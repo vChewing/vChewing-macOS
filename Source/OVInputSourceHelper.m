@@ -32,7 +32,6 @@
 {
     CFArrayRef list = TISCreateInputSourceList(NULL, true);
     return (__bridge NSArray *)list;
-//    return [NSMakeCollectable(list) autorelease];
 }
 
 + (TISInputSourceRef)inputSourceForProperty:(CFStringRef)inPropertyKey stringValue:(NSString *)inValue
