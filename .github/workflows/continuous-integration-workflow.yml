@@ -6,15 +6,10 @@ jobs:
     name: Build
     runs-on: macOS-latest
     env:
-        DEVELOPER_DIR: /Applications/Xcode_12.app/Contents/Developer
+        DEVELOPER_DIR: /Applications/Xcode_13.2.app/Contents/Developer
     steps:
       - uses: actions/checkout@v1
       - name: Clean
-        run: xcodebuild -scheme McBopomofo -configuration Release clean
-      - name: Clean
-        run: xcodebuild -scheme McBopomofoInstaller -configuration Release clean
+        run: make clean
       - name: Build
-        run: xcodebuild -scheme McBopomofo -configuration Release build
-      - name: Build
-        run: xcodebuild -scheme McBopomofoInstaller -configuration Release build
-
+        run: git pull --all && git submodule sync; make update; make

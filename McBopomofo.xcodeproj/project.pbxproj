@@ -50,6 +50,7 @@
 		6AFF97F3253B299E007F1C49 /* OVNonModalAlertWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AFF97F1253B299E007F1C49 /* OVNonModalAlertWindowController.m */; };
 		D427A9C125ED28CC005D43E0 /* OpenCCBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */; };
 		D48550A325EBE689006A204C /* OpenCC in Frameworks */ = {isa = PBXBuildFile; productRef = D48550A225EBE689006A204C /* OpenCC */; };
+
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -190,7 +191,7 @@
 		6A38BBFB15FC117A00A8A51F /* phrase.occ */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = phrase.occ; sourceTree = "<group>"; };
 		6A38BBFC15FC117A00A8A51F /* PhraseFreq.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PhraseFreq.txt; sourceTree = "<group>"; };
 		6A38BBFD15FC117A00A8A51F /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
-		6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = InputMethodKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/InputMethodKit.framework; sourceTree = DEVELOPER_DIR; };
+		6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = InputMethodKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/InputMethodKit.framework; sourceTree = DEVELOPER_DIR; };
 		6ACA41CB15FC1D7500935EF6 /* McBopomofoInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = McBopomofoInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ACA41E815FC1D9000935EF6 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Source/Installer/AppDelegate.h; sourceTree = SOURCE_ROOT; };
 		6ACA41E915FC1D9000935EF6 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Source/Installer/AppDelegate.m; sourceTree = SOURCE_ROOT; };
@@ -287,8 +288,6 @@
 				6A0D4ECA15FC0D6400ABF4B3 /* OVInputSourceHelper.m */,
 				6A0D4ECB15FC0D6400ABF4B3 /* PreferencesWindowController.h */,
 				6A0D4ECC15FC0D6400ABF4B3 /* PreferencesWindowController.m */,
-				6A0D4ECD15FC0D6400ABF4B3 /* UpdateNotificationController.h */,
-				6A0D4ECE15FC0D6400ABF4B3 /* UpdateNotificationController.m */,
 				6AE30A471F7F40B7008735BD /* UserOverrideModel.cpp */,
 				6AE30A481F7F40B7008735BD /* UserOverrideModel.h */,
 				D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */,
@@ -570,7 +569,7 @@
 			);
 			mainGroup = 6A0D4E9215FC0CFA00ABF4B3;
 			packageReferences = (
-				D48550A125EBE689006A204C /* XCRemoteSwiftPackageReference "SwiftyOpenCC" */,
+				D48550A125EBE689006A204C /* XCRemoteSwiftPackageReference "SwiftyLibreCC" */,
 			);
 			productRefGroup = 6A0D4EA315FC0D2D00ABF4B3 /* Products */;
 			projectDirPath = "";
@@ -1133,9 +1132,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		D48550A125EBE689006A204C /* XCRemoteSwiftPackageReference "SwiftyOpenCC" */ = {
+		D48550A125EBE689006A204C /* XCRemoteSwiftPackageReference "SwiftyLibreCC" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ddddxxx/SwiftyOpenCC.git";
+			repositoryURL = "https://dev.azure.com/ShikiSuen/vChewing/_git/SwiftyLibreCC";
 			requirement = {
 				kind = revision;
 				revision = 1d8105a0f7199c90af722bff62728050c858e777;
@@ -1146,7 +1145,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		D48550A225EBE689006A204C /* OpenCC */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = D48550A125EBE689006A204C /* XCRemoteSwiftPackageReference "SwiftyOpenCC" */;
+			package = D48550A125EBE689006A204C /* XCRemoteSwiftPackageReference "SwiftyLibreCC" */;
 			productName = OpenCC;
 		};
 /* End XCSwiftPackageProductDependency section */
