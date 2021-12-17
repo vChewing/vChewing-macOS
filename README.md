@@ -1,14 +1,31 @@
-# OpenVanilla McBopomofo 小麥注音輸入法
+# vChewing 威注音输入法
 
-## 開發流程
+威注音输入法由小麦注音分支而来（且词库内已经移除任何可以妨碍该输入法在世界上任何地方传播的内容），是原生简体中文注音输入法：相比中州韵（鼠须管）而言，威注音能够做到真正的大千声韵并击。
 
-用 Xcode 開啟 `McBopomofo.xcodeproj`，選 "McBopomofo Installer" target，build 完之後直接執行該安裝程式，就可以安裝小麥注音。
+威注音分支专案及威注音词库由孙志贵（Shiki Suen）维护。小麦注音官方原始仓库內的词库的内容均与孙志贵无关。
 
-第一次安裝完，日後程式碼或詞庫有任何修改，只要重複上述流程，再次安裝小麥注音即可。
+## 建置流程
 
-要注意的是 macOS 可能會限制同一次 login session 能 kill 同一個輸入法 process 的次數（安裝程式透過 kill input method process 來讓新版的輸入法生效）。如果安裝若干次後，發現程式修改的結果並沒有出現，或甚至輸入法已無法再選用，只要登出目前帳號再重新登入即可。
+系统需求：至少 macOS 10.12 Sierra。
 
-## 軟體授權
+安装 Xcode 之后，请先配置 Xcode 允许其直接构建在专案所在的资料夹下的 build 资料夹内。步骤：
+```
+「Xcode」->「Preferences...」->「Locations」；
+「File」->「Project/WorkspaceSettings...」->「Advanced」；
+选「Custom」->「Relative to Workspace」即可。不选的话，make 的过程会出错。
+```
+在终端机内定位到威注音的克隆本地专案的本地仓库的目录之后，执行 `make update` 以获取最新词库，在成功之后执行 `make` 即可组建。再执行 `make install` 可以触发威注音的安装程式。
 
-本專案採用 MIT License 釋出，使用者可自由使用、散播本軟體，惟散播時必須完整保留版權聲明及軟體授權（[詳全文](https://github.com/openvanilla/McBopomofo/blob/master/LICENSE.txt)）。
+第一次安装完，日后程式码或词库有任何修改，只要重复上述流程，再次安装威注音即可。
 
+要注意的是 macOS 可能会限制同一次 login session 能终结同一个输入法的执行进程的次数（安装程式透过 kill input method process 来让新版的输入法生效）。如果安装若干次后，发现程式修改的结果并没有出现、或甚至输入法已无法再选用，只需要登出目前的 macOS 系统帐号、再重新登入即可。
+
+补记: 该输入法是在 2021 年 11 月初「28ae7deb4092f067539cff600397292e66a5dd56」这一版小麦注音建置的基础上完成的。因为在清洗词库的时候清洗了全部的 git commit 历史，所以无法自动从小麦注音官方仓库上游继承任何改动，只能手动同步任何在此之后的程式修正。最近一次同步參照是「f7a24862c4e1733a2264b56e434d1a449325d769」。除此以外，还引入了 MJHsieh 制作（却尚未正式给小麦注音实装）的「临时记忆最近的部分选字词」的功能（该记忆有自己的忘却衰减曲线，且记忆的词汇会在每次重新开机时自动忘却。）。
+
+## 应用授权
+
+小麦注音引擎程式版权：© 2011-2021 OpenVanilla 专案团队（Mengjuei Hsieh 等人）。
+
+威注音词库由孙志贵维护，亦以 MIT 授权释出。
+
+本专案采用 MIT License 释出，使用者可自由使用、散播本软体，惟散播时必须完整保留版权声明及软体授权（[详全文 LICENSE.txt](https://github.com/openvanilla/McBopomofo/blob/master/LICENSE.txt)）。

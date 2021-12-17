@@ -24,7 +24,7 @@
 	<dict>
 		<key>tsInputModeListKey</key>
 		<dict>
-			<key>org.openvanilla.inputmethod.McBopomofo.Bopomofo</key>
+			<key>org.openvanilla.inputmethod.vChewing.Bopomofo</key>
 			<dict>
 				<key>TISDoubleSpaceSubstitution</key>
 				<string>。</string>
@@ -32,6 +32,7 @@
 				<string>Bopomofo.tiff</string>
 				<key>tsInputModeCharacterRepertoireKey</key>
 				<array>
+					<string>Hans</string>
 					<string>Hant</string>
 					<string>Han</string>
 				</array>
@@ -50,7 +51,7 @@
 				<key>tsInputModeScriptKey</key>
 				<string>smTradChinese</string>
                 <key>TISIntendedLanguage</key>
-                <string>zh-Hant</string>
+                <string>zh-Hans</string>
                 <key>tsInputModeCharacterRepertoireKey</key>
                 <array>
                     <string>Hant</string>
@@ -59,7 +60,7 @@
                 <key>tsInputModeKeyEquivalentModifiersKey</key>
                 <integer>4608</integer>
 			</dict>
-			<key>org.openvanilla.inputmethod.McBopomofo.PlainBopomofo</key>
+			<key>org.openvanilla.inputmethod.vChewing.PlainBopomofo</key>
 			<dict>
 				<key>TISDoubleSpaceSubstitution</key>
 				<string>。</string>
@@ -67,6 +68,7 @@
 				<string>PlainBopomofo.tiff</string>
 				<key>tsInputModeCharacterRepertoireKey</key>
 				<array>
+					<string>Hans</string>
 					<string>Hant</string>
 					<string>Han</string>
 				</array>
@@ -85,7 +87,7 @@
 				<key>tsInputModeScriptKey</key>
 				<string>smTradChinese</string>
                 <key>TISIntendedLanguage</key>
-                <string>zh-Hant</string>
+                <string>zh-Hans</string>
                 <key>tsInputModeCharacterRepertoireKey</key>
                 <array>
                     <string>Hant</string>
@@ -97,16 +99,16 @@
 		</dict>
 		<key>tsVisibleInputModeOrderedArrayKey</key>
 		<array>
-			<string>org.openvanilla.inputmethod.McBopomofo.Bopomofo</string>
-			<string>org.openvanilla.inputmethod.McBopomofo.PlainBopomofo</string>
+			<string>org.openvanilla.inputmethod.vChewing.Bopomofo</string>
+			<string>org.openvanilla.inputmethod.vChewing.PlainBopomofo</string>
 		</array>
 	</dict>
 	<key>InputMethodConnectionName</key>
-	<string>McBopomofo_1_Connection</string>
+	<string>vChewing_1_Connection</string>
 	<key>InputMethodServerControllerClass</key>
-	<string>McBopomofoInputMethodController</string>
+	<string>vChewingInputMethodController</string>
 	<key>InputMethodServerDelegateClass</key>
-	<string>McBopomofoInputMethodController</string>
+	<string>vChewingInputMethodController</string>
 	<key>InputMethodServerPreferencesWindowControllerClass</key>
 	<string>PreferencesWindowController</string>
 	<key>LSApplicationCategoryType</key>
@@ -126,19 +128,20 @@
 	<key>TICapsLockLanguageSwitchCapable</key>
 	<true/>
 	<key>TISInputSourceID</key>
-	<string>org.openvanilla.inputmethod.McBopomofo</string>
+	<string>org.openvanilla.inputmethod.vChewing</string>
 	<key>TISIntendedLanguage</key>
-	<string>zh-Hant</string>
+	<string>zh-Hans</string>
 	<key>TISParticipatesInTouchBar</key>
 	<false/>
 	<key>UpdateInfoEndpoint</key>
-	<string>https://mcbopomofo.openvanilla.org/updates/Info.plist</string>
+	<string>https://vchewing.openvanilla.org/updates/Info.plist</string>
 	<key>UpdateInfoSite</key>
-	<string>https://mcbopomofo.openvanilla.org/</string>
+	<string>https://vchewing.openvanilla.org/</string>
 	<key>tsInputMethodCharacterRepertoireKey</key>
 	<array>
-		<string>Hant</string>
 		<string>Hans</string>
+		<string>Hant</string>
+		<string>Han</string>
 	</array>
 	<key>tsInputMethodIconFileKey</key>
 	<string>Bopomofo.tiff</string>

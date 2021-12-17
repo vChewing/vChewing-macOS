@@ -57,7 +57,7 @@
     self = [self initWithWindow:panel];
     if (self) {
         contentRect.origin = NSMakePoint(0.0, 0.0);
-        _candidateView = [[VTHorizontalCandidateView alloc] initWithFrame:contentRect];        
+        _candidateView = [[VTHorizontalCandidateView alloc] initWithFrame:contentRect];
         _candidateView.target = self;
         _candidateView.action = @selector(candidateViewMouseDidClick:);
         [[panel contentView] addSubview:_candidateView];
@@ -151,7 +151,7 @@
 
 - (void)setSelectedCandidateIndex:(NSUInteger)newIndex
 {
-    NSUInteger keyLabelCount = [_keyLabels count];    
+    NSUInteger keyLabelCount = [_keyLabels count];
     if (newIndex < [_delegate candidateCountForController:self]) {
         _currentPage = newIndex / keyLabelCount;
         _candidateView.highlightedIndex = newIndex % keyLabelCount;
@@ -175,7 +175,7 @@
     
     NSMutableArray *candidates = [NSMutableArray array];
     NSUInteger count = [_delegate candidateCountForController:self];
-    NSUInteger keyLabelCount = [_keyLabels count];    
+    NSUInteger keyLabelCount = [_keyLabels count];
     for (NSUInteger index = _currentPage * keyLabelCount, j = 0; index < count && j < keyLabelCount; index++, j++) {
         [candidates addObject:[_delegate candidateController:self candidateAtIndex:index]];
     }

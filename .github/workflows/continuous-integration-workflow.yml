@@ -6,7 +6,8 @@ jobs:
     name: Build
     runs-on: macOS-latest
     env:
-        DEVELOPER_DIR: /Applications/Xcode_13.2.app/Contents/Developer
+        GIT_SSL_NO_VERIFY: true
+        DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
     steps:
       - uses: actions/checkout@v1
       - name: Clean

@@ -140,7 +140,7 @@
 │   ├── Bopomofo@2x.tiff
 │   ├── BopomofoTextMenu.tiff
 │   ├── BopomofoTextMenu@2x.tiff
-│   ├── McBopomofo.iconset
+│   ├── vChewing.iconset
 │   │   ├── icon_128x128.png
 │   │   ├── icon_128x128@2x.png
 │   │   ├── icon_16x16.png
@@ -169,13 +169,18 @@
 │   │   ├── Localizable.strings
 │   │   └── MainMenu.xib
 │   ├── main.m
+│   ├── zh-Hans.lproj
+│   │   ├── InfoPlist.strings
+│   │   ├── License.rtf
+│   │   ├── Localizable.strings
+│   │   └── MainMenu.xib
 │   └── zh-Hant.lproj
 │       ├── InfoPlist.strings
 │       ├── License.rtf
 │       ├── Localizable.strings
 │       └── MainMenu.xib
-├── McBopomofo-Info.plist
-├── McBopomofo-Prefix.pch
+├── vChewing-Info.plist
+├── vChewing-Prefix.pch
 ├── OVInputSourceHelper.h
 ├── OVInputSourceHelper.m
 ├── PreferencesWindowController.h
@@ -187,6 +192,12 @@
 ├── UpdateNotificationController.h
 ├── UpdateNotificationController.m
 ├── en.lproj
+│   ├── InfoPlist.strings
+│   ├── Localizable.strings
+│   ├── MainMenu.xib
+│   ├── UpdateNotificationController.xib
+│   └── preferences.xib
+├── zh-Hans.lproj
 │   ├── InfoPlist.strings
 │   ├── Localizable.strings
 │   ├── MainMenu.xib
