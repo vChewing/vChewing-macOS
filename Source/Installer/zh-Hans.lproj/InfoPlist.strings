@@ -1,4 +1,5 @@
 /* Localized versions of Info.plist keys */
 
-CFBundleName = "Install vChewing";
+CFBundleName = "安装威注音";
 NSHumanReadableCopyright = "Copyright © 2011-2021 Mengjuei Hsieh et al.\nAll Rights Reserved.";
+

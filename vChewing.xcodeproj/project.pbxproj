@@ -41,16 +41,14 @@
 		6ACA41FC15FC1D9000935EF6 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EE15FC1D9000935EF6 /* Localizable.strings */; };
 		6ACA41FD15FC1D9000935EF6 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41F015FC1D9000935EF6 /* MainMenu.xib */; };
 		6ACA41FF15FC1D9000935EF6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ACA41F415FC1D9000935EF6 /* main.m */; };
-		6ACA420215FC1E5200935EF6 /* McBopomofo.app in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */; };
+		6ACA420215FC1E5200935EF6 /* vChewing.app in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */; };
 		6AD7CBC815FE555000691B5B /* data-plain-bpmf.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */; };
 		6AE210B215FC63CC003659FE /* PlainBopomofo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6AE210B015FC63CC003659FE /* PlainBopomofo.tiff */; };
 		6AE210B315FC63CC003659FE /* PlainBopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6AE210B115FC63CC003659FE /* PlainBopomofo@2x.tiff */; };
-		6AE30A491F7F40B7008735BD /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6AE30A471F7F40B7008735BD /* UserOverrideModel.cpp */; };
 		6AFF97F2253B299E007F1C49 /* OVNonModalAlertWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6AFF97F0253B299E007F1C49 /* OVNonModalAlertWindowController.xib */; };
 		6AFF97F3253B299E007F1C49 /* OVNonModalAlertWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AFF97F1253B299E007F1C49 /* OVNonModalAlertWindowController.m */; };
 		D427A9C125ED28CC005D43E0 /* OpenCCBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */; };
 		D48550A325EBE689006A204C /* OpenCC in Frameworks */ = {isa = PBXBuildFile; productRef = D48550A225EBE689006A204C /* OpenCC */; };
-
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,14 +64,22 @@
 			containerPortal = 6A0D4E9415FC0CFA00ABF4B3 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 6A0D4EA115FC0D2D00ABF4B3;
-			remoteInfo = McBopomofo;
+			remoteInfo = vChewing;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5B9781D32763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		5B9781D42763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = "zh-Hans"; path = "zh-Hans.lproj/License.rtf"; sourceTree = "<group>"; };
+		5B9781D52763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		5B9781D62763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.xib"; sourceTree = "<group>"; };
+		5B9781D72763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Source/zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		5B9781D82763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Source/zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		5B9781D92763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.xib"; sourceTree = "<group>"; };
+		5B9781DA2763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hans"; path = "Source/zh-Hans.lproj/preferences.xib"; sourceTree = "<group>"; };
 		6A0421A615FEF3F50061ED63 /* FastLM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FastLM.cpp; sourceTree = "<group>"; };
 		6A0421A715FEF3F50061ED63 /* FastLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FastLM.h; sourceTree = "<group>"; };
-		6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = McBopomofo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		6A0D4EA915FC0D2D00ABF4B3 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		6A0D4EAB15FC0D2D00ABF4B3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -100,8 +106,8 @@
 		6A0D4EE415FC0DA600ABF4B3 /* VTVerticalKeyLabelStripView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VTVerticalKeyLabelStripView.m; sourceTree = "<group>"; };
 		6A0D4EEF15FC0DA600ABF4B3 /* Bopomofo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Bopomofo.tiff; sourceTree = "<group>"; };
 		6A0D4EF015FC0DA600ABF4B3 /* Bopomofo@2x.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "Bopomofo@2x.tiff"; sourceTree = "<group>"; };
-		6A0D4EF515FC0DA600ABF4B3 /* McBopomofo-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "McBopomofo-Info.plist"; sourceTree = "<group>"; };
-		6A0D4EF615FC0DA600ABF4B3 /* McBopomofo-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "McBopomofo-Prefix.pch"; sourceTree = "<group>"; };
+		6A0D4EF515FC0DA600ABF4B3 /* vChewing-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "vChewing-Info.plist"; sourceTree = "<group>"; };
+		6A0D4EF615FC0DA600ABF4B3 /* vChewing-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vChewing-Prefix.pch"; sourceTree = "<group>"; };
 		6A0D4F1415FC0EB100ABF4B3 /* Bigram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bigram.h; sourceTree = "<group>"; };
 		6A0D4F1515FC0EB100ABF4B3 /* BlockReadingBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockReadingBuilder.h; sourceTree = "<group>"; };
 		6A0D4F1615FC0EB100ABF4B3 /* Gramambular.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Gramambular.h; sourceTree = "<group>"; };
@@ -192,7 +198,7 @@
 		6A38BBFC15FC117A00A8A51F /* PhraseFreq.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PhraseFreq.txt; sourceTree = "<group>"; };
 		6A38BBFD15FC117A00A8A51F /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = InputMethodKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/InputMethodKit.framework; sourceTree = DEVELOPER_DIR; };
-		6ACA41CB15FC1D7500935EF6 /* McBopomofoInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = McBopomofoInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6ACA41CB15FC1D7500935EF6 /* vChewingInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ACA41E815FC1D9000935EF6 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Source/Installer/AppDelegate.h; sourceTree = SOURCE_ROOT; };
 		6ACA41E915FC1D9000935EF6 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Source/Installer/AppDelegate.m; sourceTree = SOURCE_ROOT; };
 		6ACA41EB15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -208,12 +214,10 @@
 		6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "data-plain-bpmf.txt"; sourceTree = "<group>"; };
 		6AE210B015FC63CC003659FE /* PlainBopomofo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = PlainBopomofo.tiff; sourceTree = "<group>"; };
 		6AE210B115FC63CC003659FE /* PlainBopomofo@2x.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "PlainBopomofo@2x.tiff"; sourceTree = "<group>"; };
-		6AE30A471F7F40B7008735BD /* UserOverrideModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UserOverrideModel.cpp; sourceTree = "<group>"; };
-		6AE30A481F7F40B7008735BD /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserOverrideModel.h; sourceTree = "<group>"; };
 		6AFF97EF253B299E007F1C49 /* OVNonModalAlertWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVNonModalAlertWindowController.h; sourceTree = "<group>"; };
 		6AFF97F0253B299E007F1C49 /* OVNonModalAlertWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OVNonModalAlertWindowController.xib; sourceTree = "<group>"; };
 		6AFF97F1253B299E007F1C49 /* OVNonModalAlertWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OVNonModalAlertWindowController.m; sourceTree = "<group>"; };
-		D427A9BF25ED28CC005D43E0 /* McBopomofo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "McBopomofo-Bridging-Header.h"; sourceTree = "<group>"; };
+		D427A9BF25ED28CC005D43E0 /* vChewing-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vChewing-Bridging-Header.h"; sourceTree = "<group>"; };
 		D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenCCBridge.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -251,8 +255,8 @@
 		6A0D4EA315FC0D2D00ABF4B3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */,
-				6ACA41CB15FC1D7500935EF6 /* McBopomofoInstaller.app */,
+				6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */,
+				6ACA41CB15FC1D7500935EF6 /* vChewingInstaller.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -281,17 +285,17 @@
 				6A0D4EC615FC0D6400ABF4B3 /* InputMethodController.h */,
 				6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */,
 				6A0D4EC815FC0D6400ABF4B3 /* main.m */,
-				6A0D4EF615FC0DA600ABF4B3 /* McBopomofo-Prefix.pch */,
+				6A0D4EF615FC0DA600ABF4B3 /* vChewing-Prefix.pch */,
 				6AFF97EF253B299E007F1C49 /* OVNonModalAlertWindowController.h */,
 				6AFF97F1253B299E007F1C49 /* OVNonModalAlertWindowController.m */,
 				6A0D4EC915FC0D6400ABF4B3 /* OVInputSourceHelper.h */,
 				6A0D4ECA15FC0D6400ABF4B3 /* OVInputSourceHelper.m */,
 				6A0D4ECB15FC0D6400ABF4B3 /* PreferencesWindowController.h */,
 				6A0D4ECC15FC0D6400ABF4B3 /* PreferencesWindowController.m */,
+				D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */,
+				D427A9BF25ED28CC005D43E0 /* vChewing-Bridging-Header.h */,
 				6AE30A471F7F40B7008735BD /* UserOverrideModel.cpp */,
 				6AE30A481F7F40B7008735BD /* UserOverrideModel.h */,
-				D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */,
-				D427A9BF25ED28CC005D43E0 /* McBopomofo-Bridging-Header.h */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -410,7 +414,7 @@
 			children = (
 				6AFF97F0253B299E007F1C49 /* OVNonModalAlertWindowController.xib */,
 				6A0D4EEE15FC0DA600ABF4B3 /* Images */,
-				6A0D4EF515FC0DA600ABF4B3 /* McBopomofo-Info.plist */,
+				6A0D4EF515FC0DA600ABF4B3 /* vChewing-Info.plist */,
 				6A0D4F4815FC0EE100ABF4B3 /* InfoPlist.strings */,
 				6A0D4F4A15FC0EE100ABF4B3 /* Localizable.strings */,
 				6A187E2816004C5900466B2E /* MainMenu.xib */,
@@ -490,7 +494,7 @@
 /* Begin PBXLegacyTarget section */
 		6A38BC2115FC12FD00A8A51F /* Data */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "$(ACTION)";
+			buildArgumentsString = "$(ACTION) CHSBuild";
 			buildConfigurationList = 6A38BC2215FC12FD00A8A51F /* Build configuration list for PBXLegacyTarget "Data" */;
 			buildPhases = (
 			);
@@ -505,9 +509,9 @@
 /* End PBXLegacyTarget section */
 
 /* Begin PBXNativeTarget section */
-		6A0D4EA115FC0D2D00ABF4B3 /* McBopomofo */ = {
+		6A0D4EA115FC0D2D00ABF4B3 /* vChewing */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6A0D4EC015FC0D2E00ABF4B3 /* Build configuration list for PBXNativeTarget "McBopomofo" */;
+			buildConfigurationList = 6A0D4EC015FC0D2E00ABF4B3 /* Build configuration list for PBXNativeTarget "vChewing" */;
 			buildPhases = (
 				6A0D4E9E15FC0D2D00ABF4B3 /* Sources */,
 				6A0D4E9F15FC0D2D00ABF4B3 /* Frameworks */,
@@ -518,17 +522,17 @@
 			dependencies = (
 				6A38BC2615FC131100A8A51F /* PBXTargetDependency */,
 			);
-			name = McBopomofo;
+			name = vChewing;
 			packageProductDependencies = (
 				D48550A225EBE689006A204C /* OpenCC */,
 			);
-			productName = McBopomofo;
-			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */;
+			productName = vChewing;
+			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */;
 			productType = "com.apple.product-type.application";
 		};
-		6ACA41CA15FC1D7500935EF6 /* McBopomofoInstaller */ = {
+		6ACA41CA15FC1D7500935EF6 /* vChewingInstaller */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6ACA41E415FC1D7600935EF6 /* Build configuration list for PBXNativeTarget "McBopomofoInstaller" */;
+			buildConfigurationList = 6ACA41E415FC1D7600935EF6 /* Build configuration list for PBXNativeTarget "vChewingInstaller" */;
 			buildPhases = (
 				6ACA41C715FC1D7500935EF6 /* Sources */,
 				6ACA41C815FC1D7500935EF6 /* Frameworks */,
@@ -540,9 +544,9 @@
 			dependencies = (
 				6ACA420115FC1DCC00935EF6 /* PBXTargetDependency */,
 			);
-			name = McBopomofoInstaller;
-			productName = McBopomofoInstaller;
-			productReference = 6ACA41CB15FC1D7500935EF6 /* McBopomofoInstaller.app */;
+			name = vChewingInstaller;
+			productName = vChewingInstaller;
+			productReference = 6ACA41CB15FC1D7500935EF6 /* vChewingInstaller.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -558,7 +562,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 6A0D4E9715FC0CFA00ABF4B3 /* Build configuration list for PBXProject "McBopomofo" */;
+			buildConfigurationList = 6A0D4E9715FC0CFA00ABF4B3 /* Build configuration list for PBXProject "vChewing" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -566,6 +570,7 @@
 				en,
 				"zh-Hant",
 				Base,
+				"zh-Hans",
 			);
 			mainGroup = 6A0D4E9215FC0CFA00ABF4B3;
 			packageReferences = (
@@ -575,8 +580,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				6A0D4EA115FC0D2D00ABF4B3 /* McBopomofo */,
-				6ACA41CA15FC1D7500935EF6 /* McBopomofoInstaller */,
+				6A0D4EA115FC0D2D00ABF4B3 /* vChewing */,
+				6ACA41CA15FC1D7500935EF6 /* vChewingInstaller */,
 				6A38BC2115FC12FD00A8A51F /* Data */,
 			);
 		};
@@ -606,7 +611,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6ACA420215FC1E5200935EF6 /* McBopomofo.app in Resources */,
+				6ACA420215FC1E5200935EF6 /* vChewing.app in Resources */,
 				6A2E40F9253A6AA000D1AE1D /* Images.xcassets in Resources */,
 				6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */,
 				6A225A1F23679F2600F685C6 /* NotarizedArchives in Resources */,
@@ -653,7 +658,6 @@
 				6A0D4F0015FC0DA600ABF4B3 /* VTHorizontalCandidateView.m in Sources */,
 				6AFF97F3253B299E007F1C49 /* OVNonModalAlertWindowController.m in Sources */,
 				6A0D4F0115FC0DA600ABF4B3 /* VTVerticalCandidateController.m in Sources */,
-				6AE30A491F7F40B7008735BD /* UserOverrideModel.cpp in Sources */,
 				6A0D4F0215FC0DA600ABF4B3 /* VTVerticalCandidateTableView.m in Sources */,
 				6A0D4F0315FC0DA600ABF4B3 /* VTVerticalKeyLabelStripView.m in Sources */,
 				D427A9C125ED28CC005D43E0 /* OpenCCBridge.swift in Sources */,
@@ -683,7 +687,7 @@
 		};
 		6ACA420115FC1DCC00935EF6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 6A0D4EA115FC0D2D00ABF4B3 /* McBopomofo */;
+			target = 6A0D4EA115FC0D2D00ABF4B3 /* vChewing */;
 			targetProxy = 6ACA420015FC1DCC00935EF6 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -694,6 +698,7 @@
 			children = (
 				6A0D4F4915FC0EE100ABF4B3 /* en */,
 				6A0D4F5415FC0EF900ABF4B3 /* zh-Hant */,
+				5B9781D72763850700897999 /* zh-Hans */,
 			);
 			name = InfoPlist.strings;
 			path = ..;
@@ -704,6 +709,7 @@
 			children = (
 				6A0D4F4B15FC0EE100ABF4B3 /* en */,
 				6A0D4F5515FC0EF900ABF4B3 /* zh-Hant */,
+				5B9781D82763850700897999 /* zh-Hans */,
 			);
 			name = Localizable.strings;
 			path = ..;
@@ -714,6 +720,7 @@
 			children = (
 				6A0D4F5615FC0EF900ABF4B3 /* zh-Hant */,
 				6A15B32721A51F2300B92CD3 /* Base */,
+				5B9781DA2763850700897999 /* zh-Hans */,
 			);
 			name = preferences.xib;
 			path = ..;
@@ -724,6 +731,7 @@
 			children = (
 				6A187E2916004C7300466B2E /* zh-Hant */,
 				6A15B32521A51F2300B92CD3 /* Base */,
+				5B9781D92763850700897999 /* zh-Hans */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -733,6 +741,7 @@
 			children = (
 				6ACA41EB15FC1D9000935EF6 /* en */,
 				6ACA41F515FC1D9000935EF6 /* zh-Hant */,
+				5B9781D32763850700897999 /* zh-Hans */,
 			);
 			name = InfoPlist.strings;
 			path = Source/Installer;
@@ -743,6 +752,7 @@
 			children = (
 				6ACA41ED15FC1D9000935EF6 /* en */,
 				6ACA41F615FC1D9000935EF6 /* zh-Hant */,
+				5B9781D42763850700897999 /* zh-Hans */,
 			);
 			name = License.rtf;
 			path = Source/Installer;
@@ -753,6 +763,7 @@
 			children = (
 				6ACA41EF15FC1D9000935EF6 /* en */,
 				6ACA41F715FC1D9000935EF6 /* zh-Hant */,
+				5B9781D52763850700897999 /* zh-Hans */,
 			);
 			name = Localizable.strings;
 			path = Source/Installer;
@@ -763,6 +774,7 @@
 			children = (
 				6ACA41F815FC1D9000935EF6 /* zh-Hant */,
 				6A15B32421A51F2300B92CD3 /* Base */,
+				5B9781D62763850700897999 /* zh-Hans */,
 			);
 			name = MainMenu.xib;
 			path = Source/Installer;
@@ -872,7 +884,7 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Source/McBopomofo-Prefix.pch";
+				GCC_PREFIX_HEADER = "Source/vChewing-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -893,17 +905,17 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_LABEL = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = "Source/McBopomofo-Info.plist";
+				INFOPLIST_FILE = "Source/vChewing-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = org.openvanilla.inputmethod.McBopomofo;
+				PRODUCT_BUNDLE_IDENTIFIER = org.openvanilla.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_OBJC_BRIDGING_HEADER = "Source/McBopomofo-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Source/vChewing-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = app;
@@ -931,7 +943,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Source/McBopomofo-Prefix.pch";
+				GCC_PREFIX_HEADER = "Source/vChewing-Prefix.pch";
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
@@ -947,16 +959,16 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_LABEL = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = "Source/McBopomofo-Info.plist";
+				INFOPLIST_FILE = "Source/vChewing-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				PRODUCT_BUNDLE_IDENTIFIER = org.openvanilla.inputmethod.McBopomofo;
+				PRODUCT_BUNDLE_IDENTIFIER = org.openvanilla.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_OBJC_BRIDGING_HEADER = "Source/McBopomofo-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Source/vChewing-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1051,7 +1063,7 @@
 				INFOPLIST_FILE = "Source/Installer/Installer-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.openvanilla.McBopomofo.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.openvanilla.vChewing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
@@ -1083,7 +1095,7 @@
 				HEADER_SEARCH_PATHS = ../;
 				INFOPLIST_FILE = "Source/Installer/Installer-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.openvanilla.McBopomofo.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.openvanilla.vChewing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
@@ -1093,7 +1105,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		6A0D4E9715FC0CFA00ABF4B3 /* Build configuration list for PBXProject "McBopomofo" */ = {
+		6A0D4E9715FC0CFA00ABF4B3 /* Build configuration list for PBXProject "vChewing" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6A0D4E9915FC0CFA00ABF4B3 /* Debug */,
@@ -1102,7 +1114,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6A0D4EC015FC0D2E00ABF4B3 /* Build configuration list for PBXNativeTarget "McBopomofo" */ = {
+		6A0D4EC015FC0D2E00ABF4B3 /* Build configuration list for PBXNativeTarget "vChewing" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6A0D4EBE15FC0D2E00ABF4B3 /* Debug */,
@@ -1120,7 +1132,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6ACA41E415FC1D7600935EF6 /* Build configuration list for PBXNativeTarget "McBopomofoInstaller" */ = {
+		6ACA41E415FC1D7600935EF6 /* Build configuration list for PBXNativeTarget "vChewingInstaller" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6ACA41E515FC1D7600935EF6 /* Debug */,

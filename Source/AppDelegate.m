@@ -1,7 +1,7 @@
 //
 // AppDelegate.m
 //
-// Copyright (c) 2011 The McBopomofo Project.
+// Copyright (c) 2021 The vChewing Project.
 //
 // Contributors:
 //     Mengjuei Hsieh (@mjhsieh)
@@ -156,7 +156,7 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 
 - (void)showNoUpdateAvailableAlert
 {
-    [[OVNonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Check for Update Completed", nil) content:NSLocalizedString(@"You are already using the latest version of McBopomofo.", nil) confirmButtonTitle:NSLocalizedString(@"OK", nil) cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
+    [[OVNonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Check for Update Completed", nil) content:NSLocalizedString(@"You are already using the latest version of vChewing.", nil) confirmButtonTitle:NSLocalizedString(@"OK", nil) cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
@@ -244,7 +244,7 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
         }
     }
 
-    NSString *content = [NSString stringWithFormat:NSLocalizedString(@"You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@", nil), [infoDict objectForKey:@"CFBundleShortVersionString"], currentVersion, [plist objectForKey:@"CFBundleShortVersionString"], remoteVersion, versionDescription];
+    NSString *content = [NSString stringWithFormat:NSLocalizedString(@"You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@", nil), [infoDict objectForKey:@"CFBundleShortVersionString"], currentVersion, [plist objectForKey:@"CFBundleShortVersionString"], remoteVersion, versionDescription];
 
     [[OVNonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"New Version Available", nil) content:content confirmButtonTitle:NSLocalizedString(@"Visit Website", nil) cancelButtonTitle:NSLocalizedString(@"Not Now", nil) cancelAsDefault:NO delegate:self];
 }

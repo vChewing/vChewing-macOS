@@ -1,0 +1,52 @@
+/* No comment provided by engineer. */
+"About vChewing…" = "关于威注音…";
+
+/* No comment provided by engineer. */
+"Clear Learning Dictionary (%ju Items)" = "清除学习辞典 (%ju 个项目)";
+
+/* No comment provided by engineer. */
+"Dump Learning Data to Console" = "将学习辞典内容输出到 Console 上";
+
+/* No comment provided by engineer. */
+"Enable Selection Learning" = "使用自动学习功能";
+
+/* No comment provided by engineer. */
+"vChewing Preferences" = "威注音偏好设定";
+
+/* No comment provided by engineer. */
+"Check Later" = "晚点再通知我";
+
+/* No comment provided by engineer. */
+"Check for Updates…" = "检查是否有新版…";
+
+/* No comment provided by engineer. */
+"Check for Update Completed" = "新版检查完毕";
+
+/* No comment provided by engineer. */
+"You are already using the latest version of vChewing." = "目前使用的已经是最新版本。";
+
+/* No comment provided by engineer. */
+"Update Check Failed" = "无法检查新版";
+
+/* No comment provided by engineer. */
+"There may be no internet connection or the server failed to respond.\n\nError message: %@" = "网路连线失败，或是伺服器没有回应。\n\n错误说明：%@";
+
+/* No comment provided by engineer. */
+"OK" = "好";
+
+/* No comment provided by engineer. */
+"Dismiss" = "关闭本视窗";
+
+/* No comment provided by engineer. */
+"New Version Available" = "有新版可下载";
+
+/* No comment provided by engineer. */
+"Not Now" = "以后再说";
+
+/* No comment provided by engineer. */
+"Visit Website" = "前往网站";
+
+/* No comment provided by engineer. */
+"You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@" = "目前使用的威注音版本是 %1$@ (%2$@)，网路上有更新版本 %3$@ (%4$@) 可供下载。是否要前往威注音网站下载新版来安装？%5$@";
+
+"Chinese Conversion" = "强制简体字输出";

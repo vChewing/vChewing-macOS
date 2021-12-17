@@ -1,5 +1,5 @@
 /* No comment provided by engineer. */
-"About McBopomofo…" = "關於小麥注音…";
+"About vChewing…" = "關於威注音…";
 
 /* No comment provided by engineer. */
 "Clear Learning Dictionary (%ju Items)" = "清除學習辭典 (%ju 個項目)";
@@ -11,7 +11,7 @@
 "Enable Selection Learning" = "使用自動學習功能";
 
 /* No comment provided by engineer. */
-"McBopomofo Preferences" = "小麥注音偏好設定";
+"vChewing Preferences" = "威注音偏好設定";
 
 /* No comment provided by engineer. */
 "Check Later" = "晚點再通知我";
@@ -23,7 +23,7 @@
 "Check for Update Completed" = "新版檢查完畢";
 
 /* No comment provided by engineer. */
-"You are already using the latest version of McBopomofo." = "目前使用的已經是最新版本。";
+"You are already using the latest version of vChewing." = "目前使用的已經是最新版本。";
 
 /* No comment provided by engineer. */
 "Update Check Failed" = "無法檢查新版";
@@ -47,6 +47,6 @@
 "Visit Website" = "前往網站";
 
 /* No comment provided by engineer. */
-"You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@" = "目前使用的小麥注音版本是 %1$@ (%2$@)，網路上有更新版本 %3$@ (%4$@) 可供下載。是否要前往小麥注音網站下載新版來安裝？%5$@";
+"You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@" = "目前使用的威注音版本是 %1$@ (%2$@)，網路上有更新版本 %3$@ (%4$@) 可供下載。是否要前往威注音網站下載新版來安裝？%5$@";
 
 "Chinese Conversion" = "輸出簡體中文";

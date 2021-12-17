@@ -1,7 +1,7 @@
 //
 // AppDelegate.m
 //
-// Copyright (c) 2011-2012 The McBopomofo Project.
+// Copyright (c) 2011-2012 The vChewing Project.
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -29,12 +29,12 @@
 #import <sys/mount.h>
 #import "OVInputSourceHelper.h"
 
-static NSString *const kTargetBin = @"McBopomofo";
+static NSString *const kTargetBin = @"vChewing";
 static NSString *const kTargetType = @"app";
-static NSString *const kTargetBundle = @"McBopomofo.app";
+static NSString *const kTargetBundle = @"vChewing.app";
 static NSString *const kDestinationPartial = @"~/Library/Input Methods/"; 
-static NSString *const kTargetPartialPath = @"~/Library/Input Methods/McBopomofo.app";
-static NSString *const kTargetFullBinPartialPath = @"~/Library/Input Methods/McBopomofo.app/Contents/MacOS/McBopomofo";
+static NSString *const kTargetPartialPath = @"~/Library/Input Methods/vChewing.app";
+static NSString *const kTargetFullBinPartialPath = @"~/Library/Input Methods/vChewing.app/Contents/MacOS/vChewing";
 
 static const NSTimeInterval kTranslocationRemovalTickInterval = 0.5;
 static const NSTimeInterval kTranslocationRemovalDeadline = 60.0;
@@ -231,13 +231,13 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
     }
 
     if (warning) {
-        RunAlertPanel(NSLocalizedString(@"Attention", nil), NSLocalizedString(@"McBopomofo is upgraded, but please log out or reboot for the new version to be fully functional.", nil),  NSLocalizedString(@"OK", nil));
+        RunAlertPanel(NSLocalizedString(@"Attention", nil), NSLocalizedString(@"vChewing is upgraded, but please log out or reboot for the new version to be fully functional.", nil),  NSLocalizedString(@"OK", nil));
     } else {
         // Only prompt a warning if pre-macOS 12. The flag is not indicative of anything meaningful due to the need of user intervention in Prefernces.app on macOS 12.
         if (!mainInputSourceEnabled && !isMacOS12OrAbove) {
             RunAlertPanel(NSLocalizedString(@"Warning", nil), NSLocalizedString(@"Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources.", nil), NSLocalizedString(@"Continue", nil));
         } else {
-            RunAlertPanel(NSLocalizedString(@"Installation Successful", nil), NSLocalizedString(@"McBopomofo is ready to use.", nil),  NSLocalizedString(@"OK", nil));
+            RunAlertPanel(NSLocalizedString(@"Installation Successful", nil), NSLocalizedString(@"vChewing is ready to use.", nil),  NSLocalizedString(@"OK", nil));
         }
     }
 

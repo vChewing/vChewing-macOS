@@ -58,14 +58,14 @@
 {
     NSRect bounds = [self bounds];
     [[NSColor whiteColor] setFill];
-    [NSBezierPath fillRect:bounds];    
+    [NSBezierPath fillRect:bounds];
 
-    NSUInteger count = [_keyLabels count];    
+    NSUInteger count = [_keyLabels count];
     if (!count) {
         return;
     }
 
-    CGFloat cellHeight = bounds.size.height / count;    
+    CGFloat cellHeight = bounds.size.height / count;
     NSColor *black = [NSColor blackColor];
     NSColor *darkGray = [NSColor colorWithDeviceWhite:0.7 alpha:1.0];
     NSColor *lightGray = [NSColor colorWithDeviceWhite:0.8 alpha:1.0];
@@ -99,6 +99,6 @@
         
         NSString *text = [_keyLabels objectAtIndex:index];
         [text drawInRect:textRect withAttributes:textAttr];
-    }    
+    }
 }
 @end

@@ -1,7 +1,7 @@
 //
 // InputMethodController.h
 //
-// Copyright (c) 2011 The McBopomofo Project.
+// Copyright (c) 2021 The vChewing Project.
 //
 // Contributors:
 //     Mengjuei Hsieh (@mjhsieh)
@@ -39,7 +39,7 @@
 #import "FastLM.h"
 #import "UserOverrideModel.h"
 
-@interface McBopomofoInputMethodController : IMKInputController
+@interface vChewingInputMethodController : IMKInputController
 {
 @private
     // the reading buffer that takes user input
@@ -55,7 +55,7 @@
     std::vector<Formosa::Gramambular::NodeAnchor> _walkedNodes;
 
     // user override model
-    McBopomofo::UserOverrideModel *_uom;
+    vChewing::UserOverrideModel *_uom;
 
     // the latest composing buffer that is updated to the foreground app
     NSMutableString *_composingBuffer;

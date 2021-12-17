@@ -1,7 +1,7 @@
 //
 // InputMethodController.m
 //
-// Copyright (c) 2011 The McBopomofo Project.
+// Copyright (c) 2021 The vChewing Project.
 //
 // Contributors:
 //     Mengjuei Hsieh (@mjhsieh)
@@ -41,7 +41,7 @@
 #import "AppDelegate.h"
 #import "VTHorizontalCandidateController.h"
 #import "VTVerticalCandidateController.h"
-#import "McBopomofo-Swift.h"
+#import "vChewing-Swift.h"
 
 //@import SwiftUI;
 
@@ -76,9 +76,9 @@ static NSString *const kCandidateListTextSizeKey = @"CandidateListTextSize";
 static NSString *const kSelectPhraseAfterCursorAsCandidatePreferenceKey = @"SelectPhraseAfterCursorAsCandidate";
 static NSString *const kUseHorizontalCandidateListPreferenceKey = @"UseHorizontalCandidateList";
 static NSString *const kComposingBufferSizePreferenceKey = @"ComposingBufferSize";
+static NSString *const kDisableUserCandidateSelectionLearning = @"DisableUserCandidateSelectionLearning";
 static NSString *const kChooseCandidateUsingSpaceKey = @"ChooseCandidateUsingSpaceKey";
 static NSString *const kChineseConversionEnabledKey = @"ChineseConversionEnabledKey";
-static NSString *const kDisableUserCandidateSelectionLearning = @"DisableUserCandidateSelectionLearning";
 
 // advanced (usually optional) settings
 static NSString *const kCandidateTextFontName = @"CandidateTextFontName";
@@ -86,8 +86,8 @@ static NSString *const kCandidateKeyLabelFontName = @"CandidateKeyLabelFontName"
 static NSString *const kCandidateKeys = @"CandidateKeys";
 
 // input modes
-static NSString *const kBopomofoModeIdentifier = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
-static NSString *const kPlainBopomofoModeIdentifier = @"org.openvanilla.inputmethod.McBopomofo.PlainBopomofo";
+static NSString *const kBopomofoModeIdentifier = @"org.openvanilla.inputmethod.vChewing.Bopomofo";
+static NSString *const kPlainBopomofoModeIdentifier = @"org.openvanilla.inputmethod.vChewing.PlainBopomofo";
 
 // key code enums
 enum {
@@ -111,16 +111,12 @@ VTCandidateController *gCurrentCandidateController = nil;
 // if DEBUG is defined, a DOT file (GraphViz format) will be written to the
 // specified path everytime the grid is walked
 #if DEBUG
-static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot";
+static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 #endif
 
 // shared language model object that stores our phrase-term probability database
 FastLM gLanguageModel;
 FastLM gLanguageModelPlainBopomofo;
-
-static const int kUserOverrideModelCapacity = 500;
-static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
-McBopomofo::UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
 // https://clang-analyzer.llvm.org/faq.html
 __attribute__((annotate("returns_localized_nsstring")))
@@ -129,14 +125,17 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 }
 
 // private methods
-@interface McBopomofoInputMethodController () <VTCandidateControllerDelegate>
+@interface vChewingInputMethodController () <VTCandidateControllerDelegate>
 + (VTHorizontalCandidateController *)horizontalCandidateController;
 + (VTVerticalCandidateController *)verticalCandidateController;
 
 - (void)collectCandidates;
 
 - (size_t)actualCandidateCursorIndex;
+- (NSString *)neighborTrigramString;
 
+- (void)_performDeferredSaveUserCandidatesDictionary;
+- (void)saveUserCandidatesDictionary;
 - (void)_showCandidateWindowUsingVerticalMode:(BOOL)useVerticalMode client:(id)client;
 
 - (void)beep;
@@ -153,37 +152,7 @@ public:
     }
 };
 
-static const double kEpsilon = 0.000001;
-
-static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) {
-    double highestScore = 0.0;
-    for (auto ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
-        double score = ni->node->highestUnigramScore();
-        if (score > highestScore) {
-            highestScore = score;
-        }
-    }
-    return highestScore + epsilon;
-}
-
-static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& candidateValue, bool fixed, double floatingNodeOverrideScore) {
-    for (auto ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
-        const vector<KeyValuePair>& candidates = (*ni).node->candidates();
-        for (size_t i = 0, c = candidates.size(); i < c; ++i) {
-            if (candidates[i].value == candidateValue) {
-                // found our node
-                if (fixed) {
-                    const_cast<Node*>((*ni).node)->selectCandidateAtIndex(i);
-                } else {
-                    const_cast<Node*>((*ni).node)->selectFloatingCandidateAtIndex(i, floatingNodeOverrideScore);
-                }
-                return;
-            }
-        }
-    }
-}
-
-@implementation McBopomofoInputMethodController
+@implementation vChewingInputMethodController
 - (void)dealloc
 {
     // clean up everything
@@ -213,13 +182,17 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
         // create the lattice builder
         _languageModel = &gLanguageModel;
         _builder = new BlockReadingBuilder(_languageModel);
-        _uom = &gUserOverrideModel;
 
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
 
         // create the composing buffer
         _composingBuffer = [[NSMutableString alloc] init];
+
+        // populate the settings, by default, DISABLE user candidate learning
+        if (![[NSUserDefaults standardUserDefaults] objectForKey:kDisableUserCandidateSelectionLearning]) {
+            [[NSUserDefaults standardUserDefaults] setObject:(id)kCFBooleanTrue forKey:kDisableUserCandidateSelectionLearning];
+        }
 
         _inputMode = kBopomofoModeIdentifier;
         _chineseConversionEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kChineseConversionEnabledKey];
@@ -232,7 +205,7 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
 {
     // a menu instance (autoreleased) is requested every time the user click on the input menu
     NSMenu *menu = [[NSMenu alloc] initWithTitle:LocalizationNotNeeded(@"Input Method Menu")];
-    NSMenuItem *preferenceMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"McBopomofo Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""];
+    NSMenuItem *preferenceMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"vChewing Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""];
     [menu addItem:preferenceMenuItem];
 
     // If Option key is pressed, show the learning-related menu
@@ -267,7 +240,7 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
     NSMenuItem *updateCheckItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""];
     [menu addItem:updateCheckItem];
 
-    NSMenuItem *aboutMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About McBopomofo…", @"") action:@selector(showAbout:) keyEquivalent:@""];
+    NSMenuItem *aboutMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About vChewing…", @"") action:@selector(showAbout:) keyEquivalent:@""];
     [menu addItem:aboutMenuItem];
 
     return menu;
@@ -720,15 +693,15 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
         // then walk the lattice
         [self popOverflowComposingTextAndWalk:client];
 
-        // get user override model suggestion
-        string overrideValue =
-            (_inputMode == kPlainBopomofoModeIdentifier) ? "" :
-                _uom->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
-        if (!overrideValue.empty()) {
-            size_t cursorIndex = [self actualCandidateCursorIndex];
-            vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
-            double highestScore = FindHighestScore(nodes, kEpsilon);
-            OverrideCandidate(nodes, overrideValue, false, highestScore);
+        // see if we need to override the selection if a learned one exists
+        if (![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning]) {
+            NSString *trigram = [self neighborTrigramString];
+
+            // Lookup from the user dict to see if the trigram fit or not
+            NSString *overrideCandidateString = [gCandidateLearningDictionary objectForKey:trigram];
+            if (overrideCandidateString) {
+                [self candidateSelected:(NSAttributedString *)overrideCandidateString];
+            }
         }
 
         // then update the text
@@ -1307,6 +1280,61 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
     return cursorIndex;
 }
 
+- (NSString *)neighborTrigramString
+{
+    // gather the "trigram" for user candidate selection learning
+
+    NSMutableArray *termArray = [NSMutableArray array];
+
+    size_t cursorIndex = [self actualCandidateCursorIndex];
+    vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
+
+    const Node* prev = 0;
+    const Node* current = 0;
+    const Node* next = 0;
+
+    size_t wni = 0;
+    size_t wnc = _walkedNodes.size();
+    size_t accuSpanningLength = 0;
+    for (wni = 0; wni < wnc; wni++) {
+        NodeAnchor& anchor = _walkedNodes[wni];
+        if (!anchor.node) {
+            continue;
+        }
+
+        accuSpanningLength += anchor.spanningLength;
+        if (accuSpanningLength >= cursorIndex) {
+            prev = current;
+            current = anchor.node;
+            break;
+        }
+
+        current = anchor.node;
+    }
+
+    if (wni + 1 < wnc) {
+        next = _walkedNodes[wni + 1].node;
+    }
+
+    string term;
+    if (prev) {
+        term = prev->currentKeyValue().key;
+        [termArray addObject:[NSString stringWithUTF8String:term.c_str()]];
+    }
+
+    if (current) {
+        term = current->currentKeyValue().key;
+        [termArray addObject:[NSString stringWithUTF8String:term.c_str()]];
+    }
+
+    if (next) {
+        term = next->currentKeyValue().key;
+        [termArray addObject:[NSString stringWithUTF8String:term.c_str()]];
+    }
+
+    return [termArray componentsJoinedByString:@"-"];
+}
+
 - (void)_performDeferredSaveUserCandidatesDictionary
 {
     BOOL __unused success = [gCandidateLearningDictionary writeToFile:gUserCandidatesDictionaryPath atomically:YES];
@@ -1330,13 +1358,13 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
     BOOL useHorizontalCandidateList = [[NSUserDefaults standardUserDefaults] boolForKey:kUseHorizontalCandidateListPreferenceKey];
 
     if (useVerticalMode) {
-        gCurrentCandidateController = [McBopomofoInputMethodController verticalCandidateController];
+        gCurrentCandidateController = [vChewingInputMethodController verticalCandidateController];
     }
     else if (useHorizontalCandidateList) {
-        gCurrentCandidateController = [McBopomofoInputMethodController horizontalCandidateController];
+        gCurrentCandidateController = [vChewingInputMethodController horizontalCandidateController];
     }
     else {
-        gCurrentCandidateController = [McBopomofoInputMethodController verticalCandidateController];
+        gCurrentCandidateController = [vChewingInputMethodController verticalCandidateController];
     }
 
     // set the attributes for the candidate panel (which uses NSAttributedString)
@@ -1467,15 +1495,17 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
 
     // candidate selected, override the node with selection
     string selectedValue = [[_candidates objectAtIndex:index] UTF8String];
-    size_t cursorIndex = [self actualCandidateCursorIndex];
 
-    if (_inputMode != kPlainBopomofoModeIdentifier) {
-        _uom->observe(_walkedNodes, cursorIndex, selectedValue, [[NSDate date] timeIntervalSince1970]);
+    if (![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning]) {
+        NSString *trigram = [self neighborTrigramString];
+        NSString *selectedNSString = [NSString stringWithUTF8String:selectedValue.c_str()];
+        [gCandidateLearningDictionary setObject:selectedNSString forKey:trigram];
+        [self saveUserCandidatesDictionary];
     }
+
+    size_t cursorIndex = [self actualCandidateCursorIndex];
     _builder->grid().fixNodeSelectedCandidate(cursorIndex, selectedValue);
 
-    vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
-    OverrideCandidate(nodes, selectedValue, true, 0.0);
     [_candidates removeAllObjects];
 
     [self walk];
@@ -1491,7 +1521,7 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
 
 static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, FastLM &lm)
 {
-    NSString *dataPath = [[NSBundle bundleForClass:[McBopomofoInputMethodController class]] pathForResource:filenameWithoutExtension ofType:@"txt"];
+    NSString *dataPath = [[NSBundle bundleForClass:[vChewingInputMethodController class]] pathForResource:filenameWithoutExtension ofType:@"txt"];
     bool result = lm.open([dataPath UTF8String]);
     if (!result) {
         NSLog(@"Failed opening language model: %@", dataPath);
@@ -1518,7 +1548,7 @@ void LTLoadLanguageModel()
     }
 
     NSString *appSupportPath = [paths objectAtIndex:0];
-    NSString *userDictPath = [appSupportPath stringByAppendingPathComponent:@"McBopomofo"];
+    NSString *userDictPath = [appSupportPath stringByAppendingPathComponent:@"vChewing"];
 
     BOOL isDir = NO;
     BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:userDictPath isDirectory:&isDir];

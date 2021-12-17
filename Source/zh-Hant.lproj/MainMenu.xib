@@ -14,10 +14,10 @@
         <customObject id="-3" userLabel="Application"/>
         <menu title="AMainMenu" systemMenu="main" id="29">
             <items>
-                <menuItem title="McBopomofo" id="56">
-                    <menu key="submenu" title="McBopomofo" systemMenu="apple" id="57">
+                <menuItem title="vChewing" id="56">
+                    <menu key="submenu" title="vChewing" systemMenu="apple" id="57">
                         <items>
-                            <menuItem title="About McBopomofo" id="58">
+                            <menuItem title="About vChewing" id="58">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="orderFrontStandardAboutPanel:" target="-2" id="142"/>
@@ -32,7 +32,7 @@
                             <menuItem isSeparatorItem="YES" id="144">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Hide McBopomofo" keyEquivalent="h" id="134">
+                            <menuItem title="Hide vChewing" keyEquivalent="h" id="134">
                                 <connections>
                                     <action selector="performClose:" target="-1" id="536"/>
                                 </connections>
