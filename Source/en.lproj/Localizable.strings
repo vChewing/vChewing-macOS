@@ -1,5 +1,5 @@
 /* No comment provided by engineer. */
-"About McBopomofo…" = "About McBopomofo…";
+"About vChewing…" = "About vChewing…";
 
 /* No comment provided by engineer. */
 "Clear Learning Dictionary (%ju Items)" = "Clear Learning Dictionary (%ju Items)";
@@ -11,7 +11,7 @@
 "Enable Selection Learning" = "Enable Selection Learning";
 
 /* No comment provided by engineer. */
-"McBopomofo Preferences" = "McBopomofo Preferences";
+"vChewing Preferences" = "vChewing Preferences";
 
 /* No comment provided by engineer. */
 "Check Later" = "Check Later";
@@ -23,7 +23,7 @@
 "Check for Update Completed" = "Check for Update Completed";
 
 /* No comment provided by engineer. */
-"You are already using the latest version of McBopomofo." = "You are already using the latest version of McBopomofo.";
+"You are already using the latest version of vChewing." = "You are already using the latest version of vChewing.";
 
 /* No comment provided by engineer. */
 "Update Check Failed" = "Update Check Failed";
@@ -47,6 +47,6 @@
 "Visit Website" = "Visit Website";
 
 /* No comment provided by engineer. */
-"You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@" = "You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@";
+"You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@" = "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@";
 
 "Chinese Conversion" = "Convert to Simplified Chinese";

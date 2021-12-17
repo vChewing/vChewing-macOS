@@ -81,7 +81,7 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
         scrollViewRect.origin.x = stripRect.size.width;
         scrollViewRect.size.width -= stripRect.size.width;
         
-        _scrollView = [[NSScrollView alloc] initWithFrame:scrollViewRect];        
+        _scrollView = [[NSScrollView alloc] initWithFrame:scrollViewRect];
         
         // >=10.7 only, elastic scroll causes some drawing issues with visible scroller, so we disable it
         if ([_scrollView respondsToSelector:@selector(setVerticalScrollElasticity:)]) {
@@ -155,7 +155,7 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
 
 - (BOOL)highlightPreviousCandidate
 {
-    return [self moveSelectionByOne:NO];    
+    return [self moveSelectionByOne:NO];
 }
 
 - (NSUInteger)candidateIndexAtKeyLabelIndex:(NSUInteger)index
@@ -224,13 +224,13 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
 {
     NSString *candidate = @"";
 
-    // rendering can occur when the delegate is already gone or data goes stale; in that case we ignore it    
+    // rendering can occur when the delegate is already gone or data goes stale; in that case we ignore it
 
     if (row < [_delegate candidateCountForController:self]) {
         candidate = [_delegate candidateController:self candidateAtIndex:row];
     }
 
-    NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:candidate attributes:[NSDictionary dictionaryWithObjectsAndKeys:_candidateFont, NSFontAttributeName, _candidateTextParagraphStyle, NSParagraphStyleAttributeName, nil]];    
+    NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:candidate attributes:[NSDictionary dictionaryWithObjectsAndKeys:_candidateFont, NSFontAttributeName, _candidateTextParagraphStyle, NSParagraphStyleAttributeName, nil]];
     
     // we do more work than what this method is expected to; normally not a good practice, but for the amount of data (9 to 10 rows max), we can afford the overhead
     
@@ -244,7 +244,7 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
     
     // keep track of the highlighted index in the key label strip
     NSUInteger count = [_keyLabels count];
-    NSInteger selectedRow = [_tableView selectedRow];    
+    NSInteger selectedRow = [_tableView selectedRow];
     if (selectedRow != -1) {
         // cast this into signed integer to make our life easier
         NSInteger newHilightIndex;
@@ -255,7 +255,7 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
         else {
             NSInteger firstVisibleRow = [_tableView rowAtPoint:[_scrollView documentVisibleRect].origin];
             
-            newHilightIndex = selectedRow - firstVisibleRow; 
+            newHilightIndex = selectedRow - firstVisibleRow;
             if (newHilightIndex < -1) {
                 newHilightIndex = -1;
             }
@@ -263,7 +263,7 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
         
         if (newHilightIndex != _keyLabelStripView.highlightedIndex && newHilightIndex >= 0) {
             _keyLabelStripView.highlightedIndex = newHilightIndex;
-            [_keyLabelStripView setNeedsDisplay:YES];            
+            [_keyLabelStripView setNeedsDisplay:YES];
         }
     }
 
@@ -273,8 +273,8 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
     NSInteger selectedRow = [_tableView selectedRow];
-    if (selectedRow != -1) {        
-        // keep track of the highlighted index in the key label strip        
+    if (selectedRow != -1) {
+        // keep track of the highlighted index in the key label strip
         NSInteger firstVisibleRow = [_tableView rowAtPoint:[_scrollView documentVisibleRect].origin];
         _keyLabelStripView.highlightedIndex = selectedRow - firstVisibleRow;
         [_keyLabelStripView setNeedsDisplay:YES];
@@ -285,7 +285,7 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
         if ([_scrollView hasVerticalScroller]) {
             [[_scrollView verticalScroller] setNeedsDisplay];
         }
-    }    
+    }
 }
 
 - (void)rowDoubleClicked:(id)sender
@@ -331,8 +331,8 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
         }
     }
     
-    self.selectedCandidateIndex = newIndex;    
-    return YES;    
+    self.selectedCandidateIndex = newIndex;
+    return YES;
 }
 
 - (BOOL)moveSelectionByOne:(BOOL)forward
@@ -360,7 +360,7 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
         newIndex--;
     }
     
-    self.selectedCandidateIndex = newIndex;    
+    self.selectedCandidateIndex = newIndex;
     return YES;
 }
                            
@@ -393,7 +393,7 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
         [_scrollView setHasVerticalScroller:YES];
 
         NSScroller *verticalScroller = [_scrollView verticalScroller];
-        [verticalScroller setControlSize:controlSize];        
+        [verticalScroller setControlSize:controlSize];
         [verticalScroller setScrollerStyle:NSScrollerStyleLegacy];
         scrollerWidth = [NSScroller scrollerWidthForControlSize:controlSize scrollerStyle:NSScrollerStyleLegacy];
     }
@@ -415,7 +415,7 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
         maxKeyLabelWidth = max(rect.size.width, maxKeyLabelWidth);
     }
 
-    CGFloat rowSpacing = [_tableView intercellSpacing].height;    
+    CGFloat rowSpacing = [_tableView intercellSpacing].height;
     CGFloat stripWidth = ceil(maxKeyLabelWidth * 1.20);
     CGFloat tableViewStartWidth = ceil(_maxCandidateAttrStringWidth + scrollerWidth);;
     CGFloat windowWidth = stripWidth + 1.0 + tableViewStartWidth;
@@ -425,7 +425,7 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
     NSPoint topLeftPoint = NSMakePoint(frameRect.origin.x, frameRect.origin.y + frameRect.size.height);
     
     frameRect.size = NSMakeSize(windowWidth, windowHeight);
-    frameRect.origin = NSMakePoint(topLeftPoint.x, topLeftPoint.y - frameRect.size.height);    
+    frameRect.origin = NSMakePoint(topLeftPoint.x, topLeftPoint.y - frameRect.size.height);
     
     [_keyLabelStripView setFrame:NSMakeRect(0.0, 0.0, stripWidth, windowHeight)];
     [_scrollView setFrame:NSMakeRect(stripWidth + 1.0, 0.0, tableViewStartWidth, windowHeight)];

@@ -1,7 +1,7 @@
 //
 // UpdateNotificationController.m
 //
-// Copyright (c) 2011 The McBopomofo Project.
+// Copyright (c) 2021 The vChewing Project.
 //
 // Contributors:
 //     Mengjuei Hsieh (@mjhsieh)

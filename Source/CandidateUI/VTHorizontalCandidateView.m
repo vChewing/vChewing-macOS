@@ -96,7 +96,7 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
 - (NSSize)sizeForView
 {
     NSSize result = NSMakeSize(0.0, 0.0);
-    if ([_elementWidths count]) {    
+    if ([_elementWidths count]) {
         for (NSNumber *w in _elementWidths) {
             result.width += [w doubleValue];
         }
@@ -128,7 +128,7 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
     [NSBezierPath strokeLineFromPoint:NSMakePoint(bounds.size.width, 0.0) toPoint:NSMakePoint(bounds.size.width, bounds.size.height)];
 
     NSUInteger count = [_elementWidths count];
-    CGFloat accuWidth = 0.0;    
+    CGFloat accuWidth = 0.0;
     
     for (NSUInteger index = 0; index < count; index++) {
         NSDictionary *activeCandidateAttr = _candidateAttrDict;
@@ -154,7 +154,7 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
         }
         else {
             [backgroundColor setFill];
-        }        
+        }
         
         [NSBezierPath fillRect:candidateRect];
         [[_displayedCandidates objectAtIndex:index] drawInRect:candidateRect withAttributes:activeCandidateAttr];
@@ -172,7 +172,7 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
         return result;
     }
     
-    NSUInteger count = [_elementWidths count];    
+    NSUInteger count = [_elementWidths count];
     CGFloat accuWidth = 0.0;
     for (NSUInteger index = 0; index < count; index++) {
         CGFloat currentWidth = [[_elementWidths objectAtIndex:index] doubleValue];
@@ -182,7 +182,7 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
             break;
         }
         
-        accuWidth += currentWidth + 1.0;        
+        accuWidth += currentWidth + 1.0;
     }
     
     return result;
@@ -217,7 +217,7 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
 #       pragma clang diagnostic push
 #       pragma clang diagnostic ignored "-Warc-performSelector-leaks"
     if (triggerAction && _target && _action) {
-        [_target performSelector:_action withObject:self];            
+        [_target performSelector:_action withObject:self];
     }
 #       pragma clang diagnostic pop
 }

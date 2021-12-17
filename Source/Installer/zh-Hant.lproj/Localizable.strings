@@ -23,11 +23,11 @@
 "OK" = "好";
 
 /* No comment provided by engineer. */
-"McBopomofo is ready to use." = "小麥注音輸入法安裝成功";
+"vChewing is ready to use." = "威注音輸入法安裝成功";
 
 "Finish" = "結束";
 "Attention" = "請注意";
-"McBopomofo is upgraded, but please log out or reboot for the new version to be fully functional." = "McBopomofo 安裝完成，但建議您登出或重新開機，以便順利使用新版。";
+"vChewing is upgraded, but please log out or reboot for the new version to be fully functional." = "vChewing 安裝完成，但建議您登出或重新開機，以便順利使用新版。";
 
 "Fatal Error" = "安裝錯誤";
 "Abort" = "放棄安裝";

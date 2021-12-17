@@ -1,7 +1,7 @@
 //
 // main.m
 //
-// Copyright (c) 2011 The McBopomofo Project.
+// Copyright (c) 2021 The vChewing Project.
 //
 // Contributors:
 //     Mengjuei Hsieh (@mjhsieh)
@@ -35,7 +35,7 @@
 #import <Cocoa/Cocoa.h>
 #import "OVInputSourceHelper.h"
 
-static NSString *const kConnectionName = @"McBopomofo_1_Connection";
+static NSString *const kConnectionName = @"vChewing_1_Connection";
 
 int main(int argc, char *argv[])
 {

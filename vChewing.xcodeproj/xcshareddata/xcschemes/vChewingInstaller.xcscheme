@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "6ACA41CA15FC1D7500935EF6"
-               BuildableName = "McBopomofoInstaller.app"
-               BlueprintName = "McBopomofoInstaller"
-               ReferencedContainer = "container:McBopomofo.xcodeproj">
+               BuildableName = "vChewingInstaller.app"
+               BlueprintName = "vChewingInstaller"
+               ReferencedContainer = "container:vChewing.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,9 +45,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "6ACA41CA15FC1D7500935EF6"
-            BuildableName = "McBopomofoInstaller.app"
-            BlueprintName = "McBopomofoInstaller"
-            ReferencedContainer = "container:McBopomofo.xcodeproj">
+            BuildableName = "vChewingInstaller.app"
+            BlueprintName = "vChewingInstaller"
+            ReferencedContainer = "container:vChewing.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "6ACA41CA15FC1D7500935EF6"
-            BuildableName = "McBopomofoInstaller.app"
-            BlueprintName = "McBopomofoInstaller"
-            ReferencedContainer = "container:McBopomofo.xcodeproj">
+            BuildableName = "vChewingInstaller.app"
+            BlueprintName = "vChewingInstaller"
+            ReferencedContainer = "container:vChewing.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

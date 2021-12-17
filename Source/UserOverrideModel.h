@@ -1,7 +1,7 @@
 //
 // UserOverrideModel.h
 //
-// Copyright (c) 2017 The McBopomofo Project.
+// Copyright (c) 2017 The vChewing Project.
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -34,7 +34,7 @@
 
 #include "Gramambular.h"
 
-namespace McBopomofo {
+namespace vChewing {
 
 using namespace Formosa::Gramambular;
 
@@ -75,7 +75,7 @@ private:
     std::map<std::string, std::list<KeyObservationPair>::iterator> m_lruMap;
 };
 
-};   // namespace McBopomofo
+};   // namespace vChewing
 
 #endif
 

@@ -30,7 +30,7 @@
 @implementation VTVerticalCandidateTableView
 - (NSRect)adjustScroll:(NSRect)newVisible
 {
-    NSRect scrollRect = newVisible;    
+    NSRect scrollRect = newVisible;
     CGFloat rowHeightPlusSpacing = [self rowHeight] + [self intercellSpacing].height;
     scrollRect.origin.y = (NSInteger)(scrollRect.origin.y / rowHeightPlusSpacing) * rowHeightPlusSpacing;
     return scrollRect;
