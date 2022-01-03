@@ -1149,7 +1149,7 @@
 			repositoryURL = "https://dev.azure.com/ShikiSuen/vChewing/_git/SwiftyLibreCC";
 			requirement = {
 				kind = revision;
-				revision = 1d8105a0f7199c90af722bff62728050c858e777;
+				revision = 5419c7a4f4d3ac0c5acbf67dcc90d45499c790ae;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
