@@ -49,4 +49,4 @@
 /* No comment provided by engineer. */
 "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@" = "目前使用的威注音版本是 %1$@ (%2$@)，网路上有更新版本 %3$@ (%4$@) 可供下载。是否要前往威注音网站下载新版来安装？%5$@";
 
-"Chinese Conversion" = "强制简体字输出";
+"Chinese Conversion" = "优先使用康熙繁体字";

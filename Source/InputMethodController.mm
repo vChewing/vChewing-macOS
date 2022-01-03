@@ -232,8 +232,8 @@ public:
     }
     #endif //DEBUG
 
-    NSMenuItem *chineseConversionMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Chinese Conversion", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"G"];
-    chineseConversionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
+    NSMenuItem *chineseConversionMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Chinese Conversion", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"K"];
+    chineseConversionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand;
     chineseConversionMenuItem.state = _chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     [menu addItem:chineseConversionMenuItem];
 
