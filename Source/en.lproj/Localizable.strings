@@ -17,3 +17,5 @@
 "Visit Website" = "Visit Website";
 "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@" = "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@";
 "Chinese Conversion" = "Convert zh-TW Kanji to KangXi Variants";
+"NotificationSwitchON" = " ON";
+"NotificationSwitchOFF" = " OFF";

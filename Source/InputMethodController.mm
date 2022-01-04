@@ -1534,7 +1534,7 @@ public:
 
     NSUserNotification *userNotification = [[NSUserNotification alloc] init];
     userNotification.title = @"vChewing";
-    userNotification.informativeText = [NSString stringWithFormat:@"%@%@", NSLocalizedString(@"Chinese Conversion", @""), _chineseConversionEnabled ? @" Enabled" : @" Disabled"];
+    userNotification.informativeText = [NSString stringWithFormat:@"%@%@", NSLocalizedString(@"Chinese Conversion", @""), _chineseConversionEnabled ? NSLocalizedString(@"NotificationSwitchON", @"") : NSLocalizedString(@"NotificationSwitchOFF", @"")];
     userNotification.soundName = NSUserNotificationDefaultSoundName;
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
 
