@@ -1,52 +1,19 @@
 /* No comment provided by engineer. */
 "About vChewing…" = "About vChewing…";
-
-/* No comment provided by engineer. */
 "Clear Learning Dictionary (%ju Items)" = "Clear Learning Dictionary (%ju Items)";
-
-/* No comment provided by engineer. */
 "Dump Learning Data to Console" = "Dump Learning Data to Console";
-
-/* No comment provided by engineer. */
 "Enable Selection Learning" = "Enable Selection Learning";
-
-/* No comment provided by engineer. */
 "vChewing Preferences" = "vChewing Preferences";
-
-/* No comment provided by engineer. */
 "Check Later" = "Check Later";
-
-/* No comment provided by engineer. */
 "Check for Updates…" = "Check for Updates…";
-
-/* No comment provided by engineer. */
 "Check for Update Completed" = "Check for Update Completed";
-
-/* No comment provided by engineer. */
 "You are already using the latest version of vChewing." = "You are already using the latest version of vChewing.";
-
-/* No comment provided by engineer. */
 "Update Check Failed" = "Update Check Failed";
-
-/* No comment provided by engineer. */
 "There may be no internet connection or the server failed to respond.\n\nError message: %@" = "There may be no internet connection or the server failed to respond.\n\nError message: %@";
-
-/* No comment provided by engineer. */
 "OK" = "OK";
-
-/* No comment provided by engineer. */
 "Dismiss" = "Dismiss";
-
-/* No comment provided by engineer. */
 "New Version Available" = "New Version Available";
-
-/* No comment provided by engineer. */
 "Not Now" = "Not Now";
-
-/* No comment provided by engineer. */
 "Visit Website" = "Visit Website";
-
-/* No comment provided by engineer. */
 "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@" = "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@";
-
 "Chinese Conversion" = "Convert zh-TW Kanji to KangXi Variants";
