@@ -75,6 +75,8 @@
 
     // if Chinese conversion is enabled
     BOOL _chineseConversionEnabled;
+
+    BOOL _previousChineseConversionEnabledStatus;
 }
 @end
 

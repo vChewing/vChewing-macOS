@@ -165,6 +165,8 @@ public:
     }
     // the two client pointers are weak pointers (i.e. we don't retain them)
     // therefore we don't do anything about it
+
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"ChineseConversionStatusChanged" object:nil];
 }
 
 - (id)initWithServer:(IMKServer *)server delegate:(id)delegate client:(id)client
@@ -196,6 +198,10 @@ public:
 
         _inputMode = kBopomofoModeIdentifier;
         _chineseConversionEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kChineseConversionEnabledKey];
+        _previousChineseConversionEnabledStatus = _chineseConversionEnabled;
+
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:@"ChineseConversionStatusChanged" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleChineseConversionStatusDidChanged:) name:@"ChineseConversionStatusChanged" object:nil];
     }
 
     return self;
@@ -1466,6 +1472,7 @@ public:
 {
     _chineseConversionEnabled = !_chineseConversionEnabled;
     [[NSUserDefaults standardUserDefaults] setBool:_chineseConversionEnabled forKey:kChineseConversionEnabledKey];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ChineseConversionStatusChanged" object:nil];
 }
 
 - (void)clearLearningDictionary:(id)sender
@@ -1515,6 +1522,23 @@ public:
         [self commitComposition:_currentCandidateClient];
         return;
     }
+}
+
+- (void)handleChineseConversionStatusDidChanged:(NSNotification *)notification
+{
+    // Do not post the notification if status doesn't change. 
+    // This is because the input method can be initiated by multiple applications, then all of them would post the notification.
+    if (_previousChineseConversionEnabledStatus == _chineseConversionEnabled) {
+        return;
+    }
+
+    NSUserNotification *userNotification = [[NSUserNotification alloc] init];
+    userNotification.title = @"vChewing";
+    userNotification.informativeText = [NSString stringWithFormat:@"%@%@", NSLocalizedString(@"Chinese Conversion", @""), _chineseConversionEnabled ? @" Enabled" : @" Disabled"];
+    userNotification.soundName = NSUserNotificationDefaultSoundName;
+    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
+
+    _previousChineseConversionEnabledStatus = _chineseConversionEnabled;
 }
 
 @end
