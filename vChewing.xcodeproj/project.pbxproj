@@ -9,7 +9,11 @@
 /* Begin PBXBuildFile section */
 		5B000FC3278495AD004F02AC /* SimpBopomofo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 5B000FC1278495AD004F02AC /* SimpBopomofo.tiff */; };
 		5B000FC4278495AD004F02AC /* SimpBopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 5B000FC2278495AD004F02AC /* SimpBopomofo@2x.tiff */; };
+		5B42B64027876FDC00BB9B9F /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B42B63E27876FDC00BB9B9F /* UserOverrideModel.cpp */; };
+		5B58E87F278413E7003EA2AD /* MITLicense.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B58E87D278413E7003EA2AD /* MITLicense.txt */; };
 		5BC3FB83278492DE0022E99A /* data-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BC3FB82278492DE0022E99A /* data-chs.txt */; };
+		5BF4A6FE27844738007DC6E7 /* frmAboutWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BF4A6FC27844738007DC6E7 /* frmAboutWindow.m */; };
+		5BF4A70027844DC5007DC6E7 /* frmAboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BF4A70227844DC5007DC6E7 /* frmAboutWindow.xib */; };
 		6A0421A815FEF3F50061ED63 /* FastLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A0421A615FEF3F50061ED63 /* FastLM.cpp */; };
 		6A0D4EA715FC0D2D00ABF4B3 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */; };
 		6A0D4ED015FC0D6400ABF4B3 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC415FC0D6400ABF4B3 /* AppDelegate.m */; };
@@ -87,6 +91,12 @@
 		5B9781D82763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Source/zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5B9781D92763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.xib"; sourceTree = "<group>"; };
 		5BC3FB82278492DE0022E99A /* data-chs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "data-chs.txt"; sourceTree = "<group>"; };
+		5BF4A6FB27844738007DC6E7 /* frmAboutWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = frmAboutWindow.h; sourceTree = "<group>"; };
+		5BF4A6FC27844738007DC6E7 /* frmAboutWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = frmAboutWindow.m; sourceTree = "<group>"; };
+		5BF4A70327844DD0007DC6E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmAboutWindow.xib; sourceTree = "<group>"; };
+		5BF4A70527844DD2007DC6E7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmAboutWindow.strings; sourceTree = "<group>"; };
+		5BF4A70727844DD3007DC6E7 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/frmAboutWindow.strings"; sourceTree = "<group>"; };
+		5BF4A70A278451A6007DC6E7 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/frmAboutWindow.strings"; sourceTree = "<group>"; };
 		6A0421A615FEF3F50061ED63 /* FastLM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FastLM.cpp; sourceTree = "<group>"; };
 		6A0421A715FEF3F50061ED63 /* FastLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FastLM.h; sourceTree = "<group>"; };
 		6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -268,6 +278,7 @@
 		6A0D4EC215FC0D3C00ABF4B3 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				5B58E87D278413E7003EA2AD /* MITLicense.txt */,
 				6A0D4ED815FC0DA600ABF4B3 /* CandidateUI */,
 				6A38BBDD15FC115800A8A51F /* Data */,
 				6A0D4F1215FC0EB100ABF4B3 /* Engine */,
@@ -275,6 +286,8 @@
 				6A0D4F4715FC0EB900ABF4B3 /* Resources */,
 				6A0D4EC315FC0D6400ABF4B3 /* AppDelegate.h */,
 				6A0D4EC415FC0D6400ABF4B3 /* AppDelegate.m */,
+				5BF4A6FB27844738007DC6E7 /* frmAboutWindow.h */,
+				5BF4A6FC27844738007DC6E7 /* frmAboutWindow.m */,
 				6A0D4EC615FC0D6400ABF4B3 /* InputMethodController.h */,
 				6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */,
 				6A0D4EC815FC0D6400ABF4B3 /* main.m */,
@@ -287,8 +300,8 @@
 				6A0D4ECC15FC0D6400ABF4B3 /* PreferencesWindowController.m */,
 				D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */,
 				D427A9BF25ED28CC005D43E0 /* vChewing-Bridging-Header.h */,
-				6AE30A471F7F40B7008735BD /* UserOverrideModel.cpp */,
-				6AE30A481F7F40B7008735BD /* UserOverrideModel.h */,
+				5B42B63E27876FDC00BB9B9F /* UserOverrideModel.cpp */,
+				5B42B63F27876FDC00BB9B9F /* UserOverrideModel.h */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -405,6 +418,7 @@
 		6A0D4F4715FC0EB900ABF4B3 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				5BF4A70227844DC5007DC6E7 /* frmAboutWindow.xib */,
 				6AFF97F0253B299E007F1C49 /* OVNonModalAlertWindowController.xib */,
 				6A0D4EEE15FC0DA600ABF4B3 /* Images */,
 				6A0D4EF515FC0DA600ABF4B3 /* vChewing-Info.plist */,
@@ -581,7 +595,9 @@
 				6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */,
 				6A38BC1515FC117A00A8A51F /* data.txt in Resources */,
 				6AFF97F2253B299E007F1C49 /* OVNonModalAlertWindowController.xib in Resources */,
+				5B58E87F278413E7003EA2AD /* MITLicense.txt in Resources */,
 				6A187E2616004C5900466B2E /* MainMenu.xib in Resources */,
+				5BF4A70027844DC5007DC6E7 /* frmAboutWindow.xib in Resources */,
 				5BC3FB83278492DE0022E99A /* data-chs.txt in Resources */,
 				5B000FC4278495AD004F02AC /* SimpBopomofo@2x.tiff in Resources */,
 			);
@@ -631,7 +647,9 @@
 				6A0D4ED015FC0D6400ABF4B3 /* AppDelegate.m in Sources */,
 				6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */,
 				6A0D4ED315FC0D6400ABF4B3 /* main.m in Sources */,
+				5BF4A6FE27844738007DC6E7 /* frmAboutWindow.m in Sources */,
 				6A0D4ED415FC0D6400ABF4B3 /* OVInputSourceHelper.m in Sources */,
+				5B42B64027876FDC00BB9B9F /* UserOverrideModel.cpp in Sources */,
 				6A0D4ED515FC0D6400ABF4B3 /* PreferencesWindowController.m in Sources */,
 				6A0D4EFE15FC0DA600ABF4B3 /* VTCandidateController.m in Sources */,
 				6A0D4EFF15FC0DA600ABF4B3 /* VTHorizontalCandidateController.m in Sources */,
@@ -673,6 +691,27 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		5B58E87D278413E7003EA2AD /* MITLicense.txt */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5B58E87E278413E7003EA2AD /* en */,
+				5B58E880278413EF003EA2AD /* zh-Hans */,
+				5B58E881278413F1003EA2AD /* zh-Hant */,
+			);
+			name = MITLicense.txt;
+			sourceTree = "<group>";
+		};
+		5BF4A70227844DC5007DC6E7 /* frmAboutWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5BF4A70327844DD0007DC6E7 /* Base */,
+				5BF4A70527844DD2007DC6E7 /* en */,
+				5BF4A70727844DD3007DC6E7 /* zh-Hant */,
+				5BF4A70A278451A6007DC6E7 /* zh-Hans */,
+			);
+			name = frmAboutWindow.xib;
+			sourceTree = "<group>";
+		};
 		6A0D4F4815FC0EE100ABF4B3 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -781,6 +820,7 @@
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_MISSING_PROPERTY_SYNTHESIS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
@@ -821,6 +861,7 @@
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_MISSING_PROPERTY_SYNTHESIS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;

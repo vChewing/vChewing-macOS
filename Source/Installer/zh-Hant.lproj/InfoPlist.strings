@@ -1,5 +1,5 @@
 /* Localized versions of Info.plist keys */
 
 CFBundleName = "安裝威注音";
-NSHumanReadableCopyright = "Copyright © 2011-2021 Mengjuei Hsieh et al.\nAll Rights Reserved.";
+NSHumanReadableCopyright = "Copyright © 2011-2022 OpenVanilla Project (Mengjuei Hsieh et al.)\nAll Rights Reserved.";
 

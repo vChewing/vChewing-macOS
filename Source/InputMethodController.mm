@@ -39,9 +39,11 @@
 #import "OVStringHelper.h"
 #import "OVUTF8Helper.h"
 #import "AppDelegate.h"
+#import "frmAboutWindow.h"
 #import "VTHorizontalCandidateController.h"
 #import "VTVerticalCandidateController.h"
 #import "vChewing-Swift.h"
+
 
 //@import SwiftUI;
 
@@ -1325,8 +1327,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
 - (void)showAbout:(id)sender
 {
-    [[NSApplication sharedApplication] orderFrontStandardAboutPanel:sender];
-    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+    [[frmAboutWindow defaultController].window orderFront:sender];
 }
 
 - (void)toggleChineseConverter:(id)sender
