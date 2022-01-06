@@ -1,0 +1,27 @@
+
+/* Class = "NSTextFieldCell"; title = "MIT License:"; ObjectID = "lblMITLicense"; */
+"lblMITLicense.title" = "MIT License:";
+
+/* Class = "NSTextFieldCell"; title = "version"; ObjectID = "lblVersionString"; */
+// "lblVersionString.title" = "version";
+
+/* Class = "NSWindow"; title = "About vChewing for macOS"; ObjectID = "ttlAboutWindow"; */
+"ttlAboutWindow.title" = "About vChewing for macOS";
+
+/* Class = "NSTextFieldCell"; title = "Derived from OpenVanilla McBopopmofo Project."; ObjectID = "lblProjectDescription"; */
+"lblProjectDescription.title" = "Derived from OpenVanilla McBopopmofo Project.";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "btnConfirm"; */
+"btnConfirm.title" = "OK";
+
+/* Class = "NSTextFieldCell"; title = "vChewing for macOS"; ObjectID = "lblAppTitle"; */
+"lblAppTitle.title" = "vChewing for macOS";
+
+/* Class = "NSTextFieldCell"; title = "DISCLAIMER: The vChewing project is not responsible for the phrase database shipped in the original McBopomofo project. Everything in the vChewing phrase database has been confirmed lawful to the Anti-Secession Law and the National Security Law of the PRC."; ObjectID = "lblDisclaimer"; */
+"lblDisclaimer.title" = "DISCLAIMER: The vChewing project is not responsible for the phrase database shipped in the original McBopomofo project. Everything in the vChewing phrase database has been confirmed lawful to the Anti-Secession Law and the National Security Law of the PRC.";
+
+/* Class = "NSTextFieldCell"; title = "© 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project."; ObjectID = "lblCopyright"; */
+// "lblCopyright.title" = "© 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project.";
+
+/* Class = "NSTextFieldCell"; title = "McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.\nvChewing macOS Development Reinforced by Hiraku Wang. vChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "lblCredits"; */
+"lblCredits.title" = "McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.\nvChewing macOS Development Reinforced by Hiraku Wang. vChewing Phrase Database Maintained by Shiki Suen.";

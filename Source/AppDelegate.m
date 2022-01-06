@@ -35,6 +35,7 @@
 #import "AppDelegate.h"
 #import "OVNonModalAlertWindowController.h"
 #import "PreferencesWindowController.h"
+#import "frmAboutWindow.h"
 
 extern void LTLoadLanguageModel(void);
 
@@ -271,6 +272,11 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification{
     return YES;
+}
+
+- (IBAction) about:(id)sender {
+    // Show the window:
+    [[frmAboutWindow defaultController].window orderFront:self];
 }
 
 @end
