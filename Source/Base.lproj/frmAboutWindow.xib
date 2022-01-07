@@ -16,10 +16,12 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="About vChewing for macOS" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" tabbingMode="disallowed" titlebarAppearsTransparent="YES" id="ttlAboutWindow">
-            <windowStyleMask key="styleMask" titled="YES" texturedBackground="YES"/>
+        <window title="About vChewing for macOS" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" animationBehavior="default" tabbingMode="disallowed" titlebarAppearsTransparent="YES" id="ttlAboutWindow">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <rect key="contentRect" x="196" y="240" width="533" height="430"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1600" height="875"/>
+            <value key="minSize" type="size" width="533" height="430"/>
+            <value key="maxSize" type="size" width="533" height="430"/>
             <view key="contentView" id="se5-gp-TjO">
                 <rect key="frame" x="0.0" y="0.0" width="533" height="430"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -49,16 +51,13 @@
                                     <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                 </textView>
                             </subviews>
-                            <connections>
-                                <binding destination="CaN-wP-mkf" name="hidden" keyPath="values" id="Vgn-ZH-3hq"/>
-                            </connections>
                         </clipView>
                         <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="sfo-oN-iBH">
                             <rect key="frame" x="-100" y="-100" width="240" height="16"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="X6W-MB-JfO">
-                            <rect key="frame" x="410" y="1" width="16" height="176"/>
+                        <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" controlSize="mini" horizontal="NO" id="X6W-MB-JfO">
+                            <rect key="frame" x="412" y="1" width="14" height="176"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
@@ -67,7 +66,7 @@
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="119" id="eiH-Q0-Ud8"/>
                         </constraints>
-                        <textFieldCell key="cell" lineBreakMode="clipping" title="vChewing for macOS" id="lblAppTitle">
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="vChewing for macOS" id="lblAppTitle" userLabel="appNameLabel">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -103,7 +102,8 @@
                         <textFieldCell key="cell" selectable="YES" id="lblCredits">
                             <font key="font" metaFont="cellTitle"/>
                             <string key="title">McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.
-vChewing macOS Development Reinforced by Hiraku Wang. vChewing Phrase Database Maintained by Shiki Suen.</string>
+vChewing macOS Development Reinforced by Hiraku Wang.
+vChewing Phrase Database Maintained by Shiki Suen.</string>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -131,6 +131,9 @@ vChewing macOS Development Reinforced by Hiraku Wang. vChewing Phrase Database
 DQ
 </string>
                         </buttonCell>
+                        <connections>
+                            <action selector="performClose:" target="-1" id="0yK-v8-KQd"/>
+                        </connections>
                     </button>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="d81-Fe-uNT">
                         <rect key="frame" x="13" y="21" width="379" height="83"/>

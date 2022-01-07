@@ -33,6 +33,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "frmAboutWindow.h"
 
 @class PreferencesWindowController;
 
@@ -44,11 +45,13 @@
     NSMutableData *_receivingData;
     NSURL *_updateNextStepURL;
     PreferencesWindowController *_preferencesWindowController;
+    frmAboutWindow *_aboutWindowController;
 }
 
 - (void)checkForUpdate;
 - (void)checkForUpdateForced:(BOOL)forced;
 - (void)showPreferences;
+- (void)showAbout;
 
 @property (weak, nonatomic) IBOutlet NSWindow *window;
 @end
