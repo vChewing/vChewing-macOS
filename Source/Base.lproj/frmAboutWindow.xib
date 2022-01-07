@@ -113,7 +113,7 @@ vChewing Phrase Database Maintained by Shiki Suen.</string>
                     </box>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eYM-F7-drf">
                         <rect key="frame" x="89" y="307" width="431" height="15"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" title="MIT License:" id="lblMITLicense">
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="MIT-NTL License:" id="lblMITLicense">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
