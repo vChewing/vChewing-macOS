@@ -1,6 +1,6 @@
 
-/* Class = "NSTextFieldCell"; title = "MIT License:"; ObjectID = "lblMITLicense"; */
-"lblMITLicense.title" = "麻理授權合約 (MIT License):";
+/* Class = "NSTextFieldCell"; title = "MIT-NTL License:"; ObjectID = "lblMITLicense"; */
+"lblMITLicense.title" = "麻理去商標授權合約 (MIT-NTL License):";
 
 /* Class = "NSTextFieldCell"; title = "version"; ObjectID = "lblVersionString"; */
 // "lblVersionString.title" = "版本";

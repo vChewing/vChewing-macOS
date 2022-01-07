@@ -1,4 +1,4 @@
 /* Localized versions of Info.plist keys */
 
 CFBundleName = "Install vChewing";
-NSHumanReadableCopyright = "Copyright © 2011-2022 OpenVanilla Project (Mengjuei Hsieh et al.)\nAll Rights Reserved.";
+NSHumanReadableCopyright = "© 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project.";
