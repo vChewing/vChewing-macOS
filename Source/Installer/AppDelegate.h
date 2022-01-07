@@ -50,4 +50,8 @@
 @property (unsafe_unretained) IBOutlet NSTextView *textView;
 @property (weak) IBOutlet NSWindow *progressSheet;
 @property (weak) IBOutlet NSProgressIndicator *progressIndicator;
+@property (nonatomic) IBOutlet NSTextField *appNameLabel;
+@property (nonatomic) IBOutlet NSTextField *appVersionLabel;
+@property (nonatomic) IBOutlet NSTextField *appCopyrightLabel;
+@property (nonatomic) IBOutlet NSTextView *appEULAContent;
 @end

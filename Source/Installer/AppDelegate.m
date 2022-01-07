@@ -55,9 +55,14 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
 @synthesize textView = _textView;
 @synthesize progressSheet = _progressSheet;
 @synthesize progressIndicator = _progressIndicator;
+@synthesize appNameLabel;
+@synthesize appVersionLabel;
+@synthesize appCopyrightLabel;
+@synthesize appEULAContent;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    NSLog(@"vChewing: Application Launched.");
     _installingVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:(id)kCFBundleVersionKey];
     NSString *versionString = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 
@@ -68,14 +73,19 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
     [self.installButton setNextKeyView:self.cancelButton];
     [[self window] setDefaultButtonCell:[self.installButton cell]];
 
-    NSAttributedString *attrStr = [[NSAttributedString alloc] initWithRTF:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"License" ofType:@"rtf"]] documentAttributes:NULL];
-
-    NSMutableAttributedString *mutableAttrStr = [attrStr mutableCopy];
-    [mutableAttrStr addAttribute:NSForegroundColorAttributeName value:[NSColor controlTextColor] range:NSMakeRange(0, [mutableAttrStr length])];
-    [[self.textView textStorage] setAttributedString:mutableAttrStr];
-    [self.textView setSelectedRange:NSMakeRange(0, 0)];
-  
-    [[self window] setTitle:[NSString stringWithFormat:NSLocalizedString(@"%@ (for version %@, r%@)", nil), [[self window] title], versionString, _installingVersion]];
+    
+    [self.window standardWindowButton:NSWindowCloseButton].hidden = true;
+    [self.window standardWindowButton:NSWindowMiniaturizeButton].hidden = true;
+    [self.window standardWindowButton:NSWindowZoomButton].hidden = true;
+    
+    // Update Info
+    NSDictionary* localizedInfoDictionary = [[NSBundle mainBundle] localizedInfoDictionary];
+    
+    self.appNameLabel.stringValue      = [localizedInfoDictionary objectForKey:@"CFBundleName"];
+    // self.appVersionLabel.stringValue   = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
+    self.appVersionLabel.stringValue   = [NSString stringWithFormat:@"%@ Build %@", versionString, _installingVersion];
+    self.appCopyrightLabel.stringValue = [localizedInfoDictionary objectForKey:@"NSHumanReadableCopyright"];
+    self.appEULAContent.string = [localizedInfoDictionary objectForKey:@"CFEULAContent"];
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:[kTargetPartialPath stringByExpandingTildeInPath]]) {
         NSBundle *currentBundle = [NSBundle bundleWithPath:[kTargetPartialPath stringByExpandingTildeInPath]];
@@ -90,11 +100,11 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
     }
 
     if (_upgrading) {
-        [_installButton setTitle:NSLocalizedString(@"Agree and Upgrade", nil)];
+        [_installButton setTitle:NSLocalizedString(@"Upgrade", nil)];
     }
 
     [[self window] center];
-    [[self window] orderFront:self];
+    [[self window] orderFrontRegardless];
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 }
 

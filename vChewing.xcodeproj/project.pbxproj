@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		5B000FC3278495AD004F02AC /* SimpBopomofo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 5B000FC1278495AD004F02AC /* SimpBopomofo.tiff */; };
 		5B000FC4278495AD004F02AC /* SimpBopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 5B000FC2278495AD004F02AC /* SimpBopomofo@2x.tiff */; };
+		5B1958522788A2BF00FAEB14 /* MITLicense.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B58E87D278413E7003EA2AD /* MITLicense.txt */; };
 		5B42B64027876FDC00BB9B9F /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B42B63E27876FDC00BB9B9F /* UserOverrideModel.cpp */; };
 		5B58E87F278413E7003EA2AD /* MITLicense.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B58E87D278413E7003EA2AD /* MITLicense.txt */; };
 		5BC3FB83278492DE0022E99A /* data-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BC3FB82278492DE0022E99A /* data-chs.txt */; };
@@ -44,7 +45,6 @@
 		6ACA41CD15FC1D7500935EF6 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */; };
 		6ACA41F915FC1D9000935EF6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ACA41E915FC1D9000935EF6 /* AppDelegate.m */; };
 		6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */; };
-		6ACA41FB15FC1D9000935EF6 /* License.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EC15FC1D9000935EF6 /* License.rtf */; };
 		6ACA41FC15FC1D9000935EF6 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EE15FC1D9000935EF6 /* Localizable.strings */; };
 		6ACA41FD15FC1D9000935EF6 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41F015FC1D9000935EF6 /* MainMenu.xib */; };
 		6ACA41FF15FC1D9000935EF6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ACA41F415FC1D9000935EF6 /* main.m */; };
@@ -76,6 +76,9 @@
 		5B000FC1278495AD004F02AC /* SimpBopomofo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = SimpBopomofo.tiff; sourceTree = "<group>"; };
 		5B000FC2278495AD004F02AC /* SimpBopomofo@2x.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "SimpBopomofo@2x.tiff"; sourceTree = "<group>"; };
 		5B054058278787710083EF4A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Source/en.lproj/preferences.strings; sourceTree = "<group>"; };
+		5B19584E27888F5D00FAEB14 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
+		5B19584F27888F5F00FAEB14 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/MainMenu.strings"; sourceTree = "<group>"; };
+		5B19585127888F6B00FAEB14 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		5B42B63E27876FDC00BB9B9F /* UserOverrideModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UserOverrideModel.cpp; sourceTree = "<group>"; };
 		5B42B63F27876FDC00BB9B9F /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserOverrideModel.h; sourceTree = "<group>"; };
 		5B42B64127877D6500BB9B9F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Source/zh-Hans.lproj/preferences.strings"; sourceTree = "<group>"; };
@@ -84,9 +87,7 @@
 		5B58E880278413EF003EA2AD /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hans"; path = "zh-Hans.lproj/MITLicense.txt"; sourceTree = "<group>"; };
 		5B58E881278413F1003EA2AD /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hant"; path = "zh-Hant.lproj/MITLicense.txt"; sourceTree = "<group>"; };
 		5B9781D32763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
-		5B9781D42763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = "zh-Hans"; path = "zh-Hans.lproj/License.rtf"; sourceTree = "<group>"; };
 		5B9781D52763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		5B9781D62763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.xib"; sourceTree = "<group>"; };
 		5B9781D72763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Source/zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5B9781D82763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Source/zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5B9781D92763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.xib"; sourceTree = "<group>"; };
@@ -208,15 +209,12 @@
 		6ACA41E815FC1D9000935EF6 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Source/Installer/AppDelegate.h; sourceTree = SOURCE_ROOT; };
 		6ACA41E915FC1D9000935EF6 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Source/Installer/AppDelegate.m; sourceTree = SOURCE_ROOT; };
 		6ACA41EB15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		6ACA41ED15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/License.rtf; sourceTree = "<group>"; };
 		6ACA41EF15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6ACA41F215FC1D9000935EF6 /* Installer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Installer-Info.plist"; path = "Source/Installer/Installer-Info.plist"; sourceTree = SOURCE_ROOT; };
 		6ACA41F315FC1D9000935EF6 /* Installer-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Installer-Prefix.pch"; path = "Source/Installer/Installer-Prefix.pch"; sourceTree = SOURCE_ROOT; };
 		6ACA41F415FC1D9000935EF6 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Source/Installer/main.m; sourceTree = SOURCE_ROOT; };
 		6ACA41F515FC1D9000935EF6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
-		6ACA41F615FC1D9000935EF6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = "zh-Hant"; path = "zh-Hant.lproj/License.rtf"; sourceTree = "<group>"; };
 		6ACA41F715FC1D9000935EF6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		6ACA41F815FC1D9000935EF6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hant"; path = "zh-Hant.lproj/MainMenu.xib"; sourceTree = "<group>"; };
 		6AFF97EF253B299E007F1C49 /* OVNonModalAlertWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVNonModalAlertWindowController.h; sourceTree = "<group>"; };
 		6AFF97F0253B299E007F1C49 /* OVNonModalAlertWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OVNonModalAlertWindowController.xib; sourceTree = "<group>"; };
 		6AFF97F1253B299E007F1C49 /* OVNonModalAlertWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OVNonModalAlertWindowController.m; sourceTree = "<group>"; };
@@ -473,7 +471,6 @@
 				6ACA41E815FC1D9000935EF6 /* AppDelegate.h */,
 				6ACA41E915FC1D9000935EF6 /* AppDelegate.m */,
 				6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */,
-				6ACA41EC15FC1D9000935EF6 /* License.rtf */,
 				6ACA41EE15FC1D9000935EF6 /* Localizable.strings */,
 				6ACA41F015FC1D9000935EF6 /* MainMenu.xib */,
 				6ACA41F215FC1D9000935EF6 /* Installer-Info.plist */,
@@ -609,9 +606,9 @@
 			files = (
 				6ACA420215FC1E5200935EF6 /* vChewing.app in Resources */,
 				6A2E40F9253A6AA000D1AE1D /* Images.xcassets in Resources */,
+				5B1958522788A2BF00FAEB14 /* MITLicense.txt in Resources */,
 				6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */,
 				6A225A1F23679F2600F685C6 /* NotarizedArchives in Resources */,
-				6ACA41FB15FC1D9000935EF6 /* License.rtf in Resources */,
 				6ACA41FC15FC1D9000935EF6 /* Localizable.strings in Resources */,
 				6ACA41FD15FC1D9000935EF6 /* MainMenu.xib in Resources */,
 			);
@@ -767,17 +764,6 @@
 			path = Source/Installer;
 			sourceTree = SOURCE_ROOT;
 		};
-		6ACA41EC15FC1D9000935EF6 /* License.rtf */ = {
-			isa = PBXVariantGroup;
-			children = (
-				6ACA41ED15FC1D9000935EF6 /* en */,
-				6ACA41F615FC1D9000935EF6 /* zh-Hant */,
-				5B9781D42763850700897999 /* zh-Hans */,
-			);
-			name = License.rtf;
-			path = Source/Installer;
-			sourceTree = SOURCE_ROOT;
-		};
 		6ACA41EE15FC1D9000935EF6 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -792,9 +778,10 @@
 		6ACA41F015FC1D9000935EF6 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				6ACA41F815FC1D9000935EF6 /* zh-Hant */,
 				6A15B32421A51F2300B92CD3 /* Base */,
-				5B9781D62763850700897999 /* zh-Hans */,
+				5B19584E27888F5D00FAEB14 /* zh-Hans */,
+				5B19584F27888F5F00FAEB14 /* zh-Hant */,
+				5B19585127888F6B00FAEB14 /* en */,
 			);
 			name = MainMenu.xib;
 			path = Source/Installer;
