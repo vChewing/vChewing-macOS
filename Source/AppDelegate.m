@@ -55,6 +55,7 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 - (void)dealloc
 {
     _preferencesWindowController = nil;
+    _aboutWindowController = nil;
     _updateCheckConnection = nil;
 }
 
@@ -274,9 +275,17 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
     return YES;
 }
 
+- (void)showAbout {
+    if (!_aboutWindowController) {
+        _aboutWindowController = [[frmAboutWindow alloc] initWithWindowNibName:@"frmAboutWindow"];
+    }
+    [[_aboutWindowController window] center];
+    [[_aboutWindowController window] orderFrontRegardless];
+}
+
 - (IBAction) about:(id)sender {
-    // Show the window:
-    [[frmAboutWindow defaultController] showWithSender:self];
+    [(AppDelegate *)[NSApp delegate] showAbout];
+    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 }
 
 @end

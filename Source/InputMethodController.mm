@@ -39,7 +39,6 @@
 #import "OVStringHelper.h"
 #import "OVUTF8Helper.h"
 #import "AppDelegate.h"
-#import "frmAboutWindow.h"
 #import "VTHorizontalCandidateController.h"
 #import "VTVerticalCandidateController.h"
 #import "vChewing-Swift.h"
@@ -1327,7 +1326,9 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
 - (void)showAbout:(id)sender
 {
-    [[frmAboutWindow defaultController] showWithSender:sender];
+    // show the About window, and also make the IME app itself the focus
+    [(AppDelegate *)[NSApp delegate] showAbout];
+    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 }
 
 - (void)toggleChineseConverter:(id)sender
