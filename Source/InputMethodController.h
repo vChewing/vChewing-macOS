@@ -38,6 +38,7 @@
 #import "Gramambular.h"
 #import "FastLM.h"
 #import "UserOverrideModel.h"
+#import "frmAboutWindow.h"
 
 @interface vChewingInputMethodController : IMKInputController
 {

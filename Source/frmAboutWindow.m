@@ -60,27 +60,26 @@
 - (void) windowDidLoad {
     
     [super windowDidLoad];
-
+    [self.window standardWindowButton:NSWindowCloseButton].hidden = true;
+    [self.window standardWindowButton:NSWindowMiniaturizeButton].hidden = true;
+    [self.window standardWindowButton:NSWindowZoomButton].hidden = true;
     [self updateInfo];
-
-    // If you add more custom subviews to display additional information about
-    // your app, configure them here
 }
 
 - (void) updateInfo {
-    NSDictionary* infoDictionary = [[NSBundle mainBundle] infoDictionary];
+
+    NSString *installingVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:(id)kCFBundleVersionKey];
+    NSString *versionString = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+
     NSDictionary* localizedInfoDictionary = [[NSBundle mainBundle] localizedInfoDictionary];
     
     self.appNameLabel.stringValue      = [localizedInfoDictionary objectForKey:@"CFBundleName"];
-    self.appVersionLabel.stringValue   = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
+    self.appVersionLabel.stringValue   = [NSString stringWithFormat:@"%@ Build %@", versionString, installingVersion];
     self.appCopyrightLabel.stringValue = [localizedInfoDictionary objectForKey:@"NSHumanReadableCopyright"];
     self.appEULAContent.string = [localizedInfoDictionary objectForKey:@"CFEULAContent"];
 }
 
 - (void) showWithSender:(id)sender {
-    // FIXME: updating the strings every time is a temporary workaround
-    [self updateInfo];
-    [self.window orderFront:sender];
 }
 
 @end
