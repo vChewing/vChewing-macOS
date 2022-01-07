@@ -1,28 +1,11 @@
-/* No comment provided by engineer. */
 "%@ (for version %@)" = "%1$@ (%2$@ 版)";
-
-/* No comment provided by engineer. */
-"Agree and Upgrade" = "同意並升級";
-
-/* No comment provided by engineer. */
+"Upgrade" = "接受並升級";
 "Cancel" = "取消";
-
-/* No comment provided by engineer. */
 "Cannot activate the input method." = "無法啟用輸入法。";
-
-/* No comment provided by engineer. */
 "Cannot copy the file to the destination." = "無法將輸入法拷貝至目的地。";
-
-/* No comment provided by engineer. */
 "Install Failed" = "安裝失敗";
-
-/* No comment provided by engineer. */
 "Installation Successful" = "安裝成功";
-
-/* No comment provided by engineer. */
-"OK" = "好";
-
-/* No comment provided by engineer. */
+"OK" = "確定";
 "vChewing is ready to use." = "威注音輸入法安裝成功";
 
 "Finish" = "結束";
@@ -33,7 +16,6 @@
 "Abort" = "放棄安裝";
 "Cannot register input source %@ at %@." = "無法從檔案位置 %2$@ 安裝輸入法 \"%1$@\"。";
 "Cannot find input source %@ after registration." = "在註冊完輸入法 \"%@\" 仍然無法找到輸入法。";
-
 "Warning" = "安裝不完整";
 "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources." = "輸入法已經安裝好，但可能沒有完全啟用。請從「系統偏好設定」 > 「鍵盤」 > 「輸入方式」分頁加入輸入法。";
 "Continue" = "繼續";
