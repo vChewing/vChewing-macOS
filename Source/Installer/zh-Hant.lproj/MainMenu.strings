@@ -1,0 +1,73 @@
+
+/* Class = "NSMenu"; title = "AMainMenu"; ObjectID = "29"; */
+"29.title" = "AMainMenu";
+
+/* Class = "NSMenuItem"; title = "vChewing Installer"; ObjectID = "56"; */
+"56.title" = "威注音安裝程式";
+
+/* Class = "NSMenu"; title = "vChewing Installer"; ObjectID = "57"; */
+"57.title" = "威注音安裝程式";
+
+/* Class = "NSMenuItem"; title = "About vChewing Installer"; ObjectID = "58"; */
+"58.title" = "關於威注音安裝程式";
+
+/* Class = "NSMenuItem"; title = "File"; ObjectID = "83"; */
+"83.title" = "檔案";
+
+/* Class = "NSMenu"; title = "Services"; ObjectID = "130"; */
+"130.title" = "服務";
+
+/* Class = "NSMenuItem"; title = "Services"; ObjectID = "131"; */
+"131.title" = "服務";
+
+/* Class = "NSMenuItem"; title = "Hide vChewing Installer"; ObjectID = "134"; */
+"134.title" = "隱藏威注音安裝程式";
+
+/* Class = "NSMenuItem"; title = "Quit vChewing Installer"; ObjectID = "136"; */
+"136.title" = "結束威注音安裝程式";
+
+/* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "145"; */
+"145.title" = "隱藏其他程式";
+
+/* Class = "NSMenuItem"; title = "Show All"; ObjectID = "150"; */
+"150.title" = "顯示所有程式";
+
+/* Class = "NSWindow"; title = "vChewing Installer"; ObjectID = "371"; */
+"371.title" = "威注音輸入法安裝程式";
+
+/* Class = "NSButtonCell"; title = "I Accept"; ObjectID = "576"; */
+"576.title" = "我接受";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "593"; */
+"593.title" = "取消安裝";
+
+/* Class = "NSTextFieldCell"; title = "MIT-NTL License:"; ObjectID = "AVS-ih-FXM"; */
+"AVS-ih-FXM.title" = "麻理去商標授權合約 (MIT-NTL License):";
+
+/* Class = "NSTextFieldCell"; title = "vChewing for macOS"; ObjectID = "GNc-8S-1VG"; */
+"GNc-8S-1VG.title" = "vChewing for macOS";
+
+/* Class = "NSTextFieldCell"; title = "version_placeholder"; ObjectID = "JRP-At-H9q"; */
+// "JRP-At-H9q.title" = "version_placeholder";
+
+/* Class = "NSTextFieldCell"; title = "DISCLAIMER: The vChewing project is not responsible for the phrase database shipped in the original McBopomofo project. Everything in the vChewing phrase database has been confirmed lawful to the Anti-Secession Law and the National Security Law of the PRC."; ObjectID = "Q9M-ni-kUM"; */
+"Q9M-ni-kUM.title" = "免責聲明：威注音專案對小麥注音官方專案內贈的小麥注音原版詞庫內容不負任何責任。威注音輸入法專用的威注音詞庫已依照《中華人民共和國國家安全法》與《中華人民共和國反分裂國家法》做過合規處理。";
+
+/* Class = "NSTextFieldCell"; title = "Derived from OpenVanilla McBopopmofo Project."; ObjectID = "QYf-Nf-hoi"; */
+"QYf-Nf-hoi.title" = "該專案由 OpenVanilla 小麥注音專案衍生而來。";
+
+/* Class = "NSTextFieldCell"; title = "McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.\nvChewing macOS Development Reinforced by Hiraku Wang.
+vChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "VW8-s5-Wpn"; */
+"VW8-s5-Wpn.title" = "小麥注音引擎研發：Mengjuei Hsieh, Lukhnos Liu, 楊維中 (Zonble), 等。\n威注音 macOS 程式研發協力：Hiraku Wang。\n威注音詞庫維護：孫志貴 (Shiki Suen)。";
+
+/* Class = "NSTextFieldCell"; title = "Placeholder for showing copyright information."; ObjectID = "eo3-TK-0rB"; */
+// "eo3-TK-0rB.title" = "Placeholder for showing copyright information.";
+
+/* Class = "NSWindow"; title = "Window"; ObjectID = "gHl-Hx-eQn"; */
+"gHl-Hx-eQn.title" = "視窗";
+
+/* Class = "NSTextFieldCell"; title = "By installing the software, click the \"I Accept\" to the terms above:"; ObjectID = "mf8-6e-z7X"; */
+"mf8-6e-z7X.title" = "若要安裝該軟體，請接受上述條款。";
+
+/* Class = "NSTextFieldCell"; title = "Stopping the old version. This may take up to one minute…"; ObjectID = "nTo-dx-qfZ"; */
+"nTo-dx-qfZ.title" = "等待舊版完全停用，大約需要一分鐘…";

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -18,7 +18,7 @@
                 <menuItem title="vChewing Installer" id="56">
                     <menu key="submenu" title="vChewing Installer" systemMenu="apple" id="57">
                         <items>
-                            <menuItem title="About Install vChewing" id="58">
+                            <menuItem title="About vChewing Installer" id="58">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="orderFrontStandardAboutPanel:" target="-2" id="142"/>
@@ -33,7 +33,7 @@
                             <menuItem isSeparatorItem="YES" id="144">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Hide Install vChewing" keyEquivalent="h" id="134">
+                            <menuItem title="Hide vChewing Installer" keyEquivalent="h" id="134">
                                 <connections>
                                     <action selector="hide:" target="-1" id="367"/>
                                 </connections>
@@ -52,7 +52,7 @@
                             <menuItem isSeparatorItem="YES" id="149">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Quit Install vChewing" keyEquivalent="q" id="136">
+                            <menuItem title="Quit vChewing Installer" keyEquivalent="q" id="136">
                                 <connections>
                                     <action selector="terminate:" target="-3" id="449"/>
                                 </connections>
@@ -60,68 +60,26 @@
                         </items>
                     </menu>
                 </menuItem>
-                <menuItem title="File" id="83">
-                    <menu key="submenu" title="File" id="81">
-                        <items>
-                            <menuItem title="Close" keyEquivalent="w" id="73">
-                                <connections>
-                                    <action selector="performClose:" target="-1" id="193"/>
-                                </connections>
-                            </menuItem>
-                        </items>
-                    </menu>
-                </menuItem>
-                <menuItem title="Edit" id="217"/>
-                <menuItem title="Format" id="375">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                </menuItem>
-                <menuItem title="View" id="295"/>
-                <menuItem title="Window" id="19"/>
-                <menuItem title="Help" id="490">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                </menuItem>
+                <menuItem title="File" id="83"/>
             </items>
+            <point key="canvasLocation" x="139" y="154"/>
         </menu>
-        <window title="vChewing Installer" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="371">
-            <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
-            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="335" y="390" width="640" height="360"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
+        <window title="vChewing Installer" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" animationBehavior="default" titlebarAppearsTransparent="YES" id="371">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
+            <rect key="contentRect" x="335" y="390" width="533" height="430"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1600" height="875"/>
+            <value key="minSize" type="size" width="533" height="430"/>
+            <value key="maxSize" type="size" width="533" height="430"/>
             <view key="contentView" id="372">
-                <rect key="frame" x="0.0" y="0.0" width="640" height="360"/>
+                <rect key="frame" x="0.0" y="0.0" width="533" height="421"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="536">
-                        <rect key="frame" x="20" y="60" width="600" height="251"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <clipView key="contentView" drawsBackground="NO" id="vR5-yR-zjT">
-                            <rect key="frame" x="1" y="1" width="583" height="249"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                            <subviews>
-                                <textView editable="NO" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" spellingCorrection="YES" smartInsertDelete="YES" id="537">
-                                    <rect key="frame" x="0.0" y="0.0" width="583" height="249"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="minSize" width="583" height="249"/>
-                                    <size key="maxSize" width="600" height="10000000"/>
-                                    <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                </textView>
-                            </subviews>
-                        </clipView>
-                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="538">
-                            <rect key="frame" x="-100" y="-100" width="87" height="18"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                        </scroller>
-                        <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="539">
-                            <rect key="frame" x="584" y="1" width="15" height="249"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                        </scroller>
-                    </scrollView>
-                    <button verticalHuggingPriority="750" imageHugsTitle="YES" id="575">
-                        <rect key="frame" x="460" y="12" width="166" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Agree and Install" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="576">
+                    <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="575">
+                        <rect key="frame" x="401" y="65" width="124" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="110" id="0Oj-Zi-XgI"/>
+                        </constraints>
+                        <buttonCell key="cell" type="push" title="I Accept" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="576">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
@@ -129,9 +87,141 @@
                             <action selector="agreeAndInstallAction:" target="494" id="708"/>
                         </connections>
                     </button>
-                    <button verticalHuggingPriority="750" imageHugsTitle="YES" id="592">
-                        <rect key="frame" x="330" y="12" width="130" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" findBarPosition="belowContent" translatesAutoresizingMaskIntoConstraints="NO" id="YCR-wo-M5a">
+                        <rect key="frame" x="91" y="130" width="427" height="160"/>
+                        <clipView key="contentView" drawsBackground="NO" id="NrY-FL-PVu" userLabel="appEULAContentClip">
+                            <rect key="frame" x="1" y="1" width="425" height="158"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="bar" smartInsertDelete="YES" id="47J-tO-8TZ" userLabel="appEULAContent">
+                                    <rect key="frame" x="0.0" y="-2" width="425" height="158"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <size key="minSize" width="425" height="158"/>
+                                    <size key="maxSize" width="427" height="10000000"/>
+                                    <attributedString key="textStorage">
+                                        <fragment content="Placeholder for EULA Texts.">
+                                            <attributes>
+                                                <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <font key="NSFont" metaFont="systemLight" size="11"/>
+                                                <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                            </attributes>
+                                        </fragment>
+                                    </attributedString>
+                                    <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                </textView>
+                            </subviews>
+                        </clipView>
+                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="YOZ-MC-EF2">
+                            <rect key="frame" x="-100" y="-100" width="240" height="16"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" controlSize="mini" horizontal="NO" id="E5B-3B-faV">
+                            <rect key="frame" x="412" y="1" width="14" height="158"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ir5-sQ-sJc">
+                        <rect key="frame" x="89" y="406" width="123" height="15"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="119" id="3I3-jg-OvY"/>
+                        </constraints>
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="vChewing for macOS" id="GNc-8S-1VG" userLabel="appNameLabel">
+                            <font key="font" metaFont="cellTitle"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bzR-Oa-BZa">
+                        <rect key="frame" x="89" y="390" width="281" height="15"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="277" id="VmK-1Y-k0C"/>
+                        </constraints>
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="Derived from OpenVanilla McBopopmofo Project." id="QYf-Nf-hoi">
+                            <font key="font" metaFont="cellTitle"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="03l-rN-zf9">
+                        <rect key="frame" x="89" y="374" width="297" height="15"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="293" id="y1f-5D-QsU"/>
+                        </constraints>
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="Placeholder for showing copyright information." id="eo3-TK-0rB" userLabel="appCopyrightLabel">
+                            <font key="font" metaFont="cellTitle"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XLb-mv-73s">
+                        <rect key="frame" x="89" y="321" width="431" height="45"/>
+                        <constraints>
+                            <constraint firstAttribute="height" relation="lessThanOrEqual" constant="76" id="LAm-9N-mqa"/>
+                        </constraints>
+                        <textFieldCell key="cell" selectable="YES" id="VW8-s5-Wpn">
+                            <font key="font" metaFont="cellTitle"/>
+                            <string key="title">McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.
+vChewing macOS Development Reinforced by Hiraku Wang. vChewing Phrase Database Maintained by Shiki Suen.</string>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Yyh-Nw-Sba">
+                        <rect key="frame" x="15" y="101" width="503" height="5"/>
+                    </box>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="k5O-zZ-gQY">
+                        <rect key="frame" x="89" y="298" width="431" height="15"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="MIT-NTL License:" id="AVS-ih-FXM">
+                            <font key="font" metaFont="cellTitle"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="miu-08-dZk">
+                        <rect key="frame" x="13" y="20" width="379" height="75"/>
+                        <textFieldCell key="cell" selectable="YES" id="Q9M-ni-kUM">
+                            <font key="font" metaFont="cellTitle"/>
+                            <string key="title">DISCLAIMER: The vChewing project is not responsible for the phrase database shipped in the original McBopomofo project. Everything in the vChewing phrase database has been confirmed lawful to the Anti-Secession Law and the National Security Law of the PRC.</string>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <imageView translatesAutoresizingMaskIntoConstraints="NO" id="Ked-gt-bjE">
+                        <rect key="frame" x="15" y="111" width="63" height="310"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="310" id="5wC-dT-Uz3"/>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="63" id="W7V-Ng-10g"/>
+                            <constraint firstAttribute="width" constant="63" id="YXL-A1-g3p"/>
+                        </constraints>
+                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="AboutBanner" id="akk-zO-Abm"/>
+                    </imageView>
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="z1m-8k-Z63">
+                        <rect key="frame" x="211" y="406" width="126" height="15"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="50" id="Jdx-X9-Hij"/>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="122" id="jzd-NM-NvT"/>
+                        </constraints>
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="version_placeholder" id="JRP-At-H9q" userLabel="appVersionLabel">
+                            <font key="font" metaFont="cellTitle"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nul-TQ-gOI">
+                        <rect key="frame" x="89" y="112" width="431" height="15"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="277" id="H41-O5-m6k"/>
+                        </constraints>
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="By installing the software, you must accept the terms above." id="mf8-6e-z7X">
+                            <font key="font" metaFont="systemBold" size="12"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="592">
+                        <rect key="frame" x="401" y="38" width="124" height="32"/>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="593">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -143,56 +233,82 @@ Gw
                             <action selector="cancelAction:" target="494" id="707"/>
                         </connections>
                     </button>
-                    <textField verticalHuggingPriority="750" id="623">
-                        <rect key="frame" x="17" y="323" width="559" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Welcome to the vChewing Installer! Please read the following Software Licence:" id="624">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <textField verticalHuggingPriority="750" id="688">
-                        <rect key="frame" x="17" y="19" width="337" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="By installing the software I agree to the terms above." id="689">
-                            <font key="font" metaFont="smallSystem"/>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
                 </subviews>
+                <constraints>
+                    <constraint firstItem="z1m-8k-Z63" firstAttribute="leading" secondItem="ir5-sQ-sJc" secondAttribute="trailing" constant="3" id="0o7-UY-W0K"/>
+                    <constraint firstItem="Yyh-Nw-Sba" firstAttribute="centerX" secondItem="372" secondAttribute="centerX" id="3aZ-3E-Vdy"/>
+                    <constraint firstItem="k5O-zZ-gQY" firstAttribute="trailing" secondItem="YCR-wo-M5a" secondAttribute="trailing" id="4NS-rw-Qva"/>
+                    <constraint firstItem="ir5-sQ-sJc" firstAttribute="leading" secondItem="Ked-gt-bjE" secondAttribute="trailing" constant="13" id="4V5-on-27Y"/>
+                    <constraint firstItem="Yyh-Nw-Sba" firstAttribute="top" secondItem="Ked-gt-bjE" secondAttribute="bottom" constant="7" id="AyX-mk-WtV"/>
+                    <constraint firstItem="Yyh-Nw-Sba" firstAttribute="trailing" secondItem="575" secondAttribute="trailing" id="Bca-rd-sbR"/>
+                    <constraint firstItem="bzR-Oa-BZa" firstAttribute="leading" secondItem="03l-rN-zf9" secondAttribute="leading" id="CIb-nF-iqX"/>
+                    <constraint firstItem="Ked-gt-bjE" firstAttribute="top" secondItem="ir5-sQ-sJc" secondAttribute="top" id="EMT-y1-zok"/>
+                    <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="03l-rN-zf9" secondAttribute="trailing" constant="149" id="Fbb-sS-k16"/>
+                    <constraint firstItem="Ked-gt-bjE" firstAttribute="leading" secondItem="Yyh-Nw-Sba" secondAttribute="leading" id="GCn-r0-OPd"/>
+                    <constraint firstItem="592" firstAttribute="leading" secondItem="575" secondAttribute="leading" id="IYS-ug-XYc"/>
+                    <constraint firstItem="k5O-zZ-gQY" firstAttribute="leading" secondItem="YCR-wo-M5a" secondAttribute="leading" id="IxG-yS-mAV"/>
+                    <constraint firstItem="ir5-sQ-sJc" firstAttribute="leading" secondItem="bzR-Oa-BZa" secondAttribute="leading" id="Jne-Vq-zOm"/>
+                    <constraint firstItem="Yyh-Nw-Sba" firstAttribute="top" secondItem="nul-TQ-gOI" secondAttribute="bottom" constant="8" symbolic="YES" id="KbY-VE-qlS"/>
+                    <constraint firstItem="z1m-8k-Z63" firstAttribute="baseline" secondItem="ir5-sQ-sJc" secondAttribute="baseline" id="LC5-QK-hpP"/>
+                    <constraint firstItem="k5O-zZ-gQY" firstAttribute="top" secondItem="XLb-mv-73s" secondAttribute="bottom" constant="8" symbolic="YES" id="MYT-3b-SP8"/>
+                    <constraint firstItem="XLb-mv-73s" firstAttribute="trailing" secondItem="k5O-zZ-gQY" secondAttribute="trailing" id="P3c-oh-RAT"/>
+                    <constraint firstItem="Yyh-Nw-Sba" firstAttribute="leading" secondItem="miu-08-dZk" secondAttribute="leading" id="Q3a-Oq-MZV"/>
+                    <constraint firstItem="bzR-Oa-BZa" firstAttribute="top" secondItem="ir5-sQ-sJc" secondAttribute="bottom" constant="1" id="R3J-l0-wlv"/>
+                    <constraint firstItem="XLb-mv-73s" firstAttribute="leading" secondItem="k5O-zZ-gQY" secondAttribute="leading" id="RpX-A9-2wK"/>
+                    <constraint firstItem="nul-TQ-gOI" firstAttribute="trailing" secondItem="Yyh-Nw-Sba" secondAttribute="trailing" id="Ruc-Yl-MpL"/>
+                    <constraint firstItem="575" firstAttribute="top" secondItem="Yyh-Nw-Sba" secondAttribute="bottom" constant="11" id="Txn-WT-xCT"/>
+                    <constraint firstItem="03l-rN-zf9" firstAttribute="top" secondItem="bzR-Oa-BZa" secondAttribute="bottom" constant="1" id="U4G-p1-Vwf"/>
+                    <constraint firstItem="nul-TQ-gOI" firstAttribute="top" secondItem="YCR-wo-M5a" secondAttribute="bottom" constant="3" id="W1d-gJ-JyA"/>
+                    <constraint firstItem="Ked-gt-bjE" firstAttribute="top" secondItem="372" secondAttribute="top" id="dRY-rA-OCS"/>
+                    <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="z1m-8k-Z63" secondAttribute="trailing" constant="198" id="dg9-BV-dlB"/>
+                    <constraint firstItem="miu-08-dZk" firstAttribute="top" secondItem="Yyh-Nw-Sba" secondAttribute="bottom" constant="8" symbolic="YES" id="djR-VW-Oec"/>
+                    <constraint firstItem="Ked-gt-bjE" firstAttribute="leading" secondItem="372" secondAttribute="leading" constant="15" id="eAL-dG-Mgd"/>
+                    <constraint firstAttribute="bottom" secondItem="miu-08-dZk" secondAttribute="bottom" constant="20" symbolic="YES" id="gIW-E7-Fn7"/>
+                    <constraint firstItem="592" firstAttribute="trailing" secondItem="575" secondAttribute="trailing" id="gn0-Fc-WHG"/>
+                    <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="592" secondAttribute="bottom" constant="45" id="kmc-O2-xmA"/>
+                    <constraint firstItem="YCR-wo-M5a" firstAttribute="leading" secondItem="nul-TQ-gOI" secondAttribute="leading" id="m1K-2W-JSs"/>
+                    <constraint firstItem="03l-rN-zf9" firstAttribute="leading" secondItem="XLb-mv-73s" secondAttribute="leading" id="oWV-rf-6Z5"/>
+                    <constraint firstItem="575" firstAttribute="leading" relation="lessThanOrEqual" secondItem="miu-08-dZk" secondAttribute="trailing" constant="18" id="pEL-mN-Nr5"/>
+                    <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="bzR-Oa-BZa" secondAttribute="trailing" constant="165" id="rgf-Zv-6Lp"/>
+                    <constraint firstItem="YCR-wo-M5a" firstAttribute="trailing" secondItem="Yyh-Nw-Sba" secondAttribute="trailing" id="uzb-ag-OHB"/>
+                    <constraint firstItem="XLb-mv-73s" firstAttribute="top" secondItem="03l-rN-zf9" secondAttribute="bottom" constant="8" symbolic="YES" id="vz4-Fp-Jj1"/>
+                    <constraint firstItem="592" firstAttribute="top" secondItem="575" secondAttribute="bottom" constant="7" id="wb9-Ys-Yhs"/>
+                    <constraint firstItem="YCR-wo-M5a" firstAttribute="top" secondItem="k5O-zZ-gQY" secondAttribute="bottom" constant="8" symbolic="YES" id="xds-7u-usv"/>
+                </constraints>
             </view>
             <connections>
                 <outlet property="delegate" destination="494" id="706"/>
             </connections>
+            <point key="canvasLocation" x="-112.5" y="-184.5"/>
         </window>
         <customObject id="494" customClass="AppDelegate">
             <connections>
+                <outlet property="appCopyrightLabel" destination="03l-rN-zf9" id="XS5-cZ-k9H"/>
+                <outlet property="appEULAContent" destination="47J-tO-8TZ" id="kRU-X2-8kX"/>
+                <outlet property="appVersionLabel" destination="z1m-8k-Z63" id="75X-uy-0Iz"/>
                 <outlet property="cancelButton" destination="592" id="710"/>
                 <outlet property="installButton" destination="575" id="709"/>
                 <outlet property="progressIndicator" destination="deb-uT-yNv" id="Cpk-6Z-0rj"/>
                 <outlet property="progressSheet" destination="gHl-Hx-eQn" id="gD4-XO-YO1"/>
-                <outlet property="textView" destination="537" id="705"/>
                 <outlet property="window" destination="371" id="532"/>
             </connections>
         </customObject>
-        <customObject id="420" customClass="NSFontManager"/>
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="gHl-Hx-eQn">
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="283" y="305" width="480" height="180"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1600" height="875"/>
             <view key="contentView" id="wAe-c8-Vh9">
                 <rect key="frame" x="0.0" y="0.0" width="480" height="180"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <progressIndicator wantsLayer="YES" maxValue="1" style="bar" id="deb-uT-yNv">
+                    <progressIndicator wantsLayer="YES" maxValue="1" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="deb-uT-yNv">
                         <rect key="frame" x="20" y="67" width="440" height="20"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                     </progressIndicator>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="VDL-Yq-heb">
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VDL-Yq-heb">
                         <rect key="frame" x="18" y="94" width="444" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="17" id="MLj-KG-mL8"/>
+                        </constraints>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Stopping the old version. This may take up to one minute…" id="nTo-dx-qfZ">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -200,8 +316,20 @@ Gw
                         </textFieldCell>
                     </textField>
                 </subviews>
+                <constraints>
+                    <constraint firstItem="VDL-Yq-heb" firstAttribute="trailing" secondItem="deb-uT-yNv" secondAttribute="trailing" id="DCe-Xh-ee1"/>
+                    <constraint firstItem="deb-uT-yNv" firstAttribute="top" secondItem="VDL-Yq-heb" secondAttribute="bottom" constant="8" symbolic="YES" id="HUE-gU-UFS"/>
+                    <constraint firstItem="VDL-Yq-heb" firstAttribute="top" secondItem="wAe-c8-Vh9" secondAttribute="top" constant="69" id="IwI-63-e9H"/>
+                    <constraint firstItem="VDL-Yq-heb" firstAttribute="leading" secondItem="deb-uT-yNv" secondAttribute="leading" id="UUz-sT-D9I"/>
+                    <constraint firstItem="VDL-Yq-heb" firstAttribute="leading" secondItem="wAe-c8-Vh9" secondAttribute="leading" constant="20" symbolic="YES" id="Vgg-bw-6wt"/>
+                    <constraint firstAttribute="trailing" secondItem="VDL-Yq-heb" secondAttribute="trailing" constant="20" symbolic="YES" id="ft0-oZ-8HD"/>
+                </constraints>
             </view>
-            <point key="canvasLocation" x="4" y="123.5"/>
+            <point key="canvasLocation" x="529" y="-282"/>
         </window>
+        <customObject id="420" customClass="NSFontManager"/>
     </objects>
+    <resources>
+        <image name="AboutBanner" width="63" height="310"/>
+    </resources>
 </document>
