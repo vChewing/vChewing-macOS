@@ -1,7 +1,12 @@
 //
 // VTVerticalKeyLabelStripView.h
 //
-// Copyright (c) 2012 Lukhnos D. Liu (http://lukhnos.org)
+// Copyright (c) 2021-2022 The vChewing Project.
+// Copyright (c) 2011-2022 The OpenVanilla Project.
+//
+// Contributors:
+//     Lukhnos Liu (@lukhnos) @ OpenVanilla
+//     Shiki Suen (ShikiSuen) @ vChewing
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -33,6 +38,11 @@
 @synthesize keyLabels = _keyLabels;
 @synthesize highlightedIndex = _highlightedIndex;
 
+static NSColor *colorFromRGBA(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+{
+    return [NSColor colorWithDeviceRed:(r/255.0f) green:(g/255.0f) blue:(b/255.0f) alpha:(a/255.0f)];
+}
+
 - (void)dealloc
 {
     _keyLabelFont = nil;
@@ -57,7 +67,7 @@
 - (void)drawRect:(NSRect)dirtyRect
 {
     NSRect bounds = [self bounds];
-    [[NSColor whiteColor] setFill];
+    [[NSColor clearColor] setFill];
     [NSBezierPath fillRect:bounds];
 
     NSUInteger count = [_keyLabels count];
@@ -66,22 +76,22 @@
     }
 
     CGFloat cellHeight = bounds.size.height / count;
-    NSColor *black = [NSColor blackColor];
-    NSColor *darkGray = [NSColor colorWithDeviceWhite:0.7 alpha:1.0];
-    NSColor *lightGray = [NSColor colorWithDeviceWhite:0.8 alpha:1.0];
-
+    NSColor *clrCandidateBG = colorFromRGBA(28,28,28,255);
+    NSColor *clrCandidateTextIndex = colorFromRGBA(233,233,233,213);
+    NSColor *clrCandidateSelectedBG = [NSColor alternateSelectedControlColor];
+    
     NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
     [style setAlignment:NSCenterTextAlignment];
     
     NSDictionary *textAttr = [NSDictionary dictionaryWithObjectsAndKeys:
                               _keyLabelFont, NSFontAttributeName,
-                              black, NSForegroundColorAttributeName,
+                              clrCandidateTextIndex, NSForegroundColorAttributeName,
                               style, NSParagraphStyleAttributeName,
                               nil];
 
     for (NSUInteger index = 0; index < count; index++) {
         NSRect textRect = NSMakeRect(0.0, index * cellHeight + _labelOffsetY, bounds.size.width, cellHeight - _labelOffsetY);
-        NSRect cellRect = NSMakeRect(0.0, index * cellHeight, bounds.size.width, cellHeight - 1);
+        NSRect cellRect = NSMakeRect(0.0, index * cellHeight, bounds.size.width, cellHeight);
         
         // fill in the last cell
         if (index + 1 >= count) {
@@ -89,10 +99,10 @@
         }
         
         if (index == _highlightedIndex) {
-            [darkGray setFill];
+            [clrCandidateSelectedBG setFill];
         }
         else {
-            [lightGray setFill];
+            [clrCandidateBG setFill];
         }
         
         [NSBezierPath fillRect:cellRect];

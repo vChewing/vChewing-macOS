@@ -55,10 +55,12 @@
     NSRect contentRect = NSMakeRect(128.0, 128.0, 0.0, 0.0);
     NSUInteger styleMask = NSBorderlessWindowMask | NSNonactivatingPanelMask;
     
-    NSPanel *panel = [[NSPanel alloc] initWithContentRect:contentRect styleMask:styleMask backing:NSBackingStoreBuffered defer:NO];
+    NSWindow *panel = [[NSWindow alloc] initWithContentRect:contentRect styleMask:styleMask backing:NSBackingStoreBuffered defer:NO];
     [panel setLevel:kCGPopUpMenuWindowLevel];
     [panel setHasShadow:YES];
-    
+    [panel setOpaque:NO];
+    [panel setBackgroundColor:[NSColor clearColor]];
+
     self = [self initWithWindow:panel];
     if (self) {
         contentRect.origin = NSMakePoint(0.0, 0.0);
@@ -67,20 +69,30 @@
         _candidateView.action = @selector(candidateViewMouseDidClick:);
         [[panel contentView] addSubview:_candidateView];
 
-        contentRect.size = NSMakeSize(36.0, 20.0);
+        contentRect.size = NSMakeSize(16.0, 20.0);
         _nextPageButton = [[NSButton alloc] initWithFrame:contentRect];
         _prevPageButton = [[NSButton alloc] initWithFrame:contentRect];
         [_nextPageButton setButtonType:NSMomentaryLightButton];
-        [_nextPageButton setBezelStyle:NSSmallSquareBezelStyle];
-        [_nextPageButton setTitle:@"»"];
+        [_nextPageButton setBezelStyle:NSBezelStyleSmallSquare];
+        [_nextPageButton setTitle:@"↓"];
         [_nextPageButton setTarget:self];
         [_nextPageButton setAction:@selector(pageButtonAction:)];
-
+        [_nextPageButton setWantsLayer: YES];
+        [_nextPageButton.layer setCornerRadius: 3];
+        [_nextPageButton.layer setBorderColor: [NSColor clearColor].CGColor];
+        [_nextPageButton.layer setBorderWidth: 3];
+        [_nextPageButton.layer setBackgroundColor: [NSColor windowBackgroundColor].CGColor];
+         
         [_prevPageButton setButtonType:NSMomentaryLightButton];
-        [_prevPageButton setBezelStyle:NSSmallSquareBezelStyle];
-        [_prevPageButton setTitle:@"«"];
+        [_prevPageButton setBezelStyle:NSBezelStyleSmallSquare];
+        [_prevPageButton setTitle:@"↑"];
         [_prevPageButton setTarget:self];
         [_prevPageButton setAction:@selector(pageButtonAction:)];
+        [_prevPageButton setWantsLayer: YES];
+        [_prevPageButton.layer setCornerRadius: 3];
+        [_prevPageButton.layer setBorderColor: [NSColor clearColor].CGColor];
+        [_prevPageButton.layer setBorderWidth: 3];
+        [_prevPageButton.layer setBackgroundColor: [NSColor windowBackgroundColor].CGColor];
         
         [[panel contentView] addSubview:_nextPageButton];
         [[panel contentView] addSubview:_prevPageButton];
