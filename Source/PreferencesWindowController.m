@@ -97,8 +97,8 @@ static NSString *const kDefaultKeys = @"123456789";
     [self.selectionKeyComboBox removeAllItems];
     [self.selectionKeyComboBox addItemsWithObjectValues:@[
         kDefaultKeys,
-        @"asdfghjkl",
-        @"asdfzxcvb"
+        @"ASDFGHJKL",
+        @"ASDFZXCVB"
     ]];
 
     NSString *ckeys = [[NSUserDefaults standardUserDefaults] stringForKey:kCandidateKeys];
