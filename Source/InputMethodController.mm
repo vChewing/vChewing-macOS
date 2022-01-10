@@ -1327,7 +1327,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
 - (void)showAbout:(id)sender
 {
-    [[frmAboutWindow defaultController].window orderFront:sender];
+    [[frmAboutWindow defaultController] showWithSender:sender];
 }
 
 - (void)toggleChineseConverter:(id)sender
