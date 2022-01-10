@@ -67,6 +67,7 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
     }
 
     [self checkForUpdate];
+    [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
 }
 
 - (void)checkForUpdate
@@ -266,6 +267,10 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 - (void)nonModalAlertWindowControllerDidCancel:(OVNonModalAlertWindowController *)controller
 {
     _updateNextStepURL = nil;
+}
+
+- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification{
+    return YES;
 }
 
 @end

@@ -36,7 +36,7 @@
 
 @class PreferencesWindowController;
 
-@interface AppDelegate : NSObject <NSApplicationDelegate>
+@interface AppDelegate : NSObject <NSApplicationDelegate, NSUserNotificationCenterDelegate>
 {
 @private
     NSURLConnection *_updateCheckConnection;
