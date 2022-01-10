@@ -57,7 +57,7 @@ using namespace Formosa::Gramambular;
 using namespace OpenVanilla;
 
 // default, min and max candidate list text size
-static const NSInteger kDefaultCandidateListTextSize = 16;
+static const NSInteger kDefaultCandidateListTextSize = 18;
 static const NSInteger kMinKeyLabelSize = 10;
 static const NSInteger kMinCandidateListTextSize = 12;
 static const NSInteger kMaxCandidateListTextSize = 196;
@@ -1268,8 +1268,8 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     NSString *klFontName = [[NSUserDefaults standardUserDefaults] stringForKey:kCandidateKeyLabelFontName];
     NSString *ckeys = [[NSUserDefaults standardUserDefaults] stringForKey:kCandidateKeys];
 
-    gCurrentCandidateController.keyLabelFont = klFontName ? [NSFont fontWithName:klFontName size:keyLabelSize] : [NSFont systemFontOfSize:keyLabelSize];
-    gCurrentCandidateController.candidateFont = ctFontName ? [NSFont fontWithName:ctFontName size:textSize] : [NSFont systemFontOfSize:textSize];
+    gCurrentCandidateController.keyLabelFont = klFontName ? [NSFont fontWithName:klFontName size:keyLabelSize] : [NSFont monospacedDigitSystemFontOfSize:keyLabelSize weight:NSFontWeightMedium];
+    gCurrentCandidateController.candidateFont = ctFontName ? [NSFont fontWithName:ctFontName size:textSize] : [NSFont systemFontOfSize:textSize weight:NSFontWeightRegular];
 
     NSMutableArray *keyLabels = [NSMutableArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", nil];
 
