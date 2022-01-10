@@ -117,13 +117,13 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 #endif
 
 // shared language model object that stores our phrase-term probability database
-FastLM gLanguageModel;
-FastLM gLanguageModelSimpBopomofo;
+FastLM gLanguageModelCHT;
+FastLM gLanguageModelCHS;
 
 static const int kUserOverrideModelCapacity = 500;
 static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
-vChewing::UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
-vChewing::UserOverrideModel gUserOverrideModelSimpBopomofo(kUserOverrideModelCapacity, kObservedOverrideHalflife);
+vChewing::UserOverrideModel gUserOverrideModelCHT(kUserOverrideModelCapacity, kObservedOverrideHalflife);
+vChewing::UserOverrideModel gUserOverrideModelCHS(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
 // https://clang-analyzer.llvm.org/faq.html
 __attribute__((annotate("returns_localized_nsstring")))
@@ -159,14 +159,14 @@ public:
 static const double kEpsilon = 0.000001;
 
 static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) {
-	double highestScore = 0.0;
-	for (auto ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
-		double score = ni->node->highestUnigramScore();
-		if (score > highestScore) {
-			highestScore = score;
-		}
-	}
-	return highestScore + epsilon;
+    double highestScore = 0.0;
+    for (auto ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
+        double score = ni->node->highestUnigramScore();
+        if (score > highestScore) {
+            highestScore = score;
+        }
+    }
+    return highestScore + epsilon;
 }
 
 @implementation vChewingInputMethodController
@@ -199,9 +199,9 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
         _bpmfReadingBuffer = new BopomofoReadingBuffer(BopomofoKeyboardLayout::StandardLayout());
 
         // create the lattice builder
-        _languageModel = &gLanguageModel;
+        _languageModel = &gLanguageModelCHT;
         _builder = new BlockReadingBuilder(_languageModel);
-		_uom = &gUserOverrideModel;
+        _uom = &gUserOverrideModelCHT;
 
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
@@ -337,13 +337,13 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
     if ([value isKindOfClass:[NSString class]] && [value isEqual:kSimpBopomofoModeIdentifier]) {
         newInputMode = kSimpBopomofoModeIdentifier;
-        newLanguageModel = &gLanguageModelSimpBopomofo;
-        newUom = &gUserOverrideModelSimpBopomofo;
+        newLanguageModel = &gLanguageModelCHS;
+        newUom = &gUserOverrideModelCHS;
     }
     else {
         newInputMode = kBopomofoModeIdentifier;
-        newLanguageModel = &gLanguageModel;
-        newUom = &gUserOverrideModel;
+        newLanguageModel = &gLanguageModelCHT;
+        newUom = &gUserOverrideModelCHT;
     }
 
     // Only apply the changes if the value is changed
@@ -692,15 +692,15 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
         // then walk the lattice
         [self popOverflowComposingTextAndWalk:client];
 
-		// get user override model suggestion
-		string overrideValue =
-				_uom->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
-		if (!overrideValue.empty()) {
-			size_t cursorIndex = [self actualCandidateCursorIndex];
-			vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
-			double highestScore = FindHighestScore(nodes, kEpsilon);
-			_builder->grid().overrideNodeScoreForSelectedCandidate(cursorIndex, overrideValue, highestScore);
-		}
+        // get user override model suggestion
+        string overrideValue =
+                _uom->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
+        if (!overrideValue.empty()) {
+            size_t cursorIndex = [self actualCandidateCursorIndex];
+            vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
+            double highestScore = FindHighestScore(nodes, kEpsilon);
+            _builder->grid().overrideNodeScoreForSelectedCandidate(cursorIndex, overrideValue, highestScore);
+        }
 
         // then update the text
         _bpmfReadingBuffer->clear();
@@ -734,40 +734,40 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     }
 
     // Esc
-	if (charCode == 27) {
-			BOOL escToClearInputBufferEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kEscToCleanInputBufferKey];
+    if (charCode == 27) {
+            BOOL escToClearInputBufferEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kEscToCleanInputBufferKey];
 
-			if (escToClearInputBufferEnabled) {
-				// if the optioon is enabled, we clear everythiong including the composing
-				// buffer, walked nodes and the reading.
-				if (![_composingBuffer length]) {
-					return NO;
-				}
-				_bpmfReadingBuffer->clear();
-				_builder->clear();
-				_walkedNodes.clear();
-				[_composingBuffer setString:@""];
-			}
-			else {
-				// if reading is not empty, we cancel the reading; Apple's built-in
-				// Zhuyin (and the erstwhile Hanin) has a default option that Esc
-				// "cancels" the current composed character and revert it to
-				// Bopomofo reading, in odds with the expectation of users from
-				// other platforms
+            if (escToClearInputBufferEnabled) {
+                // if the optioon is enabled, we clear everythiong including the composing
+                // buffer, walked nodes and the reading.
+                if (![_composingBuffer length]) {
+                    return NO;
+                }
+                _bpmfReadingBuffer->clear();
+                _builder->clear();
+                _walkedNodes.clear();
+                [_composingBuffer setString:@""];
+            }
+            else {
+                // if reading is not empty, we cancel the reading; Apple's built-in
+                // Zhuyin (and the erstwhile Hanin) has a default option that Esc
+                // "cancels" the current composed character and revert it to
+                // Bopomofo reading, in odds with the expectation of users from
+                // other platforms
 
-				if (_bpmfReadingBuffer->isEmpty()) {
-					// no nee to beep since the event is deliberately triggered by user
+                if (_bpmfReadingBuffer->isEmpty()) {
+                    // no nee to beep since the event is deliberately triggered by user
 
-					if (![_composingBuffer length]) {
-						return NO;
-					}
-				}
-				else {
-					_bpmfReadingBuffer->clear();
-				}
-			}
+                    if (![_composingBuffer length]) {
+                        return NO;
+                    }
+                }
+                else {
+                    _bpmfReadingBuffer->clear();
+                }
+            }
 
-			[self updateClientComposingBuffer:client];
+            [self updateClientComposingBuffer:client];
         return YES;
     }
 
@@ -1366,8 +1366,8 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
     size_t cursorIndex = [self actualCandidateCursorIndex];
     _builder->grid().fixNodeSelectedCandidate(cursorIndex, selectedValue);
-	
-	_uom->observe(_walkedNodes, cursorIndex, selectedValue, [[NSDate date] timeIntervalSince1970]);
+    
+    _uom->observe(_walkedNodes, cursorIndex, selectedValue, [[NSDate date] timeIntervalSince1970]);
 
     [_candidates removeAllObjects];
 
@@ -1407,6 +1407,6 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, FastLM &
 
 void LTLoadLanguageModel()
 {
-    LTLoadLanguageModelFile(@"data", gLanguageModel);
-    LTLoadLanguageModelFile(@"data-chs", gLanguageModelSimpBopomofo);
+    LTLoadLanguageModelFile(@"data", gLanguageModelCHT);
+    LTLoadLanguageModelFile(@"data-chs", gLanguageModelCHS);
 }
