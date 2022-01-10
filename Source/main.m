@@ -1,11 +1,15 @@
 //
 // main.m
 //
-// Copyright (c) 2021 The vChewing Project.
+// Copyright (c) 2021-2022 The vChewing Project.
+// Copyright (c) 2011-2022 The OpenVanilla Project.
 //
 // Contributors:
-//     Mengjuei Hsieh (@mjhsieh)
-//     Weizhong Yang (@zonble)
+//     Mengjuei Hsieh (@mjhsieh) @ OpenVanilla
+//     Weizhong Yang (@zonble) @ OpenVanilla
+//     Lukhnos Liu (@lukhnos) @ OpenVanilla
+//     Hiraku Wang (@hirakujira) @ vChewing
+//     Shiki Suen (@ShikiSuen) @ vChewing
 //
 // Based on the Syrup Project and the Formosana Library
 // by Lukhnos Liu (@lukhnos).
