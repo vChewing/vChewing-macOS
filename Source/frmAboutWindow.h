@@ -3,7 +3,7 @@
 //  Tile Map Editor
 //
 //  Created & Original Rights by Nicolás Miari on 2016/02/11.
-//  Patched by Shiki Suen for the vChewing Project.
+//  Patched by Hiraku Wang and Shiki Suen for the vChewing Project.
 //  Released under MIT License.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,6 +29,7 @@
 @interface frmAboutWindow : NSWindowController
 
 + (instancetype) defaultController;
+- (void) showWithSender:(id)sender;
 
 @property (nonatomic) IBOutlet NSTextField *appNameLabel;
 @property (nonatomic) IBOutlet NSTextField *appVersionLabel;
