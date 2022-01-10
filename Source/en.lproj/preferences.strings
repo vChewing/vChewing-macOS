@@ -1,0 +1,108 @@
+
+/* Class = "NSWindow"; title = "Bopomofo Preferences"; ObjectID = "1"; */
+"1.title" = "Bopomofo Preferences";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "5"; */
+"5.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Standard"; ObjectID = "6"; */
+"6.title" = "Standard";
+
+/* Class = "NSMenuItem"; title = "ETen"; ObjectID = "7"; */
+"7.title" = "ETen";
+
+/* Class = "NSMenuItem"; title = "Hsu"; ObjectID = "8"; */
+"8.title" = "Hsu";
+
+/* Class = "NSMenuItem"; title = "ETen26"; ObjectID = "9"; */
+"9.title" = "ETen26";
+
+/* Class = "NSMenuItem"; title = "Hanyu Pinyin"; ObjectID = "10"; */
+"10.title" = "Hanyu Pinyin";
+
+/* Class = "NSTextFieldCell"; title = "Bopomofo Keyboard Layout:"; ObjectID = "12"; */
+"12.title" = "Bopomofo Keyboard Layout:";
+
+/* Class = "NSTextFieldCell"; title = "Show Candidate Phrase:"; ObjectID = "14"; */
+"14.title" = "Show Candidate Phrase:";
+
+/* Class = "NSButtonCell"; title = "Before the cursor (like Hanin)"; ObjectID = "16"; */
+"16.title" = "Before the cursor (like Hanin)";
+
+/* Class = "NSButtonCell"; title = "After the cursor (like MS IME)"; ObjectID = "17"; */
+"17.title" = "After the cursor (like MS IME)";
+
+/* Class = "NSButtonCell"; title = "Radio"; ObjectID = "18"; */
+"18.title" = "Radio";
+
+/* Class = "NSButtonCell"; title = "Radio"; ObjectID = "20"; */
+"20.title" = "Radio";
+
+/* Class = "NSButtonCell"; title = "Horizontal"; ObjectID = "21"; */
+"21.title" = "Horizontal";
+
+/* Class = "NSButtonCell"; title = "Vertical"; ObjectID = "22"; */
+"22.title" = "Vertical";
+
+/* Class = "NSTextFieldCell"; title = "Candidate List Style:"; ObjectID = "24"; */
+"24.title" = "Candidate List Style:";
+
+/* Class = "NSTextFieldCell"; title = "Candidate Text Size:"; ObjectID = "29"; */
+"29.title" = "Candidate Text Size:";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "92"; */
+"92.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "12"; ObjectID = "93"; */
+"93.title" = "12";
+
+/* Class = "NSMenuItem"; title = "14"; ObjectID = "94"; */
+"94.title" = "14";
+
+/* Class = "NSMenuItem"; title = "16"; ObjectID = "95"; */
+"95.title" = "16";
+
+/* Class = "NSMenuItem"; title = "18"; ObjectID = "96"; */
+"96.title" = "18";
+
+/* Class = "NSMenuItem"; title = "24"; ObjectID = "98"; */
+"98.title" = "24";
+
+/* Class = "NSMenuItem"; title = "32"; ObjectID = "99"; */
+"99.title" = "32";
+
+/* Class = "NSMenuItem"; title = "64"; ObjectID = "100"; */
+"100.title" = "64";
+
+/* Class = "NSMenuItem"; title = "96"; ObjectID = "101"; */
+"101.title" = "96";
+
+/* Class = "NSButtonCell"; title = "Space key chooses candidate"; ObjectID = "110"; */
+"110.title" = "Space key chooses candidate";
+
+/* Class = "NSTextFieldCell"; title = "Alphanumeric Keyboard Layout:"; ObjectID = "126"; */
+"126.title" = "Alphanumeric Keyboard Layout:";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "128"; */
+"128.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "IBM"; ObjectID = "137"; */
+"137.title" = "IBM";
+
+/* Class = "NSTextFieldCell"; title = "Selection Keys:"; ObjectID = "FnD-oH-El5"; */
+"FnD-oH-El5.title" = "Selection Keys:";
+
+/* Class = "NSButtonCell"; title = "Check for updates automatically"; ObjectID = "Z9t-P0-BLF"; */
+"Z9t-P0-BLF.title" = "Check for updates automatically";
+
+/* Class = "NSButtonCell"; title = "ESC key clears entire input buffer"; ObjectID = "f2j-xD-4xK"; */
+"f2j-xD-4xK.title" = "ESC key clears entire input buffer";
+
+/* Class = "NSComboBoxCell"; jQC-12-UuK.ibShadowedObjectValues[0] = "Item 1"; ObjectID = "jQC-12-UuK"; */
+"jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
+
+/* Class = "NSComboBoxCell"; jQC-12-UuK.ibShadowedObjectValues[1] = "Item 2"; ObjectID = "jQC-12-UuK"; */
+"jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
+
+/* Class = "NSComboBoxCell"; jQC-12-UuK.ibShadowedObjectValues[2] = "Item 3"; ObjectID = "jQC-12-UuK"; */
+"jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
