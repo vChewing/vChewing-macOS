@@ -38,7 +38,7 @@ namespace Formosa {
         
         class BlockReadingBuilder {
         public:
-            BlockReadingBuilder(LanguageModel *inLM);
+            BlockReadingBuilder(LanguageModel *inLM, LanguageModel *inUserPhraseLM);
             void clear();
             
             size_t length() const;
@@ -52,7 +52,11 @@ namespace Formosa {
             
             void setJoinSeparator(const string& separator);
             const string joinSeparator() const;
-            
+
+            size_t markerCursorIndex() const;
+            void setMarkerCursorIndex(size_t inNewIndex);
+            vector<string> readingsAtRange(size_t begin, size_t end) const;
+
             Grid& grid();
                         
         protected:
@@ -60,26 +64,31 @@ namespace Formosa {
             
             static const string Join(vector<string>::const_iterator begin, vector<string>::const_iterator end, const string& separator);
             
-	    //最多使用六個字組成一個詞
+        //最多使用六個字組成一個詞
             static const size_t MaximumBuildSpanLength = 6;
             
             size_t m_cursorIndex;
+            size_t m_markerCursorIndex;
             vector<string> m_readings;
             
             Grid m_grid;
             LanguageModel *m_LM;
+            LanguageModel *m_UserPhraseLM;
             string m_joinSeparator;
         };
         
-        inline BlockReadingBuilder::BlockReadingBuilder(LanguageModel *inLM)
+        inline BlockReadingBuilder::BlockReadingBuilder(LanguageModel *inLM, LanguageModel *inUserPhraseLM)
             : m_LM(inLM)
+            , m_UserPhraseLM(inUserPhraseLM)
             , m_cursorIndex(0)
+            , m_markerCursorIndex(SIZE_MAX)
         {
         }
         
         inline void BlockReadingBuilder::clear()
         {
             m_cursorIndex = 0;
+            m_markerCursorIndex = SIZE_MAX;
             m_readings.clear();
             m_grid.clear();
         }
@@ -99,14 +108,36 @@ namespace Formosa {
             m_cursorIndex = inNewIndex > m_readings.size() ? m_readings.size() : inNewIndex;
         }
 
+        inline size_t BlockReadingBuilder::markerCursorIndex() const
+        {
+            return m_markerCursorIndex;
+        }
+
+        inline void BlockReadingBuilder::setMarkerCursorIndex(size_t inNewIndex)
+        {
+            if (inNewIndex == SIZE_MAX) {
+                m_markerCursorIndex = SIZE_MAX;
+                return;
+            }
+
+            m_markerCursorIndex = inNewIndex > m_readings.size() ? m_readings.size() : inNewIndex;
+        }
         
         inline void BlockReadingBuilder::insertReadingAtCursor(const string& inReading)
         {
             m_readings.insert(m_readings.begin() + m_cursorIndex, inReading);
                                     
-            m_grid.expandGridByOneAtLocation(m_cursorIndex);            
+            m_grid.expandGridByOneAtLocation(m_cursorIndex);
             build();
-            m_cursorIndex++;   
+            m_cursorIndex++;
+        }
+
+        inline vector<string> BlockReadingBuilder::readingsAtRange(size_t begin, size_t end) const {
+            vector<string> v;
+            for (size_t i = begin; i < end; i++) {
+                v.push_back(m_readings[i]);
+            }
+            return v;
         }
         
         inline bool BlockReadingBuilder::deleteReadingBeforeCursor()
@@ -149,7 +180,7 @@ namespace Formosa {
                 build();
             }
             
-            return true;            
+            return true;
         }
         
         inline void BlockReadingBuilder::setJoinSeparator(const string& separator)
@@ -190,10 +221,25 @@ namespace Formosa {
             for (size_t p = begin ; p < end ; p++) {
                 for (size_t q = 1 ; q <= MaximumBuildSpanLength && p+q <= end ; q++) {
                     string combinedReading = Join(m_readings.begin() + p, m_readings.begin() + p + q, m_joinSeparator);
-                    
-                    if (m_LM->hasUnigramsForKey(combinedReading) && !m_grid.hasNodeAtLocationSpanningLengthMatchingKey(p, q, combinedReading)) {
-                        Node n(combinedReading, m_LM->unigramsForKeys(combinedReading), vector<Bigram>());                        
-                        m_grid.insertNode(n, p, q);
+                    if (!m_grid.hasNodeAtLocationSpanningLengthMatchingKey(p, q, combinedReading)) {
+                        vector<Unigram> unigrams;
+
+                        if (m_UserPhraseLM != NULL) {
+                            if (m_UserPhraseLM->hasUnigramsForKey(combinedReading)) {
+                                vector<Unigram> userUnigrams = m_UserPhraseLM->unigramsForKeys(combinedReading);
+                                unigrams.insert(unigrams.end(), userUnigrams.begin(), userUnigrams.end());
+                            }
+                        }
+
+                        if (m_LM->hasUnigramsForKey(combinedReading)) {
+                            vector<Unigram> globalUnigrams = m_LM->unigramsForKeys(combinedReading);
+                            unigrams.insert(unigrams.end(), globalUnigrams.begin(), globalUnigrams.end());
+                        }
+
+                        if (unigrams.size() > 0) {
+                            Node n(combinedReading, unigrams, vector<Bigram>());
+                            m_grid.insertNode(n, p, q);
+                        }
                     }
                 }
             }
@@ -210,7 +256,7 @@ namespace Formosa {
                 }
             }
             return result;
-        }                    
+        }
     }
 }
 
