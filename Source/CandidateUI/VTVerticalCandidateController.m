@@ -1,7 +1,12 @@
 //
 // VTVerticalCandidateController.m
 //
-// Copyright (c) 2012 Lukhnos D. Liu (http://lukhnos.org)
+// Copyright (c) 2021-2022 The vChewing Project.
+// Copyright (c) 2011-2022 The OpenVanilla Project.
+//
+// Contributors:
+//     Lukhnos Liu (@lukhnos) @ OpenVanilla
+//     Shiki Suen (ShikiSuen) @ vChewing
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -36,7 +41,12 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
 static const CGFloat kCandidateTextPadding = 24.0;
 static const CGFloat kCandidateTextLeftMargin = 8.0;
 
-#if defined(__MAC_10_16)
+static NSColor *colorFromRGBA(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+{
+	return [NSColor colorWithDeviceRed:(r/255.0f) green:(g/255.0f) blue:(b/255.0f) alpha:(a/255.0f)];
+}
+
+#if defined(__MAC_11_0)
 static const CGFloat kCandidateTextPaddingWithMandatedTableViewPadding = 18.0;
 static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
 #endif
@@ -60,29 +70,50 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
 
 - (id)init
 {
-    NSRect contentRect = NSMakeRect(128.0, 128.0, 0.0, 0.0);
-    NSUInteger styleMask = NSBorderlessWindowMask | NSNonactivatingPanelMask;
-    
-    NSPanel *panel = [[NSPanel alloc] initWithContentRect:contentRect styleMask:styleMask backing:NSBackingStoreBuffered defer:NO];
-    [panel setLevel:kCGPopUpMenuWindowLevel];
-    [panel setHasShadow:YES];
+    // NSColor *clrCandidateSelectedBG = [NSColor systemBlueColor];
+    NSColor *clrCandidateSelectedText = [[NSColor whiteColor] colorWithAlphaComponent: 0.8];
+    NSColor *clrCandidateWindowBorder = colorFromRGBA(255,255,255,75);
+    NSColor *clrCandidateWindowBG = colorFromRGBA(28,28,28,255);
+	// NSColor *clrCandidateBG = colorFromRGBA(28,28,28,255);
 
-    self = [self initWithWindow:panel];
+	NSRect contentRect = NSMakeRect(128.0, 128.0, 0.0, 0.0);
+	NSUInteger styleMask = NSBorderlessWindowMask | NSNonactivatingPanelMask;
+	NSView *panelView = [[NSView alloc] initWithFrame:contentRect];
+	NSWindow *panel = [[NSWindow alloc] initWithContentRect:contentRect styleMask:styleMask backing:NSBackingStoreBuffered defer:NO];
+	[panel setLevel:kCGPopUpMenuWindowLevel];
+	[panel setContentView: panelView];
+    [panel setHasShadow:YES];
+    [panel setOpaque:NO];
+    [panel setBackgroundColor: [NSColor clearColor]];
+    [panel setOpaque:false];
+	[panelView setWantsLayer: YES];
+	[panelView.layer setBorderColor: [clrCandidateWindowBorder CGColor]];
+	[panelView.layer setBorderWidth: 1];
+	[panelView.layer setCornerRadius: 6];
+	[panelView.layer setBackgroundColor: [clrCandidateWindowBG CGColor]];
+
+	self = [self initWithWindow:panel];
     if (self) {
         contentRect.origin = NSMakePoint(0.0, 0.0);
         
         NSRect stripRect = contentRect;
         stripRect.size.width = 10.0;
         _keyLabelStripView = [[VTVerticalKeyLabelStripView alloc] initWithFrame:stripRect];
+        [_keyLabelStripView setWantsLayer: YES];
+        [_keyLabelStripView.layer setBorderWidth: 0];
         
         [[panel contentView] addSubview:_keyLabelStripView];
         
         NSRect scrollViewRect = contentRect;
         scrollViewRect.origin.x = stripRect.size.width;
-        scrollViewRect.size.width -= stripRect.size.width;
+		scrollViewRect.size.width -= stripRect.size.width;
         
         _scrollView = [[NSScrollView alloc] initWithFrame:scrollViewRect];
-        
+        [_scrollView setAutohidesScrollers: YES];
+		[_scrollView setWantsLayer: YES];
+		[_scrollView.layer setBorderWidth: 0];
+        [_scrollView setDrawsBackground:NO];
+
         // >=10.7 only, elastic scroll causes some drawing issues with visible scroller, so we disable it
         if ([_scrollView respondsToSelector:@selector(setVerticalScrollElasticity:)]) {
             [_scrollView setVerticalScrollElasticity:NSScrollElasticityNone];
@@ -95,6 +126,8 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
         NSTableColumn *column = [[NSTableColumn alloc] initWithIdentifier:@"candidate"];
         [column setDataCell:[[NSTextFieldCell alloc] init]];
         [column setEditable:NO];
+        [column.dataCell setTextColor: clrCandidateSelectedText];
+        // [column.dataCell setSelectionColor: clrCandidateSelectedBG];
 
         _candidateTextPadding = kCandidateTextPadding;
         _candidateTextLeftMargin = kCandidateTextLeftMargin;
@@ -106,9 +139,11 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
         [_tableView setAllowsEmptySelection:YES];
         [_tableView setDoubleAction:@selector(rowDoubleClicked:)];
         [_tableView setTarget:self];
+        [_tableView setBackgroundColor:[NSColor clearColor]];
+        [_tableView setGridColor:[NSColor clearColor]];
 
-        #if defined(__MAC_10_16)
-        if (@available(macOS 10.16, *)) {
+        #if defined(__MAC_11_0)
+        if (@available(macOS 11.0, *)) {
             [_tableView setStyle:NSTableViewStyleFullWidth];
             _candidateTextPadding = kCandidateTextPaddingWithMandatedTableViewPadding;
             _candidateTextLeftMargin = kCandidateTextLeftMarginWithMandatedTableViewPadding;
@@ -394,8 +429,8 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
 
         NSScroller *verticalScroller = [_scrollView verticalScroller];
         [verticalScroller setControlSize:controlSize];
-        [verticalScroller setScrollerStyle:NSScrollerStyleLegacy];
-        scrollerWidth = [NSScroller scrollerWidthForControlSize:controlSize scrollerStyle:NSScrollerStyleLegacy];
+        [verticalScroller setScrollerStyle:NSScrollerStyleOverlay];
+        scrollerWidth = [NSScroller scrollerWidthForControlSize:controlSize scrollerStyle:NSScrollerStyleOverlay];
     }
 
     _keyLabelStripView.keyLabelFont = _keyLabelFont;
@@ -416,9 +451,9 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
     }
 
     CGFloat rowSpacing = [_tableView intercellSpacing].height;
-    CGFloat stripWidth = ceil(maxKeyLabelWidth * 1.20);
+    CGFloat stripWidth = ceil(maxKeyLabelWidth);
     CGFloat tableViewStartWidth = ceil(_maxCandidateAttrStringWidth + scrollerWidth);;
-    CGFloat windowWidth = stripWidth + 1.0 + tableViewStartWidth;
+    CGFloat windowWidth = stripWidth + tableViewStartWidth;
     CGFloat windowHeight = keyLabelCount * (rowHeight + rowSpacing);
     
     NSRect frameRect = [[self window] frame];
@@ -428,7 +463,7 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
     frameRect.origin = NSMakePoint(topLeftPoint.x, topLeftPoint.y - frameRect.size.height);
     
     [_keyLabelStripView setFrame:NSMakeRect(0.0, 0.0, stripWidth, windowHeight)];
-    [_scrollView setFrame:NSMakeRect(stripWidth + 1.0, 0.0, tableViewStartWidth, windowHeight)];
+    [_scrollView setFrame:NSMakeRect(stripWidth, 0.0, tableViewStartWidth, windowHeight)];
     [[self window] setFrame:frameRect display:NO];
 }
 @end
