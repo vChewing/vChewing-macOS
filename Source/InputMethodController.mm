@@ -119,6 +119,7 @@ FastLM gLanguageModelSimpBopomofo;
 static const int kUserOverrideModelCapacity = 500;
 static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
 vChewing::UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
+vChewing::UserOverrideModel gUserOverrideModelSimpBopomofo(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
 // https://clang-analyzer.llvm.org/faq.html
 __attribute__((annotate("returns_localized_nsstring")))
@@ -328,14 +329,17 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 {
     NSString *newInputMode;
     Formosa::Gramambular::FastLM *newLanguageModel;
+    vChewing::UserOverrideModel *newUom;
 
     if ([value isKindOfClass:[NSString class]] && [value isEqual:kSimpBopomofoModeIdentifier]) {
         newInputMode = kSimpBopomofoModeIdentifier;
         newLanguageModel = &gLanguageModelSimpBopomofo;
+        newUom = &gUserOverrideModelSimpBopomofo;
     }
     else {
         newInputMode = kBopomofoModeIdentifier;
         newLanguageModel = &gLanguageModel;
+        newUom = &gUserOverrideModel;
     }
 
     // Only apply the changes if the value is changed
@@ -366,6 +370,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
             _builder = new BlockReadingBuilder(_languageModel);
             _builder->setJoinSeparator("-");
         }
+        _uom = newUom;
     }
 }
 
