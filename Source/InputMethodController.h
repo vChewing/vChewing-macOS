@@ -52,6 +52,7 @@
 
     // language model
     Formosa::Gramambular::FastLM *_languageModel;
+    Formosa::Gramambular::FastLM *_userPhrasesModel;
     
     // the grid (lattice) builder for the unigrams (and bigrams)
     Formosa::Gramambular::BlockReadingBuilder* _builder;
@@ -88,3 +89,4 @@
 
 // the shared language model object
 extern "C" void LTLoadLanguageModel();
+extern "C" void LTLoadUserLanguageModelFile();
