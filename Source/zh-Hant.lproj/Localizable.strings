@@ -19,3 +19,8 @@
 "Chinese Conversion" = "優先使用康熙繁體字";
 "NotificationSwitchON" = " 已啟用";
 "NotificationSwitchOFF" = " 已停用";
+"User Phrases" = "自訂語彙";
+"Edit User Phrases" = "編輯自訂語彙";
+"Reload User Phrases" = "重載自訂語彙";
+"Unable to create the user phrase file." = "無法創建自訂語彙檔案。";
+"Please check the permission of at \"%@\"." = "請檢查此處的存取權限：\"%@\".";
