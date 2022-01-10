@@ -1,7 +1,12 @@
 //
 // AppDelegate.m
 //
-// Copyright (c) 2011-2012 The vChewing Project.
+// Copyright (c) 2021-2022 The vChewing Project.
+// Copyright (c) 2011-2022 The OpenVanilla Project.
+//
+// Contributors:
+//     Lukhnos Liu (@lukhnos) @ OpenVanilla
+//     Shiki Suen (@ShikiSuen) @ vChewing
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
