@@ -47,8 +47,8 @@
     if (self) {
         // populate the default values        
         _keyLabels = @[@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"];
-        _keyLabelFont = [NSFont systemFontOfSize:14.0];
-        _candidateFont = [NSFont systemFontOfSize:18.0];
+        _keyLabelFont = [NSFont monospacedDigitSystemFontOfSize:14.0 weight:NSFontWeightMedium];
+        _candidateFont = [NSFont systemFontOfSize:18.0 weight:NSFontWeightRegular];
     }
     return self;
 }
