@@ -1,5 +1,5 @@
 CFBundleName = "威注音";
 CFBundleDisplayName = "威注音";
 NSHumanReadableCopyright = "Copyright © 2011-2021 Mengjuei Hsieh et al.\nAll Rights Reserved.";
-"org.openvanilla.inputmethod.vChewing.Bopomofo" = "威注音";
-"org.openvanilla.inputmethod.vChewing.PlainBopomofo" = "ㄅ半全注";
+"org.openvanilla.inputmethod.vChewing.Bopomofo" = "威註音";
+"org.openvanilla.inputmethod.vChewing.SimpBopomofo" = "威注音";
