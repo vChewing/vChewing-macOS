@@ -3,7 +3,7 @@
 //  Tile Map Editor
 //
 //  Created & Original Rights by Nicolás Miari on 2016/02/11.
-//  Patched by Shiki Suen for the vChewing Project.
+//  Patched by Hiraku Wang and Shiki Suen for the vChewing Project.
 //  Released under MIT License.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -61,15 +61,26 @@
     
     [super windowDidLoad];
 
-    NSDictionary* infoDictionary = [[NSBundle mainBundle] infoDictionary];
-
-    self.appNameLabel.stringValue      = [infoDictionary objectForKey:@"CFBundleName"];
-    self.appVersionLabel.stringValue   = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
-    self.appCopyrightLabel.stringValue = [infoDictionary objectForKey:@"NSHumanReadableCopyright"];
-    self.appEULAContent.string = [infoDictionary objectForKey:@"CFEULAContent"];
+    [self updateInfo];
 
     // If you add more custom subviews to display additional information about
     // your app, configure them here
+}
+
+- (void) updateInfo {
+    NSDictionary* infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    NSDictionary* localizedInfoDictionary = [[NSBundle mainBundle] localizedInfoDictionary];
+    
+    self.appNameLabel.stringValue      = [localizedInfoDictionary objectForKey:@"CFBundleName"];
+    self.appVersionLabel.stringValue   = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
+    self.appCopyrightLabel.stringValue = [localizedInfoDictionary objectForKey:@"NSHumanReadableCopyright"];
+    self.appEULAContent.string = [localizedInfoDictionary objectForKey:@"CFEULAContent"];
+}
+
+- (void) showWithSender:(id)sender {
+    // FIXME: updating the strings every time is a temporary workaround
+    [self updateInfo];
+    [self.window orderFront:sender];
 }
 
 @end

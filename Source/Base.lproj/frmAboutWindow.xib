@@ -8,6 +8,9 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="frmAboutWindow">
             <connections>
+                <outlet property="appCopyrightLabel" destination="8Ju-DR-2C8" id="Odh-c7-nyT"/>
+                <outlet property="appEULAContent" destination="g8d-ZO-VdQ" id="mLE-Az-YkE"/>
+                <outlet property="appVersionLabel" destination="9Pk-k3-0cO" id="y37-SM-qyG"/>
                 <outlet property="window" destination="ttlAboutWindow" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>

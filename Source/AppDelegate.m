@@ -276,7 +276,7 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 
 - (IBAction) about:(id)sender {
     // Show the window:
-    [[frmAboutWindow defaultController].window orderFront:self];
+    [[frmAboutWindow defaultController] showWithSender:self];
 }
 
 @end
