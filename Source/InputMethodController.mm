@@ -79,6 +79,7 @@ static NSString *const kComposingBufferSizePreferenceKey = @"ComposingBufferSize
 static NSString *const kDisableUserCandidateSelectionLearning = @"DisableUserCandidateSelectionLearning";
 static NSString *const kChooseCandidateUsingSpaceKey = @"ChooseCandidateUsingSpaceKey";
 static NSString *const kChineseConversionEnabledKey = @"ChineseConversionEnabledKey";
+static NSString *const kEscToCleanInputBufferKey = @"EscToCleanInputBufferKey";
 
 // advanced (usually optional) settings
 static NSString *const kCandidateTextFontName = @"CandidateTextFontName";
@@ -742,21 +743,40 @@ public:
     }
 
     // Esc
-    if (charCode == 27) {
-        // if reading is not empty, we cancel the reading; Apple's built-in Zhuyin (and the erstwhile Hanin) has a default option that Esc "cancels" the current composed character and revert it to Bopomofo reading, in odds with the expectation of users from other platforms
+	if (charCode == 27) {
+			BOOL escToClearInputBufferEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kEscToCleanInputBufferKey];
 
-        if (_bpmfReadingBuffer->isEmpty()) {
-            // no nee to beep since the event is deliberately triggered by user
+			if (escToClearInputBufferEnabled) {
+				// if the optioon is enabled, we clear everythiong including the composing
+				// buffer, walked nodes and the reading.
+				if (![_composingBuffer length]) {
+					return NO;
+				}
+				_bpmfReadingBuffer->clear();
+				_builder->clear();
+				_walkedNodes.clear();
+				[_composingBuffer setString:@""];
+			}
+			else {
+				// if reading is not empty, we cancel the reading; Apple's built-in
+				// Zhuyin (and the erstwhile Hanin) has a default option that Esc
+				// "cancels" the current composed character and revert it to
+				// Bopomofo reading, in odds with the expectation of users from
+				// other platforms
 
-            if (![_composingBuffer length]) {
-                return NO;
-            }
-        }
-        else {
-            _bpmfReadingBuffer->clear();
-        }
+				if (_bpmfReadingBuffer->isEmpty()) {
+					// no nee to beep since the event is deliberately triggered by user
 
-        [self updateClientComposingBuffer:client];
+					if (![_composingBuffer length]) {
+						return NO;
+					}
+				}
+				else {
+					_bpmfReadingBuffer->clear();
+				}
+			}
+
+			[self updateClientComposingBuffer:client];
         return YES;
     }
 
