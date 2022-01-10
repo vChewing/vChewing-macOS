@@ -87,7 +87,7 @@ static NSString *const kCandidateKeys = @"CandidateKeys";
 
 // input modes
 static NSString *const kBopomofoModeIdentifier = @"org.openvanilla.inputmethod.vChewing.Bopomofo";
-static NSString *const kPlainBopomofoModeIdentifier = @"org.openvanilla.inputmethod.vChewing.PlainBopomofo";
+static NSString *const kSimpBopomofoModeIdentifier = @"org.openvanilla.inputmethod.vChewing.SimpBopomofo";
 
 // key code enums
 enum {
@@ -116,7 +116,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
 // shared language model object that stores our phrase-term probability database
 FastLM gLanguageModel;
-FastLM gLanguageModelPlainBopomofo;
+FastLM gLanguageModelSimpBopomofo;
 
 // https://clang-analyzer.llvm.org/faq.html
 __attribute__((annotate("returns_localized_nsstring")))
@@ -345,9 +345,9 @@ public:
     NSString *newInputMode;
     Formosa::Gramambular::FastLM *newLanguageModel;
 
-    if ([value isKindOfClass:[NSString class]] && [value isEqual:kPlainBopomofoModeIdentifier]) {
-        newInputMode = kPlainBopomofoModeIdentifier;
-        newLanguageModel = &gLanguageModelPlainBopomofo;
+    if ([value isKindOfClass:[NSString class]] && [value isEqual:kSimpBopomofoModeIdentifier]) {
+        newInputMode = kSimpBopomofoModeIdentifier;
+        newLanguageModel = &gLanguageModelSimpBopomofo;
     }
     else {
         newInputMode = kBopomofoModeIdentifier;
@@ -714,10 +714,6 @@ public:
         _bpmfReadingBuffer->clear();
         [self updateClientComposingBuffer:client];
 
-        if (_inputMode == kPlainBopomofoModeIdentifier) {
-            [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
-        }
-
         // and tells the client that the key is consumed
         return YES;
     }
@@ -943,16 +939,6 @@ public:
         }
         [self updateClientComposingBuffer:client];
 
-        if (_inputMode == kPlainBopomofoModeIdentifier && _bpmfReadingBuffer->isEmpty()) {
-            [self collectCandidates];
-            if ([_candidates count] == 1) {
-                [self commitComposition:client];
-            }
-            else {
-                [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
-            }
-        }
-
         return YES;
     }
 
@@ -967,16 +953,6 @@ public:
             [self beep];
         }
         [self updateClientComposingBuffer:client];
-
-        if (_inputMode == kPlainBopomofoModeIdentifier && _bpmfReadingBuffer->isEmpty()) {
-            [self collectCandidates];
-            if ([_candidates count] == 1) {
-                [self commitComposition:client];
-            }
-            else {
-                [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
-            }
-        }
 
         return YES;
     }
@@ -995,29 +971,14 @@ public:
 
 - (BOOL)handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode
 {
-//    if (_inputMode == kPlainBopomofoModeIdentifier) {
-//        if (charCode == '<') {
-//            keyCode = kPageUpKeyCode;
-//        }
-//        else if (charCode == '>') {
-//            keyCode = kPageDownKeyCode;
-//        }
-//    }
 
-    BOOL cancelCandidateKey =
-        (charCode == 27) ||
-        ((_inputMode == kPlainBopomofoModeIdentifier) &&
-         (charCode == 8 || keyCode == kDeleteKeyCode));
+    BOOL cancelCandidateKey = (charCode == 27);
+
 
     if (cancelCandidateKey) {
         gCurrentCandidateController.visible = NO;
         [_candidates removeAllObjects];
 
-        if (_inputMode == kPlainBopomofoModeIdentifier) {
-            _builder->clear();
-            _walkedNodes.clear();
-            [_composingBuffer setString:@""];
-        }
         [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
     }
@@ -1151,23 +1112,6 @@ public:
             if (candidateIndex != NSUIntegerMax) {
                 [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:candidateIndex];
                 return YES;
-            }
-        }
-
-        if (_inputMode == kPlainBopomofoModeIdentifier) {
-            string layout = [self currentLayout];
-            string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
-            string punctuation = string("_punctuation_") + string(1, (char)charCode);
-
-            BOOL shouldAutoSelectCandidate = _bpmfReadingBuffer->isValidKey((char)charCode) || _languageModel->hasUnigramsForKey(customPunctuation) ||
-                _languageModel->hasUnigramsForKey(punctuation);
-
-            if (shouldAutoSelectCandidate) {
-                NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:0];
-                if (candidateIndex != NSUIntegerMax) {
-                    [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:candidateIndex];
-                    return [self handleInputText:inputText key:keyCode modifiers:0 client:_currentCandidateClient];
-                }
             }
         }
 
@@ -1400,11 +1344,6 @@ public:
     gCurrentCandidateController.keyLabels = keyLabels;
     [self collectCandidates];
 
-    if (_inputMode == kPlainBopomofoModeIdentifier && [_candidates count] == 1) {
-        [self commitComposition:client];
-        return;
-    }
-
     gCurrentCandidateController.delegate = self;
     [gCurrentCandidateController reloadData];
 
@@ -1518,15 +1457,11 @@ public:
     [self walk];
     [self updateClientComposingBuffer:_currentCandidateClient];
 
-    if (_inputMode == kPlainBopomofoModeIdentifier) {
-        [self commitComposition:_currentCandidateClient];
-        return;
-    }
 }
 
 - (void)handleChineseConversionStatusDidChanged:(NSNotification *)notification
 {
-    // Do not post the notification if status doesn't change. 
+    // Do not post the notification if status doesn't change.
     // This is because the input method can be initiated by multiple applications, then all of them would post the notification.
     if (_previousChineseConversionEnabledStatus == _chineseConversionEnabled) {
         return;
@@ -1556,7 +1491,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, FastLM &
 void LTLoadLanguageModel()
 {
     LTLoadLanguageModelFile(@"data", gLanguageModel);
-    LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
+    LTLoadLanguageModelFile(@"data-chs", gLanguageModelSimpBopomofo);
 
 
     // initialize the singleton learning dictionary

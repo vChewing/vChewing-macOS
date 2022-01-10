@@ -32,7 +32,6 @@
 				<string>Bopomofo.tiff</string>
 				<key>tsInputModeCharacterRepertoireKey</key>
 				<array>
-					<string>Hans</string>
 					<string>Hant</string>
 					<string>Han</string>
 				</array>
@@ -50,25 +49,17 @@
 				<true/>
 				<key>tsInputModeScriptKey</key>
 				<string>smTradChinese</string>
-                <key>TISIntendedLanguage</key>
-                <string>zh-Hans</string>
-                <key>tsInputModeCharacterRepertoireKey</key>
-                <array>
-                    <string>Hant</string>
-                    <string>Han</string>
-                </array>
-                <key>tsInputModeKeyEquivalentModifiersKey</key>
-                <integer>4608</integer>
+				<key>TISIntendedLanguage</key>
+				<string>zh-Hant</string>
 			</dict>
-			<key>org.openvanilla.inputmethod.vChewing.PlainBopomofo</key>
+			<key>org.openvanilla.inputmethod.vChewing.SimpBopomofo</key>
 			<dict>
 				<key>TISDoubleSpaceSubstitution</key>
 				<string>。</string>
 				<key>tsInputModeAlternateMenuIconFileKey</key>
-				<string>PlainBopomofo.tiff</string>
+				<string>SimpBopomofo.tiff</string>
 				<key>tsInputModeCharacterRepertoireKey</key>
 				<array>
-					<string>Hans</string>
 					<string>Hant</string>
 					<string>Han</string>
 				</array>
@@ -79,28 +70,21 @@
 				<key>tsInputModeKeyEquivalentModifiersKey</key>
 				<integer>4608</integer>
 				<key>tsInputModeMenuIconFileKey</key>
-				<string>PlainBopomofo.tiff</string>
+				<string>SimpBopomofo.tiff</string>
 				<key>tsInputModePaletteIconFileKey</key>
-				<string>PlainBopomofo.tiff</string>
+				<string>SimpBopomofo.tiff</string>
 				<key>tsInputModePrimaryInScriptKey</key>
 				<true/>
 				<key>tsInputModeScriptKey</key>
 				<string>smTradChinese</string>
-                <key>TISIntendedLanguage</key>
-                <string>zh-Hans</string>
-                <key>tsInputModeCharacterRepertoireKey</key>
-                <array>
-                    <string>Hant</string>
-                    <string>Han</string>
-                </array>
-                <key>tsInputModeKeyEquivalentModifiersKey</key>
-                <integer>4608</integer>
+				<key>TISIntendedLanguage</key>
+				<string>zh-Hans</string>
 			</dict>
 		</dict>
 		<key>tsVisibleInputModeOrderedArrayKey</key>
 		<array>
 			<string>org.openvanilla.inputmethod.vChewing.Bopomofo</string>
-			<string>org.openvanilla.inputmethod.vChewing.PlainBopomofo</string>
+			<string>org.openvanilla.inputmethod.vChewing.SimpBopomofo</string>
 		</array>
 	</dict>
 	<key>InputMethodConnectionName</key>
