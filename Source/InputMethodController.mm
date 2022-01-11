@@ -1676,10 +1676,19 @@ void LTLoadLanguageModel()
 
 void LTLoadUserLanguageModelFile()
 {
+    // Autofix: Ensure that there's a new line in the user language model file.
+    // NSString *lineBreak = @"\n";
+    // NSOutputStream *stream = [[NSOutputStream alloc] initToFileAtPath:LTUserPhrasesDataPathCHT() append:YES];
+    // [stream open];
+    // NSData *strData = [lineBreak dataUsingEncoding:NSUTF8StringEncoding];
+    // [stream write:(uint8_t *)[strData bytes] maxLength:[strData length]];
+    // [stream close];
+    
     gUserPhraseLanguageModelCHT.close();
     gUserPhraseLanguageModelCHS.close();
     bool resultCHT = gUserPhraseLanguageModelCHT.open([LTUserPhrasesDataPathCHT() UTF8String]);
     bool resultCHS = gUserPhraseLanguageModelCHS.open([LTUserPhrasesDataPathCHS() UTF8String]);
+    
     if (!resultCHT) {
         NSLog(@"Failed opening language model for CHT user phrases.");
     }
