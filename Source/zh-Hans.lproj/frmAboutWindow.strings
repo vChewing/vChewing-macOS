@@ -17,8 +17,8 @@
 /* Class = "NSTextFieldCell"; title = "vChewing for macOS"; ObjectID = "lblAppTitle"; */
 "lblAppTitle.title" = "vChewing for macOS";
 
-/* Class = "NSTextFieldCell"; title = "DISCLAIMER: The vChewing project is not responsible for the phrase database shipped in the original McBopomofo project. Everything in the vChewing phrase database has been confirmed lawful to the Anti-Secession Law and the National Security Law of the PRC."; ObjectID = "lblDisclaimer"; */
-"lblDisclaimer.title" = "免责声明：威注音专案对小麦注音官方专案内赠的小麦注音原版词库内容不负任何责任。威注音输入法专用的威注音词库已依照《中华人民共和国国家安全法》与《中华人民共和国反分裂国家法》做过合规处理。";
+/* Class = "NSTextFieldCell"; title = "DISCLAIMER: The vChewing project is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, have been removed from vChewing official phrase database."; ObjectID = "lblDisclaimer"; */
+"lblDisclaimer.title" = "免责声明：威注音专案对小麦注音官方专案内赠的小麦注音原版词库内容不负任何责任。威注音输入法专用的威注音官方词库已清除任何「会在法理上妨碍威注音在全球传播」的「与地缘政治及政治意识形态有关的」內容。 ​​​";
 
 /* Class = "NSTextFieldCell"; title = "© 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project."; ObjectID = "lblCopyright"; */
 // "lblCopyright.title" = "© 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project.";

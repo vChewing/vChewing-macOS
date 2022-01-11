@@ -19,7 +19,7 @@
         <window title="About vChewing for macOS" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" animationBehavior="default" tabbingMode="disallowed" titlebarAppearsTransparent="YES" id="ttlAboutWindow">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <rect key="contentRect" x="196" y="240" width="533" height="430"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1600" height="875"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
             <value key="minSize" type="size" width="533" height="430"/>
             <value key="maxSize" type="size" width="533" height="430"/>
             <view key="contentView" id="se5-gp-TjO">
@@ -63,9 +63,6 @@
                     </scrollView>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6Dx-DY-UG1">
                         <rect key="frame" x="89" y="415" width="123" height="15"/>
-                        <constraints>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="119" id="eiH-Q0-Ud8"/>
-                        </constraints>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="vChewing for macOS" id="lblAppTitle" userLabel="appNameLabel">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -74,9 +71,6 @@
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Srh-ua-uQD">
                         <rect key="frame" x="89" y="399" width="281" height="15"/>
-                        <constraints>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="277" id="YUq-nx-8lW"/>
-                        </constraints>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Derived from OpenVanilla McBopopmofo Project." id="lblProjectDescription">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -86,7 +80,7 @@
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8Ju-DR-2C8">
                         <rect key="frame" x="89" y="383" width="297" height="15"/>
                         <constraints>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="293" id="yHJ-a1-diY"/>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="293" id="0dL-y5-0Mg"/>
                         </constraints>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Placeholder for showing copyright information." id="lblCopyright" userLabel="appCopyrightLabel">
                             <font key="font" metaFont="cellTitle"/>
@@ -96,9 +90,6 @@
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8M8-3C-BZO">
                         <rect key="frame" x="89" y="330" width="431" height="45"/>
-                        <constraints>
-                            <constraint firstAttribute="height" relation="lessThanOrEqual" constant="76" id="AIk-Vc-nzz"/>
-                        </constraints>
                         <textFieldCell key="cell" selectable="YES" id="lblCredits">
                             <font key="font" metaFont="cellTitle"/>
                             <string key="title">McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.
@@ -119,10 +110,10 @@ vChewing Phrase Database Maintained by Shiki Suen.</string>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bSu-np-tPT" userLabel="confirmButton">
-                        <rect key="frame" x="401" y="74" width="124" height="32"/>
+                    <button horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bSu-np-tPT" userLabel="confirmButton">
+                        <rect key="frame" x="382" y="74" width="143" height="32"/>
                         <constraints>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="110" id="OSB-KO-YPq"/>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="kI3-uM-IHP"/>
                         </constraints>
                         <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="btnConfirm">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -136,10 +127,13 @@ DQ
                         </connections>
                     </button>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="d81-Fe-uNT">
-                        <rect key="frame" x="13" y="21" width="379" height="83"/>
+                        <rect key="frame" x="13" y="21" width="360" height="83"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="356" id="AFu-Zt-3cq"/>
+                        </constraints>
                         <textFieldCell key="cell" selectable="YES" id="lblDisclaimer">
                             <font key="font" metaFont="cellTitle"/>
-                            <string key="title">DISCLAIMER: The vChewing project is not responsible for the phrase database shipped in the original McBopomofo project. Everything in the vChewing phrase database has been confirmed lawful to the Anti-Secession Law and the National Security Law of the PRC.</string>
+                            <string key="title">DISCLAIMER: The vChewing project is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, have been removed from vChewing official phrase database.</string>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -147,16 +141,14 @@ DQ
                     <imageView translatesAutoresizingMaskIntoConstraints="NO" id="bAv-ZO-Ihw">
                         <rect key="frame" x="15" y="120" width="63" height="310"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="310" id="RcP-le-u4W"/>
-                            <constraint firstAttribute="width" constant="63" id="VBP-4H-GVU"/>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="63" id="eDR-49-Eeb"/>
+                            <constraint firstAttribute="width" constant="63" id="Cgr-zi-TIZ"/>
                         </constraints>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="AboutBanner" id="Noc-kP-zTE"/>
                     </imageView>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9Pk-k3-0cO">
                         <rect key="frame" x="211" y="415" width="126" height="15"/>
                         <constraints>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="50" id="rMX-jR-bFz"/>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="122" id="aYS-0q-0sR"/>
                         </constraints>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="version_placeholder" id="lblVersionString" userLabel="appVersionLabel">
                             <font key="font" metaFont="cellTitle"/>
@@ -166,40 +158,39 @@ DQ
                     </textField>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="Srh-ua-uQD" firstAttribute="top" secondItem="6Dx-DY-UG1" secondAttribute="bottom" constant="1" id="0Vx-W7-anL"/>
-                    <constraint firstItem="8Ju-DR-2C8" firstAttribute="leading" secondItem="8M8-3C-BZO" secondAttribute="leading" id="0aO-pP-7uS"/>
-                    <constraint firstAttribute="bottom" secondItem="d81-Fe-uNT" secondAttribute="bottom" constant="21" id="6Cj-l3-kuD"/>
-                    <constraint firstItem="8Ju-DR-2C8" firstAttribute="top" secondItem="Srh-ua-uQD" secondAttribute="bottom" constant="1" id="6K1-iL-ZOg"/>
-                    <constraint firstItem="6Dx-DY-UG1" firstAttribute="leading" secondItem="bAv-ZO-Ihw" secondAttribute="trailing" constant="13" id="90P-Ol-gLK"/>
-                    <constraint firstItem="eYM-F7-drf" firstAttribute="top" secondItem="8M8-3C-BZO" secondAttribute="bottom" constant="8" symbolic="YES" id="Ai2-Kx-kPT"/>
-                    <constraint firstItem="eYM-F7-drf" firstAttribute="trailing" secondItem="pHH-M3-zKo" secondAttribute="trailing" id="Avb-wY-VeU"/>
-                    <constraint firstItem="bSu-np-tPT" firstAttribute="top" secondItem="2Gh-nq-Mng" secondAttribute="bottom" constant="11" id="CZ1-J8-IxT"/>
-                    <constraint firstItem="bAv-ZO-Ihw" firstAttribute="leading" secondItem="2Gh-nq-Mng" secondAttribute="leading" id="Ces-Or-er2"/>
-                    <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="Srh-ua-uQD" secondAttribute="trailing" constant="165" id="Dh6-gE-RNm"/>
-                    <constraint firstItem="2Gh-nq-Mng" firstAttribute="trailing" secondItem="bSu-np-tPT" secondAttribute="trailing" id="GZd-wg-2EP"/>
-                    <constraint firstItem="d81-Fe-uNT" firstAttribute="top" secondItem="2Gh-nq-Mng" secondAttribute="bottom" constant="8" symbolic="YES" id="Ga5-ik-li4"/>
-                    <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="9Pk-k3-0cO" secondAttribute="trailing" constant="198" id="GtS-UI-XJj"/>
-                    <constraint firstItem="bAv-ZO-Ihw" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="15" id="Hm9-5R-xpn"/>
-                    <constraint firstItem="2Gh-nq-Mng" firstAttribute="top" secondItem="pHH-M3-zKo" secondAttribute="bottom" constant="8" symbolic="YES" id="J4r-5O-RUh"/>
-                    <constraint firstItem="9Pk-k3-0cO" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" id="Jh5-lO-xZP"/>
-                    <constraint firstItem="Srh-ua-uQD" firstAttribute="leading" secondItem="8Ju-DR-2C8" secondAttribute="leading" id="KdJ-LB-Nj7"/>
-                    <constraint firstItem="bAv-ZO-Ihw" firstAttribute="top" secondItem="6Dx-DY-UG1" secondAttribute="top" id="LLC-Mn-bl4"/>
-                    <constraint firstItem="8M8-3C-BZO" firstAttribute="leading" secondItem="eYM-F7-drf" secondAttribute="leading" id="Ndv-bx-xxO"/>
-                    <constraint firstItem="9Pk-k3-0cO" firstAttribute="leading" secondItem="6Dx-DY-UG1" secondAttribute="trailing" constant="3" id="O17-vW-Rcj"/>
-                    <constraint firstItem="2Gh-nq-Mng" firstAttribute="leading" secondItem="d81-Fe-uNT" secondAttribute="leading" id="PbM-xe-ZqO"/>
-                    <constraint firstItem="2Gh-nq-Mng" firstAttribute="top" secondItem="bAv-ZO-Ihw" secondAttribute="bottom" constant="7" id="a8O-58-d4Z"/>
-                    <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="8Ju-DR-2C8" secondAttribute="trailing" constant="149" id="bgK-GV-u2a"/>
-                    <constraint firstItem="8M8-3C-BZO" firstAttribute="trailing" secondItem="eYM-F7-drf" secondAttribute="trailing" id="blj-kM-ZeQ"/>
-                    <constraint firstItem="eYM-F7-drf" firstAttribute="leading" secondItem="pHH-M3-zKo" secondAttribute="leading" id="cVF-if-3Dn"/>
-                    <constraint firstAttribute="bottom" secondItem="bSu-np-tPT" secondAttribute="bottom" constant="81" id="e1e-9o-ErY"/>
-                    <constraint firstItem="9Pk-k3-0cO" firstAttribute="baseline" secondItem="6Dx-DY-UG1" secondAttribute="baseline" id="ee0-jl-GMC"/>
-                    <constraint firstItem="6Dx-DY-UG1" firstAttribute="leading" secondItem="Srh-ua-uQD" secondAttribute="leading" id="gxn-sw-GgZ"/>
-                    <constraint firstItem="bAv-ZO-Ihw" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" id="hYu-jj-nf7"/>
-                    <constraint firstItem="2Gh-nq-Mng" firstAttribute="centerX" secondItem="se5-gp-TjO" secondAttribute="centerX" id="jVh-KO-cdA"/>
-                    <constraint firstItem="pHH-M3-zKo" firstAttribute="top" secondItem="eYM-F7-drf" secondAttribute="bottom" constant="8" symbolic="YES" id="k5U-Pw-Xux"/>
-                    <constraint firstItem="8M8-3C-BZO" firstAttribute="top" secondItem="8Ju-DR-2C8" secondAttribute="bottom" constant="8" symbolic="YES" id="lRJ-SN-vjJ"/>
-                    <constraint firstItem="pHH-M3-zKo" firstAttribute="trailing" secondItem="2Gh-nq-Mng" secondAttribute="trailing" id="nbJ-Vi-hsg"/>
-                    <constraint firstItem="bSu-np-tPT" firstAttribute="leading" secondItem="d81-Fe-uNT" secondAttribute="trailing" constant="18" id="rSX-mm-As8"/>
+                    <constraint firstItem="6Dx-DY-UG1" firstAttribute="leading" secondItem="bAv-ZO-Ihw" secondAttribute="trailing" constant="13" id="0cJ-Hc-448"/>
+                    <constraint firstItem="d81-Fe-uNT" firstAttribute="top" secondItem="2Gh-nq-Mng" secondAttribute="bottom" constant="8" symbolic="YES" id="0id-z7-af5"/>
+                    <constraint firstItem="bSu-np-tPT" firstAttribute="leading" secondItem="d81-Fe-uNT" secondAttribute="trailing" constant="18" id="4x7-jo-QBP"/>
+                    <constraint firstItem="pHH-M3-zKo" firstAttribute="top" secondItem="eYM-F7-drf" secondAttribute="bottom" constant="8" symbolic="YES" id="5pC-2Y-uQa"/>
+                    <constraint firstItem="eYM-F7-drf" firstAttribute="leading" secondItem="pHH-M3-zKo" secondAttribute="leading" id="6jR-OP-XUa"/>
+                    <constraint firstItem="pHH-M3-zKo" firstAttribute="trailing" secondItem="2Gh-nq-Mng" secondAttribute="trailing" id="6kv-t9-Dhc"/>
+                    <constraint firstItem="6Dx-DY-UG1" firstAttribute="leading" secondItem="Srh-ua-uQD" secondAttribute="leading" id="CZC-rX-gHf"/>
+                    <constraint firstItem="6Dx-DY-UG1" firstAttribute="baseline" secondItem="9Pk-k3-0cO" secondAttribute="baseline" id="Gts-Ef-jlG"/>
+                    <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="8Ju-DR-2C8" secondAttribute="trailing" constant="149" id="Lft-ey-hgl"/>
+                    <constraint firstItem="8M8-3C-BZO" firstAttribute="leading" secondItem="eYM-F7-drf" secondAttribute="leading" id="MNy-xJ-IPH"/>
+                    <constraint firstItem="2Gh-nq-Mng" firstAttribute="top" secondItem="bAv-ZO-Ihw" secondAttribute="bottom" constant="7" id="N3p-Nh-yib"/>
+                    <constraint firstAttribute="bottom" secondItem="bSu-np-tPT" secondAttribute="bottom" constant="81" id="N6Y-Ig-rXT"/>
+                    <constraint firstItem="bAv-ZO-Ihw" firstAttribute="top" secondItem="6Dx-DY-UG1" secondAttribute="top" id="NGF-bS-pCV"/>
+                    <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="Srh-ua-uQD" secondAttribute="trailing" constant="165" id="PPQ-FU-bMM"/>
+                    <constraint firstItem="8M8-3C-BZO" firstAttribute="top" secondItem="8Ju-DR-2C8" secondAttribute="bottom" constant="8" symbolic="YES" id="Tcd-f0-Aci"/>
+                    <constraint firstAttribute="bottom" secondItem="d81-Fe-uNT" secondAttribute="bottom" constant="21" id="Uvy-fI-THY"/>
+                    <constraint firstItem="2Gh-nq-Mng" firstAttribute="centerX" secondItem="se5-gp-TjO" secondAttribute="centerX" id="YVX-xJ-ltu"/>
+                    <constraint firstItem="9Pk-k3-0cO" firstAttribute="leading" secondItem="6Dx-DY-UG1" secondAttribute="trailing" constant="3" id="avJ-mt-7lw"/>
+                    <constraint firstItem="Srh-ua-uQD" firstAttribute="top" secondItem="6Dx-DY-UG1" secondAttribute="bottom" constant="1" id="cQv-Di-ZpW"/>
+                    <constraint firstItem="Srh-ua-uQD" firstAttribute="leading" secondItem="8Ju-DR-2C8" secondAttribute="leading" id="cyo-Vw-cIQ"/>
+                    <constraint firstItem="2Gh-nq-Mng" firstAttribute="top" secondItem="pHH-M3-zKo" secondAttribute="bottom" constant="8" symbolic="YES" id="eJp-xY-HtK"/>
+                    <constraint firstItem="bAv-ZO-Ihw" firstAttribute="leading" secondItem="2Gh-nq-Mng" secondAttribute="leading" id="eem-in-Gei"/>
+                    <constraint firstItem="8M8-3C-BZO" firstAttribute="trailing" secondItem="eYM-F7-drf" secondAttribute="trailing" id="eh2-EX-44Z"/>
+                    <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="9Pk-k3-0cO" secondAttribute="trailing" constant="198" id="fmt-bA-0uF"/>
+                    <constraint firstItem="bAv-ZO-Ihw" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="15" id="gyU-x7-XA9"/>
+                    <constraint firstItem="2Gh-nq-Mng" firstAttribute="trailing" secondItem="bSu-np-tPT" secondAttribute="trailing" id="hkd-tA-UOP"/>
+                    <constraint firstItem="eYM-F7-drf" firstAttribute="top" secondItem="8M8-3C-BZO" secondAttribute="bottom" constant="8" symbolic="YES" id="iML-06-IXZ"/>
+                    <constraint firstItem="2Gh-nq-Mng" firstAttribute="leading" secondItem="d81-Fe-uNT" secondAttribute="leading" id="jAD-wJ-fot"/>
+                    <constraint firstItem="bAv-ZO-Ihw" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" id="lC0-cM-erh"/>
+                    <constraint firstItem="eYM-F7-drf" firstAttribute="trailing" secondItem="pHH-M3-zKo" secondAttribute="trailing" id="qT1-yC-noF"/>
+                    <constraint firstItem="8Ju-DR-2C8" firstAttribute="leading" secondItem="8M8-3C-BZO" secondAttribute="leading" id="sQS-M2-kfS"/>
+                    <constraint firstItem="bSu-np-tPT" firstAttribute="top" secondItem="2Gh-nq-Mng" secondAttribute="bottom" constant="11" id="sZD-Qy-WKm"/>
+                    <constraint firstItem="8Ju-DR-2C8" firstAttribute="top" secondItem="Srh-ua-uQD" secondAttribute="bottom" constant="1" id="wDV-YL-qzp"/>
                 </constraints>
             </view>
             <connections>

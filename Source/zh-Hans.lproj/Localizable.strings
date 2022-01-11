@@ -15,7 +15,7 @@
 "New Version Available" = "有新版可下载";
 "Not Now" = "以后再说";
 "Visit Website" = "前往网站";
-"You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@" = "目前使用的威注音版本是 %1$@ (%2$@)，网路上有更新版本 %3$@ (%4$@) 可供下载。是否要前往威注音网站下载新版来安装？%5$@";
+"You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@" = "目前使用的威注音官方版本是 %1$@ (%2$@)，网路上有更新版本 %3$@ (%4$@) 可供下载。是否要前往威注音网站下载新版来安装？%5$@";
 "Chinese Conversion" = "优先使用康熙繁体字";
 "NotificationSwitchON" = " 已启用";
 "NotificationSwitchOFF" = " 已停用";
