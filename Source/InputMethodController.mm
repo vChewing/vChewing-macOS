@@ -264,13 +264,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
         _languageModel = &gLanguageModelCHT;
         _userPhrasesModel = &gUserPhraseLanguageModelCHT;
         _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel);
-        if (_inputMode == kSimpBopomofoModeIdentifier) {
-            NSLog(@"gUserOverrideModelCHS called");
-            _uom = &gUserOverrideModelCHS;
-        } else {
-            NSLog(@"gUserOverrideModelCHT called");
-            _uom = &gUserOverrideModelCHT;
-        }
+        _uom = &gUserOverrideModelCHT;
 
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
@@ -420,83 +414,48 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     Formosa::Gramambular::FastLM *userPhraseModel;
     vChewing::UserOverrideModel *newUom;
 
-    if ([value isKindOfClass:[NSString class]]) {
-        
-        if ([value isEqual:kSimpBopomofoModeIdentifier]) {
-            
-            newInputMode = kSimpBopomofoModeIdentifier;
-            newLanguageModel = &gLanguageModelCHS;
-            newUom = &gUserOverrideModelCHS;
-            userPhraseModel = &gUserPhraseLanguageModelCHS;
+    if ([value isKindOfClass:[NSString class]] && [value isEqual:kSimpBopomofoModeIdentifier]) {
+        newInputMode = kSimpBopomofoModeIdentifier;
+        newLanguageModel = &gLanguageModelCHS;
+        newUom = &gUserOverrideModelCHS;
+        userPhraseModel = &gUserPhraseLanguageModelCHS;
+    }
+    else {
+        newInputMode = kBopomofoModeIdentifier;
+        newLanguageModel = &gLanguageModelCHT;
+        newUom = &gUserOverrideModelCHT;
+        userPhraseModel = &gUserPhraseLanguageModelCHT;
+    }
 
-            if (![_inputMode isEqualToString:newInputMode]) {
-                [[NSUserDefaults standardUserDefaults] synchronize];
+    // Only apply the changes if the value is changed
+    if (![_inputMode isEqualToString:newInputMode]) {
+        [[NSUserDefaults standardUserDefaults] synchronize];
 
-                // Remember to override the keyboard layout again -- treat this as an activate event
-                NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
-                if (!basisKeyboardLayoutID) {
-                    basisKeyboardLayoutID = @"com.apple.keylayout.US";
-                }
-                [sender overrideKeyboardWithKeyboardNamed:basisKeyboardLayoutID];
+        // Remember to override the keyboard layout again -- treat this as an activate event
+        NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
+        if (!basisKeyboardLayoutID) {
+            basisKeyboardLayoutID = @"com.apple.keylayout.US";
+        }
+        [sender overrideKeyboardWithKeyboardNamed:basisKeyboardLayoutID];
 
-                _inputMode = newInputMode;
-                _languageModel = newLanguageModel;
-                _userPhrasesModel = userPhraseModel;
+        _inputMode = newInputMode;
+        _languageModel = newLanguageModel;
+        _userPhrasesModel = userPhraseModel;
+        _uom = newUom;
 
-                if (!_bpmfReadingBuffer->isEmpty()) {
-                    _bpmfReadingBuffer->clear();
-                    [self updateClientComposingBuffer:sender];
-                }
+        if (!_bpmfReadingBuffer->isEmpty()) {
+            _bpmfReadingBuffer->clear();
+            [self updateClientComposingBuffer:sender];
+        }
 
-                if ([_composingBuffer length] > 0) {
-                    [self commitComposition:sender];
-                }
+        if ([_composingBuffer length] > 0) {
+            [self commitComposition:sender];
+        }
 
-                if (_builder) {
-                    delete _builder;
-                    _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel);
-                    _builder->setJoinSeparator("-");
-                }
-            }
-            _uom = newUom;
-        
-        } else if ([value isEqual:kBopomofoModeIdentifier]) {
-            
-            newInputMode = kBopomofoModeIdentifier;
-            newLanguageModel = &gLanguageModelCHT;
-            userPhraseModel = &gUserPhraseLanguageModelCHT;
-            newUom = &gUserOverrideModelCHT;
-            
-            if (![_inputMode isEqualToString:newInputMode]) {
-                [[NSUserDefaults standardUserDefaults] synchronize];
-
-                // Remember to override the keyboard layout again -- treat this as an activate event
-                NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
-                if (!basisKeyboardLayoutID) {
-                    basisKeyboardLayoutID = @"com.apple.keylayout.US";
-                }
-                [sender overrideKeyboardWithKeyboardNamed:basisKeyboardLayoutID];
-
-                _inputMode = newInputMode;
-                _languageModel = newLanguageModel;
-                _userPhrasesModel = userPhraseModel;
-
-                if (!_bpmfReadingBuffer->isEmpty()) {
-                    _bpmfReadingBuffer->clear();
-                    [self updateClientComposingBuffer:sender];
-                }
-
-                if ([_composingBuffer length] > 0) {
-                    [self commitComposition:sender];
-                }
-
-                if (_builder) {
-                    delete _builder;
-                    _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel);
-                    _builder->setJoinSeparator("-");
-                }
-            }
-            _uom = newUom;
+        if (_builder) {
+            delete _builder;
+            _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel);
+            _builder->setJoinSeparator("-");
         }
     }
 }
@@ -768,31 +727,17 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
     currentMarkedPhrase = [currentMarkedPhrase stringByAppendingString:@"\n"];
     
-    if (_inputMode == kSimpBopomofoModeIdentifier) {
-        NSString *path = LTUserPhrasesDataPathCHS();
-        NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:path];
-        if (!file) {
-            return NO;
-        }
-        [file seekToEndOfFile];
-        NSData *data = [currentMarkedPhrase dataUsingEncoding:NSUTF8StringEncoding];
-        [file writeData:data];
-        [file closeFile];
-        LTLoadUserLanguageModelFileCHS();
-        return YES;
-    } else {
-        NSString *path = LTUserPhrasesDataPathCHT();
-        NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:path];
-        if (!file) {
-            return NO;
-        }
-        [file seekToEndOfFile];
-        NSData *data = [currentMarkedPhrase dataUsingEncoding:NSUTF8StringEncoding];
-        [file writeData:data];
-        [file closeFile];
-        LTLoadUserLanguageModelFileCHT();
-        return YES;
+    NSString *path = _inputMode == kSimpBopomofoModeIdentifier ? LTUserPhrasesDataPathCHS() : LTUserPhrasesDataPathCHT();
+    NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:path];
+    if (!file) {
+        return NO;
     }
+    [file seekToEndOfFile];
+    NSData *data = [currentMarkedPhrase dataUsingEncoding:NSUTF8StringEncoding];
+    [file writeData:data];
+    [file closeFile];
+    LTLoadUserLanguageModelFile();
+    return YES;
 }
 
 - (BOOL)handleInputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
@@ -1649,13 +1594,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
 - (void)reloadUserPhrases:(id)sender
 {
-    if (_inputMode == kSimpBopomofoModeIdentifier) {
-        NSLog(@"reloadUserPhrases CHS called");
-        LTLoadUserLanguageModelFileCHS();
-    } else {
-        NSLog(@"reloadUserPhrases CHT called");
-        LTLoadUserLanguageModelFileCHT();
-    }
+    LTLoadUserLanguageModelFile();
 }
 
 - (void)showAbout:(id)sender
@@ -1735,20 +1674,16 @@ void LTLoadLanguageModel()
     LTLoadLanguageModelFile(@"data-chs", gLanguageModelCHS);
 }
 
-void LTLoadUserLanguageModelFileCHT()
+void LTLoadUserLanguageModelFile()
 {
     gUserPhraseLanguageModelCHT.close();
-    bool result = gUserPhraseLanguageModelCHT.open([LTUserPhrasesDataPathCHT() UTF8String]);
-    if (!result) {
+    gUserPhraseLanguageModelCHS.close();
+    bool resultCHT = gUserPhraseLanguageModelCHT.open([LTUserPhrasesDataPathCHT() UTF8String]);
+    bool resultCHS = gUserPhraseLanguageModelCHS.open([LTUserPhrasesDataPathCHS() UTF8String]);
+    if (!resultCHT) {
         NSLog(@"Failed opening language model for CHT user phrases.");
     }
-}
-
-void LTLoadUserLanguageModelFileCHS()
-{
-    gUserPhraseLanguageModelCHS.close();
-    bool result = gUserPhraseLanguageModelCHS.open([LTUserPhrasesDataPathCHS() UTF8String]);
-    if (!result) {
-        NSLog(@"Failed opening language model for CHT user phrases.");
+    if (!resultCHS) {
+        NSLog(@"Failed opening language model for CHS user phrases.");
     }
 }
