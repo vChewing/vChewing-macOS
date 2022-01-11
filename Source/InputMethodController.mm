@@ -141,47 +141,51 @@ static NSString *LTUserPhrasesDataPathCHT()
     return [LTUserDataFolderPath() stringByAppendingPathComponent:@"userdata-cht.txt"];
 }
 
-// static NSString *LTUserPhrasesDataPathCHS()
-// {
-    // return [LTUserDataFolderPath() stringByAppendingPathComponent:@"userdata-chs.txt"];
-    // }
+static NSString *LTUserPhrasesDataPathCHS()
+{
+    return [LTUserDataFolderPath() stringByAppendingPathComponent:@"userdata-chs.txt"];
+}
 
 static BOOL LTCheckIfUserLanguageModelFileExists() {
 
-	NSString *folderPath = LTUserDataFolderPath();
-	BOOL isFolder = NO;
-	BOOL folderExist = [[NSFileManager defaultManager] fileExistsAtPath:folderPath isDirectory:&isFolder];
-	if (folderExist && !isFolder) {
-		NSError *error = nil;
-		[[NSFileManager defaultManager] removeItemAtPath:folderPath error:&error];
-		if (error) {
-			NSLog(@"Failed to remove folder %@", error);
-			return NO;
-		}
-		folderExist = NO;
-	}
-	if (!folderExist) {
-		NSError *error = nil;
-		[[NSFileManager defaultManager] createDirectoryAtPath:folderPath withIntermediateDirectories:YES attributes:nil error:&error];
-		if (error) {
-			NSLog(@"Failed to create folder %@", error);
-			return NO;
-		}
-	}
-
-	NSString *filePath = LTUserPhrasesDataPathCHT();
-	if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
-		BOOL result = [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filePath atomically:YES];
-		if (!result) {
-			NSLog(@"Failed to write file");
-			return NO;
-		}
-	}
-	return YES;
+    NSString *folderPath = LTUserDataFolderPath();
+    BOOL isFolder = NO;
+    BOOL folderExist = [[NSFileManager defaultManager] fileExistsAtPath:folderPath isDirectory:&isFolder];
+    if (folderExist && !isFolder) {
+        NSError *error = nil;
+        [[NSFileManager defaultManager] removeItemAtPath:folderPath error:&error];
+        if (error) {
+            NSLog(@"Failed to remove folder %@", error);
+            return NO;
+        }
+        folderExist = NO;
+    }
+    if (!folderExist) {
+        NSError *error = nil;
+        [[NSFileManager defaultManager] createDirectoryAtPath:folderPath withIntermediateDirectories:YES attributes:nil error:&error];
+        if (error) {
+            NSLog(@"Failed to create folder %@", error);
+            return NO;
+        }
+    }
+    NSString *filePathCHS = LTUserPhrasesDataPathCHS();
+    if (![[NSFileManager defaultManager] fileExistsAtPath:filePathCHS]) {
+        BOOL result = [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filePathCHS atomically:YES];
+        if (!result) {
+            NSLog(@"Failed to write userdict CHS file");
+            return NO;
+        }
+    }
+    NSString *filePathCHT = LTUserPhrasesDataPathCHT();
+    if (![[NSFileManager defaultManager] fileExistsAtPath:filePathCHT]) {
+        BOOL result = [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filePathCHT atomically:YES];
+        if (!result) {
+            NSLog(@"Failed to write userdict CHT file");
+            return NO;
+        }
+    }
+    return YES;
 }
-
-
-
 
 // https://clang-analyzer.llvm.org/faq.html
 __attribute__((annotate("returns_localized_nsstring")))
@@ -260,7 +264,13 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
         _languageModel = &gLanguageModelCHT;
         _userPhrasesModel = &gUserPhraseLanguageModelCHT;
         _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel);
-        _uom = &gUserOverrideModelCHT;
+        if (_inputMode == kSimpBopomofoModeIdentifier) {
+            NSLog(@"gUserOverrideModelCHS called");
+            _uom = &gUserOverrideModelCHS;
+        } else {
+            NSLog(@"gUserOverrideModelCHT called");
+            _uom = &gUserOverrideModelCHT;
+        }
 
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
@@ -291,28 +301,26 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     chineseConversionMenuItem.state = _chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     [menu addItem:chineseConversionMenuItem];
 
-    // Needs improvement for Simplified Chinese Input
-    if (_inputMode != kSimpBopomofoModeIdentifier) {
-		[menu addItem:[NSMenuItem separatorItem]];
-		[menu addItemWithTitle:NSLocalizedString(@"User Phrases", @"") action:NULL keyEquivalent:@""];
-		NSMenuItem *editUserPheaseItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
-		[editUserPheaseItem setIndentationLevel:2];
-		[menu addItem:editUserPheaseItem];
+    [menu addItem:[NSMenuItem separatorItem]]; // -----------------------
+    
+    NSMenuItem *editUserPheaseItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
+    [editUserPheaseItem setIndentationLevel:2];
+    [menu addItem:editUserPheaseItem];
 
-		NSMenuItem *reloadUserPheaseItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
-		[reloadUserPheaseItem setIndentationLevel:2];
-		[menu addItem:reloadUserPheaseItem];
-		[menu addItem:[NSMenuItem separatorItem]];
-	}
+    NSMenuItem *reloadUserPheaseItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
+    [reloadUserPheaseItem setIndentationLevel:2];
+    [menu addItem:reloadUserPheaseItem];
+
+    [menu addItem:[NSMenuItem separatorItem]]; // -----------------------
     
     NSMenuItem *updateCheckItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""];
     [menu addItem:updateCheckItem];
 
     NSMenuItem *aboutMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About vChewing…", @"") action:@selector(showAbout:) keyEquivalent:@""];
     [menu addItem:aboutMenuItem];
-	
-	// Menu Debug Purposes...
-	NSLog(@"menu %@", menu);
+    
+    // Menu Debug Purposes...
+    NSLog(@"menu %@", menu);
 
     return menu;
 }
@@ -410,46 +418,85 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     NSString *newInputMode;
     Formosa::Gramambular::FastLM *newLanguageModel;
     Formosa::Gramambular::FastLM *userPhraseModel;
+    vChewing::UserOverrideModel *newUom;
 
-    if ([value isKindOfClass:[NSString class]] && [value isEqual:kSimpBopomofoModeIdentifier]) {
-        newInputMode = kSimpBopomofoModeIdentifier;
-        newLanguageModel = &gLanguageModelCHS;
-        userPhraseModel = &gUserPhraseLanguageModelCHS;
-    }
-    else {
-        newInputMode = kBopomofoModeIdentifier;
-        newLanguageModel = &gLanguageModelCHT;
-        userPhraseModel = &gUserPhraseLanguageModelCHT;
-    }
+    if ([value isKindOfClass:[NSString class]]) {
+        
+        if ([value isEqual:kSimpBopomofoModeIdentifier]) {
+            
+            newInputMode = kSimpBopomofoModeIdentifier;
+            newLanguageModel = &gLanguageModelCHS;
+            newUom = &gUserOverrideModelCHS;
+            userPhraseModel = &gUserPhraseLanguageModelCHS;
 
-    // Only apply the changes if the value is changed
-    if (![_inputMode isEqualToString:newInputMode]) {
-        [[NSUserDefaults standardUserDefaults] synchronize];
+            if (![_inputMode isEqualToString:newInputMode]) {
+                [[NSUserDefaults standardUserDefaults] synchronize];
 
-        // Remember to override the keyboard layout again -- treat this as an activate event
-        NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
-        if (!basisKeyboardLayoutID) {
-            basisKeyboardLayoutID = @"com.apple.keylayout.US";
-        }
-        [sender overrideKeyboardWithKeyboardNamed:basisKeyboardLayoutID];
+                // Remember to override the keyboard layout again -- treat this as an activate event
+                NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
+                if (!basisKeyboardLayoutID) {
+                    basisKeyboardLayoutID = @"com.apple.keylayout.US";
+                }
+                [sender overrideKeyboardWithKeyboardNamed:basisKeyboardLayoutID];
 
-        _inputMode = newInputMode;
-        _languageModel = newLanguageModel;
-        _userPhrasesModel = userPhraseModel;
+                _inputMode = newInputMode;
+                _languageModel = newLanguageModel;
+                _userPhrasesModel = userPhraseModel;
 
-        if (!_bpmfReadingBuffer->isEmpty()) {
-            _bpmfReadingBuffer->clear();
-            [self updateClientComposingBuffer:sender];
-        }
+                if (!_bpmfReadingBuffer->isEmpty()) {
+                    _bpmfReadingBuffer->clear();
+                    [self updateClientComposingBuffer:sender];
+                }
 
-        if ([_composingBuffer length] > 0) {
-            [self commitComposition:sender];
-        }
+                if ([_composingBuffer length] > 0) {
+                    [self commitComposition:sender];
+                }
 
-        if (_builder) {
-            delete _builder;
-            _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel);
-            _builder->setJoinSeparator("-");
+                if (_builder) {
+                    delete _builder;
+                    _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel);
+                    _builder->setJoinSeparator("-");
+                }
+            }
+            _uom = newUom;
+        
+        } else if ([value isEqual:kBopomofoModeIdentifier]) {
+            
+            newInputMode = kBopomofoModeIdentifier;
+            newLanguageModel = &gLanguageModelCHT;
+            userPhraseModel = &gUserPhraseLanguageModelCHT;
+            newUom = &gUserOverrideModelCHT;
+            
+            if (![_inputMode isEqualToString:newInputMode]) {
+                [[NSUserDefaults standardUserDefaults] synchronize];
+
+                // Remember to override the keyboard layout again -- treat this as an activate event
+                NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
+                if (!basisKeyboardLayoutID) {
+                    basisKeyboardLayoutID = @"com.apple.keylayout.US";
+                }
+                [sender overrideKeyboardWithKeyboardNamed:basisKeyboardLayoutID];
+
+                _inputMode = newInputMode;
+                _languageModel = newLanguageModel;
+                _userPhrasesModel = userPhraseModel;
+
+                if (!_bpmfReadingBuffer->isEmpty()) {
+                    _bpmfReadingBuffer->clear();
+                    [self updateClientComposingBuffer:sender];
+                }
+
+                if ([_composingBuffer length] > 0) {
+                    [self commitComposition:sender];
+                }
+
+                if (_builder) {
+                    delete _builder;
+                    _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel);
+                    _builder->setJoinSeparator("-");
+                }
+            }
+            _uom = newUom;
         }
     }
 }
@@ -710,28 +757,42 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
 - (BOOL)_writeUserPhrase
 {
-	if (!LTCheckIfUserLanguageModelFileExists()) {
-		return NO;
-	}
+    if (!LTCheckIfUserLanguageModelFileExists()) {
+        return NO;
+    }
 
-	NSString *currentMarkedPhrase = [self _currentMarkedText];
+    NSString *currentMarkedPhrase = [self _currentMarkedText];
     if (![currentMarkedPhrase length]) {
         return NO;
     }
 
     currentMarkedPhrase = [currentMarkedPhrase stringByAppendingString:@"\n"];
-	NSString *path = LTUserPhrasesDataPathCHT();
-    NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:path];
-    if (!file) {
-        return NO;
+    
+    if (_inputMode == kSimpBopomofoModeIdentifier) {
+        NSString *path = LTUserPhrasesDataPathCHS();
+        NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:path];
+        if (!file) {
+            return NO;
+        }
+        [file seekToEndOfFile];
+        NSData *data = [currentMarkedPhrase dataUsingEncoding:NSUTF8StringEncoding];
+        [file writeData:data];
+        [file closeFile];
+        LTLoadUserLanguageModelFileCHS();
+        return YES;
+    } else {
+        NSString *path = LTUserPhrasesDataPathCHT();
+        NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:path];
+        if (!file) {
+            return NO;
+        }
+        [file seekToEndOfFile];
+        NSData *data = [currentMarkedPhrase dataUsingEncoding:NSUTF8StringEncoding];
+        [file writeData:data];
+        [file closeFile];
+        LTLoadUserLanguageModelFileCHT();
+        return YES;
     }
-    [file seekToEndOfFile];
-    NSData *data = [currentMarkedPhrase dataUsingEncoding:NSUTF8StringEncoding];
-    [file writeData:data];
-    [file closeFile];
-
-    LTLoadUserLanguageModelFile();
-    return YES;
 }
 
 - (BOOL)handleInputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
@@ -1556,26 +1617,45 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
 - (void)openUserPhrases:(id)sender
 {
-	NSLog(@"openUserPhrases called");
-	if (!LTCheckIfUserLanguageModelFileExists()) {
-		NSString *content = [NSString stringWithFormat:NSLocalizedString(@"Please check the permission of at \"%@\".", @""), LTUserDataFolderPath()];
-		[[OVNonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Unable to create the user phrase file.", @"") content:content confirmButtonTitle:NSLocalizedString(@"OK", @"") cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
-		return;
-	}
-
-	NSString *path = LTUserPhrasesDataPathCHT();
-	NSLog(@"Open %@", path);
-    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:path atomically:YES];
+    NSLog(@"openUserPhrases called");
+    if (!LTCheckIfUserLanguageModelFileExists()) {
+        NSString *content = [NSString stringWithFormat:NSLocalizedString(@"Please check the permission of at \"%@\".", @""), LTUserDataFolderPath()];
+        [[OVNonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Unable to create the user phrase file.", @"") content:content confirmButtonTitle:NSLocalizedString(@"OK", @"") cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
+        return;
     }
-    NSURL *url = [NSURL fileURLWithPath:path];
-    [[NSWorkspace sharedWorkspace] openURL:url];
+
+    if (_inputMode == kSimpBopomofoModeIdentifier) {
+        NSLog(@"editUserPhrases CHS called");
+        NSString *path = LTUserPhrasesDataPathCHS();
+        NSLog(@"Open %@", path);
+        if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+            [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:path atomically:YES];
+        }
+        NSURL *url = [NSURL fileURLWithPath:path];
+        [[NSWorkspace sharedWorkspace] openURL:url];
+    } else {
+        NSLog(@"editUserPhrases CHT called");
+        NSString *path = LTUserPhrasesDataPathCHT();
+        NSLog(@"Open %@", path);
+        if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+            [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:path atomically:YES];
+        }
+        NSURL *url = [NSURL fileURLWithPath:path];
+        [[NSWorkspace sharedWorkspace] openURL:url];
+    }
+
+
 }
 
 - (void)reloadUserPhrases:(id)sender
 {
-	NSLog(@"reloadUserPhrases called");
-	LTLoadUserLanguageModelFile();
+    if (_inputMode == kSimpBopomofoModeIdentifier) {
+        NSLog(@"reloadUserPhrases CHS called");
+        LTLoadUserLanguageModelFileCHS();
+    } else {
+        NSLog(@"reloadUserPhrases CHT called");
+        LTLoadUserLanguageModelFileCHT();
+    }
 }
 
 - (void)showAbout:(id)sender
@@ -1655,10 +1735,19 @@ void LTLoadLanguageModel()
     LTLoadLanguageModelFile(@"data-chs", gLanguageModelCHS);
 }
 
-void LTLoadUserLanguageModelFile()
+void LTLoadUserLanguageModelFileCHT()
 {
     gUserPhraseLanguageModelCHT.close();
     bool result = gUserPhraseLanguageModelCHT.open([LTUserPhrasesDataPathCHT() UTF8String]);
+    if (!result) {
+        NSLog(@"Failed opening language model for CHT user phrases.");
+    }
+}
+
+void LTLoadUserLanguageModelFileCHS()
+{
+    gUserPhraseLanguageModelCHS.close();
+    bool result = gUserPhraseLanguageModelCHS.open([LTUserPhrasesDataPathCHS() UTF8String]);
     if (!result) {
         NSLog(@"Failed opening language model for CHT user phrases.");
     }

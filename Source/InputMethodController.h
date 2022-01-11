@@ -89,4 +89,5 @@
 
 // the shared language model object
 extern "C" void LTLoadLanguageModel();
-extern "C" void LTLoadUserLanguageModelFile();
+extern "C" void LTLoadUserLanguageModelFileCHT();
+extern "C" void LTLoadUserLanguageModelFileCHS();
