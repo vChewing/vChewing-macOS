@@ -67,17 +67,17 @@
         <window title="vChewing Installer" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" animationBehavior="default" titlebarAppearsTransparent="YES" id="371">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <rect key="contentRect" x="335" y="390" width="533" height="430"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1600" height="875"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
             <value key="minSize" type="size" width="533" height="430"/>
             <value key="maxSize" type="size" width="533" height="430"/>
             <view key="contentView" id="372">
-                <rect key="frame" x="0.0" y="0.0" width="533" height="421"/>
+                <rect key="frame" x="0.0" y="0.0" width="533" height="430"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="575">
-                        <rect key="frame" x="401" y="65" width="124" height="32"/>
+                        <rect key="frame" x="378" y="74" width="147" height="32"/>
                         <constraints>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="110" id="0Oj-Zi-XgI"/>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="133" id="S4F-Qe-xuk"/>
                         </constraints>
                         <buttonCell key="cell" type="push" title="I Accept" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="576">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -88,7 +88,7 @@
                         </connections>
                     </button>
                     <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" findBarPosition="belowContent" translatesAutoresizingMaskIntoConstraints="NO" id="YCR-wo-M5a">
-                        <rect key="frame" x="91" y="130" width="427" height="160"/>
+                        <rect key="frame" x="91" y="139" width="427" height="160"/>
                         <clipView key="contentView" drawsBackground="NO" id="NrY-FL-PVu" userLabel="appEULAContentClip">
                             <rect key="frame" x="1" y="1" width="425" height="158"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -123,10 +123,7 @@
                         </scroller>
                     </scrollView>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ir5-sQ-sJc">
-                        <rect key="frame" x="89" y="406" width="123" height="15"/>
-                        <constraints>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="119" id="3I3-jg-OvY"/>
-                        </constraints>
+                        <rect key="frame" x="89" y="415" width="123" height="15"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="vChewing for macOS" id="GNc-8S-1VG" userLabel="appNameLabel">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -134,10 +131,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bzR-Oa-BZa">
-                        <rect key="frame" x="89" y="390" width="281" height="15"/>
-                        <constraints>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="277" id="VmK-1Y-k0C"/>
-                        </constraints>
+                        <rect key="frame" x="89" y="399" width="281" height="15"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Derived from OpenVanilla McBopopmofo Project." id="QYf-Nf-hoi">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -145,9 +139,9 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="03l-rN-zf9">
-                        <rect key="frame" x="89" y="374" width="297" height="15"/>
+                        <rect key="frame" x="89" y="383" width="297" height="15"/>
                         <constraints>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="293" id="y1f-5D-QsU"/>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="293" id="v2b-OK-WGD"/>
                         </constraints>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Placeholder for showing copyright information." id="eo3-TK-0rB" userLabel="appCopyrightLabel">
                             <font key="font" metaFont="cellTitle"/>
@@ -156,10 +150,7 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XLb-mv-73s">
-                        <rect key="frame" x="89" y="321" width="431" height="45"/>
-                        <constraints>
-                            <constraint firstAttribute="height" relation="lessThanOrEqual" constant="76" id="LAm-9N-mqa"/>
-                        </constraints>
+                        <rect key="frame" x="89" y="330" width="431" height="45"/>
                         <textFieldCell key="cell" selectable="YES" id="VW8-s5-Wpn">
                             <font key="font" metaFont="cellTitle"/>
                             <string key="title">McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.
@@ -169,10 +160,10 @@ vChewing macOS Development Reinforced by Hiraku Wang. vChewing Phrase Database
                         </textFieldCell>
                     </textField>
                     <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Yyh-Nw-Sba">
-                        <rect key="frame" x="15" y="101" width="503" height="5"/>
+                        <rect key="frame" x="15" y="110" width="503" height="5"/>
                     </box>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="k5O-zZ-gQY">
-                        <rect key="frame" x="89" y="298" width="431" height="15"/>
+                        <rect key="frame" x="89" y="307" width="431" height="15"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="MIT-NTL License:" id="AVS-ih-FXM">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -180,28 +171,28 @@ vChewing macOS Development Reinforced by Hiraku Wang. vChewing Phrase Database
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="miu-08-dZk">
-                        <rect key="frame" x="13" y="20" width="379" height="75"/>
+                        <rect key="frame" x="13" y="29" width="360" height="75"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="356" id="pu3-zr-hJy"/>
+                        </constraints>
                         <textFieldCell key="cell" selectable="YES" id="Q9M-ni-kUM">
                             <font key="font" metaFont="cellTitle"/>
-                            <string key="title">DISCLAIMER: The vChewing project is not responsible for the phrase database shipped in the original McBopomofo project. Everything in the vChewing phrase database has been confirmed lawful to the Anti-Secession Law and the National Security Law of the PRC.</string>
+                            <string key="title">DISCLAIMER: The vChewing project is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, have been removed from vChewing official phrase database.</string>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <imageView translatesAutoresizingMaskIntoConstraints="NO" id="Ked-gt-bjE">
-                        <rect key="frame" x="15" y="111" width="63" height="310"/>
+                        <rect key="frame" x="15" y="120" width="63" height="310"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="310" id="5wC-dT-Uz3"/>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="63" id="W7V-Ng-10g"/>
-                            <constraint firstAttribute="width" constant="63" id="YXL-A1-g3p"/>
+                            <constraint firstAttribute="width" constant="63" id="fgC-vo-Ho8"/>
                         </constraints>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="AboutBanner" id="akk-zO-Abm"/>
                     </imageView>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="z1m-8k-Z63">
-                        <rect key="frame" x="211" y="406" width="126" height="15"/>
+                        <rect key="frame" x="211" y="415" width="126" height="15"/>
                         <constraints>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="50" id="Jdx-X9-Hij"/>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="122" id="jzd-NM-NvT"/>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="122" id="yKq-Fv-W1J"/>
                         </constraints>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="version_placeholder" id="JRP-At-H9q" userLabel="appVersionLabel">
                             <font key="font" metaFont="cellTitle"/>
@@ -210,10 +201,7 @@ vChewing macOS Development Reinforced by Hiraku Wang. vChewing Phrase Database
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nul-TQ-gOI">
-                        <rect key="frame" x="89" y="112" width="431" height="15"/>
-                        <constraints>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="277" id="H41-O5-m6k"/>
-                        </constraints>
+                        <rect key="frame" x="89" y="121" width="431" height="15"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="By installing the software, you must accept the terms above." id="mf8-6e-z7X">
                             <font key="font" metaFont="systemBold" size="12"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -221,7 +209,7 @@ vChewing macOS Development Reinforced by Hiraku Wang. vChewing Phrase Database
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="592">
-                        <rect key="frame" x="401" y="38" width="124" height="32"/>
+                        <rect key="frame" x="378" y="47" width="147" height="32"/>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="593">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -235,51 +223,49 @@ Gw
                     </button>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="z1m-8k-Z63" firstAttribute="leading" secondItem="ir5-sQ-sJc" secondAttribute="trailing" constant="3" id="0o7-UY-W0K"/>
-                    <constraint firstItem="Yyh-Nw-Sba" firstAttribute="centerX" secondItem="372" secondAttribute="centerX" id="3aZ-3E-Vdy"/>
-                    <constraint firstItem="k5O-zZ-gQY" firstAttribute="trailing" secondItem="YCR-wo-M5a" secondAttribute="trailing" id="4NS-rw-Qva"/>
-                    <constraint firstItem="ir5-sQ-sJc" firstAttribute="leading" secondItem="Ked-gt-bjE" secondAttribute="trailing" constant="13" id="4V5-on-27Y"/>
-                    <constraint firstItem="Yyh-Nw-Sba" firstAttribute="top" secondItem="Ked-gt-bjE" secondAttribute="bottom" constant="7" id="AyX-mk-WtV"/>
-                    <constraint firstItem="Yyh-Nw-Sba" firstAttribute="trailing" secondItem="575" secondAttribute="trailing" id="Bca-rd-sbR"/>
-                    <constraint firstItem="bzR-Oa-BZa" firstAttribute="leading" secondItem="03l-rN-zf9" secondAttribute="leading" id="CIb-nF-iqX"/>
-                    <constraint firstItem="Ked-gt-bjE" firstAttribute="top" secondItem="ir5-sQ-sJc" secondAttribute="top" id="EMT-y1-zok"/>
-                    <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="03l-rN-zf9" secondAttribute="trailing" constant="149" id="Fbb-sS-k16"/>
-                    <constraint firstItem="Ked-gt-bjE" firstAttribute="leading" secondItem="Yyh-Nw-Sba" secondAttribute="leading" id="GCn-r0-OPd"/>
-                    <constraint firstItem="592" firstAttribute="leading" secondItem="575" secondAttribute="leading" id="IYS-ug-XYc"/>
-                    <constraint firstItem="k5O-zZ-gQY" firstAttribute="leading" secondItem="YCR-wo-M5a" secondAttribute="leading" id="IxG-yS-mAV"/>
-                    <constraint firstItem="ir5-sQ-sJc" firstAttribute="leading" secondItem="bzR-Oa-BZa" secondAttribute="leading" id="Jne-Vq-zOm"/>
-                    <constraint firstItem="Yyh-Nw-Sba" firstAttribute="top" secondItem="nul-TQ-gOI" secondAttribute="bottom" constant="8" symbolic="YES" id="KbY-VE-qlS"/>
-                    <constraint firstItem="z1m-8k-Z63" firstAttribute="baseline" secondItem="ir5-sQ-sJc" secondAttribute="baseline" id="LC5-QK-hpP"/>
-                    <constraint firstItem="k5O-zZ-gQY" firstAttribute="top" secondItem="XLb-mv-73s" secondAttribute="bottom" constant="8" symbolic="YES" id="MYT-3b-SP8"/>
-                    <constraint firstItem="XLb-mv-73s" firstAttribute="trailing" secondItem="k5O-zZ-gQY" secondAttribute="trailing" id="P3c-oh-RAT"/>
-                    <constraint firstItem="Yyh-Nw-Sba" firstAttribute="leading" secondItem="miu-08-dZk" secondAttribute="leading" id="Q3a-Oq-MZV"/>
-                    <constraint firstItem="bzR-Oa-BZa" firstAttribute="top" secondItem="ir5-sQ-sJc" secondAttribute="bottom" constant="1" id="R3J-l0-wlv"/>
-                    <constraint firstItem="XLb-mv-73s" firstAttribute="leading" secondItem="k5O-zZ-gQY" secondAttribute="leading" id="RpX-A9-2wK"/>
-                    <constraint firstItem="nul-TQ-gOI" firstAttribute="trailing" secondItem="Yyh-Nw-Sba" secondAttribute="trailing" id="Ruc-Yl-MpL"/>
-                    <constraint firstItem="575" firstAttribute="top" secondItem="Yyh-Nw-Sba" secondAttribute="bottom" constant="11" id="Txn-WT-xCT"/>
-                    <constraint firstItem="03l-rN-zf9" firstAttribute="top" secondItem="bzR-Oa-BZa" secondAttribute="bottom" constant="1" id="U4G-p1-Vwf"/>
-                    <constraint firstItem="nul-TQ-gOI" firstAttribute="top" secondItem="YCR-wo-M5a" secondAttribute="bottom" constant="3" id="W1d-gJ-JyA"/>
-                    <constraint firstItem="Ked-gt-bjE" firstAttribute="top" secondItem="372" secondAttribute="top" id="dRY-rA-OCS"/>
-                    <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="z1m-8k-Z63" secondAttribute="trailing" constant="198" id="dg9-BV-dlB"/>
-                    <constraint firstItem="miu-08-dZk" firstAttribute="top" secondItem="Yyh-Nw-Sba" secondAttribute="bottom" constant="8" symbolic="YES" id="djR-VW-Oec"/>
-                    <constraint firstItem="Ked-gt-bjE" firstAttribute="leading" secondItem="372" secondAttribute="leading" constant="15" id="eAL-dG-Mgd"/>
-                    <constraint firstAttribute="bottom" secondItem="miu-08-dZk" secondAttribute="bottom" constant="20" symbolic="YES" id="gIW-E7-Fn7"/>
-                    <constraint firstItem="592" firstAttribute="trailing" secondItem="575" secondAttribute="trailing" id="gn0-Fc-WHG"/>
-                    <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="592" secondAttribute="bottom" constant="45" id="kmc-O2-xmA"/>
-                    <constraint firstItem="YCR-wo-M5a" firstAttribute="leading" secondItem="nul-TQ-gOI" secondAttribute="leading" id="m1K-2W-JSs"/>
-                    <constraint firstItem="03l-rN-zf9" firstAttribute="leading" secondItem="XLb-mv-73s" secondAttribute="leading" id="oWV-rf-6Z5"/>
-                    <constraint firstItem="575" firstAttribute="leading" relation="lessThanOrEqual" secondItem="miu-08-dZk" secondAttribute="trailing" constant="18" id="pEL-mN-Nr5"/>
-                    <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="bzR-Oa-BZa" secondAttribute="trailing" constant="165" id="rgf-Zv-6Lp"/>
-                    <constraint firstItem="YCR-wo-M5a" firstAttribute="trailing" secondItem="Yyh-Nw-Sba" secondAttribute="trailing" id="uzb-ag-OHB"/>
-                    <constraint firstItem="XLb-mv-73s" firstAttribute="top" secondItem="03l-rN-zf9" secondAttribute="bottom" constant="8" symbolic="YES" id="vz4-Fp-Jj1"/>
-                    <constraint firstItem="592" firstAttribute="top" secondItem="575" secondAttribute="bottom" constant="7" id="wb9-Ys-Yhs"/>
-                    <constraint firstItem="YCR-wo-M5a" firstAttribute="top" secondItem="k5O-zZ-gQY" secondAttribute="bottom" constant="8" symbolic="YES" id="xds-7u-usv"/>
+                    <constraint firstItem="575" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="miu-08-dZk" secondAttribute="trailing" constant="8" symbolic="YES" id="18X-Qf-xUC"/>
+                    <constraint firstItem="Yyh-Nw-Sba" firstAttribute="top" secondItem="Ked-gt-bjE" secondAttribute="bottom" constant="7" id="1Hx-8o-xpF"/>
+                    <constraint firstItem="Yyh-Nw-Sba" firstAttribute="top" secondItem="nul-TQ-gOI" secondAttribute="bottom" constant="8" symbolic="YES" id="1Mz-Yp-lqA"/>
+                    <constraint firstItem="575" firstAttribute="leading" secondItem="592" secondAttribute="leading" id="2Kf-DA-DXH"/>
+                    <constraint firstItem="Ked-gt-bjE" firstAttribute="leading" secondItem="372" secondAttribute="leading" constant="15" id="2ne-pt-ddK"/>
+                    <constraint firstItem="03l-rN-zf9" firstAttribute="leading" secondItem="XLb-mv-73s" secondAttribute="leading" id="6Mv-X8-W55"/>
+                    <constraint firstItem="nul-TQ-gOI" firstAttribute="trailing" secondItem="Yyh-Nw-Sba" secondAttribute="trailing" id="6yu-Wm-g26"/>
+                    <constraint firstItem="592" firstAttribute="top" secondItem="575" secondAttribute="bottom" constant="7" id="7Q7-30-gTO"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="bzR-Oa-BZa" secondAttribute="trailing" constant="20" symbolic="YES" id="8td-FZ-tnM"/>
+                    <constraint firstItem="ir5-sQ-sJc" firstAttribute="baseline" secondItem="z1m-8k-Z63" secondAttribute="baseline" id="9AX-QJ-G9U"/>
+                    <constraint firstItem="ir5-sQ-sJc" firstAttribute="leading" secondItem="Ked-gt-bjE" secondAttribute="trailing" constant="13" id="Brw-UI-0WK"/>
+                    <constraint firstItem="k5O-zZ-gQY" firstAttribute="trailing" secondItem="YCR-wo-M5a" secondAttribute="trailing" id="DfC-Ke-tb5"/>
+                    <constraint firstItem="k5O-zZ-gQY" firstAttribute="leading" secondItem="YCR-wo-M5a" secondAttribute="leading" id="FIo-Op-SV8"/>
+                    <constraint firstItem="Yyh-Nw-Sba" firstAttribute="leading" secondItem="miu-08-dZk" secondAttribute="leading" id="H4v-4O-xZY"/>
+                    <constraint firstItem="YCR-wo-M5a" firstAttribute="trailing" secondItem="nul-TQ-gOI" secondAttribute="trailing" id="HX6-hi-PJs"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="z1m-8k-Z63" secondAttribute="trailing" constant="20" symbolic="YES" id="Hg9-8d-O7s"/>
+                    <constraint firstItem="z1m-8k-Z63" firstAttribute="leading" secondItem="ir5-sQ-sJc" secondAttribute="trailing" constant="3" id="LSc-gD-CbY"/>
+                    <constraint firstItem="575" firstAttribute="top" secondItem="Yyh-Nw-Sba" secondAttribute="bottom" constant="11" id="Nw2-bH-vTF"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="03l-rN-zf9" secondAttribute="trailing" constant="20" symbolic="YES" id="PRC-Y1-rIz"/>
+                    <constraint firstItem="Ked-gt-bjE" firstAttribute="leading" secondItem="Yyh-Nw-Sba" secondAttribute="leading" id="SKi-gn-JeS"/>
+                    <constraint firstItem="XLb-mv-73s" firstAttribute="trailing" secondItem="k5O-zZ-gQY" secondAttribute="trailing" id="VOo-Q9-rki"/>
+                    <constraint firstItem="Ked-gt-bjE" firstAttribute="top" secondItem="372" secondAttribute="top" id="WPX-gk-uqh"/>
+                    <constraint firstItem="XLb-mv-73s" firstAttribute="top" secondItem="03l-rN-zf9" secondAttribute="bottom" constant="8" symbolic="YES" id="bJX-f1-1PU"/>
+                    <constraint firstItem="Ked-gt-bjE" firstAttribute="top" secondItem="ir5-sQ-sJc" secondAttribute="top" id="caT-rm-xEa"/>
+                    <constraint firstItem="bzR-Oa-BZa" firstAttribute="top" secondItem="ir5-sQ-sJc" secondAttribute="bottom" constant="1" id="dyJ-9C-f56"/>
+                    <constraint firstItem="bzR-Oa-BZa" firstAttribute="leading" secondItem="03l-rN-zf9" secondAttribute="leading" id="etY-2E-2Sa"/>
+                    <constraint firstItem="YCR-wo-M5a" firstAttribute="leading" secondItem="nul-TQ-gOI" secondAttribute="leading" id="fl0-wm-8Pa"/>
+                    <constraint firstItem="miu-08-dZk" firstAttribute="top" secondItem="Yyh-Nw-Sba" secondAttribute="bottom" constant="8" symbolic="YES" id="lY7-Se-lpo"/>
+                    <constraint firstItem="XLb-mv-73s" firstAttribute="leading" secondItem="k5O-zZ-gQY" secondAttribute="leading" id="qzW-qc-9yQ"/>
+                    <constraint firstItem="575" firstAttribute="trailing" secondItem="592" secondAttribute="trailing" id="sIp-L2-QLj"/>
+                    <constraint firstItem="575" firstAttribute="trailing" secondItem="Yyh-Nw-Sba" secondAttribute="trailing" id="tap-mY-bvB"/>
+                    <constraint firstItem="nul-TQ-gOI" firstAttribute="top" secondItem="YCR-wo-M5a" secondAttribute="bottom" constant="3" id="tqc-zq-Egb"/>
+                    <constraint firstItem="YCR-wo-M5a" firstAttribute="top" secondItem="k5O-zZ-gQY" secondAttribute="bottom" constant="8" symbolic="YES" id="u3L-Nh-ELP"/>
+                    <constraint firstItem="k5O-zZ-gQY" firstAttribute="top" secondItem="XLb-mv-73s" secondAttribute="bottom" constant="8" symbolic="YES" id="uxg-3X-XtF"/>
+                    <constraint firstItem="ir5-sQ-sJc" firstAttribute="leading" secondItem="bzR-Oa-BZa" secondAttribute="leading" id="vkK-Vc-WOf"/>
+                    <constraint firstItem="Yyh-Nw-Sba" firstAttribute="centerX" secondItem="372" secondAttribute="centerX" id="xqG-pX-j0d"/>
+                    <constraint firstItem="03l-rN-zf9" firstAttribute="top" secondItem="bzR-Oa-BZa" secondAttribute="bottom" constant="1" id="yKI-MD-nsC"/>
                 </constraints>
             </view>
             <connections>
                 <outlet property="delegate" destination="494" id="706"/>
             </connections>
-            <point key="canvasLocation" x="-112.5" y="-184.5"/>
+            <point key="canvasLocation" x="-306.5" y="-230"/>
         </window>
         <customObject id="494" customClass="AppDelegate">
             <connections>
@@ -296,7 +282,7 @@ Gw
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="gHl-Hx-eQn">
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="283" y="305" width="480" height="180"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1600" height="875"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
             <view key="contentView" id="wAe-c8-Vh9">
                 <rect key="frame" x="0.0" y="0.0" width="480" height="180"/>
                 <autoresizingMask key="autoresizingMask"/>

@@ -50,8 +50,8 @@
 /* Class = "NSTextFieldCell"; title = "version_placeholder"; ObjectID = "JRP-At-H9q"; */
 // "JRP-At-H9q.title" = "version_placeholder";
 
-/* Class = "NSTextFieldCell"; title = "DISCLAIMER: The vChewing project is not responsible for the phrase database shipped in the original McBopomofo project. Everything in the vChewing phrase database has been confirmed lawful to the Anti-Secession Law and the National Security Law of the PRC."; ObjectID = "Q9M-ni-kUM"; */
-"Q9M-ni-kUM.title" = "DISCLAIMER: The vChewing project is not responsible for the phrase database shipped in the original McBopomofo project. Everything in the vChewing phrase database has been confirmed lawful to the Anti-Secession Law and the National Security Law of the PRC.";
+/* Class = "NSTextFieldCell"; title = "DISCLAIMER: The vChewing project is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, have been removed from vChewing official phrase database."; ObjectID = "Q9M-ni-kUM"; */
+"Q9M-ni-kUM.title" = "DISCLAIMER: The vChewing project is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, have been removed from vChewing official phrase database.";
 
 /* Class = "NSTextFieldCell"; title = "Derived from OpenVanilla McBopopmofo Project."; ObjectID = "QYf-Nf-hoi"; */
 "QYf-Nf-hoi.title" = "Derived from OpenVanilla McBopopmofo Project.";

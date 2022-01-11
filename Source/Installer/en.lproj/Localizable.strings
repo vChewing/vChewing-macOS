@@ -1,5 +1,5 @@
 "%@ (for version %@)" = "%1$@ (for version %2$@)";
-"Upgrade" = "Accept-Upgrade";
+"Upgrade" = "Accept & Upgrade";
 "Cancel" = "Cancel";
 "Cannot activate the input method." = "Cannot activate the input method.";
 "Cannot copy the file to the destination." = "Cannot copy the file to the destination.";

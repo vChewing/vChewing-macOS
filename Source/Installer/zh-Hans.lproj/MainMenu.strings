@@ -50,8 +50,8 @@
 /* Class = "NSTextFieldCell"; title = "version_placeholder"; ObjectID = "JRP-At-H9q"; */
 // "JRP-At-H9q.title" = "version_placeholder";
 
-/* Class = "NSTextFieldCell"; title = "DISCLAIMER: The vChewing project is not responsible for the phrase database shipped in the original McBopomofo project. Everything in the vChewing phrase database has been confirmed lawful to the Anti-Secession Law and the National Security Law of the PRC."; ObjectID = "Q9M-ni-kUM"; */
-"Q9M-ni-kUM.title" = "免责声明：威注音专案对小麦注音官方专案内赠的小麦注音原版词库内容不负任何责任。威注音输入法专用的威注音词库已依照《中华人民共和国国家安全法》与《中华人民共和国反分裂国家法》做过合规处理。";
+/* Class = "NSTextFieldCell"; title = "DISCLAIMER: The vChewing project is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, have been removed from vChewing official phrase database."; ObjectID = "Q9M-ni-kUM"; */
+"Q9M-ni-kUM.title" = "免责声明：威注音专案对小麦注音官方专案内赠的小麦注音原版词库内容不负任何责任。威注音输入法专用的威注音官方词库已清除任何「会在法理上妨碍威注音在全球传播」的「与地缘政治及政治意识形态有关的」內容。";
 
 /* Class = "NSTextFieldCell"; title = "Derived from OpenVanilla McBopopmofo Project."; ObjectID = "QYf-Nf-hoi"; */
 "QYf-Nf-hoi.title" = "该专案由 OpenVanilla 小麦注音专案衍生而来。";
