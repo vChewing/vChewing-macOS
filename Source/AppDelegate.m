@@ -42,7 +42,8 @@
 #import "frmAboutWindow.h"
 
 extern void LTLoadLanguageModel(void);
-extern void LTLoadUserLanguageModelFile(void);
+extern void LTLoadUserLanguageModelFileCHT(void);
+extern void LTLoadUserLanguageModelFileCHS(void);
 
 static NSString *kCheckUpdateAutomatically = @"CheckUpdateAutomatically";
 static NSString *kNextUpdateCheckDateKey = @"NextUpdateCheckDate";
@@ -67,9 +68,10 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 - (void)applicationDidFinishLaunching:(NSNotification *)inNotification
 {
     LTLoadLanguageModel();
-    LTLoadUserLanguageModelFile();
+    LTLoadUserLanguageModelFileCHT();
+	LTLoadUserLanguageModelFileCHS();
 
-    if (![[NSUserDefaults standardUserDefaults] objectForKey:kCheckUpdateAutomatically]) {
+	if (![[NSUserDefaults standardUserDefaults] objectForKey:kCheckUpdateAutomatically]) {
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCheckUpdateAutomatically];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
