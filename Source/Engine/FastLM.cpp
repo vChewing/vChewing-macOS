@@ -31,6 +31,7 @@
 #include <fcntl.h>
 #include <fstream>
 #include <unistd.h>
+#include <syslog.h>
 
 using namespace Formosa::Gramambular;
 
@@ -53,7 +54,23 @@ bool FastLM::open(const char *path)
     if (data) {
         return false;
     }
-
+    
+    fstream zfd(path);
+    zfd.seekg(-1,ios_base::end);
+    char z;
+    zfd.get(z);
+    if(z!='\n'){
+        syslog(LOG_CONS, "REPORT: File is not ended with a new line.\n");
+        syslog(LOG_CONS, "PROCEDURE: Trying to insert a new line as EOF before per-line check process.\n");
+        ofstream zfdo(path, std::ios_base::app);
+        zfdo << std::endl;
+        zfdo.close();
+        if (zfdo.fail()) {
+            syslog(LOG_CONS, "REPORT: Failed to append a newline to the data file. Insufficient Privileges?\n");
+            return false;
+        }
+    }
+    
     fd = ::open(path, O_RDONLY);
     if (fd == -1) {
         return false;
