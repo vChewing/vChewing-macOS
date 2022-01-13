@@ -43,8 +43,6 @@
 #import "OVStringHelper.h"
 #import "OVUTF8Helper.h"
 #import "AppDelegate.h"
-#import "VTHorizontalCandidateController.h"
-#import "VTVerticalCandidateController.h"
 #import "OVNonModalAlertWindowController.h"
 #import "vChewing-Swift.h"
 
