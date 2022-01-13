@@ -12,6 +12,9 @@
 		5B1958522788A2BF00FAEB14 /* MITLicense.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B58E87D278413E7003EA2AD /* MITLicense.txt */; };
 		5B42B64027876FDC00BB9B9F /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B42B63E27876FDC00BB9B9F /* UserOverrideModel.cpp */; };
 		5B58E87F278413E7003EA2AD /* MITLicense.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B58E87D278413E7003EA2AD /* MITLicense.txt */; };
+		5BC3EE1B278FC48C00F5E44C /* VerticalCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC3EE18278FC48C00F5E44C /* VerticalCandidateController.swift */; };
+		5BC3EE1C278FC48C00F5E44C /* VTCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC3EE19278FC48C00F5E44C /* VTCandidateController.swift */; };
+		5BC3EE1D278FC48C00F5E44C /* HorizontalCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC3EE1A278FC48C00F5E44C /* HorizontalCandidateController.swift */; };
 		5BC3FB83278492DE0022E99A /* data-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BC3FB82278492DE0022E99A /* data-chs.txt */; };
 		5BF4A6FE27844738007DC6E7 /* frmAboutWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BF4A6FC27844738007DC6E7 /* frmAboutWindow.m */; };
 		5BF4A70027844DC5007DC6E7 /* frmAboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BF4A70227844DC5007DC6E7 /* frmAboutWindow.xib */; };
@@ -22,12 +25,6 @@
 		6A0D4ED315FC0D6400ABF4B3 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC815FC0D6400ABF4B3 /* main.m */; };
 		6A0D4ED415FC0D6400ABF4B3 /* OVInputSourceHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4ECA15FC0D6400ABF4B3 /* OVInputSourceHelper.m */; };
 		6A0D4ED515FC0D6400ABF4B3 /* PreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4ECC15FC0D6400ABF4B3 /* PreferencesWindowController.m */; };
-		6A0D4EFE15FC0DA600ABF4B3 /* VTCandidateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EDA15FC0DA600ABF4B3 /* VTCandidateController.m */; };
-		6A0D4EFF15FC0DA600ABF4B3 /* VTHorizontalCandidateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EDC15FC0DA600ABF4B3 /* VTHorizontalCandidateController.m */; };
-		6A0D4F0015FC0DA600ABF4B3 /* VTHorizontalCandidateView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EDE15FC0DA600ABF4B3 /* VTHorizontalCandidateView.m */; };
-		6A0D4F0115FC0DA600ABF4B3 /* VTVerticalCandidateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EE015FC0DA600ABF4B3 /* VTVerticalCandidateController.m */; };
-		6A0D4F0215FC0DA600ABF4B3 /* VTVerticalCandidateTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EE215FC0DA600ABF4B3 /* VTVerticalCandidateTableView.m */; };
-		6A0D4F0315FC0DA600ABF4B3 /* VTVerticalKeyLabelStripView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EE415FC0DA600ABF4B3 /* VTVerticalKeyLabelStripView.m */; };
 		6A0D4F0815FC0DA600ABF4B3 /* Bopomofo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EEF15FC0DA600ABF4B3 /* Bopomofo.tiff */; };
 		6A0D4F0915FC0DA600ABF4B3 /* Bopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EF015FC0DA600ABF4B3 /* Bopomofo@2x.tiff */; };
 		6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F2015FC0EB100ABF4B3 /* Mandarin.cpp */; };
@@ -91,6 +88,9 @@
 		5B9781D72763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Source/zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5B9781D82763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Source/zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5B9781D92763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.xib"; sourceTree = "<group>"; };
+		5BC3EE18278FC48C00F5E44C /* VerticalCandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalCandidateController.swift; sourceTree = "<group>"; };
+		5BC3EE19278FC48C00F5E44C /* VTCandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VTCandidateController.swift; sourceTree = "<group>"; };
+		5BC3EE1A278FC48C00F5E44C /* HorizontalCandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontalCandidateController.swift; sourceTree = "<group>"; };
 		5BC3FB82278492DE0022E99A /* data-chs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "data-chs.txt"; sourceTree = "<group>"; };
 		5BF4A6FB27844738007DC6E7 /* frmAboutWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = frmAboutWindow.h; sourceTree = "<group>"; };
 		5BF4A6FC27844738007DC6E7 /* frmAboutWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = frmAboutWindow.m; sourceTree = "<group>"; };
@@ -113,18 +113,6 @@
 		6A0D4ECA15FC0D6400ABF4B3 /* OVInputSourceHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OVInputSourceHelper.m; sourceTree = "<group>"; };
 		6A0D4ECB15FC0D6400ABF4B3 /* PreferencesWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesWindowController.h; sourceTree = "<group>"; };
 		6A0D4ECC15FC0D6400ABF4B3 /* PreferencesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesWindowController.m; sourceTree = "<group>"; };
-		6A0D4ED915FC0DA600ABF4B3 /* VTCandidateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTCandidateController.h; sourceTree = "<group>"; };
-		6A0D4EDA15FC0DA600ABF4B3 /* VTCandidateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VTCandidateController.m; sourceTree = "<group>"; };
-		6A0D4EDB15FC0DA600ABF4B3 /* VTHorizontalCandidateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTHorizontalCandidateController.h; sourceTree = "<group>"; };
-		6A0D4EDC15FC0DA600ABF4B3 /* VTHorizontalCandidateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VTHorizontalCandidateController.m; sourceTree = "<group>"; };
-		6A0D4EDD15FC0DA600ABF4B3 /* VTHorizontalCandidateView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTHorizontalCandidateView.h; sourceTree = "<group>"; };
-		6A0D4EDE15FC0DA600ABF4B3 /* VTHorizontalCandidateView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VTHorizontalCandidateView.m; sourceTree = "<group>"; };
-		6A0D4EDF15FC0DA600ABF4B3 /* VTVerticalCandidateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTVerticalCandidateController.h; sourceTree = "<group>"; };
-		6A0D4EE015FC0DA600ABF4B3 /* VTVerticalCandidateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VTVerticalCandidateController.m; sourceTree = "<group>"; };
-		6A0D4EE115FC0DA600ABF4B3 /* VTVerticalCandidateTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTVerticalCandidateTableView.h; sourceTree = "<group>"; };
-		6A0D4EE215FC0DA600ABF4B3 /* VTVerticalCandidateTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VTVerticalCandidateTableView.m; sourceTree = "<group>"; };
-		6A0D4EE315FC0DA600ABF4B3 /* VTVerticalKeyLabelStripView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTVerticalKeyLabelStripView.h; sourceTree = "<group>"; };
-		6A0D4EE415FC0DA600ABF4B3 /* VTVerticalKeyLabelStripView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VTVerticalKeyLabelStripView.m; sourceTree = "<group>"; };
 		6A0D4EEF15FC0DA600ABF4B3 /* Bopomofo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Bopomofo.tiff; sourceTree = "<group>"; };
 		6A0D4EF015FC0DA600ABF4B3 /* Bopomofo@2x.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "Bopomofo@2x.tiff"; sourceTree = "<group>"; };
 		6A0D4EF515FC0DA600ABF4B3 /* vChewing-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "vChewing-Info.plist"; sourceTree = "<group>"; };
@@ -307,18 +295,9 @@
 		6A0D4ED815FC0DA600ABF4B3 /* CandidateUI */ = {
 			isa = PBXGroup;
 			children = (
-				6A0D4ED915FC0DA600ABF4B3 /* VTCandidateController.h */,
-				6A0D4EDA15FC0DA600ABF4B3 /* VTCandidateController.m */,
-				6A0D4EDB15FC0DA600ABF4B3 /* VTHorizontalCandidateController.h */,
-				6A0D4EDC15FC0DA600ABF4B3 /* VTHorizontalCandidateController.m */,
-				6A0D4EDD15FC0DA600ABF4B3 /* VTHorizontalCandidateView.h */,
-				6A0D4EDE15FC0DA600ABF4B3 /* VTHorizontalCandidateView.m */,
-				6A0D4EDF15FC0DA600ABF4B3 /* VTVerticalCandidateController.h */,
-				6A0D4EE015FC0DA600ABF4B3 /* VTVerticalCandidateController.m */,
-				6A0D4EE115FC0DA600ABF4B3 /* VTVerticalCandidateTableView.h */,
-				6A0D4EE215FC0DA600ABF4B3 /* VTVerticalCandidateTableView.m */,
-				6A0D4EE315FC0DA600ABF4B3 /* VTVerticalKeyLabelStripView.h */,
-				6A0D4EE415FC0DA600ABF4B3 /* VTVerticalKeyLabelStripView.m */,
+				5BC3EE19278FC48C00F5E44C /* VTCandidateController.swift */,
+				5BC3EE1A278FC48C00F5E44C /* HorizontalCandidateController.swift */,
+				5BC3EE18278FC48C00F5E44C /* VerticalCandidateController.swift */,
 			);
 			path = CandidateUI;
 			sourceTree = "<group>";
@@ -646,18 +625,15 @@
 				6A0D4ED315FC0D6400ABF4B3 /* main.m in Sources */,
 				5BF4A6FE27844738007DC6E7 /* frmAboutWindow.m in Sources */,
 				6A0D4ED415FC0D6400ABF4B3 /* OVInputSourceHelper.m in Sources */,
+				5BC3EE1B278FC48C00F5E44C /* VerticalCandidateController.swift in Sources */,
 				5B42B64027876FDC00BB9B9F /* UserOverrideModel.cpp in Sources */,
 				6A0D4ED515FC0D6400ABF4B3 /* PreferencesWindowController.m in Sources */,
-				6A0D4EFE15FC0DA600ABF4B3 /* VTCandidateController.m in Sources */,
-				6A0D4EFF15FC0DA600ABF4B3 /* VTHorizontalCandidateController.m in Sources */,
-				6A0D4F0015FC0DA600ABF4B3 /* VTHorizontalCandidateView.m in Sources */,
 				6AFF97F3253B299E007F1C49 /* OVNonModalAlertWindowController.m in Sources */,
-				6A0D4F0115FC0DA600ABF4B3 /* VTVerticalCandidateController.m in Sources */,
-				6A0D4F0215FC0DA600ABF4B3 /* VTVerticalCandidateTableView.m in Sources */,
-				6A0D4F0315FC0DA600ABF4B3 /* VTVerticalKeyLabelStripView.m in Sources */,
 				D427A9C125ED28CC005D43E0 /* OpenCCBridge.swift in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
 				6A0421A815FEF3F50061ED63 /* FastLM.cpp in Sources */,
+				5BC3EE1C278FC48C00F5E44C /* VTCandidateController.swift in Sources */,
+				5BC3EE1D278FC48C00F5E44C /* HorizontalCandidateController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
