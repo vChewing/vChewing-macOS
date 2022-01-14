@@ -42,7 +42,6 @@
 #import <set>
 #import "OVStringHelper.h"
 #import "OVUTF8Helper.h"
-#import "AppDelegate.h"
 #import "vChewing-Swift.h"
 
 
