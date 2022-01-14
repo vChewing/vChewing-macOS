@@ -43,7 +43,6 @@
 #import "OVStringHelper.h"
 #import "OVUTF8Helper.h"
 #import "AppDelegate.h"
-#import "OVNonModalAlertWindowController.h"
 #import "vChewing-Swift.h"
 
 
@@ -1563,7 +1562,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     NSLog(@"openUserPhrases called");
     if (!LTCheckIfUserLanguageModelFileExists()) {
         NSString *content = [NSString stringWithFormat:NSLocalizedString(@"Please check the permission of at \"%@\".", @""), LTUserDataFolderPath()];
-        [[OVNonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Unable to create the user phrase file.", @"") content:content confirmButtonTitle:NSLocalizedString(@"OK", @"") cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
+        [[NonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Unable to create the user phrase file.", @"") content:content confirmButtonTitle:NSLocalizedString(@"OK", @"") cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
         return;
     }
 
