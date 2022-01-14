@@ -16,6 +16,8 @@
 		5BC3EE1C278FC48C00F5E44C /* VTCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC3EE19278FC48C00F5E44C /* VTCandidateController.swift */; };
 		5BC3EE1D278FC48C00F5E44C /* HorizontalCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC3EE1A278FC48C00F5E44C /* HorizontalCandidateController.swift */; };
 		5BC3FB83278492DE0022E99A /* data-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BC3FB82278492DE0022E99A /* data-chs.txt */; };
+		5BDF2CFE2791BE4400838ADB /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */; };
+		5BDF2CFF2791BECC00838ADB /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */; };
 		5BF4A6FE27844738007DC6E7 /* frmAboutWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BF4A6FC27844738007DC6E7 /* frmAboutWindow.m */; };
 		5BF4A70027844DC5007DC6E7 /* frmAboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BF4A70227844DC5007DC6E7 /* frmAboutWindow.xib */; };
 		6A0421A815FEF3F50061ED63 /* FastLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A0421A615FEF3F50061ED63 /* FastLM.cpp */; };
@@ -23,7 +25,6 @@
 		6A0D4ED015FC0D6400ABF4B3 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC415FC0D6400ABF4B3 /* AppDelegate.m */; };
 		6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */; };
 		6A0D4ED315FC0D6400ABF4B3 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC815FC0D6400ABF4B3 /* main.m */; };
-		6A0D4ED415FC0D6400ABF4B3 /* OVInputSourceHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4ECA15FC0D6400ABF4B3 /* OVInputSourceHelper.m */; };
 		6A0D4ED515FC0D6400ABF4B3 /* PreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4ECC15FC0D6400ABF4B3 /* PreferencesWindowController.m */; };
 		6A0D4F0815FC0DA600ABF4B3 /* Bopomofo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EEF15FC0DA600ABF4B3 /* Bopomofo.tiff */; };
 		6A0D4F0915FC0DA600ABF4B3 /* Bopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EF015FC0DA600ABF4B3 /* Bopomofo@2x.tiff */; };
@@ -38,7 +39,6 @@
 		6A2E40F9253A6AA000D1AE1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
 		6A38BC1515FC117A00A8A51F /* data.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A38BBF615FC117A00A8A51F /* data.txt */; };
 		6A38BC2815FC158A00A8A51F /* InputMethodKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */; };
-		6AB3620D274CA50700AC7547 /* OVInputSourceHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4ECA15FC0D6400ABF4B3 /* OVInputSourceHelper.m */; };
 		6ACA41CD15FC1D7500935EF6 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */; };
 		6ACA41F915FC1D9000935EF6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ACA41E915FC1D9000935EF6 /* AppDelegate.m */; };
 		6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */; };
@@ -88,10 +88,12 @@
 		5B9781D72763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Source/zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5B9781D82763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Source/zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5B9781D92763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.xib"; sourceTree = "<group>"; };
+		5BA923AC2791B7C20001323A /* vChewingInstaller-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vChewingInstaller-Bridging-Header.h"; sourceTree = "<group>"; };
 		5BC3EE18278FC48C00F5E44C /* VerticalCandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalCandidateController.swift; sourceTree = "<group>"; };
 		5BC3EE19278FC48C00F5E44C /* VTCandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VTCandidateController.swift; sourceTree = "<group>"; };
 		5BC3EE1A278FC48C00F5E44C /* HorizontalCandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontalCandidateController.swift; sourceTree = "<group>"; };
 		5BC3FB82278492DE0022E99A /* data-chs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "data-chs.txt"; sourceTree = "<group>"; };
+		5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourceHelper.swift; sourceTree = "<group>"; };
 		5BF4A6FB27844738007DC6E7 /* frmAboutWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = frmAboutWindow.h; sourceTree = "<group>"; };
 		5BF4A6FC27844738007DC6E7 /* frmAboutWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = frmAboutWindow.m; sourceTree = "<group>"; };
 		5BF4A70327844DD0007DC6E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmAboutWindow.xib; sourceTree = "<group>"; };
@@ -109,8 +111,6 @@
 		6A0D4EC615FC0D6400ABF4B3 /* InputMethodController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InputMethodController.h; sourceTree = "<group>"; };
 		6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = InputMethodController.mm; sourceTree = "<group>"; };
 		6A0D4EC815FC0D6400ABF4B3 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		6A0D4EC915FC0D6400ABF4B3 /* OVInputSourceHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVInputSourceHelper.h; sourceTree = "<group>"; };
-		6A0D4ECA15FC0D6400ABF4B3 /* OVInputSourceHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OVInputSourceHelper.m; sourceTree = "<group>"; };
 		6A0D4ECB15FC0D6400ABF4B3 /* PreferencesWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesWindowController.h; sourceTree = "<group>"; };
 		6A0D4ECC15FC0D6400ABF4B3 /* PreferencesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesWindowController.m; sourceTree = "<group>"; };
 		6A0D4EEF15FC0DA600ABF4B3 /* Bopomofo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Bopomofo.tiff; sourceTree = "<group>"; };
@@ -264,6 +264,7 @@
 		6A0D4EC215FC0D3C00ABF4B3 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */,
 				5B58E87D278413E7003EA2AD /* MITLicense.txt */,
 				6A0D4ED815FC0DA600ABF4B3 /* CandidateUI */,
 				6A38BBDD15FC115800A8A51F /* Data */,
@@ -280,12 +281,11 @@
 				6A0D4EF615FC0DA600ABF4B3 /* vChewing-Prefix.pch */,
 				6AFF97EF253B299E007F1C49 /* OVNonModalAlertWindowController.h */,
 				6AFF97F1253B299E007F1C49 /* OVNonModalAlertWindowController.m */,
-				6A0D4EC915FC0D6400ABF4B3 /* OVInputSourceHelper.h */,
-				6A0D4ECA15FC0D6400ABF4B3 /* OVInputSourceHelper.m */,
 				6A0D4ECB15FC0D6400ABF4B3 /* PreferencesWindowController.h */,
 				6A0D4ECC15FC0D6400ABF4B3 /* PreferencesWindowController.m */,
 				D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */,
 				D427A9BF25ED28CC005D43E0 /* vChewing-Bridging-Header.h */,
+				5BA923AC2791B7C20001323A /* vChewingInstaller-Bridging-Header.h */,
 				5B42B63E27876FDC00BB9B9F /* UserOverrideModel.cpp */,
 				5B42B63F27876FDC00BB9B9F /* UserOverrideModel.h */,
 			);
@@ -530,6 +530,9 @@
 					6A0D4EA115FC0D2D00ABF4B3 = {
 						LastSwiftMigration = 1240;
 					};
+					6ACA41CA15FC1D7500935EF6 = {
+						LastSwiftMigration = 1320;
+					};
 				};
 			};
 			buildConfigurationList = 6A0D4E9715FC0CFA00ABF4B3 /* Build configuration list for PBXProject "vChewing" */;
@@ -621,10 +624,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				6A0D4ED015FC0D6400ABF4B3 /* AppDelegate.m in Sources */,
+				5BDF2CFE2791BE4400838ADB /* InputSourceHelper.swift in Sources */,
 				6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */,
 				6A0D4ED315FC0D6400ABF4B3 /* main.m in Sources */,
 				5BF4A6FE27844738007DC6E7 /* frmAboutWindow.m in Sources */,
-				6A0D4ED415FC0D6400ABF4B3 /* OVInputSourceHelper.m in Sources */,
 				5BC3EE1B278FC48C00F5E44C /* VerticalCandidateController.swift in Sources */,
 				5B42B64027876FDC00BB9B9F /* UserOverrideModel.cpp in Sources */,
 				6A0D4ED515FC0D6400ABF4B3 /* PreferencesWindowController.m in Sources */,
@@ -643,8 +646,8 @@
 			files = (
 				6ACA41F915FC1D9000935EF6 /* AppDelegate.m in Sources */,
 				6A225A232367A1D700F685C6 /* ArchiveUtil.m in Sources */,
-				6AB3620D274CA50700AC7547 /* OVInputSourceHelper.m in Sources */,
 				6ACA41FF15FC1D9000935EF6 /* main.m in Sources */,
+				5BDF2CFF2791BECC00838ADB /* InputSourceHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -901,7 +904,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = "Source/vChewing-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1022,6 +1024,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -1046,11 +1049,17 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = ../;
 				INFOPLIST_FILE = "Source/Installer/Installer-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.openvanilla.vChewing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "Source/vChewingInstaller-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1061,6 +1070,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -1079,10 +1089,16 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = ../;
 				INFOPLIST_FILE = "Source/Installer/Installer-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.openvanilla.vChewing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "Source/vChewingInstaller-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
