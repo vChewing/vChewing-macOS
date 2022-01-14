@@ -38,7 +38,7 @@
 
 #import "AppDelegate.h"
 #import "OVNonModalAlertWindowController.h"
-#import "PreferencesWindowController.h"
+#import "vChewing-Swift.h"
 #import "frmAboutWindow.h"
 
 extern void LTLoadLanguageModel(void);

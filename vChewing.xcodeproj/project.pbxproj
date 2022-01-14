@@ -18,6 +18,7 @@
 		5BC3FB83278492DE0022E99A /* data-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BC3FB82278492DE0022E99A /* data-chs.txt */; };
 		5BDF2CFE2791BE4400838ADB /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */; };
 		5BDF2CFF2791BECC00838ADB /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */; };
+		5BDF2D012791C03B00838ADB /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDF2D002791C03B00838ADB /* PreferencesWindowController.swift */; };
 		5BF4A6FE27844738007DC6E7 /* frmAboutWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BF4A6FC27844738007DC6E7 /* frmAboutWindow.m */; };
 		5BF4A70027844DC5007DC6E7 /* frmAboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BF4A70227844DC5007DC6E7 /* frmAboutWindow.xib */; };
 		6A0421A815FEF3F50061ED63 /* FastLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A0421A615FEF3F50061ED63 /* FastLM.cpp */; };
@@ -25,7 +26,6 @@
 		6A0D4ED015FC0D6400ABF4B3 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC415FC0D6400ABF4B3 /* AppDelegate.m */; };
 		6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */; };
 		6A0D4ED315FC0D6400ABF4B3 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC815FC0D6400ABF4B3 /* main.m */; };
-		6A0D4ED515FC0D6400ABF4B3 /* PreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4ECC15FC0D6400ABF4B3 /* PreferencesWindowController.m */; };
 		6A0D4F0815FC0DA600ABF4B3 /* Bopomofo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EEF15FC0DA600ABF4B3 /* Bopomofo.tiff */; };
 		6A0D4F0915FC0DA600ABF4B3 /* Bopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EF015FC0DA600ABF4B3 /* Bopomofo@2x.tiff */; };
 		6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F2015FC0EB100ABF4B3 /* Mandarin.cpp */; };
@@ -94,6 +94,7 @@
 		5BC3EE1A278FC48C00F5E44C /* HorizontalCandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontalCandidateController.swift; sourceTree = "<group>"; };
 		5BC3FB82278492DE0022E99A /* data-chs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "data-chs.txt"; sourceTree = "<group>"; };
 		5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourceHelper.swift; sourceTree = "<group>"; };
+		5BDF2D002791C03B00838ADB /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
 		5BF4A6FB27844738007DC6E7 /* frmAboutWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = frmAboutWindow.h; sourceTree = "<group>"; };
 		5BF4A6FC27844738007DC6E7 /* frmAboutWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = frmAboutWindow.m; sourceTree = "<group>"; };
 		5BF4A70327844DD0007DC6E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmAboutWindow.xib; sourceTree = "<group>"; };
@@ -111,8 +112,6 @@
 		6A0D4EC615FC0D6400ABF4B3 /* InputMethodController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InputMethodController.h; sourceTree = "<group>"; };
 		6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = InputMethodController.mm; sourceTree = "<group>"; };
 		6A0D4EC815FC0D6400ABF4B3 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		6A0D4ECB15FC0D6400ABF4B3 /* PreferencesWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesWindowController.h; sourceTree = "<group>"; };
-		6A0D4ECC15FC0D6400ABF4B3 /* PreferencesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesWindowController.m; sourceTree = "<group>"; };
 		6A0D4EEF15FC0DA600ABF4B3 /* Bopomofo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Bopomofo.tiff; sourceTree = "<group>"; };
 		6A0D4EF015FC0DA600ABF4B3 /* Bopomofo@2x.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "Bopomofo@2x.tiff"; sourceTree = "<group>"; };
 		6A0D4EF515FC0DA600ABF4B3 /* vChewing-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "vChewing-Info.plist"; sourceTree = "<group>"; };
@@ -264,7 +263,6 @@
 		6A0D4EC215FC0D3C00ABF4B3 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */,
 				5B58E87D278413E7003EA2AD /* MITLicense.txt */,
 				6A0D4ED815FC0DA600ABF4B3 /* CandidateUI */,
 				6A38BBDD15FC115800A8A51F /* Data */,
@@ -281,9 +279,9 @@
 				6A0D4EF615FC0DA600ABF4B3 /* vChewing-Prefix.pch */,
 				6AFF97EF253B299E007F1C49 /* OVNonModalAlertWindowController.h */,
 				6AFF97F1253B299E007F1C49 /* OVNonModalAlertWindowController.m */,
-				6A0D4ECB15FC0D6400ABF4B3 /* PreferencesWindowController.h */,
-				6A0D4ECC15FC0D6400ABF4B3 /* PreferencesWindowController.m */,
+				5BDF2D002791C03B00838ADB /* PreferencesWindowController.swift */,
 				D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */,
+				5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */,
 				D427A9BF25ED28CC005D43E0 /* vChewing-Bridging-Header.h */,
 				5BA923AC2791B7C20001323A /* vChewingInstaller-Bridging-Header.h */,
 				5B42B63E27876FDC00BB9B9F /* UserOverrideModel.cpp */,
@@ -630,11 +628,11 @@
 				5BF4A6FE27844738007DC6E7 /* frmAboutWindow.m in Sources */,
 				5BC3EE1B278FC48C00F5E44C /* VerticalCandidateController.swift in Sources */,
 				5B42B64027876FDC00BB9B9F /* UserOverrideModel.cpp in Sources */,
-				6A0D4ED515FC0D6400ABF4B3 /* PreferencesWindowController.m in Sources */,
 				6AFF97F3253B299E007F1C49 /* OVNonModalAlertWindowController.m in Sources */,
 				D427A9C125ED28CC005D43E0 /* OpenCCBridge.swift in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
 				6A0421A815FEF3F50061ED63 /* FastLM.cpp in Sources */,
+				5BDF2D012791C03B00838ADB /* PreferencesWindowController.swift in Sources */,
 				5BC3EE1C278FC48C00F5E44C /* VTCandidateController.swift in Sources */,
 				5BC3EE1D278FC48C00F5E44C /* HorizontalCandidateController.swift in Sources */,
 			);
