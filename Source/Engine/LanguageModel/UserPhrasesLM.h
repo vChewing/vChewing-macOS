@@ -1,16 +1,10 @@
 //
-// vChewingLM.h
+// UserPhraseLM.h
 //
-// Copyright (c) 2021-2022 The vChewing Project.
 // Copyright (c) 2011-2022 The OpenVanilla Project.
 //
 // Contributors:
 //     Weizhong Yang (@zonble) @ OpenVanilla
-//     Hiraku Wang (@hirakujira) @ vChewing
-//     Shiki Suen (@ShikiSuen) @ vChewing
-//
-// Based on the Syrup Project and the Formosana Library
-// by Lukhnos Liu (@lukhnos).
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -34,35 +28,54 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef VCHEWINGLM_H
-#define VCHEWINGLM_H
+#ifndef USERPHRASESLM_H
+#define USERPHRASESLM_H
 
 #include <stdio.h>
-#include "FastLM.h"
-#include "UserPhrasesLM.h"
+
+#include <string>
+#include <map>
+#include <iostream>
+#include "LanguageModel.h"
 
 namespace vChewing {
 
 using namespace Formosa::Gramambular;
 
-class vChewingLM : public LanguageModel {
+class UserPhrasesLM : public LanguageModel
+{
 public:
-    vChewingLM();
-    ~vChewingLM();
-    
-    void loadLanguageModel(const char* languageModelDataPath);
-    void loadUserPhrases(const char* m_userPhrasesDataPath,
-                         const char* m_excludedPhrasesDataPath);
-    
-    const vector<Bigram> bigramsForKeys(const string& preceedingKey, const string& key);
-    const vector<Unigram> unigramsForKey(const string& key);
-    bool hasUnigramsForKey(const string& key);
-    
+    UserPhrasesLM();
+    ~UserPhrasesLM();
+
+    bool open(const char *path);
+    void close();
+    void dump();
+
+    virtual const vector<Bigram> bigramsForKeys(const string& preceedingKey, const string& key);
+    virtual const vector<Unigram> unigramsForKey(const string& key);
+    virtual bool hasUnigramsForKey(const string& key);
+
 protected:
-    FastLM m_languageModel;
-    UserPhrasesLM m_userPhrases;
-    UserPhrasesLM m_excludedPhrases;
+    struct CStringCmp
+    {
+        bool operator()(const char* s1, const char* s2) const
+        {
+            return strcmp(s1, s2) < 0;
+        }
+    };
+
+    struct Row {
+        const char *key;
+        const char *value;
+    };
+
+    map<const char *, vector<Row>, CStringCmp> keyRowMap;
+    int fd;
+    void *data;
+    size_t length;
 };
-};
+
+}
 
 #endif

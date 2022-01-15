@@ -618,8 +618,6 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [readingsArray addObject:[NSString stringWithUTF8String:it_i->c_str()]];
     }
     [string appendString:[readingsArray componentsJoinedByString:@"-"]];
-    [string appendString:@" "];
-    [string appendString:@"-1.0"];
     return string;
 }
 
