@@ -48,7 +48,6 @@ private let kTimeoutInterval: TimeInterval = 60.0
 
 @objc (AppDelegate)
 class AppDelegate: NSObject, NSApplicationDelegate,
-                   NSUserNotificationCenterDelegate, // Hiraku PR#1
                    NonModalAlertWindowControllerDelegate {
     
     @IBOutlet weak var window: NSWindow?
@@ -66,15 +65,14 @@ class AppDelegate: NSObject, NSApplicationDelegate,
     }
     
     func applicationDidFinishLaunching(_ notification: Notification) {
-        LTLoadLanguageModel()
-        LTLoadUserLanguageModelFile();
+        LanguageModelManager.loadDataModels()
+        LanguageModelManager.loadUserPhrasesModel()
         
         if UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) == nil {
             UserDefaults.standard.set(false, forKey: kCheckUpdateAutomatically)
             UserDefaults.standard.synchronize()
         }
         checkForUpdate()
-        NSUserNotificationCenter.default.delegate = self // Hiraku PR#1
     }
     
     @objc func showPreferences() {
@@ -236,11 +234,6 @@ class AppDelegate: NSObject, NSApplicationDelegate,
     
     func nonModalAlertWindowControllerDidCancel(_ controller: NonModalAlertWindowController) {
         updateNextStepURL = nil
-    }
-    
-    // Hiraku PR#1
-    func userNotificationCenter(_ center: NSUserNotificationCenter, shouldPresent notification: NSUserNotification) -> Bool {
-        return true
     }
     
     // New About Window

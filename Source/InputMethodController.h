@@ -40,7 +40,7 @@
 #import <InputMethodKit/InputMethodKit.h>
 #import "Mandarin.h"
 #import "Gramambular.h"
-#import "FastLM.h"
+#import "vChewingLM.h"
 #import "UserOverrideModel.h"
 #import "frmAboutWindow.h"
 
@@ -51,8 +51,10 @@
     Formosa::Mandarin::BopomofoReadingBuffer* _bpmfReadingBuffer;
 
     // language model
-    Formosa::Gramambular::FastLM *_languageModel;
-    Formosa::Gramambular::FastLM *_userPhrasesModel;
+    vChewing::vChewingLM *_languageModel;
+
+    // user override model
+    vChewing::UserOverrideModel *_userOverrideModel;
     
     // the grid (lattice) builder for the unigrams (and bigrams)
     Formosa::Gramambular::BlockReadingBuilder* _builder;
@@ -81,12 +83,5 @@
 
     // if Chinese conversion is enabled
     BOOL _chineseConversionEnabled;
-
-    // if Chinese conversion status has been changed
-    BOOL _previousChineseConversionEnabledStatus;
 }
 @end
-
-// the shared language model object
-extern "C" void LTLoadLanguageModel();
-extern "C" void LTLoadUserLanguageModelFile();

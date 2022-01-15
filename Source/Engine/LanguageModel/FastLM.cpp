@@ -302,7 +302,7 @@ const vector<Bigram> FastLM::bigramsForKeys(const string& preceedingKey, const s
     return vector<Bigram>();
 }
 
-const vector<Unigram> FastLM::unigramsForKeys(const string& key)
+const vector<Unigram> FastLM::unigramsForKey(const string& key)
 {
     vector<Unigram> v;
     map<const char *, vector<Row> >::const_iterator i = keyRowMap.find(key.c_str());
