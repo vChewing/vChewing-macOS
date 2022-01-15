@@ -25,6 +25,7 @@
 		5BDF2D032791C71200838ADB /* NonModalAlertWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDF2D022791C71200838ADB /* NonModalAlertWindowController.swift */; };
 		5BDF2D062791DFF200838ADB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDF2D052791DA6700838ADB /* AppDelegate.swift */; };
 		5BE798A42792E58A00337FF9 /* TooltipController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE798A32792E58A00337FF9 /* TooltipController.swift */; };
+		5BE798A72793280C00337FF9 /* NotifierController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE798A62793280C00337FF9 /* NotifierController.swift */; };
 		5BF4A6FE27844738007DC6E7 /* frmAboutWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BF4A6FC27844738007DC6E7 /* frmAboutWindow.m */; };
 		5BF4A70027844DC5007DC6E7 /* frmAboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BF4A70227844DC5007DC6E7 /* frmAboutWindow.xib */; };
 		6A0421A815FEF3F50061ED63 /* FastLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A0421A615FEF3F50061ED63 /* FastLM.cpp */; };
@@ -108,6 +109,7 @@
 		5BDF2D022791C71200838ADB /* NonModalAlertWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonModalAlertWindowController.swift; sourceTree = "<group>"; };
 		5BDF2D052791DA6700838ADB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5BE798A32792E58A00337FF9 /* TooltipController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TooltipController.swift; sourceTree = "<group>"; };
+		5BE798A62793280C00337FF9 /* NotifierController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotifierController.swift; sourceTree = "<group>"; };
 		5BF4A6FB27844738007DC6E7 /* frmAboutWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = frmAboutWindow.h; sourceTree = "<group>"; };
 		5BF4A6FC27844738007DC6E7 /* frmAboutWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = frmAboutWindow.m; sourceTree = "<group>"; };
 		5BF4A70327844DD0007DC6E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmAboutWindow.xib; sourceTree = "<group>"; };
@@ -258,6 +260,7 @@
 		5BE798A12792E50F00337FF9 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				5BE798A52793280C00337FF9 /* NotifierUI */,
 				5BE798A22792E51F00337FF9 /* TooltipUI */,
 				6A0D4ED815FC0DA600ABF4B3 /* CandidateUI */,
 			);
@@ -270,6 +273,14 @@
 				5BE798A32792E58A00337FF9 /* TooltipController.swift */,
 			);
 			path = TooltipUI;
+			sourceTree = "<group>";
+		};
+		5BE798A52793280C00337FF9 /* NotifierUI */ = {
+			isa = PBXGroup;
+			children = (
+				5BE798A62793280C00337FF9 /* NotifierController.swift */,
+			);
+			path = NotifierUI;
 			sourceTree = "<group>";
 		};
 		6A0D4E9215FC0CFA00ABF4B3 = {
@@ -660,6 +671,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5BDF2CFE2791BE4400838ADB /* InputSourceHelper.swift in Sources */,
+				5BE798A72793280C00337FF9 /* NotifierController.swift in Sources */,
 				5B5F4F93279294A300922DC2 /* LanguageModelManager.mm in Sources */,
 				6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */,
 				6A0D4ED315FC0D6400ABF4B3 /* main.m in Sources */,

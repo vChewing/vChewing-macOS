@@ -1695,6 +1695,8 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 {
     _chineseConversionEnabled = !_chineseConversionEnabled;
     [[NSUserDefaults standardUserDefaults] setBool:_chineseConversionEnabled forKey:kChineseConversionEnabledKey];
+    
+    [NotifierController notifyWithMessage:[NSString stringWithFormat:@"%@%@%@", NSLocalizedString(@"Chinese Conversion", @""), @"\n", _chineseConversionEnabled ? NSLocalizedString(@"NotificationSwitchON", @"") : NSLocalizedString(@"NotificationSwitchOFF", @"")] stay:NO];
 }
 
 - (void)toggleHalfWidthPunctuation:(id)sender
