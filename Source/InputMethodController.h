@@ -83,5 +83,8 @@
 
     // if Chinese conversion is enabled
     BOOL _chineseConversionEnabled;
+    
+    // if half-width punctuation is enabled
+    BOOL _halfWidthPunctuationEnabled;
 }
 @end

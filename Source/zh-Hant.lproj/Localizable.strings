@@ -24,3 +24,4 @@
 "Unable to create the user phrase file." = "無法創建自訂語彙檔案。";
 "Please check the permission of at \"%@\"." = "請檢查此處的存取權限：\"%@\".";
 "Edit Excluded Phrases" = "編輯要濾除的語彙";
+"Use Half-Width Punctuations" = "啟用半形標點輸出";

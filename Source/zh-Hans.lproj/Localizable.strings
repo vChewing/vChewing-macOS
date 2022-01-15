@@ -24,3 +24,4 @@
 "Unable to create the user phrase file." = "无法创建自订语汇档案。";
 "Please check the permission of at \"%@\"." = "请检查此处的存取权限：\"%@\".";
 "Edit Excluded Phrases" = "编辑要滤除的语汇";
+"Use Half-Width Punctuations" = "啟用半角標點輸出";
