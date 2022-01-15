@@ -42,19 +42,20 @@
 #import <set>
 #import "OVStringHelper.h"
 #import "OVUTF8Helper.h"
+#import "LanguageModelManager.h"
 #import "vChewing-Swift.h"
 
-
-//@import SwiftUI;
+@import OpenCC;
 
 // C++ namespace usages
 using namespace std;
 using namespace Formosa::Mandarin;
 using namespace Formosa::Gramambular;
+using namespace vChewing;
 using namespace OpenVanilla;
 
 // default, min and max candidate list text size
-static const NSInteger kDefaultCandidateListTextSize = 18;
+static const NSInteger kDefaultCandidateListTextSize = 16;
 static const NSInteger kMinKeyLabelSize = 10;
 static const NSInteger kMinCandidateListTextSize = 12;
 static const NSInteger kMaxCandidateListTextSize = 196;
@@ -113,76 +114,6 @@ VTCandidateController *gCurrentCandidateController = nil;
 static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 #endif
 
-// shared language model object that stores our phrase-term probability database
-FastLM gLanguageModelCHT;
-FastLM gLanguageModelCHS;
-FastLM gUserPhraseLanguageModelCHT;
-FastLM gUserPhraseLanguageModelCHS;
-
-static const int kUserOverrideModelCapacity = 500;
-static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
-vChewing::UserOverrideModel gUserOverrideModelCHT(kUserOverrideModelCapacity, kObservedOverrideHalflife);
-vChewing::UserOverrideModel gUserOverrideModelCHS(kUserOverrideModelCapacity, kObservedOverrideHalflife);
-
-static NSString *LTUserDataFolderPath()
-{
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES);
-    NSString *appSupportPath = [paths objectAtIndex:0];
-    NSString *userDictPath = [appSupportPath stringByAppendingPathComponent:@"vChewing"];
-    return userDictPath;
-}
-
-static NSString *LTUserPhrasesDataPathCHT()
-{
-    return [LTUserDataFolderPath() stringByAppendingPathComponent:@"userdata-cht.txt"];
-}
-
-static NSString *LTUserPhrasesDataPathCHS()
-{
-    return [LTUserDataFolderPath() stringByAppendingPathComponent:@"userdata-chs.txt"];
-}
-
-static BOOL LTCheckIfUserLanguageModelFileExists() {
-
-    NSString *folderPath = LTUserDataFolderPath();
-    BOOL isFolder = NO;
-    BOOL folderExist = [[NSFileManager defaultManager] fileExistsAtPath:folderPath isDirectory:&isFolder];
-    if (folderExist && !isFolder) {
-        NSError *error = nil;
-        [[NSFileManager defaultManager] removeItemAtPath:folderPath error:&error];
-        if (error) {
-            NSLog(@"Failed to remove folder %@", error);
-            return NO;
-        }
-        folderExist = NO;
-    }
-    if (!folderExist) {
-        NSError *error = nil;
-        [[NSFileManager defaultManager] createDirectoryAtPath:folderPath withIntermediateDirectories:YES attributes:nil error:&error];
-        if (error) {
-            NSLog(@"Failed to create folder %@", error);
-            return NO;
-        }
-    }
-    NSString *filePathCHS = LTUserPhrasesDataPathCHS();
-    if (![[NSFileManager defaultManager] fileExistsAtPath:filePathCHS]) {
-        BOOL result = [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filePathCHS atomically:YES];
-        if (!result) {
-            NSLog(@"Failed to write userdict CHS file");
-            return NO;
-        }
-    }
-    NSString *filePathCHT = LTUserPhrasesDataPathCHT();
-    if (![[NSFileManager defaultManager] fileExistsAtPath:filePathCHT]) {
-        BOOL result = [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filePathCHT atomically:YES];
-        if (!result) {
-            NSLog(@"Failed to write userdict CHT file");
-            return NO;
-        }
-    }
-    return YES;
-}
-
 // https://clang-analyzer.llvm.org/faq.html
 __attribute__((annotate("returns_localized_nsstring")))
 static inline NSString *LocalizationNotNeeded(NSString *s) {
@@ -190,19 +121,12 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 }
 
 // private methods
-@interface vChewingInputMethodController () <VTCandidateControllerDelegate>
+@interface vChewingInputMethodController ()
 + (VTHorizontalCandidateController *)horizontalCandidateController;
 + (VTVerticalCandidateController *)verticalCandidateController;
+@end
 
-- (void)collectCandidates;
-
-- (size_t)actualCandidateCursorIndex;
-
-- (void)_showCandidateWindowUsingVerticalMode:(BOOL)useVerticalMode client:(id)client;
-
-- (void)beep;
-- (BOOL)handleInputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client;
-- (BOOL)handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode;
+@interface vChewingInputMethodController (VTCandidateController) <VTCandidateControllerDelegate>
 @end
 
 // sort helper
@@ -240,8 +164,6 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     }
     // the two client pointers are weak pointers (i.e. we don't retain them)
     // therefore we don't do anything about it
-
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"ChineseConversionStatusChanged" object:nil];
 }
 
 - (id)initWithServer:(IMKServer *)server delegate:(id)delegate client:(id)client
@@ -257,10 +179,10 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
         _bpmfReadingBuffer = new BopomofoReadingBuffer(BopomofoKeyboardLayout::StandardLayout());
 
         // create the lattice builder
-        _languageModel = &gLanguageModelCHT;
-        _userPhrasesModel = &gUserPhraseLanguageModelCHT;
-        _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel);
-        _uom = &gUserOverrideModelCHT;
+        _languageModel = [LanguageModelManager languageModelBopomofo];
+        _userOverrideModel = [LanguageModelManager userOverrideModel];
+
+        _builder = new BlockReadingBuilder(_languageModel);
 
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
@@ -270,10 +192,6 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
         _inputMode = kBopomofoModeIdentifier;
         _chineseConversionEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kChineseConversionEnabledKey];
-        _previousChineseConversionEnabledStatus = _chineseConversionEnabled;
-
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:@"ChineseConversionStatusChanged" object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleChineseConversionStatusDidChanged:) name:@"ChineseConversionStatusChanged" object:nil];
     }
 
     return self;
@@ -287,31 +205,34 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     [menu addItem:preferenceMenuItem];
 
     NSMenuItem *chineseConversionMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Chinese Conversion", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"K"];
-    chineseConversionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand;
+    chineseConversionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
     chineseConversionMenuItem.state = _chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     [menu addItem:chineseConversionMenuItem];
 
-    [menu addItem:[NSMenuItem separatorItem]]; // -----------------------
-    
-    NSMenuItem *editUserPheaseItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
-    [editUserPheaseItem setIndentationLevel:2];
-    [menu addItem:editUserPheaseItem];
+    [menu addItem:[NSMenuItem separatorItem]];
+    [menu addItemWithTitle:NSLocalizedString(@"User Phrases", @"") action:NULL keyEquivalent:@""];
 
-    NSMenuItem *reloadUserPheaseItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
-    [reloadUserPheaseItem setIndentationLevel:2];
-    [menu addItem:reloadUserPheaseItem];
+    if (_inputMode == kSimpBopomofoModeIdentifier) {
+        NSMenuItem *editExcludedPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrasesSimpBopomofo:) keyEquivalent:@""];
+        [menu addItem:editExcludedPhrasesItem];
+    }
+    else {
+        NSMenuItem *editUserPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
+        [menu addItem:editUserPhrasesItem];
 
-    [menu addItem:[NSMenuItem separatorItem]]; // -----------------------
-    
+        NSMenuItem *editExcludedPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrasesvChewing:) keyEquivalent:@""];
+        [menu addItem:editExcludedPhrasesItem];
+    }
+
+    NSMenuItem *reloadUserPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
+    [menu addItem:reloadUserPhrasesItem];
+    [menu addItem:[NSMenuItem separatorItem]];
+
     NSMenuItem *updateCheckItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""];
     [menu addItem:updateCheckItem];
 
     NSMenuItem *aboutMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About vChewing…", @"") action:@selector(showAbout:) keyEquivalent:@""];
     [menu addItem:aboutMenuItem];
-    
-    // Menu Debug Purposes...
-    NSLog(@"menu %@", menu);
-
     return menu;
 }
 
@@ -406,28 +327,22 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 - (void)setValue:(id)value forTag:(long)tag client:(id)sender
 {
     NSString *newInputMode;
-    Formosa::Gramambular::FastLM *newLanguageModel;
-    Formosa::Gramambular::FastLM *userPhraseModel;
-    vChewing::UserOverrideModel *newUom;
+    vChewingLM *newLanguageModel;
 
     if ([value isKindOfClass:[NSString class]] && [value isEqual:kSimpBopomofoModeIdentifier]) {
         newInputMode = kSimpBopomofoModeIdentifier;
-        newLanguageModel = &gLanguageModelCHS;
-        newUom = &gUserOverrideModelCHS;
-        userPhraseModel = &gUserPhraseLanguageModelCHS;
+        newLanguageModel = [LanguageModelManager languageModelSimpBopomofo];
     }
     else {
         newInputMode = kBopomofoModeIdentifier;
-        newLanguageModel = &gLanguageModelCHT;
-        newUom = &gUserOverrideModelCHT;
-        userPhraseModel = &gUserPhraseLanguageModelCHT;
+        newLanguageModel = [LanguageModelManager languageModelBopomofo];
     }
 
     // Only apply the changes if the value is changed
     if (![_inputMode isEqualToString:newInputMode]) {
         [[NSUserDefaults standardUserDefaults] synchronize];
 
-        // Remember to override the keyboard layout again -- treat this as an activate event
+        // Remember to override the keyboard layout again -- treat this as an activate eventy
         NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
         if (!basisKeyboardLayoutID) {
             basisKeyboardLayoutID = @"com.apple.keylayout.US";
@@ -436,8 +351,6 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
         _inputMode = newInputMode;
         _languageModel = newLanguageModel;
-        _userPhrasesModel = userPhraseModel;
-        _uom = newUom;
 
         if (!_bpmfReadingBuffer->isEmpty()) {
             _bpmfReadingBuffer->clear();
@@ -450,7 +363,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
         if (_builder) {
             delete _builder;
-            _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel);
+            _builder = new BlockReadingBuilder(_languageModel);
             _builder->setJoinSeparator("-");
         }
     }
@@ -463,8 +376,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     // if it's Terminal, we don't commit at the first call (the client of which will not be IPMDServerClientWrapper)
     // then we defer the update in the next runloop round -- so that the composing buffer is not
     // meaninglessly flushed, an annoying bug in Terminal.app since Mac OS X 10.5
-    if ([[client bundleIdentifier] isEqualToString:@"com.apple.Terminal"] && ![NSStringFromClass([client class]) isEqualToString:@"IPMDServerClientWrapper"])
-    {
+    if ([[client bundleIdentifier] isEqualToString:@"com.apple.Terminal"] && ![NSStringFromClass([client class]) isEqualToString:@"IPMDServerClientWrapper"]) {
         if (_currentDeferredClient) {
             [self performSelector:@selector(updateClientComposingBuffer:) withObject:_currentDeferredClient afterDelay:0.0];
         }
@@ -563,7 +475,8 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         // i.e. the client app needs to take care of where to put ths composing buffer
         [client setMarkedText:attrString selectionRange:NSMakeRange((NSInteger)_builder->markerCursorIndex(), 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
         _latestReadingCursor = (NSInteger)_builder->markerCursorIndex();
-    } else {
+    }
+    else {
         // we must use NSAttributedString so that the cursor is visible --
         // can't just use NSString
         NSDictionary *attrDict = @{NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
@@ -591,13 +504,13 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     reverse(_walkedNodes.begin(), _walkedNodes.end());
 
     // if DEBUG is defined, a GraphViz file is written to kGraphVizOutputfile
-    #if DEBUG
+#if DEBUG
     string dotDump = _builder->grid().dumpDOT();
     NSString *dotStr = [NSString stringWithUTF8String:dotDump.c_str()];
     NSError *error = nil;
 
     BOOL __unused success = [dotStr writeToFile:kGraphVizOutputfile atomically:YES encoding:NSUTF8StringEncoding error:&error];
-    #endif
+#endif
 }
 
 - (void)popOverflowComposingTextAndWalk:(id)client
@@ -695,12 +608,12 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 
     NSRange range = NSMakeRange((NSInteger)begin, (NSInteger)(end - begin));
-    NSString *reading = [_composingBuffer substringWithRange:range];
+    NSString *phrase = [_composingBuffer substringWithRange:range];
     NSMutableString *string = [[NSMutableString alloc] init];
-    [string appendString:reading];
+    [string appendString:phrase];
     [string appendString:@" "];
     NSMutableArray *readingsArray = [[NSMutableArray alloc] init];
-    vector<std::string> v = _builder->readingsAtRange(begin,end);
+    vector<std::string> v = _builder->readingsAtRange(begin, end);
     for(vector<std::string>::iterator it_i=v.begin(); it_i!=v.end(); ++it_i) {
         [readingsArray addObject:[NSString stringWithUTF8String:it_i->c_str()]];
     }
@@ -712,28 +625,12 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
 - (BOOL)_writeUserPhrase
 {
-    if (!LTCheckIfUserLanguageModelFileExists()) {
-        return NO;
-    }
-
     NSString *currentMarkedPhrase = [self _currentMarkedText];
     if (![currentMarkedPhrase length]) {
         return NO;
     }
 
-    currentMarkedPhrase = [currentMarkedPhrase stringByAppendingString:@"\n"];
-    
-    NSString *path = _inputMode == kSimpBopomofoModeIdentifier ? LTUserPhrasesDataPathCHS() : LTUserPhrasesDataPathCHT();
-    NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:path];
-    if (!file) {
-        return NO;
-    }
-    [file seekToEndOfFile];
-    NSData *data = [currentMarkedPhrase dataUsingEncoding:NSUTF8StringEncoding];
-    [file writeData:data];
-    [file closeFile];
-    LTLoadUserLanguageModelFile();
-    return YES;
+    return [LanguageModelManager writeUserPhrase:currentMarkedPhrase];
 }
 
 - (BOOL)handleInputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
@@ -831,7 +728,8 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         if (charCode == 13) {
             if ([self _writeUserPhrase]) {
                 _builder->setMarkerCursorIndex(SIZE_MAX);
-            } else {
+            }
+            else {
                 [self beep];
             }
             [self updateClientComposingBuffer:client];
@@ -862,13 +760,14 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
         _builder->setMarkerCursorIndex(SIZE_MAX);
     }
-    
+
     // see if it's valid BPMF reading
     if (_bpmfReadingBuffer->isValidKey((char)charCode)) {
         _bpmfReadingBuffer->combineKey((char)charCode);
 
-        // if we have a tone marker, we have to insert the reading to the builder
-        // in other words, if we don't have a tone marker, we just update the composing buffer
+        // if we have a tone marker, we have to insert the reading to the
+        // builder in other words, if we don't have a tone marker, we just
+        // update the composing buffer
         composeReading = _bpmfReadingBuffer->hasToneMarker();
         if (!composeReading) {
             [self updateClientComposingBuffer:client];
@@ -897,8 +796,9 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [self popOverflowComposingTextAndWalk:client];
 
         // get user override model suggestion
-        string overrideValue =
-                _uom->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
+        string overrideValue = (_inputMode == kSimpBopomofoModeIdentifier) ? "" :
+            _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
+
         if (!overrideValue.empty()) {
             size_t cursorIndex = [self actualCandidateCursorIndex];
             vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
@@ -909,6 +809,10 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         // then update the text
         _bpmfReadingBuffer->clear();
         [self updateClientComposingBuffer:client];
+
+        if (_inputMode == kSimpBopomofoModeIdentifier) {
+            [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
+        }
 
         // and tells the client that the key is consumed
         return YES;
@@ -939,39 +843,39 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
     // Esc
     if (charCode == 27) {
-            BOOL escToClearInputBufferEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kEscToCleanInputBufferKey];
+        BOOL escToClearInputBufferEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kEscToCleanInputBufferKey];
 
-            if (escToClearInputBufferEnabled) {
-                // if the optioon is enabled, we clear everythiong including the composing
-                // buffer, walked nodes and the reading.
+        if (escToClearInputBufferEnabled) {
+            // if the optioon is enabled, we clear everythiong including the composing
+            // buffer, walked nodes and the reading.
+            if (![_composingBuffer length]) {
+                return NO;
+            }
+            _bpmfReadingBuffer->clear();
+            _builder->clear();
+            _walkedNodes.clear();
+            [_composingBuffer setString:@""];
+        }
+        else {
+            // if reading is not empty, we cancel the reading; Apple's built-in
+            // Zhuyin (and the erstwhile Hanin) has a default option that Esc
+            // "cancels" the current composed character and revert it to
+            // Bopomofo reading, in odds with the expectation of users from
+            // other platforms
+
+            if (_bpmfReadingBuffer->isEmpty()) {
+                // no nee to beep since the event is deliberately triggered by user
+
                 if (![_composingBuffer length]) {
                     return NO;
                 }
-                _bpmfReadingBuffer->clear();
-                _builder->clear();
-                _walkedNodes.clear();
-                [_composingBuffer setString:@""];
             }
             else {
-                // if reading is not empty, we cancel the reading; Apple's built-in
-                // Zhuyin (and the erstwhile Hanin) has a default option that Esc
-                // "cancels" the current composed character and revert it to
-                // Bopomofo reading, in odds with the expectation of users from
-                // other platforms
-
-                if (_bpmfReadingBuffer->isEmpty()) {
-                    // no nee to beep since the event is deliberately triggered by user
-
-                    if (![_composingBuffer length]) {
-                        return NO;
-                    }
-                }
-                else {
-                    _bpmfReadingBuffer->clear();
-                }
+                _bpmfReadingBuffer->clear();
             }
+        }
 
-            [self updateClientComposingBuffer:client];
+        [self updateClientComposingBuffer:client];
         return YES;
     }
 
@@ -1161,33 +1065,16 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         }
     }
 
+    // if nothing is matched, see if it's a punctuation key for current layout.
     string layout = [self currentLayout];
     string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
-    if (_languageModel->hasUnigramsForKey(customPunctuation)) {
-        if (_bpmfReadingBuffer->isEmpty()) {
-            _builder->insertReadingAtCursor(customPunctuation);
-            [self popOverflowComposingTextAndWalk:client];
-        }
-        else { // If there is still unfinished bpmf reading, ignore the punctuation
-            [self beep];
-        }
-        [self updateClientComposingBuffer:client];
-
+    if ([self handlePunctuation:customPunctuation usingVerticalMode:useVerticalMode client:client]) {
         return YES;
     }
 
-    // if nothing is matched, see if it's a punctuation key
+    // if nothing is matched, see if it's a punctuation key.
     string punctuation = string("_punctuation_") + string(1, (char)charCode);
-    if (_languageModel->hasUnigramsForKey(punctuation)) {
-        if (_bpmfReadingBuffer->isEmpty()) {
-            _builder->insertReadingAtCursor(punctuation);
-            [self popOverflowComposingTextAndWalk:client];
-        }
-        else { // If there is still unfinished bpmf reading, ignore the punctuation
-            [self beep];
-        }
-        [self updateClientComposingBuffer:client];
-
+    if ([self handlePunctuation:punctuation usingVerticalMode:useVerticalMode client:client]) {
         return YES;
     }
 
@@ -1203,16 +1090,48 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     return NO;
 }
 
+- (BOOL)handlePunctuation:(string)customPunctuation usingVerticalMode:(BOOL)useVerticalMode client:(id)client
+{
+    if (_languageModel->hasUnigramsForKey(customPunctuation)) {
+        if (_bpmfReadingBuffer->isEmpty()) {
+            _builder->insertReadingAtCursor(customPunctuation);
+            [self popOverflowComposingTextAndWalk:client];
+        }
+        else { // If there is still unfinished bpmf reading, ignore the punctuation
+            [self beep];
+        }
+        [self updateClientComposingBuffer:client];
+
+        if (_inputMode == kSimpBopomofoModeIdentifier && _bpmfReadingBuffer->isEmpty()) {
+            [self collectCandidates];
+            if ([_candidates count] == 1) {
+                [self commitComposition:client];
+            }
+            else {
+                [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
+            }
+        }
+        return YES;
+    }
+    return NO;
+}
+
 - (BOOL)handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode
 {
-
-    BOOL cancelCandidateKey = (charCode == 27);
-
+    BOOL cancelCandidateKey =
+    (charCode == 27) ||
+    ((_inputMode == kSimpBopomofoModeIdentifier) &&
+     (charCode == 8 || keyCode == kDeleteKeyCode));
 
     if (cancelCandidateKey) {
         gCurrentCandidateController.visible = NO;
         [_candidates removeAllObjects];
 
+        if (_inputMode == kSimpBopomofoModeIdentifier) {
+            _builder->clear();
+            _walkedNodes.clear();
+            [_composingBuffer setString:@""];
+        }
         [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
     }
@@ -1346,6 +1265,23 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             if (candidateIndex != NSUIntegerMax) {
                 [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:candidateIndex];
                 return YES;
+            }
+        }
+
+        if (_inputMode == kSimpBopomofoModeIdentifier) {
+            string layout = [self currentLayout];
+            string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
+            string punctuation = string("_punctuation_") + string(1, (char)charCode);
+
+            BOOL shouldAutoSelectCandidate = _bpmfReadingBuffer->isValidKey((char)charCode) || _languageModel->hasUnigramsForKey(customPunctuation) ||
+            _languageModel->hasUnigramsForKey(punctuation);
+
+            if (shouldAutoSelectCandidate) {
+                NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:0];
+                if (candidateIndex != NSUIntegerMax) {
+                    [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:candidateIndex];
+                    return [self handleInputText:inputText key:keyCode modifiers:0 client:_currentCandidateClient];
+                }
             }
         }
 
@@ -1491,8 +1427,8 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     NSString *klFontName = [[NSUserDefaults standardUserDefaults] stringForKey:kCandidateKeyLabelFontName];
     NSString *ckeys = [[NSUserDefaults standardUserDefaults] stringForKey:kCandidateKeys];
 
-    gCurrentCandidateController.keyLabelFont = klFontName ? [NSFont fontWithName:klFontName size:keyLabelSize] : [NSFont monospacedDigitSystemFontOfSize:keyLabelSize weight:NSFontWeightMedium];
-    gCurrentCandidateController.candidateFont = ctFontName ? [NSFont fontWithName:ctFontName size:textSize] : [NSFont systemFontOfSize:textSize weight:NSFontWeightRegular];
+    gCurrentCandidateController.keyLabelFont = klFontName ? [NSFont fontWithName:klFontName size:keyLabelSize] : [NSFont systemFontOfSize:keyLabelSize];
+    gCurrentCandidateController.candidateFont = ctFontName ? [NSFont fontWithName:ctFontName size:textSize] : [NSFont systemFontOfSize:textSize];
 
     NSMutableArray *keyLabels = [NSMutableArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", nil];
 
@@ -1505,6 +1441,11 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
     gCurrentCandidateController.keyLabels = keyLabels;
     [self collectCandidates];
+
+    if (_inputMode == kSimpBopomofoModeIdentifier && [_candidates count] == 1) {
+        [self commitComposition:client];
+        return;
+    }
 
     gCurrentCandidateController.delegate = self;
     [gCurrentCandidateController reloadData];
@@ -1556,41 +1497,48 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     [(AppDelegate *)[[NSApplication sharedApplication] delegate] checkForUpdateForced:YES];
 }
 
+- (BOOL)_checkUserFiles
+{
+    if (![LanguageModelManager checkIfUserLanguageModelFilesExist] ) {
+        NSString *content = [NSString stringWithFormat:NSLocalizedString(@"Please check the permission of at \"%@\".", @""), [LanguageModelManager dataFolderPath]];
+        [[NonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Unable to create the user phrase file.", @"") content:content confirmButtonTitle:NSLocalizedString(@"OK", @"") cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
+        return NO;
+    }
+
+    return YES;
+}
+
+- (void)_openUserFile:(NSString *)path
+{
+    if (![self _checkUserFiles]) {
+        return;
+    }
+    NSURL *url = [NSURL fileURLWithPath:path];
+    [[NSWorkspace sharedWorkspace] openURL:url];
+}
+
 - (void)openUserPhrases:(id)sender
 {
     NSLog(@"openUserPhrases called");
-    if (!LTCheckIfUserLanguageModelFileExists()) {
-        NSString *content = [NSString stringWithFormat:NSLocalizedString(@"Please check the permission of at \"%@\".", @""), LTUserDataFolderPath()];
-        [[NonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Unable to create the user phrase file.", @"") content:content confirmButtonTitle:NSLocalizedString(@"OK", @"") cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
-        return;
-    }
+    [self _openUserFile:[LanguageModelManager userPhrasesDataPathBopomofo]];
+}
 
-    if (_inputMode == kSimpBopomofoModeIdentifier) {
-        NSLog(@"editUserPhrases CHS called");
-        NSString *path = LTUserPhrasesDataPathCHS();
-        NSLog(@"Open %@", path);
-        if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
-            [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:path atomically:YES];
-        }
-        NSURL *url = [NSURL fileURLWithPath:path];
-        [[NSWorkspace sharedWorkspace] openURL:url];
-    } else {
-        NSLog(@"editUserPhrases CHT called");
-        NSString *path = LTUserPhrasesDataPathCHT();
-        NSLog(@"Open %@", path);
-        if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
-            [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:path atomically:YES];
-        }
-        NSURL *url = [NSURL fileURLWithPath:path];
-        [[NSWorkspace sharedWorkspace] openURL:url];
-    }
+- (void)openExcludedPhrasesSimpBopomofo:(id)sender
+{
+    NSLog(@"openExcludedPhrasesSimpBopomofo called");
+    [self _openUserFile:[LanguageModelManager excludedPhrasesDataPathSimpBopomofo]];
+}
 
-
+- (void)openExcludedPhrasesvChewing:(id)sender
+{
+    NSLog(@"openExcludedPhrasesvChewing called");
+    [self _openUserFile:[LanguageModelManager excludedPhrasesDataPathBopomofo]];
 }
 
 - (void)reloadUserPhrases:(id)sender
 {
-    LTLoadUserLanguageModelFile();
+    NSLog(@"reloadUserPhrases called");
+    [LanguageModelManager loadUserPhrasesModel];
 }
 
 - (void)showAbout:(id)sender
@@ -1604,8 +1552,13 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 {
     _chineseConversionEnabled = !_chineseConversionEnabled;
     [[NSUserDefaults standardUserDefaults] setBool:_chineseConversionEnabled forKey:kChineseConversionEnabledKey];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ChineseConversionStatusChanged" object:nil];
 }
+
+@end
+
+#pragma mark -
+
+@implementation vChewingInputMethodController (VTCandidateController)
 
 - (NSUInteger)candidateCountForController:(VTCandidateController *)controller
 {
@@ -1626,69 +1579,19 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
     size_t cursorIndex = [self actualCandidateCursorIndex];
     _builder->grid().fixNodeSelectedCandidate(cursorIndex, selectedValue);
-    
-    _uom->observe(_walkedNodes, cursorIndex, selectedValue, [[NSDate date] timeIntervalSince1970]);
+    if (_inputMode != kSimpBopomofoModeIdentifier) {
+        _userOverrideModel->observe(_walkedNodes, cursorIndex, selectedValue, [[NSDate date] timeIntervalSince1970]);
+    }
 
     [_candidates removeAllObjects];
 
     [self walk];
     [self updateClientComposingBuffer:_currentCandidateClient];
 
-}
-
-- (void)handleChineseConversionStatusDidChanged:(NSNotification *)notification
-{
-    // Do not post the notification if status doesn't change.
-    // This is because the input method can be initiated by multiple applications, then all of them would post the notification.
-    if (_previousChineseConversionEnabledStatus == _chineseConversionEnabled) {
+    if (_inputMode == kSimpBopomofoModeIdentifier) {
+        [self commitComposition:_currentCandidateClient];
         return;
     }
-
-    NSUserNotification *userNotification = [[NSUserNotification alloc] init];
-    userNotification.title = @"vChewing";
-    userNotification.informativeText = [NSString stringWithFormat:@"%@%@", NSLocalizedString(@"Chinese Conversion", @""), _chineseConversionEnabled ? NSLocalizedString(@"NotificationSwitchON", @"") : NSLocalizedString(@"NotificationSwitchOFF", @"")];
-    userNotification.soundName = NSUserNotificationDefaultSoundName;
-    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
-
-    _previousChineseConversionEnabledStatus = _chineseConversionEnabled;
 }
 
 @end
-
-static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, FastLM &lm)
-{
-    NSString *dataPath = [[NSBundle bundleForClass:[vChewingInputMethodController class]] pathForResource:filenameWithoutExtension ofType:@"txt"];
-    bool result = lm.open([dataPath UTF8String]);
-    if (!result) {
-        NSLog(@"Failed opening language model: %@", dataPath);
-    }
-}
-
-void LTLoadLanguageModel()
-{
-    LTLoadLanguageModelFile(@"data", gLanguageModelCHT);
-    LTLoadLanguageModelFile(@"data-chs", gLanguageModelCHS);
-}
-
-void LTLoadUserLanguageModelFile()
-{
-    // Autofix: Ensure that there's a new line in the user language model file.
-    // NSString *lineBreak = @"\n";
-    // NSOutputStream *stream = [[NSOutputStream alloc] initToFileAtPath:LTUserPhrasesDataPathCHT() append:YES];
-    // [stream open];
-    // NSData *strData = [lineBreak dataUsingEncoding:NSUTF8StringEncoding];
-    // [stream write:(uint8_t *)[strData bytes] maxLength:[strData length]];
-    // [stream close];
-    
-    gUserPhraseLanguageModelCHT.close();
-    gUserPhraseLanguageModelCHS.close();
-    bool resultCHT = gUserPhraseLanguageModelCHT.open([LTUserPhrasesDataPathCHT() UTF8String]);
-    bool resultCHS = gUserPhraseLanguageModelCHS.open([LTUserPhrasesDataPathCHS() UTF8String]);
-    
-    if (!resultCHT) {
-        NSLog(@"Failed opening language model for CHT user phrases.");
-    }
-    if (!resultCHS) {
-        NSLog(@"Failed opening language model for CHS user phrases.");
-    }
-}

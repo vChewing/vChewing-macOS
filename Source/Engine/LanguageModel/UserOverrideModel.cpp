@@ -4,6 +4,11 @@
 // Copyright (c) 2021-2022 The vChewing Project.
 // Copyright (c) 2011-2022 The OpenVanilla Project.
 //
+// Contributors:
+//     Weizhong Yang (@zonble) @ OpenVanilla
+//     Hiraku Wang (@hirakujira) @ vChewing
+//     Shiki Suen (@ShikiSuen) @ vChewing
+//
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without

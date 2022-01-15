@@ -1,8 +1,16 @@
 //
-// UserOverrideModel.h
+// vChewingLM.h
 //
 // Copyright (c) 2021-2022 The vChewing Project.
 // Copyright (c) 2011-2022 The OpenVanilla Project.
+//
+// Contributors:
+//     Weizhong Yang (@zonble) @ OpenVanilla
+//     Hiraku Wang (@hirakujira) @ vChewing
+//     Shiki Suen (@ShikiSuen) @ vChewing
+//
+// Based on the Syrup Project and the Formosana Library
+// by Lukhnos Liu (@lukhnos).
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -26,57 +34,34 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef USEROVERRIDEMODEL_H
-#define USEROVERRIDEMODEL_H
+#ifndef VCHEWINGLM_H
+#define VCHEWINGLM_H
 
-#include <list>
-#include <map>
-#include <string>
-
-#include "Gramambular.h"
+#include <stdio.h>
+#include "FastLM.h"
 
 namespace vChewing {
 
 using namespace Formosa::Gramambular;
 
-class UserOverrideModel {
+class vChewingLM : public LanguageModel {
 public:
-    UserOverrideModel(size_t capacity, double decayConstant);
-
-    void observe(const std::vector<NodeAnchor>& walkedNodes,
-                 size_t cursorIndex,
-                 const string& candidate,
-                 double timestamp);
-
-    string suggest(const std::vector<NodeAnchor>& walkedNodes,
-                   size_t cursorIndex,
-                   double timestamp);
-
-private:
-    struct Override {
-        size_t count;
-        double timestamp;
-
-        Override() : count(0), timestamp(0.0) {}
-    };
-
-    struct Observation {
-        size_t count;
-        std::map<std::string, Override> overrides;
-
-        Observation() : count(0) {}
-        void update(const string& candidate, double timestamp);
-    };
-
-    typedef std::pair<std::string, Observation> KeyObservationPair;
-
-    size_t m_capacity;
-    double m_decayExponent;
-    std::list<KeyObservationPair> m_lruList;
-    std::map<std::string, std::list<KeyObservationPair>::iterator> m_lruMap;
+    vChewingLM();
+    ~vChewingLM();
+    
+    void loadLanguageModel(const char* languageModelDataPath);
+    void loadUserPhrases(const char* m_userPhrasesDataPath,
+                         const char* m_excludedPhrasesDataPath);
+    
+    const vector<Bigram> bigramsForKeys(const string& preceedingKey, const string& key);
+    const vector<Unigram> unigramsForKey(const string& key);
+    bool hasUnigramsForKey(const string& key);
+    
+protected:
+    FastLM m_languageModel;
+    FastLM m_userPhrases;
+    FastLM m_excludedPhrases;
+};
 };
 
-};   // namespace vChewing
-
 #endif
-
