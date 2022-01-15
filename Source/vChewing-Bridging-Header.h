@@ -3,5 +3,9 @@
 //
 
 #import "frmAboutWindow.h"
-extern void LTLoadLanguageModel(void);
-extern void LTLoadUserLanguageModelFile(void);
+#import <Foundation/Foundation.h> // @import Foundation;
+@interface LanguageModelManager : NSObject
++ (void)loadDataModels;
++ (void)loadUserPhrasesModel;
++ (BOOL)checkIfUserLanguageModelFilesExist;
+@end
