@@ -169,7 +169,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     if (_bpmfReadingBuffer) {
         delete _bpmfReadingBuffer;
     }
-
+    
     if (_builder) {
         delete _builder;
     }
@@ -181,31 +181,31 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 {
     // an instance is initialized whenever a text input client (a Mac app) requires
     // text input from an IME
-
+    
     self = [super initWithServer:server delegate:delegate client:client];
     if (self) {
         _candidates = [[NSMutableArray alloc] init];
-
+        
         // create the reading buffer
         _bpmfReadingBuffer = new BopomofoReadingBuffer(BopomofoKeyboardLayout::StandardLayout());
-
+        
         // create the lattice builder
         _languageModel = [LanguageModelManager languageModelBopomofo];
         _userOverrideModel = [LanguageModelManager userOverrideModel];
-
+        
         _builder = new BlockReadingBuilder(_languageModel);
-
+        
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
-
+        
         // create the composing buffer
         _composingBuffer = [[NSMutableString alloc] init];
-
+        
         _inputMode = kBopomofoModeIdentifier;
         _chineseConversionEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kChineseConversionEnabledKey];
         _halfWidthPunctuationEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kHalfWidthPunctuationEnabledKey];
     }
-
+    
     return self;
 }
 
@@ -215,18 +215,18 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     NSMenu *menu = [[NSMenu alloc] initWithTitle:LocalizationNotNeeded(@"Input Method Menu")];
     NSMenuItem *preferenceMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"vChewing Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""];
     [menu addItem:preferenceMenuItem];
-
+    
     NSMenuItem *chineseConversionMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Chinese Conversion", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"K"];
     chineseConversionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
     chineseConversionMenuItem.state = _chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     [menu addItem:chineseConversionMenuItem];
     
     NSMenuItem *halfWidthPunctuationMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Use Half-Width Punctuations", @"") action:@selector(toggleHalfWidthPunctuation:) keyEquivalent:@""];
-        halfWidthPunctuationMenuItem.state = _halfWidthPunctuationEnabled ? NSControlStateValueOn : NSControlStateValueOff;
-        [menu addItem:halfWidthPunctuationMenuItem];
-
+    halfWidthPunctuationMenuItem.state = _halfWidthPunctuationEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    [menu addItem:halfWidthPunctuationMenuItem];
+    
     [menu addItem:[NSMenuItem separatorItem]]; // ------------------------------
-
+    
     if (_inputMode == kSimpBopomofoModeIdentifier) {
         NSMenuItem *editExcludedPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrasesSimpBopomofo:) keyEquivalent:@""];
         [menu addItem:editExcludedPhrasesItem];
@@ -234,19 +234,19 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     else {
         NSMenuItem *editUserPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
         [menu addItem:editUserPhrasesItem];
-
+        
         NSMenuItem *editExcludedPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrasesvChewing:) keyEquivalent:@""];
         [menu addItem:editExcludedPhrasesItem];
     }
-
+    
     NSMenuItem *reloadUserPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
     [menu addItem:reloadUserPhrasesItem];
-
+    
     [menu addItem:[NSMenuItem separatorItem]]; // ------------------------------
-
+    
     NSMenuItem *updateCheckItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""];
     [menu addItem:updateCheckItem];
-
+    
     NSMenuItem *aboutMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About vChewing…", @"") action:@selector(showAbout:) keyEquivalent:@""];
     [menu addItem:aboutMenuItem];
     return menu;
@@ -257,21 +257,21 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 - (void)activateServer:(id)client
 {
     [[NSUserDefaults standardUserDefaults] synchronize];
-
+    
     // Override the keyboard layout. Use US if not set.
     NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
     if (!basisKeyboardLayoutID) {
         basisKeyboardLayoutID = @"com.apple.keylayout.US";
     }
     [client overrideKeyboardWithKeyboardNamed:basisKeyboardLayoutID];
-
+    
     // reset the state
     _currentDeferredClient = nil;
     _currentCandidateClient = nil;
     _builder->clear();
     _walkedNodes.clear();
     [_composingBuffer setString:@""];
-
+    
     // checks and populates the default settings
     NSInteger keyboardLayout = [[NSUserDefaults standardUserDefaults] integerForKey:kKeyboardLayoutPreferenceKey];
     switch (keyboardLayout) {
@@ -297,7 +297,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::StandardLayout());
             [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:kKeyboardLayoutPreferenceKey];
     }
-
+    
     // set the size
     NSInteger textSize = [[NSUserDefaults standardUserDefaults] integerForKey:kCandidateListTextSizeKey];
     NSInteger previousTextSize = textSize;
@@ -310,14 +310,14 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     else if (textSize > kMaxCandidateListTextSize) {
         textSize = kMaxCandidateListTextSize;
     }
-
+    
     if (textSize != previousTextSize) {
         [[NSUserDefaults standardUserDefaults] setInteger:textSize forKey:kCandidateListTextSizeKey];
     }
     if (![[NSUserDefaults standardUserDefaults] objectForKey:kChooseCandidateUsingSpaceKey]) {
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kChooseCandidateUsingSpaceKey];
     }
-
+    
     [(AppDelegate *)[NSApp delegate] checkForUpdate];
 }
 
@@ -328,23 +328,25 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
         _bpmfReadingBuffer->clear();
         [client setMarkedText:@"" selectionRange:NSMakeRange(0, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
     }
-
+    
     // commit any residue in the composing buffer
     [self commitComposition:client];
-
+    
     _currentDeferredClient = nil;
     _currentCandidateClient = nil;
-
+    
     gCurrentCandidateController.delegate = nil;
     gCurrentCandidateController.visible = NO;
     [_candidates removeAllObjects];
+    
+    [self _hideTooltip];
 }
 
 - (void)setValue:(id)value forTag:(long)tag client:(id)sender
 {
     NSString *newInputMode;
     vChewingLM *newLanguageModel;
-
+    
     if ([value isKindOfClass:[NSString class]] && [value isEqual:kSimpBopomofoModeIdentifier]) {
         newInputMode = kSimpBopomofoModeIdentifier;
         newLanguageModel = [LanguageModelManager languageModelSimpBopomofo];
@@ -353,30 +355,30 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
         newInputMode = kBopomofoModeIdentifier;
         newLanguageModel = [LanguageModelManager languageModelBopomofo];
     }
-
+    
     // Only apply the changes if the value is changed
     if (![_inputMode isEqualToString:newInputMode]) {
         [[NSUserDefaults standardUserDefaults] synchronize];
-
+        
         // Remember to override the keyboard layout again -- treat this as an activate eventy
         NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
         if (!basisKeyboardLayoutID) {
             basisKeyboardLayoutID = @"com.apple.keylayout.US";
         }
         [sender overrideKeyboardWithKeyboardNamed:basisKeyboardLayoutID];
-
+        
         _inputMode = newInputMode;
         _languageModel = newLanguageModel;
-
+        
         if (!_bpmfReadingBuffer->isEmpty()) {
             _bpmfReadingBuffer->clear();
             [self updateClientComposingBuffer:sender];
         }
-
+        
         if ([_composingBuffer length] > 0) {
             [self commitComposition:sender];
         }
-
+        
         if (_builder) {
             delete _builder;
             _builder = new BlockReadingBuilder(_languageModel);
@@ -398,14 +400,14 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
         }
         return;
     }
-
+    
     // Chinese conversion.
     NSString *buffer = _composingBuffer;
     BOOL chineseConversionEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kChineseConversionEnabledKey];
     if (chineseConversionEnabled) {
         buffer = [OpenCCBridge convert:_composingBuffer];
     }
-
+    
     // commit the text, clear the state
     [client insertText:buffer replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
     _builder->clear();
@@ -413,6 +415,8 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     [_composingBuffer setString:@""];
     gCurrentCandidateController.visible = NO;
     [_candidates removeAllObjects];
+    
+    [self _hideTooltip];
 }
 
 NS_INLINE size_t min(size_t a, size_t b) { return a < b ? a : b; }
@@ -423,13 +427,13 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 {
     // "updating the composing buffer" means to request the client to "refresh" the text input buffer
     // with our "composing text"
-
+    
     [_composingBuffer setString:@""];
     NSInteger composedStringCursorIndex = 0;
-
+    
     size_t readingCursorIndex = 0;
     size_t builderCursorIndex = _builder->cursorIndex();
-
+    
     // we must do some Unicode codepoint counting to find the actual cursor location for the client
     // i.e. we need to take UTF-16 into consideration, for which a surrogate pair takes 2 UniChars
     // locations
@@ -438,10 +442,10 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             string nodeStr = (*wi).node->currentKeyValue().value;
             vector<string> codepoints = OVUTF8Helper::SplitStringByCodePoint(nodeStr);
             size_t codepointCount = codepoints.size();
-
+            
             NSString *valueString = [NSString stringWithUTF8String:nodeStr.c_str()];
             [_composingBuffer appendString:valueString];
-
+            
             // this re-aligns the cursor index in the composed string
             // (the actual cursor on the screen) with the builder's logical
             // cursor (reading) cursor; each built node has a "spanning length"
@@ -461,7 +465,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             }
         }
     }
-
+    
     // now we gather all the info, we separate the composing buffer to two parts, head and tail,
     // and insert the reading text (the Mandarin syllable) in between them;
     // the reading text is what the user is typing
@@ -470,7 +474,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     NSString *tail = [_composingBuffer substringFromIndex:composedStringCursorIndex];
     NSString *composedText = [head stringByAppendingString:[reading stringByAppendingString:tail]];
     NSInteger cursorIndex = composedStringCursorIndex + [reading length];
-
+    
     if (_bpmfReadingBuffer->isEmpty() && _builder->markerCursorIndex() != SIZE_MAX) {
         // if there is a marked range, we need to tear the string into three parts.
         NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:composedText];
@@ -492,6 +496,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         // i.e. the client app needs to take care of where to put ths composing buffer
         [client setMarkedText:attrString selectionRange:NSMakeRange((NSInteger)_builder->markerCursorIndex(), 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
         _latestReadingCursor = (NSInteger)_builder->markerCursorIndex();
+        [self _showCurrentMarkedTextTooltipWithClient:client];
     }
     else {
         // we must use NSAttributedString so that the cursor is visible --
@@ -499,11 +504,12 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         NSDictionary *attrDict = @{NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
                                    NSMarkedClauseSegmentAttributeName: @0};
         NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:composedText attributes:attrDict];
-
+        
         // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
         // i.e. the client app needs to take care of where to put ths composing buffer
         [client setMarkedText:attrString selectionRange:NSMakeRange(cursorIndex, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
         _latestReadingCursor = cursorIndex;
+        [self _hideTooltip];
     }
 }
 
@@ -513,19 +519,19 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     // of the best possible Mandarain characters given the input syllables,
     // using the Viterbi algorithm implemented in the Gramambular library
     Walker walker(&_builder->grid());
-
+    
     // the reverse walk traces the trellis from the end
     _walkedNodes = walker.reverseWalk(_builder->grid().width());
-
+    
     // then we reverse the nodes so that we get the forward-walked nodes
     reverse(_walkedNodes.begin(), _walkedNodes.end());
-
+    
     // if DEBUG is defined, a GraphViz file is written to kGraphVizOutputfile
 #if DEBUG
     string dotDump = _builder->grid().dumpDOT();
     NSString *dotStr = [NSString stringWithUTF8String:dotDump.c_str()];
     NSError *error = nil;
-
+    
     BOOL __unused success = [dotStr writeToFile:kGraphVizOutputfile atomically:YES encoding:NSUTF8StringEncoding error:&error];
 #endif
 }
@@ -539,10 +545,10 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     // lose their influence over the whole MLE anyway -- so tht when
     // the user type along, the already composed text at front will
     // be popped out
-
+    
     NSInteger _composingBufferSize = [[NSUserDefaults standardUserDefaults] integerForKey:kComposingBufferSizePreferenceKey];
     NSInteger previousComposingBufferSize = _composingBufferSize;
-
+    
     if (_composingBufferSize == 0) {
         _composingBufferSize = kDefaultComposingBufferSize;
     }
@@ -552,11 +558,11 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     else if (_composingBufferSize > kMaxComposingBufferSize) {
         _composingBufferSize = kMaxComposingBufferSize;
     }
-
+    
     if (_composingBufferSize != previousComposingBufferSize) {
         [[NSUserDefaults standardUserDefaults] setInteger:_composingBufferSize forKey:kComposingBufferSizePreferenceKey];
     }
-
+    
     if (_builder->grid().width() > (size_t)_composingBufferSize) {
         if (_walkedNodes.size() > 0) {
             NodeAnchor &anchor = _walkedNodes[0];
@@ -570,7 +576,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             _builder->removeHeadReadings(anchor.spanningLength);
         }
     }
-
+    
     [self walk];
 }
 
@@ -609,46 +615,6 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     return layout;
 }
 
-- (NSString *)_currentMarkedText
-{
-    if (_builder->markerCursorIndex() < 0) {
-        return @"";
-    }
-    if (!_bpmfReadingBuffer->isEmpty()) {
-        return @"";
-    }
-
-    size_t begin = min(_builder->markerCursorIndex(), _builder->cursorIndex());
-    size_t end = max(_builder->markerCursorIndex(), _builder->cursorIndex());
-    // A phrase should contian at least two characters.
-    if (end - begin < 2) {
-        return @"";
-    }
-
-    NSRange range = NSMakeRange((NSInteger)begin, (NSInteger)(end - begin));
-    NSString *phrase = [_composingBuffer substringWithRange:range];
-    NSMutableString *string = [[NSMutableString alloc] init];
-    [string appendString:phrase];
-    [string appendString:@" "];
-    NSMutableArray *readingsArray = [[NSMutableArray alloc] init];
-    vector<std::string> v = _builder->readingsAtRange(begin, end);
-    for(vector<std::string>::iterator it_i=v.begin(); it_i!=v.end(); ++it_i) {
-        [readingsArray addObject:[NSString stringWithUTF8String:it_i->c_str()]];
-    }
-    [string appendString:[readingsArray componentsJoinedByString:@"-"]];
-    return string;
-}
-
-- (BOOL)_writeUserPhrase
-{
-    NSString *currentMarkedPhrase = [self _currentMarkedText];
-    if (![currentMarkedPhrase length]) {
-        return NO;
-    }
-
-    return [LanguageModelManager writeUserPhrase:currentMarkedPhrase];
-}
-
 - (vChewingEmacsKey)_detectEmacsKeyFromCharCode:(UniChar)charCode modifiers:(NSUInteger)flags
 {
     if (flags & NSControlKeyMask) {
@@ -679,10 +645,10 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 {
     NSRect textFrame = NSZeroRect;
     NSDictionary *attributes = nil;
-
+    
     bool composeReading = false;
     BOOL useVerticalMode = NO;
-
+    
     @try {
         attributes = [client attributesForCharacterIndex:0 lineHeightRectangle:&textFrame];
         useVerticalMode = [attributes objectForKey:@"IMKTextOrientation"] && [[attributes objectForKey:@"IMKTextOrientation"] integerValue] == 0;
@@ -690,35 +656,35 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     @catch (NSException *e) {
         // exception may raise while using Twitter.app's search filed.
     }
-
+    
     NSInteger cursorForwardKey = useVerticalMode ? kDownKeyCode : kRightKeyCode;
     NSInteger cursorBackwardKey = useVerticalMode ? kUpKeyCode : kLeftKeyCode;
     NSInteger extraChooseCandidateKey = useVerticalMode ? kLeftKeyCode : kDownKeyCode;
     NSInteger absorbedArrowKey = useVerticalMode ? kRightKeyCode : kUpKeyCode;
     NSInteger verticalModeOnlyChooseCandidateKey = useVerticalMode ? absorbedArrowKey : 0;
-
+    
     // get the unicode character code
     UniChar charCode = [inputText length] ? [inputText characterAtIndex:0] : 0;
     
     vChewingEmacsKey emacsKey = [self _detectEmacsKeyFromCharCode:charCode modifiers:flags];
-
+    
     if ([[client bundleIdentifier] isEqualToString:@"com.apple.Terminal"] && [NSStringFromClass([client class]) isEqualToString:@"IPMDServerClientWrapper"]) {
         // special handling for com.apple.Terminal
         _currentDeferredClient = client;
     }
-
+    
     // if the inputText is empty, it's a function key combination, we ignore it
     if (![inputText length]) {
         return NO;
     }
-
+    
     // if the composing buffer is empty and there's no reading, and there is some function key combination, we ignore it
     if (![_composingBuffer length] &&
         _bpmfReadingBuffer->isEmpty() &&
         ((flags & NSCommandKeyMask) || (flags & NSControlKeyMask) || (flags & NSAlternateKeyMask) || (flags & NSNumericPadKeyMask))) {
         return NO;
     }
-
+    
     // Caps Lock processing : if Caps Lock is on, temporarily disable bopomofo.
     if (charCode == 8 || charCode == 13 || keyCode == absorbedArrowKey || keyCode == extraChooseCandidateKey || keyCode == cursorForwardKey || keyCode == cursorBackwardKey) {
         // do nothing if backspace is pressed -- we ignore the key
@@ -728,40 +694,40 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         if ([_composingBuffer length]) {
             [self commitComposition:client];
         }
-
+        
         // first commit everything in the buffer.
         if (flags & NSShiftKeyMask) {
             return NO;
         }
-
+        
         // if ASCII but not printable, don't use insertText:replacementRange: as many apps don't handle non-ASCII char insertions.
         if (charCode < 0x80 && !isprint(charCode)) {
             return NO;
         }
-
+        
         // when shift is pressed, don't do further processing, since it outputs capital letter anyway.
         NSString *popedText = [inputText lowercaseString];
         [client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
         return YES;
     }
-
+    
     if (flags & NSNumericPadKeyMask) {
         if (keyCode != kLeftKeyCode && keyCode != kRightKeyCode && keyCode != kDownKeyCode && keyCode != kUpKeyCode && charCode != 32 && isprint(charCode)) {
             if ([_composingBuffer length]) {
                 [self commitComposition:client];
             }
-
+            
             NSString *popedText = [inputText lowercaseString];
             [client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
             return YES;
         }
     }
-
+    
     // if we have candidate, it means we need to pass the event to the candidate handler
     if ([_candidates count]) {
         return [self _handleCandidateEventWithInputText:inputText charCode:charCode keyCode:keyCode emacsKey:(vChewingEmacsKey)emacsKey];
     }
-
+    
     // If we have marker index.
     if (_builder->markerCursorIndex() != SIZE_MAX) {
         // ESC
@@ -783,7 +749,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         }
         // Shift + Left // Shift + Up in vertical tyinging mode
         if ((keyCode == cursorBackwardKey || emacsKey == vChewingEmacsKeyBackward)
-                    && (flags & NSShiftKeyMask)) {
+            && (flags & NSShiftKeyMask)) {
             if (_builder->markerCursorIndex() > 0) {
                 _builder->setMarkerCursorIndex(_builder->markerCursorIndex() - 1);
             }
@@ -795,7 +761,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         }
         // Shift + Right // Shift + Down in vertical tyinging mode
         if ((keyCode == cursorForwardKey || emacsKey == vChewingEmacsKeyForward)
-                     && (flags & NSShiftKeyMask)) {
+            && (flags & NSShiftKeyMask)) {
             if (_builder->markerCursorIndex() < _builder->length()) {
                 _builder->setMarkerCursorIndex(_builder->markerCursorIndex() + 1);
             }
@@ -805,14 +771,14 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             [self updateClientComposingBuffer:client];
             return YES;
         }
-
+        
         _builder->setMarkerCursorIndex(SIZE_MAX);
     }
-
+    
     // see if it's valid BPMF reading
     if (_bpmfReadingBuffer->isValidKey((char)charCode)) {
         _bpmfReadingBuffer->combineKey((char)charCode);
-
+        
         // if we have a tone marker, we have to insert the reading to the
         // builder in other words, if we don't have a tone marker, we just
         // update the composing buffer
@@ -822,50 +788,50 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             return YES;
         }
     }
-
+    
     // see if we have composition if Enter/Space is hit and buffer is not empty
     // this is bit-OR'ed so that the tone marker key is also taken into account
     composeReading |= (!_bpmfReadingBuffer->isEmpty() && (charCode == 32 || charCode == 13));
     if (composeReading) {
         // combine the reading
         string reading = _bpmfReadingBuffer->syllable().composedString();
-
+        
         // see if we have a unigram for this
         if (!_languageModel->hasUnigramsForKey(reading)) {
             [self beep];
             [self updateClientComposingBuffer:client];
             return YES;
         }
-
+        
         // and insert it into the lattice
         _builder->insertReadingAtCursor(reading);
-
+        
         // then walk the lattice
         [self popOverflowComposingTextAndWalk:client];
-
+        
         // get user override model suggestion
         string overrideValue = (_inputMode == kSimpBopomofoModeIdentifier) ? "" :
-            _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
-
+        _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
+        
         if (!overrideValue.empty()) {
             size_t cursorIndex = [self actualCandidateCursorIndex];
             vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
             double highestScore = FindHighestScore(nodes, kEpsilon);
             _builder->grid().overrideNodeScoreForSelectedCandidate(cursorIndex, overrideValue, highestScore);
         }
-
+        
         // then update the text
         _bpmfReadingBuffer->clear();
         [self updateClientComposingBuffer:client];
-
+        
         if (_inputMode == kSimpBopomofoModeIdentifier) {
             [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
         }
-
+        
         // and tells the client that the key is consumed
         return YES;
     }
-
+    
     // keyCode 125 = Down, charCode 32 = Space
     if (_bpmfReadingBuffer->isEmpty() && [_composingBuffer length] > 0 && (keyCode == extraChooseCandidateKey || charCode == 32 || (useVerticalMode && (keyCode == verticalModeOnlyChooseCandidateKey)))) {
         if (charCode == 32) {
@@ -882,17 +848,17 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
                     [self updateClientComposingBuffer:client];
                 }
                 return YES;
-
+                
             }
         }
         [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
         return YES;
     }
-
+    
     // Esc
     if (charCode == 27) {
         BOOL escToClearInputBufferEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kEscToCleanInputBufferKey];
-
+        
         if (escToClearInputBufferEnabled) {
             // if the optioon is enabled, we clear everythiong including the composing
             // buffer, walked nodes and the reading.
@@ -910,10 +876,10 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             // "cancels" the current composed character and revert it to
             // Bopomofo reading, in odds with the expectation of users from
             // other platforms
-
+            
             if (_bpmfReadingBuffer->isEmpty()) {
                 // no nee to beep since the event is deliberately triggered by user
-
+                
                 if (![_composingBuffer length]) {
                     return NO;
                 }
@@ -922,11 +888,11 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
                 _bpmfReadingBuffer->clear();
             }
         }
-
+        
         [self updateClientComposingBuffer:client];
         return YES;
     }
-
+    
     // handle cursor backward
     if (keyCode == cursorBackwardKey || emacsKey == vChewingEmacsKeyBackward) {
         if (!_bpmfReadingBuffer->isEmpty()) {
@@ -936,7 +902,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             if (![_composingBuffer length]) {
                 return NO;
             }
-
+            
             if (flags & NSShiftKeyMask) {
                 // Shift + left
                 if (_builder->cursorIndex() > 0) {
@@ -954,11 +920,11 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
                 }
             }
         }
-
+        
         [self updateClientComposingBuffer:client];
         return YES;
     }
-
+    
     // handle cursor forward
     if (keyCode == cursorForwardKey || emacsKey == vChewingEmacsKeyForward) {
         if (!_bpmfReadingBuffer->isEmpty()) {
@@ -968,7 +934,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             if (![_composingBuffer length]) {
                 return NO;
             }
-
+            
             if (flags & NSShiftKeyMask) {
                 // Shift + Right
                 if (_builder->cursorIndex() < _builder->length()) {
@@ -985,11 +951,11 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
                 }
             }
         }
-
+        
         [self updateClientComposingBuffer:client];
         return YES;
     }
-
+    
     if (keyCode == kHomeKeyCode || emacsKey == vChewingEmacsKeyHome) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
@@ -998,7 +964,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             if (![_composingBuffer length]) {
                 return NO;
             }
-
+            
             if (_builder->cursorIndex()) {
                 _builder->setCursorIndex(0);
             }
@@ -1006,11 +972,11 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
                 [self beep];
             }
         }
-
+        
         [self updateClientComposingBuffer:client];
         return YES;
     }
-
+    
     if (keyCode == kEndKeyCode || emacsKey == vChewingEmacsKeyEnd) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
@@ -1019,7 +985,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             if (![_composingBuffer length]) {
                 return NO;
             }
-
+            
             if (_builder->cursorIndex() != _builder->length()) {
                 _builder->setCursorIndex(_builder->length());
             }
@@ -1027,11 +993,11 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
                 [self beep];
             }
         }
-
+        
         [self updateClientComposingBuffer:client];
         return YES;
     }
-
+    
     if (keyCode == absorbedArrowKey || keyCode == extraChooseCandidateKey) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
@@ -1039,14 +1005,14 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [self updateClientComposingBuffer:client];
         return YES;
     }
-
+    
     // Backspace
     if (charCode == 8) {
         if (_bpmfReadingBuffer->isEmpty()) {
             if (![_composingBuffer length]) {
                 return NO;
             }
-
+            
             if (_builder->cursorIndex()) {
                 _builder->deleteReadingBeforeCursor();
                 [self walk];
@@ -1058,18 +1024,18 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         else {
             _bpmfReadingBuffer->backspace();
         }
-
+        
         [self updateClientComposingBuffer:client];
         return YES;
     }
-
+    
     // Delete
     if (keyCode == kDeleteKeyCode || emacsKey == vChewingEmacsKeyDelete) {
         if (_bpmfReadingBuffer->isEmpty()) {
             if (![_composingBuffer length]) {
                 return NO;
             }
-
+            
             if (_builder->cursorIndex() != _builder->length()) {
                 _builder->deleteReadingAfterCursor();
                 [self walk];
@@ -1081,22 +1047,21 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         else {
             [self beep];
         }
-
+        
         [self updateClientComposingBuffer:client];
         return YES;
     }
-
-
+    
     // Enter
     if (charCode == 13) {
         if (![_composingBuffer length]) {
             return NO;
         }
-
+        
         [self commitComposition:client];
         return YES;
     }
-
+    
     // punctuation list
     if ((char)charCode == '`') {
         if (_languageModel->hasUnigramsForKey(string("_punctuation_list"))) {
@@ -1112,7 +1077,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             return YES;
         }
     }
-
+    
     // if nothing is matched, see if it's a punctuation key for current layout.
     string layout = [self _currentLayout];
     string punctuationNamePrefix = (_halfWidthPunctuationEnabled ? string("_half_punctuation_"): string("_punctuation_"));
@@ -1120,13 +1085,13 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     if ([self _handlePunctuation:customPunctuation usingVerticalMode:useVerticalMode client:client]) {
         return YES;
     }
-
+    
     // if nothing is matched, see if it's a punctuation key.
     string punctuation = punctuationNamePrefix + string(1, (char)charCode);
     if ([self _handlePunctuation:punctuation usingVerticalMode:useVerticalMode client:client]) {
         return YES;
     }
-
+    
     // still nothing, then we update the composing buffer (some app has
     // strange behavior if we don't do this, "thinking" the key is not
     // actually consumed)
@@ -1135,7 +1100,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [self updateClientComposingBuffer:client];
         return YES;
     }
-
+    
     return NO;
 }
 
@@ -1150,7 +1115,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             [self beep];
         }
         [self updateClientComposingBuffer:client];
-
+        
         if (_inputMode == kSimpBopomofoModeIdentifier && _bpmfReadingBuffer->isEmpty()) {
             [self collectCandidates];
             if ([_candidates count] == 1) {
@@ -1171,11 +1136,11 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     (charCode == 27) ||
     ((_inputMode == kSimpBopomofoModeIdentifier) &&
      (charCode == 8 || keyCode == kDeleteKeyCode));
-
+    
     if (cancelCandidateKey) {
         gCurrentCandidateController.visible = NO;
         [_candidates removeAllObjects];
-
+        
         if (_inputMode == kSimpBopomofoModeIdentifier) {
             _builder->clear();
             _walkedNodes.clear();
@@ -1295,12 +1260,12 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     else if (keyCode == kHomeKeyCode || emacsKey == vChewingEmacsKeyHome) {
         if (gCurrentCandidateController.selectedCandidateIndex == 0) {
             [self beep];
-
+            
         }
         else {
             gCurrentCandidateController.selectedCandidateIndex = 0;
         }
-
+        
         [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
     }
@@ -1311,7 +1276,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         else {
             gCurrentCandidateController.selectedCandidateIndex = [_candidates count] - 1;
         }
-
+        
         [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
     }
@@ -1323,7 +1288,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
                 break;
             }
         }
-
+        
         [gCurrentCandidateController.keyLabels indexOfObject:inputText];
         if (index != NSNotFound) {
             NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:index];
@@ -1332,15 +1297,15 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
                 return YES;
             }
         }
-
+        
         if (_inputMode == kSimpBopomofoModeIdentifier) {
             string layout = [self _currentLayout];
             string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
             string punctuation = string("_punctuation_") + string(1, (char)charCode);
-
+            
             BOOL shouldAutoSelectCandidate = _bpmfReadingBuffer->isValidKey((char)charCode) || _languageModel->hasUnigramsForKey(customPunctuation) ||
             _languageModel->hasUnigramsForKey(punctuation);
-
+            
             if (shouldAutoSelectCandidate) {
                 NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:0];
                 if (candidateIndex != NSUIntegerMax) {
@@ -1349,7 +1314,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
                 }
             }
         }
-
+        
         [self beep];
         [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
@@ -1368,17 +1333,17 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         if (!functionKeyKeyboardLayoutID) {
             functionKeyKeyboardLayoutID = @"com.apple.keylayout.US";
         }
-
+        
         NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
         if (!basisKeyboardLayoutID) {
             basisKeyboardLayoutID = @"com.apple.keylayout.US";
         }
-
+        
         // If no override is needed, just return NO.
         if ([functionKeyKeyboardLayoutID isEqualToString:basisKeyboardLayoutID]) {
             return NO;
         }
-
+        
         // Function key pressed.
         BOOL includeShift = [[NSUserDefaults standardUserDefaults] boolForKey:kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey];
         if (([event modifierFlags] & ~NSShiftKeyMask) || (([event modifierFlags] & NSShiftKeyMask) && includeShift)) {
@@ -1386,12 +1351,12 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             [client overrideKeyboardWithKeyboardNamed:functionKeyKeyboardLayoutID];
             return NO;
         }
-
+        
         // Revert back to the basis layout when the function key is released
         [client overrideKeyboardWithKeyboardNamed:basisKeyboardLayoutID];
         return NO;
     }
-
+    
     NSString *inputText = [event characters];
     NSInteger keyCode = [event keyCode];
     NSUInteger flags = [event modifierFlags];
@@ -1403,24 +1368,30 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 + (VTHorizontalCandidateController *)horizontalCandidateController
 {
     static VTHorizontalCandidateController *instance = nil;
-    @synchronized(self) {
-        if (!instance) {
-            instance = [[VTHorizontalCandidateController alloc] init];
-        }
-    }
-
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        instance = [[VTHorizontalCandidateController alloc] init];
+    });
     return instance;
 }
 
 + (VTVerticalCandidateController *)verticalCandidateController
 {
     static VTVerticalCandidateController *instance = nil;
-    @synchronized(self) {
-        if (!instance) {
-            instance = [[VTVerticalCandidateController alloc] init];
-        }
-    }
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        instance = [[VTVerticalCandidateController alloc] init];
+    });
+    return instance;
+}
 
++ (TooltipController *)tooltipController
+{
+    static TooltipController *instance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        instance = [[TooltipController alloc] init];
+    });
     return instance;
 }
 
@@ -1428,13 +1399,13 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 {
     // returns the candidate
     [_candidates removeAllObjects];
-
+    
     size_t cursorIndex = [self actualCandidateCursorIndex];
     vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
-
+    
     // sort the nodes, so that longer nodes (representing longer phrases) are placed at the top of the candidate list
     stable_sort(nodes.begin(), nodes.end(), NodeAnchorDescendingSorter());
-
+    
     // then use the C++ trick to retrieve the candidates for each node at/crossing the cursor
     for (vector<NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
         const vector<KeyValuePair>& candidates = (*ni).node->candidates();
@@ -1447,9 +1418,9 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 - (size_t)actualCandidateCursorIndex
 {
     size_t cursorIndex = _builder->cursorIndex();
-
+    
     BOOL candidatePhraseLocatedAfterCursor = [[NSUserDefaults standardUserDefaults] boolForKey:kSelectPhraseAfterCursorAsCandidatePreferenceKey];
-
+    
     if (candidatePhraseLocatedAfterCursor) {
         // MS Phonetics IME style, phrase is *after* the cursor, i.e. cursor is always *before* the phrase
         if (cursorIndex < _builder->length()) {
@@ -1461,7 +1432,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             ++cursorIndex;
         }
     }
-
+    
     return cursorIndex;
 }
 
@@ -1469,7 +1440,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 {
     // set the candidate panel style
     BOOL useHorizontalCandidateList = [[NSUserDefaults standardUserDefaults] boolForKey:kUseHorizontalCandidateListPreferenceKey];
-
+    
     if (useVerticalMode) {
         gCurrentCandidateController = [vChewingInputMethodController verticalCandidateController];
     }
@@ -1479,53 +1450,53 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     else {
         gCurrentCandidateController = [vChewingInputMethodController verticalCandidateController];
     }
-
+    
     // set the attributes for the candidate panel (which uses NSAttributedString)
     NSInteger textSize = [[NSUserDefaults standardUserDefaults] integerForKey:kCandidateListTextSizeKey];
-
+    
     NSInteger keyLabelSize = textSize / 2;
     if (keyLabelSize < kMinKeyLabelSize) {
         keyLabelSize = kMinKeyLabelSize;
     }
-
+    
     NSString *ctFontName = [[NSUserDefaults standardUserDefaults] stringForKey:kCandidateTextFontName];
     NSString *klFontName = [[NSUserDefaults standardUserDefaults] stringForKey:kCandidateKeyLabelFontName];
     NSString *ckeys = [[NSUserDefaults standardUserDefaults] stringForKey:kCandidateKeys];
-
+    
     gCurrentCandidateController.keyLabelFont = klFontName ? [NSFont fontWithName:klFontName size:keyLabelSize] : [NSFont systemFontOfSize:keyLabelSize];
     gCurrentCandidateController.candidateFont = ctFontName ? [NSFont fontWithName:ctFontName size:textSize] : [NSFont systemFontOfSize:textSize];
-
+    
     NSMutableArray *keyLabels = [NSMutableArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", nil];
-
+    
     if ([ckeys length] > 1) {
         [keyLabels removeAllObjects];
         for (NSUInteger i = 0, c = [ckeys length]; i < c; i++) {
             [keyLabels addObject:[ckeys substringWithRange:NSMakeRange(i, 1)]];
         }
     }
-
+    
     gCurrentCandidateController.keyLabels = keyLabels;
     [self collectCandidates];
-
+    
     if (_inputMode == kSimpBopomofoModeIdentifier && [_candidates count] == 1) {
         [self commitComposition:client];
         return;
     }
-
+    
     gCurrentCandidateController.delegate = self;
     [gCurrentCandidateController reloadData];
-
+    
     // update the composing text, set the client
     [self updateClientComposingBuffer:client];
     _currentCandidateClient = client;
-
+    
     NSRect lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0);
-
+    
     NSInteger cursor = _latestReadingCursor;
     if (cursor == [_composingBuffer length] && cursor != 0) {
         cursor--;
     }
-
+    
     // some apps (e.g. Twitter for Mac's search bar) handle this call incorrectly, hence the try-catch
     @try {
         [client attributesForCharacterIndex:cursor lineHeightRectangle:&lineHeightRect];
@@ -1533,15 +1504,122 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     @catch (NSException *exception) {
         NSLog(@"%@", exception);
     }
-
+    
     if (useVerticalMode) {
         [gCurrentCandidateController setWindowTopLeftPoint:NSMakePoint(lineHeightRect.origin.x + lineHeightRect.size.width + 4.0, lineHeightRect.origin.y - 4.0) bottomOutOfScreenAdjustmentHeight:lineHeightRect.size.height + 4.0];
     }
     else {
         [gCurrentCandidateController setWindowTopLeftPoint:NSMakePoint(lineHeightRect.origin.x, lineHeightRect.origin.y - 4.0) bottomOutOfScreenAdjustmentHeight:lineHeightRect.size.height + 4.0];
     }
-
+    
     gCurrentCandidateController.visible = YES;
+}
+
+#pragma mark - User phrases
+
+- (NSString *)_currentMarkedText
+{
+    if (_builder->markerCursorIndex() < 0) {
+        return @"";
+    }
+    if (!_bpmfReadingBuffer->isEmpty()) {
+        return @"";
+    }
+    
+    size_t begin = min(_builder->markerCursorIndex(), _builder->cursorIndex());
+    size_t end = max(_builder->markerCursorIndex(), _builder->cursorIndex());
+    // A phrase should contian at least two characters.
+    if (end - begin < 1) {
+        return @"";
+    }
+    
+    NSRange range = NSMakeRange((NSInteger)begin, (NSInteger)(end - begin));
+    NSString *selectedText = [_composingBuffer substringWithRange:range];
+    return selectedText;
+}
+
+- (NSString *)_currentMarkedTextAndReadings
+{
+    if (_builder->markerCursorIndex() < 0) {
+        return @"";
+    }
+    if (!_bpmfReadingBuffer->isEmpty()) {
+        return @"";
+    }
+    
+    size_t begin = min(_builder->markerCursorIndex(), _builder->cursorIndex());
+    size_t end = max(_builder->markerCursorIndex(), _builder->cursorIndex());
+    // A phrase should contian at least two characters.
+    if (end - begin < 2) {
+        return @"";
+    }
+    
+    NSRange range = NSMakeRange((NSInteger)begin, (NSInteger)(end - begin));
+    NSString *selectedText = [_composingBuffer substringWithRange:range];
+    NSMutableString *string = [[NSMutableString alloc] init];
+    [string appendString:selectedText];
+    [string appendString:@" "];
+    NSMutableArray *readingsArray = [[NSMutableArray alloc] init];
+    vector<std::string> v = _builder->readingsAtRange(begin, end);
+    for(vector<std::string>::iterator it_i=v.begin(); it_i!=v.end(); ++it_i) {
+        [readingsArray addObject:[NSString stringWithUTF8String:it_i->c_str()]];
+    }
+    [string appendString:[readingsArray componentsJoinedByString:@"-"]];
+    return string;
+}
+
+- (BOOL)_writeUserPhrase
+{
+    NSString *currentMarkedPhrase = [self _currentMarkedTextAndReadings];
+    if (![currentMarkedPhrase length]) {
+        return NO;
+    }
+    
+    return [LanguageModelManager writeUserPhrase:currentMarkedPhrase];
+}
+
+- (void)_showCurrentMarkedTextTooltipWithClient:(id)client
+{
+    NSString *text = [self _currentMarkedText];
+    NSInteger length = text.length;
+    if (!length) {
+        [self _hideTooltip];
+    }
+    else if (length == 1) {
+        NSString *messsage = [NSString stringWithFormat:NSLocalizedString(@"You are now selecting \"%@\". You can add a phrase with two or more characters.", @""), text];
+        [self _showTooltip:messsage client:client];
+    }
+    else {
+        NSString *messsage = [NSString stringWithFormat:NSLocalizedString(@"You are now selecting \"%@\". Press enter to add a new phrase.", @""), text];
+        [self _showTooltip:messsage client:client];
+    }
+}
+
+- (void)_showTooltip:(NSString *)tooltip client:(id)client
+{
+    NSRect lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0);
+    
+    NSInteger cursor = _latestReadingCursor;
+    if (cursor == [_composingBuffer length] && cursor != 0) {
+        cursor--;
+    }
+    
+    // some apps (e.g. Twitter for Mac's search bar) handle this call incorrectly, hence the try-catch
+    @try {
+        [client attributesForCharacterIndex:cursor lineHeightRectangle:&lineHeightRect];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"%@", exception);
+    }
+    
+    [[vChewingInputMethodController tooltipController] showTooltip:tooltip atPoint:lineHeightRect.origin];
+}
+
+- (void)_hideTooltip
+{
+    if ([vChewingInputMethodController tooltipController].window.isVisible) {
+        [[vChewingInputMethodController tooltipController] hide];
+    }
 }
 
 #pragma mark - Misc menu items
@@ -1569,7 +1647,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [[NonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Unable to create the user phrase file.", @"") content:content confirmButtonTitle:NSLocalizedString(@"OK", @"") cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
         return NO;
     }
-
+    
     return YES;
 }
 
@@ -1644,21 +1722,21 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 - (void)candidateController:(VTCandidateController *)controller didSelectCandidateAtIndex:(NSUInteger)index
 {
     gCurrentCandidateController.visible = NO;
-
+    
     // candidate selected, override the node with selection
     string selectedValue = [[_candidates objectAtIndex:index] UTF8String];
-
+    
     size_t cursorIndex = [self actualCandidateCursorIndex];
     _builder->grid().fixNodeSelectedCandidate(cursorIndex, selectedValue);
     if (_inputMode != kSimpBopomofoModeIdentifier) {
         _userOverrideModel->observe(_walkedNodes, cursorIndex, selectedValue, [[NSDate date] timeIntervalSince1970]);
     }
-
+    
     [_candidates removeAllObjects];
-
+    
     [self walk];
     [self updateClientComposingBuffer:_currentCandidateClient];
-
+    
     if (_inputMode == kSimpBopomofoModeIdentifier) {
         [self commitComposition:_currentCandidateClient];
         return;
@@ -1666,3 +1744,4 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 }
 
 @end
+
