@@ -14,6 +14,7 @@
 		5B58E87F278413E7003EA2AD /* MITLicense.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B58E87D278413E7003EA2AD /* MITLicense.txt */; };
 		5B5F4F8E27928F9300922DC2 /* vChewingLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F4F8D27928F9300922DC2 /* vChewingLM.cpp */; };
 		5B5F4F93279294A300922DC2 /* LanguageModelManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F4F92279294A300922DC2 /* LanguageModelManager.mm */; };
+		5B5F4F972792A4EA00922DC2 /* UserPhrasesLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F4F962792A4EA00922DC2 /* UserPhrasesLM.cpp */; };
 		5BC3EE1B278FC48C00F5E44C /* VerticalCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC3EE18278FC48C00F5E44C /* VerticalCandidateController.swift */; };
 		5BC3EE1C278FC48C00F5E44C /* VTCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC3EE19278FC48C00F5E44C /* VTCandidateController.swift */; };
 		5BC3EE1D278FC48C00F5E44C /* HorizontalCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC3EE1A278FC48C00F5E44C /* HorizontalCandidateController.swift */; };
@@ -89,7 +90,8 @@
 		5B5F4F8D27928F9300922DC2 /* vChewingLM.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = vChewingLM.cpp; sourceTree = "<group>"; };
 		5B5F4F91279294A300922DC2 /* LanguageModelManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LanguageModelManager.h; sourceTree = "<group>"; };
 		5B5F4F92279294A300922DC2 /* LanguageModelManager.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LanguageModelManager.mm; sourceTree = "<group>"; };
-		5B5F4F9427929ADC00922DC2 /* Shit4Migration.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Shit4Migration.txt; sourceTree = "<group>"; };
+		5B5F4F952792A4EA00922DC2 /* UserPhrasesLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserPhrasesLM.h; sourceTree = "<group>"; };
+		5B5F4F962792A4EA00922DC2 /* UserPhrasesLM.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UserPhrasesLM.cpp; sourceTree = "<group>"; };
 		5B9781D32763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5B9781D52763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5B9781D72763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Source/zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
@@ -245,6 +247,8 @@
 				6A0421A715FEF3F50061ED63 /* FastLM.h */,
 				5B42B63E27876FDC00BB9B9F /* UserOverrideModel.cpp */,
 				5B42B63F27876FDC00BB9B9F /* UserOverrideModel.h */,
+				5B5F4F962792A4EA00922DC2 /* UserPhrasesLM.cpp */,
+				5B5F4F952792A4EA00922DC2 /* UserPhrasesLM.h */,
 			);
 			path = LanguageModel;
 			sourceTree = "<group>";
@@ -292,7 +296,6 @@
 				5BF4A6FC27844738007DC6E7 /* frmAboutWindow.m */,
 				6A0D4EC615FC0D6400ABF4B3 /* InputMethodController.h */,
 				6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */,
-				5B5F4F9427929ADC00922DC2 /* Shit4Migration.txt */,
 				5B5F4F91279294A300922DC2 /* LanguageModelManager.h */,
 				5B5F4F92279294A300922DC2 /* LanguageModelManager.mm */,
 				6A0D4EC815FC0D6400ABF4B3 /* main.m */,
@@ -642,6 +645,7 @@
 				6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */,
 				6A0D4ED315FC0D6400ABF4B3 /* main.m in Sources */,
 				5BF4A6FE27844738007DC6E7 /* frmAboutWindow.m in Sources */,
+				5B5F4F972792A4EA00922DC2 /* UserPhrasesLM.cpp in Sources */,
 				5B5F4F8E27928F9300922DC2 /* vChewingLM.cpp in Sources */,
 				5BDF2D062791DFF200838ADB /* AppDelegate.swift in Sources */,
 				5BC3EE1B278FC48C00F5E44C /* VerticalCandidateController.swift in Sources */,
