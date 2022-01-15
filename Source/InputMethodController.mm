@@ -107,6 +107,16 @@ enum {
     kDeleteKeyCode = 117
 };
 
+typedef NS_ENUM(NSUInteger, vChewingEmacsKey) {
+    vChewingEmacsKeyNone,
+    vChewingEmacsKeyForward,
+    vChewingEmacsKeyBackward,
+    vChewingEmacsKeyHome,
+    vChewingEmacsKeyEnd,
+    vChewingEmacsKeyDelete,
+    vChewingEmacsKeyNextPage,
+};
+
 VTCandidateController *gCurrentCandidateController = nil;
 
 // if DEBUG is defined, a DOT file (GraphViz format) will be written to the
@@ -570,7 +580,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     NSBeep();
 }
 
-- (string)currentLayout
+- (string)_currentLayout
 {
     string layout = string("Standard_");;
     NSInteger keyboardLayout = [[NSUserDefaults standardUserDefaults] integerForKey:kKeyboardLayoutPreferenceKey];
@@ -639,6 +649,32 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     return [LanguageModelManager writeUserPhrase:currentMarkedPhrase];
 }
 
+- (vChewingEmacsKey)_detectEmacsKeyFromCharCode:(UniChar)charCode modifiers:(NSUInteger)flags
+{
+    if (flags & NSControlKeyMask) {
+        char c = charCode + 'a' - 1;
+        if (c == 'a') {
+            return vChewingEmacsKeyHome;
+        }
+        else if (c == 'e') {
+            return vChewingEmacsKeyEnd;
+        }
+        else if (c == 'f') {
+            return vChewingEmacsKeyForward;
+        }
+        else if (c == 'b') {
+            return vChewingEmacsKeyBackward;
+        }
+        else if (c == 'd') {
+            return vChewingEmacsKeyDelete;
+        }
+        else if (c == 'v') {
+            return vChewingEmacsKeyNextPage;
+        }
+    }
+    return vChewingEmacsKeyNone;
+}
+
 - (BOOL)handleInputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
 {
     NSRect textFrame = NSZeroRect;
@@ -663,6 +699,8 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
     // get the unicode character code
     UniChar charCode = [inputText length] ? [inputText characterAtIndex:0] : 0;
+    
+    vChewingEmacsKey emacsKey = [self _detectEmacsKeyFromCharCode:charCode modifiers:flags];
 
     if ([[client bundleIdentifier] isEqualToString:@"com.apple.Terminal"] && [NSStringFromClass([client class]) isEqualToString:@"IPMDServerClientWrapper"]) {
         // special handling for com.apple.Terminal
@@ -675,7 +713,9 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 
     // if the composing buffer is empty and there's no reading, and there is some function key combination, we ignore it
-    if (![_composingBuffer length] && _bpmfReadingBuffer->isEmpty() && ((flags & NSCommandKeyMask) || (flags & NSControlKeyMask) || (flags & NSAlternateKeyMask) || (flags & NSNumericPadKeyMask))) {
+    if (![_composingBuffer length] &&
+        _bpmfReadingBuffer->isEmpty() &&
+        ((flags & NSCommandKeyMask) || (flags & NSControlKeyMask) || (flags & NSAlternateKeyMask) || (flags & NSNumericPadKeyMask))) {
         return NO;
     }
 
@@ -719,7 +759,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
     // if we have candidate, it means we need to pass the event to the candidate handler
     if ([_candidates count]) {
-        return [self handleCandidateEventWithInputText:inputText charCode:charCode keyCode:keyCode];
+        return [self _handleCandidateEventWithInputText:inputText charCode:charCode keyCode:keyCode emacsKey:(vChewingEmacsKey)emacsKey];
     }
 
     // If we have marker index.
@@ -741,8 +781,9 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             [self updateClientComposingBuffer:client];
             return YES;
         }
-        // Shift + left
-        if (keyCode == cursorBackwardKey && (flags & NSShiftKeyMask)) {
+        // Shift + Left // Shift + Up in vertical tyinging mode
+        if ((keyCode == cursorBackwardKey || emacsKey == vChewingEmacsKeyBackward)
+                    && (flags & NSShiftKeyMask)) {
             if (_builder->markerCursorIndex() > 0) {
                 _builder->setMarkerCursorIndex(_builder->markerCursorIndex() - 1);
             }
@@ -752,8 +793,9 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             [self updateClientComposingBuffer:client];
             return YES;
         }
-        // Shift + Right
-        if (keyCode == cursorForwardKey && (flags & NSShiftKeyMask)) {
+        // Shift + Right // Shift + Down in vertical tyinging mode
+        if ((keyCode == cursorForwardKey || emacsKey == vChewingEmacsKeyForward)
+                     && (flags & NSShiftKeyMask)) {
             if (_builder->markerCursorIndex() < _builder->length()) {
                 _builder->setMarkerCursorIndex(_builder->markerCursorIndex() + 1);
             }
@@ -886,7 +928,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 
     // handle cursor backward
-    if (keyCode == cursorBackwardKey) {
+    if (keyCode == cursorBackwardKey || emacsKey == vChewingEmacsKeyBackward) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
         }
@@ -918,7 +960,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 
     // handle cursor forward
-    if (keyCode == cursorForwardKey) {
+    if (keyCode == cursorForwardKey || emacsKey == vChewingEmacsKeyForward) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
         }
@@ -948,7 +990,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         return YES;
     }
 
-    if (keyCode == kHomeKeyCode) {
+    if (keyCode == kHomeKeyCode || emacsKey == vChewingEmacsKeyHome) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
         }
@@ -969,7 +1011,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         return YES;
     }
 
-    if (keyCode == kEndKeyCode) {
+    if (keyCode == kEndKeyCode || emacsKey == vChewingEmacsKeyEnd) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
         }
@@ -1022,7 +1064,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 
     // Delete
-    if (keyCode == kDeleteKeyCode) {
+    if (keyCode == kDeleteKeyCode || emacsKey == vChewingEmacsKeyDelete) {
         if (_bpmfReadingBuffer->isEmpty()) {
             if (![_composingBuffer length]) {
                 return NO;
@@ -1072,16 +1114,16 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 
     // if nothing is matched, see if it's a punctuation key for current layout.
-    string layout = [self currentLayout];
+    string layout = [self _currentLayout];
     string punctuationNamePrefix = (_halfWidthPunctuationEnabled ? string("_half_punctuation_"): string("_punctuation_"));
     string customPunctuation = punctuationNamePrefix + layout + string(1, (char)charCode);
-    if ([self handlePunctuation:customPunctuation usingVerticalMode:useVerticalMode client:client]) {
+    if ([self _handlePunctuation:customPunctuation usingVerticalMode:useVerticalMode client:client]) {
         return YES;
     }
 
     // if nothing is matched, see if it's a punctuation key.
     string punctuation = punctuationNamePrefix + string(1, (char)charCode);
-    if ([self handlePunctuation:punctuation usingVerticalMode:useVerticalMode client:client]) {
+    if ([self _handlePunctuation:punctuation usingVerticalMode:useVerticalMode client:client]) {
         return YES;
     }
 
@@ -1097,7 +1139,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     return NO;
 }
 
-- (BOOL)handlePunctuation:(string)customPunctuation usingVerticalMode:(BOOL)useVerticalMode client:(id)client
+- (BOOL)_handlePunctuation:(string)customPunctuation usingVerticalMode:(BOOL)useVerticalMode client:(id)client
 {
     if (_languageModel->hasUnigramsForKey(customPunctuation)) {
         if (_bpmfReadingBuffer->isEmpty()) {
@@ -1123,7 +1165,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     return NO;
 }
 
-- (BOOL)handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode
+- (BOOL)_handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode emacsKey:(vChewingEmacsKey)emacsKey
 {
     BOOL cancelCandidateKey =
     (charCode == 27) ||
@@ -1146,7 +1188,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:gCurrentCandidateController.selectedCandidateIndex];
         return YES;
     }
-    else if (charCode == 32 || keyCode == kPageDownKeyCode) {
+    else if (charCode == 32 || keyCode == kPageDownKeyCode || emacsKey == vChewingEmacsKeyNextPage) {
         BOOL updated = [gCurrentCandidateController showNextPage];
         if (!updated) {
             [self beep];
@@ -1180,6 +1222,14 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             return YES;
         }
     }
+    else if (emacsKey == vChewingEmacsKeyBackward) {
+        BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
+        if (!updated) {
+            [self beep];
+        }
+        [self updateClientComposingBuffer:_currentCandidateClient];
+        return YES;
+    }
     else if (keyCode == kRightKeyCode) {
         if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
             BOOL updated = [gCurrentCandidateController highlightNextCandidate];
@@ -1197,6 +1247,14 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
+    }
+    else if (emacsKey == vChewingEmacsKeyForward) {
+        BOOL updated = [gCurrentCandidateController highlightNextCandidate];
+        if (!updated) {
+            [self beep];
+        }
+        [self updateClientComposingBuffer:_currentCandidateClient];
+        return YES;
     }
     else if (keyCode == kUpKeyCode) {
         if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
@@ -1234,7 +1292,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             return YES;
         }
     }
-    else if (keyCode == kHomeKeyCode) {
+    else if (keyCode == kHomeKeyCode || emacsKey == vChewingEmacsKeyHome) {
         if (gCurrentCandidateController.selectedCandidateIndex == 0) {
             [self beep];
 
@@ -1246,7 +1304,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
     }
-    else if (keyCode == kEndKeyCode && [_candidates count] > 0) {
+    else if ((keyCode == kEndKeyCode || emacsKey == vChewingEmacsKeyEnd) && [_candidates count] > 0) {
         if (gCurrentCandidateController.selectedCandidateIndex == [_candidates count] - 1) {
             [self beep];
         }
@@ -1276,7 +1334,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         }
 
         if (_inputMode == kSimpBopomofoModeIdentifier) {
-            string layout = [self currentLayout];
+            string layout = [self _currentLayout];
             string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
             string punctuation = string("_punctuation_") + string(1, (char)charCode);
 
