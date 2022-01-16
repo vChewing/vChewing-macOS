@@ -44,7 +44,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface LanguageModelManager : NSObject
 
 + (void)loadDataModels;
-+ (void)loadUserPhrasesModel;
++ (void)loadUserPhrases;
++ (void)loadUserPhraseReplacement;
 + (BOOL)checkIfUserLanguageModelFilesExist;
 + (BOOL)writeUserPhrase:(NSString *)userPhrase;
 
@@ -52,6 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, readonly, nonatomic) NSString *userPhrasesDataPathBopomofo;
 @property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathBopomofo;
 @property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathSimpBopomofo;
+@property (class, readonly, nonatomic) NSString *phraseReplacementDataPathBopomofo;
 @property (class, readonly, nonatomic) vChewing::vChewingLM *languageModelBopomofo;
 @property (class, readonly, nonatomic) vChewing::vChewingLM *languageModelSimpBopomofo;
 @property (class, readonly, nonatomic) vChewing::UserOverrideModel *userOverrideModel;

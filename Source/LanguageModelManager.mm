@@ -49,7 +49,7 @@ using namespace OpenVanilla;
 static const int kUserOverrideModelCapacity = 500;
 static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
 
-vChewingLM glanguageModelBopomofo;
+vChewingLM gLanguageModelBopomofo;
 vChewingLM gLanguageModelSimpBopomofo;
 UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
@@ -64,14 +64,19 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
 
 + (void)loadDataModels
 {
-    LTLoadLanguageModelFile(@"data", glanguageModelBopomofo);
+    LTLoadLanguageModelFile(@"data", gLanguageModelBopomofo);
     LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelSimpBopomofo);
 }
 
-+ (void)loadUserPhrasesModel
++ (void)loadUserPhrases
 {
-    glanguageModelBopomofo.loadUserPhrases([[self userPhrasesDataPathBopomofo] UTF8String], [[self excludedPhrasesDataPathBopomofo] UTF8String]);
+    gLanguageModelBopomofo.loadUserPhrases([[self userPhrasesDataPathBopomofo] UTF8String], [[self excludedPhrasesDataPathBopomofo] UTF8String]);
     gLanguageModelSimpBopomofo.loadUserPhrases(NULL, [[self excludedPhrasesDataPathSimpBopomofo] UTF8String]);
+}
+
++ (void)loadUserPhraseReplacement
+{
+    gLanguageModelBopomofo.loadPhraseReplacementMap([[self phraseReplacementDataPathBopomofo] UTF8String]);
 }
 
 + (BOOL)checkIfUserDataFolderExists
@@ -125,6 +130,9 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     if (![self checkIfFileExist:[self excludedPhrasesDataPathSimpBopomofo]]) {
         return NO;
     }
+    if (![self checkIfFileExist:[self phraseReplacementDataPathBopomofo]]) {
+        return NO;
+    }
     return YES;
 }
 
@@ -171,7 +179,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     [writeFile writeData:data];
     [writeFile closeFile];
 
-    [self loadUserPhrasesModel];
+    [self loadUserPhrases];
     return YES;
 }
 
@@ -198,9 +206,14 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     return [[self dataFolderPath] stringByAppendingPathComponent:@"exclude-phrases-plain-bpmf.txt"];
 }
 
++ (NSString *)phraseReplacementDataPathBopomofo
+{
+    return [[self dataFolderPath] stringByAppendingPathComponent:@"phrases-replacement.txt"];
+}
+
  + (vChewingLM *)languageModelBopomofo
 {
-    return &glanguageModelBopomofo;
+    return &gLanguageModelBopomofo;
 }
 
 + (vChewingLM *)languageModelSimpBopomofo

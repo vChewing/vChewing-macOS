@@ -6,5 +6,6 @@
 #import <Foundation/Foundation.h> // @import Foundation;
 @interface LanguageModelManager : NSObject
 + (void)loadDataModels;
-+ (void)loadUserPhrasesModel;
++ (void)loadUserPhrases;
++ (void)loadUserPhraseReplacement;
 @end

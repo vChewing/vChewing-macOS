@@ -40,6 +40,7 @@ private let kChooseCandidateUsingSpaceKey = "ChooseCandidateUsingSpaceKey"
 private let kSelectPhraseAfterCursorAsCandidate = "SelectPhraseAfterCursorAsCandidate"
 private let kUseHorizontalCandidateList = "UseHorizontalCandidateList"
 private let kChineseConversionEnabledKey = "ChineseConversionEnabled"
+private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
 
 @objc public class OOBE : NSObject {
 
@@ -75,6 +76,11 @@ private let kChineseConversionEnabledKey = "ChineseConversionEnabled"
         // 預設停用繁體轉康熙模組
         if UserDefaults.standard.object(forKey: kChineseConversionEnabledKey) == nil {
             UserDefaults.standard.set(Preferences.chineseConversionEnabled, forKey: kChineseConversionEnabledKey)
+        }
+        
+        // 預設停用自訂語彙置換
+        if UserDefaults.standard.object(forKey: kPhraseReplacementEnabledKey) == nil {
+            UserDefaults.standard.set(Preferences.phraseReplacementEnabled, forKey: kPhraseReplacementEnabledKey)
         }
 
         // 預設沒事不要在那裡放屁
