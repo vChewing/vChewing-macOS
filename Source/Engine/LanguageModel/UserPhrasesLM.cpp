@@ -4,6 +4,7 @@
 // Copyright (c) 2011-2022 The OpenVanilla Project.
 //
 // Contributors:
+//     Lukhnos Liu (@lukhnos) @ OpenVanilla
 //     Weizhong Yang (@zonble) @ OpenVanilla
 //
 // Permission is hereby granted, free of charge, to any person
@@ -29,14 +30,16 @@
 //
 
 #include "UserPhrasesLM.h"
+
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <fstream>
 #include <unistd.h>
 
-using namespace Formosa::Gramambular;
-using namespace vChewing;
+#include "KeyValueBlobReader.h"
+
+namespace vChewing {
 
 UserPhrasesLM::UserPhrasesLM()
     : fd(-1)
@@ -72,113 +75,24 @@ bool UserPhrasesLM::open(const char *path)
 
     length = (size_t)sb.st_size;
 
-    data = mmap(NULL, length, PROT_WRITE, MAP_PRIVATE, fd, 0);
+    data = mmap(NULL, length, PROT_READ, MAP_SHARED, fd, 0);
     if (!data) {
         ::close(fd);
         return false;
     }
 
-    char *head = (char *)data;
-    char *end = (char *)data + length;
-    char c;
-    Row row;
-
-start:
-    // EOF -> end
-    if (head == end) {
-        goto end;
+    KeyValueBlobReader reader(static_cast<char*>(data), length);
+    KeyValueBlobReader::KeyValue keyValue;
+    KeyValueBlobReader::State state;
+    while ((state = reader.Next(&keyValue)) == KeyValueBlobReader::State::HAS_PAIR) {
+        // We invert the key and value, since in user phrases, "key" is the phrase value, and "value" is the BPMF reading.
+        keyRowMap[keyValue.value].emplace_back(keyValue.value, keyValue.key );
     }
 
-    c = *head;
-    // \s -> error
-    if (c == ' ') {
-        goto error;
+    if (state == KeyValueBlobReader::State::ERROR) {
+        close();
+        return false;
     }
-    // \n -> start
-    else if (c == '\n') {
-        head++;
-        goto start;
-    }
-
-    // \w -> record column star, state1
-    row.value = head;
-    head++;
-    // fall through to state 1
-
-state1:
-    // EOF -> error
-    if (head == end) {
-        goto error;
-    }
-
-    c = *head;
-    // \n -> error
-    if (c == '\n') {
-        goto error;
-    }
-    // \s -> state2 + zero out ending + record column start
-    else if (c == ' ') {
-        *head = 0;
-        head++;
-        row.key = head;
-        goto state2;
-    }
-
-    // \w -> state1
-    head++;
-    goto state1;
-
-state2:
-    if (head == end) {
-        *head = 0;
-        head++;
-        keyRowMap[row.key].push_back(row);
-        goto end;
-    }
-
-    c = *head;
-    // \s -> error
-    if (c == ' ' || c == '\n') {
-        *head = 0;
-        head++;
-        keyRowMap[row.key].push_back(row);
-        if (c == ' ') {
-            goto state3;
-        }
-        goto start;
-    }
-
-    // \w -> state 2
-    head++;
-    goto state2;
-
-state3:
-    if (head == end) {
-        *head = 0;
-        head++;
-        keyRowMap[row.key].push_back(row);
-        goto end;
-    }
-
-    c = *head;
-    if (c == '\n') {
-        goto start;
-    }
-
-    head++;
-    goto state3;
-
-error:
-    close();
-    return false;
-
-end:
-    static const char *space = " ";
-    Row emptyRow;
-    emptyRow.key = space;
-    emptyRow.value = space;
-    keyRowMap[space].push_back(emptyRow);
-
     return true;
 }
 
@@ -195,33 +109,29 @@ void UserPhrasesLM::close()
 
 void UserPhrasesLM::dump()
 {
-    size_t rows = 0;
-    for (map<const char *, vector<Row> >::const_iterator i = keyRowMap.begin(), e = keyRowMap.end(); i != e; ++i) {
-        const vector<Row>& r = (*i).second;
-        for (vector<Row>::const_iterator ri = r.begin(), re = r.end(); ri != re; ++ri) {
-            const Row& row = *ri;
-            cerr << row.key << " " << row.value << "\n";
-            rows++;
+    for (const auto& entry : keyRowMap) {
+        const std::vector<Row>& rows = entry.second;
+        for (const auto& row : rows) {
+            std::cerr << row.key << " " << row.value << "\n";
         }
     }
 }
 
-const vector<Bigram> UserPhrasesLM::bigramsForKeys(const string& preceedingKey, const string& key)
+const std::vector<Formosa::Gramambular::Bigram> UserPhrasesLM::bigramsForKeys(const std::string& preceedingKey, const std::string& key)
 {
-    return vector<Bigram>();
+    return std::vector<Formosa::Gramambular::Bigram>();
 }
 
-const vector<Unigram> UserPhrasesLM::unigramsForKey(const string& key)
+const std::vector<Formosa::Gramambular::Unigram> UserPhrasesLM::unigramsForKey(const std::string& key)
 {
-    vector<Unigram> v;
-    map<const char *, vector<Row> >::const_iterator i = keyRowMap.find(key.c_str());
-
-    if (i != keyRowMap.end()) {
-        for (vector<Row>::const_iterator ri = (*i).second.begin(), re = (*i).second.end(); ri != re; ++ri) {
-            Unigram g;
-            const Row& r = *ri;
-            g.keyValue.key = r.key;
-            g.keyValue.value = r.value;
+    std::vector<Formosa::Gramambular::Unigram> v;
+    auto iter = keyRowMap.find(key);
+    if (iter != keyRowMap.end()) {
+        const std::vector<Row>& rows = iter->second;
+        for (const auto& row : rows) {
+            Formosa::Gramambular::Unigram g;
+            g.keyValue.key = row.key;
+            g.keyValue.value = row.value;
             g.score = 0.0;
             v.push_back(g);
         }
@@ -230,7 +140,9 @@ const vector<Unigram> UserPhrasesLM::unigramsForKey(const string& key)
     return v;
 }
 
-bool UserPhrasesLM::hasUnigramsForKey(const string& key)
+bool UserPhrasesLM::hasUnigramsForKey(const std::string& key)
 {
-    return keyRowMap.find(key.c_str()) != keyRowMap.end();
+    return keyRowMap.find(key) != keyRowMap.end();
 }
+
+};  // namespace vChewing
