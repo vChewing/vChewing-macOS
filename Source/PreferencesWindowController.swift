@@ -155,17 +155,13 @@ extension RangeReplaceableCollection where Element: Hashable {
         let keys = (sender as AnyObject).stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).charDeDuplicate
         if keys.count != 9 || !keys.canBeConverted(to: .ascii) {
             selectionKeyComboBox.stringValue = Preferences.defaultKeys
-            Preferences.candidateKeys = nil
+            Preferences.candidateKeys = Preferences.defaultKeys // 修正記錄：這裡千萬不能是 nil，否則會鬼打牆。
             NSSound.beep()
             return
         }
 
         selectionKeyComboBox.stringValue = keys
-        if keys == Preferences.defaultKeys {
-            Preferences.candidateKeys = nil
-        } else {
-            Preferences.candidateKeys = keys
-        }
+        Preferences.candidateKeys = keys
     }
 
 }
