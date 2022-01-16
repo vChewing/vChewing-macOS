@@ -195,6 +195,10 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
 - (void)activateServer:(id)client
 {
+    // Write missing OOBE user plist entries.
+    [OOBE setMissingDefaults];
+    
+    // Read user plist.
     [[NSUserDefaults standardUserDefaults] synchronize];
 
     // Override the keyboard layout. Use US if not set.
@@ -1470,6 +1474,9 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
 - (void)showPreferences:(id)sender
 {
+    // Write missing OOBE user plist entries.
+    [OOBE setMissingDefaults];
+
     // show the preferences panel, and also make the IME app itself the focus
     if ([IMKInputController instancesRespondToSelector:@selector(showPreferences:)]) {
         [super showPreferences:sender];
