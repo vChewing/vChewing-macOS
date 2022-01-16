@@ -140,6 +140,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
         // create the lattice builder
         _languageModel = [LanguageModelManager languageModelBopomofo];
+        _languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
         _userOverrideModel = [LanguageModelManager userOverrideModel];
 
         _builder = new BlockReadingBuilder(_languageModel);
@@ -158,22 +159,28 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
 - (NSMenu *)menu
 {
+    // Define the case which ALT / Option key is pressed.
+    BOOL optionKeyPressed = [[NSEvent class] respondsToSelector:@selector(modifierFlags)] && ([NSEvent modifierFlags] & NSAlternateKeyMask);
+
     // a menu instance (autoreleased) is requested every time the user click on the input menu
     NSMenu *menu = [[NSMenu alloc] initWithTitle:LocalizationNotNeeded(@"Input Method Menu")];
 
     [menu addItemWithTitle:NSLocalizedString(@"vChewing Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""];
 
-    NSMenuItem *chineseConversionMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Chinese Conversion", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"K"];
+    NSMenuItem *chineseConversionMenuItem = [menu addItemWithTitle:NSLocalizedString(@"Chinese Conversion", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"K"];
     chineseConversionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
     chineseConversionMenuItem.state = Preferences.chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
-    [menu addItem:chineseConversionMenuItem];
 
-    NSMenuItem *halfWidthPunctuationMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Use Half-Width Punctuations", @"") action:@selector(toggleHalfWidthPunctuation:) keyEquivalent:@""];
+    NSMenuItem *halfWidthPunctuationMenuItem = [menu addItemWithTitle:NSLocalizedString(@"Use Half-Width Punctuations", @"") action:@selector(toggleHalfWidthPunctuation:) keyEquivalent:@""];
     halfWidthPunctuationMenuItem.state = Preferences.halfWidthPunctuationEnabled ? NSControlStateValueOn : NSControlStateValueOff;
-    [menu addItem:halfWidthPunctuationMenuItem];
+
+    if (optionKeyPressed) {
+        NSMenuItem *phaseReplacementMenuItem = [menu addItemWithTitle:NSLocalizedString(@"Use Phrase Replacement", @"") action:@selector(togglePhraseReplacementEnabled:) keyEquivalent:@""];
+        phaseReplacementMenuItem.state = Preferences.phraseReplacementEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    }
 
     [menu addItem:[NSMenuItem separatorItem]]; // ------------------------------
-    
+
     if (_inputMode == kSimpBopomofoModeIdentifier) {
         NSMenuItem *editExcludedPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrasesSimpBopomofo:) keyEquivalent:@""];
         [menu addItem:editExcludedPhrasesItem];
@@ -181,9 +188,12 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     else {
         [menu addItemWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
         [menu addItemWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrasesvChewing:) keyEquivalent:@""];
+        if (optionKeyPressed) {
+            [menu addItemWithTitle:NSLocalizedString(@"Edit Phrase Replacement Table", @"") action:@selector(openPhraseReplacementvChewing:) keyEquivalent:@""];
+        }
     }
     [menu addItemWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
-    
+
     [menu addItem:[NSMenuItem separatorItem]]; // ------------------------------
 
     [menu addItemWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""];
@@ -273,6 +283,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     else {
         newInputMode = kBopomofoModeIdentifier;
         newLanguageModel = [LanguageModelManager languageModelBopomofo];
+        newLanguageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
     }
 
     // Only apply the changes if the value is changed
@@ -1486,6 +1497,27 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 }
 
+- (void)toggleChineseConverter:(id)sender
+{
+    BOOL chineseConversionEnabled = [Preferences toggleChineseConversionEnabled];
+    [NotifierController notifyWithMessage:[NSString stringWithFormat:@"%@%@%@", NSLocalizedString(@"Chinese Conversion", @""), @"\n", chineseConversionEnabled ? NSLocalizedString(@"NotificationSwitchON", @"") : NSLocalizedString(@"NotificationSwitchOFF", @"")] stay:NO];
+}
+
+- (void)toggleHalfWidthPunctuation:(id)sender
+{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
+    [Preferences toogleHalfWidthPunctuationEnabled];
+#pragma GCC diagnostic pop
+}
+
+- (void)togglePhraseReplacementEnabled:(id)sender
+{
+    BOOL enabled = [Preferences tooglePhraseReplacementEnabled];
+    vChewingLM *lm = [LanguageModelManager languageModelBopomofo];
+    lm->setPhraseReplacementEnabled(enabled);
+}
+
 - (void)checkForUpdate:(id)sender
 {
     [(AppDelegate *)[[NSApplication sharedApplication] delegate] checkForUpdateForced:YES];
@@ -1526,9 +1558,15 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     [self _openUserFile:[LanguageModelManager excludedPhrasesDataPathBopomofo]];
 }
 
+- (void)openPhraseReplacementvChewing:(id)sender
+{
+    [self _openUserFile:[LanguageModelManager phraseReplacementDataPathBopomofo]];
+}
+
 - (void)reloadUserPhrases:(id)sender
 {
-    [LanguageModelManager loadUserPhrasesModel];
+    [LanguageModelManager loadUserPhrases];
+    [LanguageModelManager loadUserPhraseReplacement];
 }
 
 - (void)showAbout:(id)sender
@@ -1538,23 +1576,9 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 }
 
-- (void)toggleChineseConverter:(id)sender
-{
-    BOOL chineseConversionEnabled = [Preferences toggleChineseConversionEnabled];
-    [NotifierController notifyWithMessage:[NSString stringWithFormat:@"%@%@%@", NSLocalizedString(@"Chinese Conversion", @""), @"\n", chineseConversionEnabled ? NSLocalizedString(@"NotificationSwitchON", @"") : NSLocalizedString(@"NotificationSwitchOFF", @"")] stay:NO];
-}
-
-- (void)toggleHalfWidthPunctuation:(id)sender
-{
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-result"
-    [Preferences toogleHalfWidthPunctuationEnabled];
-#pragma GCC diagnostic pop
-}
-
 @end
 
-#pragma mark -
+#pragma mark - Voltaire
 
 @implementation vChewingInputMethodController (VTCandidateController)
 
