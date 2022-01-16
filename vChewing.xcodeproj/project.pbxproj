@@ -23,6 +23,9 @@
 		5BC3EE1C278FC48C00F5E44C /* VTCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC3EE19278FC48C00F5E44C /* VTCandidateController.swift */; };
 		5BC3EE1D278FC48C00F5E44C /* HorizontalCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC3EE1A278FC48C00F5E44C /* HorizontalCandidateController.swift */; };
 		5BC3FB83278492DE0022E99A /* data-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BC3FB82278492DE0022E99A /* data-chs.txt */; };
+		5BD0D19427940E9D0008F48E /* Fart.aif in Resources */ = {isa = PBXBuildFile; fileRef = 5BD0D19327940E9D0008F48E /* Fart.aif */; };
+		5BD0D19A27943D390008F48E /* clsSFX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0D19927943D390008F48E /* clsSFX.swift */; };
+		5BD0D19F279454F60008F48E /* Beep.aif in Resources */ = {isa = PBXBuildFile; fileRef = 5BD0D19E279454F60008F48E /* Beep.aif */; };
 		5BD0D1A4279463510008F48E /* clsOOBEDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0D1A3279463510008F48E /* clsOOBEDefaults.swift */; };
 		5BDF2CFE2791BE4400838ADB /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */; };
 		5BDF2CFF2791BECC00838ADB /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */; };
@@ -114,6 +117,9 @@
 		5BC3EE19278FC48C00F5E44C /* VTCandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VTCandidateController.swift; sourceTree = "<group>"; };
 		5BC3EE1A278FC48C00F5E44C /* HorizontalCandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontalCandidateController.swift; sourceTree = "<group>"; };
 		5BC3FB82278492DE0022E99A /* data-chs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "data-chs.txt"; sourceTree = "<group>"; };
+		5BD0D19327940E9D0008F48E /* Fart.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.aif; sourceTree = "<group>"; };
+		5BD0D19927943D390008F48E /* clsSFX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = clsSFX.swift; sourceTree = "<group>"; };
+		5BD0D19E279454F60008F48E /* Beep.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.aif; sourceTree = "<group>"; };
 		5BD0D1A3279463510008F48E /* clsOOBEDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = clsOOBEDefaults.swift; sourceTree = "<group>"; };
 		5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourceHelper.swift; sourceTree = "<group>"; };
 		5BDF2D002791C03B00838ADB /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
@@ -287,6 +293,14 @@
 			path = Keyboard;
 			sourceTree = "<group>";
 		};
+		5BD0D19827943D270008F48E /* SFX */ = {
+			isa = PBXGroup;
+			children = (
+				5BD0D19927943D390008F48E /* clsSFX.swift */,
+			);
+			path = SFX;
+			sourceTree = "<group>";
+		};
 		5BE798A12792E50F00337FF9 /* UI */ = {
 			isa = PBXGroup;
 			children = (
@@ -396,6 +410,7 @@
 		6A0D4F1215FC0EB100ABF4B3 /* Engine */ = {
 			isa = PBXGroup;
 			children = (
+				5BD0D19827943D270008F48E /* SFX */,
 				5BC2D2892793B8DB002C0BEC /* Keyboard */,
 				5BC2D2832793B434002C0BEC /* vChewing */,
 				5BA8DAFE27928120009C9FFF /* LanguageModel */,
@@ -475,6 +490,8 @@
 		6A0D4F4715FC0EB900ABF4B3 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				5BD0D19E279454F60008F48E /* Beep.aif */,
+				5BD0D19327940E9D0008F48E /* Fart.aif */,
 				5BF4A70227844DC5007DC6E7 /* frmAboutWindow.xib */,
 				6AFF97F0253B299E007F1C49 /* NonModalAlertWindowController.xib */,
 				6A0D4EEE15FC0DA600ABF4B3 /* Images */,
@@ -652,11 +669,13 @@
 				5B000FC3278495AD004F02AC /* SimpBopomofo.tiff in Resources */,
 				6A0D4F5815FC0EF900ABF4B3 /* Localizable.strings in Resources */,
 				6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */,
-				6A38BC1515FC117A00A8A51F /* data.txt in Resources */,
+				5BD0D19427940E9D0008F48E /* Fart.aif in Resources */,
+				6A38BC1515FC117A00A8A51F /* data-cht.txt in Resources */,
 				6AFF97F2253B299E007F1C49 /* NonModalAlertWindowController.xib in Resources */,
 				5B58E87F278413E7003EA2AD /* MITLicense.txt in Resources */,
 				6A187E2616004C5900466B2E /* MainMenu.xib in Resources */,
 				5BF4A70027844DC5007DC6E7 /* frmAboutWindow.xib in Resources */,
+				5BD0D19F279454F60008F48E /* Beep.aif in Resources */,
 				5BC3FB83278492DE0022E99A /* data-chs.txt in Resources */,
 				5B000FC4278495AD004F02AC /* SimpBopomofo@2x.tiff in Resources */,
 				5BC2D2872793B434002C0BEC /* CMakeLists.txt in Resources */,
@@ -706,6 +725,7 @@
 			files = (
 				5BDF2CFE2791BE4400838ADB /* InputSourceHelper.swift in Sources */,
 				5BC2D28B2793B8FB002C0BEC /* EmacsKeyHelper.swift in Sources */,
+				5BD0D19A27943D390008F48E /* clsSFX.swift in Sources */,
 				5BE798A72793280C00337FF9 /* NotifierController.swift in Sources */,
 				5B5F4F93279294A300922DC2 /* LanguageModelManager.mm in Sources */,
 				6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */,

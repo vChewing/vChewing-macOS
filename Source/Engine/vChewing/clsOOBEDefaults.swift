@@ -33,6 +33,7 @@
 
 import Cocoa
 
+private let kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
 private let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
 private let kCandidateListTextSize = "CandidateListTextSize"
 private let kChooseCandidateUsingSpaceKey = "ChooseCandidateUsingSpaceKey"
@@ -74,6 +75,11 @@ private let kChineseConversionEnabledKey = "ChineseConversionEnabled"
         // 預設停用繁體轉康熙模組
         if UserDefaults.standard.object(forKey: kChineseConversionEnabledKey) == nil {
             UserDefaults.standard.set(Preferences.chineseConversionEnabled, forKey: kChineseConversionEnabledKey)
+        }
+
+        // 預設沒事不要在那裡放屁
+        if UserDefaults.standard.object(forKey: kShouldNotFartInLieuOfBeep) == nil {
+            UserDefaults.standard.set(Preferences.shouldNotFartInLieuOfBeep, forKey: kShouldNotFartInLieuOfBeep)
         }
         
         UserDefaults.standard.synchronize()

@@ -101,6 +101,9 @@
 /* Class = "NSTextFieldCell"; title = "UI language setting:"; ObjectID = "9DS-Rc-TXq"; */
 "9DS-Rc-TXq.title" = "UI language setting:";
 
+/* Class = "NSButtonCell"; title = "Stop farting (when typed phonetic combination is invalid, etc.)"; ObjectID = "ArK-Vk-OoT"; */
+"ArK-Vk-OoT.title" = "Stop farting (when typed phonetic combination is invalid, etc.)";
+
 /* Class = "NSButtonCell"; title = "Auto-convert traditional Chinese glyphs to KangXi characters"; ObjectID = "BSK-bH-Gct"; */
 "BSK-bH-Gct.title" = "Auto-convert traditional Chinese glyphs to KangXi characters";
 
