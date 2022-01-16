@@ -233,6 +233,9 @@
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="cellTitle"/>
                                                         </buttonCell>
+                                                        <connections>
+                                                            <binding destination="32" name="value" keyPath="values.ChineseConversionEnabled" id="X0A-OC-T6e"/>
+                                                        </connections>
                                                     </button>
                                                 </subviews>
                                                 <constraints>
