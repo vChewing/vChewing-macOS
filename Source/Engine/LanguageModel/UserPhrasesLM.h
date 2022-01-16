@@ -4,6 +4,7 @@
 // Copyright (c) 2011-2022 The OpenVanilla Project.
 //
 // Contributors:
+//     Lukhnos Liu (@lukhnos) @ OpenVanilla
 //     Weizhong Yang (@zonble) @ OpenVanilla
 //
 // Permission is hereby granted, free of charge, to any person
@@ -28,10 +29,9 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
+
 #ifndef USERPHRASESLM_H
 #define USERPHRASESLM_H
-
-#include <stdio.h>
 
 #include <string>
 #include <map>
@@ -40,37 +40,28 @@
 
 namespace vChewing {
 
-using namespace Formosa::Gramambular;
-
-class UserPhrasesLM : public LanguageModel
+class UserPhrasesLM : public Formosa::Gramambular::LanguageModel
 {
 public:
     UserPhrasesLM();
     ~UserPhrasesLM();
-
+    
     bool open(const char *path);
     void close();
     void dump();
-
-    virtual const vector<Bigram> bigramsForKeys(const string& preceedingKey, const string& key);
-    virtual const vector<Unigram> unigramsForKey(const string& key);
-    virtual bool hasUnigramsForKey(const string& key);
-
+    
+    virtual const std::vector<Formosa::Gramambular::Bigram> bigramsForKeys(const std::string& preceedingKey, const std::string& key);
+    virtual const std::vector<Formosa::Gramambular::Unigram> unigramsForKey(const std::string& key);
+    virtual bool hasUnigramsForKey(const std::string& key);
+    
 protected:
-    struct CStringCmp
-    {
-        bool operator()(const char* s1, const char* s2) const
-        {
-            return strcmp(s1, s2) < 0;
-        }
-    };
-
     struct Row {
-        const char *key;
-        const char *value;
+        Row(std::string_view& k, std::string_view& v) : key(k), value(v) {}
+        std::string_view key;
+        std::string_view value;
     };
-
-    map<const char *, vector<Row>, CStringCmp> keyRowMap;
+    
+    std::map<std::string_view, std::vector<Row>> keyRowMap;
     int fd;
     void *data;
     size_t length;
