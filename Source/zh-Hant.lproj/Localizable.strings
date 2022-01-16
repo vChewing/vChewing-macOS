@@ -17,8 +17,8 @@
 "Visit Website" = "前往網站";
 "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@" = "目前使用的威注音官方版本是 %1$@ (%2$@)，網路上有更新版本 %3$@ (%4$@) 可供下載。是否要前往威注音網站下載新版來安裝？%5$@";
 "Chinese Conversion" = "優先使用康熙繁體字";
-"NotificationSwitchON" = " 已啟用";
-"NotificationSwitchOFF" = " 已停用";
+"NotificationSwitchON" = "✔ 已啟用";
+"NotificationSwitchOFF" = "✘ 已停用";
 "Edit User Phrases" = "編輯自訂語彙";
 "Reload User Phrases" = "重載自訂語彙";
 "Unable to create the user phrase file." = "無法創建自訂語彙檔案。";
