@@ -45,6 +45,7 @@ private let kChooseCandidateUsingSpaceKey = "ChooseCandidateUsingSpaceKey"
 private let kChineseConversionEnabledKey = "ChineseConversionEnabled"
 private let kHalfWidthPunctuationEnabledKey = "HalfWidthPunctuationEnable"
 private let kEscToCleanInputBufferKey = "EscToCleanInputBuffer"
+private let kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
 
 private let kCandidateTextFontName = "CandidateTextFontName"
 private let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
@@ -245,6 +246,15 @@ struct ComposingKeys {
 
     @UserDefault(key: kChooseCandidateUsingSpaceKey, defaultValue: true)
     @objc static var chooseCandidateUsingSpace: Bool
+    
+    @UserDefault(key: kShouldNotFartInLieuOfBeep, defaultValue: true)
+    @objc static var shouldNotFartInLieuOfBeep: Bool
+    
+    @objc static func toggleShouldNotFartInLieuOfBeep() -> Bool {
+        shouldNotFartInLieuOfBeep = !shouldNotFartInLieuOfBeep
+        UserDefaults.standard.set(shouldNotFartInLieuOfBeep, forKey: kShouldNotFartInLieuOfBeep)
+        return shouldNotFartInLieuOfBeep
+    }
 
     @UserDefault(key: kChineseConversionEnabledKey, defaultValue: false)
     @objc static var chineseConversionEnabled: Bool

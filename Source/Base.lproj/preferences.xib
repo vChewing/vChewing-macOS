@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -218,17 +217,17 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Yaj-QY-7xV">
-                                                        <rect key="frame" x="19" y="102.5" width="423" height="17"/>
+                                                        <rect key="frame" x="19" y="103.5" width="423" height="17"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="height" constant="16" id="doD-85-k80"/>
+                                                            <constraint firstAttribute="height" constant="16" id="Pfc-tS-s5a"/>
                                                         </constraints>
-                                                        <buttonCell key="cell" type="check" title="Enable partial CNS11643 Support (non-PUA UTF-8 characters only)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="W24-T4-cg0">
+                                                        <buttonCell key="cell" type="check" title="Enable CNS11643 Support (non-PUA UTF-8 characters only)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="W24-T4-cg0">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="cellTitle"/>
                                                         </buttonCell>
                                                     </button>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5IL-zZ-CL9">
-                                                        <rect key="frame" x="19" y="81.5" width="423" height="16"/>
+                                                        <rect key="frame" x="19" y="82.5" width="423" height="16"/>
                                                         <buttonCell key="cell" type="check" title="Auto-convert traditional Chinese glyphs to KangXi characters" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="BSK-bH-Gct">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="cellTitle"/>
@@ -237,14 +236,28 @@
                                                             <binding destination="32" name="value" keyPath="values.ChineseConversionEnabled" id="X0A-OC-T6e"/>
                                                         </connections>
                                                     </button>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mzw-F2-aAQ">
+                                                        <rect key="frame" x="19" y="61.5" width="423" height="16"/>
+                                                        <buttonCell key="cell" type="check" title="Stop farting (when typed phonetic combination is invalid, etc.)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="ArK-Vk-OoT">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="clickedWhetherIMEShouldNotFartToggleAction:" target="-1" id="ieE-Xb-JtL"/>
+                                                            <binding destination="32" name="value" keyPath="values.ShouldNotFartInLieuOfBeep" id="7Of-X3-D03"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                                 <constraints>
-                                                    <constraint firstAttribute="trailing" secondItem="Yaj-QY-7xV" secondAttribute="trailing" constant="20" symbolic="YES" id="1cK-ql-tUm"/>
-                                                    <constraint firstItem="5IL-zZ-CL9" firstAttribute="top" secondItem="Yaj-QY-7xV" secondAttribute="bottom" constant="6" symbolic="YES" id="GNJ-3b-BdS"/>
-                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="leading" secondItem="brd-6J-saN" secondAttribute="leading" constant="20" symbolic="YES" id="Osh-Ld-41D"/>
-                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="trailing" secondItem="5IL-zZ-CL9" secondAttribute="trailing" id="aV1-VZ-dv0"/>
-                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="top" secondItem="brd-6J-saN" secondAttribute="top" constant="15" id="p4L-Wx-dK0"/>
-                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="leading" secondItem="5IL-zZ-CL9" secondAttribute="leading" id="r7K-Wg-s9D"/>
+                                                    <constraint firstItem="5IL-zZ-CL9" firstAttribute="leading" secondItem="mzw-F2-aAQ" secondAttribute="leading" id="1Ly-qx-Gu3"/>
+                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="top" secondItem="brd-6J-saN" secondAttribute="top" constant="14.5" id="3t1-EX-nuL"/>
+                                                    <constraint firstItem="5IL-zZ-CL9" firstAttribute="top" secondItem="Yaj-QY-7xV" secondAttribute="bottom" constant="6" symbolic="YES" id="MeX-CD-9FN"/>
+                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="trailing" secondItem="5IL-zZ-CL9" secondAttribute="trailing" id="S0v-Op-wDh"/>
+                                                    <constraint firstAttribute="trailing" secondItem="Yaj-QY-7xV" secondAttribute="trailing" constant="20" symbolic="YES" id="UKC-jH-d9A"/>
+                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="leading" secondItem="brd-6J-saN" secondAttribute="leading" constant="20" symbolic="YES" id="YeI-ie-7B9"/>
+                                                    <constraint firstItem="mzw-F2-aAQ" firstAttribute="top" secondItem="5IL-zZ-CL9" secondAttribute="bottom" constant="6" symbolic="YES" id="hC7-fa-qhc"/>
+                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="leading" secondItem="5IL-zZ-CL9" secondAttribute="leading" id="tjY-PG-4Kz"/>
+                                                    <constraint firstItem="5IL-zZ-CL9" firstAttribute="trailing" secondItem="mzw-F2-aAQ" secondAttribute="trailing" id="xg7-MH-hSW"/>
                                                 </constraints>
                                             </view>
                                         </box>
