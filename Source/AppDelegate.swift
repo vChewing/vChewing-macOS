@@ -68,11 +68,12 @@ class AppDelegate: NSObject, NSApplicationDelegate,
         LanguageModelManager.loadDataModels()
         LanguageModelManager.loadUserPhrasesModel()
         
-        if UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) == nil {
-            UserDefaults.standard.set(false, forKey: kCheckUpdateAutomatically)
-            UserDefaults.standard.synchronize()
+        OOBE.setMissingDefaults()
+        
+        // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
+        if (UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) != nil) == true {
+            checkForUpdate()
         }
-        checkForUpdate()
     }
     
     @objc func showPreferences() {
