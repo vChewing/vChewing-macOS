@@ -214,7 +214,7 @@ struct ComposingKeys {
 }
 
 // MARK: -
-class Preferences: NSObject {
+@objc public class Preferences: NSObject {
     @UserDefault(key: kKeyboardLayoutPreferenceKey, defaultValue: 0)
     @objc static var keyboardLayout: Int
 
@@ -237,7 +237,7 @@ class Preferences: NSObject {
     @UserDefault(key: kSelectPhraseAfterCursorAsCandidatePreferenceKey, defaultValue: false)
     @objc static var selectPhraseAfterCursorAsCandidate: Bool
 
-    @UserDefault(key: kUseHorizontalCandidateListPreferenceKey, defaultValue: false)
+    @UserDefault(key: kUseHorizontalCandidateListPreferenceKey, defaultValue: true)
     @objc static var useHorizontalCandidateList: Bool
 
     @ComposingBufferSize(key: kComposingBufferSizePreferenceKey)
