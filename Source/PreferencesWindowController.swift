@@ -135,7 +135,7 @@ extension RangeReplaceableCollection where Element: Hashable {
         basisKeyboardLayoutButton.select(chosenItem ?? usKeyboardLayoutItem)
         selectionKeyComboBox.usesDataSource = false
         selectionKeyComboBox.removeAllItems()
-        selectionKeyComboBox.addItems(withObjectValues: [Preferences.defaultKeys, "ASDFGHJKL", "ASDFZXCVB"])
+        selectionKeyComboBox.addItems(withObjectValues: [Preferences.defaultKeys, "234567890", "QWERTYUIO", "QWERTASDF", "ASDFGHJKL", "ASDFZXCVB"])
 
         var candidateSelectionKeys = Preferences.candidateKeys ?? Preferences.defaultKeys
         if candidateSelectionKeys.isEmpty {
