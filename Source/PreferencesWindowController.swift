@@ -51,6 +51,7 @@ extension RangeReplaceableCollection where Element: Hashable {
     @IBOutlet weak var fontSizePopUpButton: NSPopUpButton!
     @IBOutlet weak var basisKeyboardLayoutButton: NSPopUpButton!
     @IBOutlet weak var selectionKeyComboBox: NSComboBox!
+    @IBOutlet weak var clickedWhetherIMEShouldNotFartToggle: NSButton!
 
     override func awakeFromNib() {
         let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
@@ -151,12 +152,16 @@ extension RangeReplaceableCollection where Element: Hashable {
         }
     }
 
+    @IBAction func clickedWhetherIMEShouldNotFartToggleAction(_ sender: Any) {
+        clsSFX.beep()
+    }
+    
     @IBAction func changeSelectionKeyAction(_ sender: Any) {
         let keys = (sender as AnyObject).stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).charDeDuplicate
         if keys.count != 9 || !keys.canBeConverted(to: .ascii) {
             selectionKeyComboBox.stringValue = Preferences.defaultKeys
             Preferences.candidateKeys = Preferences.defaultKeys // 修正記錄：這裡千萬不能是 nil，否則會鬼打牆。
-            NSSound.beep()
+            clsSFX.beep()
             return
         }
 

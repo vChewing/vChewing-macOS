@@ -489,8 +489,8 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
 - (void)beep
 {
-    // use the system's default sound (configurable in System Preferences) to give a warning
-    NSBeep();
+    // use the vChewing beep.
+    [clsSFX beep];
 }
 
 - (string)_currentLayout

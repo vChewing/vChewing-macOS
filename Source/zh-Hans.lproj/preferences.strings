@@ -101,6 +101,9 @@
 /* Class = "NSTextFieldCell"; title = "UI language setting:"; ObjectID = "9DS-Rc-TXq"; */
 "9DS-Rc-TXq.title" = "介面语言设定:";
 
+/* Class = "NSButtonCell"; title = "Stop farting (when typed phonetic combination is invalid, etc.)"; ObjectID = "ArK-Vk-OoT"; */
+"ArK-Vk-OoT.title" = "不要放屁 // 例：当输入的音韵有误时，等。";
+
 /* Class = "NSButtonCell"; title = "Auto-convert traditional Chinese glyphs to KangXi characters"; ObjectID = "BSK-bH-Gct"; */
 "BSK-bH-Gct.title" = "自动将繁体中文字转换为康熙字";
 
