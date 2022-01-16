@@ -203,7 +203,7 @@
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="16" id="o6K-VN-uxe"/>
                                             </constraints>
-                                            <buttonCell key="cell" type="check" title="Check for updates automatically" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="Z9t-P0-BLF">
+                                            <buttonCell key="cell" type="check" title="Check for updates automatically" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="Z9t-P0-BLF">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
                                             </buttonCell>

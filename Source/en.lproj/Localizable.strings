@@ -17,8 +17,8 @@
 "Visit Website" = "Visit Website";
 "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@" = "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@";
 "Chinese Conversion" = "Convert zh-TW Kanji to KangXi Variants";
-"NotificationSwitchON" = " ON";
-"NotificationSwitchOFF" = " OFF";
+"NotificationSwitchON" = "✔ ON";
+"NotificationSwitchOFF" = "✘ OFF";
 "Edit User Phrases" = "Edit User Phrases";
 "Reload User Phrases" = "Reload User Phrases";
 "Unable to create the user phrase file." = "Unable to create the user phrase file.";

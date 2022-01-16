@@ -17,6 +17,8 @@
 		5B5F4F972792A4EA00922DC2 /* UserPhrasesLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F4F962792A4EA00922DC2 /* UserPhrasesLM.cpp */; };
 		5BC2D2872793B434002C0BEC /* CMakeLists.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BC2D2852793B434002C0BEC /* CMakeLists.txt */; };
 		5BC2D2882793B434002C0BEC /* KeyValueBlobReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BC2D2862793B434002C0BEC /* KeyValueBlobReader.cpp */; };
+		5BC2D28B2793B8FB002C0BEC /* EmacsKeyHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC2D28A2793B8FB002C0BEC /* EmacsKeyHelper.swift */; };
+		5BC2D28D2793B98F002C0BEC /* PreferencesModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC2D28C2793B98F002C0BEC /* PreferencesModule.swift */; };
 		5BC3EE1B278FC48C00F5E44C /* VerticalCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC3EE18278FC48C00F5E44C /* VerticalCandidateController.swift */; };
 		5BC3EE1C278FC48C00F5E44C /* VTCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC3EE19278FC48C00F5E44C /* VTCandidateController.swift */; };
 		5BC3EE1D278FC48C00F5E44C /* HorizontalCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC3EE1A278FC48C00F5E44C /* HorizontalCandidateController.swift */; };
@@ -105,6 +107,8 @@
 		5BC2D2842793B434002C0BEC /* KeyValueBlobReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyValueBlobReader.h; sourceTree = "<group>"; };
 		5BC2D2852793B434002C0BEC /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		5BC2D2862793B434002C0BEC /* KeyValueBlobReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KeyValueBlobReader.cpp; sourceTree = "<group>"; };
+		5BC2D28A2793B8FB002C0BEC /* EmacsKeyHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmacsKeyHelper.swift; sourceTree = "<group>"; };
+		5BC2D28C2793B98F002C0BEC /* PreferencesModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesModule.swift; sourceTree = "<group>"; };
 		5BC3EE18278FC48C00F5E44C /* VerticalCandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalCandidateController.swift; sourceTree = "<group>"; };
 		5BC3EE19278FC48C00F5E44C /* VTCandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VTCandidateController.swift; sourceTree = "<group>"; };
 		5BC3EE1A278FC48C00F5E44C /* HorizontalCandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontalCandidateController.swift; sourceTree = "<group>"; };
@@ -272,6 +276,14 @@
 			path = vChewing;
 			sourceTree = "<group>";
 		};
+		5BC2D2892793B8DB002C0BEC /* Keyboard */ = {
+			isa = PBXGroup;
+			children = (
+				5BC2D28A2793B8FB002C0BEC /* EmacsKeyHelper.swift */,
+			);
+			path = Keyboard;
+			sourceTree = "<group>";
+		};
 		5BE798A12792E50F00337FF9 /* UI */ = {
 			isa = PBXGroup;
 			children = (
@@ -336,7 +348,6 @@
 				6A0D4F1215FC0EB100ABF4B3 /* Engine */,
 				6ACA41E715FC1D9000935EF6 /* Installer */,
 				6A0D4F4715FC0EB900ABF4B3 /* Resources */,
-				5BDF2D052791DA6700838ADB /* AppDelegate.swift */,
 				5BF4A6FB27844738007DC6E7 /* frmAboutWindow.h */,
 				5BF4A6FC27844738007DC6E7 /* frmAboutWindow.m */,
 				6A0D4EC615FC0D6400ABF4B3 /* InputMethodController.h */,
@@ -345,10 +356,12 @@
 				5B5F4F92279294A300922DC2 /* LanguageModelManager.mm */,
 				6A0D4EC815FC0D6400ABF4B3 /* main.m */,
 				6A0D4EF615FC0DA600ABF4B3 /* vChewing-Prefix.pch */,
-				5BDF2D022791C71200838ADB /* NonModalAlertWindowController.swift */,
-				5BDF2D002791C03B00838ADB /* PreferencesWindowController.swift */,
-				D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */,
+				5BDF2D052791DA6700838ADB /* AppDelegate.swift */,
 				5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */,
+				5BDF2D022791C71200838ADB /* NonModalAlertWindowController.swift */,
+				D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */,
+				5BC2D28C2793B98F002C0BEC /* PreferencesModule.swift */,
+				5BDF2D002791C03B00838ADB /* PreferencesWindowController.swift */,
 				D427A9BF25ED28CC005D43E0 /* vChewing-Bridging-Header.h */,
 				5BA923AC2791B7C20001323A /* vChewingInstaller-Bridging-Header.h */,
 			);
@@ -380,6 +393,7 @@
 		6A0D4F1215FC0EB100ABF4B3 /* Engine */ = {
 			isa = PBXGroup;
 			children = (
+				5BC2D2892793B8DB002C0BEC /* Keyboard */,
 				5BC2D2832793B434002C0BEC /* vChewing */,
 				5BA8DAFE27928120009C9FFF /* LanguageModel */,
 				6A0D4F1315FC0EB100ABF4B3 /* Gramambular */,
@@ -688,6 +702,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5BDF2CFE2791BE4400838ADB /* InputSourceHelper.swift in Sources */,
+				5BC2D28B2793B8FB002C0BEC /* EmacsKeyHelper.swift in Sources */,
 				5BE798A72793280C00337FF9 /* NotifierController.swift in Sources */,
 				5B5F4F93279294A300922DC2 /* LanguageModelManager.mm in Sources */,
 				6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */,
@@ -704,6 +719,7 @@
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
 				6A0421A815FEF3F50061ED63 /* FastLM.cpp in Sources */,
 				5BDF2D012791C03B00838ADB /* PreferencesWindowController.swift in Sources */,
+				5BC2D28D2793B98F002C0BEC /* PreferencesModule.swift in Sources */,
 				5BC3EE1C278FC48C00F5E44C /* VTCandidateController.swift in Sources */,
 				5BDF2D032791C71200838ADB /* NonModalAlertWindowController.swift in Sources */,
 				5BC3EE1D278FC48C00F5E44C /* HorizontalCandidateController.swift in Sources */,

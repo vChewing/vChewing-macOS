@@ -1,5 +1,5 @@
 //
-// OpenCCBridge.swift
+// EmacsKeyHelper.swift
 //
 // Copyright (c) 2011-2022 The OpenVanilla Project.
 //
@@ -31,26 +31,23 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import Foundation
-import OpenCC
+import Cocoa
 
-/// A bridge to let Objctive-C code to access SwiftyOpenCC.
-///
-/// Since SwiftyOpenCC only provide Swift classes, we create an NSObject subclass
-/// in Swift in order to bridge the Swift classes into our Objective-C++ project.
-public class OpenCCBridge: NSObject {
-    private static let shared = OpenCCBridge()
-    private var converter: ChineseConverter?
-    private override init() {
-        try? converter = ChineseConverter(options: .twStandardRev)
-        super.init()
-    }
+@objc enum vChewingEmacsKey: UInt16 {
+    case none = 0
+    case forward = 6 // F
+    case backward = 2 // B
+    case home = 1 // A
+    case end = 5 // E
+    case delete = 4 // D
+    case nextPage = 22 // V
+}
 
-    /// Converts to Simplified Chinese.
-    ///
-    /// - Parameter string: Text in Traditional Chinese.
-    /// - Returns: Text in Simplified Chinese.
-    @objc public static func convertToKangXi(_ string: String) -> String? {
-        shared.converter?.convert(string)
+class EmacsKeyHelper: NSObject {
+    @objc static func detect(charCode: UniChar, flags: NSEvent.ModifierFlags) -> vChewingEmacsKey {
+        if flags.contains(.control) {
+            return vChewingEmacsKey(rawValue: charCode) ?? .none
+        }
+        return .none;
     }
 }
