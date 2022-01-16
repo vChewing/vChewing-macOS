@@ -251,6 +251,7 @@ class Preferences: NSObject {
 
     @objc static func toggleChineseConversionEnabled() -> Bool {
         chineseConversionEnabled = !chineseConversionEnabled
+        UserDefaults.standard.set(chineseConversionEnabled, forKey: kChineseConversionEnabledKey)
         return chineseConversionEnabled
     }
 
