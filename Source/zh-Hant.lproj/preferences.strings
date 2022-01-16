@@ -134,8 +134,8 @@
 /* Class = "NSBox"; title = "Output Settings"; ObjectID = "Uyz-xL-TVN"; */
 "Uyz-xL-TVN.title" = "輸出設定";
 
-/* Class = "NSButtonCell"; title = "Enable partial CNS11643 Support (non-PUA UTF-8 characters only)"; ObjectID = "W24-T4-cg0"; */
-"W24-T4-cg0.title" = "啟用部分 CNS11643 全字庫支援 (僅限非 PUA 區域的 UTF-8 文字)";
+/* Class = "NSButtonCell"; title = "Enable CNS11643 Support"; ObjectID = "W24-T4-cg0"; */
+"W24-T4-cg0.title" = "啟用 CNS11643 全字庫支援";
 
 /* Class = "NSBox"; title = "Keyboard Layout"; ObjectID = "Wvt-HE-LOv"; */
 "Wvt-HE-LOv.title" = "鍵盤佈局";

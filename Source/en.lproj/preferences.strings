@@ -6,7 +6,7 @@
 "5.title" = "OtherViews";
 
 /* Class = "NSMenuItem"; title = "Standard"; ObjectID = "6"; */
-"6.title" = "Microsoft Standard / Daqian / Wang / 01";
+"6.title" = "Standard";
 
 /* Class = "NSMenuItem"; title = "ETen"; ObjectID = "7"; */
 "7.title" = "ETen";
@@ -134,8 +134,8 @@
 /* Class = "NSBox"; title = "Output Settings"; ObjectID = "Uyz-xL-TVN"; */
 "Uyz-xL-TVN.title" = "Output Settings";
 
-/* Class = "NSButtonCell"; title = "Enable CNS11643 Support (non-PUA UTF-8 / GB18030 characters only)"; ObjectID = "W24-T4-cg0"; */
-"W24-T4-cg0.title" = "Enable CNS11643 Support (non-PUA UTF-8 / GB18030 characters only)";
+/* Class = "NSButtonCell"; title = "Enable CNS11643 Support"; ObjectID = "W24-T4-cg0"; */
+"W24-T4-cg0.title" = "Enable CNS11643 Support";
 
 /* Class = "NSBox"; title = "Keyboard Layout"; ObjectID = "Wvt-HE-LOv"; */
 "Wvt-HE-LOv.title" = "Keyboard Layout";
