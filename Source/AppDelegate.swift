@@ -66,7 +66,8 @@ class AppDelegate: NSObject, NSApplicationDelegate,
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         LanguageModelManager.loadDataModels()
-        LanguageModelManager.loadUserPhrasesModel()
+        LanguageModelManager.loadUserPhrases()
+        LanguageModelManager.loadUserPhraseReplacement()
         
         OOBE.setMissingDefaults()
         

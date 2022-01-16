@@ -51,6 +51,7 @@ private let kCandidateTextFontName = "CandidateTextFontName"
 private let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
 private let kCandidateKeys = "CandidateKeys"
 private let kChineseConversionEngineKey = "ChineseConversionEngine"
+private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
 
 private let kDefaultCandidateListTextSize: CGFloat = 18
 private let kMinKeyLabelSize: CGFloat = 10
@@ -297,4 +298,12 @@ struct ComposingKeys {
         return ChineseConversionEngine(rawValue: chineseConversionEngine)?.name
     }
 
+    @UserDefault(key: kPhraseReplacementEnabledKey, defaultValue: false)
+    @objc static var phraseReplacementEnabled: Bool
+
+    @objc static func tooglePhraseReplacementEnabled() -> Bool {
+        phraseReplacementEnabled = !phraseReplacementEnabled
+        UserDefaults.standard.set(phraseReplacementEnabled, forKey: kPhraseReplacementEnabledKey)
+        return phraseReplacementEnabled;
+    }
 }

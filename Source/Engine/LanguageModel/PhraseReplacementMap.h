@@ -1,16 +1,10 @@
 //
-// vChewingLM.h
+//  PhraseReplacementMap.h
 //
-// Copyright (c) 2021-2022 The vChewing Project.
 // Copyright (c) 2011-2022 The OpenVanilla Project.
 //
 // Contributors:
 //     Weizhong Yang (@zonble) @ OpenVanilla
-//     Hiraku Wang (@hirakujira) @ vChewing
-//     Shiki Suen (@ShikiSuen) @ vChewing
-//
-// Based on the Syrup Project and the Formosana Library
-// by Lukhnos Liu (@lukhnos).
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -34,42 +28,32 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef VCHEWINGLM_H
-#define VCHEWINGLM_H
+#ifndef PHRASEREPLACEMENTMAP_H
+#define PHRASEREPLACEMENTMAP_H
 
-#include <stdio.h>
-#include "FastLM.h"
-#include "UserPhrasesLM.h"
-#include "PhraseReplacementMap.h"
+#include <string>
+#include <map>
+#include <iostream>
 
 namespace vChewing {
 
-using namespace Formosa::Gramambular;
-
-class vChewingLM : public LanguageModel {
+class PhraseReplacementMap
+{
 public:
-    vChewingLM();
-    ~vChewingLM();
-    
-    void loadLanguageModel(const char* languageModelDataPath);
-    void loadUserPhrases(const char* userPhrasesDataPath,
-                         const char* excludedPhrasesDataPath);
-    void loadPhraseReplacementMap(const char* phraseReplacementPath);
-    
-    const vector<Bigram> bigramsForKeys(const string& preceedingKey, const string& key);
-    const vector<Unigram> unigramsForKey(const string& key);
-    bool hasUnigramsForKey(const string& key);
-    
-    void setPhraseReplacementEnabled(bool enabled);
-    bool phraseReplacementEnabled();
-    
+    PhraseReplacementMap();
+    ~PhraseReplacementMap();
+
+    bool open(const char *path);
+    void close();
+    const std::string valueForKey(const std::string& key);
+
 protected:
-    FastLM m_languageModel;
-    UserPhrasesLM m_userPhrases;
-    UserPhrasesLM m_excludedPhrases;
-    PhraseReplacementMap m_phraseReplacement;
-    bool m_phraseReplacementEnabled;
+    std::map<std::string_view, std::string_view> keyValueMap;
+    int fd;
+    void *data;
+    size_t length;
 };
-};
+
+}
 
 #endif
