@@ -29,3 +29,9 @@
 "You are now selecting \"%@\". Press enter to add a new phrase." = "您目前選擇了「%@」。按下 Enter 就可以加入到自訂語彙中。";
 "Edit Phrase Replacement Table" = "編輯語彙置換表";
 "Use Phrase Replacement" = "使用語彙置換";
+"Candidates keys cannot be empty." = "您必須指定選字鍵。";
+"Candidate keys can only contain ASCII characters like alphanumerals." = "選字鍵只能是英數等 ASCII 字符。";
+"Candidate keys cannot contain space." = "選字鍵不得包含空格。";
+"There should not be duplicated keys." = "選字鍵不得重複。";
+"The length of your candidate keys can not be less than 4 characters." = "請至少指定四個選字鍵。";
+"The length of your candidate keys can not be larger than 15 characters." = "選字鍵最多只能指定十五個。";

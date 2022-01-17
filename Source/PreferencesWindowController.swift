@@ -136,11 +136,11 @@ extension RangeReplaceableCollection where Element: Hashable {
         basisKeyboardLayoutButton.select(chosenItem ?? usKeyboardLayoutItem)
         selectionKeyComboBox.usesDataSource = false
         selectionKeyComboBox.removeAllItems()
-        selectionKeyComboBox.addItems(withObjectValues: [Preferences.defaultKeys, "234567890", "QWERTYUIO", "QWERTASDF", "ASDFGHJKL", "ASDFZXCVB"])
+        selectionKeyComboBox.addItems(withObjectValues: Preferences.suggestedCandidateKeys)
 
-        var candidateSelectionKeys = Preferences.candidateKeys ?? Preferences.defaultKeys
+        var candidateSelectionKeys = Preferences.candidateKeys
         if candidateSelectionKeys.isEmpty {
-            candidateSelectionKeys = Preferences.defaultKeys
+            candidateSelectionKeys = Preferences.defaultCandidateKeys
         }
 
         selectionKeyComboBox.stringValue = candidateSelectionKeys
@@ -157,14 +157,26 @@ extension RangeReplaceableCollection where Element: Hashable {
     }
     
     @IBAction func changeSelectionKeyAction(_ sender: Any) {
-        let keys = (sender as AnyObject).stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).charDeDuplicate
-        if keys.count != 9 || !keys.canBeConverted(to: .ascii) {
-            selectionKeyComboBox.stringValue = Preferences.defaultKeys
-            Preferences.candidateKeys = Preferences.defaultKeys // 修正記錄：這裡千萬不能是 nil，否則會鬼打牆。
-            clsSFX.beep()
-            return
-        }
-
+        guard let keys = (sender as AnyObject).stringValue?.trimmingCharacters(in: .whitespacesAndNewlines).charDeDuplicate else {
+                    return
+                }
+                do {
+                    try Preferences.validate(candidateKeys: keys)
+                    Preferences.candidateKeys = keys
+                }
+                catch Preferences.CandidateKeyError.empty {
+                    selectionKeyComboBox.stringValue = Preferences.candidateKeys
+                }
+                catch {
+                    if let window = window {
+                        let alert = NSAlert(error: error)
+                        alert.beginSheetModal(for: window) { response in
+                            self.selectionKeyComboBox.stringValue = Preferences.candidateKeys
+                        }
+                        clsSFX.beep()
+                    }
+                }
+        
         selectionKeyComboBox.stringValue = keys
         Preferences.candidateKeys = keys
     }
