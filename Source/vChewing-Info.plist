@@ -26,7 +26,7 @@
 	<dict>
 		<key>tsInputModeListKey</key>
 		<dict>
-			<key>org.openvanilla.inputmethod.vChewing.Bopomofo</key>
+			<key>org.atelierInmu.inputmethod.vChewing.Bopomofo</key>
 			<dict>
 				<key>TISDoubleSpaceSubstitution</key>
 				<string>。</string>
@@ -54,7 +54,7 @@
 				<key>TISIntendedLanguage</key>
 				<string>zh-Hant</string>
 			</dict>
-			<key>org.openvanilla.inputmethod.vChewing.SimpBopomofo</key>
+			<key>org.atelierInmu.inputmethod.vChewing.SimpBopomofo</key>
 			<dict>
 				<key>TISDoubleSpaceSubstitution</key>
 				<string>。</string>
@@ -85,8 +85,8 @@
 		</dict>
 		<key>tsVisibleInputModeOrderedArrayKey</key>
 		<array>
-			<string>org.openvanilla.inputmethod.vChewing.Bopomofo</string>
-			<string>org.openvanilla.inputmethod.vChewing.SimpBopomofo</string>
+			<string>org.atelierInmu.inputmethod.vChewing.Bopomofo</string>
+			<string>org.atelierInmu.inputmethod.vChewing.SimpBopomofo</string>
 		</array>
 	</dict>
 	<key>InputMethodConnectionName</key>
@@ -118,15 +118,15 @@
 	<key>TICapsLockLanguageSwitchCapable</key>
 	<true/>
 	<key>TISInputSourceID</key>
-	<string>org.openvanilla.inputmethod.vChewing</string>
+	<string>org.atelierInmu.inputmethod.vChewing</string>
 	<key>TISIntendedLanguage</key>
 	<string>zh-Hans</string>
 	<key>TISParticipatesInTouchBar</key>
 	<false/>
 	<key>UpdateInfoEndpoint</key>
-	<string>https://vchewing.openvanilla.org/updates/Info.plist</string>
+	<string>https://about:blank/Info.plist</string>
 	<key>UpdateInfoSite</key>
-	<string>https://vchewing.openvanilla.org/</string>
+	<string>https://about:blank/</string>
 	<key>tsInputMethodCharacterRepertoireKey</key>
 	<array>
 		<string>Hans</string>

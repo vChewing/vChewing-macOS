@@ -1,10 +1,5 @@
 vChewing macOS: 3-Clause BSD License
 
-© 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project.
-McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.
-vChewing macOS Development Reinforced by Hiraku Wang.
- vChewing Phrase Database Maintained by Shiki Suen.
-
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
