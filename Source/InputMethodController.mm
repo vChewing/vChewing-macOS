@@ -1,40 +1,10 @@
-//
-// InputMethodController.m
-//
-// Copyright (c) 2021-2022 The vChewing Project.
-// Copyright (c) 2011-2022 The OpenVanilla Project.
-//
-// Contributors:
-//     Mengjuei Hsieh (@mjhsieh) @ OpenVanilla
-//     Weizhong Yang (@zonble) @ OpenVanilla
-//     Lukhnos Liu (@lukhnos) @ OpenVanilla
-//     Hiraku Wang (@hirakujira) @ vChewing
-//     Shiki Suen (@ShikiSuen) @ vChewing
-//
-// Based on the Syrup Project and the Formosana Library
-// by Lukhnos Liu (@lukhnos).
-//
-// Permission is hereby granted, free of charge, to any person
-// obtaining a copy of this software and associated documentation
-// files (the "Software"), to deal in the Software without
-// restriction, including without limitation the rights to use,
-// copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following
-// conditions:
-//
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-// OTHER DEALINGS IN THE SOFTWARE.
-//
+/* 
+ *  InputMethodController.mm
+ *  
+ *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
+ *  Derived from 2011-2022 OpenVanilla Project (MIT License).
+ *  Some rights reserved. See "LICENSE.TXT" for details.
+ */
 
 #import "InputMethodController.h"
 #import <fstream>
@@ -55,8 +25,8 @@ using namespace OpenVanilla;
 static const NSInteger kMinKeyLabelSize = 10;
 
 // input modes
-static NSString *const kBopomofoModeIdentifier = @"org.openvanilla.inputmethod.vChewing.Bopomofo";
-static NSString *const kSimpBopomofoModeIdentifier = @"org.openvanilla.inputmethod.vChewing.SimpBopomofo";
+static NSString *const kBopomofoModeIdentifier = @"org.atelierInmu.inputmethod.vChewing.Bopomofo";
+static NSString *const kSimpBopomofoModeIdentifier = @"org.atelierInmu.inputmethod.vChewing.SimpBopomofo";
 
 // key code enums
 enum {
