@@ -160,7 +160,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 - (NSMenu *)menu
 {
     // Define the case which ALT / Option key is pressed.
-    BOOL optionKeyPressed = [[NSEvent class] respondsToSelector:@selector(modifierFlags)] && ([NSEvent modifierFlags] & NSAlternateKeyMask);
+    BOOL optionKeyPressed = [[NSEvent class] respondsToSelector:@selector(modifierFlags)] && ([NSEvent modifierFlags] & NSEventModifierFlagOption);
 
     // a menu instance (autoreleased) is requested every time the user click on the input menu
     NSMenu *menu = [[NSMenu alloc] initWithTitle:LocalizationNotNeeded(@"Input Method Menu")];
@@ -550,10 +550,10 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
     // if the composing buffer is empty and there's no reading, and there is some function key combination, we ignore it
     if (![_composingBuffer length] &&
-        _bpmfReadingBuffer->isEmpty() &&
-        ((flags & NSCommandKeyMask) || (flags & NSControlKeyMask) || (flags & NSAlternateKeyMask) || (flags & NSNumericPadKeyMask))) {
-        return NO;
-    }
+            _bpmfReadingBuffer->isEmpty() &&
+            ((flags & NSEventModifierFlagCommand) || (flags & NSEventModifierFlagControl) || (flags & NSEventModifierFlagOption) || (flags & NSEventModifierFlagNumericPad))) {
+            return NO;
+        }
 
     // Caps Lock processing : if Caps Lock is on, temporarily disable bopomofo.
     if (charCode == 8 || charCode == 13 || keyCode == absorbedArrowKey || keyCode == extraChooseCandidateKey || keyCode == cursorForwardKey || keyCode == cursorBackwardKey) {
@@ -566,7 +566,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         }
 
         // first commit everything in the buffer.
-        if (flags & NSShiftKeyMask) {
+        if (flags & NSEventModifierFlagShift) {
             return NO;
         }
 
@@ -581,7 +581,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         return YES;
     }
 
-    if (flags & NSNumericPadKeyMask) {
+    if (flags & NSEventModifierFlagNumericPad) {
         if (keyCode != kLeftKeyCode && keyCode != kRightKeyCode && keyCode != kDownKeyCode && keyCode != kUpKeyCode && charCode != 32 && isprint(charCode)) {
             if ([_composingBuffer length]) {
                 [self commitComposition:client];
@@ -619,7 +619,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         }
         // Shift + left
         if ((keyCode == cursorBackwardKey || emacsKey == vChewingEmacsKeyBackward)
-            && (flags & NSShiftKeyMask)) {
+            && (flags & NSEventModifierFlagShift)) {
             if (_builder->markerCursorIndex() > 0) {
                 _builder->setMarkerCursorIndex(_builder->markerCursorIndex() - 1);
             }
@@ -631,7 +631,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         }
         // Shift + Right
         if ((keyCode == cursorForwardKey || emacsKey == vChewingEmacsKeyForward)
-             && (flags & NSShiftKeyMask)) {
+             && (flags & NSEventModifierFlagShift)) {
             if (_builder->markerCursorIndex() < _builder->length()) {
                 _builder->setMarkerCursorIndex(_builder->markerCursorIndex() + 1);
             }
@@ -706,7 +706,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     if (_bpmfReadingBuffer->isEmpty() && [_composingBuffer length] > 0 && (keyCode == extraChooseCandidateKey || charCode == 32 || (useVerticalMode && (keyCode == verticalModeOnlyChooseCandidateKey)))) {
         if (charCode == 32) {
             // if the spacebar is NOT set to be a selection key
-            if (!Preferences.chooseCandidateUsingSpace) {
+            if ((flags & NSEventModifierFlagShift) != 0 || !Preferences.chooseCandidateUsingSpace) {
                 if (_builder->cursorIndex() >= _builder->length()) {
                     [_composingBuffer appendString:@" "];
                     [self commitComposition:client];
@@ -773,7 +773,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
                 return NO;
             }
 
-            if (flags & NSShiftKeyMask) {
+            if (flags & NSEventModifierFlagShift) {
                 // Shift + left
                 if (_builder->cursorIndex() > 0) {
                     _builder->setMarkerCursorIndex(_builder->cursorIndex() - 1);
@@ -805,7 +805,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
                 return NO;
             }
 
-            if (flags & NSShiftKeyMask) {
+            if (flags & NSEventModifierFlagShift) {
                 // Shift + Right
                 if (_builder->cursorIndex() < _builder->length()) {
                     _builder->setMarkerCursorIndex(_builder->cursorIndex() + 1);
@@ -962,6 +962,15 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         return YES;
     }
 
+    if ((char)charCode >= 'A' && (char)charCode <= 'Z') {
+        if ([_composingBuffer length]) {
+            string letter = string("_letter_") + string(1, (char)charCode);
+            if ([self _handlePunctuation:letter usingVerticalMode:useVerticalMode client:client]) {
+                return YES;
+            }
+        }
+    }
+    
     // still nothing, then we update the composing buffer (some app has
     // strange behavior if we don't do this, "thinking" the key is not
     // actually consumed)
@@ -1209,7 +1218,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
         // Function key pressed.
         BOOL includeShift = Preferences.functionKeyKeyboardLayoutOverrideIncludeShiftKey;
-        if (([event modifierFlags] & ~NSShiftKeyMask) || (([event modifierFlags] & NSShiftKeyMask) && includeShift)) {
+        if (([event modifierFlags] & ~NSEventModifierFlagShift) || (([event modifierFlags] & NSEventModifierFlagShift) && includeShift)) {
             // Override the keyboard layout and let the OS do its thing
             [client overrideKeyboardWithKeyboardNamed:functionKeyKeyboardLayoutID];
             return NO;
