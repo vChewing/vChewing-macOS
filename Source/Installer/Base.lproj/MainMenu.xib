@@ -66,16 +66,16 @@
         </menu>
         <window title="vChewing Installer" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" animationBehavior="default" titlebarAppearsTransparent="YES" id="371">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
-            <rect key="contentRect" x="335" y="390" width="533" height="430"/>
+            <rect key="contentRect" x="335" y="390" width="533" height="457"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
-            <value key="minSize" type="size" width="533" height="430"/>
-            <value key="maxSize" type="size" width="533" height="430"/>
+            <value key="minSize" type="size" width="533" height="457"/>
+            <value key="maxSize" type="size" width="533" height="457"/>
             <view key="contentView" id="372">
-                <rect key="frame" x="0.0" y="0.0" width="533" height="430"/>
+                <rect key="frame" x="0.0" y="0.0" width="533" height="457"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="575">
-                        <rect key="frame" x="378" y="74" width="147" height="32"/>
+                        <rect key="frame" x="378" y="101" width="147" height="32"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="133" id="S4F-Qe-xuk"/>
                         </constraints>
@@ -88,7 +88,7 @@
                         </connections>
                     </button>
                     <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" findBarPosition="belowContent" translatesAutoresizingMaskIntoConstraints="NO" id="YCR-wo-M5a">
-                        <rect key="frame" x="91" y="139" width="427" height="160"/>
+                        <rect key="frame" x="91" y="166" width="427" height="160"/>
                         <clipView key="contentView" drawsBackground="NO" id="NrY-FL-PVu" userLabel="appEULAContentClip">
                             <rect key="frame" x="1" y="1" width="425" height="158"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -123,7 +123,7 @@
                         </scroller>
                     </scrollView>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ir5-sQ-sJc">
-                        <rect key="frame" x="89" y="415" width="123" height="15"/>
+                        <rect key="frame" x="89" y="442" width="123" height="15"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="vChewing for macOS" id="GNc-8S-1VG" userLabel="appNameLabel">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -131,7 +131,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bzR-Oa-BZa">
-                        <rect key="frame" x="89" y="399" width="281" height="15"/>
+                        <rect key="frame" x="89" y="426" width="281" height="15"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Derived from OpenVanilla McBopopmofo Project." id="QYf-Nf-hoi">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -139,7 +139,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="03l-rN-zf9">
-                        <rect key="frame" x="89" y="383" width="297" height="15"/>
+                        <rect key="frame" x="89" y="410" width="297" height="15"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="293" id="v2b-OK-WGD"/>
                         </constraints>
@@ -150,7 +150,7 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XLb-mv-73s">
-                        <rect key="frame" x="89" y="330" width="431" height="45"/>
+                        <rect key="frame" x="89" y="357" width="431" height="45"/>
                         <textFieldCell key="cell" selectable="YES" id="VW8-s5-Wpn">
                             <font key="font" metaFont="cellTitle"/>
                             <string key="title">McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.
@@ -160,37 +160,37 @@ vChewing macOS Development Reinforced by Hiraku Wang. vChewing Phrase Database
                         </textFieldCell>
                     </textField>
                     <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Yyh-Nw-Sba">
-                        <rect key="frame" x="15" y="110" width="503" height="5"/>
+                        <rect key="frame" x="15" y="137" width="503" height="5"/>
                     </box>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="k5O-zZ-gQY">
-                        <rect key="frame" x="89" y="307" width="431" height="15"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" title="MIT-NTL License:" id="AVS-ih-FXM">
+                        <rect key="frame" x="89" y="334" width="431" height="15"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="3-Clause BSD License:" id="AVS-ih-FXM">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="miu-08-dZk">
-                        <rect key="frame" x="13" y="29" width="360" height="75"/>
+                        <rect key="frame" x="13" y="26" width="360" height="105"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="356" id="pu3-zr-hJy"/>
                         </constraints>
                         <textFieldCell key="cell" selectable="YES" id="Q9M-ni-kUM">
                             <font key="font" metaFont="cellTitle"/>
-                            <string key="title">DISCLAIMER: The vChewing project is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, have been removed from vChewing official phrase database.</string>
+                            <string key="title">DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, have been removed from vChewing official phrase database.</string>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <imageView translatesAutoresizingMaskIntoConstraints="NO" id="Ked-gt-bjE">
-                        <rect key="frame" x="15" y="120" width="63" height="310"/>
+                        <rect key="frame" x="15" y="147" width="63" height="310"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="63" id="fgC-vo-Ho8"/>
                         </constraints>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="AboutBanner" id="akk-zO-Abm"/>
                     </imageView>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="z1m-8k-Z63">
-                        <rect key="frame" x="211" y="415" width="126" height="15"/>
+                        <rect key="frame" x="211" y="442" width="126" height="15"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="122" id="yKq-Fv-W1J"/>
                         </constraints>
@@ -201,7 +201,7 @@ vChewing macOS Development Reinforced by Hiraku Wang. vChewing Phrase Database
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nul-TQ-gOI">
-                        <rect key="frame" x="89" y="121" width="431" height="15"/>
+                        <rect key="frame" x="89" y="148" width="431" height="15"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="By installing the software, you must accept the terms above." id="mf8-6e-z7X">
                             <font key="font" metaFont="systemBold" size="12"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -209,7 +209,7 @@ vChewing macOS Development Reinforced by Hiraku Wang. vChewing Phrase Database
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="592">
-                        <rect key="frame" x="378" y="47" width="147" height="32"/>
+                        <rect key="frame" x="378" y="74" width="147" height="32"/>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="593">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>

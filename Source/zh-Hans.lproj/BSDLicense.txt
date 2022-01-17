@@ -1,10 +1,5 @@
 vChewing macOS: 3-Clause BSD License 伯克利软件三款型授权合约
 
-© 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project.
-小麦注音引擎研发：Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, 等。
-威注音 macOS 程式研发协力：Hiraku Wang。
-威注音词库维护：孙志贵 (Shiki Suen)。
-
 该授权条款，在使用者符合以下诸条件之情形下，授予使用者使用及再散播本软件套件装原始码及二进位可执行形式之权利，无论此包装是否经改作皆然：
 
 １）对于本软件原始码之再散播，必须保留上述之著作权宣告、此诸条件表列，以及下述之免责声明。
