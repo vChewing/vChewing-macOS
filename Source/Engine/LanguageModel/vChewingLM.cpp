@@ -154,6 +154,10 @@ const vector<Unigram> vChewingLM::unigramsForKey(const string& key)
 
 bool vChewingLM::hasUnigramsForKey(const string& key)
 {
+    if (key == " ") {
+        return true;
+    }
+
     if (!m_excludedPhrases.hasUnigramsForKey(key)) {
         return m_userPhrases.hasUnigramsForKey(key) ||
         m_languageModel.hasUnigramsForKey(key);
