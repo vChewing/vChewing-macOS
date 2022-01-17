@@ -53,7 +53,7 @@
 		6A225A232367A1D700F685C6 /* ArchiveUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A225A222367A1D700F685C6 /* ArchiveUtil.m */; };
 		6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
 		6A2E40F9253A6AA000D1AE1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
-		6A38BC1515FC117A00A8A51F /* data.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A38BBF615FC117A00A8A51F /* data.txt */; };
+		6A38BC1515FC117A00A8A51F /* data-cht.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A38BBF615FC117A00A8A51F /* data-cht.txt */; };
 		6A38BC2815FC158A00A8A51F /* InputMethodKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */; };
 		6ACA41CD15FC1D7500935EF6 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */; };
 		6ACA41F915FC1D9000935EF6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ACA41E915FC1D9000935EF6 /* AppDelegate.m */; };
@@ -223,7 +223,7 @@
 		6A38BBEF15FC117A00A8A51F /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		6A38BBF015FC117A00A8A51F /* typocorrection.bash */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = typocorrection.bash; sourceTree = "<group>"; };
 		6A38BBF115FC117A00A8A51F /* utf8length.pl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; path = utf8length.pl; sourceTree = "<group>"; };
-		6A38BBF615FC117A00A8A51F /* data.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = data.txt; sourceTree = "<group>"; };
+		6A38BBF615FC117A00A8A51F /* data-cht.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "data-cht.txt"; sourceTree = "<group>"; };
 		6A38BBFA15FC117A00A8A51F /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = InputMethodKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/InputMethodKit.framework; sourceTree = DEVELOPER_DIR; };
 		6ACA41CB15FC1D7500935EF6 /* vChewingInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -514,7 +514,7 @@
 			isa = PBXGroup;
 			children = (
 				6A38BBE115FC117A00A8A51F /* bin */,
-				6A38BBF615FC117A00A8A51F /* data.txt */,
+				6A38BBF615FC117A00A8A51F /* data-cht.txt */,
 				5BC3FB82278492DE0022E99A /* data-chs.txt */,
 				6A38BBFA15FC117A00A8A51F /* Makefile */,
 			);
@@ -567,7 +567,7 @@
 /* Begin PBXLegacyTarget section */
 		6A38BC2115FC12FD00A8A51F /* Data */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "$(ACTION) tsi-chs tsi-cht";
+			buildArgumentsString = "$(ACTION) macv";
 			buildConfigurationList = 6A38BC2215FC12FD00A8A51F /* Build configuration list for PBXLegacyTarget "Data" */;
 			buildPhases = (
 			);
