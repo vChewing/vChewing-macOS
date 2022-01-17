@@ -64,8 +64,8 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
 
 + (void)loadDataModels
 {
-    LTLoadLanguageModelFile(@"data", gLanguageModelBopomofo);
-    LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelSimpBopomofo);
+    LTLoadLanguageModelFile(@"data-cht", gLanguageModelBopomofo);
+    LTLoadLanguageModelFile(@"data-chs", gLanguageModelSimpBopomofo);
 }
 
 + (void)loadUserPhrases
@@ -193,7 +193,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
 
 + (NSString *)userPhrasesDataPathBopomofo
 {
-    return [[self dataFolderPath] stringByAppendingPathComponent:@"data.txt"];
+    return [[self dataFolderPath] stringByAppendingPathComponent:@"data-cht.txt"];
 }
 
 + (NSString *)excludedPhrasesDataPathBopomofo
