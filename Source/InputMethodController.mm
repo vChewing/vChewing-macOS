@@ -1493,13 +1493,13 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-result"
-    [Preferences toogleHalfWidthPunctuationEnabled];
+    [Preferences toggleHalfWidthPunctuationEnabled];
 #pragma GCC diagnostic pop
 }
 
 - (void)togglePhraseReplacementEnabled:(id)sender
 {
-    BOOL enabled = [Preferences tooglePhraseReplacementEnabled];
+    BOOL enabled = [Preferences togglePhraseReplacementEnabled];
     vChewingLM *lm = [LanguageModelManager languageModelCoreCHT];
     lm->setPhraseReplacementEnabled(enabled);
 }
