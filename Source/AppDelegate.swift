@@ -16,7 +16,7 @@ private let kUpdateInfoSiteKey = "UpdateInfoSite"
 private let kNextCheckInterval: TimeInterval = 86400.0
 private let kTimeoutInterval: TimeInterval = 60.0
 
-@objc (AppDelegate)
+@objc(AppDelegate)
 class AppDelegate: NSObject, NSApplicationDelegate,
                    NonModalAlertWindowControllerDelegate {
     
@@ -64,12 +64,12 @@ class AppDelegate: NSObject, NSApplicationDelegate,
         aboutWindowController?.window?.orderFrontRegardless() // 逼著關於視窗往最前方顯示
     }
     
-    @objc (checkForUpdate)
+    @objc(checkForUpdate)
     func checkForUpdate() {
         checkForUpdate(forced: false)
     }
     
-    @objc (checkForUpdateForced:)
+    @objc(checkForUpdateForced:)
     func checkForUpdate(forced: Bool) {
         
         if checkTask != nil {

@@ -220,7 +220,7 @@ struct ComposingBufferSize {
 
     @objc static func toogleHalfWidthPunctuationEnabled() -> Bool {
         halfWidthPunctuationEnabled = !halfWidthPunctuationEnabled
-        return halfWidthPunctuationEnabled;
+        return halfWidthPunctuationEnabled
     }
 
     @UserDefault(key: kEscToCleanInputBufferKey, defaultValue: false)
@@ -306,6 +306,6 @@ struct ComposingBufferSize {
     @objc static func tooglePhraseReplacementEnabled() -> Bool {
         phraseReplacementEnabled = !phraseReplacementEnabled
         UserDefaults.standard.set(phraseReplacementEnabled, forKey: kPhraseReplacementEnabledKey)
-        return phraseReplacementEnabled;
+        return phraseReplacementEnabled
     }
 }
