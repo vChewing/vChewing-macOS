@@ -163,6 +163,29 @@ struct ComposingBufferSize {
 
 // MARK: -
 @objc public class Preferences: NSObject {
+    static func reset() {
+        let defaults = UserDefaults.standard
+        defaults.removeObject(forKey: kKeyboardLayoutPreferenceKey)
+        defaults.removeObject(forKey: kBasisKeyboardLayoutPreferenceKey)
+        defaults.removeObject(forKey: kFunctionKeyKeyboardLayoutPreferenceKey)
+        defaults.removeObject(forKey: kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey)
+        defaults.removeObject(forKey: kCandidateListTextSizeKey)
+        defaults.removeObject(forKey: kSelectPhraseAfterCursorAsCandidatePreferenceKey)
+        defaults.removeObject(forKey: kUseHorizontalCandidateListPreferenceKey)
+        defaults.removeObject(forKey: kComposingBufferSizePreferenceKey)
+        defaults.removeObject(forKey: kChooseCandidateUsingSpaceKey)
+        defaults.removeObject(forKey: kChineseConversionEnabledKey)
+        defaults.removeObject(forKey: kHalfWidthPunctuationEnabledKey)
+        defaults.removeObject(forKey: kEscToCleanInputBufferKey)
+        defaults.removeObject(forKey: kCandidateTextFontName)
+        defaults.removeObject(forKey: kCandidateKeyLabelFontName)
+        defaults.removeObject(forKey: kCandidateKeys)
+        defaults.removeObject(forKey: kPhraseReplacementEnabledKey)
+        defaults.removeObject(forKey: kChineseConversionEngineKey)
+        defaults.removeObject(forKey: kUseWinNT351BPMF)
+        defaults.removeObject(forKey: kShouldNotFartInLieuOfBeep)
+    }
+
     @UserDefault(key: kKeyboardLayoutPreferenceKey, defaultValue: 0)
     @objc static var keyboardLayout: Int
 
