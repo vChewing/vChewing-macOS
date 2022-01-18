@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include <syslog.h>
 
-using namespace Formosa::Gramambular;
+using namespace Taiyan::Gramambular;
 
 FastLM::FastLM()
     : fd(-1)

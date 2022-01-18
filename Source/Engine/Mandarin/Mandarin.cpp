@@ -13,7 +13,7 @@
 #include "OVUTF8Helper.h"
 #include "OVWildcard.h"
 
-namespace Formosa {
+namespace Taiyan {
 namespace Mandarin {
     
 using namespace OpenVanilla;
@@ -991,4 +991,4 @@ const BopomofoKeyboardLayout* BopomofoKeyboardLayout::HanyuPinyinLayout()
 
 
 } // namespace Mandarin
-} // namespace Formosa
+} // namespace Taiyan

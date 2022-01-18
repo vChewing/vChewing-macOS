@@ -18,7 +18,7 @@
 // format, and we use mmap and zero-out the separators and line feeds
 // to avoid creating new string objects; the parser is a simple DFA
 
-namespace Formosa {
+namespace Taiyan {
     namespace Gramambular {
         class FastLM : public LanguageModel
         {

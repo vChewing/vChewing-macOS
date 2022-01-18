@@ -94,19 +94,19 @@ void UserPhrasesLM::dump()
     }
 }
 
-const std::vector<Formosa::Gramambular::Bigram> UserPhrasesLM::bigramsForKeys(const std::string& preceedingKey, const std::string& key)
+const std::vector<Taiyan::Gramambular::Bigram> UserPhrasesLM::bigramsForKeys(const std::string& preceedingKey, const std::string& key)
 {
-    return std::vector<Formosa::Gramambular::Bigram>();
+    return std::vector<Taiyan::Gramambular::Bigram>();
 }
 
-const std::vector<Formosa::Gramambular::Unigram> UserPhrasesLM::unigramsForKey(const std::string& key)
+const std::vector<Taiyan::Gramambular::Unigram> UserPhrasesLM::unigramsForKey(const std::string& key)
 {
-    std::vector<Formosa::Gramambular::Unigram> v;
+    std::vector<Taiyan::Gramambular::Unigram> v;
     auto iter = keyRowMap.find(key);
     if (iter != keyRowMap.end()) {
         const std::vector<Row>& rows = iter->second;
         for (const auto& row : rows) {
-            Formosa::Gramambular::Unigram g;
+            Taiyan::Gramambular::Unigram g;
             g.keyValue.key = row.key;
             g.keyValue.value = row.value;
             g.score = 0.0;

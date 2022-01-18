@@ -13,7 +13,7 @@
 #include "Grid.h"
 #include "LanguageModel.h"
 
-namespace Formosa {
+namespace Taiyan {
     namespace Gramambular {
         using namespace std;
         

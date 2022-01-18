@@ -12,7 +12,7 @@
 #include <algorithm>
 #include "Grid.h"
 
-namespace Formosa {
+namespace Taiyan {
     namespace Gramambular {
         using namespace std;
 
