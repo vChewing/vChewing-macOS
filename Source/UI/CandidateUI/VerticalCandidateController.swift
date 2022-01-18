@@ -71,7 +71,7 @@ private let kCandidateTextLeftMargin:CGFloat = 8.0
 
 
 
-@objc (VTVerticalCandidateController)
+@objc(VTVerticalCandidateController)
 public class VerticalCandidateController: CandidateController {
     private var keyLabelStripView: VerticalKeyLabelStripView
     private var scrollView: NSScrollView
