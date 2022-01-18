@@ -1424,13 +1424,17 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     if (!length) {
         [self _hideTooltip];
     }
+    else if (Preferences.phraseReplacementEnabled) {
+        NSString *message = [NSString stringWithFormat:NSLocalizedString(@"⚠︎ Phrase replacement mode enabled, interfering user phrase entry.", @""), text];
+        [self _showTooltip:message client:client];
+    }
     else if (length == 1) {
-        NSString *messsage = [NSString stringWithFormat:NSLocalizedString(@"\"%@\" length must ≥ 2 for a user phrase.", @""), text];
-        [self _showTooltip:messsage client:client];
+        NSString *message = [NSString stringWithFormat:NSLocalizedString(@"\"%@\" length must ≥ 2 for a user phrase.", @""), text];
+        [self _showTooltip:message client:client];
     }
     else {
-        NSString *messsage = [NSString stringWithFormat:NSLocalizedString(@"\"%@\" selected. ENTER to add user phrase.", @""), text];
-        [self _showTooltip:messsage client:client];
+        NSString *message = [NSString stringWithFormat:NSLocalizedString(@"\"%@\" selected. ENTER to add user phrase.", @""), text];
+        [self _showTooltip:message client:client];
     }
 }
 

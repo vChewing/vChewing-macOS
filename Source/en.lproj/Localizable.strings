@@ -32,3 +32,4 @@
 "There should not be duplicated keys." = "There should not be duplicated keys.";
 "Please specify at least 4 candidate keys." = "Please specify at least 4 candidate keys.";
 "Maximum 15 candidate keys allowed." = "Maximum 15 candidate keys allowed.";
+"⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.";
