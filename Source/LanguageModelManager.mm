@@ -14,15 +14,15 @@
 #import "OVUTF8Helper.h"
 
 using namespace std;
-using namespace Formosa::Gramambular;
+using namespace Taiyan::Gramambular;
 using namespace vChewing;
 using namespace OpenVanilla;
 
 static const int kUserOverrideModelCapacity = 500;
 static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
 
-vChewingLM gLanguageModelBopomofo;
-vChewingLM gLanguageModelSimpBopomofo;
+vChewingLM glanguageModelCoreCHT;
+vChewingLM glanguageModelCoreCHS;
 UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
 @implementation LanguageModelManager
@@ -36,19 +36,19 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
 
 + (void)loadDataModels
 {
-    LTLoadLanguageModelFile(@"data-cht", gLanguageModelBopomofo);
-    LTLoadLanguageModelFile(@"data-chs", gLanguageModelSimpBopomofo);
+    LTLoadLanguageModelFile(@"data-cht", glanguageModelCoreCHT);
+    LTLoadLanguageModelFile(@"data-chs", glanguageModelCoreCHS);
 }
 
 + (void)loadUserPhrases
 {
-    gLanguageModelBopomofo.loadUserPhrases([[self userPhrasesDataPathBopomofo] UTF8String], [[self excludedPhrasesDataPathBopomofo] UTF8String]);
-    gLanguageModelSimpBopomofo.loadUserPhrases(NULL, [[self excludedPhrasesDataPathSimpBopomofo] UTF8String]);
+    glanguageModelCoreCHT.loadUserPhrases([[self userPhrasesDataPathBopomofo] UTF8String], [[self excludedPhrasesDataPathBopomofo] UTF8String]);
+    glanguageModelCoreCHS.loadUserPhrases(NULL, [[self excludedPhrasesDataPathSimpBopomofo] UTF8String]);
 }
 
 + (void)loadUserPhraseReplacement
 {
-    gLanguageModelBopomofo.loadPhraseReplacementMap([[self phraseReplacementDataPathBopomofo] UTF8String]);
+    glanguageModelCoreCHT.loadPhraseReplacementMap([[self phraseReplacementDataPathBopomofo] UTF8String]);
 }
 
 + (BOOL)checkIfUserDataFolderExists
@@ -183,14 +183,14 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     return [[self dataFolderPath] stringByAppendingPathComponent:@"phrases-replacement.txt"];
 }
 
- + (vChewingLM *)languageModelBopomofo
+ + (vChewingLM *)languageModelCoreCHT
 {
-    return &gLanguageModelBopomofo;
+    return &glanguageModelCoreCHT;
 }
 
-+ (vChewingLM *)languageModelSimpBopomofo
++ (vChewingLM *)languageModelCoreCHS
 {
-    return &gLanguageModelSimpBopomofo;
+    return &glanguageModelCoreCHS;
 }
 
 + (vChewing::UserOverrideModel *)userOverrideModel

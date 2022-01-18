@@ -20,6 +20,7 @@ private let kChooseCandidateUsingSpaceKey = "ChooseCandidateUsingSpaceKey"
 private let kChineseConversionEnabledKey = "ChineseConversionEnabled"
 private let kHalfWidthPunctuationEnabledKey = "HalfWidthPunctuationEnable"
 private let kEscToCleanInputBufferKey = "EscToCleanInputBuffer"
+private let kUseWinNT351BPMF = "UseWinNT351BPMF"
 private let kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
 
 private let kCandidateTextFontName = "CandidateTextFontName"
@@ -192,6 +193,9 @@ struct ComposingBufferSize {
 
     @UserDefault(key: kChooseCandidateUsingSpaceKey, defaultValue: true)
     @objc static var chooseCandidateUsingSpace: Bool
+    
+    @UserDefault(key: kUseWinNT351BPMF, defaultValue: false)
+    @objc static var useWinNT351BPMF: Bool
     
     @UserDefault(key: kShouldNotFartInLieuOfBeep, defaultValue: true)
     @objc static var shouldNotFartInLieuOfBeep: Bool

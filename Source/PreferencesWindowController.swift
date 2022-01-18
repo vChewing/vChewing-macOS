@@ -128,7 +128,7 @@ extension RangeReplaceableCollection where Element: Hashable {
     @IBAction func clickedWhetherIMEShouldNotFartToggleAction(_ sender: Any) {
         clsSFX.beep()
     }
-    
+
     @IBAction func changeSelectionKeyAction(_ sender: Any) {
         guard let keys = (sender as AnyObject).stringValue?.trimmingCharacters(in: .whitespacesAndNewlines).charDeDuplicate else {
                     return

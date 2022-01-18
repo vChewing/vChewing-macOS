@@ -18,7 +18,7 @@
 {
 @private
     // the reading buffer that takes user input
-    Formosa::Mandarin::BopomofoReadingBuffer* _bpmfReadingBuffer;
+    Taiyan::Mandarin::BopomofoReadingBuffer* _bpmfReadingBuffer;
 
     // language model
     vChewing::vChewingLM *_languageModel;
@@ -27,10 +27,10 @@
     vChewing::UserOverrideModel *_userOverrideModel;
     
     // the grid (lattice) builder for the unigrams (and bigrams)
-    Formosa::Gramambular::BlockReadingBuilder* _builder;
+    Taiyan::Gramambular::BlockReadingBuilder* _builder;
 
     // latest walked path (trellis) using the Viterbi algorithm
-    std::vector<Formosa::Gramambular::NodeAnchor> _walkedNodes;
+    std::vector<Taiyan::Gramambular::NodeAnchor> _walkedNodes;
 
     // user override model
     vChewing::UserOverrideModel *_uom;

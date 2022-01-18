@@ -13,7 +13,7 @@
 
 #include "KeyValuePair.h"
 
-namespace Formosa {
+namespace Taiyan {
     namespace Gramambular {
         class Bigram {
         public:

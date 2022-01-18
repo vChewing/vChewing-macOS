@@ -12,7 +12,7 @@
 #include <vector>
 #include "KeyValuePair.h"
 
-namespace Formosa {
+namespace Taiyan {
     namespace Gramambular {
         class Unigram {
         public:

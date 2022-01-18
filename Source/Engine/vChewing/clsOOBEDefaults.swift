@@ -12,6 +12,7 @@ private let kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
 private let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
 private let kCandidateListTextSize = "CandidateListTextSize"
 private let kChooseCandidateUsingSpaceKey = "ChooseCandidateUsingSpaceKey"
+private let kUseWinNT351BPMF = "UseWinNT351BPMF"
 private let kSelectPhraseAfterCursorAsCandidate = "SelectPhraseAfterCursorAsCandidate"
 private let kUseHorizontalCandidateList = "UseHorizontalCandidateList"
 private let kChineseConversionEnabledKey = "ChineseConversionEnabled"
@@ -36,6 +37,11 @@ private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
         // 預設摁空格鍵來選字，所以設成 true
         if UserDefaults.standard.object(forKey: kChooseCandidateUsingSpaceKey) == nil {
             UserDefaults.standard.set(Preferences.chooseCandidateUsingSpace, forKey: kChooseCandidateUsingSpaceKey)
+        }
+        
+        // 預設禁用 WinNT351 風格的注音選字模式（就是每個字都要選的那種），所以設成 false
+        if UserDefaults.standard.object(forKey: kUseWinNT351BPMF) == nil {
+            UserDefaults.standard.set(Preferences.useWinNT351BPMF, forKey: kUseWinNT351BPMF)
         }
         
         // 預設漢音風格選字，所以要設成 0

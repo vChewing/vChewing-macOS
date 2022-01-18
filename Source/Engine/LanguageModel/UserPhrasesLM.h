@@ -16,7 +16,7 @@
 
 namespace vChewing {
 
-class UserPhrasesLM : public Formosa::Gramambular::LanguageModel
+class UserPhrasesLM : public Taiyan::Gramambular::LanguageModel
 {
 public:
     UserPhrasesLM();
@@ -26,8 +26,8 @@ public:
     void close();
     void dump();
     
-    virtual const std::vector<Formosa::Gramambular::Bigram> bigramsForKeys(const std::string& preceedingKey, const std::string& key);
-    virtual const std::vector<Formosa::Gramambular::Unigram> unigramsForKey(const std::string& key);
+    virtual const std::vector<Taiyan::Gramambular::Bigram> bigramsForKeys(const std::string& preceedingKey, const std::string& key);
+    virtual const std::vector<Taiyan::Gramambular::Unigram> unigramsForKey(const std::string& key);
     virtual bool hasUnigramsForKey(const std::string& key);
     
 protected:

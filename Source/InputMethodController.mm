@@ -7,6 +7,7 @@
  */
 
 #import "InputMethodController.h"
+#include <objc/objc.h>
 #import <fstream>
 #import <iostream>
 #import <set>
@@ -17,8 +18,8 @@
 
 // C++ namespace usages
 using namespace std;
-using namespace Formosa::Mandarin;
-using namespace Formosa::Gramambular;
+using namespace Taiyan::Mandarin;
+using namespace Taiyan::Gramambular;
 using namespace vChewing;
 using namespace OpenVanilla;
 
@@ -109,7 +110,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
         _bpmfReadingBuffer = new BopomofoReadingBuffer(BopomofoKeyboardLayout::StandardLayout());
 
         // create the lattice builder
-        _languageModel = [LanguageModelManager languageModelBopomofo];
+        _languageModel = [LanguageModelManager languageModelCoreCHT];
         _languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
         _userOverrideModel = [LanguageModelManager userOverrideModel];
 
@@ -151,17 +152,12 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
     [menu addItem:[NSMenuItem separatorItem]]; // ------------------------------
 
-    if (_inputMode == kBopomofoModeIdentifierCHS) {
-        NSMenuItem *editExcludedPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrasesSimpBopomofo:) keyEquivalent:@""];
-        [menu addItem:editExcludedPhrasesItem];
+    [menu addItemWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
+    if (optionKeyPressed) {
+        [menu addItemWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrases:) keyEquivalent:@""];
+        [menu addItemWithTitle:NSLocalizedString(@"Edit Phrase Replacement Table", @"") action:@selector(openPhraseReplacement:) keyEquivalent:@""];
     }
-    else {
-        [menu addItemWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
-        [menu addItemWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrasesvChewing:) keyEquivalent:@""];
-        if (optionKeyPressed) {
-            [menu addItemWithTitle:NSLocalizedString(@"Edit Phrase Replacement Table", @"") action:@selector(openPhraseReplacementvChewing:) keyEquivalent:@""];
-        }
-    }
+
     [menu addItemWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
 
     [menu addItem:[NSMenuItem separatorItem]]; // ------------------------------
@@ -248,13 +244,14 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
     if ([value isKindOfClass:[NSString class]] && [value isEqual:kBopomofoModeIdentifierCHS]) {
         newInputMode = kBopomofoModeIdentifierCHS;
-        newLanguageModel = [LanguageModelManager languageModelSimpBopomofo];
-    }
-    else {
+        newLanguageModel = [LanguageModelManager languageModelCoreCHS];
+    } else {
         newInputMode = kBopomofoModeIdentifierCHT;
-        newLanguageModel = [LanguageModelManager languageModelBopomofo];
-        newLanguageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
+        newLanguageModel = [LanguageModelManager languageModelCoreCHT];
     }
+
+    // 自 Preferences 模組讀入自訂語彙置換功能開關狀態。
+    newLanguageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
 
     // Only apply the changes if the value is changed
     if (![_inputMode isEqualToString:newInputMode]) {
@@ -650,8 +647,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [self popOverflowComposingTextAndWalk:client];
 
         // get user override model suggestion
-        string overrideValue = (_inputMode == kBopomofoModeIdentifierCHS) ? "" :
-            _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
+        string overrideValue = _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
 
         if (!overrideValue.empty()) {
             size_t cursorIndex = [self actualCandidateCursorIndex];
@@ -663,11 +659,14 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         // then update the text
         _bpmfReadingBuffer->clear();
         [self updateClientComposingBuffer:client];
-
-        if (_inputMode == kBopomofoModeIdentifierCHS) {
+        
+        // 模擬 WINNT 351 ㄅ半注音，就是每個漢字都自動要選字的那種注音。
+        // 嚴格來講不能算純正的ㄅ半注音，畢竟候選字的順序不可能會像當年那樣了。
+        // 如果簡體中文用戶不知道ㄅ半注音是什麼的話，拿全拼輸入法來比喻恐怕比較恰當。
+        if (Preferences.useWinNT351BPMF) {
             [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
         }
-
+        
         // and tells the client that the key is consumed
         return YES;
     }
@@ -965,7 +964,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         }
         [self updateClientComposingBuffer:client];
 
-        if (_inputMode == kBopomofoModeIdentifierCHS && _bpmfReadingBuffer->isEmpty()) {
+        if (Preferences.useWinNT351BPMF && _bpmfReadingBuffer->isEmpty()) {
             [self collectCandidates];
             if ([_candidates count] == 1) {
                 [self commitComposition:client];
@@ -983,14 +982,14 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 {
     BOOL cancelCandidateKey =
     (charCode == 27) ||
-    ((_inputMode == kBopomofoModeIdentifierCHS) &&
+    (Preferences.useWinNT351BPMF &&
      (charCode == 8 || keyCode == kDeleteKeyCode));
 
     if (cancelCandidateKey) {
         gCurrentCandidateController.visible = NO;
         [_candidates removeAllObjects];
 
-        if (_inputMode == kBopomofoModeIdentifierCHS) {
+        if (Preferences.useWinNT351BPMF) {
             _builder->clear();
             _walkedNodes.clear();
             [_composingBuffer setString:@""];
@@ -1147,7 +1146,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             }
         }
 
-        if (_inputMode == kBopomofoModeIdentifierCHS) {
+        if (Preferences.useWinNT351BPMF) {
             string layout = [self _currentLayout];
             string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
             string punctuation = string("_punctuation_") + string(1, (char)charCode);
@@ -1316,7 +1315,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     gCurrentCandidateController.keyLabels = keyLabels;
     [self collectCandidates];
 
-    if (_inputMode == kBopomofoModeIdentifierCHS && [_candidates count] == 1) {
+    if (Preferences.useWinNT351BPMF && [_candidates count] == 1) {
         [self commitComposition:client];
         return;
     }
@@ -1493,7 +1492,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 - (void)togglePhraseReplacementEnabled:(id)sender
 {
     BOOL enabled = [Preferences tooglePhraseReplacementEnabled];
-    vChewingLM *lm = [LanguageModelManager languageModelBopomofo];
+    vChewingLM *lm = [LanguageModelManager languageModelCoreCHT];
     lm->setPhraseReplacementEnabled(enabled);
 }
 
@@ -1532,12 +1531,12 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     [self _openUserFile:[LanguageModelManager excludedPhrasesDataPathSimpBopomofo]];
 }
 
-- (void)openExcludedPhrasesvChewing:(id)sender
+- (void)openExcludedPhrases:(id)sender
 {
     [self _openUserFile:[LanguageModelManager excludedPhrasesDataPathBopomofo]];
 }
 
-- (void)openPhraseReplacementvChewing:(id)sender
+- (void)openPhraseReplacement:(id)sender
 {
     [self _openUserFile:[LanguageModelManager phraseReplacementDataPathBopomofo]];
 }
@@ -1580,7 +1579,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
     size_t cursorIndex = [self actualCandidateCursorIndex];
     _builder->grid().fixNodeSelectedCandidate(cursorIndex, selectedValue);
-    if (_inputMode != kBopomofoModeIdentifierCHS) {
+    if (!Preferences.useWinNT351BPMF) {
         _userOverrideModel->observe(_walkedNodes, cursorIndex, selectedValue, [[NSDate date] timeIntervalSince1970]);
     }
 
@@ -1589,7 +1588,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     [self walk];
     [self updateClientComposingBuffer:_currentCandidateClient];
 
-    if (_inputMode == kBopomofoModeIdentifierCHS) {
+    if (Preferences.useWinNT351BPMF) {
         [self commitComposition:_currentCandidateClient];
         return;
     }
