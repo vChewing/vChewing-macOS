@@ -1341,7 +1341,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [client attributesForCharacterIndex:cursor lineHeightRectangle:&lineHeightRect];
     }
     @catch (NSException *exception) {
-        NSLog(@"%@", exception);
+        NSLog(@"lineHeightRectangle %@", exception);
     }
 
     if (useVerticalMode) {
@@ -1448,7 +1448,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [client attributesForCharacterIndex:cursor lineHeightRectangle:&lineHeightRect];
     }
     @catch (NSException *exception) {
-        NSLog(@"%@", exception);
+        NSLog(@"lineHeightRectangle %@", exception);
     }
 
     [[vChewingInputMethodController tooltipController] showTooltip:tooltip atPoint:lineHeightRect.origin];
