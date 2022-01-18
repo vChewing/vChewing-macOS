@@ -32,3 +32,4 @@
 "There should not be duplicated keys." = "选字键不得重复。";
 "Please specify at least 4 candidate keys." = "请至少指定四个选字键。";
 "Maximum 15 candidate keys allowed." = "选字键最多只能指定十五个。";
+"⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 语汇置换功能已启用，会波及语汇自订。";
