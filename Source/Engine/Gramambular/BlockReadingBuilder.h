@@ -46,7 +46,7 @@ namespace Taiyan {
             static const string Join(vector<string>::const_iterator begin, vector<string>::const_iterator end, const string& separator);
             
         //最多使用六個字組成一個詞
-            static const size_t MaximumBuildSpanLength = 6;
+            static const size_t MaximumBuildSpanLength = 10;
             
             size_t m_cursorIndex;
             size_t m_markerCursorIndex;
