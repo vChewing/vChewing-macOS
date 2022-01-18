@@ -26,7 +26,7 @@
 	<dict>
 		<key>tsInputModeListKey</key>
 		<dict>
-			<key>org.atelierInmu.inputmethod.vChewing.Bopomofo</key>
+			<key>org.atelierInmu.inputmethod.vChewing.TradBopomofo</key>
 			<dict>
 				<key>TISDoubleSpaceSubstitution</key>
 				<string>。</string>
@@ -85,7 +85,7 @@
 		</dict>
 		<key>tsVisibleInputModeOrderedArrayKey</key>
 		<array>
-			<string>org.atelierInmu.inputmethod.vChewing.Bopomofo</string>
+			<string>org.atelierInmu.inputmethod.vChewing.TradBopomofo</string>
 			<string>org.atelierInmu.inputmethod.vChewing.SimpBopomofo</string>
 		</array>
 	</dict>

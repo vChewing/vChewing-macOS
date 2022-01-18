@@ -25,8 +25,8 @@ using namespace OpenVanilla;
 static const NSInteger kMinKeyLabelSize = 10;
 
 // input modes
-static NSString *const kBopomofoModeIdentifier = @"org.atelierInmu.inputmethod.vChewing.Bopomofo";
-static NSString *const kSimpBopomofoModeIdentifier = @"org.atelierInmu.inputmethod.vChewing.SimpBopomofo";
+static NSString *const kBopomofoModeIdentifierCHT = @"org.atelierInmu.inputmethod.vChewing.TradBopomofo";
+static NSString *const kBopomofoModeIdentifierCHS = @"org.atelierInmu.inputmethod.vChewing.SimpBopomofo";
 
 // key code enums
 enum {
@@ -121,7 +121,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
         // create the composing buffer
         _composingBuffer = [[NSMutableString alloc] init];
 
-        _inputMode = kBopomofoModeIdentifier;
+        _inputMode = kBopomofoModeIdentifierCHT;
     }
 
     return self;
@@ -151,7 +151,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
     [menu addItem:[NSMenuItem separatorItem]]; // ------------------------------
 
-    if (_inputMode == kSimpBopomofoModeIdentifier) {
+    if (_inputMode == kBopomofoModeIdentifierCHS) {
         NSMenuItem *editExcludedPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrasesSimpBopomofo:) keyEquivalent:@""];
         [menu addItem:editExcludedPhrasesItem];
     }
@@ -246,12 +246,12 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     NSString *newInputMode;
     vChewingLM *newLanguageModel;
 
-    if ([value isKindOfClass:[NSString class]] && [value isEqual:kSimpBopomofoModeIdentifier]) {
-        newInputMode = kSimpBopomofoModeIdentifier;
+    if ([value isKindOfClass:[NSString class]] && [value isEqual:kBopomofoModeIdentifierCHS]) {
+        newInputMode = kBopomofoModeIdentifierCHS;
         newLanguageModel = [LanguageModelManager languageModelSimpBopomofo];
     }
     else {
-        newInputMode = kBopomofoModeIdentifier;
+        newInputMode = kBopomofoModeIdentifierCHT;
         newLanguageModel = [LanguageModelManager languageModelBopomofo];
         newLanguageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
     }
@@ -650,7 +650,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [self popOverflowComposingTextAndWalk:client];
 
         // get user override model suggestion
-        string overrideValue = (_inputMode == kSimpBopomofoModeIdentifier) ? "" :
+        string overrideValue = (_inputMode == kBopomofoModeIdentifierCHS) ? "" :
             _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
 
         if (!overrideValue.empty()) {
@@ -664,7 +664,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         _bpmfReadingBuffer->clear();
         [self updateClientComposingBuffer:client];
 
-        if (_inputMode == kSimpBopomofoModeIdentifier) {
+        if (_inputMode == kBopomofoModeIdentifierCHS) {
             [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
         }
 
@@ -965,7 +965,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         }
         [self updateClientComposingBuffer:client];
 
-        if (_inputMode == kSimpBopomofoModeIdentifier && _bpmfReadingBuffer->isEmpty()) {
+        if (_inputMode == kBopomofoModeIdentifierCHS && _bpmfReadingBuffer->isEmpty()) {
             [self collectCandidates];
             if ([_candidates count] == 1) {
                 [self commitComposition:client];
@@ -983,14 +983,14 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 {
     BOOL cancelCandidateKey =
     (charCode == 27) ||
-    ((_inputMode == kSimpBopomofoModeIdentifier) &&
+    ((_inputMode == kBopomofoModeIdentifierCHS) &&
      (charCode == 8 || keyCode == kDeleteKeyCode));
 
     if (cancelCandidateKey) {
         gCurrentCandidateController.visible = NO;
         [_candidates removeAllObjects];
 
-        if (_inputMode == kSimpBopomofoModeIdentifier) {
+        if (_inputMode == kBopomofoModeIdentifierCHS) {
             _builder->clear();
             _walkedNodes.clear();
             [_composingBuffer setString:@""];
@@ -1147,7 +1147,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             }
         }
 
-        if (_inputMode == kSimpBopomofoModeIdentifier) {
+        if (_inputMode == kBopomofoModeIdentifierCHS) {
             string layout = [self _currentLayout];
             string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
             string punctuation = string("_punctuation_") + string(1, (char)charCode);
@@ -1316,7 +1316,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     gCurrentCandidateController.keyLabels = keyLabels;
     [self collectCandidates];
 
-    if (_inputMode == kSimpBopomofoModeIdentifier && [_candidates count] == 1) {
+    if (_inputMode == kBopomofoModeIdentifierCHS && [_candidates count] == 1) {
         [self commitComposition:client];
         return;
     }
@@ -1580,7 +1580,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
     size_t cursorIndex = [self actualCandidateCursorIndex];
     _builder->grid().fixNodeSelectedCandidate(cursorIndex, selectedValue);
-    if (_inputMode != kSimpBopomofoModeIdentifier) {
+    if (_inputMode != kBopomofoModeIdentifierCHS) {
         _userOverrideModel->observe(_walkedNodes, cursorIndex, selectedValue, [[NSDate date] timeIntervalSince1970]);
     }
 
@@ -1589,7 +1589,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     [self walk];
     [self updateClientComposingBuffer:_currentCandidateClient];
 
-    if (_inputMode == kSimpBopomofoModeIdentifier) {
+    if (_inputMode == kBopomofoModeIdentifierCHS) {
         [self commitComposition:_currentCandidateClient];
         return;
     }
