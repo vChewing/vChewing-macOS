@@ -1424,11 +1424,11 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [self _hideTooltip];
     }
     else if (length == 1) {
-        NSString *messsage = [NSString stringWithFormat:NSLocalizedString(@"You are now selecting \"%@\". You can add a phrase with two or more characters.", @""), text];
+        NSString *messsage = [NSString stringWithFormat:NSLocalizedString(@"\"%@\" length must ≥ 2 for a user phrase.", @""), text];
         [self _showTooltip:messsage client:client];
     }
     else {
-        NSString *messsage = [NSString stringWithFormat:NSLocalizedString(@"You are now selecting \"%@\". Press enter to add a new phrase.", @""), text];
+        NSString *messsage = [NSString stringWithFormat:NSLocalizedString(@"\"%@\" selected. ENTER to add user phrase.", @""), text];
         [self _showTooltip:messsage client:client];
     }
 }
