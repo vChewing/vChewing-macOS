@@ -281,9 +281,9 @@ struct ComposingBufferSize {
             case .duplicatedCharacters:
                 return NSLocalizedString("There should not be duplicated keys.", comment: "")
             case .tooShort:
-                return NSLocalizedString("The length of your candidate keys can not be less than 4 characters.", comment: "")
+                return NSLocalizedString("Please specify at least 4 candidate keys.", comment: "")
             case .tooLong:
-                return NSLocalizedString("The length of your candidate keys can not be larger than 15 characters.", comment: "")
+                return NSLocalizedString("Maximum 15 candidate keys allowed.", comment: "")
             }
         }
 
