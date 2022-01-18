@@ -20,7 +20,7 @@ extension RangeReplaceableCollection where Element: Hashable {
 // Please note that the class should be exposed as "PreferencesWindowController"
 // in Objective-C in order to let IMK to see the same class name as
 // the "InputMethodServerPreferencesWindowControllerClass" in Info.plist.
-@objc (PreferencesWindowController) class PreferencesWindowController: NSWindowController {
+@objc(PreferencesWindowController) class PreferencesWindowController: NSWindowController {
     @IBOutlet weak var fontSizePopUpButton: NSPopUpButton!
     @IBOutlet weak var basisKeyboardLayoutButton: NSPopUpButton!
     @IBOutlet weak var selectionKeyComboBox: NSComboBox!
