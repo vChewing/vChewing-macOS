@@ -9,9 +9,9 @@
 import Cocoa
 
 private let kKeyboardLayoutPreferenceKey = "KeyboardLayout"
-private let kBasisKeyboardLayoutPreferenceKey = "BasisKeyboardLayout";  // alphanumeric ("ASCII") input basi
-private let kFunctionKeyKeyboardLayoutPreferenceKey = "FunctionKeyKeyboardLayout";  // alphanumeric ("ASCII") input basi
-private let kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey = "FunctionKeyKeyboardLayoutOverrideIncludeShift"; // whether include shif
+private let kBasisKeyboardLayoutPreferenceKey = "BasisKeyboardLayout"  // alphanumeric ("ASCII") input basi
+private let kFunctionKeyKeyboardLayoutPreferenceKey = "FunctionKeyKeyboardLayout"  // alphanumeric ("ASCII") input basi
+private let kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey = "FunctionKeyKeyboardLayoutOverrideIncludeShift" // whether include shif
 private let kCandidateListTextSizeKey = "CandidateListTextSize"
 private let kSelectPhraseAfterCursorAsCandidatePreferenceKey = "SelectPhraseAfterCursorAsCandidate"
 private let kUseHorizontalCandidateListPreferenceKey = "UseHorizontalCandidateList"
@@ -36,8 +36,8 @@ private let kMaxCandidateListTextSize: CGFloat = 196
 
 // default, min and max composing buffer size (in codepoints)
 // modern Macs can usually work up to 16 codepoints when the builder still
-// walks the grid with good performance; slower Macs (like old PowerBooks)
-// will start to sputter beyond 12; such is the algorithmatic complexity
+// walks the grid with good performance slower Macs (like old PowerBooks)
+// will start to sputter beyond 12 such is the algorithmatic complexity
 // of the Viterbi algorithm used in the builder library (at O(N^2))
 private let kDefaultComposingBufferSize = 10
 private let kMinComposingBufferSize = 4
@@ -241,7 +241,7 @@ struct ComposingBufferSize {
     @UserDefault(key: kHalfWidthPunctuationEnabledKey, defaultValue: false)
     @objc static var halfWidthPunctuationEnabled: Bool
 
-    @objc static func toogleHalfWidthPunctuationEnabled() -> Bool {
+    @objc static func toggleHalfWidthPunctuationEnabled() -> Bool {
         halfWidthPunctuationEnabled = !halfWidthPunctuationEnabled
         return halfWidthPunctuationEnabled
     }
@@ -266,7 +266,7 @@ struct ComposingBufferSize {
         [kDefaultKeys, "234567890", "QWERTYUIO", "QWERTASDF", "ASDFGHJKL", "ASDFZXCVB"]
     }
 
-    static func validate(candidateKeys: String) throws {
+    @objc static func validate(candidateKeys: String) throws {
         let trimmed = candidateKeys.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty {
             throw CandidateKeyError.empty
@@ -326,7 +326,7 @@ struct ComposingBufferSize {
     @UserDefault(key: kPhraseReplacementEnabledKey, defaultValue: false)
     @objc static var phraseReplacementEnabled: Bool
 
-    @objc static func tooglePhraseReplacementEnabled() -> Bool {
+    @objc static func togglePhraseReplacementEnabled() -> Bool {
         phraseReplacementEnabled = !phraseReplacementEnabled
         UserDefaults.standard.set(phraseReplacementEnabled, forKey: kPhraseReplacementEnabledKey)
         return phraseReplacementEnabled
