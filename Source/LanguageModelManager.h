@@ -26,8 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathBopomofo;
 @property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathSimpBopomofo;
 @property (class, readonly, nonatomic) NSString *phraseReplacementDataPathBopomofo;
-@property (class, readonly, nonatomic) vChewing::vChewingLM *languageModelBopomofo;
-@property (class, readonly, nonatomic) vChewing::vChewingLM *languageModelSimpBopomofo;
+@property (class, readonly, nonatomic) vChewing::vChewingLM *languageModelCoreCHT;
+@property (class, readonly, nonatomic) vChewing::vChewingLM *languageModelCoreCHS;
 @property (class, readonly, nonatomic) vChewing::UserOverrideModel *userOverrideModel;
 @end
 

@@ -17,7 +17,7 @@
 
 namespace vChewing {
 
-using namespace Formosa::Gramambular;
+using namespace Taiyan::Gramambular;
 
 class UserOverrideModel {
 public:

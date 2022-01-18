@@ -13,7 +13,7 @@
 #include "Bigram.h"
 #include "Unigram.h"
 
-namespace Formosa {
+namespace Taiyan {
     namespace Gramambular {
         
         using namespace std;
