@@ -112,7 +112,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
         // create the lattice builder
         _languageModel = [LanguageModelManager languageModelCoreCHT];
         _languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
-        _userOverrideModel = [LanguageModelManager userOverrideModel];
+        _userOverrideModel = [LanguageModelManager userOverrideModelCHT];
 
         _builder = new BlockReadingBuilder(_languageModel);
 
@@ -243,13 +243,16 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 {
     NSString *newInputMode;
     vChewingLM *newLanguageModel;
+    UserOverrideModel *newUserOverrideModel;
 
     if ([value isKindOfClass:[NSString class]] && [value isEqual:kBopomofoModeIdentifierCHS]) {
         newInputMode = kBopomofoModeIdentifierCHS;
         newLanguageModel = [LanguageModelManager languageModelCoreCHS];
+        newUserOverrideModel = [LanguageModelManager userOverrideModelCHS];
     } else {
         newInputMode = kBopomofoModeIdentifierCHT;
         newLanguageModel = [LanguageModelManager languageModelCoreCHT];
+        newUserOverrideModel = [LanguageModelManager userOverrideModelCHT];
     }
 
     // 自 Preferences 模組讀入自訂語彙置換功能開關狀態。
@@ -265,6 +268,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
         _inputMode = newInputMode;
         _languageModel = newLanguageModel;
+        _userOverrideModel = newUserOverrideModel;
 
         if (!_bpmfReadingBuffer->isEmpty()) {
             _bpmfReadingBuffer->clear();
@@ -1413,8 +1417,12 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     if (![currentMarkedPhrase length]) {
         return NO;
     }
-
-    return [LanguageModelManager writeUserPhrase:currentMarkedPhrase];
+    
+    if (_inputMode == kBopomofoModeIdentifierCHT) {
+        return [LanguageModelManager writeUserPhraseCHT:currentMarkedPhrase];
+    } else {
+        return [LanguageModelManager writeUserPhraseCHS:currentMarkedPhrase];
+    }
 }
 
 - (void)_showCurrentMarkedTextTooltipWithClient:(id)client
@@ -1499,9 +1507,15 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
 - (void)togglePhraseReplacementEnabled:(id)sender
 {
-    BOOL enabled = [Preferences togglePhraseReplacementEnabled];
-    vChewingLM *lm = [LanguageModelManager languageModelCoreCHT];
-    lm->setPhraseReplacementEnabled(enabled);
+    if (_inputMode == kBopomofoModeIdentifierCHT) {
+        BOOL enabled = [Preferences togglePhraseReplacementEnabled];
+        vChewingLM *lm = [LanguageModelManager languageModelCoreCHT];
+        lm->setPhraseReplacementEnabled(enabled);
+    } else {
+        BOOL enabled = [Preferences togglePhraseReplacementEnabled];
+        vChewingLM *lm = [LanguageModelManager languageModelCoreCHS];
+        lm->setPhraseReplacementEnabled(enabled);
+    }
 }
 
 - (void)checkForUpdate:(id)sender
@@ -1531,22 +1545,29 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
 - (void)openUserPhrases:(id)sender
 {
-    [self _openUserFile:[LanguageModelManager userPhrasesDataPathBopomofo]];
-}
-
-- (void)openExcludedPhrasesSimpBopomofo:(id)sender
-{
-    [self _openUserFile:[LanguageModelManager excludedPhrasesDataPathSimpBopomofo]];
+    if (_inputMode == kBopomofoModeIdentifierCHT) {
+        [self _openUserFile:[LanguageModelManager userPhrasesDataPathCHT]];
+    } else {
+        [self _openUserFile:[LanguageModelManager userPhrasesDataPathCHS]];
+    }
 }
 
 - (void)openExcludedPhrases:(id)sender
 {
-    [self _openUserFile:[LanguageModelManager excludedPhrasesDataPathBopomofo]];
+    if (_inputMode == kBopomofoModeIdentifierCHT) {
+        [self _openUserFile:[LanguageModelManager excludedPhrasesDataPathCHT]];
+    } else {
+        [self _openUserFile:[LanguageModelManager excludedPhrasesDataPathCHS]];
+    }
 }
 
 - (void)openPhraseReplacement:(id)sender
 {
-    [self _openUserFile:[LanguageModelManager phraseReplacementDataPathBopomofo]];
+    if (_inputMode == kBopomofoModeIdentifierCHT) {
+        [self _openUserFile:[LanguageModelManager phraseReplacementDataPathCHT]];
+    } else {
+        [self _openUserFile:[LanguageModelManager phraseReplacementDataPathCHS]];
+    }
 }
 
 - (void)reloadUserPhrases:(id)sender
