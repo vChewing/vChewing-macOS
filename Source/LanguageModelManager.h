@@ -19,16 +19,20 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)loadUserPhrases;
 + (void)loadUserPhraseReplacement;
 + (BOOL)checkIfUserLanguageModelFilesExist;
-+ (BOOL)writeUserPhrase:(NSString *)userPhrase;
++ (BOOL)writeUserPhraseCHT:(NSString *)userPhraseCHT;
++ (BOOL)writeUserPhraseCHS:(NSString *)userPhraseCHS;
 
 @property (class, readonly, nonatomic) NSString *dataFolderPath;
-@property (class, readonly, nonatomic) NSString *userPhrasesDataPathBopomofo;
-@property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathBopomofo;
-@property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathSimpBopomofo;
-@property (class, readonly, nonatomic) NSString *phraseReplacementDataPathBopomofo;
+@property (class, readonly, nonatomic) NSString *userPhrasesDataPathCHT;
+@property (class, readonly, nonatomic) NSString *userPhrasesDataPathCHS;
+@property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathCHT;
+@property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathCHS;
+@property (class, readonly, nonatomic) NSString *phraseReplacementDataPathCHT;
+@property (class, readonly, nonatomic) NSString *phraseReplacementDataPathCHS;
 @property (class, readonly, nonatomic) vChewing::vChewingLM *languageModelCoreCHT;
 @property (class, readonly, nonatomic) vChewing::vChewingLM *languageModelCoreCHS;
-@property (class, readonly, nonatomic) vChewing::UserOverrideModel *userOverrideModel;
+@property (class, readonly, nonatomic) vChewing::UserOverrideModel *userOverrideModelCHT;
+@property (class, readonly, nonatomic) vChewing::UserOverrideModel *userOverrideModelCHS;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -32,9 +32,6 @@
     // latest walked path (trellis) using the Viterbi algorithm
     std::vector<Taiyan::Gramambular::NodeAnchor> _walkedNodes;
 
-    // user override model
-    vChewing::UserOverrideModel *_uom;
-
     // the latest composing buffer that is updated to the foreground app
     NSMutableString *_composingBuffer;
     NSInteger _latestReadingCursor;
