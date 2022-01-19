@@ -138,11 +138,9 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
     [menu addItemWithTitle:NSLocalizedString(@"vChewing Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""];
 
-    if ((_inputMode == kBopomofoModeIdentifierCHT) && optionKeyPressed) {
-        NSMenuItem *chineseConversionMenuItem = [menu addItemWithTitle:NSLocalizedString(@"Force KangXi Writing", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"K"];
+    NSMenuItem *chineseConversionMenuItem = [menu addItemWithTitle:NSLocalizedString(@"Force KangXi Writing", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"K"];
         chineseConversionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
         chineseConversionMenuItem.state = Preferences.chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
-    }
 
     NSMenuItem *halfWidthPunctuationMenuItem = [menu addItemWithTitle:NSLocalizedString(@"Use Half-Width Punctuations", @"") action:@selector(toggleHalfWidthPunctuation:) keyEquivalent:@""];
     halfWidthPunctuationMenuItem.state = Preferences.halfWidthPunctuationEnabled ? NSControlStateValueOn : NSControlStateValueOff;
@@ -1491,10 +1489,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
 - (void)toggleChineseConverter:(id)sender
 {
-    if (_inputMode == kBopomofoModeIdentifierCHT) {
-        BOOL chineseConversionEnabled = [Preferences toggleChineseConversionEnabled];
-        [NotifierController notifyWithMessage:[NSString stringWithFormat:@"%@%@%@", NSLocalizedString(@"Force KangXi Writing", @""), @"\n", chineseConversionEnabled ? NSLocalizedString(@"NotificationSwitchON", @"") : NSLocalizedString(@"NotificationSwitchOFF", @"")] stay:NO];
-    }
+    [NotifierController notifyWithMessage:[NSString stringWithFormat:@"%@%@%@", NSLocalizedString(@"Force KangXi Writing", @""), @"\n", [Preferences toggleChineseConversionEnabled] ? NSLocalizedString(@"NotificationSwitchON", @"") : NSLocalizedString(@"NotificationSwitchOFF", @"")] stay:NO];
 }
 
 - (void)toggleHalfWidthPunctuation:(id)sender
