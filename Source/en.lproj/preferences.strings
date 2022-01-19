@@ -104,8 +104,8 @@
 /* Class = "NSTextFieldCell"; title = "UI language setting:"; ObjectID = "9DS-Rc-TXq"; */
 "9DS-Rc-TXq.title" = "UI language setting:";
 
-/* Class = "NSButtonCell"; title = "Emulating Windows NT 3.51 legacy phonetic typing experience"; ObjectID = "ArK-Vk-OoT"; */
-"ArK-Vk-OoT.title" = "Emulating Windows NT 3.51 legacy phonetic typing experience";
+/* Class = "NSButtonCell"; title = "Emulating Windows NT 3.51 select-candidate-per-character mode"; ObjectID = "ArK-Vk-OoT"; */
+"ArK-Vk-OoT.title" = "Emulating Windows NT 3.51 select-candidate-per-character mode";
 
 /* Class = "NSButtonCell"; title = "Auto-convert traditional Chinese glyphs to KangXi characters"; ObjectID = "BSK-bH-Gct"; */
 "BSK-bH-Gct.title" = "Auto-convert traditional Chinese glyphs to KangXi characters";

@@ -104,7 +104,7 @@
 /* Class = "NSTextFieldCell"; title = "UI language setting:"; ObjectID = "9DS-Rc-TXq"; */
 "9DS-Rc-TXq.title" = "介面语言设定:";
 
-/* Class = "NSButtonCell"; title = "Emulating Windows NT 3.51 legacy phonetic typing experience"; ObjectID = "ArK-Vk-OoT"; */
+/* Class = "NSButtonCell"; title = "Emulating Windows NT 3.51 select-candidate-per-character mode"; ObjectID = "ArK-Vk-OoT"; */
 "ArK-Vk-OoT.title" = "模拟 Windows NT 3.51 注音逐字选字输入风格";
 
 /* Class = "NSButtonCell"; title = "Auto-convert traditional Chinese glyphs to KangXi characters"; ObjectID = "BSK-bH-Gct"; */
