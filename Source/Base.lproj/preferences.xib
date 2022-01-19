@@ -240,7 +240,7 @@
                                                     </button>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mzw-F2-aAQ">
                                                         <rect key="frame" x="19" y="61.5" width="423" height="16"/>
-                                                        <buttonCell key="cell" type="check" title="Emulating Windows NT 3.51 legacy phonetic typing experience" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="ArK-Vk-OoT">
+                                                        <buttonCell key="cell" type="check" title="Emulating Windows NT 3.51 select-candidate-per-character mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="ArK-Vk-OoT">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="cellTitle"/>
                                                         </buttonCell>

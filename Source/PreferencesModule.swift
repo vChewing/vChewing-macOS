@@ -220,6 +220,12 @@ struct ComposingBufferSize {
     @UserDefault(key: kUseWinNT351BPMF, defaultValue: false)
     @objc static var useWinNT351BPMF: Bool
     
+    @objc static func toggleWinNT351BPMFEnabled() -> Bool {
+        useWinNT351BPMF = !useWinNT351BPMF
+        UserDefaults.standard.set(useWinNT351BPMF, forKey: kUseWinNT351BPMF)
+        return useWinNT351BPMF
+    }
+    
     @UserDefault(key: kShouldNotFartInLieuOfBeep, defaultValue: true)
     @objc static var shouldNotFartInLieuOfBeep: Bool
     

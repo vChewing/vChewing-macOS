@@ -33,3 +33,4 @@
 "Please specify at least 4 candidate keys." = "言選り用キー陣列に少なくとも４つのキーをご登録ください。";
 "Maximum 15 candidate keys allowed." = "言選り用キー陣列には最多１５つキー登録できます。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 言葉置換機能稼働中、新添付言葉にも影響。";
+"NT351 BPMF EMU" = "全候補入力モード";

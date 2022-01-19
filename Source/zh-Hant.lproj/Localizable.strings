@@ -33,3 +33,4 @@
 "Please specify at least 4 candidate keys." = "請至少指定四個選字鍵。";
 "Maximum 15 candidate keys allowed." = "選字鍵最多只能指定十五個。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 語彙置換功能已啟用，會波及語彙自訂。";
+"NT351 BPMF EMU" = "模擬逐字選字輸入";

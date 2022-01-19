@@ -136,11 +136,13 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     // a menu instance (autoreleased) is requested every time the user click on the input menu
     NSMenu *menu = [[NSMenu alloc] initWithTitle:LocalizationNotNeeded(@"Input Method Menu")];
 
-    [menu addItemWithTitle:NSLocalizedString(@"vChewing Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""];
-
+    NSMenuItem *useWinNT351BPMFMenuItem = [menu addItemWithTitle:NSLocalizedString(@"NT351 BPMF EMU", @"") action:@selector(toggleWinNT351BPMFMode:) keyEquivalent:@"P"];
+    useWinNT351BPMFMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
+    useWinNT351BPMFMenuItem.state = Preferences.useWinNT351BPMF ? NSControlStateValueOn : NSControlStateValueOff;
+    
     NSMenuItem *chineseConversionMenuItem = [menu addItemWithTitle:NSLocalizedString(@"Force KangXi Writing", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"K"];
-        chineseConversionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
-        chineseConversionMenuItem.state = Preferences.chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    chineseConversionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
+    chineseConversionMenuItem.state = Preferences.chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
 
     NSMenuItem *halfWidthPunctuationMenuItem = [menu addItemWithTitle:NSLocalizedString(@"Use Half-Width Punctuations", @"") action:@selector(toggleHalfWidthPunctuation:) keyEquivalent:@""];
     halfWidthPunctuationMenuItem.state = Preferences.halfWidthPunctuationEnabled ? NSControlStateValueOn : NSControlStateValueOff;
@@ -162,6 +164,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
     [menu addItem:[NSMenuItem separatorItem]]; // ------------------------------
 
+    [menu addItemWithTitle:NSLocalizedString(@"vChewing Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""];
     [menu addItemWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""];
     [menu addItemWithTitle:NSLocalizedString(@"About vChewing…", @"") action:@selector(showAbout:) keyEquivalent:@""];
     return menu;
@@ -1485,6 +1488,11 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [(AppDelegate *)[NSApp delegate] showPreferences];
     }
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+}
+
+- (void)toggleWinNT351BPMFMode:(id)sender
+{
+    [NotifierController notifyWithMessage:[NSString stringWithFormat:@"%@%@%@", NSLocalizedString(@"NT351 BPMF EMU", @""), @"\n", [Preferences toggleWinNT351BPMFEnabled] ? NSLocalizedString(@"NotificationSwitchON", @"") : NSLocalizedString(@"NotificationSwitchOFF", @"")] stay:NO];
 }
 
 - (void)toggleChineseConverter:(id)sender
