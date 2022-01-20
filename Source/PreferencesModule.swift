@@ -21,6 +21,7 @@ private let kChineseConversionEnabledKey = "ChineseConversionEnabled"
 private let kHalfWidthPunctuationEnabledKey = "HalfWidthPunctuationEnable"
 private let kEscToCleanInputBufferKey = "EscToCleanInputBuffer"
 private let kUseWinNT351BPMF = "UseWinNT351BPMF"
+private let kMaxCandidateLength = "MaxCandidateLength"
 private let kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
 
 private let kCandidateTextFontName = "CandidateTextFontName"
@@ -183,6 +184,7 @@ struct ComposingBufferSize {
         defaults.removeObject(forKey: kPhraseReplacementEnabledKey)
         defaults.removeObject(forKey: kChineseConversionEngineKey)
         defaults.removeObject(forKey: kUseWinNT351BPMF)
+        defaults.removeObject(forKey: kMaxCandidateLength)
         defaults.removeObject(forKey: kShouldNotFartInLieuOfBeep)
     }
 
@@ -225,6 +227,9 @@ struct ComposingBufferSize {
         UserDefaults.standard.set(useWinNT351BPMF, forKey: kUseWinNT351BPMF)
         return useWinNT351BPMF
     }
+    
+    @UserDefault(key: kMaxCandidateLength, defaultValue: 10)
+    @objc static var maxCandidateLength: Int
     
     @UserDefault(key: kShouldNotFartInLieuOfBeep, defaultValue: true)
     @objc static var shouldNotFartInLieuOfBeep: Bool

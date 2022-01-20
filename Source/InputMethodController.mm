@@ -1372,7 +1372,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
     size_t begin = min(_builder->markerCursorIndex(), _builder->cursorIndex());
     size_t end = max(_builder->markerCursorIndex(), _builder->cursorIndex());
-    // A phrase should contian at least two characters.
+    // A phrase should contain at least two characters.
     if (end - begin < 1) {
         return @"";
     }
@@ -1393,8 +1393,11 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
     size_t begin = min(_builder->markerCursorIndex(), _builder->cursorIndex());
     size_t end = max(_builder->markerCursorIndex(), _builder->cursorIndex());
-    // A phrase should contian at least two characters.
+    // A phrase should contain at least two characters.
     if (end - begin < 2) {
+        return @"";
+    }
+    if (end - begin > Preferences.maxCandidateLength) {
         return @"";
     }
 
@@ -1416,6 +1419,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 {
     NSString *currentMarkedPhrase = [self _currentMarkedTextAndReadings];
     if (![currentMarkedPhrase length]) {
+        [self beep];
         return NO;
     }
     
@@ -1437,8 +1441,12 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         NSString *message = [NSString stringWithFormat:NSLocalizedString(@"⚠︎ Phrase replacement mode enabled, interfering user phrase entry.", @""), text];
         [self _showTooltip:message client:client];
     }
-    else if (length == 1) {
+    else if (length < 2) {
         NSString *message = [NSString stringWithFormat:NSLocalizedString(@"\"%@\" length must ≥ 2 for a user phrase.", @""), text];
+        [self _showTooltip:message client:client];
+    }
+    else if (length > Preferences.maxCandidateLength) {
+        NSString *message = [NSString stringWithFormat:NSLocalizedString(@"\"%@\" length too long for a user phrase.", @""), text];
         [self _showTooltip:message client:client];
     }
     else {

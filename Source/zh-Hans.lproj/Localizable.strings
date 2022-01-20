@@ -23,6 +23,7 @@
 "Edit Excluded Phrases" = "编辑要滤除的语汇";
 "Use Half-Width Punctuations" = "啟用半角標點輸出";
 "\"%@\" length must ≥ 2 for a user phrase." = "「%@」字数不足以自订语汇。";
+"\"%@\" length too long for a user phrase." = "「%@」字数太长、无法自订。";
 "\"%@\" selected. ENTER to add user phrase." = "「%@」敲 Enter 添入自订语汇。";
 "Edit Phrase Replacement Table" = "编辑语汇置换表";
 "Use Phrase Replacement" = "使用语汇置换";
