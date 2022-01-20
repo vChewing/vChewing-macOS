@@ -339,7 +339,8 @@ const string BPMF::HanyuPinyinString(bool includesTone, bool useVForUUmlaut) con
 
     
     if (includesTone) {
-        switch (toneMarkerComponent()) {            
+        switch (toneMarkerComponent()) {
+            case Tone1: tone = "1"; break;
             case Tone2: tone = "2"; break;
             case Tone3: tone = "3"; break;
             case Tone4: tone = "4"; break;
