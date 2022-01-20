@@ -23,6 +23,7 @@
 "Edit Excluded Phrases" = "辞書条目排除表を編集";
 "Use Half-Width Punctuations" = "半角句読機能を起用";
 "\"%@\" length must ≥ 2 for a user phrase." = "「%@」もう１つ文字のお選びを。";
+"\"%@\" length too long for a user phrase." = "「%@」文字数過剰で登録不可。";
 "\"%@\" selected. ENTER to add user phrase." = "「%@」を ENTER で辞書に登録。";
 "Edit Phrase Replacement Table" = "言葉置換表を編集";
 "Use Phrase Replacement" = "言葉置換機能";

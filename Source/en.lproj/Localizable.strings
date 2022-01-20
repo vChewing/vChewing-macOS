@@ -23,6 +23,7 @@
 "Edit Excluded Phrases" = "Edit Excluded Phrases";
 "Use Half-Width Punctuations" = "Use Half-Width Punctuations";
 "\"%@\" length must ≥ 2 for a user phrase." = "\"%@\" length must ≥ 2 for a user phrase.";
+"\"%@\" length too long for a user phrase." = "\"%@\" length too long for a user phrase.";
 "\"%@\" selected. ENTER to add user phrase." = "\"%@\" selected. ENTER to add user phrase.";
 "Edit Phrase Replacement Table" = "Edit Phrase Replacement Table";
 "Use Phrase Replacement" = "Use Phrase Replacement";
