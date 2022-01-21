@@ -36,8 +36,7 @@ fileprivate class HorizontalCandidateView: NSView {
         if !elementWidths.isEmpty {
             result.width = elementWidths.reduce(0, +)
             result.width += CGFloat(elementWidths.count)
-            // result.height = keyLabelHeight + candidateTextHeight + 1.0
-            result.height = candidateTextHeight + cellPadding;
+            result.height = candidateTextHeight + cellPadding
         }
         return result
     }
@@ -47,14 +46,13 @@ fileprivate class HorizontalCandidateView: NSView {
         let count = min(labels.count, candidates.count)
         keyLabels = Array(labels[0..<count])
         displayedCandidates = Array(candidates[0..<count])
-        // dispCandidatesWithLabels = keyLabels + displayedCandidates
         dispCandidatesWithLabels = zip(keyLabels,displayedCandidates).map() {$0 + $1}
 
         var newWidths = [CGFloat]()
         let baseSize = NSSize(width: 10240.0, height: 10240.0)
         for index in 0..<count {
             let rctCandidate = (dispCandidatesWithLabels[index] as NSString).boundingRect(with: baseSize, options: .usesLineFragmentOrigin, attributes: candidateWithLabelAttrDict)
-            let cellWidth = rctCandidate.size.width + cellPadding;
+            let cellWidth = rctCandidate.size.width + cellPadding
             newWidths.append(cellWidth)
         }
         elementWidths = newWidths
