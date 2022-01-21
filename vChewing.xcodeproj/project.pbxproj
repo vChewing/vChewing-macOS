@@ -41,7 +41,7 @@
 		6A0421A815FEF3F50061ED63 /* FastLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A0421A615FEF3F50061ED63 /* FastLM.cpp */; };
 		6A0D4EA715FC0D2D00ABF4B3 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */; };
 		6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */; };
-		6A0D4ED315FC0D6400ABF4B3 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC815FC0D6400ABF4B3 /* main.m */; };
+		6A0D4ED315FC0D6400ABF4B3 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC815FC0D6400ABF4B3 /* main.swift */; };
 		6A0D4F0815FC0DA600ABF4B3 /* Bopomofo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EEF15FC0DA600ABF4B3 /* Bopomofo.tiff */; };
 		6A0D4F0915FC0DA600ABF4B3 /* Bopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EF015FC0DA600ABF4B3 /* Bopomofo@2x.tiff */; };
 		6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F2015FC0EB100ABF4B3 /* Mandarin.cpp */; };
@@ -152,7 +152,7 @@
 		6A0D4EAB15FC0D2D00ABF4B3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6A0D4EC615FC0D6400ABF4B3 /* InputMethodController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InputMethodController.h; sourceTree = "<group>"; };
 		6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = InputMethodController.mm; sourceTree = "<group>"; };
-		6A0D4EC815FC0D6400ABF4B3 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		6A0D4EC815FC0D6400ABF4B3 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		6A0D4EEF15FC0DA600ABF4B3 /* Bopomofo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Bopomofo.tiff; sourceTree = "<group>"; };
 		6A0D4EF015FC0DA600ABF4B3 /* Bopomofo@2x.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "Bopomofo@2x.tiff"; sourceTree = "<group>"; };
 		6A0D4EF515FC0DA600ABF4B3 /* vChewing-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "vChewing-Info.plist"; sourceTree = "<group>"; };
@@ -367,7 +367,7 @@
 				6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */,
 				5B5F4F91279294A300922DC2 /* LanguageModelManager.h */,
 				5B5F4F92279294A300922DC2 /* LanguageModelManager.mm */,
-				6A0D4EC815FC0D6400ABF4B3 /* main.m */,
+				6A0D4EC815FC0D6400ABF4B3 /* main.swift */,
 				6A0D4EF615FC0DA600ABF4B3 /* vChewing-Prefix.pch */,
 				5BDF2D052791DA6700838ADB /* AppDelegate.swift */,
 				5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */,
@@ -702,7 +702,7 @@
 				5BE798A72793280C00337FF9 /* NotifierController.swift in Sources */,
 				5B5F4F93279294A300922DC2 /* LanguageModelManager.mm in Sources */,
 				6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */,
-				6A0D4ED315FC0D6400ABF4B3 /* main.m in Sources */,
+				6A0D4ED315FC0D6400ABF4B3 /* main.swift in Sources */,
 				5BF4A6FE27844738007DC6E7 /* frmAboutWindow.m in Sources */,
 				5B5F4F972792A4EA00922DC2 /* UserPhrasesLM.cpp in Sources */,
 				5BC2D2882793B434002C0BEC /* KeyValueBlobReader.cpp in Sources */,
