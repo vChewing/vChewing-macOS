@@ -20,7 +20,6 @@
 		5B5F4F93279294A300922DC2 /* LanguageModelManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F4F92279294A300922DC2 /* LanguageModelManager.mm */; };
 		5B5F4F972792A4EA00922DC2 /* UserPhrasesLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F4F962792A4EA00922DC2 /* UserPhrasesLM.cpp */; };
 		5B6797B52794822C004AC7CE /* PhraseReplacementMap.h in Sources */ = {isa = PBXBuildFile; fileRef = 5B6797B32794822C004AC7CE /* PhraseReplacementMap.h */; };
-		5BC2D2872793B434002C0BEC /* CMakeLists.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BC2D2852793B434002C0BEC /* CMakeLists.txt */; };
 		5BC2D2882793B434002C0BEC /* KeyValueBlobReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BC2D2862793B434002C0BEC /* KeyValueBlobReader.cpp */; };
 		5BC2D28B2793B8FB002C0BEC /* EmacsKeyHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC2D28A2793B8FB002C0BEC /* EmacsKeyHelper.swift */; };
 		5BC2D28D2793B98F002C0BEC /* PreferencesModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC2D28C2793B98F002C0BEC /* PreferencesModule.swift */; };
@@ -116,7 +115,6 @@
 		5B9781D82763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Source/zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5BA923AC2791B7C20001323A /* vChewingInstaller-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vChewingInstaller-Bridging-Header.h"; sourceTree = "<group>"; };
 		5BC2D2842793B434002C0BEC /* KeyValueBlobReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyValueBlobReader.h; sourceTree = "<group>"; };
-		5BC2D2852793B434002C0BEC /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		5BC2D2862793B434002C0BEC /* KeyValueBlobReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KeyValueBlobReader.cpp; sourceTree = "<group>"; };
 		5BC2D28A2793B8FB002C0BEC /* EmacsKeyHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmacsKeyHelper.swift; sourceTree = "<group>"; };
 		5BC2D28C2793B98F002C0BEC /* PreferencesModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesModule.swift; sourceTree = "<group>"; };
@@ -272,7 +270,6 @@
 			isa = PBXGroup;
 			children = (
 				5BC2D2842793B434002C0BEC /* KeyValueBlobReader.h */,
-				5BC2D2852793B434002C0BEC /* CMakeLists.txt */,
 				5BC2D2862793B434002C0BEC /* KeyValueBlobReader.cpp */,
 				5BD0D1A3279463510008F48E /* clsOOBEDefaults.swift */,
 			);
@@ -647,7 +644,6 @@
 				5BD0D19F279454F60008F48E /* Beep.aif in Resources */,
 				5BC3FB83278492DE0022E99A /* data-chs.txt in Resources */,
 				5B000FC4278495AD004F02AC /* SimpBopomofo@2x.tiff in Resources */,
-				5BC2D2872793B434002C0BEC /* CMakeLists.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
