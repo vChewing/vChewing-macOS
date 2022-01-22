@@ -110,22 +110,6 @@ vChewing Phrase Database Maintained by Shiki Suen.</string>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <button horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bSu-np-tPT" userLabel="confirmButton">
-                        <rect key="frame" x="382" y="74" width="143" height="54"/>
-                        <constraints>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="129" id="ECG-s4-D2p"/>
-                        </constraints>
-                        <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="btnConfirm">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                            <string key="keyEquivalent" base64-UTF8="YES">
-DQ
-</string>
-                        </buttonCell>
-                        <connections>
-                            <action selector="performClose:" target="-1" id="0yK-v8-KQd"/>
-                        </connections>
-                    </button>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="d81-Fe-uNT">
                         <rect key="frame" x="13" y="21" width="360" height="105"/>
                         <constraints>
@@ -156,6 +140,22 @@ DQ
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <button horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bSu-np-tPT" userLabel="confirmButton">
+                        <rect key="frame" x="382" y="96" width="143" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="129" id="ECG-s4-D2p"/>
+                        </constraints>
+                        <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="btnConfirm">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="performClose:" target="-1" id="0yK-v8-KQd"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="9Pk-k3-0cO" secondAttribute="trailing" constant="20" symbolic="YES" id="0LE-Ck-Jy5"/>
@@ -172,11 +172,12 @@ DQ
                     <constraint firstItem="bAv-ZO-Ihw" firstAttribute="leading" secondItem="2Gh-nq-Mng" secondAttribute="leading" id="EQ1-cm-RX8"/>
                     <constraint firstItem="eYM-F7-drf" firstAttribute="leading" secondItem="pHH-M3-zKo" secondAttribute="leading" id="Fcb-XF-cee"/>
                     <constraint firstItem="2Gh-nq-Mng" firstAttribute="top" secondItem="pHH-M3-zKo" secondAttribute="bottom" constant="8" symbolic="YES" id="GZ9-5T-UZI"/>
-                    <constraint firstAttribute="bottom" secondItem="bSu-np-tPT" secondAttribute="bottom" constant="81" id="Inw-Qt-fHt"/>
+                    <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="bSu-np-tPT" secondAttribute="bottom" constant="81" id="Inw-Qt-fHt"/>
                     <constraint firstAttribute="bottom" secondItem="d81-Fe-uNT" secondAttribute="bottom" constant="21" id="Km1-n7-j8F"/>
                     <constraint firstItem="8M8-3C-BZO" firstAttribute="trailing" secondItem="eYM-F7-drf" secondAttribute="trailing" id="O8T-AT-i11"/>
                     <constraint firstItem="Srh-ua-uQD" firstAttribute="leading" secondItem="8Ju-DR-2C8" secondAttribute="leading" id="Rks-Q6-4Hh"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Srh-ua-uQD" secondAttribute="trailing" constant="20" symbolic="YES" id="Swp-Z3-57P"/>
+                    <constraint firstItem="bSu-np-tPT" firstAttribute="top" secondItem="2Gh-nq-Mng" secondAttribute="bottom" constant="11" id="ThD-rE-Rc3"/>
                     <constraint firstItem="6Dx-DY-UG1" firstAttribute="baseline" secondItem="9Pk-k3-0cO" secondAttribute="baseline" id="UXk-Ir-Kti"/>
                     <constraint firstItem="6Dx-DY-UG1" firstAttribute="leading" secondItem="Srh-ua-uQD" secondAttribute="leading" id="UZA-vT-6yG"/>
                     <constraint firstItem="bAv-ZO-Ihw" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="15" id="Uhh-Lu-dEf"/>
@@ -189,7 +190,6 @@ DQ
                     <constraint firstItem="bAv-ZO-Ihw" firstAttribute="top" secondItem="6Dx-DY-UG1" secondAttribute="top" id="hJv-Sh-M4t"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="8Ju-DR-2C8" secondAttribute="trailing" constant="20" symbolic="YES" id="hm1-o7-gLp"/>
                     <constraint firstItem="2Gh-nq-Mng" firstAttribute="trailing" secondItem="bSu-np-tPT" secondAttribute="trailing" id="ixJ-xP-aIU"/>
-                    <constraint firstItem="bSu-np-tPT" firstAttribute="top" secondItem="pHH-M3-zKo" secondAttribute="bottom" constant="20" symbolic="YES" id="pW1-SU-K2z"/>
                     <constraint firstItem="8M8-3C-BZO" firstAttribute="leading" secondItem="eYM-F7-drf" secondAttribute="leading" id="rLt-ck-nSt"/>
                     <constraint firstItem="bAv-ZO-Ihw" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" id="u49-Fr-HYh"/>
                 </constraints>
