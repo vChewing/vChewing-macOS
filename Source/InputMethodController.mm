@@ -169,7 +169,8 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     [menu addItemWithTitle:NSLocalizedString(@"About vChewing…", @"") action:@selector(showAbout:) keyEquivalent:@""];
     if (optionKeyPressed) {
         [menu addItemWithTitle:NSLocalizedString(@"Reboot vChewing…", @"") action:@selector(selfTerminate:) keyEquivalent:@""];
-        [menu addItemWithTitle:NSLocalizedString(@"Deploy Zip Data…", @"") action:@selector(cnsDeploy:) keyEquivalent:@""];
+        [menu addItemWithTitle:NSLocalizedString(@"Deploy CNS Data…", @"") action:@selector(cnsDeploy:) keyEquivalent:@""];
+        [menu addItemWithTitle:NSLocalizedString(@"Load CNS Data…", @"") action:@selector(loadCNSData:) keyEquivalent:@""];
     }
     return menu;
 }
@@ -1551,6 +1552,16 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     return YES;
 }
 
+- (BOOL)_checkCNSFile
+{
+    if (![LanguageModelManager checkIfCNSDataExistAndHashMatched]) {
+        [self beep];
+        NSLog(@"_checkCNSFile failed in the InputMethodController.");
+        return NO;
+    }
+    return YES;
+}
+
 - (void)cnsDeploy:(id)sender
 {
     [LanguageModelManager deployZipDataFile:@"UNICHARS"];
@@ -1584,6 +1595,15 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 {
     [LanguageModelManager loadUserPhrases];
     [LanguageModelManager loadUserPhraseReplacement];
+}
+
+- (void)loadCNSData:(id)sender
+{
+    if (!self._checkCNSFile) {
+        [self beep];
+    } else {
+        [LanguageModelManager loadCNSData];
+    }
 }
 
 - (void)showAbout:(id)sender
