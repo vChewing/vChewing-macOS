@@ -12,6 +12,7 @@
 #import <set>
 #import "OVStringHelper.h"
 #import "OVUTF8Helper.h"
+#import "AWFileHash.h"
 
 using namespace std;
 using namespace Taiyan::Gramambular;
@@ -20,6 +21,7 @@ using namespace OpenVanilla;
 
 static const int kUserOverrideModelCapacity = 500;
 static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
+static NSString *kMD5HashCNSData = @"MD5HashCNSData";
 
 vChewingLM glanguageModelCoreCHT;
 vChewingLM glanguageModelCoreCHS;
@@ -38,6 +40,9 @@ static NSString *const kBopomofoModeIdentifierCHS = @"org.atelierInmu.inputmetho
     NSString *zipPath = [[NSBundle bundleForClass:cls] pathForResource:filenameWithoutExtension ofType:@"zip"];
     NSString *destinationPath = [self dataFolderPath];
     [SSZipArchive unzipFileAtPath:zipPath toDestination:destinationPath];
+    NSString *md5HashCNSData = [AWFileHash md5HashOfFileAtPath:[self cnsDataPath]];
+    [[NSUserDefaults standardUserDefaults] setObject:md5HashCNSData forKey:kMD5HashCNSData];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewingLM &lm)
