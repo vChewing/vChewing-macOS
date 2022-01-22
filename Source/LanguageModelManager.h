@@ -11,6 +11,7 @@
 #import "UserOverrideModel.h"
 #import "vChewingLM.h"
 #import "SSZipArchive.h"
+#import "AWFileHash.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

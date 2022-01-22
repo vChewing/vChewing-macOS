@@ -12,7 +12,6 @@
 #import <set>
 #import "OVStringHelper.h"
 #import "OVUTF8Helper.h"
-#import "AWFileHash.h"
 
 using namespace std;
 using namespace Taiyan::Gramambular;
@@ -74,7 +73,9 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
         NSLog(@"Extracted CNS Data Not Found.");
         return NO;
     }
-    if ([AWFileHash md5HashOfFileAtPath:[self cnsDataPath]] != [[NSUserDefaults standardUserDefaults] objectForKey:kMD5HashCNSData]) {
+    if (![[AWFileHash md5HashOfFileAtPath:[self cnsDataPath]] isEqualToString: [[NSUserDefaults standardUserDefaults] objectForKey:kMD5HashCNSData]]) {
+        NSLog(@"Existing CNS CSV Data Fingerprint: %@", [AWFileHash md5HashOfFileAtPath:[self cnsDataPath]]);
+        NSLog(@"UserPlist CNS CSV Data Fingerprint: %@", [[NSUserDefaults standardUserDefaults] objectForKey:kMD5HashCNSData]);
         NSLog(@"Existing CNS CSV Data fingerprint mismatch, must be tampered since it gets extracted.");
         return NO;
     }
