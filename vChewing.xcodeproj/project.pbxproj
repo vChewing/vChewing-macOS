@@ -10,6 +10,9 @@
 		5B000FC3278495AD004F02AC /* SimpBopomofo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 5B000FC1278495AD004F02AC /* SimpBopomofo.tiff */; };
 		5B000FC4278495AD004F02AC /* SimpBopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 5B000FC2278495AD004F02AC /* SimpBopomofo@2x.tiff */; };
 		5B1958522788A2BF00FAEB14 /* BSDLicense.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B58E87D278413E7003EA2AD /* BSDLicense.txt */; };
+		5B21711B279B998C00F91A2B /* Chronosphere.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B217119279B998800F91A2B /* Chronosphere.m */; };
+		5B21711E279B9AD900F91A2B /* ArchiveUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21711C279B9AD700F91A2B /* ArchiveUtil.swift */; };
+		5B217126279BA37500F91A2B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B217124279BA37300F91A2B /* AppDelegate.swift */; };
 		5B42B64027876FDC00BB9B9F /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B42B63E27876FDC00BB9B9F /* UserOverrideModel.cpp */; };
 		5B58E87F278413E7003EA2AD /* BSDLicense.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B58E87D278413E7003EA2AD /* BSDLicense.txt */; };
 		5B5F4F8E27928F9300922DC2 /* vChewingLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F4F8D27928F9300922DC2 /* vChewingLM.cpp */; };
@@ -50,13 +53,11 @@
 		6A0D4F5815FC0EF900ABF4B3 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4F4A15FC0EE100ABF4B3 /* Localizable.strings */; };
 		6A187E2616004C5900466B2E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A187E2816004C5900466B2E /* MainMenu.xib */; };
 		6A225A1F23679F2600F685C6 /* NotarizedArchives in Resources */ = {isa = PBXBuildFile; fileRef = 6A225A1E23679F2600F685C6 /* NotarizedArchives */; };
-		6A225A232367A1D700F685C6 /* ArchiveUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A225A222367A1D700F685C6 /* ArchiveUtil.m */; };
 		6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
 		6A2E40F9253A6AA000D1AE1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
 		6A38BC1515FC117A00A8A51F /* data-cht.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A38BBF615FC117A00A8A51F /* data-cht.txt */; };
 		6A38BC2815FC158A00A8A51F /* InputMethodKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */; };
 		6ACA41CD15FC1D7500935EF6 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */; };
-		6ACA41F915FC1D9000935EF6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ACA41E915FC1D9000935EF6 /* AppDelegate.m */; };
 		6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */; };
 		6ACA41FC15FC1D9000935EF6 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EE15FC1D9000935EF6 /* Localizable.strings */; };
 		6ACA41FD15FC1D9000935EF6 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41F015FC1D9000935EF6 /* MainMenu.xib */; };
@@ -90,6 +91,10 @@
 		5B19584E27888F5D00FAEB14 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
 		5B19584F27888F5F00FAEB14 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/MainMenu.strings"; sourceTree = "<group>"; };
 		5B19585127888F6B00FAEB14 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		5B217118279B998800F91A2B /* Chronosphere.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Chronosphere.h; sourceTree = "<group>"; };
+		5B217119279B998800F91A2B /* Chronosphere.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Chronosphere.m; sourceTree = "<group>"; };
+		5B21711C279B9AD700F91A2B /* ArchiveUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveUtil.swift; sourceTree = "<group>"; };
+		5B217124279BA37300F91A2B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5B42B63E27876FDC00BB9B9F /* UserOverrideModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UserOverrideModel.cpp; sourceTree = "<group>"; };
 		5B42B63F27876FDC00BB9B9F /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserOverrideModel.h; sourceTree = "<group>"; };
 		5B42B64127877D6500BB9B9F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Source/zh-Hans.lproj/preferences.strings"; sourceTree = "<group>"; };
@@ -210,15 +215,11 @@
 		6A15B32521A51F2300B92CD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		6A15B32721A51F2300B92CD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Source/Base.lproj/preferences.xib; sourceTree = "<group>"; };
 		6A225A1E23679F2600F685C6 /* NotarizedArchives */ = {isa = PBXFileReference; lastKnownFileType = folder; path = NotarizedArchives; sourceTree = "<group>"; };
-		6A225A212367A1D700F685C6 /* ArchiveUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArchiveUtil.h; sourceTree = "<group>"; };
-		6A225A222367A1D700F685C6 /* ArchiveUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArchiveUtil.m; sourceTree = "<group>"; };
 		6A2E40F5253A69DA00D1AE1D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		6A38BBF615FC117A00A8A51F /* data-cht.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "data-cht.txt"; sourceTree = "<group>"; };
 		6A38BBFA15FC117A00A8A51F /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = InputMethodKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/InputMethodKit.framework; sourceTree = DEVELOPER_DIR; };
 		6ACA41CB15FC1D7500935EF6 /* vChewingInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		6ACA41E815FC1D9000935EF6 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Source/Installer/AppDelegate.h; sourceTree = SOURCE_ROOT; };
-		6ACA41E915FC1D9000935EF6 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Source/Installer/AppDelegate.m; sourceTree = SOURCE_ROOT; };
 		6ACA41EB15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6ACA41EF15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6ACA41F215FC1D9000935EF6 /* Installer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Installer-Info.plist"; path = "Source/Installer/Installer-Info.plist"; sourceTree = SOURCE_ROOT; };
@@ -513,11 +514,11 @@
 		6ACA41E715FC1D9000935EF6 /* Installer */ = {
 			isa = PBXGroup;
 			children = (
-				6A225A212367A1D700F685C6 /* ArchiveUtil.h */,
-				6A225A222367A1D700F685C6 /* ArchiveUtil.m */,
+				5B217118279B998800F91A2B /* Chronosphere.h */,
+				5B217119279B998800F91A2B /* Chronosphere.m */,
+				5B21711C279B9AD700F91A2B /* ArchiveUtil.swift */,
+				5B217124279BA37300F91A2B /* AppDelegate.swift */,
 				6A225A1E23679F2600F685C6 /* NotarizedArchives */,
-				6ACA41E815FC1D9000935EF6 /* AppDelegate.h */,
-				6ACA41E915FC1D9000935EF6 /* AppDelegate.m */,
 				6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */,
 				6ACA41EE15FC1D9000935EF6 /* Localizable.strings */,
 				6ACA41F015FC1D9000935EF6 /* MainMenu.xib */,
@@ -729,9 +730,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6ACA41F915FC1D9000935EF6 /* AppDelegate.m in Sources */,
-				6A225A232367A1D700F685C6 /* ArchiveUtil.m in Sources */,
+				5B21711E279B9AD900F91A2B /* ArchiveUtil.swift in Sources */,
+				5B21711B279B998C00F91A2B /* Chronosphere.m in Sources */,
 				6ACA41FF15FC1D9000935EF6 /* main.m in Sources */,
+				5B217126279BA37500F91A2B /* AppDelegate.swift in Sources */,
 				5BDF2CFF2791BECC00838ADB /* InputSourceHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
