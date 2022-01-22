@@ -15,6 +15,7 @@ private let kChooseCandidateUsingSpaceKey = "ChooseCandidateUsingSpaceKey"
 private let kUseWinNT351BPMF = "UseWinNT351BPMF"
 private let kSelectPhraseAfterCursorAsCandidate = "SelectPhraseAfterCursorAsCandidate"
 private let kUseHorizontalCandidateList = "UseHorizontalCandidateList"
+private let kCNS11643EnabledKey = "CNS11643Enabled"
 private let kChineseConversionEnabledKey = "ChineseConversionEnabled"
 private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
 
@@ -52,6 +53,11 @@ private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
         // 預設橫向選字窗，不爽請自行改成縱向選字窗
         if UserDefaults.standard.object(forKey: kUseHorizontalCandidateList) == nil {
             UserDefaults.standard.set(Preferences.useHorizontalCandidateList, forKey: kUseHorizontalCandidateList)
+        }
+        
+        // 預設停用全字庫支援
+        if UserDefaults.standard.object(forKey: kCNS11643EnabledKey) == nil {
+            UserDefaults.standard.set(Preferences.cns11643Enabled, forKey: kCNS11643EnabledKey)
         }
         
         // 預設停用繁體轉康熙模組

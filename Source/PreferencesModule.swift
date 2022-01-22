@@ -17,6 +17,7 @@ private let kSelectPhraseAfterCursorAsCandidatePreferenceKey = "SelectPhraseAfte
 private let kUseHorizontalCandidateListPreferenceKey = "UseHorizontalCandidateList"
 private let kComposingBufferSizePreferenceKey = "ComposingBufferSize"
 private let kChooseCandidateUsingSpaceKey = "ChooseCandidateUsingSpaceKey"
+private let kCNS11643EnabledKey = "CNS11643Enabled"
 private let kChineseConversionEnabledKey = "ChineseConversionEnabled"
 private let kHalfWidthPunctuationEnabledKey = "HalfWidthPunctuationEnable"
 private let kEscToCleanInputBufferKey = "EscToCleanInputBuffer"
@@ -175,6 +176,7 @@ struct ComposingBufferSize {
         defaults.removeObject(forKey: kUseHorizontalCandidateListPreferenceKey)
         defaults.removeObject(forKey: kComposingBufferSizePreferenceKey)
         defaults.removeObject(forKey: kChooseCandidateUsingSpaceKey)
+        defaults.removeObject(forKey: kCNS11643EnabledKey)
         defaults.removeObject(forKey: kChineseConversionEnabledKey)
         defaults.removeObject(forKey: kHalfWidthPunctuationEnabledKey)
         defaults.removeObject(forKey: kEscToCleanInputBufferKey)
@@ -238,6 +240,15 @@ struct ComposingBufferSize {
         shouldNotFartInLieuOfBeep = !shouldNotFartInLieuOfBeep
         UserDefaults.standard.set(shouldNotFartInLieuOfBeep, forKey: kShouldNotFartInLieuOfBeep)
         return shouldNotFartInLieuOfBeep
+    }
+
+    @UserDefault(key: kCNS11643EnabledKey, defaultValue: false)
+    @objc static var cns11643Enabled: Bool
+
+    @objc static func toggleCNS11643Enabled() -> Bool {
+        cns11643Enabled = !cns11643Enabled
+        UserDefaults.standard.set(cns11643Enabled, forKey: kCNS11643EnabledKey)
+        return cns11643Enabled
     }
 
     @UserDefault(key: kChineseConversionEnabledKey, defaultValue: false)
