@@ -26,11 +26,9 @@ permission-check:
 	[ -w "$(DSTROOT)" ] && [ -w "$(VC_APP_ROOT)" ] || sudo chown -R ${USER} "$(DSTROOT)"
 
 install-debug: permission-check
-	rm -rf "$(VC_APP_ROOT)"
 	open Build/Products/Debug/vChewingInstaller.app
 
 install-release: permission-check
-	rm -rf "$(VC_APP_ROOT)"
 	open Build/Products/Release/vChewingInstaller.app
 
 .PHONY: clean
