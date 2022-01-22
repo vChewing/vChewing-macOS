@@ -35,3 +35,4 @@
 "Maximum 15 candidate keys allowed." = "言選り用キー陣列には最多１５つキー登録できます。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 言葉置換機能稼働中、新添付言葉にも影響。";
 "NT351 BPMF EMU" = "全候補入力モード";
+"Reboot vChewing…" = "入力アプリ再起動…";
