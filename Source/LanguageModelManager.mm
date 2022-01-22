@@ -64,6 +64,23 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     glanguageModelCoreCHS.loadCNSData([[self cnsDataPath] UTF8String]);
 }
 
++ (BOOL)checkIfCNSDataExistAndHashMatched
+{
+    if (![self checkIfUserDataFolderExists]) {
+        NSLog(@"User Data Folder N/A.");
+        return NO;
+    }
+    if (![self checkIfFileExist:[self cnsDataPath]]) {
+        NSLog(@"Extracted CNS Data Not Found.");
+        return NO;
+    }
+    if ([AWFileHash md5HashOfFileAtPath:[self cnsDataPath]] != [[NSUserDefaults standardUserDefaults] objectForKey:kMD5HashCNSData]) {
+        NSLog(@"Existing CNS CSV Data fingerprint mismatch, must be tampered since it gets extracted.");
+        return NO;
+    }
+    return YES;
+}
+
 + (void)loadUserPhrases
 {
     glanguageModelCoreCHT.loadUserPhrases([[self userPhrasesDataPath:kBopomofoModeIdentifierCHT] UTF8String], [[self excludedPhrasesDataPath:kBopomofoModeIdentifierCHT] UTF8String]);
