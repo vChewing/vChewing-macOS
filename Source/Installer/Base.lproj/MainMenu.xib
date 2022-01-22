@@ -271,6 +271,7 @@ Gw
             <connections>
                 <outlet property="appCopyrightLabel" destination="03l-rN-zf9" id="XS5-cZ-k9H"/>
                 <outlet property="appEULAContent" destination="47J-tO-8TZ" id="kRU-X2-8kX"/>
+                <outlet property="appNameLabel" destination="bzR-Oa-BZa" id="swF-1l-dhS"/>
                 <outlet property="appVersionLabel" destination="z1m-8k-Z63" id="75X-uy-0Iz"/>
                 <outlet property="cancelButton" destination="592" id="710"/>
                 <outlet property="installButton" destination="575" id="709"/>
