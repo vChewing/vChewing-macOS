@@ -167,6 +167,9 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     [menu addItemWithTitle:NSLocalizedString(@"vChewing Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""];
     [menu addItemWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""];
     [menu addItemWithTitle:NSLocalizedString(@"About vChewing…", @"") action:@selector(showAbout:) keyEquivalent:@""];
+    if (optionKeyPressed) {
+        [menu addItemWithTitle:NSLocalizedString(@"Reboot vChewing…", @"") action:@selector(selfTerminate:) keyEquivalent:@""];
+    }
     return menu;
 }
 
@@ -1523,6 +1526,12 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         vChewingLM *lm = [LanguageModelManager languageModelCoreCHS];
         lm->setPhraseReplacementEnabled(enabled);
     }
+}
+
+- (void)selfTerminate:(id)sender
+{
+    NSLog(@"vChewing App self-terminated on request.");
+    [NSApplication.sharedApplication terminate:nil];
 }
 
 - (void)checkForUpdate:(id)sender

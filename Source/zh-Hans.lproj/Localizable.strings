@@ -35,3 +35,4 @@
 "Maximum 15 candidate keys allowed." = "选字键最多只能指定十五个。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 语汇置换功能已启用，会波及语汇自订。";
 "NT351 BPMF EMU" = "模拟逐字选字输入";
+"Reboot vChewing…" = "重新启动输入法…";
