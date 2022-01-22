@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)loadDataModels;
 + (void)deployZipDataFile:(NSString *)filenameWithoutExtension;
 + (void)loadCNSData;
++ (BOOL)checkIfCNSDataExistAndHashMatched;
 + (void)loadUserPhrases;
 + (void)loadUserPhraseReplacement;
 + (BOOL)checkIfUserLanguageModelFilesExist;
