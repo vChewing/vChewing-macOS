@@ -41,7 +41,7 @@ bool FastLM::open(const char *path)
     char z;
     zfd.get(z);
     if(z!='\n'){
-        syslog(LOG_CONS, "REPORT: File is not ended with a new line.\n");
+        syslog(LOG_CONS, "REPORT: Core Language Data file is not ended with a new line.\n");
         syslog(LOG_CONS, "PROCEDURE: Trying to insert a new line as EOF before per-line check process.\n");
         ofstream zfdo(path, std::ios_base::app);
         zfdo << std::endl;
