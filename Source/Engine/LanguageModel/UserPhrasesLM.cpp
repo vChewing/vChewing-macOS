@@ -7,12 +7,12 @@
  */
 
 #include "UserPhrasesLM.h"
-
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <fstream>
 #include <unistd.h>
+#include <syslog.h>
 
 #include "KeyValueBlobReader.h"
 
@@ -36,6 +36,22 @@ bool UserPhrasesLM::open(const char *path)
 {
     if (data) {
         return false;
+    }
+
+    std::fstream zfd(path);
+    zfd.seekg(-1,std::ios_base::end);
+    char z;
+    zfd.get(z);
+    if(z!='\n'){
+        syslog(LOG_CONS, "REPORT: User Phrase Data File is not ended with a new line.\n");
+        syslog(LOG_CONS, "PROCEDURE: Trying to insert a new line as EOF before per-line check process.\n");
+        std::ofstream zfdo(path, std::ios_base::app);
+        zfdo << std::endl;
+        zfdo.close();
+        if (zfdo.fail()) {
+            syslog(LOG_CONS, "REPORT: Failed to append a newline to the data file. Insufficient Privileges?\n");
+            return false;
+        }
     }
 
     fd = ::open(path, O_RDONLY);
