@@ -126,7 +126,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
         return NO;
     }
 
-    BOOL shuoldAddLineBreakAtFront = NO;
+    BOOL shouldAddLineBreakAtFront = NO;
     NSString *path = [self userPhrasesDataPath:inputMode];
 
     if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
@@ -140,7 +140,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
                 NSData *data = [readFile readDataToEndOfFile];
                 const void *bytes = [data bytes];
                 if (*(char *)bytes != '\n') {
-                    shuoldAddLineBreakAtFront = YES;
+                    shouldAddLineBreakAtFront = YES;
                 }
                 [readFile closeFile];
             }
@@ -148,7 +148,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     }
 
     NSMutableString *currentMarkedPhrase = [NSMutableString string];
-    if (shuoldAddLineBreakAtFront) {
+    if (shouldAddLineBreakAtFront) {
         [currentMarkedPhrase appendString:@"\n"];
     }
     [currentMarkedPhrase appendString:userPhrase];
