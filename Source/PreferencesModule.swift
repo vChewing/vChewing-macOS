@@ -257,7 +257,7 @@ struct ComposingBufferSize {
         return halfWidthPunctuationEnabled
     }
 
-    @UserDefault(key: kEscToCleanInputBufferKey, defaultValue: false)
+    @UserDefault(key: kEscToCleanInputBufferKey, defaultValue: true)
     @objc static var escToCleanInputBuffer: Bool
 
     // MARK: Optional settings
