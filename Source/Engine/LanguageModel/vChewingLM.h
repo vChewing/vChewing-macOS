@@ -10,8 +10,9 @@
 #define VCHEWINGLM_H
 
 #include <stdio.h>
-#include "UserPhrasesLM.h"
 #include "FastLM.h"
+#include "CNSLM.h"
+#include "UserPhrasesLM.h"
 #include "PhraseReplacementMap.h"
 #include <unordered_set>
 
@@ -25,7 +26,9 @@ public:
     ~vChewingLM();
 
     void loadLanguageModel(const char* languageModelPath);
+    void loadCNSData(const char* cnsDataPath);
     void loadUserPhrases(const char* userPhrasesPath, const char* excludedPhrasesPath);
+
     void loadPhraseReplacementMap(const char* phraseReplacementPath);
 
     const vector<Bigram> bigramsForKeys(const string& preceedingKey, const string& key);
@@ -41,6 +44,7 @@ protected:
         std::unordered_set<string>& insertedValues);
 
     FastLM m_languageModel;
+    CNSLM m_cnsData;
     UserPhrasesLM m_userPhrases;
     UserPhrasesLM m_excludedPhrases;
     PhraseReplacementMap m_phraseReplacement;

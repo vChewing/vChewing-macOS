@@ -32,6 +32,14 @@ void vChewingLM::loadLanguageModel(const char* languageModelDataPath)
     }
 }
 
+void vChewingLM::loadCNSData(const char* cnsDataPath)
+{
+    if (cnsDataPath) {
+        m_cnsData.close();
+        m_cnsData.open(cnsDataPath);
+    }
+}
+
 void vChewingLM::loadUserPhrases(const char* userPhrasesDataPath,
                                  const char* excludedPhrasesDataPath)
 {

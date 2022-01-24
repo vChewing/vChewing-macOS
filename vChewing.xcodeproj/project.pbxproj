@@ -40,6 +40,7 @@
 		5BDD25F8279D6D1200AA18F8 /* zip.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BDD25E7279D64FB00AA18F8 /* zip.m */; };
 		5BDD25F9279D6D1200AA18F8 /* ioapi.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BDD25E8279D64FB00AA18F8 /* ioapi.m */; };
 		5BDD25FA279D6D1200AA18F8 /* mztools.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BDD25E9279D64FB00AA18F8 /* mztools.m */; };
+		5BDD25FD279D6D6300AA18F8 /* CNSLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BDD25FB279D6D6200AA18F8 /* CNSLM.cpp */; };
 		5BDF2CFE2791BE4400838ADB /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */; };
 		5BDF2CFF2791BECC00838ADB /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */; };
 		5BDF2D012791C03B00838ADB /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDF2D002791C03B00838ADB /* PreferencesWindowController.swift */; };
@@ -158,6 +159,8 @@
 		5BDD25F0279D64FB00AA18F8 /* SSZipArchive.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SSZipArchive.m; sourceTree = "<group>"; };
 		5BDD25F1279D65CB00AA18F8 /* UNICHARS.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; name = UNICHARS.zip; path = Data/components/common/UNICHARS.zip; sourceTree = "<group>"; };
 		5BDD25F3279D677F00AA18F8 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		5BDD25FB279D6D6200AA18F8 /* CNSLM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CNSLM.cpp; sourceTree = "<group>"; };
+		5BDD25FC279D6D6300AA18F8 /* CNSLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNSLM.h; sourceTree = "<group>"; };
 		5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourceHelper.swift; sourceTree = "<group>"; };
 		5BDF2D002791C03B00838ADB /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
 		5BDF2D022791C71200838ADB /* NonModalAlertWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonModalAlertWindowController.swift; sourceTree = "<group>"; };
@@ -276,6 +279,8 @@
 		5BA8DAFE27928120009C9FFF /* LanguageModel */ = {
 			isa = PBXGroup;
 			children = (
+				5BDD25FB279D6D6200AA18F8 /* CNSLM.cpp */,
+				5BDD25FC279D6D6300AA18F8 /* CNSLM.h */,
 				5B5F4F8D27928F9300922DC2 /* vChewingLM.cpp */,
 				5B5F4F8C27928F9300922DC2 /* vChewingLM.h */,
 				6A0421A615FEF3F50061ED63 /* FastLM.cpp */,
@@ -792,6 +797,7 @@
 				5BC3EE1C278FC48C00F5E44C /* VTCandidateController.swift in Sources */,
 				5BDF2D032791C71200838ADB /* NonModalAlertWindowController.swift in Sources */,
 				5BC3EE1D278FC48C00F5E44C /* HorizontalCandidateController.swift in Sources */,
+				5BDD25FD279D6D6300AA18F8 /* CNSLM.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
