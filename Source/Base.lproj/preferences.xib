@@ -11,6 +11,7 @@
                 <outlet property="basisKeyboardLayoutButton" destination="124" id="135"/>
                 <outlet property="fontSizePopUpButton" destination="90" id="108"/>
                 <outlet property="selectionKeyComboBox" destination="uHU-aL-du7" id="cEx-Ui-Phc"/>
+                <outlet property="uiLanguageButton" destination="oS6-u5-7dP" id="V3u-XK-z7G"/>
                 <outlet property="window" destination="1" id="30"/>
             </connections>
         </customObject>
@@ -106,6 +107,9 @@
                                                                 </items>
                                                             </menu>
                                                         </popUpButtonCell>
+                                                        <connections>
+                                                            <action selector="updateUiLanguageAction:" target="-2" id="8XG-O0-Otf"/>
+                                                        </connections>
                                                     </popUpButton>
                                                     <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="L5M-VG-W1X">
                                                         <rect key="frame" x="42" y="99" width="123" height="17"/>
