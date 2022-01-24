@@ -1570,8 +1570,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     if (![self _checkUserFiles]) {
         return;
     }
-    NSURL *url = [NSURL fileURLWithPath:path];
-    [[NSWorkspace sharedWorkspace] openURL:url];
+    [[NSWorkspace sharedWorkspace] openFile:path withApplication:@"TextEdit"];
 }
 
 - (void)openUserPhrases:(id)sender
