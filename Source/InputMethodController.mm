@@ -169,6 +169,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     [menu addItemWithTitle:NSLocalizedString(@"About vChewing…", @"") action:@selector(showAbout:) keyEquivalent:@""];
     if (optionKeyPressed) {
         [menu addItemWithTitle:NSLocalizedString(@"Reboot vChewing…", @"") action:@selector(selfTerminate:) keyEquivalent:@""];
+        [menu addItemWithTitle:NSLocalizedString(@"Deploy Zip Data…", @"") action:@selector(cnsDeploy:) keyEquivalent:@""];
     }
     return menu;
 }
@@ -1548,6 +1549,11 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 
     return YES;
+}
+
+- (void)cnsDeploy:(id)sender
+{
+    [LanguageModelManager deployZipDataFile:@"UNICHARS"];
 }
 
 - (void)_openUserFile:(NSString *)path

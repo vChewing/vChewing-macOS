@@ -137,8 +137,8 @@
 /* Class = "NSBox"; title = "Output Settings"; ObjectID = "Uyz-xL-TVN"; */
 "Uyz-xL-TVN.title" = "输出设定";
 
-/* Class = "NSButtonCell"; title = "Enable CNS11643 Support"; ObjectID = "W24-T4-cg0"; */
-"W24-T4-cg0.title" = "启用 CNS11643 全字库支援";
+/* Class = "NSButtonCell"; title = "Enable CNS11643 Support (2022-01-07)"; ObjectID = "W24-T4-cg0"; */
+"W24-T4-cg0.title" = "启用 CNS11643 全字库支援 (2022-01-07)";
 
 /* Class = "NSBox"; title = "Keyboard Layout"; ObjectID = "Wvt-HE-LOv"; */
 "Wvt-HE-LOv.title" = "键盘布局";
