@@ -59,6 +59,10 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
 
 + (void)loadCNSData
 {
+    if (!self.checkIfCNSDataExistAndHashMatched) {
+        [self deployZipDataFile:@"UNICHARS"];
+    }
+
     glanguageModelCoreCHT.loadCNSData([[self cnsDataPath] UTF8String]);
     glanguageModelCoreCHS.loadCNSData([[self cnsDataPath] UTF8String]);
 }
