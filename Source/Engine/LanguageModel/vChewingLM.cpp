@@ -76,7 +76,7 @@ const vector<Unigram> vChewingLM::unigramsForKey(const string& key)
     
     if (m_userPhrases.hasUnigramsForKey(key)) {
         vector<Unigram> rawUserUnigrams = m_userPhrases.unigramsForKey(key);
-        vector<Unigram> filterredUserUnigrams = m_userPhrases.unigramsForKey(key);
+        vector<Unigram> filterredUserUnigrams;
 
         for (auto&& unigram : rawUserUnigrams) {
             if (excludedValues.find(unigram.keyValue.value) == excludedValues.end()) {
