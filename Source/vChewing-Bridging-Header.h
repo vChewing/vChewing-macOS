@@ -14,6 +14,7 @@
 #import "SSZipArchive.h" // Zip Archive Support;
 @interface LanguageModelManager : NSObject
 + (void)loadDataModels;
++ (void)loadCNSData;
 + (void)loadUserPhrases;
 + (void)loadUserPhraseReplacement;
 @end
