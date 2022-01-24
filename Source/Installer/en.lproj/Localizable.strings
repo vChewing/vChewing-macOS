@@ -1,4 +1,3 @@
-"%@ (for version %@)" = "%1$@ (for version %2$@)";
 "Upgrade" = "Accept & Upgrade";
 "Cancel" = "Cancel";
 "Cannot activate the input method." = "Cannot activate the input method.";
@@ -7,11 +6,9 @@
 "Installation Successful" = "Installation Successful";
 "OK" = "OK";
 "vChewing is ready to use." = "vChewing is ready to use.";
-
 "Stopping the old version. This may take up to one minute…" = "Stopping the old version. This may take up to one minute…";
 "Attention" = "Attention";
 "vChewing is upgraded, but please log out or reboot for the new version to be fully functional." = "vChewing is upgraded, but please log out or reboot for the new version to be fully functional.";
-
 "Fatal Error" = "Fatal Error";
 "Abort" = "Abort";
 "Cannot register input source %@ at %@." = "Cannot register input source %@ at %@.";

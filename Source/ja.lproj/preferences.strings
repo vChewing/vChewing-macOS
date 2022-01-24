@@ -1,36 +1,36 @@
 
 /* Class = "NSWindow"; title = "vChewing Preferences"; ObjectID = "1"; */
-"1.title" = "威注音偏好設定";
+"1.title" = "威注音アプリ機能設定";
 
 /* Class = "NSMenu"; title = "OtherViews"; ObjectID = "5"; */
 "5.title" = "OtherViews";
 
 /* Class = "NSMenuItem"; title = "Standard"; ObjectID = "6"; */
-"6.title" = "微軟/大千/王安/國喬/零壹/仲鼎";
+"6.title" = "標準配列（Microsoft・大千・王安など）";
 
 /* Class = "NSMenuItem"; title = "ETen"; ObjectID = "7"; */
-"7.title" = "倚天傳統";
+"7.title" = "倚天伝統配列";
 
 /* Class = "NSMenuItem"; title = "Hsu"; ObjectID = "8"; */
-"8.title" = "許氏（國音＆自然）";
+"8.title" = "許氏国音自然配列";
 
 /* Class = "NSMenuItem"; title = "ETen26"; ObjectID = "9"; */
-"9.title" = "倚天二十六鍵";
+"9.title" = "倚天２６キー配列";
 
 /* Class = "NSMenuItem"; title = "Hanyu Pinyin"; ObjectID = "10"; */
-"10.title" = "漢語拼音二式（字母拼音+ 12345 數字標調）";
+"10.title" = "漢語弁音（ローマ字＋数字音調）";
 
 /* Class = "NSTextFieldCell"; title = "Bopomofo:"; ObjectID = "12"; */
-"12.title" = "注音鍵盤佈局:";
+"12.title" = "注音キーボード配列:";
 
 /* Class = "NSTextFieldCell"; title = "Choose the cursor position where you want to list possible candidates."; ObjectID = "14"; */
-"14.title" = "用以觸發選字的游標相對位置：";
+"14.title" = "カーソルはどこで入力候補を呼び出すかとご選択ください：";
 
 /* Class = "NSButtonCell"; title = "Cursor to the front of the phrase (like Matsushita Hanin IME)"; ObjectID = "16"; */
-"16.title" = "游標至於詞語前方 // 松下漢音風格";
+"16.title" = "単語の前で // パナソニック漢音の入力スタイル";
 
 /* Class = "NSButtonCell"; title = "Cursor to the rear of the phrase (like MS New-Phonetic IME)"; ObjectID = "17"; */
-"17.title" = "游標至於詞語後方 // 微軟新注音風格";
+"17.title" = "単語の後で // Microsoft 新注音の入力スタイル";
 
 /* Class = "NSButtonCell"; title = "Radio"; ObjectID = "18"; */
 "18.title" = "Radio";
@@ -39,16 +39,16 @@
 "20.title" = "Radio";
 
 /* Class = "NSButtonCell"; title = "Horizontal"; ObjectID = "21"; */
-"21.title" = "橫向佈局";
+"21.title" = "横型陳列";
 
 /* Class = "NSButtonCell"; title = "Vertical"; ObjectID = "22"; */
-"22.title" = "縱向佈局";
+"22.title" = "縦型陳列";
 
 /* Class = "NSTextFieldCell"; title = "Candidate List Layout:"; ObjectID = "24"; */
-"24.title" = "候選字窗佈局:";
+"24.title" = "入力候補陳列の仕様:";
 
 /* Class = "NSTextFieldCell"; title = "Candidate UI font size:"; ObjectID = "29"; */
-"29.title" = "字型大小設定:";
+"29.title" = "候補文字の字号:";
 
 /* Class = "NSMenu"; title = "OtherViews"; ObjectID = "92"; */
 "92.title" = "OtherViews";
@@ -78,10 +78,10 @@
 "101.title" = "96";
 
 /* Class = "NSButtonCell"; title = "Press Space key chooses candidate"; ObjectID = "110"; */
-"110.title" = "敲空格鍵以選字";
+"110.title" = "スペースキーで入力候補を呼び出す";
 
 /* Class = "NSTextFieldCell"; title = "Alphanumeric:"; ObjectID = "126"; */
-"126.title" = "英數鍵盤佈局:";
+"126.title" = "英数キーボード配列:";
 
 /* Class = "NSMenu"; title = "OtherViews"; ObjectID = "128"; */
 "128.title" = "OtherViews";
@@ -90,76 +90,76 @@
 "137.title" = "IBM";
 
 /* Class = "NSTabViewItem"; label = "Keyboard"; ObjectID = "1AW-xf-c2f"; */
-"1AW-xf-c2f.label" = "鍵盤";
+"1AW-xf-c2f.label" = "キーボード";
 
 /* Class = "NSBox"; title = "General Settings"; ObjectID = "2Y6-Am-WM1"; */
-"2Y6-Am-WM1.title" = "一般設定";
+"2Y6-Am-WM1.title" = "全般設定";
 
 /* Class = "NSTextFieldCell"; title = "Choose which keys you prefer for selecting candidates."; ObjectID = "2pS-nv-te4"; */
-"2pS-nv-te4.title" = "選擇您所偏好的用來選字的按鍵組合。";
+"2pS-nv-te4.title" = "お好きなる言選り用キー陣列をお選びください。";
 
 /* Class = "NSButtonCell"; title = "Stop farting (when typed phonetic combination is invalid, etc.)"; ObjectID = "62u-jY-BRh"; */
-"62u-jY-BRh.title" = "不要放屁 // 例：當輸入的音韻有誤時，等";
+"62u-jY-BRh.title" = "マナーモード // 外すと入力間違の時に変な音が出る";
 
 /* Class = "NSTextFieldCell"; title = "UI language setting:"; ObjectID = "9DS-Rc-TXq"; */
-"9DS-Rc-TXq.title" = "介面語言設定:";
+"9DS-Rc-TXq.title" = "アプリ表示用言語:";
 
 /* Class = "NSButtonCell"; title = "Emulating Windows NT 3.51 legacy phonetic typing experience"; ObjectID = "ArK-Vk-OoT"; */
-"ArK-Vk-OoT.title" = "模擬 Windows NT 3.51 注音逐字選字輸入風格";
+"ArK-Vk-OoT.title" = "Windows NT 3.51 内蔵注音入力スタイルを真似する";
 
 /* Class = "NSButtonCell"; title = "Auto-convert traditional Chinese glyphs to KangXi characters"; ObjectID = "BSK-bH-Gct"; */
-"BSK-bH-Gct.title" = "自動將繁體中文字轉換為康熙字";
+"BSK-bH-Gct.title" = "自動的に繁体漢字を康熙文字と変換する";
 
 /* Class = "NSBox"; title = "Advanced Settings"; ObjectID = "E1l-m8-xgb"; */
-"E1l-m8-xgb.title" = "進階設定";
+"E1l-m8-xgb.title" = "詳細設定";
 
 /* Class = "NSMenuItem"; title = "English"; ObjectID = "FSG-lN-CJO"; */
-"FSG-lN-CJO.title" = "英文";
+"FSG-lN-CJO.title" = "英語";
 
 /* Class = "NSTextFieldCell"; title = "Selection Keys:"; ObjectID = "FnD-oH-El5"; */
-"FnD-oH-El5.title" = "選字鍵:";
+"FnD-oH-El5.title" = "言選り用キー:";
 
 /* Class = "NSMenuItem"; title = "Auto-Select"; ObjectID = "GlJ-Ns-9eE"; */
-"GlJ-Ns-9eE.title" = "自動選擇";
+"GlJ-Ns-9eE.title" = "システム設定に準ずる";
 
 /* Class = "NSTabViewItem"; label = "Dictionary"; ObjectID = "ISh-Da-hKv"; */
-"ISh-Da-hKv.label" = "辭典";
+"ISh-Da-hKv.label" = "辞書";
 
 /* Class = "NSTabViewItem"; label = "General"; ObjectID = "QUQ-oY-4Hc"; */
-"QUQ-oY-4Hc.label" = "一般";
+"QUQ-oY-4Hc.label" = "全般";
 
 /* Class = "NSTextFieldCell"; title = "Choose your preferred keyboard layout."; ObjectID = "RQ6-MS-m4C"; */
-"RQ6-MS-m4C.title" = "選擇您所偏好的鍵盤佈局。";
+"RQ6-MS-m4C.title" = "お好きなるキーボード配列をお選びください。";
 
 /* Class = "NSMenuItem"; title = "Traditional Chinese"; ObjectID = "TXr-FF-ehw"; */
-"TXr-FF-ehw.title" = "繁體中文";
+"TXr-FF-ehw.title" = "繁体中国語";
 
 /* Class = "NSBox"; title = "Output Settings"; ObjectID = "Uyz-xL-TVN"; */
-"Uyz-xL-TVN.title" = "輸出設定";
+"Uyz-xL-TVN.title" = "出力設定";
 
 /* Class = "NSButtonCell"; title = "Enable CNS11643 Support"; ObjectID = "W24-T4-cg0"; */
-"W24-T4-cg0.title" = "啟用 CNS11643 全字庫支援";
+"W24-T4-cg0.title" = "全字庫モード // ほぼ全ての Unicode 漢字を入力できる";
 
 /* Class = "NSBox"; title = "Keyboard Layout"; ObjectID = "Wvt-HE-LOv"; */
-"Wvt-HE-LOv.title" = "鍵盤佈局";
+"Wvt-HE-LOv.title" = "キーボード配列";
 
 /* Class = "NSButtonCell"; title = "Check for updates automatically"; ObjectID = "Z9t-P0-BLF"; */
-"Z9t-P0-BLF.title" = "自動檢查軟體更新";
+"Z9t-P0-BLF.title" = "アプリの更新通知を受く";
 
 /* Class = "NSTextFieldCell"; title = "Change user interface language."; ObjectID = "ZEv-Q2-mYL"; */
-"ZEv-Q2-mYL.title" = "變更使用者介面語言。";
+"ZEv-Q2-mYL.title" = "アプリ表示用言語をご指定ください。";
 
 /* Class = "NSMenuItem"; title = "Simplified Chinese"; ObjectID = "akC-2g-ybz"; */
-"akC-2g-ybz.title" = "簡體中文";
+"akC-2g-ybz.title" = "簡体中国語";
 
 /* Class = "NSButtonCell"; title = "Press ESC key clears entire input buffer"; ObjectID = "f2j-xD-4xK"; */
-"f2j-xD-4xK.title" = "敲 ESC 鍵以清空整個輸入緩衝區";
+"f2j-xD-4xK.title" = "ESC キーで入力緩衝列を消す";
 
 /* Class = "NSTextFieldCell"; title = "Change UI font size of candidate window for a better visual clarity."; ObjectID = "iRg-wx-Nx2"; */
-"iRg-wx-Nx2.title" = "變更候選字窗的字型大小。";
+"iRg-wx-Nx2.title" = "入力候補陣列の候補文字の字号をご指定ください。";
 
 /* Class = "NSTextFieldCell"; title = "This dictionary page is under development."; ObjectID = "j48-5a-cEs"; */
-"j48-5a-cEs.title" = "該辭典頁面相關功能正在施工。";
+"j48-5a-cEs.title" = "このページの機能はまだまだ施工中ですが……";
 
 /* Class = "NSComboBoxCell"; jQC-12-UuK.ibShadowedObjectValues[0] = "Item 1"; ObjectID = "jQC-12-UuK"; */
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
@@ -174,10 +174,10 @@
 "rVQ-Hx-cGi.title" = "和語";
 
 /* Class = "NSBox"; title = "Dictionary Settings"; ObjectID = "s4r-ji-vbr"; */
-"s4r-ji-vbr.title" = "辭典設定";
+"s4r-ji-vbr.title" = "辞書設定";
 
 /* Class = "NSTextFieldCell"; title = "Choose your preferred layout of the candidate window."; ObjectID = "xC5-yV-1W1"; */
-"xC5-yV-1W1.title" = "選擇您所偏好的候選字窗佈局。";
+"xC5-yV-1W1.title" = "入力候補陳列の仕様をご指定ください。";
 
 /* Class = "NSTabViewItem"; label = "Advanced"; ObjectID = "xrE-8T-WKO"; */
-"xrE-8T-WKO.label" = "進階";
+"xrE-8T-WKO.label" = "詳細";
