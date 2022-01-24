@@ -32,13 +32,6 @@ static NSString *const kBopomofoModeIdentifierCHS = @"org.atelierInmu.inputmetho
 
 @implementation LanguageModelManager
 
-static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewingLM &lm)
-{
-    Class cls = NSClassFromString(@"vChewingInputMethodController");
-    NSString *dataPath = [[NSBundle bundleForClass:cls] pathForResource:filenameWithoutExtension ofType:@"txt"];
-    lm.loadLanguageModel([dataPath UTF8String]);
-}
-
 + (void)deployZipDataFile:(NSString *)filenameWithoutExtension
 {
     Class cls = NSClassFromString(@"vChewingInputMethodController");
@@ -47,10 +40,23 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     [SSZipArchive unzipFileAtPath:zipPath toDestination:destinationPath];
 }
 
+static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewingLM &lm)
+{
+    Class cls = NSClassFromString(@"vChewingInputMethodController");
+    NSString *dataPath = [[NSBundle bundleForClass:cls] pathForResource:filenameWithoutExtension ofType:@"txt"];
+    lm.loadLanguageModel([dataPath UTF8String]);
+}
+
 + (void)loadDataModels
 {
     LTLoadLanguageModelFile(@"data-cht", glanguageModelCoreCHT);
     LTLoadLanguageModelFile(@"data-chs", glanguageModelCoreCHS);
+}
+
++ (void)loadCNSData
+{
+    glanguageModelCoreCHT.loadCNSData([[self cnsDataPath] UTF8String]);
+    glanguageModelCoreCHS.loadCNSData([[self cnsDataPath] UTF8String]);
 }
 
 + (void)loadUserPhrases
@@ -201,7 +207,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
 }
 
-+ (NSString *)cnsDataPath:(NSString *)inputMode
++ (NSString *)cnsDataPath
 {
     return [[self dataFolderPath] stringByAppendingPathComponent:@"UNICHARS.csv"];
 }

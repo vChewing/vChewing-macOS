@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)loadDataModels;
 + (void)deployZipDataFile:(NSString *)filenameWithoutExtension;
++ (void)loadCNSData;
 + (void)loadUserPhrases;
 + (void)loadUserPhraseReplacement;
 + (BOOL)checkIfUserLanguageModelFilesExist;
@@ -25,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)userPhrasesDataPath:(NSString *)inputMode;
 + (NSString *)excludedPhrasesDataPath:(NSString *)inputMode;
 + (NSString *)phraseReplacementDataPath:(NSString *)inputMode;
-+ (NSString *)cnsDataPath:(NSString *)inputMode;
++ (NSString *)cnsDataPath;
 
 @property (class, readonly, nonatomic) NSString *dataFolderPath;
 @property (class, readonly, nonatomic) vChewing::vChewingLM *languageModelCoreCHT;
