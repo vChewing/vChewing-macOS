@@ -102,6 +102,7 @@
                                                                     <menuItem title="English" id="FSG-lN-CJO"/>
                                                                     <menuItem title="Simplified Chinese" id="akC-2g-ybz"/>
                                                                     <menuItem title="Traditional Chinese" id="TXr-FF-ehw"/>
+                                                                    <menuItem title="Japanese" id="rVQ-Hx-cGi" userLabel="Japanese"/>
                                                                 </items>
                                                             </menu>
                                                         </popUpButtonCell>
