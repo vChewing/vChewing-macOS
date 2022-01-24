@@ -324,6 +324,7 @@
 		5BDD25E0279D64FB00AA18F8 /* 3rdParty */ = {
 			isa = PBXGroup;
 			children = (
+				6A0D4F2215FC0EB100ABF4B3 /* OpenVanilla */,
 				5BDD25E1279D64FB00AA18F8 /* AWFileHash */,
 				5BDD25E4279D64FB00AA18F8 /* SSZipArchive */,
 			);
@@ -480,8 +481,6 @@
 				5BC2D2832793B434002C0BEC /* vChewing */,
 				5BA8DAFE27928120009C9FFF /* LanguageModel */,
 				6A0D4F1315FC0EB100ABF4B3 /* Gramambular */,
-				6A0D4F1F15FC0EB100ABF4B3 /* Mandarin */,
-				6A0D4F2215FC0EB100ABF4B3 /* OpenVanilla */,
 			);
 			path = Engine;
 			sourceTree = "<group>";
@@ -516,6 +515,7 @@
 		6A0D4F2215FC0EB100ABF4B3 /* OpenVanilla */ = {
 			isa = PBXGroup;
 			children = (
+				6A0D4F1F15FC0EB100ABF4B3 /* Mandarin */,
 				6A0D4F2315FC0EB100ABF4B3 /* OpenVanilla.h */,
 				6A0D4F2415FC0EB100ABF4B3 /* OVAroundFilter.h */,
 				6A0D4F2515FC0EB100ABF4B3 /* OVBase.h */,
