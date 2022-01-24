@@ -112,6 +112,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
         // create the lattice builder
         _languageModel = [LanguageModelManager languageModelCoreCHT];
         _languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
+        _languageModel->setCNSEnabled(Preferences.cns11643Enabled);
         _userOverrideModel = [LanguageModelManager userOverrideModelCHT];
 
         _builder = new BlockReadingBuilder(_languageModel);
@@ -139,7 +140,11 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     NSMenuItem *useWinNT351BPMFMenuItem = [menu addItemWithTitle:NSLocalizedString(@"NT351 BPMF EMU", @"") action:@selector(toggleWinNT351BPMFMode:) keyEquivalent:@"P"];
     useWinNT351BPMFMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
     useWinNT351BPMFMenuItem.state = Preferences.useWinNT351BPMF ? NSControlStateValueOn : NSControlStateValueOff;
-    
+
+    NSMenuItem *useCNS11643SupportMenuItem = [menu addItemWithTitle:NSLocalizedString(@"CNS11643 Mode", @"") action:@selector(toggleCNS11643Enabled:) keyEquivalent:@"L"];
+    useCNS11643SupportMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
+    useCNS11643SupportMenuItem.state = Preferences.cns11643Enabled ? NSControlStateValueOn : NSControlStateValueOff;
+
     NSMenuItem *chineseConversionMenuItem = [menu addItemWithTitle:NSLocalizedString(@"Force KangXi Writing", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"K"];
     chineseConversionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
     chineseConversionMenuItem.state = Preferences.chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
@@ -169,8 +174,6 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     [menu addItemWithTitle:NSLocalizedString(@"About vChewing…", @"") action:@selector(showAbout:) keyEquivalent:@""];
     if (optionKeyPressed) {
         [menu addItemWithTitle:NSLocalizedString(@"Reboot vChewing…", @"") action:@selector(selfTerminate:) keyEquivalent:@""];
-        [menu addItemWithTitle:NSLocalizedString(@"Deploy CNS Data…", @"") action:@selector(cnsDeploy:) keyEquivalent:@""];
-        [menu addItemWithTitle:NSLocalizedString(@"Load CNS Data…", @"") action:@selector(loadCNSData:) keyEquivalent:@""];
     }
     return menu;
 }
@@ -264,6 +267,9 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     // 自 Preferences 模組讀入自訂語彙置換功能開關狀態。
     newLanguageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
 
+    // 自 Preferences 模組讀取全字庫模式開關狀態。
+    newLanguageModel->setCNSEnabled(Preferences.cns11643Enabled);
+    
     // Only apply the changes if the value is changed
     if (![_inputMode isEqualToString:newInputMode]) {
         [[NSUserDefaults standardUserDefaults] synchronize];
@@ -1530,6 +1536,13 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 }
 
+- (void)toggleCNS11643Enabled:(id)sender
+{
+    _languageModel->setCNSEnabled([Preferences toggleCNS11643Enabled]);
+    // 注意上面這一行已經動過開關了，所以接下來就不要 toggle。
+    [NotifierController notifyWithMessage:[NSString stringWithFormat:@"%@%@%@", NSLocalizedString(@"CNS11643 Mode", @""), @"\n", [Preferences cns11643Enabled] ? NSLocalizedString(@"NotificationSwitchON", @"") : NSLocalizedString(@"NotificationSwitchOFF", @"")] stay:NO];
+}
+
 - (void)selfTerminate:(id)sender
 {
     NSLog(@"vChewing App self-terminated on request.");
@@ -1550,21 +1563,6 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 
     return YES;
-}
-
-- (BOOL)_checkCNSFile
-{
-    if (![LanguageModelManager checkIfCNSDataExistAndHashMatched]) {
-        [self beep];
-        NSLog(@"_checkCNSFile failed in the InputMethodController.");
-        return NO;
-    }
-    return YES;
-}
-
-- (void)cnsDeploy:(id)sender
-{
-    [LanguageModelManager deployZipDataFile:@"UNICHARS"];
 }
 
 - (void)_openUserFile:(NSString *)path
@@ -1595,15 +1593,6 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 {
     [LanguageModelManager loadUserPhrases];
     [LanguageModelManager loadUserPhraseReplacement];
-}
-
-- (void)loadCNSData:(id)sender
-{
-    if (!self._checkCNSFile) {
-        [self beep];
-    } else {
-        [LanguageModelManager loadCNSData];
-    }
 }
 
 - (void)showAbout:(id)sender

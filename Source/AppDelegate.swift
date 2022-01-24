@@ -146,6 +146,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         LanguageModelManager.loadDataModels()
+        LanguageModelManager.loadCNSData()
         LanguageModelManager.loadUserPhrases()
         LanguageModelManager.loadUserPhraseReplacement()
 

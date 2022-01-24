@@ -93,7 +93,7 @@ const vector<Unigram> vChewingLM::unigramsForKey(const string& key)
         allUnigrams = filterAndTransformUnigrams(rawGlobalUnigrams, excludedValues, insertedValues);
     }
     
-    if (m_cnsModel.hasUnigramsForKey(key)) {
+    if (m_cnsModel.hasUnigramsForKey(key) && m_CNSEnabled) {
         vector<Unigram> rawCNSUnigrams = m_cnsModel.unigramsForKey(key);
         cnsUnigrams = filterAndTransformUnigrams(rawCNSUnigrams, excludedValues, insertedValues);
     }
