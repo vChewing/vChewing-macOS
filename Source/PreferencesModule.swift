@@ -41,9 +41,9 @@ private let kMaxCandidateListTextSize: CGFloat = 196
 // walks the grid with good performance slower Macs (like old PowerBooks)
 // will start to sputter beyond 12 such is the algorithmatic complexity
 // of the Viterbi algorithm used in the builder library (at O(N^2))
-private let kDefaultComposingBufferSize = 10
+private let kDefaultComposingBufferSize = 20
 private let kMinComposingBufferSize = 4
-private let kMaxComposingBufferSize = 20
+private let kMaxComposingBufferSize = 30
 
 private let kDefaultKeys = "123456789"
 
