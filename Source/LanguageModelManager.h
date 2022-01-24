@@ -10,12 +10,14 @@
 #import "FastLM.h"
 #import "UserOverrideModel.h"
 #import "vChewingLM.h"
+#import "SSZipArchive.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface LanguageModelManager : NSObject
 
 + (void)loadDataModels;
++ (void)deployZipDataFile:(NSString *)filenameWithoutExtension;
 + (void)loadUserPhrases;
 + (void)loadUserPhraseReplacement;
 + (BOOL)checkIfUserLanguageModelFilesExist;
@@ -23,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)userPhrasesDataPath:(NSString *)inputMode;
 + (NSString *)excludedPhrasesDataPath:(NSString *)inputMode;
 + (NSString *)phraseReplacementDataPath:(NSString *)inputMode;
++ (NSString *)cnsDataPath:(NSString *)inputMode;
 
 @property (class, readonly, nonatomic) NSString *dataFolderPath;
 @property (class, readonly, nonatomic) vChewing::vChewingLM *languageModelCoreCHT;

@@ -137,8 +137,8 @@
 /* Class = "NSBox"; title = "Output Settings"; ObjectID = "Uyz-xL-TVN"; */
 "Uyz-xL-TVN.title" = "出力設定";
 
-/* Class = "NSButtonCell"; title = "Enable CNS11643 Support"; ObjectID = "W24-T4-cg0"; */
-"W24-T4-cg0.title" = "全字庫モード // ほぼ全ての Unicode 漢字を入力できる";
+/* Class = "NSButtonCell"; title = "Enable CNS11643 Support (2022-01-07)"; ObjectID = "W24-T4-cg0"; */
+"W24-T4-cg0.title" = "全字庫モード // 入力可能の漢字数倍増 (2022-01-07)";
 
 /* Class = "NSBox"; title = "Keyboard Layout"; ObjectID = "Wvt-HE-LOv"; */
 "Wvt-HE-LOv.title" = "キーボード配列";

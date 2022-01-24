@@ -32,6 +32,14 @@
 		5BD0D19F279454F60008F48E /* Beep.aif in Resources */ = {isa = PBXBuildFile; fileRef = 5BD0D19E279454F60008F48E /* Beep.aif */; };
 		5BD0D1A4279463510008F48E /* clsOOBEDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0D1A3279463510008F48E /* clsOOBEDefaults.swift */; };
 		5BD13F482794F0A6000E429F /* PhraseReplacementMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B6797B42794822C004AC7CE /* PhraseReplacementMap.cpp */; };
+		5BDD25F2279D65CC00AA18F8 /* UNICHARS.zip in Resources */ = {isa = PBXBuildFile; fileRef = 5BDD25F1279D65CB00AA18F8 /* UNICHARS.zip */; };
+		5BDD25F4279D678600AA18F8 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BDD25F3279D677F00AA18F8 /* libz.tbd */; };
+		5BDD25F5279D6CFE00AA18F8 /* AWFileHash.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BDD25E3279D64FB00AA18F8 /* AWFileHash.m */; };
+		5BDD25F6279D6D0200AA18F8 /* SSZipArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BDD25F0279D64FB00AA18F8 /* SSZipArchive.m */; };
+		5BDD25F7279D6D1200AA18F8 /* unzip.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BDD25E6279D64FB00AA18F8 /* unzip.m */; };
+		5BDD25F8279D6D1200AA18F8 /* zip.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BDD25E7279D64FB00AA18F8 /* zip.m */; };
+		5BDD25F9279D6D1200AA18F8 /* ioapi.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BDD25E8279D64FB00AA18F8 /* ioapi.m */; };
+		5BDD25FA279D6D1200AA18F8 /* mztools.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BDD25E9279D64FB00AA18F8 /* mztools.m */; };
 		5BDF2CFE2791BE4400838ADB /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */; };
 		5BDF2CFF2791BECC00838ADB /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */; };
 		5BDF2D012791C03B00838ADB /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDF2D002791C03B00838ADB /* PreferencesWindowController.swift */; };
@@ -135,6 +143,21 @@
 		5BD0D19927943D390008F48E /* clsSFX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = clsSFX.swift; sourceTree = "<group>"; };
 		5BD0D19E279454F60008F48E /* Beep.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.aif; sourceTree = "<group>"; };
 		5BD0D1A3279463510008F48E /* clsOOBEDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = clsOOBEDefaults.swift; sourceTree = "<group>"; };
+		5BDD25E2279D64FB00AA18F8 /* AWFileHash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AWFileHash.h; sourceTree = "<group>"; };
+		5BDD25E3279D64FB00AA18F8 /* AWFileHash.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AWFileHash.m; sourceTree = "<group>"; };
+		5BDD25E6279D64FB00AA18F8 /* unzip.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = unzip.m; sourceTree = "<group>"; };
+		5BDD25E7279D64FB00AA18F8 /* zip.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = zip.m; sourceTree = "<group>"; };
+		5BDD25E8279D64FB00AA18F8 /* ioapi.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ioapi.m; sourceTree = "<group>"; };
+		5BDD25E9279D64FB00AA18F8 /* mztools.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = mztools.m; sourceTree = "<group>"; };
+		5BDD25EA279D64FB00AA18F8 /* crypt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
+		5BDD25EB279D64FB00AA18F8 /* zip.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = zip.h; sourceTree = "<group>"; };
+		5BDD25EC279D64FB00AA18F8 /* unzip.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = unzip.h; sourceTree = "<group>"; };
+		5BDD25ED279D64FB00AA18F8 /* mztools.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mztools.h; sourceTree = "<group>"; };
+		5BDD25EE279D64FB00AA18F8 /* ioapi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ioapi.h; sourceTree = "<group>"; };
+		5BDD25EF279D64FB00AA18F8 /* SSZipArchive.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SSZipArchive.h; sourceTree = "<group>"; };
+		5BDD25F0279D64FB00AA18F8 /* SSZipArchive.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SSZipArchive.m; sourceTree = "<group>"; };
+		5BDD25F1279D65CB00AA18F8 /* UNICHARS.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; name = UNICHARS.zip; path = Data/components/common/UNICHARS.zip; sourceTree = "<group>"; };
+		5BDD25F3279D677F00AA18F8 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourceHelper.swift; sourceTree = "<group>"; };
 		5BDF2D002791C03B00838ADB /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
 		5BDF2D022791C71200838ADB /* NonModalAlertWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonModalAlertWindowController.swift; sourceTree = "<group>"; };
@@ -233,6 +256,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6A38BC2815FC158A00A8A51F /* InputMethodKit.framework in Frameworks */,
+				5BDD25F4279D678600AA18F8 /* libz.tbd in Frameworks */,
 				D48550A325EBE689006A204C /* OpenCC in Frameworks */,
 				6A0D4EA715FC0D2D00ABF4B3 /* Cocoa.framework in Frameworks */,
 			);
@@ -292,6 +316,50 @@
 			path = SFX;
 			sourceTree = "<group>";
 		};
+		5BDD25E0279D64FB00AA18F8 /* 3rdParty */ = {
+			isa = PBXGroup;
+			children = (
+				5BDD25E1279D64FB00AA18F8 /* AWFileHash */,
+				5BDD25E4279D64FB00AA18F8 /* SSZipArchive */,
+			);
+			path = 3rdParty;
+			sourceTree = "<group>";
+		};
+		5BDD25E1279D64FB00AA18F8 /* AWFileHash */ = {
+			isa = PBXGroup;
+			children = (
+				5BDD25E2279D64FB00AA18F8 /* AWFileHash.h */,
+				5BDD25E3279D64FB00AA18F8 /* AWFileHash.m */,
+			);
+			path = AWFileHash;
+			sourceTree = "<group>";
+		};
+		5BDD25E4279D64FB00AA18F8 /* SSZipArchive */ = {
+			isa = PBXGroup;
+			children = (
+				5BDD25E5279D64FB00AA18F8 /* minizip */,
+				5BDD25EF279D64FB00AA18F8 /* SSZipArchive.h */,
+				5BDD25F0279D64FB00AA18F8 /* SSZipArchive.m */,
+			);
+			path = SSZipArchive;
+			sourceTree = "<group>";
+		};
+		5BDD25E5279D64FB00AA18F8 /* minizip */ = {
+			isa = PBXGroup;
+			children = (
+				5BDD25E6279D64FB00AA18F8 /* unzip.m */,
+				5BDD25E7279D64FB00AA18F8 /* zip.m */,
+				5BDD25E8279D64FB00AA18F8 /* ioapi.m */,
+				5BDD25E9279D64FB00AA18F8 /* mztools.m */,
+				5BDD25EA279D64FB00AA18F8 /* crypt.h */,
+				5BDD25EB279D64FB00AA18F8 /* zip.h */,
+				5BDD25EC279D64FB00AA18F8 /* unzip.h */,
+				5BDD25ED279D64FB00AA18F8 /* mztools.h */,
+				5BDD25EE279D64FB00AA18F8 /* ioapi.h */,
+			);
+			path = minizip;
+			sourceTree = "<group>";
+		};
 		5BE798A12792E50F00337FF9 /* UI */ = {
 			isa = PBXGroup;
 			children = (
@@ -339,6 +407,7 @@
 		6A0D4EA515FC0D2D00ABF4B3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5BDD25F3279D677F00AA18F8 /* libz.tbd */,
 				6A0D4EA915FC0D2D00ABF4B3 /* AppKit.framework */,
 				6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */,
 				6A0D4EAB15FC0D2D00ABF4B3 /* Foundation.framework */,
@@ -350,6 +419,7 @@
 		6A0D4EC215FC0D3C00ABF4B3 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				5BDD25E0279D64FB00AA18F8 /* 3rdParty */,
 				5BE798A12792E50F00337FF9 /* UI */,
 				5B58E87D278413E7003EA2AD /* BSDLicense.txt */,
 				6A38BBDD15FC115800A8A51F /* Data */,
@@ -480,6 +550,7 @@
 		6A0D4F4715FC0EB900ABF4B3 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				5BDD25F1279D65CB00AA18F8 /* UNICHARS.zip */,
 				5BD0D19E279454F60008F48E /* Beep.aif */,
 				5BD0D19327940E9D0008F48E /* Fart.aif */,
 				5BF4A70227844DC5007DC6E7 /* frmAboutWindow.xib */,
@@ -636,6 +707,7 @@
 				6A0D4F5815FC0EF900ABF4B3 /* Localizable.strings in Resources */,
 				6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */,
 				5BD0D19427940E9D0008F48E /* Fart.aif in Resources */,
+				5BDD25F2279D65CC00AA18F8 /* UNICHARS.zip in Resources */,
 				6A38BC1515FC117A00A8A51F /* data-cht.txt in Resources */,
 				6AFF97F2253B299E007F1C49 /* NonModalAlertWindowController.xib in Resources */,
 				5B58E87F278413E7003EA2AD /* BSDLicense.txt in Resources */,
@@ -690,7 +762,10 @@
 			files = (
 				5BDF2CFE2791BE4400838ADB /* InputSourceHelper.swift in Sources */,
 				5BC2D28B2793B8FB002C0BEC /* EmacsKeyHelper.swift in Sources */,
+				5BDD25F5279D6CFE00AA18F8 /* AWFileHash.m in Sources */,
+				5BDD25F8279D6D1200AA18F8 /* zip.m in Sources */,
 				5BD0D19A27943D390008F48E /* clsSFX.swift in Sources */,
+				5BDD25F9279D6D1200AA18F8 /* ioapi.m in Sources */,
 				5BE798A72793280C00337FF9 /* NotifierController.swift in Sources */,
 				5B5F4F93279294A300922DC2 /* LanguageModelManager.mm in Sources */,
 				6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */,
@@ -699,9 +774,11 @@
 				5BC2D2882793B434002C0BEC /* KeyValueBlobReader.cpp in Sources */,
 				5B5F4F8E27928F9300922DC2 /* vChewingLM.cpp in Sources */,
 				5BE798A42792E58A00337FF9 /* TooltipController.swift in Sources */,
+				5BDD25F6279D6D0200AA18F8 /* SSZipArchive.m in Sources */,
 				5BDF2D062791DFF200838ADB /* AppDelegate.swift in Sources */,
 				5BC3EE1B278FC48C00F5E44C /* VerticalCandidateController.swift in Sources */,
 				5B42B64027876FDC00BB9B9F /* UserOverrideModel.cpp in Sources */,
+				5BDD25F7279D6D1200AA18F8 /* unzip.m in Sources */,
 				5BD0D1A4279463510008F48E /* clsOOBEDefaults.swift in Sources */,
 				D427A9C125ED28CC005D43E0 /* OpenCCBridge.swift in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
@@ -711,6 +788,7 @@
 				5BC2D28D2793B98F002C0BEC /* PreferencesModule.swift in Sources */,
 				5B217128279BB22700F91A2B /* frmAboutWindow.swift in Sources */,
 				5BD13F482794F0A6000E429F /* PhraseReplacementMap.cpp in Sources */,
+				5BDD25FA279D6D1200AA18F8 /* mztools.m in Sources */,
 				5BC3EE1C278FC48C00F5E44C /* VTCandidateController.swift in Sources */,
 				5BDF2D032791C71200838ADB /* NonModalAlertWindowController.swift in Sources */,
 				5BC3EE1D278FC48C00F5E44C /* HorizontalCandidateController.swift in Sources */,

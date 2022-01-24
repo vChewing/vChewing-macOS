@@ -39,6 +39,14 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     lm.loadLanguageModel([dataPath UTF8String]);
 }
 
++ (void)deployZipDataFile:(NSString *)filenameWithoutExtension
+{
+    Class cls = NSClassFromString(@"vChewingInputMethodController");
+    NSString *zipPath = [[NSBundle bundleForClass:cls] pathForResource:filenameWithoutExtension ofType:@"zip"];
+    NSString *destinationPath = [self dataFolderPath];
+    [SSZipArchive unzipFileAtPath:zipPath toDestination:destinationPath];
+}
+
 + (void)loadDataModels
 {
     LTLoadLanguageModelFile(@"data-cht", glanguageModelCoreCHT);
@@ -193,7 +201,12 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
 }
 
- + (vChewingLM *)languageModelCoreCHT
++ (NSString *)cnsDataPath:(NSString *)inputMode
+{
+    return [[self dataFolderPath] stringByAppendingPathComponent:@"UNICHARS.csv"];
+}
+
++ (vChewingLM *)languageModelCoreCHT
 {
     return &glanguageModelCoreCHT;
 }
