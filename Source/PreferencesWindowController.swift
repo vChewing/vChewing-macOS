@@ -22,11 +22,40 @@ extension RangeReplaceableCollection where Element: Hashable {
 // the "InputMethodServerPreferencesWindowControllerClass" in Info.plist.
 @objc(PreferencesWindowController) class PreferencesWindowController: NSWindowController {
     @IBOutlet weak var fontSizePopUpButton: NSPopUpButton!
+    @IBOutlet weak var uiLanguageButton: NSPopUpButton!
     @IBOutlet weak var basisKeyboardLayoutButton: NSPopUpButton!
     @IBOutlet weak var selectionKeyComboBox: NSComboBox!
     @IBOutlet weak var clickedWhetherIMEShouldNotFartToggle: NSButton!
+    
+    var currentLanguageSelectItem: NSMenuItem? = nil
 
     override func awakeFromNib() {
+        let languages = ["auto", "en-US", "zh-CN", "zh-TW", "ja-JP"]
+        var autoSelectItem: NSMenuItem? = nil
+        var chosenLanguageItem: NSMenuItem? = nil
+        uiLanguageButton.menu?.removeAllItems()
+        
+        let appleLanguages = Preferences.appleLanguages
+        for language in languages {
+            let menuItem = NSMenuItem()
+            menuItem.title = NSLocalizedString(language, comment: "")
+            menuItem.representedObject = language
+            
+            if language == "auto" {
+                autoSelectItem = menuItem
+            }
+            
+            if !appleLanguages.isEmpty {
+                if appleLanguages[0] == language {
+                    chosenLanguageItem = menuItem
+                }
+            }
+            uiLanguageButton.menu?.addItem(menuItem)
+        }
+        
+        currentLanguageSelectItem = chosenLanguageItem ?? autoSelectItem
+        uiLanguageButton.select(currentLanguageSelectItem)
+
         let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
         var usKeyboardLayoutItem: NSMenuItem? = nil
         var chosenItem: NSMenuItem? = nil
@@ -122,6 +151,25 @@ extension RangeReplaceableCollection where Element: Hashable {
     @IBAction func updateBasisKeyboardLayoutAction(_ sender: Any) {
         if let sourceID = basisKeyboardLayoutButton.selectedItem?.representedObject as? String {
             Preferences.basisKeyboardLayout = sourceID
+        }
+    }
+    
+    @IBAction func updateUiLanguageAction(_ sender: Any) {
+        if let selectItem = uiLanguageButton.selectedItem {
+            if currentLanguageSelectItem == selectItem {
+                return
+            }
+        }
+        if let language = uiLanguageButton.selectedItem?.representedObject as? String {
+            if (language != "auto") {
+                Preferences.appleLanguages = [language]
+            }
+            else {
+                UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+            }
+            
+            NSLog("vChewing App self-terminated due to UI language change.")
+            NSApplication.shared.terminate(nil)
         }
     }
 

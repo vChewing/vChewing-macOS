@@ -13,6 +13,7 @@ private let kBasisKeyboardLayoutPreferenceKey = "BasisKeyboardLayout"  // alphan
 private let kFunctionKeyKeyboardLayoutPreferenceKey = "FunctionKeyKeyboardLayout"  // alphanumeric ("ASCII") input basi
 private let kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey = "FunctionKeyKeyboardLayoutOverrideIncludeShift" // whether include shif
 private let kCandidateListTextSizeKey = "CandidateListTextSize"
+private let kAppleLanguagesPreferencesKey = "AppleLanguages"
 private let kSelectPhraseAfterCursorAsCandidatePreferenceKey = "SelectPhraseAfterCursorAsCandidate"
 private let kUseHorizontalCandidateListPreferenceKey = "UseHorizontalCandidateList"
 private let kComposingBufferSizePreferenceKey = "ComposingBufferSize"
@@ -172,6 +173,7 @@ struct ComposingBufferSize {
         defaults.removeObject(forKey: kFunctionKeyKeyboardLayoutPreferenceKey)
         defaults.removeObject(forKey: kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey)
         defaults.removeObject(forKey: kCandidateListTextSizeKey)
+        defaults.removeObject(forKey: kAppleLanguagesPreferencesKey)
         defaults.removeObject(forKey: kSelectPhraseAfterCursorAsCandidatePreferenceKey)
         defaults.removeObject(forKey: kUseHorizontalCandidateListPreferenceKey)
         defaults.removeObject(forKey: kComposingBufferSizePreferenceKey)
@@ -189,6 +191,9 @@ struct ComposingBufferSize {
         defaults.removeObject(forKey: kMaxCandidateLength)
         defaults.removeObject(forKey: kShouldNotFartInLieuOfBeep)
     }
+    
+    @UserDefault(key: kAppleLanguagesPreferencesKey, defaultValue: [])
+    @objc static var appleLanguages: Array<String>
 
     @UserDefault(key: kKeyboardLayoutPreferenceKey, defaultValue: 0)
     @objc static var keyboardLayout: Int
