@@ -1423,11 +1423,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         return NO;
     }
     
-    if (_inputMode == kBopomofoModeIdentifierCHT) {
-        return [LanguageModelManager writeUserPhraseCHT:currentMarkedPhrase];
-    } else {
-        return [LanguageModelManager writeUserPhraseCHS:currentMarkedPhrase];
-    }
+    return [LanguageModelManager writeUserPhrase:currentMarkedPhrase inputMode:_inputMode];
 }
 
 - (void)_showCurrentMarkedTextTooltipWithClient:(id)client
@@ -1556,29 +1552,17 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
 - (void)openUserPhrases:(id)sender
 {
-    if (_inputMode == kBopomofoModeIdentifierCHT) {
-        [self _openUserFile:[LanguageModelManager userPhrasesDataPathCHT]];
-    } else {
-        [self _openUserFile:[LanguageModelManager userPhrasesDataPathCHS]];
-    }
+    [self _openUserFile:[LanguageModelManager userPhrasesDataPath:_inputMode]];
 }
 
 - (void)openExcludedPhrases:(id)sender
 {
-    if (_inputMode == kBopomofoModeIdentifierCHT) {
-        [self _openUserFile:[LanguageModelManager excludedPhrasesDataPathCHT]];
-    } else {
-        [self _openUserFile:[LanguageModelManager excludedPhrasesDataPathCHS]];
-    }
+    [self _openUserFile:[LanguageModelManager excludedPhrasesDataPath:_inputMode]];
 }
 
 - (void)openPhraseReplacement:(id)sender
 {
-    if (_inputMode == kBopomofoModeIdentifierCHT) {
-        [self _openUserFile:[LanguageModelManager phraseReplacementDataPathCHT]];
-    } else {
-        [self _openUserFile:[LanguageModelManager phraseReplacementDataPathCHS]];
-    }
+    [self _openUserFile:[LanguageModelManager phraseReplacementDataPath:_inputMode]];
 }
 
 - (void)reloadUserPhrases:(id)sender

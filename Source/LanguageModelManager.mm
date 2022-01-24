@@ -26,6 +26,10 @@ vChewingLM glanguageModelCoreCHS;
 UserOverrideModel gUserOverrideModelCHS(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 UserOverrideModel gUserOverrideModelCHT(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
+// input modes
+static NSString *const kBopomofoModeIdentifierCHT = @"org.atelierInmu.inputmethod.vChewing.TradBopomofo";
+static NSString *const kBopomofoModeIdentifierCHS = @"org.atelierInmu.inputmethod.vChewing.SimpBopomofo";
+
 @implementation LanguageModelManager
 
 static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewingLM &lm)
@@ -43,14 +47,14 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
 
 + (void)loadUserPhrases
 {
-    glanguageModelCoreCHT.loadUserPhrases([[self userPhrasesDataPathCHT] UTF8String], [[self excludedPhrasesDataPathCHT] UTF8String]);
-	glanguageModelCoreCHS.loadUserPhrases([[self userPhrasesDataPathCHS] UTF8String], [[self excludedPhrasesDataPathCHS] UTF8String]);
+    glanguageModelCoreCHT.loadUserPhrases([[self userPhrasesDataPath:kBopomofoModeIdentifierCHT] UTF8String], [[self excludedPhrasesDataPath:kBopomofoModeIdentifierCHT] UTF8String]);
+	glanguageModelCoreCHS.loadUserPhrases([[self userPhrasesDataPath:kBopomofoModeIdentifierCHS] UTF8String], [[self excludedPhrasesDataPath:kBopomofoModeIdentifierCHS] UTF8String]);
 }
 
 + (void)loadUserPhraseReplacement
 {
-    glanguageModelCoreCHT.loadPhraseReplacementMap([[self phraseReplacementDataPathCHT] UTF8String]);
-	glanguageModelCoreCHS.loadPhraseReplacementMap([[self phraseReplacementDataPathCHS] UTF8String]);
+    glanguageModelCoreCHT.loadPhraseReplacementMap([[self phraseReplacementDataPath:kBopomofoModeIdentifierCHT] UTF8String]);
+	glanguageModelCoreCHS.loadPhraseReplacementMap([[self phraseReplacementDataPath:kBopomofoModeIdentifierCHS] UTF8String]);
 }
 
 + (BOOL)checkIfUserDataFolderExists
@@ -95,35 +99,35 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     if (![self checkIfUserDataFolderExists]) {
         return NO;
     }
-    if (![self checkIfFileExist:[self userPhrasesDataPathCHT]]) {
+    if (![self checkIfFileExist:[self userPhrasesDataPath:kBopomofoModeIdentifierCHT]]) {
         return NO;
     }
-    if (![self checkIfFileExist:[self excludedPhrasesDataPathCHT]]) {
+    if (![self checkIfFileExist:[self excludedPhrasesDataPath:kBopomofoModeIdentifierCHT]]) {
         return NO;
     }
-    if (![self checkIfFileExist:[self phraseReplacementDataPathCHT]]) {
+    if (![self checkIfFileExist:[self phraseReplacementDataPath:kBopomofoModeIdentifierCHT]]) {
         return NO;
     }
-	if (![self checkIfFileExist:[self userPhrasesDataPathCHS]]) {
+	if (![self checkIfFileExist:[self userPhrasesDataPath:kBopomofoModeIdentifierCHS]]) {
 		return NO;
 	}
-	if (![self checkIfFileExist:[self excludedPhrasesDataPathCHS]]) {
+	if (![self checkIfFileExist:[self excludedPhrasesDataPath:kBopomofoModeIdentifierCHS]]) {
 		return NO;
 	}
-	if (![self checkIfFileExist:[self phraseReplacementDataPathCHS]]) {
+	if (![self checkIfFileExist:[self phraseReplacementDataPath:kBopomofoModeIdentifierCHS]]) {
 		return NO;
 	}
 	return YES;
 }
 
-+ (BOOL)writeUserPhraseCHT:(NSString *)userPhrase
++ (BOOL)writeUserPhrase:(NSString *)userPhrase inputMode:(NSString *)inputMode
 {
     if (![self checkIfUserLanguageModelFilesExist]) {
         return NO;
     }
 
     BOOL shuoldAddLineBreakAtFront = NO;
-    NSString *path = [self userPhrasesDataPathCHT];
+    NSString *path = [self userPhrasesDataPath:inputMode];
 
     if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
         NSError *error = nil;
@@ -163,53 +167,6 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     return YES;
 }
 
-+ (BOOL)writeUserPhraseCHS:(NSString *)userPhrase
-{
-	if (![self checkIfUserLanguageModelFilesExist]) {
-		return NO;
-	}
-
-	BOOL shuoldAddLineBreakAtFront = NO;
-	NSString *path = [self userPhrasesDataPathCHS];
-
-	if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
-		NSError *error = nil;
-		NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:&error];
-		unsigned long long fileSize = [attr fileSize];
-		if (!error && fileSize) {
-			NSFileHandle *readFile = [NSFileHandle fileHandleForReadingAtPath:path];
-			if (readFile) {
-				[readFile seekToFileOffset:fileSize - 1];
-				NSData *data = [readFile readDataToEndOfFile];
-				const void *bytes = [data bytes];
-				if (*(char *)bytes != '\n') {
-					shuoldAddLineBreakAtFront = YES;
-				}
-				[readFile closeFile];
-			}
-		}
-	}
-
-	NSMutableString *currentMarkedPhrase = [NSMutableString string];
-	if (shuoldAddLineBreakAtFront) {
-		[currentMarkedPhrase appendString:@"\n"];
-	}
-	[currentMarkedPhrase appendString:userPhrase];
-	[currentMarkedPhrase appendString:@"\n"];
-
-	NSFileHandle *writeFile = [NSFileHandle fileHandleForUpdatingAtPath:path];
-	if (!writeFile) {
-		return NO;
-	}
-	[writeFile seekToEndOfFile];
-	NSData *data = [currentMarkedPhrase dataUsingEncoding:NSUTF8StringEncoding];
-	[writeFile writeData:data];
-	[writeFile closeFile];
-
-	[self loadUserPhrases];
-	return YES;
-}
-
 + (NSString *)dataFolderPath
 {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES);
@@ -218,34 +175,22 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     return userDictPath;
 }
 
-+ (NSString *)userPhrasesDataPathCHT
++ (NSString *)userPhrasesDataPath:(NSString *)inputMode
 {
-    return [[self dataFolderPath] stringByAppendingPathComponent:@"userdata-cht.txt"];
+    NSString *fileName = [inputMode isEqualToString:kBopomofoModeIdentifierCHT] ? @"userdata-cht.txt" : @"userdata-chs.txt";
+    return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
 }
 
-+ (NSString *)userPhrasesDataPathCHS
++ (NSString *)excludedPhrasesDataPath:(NSString *)inputMode
 {
-	return [[self dataFolderPath] stringByAppendingPathComponent:@"userdata-chs.txt"];
+    NSString *fileName = [inputMode isEqualToString:kBopomofoModeIdentifierCHT] ? @"exclude-phrases-cht.txt" : @"exclude-phrases-chs.txt";
+    return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
 }
 
-+ (NSString *)excludedPhrasesDataPathCHT
++ (NSString *)phraseReplacementDataPath:(NSString *)inputMode
 {
-    return [[self dataFolderPath] stringByAppendingPathComponent:@"exclude-phrases-cht.txt"];
-}
-
-+ (NSString *)excludedPhrasesDataPathCHS
-{
-    return [[self dataFolderPath] stringByAppendingPathComponent:@"exclude-phrases-chs.txt"];
-}
-
-+ (NSString *)phraseReplacementDataPathCHT
-{
-    return [[self dataFolderPath] stringByAppendingPathComponent:@"phrases-replacement-cht.txt"];
-}
-
-+ (NSString *)phraseReplacementDataPathCHS
-{
-	return [[self dataFolderPath] stringByAppendingPathComponent:@"phrases-replacement-chs.txt"];
+    NSString *fileName = [inputMode isEqualToString:kBopomofoModeIdentifierCHT] ? @"phrases-replacement-cht.txt" : @"phrases-replacement-chs.txt";
+    return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
 }
 
  + (vChewingLM *)languageModelCoreCHT
