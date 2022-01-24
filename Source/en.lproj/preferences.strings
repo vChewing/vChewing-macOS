@@ -170,6 +170,9 @@
 /* Class = "NSComboBoxCell"; jQC-12-UuK.ibShadowedObjectValues[2] = "Item 3"; ObjectID = "jQC-12-UuK"; */
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
 
+/* Class = "NSMenuItem"; title = "Japanese"; ObjectID = "rVQ-Hx-cGi"; */
+"rVQ-Hx-cGi.title" = "Japanese";
+
 /* Class = "NSBox"; title = "Dictionary Settings"; ObjectID = "s4r-ji-vbr"; */
 "s4r-ji-vbr.title" = "Dictionary Settings";
 

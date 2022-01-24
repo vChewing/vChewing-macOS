@@ -1,9 +1,6 @@
 /* No comment provided by engineer. */
 "About vChewing…" = "关于威注音…";
-"Clear Learning Dictionary (%ju Items)" = "清除学习辞典 (%ju 个项目)";
-"Dump Learning Data to Console" = "将学习辞典内容输出到 Console 上";
-"Enable Selection Learning" = "使用自动学习功能";
-"vChewing Preferences" = "威注音偏好设定";
+"vChewing Preferences" = "威注音偏好设定…";
 "Check Later" = "晚点再通知我";
 "Check for Updates…" = "检查是否有新版…";
 "Check for Update Completed" = "新版检查完毕";
