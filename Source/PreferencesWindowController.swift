@@ -30,7 +30,7 @@ extension RangeReplaceableCollection where Element: Hashable {
     var currentLanguageSelectItem: NSMenuItem? = nil
 
     override func awakeFromNib() {
-        let languages = ["auto", "en-US", "zh-CN", "zh-TW", "ja-JP"]
+        let languages = ["auto", "en", "zh-Hans", "zh-Hant", "ja"]
         var autoSelectItem: NSMenuItem? = nil
         var chosenLanguageItem: NSMenuItem? = nil
         uiLanguageButton.menu?.removeAllItems()

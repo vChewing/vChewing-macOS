@@ -146,8 +146,8 @@
 /* Class = "NSButtonCell"; title = "Check for updates automatically"; ObjectID = "Z9t-P0-BLF"; */
 "Z9t-P0-BLF.title" = "Check for updates automatically";
 
-/* Class = "NSTextFieldCell"; title = "Change user interface language."; ObjectID = "ZEv-Q2-mYL"; */
-"ZEv-Q2-mYL.title" = "Change user interface language.";
+/* Class = "NSTextFieldCell"; title = "Change user interface language (will reboot the IME)."; ObjectID = "ZEv-Q2-mYL"; */
+"ZEv-Q2-mYL.title" = "Change user interface language (will reboot the IME).";
 
 /* Class = "NSMenuItem"; title = "Simplified Chinese"; ObjectID = "akC-2g-ybz"; */
 "akC-2g-ybz.title" = "Simplified Chinese";
