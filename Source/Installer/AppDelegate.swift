@@ -83,7 +83,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
         }
 
         if upgrading {
-            installButton.title = NSLocalizedString("Agree and Upgrade", comment: "")
+            installButton.title = NSLocalizedString("Upgrade", comment: "")
         }
 
         window?.center()
