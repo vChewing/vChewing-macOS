@@ -37,3 +37,8 @@
 "NT351 BPMF EMU" = "NT351 Per-Char Select Mode";
 "CNS11643 Mode" = "CNS11643 Mode";
 "Reboot vChewing…" = "Reboot vChewing…";
+"auto" = "Follow System Settings";
+"en" = "English";
+"zh-Hans" = "Simplified Chinese";
+"zh-Hant" = "Traditional Chinese";
+"ja" = "Japanese";
