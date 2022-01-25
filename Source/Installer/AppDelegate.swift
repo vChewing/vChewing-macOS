@@ -117,12 +117,25 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 
         let shouldWaitForTranslocationRemoval = appBundleChronoshiftedToARandomizedPath(kTargetPartialPath) && (window?.responds(to: #selector(NSWindow.beginSheet(_:completionHandler:))) ?? false)
 
-        // http://www.cocoadev.com/index.pl?MoveToTrash
-        let sourceDir = (kDestinationPartial as NSString).expandingTildeInPath
-        let trashDir = (NSHomeDirectory() as NSString).appendingPathComponent(".Trash")
-        var tag = 0
-
-        NSWorkspace.shared.performFileOperation(.recycleOperation, source: sourceDir, destination: trashDir, files: [kTargetBundle], tag: &tag)
+        // 將既存輸入法扔到垃圾桶內
+        do {
+            let sourceDir = (kDestinationPartial as NSString).expandingTildeInPath
+            let fileManager = FileManager.default
+            let fileURLString = String(format: "%@/%@", sourceDir, kTargetBundle)
+            let fileURL = URL(fileURLWithPath: fileURLString)
+            
+            // 檢查檔案是否存在
+            if fileManager.fileExists(atPath: fileURLString) {
+                // 塞入垃圾桶
+                try fileManager.trashItem(at: fileURL, resultingItemURL: nil)
+            } else {
+                NSLog("File does not exist")
+            }
+         
+        }
+        catch let error as NSError {
+            NSLog("An error took place: \(error)")
+        }
 
         let killTask = Process()
         killTask.launchPath = "/usr/bin/killall"
