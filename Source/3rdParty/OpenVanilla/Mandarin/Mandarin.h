@@ -2,7 +2,7 @@
  *  Mandarin.h
  *  
  *  Copyright 2011-2022 OpenVanilla Project (MIT License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
+ *  All rights reserved. See "LICENSE.TXT" for details.
  */
 
 #ifndef Mandarin_h

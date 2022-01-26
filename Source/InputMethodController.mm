@@ -11,7 +11,6 @@
 #import <fstream>
 #import <iostream>
 #import <set>
-#import "OVStringHelper.h"
 #import "OVUTF8Helper.h"
 #import "LanguageModelManager.h"
 #import "vChewing-Swift.h"

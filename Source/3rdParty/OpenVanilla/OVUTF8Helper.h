@@ -2,7 +2,7 @@
  *  OVUTF8Helper.h
  *  
  *  Copyright 2011-2022 OpenVanilla Project (MIT License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
+ *  All rights reserved. See "LICENSE.TXT" for details.
  */
 
 #ifndef OVUTF8Helper_h
