@@ -10,7 +10,6 @@
 #import <fstream>
 #import <iostream>
 #import <set>
-#import "OVStringHelper.h"
 #import "OVUTF8Helper.h"
 
 using namespace std;
