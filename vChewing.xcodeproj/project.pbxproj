@@ -55,7 +55,7 @@
 		6A0D4ED315FC0D6400ABF4B3 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC815FC0D6400ABF4B3 /* main.swift */; };
 		6A0D4F0815FC0DA600ABF4B3 /* Bopomofo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EEF15FC0DA600ABF4B3 /* Bopomofo.tiff */; };
 		6A0D4F0915FC0DA600ABF4B3 /* Bopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EF015FC0DA600ABF4B3 /* Bopomofo@2x.tiff */; };
-		6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F2015FC0EB100ABF4B3 /* Mandarin.cpp */; };
+		6A0D4F4515FC0EB100ABF4B3 /* Mandarin.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F2015FC0EB100ABF4B3 /* Mandarin.mm */; };
 		6A0D4F5315FC0EE100ABF4B3 /* preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4F4E15FC0EE100ABF4B3 /* preferences.xib */; };
 		6A0D4F5715FC0EF900ABF4B3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4F4815FC0EE100ABF4B3 /* InfoPlist.strings */; };
 		6A0D4F5815FC0EF900ABF4B3 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4F4A15FC0EE100ABF4B3 /* Localizable.strings */; };
@@ -195,8 +195,8 @@
 		6A0D4F1C15FC0EB100ABF4B3 /* Span.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Span.h; sourceTree = "<group>"; };
 		6A0D4F1D15FC0EB100ABF4B3 /* Unigram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Unigram.h; sourceTree = "<group>"; };
 		6A0D4F1E15FC0EB100ABF4B3 /* Walker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Walker.h; sourceTree = "<group>"; };
-		6A0D4F2015FC0EB100ABF4B3 /* Mandarin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Mandarin.cpp; sourceTree = "<group>"; };
-		6A0D4F2115FC0EB100ABF4B3 /* Mandarin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mandarin.h; sourceTree = "<group>"; };
+		6A0D4F2015FC0EB100ABF4B3 /* Mandarin.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Mandarin.mm; sourceTree = "<group>"; };
+		6A0D4F2115FC0EB100ABF4B3 /* Mandarin.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Mandarin.hh; sourceTree = "<group>"; };
 		6A0D4F4115FC0EB100ABF4B3 /* OVUTF8Helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVUTF8Helper.h; sourceTree = "<group>"; };
 		6A0D4F4215FC0EB100ABF4B3 /* OVWildcard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVWildcard.h; sourceTree = "<group>"; };
 		6A0D4F4915FC0EE100ABF4B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Source/en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -476,8 +476,8 @@
 		6A0D4F1F15FC0EB100ABF4B3 /* Mandarin */ = {
 			isa = PBXGroup;
 			children = (
-				6A0D4F2015FC0EB100ABF4B3 /* Mandarin.cpp */,
-				6A0D4F2115FC0EB100ABF4B3 /* Mandarin.h */,
+				6A0D4F2015FC0EB100ABF4B3 /* Mandarin.mm */,
+				6A0D4F2115FC0EB100ABF4B3 /* Mandarin.hh */,
 			);
 			path = Mandarin;
 			sourceTree = "<group>";
@@ -726,7 +726,7 @@
 				5BDD25F7279D6D1200AA18F8 /* unzip.m in Sources */,
 				5BD0D1A4279463510008F48E /* clsOOBEDefaults.swift in Sources */,
 				D427A9C125ED28CC005D43E0 /* OpenCCBridge.swift in Sources */,
-				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
+				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.mm in Sources */,
 				5B6797B52794822C004AC7CE /* PhraseReplacementMap.h in Sources */,
 				6A0421A815FEF3F50061ED63 /* FastLM.cpp in Sources */,
 				5BDF2D012791C03B00838ADB /* PreferencesWindowController.swift in Sources */,
