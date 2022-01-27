@@ -1,5 +1,5 @@
 /* 
- *  Mandarin.cpp
+ *  Mandarin.mm
  *  
  *  Copyright 2011-2022 OpenVanilla Project (MIT License).
  *  All rights reserved. See "LICENSE.TXT" for details.
@@ -7,7 +7,7 @@
 
 #include <cctype>
 #include <algorithm>
-#include "Mandarin.h"
+#include "Mandarin.hh"
 
 #include "OVUTF8Helper.h"
 #include "OVWildcard.h"
