@@ -8,7 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <InputMethodKit/InputMethodKit.h>
-#import "Mandarin.h"
+#import "Mandarin.hh"
 #import "Gramambular.h"
 #import "vChewingLM.h"
 #import "UserOverrideModel.h"
