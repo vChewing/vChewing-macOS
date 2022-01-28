@@ -20,6 +20,7 @@
 		5B5F4F93279294A300922DC2 /* LanguageModelManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F4F92279294A300922DC2 /* LanguageModelManager.mm */; };
 		5B5F4F972792A4EA00922DC2 /* UserPhrasesLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F4F962792A4EA00922DC2 /* UserPhrasesLM.mm */; };
 		5B6797B52794822C004AC7CE /* PhraseReplacementMap.h in Sources */ = {isa = PBXBuildFile; fileRef = 5B6797B32794822C004AC7CE /* PhraseReplacementMap.h */; };
+		5B810D9F27A3A5E50032C1A9 /* LMConsolidator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B810D9D27A3A5E50032C1A9 /* LMConsolidator.mm */; };
 		5BC2D2882793B434002C0BEC /* KeyValueBlobReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BC2D2862793B434002C0BEC /* KeyValueBlobReader.cpp */; };
 		5BC2D28B2793B8FB002C0BEC /* EmacsKeyHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC2D28A2793B8FB002C0BEC /* EmacsKeyHelper.swift */; };
 		5BC2D28D2793B98F002C0BEC /* PreferencesModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC2D28C2793B98F002C0BEC /* PreferencesModule.swift */; };
@@ -118,6 +119,8 @@
 		5B5F4F962792A4EA00922DC2 /* UserPhrasesLM.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = UserPhrasesLM.mm; sourceTree = "<group>"; };
 		5B6797B32794822C004AC7CE /* PhraseReplacementMap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PhraseReplacementMap.h; sourceTree = "<group>"; };
 		5B6797B42794822C004AC7CE /* PhraseReplacementMap.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PhraseReplacementMap.mm; sourceTree = "<group>"; };
+		5B810D9D27A3A5E50032C1A9 /* LMConsolidator.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LMConsolidator.mm; sourceTree = "<group>"; };
+		5B810D9E27A3A5E50032C1A9 /* LMConsolidator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LMConsolidator.h; sourceTree = "<group>"; };
 		5B9781D32763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5B9781D52763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5B9781D72763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Source/zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
@@ -261,6 +264,8 @@
 				5B5F4F952792A4EA00922DC2 /* UserPhrasesLM.h */,
 				5B6797B42794822C004AC7CE /* PhraseReplacementMap.mm */,
 				5B6797B32794822C004AC7CE /* PhraseReplacementMap.h */,
+				5B810D9D27A3A5E50032C1A9 /* LMConsolidator.mm */,
+				5B810D9E27A3A5E50032C1A9 /* LMConsolidator.h */,
 			);
 			path = LanguageModel;
 			sourceTree = "<group>";
@@ -734,6 +739,7 @@
 				5B217128279BB22700F91A2B /* frmAboutWindow.swift in Sources */,
 				5BD13F482794F0A6000E429F /* PhraseReplacementMap.mm in Sources */,
 				5BDD25FA279D6D1200AA18F8 /* mztools.m in Sources */,
+				5B810D9F27A3A5E50032C1A9 /* LMConsolidator.mm in Sources */,
 				5BC3EE1C278FC48C00F5E44C /* VTCandidateController.swift in Sources */,
 				5BDF2D032791C71200838ADB /* NonModalAlertWindowController.swift in Sources */,
 				5BC3EE1D278FC48C00F5E44C /* HorizontalCandidateController.swift in Sources */,
