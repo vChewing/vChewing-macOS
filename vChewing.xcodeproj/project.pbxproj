@@ -14,11 +14,11 @@
 		5B21711E279B9AD900F91A2B /* ArchiveUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21711C279B9AD700F91A2B /* ArchiveUtil.swift */; };
 		5B217126279BA37500F91A2B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B217124279BA37300F91A2B /* AppDelegate.swift */; };
 		5B217128279BB22700F91A2B /* frmAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B217127279BB22700F91A2B /* frmAboutWindow.swift */; };
-		5B42B64027876FDC00BB9B9F /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B42B63E27876FDC00BB9B9F /* UserOverrideModel.cpp */; };
+		5B42B64027876FDC00BB9B9F /* UserOverrideModel.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B42B63E27876FDC00BB9B9F /* UserOverrideModel.mm */; };
 		5B58E87F278413E7003EA2AD /* BSDLicense.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B58E87D278413E7003EA2AD /* BSDLicense.txt */; };
-		5B5F4F8E27928F9300922DC2 /* vChewingLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F4F8D27928F9300922DC2 /* vChewingLM.cpp */; };
+		5B5F4F8E27928F9300922DC2 /* vChewingLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F4F8D27928F9300922DC2 /* vChewingLM.mm */; };
 		5B5F4F93279294A300922DC2 /* LanguageModelManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F4F92279294A300922DC2 /* LanguageModelManager.mm */; };
-		5B5F4F972792A4EA00922DC2 /* UserPhrasesLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F4F962792A4EA00922DC2 /* UserPhrasesLM.cpp */; };
+		5B5F4F972792A4EA00922DC2 /* UserPhrasesLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F4F962792A4EA00922DC2 /* UserPhrasesLM.mm */; };
 		5B6797B52794822C004AC7CE /* PhraseReplacementMap.h in Sources */ = {isa = PBXBuildFile; fileRef = 5B6797B32794822C004AC7CE /* PhraseReplacementMap.h */; };
 		5BC2D2882793B434002C0BEC /* KeyValueBlobReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BC2D2862793B434002C0BEC /* KeyValueBlobReader.cpp */; };
 		5BC2D28B2793B8FB002C0BEC /* EmacsKeyHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC2D28A2793B8FB002C0BEC /* EmacsKeyHelper.swift */; };
@@ -31,7 +31,7 @@
 		5BD0D19A27943D390008F48E /* clsSFX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0D19927943D390008F48E /* clsSFX.swift */; };
 		5BD0D19F279454F60008F48E /* Beep.aif in Resources */ = {isa = PBXBuildFile; fileRef = 5BD0D19E279454F60008F48E /* Beep.aif */; };
 		5BD0D1A4279463510008F48E /* clsOOBEDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0D1A3279463510008F48E /* clsOOBEDefaults.swift */; };
-		5BD13F482794F0A6000E429F /* PhraseReplacementMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B6797B42794822C004AC7CE /* PhraseReplacementMap.cpp */; };
+		5BD13F482794F0A6000E429F /* PhraseReplacementMap.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B6797B42794822C004AC7CE /* PhraseReplacementMap.mm */; };
 		5BDD25F2279D65CC00AA18F8 /* UNICHARS.zip in Resources */ = {isa = PBXBuildFile; fileRef = 5BDD25F1279D65CB00AA18F8 /* UNICHARS.zip */; };
 		5BDD25F4279D678600AA18F8 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BDD25F3279D677F00AA18F8 /* libz.tbd */; };
 		5BDD25F5279D6CFE00AA18F8 /* AWFileHash.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BDD25E3279D64FB00AA18F8 /* AWFileHash.m */; };
@@ -40,7 +40,7 @@
 		5BDD25F8279D6D1200AA18F8 /* zip.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BDD25E7279D64FB00AA18F8 /* zip.m */; };
 		5BDD25F9279D6D1200AA18F8 /* ioapi.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BDD25E8279D64FB00AA18F8 /* ioapi.m */; };
 		5BDD25FA279D6D1200AA18F8 /* mztools.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BDD25E9279D64FB00AA18F8 /* mztools.m */; };
-		5BDD25FD279D6D6300AA18F8 /* CNSLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BDD25FB279D6D6200AA18F8 /* CNSLM.cpp */; };
+		5BDD25FD279D6D6300AA18F8 /* CNSLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5BDD25FB279D6D6200AA18F8 /* CNSLM.mm */; };
 		5BDF2CFE2791BE4400838ADB /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */; };
 		5BDF2CFF2791BECC00838ADB /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */; };
 		5BDF2D012791C03B00838ADB /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDF2D002791C03B00838ADB /* PreferencesWindowController.swift */; };
@@ -49,7 +49,7 @@
 		5BE798A42792E58A00337FF9 /* TooltipController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE798A32792E58A00337FF9 /* TooltipController.swift */; };
 		5BE798A72793280C00337FF9 /* NotifierController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE798A62793280C00337FF9 /* NotifierController.swift */; };
 		5BF4A70027844DC5007DC6E7 /* frmAboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BF4A70227844DC5007DC6E7 /* frmAboutWindow.xib */; };
-		6A0421A815FEF3F50061ED63 /* FastLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A0421A615FEF3F50061ED63 /* FastLM.cpp */; };
+		6A0421A815FEF3F50061ED63 /* FastLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6A0421A615FEF3F50061ED63 /* FastLM.mm */; };
 		6A0D4EA715FC0D2D00ABF4B3 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */; };
 		6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */; };
 		6A0D4ED315FC0D6400ABF4B3 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC815FC0D6400ABF4B3 /* main.swift */; };
@@ -103,7 +103,7 @@
 		5B21711C279B9AD700F91A2B /* ArchiveUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveUtil.swift; sourceTree = "<group>"; };
 		5B217124279BA37300F91A2B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5B217127279BB22700F91A2B /* frmAboutWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = frmAboutWindow.swift; sourceTree = "<group>"; };
-		5B42B63E27876FDC00BB9B9F /* UserOverrideModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UserOverrideModel.cpp; sourceTree = "<group>"; };
+		5B42B63E27876FDC00BB9B9F /* UserOverrideModel.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = UserOverrideModel.mm; sourceTree = "<group>"; };
 		5B42B63F27876FDC00BB9B9F /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserOverrideModel.h; sourceTree = "<group>"; };
 		5B42B64127877D6500BB9B9F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Source/zh-Hans.lproj/preferences.strings"; sourceTree = "<group>"; };
 		5B42B64227877D7700BB9B9F /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "Source/zh-Hant.lproj/preferences.strings"; sourceTree = "<group>"; };
@@ -111,13 +111,13 @@
 		5B58E880278413EF003EA2AD /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hans"; path = "zh-Hans.lproj/BSDLicense.txt"; sourceTree = "<group>"; };
 		5B58E881278413F1003EA2AD /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hant"; path = "zh-Hant.lproj/BSDLicense.txt"; sourceTree = "<group>"; };
 		5B5F4F8C27928F9300922DC2 /* vChewingLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vChewingLM.h; sourceTree = "<group>"; };
-		5B5F4F8D27928F9300922DC2 /* vChewingLM.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = vChewingLM.cpp; sourceTree = "<group>"; };
+		5B5F4F8D27928F9300922DC2 /* vChewingLM.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = vChewingLM.mm; sourceTree = "<group>"; };
 		5B5F4F91279294A300922DC2 /* LanguageModelManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LanguageModelManager.h; sourceTree = "<group>"; };
 		5B5F4F92279294A300922DC2 /* LanguageModelManager.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LanguageModelManager.mm; sourceTree = "<group>"; };
 		5B5F4F952792A4EA00922DC2 /* UserPhrasesLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserPhrasesLM.h; sourceTree = "<group>"; };
-		5B5F4F962792A4EA00922DC2 /* UserPhrasesLM.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UserPhrasesLM.cpp; sourceTree = "<group>"; };
+		5B5F4F962792A4EA00922DC2 /* UserPhrasesLM.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = UserPhrasesLM.mm; sourceTree = "<group>"; };
 		5B6797B32794822C004AC7CE /* PhraseReplacementMap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PhraseReplacementMap.h; sourceTree = "<group>"; };
-		5B6797B42794822C004AC7CE /* PhraseReplacementMap.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PhraseReplacementMap.cpp; sourceTree = "<group>"; };
+		5B6797B42794822C004AC7CE /* PhraseReplacementMap.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PhraseReplacementMap.mm; sourceTree = "<group>"; };
 		5B9781D32763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5B9781D52763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5B9781D72763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Source/zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
@@ -159,7 +159,7 @@
 		5BDD25F0279D64FB00AA18F8 /* SSZipArchive.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SSZipArchive.m; sourceTree = "<group>"; };
 		5BDD25F1279D65CB00AA18F8 /* UNICHARS.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; name = UNICHARS.zip; path = Data/components/common/UNICHARS.zip; sourceTree = "<group>"; };
 		5BDD25F3279D677F00AA18F8 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
-		5BDD25FB279D6D6200AA18F8 /* CNSLM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CNSLM.cpp; sourceTree = "<group>"; };
+		5BDD25FB279D6D6200AA18F8 /* CNSLM.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CNSLM.mm; sourceTree = "<group>"; };
 		5BDD25FC279D6D6300AA18F8 /* CNSLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNSLM.h; sourceTree = "<group>"; };
 		5BDF2CFD2791BE4400838ADB /* InputSourceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourceHelper.swift; sourceTree = "<group>"; };
 		5BDF2D002791C03B00838ADB /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
@@ -171,7 +171,7 @@
 		5BF4A70527844DD2007DC6E7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmAboutWindow.strings; sourceTree = "<group>"; };
 		5BF4A70727844DD3007DC6E7 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/frmAboutWindow.strings"; sourceTree = "<group>"; };
 		5BF4A70A278451A6007DC6E7 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/frmAboutWindow.strings"; sourceTree = "<group>"; };
-		6A0421A615FEF3F50061ED63 /* FastLM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FastLM.cpp; sourceTree = "<group>"; };
+		6A0421A615FEF3F50061ED63 /* FastLM.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FastLM.mm; sourceTree = "<group>"; };
 		6A0421A715FEF3F50061ED63 /* FastLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FastLM.h; sourceTree = "<group>"; };
 		6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
@@ -249,17 +249,17 @@
 		5BA8DAFE27928120009C9FFF /* LanguageModel */ = {
 			isa = PBXGroup;
 			children = (
-				5BDD25FB279D6D6200AA18F8 /* CNSLM.cpp */,
+				5BDD25FB279D6D6200AA18F8 /* CNSLM.mm */,
 				5BDD25FC279D6D6300AA18F8 /* CNSLM.h */,
-				5B5F4F8D27928F9300922DC2 /* vChewingLM.cpp */,
+				5B5F4F8D27928F9300922DC2 /* vChewingLM.mm */,
 				5B5F4F8C27928F9300922DC2 /* vChewingLM.h */,
-				6A0421A615FEF3F50061ED63 /* FastLM.cpp */,
+				6A0421A615FEF3F50061ED63 /* FastLM.mm */,
 				6A0421A715FEF3F50061ED63 /* FastLM.h */,
-				5B42B63E27876FDC00BB9B9F /* UserOverrideModel.cpp */,
+				5B42B63E27876FDC00BB9B9F /* UserOverrideModel.mm */,
 				5B42B63F27876FDC00BB9B9F /* UserOverrideModel.h */,
-				5B5F4F962792A4EA00922DC2 /* UserPhrasesLM.cpp */,
+				5B5F4F962792A4EA00922DC2 /* UserPhrasesLM.mm */,
 				5B5F4F952792A4EA00922DC2 /* UserPhrasesLM.h */,
-				5B6797B42794822C004AC7CE /* PhraseReplacementMap.cpp */,
+				5B6797B42794822C004AC7CE /* PhraseReplacementMap.mm */,
 				5B6797B32794822C004AC7CE /* PhraseReplacementMap.h */,
 			);
 			path = LanguageModel;
@@ -715,29 +715,29 @@
 				5B5F4F93279294A300922DC2 /* LanguageModelManager.mm in Sources */,
 				6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */,
 				6A0D4ED315FC0D6400ABF4B3 /* main.swift in Sources */,
-				5B5F4F972792A4EA00922DC2 /* UserPhrasesLM.cpp in Sources */,
+				5B5F4F972792A4EA00922DC2 /* UserPhrasesLM.mm in Sources */,
 				5BC2D2882793B434002C0BEC /* KeyValueBlobReader.cpp in Sources */,
-				5B5F4F8E27928F9300922DC2 /* vChewingLM.cpp in Sources */,
+				5B5F4F8E27928F9300922DC2 /* vChewingLM.mm in Sources */,
 				5BE798A42792E58A00337FF9 /* TooltipController.swift in Sources */,
 				5BDD25F6279D6D0200AA18F8 /* SSZipArchive.m in Sources */,
 				5BDF2D062791DFF200838ADB /* AppDelegate.swift in Sources */,
 				5BC3EE1B278FC48C00F5E44C /* VerticalCandidateController.swift in Sources */,
-				5B42B64027876FDC00BB9B9F /* UserOverrideModel.cpp in Sources */,
+				5B42B64027876FDC00BB9B9F /* UserOverrideModel.mm in Sources */,
 				5BDD25F7279D6D1200AA18F8 /* unzip.m in Sources */,
 				5BD0D1A4279463510008F48E /* clsOOBEDefaults.swift in Sources */,
 				D427A9C125ED28CC005D43E0 /* OpenCCBridge.swift in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.mm in Sources */,
 				5B6797B52794822C004AC7CE /* PhraseReplacementMap.h in Sources */,
-				6A0421A815FEF3F50061ED63 /* FastLM.cpp in Sources */,
+				6A0421A815FEF3F50061ED63 /* FastLM.mm in Sources */,
 				5BDF2D012791C03B00838ADB /* PreferencesWindowController.swift in Sources */,
 				5BC2D28D2793B98F002C0BEC /* PreferencesModule.swift in Sources */,
 				5B217128279BB22700F91A2B /* frmAboutWindow.swift in Sources */,
-				5BD13F482794F0A6000E429F /* PhraseReplacementMap.cpp in Sources */,
+				5BD13F482794F0A6000E429F /* PhraseReplacementMap.mm in Sources */,
 				5BDD25FA279D6D1200AA18F8 /* mztools.m in Sources */,
 				5BC3EE1C278FC48C00F5E44C /* VTCandidateController.swift in Sources */,
 				5BDF2D032791C71200838ADB /* NonModalAlertWindowController.swift in Sources */,
 				5BC3EE1D278FC48C00F5E44C /* HorizontalCandidateController.swift in Sources */,
-				5BDD25FD279D6D6300AA18F8 /* CNSLM.cpp in Sources */,
+				5BDD25FD279D6D6300AA18F8 /* CNSLM.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
