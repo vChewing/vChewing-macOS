@@ -23,12 +23,14 @@
 		5B810D9F27A3A5E50032C1A9 /* LMConsolidator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B810D9D27A3A5E50032C1A9 /* LMConsolidator.mm */; };
 		5B9DD0A927A7950D00ED335A /* FSEventStreamHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9DD0A827A7950D00ED335A /* FSEventStreamHelper.swift */; };
 		5BC2D2882793B434002C0BEC /* KeyValueBlobReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BC2D2862793B434002C0BEC /* KeyValueBlobReader.cpp */; };
-		5BC2D28B2793B8FB002C0BEC /* EmacsKeyHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC2D28A2793B8FB002C0BEC /* EmacsKeyHelper.swift */; };
 		5BC2D28D2793B98F002C0BEC /* PreferencesModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC2D28C2793B98F002C0BEC /* PreferencesModule.swift */; };
 		5BC3EE1B278FC48C00F5E44C /* VerticalCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC3EE18278FC48C00F5E44C /* VerticalCandidateController.swift */; };
 		5BC3EE1C278FC48C00F5E44C /* VTCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC3EE19278FC48C00F5E44C /* VTCandidateController.swift */; };
 		5BC3EE1D278FC48C00F5E44C /* HorizontalCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC3EE1A278FC48C00F5E44C /* HorizontalCandidateController.swift */; };
 		5BC3FB83278492DE0022E99A /* data-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BC3FB82278492DE0022E99A /* data-chs.txt */; };
+		5BC772AA27A5A1E800CA8391 /* InputState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC772A927A5A1E800CA8391 /* InputState.swift */; };
+		5BC772AC27A5A31200CA8391 /* KeyHandlerInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC772AB27A5A31200CA8391 /* KeyHandlerInput.swift */; };
+		5BC772B027A5B3AB00CA8391 /* KeyHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5BC772AD27A5A31B00CA8391 /* KeyHandler.mm */; };
 		5BD0D19427940E9D0008F48E /* Fart.aif in Resources */ = {isa = PBXBuildFile; fileRef = 5BD0D19327940E9D0008F48E /* Fart.aif */; };
 		5BD0D19A27943D390008F48E /* clsSFX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0D19927943D390008F48E /* clsSFX.swift */; };
 		5BD0D19F279454F60008F48E /* Beep.aif in Resources */ = {isa = PBXBuildFile; fileRef = 5BD0D19E279454F60008F48E /* Beep.aif */; };
@@ -129,7 +131,6 @@
 		5BA923AC2791B7C20001323A /* vChewingInstaller-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vChewingInstaller-Bridging-Header.h"; sourceTree = "<group>"; };
 		5BC2D2842793B434002C0BEC /* KeyValueBlobReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyValueBlobReader.h; sourceTree = "<group>"; };
 		5BC2D2862793B434002C0BEC /* KeyValueBlobReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KeyValueBlobReader.cpp; sourceTree = "<group>"; };
-		5BC2D28A2793B8FB002C0BEC /* EmacsKeyHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmacsKeyHelper.swift; sourceTree = "<group>"; };
 		5BC2D28C2793B98F002C0BEC /* PreferencesModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesModule.swift; sourceTree = "<group>"; };
 		5BC3EE18278FC48C00F5E44C /* VerticalCandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalCandidateController.swift; sourceTree = "<group>"; };
 		5BC3EE19278FC48C00F5E44C /* VTCandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VTCandidateController.swift; sourceTree = "<group>"; };
@@ -144,6 +145,10 @@
 		5BC4BC5B2796E6A90023BBD5 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = Source/ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5BC4BC5C2796E6A90023BBD5 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = Source/ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5BC4BC5E2796F5C40023BBD5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Source/en.lproj/preferences.strings; sourceTree = "<group>"; };
+		5BC772A927A5A1E800CA8391 /* InputState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputState.swift; sourceTree = "<group>"; };
+		5BC772AB27A5A31200CA8391 /* KeyHandlerInput.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyHandlerInput.swift; sourceTree = "<group>"; };
+		5BC772AD27A5A31B00CA8391 /* KeyHandler.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = KeyHandler.mm; sourceTree = "<group>"; };
+		5BC772AE27A5A31B00CA8391 /* KeyHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyHandler.h; sourceTree = "<group>"; };
 		5BD0D19327940E9D0008F48E /* Fart.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.aif; sourceTree = "<group>"; };
 		5BD0D19927943D390008F48E /* clsSFX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = clsSFX.swift; sourceTree = "<group>"; };
 		5BD0D19E279454F60008F48E /* Beep.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.aif; sourceTree = "<group>"; };
@@ -271,21 +276,17 @@
 			path = LanguageModel;
 			sourceTree = "<group>";
 		};
-		5BC2D2832793B434002C0BEC /* vChewing */ = {
+		5BC2D2832793B434002C0BEC /* ControllerModules */ = {
 			isa = PBXGroup;
 			children = (
+				5BC772AE27A5A31B00CA8391 /* KeyHandler.h */,
+				5BC772AD27A5A31B00CA8391 /* KeyHandler.mm */,
+				5BC772AB27A5A31200CA8391 /* KeyHandlerInput.swift */,
 				5BC2D2842793B434002C0BEC /* KeyValueBlobReader.h */,
 				5BC2D2862793B434002C0BEC /* KeyValueBlobReader.cpp */,
+				5BC772A927A5A1E800CA8391 /* InputState.swift */,
 			);
-			path = vChewing;
-			sourceTree = "<group>";
-		};
-		5BC2D2892793B8DB002C0BEC /* Keyboard */ = {
-			isa = PBXGroup;
-			children = (
-				5BC2D28A2793B8FB002C0BEC /* EmacsKeyHelper.swift */,
-			);
-			path = Keyboard;
+			path = ControllerModules;
 			sourceTree = "<group>";
 		};
 		5BD0D19827943D270008F48E /* SFX */ = {
@@ -452,8 +453,7 @@
 			isa = PBXGroup;
 			children = (
 				5BD0D19827943D270008F48E /* SFX */,
-				5BC2D2892793B8DB002C0BEC /* Keyboard */,
-				5BC2D2832793B434002C0BEC /* vChewing */,
+				5BC2D2832793B434002C0BEC /* ControllerModules */,
 				5BA8DAFE27928120009C9FFF /* LanguageModel */,
 				6A0D4F1315FC0EB100ABF4B3 /* Gramambular */,
 			);
@@ -711,7 +711,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5BDF2CFE2791BE4400838ADB /* InputSourceHelper.swift in Sources */,
-				5BC2D28B2793B8FB002C0BEC /* EmacsKeyHelper.swift in Sources */,
+				5BC772AC27A5A31200CA8391 /* KeyHandlerInput.swift in Sources */,
 				5BDD25F5279D6CFE00AA18F8 /* AWFileHash.m in Sources */,
 				5BDD25F8279D6D1200AA18F8 /* zip.m in Sources */,
 				5BD0D19A27943D390008F48E /* clsSFX.swift in Sources */,
@@ -727,6 +727,7 @@
 				5BE798A42792E58A00337FF9 /* TooltipController.swift in Sources */,
 				5BDD25F6279D6D0200AA18F8 /* SSZipArchive.m in Sources */,
 				5BDF2D062791DFF200838ADB /* AppDelegate.swift in Sources */,
+				5BC772B027A5B3AB00CA8391 /* KeyHandler.mm in Sources */,
 				5BC3EE1B278FC48C00F5E44C /* VerticalCandidateController.swift in Sources */,
 				5B42B64027876FDC00BB9B9F /* UserOverrideModel.mm in Sources */,
 				5BDD25F7279D6D1200AA18F8 /* unzip.m in Sources */,
@@ -743,6 +744,7 @@
 				5BC3EE1C278FC48C00F5E44C /* VTCandidateController.swift in Sources */,
 				5BDF2D032791C71200838ADB /* NonModalAlertWindowController.swift in Sources */,
 				5BC3EE1D278FC48C00F5E44C /* HorizontalCandidateController.swift in Sources */,
+				5BC772AA27A5A1E800CA8391 /* InputState.swift in Sources */,
 				5BDD25FD279D6D6300AA18F8 /* CNSLM.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
