@@ -7,7 +7,6 @@
  */
 
 #import "InputMethodController.h"
-#include <objc/objc.h>
 #import <fstream>
 #import <iostream>
 #import <set>
@@ -158,14 +157,16 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
     [menu addItem:[NSMenuItem separatorItem]]; // ------------------------------
 
-    [menu addItemWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
+    [menu addItemWithTitle:NSLocalizedString(@"Edit User Phrases…", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
     if (optionKeyPressed) {
         [menu addItemWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrases:) keyEquivalent:@""];
         [menu addItemWithTitle:NSLocalizedString(@"Edit Phrase Replacement Table", @"") action:@selector(openPhraseReplacement:) keyEquivalent:@""];
     }
 
-    [menu addItemWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
-
+    if (optionKeyPressed || !Preferences.shouldAutoReloadUserDataFiles) {
+        [menu addItemWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
+    }
+    
     [menu addItem:[NSMenuItem separatorItem]]; // ------------------------------
 
     [menu addItemWithTitle:NSLocalizedString(@"vChewing Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""];
@@ -182,7 +183,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 - (void)activateServer:(id)client
 {
     // Write missing OOBE user plist entries.
-    [OOBE setMissingDefaults];
+    [Preferences setMissingDefaults];
     
     // Read user plist.
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -190,6 +191,11 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     // Override the keyboard layout. Use US if not set.
     NSString *basisKeyboardLayoutID = Preferences.basisKeyboardLayout;
     [client overrideKeyboardWithKeyboardNamed:basisKeyboardLayoutID];
+
+    // Load UserPhrases // 這裡今後需要改造成「驗證檔案指紋、根據驗證結果判定是否需要重新讀入」的形式。
+    if (Preferences.shouldAutoReloadUserDataFiles) {
+        [self reloadUserPhrases:(id)nil];
+    }
 
     // reset the state
     _currentDeferredClient = nil;
@@ -1493,7 +1499,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 - (void)showPreferences:(id)sender
 {
     // Write missing OOBE user plist entries.
-    [OOBE setMissingDefaults];
+    [Preferences setMissingDefaults];
 
     // show the preferences panel, and also make the IME app itself the focus
     if ([IMKInputController instancesRespondToSelector:@selector(showPreferences:)]) {

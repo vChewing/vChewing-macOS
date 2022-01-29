@@ -15,6 +15,7 @@
 #include <syslog.h>
 #include "LMConsolidator.h"
 #include "KeyValueBlobReader.h"
+#include "vChewing-Swift.h"
 
 namespace vChewing {
 
@@ -39,7 +40,12 @@ bool UserPhrasesLM::open(const char *path)
     }
 
     LMConsolidator::FixEOF(path);
-    LMConsolidator::ConsolidateContent(path, false);
+
+    if (Preferences.ShouldAutoSortUserPhrasesAndExclListOnLoad) {
+        LMConsolidator::ConsolidateContent(path, true);
+    } else {
+        LMConsolidator::ConsolidateContent(path, false);
+    }
 
     fd = ::open(path, O_RDONLY);
     if (fd == -1) {
