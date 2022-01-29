@@ -182,7 +182,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 - (void)activateServer:(id)client
 {
     // Write missing OOBE user plist entries.
-    [OOBE setMissingDefaults];
+    [Preferences setMissingDefaults];
     
     // Read user plist.
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -1493,7 +1493,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 - (void)showPreferences:(id)sender
 {
     // Write missing OOBE user plist entries.
-    [OOBE setMissingDefaults];
+    [Preferences setMissingDefaults];
 
     // show the preferences panel, and also make the IME app itself the focus
     if ([IMKInputController instancesRespondToSelector:@selector(showPreferences:)]) {

@@ -31,7 +31,6 @@
 		5BD0D19427940E9D0008F48E /* Fart.aif in Resources */ = {isa = PBXBuildFile; fileRef = 5BD0D19327940E9D0008F48E /* Fart.aif */; };
 		5BD0D19A27943D390008F48E /* clsSFX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0D19927943D390008F48E /* clsSFX.swift */; };
 		5BD0D19F279454F60008F48E /* Beep.aif in Resources */ = {isa = PBXBuildFile; fileRef = 5BD0D19E279454F60008F48E /* Beep.aif */; };
-		5BD0D1A4279463510008F48E /* clsOOBEDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0D1A3279463510008F48E /* clsOOBEDefaults.swift */; };
 		5BD13F482794F0A6000E429F /* PhraseReplacementMap.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B6797B42794822C004AC7CE /* PhraseReplacementMap.mm */; };
 		5BDD25F2279D65CC00AA18F8 /* UNICHARS.zip in Resources */ = {isa = PBXBuildFile; fileRef = 5BDD25F1279D65CB00AA18F8 /* UNICHARS.zip */; };
 		5BDD25F4279D678600AA18F8 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BDD25F3279D677F00AA18F8 /* libz.tbd */; };
@@ -146,7 +145,6 @@
 		5BD0D19327940E9D0008F48E /* Fart.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.aif; sourceTree = "<group>"; };
 		5BD0D19927943D390008F48E /* clsSFX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = clsSFX.swift; sourceTree = "<group>"; };
 		5BD0D19E279454F60008F48E /* Beep.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.aif; sourceTree = "<group>"; };
-		5BD0D1A3279463510008F48E /* clsOOBEDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = clsOOBEDefaults.swift; sourceTree = "<group>"; };
 		5BDD25E2279D64FB00AA18F8 /* AWFileHash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AWFileHash.h; sourceTree = "<group>"; };
 		5BDD25E3279D64FB00AA18F8 /* AWFileHash.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AWFileHash.m; sourceTree = "<group>"; };
 		5BDD25E6279D64FB00AA18F8 /* unzip.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = unzip.m; sourceTree = "<group>"; };
@@ -275,7 +273,6 @@
 			children = (
 				5BC2D2842793B434002C0BEC /* KeyValueBlobReader.h */,
 				5BC2D2862793B434002C0BEC /* KeyValueBlobReader.cpp */,
-				5BD0D1A3279463510008F48E /* clsOOBEDefaults.swift */,
 			);
 			path = vChewing;
 			sourceTree = "<group>";
@@ -729,7 +726,6 @@
 				5BC3EE1B278FC48C00F5E44C /* VerticalCandidateController.swift in Sources */,
 				5B42B64027876FDC00BB9B9F /* UserOverrideModel.mm in Sources */,
 				5BDD25F7279D6D1200AA18F8 /* unzip.m in Sources */,
-				5BD0D1A4279463510008F48E /* clsOOBEDefaults.swift in Sources */,
 				D427A9C125ED28CC005D43E0 /* OpenCCBridge.swift in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.mm in Sources */,
 				5B6797B52794822C004AC7CE /* PhraseReplacementMap.h in Sources */,
