@@ -459,21 +459,72 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dnE-Vw-KrP">
-                                                        <rect key="frame" x="18" y="361" width="249" height="15"/>
+                                                        <rect key="frame" x="18" y="361" width="323" height="15"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="231" id="MzY-w8-DKW"/>
                                                         </constraints>
-                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="This dictionary page is under development." id="j48-5a-cEs">
+                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Define your preferred action when user data files reload." id="j48-5a-cEs">
                                                             <font key="font" metaFont="cellTitle"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
+                                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="1hA-Po-5li">
+                                                        <rect key="frame" x="19" y="338.5" width="404" height="17"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="288" id="0mm-CA-Mxs"/>
+                                                            <constraint firstAttribute="height" constant="16" id="c3e-cU-pEw"/>
+                                                        </constraints>
+                                                        <buttonCell key="cell" type="check" title="Sort entries when reloading user phrases and excluded phrases list" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="Li3-Yg-SOC">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <binding destination="32" name="value" keyPath="values.ShouldAutoSortUserPhrasesAndExclListOnLoad" id="k4w-CX-EfE"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nnT-wS-mZo">
+                                                        <rect key="frame" x="19" y="316.5" width="342" height="17"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="16" id="IBn-Xf-uEw"/>
+                                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="234" id="srn-3X-kPi"/>
+                                                        </constraints>
+                                                        <buttonCell key="cell" type="check" title="Sort entries when reloading the phrase replacement map" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="o60-vW-i1B">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <binding destination="32" name="value" keyPath="values.ShouldAutoSortPhraseReplacementMapOnLoad" id="Xn2-So-Dp3"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p7V-IN-OTr">
+                                                        <rect key="frame" x="19" y="295.5" width="336" height="17"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="16" id="8eX-Tw-Erk"/>
+                                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="234" id="yhP-XF-CQj"/>
+                                                        </constraints>
+                                                        <buttonCell key="cell" type="check" title="Automatically reload user data files if changes detected" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="f8i-69-zxm">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <binding destination="32" name="value" keyPath="values.ShouldAutoReloadUserDataFiles" id="XTI-ol-DVN"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                                 <constraints>
                                                     <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="dnE-Vw-KrP" secondAttribute="trailing" constant="214" id="3wA-Rn-cTn"/>
+                                                    <constraint firstItem="nnT-wS-mZo" firstAttribute="leading" secondItem="p7V-IN-OTr" secondAttribute="leading" id="4di-W1-ufn"/>
+                                                    <constraint firstItem="1hA-Po-5li" firstAttribute="leading" secondItem="nnT-wS-mZo" secondAttribute="leading" id="Cfb-2F-MRg"/>
+                                                    <constraint firstItem="1hA-Po-5li" firstAttribute="leading" secondItem="dnE-Vw-KrP" secondAttribute="leading" id="Exw-iA-Unz"/>
+                                                    <constraint firstItem="1hA-Po-5li" firstAttribute="top" secondItem="dnE-Vw-KrP" secondAttribute="bottom" constant="6.5" id="HrQ-4q-l78"/>
+                                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="p7V-IN-OTr" secondAttribute="trailing" constant="20" symbolic="YES" id="MFR-05-QJN"/>
                                                     <constraint firstItem="dnE-Vw-KrP" firstAttribute="leading" secondItem="rWB-y8-q94" secondAttribute="leading" constant="20" id="QQJ-7P-HAG"/>
+                                                    <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="nnT-wS-mZo" secondAttribute="trailing" constant="101" id="QsT-xW-prJ"/>
                                                     <constraint firstItem="dnE-Vw-KrP" firstAttribute="top" secondItem="rWB-y8-q94" secondAttribute="top" constant="15" id="Vzj-xd-Q2W"/>
+                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="top" secondItem="nnT-wS-mZo" secondAttribute="bottom" constant="5" id="gRe-fD-67h"/>
+                                                    <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="1hA-Po-5li" secondAttribute="trailing" constant="39" id="quD-Rd-uwL"/>
+                                                    <constraint firstItem="nnT-wS-mZo" firstAttribute="top" secondItem="1hA-Po-5li" secondAttribute="bottom" constant="6" symbolic="YES" id="zxn-Pa-o6f"/>
                                                 </constraints>
                                             </view>
                                         </box>
