@@ -150,7 +150,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
         LanguageModelManager.loadUserPhrases()
         LanguageModelManager.loadUserPhraseReplacement()
 
-        OOBE.setMissingDefaults()
+        Preferences.setMissingDefaults()
         
         // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
         if (UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) != nil) == true {

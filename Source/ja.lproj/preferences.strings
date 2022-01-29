@@ -125,6 +125,9 @@
 /* Class = "NSTabViewItem"; label = "Dictionary"; ObjectID = "ISh-Da-hKv"; */
 "ISh-Da-hKv.label" = "辞書";
 
+/* Class = "NSButtonCell"; title = "Sort entries when reloading user phrases and excluded phrases list"; ObjectID = "Li3-Yg-SOC"; */
+"Li3-Yg-SOC.title" = "ユーザー辞書と条目排除表を読み込むときに、内容の順番を整う";
+
 /* Class = "NSTabViewItem"; label = "General"; ObjectID = "QUQ-oY-4Hc"; */
 "QUQ-oY-4Hc.label" = "全般";
 
@@ -155,11 +158,14 @@
 /* Class = "NSButtonCell"; title = "Press ESC key clears entire input buffer"; ObjectID = "f2j-xD-4xK"; */
 "f2j-xD-4xK.title" = "ESC キーで入力緩衝列を消す";
 
+/* Class = "NSButtonCell"; title = "Automatically reload user data files if changes detected"; ObjectID = "f8i-69-zxm"; */
+"f8i-69-zxm.title" = "変更されたユーザー辞書データを自動的に再読込";
+
 /* Class = "NSTextFieldCell"; title = "Change UI font size of candidate window for a better visual clarity."; ObjectID = "iRg-wx-Nx2"; */
 "iRg-wx-Nx2.title" = "入力候補陣列の候補文字の字号をご指定ください。";
 
-/* Class = "NSTextFieldCell"; title = "This dictionary page is under development."; ObjectID = "j48-5a-cEs"; */
-"j48-5a-cEs.title" = "このページの機能はまだまだ施工中ですが……";
+/* Class = "NSTextFieldCell"; title = "Define your preferred action when user data files reload."; ObjectID = "j48-5a-cEs"; */
+"j48-5a-cEs.title" = "ユーザー辞書データの読み込む時のやることをご指示ください。";
 
 /* Class = "NSComboBoxCell"; jQC-12-UuK.ibShadowedObjectValues[0] = "Item 1"; ObjectID = "jQC-12-UuK"; */
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
@@ -169,6 +175,9 @@
 
 /* Class = "NSComboBoxCell"; jQC-12-UuK.ibShadowedObjectValues[2] = "Item 3"; ObjectID = "jQC-12-UuK"; */
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
+
+/* Class = "NSButtonCell"; title = "Sort entries when reloading the phrase replacement map"; ObjectID = "o60-vW-i1B"; */
+"o60-vW-i1B.title" = "言葉置換表を読み込むときに、内容の順番を整う";
 
 /* Class = "NSMenuItem"; title = "Japanese"; ObjectID = "rVQ-Hx-cGi"; */
 "rVQ-Hx-cGi.title" = "和語";
