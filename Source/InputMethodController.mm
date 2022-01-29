@@ -7,7 +7,6 @@
  */
 
 #import "InputMethodController.h"
-#include <objc/objc.h>
 #import <fstream>
 #import <iostream>
 #import <set>
