@@ -8,20 +8,21 @@
 
 import Cocoa
 
-private let kKeyboardLayoutPreferenceKey = "KeyboardLayout"
-private let kBasisKeyboardLayoutPreferenceKey = "BasisKeyboardLayout"  // alphanumeric ("ASCII") input basi
-private let kFunctionKeyKeyboardLayoutPreferenceKey = "FunctionKeyKeyboardLayout"  // alphanumeric ("ASCII") input basi
-private let kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey = "FunctionKeyKeyboardLayoutOverrideIncludeShift" // whether include shif
-private let kCandidateListTextSizeKey = "CandidateListTextSize"
-private let kAppleLanguagesPreferencesKey = "AppleLanguages"
-private let kSelectPhraseAfterCursorAsCandidatePreferenceKey = "SelectPhraseAfterCursorAsCandidate"
-private let kUseHorizontalCandidateListPreferenceKey = "UseHorizontalCandidateList"
-private let kComposingBufferSizePreferenceKey = "ComposingBufferSize"
-private let kChooseCandidateUsingSpaceKey = "ChooseCandidateUsingSpaceKey"
-private let kCNS11643EnabledKey = "CNS11643Enabled"
-private let kChineseConversionEnabledKey = "ChineseConversionEnabled"
-private let kHalfWidthPunctuationEnabledKey = "HalfWidthPunctuationEnable"
-private let kEscToCleanInputBufferKey = "EscToCleanInputBuffer"
+private let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
+private let kKeyboardLayoutPreference = "KeyboardLayout"
+private let kBasisKeyboardLayoutPreference = "BasisKeyboardLayout"
+private let kFunctionKeyKeyboardLayoutPreference = "FunctionKeyKeyboardLayout"
+private let kFunctionKeyKeyboardLayoutOverrideIncludeShift = "FunctionKeyKeyboardLayoutOverrideIncludeShift"
+private let kCandidateListTextSize = "CandidateListTextSize"
+private let kAppleLanguagesPreferences = "AppleLanguages"
+private let kSelectPhraseAfterCursorAsCandidatePreference = "SelectPhraseAfterCursorAsCandidate"
+private let kUseHorizontalCandidateListPreference = "UseHorizontalCandidateList"
+private let kComposingBufferSizePreference = "ComposingBufferSize"
+private let kChooseCandidateUsingSpace = "ChooseCandidateUsingSpaceKey"
+private let kCNS11643Enabled = "CNS11643Enabled"
+private let kChineseConversionEnabled = "ChineseConversionEnabled"
+private let kHalfWidthPunctuationEnabled = "HalfWidthPunctuationEnable"
+private let kEscToCleanInputBuffer = "EscToCleanInputBuffer"
 private let kUseWinNT351BPMF = "UseWinNT351BPMF"
 private let kMaxCandidateLength = "MaxCandidateLength"
 private let kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
@@ -29,8 +30,8 @@ private let kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
 private let kCandidateTextFontName = "CandidateTextFontName"
 private let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
 private let kCandidateKeys = "CandidateKeys"
-private let kChineseConversionEngineKey = "ChineseConversionEngine"
-private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
+private let kChineseConversionEngine = "ChineseConversionEngine"
+private let kPhraseReplacementEnabled = "PhraseReplacementEnabled"
 
 private let kDefaultCandidateListTextSize: CGFloat = 18
 private let kMinKeyLabelSize: CGFloat = 10
@@ -168,62 +169,118 @@ struct ComposingBufferSize {
 @objc public class Preferences: NSObject {
     static func reset() {
         let defaults = UserDefaults.standard
-        defaults.removeObject(forKey: kKeyboardLayoutPreferenceKey)
-        defaults.removeObject(forKey: kBasisKeyboardLayoutPreferenceKey)
-        defaults.removeObject(forKey: kFunctionKeyKeyboardLayoutPreferenceKey)
-        defaults.removeObject(forKey: kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey)
-        defaults.removeObject(forKey: kCandidateListTextSizeKey)
-        defaults.removeObject(forKey: kAppleLanguagesPreferencesKey)
-        defaults.removeObject(forKey: kSelectPhraseAfterCursorAsCandidatePreferenceKey)
-        defaults.removeObject(forKey: kUseHorizontalCandidateListPreferenceKey)
-        defaults.removeObject(forKey: kComposingBufferSizePreferenceKey)
-        defaults.removeObject(forKey: kChooseCandidateUsingSpaceKey)
-        defaults.removeObject(forKey: kCNS11643EnabledKey)
-        defaults.removeObject(forKey: kChineseConversionEnabledKey)
-        defaults.removeObject(forKey: kHalfWidthPunctuationEnabledKey)
-        defaults.removeObject(forKey: kEscToCleanInputBufferKey)
+        defaults.removeObject(forKey: kKeyboardLayoutPreference)
+        defaults.removeObject(forKey: kBasisKeyboardLayoutPreference)
+        defaults.removeObject(forKey: kFunctionKeyKeyboardLayoutPreference)
+        defaults.removeObject(forKey: kFunctionKeyKeyboardLayoutOverrideIncludeShift)
+        defaults.removeObject(forKey: kCandidateListTextSize)
+        defaults.removeObject(forKey: kAppleLanguagesPreferences)
+        defaults.removeObject(forKey: kSelectPhraseAfterCursorAsCandidatePreference)
+        defaults.removeObject(forKey: kUseHorizontalCandidateListPreference)
+        defaults.removeObject(forKey: kComposingBufferSizePreference)
+        defaults.removeObject(forKey: kChooseCandidateUsingSpace)
+        defaults.removeObject(forKey: kCNS11643Enabled)
+        defaults.removeObject(forKey: kChineseConversionEnabled)
+        defaults.removeObject(forKey: kHalfWidthPunctuationEnabled)
+        defaults.removeObject(forKey: kEscToCleanInputBuffer)
         defaults.removeObject(forKey: kCandidateTextFontName)
         defaults.removeObject(forKey: kCandidateKeyLabelFontName)
         defaults.removeObject(forKey: kCandidateKeys)
-        defaults.removeObject(forKey: kPhraseReplacementEnabledKey)
-        defaults.removeObject(forKey: kChineseConversionEngineKey)
+        defaults.removeObject(forKey: kPhraseReplacementEnabled)
+        defaults.removeObject(forKey: kChineseConversionEngine)
         defaults.removeObject(forKey: kUseWinNT351BPMF)
         defaults.removeObject(forKey: kMaxCandidateLength)
         defaults.removeObject(forKey: kShouldNotFartInLieuOfBeep)
     }
     
-    @UserDefault(key: kAppleLanguagesPreferencesKey, defaultValue: [])
+    @objc public static func setMissingDefaults () {
+        // 既然 Preferences Module 的預設屬性不自動寫入 plist、而且還是 private，那這邊就先寫入了。
+
+        // 首次啟用輸入法時設定不要自動更新，免得在某些要隔絕外部網路連線的保密機構內觸犯資安規則。
+        if UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) == nil {
+            UserDefaults.standard.set(false, forKey: kCheckUpdateAutomatically)
+        }
+        
+        // 預設選字窗字詞文字尺寸，設成 18 剛剛好
+        if UserDefaults.standard.object(forKey: kCandidateListTextSize) == nil {
+            UserDefaults.standard.set(Preferences.candidateListTextSize, forKey: kCandidateListTextSize)
+        }
+        
+        // 預設摁空格鍵來選字，所以設成 true
+        if UserDefaults.standard.object(forKey: kChooseCandidateUsingSpace) == nil {
+            UserDefaults.standard.set(Preferences.chooseCandidateUsingSpace, forKey: kChooseCandidateUsingSpace)
+        }
+        
+        // 預設禁用 WinNT351 風格的注音選字模式（就是每個字都要選的那種），所以設成 false
+        if UserDefaults.standard.object(forKey: kUseWinNT351BPMF) == nil {
+            UserDefaults.standard.set(Preferences.useWinNT351BPMF, forKey: kUseWinNT351BPMF)
+        }
+        
+        // 預設漢音風格選字，所以要設成 0
+        if UserDefaults.standard.object(forKey: kSelectPhraseAfterCursorAsCandidatePreference) == nil {
+            UserDefaults.standard.set(Preferences.selectPhraseAfterCursorAsCandidate, forKey: kSelectPhraseAfterCursorAsCandidatePreference)
+        }
+        
+        // 預設橫向選字窗，不爽請自行改成縱向選字窗
+        if UserDefaults.standard.object(forKey: kUseHorizontalCandidateListPreference) == nil {
+            UserDefaults.standard.set(Preferences.useHorizontalCandidateList, forKey: kUseHorizontalCandidateListPreference)
+        }
+        
+        // 預設停用全字庫支援
+        if UserDefaults.standard.object(forKey: kCNS11643Enabled) == nil {
+            UserDefaults.standard.set(Preferences.cns11643Enabled, forKey: kCNS11643Enabled)
+        }
+        
+        // 預設停用繁體轉康熙模組
+        if UserDefaults.standard.object(forKey: kChineseConversionEnabled) == nil {
+            UserDefaults.standard.set(Preferences.chineseConversionEnabled, forKey: kChineseConversionEnabled)
+        }
+        
+        // 預設停用自訂語彙置換
+        if UserDefaults.standard.object(forKey: kPhraseReplacementEnabled) == nil {
+            UserDefaults.standard.set(Preferences.phraseReplacementEnabled, forKey: kPhraseReplacementEnabled)
+        }
+
+        // 預設沒事不要在那裡放屁
+        if UserDefaults.standard.object(forKey: kShouldNotFartInLieuOfBeep) == nil {
+            UserDefaults.standard.set(Preferences.shouldNotFartInLieuOfBeep, forKey: kShouldNotFartInLieuOfBeep)
+        }
+        
+        UserDefaults.standard.synchronize()
+    }
+
+    @UserDefault(key: kAppleLanguagesPreferences, defaultValue: [])
     @objc static var appleLanguages: Array<String>
 
-    @UserDefault(key: kKeyboardLayoutPreferenceKey, defaultValue: 0)
+    @UserDefault(key: kKeyboardLayoutPreference, defaultValue: 0)
     @objc static var keyboardLayout: Int
 
     @objc static var keyboardLayoutName: String {
         (KeyboardLayout(rawValue: self.keyboardLayout) ?? KeyboardLayout.standard).name
     }
 
-    @UserDefault(key: kBasisKeyboardLayoutPreferenceKey, defaultValue: "com.apple.keylayout.US")
+    @UserDefault(key: kBasisKeyboardLayoutPreference, defaultValue: "com.apple.keylayout.US")
     @objc static var basisKeyboardLayout: String
 
-    @UserDefault(key: kFunctionKeyKeyboardLayoutPreferenceKey, defaultValue: "com.apple.keylayout.US")
+    @UserDefault(key: kFunctionKeyKeyboardLayoutPreference, defaultValue: "com.apple.keylayout.US")
     @objc static var functionKeyboardLayout: String
 
-    @UserDefault(key: kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey, defaultValue: false)
+    @UserDefault(key: kFunctionKeyKeyboardLayoutOverrideIncludeShift, defaultValue: false)
     @objc static var functionKeyKeyboardLayoutOverrideIncludeShiftKey: Bool
 
-    @CandidateListTextSize(key: kCandidateListTextSizeKey)
+    @CandidateListTextSize(key: kCandidateListTextSize)
     @objc static var candidateListTextSize: CGFloat
 
-    @UserDefault(key: kSelectPhraseAfterCursorAsCandidatePreferenceKey, defaultValue: false)
+    @UserDefault(key: kSelectPhraseAfterCursorAsCandidatePreference, defaultValue: false)
     @objc static var selectPhraseAfterCursorAsCandidate: Bool
 
-    @UserDefault(key: kUseHorizontalCandidateListPreferenceKey, defaultValue: true)
+    @UserDefault(key: kUseHorizontalCandidateListPreference, defaultValue: true)
     @objc static var useHorizontalCandidateList: Bool
 
-    @ComposingBufferSize(key: kComposingBufferSizePreferenceKey)
+    @ComposingBufferSize(key: kComposingBufferSizePreference)
     @objc static var composingBufferSize: Int
 
-    @UserDefault(key: kChooseCandidateUsingSpaceKey, defaultValue: true)
+    @UserDefault(key: kChooseCandidateUsingSpace, defaultValue: true)
     @objc static var chooseCandidateUsingSpace: Bool
     
     @UserDefault(key: kUseWinNT351BPMF, defaultValue: false)
@@ -247,25 +304,25 @@ struct ComposingBufferSize {
         return shouldNotFartInLieuOfBeep
     }
 
-    @UserDefault(key: kCNS11643EnabledKey, defaultValue: false)
+    @UserDefault(key: kCNS11643Enabled, defaultValue: false)
     @objc static var cns11643Enabled: Bool
 
     @objc static func toggleCNS11643Enabled() -> Bool {
         cns11643Enabled = !cns11643Enabled
-        UserDefaults.standard.set(cns11643Enabled, forKey: kCNS11643EnabledKey)
+        UserDefaults.standard.set(cns11643Enabled, forKey: kCNS11643Enabled)
         return cns11643Enabled
     }
 
-    @UserDefault(key: kChineseConversionEnabledKey, defaultValue: false)
+    @UserDefault(key: kChineseConversionEnabled, defaultValue: false)
     @objc static var chineseConversionEnabled: Bool
 
     @objc static func toggleChineseConversionEnabled() -> Bool {
         chineseConversionEnabled = !chineseConversionEnabled
-        UserDefaults.standard.set(chineseConversionEnabled, forKey: kChineseConversionEnabledKey)
+        UserDefaults.standard.set(chineseConversionEnabled, forKey: kChineseConversionEnabled)
         return chineseConversionEnabled
     }
 
-    @UserDefault(key: kHalfWidthPunctuationEnabledKey, defaultValue: false)
+    @UserDefault(key: kHalfWidthPunctuationEnabled, defaultValue: false)
     @objc static var halfWidthPunctuationEnabled: Bool
 
     @objc static func toggleHalfWidthPunctuationEnabled() -> Bool {
@@ -273,7 +330,7 @@ struct ComposingBufferSize {
         return halfWidthPunctuationEnabled
     }
 
-    @UserDefault(key: kEscToCleanInputBufferKey, defaultValue: true)
+    @UserDefault(key: kEscToCleanInputBuffer, defaultValue: true)
     @objc static var escToCleanInputBuffer: Bool
 
     // MARK: Optional settings
@@ -343,19 +400,19 @@ struct ComposingBufferSize {
 
     }
 
-    @UserDefault(key: kChineseConversionEngineKey, defaultValue: 0)
+    @UserDefault(key: kChineseConversionEngine, defaultValue: 0)
     @objc static var chineseConversionEngine: Int
 
     @objc static var chineseConversionEngineName: String? {
         return ChineseConversionEngine(rawValue: chineseConversionEngine)?.name
     }
 
-    @UserDefault(key: kPhraseReplacementEnabledKey, defaultValue: false)
+    @UserDefault(key: kPhraseReplacementEnabled, defaultValue: false)
     @objc static var phraseReplacementEnabled: Bool
 
     @objc static func togglePhraseReplacementEnabled() -> Bool {
         phraseReplacementEnabled = !phraseReplacementEnabled
-        UserDefaults.standard.set(phraseReplacementEnabled, forKey: kPhraseReplacementEnabledKey)
+        UserDefaults.standard.set(phraseReplacementEnabled, forKey: kPhraseReplacementEnabled)
         return phraseReplacementEnabled
     }
 }
