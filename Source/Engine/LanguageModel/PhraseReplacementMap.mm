@@ -15,6 +15,7 @@
 #include "KeyValueBlobReader.h"
 #include "PhraseReplacementMap.h"
 #include "LMConsolidator.h"
+#include "vChewing-Swift.h"
 
 namespace vChewing {
 
@@ -39,9 +40,14 @@ bool PhraseReplacementMap::open(const char *path)
     if (data) {
         return false;
     }
-    
+
     LMConsolidator::FixEOF(path);
-    LMConsolidator::ConsolidateContent(path, false);
+
+    if (Preferences.shouldAutoSortPhraseReplacementMapOnLoad) {
+        LMConsolidator::ConsolidateContent(path, true);
+    } else {
+        LMConsolidator::ConsolidateContent(path, false);
+    }
 
     fd = ::open(path, O_RDONLY);
     if (fd == -1) {
