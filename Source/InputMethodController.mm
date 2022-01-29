@@ -163,8 +163,10 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
         [menu addItemWithTitle:NSLocalizedString(@"Edit Phrase Replacement Table", @"") action:@selector(openPhraseReplacement:) keyEquivalent:@""];
     }
 
-    [menu addItemWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
-
+    if (optionKeyPressed || !Preferences.shouldAutoReloadUserDataFiles) {
+        [menu addItemWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
+    }
+    
     [menu addItem:[NSMenuItem separatorItem]]; // ------------------------------
 
     [menu addItemWithTitle:NSLocalizedString(@"vChewing Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""];
