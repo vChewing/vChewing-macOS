@@ -85,8 +85,8 @@
                                                         </connections>
                                                     </popUpButton>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="5Rz-c8-hp9">
-                                                        <rect key="frame" x="18" y="127" width="188" height="15"/>
-                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Change user interface language." id="ZEv-Q2-mYL">
+                                                        <rect key="frame" x="18" y="127" width="306" height="15"/>
+                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Change user interface language (will reboot the IME)." id="ZEv-Q2-mYL">
                                                             <font key="font" metaFont="cellTitle"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
