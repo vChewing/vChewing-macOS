@@ -15,6 +15,9 @@ private let kFunctionKeyKeyboardLayoutPreference = "FunctionKeyKeyboardLayout"
 private let kFunctionKeyKeyboardLayoutOverrideIncludeShift = "FunctionKeyKeyboardLayoutOverrideIncludeShift"
 private let kCandidateListTextSize = "CandidateListTextSize"
 private let kAppleLanguagesPreferences = "AppleLanguages"
+private let kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
+private let kShouldAutoSortUserPhrasesAndExclListOnLoad = "ShouldAutoSortUserPhrasesAndExclListOnLoad"
+private let kShouldAutoSortPhraseReplacementMapOnLoad = "ShouldAutoSortPhraseReplacementMapOnLoad"
 private let kSelectPhraseAfterCursorAsCandidatePreference = "SelectPhraseAfterCursorAsCandidate"
 private let kUseHorizontalCandidateListPreference = "UseHorizontalCandidateList"
 private let kComposingBufferSizePreference = "ComposingBufferSize"
@@ -175,6 +178,9 @@ struct ComposingBufferSize {
         defaults.removeObject(forKey: kFunctionKeyKeyboardLayoutOverrideIncludeShift)
         defaults.removeObject(forKey: kCandidateListTextSize)
         defaults.removeObject(forKey: kAppleLanguagesPreferences)
+        defaults.removeObject(forKey: kShouldAutoReloadUserDataFiles)
+        defaults.removeObject(forKey: kShouldAutoSortUserPhrasesAndExclListOnLoad)
+        defaults.removeObject(forKey: kShouldAutoSortPhraseReplacementMapOnLoad)
         defaults.removeObject(forKey: kSelectPhraseAfterCursorAsCandidatePreference)
         defaults.removeObject(forKey: kUseHorizontalCandidateListPreference)
         defaults.removeObject(forKey: kComposingBufferSizePreference)
@@ -209,6 +215,21 @@ struct ComposingBufferSize {
         // 預設摁空格鍵來選字，所以設成 true
         if UserDefaults.standard.object(forKey: kChooseCandidateUsingSpace) == nil {
             UserDefaults.standard.set(Preferences.chooseCandidateUsingSpace, forKey: kChooseCandidateUsingSpace)
+        }
+        
+        // 在檔案載入時，預設不啟用使用者自訂語彙表與語彙排除表的內容排序。
+        if UserDefaults.standard.object(forKey: kShouldAutoReloadUserDataFiles) == nil {
+            UserDefaults.standard.set(Preferences.shouldAutoReloadUserDataFiles, forKey: kShouldAutoReloadUserDataFiles)
+        }
+        
+        // 在檔案載入時，預設不啟用語彙置換表的內容排序。
+        if UserDefaults.standard.object(forKey: kShouldAutoSortUserPhrasesAndExclListOnLoad) == nil {
+            UserDefaults.standard.set(Preferences.ShouldAutoSortUserPhrasesAndExclListOnLoad, forKey: kShouldAutoSortUserPhrasesAndExclListOnLoad)
+        }
+        
+        // 自動檢測使用者自訂語彙數據的變動並載入。
+        if UserDefaults.standard.object(forKey: kShouldAutoSortPhraseReplacementMapOnLoad) == nil {
+            UserDefaults.standard.set(Preferences.shouldAutoSortPhraseReplacementMapOnLoad, forKey: kShouldAutoSortPhraseReplacementMapOnLoad)
         }
         
         // 預設禁用 WinNT351 風格的注音選字模式（就是每個字都要選的那種），所以設成 false
@@ -270,6 +291,15 @@ struct ComposingBufferSize {
 
     @CandidateListTextSize(key: kCandidateListTextSize)
     @objc static var candidateListTextSize: CGFloat
+    
+    @UserDefault(key: kShouldAutoReloadUserDataFiles, defaultValue: false)
+    @objc static var shouldAutoReloadUserDataFiles: Bool
+
+    @UserDefault(key: kShouldAutoSortUserPhrasesAndExclListOnLoad, defaultValue: false)
+    @objc static var ShouldAutoSortUserPhrasesAndExclListOnLoad: Bool
+
+    @UserDefault(key: kShouldAutoSortPhraseReplacementMapOnLoad, defaultValue: false)
+    @objc static var shouldAutoSortPhraseReplacementMapOnLoad: Bool
 
     @UserDefault(key: kSelectPhraseAfterCursorAsCandidatePreference, defaultValue: false)
     @objc static var selectPhraseAfterCursorAsCandidate: Bool
