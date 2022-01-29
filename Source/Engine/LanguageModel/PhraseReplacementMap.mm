@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include "KeyValueBlobReader.h"
 #include "PhraseReplacementMap.h"
+#include "LMConsolidator.h"
 
 namespace vChewing {
 
@@ -38,22 +39,9 @@ bool PhraseReplacementMap::open(const char *path)
     if (data) {
         return false;
     }
-
-    std::fstream zfd(path);
-    zfd.seekg(-1,std::ios_base::end);
-    char z;
-    zfd.get(z);
-    if(z!='\n'){
-        syslog(LOG_CONS, "REPORT: Phrase Replacement Map File is not ended with a new line.\n");
-        syslog(LOG_CONS, "PROCEDURE: Trying to insert a new line as EOF before per-line check process.\n");
-        std::ofstream zfdo(path, std::ios_base::app);
-        zfdo << std::endl;
-        zfdo.close();
-        if (zfdo.fail()) {
-            syslog(LOG_CONS, "REPORT: Failed to append a newline to the data file. Insufficient Privileges?\n");
-            return false;
-        }
-    }
+    
+    LMConsolidator::FixEOF(path);
+    LMConsolidator::ConsolidateContent(path, false);
 
     fd = ::open(path, O_RDONLY);
     if (fd == -1) {
