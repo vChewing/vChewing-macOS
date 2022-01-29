@@ -125,6 +125,9 @@
 /* Class = "NSTabViewItem"; label = "Dictionary"; ObjectID = "ISh-Da-hKv"; */
 "ISh-Da-hKv.label" = "Dictionary";
 
+/* Class = "NSButtonCell"; title = "Sort entries when reloading user phrases and excluded phrases list"; ObjectID = "Li3-Yg-SOC"; */
+"Li3-Yg-SOC.title" = "Sort entries when reloading user phrases and excluded phrases list";
+
 /* Class = "NSTabViewItem"; label = "General"; ObjectID = "QUQ-oY-4Hc"; */
 "QUQ-oY-4Hc.label" = "General";
 
@@ -155,11 +158,14 @@
 /* Class = "NSButtonCell"; title = "Press ESC key clears entire input buffer"; ObjectID = "f2j-xD-4xK"; */
 "f2j-xD-4xK.title" = "Press ESC key clears entire input buffer";
 
+/* Class = "NSButtonCell"; title = "Automatically reload user data files if changes detected"; ObjectID = "f8i-69-zxm"; */
+"f8i-69-zxm.title" = "Automatically reload user data files if changes detected";
+
 /* Class = "NSTextFieldCell"; title = "Change UI font size of candidate window for a better visual clarity."; ObjectID = "iRg-wx-Nx2"; */
 "iRg-wx-Nx2.title" = "Change UI font size of candidate window for a better visual clarity.";
 
-/* Class = "NSTextFieldCell"; title = "This dictionary page is under development."; ObjectID = "j48-5a-cEs"; */
-"j48-5a-cEs.title" = "This dictionary page is under development.";
+/* Class = "NSTextFieldCell"; title = "Define your preferred action when user data files reload."; ObjectID = "j48-5a-cEs"; */
+"j48-5a-cEs.title" = "Define your preferred action when user data files reload.";
 
 /* Class = "NSComboBoxCell"; jQC-12-UuK.ibShadowedObjectValues[0] = "Item 1"; ObjectID = "jQC-12-UuK"; */
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
@@ -169,6 +175,9 @@
 
 /* Class = "NSComboBoxCell"; jQC-12-UuK.ibShadowedObjectValues[2] = "Item 3"; ObjectID = "jQC-12-UuK"; */
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
+
+/* Class = "NSButtonCell"; title = "Sort entries when reloading the phrase replacement map"; ObjectID = "o60-vW-i1B"; */
+"o60-vW-i1B.title" = "Sort entries when reloading the phrase replacement map";
 
 /* Class = "NSMenuItem"; title = "Japanese"; ObjectID = "rVQ-Hx-cGi"; */
 "rVQ-Hx-cGi.title" = "Japanese";
