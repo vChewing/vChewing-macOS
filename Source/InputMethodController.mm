@@ -192,11 +192,6 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     NSString *basisKeyboardLayoutID = Preferences.basisKeyboardLayout;
     [client overrideKeyboardWithKeyboardNamed:basisKeyboardLayoutID];
 
-    // Load UserPhrases // 這裡今後需要改造成「驗證檔案指紋、根據驗證結果判定是否需要重新讀入」的形式。
-    if (Preferences.shouldAutoReloadUserDataFiles) {
-        [self reloadUserPhrases:(id)nil];
-    }
-
     // reset the state
     _currentDeferredClient = nil;
     _currentCandidateClient = nil;
