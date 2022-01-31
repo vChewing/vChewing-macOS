@@ -292,7 +292,7 @@ struct ComposingBufferSize {
     @CandidateListTextSize(key: kCandidateListTextSize)
     @objc static var candidateListTextSize: CGFloat
     
-    @UserDefault(key: kShouldAutoReloadUserDataFiles, defaultValue: false)
+    @UserDefault(key: kShouldAutoReloadUserDataFiles, defaultValue: true)
     @objc static var shouldAutoReloadUserDataFiles: Bool
 
     @UserDefault(key: kShouldAutoSortUserPhrasesAndExclListOnLoad, defaultValue: false)
