@@ -128,13 +128,23 @@ struct VersionUpdateApi {
 }
 
 @objc(AppDelegate)
-class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControllerDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControllerDelegate, FSEventStreamHelperDelegate {
+	func helper(_ helper: FSEventStreamHelper, didReceive events: [FSEventStreamHelper.Event]) {
+		DispatchQueue.main.async {
+			if Preferences.shouldAutoReloadUserDataFiles {
+				LanguageModelManager.loadUserPhrases()
+				LanguageModelManager.loadUserPhraseReplacement()
+			}
+		}
+	}
+	
 
     @IBOutlet weak var window: NSWindow?
     private var preferencesWindowController: PreferencesWindowController?
     private var aboutWindowController: frmAboutWindow? // New About Window
     private var checkTask: URLSessionTask?
     private var updateNextStepURL: URL?
+	private var fsStreamHelper = FSEventStreamHelper(path: LanguageModelManager.dataFolderPath, queue: DispatchQueue(label: "User Phrases"))
 
     // 補上 dealloc
     deinit {
@@ -149,6 +159,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
         LanguageModelManager.loadCNSData()
         LanguageModelManager.loadUserPhrases()
         LanguageModelManager.loadUserPhraseReplacement()
+		fsStreamHelper.delegate = self
+		_ = fsStreamHelper.start()
 
         Preferences.setMissingDefaults()
         

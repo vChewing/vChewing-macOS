@@ -21,6 +21,7 @@
 		5B5F4F972792A4EA00922DC2 /* UserPhrasesLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F4F962792A4EA00922DC2 /* UserPhrasesLM.mm */; };
 		5B6797B52794822C004AC7CE /* PhraseReplacementMap.h in Sources */ = {isa = PBXBuildFile; fileRef = 5B6797B32794822C004AC7CE /* PhraseReplacementMap.h */; };
 		5B810D9F27A3A5E50032C1A9 /* LMConsolidator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B810D9D27A3A5E50032C1A9 /* LMConsolidator.mm */; };
+		5B9DD0A927A7950D00ED335A /* FSEventStreamHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9DD0A827A7950D00ED335A /* FSEventStreamHelper.swift */; };
 		5BC2D2882793B434002C0BEC /* KeyValueBlobReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BC2D2862793B434002C0BEC /* KeyValueBlobReader.cpp */; };
 		5BC2D28B2793B8FB002C0BEC /* EmacsKeyHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC2D28A2793B8FB002C0BEC /* EmacsKeyHelper.swift */; };
 		5BC2D28D2793B98F002C0BEC /* PreferencesModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC2D28C2793B98F002C0BEC /* PreferencesModule.swift */; };
@@ -124,6 +125,7 @@
 		5B9781D52763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5B9781D72763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Source/zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5B9781D82763850700897999 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Source/zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		5B9DD0A827A7950D00ED335A /* FSEventStreamHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FSEventStreamHelper.swift; sourceTree = "<group>"; };
 		5BA923AC2791B7C20001323A /* vChewingInstaller-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vChewingInstaller-Bridging-Header.h"; sourceTree = "<group>"; };
 		5BC2D2842793B434002C0BEC /* KeyValueBlobReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyValueBlobReader.h; sourceTree = "<group>"; };
 		5BC2D2862793B434002C0BEC /* KeyValueBlobReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KeyValueBlobReader.cpp; sourceTree = "<group>"; };
@@ -264,6 +266,7 @@
 				5B6797B32794822C004AC7CE /* PhraseReplacementMap.h */,
 				5B810D9D27A3A5E50032C1A9 /* LMConsolidator.mm */,
 				5B810D9E27A3A5E50032C1A9 /* LMConsolidator.h */,
+				5B9DD0A827A7950D00ED335A /* FSEventStreamHelper.swift */,
 			);
 			path = LanguageModel;
 			sourceTree = "<group>";
@@ -714,6 +717,7 @@
 				5BD0D19A27943D390008F48E /* clsSFX.swift in Sources */,
 				5BDD25F9279D6D1200AA18F8 /* ioapi.m in Sources */,
 				5BE798A72793280C00337FF9 /* NotifierController.swift in Sources */,
+				5B9DD0A927A7950D00ED335A /* FSEventStreamHelper.swift in Sources */,
 				5B5F4F93279294A300922DC2 /* LanguageModelManager.mm in Sources */,
 				6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */,
 				6A0D4ED315FC0D6400ABF4B3 /* main.swift in Sources */,

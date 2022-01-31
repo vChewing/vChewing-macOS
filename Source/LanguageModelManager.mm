@@ -181,7 +181,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     [writeFile writeData:data];
     [writeFile closeFile];
 
-    [self loadUserPhrases];
+    // [self loadUserPhrases]; // Not Needed since AppDelegate is handling this.
     return YES;
 }
 

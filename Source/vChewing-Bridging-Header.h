@@ -17,4 +17,5 @@
 + (void)loadCNSData;
 + (void)loadUserPhrases;
 + (void)loadUserPhraseReplacement;
+@property (class, readonly, nonatomic) NSString *dataFolderPath;
 @end
