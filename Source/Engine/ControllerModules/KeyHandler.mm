@@ -220,7 +220,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     // if the composing buffer is empty and there's no reading, and there is some function key combination, we ignore it
-    BOOL isFunctionKey = ([input isCommandHold] || [input isControlHold] || [input isOptionHold] || [input isNumericPad]);
+	BOOL isFunctionKey = ([input isCommandHold] || [input isOptionHold] || [input isNumericPad]) || [input isControlHotKey];
     if (![state isKindOfClass:[InputStateNotEmpty class]] && isFunctionKey) {
         return NO;
     }
@@ -282,7 +282,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     // MARK: Handle BPMF Keys
     // see if it's valid BPMF reading
-    if (_bpmfReadingBuffer->isValidKey((char) charCode)) {
+	if (![input isControlHold] && _bpmfReadingBuffer->isValidKey((char) charCode)) {
         _bpmfReadingBuffer->combineKey((char) charCode);
 
         // if we have a tone marker, we have to insert the reading to the
@@ -457,8 +457,15 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     // MARK: Punctuation
     // if nothing is matched, see if it's a punctuation key for current layout.
-    string layout = [self _currentLayout];
-    string punctuationNamePrefix = Preferences.halfWidthPunctuationEnabled ? string("_half_punctuation_") : string("_punctuation_");
+	string punctuationNamePrefix;
+	if ([input isControlHold]) {
+		punctuationNamePrefix = string("_ctrl_punctuation_");
+	} else if (Preferences.halfWidthPunctuationEnabled) {
+		punctuationNamePrefix = string("_half_punctuation_");
+	} else {
+		punctuationNamePrefix = string("_punctuation_");
+	}
+	string layout = [self _currentLayout];
     string customPunctuation = punctuationNamePrefix + layout + string(1, (char) charCode);
     if ([self _handlePunctuation:customPunctuation state:state usingVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback]) {
         return YES;
@@ -998,7 +1005,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if (Preferences.useWinNT351BPMF) {
         string layout = [self _currentLayout];
-        string punctuationNamePrefix = Preferences.halfWidthPunctuationEnabled ? string("_half_punctuation_") : string("_punctuation_");
+		string punctuationNamePrefix;
+		if ([input isControlHold]) {
+			punctuationNamePrefix = string("_ctrl_punctuation_");
+		} else if (Preferences.halfWidthPunctuationEnabled) {
+			punctuationNamePrefix = string("_half_punctuation_");
+		} else {
+			punctuationNamePrefix = string("_punctuation_");
+		}
         string customPunctuation = punctuationNamePrefix + layout + string(1, (char) charCode);
         string punctuation = punctuationNamePrefix + string(1, (char) charCode);
 

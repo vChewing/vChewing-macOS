@@ -84,6 +84,10 @@ class KeyHandlerInput: NSObject {
         flags.contains([.control])
     }
 
+	@objc var isControlHotKey: Bool {
+		flags.contains([.control]) && inputText?.first?.isLetter ?? false
+	}
+
     @objc var isOptionHold: Bool {
         flags.contains([.option])
     }
