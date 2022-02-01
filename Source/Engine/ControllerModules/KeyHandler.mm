@@ -364,7 +364,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             // if the spacebar is NOT set to be a selection key
             if ([input isShiftHold] || !Preferences.chooseCandidateUsingSpace) {
                 if (_builder->cursorIndex() >= _builder->length()) {
-                    [self clear];
+					if ([state isKindOfClass:[InputStateNotEmpty class]]) {
+						NSString *composingBuffer = [(InputStateNotEmpty *)state composingBuffer];
+						if ([composingBuffer length]) {
+							InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
+							stateCallback(committing);
+						}
+					}
+					[self clear];
                     InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:@" "];
                     stateCallback(committing);
                     InputStateEmpty *empty = [[InputStateEmpty alloc] init];
