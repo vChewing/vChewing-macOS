@@ -21,9 +21,9 @@
 "Unable to create the user phrase file." = "无法创建自订语汇档案。";
 "Please check the permission of at \"%@\"." = "请检查此处的存取权限：\"%@\".";
 "Edit Excluded Phrases" = "编辑要滤除的语汇…";
-"Use Half-Width Punctuations" = "啟用半角標點輸出";
+"Half-Width Punctuation Mode" = "半角标点模式";
 "\"%@\" length must ≥ 2 for a user phrase." = "「%@」字数不足以自订语汇。";
-"\"%@\" length too long for a user phrase." = "「%@」字数太长、无法自订。";
+"\"%@\" length should ≤ %d for a user phrase." = "「%@」字数超过 %d、无法自订。";
 "\"%@\" selected. ENTER to add user phrase." = "「%@」敲 Enter 添入自订语汇。";
 "Edit Phrase Replacement Table" = "编辑语汇置换表…";
 "Use Phrase Replacement" = "使用语汇置换";
@@ -34,6 +34,7 @@
 "Please specify at least 4 candidate keys." = "请至少指定四个选字键。";
 "Maximum 15 candidate keys allowed." = "选字键最多只能指定十五个。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 语汇置换功能已启用，会波及语汇自订。";
+"⚠︎ Unhandlable char selected for user phrases." = "⚠︎ 已选中无法处理的字元，无法加入自订语汇。";
 "NT351 BPMF EMU" = "模拟逐字选字输入";
 "CNS11643 Mode" = "全字库模式";
 "Reboot vChewing…" = "重新启动输入法…";
