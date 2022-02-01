@@ -141,13 +141,13 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if (self) {
         _bpmfReadingBuffer = new BopomofoReadingBuffer(BopomofoKeyboardLayout::StandardLayout());
 
-		// create the lattice builder
-		_languageModel = [LanguageModelManager languageModelCoreCHT];
-		_languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
-		_languageModel->setCNSEnabled(Preferences.cns11643Enabled);
-		_userOverrideModel = [LanguageModelManager userOverrideModelCHT];
-		
-		_builder = new BlockReadingBuilder(_languageModel);
+        // create the lattice builder
+        _languageModel = [LanguageModelManager languageModelCoreCHT];
+        _languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
+        _languageModel->setCNSEnabled(Preferences.cns11643Enabled);
+        _userOverrideModel = [LanguageModelManager userOverrideModelCHT];
+        
+        _builder = new BlockReadingBuilder(_languageModel);
 
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
@@ -220,7 +220,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     // if the composing buffer is empty and there's no reading, and there is some function key combination, we ignore it
-	BOOL isFunctionKey = ([input isCommandHold] || [input isOptionHold] || [input isNumericPad]) || [input isControlHotKey];
+    BOOL isFunctionKey = ([input isCommandHold] || [input isOptionHold] || [input isNumericPad]) || [input isControlHotKey];
     if (![state isKindOfClass:[InputStateNotEmpty class]] && isFunctionKey) {
         return NO;
     }
@@ -282,7 +282,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     // MARK: Handle BPMF Keys
     // see if it's valid BPMF reading
-	if (![input isControlHold] && _bpmfReadingBuffer->isValidKey((char) charCode)) {
+    if (![input isControlHold] && _bpmfReadingBuffer->isValidKey((char) charCode)) {
         _bpmfReadingBuffer->combineKey((char) charCode);
 
         // if we have a tone marker, we have to insert the reading to the
@@ -364,14 +364,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             // if the spacebar is NOT set to be a selection key
             if ([input isShiftHold] || !Preferences.chooseCandidateUsingSpace) {
                 if (_builder->cursorIndex() >= _builder->length()) {
-					if ([state isKindOfClass:[InputStateNotEmpty class]]) {
-						NSString *composingBuffer = [(InputStateNotEmpty *)state composingBuffer];
-						if ([composingBuffer length]) {
-							InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
-							stateCallback(committing);
-						}
-					}
-					[self clear];
+                    if ([state isKindOfClass:[InputStateNotEmpty class]]) {
+                        NSString *composingBuffer = [(InputStateNotEmpty *)state composingBuffer];
+                        if ([composingBuffer length]) {
+                            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
+                            stateCallback(committing);
+                        }
+                    }
+                    [self clear];
                     InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:@" "];
                     stateCallback(committing);
                     InputStateEmpty *empty = [[InputStateEmpty alloc] init];
@@ -457,15 +457,15 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     // MARK: Punctuation
     // if nothing is matched, see if it's a punctuation key for current layout.
-	string punctuationNamePrefix;
-	if ([input isControlHold]) {
-		punctuationNamePrefix = string("_ctrl_punctuation_");
-	} else if (Preferences.halfWidthPunctuationEnabled) {
-		punctuationNamePrefix = string("_half_punctuation_");
-	} else {
-		punctuationNamePrefix = string("_punctuation_");
-	}
-	string layout = [self _currentLayout];
+    string punctuationNamePrefix;
+    if ([input isControlHold]) {
+        punctuationNamePrefix = string("_ctrl_punctuation_");
+    } else if (Preferences.halfWidthPunctuationEnabled) {
+        punctuationNamePrefix = string("_half_punctuation_");
+    } else {
+        punctuationNamePrefix = string("_punctuation_");
+    }
+    string layout = [self _currentLayout];
     string customPunctuation = punctuationNamePrefix + layout + string(1, (char) charCode);
     if ([self _handlePunctuation:customPunctuation state:state usingVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback]) {
         return YES;
@@ -543,8 +543,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if ([input isShiftHold]) {
         // Shift + left
-        if (_builder->cursorIndex() > 0) {
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:currentState.cursorIndex - 1 readings: [self _currentReadings]];
+        if (currentState.cursorIndex > 0) {
+            NSInteger previousPosition = [StringUtils previousUtf16PositionForIndex:currentState.cursorIndex in:currentState.composingBuffer];
+            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:previousPosition phrases:currentState.phrases];
             stateCallback(marking);
         } else {
             errorCallback();
@@ -579,8 +580,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if ([input isShiftHold]) {
         // Shift + Right
-        if (_builder->cursorIndex() < _builder->length()) {
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:currentState.cursorIndex + 1 readings: [self _currentReadings]];
+        if (currentState.cursorIndex < currentState.composingBuffer.length) {
+            NSInteger nextPosition = [StringUtils nextUtf16PositionForIndex:currentState.cursorIndex in:currentState.composingBuffer];
+            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:nextPosition phrases:currentState.phrases];
             stateCallback(marking);
         } else {
             errorCallback();
@@ -806,8 +808,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             && ([input isShiftHold])) {
         NSUInteger index = state.markerIndex;
         if (index > 0) {
-            index -= 1;
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index readings:state.readings];
+            index = [StringUtils previousUtf16PositionForIndex:index in:state.composingBuffer];
+            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index phrases:state.phrases];
             stateCallback(marking);
         } else {
             errorCallback();
@@ -821,8 +823,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             && ([input isShiftHold])) {
         NSUInteger index = state.markerIndex;
         if (index < state.composingBuffer.length) {
-            index += 1;
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index readings:state.readings];
+            index = [StringUtils nextUtf16PositionForIndex:index in:state.composingBuffer];
+                        InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index phrases:state.phrases];
             stateCallback(marking);
         } else {
             errorCallback();
@@ -844,7 +846,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     UniChar charCode = input.charCode;
     VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
 
-    BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || [input isDelete]; 
+    BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || [input isDelete];
 
     if (cancelCandidateKey) {
         if (Preferences.useWinNT351BPMF) {
@@ -1005,14 +1007,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if (Preferences.useWinNT351BPMF) {
         string layout = [self _currentLayout];
-		string punctuationNamePrefix;
-		if ([input isControlHold]) {
-			punctuationNamePrefix = string("_ctrl_punctuation_");
-		} else if (Preferences.halfWidthPunctuationEnabled) {
-			punctuationNamePrefix = string("_half_punctuation_");
-		} else {
-			punctuationNamePrefix = string("_punctuation_");
-		}
+        string punctuationNamePrefix;
+        if ([input isControlHold]) {
+            punctuationNamePrefix = string("_ctrl_punctuation_");
+        } else if (Preferences.halfWidthPunctuationEnabled) {
+            punctuationNamePrefix = string("_half_punctuation_");
+        } else {
+            punctuationNamePrefix = string("_punctuation_");
+        }
         string customPunctuation = punctuationNamePrefix + layout + string(1, (char) charCode);
         string punctuation = punctuationNamePrefix + string(1, (char) charCode);
 
@@ -1056,6 +1058,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     size_t readingCursorIndex = 0;
     size_t builderCursorIndex = _builder->cursorIndex();
 
+    NSMutableArray <InputPhrase *> *phrases = [[NSMutableArray alloc] init];
+
     // we must do some Unicode codepoint counting to find the actual cursor location for the client
     // i.e. we need to take UTF-16 into consideration, for which a surrogate pair takes 2 UniChars
     // locations
@@ -1067,6 +1071,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
             NSString *valueString = [NSString stringWithUTF8String:nodeStr.c_str()];
             [composingBuffer appendString:valueString];
+
+            NSString *readingString = [NSString stringWithUTF8String:(*wi).node->currentKeyValue().key.c_str()];
+            InputPhrase *phrase = [[InputPhrase alloc] initWithText:valueString reading:readingString];
+            [phrases addObject:phrase];
 
             // this re-aligns the cursor index in the composed string
             // (the actual cursor on the screen) with the builder's logical
@@ -1096,7 +1104,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     NSString *composedText = [head stringByAppendingString:[reading stringByAppendingString:tail]];
     NSInteger cursorIndex = composedStringCursorIndex + [reading length];
 
-    InputStateInputting *newState = [[InputStateInputting alloc] initWithComposingBuffer:composedText cursorIndex:cursorIndex];
+    InputStateInputting *newState = [[InputStateInputting alloc] initWithComposingBuffer:composedText cursorIndex:cursorIndex phrases:phrases];
     return newState;
 }
 
@@ -1166,7 +1174,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         }
     }
 
-    InputStateChoosingCandidate *state = [[InputStateChoosingCandidate alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex candidates:candidatesArray useVerticalMode:useVerticalMode];
+    InputStateChoosingCandidate *state = [[InputStateChoosingCandidate alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex candidates:candidatesArray phrases:currentState.phrases useVerticalMode:useVerticalMode];
     return state;
 }
 

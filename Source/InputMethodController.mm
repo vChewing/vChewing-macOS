@@ -443,6 +443,10 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 	// some apps (e.g. Twitter for Mac's search bar) handle this call incorrectly, hence the try-catch
 	@try {
 		[client attributesForCharacterIndex:cursor lineHeightRectangle:&lineHeightRect];
+		if ((lineHeightRect.origin.x == 0) && (lineHeightRect.origin.y == 0) && (cursor > 0)) {
+			cursor -= 1; // Zonble's UPR fix: "Corrects the selection range while using Shift + Arrow keys to add new phrases."
+			[client attributesForCharacterIndex:cursor lineHeightRectangle:&lineHeightRect];
+		}
 	}
 	@catch (NSException *exception) {
 		NSLog(@"lineHeightRectangle %@", exception);
@@ -688,6 +692,10 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 	// some apps (e.g. Twitter for Mac's search bar) handle this call incorrectly, hence the try-catch
 	@try {
 		[client attributesForCharacterIndex:cursor lineHeightRectangle:&lineHeightRect];
+		if ((lineHeightRect.origin.x == 0) && (lineHeightRect.origin.y == 0) && (cursor > 0)) {
+			cursor -= 1; // Zonble's UPR fix: "Corrects the selection range while using Shift + Arrow keys to add new phrases."
+			[client attributesForCharacterIndex:cursor lineHeightRectangle:&lineHeightRect];
+		}
 	}
 	@catch (NSException *exception) {
 		NSLog(@"%@", exception);
