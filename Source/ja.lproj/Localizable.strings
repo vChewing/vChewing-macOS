@@ -34,6 +34,7 @@
 "Please specify at least 4 candidate keys." = "言選り用キー陣列に少なくとも４つのキーをご登録ください。";
 "Maximum 15 candidate keys allowed." = "言選り用キー陣列には最多１５つキー登録できます。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 言葉置換機能稼働中、新添付言葉にも影響。";
+"⚠︎ Unhandlable char selected for user phrases." = "⚠︎ ユーザー辞書の対処できない文字は選択されています。";
 "NT351 BPMF EMU" = "全候補入力モード";
 "CNS11643 Mode" = "全字庫モード";
 "Reboot vChewing…" = "入力アプリ再起動…";
