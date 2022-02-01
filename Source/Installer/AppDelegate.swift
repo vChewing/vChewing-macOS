@@ -228,18 +228,27 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
                 NSLog("Failed to enable input method: \(imeIdentifier)");
             }
         }
-
+        
+        // Alert Panel
+        let ntfPostInstall = NSAlert()
         if warning {
-            runAlertPanel(title: NSLocalizedString("Attention", comment: ""), message: NSLocalizedString("vChewing is upgraded, but please log out or reboot for the new version to be fully functional.", comment: ""), buttonTitle: NSLocalizedString("OK", comment: ""))
+            ntfPostInstall.messageText = NSLocalizedString("Attention", comment: "")
+            ntfPostInstall.informativeText = NSLocalizedString("vChewing is upgraded, but please log out or reboot for the new version to be fully functional.", comment: "")
+            ntfPostInstall.addButton(withTitle: NSLocalizedString("OK", comment: ""))
         } else {
             if !mainInputSourceEnabled && !isMacOS12OrAbove {
-                runAlertPanel(title: NSLocalizedString("Warning", comment: ""), message: NSLocalizedString("Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources.", comment: ""), buttonTitle: NSLocalizedString("Continue", comment: ""))
+                ntfPostInstall.messageText = NSLocalizedString("Warning", comment: "")
+                ntfPostInstall.informativeText = NSLocalizedString("Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources.", comment: "")
+                ntfPostInstall.addButton(withTitle: NSLocalizedString("Continue", comment: ""))
             } else {
-                runAlertPanel(title: NSLocalizedString("Installation Successful", comment: ""), message: NSLocalizedString("vChewing is ready to use.", comment: ""), buttonTitle: NSLocalizedString("OK", comment: ""))
+                ntfPostInstall.messageText = NSLocalizedString("Installation Successful", comment: "")
+                ntfPostInstall.informativeText = NSLocalizedString("vChewing is ready to use.", comment: "")
+                ntfPostInstall.addButton(withTitle: NSLocalizedString("OK", comment: ""))
             }
         }
-
-        endAppWithDelay()
+        ntfPostInstall.beginSheetModal(for: window!) { response in
+            self.endAppWithDelay()
+        }
     }
 
     func endAppWithDelay() {
