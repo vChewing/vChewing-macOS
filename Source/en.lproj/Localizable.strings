@@ -21,9 +21,9 @@
 "Unable to create the user phrase file." = "Unable to create the user phrase file.";
 "Please check the permission of at \"%@\"." = "Please check the permission of at \"%@\".";
 "Edit Excluded Phrases" = "Edit Excluded Phrases…";
-"Use Half-Width Punctuations" = "Use Half-Width Punctuations";
+"Half-Width Punctuation Mode" = "Half-Width Punctuation Mode";
 "\"%@\" length must ≥ 2 for a user phrase." = "\"%@\" length must ≥ 2 for a user phrase.";
-"\"%@\" length too long for a user phrase." = "\"%@\" length too long for a user phrase.";
+"\"%@\" length should ≤ %d for a user phrase." = "\"%@\" length should ≤ %d for a user phrase.";
 "\"%@\" selected. ENTER to add user phrase." = "\"%@\" selected. ENTER to add user phrase.";
 "Edit Phrase Replacement Table" = "Edit Phrase Replacement Table…";
 "Use Phrase Replacement" = "Use Phrase Replacement";
@@ -34,6 +34,7 @@
 "Please specify at least 4 candidate keys." = "Please specify at least 4 candidate keys.";
 "Maximum 15 candidate keys allowed." = "Maximum 15 candidate keys allowed.";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.";
+"⚠︎ Unhandlable char selected for user phrases." = "⚠︎ Unhandlable char selected for user phrases.";
 "NT351 BPMF EMU" = "NT351 Per-Char Select Mode";
 "CNS11643 Mode" = "CNS11643 Mode";
 "Reboot vChewing…" = "Reboot vChewing…";

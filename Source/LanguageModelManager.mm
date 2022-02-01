@@ -7,15 +7,9 @@
  */
 
 #import "LanguageModelManager.h"
-#import <fstream>
-#import <iostream>
-#import <set>
-#import "OVUTF8Helper.h"
 
 using namespace std;
-using namespace Taiyan::Gramambular;
 using namespace vChewing;
-using namespace OpenVanilla;
 
 static const int kUserOverrideModelCapacity = 500;
 static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
@@ -72,7 +66,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
         NSLog(@"User Data Folder N/A.");
         return NO;
     }
-    if (![self checkIfFileExist:[self cnsDataPath]]) {
+    if (![self ensureFileExists:[self cnsDataPath]]) {
         NSLog(@"Extracted CNS Data Not Found.");
         return NO;
     }
@@ -122,7 +116,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     return YES;
 }
 
-+ (BOOL)checkIfFileExist:(NSString *)filePath
++ (BOOL)ensureFileExists:(NSString *)filePath
 {
     if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
         BOOL result = [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filePath atomically:YES];
@@ -139,22 +133,22 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     if (![self checkIfUserDataFolderExists]) {
         return NO;
     }
-    if (![self checkIfFileExist:[self userPhrasesDataPath:kBopomofoModeIdentifierCHT]]) {
+    if (![self ensureFileExists:[self userPhrasesDataPath:kBopomofoModeIdentifierCHT]]) {
         return NO;
     }
-    if (![self checkIfFileExist:[self excludedPhrasesDataPath:kBopomofoModeIdentifierCHT]]) {
+    if (![self ensureFileExists:[self excludedPhrasesDataPath:kBopomofoModeIdentifierCHT]]) {
         return NO;
     }
-    if (![self checkIfFileExist:[self phraseReplacementDataPath:kBopomofoModeIdentifierCHT]]) {
+    if (![self ensureFileExists:[self phraseReplacementDataPath:kBopomofoModeIdentifierCHT]]) {
         return NO;
     }
-	if (![self checkIfFileExist:[self userPhrasesDataPath:kBopomofoModeIdentifierCHS]]) {
+	if (![self ensureFileExists:[self userPhrasesDataPath:kBopomofoModeIdentifierCHS]]) {
 		return NO;
 	}
-	if (![self checkIfFileExist:[self excludedPhrasesDataPath:kBopomofoModeIdentifierCHS]]) {
+	if (![self ensureFileExists:[self excludedPhrasesDataPath:kBopomofoModeIdentifierCHS]]) {
 		return NO;
 	}
-	if (![self checkIfFileExist:[self phraseReplacementDataPath:kBopomofoModeIdentifierCHS]]) {
+	if (![self ensureFileExists:[self phraseReplacementDataPath:kBopomofoModeIdentifierCHS]]) {
 		return NO;
 	}
 	return YES;
@@ -188,7 +182,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
 + (NSString *)dataFolderPath
 {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES);
-    NSString *appSupportPath = [paths objectAtIndex:0];
+	NSString *appSupportPath = paths[0];
     NSString *userDictPath = [appSupportPath stringByAppendingPathComponent:@"vChewing"];
     return userDictPath;
 }
