@@ -40,180 +40,267 @@ import Cocoa
 /// - Choosing Candidate: The candidate window is open to let the user to choose
 ///   one among the candidates.
 class InputState: NSObject {
+
+    /// Represents that the input controller is deactivated.
+    @objc (InputStateDeactivated)
+    class Deactivated: InputState {
+        override var description: String {
+            "<InputState.Deactivated>"
+        }
+    }
+
+    /// Represents that the composing buffer is empty.
+    @objc (InputStateEmpty)
+    class Empty: InputState {
+        @objc var composingBuffer: String {
+            ""
+        }
+
+        override var description: String {
+            "<InputState.Empty>"
+        }
+    }
+
+    /// Represents that the composing buffer is empty.
+    @objc (InputStateEmptyIgnoringPreviousState)
+    class EmptyIgnoringPreviousState: InputState {
+        @objc var composingBuffer: String {
+            ""
+        }
+        override var description: String {
+            "<InputState.EmptyIgnoringPreviousState>"
+        }
+    }
+
+    /// Represents that the input controller is committing text into client app.
+    @objc (InputStateCommitting)
+    class Committing: InputState {
+        @objc private(set) var poppedText: String = ""
+
+        @objc convenience init(poppedText: String) {
+            self.init()
+            self.poppedText = poppedText
+        }
+
+        override var description: String {
+            "<InputState.Committing poppedText:\(poppedText)>"
+        }
+    }
+    /// Represents that the composing buffer is not empty.
+    @objc (InputStateNotEmpty)
+    class NotEmpty: InputState {
+        @objc private(set) var composingBuffer: String
+        @objc private(set) var cursorIndex: UInt
+        @objc private(set) var phrases: [InputPhrase]
+
+        @objc init(composingBuffer: String, cursorIndex: UInt, phrases: [InputPhrase]) {
+            self.composingBuffer = composingBuffer
+            self.cursorIndex = cursorIndex
+            self.phrases = phrases
+        }
+
+        override var description: String {
+            "<InputState.NotEmpty, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), phrases:\(phrases)>"
+        }
+    }
+
+    /// Represents that the user is inputting text.
+    @objc (InputStateInputting)
+    class Inputting: NotEmpty {
+        @objc var poppedText: String = ""
+
+        @objc override init(composingBuffer: String, cursorIndex: UInt, phrases: [InputPhrase]) {
+            super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex, phrases: phrases)
+        }
+
+        @objc var attributedString: NSAttributedString {
+            let attributedSting = NSAttributedString(string: composingBuffer, attributes: [
+                .underlineStyle: NSUnderlineStyle.single.rawValue,
+                .markedClauseSegment: 0
+            ])
+            return attributedSting
+        }
+
+        override var description: String {
+            "<InputState.Inputting, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), phrases:\(phrases)>, poppedText:\(poppedText)>"
+        }
+    }
+
+    private let kMinMarkRangeLength = 2
+    private let kMaxMarkRangeLength = 6
+
+    /// Represents that the user is marking a range in the composing buffer.
+    @objc (InputStateMarking)
+    class Marking: NotEmpty {
+
+        @objc private(set) var markerIndex: UInt
+        @objc private(set) var markedRange: NSRange
+        @objc var tooltip: String {
+    
+            if Preferences.phraseReplacementEnabled {
+                return NSLocalizedString("⚠︎ Phrase replacement mode enabled, interfering user phrase entry.", comment: "")
+            }
+    
+            if markedRange.length == 0 {
+                return ""
+            }
+    
+            let text = (composingBuffer as NSString).substring(with: markedRange)
+            if markedRange.length < kMinMarkRangeLength {
+                return String(format: NSLocalizedString("\"%@\" length must ≥ 2 for a user phrase.", comment: ""), text)
+            } else if (markedRange.length > kMaxMarkRangeLength) {
+                return String(format: NSLocalizedString("\"%@\" length should ≤ %d for a user phrase.", comment: ""), text, kMaxMarkRangeLength)
+            }
+            return String(format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: ""), text)
+        }
+
+        @objc init(composingBuffer: String, cursorIndex: UInt, markerIndex: UInt, phrases: [InputPhrase]) {
+            self.markerIndex = markerIndex
+            let begin = min(cursorIndex, markerIndex)
+            let end = max(cursorIndex, markerIndex)
+            markedRange = NSMakeRange(Int(begin), Int(end - begin))
+            super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex, phrases: phrases)
+        }
+
+        @objc var attributedString: NSAttributedString {
+            let attributedSting = NSMutableAttributedString(string: composingBuffer)
+            let end = markedRange.location + markedRange.length
+
+            attributedSting.setAttributes([
+                .underlineStyle: NSUnderlineStyle.single.rawValue,
+                .markedClauseSegment: 0
+            ], range: NSRange(location: 0, length: markedRange.location))
+            attributedSting.setAttributes([
+                .underlineStyle: NSUnderlineStyle.thick.rawValue,
+                .markedClauseSegment: 1
+            ], range: markedRange)
+            attributedSting.setAttributes([
+                .underlineStyle: NSUnderlineStyle.single.rawValue,
+                .markedClauseSegment: 2
+            ], range: NSRange(location: end,
+                              length: (composingBuffer as NSString).length - end))
+            return attributedSting
+        }
+
+        override var description: String {
+            "<InputState.Marking, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), markedRange:\(markedRange), phrases:\(phrases)>"
+        }
+
+        @objc func convertToInputting() -> Inputting {
+            let state = Inputting(composingBuffer: composingBuffer, cursorIndex: cursorIndex, phrases: phrases)
+            return state
+        }
+
+        @objc var validToWrite: Bool {
+            markedRange.length >= kMinMarkRangeLength && markedRange.length <= kMaxMarkRangeLength
+        }
+
+        @objc var userPhrase: String {
+            let text = (composingBuffer as NSString).substring(with: markedRange)
+            let end = markedRange.location + markedRange.length
+            var selectedPhrases = [InputPhrase]()
+            var length = 0
+            for component in self.phrases {
+                if length >= end {
+                    break
+                }
+                if length >= markedRange.location {
+                    selectedPhrases.append(component)
+                }
+                length += (component.text as NSString).length
+            }
+
+            let readings = selectedPhrases.map { $0.reading }
+            let joined = readings.joined(separator: "-")
+            return "\(text) \(joined)"
+        }
+    }
+
+    /// Represents that the user is choosing in a candidates list.
+    @objc (InputStateChoosingCandidate)
+    class ChoosingCandidate: NotEmpty {
+        @objc private(set) var candidates: [String]
+        @objc private(set) var useVerticalMode: Bool
+
+        @objc init(composingBuffer: String, cursorIndex: UInt, candidates: [String], phrases: [InputPhrase], useVerticalMode: Bool) {
+            self.candidates = candidates
+            self.useVerticalMode = useVerticalMode
+            super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex, phrases: phrases)
+        }
+
+        @objc var attributedString: NSAttributedString {
+            let attributedSting = NSAttributedString(string: composingBuffer, attributes: [
+                .underlineStyle: NSUnderlineStyle.single.rawValue,
+                .markedClauseSegment: 0
+            ])
+            return attributedSting
+        }
+
+        override var description: String {
+            "<InputState.ChoosingCandidate, candidates:\(candidates), useVerticalMode:\(useVerticalMode), phrases:\(phrases),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
+        }
+    }
+
+    /// Represents that the user is choosing in a candidates list
+    /// in the associated phrases mode.
+    @objc (InputStateAssociatedPhrases)
+    class AssociatedPhrases: InputState {
+        @objc private(set) var candidates: [String] = []
+        @objc private(set) var useVerticalMode: Bool = false
+        @objc init(candidates: [String], useVerticalMode: Bool) {
+            self.candidates = candidates
+            self.useVerticalMode = useVerticalMode
+            super.init()
+        }
+
+        override var description: String {
+            "<InputState.AssociatedPhrases, candidates:\(candidates), useVerticalMode:\(useVerticalMode)>"
+        }
+    }
+
 }
 
-/// Represents that the input controller is deactivated.
-class InputStateDeactivated: InputState {
-	override var description: String {
-		"<InputStateDeactivated>"
-	}
+class InputPhrase: NSObject {
+    @objc private (set) var text: String
+    @objc private (set) var reading: String
+
+    @objc init(text: String, reading: String) {
+        self.text = text
+        self.reading = reading
+        super.init()
+    }
 }
 
-/// Represents that the composing buffer is empty.
-class InputStateEmpty: InputState {
-	@objc var composingBuffer: String {
-		""
-	}
-}
+class StringUtils: NSObject {
 
-/// Represents that the composing buffer is empty.
-class InputStateEmptyIgnoringPreviousState: InputState {
-	@objc var composingBuffer: String {
-		""
-	}
-}
+    static func convertToCharIndex(from utf16Index: Int, in string: String) -> Int {
+        var length = 0
+        for (i, c) in string.enumerated() {
+            if length >= utf16Index {
+                return i
+            }
+            length += c.utf16.count
+        }
+        return string.count
+    }
 
-/// Represents that the input controller is committing text into client app.
-class InputStateCommitting: InputState {
-	@objc private(set) var poppedText: String = ""
+    @objc (nextUtf16PositionForIndex:in:)
+    static func nextUtf16Position(for index: Int, in string: String) -> Int {
+        var index = convertToCharIndex(from: index, in: string)
+        if index < string.count {
+            index += 1
+        }
+        let count = string[..<string.index(string.startIndex, offsetBy: index)].utf16.count
+        return count
+    }
 
-	@objc convenience init(poppedText: String) {
-		self.init()
-		self.poppedText = poppedText
-	}
-
-	override var description: String {
-		"<InputStateCommitting poppedText:\(poppedText)>"
-	}
-}
-
-/// Represents that the composing buffer is not empty.
-class InputStateNotEmpty: InputState {
-	@objc private(set) var composingBuffer: String = ""
-	@objc private(set) var cursorIndex: UInt = 0
-
-	@objc init(composingBuffer: String, cursorIndex: UInt) {
-		self.composingBuffer = composingBuffer
-		self.cursorIndex = cursorIndex
-	}
-
-	override var description: String {
-		"<InputStateNotEmpty, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
-	}
-}
-
-/// Represents that the user is inputting text.
-class InputStateInputting: InputStateNotEmpty {
-	@objc var bpmfReading: String = ""
-	@objc var bpmfReadingCursorIndex: UInt8 = 0
-	@objc var poppedText: String = ""
-
-	@objc override init(composingBuffer: String, cursorIndex: UInt) {
-		super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
-	}
-
-	@objc var attributedString: NSAttributedString {
-		let attributedSting = NSAttributedString(string: composingBuffer, attributes: [
-			.underlineStyle: NSUnderlineStyle.single.rawValue,
-			.markedClauseSegment: 0
-		])
-		return attributedSting
-	}
-
-	override var description: String {
-		"<InputStateInputting, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), poppedText:\(poppedText)>"
-	}
-}
-
-private let kMinMarkRangeLength = 2
-private let kMaxMarkRangeLength = Preferences.maxCandidateLength
-
-/// Represents that the user is marking a range in the composing buffer.
-class InputStateMarking: InputStateNotEmpty {
-	@objc private(set) var markerIndex: UInt
-	@objc private(set) var markedRange: NSRange
-	@objc var tooltip: String {
-
-		if Preferences.phraseReplacementEnabled {
-			return NSLocalizedString("⚠︎ Phrase replacement mode enabled, interfering user phrase entry.", comment: "")
-		}
-
-		if markedRange.length == 0 {
-			return ""
-		}
-
-		let text = (composingBuffer as NSString).substring(with: markedRange)
-		if markedRange.length < kMinMarkRangeLength {
-			return String(format: NSLocalizedString("\"%@\" length must ≥ 2 for a user phrase.", comment: ""), text)
-		} else if (markedRange.length > kMaxMarkRangeLength) {
-			return String(format: NSLocalizedString("\"%@\" length should ≤ %d for a user phrase.", comment: ""), text, kMaxMarkRangeLength)
-		}
-		return String(format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: ""), text)
-	}
-
-	@objc private(set) var readings: [String] = []
-
-	@objc init(composingBuffer: String, cursorIndex: UInt, markerIndex: UInt, readings: [String]) {
-		self.markerIndex = markerIndex
-		let begin = min(cursorIndex, markerIndex)
-		let end = max(cursorIndex, markerIndex)
-		markedRange = NSMakeRange(Int(begin), Int(end - begin))
-		self.readings = readings
-		super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
-	}
-
-	@objc var attributedString: NSAttributedString {
-		let attributedSting = NSMutableAttributedString(string: composingBuffer)
-		let end = markedRange.location + markedRange.length
-
-		attributedSting.setAttributes([
-			.underlineStyle: NSUnderlineStyle.single.rawValue,
-			.markedClauseSegment: 0
-		], range: NSRange(location: 0, length: markedRange.location))
-		attributedSting.setAttributes([
-			.underlineStyle: NSUnderlineStyle.thick.rawValue,
-			.markedClauseSegment: 1
-		], range: markedRange)
-		attributedSting.setAttributes([
-			.underlineStyle: NSUnderlineStyle.single.rawValue,
-			.markedClauseSegment: 2
-		], range: NSRange(location: end,
-				length: composingBuffer.count - end))
-		return attributedSting
-	}
-
-	override var description: String {
-		"<InputStateMarking, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), markedRange:\(markedRange), readings:\(readings)>"
-	}
-
-	@objc func convertToInputting() -> InputStateInputting {
-		let state = InputStateInputting(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
-		return state
-	}
-
-	@objc var validToWrite: Bool {
-		markedRange.length >= kMinMarkRangeLength && markedRange.length <= kMaxMarkRangeLength
-	}
-
-	@objc var userPhrase: String {
-		let text = (composingBuffer as NSString).substring(with: markedRange)
-		let end = markedRange.location + markedRange.length
-		let readings = readings[markedRange.location..<end]
-		let joined = readings.joined(separator: "-")
-		return "\(text) \(joined)"
-	}
-}
-
-/// Represents that the user is choosing in a candidates list.
-class InputStateChoosingCandidate: InputStateNotEmpty {
-	@objc private(set) var candidates: [String] = []
-	@objc private(set) var useVerticalMode: Bool = false
-
-	@objc init(composingBuffer: String, cursorIndex: UInt, candidates: [String], useVerticalMode: Bool) {
-		self.candidates = candidates
-		self.useVerticalMode = useVerticalMode
-		super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
-	}
-
-	@objc var attributedString: NSAttributedString {
-		let attributedSting = NSAttributedString(string: composingBuffer, attributes: [
-			.underlineStyle: NSUnderlineStyle.single.rawValue,
-			.markedClauseSegment: 0
-		])
-		return attributedSting
-	}
-
-	override var description: String {
-		"<InputStateChoosingCandidate, candidates:\(candidates), useVerticalMode:\(useVerticalMode), composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
-	}
+    @objc (previousUtf16PositionForIndex:in:)
+    static func previousUtf16Position(for index: Int, in string: String) -> Int {
+        var index = convertToCharIndex(from: index, in: string)
+        if index > 0 {
+            index -= 1
+        }
+        let count = string[..<string.index(string.startIndex, offsetBy: index)].utf16.count
+        return count
+    }
 }
