@@ -137,7 +137,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
 			}
 		}
 	}
-	
 
     @IBOutlet weak var window: NSWindow?
     private var preferencesWindowController: PreferencesWindowController?
@@ -152,6 +151,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
         aboutWindowController = nil
         checkTask = nil
         updateNextStepURL = nil
+        fsStreamHelper.stop()
+        fsStreamHelper.delegate = nil
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
