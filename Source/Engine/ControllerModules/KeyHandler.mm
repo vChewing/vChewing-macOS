@@ -359,8 +359,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // MARK: Space and Down
     // keyCode 125 = Down, charCode 32 = Space
     if (_bpmfReadingBuffer->isEmpty() &&
-            [state isKindOfClass:[InputStateNotEmpty class]] &&
-            ([input isExtraChooseCandidateKey] || charCode == 32 || (input.useVerticalMode && ([input isVerticalModeOnlyChooseCandidateKey])))) {
+        [state isKindOfClass:[InputStateNotEmpty class]] &&
+        ([input isExtraChooseCandidateKey] || charCode == 32
+         || [input isPageDown] || [input isPageUp]
+         || (input.useVerticalMode && ([input isVerticalModeOnlyChooseCandidateKey])))) {
         if (charCode == 32) {
             // if the spacebar is NOT set to be a selection key
             if ([input isShiftHold] || !Preferences.chooseCandidateUsingSpace) {
