@@ -72,6 +72,10 @@ class KeyHandlerInput: NSObject {
         super.init()
     }
 
+    override var description: String {
+        return "<\(super.description) inputText:\(String(describing: inputText)), charCode:\(charCode), keyCode:\(keyCode), flags:\(flags), cursorForwardKey:\(cursorForwardKey), cursorBackwardKey:\(cursorBackwardKey), extraChooseCandidateKey:\(extraChooseCandidateKey), absorbedArrowKey:\(absorbedArrowKey),  verticalModeOnlyChooseCandidateKey:\(verticalModeOnlyChooseCandidateKey), emacsKey:\(emacsKey), useVerticalMode:\(useVerticalMode)>"
+    }
+
     @objc var isShiftHold: Bool {
         flags.contains([.shift])
     }
@@ -98,6 +102,13 @@ class KeyHandlerInput: NSObject {
 
     @objc var isNumericPad: Bool {
         flags.contains([.numericPad])
+    }
+
+    @objc var isReservedKey: Bool {
+        guard let code = KeyCode(rawValue: keyCode) else {
+            return false
+        }
+        return code.rawValue != KeyCode.none.rawValue
     }
 
     @objc var isEnter: Bool {

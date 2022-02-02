@@ -279,10 +279,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     bool composeReading = false;
+    bool skipBpmfHandling = [input isReservedKey] || [input isControlHold];
 
     // MARK: Handle BPMF Keys
     // see if it's valid BPMF reading
-    if (![input isControlHold] && _bpmfReadingBuffer->isValidKey((char) charCode)) {
+    if (!skipBpmfHandling && _bpmfReadingBuffer->isValidKey((char) charCode)) {
         _bpmfReadingBuffer->combineKey((char) charCode);
 
         // if we have a tone marker, we have to insert the reading to the
@@ -358,8 +359,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // MARK: Space and Down
     // keyCode 125 = Down, charCode 32 = Space
     if (_bpmfReadingBuffer->isEmpty() &&
-            [state isKindOfClass:[InputStateNotEmpty class]] &&
-            ([input isExtraChooseCandidateKey] || charCode == 32 || (input.useVerticalMode && ([input isVerticalModeOnlyChooseCandidateKey])))) {
+        [state isKindOfClass:[InputStateNotEmpty class]] &&
+        ([input isExtraChooseCandidateKey] || charCode == 32
+         || [input isPageDown] || [input isPageUp]
+         || (input.useVerticalMode && ([input isVerticalModeOnlyChooseCandidateKey])))) {
         if (charCode == 32) {
             // if the spacebar is NOT set to be a selection key
             if ([input isShiftHold] || !Preferences.chooseCandidateUsingSpace) {
