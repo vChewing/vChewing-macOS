@@ -33,7 +33,6 @@ private let kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
 private let kCandidateTextFontName = "CandidateTextFontName"
 private let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
 private let kCandidateKeys = "CandidateKeys"
-private let kChineseConversionEngine = "ChineseConversionEngine"
 private let kPhraseReplacementEnabled = "PhraseReplacementEnabled"
 
 private let kDefaultCandidateListTextSize: CGFloat = 18
@@ -154,20 +153,6 @@ struct ComposingBufferSize {
     }
 }
 
-@objc enum ChineseConversionEngine: Int {
-    case openCC
-    case vxHanConvert
-
-    var name: String {
-        switch (self) {
-        case .openCC:
-            return "OpenCC"
-        case .vxHanConvert:
-            return "VXHanConvert"
-        }
-    }
-}
-
 // MARK: -
 @objc public class Preferences: NSObject {
     static func reset() {
@@ -193,7 +178,6 @@ struct ComposingBufferSize {
         defaults.removeObject(forKey: kCandidateKeyLabelFontName)
         defaults.removeObject(forKey: kCandidateKeys)
         defaults.removeObject(forKey: kPhraseReplacementEnabled)
-        defaults.removeObject(forKey: kChineseConversionEngine)
         defaults.removeObject(forKey: kUseWinNT351BPMF)
         defaults.removeObject(forKey: kMaxCandidateLength)
         defaults.removeObject(forKey: kShouldNotFartInLieuOfBeep)
@@ -428,13 +412,6 @@ struct ComposingBufferSize {
             }
         }
 
-    }
-
-    @UserDefault(key: kChineseConversionEngine, defaultValue: 0)
-    @objc static var chineseConversionEngine: Int
-
-    @objc static var chineseConversionEngineName: String? {
-        return ChineseConversionEngine(rawValue: chineseConversionEngine)?.name
     }
 
     @UserDefault(key: kPhraseReplacementEnabled, defaultValue: false)
