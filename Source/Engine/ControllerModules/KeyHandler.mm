@@ -11,7 +11,6 @@
 #import "vChewingLM.h"
 #import "UserOverrideModel.h"
 #import "LanguageModelManager.h"
-#import "OVUTF8Helper.h"
 #import "KeyHandler.h"
 #import "vChewing-Swift.h"
 
@@ -19,7 +18,6 @@ using namespace std;
 using namespace Taiyan::Mandarin;
 using namespace Taiyan::Gramambular;
 using namespace vChewing;
-using namespace OpenVanilla;
 
 NSString *const kBopomofoModeIdentifierCHT = @"org.atelierInmu.inputmethod.vChewing.TradBopomofo";
 NSString *const kBopomofoModeIdentifierCHS = @"org.atelierInmu.inputmethod.vChewing.SimpBopomofo";
@@ -1070,11 +1068,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     for (vector<NodeAnchor>::iterator wi = _walkedNodes.begin(), we = _walkedNodes.end(); wi != we; ++wi) {
         if ((*wi).node) {
             string nodeStr = (*wi).node->currentKeyValue().value;
-            vector<string> codepoints = OVUTF8Helper::SplitStringByCodePoint(nodeStr);
-            size_t codepointCount = codepoints.size();
 
             NSString *valueString = [NSString stringWithUTF8String:nodeStr.c_str()];
             [composingBuffer appendString:valueString];
+            
+            NSArray *splited = [valueString split];
+            NSInteger codepointCount = splited.count;
 
             NSString *readingString = [NSString stringWithUTF8String:(*wi).node->currentKeyValue().key.c_str()];
             InputPhrase *phrase = [[InputPhrase alloc] initWithText:valueString reading:readingString];
@@ -1092,7 +1091,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                 readingCursorIndex += spanningLength;
             } else {
                 for (size_t i = 0; i < codepointCount && readingCursorIndex < builderCursorIndex; i++) {
-                    composedStringCursorIndex += [[NSString stringWithUTF8String:codepoints[i].c_str()] length];
+                    composedStringCursorIndex += [splited[i] length];
                     readingCursorIndex++;
                 }
             }
