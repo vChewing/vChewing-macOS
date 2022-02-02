@@ -188,7 +188,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 {
     size_t cursorIndex = [self _actualCandidateCursorIndex];
     _builder->grid().fixNodeSelectedCandidate(cursorIndex, value);
-    if (Preferences.useWinNT351BPMF) {
+    if (Preferences.useSCPCInputMode) {
         _userOverrideModel->observe(_walkedNodes, cursorIndex, value, [[NSDate date] timeIntervalSince1970]);
     }
     [self _walk];
@@ -319,7 +319,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         NSString *poppedText = [self _popOverflowComposingTextAndWalk];
 
         // get user override model suggestion
-        string overrideValue = (Preferences.useWinNT351BPMF) ? "" :
+        string overrideValue = (Preferences.useSCPCInputMode) ? "" :
                 _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
 
         if (!overrideValue.empty()) {
@@ -336,10 +336,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         inputting.poppedText = poppedText;
         stateCallback(inputting);
 
-        // 模擬 WINNT 351 ㄅ半注音，就是每個漢字都自動要選字的那種注音。
+        // 模擬類似ㄅ半注音那樣的逐字選字風格，就是每個漢字都自動要選字的那種注音。
         // 嚴格來講不能算純正的ㄅ半注音，畢竟候選字的順序不可能會像當年那樣了。
+        // 現有法律仍舊保護 Abandonware 使其無法被合法地逆向工程。
         // 如果簡體中文用戶不知道ㄅ半注音是什麼的話，拿全拼輸入法來比喻恐怕比較恰當。
-        if (Preferences.useWinNT351BPMF) {
+        if (Preferences.useSCPCInputMode) {
             InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateState:inputting useVerticalMode:input.useVerticalMode];
             if (choosingCandidates.candidates.count == 1) {
                 [self clear];
@@ -723,7 +724,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 - (BOOL)_handleEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     if ([state isKindOfClass:[InputStateInputting class]]) {
-        if (Preferences.useWinNT351BPMF) {
+        if (Preferences.useSCPCInputMode) {
             if (!_bpmfReadingBuffer->isEmpty()) {
                 errorCallback();
             }
@@ -764,7 +765,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     inputting.poppedText = poppedText;
     stateCallback(inputting);
 
-    if (Preferences.useWinNT351BPMF && _bpmfReadingBuffer->isEmpty()) {
+    if (Preferences.useSCPCInputMode && _bpmfReadingBuffer->isEmpty()) {
         InputStateChoosingCandidate *candidateState = [self _buildCandidateState:inputting useVerticalMode:useVerticalMode];
 
         if ([candidateState.candidates count] == 1) {
@@ -852,7 +853,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || [input isDelete];
 
     if (cancelCandidateKey) {
-        if (Preferences.useWinNT351BPMF) {
+        if (Preferences.useSCPCInputMode) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
@@ -1008,7 +1009,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         }
     }
 
-    if (Preferences.useWinNT351BPMF) {
+    if (Preferences.useSCPCInputMode) {
         string layout = [self _currentLayout];
         string punctuationNamePrefix;
         if ([input isControlHold]) {

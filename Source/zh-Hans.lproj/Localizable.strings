@@ -35,7 +35,7 @@
 "Maximum 15 candidate keys allowed." = "选字键最多只能指定十五个。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 语汇置换功能已启用，会波及语汇自订。";
 "⚠︎ Unhandlable char selected for user phrases." = "⚠︎ 已选中无法处理的字元，无法加入自订语汇。";
-"NT351 BPMF EMU" = "模拟逐字选字输入";
+"Per-Char Select Mode" = "模拟逐字选字输入";
 "CNS11643 Mode" = "全字库模式";
 "Reboot vChewing…" = "重新启动输入法…";
 "auto" = "与系统设定一致";
