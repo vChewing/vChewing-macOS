@@ -63,6 +63,7 @@ extension RangeReplaceableCollection where Element: Hashable {
         basisKeyboardLayoutButton.menu?.removeAllItems()
 
         let basisKeyboardLayoutID = Preferences.basisKeyboardLayout
+        
         for source in list {
 
             func getString(_ key: CFString) -> String? {
@@ -120,6 +121,11 @@ extension RangeReplaceableCollection where Element: Hashable {
             }
             basisKeyboardLayoutButton.menu?.addItem(menuItem)
         }
+
+        let menuItem = NSMenuItem()
+        menuItem.title = String(format: NSLocalizedString("Apple Zhuyin Bopomofo", comment: ""))
+        menuItem.representedObject = String("com.apple.keylayout.ZhuyinBopomofo")
+        basisKeyboardLayoutButton.menu?.addItem(menuItem)
 
         basisKeyboardLayoutButton.select(chosenItem ?? usKeyboardLayoutItem)
         selectionKeyComboBox.usesDataSource = false
