@@ -112,20 +112,6 @@ extension RangeReplaceableCollection where Element: Hashable {
             menuItem.title = localizedName
             menuItem.representedObject = sourceID
 
-            if let iconPtr = TISGetInputSourceProperty(source, kTISPropertyIconRef) {
-                let icon = IconRef(iconPtr)
-                let image = NSImage(iconRef: icon)
-
-                func resize( _ image: NSImage) -> NSImage {
-                    let newImage = NSImage(size: NSSize(width: 16, height: 16))
-                    newImage.lockFocus()
-                    image.draw(in: NSRect(x: 0, y: 0, width: 16, height: 16))
-                    newImage.unlockFocus()
-                    return newImage
-                }
-                menuItem.image = resize(image)
-            }
-
             if sourceID == "com.apple.keylayout.US" {
                 usKeyboardLayoutItem = menuItem
             }
