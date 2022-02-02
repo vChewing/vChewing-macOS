@@ -267,37 +267,3 @@ class InputPhrase: NSObject {
         super.init()
     }
 }
-
-class StringUtils: NSObject {
-
-    static func convertToCharIndex(from utf16Index: Int, in string: String) -> Int {
-        var length = 0
-        for (i, c) in string.enumerated() {
-            if length >= utf16Index {
-                return i
-            }
-            length += c.utf16.count
-        }
-        return string.count
-    }
-
-    @objc (nextUtf16PositionForIndex:in:)
-    static func nextUtf16Position(for index: Int, in string: String) -> Int {
-        var index = convertToCharIndex(from: index, in: string)
-        if index < string.count {
-            index += 1
-        }
-        let count = string[..<string.index(string.startIndex, offsetBy: index)].utf16.count
-        return count
-    }
-
-    @objc (previousUtf16PositionForIndex:in:)
-    static func previousUtf16Position(for index: Int, in string: String) -> Int {
-        var index = convertToCharIndex(from: index, in: string)
-        if index > 0 {
-            index -= 1
-        }
-        let count = string[..<string.index(string.startIndex, offsetBy: index)].utf16.count
-        return count
-    }
-}
