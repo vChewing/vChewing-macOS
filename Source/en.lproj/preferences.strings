@@ -77,8 +77,8 @@
 /* Class = "NSMenuItem"; title = "96"; ObjectID = "101"; */
 "101.title" = "96";
 
-/* Class = "NSButtonCell"; title = "Press Space key chooses candidate"; ObjectID = "110"; */
-"110.title" = "Press Space key chooses candidate";
+/* Class = "NSButtonCell"; title = "Enable SPACE key for calling candidate window"; ObjectID = "110"; */
+"110.title" = "Enable SPACE key for calling candidate window";
 
 /* Class = "NSTextFieldCell"; title = "Alphanumeric:"; ObjectID = "126"; */
 "126.title" = "Alphanumeric:";
@@ -104,8 +104,8 @@
 /* Class = "NSTextFieldCell"; title = "UI language setting:"; ObjectID = "9DS-Rc-TXq"; */
 "9DS-Rc-TXq.title" = "UI language setting:";
 
-/* Class = "NSButtonCell"; title = "Emulating Windows NT 3.51 select-candidate-per-character mode"; ObjectID = "ArK-Vk-OoT"; */
-"ArK-Vk-OoT.title" = "Emulating Windows NT 3.51 select-candidate-per-character mode";
+/* Class = "NSButtonCell"; title = "Emulating select-candidate-per-character mode"; ObjectID = "ArK-Vk-OoT"; */
+"ArK-Vk-OoT.title" = "Emulating select-candidate-per-character mode";
 
 /* Class = "NSButtonCell"; title = "Auto-convert traditional Chinese glyphs to KangXi characters"; ObjectID = "BSK-bH-Gct"; */
 "BSK-bH-Gct.title" = "Auto-convert traditional Chinese glyphs to KangXi characters";
@@ -121,9 +121,6 @@
 
 /* Class = "NSMenuItem"; title = "Auto-Select"; ObjectID = "GlJ-Ns-9eE"; */
 "GlJ-Ns-9eE.title" = "Auto-Select";
-
-/* Class = "NSTabViewItem"; label = "Dictionary"; ObjectID = "ISh-Da-hKv"; */
-"ISh-Da-hKv.label" = "Dictionary";
 
 /* Class = "NSButtonCell"; title = "Sort entries when reloading user phrases and excluded phrases list"; ObjectID = "Li3-Yg-SOC"; */
 "Li3-Yg-SOC.title" = "Sort entries when reloading user phrases and excluded phrases list";
@@ -155,8 +152,8 @@
 /* Class = "NSMenuItem"; title = "Simplified Chinese"; ObjectID = "akC-2g-ybz"; */
 "akC-2g-ybz.title" = "Simplified Chinese";
 
-/* Class = "NSButtonCell"; title = "Press ESC key clears entire input buffer"; ObjectID = "f2j-xD-4xK"; */
-"f2j-xD-4xK.title" = "Press ESC key clears entire input buffer";
+/* Class = "NSButtonCell"; title = "Use ESC key to clear entire input buffer"; ObjectID = "f2j-xD-4xK"; */
+"f2j-xD-4xK.title" = "Use ESC key to clear entire input buffer";
 
 /* Class = "NSButtonCell"; title = "Automatically reload user data files if changes detected"; ObjectID = "f8i-69-zxm"; */
 "f8i-69-zxm.title" = "Automatically reload user data files if changes detected";
