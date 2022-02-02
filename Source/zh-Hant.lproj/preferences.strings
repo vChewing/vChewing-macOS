@@ -18,7 +18,7 @@
 "9.title" = "倚天二十六鍵";
 
 /* Class = "NSMenuItem"; title = "Hanyu Pinyin"; ObjectID = "10"; */
-"10.title" = "漢語拼音二式（字母拼音+ 12345 數字標調）";
+"10.title" = "漢語拼音二式（字母拼音＋數字標調）";
 
 /* Class = "NSTextFieldCell"; title = "Bopomofo:"; ObjectID = "12"; */
 "12.title" = "注音鍵盤佈局:";
@@ -77,7 +77,7 @@
 /* Class = "NSMenuItem"; title = "96"; ObjectID = "101"; */
 "101.title" = "96";
 
-/* Class = "NSButtonCell"; title = "Press Space key chooses candidate"; ObjectID = "110"; */
+/* Class = "NSButtonCell"; title = "Enable SPACE key for calling candidate window"; ObjectID = "110"; */
 "110.title" = "敲空格鍵以選字";
 
 /* Class = "NSTextFieldCell"; title = "Alphanumeric:"; ObjectID = "126"; */
@@ -104,8 +104,8 @@
 /* Class = "NSTextFieldCell"; title = "UI language setting:"; ObjectID = "9DS-Rc-TXq"; */
 "9DS-Rc-TXq.title" = "介面語言設定:";
 
-/* Class = "NSButtonCell"; title = "Emulating Windows NT 3.51 select-candidate-per-character mode"; ObjectID = "ArK-Vk-OoT"; */
-"ArK-Vk-OoT.title" = "模擬 Windows NT 3.51 注音逐字選字輸入風格";
+/* Class = "NSButtonCell"; title = "Emulating select-candidate-per-character mode"; ObjectID = "ArK-Vk-OoT"; */
+"ArK-Vk-OoT.title" = "模擬 90 年代前期注音逐字選字輸入風格";
 
 /* Class = "NSButtonCell"; title = "Auto-convert traditional Chinese glyphs to KangXi characters"; ObjectID = "BSK-bH-Gct"; */
 "BSK-bH-Gct.title" = "自動將繁體中文字轉換為康熙字";
@@ -121,9 +121,6 @@
 
 /* Class = "NSMenuItem"; title = "Auto-Select"; ObjectID = "GlJ-Ns-9eE"; */
 "GlJ-Ns-9eE.title" = "自動選擇";
-
-/* Class = "NSTabViewItem"; label = "Dictionary"; ObjectID = "ISh-Da-hKv"; */
-"ISh-Da-hKv.label" = "辭典";
 
 /* Class = "NSButtonCell"; title = "Sort entries when reloading user phrases and excluded phrases list"; ObjectID = "Li3-Yg-SOC"; */
 "Li3-Yg-SOC.title" = "在重新載入自訂語彙與濾除語彙時，統整檔案內容排序";
@@ -155,7 +152,7 @@
 /* Class = "NSMenuItem"; title = "Simplified Chinese"; ObjectID = "akC-2g-ybz"; */
 "akC-2g-ybz.title" = "簡體中文";
 
-/* Class = "NSButtonCell"; title = "Press ESC key clears entire input buffer"; ObjectID = "f2j-xD-4xK"; */
+/* Class = "NSButtonCell"; title = "Use ESC key to clear entire input buffer"; ObjectID = "f2j-xD-4xK"; */
 "f2j-xD-4xK.title" = "敲 ESC 鍵以清空整個輸入緩衝區";
 
 /* Class = "NSButtonCell"; title = "Automatically reload user data files if changes detected"; ObjectID = "f8i-69-zxm"; */

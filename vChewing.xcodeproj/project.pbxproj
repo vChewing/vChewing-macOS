@@ -14,6 +14,7 @@
 		5B21711E279B9AD900F91A2B /* ArchiveUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21711C279B9AD700F91A2B /* ArchiveUtil.swift */; };
 		5B217126279BA37500F91A2B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B217124279BA37300F91A2B /* AppDelegate.swift */; };
 		5B217128279BB22700F91A2B /* frmAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B217127279BB22700F91A2B /* frmAboutWindow.swift */; };
+		5B36562327AA9A2D0003DFDD /* StringUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B36562227AA9A2D0003DFDD /* StringUtils.swift */; };
 		5B42B64027876FDC00BB9B9F /* UserOverrideModel.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B42B63E27876FDC00BB9B9F /* UserOverrideModel.mm */; };
 		5B58E87F278413E7003EA2AD /* BSDLicense.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B58E87D278413E7003EA2AD /* BSDLicense.txt */; };
 		5B5F4F8E27928F9300922DC2 /* vChewingLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F4F8D27928F9300922DC2 /* vChewingLM.mm */; };
@@ -106,6 +107,7 @@
 		5B21711C279B9AD700F91A2B /* ArchiveUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveUtil.swift; sourceTree = "<group>"; };
 		5B217124279BA37300F91A2B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5B217127279BB22700F91A2B /* frmAboutWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = frmAboutWindow.swift; sourceTree = "<group>"; };
+		5B36562227AA9A2D0003DFDD /* StringUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringUtils.swift; sourceTree = "<group>"; };
 		5B42B63E27876FDC00BB9B9F /* UserOverrideModel.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = UserOverrideModel.mm; sourceTree = "<group>"; };
 		5B42B63F27876FDC00BB9B9F /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserOverrideModel.h; sourceTree = "<group>"; };
 		5B42B64127877D6500BB9B9F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Source/zh-Hans.lproj/preferences.strings"; sourceTree = "<group>"; };
@@ -205,8 +207,6 @@
 		6A0D4F1E15FC0EB100ABF4B3 /* Walker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Walker.h; sourceTree = "<group>"; };
 		6A0D4F2015FC0EB100ABF4B3 /* Mandarin.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Mandarin.mm; sourceTree = "<group>"; };
 		6A0D4F2115FC0EB100ABF4B3 /* Mandarin.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Mandarin.hh; sourceTree = "<group>"; };
-		6A0D4F4115FC0EB100ABF4B3 /* OVUTF8Helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVUTF8Helper.h; sourceTree = "<group>"; };
-		6A0D4F4215FC0EB100ABF4B3 /* OVWildcard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVWildcard.h; sourceTree = "<group>"; };
 		6A0D4F4915FC0EE100ABF4B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Source/en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6A0D4F4B15FC0EE100ABF4B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Source/en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6A0D4F5415FC0EF900ABF4B3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "Source/zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
@@ -285,6 +285,7 @@
 				5BC2D2842793B434002C0BEC /* KeyValueBlobReader.h */,
 				5BC2D2862793B434002C0BEC /* KeyValueBlobReader.cpp */,
 				5BC772A927A5A1E800CA8391 /* InputState.swift */,
+				5B36562227AA9A2D0003DFDD /* StringUtils.swift */,
 			);
 			path = ControllerModules;
 			sourceTree = "<group>";
@@ -300,7 +301,7 @@
 		5BDD25E0279D64FB00AA18F8 /* 3rdParty */ = {
 			isa = PBXGroup;
 			children = (
-				6A0D4F2215FC0EB100ABF4B3 /* OpenVanilla */,
+				6A0D4F1F15FC0EB100ABF4B3 /* OVMandarin */,
 				5BDD25E1279D64FB00AA18F8 /* AWFileHash */,
 				5BDD25E4279D64FB00AA18F8 /* SSZipArchive */,
 			);
@@ -478,23 +479,13 @@
 			path = Gramambular;
 			sourceTree = "<group>";
 		};
-		6A0D4F1F15FC0EB100ABF4B3 /* Mandarin */ = {
+		6A0D4F1F15FC0EB100ABF4B3 /* OVMandarin */ = {
 			isa = PBXGroup;
 			children = (
 				6A0D4F2015FC0EB100ABF4B3 /* Mandarin.mm */,
 				6A0D4F2115FC0EB100ABF4B3 /* Mandarin.hh */,
 			);
-			path = Mandarin;
-			sourceTree = "<group>";
-		};
-		6A0D4F2215FC0EB100ABF4B3 /* OpenVanilla */ = {
-			isa = PBXGroup;
-			children = (
-				6A0D4F1F15FC0EB100ABF4B3 /* Mandarin */,
-				6A0D4F4115FC0EB100ABF4B3 /* OVUTF8Helper.h */,
-				6A0D4F4215FC0EB100ABF4B3 /* OVWildcard.h */,
-			);
-			path = OpenVanilla;
+			path = OVMandarin;
 			sourceTree = "<group>";
 		};
 		6A0D4F4715FC0EB900ABF4B3 /* Resources */ = {
@@ -741,6 +732,7 @@
 				5BD13F482794F0A6000E429F /* PhraseReplacementMap.mm in Sources */,
 				5BDD25FA279D6D1200AA18F8 /* mztools.m in Sources */,
 				5B810D9F27A3A5E50032C1A9 /* LMConsolidator.mm in Sources */,
+				5B36562327AA9A2D0003DFDD /* StringUtils.swift in Sources */,
 				5BC3EE1C278FC48C00F5E44C /* VTCandidateController.swift in Sources */,
 				5BDF2D032791C71200838ADB /* NonModalAlertWindowController.swift in Sources */,
 				5BC3EE1D278FC48C00F5E44C /* HorizontalCandidateController.swift in Sources */,
