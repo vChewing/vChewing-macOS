@@ -26,7 +26,7 @@ private let kCNS11643Enabled = "CNS11643Enabled"
 private let kChineseConversionEnabled = "ChineseConversionEnabled"
 private let kHalfWidthPunctuationEnabled = "HalfWidthPunctuationEnable"
 private let kEscToCleanInputBuffer = "EscToCleanInputBuffer"
-private let kUseWinNT351BPMF = "UseWinNT351BPMF"
+private let kUseSCPCInputMode = "UseSCPCInputMode"
 private let kMaxCandidateLength = "MaxCandidateLength"
 private let kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
 
@@ -178,7 +178,7 @@ struct ComposingBufferSize {
         defaults.removeObject(forKey: kCandidateKeyLabelFontName)
         defaults.removeObject(forKey: kCandidateKeys)
         defaults.removeObject(forKey: kPhraseReplacementEnabled)
-        defaults.removeObject(forKey: kUseWinNT351BPMF)
+        defaults.removeObject(forKey: kUseSCPCInputMode)
         defaults.removeObject(forKey: kMaxCandidateLength)
         defaults.removeObject(forKey: kShouldNotFartInLieuOfBeep)
     }
@@ -216,9 +216,9 @@ struct ComposingBufferSize {
             UserDefaults.standard.set(Preferences.shouldAutoSortPhraseReplacementMapOnLoad, forKey: kShouldAutoSortPhraseReplacementMapOnLoad)
         }
         
-        // 預設禁用 WinNT351 風格的注音選字模式（就是每個字都要選的那種），所以設成 false
-        if UserDefaults.standard.object(forKey: kUseWinNT351BPMF) == nil {
-            UserDefaults.standard.set(Preferences.useWinNT351BPMF, forKey: kUseWinNT351BPMF)
+        // 預設禁用逐字選字模式（就是每個字都要選的那種），所以設成 false
+        if UserDefaults.standard.object(forKey: kUseSCPCInputMode) == nil {
+            UserDefaults.standard.set(Preferences.useSCPCInputMode, forKey: kUseSCPCInputMode)
         }
         
         // 預設漢音風格選字，所以要設成 0
@@ -297,13 +297,13 @@ struct ComposingBufferSize {
     @UserDefault(key: kChooseCandidateUsingSpace, defaultValue: true)
     @objc static var chooseCandidateUsingSpace: Bool
     
-    @UserDefault(key: kUseWinNT351BPMF, defaultValue: false)
-    @objc static var useWinNT351BPMF: Bool
+    @UserDefault(key: kUseSCPCInputMode, defaultValue: false)
+    @objc static var useSCPCInputMode: Bool
     
-    @objc static func toggleWinNT351BPMFEnabled() -> Bool {
-        useWinNT351BPMF = !useWinNT351BPMF
-        UserDefaults.standard.set(useWinNT351BPMF, forKey: kUseWinNT351BPMF)
-        return useWinNT351BPMF
+    @objc static func toggleSCPCInputModeEnabled() -> Bool {
+        useSCPCInputMode = !useSCPCInputMode
+        UserDefaults.standard.set(useSCPCInputMode, forKey: kUseSCPCInputMode)
+        return useSCPCInputMode
     }
     
     @UserDefault(key: kMaxCandidateLength, defaultValue: 10)

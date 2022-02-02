@@ -75,9 +75,9 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
     // a menu instance (autoreleased) is requested every time the user click on the input menu
     NSMenu *menu = [[NSMenu alloc] initWithTitle:LocalizationNotNeeded(@"Input Method Menu")];
 
-    NSMenuItem *useWinNT351BPMFMenuItem = [menu addItemWithTitle:NSLocalizedString(@"NT351 BPMF EMU", @"") action:@selector(toggleWinNT351BPMFMode:) keyEquivalent:@"P"];
-    useWinNT351BPMFMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
-    useWinNT351BPMFMenuItem.state = Preferences.useWinNT351BPMF ? NSControlStateValueOn : NSControlStateValueOff;
+    NSMenuItem *useSCPCInputModeMenuItem = [menu addItemWithTitle:NSLocalizedString(@"Per-Char Select Mode", @"") action:@selector(toggleSCPCInputModeMode:) keyEquivalent:@"P"];
+    useSCPCInputModeMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
+    useSCPCInputModeMenuItem.state = Preferences.useSCPCInputMode ? NSControlStateValueOn : NSControlStateValueOff;
 
     NSMenuItem *useCNS11643SupportMenuItem = [menu addItemWithTitle:NSLocalizedString(@"CNS11643 Mode", @"") action:@selector(toggleCNS11643Enabled:) keyEquivalent:@"L"];
     useCNS11643SupportMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
@@ -477,9 +477,9 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 }
 
-- (void)toggleWinNT351BPMFMode:(id)sender
+- (void)toggleSCPCInputModeMode:(id)sender
 {
-    [NotifierController notifyWithMessage:[NSString stringWithFormat:@"%@%@%@", NSLocalizedString(@"NT351 BPMF EMU", @""), @"\n", [Preferences toggleWinNT351BPMFEnabled] ? NSLocalizedString(@"NotificationSwitchON", @"") : NSLocalizedString(@"NotificationSwitchOFF", @"")] stay:NO];
+    [NotifierController notifyWithMessage:[NSString stringWithFormat:@"%@%@%@", NSLocalizedString(@"Per-Char Select Mode", @""), @"\n", [Preferences toggleSCPCInputModeEnabled] ? NSLocalizedString(@"NotificationSwitchON", @"") : NSLocalizedString(@"NotificationSwitchOFF", @"")] stay:NO];
 }
 
 - (void)toggleChineseConverter:(id)sender
@@ -607,7 +607,7 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 		[_keyHandler fixNodeWithValue:selectedValue];
 		InputStateInputting *inputting = [_keyHandler _buildInputtingState];
 
-		if (Preferences.useWinNT351BPMF) {
+		if (Preferences.useSCPCInputMode) {
 			[_keyHandler clear];
 			InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:inputting.composingBuffer];
 			[self handleState:committing client:_currentCandidateClient];
