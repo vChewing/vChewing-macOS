@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFEULAContent</key>
-	<string>License texts used in the customized about window.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
@@ -17,49 +15,53 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.2.0</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>BPMF</string>
 	<key>CFBundleVersion</key>
-	<string>893</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>CFEULAContent</key>
+	<string>License texts used in the customized about window.</string>
 	<key>ComponentInputModeDict</key>
 	<dict>
 		<key>tsInputModeListKey</key>
 		<dict>
-			<key>org.atelierInmu.inputmethod.vChewing.TradBopomofo</key>
-			<dict>
-				<key>TISDoubleSpaceSubstitution</key>
-				<string>。</string>
-				<key>tsInputModeAlternateMenuIconFileKey</key>
-				<string>Bopomofo.tiff</string>
-				<key>tsInputModeCharacterRepertoireKey</key>
-				<array>
-					<string>Hant</string>
-					<string>Han</string>
-				</array>
-				<key>tsInputModeDefaultStateKey</key>
-				<true/>
-				<key>tsInputModeIsVisibleKey</key>
-				<true/>
-				<key>tsInputModeKeyEquivalentModifiersKey</key>
-				<integer>4608</integer>
-				<key>tsInputModeMenuIconFileKey</key>
-				<string>Bopomofo.tiff</string>
-				<key>tsInputModePaletteIconFileKey</key>
-				<string>Bopomofo.tiff</string>
-				<key>tsInputModePrimaryInScriptKey</key>
-				<true/>
-				<key>tsInputModeScriptKey</key>
-				<string>smTradChinese</string>
-				<key>TISIntendedLanguage</key>
-				<string>zh-Hant</string>
-			</dict>
 			<key>org.atelierInmu.inputmethod.vChewing.SimpBopomofo</key>
 			<dict>
 				<key>TISDoubleSpaceSubstitution</key>
 				<string>。</string>
+				<key>TISIntendedLanguage</key>
+				<string>zh-Hans</string>
 				<key>tsInputModeAlternateMenuIconFileKey</key>
-				<string>SimpBopomofo.tiff</string>
+				<string>MenuIcon-SCVIM.png</string>
+				<key>tsInputModeCharacterRepertoireKey</key>
+				<array>
+					<string>Hans</string>
+					<string>Han</string>
+				</array>
+				<key>tsInputModeDefaultStateKey</key>
+				<true/>
+				<key>tsInputModeIsVisibleKey</key>
+				<true/>
+				<key>tsInputModeKeyEquivalentModifiersKey</key>
+				<integer>4608</integer>
+				<key>tsInputModeMenuIconFileKey</key>
+				<string>MenuIcon-SCVIM.png</string>
+				<key>tsInputModePaletteIconFileKey</key>
+				<string>MenuIcon-SCVIM.png</string>
+				<key>tsInputModePrimaryInScriptKey</key>
+				<true/>
+				<key>tsInputModeScriptKey</key>
+				<string>smTradChinese</string>
+			</dict>
+			<key>org.atelierInmu.inputmethod.vChewing.TradBopomofo</key>
+			<dict>
+				<key>TISDoubleSpaceSubstitution</key>
+				<string>。</string>
+				<key>TISIntendedLanguage</key>
+				<string>zh-Hant</string>
+				<key>tsInputModeAlternateMenuIconFileKey</key>
+				<string>MenuIcon-TCVIM.png</string>
 				<key>tsInputModeCharacterRepertoireKey</key>
 				<array>
 					<string>Hant</string>
@@ -72,15 +74,13 @@
 				<key>tsInputModeKeyEquivalentModifiersKey</key>
 				<integer>4608</integer>
 				<key>tsInputModeMenuIconFileKey</key>
-				<string>SimpBopomofo.tiff</string>
+				<string>MenuIcon-TCVIM.png</string>
 				<key>tsInputModePaletteIconFileKey</key>
-				<string>SimpBopomofo.tiff</string>
+				<string>MenuIcon-TCVIM.png</string>
 				<key>tsInputModePrimaryInScriptKey</key>
 				<true/>
 				<key>tsInputModeScriptKey</key>
 				<string>smTradChinese</string>
-				<key>TISIntendedLanguage</key>
-				<string>zh-Hans</string>
 			</dict>
 		</dict>
 		<key>tsVisibleInputModeOrderedArrayKey</key>
@@ -92,11 +92,11 @@
 	<key>InputMethodConnectionName</key>
 	<string>vChewing_1_Connection</string>
 	<key>InputMethodServerControllerClass</key>
-	<string>vChewingInputMethodController</string>
+	<string>ctlInputMethod</string>
 	<key>InputMethodServerDelegateClass</key>
-	<string>vChewingInputMethodController</string>
+	<string>ctlInputMethod</string>
 	<key>InputMethodServerPreferencesWindowControllerClass</key>
-	<string>PreferencesWindowController</string>
+	<string>ctlPrefWindow</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSHasLocalizedDisplayName</key>
