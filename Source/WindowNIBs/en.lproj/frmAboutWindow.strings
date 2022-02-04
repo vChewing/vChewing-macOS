@@ -1,0 +1,27 @@
+
+/* Class = "NSTextFieldCell"; title = "3-Clause BSD License:"; ObjectID = "lblLicense"; */
+"lblLicense.title" = "3-Clause BSD License:";
+
+/* Class = "NSTextFieldCell"; title = "version"; ObjectID = "lblVersionString"; */
+// "lblVersionString.title" = "version";
+
+/* Class = "NSWindow"; title = "About vChewing for macOS"; ObjectID = "ttlAboutWindow"; */
+"ttlAboutWindow.title" = "About vChewing for macOS";
+
+/* Class = "NSTextFieldCell"; title = "Derived from OpenVanilla McBopopmofo Project."; ObjectID = "lblProjectDescription"; */
+"lblProjectDescription.title" = "Derived from OpenVanilla McBopopmofo Project.";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "btnConfirm"; */
+"btnConfirm.title" = "OK";
+
+/* Class = "NSTextFieldCell"; title = "vChewing for macOS"; ObjectID = "lblAppTitle"; */
+"lblAppTitle.title" = "vChewing for macOS";
+
+/* Class = "NSTextFieldCell"; title = "DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, have been removed from vChewing official phrase database."; ObjectID = "lblDisclaimer"; */
+"lblDisclaimer.title" = "DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, have been removed from vChewing official phrase database.";
+
+/* Class = "NSTextFieldCell"; title = "© 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project."; ObjectID = "lblCopyright"; */
+// "lblCopyright.title" = "© 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project.";
+
+/* Class = "NSTextFieldCell"; title = "McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.\nvChewing macOS Development Reinforced by Hiraku Wang.\nvChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "lblCredits"; */
+"lblCredits.title" = "McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.\nvChewing macOS Development Reinforced by Hiraku Wang.\nvChewing Phrase Database Maintained by Shiki Suen.";
