@@ -56,7 +56,7 @@
 		5BDF2D062791DFF200838ADB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDF2D052791DA6700838ADB /* AppDelegate.swift */; };
 		5BE798A42792E58A00337FF9 /* TooltipController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE798A32792E58A00337FF9 /* TooltipController.swift */; };
 		5BE798A72793280C00337FF9 /* NotifierController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE798A62793280C00337FF9 /* NotifierController.swift */; };
-		6A0421A815FEF3F50061ED63 /* FastLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6A0421A615FEF3F50061ED63 /* FastLM.mm */; };
+		6A0421A815FEF3F50061ED63 /* CoreLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6A0421A615FEF3F50061ED63 /* CoreLM.mm */; };
 		6A0D4EA715FC0D2D00ABF4B3 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */; };
 		6A0D4ED215FC0D6400ABF4B3 /* ctlInputMethod.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC715FC0D6400ABF4B3 /* ctlInputMethod.mm */; };
 		6A0D4ED315FC0D6400ABF4B3 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC815FC0D6400ABF4B3 /* main.swift */; };
@@ -180,8 +180,8 @@
 		5BDF2D052791DA6700838ADB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5BE798A32792E58A00337FF9 /* TooltipController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TooltipController.swift; sourceTree = "<group>"; };
 		5BE798A62793280C00337FF9 /* NotifierController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotifierController.swift; sourceTree = "<group>"; };
-		6A0421A615FEF3F50061ED63 /* FastLM.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FastLM.mm; sourceTree = "<group>"; };
-		6A0421A715FEF3F50061ED63 /* FastLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FastLM.h; sourceTree = "<group>"; };
+		6A0421A615FEF3F50061ED63 /* CoreLM.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CoreLM.mm; sourceTree = "<group>"; };
+		6A0421A715FEF3F50061ED63 /* CoreLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreLM.h; sourceTree = "<group>"; };
 		6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		6A0D4EA915FC0D2D00ABF4B3 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -380,8 +380,8 @@
 			children = (
 				5BDD25FB279D6D6200AA18F8 /* CNSLM.mm */,
 				5BDD25FC279D6D6300AA18F8 /* CNSLM.h */,
-				6A0421A615FEF3F50061ED63 /* FastLM.mm */,
-				6A0421A715FEF3F50061ED63 /* FastLM.h */,
+				6A0421A615FEF3F50061ED63 /* CoreLM.mm */,
+				6A0421A715FEF3F50061ED63 /* CoreLM.h */,
 				5B42B63E27876FDC00BB9B9F /* UserOverrideModel.mm */,
 				5B42B63F27876FDC00BB9B9F /* UserOverrideModel.h */,
 				5B5F4F962792A4EA00922DC2 /* UserPhrasesLM.mm */,
@@ -805,7 +805,7 @@
 				D427A9C125ED28CC005D43E0 /* OpenCCBridge.swift in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.mm in Sources */,
 				5B6797B52794822C004AC7CE /* PhraseReplacementMap.h in Sources */,
-				6A0421A815FEF3F50061ED63 /* FastLM.mm in Sources */,
+				6A0421A815FEF3F50061ED63 /* CoreLM.mm in Sources */,
 				5BDF2D012791C03B00838ADB /* ctlPrefWindow.swift in Sources */,
 				5BC2D28D2793B98F002C0BEC /* PreferencesModule.swift in Sources */,
 				5B217128279BB22700F91A2B /* ctlAboutWindow.swift in Sources */,
