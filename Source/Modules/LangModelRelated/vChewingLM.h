@@ -10,7 +10,7 @@
 #define VCHEWINGLM_H
 
 #include <stdio.h>
-#include "FastLM.h"
+#include "CoreLM.h"
 #include "CNSLM.h"
 #include "UserPhrasesLM.h"
 #include "PhraseReplacementMap.h"
@@ -45,7 +45,7 @@ protected:
                                                      const std::unordered_set<string>& excludedValues,
                                                      std::unordered_set<string>& insertedValues);
     
-    FastLM m_languageModel;
+    CoreLM m_languageModel;
     CNSLM m_cnsModel;
     UserPhrasesLM m_userPhrases;
     UserPhrasesLM m_excludedPhrases;

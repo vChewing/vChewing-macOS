@@ -1,12 +1,12 @@
-/* 
- *  FastLM.mm
- *  
+/*
+ *  CoreLM.mm
+ *
  *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
  *  Derived from 2011-2022 OpenVanilla Project (MIT License).
  *  Some rights reserved. See "LICENSE.TXT" for details.
  */
 
-#include "FastLM.h"
+#include "CoreLM.h"
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -16,21 +16,29 @@
 
 using namespace Taiyan::Gramambular;
 
-FastLM::FastLM()
+vChewing::CoreLM::CoreLM()
     : fd(-1)
     , data(0)
     , length(0)
 {
 }
 
-FastLM::~FastLM()
+vChewing::CoreLM::~CoreLM()
 {
     if (data) {
         close();
     }
 }
 
-bool FastLM::open(const char *path)
+bool vChewing::CoreLM::isLoaded()
+{
+    if (data) {
+        return true;
+    }
+    return false;
+}
+
+bool vChewing::CoreLM::open(const char *path)
 {
     if (data) {
         return false;
@@ -238,7 +246,7 @@ end:
     return true;
 }
 
-void FastLM::close()
+void vChewing::CoreLM::close()
 {
     if (data) {
         munmap(data, length);
@@ -249,7 +257,7 @@ void FastLM::close()
     keyRowMap.clear();
 }
 
-void FastLM::dump()
+void vChewing::CoreLM::dump()
 {
     size_t rows = 0;
     for (map<const char *, vector<Row> >::const_iterator i = keyRowMap.begin(), e = keyRowMap.end(); i != e; ++i) {
@@ -262,12 +270,12 @@ void FastLM::dump()
     }
 }
 
-const vector<Bigram> FastLM::bigramsForKeys(const string& preceedingKey, const string& key)
+const vector<Bigram> vChewing::CoreLM::bigramsForKeys(const string& preceedingKey, const string& key)
 {
     return vector<Bigram>();
 }
 
-const vector<Unigram> FastLM::unigramsForKey(const string& key)
+const vector<Unigram> vChewing::CoreLM::unigramsForKey(const string& key)
 {
     vector<Unigram> v;
     map<const char *, vector<Row> >::const_iterator i = keyRowMap.find(key.c_str());
@@ -286,7 +294,7 @@ const vector<Unigram> FastLM::unigramsForKey(const string& key)
     return v;
 }
 
-bool FastLM::hasUnigramsForKey(const string& key)
+bool vChewing::CoreLM::hasUnigramsForKey(const string& key)
 {
     return keyRowMap.find(key.c_str()) != keyRowMap.end();
 }
