@@ -10,7 +10,7 @@
 #import "Gramambular.h"
 #import "vChewingLM.h"
 #import "UserOverrideModel.h"
-#import "LanguageModelManager.h"
+#import "mgrLangModel.h"
 #import "KeyHandler.h"
 #import "vChewing-Swift.h"
 
@@ -87,12 +87,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if ([value isKindOfClass:[NSString class]] && [value isEqual:kBopomofoModeIdentifierCHS]) {
         newInputMode = kBopomofoModeIdentifierCHS;
-        newLanguageModel = [LanguageModelManager languageModelCoreCHS];
-        newUserOverrideModel = [LanguageModelManager userOverrideModelCHS];
+        newLanguageModel = [mgrLangModel languageModelCoreCHS];
+        newUserOverrideModel = [mgrLangModel userOverrideModelCHS];
     } else {
         newInputMode = kBopomofoModeIdentifierCHT;
-        newLanguageModel = [LanguageModelManager languageModelCoreCHT];
-        newUserOverrideModel = [LanguageModelManager userOverrideModelCHT];
+        newLanguageModel = [mgrLangModel languageModelCoreCHT];
+        newUserOverrideModel = [mgrLangModel userOverrideModelCHT];
     }
 
     // 自 Preferences 模組讀入自訂語彙置換功能開關狀態。
@@ -140,10 +140,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         _bpmfReadingBuffer = new BopomofoReadingBuffer(BopomofoKeyboardLayout::StandardLayout());
 
         // create the lattice builder
-        _languageModel = [LanguageModelManager languageModelCoreCHT];
+        _languageModel = [mgrLangModel languageModelCoreCHT];
         _languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
         _languageModel->setCNSEnabled(Preferences.cns11643Enabled);
-        _userOverrideModel = [LanguageModelManager userOverrideModelCHT];
+        _userOverrideModel = [mgrLangModel userOverrideModelCHT];
         
         _builder = new BlockReadingBuilder(_languageModel);
 

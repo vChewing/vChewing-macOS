@@ -12,7 +12,7 @@
 
 #import <Foundation/Foundation.h> // @import Foundation;
 #import "SSZipArchive.h" // Zip Archive Support;
-@interface LanguageModelManager : NSObject
+@interface mgrLangModel : NSObject
 + (void)loadDataModels;
 + (void)loadCNSData;
 + (void)loadUserPhrases;

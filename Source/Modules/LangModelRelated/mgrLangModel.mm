@@ -1,12 +1,12 @@
 /* 
- *  LanguageModelManager.mm
+ *  mgrLangModel.mm
  *  
  *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
  *  Derived from 2011-2022 OpenVanilla Project (MIT License).
  *  Some rights reserved. See "LICENSE.TXT" for details.
  */
 
-#import "LanguageModelManager.h"
+#import "mgrLangModel.h"
 
 using namespace std;
 using namespace vChewing;
@@ -24,7 +24,7 @@ UserOverrideModel gUserOverrideModelCHT(kUserOverrideModelCapacity, kObservedOve
 static NSString *const kBopomofoModeIdentifierCHT = @"org.atelierInmu.inputmethod.vChewing.TradBopomofo";
 static NSString *const kBopomofoModeIdentifierCHS = @"org.atelierInmu.inputmethod.vChewing.SimpBopomofo";
 
-@implementation LanguageModelManager
+@implementation mgrLangModel
 
 + (void)deployZipDataFile:(NSString *)filenameWithoutExtension
 {
