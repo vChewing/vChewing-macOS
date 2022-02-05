@@ -9,7 +9,7 @@
 #import "vChewingLM.h"
 #import "ctlInputMethod.h"
 #import "KeyHandler.h"
-#import "LanguageModelManager.h"
+#import "mgrLangModel.h"
 
 using namespace std;
 using namespace vChewing;
@@ -495,19 +495,19 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 - (void)togglePhraseReplacementEnabled:(id)sender
 {
 	if (_keyHandler.inputMode == kBopomofoModeIdentifierCHT){
-		[LanguageModelManager languageModelCoreCHT]->setPhraseReplacementEnabled([Preferences togglePhraseReplacementEnabled]);
+		[mgrLangModel languageModelCoreCHT]->setPhraseReplacementEnabled([Preferences togglePhraseReplacementEnabled]);
 		
 	} else {
-		[LanguageModelManager languageModelCoreCHS]->setPhraseReplacementEnabled([Preferences togglePhraseReplacementEnabled]);
+		[mgrLangModel languageModelCoreCHS]->setPhraseReplacementEnabled([Preferences togglePhraseReplacementEnabled]);
 	}
 }
 
 - (void)toggleCNS11643Enabled:(id)sender
 {
 	if (_keyHandler.inputMode == kBopomofoModeIdentifierCHT){
-		[LanguageModelManager languageModelCoreCHT]->setCNSEnabled([Preferences toggleCNS11643Enabled]);
+		[mgrLangModel languageModelCoreCHT]->setCNSEnabled([Preferences toggleCNS11643Enabled]);
 	} else {
-		[LanguageModelManager languageModelCoreCHS]->setCNSEnabled([Preferences toggleCNS11643Enabled]);
+		[mgrLangModel languageModelCoreCHS]->setCNSEnabled([Preferences toggleCNS11643Enabled]);
 	}
     // 注意上面這一行已經動過開關了，所以接下來就不要 toggle。
     [NotifierController notifyWithMessage:[NSString stringWithFormat:@"%@%@%@", NSLocalizedString(@"CNS11643 Mode", @""), @"\n", [Preferences cns11643Enabled] ? NSLocalizedString(@"NotificationSwitchON", @"") : NSLocalizedString(@"NotificationSwitchOFF", @"")] stay:NO];
@@ -526,8 +526,8 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 
 - (BOOL)_checkUserFiles
 {
-	if (![LanguageModelManager checkIfUserLanguageModelFilesExist]) {
-		NSString *content = [NSString stringWithFormat:NSLocalizedString(@"Please check the permission of at \"%@\".", @""), [LanguageModelManager dataFolderPath]];
+	if (![mgrLangModel checkIfUserLanguageModelFilesExist]) {
+		NSString *content = [NSString stringWithFormat:NSLocalizedString(@"Please check the permission of at \"%@\".", @""), [mgrLangModel dataFolderPath]];
 		[[ctlNonModalAlertWindow sharedInstance] showWithTitle:NSLocalizedString(@"Unable to create the user phrase file.", @"") content:content confirmButtonTitle:NSLocalizedString(@"OK", @"") cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
 		return NO;
 	}
@@ -545,23 +545,23 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 
 - (void)openUserPhrases:(id)sender
 {
-    [self _openUserFile:[LanguageModelManager userPhrasesDataPath:_keyHandler.inputMode]];
+    [self _openUserFile:[mgrLangModel userPhrasesDataPath:_keyHandler.inputMode]];
 }
 
 - (void)openExcludedPhrases:(id)sender
 {
-    [self _openUserFile:[LanguageModelManager excludedPhrasesDataPath:_keyHandler.inputMode]];
+    [self _openUserFile:[mgrLangModel excludedPhrasesDataPath:_keyHandler.inputMode]];
 }
 
 - (void)openPhraseReplacement:(id)sender
 {
-    [self _openUserFile:[LanguageModelManager phraseReplacementDataPath:_keyHandler.inputMode]];
+    [self _openUserFile:[mgrLangModel phraseReplacementDataPath:_keyHandler.inputMode]];
 }
 
 - (void)reloadUserPhrases:(id)sender
 {
-    [LanguageModelManager loadUserPhrases];
-    [LanguageModelManager loadUserPhraseReplacement];
+    [mgrLangModel loadUserPhrases];
+    [mgrLangModel loadUserPhraseReplacement];
 }
 
 - (void)showAbout:(id)sender
@@ -636,7 +636,7 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 		return NO;
 	}
 	NSString *userPhrase = state.userPhrase;
-	return [LanguageModelManager writeUserPhrase:userPhrase inputMode:_keyHandler.inputMode];
+	return [mgrLangModel writeUserPhrase:userPhrase inputMode:_keyHandler.inputMode];
 	return YES;
 }
 

@@ -132,8 +132,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
 	func helper(_ helper: FSEventStreamHelper, didReceive events: [FSEventStreamHelper.Event]) {
 		DispatchQueue.main.async {
 			if Preferences.shouldAutoReloadUserDataFiles {
-				LanguageModelManager.loadUserPhrases()
-				LanguageModelManager.loadUserPhraseReplacement()
+				mgrLangModel.loadUserPhrases()
+				mgrLangModel.loadUserPhraseReplacement()
 			}
 		}
 	}
@@ -143,7 +143,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
     private var ctlAboutWindowInstance: ctlAboutWindow? // New About Window
     private var checkTask: URLSessionTask?
     private var updateNextStepURL: URL?
-	private var fsStreamHelper = FSEventStreamHelper(path: LanguageModelManager.dataFolderPath, queue: DispatchQueue(label: "User Phrases"))
+	private var fsStreamHelper = FSEventStreamHelper(path: mgrLangModel.dataFolderPath, queue: DispatchQueue(label: "User Phrases"))
 
     // 補上 dealloc
     deinit {
@@ -156,10 +156,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        LanguageModelManager.loadDataModels()
-        LanguageModelManager.loadCNSData()
-        LanguageModelManager.loadUserPhrases()
-        LanguageModelManager.loadUserPhraseReplacement()
+        mgrLangModel.loadDataModels()
+        mgrLangModel.loadCNSData()
+        mgrLangModel.loadUserPhrases()
+        mgrLangModel.loadUserPhraseReplacement()
 		fsStreamHelper.delegate = self
 		_ = fsStreamHelper.start()
 

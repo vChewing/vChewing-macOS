@@ -1,5 +1,5 @@
 /* 
- *  LanguageModelManager.h
+ *  mgrLangModel.h
  *  
  *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
  *  Derived from 2011-2022 OpenVanilla Project (MIT License).
@@ -14,7 +14,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface LanguageModelManager : NSObject
+@interface mgrLangModel : NSObject
 
 + (void)loadDataModels;
 + (void)deployZipDataFile:(NSString *)filenameWithoutExtension;
