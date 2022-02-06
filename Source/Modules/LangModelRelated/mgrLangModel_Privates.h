@@ -6,9 +6,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface mgrLangModel ()
-@property (class, readonly, nonatomic) vChewing::vChewingLM *languageModelvChewing;
-@property (class, readonly, nonatomic) vChewing::vChewingLM *languageModelPlainBopomofo;
-@property (class, readonly, nonatomic) vChewing::UserOverrideModel *userOverrideModel;
+@property (class, readonly, nonatomic) vChewing::vChewingLM *lmCHT;
+@property (class, readonly, nonatomic) vChewing::vChewingLM *lmCHS;
+@property (class, readonly, nonatomic) vChewing::UserOverrideModel *userOverrideModelCHT;
+@property (class, readonly, nonatomic) vChewing::UserOverrideModel *userOverrideModelCHS;
 @end
 
 NS_ASSUME_NONNULL_END

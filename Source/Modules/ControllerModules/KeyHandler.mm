@@ -14,8 +14,8 @@ using namespace Taiyan::Mandarin;
 using namespace Taiyan::Gramambular;
 using namespace vChewing;
 
-InputMode InputModeBopomofo = @"org.atelierInmu.inputmethod.vChewing.IMECHT";
-InputMode InputModePlainBopomofo = @"org.atelierInmu.inputmethod.vChewing.IMECHS";
+InputMode imeModeCHT = @"org.atelierInmu.inputmethod.vChewing.IMECHT";
+InputMode imeModeCHS = @"org.atelierInmu.inputmethod.vChewing.IMECHS";
 
 static const double kEpsilon = 0.000001;
 
@@ -79,13 +79,13 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     NSString *newInputMode;
     vChewingLM *newLanguageModel;
 
-    if ([value isKindOfClass:[NSString class]] && [value isEqual:InputModePlainBopomofo]) {
-        newInputMode = InputModePlainBopomofo;
-        newLanguageModel = [mgrLangModel languageModelPlainBopomofo];
+    if ([value isKindOfClass:[NSString class]] && [value isEqual:imeModeCHS]) {
+        newInputMode = imeModeCHS;
+        newLanguageModel = [mgrLangModel lmCHS];
         newLanguageModel->setPhraseReplacementEnabled(false);
     } else {
-        newInputMode = InputModeBopomofo;
-        newLanguageModel = [mgrLangModel languageModelvChewing];
+        newInputMode = imeModeCHT;
+        newLanguageModel = [mgrLangModel lmCHT];
         newLanguageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
     }
 
@@ -125,7 +125,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         _bpmfReadingBuffer = new BopomofoReadingBuffer(BopomofoKeyboardLayout::StandardLayout());
 
         // create the lattice builder
-        _languageModel = [mgrLangModel languageModelvChewing];
+        _languageModel = [mgrLangModel lmCHT];
         _languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
         _userOverrideModel = [mgrLangModel userOverrideModel];
 
@@ -133,7 +133,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
-        _inputMode = InputModeBopomofo;
+        _inputMode = imeModeCHT;
     }
     return self;
 }
@@ -171,7 +171,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     size_t cursorIndex = [self _actualCandidateCursorIndex];
     string stringValue = [value UTF8String];
     _builder->grid().fixNodeSelectedCandidate(cursorIndex, stringValue);
-    if (_inputMode != InputModePlainBopomofo) {
+    if (_inputMode != imeModeCHS) {
         _userOverrideModel->observe(_walkedNodes, cursorIndex, stringValue, [[NSDate date] timeIntervalSince1970]);
     }
     [self _walk];
@@ -329,7 +329,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         NSString *poppedText = [self _popOverflowComposingTextAndWalk];
 
         // get user override model suggestion
-        string overrideValue = (_inputMode == InputModePlainBopomofo) ? "" :
+        string overrideValue = (Preferences.useSCPCTypingMode) ? "" :
                 _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
 
         if (!overrideValue.empty()) {
@@ -346,7 +346,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         inputting.poppedText = poppedText;
         stateCallback(inputting);
 
-        if (_inputMode == InputModePlainBopomofo) {
+        if (Preferences.useSCPCTypingMode) {
             InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateState:inputting useVerticalMode:input.useVerticalMode];
             if (choosingCandidates.candidates.count == 1) {
                 [self clear];
@@ -759,16 +759,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return NO;
     }
 
-// Actually the lines would not be reached. When there is BMPF reading and
-// a user input enter, we just send the readings to the client app.
-
-//    if (_inputMode == InputModePlainBopomofo) {
-//        if (!_bpmfReadingBuffer->isEmpty()) {
-//            errorCallback();
-//        }
-//        return YES;
-//    }
-
     [self clear];
 
     InputStateInputting *current = (InputStateInputting *) state;
@@ -800,7 +790,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     inputting.poppedText = poppedText;
     stateCallback(inputting);
 
-    if (_inputMode == InputModePlainBopomofo && _bpmfReadingBuffer->isEmpty()) {
+    if (Preferences.useSCPCTypingMode && _bpmfReadingBuffer->isEmpty()) {
         InputStateChoosingCandidate *candidateState = [self _buildCandidateState:inputting useVerticalMode:useVerticalMode];
 
         if ([candidateState.candidates count] == 1) {
@@ -904,7 +894,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
         }
-        else if (_inputMode == InputModePlainBopomofo) {
+        else if (Preferences.useSCPCTypingMode) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
@@ -1083,7 +1073,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return NO;
     }
 
-    if (_inputMode == InputModePlainBopomofo) {
+    if (Preferences.useSCPCTypingMode) {
         string layout = [self _currentLayout];
         string punctuationNamePrefix;
         if ([input isControlHold]) {
