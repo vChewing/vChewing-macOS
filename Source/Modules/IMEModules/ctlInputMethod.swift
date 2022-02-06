@@ -36,44 +36,51 @@ class ctlInputMethod: IMKInputController {
 
     override func menu() -> NSMenu! {
         let optionKeyPressed = NSEvent.modifierFlags.contains(.option)
-        
-        let menu = NSMenu(title: "Input Method Menu")
-        menu.addItem(withTitle: NSLocalizedString("vChewing Preferences", comment: ""), action: #selector(showPreferences(_:)), keyEquivalent: "")
 
-        let chineseConversionItem = menu.addItem(withTitle: NSLocalizedString("Chinese Conversion", comment: ""), action: #selector(toggleChineseConverter(_:)), keyEquivalent: "g")
+        let menu = NSMenu(title: "Input Method Menu")
+
+        let useSCPCTypingModeItem = menu.addItem(withTitle: NSLocalizedString("Per-Char Select Mode", comment: ""), action: #selector(toggleSCPCTypingMode(_:)), keyEquivalent: "P")
+        useSCPCTypingModeItem.keyEquivalentModifierMask = [.command, .control]
+        useSCPCTypingModeItem.state = Preferences.useSCPCTypingMode.state
+
+        let useCNS11643SupportItem = menu.addItem(withTitle: NSLocalizedString("CNS11643 Mode", comment: ""), action: #selector(toggleCNS11643Enabled(_:)), keyEquivalent: "L")
+        useCNS11643SupportItem.keyEquivalentModifierMask = [.command, .control]
+        useCNS11643SupportItem.state = Preferences.cns11643Enabled.state
+
+        let chineseConversionItem = menu.addItem(withTitle: NSLocalizedString("Force KangXi Writing", comment: ""), action: #selector(toggleChineseConverter(_:)), keyEquivalent: "K")
         chineseConversionItem.keyEquivalentModifierMask = [.command, .control]
         chineseConversionItem.state = Preferences.chineseConversionEnabled.state
 
-        let halfWidthPunctuationItem = menu.addItem(withTitle: NSLocalizedString("Use Half-Width Punctuations", comment: ""), action: #selector(toggleHalfWidthPunctuation(_:)), keyEquivalent: "h")
+        let halfWidthPunctuationItem = menu.addItem(withTitle: NSLocalizedString("Half-Width Punctuation Mode", comment: ""), action: #selector(toggleHalfWidthPunctuation(_:)), keyEquivalent: "H")
         halfWidthPunctuationItem.keyEquivalentModifierMask = [.command, .control]
         halfWidthPunctuationItem.state = Preferences.halfWidthPunctuationEnabled.state
 
-        if Preferences.useSCPCTypingMode {
-            let associatedPhrasesItem = menu.addItem(withTitle: NSLocalizedString("Associated Phrases", comment: ""), action: #selector(toggleAssociatedPhrasesEnabled(_:)), keyEquivalent: "")
-            associatedPhrasesItem.state = Preferences.associatedPhrasesEnabled.state
-        }
-
-        if keyHandler.inputMode == .imeModeCHT && optionKeyPressed {
+        if optionKeyPressed {
             let phaseReplacementItem = menu.addItem(withTitle: NSLocalizedString("Use Phrase Replacement", comment: ""), action: #selector(togglePhraseReplacement(_:)), keyEquivalent: "")
             phaseReplacementItem.state = Preferences.phraseReplacementEnabled.state
         }
 
-        menu.addItem(NSMenuItem.separator())
-        menu.addItem(withTitle: NSLocalizedString("User Phrases", comment: ""), action: nil, keyEquivalent: "")
-
+        menu.addItem(NSMenuItem.separator()) // ---------------------
 
         menu.addItem(withTitle: NSLocalizedString("Edit User Phrases", comment: ""), action: #selector(openUserPhrases(_:)), keyEquivalent: "")
-        menu.addItem(withTitle: NSLocalizedString("Edit Excluded Phrases", comment: ""), action: #selector(openExcludedPhrases(_:)), keyEquivalent: "")
+
         if optionKeyPressed {
+            menu.addItem(withTitle: NSLocalizedString("Edit Excluded Phrases", comment: ""), action: #selector(openExcludedPhrases(_:)), keyEquivalent: "")
             menu.addItem(withTitle: NSLocalizedString("Edit Phrase Replacement Table", comment: ""), action: #selector(openPhraseReplacement(_:)), keyEquivalent: "")
         }
 
+        if (optionKeyPressed || !Preferences.shouldAutoReloadUserDataFiles) {
+            menu.addItem(withTitle: NSLocalizedString("Reload User Phrases", comment: ""), action: #selector(reloadUserPhrases(_:)), keyEquivalent: "")
+        }
 
-        menu.addItem(withTitle: NSLocalizedString("Reload User Phrases", comment: ""), action: #selector(reloadUserPhrases(_:)), keyEquivalent: "")
-        menu.addItem(NSMenuItem.separator())
+        menu.addItem(NSMenuItem.separator()) // ---------------------
 
+        menu.addItem(withTitle: NSLocalizedString("vChewing Preferences", comment: ""), action: #selector(showPreferences(_:)), keyEquivalent: "")
         menu.addItem(withTitle: NSLocalizedString("Check for Updates…", comment: ""), action: #selector(checkForUpdate(_:)), keyEquivalent: "")
         menu.addItem(withTitle: NSLocalizedString("About vChewing…", comment: ""), action: #selector(showAbout(_:)), keyEquivalent: "")
+        if optionKeyPressed {
+            menu.addItem(withTitle: NSLocalizedString("Reboot vChewing…", comment: ""), action: #selector(selfTerminate(_:)), keyEquivalent: "")
+        }
         return menu
     }
 
@@ -174,14 +181,24 @@ class ctlInputMethod: IMKInputController {
         NSApp.activate(ignoringOtherApps: true)
     }
 
+    @objc func toggleSCPCTypingMode(_ sender: Any?) {
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Per-Char Select Mode", comment: ""), "\n", Preferences.toggleSCPCTypingModeEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
+    }
+
     @objc func toggleChineseConverter(_ sender: Any?) {
-        let enabled = Preferences.toggleChineseConversionEnabled()
-        NotifierController.notify(message: enabled ? NSLocalizedString("Chinese conversion on", comment: "") : NSLocalizedString("Chinese conversion off", comment: ""))
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Force KangXi Writing", comment: ""), "\n", Preferences.toggleChineseConversionEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 
     @objc func toggleHalfWidthPunctuation(_ sender: Any?) {
-        let enabled = Preferences.togglePhraseReplacementEnabled()
-        NotifierController.notify(message: enabled ? NSLocalizedString("Half-width punctuation on", comment: "") : NSLocalizedString("Half-width punctuation off", comment: ""))
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Half-Width Punctuation Mode", comment: ""), "\n", Preferences.toggleHalfWidthPunctuationEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
+    }
+
+    @objc func toggleCNS11643Enabled(_ sender: Any?) {
+        // let enabled = Preferences.toggleCNS11643Enabled()
+        // mgrLangModel.cnsEnabledCHS = enabled
+        // mgrLangModel.cnsEnabledCHT = enabled
+        _ = Preferences.toggleCNS11643Enabled()
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("CNS11643 Mode", comment: ""), "\n", Preferences.cns11643Enabled ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 
     @objc func toggleAssociatedPhrasesEnabled(_ sender: Any?) {
@@ -191,6 +208,10 @@ class ctlInputMethod: IMKInputController {
     @objc func togglePhraseReplacement(_ sender: Any?) {
         let enabled = Preferences.togglePhraseReplacementEnabled()
         mgrLangModel.phraseReplacementEnabled = enabled
+    }
+
+    @objc func selfTerminate(_ sender: Any?) {
+        NSApp.terminate(nil)
     }
 
     @objc func checkForUpdate(_ sender: Any?) {
@@ -210,8 +231,7 @@ class ctlInputMethod: IMKInputController {
         if !checkIfUserFilesExist() {
             return
         }
-        let url = URL(fileURLWithPath: path)
-        NSWorkspace.shared.open(url)
+        NSWorkspace.shared.openFile(path, withApplication: "TextEdit")
     }
 
     @objc func openUserPhrases(_ sender: Any?) {
@@ -592,3 +612,4 @@ extension ctlInputMethod: CandidateControllerDelegate {
         }
     }
 }
+
