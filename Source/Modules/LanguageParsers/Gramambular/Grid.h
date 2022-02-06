@@ -1,10 +1,9 @@
-/* 
- *  Grid.h
- *  
- *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
- *  Derived from 2011-2022 OpenVanilla Project (MIT License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
- */
+//
+// Grid.h
+//
+// Copyright (c) 2007-2010 Lukhnos D. Liu (http://lukhnos.org)
+//
+//
 
 #ifndef Grid_h
 #define Grid_h
@@ -29,18 +28,18 @@ namespace Taiyan {
             vector<NodeAnchor> nodesEndingAt(size_t inLocation);
             vector<NodeAnchor> nodesCrossingOrEndingAt(size_t inLocation);
 
-			// "Freeze" the node with the unigram that represents the selected canditate value.
-			// After this, the node that contains the unigram will always be evaluated to that
-			// unigram, while all other overlapping nodes will be reset to their initial state
-			// (that is, if any of those nodes were "frozen" or fixed, they will be unfrozen.)
-			void fixNodeSelectedCandidate(size_t location, const string& value);
+            // "Freeze" the node with the unigram that represents the selected canditate value.
+            // After this, the node that contains the unigram will always be evaluated to that
+            // unigram, while all other overlapping nodes will be reset to their initial state
+            // (that is, if any of those nodes were "frozen" or fixed, they will be unfrozen.)
+            void fixNodeSelectedCandidate(size_t location, const string& value);
 
-			// Similar to fixNodeSelectedCandidate, but instead of "freezing" the node, only
-			// boost the unigram that represents the value with an overriding score. This
-			// has the same side effect as fixNodeSelectedCandidate, which is that all other
-			// overlapping nodes will be reset to their initial state.
-			void overrideNodeScoreForSelectedCandidate(size_t location, const string& value, float overridingScore);
-			
+            // Similar to fixNodeSelectedCandidate, but instead of "freezing" the node, only
+            // boost the unigram that represents the value with an overriding score. This
+            // has the same side effect as fixNodeSelectedCandidate, which is that all other
+            // overlapping nodes will be reset to their initial state.
+            void overrideNodeScoreForSelectedCandidate(size_t location, const string& value, float overridingScore);
+            
             const string dumpDOT();
             
         protected:
@@ -186,26 +185,26 @@ namespace Taiyan {
                 }
             }
         }
+
+        inline void Grid::overrideNodeScoreForSelectedCandidate(size_t location, const string& value, float overridingScore)
+        {
+            vector<NodeAnchor> nodes = nodesCrossingOrEndingAt(location);
+            for (auto nodeAnchor : nodes) {
+                auto candidates = nodeAnchor.node->candidates();
+
+                // Reset the candidate-fixed state of every node at the location.
+                const_cast<Node*>(nodeAnchor.node)->resetCandidate();
+
+                for (size_t i = 0, c = candidates.size(); i < c; ++i) {
+                    if (candidates[i].value == value) {
+                        const_cast<Node*>(nodeAnchor.node)->selectFloatingCandidateAtIndex(i, overridingScore);
+                        break;
+                    }
+                }
+            }
+        }
         
-	inline void Grid::overrideNodeScoreForSelectedCandidate(size_t location, const string& value, float overridingScore)
-	{
-		vector<NodeAnchor> nodes = nodesCrossingOrEndingAt(location);
-		for (auto nodeAnchor : nodes) {
-			auto candidates = nodeAnchor.node->candidates();
-			
-			// Reset the candidate-fixed state of every node at the location.
-			const_cast<Node*>(nodeAnchor.node)->resetCandidate();
-			
-			for (size_t i = 0, c = candidates.size(); i < c; ++i) {
-				if (candidates[i].value == value) {
-					const_cast<Node*>(nodeAnchor.node)->selectFloatingCandidateAtIndex(i, overridingScore);
-					break;
-				}
-			}
-		}
-	}
-	
-	inline const string Grid::dumpDOT()
+        inline const string Grid::dumpDOT()
         {
             stringstream sst;
             sst << "digraph {" << endl;

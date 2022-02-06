@@ -1,10 +1,9 @@
-/* 
- *  BlockReadingBuilder.h
- *  
- *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
- *  Derived from 2011-2022 OpenVanilla Project (MIT License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
- */
+//
+// BlockReadingBuilder.h
+//
+// Copyright (c) 2007-2010 Lukhnos D. Liu (http://lukhnos.org)
+//
+//
 
 #ifndef BlockReadingBuilder_h
 #define BlockReadingBuilder_h
@@ -34,7 +33,7 @@ namespace Taiyan {
             void setJoinSeparator(const string& separator);
             const string joinSeparator() const;
 
-			vector<string> readings() const;
+            vector<string> readings() const;
 
             Grid& grid();
                         
@@ -43,8 +42,8 @@ namespace Taiyan {
             
             static const string Join(vector<string>::const_iterator begin, vector<string>::const_iterator end, const string& separator);
             
-        //最多使用六個字組成一個詞
-            static const size_t MaximumBuildSpanLength = 10;
+	    //最多使用六個字組成一個詞
+            static const size_t MaximumBuildSpanLength = 6;
             
             size_t m_cursorIndex;
             vector<string> m_readings;
@@ -86,14 +85,14 @@ namespace Taiyan {
         {
             m_readings.insert(m_readings.begin() + m_cursorIndex, inReading);
                                     
-            m_grid.expandGridByOneAtLocation(m_cursorIndex);
+            m_grid.expandGridByOneAtLocation(m_cursorIndex);            
             build();
-            m_cursorIndex++;
+            m_cursorIndex++;   
         }
 
-		inline vector<string> BlockReadingBuilder::readings() const
-		{
-			return m_readings;
+        inline vector<string> BlockReadingBuilder::readings() const
+        {
+            return m_readings;
         }
         
         inline bool BlockReadingBuilder::deleteReadingBeforeCursor()
@@ -136,7 +135,7 @@ namespace Taiyan {
                 build();
             }
             
-            return true;
+            return true;            
         }
         
         inline void BlockReadingBuilder::setJoinSeparator(const string& separator)
@@ -153,7 +152,7 @@ namespace Taiyan {
         {
             return m_grid;
         }
-        
+
         inline void BlockReadingBuilder::build()
         {
             if (!m_LM) {
@@ -200,7 +199,7 @@ namespace Taiyan {
                 }
             }
             return result;
-        }
+        }                    
     }
 }
 

@@ -1,0 +1,5 @@
+CFBundleName = "vChewing";
+CFBundleDisplayName = "vChewing";
+NSHumanReadableCopyright = "Copyright © 2011-2022 Mengjuei Hsieh et al.\nAll Rights Reserved.";
+"org.atelierInmu.inputmethod.vChewing.IMECHT" = "vChewing-CHT";
+"org.atelierInmu.inputmethod.vChewing.IMECHS" = "vChewing-CHS";

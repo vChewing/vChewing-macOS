@@ -18,7 +18,7 @@ private let kTargetFullBinPartialPath = "~/Library/Input Methods/vChewing.app/Co
 private let kTranslocationRemovalTickInterval: TimeInterval = 0.5
 private let kTranslocationRemovalDeadline: TimeInterval = 60.0
 
-@main
+@NSApplicationMain
 @objc (AppDelegate)
 class AppDelegate: NSWindowController, NSApplicationDelegate {
     @IBOutlet weak private var installButton: NSButton!

@@ -1,195 +1,86 @@
-/* 
- *  VerticalCandidateController.swift
- *  
- *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
- *  Derived from 2011-2022 OpenVanilla Project (MIT License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
- */
 
 import Cocoa
 
-fileprivate class VerticalCandidateView: NSView {
-    var highlightedIndex: UInt = 0
-    var action: Selector?
-    weak var target: AnyObject?
-
-    private var keyLabels: [String] = []
-    private var displayedCandidates: [String] = []
-    private var dispCandidatesWithLabels: [String] = []
-    private var keyLabelHeight: CGFloat = 0
-    private var keyLabelWidth: CGFloat = 0
-    private var candidateTextHeight: CGFloat = 0
-    private var cellPadding: CGFloat = 0
-    private var keyLabelAttrDict: [NSAttributedString.Key: AnyObject] = [:]
-    private var candidateAttrDict: [NSAttributedString.Key: AnyObject] = [:]
-    private var candidateWithLabelAttrDict: [NSAttributedString.Key: AnyObject] = [:]
-    private var windowWidth: CGFloat = 0
-    private var elementWidths: [CGFloat] = []
-    private var elementHeights: [CGFloat] = []
-    private var trackingHighlightedIndex: UInt = UInt.max
+fileprivate class VerticalKeyLabelStripView: NSView {
+    var keyLabelFont: NSFont = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+    var labelOffsetY: CGFloat = 0
+    var keyLabels: [String] = []
+    var highlightedIndex: UInt = UInt.max
 
     override var isFlipped: Bool {
         true
     }
 
-    var sizeForView: NSSize {
-        var result = NSSize.zero
-
-        if !elementWidths.isEmpty {
-            result.width = windowWidth
-            result.height = elementHeights.reduce(0, +)
-        }
-        return result
-    }
-
-    @objc(setKeyLabels:displayedCandidates:)
-    func set(keyLabels labels: [String], displayedCandidates candidates: [String]) {
-        let count = min(labels.count, candidates.count)
-        keyLabels = Array(labels[0..<count])
-        displayedCandidates = Array(candidates[0..<count])
-        dispCandidatesWithLabels = zip(keyLabels,displayedCandidates).map() {$0 + $1}
-
-        var newWidths = [CGFloat]()
-        var calculatedWindowWidth = CGFloat()
-        var newHeights = [CGFloat]()
-        let baseSize = NSSize(width: 10240.0, height: 10240.0)
-        for index in 0..<count {
-            let rctCandidate = (dispCandidatesWithLabels[index] as NSString).boundingRect(with: baseSize, options: .usesLineFragmentOrigin, attributes: candidateWithLabelAttrDict)
-            let cellWidth = rctCandidate.size.width + cellPadding
-            let cellHeight = rctCandidate.size.height + cellPadding
-            if (calculatedWindowWidth < rctCandidate.size.width) {
-                calculatedWindowWidth = rctCandidate.size.width
-            }
-            newWidths.append(cellWidth)
-            newHeights.append(cellHeight)
-        }
-        elementWidths = newWidths
-        elementHeights = newHeights
-        windowWidth = calculatedWindowWidth + cellPadding;
-    }
-
-    @objc(setKeyLabelFont:candidateFont:)
-    func set(keyLabelFont labelFont: NSFont, candidateFont: NSFont) {
-        let paraStyle = NSMutableParagraphStyle()
-        paraStyle.setParagraphStyle(NSParagraphStyle.default)
-        paraStyle.alignment = .left
-        
-        candidateWithLabelAttrDict = [.font: candidateFont,
-                             .paragraphStyle: paraStyle,
-                             .foregroundColor: NSColor.labelColor] // We still need this dummy section to make sure the space occupations of the candidates are correct.
-        
-        keyLabelAttrDict = [.font: labelFont,
-                            .paragraphStyle: paraStyle,
-                            .foregroundColor: NSColor.secondaryLabelColor] // Candidate phrase text color
-        candidateAttrDict = [.font: candidateFont,
-                             .paragraphStyle: paraStyle,
-                             .foregroundColor: NSColor.labelColor] // Candidate index text color
-        let labelFontSize = labelFont.pointSize
-        let candidateFontSize = candidateFont.pointSize
-        let biggestSize = max(labelFontSize, candidateFontSize)
-        keyLabelWidth = ceil(labelFontSize)
-        keyLabelHeight = ceil(labelFontSize * 1.20)
-        candidateTextHeight = ceil(candidateFontSize * 1.20)
-        cellPadding = ceil(biggestSize / 2.0)
-    }
-
     override func draw(_ dirtyRect: NSRect) {
-        
-        // Give a standalone layer to the candidate list panel
-        self.wantsLayer = true
-        self.layer?.borderColor = NSColor.selectedMenuItemTextColor.withAlphaComponent(0.30).cgColor
-        self.layer?.borderWidth = 1.0
-        self.layer?.cornerRadius = 6.0
-        
         let bounds = self.bounds
-        NSColor.controlBackgroundColor.setFill() // Candidate list panel base background
+        NSColor.white.setFill()
         NSBezierPath.fill(bounds)
 
-        if #available(macOS 10.14, *) {
-            NSColor.separatorColor.setStroke()
-        } else {
-            NSColor.darkGray.setStroke()
-        }
-
-        NSBezierPath.strokeLine(from: NSPoint(x: bounds.size.width, y: 0.0), to: NSPoint(x: bounds.size.width, y: bounds.size.height))
-
-        var accuHeight: CGFloat = 0
-        for index in 0..<elementHeights.count {
-            let currentHeight = elementHeights[index]
-            let rctCandidateArea = NSRect(x: 0.0, y: accuHeight, width: windowWidth, height: candidateTextHeight + cellPadding)
-            let rctLabel = NSRect(x: cellPadding / 2 - 1, y: accuHeight + cellPadding / 2, width: keyLabelWidth, height: candidateTextHeight)
-            let rctCandidatePhrase = NSRect(x: cellPadding / 2 - 1 + keyLabelWidth, y: accuHeight + cellPadding / 2 - 1, width: windowWidth - keyLabelWidth, height: candidateTextHeight)
-
-            var activeCandidateIndexAttr = keyLabelAttrDict
-            var activeCandidateAttr = candidateAttrDict
-            if index == highlightedIndex {
-                NSColor.alternateSelectedControlColor.setFill() // The background color of the highlightened candidate
-                activeCandidateIndexAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor.withAlphaComponent(0.84) // The index text color of the highlightened candidate
-                activeCandidateAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor // The phrase text color of the highlightened candidate
-            } else {
-                NSColor.controlBackgroundColor.setFill()
-            }
-            NSBezierPath.fill(rctCandidateArea)
-            (keyLabels[index] as NSString).draw(in: rctLabel, withAttributes: activeCandidateIndexAttr)
-            (displayedCandidates[index] as NSString).draw(in: rctCandidatePhrase, withAttributes: activeCandidateAttr)
-            accuHeight += currentHeight
-        }
-    }
-
-    private func findHitIndex(event: NSEvent) -> UInt? {
-        let location = convert(event.locationInWindow, to: nil)
-        if !NSPointInRect(location, self.bounds) {
-            return nil
-        }
-        var accuHeight: CGFloat = 0.0
-        for index in 0..<elementHeights.count {
-            let currentHeight = elementHeights[index]
-
-            if location.y >= accuHeight && location.y <= accuHeight + currentHeight {
-                return UInt(index)
-            }
-            accuHeight += currentHeight
-        }
-        return nil
-
-    }
-
-    override func mouseUp(with event: NSEvent) {
-        trackingHighlightedIndex = highlightedIndex
-        guard let newIndex = findHitIndex(event: event) else {
+        let count = UInt(keyLabels.count)
+        if count == 0 {
             return
         }
-        highlightedIndex = newIndex
-        self.setNeedsDisplay(self.bounds)
-    }
+        let cellHeight: CGFloat = bounds.size.height / CGFloat(count)
+        let black = NSColor.black
+        let darkGray = NSColor(deviceWhite: 0.7, alpha: 1.0)
+        let lightGray = NSColor(deviceWhite: 0.8, alpha: 1.0)
 
-    override func mouseDown(with event: NSEvent) {
-        guard let newIndex = findHitIndex(event: event) else {
-            return
-        }
-        var triggerAction = false
-        if newIndex == highlightedIndex {
-            triggerAction = true
-        } else {
-            highlightedIndex = trackingHighlightedIndex
-        }
+        let paraStyle = NSMutableParagraphStyle()
+        paraStyle.setParagraphStyle(NSParagraphStyle.default)
+        paraStyle.alignment = .center
 
-        trackingHighlightedIndex = 0
-        self.setNeedsDisplay(self.bounds)
-        if triggerAction {
-            if let target = target as? NSObject, let action = action {
-                target.perform(action, with: self)
+        let textAttr: [NSAttributedString.Key: AnyObject] = [
+            .font: keyLabelFont,
+            .foregroundColor: black,
+            .paragraphStyle: paraStyle]
+        for index in 0..<count {
+            let textRect = NSRect(x: 0.0, y: CGFloat(index) * cellHeight + labelOffsetY, width: bounds.size.width, height: cellHeight - labelOffsetY)
+            var cellRect = NSRect(x: 0.0, y: CGFloat(index) * cellHeight, width: bounds.size.width, height: cellHeight - 1)
+
+            if index + 1 >= count {
+                cellRect.size.height += 1.0
             }
+
+            (index == highlightedIndex ? darkGray : lightGray).setFill()
+            NSBezierPath.fill(cellRect)
+            let text = keyLabels[Int(index)]
+            (text as NSString).draw(in: textRect, withAttributes: textAttr)
         }
+    }
+}
+
+fileprivate class VerticalCandidateTableView: NSTableView {
+    override func adjustScroll(_ newVisible: NSRect) -> NSRect {
+        var scrollRect = newVisible
+        let rowHeightPlusSpacing = rowHeight + intercellSpacing.height
+        scrollRect.origin.y = (scrollRect.origin.y / rowHeightPlusSpacing) * rowHeightPlusSpacing
+        return scrollRect
+    }
+}
+
+private let kCandidateTextPadding: CGFloat = 24.0
+private let kCandidateTextLeftMargin: CGFloat = 8.0
+private let kCandidateTextPaddingWithMandatedTableViewPadding: CGFloat = 18.0
+private let kCandidateTextLeftMarginWithMandatedTableViewPadding: CGFloat = 0.0
+
+private class BackgroundView: NSView {
+    override func draw(_ dirtyRect: NSRect) {
+        NSColor.windowBackgroundColor.setFill()
+        NSBezierPath.fill(self.bounds)
     }
 }
 
 @objc(VTVerticalCandidateController)
 public class VerticalCandidateController: CandidateController {
-    private var candidateView: VerticalCandidateView
-    private var prevPageButton: NSButton
-    private var nextPageButton: NSButton
-    private var currentPage: UInt = 0
+    private var keyLabelStripView: VerticalKeyLabelStripView
+    private var scrollView: NSScrollView
+    private var tableView: NSTableView
+    private var candidateTextParagraphStyle: NSMutableParagraphStyle
+    private var candidateTextPadding: CGFloat = kCandidateTextPadding
+    private var candidateTextLeftMargin: CGFloat = kCandidateTextLeftMargin
+    private var maxCandidateAttrStringWidth: CGFloat = 0
+    private let tooltipPadding: CGFloat = 2.0
+    private var tooltipView: NSTextField
 
     public init() {
         var contentRect = NSRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
@@ -197,45 +88,62 @@ public class VerticalCandidateController: CandidateController {
         let panel = NSPanel(contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false)
         panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel) + 1)
         panel.hasShadow = true
-        panel.isOpaque = false
-        panel.backgroundColor = NSColor.clear // Transparentify everything outside of the candidate list panel
-        
+        panel.contentView = BackgroundView()
+
+        tooltipView = NSTextField(frame: NSRect.zero)
+        tooltipView.isEditable = false
+        tooltipView.isSelectable = false
+        tooltipView.isBezeled = false
+        tooltipView.drawsBackground = true
+        tooltipView.lineBreakMode = .byTruncatingTail
+
         contentRect.origin = NSPoint.zero
-        candidateView = VerticalCandidateView(frame: contentRect)
-        panel.contentView?.addSubview(candidateView)
-        
-        contentRect.size = NSSize(width: 20.0, height: 15.0) // Reduce the button width
-        nextPageButton = NSButton(frame: contentRect)
-        nextPageButton.setButtonType(.momentaryLight)
-        nextPageButton.bezelStyle = .shadowlessSquare
-        nextPageButton.wantsLayer = true
-        nextPageButton.layer?.masksToBounds = true
-        nextPageButton.layer?.borderColor = NSColor.clear.cgColor // Attempt to remove the system default layer border color - step 1
-        nextPageButton.layer?.borderWidth = 0.0 // Attempt to remove the system default layer border color - step 2
-        nextPageButton.layer?.backgroundColor = NSColor.black.cgColor // Button Background Color. Otherwise the button will be half-transparent in macOS Monterey Dark Mode.
-        nextPageButton.attributedTitle = NSMutableAttributedString(string: "➡︎") // Next Page Arrow
-        prevPageButton = NSButton(frame: contentRect)
-        prevPageButton.setButtonType(.momentaryLight)
-        prevPageButton.bezelStyle = .shadowlessSquare
-        prevPageButton.wantsLayer = true
-        prevPageButton.layer?.masksToBounds = true
-        prevPageButton.layer?.borderColor = NSColor.clear.cgColor // Attempt to remove the system default layer border color - step 1
-        prevPageButton.layer?.borderWidth = 0.0 // Attempt to remove the system default layer border color - step 2
-        prevPageButton.layer?.backgroundColor = NSColor.black.cgColor // Button Background Color. Otherwise the button will be half-transparent in macOS Monterey Dark Mode.
-        prevPageButton.attributedTitle = NSMutableAttributedString(string: "⬅︎") // Previous Page Arrow
-        panel.contentView?.addSubview(nextPageButton)
-        panel.contentView?.addSubview(prevPageButton)
+        var stripRect = contentRect
+        stripRect.size.width = 10.0
+        keyLabelStripView = VerticalKeyLabelStripView(frame: stripRect)
+        panel.contentView?.addSubview(keyLabelStripView)
+
+        var scrollViewRect = contentRect
+        scrollViewRect.origin.x = stripRect.size.width
+        scrollViewRect.size.width -= stripRect.size.width
+        scrollView = NSScrollView(frame: scrollViewRect)
+        scrollView.verticalScrollElasticity = .none
+
+        tableView = NSTableView(frame: contentRect)
+        let column = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "candidate"))
+        column.dataCell = NSTextFieldCell()
+        column.isEditable = false
+
+        candidateTextPadding = kCandidateTextPadding
+        candidateTextLeftMargin = kCandidateTextLeftMargin
+
+        tableView.addTableColumn(column)
+        tableView.intercellSpacing = NSSize(width: 0.0, height: 1.0)
+        tableView.headerView = nil
+        tableView.allowsMultipleSelection = false
+        tableView.allowsEmptySelection = false
+
+        if #available(macOS 10.16, *) {
+            tableView.style = .fullWidth
+            candidateTextPadding = kCandidateTextPaddingWithMandatedTableViewPadding
+            candidateTextLeftMargin = kCandidateTextLeftMarginWithMandatedTableViewPadding
+        }
+
+        scrollView.documentView = tableView
+        panel.contentView?.addSubview(scrollView)
+
+        let paraStyle = NSMutableParagraphStyle()
+        paraStyle.setParagraphStyle(NSParagraphStyle.default)
+        paraStyle.firstLineHeadIndent = candidateTextLeftMargin
+        paraStyle.lineBreakMode = .byClipping
+
+        candidateTextParagraphStyle = paraStyle
 
         super.init(window: panel)
-
-        candidateView.target = self
-        candidateView.action = #selector(candidateViewMouseDidClick(_:))
-
-        nextPageButton.target = self
-        nextPageButton.action = #selector(pageButtonAction(_:))
-
-        prevPageButton.target = self
-        prevPageButton.action = #selector(pageButtonAction(_:))
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.doubleAction = #selector(rowDoubleClicked(_:))
+        tableView.target = self
     }
 
     required init?(coder: NSCoder) {
@@ -243,66 +151,28 @@ public class VerticalCandidateController: CandidateController {
     }
 
     public override func reloadData() {
-        candidateView.highlightedIndex = 0
-        currentPage = 0
+        maxCandidateAttrStringWidth = ceil(candidateFont.pointSize * 2.0 + candidateTextPadding)
+        tableView.reloadData()
         layoutCandidateView()
+        if delegate?.candidateCountForController(self) ?? 0 > 0 {
+            selectedCandidateIndex = 0
+        }
     }
 
     public override func showNextPage() -> Bool {
-        guard delegate != nil else {
-            return false
-        }
-
-        if currentPage + 1 >= pageCount {
-            return false
-        }
-
-        currentPage += 1
-        candidateView.highlightedIndex = 0
-        layoutCandidateView()
-        return true
+        scrollPageByOne(true)
     }
 
     public override func showPreviousPage() -> Bool {
-        guard delegate != nil else {
-            return false
-        }
-
-        if currentPage == 0 {
-            return false
-        }
-
-        currentPage -= 1
-        candidateView.highlightedIndex = 0
-        layoutCandidateView()
-        return true
+        scrollPageByOne(false)
     }
 
     public override func highlightNextCandidate() -> Bool {
-        guard let delegate = delegate else {
-            return false
-        }
-
-        let currentIndex = selectedCandidateIndex
-        if currentIndex + 1 >= delegate.candidateCountForController(self) {
-            return false
-        }
-        selectedCandidateIndex = currentIndex + 1
-        return true
+        moveSelectionByOne(true)
     }
 
     public override func highlightPreviousCandidate() -> Bool {
-        guard delegate != nil else {
-            return false
-        }
-
-        let currentIndex = selectedCandidateIndex
-        if currentIndex == 0 {
-            return false
-        }
-
-        selectedCandidateIndex = currentIndex - 1
-        return true
+        moveSelectionByOne(false)
     }
 
     public override func candidateIndexAtKeyLabelIndex(_ index: UInt) -> UInt {
@@ -310,103 +180,285 @@ public class VerticalCandidateController: CandidateController {
             return UInt.max
         }
 
-        let result = currentPage * UInt(keyLabels.count) + index
-        return result < delegate.candidateCountForController(self) ? result : UInt.max
+        let firstVisibleRow = tableView.row(at: scrollView.documentVisibleRect.origin)
+        if firstVisibleRow != -1 {
+            let result = UInt(firstVisibleRow) + index
+            if result < delegate.candidateCountForController(self) {
+                return result
+            }
+        }
+
+        return UInt.max
     }
 
     public override var selectedCandidateIndex: UInt {
         get {
-            currentPage * UInt(keyLabels.count) + candidateView.highlightedIndex
+            let selectedRow = tableView.selectedRow
+            return selectedRow == -1 ? UInt.max : UInt(selectedRow)
+
         }
         set {
             guard let delegate = delegate else {
                 return
             }
-            let keyLabelCount = UInt(keyLabels.count)
-            if newValue < delegate.candidateCountForController(self) {
-                currentPage = newValue / keyLabelCount
-                candidateView.highlightedIndex = newValue % keyLabelCount
-                layoutCandidateView()
+            var newIndex = newValue
+            let selectedRow = tableView.selectedRow
+            let labelCount = keyLabels.count
+            let itemCount = delegate.candidateCountForController(self)
+
+            if newIndex == UInt.max {
+                if itemCount == 0 {
+                    tableView.deselectAll(self)
+                    return
+                }
+                newIndex = 0
             }
+
+            var lastVisibleRow = newValue
+
+            if selectedRow != -1 && itemCount > 0 && itemCount > labelCount {
+                if newIndex > selectedRow && (Int(newIndex) - selectedRow) > 1 {
+                    lastVisibleRow = min(newIndex + UInt(labelCount) - 1, itemCount - 1)
+                }
+                // no need to handle the backward case: (newIndex < selectedRow && selectedRow - newIndex > 1)
+            }
+
+            if itemCount > labelCount {
+                tableView.scrollRowToVisible(Int(lastVisibleRow))
+            }
+            tableView.selectRowIndexes(IndexSet(integer: Int(newIndex)), byExtendingSelection: false)
         }
     }
 }
 
-extension VerticalCandidateController {
+extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegate {
 
-    private var pageCount: UInt {
+    public func numberOfRows(in tableView: NSTableView) -> Int {
+        Int(delegate?.candidateCountForController(self) ?? 0)
+    }
+
+    public func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
         guard let delegate = delegate else {
-            return 0
+            return nil
         }
-        let totalCount = delegate.candidateCountForController(self)
-        let keyLabelCount = UInt(keyLabels.count)
-        return totalCount / keyLabelCount + ((totalCount % keyLabelCount) != 0 ? 1 : 0)
+        var candidate = ""
+        if row < delegate.candidateCountForController(self) {
+            candidate = delegate.candidateController(self, candidateAtIndex: UInt(row))
+        }
+        let attrString = NSAttributedString(string: candidate, attributes: [
+            .font: candidateFont,
+            .paragraphStyle: candidateTextParagraphStyle
+        ])
+
+        // we do more work than what this method is expected to; normally not a good practice, but for the amount of data (9 to 10 rows max), we can afford the overhead
+
+        // expand the window width if text overflows
+        let boundingRect = attrString.boundingRect(with: NSSize(width: 10240.0, height: 10240.0), options: .usesLineFragmentOrigin)
+        let textWidth = boundingRect.size.width + candidateTextPadding
+        if textWidth > maxCandidateAttrStringWidth {
+            maxCandidateAttrStringWidth = textWidth
+            layoutCandidateView()
+        }
+
+        // keep track of the highlighted index in the key label strip
+        let count = UInt(keyLabels.count)
+        let selectedRow = tableView.selectedRow
+
+        if selectedRow != -1 {
+            var newHilightIndex = 0
+
+            if keyLabelStripView.highlightedIndex != -1 &&
+                       (row >= selectedRow + Int(count) || (selectedRow > count && row <= selectedRow - Int(count))) {
+                newHilightIndex = -1
+            } else {
+                let firstVisibleRow = tableView.row(at: scrollView.documentVisibleRect.origin)
+                newHilightIndex = selectedRow - firstVisibleRow
+                if newHilightIndex < -1 {
+                    newHilightIndex = -1
+                }
+            }
+
+            if newHilightIndex != keyLabelStripView.highlightedIndex && newHilightIndex >= 0 {
+                keyLabelStripView.highlightedIndex = UInt(newHilightIndex)
+                keyLabelStripView.setNeedsDisplay(keyLabelStripView.frame)
+            }
+
+        }
+        return attrString
+    }
+
+    public func tableViewSelectionDidChange(_ notification: Notification) {
+        let selectedRow = tableView.selectedRow
+        if selectedRow != -1 {
+            // keep track of the highlighted index in the key label strip
+            let firstVisibleRow = tableView.row(at: scrollView.documentVisibleRect.origin)
+            // firstVisibleRow cannot be larger than selectedRow.
+            if selectedRow >= firstVisibleRow {
+                keyLabelStripView.highlightedIndex = UInt(selectedRow - firstVisibleRow)
+            } else {
+                keyLabelStripView.highlightedIndex = UInt.max
+            }
+
+            keyLabelStripView.setNeedsDisplay(keyLabelStripView.frame)
+
+            // fix a subtle OS X "bug" that, since we force the scroller to appear,
+            // scrolling sometimes shows a temporarily "broken" scroll bar
+            // (but quickly disappears)
+            if scrollView.hasVerticalScroller {
+                scrollView.verticalScroller?.setNeedsDisplay()
+            }
+        }
+    }
+
+    @objc func rowDoubleClicked(_ sender: Any) {
+        let clickedRow = tableView.clickedRow
+        if clickedRow != -1 {
+            delegate?.candidateController(self, didSelectCandidateAtIndex: UInt(clickedRow))
+        }
+    }
+
+    func scrollPageByOne(_ forward: Bool) -> Bool {
+        guard let delegate = delegate else {
+            return false
+        }
+        let labelCount = UInt(keyLabels.count)
+        let itemCount = delegate.candidateCountForController(self)
+        if 0 == itemCount {
+            return false
+        }
+        if itemCount <= labelCount {
+            return false
+        }
+
+        var newIndex = selectedCandidateIndex
+        if forward {
+            if newIndex >= itemCount - 1 {
+                return false
+            }
+            newIndex = min(newIndex + labelCount, itemCount - 1)
+        } else {
+            if newIndex == 0 {
+                return false
+            }
+
+            if newIndex < labelCount {
+                newIndex = 0
+            } else {
+                newIndex -= labelCount
+            }
+        }
+        selectedCandidateIndex = newIndex
+        return true
+    }
+
+    private func moveSelectionByOne(_ forward: Bool) -> Bool {
+        guard let delegate = delegate else {
+            return false
+        }
+        let itemCount = delegate.candidateCountForController(self)
+        if 0 == itemCount {
+            return false
+        }
+        var newIndex = selectedCandidateIndex
+        if newIndex == UInt.max {
+            return false
+        }
+
+        if forward {
+            if newIndex >= itemCount - 1 {
+                return false
+            }
+            newIndex += 1
+        } else {
+            if 0 == newIndex {
+                return false
+            }
+            newIndex -= 1
+        }
+        selectedCandidateIndex = newIndex
+        return true
     }
 
     private func layoutCandidateView() {
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) { [self] in
+            doLayoutCandidateView()
+        }
+    }
+
+    private func doLayoutCandidateView() {
         guard let delegate = delegate else {
             return
         }
-
-        candidateView.set(keyLabelFont: keyLabelFont, candidateFont: candidateFont)
-        var candidates = [String]()
         let count = delegate.candidateCountForController(self)
-        let keyLabelCount = UInt(keyLabels.count)
-
-        let begin = currentPage * keyLabelCount
-        for index in begin..<min(begin + keyLabelCount, count) {
-            let candidate = delegate.candidateController(self, candidateAtIndex: index)
-            candidates.append(candidate)
-        }
-        candidateView.set(keyLabels: keyLabels, displayedCandidates: candidates)
-        var newSize = candidateView.sizeForView
-        var frameRect = candidateView.frame
-        frameRect.size = newSize
-        candidateView.frame = frameRect
-
-        if pageCount > 1 {
-            var buttonRect = nextPageButton.frame
-            let spacing:CGFloat = 0.0
-
-            // buttonRect.size.height = floor(candidateTextHeight + cellPadding / 2)
-
-            let buttonOriginY = (newSize.height - (buttonRect.size.height * 2.0 + spacing)) // / 2.0
-            buttonRect.origin = NSPoint(x: newSize.width + 8.0, y: buttonOriginY)
-            nextPageButton.frame = buttonRect
-
-            buttonRect.origin = NSPoint(x: newSize.width + 8.0, y: buttonOriginY + buttonRect.size.height + spacing)
-            prevPageButton.frame = buttonRect
-
-            newSize.width += 52.0
-            nextPageButton.isHidden = false
-            prevPageButton.isHidden = false
-        } else {
-            nextPageButton.isHidden = true
-            prevPageButton.isHidden = true
-        }
-
-        frameRect = window?.frame ?? NSRect.zero
-
-        let topLeftPoint = NSMakePoint(frameRect.origin.x, frameRect.origin.y + frameRect.size.height)
-        frameRect.size = newSize
-        frameRect.origin = NSMakePoint(topLeftPoint.x, topLeftPoint.y - frameRect.size.height)
-        self.window?.setFrame(frameRect, display: false)
-        candidateView.setNeedsDisplay(candidateView.bounds)
-    }
-
-    @objc fileprivate func pageButtonAction(_ sender: Any) {
-        guard let sender = sender as? NSButton else {
+        if 0 == count {
             return
         }
-        if sender == nextPageButton {
-            _ = showNextPage()
-        } else if sender == prevPageButton {
-            _ = showPreviousPage()
+
+
+        var tooltipHeight: CGFloat = 0
+        var tooltipWidth: CGFloat = 0
+
+        if !tooltip.isEmpty {
+            tooltipView.stringValue = tooltip
+            let size = tooltipView.intrinsicContentSize
+            tooltipWidth = size.width + tooltipPadding * 2
+            tooltipHeight = size.height + tooltipPadding * 2
+            self.window?.contentView?.addSubview(tooltipView)
+        } else {
+            tooltipView.removeFromSuperview()
         }
-    }
 
-    @objc fileprivate func candidateViewMouseDidClick(_ sender: Any) {
-        delegate?.candidateController(self, didSelectCandidateAtIndex: selectedCandidateIndex)
-    }
+        let candidateFontSize = ceil(candidateFont.pointSize)
+        let keyLabelFontSize = ceil(keyLabelFont.pointSize)
+        let fontSize = max(candidateFontSize, keyLabelFontSize)
 
+        let controlSize: NSControl.ControlSize = fontSize > 36.0 ? .regular : .small
+
+        var keyLabelCount = UInt(keyLabels.count)
+        var scrollerWidth: CGFloat = 0.0
+        if count <= keyLabelCount {
+            keyLabelCount = count
+            scrollView.hasVerticalScroller = false
+        } else {
+            scrollView.hasVerticalScroller = true
+            let verticalScroller = scrollView.verticalScroller
+            verticalScroller?.controlSize = controlSize
+            verticalScroller?.scrollerStyle = .legacy
+            scrollerWidth = NSScroller.scrollerWidth(for: controlSize, scrollerStyle: .legacy)
+        }
+
+        keyLabelStripView.keyLabelFont = keyLabelFont
+        let actualKeyLabels = keyLabels[0..<Int(keyLabelCount)].map { $0.displayedText }
+        keyLabelStripView.keyLabels = actualKeyLabels
+        keyLabelStripView.labelOffsetY = (keyLabelFontSize >= candidateFontSize) ? 0.0 : floor((candidateFontSize - keyLabelFontSize) / 2.0)
+
+        let rowHeight = ceil(fontSize * 1.25)
+        tableView.rowHeight = rowHeight
+
+        var maxKeyLabelWidth = keyLabelFontSize
+        let textAttr: [NSAttributedString.Key: AnyObject] = [.font: keyLabelFont]
+        let boundingBox = NSSize(width: 1600.0, height: 1600.0)
+
+        for label in actualKeyLabels {
+            let rect = (label as NSString).boundingRect(with: boundingBox, options: .usesLineFragmentOrigin, attributes: textAttr)
+            maxKeyLabelWidth = max(rect.size.width, maxKeyLabelWidth)
+        }
+
+        let rowSpacing = tableView.intercellSpacing.height
+        let stripWidth = ceil(maxKeyLabelWidth * 1.20)
+        let tableViewStartWidth = ceil(maxCandidateAttrStringWidth + scrollerWidth)
+        let windowWidth = max(stripWidth + 1.0 + tableViewStartWidth, tooltipWidth)
+        let windowHeight = CGFloat(keyLabelCount) * (rowHeight + rowSpacing) + tooltipHeight
+
+        var frameRect = self.window?.frame ?? NSRect.zero
+        let topLeftPoint = NSMakePoint(frameRect.origin.x, frameRect.origin.y + frameRect.size.height)
+
+        frameRect.size = NSMakeSize(windowWidth, windowHeight)
+        frameRect.origin = NSMakePoint(topLeftPoint.x, topLeftPoint.y - frameRect.size.height)
+
+        keyLabelStripView.frame = NSRect(x: 0.0, y: 0, width: stripWidth, height: windowHeight - tooltipHeight)
+        scrollView.frame = NSRect(x: stripWidth + 1.0, y: 0, width: (windowWidth - stripWidth - 1), height: windowHeight - tooltipHeight)
+        tooltipView.frame = NSRect(x: tooltipPadding, y: windowHeight - tooltipHeight + tooltipPadding, width: windowWidth, height: tooltipHeight)
+        self.window?.setFrame(frameRect, display: false)
+    }
 }
