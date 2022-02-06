@@ -35,6 +35,8 @@ class ctlInputMethod: IMKInputController {
     }
 
     override func menu() -> NSMenu! {
+        let optionKeyPressed = NSEvent.modifierFlags.contains(.option)
+        
         let menu = NSMenu(title: "Input Method Menu")
         menu.addItem(withTitle: NSLocalizedString("vChewing Preferences", comment: ""), action: #selector(showPreferences(_:)), keyEquivalent: "")
 
@@ -46,15 +48,12 @@ class ctlInputMethod: IMKInputController {
         halfWidthPunctuationItem.keyEquivalentModifierMask = [.command, .control]
         halfWidthPunctuationItem.state = Preferences.halfWidthPunctuationEnabled.state
 
-        let inputMode = keyHandler.inputMode
-        let optionKeyPressed = NSEvent.modifierFlags.contains(.option)
-
-        if inputMode == .plainBopomofo {
+        if Preferences.useSCPCTypingMode {
             let associatedPhrasesItem = menu.addItem(withTitle: NSLocalizedString("Associated Phrases", comment: ""), action: #selector(toggleAssociatedPhrasesEnabled(_:)), keyEquivalent: "")
             associatedPhrasesItem.state = Preferences.associatedPhrasesEnabled.state
         }
 
-        if inputMode == .bopomofo && optionKeyPressed {
+        if keyHandler.inputMode == .imeModeCHT && optionKeyPressed {
             let phaseReplacementItem = menu.addItem(withTitle: NSLocalizedString("Use Phrase Replacement", comment: ""), action: #selector(togglePhraseReplacement(_:)), keyEquivalent: "")
             phaseReplacementItem.state = Preferences.phraseReplacementEnabled.state
         }
@@ -62,15 +61,13 @@ class ctlInputMethod: IMKInputController {
         menu.addItem(NSMenuItem.separator())
         menu.addItem(withTitle: NSLocalizedString("User Phrases", comment: ""), action: nil, keyEquivalent: "")
 
-        if inputMode == .plainBopomofo {
-            menu.addItem(withTitle: NSLocalizedString("Edit Excluded Phrases", comment: ""), action: #selector(openExcludedPhrasesPlainBopomofo(_:)), keyEquivalent: "")
-        } else {
-            menu.addItem(withTitle: NSLocalizedString("Edit User Phrases", comment: ""), action: #selector(openUserPhrases(_:)), keyEquivalent: "")
-            menu.addItem(withTitle: NSLocalizedString("Edit Excluded Phrases", comment: ""), action: #selector(openExcludedPhrasesvChewing(_:)), keyEquivalent: "")
-            if optionKeyPressed {
-                menu.addItem(withTitle: NSLocalizedString("Edit Phrase Replacement Table", comment: ""), action: #selector(openPhraseReplacementvChewing(_:)), keyEquivalent: "")
-            }
+
+        menu.addItem(withTitle: NSLocalizedString("Edit User Phrases", comment: ""), action: #selector(openUserPhrases(_:)), keyEquivalent: "")
+        menu.addItem(withTitle: NSLocalizedString("Edit Excluded Phrases", comment: ""), action: #selector(openExcludedPhrases(_:)), keyEquivalent: "")
+        if optionKeyPressed {
+            menu.addItem(withTitle: NSLocalizedString("Edit Phrase Replacement Table", comment: ""), action: #selector(openPhraseReplacement(_:)), keyEquivalent: "")
         }
+
 
         menu.addItem(withTitle: NSLocalizedString("Reload User Phrases", comment: ""), action: #selector(reloadUserPhrases(_:)), keyEquivalent: "")
         menu.addItem(NSMenuItem.separator())
@@ -104,7 +101,7 @@ class ctlInputMethod: IMKInputController {
     }
 
     override func setValue(_ value: Any!, forTag tag: Int, client: Any!) {
-        let newInputMode = InputMode(rawValue: value as? String ?? InputMode.bopomofo.rawValue)
+        let newInputMode = InputMode(rawValue: value as? String ?? InputMode.imeModeCHT.rawValue)
         mgrLangModel.loadDataModel(newInputMode)
         if keyHandler.inputMode != newInputMode {
             UserDefaults.standard.synchronize()
@@ -209,19 +206,15 @@ class ctlInputMethod: IMKInputController {
     }
 
     @objc func openUserPhrases(_ sender: Any?) {
-        open(userFileAt: mgrLangModel.userPhrasesDataPathvChewing)
+        open(userFileAt: mgrLangModel.userPhrasesDataPathCHT)
     }
 
-    @objc func openExcludedPhrasesPlainBopomofo(_ sender: Any?) {
-        open(userFileAt: mgrLangModel.excludedPhrasesDataPathPlainBopomofo)
+    @objc func openExcludedPhrases(_ sender: Any?) {
+        open(userFileAt: mgrLangModel.excludedPhrasesDataPathCHT)
     }
 
-    @objc func openExcludedPhrasesvChewing(_ sender: Any?) {
-        open(userFileAt: mgrLangModel.excludedPhrasesDataPathvChewing)
-    }
-
-    @objc func openPhraseReplacementvChewing(_ sender: Any?) {
-        open(userFileAt: mgrLangModel.phraseReplacementDataPathvChewing)
+    @objc func openPhraseReplacement(_ sender: Any?) {
+        open(userFileAt: mgrLangModel.phraseReplacementDataPathCHT)
     }
 
     @objc func reloadUserPhrases(_ sender: Any?) {
@@ -562,7 +555,7 @@ extension ctlInputMethod: CandidateControllerDelegate {
                 return
             }
 
-            if keyHandler.inputMode == .plainBopomofo {
+            if Preferences.useSCPCTypingMode {
                 keyHandler.clear()
                 let composingBuffer = inputting.composingBuffer
                 handle(state: .Committing(poppedText: composingBuffer), client: client)
