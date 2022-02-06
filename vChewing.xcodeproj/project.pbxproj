@@ -56,7 +56,6 @@
 		D41355DB278E6D17005E5CBD /* vChewingLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D41355D9278E6D17005E5CBD /* vChewingLM.cpp */; };
 		D41355DE278EA3ED005E5CBD /* UserPhrasesLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D41355DC278EA3ED005E5CBD /* UserPhrasesLM.cpp */; };
 		D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427F76B278CA1BA004A2160 /* AppDelegate.swift */; };
-		D44FB74A2791B829003C80A6 /* VXHanConvert in Frameworks */ = {isa = PBXBuildFile; productRef = D44FB7492791B829003C80A6 /* VXHanConvert */; };
 		D44FB74D2792189A003C80A6 /* PhraseReplacementMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74B2792189A003C80A6 /* PhraseReplacementMap.cpp */; };
 		D456576E279E4F7B00DF6BC9 /* KeyHandlerInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */; };
 		D461B792279DAC010070E734 /* InputState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D461B791279DAC010070E734 /* InputState.swift */; };
@@ -177,7 +176,6 @@
 		D41355DD278EA3ED005E5CBD /* UserPhrasesLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserPhrasesLM.h; sourceTree = "<group>"; };
 		D427A9BF25ED28CC005D43E0 /* vChewing-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vChewing-Bridging-Header.h"; sourceTree = "<group>"; };
 		D427F76B278CA1BA004A2160 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		D44FB7482791B346003C80A6 /* VXHanConvert */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = VXHanConvert; path = Packages/VXHanConvert; sourceTree = "<group>"; };
 		D44FB74B2792189A003C80A6 /* PhraseReplacementMap.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PhraseReplacementMap.cpp; sourceTree = "<group>"; };
 		D44FB74C2792189A003C80A6 /* PhraseReplacementMap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PhraseReplacementMap.h; sourceTree = "<group>"; };
 		D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyHandlerInput.swift; sourceTree = "<group>"; };
@@ -207,7 +205,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5B62A35227AE822400A19448 /* OpenCC in Frameworks */,
-				D44FB74A2791B829003C80A6 /* VXHanConvert in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -578,7 +575,6 @@
 			isa = PBXGroup;
 			children = (
 				5B0CF37F27AD476E00784B08 /* SwiftyOpenCC */,
-				D44FB7482791B346003C80A6 /* VXHanConvert */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -625,7 +621,6 @@
 			);
 			name = vChewing;
 			packageProductDependencies = (
-				D44FB7492791B829003C80A6 /* VXHanConvert */,
 				5B62A35127AE822400A19448 /* OpenCC */,
 			);
 			productName = vChewing;
@@ -1292,10 +1287,6 @@
 		5B62A35127AE822400A19448 /* OpenCC */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = OpenCC;
-		};
-		D44FB7492791B829003C80A6 /* VXHanConvert */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = VXHanConvert;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
