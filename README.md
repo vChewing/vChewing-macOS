@@ -36,7 +36,11 @@
 「File」->「Project/WorkspaceSettings...」->「Advanced」；
 选「Custom」->「Relative to Workspace」即可。不选的话，make 的过程会出错。
 ```
-在终端机内定位到威注音的克隆本地专案的本地仓库的目录之后，执行 `make update` 以获取最新词库，在成功之后执行 `make` 即可组建。再执行 `make install` 可以触发威注音的安装程式。
+在终端机内定位到威注音的克隆本地专案的本地仓库的目录之后，执行 `make update` 以获取最新词库。
+
+接下來就是直接開 Xcode 專案，Product -> Scheme 選「vChewingInstaller」，編譯即可。
+
+> 之前說「在成功之后执行 `make` 即可组建、再执行 `make install` 可以触发威注音的安装程式」。但最近威注音在換用 ParselessLM 之後、用這種方式建置出來的話，會出現無論如何也敲不了漢字的問題。所以該方法不再是推薦的編譯方法。
 
 第一次安装完，日后程式码或词库有任何修改，只要重复上述流程，再次安装威注音即可。
 
