@@ -1,10 +1,3 @@
-/* 
- *  UserPhrasesLM.h
- *  
- *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
- *  Derived from 2011-2022 OpenVanilla Project (MIT License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
- */
 
 #ifndef USERPHRASESLM_H
 #define USERPHRASESLM_H
@@ -21,7 +14,8 @@ class UserPhrasesLM : public Taiyan::Gramambular::LanguageModel
 public:
     UserPhrasesLM();
     ~UserPhrasesLM();
-    
+
+    bool isLoaded();
     bool open(const char *path);
     void close();
     void dump();

@@ -1,5 +1,5 @@
 /*
- *  CoreLM.hh
+ *  CoreLM.h
  *
  *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
  *  Derived from 2011-2022 OpenVanilla Project (MIT License).

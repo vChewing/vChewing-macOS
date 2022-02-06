@@ -1,10 +1,3 @@
-/* 
- *  main.m
- *  
- *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
- *  Derived from 2011-2022 OpenVanilla Project (MIT License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
- */
 
 import Cocoa
 import InputMethodKit
@@ -14,9 +7,9 @@ private func install() -> Int32 {
         return -1
     }
     let bundleUrl = Bundle.main.bundleURL
-    var inputSource = InputSourceHelper.inputSource(for: bundleID)
+    var maybeInputSource = InputSourceHelper.inputSource(for: bundleID)
 
-    if inputSource == nil {
+    if maybeInputSource == nil {
         NSLog("Registering input source \(bundleID) at \(bundleUrl.absoluteString)");
         // then register
         let status = InputSourceHelper.registerTnputSource(at: bundleUrl)
@@ -26,10 +19,10 @@ private func install() -> Int32 {
             return -1
         }
 
-        inputSource = InputSourceHelper.inputSource(for: bundleID)
+        maybeInputSource = InputSourceHelper.inputSource(for: bundleID)
     }
 
-    guard let inputSource = inputSource else {
+    guard let inputSource = maybeInputSource else {
         NSLog("Fatal error: Cannot find input source \(bundleID) after registration.")
         return -1
     }

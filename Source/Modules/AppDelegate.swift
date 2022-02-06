@@ -1,10 +1,3 @@
-/* 
- *  AppDelegate.swift
- *  
- *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
- *  Derived from 2011-2022 OpenVanilla Project (MIT License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
- */
 
 import Cocoa
 import InputMethodKit
@@ -74,6 +67,7 @@ struct VersionUpdateApi {
 
                 // TODO: Validate info (e.g. bundle identifier)
                 // TODO: Use HTML to display change log, need a new key like UpdateInfoChangeLogURL for this
+
                 let currentVersion = infoDict[kCFBundleVersionKey as String] as? String ?? ""
                 let result = currentVersion.compare(remoteVersion, options: .numeric, range: nil, locale: nil)
 
@@ -98,7 +92,7 @@ struct VersionUpdateApi {
                 let versionDescriptions = plist["Description"] as? [AnyHashable: Any]
                 if let versionDescriptions = versionDescriptions {
                     var locale = "en"
-                    let supportedLocales = ["en", "zh-Hant", "zh-Hans", "ja"]
+                    let supportedLocales = ["en", "zh-Hant", "zh-Hans"]
                     let preferredTags = Bundle.preferredLocalizations(from: supportedLocales)
                     if let first = preferredTags.first {
                         locale = first
@@ -128,64 +122,34 @@ struct VersionUpdateApi {
 }
 
 @objc(AppDelegate)
-class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelegate, FSEventStreamHelperDelegate {
-	func helper(_ helper: FSEventStreamHelper, didReceive events: [FSEventStreamHelper.Event]) {
-		DispatchQueue.main.async {
-			if Preferences.shouldAutoReloadUserDataFiles {
-				mgrLangModel.loadUserPhrases()
-				mgrLangModel.loadUserPhraseReplacement()
-			}
-		}
-	}
+class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControllerDelegate {
 
     @IBOutlet weak var window: NSWindow?
     private var ctlPrefWindowInstance: ctlPrefWindow?
-    private var ctlAboutWindowInstance: ctlAboutWindow? // New About Window
     private var checkTask: URLSessionTask?
     private var updateNextStepURL: URL?
-	private var fsStreamHelper = FSEventStreamHelper(path: mgrLangModel.dataFolderPath, queue: DispatchQueue(label: "User Phrases"))
-
-    // 補上 dealloc
-    deinit {
-        ctlPrefWindowInstance = nil
-        ctlAboutWindowInstance = nil
-        checkTask = nil
-        updateNextStepURL = nil
-        fsStreamHelper.stop()
-        fsStreamHelper.delegate = nil
-    }
+    private var fsStreamHelper = FSEventStreamHelper(path: mgrLangModel.dataFolderPath, queue: DispatchQueue(label: "User Phrases"))
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        mgrLangModel.loadDataModels()
-        mgrLangModel.loadCNSData()
+        mgrLangModel.setupDataModelValueConverter()
         mgrLangModel.loadUserPhrases()
         mgrLangModel.loadUserPhraseReplacement()
-		fsStreamHelper.delegate = self
-		_ = fsStreamHelper.start()
+        fsStreamHelper.delegate = self
+        _ = fsStreamHelper.start()
 
-        Preferences.setMissingDefaults()
-        
-        // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
-        if (UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) != nil) == true {
-            checkForUpdate()
+        if UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) == nil {
+            UserDefaults.standard.set(true, forKey: kCheckUpdateAutomatically)
+            UserDefaults.standard.synchronize()
         }
+        checkForUpdate()
     }
 
     @objc func showPreferences() {
-        if (ctlPrefWindowInstance == nil) {
-            ctlPrefWindowInstance = ctlPrefWindow.init(windowNibName: "frmPrefWindow")
+        if ctlPrefWindowInstance == nil {
+            ctlPrefWindowInstance = ctlPrefWindow(windowNibName: "frmPrefWIndow")
         }
         ctlPrefWindowInstance?.window?.center()
-        ctlPrefWindowInstance?.window?.orderFrontRegardless() // 逼著屬性視窗往最前方顯示
-    }
-    
-    // New About Window
-    @objc func showAbout() {
-        if (ctlAboutWindowInstance == nil) {
-            ctlAboutWindowInstance = ctlAboutWindow.init(windowNibName: "frmAboutWindow")
-        }
-        ctlAboutWindowInstance?.window?.center()
-        ctlAboutWindowInstance?.window?.orderFrontRegardless() // 逼著關於視窗往最前方顯示
+        ctlPrefWindowInstance?.window?.orderFront(self)
     }
 
     @objc(checkForUpdate)
@@ -231,7 +195,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
                             report.remoteShortVersion,
                             report.remoteVersion,
                             report.versionDescription)
-                    ctlNonModalAlertWindow.shared.show(title: NSLocalizedString("New Version Available", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("Visit Website", comment: ""), cancelButtonTitle: NSLocalizedString("Not Now", comment: ""), cancelAsDefault: false, delegate: self)
+                    NonModalAlertWindowController.shared.show(title: NSLocalizedString("New Version Available", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("Visit Website", comment: ""), cancelButtonTitle: NSLocalizedString("Not Now", comment: ""), cancelAsDefault: false, delegate: self)
                 case .noNeedToUpdate, .ignored:
                     break
                 }
@@ -241,7 +205,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
                     let title = NSLocalizedString("Update Check Failed", comment: "")
                     let content = String(format: NSLocalizedString("There may be no internet connection or the server failed to respond.\n\nError message: %@", comment: ""), message)
                     let buttonTitle = NSLocalizedString("Dismiss", comment: "")
-                    ctlNonModalAlertWindow.shared.show(title: title, content: content, confirmButtonTitle: buttonTitle, cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
+                    NonModalAlertWindowController.shared.show(title: title, content: content, confirmButtonTitle: buttonTitle, cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
                 default:
                     break
                 }
@@ -249,20 +213,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
         }
     }
 
-    func ctlNonModalAlertWindowDidConfirm(_ controller: ctlNonModalAlertWindow) {
+    func nonModalAlertWindowControllerDidConfirm(_ controller: NonModalAlertWindowController) {
         if let updateNextStepURL = updateNextStepURL {
             NSWorkspace.shared.open(updateNextStepURL)
         }
         updateNextStepURL = nil
     }
 
-    func ctlNonModalAlertWindowDidCancel(_ controller: ctlNonModalAlertWindow) {
+    func nonModalAlertWindowControllerDidCancel(_ controller: NonModalAlertWindowController) {
         updateNextStepURL = nil
     }
-    
-    // New About Window
-    @IBAction func about(_ sender: Any) {
-        (NSApp.delegate as? AppDelegate)?.showAbout()
-        NSApplication.shared.activate(ignoringOtherApps: true)
+}
+
+extension AppDelegate: FSEventStreamHelperDelegate {
+    func helper(_ helper: FSEventStreamHelper, didReceive events: [FSEventStreamHelper.Event]) {
+        DispatchQueue.main.async {
+            mgrLangModel.loadUserPhrases()
+            mgrLangModel.loadUserPhraseReplacement()
+        }
     }
 }

@@ -1,10 +1,9 @@
-/* 
- *  Node.h
- *  
- *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
- *  Derived from 2011-2022 OpenVanilla Project (MIT License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
- */
+//
+// Node.h
+//
+// Copyright (c) 2007-2010 Lukhnos D. Liu (http://lukhnos.org)
+//
+//
 
 #ifndef Node_h
 #define Node_h
@@ -27,8 +26,8 @@ namespace Taiyan {
             bool isCandidateFixed() const;
             const vector<KeyValuePair>& candidates() const;
             void selectCandidateAtIndex(size_t inIndex = 0, bool inFix = true);
-            void selectFloatingCandidateAtIndex(size_t index, double score);
             void resetCandidate();
+            void selectFloatingCandidateAtIndex(size_t index, double score);
             
             const string& key() const;
             double score() const;
@@ -148,16 +147,6 @@ namespace Taiyan {
             
             m_candidateFixed = inFix;
             m_score = 99;
-        }        
-
-        inline void Node::selectFloatingCandidateAtIndex(size_t index, double score) {
-            if (index >= m_unigrams.size()) {
-                m_selectedUnigramIndex = 0;
-            } else {
-                m_selectedUnigramIndex = index;
-            }
-            m_candidateFixed = false;
-            m_score = score;
         }
 
         inline void Node::resetCandidate()
@@ -167,6 +156,16 @@ namespace Taiyan {
             if (m_unigrams.size()) {
                 m_score = m_unigrams[0].score;
             }
+        }
+
+        inline void Node::selectFloatingCandidateAtIndex(size_t index, double score) {
+            if (index >= m_unigrams.size()) {
+                m_selectedUnigramIndex = 0;
+            } else {
+                m_selectedUnigramIndex = index;
+            }
+            m_candidateFixed = false;
+            m_score = score;
         }
         
         inline const string& Node::key() const

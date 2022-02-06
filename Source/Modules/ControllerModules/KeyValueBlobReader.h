@@ -1,10 +1,3 @@
-/* 
- *  KeyValueBlobReader.h
- *  
- *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
- *  Derived from 2011-2022 OpenVanilla Project (MIT License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
- */
 
 #ifndef SOURCE_ENGINE_KEYVALUEBLOBREADER_H_
 #define SOURCE_ENGINE_KEYVALUEBLOBREADER_H_
