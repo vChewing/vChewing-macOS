@@ -1,3 +1,10 @@
+/*
+ *  HorizontalCandidateController.swift
+ *
+ *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
+ *  Derived from 2011-2022 OpenVanilla Project (MIT License).
+ *  Some rights reserved. See "LICENSE.TXT" for details.
+ */
 
 import Cocoa
 
@@ -8,30 +15,16 @@ fileprivate class HorizontalCandidateView: NSView {
 
     private var keyLabels: [String] = []
     private var displayedCandidates: [String] = []
+    private var dispCandidatesWithLabels: [String] = []
     private var keyLabelHeight: CGFloat = 0
+    private var keyLabelWidth: CGFloat = 0
     private var candidateTextHeight: CGFloat = 0
     private var cellPadding: CGFloat = 0
     private var keyLabelAttrDict: [NSAttributedString.Key: AnyObject] = [:]
     private var candidateAttrDict: [NSAttributedString.Key: AnyObject] = [:]
+    private var candidateWithLabelAttrDict: [NSAttributedString.Key: AnyObject] = [:]
     private var elementWidths: [CGFloat] = []
     private var trackingHighlightedIndex: UInt = UInt.max
-
-    private let tooltipPadding: CGFloat = 2.0
-    private var tooltipSize: NSSize = NSSize.zero
-
-    override var toolTip: String? {
-        didSet {
-            if let toolTip = toolTip, !toolTip.isEmpty {
-                let baseSize = NSSize(width: 10240.0, height: 10240.0)
-                var tooltipRect = (toolTip as NSString).boundingRect(with: baseSize, options: .usesLineFragmentOrigin, attributes: keyLabelAttrDict)
-                tooltipRect.size.height += tooltipPadding * 2
-                tooltipRect.size.width += tooltipPadding * 2
-                self.tooltipSize = tooltipRect.size
-            } else {
-                self.tooltipSize = NSSize.zero
-            }
-        }
-    }
 
     override var isFlipped: Bool {
         true
@@ -43,59 +36,63 @@ fileprivate class HorizontalCandidateView: NSView {
         if !elementWidths.isEmpty {
             result.width = elementWidths.reduce(0, +)
             result.width += CGFloat(elementWidths.count)
-            result.height = keyLabelHeight + candidateTextHeight + 1.0
+            result.height = candidateTextHeight + cellPadding
         }
-
-        result.height += tooltipSize.height
-        result.width = max(tooltipSize.width, result.width)
         return result
     }
 
+    @objc(setKeyLabels:displayedCandidates:)
     func set(keyLabels labels: [String], displayedCandidates candidates: [String]) {
         let count = min(labels.count, candidates.count)
         keyLabels = Array(labels[0..<count])
         displayedCandidates = Array(candidates[0..<count])
+        dispCandidatesWithLabels = zip(keyLabels,displayedCandidates).map() {$0 + $1}
 
         var newWidths = [CGFloat]()
         let baseSize = NSSize(width: 10240.0, height: 10240.0)
         for index in 0..<count {
-            let labelRect = (keyLabels[index] as NSString).boundingRect(with: baseSize, options: .usesLineFragmentOrigin, attributes: keyLabelAttrDict)
-            let candidateRect = (displayedCandidates[index] as NSString).boundingRect(with: baseSize, options: .usesLineFragmentOrigin, attributes: candidateAttrDict)
-            let cellWidth = max(candidateTextHeight,
-                                max(labelRect.size.width, candidateRect.size.width)) + cellPadding;
+            let rctCandidate = (dispCandidatesWithLabels[index] as NSString).boundingRect(with: baseSize, options: .usesLineFragmentOrigin, attributes: candidateWithLabelAttrDict)
+            let cellWidth = rctCandidate.size.width + cellPadding
             newWidths.append(cellWidth)
         }
         elementWidths = newWidths
     }
 
+    @objc(setKeyLabelFont:candidateFont:)
     func set(keyLabelFont labelFont: NSFont, candidateFont: NSFont) {
         let paraStyle = NSMutableParagraphStyle()
         paraStyle.setParagraphStyle(NSParagraphStyle.default)
         paraStyle.alignment = .center
-
+        
+        candidateWithLabelAttrDict = [.font: candidateFont,
+                             .paragraphStyle: paraStyle,
+                             .foregroundColor: NSColor.labelColor] // We still need this dummy section to make sure the space occupations of the candidates are correct.
+        
         keyLabelAttrDict = [.font: labelFont,
                             .paragraphStyle: paraStyle,
-                            .foregroundColor: NSColor.black]
+                            .foregroundColor: NSColor.secondaryLabelColor] // Candidate phrase text color
         candidateAttrDict = [.font: candidateFont,
                              .paragraphStyle: paraStyle,
-                             .foregroundColor: NSColor.textColor]
-
+                             .foregroundColor: NSColor.labelColor] // Candidate index text color
         let labelFontSize = labelFont.pointSize
         let candidateFontSize = candidateFont.pointSize
         let biggestSize = max(labelFontSize, candidateFontSize)
-
+        keyLabelWidth = ceil(labelFontSize)
         keyLabelHeight = ceil(labelFontSize * 1.20)
         candidateTextHeight = ceil(candidateFontSize * 1.20)
         cellPadding = ceil(biggestSize / 2.0)
     }
 
     override func draw(_ dirtyRect: NSRect) {
-        let backgroundColor = NSColor.controlBackgroundColor
-        let darkGray = NSColor(deviceWhite: 0.7, alpha: 1.0)
-        let lightGray = NSColor(deviceWhite: 0.8, alpha: 1.0)
-
+        
+        // Give a standalone layer to the candidate list panel
+        self.wantsLayer = true
+        self.layer?.borderColor = NSColor.selectedMenuItemTextColor.withAlphaComponent(0.30).cgColor
+        self.layer?.borderWidth = 1.0
+        self.layer?.cornerRadius = 6.0
+        
         let bounds = self.bounds
-        backgroundColor.setFill()
+        NSColor.controlBackgroundColor.setFill() // Candidate list panel base background
         NSBezierPath.fill(bounds)
 
         if #available(macOS 10.14, *) {
@@ -104,36 +101,27 @@ fileprivate class HorizontalCandidateView: NSView {
             NSColor.darkGray.setStroke()
         }
 
-        if let toolTip = toolTip {
-            lightGray.setFill()
-            NSBezierPath.fill(NSMakeRect(0, 0, bounds.width, tooltipSize.height))
-            let tooltipFrame = NSRect(x: 0, y: 0, width: tooltipSize.width, height: tooltipSize.height)
-            (toolTip as NSString).draw(in: tooltipFrame, withAttributes: keyLabelAttrDict)
-            NSBezierPath.strokeLine(from: NSPoint(x: 0, y: tooltipSize.height - 2), to: NSPoint(x: bounds.width, y: tooltipSize.height - 2))
-        }
-
-        NSBezierPath.strokeLine(from: NSPoint(x: bounds.width, y: 0), to: NSPoint(x: bounds.width, y: bounds.height))
+        NSBezierPath.strokeLine(from: NSPoint(x: bounds.size.width, y: 0.0), to: NSPoint(x: bounds.size.width, y: bounds.size.height))
 
         var accuWidth: CGFloat = 0
         for index in 0..<elementWidths.count {
             let currentWidth = elementWidths[index]
-            let labelRect = NSRect(x: accuWidth, y: tooltipSize.height, width: currentWidth, height: keyLabelHeight)
-            let candidateRect = NSRect(x: accuWidth, y: tooltipSize.height + keyLabelHeight + 1.0, width: currentWidth, height: candidateTextHeight)
-            (index == highlightedIndex ? darkGray : lightGray).setFill()
-            NSBezierPath.fill(labelRect)
-            (keyLabels[index] as NSString).draw(in: labelRect, withAttributes: keyLabelAttrDict)
+            let rctCandidateArea = NSRect(x: accuWidth, y: 0.0, width: currentWidth + 1.0, height: candidateTextHeight + cellPadding)
+            let rctLabel = NSRect(x: accuWidth + cellPadding / 2 - 1, y: cellPadding / 2 , width: keyLabelWidth, height: candidateTextHeight)
+            let rctCandidatePhrase = NSRect(x: accuWidth + keyLabelWidth - 1, y: cellPadding / 2 , width: currentWidth - keyLabelWidth, height: candidateTextHeight)
 
+            var activeCandidateIndexAttr = keyLabelAttrDict
             var activeCandidateAttr = candidateAttrDict
             if index == highlightedIndex {
-                NSColor.selectedTextBackgroundColor.setFill()
-                activeCandidateAttr = candidateAttrDict
-                activeCandidateAttr[.foregroundColor] = NSColor.selectedTextColor
+                NSColor.alternateSelectedControlColor.setFill() // The background color of the highlightened candidate
+                activeCandidateIndexAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor.withAlphaComponent(0.84) // The index text color of the highlightened candidate
+                activeCandidateAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor // The phrase text color of the highlightened candidate
             } else {
-                backgroundColor.setFill()
+                NSColor.controlBackgroundColor.setFill()
             }
-
-            NSBezierPath.fill(candidateRect)
-            (displayedCandidates[index] as NSString).draw(in: candidateRect, withAttributes: activeCandidateAttr)
+            NSBezierPath.fill(rctCandidateArea)
+            (keyLabels[index] as NSString).draw(in: rctLabel, withAttributes: activeCandidateIndexAttr)
+            (displayedCandidates[index] as NSString).draw(in: rctCandidatePhrase, withAttributes: activeCandidateAttr)
             accuWidth += currentWidth + 1.0
         }
     }
@@ -199,22 +187,32 @@ public class HorizontalCandidateController: CandidateController {
         let panel = NSPanel(contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false)
         panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel) + 1)
         panel.hasShadow = true
-
+        panel.isOpaque = false
+        panel.backgroundColor = NSColor.clear // Transparentify everything outside of the candidate list panel
+        
         contentRect.origin = NSPoint.zero
         candidateView = HorizontalCandidateView(frame: contentRect)
         panel.contentView?.addSubview(candidateView)
-
-        contentRect.size = NSSize(width: 36.0, height: 20.0)
+        
+        contentRect.size = NSSize(width: 20.0, height: 15.0) // Reduce the button width
         nextPageButton = NSButton(frame: contentRect)
         nextPageButton.setButtonType(.momentaryLight)
-        nextPageButton.bezelStyle = .smallSquare
-        nextPageButton.title = "»"
-
+        nextPageButton.bezelStyle = .shadowlessSquare
+        nextPageButton.wantsLayer = true
+        nextPageButton.layer?.masksToBounds = true
+        nextPageButton.layer?.borderColor = NSColor.clear.cgColor // Attempt to remove the system default layer border color - step 1
+        nextPageButton.layer?.borderWidth = 0.0 // Attempt to remove the system default layer border color - step 2
+        nextPageButton.layer?.backgroundColor = NSColor.black.cgColor // Button Background Color. Otherwise the button will be half-transparent in macOS Monterey Dark Mode.
+        nextPageButton.attributedTitle = NSMutableAttributedString(string: "⬇︎") // Next Page Arrow
         prevPageButton = NSButton(frame: contentRect)
         prevPageButton.setButtonType(.momentaryLight)
-        prevPageButton.bezelStyle = .smallSquare
-        prevPageButton.title = "«"
-
+        prevPageButton.bezelStyle = .shadowlessSquare
+        prevPageButton.wantsLayer = true
+        prevPageButton.layer?.masksToBounds = true
+        prevPageButton.layer?.borderColor = NSColor.clear.cgColor // Attempt to remove the system default layer border color - step 1
+        prevPageButton.layer?.borderWidth = 0.0 // Attempt to remove the system default layer border color - step 2
+        prevPageButton.layer?.backgroundColor = NSColor.black.cgColor // Button Background Color. Otherwise the button will be half-transparent in macOS Monterey Dark Mode.
+        prevPageButton.attributedTitle = NSMutableAttributedString(string: "⬆︎") // Previous Page Arrow
         panel.contentView?.addSubview(nextPageButton)
         panel.contentView?.addSubview(prevPageButton)
 
@@ -351,7 +349,6 @@ extension HorizontalCandidateController {
             candidates.append(candidate)
         }
         candidateView.set(keyLabels: keyLabels.map { $0.displayedText}, displayedCandidates: candidates)
-        candidateView.toolTip = tooltip
         var newSize = candidateView.sizeForView
         var frameRect = candidateView.frame
         frameRect.size = newSize
@@ -359,17 +356,9 @@ extension HorizontalCandidateController {
 
         if pageCount > 1 {
             var buttonRect = nextPageButton.frame
-            var spacing: CGFloat = 0.0
+            let spacing:CGFloat = 0.0
 
-            if newSize.height < 40.0 {
-                buttonRect.size.height = floor(newSize.height / 2)
-            } else {
-                buttonRect.size.height = 20.0
-            }
-
-            if newSize.height >= 60.0 {
-                spacing = ceil(newSize.height * 0.1)
-            }
+            buttonRect.size.height = floor(newSize.height / 2)
 
             let buttonOriginY = (newSize.height - (buttonRect.size.height * 2.0 + spacing)) / 2.0
             buttonRect.origin = NSPoint(x: newSize.width + 8.0, y: buttonOriginY)
