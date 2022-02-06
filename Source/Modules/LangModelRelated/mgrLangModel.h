@@ -16,10 +16,12 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)writeUserPhrase:(NSString *)userPhrase;
 
 @property (class, readonly, nonatomic) NSString *dataFolderPath;
-@property (class, readonly, nonatomic) NSString *userPhrasesDataPathvChewing;
-@property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathvChewing;
-@property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathPlainBopomofo;
-@property (class, readonly, nonatomic) NSString *phraseReplacementDataPathvChewing;
+@property (class, readonly, nonatomic) NSString *userPhrasesDataPathCHT;
+@property (class, readonly, nonatomic) NSString *userPhrasesDataPathCHS;
+@property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathCHT;
+@property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathCHS;
+@property (class, readonly, nonatomic) NSString *phraseReplacementDataPathCHT;
+@property (class, readonly, nonatomic) NSString *phraseReplacementDataPathCHS;
 @property (class, assign, nonatomic) BOOL phraseReplacementEnabled;
 
 @end

@@ -7,8 +7,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NSString *const InputMode NS_TYPED_ENUM;
-extern InputMode InputModeBopomofo;
-extern InputMode InputModePlainBopomofo;
+extern InputMode imeModeCHT;
+extern InputMode imeModeCHS;
 
 @class KeyHandler;
 
