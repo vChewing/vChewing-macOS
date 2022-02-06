@@ -1,3 +1,10 @@
+/*
+ *  NotifierController.swift
+ *
+ *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
+ *  Derived from 2011-2022 OpenVanilla Project (MIT License).
+ *  Some rights reserved. See "LICENSE.TXT" for details.
+ */
 
 import Cocoa
 
@@ -13,8 +20,8 @@ private class NotifierWindow: NSWindow {
     }
 }
 
-private let kWindowWidth: CGFloat = 160.0
-private let kWindowHeight: CGFloat = 80.0
+private let kWindowWidth: CGFloat = 213.0
+private let kWindowHeight: CGFloat = 60.0
 
 public class NotifierController: NSWindowController, NotifierWindowDelegate {
     private var messageTextField: NSTextField
@@ -26,7 +33,7 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
             paraStyle.alignment = .center
             let attr: [NSAttributedString.Key: AnyObject] = [
                 .foregroundColor: foregroundColor,
-                .font: NSFont.systemFont(ofSize: NSFont.systemFontSize(for: .regular)),
+                .font: NSFont.boldSystemFont(ofSize: NSFont.systemFontSize(for: .regular)),
                 .paragraphStyle: paraStyle
             ]
             let attrString = NSAttributedString(string: message, attributes: attr)
@@ -41,13 +48,12 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
         }
     }
     private var shouldStay: Bool = false
-    private var backgroundColor: NSColor = .black {
+    private var backgroundColor: NSColor = .textBackgroundColor {
         didSet {
             self.window?.backgroundColor = backgroundColor
-            self.messageTextField.backgroundColor = backgroundColor
         }
     }
-    private var foregroundColor: NSColor = .white {
+    private var foregroundColor: NSColor = .controlTextColor {
         didSet {
             self.messageTextField.textColor = foregroundColor
         }
@@ -82,11 +88,22 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
         var windowRect = contentRect
         windowRect.origin.x = screenRect.maxX - windowRect.width - 10
         windowRect.origin.y = screenRect.maxY - windowRect.height - 10
-        let styleMask: NSWindow.StyleMask = [.borderless]
+        let styleMask: NSWindow.StyleMask = [.fullSizeContentView, .titled]
+        
+        
+        
         let panel = NotifierWindow(contentRect: windowRect, styleMask: styleMask, backing: .buffered, defer: false)
         panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel))
         panel.hasShadow = true
         panel.backgroundColor = backgroundColor
+        panel.title = ""
+        panel.titlebarAppearsTransparent = true
+        panel.titleVisibility = .hidden
+        panel.showsToolbarButton = false
+        panel.standardWindowButton(NSWindow.ButtonType.fullScreenButton)?.isHidden = true
+        panel.standardWindowButton(NSWindow.ButtonType.miniaturizeButton)?.isHidden = true
+        panel.standardWindowButton(NSWindow.ButtonType.closeButton)?.isHidden = true
+        panel.standardWindowButton(NSWindow.ButtonType.zoomButton)?.isHidden = true
 
         messageTextField = NSTextField()
         messageTextField.frame = contentRect
@@ -94,9 +111,8 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
         messageTextField.isSelectable = false
         messageTextField.isBezeled = false
         messageTextField.textColor = foregroundColor
-        messageTextField.drawsBackground = true
-        messageTextField.backgroundColor = backgroundColor
-        messageTextField.font = .systemFont(ofSize: NSFont.systemFontSize(for: .small))
+        messageTextField.drawsBackground = false
+        messageTextField.font = .boldSystemFont(ofSize: NSFont.systemFontSize(for: .regular))
         panel.contentView?.addSubview(messageTextField)
 
         super.init(window: panel)
@@ -155,7 +171,7 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
         waitTimer?.invalidate()
         waitTimer = nil
         NotifierController.decreaseInstanceCount()
-        fadeTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(doFadeOut(_:)), userInfo: nil, repeats: true)
+        fadeTimer = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(doFadeOut(_:)), userInfo: nil, repeats: true)
     }
 
     public override func close() {
