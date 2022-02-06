@@ -170,7 +170,8 @@ class ctlInputMethod: IMKInputController {
     // MARK: - Menu Items
 
     @objc override func showPreferences(_ sender: Any?) {
-        super.showPreferences(sender)
+        (NSApp.delegate as? AppDelegate)?.showPreferences()
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     @objc func toggleChineseConverter(_ sender: Any?) {
@@ -231,7 +232,7 @@ class ctlInputMethod: IMKInputController {
     }
 
     @objc func showAbout(_ sender: Any?) {
-        NSApp.orderFrontStandardAboutPanel(sender)
+        (NSApp.delegate as? AppDelegate)?.showAbout()
         NSApp.activate(ignoringOtherApps: true)
     }
 
