@@ -192,7 +192,7 @@ class ctlInputMethod: IMKInputController {
         func checkIfUserFilesExist() -> Bool {
             if !mgrLangModel.checkIfUserLanguageModelFilesExist() {
                 let content = String(format: NSLocalizedString("Please check the permission of at \"%@\".", comment: ""), mgrLangModel.dataFolderPath)
-                NonModalAlertWindowController.shared.show(title: NSLocalizedString("Unable to create the user phrase file.", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("OK", comment: ""), cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
+                ctlNonModalAlertWindow.shared.show(title: NSLocalizedString("Unable to create the user phrase file.", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("OK", comment: ""), cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
                 return false
             }
             return true
