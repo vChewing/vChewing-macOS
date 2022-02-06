@@ -44,6 +44,12 @@ public class ChineseConverter {
         /// Use HongKong standard.
         public static let hkStandard = Options(rawValue: 1 << 6)
         
+        /// Cancel Taiwan standard.
+        public static let twStandardRev = Options(rawValue: 1 << 15)
+        
+        /// Cancel HongKong standard.
+        public static let hkStandardRev = Options(rawValue: 1 << 16)
+
         /// Taiwanese idiom conversion.
         public static let twIdiom = Options(rawValue: 1 << 10)
     }

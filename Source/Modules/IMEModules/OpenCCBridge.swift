@@ -11,14 +11,14 @@ public class OpenCCBridge: NSObject {
     private var converter: ChineseConverter?
 
     private override init() {
-        try? converter = ChineseConverter(options: .simplify)
+        try? converter = ChineseConverter(options: .twStandardRev)
         super.init()
     }
 
     /// Converts to Simplified Chinese.
     /// 
     /// - Parameter string: Text in Traditional Chinese.
-    /// - Returns: Text in Simplified Chinese.
+    /// - Returns: Text in KangXi Chinese.
     @objc public static func convertToKangXi(_ string: String) -> String? {
         shared.converter?.convert(string)
     }
