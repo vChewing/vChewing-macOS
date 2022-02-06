@@ -1,24 +1,24 @@
 
 import Cocoa
 
-@objc protocol NonModalAlertWindowControllerDelegate: AnyObject {
-    func nonModalAlertWindowControllerDidConfirm(_ controller: NonModalAlertWindowController)
-    func nonModalAlertWindowControllerDidCancel(_ controller: NonModalAlertWindowController)
+@objc protocol ctlNonModalAlertWindowDelegate: AnyObject {
+    func ctlNonModalAlertWindowDidConfirm(_ controller: ctlNonModalAlertWindow)
+    func ctlNonModalAlertWindowDidCancel(_ controller: ctlNonModalAlertWindow)
 }
 
-class NonModalAlertWindowController: NSWindowController {
+class ctlNonModalAlertWindow: NSWindowController {
     @objc(sharedInstance)
-    static let shared = NonModalAlertWindowController(windowNibName: "NonModalAlertWindowController")
+    static let shared = ctlNonModalAlertWindow(windowNibName: "ctlNonModalAlertWindow")
 
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var contentTextField: NSTextField!
     @IBOutlet weak var confirmButton: NSButton!
     @IBOutlet weak var cancelButton: NSButton!
-    weak var delegate: NonModalAlertWindowControllerDelegate?
+    weak var delegate: ctlNonModalAlertWindowDelegate?
 
-    @objc func show(title: String, content: String, confirmButtonTitle: String, cancelButtonTitle: String?, cancelAsDefault: Bool, delegate: NonModalAlertWindowControllerDelegate?) {
+    @objc func show(title: String, content: String, confirmButtonTitle: String, cancelButtonTitle: String?, cancelAsDefault: Bool, delegate: ctlNonModalAlertWindowDelegate?) {
         if window?.isVisible == true {
-            self.delegate?.nonModalAlertWindowControllerDidCancel(self)
+            self.delegate?.ctlNonModalAlertWindowDidCancel(self)
         }
 
         self.delegate = delegate
@@ -83,7 +83,7 @@ class NonModalAlertWindowController: NSWindowController {
     }
 
     @IBAction func confirmButtonAction(_ sender: Any) {
-        delegate?.nonModalAlertWindowControllerDidConfirm(self)
+        delegate?.ctlNonModalAlertWindowDidConfirm(self)
         window?.orderOut(self)
     }
 
@@ -92,7 +92,7 @@ class NonModalAlertWindowController: NSWindowController {
     }
 
     func cancel(_ sender: Any) {
-        delegate?.nonModalAlertWindowControllerDidCancel(self)
+        delegate?.ctlNonModalAlertWindowDidCancel(self)
         delegate = nil
         window?.orderOut(self)
     }

@@ -7,7 +7,7 @@ using namespace std;
 using namespace vChewing;
 
 static const int kUserOverrideModelCapacity = 500;
-static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
+static const double kObservedOverrideHalflife = 5400.0;
 
 static vChewingLM gLangModelCHT;
 static vChewingLM gLangModelCHS;

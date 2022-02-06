@@ -92,7 +92,7 @@ struct VersionUpdateApi {
                 let versionDescriptions = plist["Description"] as? [AnyHashable: Any]
                 if let versionDescriptions = versionDescriptions {
                     var locale = "en"
-                    let supportedLocales = ["en", "zh-Hant", "zh-Hans"]
+                    let supportedLocales = ["en", "zh-Hant", "zh-Hans", "ja"]
                     let preferredTags = Bundle.preferredLocalizations(from: supportedLocales)
                     if let first = preferredTags.first {
                         locale = first
@@ -122,13 +122,32 @@ struct VersionUpdateApi {
 }
 
 @objc(AppDelegate)
-class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControllerDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelegate, FSEventStreamHelperDelegate {
+    func helper(_ helper: FSEventStreamHelper, didReceive events: [FSEventStreamHelper.Event]) {
+        DispatchQueue.main.async {
+            if Preferences.shouldAutoReloadUserDataFiles {
+                mgrLangModel.loadUserPhrases()
+                mgrLangModel.loadUserPhraseReplacement()
+            }
+        }
+    }
 
     @IBOutlet weak var window: NSWindow?
     private var ctlPrefWindowInstance: ctlPrefWindow?
+    private var ctlAboutWindowInstance: ctlAboutWindow? // New About Window
     private var checkTask: URLSessionTask?
     private var updateNextStepURL: URL?
     private var fsStreamHelper = FSEventStreamHelper(path: mgrLangModel.dataFolderPath, queue: DispatchQueue(label: "User Phrases"))
+
+    // 補上 dealloc
+    deinit {
+        ctlPrefWindowInstance = nil
+        ctlAboutWindowInstance = nil
+        checkTask = nil
+        updateNextStepURL = nil
+        fsStreamHelper.stop()
+        fsStreamHelper.delegate = nil
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         mgrLangModel.setupDataModelValueConverter()
@@ -137,19 +156,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
         fsStreamHelper.delegate = self
         _ = fsStreamHelper.start()
 
-        if UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) == nil {
-            UserDefaults.standard.set(true, forKey: kCheckUpdateAutomatically)
-            UserDefaults.standard.synchronize()
+        Preferences.setMissingDefaults()
+        
+        // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
+        if (UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) != nil) == true {
+            checkForUpdate()
         }
-        checkForUpdate()
     }
 
     @objc func showPreferences() {
         if ctlPrefWindowInstance == nil {
-            ctlPrefWindowInstance = ctlPrefWindow(windowNibName: "frmPrefWIndow")
+            ctlPrefWindowInstance = ctlPrefWindow.init(windowNibName: "frmPrefWindow")
         }
         ctlPrefWindowInstance?.window?.center()
-        ctlPrefWindowInstance?.window?.orderFront(self)
+        ctlPrefWindowInstance?.window?.orderFrontRegardless() // 逼著屬性視窗往最前方顯示
+    }
     }
 
     @objc(checkForUpdate)
@@ -195,7 +216,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
                             report.remoteShortVersion,
                             report.remoteVersion,
                             report.versionDescription)
-                    NonModalAlertWindowController.shared.show(title: NSLocalizedString("New Version Available", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("Visit Website", comment: ""), cancelButtonTitle: NSLocalizedString("Not Now", comment: ""), cancelAsDefault: false, delegate: self)
+                    ctlNonModalAlertWindow.shared.show(title: NSLocalizedString("New Version Available", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("Visit Website", comment: ""), cancelButtonTitle: NSLocalizedString("Not Now", comment: ""), cancelAsDefault: false, delegate: self)
                 case .noNeedToUpdate, .ignored:
                     break
                 }
@@ -205,7 +226,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
                     let title = NSLocalizedString("Update Check Failed", comment: "")
                     let content = String(format: NSLocalizedString("There may be no internet connection or the server failed to respond.\n\nError message: %@", comment: ""), message)
                     let buttonTitle = NSLocalizedString("Dismiss", comment: "")
-                    NonModalAlertWindowController.shared.show(title: title, content: content, confirmButtonTitle: buttonTitle, cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
+                    ctlNonModalAlertWindow.shared.show(title: title, content: content, confirmButtonTitle: buttonTitle, cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
                 default:
                     break
                 }
@@ -213,23 +234,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
         }
     }
 
-    func nonModalAlertWindowControllerDidConfirm(_ controller: NonModalAlertWindowController) {
+    func ctlNonModalAlertWindowDidConfirm(_ controller: ctlNonModalAlertWindow) {
         if let updateNextStepURL = updateNextStepURL {
             NSWorkspace.shared.open(updateNextStepURL)
         }
         updateNextStepURL = nil
     }
 
-    func nonModalAlertWindowControllerDidCancel(_ controller: NonModalAlertWindowController) {
+    func ctlNonModalAlertWindowDidCancel(_ controller: ctlNonModalAlertWindow) {
         updateNextStepURL = nil
-    }
-}
-
-extension AppDelegate: FSEventStreamHelperDelegate {
-    func helper(_ helper: FSEventStreamHelper, didReceive events: [FSEventStreamHelper.Event]) {
-        DispatchQueue.main.async {
-            mgrLangModel.loadUserPhrases()
-            mgrLangModel.loadUserPhraseReplacement()
-        }
     }
 }
