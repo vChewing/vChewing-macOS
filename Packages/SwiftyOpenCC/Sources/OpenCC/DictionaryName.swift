@@ -56,6 +56,10 @@ extension ChineseConverter.Options {
             return .hkVariants
         } else if contains(.twStandard) {
             return .twVariants
+        } else if contains(.hkStandardRev) {
+            return .hkVariantsRev
+        } else if contains(.twStandardRev) {
+            return .twVariantsRev
         } else {
             return .stPhrases
         }
@@ -88,6 +92,10 @@ extension ChineseConverter.Options {
                 result.append([.hkVariants])
             } else if contains(.twStandard) {
                 result.append([.twVariants])
+            } else if contains(.hkStandardRev) {
+                result.append([.hkVariantsRev])
+            } else if contains(.twStandardRev) {
+                result.append([.twVariantsRev])
             }
         }
         if result.isEmpty {
