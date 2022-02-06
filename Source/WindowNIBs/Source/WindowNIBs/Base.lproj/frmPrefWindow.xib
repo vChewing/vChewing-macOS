@@ -17,7 +17,7 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="vChewing Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" animationBehavior="default" titlebarAppearsTransparent="YES" id="1" userLabel="Window - Preferences">
+        <window title="vChewing Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" animationBehavior="default" titlebarAppearsTransparent="YES" id="1" userLabel="frmPrefWindow">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <rect key="contentRect" x="401" y="295" width="501" height="469"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
@@ -252,7 +252,7 @@
                                                             <font key="font" metaFont="cellTitle"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <binding destination="32" name="value" keyPath="values.UseSCPCInputMode" id="0J8-4V-5zC"/>
+                                                            <binding destination="32" name="value" keyPath="values.UseSCPCTypingMode" id="PbD-wq-OsN"/>
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pYB-E5-4Nv">
@@ -305,13 +305,13 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box title="Advanced Settings" translatesAutoresizingMaskIntoConstraints="NO" id="E1l-m8-xgb">
-                                            <rect key="frame" x="6" y="200" width="451" height="219"/>
+                                            <rect key="frame" x="6" y="179" width="451" height="240"/>
                                             <view key="contentView" id="Zaa-dP-WdF">
-                                                <rect key="frame" x="3" y="3" width="445" height="201"/>
+                                                <rect key="frame" x="3" y="3" width="445" height="222"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField autoresizesSubviews="NO" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="IpX-f7-rTL">
-                                                        <rect key="frame" x="18" y="170" width="410" height="16"/>
+                                                        <rect key="frame" x="18" y="191" width="410" height="16"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="16" id="AH9-nI-ozD"/>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="406" id="xMo-mW-3aW"/>
@@ -323,7 +323,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <comboBox verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uHU-aL-du7">
-                                                        <rect key="frame" x="128" y="139" width="150" height="25"/>
+                                                        <rect key="frame" x="128" y="160" width="150" height="25"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="147" id="aJi-ff-WnC"/>
                                                         </constraints>
@@ -342,7 +342,7 @@
                                                         </connections>
                                                     </comboBox>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ETa-09-qWI">
-                                                        <rect key="frame" x="31" y="144" width="91" height="15"/>
+                                                        <rect key="frame" x="31" y="165" width="91" height="15"/>
                                                         <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Selection Keys:" id="FnD-oH-El5">
                                                             <font key="font" metaFont="cellTitle"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -350,7 +350,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="13">
-                                                        <rect key="frame" x="18" y="120" width="403" height="15"/>
+                                                        <rect key="frame" x="18" y="141" width="403" height="15"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="371" id="lJN-Yf-Fka"/>
                                                         </constraints>
@@ -361,7 +361,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <matrix verticalHuggingPriority="751" tag="1" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="15">
-                                                        <rect key="frame" x="33" y="72" width="402" height="40"/>
+                                                        <rect key="frame" x="33" y="93" width="402" height="40"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="402" height="19"/>
                                                         <size key="intercellSpacing" width="4" height="2"/>
@@ -386,7 +386,7 @@
                                                         </connections>
                                                     </matrix>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="109">
-                                                        <rect key="frame" x="19" y="47.5" width="289" height="17"/>
+                                                        <rect key="frame" x="19" y="68.5" width="289" height="17"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="288" id="DZZ-LM-h2m"/>
                                                             <constraint firstAttribute="height" constant="16" id="lZq-1x-koI"/>
@@ -396,26 +396,41 @@
                                                             <font key="font" metaFont="cellTitle"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <binding destination="32" name="value" keyPath="values.ChooseCandidateUsingSpaceKey" id="112"/>
+                                                            <binding destination="32" name="value" keyPath="values.ChooseCandidateUsingSpace" id="NU1-DG-vUz"/>
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bE0-Lq-Pj7">
-                                                        <rect key="frame" x="19" y="25.5" width="245" height="17"/>
+                                                        <rect key="frame" x="19" y="46.5" width="266" height="17"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="234" id="PX9-9G-dZz"/>
                                                             <constraint firstAttribute="height" constant="16" id="VKi-k7-llg"/>
                                                         </constraints>
-                                                        <buttonCell key="cell" type="check" title="Use ESC key to clear entire input buffer" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="f2j-xD-4xK">
+                                                        <buttonCell key="cell" type="check" title="Use ESC key to clear the entire input buffer" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="f2j-xD-4xK">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="cellTitle"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <binding destination="32" name="value" keyPath="values.EscToCleanInputBufferKey" id="atP-oI-qLL"/>
+                                                            <binding destination="32" name="value" keyPath="values.EscToCleanInputBuffer" id="aLf-PK-mAS"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7z2-DD-c58">
+                                                        <rect key="frame" x="19" y="25.5" width="407" height="17"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="234" id="ZIc-th-1VJ"/>
+                                                            <constraint firstAttribute="height" constant="16" id="ZUJ-yT-gaw"/>
+                                                        </constraints>
+                                                        <buttonCell key="cell" type="check" title="Push the cursor to the front of the phrase after candidate selection." bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="RUG-ls-KyA">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <binding destination="32" name="value" keyPath="values.MoveCursorAfterSelectingCandidate" id="BbO-T6-zh3"/>
                                                         </connections>
                                                     </button>
                                                 </subviews>
                                                 <constraints>
                                                     <constraint firstItem="uHU-aL-du7" firstAttribute="leading" secondItem="ETa-09-qWI" secondAttribute="trailing" constant="8" symbolic="YES" id="3KF-Tb-0Tz"/>
+                                                    <constraint firstItem="7z2-DD-c58" firstAttribute="leading" secondItem="bE0-Lq-Pj7" secondAttribute="leading" id="3bj-ct-oCo"/>
                                                     <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="13" secondAttribute="trailing" constant="71" id="D0Q-CG-6LS"/>
                                                     <constraint firstItem="uHU-aL-du7" firstAttribute="top" secondItem="IpX-f7-rTL" secondAttribute="bottom" constant="8" id="Di9-bm-CIq"/>
                                                     <constraint firstItem="ETa-09-qWI" firstAttribute="centerY" secondItem="uHU-aL-du7" secondAttribute="centerY" constant="1" id="FHZ-PV-14v"/>
@@ -428,6 +443,8 @@
                                                     <constraint firstItem="bE0-Lq-Pj7" firstAttribute="top" secondItem="109" secondAttribute="bottom" constant="6" symbolic="YES" id="cT2-FV-Or9"/>
                                                     <constraint firstItem="IpX-f7-rTL" firstAttribute="leading" secondItem="13" secondAttribute="leading" id="dXS-M3-fDf"/>
                                                     <constraint firstItem="109" firstAttribute="leading" secondItem="bE0-Lq-Pj7" secondAttribute="leading" id="ePO-mn-wZM"/>
+                                                    <constraint firstAttribute="trailing" secondItem="7z2-DD-c58" secondAttribute="trailing" constant="19" id="gu0-F2-6CK"/>
+                                                    <constraint firstItem="7z2-DD-c58" firstAttribute="top" secondItem="bE0-Lq-Pj7" secondAttribute="bottom" constant="5" id="h6e-x2-Tqk"/>
                                                     <constraint firstItem="ETa-09-qWI" firstAttribute="leading" secondItem="Zaa-dP-WdF" secondAttribute="leading" constant="33" id="jMc-w0-nTn"/>
                                                     <constraint firstItem="109" firstAttribute="top" secondItem="15" secondAttribute="bottom" constant="8" id="jW8-k4-5sl"/>
                                                     <constraint firstItem="15" firstAttribute="top" secondItem="13" secondAttribute="bottom" constant="8" id="mY6-fM-KSH"/>
@@ -439,13 +456,13 @@
                                             </view>
                                         </box>
                                         <box title="Dictionary Settings" translatesAutoresizingMaskIntoConstraints="NO" id="s4r-ji-vbr">
-                                            <rect key="frame" x="6" y="10" width="451" height="186"/>
+                                            <rect key="frame" x="6" y="10" width="451" height="165"/>
                                             <view key="contentView" id="rWB-y8-q94">
-                                                <rect key="frame" x="3" y="3" width="445" height="168"/>
+                                                <rect key="frame" x="3" y="3" width="445" height="147"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dnE-Vw-KrP">
-                                                        <rect key="frame" x="18" y="138" width="323" height="15"/>
+                                                        <rect key="frame" x="18" y="117" width="323" height="15"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="231" id="MzY-w8-DKW"/>
                                                         </constraints>
@@ -456,7 +473,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="1hA-Po-5li">
-                                                        <rect key="frame" x="19" y="115.5" width="401" height="17"/>
+                                                        <rect key="frame" x="19" y="94.5" width="401" height="17"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="288" id="0mm-CA-Mxs"/>
                                                             <constraint firstAttribute="height" constant="16" id="c3e-cU-pEw"/>
@@ -470,7 +487,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nnT-wS-mZo">
-                                                        <rect key="frame" x="19" y="93.5" width="342" height="17"/>
+                                                        <rect key="frame" x="19" y="72.5" width="342" height="17"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="16" id="IBn-Xf-uEw"/>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="234" id="srn-3X-kPi"/>
@@ -484,7 +501,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p7V-IN-OTr">
-                                                        <rect key="frame" x="19" y="72.5" width="336" height="17"/>
+                                                        <rect key="frame" x="19" y="51.5" width="336" height="17"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="16" id="8eX-Tw-Erk"/>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="234" id="yhP-XF-CQj"/>
@@ -514,7 +531,7 @@
                                                 </constraints>
                                             </view>
                                             <constraints>
-                                                <constraint firstAttribute="height" constant="182" id="mfq-di-Kby"/>
+                                                <constraint firstAttribute="height" constant="161" id="mfq-di-Kby"/>
                                             </constraints>
                                         </box>
                                     </subviews>

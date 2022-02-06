@@ -165,12 +165,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
     }
 
     @objc func showPreferences() {
-        if ctlPrefWindowInstance == nil {
+        if (ctlPrefWindowInstance == nil) {
             ctlPrefWindowInstance = ctlPrefWindow.init(windowNibName: "frmPrefWindow")
         }
         ctlPrefWindowInstance?.window?.center()
         ctlPrefWindowInstance?.window?.orderFrontRegardless() // 逼著屬性視窗往最前方顯示
     }
+    
+    // New About Window
+    @objc func showAbout() {
+        if (ctlAboutWindowInstance == nil) {
+            ctlAboutWindowInstance = ctlAboutWindow.init(windowNibName: "frmAboutWindow")
+        }
+        ctlAboutWindowInstance?.window?.center()
+        ctlAboutWindowInstance?.window?.orderFrontRegardless() // 逼著關於視窗往最前方顯示
     }
 
     @objc(checkForUpdate)
@@ -243,5 +251,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
 
     func ctlNonModalAlertWindowDidCancel(_ controller: ctlNonModalAlertWindow) {
         updateNextStepURL = nil
+    }
+    
+    // New About Window
+    @IBAction func about(_ sender: Any) {
+        (NSApp.delegate as? AppDelegate)?.showAbout()
+        NSApplication.shared.activate(ignoringOtherApps: true)
     }
 }

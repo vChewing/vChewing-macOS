@@ -30,10 +30,10 @@
 		5B62A34A27AE7CD900A19448 /* NotifierController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34527AE7CD900A19448 /* NotifierController.swift */; };
 		5B62A35227AE822400A19448 /* OpenCC in Frameworks */ = {isa = PBXBuildFile; productRef = 5B62A35127AE822400A19448 /* OpenCC */; };
 		5B62A35327AE89C400A19448 /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33127AE792F00A19448 /* InputSourceHelper.swift */; };
+		5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */; };
 		5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75D27AED54C0023B93A /* Beep.m4a */; };
 		5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75E27AED54C0023B93A /* Fart.m4a */; };
 		5BBBB76B27AED5DB0023B93A /* frmNonModalAlertWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB76527AED5DB0023B93A /* frmNonModalAlertWindow.xib */; };
-		5BBBB76C27AED5DB0023B93A /* frmPrefWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB76727AED5DB0023B93A /* frmPrefWindow.xib */; };
 		5BBBB76D27AED5DB0023B93A /* frmAboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB76927AED5DB0023B93A /* frmAboutWindow.xib */; };
 		5BBBB77327AED70B0023B93A /* MenuIcon-TCVIM@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB76F27AED70B0023B93A /* MenuIcon-TCVIM@2x.png */; };
 		5BBBB77427AED70B0023B93A /* MenuIcon-SCVIM@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77027AED70B0023B93A /* MenuIcon-SCVIM@2x.png */; };
@@ -91,6 +91,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5B05A47B27AFF7CA00437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		5B05A47C27AFF7CF00437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		5B05A47F27AFF84200437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmAboutWindow.strings; sourceTree = "<group>"; };
 		5B0CF37F27AD476E00784B08 /* SwiftyOpenCC */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SwiftyOpenCC; path = Packages/SwiftyOpenCC; sourceTree = "<group>"; };
 		5B2DB16D27AF6891006D874E /* data-chs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-chs.txt"; path = "Data/data-chs.txt"; sourceTree = "<group>"; };
 		5B2DB16E27AF6891006D874E /* data-cht.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-cht.txt"; path = "Data/data-cht.txt"; sourceTree = "<group>"; };
@@ -125,10 +128,11 @@
 		5B62A34127AE7CD900A19448 /* VerticalCandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalCandidateController.swift; sourceTree = "<group>"; };
 		5B62A34327AE7CD900A19448 /* TooltipController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TooltipController.swift; sourceTree = "<group>"; };
 		5B62A34527AE7CD900A19448 /* NotifierController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotifierController.swift; sourceTree = "<group>"; };
+		5B7BC4AF27AFFBE800F66C24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Source/WindowNIBs/Base.lproj/frmPrefWindow.xib; sourceTree = "<group>"; };
+		5B7BC4B227AFFC0B00F66C24 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Source/WindowNIBs/en.lproj/frmPrefWindow.strings; sourceTree = "<group>"; };
 		5BBBB75D27AED54C0023B93A /* Beep.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.m4a; sourceTree = "<group>"; };
 		5BBBB75E27AED54C0023B93A /* Fart.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.m4a; sourceTree = "<group>"; };
 		5BBBB76627AED5DB0023B93A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmNonModalAlertWindow.xib; sourceTree = "<group>"; };
-		5BBBB76827AED5DB0023B93A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmPrefWindow.xib; sourceTree = "<group>"; };
 		5BBBB76A27AED5DB0023B93A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmAboutWindow.xib; sourceTree = "<group>"; };
 		5BBBB76F27AED70B0023B93A /* MenuIcon-TCVIM@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-TCVIM@2x.png"; sourceTree = "<group>"; };
 		5BBBB77027AED70B0023B93A /* MenuIcon-SCVIM@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-SCVIM@2x.png"; sourceTree = "<group>"; };
@@ -406,7 +410,7 @@
 			children = (
 				5BBBB76927AED5DB0023B93A /* frmAboutWindow.xib */,
 				5BBBB76527AED5DB0023B93A /* frmNonModalAlertWindow.xib */,
-				5BBBB76727AED5DB0023B93A /* frmPrefWindow.xib */,
+				5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */,
 				6A187E2816004C5900466B2E /* MainMenu.xib */,
 			);
 			path = WindowNIBs;
@@ -694,13 +698,13 @@
 			files = (
 				5BBBB77427AED70B0023B93A /* MenuIcon-SCVIM@2x.png in Resources */,
 				D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */,
-				5BBBB76C27AED5DB0023B93A /* frmPrefWindow.xib in Resources */,
 				5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */,
 				6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */,
 				D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */,
 				5BBBB76B27AED5DB0023B93A /* frmNonModalAlertWindow.xib in Resources */,
 				5BBBB76D27AED5DB0023B93A /* frmAboutWindow.xib in Resources */,
 				5BBBB77527AED70B0023B93A /* MenuIcon-SCVIM.png in Resources */,
+				5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */,
 				5B2DB17027AF6891006D874E /* data-cht.txt in Resources */,
 				5BBBB77327AED70B0023B93A /* MenuIcon-TCVIM@2x.png in Resources */,
 				5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.png in Resources */,
@@ -818,6 +822,15 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5B7BC4AF27AFFBE800F66C24 /* Base */,
+				5B7BC4B227AFFC0B00F66C24 /* en */,
+			);
+			name = frmPrefWindow.xib;
+			sourceTree = "<group>";
+		};
 		5BBBB76527AED5DB0023B93A /* frmNonModalAlertWindow.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -826,18 +839,11 @@
 			name = frmNonModalAlertWindow.xib;
 			sourceTree = "<group>";
 		};
-		5BBBB76727AED5DB0023B93A /* frmPrefWindow.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				5BBBB76827AED5DB0023B93A /* Base */,
-			);
-			name = frmPrefWindow.xib;
-			sourceTree = "<group>";
-		};
 		5BBBB76927AED5DB0023B93A /* frmAboutWindow.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				5BBBB76A27AED5DB0023B93A /* Base */,
+				5B05A47F27AFF84200437698 /* en */,
 			);
 			name = frmAboutWindow.xib;
 			sourceTree = "<group>";
@@ -879,6 +885,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				D4E33D8927A838CF006DB1CF /* Base */,
+				5B05A47C27AFF7CF00437698 /* en */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -887,6 +894,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				D4E33D8E27A838F0006DB1CF /* Base */,
+				5B05A47B27AFF7CA00437698 /* en */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
