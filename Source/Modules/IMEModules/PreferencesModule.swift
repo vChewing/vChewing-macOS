@@ -21,7 +21,7 @@ private let kShouldAutoSortPhraseReplacementMapOnLoad = "ShouldAutoSortPhraseRep
 private let kSelectPhraseAfterCursorAsCandidatePreference = "SelectPhraseAfterCursorAsCandidate"
 private let kUseHorizontalCandidateListPreference = "UseHorizontalCandidateList"
 private let kComposingBufferSizePreference = "ComposingBufferSize"
-private let kChooseCandidateUsingSpace = "ChooseCandidateUsingSpaceKey"
+private let kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
 private let kCNS11643Enabled = "CNS11643Enabled"
 private let kChineseConversionEnabled = "ChineseConversionEnabled"
 private let kHalfWidthPunctuationEnabled = "HalfWidthPunctuationEnable"
@@ -331,7 +331,7 @@ struct ComposingBufferSize {
     @UserDefault(key: kShouldAutoSortPhraseReplacementMapOnLoad, defaultValue: false)
     @objc static var shouldAutoSortPhraseReplacementMapOnLoad: Bool
 
-    @UserDefault(key: kSelectPhraseAfterCursorAsCandidatePreference, defaultValue: false)
+    @UserDefault(key: kSelectPhraseAfterCursorAsCandidatePreference, defaultValue: true)
     @objc static var selectPhraseAfterCursorAsCandidate: Bool
 
     @UserDefault(key: kMoveCursorAfterSelectingCandidate, defaultValue: false)
