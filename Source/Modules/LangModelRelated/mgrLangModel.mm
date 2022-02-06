@@ -3,8 +3,6 @@
 #import "mgrLangModel_Privates.h"
 #import "vChewing-Swift.h"
 
-@import VXHanConvert;
-
 using namespace std;
 using namespace vChewing;
 
