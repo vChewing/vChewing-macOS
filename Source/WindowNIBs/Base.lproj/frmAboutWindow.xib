@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="AboutWindow">
+            <connections>
+                <outlet property="appCopyrightLabel" destination="8Ju-DR-2C8" id="Odh-c7-nyT"/>
+                <outlet property="appEULAContent" destination="g8d-ZO-VdQ" id="mLE-Az-YkE"/>
+                <outlet property="appVersionLabel" destination="9Pk-k3-0cO" id="y37-SM-qyG"/>
+                <outlet property="window" destination="ttlAboutWindow" id="gIp-Ho-8D9"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="About vChewing for macOS" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" animationBehavior="default" tabbingMode="disallowed" titlebarAppearsTransparent="YES" id="ttlAboutWindow">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
+            <rect key="contentRect" x="196" y="240" width="533" height="457"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
+            <value key="minSize" type="size" width="533" height="457"/>
+            <value key="maxSize" type="size" width="533" height="457"/>
+            <view key="contentView" id="se5-gp-TjO">
+                <rect key="frame" x="0.0" y="0.0" width="533" height="457"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" findBarPosition="belowContent" translatesAutoresizingMaskIntoConstraints="NO" id="pHH-M3-zKo">
+                        <rect key="frame" x="91" y="143" width="427" height="183"/>
+                        <clipView key="contentView" drawsBackground="NO" id="kdo-3u-t4d" userLabel="appEULAContentClip">
+                            <rect key="frame" x="1" y="1" width="425" height="181"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="bar" smartInsertDelete="YES" id="g8d-ZO-VdQ" userLabel="appEULAContent">
+                                    <rect key="frame" x="0.0" y="-2" width="425" height="181"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <size key="minSize" width="425" height="181"/>
+                                    <size key="maxSize" width="427" height="183"/>
+                                    <attributedString key="textStorage">
+                                        <fragment content="Placeholder for EULA Texts.">
+                                            <attributes>
+                                                <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <font key="NSFont" metaFont="systemLight" size="11"/>
+                                                <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                            </attributes>
+                                        </fragment>
+                                    </attributedString>
+                                    <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                </textView>
+                            </subviews>
+                        </clipView>
+                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="sfo-oN-iBH">
+                            <rect key="frame" x="-100" y="-100" width="240" height="16"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" controlSize="mini" horizontal="NO" id="X6W-MB-JfO">
+                            <rect key="frame" x="412" y="1" width="14" height="181"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6Dx-DY-UG1">
+                        <rect key="frame" x="89" y="442" width="123" height="15"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="vChewing for macOS" id="lblAppTitle" userLabel="appNameLabel">
+                            <font key="font" metaFont="cellTitle"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Srh-ua-uQD">
+                        <rect key="frame" x="89" y="426" width="281" height="15"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="Derived from OpenVanilla McBopopmofo Project." id="lblProjectDescription">
+                            <font key="font" metaFont="cellTitle"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8Ju-DR-2C8">
+                        <rect key="frame" x="89" y="410" width="297" height="15"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="293" id="I1K-WT-jie"/>
+                        </constraints>
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="Placeholder for showing copyright information." id="lblCopyright" userLabel="appCopyrightLabel">
+                            <font key="font" metaFont="cellTitle"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8M8-3C-BZO">
+                        <rect key="frame" x="89" y="357" width="431" height="45"/>
+                        <textFieldCell key="cell" selectable="YES" id="lblCredits">
+                            <font key="font" metaFont="cellTitle"/>
+                            <string key="title">McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.
+vChewing macOS Development Reinforced by Hiraku Wang.
+vChewing Phrase Database Maintained by Shiki Suen.</string>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="2Gh-nq-Mng">
+                        <rect key="frame" x="15" y="132" width="503" height="5"/>
+                    </box>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eYM-F7-drf">
+                        <rect key="frame" x="89" y="334" width="431" height="15"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="3-Clause BSD License:" id="lblLicense">
+                            <font key="font" metaFont="cellTitle"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="d81-Fe-uNT">
+                        <rect key="frame" x="13" y="21" width="360" height="105"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="356" id="B0d-48-3we"/>
+                        </constraints>
+                        <textFieldCell key="cell" selectable="YES" id="lblDisclaimer">
+                            <font key="font" metaFont="cellTitle"/>
+                            <string key="title">DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, have been removed from vChewing official phrase database.</string>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <imageView translatesAutoresizingMaskIntoConstraints="NO" id="bAv-ZO-Ihw">
+                        <rect key="frame" x="15" y="142" width="63" height="315"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="63" id="ugR-og-6Vl"/>
+                        </constraints>
+                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="AboutBanner" id="Noc-kP-zTE"/>
+                    </imageView>
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9Pk-k3-0cO">
+                        <rect key="frame" x="211" y="442" width="126" height="15"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="122" id="0XT-cl-6S4"/>
+                        </constraints>
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="version_placeholder" id="lblVersionString" userLabel="appVersionLabel">
+                            <font key="font" metaFont="cellTitle"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <button horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bSu-np-tPT" userLabel="confirmButton">
+                        <rect key="frame" x="382" y="96" width="143" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="129" id="ECG-s4-D2p"/>
+                        </constraints>
+                        <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="btnConfirm">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="performClose:" target="-1" id="0yK-v8-KQd"/>
+                        </connections>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="9Pk-k3-0cO" secondAttribute="trailing" constant="20" symbolic="YES" id="0LE-Ck-Jy5"/>
+                    <constraint firstItem="2Gh-nq-Mng" firstAttribute="centerX" secondItem="se5-gp-TjO" secondAttribute="centerX" id="1cy-gM-7lt"/>
+                    <constraint firstItem="6Dx-DY-UG1" firstAttribute="leading" secondItem="bAv-ZO-Ihw" secondAttribute="trailing" constant="13" id="43n-1d-TD2"/>
+                    <constraint firstItem="eYM-F7-drf" firstAttribute="trailing" secondItem="pHH-M3-zKo" secondAttribute="trailing" id="5Uw-U0-lVp"/>
+                    <constraint firstItem="8Ju-DR-2C8" firstAttribute="top" secondItem="Srh-ua-uQD" secondAttribute="bottom" constant="1" id="5eL-dp-7Z8"/>
+                    <constraint firstItem="8M8-3C-BZO" firstAttribute="top" secondItem="8Ju-DR-2C8" secondAttribute="bottom" constant="8" symbolic="YES" id="82T-Pc-3db"/>
+                    <constraint firstItem="2Gh-nq-Mng" firstAttribute="top" secondItem="bAv-ZO-Ihw" secondAttribute="bottom" constant="7" id="8EG-DW-AZM"/>
+                    <constraint firstItem="Srh-ua-uQD" firstAttribute="top" secondItem="6Dx-DY-UG1" secondAttribute="bottom" constant="1" id="91b-Oo-tsv"/>
+                    <constraint firstItem="d81-Fe-uNT" firstAttribute="top" secondItem="2Gh-nq-Mng" secondAttribute="bottom" constant="8" symbolic="YES" id="C6S-3S-QcT"/>
+                    <constraint firstItem="2Gh-nq-Mng" firstAttribute="leading" secondItem="d81-Fe-uNT" secondAttribute="leading" id="CBk-Lx-b1d"/>
+                    <constraint firstItem="bSu-np-tPT" firstAttribute="leading" secondItem="d81-Fe-uNT" secondAttribute="trailing" constant="18" id="E2b-7Z-Yjw"/>
+                    <constraint firstItem="bAv-ZO-Ihw" firstAttribute="leading" secondItem="2Gh-nq-Mng" secondAttribute="leading" id="EQ1-cm-RX8"/>
+                    <constraint firstItem="eYM-F7-drf" firstAttribute="leading" secondItem="pHH-M3-zKo" secondAttribute="leading" id="Fcb-XF-cee"/>
+                    <constraint firstItem="2Gh-nq-Mng" firstAttribute="top" secondItem="pHH-M3-zKo" secondAttribute="bottom" constant="8" symbolic="YES" id="GZ9-5T-UZI"/>
+                    <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="bSu-np-tPT" secondAttribute="bottom" constant="81" id="Inw-Qt-fHt"/>
+                    <constraint firstAttribute="bottom" secondItem="d81-Fe-uNT" secondAttribute="bottom" constant="21" id="Km1-n7-j8F"/>
+                    <constraint firstItem="8M8-3C-BZO" firstAttribute="trailing" secondItem="eYM-F7-drf" secondAttribute="trailing" id="O8T-AT-i11"/>
+                    <constraint firstItem="Srh-ua-uQD" firstAttribute="leading" secondItem="8Ju-DR-2C8" secondAttribute="leading" id="Rks-Q6-4Hh"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Srh-ua-uQD" secondAttribute="trailing" constant="20" symbolic="YES" id="Swp-Z3-57P"/>
+                    <constraint firstItem="bSu-np-tPT" firstAttribute="top" secondItem="2Gh-nq-Mng" secondAttribute="bottom" constant="11" id="ThD-rE-Rc3"/>
+                    <constraint firstItem="6Dx-DY-UG1" firstAttribute="baseline" secondItem="9Pk-k3-0cO" secondAttribute="baseline" id="UXk-Ir-Kti"/>
+                    <constraint firstItem="6Dx-DY-UG1" firstAttribute="leading" secondItem="Srh-ua-uQD" secondAttribute="leading" id="UZA-vT-6yG"/>
+                    <constraint firstItem="bAv-ZO-Ihw" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="15" id="Uhh-Lu-dEf"/>
+                    <constraint firstItem="8Ju-DR-2C8" firstAttribute="leading" secondItem="8M8-3C-BZO" secondAttribute="leading" id="UrF-M2-wpG"/>
+                    <constraint firstItem="eYM-F7-drf" firstAttribute="top" secondItem="8M8-3C-BZO" secondAttribute="bottom" constant="8" symbolic="YES" id="WIZ-YQ-chM"/>
+                    <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="2Gh-nq-Mng" secondAttribute="bottom" constant="134" id="WJK-gw-zR7"/>
+                    <constraint firstItem="pHH-M3-zKo" firstAttribute="top" secondItem="eYM-F7-drf" secondAttribute="bottom" constant="8" symbolic="YES" id="XVp-6y-CaO"/>
+                    <constraint firstItem="9Pk-k3-0cO" firstAttribute="leading" secondItem="6Dx-DY-UG1" secondAttribute="trailing" constant="3" id="c3v-ZJ-usi"/>
+                    <constraint firstItem="pHH-M3-zKo" firstAttribute="trailing" secondItem="2Gh-nq-Mng" secondAttribute="trailing" id="ddO-4o-gsZ"/>
+                    <constraint firstItem="bAv-ZO-Ihw" firstAttribute="top" secondItem="6Dx-DY-UG1" secondAttribute="top" id="hJv-Sh-M4t"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="8Ju-DR-2C8" secondAttribute="trailing" constant="20" symbolic="YES" id="hm1-o7-gLp"/>
+                    <constraint firstItem="2Gh-nq-Mng" firstAttribute="trailing" secondItem="bSu-np-tPT" secondAttribute="trailing" id="ixJ-xP-aIU"/>
+                    <constraint firstItem="8M8-3C-BZO" firstAttribute="leading" secondItem="eYM-F7-drf" secondAttribute="leading" id="rLt-ck-nSt"/>
+                    <constraint firstItem="bAv-ZO-Ihw" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" id="u49-Fr-HYh"/>
+                </constraints>
+            </view>
+            <connections>
+                <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
+            </connections>
+            <point key="canvasLocation" x="111" y="111"/>
+        </window>
+        <userDefaultsController representsSharedInstance="YES" id="CaN-wP-mkf"/>
+    </objects>
+    <resources>
+        <image name="AboutBanner" width="63" height="310"/>
+    </resources>
+</document>
