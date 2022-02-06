@@ -1,10 +1,3 @@
-/*
- *  InputState.cpp
- *
- *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
- *  Derived from 2011-2022 OpenVanilla Project (MIT License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
- */
 
 import Cocoa
 
@@ -49,6 +42,8 @@ class InputState: NSObject {
         }
     }
 
+    // MARK: -
+
     /// Represents that the composing buffer is empty.
     @objc (InputStateEmpty)
     class Empty: InputState {
@@ -61,6 +56,8 @@ class InputState: NSObject {
         }
     }
 
+    // MARK: -
+
     /// Represents that the composing buffer is empty.
     @objc (InputStateEmptyIgnoringPreviousState)
     class EmptyIgnoringPreviousState: InputState {
@@ -71,6 +68,8 @@ class InputState: NSObject {
             "<InputState.EmptyIgnoringPreviousState>"
         }
     }
+
+    // MARK: -
 
     /// Represents that the input controller is committing text into client app.
     @objc (InputStateCommitting)
@@ -86,6 +85,9 @@ class InputState: NSObject {
             "<InputState.Committing poppedText:\(poppedText)>"
         }
     }
+
+    // MARK: -
+
     /// Represents that the composing buffer is not empty.
     @objc (InputStateNotEmpty)
     class NotEmpty: InputState {
@@ -102,10 +104,13 @@ class InputState: NSObject {
         }
     }
 
+    // MARK: -
+
     /// Represents that the user is inputting text.
     @objc (InputStateInputting)
     class Inputting: NotEmpty {
         @objc var poppedText: String = ""
+        @objc var tooltip: String = ""
 
         @objc override init(composingBuffer: String, cursorIndex: UInt) {
             super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
@@ -124,6 +129,8 @@ class InputState: NSObject {
         }
     }
 
+    // MARK: -
+
     private let kMinMarkRangeLength = 2
     private let kMaxMarkRangeLength = 6
 
@@ -136,26 +143,36 @@ class InputState: NSObject {
         @objc var tooltip: String {
 
             if composingBuffer.count != readings.count {
-                return NSLocalizedString("⚠︎ Unhandlable char selected for user phrases.", comment: "")
+                return NSLocalizedString("There are special phrases in your text. We don't support adding new phrases in this case.", comment: "")
             }
 
             if Preferences.phraseReplacementEnabled {
-                return NSLocalizedString("⚠︎ Phrase replacement mode enabled, interfering user phrase entry.", comment: "")
+                return NSLocalizedString("Phrase replacement mode is on. Not suggested to add phrase in the mode.", comment: "")
             }
-    
             if markedRange.length == 0 {
                 return ""
             }
 
             let text = (composingBuffer as NSString).substring(with: markedRange)
             if markedRange.length < kMinMarkRangeLength {
-                return String(format: NSLocalizedString("\"%@\" length must ≥ 2 for a user phrase.", comment: ""), text)
+                return String(format: NSLocalizedString("You are now selecting \"%@\". You can add a phrase with two or more characters.", comment: ""), text)
             } else if (markedRange.length > kMaxMarkRangeLength) {
-                return String(format: NSLocalizedString("\"%@\" length should ≤ %d for a user phrase.", comment: ""), text, kMaxMarkRangeLength)
+                return String(format: NSLocalizedString("You are now selecting \"%@\". A phrase cannot be longer than %d characters.", comment: ""), text, kMaxMarkRangeLength)
             }
-            return String(format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: ""), text)
+
+            let (exactBegin, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location)
+            let (exactEnd, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location + markedRange.length)
+            let selectedReadings = readings[exactBegin..<exactEnd]
+            let joined = selectedReadings.joined(separator: "-")
+            let exist = mgrLangModel.checkIfExist(userPhrase: text, key: joined)
+            if exist {
+                return String(format: NSLocalizedString("You are now selecting \"%@\". The phrase already exists.", comment: ""), text)
+            }
+
+            return String(format: NSLocalizedString("You are now selecting \"%@\". Press enter to add a new phrase.", comment: ""), text)
         }
 
+        @objc var tooltipForInputting: String = ""
         @objc private(set) var readings: [String]
 
         @objc init(composingBuffer: String, cursorIndex: UInt, markerIndex: UInt, readings: [String]) {
@@ -193,25 +210,43 @@ class InputState: NSObject {
 
         @objc func convertToInputting() -> Inputting {
             let state = Inputting(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
+            state.tooltip = tooltipForInputting
             return state
         }
 
         @objc var validToWrite: Bool {
+            /// vChewing allows users to input a string whose length differs
+            /// from the amount of Bopomofo readings. In this case, the range
+            /// in the composing buffer and the readings could not match, so
+            /// we disable the function to write user phrases in this case.
             if composingBuffer.count != readings.count {
                 return false
             }
-            return markedRange.length >= kMinMarkRangeLength && markedRange.length <= kMaxMarkRangeLength
+            if  markedRange.length < kMinMarkRangeLength {
+                return false
+            }
+            if markedRange.length > kMaxMarkRangeLength {
+                return false
+            }
+            let text = (composingBuffer as NSString).substring(with: markedRange)
+            let (exactBegin, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location)
+            let (exactEnd, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location + markedRange.length)
+            let selectedReadings = readings[exactBegin..<exactEnd]
+            let joined = selectedReadings.joined(separator: "-")
+            return mgrLangModel.checkIfExist(userPhrase: text, key: joined) == false
         }
 
         @objc var userPhrase: String {
             let text = (composingBuffer as NSString).substring(with: markedRange)
-            let exactBegin = StringUtils.convertToCharIndex(from: markedRange.location, in: composingBuffer)
-            let exactEnd = StringUtils.convertToCharIndex(from: markedRange.location + markedRange.length, in: composingBuffer)
-            let readings = readings[exactBegin..<exactEnd]
-            let joined = readings.joined(separator: "-")
+            let (exactBegin, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location)
+            let (exactEnd, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location + markedRange.length)
+            let selectedReadings = readings[exactBegin..<exactEnd]
+            let joined = selectedReadings.joined(separator: "-")
             return "\(text) \(joined)"
         }
     }
+
+    // MARK: -
 
     /// Represents that the user is choosing in a candidates list.
     @objc (InputStateChoosingCandidate)
@@ -238,6 +273,8 @@ class InputState: NSObject {
         }
     }
 
+    // MARK: -
+
     /// Represents that the user is choosing in a candidates list
     /// in the associated phrases mode.
     @objc (InputStateAssociatedPhrases)
@@ -255,15 +292,52 @@ class InputState: NSObject {
         }
     }
 
+    @objc (InputStateSymbolTable)
+    class SymbolTable: ChoosingCandidate {
+        @objc var node: SymbolNode
+
+        @objc init(node: SymbolNode, useVerticalMode: Bool) {
+            self.node = node
+            let candidates = node.children?.map { $0.title } ?? [String]()
+            super.init(composingBuffer: "", cursorIndex: 0, candidates: candidates, useVerticalMode: useVerticalMode)
+        }
+
+        override var description: String {
+            "<InputState.SymbolTable, candidates:\(candidates), useVerticalMode:\(useVerticalMode),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
+        }
+    }
+
 }
 
-class InputPhrase: NSObject {
-    @objc private (set) var text: String
-    @objc private (set) var reading: String
+@objc class SymbolNode: NSObject {
+    @objc var title: String
+    @objc var children: [SymbolNode]?
 
-    @objc init(text: String, reading: String) {
-        self.text = text
-        self.reading = reading
+    @objc init(_ title: String, _ children: [SymbolNode]? = nil) {
+        self.title = title
+        self.children = children
         super.init()
     }
+
+    @objc init(_ title: String, symbols: String) {
+        self.title = title
+        self.children = Array(symbols).map { SymbolNode(String($0), nil) }
+        super.init()
+    }
+
+    @objc static let root: SymbolNode = SymbolNode("/", [
+        SymbolNode("…"),
+        SymbolNode("※"),
+        SymbolNode("常用符號", symbols:"，、。．？！；：‧‥﹐﹒˙·‘’“”〝〞‵′〃～＄％＠＆＃＊"),
+        SymbolNode("左右括號", symbols:"（）「」〔〕｛｝〈〉『』《》【】﹙﹚﹝﹞﹛﹜"),
+        SymbolNode("上下括號", symbols:"︵︶﹁﹂︹︺︷︸︿﹀﹃﹄︽︾︻︼"),
+        SymbolNode("希臘字母", symbols:"αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ"),
+        SymbolNode("數學符號", symbols:"＋－×÷＝≠≒∞±√＜＞﹤﹥≦≧∩∪ˇ⊥∠∟⊿㏒㏑∫∮∵∴╳﹢"),
+        SymbolNode("特殊圖形", symbols:"↑↓←→↖↗↙↘㊣◎○●⊕⊙○●△▲☆★◇◆□■▽▼§￥〒￠￡※♀♂"),
+        SymbolNode("Unicode", symbols:"♨☀☁☂☃♠♥♣♦♩♪♫♬☺☻"),
+        SymbolNode("單線框", symbols:"├─┼┴┬┤┌┐╞═╪╡│▕└┘╭╮╰╯"),
+        SymbolNode("雙線框", symbols:"╔╦╗╠═╬╣╓╥╖╒╤╕║╚╩╝╟╫╢╙╨╜╞╪╡╘╧╛"),
+        SymbolNode("填色方塊", symbols:"＿ˍ▁▂▃▄▅▆▇█▏▎▍▌▋▊▉◢◣◥◤"),
+        SymbolNode("線段", symbols:"﹣﹦≡｜∣∥–︱—︳╴¯￣﹉﹊﹍﹎﹋﹌﹏︴∕﹨╱╲／＼"),
+    ])
 }

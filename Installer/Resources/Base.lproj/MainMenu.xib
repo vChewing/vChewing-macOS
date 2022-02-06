@@ -91,7 +91,7 @@
                         <rect key="frame" x="91" y="166" width="427" height="160"/>
                         <clipView key="contentView" drawsBackground="NO" id="NrY-FL-PVu" userLabel="appEULAContentClip">
                             <rect key="frame" x="1" y="1" width="425" height="158"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="bar" smartInsertDelete="YES" id="47J-tO-8TZ" userLabel="appEULAContent">
                                     <rect key="frame" x="0.0" y="-2" width="425" height="158"/>

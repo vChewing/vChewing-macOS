@@ -1,17 +1,10 @@
-/* 
- *  TooltipController.swift
- *  
- *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
- *  Derived from 2011-2022 OpenVanilla Project (MIT License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
- */
 
 import Cocoa
 
 public class TooltipController: NSWindowController {
-    private let backgroundColor =  NSColor.windowBackgroundColor
+    private let backgroundColor = NSColor(calibratedHue: 0.16, saturation: 0.22, brightness: 0.97, alpha: 1.0)
     private var messageTextField: NSTextField
-    private var tooltip: String  = "" {
+    private var tooltip: String = "" {
         didSet {
             messageTextField.stringValue = tooltip
             adjustSize()
@@ -29,7 +22,7 @@ public class TooltipController: NSWindowController {
         messageTextField.isEditable = false
         messageTextField.isSelectable = false
         messageTextField.isBezeled = false
-        messageTextField.textColor = NSColor.textColor
+        messageTextField.textColor = .black
         messageTextField.drawsBackground = true
         messageTextField.backgroundColor = backgroundColor
         messageTextField.font = .systemFont(ofSize: NSFont.systemFontSize(for: .small))

@@ -63,7 +63,7 @@ bool LMConsolidator::ConsolidateContent(const char *path, bool shouldsort) {
     }
     // 在第二遍 for 運算之前，針對 vecEntry 排序＋去除重複條目。
     if (shouldsort) {sort(vecEntry.begin(), vecEntry.end());} // 要不要排序，得做成開關。
-    vecEntry.erase(unique(vecEntry.begin(), vecEntry.end()), vecEntry.end()); // 排序。
+    vecEntry.erase(unique(vecEntry.begin(), vecEntry.end()), vecEntry.end()); // 去重複。
     // 統整完畢。開始將統整過的內容寫入檔案。
     ofstream zfdContentConsolidatorOutput(path); // 這裡是要從頭開始重寫檔案內容，所以不需要「 ios_base::app 」。
     for(int i=0;i<vecEntry.size();i++) { // 第二遍 for 用來寫入統整過的內容。

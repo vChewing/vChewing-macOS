@@ -1,10 +1,3 @@
-/*
- *  KeyHandlerInput.swift
- *
- *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
- *  Derived from 2011-2022 OpenVanilla Project (MIT License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
- */
 
 import Cocoa
 
@@ -25,8 +18,9 @@ enum KeyCode: UInt16 {
 class KeyHandlerInput: NSObject {
     @objc private (set) var useVerticalMode: Bool
     @objc private (set) var inputText: String?
+    @objc private (set) var inputTextIgnoringModifiers: String?
     @objc private (set) var charCode: UInt16
-    private var keyCode: UInt16
+    @objc private (set) var keyCode: UInt16
     private var flags: NSEvent.ModifierFlags
     private var cursorForwardKey: KeyCode
     private var cursorBackwardKey: KeyCode
@@ -35,8 +29,9 @@ class KeyHandlerInput: NSObject {
     private var verticalModeOnlyChooseCandidateKey: KeyCode
     @objc private (set) var emacsKey: vChewingEmacsKey
 
-    @objc init(inputText: String?, keyCode: UInt16, charCode: UInt16, flags: NSEvent.ModifierFlags, isVerticalMode: Bool) {
+    @objc init(inputText: String?, keyCode: UInt16, charCode: UInt16, flags: NSEvent.ModifierFlags, isVerticalMode: Bool, inputTextIgnoringModifiers: String? = nil) {
         self.inputText = inputText
+        self.inputTextIgnoringModifiers = inputTextIgnoringModifiers ?? inputText
         self.keyCode = keyCode
         self.charCode = charCode
         self.flags = flags
@@ -52,6 +47,7 @@ class KeyHandlerInput: NSObject {
 
     @objc init(event: NSEvent, isVerticalMode: Bool) {
         inputText = event.characters
+        inputTextIgnoringModifiers = event.charactersIgnoringModifiers
         keyCode = event.keyCode
         flags = event.modifierFlags
         useVerticalMode = isVerticalMode
@@ -73,7 +69,7 @@ class KeyHandlerInput: NSObject {
     }
 
     override var description: String {
-        return "<\(super.description) inputText:\(String(describing: inputText)), charCode:\(charCode), keyCode:\(keyCode), flags:\(flags), cursorForwardKey:\(cursorForwardKey), cursorBackwardKey:\(cursorBackwardKey), extraChooseCandidateKey:\(extraChooseCandidateKey), absorbedArrowKey:\(absorbedArrowKey),  verticalModeOnlyChooseCandidateKey:\(verticalModeOnlyChooseCandidateKey), emacsKey:\(emacsKey), useVerticalMode:\(useVerticalMode)>"
+        return "<\(super.description) inputText:\(String(describing: inputText)), inputTextIgnoringModifiers:\(String(describing: inputTextIgnoringModifiers)) charCode:\(charCode), keyCode:\(keyCode), flags:\(flags), cursorForwardKey:\(cursorForwardKey), cursorBackwardKey:\(cursorBackwardKey), extraChooseCandidateKey:\(extraChooseCandidateKey), absorbedArrowKey:\(absorbedArrowKey),  verticalModeOnlyChooseCandidateKey:\(verticalModeOnlyChooseCandidateKey), emacsKey:\(emacsKey), useVerticalMode:\(useVerticalMode)>"
     }
 
     @objc var isShiftHold: Bool {
@@ -88,9 +84,9 @@ class KeyHandlerInput: NSObject {
         flags.contains([.control])
     }
 
-	@objc var isControlHotKey: Bool {
-		flags.contains([.control]) && inputText?.first?.isLetter ?? false
-	}
+    @objc var isControlHotKey: Bool {
+        flags.contains([.control]) && inputText?.first?.isLetter ?? false
+    }
 
     @objc var isOptionHold: Bool {
         flags.contains([.option])
