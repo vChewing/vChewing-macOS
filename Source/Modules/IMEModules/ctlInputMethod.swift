@@ -1,7 +1,6 @@
 
 import Cocoa
 import InputMethodKit
-import VXHanConvert
 
 extension Bool {
     var state: NSControl.StateValue {
