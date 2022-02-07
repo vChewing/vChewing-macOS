@@ -31,16 +31,16 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)checkIfUserLanguageModelFilesExist;
 
 + (BOOL)checkIfUserPhraseExist:(NSString *)userPhrase key:(NSString *)key NS_SWIFT_NAME(checkIfExist(userPhrase:key:));
-+ (BOOL)writeUserPhrase:(NSString *)userPhrase;
++ (BOOL)writeUserPhrase:(NSString *)userPhrase inputMode:(InputMode)mode;
++ (void)setPhraseReplacementEnabled:(BOOL)phraseReplacementEnabled;
++ (BOOL)cnsEnabled:(InputMode)mode;
++ (void)setCNSEnabled:(BOOL)cnsEnabled inputMode:(InputMode)mode;
++ (NSString *)userPhrasesDataPath:(InputMode)mode;
++ (NSString *)excludedPhrasesDataPath:(InputMode)mode;
++ (NSString *)phraseReplacementDataPath:(InputMode)mode;
 
 @property (class, readonly, nonatomic) NSString *dataFolderPath;
-@property (class, readonly, nonatomic) NSString *userPhrasesDataPathCHT;
-@property (class, readonly, nonatomic) NSString *userPhrasesDataPathCHS;
-@property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathCHT;
-@property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathCHS;
-@property (class, readonly, nonatomic) NSString *phraseReplacementDataPathCHT;
-@property (class, readonly, nonatomic) NSString *phraseReplacementDataPathCHS;
-@property (class, assign, nonatomic) BOOL phraseReplacementEnabled;
+@property (class, readonly, nonatomic) NSString *cnsDataPath;
 
 @end
 
