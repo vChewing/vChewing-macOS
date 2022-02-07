@@ -224,8 +224,7 @@ class ctlInputMethod: IMKInputController {
     }
 
     @objc func togglePhraseReplacement(_ sender: Any?) {
-        let enabled = Preferences.togglePhraseReplacementEnabled()
-        mgrLangModel.phraseReplacementEnabled = enabled
+        mgrLangModel.setPhraseReplacementEnabled(Preferences.togglePhraseReplacementEnabled())
     }
 
     @objc func selfTerminate(_ sender: Any?) {
@@ -253,15 +252,15 @@ class ctlInputMethod: IMKInputController {
     }
 
     @objc func openUserPhrases(_ sender: Any?) {
-        open(userFileAt: mgrLangModel.userPhrasesDataPathCHT)
+        open(userFileAt: mgrLangModel.userPhrasesDataPath(keyHandler.inputMode))
     }
 
     @objc func openExcludedPhrases(_ sender: Any?) {
-        open(userFileAt: mgrLangModel.excludedPhrasesDataPathCHT)
+        open(userFileAt: mgrLangModel.excludedPhrasesDataPath(keyHandler.inputMode))
     }
 
     @objc func openPhraseReplacement(_ sender: Any?) {
-        open(userFileAt: mgrLangModel.phraseReplacementDataPathCHT)
+        open(userFileAt: mgrLangModel.phraseReplacementDataPath(keyHandler.inputMode))
     }
 
     @objc func reloadUserPhrases(_ sender: Any?) {
@@ -554,7 +553,7 @@ extension ctlInputMethod: KeyHandlerDelegate {
         if !state.validToWrite {
             return false
         }
-        mgrLangModel.writeUserPhrase(state.userPhrase)
+        mgrLangModel.writeUserPhrase(state.userPhrase, inputMode: keyHandler.inputMode)
         return true
     }
 }

@@ -97,21 +97,26 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 {
     NSString *newInputMode;
     vChewingLM *newLanguageModel;
+    UserOverrideModel *newUserOverrideModel;
 
     if ([value isKindOfClass:[NSString class]] && [value isEqual:imeModeCHS]) {
         newInputMode = imeModeCHS;
         newLanguageModel = [mgrLangModel lmCHS];
-        newLanguageModel->setPhraseReplacementEnabled(false);
+        newUserOverrideModel = [mgrLangModel userOverrideModelCHS];
     } else {
         newInputMode = imeModeCHT;
         newLanguageModel = [mgrLangModel lmCHT];
-        newLanguageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
+        newUserOverrideModel = [mgrLangModel userOverrideModelCHT];
     }
+
+    // Symchronize the Preference Setting "setPhraseReplacementEnabled" to the new LM.
+    newLanguageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
 
     // Only apply the changes if the value is changed
     if (![_inputMode isEqualToString:newInputMode]) {
         _inputMode = newInputMode;
         _languageModel = newLanguageModel;
+        _userOverrideModel = newUserOverrideModel;
 
         if (_builder) {
             delete _builder;
@@ -146,7 +151,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         // create the lattice builder
         _languageModel = [mgrLangModel lmCHT];
         _languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
-        _userOverrideModel = [mgrLangModel userOverrideModel];
+        _userOverrideModel = [mgrLangModel userOverrideModelCHT];
 
         _builder = new BlockReadingBuilder(_languageModel);
 
@@ -190,7 +195,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     size_t cursorIndex = [self _actualCandidateCursorIndex];
     string stringValue = [value UTF8String];
     _builder->grid().fixNodeSelectedCandidate(cursorIndex, stringValue);
-    if (_inputMode != imeModeCHS) {
+    if (!Preferences.useSCPCTypingMode) { // 不要針對逐字選字模式啟用臨時半衰記憶模型。
         _userOverrideModel->observe(_walkedNodes, cursorIndex, stringValue, [[NSDate date] timeIntervalSince1970]);
     }
     [self _walk];
