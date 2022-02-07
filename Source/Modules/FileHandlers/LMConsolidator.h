@@ -1,9 +1,5 @@
-/* 
- *  LMConsolidator.h
- *  vChewing-Specific module for Consolidating Language Model Data files.
- *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
- */
+// Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// See LICENSE.TXT for details.
 
 #ifndef LMConsolidator_hpp
 #define LMConsolidator_hpp
