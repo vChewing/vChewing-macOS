@@ -9,7 +9,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="AboutWindow">
             <connections>
                 <outlet property="appCopyrightLabel" destination="8Ju-DR-2C8" id="Odh-c7-nyT"/>
-                <outlet property="appEULAContent" destination="g8d-ZO-VdQ" id="mLE-Az-YkE"/>
+                <outlet property="appEULAContent" destination="cEu-uC-XnV" id="yoU-Ua-cHn"/>
                 <outlet property="appVersionLabel" destination="9Pk-k3-0cO" id="y37-SM-qyG"/>
                 <outlet property="window" destination="ttlAboutWindow" id="gIp-Ho-8D9"/>
             </connections>
@@ -26,41 +26,6 @@
                 <rect key="frame" x="0.0" y="0.0" width="533" height="457"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" findBarPosition="belowContent" translatesAutoresizingMaskIntoConstraints="NO" id="pHH-M3-zKo">
-                        <rect key="frame" x="91" y="143" width="427" height="183"/>
-                        <clipView key="contentView" drawsBackground="NO" id="kdo-3u-t4d" userLabel="appEULAContentClip">
-                            <rect key="frame" x="1" y="1" width="425" height="181"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                            <subviews>
-                                <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="bar" smartInsertDelete="YES" id="g8d-ZO-VdQ" userLabel="appEULAContent">
-                                    <rect key="frame" x="0.0" y="-2" width="425" height="181"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
-                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="minSize" width="425" height="181"/>
-                                    <size key="maxSize" width="427" height="183"/>
-                                    <attributedString key="textStorage">
-                                        <fragment content="Placeholder for EULA Texts.">
-                                            <attributes>
-                                                <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                <font key="NSFont" metaFont="systemLight" size="11"/>
-                                                <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                                            </attributes>
-                                        </fragment>
-                                    </attributedString>
-                                    <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                </textView>
-                            </subviews>
-                        </clipView>
-                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="sfo-oN-iBH">
-                            <rect key="frame" x="-100" y="-100" width="240" height="16"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                        </scroller>
-                        <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" controlSize="mini" horizontal="NO" id="X6W-MB-JfO">
-                            <rect key="frame" x="412" y="1" width="14" height="181"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                        </scroller>
-                    </scrollView>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6Dx-DY-UG1">
                         <rect key="frame" x="89" y="442" width="123" height="15"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="vChewing for macOS" id="lblAppTitle" userLabel="appNameLabel">
@@ -104,7 +69,7 @@ vChewing Phrase Database Maintained by Shiki Suen.</string>
                     </box>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eYM-F7-drf">
                         <rect key="frame" x="89" y="334" width="431" height="15"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" title="3-Clause BSD License:" id="lblLicense">
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="MIT-NTL License:" id="lblLicense">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -156,12 +121,47 @@ DQ
                             <action selector="performClose:" target="-1" id="0yK-v8-KQd"/>
                         </connections>
                     </button>
+                    <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JkD-J1-Yeu">
+                        <rect key="frame" x="91" y="143" width="427" height="183"/>
+                        <clipView key="contentView" drawsBackground="NO" id="35U-hd-B9v">
+                            <rect key="frame" x="1" y="1" width="425" height="181"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" smartInsertDelete="YES" id="cEu-uC-XnV" userLabel="appEULAContent">
+                                    <rect key="frame" x="0.0" y="0.0" width="425" height="181"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <size key="minSize" width="425" height="181"/>
+                                    <size key="maxSize" width="436" height="10000000"/>
+                                    <attributedString key="textStorage">
+                                        <fragment content="Placeholder for EULA Texts.">
+                                            <attributes>
+                                                <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <font key="NSFont" metaFont="smallSystem"/>
+                                                <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
+                                            </attributes>
+                                        </fragment>
+                                    </attributedString>
+                                    <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                </textView>
+                            </subviews>
+                        </clipView>
+                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="Ish-Zy-cQw">
+                            <rect key="frame" x="-100" y="-100" width="240" height="16"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="qxC-Vo-FVi">
+                            <rect key="frame" x="410" y="1" width="16" height="181"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="9Pk-k3-0cO" secondAttribute="trailing" constant="20" symbolic="YES" id="0LE-Ck-Jy5"/>
                     <constraint firstItem="2Gh-nq-Mng" firstAttribute="centerX" secondItem="se5-gp-TjO" secondAttribute="centerX" id="1cy-gM-7lt"/>
+                    <constraint firstItem="JkD-J1-Yeu" firstAttribute="trailing" secondItem="2Gh-nq-Mng" secondAttribute="trailing" id="24O-Jp-K8a"/>
                     <constraint firstItem="6Dx-DY-UG1" firstAttribute="leading" secondItem="bAv-ZO-Ihw" secondAttribute="trailing" constant="13" id="43n-1d-TD2"/>
-                    <constraint firstItem="eYM-F7-drf" firstAttribute="trailing" secondItem="pHH-M3-zKo" secondAttribute="trailing" id="5Uw-U0-lVp"/>
                     <constraint firstItem="8Ju-DR-2C8" firstAttribute="top" secondItem="Srh-ua-uQD" secondAttribute="bottom" constant="1" id="5eL-dp-7Z8"/>
                     <constraint firstItem="8M8-3C-BZO" firstAttribute="top" secondItem="8Ju-DR-2C8" secondAttribute="bottom" constant="8" symbolic="YES" id="82T-Pc-3db"/>
                     <constraint firstItem="2Gh-nq-Mng" firstAttribute="top" secondItem="bAv-ZO-Ihw" secondAttribute="bottom" constant="7" id="8EG-DW-AZM"/>
@@ -170,8 +170,6 @@ DQ
                     <constraint firstItem="2Gh-nq-Mng" firstAttribute="leading" secondItem="d81-Fe-uNT" secondAttribute="leading" id="CBk-Lx-b1d"/>
                     <constraint firstItem="bSu-np-tPT" firstAttribute="leading" secondItem="d81-Fe-uNT" secondAttribute="trailing" constant="18" id="E2b-7Z-Yjw"/>
                     <constraint firstItem="bAv-ZO-Ihw" firstAttribute="leading" secondItem="2Gh-nq-Mng" secondAttribute="leading" id="EQ1-cm-RX8"/>
-                    <constraint firstItem="eYM-F7-drf" firstAttribute="leading" secondItem="pHH-M3-zKo" secondAttribute="leading" id="Fcb-XF-cee"/>
-                    <constraint firstItem="2Gh-nq-Mng" firstAttribute="top" secondItem="pHH-M3-zKo" secondAttribute="bottom" constant="8" symbolic="YES" id="GZ9-5T-UZI"/>
                     <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="bSu-np-tPT" secondAttribute="bottom" constant="81" id="Inw-Qt-fHt"/>
                     <constraint firstAttribute="bottom" secondItem="d81-Fe-uNT" secondAttribute="bottom" constant="21" id="Km1-n7-j8F"/>
                     <constraint firstItem="8M8-3C-BZO" firstAttribute="trailing" secondItem="eYM-F7-drf" secondAttribute="trailing" id="O8T-AT-i11"/>
@@ -184,20 +182,22 @@ DQ
                     <constraint firstItem="8Ju-DR-2C8" firstAttribute="leading" secondItem="8M8-3C-BZO" secondAttribute="leading" id="UrF-M2-wpG"/>
                     <constraint firstItem="eYM-F7-drf" firstAttribute="top" secondItem="8M8-3C-BZO" secondAttribute="bottom" constant="8" symbolic="YES" id="WIZ-YQ-chM"/>
                     <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="2Gh-nq-Mng" secondAttribute="bottom" constant="134" id="WJK-gw-zR7"/>
-                    <constraint firstItem="pHH-M3-zKo" firstAttribute="top" secondItem="eYM-F7-drf" secondAttribute="bottom" constant="8" symbolic="YES" id="XVp-6y-CaO"/>
                     <constraint firstItem="9Pk-k3-0cO" firstAttribute="leading" secondItem="6Dx-DY-UG1" secondAttribute="trailing" constant="3" id="c3v-ZJ-usi"/>
-                    <constraint firstItem="pHH-M3-zKo" firstAttribute="trailing" secondItem="2Gh-nq-Mng" secondAttribute="trailing" id="ddO-4o-gsZ"/>
+                    <constraint firstItem="JkD-J1-Yeu" firstAttribute="top" secondItem="eYM-F7-drf" secondAttribute="bottom" constant="8" symbolic="YES" id="eqh-Gi-fS2"/>
                     <constraint firstItem="bAv-ZO-Ihw" firstAttribute="top" secondItem="6Dx-DY-UG1" secondAttribute="top" id="hJv-Sh-M4t"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="8Ju-DR-2C8" secondAttribute="trailing" constant="20" symbolic="YES" id="hm1-o7-gLp"/>
                     <constraint firstItem="2Gh-nq-Mng" firstAttribute="trailing" secondItem="bSu-np-tPT" secondAttribute="trailing" id="ixJ-xP-aIU"/>
+                    <constraint firstItem="2Gh-nq-Mng" firstAttribute="top" secondItem="JkD-J1-Yeu" secondAttribute="bottom" constant="8" symbolic="YES" id="pvU-C2-BNa"/>
                     <constraint firstItem="8M8-3C-BZO" firstAttribute="leading" secondItem="eYM-F7-drf" secondAttribute="leading" id="rLt-ck-nSt"/>
+                    <constraint firstAttribute="trailing" secondItem="8M8-3C-BZO" secondAttribute="trailing" constant="15" id="rx3-ed-9sg"/>
+                    <constraint firstItem="JkD-J1-Yeu" firstAttribute="leading" secondItem="eYM-F7-drf" secondAttribute="leading" id="t9D-Vu-dOC"/>
                     <constraint firstItem="bAv-ZO-Ihw" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" id="u49-Fr-HYh"/>
                 </constraints>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
             </connections>
-            <point key="canvasLocation" x="111" y="111"/>
+            <point key="canvasLocation" x="110.5" y="110.5"/>
         </window>
         <userDefaultsController representsSharedInstance="YES" id="CaN-wP-mkf"/>
     </objects>

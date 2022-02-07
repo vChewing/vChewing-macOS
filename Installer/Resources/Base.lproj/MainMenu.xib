@@ -164,7 +164,7 @@ vChewing macOS Development Reinforced by Hiraku Wang. vChewing Phrase Database
                     </box>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="k5O-zZ-gQY">
                         <rect key="frame" x="89" y="334" width="431" height="15"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" title="3-Clause BSD License:" id="AVS-ih-FXM">
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="MIT-NTL License:" id="AVS-ih-FXM">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
