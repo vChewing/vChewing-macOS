@@ -170,6 +170,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         mgrLangModel.setupDataModelValueConverter()
+        mgrLangModel.loadDataModels() // 這句還是不要砍了。
         mgrLangModel.loadUserPhrases()
         mgrLangModel.loadUserPhraseReplacement()
         fsStreamHelper.delegate = self
