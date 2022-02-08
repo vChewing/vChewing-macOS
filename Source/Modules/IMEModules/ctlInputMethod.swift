@@ -245,7 +245,7 @@ class ctlInputMethod: IMKInputController {
         if !checkIfUserFilesExist() {
             return
         }
-        NSWorkspace.shared.openFile(path, withApplication: "TextEdit")
+        NSWorkspace.shared.openFile(path, withApplication: "vChewingPhraseEditor")
     }
 
     @objc func openUserPhrases(_ sender: Any?) {
