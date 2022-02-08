@@ -9,6 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 typedef NSString *const InputMode NS_TYPED_ENUM;
 extern InputMode imeModeCHT;
 extern InputMode imeModeCHS;
+extern InputMode imeModeNULL;
 
 @class KeyHandler;
 
