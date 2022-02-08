@@ -16,6 +16,7 @@ using namespace vChewing;
 
 InputMode imeModeCHT = @"org.atelierInmu.inputmethod.vChewing.IMECHT";
 InputMode imeModeCHS = @"org.atelierInmu.inputmethod.vChewing.IMECHS";
+InputMode imeModeNULL = @"org.atelierInmu.inputmethod.vChewing.IMENULL";
 
 static const double kEpsilon = 0.000001;
 

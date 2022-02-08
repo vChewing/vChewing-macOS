@@ -101,7 +101,15 @@ class ctlInputMethod: IMKInputController {
     }
 
     override func setValue(_ value: Any!, forTag tag: Int, client: Any!) {
-        let newInputMode = InputMode(rawValue: value as? String ?? InputMode.imeModeCHT.rawValue)
+        var newInputMode = InputMode(rawValue: value as? String ?? InputMode.imeModeNULL.rawValue)
+        switch newInputMode {
+        case InputMode.imeModeCHS:
+            newInputMode = InputMode.imeModeCHS
+        case InputMode.imeModeCHT:
+            newInputMode = InputMode.imeModeCHT
+        default:
+            newInputMode = InputMode.imeModeNULL
+        }
         mgrLangModel.loadDataModel(newInputMode)
         if keyHandler.inputMode != newInputMode {
             UserDefaults.standard.synchronize()
