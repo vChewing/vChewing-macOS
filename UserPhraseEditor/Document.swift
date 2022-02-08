@@ -68,12 +68,18 @@ class Document: NSDocument {
     
     /// - Tag: readExample
     override func read(from data: Data, ofType typeName: String) throws {
-        content.read(from: data)
+        var strToDealWith = String(decoding: data, as: UTF8.self)
+        strToDealWith.formatConsolidate()
+        let processedIncomingData = Data(strToDealWith.utf8)
+        content.read(from: processedIncomingData)
     }
     
     /// - Tag: writeExample
     override func data(ofType typeName: String) throws -> Data {
-        return content.data()!
+        var strToDealWith = content.contentString
+        strToDealWith.formatConsolidate()
+        let outputData = Data(strToDealWith.utf8)
+        return outputData
     }
     
     // MARK: - Printing
