@@ -31,6 +31,7 @@ vChewingLM::~vChewingLM()
 {
     m_languageModel.close();
     m_userPhrases.close();
+    m_cnsModel.close();
     m_excludedPhrases.close();
     m_phraseReplacement.close();
     m_associatedPhrases.close();
@@ -60,6 +61,19 @@ void vChewingLM::loadAssociatedPhrases(const char* associatedPhrasesPath)
 bool vChewingLM::isAssociatedPhrasesLoaded()
 {
     return m_associatedPhrases.isLoaded();
+}
+
+void vChewingLM::loadCNSData(const char* cnsDataPath)
+{
+    if (cnsDataPath) {
+        m_cnsModel.close();
+        m_cnsModel.open(cnsDataPath);
+    }
+}
+
+bool vChewingLM::isCNSDataLoaded()
+{
+    return m_cnsModel.isLoaded();
 }
 
 void vChewingLM::loadUserPhrases(const char* userPhrasesDataPath,
@@ -102,6 +116,7 @@ const vector<Unigram> vChewingLM::unigramsForKey(const string& key)
 
     vector<Unigram> allUnigrams;
     vector<Unigram> userUnigrams;
+    vector<Unigram> cnsUnigrams;
 
     unordered_set<string> excludedValues;
     unordered_set<string> insertedValues;
@@ -123,7 +138,13 @@ const vector<Unigram> vChewingLM::unigramsForKey(const string& key)
         allUnigrams = filterAndTransformUnigrams(rawGlobalUnigrams, excludedValues, insertedValues);
     }
 
+    if (m_cnsModel.hasUnigramsForKey(key) && m_cnsEnabled) {
+        vector<Unigram> rawCNSUnigrams = m_cnsModel.unigramsForKey(key);
+        cnsUnigrams = filterAndTransformUnigrams(rawCNSUnigrams, excludedValues, insertedValues);
+    }
+
     allUnigrams.insert(allUnigrams.begin(), userUnigrams.begin(), userUnigrams.end());
+    allUnigrams.insert(allUnigrams.end(), cnsUnigrams.begin(), cnsUnigrams.end());
     return allUnigrams;
 }
 
@@ -148,6 +169,15 @@ void vChewingLM::setPhraseReplacementEnabled(bool enabled)
 bool vChewingLM::phraseReplacementEnabled()
 {
     return m_phraseReplacementEnabled;
+}
+
+void vChewingLM::setCNSEnabled(bool enabled)
+{
+    m_cnsEnabled = enabled;
+}
+bool vChewingLM::cnsEnabled()
+{
+    return m_cnsEnabled;
 }
 
 void vChewingLM::setExternalConverterEnabled(bool enabled)
