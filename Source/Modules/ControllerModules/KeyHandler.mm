@@ -151,6 +151,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         // create the lattice builder
         _languageModel = [mgrLangModel lmCHT];
         _languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
+        _languageModel->setCNSEnabled(Preferences.cns11643Enabled);
         _userOverrideModel = [mgrLangModel userOverrideModelCHT];
 
         _builder = new BlockReadingBuilder(_languageModel);
