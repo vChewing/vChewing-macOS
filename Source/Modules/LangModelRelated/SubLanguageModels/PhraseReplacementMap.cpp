@@ -24,6 +24,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <fcntl.h>
 #include <fstream>
 #include <unistd.h>
+#include <syslog.h>
 
 #include "KeyValueBlobReader.h"
 
@@ -76,6 +77,12 @@ bool PhraseReplacementMap::open(const char *path)
     KeyValueBlobReader::State state;
     while ((state = reader.Next(&keyValue)) == KeyValueBlobReader::State::HAS_PAIR) {
         keyValueMap[keyValue.key] = keyValue.value;
+    }
+    // 下面這一段或許可以做成開關、來詢問是否對使用者語彙採取寬鬆策略（哪怕有行內容寫錯也會放行）
+    if (state == KeyValueBlobReader::State::ERROR) {
+        // close();
+        syslog(LOG_CONS, "PhraseReplacementMap: Failed at Open Step 5. On Error Resume Next.\n");
+        // return false;
     }
     return true;
 }

@@ -24,6 +24,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <fcntl.h>
 #include <fstream>
 #include <unistd.h>
+#include <syslog.h>
 
 #include "KeyValueBlobReader.h"
 
@@ -83,6 +84,12 @@ bool UserPhrasesLM::open(const char *path)
     while ((state = reader.Next(&keyValue)) == KeyValueBlobReader::State::HAS_PAIR) {
         // We invert the key and value, since in user phrases, "key" is the phrase value, and "value" is the BPMF reading.
         keyRowMap[keyValue.value].emplace_back(keyValue.value, keyValue.key);
+    }
+    // 下面這一段或許可以做成開關、來詢問是否對使用者語彙採取寬鬆策略（哪怕有行內容寫錯也會放行）
+    if (state == KeyValueBlobReader::State::ERROR) {
+        // close();
+        syslog(LOG_CONS, "UserPhrasesLM: Failed at Open Step 5. On Error Resume Next.\n");
+        // return false;
     }
     return true;
 }
