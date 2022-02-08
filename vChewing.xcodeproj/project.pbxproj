@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0AF8B427B2C8290096FE54 /* StringExtension.swift */; };
 		5B2DB16F27AF6891006D874E /* data-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16D27AF6891006D874E /* data-chs.txt */; };
 		5B2DB17027AF6891006D874E /* data-cht.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16E27AF6891006D874E /* data-cht.txt */; };
 		5B62A31727AE73A700A19448 /* unzip.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A30927AE73A700A19448 /* unzip.m */; };
@@ -112,6 +113,7 @@
 		5B05A47B27AFF7CA00437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5B05A47C27AFF7CF00437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5B05A47F27AFF84200437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmAboutWindow.strings; sourceTree = "<group>"; };
+		5B0AF8B427B2C8290096FE54 /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		5B0CF37F27AD476E00784B08 /* SwiftyOpenCC */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SwiftyOpenCC; path = Packages/SwiftyOpenCC; sourceTree = "<group>"; };
 		5B2DB16D27AF6891006D874E /* data-chs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-chs.txt"; path = "Data/data-chs.txt"; sourceTree = "<group>"; };
 		5B2DB16E27AF6891006D874E /* data-cht.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-cht.txt"; path = "Data/data-cht.txt"; sourceTree = "<group>"; };
@@ -532,6 +534,7 @@
 				5BD05C6227B2BBEF004C4F1D /* AppDelegate.swift */,
 				5BD05C6327B2BBEF004C4F1D /* Content.swift */,
 				5BD05C6127B2BBEF004C4F1D /* Document.swift */,
+				5B0AF8B427B2C8290096FE54 /* StringExtension.swift */,
 				5BD05C6527B2BBEF004C4F1D /* ViewController.swift */,
 				5BD05C6427B2BBEF004C4F1D /* WindowController.swift */,
 				5B73FB5427B2BD6900E9BF49 /* PhraseEditor-Info.plist */,
@@ -859,6 +862,7 @@
 			files = (
 				5BD05C6A27B2BBEF004C4F1D /* ViewController.swift in Sources */,
 				5BD05C6727B2BBEF004C4F1D /* AppDelegate.swift in Sources */,
+				5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */,
 				5BD05C6927B2BBEF004C4F1D /* WindowController.swift in Sources */,
 				5BD05C6627B2BBEF004C4F1D /* Document.swift in Sources */,
 				5BD05C6827B2BBEF004C4F1D /* Content.swift in Sources */,
