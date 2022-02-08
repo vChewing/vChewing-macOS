@@ -40,6 +40,7 @@
 		5BBBB77527AED70B0023B93A /* MenuIcon-SCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77127AED70B0023B93A /* MenuIcon-SCVIM.png */; };
 		5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77227AED70B0023B93A /* MenuIcon-TCVIM.png */; };
 		5BBBB77A27AEDC690023B93A /* clsSFX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBBB77927AEDC690023B93A /* clsSFX.swift */; };
+		5BD05B8127B22F3C004C4F1D /* char-kanji-cns.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BD05B8027B22F3C004C4F1D /* char-kanji-cns.txt */; };
 		6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F2015FC0EB100ABF4B3 /* Mandarin.cpp */; };
 		6A187E2616004C5900466B2E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A187E2816004C5900466B2E /* MainMenu.xib */; };
 		6A225A1F23679F2600F685C6 /* NotarizedArchives in Resources */ = {isa = PBXBuildFile; fileRef = 6A225A1E23679F2600F685C6 /* NotarizedArchives */; };
@@ -140,6 +141,7 @@
 		5BBBB77227AED70B0023B93A /* MenuIcon-TCVIM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-TCVIM.png"; sourceTree = "<group>"; };
 		5BBBB77727AEDB290023B93A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		5BBBB77927AEDC690023B93A /* clsSFX.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = clsSFX.swift; sourceTree = "<group>"; };
+		5BD05B8027B22F3C004C4F1D /* char-kanji-cns.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "char-kanji-cns.txt"; path = "Data/components/common/char-kanji-cns.txt"; sourceTree = "<group>"; };
 		6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A0D4EF515FC0DA600ABF4B3 /* IME-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IME-Info.plist"; sourceTree = "<group>"; };
 		6A0D4EF615FC0DA600ABF4B3 /* vChewing-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vChewing-Prefix.pch"; sourceTree = "<group>"; };
@@ -445,9 +447,10 @@
 		5B62A35027AE7F6600A19448 /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				5B2DB17127AF8771006D874E /* Makefile */,
+				5BD05B8027B22F3C004C4F1D /* char-kanji-cns.txt */,
 				5B2DB16D27AF6891006D874E /* data-chs.txt */,
 				5B2DB16E27AF6891006D874E /* data-cht.txt */,
+				5B2DB17127AF8771006D874E /* Makefile */,
 			);
 			name = Data;
 			sourceTree = "<group>";
@@ -705,6 +708,7 @@
 				5BBBB76D27AED5DB0023B93A /* frmAboutWindow.xib in Resources */,
 				5BBBB77527AED70B0023B93A /* MenuIcon-SCVIM.png in Resources */,
 				5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */,
+				5BD05B8127B22F3C004C4F1D /* char-kanji-cns.txt in Resources */,
 				5B2DB17027AF6891006D874E /* data-cht.txt in Resources */,
 				5BBBB77327AED70B0023B93A /* MenuIcon-TCVIM@2x.png in Resources */,
 				5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.png in Resources */,

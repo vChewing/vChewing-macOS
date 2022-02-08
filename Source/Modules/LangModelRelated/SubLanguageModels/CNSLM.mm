@@ -44,6 +44,14 @@ CNSLM::~CNSLM()
     }
 }
 
+bool CNSLM::isLoaded()
+{
+    if (data) {
+        return true;
+    }
+    return false;
+}
+
 bool CNSLM::open(const char *path)
 {
     if (data) {

@@ -212,10 +212,7 @@ class ctlInputMethod: IMKInputController {
     }
 
     @objc func toggleCNS11643Enabled(_ sender: Any?) {
-        // let enabled = Preferences.toggleCNS11643Enabled()
-        // mgrLangModel.cnsEnabledCHS = enabled
-        // mgrLangModel.cnsEnabledCHT = enabled
-        _ = Preferences.toggleCNS11643Enabled()
+        mgrLangModel.setCNSEnabled(Preferences.toggleCNS11643Enabled())
         NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("CNS11643 Mode", comment: ""), "\n", Preferences.cns11643Enabled ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 

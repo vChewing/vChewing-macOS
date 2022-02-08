@@ -23,6 +23,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <stdio.h>
 #include "UserPhrasesLM.h"
 #include "ParselessLM.h"
+#include "CNSLM.h"
 #include "PhraseReplacementMap.h"
 #include "AssociatedPhrases.h"
 #include <unordered_set>
@@ -64,6 +65,12 @@ public:
     /// If the data model is already loaded.
     bool isDataModelLoaded();
 
+    /// Asks to load the primary language model at the given path.
+    /// @param cnsDataPath The path of the CNS data model.
+    void loadCNSData(const char* cnsDataPath);
+    /// If the data model is already loaded.
+    bool isCNSDataLoaded();
+
     /// Asks to load the associated phrases at the given path.
     /// @param associatedPhrasesPath The path of the associated phrases.
     void loadAssociatedPhrases(const char* associatedPhrasesPath);
@@ -93,6 +100,11 @@ public:
     /// If phrase replacement is enabled or not.
     bool phraseReplacementEnabled();
 
+    /// Enables or disables CNS11643 input.
+    void setCNSEnabled(bool enabled);
+    /// If CNS11643 input is enabled or not.
+    bool cnsEnabled();
+
     /// Enables or disables the external converter.
     void setExternalConverterEnabled(bool enabled);
     /// If the external converted is enabled or not.
@@ -117,11 +129,13 @@ protected:
         std::unordered_set<string>& insertedValues);
 
     ParselessLM m_languageModel;
+    CNSLM m_cnsModel;
     UserPhrasesLM m_userPhrases;
     UserPhrasesLM m_excludedPhrases;
     PhraseReplacementMap m_phraseReplacement;
     AssociatedPhrases m_associatedPhrases;
     bool m_phraseReplacementEnabled;
+    bool m_cnsEnabled;
     bool m_externalConverterEnabled;
     std::function<string(string)> m_externalConverter;
 };

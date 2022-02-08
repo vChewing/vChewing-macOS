@@ -58,8 +58,17 @@ static void LTLoadAssociatedPhrases(vChewingLM &lm)
     if (!gLangModelCHT.isDataModelLoaded()) {
         LTLoadLanguageModelFile(@"data-cht", gLangModelCHT);
     }
+    if (!gLangModelCHT.isCNSDataLoaded()){
+        gLangModelCHT.loadCNSData([[self cnsDataPath] UTF8String]);
+    }
+    if (!gLangModelCHT.isAssociatedPhrasesLoaded()) {
+        LTLoadAssociatedPhrases(gLangModelCHT);
+    }
     if (!gLangModelCHS.isDataModelLoaded()) {
         LTLoadLanguageModelFile(@"data-chs", gLangModelCHS);
+    }
+    if (!gLangModelCHS.isCNSDataLoaded()){
+        gLangModelCHS.loadCNSData([[self cnsDataPath] UTF8String]);
     }
     if (!gLangModelCHS.isAssociatedPhrasesLoaded()) {
         LTLoadAssociatedPhrases(gLangModelCHS);
@@ -72,6 +81,9 @@ static void LTLoadAssociatedPhrases(vChewingLM &lm)
         if (!gLangModelCHT.isDataModelLoaded()) {
             LTLoadLanguageModelFile(@"data-cht", gLangModelCHT);
         }
+        if (!gLangModelCHT.isCNSDataLoaded()){
+            gLangModelCHT.loadCNSData([[self cnsDataPath] UTF8String]);
+        }
         if (!gLangModelCHT.isAssociatedPhrasesLoaded()) {
             LTLoadAssociatedPhrases(gLangModelCHT);
         }
@@ -80,6 +92,9 @@ static void LTLoadAssociatedPhrases(vChewingLM &lm)
     if ([mode isEqualToString:imeModeCHS]) {
         if (!gLangModelCHS.isDataModelLoaded()) {
             LTLoadLanguageModelFile(@"data-chs", gLangModelCHS);
+        }
+        if (!gLangModelCHS.isCNSDataLoaded()){
+            gLangModelCHS.loadCNSData([[self cnsDataPath] UTF8String]);
         }
         if (!gLangModelCHS.isAssociatedPhrasesLoaded()) {
             LTLoadAssociatedPhrases(gLangModelCHS);
@@ -285,6 +300,12 @@ static void LTLoadAssociatedPhrases(vChewingLM &lm)
     return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
 }
 
++ (NSString *)cnsDataPath
+{
+    Class cls = NSClassFromString(@"ctlInputMethod");
+    return [[NSBundle bundleForClass:cls] pathForResource:@"char-kanji-cns" ofType:@"txt"];
+}
+
  + (vChewingLM *)lmCHT
 {
     return &gLangModelCHT;
@@ -309,6 +330,12 @@ static void LTLoadAssociatedPhrases(vChewingLM &lm)
 {
     gLangModelCHT.setPhraseReplacementEnabled(phraseReplacementEnabled);
     gLangModelCHS.setPhraseReplacementEnabled(phraseReplacementEnabled);
+}
+
++ (void)setCNSEnabled:(BOOL)cnsEnabled
+{
+    gLangModelCHT.setCNSEnabled(cnsEnabled);
+    gLangModelCHS.setCNSEnabled(cnsEnabled);
 }
 
 @end

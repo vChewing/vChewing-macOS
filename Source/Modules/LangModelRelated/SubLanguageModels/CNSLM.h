@@ -33,6 +33,7 @@ public:
     CNSLM();
     ~CNSLM();
     
+    bool isLoaded();
     bool open(const char *path);
     void close();
     void dump();
