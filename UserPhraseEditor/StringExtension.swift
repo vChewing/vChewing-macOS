@@ -484,7 +484,11 @@ extension String {
             }
         }
         
-        // Step 3: Deduplication.
+        // Step 3: Add Formatted Pragma
+        let hdrFormatted = "# 𝙵𝙾𝚁𝙼𝙰𝚃 𝚘𝚛𝚐.𝚊𝚝𝚎𝚕𝚒𝚎𝚛𝙸𝚗𝚖𝚞.𝚟𝚌𝚑𝚎𝚠𝚒𝚗𝚐.𝚞𝚜𝚎𝚛𝙻𝚊𝚗𝚐𝚞𝚊𝚐𝚎𝙼𝚘𝚍𝚎𝚕𝙳𝚊𝚝𝚊.𝚏𝚘𝚛𝚖𝚊𝚝𝚝𝚎𝚍\n" // Sorted Header
+        strProcessed = hdrFormatted + strProcessed // Add Sorted Header
+        
+        // Step 4: Deduplication.
         arrData = strProcessed.components(separatedBy: "\n")
         strProcessed = "" // Reset its value
         let arrDataDeduplicated = Array(NSOrderedSet(array: arrData).array as! [String])
@@ -493,8 +497,10 @@ extension String {
             strProcessed += "\n"
         }
         
-        // Step 4: Remove duplicated newlines at the end of the file.
+        // Step 5: Remove duplicated newlines at the end of the file.
         strProcessed.regReplace(pattern: "\\n\\n", replaceWith: "\n")
+
+        // Step 6: Commit Formatted Contents.
         self = strProcessed
     }
 }
