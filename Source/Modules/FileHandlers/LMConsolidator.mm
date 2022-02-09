@@ -102,6 +102,9 @@ bool LMConsolidator::ConsolidateContent(const char *path, bool shouldsort) {
     vecEntry.erase(unique(vecEntry.begin(), vecEntry.end()), vecEntry.end()); // 去重複。
     // 統整完畢。開始將統整過的內容寫入檔案。
     ofstream zfdContentConsolidatorOutput(path); // 這裡是要從頭開始重寫檔案內容，所以不需要「 ios_base::app 」。
+    if (!LMConsolidator::CheckPragma(path)){
+        zfdContentConsolidatorOutput<<FORMATTED_PRAGMA_HEADER<<endl; // 寫入經過整理處理的 HEADER。
+    }
     for(int i=0;i<vecEntry.size();i++) { // 第二遍 for 用來寫入統整過的內容。
         if (vecEntry[i].size() != 0) { // 這句很重要，不然還是會把經過 RegEx 處理後出現的空行搞到檔案裡。
             zfdContentConsolidatorOutput<<vecEntry[i]<<endl; // 這裡是必須得加上 endl 的，不然所有行都變成一個整合行。
