@@ -17,33 +17,35 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "AssociatedPhrases.h"
-
+#include "UserPhrasesLM.h"
+#include "vChewing-Swift.h"
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <fstream>
 #include <unistd.h>
+#include <syslog.h>
 
 #include "KeyValueBlobReader.h"
+#include "LMConsolidator.h"
 
 namespace vChewing {
 
-AssociatedPhrases::AssociatedPhrases()
-: fd(-1)
-, data(0)
-, length(0)
+UserPhrasesLM::UserPhrasesLM()
+    : fd(-1)
+    , data(0)
+    , length(0)
 {
 }
 
-AssociatedPhrases::~AssociatedPhrases()
+UserPhrasesLM::~UserPhrasesLM()
 {
     if (data) {
         close();
     }
 }
 
-const bool AssociatedPhrases::isLoaded()
+bool UserPhrasesLM::isLoaded()
 {
     if (data) {
         return true;
@@ -51,10 +53,18 @@ const bool AssociatedPhrases::isLoaded()
     return false;
 }
 
-bool AssociatedPhrases::open(const char *path)
+bool UserPhrasesLM::open(const char *path)
 {
     if (data) {
         return false;
+    }
+
+    LMConsolidator::FixEOF(path);
+
+    if (Preferences.shouldAutoSortUserPhrasesAndExclListOnLoad) {
+        LMConsolidator::ConsolidateContent(path, true);
+    } else {
+        LMConsolidator::ConsolidateContent(path, false);
     }
 
     fd = ::open(path, O_RDONLY);
@@ -81,18 +91,19 @@ bool AssociatedPhrases::open(const char *path)
     KeyValueBlobReader::KeyValue keyValue;
     KeyValueBlobReader::State state;
     while ((state = reader.Next(&keyValue)) == KeyValueBlobReader::State::HAS_PAIR) {
-        keyRowMap[keyValue.key].emplace_back(keyValue.key, keyValue.value);
+        // We invert the key and value, since in user phrases, "key" is the phrase value, and "value" is the BPMF reading.
+        keyRowMap[keyValue.value].emplace_back(keyValue.value, keyValue.key);
     }
     // 下面這一段或許可以做成開關、來詢問是否對使用者語彙採取寬鬆策略（哪怕有行內容寫錯也會放行）
     if (state == KeyValueBlobReader::State::ERROR) {
         // close();
-        syslog(LOG_CONS, "AssociatedPhrases: Failed at Open Step 5. On Error Resume Next.\n");
+        syslog(LOG_CONS, "UserPhrasesLM: Failed at Open Step 5. On Error Resume Next.\n");
         // return false;
     }
     return true;
 }
 
-void AssociatedPhrases::close()
+void UserPhrasesLM::close()
 {
     if (data) {
         munmap(data, length);
@@ -103,21 +114,40 @@ void AssociatedPhrases::close()
     keyRowMap.clear();
 }
 
-const std::vector<std::string> AssociatedPhrases::valuesForKey(const std::string& key)
+void UserPhrasesLM::dump()
 {
-    std::vector<std::string> v;
+    for (const auto& entry : keyRowMap) {
+        const std::vector<Row>& rows = entry.second;
+        for (const auto& row : rows) {
+            std::cerr << row.key << " " << row.value << "\n";
+        }
+    }
+}
+
+const std::vector<Taiyan::Gramambular::Bigram> UserPhrasesLM::bigramsForKeys(const std::string& preceedingKey, const std::string& key)
+{
+    return std::vector<Taiyan::Gramambular::Bigram>();
+}
+
+const std::vector<Taiyan::Gramambular::Unigram> UserPhrasesLM::unigramsForKey(const std::string& key)
+{
+    std::vector<Taiyan::Gramambular::Unigram> v;
     auto iter = keyRowMap.find(key);
     if (iter != keyRowMap.end()) {
         const std::vector<Row>& rows = iter->second;
         for (const auto& row : rows) {
-            std::string_view value = row.value;
-            v.push_back({value.data(), value.size()});
+            Taiyan::Gramambular::Unigram g;
+            g.keyValue.key = row.key;
+            g.keyValue.value = row.value;
+            g.score = 0.0;
+            v.push_back(g);
         }
     }
+
     return v;
 }
 
-const bool AssociatedPhrases::hasValuesForKey(const std::string& key)
+bool UserPhrasesLM::hasUnigramsForKey(const std::string& key)
 {
     return keyRowMap.find(key) != keyRowMap.end();
 }
