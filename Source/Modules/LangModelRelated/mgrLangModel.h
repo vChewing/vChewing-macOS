@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)loadDataModel:(InputMode)mode;
 + (void)loadUserPhrases;
++ (void)loadUserAssociatedPhrases;
 + (void)loadUserPhraseReplacement;
 + (void)setupDataModelValueConverter;
 + (BOOL)checkIfUserLanguageModelFilesExist;
@@ -36,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)setPhraseReplacementEnabled:(BOOL)phraseReplacementEnabled;
 + (void)setCNSEnabled:(BOOL)cnsEnabled;
 + (NSString *)userPhrasesDataPath:(InputMode)mode;
++ (NSString *)userAssociatedPhrasesDataPath:(InputMode)mode;
 + (NSString *)excludedPhrasesDataPath:(InputMode)mode;
 + (NSString *)phraseReplacementDataPath:(InputMode)mode;
 

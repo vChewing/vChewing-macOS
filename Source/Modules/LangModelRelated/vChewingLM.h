@@ -71,16 +71,13 @@ public:
     /// If the data model is already loaded.
     bool isCNSDataLoaded();
 
-    /// Asks to load the associated phrases at the given path.
-    /// @param associatedPhrasesPath The path of the associated phrases.
-    void loadAssociatedPhrases(const char* associatedPhrasesPath);
-    /// If the associated phrases already loaded.
-    bool isAssociatedPhrasesLoaded();
-
     /// Asks to load the user phrases and excluded phrases at the given path.
     /// @param userPhrasesPath The path of user phrases.
     /// @param excludedPhrasesPath The path of excluded phrases.
     void loadUserPhrases(const char* userPhrasesPath, const char* excludedPhrasesPath);
+    /// Asks to load the user associated phrases at the given path.
+    /// @param userAssociatedPhrasesPath The path of the phrase replacement table.
+    void loadUserAssociatedPhrases(const char* userAssociatedPhrasesPath);
     /// Asks to load the phrase replacement table at the given path.
     /// @param phraseReplacementPath The path of the phrase replacement table.
     void loadPhraseReplacementMap(const char* phraseReplacementPath);

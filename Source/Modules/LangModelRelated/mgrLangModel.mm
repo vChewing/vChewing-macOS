@@ -33,6 +33,7 @@ static UserOverrideModel gUserOverrideModelCHT(kUserOverrideModelCapacity, kObse
 static UserOverrideModel gUserOverrideModelCHS(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
 static NSString *const kUserDataTemplateName = @"template-data";
+static NSString *const kUserAssDataTemplateName = @"template-data";
 static NSString *const kExcludedPhrasesvChewingTemplateName = @"template-exclude-phrases";
 static NSString *const kPhraseReplacementTemplateName = @"template-phrases-replacement";
 static NSString *const kTemplateExtension = @".txt";
@@ -46,13 +47,6 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     lm.loadLanguageModel([dataPath UTF8String]);
 }
 
-static void LTLoadAssociatedPhrases(vChewingLM &lm)
-{
-    Class cls = NSClassFromString(@"ctlInputMethod");
-    NSString *dataPath = [[NSBundle bundleForClass:cls] pathForResource:@"assPhrases" ofType:@"txt"];
-    lm.loadAssociatedPhrases([dataPath UTF8String]);
-}
-
 + (void)loadDataModels
 {
     if (!gLangModelCHT.isDataModelLoaded()) {
@@ -61,17 +55,11 @@ static void LTLoadAssociatedPhrases(vChewingLM &lm)
     if (!gLangModelCHT.isCNSDataLoaded()){
         gLangModelCHT.loadCNSData([[self cnsDataPath] UTF8String]);
     }
-    if (!gLangModelCHT.isAssociatedPhrasesLoaded()) {
-        LTLoadAssociatedPhrases(gLangModelCHT);
-    }
     if (!gLangModelCHS.isDataModelLoaded()) {
         LTLoadLanguageModelFile(@"data-chs", gLangModelCHS);
     }
     if (!gLangModelCHS.isCNSDataLoaded()){
         gLangModelCHS.loadCNSData([[self cnsDataPath] UTF8String]);
-    }
-    if (!gLangModelCHS.isAssociatedPhrasesLoaded()) {
-        LTLoadAssociatedPhrases(gLangModelCHS);
     }
 }
 
@@ -84,9 +72,6 @@ static void LTLoadAssociatedPhrases(vChewingLM &lm)
         if (!gLangModelCHT.isCNSDataLoaded()){
             gLangModelCHT.loadCNSData([[self cnsDataPath] UTF8String]);
         }
-        if (!gLangModelCHT.isAssociatedPhrasesLoaded()) {
-            LTLoadAssociatedPhrases(gLangModelCHT);
-        }
     }
 
     if ([mode isEqualToString:imeModeCHS]) {
@@ -96,9 +81,6 @@ static void LTLoadAssociatedPhrases(vChewingLM &lm)
         if (!gLangModelCHS.isCNSDataLoaded()){
             gLangModelCHS.loadCNSData([[self cnsDataPath] UTF8String]);
         }
-        if (!gLangModelCHS.isAssociatedPhrasesLoaded()) {
-            LTLoadAssociatedPhrases(gLangModelCHS);
-        }
     }
 }
 
@@ -106,6 +88,12 @@ static void LTLoadAssociatedPhrases(vChewingLM &lm)
 {
     gLangModelCHT.loadUserPhrases([[self userPhrasesDataPath:imeModeCHT] UTF8String], [[self excludedPhrasesDataPath:imeModeCHT] UTF8String]);
     gLangModelCHS.loadUserPhrases([[self userPhrasesDataPath:imeModeCHS] UTF8String], [[self excludedPhrasesDataPath:imeModeCHS] UTF8String]);
+}
+
++ (void)loadUserAssociatedPhrases
+{
+    gLangModelCHT.loadUserAssociatedPhrases([[self userAssociatedPhrasesDataPath:imeModeCHT] UTF8String]);
+    gLangModelCHS.loadUserAssociatedPhrases([[self userAssociatedPhrasesDataPath:imeModeCHS] UTF8String]);
 }
 
 + (void)loadUserPhraseReplacement
@@ -197,6 +185,12 @@ static void LTLoadAssociatedPhrases(vChewingLM &lm)
     if (![self ensureFileExists:[self userPhrasesDataPath:imeModeCHT] populateWithTemplate:kUserDataTemplateName extension:kTemplateExtension]) {
         return NO;
     }
+    if (![self ensureFileExists:[self userAssociatedPhrasesDataPath:imeModeCHS] populateWithTemplate:kUserAssDataTemplateName extension:kTemplateExtension]) {
+        return NO;
+    }
+    if (![self ensureFileExists:[self userAssociatedPhrasesDataPath:imeModeCHT] populateWithTemplate:kUserAssDataTemplateName extension:kTemplateExtension]) {
+        return NO;
+    }
     if (![self ensureFileExists:[self excludedPhrasesDataPath:imeModeCHS] populateWithTemplate:kExcludedPhrasesvChewingTemplateName extension:kTemplateExtension]) {
         return NO;
     }
@@ -285,6 +279,12 @@ static void LTLoadAssociatedPhrases(vChewingLM &lm)
 + (NSString *)userPhrasesDataPath:(InputMode)mode;
 {
     NSString *fileName = [mode isEqualToString:imeModeCHT] ? @"userdata-cht.txt" : @"userdata-chs.txt";
+    return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
+}
+
++ (NSString *)userAssociatedPhrasesDataPath:(InputMode)mode;
+{
+    NSString *fileName = [mode isEqualToString:imeModeCHT] ? @"associatedPhrases-cht.txt" : @"associatedPhrases-chs.txt";
     return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
 }
 

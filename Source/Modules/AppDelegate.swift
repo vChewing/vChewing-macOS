@@ -147,6 +147,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
             if Preferences.shouldAutoReloadUserDataFiles {
                 mgrLangModel.loadUserPhrases()
                 mgrLangModel.loadUserPhraseReplacement()
+                mgrLangModel.loadUserAssociatedPhrases()
             }
         }
     }
@@ -173,6 +174,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
         mgrLangModel.loadDataModels() // 這句還是不要砍了。
         mgrLangModel.loadUserPhrases()
         mgrLangModel.loadUserPhraseReplacement()
+        mgrLangModel.loadUserAssociatedPhrases()
         fsStreamHelper.delegate = self
         _ = fsStreamHelper.start()
 
