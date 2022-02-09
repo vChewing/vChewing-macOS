@@ -50,19 +50,6 @@ bool vChewingLM::isDataModelLoaded()
     return m_languageModel.isLoaded();
 }
 
-void vChewingLM::loadAssociatedPhrases(const char* associatedPhrasesPath)
-{
-    if (associatedPhrasesPath) {
-        m_associatedPhrases.close();
-        m_associatedPhrases.open(associatedPhrasesPath);
-    }
-}
-
-bool vChewingLM::isAssociatedPhrasesLoaded()
-{
-    return m_associatedPhrases.isLoaded();
-}
-
 void vChewingLM::loadCNSData(const char* cnsDataPath)
 {
     if (cnsDataPath) {
@@ -86,6 +73,14 @@ void vChewingLM::loadUserPhrases(const char* userPhrasesDataPath,
     if (excludedPhrasesDataPath) {
         m_excludedPhrases.close();
         m_excludedPhrases.open(excludedPhrasesDataPath);
+    }
+}
+
+void vChewingLM::loadUserAssociatedPhrases(const char *userAssociatedPhrasesPath)
+{
+    if (userAssociatedPhrasesPath) {
+        m_associatedPhrases.close();
+        m_associatedPhrases.open(userAssociatedPhrasesPath);
     }
 }
 
