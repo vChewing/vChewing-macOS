@@ -20,6 +20,27 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 namespace vChewing {
 
+constexpr std::string_view FORMATTED_PRAGMA_HEADER
+    = "# 𝙵𝙾𝚁𝙼𝙰𝚃 𝚘𝚛𝚐.𝚊𝚝𝚎𝚕𝚒𝚎𝚛𝙸𝚗𝚖𝚞.𝚟𝚌𝚑𝚎𝚠𝚒𝚗𝚐.𝚞𝚜𝚎𝚛𝙻𝚊𝚗𝚐𝚞𝚊𝚐𝚎𝙼𝚘𝚍𝚎𝚕𝙳𝚊𝚝𝚊.𝚏𝚘𝚛𝚖𝚊𝚝𝚝𝚎𝚍";
+
+// HEADER VERIFIER. CREDIT: Shiki Suen
+bool LMConsolidator::CheckPragma(const char *path)
+{
+    ifstream zfdCheckPragma(path);
+    if (zfdCheckPragma.good())
+    {
+        string firstLine;
+        getline(zfdCheckPragma, firstLine);
+        syslog(LOG_CONS, "HEADER SEEN ||%s", firstLine.c_str());
+        if (firstLine != FORMATTED_PRAGMA_HEADER) {
+            syslog(LOG_CONS, "HEADER VERIFICATION FAILED. START IN-PLACE CONSOLIDATING PROCESS.");
+            return false;
+        }
+    }
+    syslog(LOG_CONS, "HEADER VERIFICATION SUCCESSFUL.");
+    return true;
+}
+
 // EOF FIXER. CREDIT: Shiki Suen.
 bool LMConsolidator::FixEOF(const char *path)
 {
@@ -51,6 +72,10 @@ bool LMConsolidator::FixEOF(const char *path)
 
 // CONTENT CONSOLIDATOR. CREDIT: Shiki Suen.
 bool LMConsolidator::ConsolidateContent(const char *path, bool shouldsort) {
+    if (LMConsolidator::CheckPragma(path) && !shouldsort){
+        return true;
+    }
+
     ifstream zfdContentConsolidatorIncomingStream(path);
     vector<string>vecEntry;
     while(!zfdContentConsolidatorIncomingStream.eof())
