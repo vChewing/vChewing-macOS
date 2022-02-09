@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)loadUserPhraseReplacement;
 + (void)setupDataModelValueConverter;
 + (BOOL)checkIfUserLanguageModelFilesExist;
++ (BOOL)checkIfUserDataFolderExists;
 
 + (BOOL)checkIfUserPhraseExist:(NSString *)userPhrase key:(NSString *)key NS_SWIFT_NAME(checkIfExist(userPhrase:key:));
 + (BOOL)writeUserPhrase:(NSString *)userPhrase inputMode:(InputMode)mode;
