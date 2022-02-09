@@ -80,6 +80,7 @@ class ctlInputMethod: IMKInputController {
 
         menu.addItem(NSMenuItem.separator()) // ---------------------
 
+        menu.addItem(withTitle: NSLocalizedString("Open User Data Folder", comment: ""), action: #selector(openUserDataFolder(_:)), keyEquivalent: "")
         menu.addItem(withTitle: NSLocalizedString("Edit User Phrases", comment: ""), action: #selector(openUserPhrases(_:)), keyEquivalent: "")
 
         if optionKeyPressed {
@@ -250,6 +251,13 @@ class ctlInputMethod: IMKInputController {
 
     @objc func openUserPhrases(_ sender: Any?) {
         open(userFileAt: mgrLangModel.userPhrasesDataPath(keyHandler.inputMode))
+    }
+
+    @objc func openUserDataFolder(_ sender: Any?) {
+        if !mgrLangModel.checkIfUserDataFolderExists() {
+            return
+        }
+        NSWorkspace.shared.openFile(mgrLangModel.dataFolderPath, withApplication: "Finder")
     }
 
     @objc func openExcludedPhrases(_ sender: Any?) {
