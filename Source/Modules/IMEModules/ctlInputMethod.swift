@@ -187,7 +187,7 @@ class ctlInputMethod: IMKInputController {
         let result = keyHandler.handle(input: input, state: state) { newState in
             self.handle(state: newState, client: client)
         } errorCallback: {
-            NSSound.beep()
+            clsSFX.beep()
         }
         return result
     }
