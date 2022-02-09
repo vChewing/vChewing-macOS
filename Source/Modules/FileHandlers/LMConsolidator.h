@@ -35,6 +35,7 @@ namespace vChewing {
 class LMConsolidator
 {
 public:
+    static bool CheckPragma(const char *path);
     static bool FixEOF(const char *path);
     static bool ConsolidateContent(const char *path, bool shouldsort);
 };
