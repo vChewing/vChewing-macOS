@@ -231,31 +231,31 @@ static void LTLoadAssociatedPhrases(vChewingLM &lm)
         return NO;
     }
 
-    BOOL addLineBreakAtFront = NO;
+    // BOOL addLineBreakAtFront = NO;
     NSString *path = [self userPhrasesDataPath:mode];
 
-    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        NSError *error = nil;
-        NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:&error];
-        unsigned long long fileSize = [attr fileSize];
-        if (!error && fileSize) {
-            NSFileHandle *readFile = [NSFileHandle fileHandleForReadingAtPath:path];
-            if (readFile) {
-                [readFile seekToFileOffset:fileSize - 1];
-                NSData *data = [readFile readDataToEndOfFile];
-                const void *bytes = [data bytes];
-                if (*(char *)bytes != '\n') {
-                    addLineBreakAtFront = YES;
-                }
-                [readFile closeFile];
-            }
-        }
-    }
+//    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
+//        NSError *error = nil;
+//        NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:&error];
+//        unsigned long long fileSize = [attr fileSize];
+//        if (!error && fileSize) {
+//            NSFileHandle *readFile = [NSFileHandle fileHandleForReadingAtPath:path];
+//            if (readFile) {
+//                [readFile seekToFileOffset:fileSize - 1];
+//                NSData *data = [readFile readDataToEndOfFile];
+//                const void *bytes = [data bytes];
+//                if (*(char *)bytes != '\n') {
+//                    addLineBreakAtFront = YES;
+//                }
+//                [readFile closeFile];
+//            }
+//        }
+//    }
 
     NSMutableString *currentMarkedPhrase = [NSMutableString string];
-    if (addLineBreakAtFront) {
-        [currentMarkedPhrase appendString:@"\n"];
-    }
+    // if (addLineBreakAtFront) {
+    //     [currentMarkedPhrase appendString:@"\n"];
+    // }
     [currentMarkedPhrase appendString:userPhrase];
     [currentMarkedPhrase appendString:@"\n"];
 
