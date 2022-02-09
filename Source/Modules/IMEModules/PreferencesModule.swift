@@ -29,6 +29,7 @@ private let kAppleLanguagesPreferences = "AppleLanguages"
 private let kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
 private let kShouldAutoSortUserPhrasesAndExclListOnLoad = "ShouldAutoSortUserPhrasesAndExclListOnLoad"
 private let kShouldAutoSortPhraseReplacementMapOnLoad = "ShouldAutoSortPhraseReplacementMapOnLoad"
+private let kShouldAutoSortAssociatedPhrasesOnLoad = "ShouldAutoSortAssociatedPhrasesOnLoad"
 private let kSelectPhraseAfterCursorAsCandidatePreference = "SelectPhraseAfterCursorAsCandidate"
 private let kUseHorizontalCandidateListPreference = "UseHorizontalCandidateList"
 private let kComposingBufferSizePreference = "ComposingBufferSize"
@@ -214,6 +215,7 @@ struct ComposingBufferSize {
          kShouldAutoReloadUserDataFiles,
          kShouldAutoSortUserPhrasesAndExclListOnLoad,
          kShouldAutoSortPhraseReplacementMapOnLoad,
+         kShouldAutoSortAssociatedPhrasesOnLoad,
          kSelectPhraseAfterCursorAsCandidatePreference,
          kUseHorizontalCandidateListPreference,
          kComposingBufferSizePreference,
@@ -260,7 +262,12 @@ struct ComposingBufferSize {
         
         // 在檔案載入時，預設不啟用語彙置換表的內容排序。
         if UserDefaults.standard.object(forKey: kShouldAutoSortUserPhrasesAndExclListOnLoad) == nil {
-            UserDefaults.standard.set(Preferences.ShouldAutoSortUserPhrasesAndExclListOnLoad, forKey: kShouldAutoSortUserPhrasesAndExclListOnLoad)
+            UserDefaults.standard.set(Preferences.shouldAutoSortUserPhrasesAndExclListOnLoad, forKey: kShouldAutoSortUserPhrasesAndExclListOnLoad)
+        }
+        
+        // 在檔案載入時，預設不啟用自訂聯想詞表的內容排序。
+        if UserDefaults.standard.object(forKey: kShouldAutoSortAssociatedPhrasesOnLoad) == nil {
+            UserDefaults.standard.set(Preferences.shouldAutoSortAssociatedPhrasesOnLoad, forKey: kShouldAutoSortAssociatedPhrasesOnLoad)
         }
         
         // 自動檢測使用者自訂語彙數據的變動並載入。
@@ -337,10 +344,13 @@ struct ComposingBufferSize {
     @objc static var shouldAutoReloadUserDataFiles: Bool
 
     @UserDefault(key: kShouldAutoSortUserPhrasesAndExclListOnLoad, defaultValue: false)
-    @objc static var ShouldAutoSortUserPhrasesAndExclListOnLoad: Bool
+    @objc static var shouldAutoSortUserPhrasesAndExclListOnLoad: Bool
 
     @UserDefault(key: kShouldAutoSortPhraseReplacementMapOnLoad, defaultValue: false)
     @objc static var shouldAutoSortPhraseReplacementMapOnLoad: Bool
+
+    @UserDefault(key: kShouldAutoSortAssociatedPhrasesOnLoad, defaultValue: false)
+    @objc static var shouldAutoSortAssociatedPhrasesOnLoad: Bool
 
     @UserDefault(key: kSelectPhraseAfterCursorAsCandidatePreference, defaultValue: true)
     @objc static var selectPhraseAfterCursorAsCandidate: Bool
