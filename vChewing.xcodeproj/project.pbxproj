@@ -53,6 +53,7 @@
 		5BDCBB2E27B4E67A00D0CC59 /* vChewingPhraseEditor.app in Resources */ = {isa = PBXBuildFile; fileRef = 5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */; };
 		5BE78BD927B3775B005EA1BE /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE78BD827B37750005EA1BE /* ctlAboutWindow.swift */; };
 		5BE78BDD27B3776D005EA1BE /* frmAboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BE78BDA27B37764005EA1BE /* frmAboutWindow.xib */; };
+		5BE78BE027B38804005EA1BE /* LMConsolidator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32727AE77BB00A19448 /* LMConsolidator.mm */; };
 		6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F2015FC0EB100ABF4B3 /* Mandarin.cpp */; };
 		6A187E2616004C5900466B2E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A187E2816004C5900466B2E /* MainMenu.xib */; };
 		6A225A1F23679F2600F685C6 /* NotarizedArchives in Resources */ = {isa = PBXBuildFile; fileRef = 6A225A1E23679F2600F685C6 /* NotarizedArchives */; };
@@ -66,14 +67,14 @@
 		6ACC3D442793701600F1B140 /* ParselessPhraseDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ACC3D402793701600F1B140 /* ParselessPhraseDB.cpp */; };
 		6ACC3D452793701600F1B140 /* ParselessLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ACC3D422793701600F1B140 /* ParselessLM.cpp */; };
 		D41355D8278D74B5005E5CBD /* mgrLangModel.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355D7278D7409005E5CBD /* mgrLangModel.mm */; };
-		D41355DB278E6D17005E5CBD /* vChewingLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D41355D9278E6D17005E5CBD /* vChewingLM.cpp */; };
-		D41355DE278EA3ED005E5CBD /* UserPhrasesLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D41355DC278EA3ED005E5CBD /* UserPhrasesLM.cpp */; };
+		D41355DB278E6D17005E5CBD /* vChewingLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355D9278E6D17005E5CBD /* vChewingLM.mm */; };
+		D41355DE278EA3ED005E5CBD /* UserPhrasesLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355DC278EA3ED005E5CBD /* UserPhrasesLM.mm */; };
 		D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427F76B278CA1BA004A2160 /* AppDelegate.swift */; };
-		D44FB74D2792189A003C80A6 /* PhraseReplacementMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74B2792189A003C80A6 /* PhraseReplacementMap.cpp */; };
+		D44FB74D2792189A003C80A6 /* PhraseReplacementMap.mm in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74B2792189A003C80A6 /* PhraseReplacementMap.mm */; };
 		D456576E279E4F7B00DF6BC9 /* KeyHandlerInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */; };
 		D461B792279DAC010070E734 /* InputState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D461B791279DAC010070E734 /* InputState.swift */; };
 		D47B92C027972AD100458394 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47B92BF27972AC800458394 /* main.swift */; };
-		D47D73AC27A6CAE600255A50 /* AssociatedPhrases.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D47D73AA27A6CAE600255A50 /* AssociatedPhrases.cpp */; };
+		D47D73AC27A6CAE600255A50 /* AssociatedPhrases.mm in Sources */ = {isa = PBXBuildFile; fileRef = D47D73AA27A6CAE600255A50 /* AssociatedPhrases.mm */; };
 		D47F7DCE278BFB57002F9DD7 /* ctlPrefWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCD278BFB57002F9DD7 /* ctlPrefWindow.swift */; };
 		D47F7DD0278C0897002F9DD7 /* ctlNonModalAlertWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCF278C0897002F9DD7 /* ctlNonModalAlertWindow.swift */; };
 		D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */; };
@@ -209,18 +210,18 @@
 		6ACC3D432793701600F1B140 /* ParselessLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParselessLM.h; sourceTree = "<group>"; };
 		D41355D6278D7409005E5CBD /* mgrLangModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mgrLangModel.h; sourceTree = "<group>"; };
 		D41355D7278D7409005E5CBD /* mgrLangModel.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = mgrLangModel.mm; sourceTree = "<group>"; };
-		D41355D9278E6D17005E5CBD /* vChewingLM.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = vChewingLM.cpp; sourceTree = "<group>"; };
+		D41355D9278E6D17005E5CBD /* vChewingLM.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = vChewingLM.mm; sourceTree = "<group>"; };
 		D41355DA278E6D17005E5CBD /* vChewingLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vChewingLM.h; sourceTree = "<group>"; };
-		D41355DC278EA3ED005E5CBD /* UserPhrasesLM.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UserPhrasesLM.cpp; sourceTree = "<group>"; };
+		D41355DC278EA3ED005E5CBD /* UserPhrasesLM.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = UserPhrasesLM.mm; sourceTree = "<group>"; };
 		D41355DD278EA3ED005E5CBD /* UserPhrasesLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserPhrasesLM.h; sourceTree = "<group>"; };
 		D427A9BF25ED28CC005D43E0 /* vChewing-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vChewing-Bridging-Header.h"; sourceTree = "<group>"; };
 		D427F76B278CA1BA004A2160 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		D44FB74B2792189A003C80A6 /* PhraseReplacementMap.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PhraseReplacementMap.cpp; sourceTree = "<group>"; };
+		D44FB74B2792189A003C80A6 /* PhraseReplacementMap.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PhraseReplacementMap.mm; sourceTree = "<group>"; };
 		D44FB74C2792189A003C80A6 /* PhraseReplacementMap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PhraseReplacementMap.h; sourceTree = "<group>"; };
 		D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyHandlerInput.swift; sourceTree = "<group>"; };
 		D461B791279DAC010070E734 /* InputState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputState.swift; sourceTree = "<group>"; };
 		D47B92BF27972AC800458394 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		D47D73AA27A6CAE600255A50 /* AssociatedPhrases.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AssociatedPhrases.cpp; sourceTree = "<group>"; };
+		D47D73AA27A6CAE600255A50 /* AssociatedPhrases.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AssociatedPhrases.mm; sourceTree = "<group>"; };
 		D47D73AB27A6CAE600255A50 /* AssociatedPhrases.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AssociatedPhrases.h; sourceTree = "<group>"; };
 		D47F7DCD278BFB57002F9DD7 /* ctlPrefWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlPrefWindow.swift; sourceTree = "<group>"; };
 		D47F7DCF278C0897002F9DD7 /* ctlNonModalAlertWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlNonModalAlertWindow.swift; sourceTree = "<group>"; };
@@ -385,7 +386,7 @@
 				D495583A27A5C6C4006ADE1C /* mgrLangModel_Privates.h */,
 				D41355D7278D7409005E5CBD /* mgrLangModel.mm */,
 				5B62A32527AE758000A19448 /* SubLanguageModels */,
-				D41355D9278E6D17005E5CBD /* vChewingLM.cpp */,
+				D41355D9278E6D17005E5CBD /* vChewingLM.mm */,
 				D41355DA278E6D17005E5CBD /* vChewingLM.h */,
 			);
 			path = LangModelRelated;
@@ -398,17 +399,17 @@
 				5B62A32A27AE78B000A19448 /* CNSLM.mm */,
 				5B62A32C27AE78B000A19448 /* CoreLM.h */,
 				5B62A32D27AE78B000A19448 /* CoreLM.mm */,
-				D41355DC278EA3ED005E5CBD /* UserPhrasesLM.cpp */,
+				D41355DC278EA3ED005E5CBD /* UserPhrasesLM.mm */,
 				D41355DD278EA3ED005E5CBD /* UserPhrasesLM.h */,
 				6ACC3D422793701600F1B140 /* ParselessLM.cpp */,
 				6ACC3D432793701600F1B140 /* ParselessLM.h */,
 				6ACC3D402793701600F1B140 /* ParselessPhraseDB.cpp */,
 				6ACC3D412793701600F1B140 /* ParselessPhraseDB.h */,
-				D44FB74B2792189A003C80A6 /* PhraseReplacementMap.cpp */,
+				D44FB74B2792189A003C80A6 /* PhraseReplacementMap.mm */,
 				D44FB74C2792189A003C80A6 /* PhraseReplacementMap.h */,
 				D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */,
 				D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */,
-				D47D73AA27A6CAE600255A50 /* AssociatedPhrases.cpp */,
+				D47D73AA27A6CAE600255A50 /* AssociatedPhrases.mm */,
 				D47D73AB27A6CAE600255A50 /* AssociatedPhrases.h */,
 			);
 			path = SubLanguageModels;
@@ -883,19 +884,20 @@
 				D461B792279DAC010070E734 /* InputState.swift in Sources */,
 				5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */,
 				D47B92C027972AD100458394 /* main.swift in Sources */,
-				D44FB74D2792189A003C80A6 /* PhraseReplacementMap.cpp in Sources */,
+				D44FB74D2792189A003C80A6 /* PhraseReplacementMap.mm in Sources */,
 				D4A13D5A27A59F0B003BE359 /* ctlInputMethod.swift in Sources */,
 				D4E569DC27A34D0E00AC2CEF /* KeyHandler.mm in Sources */,
 				D47F7DD0278C0897002F9DD7 /* ctlNonModalAlertWindow.swift in Sources */,
 				5B62A32F27AE78B000A19448 /* CoreLM.mm in Sources */,
 				5B62A33427AE793F00A19448 /* OpenCCBridge.swift in Sources */,
+				5BE78BE027B38804005EA1BE /* LMConsolidator.mm in Sources */,
 				D456576E279E4F7B00DF6BC9 /* KeyHandlerInput.swift in Sources */,
 				D47F7DCE278BFB57002F9DD7 /* ctlPrefWindow.swift in Sources */,
-				D47D73AC27A6CAE600255A50 /* AssociatedPhrases.cpp in Sources */,
+				D47D73AC27A6CAE600255A50 /* AssociatedPhrases.mm in Sources */,
 				5B62A34A27AE7CD900A19448 /* NotifierController.swift in Sources */,
 				5B62A31827AE73A700A19448 /* zip.m in Sources */,
 				5B62A32E27AE78B000A19448 /* CNSLM.mm in Sources */,
-				D41355DB278E6D17005E5CBD /* vChewingLM.cpp in Sources */,
+				D41355DB278E6D17005E5CBD /* vChewingLM.mm in Sources */,
 				5B62A31A27AE73A700A19448 /* mztools.m in Sources */,
 				5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */,
 				D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */,
@@ -911,7 +913,7 @@
 				5B62A34627AE7CD900A19448 /* HorizontalCandidateController.swift in Sources */,
 				5B62A34727AE7CD900A19448 /* CandidateController.swift in Sources */,
 				5B62A31B27AE73A700A19448 /* SSZipArchive.m in Sources */,
-				D41355DE278EA3ED005E5CBD /* UserPhrasesLM.cpp in Sources */,
+				D41355DE278EA3ED005E5CBD /* UserPhrasesLM.mm in Sources */,
 				6ACC3D3F27914F2400F1B140 /* KeyValueBlobReader.cpp in Sources */,
 				D41355D8278D74B5005E5CBD /* mgrLangModel.mm in Sources */,
 			);

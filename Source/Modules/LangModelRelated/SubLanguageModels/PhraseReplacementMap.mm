@@ -18,7 +18,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 */
 
 #include "PhraseReplacementMap.h"
-
+#include "vChewing-Swift.h"
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -27,6 +27,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <syslog.h>
 
 #include "KeyValueBlobReader.h"
+#include "LMConsolidator.h"
 
 namespace vChewing {
 
@@ -50,6 +51,14 @@ bool PhraseReplacementMap::open(const char *path)
 {
     if (data) {
         return false;
+    }
+
+    LMConsolidator::FixEOF(path);
+
+    if (Preferences.shouldAutoSortPhraseReplacementMapOnLoad) {
+        LMConsolidator::ConsolidateContent(path, true);
+    } else {
+        LMConsolidator::ConsolidateContent(path, false);
     }
 
     fd = ::open(path, O_RDONLY);
