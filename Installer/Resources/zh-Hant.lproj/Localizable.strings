@@ -6,11 +6,9 @@
 "Installation Successful" = "安裝成功";
 "OK" = "確定";
 "vChewing is ready to use." = "威注音輸入法安裝成功";
-
-"Finish" = "結束";
+"Stopping the old version. This may take up to one minute…" = "正在試圖結束正在運行的舊版輸入法，大概需要一分鐘…";
 "Attention" = "請注意";
 "vChewing is upgraded, but please log out or reboot for the new version to be fully functional." = "vChewing 安裝完成，但建議您登出或重新開機，以便順利使用新版。";
-
 "Fatal Error" = "安裝錯誤";
 "Abort" = "放棄安裝";
 "Cannot register input source %@ at %@." = "無法從檔案位置 %2$@ 安裝輸入法 \"%1$@\"。";
