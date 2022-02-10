@@ -1,0 +1,27 @@
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "btnConfirm"; */
+"btnConfirm.title" = "確定";
+
+/* Class = "NSTextFieldCell"; title = "vChewing Phrase Editor for macOS"; ObjectID = "lblAppTitle"; */
+"lblAppTitle.title" = "vChewing Phrase Editor for macOS";
+
+/* Class = "NSTextFieldCell"; title = "Placeholder for showing copyright information."; ObjectID = "lblCopyright"; */
+"lblCopyright.title" = "Placeholder for showing copyright information.";
+
+/* Class = "NSTextFieldCell"; title = "vChewing Phrase Editor developed by Shiki Suen.\nvChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "lblCredits"; */
+"lblCredits.title" = "威注音語彙編輯器研發：Shiki Suen。\n威注音詞庫維護：Shiki Suen。";
+
+/* Class = "NSTextFieldCell"; title = "DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, have been removed from vChewing official phrase database."; ObjectID = "lblDisclaimer"; */
+"lblDisclaimer.title" = "免責聲明：威注音專案對小麥注音官方專案內贈的小麥注音原版詞庫內容不負任何責任。威注音輸入法專用的威注音官方詞庫已清除任何「會在法理上妨礙威注音在全球傳播」的「與地緣政治及政治意識形態有關的」內容。威註音專案與 OpenVanilla 專案之間無合作關係、無隸屬關係。";
+
+/* Class = "NSTextFieldCell"; title = "MIT-NTL License:"; ObjectID = "lblLicense"; */
+"lblLicense.title" = "麻理去商標授權合約 (MIT-NTL License):";
+
+/* Class = "NSTextFieldCell"; title = "A subproduct of the vChewing Input Method for macOS."; ObjectID = "lblProjectDescription"; */
+"lblProjectDescription.title" = "此乃威注音輸入法的內建組件之一。";
+
+/* Class = "NSTextFieldCell"; title = "version_placeholder"; ObjectID = "lblVersionString"; */
+"lblVersionString.title" = "version_placeholder";
+
+/* Class = "NSWindow"; title = "About vChewing Phrase Editor for macOS"; ObjectID = "ttlAboutWindow"; */
+"ttlAboutWindow.title" = "關於 macOS 版「威注音語彙編輯器」";
