@@ -41,8 +41,8 @@
 /* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "593"; */
 "593.title" = "Cancel";
 
-/* Class = "NSTextFieldCell"; title = "3-Clause BSD License:"; ObjectID = "AVS-ih-FXM"; */
-"AVS-ih-FXM.title" = "3-Clause BSD License:";
+/* Class = "NSTextFieldCell"; title = "MIT-NTL License:"; ObjectID = "AVS-ih-FXM"; */
+"AVS-ih-FXM.title" = "MIT-NTL License:";
 
 /* Class = "NSTextFieldCell"; title = "vChewing for macOS"; ObjectID = "GNc-8S-1VG"; */
 "GNc-8S-1VG.title" = "vChewing for macOS";

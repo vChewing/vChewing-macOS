@@ -1,10 +1,21 @@
-/* 
- *  AppDelegate.swift
- *  
- *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
- *  Derived from 2011-2022 OpenVanilla Project (MIT License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
- */
+// Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
+// All possible vChewing-specific modifications are (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+/*
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+1. The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+2. No trademark license is granted to use the trade names, trademarks, service marks, or product names of Contributor,
+   except as required to fulfill notice requirements above.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 
 import Cocoa
 import InputMethodKit
@@ -74,6 +85,7 @@ struct VersionUpdateApi {
 
                 // TODO: Validate info (e.g. bundle identifier)
                 // TODO: Use HTML to display change log, need a new key like UpdateInfoChangeLogURL for this
+
                 let currentVersion = infoDict[kCFBundleVersionKey as String] as? String ?? ""
                 let result = currentVersion.compare(remoteVersion, options: .numeric, range: nil, locale: nil)
 
@@ -129,21 +141,23 @@ struct VersionUpdateApi {
 
 @objc(AppDelegate)
 class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelegate, FSEventStreamHelperDelegate {
-	func helper(_ helper: FSEventStreamHelper, didReceive events: [FSEventStreamHelper.Event]) {
-		DispatchQueue.main.async {
-			if Preferences.shouldAutoReloadUserDataFiles {
-				mgrLangModel.loadUserPhrases()
-				mgrLangModel.loadUserPhraseReplacement()
-			}
-		}
-	}
+    func helper(_ helper: FSEventStreamHelper, didReceive events: [FSEventStreamHelper.Event]) {
+        // 拖一秒鐘再重載，畢竟有些有特殊需求的使用者可能會想使用巨型自訂語彙檔案。
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
+            if Preferences.shouldAutoReloadUserDataFiles {
+                mgrLangModel.loadUserPhrases()
+                mgrLangModel.loadUserPhraseReplacement()
+                mgrLangModel.loadUserAssociatedPhrases()
+            }
+        }
+    }
 
     @IBOutlet weak var window: NSWindow?
     private var ctlPrefWindowInstance: ctlPrefWindow?
     private var ctlAboutWindowInstance: ctlAboutWindow? // New About Window
     private var checkTask: URLSessionTask?
     private var updateNextStepURL: URL?
-	private var fsStreamHelper = FSEventStreamHelper(path: mgrLangModel.dataFolderPath, queue: DispatchQueue(label: "User Phrases"))
+    private var fsStreamHelper = FSEventStreamHelper(path: mgrLangModel.dataFolderPath, queue: DispatchQueue(label: "User Phrases"))
 
     // 補上 dealloc
     deinit {
@@ -156,12 +170,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        mgrLangModel.loadDataModels()
-        mgrLangModel.loadCNSData()
+        mgrLangModel.setupDataModelValueConverter()
+        mgrLangModel.loadDataModels() // 這句還是不要砍了。
         mgrLangModel.loadUserPhrases()
         mgrLangModel.loadUserPhraseReplacement()
-		fsStreamHelper.delegate = self
-		_ = fsStreamHelper.start()
+        mgrLangModel.loadUserAssociatedPhrases()
+        fsStreamHelper.delegate = self
+        _ = fsStreamHelper.start()
 
         Preferences.setMissingDefaults()
         

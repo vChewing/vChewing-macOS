@@ -1,41 +1,44 @@
-/* 
- *  mgrLangModel.mm
- *  
- *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
- *  Derived from 2011-2022 OpenVanilla Project (MIT License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
- */
+// Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
+// All possible vChewing-specific modifications are (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+/*
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+1. The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+2. No trademark license is granted to use the trade names, trademarks, service marks, or product names of Contributor,
+   except as required to fulfill notice requirements above.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 
 #import "mgrLangModel.h"
+#import "mgrLangModel_Privates.h"
+#import "vChewing-Swift.h"
 
 using namespace std;
 using namespace vChewing;
 
 static const int kUserOverrideModelCapacity = 500;
-static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
-static NSString *kMD5HashCNSData = @"MD5HashCNSData";
+static const double kObservedOverrideHalflife = 5400.0;
 
-vChewingLM glanguageModelCoreCHT;
-vChewingLM glanguageModelCoreCHS;
-UserOverrideModel gUserOverrideModelCHS(kUserOverrideModelCapacity, kObservedOverrideHalflife);
-UserOverrideModel gUserOverrideModelCHT(kUserOverrideModelCapacity, kObservedOverrideHalflife);
+static vChewingLM gLangModelCHT;
+static vChewingLM gLangModelCHS;
+static UserOverrideModel gUserOverrideModelCHT(kUserOverrideModelCapacity, kObservedOverrideHalflife);
+static UserOverrideModel gUserOverrideModelCHS(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
-// input modes
-static NSString *const kBopomofoModeIdentifierCHT = @"org.atelierInmu.inputmethod.vChewing.TradBopomofo";
-static NSString *const kBopomofoModeIdentifierCHS = @"org.atelierInmu.inputmethod.vChewing.SimpBopomofo";
+static NSString *const kUserDataTemplateName = @"template-data";
+static NSString *const kUserAssDataTemplateName = @"template-data";
+static NSString *const kExcludedPhrasesvChewingTemplateName = @"template-exclude-phrases";
+static NSString *const kPhraseReplacementTemplateName = @"template-phrases-replacement";
+static NSString *const kTemplateExtension = @".txt";
 
 @implementation mgrLangModel
-
-+ (void)deployZipDataFile:(NSString *)filenameWithoutExtension
-{
-    Class cls = NSClassFromString(@"ctlInputMethod");
-    NSString *zipPath = [[NSBundle bundleForClass:cls] pathForResource:filenameWithoutExtension ofType:@"zip"];
-    NSString *destinationPath = [self dataFolderPath];
-    [SSZipArchive unzipFileAtPath:zipPath toDestination:destinationPath];
-    NSString *md5HashCNSData = [AWFileHash md5HashOfFileAtPath:[self cnsDataPath]];
-    [[NSUserDefaults standardUserDefaults] setObject:md5HashCNSData forKey:kMD5HashCNSData];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-}
 
 static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewingLM &lm)
 {
@@ -46,49 +49,83 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
 
 + (void)loadDataModels
 {
-    LTLoadLanguageModelFile(@"data-cht", glanguageModelCoreCHT);
-    LTLoadLanguageModelFile(@"data-chs", glanguageModelCoreCHS);
+    if (!gLangModelCHT.isDataModelLoaded()) {
+        LTLoadLanguageModelFile(@"data-cht", gLangModelCHT);
+    }
+    if (!gLangModelCHT.isCNSDataLoaded()){
+        gLangModelCHT.loadCNSData([[self cnsDataPath] UTF8String]);
+    }
+    if (!gLangModelCHS.isDataModelLoaded()) {
+        LTLoadLanguageModelFile(@"data-chs", gLangModelCHS);
+    }
+    if (!gLangModelCHS.isCNSDataLoaded()){
+        gLangModelCHS.loadCNSData([[self cnsDataPath] UTF8String]);
+    }
 }
 
-+ (void)loadCNSData
++ (void)loadDataModel:(InputMode)mode
 {
-    if (!self.checkIfCNSDataExistAndHashMatched) {
-        [self deployZipDataFile:@"UNICHARS"];
+    if ([mode isEqualToString:imeModeCHT]) {
+        if (!gLangModelCHT.isDataModelLoaded()) {
+            LTLoadLanguageModelFile(@"data-cht", gLangModelCHT);
+        }
+        if (!gLangModelCHT.isCNSDataLoaded()){
+            gLangModelCHT.loadCNSData([[self cnsDataPath] UTF8String]);
+        }
     }
 
-    glanguageModelCoreCHT.loadCNSData([[self cnsDataPath] UTF8String]);
-    glanguageModelCoreCHS.loadCNSData([[self cnsDataPath] UTF8String]);
-}
-
-+ (BOOL)checkIfCNSDataExistAndHashMatched
-{
-    if (![self checkIfUserDataFolderExists]) {
-        NSLog(@"User Data Folder N/A.");
-        return NO;
+    if ([mode isEqualToString:imeModeCHS]) {
+        if (!gLangModelCHS.isDataModelLoaded()) {
+            LTLoadLanguageModelFile(@"data-chs", gLangModelCHS);
+        }
+        if (!gLangModelCHS.isCNSDataLoaded()){
+            gLangModelCHS.loadCNSData([[self cnsDataPath] UTF8String]);
+        }
     }
-    if (![self ensureFileExists:[self cnsDataPath]]) {
-        NSLog(@"Extracted CNS Data Not Found.");
-        return NO;
-    }
-    if (![[AWFileHash md5HashOfFileAtPath:[self cnsDataPath]] isEqualToString: [[NSUserDefaults standardUserDefaults] objectForKey:kMD5HashCNSData]]) {
-        NSLog(@"Existing CNS CSV Data Fingerprint: %@", [AWFileHash md5HashOfFileAtPath:[self cnsDataPath]]);
-        NSLog(@"UserPlist CNS CSV Data Fingerprint: %@", [[NSUserDefaults standardUserDefaults] objectForKey:kMD5HashCNSData]);
-        NSLog(@"Existing CNS CSV Data fingerprint mismatch, must be tampered since it gets extracted.");
-        return NO;
-    }
-    return YES;
 }
 
 + (void)loadUserPhrases
 {
-    glanguageModelCoreCHT.loadUserPhrases([[self userPhrasesDataPath:kBopomofoModeIdentifierCHT] UTF8String], [[self excludedPhrasesDataPath:kBopomofoModeIdentifierCHT] UTF8String]);
-	glanguageModelCoreCHS.loadUserPhrases([[self userPhrasesDataPath:kBopomofoModeIdentifierCHS] UTF8String], [[self excludedPhrasesDataPath:kBopomofoModeIdentifierCHS] UTF8String]);
+    gLangModelCHT.loadUserPhrases([[self userPhrasesDataPath:imeModeCHT] UTF8String], [[self excludedPhrasesDataPath:imeModeCHT] UTF8String]);
+    gLangModelCHS.loadUserPhrases([[self userPhrasesDataPath:imeModeCHS] UTF8String], [[self excludedPhrasesDataPath:imeModeCHS] UTF8String]);
+}
+
++ (void)loadUserAssociatedPhrases
+{
+    gLangModelCHT.loadUserAssociatedPhrases([[self userAssociatedPhrasesDataPath:imeModeCHT] UTF8String]);
+    gLangModelCHS.loadUserAssociatedPhrases([[self userAssociatedPhrasesDataPath:imeModeCHS] UTF8String]);
 }
 
 + (void)loadUserPhraseReplacement
 {
-    glanguageModelCoreCHT.loadPhraseReplacementMap([[self phraseReplacementDataPath:kBopomofoModeIdentifierCHT] UTF8String]);
-	glanguageModelCoreCHS.loadPhraseReplacementMap([[self phraseReplacementDataPath:kBopomofoModeIdentifierCHS] UTF8String]);
+    gLangModelCHT.loadPhraseReplacementMap([[self phraseReplacementDataPath:imeModeCHT] UTF8String]);
+    gLangModelCHS.loadPhraseReplacementMap([[self phraseReplacementDataPath:imeModeCHS] UTF8String]);
+}
+
++ (void)setupDataModelValueConverter
+{
+    auto converter = [] (string input) {
+//        if (!Preferences.chineseConversionEnabled) {
+//            return input;
+//        }
+//
+//        if (Preferences.chineseConversionStyle == 0) {
+//            return input;
+//        }
+//
+//        NSString *text = [NSString stringWithUTF8String:input.c_str()];
+//        if (Preferences.chineseConversionEngine == 1) {
+//            text = [VXHanConvert convertToKangXiFrom:text];
+//        }
+//        else {
+//            text = [OpenCCBridge convertToKangXi:text];
+//        }
+//        return string(text.UTF8String);
+        return input;
+    };
+
+    gLangModelCHT.setExternalConverter(converter);
+    gLangModelCHS.setExternalConverter(converter);
 }
 
 + (BOOL)checkIfUserDataFolderExists
@@ -116,10 +153,19 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     return YES;
 }
 
-+ (BOOL)ensureFileExists:(NSString *)filePath
++ (BOOL)ensureFileExists:(NSString *)filePath populateWithTemplate:(NSString *)templateBasename extension:(NSString *)ext
 {
     if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
-        BOOL result = [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filePath atomically:YES];
+
+        NSURL *templateURL = [[NSBundle mainBundle] URLForResource:templateBasename withExtension:ext];
+        NSData *templateData;
+        if (templateURL) {
+            templateData = [NSData dataWithContentsOfURL:templateURL];
+        } else {
+            templateData = [@"" dataUsingEncoding:NSUTF8StringEncoding];
+        }
+
+        BOOL result = [templateData writeToFile:filePath atomically:YES];
         if (!result) {
             NSLog(@"Failed to write file");
             return NO;
@@ -133,36 +179,77 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     if (![self checkIfUserDataFolderExists]) {
         return NO;
     }
-    if (![self ensureFileExists:[self userPhrasesDataPath:kBopomofoModeIdentifierCHT]]) {
+    if (![self ensureFileExists:[self userPhrasesDataPath:imeModeCHS] populateWithTemplate:kUserDataTemplateName extension:kTemplateExtension]) {
         return NO;
     }
-    if (![self ensureFileExists:[self excludedPhrasesDataPath:kBopomofoModeIdentifierCHT]]) {
+    if (![self ensureFileExists:[self userPhrasesDataPath:imeModeCHT] populateWithTemplate:kUserDataTemplateName extension:kTemplateExtension]) {
         return NO;
     }
-    if (![self ensureFileExists:[self phraseReplacementDataPath:kBopomofoModeIdentifierCHT]]) {
+    if (![self ensureFileExists:[self userAssociatedPhrasesDataPath:imeModeCHS] populateWithTemplate:kUserAssDataTemplateName extension:kTemplateExtension]) {
         return NO;
     }
-	if (![self ensureFileExists:[self userPhrasesDataPath:kBopomofoModeIdentifierCHS]]) {
-		return NO;
-	}
-	if (![self ensureFileExists:[self excludedPhrasesDataPath:kBopomofoModeIdentifierCHS]]) {
-		return NO;
-	}
-	if (![self ensureFileExists:[self phraseReplacementDataPath:kBopomofoModeIdentifierCHS]]) {
-		return NO;
-	}
-	return YES;
+    if (![self ensureFileExists:[self userAssociatedPhrasesDataPath:imeModeCHT] populateWithTemplate:kUserAssDataTemplateName extension:kTemplateExtension]) {
+        return NO;
+    }
+    if (![self ensureFileExists:[self excludedPhrasesDataPath:imeModeCHS] populateWithTemplate:kExcludedPhrasesvChewingTemplateName extension:kTemplateExtension]) {
+        return NO;
+    }
+    if (![self ensureFileExists:[self excludedPhrasesDataPath:imeModeCHT] populateWithTemplate:kExcludedPhrasesvChewingTemplateName extension:kTemplateExtension]) {
+        return NO;
+    }
+    if (![self ensureFileExists:[self phraseReplacementDataPath:imeModeCHS] populateWithTemplate:kPhraseReplacementTemplateName extension:kTemplateExtension]) {
+        return NO;
+    }
+    if (![self ensureFileExists:[self phraseReplacementDataPath:imeModeCHT] populateWithTemplate:kPhraseReplacementTemplateName extension:kTemplateExtension]) {
+        return NO;
+    }
+    return YES;
 }
 
-+ (BOOL)writeUserPhrase:(NSString *)userPhrase inputMode:(NSString *)inputMode
++ (BOOL)checkIfUserPhraseExist:(NSString *)userPhrase key:(NSString *)key NS_SWIFT_NAME(checkIfExist(userPhrase:key:))
+{
+    string unigramKey = string(key.UTF8String);
+    vector<Unigram> unigrams = gLangModelCHT.unigramsForKey(unigramKey);
+    string userPhraseString = string(userPhrase.UTF8String);
+    for (auto unigram: unigrams) {
+        if (unigram.keyValue.value == userPhraseString) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
++ (BOOL)writeUserPhrase:(NSString *)userPhrase inputMode:(InputMode)mode;
 {
     if (![self checkIfUserLanguageModelFilesExist]) {
         return NO;
     }
 
-    NSString *path = [self userPhrasesDataPath:inputMode];
+    // BOOL addLineBreakAtFront = NO;
+    NSString *path = [self userPhrasesDataPath:mode];
+
+//    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
+//        NSError *error = nil;
+//        NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:&error];
+//        unsigned long long fileSize = [attr fileSize];
+//        if (!error && fileSize) {
+//            NSFileHandle *readFile = [NSFileHandle fileHandleForReadingAtPath:path];
+//            if (readFile) {
+//                [readFile seekToFileOffset:fileSize - 1];
+//                NSData *data = [readFile readDataToEndOfFile];
+//                const void *bytes = [data bytes];
+//                if (*(char *)bytes != '\n') {
+//                    addLineBreakAtFront = YES;
+//                }
+//                [readFile closeFile];
+//            }
+//        }
+//    }
 
     NSMutableString *currentMarkedPhrase = [NSMutableString string];
+    // if (addLineBreakAtFront) {
+    //     [currentMarkedPhrase appendString:@"\n"];
+    // }
     [currentMarkedPhrase appendString:userPhrase];
     [currentMarkedPhrase appendString:@"\n"];
 
@@ -175,49 +262,58 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     [writeFile writeData:data];
     [writeFile closeFile];
 
-    // [self loadUserPhrases]; // Not Needed since AppDelegate is handling this.
+//  We use FSEventStream to monitor the change of the user phrase folder,
+//  so we don't have to load data here.
+//  [self loadUserPhrases];
     return YES;
 }
 
 + (NSString *)dataFolderPath
 {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES);
-	NSString *appSupportPath = paths[0];
+    NSString *appSupportPath = paths[0];
     NSString *userDictPath = [appSupportPath stringByAppendingPathComponent:@"vChewing"];
     return userDictPath;
 }
 
-+ (NSString *)userPhrasesDataPath:(NSString *)inputMode
++ (NSString *)userPhrasesDataPath:(InputMode)mode;
 {
-    NSString *fileName = [inputMode isEqualToString:kBopomofoModeIdentifierCHT] ? @"userdata-cht.txt" : @"userdata-chs.txt";
+    NSString *fileName = [mode isEqualToString:imeModeCHT] ? @"userdata-cht.txt" : @"userdata-chs.txt";
     return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
 }
 
-+ (NSString *)excludedPhrasesDataPath:(NSString *)inputMode
++ (NSString *)userAssociatedPhrasesDataPath:(InputMode)mode;
 {
-    NSString *fileName = [inputMode isEqualToString:kBopomofoModeIdentifierCHT] ? @"exclude-phrases-cht.txt" : @"exclude-phrases-chs.txt";
+    NSString *fileName = [mode isEqualToString:imeModeCHT] ? @"associatedPhrases-cht.txt" : @"associatedPhrases-chs.txt";
     return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
 }
 
-+ (NSString *)phraseReplacementDataPath:(NSString *)inputMode
++ (NSString *)excludedPhrasesDataPath:(InputMode)mode;
 {
-    NSString *fileName = [inputMode isEqualToString:kBopomofoModeIdentifierCHT] ? @"phrases-replacement-cht.txt" : @"phrases-replacement-chs.txt";
+    NSString *fileName = [mode isEqualToString:imeModeCHT] ? @"exclude-phrases-cht.txt" : @"exclude-phrases-chs.txt";
+    return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
+}
+
++ (NSString *)phraseReplacementDataPath:(InputMode)mode;
+{
+    NSString *fileName = [mode isEqualToString:imeModeCHT] ? @"phrases-replacement-cht.txt" : @"phrases-replacement-chs.txt";
     return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
 }
 
 + (NSString *)cnsDataPath
 {
-    return [[self dataFolderPath] stringByAppendingPathComponent:@"UNICHARS.csv"];
+    Class cls = NSClassFromString(@"ctlInputMethod");
+    return [[NSBundle bundleForClass:cls] pathForResource:@"char-kanji-cns" ofType:@"txt"];
 }
 
-+ (vChewingLM *)languageModelCoreCHT
+ + (vChewingLM *)lmCHT
 {
-    return &glanguageModelCoreCHT;
+    return &gLangModelCHT;
 }
 
-+ (vChewingLM *)languageModelCoreCHS
++ (vChewingLM *)lmCHS
 {
-    return &glanguageModelCoreCHS;
+    return &gLangModelCHS;
 }
 
 + (vChewing::UserOverrideModel *)userOverrideModelCHT
@@ -227,7 +323,19 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
 
 + (vChewing::UserOverrideModel *)userOverrideModelCHS
 {
-	return &gUserOverrideModelCHS;
+    return &gUserOverrideModelCHS;
+}
+
++ (void)setPhraseReplacementEnabled:(BOOL)phraseReplacementEnabled
+{
+    gLangModelCHT.setPhraseReplacementEnabled(phraseReplacementEnabled);
+    gLangModelCHS.setPhraseReplacementEnabled(phraseReplacementEnabled);
+}
+
++ (void)setCNSEnabled:(BOOL)cnsEnabled
+{
+    gLangModelCHT.setCNSEnabled(cnsEnabled);
+    gLangModelCHS.setCNSEnabled(cnsEnabled);
 }
 
 @end

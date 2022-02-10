@@ -1,6 +1,6 @@
 
-/* Class = "NSTextFieldCell"; title = "3-Clause BSD License:"; ObjectID = "lblLicense"; */
-"lblLicense.title" = "柏克萊軟體三款型授權合約 (3-Clause BSD License):";
+/* Class = "NSTextFieldCell"; title = "MIT-NTL License:"; ObjectID = "lblLicense"; */
+"lblLicense.title" = "麻理去商標授權合約 (MIT-NTL License):";
 
 /* Class = "NSTextFieldCell"; title = "version"; ObjectID = "lblVersionString"; */
 // "lblVersionString.title" = "版本";
@@ -24,4 +24,4 @@
 // "lblCopyright.title" = "© 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project.";
 
 /* Class = "NSTextFieldCell"; title = "McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.\nvChewing macOS Development Reinforced by Hiraku Wang.\nvChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "lblCredits"; */
-"lblCredits.title" = "小麥注音引擎研發：Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, 等。\n威注音 macOS 程式研發協力：Hiraku Wang。\n威注音詞庫維護：孫志貴 (Shiki Suen)。";
+"VW8-s5-Wpn.title" = "小麥注音引擎研發：Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, 等。\n威注音 macOS 程式研發協力：Hiraku Wang。\n威注音詞庫維護：Shiki Suen。";

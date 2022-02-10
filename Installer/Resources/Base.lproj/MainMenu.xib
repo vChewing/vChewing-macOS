@@ -91,7 +91,7 @@
                         <rect key="frame" x="91" y="166" width="427" height="160"/>
                         <clipView key="contentView" drawsBackground="NO" id="NrY-FL-PVu" userLabel="appEULAContentClip">
                             <rect key="frame" x="1" y="1" width="425" height="158"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="bar" smartInsertDelete="YES" id="47J-tO-8TZ" userLabel="appEULAContent">
                                     <rect key="frame" x="0.0" y="-2" width="425" height="158"/>
@@ -164,7 +164,7 @@ vChewing macOS Development Reinforced by Hiraku Wang. vChewing Phrase Database
                     </box>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="k5O-zZ-gQY">
                         <rect key="frame" x="89" y="334" width="431" height="15"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" title="3-Clause BSD License:" id="AVS-ih-FXM">
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="MIT-NTL License:" id="AVS-ih-FXM">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

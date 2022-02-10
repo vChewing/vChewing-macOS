@@ -1,10 +1,21 @@
-/* 
- *  PreferencesModule.swift
- *  
- *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
- *  Derived from 2011-2022 OpenVanilla Project (MIT License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
- */
+// Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
+// All possible vChewing-specific modifications are (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+/*
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+1. The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+2. No trademark license is granted to use the trade names, trademarks, service marks, or product names of Contributor,
+   except as required to fulfill notice requirements above.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 
 import Cocoa
 
@@ -18,21 +29,27 @@ private let kAppleLanguagesPreferences = "AppleLanguages"
 private let kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
 private let kShouldAutoSortUserPhrasesAndExclListOnLoad = "ShouldAutoSortUserPhrasesAndExclListOnLoad"
 private let kShouldAutoSortPhraseReplacementMapOnLoad = "ShouldAutoSortPhraseReplacementMapOnLoad"
+private let kShouldAutoSortAssociatedPhrasesOnLoad = "ShouldAutoSortAssociatedPhrasesOnLoad"
 private let kSelectPhraseAfterCursorAsCandidatePreference = "SelectPhraseAfterCursorAsCandidate"
 private let kUseHorizontalCandidateListPreference = "UseHorizontalCandidateList"
 private let kComposingBufferSizePreference = "ComposingBufferSize"
-private let kChooseCandidateUsingSpace = "ChooseCandidateUsingSpaceKey"
+private let kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
 private let kCNS11643Enabled = "CNS11643Enabled"
 private let kChineseConversionEnabled = "ChineseConversionEnabled"
 private let kHalfWidthPunctuationEnabled = "HalfWidthPunctuationEnable"
+private let kMoveCursorAfterSelectingCandidate = "MoveCursorAfterSelectingCandidate"
 private let kEscToCleanInputBuffer = "EscToCleanInputBuffer"
-private let kUseSCPCInputMode = "UseSCPCInputMode"
+private let kUseSCPCTypingMode = "UseSCPCTypingMode"
 private let kMaxCandidateLength = "MaxCandidateLength"
 private let kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
 
 private let kCandidateTextFontName = "CandidateTextFontName"
 private let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
 private let kCandidateKeys = "CandidateKeys"
+
+private let kChineseConversionEngineKey = "ChineseConversionEngine"
+private let kChineseConversionStyleKey = "ChineseConversionStyle"
+private let kAssociatedPhrasesEnabled = "AssociatedPhrasesEnabled"
 private let kPhraseReplacementEnabled = "PhraseReplacementEnabled"
 
 private let kDefaultCandidateListTextSize: CGFloat = 18
@@ -50,8 +67,10 @@ private let kMinComposingBufferSize = 4
 private let kMaxComposingBufferSize = 30
 
 private let kDefaultKeys = "123456789"
+private let kDefaultAssociatedPhrasesKeys = "!@#$%^&*("
 
 // MARK: Property wrappers
+
 @propertyWrapper
 struct UserDefault<Value> {
     let key: String
@@ -60,7 +79,7 @@ struct UserDefault<Value> {
 
     var wrappedValue: Value {
         get {
-            return container.object(forKey: key) as? Value ?? defaultValue
+            container.object(forKey: key) as? Value ?? defaultValue
         }
         set {
             container.set(newValue, forKey: key)
@@ -73,7 +92,8 @@ struct CandidateListTextSize {
     let key: String
     let defaultValue: CGFloat = kDefaultCandidateListTextSize
     lazy var container: UserDefault = {
-        UserDefault(key: key, defaultValue: defaultValue) }()
+        UserDefault(key: key, defaultValue: defaultValue)
+    }()
 
     var wrappedValue: CGFloat {
         mutating get {
@@ -102,7 +122,8 @@ struct ComposingBufferSize {
     let key: String
     let defaultValue: Int = kDefaultComposingBufferSize
     lazy var container: UserDefault = {
-        UserDefault(key: key, defaultValue: defaultValue) }()
+        UserDefault(key: key, defaultValue: defaultValue)
+    }()
 
     var wrappedValue: Int {
         mutating get {
@@ -127,6 +148,7 @@ struct ComposingBufferSize {
 }
 
 // MARK: -
+
 @objc enum KeyboardLayout: Int {
     case standard = 0
     case eten = 1
@@ -153,34 +175,66 @@ struct ComposingBufferSize {
     }
 }
 
+@objc enum ChineseConversionEngine: Int {
+    case openCC
+    case vxHanConvert
+
+    var name: String {
+        switch (self) {
+        case .openCC:
+            return "OpenCC"
+        case .vxHanConvert:
+            return "VXHanConvert"
+        }
+    }
+}
+
+@objc enum ChineseConversionStyle: Int {
+    case output
+    case model
+
+    var name: String {
+        switch (self) {
+        case .output:
+            return "output"
+        case .model:
+            return "model"
+        }
+    }
+}
+
 // MARK: -
 @objc public class Preferences: NSObject {
-    static func reset() {
-        let defaults = UserDefaults.standard
-        defaults.removeObject(forKey: kKeyboardLayoutPreference)
-        defaults.removeObject(forKey: kBasisKeyboardLayoutPreference)
-        defaults.removeObject(forKey: kFunctionKeyKeyboardLayoutPreference)
-        defaults.removeObject(forKey: kFunctionKeyKeyboardLayoutOverrideIncludeShift)
-        defaults.removeObject(forKey: kCandidateListTextSize)
-        defaults.removeObject(forKey: kAppleLanguagesPreferences)
-        defaults.removeObject(forKey: kShouldAutoReloadUserDataFiles)
-        defaults.removeObject(forKey: kShouldAutoSortUserPhrasesAndExclListOnLoad)
-        defaults.removeObject(forKey: kShouldAutoSortPhraseReplacementMapOnLoad)
-        defaults.removeObject(forKey: kSelectPhraseAfterCursorAsCandidatePreference)
-        defaults.removeObject(forKey: kUseHorizontalCandidateListPreference)
-        defaults.removeObject(forKey: kComposingBufferSizePreference)
-        defaults.removeObject(forKey: kChooseCandidateUsingSpace)
-        defaults.removeObject(forKey: kCNS11643Enabled)
-        defaults.removeObject(forKey: kChineseConversionEnabled)
-        defaults.removeObject(forKey: kHalfWidthPunctuationEnabled)
-        defaults.removeObject(forKey: kEscToCleanInputBuffer)
-        defaults.removeObject(forKey: kCandidateTextFontName)
-        defaults.removeObject(forKey: kCandidateKeyLabelFontName)
-        defaults.removeObject(forKey: kCandidateKeys)
-        defaults.removeObject(forKey: kPhraseReplacementEnabled)
-        defaults.removeObject(forKey: kUseSCPCInputMode)
-        defaults.removeObject(forKey: kMaxCandidateLength)
-        defaults.removeObject(forKey: kShouldNotFartInLieuOfBeep)
+    static var allKeys:[String] {
+        [kKeyboardLayoutPreference,
+         kBasisKeyboardLayoutPreference,
+         kFunctionKeyKeyboardLayoutPreference,
+         kFunctionKeyKeyboardLayoutOverrideIncludeShift,
+         kCandidateListTextSize,
+         kAppleLanguagesPreferences,
+         kShouldAutoReloadUserDataFiles,
+         kShouldAutoSortUserPhrasesAndExclListOnLoad,
+         kShouldAutoSortPhraseReplacementMapOnLoad,
+         kShouldAutoSortAssociatedPhrasesOnLoad,
+         kSelectPhraseAfterCursorAsCandidatePreference,
+         kUseHorizontalCandidateListPreference,
+         kComposingBufferSizePreference,
+         kChooseCandidateUsingSpace,
+         kCNS11643Enabled,
+         kChineseConversionEnabled,
+         kHalfWidthPunctuationEnabled,
+         kEscToCleanInputBuffer,
+         kCandidateTextFontName,
+         kCandidateKeyLabelFontName,
+         kCandidateKeys,
+         kMoveCursorAfterSelectingCandidate,
+         kPhraseReplacementEnabled,
+         kUseSCPCTypingMode,
+         kMaxCandidateLength,
+         kShouldNotFartInLieuOfBeep,
+         kChineseConversionEngineKey,
+         kChineseConversionStyleKey,
+         kAssociatedPhrasesEnabled]
     }
     
     @objc public static func setMissingDefaults () {
@@ -208,7 +262,12 @@ struct ComposingBufferSize {
         
         // 在檔案載入時，預設不啟用語彙置換表的內容排序。
         if UserDefaults.standard.object(forKey: kShouldAutoSortUserPhrasesAndExclListOnLoad) == nil {
-            UserDefaults.standard.set(Preferences.ShouldAutoSortUserPhrasesAndExclListOnLoad, forKey: kShouldAutoSortUserPhrasesAndExclListOnLoad)
+            UserDefaults.standard.set(Preferences.shouldAutoSortUserPhrasesAndExclListOnLoad, forKey: kShouldAutoSortUserPhrasesAndExclListOnLoad)
+        }
+        
+        // 在檔案載入時，預設不啟用自訂聯想詞表的內容排序。
+        if UserDefaults.standard.object(forKey: kShouldAutoSortAssociatedPhrasesOnLoad) == nil {
+            UserDefaults.standard.set(Preferences.shouldAutoSortAssociatedPhrasesOnLoad, forKey: kShouldAutoSortAssociatedPhrasesOnLoad)
         }
         
         // 自動檢測使用者自訂語彙數據的變動並載入。
@@ -217,13 +276,23 @@ struct ComposingBufferSize {
         }
         
         // 預設禁用逐字選字模式（就是每個字都要選的那種），所以設成 false
-        if UserDefaults.standard.object(forKey: kUseSCPCInputMode) == nil {
-            UserDefaults.standard.set(Preferences.useSCPCInputMode, forKey: kUseSCPCInputMode)
+        if UserDefaults.standard.object(forKey: kUseSCPCTypingMode) == nil {
+            UserDefaults.standard.set(Preferences.useSCPCTypingMode, forKey: kUseSCPCTypingMode)
         }
-        
+
+        // 預設禁用逐字選字模式時的聯想詞功能，所以設成 false
+        if UserDefaults.standard.object(forKey: kAssociatedPhrasesEnabled) == nil {
+            UserDefaults.standard.set(Preferences.associatedPhrasesEnabled, forKey: kAssociatedPhrasesEnabled)
+        }
+
         // 預設漢音風格選字，所以要設成 0
         if UserDefaults.standard.object(forKey: kSelectPhraseAfterCursorAsCandidatePreference) == nil {
             UserDefaults.standard.set(Preferences.selectPhraseAfterCursorAsCandidate, forKey: kSelectPhraseAfterCursorAsCandidatePreference)
+        }
+        
+        // 預設在選字後自動移動游標
+        if UserDefaults.standard.object(forKey: kMoveCursorAfterSelectingCandidate) == nil {
+            UserDefaults.standard.set(Preferences.moveCursorAfterSelectingCandidate, forKey: kMoveCursorAfterSelectingCandidate)
         }
         
         // 預設橫向選字窗，不爽請自行改成縱向選字窗
@@ -280,13 +349,19 @@ struct ComposingBufferSize {
     @objc static var shouldAutoReloadUserDataFiles: Bool
 
     @UserDefault(key: kShouldAutoSortUserPhrasesAndExclListOnLoad, defaultValue: false)
-    @objc static var ShouldAutoSortUserPhrasesAndExclListOnLoad: Bool
+    @objc static var shouldAutoSortUserPhrasesAndExclListOnLoad: Bool
 
     @UserDefault(key: kShouldAutoSortPhraseReplacementMapOnLoad, defaultValue: false)
     @objc static var shouldAutoSortPhraseReplacementMapOnLoad: Bool
 
-    @UserDefault(key: kSelectPhraseAfterCursorAsCandidatePreference, defaultValue: false)
+    @UserDefault(key: kShouldAutoSortAssociatedPhrasesOnLoad, defaultValue: false)
+    @objc static var shouldAutoSortAssociatedPhrasesOnLoad: Bool
+
+    @UserDefault(key: kSelectPhraseAfterCursorAsCandidatePreference, defaultValue: true)
     @objc static var selectPhraseAfterCursorAsCandidate: Bool
+
+    @UserDefault(key: kMoveCursorAfterSelectingCandidate, defaultValue: false)
+    @objc static var moveCursorAfterSelectingCandidate: Bool
 
     @UserDefault(key: kUseHorizontalCandidateListPreference, defaultValue: true)
     @objc static var useHorizontalCandidateList: Bool
@@ -297,13 +372,13 @@ struct ComposingBufferSize {
     @UserDefault(key: kChooseCandidateUsingSpace, defaultValue: true)
     @objc static var chooseCandidateUsingSpace: Bool
     
-    @UserDefault(key: kUseSCPCInputMode, defaultValue: false)
-    @objc static var useSCPCInputMode: Bool
+    @UserDefault(key: kUseSCPCTypingMode, defaultValue: false)
+    @objc static var useSCPCTypingMode: Bool
     
-    @objc static func toggleSCPCInputModeEnabled() -> Bool {
-        useSCPCInputMode = !useSCPCInputMode
-        UserDefaults.standard.set(useSCPCInputMode, forKey: kUseSCPCInputMode)
-        return useSCPCInputMode
+    @objc static func toggleSCPCTypingModeEnabled() -> Bool {
+        useSCPCTypingMode = !useSCPCTypingMode
+        UserDefaults.standard.set(useSCPCTypingMode, forKey: kUseSCPCTypingMode)
+        return useSCPCTypingMode
     }
     
     @UserDefault(key: kMaxCandidateLength, defaultValue: 10)
@@ -422,4 +497,14 @@ struct ComposingBufferSize {
         UserDefaults.standard.set(phraseReplacementEnabled, forKey: kPhraseReplacementEnabled)
         return phraseReplacementEnabled
     }
+
+    @UserDefault(key: kAssociatedPhrasesEnabled, defaultValue: false)
+    @objc static var associatedPhrasesEnabled: Bool
+
+    @objc static func toggleAssociatedPhrasesEnabled() -> Bool {
+        associatedPhrasesEnabled = !associatedPhrasesEnabled
+        UserDefaults.standard.set(associatedPhrasesEnabled, forKey: kAssociatedPhrasesEnabled)
+        return associatedPhrasesEnabled
+    }
+    
 }
