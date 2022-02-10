@@ -1,0 +1,387 @@
+
+/* Class = "NSMenuItem"; title = "自订工具列…"; ObjectID = "1UK-8n-QPP"; */
+"1UK-8n-QPP.title" = "自订工具列…";
+
+/* Class = "NSMenuItem"; title = "威注音语汇编辑器"; ObjectID = "1Xt-HY-uBw"; */
+"1Xt-HY-uBw.title" = "威注音语汇编辑器";
+
+/* Class = "NSMenu"; title = "检索"; ObjectID = "1b7-l0-nxx"; */
+"1b7-l0-nxx.title" = "检索";
+
+/* Class = "NSMenuItem"; title = "调低"; ObjectID = "1tx-W0-xDw"; */
+"1tx-W0-xDw.title" = "调低";
+
+/* Class = "NSMenuItem"; title = "提高"; ObjectID = "2h7-ER-AoG"; */
+"2h7-ER-AoG.title" = "提高";
+
+/* Class = "NSMenuItem"; title = "形态转换"; ObjectID = "2oI-Rn-ZJC"; */
+"2oI-Rn-ZJC.title" = "形态转换";
+
+/* Class = "NSMenu"; title = "拼写与文法"; ObjectID = "3IN-sU-3Bg"; */
+"3IN-sU-3Bg.title" = "拼写与文法";
+
+/* Class = "NSMenuItem"; title = "采缺省设定"; ObjectID = "3Om-Ey-2VK"; */
+"3Om-Ey-2VK.title" = "采缺省设定";
+
+/* Class = "NSMenu"; title = "语音"; ObjectID = "3rS-ZA-NoH"; */
+"3rS-ZA-NoH.title" = "语音";
+
+/* Class = "NSMenuItem"; title = "Tighten"; ObjectID = "46P-cB-AYj"; */
+"46P-cB-AYj.title" = "使之紧凑";
+
+/* Class = "NSMenuItem"; title = "检索"; ObjectID = "4EN-yA-p0u"; */
+"4EN-yA-p0u.title" = "检索";
+
+/* Class = "NSMenuItem"; title = "进入全萤幕"; ObjectID = "4J7-dP-txa"; */
+"4J7-dP-txa.title" = "进入全萤幕";
+
+/* Class = "NSMenuItem"; title = "退出威注音语汇编辑器"; ObjectID = "4sb-4s-VLi"; */
+"4sb-4s-VLi.title" = "退出威注音语汇编辑器";
+
+/* Class = "NSMenuItem"; title = "编辑"; ObjectID = "5QF-Oa-p0T"; */
+"5QF-Oa-p0T.title" = "编辑";
+
+/* Class = "NSMenuItem"; title = "拷贝样式"; ObjectID = "5Vv-lz-BsD"; */
+"5Vv-lz-BsD.title" = "拷贝样式";
+
+/* Class = "NSMenuItem"; title = "关于威注音语汇编辑器"; ObjectID = "5kV-Vb-QxS"; */
+"5kV-Vb-QxS.title" = "关于威注音语汇编辑器";
+
+/* Class = "NSMenuItem"; title = "重做"; ObjectID = "6dh-zS-Vam"; */
+"6dh-zS-Vam.title" = "重做";
+
+/* Class = "NSMenuItem"; title = "自动纠正拼写"; ObjectID = "78Y-hA-62v"; */
+"78Y-hA-62v.title" = "自动纠正拼写";
+
+/* Class = "NSMenu"; title = "书写方向"; ObjectID = "8mr-sm-Yjd"; */
+"8mr-sm-Yjd.title" = "书写方向";
+
+/* Class = "NSMenuItem"; title = "内容替代项目"; ObjectID = "9ic-FL-obx"; */
+"9ic-FL-obx.title" = "内容替代项目";
+
+/* Class = "NSMenuItem"; title = "智能拷贝/粘贴"; ObjectID = "9yt-4B-nSM"; */
+"9yt-4B-nSM.title" = "智能拷贝/粘贴";
+
+/* Class = "NSMenu"; title = "Main Menu"; ObjectID = "AYu-sK-qS6"; */
+"AYu-sK-qS6.title" = "主选单";
+
+/* Class = "NSMenuItem"; title = "偏好设定…"; ObjectID = "BOF-NM-1cW"; */
+"BOF-NM-1cW.title" = "偏好设定…";
+
+/* Class = "NSMenuItem"; title = "\t由左至右"; ObjectID = "BgM-ve-c93"; */
+"BgM-ve-c93.title" = "\t由左至右";
+
+/* Class = "NSMenuItem"; title = "另存…"; ObjectID = "Bw7-FT-i3A"; */
+"Bw7-FT-i3A.title" = "另存…";
+
+/* Class = "NSWindow"; title = "Window"; ObjectID = "Ckk-yw-fiv"; */
+"Ckk-yw-fiv.title" = "视窗";
+
+/* Class = "NSMenuItem"; title = "关闭档案"; ObjectID = "DVo-aG-piG"; */
+"DVo-aG-piG.title" = "关闭档案";
+
+/* Class = "NSMenuItem"; title = "拼写与文法"; ObjectID = "Dv1-io-Yv7"; */
+"Dv1-io-Yv7.title" = "拼写与文法";
+
+/* Class = "NSMenuItem"; title = "文字"; ObjectID = "Fal-I4-PZk"; */
+"Fal-I4-PZk.title" = "文字";
+
+/* Class = "NSMenu"; title = "内容替代项目"; ObjectID = "FeM-D8-WVr"; */
+"FeM-D8-WVr.title" = "内容替代项目";
+
+/* Class = "NSMenuItem"; title = "粗体"; ObjectID = "GB9-OM-e27"; */
+"GB9-OM-e27.title" = "粗体";
+
+/* Class = "NSMenu"; title = "格式"; ObjectID = "GEO-Iw-cKr"; */
+"GEO-Iw-cKr.title" = "格式";
+
+/* Class = "NSMenuItem"; title = "Use Default"; ObjectID = "GUa-eO-cwY"; */
+"GUa-eO-cwY.title" = "使用默认值";
+
+/* Class = "NSMenuItem"; title = "字型"; ObjectID = "Gi5-1S-RQB"; */
+"Gi5-1S-RQB.title" = "字型";
+
+/* Class = "NSMenuItem"; title = "书写方向"; ObjectID = "H1b-Si-o9J"; */
+"H1b-Si-o9J.title" = "书写方向";
+
+/* Class = "NSMenuItem"; title = "检视"; ObjectID = "H8h-7b-M4v"; */
+"H8h-7b-M4v.title" = "检视";
+
+/* Class = "NSMenuItem"; title = "文本取代"; ObjectID = "HFQ-gK-NFA"; */
+"HFQ-gK-NFA.title" = "文本取代";
+
+/* Class = "NSMenuItem"; title = "显示拼写与文法"; ObjectID = "HFo-cy-zxI"; */
+"HFo-cy-zxI.title" = "显示拼写与文法";
+
+/* Class = "NSMenu"; title = "检视"; ObjectID = "HyV-fh-RgO"; */
+"HyV-fh-RgO.title" = "检视";
+
+/* Class = "NSMenuItem"; title = "下标"; ObjectID = "I0S-gh-46l"; */
+"I0S-gh-46l.title" = "下标";
+
+/* Class = "NSMenuItem"; title = "开启档案…"; ObjectID = "IAo-SY-fd9"; */
+"IAo-SY-fd9.title" = "开启档案…";
+
+/* Class = "NSMenuItem"; title = "齐行"; ObjectID = "J5U-5w-g23"; */
+"J5U-5w-g23.title" = "齐行";
+
+/* Class = "NSMenuItem"; title = "Use None"; ObjectID = "J7y-lM-qPV"; */
+"J7y-lM-qPV.title" = "Use None";
+
+/* Class = "NSMenuItem"; title = "恢复至近期存盘"; ObjectID = "KaW-ft-85H"; */
+"KaW-ft-85H.title" = "恢复至近期存盘";
+
+/* Class = "NSMenuItem"; title = "全部显示"; ObjectID = "Kd2-mp-pUS"; */
+"Kd2-mp-pUS.title" = "全部显示";
+
+/* Class = "NSMenuItem"; title = "全部置于前方"; ObjectID = "LE2-aR-0XJ"; */
+"LE2-aR-0XJ.title" = "全部置于前方";
+
+/* Class = "NSMenuItem"; title = "粘贴尺标"; ObjectID = "LVM-kO-fVI"; */
+"LVM-kO-fVI.title" = "粘贴尺标";
+
+/* Class = "NSMenuItem"; title = "\t由左至右"; ObjectID = "Lbh-J2-qVU"; */
+"Lbh-J2-qVU.title" = "\t由左至右";
+
+/* Class = "NSMenuItem"; title = "拷贝尺标"; ObjectID = "MkV-Pr-PK5"; */
+"MkV-Pr-PK5.title" = "拷贝尺标";
+
+/* Class = "NSMenuItem"; title = "服务"; ObjectID = "NMo-om-nkz"; */
+"NMo-om-nkz.title" = "服务";
+
+/* Class = "NSMenuItem"; title = "\t缺省"; ObjectID = "Nop-cj-93Q"; */
+"Nop-cj-93Q.title" = "\t缺省";
+
+/* Class = "NSMenuItem"; title = "最小化"; ObjectID = "OY7-WF-poV"; */
+"OY7-WF-poV.title" = "最小化";
+
+/* Class = "NSMenuItem"; title = "基线"; ObjectID = "OaQ-X3-Vso"; */
+"OaQ-X3-Vso.title" = "基线";
+
+/* Class = "NSMenuItem"; title = "隐藏本程式视窗"; ObjectID = "Olw-nP-bQN"; */
+"Olw-nP-bQN.title" = "隐藏本程式视窗";
+
+/* Class = "NSMenuItem"; title = "向上文检索"; ObjectID = "OwM-mh-QMV"; */
+"OwM-mh-QMV.title" = "向上文检索";
+
+/* Class = "NSMenuItem"; title = "停止朗读"; ObjectID = "Oyz-dy-DGm"; */
+"Oyz-dy-DGm.title" = "停止朗读";
+
+/* Class = "NSMenuItem"; title = "扩大字号"; ObjectID = "Ptp-SP-VEL"; */
+"Ptp-SP-VEL.title" = "扩大字号";
+
+/* Class = "NSMenuItem"; title = "显示字型"; ObjectID = "Q5e-8K-NDq"; */
+"Q5e-8K-NDq.title" = "显示字型";
+
+/* Class = "NSMenuItem"; title = "缩放"; ObjectID = "R4o-n2-Eq4"; */
+"R4o-n2-Eq4.title" = "缩放";
+
+/* Class = "NSMenuItem"; title = "\t由右至左"; ObjectID = "RB4-Sm-HuC"; */
+"RB4-Sm-HuC.title" = "\t由右至左";
+
+/* Class = "NSMenuItem"; title = "上标"; ObjectID = "Rqc-34-cIF"; */
+"Rqc-34-cIF.title" = "上标";
+
+/* Class = "NSMenuItem"; title = "全选"; ObjectID = "Ruw-6m-B2m"; */
+"Ruw-6m-B2m.title" = "全选";
+
+/* Class = "NSMenuItem"; title = "跳转至选中的内容"; ObjectID = "S0p-oC-mLd"; */
+"S0p-oC-mLd.title" = "跳转至选中的内容";
+
+/* Class = "NSMenu"; title = "视窗"; ObjectID = "Td7-aD-5lo"; */
+"Td7-aD-5lo.title" = "视窗";
+
+/* Class = "NSMenuItem"; title = "首字母大写"; ObjectID = "UEZ-Bs-lqG"; */
+"UEZ-Bs-lqG.title" = "首字母大写";
+
+/* Class = "NSMenuItem"; title = "置中"; ObjectID = "VIY-Ag-zcb"; */
+"VIY-Ag-zcb.title" = "置中";
+
+/* Class = "NSMenuItem"; title = "隐藏其他程式视窗"; ObjectID = "Vdr-fp-XzO"; */
+"Vdr-fp-XzO.title" = "隐藏其他程式视窗";
+
+/* Class = "NSMenuItem"; title = "斜体"; ObjectID = "Vjx-xi-njq"; */
+"Vjx-xi-njq.title" = "斜体";
+
+/* Class = "NSMenu"; title = "编辑"; ObjectID = "W48-6f-4Dl"; */
+"W48-6f-4Dl.title" = "编辑";
+
+/* Class = "NSMenuItem"; title = "下画线"; ObjectID = "WRG-CD-K1S"; */
+"WRG-CD-K1S.title" = "下画线";
+
+/* Class = "NSMenuItem"; title = "新增档案"; ObjectID = "Was-JA-tGl"; */
+"Was-JA-tGl.title" = "新增档案";
+
+/* Class = "NSMenuItem"; title = "依目标格式粘贴"; ObjectID = "WeT-3V-zwk"; */
+"WeT-3V-zwk.title" = "依目标格式粘贴";
+
+/* Class = "NSMenuItem"; title = "检索…"; ObjectID = "Xz5-n4-O0W"; */
+"Xz5-n4-O0W.title" = "检索…";
+
+/* Class = "NSMenuItem"; title = "检索且取代…"; ObjectID = "YEy-JH-Tfz"; */
+"YEy-JH-Tfz.title" = "检索且取代…";
+
+/* Class = "NSMenuItem"; title = "\t缺省"; ObjectID = "YGs-j5-SAR"; */
+"YGs-j5-SAR.title" = "\t缺省";
+
+/* Class = "NSMenuItem"; title = "开始朗读"; ObjectID = "Ynk-f8-cLZ"; */
+"Ynk-f8-cLZ.title" = "开始朗读";
+
+/* Class = "NSMenuItem"; title = "置左"; ObjectID = "ZM1-6Q-yy1"; */
+"ZM1-6Q-yy1.title" = "置左";
+
+/* Class = "NSMenuItem"; title = "段落"; ObjectID = "ZvO-Gk-QUH"; */
+"ZvO-Gk-QUH.title" = "段落";
+
+/* Class = "NSMenuItem"; title = "打印…"; ObjectID = "aTl-1u-JFS"; */
+"aTl-1u-JFS.title" = "打印…";
+
+/* Class = "NSMenuItem"; title = "视窗"; ObjectID = "aUF-d1-5bR"; */
+"aUF-d1-5bR.title" = "视窗";
+
+/* Class = "NSMenu"; title = "字型"; ObjectID = "aXa-aM-Jaq"; */
+"aXa-aM-Jaq.title" = "字型";
+
+/* Class = "NSMenuItem"; title = "Use Default"; ObjectID = "agt-UL-0e3"; */
+"agt-UL-0e3.title" = "使用默认值";
+
+/* Class = "NSMenuItem"; title = "显示调色盘"; ObjectID = "bgn-CT-cEk"; */
+"bgn-CT-cEk.title" = "显示调色盘";
+
+/* Class = "NSMenu"; title = "档案"; ObjectID = "bib-Uj-vzu"; */
+"bib-Uj-vzu.title" = "档案";
+
+/* Class = "NSMenuItem"; title = "检索选中的内容"; ObjectID = "buJ-ug-pKt"; */
+"buJ-ug-pKt.title" = "检索选中的内容";
+
+/* Class = "NSMenu"; title = "形态转换"; ObjectID = "c8a-y6-VQd"; */
+"c8a-y6-VQd.title" = "形态转换";
+
+/* Class = "NSMenuItem"; title = "Use None"; ObjectID = "cDB-IK-hbR"; */
+"cDB-IK-hbR.title" = "Use None";
+
+/* Class = "NSMenuItem"; title = "所选范围"; ObjectID = "cqv-fj-IhA"; */
+"cqv-fj-IhA.title" = "所选范围";
+
+/* Class = "NSMenuItem"; title = "智能链结"; ObjectID = "cwL-P1-jid"; */
+"cwL-P1-jid.title" = "智能链结";
+
+/* Class = "NSMenuItem"; title = "转换微小写"; ObjectID = "d9M-CD-aMd"; */
+"d9M-CD-aMd.title" = "转换微小写";
+
+/* Class = "NSMenu"; title = "文字"; ObjectID = "d9c-me-L2H"; */
+"d9c-me-L2H.title" = "文字";
+
+/* Class = "NSMenuItem"; title = "档案"; ObjectID = "dMs-cI-mzQ"; */
+"dMs-cI-mzQ.title" = "档案";
+
+/* Class = "NSMenuItem"; title = "撤销"; ObjectID = "dRJ-4n-Yzg"; */
+"dRJ-4n-Yzg.title" = "撤销";
+
+/* Class = "NSMenuItem"; title = "粘贴"; ObjectID = "gVA-U4-sdL"; */
+"gVA-U4-sdL.title" = "粘贴";
+
+/* Class = "NSMenuItem"; title = "智能引号"; ObjectID = "hQb-2v-fYv"; */
+"hQb-2v-fYv.title" = "智能引号";
+
+/* Class = "NSMenuItem"; title = "立即检查全文"; ObjectID = "hz2-CU-CR7"; */
+"hz2-CU-CR7.title" = "立即检查全文";
+
+/* Class = "NSMenu"; title = "服务"; ObjectID = "hz9-B4-Xy5"; */
+"hz9-B4-Xy5.title" = "服务";
+
+/* Class = "NSMenuItem"; title = "缩小字号"; ObjectID = "i1d-Er-qST"; */
+"i1d-Er-qST.title" = "缩小字号";
+
+/* Class = "NSMenu"; title = "基线"; ObjectID = "ijk-EB-dga"; */
+"ijk-EB-dga.title" = "基线";
+
+/* Class = "NSMenuItem"; title = "字符间距"; ObjectID = "jBQ-r6-VK2"; */
+"jBQ-r6-VK2.title" = "字符间距";
+
+/* Class = "NSMenuItem"; title = "\t由右至左"; ObjectID = "jFq-tB-4Kx"; */
+"jFq-tB-4Kx.title" = "\t由右至左";
+
+/* Class = "NSMenuItem"; title = "格式"; ObjectID = "jxT-CU-nIS"; */
+"jxT-CU-nIS.title" = "格式";
+
+/* Class = "NSMenuItem"; title = "显示侧边栏"; ObjectID = "kIP-vf-haE"; */
+"kIP-vf-haE.title" = "显示侧边栏";
+
+/* Class = "NSMenuItem"; title = "检查拼写时同时检查文法"; ObjectID = "mK6-2p-4JG"; */
+"mK6-2p-4JG.title" = "检查拼写时同时检查文法";
+
+/* Class = "NSMenuItem"; title = "连字"; ObjectID = "o6e-r0-MWq"; */
+"o6e-r0-MWq.title" = "连字";
+
+/* Class = "NSMenu"; title = "开启近期的档案"; ObjectID = "oas-Oc-fiZ"; */
+"oas-Oc-fiZ.title" = "开启近期的档案";
+
+/* Class = "NSMenuItem"; title = "Loosen"; ObjectID = "ogc-rX-tC1"; */
+"ogc-rX-tC1.title" = "Loosen";
+
+/* Class = "NSMenuItem"; title = "删除"; ObjectID = "pa3-QI-u2k"; */
+"pa3-QI-u2k.title" = "删除";
+
+/* Class = "NSMenuItem"; title = "保存…"; ObjectID = "pxx-59-PXV"; */
+"pxx-59-PXV.title" = "保存…";
+
+/* Class = "NSMenuItem"; title = "向下文检索"; ObjectID = "q09-fT-Sye"; */
+"q09-fT-Sye.title" = "向下文检索";
+
+/* Class = "NSMenuItem"; title = "页面设定…"; ObjectID = "qIS-W8-SiK"; */
+"qIS-W8-SiK.title" = "页面设定…";
+
+/* Class = "NSMenuItem"; title = "一边敲字一边检查拼写"; ObjectID = "rbD-Rh-wIN"; */
+"rbD-Rh-wIN.title" = "一边敲字一边检查拼写";
+
+/* Class = "NSMenuItem"; title = "智能破折号"; ObjectID = "rgM-f4-ycn"; */
+"rgM-f4-ycn.title" = "智能破折号";
+
+/* Class = "NSMenuItem"; title = "显示工具列"; ObjectID = "snW-S8-Cw5"; */
+"snW-S8-Cw5.title" = "显示工具列";
+
+/* Class = "NSMenuItem"; title = "数据侦测器"; ObjectID = "tRr-pd-1PS"; */
+"tRr-pd-1PS.title" = "数据侦测器";
+
+/* Class = "NSMenuItem"; title = "开启近期的档案"; ObjectID = "tXI-mr-wws"; */
+"tXI-mr-wws.title" = "开启近期的档案";
+
+/* Class = "NSMenu"; title = "字符间距"; ObjectID = "tlD-Oa-oAM"; */
+"tlD-Oa-oAM.title" = "字符间距";
+
+/* Class = "NSMenu"; title = "威注音语汇编辑器"; ObjectID = "uQy-DD-JDr"; */
+"uQy-DD-JDr.title" = "威注音语汇编辑器";
+
+/* Class = "NSMenuItem"; title = "剪下"; ObjectID = "uRl-iY-unG"; */
+"uRl-iY-unG.title" = "剪下";
+
+/* Class = "NSMenuItem"; title = "粘贴样式"; ObjectID = "vKC-jM-MkH"; */
+"vKC-jM-MkH.title" = "粘贴样式";
+
+/* Class = "NSMenuItem"; title = "显示尺标"; ObjectID = "vLm-3I-IUL"; */
+"vLm-3I-IUL.title" = "显示尺标";
+
+/* Class = "NSMenuItem"; title = "Clear Menu"; ObjectID = "vNY-rz-j42"; */
+"vNY-rz-j42.title" = "清空选单";
+
+/* Class = "NSMenuItem"; title = "转换为大写"; ObjectID = "vmV-6d-7jI"; */
+"vmV-6d-7jI.title" = "转换为大写";
+
+/* Class = "NSMenu"; title = "连字"; ObjectID = "w0m-vy-SC9"; */
+"w0m-vy-SC9.title" = "连字";
+
+/* Class = "NSMenuItem"; title = "齐右"; ObjectID = "wb2-vD-lq4"; */
+"wb2-vD-lq4.title" = "齐右";
+
+/* Class = "NSMenuItem"; title = "拷贝"; ObjectID = "x3v-GG-iWU"; */
+"x3v-GG-iWU.title" = "拷贝";
+
+/* Class = "NSMenuItem"; title = "Use All"; ObjectID = "xQD-1f-W4t"; */
+"xQD-1f-W4t.title" = "Use All";
+
+/* Class = "NSMenuItem"; title = "语音"; ObjectID = "xrE-MZ-jX0"; */
+"xrE-MZ-jX0.title" = "语音";
+
+/* Class = "NSMenuItem"; title = "显示替代项目"; ObjectID = "z6F-FW-3nz"; */
+"z6F-FW-3nz.title" = "显示替代项目";
