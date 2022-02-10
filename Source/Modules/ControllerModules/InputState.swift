@@ -161,11 +161,11 @@ class InputState: NSObject {
         @objc var tooltip: String {
 
             if composingBuffer.count != readings.count {
-                return NSLocalizedString("There are special phrases in your text. We don't support adding new phrases in this case.", comment: "")
+                return NSLocalizedString("⚠︎ Unhandlable char selected for user phrases.", comment: "")
             }
 
             if Preferences.phraseReplacementEnabled {
-                return NSLocalizedString("Phrase replacement mode is on. Not suggested to add phrase in the mode.", comment: "")
+                return NSLocalizedString("⚠︎ Phrase replacement mode enabled, interfering user phrase entry.", comment: "")
             }
             if markedRange.length == 0 {
                 return ""
@@ -173,9 +173,9 @@ class InputState: NSObject {
 
             let text = (composingBuffer as NSString).substring(with: markedRange)
             if markedRange.length < kMinMarkRangeLength {
-                return String(format: NSLocalizedString("You are now selecting \"%@\". You can add a phrase with two or more characters.", comment: ""), text)
+                return String(format: NSLocalizedString("\"%@\" length must ≥ 2 for a user phrase.", comment: ""), text)
             } else if (markedRange.length > kMaxMarkRangeLength) {
-                return String(format: NSLocalizedString("You are now selecting \"%@\". A phrase cannot be longer than %d characters.", comment: ""), text, kMaxMarkRangeLength)
+                return String(format: NSLocalizedString("\"%@\" length should ≤ %d for a user phrase.", comment: ""), text, kMaxMarkRangeLength)
             }
 
             let (exactBegin, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location)
@@ -184,10 +184,10 @@ class InputState: NSObject {
             let joined = selectedReadings.joined(separator: "-")
             let exist = mgrLangModel.checkIfExist(userPhrase: text, key: joined)
             if exist {
-                return String(format: NSLocalizedString("You are now selecting \"%@\". The phrase already exists.", comment: ""), text)
+                return String(format: NSLocalizedString("\"%@\" already exists.", comment: ""), text)
             }
 
-            return String(format: NSLocalizedString("You are now selecting \"%@\". Press enter to add a new phrase.", comment: ""), text)
+            return String(format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: ""), text)
         }
 
         @objc var tooltipForInputting: String = ""
