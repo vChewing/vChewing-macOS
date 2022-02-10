@@ -73,7 +73,7 @@ public class CandidateController: NSWindowController {
     @objc public var keyLabels: [CandidateKeyLabel] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"].map {
         CandidateKeyLabel(key: $0, displayedText: $0)
     }
-    @objc public var keyLabelFont: NSFont = NSFont.systemFont(ofSize: 14)
+    @objc public var keyLabelFont: NSFont = NSFont.monospacedDigitSystemFont(ofSize: 14, weight: .medium)
     @objc public var candidateFont: NSFont = NSFont.systemFont(ofSize: 18)
     @objc public var tooltip: String = ""
 
