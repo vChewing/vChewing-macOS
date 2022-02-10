@@ -73,6 +73,10 @@ class ctlInputMethod: IMKInputController {
         halfWidthPunctuationItem.keyEquivalentModifierMask = [.command, .control]
         halfWidthPunctuationItem.state = Preferences.halfWidthPunctuationEnabled.state
 
+        let userAssociatedPhrasesItem = menu.addItem(withTitle: NSLocalizedString("Per-Char Associated Phrases", comment: ""), action: #selector(toggleAssociatedPhrasesEnabled(_:)), keyEquivalent: "O")
+        userAssociatedPhrasesItem.keyEquivalentModifierMask = [.command, .control]
+        userAssociatedPhrasesItem.state = Preferences.associatedPhrasesEnabled.state
+
         if optionKeyPressed {
             let phaseReplacementItem = menu.addItem(withTitle: NSLocalizedString("Use Phrase Replacement", comment: ""), action: #selector(togglePhraseReplacement(_:)), keyEquivalent: "")
             phaseReplacementItem.state = Preferences.phraseReplacementEnabled.state
@@ -86,6 +90,7 @@ class ctlInputMethod: IMKInputController {
         if optionKeyPressed {
             menu.addItem(withTitle: NSLocalizedString("Edit Excluded Phrases", comment: ""), action: #selector(openExcludedPhrases(_:)), keyEquivalent: "")
             menu.addItem(withTitle: NSLocalizedString("Edit Phrase Replacement Table", comment: ""), action: #selector(openPhraseReplacement(_:)), keyEquivalent: "")
+            menu.addItem(withTitle: NSLocalizedString("Edit Associated Phrases", comment: ""), action: #selector(openAssociatedPhrases(_:)), keyEquivalent: "")
         }
 
         if (optionKeyPressed || !Preferences.shouldAutoReloadUserDataFiles) {
@@ -218,7 +223,7 @@ class ctlInputMethod: IMKInputController {
     }
 
     @objc func toggleAssociatedPhrasesEnabled(_ sender: Any?) {
-        _ = Preferences.toggleAssociatedPhrasesEnabled()
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Per-Char Associated Phrases", comment: ""), "\n", Preferences.toggleAssociatedPhrasesEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 
     @objc func togglePhraseReplacement(_ sender: Any?) {
@@ -266,6 +271,10 @@ class ctlInputMethod: IMKInputController {
 
     @objc func openPhraseReplacement(_ sender: Any?) {
         open(userFileAt: mgrLangModel.phraseReplacementDataPath(keyHandler.inputMode))
+    }
+
+    @objc func openAssociatedPhrases(_ sender: Any?) {
+        open(userFileAt: mgrLangModel.userAssociatedPhrasesDataPath(keyHandler.inputMode))
     }
 
     @objc func reloadUserPhrases(_ sender: Any?) {

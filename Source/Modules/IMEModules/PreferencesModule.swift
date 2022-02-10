@@ -279,7 +279,12 @@ struct ComposingBufferSize {
         if UserDefaults.standard.object(forKey: kUseSCPCTypingMode) == nil {
             UserDefaults.standard.set(Preferences.useSCPCTypingMode, forKey: kUseSCPCTypingMode)
         }
-        
+
+        // 預設禁用逐字選字模式時的聯想詞功能，所以設成 false
+        if UserDefaults.standard.object(forKey: kAssociatedPhrasesEnabled) == nil {
+            UserDefaults.standard.set(Preferences.associatedPhrasesEnabled, forKey: kAssociatedPhrasesEnabled)
+        }
+
         // 預設漢音風格選字，所以要設成 0
         if UserDefaults.standard.object(forKey: kSelectPhraseAfterCursorAsCandidatePreference) == nil {
             UserDefaults.standard.set(Preferences.selectPhraseAfterCursorAsCandidate, forKey: kSelectPhraseAfterCursorAsCandidatePreference)
