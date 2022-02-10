@@ -173,9 +173,19 @@
 		5BD05C6327B2BBEF004C4F1D /* Content.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Content.swift; sourceTree = "<group>"; };
 		5BD05C6427B2BBEF004C4F1D /* WindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WindowController.swift; sourceTree = "<group>"; };
 		5BD05C6527B2BBEF004C4F1D /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		5BDCBB4227B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/MainMenu.strings"; sourceTree = "<group>"; };
+		5BDCBB4327B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/frmAboutWindow.strings"; sourceTree = "<group>"; };
+		5BDCBB4527B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "Source/WindowNIBs/zh-Hant.lproj/frmPrefWindow.strings"; sourceTree = "<group>"; };
+		5BDCBB4727B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		5BDCBB4827B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		5BDCBB4927B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		5BDCBB4A27B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		5BDCBB4B27B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/frmAboutWindow.strings"; sourceTree = "<group>"; };
+		5BDCBB4D27B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5BE78BD827B37750005EA1BE /* ctlAboutWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlAboutWindow.swift; sourceTree = "<group>"; };
 		5BE78BDB27B37764005EA1BE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmAboutWindow.xib; sourceTree = "<group>"; };
 		5BE78BDF27B37968005EA1BE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmAboutWindow.strings; sourceTree = "<group>"; };
+		5BFDF48C27B51867009523B6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Main.strings"; sourceTree = "<group>"; };
 		6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A0D4EF515FC0DA600ABF4B3 /* IME-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IME-Info.plist"; sourceTree = "<group>"; };
 		6A0D4EF615FC0DA600ABF4B3 /* vChewing-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vChewing-Prefix.pch"; sourceTree = "<group>"; };
@@ -771,6 +781,7 @@
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hant",
 			);
 			mainGroup = 6A0D4E9215FC0CFA00ABF4B3;
 			packageReferences = (
@@ -955,6 +966,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				5B73FB5F27B2BE1300E9BF49 /* en */,
+				5BDCBB4D27B4F6C700D0CC59 /* zh-Hant */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -964,6 +976,7 @@
 			children = (
 				5B7BC4AF27AFFBE800F66C24 /* Base */,
 				5B7BC4B227AFFC0B00F66C24 /* en */,
+				5BDCBB4527B4F6C600D0CC59 /* zh-Hant */,
 			);
 			name = frmPrefWindow.xib;
 			sourceTree = "<group>";
@@ -981,6 +994,7 @@
 			children = (
 				5BBBB76A27AED5DB0023B93A /* Base */,
 				5B05A47F27AFF84200437698 /* en */,
+				5BDCBB4327B4F6C600D0CC59 /* zh-Hant */,
 			);
 			name = frmAboutWindow.xib;
 			sourceTree = "<group>";
@@ -989,6 +1003,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				5BD05C5C27B2BBA9004C4F1D /* Base */,
+				5BFDF48C27B51867009523B6 /* zh-Hant */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -998,6 +1013,7 @@
 			children = (
 				5BE78BDB27B37764005EA1BE /* Base */,
 				5BE78BDF27B37968005EA1BE /* en */,
+				5BDCBB4B27B4F6C700D0CC59 /* zh-Hant */,
 			);
 			name = frmAboutWindow.xib;
 			sourceTree = "<group>";
@@ -1014,6 +1030,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				6ACA41EB15FC1D9000935EF6 /* en */,
+				5BDCBB4727B4F6C600D0CC59 /* zh-Hant */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1022,6 +1039,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				6ACA41EF15FC1D9000935EF6 /* en */,
+				5BDCBB4827B4F6C600D0CC59 /* zh-Hant */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1031,6 +1049,7 @@
 			children = (
 				6A15B32421A51F2300B92CD3 /* Base */,
 				5BBBB77727AEDB290023B93A /* en */,
+				5BDCBB4227B4F6C600D0CC59 /* zh-Hant */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -1040,6 +1059,7 @@
 			children = (
 				D4E33D8927A838CF006DB1CF /* Base */,
 				5B05A47C27AFF7CF00437698 /* en */,
+				5BDCBB4A27B4F6C700D0CC59 /* zh-Hant */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1049,6 +1069,7 @@
 			children = (
 				D4E33D8E27A838F0006DB1CF /* Base */,
 				5B05A47B27AFF7CA00437698 /* en */,
+				5BDCBB4927B4F6C700D0CC59 /* zh-Hant */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
