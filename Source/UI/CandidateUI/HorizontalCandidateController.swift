@@ -63,7 +63,11 @@ fileprivate class HorizontalCandidateView: NSView {
         let baseSize = NSSize(width: 10240.0, height: 10240.0)
         for index in 0..<count {
             let rctCandidate = (dispCandidatesWithLabels[index] as NSString).boundingRect(with: baseSize, options: .usesLineFragmentOrigin, attributes: candidateWithLabelAttrDict)
-            let cellWidth = rctCandidate.size.width + cellPadding
+            var cellWidth = rctCandidate.size.width + cellPadding
+            let cellHeight = rctCandidate.size.height + cellPadding
+            if cellWidth < cellHeight * 1.35 {
+                cellWidth = cellHeight * 1.35
+            }
             newWidths.append(cellWidth)
         }
         elementWidths = newWidths
