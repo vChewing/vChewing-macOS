@@ -496,9 +496,9 @@ extension ctlInputMethod {
 
         let candidateKeys = Preferences.candidateKeys
         let keyLabels = candidateKeys.count > 4 ? Array(candidateKeys) : Array(Preferences.defaultCandidateKeys)
-        let keyLabelPrefix = state is InputState.AssociatedPhrases ? "⇧ " : ""
+        let keyLabelSuffix = state is InputState.AssociatedPhrases ? "^" : ""
         gCurrentCandidateController?.keyLabels = keyLabels.map {
-            CandidateKeyLabel(key: String($0), displayedText: keyLabelPrefix + String($0))
+            CandidateKeyLabel(key: String($0), displayedText: String($0) + keyLabelSuffix)
         }
 
         gCurrentCandidateController?.delegate = self

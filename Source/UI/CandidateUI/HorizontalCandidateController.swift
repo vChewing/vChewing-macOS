@@ -81,6 +81,7 @@ fileprivate class HorizontalCandidateView: NSView {
         
         keyLabelAttrDict = [.font: labelFont,
                             .paragraphStyle: paraStyle,
+                            .verticalGlyphForm: true as AnyObject,
                             .foregroundColor: NSColor.secondaryLabelColor] // Candidate phrase text color
         candidateAttrDict = [.font: candidateFont,
                              .paragraphStyle: paraStyle,
@@ -89,7 +90,7 @@ fileprivate class HorizontalCandidateView: NSView {
         let candidateFontSize = candidateFont.pointSize
         let biggestSize = max(labelFontSize, candidateFontSize)
         keyLabelWidth = ceil(labelFontSize)
-        keyLabelHeight = ceil(labelFontSize * 1.20)
+        keyLabelHeight = ceil(labelFontSize * 2)
         candidateTextHeight = ceil(candidateFontSize * 1.20)
         cellPadding = ceil(biggestSize / 2.0)
     }
@@ -118,7 +119,7 @@ fileprivate class HorizontalCandidateView: NSView {
         for index in 0..<elementWidths.count {
             let currentWidth = elementWidths[index]
             let rctCandidateArea = NSRect(x: accuWidth, y: 0.0, width: currentWidth + 1.0, height: candidateTextHeight + cellPadding)
-            let rctLabel = NSRect(x: accuWidth + cellPadding / 2 - 1, y: cellPadding / 2 , width: keyLabelWidth, height: candidateTextHeight)
+            let rctLabel = NSRect(x: accuWidth + cellPadding / 2 - 1, y: cellPadding / 2 , width: keyLabelWidth, height: keyLabelHeight * 2.0)
             let rctCandidatePhrase = NSRect(x: accuWidth + keyLabelWidth - 1, y: cellPadding / 2 , width: currentWidth - keyLabelWidth, height: candidateTextHeight)
 
             var activeCandidateIndexAttr = keyLabelAttrDict
