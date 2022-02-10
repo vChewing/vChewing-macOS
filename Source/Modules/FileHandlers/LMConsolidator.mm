@@ -1,13 +1,45 @@
-/* 
- *  LMConsolidator.mm
- *  vChewing-Specific module for Consolidating Language Model Data files.
- *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
- */
+// Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+/*
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+1. The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+2. No trademark license is granted to use the trade names, trademarks, service marks, or product names of Contributor,
+   except as required to fulfill notice requirements above.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 
 #include "LMConsolidator.h"
 
 namespace vChewing {
+
+constexpr std::string_view FORMATTED_PRAGMA_HEADER
+    = "# 𝙵𝙾𝚁𝙼𝙰𝚃 𝚘𝚛𝚐.𝚊𝚝𝚎𝚕𝚒𝚎𝚛𝙸𝚗𝚖𝚞.𝚟𝚌𝚑𝚎𝚠𝚒𝚗𝚐.𝚞𝚜𝚎𝚛𝙻𝚊𝚗𝚐𝚞𝚊𝚐𝚎𝙼𝚘𝚍𝚎𝚕𝙳𝚊𝚝𝚊.𝚏𝚘𝚛𝚖𝚊𝚝𝚝𝚎𝚍";
+
+// HEADER VERIFIER. CREDIT: Shiki Suen
+bool LMConsolidator::CheckPragma(const char *path)
+{
+    ifstream zfdCheckPragma(path);
+    if (zfdCheckPragma.good())
+    {
+        string firstLine;
+        getline(zfdCheckPragma, firstLine);
+        syslog(LOG_CONS, "HEADER SEEN ||%s", firstLine.c_str());
+        if (firstLine != FORMATTED_PRAGMA_HEADER) {
+            syslog(LOG_CONS, "HEADER VERIFICATION FAILED. START IN-PLACE CONSOLIDATING PROCESS.");
+            return false;
+        }
+    }
+    syslog(LOG_CONS, "HEADER VERIFICATION SUCCESSFUL.");
+    return true;
+}
 
 // EOF FIXER. CREDIT: Shiki Suen.
 bool LMConsolidator::FixEOF(const char *path)
@@ -40,6 +72,10 @@ bool LMConsolidator::FixEOF(const char *path)
 
 // CONTENT CONSOLIDATOR. CREDIT: Shiki Suen.
 bool LMConsolidator::ConsolidateContent(const char *path, bool shouldsort) {
+    if (LMConsolidator::CheckPragma(path) && !shouldsort){
+        return true;
+    }
+
     ifstream zfdContentConsolidatorIncomingStream(path);
     vector<string>vecEntry;
     while(!zfdContentConsolidatorIncomingStream.eof())
@@ -63,9 +99,12 @@ bool LMConsolidator::ConsolidateContent(const char *path, bool shouldsort) {
     }
     // 在第二遍 for 運算之前，針對 vecEntry 排序＋去除重複條目。
     if (shouldsort) {sort(vecEntry.begin(), vecEntry.end());} // 要不要排序，得做成開關。
-    vecEntry.erase(unique(vecEntry.begin(), vecEntry.end()), vecEntry.end()); // 排序。
+    vecEntry.erase(unique(vecEntry.begin(), vecEntry.end()), vecEntry.end()); // 去重複。
     // 統整完畢。開始將統整過的內容寫入檔案。
     ofstream zfdContentConsolidatorOutput(path); // 這裡是要從頭開始重寫檔案內容，所以不需要「 ios_base::app 」。
+    if (!LMConsolidator::CheckPragma(path)){
+        zfdContentConsolidatorOutput<<FORMATTED_PRAGMA_HEADER<<endl; // 寫入經過整理處理的 HEADER。
+    }
     for(int i=0;i<vecEntry.size();i++) { // 第二遍 for 用來寫入統整過的內容。
         if (vecEntry[i].size() != 0) { // 這句很重要，不然還是會把經過 RegEx 處理後出現的空行搞到檔案裡。
             zfdContentConsolidatorOutput<<vecEntry[i]<<endl; // 這裡是必須得加上 endl 的，不然所有行都變成一個整合行。

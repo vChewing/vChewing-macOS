@@ -1,10 +1,21 @@
-/* 
- *  VerticalCandidateController.swift
- *  
- *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
- *  Derived from 2011-2022 OpenVanilla Project (MIT License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
- */
+// Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
+// All possible vChewing-specific modifications are (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+/*
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+1. The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+2. No trademark license is granted to use the trade names, trademarks, service marks, or product names of Contributor,
+   except as required to fulfill notice requirements above.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 
 import Cocoa
 
@@ -80,6 +91,7 @@ fileprivate class VerticalCandidateView: NSView {
         
         keyLabelAttrDict = [.font: labelFont,
                             .paragraphStyle: paraStyle,
+                            .verticalGlyphForm: true as AnyObject,
                             .foregroundColor: NSColor.secondaryLabelColor] // Candidate phrase text color
         candidateAttrDict = [.font: candidateFont,
                              .paragraphStyle: paraStyle,
@@ -88,7 +100,7 @@ fileprivate class VerticalCandidateView: NSView {
         let candidateFontSize = candidateFont.pointSize
         let biggestSize = max(labelFontSize, candidateFontSize)
         keyLabelWidth = ceil(labelFontSize)
-        keyLabelHeight = ceil(labelFontSize * 1.20)
+        keyLabelHeight = ceil(labelFontSize * 2)
         candidateTextHeight = ceil(candidateFontSize * 1.20)
         cellPadding = ceil(biggestSize / 2.0)
     }
@@ -117,7 +129,7 @@ fileprivate class VerticalCandidateView: NSView {
         for index in 0..<elementHeights.count {
             let currentHeight = elementHeights[index]
             let rctCandidateArea = NSRect(x: 0.0, y: accuHeight, width: windowWidth, height: candidateTextHeight + cellPadding)
-            let rctLabel = NSRect(x: cellPadding / 2 - 1, y: accuHeight + cellPadding / 2, width: keyLabelWidth, height: candidateTextHeight)
+            let rctLabel = NSRect(x: cellPadding / 2 - 1, y: accuHeight + cellPadding / 2, width: keyLabelWidth, height: keyLabelHeight * 2.0)
             let rctCandidatePhrase = NSRect(x: cellPadding / 2 - 1 + keyLabelWidth, y: accuHeight + cellPadding / 2 - 1, width: windowWidth - keyLabelWidth, height: candidateTextHeight)
 
             var activeCandidateIndexAttr = keyLabelAttrDict
@@ -358,7 +370,7 @@ extension VerticalCandidateController {
             let candidate = delegate.candidateController(self, candidateAtIndex: index)
             candidates.append(candidate)
         }
-        candidateView.set(keyLabels: keyLabels, displayedCandidates: candidates)
+        candidateView.set(keyLabels: keyLabels.map { $0.displayedText}, displayedCandidates: candidates)
         var newSize = candidateView.sizeForView
         var frameRect = candidateView.frame
         frameRect.size = newSize

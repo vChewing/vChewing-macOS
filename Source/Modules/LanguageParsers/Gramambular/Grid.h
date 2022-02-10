@@ -1,10 +1,21 @@
-/* 
- *  Grid.h
- *  
- *  Copyright 2021-2022 vChewing Project (3-Clause BSD License).
- *  Derived from 2011-2022 OpenVanilla Project (MIT License).
- *  Some rights reserved. See "LICENSE.TXT" for details.
- */
+// Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
+// All possible vChewing-specific modifications are (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+/*
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+1. The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+2. No trademark license is granted to use the trade names, trademarks, service marks, or product names of Contributor,
+   except as required to fulfill notice requirements above.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 
 #ifndef Grid_h
 #define Grid_h
@@ -29,18 +40,18 @@ namespace Taiyan {
             vector<NodeAnchor> nodesEndingAt(size_t inLocation);
             vector<NodeAnchor> nodesCrossingOrEndingAt(size_t inLocation);
 
-			// "Freeze" the node with the unigram that represents the selected canditate value.
-			// After this, the node that contains the unigram will always be evaluated to that
-			// unigram, while all other overlapping nodes will be reset to their initial state
-			// (that is, if any of those nodes were "frozen" or fixed, they will be unfrozen.)
-			void fixNodeSelectedCandidate(size_t location, const string& value);
+            // "Freeze" the node with the unigram that represents the selected canditate value.
+            // After this, the node that contains the unigram will always be evaluated to that
+            // unigram, while all other overlapping nodes will be reset to their initial state
+            // (that is, if any of those nodes were "frozen" or fixed, they will be unfrozen.)
+            void fixNodeSelectedCandidate(size_t location, const string& value);
 
-			// Similar to fixNodeSelectedCandidate, but instead of "freezing" the node, only
-			// boost the unigram that represents the value with an overriding score. This
-			// has the same side effect as fixNodeSelectedCandidate, which is that all other
-			// overlapping nodes will be reset to their initial state.
-			void overrideNodeScoreForSelectedCandidate(size_t location, const string& value, float overridingScore);
-			
+            // Similar to fixNodeSelectedCandidate, but instead of "freezing" the node, only
+            // boost the unigram that represents the value with an overriding score. This
+            // has the same side effect as fixNodeSelectedCandidate, which is that all other
+            // overlapping nodes will be reset to their initial state.
+            void overrideNodeScoreForSelectedCandidate(size_t location, const string& value, float overridingScore);
+            
             const string dumpDOT();
             
         protected:
@@ -186,26 +197,26 @@ namespace Taiyan {
                 }
             }
         }
+
+        inline void Grid::overrideNodeScoreForSelectedCandidate(size_t location, const string& value, float overridingScore)
+        {
+            vector<NodeAnchor> nodes = nodesCrossingOrEndingAt(location);
+            for (auto nodeAnchor : nodes) {
+                auto candidates = nodeAnchor.node->candidates();
+
+                // Reset the candidate-fixed state of every node at the location.
+                const_cast<Node*>(nodeAnchor.node)->resetCandidate();
+
+                for (size_t i = 0, c = candidates.size(); i < c; ++i) {
+                    if (candidates[i].value == value) {
+                        const_cast<Node*>(nodeAnchor.node)->selectFloatingCandidateAtIndex(i, overridingScore);
+                        break;
+                    }
+                }
+            }
+        }
         
-	inline void Grid::overrideNodeScoreForSelectedCandidate(size_t location, const string& value, float overridingScore)
-	{
-		vector<NodeAnchor> nodes = nodesCrossingOrEndingAt(location);
-		for (auto nodeAnchor : nodes) {
-			auto candidates = nodeAnchor.node->candidates();
-			
-			// Reset the candidate-fixed state of every node at the location.
-			const_cast<Node*>(nodeAnchor.node)->resetCandidate();
-			
-			for (size_t i = 0, c = candidates.size(); i < c; ++i) {
-				if (candidates[i].value == value) {
-					const_cast<Node*>(nodeAnchor.node)->selectFloatingCandidateAtIndex(i, overridingScore);
-					break;
-				}
-			}
-		}
-	}
-	
-	inline const string Grid::dumpDOT()
+        inline const string Grid::dumpDOT()
         {
             stringstream sst;
             sst << "digraph {" << endl;

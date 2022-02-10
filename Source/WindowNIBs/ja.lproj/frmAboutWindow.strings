@@ -1,27 +1,27 @@
 
-/* Class = "NSButtonCell"; title = "OK"; ObjectID = "btnConfirm"; */
-"btnConfirm.title" = "OK";
+/* Class = "NSTextFieldCell"; title = "MIT-NTL License:"; ObjectID = "lblLicense"; */
+"lblLicense.title" = "ＭＩＴ商標不許可ライセンス (MIT-NTL License):";
 
-/* Class = "NSTextFieldCell"; title = "vChewing for macOS"; ObjectID = "lblAppTitle"; */
-"lblAppTitle.title" = "vChewing for macOS";
+/* Class = "NSTextFieldCell"; title = "version"; ObjectID = "lblVersionString"; */
+// "lblVersionString.title" = "版本";
 
-/* Class = "NSTextFieldCell"; title = "Placeholder for showing copyright information."; ObjectID = "lblCopyright"; */
-"lblCopyright.title" = "Placeholder for showing copyright information.";
-
-/* Class = "NSTextFieldCell"; title = "McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.\nvChewing macOS Development Reinforced by Hiraku Wang.\nvChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "lblCredits"; */
-"lblCredits.title" = "小麦注音入力エンジン開発：Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, など。\nmacOS 版の開発協力：Hiraku Wang。\n威注音語彙データの維持：孫志貴 (Shiki Suen)。";
-
-/* Class = "NSTextFieldCell"; title = "DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, have been removed from vChewing official phrase database."; ObjectID = "lblDisclaimer"; */
-"lblDisclaimer.title" = "免責事項：vChewing Project は、OpenVanilla と協力関係や提携関係にあるわけではなく、OpenVanilla が小麦注音プロジェクトに同梱した辞書データについて、vChewing Project は一切責任負い兼ねる。特定な地政学的・観念形態的な内容は、vChewing アプリの世界的な普及に妨害する恐れがあるため、vChewing 公式辞書データから削除済みである。";
-
-/* Class = "NSTextFieldCell"; title = "3-Clause BSD License:"; ObjectID = "lblLicense"; */
-"lblLicense.title" = "３条項ＢＳＤライセンス (3-Clause BSD License):";
+/* Class = "NSWindow"; title = "About vChewing for macOS"; ObjectID = "ttlAboutWindow"; */
+"ttlAboutWindow.title" = "macOS 版威注音入力アプリについて";
 
 /* Class = "NSTextFieldCell"; title = "Derived from OpenVanilla McBopopmofo Project."; ObjectID = "lblProjectDescription"; */
 "lblProjectDescription.title" = "OpenVanilla 小麦注音プロジェクトから派生。";
 
-/* Class = "NSTextFieldCell"; title = "version_placeholder"; ObjectID = "lblVersionString"; */
-"lblVersionString.title" = "version_placeholder";
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "btnConfirm"; */
+"btnConfirm.title" = "うむ";
 
-/* Class = "NSWindow"; title = "About vChewing for macOS"; ObjectID = "ttlAboutWindow"; */
-"ttlAboutWindow.title" = "macOS 版威注音入力アプリについて";
+/* Class = "NSTextFieldCell"; title = "vChewing for macOS"; ObjectID = "lblAppTitle"; */
+"lblAppTitle.title" = "vChewing for macOS";
+
+/* Class = "NSTextFieldCell"; title = "DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, have been removed from vChewing official phrase database."; ObjectID = "lblDisclaimer"; */
+"lblDisclaimer.title" = "免責事項：vChewing Project は、OpenVanilla と協力関係や提携関係にあるわけではなく、OpenVanilla が小麦注音プロジェクトに同梱した辞書データについて、vChewing Project は一切責任負い兼ねる。特定な地政学的・観念形態的な内容は、vChewing アプリの世界的な普及に妨害する恐れがあるため、vChewing 公式辞書データから削除済みである。";
+
+/* Class = "NSTextFieldCell"; title = "© 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project."; ObjectID = "lblCopyright"; */
+// "lblCopyright.title" = "© 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project.";
+
+/* Class = "NSTextFieldCell"; title = "McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.\nvChewing macOS Development Reinforced by Hiraku Wang.\nvChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "lblCredits"; */
+"lblCredits.title" = "小麦注音入力エンジン開発：Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, など。\nmacOS 版の開発協力：Hiraku Wang。\n威注音語彙データの維持：Shiki Suen。";
