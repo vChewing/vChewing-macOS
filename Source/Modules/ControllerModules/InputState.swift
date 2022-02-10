@@ -344,18 +344,21 @@ class InputState: NSObject {
     }
 
     @objc static let root: SymbolNode = SymbolNode("/", [
-        SymbolNode("…"),
-        SymbolNode("※"),
-        SymbolNode("常用符號", symbols:"，、。．？！；：‧‥﹐﹒˙·‘’“”〝〞‵′〃～＄％＠＆＃＊"),
-        SymbolNode("左右括號", symbols:"（）「」〔〕｛｝〈〉『』《》【】﹙﹚﹝﹞﹛﹜"),
-        SymbolNode("上下括號", symbols:"︵︶﹁﹂︹︺︷︸︿﹀﹃﹄︽︾︻︼"),
-        SymbolNode("希臘字母", symbols:"αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ"),
-        SymbolNode("數學符號", symbols:"＋－×÷＝≠≒∞±√＜＞﹤﹥≦≧∩∪ˇ⊥∠∟⊿㏒㏑∫∮∵∴╳﹢"),
-        SymbolNode("特殊圖形", symbols:"↑↓←→↖↗↙↘㊣◎○●⊕⊙○●△▲☆★◇◆□■▽▼§￥〒￠￡※♀♂"),
-        SymbolNode("Unicode", symbols:"♨☀☁☂☃♠♥♣♦♩♪♫♬☺☻"),
-        SymbolNode("單線框", symbols:"├─┼┴┬┤┌┐╞═╪╡│▕└┘╭╮╰╯"),
-        SymbolNode("雙線框", symbols:"╔╦╗╠═╬╣╓╥╖╒╤╕║╚╩╝╟╫╢╙╨╜╞╪╡╘╧╛"),
-        SymbolNode("填色方塊", symbols:"＿ˍ▁▂▃▄▅▆▇█▏▎▍▌▋▊▉◢◣◥◤"),
+        SymbolNode("｀"),
+        SymbolNode("常用", symbols:"，、。．？！；：‧‥﹐﹒˙·‘’“”〝〞‵′〃～＄％＠＆＃＊"),
+        SymbolNode("橫括", symbols:"（）「」〔〕｛｝〈〉『』《》【】﹙﹚﹝﹞﹛﹜"),
+        SymbolNode("縱括", symbols:"︵︶﹁﹂︹︺︷︸︿﹀﹃﹄︽︾︻︼"),
+        SymbolNode("希臘", symbols:"αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ"),
+        SymbolNode("數學", symbols:"＋－×÷＝≠≒∞±√＜＞﹤﹥≦≧∩∪ˇ⊥∠∟⊿㏒㏑∫∮∵∴╳﹢"),
+        SymbolNode("貨幣", symbols:"$€¥¢£₽₨₩฿₺₮₱₭₴₦৲৳૱௹﷼₹₲₪₡₫៛₵₢₸₤₳₥₠₣₰₧₯₶₷"),
+        SymbolNode("特殊", symbols:"↑↓←→↖↗↙↘↺⇧⇩⇦⇨⇄⇆⇅⇵↻◎○●⊕⊙※△▲☆★◇◆□■▽▼§￥〒￠￡♀♂↯"),
+        SymbolNode("萬國", symbols:"♨☀☁☂☃♠♥♣♦♩♪♫♬☺☻"),
+        SymbolNode("圈字", symbols:"㊟㊞㊚㊛㊊㊋㊌㊍㊎㊏㊐㊑㊒㊓㊔㊕㊖㊗︎㊘㊙︎㊜㊝㊠㊡㊢㊣㊤㊥㊦㊧㊨㊩㊪㊫㊬㊭㊮㊯㊰🈚︎🈯︎"),
+        SymbolNode("圈假", symbols:"㋐㋑㋒㋓㋔㋕㋖㋗㋘㋙㋚㋛㋜㋝㋞㋟㋠㋡㋢㋣㋤㋥㋦㋧㋨㋩㋪㋫㋬㋭㋮㋯㋰㋱㋲㋳㋴㋵㋶㋷㋸㋹㋺㋻㋼㋾"),
+        SymbolNode("括字", symbols:"㈪㈫㈬㈭㈮㈯㈰㈱㈲㈳㈴㈵㈶㈷㈸㈹㈺㈻㈼㈽㈾㈿㉀㉁㉂㉃"),
+        SymbolNode("單線", symbols:"├─┼┴┬┤┌┐╞═╪╡│▕└┘╭╮╰╯"),
+        SymbolNode("雙線", symbols:"╔╦╗╠═╬╣╓╥╖╒╤╕║╚╩╝╟╫╢╙╨╜╞╪╡╘╧╛"),
+        SymbolNode("填色", symbols:"＿ˍ▁▂▃▄▅▆▇█▏▎▍▌▋▊▉◢◣◥◤"),
         SymbolNode("線段", symbols:"﹣﹦≡｜∣∥–︱—︳╴¯￣﹉﹊﹍﹎﹋﹌﹏︴∕﹨╱╲／＼"),
     ])
 }
