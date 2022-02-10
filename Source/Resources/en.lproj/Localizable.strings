@@ -1,94 +1,49 @@
-/* No comment provided by engineer. */
 "About vChewing…" = "About vChewing…";
-
-/* No comment provided by engineer. */
-"vChewing Preferences" = "vChewing Preferences";
-
-/* No comment provided by engineer. */
+"vChewing Preferences…" = "vChewing Preferences…";
+"Check Later" = "Check Later";
 "Check for Updates…" = "Check for Updates…";
-
-/* No comment provided by engineer. */
+"Check for Update Completed" = "Check for Update Completed";
+"You are already using the latest version of vChewing." = "You are already using the latest version of vChewing.";
 "Update Check Failed" = "Update Check Failed";
-
-/* No comment provided by engineer. */
 "There may be no internet connection or the server failed to respond.\n\nError message: %@" = "There may be no internet connection or the server failed to respond.\n\nError message: %@";
-
-/* No comment provided by engineer. */
 "OK" = "OK";
-
-/* No comment provided by engineer. */
 "Dismiss" = "Dismiss";
-
-/* No comment provided by engineer. */
 "New Version Available" = "New Version Available";
-
-/* No comment provided by engineer. */
 "Not Now" = "Not Now";
-
-/* No comment provided by engineer. */
 "Visit Website" = "Visit Website";
-
-/* No comment provided by engineer. */
 "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@" = "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@";
-
-"Chinese Conversion" = "Convert to Simplified Chinese";
-
-"User Phrases" = "User Phrases";
-
-"Edit User Phrases" = "Edit User Phrases";
-
+"Force KangXi Writing" = "Force KangXi Writing";
+"NotificationSwitchON" = "✔ ON";
+"NotificationSwitchOFF" = "✘ OFF";
+"Edit User Phrases…" = "Edit User Phrases…";
 "Reload User Phrases" = "Reload User Phrases";
-
 "Unable to create the user phrase file." = "Unable to create the user phrase file.";
-
 "Please check the permission of at \"%@\"." = "Please check the permission of at \"%@\".";
-
-"Edit Excluded Phrases" = "Edit Excluded Phrases";
-
-"Use Half-Width Punctuations" = "Use Half-Width Punctuations";
-
-"You are now selecting \"%@\". You can add a phrase with two or more characters." = "You are now selecting \"%@\". You can add a phrase with two or more characters.";
-
-"You are now selecting \"%@\". Press enter to add a new phrase." = "You are now selecting \"%@\". Press enter to add a new phrase.";
-
-"You are now selecting \"%@\". A phrase cannot be longer than %d characters." = "You are now selecting \"%@\". A phrase cannot be longer than %d characters.";
-
-"Chinese conversion on" = "Chinese conversion on";
-
-"Chinese conversion off" = "Chinese conversion off";
-
-"Edit Phrase Replacement Table" = "Edit Phrase Replacement Table";
-
+"Edit Excluded Phrases" = "Edit Excluded Phrases…";
+"Half-Width Punctuation Mode" = "Half-Width Punctuation Mode";
+"\"%@\" length must ≥ 2 for a user phrase." = "\"%@\" length must ≥ 2 for a user phrase.";
+"\"%@\" length should ≤ %d for a user phrase." = "\"%@\" length should ≤ %d for a user phrase.";
+"\"%@\" selected. ENTER to add user phrase." = "\"%@\" selected. ENTER to add user phrase.";
+"\"%@\" already exists." = "\"%@\" already exists.";
+"Edit Phrase Replacement Table…" = "Edit Phrase Replacement Table…";
 "Use Phrase Replacement" = "Use Phrase Replacement";
-
 "Candidates keys cannot be empty." = "Candidates keys cannot be empty.";
-
-"Candidate keys can only contain latin characters and numbers." = "Candidate keys can only contain latin characters and numbers.";
-
+"Candidate keys can only contain ASCII characters like alphanumerals." = "Candidate keys can only contain ASCII characters like alphanumerals.";
 "Candidate keys cannot contain space." = "Candidate keys cannot contain space.";
-
 "There should not be duplicated keys." = "There should not be duplicated keys.";
-
-"The length of your candidate keys can not be less than 4 characters." = "The length of your candidate keys can not be less than 4 characters.";
-
-"The length of your candidate keys can not be larger than 15 characters." = "The length of your candidate keys can not be larger than 15 characters.";
-
-"Phrase replacement mode is on. Not suggested to add phrase in the mode." = "Phrase replacement mode is on. Not suggested to add phrase in the mode.";
-
-"Model based Chinese conversion is on. Not suggested to add phrase in the mode." = "Model based Chinese conversion is on. Not suggested to add phrase in the mode.";
-
-"Half-width punctuation on" = "Half-width punctuation on";
-
-"Half-width punctuation off" = "Half-width punctuation off";
-
-"Associated Phrases" = "Associated Phrases";
-
-"There are special phrases in your text. We don't support adding new phrases in this case." = "There are special phrases in your text. We don't support adding new phrases in this case.";
-
-"Cursor is before \"%@\"." = "Cursor is before \"%@\".";
-
-"Cursor is after \"%@\"." = "Cursor is after \"%@\".";
-
-"Cursor is between \"%@\" and \"%@\"." = "Cursor is between \"%@\" and \"%@\".";
-
-"You are now selecting \"%@\". The phrase already exists." = "You are now selecting \"%@\". The phrase already exists.";
+"Please specify at least 4 candidate keys." = "Please specify at least 4 candidate keys.";
+"Maximum 15 candidate keys allowed." = "Maximum 15 candidate keys allowed.";
+"⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.";
+"⚠︎ Unhandlable char selected for user phrases." = "⚠︎ Unhandlable char selected for user phrases.";
+"Per-Char Select Mode" = "Per-Char Select Mode";
+"CNS11643 Mode" = "CNS11643 Mode";
+"Per-Char Associated Phrases" = "Per-Char Associated Phrases";
+"Open User Data Folder" = "Open User Data Folder";
+"Edit Associated Phrases…" = "Edit Associated Phrases…";
+"Reboot vChewing…" = "Reboot vChewing…";
+"auto" = "Follow System Settings";
+"en" = "English";
+"zh-Hans" = "Simplified Chinese";
+"zh-Hant" = "Traditional Chinese";
+"ja" = "Japanese";
+"Apple Zhuyin Bopomofo" = "Apple Zhuyin Bopomofo";

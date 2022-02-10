@@ -85,12 +85,12 @@ class ctlInputMethod: IMKInputController {
         menu.addItem(NSMenuItem.separator()) // ---------------------
 
         menu.addItem(withTitle: NSLocalizedString("Open User Data Folder", comment: ""), action: #selector(openUserDataFolder(_:)), keyEquivalent: "")
-        menu.addItem(withTitle: NSLocalizedString("Edit User Phrases", comment: ""), action: #selector(openUserPhrases(_:)), keyEquivalent: "")
+        menu.addItem(withTitle: NSLocalizedString("Edit User Phrases…", comment: ""), action: #selector(openUserPhrases(_:)), keyEquivalent: "")
 
         if optionKeyPressed {
             menu.addItem(withTitle: NSLocalizedString("Edit Excluded Phrases", comment: ""), action: #selector(openExcludedPhrases(_:)), keyEquivalent: "")
-            menu.addItem(withTitle: NSLocalizedString("Edit Phrase Replacement Table", comment: ""), action: #selector(openPhraseReplacement(_:)), keyEquivalent: "")
-            menu.addItem(withTitle: NSLocalizedString("Edit Associated Phrases", comment: ""), action: #selector(openAssociatedPhrases(_:)), keyEquivalent: "")
+            menu.addItem(withTitle: NSLocalizedString("Edit Phrase Replacement Table…", comment: ""), action: #selector(openPhraseReplacement(_:)), keyEquivalent: "")
+            menu.addItem(withTitle: NSLocalizedString("Edit Associated Phrases…", comment: ""), action: #selector(openAssociatedPhrases(_:)), keyEquivalent: "")
         }
 
         if (optionKeyPressed || !Preferences.shouldAutoReloadUserDataFiles) {
@@ -99,7 +99,7 @@ class ctlInputMethod: IMKInputController {
 
         menu.addItem(NSMenuItem.separator()) // ---------------------
 
-        menu.addItem(withTitle: NSLocalizedString("vChewing Preferences", comment: ""), action: #selector(showPreferences(_:)), keyEquivalent: "")
+        menu.addItem(withTitle: NSLocalizedString("vChewing Preferences…", comment: ""), action: #selector(showPreferences(_:)), keyEquivalent: "")
         menu.addItem(withTitle: NSLocalizedString("Check for Updates…", comment: ""), action: #selector(checkForUpdate(_:)), keyEquivalent: "")
         menu.addItem(withTitle: NSLocalizedString("About vChewing…", comment: ""), action: #selector(showAbout(_:)), keyEquivalent: "")
         if optionKeyPressed {

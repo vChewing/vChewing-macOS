@@ -419,7 +419,7 @@
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="234" id="ZIc-th-1VJ"/>
                                                             <constraint firstAttribute="height" constant="16" id="ZUJ-yT-gaw"/>
                                                         </constraints>
-                                                        <buttonCell key="cell" type="check" title="Push the cursor to the front of the phrase after candidate selection." bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="RUG-ls-KyA">
+                                                        <buttonCell key="cell" type="check" title="Push the cursor to the front of the phrase after candidate selection" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="RUG-ls-KyA">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="cellTitle"/>
                                                         </buttonCell>
