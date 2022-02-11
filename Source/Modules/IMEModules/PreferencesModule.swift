@@ -384,7 +384,7 @@ struct ComposingBufferSize {
         return useSCPCTypingMode
     }
     
-    @UserDefault(key: kMaxCandidateLength, defaultValue: 10)
+    @UserDefault(key: kMaxCandidateLength, defaultValue: kDefaultComposingBufferSize * 2)
     @objc static var maxCandidateLength: Int
     
     @UserDefault(key: kShouldNotFartInLieuOfBeep, defaultValue: true)
