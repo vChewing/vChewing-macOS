@@ -179,11 +179,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         case KeyboardLayoutEten26:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::ETen26Layout());
             break;
-        case KeyboardLayoutHanyuPinyin:
-            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::HanyuPinyinLayout());
-            break;
         case KeyboardLayoutIBM:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::IBMLayout());
+            break;
+        case KeyboardLayoutMiTAC:
+            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::MiTACLayout());
+            break;
+        case KeyboardLayoutHanyuPinyin:
+            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::HanyuPinyinLayout());
             break;
         default:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::StandardLayout());

@@ -36,13 +36,12 @@ extension RangeReplaceableCollection where Element: Hashable {
     @IBOutlet weak var uiLanguageButton: NSPopUpButton!
     @IBOutlet weak var basisKeyboardLayoutButton: NSPopUpButton!
     @IBOutlet weak var selectionKeyComboBox: NSComboBox!
-    @IBOutlet weak var clickedWhetherIMEShouldNotFartToggle: NSButton!
     
     var currentLanguageSelectItem: NSMenuItem? = nil
 
     override func awakeFromNib() {
         let languages = ["auto", "en", "zh-Hans", "zh-Hant", "ja"]
-        var autoSelectItem: NSMenuItem? = nil
+        var autoMUISelectItem: NSMenuItem? = nil
         var chosenLanguageItem: NSMenuItem? = nil
         uiLanguageButton.menu?.removeAllItems()
         
@@ -53,7 +52,7 @@ extension RangeReplaceableCollection where Element: Hashable {
             menuItem.representedObject = language
             
             if language == "auto" {
-                autoSelectItem = menuItem
+                autoMUISelectItem = menuItem
             }
             
             if !appleLanguages.isEmpty {
@@ -64,12 +63,12 @@ extension RangeReplaceableCollection where Element: Hashable {
             uiLanguageButton.menu?.addItem(menuItem)
         }
         
-        currentLanguageSelectItem = chosenLanguageItem ?? autoSelectItem
+        currentLanguageSelectItem = chosenLanguageItem ?? autoMUISelectItem
         uiLanguageButton.select(currentLanguageSelectItem)
 
         let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
         var usKeyboardLayoutItem: NSMenuItem? = nil
-        var chosenItem: NSMenuItem? = nil
+        var chosenBaseKeyboardLayoutItem: NSMenuItem? = nil
 
         basisKeyboardLayoutButton.menu?.removeAllItems()
 
@@ -128,7 +127,7 @@ extension RangeReplaceableCollection where Element: Hashable {
                 usKeyboardLayoutItem = menuItem
             }
             if basisKeyboardLayoutID == sourceID {
-                chosenItem = menuItem
+                chosenBaseKeyboardLayoutItem = menuItem
             }
             basisKeyboardLayoutButton.menu?.addItem(menuItem)
         }
@@ -137,8 +136,8 @@ extension RangeReplaceableCollection where Element: Hashable {
         menuItem.title = String(format: NSLocalizedString("Apple Zhuyin Bopomofo", comment: ""))
         menuItem.representedObject = String("com.apple.keylayout.ZhuyinBopomofo")
         basisKeyboardLayoutButton.menu?.addItem(menuItem)
+        basisKeyboardLayoutButton.select(chosenBaseKeyboardLayoutItem ?? usKeyboardLayoutItem)
 
-        basisKeyboardLayoutButton.select(chosenItem ?? usKeyboardLayoutItem)
         selectionKeyComboBox.usesDataSource = false
         selectionKeyComboBox.removeAllItems()
         selectionKeyComboBox.addItems(withObjectValues: Preferences.suggestedCandidateKeys)
