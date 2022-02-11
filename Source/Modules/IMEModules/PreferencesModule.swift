@@ -154,9 +154,10 @@ struct ComposingBufferSize {
     case eten = 1
     case hsu = 2
     case eten26 = 3
-    case hanyuPinyin = 4
-    case IBM = 5
-
+    case IBM = 4
+    case shintsuu = 5
+    case hanyuPinyin = 10
+    
     var name: String {
         switch (self) {
         case .standard:
@@ -167,10 +168,12 @@ struct ComposingBufferSize {
             return "Hsu"
         case .eten26:
             return "ETen26"
-        case .hanyuPinyin:
-            return "HanyuPinyin"
         case .IBM:
             return "IBM"
+        case .shintsuu:
+            return "Shintsuu"
+        case .hanyuPinyin:
+            return "HanyuPinyin"
         }
     }
 }
