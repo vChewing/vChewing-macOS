@@ -36,7 +36,6 @@ extension RangeReplaceableCollection where Element: Hashable {
     @IBOutlet weak var uiLanguageButton: NSPopUpButton!
     @IBOutlet weak var basisKeyboardLayoutButton: NSPopUpButton!
     @IBOutlet weak var selectionKeyComboBox: NSComboBox!
-    @IBOutlet weak var clickedWhetherIMEShouldNotFartToggle: NSButton!
     
     var currentLanguageSelectItem: NSMenuItem? = nil
 
