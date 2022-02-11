@@ -41,7 +41,7 @@ extension RangeReplaceableCollection where Element: Hashable {
 
     override func awakeFromNib() {
         let languages = ["auto", "en", "zh-Hans", "zh-Hant", "ja"]
-        var autoSelectItem: NSMenuItem? = nil
+        var autoMUISelectItem: NSMenuItem? = nil
         var chosenLanguageItem: NSMenuItem? = nil
         uiLanguageButton.menu?.removeAllItems()
         
@@ -52,7 +52,7 @@ extension RangeReplaceableCollection where Element: Hashable {
             menuItem.representedObject = language
             
             if language == "auto" {
-                autoSelectItem = menuItem
+                autoMUISelectItem = menuItem
             }
             
             if !appleLanguages.isEmpty {
@@ -63,7 +63,7 @@ extension RangeReplaceableCollection where Element: Hashable {
             uiLanguageButton.menu?.addItem(menuItem)
         }
         
-        currentLanguageSelectItem = chosenLanguageItem ?? autoSelectItem
+        currentLanguageSelectItem = chosenLanguageItem ?? autoMUISelectItem
         uiLanguageButton.select(currentLanguageSelectItem)
 
         let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
