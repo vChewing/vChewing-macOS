@@ -343,22 +343,38 @@ class InputState: NSObject {
         super.init()
     }
 
+    @objc static let catCommonSymbols = String(format: NSLocalizedString("catCommonSymbols", comment: ""))
+    @objc static let catHoriBrackets = String(format: NSLocalizedString("catHoriBrackets", comment: ""))
+    @objc static let catVertBrackets = String(format: NSLocalizedString("catVertBrackets", comment: ""))
+    @objc static let catGreekLetters = String(format: NSLocalizedString("catGreekLetters", comment: ""))
+    @objc static let catMathSymbols = String(format: NSLocalizedString("catMathSymbols", comment: ""))
+    @objc static let catCurrencyUnits = String(format: NSLocalizedString("catCurrencyUnits", comment: ""))
+    @objc static let catSpecialSymbols = String(format: NSLocalizedString("catSpecialSymbols", comment: ""))
+    @objc static let catUnicodeSymbols = String(format: NSLocalizedString("catUnicodeSymbols", comment: ""))
+    @objc static let catCircledKanjis = String(format: NSLocalizedString("catCircledKanjis", comment: ""))
+    @objc static let catCircledKataKana = String(format: NSLocalizedString("catCircledKataKana", comment: ""))
+    @objc static let catBracketKanjis = String(format: NSLocalizedString("catBracketKanjis", comment: ""))
+    @objc static let catSingleTableLines = String(format: NSLocalizedString("catSingleTableLines", comment: ""))
+    @objc static let catDoubleTableLines = String(format: NSLocalizedString("catDoubleTableLines", comment: ""))
+    @objc static let catFillingBlocks = String(format: NSLocalizedString("catFillingBlocks", comment: ""))
+    @objc static let catLineSegments = String(format: NSLocalizedString("catLineSegments", comment: ""))
+    
     @objc static let root: SymbolNode = SymbolNode("/", [
         SymbolNode("｀"),
-        SymbolNode("常用", symbols:"，、。．？！；：‧‥﹐﹒˙·‘’“”〝〞‵′〃～＄％＠＆＃＊"),
-        SymbolNode("橫括", symbols:"（）「」〔〕｛｝〈〉『』《》【】﹙﹚﹝﹞﹛﹜"),
-        SymbolNode("縱括", symbols:"︵︶﹁﹂︹︺︷︸︿﹀﹃﹄︽︾︻︼"),
-        SymbolNode("希臘", symbols:"αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ"),
-        SymbolNode("數學", symbols:"＋－×÷＝≠≒∞±√＜＞﹤﹥≦≧∩∪ˇ⊥∠∟⊿㏒㏑∫∮∵∴╳﹢"),
-        SymbolNode("貨幣", symbols:"$€¥¢£₽₨₩฿₺₮₱₭₴₦৲৳૱௹﷼₹₲₪₡₫៛₵₢₸₤₳₥₠₣₰₧₯₶₷"),
-        SymbolNode("特殊", symbols:"↑↓←→↖↗↙↘↺⇧⇩⇦⇨⇄⇆⇅⇵↻◎○●⊕⊙※△▲☆★◇◆□■▽▼§￥〒￠￡♀♂↯"),
-        SymbolNode("萬國", symbols:"♨☀☁☂☃♠♥♣♦♩♪♫♬☺☻"),
-        SymbolNode("圈字", symbols:"㊟㊞㊚㊛㊊㊋㊌㊍㊎㊏㊐㊑㊒㊓㊔㊕㊖㊗︎㊘㊙︎㊜㊝㊠㊡㊢㊣㊤㊥㊦㊧㊨㊩㊪㊫㊬㊭㊮㊯㊰🈚︎🈯︎"),
-        SymbolNode("圈假", symbols:"㋐㋑㋒㋓㋔㋕㋖㋗㋘㋙㋚㋛㋜㋝㋞㋟㋠㋡㋢㋣㋤㋥㋦㋧㋨㋩㋪㋫㋬㋭㋮㋯㋰㋱㋲㋳㋴㋵㋶㋷㋸㋹㋺㋻㋼㋾"),
-        SymbolNode("括字", symbols:"㈪㈫㈬㈭㈮㈯㈰㈱㈲㈳㈴㈵㈶㈷㈸㈹㈺㈻㈼㈽㈾㈿㉀㉁㉂㉃"),
-        SymbolNode("單線", symbols:"├─┼┴┬┤┌┐╞═╪╡│▕└┘╭╮╰╯"),
-        SymbolNode("雙線", symbols:"╔╦╗╠═╬╣╓╥╖╒╤╕║╚╩╝╟╫╢╙╨╜╞╪╡╘╧╛"),
-        SymbolNode("填色", symbols:"＿ˍ▁▂▃▄▅▆▇█▏▎▍▌▋▊▉◢◣◥◤"),
-        SymbolNode("線段", symbols:"﹣﹦≡｜∣∥–︱—︳╴¯￣﹉﹊﹍﹎﹋﹌﹏︴∕﹨╱╲／＼"),
+        SymbolNode(catCommonSymbols, symbols:"，、。．？！；：‧‥﹐﹒˙·‘’“”〝〞‵′〃～＄％＠＆＃＊"),
+        SymbolNode(catHoriBrackets, symbols:"（）「」〔〕｛｝〈〉『』《》【】﹙﹚﹝﹞﹛﹜"),
+        SymbolNode(catVertBrackets, symbols:"︵︶﹁﹂︹︺︷︸︿﹀﹃﹄︽︾︻︼"),
+        SymbolNode(catGreekLetters, symbols:"αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ"),
+        SymbolNode(catMathSymbols, symbols:"＋－×÷＝≠≒∞±√＜＞﹤﹥≦≧∩∪ˇ⊥∠∟⊿㏒㏑∫∮∵∴╳﹢"),
+        SymbolNode(catCurrencyUnits, symbols:"$€¥¢£₽₨₩฿₺₮₱₭₴₦৲৳૱௹﷼₹₲₪₡₫៛₵₢₸₤₳₥₠₣₰₧₯₶₷"),
+        SymbolNode(catSpecialSymbols, symbols:"↑↓←→↖↗↙↘↺⇧⇩⇦⇨⇄⇆⇅⇵↻◎○●⊕⊙※△▲☆★◇◆□■▽▼§￥〒￠￡♀♂↯"),
+        SymbolNode(catUnicodeSymbols, symbols:"♨☀☁☂☃♠♥♣♦♩♪♫♬☺☻"),
+        SymbolNode(catCircledKanjis, symbols:"㊟㊞㊚㊛㊊㊋㊌㊍㊎㊏㊐㊑㊒㊓㊔㊕㊖㊗︎㊘㊙︎㊜㊝㊠㊡㊢㊣㊤㊥㊦㊧㊨㊩㊪㊫㊬㊭㊮㊯㊰🈚︎🈯︎"),
+        SymbolNode(catCircledKataKana, symbols:"㋐㋑㋒㋓㋔㋕㋖㋗㋘㋙㋚㋛㋜㋝㋞㋟㋠㋡㋢㋣㋤㋥㋦㋧㋨㋩㋪㋫㋬㋭㋮㋯㋰㋱㋲㋳㋴㋵㋶㋷㋸㋹㋺㋻㋼㋾"),
+        SymbolNode(catBracketKanjis, symbols:"㈪㈫㈬㈭㈮㈯㈰㈱㈲㈳㈴㈵㈶㈷㈸㈹㈺㈻㈼㈽㈾㈿㉀㉁㉂㉃"),
+        SymbolNode(catSingleTableLines, symbols:"├─┼┴┬┤┌┐╞═╪╡│▕└┘╭╮╰╯"),
+        SymbolNode(catDoubleTableLines, symbols:"╔╦╗╠═╬╣╓╥╖╒╤╕║╚╩╝╟╫╢╙╨╜╞╪╡╘╧╛"),
+        SymbolNode(catFillingBlocks, symbols:"＿ˍ▁▂▃▄▅▆▇█▏▎▍▌▋▊▉◢◣◥◤"),
+        SymbolNode(catLineSegments, symbols:"﹣﹦≡｜∣∥–︱—︳╴¯￣﹉﹊﹍﹎﹋﹌﹏︴∕﹨╱╲／＼"),
     ])
 }

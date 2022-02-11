@@ -47,3 +47,20 @@
 "zh-Hant" = "繁體中文";
 "ja" = "和文";
 "Apple Zhuyin Bopomofo" = "Apple 注音鍵盤佈局";
+
+// The followings are the category names used in the Symbol menu.
+"catCommonSymbols" = "常用";
+"catHoriBrackets" = "橫括";
+"catVertBrackets" = "縱括";
+"catGreekLetters" = "希臘";
+"catMathSymbols" = "數學";
+"catCurrencyUnits" = "貨幣";
+"catSpecialSymbols" = "特殊";
+"catUnicodeSymbols" = "萬國";
+"catCircledKanjis" = "圈字";
+"catCircledKataKana" = "圈假";
+"catBracketKanjis" = "括字";
+"catSingleTableLines" = "單線";
+"catDoubleTableLines" = "雙線";
+"catFillingBlocks" = "填色";
+"catLineSegments" = "線段";
