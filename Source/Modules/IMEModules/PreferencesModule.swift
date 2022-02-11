@@ -155,7 +155,7 @@ struct ComposingBufferSize {
     case hsu = 2
     case eten26 = 3
     case IBM = 4
-    case shintsuu = 5
+    case MiTAC = 5
     case hanyuPinyin = 10
     
     var name: String {
@@ -170,8 +170,8 @@ struct ComposingBufferSize {
             return "ETen26"
         case .IBM:
             return "IBM"
-        case .shintsuu:
-            return "Shintsuu"
+        case .MiTAC:
+            return "MiTAC"
         case .hanyuPinyin:
             return "HanyuPinyin"
         }
