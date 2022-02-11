@@ -1097,6 +1097,55 @@ static BopomofoKeyboardLayout* CreateIBMLayout() {
     return new BopomofoKeyboardLayout(ktcm, "IBM");
 }
 
+static BopomofoKeyboardLayout* CreateShintsuuLayout() {
+    std::vector<BPMF::Component> vec;
+    BopomofoKeyToComponentMap ktcm;
+    
+    ASSIGNKEY1(ktcm, vec, '1', BPMF::Tone5);
+    ASSIGNKEY1(ktcm, vec, '2', BPMF::Tone2);
+    ASSIGNKEY1(ktcm, vec, '3', BPMF::Tone3);
+    ASSIGNKEY1(ktcm, vec, '4', BPMF::Tone4);
+    ASSIGNKEY1(ktcm, vec, '5', BPMF::AI);
+    ASSIGNKEY1(ktcm, vec, '6', BPMF::AO);
+    ASSIGNKEY1(ktcm, vec, '7', BPMF::AN);
+    ASSIGNKEY1(ktcm, vec, '8', BPMF::EN);
+    ASSIGNKEY1(ktcm, vec, '9', BPMF::ANG);
+    ASSIGNKEY1(ktcm, vec, '0', BPMF::ENG);
+    ASSIGNKEY1(ktcm, vec, '-', BPMF::ERR);
+    ASSIGNKEY1(ktcm, vec, ';', BPMF::E);
+    ASSIGNKEY1(ktcm, vec, ',', BPMF::ZH);
+    ASSIGNKEY1(ktcm, vec, '.', BPMF::CH);
+    ASSIGNKEY1(ktcm, vec, '/', BPMF::SH);
+    ASSIGNKEY1(ktcm, vec, 'a', BPMF::A);
+    ASSIGNKEY1(ktcm, vec, 'b', BPMF::B);
+    ASSIGNKEY1(ktcm, vec, 'c', BPMF::C);
+    ASSIGNKEY1(ktcm, vec, 'd', BPMF::D);
+    ASSIGNKEY1(ktcm, vec, 'e', BPMF::ER);
+    ASSIGNKEY1(ktcm, vec, 'f', BPMF::F);
+    ASSIGNKEY1(ktcm, vec, 'g', BPMF::G);
+    ASSIGNKEY1(ktcm, vec, 'h', BPMF::H);
+    ASSIGNKEY1(ktcm, vec, 'i', BPMF::EI);
+    ASSIGNKEY1(ktcm, vec, 'j', BPMF::J);
+    ASSIGNKEY1(ktcm, vec, 'k', BPMF::K);
+    ASSIGNKEY1(ktcm, vec, 'l', BPMF::L);
+    ASSIGNKEY1(ktcm, vec, 'm', BPMF::M);
+    ASSIGNKEY1(ktcm, vec, 'n', BPMF::N);
+    ASSIGNKEY1(ktcm, vec, 'o', BPMF::O);
+    ASSIGNKEY1(ktcm, vec, 'p', BPMF::P);
+    ASSIGNKEY1(ktcm, vec, 'q', BPMF::Q);
+    ASSIGNKEY1(ktcm, vec, 'r', BPMF::R);
+    ASSIGNKEY1(ktcm, vec, 's', BPMF::S);
+    ASSIGNKEY1(ktcm, vec, 't', BPMF::T);
+    ASSIGNKEY1(ktcm, vec, 'u', BPMF::OU);
+    ASSIGNKEY1(ktcm, vec, 'v', BPMF::UE);
+    ASSIGNKEY1(ktcm, vec, 'w', BPMF::U);
+    ASSIGNKEY1(ktcm, vec, 'x', BPMF::X);
+    ASSIGNKEY1(ktcm, vec, 'y', BPMF::I);
+    ASSIGNKEY1(ktcm, vec, 'z', BPMF::Z);
+    
+    return new BopomofoKeyboardLayout(ktcm, "Shintsuu");
+}
+
 static BopomofoKeyboardLayout* CreateETenLayout() {
     std::vector<BPMF::Component> vec;
     BopomofoKeyToComponentMap ktcm;
@@ -1239,6 +1288,11 @@ const BopomofoKeyboardLayout* BopomofoKeyboardLayout::ETen26Layout() {
 
 const BopomofoKeyboardLayout* BopomofoKeyboardLayout::IBMLayout() {
     static BopomofoKeyboardLayout* layout = CreateIBMLayout();
+    return layout;
+}
+
+const BopomofoKeyboardLayout* BopomofoKeyboardLayout::ShintsuuLayout() {
+    static BopomofoKeyboardLayout* layout = CreateShintsuuLayout();
     return layout;
 }
 
