@@ -68,7 +68,7 @@ extension RangeReplaceableCollection where Element: Hashable {
 
         let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
         var usKeyboardLayoutItem: NSMenuItem? = nil
-        var chosenItem: NSMenuItem? = nil
+        var chosenBaseKeyboardLayoutItem: NSMenuItem? = nil
 
         basisKeyboardLayoutButton.menu?.removeAllItems()
 
@@ -127,7 +127,7 @@ extension RangeReplaceableCollection where Element: Hashable {
                 usKeyboardLayoutItem = menuItem
             }
             if basisKeyboardLayoutID == sourceID {
-                chosenItem = menuItem
+                chosenBaseKeyboardLayoutItem = menuItem
             }
             basisKeyboardLayoutButton.menu?.addItem(menuItem)
         }
@@ -136,8 +136,8 @@ extension RangeReplaceableCollection where Element: Hashable {
         menuItem.title = String(format: NSLocalizedString("Apple Zhuyin Bopomofo", comment: ""))
         menuItem.representedObject = String("com.apple.keylayout.ZhuyinBopomofo")
         basisKeyboardLayoutButton.menu?.addItem(menuItem)
+        basisKeyboardLayoutButton.select(chosenBaseKeyboardLayoutItem ?? usKeyboardLayoutItem)
 
-        basisKeyboardLayoutButton.select(chosenItem ?? usKeyboardLayoutItem)
         selectionKeyComboBox.usesDataSource = false
         selectionKeyComboBox.removeAllItems()
         selectionKeyComboBox.addItems(withObjectValues: Preferences.suggestedCandidateKeys)
