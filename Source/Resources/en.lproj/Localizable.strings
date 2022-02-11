@@ -47,3 +47,20 @@
 "zh-Hant" = "Traditional Chinese";
 "ja" = "Japanese";
 "Apple Zhuyin Bopomofo" = "Apple Zhuyin Bopomofo";
+
+// The followings are the category names used in the Symbol menu.
+"catCommonSymbols" = "CommonSymbols";
+"catHoriBrackets" = "HoriBrackets";
+"catVertBrackets" = "VertBrackets";
+"catGreekLetters" = "GreekLetters";
+"catMathSymbols" = "MathSymbols";
+"catCurrencyUnits" = "CurrencyUnits";
+"catSpecialSymbols" = "SpecialSymbols";
+"catUnicodeSymbols" = "UnicodeSymbols";
+"catCircledKanjis" = "CircledKanjis";
+"catCircledKataKana" = "CircledKataKana";
+"catBracketKanjis" = "BracketKanjis";
+"catSingleTableLines" = "SingleTableLines";
+"catDoubleTableLines" = "DoubleTableLines";
+"catFillingBlocks" = "FillingBlocks";
+"catLineSegments" = "LineSegments";
