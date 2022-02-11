@@ -262,7 +262,7 @@
                                                             <font key="font" metaFont="cellTitle"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="clickedWhetherIMEShouldNotFartToggleAction:" target="-1" id="bUl-EZ-USn"/>
+                                                            <action selector="clickedWhetherIMEShouldNotFartToggleAction:" target="-2" id="9h1-f6-SGF"/>
                                                             <binding destination="32" name="value" keyPath="values.ShouldNotFartInLieuOfBeep" id="EOH-Pc-8Hk"/>
                                                         </connections>
                                                     </button>
