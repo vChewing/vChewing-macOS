@@ -339,10 +339,10 @@ struct ComposingBufferSize {
         (KeyboardLayout(rawValue: self.keyboardLayout) ?? KeyboardLayout.standard).name
     }
 
-    @UserDefault(key: kBasisKeyboardLayoutPreference, defaultValue: "com.apple.keylayout.US")
+    @UserDefault(key: kBasisKeyboardLayoutPreference, defaultValue: "com.apple.keylayout.ZhuyinBopomofo")
     @objc static var basisKeyboardLayout: String
 
-    @UserDefault(key: kFunctionKeyKeyboardLayoutPreference, defaultValue: "com.apple.keylayout.US")
+    @UserDefault(key: kFunctionKeyKeyboardLayoutPreference, defaultValue: "com.apple.keylayout.ZhuyinBopomofo")
     @objc static var functionKeyboardLayout: String
 
     @UserDefault(key: kFunctionKeyKeyboardLayoutOverrideIncludeShift, defaultValue: false)
