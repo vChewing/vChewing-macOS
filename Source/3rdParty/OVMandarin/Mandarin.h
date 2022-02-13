@@ -214,6 +214,7 @@ public:
     static const BopomofoKeyboardLayout* ETen26Layout();
     static const BopomofoKeyboardLayout* IBMLayout();
     static const BopomofoKeyboardLayout* MiTACLayout();
+    static const BopomofoKeyboardLayout* FakeSeigyouLayout();
     static const BopomofoKeyboardLayout* HanyuPinyinLayout();
     
     BopomofoKeyboardLayout(const BopomofoKeyToComponentMap& ktcm,
