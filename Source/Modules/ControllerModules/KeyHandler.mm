@@ -943,6 +943,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 {
     NSString *inputText = input.inputText;
     UniChar charCode = input.charCode;
+    NSString *char2Print = [NSString stringWithCharacters:&charCode length:1];
+    NSLog(@"vChewingCandidateKeyDebug: %@", char2Print);
     VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
 
     BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || [input isDelete];
