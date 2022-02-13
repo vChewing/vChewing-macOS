@@ -18,7 +18,7 @@
 "Edit User Phrases…" = "Edit User Phrases…";
 "Reload User Phrases" = "Reload User Phrases";
 "Unable to create the user phrase file." = "Unable to create the user phrase file.";
-"Please check the permission of at \"%@\"." = "Please check the permission of at \"%@\".";
+"Please check the permission at \"%@\"." = "Please check the permission at \"%@\".";
 "Edit Excluded Phrases" = "Edit Excluded Phrases…";
 "Half-Width Punctuation Mode" = "Half-Width Punctuation Mode";
 "\"%@\" length must ≥ 2 for a user phrase." = "\"%@\" length must ≥ 2 for a user phrase.";
@@ -46,7 +46,8 @@
 "zh-Hans" = "Simplified Chinese";
 "zh-Hant" = "Traditional Chinese";
 "ja" = "Japanese";
-"Apple Zhuyin Bopomofo" = "Apple Zhuyin Bopomofo";
+"Apple Zhuyin Bopomofo" = "Apple Zhuyin Bopomofo (Standard)";
+"Apple Zhuyin Eten" = "Apple Zhuyin Eten";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "CommonSymbols";
