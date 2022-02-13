@@ -40,11 +40,11 @@ namespace Taiyan {
             vector<NodeAnchor> nodesEndingAt(size_t inLocation);
             vector<NodeAnchor> nodesCrossingOrEndingAt(size_t inLocation);
 
-            // "Freeze" the node with the unigram that represents the selected canditate value.
+            // "Freeze" the node with the unigram that represents the selected candidate value.
             // After this, the node that contains the unigram will always be evaluated to that
             // unigram, while all other overlapping nodes will be reset to their initial state
             // (that is, if any of those nodes were "frozen" or fixed, they will be unfrozen.)
-            void fixNodeSelectedCandidate(size_t location, const string& value);
+            NodeAnchor fixNodeSelectedCandidate(size_t location, const string& value);
 
             // Similar to fixNodeSelectedCandidate, but instead of "freezing" the node, only
             // boost the unigram that represents the value with an overriding score. This
@@ -64,7 +64,7 @@ namespace Taiyan {
         }
         
         inline void Grid::insertNode(const Node& inNode, size_t inLocation, size_t inSpanningLength)
-        {            
+        {
             if (inLocation >= m_spans.size()) {
                 size_t diff = inLocation - m_spans.size() + 1;
                 
@@ -156,7 +156,7 @@ namespace Taiyan {
                     
                     if (i + span.maximumLength() >= inLocation) {
 
-                        for (size_t j = 1, m = span.maximumLength(); j <= m ; j++) { 
+                        for (size_t j = 1, m = span.maximumLength(); j <= m ; j++) {
                             
                             if (i + j < inLocation) {
                                 continue;
@@ -180,9 +180,10 @@ namespace Taiyan {
         }
 
         // For nodes found at the location, fix their currently-selected candidate using the supplied string value.
-        inline void Grid::fixNodeSelectedCandidate(size_t location, const string& value)
+        inline NodeAnchor Grid::fixNodeSelectedCandidate(size_t location, const string& value)
         {
             vector<NodeAnchor> nodes = nodesCrossingOrEndingAt(location);
+            NodeAnchor node;
             for (auto nodeAnchor : nodes) {
                 auto candidates = nodeAnchor.node->candidates();
 
@@ -192,10 +193,12 @@ namespace Taiyan {
                 for (size_t i = 0, c = candidates.size(); i < c; ++i) {
                     if (candidates[i].value == value) {
                         const_cast<Node*>(nodeAnchor.node)->selectCandidateAtIndex(i);
-                        break;
+                        node = nodeAnchor;
+                        break;;
                     }
                 }
             }
+            return node;
         }
 
         inline void Grid::overrideNodeScoreForSelectedCandidate(size_t location, const string& value, float overridingScore)
@@ -254,7 +257,7 @@ namespace Taiyan {
             sst << "EOS;" << endl;
             sst << "}";
             return sst.str();
-        }        
+        }
     }
 }
 
