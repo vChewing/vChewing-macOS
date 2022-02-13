@@ -341,8 +341,8 @@
 /* Class = "NSMenuItem"; title = "显示工具列"; ObjectID = "snW-S8-Cw5"; */
 "snW-S8-Cw5.title" = "显示工具列";
 
-/* Class = "NSMenuItem"; title = "数据侦测器"; ObjectID = "tRr-pd-1PS"; */
-"tRr-pd-1PS.title" = "数据侦测器";
+/* Class = "NSMenuItem"; title = "资料侦测器"; ObjectID = "tRr-pd-1PS"; */
+"tRr-pd-1PS.title" = "资料侦测器";
 
 /* Class = "NSMenuItem"; title = "开启近期的档案"; ObjectID = "tXI-mr-wws"; */
 "tXI-mr-wws.title" = "开启近期的档案";

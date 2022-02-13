@@ -18,7 +18,7 @@
 "Edit User Phrases…" = "編輯自訂語彙…";
 "Reload User Phrases" = "重載自訂語彙";
 "Unable to create the user phrase file." = "無法創建自訂語彙檔案。";
-"Please check the permission of at \"%@\"." = "請檢查此處的存取權限：\"%@\".";
+"Please check the permission at \"%@\"." = "請檢查此處的存取權限：\"%@\".";
 "Edit Excluded Phrases" = "編輯要濾除的語彙…";
 "Half-Width Punctuation Mode" = "半形標點模式";
 "\"%@\" length must ≥ 2 for a user phrase." = "「%@」字數不足以自訂語彙。";
@@ -46,7 +46,8 @@
 "zh-Hans" = "簡體中文";
 "zh-Hant" = "繁體中文";
 "ja" = "和文";
-"Apple Zhuyin Bopomofo" = "Apple 注音鍵盤佈局";
+"Apple Zhuyin Bopomofo" = "Apple 標準注音鍵盤佈局";
+"Apple Zhuyin Eten" = "Apple 倚天注音鍵盤佈局";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";
