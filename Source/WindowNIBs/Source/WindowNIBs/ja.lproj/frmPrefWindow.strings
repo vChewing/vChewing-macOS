@@ -92,6 +92,9 @@
 /* Class = "NSMenuItem"; title = "MiTAC"; ObjectID = "7fV-x8-WHQ"; */
 "7fV-x8-WHQ.title" = "神通";
 
+/* Class = "NSMenuItem"; title = "Fake Seigyou"; ObjectID = "27F-8T-FkQ"; */
+"27F-8T-FkQ.title" = "偽精業";
+
 /* Class = "NSTabViewItem"; label = "Keyboard"; ObjectID = "1AW-xf-c2f"; */
 "1AW-xf-c2f.label" = "キーボード";
 
