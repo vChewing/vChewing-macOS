@@ -1258,7 +1258,57 @@ static BopomofoKeyboardLayout* CreateETen26Layout() {
     ASSIGNKEY1(ktcm, vec, 'r', BPMF::ER);
     ASSIGNKEY1(ktcm, vec, 'i', BPMF::AI);
     ASSIGNKEY1(ktcm, vec, 'z', BPMF::AO);
+    
     return new BopomofoKeyboardLayout(ktcm, "ETen26");
+}
+
+static BopomofoKeyboardLayout* CreateFakeSeigyouLayout() {
+    std::vector<BPMF::Component> vec;
+    BopomofoKeyToComponentMap ktcm;
+    
+    ASSIGNKEY1(ktcm, vec, '1', BPMF::Tone5);
+    ASSIGNKEY1(ktcm, vec, '2', BPMF::B);
+    ASSIGNKEY1(ktcm, vec, '3', BPMF::D);
+    ASSIGNKEY1(ktcm, vec, '4', BPMF::I);
+    ASSIGNKEY1(ktcm, vec, '5', BPMF::U);
+    ASSIGNKEY1(ktcm, vec, '6', BPMF::ZH);
+    ASSIGNKEY1(ktcm, vec, '7', BPMF::UE);
+    ASSIGNKEY1(ktcm, vec, '8', BPMF::A);
+    ASSIGNKEY1(ktcm, vec, '9', BPMF::AI);
+    ASSIGNKEY1(ktcm, vec, '0', BPMF::AN);
+    ASSIGNKEY1(ktcm, vec, '-', BPMF::ERR);
+    ASSIGNKEY1(ktcm, vec, ';', BPMF::ANG);
+    ASSIGNKEY1(ktcm, vec, ',', BPMF::E);
+    ASSIGNKEY1(ktcm, vec, '.', BPMF::OU);
+    ASSIGNKEY1(ktcm, vec, '/', BPMF::ENG);
+    ASSIGNKEY1(ktcm, vec, 'a', BPMF::Tone3);
+    ASSIGNKEY1(ktcm, vec, 'b', BPMF::X);
+    ASSIGNKEY1(ktcm, vec, 'c', BPMF::L);
+    ASSIGNKEY1(ktcm, vec, 'd', BPMF::N);
+    ASSIGNKEY1(ktcm, vec, 'e', BPMF::T);
+    ASSIGNKEY1(ktcm, vec, 'f', BPMF::K);
+    ASSIGNKEY1(ktcm, vec, 'g', BPMF::Q);
+    ASSIGNKEY1(ktcm, vec, 'h', BPMF::SH);
+    ASSIGNKEY1(ktcm, vec, 'i', BPMF::O);
+    ASSIGNKEY1(ktcm, vec, 'j', BPMF::C);
+    ASSIGNKEY1(ktcm, vec, 'k', BPMF::ER);
+    ASSIGNKEY1(ktcm, vec, 'l', BPMF::AO);
+    ASSIGNKEY1(ktcm, vec, 'm', BPMF::S);
+    ASSIGNKEY1(ktcm, vec, 'n', BPMF::R);
+    ASSIGNKEY1(ktcm, vec, 'o', BPMF::EI);
+    ASSIGNKEY1(ktcm, vec, 'p', BPMF::EN);
+    ASSIGNKEY1(ktcm, vec, 'q', BPMF::Tone2);
+    ASSIGNKEY1(ktcm, vec, 'r', BPMF::G);
+    ASSIGNKEY1(ktcm, vec, 's', BPMF::M);
+    ASSIGNKEY1(ktcm, vec, 't', BPMF::J);
+    ASSIGNKEY1(ktcm, vec, 'u', BPMF::Z);
+    ASSIGNKEY1(ktcm, vec, 'v', BPMF::H);
+    ASSIGNKEY1(ktcm, vec, 'w', BPMF::P);
+    ASSIGNKEY1(ktcm, vec, 'x', BPMF::F);
+    ASSIGNKEY1(ktcm, vec, 'y', BPMF::CH);
+    ASSIGNKEY1(ktcm, vec, 'z', BPMF::Tone4);
+    
+    return new BopomofoKeyboardLayout(ktcm, "FakeSeigyou");
 }
 
 static BopomofoKeyboardLayout* CreateHanyuPinyinLayout() {
@@ -1293,6 +1343,11 @@ const BopomofoKeyboardLayout* BopomofoKeyboardLayout::IBMLayout() {
 
 const BopomofoKeyboardLayout* BopomofoKeyboardLayout::MiTACLayout() {
     static BopomofoKeyboardLayout* layout = CreateMiTACLayout();
+    return layout;
+}
+
+const BopomofoKeyboardLayout* BopomofoKeyboardLayout::FakeSeigyouLayout() {
+    static BopomofoKeyboardLayout* layout = CreateFakeSeigyouLayout();
     return layout;
 }
 
