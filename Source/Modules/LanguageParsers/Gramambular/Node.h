@@ -43,6 +43,7 @@ namespace Taiyan {
             
             const string& key() const;
             double score() const;
+            // double scoreForCandidate(string &candidate) const; // Prevents the override model to remember symbols with scode -X or lower.
             const KeyValuePair currentKeyValue() const;
             double highestUnigramScore() const;
             
@@ -189,6 +190,17 @@ namespace Taiyan {
         {
             return m_score;
         }
+
+        // Prevents the override model to remember symbols with scode -X or lower.
+//        inline double Node::scoreForCandidate(string &candidate) const
+//        {
+//            for (auto unigram : m_unigrams) {
+//                if (unigram.keyValue.value == candidate) {
+//                    return unigram.score;
+//                }
+//            }
+//            return 0.0;
+//        }
 
         inline double Node::highestUnigramScore() const {
             if (m_unigrams.empty()) {
