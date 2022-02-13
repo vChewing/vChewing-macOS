@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0AF8B427B2C8290096FE54 /* StringExtension.swift */; };
+		5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */; };
 		5B2DB16F27AF6891006D874E /* data-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16D27AF6891006D874E /* data-chs.txt */; };
 		5B2DB17027AF6891006D874E /* data-cht.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16E27AF6891006D874E /* data-cht.txt */; };
 		5B62A31727AE73A700A19448 /* unzip.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A30927AE73A700A19448 /* unzip.m */; };
@@ -137,6 +138,7 @@
 		5B05A47F27AFF84200437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmAboutWindow.strings; sourceTree = "<group>"; };
 		5B0AF8B427B2C8290096FE54 /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		5B0CF37F27AD476E00784B08 /* SwiftyOpenCC */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SwiftyOpenCC; path = Packages/SwiftyOpenCC; sourceTree = "<group>"; };
+		5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleKeyboardConverter.swift; sourceTree = "<group>"; };
 		5B2DB16D27AF6891006D874E /* data-chs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-chs.txt"; path = "Data/data-chs.txt"; sourceTree = "<group>"; };
 		5B2DB16E27AF6891006D874E /* data-cht.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-cht.txt"; path = "Data/data-cht.txt"; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
@@ -361,6 +363,7 @@
 		5B62A31F27AE74E900A19448 /* ControllerModules */ = {
 			isa = PBXGroup;
 			children = (
+				5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */,
 				D4E569DA27A34CC100AC2CEF /* KeyHandler.h */,
 				D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */,
 				D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */,
@@ -930,6 +933,7 @@
 				D47F7DCE278BFB57002F9DD7 /* ctlPrefWindow.swift in Sources */,
 				D47D73AC27A6CAE600255A50 /* AssociatedPhrases.mm in Sources */,
 				5B62A34A27AE7CD900A19448 /* NotifierController.swift in Sources */,
+				5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */,
 				5B62A31827AE73A700A19448 /* zip.m in Sources */,
 				5B62A32E27AE78B000A19448 /* CNSLM.mm in Sources */,
 				D41355DB278E6D17005E5CBD /* vChewingLM.mm in Sources */,
