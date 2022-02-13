@@ -42,7 +42,7 @@
 "593.title" = "取消安装";
 
 /* Class = "NSTextFieldCell"; title = "MIT-NTL License:"; ObjectID = "AVS-ih-FXM"; */
-"AVS-ih-FXM.title" = "麻理去商标授权合约 (3-Clause BSD License):";
+"AVS-ih-FXM.title" = "麻理去商标授权合约 (MIT-NTL License):";
 
 /* Class = "NSTextFieldCell"; title = "vChewing for macOS"; ObjectID = "GNc-8S-1VG"; */
 "GNc-8S-1VG.title" = "vChewing for macOS";
