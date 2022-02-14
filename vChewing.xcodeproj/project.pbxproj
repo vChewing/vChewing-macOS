@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -30,7 +30,6 @@
 		5B62A34827AE7CD900A19448 /* VerticalCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34127AE7CD900A19448 /* VerticalCandidateController.swift */; };
 		5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34327AE7CD900A19448 /* TooltipController.swift */; };
 		5B62A34A27AE7CD900A19448 /* NotifierController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34527AE7CD900A19448 /* NotifierController.swift */; };
-		5B62A35227AE822400A19448 /* OpenCC in Frameworks */ = {isa = PBXBuildFile; productRef = 5B62A35127AE822400A19448 /* OpenCC */; };
 		5B62A35327AE89C400A19448 /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33127AE792F00A19448 /* InputSourceHelper.swift */; };
 		5B73FB5E27B2BE1300E9BF49 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */; };
 		5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */; };
@@ -138,7 +137,6 @@
 		5B05A47C27AFF7CF00437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5B05A47F27AFF84200437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmAboutWindow.strings; sourceTree = "<group>"; };
 		5B0AF8B427B2C8290096FE54 /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
-		5B0CF37F27AD476E00784B08 /* SwiftyOpenCC */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SwiftyOpenCC; path = Packages/SwiftyOpenCC; sourceTree = "<group>"; };
 		5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleKeyboardConverter.swift; sourceTree = "<group>"; };
 		5B2DB16D27AF6891006D874E /* data-chs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-chs.txt"; path = "Data/data-chs.txt"; sourceTree = "<group>"; };
 		5B2DB16E27AF6891006D874E /* data-cht.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-cht.txt"; path = "Data/data-cht.txt"; sourceTree = "<group>"; };
@@ -286,7 +284,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B62A35227AE822400A19448 /* OpenCC in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -605,7 +602,6 @@
 				5BBD627827B6C4D900271480 /* Update-Info.plist */,
 				6ACA41E715FC1D9000935EF6 /* Installer */,
 				6A0D4EC215FC0D3C00ABF4B3 /* Source */,
-				D427F766278C9CBD004A2160 /* Packages */,
 				5BD05BB927B2A429004C4F1D /* UserPhraseEditor */,
 				6A0D4EA315FC0D2D00ABF4B3 /* Products */,
 				D47D73C127A7200500255A50 /* Frameworks */,
@@ -694,14 +690,6 @@
 			path = Installer;
 			sourceTree = "<group>";
 		};
-		D427F766278C9CBD004A2160 /* Packages */ = {
-			isa = PBXGroup;
-			children = (
-				5B0CF37F27AD476E00784B08 /* SwiftyOpenCC */,
-			);
-			name = Packages;
-			sourceTree = "<group>";
-		};
 		D47D73C127A7200500255A50 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -762,7 +750,6 @@
 			);
 			name = vChewing;
 			packageProductDependencies = (
-				5B62A35127AE822400A19448 /* OpenCC */,
 			);
 			productName = vChewing;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */;
@@ -801,12 +788,15 @@
 					5BD05BB727B2A429004C4F1D = {
 						CreatedOnToolsVersion = 13.2;
 						LastSwiftMigration = 1320;
+						ProvisioningStyle = Automatic;
 					};
 					6A0D4EA115FC0D2D00ABF4B3 = {
 						LastSwiftMigration = 1240;
+						ProvisioningStyle = Automatic;
 					};
 					6ACA41CA15FC1D7500935EF6 = {
 						LastSwiftMigration = 1320;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -1174,10 +1164,7 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2021-2022 vChewing Project.";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
 				MARKETING_VERSION = 1.3.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -1224,10 +1211,7 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2021-2022 vChewing Project.";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
 				MARKETING_VERSION = 1.3.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -1372,10 +1356,7 @@
 				GCC_WARN_UNUSED_LABEL = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "Source/Resources/IME-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
 				MARKETING_VERSION = 1.3.2;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1432,10 +1413,7 @@
 				GCC_WARN_UNUSED_LABEL = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "Source/Resources/IME-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
 				MARKETING_VERSION = 1.3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
@@ -1540,10 +1518,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = ../;
 				INFOPLIST_FILE = "Installer/Installer-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
 				MARKETING_VERSION = 1.3.2;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1587,10 +1562,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = ../;
 				INFOPLIST_FILE = "Installer/Installer-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
 				MARKETING_VERSION = 1.3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.atelierInmu.vChewing.${PRODUCT_NAME:rfc1034identifier}";
@@ -1652,13 +1624,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		5B62A35127AE822400A19448 /* OpenCC */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = OpenCC;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6A0D4E9415FC0CFA00ABF4B3 /* Project object */;
 }
