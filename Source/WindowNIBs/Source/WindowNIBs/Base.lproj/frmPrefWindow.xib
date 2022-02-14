@@ -627,6 +627,22 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="hab-1o-1kS">
+                                                        <rect key="frame" x="18" y="41" width="409" height="235"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="235" id="DuE-Bj-q43"/>
+                                                        </constraints>
+                                                        <textFieldCell key="cell" selectable="YES" id="wQ9-px-b07">
+                                                            <font key="font" metaFont="system"/>
+                                                            <mutableString key="title">Regarding On-Screen Keyboard Viewer Support:
+
+	Since v1.3.2, vChewing supports on-screen keyboard by supporting "Apple Zhuyin Bopomofo" and "Apple Zhuyin Eten" alphanumeric layout. Theoreotically, these two dynamic layouts work with all types of Apple physical keyboards, and you can report failure cases through macOS Feedback Assistant app if macOS built-in Zhuyin / Eten-Zhuyin Input Method fails from working with your non-US keyboard.
+
+	HOWEVER, choosing such dynamic alphanumeric layouts REQUIRING THAT you have to choose the Bopomofo layout above to Standard (Microsoft / Dachen) since the Bopomofo / Eten layout support in this case is already finished by the macOS system.</mutableString>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                 </subviews>
                                                 <constraints>
                                                     <constraint firstItem="onD-QP-KPf" firstAttribute="leading" secondItem="mE9-SY-ijS" secondAttribute="leading" constant="20" symbolic="YES" id="2R9-Gu-Kmf"/>
@@ -641,9 +657,12 @@
                                                     <constraint firstItem="onD-QP-KPf" firstAttribute="top" secondItem="mE9-SY-ijS" secondAttribute="top" constant="15" id="XSD-Vc-x52"/>
                                                     <constraint firstAttribute="trailing" secondItem="3" secondAttribute="trailing" constant="60" id="Z1E-EK-5Ts"/>
                                                     <constraint firstItem="124" firstAttribute="top" secondItem="3" secondAttribute="bottom" constant="7" id="Zl4-5d-SJ5"/>
+                                                    <constraint firstItem="hab-1o-1kS" firstAttribute="leading" secondItem="onD-QP-KPf" secondAttribute="leading" id="fLo-kq-NYc"/>
                                                     <constraint firstItem="3" firstAttribute="leading" secondItem="11" secondAttribute="trailing" constant="8" symbolic="YES" id="hZ7-qC-PmJ"/>
                                                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="onD-QP-KPf" secondAttribute="trailing" constant="20" symbolic="YES" id="nMf-Gq-Hm1"/>
+                                                    <constraint firstAttribute="trailing" secondItem="hab-1o-1kS" secondAttribute="trailing" constant="20" symbolic="YES" id="obq-hT-3AF"/>
                                                     <constraint firstItem="11" firstAttribute="centerY" secondItem="3" secondAttribute="centerY" id="t9r-zq-f68"/>
+                                                    <constraint firstItem="hab-1o-1kS" firstAttribute="top" secondItem="124" secondAttribute="bottom" constant="22" id="vkh-FL-eIW"/>
                                                 </constraints>
                                             </view>
                                         </box>

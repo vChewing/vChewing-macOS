@@ -196,3 +196,6 @@
 
 /* Class = "NSTabViewItem"; label = "Advanced"; ObjectID = "xrE-8T-WKO"; */
 "xrE-8T-WKO.label" = "Advanced";
+
+/* Class = "NSTextFieldCell"; title = "Regarding On-Screen Keyboard Support:"; ObjectID = "wQ9-px-b07"; */
+"wQ9-px-b07.title" = "Regarding On-Screen Keyboard Viewer Support:\n\n\tSince v1.3.2, vChewing supports on-screen keyboard by supporting \"Apple Zhuyin Bopomofo\" and \"Apple Zhuyin Eten\" alphanumeric layout. Theoreotically, these two dynamic layouts work with all types of Apple physical keyboards, and you can report failure cases through macOS Feedback Assistant app if macOS built-in Zhuyin / Eten-Zhuyin Input Method fails from working with your non-US keyboard.\n\n\tHOWEVER, choosing such dynamic alphanumeric layouts REQUIRING THAT you have to choose the Bopomofo layout above to Standard (Microsoft / Dachen) since the Bopomofo / Eten layout support in this case is already finished by the macOS system.";
