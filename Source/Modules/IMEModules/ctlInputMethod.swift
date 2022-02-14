@@ -20,7 +20,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 import Cocoa
 import InputMethodKit
 
-extension Bool {
+private extension Bool {
     var state: NSControl.StateValue {
         self ? .on : .off
     }
@@ -30,11 +30,14 @@ private let kMinKeyLabelSize: CGFloat = 10
 
 private var gCurrentCandidateController: CandidateController?
 
+private extension CandidateController {
+    static let horizontal = HorizontalCandidateController()
+    static let vertical = VerticalCandidateController()
+}
+
 @objc(ctlInputMethod)
 class ctlInputMethod: IMKInputController {
 
-    private static let horizontalCandidateController = HorizontalCandidateController()
-    private static let verticalCandidateController = VerticalCandidateController()
     private static let tooltipController = TooltipController()
 
     // MARK: -
@@ -183,11 +186,6 @@ class ctlInputMethod: IMKInputController {
         let attributes: [AnyHashable: Any]? = (client as? IMKTextInput)?.attributes(forCharacterIndex: 0, lineHeightRectangle: &textFrame)
         let useVerticalMode = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
 
-        if (client as? IMKTextInput)?.bundleIdentifier() == "com.apple.Terminal" &&
-                   NSStringFromClass(client.self as! AnyClass) == "IPMDServerClientWrapper" {
-            currentDeferredClient = client
-        }
-
         let input = KeyHandlerInput(event: event, isVerticalMode: useVerticalMode)
 
         let result = keyHandler.handle(input: input, state: state) { newState in
@@ -241,7 +239,7 @@ class ctlInputMethod: IMKInputController {
     private func open(userFileAt path: String) {
         func checkIfUserFilesExist() -> Bool {
             if !mgrLangModel.checkIfUserLanguageModelFilesExist() {
-                let content = String(format: NSLocalizedString("Please check the permission of at \"%@\".", comment: ""), mgrLangModel.dataFolderPath)
+                let content = String(format: NSLocalizedString("Please check the permission at \"%@\".", comment: ""), mgrLangModel.dataFolderPath)
                 ctlNonModalAlertWindow.shared.show(title: NSLocalizedString("Unable to create the user phrase file.", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("OK", comment: ""), cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
                 return false
             }
@@ -328,15 +326,6 @@ extension ctlInputMethod {
         let buffer = convertToKangXiChineseIfRequired(text)
         if buffer.isEmpty {
             return
-        }
-        // if it's Terminal, we don't commit at the first call (the client of which will not be IPMDServerClientWrapper)
-        // then we defer the update in the next runloop round -- so that the composing buffer is not
-        // meaninglessly flushed, an annoying bug in Terminal.app since Mac OS X 10.5
-        if (client as? IMKTextInput)?.bundleIdentifier() == "com.apple.Terminal" && NSStringFromClass(client.self as! AnyClass) != "IPMDServerClientWrapper" {
-            let innerCurrentDeferredClient = currentDeferredClient
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
-                (innerCurrentDeferredClient as? IMKTextInput)?.insertText(buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
-            }
         }
         (client as? IMKTextInput)?.insertText(buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
     }
@@ -464,20 +453,37 @@ extension ctlInputMethod {
 
     private func show(candidateWindowWith state: InputState, client: Any!) {
         let useVerticalMode: Bool = {
+            var useVerticalMode = false
+            var candidates: [String] = []
             if let state = state as? InputState.ChoosingCandidate {
-                return state.useVerticalMode
+                useVerticalMode = state.useVerticalMode
+                candidates = state.candidates
             } else if let state = state as? InputState.AssociatedPhrases {
-                return state.useVerticalMode
+                useVerticalMode = state.useVerticalMode
+                candidates = state.candidates
+            }
+            if useVerticalMode == true {
+                return true
+            }
+            candidates.sort {
+                return $0.count > $1.count
+            }
+            // If there is a candidate which is too long, we use the vertical
+            // candidate list window automatically.
+            if candidates.first?.count ?? 0 > 8 {
+                // return true // 禁用這一項。威注音回頭會換候選窗格。
             }
             return false
         }()
+        
+        gCurrentCandidateController?.delegate = nil
 
         if useVerticalMode {
-            gCurrentCandidateController = ctlInputMethod.verticalCandidateController
+            gCurrentCandidateController = .vertical
         } else if Preferences.useHorizontalCandidateList {
-            gCurrentCandidateController = ctlInputMethod.horizontalCandidateController
+            gCurrentCandidateController = .horizontal
         } else {
-            gCurrentCandidateController = ctlInputMethod.verticalCandidateController
+            gCurrentCandidateController = .vertical
         }
 
         // set the attributes for the candidate panel (which uses NSAttributedString)
@@ -551,7 +557,7 @@ extension ctlInputMethod {
 
 extension ctlInputMethod: KeyHandlerDelegate {
     func candidateController(for keyHandler: KeyHandler) -> Any {
-        gCurrentCandidateController ?? ctlInputMethod.verticalCandidateController
+        gCurrentCandidateController ?? .vertical
     }
 
     func keyHandler(_ keyHandler: KeyHandler, didSelectCandidateAt index: Int, candidateController controller: Any) {
