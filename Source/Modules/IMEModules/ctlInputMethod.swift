@@ -320,7 +320,8 @@ extension ctlInputMethod {
             if !Preferences.chineseConversionEnabled {
                 return text
             }
-            return OpenCCBridge.convertToKangXi(text) ?? ""
+            // return OpenCCBridge.convertToKangXi(text) ?? ""
+            return vChewingKanjiConverter.cnvTradToKangXi(text)
         }
 
         let buffer = convertToKangXiChineseIfRequired(text)

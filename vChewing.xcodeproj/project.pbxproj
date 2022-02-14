@@ -22,7 +22,6 @@
 		5B62A32E27AE78B000A19448 /* CNSLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32A27AE78B000A19448 /* CNSLM.mm */; };
 		5B62A32F27AE78B000A19448 /* CoreLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32D27AE78B000A19448 /* CoreLM.mm */; };
 		5B62A33227AE792F00A19448 /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33127AE792F00A19448 /* InputSourceHelper.swift */; };
-		5B62A33427AE793F00A19448 /* OpenCCBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33327AE793F00A19448 /* OpenCCBridge.swift */; };
 		5B62A33627AE795800A19448 /* PreferencesModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33527AE795800A19448 /* PreferencesModule.swift */; };
 		5B62A33827AE79CD00A19448 /* NSStringUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33727AE79CD00A19448 /* NSStringUtils.swift */; };
 		5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */; };
@@ -166,7 +165,6 @@
 		5B62A32C27AE78B000A19448 /* CoreLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CoreLM.h; sourceTree = "<group>"; };
 		5B62A32D27AE78B000A19448 /* CoreLM.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CoreLM.mm; sourceTree = "<group>"; };
 		5B62A33127AE792F00A19448 /* InputSourceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourceHelper.swift; sourceTree = "<group>"; };
-		5B62A33327AE793F00A19448 /* OpenCCBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenCCBridge.swift; sourceTree = "<group>"; };
 		5B62A33527AE795800A19448 /* PreferencesModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesModule.swift; sourceTree = "<group>"; };
 		5B62A33727AE79CD00A19448 /* NSStringUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStringUtils.swift; sourceTree = "<group>"; };
 		5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlAboutWindow.swift; sourceTree = "<group>"; };
@@ -412,7 +410,6 @@
 			children = (
 				D4A13D5927A59D5C003BE359 /* ctlInputMethod.swift */,
 				5B62A33127AE792F00A19448 /* InputSourceHelper.swift */,
-				5B62A33327AE793F00A19448 /* OpenCCBridge.swift */,
 				5B62A33527AE795800A19448 /* PreferencesModule.swift */,
 			);
 			path = IMEModules;
@@ -942,7 +939,6 @@
 				D4E569DC27A34D0E00AC2CEF /* KeyHandler.mm in Sources */,
 				D47F7DD0278C0897002F9DD7 /* ctlNonModalAlertWindow.swift in Sources */,
 				5B62A32F27AE78B000A19448 /* CoreLM.mm in Sources */,
-				5B62A33427AE793F00A19448 /* OpenCCBridge.swift in Sources */,
 				5BE78BE027B38804005EA1BE /* LMConsolidator.mm in Sources */,
 				D456576E279E4F7B00DF6BC9 /* KeyHandlerInput.swift in Sources */,
 				D47F7DCE278BFB57002F9DD7 /* ctlPrefWindow.swift in Sources */,
