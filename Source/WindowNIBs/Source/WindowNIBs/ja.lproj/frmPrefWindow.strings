@@ -196,3 +196,6 @@
 
 /* Class = "NSTabViewItem"; label = "Advanced"; ObjectID = "xrE-8T-WKO"; */
 "xrE-8T-WKO.label" = "詳細";
+
+/* Class = "NSTextFieldCell"; title = "Regarding On-Screen Keyboard Support:"; ObjectID = "wQ9-px-b07"; */
+"wQ9-px-b07.title" = "macOS 内蔵のキーボードビューアについて：\n\n\t威注音は v1.3.2 版にて macOS 内蔵のキーボードビューアをサポートし始めたが、「Apple Zhuyin Bopomofo」と「Apple Zhuyin Eten」この２つダイナミック英数キーボード配列をサポートしたためである。基本的には、この機能は全ての言語の Apple キーボードと一緒に動けるはず。macOS 内蔵の注音入力と倚天注音入力が支障なく使える限り（支障があったら Feedback Assistant.app で Apple にご報告を）、この２つダイナミック英数キーボード配列も威注音で作動できるだと考えられる。\n\n\tだが、もし、ダイナミック英数キーボード配列を起用すると、今のこの画面の上の「注音キーボード配列」を標準配列にしなければならぬこと。なぜなら、この場合、倚天などの注音配列のサポート役割は macOS である。";
