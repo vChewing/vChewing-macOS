@@ -196,3 +196,6 @@
 
 /* Class = "NSTabViewItem"; label = "Advanced"; ObjectID = "xrE-8T-WKO"; */
 "xrE-8T-WKO.label" = "进阶";
+
+/* Class = "NSTextFieldCell"; title = "Regarding On-Screen Keyboard Support:"; ObjectID = "wQ9-px-b07"; */
+"wQ9-px-b07.title" = "关于 macOS 内建萤幕模拟键盘支援：\n\n\t自 v1.3.2 版开始，威注音支援 macOS 内建的萤幕小键盘。该功能是借由对「Apple 标准注音键盘布局」与「Apple 倚天注音键盘布局」这两个动态英数键盘布局来完成的。理论上来讲，这两个动态英数键盘布局应该可以与所有语种的 Apple 物理键盘相容。如果有不相容的情况的话，macOS 内建的注音与倚天注音输入法一定也会有相同的故障（可以借由 Feedback Assistant.app 向 Apple 反馈这种键盘布局问题）。\n\n\t然而，如果您启用了这种动态英数键盘布局的话，请将当前画面顶端的注音键盘布局设为「微软/大千……」，因为对诸如倚天等异种键盘的支援已经交给 macOS 系统来事先完成了。";
