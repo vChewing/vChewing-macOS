@@ -72,6 +72,16 @@ extension RangeReplaceableCollection where Element: Hashable {
 
         basisKeyboardLayoutButton.menu?.removeAllItems()
 
+        let menuItem_AppleZhuyinBopomofo = NSMenuItem()
+        menuItem_AppleZhuyinBopomofo.title = String(format: NSLocalizedString("Apple Zhuyin Bopomofo", comment: ""))
+        menuItem_AppleZhuyinBopomofo.representedObject = String("com.apple.keylayout.ZhuyinBopomofo")
+        basisKeyboardLayoutButton.menu?.addItem(menuItem_AppleZhuyinBopomofo)
+
+        let menuItem_AppleZhuyinEten = NSMenuItem()
+        menuItem_AppleZhuyinEten.title = String(format: NSLocalizedString("Apple Zhuyin Eten", comment: ""))
+        menuItem_AppleZhuyinEten.representedObject = String("com.apple.keylayout.ZhuyinEten")
+        basisKeyboardLayoutButton.menu?.addItem(menuItem_AppleZhuyinEten)
+
         let basisKeyboardLayoutID = Preferences.basisKeyboardLayout
         
         for source in list {
@@ -132,10 +142,12 @@ extension RangeReplaceableCollection where Element: Hashable {
             basisKeyboardLayoutButton.menu?.addItem(menuItem)
         }
 
-        let menuItem = NSMenuItem()
-        menuItem.title = String(format: NSLocalizedString("Apple Zhuyin Bopomofo", comment: ""))
-        menuItem.representedObject = String("com.apple.keylayout.ZhuyinBopomofo")
-        basisKeyboardLayoutButton.menu?.addItem(menuItem)
+        if (basisKeyboardLayoutID == "com.apple.keylayout.ZhuyinBopomofo") {
+            chosenBaseKeyboardLayoutItem = menuItem_AppleZhuyinBopomofo
+        } else if basisKeyboardLayoutID == "com.apple.keylayout.ZhuyinEten" {
+            chosenBaseKeyboardLayoutItem = menuItem_AppleZhuyinEten
+        }
+
         basisKeyboardLayoutButton.select(chosenBaseKeyboardLayoutItem ?? usKeyboardLayoutItem)
 
         selectionKeyComboBox.usesDataSource = false
