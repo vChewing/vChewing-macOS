@@ -56,6 +56,7 @@
 		5BE78BD927B3775B005EA1BE /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE78BD827B37750005EA1BE /* ctlAboutWindow.swift */; };
 		5BE78BDD27B3776D005EA1BE /* frmAboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BE78BDA27B37764005EA1BE /* frmAboutWindow.xib */; };
 		5BE78BE027B38804005EA1BE /* LMConsolidator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32727AE77BB00A19448 /* LMConsolidator.mm */; };
+		5BF8423127BAA942008E7E4C /* vChewingKanjiConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF8423027BAA942008E7E4C /* vChewingKanjiConverter.swift */; };
 		6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F2015FC0EB100ABF4B3 /* Mandarin.cpp */; };
 		6A187E2616004C5900466B2E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A187E2816004C5900466B2E /* MainMenu.xib */; };
 		6A225A1F23679F2600F685C6 /* NotarizedArchives in Resources */ = {isa = PBXBuildFile; fileRef = 6A225A1E23679F2600F685C6 /* NotarizedArchives */; };
@@ -210,6 +211,7 @@
 		5BE78BD827B37750005EA1BE /* ctlAboutWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlAboutWindow.swift; sourceTree = "<group>"; };
 		5BE78BDB27B37764005EA1BE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmAboutWindow.xib; sourceTree = "<group>"; };
 		5BE78BDF27B37968005EA1BE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmAboutWindow.strings; sourceTree = "<group>"; };
+		5BF8423027BAA942008E7E4C /* vChewingKanjiConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vChewingKanjiConverter.swift; sourceTree = "<group>"; };
 		5BFDF48C27B51867009523B6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Main.strings"; sourceTree = "<group>"; };
 		6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A0D4EF515FC0DA600ABF4B3 /* IME-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IME-Info.plist"; sourceTree = "<group>"; };
@@ -374,13 +376,14 @@
 			isa = PBXGroup;
 			children = (
 				5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */,
+				D461B791279DAC010070E734 /* InputState.swift */,
 				D4E569DA27A34CC100AC2CEF /* KeyHandler.h */,
 				D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */,
 				D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */,
 				6ACC3D3E27914F2400F1B140 /* KeyValueBlobReader.cpp */,
 				6ACC3D3C27914AAB00F1B140 /* KeyValueBlobReader.h */,
-				D461B791279DAC010070E734 /* InputState.swift */,
 				5B62A33727AE79CD00A19448 /* NSStringUtils.swift */,
+				5BF8423027BAA942008E7E4C /* vChewingKanjiConverter.swift */,
 			);
 			path = ControllerModules;
 			sourceTree = "<group>";
@@ -961,6 +964,7 @@
 				6ACC3D452793701600F1B140 /* ParselessLM.cpp in Sources */,
 				5BBBB77A27AEDC690023B93A /* clsSFX.swift in Sources */,
 				5B62A31727AE73A700A19448 /* unzip.m in Sources */,
+				5BF8423127BAA942008E7E4C /* vChewingKanjiConverter.swift in Sources */,
 				5B62A34627AE7CD900A19448 /* HorizontalCandidateController.swift in Sources */,
 				5B62A34727AE7CD900A19448 /* CandidateController.swift in Sources */,
 				5B62A31B27AE73A700A19448 /* SSZipArchive.m in Sources */,
