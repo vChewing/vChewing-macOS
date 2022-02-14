@@ -156,6 +156,7 @@ struct ComposingBufferSize {
     case eten26 = 3
     case IBM = 4
     case MiTAC = 5
+    case FakeSeigyou = 6
     case hanyuPinyin = 10
     
     var name: String {
@@ -172,6 +173,8 @@ struct ComposingBufferSize {
             return "IBM"
         case .MiTAC:
             return "MiTAC"
+        case .FakeSeigyou:
+            return "FakeSeigyou"
         case .hanyuPinyin:
             return "HanyuPinyin"
         }
@@ -336,10 +339,10 @@ struct ComposingBufferSize {
         (KeyboardLayout(rawValue: self.keyboardLayout) ?? KeyboardLayout.standard).name
     }
 
-    @UserDefault(key: kBasisKeyboardLayoutPreference, defaultValue: "com.apple.keylayout.US")
+    @UserDefault(key: kBasisKeyboardLayoutPreference, defaultValue: "com.apple.keylayout.ZhuyinBopomofo")
     @objc static var basisKeyboardLayout: String
 
-    @UserDefault(key: kFunctionKeyKeyboardLayoutPreference, defaultValue: "com.apple.keylayout.US")
+    @UserDefault(key: kFunctionKeyKeyboardLayoutPreference, defaultValue: "com.apple.keylayout.ZhuyinBopomofo")
     @objc static var functionKeyboardLayout: String
 
     @UserDefault(key: kFunctionKeyKeyboardLayoutOverrideIncludeShift, defaultValue: false)

@@ -92,6 +92,9 @@
 /* Class = "NSMenuItem"; title = "MiTAC"; ObjectID = "7fV-x8-WHQ"; */
 "7fV-x8-WHQ.title" = "神通";
 
+/* Class = "NSMenuItem"; title = "Fake Seigyou"; ObjectID = "27F-8T-FkQ"; */
+"27F-8T-FkQ.title" = "伪精业";
+
 /* Class = "NSTabViewItem"; label = "Keyboard"; ObjectID = "1AW-xf-c2f"; */
 "1AW-xf-c2f.label" = "键盘";
 
@@ -162,13 +165,13 @@
 "f2j-xD-4xK.title" = "敲 ESC 键以清空整个输入缓冲区";
 
 /* Class = "NSButtonCell"; title = "Automatically reload user data files if changes detected"; ObjectID = "f8i-69-zxm"; */
-"f8i-69-zxm.title" = "自动重新加载变更过的使用者数据内容";
+"f8i-69-zxm.title" = "自动重新加载变更过的使用者资料内容";
 
 /* Class = "NSTextFieldCell"; title = "Change UI font size of candidate window for a better visual clarity."; ObjectID = "iRg-wx-Nx2"; */
 "iRg-wx-Nx2.title" = "变更候选字窗的字型大小。";
 
 /* Class = "NSTextFieldCell"; title = "Define your preferred action when user data files reload."; ObjectID = "j48-5a-cEs"; */
-"j48-5a-cEs.title" = "请指定在使用者数据重载时要启用的功能。";
+"j48-5a-cEs.title" = "请指定在使用者资料重载时要启用的功能。";
 
 /* Class = "NSComboBoxCell"; jQC-12-UuK.ibShadowedObjectValues[0] = "Item 1"; ObjectID = "jQC-12-UuK"; */
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
@@ -193,3 +196,6 @@
 
 /* Class = "NSTabViewItem"; label = "Advanced"; ObjectID = "xrE-8T-WKO"; */
 "xrE-8T-WKO.label" = "进阶";
+
+/* Class = "NSTextFieldCell"; title = "Regarding On-Screen Keyboard Support:"; ObjectID = "wQ9-px-b07"; */
+"wQ9-px-b07.title" = "关于 macOS 内建萤幕模拟键盘支援：\n\n\t自 v1.3.2 版开始，威注音支援 macOS 内建的萤幕小键盘。该功能是借由对「Apple 标准注音键盘布局」与「Apple 倚天注音键盘布局」这两个动态英数键盘布局来完成的。理论上来讲，这两个动态英数键盘布局应该可以与所有语种的 Apple 物理键盘相容。如果有不相容的情况的话，macOS 内建的注音与倚天注音输入法一定也会有相同的故障（可以借由 Feedback Assistant.app 向 Apple 反馈这种键盘布局问题）。\n\n\t然而，如果您启用了这种动态英数键盘布局的话，请将当前画面顶端的注音键盘布局设为「微软/大千……」，因为对诸如倚天等异种键盘的支援已经交给 macOS 系统来事先完成了。";

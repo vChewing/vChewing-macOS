@@ -185,6 +185,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         case KeyboardLayoutMiTAC:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::MiTACLayout());
             break;
+        case KeyboardLayoutFakeSeigyou:
+            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::FakeSeigyouLayout());
+            break;
         case KeyboardLayoutHanyuPinyin:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::HanyuPinyinLayout());
             break;
@@ -198,9 +201,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 {
     size_t cursorIndex = [self _actualCandidateCursorIndex];
     string stringValue = [value UTF8String];
-    _builder->grid().fixNodeSelectedCandidate(cursorIndex, stringValue);
+    NodeAnchor selectedNode = _builder->grid().fixNodeSelectedCandidate(cursorIndex, stringValue);
     if (!Preferences.useSCPCTypingMode) { // 不要針對逐字選字模式啟用臨時半衰記憶模型。
-        _userOverrideModel->observe(_walkedNodes, cursorIndex, stringValue, [[NSDate date] timeIntervalSince1970]);
+        // If the length of the readings and the characters do not match,
+        // it often means it is a special symbol and it should not be stored
+        // in the user override model.
+        if (selectedNode.spanningLength == [value count]) {
+            _userOverrideModel->observe(_walkedNodes, cursorIndex, stringValue, [[NSDate date] timeIntervalSince1970]);
+        }
     }
     [self _walk];
 
@@ -482,6 +490,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     // MARK: Enter
     if (charCode == 13) {
+        if ([input isControlHold]) {
+            return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+        }
         return [self _handleEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
 
@@ -783,6 +794,24 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     return YES;
 }
 
+- (BOOL)_handleCtrlEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+{
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
+
+    NSArray *readings = [self _currentReadings];
+    NSString *composingBuffer = [readings componentsJoinedByString:@"-"];
+
+    [self clear];
+
+    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
+    stateCallback(committing);
+    InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+    stateCallback(empty);
+    return YES;
+}
+
 - (BOOL)_handleEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     if (![state isKindOfClass:[InputStateInputting class]]) {
@@ -914,6 +943,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 {
     NSString *inputText = input.inputText;
     UniChar charCode = input.charCode;
+    NSString *char2Print = [NSString stringWithCharacters:&charCode length:1];
+    NSLog(@"vChewingCandidateKeyDebug: %@", char2Print);
     VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
 
     BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || [input isDelete];

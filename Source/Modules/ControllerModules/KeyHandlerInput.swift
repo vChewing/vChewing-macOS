@@ -48,13 +48,15 @@ class KeyHandlerInput: NSObject {
     @objc private (set) var emacsKey: vChewingEmacsKey
 
     @objc init(inputText: String?, keyCode: UInt16, charCode: UInt16, flags: NSEvent.ModifierFlags, isVerticalMode: Bool, inputTextIgnoringModifiers: String? = nil) {
+        let inputText = AppleKeyboardConverter.cnvStringApple2ABC(inputText ?? "")
+        let inputTextIgnoringModifiers = AppleKeyboardConverter.cnvStringApple2ABC(inputTextIgnoringModifiers ?? inputText)
         self.inputText = inputText
-        self.inputTextIgnoringModifiers = inputTextIgnoringModifiers ?? inputText
+        self.inputTextIgnoringModifiers = inputTextIgnoringModifiers
         self.keyCode = keyCode
-        self.charCode = charCode
+        self.charCode = AppleKeyboardConverter.cnvApple2ABC(charCode)
         self.flags = flags
         useVerticalMode = isVerticalMode
-        emacsKey = EmacsKeyHelper.detect(charCode: charCode, flags: flags)
+        emacsKey = EmacsKeyHelper.detect(charCode: AppleKeyboardConverter.cnvApple2ABC(charCode), flags: flags)
         cursorForwardKey = useVerticalMode ? .down : .right
         cursorBackwardKey = useVerticalMode ? .up : .left
         extraChooseCandidateKey = useVerticalMode ? .left : .down
@@ -64,8 +66,8 @@ class KeyHandlerInput: NSObject {
     }
 
     @objc init(event: NSEvent, isVerticalMode: Bool) {
-        inputText = event.characters
-        inputTextIgnoringModifiers = event.charactersIgnoringModifiers
+        inputText = AppleKeyboardConverter.cnvStringApple2ABC(event.characters ?? "")
+        inputTextIgnoringModifiers = AppleKeyboardConverter.cnvStringApple2ABC(event.charactersIgnoringModifiers ?? "")
         keyCode = event.keyCode
         flags = event.modifierFlags
         useVerticalMode = isVerticalMode
@@ -76,8 +78,8 @@ class KeyHandlerInput: NSObject {
             let first = inputText[inputText.startIndex].utf16.first!
             return first
         }()
-        self.charCode = charCode
-        emacsKey = EmacsKeyHelper.detect(charCode: charCode, flags: event.modifierFlags)
+        self.charCode = AppleKeyboardConverter.cnvApple2ABC(charCode)
+        emacsKey = EmacsKeyHelper.detect(charCode: AppleKeyboardConverter.cnvApple2ABC(charCode), flags: event.modifierFlags)
         cursorForwardKey = useVerticalMode ? .down : .right
         cursorBackwardKey = useVerticalMode ? .up : .left
         extraChooseCandidateKey = useVerticalMode ? .left : .down
@@ -87,6 +89,9 @@ class KeyHandlerInput: NSObject {
     }
 
     override var description: String {
+        charCode = AppleKeyboardConverter.cnvApple2ABC(charCode)
+        inputText = AppleKeyboardConverter.cnvStringApple2ABC(inputText ?? "")
+        inputTextIgnoringModifiers = AppleKeyboardConverter.cnvStringApple2ABC(inputTextIgnoringModifiers ?? "")
         return "<\(super.description) inputText:\(String(describing: inputText)), inputTextIgnoringModifiers:\(String(describing: inputTextIgnoringModifiers)) charCode:\(charCode), keyCode:\(keyCode), flags:\(flags), cursorForwardKey:\(cursorForwardKey), cursorBackwardKey:\(cursorBackwardKey), extraChooseCandidateKey:\(extraChooseCandidateKey), absorbedArrowKey:\(absorbedArrowKey),  verticalModeOnlyChooseCandidateKey:\(verticalModeOnlyChooseCandidateKey), emacsKey:\(emacsKey), useVerticalMode:\(useVerticalMode)>"
     }
 
@@ -199,6 +204,7 @@ class KeyHandlerInput: NSObject {
 
 class EmacsKeyHelper: NSObject {
     @objc static func detect(charCode: UniChar, flags: NSEvent.ModifierFlags) -> vChewingEmacsKey {
+        let charCode = AppleKeyboardConverter.cnvApple2ABC(charCode)
         if flags.contains(.control) {
             return vChewingEmacsKey(rawValue: charCode) ?? .none
         }
