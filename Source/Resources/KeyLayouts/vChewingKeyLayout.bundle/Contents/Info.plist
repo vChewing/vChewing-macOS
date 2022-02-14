@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleIdentifier</key>
+	<string>org.atelierInmu.vChewing.keyLayouts</string>
+	<key>CFBundleName</key>
+	<string>vChewingKeyLayout</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>KLInfo_Zhuyin Dachen</key>
+	<dict>
+		<key>TICapsLockLanguageSwitchCapable</key>
+		<false/>
+		<key>TISInputSourceID</key>
+		<string>org.atelierInmu.vChewing.keyLayouts.zhuyindachen</string>
+		<key>TISIntendedLanguage</key>
+		<string>zh-Hanb</string>
+	</dict>
+	<key>KLInfo_Zhuyin ETen</key>
+	<dict>
+		<key>TICapsLockLanguageSwitchCapable</key>
+		<false/>
+		<key>TISInputSourceID</key>
+		<string>org.atelierInmu.vChewing.keyLayouts.zhuyineten</string>
+		<key>TISIntendedLanguage</key>
+		<string>zh-Hanb</string>
+	</dict>
+	<key>KLInfo_Zhuyin IBM</key>
+	<dict>
+		<key>TICapsLockLanguageSwitchCapable</key>
+		<false/>
+		<key>TISInputSourceID</key>
+		<string>org.atelierInmu.vChewing.keyLayouts.zhuyinibm</string>
+		<key>TISIntendedLanguage</key>
+		<string>zh-Hanb</string>
+	</dict>
+	<key>KLInfo_Zhuyin MiTAC</key>
+	<dict>
+		<key>TICapsLockLanguageSwitchCapable</key>
+		<false/>
+		<key>TISInputSourceID</key>
+		<string>org.atelierInmu.vChewing.keyLayouts.zhuyinmitac</string>
+		<key>TISIntendedLanguage</key>
+		<string>zh-Hanb</string>
+	</dict>
+	<key>KLInfo_Zhuyin Seigyou</key>
+	<dict>
+		<key>TICapsLockLanguageSwitchCapable</key>
+		<false/>
+		<key>TISInputSourceID</key>
+		<string>org.atelierInmu.vChewing.keyLayouts.zhuyinseigyou</string>
+		<key>TISIntendedLanguage</key>
+		<string>zh-Hanb</string>
+	</dict>
+</dict>
+</plist>
