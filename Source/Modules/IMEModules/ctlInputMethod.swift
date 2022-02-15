@@ -185,6 +185,12 @@ class ctlInputMethod: IMKInputController {
         var textFrame = NSRect.zero
         let attributes: [AnyHashable: Any]? = (client as? IMKTextInput)?.attributes(forCharacterIndex: 0, lineHeightRectangle: &textFrame)
         let useVerticalMode = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
+        
+        if (client as? IMKTextInput)?.bundleIdentifier() == "org.atelierInmu.vChewing.vChewingPhraseEditor" {
+            ctlInputMethod.areWeUsingOurOwnPhraseEditor = true
+        } else {
+            ctlInputMethod.areWeUsingOurOwnPhraseEditor = false
+        }
 
         let input = KeyHandlerInput(event: event, isVerticalMode: useVerticalMode)
 
@@ -552,6 +558,12 @@ extension ctlInputMethod {
     private func hideTooltip() {
         ctlInputMethod.tooltipController.hide()
     }
+}
+
+// MARK: - 開關判定當前應用究竟是？
+
+@objc extension ctlInputMethod {
+    @objc static var areWeUsingOurOwnPhraseEditor: Bool = false
 }
 
 // MARK: -
