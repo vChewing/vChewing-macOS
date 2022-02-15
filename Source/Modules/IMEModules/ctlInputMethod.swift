@@ -43,7 +43,6 @@ class ctlInputMethod: IMKInputController {
     // MARK: -
 
     private var currentCandidateClient: Any?
-    private var currentDeferredClient: Any?
 
     private var keyHandler: KeyHandler = KeyHandler()
     private var state: InputState = InputState.Empty()
@@ -119,7 +118,6 @@ class ctlInputMethod: IMKInputController {
         // Override the keyboard layout. Use US if not set.
         (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: Preferences.basisKeyboardLayout)
         // reset the state
-        currentDeferredClient = nil
         currentCandidateClient = nil
 
         keyHandler.clear()
@@ -338,7 +336,6 @@ extension ctlInputMethod {
     }
 
     private func handle(state: InputState.Deactivated, previous: InputState, client: Any?) {
-        currentDeferredClient = nil
         currentCandidateClient = nil
 
         gCurrentCandidateController?.delegate = nil
