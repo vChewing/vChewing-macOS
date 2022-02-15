@@ -36,6 +36,8 @@ extension RangeReplaceableCollection where Element: Hashable {
     @IBOutlet weak var uiLanguageButton: NSPopUpButton!
     @IBOutlet weak var basisKeyboardLayoutButton: NSPopUpButton!
     @IBOutlet weak var selectionKeyComboBox: NSComboBox!
+    @IBOutlet weak var chkTrad2KangXi: NSButton!
+    @IBOutlet weak var chkTrad2JISShinjitai: NSButton!
     
     var currentLanguageSelectItem: NSMenuItem? = nil
 
@@ -81,6 +83,11 @@ extension RangeReplaceableCollection where Element: Hashable {
         menuItem_AppleZhuyinEten.title = String(format: NSLocalizedString("Apple Zhuyin Eten", comment: ""))
         menuItem_AppleZhuyinEten.representedObject = String("com.apple.keylayout.ZhuyinEten")
         basisKeyboardLayoutButton.menu?.addItem(menuItem_AppleZhuyinEten)
+
+        let menuItem_vChewingDachen = NSMenuItem()
+        menuItem_vChewingDachen.title = String(format: NSLocalizedString("vChewing Dachen (Not Finished Yet)", comment: ""))
+        menuItem_vChewingDachen.representedObject = String("org.atelierInmu.keyboardlayout.vChewingKeyLayout.zhuyindachen")
+        basisKeyboardLayoutButton.menu?.addItem(menuItem_vChewingDachen)
 
         let basisKeyboardLayoutID = Preferences.basisKeyboardLayout
         
@@ -142,10 +149,15 @@ extension RangeReplaceableCollection where Element: Hashable {
             basisKeyboardLayoutButton.menu?.addItem(menuItem)
         }
 
-        if (basisKeyboardLayoutID == "com.apple.keylayout.ZhuyinBopomofo") {
+        switch basisKeyboardLayoutID {
+        case "com.apple.keylayout.ZhuyinBopomofo":
             chosenBaseKeyboardLayoutItem = menuItem_AppleZhuyinBopomofo
-        } else if basisKeyboardLayoutID == "com.apple.keylayout.ZhuyinEten" {
+        case "com.apple.keylayout.ZhuyinEten":
             chosenBaseKeyboardLayoutItem = menuItem_AppleZhuyinEten
+        case "org.atelierInmu.keyboardlayout.vChewingKeyLayout.zhuyindachen":
+            chosenBaseKeyboardLayoutItem = menuItem_vChewingDachen
+        default:
+            break // nothing to do
         }
 
         basisKeyboardLayoutButton.select(chosenBaseKeyboardLayoutItem ?? usKeyboardLayoutItem)
@@ -160,6 +172,21 @@ extension RangeReplaceableCollection where Element: Hashable {
         }
 
         selectionKeyComboBox.stringValue = candidateSelectionKeys
+        
+        // MARK: - 設定漢字轉換選項是否禁用
+
+    }
+
+    @IBAction func toggleTrad2KangXiAction(_ sender: Any) {
+        if chkTrad2KangXi.state == .on && chkTrad2JISShinjitai.state == .on {
+            Preferences.toggleShiftJISShinjitaiOutputEnabled()
+        }
+    }
+
+    @IBAction func toggleTrad2JISShinjitaiAction(_ sender: Any) {
+        if chkTrad2KangXi.state == .on && chkTrad2JISShinjitai.state == .on {
+            Preferences.toggleChineseConversionEnabled()
+        }
     }
 
     @IBAction func updateBasisKeyboardLayoutAction(_ sender: Any) {
