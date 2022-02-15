@@ -491,7 +491,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // MARK: Enter
     if (charCode == 13) {
         if ([input isControlHold]) {
-            return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+            if (ctlInputMethod.areWeUsingOurOwnPhraseEditor) {
+                return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+            }
         }
         return [self _handleEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
