@@ -67,10 +67,16 @@ class ctlInputMethod: IMKInputController {
         useCNS11643SupportItem.keyEquivalentModifierMask = [.command, .control]
         useCNS11643SupportItem.state = Preferences.cns11643Enabled.state
 
-        let chineseConversionItem = menu.addItem(withTitle: NSLocalizedString("Force KangXi Writing", comment: ""), action: #selector(toggleChineseConverter(_:)), keyEquivalent: "K")
-        chineseConversionItem.keyEquivalentModifierMask = [.command, .control]
-        chineseConversionItem.state = Preferences.chineseConversionEnabled.state
+        if keyHandler.inputMode == InputMode.imeModeCHT {
+            let chineseConversionItem = menu.addItem(withTitle: NSLocalizedString("Force KangXi Writing", comment: ""), action: #selector(toggleChineseConverter(_:)), keyEquivalent: "K")
+            chineseConversionItem.keyEquivalentModifierMask = [.command, .control]
+            chineseConversionItem.state = Preferences.chineseConversionEnabled.state
 
+            let shiftJISConversionItem = menu.addItem(withTitle: NSLocalizedString("JIS Shinjitai Output", comment: ""), action: #selector(toggleShiftJISShinjitaiOutput(_:)), keyEquivalent: "J")
+            shiftJISConversionItem.keyEquivalentModifierMask = [.command, .control]
+            shiftJISConversionItem.state = Preferences.shiftJISShinjitaiOutputEnabled.state
+        }
+        
         let halfWidthPunctuationItem = menu.addItem(withTitle: NSLocalizedString("Half-Width Punctuation Mode", comment: ""), action: #selector(toggleHalfWidthPunctuation(_:)), keyEquivalent: "H")
         halfWidthPunctuationItem.keyEquivalentModifierMask = [.command, .control]
         halfWidthPunctuationItem.state = Preferences.halfWidthPunctuationEnabled.state
@@ -215,6 +221,10 @@ class ctlInputMethod: IMKInputController {
         NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Force KangXi Writing", comment: ""), "\n", Preferences.toggleChineseConversionEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 
+    @objc func toggleShiftJISShinjitaiOutput(_ sender: Any?) {
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("JIS Shinjitai Output", comment: ""), "\n", Preferences.toggleShiftJISShinjitaiOutputEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
+    }
+
     @objc func toggleHalfWidthPunctuation(_ sender: Any?) {
         NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Half-Width Punctuation Mode", comment: ""), "\n", Preferences.toggleHalfWidthPunctuationEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
@@ -320,15 +330,27 @@ extension ctlInputMethod {
 
     private func commit(text: String, client: Any!) {
 
-        func convertToKangXiChineseIfRequired(_ text: String) -> String {
-            if !Preferences.chineseConversionEnabled {
-                return text
+        func kanjiConversionIfRequired(_ text: String) -> String {
+            var result : String = ""
+            if keyHandler.inputMode == InputMode.imeModeCHT {
+                if !Preferences.chineseConversionEnabled && Preferences.shiftJISShinjitaiOutputEnabled {
+                    result = vChewingKanjiConverter.cnvTradToJIS(text)
+                }
+                if Preferences.chineseConversionEnabled && !Preferences.shiftJISShinjitaiOutputEnabled {
+                    result = vChewingKanjiConverter.cnvTradToKangXi(text)
+                }
+                // 本來這兩個開關不該同時開啟的，但萬一被開啟了的話就這樣處理：
+                if Preferences.chineseConversionEnabled && Preferences.shiftJISShinjitaiOutputEnabled {
+                    result = vChewingKanjiConverter.cnvTradToJIS(text)
+                }
             }
-            // return OpenCCBridge.convertToKangXi(text) ?? ""
-            return vChewingKanjiConverter.cnvTradToKangXi(text)
+            // if (!Preferences.chineseConversionEnabled && !Preferences.shiftJISShinjitaiOutputEnabled) || (keyHandler.inputMode != InputMode.imeModeCHT);
+            result = text
+            
+            return result
         }
 
-        let buffer = convertToKangXiChineseIfRequired(text)
+        let buffer = kanjiConversionIfRequired(text)
         if buffer.isEmpty {
             return
         }

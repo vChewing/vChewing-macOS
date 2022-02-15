@@ -36,6 +36,7 @@ private let kComposingBufferSizePreference = "ComposingBufferSize"
 private let kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
 private let kCNS11643Enabled = "CNS11643Enabled"
 private let kChineseConversionEnabled = "ChineseConversionEnabled"
+private let kShiftJISShinjitaiOutputEnabled = "ShiftJISShinjitaiOutputEnabled"
 private let kHalfWidthPunctuationEnabled = "HalfWidthPunctuationEnable"
 private let kMoveCursorAfterSelectingCandidate = "MoveCursorAfterSelectingCandidate"
 private let kEscToCleanInputBuffer = "EscToCleanInputBuffer"
@@ -228,6 +229,7 @@ struct ComposingBufferSize {
          kChooseCandidateUsingSpace,
          kCNS11643Enabled,
          kChineseConversionEnabled,
+         kShiftJISShinjitaiOutputEnabled,
          kHalfWidthPunctuationEnabled,
          kEscToCleanInputBuffer,
          kCandidateTextFontName,
@@ -314,6 +316,11 @@ struct ComposingBufferSize {
         // 預設停用繁體轉康熙模組
         if UserDefaults.standard.object(forKey: kChineseConversionEnabled) == nil {
             UserDefaults.standard.set(Preferences.chineseConversionEnabled, forKey: kChineseConversionEnabled)
+        }
+        
+        // 預設停用繁體轉 JIS 當用新字體模組
+        if UserDefaults.standard.object(forKey: kShiftJISShinjitaiOutputEnabled) == nil {
+            UserDefaults.standard.set(Preferences.shiftJISShinjitaiOutputEnabled, forKey: kShiftJISShinjitaiOutputEnabled)
         }
         
         // 預設停用自訂語彙置換
@@ -411,10 +418,23 @@ struct ComposingBufferSize {
     @UserDefault(key: kChineseConversionEnabled, defaultValue: false)
     @objc static var chineseConversionEnabled: Bool
 
-    @objc static func toggleChineseConversionEnabled() -> Bool {
+    @objc @discardableResult static func toggleChineseConversionEnabled() -> Bool {
         chineseConversionEnabled = !chineseConversionEnabled
+        // 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
+        if chineseConversionEnabled && shiftJISShinjitaiOutputEnabled {self.toggleShiftJISShinjitaiOutputEnabled()}
         UserDefaults.standard.set(chineseConversionEnabled, forKey: kChineseConversionEnabled)
         return chineseConversionEnabled
+    }
+
+    @UserDefault(key: kShiftJISShinjitaiOutputEnabled, defaultValue: false)
+    @objc static var shiftJISShinjitaiOutputEnabled: Bool
+
+    @objc @discardableResult static func toggleShiftJISShinjitaiOutputEnabled() -> Bool {
+        shiftJISShinjitaiOutputEnabled = !shiftJISShinjitaiOutputEnabled
+        // 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
+        if shiftJISShinjitaiOutputEnabled && chineseConversionEnabled {self.toggleChineseConversionEnabled()}
+        UserDefaults.standard.set(shiftJISShinjitaiOutputEnabled, forKey: kShiftJISShinjitaiOutputEnabled)
+        return shiftJISShinjitaiOutputEnabled
     }
 
     @UserDefault(key: kHalfWidthPunctuationEnabled, defaultValue: false)
