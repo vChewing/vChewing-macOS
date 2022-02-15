@@ -37,6 +37,7 @@
 "⚠︎ Unhandlable char selected for user phrases." = "⚠︎ 已选中无法处理的字符，无法加入自订语汇。";
 "Per-Char Select Mode" = "仿真逐字选字输入";
 "CNS11643 Mode" = "全字库模式";
+"JIS Shinjitai Output" = "JIS 新字体模式";
 "Per-Char Associated Phrases" = "逐字选字联想模式";
 "Open User Data Folder" = "开启使用者资料夹";
 "Edit Associated Phrases…" = "编辑联想词…";

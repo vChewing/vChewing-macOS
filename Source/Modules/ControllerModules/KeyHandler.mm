@@ -261,7 +261,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     // Caps Lock processing : if Caps Lock is on, temporarily disable bopomofo.
-    if (charCode == 8 || charCode == 13 || [input isAbsorbedArrowKey] || [input isExtraChooseCandidateKey] || [input isCursorForward] || [input isCursorBackward]) {
+    if ([input isBackSpace] || [input isEnterCharCode] || [input isEnter] || [input isAbsorbedArrowKey] || [input isExtraChooseCandidateKey] || [input isExtraChooseCandidateKeyReverse] || [input isCursorForward] || [input isCursorBackward]) {
         // do nothing if backspace is pressed -- we ignore the key
     } else if ([input isCapsLockOn]) {
         // process all possible combination, we hope.
@@ -345,7 +345,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     // see if we have composition if Enter/Space is hit and buffer is not empty
     // this is bit-OR'ed so that the tone marker key is also taken into account
-    composeReading |= (!_bpmfReadingBuffer->isEmpty() && (charCode == 32 || charCode == 13));
+    composeReading |= (!_bpmfReadingBuffer->isEmpty() && ([input isSpace] || [input isEnterCharCode] || [input isEnter]));
     if (composeReading) {
         // combine the reading
         string reading = _bpmfReadingBuffer->syllable().composedString();
@@ -411,14 +411,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return YES;
     }
 
-	// MARK: Space and Down
+	// MARK: Space and Down, plus PageUp / PageDn / PageLeft / PageRight.
 	// keyCode 125 = Down, charCode 32 = Space
 	if (_bpmfReadingBuffer->isEmpty() &&
 		[state isKindOfClass:[InputStateNotEmpty class]] &&
-		([input isExtraChooseCandidateKey] || charCode == 32
-		 || [input isPageDown] || [input isPageUp]
+		([input isExtraChooseCandidateKey] || [input isExtraChooseCandidateKeyReverse]
+         || [input isSpace] || [input isPageDown] || [input isPageUp]
 		 || (input.useVerticalMode && ([input isVerticalModeOnlyChooseCandidateKey])))) {
-        if (charCode == 32) {
+        if ([input isSpace]) {
             // if the spacebar is NOT set to be a selection key
             if ([input isShiftHold] || !Preferences.chooseCandidateUsingSpace) {
                 if (_builder->cursorIndex() >= _builder->length()) {
@@ -449,7 +449,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     // MARK: Esc
-    if (charCode == 27) {
+    if ([input isESC]) {
         return [self _handleEscWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
 
@@ -473,13 +473,27 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return [self _handleEndWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
 
+    // MARK: Ctrl+PgLf or Shift+PgLf
+    if ([input isControlHold] || [input isShiftHold]) {
+        if ([input isOptionHold] && [input isLeft]) {
+            return [self _handleHomeWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+        }
+    }
+
+    // MARK: Ctrl+PgRt or Shift+PgRt
+    if ([input isControlHold] || [input isShiftHold]) {
+        if ([input isOptionHold] && [input isRight]) {
+            return [self _handleEndWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+        }
+    }
+
     // MARK: AbsorbedArrowKey
-    if ([input isAbsorbedArrowKey] || [input isExtraChooseCandidateKey]) {
+    if ([input isAbsorbedArrowKey] || [input isExtraChooseCandidateKey] || [input isExtraChooseCandidateKeyReverse]) {
         return [self _handleAbsorbedArrowKeyWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     // MARK: Backspace
-    if (charCode == 8) {
+    if ([input isBackSpace]) {
         return [self _handleBackspaceWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
 
@@ -489,15 +503,17 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     // MARK: Enter
-    if (charCode == 13) {
+    if ([input isEnter] || [input isEnterCharCode]) {
         if ([input isControlHold]) {
-            return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+            if (ctlInputMethod.areWeUsingOurOwnPhraseEditor) {
+                return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+            }
         }
         return [self _handleEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     // MARK: Punctuation list
-    if ((char) charCode == '`') {
+    if ([input isSymbolMenuKey]) {
         InputStateEmpty *empty = [[InputStateEmpty alloc] init];
         stateCallback(empty);
 
@@ -871,16 +887,15 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
               stateCallback:(void (^)(InputState *))stateCallback
               errorCallback:(void (^)(void))errorCallback
 {
-    UniChar charCode = input.charCode;
 
-    if (charCode == 27) {
+    if ([input isESC]) {
         InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
         stateCallback(inputting);
         return YES;
     }
 
     // Enter
-    if (charCode == 13) {
+    if ([input isEnter] || [input isEnterCharCode]) {
         if (![self.delegate keyHandler:self didRequestWriteUserPhraseWithState:state]) {
             errorCallback();
             return YES;
@@ -947,7 +962,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     NSLog(@"vChewingCandidateKeyDebug: %@", char2Print);
     VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
 
-    BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || [input isDelete];
+    BOOL cancelCandidateKey = [input isBackSpace] || [input isESC] || [input isDelete];
 
     if (cancelCandidateKey) {
         if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
@@ -966,7 +981,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return YES;
     }
 
-    if (charCode == 13 || [input isEnter]) {
+    if ([input isEnterCharCode] || [input isEnter]) {
         if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
@@ -977,7 +992,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return YES;
     }
 
-    if (charCode == 32 || [input isPageDown] || input.emacsKey == vChewingEmacsKeyNextPage) {
+    if ([input isSpace] || [input isPageDown] || input.emacsKey == vChewingEmacsKeyNextPage) {
         BOOL updated = [gCurrentCandidateController showNextPage];
         if (!updated) {
             errorCallback();

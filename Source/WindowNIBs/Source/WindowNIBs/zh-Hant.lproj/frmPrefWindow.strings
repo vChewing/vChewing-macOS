@@ -116,6 +116,9 @@
 /* Class = "NSButtonCell"; title = "Auto-convert traditional Chinese glyphs to KangXi characters"; ObjectID = "BSK-bH-Gct"; */
 "BSK-bH-Gct.title" = "自動將繁體中文字轉換為康熙字";
 
+/* Class = "NSButtonCell"; title = "Auto-convert traditional Chinese glyphs to KangXi characters"; ObjectID = "eia-1F-Do0"; */
+"eia-1F-Do0.title" = "自動將繁體中文字轉換為日本簡化字（JIS 新字體）";
+
 /* Class = "NSBox"; title = "Advanced Settings"; ObjectID = "E1l-m8-xgb"; */
 "E1l-m8-xgb.title" = "進階設定";
 

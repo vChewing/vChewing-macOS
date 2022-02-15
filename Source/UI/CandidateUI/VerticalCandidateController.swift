@@ -266,7 +266,7 @@ public class VerticalCandidateController: CandidateController {
         }
 
         if currentPage + 1 >= pageCount {
-            return false
+            currentPage = 1
         }
 
         currentPage += 1
@@ -281,7 +281,7 @@ public class VerticalCandidateController: CandidateController {
         }
 
         if currentPage == 0 {
-            return false
+            currentPage = pageCount
         }
 
         currentPage -= 1
