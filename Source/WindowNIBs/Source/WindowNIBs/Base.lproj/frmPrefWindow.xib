@@ -650,7 +650,7 @@
                                                             <constraint firstAttribute="height" constant="235" id="DuE-Bj-q43"/>
                                                         </constraints>
                                                         <textFieldCell key="cell" selectable="YES" id="wQ9-px-b07">
-                                                            <font key="font" metaFont="system"/>
+                                                            <font key="font" metaFont="cellTitle"/>
                                                             <string key="title">Regarding On-Screen Keyboard Viewer Support:
 
 	Since v1.3.2, vChewing supports on-screen keyboard by supporting "Apple Zhuyin Bopomofo" and "Apple Zhuyin Eten" alphanumeric layout. Theoreotically, these two dynamic layouts work with all types of Apple physical keyboards, and you can report failure cases through macOS Feedback Assistant app if macOS built-in Zhuyin / Eten-Zhuyin Input Method fails from working with your non-US keyboard.
