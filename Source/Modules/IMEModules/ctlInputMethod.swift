@@ -331,23 +331,21 @@ extension ctlInputMethod {
     private func commit(text: String, client: Any!) {
 
         func kanjiConversionIfRequired(_ text: String) -> String {
-            var result : String = ""
             if keyHandler.inputMode == InputMode.imeModeCHT {
                 if !Preferences.chineseConversionEnabled && Preferences.shiftJISShinjitaiOutputEnabled {
-                    result = vChewingKanjiConverter.cnvTradToJIS(text)
+                    return vChewingKanjiConverter.cnvTradToJIS(text)
                 }
                 if Preferences.chineseConversionEnabled && !Preferences.shiftJISShinjitaiOutputEnabled {
-                    result = vChewingKanjiConverter.cnvTradToKangXi(text)
+                    return vChewingKanjiConverter.cnvTradToKangXi(text)
                 }
                 // 本來這兩個開關不該同時開啟的，但萬一被開啟了的話就這樣處理：
                 if Preferences.chineseConversionEnabled && Preferences.shiftJISShinjitaiOutputEnabled {
-                    result = vChewingKanjiConverter.cnvTradToJIS(text)
+                    return vChewingKanjiConverter.cnvTradToJIS(text)
                 }
+                // if (!Preferences.chineseConversionEnabled && !Preferences.shiftJISShinjitaiOutputEnabled) || (keyHandler.inputMode != InputMode.imeModeCHT);
+                return text
             }
-            // if (!Preferences.chineseConversionEnabled && !Preferences.shiftJISShinjitaiOutputEnabled) || (keyHandler.inputMode != InputMode.imeModeCHT);
-            result = text
-            
-            return result
+            return text
         }
 
         let buffer = kanjiConversionIfRequired(text)
