@@ -37,6 +37,7 @@
 "⚠︎ Unhandlable char selected for user phrases." = "⚠︎ 已選中無法處理的字元，無法加入自訂語彙。";
 "Per-Char Select Mode" = "模擬逐字選字輸入";
 "CNS11643 Mode" = "全字庫模式";
+"JIS Shinjitai Output" = "JIS 新字體模式";
 "Per-Char Associated Phrases" = "逐字選字聯想模式";
 "Open User Data Folder" = "開啟使用者資料夾";
 "Edit Associated Phrases…" = "編輯聯想詞…";

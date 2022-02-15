@@ -33,6 +33,14 @@ enum KeyCode: UInt16 {
     case delete = 117
 }
 
+enum CharCode: UInt16 {
+    case space = 32
+    case backSpace = 8
+    case enter = 13
+    case esc = 27
+    case symbolMenuKey_ABC = 96
+}
+
 class KeyHandlerInput: NSObject {
     @objc private (set) var useVerticalMode: Bool
     @objc private (set) var inputText: String?
@@ -43,6 +51,7 @@ class KeyHandlerInput: NSObject {
     private var cursorForwardKey: KeyCode
     private var cursorBackwardKey: KeyCode
     private var extraChooseCandidateKey: KeyCode
+    private var extraChooseCandidateKeyReverse: KeyCode
     private var absorbedArrowKey: KeyCode
     private var verticalModeOnlyChooseCandidateKey: KeyCode
     @objc private (set) var emacsKey: vChewingEmacsKey
@@ -60,6 +69,7 @@ class KeyHandlerInput: NSObject {
         cursorForwardKey = useVerticalMode ? .down : .right
         cursorBackwardKey = useVerticalMode ? .up : .left
         extraChooseCandidateKey = useVerticalMode ? .left : .down
+        extraChooseCandidateKeyReverse = useVerticalMode ? .right : .up
         absorbedArrowKey = useVerticalMode ? .right : .up
         verticalModeOnlyChooseCandidateKey = useVerticalMode ? absorbedArrowKey : .none
         super.init()
@@ -83,6 +93,7 @@ class KeyHandlerInput: NSObject {
         cursorForwardKey = useVerticalMode ? .down : .right
         cursorBackwardKey = useVerticalMode ? .up : .left
         extraChooseCandidateKey = useVerticalMode ? .left : .down
+        extraChooseCandidateKeyReverse = useVerticalMode ? .right : .up
         absorbedArrowKey = useVerticalMode ? .right : .up
         verticalModeOnlyChooseCandidateKey = useVerticalMode ? absorbedArrowKey : .none
         super.init()
@@ -92,7 +103,7 @@ class KeyHandlerInput: NSObject {
         charCode = AppleKeyboardConverter.cnvApple2ABC(charCode)
         inputText = AppleKeyboardConverter.cnvStringApple2ABC(inputText ?? "")
         inputTextIgnoringModifiers = AppleKeyboardConverter.cnvStringApple2ABC(inputTextIgnoringModifiers ?? "")
-        return "<\(super.description) inputText:\(String(describing: inputText)), inputTextIgnoringModifiers:\(String(describing: inputTextIgnoringModifiers)) charCode:\(charCode), keyCode:\(keyCode), flags:\(flags), cursorForwardKey:\(cursorForwardKey), cursorBackwardKey:\(cursorBackwardKey), extraChooseCandidateKey:\(extraChooseCandidateKey), absorbedArrowKey:\(absorbedArrowKey),  verticalModeOnlyChooseCandidateKey:\(verticalModeOnlyChooseCandidateKey), emacsKey:\(emacsKey), useVerticalMode:\(useVerticalMode)>"
+        return "<\(super.description) inputText:\(String(describing: inputText)), inputTextIgnoringModifiers:\(String(describing: inputTextIgnoringModifiers)) charCode:\(charCode), keyCode:\(keyCode), flags:\(flags), cursorForwardKey:\(cursorForwardKey), cursorBackwardKey:\(cursorBackwardKey), extraChooseCandidateKey:\(extraChooseCandidateKey), extraChooseCandidateKeyReverse:\(extraChooseCandidateKeyReverse), absorbedArrowKey:\(absorbedArrowKey),  verticalModeOnlyChooseCandidateKey:\(verticalModeOnlyChooseCandidateKey), emacsKey:\(emacsKey), useVerticalMode:\(useVerticalMode)>"
     }
 
     @objc var isShiftHold: Bool {
@@ -134,6 +145,10 @@ class KeyHandlerInput: NSObject {
         KeyCode(rawValue: keyCode) == KeyCode.enter
     }
 
+    @objc var isEnterCharCode: Bool {
+        CharCode(rawValue: charCode) == CharCode.enter
+    }
+
     @objc var isUp: Bool {
         KeyCode(rawValue: keyCode) == KeyCode.up
     }
@@ -156,6 +171,18 @@ class KeyHandlerInput: NSObject {
 
     @objc var isPageDown: Bool {
         KeyCode(rawValue: keyCode) == KeyCode.pageDown
+    }
+
+    @objc var isSpace: Bool {
+        CharCode(rawValue: charCode) == CharCode.space
+    }
+
+    @objc var isBackSpace: Bool {
+        CharCode(rawValue: charCode) == CharCode.backSpace
+    }
+
+    @objc var isESC: Bool {
+        CharCode(rawValue: charCode) == CharCode.esc
     }
 
     @objc var isHome: Bool {
@@ -186,8 +213,16 @@ class KeyHandlerInput: NSObject {
         KeyCode(rawValue: keyCode) == extraChooseCandidateKey
     }
 
+    @objc var isExtraChooseCandidateKeyReverse: Bool {
+        KeyCode(rawValue: keyCode) == extraChooseCandidateKeyReverse
+    }
+
     @objc var isVerticalModeOnlyChooseCandidateKey: Bool {
         KeyCode(rawValue: keyCode) == verticalModeOnlyChooseCandidateKey
+    }
+
+    @objc var isSymbolMenuKey: Bool {
+        CharCode(rawValue: charCode) == CharCode.symbolMenuKey_ABC
     }
 
 }

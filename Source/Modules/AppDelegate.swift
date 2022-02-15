@@ -152,6 +152,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
         }
     }
 
+    // let vChewingKeyLayoutBundle = Bundle.init(path: URL(fileURLWithPath: Bundle.main.resourcePath ?? "").appendingPathComponent("vChewingKeyLayout.bundle").path)
+
     @IBOutlet weak var window: NSWindow?
     private var ctlPrefWindowInstance: ctlPrefWindow?
     private var ctlAboutWindowInstance: ctlAboutWindow? // New About Window
