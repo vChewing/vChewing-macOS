@@ -37,6 +37,7 @@
 "⚠︎ Unhandlable char selected for user phrases." = "⚠︎ ユーザー辞書の対処できない文字は選択されています。";
 "Per-Char Select Mode" = "全候補入力モード";
 "CNS11643 Mode" = "全字庫モード";
+"JIS Shinjitai Output" = "JIS 新字体モード";
 "Per-Char Associated Phrases" = "全候補入力で連想語彙";
 "Open User Data Folder" = "ユーザー資料フォルダを開く";
 "Edit Associated Phrases…" = "連想語彙を編集…";

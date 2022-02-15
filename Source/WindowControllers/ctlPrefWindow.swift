@@ -36,6 +36,8 @@ extension RangeReplaceableCollection where Element: Hashable {
     @IBOutlet weak var uiLanguageButton: NSPopUpButton!
     @IBOutlet weak var basisKeyboardLayoutButton: NSPopUpButton!
     @IBOutlet weak var selectionKeyComboBox: NSComboBox!
+    @IBOutlet weak var chkTrad2KangXi: NSButton!
+    @IBOutlet weak var chkTrad2JISShinjitai: NSButton!
     
     var currentLanguageSelectItem: NSMenuItem? = nil
 
@@ -160,6 +162,21 @@ extension RangeReplaceableCollection where Element: Hashable {
         }
 
         selectionKeyComboBox.stringValue = candidateSelectionKeys
+        
+        // MARK: - 設定漢字轉換選項是否禁用
+
+    }
+
+    @IBAction func toggleTrad2KangXiAction(_ sender: Any) {
+        if chkTrad2KangXi.state == .on && chkTrad2JISShinjitai.state == .on {
+            Preferences.toggleShiftJISShinjitaiOutputEnabled()
+        }
+    }
+
+    @IBAction func toggleTrad2JISShinjitaiAction(_ sender: Any) {
+        if chkTrad2KangXi.state == .on && chkTrad2JISShinjitai.state == .on {
+            Preferences.toggleChineseConversionEnabled()
+        }
     }
 
     @IBAction func updateBasisKeyboardLayoutAction(_ sender: Any) {
