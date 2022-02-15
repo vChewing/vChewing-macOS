@@ -144,10 +144,13 @@ extension RangeReplaceableCollection where Element: Hashable {
             basisKeyboardLayoutButton.menu?.addItem(menuItem)
         }
 
-        if (basisKeyboardLayoutID == "com.apple.keylayout.ZhuyinBopomofo") {
+        switch basisKeyboardLayoutID {
+        case "com.apple.keylayout.ZhuyinBopomofo":
             chosenBaseKeyboardLayoutItem = menuItem_AppleZhuyinBopomofo
-        } else if basisKeyboardLayoutID == "com.apple.keylayout.ZhuyinEten" {
+        case "com.apple.keylayout.ZhuyinEten":
             chosenBaseKeyboardLayoutItem = menuItem_AppleZhuyinEten
+        default:
+            break // nothing to do
         }
 
         basisKeyboardLayoutButton.select(chosenBaseKeyboardLayoutItem ?? usKeyboardLayoutItem)
