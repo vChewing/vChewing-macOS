@@ -7,8 +7,8 @@
 	<key>UpdateInfoSite</key>
 	<string>https://gitee.com/vchewing/vChewing-macOS</string>
 	<key>CFBundleVersion</key>
-	<string>1921</string>
+	<string>1922</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.3.2</string>
+	<string>1.3.3</string>
 </dict>
 </plist>
