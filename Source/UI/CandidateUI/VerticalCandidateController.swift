@@ -266,10 +266,11 @@ public class VerticalCandidateController: CandidateController {
         }
 
         if currentPage + 1 >= pageCount {
-            currentPage = 1
+            currentPage = 0
+        } else {
+            currentPage += 1
         }
 
-        currentPage += 1
         candidateView.highlightedIndex = 0
         layoutCandidateView()
         return true
@@ -281,10 +282,11 @@ public class VerticalCandidateController: CandidateController {
         }
 
         if currentPage == 0 {
-            currentPage = pageCount
+            currentPage = pageCount - 1
+        } else {
+            currentPage -= 1
         }
 
-        currentPage -= 1
         candidateView.highlightedIndex = 0
         layoutCandidateView()
         return true
