@@ -252,7 +252,9 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     // }
     [currentMarkedPhrase appendString:userPhrase];
     if (areWeDuplicating) {
-        [currentMarkedPhrase appendString:@"\tFreqOverrideByDuplication"];
+        // Do not use ASCII characters to comment here.
+        // Otherwise, it will be scrambled by HYPY2BPMF module shipped in the vChewing Phrase Editor.
+        [currentMarkedPhrase appendString:@"\t#𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎"];
     }
     [currentMarkedPhrase appendString:@"\n"];
 
