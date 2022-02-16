@@ -24,7 +24,7 @@
 "\"%@\" length must ≥ 2 for a user phrase." = "\"%@\" length must ≥ 2 for a user phrase.";
 "\"%@\" length should ≤ %d for a user phrase." = "\"%@\" length should ≤ %d for a user phrase.";
 "\"%@\" selected. ENTER to add user phrase." = "\"%@\" selected. ENTER to add user phrase.";
-"\"%@\" already exists." = "\"%@\" already exists.";
+"\"%@\" already exists, ENTER to boost its priority." = "\"%@\" already exists, ENTER to boost its priority.";
 "Edit Phrase Replacement Table…" = "Edit Phrase Replacement Table…";
 "Use Phrase Replacement" = "Use Phrase Replacement";
 "Candidates keys cannot be empty." = "Candidates keys cannot be empty.";
