@@ -246,12 +246,16 @@ class InputState: NSObject {
             if markedRange.length > kMaxMarkRangeLength {
                 return false
             }
+            return markedRange.length >= kMinMarkRangeLength && markedRange.length <= kMaxMarkRangeLength
+        }
+
+        @objc var chkIfUserPhraseExists: Bool {
             let text = (composingBuffer as NSString).substring(with: markedRange)
             let (exactBegin, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location)
             let (exactEnd, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location + markedRange.length)
             let selectedReadings = readings[exactBegin..<exactEnd]
             let joined = selectedReadings.joined(separator: "-")
-            return mgrLangModel.checkIfExist(userPhrase: text, key: joined) == false
+            return mgrLangModel.checkIfExist(userPhrase: text, key: joined) == true
         }
 
         @objc var userPhrase: String {
