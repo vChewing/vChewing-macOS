@@ -219,7 +219,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     return NO;
 }
 
-+ (BOOL)writeUserPhrase:(NSString *)userPhrase inputMode:(InputMode)mode;
++ (BOOL)writeUserPhrase:(NSString *)userPhrase inputMode:(InputMode)mode areWeDuplicating:(BOOL)areWeDuplicating
 {
     if (![self checkIfUserLanguageModelFilesExist]) {
         return NO;
@@ -251,6 +251,9 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     //     [currentMarkedPhrase appendString:@"\n"];
     // }
     [currentMarkedPhrase appendString:userPhrase];
+    if (areWeDuplicating) {
+        [currentMarkedPhrase appendString:@"\tFreqOverrideByDuplication"];
+    }
     [currentMarkedPhrase appendString:@"\n"];
 
     NSFileHandle *writeFile = [NSFileHandle fileHandleForUpdatingAtPath:path];
