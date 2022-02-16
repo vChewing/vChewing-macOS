@@ -182,7 +182,7 @@ class InputState: NSObject {
             let (exactEnd, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location + markedRange.length)
             let selectedReadings = readings[exactBegin..<exactEnd]
             let joined = selectedReadings.joined(separator: "-")
-            let exist = mgrLangModel.checkIfExist(userPhrase: text, key: joined)
+            let exist = mgrLangModel.checkIfUserPhraseExist(userPhrase: text, mode: ctlInputMethod.currentKeyHandler.inputMode, key: joined)
             if exist {
                 return String(format: NSLocalizedString("\"%@\" already exists.", comment: ""), text)
             }
@@ -255,7 +255,7 @@ class InputState: NSObject {
             let (exactEnd, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location + markedRange.length)
             let selectedReadings = readings[exactBegin..<exactEnd]
             let joined = selectedReadings.joined(separator: "-")
-            return mgrLangModel.checkIfExist(userPhrase: text, key: joined) == true
+            return mgrLangModel.checkIfUserPhraseExist(userPhrase: text, mode: ctlInputMethod.currentKeyHandler.inputMode, key: joined) == true
         }
 
         @objc var userPhrase: String {

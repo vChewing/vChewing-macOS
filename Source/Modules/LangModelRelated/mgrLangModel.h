@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)checkIfUserLanguageModelFilesExist;
 + (BOOL)checkIfUserDataFolderExists;
 
-+ (BOOL)checkIfUserPhraseExist:(NSString *)userPhrase key:(NSString *)key NS_SWIFT_NAME(checkIfExist(userPhrase:key:));
++ (BOOL)checkIfUserPhraseExist:(NSString *)userPhrase inputMode:(InputMode)mode key:(NSString *)key NS_SWIFT_NAME(checkIfUserPhraseExist(userPhrase:mode:key:));
 + (BOOL)writeUserPhrase:(NSString *)userPhrase inputMode:(InputMode)mode areWeDuplicating:(BOOL)areWeDuplicating;
 + (void)setPhraseReplacementEnabled:(BOOL)phraseReplacementEnabled;
 + (void)setCNSEnabled:(BOOL)cnsEnabled;

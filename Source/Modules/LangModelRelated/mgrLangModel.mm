@@ -207,10 +207,10 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     return YES;
 }
 
-+ (BOOL)checkIfUserPhraseExist:(NSString *)userPhrase key:(NSString *)key NS_SWIFT_NAME(checkIfExist(userPhrase:key:))
++ (BOOL)checkIfUserPhraseExist:(NSString *)userPhrase inputMode:(InputMode)mode key:(NSString *)key NS_SWIFT_NAME(checkIfUserPhraseExist(userPhrase:mode:key:))
 {
     string unigramKey = string(key.UTF8String);
-    vector<Unigram> unigrams = gLangModelCHT.unigramsForKey(unigramKey);
+    vector<Unigram> unigrams = [mode isEqualToString:imeModeCHT] ? gLangModelCHT.unigramsForKey(unigramKey): gLangModelCHS.unigramsForKey(unigramKey);
     string userPhraseString = string(userPhrase.UTF8String);
     for (auto unigram: unigrams) {
         if (unigram.keyValue.value == userPhraseString) {
