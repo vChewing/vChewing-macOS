@@ -20,6 +20,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #import "mgrLangModel.h"
 #import "mgrLangModel_Privates.h"
 #import "vChewing-Swift.h"
+#import "LMConsolidator.h"
 
 using namespace std;
 using namespace vChewing;
@@ -266,6 +267,9 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     NSData *data = [currentMarkedPhrase dataUsingEncoding:NSUTF8StringEncoding];
     [writeFile writeData:data];
     [writeFile closeFile];
+
+    // We enforce the format consolidation here, since the pragma header will let the UserPhraseLM bypasses the consolidating process on load.
+    LMConsolidator::ConsolidateContent([path UTF8String], Preferences.shouldAutoSortUserPhrasesAndExclListOnLoad, false);
 
 //  We use FSEventStream to monitor the change of the user phrase folder,
 //  so we don't have to load data here.
