@@ -71,8 +71,8 @@ bool LMConsolidator::FixEOF(const char *path)
 } // END: EOF FIXER.
 
 // CONTENT CONSOLIDATOR. CREDIT: Shiki Suen.
-bool LMConsolidator::ConsolidateContent(const char *path, bool shouldsort) {
-    if (LMConsolidator::CheckPragma(path) && !shouldsort){
+bool LMConsolidator::ConsolidateContent(const char *path, bool shouldsort, bool shouldCheckPragma) {
+    if (LMConsolidator::CheckPragma(path) && !shouldsort && shouldCheckPragma){
         return true;
     }
 
