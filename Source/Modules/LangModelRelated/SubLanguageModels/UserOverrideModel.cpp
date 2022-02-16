@@ -136,7 +136,7 @@ static double Score(size_t eventCount,
 
 static bool IsEndingPunctuation(const string& value) {
     return value == "，" || value == "。" || value== "！" || value == "？" ||
-        value == "」" || value == "』" || value== "”" || value == "”";
+        value == "」" || value == "』" || value== "”" || value == "’";
 }
 static string WalkedNodesToKey(const std::vector<NodeAnchor>& walkedNodes,
                                size_t cursorIndex) {
