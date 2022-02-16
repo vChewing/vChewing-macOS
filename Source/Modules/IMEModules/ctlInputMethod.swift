@@ -603,7 +603,7 @@ extension ctlInputMethod: KeyHandlerDelegate {
         if !state.validToWrite {
             return false
         }
-        mgrLangModel.writeUserPhrase(state.userPhrase, inputMode: keyHandler.inputMode)
+        mgrLangModel.writeUserPhrase(state.userPhrase, inputMode: keyHandler.inputMode, areWeDuplicating: state.chkIfUserPhraseExists)
         return true
     }
 }
