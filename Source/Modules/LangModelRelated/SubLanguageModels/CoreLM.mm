@@ -281,14 +281,14 @@ void vChewing::CoreLM::dump()
     }
 }
 
-const vector<Bigram> vChewing::CoreLM::bigramsForKeys(const string& preceedingKey, const string& key)
+const std::vector<Taiyan::Gramambular::Bigram> vChewing::CoreLM::bigramsForKeys(const string& preceedingKey, const string& key)
 {
-    return vector<Bigram>();
+    return std::vector<Taiyan::Gramambular::Bigram>();
 }
 
-const vector<Unigram> vChewing::CoreLM::unigramsForKey(const string& key)
+const std::vector<Taiyan::Gramambular::Unigram> vChewing::CoreLM::unigramsForKey(const string& key)
 {
-    vector<Unigram> v;
+    std::vector<Taiyan::Gramambular::Unigram> v;
     map<const char *, vector<Row> >::const_iterator i = keyRowMap.find(key.c_str());
 
     if (i != keyRowMap.end()) {

@@ -17,20 +17,15 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#import "Mandarin.h"
+
 #import "Gramambular.h"
-#import "vChewingLM.h"
-#import "UserOverrideModel.h"
-#import "mgrLangModel_Privates.h"
 #import "KeyHandler.h"
+#import "LMInstantiator.h"
+#import "Mandarin.h"
+#import "mgrLangModel_Privates.h"
+#import "UserOverrideModel.h"
 #import "vChewing-Swift.h"
 #import <string>
-
-// C++ namespace usages
-using namespace std;
-using namespace Taiyan::Mandarin;
-using namespace Taiyan::Gramambular;
-using namespace vChewing;
 
 InputMode imeModeCHT = @"org.atelierInmu.inputmethod.vChewing.IMECHT";
 InputMode imeModeCHS = @"org.atelierInmu.inputmethod.vChewing.IMECHS";
@@ -38,7 +33,7 @@ InputMode imeModeNULL = @"org.atelierInmu.inputmethod.vChewing.IMENULL";
 
 static const double kEpsilon = 0.000001;
 
-static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) {
+static double FindHighestScore(const std::vector<Taiyan::Gramambular::NodeAnchor> &nodes, double epsilon) {
     double highestScore = 0.0;
     for (auto ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
         double score = ni->node->highestUnigramScore();
@@ -49,16 +44,15 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     return highestScore + epsilon;
 }
 
-// sort helper
-class NodeAnchorDescendingSorter
-{
+class NodeAnchorDescendingSorter {
 public:
-    bool operator()(const NodeAnchor &a, const NodeAnchor &b) const {
+    bool operator()(const Taiyan::Gramambular::NodeAnchor &a, const Taiyan::Gramambular::NodeAnchor &b) const
+    {
         return a.node->key().length() > b.node->key().length();
     }
 };
 
-// if DEBUG is defined, a DOT file (GraphViz format) will be written to the
+;// if DEBUG is defined, a DOT file (GraphViz format) will be written to the
 // specified path every time the grid is walked
 #if DEBUG
 static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
@@ -71,7 +65,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     Taiyan::Mandarin::BopomofoReadingBuffer *_bpmfReadingBuffer;
 
     // language model
-    vChewing::vChewingLM *_languageModel;
+    vChewing::LMInstantiator *_languageModel;
 
     // user override model
     vChewing::UserOverrideModel *_userOverrideModel;
@@ -96,8 +90,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 - (void)setInputMode:(NSString *)value
 {
     NSString *newInputMode;
-    vChewingLM *newLanguageModel;
-    UserOverrideModel *newUserOverrideModel;
+    vChewing::LMInstantiator *newLanguageModel;
+    vChewing::UserOverrideModel *newUserOverrideModel;
 
     if ([value isKindOfClass:[NSString class]] && [value isEqual:imeModeCHS]) {
         newInputMode = imeModeCHS;
@@ -120,7 +114,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
         if (_builder) {
             delete _builder;
-            _builder = new BlockReadingBuilder(_languageModel);
+            _builder = new Taiyan::Gramambular::BlockReadingBuilder(_languageModel);
             _builder->setJoinSeparator("-");
         }
 
@@ -146,7 +140,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 {
     self = [super init];
     if (self) {
-        _bpmfReadingBuffer = new BopomofoReadingBuffer(BopomofoKeyboardLayout::StandardLayout());
+        _bpmfReadingBuffer = new Taiyan::Mandarin::BopomofoReadingBuffer(Taiyan::Mandarin::BopomofoKeyboardLayout::StandardLayout());
 
         // create the lattice builder
         _languageModel = [mgrLangModel lmCHT];
@@ -154,8 +148,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         _languageModel->setCNSEnabled(Preferences.cns11643Enabled);
         _userOverrideModel = [mgrLangModel userOverrideModelCHT];
 
-        _builder = new BlockReadingBuilder(_languageModel);
-
+        _builder = new Taiyan::Gramambular::BlockReadingBuilder(_languageModel);
+        
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
         _inputMode = imeModeCHT;
@@ -168,31 +162,31 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     NSInteger layout = Preferences.keyboardLayout;
     switch (layout) {
         case KeyboardLayoutStandard:
-            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::StandardLayout());
+            _bpmfReadingBuffer->setKeyboardLayout(Taiyan::Mandarin::BopomofoKeyboardLayout::StandardLayout());
             break;
         case KeyboardLayoutEten:
-            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::ETenLayout());
+            _bpmfReadingBuffer->setKeyboardLayout(Taiyan::Mandarin::BopomofoKeyboardLayout::ETenLayout());
             break;
         case KeyboardLayoutHsu:
-            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::HsuLayout());
+            _bpmfReadingBuffer->setKeyboardLayout(Taiyan::Mandarin::BopomofoKeyboardLayout::HsuLayout());
             break;
         case KeyboardLayoutEten26:
-            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::ETen26Layout());
+            _bpmfReadingBuffer->setKeyboardLayout(Taiyan::Mandarin::BopomofoKeyboardLayout::ETen26Layout());
             break;
         case KeyboardLayoutIBM:
-            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::IBMLayout());
+            _bpmfReadingBuffer->setKeyboardLayout(Taiyan::Mandarin::BopomofoKeyboardLayout::IBMLayout());
             break;
         case KeyboardLayoutMiTAC:
-            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::MiTACLayout());
+            _bpmfReadingBuffer->setKeyboardLayout(Taiyan::Mandarin::BopomofoKeyboardLayout::MiTACLayout());
             break;
         case KeyboardLayoutFakeSeigyou:
-            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::FakeSeigyouLayout());
+            _bpmfReadingBuffer->setKeyboardLayout(Taiyan::Mandarin::BopomofoKeyboardLayout::FakeSeigyouLayout());
             break;
         case KeyboardLayoutHanyuPinyin:
-            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::HanyuPinyinLayout());
+            _bpmfReadingBuffer->setKeyboardLayout(Taiyan::Mandarin::BopomofoKeyboardLayout::HanyuPinyinLayout());
             break;
         default:
-            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::StandardLayout());
+            _bpmfReadingBuffer->setKeyboardLayout(Taiyan::Mandarin::BopomofoKeyboardLayout::StandardLayout());
             Preferences.keyboardLayout = KeyboardLayoutStandard;
     }
 }
@@ -200,8 +194,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 - (void)fixNodeWithValue:(NSString *)value
 {
     size_t cursorIndex = [self _actualCandidateCursorIndex];
-    string stringValue = [value UTF8String];
-    NodeAnchor selectedNode = _builder->grid().fixNodeSelectedCandidate(cursorIndex, stringValue);
+    std::string stringValue(value.UTF8String);
+    Taiyan::Gramambular::NodeAnchor selectedNode = _builder->grid().fixNodeSelectedCandidate(cursorIndex, stringValue);
     if (!Preferences.useSCPCTypingMode) { // 不要針對逐字選字模式啟用臨時半衰記憶模型。
         // If the length of the readings and the characters do not match,
         // it often means it is a special symbol and it should not be stored
@@ -234,10 +228,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     _walkedNodes.clear();
 }
 
-- (string)_currentLayout
+- (std::string)_currentLayout
 {
     NSString *keyboardLayoutName = Preferences.keyboardLayoutName;
-    string layout = string(keyboardLayoutName.UTF8String) + string("_");
+    std::string layout = std::string(keyboardLayoutName.UTF8String) + std::string("_");
     return layout;
 }
 
@@ -348,7 +342,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     composeReading |= (!_bpmfReadingBuffer->isEmpty() && ([input isSpace] || [input isEnterCharCode] || [input isEnter]));
     if (composeReading) {
         // combine the reading
-        string reading = _bpmfReadingBuffer->syllable().composedString();
+        std::string reading = _bpmfReadingBuffer->syllable().composedString();
 
         // see if we have a unigram for this
         if (!_languageModel->hasUnigramsForKey(reading)) {
@@ -365,12 +359,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         NSString *poppedText = [self _popOverflowComposingTextAndWalk];
 
         // get user override model suggestion
-        string overrideValue = (Preferences.useSCPCTypingMode) ? "" :
+        std::string overrideValue = (Preferences.useSCPCTypingMode) ? "" :
                 _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
 
         if (!overrideValue.empty()) {
             size_t cursorIndex = [self _actualCandidateCursorIndex];
-            vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
+            std::vector<Taiyan::Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
             double highestScore = FindHighestScore(nodes, kEpsilon);
             _builder->grid().overrideNodeScoreForSelectedCandidate(cursorIndex, overrideValue, static_cast<float>(highestScore));
         }
@@ -411,13 +405,13 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return YES;
     }
 
-	// MARK: Space and Down, plus PageUp / PageDn / PageLeft / PageRight.
-	// keyCode 125 = Down, charCode 32 = Space
-	if (_bpmfReadingBuffer->isEmpty() &&
-		[state isKindOfClass:[InputStateNotEmpty class]] &&
-		([input isExtraChooseCandidateKey] || [input isExtraChooseCandidateKeyReverse]
+    // MARK: Space and Down, plus PageUp / PageDn / PageLeft / PageRight.
+    // keyCode 125 = Down, charCode 32 = Space
+    if (_bpmfReadingBuffer->isEmpty() &&
+        [state isKindOfClass:[InputStateNotEmpty class]] &&
+        ([input isExtraChooseCandidateKey] || [input isExtraChooseCandidateKeyReverse]
          || [input isSpace] || [input isPageDown] || [input isPageUp]
-		 || (input.useVerticalMode && ([input isVerticalModeOnlyChooseCandidateKey])))) {
+         || (input.useVerticalMode && ([input isVerticalModeOnlyChooseCandidateKey])))) {
         if ([input isSpace]) {
             // if the spacebar is NOT set to be a selection key
             if ([input isShiftHold] || !Preferences.chooseCandidateUsingSpace) {
@@ -521,7 +515,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         InputStateSymbolTable *symbolState = [[InputStateSymbolTable alloc] initWithNode:root useVerticalMode:input.useVerticalMode];
         stateCallback(symbolState);
         return YES;
-//        if (_languageModel->hasUnigramsForKey(string("_punctuation_list"))) {
+//        if (_languageModel->hasUnigramsForKey("_punctuation_list"))) {
 //            if (_bpmfReadingBuffer->isEmpty()) {
 //                _builder->insertReadingAtCursor(string("_punctuation_list"));
 //                NSString *poppedText = [self _popOverflowComposingTextAndWalk];
@@ -540,28 +534,30 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // MARK: Punctuation
     // if nothing is matched, see if it's a punctuation key for current layout.
 
-    string punctuationNamePrefix;
+    std::string punctuationNamePrefix;
     if ([input isControlHold]) {
-        punctuationNamePrefix = string("_ctrl_punctuation_");
+        punctuationNamePrefix = std::string("_ctrl_punctuation_");
     } else if (Preferences.halfWidthPunctuationEnabled) {
-        punctuationNamePrefix = string("_half_punctuation_");
+        punctuationNamePrefix = std::string("_half_punctuation_");
     } else {
-        punctuationNamePrefix = string("_punctuation_");
+        punctuationNamePrefix = std::string("_punctuation_");
     }
-    string layout = [self _currentLayout];
-    string customPunctuation = punctuationNamePrefix + layout + string(1, (char) charCode);
+    std::string layout = [self _currentLayout];
+    std::string customPunctuation = punctuationNamePrefix + layout + std::string(1, (char) charCode);
     if ([self _handlePunctuation:customPunctuation state:state usingVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback]) {
         return YES;
     }
 
     // if nothing is matched, see if it's a punctuation key.
-    string punctuation = punctuationNamePrefix + string(1, (char) charCode);
+    std::string punctuation = punctuationNamePrefix + std::string(1, (char) charCode);
     if ([self _handlePunctuation:punctuation state:state usingVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback]) {
         return YES;
     }
 
-    if ((char) charCode >= 'A' && (char) charCode <= 'Z') {
-        string letter = string("_letter_") + string(1, (char) charCode);
+    // Lukhnos 這裡的處理反而會使得 Apple 倚天注音動態鍵盤佈局「敲不了半形大寫英文」的缺點曝露無疑，所以注釋掉。
+    // 至於他試圖用這種處理來解決的上游 UPR293 的問題，其實針對詞庫檔案的排序做點手腳就可以解決。威注音本來也就是這麼做的。
+    if (/*[state isKindOfClass:[InputStateNotEmpty class]] && */(char) charCode >= 'A' && (char) charCode <= 'Z') {
+        std::string letter = std::string("_letter_") + std::string(1, (char) charCode);
         if ([self _handlePunctuation:letter state:state usingVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback]) {
             return YES;
         }
@@ -845,7 +841,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     return YES;
 }
 
-- (BOOL)_handlePunctuation:(string)customPunctuation state:(InputState *)state usingVerticalMode:(BOOL)useVerticalMode stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+- (BOOL)_handlePunctuation:(std::string)customPunctuation state:(InputState *)state usingVerticalMode:(BOOL)useVerticalMode stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     if (!_languageModel->hasUnigramsForKey(customPunctuation)) {
         return NO;
@@ -1150,23 +1146,23 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     if (Preferences.useSCPCTypingMode) {
-        string layout = [self _currentLayout];
-        string punctuationNamePrefix;
+        std::string layout = [self _currentLayout];
+        std::string punctuationNamePrefix;
         if ([input isControlHold]) {
-            punctuationNamePrefix = string("_ctrl_punctuation_");
+            punctuationNamePrefix = std::string("_ctrl_punctuation_");
         } else if (Preferences.halfWidthPunctuationEnabled) {
-            punctuationNamePrefix = string("_half_punctuation_");
+            punctuationNamePrefix = std::string("_half_punctuation_");
         } else {
-            punctuationNamePrefix = string("_punctuation_");
+            punctuationNamePrefix = std::string("_punctuation_");
         }
-        string customPunctuation = punctuationNamePrefix + layout + string(1, (char) charCode);
-        string punctuation = punctuationNamePrefix + string(1, (char) charCode);
+        std::string customPunctuation = punctuationNamePrefix + layout + std::string(1, (char) charCode);
+        std::string punctuation = punctuationNamePrefix + std::string(1, (char) charCode);
 
         BOOL shouldAutoSelectCandidate = _bpmfReadingBuffer->isValidKey((char) charCode) || _languageModel->hasUnigramsForKey(customPunctuation) ||
                 _languageModel->hasUnigramsForKey(punctuation);
 
         if (!shouldAutoSelectCandidate && (char) charCode >= 'A' && (char) charCode <= 'Z') {
-            string letter = string("_letter_") + string(1, (char) charCode);
+            std::string letter = std::string("_letter_") + std::string(1, (char) charCode);
             if (_languageModel->hasUnigramsForKey(letter)) {
                 shouldAutoSelectCandidate = YES;
             }
@@ -1206,9 +1202,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // we must do some Unicode codepoint counting to find the actual cursor location for the client
     // i.e. we need to take UTF-16 into consideration, for which a surrogate pair takes 2 UniChars
     // locations
-    for (vector<NodeAnchor>::iterator wi = _walkedNodes.begin(), we = _walkedNodes.end(); wi != we; ++wi) {
+    for (std::vector<Taiyan::Gramambular::NodeAnchor>::iterator wi = _walkedNodes.begin(), we = _walkedNodes.end(); wi != we; ++wi) {
         if ((*wi).node) {
-            string nodeStr = (*wi).node->currentKeyValue().value;
+            std::string nodeStr = (*wi).node->currentKeyValue().value;
             NSString *valueString = [NSString stringWithUTF8String:nodeStr.c_str()];
             [composingBuffer appendString:valueString];
 
@@ -1274,7 +1270,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // retrieve the most likely trellis, i.e. a Maximum Likelihood Estimation
     // of the best possible Mandarain characters given the input syllables,
     // using the Viterbi algorithm implemented in the Gramambular library
-    Walker walker(&_builder->grid());
+    Taiyan::Gramambular::Walker walker(&_builder->grid());
 
     // the reverse walk traces the trellis from the end
     _walkedNodes = walker.reverseWalk(_builder->grid().width());
@@ -1284,7 +1280,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     // if DEBUG is defined, a GraphViz file is written to kGraphVizOutputfile
 #if DEBUG
-    string dotDump = _builder->grid().dumpDOT();
+    std::string dotDump = _builder->grid().dumpDOT();
     NSString *dotStr = [NSString stringWithUTF8String:dotDump.c_str()];
     NSError *error = nil;
 
@@ -1307,7 +1303,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if (_builder->grid().width() > (size_t) composingBufferSize) {
         if (_walkedNodes.size() > 0) {
-            NodeAnchor &anchor = _walkedNodes[0];
+            Taiyan::Gramambular::NodeAnchor &anchor = _walkedNodes[0];
             poppedText = [NSString stringWithUTF8String:anchor.node->currentKeyValue().value.c_str()];
             _builder->removeHeadReadings(anchor.spanningLength);
         }
@@ -1322,15 +1318,15 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     NSMutableArray *candidatesArray = [[NSMutableArray alloc] init];
 
     size_t cursorIndex = [self _actualCandidateCursorIndex];
-    vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
+    std::vector<Taiyan::Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
 
     // sort the nodes, so that longer nodes (representing longer phrases) are placed at the top of the candidate list
     stable_sort(nodes.begin(), nodes.end(), NodeAnchorDescendingSorter());
 
     // then use the C++ trick to retrieve the candidates for each node at/crossing the cursor
-    for (vector<NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
-        const vector<KeyValuePair> &candidates = (*ni).node->candidates();
-        for (vector<KeyValuePair>::const_iterator ci = candidates.begin(), ce = candidates.end(); ci != ce; ++ci) {
+    for (std::vector<Taiyan::Gramambular::NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
+        const std::vector<Taiyan::Gramambular::KeyValuePair> &candidates = (*ni).node->candidates();
+        for (std::vector<Taiyan::Gramambular::KeyValuePair>::const_iterator ci = candidates.begin(), ce = candidates.end(); ci != ce; ++ci) {
             [candidatesArray addObject:[NSString stringWithUTF8String:(*ci).value.c_str()]];
         }
     }
@@ -1359,8 +1355,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 - (NSArray *)_currentReadings
 {
     NSMutableArray *readingsArray = [[NSMutableArray alloc] init];
-    vector<std::string> v = _builder->readings();
-    for (vector<std::string>::iterator it_i = v.begin(); it_i != v.end(); ++it_i) {
+    std::vector<std::string> v = _builder->readings();
+    for (std::vector<std::string>::iterator it_i = v.begin(); it_i != v.end(); ++it_i) {
         [readingsArray addObject:[NSString stringWithUTF8String:it_i->c_str()]];
     }
     return readingsArray;
@@ -1368,9 +1364,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
 - (nullable InputState *)buildAssociatePhraseStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode
 {
-    string cppKey = string(key.UTF8String);
+    std::string cppKey = std::string(key.UTF8String);
     if (_languageModel->hasAssociatedPhrasesForKey(cppKey)) {
-        vector<string> phrases = _languageModel->associatedPhrasesForKey(cppKey);
+        std::vector<std::string> phrases = _languageModel->associatedPhrasesForKey(cppKey);
         NSMutableArray <NSString *> *array = [NSMutableArray array];
         for (auto phrase: phrases) {
             NSString *item = [[NSString alloc] initWithUTF8String:phrase.c_str()];

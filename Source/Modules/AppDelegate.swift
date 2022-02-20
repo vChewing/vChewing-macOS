@@ -142,8 +142,8 @@ struct VersionUpdateApi {
 @objc(AppDelegate)
 class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelegate, FSEventStreamHelperDelegate {
     func helper(_ helper: FSEventStreamHelper, didReceive events: [FSEventStreamHelper.Event]) {
-        // 拖一秒鐘再重載，畢竟有些有特殊需求的使用者可能會想使用巨型自訂語彙檔案。
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
+        // 拖 100ms 再重載，畢竟有些有特殊需求的使用者可能會想使用巨型自訂語彙檔案。
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
             if Preferences.shouldAutoReloadUserDataFiles {
                 mgrLangModel.loadUserPhrases()
                 mgrLangModel.loadUserPhraseReplacement()
@@ -159,7 +159,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
     private var ctlAboutWindowInstance: ctlAboutWindow? // New About Window
     private var checkTask: URLSessionTask?
     private var updateNextStepURL: URL?
-    private var fsStreamHelper = FSEventStreamHelper(path: mgrLangModel.dataFolderPath, queue: DispatchQueue(label: "User Phrases"))
+    private var fsStreamHelper = FSEventStreamHelper(path: mgrLangModel.dataFolderPath, queue: DispatchQueue(label: "vChewing User Phrases"))
 
     // 補上 dealloc
     deinit {
