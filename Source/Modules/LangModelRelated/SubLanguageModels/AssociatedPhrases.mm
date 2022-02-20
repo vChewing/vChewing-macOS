@@ -59,12 +59,7 @@ bool AssociatedPhrases::open(const char *path)
     }
 
     LMConsolidator::FixEOF(path);
-
-    if (Preferences.shouldAutoSortAssociatedPhrasesOnLoad) {
-        LMConsolidator::ConsolidateContent(path, true);
-    } else {
-        LMConsolidator::ConsolidateContent(path, false);
-    }
+    LMConsolidator::ConsolidateContent(path, Preferences.shouldAutoSortAssociatedPhrasesOnLoad, true);
 
     fd = ::open(path, O_RDONLY);
     if (fd == -1) {

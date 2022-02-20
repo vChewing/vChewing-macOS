@@ -11,7 +11,6 @@
 		5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */; };
 		5B2DB16F27AF6891006D874E /* data-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16D27AF6891006D874E /* data-chs.txt */; };
 		5B2DB17027AF6891006D874E /* data-cht.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16E27AF6891006D874E /* data-cht.txt */; };
-		5B30F11327BA568800484E24 /* vChewingKeyLayout.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */; };
 		5B62A31727AE73A700A19448 /* unzip.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A30927AE73A700A19448 /* unzip.m */; };
 		5B62A31827AE73A700A19448 /* zip.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A30A27AE73A700A19448 /* zip.m */; };
 		5B62A31927AE73A700A19448 /* ioapi.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A30B27AE73A700A19448 /* ioapi.m */; };
@@ -50,6 +49,12 @@
 		5BD05C6827B2BBEF004C4F1D /* Content.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD05C6327B2BBEF004C4F1D /* Content.swift */; };
 		5BD05C6927B2BBEF004C4F1D /* WindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD05C6427B2BBEF004C4F1D /* WindowController.swift */; };
 		5BD05C6A27B2BBEF004C4F1D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD05C6527B2BBEF004C4F1D /* ViewController.swift */; };
+		5BDC5CAB27C2873D00E1CCE2 /* Grid.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5BDC5CAA27C2873D00E1CCE2 /* Grid.mm */; };
+		5BDC5CB327C28E8B00E1CCE2 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 5BDC5CB227C28E8B00E1CCE2 /* icon.icns */; };
+		5BDC5CB527C28E8B00E1CCE2 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDC5CB427C28E8B00E1CCE2 /* ShareViewController.swift */; };
+		5BDC5CB827C28E8B00E1CCE2 /* ShareViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BDC5CB627C28E8B00E1CCE2 /* ShareViewController.xib */; };
+		5BDC5CBD27C28E8B00E1CCE2 /* KeyboardExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 5BDC5CB027C28E8B00E1CCE2 /* KeyboardExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		5BDC5CC227C2941F00E1CCE2 /* vChewingKeyLayout.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */; };
 		5BDCBB2E27B4E67A00D0CC59 /* vChewingPhraseEditor.app in Resources */ = {isa = PBXBuildFile; fileRef = 5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */; };
 		5BE78BD927B3775B005EA1BE /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE78BD827B37750005EA1BE /* ctlAboutWindow.swift */; };
 		5BE78BDD27B3776D005EA1BE /* frmAboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BE78BDA27B37764005EA1BE /* frmAboutWindow.xib */; };
@@ -68,7 +73,7 @@
 		6ACC3D442793701600F1B140 /* ParselessPhraseDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ACC3D402793701600F1B140 /* ParselessPhraseDB.cpp */; };
 		6ACC3D452793701600F1B140 /* ParselessLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ACC3D422793701600F1B140 /* ParselessLM.cpp */; };
 		D41355D8278D74B5005E5CBD /* mgrLangModel.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355D7278D7409005E5CBD /* mgrLangModel.mm */; };
-		D41355DB278E6D17005E5CBD /* vChewingLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355D9278E6D17005E5CBD /* vChewingLM.mm */; };
+		D41355DB278E6D17005E5CBD /* LMInstantiator.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355D9278E6D17005E5CBD /* LMInstantiator.mm */; };
 		D41355DE278EA3ED005E5CBD /* UserPhrasesLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355DC278EA3ED005E5CBD /* UserPhrasesLM.mm */; };
 		D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427F76B278CA1BA004A2160 /* AppDelegate.swift */; };
 		D44FB74D2792189A003C80A6 /* PhraseReplacementMap.mm in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74B2792189A003C80A6 /* PhraseReplacementMap.mm */; };
@@ -96,6 +101,13 @@
 			remoteGlobalIDString = 5BD05BB727B2A429004C4F1D;
 			remoteInfo = vChewingPhraseEditor;
 		};
+		5BDC5CBB27C28E8B00E1CCE2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6A0D4E9415FC0CFA00ABF4B3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5BDC5CAF27C28E8B00E1CCE2;
+			remoteInfo = KeyboardExtension;
+		};
 		6A38BC2515FC131100A8A51F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6A0D4E9415FC0CFA00ABF4B3 /* Project object */;
@@ -111,6 +123,20 @@
 			remoteInfo = vChewing;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		5BDC5CBE27C28E8B00E1CCE2 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				5BDC5CBD27C28E8B00E1CCE2 /* KeyboardExtension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		5B04305327B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
@@ -195,6 +221,13 @@
 		5BD05C6327B2BBEF004C4F1D /* Content.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Content.swift; sourceTree = "<group>"; };
 		5BD05C6427B2BBEF004C4F1D /* WindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WindowController.swift; sourceTree = "<group>"; };
 		5BD05C6527B2BBEF004C4F1D /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		5BDC5CAA27C2873D00E1CCE2 /* Grid.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Grid.mm; sourceTree = "<group>"; };
+		5BDC5CB027C28E8B00E1CCE2 /* KeyboardExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = KeyboardExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		5BDC5CB227C28E8B00E1CCE2 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = icon.icns; sourceTree = "<group>"; };
+		5BDC5CB427C28E8B00E1CCE2 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		5BDC5CB727C28E8B00E1CCE2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ShareViewController.xib; sourceTree = "<group>"; };
+		5BDC5CB927C28E8B00E1CCE2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5BDC5CBA27C28E8B00E1CCE2 /* KeyboardExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KeyboardExtension.entitlements; sourceTree = "<group>"; };
 		5BDCBB4227B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/MainMenu.strings"; sourceTree = "<group>"; };
 		5BDCBB4327B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/frmAboutWindow.strings"; sourceTree = "<group>"; };
 		5BDCBB4527B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "Source/WindowNIBs/zh-Hant.lproj/frmPrefWindow.strings"; sourceTree = "<group>"; };
@@ -243,8 +276,8 @@
 		6ACC3D432793701600F1B140 /* ParselessLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParselessLM.h; sourceTree = "<group>"; };
 		D41355D6278D7409005E5CBD /* mgrLangModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mgrLangModel.h; sourceTree = "<group>"; };
 		D41355D7278D7409005E5CBD /* mgrLangModel.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = mgrLangModel.mm; sourceTree = "<group>"; };
-		D41355D9278E6D17005E5CBD /* vChewingLM.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = vChewingLM.mm; sourceTree = "<group>"; };
-		D41355DA278E6D17005E5CBD /* vChewingLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vChewingLM.h; sourceTree = "<group>"; };
+		D41355D9278E6D17005E5CBD /* LMInstantiator.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LMInstantiator.mm; sourceTree = "<group>"; };
+		D41355DA278E6D17005E5CBD /* LMInstantiator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LMInstantiator.h; sourceTree = "<group>"; };
 		D41355DC278EA3ED005E5CBD /* UserPhrasesLM.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = UserPhrasesLM.mm; sourceTree = "<group>"; };
 		D41355DD278EA3ED005E5CBD /* UserPhrasesLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserPhrasesLM.h; sourceTree = "<group>"; };
 		D427A9BF25ED28CC005D43E0 /* vChewing-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vChewing-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -280,6 +313,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5BDC5CAD27C28E8B00E1CCE2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6A0D4E9F15FC0D2D00ABF4B3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -297,14 +337,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		5B30F10727BA501900484E24 /* KeyLayouts */ = {
-			isa = PBXGroup;
-			children = (
-				5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */,
-			);
-			path = KeyLayouts;
-			sourceTree = "<group>";
-		};
 		5B62A30127AE732800A19448 /* 3rdParty */ = {
 			isa = PBXGroup;
 			children = (
@@ -423,12 +455,12 @@
 		5B62A32427AE757300A19448 /* LangModelRelated */ = {
 			isa = PBXGroup;
 			children = (
+				D41355D9278E6D17005E5CBD /* LMInstantiator.mm */,
+				D41355DA278E6D17005E5CBD /* LMInstantiator.h */,
 				D41355D6278D7409005E5CBD /* mgrLangModel.h */,
 				D495583A27A5C6C4006ADE1C /* mgrLangModel_Privates.h */,
 				D41355D7278D7409005E5CBD /* mgrLangModel.mm */,
 				5B62A32527AE758000A19448 /* SubLanguageModels */,
-				D41355D9278E6D17005E5CBD /* vChewingLM.mm */,
-				D41355DA278E6D17005E5CBD /* vChewingLM.h */,
 			);
 			path = LangModelRelated;
 			sourceTree = "<group>";
@@ -459,7 +491,6 @@
 		5B62A33027AE78E500A19448 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				5B30F10727BA501900484E24 /* KeyLayouts */,
 				6A0D4EEE15FC0DA600ABF4B3 /* Images */,
 				5BBBB76E27AED70B0023B93A /* MenuIcons */,
 				5BBBB75C27AED54C0023B93A /* SoundFiles */,
@@ -596,6 +627,19 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		5BDC5CB127C28E8B00E1CCE2 /* KeyboardExtension */ = {
+			isa = PBXGroup;
+			children = (
+				5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */,
+				5BDC5CB227C28E8B00E1CCE2 /* icon.icns */,
+				5BDC5CB427C28E8B00E1CCE2 /* ShareViewController.swift */,
+				5BDC5CB627C28E8B00E1CCE2 /* ShareViewController.xib */,
+				5BDC5CB927C28E8B00E1CCE2 /* Info.plist */,
+				5BDC5CBA27C28E8B00E1CCE2 /* KeyboardExtension.entitlements */,
+			);
+			path = KeyboardExtension;
+			sourceTree = "<group>";
+		};
 		6A0D4E9215FC0CFA00ABF4B3 = {
 			isa = PBXGroup;
 			children = (
@@ -603,6 +647,7 @@
 				6ACA41E715FC1D9000935EF6 /* Installer */,
 				6A0D4EC215FC0D3C00ABF4B3 /* Source */,
 				5BD05BB927B2A429004C4F1D /* UserPhraseEditor */,
+				5BDC5CB127C28E8B00E1CCE2 /* KeyboardExtension */,
 				6A0D4EA315FC0D2D00ABF4B3 /* Products */,
 				D47D73C127A7200500255A50 /* Frameworks */,
 			);
@@ -614,6 +659,7 @@
 				6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */,
 				6ACA41CB15FC1D7500935EF6 /* vChewingInstaller.app */,
 				5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */,
+				5BDC5CB027C28E8B00E1CCE2 /* KeyboardExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -663,6 +709,7 @@
 				6A0D4F1515FC0EB100ABF4B3 /* BlockReadingBuilder.h */,
 				6A0D4F1615FC0EB100ABF4B3 /* Gramambular.h */,
 				6A0D4F1715FC0EB100ABF4B3 /* Grid.h */,
+				5BDC5CAA27C2873D00E1CCE2 /* Grid.mm */,
 				6A0D4F1815FC0EB100ABF4B3 /* KeyValuePair.h */,
 				6A0D4F1915FC0EB100ABF4B3 /* LanguageModel.h */,
 				6A0D4F1A15FC0EB100ABF4B3 /* Node.h */,
@@ -734,6 +781,23 @@
 			productReference = 5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */;
 			productType = "com.apple.product-type.application";
 		};
+		5BDC5CAF27C28E8B00E1CCE2 /* KeyboardExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5BDC5CC127C28E8B00E1CCE2 /* Build configuration list for PBXNativeTarget "KeyboardExtension" */;
+			buildPhases = (
+				5BDC5CAC27C28E8B00E1CCE2 /* Sources */,
+				5BDC5CAD27C28E8B00E1CCE2 /* Frameworks */,
+				5BDC5CAE27C28E8B00E1CCE2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = KeyboardExtension;
+			productName = KeyboardExtension;
+			productReference = 5BDC5CB027C28E8B00E1CCE2 /* KeyboardExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		6A0D4EA115FC0D2D00ABF4B3 /* vChewing */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6A0D4EC015FC0D2E00ABF4B3 /* Build configuration list for PBXNativeTarget "vChewing" */;
@@ -741,12 +805,14 @@
 				6A0D4E9E15FC0D2D00ABF4B3 /* Sources */,
 				6A0D4E9F15FC0D2D00ABF4B3 /* Frameworks */,
 				6A0D4EA015FC0D2D00ABF4B3 /* Resources */,
+				5BDC5CBE27C28E8B00E1CCE2 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				5B0AF8B327B2C4E20096FE54 /* PBXTargetDependency */,
 				6A38BC2615FC131100A8A51F /* PBXTargetDependency */,
+				5BDC5CBC27C28E8B00E1CCE2 /* PBXTargetDependency */,
 			);
 			name = vChewing;
 			packageProductDependencies = (
@@ -790,6 +856,10 @@
 						LastSwiftMigration = 1320;
 						ProvisioningStyle = Automatic;
 					};
+					5BDC5CAF27C28E8B00E1CCE2 = {
+						CreatedOnToolsVersion = 13.2;
+						ProvisioningStyle = Automatic;
+					};
 					6A0D4EA115FC0D2D00ABF4B3 = {
 						LastSwiftMigration = 1240;
 						ProvisioningStyle = Automatic;
@@ -821,6 +891,7 @@
 				6A0D4EA115FC0D2D00ABF4B3 /* vChewing */,
 				6ACA41CA15FC1D7500935EF6 /* vChewingInstaller */,
 				5BD05BB727B2A429004C4F1D /* vChewingPhraseEditor */,
+				5BDC5CAF27C28E8B00E1CCE2 /* KeyboardExtension */,
 				6A38BC2115FC12FD00A8A51F /* Data */,
 			);
 		};
@@ -835,6 +906,16 @@
 				5B73FB5E27B2BE1300E9BF49 /* InfoPlist.strings in Resources */,
 				5BD05C5D27B2BBA9004C4F1D /* Main.storyboard in Resources */,
 				5BE78BDD27B3776D005EA1BE /* frmAboutWindow.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5BDC5CAE27C28E8B00E1CCE2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5BDC5CB827C28E8B00E1CCE2 /* ShareViewController.xib in Resources */,
+				5BDC5CC227C2941F00E1CCE2 /* vChewingKeyLayout.bundle in Resources */,
+				5BDC5CB327C28E8B00E1CCE2 /* icon.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -858,7 +939,6 @@
 				5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.png in Resources */,
 				6A187E2616004C5900466B2E /* MainMenu.xib in Resources */,
 				5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */,
-				5B30F11327BA568800484E24 /* vChewingKeyLayout.bundle in Resources */,
 				5B2DB16F27AF6891006D874E /* data-chs.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -913,6 +993,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5BDC5CAC27C28E8B00E1CCE2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5BDC5CB527C28E8B00E1CCE2 /* ShareViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6A0D4E9E15FC0D2D00ABF4B3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -937,12 +1025,13 @@
 				5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */,
 				5B62A31827AE73A700A19448 /* zip.m in Sources */,
 				5B62A32E27AE78B000A19448 /* CNSLM.mm in Sources */,
-				D41355DB278E6D17005E5CBD /* vChewingLM.mm in Sources */,
+				D41355DB278E6D17005E5CBD /* LMInstantiator.mm in Sources */,
 				5B62A31A27AE73A700A19448 /* mztools.m in Sources */,
 				5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */,
 				D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */,
 				5B62A33627AE795800A19448 /* PreferencesModule.swift in Sources */,
 				5B62A33827AE79CD00A19448 /* NSStringUtils.swift in Sources */,
+				5BDC5CAB27C2873D00E1CCE2 /* Grid.mm in Sources */,
 				5B62A33227AE792F00A19448 /* InputSourceHelper.swift in Sources */,
 				5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
@@ -978,6 +1067,11 @@
 			isa = PBXTargetDependency;
 			target = 5BD05BB727B2A429004C4F1D /* vChewingPhraseEditor */;
 			targetProxy = 5B0AF8B227B2C4E20096FE54 /* PBXContainerItemProxy */;
+		};
+		5BDC5CBC27C28E8B00E1CCE2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5BDC5CAF27C28E8B00E1CCE2 /* KeyboardExtension */;
+			targetProxy = 5BDC5CBB27C28E8B00E1CCE2 /* PBXContainerItemProxy */;
 		};
 		6A38BC2615FC131100A8A51F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1044,6 +1138,14 @@
 				5B04306727B5312E00CB65BC /* ja */,
 			);
 			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		5BDC5CB627C28E8B00E1CCE2 /* ShareViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5BDC5CB727C28E8B00E1CCE2 /* Base */,
+			);
+			name = ShareViewController.xib;
 			sourceTree = "<group>";
 		};
 		5BE78BDA27B37764005EA1BE /* frmAboutWindow.xib */ = {
@@ -1147,7 +1249,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1922;
+				CURRENT_PROJECT_VERSION = 1923;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1166,7 +1268,7 @@
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.3.3;
+				MARKETING_VERSION = 1.3.4;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
@@ -1199,7 +1301,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1922;
+				CURRENT_PROJECT_VERSION = 1923;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1213,12 +1315,108 @@
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.3.3;
+				MARKETING_VERSION = 1.3.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		5BDC5CBF27C28E8B00E1CCE2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = KeyboardExtension/KeyboardExtension.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1923;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_ASSET_PATHS = KeyboardExtension/vChewingKeyLayout.bundle;
+				DEVELOPMENT_TEAM = "";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = KeyboardExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = KeyboardExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 12.1;
+				MARKETING_VERSION = 1.3.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing.KeyboardExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		5BDC5CC027C28E8B00E1CCE2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = KeyboardExtension/KeyboardExtension.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1923;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = KeyboardExtension/vChewingKeyLayout.bundle;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = KeyboardExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = KeyboardExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 12.1;
+				MARKETING_VERSION = 1.3.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing.KeyboardExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
@@ -1311,6 +1509,7 @@
 		6A0D4EBE15FC0D2E00ABF4B3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
@@ -1327,8 +1526,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1922;
-				DEVELOPMENT_ASSET_PATHS = Source/Resources/KeyLayouts/vChewingKeyLayout.bundle;
+				CURRENT_PROJECT_VERSION = 1923;
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1359,7 +1558,7 @@
 				INFOPLIST_FILE = "Source/Resources/IME-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.3.3;
+				MARKETING_VERSION = 1.3.4;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1375,6 +1574,7 @@
 		6A0D4EBF15FC0D2E00ABF4B3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
@@ -1391,9 +1591,9 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1922;
+				CURRENT_PROJECT_VERSION = 1923;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_ASSET_PATHS = Source/Resources/KeyLayouts/vChewingKeyLayout.bundle;
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -1417,7 +1617,7 @@
 				INFOPLIST_FILE = "Source/Resources/IME-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.3.3;
+				MARKETING_VERSION = 1.3.4;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1500,7 +1700,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1922;
+				CURRENT_PROJECT_VERSION = 1923;
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1522,7 +1722,7 @@
 				INFOPLIST_FILE = "Installer/Installer-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.3.3;
+				MARKETING_VERSION = 1.3.4;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.atelierInmu.vChewing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1550,7 +1750,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1922;
+				CURRENT_PROJECT_VERSION = 1923;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1566,7 +1766,7 @@
 				INFOPLIST_FILE = "Installer/Installer-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.3.3;
+				MARKETING_VERSION = 1.3.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.atelierInmu.vChewing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1585,6 +1785,15 @@
 			buildConfigurations = (
 				5BD05BC727B2A42A004C4F1D /* Debug */,
 				5BD05BC827B2A42A004C4F1D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5BDC5CC127C28E8B00E1CCE2 /* Build configuration list for PBXNativeTarget "KeyboardExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5BDC5CBF27C28E8B00E1CCE2 /* Debug */,
+				5BDC5CC027C28E8B00E1CCE2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

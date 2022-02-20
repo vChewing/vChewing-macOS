@@ -20,17 +20,15 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #import "mgrLangModel.h"
 #import "mgrLangModel_Privates.h"
 #import "vChewing-Swift.h"
-
-using namespace std;
-using namespace vChewing;
+#import "LMConsolidator.h"
 
 static const int kUserOverrideModelCapacity = 500;
 static const double kObservedOverrideHalflife = 5400.0;
 
-static vChewingLM gLangModelCHT;
-static vChewingLM gLangModelCHS;
-static UserOverrideModel gUserOverrideModelCHT(kUserOverrideModelCapacity, kObservedOverrideHalflife);
-static UserOverrideModel gUserOverrideModelCHS(kUserOverrideModelCapacity, kObservedOverrideHalflife);
+static vChewing::LMInstantiator gLangModelCHT;
+static vChewing::LMInstantiator gLangModelCHS;
+static vChewing::UserOverrideModel gUserOverrideModelCHT(kUserOverrideModelCapacity, kObservedOverrideHalflife);
+static vChewing::UserOverrideModel gUserOverrideModelCHS(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
 static NSString *const kUserDataTemplateName = @"template-data";
 static NSString *const kUserAssDataTemplateName = @"template-data";
@@ -40,7 +38,7 @@ static NSString *const kTemplateExtension = @".txt";
 
 @implementation mgrLangModel
 
-static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewingLM &lm)
+static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing::LMInstantiator &lm)
 {
     Class cls = NSClassFromString(@"ctlInputMethod");
     NSString *dataPath = [[NSBundle bundleForClass:cls] pathForResource:filenameWithoutExtension ofType:@"txt"];
@@ -206,10 +204,10 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     return YES;
 }
 
-+ (BOOL)checkIfUserPhraseExist:(NSString *)userPhrase key:(NSString *)key NS_SWIFT_NAME(checkIfExist(userPhrase:key:))
++ (BOOL)checkIfUserPhraseExist:(NSString *)userPhrase inputMode:(InputMode)mode key:(NSString *)key NS_SWIFT_NAME(checkIfUserPhraseExist(userPhrase:mode:key:))
 {
     string unigramKey = string(key.UTF8String);
-    vector<Unigram> unigrams = gLangModelCHT.unigramsForKey(unigramKey);
+    vector<vChewing::Unigram> unigrams = [mode isEqualToString:imeModeCHT] ? gLangModelCHT.unigramsForKey(unigramKey): gLangModelCHS.unigramsForKey(unigramKey);
     string userPhraseString = string(userPhrase.UTF8String);
     for (auto unigram: unigrams) {
         if (unigram.keyValue.value == userPhraseString) {
@@ -219,7 +217,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     return NO;
 }
 
-+ (BOOL)writeUserPhrase:(NSString *)userPhrase inputMode:(InputMode)mode;
++ (BOOL)writeUserPhrase:(NSString *)userPhrase inputMode:(InputMode)mode areWeDuplicating:(BOOL)areWeDuplicating
 {
     if (![self checkIfUserLanguageModelFilesExist]) {
         return NO;
@@ -251,6 +249,11 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     //     [currentMarkedPhrase appendString:@"\n"];
     // }
     [currentMarkedPhrase appendString:userPhrase];
+    if (areWeDuplicating) {
+        // Do not use ASCII characters to comment here.
+        // Otherwise, it will be scrambled by HYPY2BPMF module shipped in the vChewing Phrase Editor.
+        [currentMarkedPhrase appendString:@"\t#𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎"];
+    }
     [currentMarkedPhrase appendString:@"\n"];
 
     NSFileHandle *writeFile = [NSFileHandle fileHandleForUpdatingAtPath:path];
@@ -262,9 +265,14 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     [writeFile writeData:data];
     [writeFile closeFile];
 
-//  We use FSEventStream to monitor the change of the user phrase folder,
-//  so we don't have to load data here.
-//  [self loadUserPhrases];
+    // We enforce the format consolidation here, since the pragma header will let the UserPhraseLM bypasses the consolidating process on load.
+    vChewing::LMConsolidator::ConsolidateContent([path UTF8String], Preferences.shouldAutoSortUserPhrasesAndExclListOnLoad, false);
+
+    //  We use FSEventStream to monitor the change of the user phrase folder,
+    //  so we don't have to load data here unless FSEventStream is disabled by user.
+    if (!Preferences.shouldAutoReloadUserDataFiles) {
+        [self loadUserPhrases];
+    }
     return YES;
 }
 
@@ -306,12 +314,12 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     return [[NSBundle bundleForClass:cls] pathForResource:@"char-kanji-cns" ofType:@"txt"];
 }
 
- + (vChewingLM *)lmCHT
+ + (vChewing::LMInstantiator *)lmCHT
 {
     return &gLangModelCHT;
 }
 
-+ (vChewingLM *)lmCHS
++ (vChewing::LMInstantiator *)lmCHS
 {
     return &gLangModelCHS;
 }

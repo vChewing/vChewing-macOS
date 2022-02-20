@@ -22,7 +22,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 #include <list>
 #include <map>
-#include <string>
 
 #include "Gramambular.h"
 
@@ -34,12 +33,12 @@ class UserOverrideModel {
 public:
     UserOverrideModel(size_t capacity, double decayConstant);
 
-    void observe(const std::vector<NodeAnchor>& walkedNodes,
+    void observe(const std::vector<Taiyan::Gramambular::NodeAnchor>& walkedNodes,
                  size_t cursorIndex,
-                 const string& candidate,
+                 const std::string& candidate,
                  double timestamp);
 
-    string suggest(const std::vector<NodeAnchor>& walkedNodes,
+    std::string suggest(const std::vector<Taiyan::Gramambular::NodeAnchor>& walkedNodes,
                    size_t cursorIndex,
                    double timestamp);
 
@@ -56,7 +55,7 @@ private:
         std::map<std::string, Override> overrides;
 
         Observation() : count(0) {}
-        void update(const string& candidate, double timestamp);
+        void update(const std::string& candidate, double timestamp);
     };
 
     typedef std::pair<std::string, Observation> KeyObservationPair;
@@ -67,7 +66,7 @@ private:
     std::map<std::string, std::list<KeyObservationPair>::iterator> m_lruMap;
 };
 
-};   // namespace vChewing
+}; // namespace vChewing
 
 #endif
 
