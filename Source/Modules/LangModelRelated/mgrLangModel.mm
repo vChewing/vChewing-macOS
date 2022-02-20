@@ -22,16 +22,13 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #import "vChewing-Swift.h"
 #import "LMConsolidator.h"
 
-using namespace std;
-using namespace vChewing;
-
 static const int kUserOverrideModelCapacity = 500;
 static const double kObservedOverrideHalflife = 5400.0;
 
-static LMInstantiator gLangModelCHT;
-static LMInstantiator gLangModelCHS;
-static UserOverrideModel gUserOverrideModelCHT(kUserOverrideModelCapacity, kObservedOverrideHalflife);
-static UserOverrideModel gUserOverrideModelCHS(kUserOverrideModelCapacity, kObservedOverrideHalflife);
+static vChewing::LMInstantiator gLangModelCHT;
+static vChewing::LMInstantiator gLangModelCHS;
+static vChewing::UserOverrideModel gUserOverrideModelCHT(kUserOverrideModelCapacity, kObservedOverrideHalflife);
+static vChewing::UserOverrideModel gUserOverrideModelCHS(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
 static NSString *const kUserDataTemplateName = @"template-data";
 static NSString *const kUserAssDataTemplateName = @"template-data";
@@ -41,7 +38,7 @@ static NSString *const kTemplateExtension = @".txt";
 
 @implementation mgrLangModel
 
-static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, LMInstantiator &lm)
+static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing::LMInstantiator &lm)
 {
     Class cls = NSClassFromString(@"ctlInputMethod");
     NSString *dataPath = [[NSBundle bundleForClass:cls] pathForResource:filenameWithoutExtension ofType:@"txt"];
@@ -210,7 +207,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, LMInstan
 + (BOOL)checkIfUserPhraseExist:(NSString *)userPhrase inputMode:(InputMode)mode key:(NSString *)key NS_SWIFT_NAME(checkIfUserPhraseExist(userPhrase:mode:key:))
 {
     string unigramKey = string(key.UTF8String);
-    vector<Unigram> unigrams = [mode isEqualToString:imeModeCHT] ? gLangModelCHT.unigramsForKey(unigramKey): gLangModelCHS.unigramsForKey(unigramKey);
+    vector<vChewing::Unigram> unigrams = [mode isEqualToString:imeModeCHT] ? gLangModelCHT.unigramsForKey(unigramKey): gLangModelCHS.unigramsForKey(unigramKey);
     string userPhraseString = string(userPhrase.UTF8String);
     for (auto unigram: unigrams) {
         if (unigram.keyValue.value == userPhraseString) {
@@ -269,7 +266,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, LMInstan
     [writeFile closeFile];
 
     // We enforce the format consolidation here, since the pragma header will let the UserPhraseLM bypasses the consolidating process on load.
-    LMConsolidator::ConsolidateContent([path UTF8String], Preferences.shouldAutoSortUserPhrasesAndExclListOnLoad, false);
+    vChewing::LMConsolidator::ConsolidateContent([path UTF8String], Preferences.shouldAutoSortUserPhrasesAndExclListOnLoad, false);
 
     //  We use FSEventStream to monitor the change of the user phrase folder,
     //  so we don't have to load data here unless FSEventStream is disabled by user.
@@ -317,12 +314,12 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, LMInstan
     return [[NSBundle bundleForClass:cls] pathForResource:@"char-kanji-cns" ofType:@"txt"];
 }
 
- + (LMInstantiator *)lmCHT
+ + (vChewing::LMInstantiator *)lmCHT
 {
     return &gLangModelCHT;
 }
 
-+ (LMInstantiator *)lmCHS
++ (vChewing::LMInstantiator *)lmCHS
 {
     return &gLangModelCHS;
 }
