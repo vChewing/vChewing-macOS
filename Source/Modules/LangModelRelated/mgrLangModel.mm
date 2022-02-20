@@ -28,8 +28,8 @@ using namespace vChewing;
 static const int kUserOverrideModelCapacity = 500;
 static const double kObservedOverrideHalflife = 5400.0;
 
-static vChewingLM gLangModelCHT;
-static vChewingLM gLangModelCHS;
+static LMInstantiator gLangModelCHT;
+static LMInstantiator gLangModelCHS;
 static UserOverrideModel gUserOverrideModelCHT(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 static UserOverrideModel gUserOverrideModelCHS(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
@@ -41,7 +41,7 @@ static NSString *const kTemplateExtension = @".txt";
 
 @implementation mgrLangModel
 
-static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewingLM &lm)
+static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, LMInstantiator &lm)
 {
     Class cls = NSClassFromString(@"ctlInputMethod");
     NSString *dataPath = [[NSBundle bundleForClass:cls] pathForResource:filenameWithoutExtension ofType:@"txt"];
@@ -317,12 +317,12 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     return [[NSBundle bundleForClass:cls] pathForResource:@"char-kanji-cns" ofType:@"txt"];
 }
 
- + (vChewingLM *)lmCHT
+ + (LMInstantiator *)lmCHT
 {
     return &gLangModelCHT;
 }
 
-+ (vChewingLM *)lmCHS
++ (LMInstantiator *)lmCHS
 {
     return &gLangModelCHS;
 }

@@ -19,7 +19,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 #import "Mandarin.h"
 #import "Gramambular.h"
-#import "vChewingLM.h"
+#import "LMInstantiator.h"
 #import "UserOverrideModel.h"
 #import "mgrLangModel_Privates.h"
 #import "KeyHandler.h"
@@ -71,7 +71,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     Taiyan::Mandarin::BopomofoReadingBuffer *_bpmfReadingBuffer;
 
     // language model
-    vChewing::vChewingLM *_languageModel;
+    vChewing::LMInstantiator *_languageModel;
 
     // user override model
     vChewing::UserOverrideModel *_userOverrideModel;
@@ -96,7 +96,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 - (void)setInputMode:(NSString *)value
 {
     NSString *newInputMode;
-    vChewingLM *newLanguageModel;
+    LMInstantiator *newLanguageModel;
     UserOverrideModel *newUserOverrideModel;
 
     if ([value isKindOfClass:[NSString class]] && [value isEqual:imeModeCHS]) {

@@ -19,13 +19,13 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 #import "mgrLangModel.h"
 #import "UserOverrideModel.h"
-#import "vChewingLM.h"
+#import "LMInstantiator.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface mgrLangModel ()
-@property (class, readonly, nonatomic) vChewing::vChewingLM *lmCHT;
-@property (class, readonly, nonatomic) vChewing::vChewingLM *lmCHS;
+@property (class, readonly, nonatomic) vChewing::LMInstantiator *lmCHT;
+@property (class, readonly, nonatomic) vChewing::LMInstantiator *lmCHS;
 @property (class, readonly, nonatomic) vChewing::UserOverrideModel *userOverrideModelCHS;
 @property (class, readonly, nonatomic) vChewing::UserOverrideModel *userOverrideModelCHT;
 @end
