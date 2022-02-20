@@ -23,7 +23,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <cmath>
 #include <sstream>
 
-using namespace vChewing;
+namespace vChewing {
 
 // About 20 generations.
 static const double DecayThreshould = 1.0 / 1048576.0;
@@ -33,8 +33,8 @@ static double Score(size_t eventCount,
                     double eventTimestamp,
                     double timestamp,
                     double lambda);
-static bool IsEndingPunctuation(const string& value);
-static string WalkedNodesToKey(const std::vector<NodeAnchor>& walkedNodes,
+static bool IsEndingPunctuation(const std::string& value);
+static std::string WalkedNodesToKey(const std::vector<Taiyan::Gramambular::NodeAnchor>& walkedNodes,
                                size_t cursorIndex);
 
 UserOverrideModel::UserOverrideModel(size_t capacity, double decayConstant)
@@ -43,11 +43,11 @@ UserOverrideModel::UserOverrideModel(size_t capacity, double decayConstant)
     m_decayExponent = log(0.5) / decayConstant;
 }
 
-void UserOverrideModel::observe(const std::vector<NodeAnchor>& walkedNodes,
+void UserOverrideModel::observe(const std::vector<Taiyan::Gramambular::NodeAnchor>& walkedNodes,
                                 size_t cursorIndex,
-                                const string& candidate,
+                                const std::string& candidate,
                                 double timestamp) {
-    string key = WalkedNodesToKey(walkedNodes, cursorIndex);
+    std::string key = WalkedNodesToKey(walkedNodes, cursorIndex);
     auto mapIter = m_lruMap.find(key);
     if (mapIter == m_lruMap.end()) {
         auto keyValuePair = KeyObservationPair(key, Observation());
@@ -76,20 +76,20 @@ void UserOverrideModel::observe(const std::vector<NodeAnchor>& walkedNodes,
     }
 }
 
-string UserOverrideModel::suggest(const std::vector<NodeAnchor>& walkedNodes,
+std::string UserOverrideModel::suggest(const std::vector<Taiyan::Gramambular::NodeAnchor>& walkedNodes,
                                   size_t cursorIndex,
                                   double timestamp) {
-    string key = WalkedNodesToKey(walkedNodes, cursorIndex);
+    std::string key = WalkedNodesToKey(walkedNodes, cursorIndex);
     auto mapIter = m_lruMap.find(key);
     if (mapIter == m_lruMap.end()) {
-        return string();
+        return std::string();
     }
 
     auto listIter = mapIter->second;
     auto& keyValuePair = *listIter;
     const Observation& observation = keyValuePair.second;
 
-    string candidate;
+    std::string candidate;
     double score = 0.0;
     for (auto i = observation.overrides.begin();
          i != observation.overrides.end();
@@ -112,7 +112,7 @@ string UserOverrideModel::suggest(const std::vector<NodeAnchor>& walkedNodes,
     return candidate;
 }
 
-void UserOverrideModel::Observation::update(const string& candidate,
+void UserOverrideModel::Observation::update(const std::string& candidate,
                                             double timestamp) {
     count++;
     auto& o = overrides[candidate];
@@ -134,16 +134,16 @@ static double Score(size_t eventCount,
     return prob * decay;
 }
 
-static bool IsEndingPunctuation(const string& value) {
+static bool IsEndingPunctuation(const std::string& value) {
     return value == "，" || value == "。" || value== "！" || value == "？" ||
         value == "」" || value == "』" || value== "”" || value == "’";
 }
-static string WalkedNodesToKey(const std::vector<NodeAnchor>& walkedNodes,
+static std::string WalkedNodesToKey(const std::vector<Taiyan::Gramambular::NodeAnchor>& walkedNodes,
                                size_t cursorIndex) {
     std::stringstream s;
-    std::vector<NodeAnchor> n;
+    std::vector<Taiyan::Gramambular::NodeAnchor> n;
     size_t ll = 0;
-    for (std::vector<NodeAnchor>::const_iterator i = walkedNodes.begin();
+    for (std::vector<Taiyan::Gramambular::NodeAnchor>::const_iterator i = walkedNodes.begin();
          i != walkedNodes.end();
          ++i) {
         const auto& nn = *i;
@@ -154,19 +154,19 @@ static string WalkedNodesToKey(const std::vector<NodeAnchor>& walkedNodes,
         }
     }
 
-    std::vector<NodeAnchor>::const_reverse_iterator r = n.rbegin();
+    std::vector<Taiyan::Gramambular::NodeAnchor>::const_reverse_iterator r = n.rbegin();
 
     if (r == n.rend()) {
         return "";
     }
 
-    string current = (*r).node->currentKeyValue().key;
+    std::string current = (*r).node->currentKeyValue().key;
     ++r;
 
     s.clear();
     s.str(std::string());
     if (r != n.rend()) {
-        string value = (*r).node->currentKeyValue().value;
+        std::string value = (*r).node->currentKeyValue().value;
         if (IsEndingPunctuation(value)) {
             s << "()";
             r = n.rend();
@@ -181,12 +181,12 @@ static string WalkedNodesToKey(const std::vector<NodeAnchor>& walkedNodes,
     } else {
         s << "()";
     }
-    string prev = s.str();
+    std::string prev = s.str();
 
     s.clear();
     s.str(std::string());
     if (r != n.rend()) {
-        string value = (*r).node->currentKeyValue().value;
+        std::string value = (*r).node->currentKeyValue().value;
         if (IsEndingPunctuation(value)) {
             s << "()";
             r = n.rend();
@@ -201,7 +201,7 @@ static string WalkedNodesToKey(const std::vector<NodeAnchor>& walkedNodes,
     } else {
         s << "()";
     }
-    string anterior = s.str();
+    std::string anterior = s.str();
 
     s.clear();
     s.str(std::string());
@@ -209,3 +209,5 @@ static string WalkedNodesToKey(const std::vector<NodeAnchor>& walkedNodes,
 
     return s.str();
 }
+
+} // namespace vChewing
