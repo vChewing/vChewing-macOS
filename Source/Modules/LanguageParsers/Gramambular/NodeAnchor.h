@@ -17,55 +17,48 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef NodeAnchor_h
-#define NodeAnchor_h
+#ifndef NODEANCHOR_H_
+#define NODEANCHOR_H_
+
+#include <vector>
 
 #include "Node.h"
 
 namespace Taiyan {
-    namespace Gramambular {
-        class NodeAnchor {
-        public:
-            NodeAnchor();
-            const Node *node;
-            size_t location;
-            size_t spanningLength;
-            double accumulatedScore;
-        };
-        
-        inline NodeAnchor::NodeAnchor()
-            : node(0)
-            , location(0)
-            , spanningLength(0)
-            , accumulatedScore(0.0)
-        {
-        }        
+namespace Gramambular {
 
-        inline ostream& operator<<(ostream& inStream, const NodeAnchor& inAnchor)
-        {
-            inStream << "{@(" << inAnchor.location << "," << inAnchor.spanningLength << "),";
-            if (inAnchor.node) {
-                inStream << *(inAnchor.node);
-            }
-            else {
-                inStream << "null";
-            }
-            inStream << "}";
-            return inStream;
-        }
-        
-        inline ostream& operator<<(ostream& inStream, const vector<NodeAnchor>& inAnchor)
-        {
-            for (vector<NodeAnchor>::const_iterator i = inAnchor.begin() ; i != inAnchor.end() ; ++i) {
-                inStream << *i;
-                if (i + 1 != inAnchor.end()) {
-                    inStream << "<-";
-                }
-            }
-            
-            return inStream;            
+struct NodeAnchor {
+    const Node* node = nullptr;
+    size_t location = 0;
+    size_t spanningLength = 0;
+    double accumulatedScore = 0.0;
+};
+
+inline std::ostream& operator<<(std::ostream& stream,
+                                const NodeAnchor& anchor) {
+    stream << "{@(" << anchor.location << "," << anchor.spanningLength << "),";
+    if (anchor.node) {
+        stream << *(anchor.node);
+    } else {
+        stream << "null";
+    }
+    stream << "}";
+    return stream;
+}
+
+inline std::ostream& operator<<(std::ostream& stream,
+                                const std::vector<NodeAnchor>& anchor) {
+    for (std::vector<NodeAnchor>::const_iterator i = anchor.begin();
+         i != anchor.end(); ++i) {
+        stream << *i;
+        if (i + 1 != anchor.end()) {
+            stream << "<-";
         }
     }
+    
+    return stream;
 }
+}  // namespace Gramambular
+}  // namespace Taiyan
 
 #endif
