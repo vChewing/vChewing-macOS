@@ -21,7 +21,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <algorithm>
 #include <iterator>
 
-using namespace vChewing;
+namespace vChewing {
 
 LMInstantiator::LMInstantiator()
 {
@@ -92,49 +92,49 @@ void LMInstantiator::loadPhraseReplacementMap(const char* phraseReplacementPath)
     }
 }
 
-const vector<Bigram> LMInstantiator::bigramsForKeys(const string& preceedingKey, const string& key)
+const std::vector<Taiyan::Gramambular::Bigram> LMInstantiator::bigramsForKeys(const std::string& preceedingKey, const std::string& key)
 {
-    return vector<Bigram>();
+    return std::vector<Taiyan::Gramambular::Bigram>();
 }
 
-const vector<Unigram> LMInstantiator::unigramsForKey(const string& key)
+const std::vector<Taiyan::Gramambular::Unigram> LMInstantiator::unigramsForKey(const std::string& key)
 {
     if (key == " ") {
-        vector<Unigram> spaceUnigrams;
-        Unigram g;
+        std::vector<Taiyan::Gramambular::Unigram> spaceUnigrams;
+        Taiyan::Gramambular::Unigram g;
         g.keyValue.key = " ";
-        g.keyValue.value= " ";
+        g.keyValue.value = " ";
         g.score = 0;
         spaceUnigrams.push_back(g);
         return spaceUnigrams;
     }
 
-    vector<Unigram> allUnigrams;
-    vector<Unigram> userUnigrams;
-    vector<Unigram> cnsUnigrams;
+    std::vector<Taiyan::Gramambular::Unigram> allUnigrams;
+    std::vector<Taiyan::Gramambular::Unigram> userUnigrams;
+    std::vector<Taiyan::Gramambular::Unigram> cnsUnigrams;
 
-    unordered_set<string> excludedValues;
-    unordered_set<string> insertedValues;
+     std::unordered_set<std::string> excludedValues;
+     std::unordered_set<std::string> insertedValues;
 
     if (m_excludedPhrases.hasUnigramsForKey(key)) {
-        vector<Unigram> excludedUnigrams = m_excludedPhrases.unigramsForKey(key);
+        std::vector<Taiyan::Gramambular::Unigram> excludedUnigrams = m_excludedPhrases.unigramsForKey(key);
         transform(excludedUnigrams.begin(), excludedUnigrams.end(),
             inserter(excludedValues, excludedValues.end()),
-            [](const Unigram& u) { return u.keyValue.value; });
+            [](const Taiyan::Gramambular::Unigram& u) { return u.keyValue.value; });
     }
 
     if (m_userPhrases.hasUnigramsForKey(key)) {
-        vector<Unigram> rawUserUnigrams = m_userPhrases.unigramsForKey(key);
+        std::vector<Taiyan::Gramambular::Unigram> rawUserUnigrams = m_userPhrases.unigramsForKey(key);
         userUnigrams = filterAndTransformUnigrams(rawUserUnigrams, excludedValues, insertedValues);
     }
 
     if (m_languageModel.hasUnigramsForKey(key)) {
-        vector<Unigram> rawGlobalUnigrams = m_languageModel.unigramsForKey(key);
+        std::vector<Taiyan::Gramambular::Unigram> rawGlobalUnigrams = m_languageModel.unigramsForKey(key);
         allUnigrams = filterAndTransformUnigrams(rawGlobalUnigrams, excludedValues, insertedValues);
     }
 
     if (m_cnsModel.hasUnigramsForKey(key) && m_cnsEnabled) {
-        vector<Unigram> rawCNSUnigrams = m_cnsModel.unigramsForKey(key);
+        std::vector<Taiyan::Gramambular::Unigram> rawCNSUnigrams = m_cnsModel.unigramsForKey(key);
         cnsUnigrams = filterAndTransformUnigrams(rawCNSUnigrams, excludedValues, insertedValues);
     }
 
@@ -143,7 +143,7 @@ const vector<Unigram> LMInstantiator::unigramsForKey(const string& key)
     return allUnigrams;
 }
 
-bool LMInstantiator::hasUnigramsForKey(const string& key)
+bool LMInstantiator::hasUnigramsForKey(const std::string& key)
 {
     if (key == " ") {
         return true;
@@ -185,36 +185,36 @@ bool LMInstantiator::externalConverterEnabled()
     return m_externalConverterEnabled;
 }
 
-void LMInstantiator::setExternalConverter(std::function<string(string)> externalConverter)
+void LMInstantiator::setExternalConverter(std::function<std::string(std::string)> externalConverter)
 {
     m_externalConverter = externalConverter;
 }
 
-const vector<Unigram> LMInstantiator::filterAndTransformUnigrams(const vector<Unigram> unigrams, const unordered_set<string>& excludedValues, unordered_set<string>& insertedValues)
+const std::vector<Taiyan::Gramambular::Unigram> LMInstantiator::filterAndTransformUnigrams(const std::vector<Taiyan::Gramambular::Unigram> unigrams, const  std::unordered_set<std::string>& excludedValues,  std::unordered_set<std::string>& insertedValues)
 {
-    vector<Unigram> results;
+    std::vector<Taiyan::Gramambular::Unigram> results;
 
     for (auto&& unigram : unigrams) {
         // excludedValues filters out the unigrams with the original value.
         // insertedValues filters out the ones with the converted value
-        string originalValue = unigram.keyValue.value;
+        std::string originalValue = unigram.keyValue.value;
         if (excludedValues.find(originalValue) != excludedValues.end()) {
             continue;
         }
 
-        string value = originalValue;
+        std::string value = originalValue;
         if (m_phraseReplacementEnabled) {
-            string replacement = m_phraseReplacement.valueForKey(value);
+            std::string replacement = m_phraseReplacement.valueForKey(value);
             if (replacement != "") {
                 value = replacement;
             }
         }
         if (m_externalConverterEnabled && m_externalConverter) {
-            string replacement = m_externalConverter(value);
+            std::string replacement = m_externalConverter(value);
             value = replacement;
         }
         if (insertedValues.find(value) == insertedValues.end()) {
-            Unigram g;
+            Taiyan::Gramambular::Unigram g;
             g.keyValue.value = value;
             g.keyValue.key = unigram.keyValue.key;
             g.score = unigram.score;
@@ -225,12 +225,14 @@ const vector<Unigram> LMInstantiator::filterAndTransformUnigrams(const vector<Un
     return results;
 }
 
-const vector<std::string> LMInstantiator::associatedPhrasesForKey(const string& key)
+const std::vector<std::string> LMInstantiator::associatedPhrasesForKey(const std::string& key)
 {
     return m_associatedPhrases.valuesForKey(key);
 }
 
-bool LMInstantiator::hasAssociatedPhrasesForKey(const string& key)
+bool LMInstantiator::hasAssociatedPhrasesForKey(const std::string& key)
 {
     return m_associatedPhrases.hasValuesForKey(key);
 }
+
+} // namespace vChewing
