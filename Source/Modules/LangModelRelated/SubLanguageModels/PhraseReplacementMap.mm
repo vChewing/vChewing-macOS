@@ -54,12 +54,7 @@ bool PhraseReplacementMap::open(const char *path)
     }
 
     LMConsolidator::FixEOF(path);
-
-    if (Preferences.shouldAutoSortPhraseReplacementMapOnLoad) {
-        LMConsolidator::ConsolidateContent(path, true);
-    } else {
-        LMConsolidator::ConsolidateContent(path, false);
-    }
+    LMConsolidator::ConsolidateContent(path, Preferences.shouldAutoSortPhraseReplacementMapOnLoad, true);
 
     fd = ::open(path, O_RDONLY);
     if (fd == -1) {

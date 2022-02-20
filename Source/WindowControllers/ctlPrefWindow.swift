@@ -86,7 +86,7 @@ extension RangeReplaceableCollection where Element: Hashable {
 
         let menuItem_vChewingDachen = NSMenuItem()
         menuItem_vChewingDachen.title = String(format: NSLocalizedString("vChewing Dachen (Not Finished Yet)", comment: ""))
-        menuItem_vChewingDachen.representedObject = String("org.atelierInmu.keyboardlayout.vChewingKeyLayout.zhuyindachen")
+        menuItem_vChewingDachen.representedObject = String("org.atelierInmu.keyboardlayout.vChewingKeyLayout.vChewingDachen")
         basisKeyboardLayoutButton.menu?.addItem(menuItem_vChewingDachen)
 
         let basisKeyboardLayoutID = Preferences.basisKeyboardLayout

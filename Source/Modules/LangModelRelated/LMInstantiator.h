@@ -17,22 +17,22 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef VCHEWINGLM_H
-#define VCHEWINGLM_H
+#ifndef LMInstantiator_H
+#define LMInstantiator_H
 
-#include <stdio.h>
-#include "UserPhrasesLM.h"
-#include "ParselessLM.h"
-#include "CNSLM.h"
-#include "PhraseReplacementMap.h"
 #include "AssociatedPhrases.h"
+#include "CNSLM.h"
+#include "ParselessLM.h"
+#include "PhraseReplacementMap.h"
+#include "UserPhrasesLM.h"
+#include <stdio.h>
 #include <unordered_set>
 
 namespace vChewing {
 
 using namespace Taiyan::Gramambular;
 
-/// vChewingLM is a facade for managing a set of models including
+/// LMInstantiator is a facade for managing a set of models including
 /// the input method language model, user phrases and excluded phrases.
 ///
 /// It is the primary model class that the input controller and grammar builder
@@ -41,7 +41,7 @@ using namespace Taiyan::Gramambular;
 /// if there are valid unigrams, and use returned unigrams to produce the final
 /// results.
 ///
-/// vChewingLM combine and transform the unigrams from the primary language
+/// LMInstantiator combine and transform the unigrams from the primary language
 /// model and user phrases. The process is
 ///
 /// 1) Get the original unigrams.
@@ -54,10 +54,10 @@ using namespace Taiyan::Gramambular;
 /// model while launching and to load the user phrases anytime if the custom
 /// files are modified. It does not keep the reference of the data pathes but
 /// you have to pass the paths when you ask it to do loading.
-class vChewingLM : public LanguageModel {
+class LMInstantiator : public Taiyan::Gramambular::LanguageModel {
 public:
-    vChewingLM();
-    ~vChewingLM();
+    LMInstantiator();
+    ~LMInstantiator();
 
     /// Asks to load the primary language model at the given path.
     /// @param languageModelPath The path of the language model.
@@ -83,14 +83,14 @@ public:
     void loadPhraseReplacementMap(const char* phraseReplacementPath);
 
     /// Not implemented since we do not have data to provide bigram function.
-    const vector<Bigram> bigramsForKeys(const string& preceedingKey, const string& key);
+    const std::vector<Taiyan::Gramambular::Bigram> bigramsForKeys(const std::string& preceedingKey, const std::string& key);
     /// Returns a list of available unigram for the given key.
-    /// @param key A string represents the BPMF reading or a symbol key. For
+    /// @param key A std::string represents the BPMF reading or a symbol key. For
     ///     example, it you pass "ㄇㄚ", it returns "嗎", "媽", and so on.
-    const vector<Unigram> unigramsForKey(const string& key);
+    const std::vector<Taiyan::Gramambular::Unigram> unigramsForKey(const std::string& key);
     /// If the model has unigrams for the given key.
     /// @param key The key.
-    bool hasUnigramsForKey(const string& key);
+    bool hasUnigramsForKey(const std::string& key);
 
     /// Enables or disables phrase replacement.
     void setPhraseReplacementEnabled(bool enabled);
@@ -107,10 +107,10 @@ public:
     /// If the external converted is enabled or not.
     bool externalConverterEnabled();
     /// Sets a lambda to let the values of unigrams could be converted by it.
-    void setExternalConverter(std::function<string(string)> externalConverter);
+    void setExternalConverter(std::function<std::string(std::string)> externalConverter);
 
-    const vector<std::string> associatedPhrasesForKey(const string& key);
-    bool hasAssociatedPhrasesForKey(const string& key);
+    const std::vector<std::string> associatedPhrasesForKey(const std::string& key);
+    bool hasAssociatedPhrasesForKey(const std::string& key);
 
 
 protected:
@@ -121,9 +121,9 @@ protected:
     /// @param insertedValues The values for unigrams already in the results.
     ///   It helps to prevent duplicated unigrams. Please note that the method
     ///   has a side effect that it inserts values to `insertedValues`.
-    const vector<Unigram> filterAndTransformUnigrams(const vector<Unigram> unigrams,
-        const std::unordered_set<string>& excludedValues,
-        std::unordered_set<string>& insertedValues);
+    const std::vector<Taiyan::Gramambular::Unigram> filterAndTransformUnigrams(const std::vector<Taiyan::Gramambular::Unigram> unigrams,
+        const std::unordered_set<std::string>& excludedValues,
+        std::unordered_set<std::string>& insertedValues);
 
     ParselessLM m_languageModel;
     CNSLM m_cnsModel;
@@ -134,7 +134,7 @@ protected:
     bool m_phraseReplacementEnabled;
     bool m_cnsEnabled;
     bool m_externalConverterEnabled;
-    std::function<string(string)> m_externalConverter;
+    std::function<std::string(std::string)> m_externalConverter;
 };
 };
 

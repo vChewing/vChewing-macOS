@@ -67,7 +67,7 @@
         <window title="vChewing Installer" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" animationBehavior="default" titlebarAppearsTransparent="YES" id="371">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <rect key="contentRect" x="335" y="390" width="533" height="457"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1600" height="875"/>
             <value key="minSize" type="size" width="533" height="457"/>
             <value key="maxSize" type="size" width="533" height="457"/>
             <view key="contentView" id="372">
@@ -271,7 +271,6 @@ Gw
             <connections>
                 <outlet property="appCopyrightLabel" destination="03l-rN-zf9" id="XS5-cZ-k9H"/>
                 <outlet property="appEULAContent" destination="47J-tO-8TZ" id="kRU-X2-8kX"/>
-                <outlet property="appNameLabel" destination="bzR-Oa-BZa" id="swF-1l-dhS"/>
                 <outlet property="appVersionLabel" destination="z1m-8k-Z63" id="75X-uy-0Iz"/>
                 <outlet property="cancelButton" destination="592" id="710"/>
                 <outlet property="installButton" destination="575" id="709"/>
@@ -283,7 +282,7 @@ Gw
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="gHl-Hx-eQn">
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="283" y="305" width="480" height="180"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1600" height="875"/>
             <view key="contentView" id="wAe-c8-Vh9">
                 <rect key="frame" x="0.0" y="0.0" width="480" height="180"/>
                 <autoresizingMask key="autoresizingMask"/>
