@@ -68,7 +68,7 @@
 		6ACC3D442793701600F1B140 /* ParselessPhraseDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ACC3D402793701600F1B140 /* ParselessPhraseDB.cpp */; };
 		6ACC3D452793701600F1B140 /* ParselessLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ACC3D422793701600F1B140 /* ParselessLM.cpp */; };
 		D41355D8278D74B5005E5CBD /* mgrLangModel.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355D7278D7409005E5CBD /* mgrLangModel.mm */; };
-		D41355DB278E6D17005E5CBD /* vChewingLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355D9278E6D17005E5CBD /* vChewingLM.mm */; };
+		D41355DB278E6D17005E5CBD /* LMInstantiator.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355D9278E6D17005E5CBD /* LMInstantiator.mm */; };
 		D41355DE278EA3ED005E5CBD /* UserPhrasesLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355DC278EA3ED005E5CBD /* UserPhrasesLM.mm */; };
 		D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427F76B278CA1BA004A2160 /* AppDelegate.swift */; };
 		D44FB74D2792189A003C80A6 /* PhraseReplacementMap.mm in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74B2792189A003C80A6 /* PhraseReplacementMap.mm */; };
@@ -243,8 +243,8 @@
 		6ACC3D432793701600F1B140 /* ParselessLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParselessLM.h; sourceTree = "<group>"; };
 		D41355D6278D7409005E5CBD /* mgrLangModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mgrLangModel.h; sourceTree = "<group>"; };
 		D41355D7278D7409005E5CBD /* mgrLangModel.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = mgrLangModel.mm; sourceTree = "<group>"; };
-		D41355D9278E6D17005E5CBD /* vChewingLM.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = vChewingLM.mm; sourceTree = "<group>"; };
-		D41355DA278E6D17005E5CBD /* vChewingLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vChewingLM.h; sourceTree = "<group>"; };
+		D41355D9278E6D17005E5CBD /* LMInstantiator.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LMInstantiator.mm; sourceTree = "<group>"; };
+		D41355DA278E6D17005E5CBD /* LMInstantiator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LMInstantiator.h; sourceTree = "<group>"; };
 		D41355DC278EA3ED005E5CBD /* UserPhrasesLM.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = UserPhrasesLM.mm; sourceTree = "<group>"; };
 		D41355DD278EA3ED005E5CBD /* UserPhrasesLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserPhrasesLM.h; sourceTree = "<group>"; };
 		D427A9BF25ED28CC005D43E0 /* vChewing-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vChewing-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -423,12 +423,12 @@
 		5B62A32427AE757300A19448 /* LangModelRelated */ = {
 			isa = PBXGroup;
 			children = (
+				D41355D9278E6D17005E5CBD /* LMInstantiator.mm */,
+				D41355DA278E6D17005E5CBD /* LMInstantiator.h */,
 				D41355D6278D7409005E5CBD /* mgrLangModel.h */,
 				D495583A27A5C6C4006ADE1C /* mgrLangModel_Privates.h */,
 				D41355D7278D7409005E5CBD /* mgrLangModel.mm */,
 				5B62A32527AE758000A19448 /* SubLanguageModels */,
-				D41355D9278E6D17005E5CBD /* vChewingLM.mm */,
-				D41355DA278E6D17005E5CBD /* vChewingLM.h */,
 			);
 			path = LangModelRelated;
 			sourceTree = "<group>";
@@ -937,7 +937,7 @@
 				5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */,
 				5B62A31827AE73A700A19448 /* zip.m in Sources */,
 				5B62A32E27AE78B000A19448 /* CNSLM.mm in Sources */,
-				D41355DB278E6D17005E5CBD /* vChewingLM.mm in Sources */,
+				D41355DB278E6D17005E5CBD /* LMInstantiator.mm in Sources */,
 				5B62A31A27AE73A700A19448 /* mztools.m in Sources */,
 				5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */,
 				D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */,

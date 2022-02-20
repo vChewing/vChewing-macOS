@@ -17,17 +17,17 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "vChewingLM.h"
+#include "LMInstantiator.h"
 #include <algorithm>
 #include <iterator>
 
 using namespace vChewing;
 
-vChewingLM::vChewingLM()
+LMInstantiator::LMInstantiator()
 {
 }
 
-vChewingLM::~vChewingLM()
+LMInstantiator::~LMInstantiator()
 {
     m_languageModel.close();
     m_userPhrases.close();
@@ -37,7 +37,7 @@ vChewingLM::~vChewingLM()
     m_associatedPhrases.close();
 }
 
-void vChewingLM::loadLanguageModel(const char* languageModelDataPath)
+void LMInstantiator::loadLanguageModel(const char* languageModelDataPath)
 {
     if (languageModelDataPath) {
         m_languageModel.close();
@@ -45,12 +45,12 @@ void vChewingLM::loadLanguageModel(const char* languageModelDataPath)
     }
 }
 
-bool vChewingLM::isDataModelLoaded()
+bool LMInstantiator::isDataModelLoaded()
 {
     return m_languageModel.isLoaded();
 }
 
-void vChewingLM::loadCNSData(const char* cnsDataPath)
+void LMInstantiator::loadCNSData(const char* cnsDataPath)
 {
     if (cnsDataPath) {
         m_cnsModel.close();
@@ -58,12 +58,12 @@ void vChewingLM::loadCNSData(const char* cnsDataPath)
     }
 }
 
-bool vChewingLM::isCNSDataLoaded()
+bool LMInstantiator::isCNSDataLoaded()
 {
     return m_cnsModel.isLoaded();
 }
 
-void vChewingLM::loadUserPhrases(const char* userPhrasesDataPath,
+void LMInstantiator::loadUserPhrases(const char* userPhrasesDataPath,
     const char* excludedPhrasesDataPath)
 {
     if (userPhrasesDataPath) {
@@ -76,7 +76,7 @@ void vChewingLM::loadUserPhrases(const char* userPhrasesDataPath,
     }
 }
 
-void vChewingLM::loadUserAssociatedPhrases(const char *userAssociatedPhrasesPath)
+void LMInstantiator::loadUserAssociatedPhrases(const char *userAssociatedPhrasesPath)
 {
     if (userAssociatedPhrasesPath) {
         m_associatedPhrases.close();
@@ -84,7 +84,7 @@ void vChewingLM::loadUserAssociatedPhrases(const char *userAssociatedPhrasesPath
     }
 }
 
-void vChewingLM::loadPhraseReplacementMap(const char* phraseReplacementPath)
+void LMInstantiator::loadPhraseReplacementMap(const char* phraseReplacementPath)
 {
     if (phraseReplacementPath) {
         m_phraseReplacement.close();
@@ -92,12 +92,12 @@ void vChewingLM::loadPhraseReplacementMap(const char* phraseReplacementPath)
     }
 }
 
-const vector<Bigram> vChewingLM::bigramsForKeys(const string& preceedingKey, const string& key)
+const vector<Bigram> LMInstantiator::bigramsForKeys(const string& preceedingKey, const string& key)
 {
     return vector<Bigram>();
 }
 
-const vector<Unigram> vChewingLM::unigramsForKey(const string& key)
+const vector<Unigram> LMInstantiator::unigramsForKey(const string& key)
 {
     if (key == " ") {
         vector<Unigram> spaceUnigrams;
@@ -143,7 +143,7 @@ const vector<Unigram> vChewingLM::unigramsForKey(const string& key)
     return allUnigrams;
 }
 
-bool vChewingLM::hasUnigramsForKey(const string& key)
+bool LMInstantiator::hasUnigramsForKey(const string& key)
 {
     if (key == " ") {
         return true;
@@ -156,41 +156,41 @@ bool vChewingLM::hasUnigramsForKey(const string& key)
     return unigramsForKey(key).size() > 0;
 }
 
-void vChewingLM::setPhraseReplacementEnabled(bool enabled)
+void LMInstantiator::setPhraseReplacementEnabled(bool enabled)
 {
     m_phraseReplacementEnabled = enabled;
 }
 
-bool vChewingLM::phraseReplacementEnabled()
+bool LMInstantiator::phraseReplacementEnabled()
 {
     return m_phraseReplacementEnabled;
 }
 
-void vChewingLM::setCNSEnabled(bool enabled)
+void LMInstantiator::setCNSEnabled(bool enabled)
 {
     m_cnsEnabled = enabled;
 }
-bool vChewingLM::cnsEnabled()
+bool LMInstantiator::cnsEnabled()
 {
     return m_cnsEnabled;
 }
 
-void vChewingLM::setExternalConverterEnabled(bool enabled)
+void LMInstantiator::setExternalConverterEnabled(bool enabled)
 {
     m_externalConverterEnabled = enabled;
 }
 
-bool vChewingLM::externalConverterEnabled()
+bool LMInstantiator::externalConverterEnabled()
 {
     return m_externalConverterEnabled;
 }
 
-void vChewingLM::setExternalConverter(std::function<string(string)> externalConverter)
+void LMInstantiator::setExternalConverter(std::function<string(string)> externalConverter)
 {
     m_externalConverter = externalConverter;
 }
 
-const vector<Unigram> vChewingLM::filterAndTransformUnigrams(const vector<Unigram> unigrams, const unordered_set<string>& excludedValues, unordered_set<string>& insertedValues)
+const vector<Unigram> LMInstantiator::filterAndTransformUnigrams(const vector<Unigram> unigrams, const unordered_set<string>& excludedValues, unordered_set<string>& insertedValues)
 {
     vector<Unigram> results;
 
@@ -225,12 +225,12 @@ const vector<Unigram> vChewingLM::filterAndTransformUnigrams(const vector<Unigra
     return results;
 }
 
-const vector<std::string> vChewingLM::associatedPhrasesForKey(const string& key)
+const vector<std::string> LMInstantiator::associatedPhrasesForKey(const string& key)
 {
     return m_associatedPhrases.valuesForKey(key);
 }
 
-bool vChewingLM::hasAssociatedPhrasesForKey(const string& key)
+bool LMInstantiator::hasAssociatedPhrasesForKey(const string& key)
 {
     return m_associatedPhrases.hasValuesForKey(key);
 }
