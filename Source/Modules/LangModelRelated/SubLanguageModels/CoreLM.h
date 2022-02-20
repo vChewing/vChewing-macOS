@@ -45,8 +45,8 @@ public:
     void close();
     void dump();
 
-    virtual const vector<Bigram> bigramsForKeys(const string& preceedingKey, const string& key);
-    virtual const vector<Unigram> unigramsForKey(const string& key);
+    virtual const std::vector<Taiyan::Gramambular::Bigram> bigramsForKeys(const string& preceedingKey, const string& key);
+    virtual const std::vector<Taiyan::Gramambular::Unigram> unigramsForKey(const string& key);
     virtual bool hasUnigramsForKey(const string& key);
 
 protected:
