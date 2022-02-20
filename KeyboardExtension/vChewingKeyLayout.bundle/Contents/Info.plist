@@ -8,48 +8,48 @@
 	<string>vChewingKeyLayout</string>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
-	<key>KLInfo_Zhuyin Dachen</key>
+	<key>KLInfo_vChewingDachen</key>
 	<dict>
 		<key>TICapsLockLanguageSwitchCapable</key>
 		<false/>
 		<key>TISInputSourceID</key>
-		<string>org.atelierInmu.keyboardlayout.vChewingKeyLayout.zhuyindachen</string>
+		<string>org.atelierInmu.keyboardlayout.vChewingKeyLayout.vChewingDachen</string>
 		<key>TISIntendedLanguage</key>
 		<string>zh-Hanb</string>
 	</dict>
-	<key>KLInfo_Zhuyin ETen</key>
+	<key>KLInfo_vChewingETen</key>
 	<dict>
 		<key>TICapsLockLanguageSwitchCapable</key>
 		<false/>
 		<key>TISInputSourceID</key>
-		<string>org.atelierInmu.keyboardlayout.vChewingKeyLayout.zhuyineten</string>
+		<string>org.atelierInmu.keyboardlayout.vChewingKeyLayout.vChewingETen</string>
 		<key>TISIntendedLanguage</key>
 		<string>zh-Hanb</string>
 	</dict>
-	<key>KLInfo_Zhuyin IBM</key>
+	<key>KLInfo_vChewingIBM</key>
 	<dict>
 		<key>TICapsLockLanguageSwitchCapable</key>
 		<false/>
 		<key>TISInputSourceID</key>
-		<string>org.atelierInmu.keyboardlayout.vChewingKeyLayout.zhuyinibm</string>
+		<string>org.atelierInmu.keyboardlayout.vChewingKeyLayout.vChewingIBM</string>
 		<key>TISIntendedLanguage</key>
 		<string>zh-Hanb</string>
 	</dict>
-	<key>KLInfo_Zhuyin MiTAC</key>
+	<key>KLInfo_vChewingMiTAC</key>
 	<dict>
 		<key>TICapsLockLanguageSwitchCapable</key>
 		<false/>
 		<key>TISInputSourceID</key>
-		<string>org.atelierInmu.keyboardlayout.vChewingKeyLayout.zhuyinmitac</string>
+		<string>org.atelierInmu.keyboardlayout.vChewingKeyLayout.vChewingMiTAC</string>
 		<key>TISIntendedLanguage</key>
 		<string>zh-Hanb</string>
 	</dict>
-	<key>KLInfo_Zhuyin Seigyou</key>
+	<key>KLInfo_vChewingSeigyou</key>
 	<dict>
 		<key>TICapsLockLanguageSwitchCapable</key>
 		<false/>
 		<key>TISInputSourceID</key>
-		<string>org.atelierInmu.keyboardlayout.vChewingKeyLayout.zhuyinseigyou</string>
+		<string>org.atelierInmu.keyboardlayout.vChewingKeyLayout.vChewingSeigyou</string>
 		<key>TISIntendedLanguage</key>
 		<string>zh-Hanb</string>
 	</dict>
