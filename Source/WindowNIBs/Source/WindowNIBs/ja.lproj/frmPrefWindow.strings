@@ -2,6 +2,9 @@
 /* Class = "NSWindow"; title = "vChewing Preferences"; ObjectID = "1"; */
 "1.title" = "威注音アプリ機能設定";
 
+/* Class = "NSButtonCell"; title = "Debug Mode"; ObjectID = "sZx-18-8dO"; */
+"sZx-18-8dO.title" = "欠陥辿着モード";
+
 /* Class = "NSMenu"; title = "OtherViews"; ObjectID = "5"; */
 "5.title" = "OtherViews";
 

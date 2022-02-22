@@ -300,15 +300,29 @@
                                                 </constraints>
                                             </view>
                                         </box>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mwD-Yz-AU9">
+                                            <rect key="frame" x="346" y="12.5" width="94" height="17"/>
+                                            <buttonCell key="cell" type="check" title="Debug Mode" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="sZx-18-8dO">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="cellTitle"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <binding destination="32" name="value" keyPath="values._DebugMode" id="RsM-TR-7Lf"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                     <constraints>
+                                        <constraint firstItem="mwD-Yz-AU9" firstAttribute="baseline" secondItem="Fc2-qh-r1H" secondAttribute="baseline" id="0JL-hQ-6wv"/>
                                         <constraint firstItem="2Y6-Am-WM1" firstAttribute="leading" secondItem="Uyz-xL-TVN" secondAttribute="leading" id="37f-ZR-zcC"/>
+                                        <constraint firstItem="mwD-Yz-AU9" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Fc2-qh-r1H" secondAttribute="trailing" constant="8" symbolic="YES" id="46T-tt-c7b"/>
                                         <constraint firstItem="Fc2-qh-r1H" firstAttribute="leading" secondItem="9TJ-dn-iXU" secondAttribute="leading" constant="27" id="BGq-cN-jpR"/>
                                         <constraint firstAttribute="bottom" secondItem="Fc2-qh-r1H" secondAttribute="bottom" constant="13" id="DF3-YG-9e5"/>
+                                        <constraint firstAttribute="trailing" secondItem="mwD-Yz-AU9" secondAttribute="trailing" constant="23" id="Vwp-g8-y63"/>
                                         <constraint firstAttribute="trailing" secondItem="2Y6-Am-WM1" secondAttribute="trailing" constant="9" id="ZPe-b1-SbT"/>
                                         <constraint firstItem="2Y6-Am-WM1" firstAttribute="top" secondItem="9TJ-dn-iXU" secondAttribute="top" constant="5" id="bJ6-j1-t07"/>
                                         <constraint firstItem="2Y6-Am-WM1" firstAttribute="trailing" secondItem="Uyz-xL-TVN" secondAttribute="trailing" id="ewc-fS-Lds"/>
                                         <constraint firstItem="Uyz-xL-TVN" firstAttribute="top" secondItem="9TJ-dn-iXU" secondAttribute="top" constant="239" id="hBw-kZ-RWt"/>
+                                        <constraint firstItem="mwD-Yz-AU9" firstAttribute="firstBaseline" secondItem="Fc2-qh-r1H" secondAttribute="firstBaseline" id="jda-kZ-9OZ"/>
                                         <constraint firstItem="Fc2-qh-r1H" firstAttribute="top" secondItem="Uyz-xL-TVN" secondAttribute="bottom" constant="8" symbolic="YES" id="m8Q-6u-Xbr"/>
                                         <constraint firstItem="2Y6-Am-WM1" firstAttribute="leading" secondItem="9TJ-dn-iXU" secondAttribute="leading" constant="9" id="pSQ-3h-nNK"/>
                                         <constraint firstItem="Uyz-xL-TVN" firstAttribute="top" secondItem="2Y6-Am-WM1" secondAttribute="bottom" constant="8" symbolic="YES" id="raC-bi-5o9"/>
