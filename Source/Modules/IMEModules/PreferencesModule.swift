@@ -19,6 +19,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 import Cocoa
 
+private let kIsDebugModeEnabled = "_DebugMode"
 private let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
 private let kKeyboardLayoutPreference = "KeyboardLayout"
 private let kBasisKeyboardLayoutPreference = "BasisKeyboardLayout"
@@ -213,7 +214,8 @@ struct ComposingBufferSize {
 // MARK: -
 @objc public class Preferences: NSObject {
     static var allKeys:[String] {
-        [kKeyboardLayoutPreference,
+        [kIsDebugModeEnabled,
+         kKeyboardLayoutPreference,
          kBasisKeyboardLayoutPreference,
          kFunctionKeyKeyboardLayoutPreference,
          kFunctionKeyKeyboardLayoutOverrideIncludeShift,
@@ -248,11 +250,16 @@ struct ComposingBufferSize {
     @objc public static func setMissingDefaults () {
         // 既然 Preferences Module 的預設屬性不自動寫入 plist、而且還是 private，那這邊就先寫入了。
 
+        // 首次啟用輸入法時不要啟用偵錯模式。
+        if UserDefaults.standard.object(forKey: kIsDebugModeEnabled) == nil {
+            UserDefaults.standard.set(Preferences.isDebugModeEnabled, forKey: kIsDebugModeEnabled)
+        }
+
         // 首次啟用輸入法時設定不要自動更新，免得在某些要隔絕外部網路連線的保密機構內觸犯資安規則。
         if UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) == nil {
             UserDefaults.standard.set(false, forKey: kCheckUpdateAutomatically)
         }
-        
+
         // 預設選字窗字詞文字尺寸，設成 18 剛剛好
         if UserDefaults.standard.object(forKey: kCandidateListTextSize) == nil {
             UserDefaults.standard.set(Preferences.candidateListTextSize, forKey: kCandidateListTextSize)
@@ -335,6 +342,9 @@ struct ComposingBufferSize {
         
         UserDefaults.standard.synchronize()
     }
+
+    @UserDefault(key: kIsDebugModeEnabled, defaultValue: false)
+    @objc static var isDebugModeEnabled: Bool
 
     @UserDefault(key: kAppleLanguagesPreferences, defaultValue: [])
     @objc static var appleLanguages: Array<String>
