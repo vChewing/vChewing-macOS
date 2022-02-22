@@ -87,6 +87,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     return _inputMode;
 }
 
+- (BOOL)isBuilderEmpty {
+    if (_builder->grid().width() == 0) {
+        return YES;
+    } else {
+        return NO;
+    }
+}
+
 - (void)setInputMode:(NSString *)value
 {
     NSString *newInputMode;
