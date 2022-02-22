@@ -1000,6 +1000,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
+        } else if ([self isBuilderEmpty]) {
+            // 如果此時發現當前組字緩衝區為真空的情況的話，就將當前的組字緩衝區析構處理、強制重設輸入狀態。
+            // 不然的話，一個本不該出現的真空組字緩衝區會使前後方向鍵與 BackSpace 鍵失靈。
+            [self clear];
+            InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
+            stateCallback(empty);
         } else {
             InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);
