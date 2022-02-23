@@ -19,6 +19,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 import Cocoa
 
+// KeyCodes: https://eastmanreference.com/complete-list-of-applescript-key-codes
 enum KeyCode: UInt16 {
     case none = 0
     case enter = 76
@@ -33,6 +34,7 @@ enum KeyCode: UInt16 {
     case delete = 117
 }
 
+// CharCodes: https://theasciicode.com.ar/ascii-control-characters/horizontal-tab-ascii-code-9.html
 enum CharCode: UInt16 {
     case space = 32
     case backSpace = 8
