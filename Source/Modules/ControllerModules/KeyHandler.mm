@@ -87,6 +87,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     return _inputMode;
 }
 
+- (BOOL)isBuilderEmpty {
+    if (_builder->grid().width() == 0) {
+        return YES;
+    } else {
+        return NO;
+    }
+}
+
 - (void)setInputMode:(NSString *)value
 {
     NSString *newInputMode;
@@ -255,7 +263,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     // Caps Lock processing : if Caps Lock is on, temporarily disable bopomofo.
-    if ([input isBackSpace] || [input isEnterCharCode] || [input isEnter] || [input isAbsorbedArrowKey] || [input isExtraChooseCandidateKey] || [input isExtraChooseCandidateKeyReverse] || [input isCursorForward] || [input isCursorBackward]) {
+    if ([input isBackSpace] || [input isEnter] || [input isAbsorbedArrowKey] || [input isExtraChooseCandidateKey] || [input isExtraChooseCandidateKeyReverse] || [input isCursorForward] || [input isCursorBackward]) {
         // do nothing if backspace is pressed -- we ignore the key
     } else if ([input isCapsLockOn]) {
         // process all possible combination, we hope.
@@ -339,13 +347,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     // see if we have composition if Enter/Space is hit and buffer is not empty
     // this is bit-OR'ed so that the tone marker key is also taken into account
-    composeReading |= (!_bpmfReadingBuffer->isEmpty() && ([input isSpace] || [input isEnterCharCode] || [input isEnter]));
+    composeReading |= (!_bpmfReadingBuffer->isEmpty() && ([input isSpace] || [input isEnter]));
     if (composeReading) {
         // combine the reading
         std::string reading = _bpmfReadingBuffer->syllable().composedString();
 
         // see if we have a unigram for this
         if (!_languageModel->hasUnigramsForKey(reading)) {
+            [self errorCallbackConsolePrint:@"B49C0979"];
             errorCallback();
             InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);
@@ -410,7 +419,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if (_bpmfReadingBuffer->isEmpty() &&
         [state isKindOfClass:[InputStateNotEmpty class]] &&
         ([input isExtraChooseCandidateKey] || [input isExtraChooseCandidateKeyReverse]
-         || [input isSpace] || [input isPageDown] || [input isPageUp]
+         || [input isSpace] || [input isPageDown] || [input isPageUp] || [input isTab]
          || (input.useVerticalMode && ([input isVerticalModeOnlyChooseCandidateKey])))) {
         if ([input isSpace]) {
             // if the spacebar is NOT set to be a selection key
@@ -497,7 +506,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     // MARK: Enter
-    if ([input isEnter] || [input isEnterCharCode]) {
+    if ([input isEnter]) {
         if ([input isControlHold]) {
             if (ctlInputMethod.areWeUsingOurOwnPhraseEditor) {
                 return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
@@ -508,8 +517,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     // MARK: Punctuation list
     if ([input isSymbolMenuKey]) {
-        InputStateEmpty *empty = [[InputStateEmpty alloc] init];
-        stateCallback(empty);
+
+        // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
+        // 於是這裡用「模擬一次 Enter 鍵的操作」使其代為執行這個 commit buffer 的動作。
+        [self _handleEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
 
         SymbolNode *root = [SymbolNode root];
         InputStateSymbolTable *symbolState = [[InputStateSymbolTable alloc] initWithNode:root useVerticalMode:input.useVerticalMode];
@@ -567,6 +578,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // strange behavior if we don't do this, "thinking" the key is not
     // actually consumed)
     if ([state isKindOfClass:[InputStateNotEmpty class]] || !_bpmfReadingBuffer->isEmpty()) {
+        [self errorCallbackConsolePrint:@"A9BFF20E"];
         errorCallback();
         stateCallback(state);
         return YES;
@@ -617,6 +629,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     if (!_bpmfReadingBuffer->isEmpty()) {
+        [self errorCallbackConsolePrint:@"6ED95318"];
         errorCallback();
         stateCallback(state);
         return YES;
@@ -632,6 +645,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             marking.tooltipForInputting = currentState.tooltip;
             stateCallback(marking);
         } else {
+            [self errorCallbackConsolePrint:@"D326DEA3"];
             errorCallback();
             stateCallback(state);
         }
@@ -641,6 +655,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);
         } else {
+            [self errorCallbackConsolePrint:@"7045E6F3"];
             errorCallback();
             stateCallback(state);
         }
@@ -655,6 +670,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     if (!_bpmfReadingBuffer->isEmpty()) {
+        [self errorCallbackConsolePrint:@"B3BA5257"];
         errorCallback();
         stateCallback(state);
         return YES;
@@ -670,6 +686,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             marking.tooltipForInputting = currentState.tooltip;
             stateCallback(marking);
         } else {
+            [self errorCallbackConsolePrint:@"BB7F6DB9"];
             errorCallback();
             stateCallback(state);
         }
@@ -679,6 +696,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);
         } else {
+            [self errorCallbackConsolePrint:@"A96AAD58"];
             errorCallback();
             stateCallback(state);
         }
@@ -694,6 +712,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     if (!_bpmfReadingBuffer->isEmpty()) {
+        [self errorCallbackConsolePrint:@"ABC44080"];
         errorCallback();
         stateCallback(state);
         return YES;
@@ -704,6 +723,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
         stateCallback(inputting);
     } else {
+        [self errorCallbackConsolePrint:@"66D97F90"];
         errorCallback();
         stateCallback(state);
     }
@@ -718,6 +738,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     if (!_bpmfReadingBuffer->isEmpty()) {
+        [self errorCallbackConsolePrint:@"9B69908D"];
         errorCallback();
         stateCallback(state);
         return YES;
@@ -728,6 +749,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
         stateCallback(inputting);
     } else {
+        [self errorCallbackConsolePrint:@"9B69908E"];
         errorCallback();
         stateCallback(state);
     }
@@ -742,6 +764,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     if (!_bpmfReadingBuffer->isEmpty()) {
+        [self errorCallbackConsolePrint:@"9B6F908D"];
         errorCallback();
     }
     stateCallback(state);
@@ -759,6 +782,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             _builder->deleteReadingBeforeCursor();
             [self _walk];
         } else {
+            [self errorCallbackConsolePrint:@"9D69908D"];
             errorCallback();
             stateCallback(state);
             return YES;
@@ -795,10 +819,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                 stateCallback(inputting);
             }
         } else {
+            [self errorCallbackConsolePrint:@"9B69938D"];
             errorCallback();
             stateCallback(state);
         }
     } else {
+        [self errorCallbackConsolePrint:@"9C69908D"];
         errorCallback();
         stateCallback(state);
     }
@@ -852,6 +878,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         _builder->insertReadingAtCursor(customPunctuation);
         poppedText = [self _popOverflowComposingTextAndWalk];
     } else { // If there is still unfinished bpmf reading, ignore the punctuation
+        [self errorCallbackConsolePrint:@"A9B69908D"];
         errorCallback();
         stateCallback(state);
         return YES;
@@ -891,8 +918,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     // Enter
-    if ([input isEnter] || [input isEnterCharCode]) {
+    if ([input isEnter]) {
         if (![self.delegate keyHandler:self didRequestWriteUserPhraseWithState:state]) {
+            [self errorCallbackConsolePrint:@"5B69CC8D"];
             errorCallback();
             return YES;
         }
@@ -917,6 +945,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                 stateCallback(marking);
             }
         } else {
+            [self errorCallbackConsolePrint:@"1149908D"];
             errorCallback();
             stateCallback(state);
         }
@@ -938,6 +967,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                 stateCallback(marking);
             }
         } else {
+            [self errorCallbackConsolePrint:@"9B51408D"];
             errorCallback();
             stateCallback(state);
         }
@@ -970,6 +1000,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
+        } else if ([self isBuilderEmpty]) {
+            // 如果此時發現當前組字緩衝區為真空的情況的話，就將當前的組字緩衝區析構處理、強制重設輸入狀態。
+            // 不然的話，一個本不該出現的真空組字緩衝區會使前後方向鍵與 BackSpace 鍵失靈。
+            [self clear];
+            InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
+            stateCallback(empty);
         } else {
             InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);
@@ -977,7 +1013,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return YES;
     }
 
-    if ([input isEnterCharCode] || [input isEnter]) {
+    if ([input isEnter]) {
         if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
@@ -988,9 +1024,24 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return YES;
     }
 
+    if ([input isTab]) {
+        BOOL updated =
+            Preferences.specifyTabKeyBehavior?
+                ([input isShiftHold] ? [gCurrentCandidateController showPreviousPage] : [gCurrentCandidateController showNextPage])
+            :
+                ([input isShiftHold] ? [gCurrentCandidateController highlightPreviousCandidate] : [gCurrentCandidateController highlightNextCandidate])
+        ;
+        if (!updated) {
+            [self errorCallbackConsolePrint:@"9B691919"];
+            errorCallback();
+        }
+        return YES;
+    }
+
     if ([input isSpace] || [input isPageDown] || input.emacsKey == vChewingEmacsKeyNextPage) {
         BOOL updated = [gCurrentCandidateController showNextPage];
         if (!updated) {
+            [self errorCallbackConsolePrint:@"9B691919"];
             errorCallback();
         }
         return YES;
@@ -999,6 +1050,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if ([input isPageUp]) {
         BOOL updated = [gCurrentCandidateController showPreviousPage];
         if (!updated) {
+            [self errorCallbackConsolePrint:@"9569955D"];
             errorCallback();
         }
         return YES;
@@ -1008,11 +1060,13 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
             BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
             if (!updated) {
+                [self errorCallbackConsolePrint:@"1145148D"];
                 errorCallback();
             }
         } else {
             BOOL updated = [gCurrentCandidateController showPreviousPage];
             if (!updated) {
+                [self errorCallbackConsolePrint:@"1919810D"];
                 errorCallback();
             }
         }
@@ -1022,6 +1076,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if (input.emacsKey == vChewingEmacsKeyBackward) {
         BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
         if (!updated) {
+            [self errorCallbackConsolePrint:@"9B89308D"];
             errorCallback();
         }
         return YES;
@@ -1031,11 +1086,13 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
             BOOL updated = [gCurrentCandidateController highlightNextCandidate];
             if (!updated) {
+                [self errorCallbackConsolePrint:@"9B65138D"];
                 errorCallback();
             }
         } else {
             BOOL updated = [gCurrentCandidateController showNextPage];
             if (!updated) {
+                [self errorCallbackConsolePrint:@"9244908D"];
                 errorCallback();
             }
         }
@@ -1045,6 +1102,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if (input.emacsKey == vChewingEmacsKeyForward) {
         BOOL updated = [gCurrentCandidateController highlightNextCandidate];
         if (!updated) {
+            [self errorCallbackConsolePrint:@"9B2428D"];
             errorCallback();
         }
         return YES;
@@ -1054,11 +1112,13 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
             BOOL updated = [gCurrentCandidateController showPreviousPage];
             if (!updated) {
+                [self errorCallbackConsolePrint:@"9B614524"];
                 errorCallback();
             }
         } else {
             BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
             if (!updated) {
+                [self errorCallbackConsolePrint:@"ASD9908D"];
                 errorCallback();
             }
         }
@@ -1069,11 +1129,13 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
             BOOL updated = [gCurrentCandidateController showNextPage];
             if (!updated) {
+                [self errorCallbackConsolePrint:@"92B990DD"];
                 errorCallback();
             }
         } else {
             BOOL updated = [gCurrentCandidateController highlightNextCandidate];
             if (!updated) {
+                [self errorCallbackConsolePrint:@"6B99908D"];
                 errorCallback();
             }
         }
@@ -1082,6 +1144,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if ([input isHome] || input.emacsKey == vChewingEmacsKeyHome) {
         if (gCurrentCandidateController.selectedCandidateIndex == 0) {
+            [self errorCallbackConsolePrint:@"9B6EDE8D"];
             errorCallback();
         } else {
             gCurrentCandidateController.selectedCandidateIndex = 0;
@@ -1104,6 +1167,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if (([input isEnd] || input.emacsKey == vChewingEmacsKeyEnd) && candidates.count > 0) {
         if (gCurrentCandidateController.selectedCandidateIndex == candidates.count - 1) {
+            [self errorCallbackConsolePrint:@"9B69AAAD"];
             errorCallback();
         } else {
             gCurrentCandidateController.selectedCandidateIndex = candidates.count - 1;
@@ -1181,6 +1245,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         }
     }
 
+    [self errorCallbackConsolePrint:@"172A0F81"];
     errorCallback();
     return YES;
 }
@@ -1376,6 +1441,13 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return associatedPhrases;
     }
     return nil;
+}
+
+-(void)errorCallbackConsolePrint:(NSString *)strPrint
+{
+    if (Preferences.isDebugModeEnabled) {
+        NSLog(@"vChewingErrorCallback: %@", strPrint);
+    }
 }
 
 @end

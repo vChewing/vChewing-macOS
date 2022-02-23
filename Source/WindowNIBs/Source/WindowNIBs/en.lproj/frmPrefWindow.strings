@@ -2,6 +2,9 @@
 /* Class = "NSWindow"; title = "vChewing Preferences"; ObjectID = "1"; */
 "1.title" = "vChewing Preferences";
 
+/* Class = "NSButtonCell"; title = "Debug Mode"; ObjectID = "sZx-18-8dO"; */
+"sZx-18-8dO.title" = "Debug Mode";
+
 /* Class = "NSMenu"; title = "OtherViews"; ObjectID = "5"; */
 "5.title" = "OtherViews";
 
@@ -131,9 +134,6 @@
 /* Class = "NSMenuItem"; title = "Auto-Select"; ObjectID = "GlJ-Ns-9eE"; */
 "GlJ-Ns-9eE.title" = "Auto-Select";
 
-/* Class = "NSButtonCell"; title = "Sort entries when reloading user phrases and excluded phrases list"; ObjectID = "Li3-Yg-SOC"; */
-"Li3-Yg-SOC.title" = "Sort entries when reloading user phrases and excluded phrases list";
-
 /* Class = "NSTabViewItem"; label = "General"; ObjectID = "QUQ-oY-4Hc"; */
 "QUQ-oY-4Hc.label" = "General";
 
@@ -173,9 +173,6 @@
 /* Class = "NSTextFieldCell"; title = "Change UI font size of candidate window for a better visual clarity."; ObjectID = "iRg-wx-Nx2"; */
 "iRg-wx-Nx2.title" = "Change UI font size of candidate window for a better visual clarity.";
 
-/* Class = "NSTextFieldCell"; title = "Define your preferred action when user data files reload."; ObjectID = "j48-5a-cEs"; */
-"j48-5a-cEs.title" = "Define your preferred action when user data files reload.";
-
 /* Class = "NSComboBoxCell"; jQC-12-UuK.ibShadowedObjectValues[0] = "Item 1"; ObjectID = "jQC-12-UuK"; */
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
 
@@ -184,9 +181,6 @@
 
 /* Class = "NSComboBoxCell"; jQC-12-UuK.ibShadowedObjectValues[2] = "Item 3"; ObjectID = "jQC-12-UuK"; */
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
-
-/* Class = "NSButtonCell"; title = "Sort entries when reloading the phrase replacement map"; ObjectID = "o60-vW-i1B"; */
-"o60-vW-i1B.title" = "Sort entries when reloading the phrase replacement map";
 
 /* Class = "NSMenuItem"; title = "Japanese"; ObjectID = "rVQ-Hx-cGi"; */
 "rVQ-Hx-cGi.title" = "Japanese";

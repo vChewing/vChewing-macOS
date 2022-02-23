@@ -115,7 +115,9 @@ class ctlInputMethod: IMKInputController {
         menu.addItem(NSMenuItem.separator()) // ---------------------
 
         menu.addItem(withTitle: NSLocalizedString("vChewing Preferences…", comment: ""), action: #selector(showPreferences(_:)), keyEquivalent: "")
-        menu.addItem(withTitle: NSLocalizedString("Check for Updates…", comment: ""), action: #selector(checkForUpdate(_:)), keyEquivalent: "")
+        if !optionKeyPressed {
+            menu.addItem(withTitle: NSLocalizedString("Check for Updates…", comment: ""), action: #selector(checkForUpdate(_:)), keyEquivalent: "")
+        }
         menu.addItem(withTitle: NSLocalizedString("About vChewing…", comment: ""), action: #selector(showAbout(_:)), keyEquivalent: "")
         if optionKeyPressed {
             menu.addItem(withTitle: NSLocalizedString("Reboot vChewing…", comment: ""), action: #selector(selfTerminate(_:)), keyEquivalent: "")

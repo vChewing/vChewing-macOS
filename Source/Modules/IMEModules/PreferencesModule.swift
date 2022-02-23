@@ -19,6 +19,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 import Cocoa
 
+private let kIsDebugModeEnabled = "_DebugMode"
 private let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
 private let kKeyboardLayoutPreference = "KeyboardLayout"
 private let kBasisKeyboardLayoutPreference = "BasisKeyboardLayout"
@@ -27,9 +28,6 @@ private let kFunctionKeyKeyboardLayoutOverrideIncludeShift = "FunctionKeyKeyboar
 private let kCandidateListTextSize = "CandidateListTextSize"
 private let kAppleLanguagesPreferences = "AppleLanguages"
 private let kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
-private let kShouldAutoSortUserPhrasesAndExclListOnLoad = "ShouldAutoSortUserPhrasesAndExclListOnLoad"
-private let kShouldAutoSortPhraseReplacementMapOnLoad = "ShouldAutoSortPhraseReplacementMapOnLoad"
-private let kShouldAutoSortAssociatedPhrasesOnLoad = "ShouldAutoSortAssociatedPhrasesOnLoad"
 private let kSelectPhraseAfterCursorAsCandidatePreference = "SelectPhraseAfterCursorAsCandidate"
 private let kUseHorizontalCandidateListPreference = "UseHorizontalCandidateList"
 private let kComposingBufferSizePreference = "ComposingBufferSize"
@@ -40,6 +38,7 @@ private let kShiftJISShinjitaiOutputEnabled = "ShiftJISShinjitaiOutputEnabled"
 private let kHalfWidthPunctuationEnabled = "HalfWidthPunctuationEnable"
 private let kMoveCursorAfterSelectingCandidate = "MoveCursorAfterSelectingCandidate"
 private let kEscToCleanInputBuffer = "EscToCleanInputBuffer"
+private let kSpecifyTabKeyBehavior = "SpecifyTabKeyBehavior"
 private let kUseSCPCTypingMode = "UseSCPCTypingMode"
 private let kMaxCandidateLength = "MaxCandidateLength"
 private let kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
@@ -213,16 +212,14 @@ struct ComposingBufferSize {
 // MARK: -
 @objc public class Preferences: NSObject {
     static var allKeys:[String] {
-        [kKeyboardLayoutPreference,
+        [kIsDebugModeEnabled,
+         kKeyboardLayoutPreference,
          kBasisKeyboardLayoutPreference,
          kFunctionKeyKeyboardLayoutPreference,
          kFunctionKeyKeyboardLayoutOverrideIncludeShift,
          kCandidateListTextSize,
          kAppleLanguagesPreferences,
          kShouldAutoReloadUserDataFiles,
-         kShouldAutoSortUserPhrasesAndExclListOnLoad,
-         kShouldAutoSortPhraseReplacementMapOnLoad,
-         kShouldAutoSortAssociatedPhrasesOnLoad,
          kSelectPhraseAfterCursorAsCandidatePreference,
          kUseHorizontalCandidateListPreference,
          kComposingBufferSizePreference,
@@ -231,6 +228,7 @@ struct ComposingBufferSize {
          kChineseConversionEnabled,
          kShiftJISShinjitaiOutputEnabled,
          kHalfWidthPunctuationEnabled,
+         kSpecifyTabKeyBehavior,
          kEscToCleanInputBuffer,
          kCandidateTextFontName,
          kCandidateKeyLabelFontName,
@@ -248,11 +246,16 @@ struct ComposingBufferSize {
     @objc public static func setMissingDefaults () {
         // 既然 Preferences Module 的預設屬性不自動寫入 plist、而且還是 private，那這邊就先寫入了。
 
+        // 首次啟用輸入法時不要啟用偵錯模式。
+        if UserDefaults.standard.object(forKey: kIsDebugModeEnabled) == nil {
+            UserDefaults.standard.set(Preferences.isDebugModeEnabled, forKey: kIsDebugModeEnabled)
+        }
+
         // 首次啟用輸入法時設定不要自動更新，免得在某些要隔絕外部網路連線的保密機構內觸犯資安規則。
         if UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) == nil {
             UserDefaults.standard.set(false, forKey: kCheckUpdateAutomatically)
         }
-        
+
         // 預設選字窗字詞文字尺寸，設成 18 剛剛好
         if UserDefaults.standard.object(forKey: kCandidateListTextSize) == nil {
             UserDefaults.standard.set(Preferences.candidateListTextSize, forKey: kCandidateListTextSize)
@@ -263,24 +266,14 @@ struct ComposingBufferSize {
             UserDefaults.standard.set(Preferences.chooseCandidateUsingSpace, forKey: kChooseCandidateUsingSpace)
         }
         
-        // 在檔案載入時，預設不啟用使用者自訂語彙表與語彙排除表的內容排序。
+        // 自動檢測使用者自訂語彙數據的變動並載入。
         if UserDefaults.standard.object(forKey: kShouldAutoReloadUserDataFiles) == nil {
             UserDefaults.standard.set(Preferences.shouldAutoReloadUserDataFiles, forKey: kShouldAutoReloadUserDataFiles)
         }
         
-        // 在檔案載入時，預設不啟用語彙置換表的內容排序。
-        if UserDefaults.standard.object(forKey: kShouldAutoSortUserPhrasesAndExclListOnLoad) == nil {
-            UserDefaults.standard.set(Preferences.shouldAutoSortUserPhrasesAndExclListOnLoad, forKey: kShouldAutoSortUserPhrasesAndExclListOnLoad)
-        }
-        
-        // 在檔案載入時，預設不啟用自訂聯想詞表的內容排序。
-        if UserDefaults.standard.object(forKey: kShouldAutoSortAssociatedPhrasesOnLoad) == nil {
-            UserDefaults.standard.set(Preferences.shouldAutoSortAssociatedPhrasesOnLoad, forKey: kShouldAutoSortAssociatedPhrasesOnLoad)
-        }
-        
-        // 自動檢測使用者自訂語彙數據的變動並載入。
-        if UserDefaults.standard.object(forKey: kShouldAutoSortPhraseReplacementMapOnLoad) == nil {
-            UserDefaults.standard.set(Preferences.shouldAutoSortPhraseReplacementMapOnLoad, forKey: kShouldAutoSortPhraseReplacementMapOnLoad)
+        // 預設情況下讓 Tab 鍵在選字窗內切換候選字、而不是用來換頁。
+        if UserDefaults.standard.object(forKey: kSpecifyTabKeyBehavior) == nil {
+            UserDefaults.standard.set(Preferences.specifyTabKeyBehavior, forKey: kSpecifyTabKeyBehavior)
         }
         
         // 預設禁用逐字選字模式（就是每個字都要選的那種），所以設成 false
@@ -336,6 +329,9 @@ struct ComposingBufferSize {
         UserDefaults.standard.synchronize()
     }
 
+    @UserDefault(key: kIsDebugModeEnabled, defaultValue: false)
+    @objc static var isDebugModeEnabled: Bool
+
     @UserDefault(key: kAppleLanguagesPreferences, defaultValue: [])
     @objc static var appleLanguages: Array<String>
 
@@ -360,15 +356,6 @@ struct ComposingBufferSize {
     
     @UserDefault(key: kShouldAutoReloadUserDataFiles, defaultValue: true)
     @objc static var shouldAutoReloadUserDataFiles: Bool
-
-    @UserDefault(key: kShouldAutoSortUserPhrasesAndExclListOnLoad, defaultValue: false)
-    @objc static var shouldAutoSortUserPhrasesAndExclListOnLoad: Bool
-
-    @UserDefault(key: kShouldAutoSortPhraseReplacementMapOnLoad, defaultValue: false)
-    @objc static var shouldAutoSortPhraseReplacementMapOnLoad: Bool
-
-    @UserDefault(key: kShouldAutoSortAssociatedPhrasesOnLoad, defaultValue: false)
-    @objc static var shouldAutoSortAssociatedPhrasesOnLoad: Bool
 
     @UserDefault(key: kSelectPhraseAfterCursorAsCandidatePreference, defaultValue: true)
     @objc static var selectPhraseAfterCursorAsCandidate: Bool
@@ -448,7 +435,10 @@ struct ComposingBufferSize {
     @UserDefault(key: kEscToCleanInputBuffer, defaultValue: true)
     @objc static var escToCleanInputBuffer: Bool
 
-    // MARK: Optional settings
+    @UserDefault(key: kSpecifyTabKeyBehavior, defaultValue: false)
+    @objc static var specifyTabKeyBehavior: Bool
+
+    // MARK: - Optional settings
     @UserDefault(key: kCandidateTextFontName, defaultValue: nil)
     @objc static var candidateTextFontName: String?
 

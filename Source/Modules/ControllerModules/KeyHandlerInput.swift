@@ -19,8 +19,11 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 import Cocoa
 
+// KeyCodes: https://eastmanreference.com/complete-list-of-applescript-key-codes
 enum KeyCode: UInt16 {
     case none = 0
+    case esc = 53
+    case tab = 48
     case enter = 76
     case up = 126
     case down = 125
@@ -33,6 +36,7 @@ enum KeyCode: UInt16 {
     case delete = 117
 }
 
+// CharCodes: https://theasciicode.com.ar/ascii-control-characters/horizontal-tab-ascii-code-9.html
 enum CharCode: UInt16 {
     case space = 32
     case backSpace = 8
@@ -141,12 +145,12 @@ class KeyHandlerInput: NSObject {
         return code.rawValue != KeyCode.none.rawValue
     }
 
-    @objc var isEnter: Bool {
-        KeyCode(rawValue: keyCode) == KeyCode.enter
+    @objc var isTab: Bool {
+        KeyCode(rawValue: keyCode) == KeyCode.tab
     }
 
-    @objc var isEnterCharCode: Bool {
-        CharCode(rawValue: charCode) == CharCode.enter
+    @objc var isEnter: Bool {
+        (CharCode(rawValue: charCode) == CharCode.enter) || (KeyCode(rawValue: keyCode) == KeyCode.enter)
     }
 
     @objc var isUp: Bool {
@@ -182,7 +186,7 @@ class KeyHandlerInput: NSObject {
     }
 
     @objc var isESC: Bool {
-        CharCode(rawValue: charCode) == CharCode.esc
+        (CharCode(rawValue: charCode) == CharCode.esc) || (KeyCode(rawValue: keyCode) == KeyCode.esc)
     }
 
     @objc var isHome: Bool {
