@@ -261,40 +261,18 @@ public class VerticalCandidateController: CandidateController {
     }
 
     public override func showNextPage() -> Bool {
-        guard delegate != nil else {
-            return false
-        }
-
-        if pageCount == 1 {
-            return highlightNextCandidate()
-        }
-
-        if currentPage + 1 >= pageCount {
-            currentPage = 0
-        } else {
-            currentPage += 1
-        }
-
+        guard delegate != nil else {return false}
+        if pageCount == 1 {return highlightNextCandidate()}
+        currentPage = (currentPage + 1 >= pageCount) ? 0 : currentPage + 1
         candidateView.highlightedIndex = 0
         layoutCandidateView()
         return true
     }
 
     public override func showPreviousPage() -> Bool {
-        guard delegate != nil else {
-            return false
-        }
-
-        if pageCount == 1 {
-            return highlightPreviousCandidate()
-        }
-
-        if currentPage == 0 {
-            currentPage = pageCount - 1
-        } else {
-            currentPage -= 1
-        }
-
+        guard delegate != nil else {return false}
+        if pageCount == 1 {return highlightPreviousCandidate()}
+        currentPage = (currentPage == 0) ? pageCount - 1 : currentPage - 1
         candidateView.highlightedIndex = 0
         layoutCandidateView()
         return true
