@@ -24,7 +24,7 @@
 "\"%@\" length must ≥ 2 for a user phrase." = "「%@」字數不足以自訂語彙。";
 "\"%@\" length should ≤ %d for a user phrase." = "「%@」字數超過 %d、無法自訂。";
 "\"%@\" selected. ENTER to add user phrase." = "「%@」敲 Enter 添入自訂語彙。";
-"\"%@\" already exists, ENTER to boost its priority." = "「%@」已存在，敲 ENTER 以提升其權重。";
+"\"%@\" already exists, ENTER to override its priority." = "「%@」已存在，敲 ENTER 以覆寫其權重。";
 "Edit Phrase Replacement Table…" = "編輯語彙置換表…";
 "Use Phrase Replacement" = "使用語彙置換";
 "Candidates keys cannot be empty." = "您必須指定選字鍵。";

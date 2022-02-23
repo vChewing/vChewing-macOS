@@ -39,6 +39,7 @@ extern InputMode imeModeNULL;
 
 @interface KeyHandler : NSObject
 
+- (BOOL)isBuilderEmpty;
 - (BOOL)handleInput:(KeyHandlerInput *)input
               state:(InputState *)state
       stateCallback:(void (^)(InputState *))stateCallback
