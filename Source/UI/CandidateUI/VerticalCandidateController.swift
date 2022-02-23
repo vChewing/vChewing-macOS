@@ -265,6 +265,10 @@ public class VerticalCandidateController: CandidateController {
             return false
         }
 
+        if pageCount == 1 {
+            return highlightNextCandidate()
+        }
+
         if currentPage + 1 >= pageCount {
             currentPage = 0
         } else {
@@ -279,6 +283,10 @@ public class VerticalCandidateController: CandidateController {
     public override func showPreviousPage() -> Bool {
         guard delegate != nil else {
             return false
+        }
+
+        if pageCount == 1 {
+            return highlightPreviousCandidate()
         }
 
         if currentPage == 0 {
