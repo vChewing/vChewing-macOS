@@ -273,29 +273,14 @@ public class HorizontalCandidateController: CandidateController {
     }
 
     public override func highlightNextCandidate() -> Bool {
-        guard let delegate = delegate else {
-            return false
-        }
-
-        let currentIndex = selectedCandidateIndex
-        if currentIndex + 1 >= delegate.candidateCountForController(self) {
-            return false
-        }
-        selectedCandidateIndex = currentIndex + 1
+        guard let delegate = delegate else {return false}
+        selectedCandidateIndex = (selectedCandidateIndex + 1 >= delegate.candidateCountForController(self)) ? 0 : selectedCandidateIndex + 1
         return true
     }
 
     public override func highlightPreviousCandidate() -> Bool {
-        guard delegate != nil else {
-            return false
-        }
-
-        let currentIndex = selectedCandidateIndex
-        if currentIndex == 0 {
-            return false
-        }
-
-        selectedCandidateIndex = currentIndex - 1
+        guard let delegate = delegate else {return false}
+        selectedCandidateIndex = (selectedCandidateIndex == 0) ? delegate.candidateCountForController(self) - 1 : selectedCandidateIndex - 1
         return true
     }
 
