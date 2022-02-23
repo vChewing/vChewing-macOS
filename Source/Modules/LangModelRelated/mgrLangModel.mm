@@ -266,7 +266,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     [writeFile closeFile];
 
     // We enforce the format consolidation here, since the pragma header will let the UserPhraseLM bypasses the consolidating process on load.
-    vChewing::LMConsolidator::ConsolidateContent([path UTF8String], Preferences.shouldAutoSortUserPhrasesAndExclListOnLoad, false);
+    vChewing::LMConsolidator::ConsolidateContent([path UTF8String], false);
 
     //  We use FSEventStream to monitor the change of the user phrase folder,
     //  so we don't have to load data here unless FSEventStream is disabled by user.

@@ -134,9 +134,6 @@
 /* Class = "NSMenuItem"; title = "Auto-Select"; ObjectID = "GlJ-Ns-9eE"; */
 "GlJ-Ns-9eE.title" = "Auto-Select";
 
-/* Class = "NSButtonCell"; title = "Sort entries when reloading user phrases and excluded phrases list"; ObjectID = "Li3-Yg-SOC"; */
-"Li3-Yg-SOC.title" = "Sort entries when reloading user phrases and excluded phrases list";
-
 /* Class = "NSTabViewItem"; label = "General"; ObjectID = "QUQ-oY-4Hc"; */
 "QUQ-oY-4Hc.label" = "General";
 
@@ -187,9 +184,6 @@
 
 /* Class = "NSComboBoxCell"; jQC-12-UuK.ibShadowedObjectValues[2] = "Item 3"; ObjectID = "jQC-12-UuK"; */
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
-
-/* Class = "NSButtonCell"; title = "Sort entries when reloading the phrase replacement map"; ObjectID = "o60-vW-i1B"; */
-"o60-vW-i1B.title" = "Sort entries when reloading the phrase replacement map";
 
 /* Class = "NSMenuItem"; title = "Japanese"; ObjectID = "rVQ-Hx-cGi"; */
 "rVQ-Hx-cGi.title" = "Japanese";
