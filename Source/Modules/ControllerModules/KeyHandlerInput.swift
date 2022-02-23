@@ -144,11 +144,7 @@ class KeyHandlerInput: NSObject {
     }
 
     @objc var isEnter: Bool {
-        KeyCode(rawValue: keyCode) == KeyCode.enter
-    }
-
-    @objc var isEnterCharCode: Bool {
-        CharCode(rawValue: charCode) == CharCode.enter
+        (CharCode(rawValue: charCode) == CharCode.enter) || (KeyCode(rawValue: keyCode) == KeyCode.enter)
     }
 
     @objc var isUp: Bool {
