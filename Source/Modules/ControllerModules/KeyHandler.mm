@@ -1024,6 +1024,20 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return YES;
     }
 
+    if ([input isTab]) {
+        BOOL updated =
+            Preferences.specifyTabKeyBehavior?
+                ([input isShiftHold] ? [gCurrentCandidateController showPreviousPage] : [gCurrentCandidateController showNextPage])
+            :
+                ([input isShiftHold] ? [gCurrentCandidateController highlightPreviousCandidate] : [gCurrentCandidateController highlightNextCandidate])
+        ;
+        if (!updated) {
+            [self errorCallbackConsolePrint:@"9B691919"];
+            errorCallback();
+        }
+        return YES;
+    }
+
     if ([input isSpace] || [input isPageDown] || input.emacsKey == vChewingEmacsKeyNextPage) {
         BOOL updated = [gCurrentCandidateController showNextPage];
         if (!updated) {
