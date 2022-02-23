@@ -38,6 +38,7 @@ private let kShiftJISShinjitaiOutputEnabled = "ShiftJISShinjitaiOutputEnabled"
 private let kHalfWidthPunctuationEnabled = "HalfWidthPunctuationEnable"
 private let kMoveCursorAfterSelectingCandidate = "MoveCursorAfterSelectingCandidate"
 private let kEscToCleanInputBuffer = "EscToCleanInputBuffer"
+private let kSpecifyTabKeyBehavior = "SpecifyTabKeyBehavior"
 private let kUseSCPCTypingMode = "UseSCPCTypingMode"
 private let kMaxCandidateLength = "MaxCandidateLength"
 private let kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
@@ -227,6 +228,7 @@ struct ComposingBufferSize {
          kChineseConversionEnabled,
          kShiftJISShinjitaiOutputEnabled,
          kHalfWidthPunctuationEnabled,
+         kSpecifyTabKeyBehavior,
          kEscToCleanInputBuffer,
          kCandidateTextFontName,
          kCandidateKeyLabelFontName,
@@ -267,6 +269,11 @@ struct ComposingBufferSize {
         // 自動檢測使用者自訂語彙數據的變動並載入。
         if UserDefaults.standard.object(forKey: kShouldAutoReloadUserDataFiles) == nil {
             UserDefaults.standard.set(Preferences.shouldAutoReloadUserDataFiles, forKey: kShouldAutoReloadUserDataFiles)
+        }
+        
+        // 預設情況下讓 Tab 鍵在選字窗內切換候選字、而不是用來換頁。
+        if UserDefaults.standard.object(forKey: kSpecifyTabKeyBehavior) == nil {
+            UserDefaults.standard.set(Preferences.specifyTabKeyBehavior, forKey: kSpecifyTabKeyBehavior)
         }
         
         // 預設禁用逐字選字模式（就是每個字都要選的那種），所以設成 false
@@ -428,7 +435,10 @@ struct ComposingBufferSize {
     @UserDefault(key: kEscToCleanInputBuffer, defaultValue: true)
     @objc static var escToCleanInputBuffer: Bool
 
-    // MARK: Optional settings
+    @UserDefault(key: kSpecifyTabKeyBehavior, defaultValue: false)
+    @objc static var specifyTabKeyBehavior: Bool
+
+    // MARK: - Optional settings
     @UserDefault(key: kCandidateTextFontName, defaultValue: nil)
     @objc static var candidateTextFontName: String?
 

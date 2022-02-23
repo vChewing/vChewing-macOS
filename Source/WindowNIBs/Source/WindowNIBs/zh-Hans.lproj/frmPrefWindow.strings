@@ -173,9 +173,6 @@
 /* Class = "NSTextFieldCell"; title = "Change UI font size of candidate window for a better visual clarity."; ObjectID = "iRg-wx-Nx2"; */
 "iRg-wx-Nx2.title" = "变更候选字窗的字型大小。";
 
-/* Class = "NSTextFieldCell"; title = "Define your preferred action when user data files reload."; ObjectID = "j48-5a-cEs"; */
-"j48-5a-cEs.title" = "请指定在使用者资料重载时要启用的功能。";
-
 /* Class = "NSComboBoxCell"; jQC-12-UuK.ibShadowedObjectValues[0] = "Item 1"; ObjectID = "jQC-12-UuK"; */
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
 
