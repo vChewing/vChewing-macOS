@@ -71,8 +71,8 @@ bool LMConsolidator::FixEOF(const char *path)
 } // END: EOF FIXER.
 
 // CONTENT CONSOLIDATOR. CREDIT: Shiki Suen.
-bool LMConsolidator::ConsolidateContent(const char *path, bool shouldsort, bool shouldCheckPragma) {
-    if (LMConsolidator::CheckPragma(path) && !shouldsort && shouldCheckPragma){
+bool LMConsolidator::ConsolidateContent(const char *path, bool shouldCheckPragma) {
+    if (LMConsolidator::CheckPragma(path) && shouldCheckPragma){
         return true;
     }
 
@@ -97,8 +97,7 @@ bool LMConsolidator::ConsolidateContent(const char *path, bool shouldsort, bool 
             vecEntry[i] = regex_replace(vecEntry[i], sedTrailingSpace, "").c_str(); // 去掉行尾空格。
         }
     }
-    // 在第二遍 for 運算之前，針對 vecEntry 排序＋去除重複條目。
-    if (shouldsort) {sort(vecEntry.begin(), vecEntry.end());} // 要不要排序，得做成開關。
+    // 在第二遍 for 運算之前，針對 vecEntry 去除重複條目。
     vecEntry.erase(unique(vecEntry.begin(), vecEntry.end()), vecEntry.end()); // 去重複。
     // 統整完畢。開始將統整過的內容寫入檔案。
     ofstream zfdContentConsolidatorOutput(path); // 這裡是要從頭開始重寫檔案內容，所以不需要「 ios_base::app 」。
