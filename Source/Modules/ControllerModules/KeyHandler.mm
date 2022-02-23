@@ -263,7 +263,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     // Caps Lock processing : if Caps Lock is on, temporarily disable bopomofo.
-    if ([input isBackSpace] || [input isEnterCharCode] || [input isEnter] || [input isAbsorbedArrowKey] || [input isExtraChooseCandidateKey] || [input isExtraChooseCandidateKeyReverse] || [input isCursorForward] || [input isCursorBackward]) {
+    if ([input isBackSpace] || [input isEnter] || [input isAbsorbedArrowKey] || [input isExtraChooseCandidateKey] || [input isExtraChooseCandidateKeyReverse] || [input isCursorForward] || [input isCursorBackward]) {
         // do nothing if backspace is pressed -- we ignore the key
     } else if ([input isCapsLockOn]) {
         // process all possible combination, we hope.
@@ -347,7 +347,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     // see if we have composition if Enter/Space is hit and buffer is not empty
     // this is bit-OR'ed so that the tone marker key is also taken into account
-    composeReading |= (!_bpmfReadingBuffer->isEmpty() && ([input isSpace] || [input isEnterCharCode] || [input isEnter]));
+    composeReading |= (!_bpmfReadingBuffer->isEmpty() && ([input isSpace] || [input isEnter]));
     if (composeReading) {
         // combine the reading
         std::string reading = _bpmfReadingBuffer->syllable().composedString();
@@ -506,7 +506,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     // MARK: Enter
-    if ([input isEnter] || [input isEnterCharCode]) {
+    if ([input isEnter]) {
         if ([input isControlHold]) {
             if (ctlInputMethod.areWeUsingOurOwnPhraseEditor) {
                 return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
@@ -918,7 +918,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     // Enter
-    if ([input isEnter] || [input isEnterCharCode]) {
+    if ([input isEnter]) {
         if (![self.delegate keyHandler:self didRequestWriteUserPhraseWithState:state]) {
             [self errorCallbackConsolePrint:@"5B69CC8D"];
             errorCallback();
@@ -1013,7 +1013,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return YES;
     }
 
-    if ([input isEnterCharCode] || [input isEnter]) {
+    if ([input isEnter]) {
         if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
