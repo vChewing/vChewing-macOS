@@ -419,7 +419,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if (_bpmfReadingBuffer->isEmpty() &&
         [state isKindOfClass:[InputStateNotEmpty class]] &&
         ([input isExtraChooseCandidateKey] || [input isExtraChooseCandidateKeyReverse]
-         || [input isSpace] || [input isPageDown] || [input isPageUp]
+         || [input isSpace] || [input isPageDown] || [input isPageUp] || [input isTab]
          || (input.useVerticalMode && ([input isVerticalModeOnlyChooseCandidateKey])))) {
         if ([input isSpace]) {
             // if the spacebar is NOT set to be a selection key
