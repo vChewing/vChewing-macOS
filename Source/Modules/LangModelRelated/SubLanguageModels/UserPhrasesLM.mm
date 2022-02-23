@@ -60,7 +60,7 @@ bool UserPhrasesLM::open(const char *path)
     }
 
     LMConsolidator::FixEOF(path);
-    LMConsolidator::ConsolidateContent(path, Preferences.shouldAutoSortUserPhrasesAndExclListOnLoad, true);
+    LMConsolidator::ConsolidateContent(path, true);
 
     fd = ::open(path, O_RDONLY);
     if (fd == -1) {
