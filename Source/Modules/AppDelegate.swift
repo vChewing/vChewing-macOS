@@ -24,6 +24,7 @@ private let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
 private let kNextUpdateCheckDateKey = "NextUpdateCheckDate"
 private let kUpdateInfoEndpointKey = "UpdateInfoEndpoint"
 private let kUpdateInfoSiteKey = "UpdateInfoSite"
+private let kVersionDescription = "VersionDescription"
 private let kNextCheckInterval: TimeInterval = 86400.0
 private let kTimeoutInterval: TimeInterval = 60.0
 
@@ -93,21 +94,23 @@ struct VersionUpdateApi {
                     DispatchQueue.main.async {
                         forced ? callback(.success(.noNeedToUpdate)) : callback(.success(.ignored))
                     }
+                    IME.prtDebugIntel("vChewingDebug: Update // Order is not Ascending, assuming that there's no new version available.")
                     return
                 }
-
+                IME.prtDebugIntel("vChewingDebug: Update // New version detected, proceeding to the next phase.")
                 guard let siteInfoURLString = plist[kUpdateInfoSiteKey] as? String,
                       let siteInfoURL = URL(string: siteInfoURLString)
                         else {
                     DispatchQueue.main.async {
                         forced ? callback(.success(.noNeedToUpdate)) : callback(.success(.ignored))
                     }
+                    IME.prtDebugIntel("vChewingDebug: Update // Failed from retrieving / parsing URL intel.")
                     return
                 }
-
+                IME.prtDebugIntel("vChewingDebug: Update // URL intel retrieved, proceeding to the next phase.")
                 var report = VersionUpdateReport(siteUrl: siteInfoURL)
                 var versionDescription = ""
-                let versionDescriptions = plist["Description"] as? [AnyHashable: Any]
+                let versionDescriptions = plist[kVersionDescription] as? [AnyHashable: Any]
                 if let versionDescriptions = versionDescriptions {
                     var locale = "en"
                     let supportedLocales = ["en", "zh-Hant", "zh-Hans", "ja"]
@@ -128,6 +131,7 @@ struct VersionUpdateApi {
                 DispatchQueue.main.async {
                     callback(.success(.shouldUpdate(report: report)))
                 }
+                IME.prtDebugIntel("vChewingDebug: Update // Callbck Complete.")
             } catch {
                 DispatchQueue.main.async {
                     forced ? callback(.success(.noNeedToUpdate)) : callback(.success(.ignored))
@@ -248,6 +252,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
                             report.remoteShortVersion,
                             report.remoteVersion,
                             report.versionDescription)
+                    IME.prtDebugIntel("vChewingDebug: \(content)")
                     ctlNonModalAlertWindow.shared.show(title: NSLocalizedString("New Version Available", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("Visit Website", comment: ""), cancelButtonTitle: NSLocalizedString("Not Now", comment: ""), cancelAsDefault: false, delegate: self)
                 case .noNeedToUpdate, .ignored:
                     break
@@ -258,6 +263,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
                     let title = NSLocalizedString("Update Check Failed", comment: "")
                     let content = String(format: NSLocalizedString("There may be no internet connection or the server failed to respond.\n\nError message: %@", comment: ""), message)
                     let buttonTitle = NSLocalizedString("Dismiss", comment: "")
+                    IME.prtDebugIntel("vChewingDebug: \(content)")
                     ctlNonModalAlertWindow.shared.show(title: title, content: content, confirmButtonTitle: buttonTitle, cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
                 default:
                     break
@@ -276,10 +282,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
     func ctlNonModalAlertWindowDidCancel(_ controller: ctlNonModalAlertWindow) {
         updateNextStepURL = nil
     }
-    
+
     // New About Window
     @IBAction func about(_ sender: Any) {
         (NSApp.delegate as? AppDelegate)?.showAbout()
         NSApplication.shared.activate(ignoringOtherApps: true)
+    }
+}
+
+@objc public class IME: NSObject {
+    // Print debug information to the console.
+    @objc static func prtDebugIntel(_ strPrint: String) {
+        if Preferences.isDebugModeEnabled {
+            NSLog("vChewingErrorCallback: %@", strPrint)
+        }
     }
 }
