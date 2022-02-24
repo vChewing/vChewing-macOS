@@ -125,6 +125,9 @@ const std::vector<Taiyan::Gramambular::Unigram> LMInstantiator::unigramsForKey(c
 
     if (m_userPhrases.hasUnigramsForKey(key)) {
         std::vector<Taiyan::Gramambular::Unigram> rawUserUnigrams = m_userPhrases.unigramsForKey(key);
+        // 用這句指令讓使用者語彙檔案內的詞條優先順序隨著行數增加而逐漸增高。
+        // 這樣一來就可以在就地新增語彙時徹底複寫優先權。
+        std::reverse(rawUserUnigrams.begin(), rawUserUnigrams.end());
         userUnigrams = filterAndTransformUnigrams(rawUserUnigrams, excludedValues, insertedValues);
     }
 
