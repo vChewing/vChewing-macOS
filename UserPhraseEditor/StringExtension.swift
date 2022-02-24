@@ -491,15 +491,16 @@ extension String {
         // Step 4: Deduplication.
         arrData = strProcessed.components(separatedBy: "\n")
         strProcessed = "" // Reset its value
-        let arrDataDeduplicated = Array(NSOrderedSet(array: arrData).array as! [String])
-        for lineData in arrDataDeduplicated {
+        // 下面兩行的 reversed 是首尾顛倒，免得破壞最新的 override 資訊。
+        let arrDataDeduplicated = Array(NSOrderedSet(array: arrData.reversed()).array as! [String])
+        for lineData in arrDataDeduplicated.reversed() {
             strProcessed += lineData
             strProcessed += "\n"
         }
         
         // Step 5: Remove duplicated newlines at the end of the file.
         strProcessed.regReplace(pattern: "\\n\\n", replaceWith: "\n")
-
+        
         // Step 6: Commit Formatted Contents.
         self = strProcessed
     }
