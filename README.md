@@ -1,7 +1,7 @@
-因不可控原因，该仓库只能保证在 GitLab China 有最新的内容可用：
+因不可控原因，该仓库只能保证在 Gitee 有最新的内容可用：
 
-- 下载：https://jihulab.com/vChewing/vChewing-macOS/-/releases
-- 程式码仓库：https://jihulab.com/vChewing/vChewing-macOS
+- 下载：https://gitee.com/vchewing/vChewing-macOS/releases
+- 程式码仓库：https://gitee.com/vchewing/vChewing-macOS
 
 # vChewing 威注音输入法
 
