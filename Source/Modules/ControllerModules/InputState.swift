@@ -184,7 +184,7 @@ class InputState: NSObject {
             let joined = selectedReadings.joined(separator: "-")
             let exist = mgrLangModel.checkIfUserPhraseExist(userPhrase: text, mode: ctlInputMethod.currentKeyHandler.inputMode, key: joined)
             if exist {
-                return String(format: NSLocalizedString("\"%@\" already exists, ENTER to override its priority.", comment: ""), text)
+                return String(format: NSLocalizedString("\"%@\" already exists, ENTER to boost its priority.", comment: ""), text)
             }
 
             return String(format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: ""), text)
