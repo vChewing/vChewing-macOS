@@ -124,9 +124,9 @@
 	<key>TISParticipatesInTouchBar</key>
 	<false/>
 	<key>UpdateInfoEndpoint</key>
-	<string>https://jihulab.com/vChewing/vChewing-macOS/-/raw/main/Update-Info.plist</string>
+	<string>https://gitee.com/vchewing/vChewing-macOS/raw/main/Update-Info.plist</string>
 	<key>UpdateInfoSite</key>
-	<string>https://jihulab.com/vChewing/vChewing-macOS</string>
+	<string>https://gitee.com/vchewing/vChewing-macOS</string>
 	<key>tsInputMethodCharacterRepertoireKey</key>
 	<array>
 		<string>Hans</string>
