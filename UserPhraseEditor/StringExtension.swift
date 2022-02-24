@@ -499,7 +499,7 @@ extension String {
         }
         
         // Step 5: Remove duplicated newlines at the end of the file.
-        strProcessed.regReplace(pattern: "\\n\\n", replaceWith: "\n")
+        strProcessed.regReplace(pattern: "\\n+", replaceWith: "\n")
         
         // Step 6: Commit Formatted Contents.
         self = strProcessed
