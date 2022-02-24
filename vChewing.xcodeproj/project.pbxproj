@@ -163,6 +163,7 @@
 		5B05A47C27AFF7CF00437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5B05A47F27AFF84200437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmAboutWindow.strings; sourceTree = "<group>"; };
 		5B0AF8B427B2C8290096FE54 /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
+		5B0C5EDF27C7D9870078037C /* dataCompiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dataCompiler.swift; sourceTree = "<group>"; };
 		5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleKeyboardConverter.swift; sourceTree = "<group>"; };
 		5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHS.txt"; sourceTree = "<group>"; };
 		5B18BA7027C7BD8B0056EB19 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
@@ -343,6 +344,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5B0C5EDE27C7D94C0078037C /* DataCompiler */ = {
+			isa = PBXGroup;
+			children = (
+				5B0C5EDF27C7D9870078037C /* dataCompiler.swift */,
+			);
+			path = DataCompiler;
+			sourceTree = "<group>";
+		};
 		5B18BA7527C7BF6D0056EB19 /* MiscRootFiles */ = {
 			isa = PBXGroup;
 			children = (
@@ -663,6 +672,7 @@
 			children = (
 				5BBD627827B6C4D900271480 /* Update-Info.plist */,
 				5B18BA7027C7BD8B0056EB19 /* Makefile */,
+				5B0C5EDE27C7D94C0078037C /* DataCompiler */,
 				6ACA41E715FC1D9000935EF6 /* Installer */,
 				6A0D4EC215FC0D3C00ABF4B3 /* Source */,
 				5BD05BB927B2A429004C4F1D /* UserPhraseEditor */,
