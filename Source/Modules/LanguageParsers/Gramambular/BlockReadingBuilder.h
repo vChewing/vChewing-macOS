@@ -57,8 +57,8 @@ protected:
                                   std::vector<std::string>::const_iterator end,
                                   const std::string& separator);
     
-    // 最多使用六個字組成一個詞
-    static const size_t MaximumBuildSpanLength = 6;
+    // 規定最多可以組成的詞的字數上限為 10
+    static const size_t MaximumBuildSpanLength = 10;
     
     size_t m_cursorIndex;
     std::vector<std::string> m_readings;
