@@ -11,6 +11,8 @@
 		5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */; };
 		5B2DB16F27AF6891006D874E /* data-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16D27AF6891006D874E /* data-chs.txt */; };
 		5B2DB17027AF6891006D874E /* data-cht.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16E27AF6891006D874E /* data-cht.txt */; };
+		5B4D47C127C9304000220DDC /* data-zhuyinwen.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B4D47BD27C9304000220DDC /* data-zhuyinwen.txt */; };
+		5B4D47C227C9304000220DDC /* data-symbols.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B4D47BE27C9304000220DDC /* data-symbols.txt */; };
 		5B62A31727AE73A700A19448 /* unzip.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A30927AE73A700A19448 /* unzip.m */; };
 		5B62A31827AE73A700A19448 /* zip.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A30A27AE73A700A19448 /* zip.m */; };
 		5B62A31927AE73A700A19448 /* ioapi.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A30B27AE73A700A19448 /* ioapi.m */; };
@@ -174,6 +176,8 @@
 		5B2DB16E27AF6891006D874E /* data-cht.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-cht.txt"; path = "Data/data-cht.txt"; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
+		5B4D47BD27C9304000220DDC /* data-zhuyinwen.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-zhuyinwen.txt"; path = "../../libvchewing-data/components/common/data-zhuyinwen.txt"; sourceTree = "<group>"; };
+		5B4D47BE27C9304000220DDC /* data-symbols.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-symbols.txt"; path = "../../libvchewing-data/components/common/data-symbols.txt"; sourceTree = "<group>"; };
 		5B62A30927AE73A700A19448 /* unzip.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = unzip.m; sourceTree = "<group>"; };
 		5B62A30A27AE73A700A19448 /* zip.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = zip.m; sourceTree = "<group>"; };
 		5B62A30B27AE73A700A19448 /* ioapi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ioapi.m; sourceTree = "<group>"; };
@@ -206,6 +210,7 @@
 		5B73FB5F27B2BE1300E9BF49 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5B7BC4AF27AFFBE800F66C24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Source/WindowNIBs/Base.lproj/frmPrefWindow.xib; sourceTree = "<group>"; };
 		5B7BC4B227AFFC0B00F66C24 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Source/WindowNIBs/en.lproj/frmPrefWindow.strings; sourceTree = "<group>"; };
+		5B8F43ED27C9BC220069AC27 /* SymbolLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SymbolLM.h; sourceTree = "<group>"; };
 		5BBBB75D27AED54C0023B93A /* Beep.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.m4a; sourceTree = "<group>"; };
 		5BBBB75E27AED54C0023B93A /* Fart.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.m4a; sourceTree = "<group>"; };
 		5BBBB76627AED5DB0023B93A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmNonModalAlertWindow.xib; sourceTree = "<group>"; };
@@ -365,6 +370,7 @@
 		5B4D47B627C9186900220DDC /* InstantiatedModels */ = {
 			isa = PBXGroup;
 			children = (
+				5B8F43ED27C9BC220069AC27 /* SymbolLM.h */,
 				5B62A32B27AE78B000A19448 /* CNSLM.h */,
 			);
 			path = InstantiatedModels;
@@ -596,6 +602,8 @@
 				5BD05B8027B22F3C004C4F1D /* char-kanji-cns.txt */,
 				5B2DB16D27AF6891006D874E /* data-chs.txt */,
 				5B2DB16E27AF6891006D874E /* data-cht.txt */,
+				5B4D47BE27C9304000220DDC /* data-symbols.txt */,
+				5B4D47BD27C9304000220DDC /* data-zhuyinwen.txt */,
 				5B2DB17127AF8771006D874E /* Makefile */,
 			);
 			name = Data;
@@ -962,6 +970,7 @@
 				D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */,
 				5BDCBB2E27B4E67A00D0CC59 /* vChewingPhraseEditor.app in Resources */,
 				5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */,
+				5B4D47C227C9304000220DDC /* data-symbols.txt in Resources */,
 				6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */,
 				D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */,
 				5BBBB76B27AED5DB0023B93A /* frmNonModalAlertWindow.xib in Resources */,
@@ -969,6 +978,7 @@
 				5BBBB77527AED70B0023B93A /* MenuIcon-SCVIM.png in Resources */,
 				5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */,
 				5BD05B8127B22F3C004C4F1D /* char-kanji-cns.txt in Resources */,
+				5B4D47C127C9304000220DDC /* data-zhuyinwen.txt in Resources */,
 				5B2DB17027AF6891006D874E /* data-cht.txt in Resources */,
 				5BBBB77327AED70B0023B93A /* MenuIcon-TCVIM@2x.png in Resources */,
 				5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.png in Resources */,
