@@ -37,7 +37,15 @@ public:
     bool open(const char *path);
     void close();
     void dump();
-    
+
+    virtual bool allowConsolidation() {
+        return true;
+    }
+
+    virtual float overridedValue() {
+        return 0.0;
+    }
+
     virtual const std::vector<Taiyan::Gramambular::Bigram> bigramsForKeys(const std::string& preceedingKey, const std::string& key);
     virtual const std::vector<Taiyan::Gramambular::Unigram> unigramsForKey(const std::string& key);
     virtual bool hasUnigramsForKey(const std::string& key);

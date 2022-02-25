@@ -59,8 +59,10 @@ bool UserPhrasesLM::open(const char *path)
         return false;
     }
 
-    LMConsolidator::FixEOF(path);
-    LMConsolidator::ConsolidateContent(path, true);
+    if (allowConsolidation()) {
+        LMConsolidator::FixEOF(path);
+        LMConsolidator::ConsolidateContent(path, true);
+    }
 
     fd = ::open(path, O_RDONLY);
     if (fd == -1) {
@@ -134,7 +136,7 @@ const std::vector<Taiyan::Gramambular::Unigram> UserPhrasesLM::unigramsForKey(co
             Taiyan::Gramambular::Unigram g;
             g.keyValue.key = row.key;
             g.keyValue.value = row.value;
-            g.score = 0.0;
+            g.score = overridedValue();
             v.push_back(g);
         }
     }

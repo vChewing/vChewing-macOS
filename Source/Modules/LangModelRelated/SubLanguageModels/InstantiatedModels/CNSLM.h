@@ -24,35 +24,19 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <map>
 #include <iostream>
 #include "LanguageModel.h"
+#include "UserPhrasesLM.h"
 
 namespace vChewing {
 
-class CNSLM : public Taiyan::Gramambular::LanguageModel
+class CNSLM: public UserPhrasesLM
 {
 public:
-    CNSLM();
-    ~CNSLM();
-    
-    bool isLoaded();
-    bool open(const char *path);
-    void close();
-    void dump();
-    
-    virtual const std::vector<Taiyan::Gramambular::Bigram> bigramsForKeys(const std::string& preceedingKey, const std::string& key);
-    virtual const std::vector<Taiyan::Gramambular::Unigram> unigramsForKey(const std::string& key);
-    virtual bool hasUnigramsForKey(const std::string& key);
-    
-protected:
-    struct Row {
-        Row(std::string_view& k, std::string_view& v) : key(k), value(v) {}
-        std::string_view key;
-        std::string_view value;
-    };
-    
-    std::map<std::string_view, std::vector<Row>> keyRowMap;
-    int fd;
-    void *data;
-    size_t length;
+    virtual bool allowConsolidation() override {
+        return false;
+    }
+    virtual float overridedValue() override {
+        return -11.0;
+    }
 };
 
 }
