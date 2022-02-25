@@ -30,6 +30,7 @@ LMInstantiator::LMInstantiator()
 LMInstantiator::~LMInstantiator()
 {
     m_languageModel.close();
+    m_miscModel.close();
     m_userPhrases.close();
     m_cnsModel.close();
     m_excludedPhrases.close();
@@ -61,6 +62,32 @@ void LMInstantiator::loadCNSData(const char* cnsDataPath)
 bool LMInstantiator::isCNSDataLoaded()
 {
     return m_cnsModel.isLoaded();
+}
+
+void LMInstantiator::loadMiscData(const char* miscDataPath)
+{
+    if (miscDataPath) {
+        m_miscModel.close();
+        m_miscModel.open(miscDataPath);
+    }
+}
+
+bool LMInstantiator::isMiscDataLoaded()
+{
+    return m_miscModel.isLoaded();
+}
+
+void LMInstantiator::loadSymbolData(const char* symbolDataPath)
+{
+    if (symbolDataPath) {
+        m_symbolModel.close();
+        m_symbolModel.open(symbolDataPath);
+    }
+}
+
+bool LMInstantiator::isSymbolDataLoaded()
+{
+    return m_symbolModel.isLoaded();
 }
 
 void LMInstantiator::loadUserPhrases(const char* userPhrasesDataPath,
@@ -110,6 +137,8 @@ const std::vector<Taiyan::Gramambular::Unigram> LMInstantiator::unigramsForKey(c
     }
 
     std::vector<Taiyan::Gramambular::Unigram> allUnigrams;
+    std::vector<Taiyan::Gramambular::Unigram> miscUnigrams;
+    std::vector<Taiyan::Gramambular::Unigram> symbolUnigrams;
     std::vector<Taiyan::Gramambular::Unigram> userUnigrams;
     std::vector<Taiyan::Gramambular::Unigram> cnsUnigrams;
 
@@ -136,6 +165,16 @@ const std::vector<Taiyan::Gramambular::Unigram> LMInstantiator::unigramsForKey(c
         allUnigrams = filterAndTransformUnigrams(rawGlobalUnigrams, excludedValues, insertedValues);
     }
 
+    if (m_miscModel.hasUnigramsForKey(key)) {
+        std::vector<Taiyan::Gramambular::Unigram> rawMiscUnigrams = m_miscModel.unigramsForKey(key);
+        miscUnigrams = filterAndTransformUnigrams(rawMiscUnigrams, excludedValues, insertedValues);
+    }
+
+    if (m_symbolModel.hasUnigramsForKey(key)) {
+        std::vector<Taiyan::Gramambular::Unigram> rawSymbolUnigrams = m_symbolModel.unigramsForKey(key);
+        symbolUnigrams = filterAndTransformUnigrams(rawSymbolUnigrams, excludedValues, insertedValues);
+    }
+
     if (m_cnsModel.hasUnigramsForKey(key) && m_cnsEnabled) {
         std::vector<Taiyan::Gramambular::Unigram> rawCNSUnigrams = m_cnsModel.unigramsForKey(key);
         cnsUnigrams = filterAndTransformUnigrams(rawCNSUnigrams, excludedValues, insertedValues);
@@ -143,6 +182,8 @@ const std::vector<Taiyan::Gramambular::Unigram> LMInstantiator::unigramsForKey(c
 
     allUnigrams.insert(allUnigrams.begin(), userUnigrams.begin(), userUnigrams.end());
     allUnigrams.insert(allUnigrams.end(), cnsUnigrams.begin(), cnsUnigrams.end());
+    allUnigrams.insert(allUnigrams.begin(), miscUnigrams.begin(), miscUnigrams.end());
+    allUnigrams.insert(allUnigrams.end(), symbolUnigrams.begin(), symbolUnigrams.end());
     return allUnigrams;
 }
 

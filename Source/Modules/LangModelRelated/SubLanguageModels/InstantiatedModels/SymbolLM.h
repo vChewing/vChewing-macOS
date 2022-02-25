@@ -17,38 +17,28 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#import <Foundation/Foundation.h>
-#import "KeyHandler.h"
+#ifndef SYMBOLLM_H
+#define SYMBOLLM_H
 
-NS_ASSUME_NONNULL_BEGIN
+#include <string>
+#include <map>
+#include <iostream>
+#include "LanguageModel.h"
+#include "UserPhrasesLM.h"
 
-@interface mgrLangModel : NSObject
+namespace vChewing {
 
-+ (void)loadDataModel:(InputMode)mode;
-+ (void)loadUserPhrases;
-+ (void)loadUserAssociatedPhrases;
-+ (void)loadUserPhraseReplacement;
-+ (void)setupDataModelValueConverter;
-+ (BOOL)checkIfUserLanguageModelFilesExist;
-+ (BOOL)checkIfUserDataFolderExists;
+class SymbolLM: public UserPhrasesLM
+{
+public:
+    virtual bool allowConsolidation() override {
+        return false;
+    }
+    virtual float overridedValue() override {
+        return -12.0;
+    }
+};
 
-+ (BOOL)checkIfUserPhraseExist:(NSString *)userPhrase inputMode:(InputMode)mode key:(NSString *)key NS_SWIFT_NAME(checkIfUserPhraseExist(userPhrase:mode:key:));
-+ (BOOL)writeUserPhrase:(NSString *)userPhrase inputMode:(InputMode)mode areWeDuplicating:(BOOL)areWeDuplicating;
-+ (void)setPhraseReplacementEnabled:(BOOL)phraseReplacementEnabled;
-+ (void)setCNSEnabled:(BOOL)cnsEnabled;
-+ (NSString *)specifyBundleDataPath:(NSString *)filename;
-+ (NSString *)userPhrasesDataPath:(InputMode)mode;
-+ (NSString *)userAssociatedPhrasesDataPath:(InputMode)mode;
-+ (NSString *)excludedPhrasesDataPath:(InputMode)mode;
-+ (NSString *)phraseReplacementDataPath:(InputMode)mode;
+}
 
-@property (class, readonly, nonatomic) NSString *dataFolderPath;
-
-@end
-
-/// The following methods are merely for testing.
-@interface mgrLangModel ()
-+ (void)loadDataModels;
-@end
-
-NS_ASSUME_NONNULL_END
+#endif

@@ -21,9 +21,11 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #define LMInstantiator_H
 
 #include "AssociatedPhrases.h"
+#include "CoreLM.h"
 #include "CNSLM.h"
 #include "ParselessLM.h"
 #include "PhraseReplacementMap.h"
+#include "SymbolLM.h"
 #include "UserPhrasesLM.h"
 #include <stdio.h>
 #include <unordered_set>
@@ -64,6 +66,18 @@ public:
     void loadLanguageModel(const char* languageModelPath);
     /// If the data model is already loaded.
     bool isDataModelLoaded();
+
+    /// Asks to load the primary language model at the given path.
+    /// @param miscDataPath The path of the misc data model.
+    void loadMiscData(const char* miscDataPath);
+    /// If the data model is already loaded.
+    bool isMiscDataLoaded();
+
+    /// Asks to load the primary language model at the given path.
+    /// @param symbolDataPath The path of the symbol data model.
+    void loadSymbolData(const char* symbolDataPath);
+    /// If the data model is already loaded.
+    bool isSymbolDataLoaded();
 
     /// Asks to load the primary language model at the given path.
     /// @param cnsDataPath The path of the CNS data model.
@@ -126,6 +140,8 @@ protected:
         std::unordered_set<std::string>& insertedValues);
 
     ParselessLM m_languageModel;
+    CoreLM m_miscModel;
+    SymbolLM m_symbolModel;
     CNSLM m_cnsModel;
     UserPhrasesLM m_userPhrases;
     UserPhrasesLM m_excludedPhrases;
