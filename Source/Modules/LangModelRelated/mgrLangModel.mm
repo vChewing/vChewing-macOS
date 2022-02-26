@@ -45,19 +45,38 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     lm.loadLanguageModel([dataPath UTF8String]);
 }
 
++ (NSString *)specifyBundleDataPath:(NSString *)filenameWithoutExtension;
+{
+    Class cls = NSClassFromString(@"ctlInputMethod");
+    return [[NSBundle bundleForClass:cls] pathForResource:filenameWithoutExtension ofType:@"txt"];
+}
+
 + (void)loadDataModels
 {
     if (!gLangModelCHT.isDataModelLoaded()) {
         LTLoadLanguageModelFile(@"data-cht", gLangModelCHT);
     }
-    if (!gLangModelCHT.isCNSDataLoaded()){
-        gLangModelCHT.loadCNSData([[self cnsDataPath] UTF8String]);
+    if (!gLangModelCHT.isMiscDataLoaded()) {
+        gLangModelCHT.loadMiscData([[self specifyBundleDataPath: @"data-zhuyinwen"] UTF8String]);
     }
+    if (!gLangModelCHT.isSymbolDataLoaded()){
+        gLangModelCHT.loadSymbolData([[self specifyBundleDataPath: @"data-symbols"] UTF8String]);
+    }
+    if (!gLangModelCHT.isCNSDataLoaded()){
+        gLangModelCHT.loadCNSData([[self specifyBundleDataPath: @"char-kanji-cns"] UTF8String]);
+    }
+    // -----------------
     if (!gLangModelCHS.isDataModelLoaded()) {
         LTLoadLanguageModelFile(@"data-chs", gLangModelCHS);
     }
+    if (!gLangModelCHS.isMiscDataLoaded()) {
+        gLangModelCHS.loadMiscData([[self specifyBundleDataPath: @"data-zhuyinwen"] UTF8String]);
+    }
+    if (!gLangModelCHS.isSymbolDataLoaded()){
+        gLangModelCHS.loadSymbolData([[self specifyBundleDataPath: @"data-symbols"] UTF8String]);
+    }
     if (!gLangModelCHS.isCNSDataLoaded()){
-        gLangModelCHS.loadCNSData([[self cnsDataPath] UTF8String]);
+        gLangModelCHS.loadCNSData([[self specifyBundleDataPath: @"char-kanji-cns"] UTF8String]);
     }
 }
 
@@ -67,8 +86,14 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
         if (!gLangModelCHT.isDataModelLoaded()) {
             LTLoadLanguageModelFile(@"data-cht", gLangModelCHT);
         }
+        if (!gLangModelCHT.isMiscDataLoaded()) {
+            gLangModelCHT.loadMiscData([[self specifyBundleDataPath: @"data-zhuyinwen"] UTF8String]);
+        }
+        if (!gLangModelCHT.isSymbolDataLoaded()){
+            gLangModelCHT.loadSymbolData([[self specifyBundleDataPath: @"data-symbols"] UTF8String]);
+        }
         if (!gLangModelCHT.isCNSDataLoaded()){
-            gLangModelCHT.loadCNSData([[self cnsDataPath] UTF8String]);
+            gLangModelCHT.loadCNSData([[self specifyBundleDataPath: @"char-kanji-cns"] UTF8String]);
         }
     }
 
@@ -76,8 +101,14 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
         if (!gLangModelCHS.isDataModelLoaded()) {
             LTLoadLanguageModelFile(@"data-chs", gLangModelCHS);
         }
+        if (!gLangModelCHS.isMiscDataLoaded()) {
+            gLangModelCHS.loadMiscData([[self specifyBundleDataPath: @"data-zhuyinwen"] UTF8String]);
+        }
+        if (!gLangModelCHS.isSymbolDataLoaded()){
+            gLangModelCHS.loadSymbolData([[self specifyBundleDataPath: @"data-symbols"] UTF8String]);
+        }
         if (!gLangModelCHS.isCNSDataLoaded()){
-            gLangModelCHS.loadCNSData([[self cnsDataPath] UTF8String]);
+            gLangModelCHS.loadCNSData([[self specifyBundleDataPath: @"char-kanji-cns"] UTF8String]);
         }
     }
 }
@@ -306,12 +337,6 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
 {
     NSString *fileName = [mode isEqualToString:imeModeCHT] ? @"phrases-replacement-cht.txt" : @"phrases-replacement-chs.txt";
     return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
-}
-
-+ (NSString *)cnsDataPath
-{
-    Class cls = NSClassFromString(@"ctlInputMethod");
-    return [[NSBundle bundleForClass:cls] pathForResource:@"char-kanji-cns" ofType:@"txt"];
 }
 
  + (vChewing::LMInstantiator *)lmCHT

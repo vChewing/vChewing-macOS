@@ -28,26 +28,31 @@ extension String {
     }
     mutating func formatConsolidate(HYPY2BPMF: Bool) {
         // Step 1: Consolidating formats per line.
-        var arrData = self.components(separatedBy: "\n")
-        var varLineData = ""
-        var strProcessed = ""
-        for lineData in arrData {
-            varLineData = lineData
-            varLineData.regReplace(pattern: "　", replaceWith: " ") // CJKWhiteSpace to ASCIISpace
-            varLineData.regReplace(pattern: " ", replaceWith: " ") // NonBreakWhiteSpace to ASCIISpace
-            varLineData.regReplace(pattern: "\\s+", replaceWith: " ") // Consolidating Consecutive Spaves
-            varLineData.regReplace(pattern: "^\\s", replaceWith: "") // Trim Leading Space
-            varLineData.regReplace(pattern: "\\s$", replaceWith: "") // Trim Trailing Space
-            strProcessed += varLineData
-            strProcessed += "\n"
+        var strProcessed = self
+        // 預處理格式
+        strProcessed = strProcessed.replacingOccurrences(of: " #MACOS", with: "") // 去掉 macOS 標記
+        strProcessed = strProcessed.replacingOccurrences(of: "　", with: " ") // CJKWhiteSpace (\x{3000}) to ASCII Space
+        strProcessed = strProcessed.replacingOccurrences(of: " ", with: " ") // NonBreakWhiteSpace (\x{A0}) to ASCII Space
+        strProcessed = strProcessed.replacingOccurrences(of: "\t", with: " ") // Tab to ASCII Space
+        strProcessed.regReplace(pattern: "\\f", replaceWith: "\n") // Form Feed to LF
+        strProcessed = strProcessed.replacingOccurrences(of: "\r", with: "\n") // CR to LF
+        strProcessed.regReplace(pattern: " +", replaceWith: " ") // 統整連續空格為一個 ASCII 空格
+        strProcessed.regReplace(pattern: "\\n+", replaceWith: "\n") // 統整連續 LF 為一個 LF
+        strProcessed = strProcessed.replacingOccurrences(of: " \n", with: "\n") // 去除行尾空格
+        strProcessed = strProcessed.replacingOccurrences(of: "\n ", with: "\n") // 去除行首空格
+        if strProcessed.prefix(1) == " " { // 去除檔案開頭空格
+            strProcessed.removeFirst()
         }
-        
+        if strProcessed.suffix(1) == " " { // 去除檔案結尾空格
+            strProcessed.removeLast()
+        }
+        var arrData = [""]
         if HYPY2BPMF {
             // Step 0: Convert HanyuPinyin to Bopomofo.
             arrData = strProcessed.components(separatedBy: "\n")
             strProcessed = "" // Reset its value
             for lineData in arrData {
-                varLineData = lineData
+                var varLineData = lineData
                 // 漢語拼音轉注音，得先從最長的可能的拼音組合開始轉起，
                 // 這樣等轉換到更短的可能的漢語拼音組合時就不會出錯。
                 // 依此類推，聲調放在最後來轉換。
@@ -491,15 +496,16 @@ extension String {
         // Step 4: Deduplication.
         arrData = strProcessed.components(separatedBy: "\n")
         strProcessed = "" // Reset its value
-        let arrDataDeduplicated = Array(NSOrderedSet(array: arrData).array as! [String])
-        for lineData in arrDataDeduplicated {
+        // 下面兩行的 reversed 是首尾顛倒，免得破壞最新的 override 資訊。
+        let arrDataDeduplicated = Array(NSOrderedSet(array: arrData.reversed()).array as! [String])
+        for lineData in arrDataDeduplicated.reversed() {
             strProcessed += lineData
             strProcessed += "\n"
         }
         
         // Step 5: Remove duplicated newlines at the end of the file.
-        strProcessed.regReplace(pattern: "\\n\\n", replaceWith: "\n")
-
+        strProcessed.regReplace(pattern: "\\n+", replaceWith: "\n")
+        
         // Step 6: Commit Formatted Contents.
         self = strProcessed
     }

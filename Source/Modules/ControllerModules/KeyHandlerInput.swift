@@ -19,12 +19,16 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 import Cocoa
 
+// Use KeyCodes as much as possible since its recognition won't be affected by macOS Base Keyboard Layouts.
 // KeyCodes: https://eastmanreference.com/complete-list-of-applescript-key-codes
 enum KeyCode: UInt16 {
     case none = 0
+    case space = 49
+    case backSpace = 51
     case esc = 53
     case tab = 48
-    case enter = 76
+    case enterLF = 76
+    case enterCR = 36
     case up = 126
     case down = 125
     case left = 123
@@ -38,10 +42,6 @@ enum KeyCode: UInt16 {
 
 // CharCodes: https://theasciicode.com.ar/ascii-control-characters/horizontal-tab-ascii-code-9.html
 enum CharCode: UInt16 {
-    case space = 32
-    case backSpace = 8
-    case enter = 13
-    case esc = 27
     case symbolMenuKey_ABC = 96
 }
 
@@ -150,7 +150,7 @@ class KeyHandlerInput: NSObject {
     }
 
     @objc var isEnter: Bool {
-        (CharCode(rawValue: charCode) == CharCode.enter) || (KeyCode(rawValue: keyCode) == KeyCode.enter)
+        (KeyCode(rawValue: keyCode) == KeyCode.enterCR) || (KeyCode(rawValue: keyCode) == KeyCode.enterLF)
     }
 
     @objc var isUp: Bool {
@@ -178,15 +178,15 @@ class KeyHandlerInput: NSObject {
     }
 
     @objc var isSpace: Bool {
-        CharCode(rawValue: charCode) == CharCode.space
+        KeyCode(rawValue: keyCode) == KeyCode.space
     }
 
     @objc var isBackSpace: Bool {
-        CharCode(rawValue: charCode) == CharCode.backSpace
+        KeyCode(rawValue: keyCode) == KeyCode.backSpace
     }
 
     @objc var isESC: Bool {
-        (CharCode(rawValue: charCode) == CharCode.esc) || (KeyCode(rawValue: keyCode) == KeyCode.esc)
+        KeyCode(rawValue: keyCode) == KeyCode.esc
     }
 
     @objc var isHome: Bool {
@@ -226,6 +226,7 @@ class KeyHandlerInput: NSObject {
     }
 
     @objc var isSymbolMenuKey: Bool {
+        // 這裡用 CharCode 更合適，不然就無法輸入波浪鍵了。
         CharCode(rawValue: charCode) == CharCode.symbolMenuKey_ABC
     }
 

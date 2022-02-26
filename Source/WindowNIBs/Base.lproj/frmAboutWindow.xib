@@ -58,7 +58,7 @@
                         <textFieldCell key="cell" selectable="YES" id="lblCredits">
                             <font key="font" metaFont="cellTitle"/>
                             <string key="title">McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.
-vChewing macOS Development Reinforced by Hiraku Wang.
+vChewing macOS Development: Shiki Suen, Hiraku Wang, etc.
 vChewing Phrase Database Maintained by Shiki Suen.</string>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

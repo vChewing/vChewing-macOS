@@ -36,13 +36,13 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)writeUserPhrase:(NSString *)userPhrase inputMode:(InputMode)mode areWeDuplicating:(BOOL)areWeDuplicating;
 + (void)setPhraseReplacementEnabled:(BOOL)phraseReplacementEnabled;
 + (void)setCNSEnabled:(BOOL)cnsEnabled;
++ (NSString *)specifyBundleDataPath:(NSString *)filename;
 + (NSString *)userPhrasesDataPath:(InputMode)mode;
 + (NSString *)userAssociatedPhrasesDataPath:(InputMode)mode;
 + (NSString *)excludedPhrasesDataPath:(InputMode)mode;
 + (NSString *)phraseReplacementDataPath:(InputMode)mode;
 
 @property (class, readonly, nonatomic) NSString *dataFolderPath;
-@property (class, readonly, nonatomic) NSString *cnsDataPath;
 
 @end
 

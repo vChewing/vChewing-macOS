@@ -5,10 +5,10 @@
 	<key>UpdateInfoEndpoint</key>
 	<string>https://gitee.com/vchewing/vChewing-macOS/raw/main/Update-Info.plist</string>
 	<key>UpdateInfoSite</key>
-	<string>https://gitee.com/vchewing/vChewing-macOS</string>
+	<string>https://gitee.com/vChewing/vChewing-macOS/releases</string>
 	<key>CFBundleVersion</key>
-	<string>1923</string>
+	<string>1925</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.3.4</string>
+	<string>1.3.6</string>
 </dict>
 </plist>

@@ -184,15 +184,15 @@ inline const std::string& Node::key() const { return m_key; }
 
 inline double Node::score() const { return m_score; }
 
-// Prevents the override model to remember symbols with scode -X or lower.
-//inline double Node::scoreForCandidate(const std::string& candidate) const {
-//    for (auto unigram : m_unigrams) {
-//        if (unigram.keyValue.value == candidate) {
-//            return unigram.score;
-//        }
-//    }
-//    return 0.0;
-//}
+
+inline double Node::scoreForCandidate(const std::string& candidate) const {
+    for (auto unigram : m_unigrams) {
+        if (unigram.keyValue.value == candidate) {
+            return unigram.score;
+        }
+    }
+    return 0.0;
+}
 
 inline double Node::highestUnigramScore() const {
     if (m_unigrams.empty()) {

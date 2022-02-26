@@ -126,7 +126,7 @@
 	<key>UpdateInfoEndpoint</key>
 	<string>https://gitee.com/vchewing/vChewing-macOS/raw/main/Update-Info.plist</string>
 	<key>UpdateInfoSite</key>
-	<string>https://gitee.com/vchewing/vChewing-macOS</string>
+	<string>https://gitee.com/vChewing/vChewing-macOS/releases</string>
 	<key>tsInputMethodCharacterRepertoireKey</key>
 	<array>
 		<string>Hans</string>
