@@ -11,6 +11,8 @@
 		5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */; };
 		5B2DB16F27AF6891006D874E /* data-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16D27AF6891006D874E /* data-chs.txt */; };
 		5B2DB17027AF6891006D874E /* data-cht.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16E27AF6891006D874E /* data-cht.txt */; };
+		5B4D47C127C9304000220DDC /* data-zhuyinwen.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B4D47BD27C9304000220DDC /* data-zhuyinwen.txt */; };
+		5B4D47C227C9304000220DDC /* data-symbols.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B4D47BE27C9304000220DDC /* data-symbols.txt */; };
 		5B62A31727AE73A700A19448 /* unzip.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A30927AE73A700A19448 /* unzip.m */; };
 		5B62A31827AE73A700A19448 /* zip.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A30A27AE73A700A19448 /* zip.m */; };
 		5B62A31927AE73A700A19448 /* ioapi.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A30B27AE73A700A19448 /* ioapi.m */; };
@@ -18,7 +20,6 @@
 		5B62A31B27AE73A700A19448 /* SSZipArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A31327AE73A700A19448 /* SSZipArchive.m */; };
 		5B62A31C27AE73A700A19448 /* AWFileHash.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A31627AE73A700A19448 /* AWFileHash.m */; };
 		5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */; };
-		5B62A32E27AE78B000A19448 /* CNSLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32A27AE78B000A19448 /* CNSLM.mm */; };
 		5B62A32F27AE78B000A19448 /* CoreLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32D27AE78B000A19448 /* CoreLM.mm */; };
 		5B62A33227AE792F00A19448 /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33127AE792F00A19448 /* InputSourceHelper.swift */; };
 		5B62A33627AE795800A19448 /* PreferencesModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33527AE795800A19448 /* PreferencesModule.swift */; };
@@ -163,11 +164,20 @@
 		5B05A47C27AFF7CF00437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5B05A47F27AFF84200437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmAboutWindow.strings; sourceTree = "<group>"; };
 		5B0AF8B427B2C8290096FE54 /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
+		5B0C5EDF27C7D9870078037C /* dataCompiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dataCompiler.swift; sourceTree = "<group>"; };
 		5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleKeyboardConverter.swift; sourceTree = "<group>"; };
+		5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHS.txt"; sourceTree = "<group>"; };
+		5B18BA7027C7BD8B0056EB19 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		5B18BA7127C7BD8B0056EB19 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
+		5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-JPN.txt"; sourceTree = "<group>"; };
+		5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHT.txt"; sourceTree = "<group>"; };
 		5B2DB16D27AF6891006D874E /* data-chs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-chs.txt"; path = "Data/data-chs.txt"; sourceTree = "<group>"; };
 		5B2DB16E27AF6891006D874E /* data-cht.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-cht.txt"; path = "Data/data-cht.txt"; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
+		5B4D47BD27C9304000220DDC /* data-zhuyinwen.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-zhuyinwen.txt"; path = "../../libvchewing-data/components/common/data-zhuyinwen.txt"; sourceTree = "<group>"; };
+		5B4D47BE27C9304000220DDC /* data-symbols.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-symbols.txt"; path = "../../libvchewing-data/components/common/data-symbols.txt"; sourceTree = "<group>"; };
 		5B62A30927AE73A700A19448 /* unzip.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = unzip.m; sourceTree = "<group>"; };
 		5B62A30A27AE73A700A19448 /* zip.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = zip.m; sourceTree = "<group>"; };
 		5B62A30B27AE73A700A19448 /* ioapi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ioapi.m; sourceTree = "<group>"; };
@@ -184,7 +194,6 @@
 		5B62A32627AE77BB00A19448 /* LMConsolidator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LMConsolidator.h; sourceTree = "<group>"; };
 		5B62A32727AE77BB00A19448 /* LMConsolidator.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LMConsolidator.mm; sourceTree = "<group>"; };
 		5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FSEventStreamHelper.swift; sourceTree = "<group>"; };
-		5B62A32A27AE78B000A19448 /* CNSLM.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CNSLM.mm; sourceTree = "<group>"; };
 		5B62A32B27AE78B000A19448 /* CNSLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CNSLM.h; sourceTree = "<group>"; };
 		5B62A32C27AE78B000A19448 /* CoreLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CoreLM.h; sourceTree = "<group>"; };
 		5B62A32D27AE78B000A19448 /* CoreLM.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CoreLM.mm; sourceTree = "<group>"; };
@@ -201,6 +210,7 @@
 		5B73FB5F27B2BE1300E9BF49 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5B7BC4AF27AFFBE800F66C24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Source/WindowNIBs/Base.lproj/frmPrefWindow.xib; sourceTree = "<group>"; };
 		5B7BC4B227AFFC0B00F66C24 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Source/WindowNIBs/en.lproj/frmPrefWindow.strings; sourceTree = "<group>"; };
+		5B8F43ED27C9BC220069AC27 /* SymbolLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SymbolLM.h; sourceTree = "<group>"; };
 		5BBBB75D27AED54C0023B93A /* Beep.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.m4a; sourceTree = "<group>"; };
 		5BBBB75E27AED54C0023B93A /* Fart.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.m4a; sourceTree = "<group>"; };
 		5BBBB76627AED5DB0023B93A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmNonModalAlertWindow.xib; sourceTree = "<group>"; };
@@ -337,6 +347,35 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5B0C5EDE27C7D94C0078037C /* DataCompiler */ = {
+			isa = PBXGroup;
+			children = (
+				5B0C5EDF27C7D9870078037C /* dataCompiler.swift */,
+			);
+			path = DataCompiler;
+			sourceTree = "<group>";
+		};
+		5B18BA7527C7BF6D0056EB19 /* MiscRootFiles */ = {
+			isa = PBXGroup;
+			children = (
+				5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */,
+				5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */,
+				5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */,
+				5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */,
+				5B18BA7127C7BD8B0056EB19 /* README.md */,
+			);
+			name = MiscRootFiles;
+			sourceTree = "<group>";
+		};
+		5B4D47B627C9186900220DDC /* InstantiatedModels */ = {
+			isa = PBXGroup;
+			children = (
+				5B8F43ED27C9BC220069AC27 /* SymbolLM.h */,
+				5B62A32B27AE78B000A19448 /* CNSLM.h */,
+			);
+			path = InstantiatedModels;
+			sourceTree = "<group>";
+		};
 		5B62A30127AE732800A19448 /* 3rdParty */ = {
 			isa = PBXGroup;
 			children = (
@@ -468,8 +507,7 @@
 		5B62A32527AE758000A19448 /* SubLanguageModels */ = {
 			isa = PBXGroup;
 			children = (
-				5B62A32B27AE78B000A19448 /* CNSLM.h */,
-				5B62A32A27AE78B000A19448 /* CNSLM.mm */,
+				5B4D47B627C9186900220DDC /* InstantiatedModels */,
 				5B62A32C27AE78B000A19448 /* CoreLM.h */,
 				5B62A32D27AE78B000A19448 /* CoreLM.mm */,
 				D41355DC278EA3ED005E5CBD /* UserPhrasesLM.mm */,
@@ -564,6 +602,8 @@
 				5BD05B8027B22F3C004C4F1D /* char-kanji-cns.txt */,
 				5B2DB16D27AF6891006D874E /* data-chs.txt */,
 				5B2DB16E27AF6891006D874E /* data-cht.txt */,
+				5B4D47BE27C9304000220DDC /* data-symbols.txt */,
+				5B4D47BD27C9304000220DDC /* data-zhuyinwen.txt */,
 				5B2DB17127AF8771006D874E /* Makefile */,
 			);
 			name = Data;
@@ -644,12 +684,15 @@
 			isa = PBXGroup;
 			children = (
 				5BBD627827B6C4D900271480 /* Update-Info.plist */,
+				5B18BA7027C7BD8B0056EB19 /* Makefile */,
+				5B0C5EDE27C7D94C0078037C /* DataCompiler */,
 				6ACA41E715FC1D9000935EF6 /* Installer */,
 				6A0D4EC215FC0D3C00ABF4B3 /* Source */,
 				5BD05BB927B2A429004C4F1D /* UserPhraseEditor */,
-				5BDC5CB127C28E8B00E1CCE2 /* KeyboardExtension */,
 				6A0D4EA315FC0D2D00ABF4B3 /* Products */,
 				D47D73C127A7200500255A50 /* Frameworks */,
+				5BDC5CB127C28E8B00E1CCE2 /* KeyboardExtension */,
+				5B18BA7527C7BF6D0056EB19 /* MiscRootFiles */,
 			);
 			sourceTree = "<group>";
 		};
@@ -927,6 +970,7 @@
 				D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */,
 				5BDCBB2E27B4E67A00D0CC59 /* vChewingPhraseEditor.app in Resources */,
 				5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */,
+				5B4D47C227C9304000220DDC /* data-symbols.txt in Resources */,
 				6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */,
 				D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */,
 				5BBBB76B27AED5DB0023B93A /* frmNonModalAlertWindow.xib in Resources */,
@@ -934,6 +978,7 @@
 				5BBBB77527AED70B0023B93A /* MenuIcon-SCVIM.png in Resources */,
 				5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */,
 				5BD05B8127B22F3C004C4F1D /* char-kanji-cns.txt in Resources */,
+				5B4D47C127C9304000220DDC /* data-zhuyinwen.txt in Resources */,
 				5B2DB17027AF6891006D874E /* data-cht.txt in Resources */,
 				5BBBB77327AED70B0023B93A /* MenuIcon-TCVIM@2x.png in Resources */,
 				5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.png in Resources */,
@@ -1024,7 +1069,6 @@
 				5B62A34A27AE7CD900A19448 /* NotifierController.swift in Sources */,
 				5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */,
 				5B62A31827AE73A700A19448 /* zip.m in Sources */,
-				5B62A32E27AE78B000A19448 /* CNSLM.mm in Sources */,
 				D41355DB278E6D17005E5CBD /* LMInstantiator.mm in Sources */,
 				5B62A31A27AE73A700A19448 /* mztools.m in Sources */,
 				5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */,
@@ -1249,7 +1293,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1924;
+				CURRENT_PROJECT_VERSION = 1925;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1268,7 +1312,7 @@
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.3.5;
+				MARKETING_VERSION = 1.3.6;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
@@ -1301,7 +1345,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1924;
+				CURRENT_PROJECT_VERSION = 1925;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1315,7 +1359,7 @@
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.3.5;
+				MARKETING_VERSION = 1.3.6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
@@ -1345,7 +1389,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1924;
+				CURRENT_PROJECT_VERSION = 1925;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = KeyboardExtension/vChewingKeyLayout.bundle;
 				DEVELOPMENT_TEAM = "";
@@ -1364,7 +1408,7 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 12.1;
-				MARKETING_VERSION = 1.3.5;
+				MARKETING_VERSION = 1.3.6;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing.KeyboardExtension;
@@ -1396,7 +1440,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1924;
+				CURRENT_PROJECT_VERSION = 1925;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = KeyboardExtension/vChewingKeyLayout.bundle;
 				DEVELOPMENT_TEAM = "";
@@ -1410,7 +1454,7 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 12.1;
-				MARKETING_VERSION = 1.3.5;
+				MARKETING_VERSION = 1.3.6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing.KeyboardExtension;
@@ -1526,7 +1570,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1924;
+				CURRENT_PROJECT_VERSION = 1925;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1558,7 +1602,7 @@
 				INFOPLIST_FILE = "Source/Resources/IME-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.3.5;
+				MARKETING_VERSION = 1.3.6;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1591,7 +1635,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1924;
+				CURRENT_PROJECT_VERSION = 1925;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1617,7 +1661,7 @@
 				INFOPLIST_FILE = "Source/Resources/IME-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.3.5;
+				MARKETING_VERSION = 1.3.6;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1700,7 +1744,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1924;
+				CURRENT_PROJECT_VERSION = 1925;
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1722,7 +1766,7 @@
 				INFOPLIST_FILE = "Installer/Installer-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.3.5;
+				MARKETING_VERSION = 1.3.6;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.atelierInmu.vChewing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1750,7 +1794,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1924;
+				CURRENT_PROJECT_VERSION = 1925;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1766,7 +1810,7 @@
 				INFOPLIST_FILE = "Installer/Installer-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.3.5;
+				MARKETING_VERSION = 1.3.6;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.atelierInmu.vChewing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

@@ -17,50 +17,26 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef USERPHRASESLM_H
-#define USERPHRASESLM_H
+#ifndef SYMBOLLM_H
+#define SYMBOLLM_H
 
 #include <string>
 #include <map>
 #include <iostream>
 #include "LanguageModel.h"
+#include "UserPhrasesLM.h"
 
 namespace vChewing {
 
-class UserPhrasesLM : public Taiyan::Gramambular::LanguageModel
+class SymbolLM: public UserPhrasesLM
 {
 public:
-    UserPhrasesLM();
-    ~UserPhrasesLM();
-
-    bool isLoaded();
-    bool open(const char *path);
-    void close();
-    void dump();
-
-    virtual bool allowConsolidation() {
-        return true;
+    virtual bool allowConsolidation() override {
+        return false;
     }
-
-    virtual float overridedValue() {
-        return 0.0;
+    virtual float overridedValue() override {
+        return -12.0;
     }
-
-    virtual const std::vector<Taiyan::Gramambular::Bigram> bigramsForKeys(const std::string& preceedingKey, const std::string& key);
-    virtual const std::vector<Taiyan::Gramambular::Unigram> unigramsForKey(const std::string& key);
-    virtual bool hasUnigramsForKey(const std::string& key);
-    
-protected:
-    struct Row {
-        Row(std::string_view& k, std::string_view& v) : key(k), value(v) {}
-        std::string_view key;
-        std::string_view value;
-    };
-    
-    std::map<std::string_view, std::vector<Row>> keyRowMap;
-    int fd;
-    void *data;
-    size_t length;
 };
 
 }

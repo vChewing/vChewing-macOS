@@ -24,7 +24,7 @@
 "\"%@\" length must ≥ 2 for a user phrase." = "「%@」もう１つ文字のお選びを。";
 "\"%@\" length should ≤ %d for a user phrase." = "「%@」文字数過剰で登録不可、%d 文字以内にして下さい。";
 "\"%@\" selected. ENTER to add user phrase." = "「%@」を ENTER で辞書に登録。";
-"\"%@\" already exists, ENTER to override its priority." = "「%@」は既存語彙であり、ENTER で優先順位を再調整。";
+"\"%@\" already exists, ENTER to boost its priority." = "「%@」は既存語彙であり、ENTER で最優先にする。";
 "Edit Phrase Replacement Table…" = "言葉置換表を編集…";
 "Use Phrase Replacement" = "言葉置換機能";
 "Candidates keys cannot be empty." = "言選り用キー陣列に何かキーをご登録ください。";
