@@ -23,5 +23,5 @@
 /* Class = "NSTextFieldCell"; title = "© 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project."; ObjectID = "lblCopyright"; */
 // "lblCopyright.title" = "© 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project.";
 
-/* Class = "NSTextFieldCell"; title = "McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.\nvChewing macOS Development Reinforced by Hiraku Wang.\nvChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "lblCredits"; */
-"lblCredits.title" = "小麦注音入力エンジン開発：Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, など。\nmacOS 版の開発協力：Hiraku Wang。\n威注音語彙データの維持：Shiki Suen。";
+/* Class = "NSTextFieldCell"; title = "McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.\nvChewing macOS Development: Shiki Suen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "lblCredits"; */
+"lblCredits.title" = "小麦注音入力エンジン開発：Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, など。\nmacOS 版の開発：Shiki Suen, Hiraku Wang, など。\n威注音語彙データの維持：Shiki Suen。";
