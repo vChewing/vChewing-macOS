@@ -343,17 +343,24 @@ func weightAndSort(_ arrStructUncalculated: [Entry], isCHS: Bool) -> [Entry] {
     let fscale: Float = 2.7
     var norm: Float = 0.0
     for entry in arrStructUncalculated {
-        norm += fscale**(Float(entry.valPhrase.count) / 3.0 - 1.0) * Float(entry.valCount) // Credit: MJHsieh.
+        if entry.valCount >= 0 {
+            norm += fscale**(Float(entry.valPhrase.count) / 3.0 - 1.0) * Float(entry.valCount) // Credit: MJHsieh.
+        }
     }
     // norm 計算完畢，開始將 norm 作為新的固定常數來為每個詞條記錄計算權重。
     // 將新酷音的詞語出現次數數據轉換成小麥引擎可讀的數據形式。
     // 對出現次數小於 1 的詞條，將 0 當成 0.5 來處理、以防止除零。
     // 統計公式著作權歸 MJHsieh 所有（MIT License）。
     for entry in arrStructUncalculated {
-        let weight: Float = (entry.valCount < 1) ?
-            log10(fscale**(Float(entry.valPhrase.count) / 3.0 - 1.0) * 0.5 / norm) // Credit: MJHsieh.
-        :
-            log10(fscale**(Float(entry.valPhrase.count) / 3.0 - 1.0) * Float(entry.valCount) / norm) // Credit: MJHsieh.
+        var weight: Float = 0
+        switch entry.valCount {
+        case -1: // 假名
+            weight = -13
+        case 0: // 墊底低頻漢字與詞語
+            weight = log10(fscale**(Float(entry.valPhrase.count) / 3.0 - 1.0) * 0.5 / norm) // Credit: MJHsieh.
+        default:
+            weight = log10(fscale**(Float(entry.valPhrase.count) / 3.0 - 1.0) * Float(entry.valCount) / norm) // Credit: MJHsieh.
+        }
         let weightRounded: Float = weight.rounded(toPlaces: 3) // 為了節省生成的檔案體積，僅保留小數點後三位。
         arrStructCalculated += [Entry.init(valPhone: entry.valPhone, valPhrase: entry.valPhrase, valWeight: weightRounded, valCount: entry.valCount)]
     }
