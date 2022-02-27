@@ -9,10 +9,10 @@
 /* Begin PBXBuildFile section */
 		5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0AF8B427B2C8290096FE54 /* StringExtension.swift */; };
 		5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */; };
+		5B27AD6A27CB1F9B000ED75B /* data-symbols.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B27AD6827CB1F9B000ED75B /* data-symbols.txt */; };
+		5B27AD6B27CB1F9B000ED75B /* data-zhuyinwen.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B27AD6927CB1F9B000ED75B /* data-zhuyinwen.txt */; };
 		5B2DB16F27AF6891006D874E /* data-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16D27AF6891006D874E /* data-chs.txt */; };
 		5B2DB17027AF6891006D874E /* data-cht.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16E27AF6891006D874E /* data-cht.txt */; };
-		5B4D47C127C9304000220DDC /* data-zhuyinwen.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B4D47BD27C9304000220DDC /* data-zhuyinwen.txt */; };
-		5B4D47C227C9304000220DDC /* data-symbols.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B4D47BE27C9304000220DDC /* data-symbols.txt */; };
 		5B62A31727AE73A700A19448 /* unzip.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A30927AE73A700A19448 /* unzip.m */; };
 		5B62A31827AE73A700A19448 /* zip.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A30A27AE73A700A19448 /* zip.m */; };
 		5B62A31927AE73A700A19448 /* ioapi.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A30B27AE73A700A19448 /* ioapi.m */; };
@@ -172,12 +172,12 @@
 		5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-JPN.txt"; sourceTree = "<group>"; };
 		5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHT.txt"; sourceTree = "<group>"; };
+		5B27AD6827CB1F9B000ED75B /* data-symbols.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-symbols.txt"; path = "Data/components/common/data-symbols.txt"; sourceTree = "<group>"; };
+		5B27AD6927CB1F9B000ED75B /* data-zhuyinwen.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-zhuyinwen.txt"; path = "Data/components/common/data-zhuyinwen.txt"; sourceTree = "<group>"; };
 		5B2DB16D27AF6891006D874E /* data-chs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-chs.txt"; path = "Data/data-chs.txt"; sourceTree = "<group>"; };
 		5B2DB16E27AF6891006D874E /* data-cht.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-cht.txt"; path = "Data/data-cht.txt"; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
-		5B4D47BD27C9304000220DDC /* data-zhuyinwen.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-zhuyinwen.txt"; path = "../../libvchewing-data/components/common/data-zhuyinwen.txt"; sourceTree = "<group>"; };
-		5B4D47BE27C9304000220DDC /* data-symbols.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-symbols.txt"; path = "../../libvchewing-data/components/common/data-symbols.txt"; sourceTree = "<group>"; };
 		5B62A30927AE73A700A19448 /* unzip.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = unzip.m; sourceTree = "<group>"; };
 		5B62A30A27AE73A700A19448 /* zip.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = zip.m; sourceTree = "<group>"; };
 		5B62A30B27AE73A700A19448 /* ioapi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ioapi.m; sourceTree = "<group>"; };
@@ -602,8 +602,8 @@
 				5BD05B8027B22F3C004C4F1D /* char-kanji-cns.txt */,
 				5B2DB16D27AF6891006D874E /* data-chs.txt */,
 				5B2DB16E27AF6891006D874E /* data-cht.txt */,
-				5B4D47BE27C9304000220DDC /* data-symbols.txt */,
-				5B4D47BD27C9304000220DDC /* data-zhuyinwen.txt */,
+				5B27AD6827CB1F9B000ED75B /* data-symbols.txt */,
+				5B27AD6927CB1F9B000ED75B /* data-zhuyinwen.txt */,
 				5B2DB17127AF8771006D874E /* Makefile */,
 			);
 			name = Data;
@@ -970,7 +970,7 @@
 				D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */,
 				5BDCBB2E27B4E67A00D0CC59 /* vChewingPhraseEditor.app in Resources */,
 				5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */,
-				5B4D47C227C9304000220DDC /* data-symbols.txt in Resources */,
+				5B27AD6A27CB1F9B000ED75B /* data-symbols.txt in Resources */,
 				6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */,
 				D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */,
 				5BBBB76B27AED5DB0023B93A /* frmNonModalAlertWindow.xib in Resources */,
@@ -978,7 +978,7 @@
 				5BBBB77527AED70B0023B93A /* MenuIcon-SCVIM.png in Resources */,
 				5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */,
 				5BD05B8127B22F3C004C4F1D /* char-kanji-cns.txt in Resources */,
-				5B4D47C127C9304000220DDC /* data-zhuyinwen.txt in Resources */,
+				5B27AD6B27CB1F9B000ED75B /* data-zhuyinwen.txt in Resources */,
 				5B2DB17027AF6891006D874E /* data-cht.txt in Resources */,
 				5BBBB77327AED70B0023B93A /* MenuIcon-TCVIM@2x.png in Resources */,
 				5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.png in Resources */,
