@@ -127,7 +127,15 @@ fileprivate class HorizontalCandidateView: NSView {
             var activeCandidateIndexAttr = keyLabelAttrDict
             var activeCandidateAttr = candidateAttrDict
             if index == highlightedIndex {
-                NSColor.alternateSelectedControlColor.setFill() // The background color of the highlightened candidate
+                // The background color of the highlightened candidate
+                switch ctlInputMethod.currentKeyHandler.inputMode {
+                case InputMode.imeModeCHS:
+                    NSColor.systemRed.withAlphaComponent(0.75).setFill()
+                case InputMode.imeModeCHT:
+                    NSColor.systemBlue.withAlphaComponent(0.75).setFill()
+                default:
+                    NSColor.alternateSelectedControlColor.setFill()
+                }
                 activeCandidateIndexAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor.withAlphaComponent(0.84) // The index text color of the highlightened candidate
                 activeCandidateAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor // The phrase text color of the highlightened candidate
             } else {
