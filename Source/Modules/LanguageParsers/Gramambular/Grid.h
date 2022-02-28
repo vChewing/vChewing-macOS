@@ -27,7 +27,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include "NodeAnchor.h"
 #include "Span.h"
 
-namespace Taiyan {
 namespace Gramambular {
 
 class Grid {
@@ -218,6 +217,6 @@ inline void Grid::overrideNodeScoreForSelectedCandidate(
 }
 
 }  // namespace Gramambular
-}  // namespace Taiyan
+
 
 #endif

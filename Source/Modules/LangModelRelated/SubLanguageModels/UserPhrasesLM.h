@@ -27,7 +27,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 namespace vChewing {
 
-class UserPhrasesLM : public Taiyan::Gramambular::LanguageModel
+class UserPhrasesLM : public Gramambular::LanguageModel
 {
 public:
     UserPhrasesLM();
@@ -46,8 +46,8 @@ public:
         return 0.0;
     }
 
-    virtual const std::vector<Taiyan::Gramambular::Bigram> bigramsForKeys(const std::string& preceedingKey, const std::string& key);
-    virtual const std::vector<Taiyan::Gramambular::Unigram> unigramsForKey(const std::string& key);
+    virtual const std::vector<Gramambular::Bigram> bigramsForKeys(const std::string& preceedingKey, const std::string& key);
+    virtual const std::vector<Gramambular::Unigram> unigramsForKey(const std::string& key);
     virtual bool hasUnigramsForKey(const std::string& key);
     
 protected:
