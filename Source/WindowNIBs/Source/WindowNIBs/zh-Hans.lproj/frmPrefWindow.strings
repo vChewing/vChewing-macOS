@@ -80,7 +80,7 @@
 /* Class = "NSMenuItem"; title = "96"; ObjectID = "101"; */
 "101.title" = "96";
 
-/* Class = "NSButtonCell"; title = "Enable SPACE key for calling candidate window"; ObjectID = "110"; */
+/* Class = "NSButtonCell"; title = "Enable Space key for calling candidate window"; ObjectID = "110"; */
 "110.title" = "敲空格键以选字";
 
 /* Class = "NSTextFieldCell"; title = "Alphanumeric:"; ObjectID = "126"; */
@@ -200,11 +200,20 @@
 /* Class = "NSTextFieldCell"; title = "Regarding On-Screen Keyboard Support:"; ObjectID = "wQ9-px-b07"; */
 "wQ9-px-b07.title" = "关于 macOS 内建萤幕模拟键盘支援：\n\n\t自 v1.3.2 版开始，威注音支援 macOS 内建的萤幕小键盘。该功能是借由对「Apple 标准注音键盘布局」与「Apple 倚天注音键盘布局」这两个动态英数键盘布局来完成的。理论上来讲，这两个动态英数键盘布局应该可以与所有语种的 Apple 物理键盘相容。如果有不相容的情况的话，macOS 内建的注音与倚天注音输入法一定也会有相同的故障（可以借由 Feedback Assistant.app 向 Apple 反馈这种键盘布局问题）。\n\n\t然而，如果您启用了这种动态英数键盘布局的话，请将当前画面顶端的注音键盘布局设为「微软/大千……」，因为对诸如倚天等异种键盘的支援已经交给 macOS 系统来事先完成了。";
 
+/* Class = "NSTextFieldCell"; title = "Choose the behavior of (Shift+)Tab key in the candidate window."; ObjectID = "ueU-Rz-a1C"; */
+"ueU-Rz-a1C.title" = "指定 (Shift+)Tab 热键在选字窗内的轮替操作对象。";
+
 /* Class = "NSButtonCell"; title = "Cycling Pages"; ObjectID = "s7u-Fm-dVg"; */
 "s7u-Fm-dVg.title" = "轮替页面";
 
 /* Class = "NSButtonCell"; title = "Cycling Candidates"; ObjectID = "FVC-br-H57"; */
 "FVC-br-H57.title" = "轮替候选字";
 
-/* Class = "NSTextFieldCell"; title = "Choose the behavior of (Shift+)Tab key in the candidate window."; ObjectID = "ueU-Rz-a1C"; */
-"ueU-Rz-a1C.title" = "指定 (Shift+)Tab 热键在选字窗内的轮替操作对象。";
+/* Class = "NSTextFieldCell"; title = "Choose the behavior of (Shift+)Space key in the candidate window."; ObjectID = "Pg5-G9-pY5"; */
+"Pg5-G9-pY5.title" = "指定 (Shift+)Space 热键在选字窗内的轮替操作对象。";
+
+/* Class = "NSButtonCell"; title = "Space to +cycle pages, Shift+Space to +cycle candidates"; ObjectID = "XqL-rf-X6d"; */
+"XqL-rf-X6d.title" = "Space 换下一页，Shift+Space 换选下一个候选字。";
+
+/* Class = "NSButtonCell"; title = "Space to +cycle candidates, Shift+Space to +cycle pages"; ObjectID = "dIN-TZ-67g"; */
+"dIN-TZ-67g.title" = "Shift+Space 换下一页，Space 换选下一个候选字。";
