@@ -185,14 +185,17 @@
 /* Class = "NSMenuItem"; title = "Japanese"; ObjectID = "rVQ-Hx-cGi"; */
 "rVQ-Hx-cGi.title" = "和語";
 
-/* Class = "NSBox"; title = "Dictionary Settings"; ObjectID = "s4r-ji-vbr"; */
-"s4r-ji-vbr.title" = "辞書設定";
+/* Class = "NSBox"; title = "Dictionary and Language Models"; ObjectID = "cf2-se-PDO"; */
+"cf2-se-PDO.title" = "辞書と言語モデル";
 
 /* Class = "NSTextFieldCell"; title = "Choose your preferred layout of the candidate window."; ObjectID = "xC5-yV-1W1"; */
 "xC5-yV-1W1.title" = "入力候補陳列の仕様をご指定ください。";
 
 /* Class = "NSTabViewItem"; label = "Advanced"; ObjectID = "xrE-8T-WKO"; */
 "xrE-8T-WKO.label" = "詳細";
+
+/* Class = "NSTabViewItem"; label = "Dictionary"; ObjectID = "2iG-Ic-gbl"; */
+"2iG-Ic-gbl.label" = "辞書";
 
 /* Class = "NSTextFieldCell"; title = "Regarding On-Screen Keyboard Support:"; ObjectID = "wQ9-px-b07"; */
 "wQ9-px-b07.title" = "macOS 内蔵のキーボードビューアについて：\n\n\t威注音は v1.3.2 版にて macOS 内蔵のキーボードビューアをサポートし始めたが、「Apple Zhuyin Bopomofo」と「Apple Zhuyin Eten」この２つダイナミック英数キーボード配列をサポートしたためである。基本的には、この機能は全ての言語の Apple キーボードと一緒に動けるはず。macOS 内蔵の注音入力と倚天注音入力が支障なく使える限り（支障があったら Feedback Assistant.app で Apple にご報告を）、この２つダイナミック英数キーボード配列も威注音で作動できるだと考えられる。\n\n\tだが、もし、ダイナミック英数キーボード配列を起用すると、今のこの画面の上の「注音キーボード配列」を標準配列にしなければならぬこと。なぜなら、この場合、倚天などの注音配列のサポート役割は macOS である。";
