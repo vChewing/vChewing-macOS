@@ -80,8 +80,8 @@
 /* Class = "NSMenuItem"; title = "96"; ObjectID = "101"; */
 "101.title" = "96";
 
-/* Class = "NSButtonCell"; title = "Enable SPACE key for calling candidate window"; ObjectID = "110"; */
-"110.title" = "Enable SPACE key for calling candidate window";
+/* Class = "NSButtonCell"; title = "Enable Space key for calling candidate window"; ObjectID = "110"; */
+"110.title" = "Enable Space key for calling candidate window";
 
 /* Class = "NSTextFieldCell"; title = "Alphanumeric:"; ObjectID = "126"; */
 "126.title" = "Alphanumeric:";
@@ -200,11 +200,20 @@
 /* Class = "NSTextFieldCell"; title = "Regarding On-Screen Keyboard Support:"; ObjectID = "wQ9-px-b07"; */
 "wQ9-px-b07.title" = "Regarding On-Screen Keyboard Viewer Support:\n\n\tSince v1.3.2, vChewing supports on-screen keyboard by supporting \"Apple Zhuyin Bopomofo\" and \"Apple Zhuyin Eten\" alphanumeric layout. Theoreotically, these two dynamic layouts work with all types of Apple physical keyboards, and you can report failure cases through macOS Feedback Assistant app if macOS built-in Zhuyin / Eten-Zhuyin Input Method fails from working with your non-US keyboard.\n\n\tHOWEVER, choosing such dynamic alphanumeric layouts REQUIRING THAT you have to choose the Bopomofo layout above to Standard (Microsoft / Dachen) since the Bopomofo / Eten layout support in this case is already finished by the macOS system.";
 
+/* Class = "NSTextFieldCell"; title = "Choose the behavior of (Shift+)Tab key in the candidate window."; ObjectID = "ueU-Rz-a1C"; */
+"ueU-Rz-a1C.title" = "Choose the behavior of (Shift+)Tab key in the candidate window.";
+
 /* Class = "NSButtonCell"; title = "Cycling Pages"; ObjectID = "s7u-Fm-dVg"; */
 "s7u-Fm-dVg.title" = "Cycling Pages";
 
 /* Class = "NSButtonCell"; title = "Cycling Candidates"; ObjectID = "FVC-br-H57"; */
 "FVC-br-H57.title" = "Cycling Candidates";
 
-/* Class = "NSTextFieldCell"; title = "Choose the behavior of (Shift+)Tab key in the candidate window."; ObjectID = "ueU-Rz-a1C"; */
-"ueU-Rz-a1C.title" = "Choose the behavior of (Shift+)Tab key in the candidate window.";
+/* Class = "NSTextFieldCell"; title = "Choose the behavior of (Shift+)Space key in the candidate window."; ObjectID = "Pg5-G9-pY5"; */
+"Pg5-G9-pY5.title" = "Choose the behavior of (Shift+)Space key in the candidate window.";
+
+/* Class = "NSButtonCell"; title = "Space to +cycle pages, Shift+Space to +cycle candidates"; ObjectID = "XqL-rf-X6d"; */
+"XqL-rf-X6d.title" = "Space to +cycle pages, Shift+Space to +cycle candidates";
+
+/* Class = "NSButtonCell"; title = "Space to +cycle candidates, Shift+Space to +cycle pages"; ObjectID = "dIN-TZ-67g"; */
+"dIN-TZ-67g.title" = "Space to +cycle candidates, Shift+Space to +cycle pages";
