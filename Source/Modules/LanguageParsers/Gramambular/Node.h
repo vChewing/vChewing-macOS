@@ -27,7 +27,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 #include "LanguageModel.h"
 
-namespace Taiyan {
 namespace Gramambular {
 
 class Node {
@@ -209,6 +208,6 @@ inline const KeyValuePair Node::currentKeyValue() const {
     }
 }
 }  // namespace Gramambular
-}  // namespace Taiyan
+
 
 #endif

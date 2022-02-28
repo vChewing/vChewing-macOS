@@ -24,7 +24,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 #include "KeyValuePair.h"
 
-namespace Taiyan {
 namespace Gramambular {
 
 class Unigram {
@@ -86,6 +85,6 @@ inline bool Unigram::ScoreCompare(const Unigram& a, const Unigram& b) {
     return a.score > b.score;
 }
 }  // namespace Gramambular
-}  // namespace Taiyan
+
 
 #endif

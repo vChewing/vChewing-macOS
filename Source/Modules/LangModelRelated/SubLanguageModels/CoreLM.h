@@ -31,11 +31,11 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 // to avoid creating new string objects; the parser is a simple DFA
 
 using namespace std;
-using namespace Taiyan::Gramambular;
+using namespace Gramambular;
 
 namespace vChewing {
 
-class CoreLM : public Taiyan::Gramambular::LanguageModel {
+class CoreLM : public Gramambular::LanguageModel {
 public:
     CoreLM();
     ~CoreLM();
@@ -45,8 +45,8 @@ public:
     void close();
     void dump();
 
-    virtual const std::vector<Taiyan::Gramambular::Bigram> bigramsForKeys(const string& preceedingKey, const string& key);
-    virtual const std::vector<Taiyan::Gramambular::Unigram> unigramsForKey(const string& key);
+    virtual const std::vector<Gramambular::Bigram> bigramsForKeys(const string& preceedingKey, const string& key);
+    virtual const std::vector<Gramambular::Unigram> unigramsForKey(const string& key);
     virtual bool hasUnigramsForKey(const string& key);
 
 protected:

@@ -24,7 +24,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 #include "Node.h"
 
-namespace Taiyan {
 namespace Gramambular {
 
 struct NodeAnchor {
@@ -59,6 +58,6 @@ inline std::ostream& operator<<(std::ostream& stream,
     return stream;
 }
 }  // namespace Gramambular
-}  // namespace Taiyan
+
 
 #endif

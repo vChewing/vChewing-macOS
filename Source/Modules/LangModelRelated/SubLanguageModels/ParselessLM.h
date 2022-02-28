@@ -29,7 +29,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 namespace vChewing {
 
-class ParselessLM : public Taiyan::Gramambular::LanguageModel {
+class ParselessLM : public Gramambular::LanguageModel {
 public:
     ~ParselessLM() override;
 
@@ -37,9 +37,9 @@ public:
     bool open(const std::string_view& path);
     void close();
 
-    const std::vector<Taiyan::Gramambular::Bigram> bigramsForKeys(
+    const std::vector<Gramambular::Bigram> bigramsForKeys(
         const std::string& preceedingKey, const std::string& key) override;
-    const std::vector<Taiyan::Gramambular::Unigram> unigramsForKey(
+    const std::vector<Gramambular::Unigram> unigramsForKey(
         const std::string& key) override;
     bool hasUnigramsForKey(const std::string& key) override;
 

@@ -121,19 +121,19 @@ void UserPhrasesLM::dump()
     }
 }
 
-const std::vector<Taiyan::Gramambular::Bigram> UserPhrasesLM::bigramsForKeys(const std::string& preceedingKey, const std::string& key)
+const std::vector<Gramambular::Bigram> UserPhrasesLM::bigramsForKeys(const std::string& preceedingKey, const std::string& key)
 {
-    return std::vector<Taiyan::Gramambular::Bigram>();
+    return std::vector<Gramambular::Bigram>();
 }
 
-const std::vector<Taiyan::Gramambular::Unigram> UserPhrasesLM::unigramsForKey(const std::string& key)
+const std::vector<Gramambular::Unigram> UserPhrasesLM::unigramsForKey(const std::string& key)
 {
-    std::vector<Taiyan::Gramambular::Unigram> v;
+    std::vector<Gramambular::Unigram> v;
     auto iter = keyRowMap.find(key);
     if (iter != keyRowMap.end()) {
         const std::vector<Row>& rows = iter->second;
         for (const auto& row : rows) {
-            Taiyan::Gramambular::Unigram g;
+            Gramambular::Unigram g;
             g.keyValue.key = row.key;
             g.keyValue.value = row.value;
             g.score = overridedValue();

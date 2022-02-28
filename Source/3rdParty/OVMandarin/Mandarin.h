@@ -25,7 +25,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <string>
 #include <vector>
 
-namespace Taiyan {
 namespace Mandarin {
 
 class BopomofoSyllable {
@@ -471,6 +470,6 @@ protected:
     std::string pinyin_sequence_;
 };
 }  // namespace Mandarin
-}  // namespace Taiyan
+
 
 #endif  // MANDARIN_H_

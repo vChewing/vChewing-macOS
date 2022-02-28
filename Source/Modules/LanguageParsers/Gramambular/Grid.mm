@@ -22,7 +22,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <iostream>
 #include <string>
 
-namespace Taiyan {
 namespace Gramambular {
 
 std::string Grid::dumpDOT() {
@@ -67,4 +66,4 @@ std::string Grid::dumpDOT() {
 }
 
 }  // namespace Gramambular
-}  // namespace Taiyan
+
