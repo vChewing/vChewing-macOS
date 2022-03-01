@@ -92,6 +92,10 @@ class ctlInputMethod: IMKInputController {
         userAssociatedPhrasesItem.keyEquivalentModifierMask = [.command, .control]
         userAssociatedPhrasesItem.state = Preferences.associatedPhrasesEnabled.state
 
+        let alphaNumericalModeItem = menu.addItem(withTitle: NSLocalizedString("Alphanumerical Input Mode", comment: ""), action: #selector(toggleAlphanumericalModeEnabled(_:)), keyEquivalent: "I")
+        alphaNumericalModeItem.keyEquivalentModifierMask = [.command, .control]
+        alphaNumericalModeItem.state = Preferences.isAlphanumericalModeEnabled.state
+
         if optionKeyPressed {
             let phaseReplacementItem = menu.addItem(withTitle: NSLocalizedString("Use Phrase Replacement", comment: ""), action: #selector(togglePhraseReplacement(_:)), keyEquivalent: "")
             phaseReplacementItem.state = Preferences.phraseReplacementEnabled.state
@@ -200,7 +204,7 @@ class ctlInputMethod: IMKInputController {
         var textFrame = NSRect.zero
         let attributes: [AnyHashable: Any]? = (client as? IMKTextInput)?.attributes(forCharacterIndex: 0, lineHeightRectangle: &textFrame)
         let useVerticalMode = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
-        
+
         if (client as? IMKTextInput)?.bundleIdentifier() == "org.atelierInmu.vChewing.vChewingPhraseEditor" {
             ctlInputMethod.areWeUsingOurOwnPhraseEditor = true
         } else {
@@ -247,6 +251,10 @@ class ctlInputMethod: IMKInputController {
 
     @objc func toggleAssociatedPhrasesEnabled(_ sender: Any?) {
         NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Per-Char Associated Phrases", comment: ""), "\n", Preferences.toggleAssociatedPhrasesEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
+    }
+
+    @objc func toggleAlphanumericalModeEnabled(_ sender: Any?) {
+        Preferences.toggleAlphanumericalModeEnabled()
     }
 
     @objc func togglePhraseReplacement(_ sender: Any?) {
