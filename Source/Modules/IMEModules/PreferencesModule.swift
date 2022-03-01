@@ -48,8 +48,8 @@ private let kCandidateTextFontName = "CandidateTextFontName"
 private let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
 private let kCandidateKeys = "CandidateKeys"
 
-private let kChineseConversionEngineKey = "ChineseConversionEngine"
-private let kChineseConversionStyleKey = "ChineseConversionStyle"
+private let kChineseConversionEngine = "ChineseConversionEngine"
+private let kChineseConversionStyle = "ChineseConversionStyle"
 private let kAssociatedPhrasesEnabled = "AssociatedPhrasesEnabled"
 private let kPhraseReplacementEnabled = "PhraseReplacementEnabled"
 
@@ -240,8 +240,8 @@ struct ComposingBufferSize {
          kUseSCPCTypingMode,
          kMaxCandidateLength,
          kShouldNotFartInLieuOfBeep,
-         kChineseConversionEngineKey,
-         kChineseConversionStyleKey,
+         kChineseConversionEngine,
+         kChineseConversionStyle,
          kAssociatedPhrasesEnabled]
     }
 
