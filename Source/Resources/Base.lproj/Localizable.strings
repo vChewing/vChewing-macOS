@@ -28,7 +28,7 @@
 "Edit Phrase Replacement Table…" = "Edit Phrase Replacement Table…";
 "Use Phrase Replacement" = "Use Phrase Replacement";
 "Candidates keys cannot be empty." = "Candidates keys cannot be empty.";
-"Candidate keys can only contain ASCII characters like alphanumerals." = "Candidate keys can only contain ASCII characters like alphanumerals.";
+"Candidate keys can only contain ASCII characters like alphanumericals." = "Candidate keys can only contain ASCII characters like alphanumericals.";
 "Candidate keys cannot contain space." = "Candidate keys cannot contain space.";
 "There should not be duplicated keys." = "There should not be duplicated keys.";
 "Please specify at least 4 candidate keys." = "Please specify at least 4 candidate keys.";

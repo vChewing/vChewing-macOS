@@ -28,7 +28,7 @@
 "Edit Phrase Replacement Table…" = "编辑语汇置换表…";
 "Use Phrase Replacement" = "使用语汇置换";
 "Candidates keys cannot be empty." = "您必须指定选字键。";
-"Candidate keys can only contain ASCII characters like alphanumerals." = "选字键只能是英数等 ASCII 字符。";
+"Candidate keys can only contain ASCII characters like alphanumericals." = "选字键只能是英数等 ASCII 字符。";
 "Candidate keys cannot contain space." = "选字键不得包含空格。";
 "There should not be duplicated keys." = "选字键不得重复。";
 "Please specify at least 4 candidate keys." = "请至少指定四个选字键。";
