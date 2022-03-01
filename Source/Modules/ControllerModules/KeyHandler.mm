@@ -272,18 +272,23 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return NO;
     }
 
-    // Caps Lock processing : if Caps Lock is on or Preferences.isAlphanumericalModeEnabled, temporarily disable bopomofo.
+    // Caps Lock processing: if Caps Lock is on or Preferences.isAlphanumericalModeEnabled, temporarily disable bopomofo.
+    // Also: Alphanumerical mode processing.
     if ([input isBackSpace] || [input isEnter] || [input isAbsorbedArrowKey] || [input isExtraChooseCandidateKey] || [input isExtraChooseCandidateKeyReverse] || [input isCursorForward] || [input isCursorBackward]) {
         // do nothing if backspace is pressed -- we ignore the key
-    } else if ([input isCapsLockOn] || Preferences.isAlphanumericalModeEnabled) {
+    } else if (Preferences.isAlphanumericalModeEnabled || [input isCapsLockOn]) {
         // process all possible combination, we hope.
         [self clear];
         InputStateEmpty *emptyState = [[InputStateEmpty alloc] init];
         stateCallback(emptyState);
 
-        // first commit everything in the buffer.
-        if ([input isShiftHold]) {
-            return NO;
+        // Non-Dynamic Keyboard Layouts Only: When shift is pressed, don't do further processing, since it outputs capital letter anyway.
+        if ((![Preferences.basisKeyboardLayout isEqual: @"com.apple.keylayout.ZhuyinBopomofo"]
+             && ![Preferences.basisKeyboardLayout isEqual: @"com.apple.keylayout.ZhuyinEten"])
+            || [input isCapsLockOn]){
+            if ([input isShiftHold]) {
+                return NO;
+            }
         }
 
         // if ASCII but not printable, don't use insertText:replacementRange: as many apps don't handle non-ASCII char insertions.
@@ -291,10 +296,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             return NO;
         }
 
-        // when shift is pressed, don't do further processing, since it outputs capital letter anyway.
+        // commit everything in the buffer.
         InputStateCommitting *committingState = [[InputStateCommitting alloc] initWithPoppedText:[input.inputText lowercaseString]];
         stateCallback(committingState);
         stateCallback(emptyState);
+
         return YES;
     }
 
