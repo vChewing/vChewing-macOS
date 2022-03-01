@@ -182,6 +182,12 @@ class ctlInputMethod: IMKInputController {
     }
 
     override func handle(_ event: NSEvent!, client: Any!) -> Bool {
+
+        if (Preferences.isAlphanumericalModeEnabled) {
+            (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: Preferences.functionKeyboardLayout)
+            return false
+        }
+
         if event.type == .flagsChanged {
             let functionKeyKeyboardLayoutID = Preferences.functionKeyboardLayout
             let basisKeyboardLayoutID = Preferences.basisKeyboardLayout
