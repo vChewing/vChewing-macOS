@@ -502,7 +502,7 @@ struct ComposingBufferSize {
             case .empty:
                 return NSLocalizedString("Candidates keys cannot be empty.", comment: "")
             case .invalidCharacters:
-                return NSLocalizedString("Candidate keys can only contain ASCII characters like alphanumerals.", comment: "")
+                return NSLocalizedString("Candidate keys can only contain ASCII characters like alphanumericals.", comment: "")
             case .containSpace:
                 return NSLocalizedString("Candidate keys cannot contain space.", comment: "")
             case .duplicatedCharacters:
