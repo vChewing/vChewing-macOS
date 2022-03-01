@@ -113,11 +113,7 @@ fileprivate class HorizontalCandidateView: NSView {
         NSColor.controlBackgroundColor.setFill() // Candidate list panel base background
         NSBezierPath.fill(bounds)
 
-        if #available(macOS 10.14, *) {
-            NSColor.separatorColor.setStroke()
-        } else {
-            NSColor.darkGray.setStroke()
-        }
+        NSColor.systemGray.withAlphaComponent(0.75).setStroke()
 
         NSBezierPath.strokeLine(from: NSPoint(x: bounds.size.width, y: 0.0), to: NSPoint(x: bounds.size.width, y: bounds.size.height))
 
