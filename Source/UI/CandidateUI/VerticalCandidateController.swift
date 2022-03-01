@@ -111,7 +111,9 @@ fileprivate class VerticalCandidateView: NSView {
         self.wantsLayer = true
         self.layer?.borderColor = NSColor.selectedMenuItemTextColor.withAlphaComponent(0.30).cgColor
         self.layer?.borderWidth = 1.0
-        self.layer?.cornerRadius = 6.0
+        if #available(macOS 10.13, *) {
+            self.layer?.cornerRadius = 6.0
+        }
         
         let bounds = self.bounds
         NSColor.controlBackgroundColor.setFill() // Candidate list panel base background
