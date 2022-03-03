@@ -792,11 +792,11 @@
 /* Begin PBXLegacyTarget section */
 		6A38BC2115FC12FD00A8A51F /* Data */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "$(ACTION) macv";
+			buildArgumentsString = "$(ACTION) ../../DataCompiler/dataCompiler.swift";
 			buildConfigurationList = 6A38BC2215FC12FD00A8A51F /* Build configuration list for PBXLegacyTarget "Data" */;
 			buildPhases = (
 			);
-			buildToolPath = /usr/bin/make;
+			buildToolPath = /usr/bin/swift;
 			buildWorkingDirectory = "$(SRCROOT)/Source/Data";
 			dependencies = (
 			);
