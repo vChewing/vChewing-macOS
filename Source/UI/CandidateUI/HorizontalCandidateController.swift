@@ -100,15 +100,6 @@ fileprivate class HorizontalCandidateView: NSView {
     }
 
     override func draw(_ dirtyRect: NSRect) {
-        
-        // Give a standalone layer to the candidate list panel
-        self.wantsLayer = true
-        self.layer?.borderColor = NSColor.selectedMenuItemTextColor.withAlphaComponent(0.30).cgColor
-        self.layer?.borderWidth = 1.0
-        if #available(macOS 10.13, *) {
-            self.layer?.cornerRadius = 6.0
-        }
-        
         let bounds = self.bounds
         NSColor.controlBackgroundColor.setFill() // Candidate list panel base background
         NSBezierPath.fill(bounds)
@@ -205,36 +196,50 @@ public class HorizontalCandidateController: CandidateController {
 
     public init() {
         var contentRect = NSRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
-        let styleMask: NSWindow.StyleMask = [.borderless, .nonactivatingPanel]
+        let styleMask: NSWindow.StyleMask = [.nonactivatingPanel]
         let panel = NSPanel(contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false)
         panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel) + 1)
         panel.hasShadow = true
         panel.isOpaque = false
-        panel.backgroundColor = NSColor.clear // Transparentify everything outside of the candidate list panel
+        panel.backgroundColor = NSColor.clear
         
         contentRect.origin = NSPoint.zero
         candidateView = HorizontalCandidateView(frame: contentRect)
+
+        candidateView.wantsLayer = true
+        candidateView.layer?.borderColor = NSColor.selectedMenuItemTextColor.withAlphaComponent(0.30).cgColor
+        candidateView.layer?.borderWidth = 1.0
+        if #available(macOS 10.13, *) {
+            candidateView.layer?.cornerRadius = 6.0
+        }
+
         panel.contentView?.addSubview(candidateView)
         
-        contentRect.size = NSSize(width: 20.0, height: 15.0) // Reduce the button width
+        contentRect.size = NSSize(width: 20.0, height: 10.0) // Reduce the button width
+        let buttonAttribute: [NSAttributedString.Key : Any] = [.font : NSFont.systemFont(ofSize: 9.0)]
+
         nextPageButton = NSButton(frame: contentRect)
-        nextPageButton.setButtonType(.momentaryLight)
-        nextPageButton.bezelStyle = .shadowlessSquare
+        NSColor.controlBackgroundColor.setFill()
+        NSBezierPath.fill(nextPageButton.bounds)
         nextPageButton.wantsLayer = true
         nextPageButton.layer?.masksToBounds = true
-        nextPageButton.layer?.borderColor = NSColor.clear.cgColor // Attempt to remove the system default layer border color - step 1
-        nextPageButton.layer?.borderWidth = 0.0 // Attempt to remove the system default layer border color - step 2
-        nextPageButton.layer?.backgroundColor = NSColor.black.cgColor // Button Background Color. Otherwise the button will be half-transparent in macOS Monterey Dark Mode.
-        nextPageButton.attributedTitle = NSMutableAttributedString(string: "⬇︎") // Next Page Arrow
+        nextPageButton.layer?.borderColor = NSColor.clear.cgColor
+        nextPageButton.layer?.borderWidth = 0.0
+        nextPageButton.setButtonType(.momentaryLight)
+        nextPageButton.bezelStyle = .disclosure
+        nextPageButton.userInterfaceLayoutDirection = .leftToRight
+        nextPageButton.attributedTitle = NSMutableAttributedString(string: " ", attributes: buttonAttribute) // Next Page Arrow
         prevPageButton = NSButton(frame: contentRect)
-        prevPageButton.setButtonType(.momentaryLight)
-        prevPageButton.bezelStyle = .shadowlessSquare
+        NSColor.controlBackgroundColor.setFill()
+        NSBezierPath.fill(prevPageButton.bounds)
         prevPageButton.wantsLayer = true
         prevPageButton.layer?.masksToBounds = true
-        prevPageButton.layer?.borderColor = NSColor.clear.cgColor // Attempt to remove the system default layer border color - step 1
-        prevPageButton.layer?.borderWidth = 0.0 // Attempt to remove the system default layer border color - step 2
-        prevPageButton.layer?.backgroundColor = NSColor.black.cgColor // Button Background Color. Otherwise the button will be half-transparent in macOS Monterey Dark Mode.
-        prevPageButton.attributedTitle = NSMutableAttributedString(string: "⬆︎") // Previous Page Arrow
+        prevPageButton.layer?.borderColor = NSColor.clear.cgColor
+        prevPageButton.layer?.borderWidth = 0.0
+        prevPageButton.setButtonType(.momentaryLight)
+        prevPageButton.bezelStyle = .disclosure
+        prevPageButton.userInterfaceLayoutDirection = .rightToLeft
+        prevPageButton.attributedTitle = NSMutableAttributedString(string: " ", attributes: buttonAttribute) // Previous Page Arrow
         panel.contentView?.addSubview(nextPageButton)
         panel.contentView?.addSubview(prevPageButton)
 
@@ -356,13 +361,13 @@ extension HorizontalCandidateController {
             buttonRect.size.height = floor(newSize.height / 2)
 
             let buttonOriginY = (newSize.height - (buttonRect.size.height * 2.0 + spacing)) / 2.0
-            buttonRect.origin = NSPoint(x: newSize.width + 8.0, y: buttonOriginY)
+            buttonRect.origin = NSPoint(x: newSize.width, y: buttonOriginY)
             nextPageButton.frame = buttonRect
 
-            buttonRect.origin = NSPoint(x: newSize.width + 8.0, y: buttonOriginY + buttonRect.size.height + spacing)
+            buttonRect.origin = NSPoint(x: newSize.width, y: buttonOriginY + buttonRect.size.height + spacing)
             prevPageButton.frame = buttonRect
 
-            newSize.width += 52.0
+            newSize.width += 20
             nextPageButton.isHidden = false
             prevPageButton.isHidden = false
         } else {
