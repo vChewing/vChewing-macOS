@@ -47,6 +47,9 @@
 /* Class = "NSButtonCell"; title = "Vertical"; ObjectID = "22"; */
 "22.title" = "纵向布局";
 
+/* Class = "NSButtonCell"; title = "Show page buttons in candidate list"; ObjectID = "shc-Nu-UsM"; */
+"shc-Nu-UsM.title" = "在选字窗内显示翻页按钮";
+
 /* Class = "NSTextFieldCell"; title = "Candidate List Layout:"; ObjectID = "24"; */
 "24.title" = "候选字窗布局:";
 

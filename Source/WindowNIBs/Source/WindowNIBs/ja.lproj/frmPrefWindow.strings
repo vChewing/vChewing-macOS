@@ -47,6 +47,9 @@
 /* Class = "NSButtonCell"; title = "Vertical"; ObjectID = "22"; */
 "22.title" = "縦型陳列";
 
+/* Class = "NSButtonCell"; title = "Show page buttons in candidate list"; ObjectID = "shc-Nu-UsM"; */
+"shc-Nu-UsM.title" = "ページボタンを表示";
+
 /* Class = "NSTextFieldCell"; title = "Candidate List Layout:"; ObjectID = "24"; */
 "24.title" = "入力候補陳列の仕様:";
 
