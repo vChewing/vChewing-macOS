@@ -349,7 +349,7 @@ extension VerticalCandidateController {
         frameRect.size = newSize
         candidateView.frame = frameRect
 
-        if pageCount > 1 {
+        if pageCount > 1 && Preferences.showPageButtonsInCandidateWindow {
             var buttonRect = nextPageButton.frame
             let spacing:CGFloat = 0.0
 
