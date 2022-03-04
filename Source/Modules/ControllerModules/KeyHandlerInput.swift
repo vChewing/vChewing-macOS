@@ -38,6 +38,9 @@ import Cocoa
     case home = 115
     case end = 119
     case delete = 117
+    case leftShift = 56
+    case rightShift = 60
+    case capsLock = 57
 }
 
 // CharCodes: https://theasciicode.com.ar/ascii-control-characters/horizontal-tab-ascii-code-9.html
