@@ -47,6 +47,9 @@
 /* Class = "NSButtonCell"; title = "Vertical"; ObjectID = "22"; */
 "22.title" = "Vertical";
 
+/* Class = "NSButtonCell"; title = "Show page buttons in candidate list"; ObjectID = "shc-Nu-UsM"; */
+"shc-Nu-UsM.title" = "Show page buttons in candidate list";
+
 /* Class = "NSTextFieldCell"; title = "Candidate List Layout:"; ObjectID = "24"; */
 "24.title" = "Candidate List Layout:";
 
