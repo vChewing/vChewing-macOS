@@ -51,6 +51,7 @@ class KeyHandlerInput: NSObject {
     @objc private (set) var inputTextIgnoringModifiers: String?
     @objc private (set) var charCode: UInt16
     @objc private (set) var keyCode: UInt16
+    private var isFlagChanged: Bool
     private var flags: NSEvent.ModifierFlags
     private var cursorForwardKey: KeyCode
     private var cursorBackwardKey: KeyCode
@@ -68,6 +69,7 @@ class KeyHandlerInput: NSObject {
         self.keyCode = keyCode
         self.charCode = AppleKeyboardConverter.cnvApple2ABC(charCode)
         self.flags = flags
+        self.isFlagChanged = false
         useVerticalMode = isVerticalMode
         emacsKey = EmacsKeyHelper.detect(charCode: AppleKeyboardConverter.cnvApple2ABC(charCode), flags: flags)
         cursorForwardKey = useVerticalMode ? .down : .right
@@ -84,6 +86,7 @@ class KeyHandlerInput: NSObject {
         inputTextIgnoringModifiers = AppleKeyboardConverter.cnvStringApple2ABC(event.charactersIgnoringModifiers ?? "")
         keyCode = event.keyCode
         flags = event.modifierFlags
+        isFlagChanged = (event.type == .flagsChanged) ? true : false
         useVerticalMode = isVerticalMode
         let charCode: UInt16 = {
             guard let inputText = event.characters, inputText.count > 0 else {
