@@ -26,6 +26,7 @@ private let kKeyboardLayoutPreference = "KeyboardLayout"
 private let kBasisKeyboardLayoutPreference = "BasisKeyboardLayout"
 private let kFunctionKeyKeyboardLayoutPreference = "FunctionKeyKeyboardLayout"
 private let kFunctionKeyKeyboardLayoutOverrideIncludeShift = "FunctionKeyKeyboardLayoutOverrideIncludeShift"
+private let kShowPageButtonsInCandidateWindow = "ShowPageButtonsInCandidateWindow"
 private let kCandidateListTextSize = "CandidateListTextSize"
 private let kAppleLanguagesPreferences = "AppleLanguages"
 private let kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
@@ -220,6 +221,7 @@ struct ComposingBufferSize {
          kBasisKeyboardLayoutPreference,
          kFunctionKeyKeyboardLayoutPreference,
          kFunctionKeyKeyboardLayoutOverrideIncludeShift,
+         kShowPageButtonsInCandidateWindow,
          kCandidateListTextSize,
          kAppleLanguagesPreferences,
          kShouldAutoReloadUserDataFiles,
@@ -263,6 +265,11 @@ struct ComposingBufferSize {
         // 首次啟用輸入法時設定不要自動更新，免得在某些要隔絕外部網路連線的保密機構內觸犯資安規則。
         if UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) == nil {
             UserDefaults.standard.set(false, forKey: kCheckUpdateAutomatically)
+        }
+
+        // 預設不顯示選字窗翻頁按鈕
+        if UserDefaults.standard.object(forKey: kShowPageButtonsInCandidateWindow) == nil {
+            UserDefaults.standard.set(Preferences.showPageButtonsInCandidateWindow, forKey: kShowPageButtonsInCandidateWindow)
         }
 
         // 預設選字窗字詞文字尺寸，設成 18 剛剛好
@@ -374,6 +381,9 @@ struct ComposingBufferSize {
 
     @UserDefault(key: kFunctionKeyKeyboardLayoutOverrideIncludeShift, defaultValue: false)
     @objc static var functionKeyKeyboardLayoutOverrideIncludeShiftKey: Bool
+
+    @UserDefault(key: kShowPageButtonsInCandidateWindow, defaultValue: false)
+    @objc static var showPageButtonsInCandidateWindow: Bool
 
     @CandidateListTextSize(key: kCandidateListTextSize)
     @objc static var candidateListTextSize: CGFloat
