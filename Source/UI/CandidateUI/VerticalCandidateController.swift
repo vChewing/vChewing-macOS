@@ -69,7 +69,7 @@ fileprivate class VerticalCandidateView: NSView {
             let cellWidth = rctCandidate.size.width + cellPadding
             let cellHeight = rctCandidate.size.height + cellPadding
             if (calculatedWindowWidth < rctCandidate.size.width) {
-                calculatedWindowWidth = rctCandidate.size.width
+                calculatedWindowWidth = rctCandidate.size.width + cellPadding
             }
             newWidths.append(cellWidth)
             newHeights.append(cellHeight)
