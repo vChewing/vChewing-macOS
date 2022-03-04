@@ -21,7 +21,7 @@ import Cocoa
 
 // Use KeyCodes as much as possible since its recognition won't be affected by macOS Base Keyboard Layouts.
 // KeyCodes: https://eastmanreference.com/complete-list-of-applescript-key-codes
-enum KeyCode: UInt16 {
+@objc enum KeyCode: UInt16 {
     case none = 0
     case space = 49
     case backSpace = 51
