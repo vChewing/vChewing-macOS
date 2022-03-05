@@ -31,15 +31,13 @@ extension String {
         var strProcessed = self
         // 預處理格式
         strProcessed = strProcessed.replacingOccurrences(of: " #MACOS", with: "") // 去掉 macOS 標記
-        strProcessed = strProcessed.replacingOccurrences(of: "　", with: " ") // CJKWhiteSpace (\x{3000}) to ASCII Space
-        strProcessed = strProcessed.replacingOccurrences(of: " ", with: " ") // NonBreakWhiteSpace (\x{A0}) to ASCII Space
-        strProcessed = strProcessed.replacingOccurrences(of: "\t", with: " ") // Tab to ASCII Space
-        strProcessed.regReplace(pattern: "\\f", replaceWith: "\n") // Form Feed to LF
-        strProcessed = strProcessed.replacingOccurrences(of: "\r", with: "\n") // CR to LF
-        strProcessed.regReplace(pattern: " +", replaceWith: " ") // 統整連續空格為一個 ASCII 空格
-        strProcessed.regReplace(pattern: "\\n+", replaceWith: "\n") // 統整連續 LF 為一個 LF
-        strProcessed = strProcessed.replacingOccurrences(of: " \n", with: "\n") // 去除行尾空格
-        strProcessed = strProcessed.replacingOccurrences(of: "\n ", with: "\n") // 去除行首空格
+        // CJKWhiteSpace (\x{3000}) to ASCII Space
+        // NonBreakWhiteSpace (\x{A0}) to ASCII Space
+        // Tab to ASCII Space
+        // 統整連續空格為一個 ASCII 空格
+        strProcessed.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: " ")
+        strProcessed.regReplace(pattern: #"(\f+|\r+)+"#, replaceWith: "\n") // CR & Form Feed to LF
+        strProcessed.regReplace(pattern: #"(\n+| \n+|\n+ )"#, replaceWith: "\n") // 去除行尾行首空格與重複行
         if strProcessed.prefix(1) == " " { // 去除檔案開頭空格
             strProcessed.removeFirst()
         }
