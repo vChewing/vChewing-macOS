@@ -391,7 +391,7 @@ struct ComposingBufferSize {
     @UserDefault(key: kShouldAutoReloadUserDataFiles, defaultValue: true)
     @objc static var shouldAutoReloadUserDataFiles: Bool
 
-    @UserDefault(key: kSelectPhraseAfterCursorAsCandidatePreference, defaultValue: true)
+    @UserDefault(key: kSelectPhraseAfterCursorAsCandidatePreference, defaultValue: false)
     @objc static var selectPhraseAfterCursorAsCandidate: Bool
 
     @UserDefault(key: kMoveCursorAfterSelectingCandidate, defaultValue: false)
