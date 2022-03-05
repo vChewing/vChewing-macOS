@@ -111,7 +111,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         newUserOverrideModel = [mgrLangModel userOverrideModelCHT];
     }
 
-    // Symchronize the Preference Setting "setPhraseReplacementEnabled" to the new LM.
+    // Synchronize the Preference Setting "setPhraseReplacementEnabled" to the new LM.
     newLanguageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
 
     // Only apply the changes if the value is changed
