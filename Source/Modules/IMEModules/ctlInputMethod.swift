@@ -198,6 +198,15 @@ class ctlInputMethod: IMKInputController {
 
             let includeShift = Preferences.functionKeyKeyboardLayoutOverrideIncludeShiftKey
             let notShift = NSEvent.ModifierFlags(rawValue: ~(NSEvent.ModifierFlags.shift.rawValue))
+
+            // Shift Click Handling: Toggling Alphanumerical Mode. // STILL BUGGY, hence being commented out.
+            // if !event.modifierFlags.contains(.shift)
+            //     && event.modifierFlags == .init(rawValue: 0)
+            //     && !event.modifierFlags.contains(notShift)
+            //     && (event.keyCode == KeyCode.leftShift.rawValue || event.keyCode == KeyCode.rightShift.rawValue) {
+            //             Preferences.toggleAlphanumericalModeEnabled()
+            // }
+
             if event.modifierFlags.contains(notShift) ||
                        (event.modifierFlags.contains(.shift) && includeShift) {
                 (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: functionKeyKeyboardLayoutID)
