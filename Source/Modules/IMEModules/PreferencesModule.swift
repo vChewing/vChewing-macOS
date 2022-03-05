@@ -382,7 +382,7 @@ struct ComposingBufferSize {
     @UserDefault(key: kFunctionKeyKeyboardLayoutOverrideIncludeShift, defaultValue: false)
     @objc static var functionKeyKeyboardLayoutOverrideIncludeShiftKey: Bool
 
-    @UserDefault(key: kShowPageButtonsInCandidateWindow, defaultValue: false)
+    @UserDefault(key: kShowPageButtonsInCandidateWindow, defaultValue: true)
     @objc static var showPageButtonsInCandidateWindow: Bool
 
     @CandidateListTextSize(key: kCandidateListTextSize)
