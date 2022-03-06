@@ -35,6 +35,7 @@ private let kUseHorizontalCandidateListPreference = "UseHorizontalCandidateList"
 private let kComposingBufferSizePreference = "ComposingBufferSize"
 private let kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
 private let kCNS11643Enabled = "CNS11643Enabled"
+private let kSymbolInputEnabled = "SymbolInputEnabled"
 private let kChineseConversionEnabled = "ChineseConversionEnabled"
 private let kShiftJISShinjitaiOutputEnabled = "ShiftJISShinjitaiOutputEnabled"
 private let kHalfWidthPunctuationEnabled = "HalfWidthPunctuationEnable"
@@ -230,6 +231,7 @@ struct ComposingBufferSize {
          kComposingBufferSizePreference,
          kChooseCandidateUsingSpace,
          kCNS11643Enabled,
+         kSymbolInputEnabled,
          kChineseConversionEnabled,
          kShiftJISShinjitaiOutputEnabled,
          kHalfWidthPunctuationEnabled,
@@ -270,6 +272,11 @@ struct ComposingBufferSize {
         // 預設不顯示選字窗翻頁按鈕
         if UserDefaults.standard.object(forKey: kShowPageButtonsInCandidateWindow) == nil {
             UserDefaults.standard.set(Preferences.showPageButtonsInCandidateWindow, forKey: kShowPageButtonsInCandidateWindow)
+        }
+
+        // 預設啟用繪文字與符號輸入
+        if UserDefaults.standard.object(forKey: kSymbolInputEnabled) == nil {
+            UserDefaults.standard.set(Preferences.symbolInputEnabled, forKey: kSymbolInputEnabled)
         }
 
         // 預設選字窗字詞文字尺寸，設成 18 剛剛好
@@ -434,6 +441,16 @@ struct ComposingBufferSize {
         cns11643Enabled = !cns11643Enabled
         UserDefaults.standard.set(cns11643Enabled, forKey: kCNS11643Enabled)
         return cns11643Enabled
+    }
+
+    @UserDefault(key: kSymbolInputEnabled, defaultValue: true)
+    @objc static var symbolInputEnabled: Bool
+
+    @objc static func toggleSymbolInputEnabled() -> Bool {
+        symbolInputEnabled = !symbolInputEnabled
+        mgrLangModel.setSymbolEnabled(symbolInputEnabled) // 很重要
+        UserDefaults.standard.set(symbolInputEnabled, forKey: kSymbolInputEnabled)
+        return symbolInputEnabled
     }
 
     @UserDefault(key: kChineseConversionEnabled, defaultValue: false)
