@@ -50,6 +50,7 @@
 "Alphanumerical Input Mode" = "原生英数输入模式";
 "Apple Zhuyin Bopomofo" = "Apple 标准注音键盘布局";
 "Apple Zhuyin Eten" = "Apple 倚天注音键盘布局";
+"Symbol & Emoji Input" = "符号＆绘文字输入";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";

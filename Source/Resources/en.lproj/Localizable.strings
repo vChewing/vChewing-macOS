@@ -50,6 +50,7 @@
 "Alphanumerical Input Mode" = "Alphanumerical Input Mode";
 "Apple Zhuyin Bopomofo" = "Apple Zhuyin Bopomofo (Standard)";
 "Apple Zhuyin Eten" = "Apple Zhuyin Eten";
+"Symbol & Emoji Input" = "Symbol & Emoji Input";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "CommonSymbols";
