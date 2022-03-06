@@ -371,4 +371,10 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     gLangModelCHS.setCNSEnabled(cnsEnabled);
 }
 
++ (void)setSymbolEnabled:(BOOL)symbolEnabled
+{
+    gLangModelCHT.setSymbolEnabled(symbolEnabled);
+    gLangModelCHS.setSymbolEnabled(symbolEnabled);
+}
+
 @end
