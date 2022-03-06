@@ -99,6 +99,9 @@ class ctlInputMethod: IMKInputController {
         if optionKeyPressed {
             let phaseReplacementItem = menu.addItem(withTitle: NSLocalizedString("Use Phrase Replacement", comment: ""), action: #selector(togglePhraseReplacement(_:)), keyEquivalent: "")
             phaseReplacementItem.state = Preferences.phraseReplacementEnabled.state
+
+            let toggleSymbolInputItem = menu.addItem(withTitle: NSLocalizedString("Symbol & Emoji Input", comment: ""), action: #selector(toggleSymbolEnabled(_:)), keyEquivalent: "")
+            toggleSymbolInputItem.state = Preferences.symbolInputEnabled.state
         }
 
         menu.addItem(NSMenuItem.separator()) // ---------------------
@@ -262,6 +265,11 @@ class ctlInputMethod: IMKInputController {
     @objc func toggleCNS11643Enabled(_ sender: Any?) {
         mgrLangModel.setCNSEnabled(Preferences.toggleCNS11643Enabled())
         NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("CNS11643 Mode", comment: ""), "\n", Preferences.cns11643Enabled ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
+    }
+
+    @objc func toggleSymbolEnabled(_ sender: Any?) {
+        mgrLangModel.setSymbolEnabled(Preferences.toggleSymbolInputEnabled())
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Symbol & Emoji Input", comment: ""), "\n", Preferences.symbolInputEnabled ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 
     @objc func toggleAssociatedPhrasesEnabled(_ sender: Any?) {
