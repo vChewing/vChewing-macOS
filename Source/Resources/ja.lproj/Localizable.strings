@@ -49,7 +49,7 @@
 "ja" = "和語";
 "Alphanumerical Input Mode" = "英数入力モード";
 "Apple Zhuyin Bopomofo" = "Apple 注音ボポモフォ配列（大千標準）";
-"Apple Zhuyin Bopomofo" = "Apple 注音ボポモフォ配列（倚天伝統）";
+"Apple Zhuyin Eten" = "Apple 注音ボポモフォ配列（倚天伝統）";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";
