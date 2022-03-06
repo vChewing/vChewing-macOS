@@ -111,6 +111,11 @@ public:
     /// If phrase replacement is enabled or not.
     bool phraseReplacementEnabled();
 
+    /// Enables or disables symbol input.
+    void setSymbolEnabled(bool enabled);
+    /// If symbol input is enabled or not.
+    bool symbolEnabled();
+
     /// Enables or disables CNS11643 input.
     void setCNSEnabled(bool enabled);
     /// If CNS11643 input is enabled or not.
@@ -149,6 +154,7 @@ protected:
     AssociatedPhrases m_associatedPhrases;
     bool m_phraseReplacementEnabled;
     bool m_cnsEnabled;
+    bool m_symbolEnabled;
     bool m_externalConverterEnabled;
     std::function<std::string(std::string)> m_externalConverter;
 };
