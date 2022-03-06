@@ -41,11 +41,13 @@ import Cocoa
     case leftShift = 56
     case rightShift = 60
     case capsLock = 57
+    case symbolMenuPhysicalKey = 50
 }
 
 // CharCodes: https://theasciicode.com.ar/ascii-control-characters/horizontal-tab-ascii-code-9.html
-enum CharCode: UInt16 {
-    case symbolMenuKey_ABC = 96
+enum CharCode: UInt/*16*/ {
+    case yajuusenpai = 1145141919810893
+    // - CharCode is not reliable at all. KeyCode is the most accurate. KeyCode doesn't give a phuque about the character sent through macOS keyboard layouts but only focuses on which physical key is pressed.
 }
 
 class KeyHandlerInput: NSObject {
@@ -231,9 +233,10 @@ class KeyHandlerInput: NSObject {
         KeyCode(rawValue: keyCode) == verticalModeOnlyChooseCandidateKey
     }
 
-    @objc var isSymbolMenuKey: Bool {
-        // 這裡用 CharCode 更合適，不然就無法輸入波浪鍵了。
-        CharCode(rawValue: charCode) == CharCode.symbolMenuKey_ABC
+    @objc var isSymbolMenuPhysicalKey: Bool {
+        // 這裡必須用 KeyCode，這樣才不會受隨 macOS 版本更動的 Apple 動態注音鍵盤排列內容的影響。
+        // 只是必須得與 ![input isShift] 搭配使用才可以（也就是僅判定 Shift 沒被摁下的情形）。
+        KeyCode(rawValue: keyCode) == KeyCode.symbolMenuPhysicalKey
     }
 
 }
