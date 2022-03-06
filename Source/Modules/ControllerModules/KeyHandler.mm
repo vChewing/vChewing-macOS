@@ -1429,15 +1429,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 - (size_t)_actualCandidateCursorIndex
 {
     size_t cursorIndex = _builder->cursorIndex();
-    if (Preferences.selectPhraseAfterCursorAsCandidate) {
-        // MS Phonetics IME style, phrase is *after* the cursor, i.e. cursor is always *before* the phrase
-        if (cursorIndex < _builder->length()) {
-            ++cursorIndex;
-        }
-    } else {
-        if (!cursorIndex) {
-            ++cursorIndex;
-        }
+    // MS Phonetics IME style, phrase is *after* the cursor, i.e. cursor is always *before* the phrase
+    if ((Preferences.selectPhraseAfterCursorAsCandidate && (cursorIndex < _builder->length()))
+        || !cursorIndex) {
+        ++cursorIndex;
     }
 
     return cursorIndex;
