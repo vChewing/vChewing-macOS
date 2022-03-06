@@ -154,6 +154,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         _languageModel = [mgrLangModel lmCHT];
         _languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
         _languageModel->setCNSEnabled(Preferences.cns11643Enabled);
+        _languageModel->setSymbolEnabled(Preferences.symbolInputEnabled);
         _userOverrideModel = [mgrLangModel userOverrideModelCHT];
 
         _builder = new Gramambular::BlockReadingBuilder(_languageModel);
