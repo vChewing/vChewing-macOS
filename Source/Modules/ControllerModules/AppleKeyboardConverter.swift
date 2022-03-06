@@ -34,9 +34,6 @@ import Cocoa
         var charCode = charCode
         // 在按鍵資訊被送往 OVMandarin 之前，先轉換為可以被 OVMandarin 正常處理的資訊。
         if self.isDynamicBaseKeyboardLayoutEnabled() {
-            // 保證 Apple 大千佈局內的符號鍵正常工作。
-            if charCode == 45 && (Preferences.basisKeyboardLayout == "com.apple.keylayout.ZhuyinBopomofo") { charCode = UniChar(96) }
-            if charCode == 183 && (Preferences.basisKeyboardLayout == "com.apple.keylayout.ZhuyinEten") { charCode = UniChar(96) }
             // 針對不同的 Apple 動態鍵盤佈局糾正大寫英文輸入。
             switch Preferences.basisKeyboardLayout {
             case "com.apple.keylayout.ZhuyinBopomofo": do {
@@ -173,9 +170,6 @@ import Cocoa
     @objc class func cnvStringApple2ABC(_ strProcessed: String) -> String {
         var strProcessed = strProcessed
         if self.isDynamicBaseKeyboardLayoutEnabled() {
-            // 保證 Apple 大千佈局內的符號鍵正常工作。
-            if (strProcessed == "-" && Preferences.basisKeyboardLayout == "com.apple.keylayout.ZhuyinBopomofo") { strProcessed = "`" }
-            if (strProcessed == "·" && Preferences.basisKeyboardLayout == "com.apple.keylayout.ZhuyinEten") { strProcessed = "`" }
             // 針對不同的 Apple 動態鍵盤佈局糾正大寫英文輸入。
             switch Preferences.basisKeyboardLayout {
             case "com.apple.keylayout.ZhuyinBopomofo": do {
