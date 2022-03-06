@@ -170,7 +170,7 @@ const std::vector<Gramambular::Unigram> LMInstantiator::unigramsForKey(const std
         miscUnigrams = filterAndTransformUnigrams(rawMiscUnigrams, excludedValues, insertedValues);
     }
 
-    if (m_symbolModel.hasUnigramsForKey(key)) {
+    if (m_symbolModel.hasUnigramsForKey(key) && m_symbolEnabled) {
         std::vector<Gramambular::Unigram> rawSymbolUnigrams = m_symbolModel.unigramsForKey(key);
         symbolUnigrams = filterAndTransformUnigrams(rawSymbolUnigrams, excludedValues, insertedValues);
     }
@@ -214,9 +214,20 @@ void LMInstantiator::setCNSEnabled(bool enabled)
 {
     m_cnsEnabled = enabled;
 }
+
 bool LMInstantiator::cnsEnabled()
 {
     return m_cnsEnabled;
+}
+
+void LMInstantiator::setSymbolEnabled(bool enabled)
+{
+    m_symbolEnabled = enabled;
+}
+
+bool LMInstantiator::symbolEnabled()
+{
+    return m_symbolEnabled;
 }
 
 void LMInstantiator::setExternalConverterEnabled(bool enabled)
