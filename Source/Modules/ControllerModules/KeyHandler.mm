@@ -532,7 +532,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     // MARK: Punctuation list
-    if ([input isSymbolMenuKey]) {
+    if ([input isSymbolMenuPhysicalKey] && ![input isShiftHold]) {
 
         // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
         // 於是這裡用「模擬一次 Enter 鍵的操作」使其代為執行這個 commit buffer 的動作。
