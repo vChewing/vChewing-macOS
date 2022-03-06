@@ -442,7 +442,10 @@ struct ComposingBufferSize {
     @objc @discardableResult static func toggleChineseConversionEnabled() -> Bool {
         chineseConversionEnabled = !chineseConversionEnabled
         // 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
-        if chineseConversionEnabled && shiftJISShinjitaiOutputEnabled {self.toggleShiftJISShinjitaiOutputEnabled()}
+        if chineseConversionEnabled && shiftJISShinjitaiOutputEnabled {
+            self.toggleShiftJISShinjitaiOutputEnabled()
+            UserDefaults.standard.set(shiftJISShinjitaiOutputEnabled, forKey: kShiftJISShinjitaiOutputEnabled)
+        }
         UserDefaults.standard.set(chineseConversionEnabled, forKey: kChineseConversionEnabled)
         return chineseConversionEnabled
     }
