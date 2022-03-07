@@ -598,11 +598,29 @@
                                                             <binding destination="32" name="value" keyPath="values.ShouldAutoReloadUserDataFiles" id="XTI-ol-DVN"/>
                                                         </connections>
                                                     </button>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="O4B-Z2-XYi">
+                                                        <rect key="frame" x="19" y="334.5" width="406" height="17"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="234" id="b55-tE-4Xz"/>
+                                                            <constraint firstAttribute="height" constant="16" id="xK8-Au-QSC"/>
+                                                        </constraints>
+                                                        <buttonCell key="cell" type="check" title="Enable symbol input support (incl. certain emoji symbols)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="hSv-LJ-Cq3" userLabel="chkSymbolEnabled">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="toggleSymbolInputEnabled:" target="-2" id="Gzj-dF-gvj"/>
+                                                            <binding destination="32" name="value" keyPath="values.SymbolInputEnabled" id="XWG-G3-DRu"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                                 <constraints>
                                                     <constraint firstItem="p7V-IN-OTr" firstAttribute="top" secondItem="cy4-aV-hhk" secondAttribute="top" constant="18.5" id="GTZ-mq-8zK"/>
+                                                    <constraint firstItem="O4B-Z2-XYi" firstAttribute="top" secondItem="p7V-IN-OTr" secondAttribute="bottom" constant="6" id="Vhi-Ma-ErF"/>
                                                     <constraint firstItem="p7V-IN-OTr" firstAttribute="leading" secondItem="cy4-aV-hhk" secondAttribute="leading" constant="20" id="gvI-87-PEb"/>
+                                                    <constraint firstAttribute="trailing" secondItem="O4B-Z2-XYi" secondAttribute="trailing" constant="20" symbolic="YES" id="h9K-ln-6cI"/>
                                                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="p7V-IN-OTr" secondAttribute="trailing" constant="20" symbolic="YES" id="hSy-OW-G1A"/>
+                                                    <constraint firstItem="O4B-Z2-XYi" firstAttribute="leading" secondItem="p7V-IN-OTr" secondAttribute="leading" id="s7z-z0-Zhe"/>
                                                 </constraints>
                                             </view>
                                         </box>
