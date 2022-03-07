@@ -281,7 +281,7 @@ class ctlInputMethod: IMKInputController {
     }
 
     @objc func togglePhraseReplacement(_ sender: Any?) {
-        mgrLangModel.setPhraseReplacementEnabled(Preferences.togglePhraseReplacementEnabled())
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Use Phrase Replacement", comment: ""), "\n", Preferences.togglePhraseReplacementEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 
     @objc func selfTerminate(_ sender: Any?) {
