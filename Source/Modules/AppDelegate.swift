@@ -198,6 +198,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
         }
         ctlPrefWindowInstance?.window?.center()
         ctlPrefWindowInstance?.window?.orderFrontRegardless() // 逼著屬性視窗往最前方顯示
+        ctlPrefWindowInstance?.window?.level = .statusBar
     }
     
     // New About Window
@@ -207,6 +208,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
         }
         ctlAboutWindowInstance?.window?.center()
         ctlAboutWindowInstance?.window?.orderFrontRegardless() // 逼著關於視窗往最前方顯示
+        ctlAboutWindowInstance?.window?.level = .statusBar
     }
 
     @objc(checkForUpdate)
