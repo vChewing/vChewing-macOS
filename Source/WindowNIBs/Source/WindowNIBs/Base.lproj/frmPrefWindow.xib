@@ -232,7 +232,7 @@
                                                 <rect key="frame" x="3" y="3" width="445" height="134"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Yaj-QY-7xV">
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Yaj-QY-7xV" userLabel="chkCNSSupport">
                                                         <rect key="frame" x="19" y="104.5" width="406" height="17"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="16" id="KdE-Vd-Y50"/>
@@ -242,6 +242,7 @@
                                                             <font key="font" metaFont="cellTitle"/>
                                                         </buttonCell>
                                                         <connections>
+                                                            <action selector="toggleCNSSupport:" target="-2" id="mcY-ma-N0c"/>
                                                             <binding destination="32" name="value" keyPath="values.CNS11643Enabled" id="Pbx-Gt-upm"/>
                                                         </connections>
                                                     </button>
