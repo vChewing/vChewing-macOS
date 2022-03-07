@@ -50,7 +50,6 @@
 		5BD05C6827B2BBEF004C4F1D /* Content.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD05C6327B2BBEF004C4F1D /* Content.swift */; };
 		5BD05C6927B2BBEF004C4F1D /* WindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD05C6427B2BBEF004C4F1D /* WindowController.swift */; };
 		5BD05C6A27B2BBEF004C4F1D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD05C6527B2BBEF004C4F1D /* ViewController.swift */; };
-		5BDC5CAB27C2873D00E1CCE2 /* Grid.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5BDC5CAA27C2873D00E1CCE2 /* Grid.mm */; };
 		5BDC5CB327C28E8B00E1CCE2 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 5BDC5CB227C28E8B00E1CCE2 /* icon.icns */; };
 		5BDC5CB527C28E8B00E1CCE2 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDC5CB427C28E8B00E1CCE2 /* ShareViewController.swift */; };
 		5BDC5CB827C28E8B00E1CCE2 /* ShareViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BDC5CB627C28E8B00E1CCE2 /* ShareViewController.xib */; };
@@ -231,7 +230,6 @@
 		5BD05C6327B2BBEF004C4F1D /* Content.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Content.swift; sourceTree = "<group>"; };
 		5BD05C6427B2BBEF004C4F1D /* WindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WindowController.swift; sourceTree = "<group>"; };
 		5BD05C6527B2BBEF004C4F1D /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		5BDC5CAA27C2873D00E1CCE2 /* Grid.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Grid.mm; sourceTree = "<group>"; };
 		5BDC5CB027C28E8B00E1CCE2 /* KeyboardExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = KeyboardExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		5BDC5CB227C28E8B00E1CCE2 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = icon.icns; sourceTree = "<group>"; };
 		5BDC5CB427C28E8B00E1CCE2 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
@@ -752,7 +750,6 @@
 				6A0D4F1515FC0EB100ABF4B3 /* BlockReadingBuilder.h */,
 				6A0D4F1615FC0EB100ABF4B3 /* Gramambular.h */,
 				6A0D4F1715FC0EB100ABF4B3 /* Grid.h */,
-				5BDC5CAA27C2873D00E1CCE2 /* Grid.mm */,
 				6A0D4F1815FC0EB100ABF4B3 /* KeyValuePair.h */,
 				6A0D4F1915FC0EB100ABF4B3 /* LanguageModel.h */,
 				6A0D4F1A15FC0EB100ABF4B3 /* Node.h */,
@@ -1075,7 +1072,6 @@
 				D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */,
 				5B62A33627AE795800A19448 /* PreferencesModule.swift in Sources */,
 				5B62A33827AE79CD00A19448 /* NSStringUtils.swift in Sources */,
-				5BDC5CAB27C2873D00E1CCE2 /* Grid.mm in Sources */,
 				5B62A33227AE792F00A19448 /* InputSourceHelper.swift in Sources */,
 				5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
