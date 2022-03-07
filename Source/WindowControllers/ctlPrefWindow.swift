@@ -168,6 +168,12 @@ extension RangeReplaceableCollection where Element: Hashable {
 
     }
 
+    // 這裡有必要加上這段處理，用來確保藉由偏好設定介面動過的 CNS 開關能夠立刻生效。
+    // 所有涉及到語言模型開關的內容均需要這樣處理。
+    @IBAction func toggleCNSSupport(_ sender: Any) {
+        mgrLangModel.setCNSEnabled(Preferences.cns11643Enabled)
+    }
+
     @IBAction func toggleTrad2KangXiAction(_ sender: Any) {
         if chkTrad2KangXi.state == .on && chkTrad2JISShinjitai.state == .on {
             Preferences.toggleShiftJISShinjitaiOutputEnabled()
