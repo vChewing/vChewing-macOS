@@ -569,6 +569,7 @@ struct ComposingBufferSize {
 
     @objc static func togglePhraseReplacementEnabled() -> Bool {
         phraseReplacementEnabled = !phraseReplacementEnabled
+        mgrLangModel.setPhraseReplacementEnabled(phraseReplacementEnabled)
         UserDefaults.standard.set(phraseReplacementEnabled, forKey: kPhraseReplacementEnabled)
         return phraseReplacementEnabled
     }
