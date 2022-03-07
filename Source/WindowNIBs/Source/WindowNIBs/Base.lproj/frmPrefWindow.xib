@@ -514,6 +514,7 @@
                                                         </buttonCell>
                                                         <connections>
                                                             <binding destination="32" name="value" keyPath="values.MoveCursorAfterSelectingCandidate" id="BbO-T6-zh3"/>
+                                                            <binding destination="32" name="enabled" keyPath="values.SelectPhraseAfterCursorAsCandidate" id="lfH-IT-XBO"/>
                                                         </connections>
                                                     </button>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="109">
