@@ -439,6 +439,7 @@ struct ComposingBufferSize {
 
     @objc static func toggleCNS11643Enabled() -> Bool {
         cns11643Enabled = !cns11643Enabled
+        mgrLangModel.setCNSEnabled(cns11643Enabled) // 很重要
         UserDefaults.standard.set(cns11643Enabled, forKey: kCNS11643Enabled)
         return cns11643Enabled
     }
