@@ -220,3 +220,6 @@
 
 /* Class = "NSButtonCell"; title = "Space to +cycle candidates, Shift+Space to +cycle pages"; ObjectID = "dIN-TZ-67g"; */
 "dIN-TZ-67g.title" = "Space to +cycle candidates, Shift+Space to +cycle pages";
+
+/* Class = "NSButtonCell"; title = "Enable symbol input support (incl. certain emoji symbols)"; ObjectID = "hSv-LJ-Cq3"; */
+"hSv-LJ-Cq3.title" = "Enable symbol input support (incl. certain emoji symbols)";

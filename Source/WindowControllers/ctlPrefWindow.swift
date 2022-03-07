@@ -174,6 +174,10 @@ extension RangeReplaceableCollection where Element: Hashable {
         mgrLangModel.setCNSEnabled(Preferences.cns11643Enabled)
     }
 
+    @IBAction func toggleSymbolInputEnabled(_ sender: Any) {
+        mgrLangModel.setSymbolEnabled(Preferences.symbolInputEnabled)
+    }
+
     @IBAction func toggleTrad2KangXiAction(_ sender: Any) {
         if chkTrad2KangXi.state == .on && chkTrad2JISShinjitai.state == .on {
             Preferences.toggleShiftJISShinjitaiOutputEnabled()
