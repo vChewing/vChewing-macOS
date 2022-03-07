@@ -263,13 +263,11 @@ class ctlInputMethod: IMKInputController {
     }
 
     @objc func toggleCNS11643Enabled(_ sender: Any?) {
-        mgrLangModel.setCNSEnabled(Preferences.toggleCNS11643Enabled())
-        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("CNS11643 Mode", comment: ""), "\n", Preferences.cns11643Enabled ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("CNS11643 Mode", comment: ""), "\n", Preferences.toggleCNS11643Enabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 
     @objc func toggleSymbolEnabled(_ sender: Any?) {
-        mgrLangModel.setSymbolEnabled(Preferences.toggleSymbolInputEnabled())
-        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Symbol & Emoji Input", comment: ""), "\n", Preferences.symbolInputEnabled ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Symbol & Emoji Input", comment: ""), "\n", Preferences.toggleSymbolInputEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 
     @objc func toggleAssociatedPhrasesEnabled(_ sender: Any?) {
