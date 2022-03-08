@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="UTF-8"?>
 <!DOCTYPE keyboard SYSTEM "file://localhost/System/Library/DTDs/KeyboardLayout.dtd">
-<!--Last edited by Ukelele version 351 on 2022-03-08 at 11:10 (GMT+8)-->
-<keyboard group="126" id="-17519" name="vChewing Seigyou" maxout="1">
+<!--Last edited by Ukelele version 351 on 2022-03-08 at 13:26 (GMT+8)-->
+<keyboard group="126" id="-17519" name="vChewing FakeSeigyou" maxout="1">
     <layouts>
         <layout first="0" last="17" mapSet="16c" modifiers="f4"/>
         <layout first="18" last="18" mapSet="a88" modifiers="f4"/>
@@ -66,19 +66,19 @@
             <key code="18" output="˙"/>
             <key code="19" output="ㄅ"/>
             <key code="20" output="ㄉ"/>
-            <key code="21" output="4"/>
+            <key code="21" output="ㄧ"/>
             <key code="22" output="ㄓ"/>
-            <key code="23" output="5"/>
-            <key code="24" output="ㄦ"/>
+            <key code="23" output="ㄨ"/>
+            <key code="24" output="＝"/>
             <key code="25" output="ㄞ"/>
-            <key code="26" output="7"/>
-            <key code="27" output="ㄧ"/>
+            <key code="26" output="ㄩ"/>
+            <key code="27" output="ㄦ"/>
             <key code="28" output="ㄚ"/>
             <key code="29" output="ㄢ"/>
             <key code="30" output="」"/>
             <key code="31" output="ㄟ"/>
             <key code="32" output="ㄗ"/>
-            <key code="33" output="ㄨ"/>
+            <key code="33" output="「"/>
             <key code="34" output="ㄛ"/>
             <key code="35" output="ㄣ"/>
             <key code="36" output="&#x000D;"/>
@@ -492,6 +492,7 @@
             <key code="7" output="x"/>
             <key code="8" output="c"/>
             <key code="9" output="v"/>
+            <key code="10" output=""/>
             <key code="11" output="b"/>
             <key code="12" output="q"/>
             <key code="13" output="w"/>
