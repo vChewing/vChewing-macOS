@@ -84,11 +84,6 @@ extension RangeReplaceableCollection where Element: Hashable {
         menuItem_AppleZhuyinEten.representedObject = String("com.apple.keylayout.ZhuyinEten")
         basisKeyboardLayoutButton.menu?.addItem(menuItem_AppleZhuyinEten)
 
-        let menuItem_vChewingDachen = NSMenuItem()
-        menuItem_vChewingDachen.title = String(format: NSLocalizedString("vChewing Dachen (Not Finished Yet)", comment: ""))
-        menuItem_vChewingDachen.representedObject = String("org.atelierInmu.keyboardlayout.vChewingKeyLayout.vChewingDachen")
-        basisKeyboardLayoutButton.menu?.addItem(menuItem_vChewingDachen)
-
         let basisKeyboardLayoutID = Preferences.basisKeyboardLayout
 
         for source in list {
@@ -145,8 +140,6 @@ extension RangeReplaceableCollection where Element: Hashable {
             chosenBaseKeyboardLayoutItem = menuItem_AppleZhuyinBopomofo
         case "com.apple.keylayout.ZhuyinEten":
             chosenBaseKeyboardLayoutItem = menuItem_AppleZhuyinEten
-        case "org.atelierInmu.keyboardlayout.vChewingKeyLayout.zhuyindachen":
-            chosenBaseKeyboardLayoutItem = menuItem_vChewingDachen
         default:
             break // nothing to do
         }
