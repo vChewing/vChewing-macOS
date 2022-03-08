@@ -26,7 +26,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include "Grid.h"
 #include "LanguageModel.h"
 
-namespace Taiyan {
 namespace Gramambular {
 
 class BlockReadingBuilder {
@@ -201,6 +200,6 @@ inline const std::string BlockReadingBuilder::Join(
     return result;
 }
 }  // namespace Gramambular
-}  // namespace Taiyan
+
 
 #endif

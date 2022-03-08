@@ -34,7 +34,7 @@ static double Score(size_t eventCount,
                     double timestamp,
                     double lambda);
 static bool IsEndingPunctuation(const std::string& value);
-static std::string WalkedNodesToKey(const std::vector<Taiyan::Gramambular::NodeAnchor>& walkedNodes,
+static std::string WalkedNodesToKey(const std::vector<Gramambular::NodeAnchor>& walkedNodes,
                                size_t cursorIndex);
 
 UserOverrideModel::UserOverrideModel(size_t capacity, double decayConstant)
@@ -43,7 +43,7 @@ UserOverrideModel::UserOverrideModel(size_t capacity, double decayConstant)
     m_decayExponent = log(0.5) / decayConstant;
 }
 
-void UserOverrideModel::observe(const std::vector<Taiyan::Gramambular::NodeAnchor>& walkedNodes,
+void UserOverrideModel::observe(const std::vector<Gramambular::NodeAnchor>& walkedNodes,
                                 size_t cursorIndex,
                                 const std::string& candidate,
                                 double timestamp) {
@@ -76,7 +76,7 @@ void UserOverrideModel::observe(const std::vector<Taiyan::Gramambular::NodeAncho
     }
 }
 
-std::string UserOverrideModel::suggest(const std::vector<Taiyan::Gramambular::NodeAnchor>& walkedNodes,
+std::string UserOverrideModel::suggest(const std::vector<Gramambular::NodeAnchor>& walkedNodes,
                                   size_t cursorIndex,
                                   double timestamp) {
     std::string key = WalkedNodesToKey(walkedNodes, cursorIndex);
@@ -138,12 +138,12 @@ static bool IsEndingPunctuation(const std::string& value) {
     return value == "，" || value == "。" || value== "！" || value == "？" ||
         value == "」" || value == "』" || value== "”" || value == "’";
 }
-static std::string WalkedNodesToKey(const std::vector<Taiyan::Gramambular::NodeAnchor>& walkedNodes,
+static std::string WalkedNodesToKey(const std::vector<Gramambular::NodeAnchor>& walkedNodes,
                                size_t cursorIndex) {
     std::stringstream s;
-    std::vector<Taiyan::Gramambular::NodeAnchor> n;
+    std::vector<Gramambular::NodeAnchor> n;
     size_t ll = 0;
-    for (std::vector<Taiyan::Gramambular::NodeAnchor>::const_iterator i = walkedNodes.begin();
+    for (std::vector<Gramambular::NodeAnchor>::const_iterator i = walkedNodes.begin();
          i != walkedNodes.end();
          ++i) {
         const auto& nn = *i;
@@ -154,7 +154,7 @@ static std::string WalkedNodesToKey(const std::vector<Taiyan::Gramambular::NodeA
         }
     }
 
-    std::vector<Taiyan::Gramambular::NodeAnchor>::const_reverse_iterator r = n.rbegin();
+    std::vector<Gramambular::NodeAnchor>::const_reverse_iterator r = n.rbegin();
 
     if (r == n.rend()) {
         return "";

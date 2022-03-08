@@ -84,57 +84,43 @@ extension RangeReplaceableCollection where Element: Hashable {
         menuItem_AppleZhuyinEten.representedObject = String("com.apple.keylayout.ZhuyinEten")
         basisKeyboardLayoutButton.menu?.addItem(menuItem_AppleZhuyinEten)
 
-        let menuItem_vChewingDachen = NSMenuItem()
-        menuItem_vChewingDachen.title = String(format: NSLocalizedString("vChewing Dachen (Not Finished Yet)", comment: ""))
-        menuItem_vChewingDachen.representedObject = String("org.atelierInmu.keyboardlayout.vChewingKeyLayout.vChewingDachen")
-        basisKeyboardLayoutButton.menu?.addItem(menuItem_vChewingDachen)
-
         let basisKeyboardLayoutID = Preferences.basisKeyboardLayout
-        
+
         for source in list {
-
-            func getString(_ key: CFString) -> String? {
-                if let ptr = TISGetInputSourceProperty(source, key) {
-                    return String(Unmanaged<CFString>.fromOpaque(ptr).takeUnretainedValue())
-                }
-                return nil
-            }
-
-            func getBool(_ key: CFString) -> Bool? {
-                if let ptr = TISGetInputSourceProperty(source, key) {
-                    return Unmanaged<CFBoolean>.fromOpaque(ptr).takeUnretainedValue() == kCFBooleanTrue
-                }
-                return nil
-            }
-
-            if let category = getString(kTISPropertyInputSourceCategory) {
-                if category != String(kTISCategoryKeyboardInputSource) {
+            if let categoryPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceCategory) {
+                let category = Unmanaged<CFString>.fromOpaque(categoryPtr).takeUnretainedValue()
+                if category != kTISCategoryKeyboardInputSource {
                     continue
                 }
             } else {
                 continue
             }
 
-            if let asciiCapable = getBool(kTISPropertyInputSourceIsASCIICapable) {
-                if !asciiCapable {
+            if let asciiCapablePtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceIsASCIICapable) {
+                let asciiCapable = Unmanaged<CFBoolean>.fromOpaque(asciiCapablePtr).takeUnretainedValue()
+                if asciiCapable != kCFBooleanTrue {
                     continue
                 }
             } else {
                 continue
             }
 
-            if let sourceType = getString(kTISPropertyInputSourceType) {
-                if sourceType != String(kTISTypeKeyboardLayout) {
+            if let sourceTypePtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceType) {
+                let sourceType = Unmanaged<CFString>.fromOpaque(sourceTypePtr).takeUnretainedValue()
+                if sourceType != kTISTypeKeyboardLayout {
                     continue
                 }
             } else {
                 continue
             }
 
-            guard let sourceID = getString(kTISPropertyInputSourceID),
-                  let localizedName = getString(kTISPropertyLocalizedName) else {
+            guard let sourceIDPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceID),
+                  let localizedNamePtr = TISGetInputSourceProperty(source, kTISPropertyLocalizedName) else {
                 continue
             }
+
+            let sourceID = String(Unmanaged<CFString>.fromOpaque(sourceIDPtr).takeUnretainedValue())
+            let localizedName = String(Unmanaged<CFString>.fromOpaque(localizedNamePtr).takeUnretainedValue())
 
             let menuItem = NSMenuItem()
             menuItem.title = localizedName
@@ -154,8 +140,6 @@ extension RangeReplaceableCollection where Element: Hashable {
             chosenBaseKeyboardLayoutItem = menuItem_AppleZhuyinBopomofo
         case "com.apple.keylayout.ZhuyinEten":
             chosenBaseKeyboardLayoutItem = menuItem_AppleZhuyinEten
-        case "org.atelierInmu.keyboardlayout.vChewingKeyLayout.zhuyindachen":
-            chosenBaseKeyboardLayoutItem = menuItem_vChewingDachen
         default:
             break // nothing to do
         }
@@ -175,6 +159,16 @@ extension RangeReplaceableCollection where Element: Hashable {
         
         // MARK: - 設定漢字轉換選項是否禁用
 
+    }
+
+    // 這裡有必要加上這段處理，用來確保藉由偏好設定介面動過的 CNS 開關能夠立刻生效。
+    // 所有涉及到語言模型開關的內容均需要這樣處理。
+    @IBAction func toggleCNSSupport(_ sender: Any) {
+        mgrLangModel.setCNSEnabled(Preferences.cns11643Enabled)
+    }
+
+    @IBAction func toggleSymbolInputEnabled(_ sender: Any) {
+        mgrLangModel.setSymbolEnabled(Preferences.symbolInputEnabled)
     }
 
     @IBAction func toggleTrad2KangXiAction(_ sender: Any) {

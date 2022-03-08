@@ -25,18 +25,85 @@ import Cocoa
             return true
         case "com.apple.keylayout.ZhuyinEten":
             return true
+        case "org.atelierInmu.vChewing.keyLayouts.vchewingdachen":
+            return true
+        case "org.atelierInmu.vChewing.keyLayouts.vchewingmitac":
+            return true
+        case "org.atelierInmu.vChewing.keyLayouts.vchewingibm":
+            return true
+        case "org.atelierInmu.vChewing.keyLayouts.vchewingseigyou":
+            return true
+        case "org.atelierInmu.vChewing.keyLayouts.vchewingeten":
+            return true
         default:
             return false
         }
     }
-    // 處理 Apple 注音鍵盤佈局類型
+    // 處理 Apple 注音鍵盤佈局類型。
     @objc class func cnvApple2ABC(_ charCode: UniChar) -> UniChar {
         var charCode = charCode
         // 在按鍵資訊被送往 OVMandarin 之前，先轉換為可以被 OVMandarin 正常處理的資訊。
         if self.isDynamicBaseKeyboardLayoutEnabled() {
-            // 保證 Apple 大千佈局內的符號鍵正常工作
-            if charCode == 45 && (Preferences.basisKeyboardLayout == "com.apple.keylayout.ZhuyinBopomofo") { charCode = UniChar(96) }
-            if charCode == 183 && (Preferences.basisKeyboardLayout == "com.apple.keylayout.ZhuyinEten") { charCode = UniChar(96) }
+            // 針對不同的 Apple 動態鍵盤佈局糾正大寫英文輸入。
+            switch Preferences.basisKeyboardLayout {
+            case "com.apple.keylayout.ZhuyinBopomofo": do {
+                if (charCode == 97) {charCode = UniChar(65)}
+                if (charCode == 98) {charCode = UniChar(66)}
+                if (charCode == 99) {charCode = UniChar(67)}
+                if (charCode == 100) {charCode = UniChar(68)}
+                if (charCode == 101) {charCode = UniChar(69)}
+                if (charCode == 102) {charCode = UniChar(70)}
+                if (charCode == 103) {charCode = UniChar(71)}
+                if (charCode == 104) {charCode = UniChar(72)}
+                if (charCode == 105) {charCode = UniChar(73)}
+                if (charCode == 106) {charCode = UniChar(74)}
+                if (charCode == 107) {charCode = UniChar(75)}
+                if (charCode == 108) {charCode = UniChar(76)}
+                if (charCode == 109) {charCode = UniChar(77)}
+                if (charCode == 110) {charCode = UniChar(78)}
+                if (charCode == 111) {charCode = UniChar(79)}
+                if (charCode == 112) {charCode = UniChar(80)}
+                if (charCode == 113) {charCode = UniChar(81)}
+                if (charCode == 114) {charCode = UniChar(82)}
+                if (charCode == 115) {charCode = UniChar(83)}
+                if (charCode == 116) {charCode = UniChar(84)}
+                if (charCode == 117) {charCode = UniChar(85)}
+                if (charCode == 118) {charCode = UniChar(86)}
+                if (charCode == 119) {charCode = UniChar(87)}
+                if (charCode == 120) {charCode = UniChar(88)}
+                if (charCode == 121) {charCode = UniChar(89)}
+                if (charCode == 122) {charCode = UniChar(90)}
+            }
+            case "com.apple.keylayout.ZhuyinEten": do {
+                if (charCode == 65345) {charCode = UniChar(65)}
+                if (charCode == 65346) {charCode = UniChar(66)}
+                if (charCode == 65347) {charCode = UniChar(67)}
+                if (charCode == 65348) {charCode = UniChar(68)}
+                if (charCode == 65349) {charCode = UniChar(69)}
+                if (charCode == 65350) {charCode = UniChar(70)}
+                if (charCode == 65351) {charCode = UniChar(71)}
+                if (charCode == 65352) {charCode = UniChar(72)}
+                if (charCode == 65353) {charCode = UniChar(73)}
+                if (charCode == 65354) {charCode = UniChar(74)}
+                if (charCode == 65355) {charCode = UniChar(75)}
+                if (charCode == 65356) {charCode = UniChar(76)}
+                if (charCode == 65357) {charCode = UniChar(77)}
+                if (charCode == 65358) {charCode = UniChar(78)}
+                if (charCode == 65359) {charCode = UniChar(79)}
+                if (charCode == 65360) {charCode = UniChar(80)}
+                if (charCode == 65361) {charCode = UniChar(81)}
+                if (charCode == 65362) {charCode = UniChar(82)}
+                if (charCode == 65363) {charCode = UniChar(83)}
+                if (charCode == 65364) {charCode = UniChar(84)}
+                if (charCode == 65365) {charCode = UniChar(85)}
+                if (charCode == 65366) {charCode = UniChar(86)}
+                if (charCode == 65367) {charCode = UniChar(87)}
+                if (charCode == 65368) {charCode = UniChar(88)}
+                if (charCode == 65369) {charCode = UniChar(89)}
+                if (charCode == 65370) {charCode = UniChar(90)}
+            }
+            default: break
+            }
             // 注音鍵群。
             if (charCode == 12573) {charCode = UniChar(44)}
             if (charCode == 12582) {charCode = UniChar(45)}
@@ -98,6 +165,14 @@ import Cocoa
             if (charCode == 65290) {charCode = UniChar(42)}
             if (charCode == 65288) {charCode = UniChar(40)}
             if (charCode == 65289) {charCode = UniChar(41)}
+            // Apple 倚天注音佈局追加符號糾正項目。
+            if Preferences.basisKeyboardLayout == "com.apple.keylayout.ZhuyinEten" {
+                if (charCode == 65343) {charCode = UniChar(95)}
+                if (charCode == 65306) {charCode = UniChar(58)}
+                if (charCode == 65311) {charCode = UniChar(63)}
+                if (charCode == 65291) {charCode = UniChar(43)}
+                if (charCode == 65372) {charCode = UniChar(124)}
+            }
         }
         return charCode
     }
@@ -105,9 +180,66 @@ import Cocoa
     @objc class func cnvStringApple2ABC(_ strProcessed: String) -> String {
         var strProcessed = strProcessed
         if self.isDynamicBaseKeyboardLayoutEnabled() {
-            // 保證 Apple 大千佈局內的符號鍵正常工作
-            if (strProcessed == "-" && Preferences.basisKeyboardLayout == "com.apple.keylayout.ZhuyinBopomofo") { strProcessed = "`" }
-            if (strProcessed == "·" && Preferences.basisKeyboardLayout == "com.apple.keylayout.ZhuyinEten") { strProcessed = "`" }
+            // 針對不同的 Apple 動態鍵盤佈局糾正大寫英文輸入。
+            switch Preferences.basisKeyboardLayout {
+            case "com.apple.keylayout.ZhuyinBopomofo": do {
+                if (strProcessed == "a") {strProcessed = "A"}
+                if (strProcessed == "b") {strProcessed = "B"}
+                if (strProcessed == "c") {strProcessed = "C"}
+                if (strProcessed == "d") {strProcessed = "D"}
+                if (strProcessed == "e") {strProcessed = "E"}
+                if (strProcessed == "f") {strProcessed = "F"}
+                if (strProcessed == "g") {strProcessed = "G"}
+                if (strProcessed == "h") {strProcessed = "H"}
+                if (strProcessed == "i") {strProcessed = "I"}
+                if (strProcessed == "j") {strProcessed = "J"}
+                if (strProcessed == "k") {strProcessed = "K"}
+                if (strProcessed == "l") {strProcessed = "L"}
+                if (strProcessed == "m") {strProcessed = "M"}
+                if (strProcessed == "n") {strProcessed = "N"}
+                if (strProcessed == "o") {strProcessed = "O"}
+                if (strProcessed == "p") {strProcessed = "P"}
+                if (strProcessed == "q") {strProcessed = "Q"}
+                if (strProcessed == "r") {strProcessed = "R"}
+                if (strProcessed == "s") {strProcessed = "S"}
+                if (strProcessed == "t") {strProcessed = "T"}
+                if (strProcessed == "u") {strProcessed = "U"}
+                if (strProcessed == "v") {strProcessed = "V"}
+                if (strProcessed == "w") {strProcessed = "W"}
+                if (strProcessed == "x") {strProcessed = "X"}
+                if (strProcessed == "y") {strProcessed = "Y"}
+                if (strProcessed == "z") {strProcessed = "Z"}
+            }
+            case "com.apple.keylayout.ZhuyinEten": do {
+                if (strProcessed == "ａ") {strProcessed = "A"}
+                if (strProcessed == "ｂ") {strProcessed = "B"}
+                if (strProcessed == "ｃ") {strProcessed = "C"}
+                if (strProcessed == "ｄ") {strProcessed = "D"}
+                if (strProcessed == "ｅ") {strProcessed = "E"}
+                if (strProcessed == "ｆ") {strProcessed = "F"}
+                if (strProcessed == "ｇ") {strProcessed = "G"}
+                if (strProcessed == "ｈ") {strProcessed = "H"}
+                if (strProcessed == "ｉ") {strProcessed = "I"}
+                if (strProcessed == "ｊ") {strProcessed = "J"}
+                if (strProcessed == "ｋ") {strProcessed = "K"}
+                if (strProcessed == "ｌ") {strProcessed = "L"}
+                if (strProcessed == "ｍ") {strProcessed = "M"}
+                if (strProcessed == "ｎ") {strProcessed = "N"}
+                if (strProcessed == "ｏ") {strProcessed = "O"}
+                if (strProcessed == "ｐ") {strProcessed = "P"}
+                if (strProcessed == "ｑ") {strProcessed = "Q"}
+                if (strProcessed == "ｒ") {strProcessed = "R"}
+                if (strProcessed == "ｓ") {strProcessed = "S"}
+                if (strProcessed == "ｔ") {strProcessed = "T"}
+                if (strProcessed == "ｕ") {strProcessed = "U"}
+                if (strProcessed == "ｖ") {strProcessed = "V"}
+                if (strProcessed == "ｗ") {strProcessed = "W"}
+                if (strProcessed == "ｘ") {strProcessed = "X"}
+                if (strProcessed == "ｙ") {strProcessed = "Y"}
+                if (strProcessed == "ｚ") {strProcessed = "Z"}
+            }
+            default: break
+            }
             // 注音鍵群。
             if (strProcessed == "ㄝ") {strProcessed = ","}
             if (strProcessed == "ㄦ") {strProcessed = "-"}
@@ -169,6 +301,14 @@ import Cocoa
             if (strProcessed == "＊") {strProcessed = "*"}
             if (strProcessed == "（") {strProcessed = "("}
             if (strProcessed == "）") {strProcessed = ")"}
+            // Apple 倚天注音佈局追加符號糾正項目。
+            if Preferences.basisKeyboardLayout == "com.apple.keylayout.ZhuyinEten" {
+                if (strProcessed == "＿") {strProcessed = "_"}
+                if (strProcessed == "：") {strProcessed = ":"}
+                if (strProcessed == "？") {strProcessed = "?"}
+                if (strProcessed == "＋") {strProcessed = "+"}
+                if (strProcessed == "｜") {strProcessed = "|"}
+            }
         }
         return strProcessed
     }

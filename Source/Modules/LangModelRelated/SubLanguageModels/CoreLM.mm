@@ -25,7 +25,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <unistd.h>
 #include <syslog.h>
 
-using namespace Taiyan::Gramambular;
+using namespace Gramambular;
 
 vChewing::CoreLM::CoreLM()
     : fd(-1)
@@ -292,14 +292,14 @@ void vChewing::CoreLM::dump()
     }
 }
 
-const std::vector<Taiyan::Gramambular::Bigram> vChewing::CoreLM::bigramsForKeys(const string& preceedingKey, const string& key)
+const std::vector<Gramambular::Bigram> vChewing::CoreLM::bigramsForKeys(const string& preceedingKey, const string& key)
 {
-    return std::vector<Taiyan::Gramambular::Bigram>();
+    return std::vector<Gramambular::Bigram>();
 }
 
-const std::vector<Taiyan::Gramambular::Unigram> vChewing::CoreLM::unigramsForKey(const string& key)
+const std::vector<Gramambular::Unigram> vChewing::CoreLM::unigramsForKey(const string& key)
 {
-    std::vector<Taiyan::Gramambular::Unigram> v;
+    std::vector<Gramambular::Unigram> v;
     map<const char *, vector<Row> >::const_iterator i = keyRowMap.find(key.c_str());
 
     if (i != keyRowMap.end()) {

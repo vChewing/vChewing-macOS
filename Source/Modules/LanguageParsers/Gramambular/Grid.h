@@ -27,7 +27,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include "NodeAnchor.h"
 #include "Span.h"
 
-namespace Taiyan {
 namespace Gramambular {
 
 class Grid {
@@ -61,7 +60,46 @@ public:
                                                const std::string& value,
                                                float overridingScore);
     
-    std::string dumpDOT();
+    std::string dumpDOT() {
+        std::stringstream sst;
+        sst << "digraph {" << std::endl;
+        sst << "graph [ rankdir=LR ];" << std::endl;
+        sst << "BOS;" << std::endl;
+        
+        for (size_t p = 0; p < m_spans.size(); p++) {
+            Span& span = m_spans[p];
+            for (size_t ni = 0; ni <= span.maximumLength(); ni++) {
+                Node* np = span.nodeOfLength(ni);
+                if (np) {
+                    if (!p) {
+                        sst << "BOS -> " << np->currentKeyValue().value << ";" << std::endl;
+                    }
+                    
+                    sst << np->currentKeyValue().value << ";" << std::endl;
+                    
+                    if (p + ni < m_spans.size()) {
+                        Span& dstSpan = m_spans[p + ni];
+                        for (size_t q = 0; q <= dstSpan.maximumLength(); q++) {
+                            Node* dn = dstSpan.nodeOfLength(q);
+                            if (dn) {
+                                sst << np->currentKeyValue().value << " -> "
+                                << dn->currentKeyValue().value << ";" << std::endl;
+                            }
+                        }
+                    }
+                    
+                    if (p + ni == m_spans.size()) {
+                        sst << np->currentKeyValue().value << " -> "
+                        << "EOS;" << std::endl;
+                    }
+                }
+            }
+        }
+        
+        sst << "EOS;" << std::endl;
+        sst << "}";
+        return sst.str();
+    }
     
 protected:
     std::vector<Span> m_spans;
@@ -218,6 +256,6 @@ inline void Grid::overrideNodeScoreForSelectedCandidate(
 }
 
 }  // namespace Gramambular
-}  // namespace Taiyan
+
 
 #endif

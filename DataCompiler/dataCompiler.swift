@@ -21,9 +21,10 @@ import Foundation
 // MARK: - 前導工作
 fileprivate extension String {
     mutating func regReplace(pattern: String, replaceWith: String = "") {
+        // Ref: https://stackoverflow.com/a/40993403/4162914 && https://stackoverflow.com/a/71291137/4162914
         do {
             let regex = try NSRegularExpression(pattern: pattern, options: .caseInsensitive)
-            let range = NSRange(location: 0, length: count)
+            let range = NSRange(location: 0, length: self.utf16.count)
             self = regex.stringByReplacingMatches(in: self, options: [], range: range, withTemplate: replaceWith)
         } catch { return }
     }
@@ -117,16 +118,13 @@ func rawDictForPhrases(isCHS: Bool) -> [Entry] {
     }
     // 預處理格式
     strRAW = strRAW.replacingOccurrences(of: " #MACOS", with: "") // 去掉 macOS 標記
-    strRAW = strRAW.replacingOccurrences(of: "　", with: " ") // CJKWhiteSpace (\x{3000}) to ASCII Space
-    strRAW = strRAW.replacingOccurrences(of: " ", with: " ") // NonBreakWhiteSpace (\x{A0}) to ASCII Space
-    strRAW = strRAW.replacingOccurrences(of: "\t", with: " ") // Tab to ASCII Space
-    strRAW.regReplace(pattern: "\\f", replaceWith: "\n") // Form Feed to LF
-    strRAW = strRAW.replacingOccurrences(of: "\r", with: "\n") // CR to LF
-    strRAW.regReplace(pattern: " +", replaceWith: " ") // 統整連續空格為一個 ASCII 空格
-    // strRAW.regReplace(pattern: "\\n+", replaceWith: "\n") // 統整連續 LF 為一個 LF
-    // (不需要處理純空行，因為空記錄不會被轉為 Entry)
-    strRAW = strRAW.replacingOccurrences(of: " \n", with: "\n") // 去除行尾空格
-    strRAW = strRAW.replacingOccurrences(of: "\n ", with: "\n") // 去除行首空格
+    // CJKWhiteSpace (\x{3000}) to ASCII Space
+    // NonBreakWhiteSpace (\x{A0}) to ASCII Space
+    // Tab to ASCII Space
+    // 統整連續空格為一個 ASCII 空格
+    strRAW.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: " ")
+    strRAW.regReplace(pattern: #"(\f+|\r+)+"#, replaceWith: "\n") // CR & Form Feed to LF
+    strRAW.regReplace(pattern: #"(\n+| \n+|\n+ )"#, replaceWith: "\n") // 去除行尾行首空格與重複行
     if strRAW.prefix(1) == " " { // 去除檔案開頭空格
         strRAW.removeFirst()
     }
@@ -194,16 +192,13 @@ func rawDictForKanjis(isCHS: Bool) -> [Entry] {
     }
     // 預處理格式
     strRAW = strRAW.replacingOccurrences(of: " #MACOS", with: "") // 去掉 macOS 標記
-    strRAW = strRAW.replacingOccurrences(of: "　", with: " ") // CJKWhiteSpace (\x{3000}) to ASCII Space
-    strRAW = strRAW.replacingOccurrences(of: " ", with: " ") // NonBreakWhiteSpace (\x{A0}) to ASCII Space
-    strRAW = strRAW.replacingOccurrences(of: "\t", with: " ") // Tab to ASCII Space
-    strRAW.regReplace(pattern: "\\f", replaceWith: "\n") // Form Feed to LF
-    strRAW = strRAW.replacingOccurrences(of: "\r", with: "\n") // CR to LF
-    strRAW.regReplace(pattern: " +", replaceWith: " ") // 統整連續空格為一個 ASCII 空格
-    // strRAW.regReplace(pattern: "\\n+", replaceWith: "\n") // 統整連續 LF 為一個 LF
-    // (不需要處理純空行，因為空記錄不會被轉為 Entry)
-    strRAW = strRAW.replacingOccurrences(of: " \n", with: "\n") // 去除行尾空格
-    strRAW = strRAW.replacingOccurrences(of: "\n ", with: "\n") // 去除行首空格
+    // CJKWhiteSpace (\x{3000}) to ASCII Space
+    // NonBreakWhiteSpace (\x{A0}) to ASCII Space
+    // Tab to ASCII Space
+    // 統整連續空格為一個 ASCII 空格
+    strRAW.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: " ")
+    strRAW.regReplace(pattern: #"(\f+|\r+)+"#, replaceWith: "\n") // CR & Form Feed to LF
+    strRAW.regReplace(pattern: #"(\n+| \n+|\n+ )"#, replaceWith: "\n") // 去除行尾行首空格與重複行
     if strRAW.prefix(1) == " " { // 去除檔案開頭空格
         strRAW.removeFirst()
     }
@@ -276,16 +271,13 @@ func rawDictForNonKanjis(isCHS: Bool) -> [Entry] {
     }
     // 預處理格式
     strRAW = strRAW.replacingOccurrences(of: " #MACOS", with: "") // 去掉 macOS 標記
-    strRAW = strRAW.replacingOccurrences(of: "　", with: " ") // CJKWhiteSpace (\x{3000}) to ASCII Space
-    strRAW = strRAW.replacingOccurrences(of: " ", with: " ") // NonBreakWhiteSpace (\x{A0}) to ASCII Space
-    strRAW = strRAW.replacingOccurrences(of: "\t", with: " ") // Tab to ASCII Space
-    strRAW.regReplace(pattern: "\\f", replaceWith: "\n") // Form Feed to LF
-    strRAW = strRAW.replacingOccurrences(of: "\r", with: "\n") // CR to LF
-    strRAW.regReplace(pattern: " +", replaceWith: " ") // 統整連續空格為一個 ASCII 空格
-    // strRAW.regReplace(pattern: "\\n+", replaceWith: "\n") // 統整連續 LF 為一個 LF
-    // (不需要處理純空行，因為空記錄不會被轉為 Entry)
-    strRAW = strRAW.replacingOccurrences(of: " \n", with: "\n") // 去除行尾空格
-    strRAW = strRAW.replacingOccurrences(of: "\n ", with: "\n") // 去除行首空格
+    // CJKWhiteSpace (\x{3000}) to ASCII Space
+    // NonBreakWhiteSpace (\x{A0}) to ASCII Space
+    // Tab to ASCII Space
+    // 統整連續空格為一個 ASCII 空格
+    strRAW.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: " ")
+    strRAW.regReplace(pattern: #"(\f+|\r+)+"#, replaceWith: "\n") // CR & Form Feed to LF
+    strRAW.regReplace(pattern: #"(\n+| \n+|\n+ )"#, replaceWith: "\n") // 去除行尾行首空格與重複行
     if strRAW.prefix(1) == " " { // 去除檔案開頭空格
         strRAW.removeFirst()
     }
@@ -343,17 +335,23 @@ func weightAndSort(_ arrStructUncalculated: [Entry], isCHS: Bool) -> [Entry] {
     let fscale: Float = 2.7
     var norm: Float = 0.0
     for entry in arrStructUncalculated {
-        norm += fscale**(Float(entry.valPhrase.count) / 3.0 - 1.0) * Float(entry.valCount) // Credit: MJHsieh.
+        if entry.valCount >= 0 {
+            norm += fscale**(Float(entry.valPhrase.count) / 3.0 - 1.0) * Float(entry.valCount)
+        }
     }
     // norm 計算完畢，開始將 norm 作為新的固定常數來為每個詞條記錄計算權重。
     // 將新酷音的詞語出現次數數據轉換成小麥引擎可讀的數據形式。
     // 對出現次數小於 1 的詞條，將 0 當成 0.5 來處理、以防止除零。
-    // 統計公式著作權歸 MJHsieh 所有（MIT License）。
     for entry in arrStructUncalculated {
-        let weight: Float = (entry.valCount < 1) ?
-            log10(fscale**(Float(entry.valPhrase.count) / 3.0 - 1.0) * 0.5 / norm) // Credit: MJHsieh.
-        :
-            log10(fscale**(Float(entry.valPhrase.count) / 3.0 - 1.0) * Float(entry.valCount) / norm) // Credit: MJHsieh.
+        var weight: Float = 0
+        switch entry.valCount {
+        case -1: // 假名
+            weight = -13
+        case 0: // 墊底低頻漢字與詞語
+            weight = log10(fscale**(Float(entry.valPhrase.count) / 3.0 - 1.0) * 0.5 / norm)
+        default:
+            weight = log10(fscale**(Float(entry.valPhrase.count) / 3.0 - 1.0) * Float(entry.valCount) / norm) // Credit: MJHsieh.
+        }
         let weightRounded: Float = weight.rounded(toPlaces: 3) // 為了節省生成的檔案體積，僅保留小數點後三位。
         arrStructCalculated += [Entry.init(valPhone: entry.valPhone, valPhrase: entry.valPhrase, valWeight: weightRounded, valCount: entry.valCount)]
     }

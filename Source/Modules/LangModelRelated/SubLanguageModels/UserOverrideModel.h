@@ -27,18 +27,18 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 namespace vChewing {
 
-using namespace Taiyan::Gramambular;
+using namespace Gramambular;
 
 class UserOverrideModel {
 public:
     UserOverrideModel(size_t capacity, double decayConstant);
 
-    void observe(const std::vector<Taiyan::Gramambular::NodeAnchor>& walkedNodes,
+    void observe(const std::vector<Gramambular::NodeAnchor>& walkedNodes,
                  size_t cursorIndex,
                  const std::string& candidate,
                  double timestamp);
 
-    std::string suggest(const std::vector<Taiyan::Gramambular::NodeAnchor>& walkedNodes,
+    std::string suggest(const std::vector<Gramambular::NodeAnchor>& walkedNodes,
                    size_t cursorIndex,
                    double timestamp);
 

@@ -36,6 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)writeUserPhrase:(NSString *)userPhrase inputMode:(InputMode)mode areWeDuplicating:(BOOL)areWeDuplicating;
 + (void)setPhraseReplacementEnabled:(BOOL)phraseReplacementEnabled;
 + (void)setCNSEnabled:(BOOL)cnsEnabled;
++ (void)setSymbolEnabled:(BOOL)symbolEnabled;
+
 + (NSString *)specifyBundleDataPath:(NSString *)filename;
 + (NSString *)userPhrasesDataPath:(InputMode)mode;
 + (NSString *)userAssociatedPhrasesDataPath:(InputMode)mode;

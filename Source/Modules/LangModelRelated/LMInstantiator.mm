@@ -119,16 +119,16 @@ void LMInstantiator::loadPhraseReplacementMap(const char* phraseReplacementPath)
     }
 }
 
-const std::vector<Taiyan::Gramambular::Bigram> LMInstantiator::bigramsForKeys(const std::string& preceedingKey, const std::string& key)
+const std::vector<Gramambular::Bigram> LMInstantiator::bigramsForKeys(const std::string& preceedingKey, const std::string& key)
 {
-    return std::vector<Taiyan::Gramambular::Bigram>();
+    return std::vector<Gramambular::Bigram>();
 }
 
-const std::vector<Taiyan::Gramambular::Unigram> LMInstantiator::unigramsForKey(const std::string& key)
+const std::vector<Gramambular::Unigram> LMInstantiator::unigramsForKey(const std::string& key)
 {
     if (key == " ") {
-        std::vector<Taiyan::Gramambular::Unigram> spaceUnigrams;
-        Taiyan::Gramambular::Unigram g;
+        std::vector<Gramambular::Unigram> spaceUnigrams;
+        Gramambular::Unigram g;
         g.keyValue.key = " ";
         g.keyValue.value = " ";
         g.score = 0;
@@ -136,24 +136,24 @@ const std::vector<Taiyan::Gramambular::Unigram> LMInstantiator::unigramsForKey(c
         return spaceUnigrams;
     }
 
-    std::vector<Taiyan::Gramambular::Unigram> allUnigrams;
-    std::vector<Taiyan::Gramambular::Unigram> miscUnigrams;
-    std::vector<Taiyan::Gramambular::Unigram> symbolUnigrams;
-    std::vector<Taiyan::Gramambular::Unigram> userUnigrams;
-    std::vector<Taiyan::Gramambular::Unigram> cnsUnigrams;
+    std::vector<Gramambular::Unigram> allUnigrams;
+    std::vector<Gramambular::Unigram> miscUnigrams;
+    std::vector<Gramambular::Unigram> symbolUnigrams;
+    std::vector<Gramambular::Unigram> userUnigrams;
+    std::vector<Gramambular::Unigram> cnsUnigrams;
 
      std::unordered_set<std::string> excludedValues;
      std::unordered_set<std::string> insertedValues;
 
     if (m_excludedPhrases.hasUnigramsForKey(key)) {
-        std::vector<Taiyan::Gramambular::Unigram> excludedUnigrams = m_excludedPhrases.unigramsForKey(key);
+        std::vector<Gramambular::Unigram> excludedUnigrams = m_excludedPhrases.unigramsForKey(key);
         transform(excludedUnigrams.begin(), excludedUnigrams.end(),
             inserter(excludedValues, excludedValues.end()),
-            [](const Taiyan::Gramambular::Unigram& u) { return u.keyValue.value; });
+            [](const Gramambular::Unigram& u) { return u.keyValue.value; });
     }
 
     if (m_userPhrases.hasUnigramsForKey(key)) {
-        std::vector<Taiyan::Gramambular::Unigram> rawUserUnigrams = m_userPhrases.unigramsForKey(key);
+        std::vector<Gramambular::Unigram> rawUserUnigrams = m_userPhrases.unigramsForKey(key);
         // 用這句指令讓使用者語彙檔案內的詞條優先順序隨著行數增加而逐漸增高。
         // 這樣一來就可以在就地新增語彙時徹底複寫優先權。
         std::reverse(rawUserUnigrams.begin(), rawUserUnigrams.end());
@@ -161,22 +161,22 @@ const std::vector<Taiyan::Gramambular::Unigram> LMInstantiator::unigramsForKey(c
     }
 
     if (m_languageModel.hasUnigramsForKey(key)) {
-        std::vector<Taiyan::Gramambular::Unigram> rawGlobalUnigrams = m_languageModel.unigramsForKey(key);
+        std::vector<Gramambular::Unigram> rawGlobalUnigrams = m_languageModel.unigramsForKey(key);
         allUnigrams = filterAndTransformUnigrams(rawGlobalUnigrams, excludedValues, insertedValues);
     }
 
     if (m_miscModel.hasUnigramsForKey(key)) {
-        std::vector<Taiyan::Gramambular::Unigram> rawMiscUnigrams = m_miscModel.unigramsForKey(key);
+        std::vector<Gramambular::Unigram> rawMiscUnigrams = m_miscModel.unigramsForKey(key);
         miscUnigrams = filterAndTransformUnigrams(rawMiscUnigrams, excludedValues, insertedValues);
     }
 
-    if (m_symbolModel.hasUnigramsForKey(key)) {
-        std::vector<Taiyan::Gramambular::Unigram> rawSymbolUnigrams = m_symbolModel.unigramsForKey(key);
+    if (m_symbolModel.hasUnigramsForKey(key) && m_symbolEnabled) {
+        std::vector<Gramambular::Unigram> rawSymbolUnigrams = m_symbolModel.unigramsForKey(key);
         symbolUnigrams = filterAndTransformUnigrams(rawSymbolUnigrams, excludedValues, insertedValues);
     }
 
     if (m_cnsModel.hasUnigramsForKey(key) && m_cnsEnabled) {
-        std::vector<Taiyan::Gramambular::Unigram> rawCNSUnigrams = m_cnsModel.unigramsForKey(key);
+        std::vector<Gramambular::Unigram> rawCNSUnigrams = m_cnsModel.unigramsForKey(key);
         cnsUnigrams = filterAndTransformUnigrams(rawCNSUnigrams, excludedValues, insertedValues);
     }
 
@@ -214,9 +214,20 @@ void LMInstantiator::setCNSEnabled(bool enabled)
 {
     m_cnsEnabled = enabled;
 }
+
 bool LMInstantiator::cnsEnabled()
 {
     return m_cnsEnabled;
+}
+
+void LMInstantiator::setSymbolEnabled(bool enabled)
+{
+    m_symbolEnabled = enabled;
+}
+
+bool LMInstantiator::symbolEnabled()
+{
+    return m_symbolEnabled;
 }
 
 void LMInstantiator::setExternalConverterEnabled(bool enabled)
@@ -234,9 +245,9 @@ void LMInstantiator::setExternalConverter(std::function<std::string(std::string)
     m_externalConverter = externalConverter;
 }
 
-const std::vector<Taiyan::Gramambular::Unigram> LMInstantiator::filterAndTransformUnigrams(const std::vector<Taiyan::Gramambular::Unigram> unigrams, const  std::unordered_set<std::string>& excludedValues,  std::unordered_set<std::string>& insertedValues)
+const std::vector<Gramambular::Unigram> LMInstantiator::filterAndTransformUnigrams(const std::vector<Gramambular::Unigram> unigrams, const  std::unordered_set<std::string>& excludedValues,  std::unordered_set<std::string>& insertedValues)
 {
-    std::vector<Taiyan::Gramambular::Unigram> results;
+    std::vector<Gramambular::Unigram> results;
 
     for (auto&& unigram : unigrams) {
         // excludedValues filters out the unigrams with the original value.
@@ -258,7 +269,7 @@ const std::vector<Taiyan::Gramambular::Unigram> LMInstantiator::filterAndTransfo
             value = replacement;
         }
         if (insertedValues.find(value) == insertedValues.end()) {
-            Taiyan::Gramambular::Unigram g;
+            Gramambular::Unigram g;
             g.keyValue.value = value;
             g.keyValue.key = unigram.keyValue.key;
             g.score = unigram.score;

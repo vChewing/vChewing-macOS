@@ -22,7 +22,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <algorithm>
 #include <cctype>
 
-namespace Taiyan {
 namespace Mandarin {
 
 class PinyinParseHelper {
@@ -1034,5 +1033,5 @@ const BopomofoKeyboardLayout* BopomofoKeyboardLayout::HanyuPinyinLayout() {
 }
 
 }  // namespace Mandarin
-}  // namespace Taiyan
+
 

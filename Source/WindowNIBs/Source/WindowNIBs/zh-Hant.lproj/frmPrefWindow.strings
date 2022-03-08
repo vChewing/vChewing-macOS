@@ -47,6 +47,9 @@
 /* Class = "NSButtonCell"; title = "Vertical"; ObjectID = "22"; */
 "22.title" = "縱向佈局";
 
+/* Class = "NSButtonCell"; title = "Show page buttons in candidate list"; ObjectID = "shc-Nu-UsM"; */
+"shc-Nu-UsM.title" = "在選字窗內顯示翻頁按鈕";
+
 /* Class = "NSTextFieldCell"; title = "Candidate List Layout:"; ObjectID = "24"; */
 "24.title" = "候選字窗佈局:";
 
@@ -80,7 +83,7 @@
 /* Class = "NSMenuItem"; title = "96"; ObjectID = "101"; */
 "101.title" = "96";
 
-/* Class = "NSButtonCell"; title = "Enable SPACE key for calling candidate window"; ObjectID = "110"; */
+/* Class = "NSButtonCell"; title = "Enable Space key for calling candidate window"; ObjectID = "110"; */
 "110.title" = "敲空格鍵以選字";
 
 /* Class = "NSTextFieldCell"; title = "Alphanumeric:"; ObjectID = "126"; */
@@ -140,7 +143,7 @@
 /* Class = "NSTextFieldCell"; title = "Choose your preferred keyboard layout."; ObjectID = "RQ6-MS-m4C"; */
 "RQ6-MS-m4C.title" = "選擇您所偏好的鍵盤佈局。";
 
-/* Class = "NSButtonCell"; title = "Push the cursor to the front of the phrase after candidate selection"; ObjectID = "RUG-ls-KyA"; */
+/* Class = "NSButtonCell"; title = "Push the cursor to the front of the phrase after selection"; ObjectID = "RUG-ls-KyA"; */
 "RUG-ls-KyA.title" = "在選字後將游標置於該字詞的前方";
 
 /* Class = "NSMenuItem"; title = "Traditional Chinese"; ObjectID = "TXr-FF-ehw"; */
@@ -185,8 +188,8 @@
 /* Class = "NSMenuItem"; title = "Japanese"; ObjectID = "rVQ-Hx-cGi"; */
 "rVQ-Hx-cGi.title" = "和語";
 
-/* Class = "NSBox"; title = "Dictionary Settings"; ObjectID = "s4r-ji-vbr"; */
-"s4r-ji-vbr.title" = "辭典設定";
+/* Class = "NSBox"; title = "Dictionary and Language Models"; ObjectID = "cf2-se-PDO"; */
+"cf2-se-PDO.title" = "辭典＆語言模型";
 
 /* Class = "NSTextFieldCell"; title = "Choose your preferred layout of the candidate window."; ObjectID = "xC5-yV-1W1"; */
 "xC5-yV-1W1.title" = "選擇您所偏好的候選字窗佈局。";
@@ -194,8 +197,14 @@
 /* Class = "NSTabViewItem"; label = "Advanced"; ObjectID = "xrE-8T-WKO"; */
 "xrE-8T-WKO.label" = "進階";
 
+/* Class = "NSTabViewItem"; label = "Dictionary"; ObjectID = "2iG-Ic-gbl"; */
+"2iG-Ic-gbl.label" = "辭典";
+
 /* Class = "NSTextFieldCell"; title = "Regarding On-Screen Keyboard Support:"; ObjectID = "wQ9-px-b07"; */
-"wQ9-px-b07.title" = "關於 macOS 內建螢幕模擬鍵盤支援：\n\n\t自 v1.3.2 版開始，威注音支援 macOS 內建的螢幕小鍵盤。該功能是藉由對「Apple 標準注音鍵盤佈局」與「Apple 倚天注音鍵盤佈局」這兩個動態英數鍵盤佈局來完成的。理論上來講，這兩個動態英數鍵盤佈局應該可以與所有語種的 Apple 物理鍵盤相容。如果有不相容的情況的話，macOS 內建的注音與倚天注音輸入法一定也會有相同的故障（可以藉由 Feedback Assistant.app 向 Apple 反饋這種鍵盤佈局問題）。\n\n\t然而，如果您啟用了這種動態英數鍵盤佈局的話，請將當前畫面頂端的注音鍵盤佈局設為「微軟/大千……」，因為對諸如倚天等異種鍵盤的支援已經交給 macOS 系統來事先完成了。";
+"wQ9-px-b07.title" = "關於 macOS 內建螢幕模擬鍵盤支援：\n\n\t自 v1.3.2 版開始，威注音支援 macOS 內建的螢幕小鍵盤。該功能是藉由對「Apple 標準注音鍵盤佈局」與「Apple 倚天注音鍵盤佈局」這兩個動態英數鍵盤佈局來完成的。理論上來講，這兩個動態英數鍵盤佈局應該可以與所有語種的 Apple 物理鍵盤相容。如果有不相容的情況的話，macOS 內建的注音與倚天注音輸入法一定也會有相同的故障（可以藉由 Feedback Assistant.app 向 Apple 反饋這種鍵盤佈局問題）。然而，如果您啟用了這種動態英數鍵盤佈局的話，請將當前畫面頂端的注音鍵盤佈局設為「微軟/大千……」，因為對諸如倚天等異種鍵盤的支援已經交給 macOS 系統來事先完成了。\n\n\t另外：如果您在「英數鍵盤佈局」內選了所有以「vChewing」開頭的鍵盤配列的話，對應的「注音鍵盤佈局」也要選成相同的配列才可以。比如說前者選「vChewing Dachen」那後者就得選「微軟/大千……」、前者選「vChewing FakeSeigyou」那後者就得選「偽精業」，依此類推。";
+
+/* Class = "NSTextFieldCell"; title = "Choose the behavior of (Shift+)Tab key in the candidate window."; ObjectID = "ueU-Rz-a1C"; */
+"ueU-Rz-a1C.title" = "指定 (Shift+)Tab 熱鍵在選字窗內的輪替操作對象。";
 
 /* Class = "NSButtonCell"; title = "Cycling Pages"; ObjectID = "s7u-Fm-dVg"; */
 "s7u-Fm-dVg.title" = "輪替頁面";
@@ -203,5 +212,15 @@
 /* Class = "NSButtonCell"; title = "Cycling Candidates"; ObjectID = "FVC-br-H57"; */
 "FVC-br-H57.title" = "輪替候選字";
 
-/* Class = "NSTextFieldCell"; title = "Choose the behavior of (Shift+)Tab key in the candidate window."; ObjectID = "ueU-Rz-a1C"; */
-"ueU-Rz-a1C.title" = "指定 (Shift+)Tab 熱鍵在選字窗內的輪替操作對象。";
+/* Class = "NSTextFieldCell"; title = "Choose the behavior of (Shift+)Space key in the candidate window."; ObjectID = "Pg5-G9-pY5"; */
+"Pg5-G9-pY5.title" = "指定 (Shift+)Space 熱鍵在選字窗內的輪替操作對象。";
+
+/* Class = "NSButtonCell"; title = "Space to +cycle pages, Shift+Space to +cycle candidates"; ObjectID = "XqL-rf-X6d"; */
+"XqL-rf-X6d.title" = "Space 換下一頁，Shift+Space 換選下一個候選字";
+
+/* Class = "NSButtonCell"; title = "Space to +cycle candidates, Shift+Space to +cycle pages"; ObjectID = "dIN-TZ-67g"; */
+"dIN-TZ-67g.title" = "Shift+Space 換下一頁，Space 換選下一個候選字";
+
+/* Class = "NSButtonCell"; title = "Enable symbol input support (incl. certain emoji symbols)"; ObjectID = "hSv-LJ-Cq3"; */
+"hSv-LJ-Cq3.title" = "啟用包括少許繪文字在內的符號輸入支援";
+

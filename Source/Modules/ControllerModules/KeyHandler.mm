@@ -33,7 +33,7 @@ InputMode imeModeNULL = @"org.atelierInmu.inputmethod.vChewing.IMENULL";
 
 static const double kEpsilon = 0.000001;
 
-static double FindHighestScore(const std::vector<Taiyan::Gramambular::NodeAnchor> &nodes, double epsilon) {
+static double FindHighestScore(const std::vector<Gramambular::NodeAnchor> &nodes, double epsilon) {
     double highestScore = 0.0;
     for (auto ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
         double score = ni->node->highestUnigramScore();
@@ -46,7 +46,7 @@ static double FindHighestScore(const std::vector<Taiyan::Gramambular::NodeAnchor
 
 class NodeAnchorDescendingSorter {
 public:
-    bool operator()(const Taiyan::Gramambular::NodeAnchor &a, const Taiyan::Gramambular::NodeAnchor &b) const
+    bool operator()(const Gramambular::NodeAnchor &a, const Gramambular::NodeAnchor &b) const
     {
         return a.node->key().length() > b.node->key().length();
     }
@@ -62,7 +62,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 @implementation KeyHandler
 {
     // the reading buffer that takes user input
-    Taiyan::Mandarin::BopomofoReadingBuffer *_bpmfReadingBuffer;
+    Mandarin::BopomofoReadingBuffer *_bpmfReadingBuffer;
 
     // language model
     vChewing::LMInstantiator *_languageModel;
@@ -71,10 +71,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     vChewing::UserOverrideModel *_userOverrideModel;
 
     // the grid (lattice) builder for the unigrams (and bigrams)
-    Taiyan::Gramambular::BlockReadingBuilder *_builder;
+    Gramambular::BlockReadingBuilder *_builder;
 
     // latest walked path (trellis) using the Viterbi algorithm
-    std::vector<Taiyan::Gramambular::NodeAnchor> _walkedNodes;
+    std::vector<Gramambular::NodeAnchor> _walkedNodes;
 
     NSString *_inputMode;
 }
@@ -111,7 +111,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         newUserOverrideModel = [mgrLangModel userOverrideModelCHT];
     }
 
-    // Symchronize the Preference Setting "setPhraseReplacementEnabled" to the new LM.
+    // Synchronize the Preference Setting "setPhraseReplacementEnabled" to the new LM.
     newLanguageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
 
     // Only apply the changes if the value is changed
@@ -122,7 +122,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
         if (_builder) {
             delete _builder;
-            _builder = new Taiyan::Gramambular::BlockReadingBuilder(_languageModel);
+            _builder = new Gramambular::BlockReadingBuilder(_languageModel);
             _builder->setJoinSeparator("-");
         }
 
@@ -148,15 +148,16 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 {
     self = [super init];
     if (self) {
-        _bpmfReadingBuffer = new Taiyan::Mandarin::BopomofoReadingBuffer(Taiyan::Mandarin::BopomofoKeyboardLayout::StandardLayout());
+        _bpmfReadingBuffer = new Mandarin::BopomofoReadingBuffer(Mandarin::BopomofoKeyboardLayout::StandardLayout());
 
         // create the lattice builder
         _languageModel = [mgrLangModel lmCHT];
         _languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
         _languageModel->setCNSEnabled(Preferences.cns11643Enabled);
+        _languageModel->setSymbolEnabled(Preferences.symbolInputEnabled);
         _userOverrideModel = [mgrLangModel userOverrideModelCHT];
 
-        _builder = new Taiyan::Gramambular::BlockReadingBuilder(_languageModel);
+        _builder = new Gramambular::BlockReadingBuilder(_languageModel);
         
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
@@ -170,31 +171,31 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     NSInteger layout = Preferences.keyboardLayout;
     switch (layout) {
         case KeyboardLayoutStandard:
-            _bpmfReadingBuffer->setKeyboardLayout(Taiyan::Mandarin::BopomofoKeyboardLayout::StandardLayout());
+            _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::StandardLayout());
             break;
         case KeyboardLayoutEten:
-            _bpmfReadingBuffer->setKeyboardLayout(Taiyan::Mandarin::BopomofoKeyboardLayout::ETenLayout());
+            _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::ETenLayout());
             break;
         case KeyboardLayoutHsu:
-            _bpmfReadingBuffer->setKeyboardLayout(Taiyan::Mandarin::BopomofoKeyboardLayout::HsuLayout());
+            _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::HsuLayout());
             break;
         case KeyboardLayoutEten26:
-            _bpmfReadingBuffer->setKeyboardLayout(Taiyan::Mandarin::BopomofoKeyboardLayout::ETen26Layout());
+            _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::ETen26Layout());
             break;
         case KeyboardLayoutIBM:
-            _bpmfReadingBuffer->setKeyboardLayout(Taiyan::Mandarin::BopomofoKeyboardLayout::IBMLayout());
+            _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::IBMLayout());
             break;
         case KeyboardLayoutMiTAC:
-            _bpmfReadingBuffer->setKeyboardLayout(Taiyan::Mandarin::BopomofoKeyboardLayout::MiTACLayout());
+            _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::MiTACLayout());
             break;
         case KeyboardLayoutFakeSeigyou:
-            _bpmfReadingBuffer->setKeyboardLayout(Taiyan::Mandarin::BopomofoKeyboardLayout::FakeSeigyouLayout());
+            _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::FakeSeigyouLayout());
             break;
         case KeyboardLayoutHanyuPinyin:
-            _bpmfReadingBuffer->setKeyboardLayout(Taiyan::Mandarin::BopomofoKeyboardLayout::HanyuPinyinLayout());
+            _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::HanyuPinyinLayout());
             break;
         default:
-            _bpmfReadingBuffer->setKeyboardLayout(Taiyan::Mandarin::BopomofoKeyboardLayout::StandardLayout());
+            _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::StandardLayout());
             Preferences.keyboardLayout = KeyboardLayoutStandard;
     }
 }
@@ -203,7 +204,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 {
     size_t cursorIndex = [self _actualCandidateCursorIndex];
     std::string stringValue(value.UTF8String);
-    Taiyan::Gramambular::NodeAnchor selectedNode = _builder->grid().fixNodeSelectedCandidate(cursorIndex, stringValue);
+    Gramambular::NodeAnchor selectedNode = _builder->grid().fixNodeSelectedCandidate(cursorIndex, stringValue);
     if (!Preferences.useSCPCTypingMode) { // 不要針對逐字選字模式啟用臨時半衰記憶模型。
         // If the length of the readings and the characters do not match,
         // it often means it is a special symbol and it should not be stored
@@ -272,18 +273,23 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return NO;
     }
 
-    // Caps Lock processing : if Caps Lock is on, temporarily disable bopomofo.
+    // Caps Lock processing: if Caps Lock is on or Preferences.isAlphanumericalModeEnabled, temporarily disable bopomofo.
+    // Also: Alphanumerical mode processing.
     if ([input isBackSpace] || [input isEnter] || [input isAbsorbedArrowKey] || [input isExtraChooseCandidateKey] || [input isExtraChooseCandidateKeyReverse] || [input isCursorForward] || [input isCursorBackward]) {
         // do nothing if backspace is pressed -- we ignore the key
-    } else if ([input isCapsLockOn]) {
+    } else if (Preferences.isAlphanumericalModeEnabled || [input isCapsLockOn]) {
         // process all possible combination, we hope.
         [self clear];
         InputStateEmpty *emptyState = [[InputStateEmpty alloc] init];
         stateCallback(emptyState);
 
-        // first commit everything in the buffer.
-        if ([input isShiftHold]) {
-            return NO;
+        // Non-Dynamic Keyboard Layouts Only: When shift is pressed, don't do further processing, since it outputs capital letter anyway.
+        if ((![Preferences.basisKeyboardLayout isEqual: @"com.apple.keylayout.ZhuyinBopomofo"]
+             && ![Preferences.basisKeyboardLayout isEqual: @"com.apple.keylayout.ZhuyinEten"])
+            || [input isCapsLockOn]){
+            if ([input isShiftHold]) {
+                return NO;
+            }
         }
 
         // if ASCII but not printable, don't use insertText:replacementRange: as many apps don't handle non-ASCII char insertions.
@@ -291,10 +297,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             return NO;
         }
 
-        // when shift is pressed, don't do further processing, since it outputs capital letter anyway.
+        // commit everything in the buffer.
         InputStateCommitting *committingState = [[InputStateCommitting alloc] initWithPoppedText:[input.inputText lowercaseString]];
         stateCallback(committingState);
         stateCallback(emptyState);
+
         return YES;
     }
 
@@ -383,7 +390,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
         if (!overrideValue.empty()) {
             size_t cursorIndex = [self _actualCandidateCursorIndex];
-            std::vector<Taiyan::Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
+            std::vector<Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
             double highestScore = FindHighestScore(nodes, kEpsilon);
             _builder->grid().overrideNodeScoreForSelectedCandidate(cursorIndex, overrideValue, static_cast<float>(highestScore));
         }
@@ -518,7 +525,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // MARK: Enter
     if ([input isEnter]) {
         if ([input isControlHold]) {
-            if (ctlInputMethod.areWeUsingOurOwnPhraseEditor) {
+            if (ctlInputMethod.areWeUsingOurOwnPhraseEditor || [input isCommandHold]) {
                 return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
             }
         }
@@ -526,7 +533,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     // MARK: Punctuation list
-    if ([input isSymbolMenuKey]) {
+    if ([input isSymbolMenuPhysicalKey] && ![input isShiftHold]) {
 
         // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
         // 於是這裡用「模擬一次 Enter 鍵的操作」使其代為執行這個 commit buffer 的動作。
@@ -844,12 +851,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
 - (BOOL)_handleCtrlEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
-    if (![state isKindOfClass:[InputStateInputting class]]) {
-        return NO;
-    }
+    if (![state isKindOfClass:[InputStateInputting class]]) return NO;
 
     NSArray *readings = [self _currentReadings];
-    NSString *composingBuffer = [readings componentsJoinedByString:@"-"];
+    NSString *composingBuffer = (ctlInputMethod.areWeUsingOurOwnPhraseEditor) ? [readings componentsJoinedByString:@"-"] : [readings componentsJoinedByString:@" "] ;
 
     [self clear];
 
@@ -1046,7 +1051,21 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return YES;
     }
 
-    if ([input isSpace] || [input isPageDown] || input.emacsKey == vChewingEmacsKeyNextPage) {
+    if ([input isSpace]) {
+        BOOL updated =
+            Preferences.specifySpaceKeyBehavior?
+                ([input isShiftHold] ? [gCurrentCandidateController highlightNextCandidate] : [gCurrentCandidateController showNextPage])
+            :
+                ([input isShiftHold] ? [gCurrentCandidateController showNextPage] : [gCurrentCandidateController highlightNextCandidate])
+        ;
+        if (!updated) {
+            [IME prtDebugIntel:@"A11C781F"];
+            errorCallback();
+        }
+        return YES;
+    }
+
+    if ([input isPageDown] || input.emacsKey == vChewingEmacsKeyNextPage) {
         BOOL updated = [gCurrentCandidateController showNextPage];
         if (!updated) {
             [IME prtDebugIntel:@"9B691919"];
@@ -1275,7 +1294,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // we must do some Unicode codepoint counting to find the actual cursor location for the client
     // i.e. we need to take UTF-16 into consideration, for which a surrogate pair takes 2 UniChars
     // locations
-    for (std::vector<Taiyan::Gramambular::NodeAnchor>::iterator wi = _walkedNodes.begin(), we = _walkedNodes.end(); wi != we; ++wi) {
+    for (std::vector<Gramambular::NodeAnchor>::iterator wi = _walkedNodes.begin(), we = _walkedNodes.end(); wi != we; ++wi) {
         if ((*wi).node) {
             std::string nodeStr = (*wi).node->currentKeyValue().value;
             NSString *valueString = [NSString stringWithUTF8String:nodeStr.c_str()];
@@ -1343,7 +1362,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // retrieve the most likely trellis, i.e. a Maximum Likelihood Estimation
     // of the best possible Mandarain characters given the input syllables,
     // using the Viterbi algorithm implemented in the Gramambular library
-    Taiyan::Gramambular::Walker walker(&_builder->grid());
+    Gramambular::Walker walker(&_builder->grid());
 
     // the reverse walk traces the trellis from the end
     _walkedNodes = walker.reverseWalk(_builder->grid().width());
@@ -1376,7 +1395,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if (_builder->grid().width() > (size_t) composingBufferSize) {
         if (_walkedNodes.size() > 0) {
-            Taiyan::Gramambular::NodeAnchor &anchor = _walkedNodes[0];
+            Gramambular::NodeAnchor &anchor = _walkedNodes[0];
             poppedText = [NSString stringWithUTF8String:anchor.node->currentKeyValue().value.c_str()];
             _builder->removeHeadReadings(anchor.spanningLength);
         }
@@ -1391,15 +1410,15 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     NSMutableArray *candidatesArray = [[NSMutableArray alloc] init];
 
     size_t cursorIndex = [self _actualCandidateCursorIndex];
-    std::vector<Taiyan::Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
+    std::vector<Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
 
     // sort the nodes, so that longer nodes (representing longer phrases) are placed at the top of the candidate list
     stable_sort(nodes.begin(), nodes.end(), NodeAnchorDescendingSorter());
 
     // then use the C++ trick to retrieve the candidates for each node at/crossing the cursor
-    for (std::vector<Taiyan::Gramambular::NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
-        const std::vector<Taiyan::Gramambular::KeyValuePair> &candidates = (*ni).node->candidates();
-        for (std::vector<Taiyan::Gramambular::KeyValuePair>::const_iterator ci = candidates.begin(), ce = candidates.end(); ci != ce; ++ci) {
+    for (std::vector<Gramambular::NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
+        const std::vector<Gramambular::KeyValuePair> &candidates = (*ni).node->candidates();
+        for (std::vector<Gramambular::KeyValuePair>::const_iterator ci = candidates.begin(), ce = candidates.end(); ci != ce; ++ci) {
             [candidatesArray addObject:[NSString stringWithUTF8String:(*ci).value.c_str()]];
         }
     }
@@ -1411,15 +1430,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 - (size_t)_actualCandidateCursorIndex
 {
     size_t cursorIndex = _builder->cursorIndex();
-    if (Preferences.selectPhraseAfterCursorAsCandidate) {
-        // MS Phonetics IME style, phrase is *after* the cursor, i.e. cursor is always *before* the phrase
-        if (cursorIndex < _builder->length()) {
-            ++cursorIndex;
-        }
-    } else {
-        if (!cursorIndex) {
-            ++cursorIndex;
-        }
+    // MS Phonetics IME style, phrase is *after* the cursor, i.e. cursor is always *before* the phrase
+    if ((Preferences.selectPhraseAfterCursorAsCandidate && (cursorIndex < _builder->length()))
+        || !cursorIndex) {
+        ++cursorIndex;
     }
 
     return cursorIndex;

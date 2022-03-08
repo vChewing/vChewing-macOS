@@ -92,9 +92,16 @@ class ctlInputMethod: IMKInputController {
         userAssociatedPhrasesItem.keyEquivalentModifierMask = [.command, .control]
         userAssociatedPhrasesItem.state = Preferences.associatedPhrasesEnabled.state
 
+        let alphaNumericalModeItem = menu.addItem(withTitle: NSLocalizedString("Alphanumerical Input Mode", comment: ""), action: #selector(toggleAlphanumericalModeEnabled(_:)), keyEquivalent: "I")
+        alphaNumericalModeItem.keyEquivalentModifierMask = [.command, .control]
+        alphaNumericalModeItem.state = Preferences.isAlphanumericalModeEnabled.state
+
         if optionKeyPressed {
             let phaseReplacementItem = menu.addItem(withTitle: NSLocalizedString("Use Phrase Replacement", comment: ""), action: #selector(togglePhraseReplacement(_:)), keyEquivalent: "")
             phaseReplacementItem.state = Preferences.phraseReplacementEnabled.state
+
+            let toggleSymbolInputItem = menu.addItem(withTitle: NSLocalizedString("Symbol & Emoji Input", comment: ""), action: #selector(toggleSymbolEnabled(_:)), keyEquivalent: "")
+            toggleSymbolInputItem.state = Preferences.symbolInputEnabled.state
         }
 
         menu.addItem(NSMenuItem.separator()) // ---------------------
@@ -178,6 +185,12 @@ class ctlInputMethod: IMKInputController {
     }
 
     override func handle(_ event: NSEvent!, client: Any!) -> Bool {
+
+        if (Preferences.isAlphanumericalModeEnabled) {
+            (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: Preferences.functionKeyboardLayout)
+            return false
+        }
+
         if event.type == .flagsChanged {
             let functionKeyKeyboardLayoutID = Preferences.functionKeyboardLayout
             let basisKeyboardLayoutID = Preferences.basisKeyboardLayout
@@ -188,6 +201,15 @@ class ctlInputMethod: IMKInputController {
 
             let includeShift = Preferences.functionKeyKeyboardLayoutOverrideIncludeShiftKey
             let notShift = NSEvent.ModifierFlags(rawValue: ~(NSEvent.ModifierFlags.shift.rawValue))
+
+            // Shift Click Handling: Toggling Alphanumerical Mode. // STILL BUGGY, hence being commented out.
+            // if !event.modifierFlags.contains(.shift)
+            //     && event.modifierFlags == .init(rawValue: 0)
+            //     && !event.modifierFlags.contains(notShift)
+            //     && (event.keyCode == KeyCode.leftShift.rawValue || event.keyCode == KeyCode.rightShift.rawValue) {
+            //             Preferences.toggleAlphanumericalModeEnabled()
+            // }
+
             if event.modifierFlags.contains(notShift) ||
                        (event.modifierFlags.contains(.shift) && includeShift) {
                 (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: functionKeyKeyboardLayoutID)
@@ -200,7 +222,7 @@ class ctlInputMethod: IMKInputController {
         var textFrame = NSRect.zero
         let attributes: [AnyHashable: Any]? = (client as? IMKTextInput)?.attributes(forCharacterIndex: 0, lineHeightRectangle: &textFrame)
         let useVerticalMode = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
-        
+
         if (client as? IMKTextInput)?.bundleIdentifier() == "org.atelierInmu.vChewing.vChewingPhraseEditor" {
             ctlInputMethod.areWeUsingOurOwnPhraseEditor = true
         } else {
@@ -241,16 +263,23 @@ class ctlInputMethod: IMKInputController {
     }
 
     @objc func toggleCNS11643Enabled(_ sender: Any?) {
-        mgrLangModel.setCNSEnabled(Preferences.toggleCNS11643Enabled())
-        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("CNS11643 Mode", comment: ""), "\n", Preferences.cns11643Enabled ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("CNS11643 Mode", comment: ""), "\n", Preferences.toggleCNS11643Enabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
+    }
+
+    @objc func toggleSymbolEnabled(_ sender: Any?) {
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Symbol & Emoji Input", comment: ""), "\n", Preferences.toggleSymbolInputEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 
     @objc func toggleAssociatedPhrasesEnabled(_ sender: Any?) {
         NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Per-Char Associated Phrases", comment: ""), "\n", Preferences.toggleAssociatedPhrasesEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 
+    @objc func toggleAlphanumericalModeEnabled(_ sender: Any?) {
+        Preferences.toggleAlphanumericalModeEnabled()
+    }
+
     @objc func togglePhraseReplacement(_ sender: Any?) {
-        mgrLangModel.setPhraseReplacementEnabled(Preferences.togglePhraseReplacementEnabled())
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Use Phrase Replacement", comment: ""), "\n", Preferences.togglePhraseReplacementEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 
     @objc func selfTerminate(_ sender: Any?) {

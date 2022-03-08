@@ -32,7 +32,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 namespace vChewing {
 
-using namespace Taiyan::Gramambular;
+using namespace Gramambular;
 
 /// LMInstantiator is a facade for managing a set of models including
 /// the input method language model, user phrases and excluded phrases.
@@ -56,7 +56,7 @@ using namespace Taiyan::Gramambular;
 /// model while launching and to load the user phrases anytime if the custom
 /// files are modified. It does not keep the reference of the data pathes but
 /// you have to pass the paths when you ask it to do loading.
-class LMInstantiator : public Taiyan::Gramambular::LanguageModel {
+class LMInstantiator : public Gramambular::LanguageModel {
 public:
     LMInstantiator();
     ~LMInstantiator();
@@ -97,11 +97,11 @@ public:
     void loadPhraseReplacementMap(const char* phraseReplacementPath);
 
     /// Not implemented since we do not have data to provide bigram function.
-    const std::vector<Taiyan::Gramambular::Bigram> bigramsForKeys(const std::string& preceedingKey, const std::string& key);
+    const std::vector<Gramambular::Bigram> bigramsForKeys(const std::string& preceedingKey, const std::string& key);
     /// Returns a list of available unigram for the given key.
     /// @param key A std::string represents the BPMF reading or a symbol key. For
     ///     example, it you pass "ㄇㄚ", it returns "嗎", "媽", and so on.
-    const std::vector<Taiyan::Gramambular::Unigram> unigramsForKey(const std::string& key);
+    const std::vector<Gramambular::Unigram> unigramsForKey(const std::string& key);
     /// If the model has unigrams for the given key.
     /// @param key The key.
     bool hasUnigramsForKey(const std::string& key);
@@ -110,6 +110,11 @@ public:
     void setPhraseReplacementEnabled(bool enabled);
     /// If phrase replacement is enabled or not.
     bool phraseReplacementEnabled();
+
+    /// Enables or disables symbol input.
+    void setSymbolEnabled(bool enabled);
+    /// If symbol input is enabled or not.
+    bool symbolEnabled();
 
     /// Enables or disables CNS11643 input.
     void setCNSEnabled(bool enabled);
@@ -135,7 +140,7 @@ protected:
     /// @param insertedValues The values for unigrams already in the results.
     ///   It helps to prevent duplicated unigrams. Please note that the method
     ///   has a side effect that it inserts values to `insertedValues`.
-    const std::vector<Taiyan::Gramambular::Unigram> filterAndTransformUnigrams(const std::vector<Taiyan::Gramambular::Unigram> unigrams,
+    const std::vector<Gramambular::Unigram> filterAndTransformUnigrams(const std::vector<Gramambular::Unigram> unigrams,
         const std::unordered_set<std::string>& excludedValues,
         std::unordered_set<std::string>& insertedValues);
 
@@ -149,6 +154,7 @@ protected:
     AssociatedPhrases m_associatedPhrases;
     bool m_phraseReplacementEnabled;
     bool m_cnsEnabled;
+    bool m_symbolEnabled;
     bool m_externalConverterEnabled;
     std::function<std::string(std::string)> m_externalConverter;
 };
