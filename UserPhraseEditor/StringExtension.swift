@@ -222,6 +222,7 @@ extension String {
                 varLineData.regReplace(pattern: "cai", replaceWith: "ㄘㄞ")
                 varLineData.regReplace(pattern: "can", replaceWith: "ㄘㄢ")
                 varLineData.regReplace(pattern: "cao", replaceWith: "ㄘㄠ")
+                varLineData.regReplace(pattern: "cei", replaceWith: "ㄘㄟ")
                 varLineData.regReplace(pattern: "cen", replaceWith: "ㄘㄣ")
                 varLineData.regReplace(pattern: "cha", replaceWith: "ㄔㄚ")
                 varLineData.regReplace(pattern: "che", replaceWith: "ㄔㄜ")
