@@ -86,15 +86,19 @@ bool LMConsolidator::ConsolidateContent(const char *path, bool shouldCheckPragma
     }
     // 第一遍 for 用來統整每行內的內容。
     // regex sedCJKWhiteSpace("\\x{3000}"), sedNonBreakWhiteSpace("\\x{A0}"), sedWhiteSpace("\\s+"), sedLeadingSpace("^\\s"), sedTrailingSpace("\\s$"); // 這樣寫會導致輸入法敲不了任何字，推測 Xcode 13 支援的 cpp / objCpp 可能對某些 Regex 寫法有相容性問題。
-    regex sedCJKWhiteSpace("　"), sedNonBreakWhiteSpace(" "), sedWhiteSpace("\\s+"), sedLeadingSpace("^\\s"), sedTrailingSpace("\\s$"); // RegEx 先定義好。
+    // regex sedCJKWhiteSpace("　"), sedNonBreakWhiteSpace(" "), sedWhiteSpace("\\s+"), sedLeadingSpace("^\\s"), sedTrailingSpace("\\s$"); // RegEx 先定義好。
+    regex sedToConsolidate("(　+| +| +|\t+)+"), sedToTrim("(^\\s|\\s$)");
     for(int i=0;i<vecEntry.size();i++) { // 第一遍 for 用來統整每行內的內容。
         if (vecEntry[i].size() != 0) { // 不要理會空行，否則給空行加上 endl 等於再加空行。
             // RegEx 處理順序：先將全形空格換成西文空格，然後合併任何意義上的連續空格（包括 tab 等），最後去除每行首尾空格。
-            vecEntry[i] = regex_replace(vecEntry[i], sedCJKWhiteSpace, " ").c_str(); // 中日韓全形空格轉為 ASCII 空格。
-            vecEntry[i] = regex_replace(vecEntry[i], sedNonBreakWhiteSpace, " ").c_str(); // Non-Break 型空格轉為 ASCII 空格。
-            vecEntry[i] = regex_replace(vecEntry[i], sedWhiteSpace, " ").c_str(); // 所有意義上的連續的 \s 型空格都轉為單個 ASCII 空格。
-            vecEntry[i] = regex_replace(vecEntry[i], sedLeadingSpace, "").c_str(); // 去掉行首空格。
-            vecEntry[i] = regex_replace(vecEntry[i], sedTrailingSpace, "").c_str(); // 去掉行尾空格。
+            // vecEntry[i] = regex_replace(vecEntry[i], sedCJKWhiteSpace, " ").c_str(); // 中日韓全形空格轉為 ASCII 空格。
+            // vecEntry[i] = regex_replace(vecEntry[i], sedNonBreakWhiteSpace, " ").c_str(); // Non-Break 型空格轉為 ASCII 空格。
+            // vecEntry[i] = regex_replace(vecEntry[i], sedWhiteSpace, " ").c_str(); // 所有意義上的連續的 \s 型空格都轉為單個 ASCII 空格。
+            // vecEntry[i] = regex_replace(vecEntry[i], sedLeadingSpace, "").c_str(); // 去掉行首空格。
+            // vecEntry[i] = regex_replace(vecEntry[i], sedTrailingSpace, "").c_str(); // 去掉行尾空格。
+            // 上述命令分步驟執行容易產生效能問題，故濃縮為下述兩句。
+            vecEntry[i] = regex_replace(vecEntry[i], sedToConsolidate, " ").c_str();
+            vecEntry[i] = regex_replace(vecEntry[i], sedToTrim, "").c_str();
         }
     }
     // 在第二遍 for 運算之前，針對 vecEntry 去除重複條目。

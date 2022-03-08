@@ -21,7 +21,7 @@ import Cocoa
 
 // Use KeyCodes as much as possible since its recognition won't be affected by macOS Base Keyboard Layouts.
 // KeyCodes: https://eastmanreference.com/complete-list-of-applescript-key-codes
-enum KeyCode: UInt16 {
+@objc enum KeyCode: UInt16 {
     case none = 0
     case space = 49
     case backSpace = 51
@@ -38,11 +38,16 @@ enum KeyCode: UInt16 {
     case home = 115
     case end = 119
     case delete = 117
+    case leftShift = 56
+    case rightShift = 60
+    case capsLock = 57
+    case symbolMenuPhysicalKey = 50
 }
 
 // CharCodes: https://theasciicode.com.ar/ascii-control-characters/horizontal-tab-ascii-code-9.html
-enum CharCode: UInt16 {
-    case symbolMenuKey_ABC = 96
+enum CharCode: UInt/*16*/ {
+    case yajuusenpai = 1145141919810893
+    // - CharCode is not reliable at all. KeyCode is the most accurate. KeyCode doesn't give a phuque about the character sent through macOS keyboard layouts but only focuses on which physical key is pressed.
 }
 
 class KeyHandlerInput: NSObject {
@@ -51,6 +56,7 @@ class KeyHandlerInput: NSObject {
     @objc private (set) var inputTextIgnoringModifiers: String?
     @objc private (set) var charCode: UInt16
     @objc private (set) var keyCode: UInt16
+    private var isFlagChanged: Bool
     private var flags: NSEvent.ModifierFlags
     private var cursorForwardKey: KeyCode
     private var cursorBackwardKey: KeyCode
@@ -68,6 +74,7 @@ class KeyHandlerInput: NSObject {
         self.keyCode = keyCode
         self.charCode = AppleKeyboardConverter.cnvApple2ABC(charCode)
         self.flags = flags
+        self.isFlagChanged = false
         useVerticalMode = isVerticalMode
         emacsKey = EmacsKeyHelper.detect(charCode: AppleKeyboardConverter.cnvApple2ABC(charCode), flags: flags)
         cursorForwardKey = useVerticalMode ? .down : .right
@@ -84,6 +91,7 @@ class KeyHandlerInput: NSObject {
         inputTextIgnoringModifiers = AppleKeyboardConverter.cnvStringApple2ABC(event.charactersIgnoringModifiers ?? "")
         keyCode = event.keyCode
         flags = event.modifierFlags
+        isFlagChanged = (event.type == .flagsChanged) ? true : false
         useVerticalMode = isVerticalMode
         let charCode: UInt16 = {
             guard let inputText = event.characters, inputText.count > 0 else {
@@ -225,9 +233,10 @@ class KeyHandlerInput: NSObject {
         KeyCode(rawValue: keyCode) == verticalModeOnlyChooseCandidateKey
     }
 
-    @objc var isSymbolMenuKey: Bool {
-        // 這裡用 CharCode 更合適，不然就無法輸入波浪鍵了。
-        CharCode(rawValue: charCode) == CharCode.symbolMenuKey_ABC
+    @objc var isSymbolMenuPhysicalKey: Bool {
+        // 這裡必須用 KeyCode，這樣才不會受隨 macOS 版本更動的 Apple 動態注音鍵盤排列內容的影響。
+        // 只是必須得與 ![input isShift] 搭配使用才可以（也就是僅判定 Shift 沒被摁下的情形）。
+        KeyCode(rawValue: keyCode) == KeyCode.symbolMenuPhysicalKey
     }
 
 }

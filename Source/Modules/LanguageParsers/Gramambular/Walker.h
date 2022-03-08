@@ -25,7 +25,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 #include "Grid.h"
 
-namespace Taiyan {
 namespace Gramambular {
 
 class Walker {
@@ -80,6 +79,6 @@ inline const std::vector<NodeAnchor> Walker::reverseWalk(
     return *result;
 }
 }  // namespace Gramambular
-}  // namespace Taiyan
+
 
 #endif

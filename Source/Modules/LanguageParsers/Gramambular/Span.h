@@ -26,7 +26,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 #include "Node.h"
 
-namespace Taiyan {
 namespace Gramambular {
 class Span {
 public:
@@ -88,6 +87,6 @@ inline Node* Span::nodeOfLength(size_t length) {
 
 inline size_t Span::maximumLength() const { return m_maximumLength; }
 }  // namespace Gramambular
-}  // namespace Taiyan
+
 
 #endif

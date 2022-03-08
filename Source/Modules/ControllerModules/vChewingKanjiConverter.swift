@@ -21,10 +21,11 @@ import Cocoa
 // 這個模組果然還是要用 Regex 轉換會比較爽。
 // 為防止與其他模組彼此發生可能的衝突，這段 String 擴展就用 private 開頭來私有化。
 private extension String {
+    // Ref: https://stackoverflow.com/a/40993403/4162914 && https://stackoverflow.com/a/71291137/4162914
     mutating func regReplace(pattern: String, replaceWith: String = "") {
         do {
             let regex = try NSRegularExpression(pattern: pattern, options: .caseInsensitive)
-            let range = NSRange(location: 0, length: count)
+            let range = NSRange(location: 0, length: self.utf16.count)
             self = regex.stringByReplacingMatches(in: self, options: [], range: range, withTemplate: replaceWith)
         } catch { return }
     }

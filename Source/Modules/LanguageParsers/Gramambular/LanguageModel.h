@@ -26,7 +26,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include "Bigram.h"
 #include "Unigram.h"
 
-namespace Taiyan {
 namespace Gramambular {
 
 class LanguageModel {
@@ -39,6 +38,6 @@ public:
     virtual bool hasUnigramsForKey(const std::string& key) = 0;
 };
 }  // namespace Gramambular
-}  // namespace Taiyan
+
 
 #endif

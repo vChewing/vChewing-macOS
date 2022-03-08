@@ -28,7 +28,7 @@
 "Edit Phrase Replacement Table…" = "編輯語彙置換表…";
 "Use Phrase Replacement" = "使用語彙置換";
 "Candidates keys cannot be empty." = "您必須指定選字鍵。";
-"Candidate keys can only contain ASCII characters like alphanumerals." = "選字鍵只能是英數等 ASCII 字符。";
+"Candidate keys can only contain ASCII characters like alphanumericals." = "選字鍵只能是英數等 ASCII 字符。";
 "Candidate keys cannot contain space." = "選字鍵不得包含空格。";
 "There should not be duplicated keys." = "選字鍵不得重複。";
 "Please specify at least 4 candidate keys." = "請至少指定四個選字鍵。";
@@ -47,8 +47,10 @@
 "zh-Hans" = "簡體中文";
 "zh-Hant" = "繁體中文";
 "ja" = "和文";
+"Alphanumerical Input Mode" = "原生英數輸入模式";
 "Apple Zhuyin Bopomofo" = "Apple 標準注音鍵盤佈局";
 "Apple Zhuyin Eten" = "Apple 倚天注音鍵盤佈局";
+"Symbol & Emoji Input" = "符號＆繪文字輸入";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";

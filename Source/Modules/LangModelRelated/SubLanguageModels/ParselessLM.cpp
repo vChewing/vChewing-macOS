@@ -80,23 +80,23 @@ void vChewing::ParselessLM::close()
     }
 }
 
-const std::vector<Taiyan::Gramambular::Bigram>
+const std::vector<Gramambular::Bigram>
 vChewing::ParselessLM::bigramsForKeys(
     const std::string& preceedingKey, const std::string& key)
 {
-    return std::vector<Taiyan::Gramambular::Bigram>();
+    return std::vector<Gramambular::Bigram>();
 }
 
-const std::vector<Taiyan::Gramambular::Unigram>
+const std::vector<Gramambular::Unigram>
 vChewing::ParselessLM::unigramsForKey(const std::string& key)
 {
     if (db_ == nullptr) {
-        return std::vector<Taiyan::Gramambular::Unigram>();
+        return std::vector<Gramambular::Unigram>();
     }
 
-    std::vector<Taiyan::Gramambular::Unigram> results;
+    std::vector<Gramambular::Unigram> results;
     for (const auto& row : db_->findRows(key + " ")) {
-        Taiyan::Gramambular::Unigram unigram;
+        Gramambular::Unigram unigram;
 
         // Move ahead until we encounter the first space. This is the key.
         auto it = row.begin();

@@ -24,7 +24,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 #include "KeyValuePair.h"
 
-namespace Taiyan {
 namespace Gramambular {
 class Bigram {
 public:
@@ -88,6 +87,6 @@ inline bool Bigram::operator<(const Bigram& another) const {
     return false;
 }
 }  // namespace Gramambular
-}  // namespace Taiyan
+
 
 #endif

@@ -41,6 +41,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         ctlAboutWindowInstance?.window?.center()
         ctlAboutWindowInstance?.window?.orderFrontRegardless() // 逼著關於視窗往最前方顯示
+        ctlAboutWindowInstance?.window?.level = .statusBar
     }
     // Call the New About Window
     @IBAction func about(_ sender: Any) {

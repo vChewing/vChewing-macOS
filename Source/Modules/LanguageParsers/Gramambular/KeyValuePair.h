@@ -23,7 +23,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <ostream>
 #include <string>
 
-namespace Taiyan {
 namespace Gramambular {
 
 class KeyValuePair {
@@ -54,6 +53,6 @@ inline bool KeyValuePair::operator<(const KeyValuePair& another) const {
     return false;
 }
 }  // namespace Gramambular
-}  // namespace Taiyan
+
 
 #endif
