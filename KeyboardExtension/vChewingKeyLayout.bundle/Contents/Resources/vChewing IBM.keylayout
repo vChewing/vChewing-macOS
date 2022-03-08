@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="UTF-8"?>
 <!DOCTYPE keyboard SYSTEM "file://localhost/System/Library/DTDs/KeyboardLayout.dtd">
-<!--Last edited by Ukelele version 351 on 2022-02-14 at 17:29 (GMT+8)-->
-<keyboard group="126" id="-2369" name="vChewing ETen" maxout="1">
+<!--Last edited by Ukelele version 351 on 2022-03-08 at 11:10 (GMT+8)-->
+<keyboard group="126" id="-28630" name="vChewing IBM" maxout="1">
     <layouts>
         <layout first="0" last="17" mapSet="16c" modifiers="f4"/>
         <layout first="18" last="18" mapSet="a88" modifiers="f4"/>
@@ -45,54 +45,54 @@
     </modifierMap>
     <keyMapSet id="16c">
         <keyMap index="0">
-            <key code="0" output="ㄚ"/>
-            <key code="1" output="ㄙ"/>
-            <key code="2" output="ㄉ"/>
-            <key code="3" output="ㄈ"/>
-            <key code="4" output="ㄏ"/>
-            <key code="5" output="ㄐ"/>
-            <key code="6" output="ㄠ"/>
-            <key code="7" output="ㄨ"/>
-            <key code="8" output="ㄒ"/>
-            <key code="9" output="ㄍ"/>
+            <key code="0" output="ㄧ"/>
+            <key code="1" output="ㄨ"/>
+            <key code="2" output="ㄩ"/>
+            <key code="3" output="ㄚ"/>
+            <key code="4" output="ㄜ"/>
+            <key code="5" output="ㄛ"/>
+            <key code="6" output="ㄡ"/>
+            <key code="7" output="ㄢ"/>
+            <key code="8" output="ㄣ"/>
+            <key code="9" output="ㄤ"/>
             <key code="10" output="§"/>
-            <key code="11" output="ㄅ"/>
-            <key code="12" output="ㄟ"/>
-            <key code="13" output="ㄝ"/>
-            <key code="14" output="ㄧ"/>
-            <key code="15" output="ㄜ"/>
-            <key code="16" output="ㄡ"/>
-            <key code="17" output="ㄊ"/>
-            <key code="18" output="˙"/>
-            <key code="19" output="ˊ"/>
-            <key code="20" output="ˇ"/>
-            <key code="21" output="ˋ"/>
-            <key code="22" output="6"/>
-            <key code="23" output="5"/>
-            <key code="24" output="ㄦ"/>
-            <key code="25" output="ㄣ"/>
-            <key code="26" output="ㄑ"/>
-            <key code="27" output="ㄥ"/>
-            <key code="28" output="ㄢ"/>
-            <key code="29" output="ㄤ"/>
+            <key code="11" output="ㄥ"/>
+            <key code="12" output="ㄐ"/>
+            <key code="13" output="ㄑ"/>
+            <key code="14" output="ㄒ"/>
+            <key code="15" output="ㄓ"/>
+            <key code="16" output="ㄕ"/>
+            <key code="17" output="ㄔ"/>
+            <key code="18" output="ㄅ"/>
+            <key code="19" output="ㄆ"/>
+            <key code="20" output="ㄇ"/>
+            <key code="21" output="ㄈ"/>
+            <key code="22" output="ㄊ"/>
+            <key code="23" output="ㄉ"/>
+            <key code="24" output="="/>
+            <key code="25" output="ㄍ"/>
+            <key code="26" output="ㄋ"/>
+            <key code="27" output="ㄏ"/>
+            <key code="28" output="ㄌ"/>
+            <key code="29" output="ㄎ"/>
             <key code="30" output="」"/>
-            <key code="31" output="ㄛ"/>
-            <key code="32" output="ㄩ"/>
+            <key code="31" output="ㄘ"/>
+            <key code="32" output="ㄖ"/>
             <key code="33" output="「"/>
-            <key code="34" output="ㄞ"/>
-            <key code="35" output="ㄆ"/>
+            <key code="34" output="ㄗ"/>
+            <key code="35" output="ㄙ"/>
             <key code="36" output="&#x000D;"/>
-            <key code="37" output="ㄌ"/>
-            <key code="38" output="ㄖ"/>
-            <key code="39" output="ㄘ"/>
-            <key code="40" output="ㄎ"/>
-            <key code="41" output="ㄗ"/>
+            <key code="37" output="ㄟ"/>
+            <key code="38" output="ㄝ"/>
+            <key code="39" output="&#x0027;"/>
+            <key code="40" output="ㄞ"/>
+            <key code="41" output="ㄠ"/>
             <key code="42" output="、"/>
-            <key code="43" output="ㄓ"/>
-            <key code="44" output="ㄕ"/>
-            <key code="45" output="ㄋ"/>
-            <key code="46" output="ㄇ"/>
-            <key code="47" output="ㄔ"/>
+            <key code="43" output="ˇ"/>
+            <key code="44" output="˙"/>
+            <key code="45" output="ㄦ"/>
+            <key code="46" output="ˊ"/>
+            <key code="47" output="ˋ"/>
             <key code="48" output="&#x0009;"/>
             <key code="49" output=" "/>
             <key code="50" output="`"/>
@@ -817,6 +817,7 @@
             <key code="7" output="x"/>
             <key code="8" output="c"/>
             <key code="9" output="v"/>
+            <key code="10" output=""/>
             <key code="11" output="b"/>
             <key code="12" output="q"/>
             <key code="13" output="w"/>

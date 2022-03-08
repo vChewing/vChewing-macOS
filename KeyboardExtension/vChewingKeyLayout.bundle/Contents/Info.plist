@@ -8,48 +8,48 @@
 	<string>vChewingKeyLayout</string>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
-	<key>KLInfo_vChewingDachen</key>
+	<key>KLInfo_vChewing Dachen</key>
 	<dict>
 		<key>TICapsLockLanguageSwitchCapable</key>
 		<false/>
 		<key>TISInputSourceID</key>
-		<string>org.atelierInmu.keyboardlayout.vChewingKeyLayout.vChewingDachen</string>
+		<string>org.atelierInmu.vChewing.keyLayouts.vchewingdachen</string>
 		<key>TISIntendedLanguage</key>
 		<string>zh-Hanb</string>
 	</dict>
-	<key>KLInfo_vChewingETen</key>
+	<key>KLInfo_vChewing ETen</key>
 	<dict>
 		<key>TICapsLockLanguageSwitchCapable</key>
 		<false/>
 		<key>TISInputSourceID</key>
-		<string>org.atelierInmu.keyboardlayout.vChewingKeyLayout.vChewingETen</string>
+		<string>org.atelierInmu.vChewing.keyLayouts.vchewingeten</string>
 		<key>TISIntendedLanguage</key>
 		<string>zh-Hanb</string>
 	</dict>
-	<key>KLInfo_vChewingIBM</key>
+	<key>KLInfo_vChewing IBM</key>
 	<dict>
 		<key>TICapsLockLanguageSwitchCapable</key>
 		<false/>
 		<key>TISInputSourceID</key>
-		<string>org.atelierInmu.keyboardlayout.vChewingKeyLayout.vChewingIBM</string>
+		<string>org.atelierInmu.vChewing.keyLayouts.vchewingibm</string>
 		<key>TISIntendedLanguage</key>
 		<string>zh-Hanb</string>
 	</dict>
-	<key>KLInfo_vChewingMiTAC</key>
+	<key>KLInfo_vChewing MiTAC</key>
 	<dict>
 		<key>TICapsLockLanguageSwitchCapable</key>
 		<false/>
 		<key>TISInputSourceID</key>
-		<string>org.atelierInmu.keyboardlayout.vChewingKeyLayout.vChewingMiTAC</string>
+		<string>org.atelierInmu.vChewing.keyLayouts.vchewingmitac</string>
 		<key>TISIntendedLanguage</key>
 		<string>zh-Hanb</string>
 	</dict>
-	<key>KLInfo_vChewingSeigyou</key>
+	<key>KLInfo_vChewing Seigyou</key>
 	<dict>
 		<key>TICapsLockLanguageSwitchCapable</key>
 		<false/>
 		<key>TISInputSourceID</key>
-		<string>org.atelierInmu.keyboardlayout.vChewingKeyLayout.vChewingSeigyou</string>
+		<string>org.atelierInmu.vChewing.keyLayouts.vchewingseigyou</string>
 		<key>TISIntendedLanguage</key>
 		<string>zh-Hanb</string>
 	</dict>
