@@ -25,6 +25,16 @@ import Cocoa
             return true
         case "com.apple.keylayout.ZhuyinEten":
             return true
+        case "org.atelierInmu.vChewing.keyLayouts.vchewingdachen":
+            return true
+        case "org.atelierInmu.vChewing.keyLayouts.vchewingmitac":
+            return true
+        case "org.atelierInmu.vChewing.keyLayouts.vchewingibm":
+            return true
+        case "org.atelierInmu.vChewing.keyLayouts.vchewingseigyou":
+            return true
+        case "org.atelierInmu.vChewing.keyLayouts.vchewingeten":
+            return true
         default:
             return false
         }
