@@ -554,15 +554,24 @@ extension ctlInputMethod {
         let textSize = Preferences.candidateListTextSize
         let keyLabelSize = max(textSize / 2, kMinKeyLabelSize)
 
-        func font(name: String?, size: CGFloat) -> NSFont {
+        func labelFont(name: String?, size: CGFloat) -> NSFont {
             if let name = name {
                 return NSFont(name: name, size: size) ?? NSFont.systemFont(ofSize: size)
             }
             return NSFont.systemFont(ofSize: size)
         }
 
-        gCurrentCandidateController?.keyLabelFont = font(name: Preferences.candidateKeyLabelFontName, size: keyLabelSize)
-        gCurrentCandidateController?.candidateFont = font(name: Preferences.candidateTextFontName, size: textSize)
+        func candidateFont(name: String?, size: CGFloat) -> NSFont {
+            let currentMUIFont = (keyHandler.inputMode == InputMode.imeModeCHS) ? "Sarasa Term Slab SC" : "Sarasa Term Slab TC"
+            let finalReturnFont = NSFont(name: currentMUIFont, size: size) ?? NSFont.systemFont(ofSize: size)
+            if let name = name {
+                return NSFont(name: name, size: size) ?? finalReturnFont
+            }
+            return finalReturnFont
+        }
+
+        gCurrentCandidateController?.keyLabelFont = labelFont(name: Preferences.candidateKeyLabelFontName, size: keyLabelSize)
+        gCurrentCandidateController?.candidateFont = candidateFont(name: Preferences.candidateTextFontName, size: textSize)
 
         let candidateKeys = Preferences.candidateKeys
         let keyLabels = candidateKeys.count > 4 ? Array(candidateKeys) : Array(Preferences.defaultCandidateKeys)
