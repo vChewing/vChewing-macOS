@@ -26,6 +26,15 @@
 		<key>TISIntendedLanguage</key>
 		<string>zh-Hanb</string>
 	</dict>
+	<key>KLInfo_vChewing FakeSeigyou</key>
+	<dict>
+		<key>TICapsLockLanguageSwitchCapable</key>
+		<false/>
+		<key>TISInputSourceID</key>
+		<string>org.atelierInmu.vChewing.keyLayouts.vchewingfakeseigyou</string>
+		<key>TISIntendedLanguage</key>
+		<string>zh-Hanb</string>
+	</dict>
 	<key>KLInfo_vChewing IBM</key>
 	<dict>
 		<key>TICapsLockLanguageSwitchCapable</key>
@@ -41,15 +50,6 @@
 		<false/>
 		<key>TISInputSourceID</key>
 		<string>org.atelierInmu.vChewing.keyLayouts.vchewingmitac</string>
-		<key>TISIntendedLanguage</key>
-		<string>zh-Hanb</string>
-	</dict>
-	<key>KLInfo_vChewing Seigyou</key>
-	<dict>
-		<key>TICapsLockLanguageSwitchCapable</key>
-		<false/>
-		<key>TISInputSourceID</key>
-		<string>org.atelierInmu.vChewing.keyLayouts.vchewingseigyou</string>
 		<key>TISIntendedLanguage</key>
 		<string>zh-Hanb</string>
 	</dict>
