@@ -132,6 +132,14 @@ fileprivate class HorizontalCandidateView: NSView {
             } else {
                 NSColor.controlBackgroundColor.setFill()
             }
+            switch ctlInputMethod.currentKeyHandler.inputMode {
+            case InputMode.imeModeCHS:
+                if #available(macOS 12.0, *) {activeCandidateAttr[.languageIdentifier] = "zh-Hans" as AnyObject}
+            case InputMode.imeModeCHT:
+                if #available(macOS 12.0, *) {activeCandidateAttr[.languageIdentifier] = "zh-Hant" as AnyObject}
+            default:
+                break
+            }
             NSBezierPath.fill(rctCandidateArea)
             (keyLabels[index] as NSString).draw(in: rctLabel, withAttributes: activeCandidateIndexAttr)
             (displayedCandidates[index] as NSString).draw(in: rctCandidatePhrase, withAttributes: activeCandidateAttr)
