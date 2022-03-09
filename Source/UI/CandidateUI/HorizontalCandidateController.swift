@@ -118,12 +118,13 @@ fileprivate class HorizontalCandidateView: NSView {
             var activeCandidateIndexAttr = keyLabelAttrDict
             var activeCandidateAttr = candidateAttrDict
             if index == highlightedIndex {
+                let colorBlendAmount: CGFloat = IME.isDarkMode() ? 0.25 : 0
                 // The background color of the highlightened candidate
                 switch ctlInputMethod.currentKeyHandler.inputMode {
                 case InputMode.imeModeCHS:
-                    NSColor.systemRed.withAlphaComponent(0.75).setFill()
+                    NSColor.systemRed.blended(withFraction: colorBlendAmount, of: NSColor.controlBackgroundColor)!.setFill()
                 case InputMode.imeModeCHT:
-                    NSColor.systemBlue.withAlphaComponent(0.75).setFill()
+                    NSColor.systemBlue.blended(withFraction: colorBlendAmount, of: NSColor.controlBackgroundColor)!.setFill()
                 default:
                     NSColor.alternateSelectedControlColor.setFill()
                 }
