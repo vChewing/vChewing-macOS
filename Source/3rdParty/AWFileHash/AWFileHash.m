@@ -307,11 +307,7 @@ int CC_CRC32_Final(unsigned char *md, CC_CRC32_CTX *c) {
 
 #pragma mark -
 #pragma mark public class accessors
-+ (NSString *)md5HashOfData:(NSData *)data {
-    FileHashComputationContext context;
-    FileHashComputationContextInitialize(context, MD5);
-    return [self hashOfNSData:data withComputationContext:&context];
-}
+
 
 + (NSString *)sha1HashOfData:(NSData *)data {
     FileHashComputationContext context;
@@ -329,12 +325,6 @@ int CC_CRC32_Final(unsigned char *md, CC_CRC32_CTX *c) {
     FileHashComputationContext context;
     FileHashComputationContextInitialize(context, CRC32);
     return [self hashOfNSData:data withComputationContext:&context];
-}
-
-+ (NSString *)md5HashOfFileAtPath:(NSString *)filePath {
-    FileHashComputationContext context;
-    FileHashComputationContextInitialize(context, MD5);
-    return [self hashOfFileAtPath:filePath withComputationContext:&context];
 }
 
 + (NSString *)sha1HashOfFileAtPath:(NSString *)filePath {

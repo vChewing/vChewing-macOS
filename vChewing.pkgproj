@@ -58,7 +58,39 @@
 									<key>GID</key>
 									<integer>0</integer>
 									<key>PATH</key>
+									<string>Audio</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
 									<string>Automator</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>ColorPickers</string>
 									<key>PATH_TYPE</key>
 									<integer>0</integer>
 									<key>PERMISSIONS</key>
@@ -111,6 +143,22 @@
 									<integer>0</integer>
 									<key>PERMISSIONS</key>
 									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>80</integer>
+									<key>PATH</key>
+									<string>Fonts</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>1021</integer>
 									<key>TYPE</key>
 									<integer>1</integer>
 									<key>UID</key>
@@ -529,6 +577,56 @@
 							<array>
 								<dict>
 									<key>CHILDREN</key>
+									<array>
+										<dict>
+											<key>CHILDREN</key>
+											<array/>
+											<key>GID</key>
+											<integer>0</integer>
+											<key>PATH</key>
+											<string>Extensions</string>
+											<key>PATH_TYPE</key>
+											<integer>0</integer>
+											<key>PERMISSIONS</key>
+											<integer>493</integer>
+											<key>TYPE</key>
+											<integer>1</integer>
+											<key>UID</key>
+											<integer>0</integer>
+										</dict>
+									</array>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>Library</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+							</array>
+							<key>GID</key>
+							<integer>0</integer>
+							<key>PATH</key>
+							<string>System</string>
+							<key>PATH_TYPE</key>
+							<integer>0</integer>
+							<key>PERMISSIONS</key>
+							<integer>493</integer>
+							<key>TYPE</key>
+							<integer>1</integer>
+							<key>UID</key>
+							<integer>0</integer>
+						</dict>
+						<dict>
+							<key>CHILDREN</key>
+							<array>
+								<dict>
+									<key>CHILDREN</key>
 									<array/>
 									<key>GID</key>
 									<integer>0</integer>
@@ -594,7 +692,7 @@
 				<key>PREINSTALL_PATH</key>
 				<dict>
 					<key>PATH</key>
-					<string>Installer/pkgPostInstall.sh</string>
+					<string>Installer/pkgPreInstall.sh</string>
 					<key>PATH_TYPE</key>
 					<integer>1</integer>
 				</dict>
@@ -846,11 +944,11 @@
 					</dict>
 					<dict>
 						<key>LANGUAGE</key>
-						<string>Simplified Chinese</string>
+						<string>Traditional Chinese</string>
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>LICENSE-CHS.txt</string>
+							<string>LICENSE-CHT.txt</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>
@@ -868,11 +966,11 @@
 					</dict>
 					<dict>
 						<key>LANGUAGE</key>
-						<string>Traditional Chinese</string>
+						<string>Simplified Chinese</string>
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>LICENSE-CHT.txt</string>
+							<string>LICENSE-CHS.txt</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>
@@ -903,9 +1001,9 @@
 					</dict>
 					<dict>
 						<key>LANGUAGE</key>
-						<string>Traditional Chinese</string>
+						<string>Simplified Chinese</string>
 						<key>VALUE</key>
-						<string>威注音輸入法</string>
+						<string>威注音输入法</string>
 					</dict>
 					<dict>
 						<key>LANGUAGE</key>
@@ -915,9 +1013,9 @@
 					</dict>
 					<dict>
 						<key>LANGUAGE</key>
-						<string>Simplified Chinese</string>
+						<string>Traditional Chinese</string>
 						<key>VALUE</key>
-						<string>威注音输入法</string>
+						<string>威注音輸入法</string>
 					</dict>
 				</array>
 			</dict>
@@ -954,11 +1052,11 @@
 						</dict>
 						<dict>
 							<key>LANGUAGE</key>
-							<string>Traditional Chinese</string>
+							<string>Simplified Chinese</string>
 							<key>SECONDARY_VALUE</key>
-							<string>至少 macOS 10.11.5 方可滿足威注音對系統內的萬國碼版本支援的需要。</string>
+							<string>至少 macOS 10.11.5 方可满足威注音对系统内的万国码版本支援的需要。</string>
 							<key>VALUE</key>
-							<string>作業系統版本太舊</string>
+							<string>作业系统版本太旧</string>
 						</dict>
 						<dict>
 							<key>LANGUAGE</key>
@@ -970,11 +1068,11 @@
 						</dict>
 						<dict>
 							<key>LANGUAGE</key>
-							<string>Simplified Chinese</string>
+							<string>Traditional Chinese</string>
 							<key>SECONDARY_VALUE</key>
-							<string>至少 macOS 10.11.5 方可满足威注音对系统内的万国码版本支援的需要。</string>
+							<string>至少 macOS 10.11.5 方可滿足威注音對系統內的萬國碼版本支援的需要。</string>
 							<key>VALUE</key>
-							<string>作业系统版本太旧</string>
+							<string>作業系統版本太舊</string>
 						</dict>
 					</array>
 					<key>NAME</key>
