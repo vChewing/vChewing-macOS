@@ -563,7 +563,9 @@ extension ctlInputMethod {
 
         func candidateFont(name: String?, size: CGFloat) -> NSFont {
             let currentMUIFont = (keyHandler.inputMode == InputMode.imeModeCHS) ? "Sarasa Term Slab SC" : "Sarasa Term Slab TC"
-            let finalReturnFont = NSFont(name: currentMUIFont, size: size) ?? NSFont.systemFont(ofSize: size)
+            var finalReturnFont = NSFont(name: currentMUIFont, size: size) ?? NSFont.systemFont(ofSize: size)
+            // 對更紗黑體的依賴到 macOS 11 Big Sur 為止。macOS 12 Monterey 開始則依賴系統內建的函數使用蘋方來處理。
+            if #available(macOS 12.0, *) {finalReturnFont = NSFont.systemFont(ofSize: size)}
             if let name = name {
                 return NSFont(name: name, size: size) ?? finalReturnFont
             }
