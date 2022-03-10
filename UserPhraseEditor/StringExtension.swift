@@ -22,8 +22,8 @@ extension String {
     mutating func regReplace(pattern: String, replaceWith: String = "") {
         // Ref: https://stackoverflow.com/a/40993403/4162914 && https://stackoverflow.com/a/71291137/4162914
         do {
-            let regex = try NSRegularExpression(pattern: pattern, options: .caseInsensitive)
-            let range = NSRange(location: 0, length: self.utf16.count)
+            let regex = try NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .anchorsMatchLines])
+            let range = NSRange(self.startIndex..., in: self)
             self = regex.stringByReplacingMatches(in: self, options: [], range: range, withTemplate: replaceWith)
         } catch { return }
     }
