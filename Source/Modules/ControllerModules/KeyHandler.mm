@@ -27,9 +27,9 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #import "vChewing-Swift.h"
 #import <string>
 
-InputMode imeModeCHT = @"org.atelierInmu.inputmethod.vChewing.IMECHT";
-InputMode imeModeCHS = @"org.atelierInmu.inputmethod.vChewing.IMECHS";
-InputMode imeModeNULL = @"org.atelierInmu.inputmethod.vChewing.IMENULL";
+InputMode imeModeCHS = ctlInputMethod.kIMEModeCHS;
+InputMode imeModeCHT = ctlInputMethod.kIMEModeCHT;
+InputMode imeModeNULL = ctlInputMethod.kIMEModeNULL;
 
 static const double kEpsilon = 0.000001;
 
@@ -110,6 +110,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         newLanguageModel = [mgrLangModel lmCHT];
         newUserOverrideModel = [mgrLangModel userOverrideModelCHT];
     }
+
+    // Report the current Input Mode to ctlInputMethod:
+    ctlInputMethod.currentInputMode = newInputMode;
 
     // Synchronize the Preference Setting "setPhraseReplacementEnabled" to the new LM.
     newLanguageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
