@@ -319,7 +319,9 @@ func weightAndSort(_ arrStructUncalculated: [Entry], isCHS: Bool) -> [Entry] {
     for entry in arrStructUncalculated {
         var weight: Float = 0
         switch entry.valCount {
-        case -1: // 假名
+        case -2: // 拗音假名
+            weight = -13
+        case -1: // 單個假名
             weight = -13
         case 0: // 墊底低頻漢字與詞語
             weight = log10(fscale**(Float(entry.valPhrase.count) / 3.0 - 1.0) * 0.5 / norm)
