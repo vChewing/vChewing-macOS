@@ -266,6 +266,16 @@ class InputState: NSObject {
             let joined = selectedReadings.joined(separator: "-")
             return "\(text) \(joined)"
         }
+
+        @objc var userPhraseConverted: String {
+            let text = OpenCCBridge.crossConvert((composingBuffer as NSString).substring(with: markedRange)) ?? ""
+            let (exactBegin, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location)
+            let (exactEnd, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location + markedRange.length)
+            let selectedReadings = readings[exactBegin..<exactEnd]
+            let joined = selectedReadings.joined(separator: "-")
+            let convertedMark = "#𝙊𝙥𝙚𝙣𝘾𝘾"
+            return "\(text) \(joined)\t\(convertedMark)"
+        }
     }
 
     // MARK: -
