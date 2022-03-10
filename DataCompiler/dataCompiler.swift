@@ -123,24 +123,14 @@ func rawDictForPhrases(isCHS: Bool) -> [Entry] {
     // Tab to ASCII Space
     // 統整連續空格為一個 ASCII 空格
     strRAW.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: " ")
-    strRAW.regReplace(pattern: #"(\f+|\r+)+"#, replaceWith: "\n") // CR & Form Feed to LF
-    strRAW.regReplace(pattern: #"(\n+| \n+|\n+ )"#, replaceWith: "\n") // 去除行尾行首空格與重複行
-    if strRAW.prefix(1) == " " { // 去除檔案開頭空格
-        strRAW.removeFirst()
-    }
-    if strRAW.suffix(1) == " " { // 去除檔案結尾空格
-        strRAW.removeLast()
-    }
+    strRAW.regReplace(pattern: #"(^ | $)"#, replaceWith: "") // 去除行尾行首空格
+    strRAW.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n") // CR & Form Feed to LF, 且去除重複行
+    strRAW.regReplace(pattern: #"^(#.*|.*#WIN32.*)$"#, replaceWith: "") // 以#開頭的行都淨空+去掉所有 WIN32 特有的行
     // 正式整理格式，現在就開始去重複：
     let arrData = Array(NSOrderedSet(array: strRAW.components(separatedBy: "\n")).array as! [String])
-    var varLineData: String = ""
     for lineData in arrData {
-        varLineData = lineData
-        // 先完成某兩步需要分行處理才能完成的格式整理。
-        varLineData.regReplace(pattern: "^#.*$", replaceWith: "") // 以#開頭的行都淨空
-        varLineData.regReplace(pattern: "^.*#WIN32.*$", replaceWith: "") // 去掉所有 WIN32 特有的行
         // 第三欄開始是注音
-        let arrLineData = varLineData.components(separatedBy: " ")
+        let arrLineData = lineData.components(separatedBy: " ")
         var varLineDataProcessed: String = ""
         var count = 0
         for currentCell in arrLineData {
@@ -197,25 +187,16 @@ func rawDictForKanjis(isCHS: Bool) -> [Entry] {
     // Tab to ASCII Space
     // 統整連續空格為一個 ASCII 空格
     strRAW.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: " ")
-    strRAW.regReplace(pattern: #"(\f+|\r+)+"#, replaceWith: "\n") // CR & Form Feed to LF
-    strRAW.regReplace(pattern: #"(\n+| \n+|\n+ )"#, replaceWith: "\n") // 去除行尾行首空格與重複行
-    if strRAW.prefix(1) == " " { // 去除檔案開頭空格
-        strRAW.removeFirst()
-    }
-    if strRAW.suffix(1) == " " { // 去除檔案結尾空格
-        strRAW.removeLast()
-    }
+    strRAW.regReplace(pattern: #"(^ | $)"#, replaceWith: "") // 去除行尾行首空格
+    strRAW.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n") // CR & Form Feed to LF, 且去除重複行
+    strRAW.regReplace(pattern: #"^(#.*|.*#WIN32.*)$"#, replaceWith: "") // 以#開頭的行都淨空+去掉所有 WIN32 特有的行
     // 正式整理格式，現在就開始去重複：
     let arrData = Array(NSOrderedSet(array: strRAW.components(separatedBy: "\n")).array as! [String])
     var varLineData: String = ""
     for lineData in arrData {
-        varLineData = lineData
-        // 先完成某兩步需要分行處理才能完成的格式整理。
-        varLineData.regReplace(pattern: "^#.*$", replaceWith: "") // 以#開頭的行都淨空
-        varLineData.regReplace(pattern: "^.*#WIN32.*$", replaceWith: "") // 去掉所有 WIN32 特有的行
         // 簡體中文的話，提取 1,2,4；繁體中文的話，提取 1,3,4。
-        let varLineDataPre = varLineData.components(separatedBy: " ").prefix(isCHS ? 2 : 1).joined(separator: "\t")
-        let varLineDataPost = varLineData.components(separatedBy: " ").suffix(isCHS ? 1 : 2).joined(separator: "\t")
+        let varLineDataPre = lineData.components(separatedBy: " ").prefix(isCHS ? 2 : 1).joined(separator: "\t")
+        let varLineDataPost = lineData.components(separatedBy: " ").suffix(isCHS ? 1 : 2).joined(separator: "\t")
         varLineData = varLineDataPre + "\t" + varLineDataPost
         let arrLineData = varLineData.components(separatedBy: " ")
         var varLineDataProcessed: String = ""
@@ -276,22 +257,15 @@ func rawDictForNonKanjis(isCHS: Bool) -> [Entry] {
     // Tab to ASCII Space
     // 統整連續空格為一個 ASCII 空格
     strRAW.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: " ")
-    strRAW.regReplace(pattern: #"(\f+|\r+)+"#, replaceWith: "\n") // CR & Form Feed to LF
-    strRAW.regReplace(pattern: #"(\n+| \n+|\n+ )"#, replaceWith: "\n") // 去除行尾行首空格與重複行
-    if strRAW.prefix(1) == " " { // 去除檔案開頭空格
-        strRAW.removeFirst()
-    }
-    if strRAW.suffix(1) == " " { // 去除檔案結尾空格
-        strRAW.removeLast()
-    }
+    strRAW.regReplace(pattern: #"(^ | $)"#, replaceWith: "") // 去除行尾行首空格
+    strRAW.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n") // CR & Form Feed to LF, 且去除重複行
+    strRAW.regReplace(pattern: #"^(#.*|.*#WIN32.*)$"#, replaceWith: "") // 以#開頭的行都淨空+去掉所有 WIN32 特有的行
     // 正式整理格式，現在就開始去重複：
     let arrData = Array(NSOrderedSet(array: strRAW.components(separatedBy: "\n")).array as! [String])
     var varLineData: String = ""
     for lineData in arrData {
         varLineData = lineData
         // 先完成某兩步需要分行處理才能完成的格式整理。
-        varLineData.regReplace(pattern: "^#.*$", replaceWith: "") // 以#開頭的行都淨空
-        varLineData.regReplace(pattern: "^.*#WIN32.*$", replaceWith: "") // 去掉所有 WIN32 特有的行
         varLineData = varLineData.components(separatedBy: " ").prefix(3).joined(separator: "\t") // 提取前三欄的內容。
         let arrLineData = varLineData.components(separatedBy: " ")
         var varLineDataProcessed: String = ""
