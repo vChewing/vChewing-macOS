@@ -37,8 +37,8 @@ extension String {
         // Tab to ASCII Space
         // 統整連續空格為一個 ASCII 空格
         strProcessed.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: " ")
-        strProcessed.regReplace(pattern: #"(\f+|\r+)+"#, replaceWith: "\n") // CR & Form Feed to LF
-        strProcessed.regReplace(pattern: #"(\n+| \n+|\n+ )"#, replaceWith: "\n") // 去除行尾行首空格與重複行
+        strProcessed.regReplace(pattern: #"(^ | $)"#, replaceWith: "") // 去除行尾行首空格
+        strProcessed.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n") // CR & Form Feed to LF, 且去除重複行
         if strProcessed.prefix(1) == " " { // 去除檔案開頭空格
             strProcessed.removeFirst()
         }
