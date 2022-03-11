@@ -527,7 +527,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // MARK: Enter
     if ([input isEnter]) {
         if ([input isControlHold]) {
-            if (ctlInputMethod.areWeUsingOurOwnPhraseEditor || [input isCommandHold]) {
+            if (![input isCommandHold]) {
                 return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
             }
         }
