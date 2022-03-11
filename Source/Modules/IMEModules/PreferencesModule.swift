@@ -20,7 +20,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 import Cocoa
 
 private let kIsDebugModeEnabled = "_DebugMode"
-private let kIsAlphanumericalModeEnabled = "IsAlphanumericalModeEnabled"
 private let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
 private let kKeyboardLayoutPreference = "KeyboardLayout"
 private let kBasisKeyboardLayoutPreference = "BasisKeyboardLayout"
@@ -217,7 +216,6 @@ struct ComposingBufferSize {
 @objc public class Preferences: NSObject {
     static var allKeys:[String] {
         [kIsDebugModeEnabled,
-         kIsAlphanumericalModeEnabled,
          kKeyboardLayoutPreference,
          kBasisKeyboardLayoutPreference,
          kFunctionKeyKeyboardLayoutPreference,
@@ -257,11 +255,6 @@ struct ComposingBufferSize {
         // 首次啟用輸入法時不要啟用偵錯模式。
         if UserDefaults.standard.object(forKey: kIsDebugModeEnabled) == nil {
             UserDefaults.standard.set(Preferences.isDebugModeEnabled, forKey: kIsDebugModeEnabled)
-        }
-
-        // 首次啟用輸入法時不要啟用英數模式。
-        if UserDefaults.standard.object(forKey: kIsAlphanumericalModeEnabled) == nil {
-            UserDefaults.standard.set(Preferences.isAlphanumericalModeEnabled, forKey: kIsAlphanumericalModeEnabled)
         }
 
         // 首次啟用輸入法時設定不要自動更新，免得在某些要隔絕外部網路連線的保密機構內觸犯資安規則。
@@ -359,16 +352,6 @@ struct ComposingBufferSize {
 
     @UserDefault(key: kIsDebugModeEnabled, defaultValue: false)
     @objc static var isDebugModeEnabled: Bool
-
-    @UserDefault(key: kIsAlphanumericalModeEnabled, defaultValue: false)
-    @objc static var isAlphanumericalModeEnabled: Bool
-
-    @objc @discardableResult static func toggleAlphanumericalModeEnabled() -> Bool {
-        isAlphanumericalModeEnabled = !isAlphanumericalModeEnabled
-        UserDefaults.standard.set(isAlphanumericalModeEnabled, forKey: kIsAlphanumericalModeEnabled)
-        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Alphanumerical Input Mode", comment: ""), "\n", isAlphanumericalModeEnabled ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
-        return isAlphanumericalModeEnabled
-    }
 
     @UserDefault(key: kAppleLanguagesPreferences, defaultValue: [])
     @objc static var appleLanguages: Array<String>

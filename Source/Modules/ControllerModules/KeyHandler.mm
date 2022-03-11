@@ -27,9 +27,9 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #import "vChewing-Swift.h"
 #import <string>
 
-InputMode imeModeCHT = @"org.atelierInmu.inputmethod.vChewing.IMECHT";
-InputMode imeModeCHS = @"org.atelierInmu.inputmethod.vChewing.IMECHS";
-InputMode imeModeNULL = @"org.atelierInmu.inputmethod.vChewing.IMENULL";
+InputMode imeModeCHS = ctlInputMethod.kIMEModeCHS;
+InputMode imeModeCHT = ctlInputMethod.kIMEModeCHT;
+InputMode imeModeNULL = ctlInputMethod.kIMEModeNULL;
 
 static const double kEpsilon = 0.000001;
 
@@ -111,8 +111,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         newUserOverrideModel = [mgrLangModel userOverrideModelCHT];
     }
 
+    // Report the current Input Mode to ctlInputMethod:
+    ctlInputMethod.currentInputMode = newInputMode;
+
     // Synchronize the Preference Setting "setPhraseReplacementEnabled" to the new LM.
     newLanguageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
+    // Also other sub language models:
+    newLanguageModel->setSymbolEnabled(Preferences.symbolInputEnabled);
+    newLanguageModel->setCNSEnabled(Preferences.cns11643Enabled);
 
     // Only apply the changes if the value is changed
     if (![_inputMode isEqualToString:newInputMode]) {
@@ -273,23 +279,19 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return NO;
     }
 
-    // Caps Lock processing: if Caps Lock is on or Preferences.isAlphanumericalModeEnabled, temporarily disable bopomofo.
-    // Also: Alphanumerical mode processing.
+    // Caps Lock processing: if Caps Lock is ON, temporarily disable bopomofo.
+    // Note: Alphanumerical mode processing.
     if ([input isBackSpace] || [input isEnter] || [input isAbsorbedArrowKey] || [input isExtraChooseCandidateKey] || [input isExtraChooseCandidateKeyReverse] || [input isCursorForward] || [input isCursorBackward]) {
         // do nothing if backspace is pressed -- we ignore the key
-    } else if (Preferences.isAlphanumericalModeEnabled || [input isCapsLockOn]) {
+    } else if ([input isCapsLockOn]) {
         // process all possible combination, we hope.
         [self clear];
         InputStateEmpty *emptyState = [[InputStateEmpty alloc] init];
         stateCallback(emptyState);
 
-        // Non-Dynamic Keyboard Layouts Only: When shift is pressed, don't do further processing, since it outputs capital letter anyway.
-        if ((![Preferences.basisKeyboardLayout isEqual: @"com.apple.keylayout.ZhuyinBopomofo"]
-             && ![Preferences.basisKeyboardLayout isEqual: @"com.apple.keylayout.ZhuyinEten"])
-            || [input isCapsLockOn]){
-            if ([input isShiftHold]) {
-                return NO;
-            }
+        // When shift is pressed, don't do further processing, since it outputs capital letter anyway.
+        if ([input isShiftHold]) {
+            return NO;
         }
 
         // if ASCII but not printable, don't use insertText:replacementRange: as many apps don't handle non-ASCII char insertions.
@@ -306,7 +308,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     if ([input isNumericPad]) {
-        if (![input isLeft] && ![input isRight] && ![input isDown] && ![input isUp] && charCode != 32 && isprint(charCode)) {
+        if (![input isLeft] && ![input isRight] && ![input isDown] && ![input isUp] && ![input isSpace] && isprint(charCode)) {
             [self clear];
             InputStateEmpty *emptyState = [[InputStateEmpty alloc] init];
             stateCallback(emptyState);
@@ -525,7 +527,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // MARK: Enter
     if ([input isEnter]) {
         if ([input isControlHold]) {
-            if (ctlInputMethod.areWeUsingOurOwnPhraseEditor || [input isCommandHold]) {
+            if (![input isCommandHold]) {
                 return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
             }
         }
