@@ -196,10 +196,11 @@ class ctlInputMethod: IMKInputController {
             }
 
             let includeShift = Preferences.functionKeyKeyboardLayoutOverrideIncludeShiftKey
-            let notShift = NSEvent.ModifierFlags(rawValue: ~(NSEvent.ModifierFlags.shift.rawValue))
 
-            if event.modifierFlags.contains(notShift) ||
-                event.modifierFlags.contains(.capsLock) ||
+            if event.modifierFlags.contains(.capsLock) ||
+                event.modifierFlags.contains(.option) ||
+                event.modifierFlags.contains(.control) ||
+                event.modifierFlags.contains(.function) ||
                        (event.modifierFlags.contains(.shift) && includeShift) {
                 (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: functionKeyKeyboardLayoutID)
                 return false
