@@ -116,6 +116,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     // Synchronize the Preference Setting "setPhraseReplacementEnabled" to the new LM.
     newLanguageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
+    // Also other sub language models:
+    newLanguageModel->setSymbolEnabled(Preferences.symbolInputEnabled);
+    newLanguageModel->setCNSEnabled(Preferences.cns11643Enabled);
 
     // Only apply the changes if the value is changed
     if (![_inputMode isEqualToString:newInputMode]) {
