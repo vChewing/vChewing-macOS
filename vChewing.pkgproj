@@ -724,7 +724,7 @@
 				<key>USE_HFS+_COMPRESSION</key>
 				<false/>
 				<key>VERSION</key>
-				<string>1.3.7</string>
+				<string>1.3.8</string>
 			</dict>
 			<key>TYPE</key>
 			<integer>0</integer>
@@ -944,11 +944,11 @@
 					</dict>
 					<dict>
 						<key>LANGUAGE</key>
-						<string>Traditional Chinese</string>
+						<string>Simplified Chinese</string>
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>LICENSE-CHT.txt</string>
+							<string>LICENSE-CHS.txt</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>
@@ -966,11 +966,11 @@
 					</dict>
 					<dict>
 						<key>LANGUAGE</key>
-						<string>Simplified Chinese</string>
+						<string>Traditional Chinese</string>
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>LICENSE-CHS.txt</string>
+							<string>LICENSE-CHT.txt</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>
@@ -1001,9 +1001,9 @@
 					</dict>
 					<dict>
 						<key>LANGUAGE</key>
-						<string>Simplified Chinese</string>
+						<string>Traditional Chinese</string>
 						<key>VALUE</key>
-						<string>威注音输入法</string>
+						<string>威注音輸入法</string>
 					</dict>
 					<dict>
 						<key>LANGUAGE</key>
@@ -1013,9 +1013,9 @@
 					</dict>
 					<dict>
 						<key>LANGUAGE</key>
-						<string>Traditional Chinese</string>
+						<string>Simplified Chinese</string>
 						<key>VALUE</key>
-						<string>威注音輸入法</string>
+						<string>威注音输入法</string>
 					</dict>
 				</array>
 			</dict>
@@ -1052,11 +1052,11 @@
 						</dict>
 						<dict>
 							<key>LANGUAGE</key>
-							<string>Simplified Chinese</string>
+							<string>Traditional Chinese</string>
 							<key>SECONDARY_VALUE</key>
-							<string>至少 macOS 10.11.5 方可满足威注音对系统内的万国码版本支援的需要。</string>
+							<string>至少 macOS 10.11.5 方可滿足威注音對系統內的萬國碼版本支援的需要。</string>
 							<key>VALUE</key>
-							<string>作业系统版本太旧</string>
+							<string>作業系統版本太舊</string>
 						</dict>
 						<dict>
 							<key>LANGUAGE</key>
@@ -1068,11 +1068,11 @@
 						</dict>
 						<dict>
 							<key>LANGUAGE</key>
-							<string>Traditional Chinese</string>
+							<string>Simplified Chinese</string>
 							<key>SECONDARY_VALUE</key>
-							<string>至少 macOS 10.11.5 方可滿足威注音對系統內的萬國碼版本支援的需要。</string>
+							<string>至少 macOS 10.11.5 方可满足威注音对系统内的万国码版本支援的需要。</string>
 							<key>VALUE</key>
-							<string>作業系統版本太舊</string>
+							<string>作业系统版本太旧</string>
 						</dict>
 					</array>
 					<key>NAME</key>
