@@ -308,7 +308,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     if ([input isNumericPad]) {
-        if (![input isLeft] && ![input isRight] && ![input isDown] && ![input isUp] && charCode != 32 && isprint(charCode)) {
+        if (![input isLeft] && ![input isRight] && ![input isDown] && ![input isUp] && ![input isSpace] && isprint(charCode)) {
             [self clear];
             InputStateEmpty *emptyState = [[InputStateEmpty alloc] init];
             stateCallback(emptyState);
