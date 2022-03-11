@@ -276,11 +276,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return NO;
     }
 
-    // Caps Lock processing: if Caps Lock is on or Preferences.isAlphanumericalModeEnabled, temporarily disable bopomofo.
-    // Also: Alphanumerical mode processing.
+    // Caps Lock processing: if Caps Lock is ON, temporarily disable bopomofo.
+    // Note: Alphanumerical mode processing.
     if ([input isBackSpace] || [input isEnter] || [input isAbsorbedArrowKey] || [input isExtraChooseCandidateKey] || [input isExtraChooseCandidateKeyReverse] || [input isCursorForward] || [input isCursorBackward]) {
         // do nothing if backspace is pressed -- we ignore the key
-    } else if (Preferences.isAlphanumericalModeEnabled || [input isCapsLockOn]) {
+    } else if ([input isCapsLockOn]) {
         // process all possible combination, we hope.
         [self clear];
         InputStateEmpty *emptyState = [[InputStateEmpty alloc] init];
