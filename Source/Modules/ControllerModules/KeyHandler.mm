@@ -286,13 +286,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         InputStateEmpty *emptyState = [[InputStateEmpty alloc] init];
         stateCallback(emptyState);
 
-        // Non-Dynamic Keyboard Layouts Only: When shift is pressed, don't do further processing, since it outputs capital letter anyway.
-        if ((![Preferences.basisKeyboardLayout isEqual: @"com.apple.keylayout.ZhuyinBopomofo"]
-             && ![Preferences.basisKeyboardLayout isEqual: @"com.apple.keylayout.ZhuyinEten"])
-            || [input isCapsLockOn]){
-            if ([input isShiftHold]) {
-                return NO;
-            }
+        // When shift is pressed, don't do further processing, since it outputs capital letter anyway.
+        if ([input isShiftHold]) {
+            return NO;
         }
 
         // if ASCII but not printable, don't use insertText:replacementRange: as many apps don't handle non-ASCII char insertions.
