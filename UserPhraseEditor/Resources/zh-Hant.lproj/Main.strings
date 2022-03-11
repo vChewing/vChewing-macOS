@@ -266,8 +266,8 @@
 /* Class = "NSMenuItem"; title = "智能鏈結"; ObjectID = "cwL-P1-jid"; */
 "cwL-P1-jid.title" = "智能鏈結";
 
-/* Class = "NSMenuItem"; title = "轉換微小寫"; ObjectID = "d9M-CD-aMd"; */
-"d9M-CD-aMd.title" = "轉換微小寫";
+/* Class = "NSMenuItem"; title = "轉換為小寫"; ObjectID = "d9M-CD-aMd"; */
+"d9M-CD-aMd.title" = "轉換為小寫";
 
 /* Class = "NSMenu"; title = "文字"; ObjectID = "d9c-me-L2H"; */
 "d9c-me-L2H.title" = "文字";

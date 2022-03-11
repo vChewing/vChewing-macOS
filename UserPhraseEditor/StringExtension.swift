@@ -22,8 +22,8 @@ extension String {
     mutating func regReplace(pattern: String, replaceWith: String = "") {
         // Ref: https://stackoverflow.com/a/40993403/4162914 && https://stackoverflow.com/a/71291137/4162914
         do {
-            let regex = try NSRegularExpression(pattern: pattern, options: .caseInsensitive)
-            let range = NSRange(location: 0, length: self.utf16.count)
+            let regex = try NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .anchorsMatchLines])
+            let range = NSRange(self.startIndex..., in: self)
             self = regex.stringByReplacingMatches(in: self, options: [], range: range, withTemplate: replaceWith)
         } catch { return }
     }
@@ -37,8 +37,8 @@ extension String {
         // Tab to ASCII Space
         // 統整連續空格為一個 ASCII 空格
         strProcessed.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: " ")
-        strProcessed.regReplace(pattern: #"(\f+|\r+)+"#, replaceWith: "\n") // CR & Form Feed to LF
-        strProcessed.regReplace(pattern: #"(\n+| \n+|\n+ )"#, replaceWith: "\n") // 去除行尾行首空格與重複行
+        strProcessed.regReplace(pattern: #"(^ | $)"#, replaceWith: "") // 去除行尾行首空格
+        strProcessed.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n") // CR & Form Feed to LF, 且去除重複行
         if strProcessed.prefix(1) == " " { // 去除檔案開頭空格
             strProcessed.removeFirst()
         }

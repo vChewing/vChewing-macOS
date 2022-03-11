@@ -38,6 +38,10 @@ private extension CandidateController {
 @objc(ctlInputMethod)
 class ctlInputMethod: IMKInputController {
 
+    @objc static let kIMEModeCHS = "org.atelierInmu.inputmethod.vChewing.IMECHS";
+    @objc static let kIMEModeCHT = "org.atelierInmu.inputmethod.vChewing.IMECHT";
+    @objc static let kIMEModeNULL = "org.atelierInmu.inputmethod.vChewing.IMENULL";
+
     private static let tooltipController = TooltipController()
 
     // MARK: -
@@ -53,6 +57,7 @@ class ctlInputMethod: IMKInputController {
     // 所以才需要「currentKeyHandler」這個假 keyHandler。
     // 這個「currentKeyHandler」僅用來讓其他模組知道當前的輸入模式是什麼模式，除此之外別無屌用。
     static var currentKeyHandler: KeyHandler = KeyHandler()
+    @objc static var currentInputMode = ""
 
     // MARK: - IMKInputController methods
 
@@ -91,10 +96,6 @@ class ctlInputMethod: IMKInputController {
         let userAssociatedPhrasesItem = menu.addItem(withTitle: NSLocalizedString("Per-Char Associated Phrases", comment: ""), action: #selector(toggleAssociatedPhrasesEnabled(_:)), keyEquivalent: "O")
         userAssociatedPhrasesItem.keyEquivalentModifierMask = [.command, .control]
         userAssociatedPhrasesItem.state = Preferences.associatedPhrasesEnabled.state
-
-        let alphaNumericalModeItem = menu.addItem(withTitle: NSLocalizedString("Alphanumerical Input Mode", comment: ""), action: #selector(toggleAlphanumericalModeEnabled(_:)), keyEquivalent: "I")
-        alphaNumericalModeItem.keyEquivalentModifierMask = [.command, .control]
-        alphaNumericalModeItem.state = Preferences.isAlphanumericalModeEnabled.state
 
         if optionKeyPressed {
             let phaseReplacementItem = menu.addItem(withTitle: NSLocalizedString("Use Phrase Replacement", comment: ""), action: #selector(togglePhraseReplacement(_:)), keyEquivalent: "")
@@ -186,11 +187,6 @@ class ctlInputMethod: IMKInputController {
 
     override func handle(_ event: NSEvent!, client: Any!) -> Bool {
 
-        if (Preferences.isAlphanumericalModeEnabled) {
-            (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: Preferences.functionKeyboardLayout)
-            return false
-        }
-
         if event.type == .flagsChanged {
             let functionKeyKeyboardLayoutID = Preferences.functionKeyboardLayout
             let basisKeyboardLayoutID = Preferences.basisKeyboardLayout
@@ -200,17 +196,11 @@ class ctlInputMethod: IMKInputController {
             }
 
             let includeShift = Preferences.functionKeyKeyboardLayoutOverrideIncludeShiftKey
-            let notShift = NSEvent.ModifierFlags(rawValue: ~(NSEvent.ModifierFlags.shift.rawValue))
 
-            // Shift Click Handling: Toggling Alphanumerical Mode. // STILL BUGGY, hence being commented out.
-            // if !event.modifierFlags.contains(.shift)
-            //     && event.modifierFlags == .init(rawValue: 0)
-            //     && !event.modifierFlags.contains(notShift)
-            //     && (event.keyCode == KeyCode.leftShift.rawValue || event.keyCode == KeyCode.rightShift.rawValue) {
-            //             Preferences.toggleAlphanumericalModeEnabled()
-            // }
-
-            if event.modifierFlags.contains(notShift) ||
+            if event.modifierFlags.contains(.capsLock) ||
+                event.modifierFlags.contains(.option) ||
+                event.modifierFlags.contains(.control) ||
+                event.modifierFlags.contains(.function) ||
                        (event.modifierFlags.contains(.shift) && includeShift) {
                 (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: functionKeyKeyboardLayoutID)
                 return false
@@ -272,10 +262,6 @@ class ctlInputMethod: IMKInputController {
 
     @objc func toggleAssociatedPhrasesEnabled(_ sender: Any?) {
         NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Per-Char Associated Phrases", comment: ""), "\n", Preferences.toggleAssociatedPhrasesEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
-    }
-
-    @objc func toggleAlphanumericalModeEnabled(_ sender: Any?) {
-        Preferences.toggleAlphanumericalModeEnabled()
     }
 
     @objc func togglePhraseReplacement(_ sender: Any?) {
@@ -654,7 +640,9 @@ extension ctlInputMethod: KeyHandlerDelegate {
         if !state.validToWrite {
             return false
         }
+        let InputModeReversed: InputMode = (ctlInputMethod.currentKeyHandler.inputMode == InputMode.imeModeCHT) ? InputMode.imeModeCHS : InputMode.imeModeCHT
         mgrLangModel.writeUserPhrase(state.userPhrase, inputMode: keyHandler.inputMode, areWeDuplicating: state.chkIfUserPhraseExists)
+        mgrLangModel.writeUserPhrase(state.userPhraseConverted, inputMode: InputModeReversed, areWeDuplicating: false)
         return true
     }
 }
