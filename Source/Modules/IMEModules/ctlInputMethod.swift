@@ -199,6 +199,7 @@ class ctlInputMethod: IMKInputController {
             let notShift = NSEvent.ModifierFlags(rawValue: ~(NSEvent.ModifierFlags.shift.rawValue))
 
             if event.modifierFlags.contains(notShift) ||
+                event.modifierFlags.contains(.capsLock) ||
                        (event.modifierFlags.contains(.shift) && includeShift) {
                 (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: functionKeyKeyboardLayoutID)
                 return false
