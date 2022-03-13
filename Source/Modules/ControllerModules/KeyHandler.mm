@@ -433,8 +433,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return YES;
     }
 
-    // MARK: Space and Down, plus PageUp / PageDn / PageLeft / PageRight.
-    // keyCode 125 = Down, charCode 32 = Space
+    // MARK: Calling candidate window using Space or Down or PageUp / PageDn.
     if (_bpmfReadingBuffer->isEmpty() &&
         [state isKindOfClass:[InputStateNotEmpty class]] &&
         ([input isExtraChooseCandidateKey] || [input isExtraChooseCandidateKeyReverse]
