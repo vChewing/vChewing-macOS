@@ -233,6 +233,11 @@ class KeyHandlerInput: NSObject {
         KeyCode(rawValue: keyCode) == verticalModeOnlyChooseCandidateKey
     }
 
+    @objc var isUpperCaseASCIILetterKey: Bool {
+        // 這裡必須加上「flags == .shift」，否則會出現某些情況下輸入法「誤判當前鍵入的非 Shift 字符為大寫」的問題。
+        self.charCode >= 65 && self.charCode <= 90 && flags == .shift
+    }
+
     @objc var isSymbolMenuPhysicalKey: Bool {
         // 這裡必須用 KeyCode，這樣才不會受隨 macOS 版本更動的 Apple 動態注音鍵盤排列內容的影響。
         // 只是必須得與 ![input isShift] 搭配使用才可以（也就是僅判定 Shift 沒被摁下的情形）。

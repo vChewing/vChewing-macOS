@@ -585,7 +585,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     // Lukhnos 這裡的處理反而會使得 Apple 倚天注音動態鍵盤佈局「敲不了半形大寫英文」的缺點曝露無疑，所以注釋掉。
     // 至於他試圖用這種處理來解決的上游 UPR293 的問題，其實針對詞庫檔案的排序做點手腳就可以解決。威注音本來也就是這麼做的。
-    if (/*[state isKindOfClass:[InputStateNotEmpty class]] && */(char) charCode >= 'A' && (char) charCode <= 'Z') {
+    if (/*[state isKindOfClass:[InputStateNotEmpty class]] && */[input isUpperCaseASCIILetterKey]) {
         std::string letter = std::string("_letter_") + std::string(1, (char) charCode);
         if ([self _handlePunctuation:letter state:state usingVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback]) {
             return YES;
@@ -1253,7 +1253,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         BOOL shouldAutoSelectCandidate = _bpmfReadingBuffer->isValidKey((char) charCode) || _languageModel->hasUnigramsForKey(customPunctuation) ||
                 _languageModel->hasUnigramsForKey(punctuation);
 
-        if (!shouldAutoSelectCandidate && (char) charCode >= 'A' && (char) charCode <= 'Z') {
+        if (!shouldAutoSelectCandidate && [input isUpperCaseASCIILetterKey]) {
             std::string letter = std::string("_letter_") + std::string(1, (char) charCode);
             if (_languageModel->hasUnigramsForKey(letter)) {
                 shouldAutoSelectCandidate = YES;
