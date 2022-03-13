@@ -70,7 +70,6 @@ private let kMinComposingBufferSize = 4
 private let kMaxComposingBufferSize = 30
 
 private let kDefaultKeys = "123456789"
-private let kDefaultAssociatedPhrasesKeys = "!@#$%^&*("
 
 // MARK: Property wrappers
 
