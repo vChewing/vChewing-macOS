@@ -156,9 +156,6 @@ extension RangeReplaceableCollection where Element: Hashable {
         }
 
         selectionKeyComboBox.stringValue = candidateSelectionKeys
-        
-        // MARK: - 設定漢字轉換選項是否禁用
-
     }
 
     // 這裡有必要加上這段處理，用來確保藉由偏好設定介面動過的 CNS 開關能夠立刻生效。
