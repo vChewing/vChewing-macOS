@@ -111,9 +111,10 @@ class ctlInputMethod: IMKInputController {
         menu.addItem(withTitle: NSLocalizedString("Edit User Phrases…", comment: ""), action: #selector(openUserPhrases(_:)), keyEquivalent: "")
 
         if optionKeyPressed {
-            menu.addItem(withTitle: NSLocalizedString("Edit Excluded Phrases", comment: ""), action: #selector(openExcludedPhrases(_:)), keyEquivalent: "")
+            menu.addItem(withTitle: NSLocalizedString("Edit Excluded Phrases…", comment: ""), action: #selector(openExcludedPhrases(_:)), keyEquivalent: "")
             menu.addItem(withTitle: NSLocalizedString("Edit Phrase Replacement Table…", comment: ""), action: #selector(openPhraseReplacement(_:)), keyEquivalent: "")
             menu.addItem(withTitle: NSLocalizedString("Edit Associated Phrases…", comment: ""), action: #selector(openAssociatedPhrases(_:)), keyEquivalent: "")
+            menu.addItem(withTitle: NSLocalizedString("Edit User Symbol & Emoji Data…", comment: ""), action: #selector(openUserSymbols(_:)), keyEquivalent: "")
         }
 
         if (optionKeyPressed || !Preferences.shouldAutoReloadUserDataFiles) {
@@ -305,6 +306,10 @@ class ctlInputMethod: IMKInputController {
 
     @objc func openExcludedPhrases(_ sender: Any?) {
         open(userFileAt: mgrLangModel.excludedPhrasesDataPath(keyHandler.inputMode))
+    }
+
+    @objc func openUserSymbols(_ sender: Any?) {
+        open(userFileAt: mgrLangModel.userSymbolDataPath(keyHandler.inputMode))
     }
 
     @objc func openPhraseReplacement(_ sender: Any?) {

@@ -19,7 +19,7 @@
 "Reload User Phrases" = "ユーザー辞書を再び読込む";
 "Unable to create the user phrase file." = "ユーザー辞書ファイルの作成は失敗しました。";
 "Please check the permission at \"%@\"." = "「%@」に書き出す権限は不足らしい。";
-"Edit Excluded Phrases" = "辞書条目排除表を編集…";
+"Edit Excluded Phrases…" = "辞書条目排除表を編集…";
 "Half-Width Punctuation Mode" = "半角句読モード";
 "\"%@\" length must ≥ 2 for a user phrase." = "「%@」もう１つ文字のお選びを。";
 "\"%@\" length should ≤ %d for a user phrase." = "「%@」文字数過剰で登録不可、%d 文字以内にして下さい。";
@@ -51,6 +51,7 @@
 "Apple Zhuyin Bopomofo" = "Apple 注音ボポモフォ配列（大千標準）";
 "Apple Zhuyin Eten" = "Apple 注音ボポモフォ配列（倚天伝統）";
 "Symbol & Emoji Input" = "符号＆絵文字入力";
+"Edit User Symbol & Emoji Data…" = "ユーザー符号＆絵文字辞書を編集…";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";
