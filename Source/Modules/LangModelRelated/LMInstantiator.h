@@ -27,6 +27,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include "PhraseReplacementMap.h"
 #include "SymbolLM.h"
 #include "UserPhrasesLM.h"
+#include "UserSymbolLM.h"
 #include <stdio.h>
 #include <unordered_set>
 
@@ -89,8 +90,11 @@ public:
     /// @param userPhrasesPath The path of user phrases.
     /// @param excludedPhrasesPath The path of excluded phrases.
     void loadUserPhrases(const char* userPhrasesPath, const char* excludedPhrasesPath);
+    /// Asks to load the user symbol data at the given path.
+    /// @param userSymbolDataPath The path of user symbol data.
+    void loadUserSymbolData(const char* userPhrasesPath);
     /// Asks to load the user associated phrases at the given path.
-    /// @param userAssociatedPhrasesPath The path of the phrase replacement table.
+    /// @param userAssociatedPhrasesPath The path of the user associated phrases.
     void loadUserAssociatedPhrases(const char* userAssociatedPhrasesPath);
     /// Asks to load the phrase replacement table at the given path.
     /// @param phraseReplacementPath The path of the phrase replacement table.
@@ -150,6 +154,7 @@ protected:
     CNSLM m_cnsModel;
     UserPhrasesLM m_userPhrases;
     UserPhrasesLM m_excludedPhrases;
+    UserSymbolLM m_userSymbolModel;
     PhraseReplacementMap m_phraseReplacement;
     AssociatedPhrases m_associatedPhrases;
     bool m_phraseReplacementEnabled;
