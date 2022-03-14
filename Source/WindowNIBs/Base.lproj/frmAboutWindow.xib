@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -156,12 +156,23 @@ DQ
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8WL-H4-o1O">
+                        <rect key="frame" x="382" y="69" width="143" height="32"/>
+                        <buttonCell key="cell" type="push" title="Wiki" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="xCD-lx-zY7">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="btnWiki:" target="-2" id="ond-bM-3LE"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="9Pk-k3-0cO" secondAttribute="trailing" constant="20" symbolic="YES" id="0LE-Ck-Jy5"/>
                     <constraint firstItem="2Gh-nq-Mng" firstAttribute="centerX" secondItem="se5-gp-TjO" secondAttribute="centerX" id="1cy-gM-7lt"/>
                     <constraint firstItem="JkD-J1-Yeu" firstAttribute="trailing" secondItem="2Gh-nq-Mng" secondAttribute="trailing" id="24O-Jp-K8a"/>
                     <constraint firstItem="6Dx-DY-UG1" firstAttribute="leading" secondItem="bAv-ZO-Ihw" secondAttribute="trailing" constant="13" id="43n-1d-TD2"/>
+                    <constraint firstItem="8WL-H4-o1O" firstAttribute="top" secondItem="bSu-np-tPT" secondAttribute="bottom" constant="7" id="450-VN-7n2"/>
                     <constraint firstItem="8Ju-DR-2C8" firstAttribute="top" secondItem="Srh-ua-uQD" secondAttribute="bottom" constant="1" id="5eL-dp-7Z8"/>
                     <constraint firstItem="8M8-3C-BZO" firstAttribute="top" secondItem="8Ju-DR-2C8" secondAttribute="bottom" constant="8" symbolic="YES" id="82T-Pc-3db"/>
                     <constraint firstItem="2Gh-nq-Mng" firstAttribute="top" secondItem="bAv-ZO-Ihw" secondAttribute="bottom" constant="7" id="8EG-DW-AZM"/>
@@ -182,12 +193,14 @@ DQ
                     <constraint firstItem="8Ju-DR-2C8" firstAttribute="leading" secondItem="8M8-3C-BZO" secondAttribute="leading" id="UrF-M2-wpG"/>
                     <constraint firstItem="eYM-F7-drf" firstAttribute="top" secondItem="8M8-3C-BZO" secondAttribute="bottom" constant="8" symbolic="YES" id="WIZ-YQ-chM"/>
                     <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="2Gh-nq-Mng" secondAttribute="bottom" constant="134" id="WJK-gw-zR7"/>
+                    <constraint firstItem="8WL-H4-o1O" firstAttribute="trailing" secondItem="bSu-np-tPT" secondAttribute="trailing" id="aEs-t7-H6v"/>
                     <constraint firstItem="9Pk-k3-0cO" firstAttribute="leading" secondItem="6Dx-DY-UG1" secondAttribute="trailing" constant="3" id="c3v-ZJ-usi"/>
                     <constraint firstItem="JkD-J1-Yeu" firstAttribute="top" secondItem="eYM-F7-drf" secondAttribute="bottom" constant="8" symbolic="YES" id="eqh-Gi-fS2"/>
                     <constraint firstItem="bAv-ZO-Ihw" firstAttribute="top" secondItem="6Dx-DY-UG1" secondAttribute="top" id="hJv-Sh-M4t"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="8Ju-DR-2C8" secondAttribute="trailing" constant="20" symbolic="YES" id="hm1-o7-gLp"/>
                     <constraint firstItem="2Gh-nq-Mng" firstAttribute="trailing" secondItem="bSu-np-tPT" secondAttribute="trailing" id="ixJ-xP-aIU"/>
                     <constraint firstItem="2Gh-nq-Mng" firstAttribute="top" secondItem="JkD-J1-Yeu" secondAttribute="bottom" constant="8" symbolic="YES" id="pvU-C2-BNa"/>
+                    <constraint firstItem="8WL-H4-o1O" firstAttribute="leading" secondItem="bSu-np-tPT" secondAttribute="leading" id="qog-au-dXJ"/>
                     <constraint firstItem="8M8-3C-BZO" firstAttribute="leading" secondItem="eYM-F7-drf" secondAttribute="leading" id="rLt-ck-nSt"/>
                     <constraint firstAttribute="trailing" secondItem="8M8-3C-BZO" secondAttribute="trailing" constant="15" id="rx3-ed-9sg"/>
                     <constraint firstItem="JkD-J1-Yeu" firstAttribute="leading" secondItem="eYM-F7-drf" secondAttribute="leading" id="t9D-Vu-dOC"/>

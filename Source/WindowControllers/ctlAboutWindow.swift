@@ -42,5 +42,10 @@ import Cocoa
         }
         appVersionLabel.stringValue = String(format: "%@ Build %@", versionString, installingVersion)
     }
-    
+
+    @IBAction func btnWiki(_ sender: NSButton) {
+        if let url = URL(string: "https://gitee.com/vchewing/vChewing-macOS/wikis") {
+            NSWorkspace.shared.open(url)
+        }
+    }
 }
