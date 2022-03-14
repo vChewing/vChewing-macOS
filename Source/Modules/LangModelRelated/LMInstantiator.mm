@@ -32,6 +32,7 @@ LMInstantiator::~LMInstantiator()
     m_languageModel.close();
     m_miscModel.close();
     m_userPhrases.close();
+    m_userSymbolModel.close();
     m_cnsModel.close();
     m_excludedPhrases.close();
     m_phraseReplacement.close();
@@ -103,6 +104,14 @@ void LMInstantiator::loadUserPhrases(const char* userPhrasesDataPath,
     }
 }
 
+void LMInstantiator::loadUserSymbolData(const char *userSymbolDataPath)
+{
+    if (userSymbolDataPath) {
+        m_userSymbolModel.close();
+        m_userSymbolModel.open(userSymbolDataPath);
+    }
+}
+
 void LMInstantiator::loadUserAssociatedPhrases(const char *userAssociatedPhrasesPath)
 {
     if (userAssociatedPhrasesPath) {
@@ -140,6 +149,7 @@ const std::vector<Gramambular::Unigram> LMInstantiator::unigramsForKey(const std
     std::vector<Gramambular::Unigram> miscUnigrams;
     std::vector<Gramambular::Unigram> symbolUnigrams;
     std::vector<Gramambular::Unigram> userUnigrams;
+    std::vector<Gramambular::Unigram> userSymbolUnigrams;
     std::vector<Gramambular::Unigram> cnsUnigrams;
 
      std::unordered_set<std::string> excludedValues;
@@ -175,6 +185,11 @@ const std::vector<Gramambular::Unigram> LMInstantiator::unigramsForKey(const std
         symbolUnigrams = filterAndTransformUnigrams(rawSymbolUnigrams, excludedValues, insertedValues);
     }
 
+    if (m_userSymbolModel.hasUnigramsForKey(key) && m_symbolEnabled) {
+        std::vector<Gramambular::Unigram> rawUserSymbolUnigrams = m_userSymbolModel.unigramsForKey(key);
+        userSymbolUnigrams = filterAndTransformUnigrams(rawUserSymbolUnigrams, excludedValues, insertedValues);
+    }
+
     if (m_cnsModel.hasUnigramsForKey(key) && m_cnsEnabled) {
         std::vector<Gramambular::Unigram> rawCNSUnigrams = m_cnsModel.unigramsForKey(key);
         cnsUnigrams = filterAndTransformUnigrams(rawCNSUnigrams, excludedValues, insertedValues);
@@ -183,6 +198,7 @@ const std::vector<Gramambular::Unigram> LMInstantiator::unigramsForKey(const std
     allUnigrams.insert(allUnigrams.begin(), userUnigrams.begin(), userUnigrams.end());
     allUnigrams.insert(allUnigrams.end(), cnsUnigrams.begin(), cnsUnigrams.end());
     allUnigrams.insert(allUnigrams.begin(), miscUnigrams.begin(), miscUnigrams.end());
+    allUnigrams.insert(allUnigrams.end(), userSymbolUnigrams.begin(), userSymbolUnigrams.end());
     allUnigrams.insert(allUnigrams.end(), symbolUnigrams.begin(), symbolUnigrams.end());
     return allUnigrams;
 }
