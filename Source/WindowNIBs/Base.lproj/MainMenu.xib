@@ -23,6 +23,17 @@
                                     <action selector="about:" target="-1" id="1xp-To-Ecq"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Preferences…" hidden="YES" enabled="NO" keyEquivalent="," id="duv-M8-BHk"/>
+                            <menuItem title="Minimize" keyEquivalent="m" id="vF5-tQ-GWX">
+                                <connections>
+                                    <action selector="performMiniaturize:" target="-1" id="FBN-kr-nL9"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Close" keyEquivalent="w" id="7tD-hM-1q5">
+                                <connections>
+                                    <action selector="performClose:" target="-1" id="RlZ-ub-Ep8"/>
+                                </connections>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>
