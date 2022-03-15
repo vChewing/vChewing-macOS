@@ -211,27 +211,25 @@ extension RangeReplaceableCollection where Element: Hashable {
 
     @IBAction func changeSelectionKeyAction(_ sender: Any) {
         guard let keys = (sender as AnyObject).stringValue?.trimmingCharacters(in: .whitespacesAndNewlines).charDeDuplicate else {
-                    return
+            return
+        }
+        do {
+            try Preferences.validate(candidateKeys: keys)
+            Preferences.candidateKeys = keys
+            selectionKeyComboBox.stringValue = Preferences.candidateKeys
+        }
+        catch Preferences.CandidateKeyError.empty {
+            selectionKeyComboBox.stringValue = Preferences.candidateKeys
+        }
+        catch {
+            if let window = window {
+                let alert = NSAlert(error: error)
+                alert.beginSheetModal(for: window) { response in
+                    self.selectionKeyComboBox.stringValue = Preferences.candidateKeys
                 }
-                do {
-                    try Preferences.validate(candidateKeys: keys)
-                    Preferences.candidateKeys = keys
-                }
-                catch Preferences.CandidateKeyError.empty {
-                    selectionKeyComboBox.stringValue = Preferences.candidateKeys
-                }
-                catch {
-                    if let window = window {
-                        let alert = NSAlert(error: error)
-                        alert.beginSheetModal(for: window) { response in
-                            self.selectionKeyComboBox.stringValue = Preferences.candidateKeys
-                        }
-                        clsSFX.beep()
-                    }
-                }
-        
-        selectionKeyComboBox.stringValue = keys
-        Preferences.candidateKeys = keys
+                clsSFX.beep()
+            }
+        }
     }
 
 }
