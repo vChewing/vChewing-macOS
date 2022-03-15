@@ -45,6 +45,7 @@
 		5BBBB77527AED70B0023B93A /* MenuIcon-SCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77127AED70B0023B93A /* MenuIcon-SCVIM.png */; };
 		5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77227AED70B0023B93A /* MenuIcon-TCVIM.png */; };
 		5BBBB77A27AEDC690023B93A /* clsSFX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBBB77927AEDC690023B93A /* clsSFX.swift */; };
+		5BC2652227E04B7E00700291 /* uninstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 5BC2652127E04B7B00700291 /* uninstall.sh */; };
 		5BD05B8127B22F3C004C4F1D /* char-kanji-cns.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BD05B8027B22F3C004C4F1D /* char-kanji-cns.txt */; };
 		5BD05BCA27B2A43D004C4F1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
 		5BD05C5D27B2BBA9004C4F1D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5BD05C5B27B2BBA9004C4F1D /* Main.storyboard */; };
@@ -214,6 +215,7 @@
 		5BBBB77727AEDB290023B93A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		5BBBB77927AEDC690023B93A /* clsSFX.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = clsSFX.swift; sourceTree = "<group>"; };
 		5BBD627827B6C4D900271480 /* Update-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Update-Info.plist"; sourceTree = "<group>"; };
+		5BC2652127E04B7B00700291 /* uninstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; lineEnding = 0; path = uninstall.sh; sourceTree = "<group>"; };
 		5BD05B8027B22F3C004C4F1D /* char-kanji-cns.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "char-kanji-cns.txt"; path = "Data/components/common/char-kanji-cns.txt"; sourceTree = "<group>"; };
 		5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingPhraseEditor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5BD05BC627B2A42A004C4F1D /* vChewingPhraseEditor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewingPhraseEditor.entitlements; sourceTree = "<group>"; };
@@ -337,6 +339,7 @@
 		5B18BA7527C7BF6D0056EB19 /* MiscRootFiles */ = {
 			isa = PBXGroup;
 			children = (
+				5BC2652127E04B7B00700291 /* uninstall.sh */,
 				5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */,
 				5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */,
 				5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */,
@@ -944,6 +947,7 @@
 				5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.png in Resources */,
 				6A187E2616004C5900466B2E /* MainMenu.xib in Resources */,
 				5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */,
+				5BC2652227E04B7E00700291 /* uninstall.sh in Resources */,
 				5BAD0CD527D701F6003D127F /* vChewingKeyLayout.bundle in Resources */,
 				5B2DB16F27AF6891006D874E /* data-chs.txt in Resources */,
 			);
