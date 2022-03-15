@@ -72,7 +72,8 @@ bool LMConsolidator::FixEOF(const char *path)
 
 // CONTENT CONSOLIDATOR. CREDIT: Shiki Suen.
 bool LMConsolidator::ConsolidateContent(const char *path, bool shouldCheckPragma) {
-    if (LMConsolidator::CheckPragma(path) && shouldCheckPragma){
+    bool pragmaCheckResult = LMConsolidator::CheckPragma(path);
+    if (pragmaCheckResult && shouldCheckPragma){
         return true;
     }
 
@@ -107,7 +108,7 @@ bool LMConsolidator::ConsolidateContent(const char *path, bool shouldCheckPragma
     std::reverse(vecEntry.begin(), vecEntry.end()); // 再顛倒回來。
     // 統整完畢。開始將統整過的內容寫入檔案。
     ofstream zfdContentConsolidatorOutput(path); // 這裡是要從頭開始重寫檔案內容，所以不需要「 ios_base::app 」。
-    if (!LMConsolidator::CheckPragma(path)){
+    if (!pragmaCheckResult){
         zfdContentConsolidatorOutput<<FORMATTED_PRAGMA_HEADER<<endl; // 寫入經過整理處理的 HEADER。
     }
     for(int i=0;i<vecEntry.size();i++) { // 第二遍 for 用來寫入統整過的內容。
