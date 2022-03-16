@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -20,15 +20,15 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="vChewing Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" animationBehavior="default" titlebarAppearsTransparent="YES" id="1" userLabel="frmPrefWindow">
-            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
-            <rect key="contentRect" x="401" y="295" width="501" height="469"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
-            <view key="contentView" id="2">
-                <rect key="frame" x="0.0" y="0.0" width="501" height="469"/>
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" fullSizeContentView="YES"/>
+            <rect key="contentRect" x="401" y="295" width="501" height="494"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
+            <view key="contentView" id="2" customClass="NSVisualEffectView">
+                <rect key="frame" x="0.0" y="0.0" width="501" height="494"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <tabView initialItem="QUQ-oY-4Hc" translatesAutoresizingMaskIntoConstraints="NO" id="ul0-iw-Dk6">
-                        <rect key="frame" x="9" y="4" width="483" height="470"/>
+                        <rect key="frame" x="9" y="2" width="483" height="470"/>
                         <font key="font" usesAppearanceFont="YES"/>
                         <tabViewItems>
                             <tabViewItem label="General" identifier="" id="QUQ-oY-4Hc">
@@ -328,11 +328,11 @@
                             </tabViewItem>
                             <tabViewItem label="Advanced" identifier="" id="xrE-8T-WKO">
                                 <view key="view" id="bZr-iP-F6T">
-                                    <rect key="frame" x="10" y="33" width="463" height="424"/>
+                                    <rect key="frame" x="10" y="33" width="463" height="418"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box title="Advanced Settings" translatesAutoresizingMaskIntoConstraints="NO" id="E1l-m8-xgb">
-                                            <rect key="frame" x="6" y="10" width="451" height="409"/>
+                                            <rect key="frame" x="6" y="4" width="451" height="409"/>
                                             <view key="contentView" id="Zaa-dP-WdF">
                                                 <rect key="frame" x="3" y="3" width="445" height="391"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -575,11 +575,11 @@
                             </tabViewItem>
                             <tabViewItem label="Dictionary" identifier="" id="2iG-Ic-gbl" userLabel="Dictionary">
                                 <view key="view" id="DCm-Zy-lr2">
-                                    <rect key="frame" x="10" y="33" width="463" height="424"/>
+                                    <rect key="frame" x="10" y="33" width="463" height="418"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box title="Dictionary and Language Models" translatesAutoresizingMaskIntoConstraints="NO" id="cf2-se-PDO" userLabel="Dictionary and Language Models">
-                                            <rect key="frame" x="6" y="10" width="451" height="409"/>
+                                            <rect key="frame" x="6" y="4" width="451" height="409"/>
                                             <view key="contentView" id="cy4-aV-hhk">
                                                 <rect key="frame" x="3" y="3" width="445" height="391"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -635,11 +635,11 @@
                             </tabViewItem>
                             <tabViewItem label="Keyboard" identifier="" id="1AW-xf-c2f">
                                 <view key="view" id="FxL-ZG-Eue">
-                                    <rect key="frame" x="10" y="33" width="463" height="424"/>
+                                    <rect key="frame" x="10" y="33" width="463" height="418"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box title="Keyboard Layout" translatesAutoresizingMaskIntoConstraints="NO" id="Wvt-HE-LOv">
-                                            <rect key="frame" x="6" y="10" width="451" height="409"/>
+                                            <rect key="frame" x="6" y="4" width="451" height="409"/>
                                             <view key="contentView" id="mE9-SY-ijS">
                                                 <rect key="frame" x="3" y="3" width="445" height="391"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -662,13 +662,13 @@
                                                         </constraints>
                                                         <textFieldCell key="cell" selectable="YES" id="wQ9-px-b07">
                                                             <font key="font" metaFont="cellTitle"/>
-                                                            <mutableString key="title">Regarding On-Screen Keyboard Viewer Support:
+                                                            <string key="title">Regarding On-Screen Keyboard Viewer Support:
 
 	Since v1.3.2, vChewing supports on-screen keyboard by supporting "Apple Zhuyin Bopomofo" and "Apple Zhuyin Eten" alphanumeric layout. Theoreotically, these two dynamic layouts work with all types of Apple physical keyboards, and you can report failure cases through macOS Feedback Assistant app if macOS built-in Zhuyin / Eten-Zhuyin Input Method fails from working with your non-US keyboard.
 
 	HOWEVER, choosing such dynamic alphanumeric layouts REQUIRING THAT you have to choose the Bopomofo layout above to Standard (Microsoft / Dachen) since the Bopomofo / Eten layout support in this case is already finished by the macOS system.
 
-	Note that If you have chosen those "vChewing****" Alphanumerical layouts, then the Bopomofo layouts MUST MATCH the choices.</mutableString>
+	Note that If you have chosen those "vChewing****" Alphanumerical layouts, then the Bopomofo layouts MUST MATCH the choices.</string>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
@@ -770,13 +770,13 @@
                 <constraints>
                     <constraint firstItem="ul0-iw-Dk6" firstAttribute="centerX" secondItem="2" secondAttribute="centerX" id="BOt-MN-cnS"/>
                     <constraint firstItem="ul0-iw-Dk6" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="16" id="Nbz-2Q-S3Q"/>
-                    <constraint firstAttribute="bottom" secondItem="ul0-iw-Dk6" secondAttribute="bottom" constant="14" id="QYj-Si-eCv"/>
-                    <constraint firstItem="ul0-iw-Dk6" firstAttribute="top" secondItem="2" secondAttribute="top" constant="1" id="VcH-iG-o6f"/>
+                    <constraint firstAttribute="bottom" secondItem="ul0-iw-Dk6" secondAttribute="bottom" constant="12" id="QYj-Si-eCv"/>
+                    <constraint firstItem="ul0-iw-Dk6" firstAttribute="top" secondItem="2" secondAttribute="top" constant="28" id="VcH-iG-o6f"/>
                     <constraint firstItem="ul0-iw-Dk6" firstAttribute="centerX" relation="greaterThanOrEqual" secondItem="2" secondAttribute="centerX" id="dAE-nS-es9"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="ul0-iw-Dk6" secondAttribute="centerX" id="spC-lA-Mpv"/>
                 </constraints>
             </view>
-            <point key="canvasLocation" x="161.5" y="66.5"/>
+            <point key="canvasLocation" x="161.5" y="79"/>
         </window>
         <userDefaultsController representsSharedInstance="YES" id="32"/>
     </objects>

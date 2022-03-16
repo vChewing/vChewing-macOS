@@ -199,6 +199,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
         ctlPrefWindowInstance?.window?.center()
         ctlPrefWindowInstance?.window?.orderFrontRegardless() // 逼著屬性視窗往最前方顯示
         ctlPrefWindowInstance?.window?.level = .statusBar
+        ctlPrefWindowInstance?.window?.titlebarAppearsTransparent = true
     }
     
     // New About Window
