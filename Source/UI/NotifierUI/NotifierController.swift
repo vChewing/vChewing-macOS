@@ -100,10 +100,15 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
         windowRect.origin.x = screenRect.maxX - windowRect.width - 10
         windowRect.origin.y = screenRect.maxY - windowRect.height - 10
         let styleMask: NSWindow.StyleMask = [.fullSizeContentView, .titled]
-        
-        
-        
+
+        let transparentVisualEffect = NSVisualEffectView()
+        transparentVisualEffect.blendingMode = .behindWindow
+        transparentVisualEffect.state = .active
+        transparentVisualEffect.material = .dark
+
         let panel = NotifierWindow(contentRect: windowRect, styleMask: styleMask, backing: .buffered, defer: false)
+        panel.contentView = transparentVisualEffect
+        panel.isMovableByWindowBackground = true
         panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel))
         panel.hasShadow = true
         panel.backgroundColor = backgroundColor
