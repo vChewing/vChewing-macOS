@@ -161,10 +161,14 @@ class InputState: NSObject {
         @objc var tooltip: String {
 
             if composingBuffer.count != readings.count {
+                TooltipController.backgroundColor = NSColor(red: 0.55, green: 0.00, blue: 0.00, alpha: 1.00)
+                TooltipController.textColor = NSColor.white
                 return NSLocalizedString("⚠︎ Unhandlable char selected for user phrases.", comment: "")
             }
 
             if Preferences.phraseReplacementEnabled {
+                TooltipController.backgroundColor = NSColor.purple
+                TooltipController.textColor = NSColor.white
                 return NSLocalizedString("⚠︎ Phrase replacement mode enabled, interfering user phrase entry.", comment: "")
             }
             if markedRange.length == 0 {
@@ -173,8 +177,12 @@ class InputState: NSObject {
 
             let text = (composingBuffer as NSString).substring(with: markedRange)
             if markedRange.length < kMinMarkRangeLength {
+                TooltipController.backgroundColor = NSColor(red: 0.18, green: 0.18, blue: 0.18, alpha: 1.00)
+                TooltipController.textColor = NSColor(red: 0.86, green: 0.86, blue: 0.86, alpha: 1.00)
                 return String(format: NSLocalizedString("\"%@\" length must ≥ 2 for a user phrase.", comment: ""), text)
             } else if (markedRange.length > kMaxMarkRangeLength) {
+                TooltipController.backgroundColor = NSColor(red: 0.26, green: 0.16, blue: 0.00, alpha: 1.00)
+                TooltipController.textColor = NSColor(red: 1.00, green: 0.60, blue: 0.00, alpha: 1.00)
                 return String(format: NSLocalizedString("\"%@\" length should ≤ %d for a user phrase.", comment: ""), text, kMaxMarkRangeLength)
             }
 
@@ -184,9 +192,12 @@ class InputState: NSObject {
             let joined = selectedReadings.joined(separator: "-")
             let exist = mgrLangModel.checkIfUserPhraseExist(userPhrase: text, mode: ctlInputMethod.currentKeyHandler.inputMode, key: joined)
             if exist {
+                TooltipController.backgroundColor = NSColor(red: 0.00, green: 0.18, blue: 0.13, alpha: 1.00)
+                TooltipController.textColor = NSColor(red: 0.00, green: 1.00, blue: 0.74, alpha: 1.00)
                 return String(format: NSLocalizedString("\"%@\" already exists, ENTER to boost its priority.", comment: ""), text)
             }
-
+            TooltipController.backgroundColor = NSColor(red: 0.18, green: 0.18, blue: 0.18, alpha: 1.00)
+            TooltipController.textColor = NSColor.white
             return String(format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: ""), text)
         }
 
