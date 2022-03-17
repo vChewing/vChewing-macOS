@@ -20,7 +20,8 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 import Cocoa
 
 public class TooltipController: NSWindowController {
-    private let backgroundColor =  NSColor.windowBackgroundColor
+    static var backgroundColor = NSColor.windowBackgroundColor
+    static var textColor = NSColor.windowBackgroundColor
     private var messageTextField: NSTextField
     private var tooltip: String = "" {
         didSet {
@@ -40,9 +41,9 @@ public class TooltipController: NSWindowController {
         messageTextField.isEditable = false
         messageTextField.isSelectable = false
         messageTextField.isBezeled = false
-        messageTextField.textColor = NSColor.textColor
+        messageTextField.textColor = TooltipController.textColor
         messageTextField.drawsBackground = true
-        messageTextField.backgroundColor = backgroundColor
+        messageTextField.backgroundColor = TooltipController.backgroundColor
         messageTextField.font = .systemFont(ofSize: NSFont.systemFontSize(for: .small))
         panel.contentView?.addSubview(messageTextField)
 
@@ -55,6 +56,8 @@ public class TooltipController: NSWindowController {
 
     @objc(showTooltip:atPoint:)
     public func show(tooltip: String, at point: NSPoint) {
+        messageTextField.textColor = TooltipController.textColor
+        messageTextField.backgroundColor = TooltipController.backgroundColor
         self.tooltip = tooltip
         window?.orderFront(nil)
         set(windowLocation: point)
