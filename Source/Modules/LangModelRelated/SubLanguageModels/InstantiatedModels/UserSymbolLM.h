@@ -17,8 +17,8 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef SYMBOLLM_H
-#define SYMBOLLM_H
+#ifndef USERSYMBOLLM_H
+#define USERSYMBOLLM_H
 
 #include <string>
 #include <map>
@@ -28,14 +28,14 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 namespace vChewing {
 
-class SymbolLM: public UserPhrasesLM
+class UserSymbolLM: public UserPhrasesLM
 {
 public:
     virtual bool allowConsolidation() override {
-        return false;
+        return true;
     }
     virtual float overridedValue() override {
-        return -13.0;
+        return -12.0;
     }
 };
 

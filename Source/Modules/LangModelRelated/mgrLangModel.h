@@ -40,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)specifyBundleDataPath:(NSString *)filename;
 + (NSString *)userPhrasesDataPath:(InputMode)mode;
++ (NSString *)userSymbolDataPath:(InputMode)mode;
 + (NSString *)userAssociatedPhrasesDataPath:(InputMode)mode;
 + (NSString *)excludedPhrasesDataPath:(InputMode)mode;
 + (NSString *)phraseReplacementDataPath:(InputMode)mode;

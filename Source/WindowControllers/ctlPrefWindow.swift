@@ -41,7 +41,9 @@ extension RangeReplaceableCollection where Element: Hashable {
     
     var currentLanguageSelectItem: NSMenuItem? = nil
 
-    override func awakeFromNib() {
+    override func windowDidLoad() {
+        super.windowDidLoad()
+
         let languages = ["auto", "en", "zh-Hans", "zh-Hant", "ja"]
         var autoMUISelectItem: NSMenuItem? = nil
         var chosenLanguageItem: NSMenuItem? = nil
@@ -156,9 +158,6 @@ extension RangeReplaceableCollection where Element: Hashable {
         }
 
         selectionKeyComboBox.stringValue = candidateSelectionKeys
-        
-        // MARK: - 設定漢字轉換選項是否禁用
-
     }
 
     // 這裡有必要加上這段處理，用來確保藉由偏好設定介面動過的 CNS 開關能夠立刻生效。
@@ -214,27 +213,25 @@ extension RangeReplaceableCollection where Element: Hashable {
 
     @IBAction func changeSelectionKeyAction(_ sender: Any) {
         guard let keys = (sender as AnyObject).stringValue?.trimmingCharacters(in: .whitespacesAndNewlines).charDeDuplicate else {
-                    return
+            return
+        }
+        do {
+            try Preferences.validate(candidateKeys: keys)
+            Preferences.candidateKeys = keys
+            selectionKeyComboBox.stringValue = Preferences.candidateKeys
+        }
+        catch Preferences.CandidateKeyError.empty {
+            selectionKeyComboBox.stringValue = Preferences.candidateKeys
+        }
+        catch {
+            if let window = window {
+                let alert = NSAlert(error: error)
+                alert.beginSheetModal(for: window) { response in
+                    self.selectionKeyComboBox.stringValue = Preferences.candidateKeys
                 }
-                do {
-                    try Preferences.validate(candidateKeys: keys)
-                    Preferences.candidateKeys = keys
-                }
-                catch Preferences.CandidateKeyError.empty {
-                    selectionKeyComboBox.stringValue = Preferences.candidateKeys
-                }
-                catch {
-                    if let window = window {
-                        let alert = NSAlert(error: error)
-                        alert.beginSheetModal(for: window) { response in
-                            self.selectionKeyComboBox.stringValue = Preferences.candidateKeys
-                        }
-                        clsSFX.beep()
-                    }
-                }
-        
-        selectionKeyComboBox.stringValue = keys
-        Preferences.candidateKeys = keys
+                clsSFX.beep()
+            }
+        }
     }
 
 }
