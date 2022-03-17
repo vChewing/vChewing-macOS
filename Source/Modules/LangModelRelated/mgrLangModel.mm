@@ -34,6 +34,7 @@ static NSString *const kUserDataTemplateName = @"template-data";
 static NSString *const kUserAssDataTemplateName = @"template-data";
 static NSString *const kExcludedPhrasesvChewingTemplateName = @"template-exclude-phrases";
 static NSString *const kPhraseReplacementTemplateName = @"template-phrases-replacement";
+static NSString *const kUserSymbolDataTemplateName = @"template-user-symbol-data";
 static NSString *const kTemplateExtension = @".txt";
 
 @implementation mgrLangModel
@@ -117,6 +118,8 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
 {
     gLangModelCHT.loadUserPhrases([[self userPhrasesDataPath:imeModeCHT] UTF8String], [[self excludedPhrasesDataPath:imeModeCHT] UTF8String]);
     gLangModelCHS.loadUserPhrases([[self userPhrasesDataPath:imeModeCHS] UTF8String], [[self excludedPhrasesDataPath:imeModeCHS] UTF8String]);
+    gLangModelCHT.loadUserSymbolData([[self userSymbolDataPath:imeModeCHT] UTF8String]);
+    gLangModelCHS.loadUserSymbolData([[self userSymbolDataPath:imeModeCHS] UTF8String]);
 }
 
 + (void)loadUserAssociatedPhrases
@@ -205,33 +208,17 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
 
 + (BOOL)checkIfUserLanguageModelFilesExist
 {
-    if (![self checkIfUserDataFolderExists]) {
-        return NO;
-    }
-    if (![self ensureFileExists:[self userPhrasesDataPath:imeModeCHS] populateWithTemplate:kUserDataTemplateName extension:kTemplateExtension]) {
-        return NO;
-    }
-    if (![self ensureFileExists:[self userPhrasesDataPath:imeModeCHT] populateWithTemplate:kUserDataTemplateName extension:kTemplateExtension]) {
-        return NO;
-    }
-    if (![self ensureFileExists:[self userAssociatedPhrasesDataPath:imeModeCHS] populateWithTemplate:kUserAssDataTemplateName extension:kTemplateExtension]) {
-        return NO;
-    }
-    if (![self ensureFileExists:[self userAssociatedPhrasesDataPath:imeModeCHT] populateWithTemplate:kUserAssDataTemplateName extension:kTemplateExtension]) {
-        return NO;
-    }
-    if (![self ensureFileExists:[self excludedPhrasesDataPath:imeModeCHS] populateWithTemplate:kExcludedPhrasesvChewingTemplateName extension:kTemplateExtension]) {
-        return NO;
-    }
-    if (![self ensureFileExists:[self excludedPhrasesDataPath:imeModeCHT] populateWithTemplate:kExcludedPhrasesvChewingTemplateName extension:kTemplateExtension]) {
-        return NO;
-    }
-    if (![self ensureFileExists:[self phraseReplacementDataPath:imeModeCHS] populateWithTemplate:kPhraseReplacementTemplateName extension:kTemplateExtension]) {
-        return NO;
-    }
-    if (![self ensureFileExists:[self phraseReplacementDataPath:imeModeCHT] populateWithTemplate:kPhraseReplacementTemplateName extension:kTemplateExtension]) {
-        return NO;
-    }
+    if (![self checkIfUserDataFolderExists]) return NO;
+    if (![self ensureFileExists:[self userPhrasesDataPath:imeModeCHS] populateWithTemplate:kUserDataTemplateName extension:kTemplateExtension]) return NO;
+    if (![self ensureFileExists:[self userPhrasesDataPath:imeModeCHT] populateWithTemplate:kUserDataTemplateName extension:kTemplateExtension]) return NO;
+    if (![self ensureFileExists:[self userAssociatedPhrasesDataPath:imeModeCHS] populateWithTemplate:kUserAssDataTemplateName extension:kTemplateExtension]) return NO;
+    if (![self ensureFileExists:[self userAssociatedPhrasesDataPath:imeModeCHT] populateWithTemplate:kUserAssDataTemplateName extension:kTemplateExtension]) return NO;
+    if (![self ensureFileExists:[self excludedPhrasesDataPath:imeModeCHS] populateWithTemplate:kExcludedPhrasesvChewingTemplateName extension:kTemplateExtension]) return NO;
+    if (![self ensureFileExists:[self excludedPhrasesDataPath:imeModeCHT] populateWithTemplate:kExcludedPhrasesvChewingTemplateName extension:kTemplateExtension]) return NO;
+    if (![self ensureFileExists:[self phraseReplacementDataPath:imeModeCHS] populateWithTemplate:kPhraseReplacementTemplateName extension:kTemplateExtension]) return NO;
+    if (![self ensureFileExists:[self phraseReplacementDataPath:imeModeCHT] populateWithTemplate:kPhraseReplacementTemplateName extension:kTemplateExtension]) return NO;
+    if (![self ensureFileExists:[self userSymbolDataPath:imeModeCHT] populateWithTemplate:kUserSymbolDataTemplateName extension:kTemplateExtension]) return NO;
+    if (![self ensureFileExists:[self userSymbolDataPath:imeModeCHS] populateWithTemplate:kUserSymbolDataTemplateName extension:kTemplateExtension]) return NO;
     return YES;
 }
 
@@ -318,6 +305,12 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
 + (NSString *)userPhrasesDataPath:(InputMode)mode;
 {
     NSString *fileName = [mode isEqualToString:imeModeCHT] ? @"userdata-cht.txt" : @"userdata-chs.txt";
+    return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
+}
+
++ (NSString *)userSymbolDataPath:(InputMode)mode;
+{
+    NSString *fileName = [mode isEqualToString:imeModeCHT] ? @"usersymbolphrases-cht.txt" : @"usersymbolphrases-chs.txt";
     return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
 }
 

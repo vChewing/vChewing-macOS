@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -155,8 +155,16 @@ DQ
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fbv-c6-gW8">
+                        <rect key="frame" x="382" y="69" width="143" height="32"/>
+                        <buttonCell key="cell" type="push" title="Wiki" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ImH-h2-3FG">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                    </button>
                 </subviews>
                 <constraints>
+                    <constraint firstItem="fbv-c6-gW8" firstAttribute="trailing" secondItem="bSu-np-tPT" secondAttribute="trailing" id="00j-Nu-LyX"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="9Pk-k3-0cO" secondAttribute="trailing" constant="20" symbolic="YES" id="0LE-Ck-Jy5"/>
                     <constraint firstItem="2Gh-nq-Mng" firstAttribute="centerX" secondItem="se5-gp-TjO" secondAttribute="centerX" id="1cy-gM-7lt"/>
                     <constraint firstItem="JkD-J1-Yeu" firstAttribute="trailing" secondItem="2Gh-nq-Mng" secondAttribute="trailing" id="24O-Jp-K8a"/>
@@ -181,6 +189,7 @@ DQ
                     <constraint firstItem="8Ju-DR-2C8" firstAttribute="leading" secondItem="8M8-3C-BZO" secondAttribute="leading" id="UrF-M2-wpG"/>
                     <constraint firstItem="eYM-F7-drf" firstAttribute="top" secondItem="8M8-3C-BZO" secondAttribute="bottom" constant="8" symbolic="YES" id="WIZ-YQ-chM"/>
                     <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="2Gh-nq-Mng" secondAttribute="bottom" constant="134" id="WJK-gw-zR7"/>
+                    <constraint firstItem="fbv-c6-gW8" firstAttribute="leading" secondItem="bSu-np-tPT" secondAttribute="leading" id="YoT-2L-YLU"/>
                     <constraint firstItem="9Pk-k3-0cO" firstAttribute="leading" secondItem="6Dx-DY-UG1" secondAttribute="trailing" constant="3" id="c3v-ZJ-usi"/>
                     <constraint firstItem="JkD-J1-Yeu" firstAttribute="top" secondItem="eYM-F7-drf" secondAttribute="bottom" constant="8" symbolic="YES" id="eqh-Gi-fS2"/>
                     <constraint firstItem="bAv-ZO-Ihw" firstAttribute="top" secondItem="6Dx-DY-UG1" secondAttribute="top" id="hJv-Sh-M4t"/>
@@ -191,6 +200,7 @@ DQ
                     <constraint firstAttribute="trailing" secondItem="8M8-3C-BZO" secondAttribute="trailing" constant="15" id="rx3-ed-9sg"/>
                     <constraint firstItem="JkD-J1-Yeu" firstAttribute="leading" secondItem="eYM-F7-drf" secondAttribute="leading" id="t9D-Vu-dOC"/>
                     <constraint firstItem="bAv-ZO-Ihw" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" id="u49-Fr-HYh"/>
+                    <constraint firstItem="fbv-c6-gW8" firstAttribute="top" secondItem="bSu-np-tPT" secondAttribute="bottom" constant="7" id="zYE-t7-7vl"/>
                 </constraints>
             </view>
             <connections>

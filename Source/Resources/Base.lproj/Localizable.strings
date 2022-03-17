@@ -19,7 +19,7 @@
 "Reload User Phrases" = "Reload User Phrases";
 "Unable to create the user phrase file." = "Unable to create the user phrase file.";
 "Please check the permission at \"%@\"." = "Please check the permission at \"%@\".";
-"Edit Excluded Phrases" = "Edit Excluded Phrases…";
+"Edit Excluded Phrases…" = "Edit Excluded Phrases…";
 "Half-Width Punctuation Mode" = "Half-Width Punctuation Mode";
 "\"%@\" length must ≥ 2 for a user phrase." = "\"%@\" length must ≥ 2 for a user phrase.";
 "\"%@\" length should ≤ %d for a user phrase." = "\"%@\" length should ≤ %d for a user phrase.";
