@@ -150,7 +150,7 @@ class InputState: NSObject {
     // MARK: -
 
     private let kMinMarkRangeLength = 2
-    private let kMaxMarkRangeLength = Preferences.maxCandidateLength
+    private let kMaxMarkRangeLength = mgrPrefs.maxCandidateLength
 
     /// Represents that the user is marking a range in the composing buffer.
     @objc (InputStateMarking)
@@ -166,7 +166,7 @@ class InputState: NSObject {
                 return NSLocalizedString("⚠︎ Unhandlable char selected for user phrases.", comment: "")
             }
 
-            if Preferences.phraseReplacementEnabled {
+            if mgrPrefs.phraseReplacementEnabled {
                 TooltipController.backgroundColor = NSColor.purple
                 TooltipController.textColor = NSColor.white
                 return NSLocalizedString("⚠︎ Phrase replacement mode enabled, interfering user phrase entry.", comment: "")
