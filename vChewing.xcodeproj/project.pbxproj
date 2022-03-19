@@ -13,12 +13,6 @@
 		5B27AD6B27CB1F9B000ED75B /* data-zhuyinwen.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B27AD6927CB1F9B000ED75B /* data-zhuyinwen.txt */; };
 		5B2DB16F27AF6891006D874E /* data-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16D27AF6891006D874E /* data-chs.txt */; };
 		5B2DB17027AF6891006D874E /* data-cht.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16E27AF6891006D874E /* data-cht.txt */; };
-		5B62A31727AE73A700A19448 /* unzip.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A30927AE73A700A19448 /* unzip.m */; };
-		5B62A31827AE73A700A19448 /* zip.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A30A27AE73A700A19448 /* zip.m */; };
-		5B62A31927AE73A700A19448 /* ioapi.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A30B27AE73A700A19448 /* ioapi.m */; };
-		5B62A31A27AE73A700A19448 /* mztools.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A30C27AE73A700A19448 /* mztools.m */; };
-		5B62A31B27AE73A700A19448 /* SSZipArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A31327AE73A700A19448 /* SSZipArchive.m */; };
-		5B62A31C27AE73A700A19448 /* AWFileHash.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A31627AE73A700A19448 /* AWFileHash.m */; };
 		5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */; };
 		5B62A32F27AE78B000A19448 /* CoreLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32D27AE78B000A19448 /* CoreLM.mm */; };
 		5B62A33227AE792F00A19448 /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33127AE792F00A19448 /* InputSourceHelper.swift */; };
@@ -168,19 +162,6 @@
 		5B2DB16E27AF6891006D874E /* data-cht.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-cht.txt"; path = "Data/data-cht.txt"; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
-		5B62A30927AE73A700A19448 /* unzip.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = unzip.m; sourceTree = "<group>"; };
-		5B62A30A27AE73A700A19448 /* zip.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = zip.m; sourceTree = "<group>"; };
-		5B62A30B27AE73A700A19448 /* ioapi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ioapi.m; sourceTree = "<group>"; };
-		5B62A30C27AE73A700A19448 /* mztools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = mztools.m; sourceTree = "<group>"; };
-		5B62A30D27AE73A700A19448 /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
-		5B62A30E27AE73A700A19448 /* zip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zip.h; sourceTree = "<group>"; };
-		5B62A30F27AE73A700A19448 /* unzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unzip.h; sourceTree = "<group>"; };
-		5B62A31027AE73A700A19448 /* mztools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mztools.h; sourceTree = "<group>"; };
-		5B62A31127AE73A700A19448 /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ioapi.h; sourceTree = "<group>"; };
-		5B62A31227AE73A700A19448 /* SSZipArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SSZipArchive.h; sourceTree = "<group>"; };
-		5B62A31327AE73A700A19448 /* SSZipArchive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSZipArchive.m; sourceTree = "<group>"; };
-		5B62A31527AE73A700A19448 /* AWFileHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AWFileHash.h; sourceTree = "<group>"; };
-		5B62A31627AE73A700A19448 /* AWFileHash.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AWFileHash.m; sourceTree = "<group>"; };
 		5B62A32627AE77BB00A19448 /* LMConsolidator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LMConsolidator.h; sourceTree = "<group>"; };
 		5B62A32727AE77BB00A19448 /* LMConsolidator.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LMConsolidator.mm; sourceTree = "<group>"; };
 		5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FSEventStreamHelper.swift; sourceTree = "<group>"; };
@@ -363,8 +344,6 @@
 			isa = PBXGroup;
 			children = (
 				5B707CE627D9F43E0099EF99 /* OpenCCBridge */,
-				5B62A31427AE73A700A19448 /* AWFileHash */,
-				5B62A30727AE73A700A19448 /* SSZipArchive */,
 				5B62A30227AE733500A19448 /* OVMandarin */,
 			);
 			path = 3rdParty;
@@ -377,41 +356,6 @@
 				6A0D4F2115FC0EB100ABF4B3 /* Mandarin.h */,
 			);
 			path = OVMandarin;
-			sourceTree = "<group>";
-		};
-		5B62A30727AE73A700A19448 /* SSZipArchive */ = {
-			isa = PBXGroup;
-			children = (
-				5B62A30827AE73A700A19448 /* minizip */,
-				5B62A31227AE73A700A19448 /* SSZipArchive.h */,
-				5B62A31327AE73A700A19448 /* SSZipArchive.m */,
-			);
-			path = SSZipArchive;
-			sourceTree = "<group>";
-		};
-		5B62A30827AE73A700A19448 /* minizip */ = {
-			isa = PBXGroup;
-			children = (
-				5B62A30927AE73A700A19448 /* unzip.m */,
-				5B62A30A27AE73A700A19448 /* zip.m */,
-				5B62A30B27AE73A700A19448 /* ioapi.m */,
-				5B62A30C27AE73A700A19448 /* mztools.m */,
-				5B62A30D27AE73A700A19448 /* crypt.h */,
-				5B62A30E27AE73A700A19448 /* zip.h */,
-				5B62A30F27AE73A700A19448 /* unzip.h */,
-				5B62A31027AE73A700A19448 /* mztools.h */,
-				5B62A31127AE73A700A19448 /* ioapi.h */,
-			);
-			path = minizip;
-			sourceTree = "<group>";
-		};
-		5B62A31427AE73A700A19448 /* AWFileHash */ = {
-			isa = PBXGroup;
-			children = (
-				5B62A31527AE73A700A19448 /* AWFileHash.h */,
-				5B62A31627AE73A700A19448 /* AWFileHash.m */,
-			);
-			path = AWFileHash;
 			sourceTree = "<group>";
 		};
 		5B62A31E27AE74E400A19448 /* SFX */ = {
@@ -1007,8 +951,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B62A31927AE73A700A19448 /* ioapi.m in Sources */,
-				5B62A31C27AE73A700A19448 /* AWFileHash.m in Sources */,
 				5B707CE827D9F4590099EF99 /* OpenCCBridge.swift in Sources */,
 				D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */,
 				6ACC3D442793701600F1B140 /* ParselessPhraseDB.cpp in Sources */,
@@ -1026,9 +968,7 @@
 				D47D73AC27A6CAE600255A50 /* AssociatedPhrases.mm in Sources */,
 				5B62A34A27AE7CD900A19448 /* NotifierController.swift in Sources */,
 				5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */,
-				5B62A31827AE73A700A19448 /* zip.m in Sources */,
 				D41355DB278E6D17005E5CBD /* LMInstantiator.mm in Sources */,
-				5B62A31A27AE73A700A19448 /* mztools.m in Sources */,
 				5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */,
 				D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */,
 				5B62A33627AE795800A19448 /* mgrPrefs.swift in Sources */,
@@ -1039,11 +979,9 @@
 				5B62A34827AE7CD900A19448 /* VerticalCandidateController.swift in Sources */,
 				6ACC3D452793701600F1B140 /* ParselessLM.cpp in Sources */,
 				5BBBB77A27AEDC690023B93A /* clsSFX.swift in Sources */,
-				5B62A31727AE73A700A19448 /* unzip.m in Sources */,
 				5BF8423127BAA942008E7E4C /* vChewingKanjiConverter.swift in Sources */,
 				5B62A34627AE7CD900A19448 /* HorizontalCandidateController.swift in Sources */,
 				5B62A34727AE7CD900A19448 /* CandidateController.swift in Sources */,
-				5B62A31B27AE73A700A19448 /* SSZipArchive.m in Sources */,
 				D41355DE278EA3ED005E5CBD /* UserPhrasesLM.mm in Sources */,
 				6ACC3D3F27914F2400F1B140 /* KeyValueBlobReader.cpp in Sources */,
 				D41355D8278D74B5005E5CBD /* mgrLangModel.mm in Sources */,
