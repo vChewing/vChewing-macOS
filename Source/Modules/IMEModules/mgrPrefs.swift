@@ -261,7 +261,7 @@ struct ComposingBufferSize {
             UserDefaults.standard.set(false, forKey: kCheckUpdateAutomatically)
         }
 
-        // 預設不顯示選字窗翻頁按鈕
+        // 預設顯示選字窗翻頁按鈕
         if UserDefaults.standard.object(forKey: kShowPageButtonsInCandidateWindow) == nil {
             UserDefaults.standard.set(mgrPrefs.showPageButtonsInCandidateWindow, forKey: kShowPageButtonsInCandidateWindow)
         }
