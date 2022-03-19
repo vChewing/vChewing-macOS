@@ -200,6 +200,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
         ctlPrefWindowInstance?.window?.orderFrontRegardless() // 逼著屬性視窗往最前方顯示
         ctlPrefWindowInstance?.window?.level = .statusBar
         ctlPrefWindowInstance?.window?.titlebarAppearsTransparent = true
+        NSApp.setActivationPolicy(.accessory)
     }
     
     // New About Window
@@ -210,6 +211,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
         ctlAboutWindowInstance?.window?.center()
         ctlAboutWindowInstance?.window?.orderFrontRegardless() // 逼著關於視窗往最前方顯示
         ctlAboutWindowInstance?.window?.level = .statusBar
+        NSApp.setActivationPolicy(.accessory)
     }
 
     @objc(checkForUpdate)
@@ -257,6 +259,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
                             report.versionDescription)
                     IME.prtDebugIntel("vChewingDebug: \(content)")
                     ctlNonModalAlertWindow.shared.show(title: NSLocalizedString("New Version Available", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("Visit Website", comment: ""), cancelButtonTitle: NSLocalizedString("Not Now", comment: ""), cancelAsDefault: false, delegate: self)
+                    NSApp.setActivationPolicy(.accessory)
                 case .noNeedToUpdate, .ignored:
                     break
                 }
@@ -268,6 +271,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
                     let buttonTitle = NSLocalizedString("Dismiss", comment: "")
                     IME.prtDebugIntel("vChewingDebug: \(content)")
                     ctlNonModalAlertWindow.shared.show(title: title, content: content, confirmButtonTitle: buttonTitle, cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
+                    NSApp.setActivationPolicy(.accessory)
                 default:
                     break
                 }
