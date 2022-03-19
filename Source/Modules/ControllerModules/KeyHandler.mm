@@ -115,10 +115,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     ctlInputMethod.currentInputMode = newInputMode;
 
     // Synchronize the Preference Setting "setPhraseReplacementEnabled" to the new LM.
-    newLanguageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
+    newLanguageModel->setPhraseReplacementEnabled(mgrPrefs.phraseReplacementEnabled);
     // Also other sub language models:
-    newLanguageModel->setSymbolEnabled(Preferences.symbolInputEnabled);
-    newLanguageModel->setCNSEnabled(Preferences.cns11643Enabled);
+    newLanguageModel->setSymbolEnabled(mgrPrefs.symbolInputEnabled);
+    newLanguageModel->setCNSEnabled(mgrPrefs.cns11643Enabled);
 
     // Only apply the changes if the value is changed
     if (![_inputMode isEqualToString:newInputMode]) {
@@ -158,9 +158,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
         // create the lattice builder
         _languageModel = [mgrLangModel lmCHT];
-        _languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
-        _languageModel->setCNSEnabled(Preferences.cns11643Enabled);
-        _languageModel->setSymbolEnabled(Preferences.symbolInputEnabled);
+        _languageModel->setPhraseReplacementEnabled(mgrPrefs.phraseReplacementEnabled);
+        _languageModel->setCNSEnabled(mgrPrefs.cns11643Enabled);
+        _languageModel->setSymbolEnabled(mgrPrefs.symbolInputEnabled);
         _userOverrideModel = [mgrLangModel userOverrideModelCHT];
 
         _builder = new Gramambular::BlockReadingBuilder(_languageModel);
@@ -174,7 +174,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
 - (void)syncWithPreferences
 {
-    NSInteger layout = Preferences.keyboardLayout;
+    NSInteger layout = mgrPrefs.keyboardLayout;
     switch (layout) {
         case KeyboardLayoutStandard:
             _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::StandardLayout());
@@ -202,7 +202,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             break;
         default:
             _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::StandardLayout());
-            Preferences.keyboardLayout = KeyboardLayoutStandard;
+            mgrPrefs.keyboardLayout = KeyboardLayoutStandard;
     }
 }
 
@@ -211,7 +211,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     size_t cursorIndex = [self _actualCandidateCursorIndex];
     std::string stringValue(value.UTF8String);
     Gramambular::NodeAnchor selectedNode = _builder->grid().fixNodeSelectedCandidate(cursorIndex, stringValue);
-    if (!Preferences.useSCPCTypingMode) { // 不要針對逐字選字模式啟用臨時半衰記憶模型。
+    if (!mgrPrefs.useSCPCTypingMode) { // 不要針對逐字選字模式啟用臨時半衰記憶模型。
         // If the length of the readings and the characters do not match,
         // it often means it is a special symbol and it should not be stored
         // in the user override model.
@@ -231,8 +231,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
     [self _walk];
 
-    if (Preferences.selectPhraseAfterCursorAsCandidate &&
-        Preferences.moveCursorAfterSelectingCandidate) {
+    if (mgrPrefs.selectPhraseAfterCursorAsCandidate &&
+        mgrPrefs.moveCursorAfterSelectingCandidate) {
         size_t nextPosition = 0;
         for (auto node: _walkedNodes) {
             if (nextPosition >= cursorIndex) {
@@ -255,7 +255,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
 - (std::string)_currentLayout
 {
-    NSString *keyboardLayoutName = Preferences.keyboardLayoutName;
+    NSString *keyboardLayoutName = mgrPrefs.keyboardLayoutName;
     std::string layout = std::string(keyboardLayoutName.UTF8String) + std::string("_");
     return layout;
 }
@@ -387,7 +387,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         NSString *poppedText = [self _popOverflowComposingTextAndWalk];
 
         // get user override model suggestion
-        std::string overrideValue = (Preferences.useSCPCTypingMode) ? "" :
+        std::string overrideValue = (mgrPrefs.useSCPCTypingMode) ? "" :
                 _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
 
         if (!overrideValue.empty()) {
@@ -404,7 +404,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         inputting.poppedText = poppedText;
         stateCallback(inputting);
 
-        if (Preferences.useSCPCTypingMode) {
+        if (mgrPrefs.useSCPCTypingMode) {
             InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateState:inputting useVerticalMode:input.useVerticalMode];
             if (choosingCandidates.candidates.count == 1) {
                 [self clear];
@@ -412,7 +412,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                 InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:text];
                 stateCallback(committing);
 
-                if (!Preferences.associatedPhrasesEnabled) {
+                if (!mgrPrefs.associatedPhrasesEnabled) {
                     InputStateEmpty *empty = [[InputStateEmpty alloc] init];
                     stateCallback(empty);
                 } else {
@@ -441,7 +441,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
          || (input.useVerticalMode && ([input isVerticalModeOnlyChooseCandidateKey])))) {
         if ([input isSpace]) {
             // if the spacebar is NOT set to be a selection key
-            if ([input isShiftHold] || !Preferences.chooseCandidateUsingSpace) {
+            if ([input isShiftHold] || !mgrPrefs.chooseCandidateUsingSpace) {
                 if (_builder->cursorIndex() >= _builder->length()) {
                     NSString *composingBuffer = [(InputStateNotEmpty*) state composingBuffer];
                     if (composingBuffer.length) {
@@ -566,7 +566,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     std::string punctuationNamePrefix;
     if ([input isControlHold]) {
         punctuationNamePrefix = std::string("_ctrl_punctuation_");
-    } else if (Preferences.halfWidthPunctuationEnabled) {
+    } else if (mgrPrefs.halfWidthPunctuationEnabled) {
         punctuationNamePrefix = std::string("_half_punctuation_");
     } else {
         punctuationNamePrefix = std::string("_punctuation_");
@@ -611,7 +611,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return NO;
     }
 
-    BOOL escToClearInputBufferEnabled = Preferences.escToCleanInputBuffer;
+    BOOL escToClearInputBufferEnabled = mgrPrefs.escToCleanInputBuffer;
 
     if (escToClearInputBufferEnabled) {
         // if the option is enabled, we clear everything including the composing
@@ -904,7 +904,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     inputting.poppedText = poppedText;
     stateCallback(inputting);
 
-    if (Preferences.useSCPCTypingMode && _bpmfReadingBuffer->isEmpty()) {
+    if (mgrPrefs.useSCPCTypingMode && _bpmfReadingBuffer->isEmpty()) {
         InputStateChoosingCandidate *candidateState = [self _buildCandidateState:inputting useVerticalMode:useVerticalMode];
 
         if ([candidateState.candidates count] == 1) {
@@ -1010,7 +1010,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
         }
-        else if (Preferences.useSCPCTypingMode) {
+        else if (mgrPrefs.useSCPCTypingMode) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
@@ -1040,7 +1040,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if ([input isTab]) {
         BOOL updated =
-            Preferences.specifyTabKeyBehavior?
+            mgrPrefs.specifyTabKeyBehavior?
                 ([input isShiftHold] ? [gCurrentCandidateController showPreviousPage] : [gCurrentCandidateController showNextPage])
             :
                 ([input isShiftHold] ? [gCurrentCandidateController highlightPreviousCandidate] : [gCurrentCandidateController highlightNextCandidate])
@@ -1054,7 +1054,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if ([input isSpace]) {
         BOOL updated =
-            Preferences.specifySpaceKeyBehavior?
+            mgrPrefs.specifySpaceKeyBehavior?
                 ([input isShiftHold] ? [gCurrentCandidateController highlightNextCandidate] : [gCurrentCandidateController showNextPage])
             :
                 ([input isShiftHold] ? [gCurrentCandidateController showNextPage] : [gCurrentCandidateController highlightNextCandidate])
@@ -1237,12 +1237,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return NO;
     }
 
-    if (Preferences.useSCPCTypingMode) {
+    if (mgrPrefs.useSCPCTypingMode) {
         std::string layout = [self _currentLayout];
         std::string punctuationNamePrefix;
         if ([input isControlHold]) {
             punctuationNamePrefix = std::string("_ctrl_punctuation_");
-        } else if (Preferences.halfWidthPunctuationEnabled) {
+        } else if (mgrPrefs.halfWidthPunctuationEnabled) {
             punctuationNamePrefix = std::string("_half_punctuation_");
         } else {
             punctuationNamePrefix = std::string("_punctuation_");
@@ -1392,7 +1392,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // be popped out
 
     NSString *poppedText = @"";
-    NSInteger composingBufferSize = Preferences.composingBufferSize;
+    NSInteger composingBufferSize = mgrPrefs.composingBufferSize;
 
     if (_builder->grid().width() > (size_t) composingBufferSize) {
         if (_walkedNodes.size() > 0) {
@@ -1432,7 +1432,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 {
     size_t cursorIndex = _builder->cursorIndex();
     // MS Phonetics IME style, phrase is *after* the cursor, i.e. cursor is always *before* the phrase
-    if ((Preferences.selectPhraseAfterCursorAsCandidate && (cursorIndex < _builder->length()))
+    if ((mgrPrefs.selectPhraseAfterCursorAsCandidate && (cursorIndex < _builder->length()))
         || !cursorIndex) {
         ++cursorIndex;
     }
