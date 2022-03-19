@@ -137,16 +137,16 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
 + (void)setupDataModelValueConverter
 {
     auto converter = [] (string input) {
-//        if (!Preferences.chineseConversionEnabled) {
+//        if (!mgrPrefs.chineseConversionEnabled) {
 //            return input;
 //        }
 //
-//        if (Preferences.chineseConversionStyle == 0) {
+//        if (mgrPrefs.chineseConversionStyle == 0) {
 //            return input;
 //        }
 //
 //        NSString *text = [NSString stringWithUTF8String:input.c_str()];
-//        if (Preferences.chineseConversionEngine == 1) {
+//        if (mgrPrefs.chineseConversionEngine == 1) {
 //            text = [VXHanConvert convertToKangXiFrom:text];
 //        }
 //        else {
@@ -288,7 +288,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
 
     //  We use FSEventStream to monitor the change of the user phrase folder,
     //  so we don't have to load data here unless FSEventStream is disabled by user.
-    if (!Preferences.shouldAutoReloadUserDataFiles) {
+    if (!mgrPrefs.shouldAutoReloadUserDataFiles) {
         [self loadUserPhrases];
     }
     return YES;

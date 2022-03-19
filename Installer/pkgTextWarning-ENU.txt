@@ -1,0 +1,5 @@
+Notice:
+
+Due to a bug in macOS 10.x and 11.x, if you are trying to install this input method on macOS releases earlier than macOS 12 Monterey, PLEASE manually choose the install target to the user folder. Otherwise, there will be problems when you are trying to install this input method to later versions when your OS gets upgraded to macOS 12 Monterey or later.
+
+Also, feel free to logout and re-login if the input method doesn't work after installation.

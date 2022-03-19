@@ -34,7 +34,7 @@ import Cocoa
         }
         // Create a new beep sound if possible
         var sndBeep:String
-        if Preferences.shouldNotFartInLieuOfBeep == false {
+        if mgrPrefs.shouldNotFartInLieuOfBeep == false {
             sndBeep = "Fart"
         } else {
             sndBeep = "Beep"
