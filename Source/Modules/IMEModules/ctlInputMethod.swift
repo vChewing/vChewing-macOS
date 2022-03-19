@@ -73,36 +73,36 @@ class ctlInputMethod: IMKInputController {
 
         let useSCPCTypingModeItem = menu.addItem(withTitle: NSLocalizedString("Per-Char Select Mode", comment: ""), action: #selector(toggleSCPCTypingMode(_:)), keyEquivalent: "P")
         useSCPCTypingModeItem.keyEquivalentModifierMask = [.command, .control]
-        useSCPCTypingModeItem.state = Preferences.useSCPCTypingMode.state
+        useSCPCTypingModeItem.state = mgrPrefs.useSCPCTypingMode.state
 
         let useCNS11643SupportItem = menu.addItem(withTitle: NSLocalizedString("CNS11643 Mode", comment: ""), action: #selector(toggleCNS11643Enabled(_:)), keyEquivalent: "L")
         useCNS11643SupportItem.keyEquivalentModifierMask = [.command, .control]
-        useCNS11643SupportItem.state = Preferences.cns11643Enabled.state
+        useCNS11643SupportItem.state = mgrPrefs.cns11643Enabled.state
 
         if keyHandler.inputMode == InputMode.imeModeCHT {
             let chineseConversionItem = menu.addItem(withTitle: NSLocalizedString("Force KangXi Writing", comment: ""), action: #selector(toggleChineseConverter(_:)), keyEquivalent: "K")
             chineseConversionItem.keyEquivalentModifierMask = [.command, .control]
-            chineseConversionItem.state = Preferences.chineseConversionEnabled.state
+            chineseConversionItem.state = mgrPrefs.chineseConversionEnabled.state
 
             let shiftJISConversionItem = menu.addItem(withTitle: NSLocalizedString("JIS Shinjitai Output", comment: ""), action: #selector(toggleShiftJISShinjitaiOutput(_:)), keyEquivalent: "J")
             shiftJISConversionItem.keyEquivalentModifierMask = [.command, .control]
-            shiftJISConversionItem.state = Preferences.shiftJISShinjitaiOutputEnabled.state
+            shiftJISConversionItem.state = mgrPrefs.shiftJISShinjitaiOutputEnabled.state
         }
         
         let halfWidthPunctuationItem = menu.addItem(withTitle: NSLocalizedString("Half-Width Punctuation Mode", comment: ""), action: #selector(toggleHalfWidthPunctuation(_:)), keyEquivalent: "H")
         halfWidthPunctuationItem.keyEquivalentModifierMask = [.command, .control]
-        halfWidthPunctuationItem.state = Preferences.halfWidthPunctuationEnabled.state
+        halfWidthPunctuationItem.state = mgrPrefs.halfWidthPunctuationEnabled.state
 
         let userAssociatedPhrasesItem = menu.addItem(withTitle: NSLocalizedString("Per-Char Associated Phrases", comment: ""), action: #selector(toggleAssociatedPhrasesEnabled(_:)), keyEquivalent: "O")
         userAssociatedPhrasesItem.keyEquivalentModifierMask = [.command, .control]
-        userAssociatedPhrasesItem.state = Preferences.associatedPhrasesEnabled.state
+        userAssociatedPhrasesItem.state = mgrPrefs.associatedPhrasesEnabled.state
 
         if optionKeyPressed {
             let phaseReplacementItem = menu.addItem(withTitle: NSLocalizedString("Use Phrase Replacement", comment: ""), action: #selector(togglePhraseReplacement(_:)), keyEquivalent: "")
-            phaseReplacementItem.state = Preferences.phraseReplacementEnabled.state
+            phaseReplacementItem.state = mgrPrefs.phraseReplacementEnabled.state
 
             let toggleSymbolInputItem = menu.addItem(withTitle: NSLocalizedString("Symbol & Emoji Input", comment: ""), action: #selector(toggleSymbolEnabled(_:)), keyEquivalent: "")
-            toggleSymbolInputItem.state = Preferences.symbolInputEnabled.state
+            toggleSymbolInputItem.state = mgrPrefs.symbolInputEnabled.state
         }
 
         menu.addItem(NSMenuItem.separator()) // ---------------------
@@ -117,7 +117,7 @@ class ctlInputMethod: IMKInputController {
             menu.addItem(withTitle: NSLocalizedString("Edit User Symbol & Emoji Data…", comment: ""), action: #selector(openUserSymbols(_:)), keyEquivalent: "")
         }
 
-        if (optionKeyPressed || !Preferences.shouldAutoReloadUserDataFiles) {
+        if (optionKeyPressed || !mgrPrefs.shouldAutoReloadUserDataFiles) {
             menu.addItem(withTitle: NSLocalizedString("Reload User Phrases", comment: ""), action: #selector(reloadUserPhrases(_:)), keyEquivalent: "")
         }
 
@@ -140,7 +140,7 @@ class ctlInputMethod: IMKInputController {
         UserDefaults.standard.synchronize()
 
         // Override the keyboard layout. Use US if not set.
-        (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: Preferences.basisKeyboardLayout)
+        (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.basisKeyboardLayout)
         // reset the state
         currentCandidateClient = nil
 
@@ -170,7 +170,7 @@ class ctlInputMethod: IMKInputController {
         if keyHandler.inputMode != newInputMode {
             UserDefaults.standard.synchronize()
             // Remember to override the keyboard layout again -- treat this as an activate event.
-            (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: Preferences.basisKeyboardLayout)
+            (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.basisKeyboardLayout)
             keyHandler.clear()
             keyHandler.inputMode = newInputMode
             self.handle(state: .Empty(), client: client)
@@ -189,14 +189,14 @@ class ctlInputMethod: IMKInputController {
     override func handle(_ event: NSEvent!, client: Any!) -> Bool {
 
         if event.type == .flagsChanged {
-            let functionKeyKeyboardLayoutID = Preferences.functionKeyboardLayout
-            let basisKeyboardLayoutID = Preferences.basisKeyboardLayout
+            let functionKeyKeyboardLayoutID = mgrPrefs.functionKeyboardLayout
+            let basisKeyboardLayoutID = mgrPrefs.basisKeyboardLayout
 
             if functionKeyKeyboardLayoutID == basisKeyboardLayoutID {
                 return false
             }
 
-            let includeShift = Preferences.functionKeyKeyboardLayoutOverrideIncludeShiftKey
+            let includeShift = mgrPrefs.functionKeyKeyboardLayoutOverrideIncludeShiftKey
 
             if event.modifierFlags.contains(.capsLock) ||
                 event.modifierFlags.contains(.option) ||
@@ -238,35 +238,35 @@ class ctlInputMethod: IMKInputController {
     }
 
     @objc func toggleSCPCTypingMode(_ sender: Any?) {
-        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Per-Char Select Mode", comment: ""), "\n", Preferences.toggleSCPCTypingModeEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Per-Char Select Mode", comment: ""), "\n", mgrPrefs.toggleSCPCTypingModeEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 
     @objc func toggleChineseConverter(_ sender: Any?) {
-        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Force KangXi Writing", comment: ""), "\n", Preferences.toggleChineseConversionEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Force KangXi Writing", comment: ""), "\n", mgrPrefs.toggleChineseConversionEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 
     @objc func toggleShiftJISShinjitaiOutput(_ sender: Any?) {
-        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("JIS Shinjitai Output", comment: ""), "\n", Preferences.toggleShiftJISShinjitaiOutputEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("JIS Shinjitai Output", comment: ""), "\n", mgrPrefs.toggleShiftJISShinjitaiOutputEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 
     @objc func toggleHalfWidthPunctuation(_ sender: Any?) {
-        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Half-Width Punctuation Mode", comment: ""), "\n", Preferences.toggleHalfWidthPunctuationEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Half-Width Punctuation Mode", comment: ""), "\n", mgrPrefs.toggleHalfWidthPunctuationEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 
     @objc func toggleCNS11643Enabled(_ sender: Any?) {
-        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("CNS11643 Mode", comment: ""), "\n", Preferences.toggleCNS11643Enabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("CNS11643 Mode", comment: ""), "\n", mgrPrefs.toggleCNS11643Enabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 
     @objc func toggleSymbolEnabled(_ sender: Any?) {
-        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Symbol & Emoji Input", comment: ""), "\n", Preferences.toggleSymbolInputEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Symbol & Emoji Input", comment: ""), "\n", mgrPrefs.toggleSymbolInputEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 
     @objc func toggleAssociatedPhrasesEnabled(_ sender: Any?) {
-        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Per-Char Associated Phrases", comment: ""), "\n", Preferences.toggleAssociatedPhrasesEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Per-Char Associated Phrases", comment: ""), "\n", mgrPrefs.toggleAssociatedPhrasesEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 
     @objc func togglePhraseReplacement(_ sender: Any?) {
-        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Use Phrase Replacement", comment: ""), "\n", Preferences.togglePhraseReplacementEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Use Phrase Replacement", comment: ""), "\n", mgrPrefs.togglePhraseReplacementEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
     }
 
     @objc func selfTerminate(_ sender: Any?) {
@@ -363,17 +363,17 @@ extension ctlInputMethod {
 
         func kanjiConversionIfRequired(_ text: String) -> String {
             if keyHandler.inputMode == InputMode.imeModeCHT {
-                if !Preferences.chineseConversionEnabled && Preferences.shiftJISShinjitaiOutputEnabled {
+                if !mgrPrefs.chineseConversionEnabled && mgrPrefs.shiftJISShinjitaiOutputEnabled {
                     return vChewingKanjiConverter.cnvTradToJIS(text)
                 }
-                if Preferences.chineseConversionEnabled && !Preferences.shiftJISShinjitaiOutputEnabled {
+                if mgrPrefs.chineseConversionEnabled && !mgrPrefs.shiftJISShinjitaiOutputEnabled {
                     return vChewingKanjiConverter.cnvTradToKangXi(text)
                 }
                 // 本來這兩個開關不該同時開啟的，但萬一被開啟了的話就這樣處理：
-                if Preferences.chineseConversionEnabled && Preferences.shiftJISShinjitaiOutputEnabled {
+                if mgrPrefs.chineseConversionEnabled && mgrPrefs.shiftJISShinjitaiOutputEnabled {
                     return vChewingKanjiConverter.cnvTradToJIS(text)
                 }
-                // if (!Preferences.chineseConversionEnabled && !Preferences.shiftJISShinjitaiOutputEnabled) || (keyHandler.inputMode != InputMode.imeModeCHT);
+                // if (!mgrPrefs.chineseConversionEnabled && !mgrPrefs.shiftJISShinjitaiOutputEnabled) || (keyHandler.inputMode != InputMode.imeModeCHT);
                 return text
             }
             return text
@@ -535,14 +535,14 @@ extension ctlInputMethod {
 
         if useVerticalMode {
             gCurrentCandidateController = .vertical
-        } else if Preferences.useHorizontalCandidateList {
+        } else if mgrPrefs.useHorizontalCandidateList {
             gCurrentCandidateController = .horizontal
         } else {
             gCurrentCandidateController = .vertical
         }
 
         // set the attributes for the candidate panel (which uses NSAttributedString)
-        let textSize = Preferences.candidateListTextSize
+        let textSize = mgrPrefs.candidateListTextSize
         let keyLabelSize = max(textSize / 2, kMinKeyLabelSize)
 
         func labelFont(name: String?, size: CGFloat) -> NSFont {
@@ -563,11 +563,11 @@ extension ctlInputMethod {
             return finalReturnFont
         }
 
-        gCurrentCandidateController?.keyLabelFont = labelFont(name: Preferences.candidateKeyLabelFontName, size: keyLabelSize)
-        gCurrentCandidateController?.candidateFont = candidateFont(name: Preferences.candidateTextFontName, size: textSize)
+        gCurrentCandidateController?.keyLabelFont = labelFont(name: mgrPrefs.candidateKeyLabelFontName, size: keyLabelSize)
+        gCurrentCandidateController?.candidateFont = candidateFont(name: mgrPrefs.candidateTextFontName, size: textSize)
 
-        let candidateKeys = Preferences.candidateKeys
-        let keyLabels = candidateKeys.count > 4 ? Array(candidateKeys) : Array(Preferences.defaultCandidateKeys)
+        let candidateKeys = mgrPrefs.candidateKeys
+        let keyLabels = candidateKeys.count > 4 ? Array(candidateKeys) : Array(mgrPrefs.defaultCandidateKeys)
         let keyLabelSuffix = state is InputState.AssociatedPhrases ? "^" : ""
         gCurrentCandidateController?.keyLabels = keyLabels.map {
             CandidateKeyLabel(key: String($0), displayedText: String($0) + keyLabelSuffix)
@@ -695,11 +695,11 @@ extension ctlInputMethod: CandidateControllerDelegate {
                 return
             }
 
-            if Preferences.useSCPCTypingMode {
+            if mgrPrefs.useSCPCTypingMode {
                 keyHandler.clear()
                 let composingBuffer = inputting.composingBuffer
                 handle(state: .Committing(poppedText: composingBuffer), client: client)
-                if Preferences.associatedPhrasesEnabled,
+                if mgrPrefs.associatedPhrasesEnabled,
                    let associatePhrases = keyHandler.buildAssociatePhraseState(withKey: composingBuffer, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrases {
                     self.handle(state: associatePhrases, client: client)
                 } else {
@@ -714,7 +714,7 @@ extension ctlInputMethod: CandidateControllerDelegate {
         if let state = state as? InputState.AssociatedPhrases {
             let selectedValue = state.candidates[Int(index)]
             handle(state: .Committing(poppedText: selectedValue), client: currentCandidateClient)
-            if Preferences.associatedPhrasesEnabled,
+            if mgrPrefs.associatedPhrasesEnabled,
                let associatePhrases = keyHandler.buildAssociatePhraseState(withKey: selectedValue, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrases {
                 self.handle(state: associatePhrases, client: client)
             } else {

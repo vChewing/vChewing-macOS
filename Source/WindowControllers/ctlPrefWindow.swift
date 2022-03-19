@@ -49,7 +49,7 @@ extension RangeReplaceableCollection where Element: Hashable {
         var chosenLanguageItem: NSMenuItem? = nil
         uiLanguageButton.menu?.removeAllItems()
         
-        let appleLanguages = Preferences.appleLanguages
+        let appleLanguages = mgrPrefs.appleLanguages
         for language in languages {
             let menuItem = NSMenuItem()
             menuItem.title = NSLocalizedString(language, comment: "")
@@ -86,7 +86,7 @@ extension RangeReplaceableCollection where Element: Hashable {
         menuItem_AppleZhuyinEten.representedObject = String("com.apple.keylayout.ZhuyinEten")
         basisKeyboardLayoutButton.menu?.addItem(menuItem_AppleZhuyinEten)
 
-        let basisKeyboardLayoutID = Preferences.basisKeyboardLayout
+        let basisKeyboardLayoutID = mgrPrefs.basisKeyboardLayout
 
         for source in list {
             if let categoryPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceCategory) {
@@ -150,11 +150,11 @@ extension RangeReplaceableCollection where Element: Hashable {
 
         selectionKeyComboBox.usesDataSource = false
         selectionKeyComboBox.removeAllItems()
-        selectionKeyComboBox.addItems(withObjectValues: Preferences.suggestedCandidateKeys)
+        selectionKeyComboBox.addItems(withObjectValues: mgrPrefs.suggestedCandidateKeys)
 
-        var candidateSelectionKeys = Preferences.candidateKeys
+        var candidateSelectionKeys = mgrPrefs.candidateKeys
         if candidateSelectionKeys.isEmpty {
-            candidateSelectionKeys = Preferences.defaultCandidateKeys
+            candidateSelectionKeys = mgrPrefs.defaultCandidateKeys
         }
 
         selectionKeyComboBox.stringValue = candidateSelectionKeys
@@ -163,28 +163,28 @@ extension RangeReplaceableCollection where Element: Hashable {
     // 這裡有必要加上這段處理，用來確保藉由偏好設定介面動過的 CNS 開關能夠立刻生效。
     // 所有涉及到語言模型開關的內容均需要這樣處理。
     @IBAction func toggleCNSSupport(_ sender: Any) {
-        mgrLangModel.setCNSEnabled(Preferences.cns11643Enabled)
+        mgrLangModel.setCNSEnabled(mgrPrefs.cns11643Enabled)
     }
 
     @IBAction func toggleSymbolInputEnabled(_ sender: Any) {
-        mgrLangModel.setSymbolEnabled(Preferences.symbolInputEnabled)
+        mgrLangModel.setSymbolEnabled(mgrPrefs.symbolInputEnabled)
     }
 
     @IBAction func toggleTrad2KangXiAction(_ sender: Any) {
         if chkTrad2KangXi.state == .on && chkTrad2JISShinjitai.state == .on {
-            Preferences.toggleShiftJISShinjitaiOutputEnabled()
+            mgrPrefs.toggleShiftJISShinjitaiOutputEnabled()
         }
     }
 
     @IBAction func toggleTrad2JISShinjitaiAction(_ sender: Any) {
         if chkTrad2KangXi.state == .on && chkTrad2JISShinjitai.state == .on {
-            Preferences.toggleChineseConversionEnabled()
+            mgrPrefs.toggleChineseConversionEnabled()
         }
     }
 
     @IBAction func updateBasisKeyboardLayoutAction(_ sender: Any) {
         if let sourceID = basisKeyboardLayoutButton.selectedItem?.representedObject as? String {
-            Preferences.basisKeyboardLayout = sourceID
+            mgrPrefs.basisKeyboardLayout = sourceID
         }
     }
     
@@ -196,7 +196,7 @@ extension RangeReplaceableCollection where Element: Hashable {
         }
         if let language = uiLanguageButton.selectedItem?.representedObject as? String {
             if (language != "auto") {
-                Preferences.appleLanguages = [language]
+                mgrPrefs.appleLanguages = [language]
             }
             else {
                 UserDefaults.standard.removeObject(forKey: "AppleLanguages")
@@ -216,18 +216,18 @@ extension RangeReplaceableCollection where Element: Hashable {
             return
         }
         do {
-            try Preferences.validate(candidateKeys: keys)
-            Preferences.candidateKeys = keys
-            selectionKeyComboBox.stringValue = Preferences.candidateKeys
+            try mgrPrefs.validate(candidateKeys: keys)
+            mgrPrefs.candidateKeys = keys
+            selectionKeyComboBox.stringValue = mgrPrefs.candidateKeys
         }
-        catch Preferences.CandidateKeyError.empty {
-            selectionKeyComboBox.stringValue = Preferences.candidateKeys
+        catch mgrPrefs.CandidateKeyError.empty {
+            selectionKeyComboBox.stringValue = mgrPrefs.candidateKeys
         }
         catch {
             if let window = window {
                 let alert = NSAlert(error: error)
                 alert.beginSheetModal(for: window) { response in
-                    self.selectionKeyComboBox.stringValue = Preferences.candidateKeys
+                    self.selectionKeyComboBox.stringValue = mgrPrefs.candidateKeys
                 }
                 clsSFX.beep()
             }

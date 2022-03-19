@@ -148,7 +148,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
     func helper(_ helper: FSEventStreamHelper, didReceive events: [FSEventStreamHelper.Event]) {
         // 拖 100ms 再重載，畢竟有些有特殊需求的使用者可能會想使用巨型自訂語彙檔案。
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
-            if Preferences.shouldAutoReloadUserDataFiles {
+            if mgrPrefs.shouldAutoReloadUserDataFiles {
                 mgrLangModel.loadUserPhrases()
                 mgrLangModel.loadUserPhraseReplacement()
                 mgrLangModel.loadUserAssociatedPhrases()
@@ -184,7 +184,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
         fsStreamHelper.delegate = self
         _ = fsStreamHelper.start()
 
-        Preferences.setMissingDefaults()
+        mgrPrefs.setMissingDefaults()
         
         // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
         if (UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) != nil) == true {
@@ -296,7 +296,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
 @objc public class IME: NSObject {
     // Print debug information to the console.
     @objc static func prtDebugIntel(_ strPrint: String) {
-        if Preferences.isDebugModeEnabled {
+        if mgrPrefs.isDebugModeEnabled {
             NSLog("vChewingErrorCallback: %@", strPrint)
         }
     }

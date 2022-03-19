@@ -20,7 +20,7 @@ import Cocoa
 
 @objc class AppleKeyboardConverter: NSObject {
     @objc class func isDynamicBaseKeyboardLayoutEnabled() -> Bool {
-        switch Preferences.basisKeyboardLayout {
+        switch mgrPrefs.basisKeyboardLayout {
         case "com.apple.keylayout.ZhuyinBopomofo":
             return true
         case "com.apple.keylayout.ZhuyinEten":
@@ -45,7 +45,7 @@ import Cocoa
         // 在按鍵資訊被送往 OVMandarin 之前，先轉換為可以被 OVMandarin 正常處理的資訊。
         if self.isDynamicBaseKeyboardLayoutEnabled() {
             // 針對不同的 Apple 動態鍵盤佈局糾正大寫英文輸入。
-            switch Preferences.basisKeyboardLayout {
+            switch mgrPrefs.basisKeyboardLayout {
             case "com.apple.keylayout.ZhuyinBopomofo": do {
                 if (charCode == 97) {charCode = UniChar(65)}
                 if (charCode == 98) {charCode = UniChar(66)}
@@ -166,7 +166,7 @@ import Cocoa
             if (charCode == 65288) {charCode = UniChar(40)}
             if (charCode == 65289) {charCode = UniChar(41)}
             // Apple 倚天注音佈局追加符號糾正項目。
-            if Preferences.basisKeyboardLayout == "com.apple.keylayout.ZhuyinEten" {
+            if mgrPrefs.basisKeyboardLayout == "com.apple.keylayout.ZhuyinEten" {
                 if (charCode == 65343) {charCode = UniChar(95)}
                 if (charCode == 65306) {charCode = UniChar(58)}
                 if (charCode == 65311) {charCode = UniChar(63)}
@@ -181,7 +181,7 @@ import Cocoa
         var strProcessed = strProcessed
         if self.isDynamicBaseKeyboardLayoutEnabled() {
             // 針對不同的 Apple 動態鍵盤佈局糾正大寫英文輸入。
-            switch Preferences.basisKeyboardLayout {
+            switch mgrPrefs.basisKeyboardLayout {
             case "com.apple.keylayout.ZhuyinBopomofo": do {
                 if (strProcessed == "a") {strProcessed = "A"}
                 if (strProcessed == "b") {strProcessed = "B"}
@@ -302,7 +302,7 @@ import Cocoa
             if (strProcessed == "（") {strProcessed = "("}
             if (strProcessed == "）") {strProcessed = ")"}
             // Apple 倚天注音佈局追加符號糾正項目。
-            if Preferences.basisKeyboardLayout == "com.apple.keylayout.ZhuyinEten" {
+            if mgrPrefs.basisKeyboardLayout == "com.apple.keylayout.ZhuyinEten" {
                 if (strProcessed == "＿") {strProcessed = "_"}
                 if (strProcessed == "：") {strProcessed = ":"}
                 if (strProcessed == "？") {strProcessed = "?"}
