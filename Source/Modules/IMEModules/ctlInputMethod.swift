@@ -188,25 +188,22 @@ class ctlInputMethod: IMKInputController {
 
     override func handle(_ event: NSEvent!, client: Any!) -> Bool {
 
-        if event.type == .flagsChanged {
-            let functionKeyKeyboardLayoutID = mgrPrefs.functionKeyboardLayout
-            let basisKeyboardLayoutID = mgrPrefs.basisKeyboardLayout
-
-            if functionKeyKeyboardLayoutID == basisKeyboardLayoutID {
-                return false
-            }
-
+        // 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
+        // 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
+        // 同時注意：必須將 event.type == .flagsChanged 放在最外圍、且在其結尾插入 return false，
+        // 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
+        if (mgrPrefs.functionKeyboardLayout != mgrPrefs.basisKeyboardLayout) && (event.type == .flagsChanged) {
             let includeShift = mgrPrefs.functionKeyKeyboardLayoutOverrideIncludeShiftKey
-
-            if event.modifierFlags.contains(.capsLock) ||
+            if (event.modifierFlags == .capsLock ||
+                event.modifierFlags.contains(.command) ||
                 event.modifierFlags.contains(.option) ||
                 event.modifierFlags.contains(.control) ||
                 event.modifierFlags.contains(.function) ||
-                       (event.modifierFlags.contains(.shift) && includeShift) {
-                (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: functionKeyKeyboardLayoutID)
-                return false
+                       (event.modifierFlags.contains(.shift) && includeShift)) {
+                (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.functionKeyboardLayout)
+            } else {
+                (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.basisKeyboardLayout)
             }
-            (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: basisKeyboardLayoutID)
             return false
         }
 
