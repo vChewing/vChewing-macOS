@@ -158,6 +158,7 @@ class InputState: NSObject {
 
         @objc private(set) var markerIndex: UInt
         @objc private(set) var markedRange: NSRange
+        @objc private var deleteTargetExists = false
         @objc var tooltip: String {
 
             if composingBuffer.count != readings.count {
@@ -192,6 +193,7 @@ class InputState: NSObject {
             let joined = selectedReadings.joined(separator: "-")
             let exist = mgrLangModel.checkIfUserPhraseExist(userPhrase: text, mode: ctlInputMethod.currentKeyHandler.inputMode, key: joined)
             if exist {
+                deleteTargetExists = exist
                 TooltipController.backgroundColor = NSColor(red: 0.00, green: 0.18, blue: 0.13, alpha: 1.00)
                 TooltipController.textColor = NSColor(red: 0.00, green: 1.00, blue: 0.74, alpha: 1.00)
                 return String(format: NSLocalizedString("\"%@\" already exists, ENTER to boost its priority.", comment: ""), text)
@@ -255,6 +257,9 @@ class InputState: NSObject {
                 return false
             }
             if markedRange.length > kMaxMarkRangeLength {
+                return false
+            }
+            if ctlInputMethod.areWeDeleting && !deleteTargetExists {
                 return false
             }
             return markedRange.length >= kMinMarkRangeLength && markedRange.length <= kMaxMarkRangeLength
