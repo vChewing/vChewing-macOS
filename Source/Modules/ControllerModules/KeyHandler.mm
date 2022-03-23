@@ -525,12 +525,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     // MARK: Enter
     if ([input isEnter]) {
-        if ([input isControlHold]) {
-            if (ctlInputMethod.areWeUsingOurOwnPhraseEditor || [input isCommandHold]) {
-                return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
-            }
-        }
-        return [self _handleEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+        return ([input isControlHold] && [input isCommandHold]) ?
+            [self _handleCtrlCommandEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback]
+        :
+            [self _handleEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     // MARK: Punctuation list
@@ -850,7 +848,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     return YES;
 }
 
-- (BOOL)_handleCtrlEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+- (BOOL)_handleCtrlCommandEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     if (![state isKindOfClass:[InputStateInputting class]]) return NO;
 
