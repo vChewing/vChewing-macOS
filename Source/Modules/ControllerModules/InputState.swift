@@ -196,11 +196,11 @@ class InputState: NSObject {
                 deleteTargetExists = exist
                 TooltipController.backgroundColor = NSColor(red: 0.00, green: 0.18, blue: 0.13, alpha: 1.00)
                 TooltipController.textColor = NSColor(red: 0.00, green: 1.00, blue: 0.74, alpha: 1.00)
-                return String(format: NSLocalizedString("\"%@\" already exists, ENTER to boost its priority.", comment: ""), text)
+                return String(format: NSLocalizedString("\"%@\" already exists: ↩ to boost, ⇧⌘↩ to exclude.", comment: ""), text)
             }
             TooltipController.backgroundColor = NSColor(red: 0.18, green: 0.18, blue: 0.18, alpha: 1.00)
             TooltipController.textColor = NSColor.white
-            return String(format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: ""), text)
+            return String(format: NSLocalizedString("\"%@\" selected. ↩ to add user phrase.", comment: ""), text)
         }
 
         @objc var tooltipForInputting: String = ""
