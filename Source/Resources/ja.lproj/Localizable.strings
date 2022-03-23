@@ -23,8 +23,8 @@
 "Half-Width Punctuation Mode" = "半角句読モード";
 "\"%@\" length must ≥ 2 for a user phrase." = "「%@」もう１つ文字のお選びを。";
 "\"%@\" length should ≤ %d for a user phrase." = "「%@」文字数過剰で登録不可、%d 文字以内にして下さい。";
-"\"%@\" selected. ENTER to add user phrase." = "「%@」を ENTER で辞書に登録。";
-"\"%@\" already exists, ENTER to boost its priority." = "「%@」は既存語彙であり、ENTER で最優先にする。";
+"\"%@\" selected. ↩ to add user phrase." = "「%@」を ↩ で辞書に登録。";
+"\"%@\" already exists: ↩ to boost, ⇧⌘↩ to exclude." = "「%@」は既存語彙：↩ で最優先にし；⇧⌘↩ で排除。";
 "Edit Phrase Replacement Table…" = "言葉置換表を編集…";
 "Use Phrase Replacement" = "言葉置換機能";
 "Candidates keys cannot be empty." = "言選り用キー陣列に何かキーをご登録ください。";
