@@ -41,6 +41,8 @@ class ctlInputMethod: IMKInputController {
     @objc static let kIMEModeCHS = "org.atelierInmu.inputmethod.vChewing.IMECHS";
     @objc static let kIMEModeCHT = "org.atelierInmu.inputmethod.vChewing.IMECHT";
     @objc static let kIMEModeNULL = "org.atelierInmu.inputmethod.vChewing.IMENULL";
+    
+    @objc static var areWeDeleting = false;
 
     private static let tooltipController = TooltipController()
 
@@ -204,6 +206,8 @@ class ctlInputMethod: IMKInputController {
             } else {
                 (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.basisKeyboardLayout)
             }
+            // 準備修飾鍵，用來判定是否需要利用就地新增語彙時的 Enter 鍵來砍詞。
+            ctlInputMethod.areWeDeleting = event.modifierFlags.contains([.shift, .command])
             return false
         }
 
@@ -644,8 +648,8 @@ extension ctlInputMethod: KeyHandlerDelegate {
             return false
         }
         let InputModeReversed: InputMode = (ctlInputMethod.currentKeyHandler.inputMode == InputMode.imeModeCHT) ? InputMode.imeModeCHS : InputMode.imeModeCHT
-        mgrLangModel.writeUserPhrase(state.userPhrase, inputMode: keyHandler.inputMode, areWeDuplicating: state.chkIfUserPhraseExists)
-        mgrLangModel.writeUserPhrase(state.userPhraseConverted, inputMode: InputModeReversed, areWeDuplicating: false)
+        mgrLangModel.writeUserPhrase(state.userPhrase, inputMode: keyHandler.inputMode, areWeDuplicating: state.chkIfUserPhraseExists, areWeDeleting: ctlInputMethod.areWeDeleting)
+        mgrLangModel.writeUserPhrase(state.userPhraseConverted, inputMode: InputModeReversed, areWeDuplicating: false, areWeDeleting: ctlInputMethod.areWeDeleting)
         return true
     }
 }
