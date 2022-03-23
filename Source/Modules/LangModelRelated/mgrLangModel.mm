@@ -235,14 +235,14 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     return NO;
 }
 
-+ (BOOL)writeUserPhrase:(NSString *)userPhrase inputMode:(InputMode)mode areWeDuplicating:(BOOL)areWeDuplicating
++ (BOOL)writeUserPhrase:(NSString *)userPhrase inputMode:(InputMode)mode areWeDuplicating:(BOOL)areWeDuplicating areWeDeleting:(BOOL)areWeDeleting
 {
     if (![self checkIfUserLanguageModelFilesExist]) {
         return NO;
     }
 
     // BOOL addLineBreakAtFront = NO;
-    NSString *path = [self userPhrasesDataPath:mode];
+    NSString *path = areWeDeleting ? [self excludedPhrasesDataPath:mode] : [self userPhrasesDataPath:mode];
 
 //    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
 //        NSError *error = nil;
@@ -267,7 +267,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     //     [currentMarkedPhrase appendString:@"\n"];
     // }
     [currentMarkedPhrase appendString:userPhrase];
-    if (areWeDuplicating) {
+    if (areWeDuplicating && !areWeDeleting) {
         // Do not use ASCII characters to comment here.
         // Otherwise, it will be scrambled by HYPY2BPMF module shipped in the vChewing Phrase Editor.
         [currentMarkedPhrase appendString:@"\t#𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎"];
