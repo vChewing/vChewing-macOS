@@ -164,7 +164,7 @@ class InputState: NSObject {
             if composingBuffer.count != readings.count {
                 TooltipController.backgroundColor = NSColor(red: 0.55, green: 0.00, blue: 0.00, alpha: 1.00)
                 TooltipController.textColor = NSColor.white
-                return NSLocalizedString("⚠︎ Unhandlable char selected for user phrases.", comment: "")
+                return NSLocalizedString("⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.", comment: "")
             }
 
             if mgrPrefs.phraseReplacementEnabled {
