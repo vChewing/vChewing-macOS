@@ -1002,7 +1002,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     UniChar charCode = input.charCode;
     VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
 
-    BOOL cancelCandidateKey = [input isBackSpace] || [input isESC] || [input isDelete];
+    BOOL cancelCandidateKey = [input isBackSpace] || [input isESC] || [input isDelete]
+        || (([input isCursorBackward] || [input isCursorForward]) && [input isShiftHold]);
 
     if (cancelCandidateKey) {
         if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
