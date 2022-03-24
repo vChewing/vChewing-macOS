@@ -104,7 +104,6 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
         let transparentVisualEffect = NSVisualEffectView()
         transparentVisualEffect.blendingMode = .behindWindow
         transparentVisualEffect.state = .active
-        transparentVisualEffect.material = .dark
 
         let panel = NotifierWindow(contentRect: windowRect, styleMask: styleMask, backing: .buffered, defer: false)
         panel.contentView = transparentVisualEffect

@@ -41,6 +41,8 @@ class ctlInputMethod: IMKInputController {
     @objc static let kIMEModeCHS = "org.atelierInmu.inputmethod.vChewing.IMECHS";
     @objc static let kIMEModeCHT = "org.atelierInmu.inputmethod.vChewing.IMECHT";
     @objc static let kIMEModeNULL = "org.atelierInmu.inputmethod.vChewing.IMENULL";
+    
+    @objc static var areWeDeleting = false;
 
     private static let tooltipController = TooltipController()
 
@@ -188,25 +190,24 @@ class ctlInputMethod: IMKInputController {
 
     override func handle(_ event: NSEvent!, client: Any!) -> Bool {
 
-        if event.type == .flagsChanged {
-            let functionKeyKeyboardLayoutID = mgrPrefs.functionKeyboardLayout
-            let basisKeyboardLayoutID = mgrPrefs.basisKeyboardLayout
-
-            if functionKeyKeyboardLayoutID == basisKeyboardLayoutID {
-                return false
-            }
-
+        // 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
+        // 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
+        // 同時注意：必須將 event.type == .flagsChanged 放在最外圍、且在其結尾插入 return false，
+        // 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
+        if (mgrPrefs.functionKeyboardLayout != mgrPrefs.basisKeyboardLayout) && (event.type == .flagsChanged) {
             let includeShift = mgrPrefs.functionKeyKeyboardLayoutOverrideIncludeShiftKey
-
-            if event.modifierFlags.contains(.capsLock) ||
+            if (event.modifierFlags == .capsLock ||
+                event.modifierFlags.contains(.command) ||
                 event.modifierFlags.contains(.option) ||
                 event.modifierFlags.contains(.control) ||
                 event.modifierFlags.contains(.function) ||
-                       (event.modifierFlags.contains(.shift) && includeShift) {
-                (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: functionKeyKeyboardLayoutID)
-                return false
+                       (event.modifierFlags.contains(.shift) && includeShift)) {
+                (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.functionKeyboardLayout)
+            } else {
+                (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.basisKeyboardLayout)
             }
-            (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: basisKeyboardLayoutID)
+            // 準備修飾鍵，用來判定是否需要利用就地新增語彙時的 Enter 鍵來砍詞。
+            ctlInputMethod.areWeDeleting = event.modifierFlags.contains([.shift, .command])
             return false
         }
 
@@ -647,8 +648,8 @@ extension ctlInputMethod: KeyHandlerDelegate {
             return false
         }
         let InputModeReversed: InputMode = (ctlInputMethod.currentKeyHandler.inputMode == InputMode.imeModeCHT) ? InputMode.imeModeCHS : InputMode.imeModeCHT
-        mgrLangModel.writeUserPhrase(state.userPhrase, inputMode: keyHandler.inputMode, areWeDuplicating: state.chkIfUserPhraseExists)
-        mgrLangModel.writeUserPhrase(state.userPhraseConverted, inputMode: InputModeReversed, areWeDuplicating: false)
+        mgrLangModel.writeUserPhrase(state.userPhrase, inputMode: keyHandler.inputMode, areWeDuplicating: state.chkIfUserPhraseExists, areWeDeleting: ctlInputMethod.areWeDeleting)
+        mgrLangModel.writeUserPhrase(state.userPhraseConverted, inputMode: InputModeReversed, areWeDuplicating: false, areWeDeleting: ctlInputMethod.areWeDeleting)
         return true
     }
 }
