@@ -72,7 +72,7 @@
 
 威注音輸入法 macOS 版程式維護：Shiki Suen。特別感謝 Hiraku Wong 等人的技術協力。
 
-威注音詞庫由孫志貴維護，以 3-Clause BSD License 授權釋出。
+威注音詞庫由 Shiki Suen 維護，以 3-Clause BSD License 授權釋出。其中的詞頻數據[由 NAER 授權用於非商業用途](https://twitter.com/ShikiSuen/status/1479329302713831424)。
 
 使用者可自由使用、散播本軟體，惟散播時必須完整保留版權聲明及軟體授權、且一旦經過修改便不可以再繼續使用威注音的產品名稱。
 

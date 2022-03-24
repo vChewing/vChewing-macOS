@@ -686,6 +686,8 @@
 			<dict>
 				<key>POSTINSTALL_PATH</key>
 				<dict>
+					<key>PATH</key>
+					<string>Installer/pkgPostInstall.sh</string>
 					<key>PATH_TYPE</key>
 					<integer>1</integer>
 				</dict>
@@ -724,7 +726,7 @@
 				<key>USE_HFS+_COMPRESSION</key>
 				<false/>
 				<key>VERSION</key>
-				<string>1.4.0</string>
+				<string>1.4.2</string>
 			</dict>
 			<key>TYPE</key>
 			<integer>0</integer>

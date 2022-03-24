@@ -525,12 +525,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     // MARK: Enter
     if ([input isEnter]) {
-        if ([input isControlHold]) {
-            if (ctlInputMethod.areWeUsingOurOwnPhraseEditor || [input isCommandHold]) {
-                return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
-            }
-        }
-        return [self _handleEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+        return ([input isControlHold] && [input isCommandHold]) ?
+            [self _handleCtrlCommandEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback]
+        :
+            [self _handleEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     // MARK: Punctuation list
@@ -592,10 +590,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         }
     }
 
-    // still nothing, then we update the composing buffer (some app has
-    // strange behavior if we don't do this, "thinking" the key is not
-    // actually consumed)
+    // still nothing, then we update the composing buffer (some app has strange behavior if we don't do this, "thinking" the key is not actually consumed)
+    // 砍掉這一段會導致「F1-F12 按鍵干擾組字區」的問題。暫時只能先恢復這段，且補上偵錯彙報機制，方便今後排查故障。
     if ([state isKindOfClass:[InputStateNotEmpty class]] || !_bpmfReadingBuffer->isEmpty()) {
+        [IME prtDebugIntel:[NSString stringWithFormat:@"Blocked data: charCode: %c, keyCode: %c", charCode, input.keyCode]];
         [IME prtDebugIntel:@"A9BFF20E"];
         errorCallback();
         stateCallback(state);
@@ -850,7 +848,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     return YES;
 }
 
-- (BOOL)_handleCtrlEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+- (BOOL)_handleCtrlCommandEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     if (![state isKindOfClass:[InputStateInputting class]]) return NO;
 
@@ -1002,7 +1000,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     UniChar charCode = input.charCode;
     VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
 
-    BOOL cancelCandidateKey = [input isBackSpace] || [input isESC] || [input isDelete];
+    BOOL cancelCandidateKey = [input isBackSpace] || [input isESC] || [input isDelete]
+        || (([input isCursorBackward] || [input isCursorForward]) && [input isShiftHold]);
 
     if (cancelCandidateKey) {
         if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
