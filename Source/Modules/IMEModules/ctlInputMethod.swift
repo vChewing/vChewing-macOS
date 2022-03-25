@@ -205,10 +205,11 @@ class ctlInputMethod: IMKInputController {
             } else {
                 (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.basisKeyboardLayout)
             }
-            // 準備修飾鍵，用來判定是否需要利用就地新增語彙時的 Enter 鍵來砍詞。
-            ctlInputMethod.areWeDeleting = event.modifierFlags.contains([.shift, .command])
             return false
         }
+
+        // 準備修飾鍵，用來判定是否需要利用就地新增語彙時的 Enter 鍵來砍詞。
+        ctlInputMethod.areWeDeleting = event.modifierFlags.contains([.shift, .command])
 
         var textFrame = NSRect.zero
         let attributes: [AnyHashable: Any]? = (client as? IMKTextInput)?.attributes(forCharacterIndex: 0, lineHeightRectangle: &textFrame)
