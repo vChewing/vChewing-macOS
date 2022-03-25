@@ -35,6 +35,16 @@ import Cocoa
             return true
         case "org.atelierInmu.vChewing.keyLayouts.vchewingeten":
             return true
+        case "org.unknown.keylayout.vChewingDachen":
+            return true
+        case "org.unknown.keylayout.vChewingFakeSeigyou":
+            return true
+        case "org.unknown.keylayout.vChewingETen":
+            return true
+        case "org.unknown.keylayout.vChewingIBM":
+            return true
+        case "org.unknown.keylayout.vChewingMiTAC":
+            return true
         default:
             return false
         }
