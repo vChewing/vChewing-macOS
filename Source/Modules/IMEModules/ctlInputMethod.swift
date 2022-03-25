@@ -61,6 +61,13 @@ class ctlInputMethod: IMKInputController {
     static var currentKeyHandler: KeyHandler = KeyHandler()
     @objc static var currentInputMode = ""
 
+    // MARK: - Keyboard Layout Specifier
+
+    @objc func setKeyLayout(isfunctionKeyboardLayout: Bool = false) {
+        let client = client().self as IMKTextInput
+        client.overrideKeyboard(withKeyboardNamed: isfunctionKeyboardLayout ? mgrPrefs.functionKeyboardLayout : mgrPrefs.basisKeyboardLayout)
+    }
+
     // MARK: - IMKInputController methods
 
     override init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
