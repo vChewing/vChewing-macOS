@@ -146,6 +146,10 @@ class KeyHandlerInput: NSObject {
         flags.contains([.numericPad])
     }
 
+    @objc var isFunctionKeyHold: Bool {
+        flags.contains([.function])
+    }
+
     @objc var isReservedKey: Bool {
         guard let code = KeyCode(rawValue: keyCode) else {
             return false
