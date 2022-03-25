@@ -145,6 +145,9 @@ class ctlInputMethod: IMKInputController {
         if optionKeyPressed {
             menu.addItem(withTitle: NSLocalizedString("Reboot vChewing…", comment: ""), action: #selector(selfTerminate(_:)), keyEquivalent: "")
         }
+
+        // NSMenu 會阻止任何 modified key 相關的訊號傳回輸入法，所以咱們在此重設鍵盤佈局
+        setKeyLayout(isfunctionKeyboardLayout: false)
         return menu
     }
 
