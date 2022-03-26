@@ -19,6 +19,18 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 import Cocoa
 
 @objc public class IME: NSObject {
+    // 直接在 AppleKeyboardConverter 內使用 KeyParser 判定修飾鍵狀態的話，會出現蛇吞自己尾巴的現象。
+    // 所以就藉由 ctlInputMethod 的這幾個常態變數來判斷。
+    // 這裡不會列出全部的 modifier flags，只會列出可能會影響符號輸入的 flags、主要用於 AppleKeyboardConverter。
+    @objc static var isOptionPressed: Bool = false
+    @objc static var isShiftPressed: Bool = false
+    @objc static var isCapsLockOn: Bool = false
+    @objc static var isCommandPressed: Bool = false
+    @objc static var isNumericPad: Bool = false
+    @objc static var isFunction: Bool = false
+
+    // MARK: - Functions
+
     // Print debug information to the console.
     @objc static func prtDebugIntel(_ strPrint: String) {
         if mgrPrefs.isDebugModeEnabled {
