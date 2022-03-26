@@ -296,27 +296,3 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
         NSApplication.shared.activate(ignoringOtherApps: true)
     }
 }
-
-@objc public class IME: NSObject {
-    // Print debug information to the console.
-    @objc static func prtDebugIntel(_ strPrint: String) {
-        if mgrPrefs.isDebugModeEnabled {
-            NSLog("vChewingErrorCallback: %@", strPrint)
-        }
-    }
-    @objc static func isDarkMode() -> Bool {
-        if #available(macOS 10.15, *) {
-            let appearanceDescription = NSApplication.shared.effectiveAppearance.debugDescription.lowercased()
-            if appearanceDescription.contains("dark") {
-                return true
-            }
-        } else if #available(macOS 10.14, *) {
-            if let appleInterfaceStyle = UserDefaults.standard.object(forKey: "AppleInterfaceStyle") as? String {
-                if appleInterfaceStyle.lowercased().contains("dark") {
-                    return true
-                }
-            }
-        }
-        return false
-    }
-}
