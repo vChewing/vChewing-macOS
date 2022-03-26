@@ -35,6 +35,16 @@ import Cocoa
             return true
         case "org.atelierInmu.vChewing.keyLayouts.vchewingeten":
             return true
+        case "org.unknown.keylayout.vChewingDachen":
+            return true
+        case "org.unknown.keylayout.vChewingFakeSeigyou":
+            return true
+        case "org.unknown.keylayout.vChewingETen":
+            return true
+        case "org.unknown.keylayout.vChewingIBM":
+            return true
+        case "org.unknown.keylayout.vChewingMiTAC":
+            return true
         default:
             return false
         }
@@ -165,6 +175,8 @@ import Cocoa
             if (charCode == 65290) {charCode = UniChar(42)}
             if (charCode == 65288) {charCode = UniChar(40)}
             if (charCode == 65289) {charCode = UniChar(41)}
+            // 摁了 Alt 的符號。
+            if (charCode == 8212) {charCode = UniChar(45)}
             // Apple 倚天注音佈局追加符號糾正項目。
             if mgrPrefs.basisKeyboardLayout == "com.apple.keylayout.ZhuyinEten" {
                 if (charCode == 65343) {charCode = UniChar(95)}
@@ -301,6 +313,8 @@ import Cocoa
             if (strProcessed == "＊") {strProcessed = "*"}
             if (strProcessed == "（") {strProcessed = "("}
             if (strProcessed == "）") {strProcessed = ")"}
+            // 摁了 Alt 的符號。
+            if (strProcessed == "—") {strProcessed = "-"}
             // Apple 倚天注音佈局追加符號糾正項目。
             if mgrPrefs.basisKeyboardLayout == "com.apple.keylayout.ZhuyinEten" {
                 if (strProcessed == "＿") {strProcessed = "_"}

@@ -50,7 +50,7 @@ enum CharCode: UInt/*16*/ {
     // - CharCode is not reliable at all. KeyCode is the most accurate. KeyCode doesn't give a phuque about the character sent through macOS keyboard layouts but only focuses on which physical key is pressed.
 }
 
-class KeyHandlerInput: NSObject {
+class keyParser: NSObject {
     @objc private (set) var useVerticalMode: Bool
     @objc private (set) var inputText: String?
     @objc private (set) var inputTextIgnoringModifiers: String?
@@ -134,6 +134,10 @@ class KeyHandlerInput: NSObject {
         flags.contains([.control]) && inputText?.first?.isLetter ?? false
     }
 
+    @objc var isOptionHotKey: Bool {
+        flags.contains([.option]) && inputText?.first?.isLetter ?? false
+    }
+
     @objc var isOptionHold: Bool {
         flags.contains([.option])
     }
@@ -144,6 +148,10 @@ class KeyHandlerInput: NSObject {
 
     @objc var isNumericPad: Bool {
         flags.contains([.numericPad])
+    }
+
+    @objc var isFunctionKeyHold: Bool {
+        flags.contains([.function])
     }
 
     @objc var isReservedKey: Bool {
