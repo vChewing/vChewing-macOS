@@ -19,7 +19,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 #import <Foundation/Foundation.h>
 
-@class KeyHandlerInput;
+@class keyParser;
 @class InputState;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -40,7 +40,7 @@ extern InputMode imeModeNULL;
 @interface KeyHandler : NSObject
 
 - (BOOL)isBuilderEmpty;
-- (BOOL)handleInput:(KeyHandlerInput *)input
+- (BOOL)handleInput:(keyParser *)input
               state:(InputState *)state
       stateCallback:(void (^)(InputState *))stateCallback
       errorCallback:(void (^)(void))errorCallback NS_SWIFT_NAME(handle(input:state:stateCallback:errorCallback:));
