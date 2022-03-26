@@ -70,7 +70,7 @@
 		D41355DE278EA3ED005E5CBD /* UserPhrasesLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355DC278EA3ED005E5CBD /* UserPhrasesLM.mm */; };
 		D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427F76B278CA1BA004A2160 /* AppDelegate.swift */; };
 		D44FB74D2792189A003C80A6 /* PhraseReplacementMap.mm in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74B2792189A003C80A6 /* PhraseReplacementMap.mm */; };
-		D456576E279E4F7B00DF6BC9 /* KeyHandlerInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */; };
+		D456576E279E4F7B00DF6BC9 /* KeyParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D456576D279E4F7B00DF6BC9 /* KeyParser.swift */; };
 		D461B792279DAC010070E734 /* InputState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D461B791279DAC010070E734 /* InputState.swift */; };
 		D47B92C027972AD100458394 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47B92BF27972AC800458394 /* main.swift */; };
 		D47D73AC27A6CAE600255A50 /* AssociatedPhrases.mm in Sources */ = {isa = PBXBuildFile; fileRef = D47D73AA27A6CAE600255A50 /* AssociatedPhrases.mm */; };
@@ -262,7 +262,7 @@
 		D427F76B278CA1BA004A2160 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D44FB74B2792189A003C80A6 /* PhraseReplacementMap.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PhraseReplacementMap.mm; sourceTree = "<group>"; };
 		D44FB74C2792189A003C80A6 /* PhraseReplacementMap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PhraseReplacementMap.h; sourceTree = "<group>"; };
-		D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyHandlerInput.swift; sourceTree = "<group>"; };
+		D456576D279E4F7B00DF6BC9 /* KeyParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyParser.swift; sourceTree = "<group>"; };
 		D461B791279DAC010070E734 /* InputState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputState.swift; sourceTree = "<group>"; };
 		D47B92BF27972AC800458394 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		D47D73AA27A6CAE600255A50 /* AssociatedPhrases.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AssociatedPhrases.mm; sourceTree = "<group>"; };
@@ -373,7 +373,7 @@
 				D461B791279DAC010070E734 /* InputState.swift */,
 				D4E569DA27A34CC100AC2CEF /* KeyHandler.h */,
 				D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */,
-				D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */,
+				D456576D279E4F7B00DF6BC9 /* KeyParser.swift */,
 				6ACC3D3E27914F2400F1B140 /* KeyValueBlobReader.cpp */,
 				6ACC3D3C27914AAB00F1B140 /* KeyValueBlobReader.h */,
 				5B62A33727AE79CD00A19448 /* NSStringUtils.swift */,
@@ -963,7 +963,7 @@
 				D47F7DD0278C0897002F9DD7 /* ctlNonModalAlertWindow.swift in Sources */,
 				5B62A32F27AE78B000A19448 /* CoreLM.mm in Sources */,
 				5BE78BE027B38804005EA1BE /* LMConsolidator.mm in Sources */,
-				D456576E279E4F7B00DF6BC9 /* KeyHandlerInput.swift in Sources */,
+				D456576E279E4F7B00DF6BC9 /* KeyParser.swift in Sources */,
 				D47F7DCE278BFB57002F9DD7 /* ctlPrefWindow.swift in Sources */,
 				D47D73AC27A6CAE600255A50 /* AssociatedPhrases.mm in Sources */,
 				5B62A34A27AE7CD900A19448 /* NotifierController.swift in Sources */,
