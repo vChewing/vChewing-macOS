@@ -272,7 +272,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     // if the composing buffer is empty and there's no reading, and there is some function key combination, we ignore it
-    BOOL isFunctionKey = ([input isCommandHold] || [input isOptionHold] || [input isNumericPad]) || [input isControlHotKey];
+    BOOL isFunctionKey = ([input isCommandHold] || [input isOptionHotKey] || [input isNumericPad]) || [input isControlHotKey];
     if (![state isKindOfClass:[InputStateNotEmpty class]] &&
         ![state isKindOfClass:[InputStateAssociatedPhrases class]] &&
         isFunctionKey) {
@@ -345,7 +345,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     bool composeReading = false;
-    BOOL skipBpmfHandling = [input isReservedKey] || [input isControlHold];
+    BOOL skipBpmfHandling = [input isReservedKey] || [input isControlHold] || [input isOptionHold];
 
     // MARK: Handle BPMF Keys
 
@@ -562,7 +562,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // if nothing is matched, see if it's a punctuation key for current layout.
 
     std::string punctuationNamePrefix;
-    if ([input isControlHold]) {
+    if ([input isOptionHold]) {
+        punctuationNamePrefix = std::string("_alt_punctuation_");
+    } else if ([input isControlHold]) {
         punctuationNamePrefix = std::string("_ctrl_punctuation_");
     } else if (mgrPrefs.halfWidthPunctuationEnabled) {
         punctuationNamePrefix = std::string("_half_punctuation_");
@@ -1239,7 +1241,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if (mgrPrefs.useSCPCTypingMode) {
         std::string layout = [self _currentLayout];
         std::string punctuationNamePrefix;
-        if ([input isControlHold]) {
+        if ([input isOptionHold]) {
+            punctuationNamePrefix = std::string("_alt_punctuation_");
+        } else if ([input isControlHold]) {
             punctuationNamePrefix = std::string("_ctrl_punctuation_");
         } else if (mgrPrefs.halfWidthPunctuationEnabled) {
             punctuationNamePrefix = std::string("_half_punctuation_");
