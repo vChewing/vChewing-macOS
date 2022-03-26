@@ -260,7 +260,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     return layout;
 }
 
-- (BOOL)handleInput:(KeyHandlerInput *)input state:(InputState *)inState stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+- (BOOL)handleInput:(keyParser *)input state:(InputState *)inState stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     InputState *state = inState;
     UniChar charCode = input.charCode;
@@ -638,7 +638,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     return YES;
 }
 
-- (BOOL)_handleBackwardWithState:(InputState *)state input:(KeyHandlerInput *)input stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+- (BOOL)_handleBackwardWithState:(InputState *)state input:(keyParser *)input stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     if (![state isKindOfClass:[InputStateInputting class]]) {
         return NO;
@@ -679,7 +679,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     return YES;
 }
 
-- (BOOL)_handleForwardWithState:(InputState *)state input:(KeyHandlerInput *)input stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+- (BOOL)_handleForwardWithState:(InputState *)state input:(keyParser *)input stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     if (![state isKindOfClass:[InputStateInputting class]]) {
         return NO;
@@ -920,7 +920,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
 
 - (BOOL)_handleMarkingState:(InputStateMarking *)state
-                      input:(KeyHandlerInput *)input
+                      input:(keyParser *)input
               stateCallback:(void (^)(InputState *))stateCallback
               errorCallback:(void (^)(void))errorCallback
 {
@@ -992,7 +992,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
 
 - (BOOL)_handleCandidateState:(InputState *)state
-                        input:(KeyHandlerInput *)input
+                        input:(keyParser *)input
                 stateCallback:(void (^)(InputState *))stateCallback
                 errorCallback:(void (^)(void))errorCallback;
 {
