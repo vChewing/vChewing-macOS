@@ -73,6 +73,16 @@ class ctlInputMethod: IMKInputController {
         client.overrideKeyboard(withKeyboardNamed: isfunctionKeyboardLayout ? mgrPrefs.functionKeyboardLayout : mgrPrefs.basisKeyboardLayout)
     }
 
+    func updateModifierFlags(_ event: NSEvent!) {
+        // 這裡不會列出全部的 modifier flags，只會列出可能會影響符號輸入的 flags、主要用於 AppleKeyboardConverter。
+        IME.isShiftPressed = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.shift)
+        IME.isOptionPressed = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.option)
+        IME.isCapsLockOn = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
+        IME.isCommandPressed = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.command)
+        IME.isNumericPad = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.numericPad)
+        IME.isFunction = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.function)
+    }
+
     // MARK: - IMKInputController methods
 
     override init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
@@ -207,6 +217,8 @@ class ctlInputMethod: IMKInputController {
     }
 
     override func handle(_ event: NSEvent!, client: Any!) -> Bool {
+        // 更新全局共用狀態開關的參數。
+        updateModifierFlags(event)
 
         if mgrPrefs.functionKeyboardLayout != mgrPrefs.basisKeyboardLayout {
             // 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
