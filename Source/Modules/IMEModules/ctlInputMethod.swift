@@ -83,6 +83,15 @@ class ctlInputMethod: IMKInputController {
         IME.isFunction = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.function)
     }
 
+    func resetModifierFlags() {
+        IME.isShiftPressed = false
+        IME.isOptionPressed = false
+        IME.isCapsLockOn = false
+        IME.isCommandPressed = false
+        IME.isNumericPad = false
+        IME.isFunction = false
+    }
+
     // MARK: - IMKInputController methods
 
     override init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
@@ -217,7 +226,8 @@ class ctlInputMethod: IMKInputController {
     }
 
     override func handle(_ event: NSEvent!, client: Any!) -> Bool {
-        // 更新全局共用狀態開關的參數。
+        //重設且更新全局共用狀態開關的參數。
+        resetModifierFlags()
         updateModifierFlags(event)
 
         if mgrPrefs.functionKeyboardLayout != mgrPrefs.basisKeyboardLayout {
