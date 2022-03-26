@@ -153,8 +153,8 @@ class ctlInputMethod: IMKInputController {
     override func activateServer(_ client: Any!) {
         UserDefaults.standard.synchronize()
 
-        // Override the keyboard layout. Use US if not set.
-        (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.basisKeyboardLayout)
+        // Override the keyboard layout to the basic one.
+        setKeyLayout(isfunctionKeyboardLayout: false)
         // reset the state
         currentCandidateClient = nil
 
@@ -181,14 +181,17 @@ class ctlInputMethod: IMKInputController {
             newInputMode = InputMode.imeModeNULL
         }
         mgrLangModel.loadDataModel(newInputMode)
+
+        // Remember to override the keyboard layout again -- treat this as an activate event.
+        setKeyLayout(isfunctionKeyboardLayout: false)
+
         if keyHandler.inputMode != newInputMode {
             UserDefaults.standard.synchronize()
-            // Remember to override the keyboard layout again -- treat this as an activate event.
-            (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.basisKeyboardLayout)
             keyHandler.clear()
             keyHandler.inputMode = newInputMode
             self.handle(state: .Empty(), client: client)
         }
+
         // 讓外界知道目前的簡繁體輸入模式。
         ctlInputMethod.currentKeyHandler.inputMode = keyHandler.inputMode
     }
@@ -208,7 +211,7 @@ class ctlInputMethod: IMKInputController {
             // 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
             // 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
             if event.type == .flagsChanged {
-                (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: getKeyLayoutFlagsCondition(event) ? mgrPrefs.functionKeyboardLayout : mgrPrefs.basisKeyboardLayout)
+                setKeyLayout(isfunctionKeyboardLayout: getKeyLayoutFlagsCondition(event))
                 return false
             }
         }
