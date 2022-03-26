@@ -134,6 +134,10 @@ class keyParser: NSObject {
         flags.contains([.control]) && inputText?.first?.isLetter ?? false
     }
 
+    @objc var isOptionHotKey: Bool {
+        flags.contains([.option]) && inputText?.first?.isLetter ?? false
+    }
+
     @objc var isOptionHold: Bool {
         flags.contains([.option])
     }
