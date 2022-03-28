@@ -20,6 +20,8 @@ import Cocoa
 
 @objc public class IME: NSObject {
 
+    static let dlgOpenPath = NSOpenPanel();
+
     // MARK: - Functions
 
     // Print debug information to the console.
