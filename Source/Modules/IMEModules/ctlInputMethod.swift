@@ -73,25 +73,6 @@ class ctlInputMethod: IMKInputController {
         client.overrideKeyboard(withKeyboardNamed: isfunctionKeyboardLayout ? mgrPrefs.functionKeyboardLayout : mgrPrefs.basisKeyboardLayout)
     }
 
-    func updateModifierFlags(_ event: NSEvent!) {
-        // 這裡不會列出全部的 modifier flags，只會列出可能會影響符號輸入的 flags、主要用於 AppleKeyboardConverter。
-        IME.isShiftPressed = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.shift)
-        IME.isOptionPressed = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.option)
-        IME.isCapsLockOn = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
-        IME.isCommandPressed = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.command)
-        IME.isNumericPad = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.numericPad)
-        IME.isFunction = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.function)
-    }
-
-    func resetModifierFlags() {
-        IME.isShiftPressed = false
-        IME.isOptionPressed = false
-        IME.isCapsLockOn = false
-        IME.isCommandPressed = false
-        IME.isNumericPad = false
-        IME.isFunction = false
-    }
-
     // MARK: - IMKInputController methods
 
     override init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
