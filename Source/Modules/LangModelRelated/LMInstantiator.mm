@@ -246,21 +246,6 @@ bool LMInstantiator::symbolEnabled()
     return m_symbolEnabled;
 }
 
-void LMInstantiator::setExternalConverterEnabled(bool enabled)
-{
-    m_externalConverterEnabled = enabled;
-}
-
-bool LMInstantiator::externalConverterEnabled()
-{
-    return m_externalConverterEnabled;
-}
-
-void LMInstantiator::setExternalConverter(std::function<std::string(std::string)> externalConverter)
-{
-    m_externalConverter = externalConverter;
-}
-
 const std::vector<Gramambular::Unigram> LMInstantiator::filterAndTransformUnigrams(const std::vector<Gramambular::Unigram> unigrams, const  std::unordered_set<std::string>& excludedValues,  std::unordered_set<std::string>& insertedValues)
 {
     std::vector<Gramambular::Unigram> results;
@@ -279,10 +264,6 @@ const std::vector<Gramambular::Unigram> LMInstantiator::filterAndTransformUnigra
             if (replacement != "") {
                 value = replacement;
             }
-        }
-        if (m_externalConverterEnabled && m_externalConverter) {
-            std::string replacement = m_externalConverter(value);
-            value = replacement;
         }
         if (insertedValues.find(value) == insertedValues.end()) {
             Gramambular::Unigram g;

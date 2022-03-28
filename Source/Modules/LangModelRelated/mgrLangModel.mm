@@ -134,32 +134,6 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     gLangModelCHS.loadPhraseReplacementMap([[self phraseReplacementDataPath:imeModeCHS] UTF8String]);
 }
 
-+ (void)setupDataModelValueConverter
-{
-    auto converter = [] (string input) {
-//        if (!mgrPrefs.chineseConversionEnabled) {
-//            return input;
-//        }
-//
-//        if (mgrPrefs.chineseConversionStyle == 0) {
-//            return input;
-//        }
-//
-//        NSString *text = [NSString stringWithUTF8String:input.c_str()];
-//        if (mgrPrefs.chineseConversionEngine == 1) {
-//            text = [VXHanConvert convertToKangXiFrom:text];
-//        }
-//        else {
-//            text = [OpenCCBridge convertToKangXi:text];
-//        }
-//        return string(text.UTF8String);
-        return input;
-    };
-
-    gLangModelCHT.setExternalConverter(converter);
-    gLangModelCHS.setExternalConverter(converter);
-}
-
 + (BOOL)checkIfUserDataFolderExists
 {
     NSString *folderPath = [self dataFolderPath];

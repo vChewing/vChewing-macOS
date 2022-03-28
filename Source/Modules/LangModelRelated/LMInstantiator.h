@@ -125,13 +125,6 @@ public:
     /// If CNS11643 input is enabled or not.
     bool cnsEnabled();
 
-    /// Enables or disables the external converter.
-    void setExternalConverterEnabled(bool enabled);
-    /// If the external converted is enabled or not.
-    bool externalConverterEnabled();
-    /// Sets a lambda to let the values of unigrams could be converted by it.
-    void setExternalConverter(std::function<std::string(std::string)> externalConverter);
-
     const std::vector<std::string> associatedPhrasesForKey(const std::string& key);
     bool hasAssociatedPhrasesForKey(const std::string& key);
 
@@ -160,8 +153,6 @@ protected:
     bool m_phraseReplacementEnabled;
     bool m_cnsEnabled;
     bool m_symbolEnabled;
-    bool m_externalConverterEnabled;
-    std::function<std::string(std::string)> m_externalConverter;
 };
 };
 

@@ -28,7 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)loadUserPhrases;
 + (void)loadUserAssociatedPhrases;
 + (void)loadUserPhraseReplacement;
-+ (void)setupDataModelValueConverter;
 + (BOOL)checkIfUserLanguageModelFilesExist;
 + (BOOL)checkIfUserDataFolderExists;
 
