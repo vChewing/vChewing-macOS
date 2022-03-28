@@ -49,7 +49,6 @@ private let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
 private let kCandidateKeys = "CandidateKeys"
 
 private let kChineseConversionEngine = "ChineseConversionEngine"
-private let kChineseConversionStyle = "ChineseConversionStyle"
 private let kAssociatedPhrasesEnabled = "AssociatedPhrasesEnabled"
 private let kPhraseReplacementEnabled = "PhraseReplacementEnabled"
 
@@ -195,20 +194,6 @@ struct ComposingBufferSize {
     }
 }
 
-@objc enum ChineseConversionStyle: Int {
-    case output
-    case model
-
-    var name: String {
-        switch (self) {
-        case .output:
-            return "output"
-        case .model:
-            return "model"
-        }
-    }
-}
-
 // MARK: -
 @objc public class mgrPrefs: NSObject {
     static var allKeys:[String] {
@@ -240,7 +225,6 @@ struct ComposingBufferSize {
          kMaxCandidateLength,
          kShouldNotFartInLieuOfBeep,
          kChineseConversionEngine,
-         kChineseConversionStyle,
          kAssociatedPhrasesEnabled]
     }
 
