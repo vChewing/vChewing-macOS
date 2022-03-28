@@ -23,8 +23,6 @@ private let kIsDebugModeEnabled = "_DebugMode"
 private let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
 private let kKeyboardLayoutPreference = "KeyboardLayout"
 private let kBasisKeyboardLayoutPreference = "BasisKeyboardLayout"
-private let kFunctionKeyKeyboardLayoutPreference = "FunctionKeyKeyboardLayout"
-private let kFunctionKeyKeyboardLayoutOverrideIncludeShift = "FunctionKeyKeyboardLayoutOverrideIncludeShift"
 private let kShowPageButtonsInCandidateWindow = "ShowPageButtonsInCandidateWindow"
 private let kCandidateListTextSize = "CandidateListTextSize"
 private let kAppleLanguagesPreferences = "AppleLanguages"
@@ -217,8 +215,6 @@ struct ComposingBufferSize {
         [kIsDebugModeEnabled,
          kKeyboardLayoutPreference,
          kBasisKeyboardLayoutPreference,
-         kFunctionKeyKeyboardLayoutPreference,
-         kFunctionKeyKeyboardLayoutOverrideIncludeShift,
          kShowPageButtonsInCandidateWindow,
          kCandidateListTextSize,
          kAppleLanguagesPreferences,
@@ -364,12 +360,6 @@ struct ComposingBufferSize {
 
     @UserDefault(key: kBasisKeyboardLayoutPreference, defaultValue: "com.apple.keylayout.ZhuyinBopomofo")
     @objc static var basisKeyboardLayout: String
-
-    @UserDefault(key: kFunctionKeyKeyboardLayoutPreference, defaultValue: "com.apple.keylayout.ABC")
-    @objc static var functionKeyboardLayout: String
-
-    @UserDefault(key: kFunctionKeyKeyboardLayoutOverrideIncludeShift, defaultValue: false)
-    @objc static var functionKeyKeyboardLayoutOverrideIncludeShiftKey: Bool
 
     @UserDefault(key: kShowPageButtonsInCandidateWindow, defaultValue: true)
     @objc static var showPageButtonsInCandidateWindow: Bool
