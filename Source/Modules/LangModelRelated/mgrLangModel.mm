@@ -136,7 +136,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
 
 + (BOOL)checkIfUserDataFolderExists
 {
-    NSString *folderPath = [self dataFolderPath];
+    NSString *folderPath = [self dataFolderPath:false];
     BOOL isFolder = NO;
     BOOL folderExist = [[NSFileManager defaultManager] fileExistsAtPath:folderPath isDirectory:&isFolder];
     if (folderExist && !isFolder) {
@@ -155,6 +155,16 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
             NSLog(@"Failed to create folder %@", error);
             return NO;
         }
+    }
+    return YES;
+}
+
++ (BOOL)checkIfSpecifiedUserDataFolderValid:(NSString *)folderPath
+{
+    BOOL isFolder = NO;
+    BOOL folderExist = [[NSFileManager defaultManager] fileExistsAtPath:folderPath isDirectory:&isFolder];
+    if ((folderExist && !isFolder) || (!folderExist)) {
+        return NO;
     }
     return YES;
 }
@@ -250,42 +260,52 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     return YES;
 }
 
-+ (NSString *)dataFolderPath
++ (NSString *)dataFolderPath:(bool)isDefaultFolder
 {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES);
-    NSString *appSupportPath = paths[0];
-    NSString *userDictPath = [appSupportPath stringByAppendingPathComponent:@"vChewing"];
+    // 此處不能用「~」來取代當前使用者目錄名稱。不然的話，一旦輸入法被系統的沙箱干預的話，則反而會定位到沙箱目錄內。
+    NSString *appSupportPath = [NSFileManager.defaultManager URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask][0].path;
+    NSString *userDictPath = [appSupportPath stringByAppendingPathComponent:@"vChewing"].stringByExpandingTildeInPath;
+    if (mgrPrefs.userDataFolderSpecified.stringByExpandingTildeInPath == userDictPath || isDefaultFolder) {
+        return userDictPath;
+    }
+    if ([mgrPrefs ifSpecifiedUserDataPathExistsInPlist]) {
+        if ([self checkIfSpecifiedUserDataFolderValid:mgrPrefs.userDataFolderSpecified.stringByExpandingTildeInPath]) {
+            return mgrPrefs.userDataFolderSpecified.stringByExpandingTildeInPath;
+        } else {
+            [NSUserDefaults.standardUserDefaults removeObjectForKey:@"UserDataFolderSpecified"];
+        }
+    }
     return userDictPath;
 }
 
 + (NSString *)userPhrasesDataPath:(InputMode)mode;
 {
     NSString *fileName = [mode isEqualToString:imeModeCHT] ? @"userdata-cht.txt" : @"userdata-chs.txt";
-    return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
+    return [[self dataFolderPath:false] stringByAppendingPathComponent:fileName];
 }
 
 + (NSString *)userSymbolDataPath:(InputMode)mode;
 {
     NSString *fileName = [mode isEqualToString:imeModeCHT] ? @"usersymbolphrases-cht.txt" : @"usersymbolphrases-chs.txt";
-    return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
+    return [[self dataFolderPath:false] stringByAppendingPathComponent:fileName];
 }
 
 + (NSString *)userAssociatedPhrasesDataPath:(InputMode)mode;
 {
     NSString *fileName = [mode isEqualToString:imeModeCHT] ? @"associatedPhrases-cht.txt" : @"associatedPhrases-chs.txt";
-    return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
+    return [[self dataFolderPath:false] stringByAppendingPathComponent:fileName];
 }
 
 + (NSString *)excludedPhrasesDataPath:(InputMode)mode;
 {
     NSString *fileName = [mode isEqualToString:imeModeCHT] ? @"exclude-phrases-cht.txt" : @"exclude-phrases-chs.txt";
-    return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
+    return [[self dataFolderPath:false] stringByAppendingPathComponent:fileName];
 }
 
 + (NSString *)phraseReplacementDataPath:(InputMode)mode;
 {
     NSString *fileName = [mode isEqualToString:imeModeCHT] ? @"phrases-replacement-cht.txt" : @"phrases-replacement-chs.txt";
-    return [[self dataFolderPath] stringByAppendingPathComponent:fileName];
+    return [[self dataFolderPath:false] stringByAppendingPathComponent:fileName];
 }
 
  + (vChewing::LMInstantiator *)lmCHT
