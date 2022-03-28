@@ -223,3 +223,6 @@
 
 /* Class = "NSButtonCell"; title = "Enable symbol input support (incl. certain emoji symbols)"; ObjectID = "hSv-LJ-Cq3"; */
 "hSv-LJ-Cq3.title" = "僅かなる絵文字も含む符号入力サポートを起用";
+
+/* Class = "NSTextFieldCell"; title = "Choose your desired user data folder path. Will be omitted if invalid."; ObjectID = "wN3-k3-b2a"; */
+"wN3-k3-b2a.title" = "欲しがるユーザー辞書保存先をご指定ください。無効の保存先設定は効かぬ。";
