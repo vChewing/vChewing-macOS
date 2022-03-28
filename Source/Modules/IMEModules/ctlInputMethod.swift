@@ -63,11 +63,6 @@ class ctlInputMethod: IMKInputController {
 
     // MARK: - Keyboard Layout Specifier
 
-    func getKeyLayoutFlagsCondition(_ event: NSEvent!) -> Bool {
-        event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(NSEvent.ModifierFlags(rawValue: ~(NSEvent.ModifierFlags.shift.rawValue))) ||
-            (event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.shift) && mgrPrefs.functionKeyKeyboardLayoutOverrideIncludeShiftKey)
-    }
-
     @objc func setKeyLayout(isfunctionKeyboardLayout: Bool = false) {
         let client = client().self as IMKTextInput
         client.overrideKeyboard(withKeyboardNamed: isfunctionKeyboardLayout ? mgrPrefs.functionKeyboardLayout : mgrPrefs.basisKeyboardLayout)
@@ -157,7 +152,7 @@ class ctlInputMethod: IMKInputController {
         UserDefaults.standard.synchronize()
 
         // Override the keyboard layout to the basic one.
-        setKeyLayout(isfunctionKeyboardLayout: false)
+        (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.basisKeyboardLayout)
         // reset the state
         currentCandidateClient = nil
 
@@ -186,7 +181,7 @@ class ctlInputMethod: IMKInputController {
         mgrLangModel.loadDataModel(newInputMode)
 
         // Remember to override the keyboard layout again -- treat this as an activate event.
-        setKeyLayout(isfunctionKeyboardLayout: false)
+        (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.basisKeyboardLayout)
 
         if keyHandler.inputMode != newInputMode {
             UserDefaults.standard.synchronize()
@@ -207,19 +202,27 @@ class ctlInputMethod: IMKInputController {
     }
 
     override func handle(_ event: NSEvent!, client: Any!) -> Bool {
-        //重設且更新全局共用狀態開關的參數。
-        resetModifierFlags()
-        updateModifierFlags(event)
 
-        if mgrPrefs.functionKeyboardLayout != mgrPrefs.basisKeyboardLayout {
-            // 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
-            // 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
-            // 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
-            // 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
-            if event.type == .flagsChanged {
-                setKeyLayout(isfunctionKeyboardLayout: getKeyLayoutFlagsCondition(event))
+        // 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
+        // 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
+        // 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
+        // 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
+        if event.type == .flagsChanged {
+            // If no override is needed, just return NO.
+            if mgrPrefs.functionKeyboardLayout == mgrPrefs.basisKeyboardLayout {
                 return false
             }
+
+            // Function key conditions met. Swift cannot handle this.
+            if ObjCUtils.keyboardSwitchCondition(event) {
+                setKeyLayout(isfunctionKeyboardLayout: true)
+                (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.functionKeyboardLayout)
+                return false
+            }
+
+            // Revert to the basis layout when the function key is released. This step has to be standalone.
+            (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.basisKeyboardLayout)
+            return false
         }
 
         // 準備修飾鍵，用來判定是否需要利用就地新增語彙時的 Enter 鍵來砍詞。
