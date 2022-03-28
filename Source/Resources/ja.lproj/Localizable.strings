@@ -52,6 +52,7 @@
 "Apple Zhuyin Eten" = "Apple 注音ボポモフォ配列（倚天伝統）";
 "Symbol & Emoji Input" = "符号＆絵文字入力";
 "Edit User Symbol & Emoji Data…" = "ユーザー符号＆絵文字辞書を編集…";
+"Choose your desired user data folder." = "欲しがるユーザー辞書フォルダをお選びください。";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";
