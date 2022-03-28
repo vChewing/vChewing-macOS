@@ -650,7 +650,7 @@ extension ctlInputMethod: KeyHandlerDelegate {
         if !state.validToWrite {
             return false
         }
-        let InputModeReversed: InputMode = (ctlInputMethod.currentKeyHandler.inputMode == InputMode.imeModeCHT) ? InputMode.imeModeCHS : InputMode.imeModeCHT
+        let InputModeReversed: InputMode = (keyHandler.inputMode == InputMode.imeModeCHT) ? InputMode.imeModeCHS : InputMode.imeModeCHT
         mgrLangModel.writeUserPhrase(state.userPhrase, inputMode: keyHandler.inputMode, areWeDuplicating: state.chkIfUserPhraseExists, areWeDeleting: ctlInputMethod.areWeDeleting)
         mgrLangModel.writeUserPhrase(state.userPhraseConverted, inputMode: InputModeReversed, areWeDuplicating: false, areWeDeleting: ctlInputMethod.areWeDeleting)
         return true
