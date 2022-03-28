@@ -63,9 +63,9 @@ class ctlInputMethod: IMKInputController {
 
     // MARK: - Keyboard Layout Specifier
 
-    @objc func setKeyLayout(isfunctionKeyboardLayout: Bool = false) {
+    @objc func setKeyLayout() {
         let client = client().self as IMKTextInput
-        client.overrideKeyboard(withKeyboardNamed: isfunctionKeyboardLayout ? mgrPrefs.functionKeyboardLayout : mgrPrefs.basisKeyboardLayout)
+        client.overrideKeyboard(withKeyboardNamed: mgrPrefs.basisKeyboardLayout)
     }
 
     // MARK: - IMKInputController methods
@@ -142,7 +142,7 @@ class ctlInputMethod: IMKInputController {
         }
 
         // NSMenu 會阻止任何 modified key 相關的訊號傳回輸入法，所以咱們在此重設鍵盤佈局
-        setKeyLayout(isfunctionKeyboardLayout: false)
+        setKeyLayout()
         return menu
     }
 
@@ -152,7 +152,7 @@ class ctlInputMethod: IMKInputController {
         UserDefaults.standard.synchronize()
 
         // Override the keyboard layout to the basic one.
-        (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.basisKeyboardLayout)
+        setKeyLayout()
         // reset the state
         currentCandidateClient = nil
 
@@ -181,7 +181,7 @@ class ctlInputMethod: IMKInputController {
         mgrLangModel.loadDataModel(newInputMode)
 
         // Remember to override the keyboard layout again -- treat this as an activate event.
-        (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.basisKeyboardLayout)
+        setKeyLayout()
 
         if keyHandler.inputMode != newInputMode {
             UserDefaults.standard.synchronize()
@@ -208,20 +208,6 @@ class ctlInputMethod: IMKInputController {
         // 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
         // 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
         if event.type == .flagsChanged {
-            // If no override is needed, just return NO.
-            if mgrPrefs.functionKeyboardLayout == mgrPrefs.basisKeyboardLayout {
-                return false
-            }
-
-            // Function key conditions met. Swift cannot handle this.
-            if ObjCUtils.keyboardSwitchCondition(event) {
-                setKeyLayout(isfunctionKeyboardLayout: true)
-                (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.functionKeyboardLayout)
-                return false
-            }
-
-            // Revert to the basis layout when the function key is released. This step has to be standalone.
-            (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.basisKeyboardLayout)
             return false
         }
 
