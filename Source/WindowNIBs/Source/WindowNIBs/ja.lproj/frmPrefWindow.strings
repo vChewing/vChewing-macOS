@@ -144,7 +144,7 @@
 "RQ6-MS-m4C.title" = "お好きなるキーボード配列をお選びください。";
 
 /* Class = "NSButtonCell"; title = "Push the cursor to the front of the phrase after selection"; ObjectID = "RUG-ls-KyA"; */
-"RUG-ls-KyA.title" = "候補選択の直後、すぐカーソルを単語の後ろに移す";
+"RUG-ls-KyA.title" = "候補選択の直後、すぐカーソルを単語の向こうに推す";
 
 /* Class = "NSMenuItem"; title = "Traditional Chinese"; ObjectID = "TXr-FF-ehw"; */
 "TXr-FF-ehw.title" = "繁体中国語";
