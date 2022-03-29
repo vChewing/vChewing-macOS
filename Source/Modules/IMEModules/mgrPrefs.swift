@@ -23,8 +23,6 @@ private let kIsDebugModeEnabled = "_DebugMode"
 private let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
 private let kKeyboardLayoutPreference = "KeyboardLayout"
 private let kBasisKeyboardLayoutPreference = "BasisKeyboardLayout"
-private let kFunctionKeyKeyboardLayoutPreference = "FunctionKeyKeyboardLayout"
-private let kFunctionKeyKeyboardLayoutOverrideIncludeShift = "FunctionKeyKeyboardLayoutOverrideIncludeShift"
 private let kShowPageButtonsInCandidateWindow = "ShowPageButtonsInCandidateWindow"
 private let kCandidateListTextSize = "CandidateListTextSize"
 private let kAppleLanguagesPreferences = "AppleLanguages"
@@ -50,8 +48,6 @@ private let kCandidateTextFontName = "CandidateTextFontName"
 private let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
 private let kCandidateKeys = "CandidateKeys"
 
-private let kChineseConversionEngine = "ChineseConversionEngine"
-private let kChineseConversionStyle = "ChineseConversionStyle"
 private let kAssociatedPhrasesEnabled = "AssociatedPhrasesEnabled"
 private let kPhraseReplacementEnabled = "PhraseReplacementEnabled"
 
@@ -183,42 +179,12 @@ struct ComposingBufferSize {
     }
 }
 
-@objc enum ChineseConversionEngine: Int {
-    case openCC
-    case vxHanConvert
-
-    var name: String {
-        switch (self) {
-        case .openCC:
-            return "OpenCC"
-        case .vxHanConvert:
-            return "VXHanConvert"
-        }
-    }
-}
-
-@objc enum ChineseConversionStyle: Int {
-    case output
-    case model
-
-    var name: String {
-        switch (self) {
-        case .output:
-            return "output"
-        case .model:
-            return "model"
-        }
-    }
-}
-
 // MARK: -
 @objc public class mgrPrefs: NSObject {
     static var allKeys:[String] {
         [kIsDebugModeEnabled,
          kKeyboardLayoutPreference,
          kBasisKeyboardLayoutPreference,
-         kFunctionKeyKeyboardLayoutPreference,
-         kFunctionKeyKeyboardLayoutOverrideIncludeShift,
          kShowPageButtonsInCandidateWindow,
          kCandidateListTextSize,
          kAppleLanguagesPreferences,
@@ -243,8 +209,6 @@ struct ComposingBufferSize {
          kUseSCPCTypingMode,
          kMaxCandidateLength,
          kShouldNotFartInLieuOfBeep,
-         kChineseConversionEngine,
-         kChineseConversionStyle,
          kAssociatedPhrasesEnabled]
     }
 
@@ -364,12 +328,6 @@ struct ComposingBufferSize {
 
     @UserDefault(key: kBasisKeyboardLayoutPreference, defaultValue: "com.apple.keylayout.ZhuyinBopomofo")
     @objc static var basisKeyboardLayout: String
-
-    @UserDefault(key: kFunctionKeyKeyboardLayoutPreference, defaultValue: "com.apple.keylayout.ABC")
-    @objc static var functionKeyboardLayout: String
-
-    @UserDefault(key: kFunctionKeyKeyboardLayoutOverrideIncludeShift, defaultValue: false)
-    @objc static var functionKeyKeyboardLayoutOverrideIncludeShiftKey: Bool
 
     @UserDefault(key: kShowPageButtonsInCandidateWindow, defaultValue: true)
     @objc static var showPageButtonsInCandidateWindow: Bool
