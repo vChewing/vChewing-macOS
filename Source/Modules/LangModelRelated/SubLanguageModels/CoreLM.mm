@@ -24,6 +24,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <fstream>
 #include <unistd.h>
 #include <syslog.h>
+#include "vChewing-Swift.h"
 
 using namespace Gramambular;
 
@@ -123,7 +124,7 @@ start:
     c = *head;
     // \s -> error
     if (c == ' ') {
-        syslog(LOG_CONS, "vChewingDebug: CoreLM // Start: \\s -> error");
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // Start: \\s -> error");
         goto error;
     }
     // \n -> start
@@ -140,14 +141,14 @@ start:
 state1:
     // EOF -> error
     if (head == end) {
-        syslog(LOG_CONS, "vChewingDebug: CoreLM // state 1: EOF -> error");
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 1: EOF -> error");
         goto error;
     }
 
     c = *head;
     // \n -> error
     if (c == '\n') {
-        syslog(LOG_CONS, "vChewingDebug: CoreLM // state 1: \\n -> error");
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 1: \\n -> error");
         goto error;
     }
     // \s -> state2 + zero out ending + record column start
@@ -165,14 +166,14 @@ state1:
 state2:
     // eof -> error
     if (head == end) {
-        syslog(LOG_CONS, "vChewingDebug: CoreLM // state 2: EOF -> error");
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 2: EOF -> error");
         goto error;
     }
 
     c = *head;
     // \n, \s -> error
     if (c == '\n' || c == ' ') {
-        syslog(LOG_CONS, "vChewingDebug: CoreLM // state 2: \\n \\s -> error");
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 2: \\n \\s -> error");
         goto error;
     }
 
@@ -184,7 +185,7 @@ state2:
 state3:
     // eof -> error
     if (head == end) {
-        syslog(LOG_CONS, "vChewingDebug: CoreLM // state 3: EOF -> error");
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 3: EOF -> error");
         goto error;
     }
 
@@ -192,7 +193,7 @@ state3:
 
     // \n -> error
     if (c == '\n') {
-        syslog(LOG_CONS, "vChewingDebug: CoreLM // state 3: \\n -> error");
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 3: \\n -> error");
         goto error;
     }
     // \s -> state4 + zero out ending + record column start
@@ -210,14 +211,14 @@ state3:
 state4:
     // eof -> error
     if (head == end) {
-        syslog(LOG_CONS, "vChewingDebug: CoreLM // state 4: EOF -> error");
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 4: EOF -> error");
         goto error;
     }
 
     c = *head;
     // \n, \s -> error
     if (c == '\n' || c == ' ') {
-        syslog(LOG_CONS, "vChewingDebug: CoreLM // state 4: \\n \\s -> error");
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 4: \\n \\s -> error");
         goto error;
     }
 
@@ -230,14 +231,14 @@ state4:
 state5:
     // eof -> error
     if (head == end) {
-        syslog(LOG_CONS, "vChewingDebug: CoreLM // state 5: EOF -> error");
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 5: EOF -> error");
         goto error;
     }
 
     c = *head;
     // \s -> error
     if (c == ' ') {
-        syslog(LOG_CONS, "vChewingDebug: CoreLM // state 5: \\s -> error");
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 5: \\s -> error");
         goto error;
     }
     // \n -> start
@@ -264,7 +265,7 @@ end:
     emptyRow.value = space;
     emptyRow.logProbability = zero;
     keyRowMap[space].push_back(emptyRow);
-    syslog(LOG_CONS, "vChewingDebug: CoreLM // File Load Complete.");
+    if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // File Load Complete.");
     return true;
 }
 
