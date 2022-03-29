@@ -30,10 +30,10 @@
 "14.title" = "用以觸發選字的游標相對位置：";
 
 /* Class = "NSButtonCell"; title = "Cursor to the front of the phrase (like Matsushita Hanin IME)"; ObjectID = "16"; */
-"16.title" = "游標至於詞語前方 // 松下漢音風格";
+"16.title" = "游標置於詞語前方 // 松下漢音風格";
 
 /* Class = "NSButtonCell"; title = "Cursor to the rear of the phrase (like MS New-Phonetic IME)"; ObjectID = "17"; */
-"17.title" = "游標至於詞語後方 // 微軟新注音風格";
+"17.title" = "游標置於詞語後方 // 微軟新注音風格";
 
 /* Class = "NSButtonCell"; title = "Radio"; ObjectID = "18"; */
 "18.title" = "Radio";
