@@ -63,33 +63,9 @@ class ctlInputMethod: IMKInputController {
 
     // MARK: - Keyboard Layout Specifier
 
-    func getKeyLayoutFlagsCondition(_ event: NSEvent!) -> Bool {
-        event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(NSEvent.ModifierFlags(rawValue: ~(NSEvent.ModifierFlags.shift.rawValue))) ||
-            (event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.shift) && mgrPrefs.functionKeyKeyboardLayoutOverrideIncludeShiftKey)
-    }
-
-    @objc func setKeyLayout(isfunctionKeyboardLayout: Bool = false) {
+    @objc func setKeyLayout() {
         let client = client().self as IMKTextInput
-        client.overrideKeyboard(withKeyboardNamed: isfunctionKeyboardLayout ? mgrPrefs.functionKeyboardLayout : mgrPrefs.basisKeyboardLayout)
-    }
-
-    func updateModifierFlags(_ event: NSEvent!) {
-        // 這裡不會列出全部的 modifier flags，只會列出可能會影響符號輸入的 flags、主要用於 AppleKeyboardConverter。
-        IME.isShiftPressed = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.shift)
-        IME.isOptionPressed = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.option)
-        IME.isCapsLockOn = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
-        IME.isCommandPressed = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.command)
-        IME.isNumericPad = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.numericPad)
-        IME.isFunction = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.function)
-    }
-
-    func resetModifierFlags() {
-        IME.isShiftPressed = false
-        IME.isOptionPressed = false
-        IME.isCapsLockOn = false
-        IME.isCommandPressed = false
-        IME.isNumericPad = false
-        IME.isFunction = false
+        client.overrideKeyboard(withKeyboardNamed: mgrPrefs.basisKeyboardLayout)
     }
 
     // MARK: - IMKInputController methods
@@ -166,7 +142,7 @@ class ctlInputMethod: IMKInputController {
         }
 
         // NSMenu 會阻止任何 modified key 相關的訊號傳回輸入法，所以咱們在此重設鍵盤佈局
-        setKeyLayout(isfunctionKeyboardLayout: false)
+        setKeyLayout()
         return menu
     }
 
@@ -176,7 +152,7 @@ class ctlInputMethod: IMKInputController {
         UserDefaults.standard.synchronize()
 
         // Override the keyboard layout to the basic one.
-        setKeyLayout(isfunctionKeyboardLayout: false)
+        setKeyLayout()
         // reset the state
         currentCandidateClient = nil
 
@@ -205,7 +181,7 @@ class ctlInputMethod: IMKInputController {
         mgrLangModel.loadDataModel(newInputMode)
 
         // Remember to override the keyboard layout again -- treat this as an activate event.
-        setKeyLayout(isfunctionKeyboardLayout: false)
+        setKeyLayout()
 
         if keyHandler.inputMode != newInputMode {
             UserDefaults.standard.synchronize()
@@ -226,19 +202,13 @@ class ctlInputMethod: IMKInputController {
     }
 
     override func handle(_ event: NSEvent!, client: Any!) -> Bool {
-        //重設且更新全局共用狀態開關的參數。
-        resetModifierFlags()
-        updateModifierFlags(event)
 
-        if mgrPrefs.functionKeyboardLayout != mgrPrefs.basisKeyboardLayout {
-            // 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
-            // 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
-            // 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
-            // 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
-            if event.type == .flagsChanged {
-                setKeyLayout(isfunctionKeyboardLayout: getKeyLayoutFlagsCondition(event))
-                return false
-            }
+        // 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
+        // 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
+        // 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
+        // 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
+        if event.type == .flagsChanged {
+            return false
         }
 
         // 準備修飾鍵，用來判定是否需要利用就地新增語彙時的 Enter 鍵來砍詞。
@@ -680,7 +650,7 @@ extension ctlInputMethod: KeyHandlerDelegate {
         if !state.validToWrite {
             return false
         }
-        let InputModeReversed: InputMode = (ctlInputMethod.currentKeyHandler.inputMode == InputMode.imeModeCHT) ? InputMode.imeModeCHS : InputMode.imeModeCHT
+        let InputModeReversed: InputMode = (keyHandler.inputMode == InputMode.imeModeCHT) ? InputMode.imeModeCHS : InputMode.imeModeCHT
         mgrLangModel.writeUserPhrase(state.userPhrase, inputMode: keyHandler.inputMode, areWeDuplicating: state.chkIfUserPhraseExists, areWeDeleting: ctlInputMethod.areWeDeleting)
         mgrLangModel.writeUserPhrase(state.userPhraseConverted, inputMode: InputModeReversed, areWeDuplicating: false, areWeDeleting: ctlInputMethod.areWeDeleting)
         return true

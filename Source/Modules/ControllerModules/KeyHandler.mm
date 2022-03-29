@@ -231,8 +231,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
     [self _walk];
 
-    if (mgrPrefs.selectPhraseAfterCursorAsCandidate &&
-        mgrPrefs.moveCursorAfterSelectingCandidate) {
+    if (mgrPrefs.moveCursorAfterSelectingCandidate) {
         size_t nextPosition = 0;
         for (auto node: _walkedNodes) {
             if (nextPosition >= cursorIndex) {
