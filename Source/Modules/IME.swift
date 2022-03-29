@@ -31,6 +31,18 @@ import Cocoa
         }
     }
 
+    @objc static func initLangModels(userOnly: Bool) {
+        if !userOnly {
+            mgrLangModel.loadDataModels() // 這句還是不要砍了。
+        }
+        // mgrLangModel 的 loadUserPhrases 等函數在自動讀取 dataFolderPath 時，
+        // 如果發現自訂目錄不可用，則會自動抹去自訂目錄設定、改採預設目錄。
+        // 所以這裡不需要特別處理。
+        mgrLangModel.loadUserPhrases()
+        mgrLangModel.loadUserPhraseReplacement()
+        mgrLangModel.loadUserAssociatedPhrases()
+    }
+
     @objc static func isDarkMode() -> Bool {
         if #available(macOS 10.15, *) {
             let appearanceDescription = NSApplication.shared.effectiveAppearance.debugDescription.lowercased()
