@@ -22,9 +22,14 @@ import Cocoa
 private let kTargetBin = "vChewing"
 private let kTargetType = "app"
 private let kTargetBundle = "vChewing.app"
-private let kDestinationPartial = "~/Library/Input Methods/"
-private let kTargetPartialPath = "~/Library/Input Methods/vChewing.app"
-private let kTargetFullBinPartialPath = "~/Library/Input Methods/vChewing.app/Contents/MacOS/vChewing"
+
+private let urlDestinationPartial = FileManager.default.urls(for: .inputMethodsDirectory, in: .userDomainMask)[0]
+private let urlTargetPartial = urlDestinationPartial.appendingPathComponent(kTargetBundle)
+private let urlTargetFullBinPartial = urlTargetPartial.appendingPathComponent("Contents/MacOS/").appendingPathComponent(kTargetBin)
+
+private let kDestinationPartial = urlDestinationPartial.path
+private let kTargetPartialPath = urlTargetPartial.path
+private let kTargetFullBinPartialPath = urlTargetFullBinPartial.path
 
 private let kTranslocationRemovalTickInterval: TimeInterval = 0.5
 private let kTranslocationRemovalDeadline: TimeInterval = 60.0
