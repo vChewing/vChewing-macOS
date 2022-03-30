@@ -597,7 +597,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="s7t-Kk-EPu">
-                                                        <rect key="frame" x="20" y="327" width="346" height="20"/>
+                                                        <rect key="frame" x="20" y="327" width="345" height="20"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" allowsUndo="NO" borderStyle="border" baseWritingDirection="leftToRight" alignment="left" drawsBackground="YES" usesSingleLineMode="YES" id="REC-r4-T7m">
                                                             <font key="font" metaFont="cellTitle"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -681,9 +681,9 @@
                                                     <constraint firstItem="O4B-Z2-XYi" firstAttribute="top" secondItem="p7V-IN-OTr" secondAttribute="bottom" constant="7" id="ZsG-Rv-Xjo"/>
                                                     <constraint firstItem="p7V-IN-OTr" firstAttribute="trailing" secondItem="O4B-Z2-XYi" secondAttribute="trailing" id="auY-l9-U7h"/>
                                                     <constraint firstItem="jXe-xz-9Sd" firstAttribute="leading" secondItem="MPN-np-SbT" secondAttribute="trailing" constant="-1" id="cYQ-Rx-tuG"/>
-                                                    <constraint firstItem="s7t-Kk-EPu" firstAttribute="trailing" secondItem="p7V-IN-OTr" secondAttribute="trailing" constant="-59" id="eIn-kD-FGz"/>
+                                                    <constraint firstItem="s7t-Kk-EPu" firstAttribute="trailing" secondItem="p7V-IN-OTr" secondAttribute="trailing" constant="-60" id="eIn-kD-FGz"/>
                                                     <constraint firstItem="p7V-IN-OTr" firstAttribute="leading" secondItem="O4B-Z2-XYi" secondAttribute="leading" id="mmu-SS-jac"/>
-                                                    <constraint firstItem="s7t-Kk-EPu" firstAttribute="trailing" secondItem="FUV-qx-xkC" secondAttribute="trailing" constant="-59" id="vIO-x1-7Q2"/>
+                                                    <constraint firstItem="s7t-Kk-EPu" firstAttribute="trailing" secondItem="FUV-qx-xkC" secondAttribute="trailing" constant="-60" id="vIO-x1-7Q2"/>
                                                     <constraint firstItem="jXe-xz-9Sd" firstAttribute="baseline" secondItem="MPN-np-SbT" secondAttribute="baseline" id="wys-ML-2Q2"/>
                                                 </constraints>
                                             </view>
