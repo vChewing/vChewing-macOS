@@ -52,6 +52,7 @@
 "Apple Zhuyin Eten" = "Apple 倚天注音鍵盤佈局";
 "Symbol & Emoji Input" = "符號＆繪文字輸入";
 "Edit User Symbol & Emoji Data…" = "編輯自訂符號&繪文字資料…";
+"Choose your desired user data folder." = "請選擇您想指定的使用者語彙檔案目錄。";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";

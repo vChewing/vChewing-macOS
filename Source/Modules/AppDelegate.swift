@@ -149,9 +149,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
         // 拖 100ms 再重載，畢竟有些有特殊需求的使用者可能會想使用巨型自訂語彙檔案。
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
             if mgrPrefs.shouldAutoReloadUserDataFiles {
-                mgrLangModel.loadUserPhrases()
-                mgrLangModel.loadUserPhraseReplacement()
-                mgrLangModel.loadUserAssociatedPhrases()
+                IME.initLangModels(userOnly: true)
             }
         }
     }
@@ -163,7 +161,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
     private var ctlAboutWindowInstance: ctlAboutWindow? // New About Window
     private var checkTask: URLSessionTask?
     private var updateNextStepURL: URL?
-    private var fsStreamHelper = FSEventStreamHelper(path: mgrLangModel.dataFolderPath, queue: DispatchQueue(label: "vChewing User Phrases"))
+    private var fsStreamHelper = FSEventStreamHelper(path: mgrLangModel.dataFolderPath(isDefaultFolder: false), queue: DispatchQueue(label: "vChewing User Phrases"))
 
     // 補上 dealloc
     deinit {
@@ -176,10 +174,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        mgrLangModel.loadDataModels() // 這句還是不要砍了。
-        mgrLangModel.loadUserPhrases()
-        mgrLangModel.loadUserPhraseReplacement()
-        mgrLangModel.loadUserAssociatedPhrases()
+        IME.initLangModels(userOnly: false)
         fsStreamHelper.delegate = self
         _ = fsStreamHelper.start()
 

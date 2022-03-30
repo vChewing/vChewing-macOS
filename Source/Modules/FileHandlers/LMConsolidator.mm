@@ -17,6 +17,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 */
 
 #include "LMConsolidator.h"
+#include "vChewing-Swift.h"
 
 namespace vChewing {
 
@@ -31,13 +32,13 @@ bool LMConsolidator::CheckPragma(const char *path)
     {
         string firstLine;
         getline(zfdCheckPragma, firstLine);
-        syslog(LOG_CONS, "HEADER SEEN ||%s", firstLine.c_str());
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "HEADER SEEN ||%s", firstLine.c_str());
         if (firstLine != FORMATTED_PRAGMA_HEADER) {
-            syslog(LOG_CONS, "HEADER VERIFICATION FAILED. START IN-PLACE CONSOLIDATING PROCESS.");
+            if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "HEADER VERIFICATION FAILED. START IN-PLACE CONSOLIDATING PROCESS.");
             return false;
         }
     }
-    syslog(LOG_CONS, "HEADER VERIFICATION SUCCESSFUL.");
+    if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "HEADER VERIFICATION SUCCESSFUL.");
     return true;
 }
 
@@ -49,22 +50,22 @@ bool LMConsolidator::FixEOF(const char *path)
     char z;
     zfdEOFFixerIncomingStream.get(z);
     if(z!='\n'){
-        syslog(LOG_CONS, "// REPORT: Data File not ended with a new line.\n");
-        syslog(LOG_CONS, "// DATA FILE: %s", path);
-        syslog(LOG_CONS, "// PROCEDURE: Trying to insert a new line as EOF before per-line check process.\n");
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "// REPORT: Data File not ended with a new line.\n");
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "// DATA FILE: %s", path);
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "// PROCEDURE: Trying to insert a new line as EOF before per-line check process.\n");
         std::ofstream zfdEOFFixerOutput(path, std::ios_base::app);
         zfdEOFFixerOutput << std::endl;
         zfdEOFFixerOutput.close();
         if (zfdEOFFixerOutput.fail()) {
-            syslog(LOG_CONS, "// REPORT: Failed to append a newline to the data file. Insufficient Privileges?\n");
-            syslog(LOG_CONS, "// DATA FILE: %s", path);
+            if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "// REPORT: Failed to append a newline to the data file. Insufficient Privileges?\n");
+            if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "// DATA FILE: %s", path);
             return false;
         }
     }
     zfdEOFFixerIncomingStream.close();
     if (zfdEOFFixerIncomingStream.fail()) {
-        syslog(LOG_CONS, "// REPORT: Failed to read lines through the data file for EOF check. Insufficient Privileges?\n");
-        syslog(LOG_CONS, "// DATA FILE: %s", path);
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "// REPORT: Failed to read lines through the data file for EOF check. Insufficient Privileges?\n");
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "// DATA FILE: %s", path);
         return false;
     }
     return true;
@@ -118,14 +119,14 @@ bool LMConsolidator::ConsolidateContent(const char *path, bool shouldCheckPragma
     }
     zfdContentConsolidatorOutput.close();
     if (zfdContentConsolidatorOutput.fail()) {
-        syslog(LOG_CONS, "// REPORT: Failed to write content-consolidated data to the file. Insufficient Privileges?\n");
-        syslog(LOG_CONS, "// DATA FILE: %s", path);
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "// REPORT: Failed to write content-consolidated data to the file. Insufficient Privileges?\n");
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "// DATA FILE: %s", path);
         return false;
     }
     zfdContentConsolidatorIncomingStream.close();
     if (zfdContentConsolidatorIncomingStream.fail()) {
-        syslog(LOG_CONS, "// REPORT: Failed to read lines through the data file for content-consolidation. Insufficient Privileges?\n");
-        syslog(LOG_CONS, "// DATA FILE: %s", path);
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "// REPORT: Failed to read lines through the data file for content-consolidation. Insufficient Privileges?\n");
+        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "// DATA FILE: %s", path);
         return false;
     }
     return true;

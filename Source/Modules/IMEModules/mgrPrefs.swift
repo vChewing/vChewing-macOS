@@ -20,6 +20,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 import Cocoa
 
 private let kIsDebugModeEnabled = "_DebugMode"
+private let kUserDataFolderSpecified = "UserDataFolderSpecified"
 private let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
 private let kKeyboardLayoutPreference = "KeyboardLayout"
 private let kBasisKeyboardLayoutPreference = "BasisKeyboardLayout"
@@ -183,6 +184,7 @@ struct ComposingBufferSize {
 @objc public class mgrPrefs: NSObject {
     static var allKeys:[String] {
         [kIsDebugModeEnabled,
+         kUserDataFolderSpecified,
          kKeyboardLayoutPreference,
          kBasisKeyboardLayoutPreference,
          kShowPageButtonsInCandidateWindow,
@@ -315,6 +317,13 @@ struct ComposingBufferSize {
 
     @UserDefault(key: kIsDebugModeEnabled, defaultValue: false)
     @objc static var isDebugModeEnabled: Bool
+
+    @UserDefault(key: kUserDataFolderSpecified, defaultValue: "")
+    @objc static var userDataFolderSpecified: String
+
+    @objc static func ifSpecifiedUserDataPathExistsInPlist() -> Bool {
+        UserDefaults.standard.object(forKey: kUserDataFolderSpecified) != nil
+    }
 
     @UserDefault(key: kAppleLanguagesPreferences, defaultValue: [])
     @objc static var appleLanguages: Array<String>
