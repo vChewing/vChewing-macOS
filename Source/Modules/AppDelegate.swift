@@ -163,7 +163,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
     private var ctlAboutWindowInstance: ctlAboutWindow? // New About Window
     private var checkTask: URLSessionTask?
     private var updateNextStepURL: URL?
-    private var fsStreamHelper = FSEventStreamHelper(path: mgrLangModel.dataFolderPath, queue: DispatchQueue(label: "vChewing User Phrases"))
+    private var fsStreamHelper = FSEventStreamHelper(path: mgrLangModel.dataFolderPath(isDefaultFolder: false), queue: DispatchQueue(label: "vChewing User Phrases"))
 
     // 補上 dealloc
     deinit {
