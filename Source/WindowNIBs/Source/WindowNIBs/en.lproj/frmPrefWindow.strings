@@ -23,8 +23,8 @@
 /* Class = "NSMenuItem"; title = "Hanyu Pinyin"; ObjectID = "10"; */
 "10.title" = "Hanyu Pinyin";
 
-/* Class = "NSTextFieldCell"; title = "Bopomofo:"; ObjectID = "12"; */
-"12.title" = "Bopomofo:";
+/* Class = "NSTextFieldCell"; title = "BPMF Parser:"; ObjectID = "12"; */
+"12.title" = "BPMF Parser:";
 
 /* Class = "NSTextFieldCell"; title = "Choose the cursor position where you want to list possible candidates."; ObjectID = "14"; */
 "14.title" = "Choose the cursor position where you want to list possible candidates.";
@@ -86,8 +86,8 @@
 /* Class = "NSButtonCell"; title = "Enable Space key for calling candidate window"; ObjectID = "110"; */
 "110.title" = "Enable Space key for calling candidate window";
 
-/* Class = "NSTextFieldCell"; title = "Alphanumeric:"; ObjectID = "126"; */
-"126.title" = "Alphanumeric:";
+/* Class = "NSTextFieldCell"; title = "Basic Layout:"; ObjectID = "126"; */
+"126.title" = "Basic Layout:";
 
 /* Class = "NSMenu"; title = "OtherViews"; ObjectID = "128"; */
 "128.title" = "OtherViews";
@@ -140,8 +140,8 @@
 /* Class = "NSTabViewItem"; label = "General"; ObjectID = "QUQ-oY-4Hc"; */
 "QUQ-oY-4Hc.label" = "General";
 
-/* Class = "NSTextFieldCell"; title = "Choose your preferred keyboard layout."; ObjectID = "RQ6-MS-m4C"; */
-"RQ6-MS-m4C.title" = "Choose your preferred keyboard layout.";
+/* Class = "NSTextFieldCell"; title = "Choose your preferred keyboard layout and phonetic parser."; ObjectID = "RQ6-MS-m4C"; */
+"RQ6-MS-m4C.title" = "Choose your preferred keyboard layout and phonetic parser.";
 
 /* Class = "NSButtonCell"; title = "Push the cursor to the front of the phrase after selection"; ObjectID = "RUG-ls-KyA"; */
 "RUG-ls-KyA.title" = "Push the cursor to the front of the phrase after selection";
@@ -200,8 +200,8 @@
 /* Class = "NSTabViewItem"; label = "Dictionary"; ObjectID = "2iG-Ic-gbl"; */
 "2iG-Ic-gbl.label" = "Dictionary";
 
-/* Class = "NSTextFieldCell"; title = "Regarding On-Screen Keyboard Support:"; ObjectID = "wQ9-px-b07"; */
-"wQ9-px-b07.title" = "Regarding On-Screen Keyboard Viewer Support:\n\n\tSince v1.3.2, vChewing supports on-screen keyboard by supporting \"Apple Zhuyin Bopomofo\" and \"Apple Zhuyin Eten\" alphanumeric layout. Theoreotically, these two dynamic layouts work with all types of Apple physical keyboards, and you can report failure cases through macOS Feedback Assistant app if macOS built-in Zhuyin / Eten-Zhuyin Input Method fails from working with your non-US keyboard. HOWEVER, choosing such dynamic alphanumeric layouts REQUIRING THAT you have to choose the Bopomofo layout above to Standard (Microsoft / Dachen) since the Bopomofo / Eten layout support in this case is already finished by the macOS system.\n\n\tAlso: If you have chosen those \"vChewing****\" Alphanumerical layouts, then the Bopomofo layouts MUST MATCH the choices.";
+/* Class = "NSTextFieldCell"; title = "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional."; ObjectID = "wQ9-px-b07"; */
+"wQ9-px-b07.title" = "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional.";
 
 /* Class = "NSTextFieldCell"; title = "Choose the behavior of (Shift+)Tab key in the candidate window."; ObjectID = "ueU-Rz-a1C"; */
 "ueU-Rz-a1C.title" = "Choose the behavior of (Shift+)Tab key in the candidate window.";

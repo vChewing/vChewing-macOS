@@ -23,8 +23,8 @@
 /* Class = "NSMenuItem"; title = "Hanyu Pinyin"; ObjectID = "10"; */
 "10.title" = "漢語拼音二式（字母拼音＋數字標調）";
 
-/* Class = "NSTextFieldCell"; title = "Bopomofo:"; ObjectID = "12"; */
-"12.title" = "注音鍵盤佈局:";
+/* Class = "NSTextFieldCell"; title = "BPMF Parser:"; ObjectID = "12"; */
+"12.title" = "注音配列:";
 
 /* Class = "NSTextFieldCell"; title = "Choose the cursor position where you want to list possible candidates."; ObjectID = "14"; */
 "14.title" = "用以觸發選字的游標相對位置：";
@@ -86,8 +86,8 @@
 /* Class = "NSButtonCell"; title = "Enable Space key for calling candidate window"; ObjectID = "110"; */
 "110.title" = "敲空格鍵以選字";
 
-/* Class = "NSTextFieldCell"; title = "Alphanumeric:"; ObjectID = "126"; */
-"126.title" = "英數鍵盤佈局:";
+/* Class = "NSTextFieldCell"; title = "Basic Layout:"; ObjectID = "126"; */
+"126.title" = "基礎鍵盤佈局:";
 
 /* Class = "NSMenu"; title = "OtherViews"; ObjectID = "128"; */
 "128.title" = "OtherViews";
@@ -140,8 +140,8 @@
 /* Class = "NSTabViewItem"; label = "General"; ObjectID = "QUQ-oY-4Hc"; */
 "QUQ-oY-4Hc.label" = "一般";
 
-/* Class = "NSTextFieldCell"; title = "Choose your preferred keyboard layout."; ObjectID = "RQ6-MS-m4C"; */
-"RQ6-MS-m4C.title" = "選擇您所偏好的鍵盤佈局。";
+/* Class = "NSTextFieldCell"; title = "Choose your preferred keyboard layout and phonetic parser."; ObjectID = "RQ6-MS-m4C"; */
+"RQ6-MS-m4C.title" = "選擇您所偏好的系統鍵盤佈局與注音分析器配列。";
 
 /* Class = "NSButtonCell"; title = "Push the cursor to the front of the phrase after selection"; ObjectID = "RUG-ls-KyA"; */
 "RUG-ls-KyA.title" = "在選字後將游標置於該字詞的前方";
@@ -200,8 +200,8 @@
 /* Class = "NSTabViewItem"; label = "Dictionary"; ObjectID = "2iG-Ic-gbl"; */
 "2iG-Ic-gbl.label" = "辭典";
 
-/* Class = "NSTextFieldCell"; title = "Regarding On-Screen Keyboard Support:"; ObjectID = "wQ9-px-b07"; */
-"wQ9-px-b07.title" = "關於 macOS 內建螢幕模擬鍵盤支援：\n\n\t自 v1.3.2 版開始，威注音支援 macOS 內建的螢幕小鍵盤。該功能是藉由對「Apple 標準注音鍵盤佈局」與「Apple 倚天注音鍵盤佈局」這兩個動態英數鍵盤佈局來完成的。理論上來講，這兩個動態英數鍵盤佈局應該可以與所有語種的 Apple 物理鍵盤相容。如果有不相容的情況的話，macOS 內建的注音與倚天注音輸入法一定也會有相同的故障（可以藉由 Feedback Assistant.app 向 Apple 反饋這種鍵盤佈局問題）。然而，如果您啟用了這種動態英數鍵盤佈局的話，請將當前畫面頂端的注音鍵盤佈局設為「微軟/大千……」，因為對諸如倚天等異種鍵盤的支援已經交給 macOS 系統來事先完成了。\n\n\t另外：如果您在「英數鍵盤佈局」內選了所有以「vChewing」開頭的鍵盤配列的話，對應的「注音鍵盤佈局」也要選成相同的配列才可以。比如說前者選「vChewing Dachen」那後者就得選「微軟/大千……」、前者選「vChewing FakeSeigyou」那後者就得選「偽精業」，依此類推。";
+/* Class = "NSTextFieldCell"; title = "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional."; ObjectID = "wQ9-px-b07"; */
+"wQ9-px-b07.title" = "Apple 動態注音鍵盤佈局（大千與倚天）要求普通話/國音分析器的注音配列得配置為大千配列。";
 
 /* Class = "NSTextFieldCell"; title = "Choose the behavior of (Shift+)Tab key in the candidate window."; ObjectID = "ueU-Rz-a1C"; */
 "ueU-Rz-a1C.title" = "指定 (Shift+)Tab 熱鍵在選字窗內的輪替操作對象。";

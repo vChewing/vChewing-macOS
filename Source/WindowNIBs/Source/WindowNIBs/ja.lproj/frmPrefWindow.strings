@@ -9,7 +9,7 @@
 "5.title" = "OtherViews";
 
 /* Class = "NSMenuItem"; title = "Standard"; ObjectID = "6"; */
-"6.title" = "標準配列（Microsoft・大千・王安など）";
+"6.title" = "大千配列（Microsoft 標準・王安など）";
 
 /* Class = "NSMenuItem"; title = "ETen"; ObjectID = "7"; */
 "7.title" = "倚天伝統配列";
@@ -18,13 +18,13 @@
 "8.title" = "許氏国音自然配列";
 
 /* Class = "NSMenuItem"; title = "ETen26"; ObjectID = "9"; */
-"9.title" = "倚天２６キー配列";
+"9.title" = "倚天形忘れ配列 (26キー)";
 
 /* Class = "NSMenuItem"; title = "Hanyu Pinyin"; ObjectID = "10"; */
 "10.title" = "漢語弁音（ローマ字＋数字音調）";
 
-/* Class = "NSTextFieldCell"; title = "Bopomofo:"; ObjectID = "12"; */
-"12.title" = "注音キーボード配列:";
+/* Class = "NSTextFieldCell"; title = "BPMF Parser:"; ObjectID = "12"; */
+"12.title" = "注音配列:";
 
 /* Class = "NSTextFieldCell"; title = "Choose the cursor position where you want to list possible candidates."; ObjectID = "14"; */
 "14.title" = "カーソルはどこで入力候補を呼び出すかとご選択ください：";
@@ -86,20 +86,20 @@
 /* Class = "NSButtonCell"; title = "Enable Space key for calling candidate window"; ObjectID = "110"; */
 "110.title" = "Space キーで入力候補を呼び出す";
 
-/* Class = "NSTextFieldCell"; title = "Alphanumeric:"; ObjectID = "126"; */
-"126.title" = "英数キーボード配列:";
+/* Class = "NSTextFieldCell"; title = "Basic Layout:"; ObjectID = "126"; */
+"126.title" = "基礎キーボード:";
 
 /* Class = "NSMenu"; title = "OtherViews"; ObjectID = "128"; */
 "128.title" = "OtherViews";
 
 /* Class = "NSMenuItem"; title = "IBM"; ObjectID = "137"; */
-"137.title" = "IBM";
+"137.title" = "IBM 配列";
 
 /* Class = "NSMenuItem"; title = "MiTAC"; ObjectID = "7fV-x8-WHQ"; */
-"7fV-x8-WHQ.title" = "神通";
+"7fV-x8-WHQ.title" = "神通配列";
 
 /* Class = "NSMenuItem"; title = "Fake Seigyou"; ObjectID = "27F-8T-FkQ"; */
-"27F-8T-FkQ.title" = "偽精業";
+"27F-8T-FkQ.title" = "偽精業配列";
 
 /* Class = "NSTabViewItem"; label = "Keyboard"; ObjectID = "1AW-xf-c2f"; */
 "1AW-xf-c2f.label" = "キーボード";
@@ -140,8 +140,8 @@
 /* Class = "NSTabViewItem"; label = "General"; ObjectID = "QUQ-oY-4Hc"; */
 "QUQ-oY-4Hc.label" = "全般";
 
-/* Class = "NSTextFieldCell"; title = "Choose your preferred keyboard layout."; ObjectID = "RQ6-MS-m4C"; */
-"RQ6-MS-m4C.title" = "お好きなるキーボード配列をお選びください。";
+/* Class = "NSTextFieldCell"; title = "Choose your preferred keyboard layout and phonetic parser."; ObjectID = "RQ6-MS-m4C"; */
+"RQ6-MS-m4C.title" = "お好きなるキーボードとそれに相応しい注音配列をお選びください。";
 
 /* Class = "NSButtonCell"; title = "Push the cursor to the front of the phrase after selection"; ObjectID = "RUG-ls-KyA"; */
 "RUG-ls-KyA.title" = "候補選択の直後、すぐカーソルを単語の向こうに推す";
@@ -156,7 +156,7 @@
 "W24-T4-cg0.title" = "全字庫モード // 入力可能の漢字数倍増 (2022-01-07)";
 
 /* Class = "NSBox"; title = "Keyboard Layout"; ObjectID = "Wvt-HE-LOv"; */
-"Wvt-HE-LOv.title" = "キーボード配列";
+"Wvt-HE-LOv.title" = "キーボード";
 
 /* Class = "NSButtonCell"; title = "Check for updates automatically"; ObjectID = "Z9t-P0-BLF"; */
 "Z9t-P0-BLF.title" = "アプリの更新通知を受く";
@@ -200,8 +200,8 @@
 /* Class = "NSTabViewItem"; label = "Dictionary"; ObjectID = "2iG-Ic-gbl"; */
 "2iG-Ic-gbl.label" = "辞書";
 
-/* Class = "NSTextFieldCell"; title = "Regarding On-Screen Keyboard Support:"; ObjectID = "wQ9-px-b07"; */
-"wQ9-px-b07.title" = "macOS 内蔵のキーボードビューアについて：\n\n\t威注音は v1.3.2 版にて macOS 内蔵のキーボードビューアをサポートし始めたが、「Apple Zhuyin Bopomofo」と「Apple Zhuyin Eten」この２つダイナミック英数キーボード配列をサポートしたためである。基本的には、この機能は全ての言語の Apple キーボードと一緒に動けるはず。macOS 内蔵の注音入力と倚天注音入力が支障なく使える限り（支障があったら Feedback Assistant.app で Apple にご報告を）、この２つダイナミック英数キーボード配列も威注音で作動できるだと考えられる。だが、もし、ダイナミック英数キーボード配列を起用すると、今のこの画面の上の「注音キーボード配列」を標準配列にしなければならぬこと。なぜなら、この場合、倚天などの注音配列のサポート役割は macOS である。\n\n\t他に注意：英数配列を「vChewing○○○○」と名付けた配列に設定した場合、注音配列も必ず一致して下さい。";
+/* Class = "NSTextFieldCell"; title = "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional."; ObjectID = "wQ9-px-b07"; */
+"wQ9-px-b07.title" = "Apple 動態注音キーボード (大千と倚天伝統) を使うには、共通語分析器の注音配列を大千と設定すべきである。";
 
 /* Class = "NSTextFieldCell"; title = "Choose the behavior of (Shift+)Tab key in the candidate window."; ObjectID = "ueU-Rz-a1C"; */
 "ueU-Rz-a1C.title" = "入力候補陳列での (Shift+)Tab キーの輪番切替対象をご指定ください。";
