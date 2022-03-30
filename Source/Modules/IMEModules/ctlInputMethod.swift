@@ -284,7 +284,7 @@ class ctlInputMethod: IMKInputController {
     private func open(userFileAt path: String) {
         func checkIfUserFilesExist() -> Bool {
             if !mgrLangModel.checkIfUserLanguageModelFilesExist() {
-                let content = String(format: NSLocalizedString("Please check the permission at \"%@\".", comment: ""), mgrLangModel.dataFolderPath)
+                let content = String(format: NSLocalizedString("Please check the permission at \"%@\".", comment: ""), mgrLangModel.dataFolderPath(isDefaultFolder: false))
                 ctlNonModalAlertWindow.shared.show(title: NSLocalizedString("Unable to create the user phrase file.", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("OK", comment: ""), cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
                 NSApp.setActivationPolicy(.accessory)
                 return false
@@ -306,7 +306,7 @@ class ctlInputMethod: IMKInputController {
         if !mgrLangModel.checkIfUserDataFolderExists() {
             return
         }
-        NSWorkspace.shared.openFile(mgrLangModel.dataFolderPath, withApplication: "Finder")
+        NSWorkspace.shared.openFile(mgrLangModel.dataFolderPath(isDefaultFolder: false), withApplication: "Finder")
     }
 
     @objc func openExcludedPhrases(_ sender: Any?) {

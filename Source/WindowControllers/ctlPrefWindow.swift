@@ -38,11 +38,14 @@ extension RangeReplaceableCollection where Element: Hashable {
     @IBOutlet weak var selectionKeyComboBox: NSComboBox!
     @IBOutlet weak var chkTrad2KangXi: NSButton!
     @IBOutlet weak var chkTrad2JISShinjitai: NSButton!
+    @IBOutlet weak var lblCurrentlySpecifiedUserDataFolder: NSTextFieldCell!
     
     var currentLanguageSelectItem: NSMenuItem? = nil
 
     override func windowDidLoad() {
         super.windowDidLoad()
+
+        lblCurrentlySpecifiedUserDataFolder.placeholderString = mgrLangModel.dataFolderPath(isDefaultFolder: true)
 
         let languages = ["auto", "en", "zh-Hans", "zh-Hant", "ja"]
         var autoMUISelectItem: NSMenuItem? = nil
@@ -233,5 +236,44 @@ extension RangeReplaceableCollection where Element: Hashable {
             }
         }
     }
+
+    @IBAction func resetSpecifiedUserDataFolder(_ sender: Any) {
+        UserDefaults.standard.removeObject(forKey: "UserDataFolderSpecified")
+        IME.initLangModels(userOnly: true)
+    }
+
+    @IBAction func chooseUserDataFolderToSpecify(_ sender: Any) {
+        IME.dlgOpenPath.title = NSLocalizedString("Choose your desired user data folder.", comment: "");
+        IME.dlgOpenPath.showsResizeIndicator = true;
+        IME.dlgOpenPath.showsHiddenFiles = true;
+        IME.dlgOpenPath.canChooseFiles = false;
+        IME.dlgOpenPath.canChooseDirectories = true;
+
+        let PreviousFolderValidity = mgrLangModel.checkIfSpecifiedUserDataFolderValid(NSString(string: mgrPrefs.userDataFolderSpecified).expandingTildeInPath)
+
+        if self.window != nil {
+            IME.dlgOpenPath.beginSheetModal(for: self.window!) { result in
+                if result == NSApplication.ModalResponse.OK {
+                    if (IME.dlgOpenPath.url != nil) {
+                        if (mgrLangModel.checkIfSpecifiedUserDataFolderValid(IME.dlgOpenPath.url!.path)) {
+                            mgrPrefs.userDataFolderSpecified = IME.dlgOpenPath.url!.path
+                            IME.initLangModels(userOnly: true)
+                        } else {
+                            clsSFX.beep()
+                            if !PreviousFolderValidity {
+                                self.resetSpecifiedUserDataFolder(self)
+                            }
+                            return
+                        }
+                    }
+                } else {
+                    if !PreviousFolderValidity {
+                        self.resetSpecifiedUserDataFolder(self)
+                    }
+                    return
+                }
+            }
+        } // End If self.window != nil
+    } // End IBAction
 
 }

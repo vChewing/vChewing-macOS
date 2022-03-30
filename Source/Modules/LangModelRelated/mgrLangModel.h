@@ -30,6 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)loadUserPhraseReplacement;
 + (BOOL)checkIfUserLanguageModelFilesExist;
 + (BOOL)checkIfUserDataFolderExists;
++ (BOOL)checkIfSpecifiedUserDataFolderValid:(NSString *)folderPath;
++ (NSString *)dataFolderPath:(bool)isDefaultFolder NS_SWIFT_NAME(dataFolderPath(isDefaultFolder:));
 
 + (BOOL)checkIfUserPhraseExist:(NSString *)userPhrase inputMode:(InputMode)mode key:(NSString *)key NS_SWIFT_NAME(checkIfUserPhraseExist(userPhrase:mode:key:));
 + (BOOL)writeUserPhrase:(NSString *)userPhrase inputMode:(InputMode)mode areWeDuplicating:(BOOL)areWeDuplicating  areWeDeleting:(BOOL)areWeDeleting;
@@ -43,8 +45,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)userAssociatedPhrasesDataPath:(InputMode)mode;
 + (NSString *)excludedPhrasesDataPath:(InputMode)mode;
 + (NSString *)phraseReplacementDataPath:(InputMode)mode;
-
-@property (class, readonly, nonatomic) NSString *dataFolderPath;
 
 @end
 
