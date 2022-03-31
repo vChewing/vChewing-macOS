@@ -20,56 +20,15 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 import Cocoa
 import InputMethodKit
 
-private func install() -> Int32 {
-    guard let bundleID = Bundle.main.bundleIdentifier else {
-        return -1
-    }
-    let bundleUrl = Bundle.main.bundleURL
-    var maybeInputSource = InputSourceHelper.inputSource(for: bundleID)
-
-    if maybeInputSource == nil {
-        NSLog("Registering input source \(bundleID) at \(bundleUrl.absoluteString)");
-        // then register
-        let status = InputSourceHelper.registerTnputSource(at: bundleUrl)
-
-        if !status {
-            NSLog("Fatal error: Cannot register input source \(bundleID) at \(bundleUrl.absoluteString).")
-            return -1
-        }
-
-        maybeInputSource = InputSourceHelper.inputSource(for: bundleID)
-    }
-
-    guard let inputSource = maybeInputSource else {
-        NSLog("Fatal error: Cannot find input source \(bundleID) after registration.")
-        return -1
-    }
-
-    if !InputSourceHelper.inputSourceEnabled(for: inputSource) {
-        NSLog("Enabling input source \(bundleID) at \(bundleUrl.absoluteString).")
-        let status = InputSourceHelper.enable(inputSource: inputSource)
-        if !status {
-            NSLog("Fatal error: Cannot enable input source \(bundleID).")
-            return -1
-        }
-        if !InputSourceHelper.inputSourceEnabled(for: inputSource) {
-            NSLog("Fatal error: Cannot enable input source \(bundleID).")
-            return -1
-        }
-    }
-
-    if CommandLine.arguments.count > 2 && CommandLine.arguments[2] == "--all" {
-        let enabled = InputSourceHelper.enableAllInputMode(for: bundleID)
-        NSLog(enabled ? "All input sources enabled for \(bundleID)" : "Cannot enable all input sources for \(bundleID), but this is ignored")
-    }
-    return 0
-}
-
 let kConnectionName = "vChewing_1_Connection"
 
 if CommandLine.arguments.count > 1 {
     if CommandLine.arguments[1] == "install" {
-        let exitCode = install()
+        let exitCode = IME.registerInputMethod()
+        exit(exitCode)
+    }
+    if CommandLine.arguments[1] == "uninstall" {
+        let exitCode = IME.uninstall(isSudo: IME.isSudoMode)
         exit(exitCode)
     }
 }

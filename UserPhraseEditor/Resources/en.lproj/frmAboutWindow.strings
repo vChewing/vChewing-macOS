@@ -11,8 +11,8 @@
 /* Class = "NSTextFieldCell"; title = "vChewing Phrase Editor developed by Shiki Suen.\nvChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "lblCredits"; */
 "lblCredits.title" = "vChewing Phrase Editor developed by Shiki Suen.\nvChewing Phrase Database Maintained by Shiki Suen.";
 
-/* Class = "NSTextFieldCell"; title = "DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, have been removed from vChewing official phrase database."; ObjectID = "lblDisclaimer"; */
-"lblDisclaimer.title" = "DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, have been removed from vChewing official phrase database.";
+/* Class = "NSTextFieldCell"; title = "DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, are not included in vChewing official phrase database."; ObjectID = "lblDisclaimer"; */
+"lblDisclaimer.title" = "DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, are not included in vChewing official phrase database.";
 
 /* Class = "NSTextFieldCell"; title = "MIT-NTL License:"; ObjectID = "lblLicense"; */
 "lblLicense.title" = "MIT-NTL License:";

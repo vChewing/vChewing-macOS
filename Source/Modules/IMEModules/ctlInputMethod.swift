@@ -136,9 +136,10 @@ class ctlInputMethod: IMKInputController {
         if !optionKeyPressed {
             menu.addItem(withTitle: NSLocalizedString("Check for Updates…", comment: ""), action: #selector(checkForUpdate(_:)), keyEquivalent: "")
         }
+        menu.addItem(withTitle: NSLocalizedString("Reboot vChewing…", comment: ""), action: #selector(selfTerminate(_:)), keyEquivalent: "")
         menu.addItem(withTitle: NSLocalizedString("About vChewing…", comment: ""), action: #selector(showAbout(_:)), keyEquivalent: "")
         if optionKeyPressed {
-            menu.addItem(withTitle: NSLocalizedString("Reboot vChewing…", comment: ""), action: #selector(selfTerminate(_:)), keyEquivalent: "")
+            menu.addItem(withTitle: NSLocalizedString("Uninstall vChewing…", comment: ""), action: #selector(selfUninstall(_:)), keyEquivalent: "")
         }
 
         // NSMenu 會阻止任何 modified key 相關的訊號傳回輸入法，所以咱們在此重設鍵盤佈局
@@ -271,6 +272,10 @@ class ctlInputMethod: IMKInputController {
 
     @objc func togglePhraseReplacement(_ sender: Any?) {
         NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Use Phrase Replacement", comment: ""), "\n", mgrPrefs.togglePhraseReplacementEnabled() ? NSLocalizedString("NotificationSwitchON", comment: "") : NSLocalizedString("NotificationSwitchOFF", comment: "")))
+    }
+
+    @objc func selfUninstall(_ sender: Any?) {
+        (NSApp.delegate as? AppDelegate)?.selfUninstall()
     }
 
     @objc func selfTerminate(_ sender: Any?) {

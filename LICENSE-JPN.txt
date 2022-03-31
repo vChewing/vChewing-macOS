@@ -1,3 +1,5 @@
+免責事項：vChewing Project は、OpenVanilla と協力関係や提携関係にあるわけではなく、OpenVanilla が小麦注音プロジェクトに同梱した辞書データについて、vChewing Project は一切責任負い兼ねる。特定な地政学的・観念形態的な内容は、vChewing アプリの世界的な普及に妨害する恐れがあるため、vChewing 公式辞書データに不収録。
+
 vChewing macOS: ＭＩＴ商標不許可ライセンス (MIT-NTL License)
 
 © 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project.

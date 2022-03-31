@@ -162,6 +162,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
     private var checkTask: URLSessionTask?
     private var updateNextStepURL: URL?
     private var fsStreamHelper = FSEventStreamHelper(path: mgrLangModel.dataFolderPath(isDefaultFolder: false), queue: DispatchQueue(label: "vChewing User Phrases"))
+    private var currentAlertType: String = ""
 
     // 補上 dealloc
     deinit {
@@ -236,7 +237,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
         let nextUpdateDate = Date(timeInterval: kNextCheckInterval, since: Date())
         UserDefaults.standard.set(nextUpdateDate, forKey: kNextUpdateCheckDateKey)
 
-        checkTask = VersionUpdateApi.check(forced: forced) { result in
+        checkTask = VersionUpdateApi.check(forced: forced) { [self] result in
             defer {
                 self.checkTask = nil
             }
@@ -252,6 +253,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
                             report.remoteVersion,
                             report.versionDescription)
                     IME.prtDebugIntel("vChewingDebug: \(content)")
+                    self.currentAlertType = "Update"
                     ctlNonModalAlertWindow.shared.show(title: NSLocalizedString("New Version Available", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("Visit Website", comment: ""), cancelButtonTitle: NSLocalizedString("Not Now", comment: ""), cancelAsDefault: false, delegate: self)
                     NSApp.setActivationPolicy(.accessory)
                 case .noNeedToUpdate, .ignored:
@@ -264,6 +266,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
                     let content = String(format: NSLocalizedString("There may be no internet connection or the server failed to respond.\n\nError message: %@", comment: ""), message)
                     let buttonTitle = NSLocalizedString("Dismiss", comment: "")
                     IME.prtDebugIntel("vChewingDebug: \(content)")
+                    self.currentAlertType = "Update"
                     ctlNonModalAlertWindow.shared.show(title: title, content: content, confirmButtonTitle: buttonTitle, cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
                     NSApp.setActivationPolicy(.accessory)
                 default:
@@ -273,15 +276,35 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
         }
     }
 
+    func selfUninstall() {
+        self.currentAlertType = "Uninstall"
+        let content = String(format: NSLocalizedString("This will remove vChewing Input Method from this user account, requiring your confirmation.", comment: ""))
+        ctlNonModalAlertWindow.shared.show(title: NSLocalizedString("Uninstallation", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("OK", comment: ""), cancelButtonTitle: NSLocalizedString("Not Now", comment: ""), cancelAsDefault: false, delegate: self)
+        NSApp.setActivationPolicy(.accessory)
+    }
+
     func ctlNonModalAlertWindowDidConfirm(_ controller: ctlNonModalAlertWindow) {
-        if let updateNextStepURL = updateNextStepURL {
-            NSWorkspace.shared.open(updateNextStepURL)
+        switch self.currentAlertType {
+        case "Uninstall":
+            NSWorkspace.shared.openFile(mgrLangModel.dataFolderPath(isDefaultFolder: true), withApplication: "Finder")
+            IME.uninstall(isSudo: false, selfKill: true)
+        case "Update":
+            if let updateNextStepURL = self.updateNextStepURL {
+                NSWorkspace.shared.open(updateNextStepURL)
+            }
+            self.updateNextStepURL = nil
+        default:
+            break
         }
-        updateNextStepURL = nil
     }
 
     func ctlNonModalAlertWindowDidCancel(_ controller: ctlNonModalAlertWindow) {
-        updateNextStepURL = nil
+        switch self.currentAlertType {
+        case "Update":
+            self.updateNextStepURL = nil
+        default:
+            break
+        }
     }
 
     // New About Window
