@@ -1,3 +1,5 @@
+DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, are not included in vChewing official phrase database.
+
 vChewing macOS: MIT-NTL License
 
 © 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project.
