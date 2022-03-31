@@ -276,8 +276,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
         }
     }
 
+    func selfUninstall() {
+        self.currentAlertType = "Uninstall"
+        let content = String(format: NSLocalizedString("This will remove vChewing Input Method from this user account, requiring your confirmation.", comment: ""))
+        ctlNonModalAlertWindow.shared.show(title: NSLocalizedString("Uninstallation", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("OK", comment: ""), cancelButtonTitle: NSLocalizedString("Not Now", comment: ""), cancelAsDefault: false, delegate: self)
+        NSApp.setActivationPolicy(.accessory)
+    }
+
     func ctlNonModalAlertWindowDidConfirm(_ controller: ctlNonModalAlertWindow) {
         switch self.currentAlertType {
+        case "Uninstall":
+            NSWorkspace.shared.openFile(mgrLangModel.dataFolderPath(isDefaultFolder: true), withApplication: "Finder")
+            IME.uninstall(isSudo: false, selfKill: true)
         case "Update":
             if let updateNextStepURL = self.updateNextStepURL {
                 NSWorkspace.shared.open(updateNextStepURL)
