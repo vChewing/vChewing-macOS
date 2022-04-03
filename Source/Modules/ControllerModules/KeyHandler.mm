@@ -176,33 +176,33 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 {
     NSInteger layout = mgrPrefs.keyboardLayout;
     switch (layout) {
-        case KeyboardLayoutStandard:
+        case KeyboardLayoutOfStandard:
             _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::StandardLayout());
             break;
-        case KeyboardLayoutEten:
+        case KeyboardLayoutOfEten:
             _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::ETenLayout());
             break;
-        case KeyboardLayoutHsu:
+        case KeyboardLayoutOfHsu:
             _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::HsuLayout());
             break;
-        case KeyboardLayoutEten26:
+        case KeyboardLayoutOfEen26:
             _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::ETen26Layout());
             break;
-        case KeyboardLayoutIBM:
+        case KeyboardLayoutOfIBM:
             _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::IBMLayout());
             break;
-        case KeyboardLayoutMiTAC:
+        case KeyboardLayoutOfMiTAC:
             _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::MiTACLayout());
             break;
-        case KeyboardLayoutFakeSeigyou:
+        case KeyboardLayoutOfFakeSeigyou:
             _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::FakeSeigyouLayout());
             break;
-        case KeyboardLayoutHanyuPinyin:
+        case KeyboardLayoutOfHanyuPinyin:
             _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::HanyuPinyinLayout());
             break;
         default:
             _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::StandardLayout());
-            mgrPrefs.keyboardLayout = KeyboardLayoutStandard;
+            mgrPrefs.keyboardLayout = KeyboardLayoutOfStandard;
     }
 }
 

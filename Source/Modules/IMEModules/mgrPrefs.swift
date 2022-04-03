@@ -156,32 +156,32 @@ struct ComposingBufferSize {
 // MARK: -
 
 @objc enum KeyboardLayout: Int {
-	case standard = 0
-	case eten = 1
-	case hsu = 2
-	case eten26 = 3
-	case ibm = 4
-	case mitac = 5
-	case fakeSeigyou = 6
-	case hanyuPinyin = 10
+	case ofStandard = 0
+	case ofEten = 1
+	case ofHsu = 2
+	case ofEen26 = 3
+	case ofIBM = 4
+	case ofMiTAC = 5
+	case ofFakeSeigyou = 6
+	case ofHanyuPinyin = 10
 
 	var name: String {
 		switch self {
-			case .standard:
+			case .ofStandard:
 				return "Standard"
-			case .eten:
+			case .ofEten:
 				return "ETen"
-			case .hsu:
+			case .ofHsu:
 				return "Hsu"
-			case .eten26:
+			case .ofEen26:
 				return "ETen26"
-			case .ibm:
+			case .ofIBM:
 				return "IBM"
-			case .mitac:
+			case .ofMiTAC:
 				return "MiTAC"
-			case .fakeSeigyou:
+			case .ofFakeSeigyou:
 				return "FakeSeigyou"
-			case .hanyuPinyin:
+			case .ofHanyuPinyin:
 				return "HanyuPinyin"
 		}
 	}
@@ -360,7 +360,7 @@ struct ComposingBufferSize {
 	@objc static var keyboardLayout: Int
 
 	@objc static var keyboardLayoutName: String {
-		(KeyboardLayout(rawValue: self.keyboardLayout) ?? KeyboardLayout.standard).name
+		(KeyboardLayout(rawValue: self.keyboardLayout) ?? KeyboardLayout.ofStandard).name
 	}
 
 	@UserDefault(
