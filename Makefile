@@ -37,3 +37,8 @@ clean:
 	xcodebuild -scheme vChewingInstaller -configuration Debug $(BUILD_SETTINGS)  clean
 	xcodebuild -scheme vChewingInstaller -configuration Release $(BUILD_SETTINGS) clean
 	make clean --file=./Source/Data/Makefile || true
+
+.PHONY: gc
+
+gc:
+	git reflog expire --expire=now --all && git gc --prune=now --aggressive
