@@ -1,51 +1,64 @@
 // Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// All possible vChewing-specific modifications are of:
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 /*
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-documentation files (the "Software"), to deal in the Software without restriction, including without limitation
-the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
-to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
 
-1. The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+1. The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-2. No trademark license is granted to use the trade names, trademarks, service marks, or product names of Contributor,
-   except as required to fulfill notice requirements above.
+2. No trademark license is granted to use the trade names, trademarks, service
+marks, or product names of Contributor, except as required to fulfill notice
+requirements above.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
-TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import Cocoa
 
 @objc(AboutWindow) class ctlAboutWindow: NSWindowController {
-    @IBOutlet weak var appVersionLabel: NSTextField!
-    @IBOutlet weak var appCopyrightLabel: NSTextField!
-    @IBOutlet var appEULAContent: NSTextView!
+	@IBOutlet weak var appVersionLabel: NSTextField!
+	@IBOutlet weak var appCopyrightLabel: NSTextField!
+	@IBOutlet var appEULAContent: NSTextView!
 
-    override func windowDidLoad() {
-        super.windowDidLoad()
-        
-        window?.standardWindowButton(.closeButton)?.isHidden = true
-        window?.standardWindowButton(.miniaturizeButton)?.isHidden = true
-        window?.standardWindowButton(.zoomButton)?.isHidden = true
-        guard let installingVersion = Bundle.main.infoDictionary?[kCFBundleVersionKey as String] as? String,
-              let versionString = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
-            return
-        }
-        if let copyrightLabel = Bundle.main.localizedInfoDictionary?["NSHumanReadableCopyright"] as? String {
-            appCopyrightLabel.stringValue = copyrightLabel
-        }
-        if let eulaContent = Bundle.main.localizedInfoDictionary?["CFEULAContent"] as? String {
-            appEULAContent.string = eulaContent
-        }
-        appVersionLabel.stringValue = String(format: "%@ Build %@", versionString, installingVersion)
-    }
+	override func windowDidLoad() {
+		super.windowDidLoad()
 
-    @IBAction func btnWiki(_ sender: NSButton) {
-        if let url = URL(string: "https://gitee.com/vchewing/vChewing-macOS/wikis") {
-            NSWorkspace.shared.open(url)
-        }
-    }
+		window?.standardWindowButton(.closeButton)?.isHidden = true
+		window?.standardWindowButton(.miniaturizeButton)?.isHidden = true
+		window?.standardWindowButton(.zoomButton)?.isHidden = true
+		guard
+			let installingVersion = Bundle.main.infoDictionary?[kCFBundleVersionKey as String]
+				as? String,
+			let versionString = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+		else {
+			return
+		}
+		if let copyrightLabel = Bundle.main.localizedInfoDictionary?["NSHumanReadableCopyright"]
+			as? String
+		{
+			appCopyrightLabel.stringValue = copyrightLabel
+		}
+		if let eulaContent = Bundle.main.localizedInfoDictionary?["CFEULAContent"] as? String {
+			appEULAContent.string = eulaContent
+		}
+		appVersionLabel.stringValue = String(
+			format: "%@ Build %@", versionString, installingVersion)
+	}
+
+	@IBAction func btnWiki(_ sender: NSButton) {
+		if let url = URL(string: "https://gitee.com/vchewing/vChewing-macOS/wikis") {
+			NSWorkspace.shared.open(url)
+		}
+	}
 }
