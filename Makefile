@@ -20,6 +20,22 @@ debug:
 DSTROOT = /Library/Input Methods
 VC_APP_ROOT = $(DSTROOT)/vChewing.app
 
+.PHONY: clang-format lint
+
+clang-format:
+	@swift-format format --in-place --configuration ./.clang-format-swift.json --recursive ./DataCompiler/
+	@swift-format format --in-place --configuration ./.clang-format-swift.json --recursive ./Installer/
+	@swift-format format --in-place --configuration ./.clang-format-swift.json --recursive ./Source/
+	@swift-format format --in-place --configuration ./.clang-format-swift.json --recursive ./UserPhraseEditor/
+	@find ./Installer/ -iname '*.h' -o -iname '*.m' | xargs clang-format -i -style=Microsoft
+	@find ./Source/3rdParty/OVMandarin -iname '*.h' -o -iname '*.cpp' -o -iname '*.mm' -o -iname '*.m' | xargs clang-format -i -style=Microsoft
+	@find ./Source/Modules/ -iname '*.h' -o -iname '*.cpp' -o -iname '*.mm' -o -iname '*.m' | xargs clang-format -i -style=Microsoft
+lint:
+	@swift-format lint --configuration ./.clang-format-swift.json --recursive ./DataCompiler/
+	@swift-format lint --configuration ./.clang-format-swift.json --recursive ./Installer/
+	@swift-format lint --configuration ./.clang-format-swift.json --recursive ./Source/
+	@swift-format lint --configuration ./.clang-format-swift.json --recursive ./UserPhraseEditor/
+
 .PHONY: permission-check install-debug install-release
 
 permission-check:
