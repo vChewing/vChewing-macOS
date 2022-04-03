@@ -638,30 +638,41 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // MARK: Punctuation list
     if ([input isSymbolMenuPhysicalKey] && ![input isShiftHold])
     {
+        if (![input isOptionHold])
+        {
+            if (_languageModel->hasUnigramsForKey("_punctuation_list"))
+            {
+                if (_bpmfReadingBuffer->isEmpty())
+                {
+                    _builder->insertReadingAtCursor(string("_punctuation_list"));
+                    NSString *poppedText = [self _popOverflowComposingTextAndWalk];
+                    InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
+                    inputting.poppedText = poppedText;
+                    stateCallback(inputting);
+                    InputStateChoosingCandidate *choosingCandidate = [self _buildCandidateState:inputting
+                                                                                useVerticalMode:input.useVerticalMode];
+                    stateCallback(choosingCandidate);
+                }
+                else
+                { // If there is still unfinished bpmf reading, ignore the punctuation
+                    [IME prtDebugIntel:@"17446655"];
+                    errorCallback();
+                }
+                return YES;
+            }
+        }
+        else
+        {
+            // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
+            // 於是這裡用「模擬一次 Enter 鍵的操作」使其代為執行這個 commit buffer 的動作。
+            [self _handleEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
 
-        // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
-        // 於是這裡用「模擬一次 Enter 鍵的操作」使其代為執行這個 commit buffer 的動作。
-        [self _handleEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
-
-        SymbolNode *root = [SymbolNode root];
-        InputStateSymbolTable *symbolState = [[InputStateSymbolTable alloc] initWithNode:root
-                                                                         useVerticalMode:input.useVerticalMode];
-        stateCallback(symbolState);
-        return YES;
-        //        if (_languageModel->hasUnigramsForKey("_punctuation_list"))) {
-        //            if (_bpmfReadingBuffer->isEmpty()) {
-        //                _builder->insertReadingAtCursor(string("_punctuation_list"));
-        //                NSString *poppedText = [self _popOverflowComposingTextAndWalk];
-        //                InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
-        //                inputting.poppedText = poppedText;
-        //                stateCallback(inputting);
-        //                InputStateChoosingCandidate *choosingCandidate = [self _buildCandidateState:inputting
-        //                useVerticalMode:input.useVerticalMode]; stateCallback(choosingCandidate);
-        //            } else { // If there is still unfinished bpmf reading, ignore the punctuation
-        //                errorCallback();
-        //            }
-        //            return YES;
-        //        }
+            SymbolNode *root = [SymbolNode root];
+            InputStateSymbolTable *symbolState = [[InputStateSymbolTable alloc] initWithNode:root
+                                                                             useVerticalMode:input.useVerticalMode];
+            stateCallback(symbolState);
+            return YES;
+        }
     }
 
     // MARK: Punctuation
