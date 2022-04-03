@@ -1,50 +1,56 @@
 // Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// All possible vChewing-specific modifications are of:
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 /*
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-documentation files (the "Software"), to deal in the Software without restriction, including without limitation
-the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
-to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
 
-1. The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+1. The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-2. No trademark license is granted to use the trade names, trademarks, service marks, or product names of Contributor,
-   except as required to fulfill notice requirements above.
+2. No trademark license is granted to use the trade names, trademarks, service
+marks, or product names of Contributor, except as required to fulfill notice
+requirements above.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
-TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 #include "CoreLM.h"
-#include <sys/mman.h>
-#include <sys/stat.h>
+#include "vChewing-Swift.h"
 #include <fcntl.h>
 #include <fstream>
-#include <unistd.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
 #include <syslog.h>
-#include "vChewing-Swift.h"
+#include <unistd.h>
 
 using namespace Gramambular;
 
-vChewing::CoreLM::CoreLM()
-    : fd(-1)
-    , data(0)
-    , length(0)
+vChewing::CoreLM::CoreLM() : fd(-1), data(0), length(0)
 {
 }
 
 vChewing::CoreLM::~CoreLM()
 {
-    if (data) {
+    if (data)
+    {
         close();
     }
 }
 
 bool vChewing::CoreLM::isLoaded()
 {
-    if (data) {
+    if (data)
+    {
         return true;
     }
     return false;
@@ -52,24 +58,28 @@ bool vChewing::CoreLM::isLoaded()
 
 bool vChewing::CoreLM::open(const char *path)
 {
-    if (data) {
+    if (data)
+    {
         return false;
     }
-    
+
     fd = ::open(path, O_RDONLY);
-    if (fd == -1) {
+    if (fd == -1)
+    {
         return false;
     }
 
     struct stat sb;
-    if (fstat(fd, &sb) == -1) {
+    if (fstat(fd, &sb) == -1)
+    {
         return false;
     }
 
     length = (size_t)sb.st_size;
 
     data = mmap(NULL, length, PROT_WRITE, MAP_PRIVATE, fd, 0);
-    if (!data) {
+    if (!data)
+    {
         ::close(fd);
         return false;
     }
@@ -117,18 +127,22 @@ bool vChewing::CoreLM::open(const char *path)
 
 start:
     // EOF -> end
-    if (head == end) {
+    if (head == end)
+    {
         goto end;
     }
 
     c = *head;
     // \s -> error
-    if (c == ' ') {
-        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // Start: \\s -> error");
+    if (c == ' ')
+    {
+        if (mgrPrefs.isDebugModeEnabled)
+            syslog(LOG_CONS, "vChewingDebug: CoreLM // Start: \\s -> error");
         goto error;
     }
     // \n -> start
-    else if (c == '\n') {
+    else if (c == '\n')
+    {
         head++;
         goto start;
     }
@@ -140,19 +154,24 @@ start:
 
 state1:
     // EOF -> error
-    if (head == end) {
-        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 1: EOF -> error");
+    if (head == end)
+    {
+        if (mgrPrefs.isDebugModeEnabled)
+            syslog(LOG_CONS, "vChewingDebug: CoreLM // state 1: EOF -> error");
         goto error;
     }
 
     c = *head;
     // \n -> error
-    if (c == '\n') {
-        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 1: \\n -> error");
+    if (c == '\n')
+    {
+        if (mgrPrefs.isDebugModeEnabled)
+            syslog(LOG_CONS, "vChewingDebug: CoreLM // state 1: \\n -> error");
         goto error;
     }
     // \s -> state2 + zero out ending + record column start
-    else if (c == ' ') {
+    else if (c == ' ')
+    {
         *head = 0;
         head++;
         row.key = head;
@@ -165,15 +184,19 @@ state1:
 
 state2:
     // eof -> error
-    if (head == end) {
-        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 2: EOF -> error");
+    if (head == end)
+    {
+        if (mgrPrefs.isDebugModeEnabled)
+            syslog(LOG_CONS, "vChewingDebug: CoreLM // state 2: EOF -> error");
         goto error;
     }
 
     c = *head;
     // \n, \s -> error
-    if (c == '\n' || c == ' ') {
-        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 2: \\n \\s -> error");
+    if (c == '\n' || c == ' ')
+    {
+        if (mgrPrefs.isDebugModeEnabled)
+            syslog(LOG_CONS, "vChewingDebug: CoreLM // state 2: \\n \\s -> error");
         goto error;
     }
 
@@ -184,20 +207,25 @@ state2:
 
 state3:
     // eof -> error
-    if (head == end) {
-        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 3: EOF -> error");
+    if (head == end)
+    {
+        if (mgrPrefs.isDebugModeEnabled)
+            syslog(LOG_CONS, "vChewingDebug: CoreLM // state 3: EOF -> error");
         goto error;
     }
 
     c = *head;
 
     // \n -> error
-    if (c == '\n') {
-        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 3: \\n -> error");
+    if (c == '\n')
+    {
+        if (mgrPrefs.isDebugModeEnabled)
+            syslog(LOG_CONS, "vChewingDebug: CoreLM // state 3: \\n -> error");
         goto error;
     }
     // \s -> state4 + zero out ending + record column start
-    else if (c == ' ') {
+    else if (c == ' ')
+    {
         *head = 0;
         head++;
         row.logProbability = head;
@@ -210,15 +238,19 @@ state3:
 
 state4:
     // eof -> error
-    if (head == end) {
-        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 4: EOF -> error");
+    if (head == end)
+    {
+        if (mgrPrefs.isDebugModeEnabled)
+            syslog(LOG_CONS, "vChewingDebug: CoreLM // state 4: EOF -> error");
         goto error;
     }
 
     c = *head;
     // \n, \s -> error
-    if (c == '\n' || c == ' ') {
-        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 4: \\n \\s -> error");
+    if (c == '\n' || c == ' ')
+    {
+        if (mgrPrefs.isDebugModeEnabled)
+            syslog(LOG_CONS, "vChewingDebug: CoreLM // state 4: \\n \\s -> error");
         goto error;
     }
 
@@ -227,22 +259,26 @@ state4:
 
     // fall through to state 5
 
-
 state5:
     // eof -> error
-    if (head == end) {
-        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 5: EOF -> error");
+    if (head == end)
+    {
+        if (mgrPrefs.isDebugModeEnabled)
+            syslog(LOG_CONS, "vChewingDebug: CoreLM // state 5: EOF -> error");
         goto error;
     }
 
     c = *head;
     // \s -> error
-    if (c == ' ') {
-        if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // state 5: \\s -> error");
+    if (c == ' ')
+    {
+        if (mgrPrefs.isDebugModeEnabled)
+            syslog(LOG_CONS, "vChewingDebug: CoreLM // state 5: \\s -> error");
         goto error;
     }
     // \n -> start
-    else if (c == '\n') {
+    else if (c == '\n')
+    {
         *head = 0;
         head++;
         keyRowMap[row.key].push_back(row);
@@ -265,13 +301,15 @@ end:
     emptyRow.value = space;
     emptyRow.logProbability = zero;
     keyRowMap[space].push_back(emptyRow);
-    if (mgrPrefs.isDebugModeEnabled) syslog(LOG_CONS, "vChewingDebug: CoreLM // File Load Complete.");
+    if (mgrPrefs.isDebugModeEnabled)
+        syslog(LOG_CONS, "vChewingDebug: CoreLM // File Load Complete.");
     return true;
 }
 
 void vChewing::CoreLM::close()
 {
-    if (data) {
+    if (data)
+    {
         munmap(data, length);
         ::close(fd);
         data = 0;
@@ -283,30 +321,34 @@ void vChewing::CoreLM::close()
 void vChewing::CoreLM::dump()
 {
     size_t rows = 0;
-    for (map<const char *, vector<Row> >::const_iterator i = keyRowMap.begin(), e = keyRowMap.end(); i != e; ++i) {
-        const vector<Row>& r = (*i).second;
-        for (vector<Row>::const_iterator ri = r.begin(), re = r.end(); ri != re; ++ri) {
-            const Row& row = *ri;
+    for (map<const char *, vector<Row>>::const_iterator i = keyRowMap.begin(), e = keyRowMap.end(); i != e; ++i)
+    {
+        const vector<Row> &r = (*i).second;
+        for (vector<Row>::const_iterator ri = r.begin(), re = r.end(); ri != re; ++ri)
+        {
+            const Row &row = *ri;
             cerr << row.key << " " << row.value << " " << row.logProbability << "\n";
             rows++;
         }
     }
 }
 
-const std::vector<Gramambular::Bigram> vChewing::CoreLM::bigramsForKeys(const string& preceedingKey, const string& key)
+const std::vector<Gramambular::Bigram> vChewing::CoreLM::bigramsForKeys(const string &preceedingKey, const string &key)
 {
     return std::vector<Gramambular::Bigram>();
 }
 
-const std::vector<Gramambular::Unigram> vChewing::CoreLM::unigramsForKey(const string& key)
+const std::vector<Gramambular::Unigram> vChewing::CoreLM::unigramsForKey(const string &key)
 {
     std::vector<Gramambular::Unigram> v;
-    map<const char *, vector<Row> >::const_iterator i = keyRowMap.find(key.c_str());
+    map<const char *, vector<Row>>::const_iterator i = keyRowMap.find(key.c_str());
 
-    if (i != keyRowMap.end()) {
-        for (vector<Row>::const_iterator ri = (*i).second.begin(), re = (*i).second.end(); ri != re; ++ri) {
+    if (i != keyRowMap.end())
+    {
+        for (vector<Row>::const_iterator ri = (*i).second.begin(), re = (*i).second.end(); ri != re; ++ri)
+        {
             Unigram g;
-            const Row& r = *ri;
+            const Row &r = *ri;
             g.keyValue.key = r.key;
             g.keyValue.value = r.value;
             g.score = atof(r.logProbability);
@@ -317,7 +359,7 @@ const std::vector<Gramambular::Unigram> vChewing::CoreLM::unigramsForKey(const s
     return v;
 }
 
-bool vChewing::CoreLM::hasUnigramsForKey(const string& key)
+bool vChewing::CoreLM::hasUnigramsForKey(const string &key)
 {
     return keyRowMap.find(key.c_str()) != keyRowMap.end();
 }
