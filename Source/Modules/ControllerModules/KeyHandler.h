@@ -39,10 +39,8 @@ extern InputMode imeModeNULL;
 @class KeyHandler;
 
 @protocol KeyHandlerDelegate <NSObject>
-- (id)candidateControllerForKeyHandler:(KeyHandler *)keyHandler;
-- (void)keyHandler:(KeyHandler *)keyHandler
-    didSelectCandidateAtIndex:(NSInteger)index
-          candidateController:(id)controller;
+- (id)ctlCandidateForKeyHandler:(KeyHandler *)keyHandler;
+- (void)keyHandler:(KeyHandler *)keyHandler didSelectCandidateAtIndex:(NSInteger)index ctlCandidate:(id)controller;
 - (BOOL)keyHandler:(KeyHandler *)keyHandler didRequestWriteUserPhraseWithState:(InputState *)state;
 @end
 

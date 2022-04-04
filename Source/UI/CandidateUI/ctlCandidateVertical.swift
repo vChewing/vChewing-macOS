@@ -26,7 +26,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
 
-private class HorizontalCandidateView: NSView {
+private class VerticalCandidateView: NSView {
 	var highlightedIndex: UInt = 0
 	var action: Selector?
 	weak var target: AnyObject?
@@ -41,7 +41,9 @@ private class HorizontalCandidateView: NSView {
 	private var keyLabelAttrDict: [NSAttributedString.Key: AnyObject] = [:]
 	private var candidateAttrDict: [NSAttributedString.Key: AnyObject] = [:]
 	private var candidateWithLabelAttrDict: [NSAttributedString.Key: AnyObject] = [:]
+	private var windowWidth: CGFloat = 0
 	private var elementWidths: [CGFloat] = []
+	private var elementHeights: [CGFloat] = []
 	private var trackingHighlightedIndex: UInt = UInt.max
 
 	override var isFlipped: Bool {
@@ -52,9 +54,8 @@ private class HorizontalCandidateView: NSView {
 		var result = NSSize.zero
 
 		if !elementWidths.isEmpty {
-			result.width = elementWidths.reduce(0, +)
-			result.width += CGFloat(elementWidths.count)
-			result.height = candidateTextHeight + cellPadding
+			result.width = windowWidth
+			result.height = elementHeights.reduce(0, +)
 		}
 		return result
 	}
@@ -67,26 +68,31 @@ private class HorizontalCandidateView: NSView {
 		dispCandidatesWithLabels = zip(keyLabels, displayedCandidates).map { $0 + $1 }
 
 		var newWidths = [CGFloat]()
+		var calculatedWindowWidth = CGFloat()
+		var newHeights = [CGFloat]()
 		let baseSize = NSSize(width: 10240.0, height: 10240.0)
 		for index in 0..<count {
 			let rctCandidate = (dispCandidatesWithLabels[index] as NSString).boundingRect(
 				with: baseSize, options: .usesLineFragmentOrigin,
 				attributes: candidateWithLabelAttrDict)
-			var cellWidth = rctCandidate.size.width + cellPadding
+			let cellWidth = rctCandidate.size.width + cellPadding
 			let cellHeight = rctCandidate.size.height + cellPadding
-			if cellWidth < cellHeight * 1.35 {
-				cellWidth = cellHeight * 1.35
+			if calculatedWindowWidth < rctCandidate.size.width {
+				calculatedWindowWidth = rctCandidate.size.width + cellPadding
 			}
 			newWidths.append(cellWidth)
+			newHeights.append(cellHeight)
 		}
 		elementWidths = newWidths
+		elementHeights = newHeights
+		windowWidth = calculatedWindowWidth + cellPadding
 	}
 
 	@objc(setKeyLabelFont:candidateFont:)
 	func set(keyLabelFont labelFont: NSFont, candidateFont: NSFont) {
 		let paraStyle = NSMutableParagraphStyle()
 		paraStyle.setParagraphStyle(NSParagraphStyle.default)
-		paraStyle.alignment = .center
+		paraStyle.alignment = .left
 
 		candidateWithLabelAttrDict = [
 			.font: candidateFont,
@@ -126,19 +132,18 @@ private class HorizontalCandidateView: NSView {
 			from: NSPoint(x: bounds.size.width, y: 0.0),
 			to: NSPoint(x: bounds.size.width, y: bounds.size.height))
 
-		var accuWidth: CGFloat = 0
-		for index in 0..<elementWidths.count {
-			let currentWidth = elementWidths[index]
+		var accuHeight: CGFloat = 0
+		for index in 0..<elementHeights.count {
+			let currentHeight = elementHeights[index]
 			let rctCandidateArea = NSRect(
-				x: accuWidth, y: 0.0, width: currentWidth + 1.0,
-				height: candidateTextHeight + cellPadding)
+				x: 0.0, y: accuHeight, width: windowWidth, height: candidateTextHeight + cellPadding
+			)
 			let rctLabel = NSRect(
-				x: accuWidth + cellPadding / 2 - 1, y: cellPadding / 2, width: keyLabelWidth,
+				x: cellPadding / 2 - 1, y: accuHeight + cellPadding / 2, width: keyLabelWidth,
 				height: keyLabelHeight * 2.0)
 			let rctCandidatePhrase = NSRect(
-				x: accuWidth + keyLabelWidth - 1, y: cellPadding / 2,
-				width: currentWidth - keyLabelWidth,
-				height: candidateTextHeight)
+				x: cellPadding / 2 - 1 + keyLabelWidth, y: accuHeight + cellPadding / 2 - 1,
+				width: windowWidth - keyLabelWidth, height: candidateTextHeight)
 
 			var activeCandidateIndexAttr = keyLabelAttrDict
 			var activeCandidateAttr = candidateAttrDict
@@ -184,7 +189,7 @@ private class HorizontalCandidateView: NSView {
 				in: rctLabel, withAttributes: activeCandidateIndexAttr)
 			(displayedCandidates[index] as NSString).draw(
 				in: rctCandidatePhrase, withAttributes: activeCandidateAttr)
-			accuWidth += currentWidth + 1.0
+			accuHeight += currentHeight
 		}
 	}
 
@@ -193,14 +198,14 @@ private class HorizontalCandidateView: NSView {
 		if !NSPointInRect(location, self.bounds) {
 			return nil
 		}
-		var accuWidth: CGFloat = 0.0
-		for index in 0..<elementWidths.count {
-			let currentWidth = elementWidths[index]
+		var accuHeight: CGFloat = 0.0
+		for index in 0..<elementHeights.count {
+			let currentHeight = elementHeights[index]
 
-			if location.x >= accuWidth && location.x <= accuWidth + currentWidth {
+			if location.y >= accuHeight && location.y <= accuHeight + currentHeight {
 				return UInt(index)
 			}
-			accuWidth += currentWidth + 1.0
+			accuHeight += currentHeight
 		}
 		return nil
 
@@ -236,9 +241,8 @@ private class HorizontalCandidateView: NSView {
 	}
 }
 
-@objc(VTHorizontalCandidateController)
-public class HorizontalCandidateController: CandidateController {
-	private var candidateView: HorizontalCandidateView
+@objc public class ctlCandidateVertical: ctlCandidate {
+	private var candidateView: VerticalCandidateView
 	private var prevPageButton: NSButton
 	private var nextPageButton: NSButton
 	private var currentPage: UInt = 0
@@ -254,7 +258,7 @@ public class HorizontalCandidateController: CandidateController {
 		panel.backgroundColor = NSColor.clear
 
 		contentRect.origin = NSPoint.zero
-		candidateView = HorizontalCandidateView(frame: contentRect)
+		candidateView = VerticalCandidateView(frame: contentRect)
 
 		candidateView.wantsLayer = true
 		candidateView.layer?.borderColor =
@@ -379,7 +383,7 @@ public class HorizontalCandidateController: CandidateController {
 	}
 }
 
-extension HorizontalCandidateController {
+extension ctlCandidateVertical {
 
 	private var pageCount: UInt {
 		guard let delegate = delegate else {
@@ -402,7 +406,7 @@ extension HorizontalCandidateController {
 
 		let begin = currentPage * keyLabelCount
 		for index in begin..<min(begin + keyLabelCount, count) {
-			let candidate = delegate.candidateController(self, candidateAtIndex: index)
+			let candidate = delegate.ctlCandidate(self, candidateAtIndex: index)
 			candidates.append(candidate)
 		}
 		candidateView.set(
@@ -416,9 +420,9 @@ extension HorizontalCandidateController {
 			var buttonRect = nextPageButton.frame
 			let spacing: CGFloat = 0.0
 
-			buttonRect.size.height = floor(newSize.height / 2)
+			// buttonRect.size.height = floor(candidateTextHeight + cellPadding / 2)
 
-			let buttonOriginY = (newSize.height - (buttonRect.size.height * 2.0 + spacing)) / 2.0
+			let buttonOriginY = (newSize.height - (buttonRect.size.height * 2.0 + spacing))  // / 2.0
 			buttonRect.origin = NSPoint(x: newSize.width, y: buttonOriginY)
 			nextPageButton.frame = buttonRect
 
@@ -456,7 +460,7 @@ extension HorizontalCandidateController {
 	}
 
 	@objc fileprivate func candidateViewMouseDidClick(_ sender: Any) {
-		delegate?.candidateController(self, didSelectCandidateAtIndex: selectedCandidateIndex)
+		delegate?.ctlCandidate(self, didSelectCandidateAtIndex: selectedCandidateIndex)
 	}
 
 }

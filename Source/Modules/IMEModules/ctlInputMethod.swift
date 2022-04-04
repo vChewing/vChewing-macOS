@@ -35,11 +35,11 @@ extension Bool {
 
 private let kMinKeyLabelSize: CGFloat = 10
 
-private var gCurrentCandidateController: CandidateController?
+private var ctlCandidateCurrent: ctlCandidate?
 
-extension CandidateController {
-	fileprivate static let horizontal = HorizontalCandidateController()
-	fileprivate static let vertical = VerticalCandidateController()
+extension ctlCandidate {
+	fileprivate static let horizontal = ctlCandidateHorizontal()
+	fileprivate static let vertical = ctlCandidateVertical()
 }
 
 @objc(ctlInputMethod)
@@ -500,8 +500,8 @@ extension ctlInputMethod {
 	private func handle(state: InputState.Deactivated, previous: InputState, client: Any?) {
 		currentCandidateClient = nil
 
-		gCurrentCandidateController?.delegate = nil
-		gCurrentCandidateController?.visible = false
+		ctlCandidateCurrent?.delegate = nil
+		ctlCandidateCurrent?.visible = false
 		hideTooltip()
 
 		if let previous = previous as? InputState.NotEmpty {
@@ -513,7 +513,7 @@ extension ctlInputMethod {
 	}
 
 	private func handle(state: InputState.Empty, previous: InputState, client: Any?) {
-		gCurrentCandidateController?.visible = false
+		ctlCandidateCurrent?.visible = false
 		hideTooltip()
 
 		guard let client = client as? IMKTextInput else {
@@ -531,7 +531,7 @@ extension ctlInputMethod {
 	private func handle(
 		state: InputState.EmptyIgnoringPreviousState, previous: InputState, client: Any!
 	) {
-		gCurrentCandidateController?.visible = false
+		ctlCandidateCurrent?.visible = false
 		hideTooltip()
 
 		guard let client = client as? IMKTextInput else {
@@ -544,7 +544,7 @@ extension ctlInputMethod {
 	}
 
 	private func handle(state: InputState.Committing, previous: InputState, client: Any?) {
-		gCurrentCandidateController?.visible = false
+		ctlCandidateCurrent?.visible = false
 		hideTooltip()
 
 		guard let client = client as? IMKTextInput else {
@@ -561,7 +561,7 @@ extension ctlInputMethod {
 	}
 
 	private func handle(state: InputState.Inputting, previous: InputState, client: Any?) {
-		gCurrentCandidateController?.visible = false
+		ctlCandidateCurrent?.visible = false
 		hideTooltip()
 
 		guard let client = client as? IMKTextInput else {
@@ -586,7 +586,7 @@ extension ctlInputMethod {
 	}
 
 	private func handle(state: InputState.Marking, previous: InputState, client: Any?) {
-		gCurrentCandidateController?.visible = false
+		ctlCandidateCurrent?.visible = false
 		guard let client = client as? IMKTextInput else {
 			hideTooltip()
 			return
@@ -610,7 +610,7 @@ extension ctlInputMethod {
 	private func handle(state: InputState.ChoosingCandidate, previous: InputState, client: Any?) {
 		hideTooltip()
 		guard let client = client as? IMKTextInput else {
-			gCurrentCandidateController?.visible = false
+			ctlCandidateCurrent?.visible = false
 			return
 		}
 
@@ -625,7 +625,7 @@ extension ctlInputMethod {
 	private func handle(state: InputState.AssociatedPhrases, previous: InputState, client: Any?) {
 		hideTooltip()
 		guard let client = client as? IMKTextInput else {
-			gCurrentCandidateController?.visible = false
+			ctlCandidateCurrent?.visible = false
 			return
 		}
 		client.setMarkedText(
@@ -664,14 +664,14 @@ extension ctlInputMethod {
 			return false
 		}()
 
-		gCurrentCandidateController?.delegate = nil
+		ctlCandidateCurrent?.delegate = nil
 
 		if useVerticalMode {
-			gCurrentCandidateController = .vertical
+			ctlCandidateCurrent = .vertical
 		} else if mgrPrefs.useHorizontalCandidateList {
-			gCurrentCandidateController = .horizontal
+			ctlCandidateCurrent = .horizontal
 		} else {
-			gCurrentCandidateController = .vertical
+			ctlCandidateCurrent = .vertical
 		}
 
 		// set the attributes for the candidate panel (which uses NSAttributedString)
@@ -699,24 +699,24 @@ extension ctlInputMethod {
 			return finalReturnFont
 		}
 
-		gCurrentCandidateController?.keyLabelFont = labelFont(
+		ctlCandidateCurrent?.keyLabelFont = labelFont(
 			name: mgrPrefs.candidateKeyLabelFontName, size: keyLabelSize)
-		gCurrentCandidateController?.candidateFont = candidateFont(
+		ctlCandidateCurrent?.candidateFont = candidateFont(
 			name: mgrPrefs.candidateTextFontName, size: textSize)
 
 		let candidateKeys = mgrPrefs.candidateKeys
 		let keyLabels =
 			candidateKeys.count > 4 ? Array(candidateKeys) : Array(mgrPrefs.defaultCandidateKeys)
 		let keyLabelSuffix = state is InputState.AssociatedPhrases ? "^" : ""
-		gCurrentCandidateController?.keyLabels = keyLabels.map {
+		ctlCandidateCurrent?.keyLabels = keyLabels.map {
 			CandidateKeyLabel(key: String($0), displayedText: String($0) + keyLabelSuffix)
 		}
 
-		gCurrentCandidateController?.delegate = self
-		gCurrentCandidateController?.reloadData()
+		ctlCandidateCurrent?.delegate = self
+		ctlCandidateCurrent?.reloadData()
 		currentCandidateClient = client
 
-		gCurrentCandidateController?.visible = true
+		ctlCandidateCurrent?.visible = true
 
 		var lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0)
 		var cursor: Int = 0
@@ -735,13 +735,13 @@ extension ctlInputMethod {
 		}
 
 		if useVerticalMode {
-			gCurrentCandidateController?.set(
+			ctlCandidateCurrent?.set(
 				windowTopLeftPoint: NSMakePoint(
 					lineHeightRect.origin.x + lineHeightRect.size.width + 4.0,
 					lineHeightRect.origin.y - 4.0),
 				bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0)
 		} else {
-			gCurrentCandidateController?.set(
+			ctlCandidateCurrent?.set(
 				windowTopLeftPoint: NSMakePoint(
 					lineHeightRect.origin.x, lineHeightRect.origin.y - 4.0),
 				bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0)
@@ -776,16 +776,16 @@ extension ctlInputMethod {
 // MARK: -
 
 extension ctlInputMethod: KeyHandlerDelegate {
-	func candidateController(for keyHandler: KeyHandler) -> Any {
-		gCurrentCandidateController ?? .vertical
+	func ctlCandidate(for keyHandler: KeyHandler) -> Any {
+		ctlCandidateCurrent ?? .vertical
 	}
 
 	func keyHandler(
 		_ keyHandler: KeyHandler, didSelectCandidateAt index: Int,
-		candidateController controller: Any
+		ctlCandidate controller: Any
 	) {
-		if let controller = controller as? CandidateController {
-			self.candidateController(controller, didSelectCandidateAtIndex: UInt(index))
+		if let controller = controller as? ctlCandidate {
+			self.ctlCandidate(controller, didSelectCandidateAtIndex: UInt(index))
 		}
 	}
 
@@ -815,8 +815,8 @@ extension ctlInputMethod: KeyHandlerDelegate {
 
 // MARK: -
 
-extension ctlInputMethod: CandidateControllerDelegate {
-	func candidateCountForController(_ controller: CandidateController) -> UInt {
+extension ctlInputMethod: ctlCandidateDelegate {
+	func candidateCountForController(_ controller: ctlCandidate) -> UInt {
 		if let state = state as? InputState.ChoosingCandidate {
 			return UInt(state.candidates.count)
 		} else if let state = state as? InputState.AssociatedPhrases {
@@ -825,7 +825,7 @@ extension ctlInputMethod: CandidateControllerDelegate {
 		return 0
 	}
 
-	func candidateController(_ controller: CandidateController, candidateAtIndex index: UInt)
+	func ctlCandidate(_ controller: ctlCandidate, candidateAtIndex index: UInt)
 		-> String
 	{
 		if let state = state as? InputState.ChoosingCandidate {
@@ -836,9 +836,7 @@ extension ctlInputMethod: CandidateControllerDelegate {
 		return ""
 	}
 
-	func candidateController(
-		_ controller: CandidateController, didSelectCandidateAtIndex index: UInt
-	) {
+	func ctlCandidate(_ controller: ctlCandidate, didSelectCandidateAtIndex index: UInt) {
 		let client = currentCandidateClient
 
 		if let state = state as? InputState.SymbolTable,
