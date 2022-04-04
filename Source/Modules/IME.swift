@@ -28,6 +28,9 @@ import Cocoa
 
 	static let dlgOpenPath = NSOpenPanel()
 
+	// MARK: - 開關判定當前應用究竟是？
+	@objc static var areWeUsingOurOwnPhraseEditor: Bool = false
+
 	// MARK: - Print debug information to the console.
 	@objc static func prtDebugIntel(_ strPrint: String) {
 		if mgrPrefs.isDebugModeEnabled {
