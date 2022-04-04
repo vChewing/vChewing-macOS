@@ -1,55 +1,67 @@
 // Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// All possible vChewing-specific modifications are of:
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 /*
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-documentation files (the "Software"), to deal in the Software without restriction, including without limitation
-the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
-to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
 
-1. The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+1. The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-2. No trademark license is granted to use the trade names, trademarks, service marks, or product names of Contributor,
-   except as required to fulfill notice requirements above.
+2. No trademark license is granted to use the trade names, trademarks, service
+marks, or product names of Contributor, except as required to fulfill notice
+requirements above.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
-TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 #include "KeyValueBlobReader.h"
 
-namespace vChewing {
+namespace vChewing
+{
 
-KeyValueBlobReader::State KeyValueBlobReader::Next(KeyValue* out)
+KeyValueBlobReader::State KeyValueBlobReader::Next(KeyValue *out)
 {
     static auto new_line = [](char c) { return c == '\n' || c == '\r'; };
     static auto blank = [](char c) { return c == ' ' || c == '\t'; };
-    static auto blank_or_newline
-        = [](char c) { return blank(c) || new_line(c); };
+    static auto blank_or_newline = [](char c) { return blank(c) || new_line(c); };
     static auto content_char = [](char c) { return !blank(c) && !new_line(c); };
 
-    if (state_ == State::ERROR) {
+    if (state_ == State::ERROR)
+    {
         return state_;
     }
 
-    const char* key_begin = nullptr;
+    const char *key_begin = nullptr;
     size_t key_length = 0;
-    const char* value_begin = nullptr;
+    const char *value_begin = nullptr;
     size_t value_length = 0;
 
-    while (true) {
+    while (true)
+    {
         state_ = SkipUntilNot(blank_or_newline);
-        if (state_ != State::CAN_CONTINUE) {
+        if (state_ != State::CAN_CONTINUE)
+        {
             return state_;
         }
 
         // Check if it's a comment line; if so, read until end of line.
-        if (*current_ != '#') {
+        if (*current_ != '#')
+        {
             break;
         }
         state_ = SkipUntil(new_line);
-        if (state_ != State::CAN_CONTINUE) {
+        if (state_ != State::CAN_CONTINUE)
+        {
             return state_;
         }
     }
@@ -59,22 +71,26 @@ KeyValueBlobReader::State KeyValueBlobReader::Next(KeyValue* out)
 
     key_begin = current_;
     state_ = SkipUntilNot(content_char);
-    if (state_ != State::CAN_CONTINUE) {
+    if (state_ != State::CAN_CONTINUE)
+    {
         goto error;
     }
     key_length = current_ - key_begin;
 
     // There should be at least one blank character after the key string.
-    if (!blank(*current_)) {
+    if (!blank(*current_))
+    {
         goto error;
     }
 
     state_ = SkipUntilNot(blank);
-    if (state_ != State::CAN_CONTINUE) {
+    if (state_ != State::CAN_CONTINUE)
+    {
         goto error;
     }
 
-    if (!content_char(*current_)) {
+    if (!content_char(*current_))
+    {
         goto error;
     }
 
@@ -90,9 +106,9 @@ KeyValueBlobReader::State KeyValueBlobReader::Next(KeyValue* out)
     // like "foo bar baz\n" where baz should not be treated as the Next key.
     SkipUntil(new_line);
 
-    if (out != nullptr) {
-        *out = KeyValue { std::string_view { key_begin, key_length },
-            std::string_view { value_begin, value_length } };
+    if (out != nullptr)
+    {
+        *out = KeyValue{std::string_view{key_begin, key_length}, std::string_view{value_begin, value_length}};
     }
     state_ = State::HAS_PAIR;
     return state_;
@@ -102,11 +118,12 @@ error:
     return state_;
 }
 
-KeyValueBlobReader::State KeyValueBlobReader::SkipUntilNot(
-    const std::function<bool(char)>& f)
+KeyValueBlobReader::State KeyValueBlobReader::SkipUntilNot(const std::function<bool(char)> &f)
 {
-    while (current_ != end_ && *current_) {
-        if (!f(*current_)) {
+    while (current_ != end_ && *current_)
+    {
+        if (!f(*current_))
+        {
             return State::CAN_CONTINUE;
         }
         ++current_;
@@ -115,11 +132,12 @@ KeyValueBlobReader::State KeyValueBlobReader::SkipUntilNot(
     return State::END;
 }
 
-KeyValueBlobReader::State KeyValueBlobReader::SkipUntil(
-    const std::function<bool(char)>& f)
+KeyValueBlobReader::State KeyValueBlobReader::SkipUntil(const std::function<bool(char)> &f)
 {
-    while (current_ != end_ && *current_) {
-        if (f(*current_)) {
+    while (current_ != end_ && *current_)
+    {
+        if (f(*current_))
+        {
             return State::CAN_CONTINUE;
         }
         ++current_;
@@ -128,8 +146,7 @@ KeyValueBlobReader::State KeyValueBlobReader::SkipUntil(
     return State::END;
 }
 
-std::ostream& operator<<(
-    std::ostream& os, const KeyValueBlobReader::KeyValue& kv)
+std::ostream &operator<<(std::ostream &os, const KeyValueBlobReader::KeyValue &kv)
 {
     os << "(key: " << kv.key << ", value: " << kv.value << ")";
     return os;

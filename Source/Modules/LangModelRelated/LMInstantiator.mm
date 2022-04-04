@@ -1,27 +1,35 @@
 // Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// All possible vChewing-specific modifications are of:
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 /*
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-documentation files (the "Software"), to deal in the Software without restriction, including without limitation
-the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
-to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
 
-1. The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+1. The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-2. No trademark license is granted to use the trade names, trademarks, service marks, or product names of Contributor,
-   except as required to fulfill notice requirements above.
+2. No trademark license is granted to use the trade names, trademarks, service
+marks, or product names of Contributor, except as required to fulfill notice
+requirements above.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
-TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 #include "LMInstantiator.h"
 #include <algorithm>
 #include <iterator>
 
-namespace vChewing {
+namespace vChewing
+{
 
 LMInstantiator::LMInstantiator()
 {
@@ -39,9 +47,10 @@ LMInstantiator::~LMInstantiator()
     m_associatedPhrases.close();
 }
 
-void LMInstantiator::loadLanguageModel(const char* languageModelDataPath)
+void LMInstantiator::loadLanguageModel(const char *languageModelDataPath)
 {
-    if (languageModelDataPath) {
+    if (languageModelDataPath)
+    {
         m_languageModel.close();
         m_languageModel.open(languageModelDataPath);
     }
@@ -52,9 +61,10 @@ bool LMInstantiator::isDataModelLoaded()
     return m_languageModel.isLoaded();
 }
 
-void LMInstantiator::loadCNSData(const char* cnsDataPath)
+void LMInstantiator::loadCNSData(const char *cnsDataPath)
 {
-    if (cnsDataPath) {
+    if (cnsDataPath)
+    {
         m_cnsModel.close();
         m_cnsModel.open(cnsDataPath);
     }
@@ -65,9 +75,10 @@ bool LMInstantiator::isCNSDataLoaded()
     return m_cnsModel.isLoaded();
 }
 
-void LMInstantiator::loadMiscData(const char* miscDataPath)
+void LMInstantiator::loadMiscData(const char *miscDataPath)
 {
-    if (miscDataPath) {
+    if (miscDataPath)
+    {
         m_miscModel.close();
         m_miscModel.open(miscDataPath);
     }
@@ -78,9 +89,10 @@ bool LMInstantiator::isMiscDataLoaded()
     return m_miscModel.isLoaded();
 }
 
-void LMInstantiator::loadSymbolData(const char* symbolDataPath)
+void LMInstantiator::loadSymbolData(const char *symbolDataPath)
 {
-    if (symbolDataPath) {
+    if (symbolDataPath)
+    {
         m_symbolModel.close();
         m_symbolModel.open(symbolDataPath);
     }
@@ -91,14 +103,15 @@ bool LMInstantiator::isSymbolDataLoaded()
     return m_symbolModel.isLoaded();
 }
 
-void LMInstantiator::loadUserPhrases(const char* userPhrasesDataPath,
-    const char* excludedPhrasesDataPath)
+void LMInstantiator::loadUserPhrases(const char *userPhrasesDataPath, const char *excludedPhrasesDataPath)
 {
-    if (userPhrasesDataPath) {
+    if (userPhrasesDataPath)
+    {
         m_userPhrases.close();
         m_userPhrases.open(userPhrasesDataPath);
     }
-    if (excludedPhrasesDataPath) {
+    if (excludedPhrasesDataPath)
+    {
         m_excludedPhrases.close();
         m_excludedPhrases.open(excludedPhrasesDataPath);
     }
@@ -106,7 +119,8 @@ void LMInstantiator::loadUserPhrases(const char* userPhrasesDataPath,
 
 void LMInstantiator::loadUserSymbolData(const char *userSymbolDataPath)
 {
-    if (userSymbolDataPath) {
+    if (userSymbolDataPath)
+    {
         m_userSymbolModel.close();
         m_userSymbolModel.open(userSymbolDataPath);
     }
@@ -114,28 +128,32 @@ void LMInstantiator::loadUserSymbolData(const char *userSymbolDataPath)
 
 void LMInstantiator::loadUserAssociatedPhrases(const char *userAssociatedPhrasesPath)
 {
-    if (userAssociatedPhrasesPath) {
+    if (userAssociatedPhrasesPath)
+    {
         m_associatedPhrases.close();
         m_associatedPhrases.open(userAssociatedPhrasesPath);
     }
 }
 
-void LMInstantiator::loadPhraseReplacementMap(const char* phraseReplacementPath)
+void LMInstantiator::loadPhraseReplacementMap(const char *phraseReplacementPath)
 {
-    if (phraseReplacementPath) {
+    if (phraseReplacementPath)
+    {
         m_phraseReplacement.close();
         m_phraseReplacement.open(phraseReplacementPath);
     }
 }
 
-const std::vector<Gramambular::Bigram> LMInstantiator::bigramsForKeys(const std::string& preceedingKey, const std::string& key)
+const std::vector<Gramambular::Bigram> LMInstantiator::bigramsForKeys(const std::string &preceedingKey,
+                                                                      const std::string &key)
 {
     return std::vector<Gramambular::Bigram>();
 }
 
-const std::vector<Gramambular::Unigram> LMInstantiator::unigramsForKey(const std::string& key)
+const std::vector<Gramambular::Unigram> LMInstantiator::unigramsForKey(const std::string &key)
 {
-    if (key == " ") {
+    if (key == " ")
+    {
         std::vector<Gramambular::Unigram> spaceUnigrams;
         Gramambular::Unigram g;
         g.keyValue.key = " ";
@@ -152,17 +170,18 @@ const std::vector<Gramambular::Unigram> LMInstantiator::unigramsForKey(const std
     std::vector<Gramambular::Unigram> userSymbolUnigrams;
     std::vector<Gramambular::Unigram> cnsUnigrams;
 
-     std::unordered_set<std::string> excludedValues;
-     std::unordered_set<std::string> insertedValues;
+    std::unordered_set<std::string> excludedValues;
+    std::unordered_set<std::string> insertedValues;
 
-    if (m_excludedPhrases.hasUnigramsForKey(key)) {
+    if (m_excludedPhrases.hasUnigramsForKey(key))
+    {
         std::vector<Gramambular::Unigram> excludedUnigrams = m_excludedPhrases.unigramsForKey(key);
-        transform(excludedUnigrams.begin(), excludedUnigrams.end(),
-            inserter(excludedValues, excludedValues.end()),
-            [](const Gramambular::Unigram& u) { return u.keyValue.value; });
+        transform(excludedUnigrams.begin(), excludedUnigrams.end(), inserter(excludedValues, excludedValues.end()),
+                  [](const Gramambular::Unigram &u) { return u.keyValue.value; });
     }
 
-    if (m_userPhrases.hasUnigramsForKey(key)) {
+    if (m_userPhrases.hasUnigramsForKey(key))
+    {
         std::vector<Gramambular::Unigram> rawUserUnigrams = m_userPhrases.unigramsForKey(key);
         // 用這句指令讓使用者語彙檔案內的詞條優先順序隨著行數增加而逐漸增高。
         // 這樣一來就可以在就地新增語彙時徹底複寫優先權。
@@ -170,27 +189,32 @@ const std::vector<Gramambular::Unigram> LMInstantiator::unigramsForKey(const std
         userUnigrams = filterAndTransformUnigrams(rawUserUnigrams, excludedValues, insertedValues);
     }
 
-    if (m_languageModel.hasUnigramsForKey(key)) {
+    if (m_languageModel.hasUnigramsForKey(key))
+    {
         std::vector<Gramambular::Unigram> rawGlobalUnigrams = m_languageModel.unigramsForKey(key);
         allUnigrams = filterAndTransformUnigrams(rawGlobalUnigrams, excludedValues, insertedValues);
     }
 
-    if (m_miscModel.hasUnigramsForKey(key)) {
+    if (m_miscModel.hasUnigramsForKey(key))
+    {
         std::vector<Gramambular::Unigram> rawMiscUnigrams = m_miscModel.unigramsForKey(key);
         miscUnigrams = filterAndTransformUnigrams(rawMiscUnigrams, excludedValues, insertedValues);
     }
 
-    if (m_symbolModel.hasUnigramsForKey(key) && m_symbolEnabled) {
+    if (m_symbolModel.hasUnigramsForKey(key) && m_symbolEnabled)
+    {
         std::vector<Gramambular::Unigram> rawSymbolUnigrams = m_symbolModel.unigramsForKey(key);
         symbolUnigrams = filterAndTransformUnigrams(rawSymbolUnigrams, excludedValues, insertedValues);
     }
 
-    if (m_userSymbolModel.hasUnigramsForKey(key) && m_symbolEnabled) {
+    if (m_userSymbolModel.hasUnigramsForKey(key) && m_symbolEnabled)
+    {
         std::vector<Gramambular::Unigram> rawUserSymbolUnigrams = m_userSymbolModel.unigramsForKey(key);
         userSymbolUnigrams = filterAndTransformUnigrams(rawUserSymbolUnigrams, excludedValues, insertedValues);
     }
 
-    if (m_cnsModel.hasUnigramsForKey(key) && m_cnsEnabled) {
+    if (m_cnsModel.hasUnigramsForKey(key) && m_cnsEnabled)
+    {
         std::vector<Gramambular::Unigram> rawCNSUnigrams = m_cnsModel.unigramsForKey(key);
         cnsUnigrams = filterAndTransformUnigrams(rawCNSUnigrams, excludedValues, insertedValues);
     }
@@ -203,13 +227,15 @@ const std::vector<Gramambular::Unigram> LMInstantiator::unigramsForKey(const std
     return allUnigrams;
 }
 
-bool LMInstantiator::hasUnigramsForKey(const std::string& key)
+bool LMInstantiator::hasUnigramsForKey(const std::string &key)
 {
-    if (key == " ") {
+    if (key == " ")
+    {
         return true;
     }
 
-    if (!m_excludedPhrases.hasUnigramsForKey(key)) {
+    if (!m_excludedPhrases.hasUnigramsForKey(key))
+    {
         return m_userPhrases.hasUnigramsForKey(key) || m_languageModel.hasUnigramsForKey(key);
     }
 
@@ -246,26 +272,33 @@ bool LMInstantiator::symbolEnabled()
     return m_symbolEnabled;
 }
 
-const std::vector<Gramambular::Unigram> LMInstantiator::filterAndTransformUnigrams(const std::vector<Gramambular::Unigram> unigrams, const  std::unordered_set<std::string>& excludedValues,  std::unordered_set<std::string>& insertedValues)
+const std::vector<Gramambular::Unigram> LMInstantiator::filterAndTransformUnigrams(
+    const std::vector<Gramambular::Unigram> unigrams, const std::unordered_set<std::string> &excludedValues,
+    std::unordered_set<std::string> &insertedValues)
 {
     std::vector<Gramambular::Unigram> results;
 
-    for (auto&& unigram : unigrams) {
+    for (auto &&unigram : unigrams)
+    {
         // excludedValues filters out the unigrams with the original value.
         // insertedValues filters out the ones with the converted value
         std::string originalValue = unigram.keyValue.value;
-        if (excludedValues.find(originalValue) != excludedValues.end()) {
+        if (excludedValues.find(originalValue) != excludedValues.end())
+        {
             continue;
         }
 
         std::string value = originalValue;
-        if (m_phraseReplacementEnabled) {
+        if (m_phraseReplacementEnabled)
+        {
             std::string replacement = m_phraseReplacement.valueForKey(value);
-            if (replacement != "") {
+            if (replacement != "")
+            {
                 value = replacement;
             }
         }
-        if (insertedValues.find(value) == insertedValues.end()) {
+        if (insertedValues.find(value) == insertedValues.end())
+        {
             Gramambular::Unigram g;
             g.keyValue.value = value;
             g.keyValue.key = unigram.keyValue.key;
@@ -277,12 +310,12 @@ const std::vector<Gramambular::Unigram> LMInstantiator::filterAndTransformUnigra
     return results;
 }
 
-const std::vector<std::string> LMInstantiator::associatedPhrasesForKey(const std::string& key)
+const std::vector<std::string> LMInstantiator::associatedPhrasesForKey(const std::string &key)
 {
     return m_associatedPhrases.valuesForKey(key);
 }
 
-bool LMInstantiator::hasAssociatedPhrasesForKey(const std::string& key)
+bool LMInstantiator::hasAssociatedPhrasesForKey(const std::string &key)
 {
     return m_associatedPhrases.hasValuesForKey(key);
 }

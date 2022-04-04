@@ -1,28 +1,35 @@
 // Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// All possible vChewing-specific modifications are of:
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 /*
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-documentation files (the "Software"), to deal in the Software without restriction, including without limitation
-the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
-to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
 
-1. The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+1. The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-2. No trademark license is granted to use the trade names, trademarks, service marks, or product names of Contributor,
-   except as required to fulfill notice requirements above.
+2. No trademark license is granted to use the trade names, trademarks, service
+marks, or product names of Contributor, except as required to fulfill notice
+requirements above.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
-TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 #ifndef LMInstantiator_H
 #define LMInstantiator_H
 
 #include "AssociatedPhrases.h"
-#include "CoreLM.h"
 #include "CNSLM.h"
+#include "CoreLM.h"
 #include "ParselessLM.h"
 #include "PhraseReplacementMap.h"
 #include "SymbolLM.h"
@@ -31,7 +38,8 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <stdio.h>
 #include <unordered_set>
 
-namespace vChewing {
+namespace vChewing
+{
 
 using namespace Gramambular;
 
@@ -57,58 +65,59 @@ using namespace Gramambular;
 /// model while launching and to load the user phrases anytime if the custom
 /// files are modified. It does not keep the reference of the data pathes but
 /// you have to pass the paths when you ask it to do loading.
-class LMInstantiator : public Gramambular::LanguageModel {
-public:
+class LMInstantiator : public Gramambular::LanguageModel
+{
+  public:
     LMInstantiator();
     ~LMInstantiator();
 
     /// Asks to load the primary language model at the given path.
     /// @param languageModelPath The path of the language model.
-    void loadLanguageModel(const char* languageModelPath);
+    void loadLanguageModel(const char *languageModelPath);
     /// If the data model is already loaded.
     bool isDataModelLoaded();
 
     /// Asks to load the primary language model at the given path.
     /// @param miscDataPath The path of the misc data model.
-    void loadMiscData(const char* miscDataPath);
+    void loadMiscData(const char *miscDataPath);
     /// If the data model is already loaded.
     bool isMiscDataLoaded();
 
     /// Asks to load the primary language model at the given path.
     /// @param symbolDataPath The path of the symbol data model.
-    void loadSymbolData(const char* symbolDataPath);
+    void loadSymbolData(const char *symbolDataPath);
     /// If the data model is already loaded.
     bool isSymbolDataLoaded();
 
     /// Asks to load the primary language model at the given path.
     /// @param cnsDataPath The path of the CNS data model.
-    void loadCNSData(const char* cnsDataPath);
+    void loadCNSData(const char *cnsDataPath);
     /// If the data model is already loaded.
     bool isCNSDataLoaded();
 
     /// Asks to load the user phrases and excluded phrases at the given path.
     /// @param userPhrasesPath The path of user phrases.
     /// @param excludedPhrasesPath The path of excluded phrases.
-    void loadUserPhrases(const char* userPhrasesPath, const char* excludedPhrasesPath);
+    void loadUserPhrases(const char *userPhrasesPath, const char *excludedPhrasesPath);
     /// Asks to load the user symbol data at the given path.
     /// @param userSymbolDataPath The path of user symbol data.
-    void loadUserSymbolData(const char* userPhrasesPath);
+    void loadUserSymbolData(const char *userPhrasesPath);
     /// Asks to load the user associated phrases at the given path.
     /// @param userAssociatedPhrasesPath The path of the user associated phrases.
-    void loadUserAssociatedPhrases(const char* userAssociatedPhrasesPath);
+    void loadUserAssociatedPhrases(const char *userAssociatedPhrasesPath);
     /// Asks to load the phrase replacement table at the given path.
     /// @param phraseReplacementPath The path of the phrase replacement table.
-    void loadPhraseReplacementMap(const char* phraseReplacementPath);
+    void loadPhraseReplacementMap(const char *phraseReplacementPath);
 
     /// Not implemented since we do not have data to provide bigram function.
-    const std::vector<Gramambular::Bigram> bigramsForKeys(const std::string& preceedingKey, const std::string& key);
+    const std::vector<Gramambular::Bigram> bigramsForKeys(const std::string &preceedingKey, const std::string &key);
     /// Returns a list of available unigram for the given key.
     /// @param key A std::string represents the BPMF reading or a symbol key. For
     ///     example, it you pass "ㄇㄚ", it returns "嗎", "媽", and so on.
-    const std::vector<Gramambular::Unigram> unigramsForKey(const std::string& key);
+    const std::vector<Gramambular::Unigram> unigramsForKey(const std::string &key);
     /// If the model has unigrams for the given key.
     /// @param key The key.
-    bool hasUnigramsForKey(const std::string& key);
+    bool hasUnigramsForKey(const std::string &key);
 
     /// Enables or disables phrase replacement.
     void setPhraseReplacementEnabled(bool enabled);
@@ -125,21 +134,20 @@ public:
     /// If CNS11643 input is enabled or not.
     bool cnsEnabled();
 
-    const std::vector<std::string> associatedPhrasesForKey(const std::string& key);
-    bool hasAssociatedPhrasesForKey(const std::string& key);
+    const std::vector<std::string> associatedPhrasesForKey(const std::string &key);
+    bool hasAssociatedPhrasesForKey(const std::string &key);
 
-
-protected:
+  protected:
     /// Filters and converts the input unigrams and return a new list of unigrams.
-    /// 
+    ///
     /// @param unigrams The unigrams to be processed.
     /// @param excludedValues The values to excluded unigrams.
     /// @param insertedValues The values for unigrams already in the results.
     ///   It helps to prevent duplicated unigrams. Please note that the method
     ///   has a side effect that it inserts values to `insertedValues`.
-    const std::vector<Gramambular::Unigram> filterAndTransformUnigrams(const std::vector<Gramambular::Unigram> unigrams,
-        const std::unordered_set<std::string>& excludedValues,
-        std::unordered_set<std::string>& insertedValues);
+    const std::vector<Gramambular::Unigram> filterAndTransformUnigrams(
+        const std::vector<Gramambular::Unigram> unigrams, const std::unordered_set<std::string> &excludedValues,
+        std::unordered_set<std::string> &insertedValues);
 
     ParselessLM m_languageModel;
     CoreLM m_miscModel;
@@ -154,6 +162,6 @@ protected:
     bool m_cnsEnabled;
     bool m_symbolEnabled;
 };
-};
+}; // namespace vChewing
 
 #endif

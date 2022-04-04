@@ -20,9 +20,9 @@
 		5B62A33627AE795800A19448 /* mgrPrefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33527AE795800A19448 /* mgrPrefs.swift */; };
 		5B62A33827AE79CD00A19448 /* NSStringUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33727AE79CD00A19448 /* NSStringUtils.swift */; };
 		5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */; };
-		5B62A34627AE7CD900A19448 /* HorizontalCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33F27AE7CD900A19448 /* HorizontalCandidateController.swift */; };
-		5B62A34727AE7CD900A19448 /* CandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34027AE7CD900A19448 /* CandidateController.swift */; };
-		5B62A34827AE7CD900A19448 /* VerticalCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34127AE7CD900A19448 /* VerticalCandidateController.swift */; };
+		5B62A34627AE7CD900A19448 /* ctlCandidateHorizontal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33F27AE7CD900A19448 /* ctlCandidateHorizontal.swift */; };
+		5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34027AE7CD900A19448 /* ctlCandidate.swift */; };
+		5B62A34827AE7CD900A19448 /* ctlCandidateVertical.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34127AE7CD900A19448 /* ctlCandidateVertical.swift */; };
 		5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34327AE7CD900A19448 /* TooltipController.swift */; };
 		5B62A34A27AE7CD900A19448 /* NotifierController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34527AE7CD900A19448 /* NotifierController.swift */; };
 		5B62A35327AE89C400A19448 /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33127AE792F00A19448 /* InputSourceHelper.swift */; };
@@ -31,6 +31,7 @@
 		5B73FB5E27B2BE1300E9BF49 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */; };
 		5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */; };
 		5BAD0CD527D701F6003D127F /* vChewingKeyLayout.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */; };
+		5BB802DA27FABA8300CF1C19 /* ctlInputMethod_Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */; };
 		5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75D27AED54C0023B93A /* Beep.m4a */; };
 		5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75E27AED54C0023B93A /* Fart.m4a */; };
 		5BBBB76B27AED5DB0023B93A /* frmNonModalAlertWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB76527AED5DB0023B93A /* frmNonModalAlertWindow.xib */; };
@@ -174,9 +175,9 @@
 		5B62A33527AE795800A19448 /* mgrPrefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mgrPrefs.swift; sourceTree = "<group>"; };
 		5B62A33727AE79CD00A19448 /* NSStringUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStringUtils.swift; sourceTree = "<group>"; };
 		5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlAboutWindow.swift; sourceTree = "<group>"; };
-		5B62A33F27AE7CD900A19448 /* HorizontalCandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontalCandidateController.swift; sourceTree = "<group>"; };
-		5B62A34027AE7CD900A19448 /* CandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CandidateController.swift; sourceTree = "<group>"; };
-		5B62A34127AE7CD900A19448 /* VerticalCandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalCandidateController.swift; sourceTree = "<group>"; };
+		5B62A33F27AE7CD900A19448 /* ctlCandidateHorizontal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ctlCandidateHorizontal.swift; sourceTree = "<group>"; };
+		5B62A34027AE7CD900A19448 /* ctlCandidate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ctlCandidate.swift; sourceTree = "<group>"; };
+		5B62A34127AE7CD900A19448 /* ctlCandidateVertical.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ctlCandidateVertical.swift; sourceTree = "<group>"; };
 		5B62A34327AE7CD900A19448 /* TooltipController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TooltipController.swift; sourceTree = "<group>"; };
 		5B62A34527AE7CD900A19448 /* NotifierController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotifierController.swift; sourceTree = "<group>"; };
 		5B707CE527D9F3A10099EF99 /* SwiftyOpenCC */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SwiftyOpenCC; path = Packages/SwiftyOpenCC; sourceTree = "<group>"; };
@@ -187,6 +188,7 @@
 		5B7BC4AF27AFFBE800F66C24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Source/WindowNIBs/Base.lproj/frmPrefWindow.xib; sourceTree = "<group>"; };
 		5B7BC4B227AFFC0B00F66C24 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Source/WindowNIBs/en.lproj/frmPrefWindow.strings; sourceTree = "<group>"; };
 		5B8F43ED27C9BC220069AC27 /* SymbolLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SymbolLM.h; sourceTree = "<group>"; };
+		5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_Menu.swift; sourceTree = "<group>"; };
 		5BBBB75D27AED54C0023B93A /* Beep.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.m4a; sourceTree = "<group>"; };
 		5BBBB75E27AED54C0023B93A /* Fart.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.m4a; sourceTree = "<group>"; };
 		5BBBB76627AED5DB0023B93A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmNonModalAlertWindow.xib; sourceTree = "<group>"; };
@@ -409,6 +411,7 @@
 			isa = PBXGroup;
 			children = (
 				D4A13D5927A59D5C003BE359 /* ctlInputMethod.swift */,
+				5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */,
 				5B62A33127AE792F00A19448 /* InputSourceHelper.swift */,
 				5B62A33527AE795800A19448 /* mgrPrefs.swift */,
 			);
@@ -505,9 +508,9 @@
 		5B62A33E27AE7CD900A19448 /* CandidateUI */ = {
 			isa = PBXGroup;
 			children = (
-				5B62A33F27AE7CD900A19448 /* HorizontalCandidateController.swift */,
-				5B62A34027AE7CD900A19448 /* CandidateController.swift */,
-				5B62A34127AE7CD900A19448 /* VerticalCandidateController.swift */,
+				5B62A34027AE7CD900A19448 /* ctlCandidate.swift */,
+				5B62A33F27AE7CD900A19448 /* ctlCandidateHorizontal.swift */,
+				5B62A34127AE7CD900A19448 /* ctlCandidateVertical.swift */,
 			);
 			path = CandidateUI;
 			sourceTree = "<group>";
@@ -984,12 +987,13 @@
 				5B5E535227EF261400C6AA1E /* IME.swift in Sources */,
 				5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
-				5B62A34827AE7CD900A19448 /* VerticalCandidateController.swift in Sources */,
+				5B62A34827AE7CD900A19448 /* ctlCandidateVertical.swift in Sources */,
 				6ACC3D452793701600F1B140 /* ParselessLM.cpp in Sources */,
 				5BBBB77A27AEDC690023B93A /* clsSFX.swift in Sources */,
 				5BF8423127BAA942008E7E4C /* vChewingKanjiConverter.swift in Sources */,
-				5B62A34627AE7CD900A19448 /* HorizontalCandidateController.swift in Sources */,
-				5B62A34727AE7CD900A19448 /* CandidateController.swift in Sources */,
+				5B62A34627AE7CD900A19448 /* ctlCandidateHorizontal.swift in Sources */,
+				5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */,
+				5BB802DA27FABA8300CF1C19 /* ctlInputMethod_Menu.swift in Sources */,
 				D41355DE278EA3ED005E5CBD /* UserPhrasesLM.mm in Sources */,
 				6ACC3D3F27914F2400F1B140 /* KeyValueBlobReader.cpp in Sources */,
 				D41355D8278D74B5005E5CBD /* mgrLangModel.mm in Sources */,
@@ -1187,7 +1191,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1947;
+				CURRENT_PROJECT_VERSION = 1948;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1210,7 +1214,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.4.6;
+				MARKETING_VERSION = 1.4.7;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
@@ -1243,7 +1247,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1947;
+				CURRENT_PROJECT_VERSION = 1948;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1262,7 +1266,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.4.6;
+				MARKETING_VERSION = 1.4.7;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
@@ -1377,7 +1381,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1947;
+				CURRENT_PROJECT_VERSION = 1948;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1412,7 +1416,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.4.6;
+				MARKETING_VERSION = 1.4.7;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1445,7 +1449,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1947;
+				CURRENT_PROJECT_VERSION = 1948;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1475,7 +1479,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.4.6;
+				MARKETING_VERSION = 1.4.7;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1559,7 +1563,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1947;
+				CURRENT_PROJECT_VERSION = 1948;
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1584,7 +1588,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.4.6;
+				MARKETING_VERSION = 1.4.7;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.atelierInmu.vChewing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1612,7 +1616,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1947;
+				CURRENT_PROJECT_VERSION = 1948;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1632,7 +1636,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.4.6;
+				MARKETING_VERSION = 1.4.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.atelierInmu.vChewing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

@@ -1,0 +1,39 @@
+[core]
+        repositoryformatversion = 0
+        filemode = true
+        bare = false
+        logallrefupdates = true
+        ignorecase = false
+        precomposeunicode = true
+[submodule]
+        active = .
+[remote "origin"]
+        url = https://gitee.com/vchewing/vChewing-macOS
+        fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "main"]
+        remote = origin
+        merge = refs/heads/main
+[submodule "Source/Data"]
+        url = https://gitee.com/vchewing/libvchewing-data
+[branch "upd/dev"]
+        remote = origin
+        merge = refs/heads/upd/dev
+[branch "bleed/1.5.x"]
+        remote = origin
+        merge = refs/heads/bleed/1.5.x
+[remote "gitcode"]
+        url = https://gitcode.net/vChewing/vChewing-macOS.git/
+        fetch = +refs/heads/*:refs/remotes/gitcode/*
+[remote "gitlab"]
+        url = https://jihulab.com/vChewing/vChewing-macOS.git/
+        fetch = +refs/heads/*:refs/remotes/gitlab/*
+[remote "github"]
+        url = https://github.com/ShikiSuen//vChewing-macOS
+        fetch = +refs/heads/*:refs/remotes/github/*
+[remote "all"]
+        url = https://gitee.com/vchewing/vChewing-macOS
+        fetch = +refs/heads/*:refs/remotes/all/*
+        pushurl = https://gitee.com/vchewing/vChewing-macOS
+        pushurl = https://gitcode.net/vChewing/vChewing-macOS.git/
+        pushurl = https://jihulab.com/vChewing/vChewing-macOS.git/
+        pushurl = https://github.com/ShikiSuen//vChewing-macOS
