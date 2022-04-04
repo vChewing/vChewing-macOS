@@ -31,6 +31,11 @@ import Cocoa
 	// MARK: - 開關判定當前應用究竟是？
 	@objc static var areWeUsingOurOwnPhraseEditor: Bool = false
 
+	// MARK: - 自 ctlInputMethod 讀取當前輸入法的簡繁體模式
+	static func getInputMode() -> InputMode {
+		return ctlInputMethod.currentKeyHandler.inputMode
+	}
+
 	// MARK: - Print debug information to the console.
 	@objc static func prtDebugIntel(_ strPrint: String) {
 		if mgrPrefs.isDebugModeEnabled {
@@ -74,6 +79,30 @@ import Cocoa
 			}
 		}
 		return false
+	}
+
+	// MARK: - Open a phrase data file.
+	static func openPhraseFile(userFileAt path: String) {
+		func checkIfUserFilesExist() -> Bool {
+			if !mgrLangModel.checkIfUserLanguageModelFilesExist() {
+				let content = String(
+					format: NSLocalizedString(
+						"Please check the permission at \"%@\".", comment: ""),
+					mgrLangModel.dataFolderPath(isDefaultFolder: false))
+				ctlNonModalAlertWindow.shared.show(
+					title: NSLocalizedString("Unable to create the user phrase file.", comment: ""),
+					content: content, confirmButtonTitle: NSLocalizedString("OK", comment: ""),
+					cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
+				NSApp.setActivationPolicy(.accessory)
+				return false
+			}
+			return true
+		}
+
+		if !checkIfUserFilesExist() {
+			return
+		}
+		NSWorkspace.shared.openFile(path, withApplication: "vChewingPhraseEditor")
 	}
 
 	// MARK: - Trash a file if it exists.
