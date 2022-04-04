@@ -1261,7 +1261,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 {
     NSString *inputText = input.inputText;
     UniChar charCode = input.charCode;
-    VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
+    ctlCandidate *ctlCandidateCurrent = [self.delegate ctlCandidateForKeyHandler:self];
 
     BOOL cancelCandidateKey = [input isBackSpace] || [input isESC] || [input isDelete] ||
                               (([input isCursorBackward] || [input isCursorForward]) && [input isShiftHold]);
@@ -1306,18 +1306,18 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             return YES;
         }
         [self.delegate keyHandler:self
-            didSelectCandidateAtIndex:gCurrentCandidateController.selectedCandidateIndex
-                  candidateController:gCurrentCandidateController];
+            didSelectCandidateAtIndex:ctlCandidateCurrent.selectedCandidateIndex
+                         ctlCandidate:ctlCandidateCurrent];
         return YES;
     }
 
     if ([input isTab])
     {
-        BOOL updated = mgrPrefs.specifyTabKeyBehavior
-                           ? ([input isShiftHold] ? [gCurrentCandidateController showPreviousPage]
-                                                  : [gCurrentCandidateController showNextPage])
-                           : ([input isShiftHold] ? [gCurrentCandidateController highlightPreviousCandidate]
-                                                  : [gCurrentCandidateController highlightNextCandidate]);
+        BOOL updated =
+            mgrPrefs.specifyTabKeyBehavior
+                ? ([input isShiftHold] ? [ctlCandidateCurrent showPreviousPage] : [ctlCandidateCurrent showNextPage])
+                : ([input isShiftHold] ? [ctlCandidateCurrent highlightPreviousCandidate]
+                                       : [ctlCandidateCurrent highlightNextCandidate]);
         if (!updated)
         {
             [IME prtDebugIntel:@"9B691919"];
@@ -1329,10 +1329,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if ([input isSpace])
     {
         BOOL updated = mgrPrefs.specifySpaceKeyBehavior
-                           ? ([input isShiftHold] ? [gCurrentCandidateController highlightNextCandidate]
-                                                  : [gCurrentCandidateController showNextPage])
-                           : ([input isShiftHold] ? [gCurrentCandidateController showNextPage]
-                                                  : [gCurrentCandidateController highlightNextCandidate]);
+                           ? ([input isShiftHold] ? [ctlCandidateCurrent highlightNextCandidate]
+                                                  : [ctlCandidateCurrent showNextPage])
+                           : ([input isShiftHold] ? [ctlCandidateCurrent showNextPage]
+                                                  : [ctlCandidateCurrent highlightNextCandidate]);
         if (!updated)
         {
             [IME prtDebugIntel:@"A11C781F"];
@@ -1343,7 +1343,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if ([input isPageDown] || input.emacsKey == vChewingEmacsKeyNextPage)
     {
-        BOOL updated = [gCurrentCandidateController showNextPage];
+        BOOL updated = [ctlCandidateCurrent showNextPage];
         if (!updated)
         {
             [IME prtDebugIntel:@"9B691919"];
@@ -1354,7 +1354,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if ([input isPageUp])
     {
-        BOOL updated = [gCurrentCandidateController showPreviousPage];
+        BOOL updated = [ctlCandidateCurrent showPreviousPage];
         if (!updated)
         {
             [IME prtDebugIntel:@"9569955D"];
@@ -1365,9 +1365,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if ([input isLeft])
     {
-        if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]])
+        if ([ctlCandidateCurrent isKindOfClass:[ctlCandidateHorizontal class]])
         {
-            BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
+            BOOL updated = [ctlCandidateCurrent highlightPreviousCandidate];
             if (!updated)
             {
                 [IME prtDebugIntel:@"1145148D"];
@@ -1376,7 +1376,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         }
         else
         {
-            BOOL updated = [gCurrentCandidateController showPreviousPage];
+            BOOL updated = [ctlCandidateCurrent showPreviousPage];
             if (!updated)
             {
                 [IME prtDebugIntel:@"1919810D"];
@@ -1388,7 +1388,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if (input.emacsKey == vChewingEmacsKeyBackward)
     {
-        BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
+        BOOL updated = [ctlCandidateCurrent highlightPreviousCandidate];
         if (!updated)
         {
             [IME prtDebugIntel:@"9B89308D"];
@@ -1399,9 +1399,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if ([input isRight])
     {
-        if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]])
+        if ([ctlCandidateCurrent isKindOfClass:[ctlCandidateHorizontal class]])
         {
-            BOOL updated = [gCurrentCandidateController highlightNextCandidate];
+            BOOL updated = [ctlCandidateCurrent highlightNextCandidate];
             if (!updated)
             {
                 [IME prtDebugIntel:@"9B65138D"];
@@ -1410,7 +1410,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         }
         else
         {
-            BOOL updated = [gCurrentCandidateController showNextPage];
+            BOOL updated = [ctlCandidateCurrent showNextPage];
             if (!updated)
             {
                 [IME prtDebugIntel:@"9244908D"];
@@ -1422,7 +1422,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if (input.emacsKey == vChewingEmacsKeyForward)
     {
-        BOOL updated = [gCurrentCandidateController highlightNextCandidate];
+        BOOL updated = [ctlCandidateCurrent highlightNextCandidate];
         if (!updated)
         {
             [IME prtDebugIntel:@"9B2428D"];
@@ -1433,9 +1433,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if ([input isUp])
     {
-        if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]])
+        if ([ctlCandidateCurrent isKindOfClass:[ctlCandidateHorizontal class]])
         {
-            BOOL updated = [gCurrentCandidateController showPreviousPage];
+            BOOL updated = [ctlCandidateCurrent showPreviousPage];
             if (!updated)
             {
                 [IME prtDebugIntel:@"9B614524"];
@@ -1444,7 +1444,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         }
         else
         {
-            BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
+            BOOL updated = [ctlCandidateCurrent highlightPreviousCandidate];
             if (!updated)
             {
                 [IME prtDebugIntel:@"ASD9908D"];
@@ -1456,9 +1456,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if ([input isDown])
     {
-        if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]])
+        if ([ctlCandidateCurrent isKindOfClass:[ctlCandidateHorizontal class]])
         {
-            BOOL updated = [gCurrentCandidateController showNextPage];
+            BOOL updated = [ctlCandidateCurrent showNextPage];
             if (!updated)
             {
                 [IME prtDebugIntel:@"92B990DD"];
@@ -1467,7 +1467,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         }
         else
         {
-            BOOL updated = [gCurrentCandidateController highlightNextCandidate];
+            BOOL updated = [ctlCandidateCurrent highlightNextCandidate];
             if (!updated)
             {
                 [IME prtDebugIntel:@"6B99908D"];
@@ -1479,14 +1479,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if ([input isHome] || input.emacsKey == vChewingEmacsKeyHome)
     {
-        if (gCurrentCandidateController.selectedCandidateIndex == 0)
+        if (ctlCandidateCurrent.selectedCandidateIndex == 0)
         {
             [IME prtDebugIntel:@"9B6EDE8D"];
             errorCallback();
         }
         else
         {
-            gCurrentCandidateController.selectedCandidateIndex = 0;
+            ctlCandidateCurrent.selectedCandidateIndex = 0;
         }
 
         return YES;
@@ -1510,14 +1510,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if (([input isEnd] || input.emacsKey == vChewingEmacsKeyEnd) && candidates.count > 0)
     {
-        if (gCurrentCandidateController.selectedCandidateIndex == candidates.count - 1)
+        if (ctlCandidateCurrent.selectedCandidateIndex == candidates.count - 1)
         {
             [IME prtDebugIntel:@"9B69AAAD"];
             errorCallback();
         }
         else
         {
-            gCurrentCandidateController.selectedCandidateIndex = candidates.count - 1;
+            ctlCandidateCurrent.selectedCandidateIndex = candidates.count - 1;
         }
         return YES;
     }
@@ -1541,9 +1541,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         match = inputText;
     }
 
-    for (NSUInteger j = 0, c = [gCurrentCandidateController.keyLabels count]; j < c; j++)
+    for (NSUInteger j = 0, c = [ctlCandidateCurrent.keyLabels count]; j < c; j++)
     {
-        VTCandidateKeyLabel *label = gCurrentCandidateController.keyLabels[j];
+        VTCandidateKeyLabel *label = ctlCandidateCurrent.keyLabels[j];
         if ([match compare:label.key options:NSCaseInsensitiveSearch] == NSOrderedSame)
         {
             index = j;
@@ -1553,12 +1553,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if (index != NSNotFound)
     {
-        NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:index];
+        NSUInteger candidateIndex = [ctlCandidateCurrent candidateIndexAtKeyLabelIndex:index];
         if (candidateIndex != NSUIntegerMax)
         {
-            [self.delegate keyHandler:self
-                didSelectCandidateAtIndex:candidateIndex
-                      candidateController:gCurrentCandidateController];
+            [self.delegate keyHandler:self didSelectCandidateAtIndex:candidateIndex ctlCandidate:ctlCandidateCurrent];
             return YES;
         }
     }
@@ -1606,12 +1604,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
         if (shouldAutoSelectCandidate)
         {
-            NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:0];
+            NSUInteger candidateIndex = [ctlCandidateCurrent candidateIndexAtKeyLabelIndex:0];
             if (candidateIndex != NSUIntegerMax)
             {
                 [self.delegate keyHandler:self
                     didSelectCandidateAtIndex:candidateIndex
-                          candidateController:gCurrentCandidateController];
+                                 ctlCandidate:ctlCandidateCurrent];
                 [self clear];
                 InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
                 stateCallback(empty);

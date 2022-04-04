@@ -20,9 +20,9 @@
 		5B62A33627AE795800A19448 /* mgrPrefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33527AE795800A19448 /* mgrPrefs.swift */; };
 		5B62A33827AE79CD00A19448 /* NSStringUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33727AE79CD00A19448 /* NSStringUtils.swift */; };
 		5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */; };
-		5B62A34627AE7CD900A19448 /* HorizontalCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33F27AE7CD900A19448 /* HorizontalCandidateController.swift */; };
-		5B62A34727AE7CD900A19448 /* CandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34027AE7CD900A19448 /* CandidateController.swift */; };
-		5B62A34827AE7CD900A19448 /* VerticalCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34127AE7CD900A19448 /* VerticalCandidateController.swift */; };
+		5B62A34627AE7CD900A19448 /* ctlCandidateHorizontal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33F27AE7CD900A19448 /* ctlCandidateHorizontal.swift */; };
+		5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34027AE7CD900A19448 /* ctlCandidate.swift */; };
+		5B62A34827AE7CD900A19448 /* ctlCandidateVertical.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34127AE7CD900A19448 /* ctlCandidateVertical.swift */; };
 		5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34327AE7CD900A19448 /* TooltipController.swift */; };
 		5B62A34A27AE7CD900A19448 /* NotifierController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34527AE7CD900A19448 /* NotifierController.swift */; };
 		5B62A35327AE89C400A19448 /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33127AE792F00A19448 /* InputSourceHelper.swift */; };
@@ -174,9 +174,9 @@
 		5B62A33527AE795800A19448 /* mgrPrefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mgrPrefs.swift; sourceTree = "<group>"; };
 		5B62A33727AE79CD00A19448 /* NSStringUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStringUtils.swift; sourceTree = "<group>"; };
 		5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlAboutWindow.swift; sourceTree = "<group>"; };
-		5B62A33F27AE7CD900A19448 /* HorizontalCandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontalCandidateController.swift; sourceTree = "<group>"; };
-		5B62A34027AE7CD900A19448 /* CandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CandidateController.swift; sourceTree = "<group>"; };
-		5B62A34127AE7CD900A19448 /* VerticalCandidateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalCandidateController.swift; sourceTree = "<group>"; };
+		5B62A33F27AE7CD900A19448 /* ctlCandidateHorizontal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ctlCandidateHorizontal.swift; sourceTree = "<group>"; };
+		5B62A34027AE7CD900A19448 /* ctlCandidate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ctlCandidate.swift; sourceTree = "<group>"; };
+		5B62A34127AE7CD900A19448 /* ctlCandidateVertical.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ctlCandidateVertical.swift; sourceTree = "<group>"; };
 		5B62A34327AE7CD900A19448 /* TooltipController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TooltipController.swift; sourceTree = "<group>"; };
 		5B62A34527AE7CD900A19448 /* NotifierController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotifierController.swift; sourceTree = "<group>"; };
 		5B707CE527D9F3A10099EF99 /* SwiftyOpenCC */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SwiftyOpenCC; path = Packages/SwiftyOpenCC; sourceTree = "<group>"; };
@@ -505,9 +505,9 @@
 		5B62A33E27AE7CD900A19448 /* CandidateUI */ = {
 			isa = PBXGroup;
 			children = (
-				5B62A33F27AE7CD900A19448 /* HorizontalCandidateController.swift */,
-				5B62A34027AE7CD900A19448 /* CandidateController.swift */,
-				5B62A34127AE7CD900A19448 /* VerticalCandidateController.swift */,
+				5B62A34027AE7CD900A19448 /* ctlCandidate.swift */,
+				5B62A33F27AE7CD900A19448 /* ctlCandidateHorizontal.swift */,
+				5B62A34127AE7CD900A19448 /* ctlCandidateVertical.swift */,
 			);
 			path = CandidateUI;
 			sourceTree = "<group>";
@@ -984,12 +984,12 @@
 				5B5E535227EF261400C6AA1E /* IME.swift in Sources */,
 				5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
-				5B62A34827AE7CD900A19448 /* VerticalCandidateController.swift in Sources */,
+				5B62A34827AE7CD900A19448 /* ctlCandidateVertical.swift in Sources */,
 				6ACC3D452793701600F1B140 /* ParselessLM.cpp in Sources */,
 				5BBBB77A27AEDC690023B93A /* clsSFX.swift in Sources */,
 				5BF8423127BAA942008E7E4C /* vChewingKanjiConverter.swift in Sources */,
-				5B62A34627AE7CD900A19448 /* HorizontalCandidateController.swift in Sources */,
-				5B62A34727AE7CD900A19448 /* CandidateController.swift in Sources */,
+				5B62A34627AE7CD900A19448 /* ctlCandidateHorizontal.swift in Sources */,
+				5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */,
 				D41355DE278EA3ED005E5CBD /* UserPhrasesLM.mm in Sources */,
 				6ACC3D3F27914F2400F1B140 /* KeyValueBlobReader.cpp in Sources */,
 				D41355D8278D74B5005E5CBD /* mgrLangModel.mm in Sources */,

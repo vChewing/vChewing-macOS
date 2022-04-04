@@ -38,18 +38,18 @@ public class CandidateKeyLabel: NSObject {
 	}
 }
 
-@objc(VTCandidateControllerDelegate)
-public protocol CandidateControllerDelegate: AnyObject {
-	func candidateCountForController(_ controller: CandidateController) -> UInt
-	func candidateController(_ controller: CandidateController, candidateAtIndex index: UInt)
+@objc(ctlCandidateDelegate)
+public protocol ctlCandidateDelegate: AnyObject {
+	func candidateCountForController(_ controller: ctlCandidate) -> UInt
+	func ctlCandidate(_ controller: ctlCandidate, candidateAtIndex index: UInt)
 		-> String
-	func candidateController(
-		_ controller: CandidateController, didSelectCandidateAtIndex index: UInt)
+	func ctlCandidate(
+		_ controller: ctlCandidate, didSelectCandidateAtIndex index: UInt)
 }
 
-@objc(VTCandidateController)
-public class CandidateController: NSWindowController {
-	@objc public weak var delegate: CandidateControllerDelegate? {
+@objc(ctlCandidate)
+public class ctlCandidate: NSWindowController {
+	@objc public weak var delegate: ctlCandidateDelegate? {
 		didSet {
 			reloadData()
 		}
