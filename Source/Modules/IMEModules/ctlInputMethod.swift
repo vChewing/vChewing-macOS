@@ -271,9 +271,9 @@ class ctlInputMethod: IMKInputController {
 		if (client as? IMKTextInput)?.bundleIdentifier()
 			== "org.atelierInmu.vChewing.vChewingPhraseEditor"
 		{
-			ctlInputMethod.areWeUsingOurOwnPhraseEditor = true
+			IME.areWeUsingOurOwnPhraseEditor = true
 		} else {
-			ctlInputMethod.areWeUsingOurOwnPhraseEditor = false
+			IME.areWeUsingOurOwnPhraseEditor = false
 		}
 
 		let input = keyParser(event: event, isVerticalMode: useVerticalMode)
@@ -765,12 +765,6 @@ extension ctlInputMethod {
 	private func hideTooltip() {
 		ctlInputMethod.tooltipController.hide()
 	}
-}
-
-// MARK: - 開關判定當前應用究竟是？
-
-@objc extension ctlInputMethod {
-	@objc static var areWeUsingOurOwnPhraseEditor: Bool = false
 }
 
 // MARK: -

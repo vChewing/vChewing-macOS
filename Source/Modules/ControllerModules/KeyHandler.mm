@@ -1089,9 +1089,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return NO;
 
     NSArray *readings = [self _currentReadings];
-    NSString *composingBuffer = (ctlInputMethod.areWeUsingOurOwnPhraseEditor)
-                                    ? [readings componentsJoinedByString:@"-"]
-                                    : [readings componentsJoinedByString:@" "];
+    NSString *composingBuffer = (IME.areWeUsingOurOwnPhraseEditor) ? [readings componentsJoinedByString:@"-"]
+                                                                   : [readings componentsJoinedByString:@" "];
 
     [self clear];
 
