@@ -1,20 +1,27 @@
 // Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// All possible vChewing-specific modifications are of:
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 /*
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-documentation files (the "Software"), to deal in the Software without restriction, including without limitation
-the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
-to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
 
-1. The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+1. The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-2. No trademark license is granted to use the trade names, trademarks, service marks, or product names of Contributor,
-   except as required to fulfill notice requirements above.
+2. No trademark license is granted to use the trade names, trademarks, service
+marks, or product names of Contributor, except as required to fulfill notice
+requirements above.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
-TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 #include "Mandarin.h"
@@ -22,570 +29,744 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <algorithm>
 #include <cctype>
 
-namespace Mandarin {
+namespace Mandarin
+{
 
-class PinyinParseHelper {
-public:
-    static const bool ConsumePrefix(std::string& target,
-                                    const std::string& prefix) {
-        if (target.length() < prefix.length()) {
+class PinyinParseHelper
+{
+  public:
+    static const bool ConsumePrefix(std::string &target, const std::string &prefix)
+    {
+        if (target.length() < prefix.length())
+        {
             return false;
         }
-        
-        if (target.substr(0, prefix.length()) == prefix) {
-            target =
-            target.substr(prefix.length(), target.length() - prefix.length());
+
+        if (target.substr(0, prefix.length()) == prefix)
+        {
+            target = target.substr(prefix.length(), target.length() - prefix.length());
             return true;
         }
-        
+
         return false;
     }
 };
 
-class BopomofoCharacterMap {
-public:
-    static const BopomofoCharacterMap& SharedInstance();
-    
+class BopomofoCharacterMap
+{
+  public:
+    static const BopomofoCharacterMap &SharedInstance();
+
     std::map<BPMF::Component, std::string> componentToCharacter;
     std::map<std::string, BPMF::Component> characterToComponent;
-    
-protected:
+
+  protected:
     BopomofoCharacterMap();
 };
 
-const BPMF BPMF::FromHanyuPinyin(const std::string& str) {
-    if (!str.length()) {
+const BPMF BPMF::FromHanyuPinyin(const std::string &str)
+{
+    if (!str.length())
+    {
         return BPMF();
     }
-    
+
     std::string pinyin = str;
     transform(pinyin.begin(), pinyin.end(), pinyin.begin(), ::tolower);
-    
+
     BPMF::Component firstComponent = 0;
     BPMF::Component secondComponent = 0;
     BPMF::Component thirdComponent = 0;
     BPMF::Component toneComponent = 0;
-    
+
     // lookup consonants and consume them
     bool independentConsonant = false;
-    
+
     // the y exceptions fist
-    if (0) {
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "yuan")) {
+    if (0)
+    {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "yuan"))
+    {
         secondComponent = BPMF::UE;
         thirdComponent = BPMF::AN;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "ying")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "ying"))
+    {
         secondComponent = BPMF::I;
         thirdComponent = BPMF::ENG;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "yung")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "yung"))
+    {
         secondComponent = BPMF::UE;
         thirdComponent = BPMF::ENG;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "yong")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "yong"))
+    {
         secondComponent = BPMF::UE;
         thirdComponent = BPMF::ENG;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "yue")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "yue"))
+    {
         secondComponent = BPMF::UE;
         thirdComponent = BPMF::E;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "yun")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "yun"))
+    {
         secondComponent = BPMF::UE;
         thirdComponent = BPMF::EN;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "you")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "you"))
+    {
         secondComponent = BPMF::I;
         thirdComponent = BPMF::OU;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "yu")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "yu"))
+    {
         secondComponent = BPMF::UE;
     }
-    
+
     // try the first character
     char c = pinyin.length() ? pinyin[0] : 0;
-    switch (c) {
-        case 'b':
-            firstComponent = BPMF::B;
-            pinyin = pinyin.substr(1);
-            break;
-        case 'p':
-            firstComponent = BPMF::P;
-            pinyin = pinyin.substr(1);
-            break;
-        case 'm':
-            firstComponent = BPMF::M;
-            pinyin = pinyin.substr(1);
-            break;
-        case 'f':
-            firstComponent = BPMF::F;
-            pinyin = pinyin.substr(1);
-            break;
-        case 'd':
-            firstComponent = BPMF::D;
-            pinyin = pinyin.substr(1);
-            break;
-        case 't':
-            firstComponent = BPMF::T;
-            pinyin = pinyin.substr(1);
-            break;
-        case 'n':
-            firstComponent = BPMF::N;
-            pinyin = pinyin.substr(1);
-            break;
-        case 'l':
-            firstComponent = BPMF::L;
-            pinyin = pinyin.substr(1);
-            break;
-        case 'g':
-            firstComponent = BPMF::G;
-            pinyin = pinyin.substr(1);
-            break;
-        case 'k':
-            firstComponent = BPMF::K;
-            pinyin = pinyin.substr(1);
-            break;
-        case 'h':
-            firstComponent = BPMF::H;
-            pinyin = pinyin.substr(1);
-            break;
-        case 'j':
-            firstComponent = BPMF::J;
-            pinyin = pinyin.substr(1);
-            break;
-        case 'q':
-            firstComponent = BPMF::Q;
-            pinyin = pinyin.substr(1);
-            break;
-        case 'x':
-            firstComponent = BPMF::X;
-            pinyin = pinyin.substr(1);
-            break;
-            
-            // special hanlding for w and y
-        case 'w':
-            secondComponent = BPMF::U;
-            pinyin = pinyin.substr(1);
-            break;
-        case 'y':
-            if (!secondComponent && !thirdComponent) {
-                secondComponent = BPMF::I;
-            }
-            pinyin = pinyin.substr(1);
-            break;
+    switch (c)
+    {
+    case 'b':
+        firstComponent = BPMF::B;
+        pinyin = pinyin.substr(1);
+        break;
+    case 'p':
+        firstComponent = BPMF::P;
+        pinyin = pinyin.substr(1);
+        break;
+    case 'm':
+        firstComponent = BPMF::M;
+        pinyin = pinyin.substr(1);
+        break;
+    case 'f':
+        firstComponent = BPMF::F;
+        pinyin = pinyin.substr(1);
+        break;
+    case 'd':
+        firstComponent = BPMF::D;
+        pinyin = pinyin.substr(1);
+        break;
+    case 't':
+        firstComponent = BPMF::T;
+        pinyin = pinyin.substr(1);
+        break;
+    case 'n':
+        firstComponent = BPMF::N;
+        pinyin = pinyin.substr(1);
+        break;
+    case 'l':
+        firstComponent = BPMF::L;
+        pinyin = pinyin.substr(1);
+        break;
+    case 'g':
+        firstComponent = BPMF::G;
+        pinyin = pinyin.substr(1);
+        break;
+    case 'k':
+        firstComponent = BPMF::K;
+        pinyin = pinyin.substr(1);
+        break;
+    case 'h':
+        firstComponent = BPMF::H;
+        pinyin = pinyin.substr(1);
+        break;
+    case 'j':
+        firstComponent = BPMF::J;
+        pinyin = pinyin.substr(1);
+        break;
+    case 'q':
+        firstComponent = BPMF::Q;
+        pinyin = pinyin.substr(1);
+        break;
+    case 'x':
+        firstComponent = BPMF::X;
+        pinyin = pinyin.substr(1);
+        break;
+
+        // special hanlding for w and y
+    case 'w':
+        secondComponent = BPMF::U;
+        pinyin = pinyin.substr(1);
+        break;
+    case 'y':
+        if (!secondComponent && !thirdComponent)
+        {
+            secondComponent = BPMF::I;
+        }
+        pinyin = pinyin.substr(1);
+        break;
     }
-    
+
     // then we try ZH, CH, SH, R, Z, C, S (in that order)
-    if (0) {
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "zh")) {
+    if (0)
+    {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "zh"))
+    {
         firstComponent = BPMF::ZH;
         independentConsonant = true;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "ch")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "ch"))
+    {
         firstComponent = BPMF::CH;
         independentConsonant = true;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "sh")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "sh"))
+    {
         firstComponent = BPMF::SH;
         independentConsonant = true;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "r")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "r"))
+    {
         firstComponent = BPMF::R;
         independentConsonant = true;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "z")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "z"))
+    {
         firstComponent = BPMF::Z;
         independentConsonant = true;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "c")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "c"))
+    {
         firstComponent = BPMF::C;
         independentConsonant = true;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "s")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "s"))
+    {
         firstComponent = BPMF::S;
         independentConsonant = true;
     }
-    
+
     // consume exceptions first: (ien, in), (iou, iu), (uen, un), (veng, iong),
     // (ven, vn), (uei, ui), ung but longer sequence takes precedence
-    if (0) {
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "veng")) {
+    if (0)
+    {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "veng"))
+    {
         secondComponent = BPMF::UE;
         thirdComponent = BPMF::ENG;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "iong")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "iong"))
+    {
         secondComponent = BPMF::UE;
         thirdComponent = BPMF::ENG;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "ing")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "ing"))
+    {
         secondComponent = BPMF::I;
         thirdComponent = BPMF::ENG;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "ien")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "ien"))
+    {
         secondComponent = BPMF::I;
         thirdComponent = BPMF::EN;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "iou")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "iou"))
+    {
         secondComponent = BPMF::I;
         thirdComponent = BPMF::OU;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "uen")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "uen"))
+    {
         secondComponent = BPMF::U;
         thirdComponent = BPMF::EN;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "ven")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "ven"))
+    {
         secondComponent = BPMF::UE;
         thirdComponent = BPMF::EN;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "uei")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "uei"))
+    {
         secondComponent = BPMF::U;
         thirdComponent = BPMF::EI;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "ung")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "ung"))
+    {
         // f exception
-        if (firstComponent == BPMF::F) {
+        if (firstComponent == BPMF::F)
+        {
             thirdComponent = BPMF::ENG;
-        } else {
+        }
+        else
+        {
             secondComponent = BPMF::U;
             thirdComponent = BPMF::ENG;
         }
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "ong")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "ong"))
+    {
         // f exception
-        if (firstComponent == BPMF::F) {
+        if (firstComponent == BPMF::F)
+        {
             thirdComponent = BPMF::ENG;
-        } else {
+        }
+        else
+        {
             secondComponent = BPMF::U;
             thirdComponent = BPMF::ENG;
         }
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "un")) {
-        if (firstComponent == BPMF::J || firstComponent == BPMF::Q ||
-            firstComponent == BPMF::X) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "un"))
+    {
+        if (firstComponent == BPMF::J || firstComponent == BPMF::Q || firstComponent == BPMF::X)
+        {
             secondComponent = BPMF::UE;
-        } else {
+        }
+        else
+        {
             secondComponent = BPMF::U;
         }
         thirdComponent = BPMF::EN;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "iu")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "iu"))
+    {
         secondComponent = BPMF::I;
         thirdComponent = BPMF::OU;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "in")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "in"))
+    {
         secondComponent = BPMF::I;
         thirdComponent = BPMF::EN;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "vn")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "vn"))
+    {
         secondComponent = BPMF::UE;
         thirdComponent = BPMF::EN;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "ui")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "ui"))
+    {
         secondComponent = BPMF::U;
         thirdComponent = BPMF::EI;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "ue")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "ue"))
+    {
         secondComponent = BPMF::UE;
         thirdComponent = BPMF::E;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, u8"ü")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, u8"ü"))
+    {
         secondComponent = BPMF::UE;
     }
-    
+
     // then consume the middle component...
-    if (0) {
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "i")) {
+    if (0)
+    {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "i"))
+    {
         secondComponent = independentConsonant ? 0 : BPMF::I;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "u")) {
-        if (firstComponent == BPMF::J || firstComponent == BPMF::Q ||
-            firstComponent == BPMF::X) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "u"))
+    {
+        if (firstComponent == BPMF::J || firstComponent == BPMF::Q || firstComponent == BPMF::X)
+        {
             secondComponent = BPMF::UE;
-        } else {
+        }
+        else
+        {
             secondComponent = BPMF::U;
         }
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "v")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "v"))
+    {
         secondComponent = BPMF::UE;
     }
-    
+
     // the vowels, longer sequence takes precedence
-    if (0) {
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "ang")) {
+    if (0)
+    {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "ang"))
+    {
         thirdComponent = BPMF::ANG;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "eng")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "eng"))
+    {
         thirdComponent = BPMF::ENG;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "err")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "err"))
+    {
         thirdComponent = BPMF::ERR;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "ai")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "ai"))
+    {
         thirdComponent = BPMF::AI;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "ei")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "ei"))
+    {
         thirdComponent = BPMF::EI;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "ao")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "ao"))
+    {
         thirdComponent = BPMF::AO;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "ou")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "ou"))
+    {
         thirdComponent = BPMF::OU;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "an")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "an"))
+    {
         thirdComponent = BPMF::AN;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "en")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "en"))
+    {
         thirdComponent = BPMF::EN;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "er")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "er"))
+    {
         thirdComponent = BPMF::ERR;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "a")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "a"))
+    {
         thirdComponent = BPMF::A;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "o")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "o"))
+    {
         thirdComponent = BPMF::O;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "e")) {
-        if (secondComponent) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "e"))
+    {
+        if (secondComponent)
+        {
             thirdComponent = BPMF::E;
-        } else {
+        }
+        else
+        {
             thirdComponent = BPMF::ER;
         }
     }
-    
+
     // at last!
-    if (0) {
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "1")) {
+    if (0)
+    {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "1"))
+    {
         toneComponent = BPMF::Tone1;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "2")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "2"))
+    {
         toneComponent = BPMF::Tone2;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "3")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "3"))
+    {
         toneComponent = BPMF::Tone3;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "4")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "4"))
+    {
         toneComponent = BPMF::Tone4;
-    } else if (PinyinParseHelper::ConsumePrefix(pinyin, "5")) {
+    }
+    else if (PinyinParseHelper::ConsumePrefix(pinyin, "5"))
+    {
         toneComponent = BPMF::Tone5;
     }
-    
-    return BPMF(firstComponent | secondComponent | thirdComponent |
-                toneComponent);
+
+    return BPMF(firstComponent | secondComponent | thirdComponent | toneComponent);
 }
 
-const std::string BPMF::HanyuPinyinString(bool includesTone,
-                                          bool useVForUUmlaut) const {
+const std::string BPMF::HanyuPinyinString(bool includesTone, bool useVForUUmlaut) const
+{
     std::string consonant, middle, vowel, tone;
-    
-    Component cc = consonantComponent(), mvc = middleVowelComponent(),
-    vc = vowelComponent();
+
+    Component cc = consonantComponent(), mvc = middleVowelComponent(), vc = vowelComponent();
     bool hasNoMVCOrVC = !(mvc || vc);
-    
-    switch (cc) {
-        case B:
-            consonant = "b";
-            break;
-        case P:
-            consonant = "p";
-            break;
-        case M:
-            consonant = "m";
-            break;
-        case F:
-            consonant = "f";
-            break;
-        case D:
-            consonant = "d";
-            break;
-        case T:
-            consonant = "t";
-            break;
-        case N:
-            consonant = "n";
-            break;
-        case L:
-            consonant = "l";
-            break;
-        case G:
-            consonant = "g";
-            break;
-        case K:
-            consonant = "k";
-            break;
-        case H:
-            consonant = "h";
-            break;
-        case J:
-            consonant = "j";
-            if (hasNoMVCOrVC) middle = "i";
-            break;
-        case Q:
-            consonant = "q";
-            if (hasNoMVCOrVC) middle = "i";
-            break;
-        case X:
-            consonant = "x";
-            if (hasNoMVCOrVC) middle = "i";
-            break;
-        case ZH:
-            consonant = "zh";
-            if (hasNoMVCOrVC) middle = "i";
-            break;
-        case CH:
-            consonant = "ch";
-            if (hasNoMVCOrVC) middle = "i";
-            break;
-        case SH:
-            consonant = "sh";
-            if (hasNoMVCOrVC) middle = "i";
-            break;
-        case R:
-            consonant = "r";
-            if (hasNoMVCOrVC) middle = "i";
-            break;
-        case Z:
-            consonant = "z";
-            if (hasNoMVCOrVC) middle = "i";
-            break;
-        case C:
-            consonant = "c";
-            if (hasNoMVCOrVC) middle = "i";
-            break;
-        case S:
-            consonant = "s";
-            if (hasNoMVCOrVC) middle = "i";
-            break;
+
+    switch (cc)
+    {
+    case B:
+        consonant = "b";
+        break;
+    case P:
+        consonant = "p";
+        break;
+    case M:
+        consonant = "m";
+        break;
+    case F:
+        consonant = "f";
+        break;
+    case D:
+        consonant = "d";
+        break;
+    case T:
+        consonant = "t";
+        break;
+    case N:
+        consonant = "n";
+        break;
+    case L:
+        consonant = "l";
+        break;
+    case G:
+        consonant = "g";
+        break;
+    case K:
+        consonant = "k";
+        break;
+    case H:
+        consonant = "h";
+        break;
+    case J:
+        consonant = "j";
+        if (hasNoMVCOrVC)
+            middle = "i";
+        break;
+    case Q:
+        consonant = "q";
+        if (hasNoMVCOrVC)
+            middle = "i";
+        break;
+    case X:
+        consonant = "x";
+        if (hasNoMVCOrVC)
+            middle = "i";
+        break;
+    case ZH:
+        consonant = "zh";
+        if (hasNoMVCOrVC)
+            middle = "i";
+        break;
+    case CH:
+        consonant = "ch";
+        if (hasNoMVCOrVC)
+            middle = "i";
+        break;
+    case SH:
+        consonant = "sh";
+        if (hasNoMVCOrVC)
+            middle = "i";
+        break;
+    case R:
+        consonant = "r";
+        if (hasNoMVCOrVC)
+            middle = "i";
+        break;
+    case Z:
+        consonant = "z";
+        if (hasNoMVCOrVC)
+            middle = "i";
+        break;
+    case C:
+        consonant = "c";
+        if (hasNoMVCOrVC)
+            middle = "i";
+        break;
+    case S:
+        consonant = "s";
+        if (hasNoMVCOrVC)
+            middle = "i";
+        break;
     }
-    
-    switch (mvc) {
-        case I:
-            if (!cc) {
-                consonant = "y";
-            }
-            
-            middle = (!vc || cc) ? "i" : "";
-            break;
-        case U:
-            if (!cc) {
-                consonant = "w";
-            }
-            middle = (!vc || cc) ? "u" : "";
-            break;
-        case UE:
-            if (!cc) {
-                consonant = "y";
-            }
-            
-            if ((cc == N || cc == L) && vc != E) {
-                middle = useVForUUmlaut ? "v" : "ü";
-            } else {
-                middle = "u";
-            }
-            
-            break;
+
+    switch (mvc)
+    {
+    case I:
+        if (!cc)
+        {
+            consonant = "y";
+        }
+
+        middle = (!vc || cc) ? "i" : "";
+        break;
+    case U:
+        if (!cc)
+        {
+            consonant = "w";
+        }
+        middle = (!vc || cc) ? "u" : "";
+        break;
+    case UE:
+        if (!cc)
+        {
+            consonant = "y";
+        }
+
+        if ((cc == N || cc == L) && vc != E)
+        {
+            middle = useVForUUmlaut ? "v" : "ü";
+        }
+        else
+        {
+            middle = "u";
+        }
+
+        break;
     }
-    
-    switch (vc) {
-        case A:
-            vowel = "a";
-            break;
-        case O:
-            vowel = "o";
-            break;
-        case ER:
-            vowel = "e";
-            break;
-        case E:
-            vowel = "e";
-            break;
-        case AI:
-            vowel = "ai";
-            break;
-        case EI:
-            vowel = "ei";
-            break;
-        case AO:
-            vowel = "ao";
-            break;
-        case OU:
-            vowel = "ou";
-            break;
-        case AN:
-            vowel = "an";
-            break;
-        case EN:
-            vowel = "en";
-            break;
-        case ANG:
-            vowel = "ang";
-            break;
-        case ENG:
-            vowel = "eng";
-            break;
-        case ERR:
-            vowel = "er";
-            break;
+
+    switch (vc)
+    {
+    case A:
+        vowel = "a";
+        break;
+    case O:
+        vowel = "o";
+        break;
+    case ER:
+        vowel = "e";
+        break;
+    case E:
+        vowel = "e";
+        break;
+    case AI:
+        vowel = "ai";
+        break;
+    case EI:
+        vowel = "ei";
+        break;
+    case AO:
+        vowel = "ao";
+        break;
+    case OU:
+        vowel = "ou";
+        break;
+    case AN:
+        vowel = "an";
+        break;
+    case EN:
+        vowel = "en";
+        break;
+    case ANG:
+        vowel = "ang";
+        break;
+    case ENG:
+        vowel = "eng";
+        break;
+    case ERR:
+        vowel = "er";
+        break;
     }
-    
+
     // combination rules
-    
+
     // ueng -> ong, but note "weng"
-    if ((mvc == U || mvc == UE) && vc == ENG) {
+    if ((mvc == U || mvc == UE) && vc == ENG)
+    {
         middle = "";
-        vowel = (cc == J || cc == Q || cc == X)
-        ? "iong"
-        : ((!cc && mvc == U) ? "eng" : "ong");
+        vowel = (cc == J || cc == Q || cc == X) ? "iong" : ((!cc && mvc == U) ? "eng" : "ong");
     }
-    
+
     // ien, uen, üen -> in, un, ün ; but note "wen", "yin" and "yun"
-    if (mvc && vc == EN) {
-        if (cc) {
+    if (mvc && vc == EN)
+    {
+        if (cc)
+        {
             vowel = "n";
-        } else {
-            if (mvc == UE) {
-                vowel = "n";  // yun
-            } else if (mvc == U) {
-                vowel = "en";  // wen
-            } else {
-                vowel = "in";  // yin
+        }
+        else
+        {
+            if (mvc == UE)
+            {
+                vowel = "n"; // yun
+            }
+            else if (mvc == U)
+            {
+                vowel = "en"; // wen
+            }
+            else
+            {
+                vowel = "in"; // yin
             }
         }
     }
-    
+
     // iou -> iu
-    if (cc && mvc == I && vc == OU) {
+    if (cc && mvc == I && vc == OU)
+    {
         middle = "";
         vowel = "iu";
     }
-    
+
     // ieng -> ing
-    if (mvc == I && vc == ENG) {
+    if (mvc == I && vc == ENG)
+    {
         middle = "";
         vowel = "ing";
     }
-    
+
     // uei -> ui
-    if (cc && mvc == U && vc == EI) {
+    if (cc && mvc == U && vc == EI)
+    {
         middle = "";
         vowel = "ui";
     }
-    
-    if (includesTone) {
-        switch (toneMarkerComponent()) {
-            case Tone2:
-                tone = "2";
-                break;
-            case Tone3:
-                tone = "3";
-                break;
-            case Tone4:
-                tone = "4";
-                break;
-            case Tone5:
-                tone = "5";
-                break;
+
+    if (includesTone)
+    {
+        switch (toneMarkerComponent())
+        {
+        case Tone2:
+            tone = "2";
+            break;
+        case Tone3:
+            tone = "3";
+            break;
+        case Tone4:
+            tone = "4";
+            break;
+        case Tone5:
+            tone = "5";
+            break;
         }
     }
-    
+
     return consonant + middle + vowel + tone;
 }
 
-const BPMF BPMF::FromComposedString(const std::string& str) {
+const BPMF BPMF::FromComposedString(const std::string &str)
+{
     BPMF syllable;
     auto iter = str.begin();
-    while (iter != str.end()) {
+    while (iter != str.end())
+    {
         // This is a naive implementation and we bail early at anything we don't
         // recognize. A sound implementation would require to either use a trie for
         // the Bopomofo character map or to split the input by codepoints. This
         // suffices for now.
-        
+
         // Illegal.
-        if (!(*iter & 0x80)) {
+        if (!(*iter & 0x80))
+        {
             break;
         }
-        
+
         size_t utf8_length = -1;
-        
+
         // These are the code points for the tone markers.
-        if ((*iter & (0x80 | 0x40)) && !(*iter & 0x20)) {
+        if ((*iter & (0x80 | 0x40)) && !(*iter & 0x20))
+        {
             utf8_length = 2;
-        } else if ((*iter & (0x80 | 0x40 | 0x20)) && !(*iter & 0x10)) {
+        }
+        else if ((*iter & (0x80 | 0x40 | 0x20)) && !(*iter & 0x10))
+        {
             utf8_length = 3;
-        } else {
+        }
+        else
+        {
             // Illegal.
             break;
         }
-        
-        if (iter + (utf8_length - 1) == str.end()) {
+
+        if (iter + (utf8_length - 1) == str.end())
+        {
             break;
         }
-        
+
         std::string component = std::string(iter, iter + utf8_length);
-        const std::map<std::string, BPMF::Component>& charToComp =
-        BopomofoCharacterMap::SharedInstance().characterToComponent;
-        std::map<std::string, BPMF::Component>::const_iterator result =
-        charToComp.find(component);
-        if (result == charToComp.end()) {
+        const std::map<std::string, BPMF::Component> &charToComp =
+            BopomofoCharacterMap::SharedInstance().characterToComponent;
+        std::map<std::string, BPMF::Component>::const_iterator result = charToComp.find(component);
+        if (result == charToComp.end())
+        {
             break;
-        } else {
+        }
+        else
+        {
             syllable += BPMF((*result).second);
         }
         iter += utf8_length;
@@ -593,14 +774,12 @@ const BPMF BPMF::FromComposedString(const std::string& str) {
     return syllable;
 }
 
-const std::string BPMF::composedString() const {
+const std::string BPMF::composedString() const
+{
     std::string result;
-#define APPEND(c)                                                         \
-if (syllable_ & c)                                                     \
-result +=                                                               \
-(*BopomofoCharacterMap::SharedInstance().componentToCharacter.find( \
-syllable_ & c))                                               \
-.second
+#define APPEND(c)                                                                                                      \
+    if (syllable_ & c)                                                                                                 \
+    result += (*BopomofoCharacterMap::SharedInstance().componentToCharacter.find(syllable_ & c)).second
     APPEND(ConsonantMask);
     APPEND(MiddleVowelMask);
     APPEND(VowelMask);
@@ -609,14 +788,14 @@ syllable_ & c))                                               \
     return result;
 }
 
-
-
-const BopomofoCharacterMap& BopomofoCharacterMap::SharedInstance() {
-    static BopomofoCharacterMap* map = new BopomofoCharacterMap();
+const BopomofoCharacterMap &BopomofoCharacterMap::SharedInstance()
+{
+    static BopomofoCharacterMap *map = new BopomofoCharacterMap();
     return *map;
 }
 
-BopomofoCharacterMap::BopomofoCharacterMap() {
+BopomofoCharacterMap::BopomofoCharacterMap()
+{
     characterToComponent[u8"ㄅ"] = BPMF::B;
     characterToComponent[u8"ㄆ"] = BPMF::P;
     characterToComponent[u8"ㄇ"] = BPMF::M;
@@ -658,27 +837,24 @@ BopomofoCharacterMap::BopomofoCharacterMap() {
     characterToComponent[u8"ˇ"] = BPMF::Tone3;
     characterToComponent[u8"ˋ"] = BPMF::Tone4;
     characterToComponent[u8"˙"] = BPMF::Tone5;
-    
-    for (std::map<std::string, BPMF::Component>::iterator iter =
-         characterToComponent.begin();
+
+    for (std::map<std::string, BPMF::Component>::iterator iter = characterToComponent.begin();
          iter != characterToComponent.end(); ++iter)
         componentToCharacter[(*iter).second] = (*iter).first;
 }
 
-#define ASSIGNKEY1(m, vec, k, val) \
-m[k] = (vec.clear(), vec.push_back((BPMF::Component)val), vec)
-#define ASSIGNKEY2(m, vec, k, val1, val2)                    \
-m[k] = (vec.clear(), vec.push_back((BPMF::Component)val1), \
-vec.push_back((BPMF::Component)val2), vec)
-#define ASSIGNKEY3(m, vec, k, val1, val2, val3)              \
-m[k] = (vec.clear(), vec.push_back((BPMF::Component)val1), \
-vec.push_back((BPMF::Component)val2),              \
-vec.push_back((BPMF::Component)val3), vec)
+#define ASSIGNKEY1(m, vec, k, val) m[k] = (vec.clear(), vec.push_back((BPMF::Component)val), vec)
+#define ASSIGNKEY2(m, vec, k, val1, val2)                                                                              \
+    m[k] = (vec.clear(), vec.push_back((BPMF::Component)val1), vec.push_back((BPMF::Component)val2), vec)
+#define ASSIGNKEY3(m, vec, k, val1, val2, val3)                                                                        \
+    m[k] = (vec.clear(), vec.push_back((BPMF::Component)val1), vec.push_back((BPMF::Component)val2),                   \
+            vec.push_back((BPMF::Component)val3), vec)
 
-static BopomofoKeyboardLayout* CreateStandardLayout() {
+static BopomofoKeyboardLayout *CreateStandardLayout()
+{
     std::vector<BPMF::Component> vec;
     BopomofoKeyToComponentMap ktcm;
-    
+
     ASSIGNKEY1(ktcm, vec, '1', BPMF::B);
     ASSIGNKEY1(ktcm, vec, 'q', BPMF::P);
     ASSIGNKEY1(ktcm, vec, 'a', BPMF::M);
@@ -720,14 +896,15 @@ static BopomofoKeyboardLayout* CreateStandardLayout() {
     ASSIGNKEY1(ktcm, vec, '4', BPMF::Tone4);
     ASSIGNKEY1(ktcm, vec, '6', BPMF::Tone2);
     ASSIGNKEY1(ktcm, vec, '7', BPMF::Tone5);
-    
+
     return new BopomofoKeyboardLayout(ktcm, "Standard");
 }
 
-static BopomofoKeyboardLayout* CreateIBMLayout() {
+static BopomofoKeyboardLayout *CreateIBMLayout()
+{
     std::vector<BPMF::Component> vec;
     BopomofoKeyToComponentMap ktcm;
-    
+
     ASSIGNKEY1(ktcm, vec, '1', BPMF::B);
     ASSIGNKEY1(ktcm, vec, '2', BPMF::P);
     ASSIGNKEY1(ktcm, vec, '3', BPMF::M);
@@ -769,14 +946,15 @@ static BopomofoKeyboardLayout* CreateIBMLayout() {
     ASSIGNKEY1(ktcm, vec, ',', BPMF::Tone3);
     ASSIGNKEY1(ktcm, vec, '.', BPMF::Tone4);
     ASSIGNKEY1(ktcm, vec, '/', BPMF::Tone5);
-    
+
     return new BopomofoKeyboardLayout(ktcm, "IBM");
 }
 
-static BopomofoKeyboardLayout* CreateMiTACLayout() {
+static BopomofoKeyboardLayout *CreateMiTACLayout()
+{
     std::vector<BPMF::Component> vec;
     BopomofoKeyToComponentMap ktcm;
-    
+
     ASSIGNKEY1(ktcm, vec, '1', BPMF::Tone5);
     ASSIGNKEY1(ktcm, vec, '2', BPMF::Tone2);
     ASSIGNKEY1(ktcm, vec, '3', BPMF::Tone3);
@@ -818,14 +996,15 @@ static BopomofoKeyboardLayout* CreateMiTACLayout() {
     ASSIGNKEY1(ktcm, vec, 'x', BPMF::X);
     ASSIGNKEY1(ktcm, vec, 'y', BPMF::I);
     ASSIGNKEY1(ktcm, vec, 'z', BPMF::Z);
-    
+
     return new BopomofoKeyboardLayout(ktcm, "MiTAC");
 }
 
-static BopomofoKeyboardLayout* CreateETenLayout() {
+static BopomofoKeyboardLayout *CreateETenLayout()
+{
     std::vector<BPMF::Component> vec;
     BopomofoKeyToComponentMap ktcm;
-    
+
     ASSIGNKEY1(ktcm, vec, 'b', BPMF::B);
     ASSIGNKEY1(ktcm, vec, 'p', BPMF::P);
     ASSIGNKEY1(ktcm, vec, 'm', BPMF::M);
@@ -867,14 +1046,15 @@ static BopomofoKeyboardLayout* CreateETenLayout() {
     ASSIGNKEY1(ktcm, vec, '3', BPMF::Tone3);
     ASSIGNKEY1(ktcm, vec, '4', BPMF::Tone4);
     ASSIGNKEY1(ktcm, vec, '1', BPMF::Tone5);
-    
+
     return new BopomofoKeyboardLayout(ktcm, "ETen");
 }
 
-static BopomofoKeyboardLayout* CreateHsuLayout() {
+static BopomofoKeyboardLayout *CreateHsuLayout()
+{
     std::vector<BPMF::Component> vec;
     BopomofoKeyToComponentMap ktcm;
-    
+
     ASSIGNKEY1(ktcm, vec, 'b', BPMF::B);
     ASSIGNKEY1(ktcm, vec, 'p', BPMF::P);
     ASSIGNKEY2(ktcm, vec, 'm', BPMF::M, BPMF::AN);
@@ -900,14 +1080,15 @@ static BopomofoKeyboardLayout* CreateHsuLayout() {
     ASSIGNKEY1(ktcm, vec, 'i', BPMF::AI);
     ASSIGNKEY1(ktcm, vec, 'w', BPMF::AO);
     ASSIGNKEY1(ktcm, vec, 'o', BPMF::OU);
-    
+
     return new BopomofoKeyboardLayout(ktcm, "Hsu");
 }
 
-static BopomofoKeyboardLayout* CreateETen26Layout() {
+static BopomofoKeyboardLayout *CreateETen26Layout()
+{
     std::vector<BPMF::Component> vec;
     BopomofoKeyToComponentMap ktcm;
-    
+
     ASSIGNKEY1(ktcm, vec, 'b', BPMF::B);
     ASSIGNKEY2(ktcm, vec, 'p', BPMF::P, BPMF::OU);
     ASSIGNKEY2(ktcm, vec, 'm', BPMF::M, BPMF::AN);
@@ -934,14 +1115,15 @@ static BopomofoKeyboardLayout* CreateETen26Layout() {
     ASSIGNKEY1(ktcm, vec, 'r', BPMF::ER);
     ASSIGNKEY1(ktcm, vec, 'i', BPMF::AI);
     ASSIGNKEY1(ktcm, vec, 'z', BPMF::AO);
-    
+
     return new BopomofoKeyboardLayout(ktcm, "ETen26");
 }
 
-static BopomofoKeyboardLayout* CreateFakeSeigyouLayout() {
+static BopomofoKeyboardLayout *CreateFakeSeigyouLayout()
+{
     std::vector<BPMF::Component> vec;
     BopomofoKeyToComponentMap ktcm;
-    
+
     ASSIGNKEY1(ktcm, vec, '1', BPMF::Tone5);
     ASSIGNKEY1(ktcm, vec, '2', BPMF::B);
     ASSIGNKEY1(ktcm, vec, '3', BPMF::D);
@@ -983,55 +1165,62 @@ static BopomofoKeyboardLayout* CreateFakeSeigyouLayout() {
     ASSIGNKEY1(ktcm, vec, 'x', BPMF::F);
     ASSIGNKEY1(ktcm, vec, 'y', BPMF::CH);
     ASSIGNKEY1(ktcm, vec, 'z', BPMF::Tone4);
-    
+
     return new BopomofoKeyboardLayout(ktcm, "FakeSeigyou");
 }
 
-static BopomofoKeyboardLayout* CreateHanyuPinyinLayout() {
+static BopomofoKeyboardLayout *CreateHanyuPinyinLayout()
+{
     BopomofoKeyToComponentMap ktcm;
     return new BopomofoKeyboardLayout(ktcm, "HanyuPinyin");
 }
 
-const BopomofoKeyboardLayout* BopomofoKeyboardLayout::StandardLayout() {
-    static BopomofoKeyboardLayout* layout = CreateStandardLayout();
+const BopomofoKeyboardLayout *BopomofoKeyboardLayout::StandardLayout()
+{
+    static BopomofoKeyboardLayout *layout = CreateStandardLayout();
     return layout;
 }
 
-const BopomofoKeyboardLayout* BopomofoKeyboardLayout::ETenLayout() {
-    static BopomofoKeyboardLayout* layout = CreateETenLayout();
+const BopomofoKeyboardLayout *BopomofoKeyboardLayout::ETenLayout()
+{
+    static BopomofoKeyboardLayout *layout = CreateETenLayout();
     return layout;
 }
 
-const BopomofoKeyboardLayout* BopomofoKeyboardLayout::HsuLayout() {
-    static BopomofoKeyboardLayout* layout = CreateHsuLayout();
+const BopomofoKeyboardLayout *BopomofoKeyboardLayout::HsuLayout()
+{
+    static BopomofoKeyboardLayout *layout = CreateHsuLayout();
     return layout;
 }
 
-const BopomofoKeyboardLayout* BopomofoKeyboardLayout::ETen26Layout() {
-    static BopomofoKeyboardLayout* layout = CreateETen26Layout();
+const BopomofoKeyboardLayout *BopomofoKeyboardLayout::ETen26Layout()
+{
+    static BopomofoKeyboardLayout *layout = CreateETen26Layout();
     return layout;
 }
 
-const BopomofoKeyboardLayout* BopomofoKeyboardLayout::IBMLayout() {
-    static BopomofoKeyboardLayout* layout = CreateIBMLayout();
+const BopomofoKeyboardLayout *BopomofoKeyboardLayout::IBMLayout()
+{
+    static BopomofoKeyboardLayout *layout = CreateIBMLayout();
     return layout;
 }
 
-const BopomofoKeyboardLayout* BopomofoKeyboardLayout::MiTACLayout() {
-    static BopomofoKeyboardLayout* layout = CreateMiTACLayout();
+const BopomofoKeyboardLayout *BopomofoKeyboardLayout::MiTACLayout()
+{
+    static BopomofoKeyboardLayout *layout = CreateMiTACLayout();
     return layout;
 }
 
-const BopomofoKeyboardLayout* BopomofoKeyboardLayout::FakeSeigyouLayout() {
-    static BopomofoKeyboardLayout* layout = CreateFakeSeigyouLayout();
+const BopomofoKeyboardLayout *BopomofoKeyboardLayout::FakeSeigyouLayout()
+{
+    static BopomofoKeyboardLayout *layout = CreateFakeSeigyouLayout();
     return layout;
 }
 
-const BopomofoKeyboardLayout* BopomofoKeyboardLayout::HanyuPinyinLayout() {
-    static BopomofoKeyboardLayout* layout = CreateHanyuPinyinLayout();
+const BopomofoKeyboardLayout *BopomofoKeyboardLayout::HanyuPinyinLayout()
+{
+    static BopomofoKeyboardLayout *layout = CreateHanyuPinyinLayout();
     return layout;
 }
 
-}  // namespace Mandarin
-
-
+} // namespace Mandarin

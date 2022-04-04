@@ -76,6 +76,18 @@
 
 使用者可自由使用、散播本軟體，惟散播時必須完整保留版權聲明及軟體授權、且一旦經過修改便不可以再繼續使用威注音的產品名稱。
 
+## 格式規範：
+
+該專案對源碼格式有規範，且 Swift 與其他 (Obj)C(++) 系語言持不同規範：
+
+- Swift: 採 [Apple 官方 Swift-Format](https://github.com/apple/swift-format)，且施加如下例外修改項目：
+	- Indentation 僅使用 `"indentation" : {     "tabs" : 1   },`，不以空格來縮進。
+	- `"indentSwitchCaseLabels" : true,`
+	- `"lineLength" : 120,`
+	- `"NoBlockComments" : false,`
+	- `"tabWidth" : 4,`
+- (Obj)C(++) 系語言：使用 clang-format 命令、且採 Microsoft 行文規範。該規範以四個西文半形空格為行縮進單位。
+
 ## 特殊勸告
 
 為了您的精神衛生，任何使用威注音輸入法時遇到的產品問題、請勿提報至小麥注音，除非您確信小麥注音也有該問題。即便如此，也請在他們那邊不要提及威注音。
