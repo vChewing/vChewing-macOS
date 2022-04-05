@@ -89,14 +89,14 @@ extension RangeReplaceableCollection where Element: Hashable {
 
 		let itmAppleZhuyinBopomofo = NSMenuItem()
 		itmAppleZhuyinBopomofo.title = String(
-			format: NSLocalizedString("Apple Zhuyin Bopomofo", comment: ""))
+			format: NSLocalizedString("Apple Zhuyin Bopomofo (Dachen)", comment: ""))
 		itmAppleZhuyinBopomofo.representedObject = String(
 			"com.apple.keylayout.ZhuyinBopomofo")
 		basisKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinBopomofo)
 
 		let itmAppleZhuyinEten = NSMenuItem()
 		itmAppleZhuyinEten.title = String(
-			format: NSLocalizedString("Apple Zhuyin Eten", comment: ""))
+			format: NSLocalizedString("Apple Zhuyin Eten (Traditional)", comment: ""))
 		itmAppleZhuyinEten.representedObject = String("com.apple.keylayout.ZhuyinEten")
 		basisKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinEten)
 
