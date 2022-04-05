@@ -412,6 +412,7 @@
 			children = (
 				D4A13D5927A59D5C003BE359 /* ctlInputMethod.swift */,
 				5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */,
+				5B5E535127EF261400C6AA1E /* IME.swift */,
 				5B62A33127AE792F00A19448 /* InputSourceHelper.swift */,
 				5B62A33527AE795800A19448 /* mgrPrefs.swift */,
 			);
@@ -680,7 +681,6 @@
 			isa = PBXGroup;
 			children = (
 				D427F76B278CA1BA004A2160 /* AppDelegate.swift */,
-				5B5E535127EF261400C6AA1E /* IME.swift */,
 				D47B92BF27972AC800458394 /* main.swift */,
 				5B62A31F27AE74E900A19448 /* ControllerModules */,
 				5B62A32127AE755D00A19448 /* FileHandlers */,
