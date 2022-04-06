@@ -51,8 +51,8 @@
 "zh-Hant" = "繁體中国語";
 "ja" = "和語";
 "Alphanumerical Input Mode" = "英数入力モード";
-"Apple Zhuyin Bopomofo" = "Apple 注音ボポモフォ（大千標準）";
-"Apple Zhuyin Eten" = "Apple 注音ボポモフォ（倚天伝統）";
+"Apple Zhuyin Bopomofo (Dachen)" = "Apple 注音ボポモフォ（大千標準）";
+"Apple Zhuyin Eten (Traditional)" = "Apple 注音ボポモフォ（倚天伝統）";
 "Symbol & Emoji Input" = "符号＆絵文字入力";
 "Edit User Symbol & Emoji Data…" = "ユーザー符号＆絵文字辞書を編集…";
 "Choose your desired user data folder." = "欲しがるユーザー辞書フォルダをお選びください。";

@@ -1,11 +1,12 @@
 ご注意：
+●　macOS 12 Monterey 以前の OS（macOS 10.x-11.x）のバグのため、macOS 10.x-11.x でインストールする場合、この入力アプリ必ずご自分でユーザーフォルダをインストール先と設定してください。然もないと、いずれ macOS 12 にアップデートし、この入力アプリのもっと新しいバージョンをインストールする時に、予測できない支障が生ずる恐れがあります。下記のターミナル指令を（必ず下記のまま sudo で）実行すれば、この様な支障を解決することができます：
+    sudo /Users/$(stat -f%Su /dev/console)/Library/Input\ Methods/vChewing.app/Contents/MacOS/vChewing uninstall
+⚠︎ 間違ったところへ実装したファイルだけは消されますが、もし sudo 使わずに実行すると、逆に正しく実装されたファイルは消されます。
 
-macOS 12 Monterey 以前の OS（macOS 10.x-11.x）のバグのため、macOS 10.x-11.x でインストールする場合、この入力アプリ必ずご自分でユーザーフォルダをインストール先と設定してください。然もないと、いずれ macOS 12 にアップデートし、この入力アプリのもっと新しいバージョンをインストールする時に、予測できない支障が生ずる恐れがあります。下記のターミナル指令を実行すれば、この様な支障を解決することができます：
+●　そして、インストール直後、入力アプリがうまく使えない場合、再ログインすれば済ませることです。
 
-sudo /Users/$(stat -f%Su /dev/console)/Library/Input\ Methods/vChewing.app/Contents/MacOS/vChewing uninstall
-
-これで、間違ったところへ実装したファイルだけは消されます。
-
-そして、インストール直後、入力アプリがうまく使えない場合、再ログインすれば済ませることです。
+●　あと、IT 担当者は、Terminal で実装したい場合、OS バージョンを問わずに、下記の指令をご参考ください：
+    installer -pkg ~/Downloads/vChewing-macOS-?.?.?-unsigned.pkg -target CurrentUserHomeDirectory
 
 よろしくお願いいたします。
+威注音入力アプリ
