@@ -50,6 +50,7 @@
 		5BD05C6827B2BBEF004C4F1D /* Content.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD05C6327B2BBEF004C4F1D /* Content.swift */; };
 		5BD05C6927B2BBEF004C4F1D /* WindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD05C6427B2BBEF004C4F1D /* WindowController.swift */; };
 		5BD05C6A27B2BBEF004C4F1D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD05C6527B2BBEF004C4F1D /* ViewController.swift */; };
+		5BDC1CFA27FDF1310052C2B9 /* apiUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDC1CF927FDF1310052C2B9 /* apiUpdate.swift */; };
 		5BDCBB2E27B4E67A00D0CC59 /* vChewingPhraseEditor.app in Resources */ = {isa = PBXBuildFile; fileRef = 5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */; };
 		5BE78BD927B3775B005EA1BE /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE78BD827B37750005EA1BE /* ctlAboutWindow.swift */; };
 		5BE78BDD27B3776D005EA1BE /* frmAboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BE78BDA27B37764005EA1BE /* frmAboutWindow.xib */; };
@@ -212,6 +213,7 @@
 		5BD05C6327B2BBEF004C4F1D /* Content.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Content.swift; sourceTree = "<group>"; };
 		5BD05C6427B2BBEF004C4F1D /* WindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WindowController.swift; sourceTree = "<group>"; };
 		5BD05C6527B2BBEF004C4F1D /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		5BDC1CF927FDF1310052C2B9 /* apiUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = apiUpdate.swift; sourceTree = "<group>"; };
 		5BDCBB4227B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/MainMenu.strings"; sourceTree = "<group>"; };
 		5BDCBB4327B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/frmAboutWindow.strings"; sourceTree = "<group>"; };
 		5BDCBB4527B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/frmPrefWindow.strings"; sourceTree = "<group>"; };
@@ -410,6 +412,7 @@
 		5B62A32227AE756300A19448 /* IMEModules */ = {
 			isa = PBXGroup;
 			children = (
+				5BDC1CF927FDF1310052C2B9 /* apiUpdate.swift */,
 				D4A13D5927A59D5C003BE359 /* ctlInputMethod.swift */,
 				5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */,
 				5B5E535127EF261400C6AA1E /* IME.swift */,
@@ -997,6 +1000,7 @@
 				D41355DE278EA3ED005E5CBD /* UserPhrasesLM.mm in Sources */,
 				6ACC3D3F27914F2400F1B140 /* KeyValueBlobReader.cpp in Sources */,
 				D41355D8278D74B5005E5CBD /* mgrLangModel.mm in Sources */,
+				5BDC1CFA27FDF1310052C2B9 /* apiUpdate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
