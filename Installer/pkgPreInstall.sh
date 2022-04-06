@@ -1,9 +1,8 @@
 #!/bin/sh
-loggedInUser=$(stat -f%Su /dev/console)
 
 killall vChewing || true
 
-if [ "$loggedInUser" = root ]; then
+if [ "${login_user}" = root ]; then
     rm -rf /Library/Input\ Methods/vChewing.app || true
     rm -rf /Library/Keyboard\ Layouts/vChewingKeyLayout.bundle || true
     rm -rf /Library/Keyboard\ Layouts/vChewing\ Dachen.keylayout || true
