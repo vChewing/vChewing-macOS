@@ -124,7 +124,7 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
 		panel.titlebarAppearsTransparent = true
 		panel.titleVisibility = .hidden
 		panel.showsToolbarButton = false
-		panel.standardWindowButton(NSWindow.ButtonType.fullScreenButton)?.isHidden = true
+		panel.standardWindowButton(NSWindow.ButtonType.zoomButton)?.isHidden = true
 		panel.standardWindowButton(NSWindow.ButtonType.miniaturizeButton)?.isHidden = true
 		panel.standardWindowButton(NSWindow.ButtonType.closeButton)?.isHidden = true
 		panel.standardWindowButton(NSWindow.ButtonType.zoomButton)?.isHidden = true
