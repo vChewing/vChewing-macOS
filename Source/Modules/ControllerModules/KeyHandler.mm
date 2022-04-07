@@ -1324,7 +1324,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if ([input isTab])
     {
         BOOL updated =
-            mgrPrefs.specifyTabKeyBehavior
+            mgrPrefs.specifyShiftTabKeyBehavior
                 ? ([input isShiftHold] ? [ctlCandidateCurrent showPreviousPage] : [ctlCandidateCurrent showNextPage])
                 : ([input isShiftHold] ? [ctlCandidateCurrent highlightPreviousCandidate]
                                        : [ctlCandidateCurrent highlightNextCandidate]);
@@ -1338,7 +1338,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if ([input isSpace])
     {
-        BOOL updated = mgrPrefs.specifySpaceKeyBehavior
+        BOOL updated = mgrPrefs.specifyShiftSpaceKeyBehavior
                            ? ([input isShiftHold] ? [ctlCandidateCurrent highlightNextCandidate]
                                                   : [ctlCandidateCurrent showNextPage])
                            : ([input isShiftHold] ? [ctlCandidateCurrent showNextPage]
