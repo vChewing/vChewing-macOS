@@ -26,38 +26,40 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
 
-private let kIsDebugModeEnabled = "_DebugMode"
-private let kUserDataFolderSpecified = "UserDataFolderSpecified"
-private let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
-private let kKeyboardLayoutPreference = "KeyboardLayout"
-private let kBasisKeyboardLayoutPreference = "BasisKeyboardLayout"
-private let kShowPageButtonsInCandidateWindow = "ShowPageButtonsInCandidateWindow"
-private let kCandidateListTextSize = "CandidateListTextSize"
-private let kAppleLanguagesPreferences = "AppleLanguages"
-private let kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
-private let kSelectPhraseAfterCursorAsCandidatePreference = "SelectPhraseAfterCursorAsCandidate"
-private let kUseHorizontalCandidateListPreference = "UseHorizontalCandidateList"
-private let kComposingBufferSizePreference = "ComposingBufferSize"
-private let kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
-private let kCNS11643Enabled = "CNS11643Enabled"
-private let kSymbolInputEnabled = "SymbolInputEnabled"
-private let kChineseConversionEnabled = "ChineseConversionEnabled"
-private let kShiftJISShinjitaiOutputEnabled = "ShiftJISShinjitaiOutputEnabled"
-private let kHalfWidthPunctuationEnabled = "HalfWidthPunctuationEnable"
-private let kMoveCursorAfterSelectingCandidate = "MoveCursorAfterSelectingCandidate"
-private let kEscToCleanInputBuffer = "EscToCleanInputBuffer"
-private let kSpecifyTabKeyBehavior = "SpecifyTabKeyBehavior"
-private let kSpecifySpaceKeyBehavior = "SpecifySpaceKeyBehavior"
-private let kUseSCPCTypingMode = "UseSCPCTypingMode"
-private let kMaxCandidateLength = "MaxCandidateLength"
-private let kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
+struct UserDef {
+	static let kIsDebugModeEnabled = "_DebugMode"
+	static let kUserDataFolderSpecified = "UserDataFolderSpecified"
+	static let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
+	static let kKeyboardLayout = "KeyboardLayout"
+	static let kBasisKeyboardLayout = "BasisKeyboardLayout"
+	static let kShowPageButtonsInCandidateWindow = "ShowPageButtonsInCandidateWindow"
+	static let kCandidateListTextSize = "CandidateListTextSize"
+	static let kAppleLanguages = "AppleLanguages"
+	static let kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
+	static let kSelectPhraseAfterCursorAsCandidate = "SelectPhraseAfterCursorAsCandidate"
+	static let kUseHorizontalCandidateList = "UseHorizontalCandidateList"
+	static let kComposingBufferSize = "ComposingBufferSize"
+	static let kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
+	static let kCNS11643Enabled = "CNS11643Enabled"
+	static let kSymbolInputEnabled = "SymbolInputEnabled"
+	static let kChineseConversionEnabled = "ChineseConversionEnabled"
+	static let kShiftJISShinjitaiOutputEnabled = "ShiftJISShinjitaiOutputEnabled"
+	static let kHalfWidthPunctuationEnabled = "HalfWidthPunctuationEnable"
+	static let kMoveCursorAfterSelectingCandidate = "MoveCursorAfterSelectingCandidate"
+	static let kEscToCleanInputBuffer = "EscToCleanInputBuffer"
+	static let kSpecifyShiftTabKeyBehavior = "SpecifyShiftTabKeyBehavior"
+	static let kSpecifyShiftSpaceKeyBehavior = "SpecifyShiftSpaceKeyBehavior"
+	static let kUseSCPCTypingMode = "UseSCPCTypingMode"
+	static let kMaxCandidateLength = "MaxCandidateLength"
+	static let kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
 
-private let kCandidateTextFontName = "CandidateTextFontName"
-private let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
-private let kCandidateKeys = "CandidateKeys"
+	static let kCandidateTextFontName = "CandidateTextFontName"
+	static let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
+	static let kCandidateKeys = "CandidateKeys"
 
-private let kAssociatedPhrasesEnabled = "AssociatedPhrasesEnabled"
-private let kPhraseReplacementEnabled = "PhraseReplacementEnabled"
+	static let kAssociatedPhrasesEnabled = "AssociatedPhrasesEnabled"
+	static let kPhraseReplacementEnabled = "PhraseReplacementEnabled"
+}
 
 private let kDefaultCandidateListTextSize: CGFloat = 18
 private let kMinKeyLabelSize: CGFloat = 10
@@ -191,35 +193,35 @@ struct ComposingBufferSize {
 @objc public class mgrPrefs: NSObject {
 	static var allKeys: [String] {
 		[
-			kIsDebugModeEnabled,
-			kUserDataFolderSpecified,
-			kKeyboardLayoutPreference,
-			kBasisKeyboardLayoutPreference,
-			kShowPageButtonsInCandidateWindow,
-			kCandidateListTextSize,
-			kAppleLanguagesPreferences,
-			kShouldAutoReloadUserDataFiles,
-			kSelectPhraseAfterCursorAsCandidatePreference,
-			kUseHorizontalCandidateListPreference,
-			kComposingBufferSizePreference,
-			kChooseCandidateUsingSpace,
-			kCNS11643Enabled,
-			kSymbolInputEnabled,
-			kChineseConversionEnabled,
-			kShiftJISShinjitaiOutputEnabled,
-			kHalfWidthPunctuationEnabled,
-			kSpecifyTabKeyBehavior,
-			kSpecifySpaceKeyBehavior,
-			kEscToCleanInputBuffer,
-			kCandidateTextFontName,
-			kCandidateKeyLabelFontName,
-			kCandidateKeys,
-			kMoveCursorAfterSelectingCandidate,
-			kPhraseReplacementEnabled,
-			kUseSCPCTypingMode,
-			kMaxCandidateLength,
-			kShouldNotFartInLieuOfBeep,
-			kAssociatedPhrasesEnabled,
+			UserDef.kIsDebugModeEnabled,
+			UserDef.kUserDataFolderSpecified,
+			UserDef.kKeyboardLayout,
+			UserDef.kBasisKeyboardLayout,
+			UserDef.kShowPageButtonsInCandidateWindow,
+			UserDef.kCandidateListTextSize,
+			UserDef.kAppleLanguages,
+			UserDef.kShouldAutoReloadUserDataFiles,
+			UserDef.kSelectPhraseAfterCursorAsCandidate,
+			UserDef.kUseHorizontalCandidateList,
+			UserDef.kComposingBufferSize,
+			UserDef.kChooseCandidateUsingSpace,
+			UserDef.kCNS11643Enabled,
+			UserDef.kSymbolInputEnabled,
+			UserDef.kChineseConversionEnabled,
+			UserDef.kShiftJISShinjitaiOutputEnabled,
+			UserDef.kHalfWidthPunctuationEnabled,
+			UserDef.kSpecifyShiftTabKeyBehavior,
+			UserDef.kSpecifyShiftSpaceKeyBehavior,
+			UserDef.kEscToCleanInputBuffer,
+			UserDef.kCandidateTextFontName,
+			UserDef.kCandidateKeyLabelFontName,
+			UserDef.kCandidateKeys,
+			UserDef.kMoveCursorAfterSelectingCandidate,
+			UserDef.kPhraseReplacementEnabled,
+			UserDef.kUseSCPCTypingMode,
+			UserDef.kMaxCandidateLength,
+			UserDef.kShouldNotFartInLieuOfBeep,
+			UserDef.kAssociatedPhrasesEnabled,
 		]
 	}
 
@@ -227,139 +229,139 @@ struct ComposingBufferSize {
 		// 既然 Preferences Module 的預設屬性不自動寫入 plist、而且還是 private，那這邊就先寫入了。
 
 		// 首次啟用輸入法時不要啟用偵錯模式。
-		if UserDefaults.standard.object(forKey: kIsDebugModeEnabled) == nil {
-			UserDefaults.standard.set(mgrPrefs.isDebugModeEnabled, forKey: kIsDebugModeEnabled)
+		if UserDefaults.standard.object(forKey: UserDef.kIsDebugModeEnabled) == nil {
+			UserDefaults.standard.set(mgrPrefs.isDebugModeEnabled, forKey: UserDef.kIsDebugModeEnabled)
 		}
 
 		// 首次啟用輸入法時設定不要自動更新，免得在某些要隔絕外部網路連線的保密機構內觸犯資安規則。
-		if UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) == nil {
-			UserDefaults.standard.set(false, forKey: kCheckUpdateAutomatically)
+		if UserDefaults.standard.object(forKey: UserDef.kCheckUpdateAutomatically) == nil {
+			UserDefaults.standard.set(false, forKey: UserDef.kCheckUpdateAutomatically)
 		}
 
 		// 預設顯示選字窗翻頁按鈕
-		if UserDefaults.standard.object(forKey: kShowPageButtonsInCandidateWindow) == nil {
+		if UserDefaults.standard.object(forKey: UserDef.kShowPageButtonsInCandidateWindow) == nil {
 			UserDefaults.standard.set(
-				mgrPrefs.showPageButtonsInCandidateWindow, forKey: kShowPageButtonsInCandidateWindow
+				mgrPrefs.showPageButtonsInCandidateWindow, forKey: UserDef.kShowPageButtonsInCandidateWindow
 			)
 		}
 
 		// 預設啟用繪文字與符號輸入
-		if UserDefaults.standard.object(forKey: kSymbolInputEnabled) == nil {
-			UserDefaults.standard.set(mgrPrefs.symbolInputEnabled, forKey: kSymbolInputEnabled)
+		if UserDefaults.standard.object(forKey: UserDef.kSymbolInputEnabled) == nil {
+			UserDefaults.standard.set(mgrPrefs.symbolInputEnabled, forKey: UserDef.kSymbolInputEnabled)
 		}
 
 		// 預設選字窗字詞文字尺寸，設成 18 剛剛好
-		if UserDefaults.standard.object(forKey: kCandidateListTextSize) == nil {
+		if UserDefaults.standard.object(forKey: UserDef.kCandidateListTextSize) == nil {
 			UserDefaults.standard.set(
-				mgrPrefs.candidateListTextSize, forKey: kCandidateListTextSize)
+				mgrPrefs.candidateListTextSize, forKey: UserDef.kCandidateListTextSize)
 		}
 
 		// 預設摁空格鍵來選字，所以設成 true
-		if UserDefaults.standard.object(forKey: kChooseCandidateUsingSpace) == nil {
+		if UserDefaults.standard.object(forKey: UserDef.kChooseCandidateUsingSpace) == nil {
 			UserDefaults.standard.set(
-				mgrPrefs.chooseCandidateUsingSpace, forKey: kChooseCandidateUsingSpace)
+				mgrPrefs.chooseCandidateUsingSpace, forKey: UserDef.kChooseCandidateUsingSpace)
 		}
 
 		// 自動檢測使用者自訂語彙數據的變動並載入。
-		if UserDefaults.standard.object(forKey: kShouldAutoReloadUserDataFiles) == nil {
+		if UserDefaults.standard.object(forKey: UserDef.kShouldAutoReloadUserDataFiles) == nil {
 			UserDefaults.standard.set(
-				mgrPrefs.shouldAutoReloadUserDataFiles, forKey: kShouldAutoReloadUserDataFiles)
+				mgrPrefs.shouldAutoReloadUserDataFiles, forKey: UserDef.kShouldAutoReloadUserDataFiles)
 		}
 
 		// 預設情況下讓 Tab 鍵在選字窗內切換候選字、而不是用來換頁。
-		if UserDefaults.standard.object(forKey: kSpecifyTabKeyBehavior) == nil {
+		if UserDefaults.standard.object(forKey: UserDef.kSpecifyShiftTabKeyBehavior) == nil {
 			UserDefaults.standard.set(
-				mgrPrefs.specifyTabKeyBehavior, forKey: kSpecifyTabKeyBehavior)
+				mgrPrefs.specifyShiftTabKeyBehavior, forKey: UserDef.kSpecifyShiftTabKeyBehavior)
 		}
 
 		// 預設情況下讓 Space 鍵在選字窗內切換候選字、而不是用來換頁。
-		if UserDefaults.standard.object(forKey: kSpecifySpaceKeyBehavior) == nil {
+		if UserDefaults.standard.object(forKey: UserDef.kSpecifyShiftSpaceKeyBehavior) == nil {
 			UserDefaults.standard.set(
-				mgrPrefs.specifySpaceKeyBehavior, forKey: kSpecifySpaceKeyBehavior)
+				mgrPrefs.specifyShiftSpaceKeyBehavior, forKey: UserDef.kSpecifyShiftSpaceKeyBehavior)
 		}
 
 		// 預設禁用逐字選字模式（就是每個字都要選的那種），所以設成 false
-		if UserDefaults.standard.object(forKey: kUseSCPCTypingMode) == nil {
-			UserDefaults.standard.set(mgrPrefs.useSCPCTypingMode, forKey: kUseSCPCTypingMode)
+		if UserDefaults.standard.object(forKey: UserDef.kUseSCPCTypingMode) == nil {
+			UserDefaults.standard.set(mgrPrefs.useSCPCTypingMode, forKey: UserDef.kUseSCPCTypingMode)
 		}
 
 		// 預設禁用逐字選字模式時的聯想詞功能，所以設成 false
-		if UserDefaults.standard.object(forKey: kAssociatedPhrasesEnabled) == nil {
+		if UserDefaults.standard.object(forKey: UserDef.kAssociatedPhrasesEnabled) == nil {
 			UserDefaults.standard.set(
-				mgrPrefs.associatedPhrasesEnabled, forKey: kAssociatedPhrasesEnabled)
+				mgrPrefs.associatedPhrasesEnabled, forKey: UserDef.kAssociatedPhrasesEnabled)
 		}
 
 		// 預設漢音風格選字，所以要設成 0
-		if UserDefaults.standard.object(forKey: kSelectPhraseAfterCursorAsCandidatePreference)
+		if UserDefaults.standard.object(forKey: UserDef.kSelectPhraseAfterCursorAsCandidate)
 			== nil
 		{
 			UserDefaults.standard.set(
 				mgrPrefs.selectPhraseAfterCursorAsCandidate,
-				forKey: kSelectPhraseAfterCursorAsCandidatePreference)
+				forKey: UserDef.kSelectPhraseAfterCursorAsCandidate)
 		}
 
 		// 預設在選字後自動移動游標
-		if UserDefaults.standard.object(forKey: kMoveCursorAfterSelectingCandidate) == nil {
+		if UserDefaults.standard.object(forKey: UserDef.kMoveCursorAfterSelectingCandidate) == nil {
 			UserDefaults.standard.set(
 				mgrPrefs.moveCursorAfterSelectingCandidate,
-				forKey: kMoveCursorAfterSelectingCandidate)
+				forKey: UserDef.kMoveCursorAfterSelectingCandidate)
 		}
 
 		// 預設橫向選字窗，不爽請自行改成縱向選字窗
-		if UserDefaults.standard.object(forKey: kUseHorizontalCandidateListPreference) == nil {
+		if UserDefaults.standard.object(forKey: UserDef.kUseHorizontalCandidateList) == nil {
 			UserDefaults.standard.set(
-				mgrPrefs.useHorizontalCandidateList, forKey: kUseHorizontalCandidateListPreference)
+				mgrPrefs.useHorizontalCandidateList, forKey: UserDef.kUseHorizontalCandidateList)
 		}
 
 		// 預設停用全字庫支援
-		if UserDefaults.standard.object(forKey: kCNS11643Enabled) == nil {
-			UserDefaults.standard.set(mgrPrefs.cns11643Enabled, forKey: kCNS11643Enabled)
+		if UserDefaults.standard.object(forKey: UserDef.kCNS11643Enabled) == nil {
+			UserDefaults.standard.set(mgrPrefs.cns11643Enabled, forKey: UserDef.kCNS11643Enabled)
 		}
 
 		// 預設停用繁體轉康熙模組
-		if UserDefaults.standard.object(forKey: kChineseConversionEnabled) == nil {
+		if UserDefaults.standard.object(forKey: UserDef.kChineseConversionEnabled) == nil {
 			UserDefaults.standard.set(
-				mgrPrefs.chineseConversionEnabled, forKey: kChineseConversionEnabled)
+				mgrPrefs.chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled)
 		}
 
 		// 預設停用繁體轉 JIS 當用新字體模組
-		if UserDefaults.standard.object(forKey: kShiftJISShinjitaiOutputEnabled) == nil {
+		if UserDefaults.standard.object(forKey: UserDef.kShiftJISShinjitaiOutputEnabled) == nil {
 			UserDefaults.standard.set(
-				mgrPrefs.shiftJISShinjitaiOutputEnabled, forKey: kShiftJISShinjitaiOutputEnabled)
+				mgrPrefs.shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled)
 		}
 
 		// 預設停用自訂語彙置換
-		if UserDefaults.standard.object(forKey: kPhraseReplacementEnabled) == nil {
+		if UserDefaults.standard.object(forKey: UserDef.kPhraseReplacementEnabled) == nil {
 			UserDefaults.standard.set(
-				mgrPrefs.phraseReplacementEnabled, forKey: kPhraseReplacementEnabled)
+				mgrPrefs.phraseReplacementEnabled, forKey: UserDef.kPhraseReplacementEnabled)
 		}
 
 		// 預設沒事不要在那裡放屁
-		if UserDefaults.standard.object(forKey: kShouldNotFartInLieuOfBeep) == nil {
+		if UserDefaults.standard.object(forKey: UserDef.kShouldNotFartInLieuOfBeep) == nil {
 			UserDefaults.standard.set(
-				mgrPrefs.shouldNotFartInLieuOfBeep, forKey: kShouldNotFartInLieuOfBeep)
+				mgrPrefs.shouldNotFartInLieuOfBeep, forKey: UserDef.kShouldNotFartInLieuOfBeep)
 		}
 
 		UserDefaults.standard.synchronize()
 	}
 
-	@UserDefault(key: kIsDebugModeEnabled, defaultValue: false)
+	@UserDefault(key: UserDef.kIsDebugModeEnabled, defaultValue: false)
 	@objc static var isDebugModeEnabled: Bool
 
-	@UserDefault(key: kCheckUpdateAutomatically, defaultValue: false)
+	@UserDefault(key: UserDef.kCheckUpdateAutomatically, defaultValue: false)
 	@objc static var checkUpdateAutomatically: Bool
 
-	@UserDefault(key: kUserDataFolderSpecified, defaultValue: "")
+	@UserDefault(key: UserDef.kUserDataFolderSpecified, defaultValue: "")
 	@objc static var userDataFolderSpecified: String
 
 	@objc static func ifSpecifiedUserDataPathExistsInPlist() -> Bool {
-		UserDefaults.standard.object(forKey: kUserDataFolderSpecified) != nil
+		UserDefaults.standard.object(forKey: UserDef.kUserDataFolderSpecified) != nil
 	}
 
-	@UserDefault(key: kAppleLanguagesPreferences, defaultValue: [])
+	@UserDefault(key: UserDef.kAppleLanguages, defaultValue: [])
 	@objc static var appleLanguages: [String]
 
-	@UserDefault(key: kKeyboardLayoutPreference, defaultValue: 0)
+	@UserDefault(key: UserDef.kKeyboardLayout, defaultValue: 0)
 	@objc static var keyboardLayout: Int
 
 	@objc static var keyboardLayoutName: String {
@@ -367,75 +369,75 @@ struct ComposingBufferSize {
 	}
 
 	@UserDefault(
-		key: kBasisKeyboardLayoutPreference, defaultValue: "com.apple.keylayout.ZhuyinBopomofo")
+		key: UserDef.kBasisKeyboardLayout, defaultValue: "com.apple.keylayout.ZhuyinBopomofo")
 	@objc static var basisKeyboardLayout: String
 
-	@UserDefault(key: kShowPageButtonsInCandidateWindow, defaultValue: true)
+	@UserDefault(key: UserDef.kShowPageButtonsInCandidateWindow, defaultValue: true)
 	@objc static var showPageButtonsInCandidateWindow: Bool
 
-	@CandidateListTextSize(key: kCandidateListTextSize)
+	@CandidateListTextSize(key: UserDef.kCandidateListTextSize)
 	@objc static var candidateListTextSize: CGFloat
 
-	@UserDefault(key: kShouldAutoReloadUserDataFiles, defaultValue: true)
+	@UserDefault(key: UserDef.kShouldAutoReloadUserDataFiles, defaultValue: true)
 	@objc static var shouldAutoReloadUserDataFiles: Bool
 
-	@UserDefault(key: kSelectPhraseAfterCursorAsCandidatePreference, defaultValue: false)
+	@UserDefault(key: UserDef.kSelectPhraseAfterCursorAsCandidate, defaultValue: false)
 	@objc static var selectPhraseAfterCursorAsCandidate: Bool
 
-	@UserDefault(key: kMoveCursorAfterSelectingCandidate, defaultValue: false)
+	@UserDefault(key: UserDef.kMoveCursorAfterSelectingCandidate, defaultValue: true)
 	@objc static var moveCursorAfterSelectingCandidate: Bool
 
-	@UserDefault(key: kUseHorizontalCandidateListPreference, defaultValue: true)
+	@UserDefault(key: UserDef.kUseHorizontalCandidateList, defaultValue: true)
 	@objc static var useHorizontalCandidateList: Bool
 
-	@ComposingBufferSize(key: kComposingBufferSizePreference)
+	@ComposingBufferSize(key: UserDef.kComposingBufferSize)
 	@objc static var composingBufferSize: Int
 
-	@UserDefault(key: kChooseCandidateUsingSpace, defaultValue: true)
+	@UserDefault(key: UserDef.kChooseCandidateUsingSpace, defaultValue: true)
 	@objc static var chooseCandidateUsingSpace: Bool
 
-	@UserDefault(key: kUseSCPCTypingMode, defaultValue: false)
+	@UserDefault(key: UserDef.kUseSCPCTypingMode, defaultValue: false)
 	@objc static var useSCPCTypingMode: Bool
 
 	@objc static func toggleSCPCTypingModeEnabled() -> Bool {
 		useSCPCTypingMode = !useSCPCTypingMode
-		UserDefaults.standard.set(useSCPCTypingMode, forKey: kUseSCPCTypingMode)
+		UserDefaults.standard.set(useSCPCTypingMode, forKey: UserDef.kUseSCPCTypingMode)
 		return useSCPCTypingMode
 	}
 
-	@UserDefault(key: kMaxCandidateLength, defaultValue: kDefaultComposingBufferSize * 2)
+	@UserDefault(key: UserDef.kMaxCandidateLength, defaultValue: kDefaultComposingBufferSize * 2)
 	@objc static var maxCandidateLength: Int
 
-	@UserDefault(key: kShouldNotFartInLieuOfBeep, defaultValue: true)
+	@UserDefault(key: UserDef.kShouldNotFartInLieuOfBeep, defaultValue: true)
 	@objc static var shouldNotFartInLieuOfBeep: Bool
 
 	@objc static func toggleShouldNotFartInLieuOfBeep() -> Bool {
 		shouldNotFartInLieuOfBeep = !shouldNotFartInLieuOfBeep
-		UserDefaults.standard.set(shouldNotFartInLieuOfBeep, forKey: kShouldNotFartInLieuOfBeep)
+		UserDefaults.standard.set(shouldNotFartInLieuOfBeep, forKey: UserDef.kShouldNotFartInLieuOfBeep)
 		return shouldNotFartInLieuOfBeep
 	}
 
-	@UserDefault(key: kCNS11643Enabled, defaultValue: false)
+	@UserDefault(key: UserDef.kCNS11643Enabled, defaultValue: false)
 	@objc static var cns11643Enabled: Bool
 
 	@objc static func toggleCNS11643Enabled() -> Bool {
 		cns11643Enabled = !cns11643Enabled
 		mgrLangModel.setCNSEnabled(cns11643Enabled)  // 很重要
-		UserDefaults.standard.set(cns11643Enabled, forKey: kCNS11643Enabled)
+		UserDefaults.standard.set(cns11643Enabled, forKey: UserDef.kCNS11643Enabled)
 		return cns11643Enabled
 	}
 
-	@UserDefault(key: kSymbolInputEnabled, defaultValue: true)
+	@UserDefault(key: UserDef.kSymbolInputEnabled, defaultValue: true)
 	@objc static var symbolInputEnabled: Bool
 
 	@objc static func toggleSymbolInputEnabled() -> Bool {
 		symbolInputEnabled = !symbolInputEnabled
 		mgrLangModel.setSymbolEnabled(symbolInputEnabled)  // 很重要
-		UserDefaults.standard.set(symbolInputEnabled, forKey: kSymbolInputEnabled)
+		UserDefaults.standard.set(symbolInputEnabled, forKey: UserDef.kSymbolInputEnabled)
 		return symbolInputEnabled
 	}
 
-	@UserDefault(key: kChineseConversionEnabled, defaultValue: false)
+	@UserDefault(key: UserDef.kChineseConversionEnabled, defaultValue: false)
 	@objc static var chineseConversionEnabled: Bool
 
 	@objc @discardableResult static func toggleChineseConversionEnabled() -> Bool {
@@ -444,13 +446,13 @@ struct ComposingBufferSize {
 		if chineseConversionEnabled && shiftJISShinjitaiOutputEnabled {
 			self.toggleShiftJISShinjitaiOutputEnabled()
 			UserDefaults.standard.set(
-				shiftJISShinjitaiOutputEnabled, forKey: kShiftJISShinjitaiOutputEnabled)
+				shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled)
 		}
-		UserDefaults.standard.set(chineseConversionEnabled, forKey: kChineseConversionEnabled)
+		UserDefaults.standard.set(chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled)
 		return chineseConversionEnabled
 	}
 
-	@UserDefault(key: kShiftJISShinjitaiOutputEnabled, defaultValue: false)
+	@UserDefault(key: UserDef.kShiftJISShinjitaiOutputEnabled, defaultValue: false)
 	@objc static var shiftJISShinjitaiOutputEnabled: Bool
 
 	@objc @discardableResult static func toggleShiftJISShinjitaiOutputEnabled() -> Bool {
@@ -460,11 +462,11 @@ struct ComposingBufferSize {
 			self.toggleChineseConversionEnabled()
 		}
 		UserDefaults.standard.set(
-			shiftJISShinjitaiOutputEnabled, forKey: kShiftJISShinjitaiOutputEnabled)
+			shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled)
 		return shiftJISShinjitaiOutputEnabled
 	}
 
-	@UserDefault(key: kHalfWidthPunctuationEnabled, defaultValue: false)
+	@UserDefault(key: UserDef.kHalfWidthPunctuationEnabled, defaultValue: false)
 	@objc static var halfWidthPunctuationEnabled: Bool
 
 	@objc static func toggleHalfWidthPunctuationEnabled() -> Bool {
@@ -472,23 +474,23 @@ struct ComposingBufferSize {
 		return halfWidthPunctuationEnabled
 	}
 
-	@UserDefault(key: kEscToCleanInputBuffer, defaultValue: true)
+	@UserDefault(key: UserDef.kEscToCleanInputBuffer, defaultValue: true)
 	@objc static var escToCleanInputBuffer: Bool
 
-	@UserDefault(key: kSpecifyTabKeyBehavior, defaultValue: false)
-	@objc static var specifyTabKeyBehavior: Bool
+	@UserDefault(key: UserDef.kSpecifyShiftTabKeyBehavior, defaultValue: false)
+	@objc static var specifyShiftTabKeyBehavior: Bool
 
-	@UserDefault(key: kSpecifySpaceKeyBehavior, defaultValue: false)
-	@objc static var specifySpaceKeyBehavior: Bool
+	@UserDefault(key: UserDef.kSpecifyShiftSpaceKeyBehavior, defaultValue: false)
+	@objc static var specifyShiftSpaceKeyBehavior: Bool
 
 	// MARK: - Optional settings
-	@UserDefault(key: kCandidateTextFontName, defaultValue: nil)
+	@UserDefault(key: UserDef.kCandidateTextFontName, defaultValue: nil)
 	@objc static var candidateTextFontName: String?
 
-	@UserDefault(key: kCandidateKeyLabelFontName, defaultValue: nil)
+	@UserDefault(key: UserDef.kCandidateKeyLabelFontName, defaultValue: nil)
 	@objc static var candidateKeyLabelFontName: String?
 
-	@UserDefault(key: kCandidateKeys, defaultValue: kDefaultKeys)
+	@UserDefault(key: UserDef.kCandidateKeys, defaultValue: kDefaultKeys)
 	@objc static var candidateKeys: String
 
 	@objc static var defaultCandidateKeys: String {
@@ -551,22 +553,22 @@ struct ComposingBufferSize {
 
 	}
 
-	@UserDefault(key: kPhraseReplacementEnabled, defaultValue: false)
+	@UserDefault(key: UserDef.kPhraseReplacementEnabled, defaultValue: false)
 	@objc static var phraseReplacementEnabled: Bool
 
 	@objc static func togglePhraseReplacementEnabled() -> Bool {
 		phraseReplacementEnabled = !phraseReplacementEnabled
 		mgrLangModel.setPhraseReplacementEnabled(phraseReplacementEnabled)
-		UserDefaults.standard.set(phraseReplacementEnabled, forKey: kPhraseReplacementEnabled)
+		UserDefaults.standard.set(phraseReplacementEnabled, forKey: UserDef.kPhraseReplacementEnabled)
 		return phraseReplacementEnabled
 	}
 
-	@UserDefault(key: kAssociatedPhrasesEnabled, defaultValue: false)
+	@UserDefault(key: UserDef.kAssociatedPhrasesEnabled, defaultValue: false)
 	@objc static var associatedPhrasesEnabled: Bool
 
 	@objc static func toggleAssociatedPhrasesEnabled() -> Bool {
 		associatedPhrasesEnabled = !associatedPhrasesEnabled
-		UserDefaults.standard.set(associatedPhrasesEnabled, forKey: kAssociatedPhrasesEnabled)
+		UserDefaults.standard.set(associatedPhrasesEnabled, forKey: UserDef.kAssociatedPhrasesEnabled)
 		return associatedPhrasesEnabled
 	}
 
