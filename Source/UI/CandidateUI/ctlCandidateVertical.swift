@@ -440,10 +440,9 @@ extension ctlCandidateVertical {
 
 		frameRect = window?.frame ?? NSRect.zero
 
-		let topLeftPoint = NSMakePoint(
-			frameRect.origin.x, frameRect.origin.y + frameRect.size.height)
+		let topLeftPoint = NSPoint(x: frameRect.origin.x, y: frameRect.origin.y + frameRect.size.height)
 		frameRect.size = newSize
-		frameRect.origin = NSMakePoint(topLeftPoint.x, topLeftPoint.y - frameRect.size.height)
+		frameRect.origin = NSPoint(x: topLeftPoint.x, y: topLeftPoint.y - frameRect.size.height)
 		self.window?.setFrame(frameRect, display: false)
 		candidateView.setNeedsDisplay(candidateView.bounds)
 	}
