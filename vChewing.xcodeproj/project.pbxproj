@@ -30,6 +30,19 @@
 		5B707CEC27D9F4870099EF99 /* OpenCC in Frameworks */ = {isa = PBXBuildFile; productRef = 5B707CEB27D9F4870099EF99 /* OpenCC */; };
 		5B73FB5E27B2BE1300E9BF49 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */; };
 		5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */; };
+		5BA9FD2327FEF39C002DE248 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD1627FEF39C002DE248 /* Utilities.swift */; };
+		5BA9FD2427FEF39C002DE248 /* Pane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD1727FEF39C002DE248 /* Pane.swift */; };
+		5BA9FD2527FEF39C002DE248 /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD1827FEF39C002DE248 /* Localization.swift */; };
+		5BA9FD2627FEF39C002DE248 /* PreferencesStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD1927FEF39C002DE248 /* PreferencesStyle.swift */; };
+		5BA9FD2727FEF39C002DE248 /* PreferencePane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD1A27FEF39C002DE248 /* PreferencePane.swift */; };
+		5BA9FD2827FEF39C002DE248 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD1B27FEF39C002DE248 /* Preferences.swift */; };
+		5BA9FD2927FEF39C002DE248 /* SegmentedControlStyleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD1C27FEF39C002DE248 /* SegmentedControlStyleViewController.swift */; };
+		5BA9FD2A27FEF39C002DE248 /* ToolbarItemStyleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD1D27FEF39C002DE248 /* ToolbarItemStyleViewController.swift */; };
+		5BA9FD2B27FEF39C002DE248 /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD1E27FEF39C002DE248 /* Container.swift */; };
+		5BA9FD2C27FEF39C002DE248 /* PreferencesStyleController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD1F27FEF39C002DE248 /* PreferencesStyleController.swift */; };
+		5BA9FD2D27FEF39C002DE248 /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD2027FEF39C002DE248 /* PreferencesWindowController.swift */; };
+		5BA9FD2E27FEF39C002DE248 /* Section.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD2127FEF39C002DE248 /* Section.swift */; };
+		5BA9FD2F27FEF39C002DE248 /* PreferencesTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD2227FEF39C002DE248 /* PreferencesTabViewController.swift */; };
 		5BAD0CD527D701F6003D127F /* vChewingKeyLayout.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */; };
 		5BB802DA27FABA8300CF1C19 /* ctlInputMethod_Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */; };
 		5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75D27AED54C0023B93A /* Beep.m4a */; };
@@ -189,6 +202,19 @@
 		5B7BC4AF27AFFBE800F66C24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmPrefWindow.xib; sourceTree = "<group>"; };
 		5B7BC4B227AFFC0B00F66C24 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmPrefWindow.strings; sourceTree = "<group>"; };
 		5B8F43ED27C9BC220069AC27 /* SymbolLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SymbolLM.h; sourceTree = "<group>"; };
+		5BA9FD1627FEF39C002DE248 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		5BA9FD1727FEF39C002DE248 /* Pane.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pane.swift; sourceTree = "<group>"; };
+		5BA9FD1827FEF39C002DE248 /* Localization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
+		5BA9FD1927FEF39C002DE248 /* PreferencesStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesStyle.swift; sourceTree = "<group>"; };
+		5BA9FD1A27FEF39C002DE248 /* PreferencePane.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencePane.swift; sourceTree = "<group>"; };
+		5BA9FD1B27FEF39C002DE248 /* Preferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
+		5BA9FD1C27FEF39C002DE248 /* SegmentedControlStyleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentedControlStyleViewController.swift; sourceTree = "<group>"; };
+		5BA9FD1D27FEF39C002DE248 /* ToolbarItemStyleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToolbarItemStyleViewController.swift; sourceTree = "<group>"; };
+		5BA9FD1E27FEF39C002DE248 /* Container.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Container.swift; sourceTree = "<group>"; };
+		5BA9FD1F27FEF39C002DE248 /* PreferencesStyleController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesStyleController.swift; sourceTree = "<group>"; };
+		5BA9FD2027FEF39C002DE248 /* PreferencesWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
+		5BA9FD2127FEF39C002DE248 /* Section.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Section.swift; sourceTree = "<group>"; };
+		5BA9FD2227FEF39C002DE248 /* PreferencesTabViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesTabViewController.swift; sourceTree = "<group>"; };
 		5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_Menu.swift; sourceTree = "<group>"; };
 		5BBBB75D27AED54C0023B93A /* Beep.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.m4a; sourceTree = "<group>"; };
 		5BBBB75E27AED54C0023B93A /* Fart.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.m4a; sourceTree = "<group>"; };
@@ -353,6 +379,7 @@
 			children = (
 				5B707CE627D9F43E0099EF99 /* OpenCCBridge */,
 				5B62A30227AE733500A19448 /* OVMandarin */,
+				5BA9FCEA27FED652002DE248 /* SindreSorhus */,
 			);
 			path = 3rdParty;
 			sourceTree = "<group>";
@@ -562,6 +589,35 @@
 				5B707CE727D9F4590099EF99 /* OpenCCBridge.swift */,
 			);
 			path = OpenCCBridge;
+			sourceTree = "<group>";
+		};
+		5BA9FCEA27FED652002DE248 /* SindreSorhus */ = {
+			isa = PBXGroup;
+			children = (
+				5BA9FD1527FEF39C002DE248 /* Preferences */,
+			);
+			name = SindreSorhus;
+			path = Source/3rdParty/SindreSorhus;
+			sourceTree = SOURCE_ROOT;
+		};
+		5BA9FD1527FEF39C002DE248 /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				5BA9FD1E27FEF39C002DE248 /* Container.swift */,
+				5BA9FD1827FEF39C002DE248 /* Localization.swift */,
+				5BA9FD1727FEF39C002DE248 /* Pane.swift */,
+				5BA9FD1A27FEF39C002DE248 /* PreferencePane.swift */,
+				5BA9FD1B27FEF39C002DE248 /* Preferences.swift */,
+				5BA9FD1927FEF39C002DE248 /* PreferencesStyle.swift */,
+				5BA9FD1F27FEF39C002DE248 /* PreferencesStyleController.swift */,
+				5BA9FD2227FEF39C002DE248 /* PreferencesTabViewController.swift */,
+				5BA9FD2027FEF39C002DE248 /* PreferencesWindowController.swift */,
+				5BA9FD2127FEF39C002DE248 /* Section.swift */,
+				5BA9FD1C27FEF39C002DE248 /* SegmentedControlStyleViewController.swift */,
+				5BA9FD1D27FEF39C002DE248 /* ToolbarItemStyleViewController.swift */,
+				5BA9FD1627FEF39C002DE248 /* Utilities.swift */,
+			);
+			path = Preferences;
 			sourceTree = "<group>";
 		};
 		5BBBB75C27AED54C0023B93A /* SoundFiles */ = {
@@ -970,7 +1026,9 @@
 				D461B792279DAC010070E734 /* InputState.swift in Sources */,
 				5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */,
 				D47B92C027972AD100458394 /* main.swift in Sources */,
+				5BA9FD2527FEF39C002DE248 /* Localization.swift in Sources */,
 				D44FB74D2792189A003C80A6 /* PhraseReplacementMap.mm in Sources */,
+				5BA9FD2E27FEF39C002DE248 /* Section.swift in Sources */,
 				D4A13D5A27A59F0B003BE359 /* ctlInputMethod.swift in Sources */,
 				D4E569DC27A34D0E00AC2CEF /* KeyHandler.mm in Sources */,
 				D47F7DD0278C0897002F9DD7 /* ctlNonModalAlertWindow.swift in Sources */,
@@ -978,16 +1036,26 @@
 				5BE78BE027B38804005EA1BE /* LMConsolidator.mm in Sources */,
 				D456576E279E4F7B00DF6BC9 /* KeyParser.swift in Sources */,
 				D47F7DCE278BFB57002F9DD7 /* ctlPrefWindow.swift in Sources */,
+				5BA9FD2927FEF39C002DE248 /* SegmentedControlStyleViewController.swift in Sources */,
 				D47D73AC27A6CAE600255A50 /* AssociatedPhrases.mm in Sources */,
 				5B62A34A27AE7CD900A19448 /* NotifierController.swift in Sources */,
+				5BA9FD2827FEF39C002DE248 /* Preferences.swift in Sources */,
+				5BA9FD2D27FEF39C002DE248 /* PreferencesWindowController.swift in Sources */,
+				5BA9FD2B27FEF39C002DE248 /* Container.swift in Sources */,
+				5BA9FD2427FEF39C002DE248 /* Pane.swift in Sources */,
 				5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */,
 				D41355DB278E6D17005E5CBD /* LMInstantiator.mm in Sources */,
 				5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */,
 				D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */,
 				5B62A33627AE795800A19448 /* mgrPrefs.swift in Sources */,
 				5B62A33827AE79CD00A19448 /* NSStringUtils.swift in Sources */,
+				5BA9FD2327FEF39C002DE248 /* Utilities.swift in Sources */,
 				5B62A33227AE792F00A19448 /* InputSourceHelper.swift in Sources */,
+				5BA9FD2C27FEF39C002DE248 /* PreferencesStyleController.swift in Sources */,
+				5BA9FD2A27FEF39C002DE248 /* ToolbarItemStyleViewController.swift in Sources */,
+				5BA9FD2F27FEF39C002DE248 /* PreferencesTabViewController.swift in Sources */,
 				5B5E535227EF261400C6AA1E /* IME.swift in Sources */,
+				5BA9FD2627FEF39C002DE248 /* PreferencesStyle.swift in Sources */,
 				5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
 				5B62A34827AE7CD900A19448 /* ctlCandidateVertical.swift in Sources */,
@@ -999,6 +1067,7 @@
 				5BB802DA27FABA8300CF1C19 /* ctlInputMethod_Menu.swift in Sources */,
 				D41355DE278EA3ED005E5CBD /* UserPhrasesLM.mm in Sources */,
 				6ACC3D3F27914F2400F1B140 /* KeyValueBlobReader.cpp in Sources */,
+				5BA9FD2727FEF39C002DE248 /* PreferencePane.swift in Sources */,
 				D41355D8278D74B5005E5CBD /* mgrLangModel.mm in Sources */,
 				5BDC1CFA27FDF1310052C2B9 /* apiUpdate.swift in Sources */,
 			);
