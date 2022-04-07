@@ -346,6 +346,9 @@ struct ComposingBufferSize {
 	@UserDefault(key: kIsDebugModeEnabled, defaultValue: false)
 	@objc static var isDebugModeEnabled: Bool
 
+	@UserDefault(key: kCheckUpdateAutomatically, defaultValue: false)
+	@objc static var checkUpdateAutomatically: Bool
+
 	@UserDefault(key: kUserDataFolderSpecified, defaultValue: "")
 	@objc static var userDataFolderSpecified: String
 
