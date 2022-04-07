@@ -123,10 +123,14 @@ extension ctlInputMethod {
 
 		menu.addItem(NSMenuItem.separator())  // ---------------------
 
-		menu.addItem(
-			withTitle: NSLocalizedString("vChewing Preferences…", comment: ""),
-			action: #selector(showPreferences(_:)), keyEquivalent: "")
-		if !optionKeyPressed {
+		if optionKeyPressed {
+			menu.addItem(
+				withTitle: NSLocalizedString("vChewing Preferences…", comment: ""),
+				action: #selector(showLegacyPreferences(_:)), keyEquivalent: "")
+		} else {
+			menu.addItem(
+				withTitle: NSLocalizedString("vChewing Preferences…", comment: ""),
+				action: #selector(showPreferences(_:)), keyEquivalent: "")
 			menu.addItem(
 				withTitle: NSLocalizedString("Check for Updates…", comment: ""),
 				action: #selector(checkForUpdate(_:)), keyEquivalent: "")
@@ -152,6 +156,20 @@ extension ctlInputMethod {
 	// MARK: - IME Menu Items
 
 	@objc override func showPreferences(_ sender: Any?) {
+		if #available(macOS 11.0, *) {
+			NSApp.setActivationPolicy(.accessory)
+			ctlPrefUI.shared.controller.show(preferencePane: Preferences.PaneIdentifier(rawValue: "General"))
+			ctlPrefUI.shared.controller.window?.level = .floating
+		} else {
+			showPrefWindowTraditional()
+		}
+	}
+
+	@objc func showLegacyPreferences(_ sender: Any?) {
+		showPrefWindowTraditional()
+	}
+
+	private func showPrefWindowTraditional() {
 		(NSApp.delegate as? AppDelegate)?.showPreferences()
 		NSApp.activate(ignoringOtherApps: true)
 	}
