@@ -77,7 +77,17 @@ private let kMaxComposingBufferSize = 30
 
 private let kDefaultKeys = "123456789"
 
-// MARK: Property wrappers
+// MARK: - UserDefaults extension.
+
+@objc extension UserDefaults {
+	func setDefault(_ value: Any?, forKey defaultName: String) {
+		if self.object(forKey: defaultName) == nil {
+			self.set(value, forKey: defaultName)
+		}
+	}
+}
+
+// MARK: - Property wrappers
 
 @propertyWrapper
 struct UserDefault<Value> {
@@ -225,122 +235,35 @@ struct ComposingBufferSize {
 		]
 	}
 
+	// MARK: - 既然 Preferences Module 的預設屬性不自動寫入 plist，那這邊就先寫入了。
 	@objc public static func setMissingDefaults() {
-		// 既然 Preferences Module 的預設屬性不自動寫入 plist、而且還是 private，那這邊就先寫入了。
-
-		// 首次啟用輸入法時不要啟用偵錯模式。
-		if UserDefaults.standard.object(forKey: UserDef.kIsDebugModeEnabled) == nil {
-			UserDefaults.standard.set(mgrPrefs.isDebugModeEnabled, forKey: UserDef.kIsDebugModeEnabled)
-		}
-
-		// 首次啟用輸入法時設定不要自動更新，免得在某些要隔絕外部網路連線的保密機構內觸犯資安規則。
-		if UserDefaults.standard.object(forKey: UserDef.kCheckUpdateAutomatically) == nil {
-			UserDefaults.standard.set(false, forKey: UserDef.kCheckUpdateAutomatically)
-		}
-
-		// 預設顯示選字窗翻頁按鈕
-		if UserDefaults.standard.object(forKey: UserDef.kShowPageButtonsInCandidateWindow) == nil {
-			UserDefaults.standard.set(
-				mgrPrefs.showPageButtonsInCandidateWindow, forKey: UserDef.kShowPageButtonsInCandidateWindow
-			)
-		}
-
-		// 預設啟用繪文字與符號輸入
-		if UserDefaults.standard.object(forKey: UserDef.kSymbolInputEnabled) == nil {
-			UserDefaults.standard.set(mgrPrefs.symbolInputEnabled, forKey: UserDef.kSymbolInputEnabled)
-		}
-
-		// 預設選字窗字詞文字尺寸，設成 18 剛剛好
-		if UserDefaults.standard.object(forKey: UserDef.kCandidateListTextSize) == nil {
-			UserDefaults.standard.set(
-				mgrPrefs.candidateListTextSize, forKey: UserDef.kCandidateListTextSize)
-		}
-
-		// 預設摁空格鍵來選字，所以設成 true
-		if UserDefaults.standard.object(forKey: UserDef.kChooseCandidateUsingSpace) == nil {
-			UserDefaults.standard.set(
-				mgrPrefs.chooseCandidateUsingSpace, forKey: UserDef.kChooseCandidateUsingSpace)
-		}
-
-		// 自動檢測使用者自訂語彙數據的變動並載入。
-		if UserDefaults.standard.object(forKey: UserDef.kShouldAutoReloadUserDataFiles) == nil {
-			UserDefaults.standard.set(
-				mgrPrefs.shouldAutoReloadUserDataFiles, forKey: UserDef.kShouldAutoReloadUserDataFiles)
-		}
-
-		// 預設情況下讓 Tab 鍵在選字窗內切換候選字、而不是用來換頁。
-		if UserDefaults.standard.object(forKey: UserDef.kSpecifyShiftTabKeyBehavior) == nil {
-			UserDefaults.standard.set(
-				mgrPrefs.specifyShiftTabKeyBehavior, forKey: UserDef.kSpecifyShiftTabKeyBehavior)
-		}
-
-		// 預設情況下讓 Space 鍵在選字窗內切換候選字、而不是用來換頁。
-		if UserDefaults.standard.object(forKey: UserDef.kSpecifyShiftSpaceKeyBehavior) == nil {
-			UserDefaults.standard.set(
-				mgrPrefs.specifyShiftSpaceKeyBehavior, forKey: UserDef.kSpecifyShiftSpaceKeyBehavior)
-		}
-
-		// 預設禁用逐字選字模式（就是每個字都要選的那種），所以設成 false
-		if UserDefaults.standard.object(forKey: UserDef.kUseSCPCTypingMode) == nil {
-			UserDefaults.standard.set(mgrPrefs.useSCPCTypingMode, forKey: UserDef.kUseSCPCTypingMode)
-		}
-
-		// 預設禁用逐字選字模式時的聯想詞功能，所以設成 false
-		if UserDefaults.standard.object(forKey: UserDef.kAssociatedPhrasesEnabled) == nil {
-			UserDefaults.standard.set(
-				mgrPrefs.associatedPhrasesEnabled, forKey: UserDef.kAssociatedPhrasesEnabled)
-		}
-
-		// 預設漢音風格選字，所以要設成 0
-		if UserDefaults.standard.object(forKey: UserDef.kSelectPhraseAfterCursorAsCandidate)
-			== nil
-		{
-			UserDefaults.standard.set(
-				mgrPrefs.selectPhraseAfterCursorAsCandidate,
-				forKey: UserDef.kSelectPhraseAfterCursorAsCandidate)
-		}
-
-		// 預設在選字後自動移動游標
-		if UserDefaults.standard.object(forKey: UserDef.kMoveCursorAfterSelectingCandidate) == nil {
-			UserDefaults.standard.set(
-				mgrPrefs.moveCursorAfterSelectingCandidate,
-				forKey: UserDef.kMoveCursorAfterSelectingCandidate)
-		}
-
-		// 預設橫向選字窗，不爽請自行改成縱向選字窗
-		if UserDefaults.standard.object(forKey: UserDef.kUseHorizontalCandidateList) == nil {
-			UserDefaults.standard.set(
-				mgrPrefs.useHorizontalCandidateList, forKey: UserDef.kUseHorizontalCandidateList)
-		}
-
-		// 預設停用全字庫支援
-		if UserDefaults.standard.object(forKey: UserDef.kCNS11643Enabled) == nil {
-			UserDefaults.standard.set(mgrPrefs.cns11643Enabled, forKey: UserDef.kCNS11643Enabled)
-		}
-
-		// 預設停用繁體轉康熙模組
-		if UserDefaults.standard.object(forKey: UserDef.kChineseConversionEnabled) == nil {
-			UserDefaults.standard.set(
-				mgrPrefs.chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled)
-		}
-
-		// 預設停用繁體轉 JIS 當用新字體模組
-		if UserDefaults.standard.object(forKey: UserDef.kShiftJISShinjitaiOutputEnabled) == nil {
-			UserDefaults.standard.set(
-				mgrPrefs.shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled)
-		}
-
-		// 預設停用自訂語彙置換
-		if UserDefaults.standard.object(forKey: UserDef.kPhraseReplacementEnabled) == nil {
-			UserDefaults.standard.set(
-				mgrPrefs.phraseReplacementEnabled, forKey: UserDef.kPhraseReplacementEnabled)
-		}
-
-		// 預設沒事不要在那裡放屁
-		if UserDefaults.standard.object(forKey: UserDef.kShouldNotFartInLieuOfBeep) == nil {
-			UserDefaults.standard.set(
-				mgrPrefs.shouldNotFartInLieuOfBeep, forKey: UserDef.kShouldNotFartInLieuOfBeep)
-		}
+		UserDefaults.standard.setDefault(mgrPrefs.isDebugModeEnabled, forKey: UserDef.kIsDebugModeEnabled)
+		UserDefaults.standard.setDefault(mgrPrefs.checkUpdateAutomatically, forKey: UserDef.kCheckUpdateAutomatically)
+		UserDefaults.standard.setDefault(
+			mgrPrefs.showPageButtonsInCandidateWindow, forKey: UserDef.kShowPageButtonsInCandidateWindow)
+		UserDefaults.standard.setDefault(mgrPrefs.symbolInputEnabled, forKey: UserDef.kSymbolInputEnabled)
+		UserDefaults.standard.setDefault(mgrPrefs.candidateListTextSize, forKey: UserDef.kCandidateListTextSize)
+		UserDefaults.standard.setDefault(mgrPrefs.chooseCandidateUsingSpace, forKey: UserDef.kChooseCandidateUsingSpace)
+		UserDefaults.standard.setDefault(
+			mgrPrefs.shouldAutoReloadUserDataFiles, forKey: UserDef.kShouldAutoReloadUserDataFiles)
+		UserDefaults.standard.setDefault(
+			mgrPrefs.specifyShiftTabKeyBehavior, forKey: UserDef.kSpecifyShiftTabKeyBehavior)
+		UserDefaults.standard.setDefault(
+			mgrPrefs.specifyShiftSpaceKeyBehavior, forKey: UserDef.kSpecifyShiftSpaceKeyBehavior)
+		UserDefaults.standard.setDefault(mgrPrefs.useSCPCTypingMode, forKey: UserDef.kUseSCPCTypingMode)
+		UserDefaults.standard.setDefault(mgrPrefs.associatedPhrasesEnabled, forKey: UserDef.kAssociatedPhrasesEnabled)
+		UserDefaults.standard.setDefault(
+			mgrPrefs.selectPhraseAfterCursorAsCandidate, forKey: UserDef.kSelectPhraseAfterCursorAsCandidate)
+		UserDefaults.standard.setDefault(
+			mgrPrefs.moveCursorAfterSelectingCandidate, forKey: UserDef.kMoveCursorAfterSelectingCandidate)
+		UserDefaults.standard.setDefault(
+			mgrPrefs.useHorizontalCandidateList, forKey: UserDef.kUseHorizontalCandidateList)
+		UserDefaults.standard.setDefault(mgrPrefs.cns11643Enabled, forKey: UserDef.kCNS11643Enabled)
+		UserDefaults.standard.setDefault(mgrPrefs.chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled)
+		UserDefaults.standard.setDefault(
+			mgrPrefs.shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled)
+		UserDefaults.standard.setDefault(mgrPrefs.phraseReplacementEnabled, forKey: UserDef.kPhraseReplacementEnabled)
+		UserDefaults.standard.setDefault(mgrPrefs.shouldNotFartInLieuOfBeep, forKey: UserDef.kShouldNotFartInLieuOfBeep)
 
 		UserDefaults.standard.synchronize()
 	}
