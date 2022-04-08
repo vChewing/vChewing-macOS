@@ -248,8 +248,7 @@ import Cocoa
 	}
 
 	@IBAction func resetSpecifiedUserDataFolder(_ sender: Any) {
-		UserDefaults.standard.removeObject(forKey: "UserDataFolderSpecified")
-		IME.initLangModels(userOnly: true)
+		mgrPrefs.resetSpecifiedUserDataFolder()
 	}
 
 	@IBAction func chooseUserDataFolderToSpecify(_ sender: Any) {
@@ -275,14 +274,14 @@ import Cocoa
 						} else {
 							clsSFX.beep()
 							if !bolPreviousFolderValidity {
-								self.resetSpecifiedUserDataFolder(self)
+								mgrPrefs.resetSpecifiedUserDataFolder()
 							}
 							return
 						}
 					}
 				} else {
 					if !bolPreviousFolderValidity {
-						self.resetSpecifiedUserDataFolder(self)
+						mgrPrefs.resetSpecifiedUserDataFolder()
 					}
 					return
 				}
