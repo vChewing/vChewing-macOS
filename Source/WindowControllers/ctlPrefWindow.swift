@@ -27,14 +27,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Carbon
 import Cocoa
 
-// Extend the RangeReplaceableCollection to allow it clean duplicated characters.
-extension RangeReplaceableCollection where Element: Hashable {
-	var charDeDuplicate: Self {
-		var set = Set<Element>()
-		return filter { set.insert($0).inserted }
-	}
-}
-
 // Please note that the class should be exposed using the same class name
 // in Objective-C in order to let IMK to see the same class name as
 // the "InputMethodServerPreferencesWindowControllerClass" in Info.plist.
