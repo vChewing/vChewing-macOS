@@ -33,7 +33,7 @@ import Cocoa
 @objc(ctlPrefWindow) class ctlPrefWindow: NSWindowController {
 	@IBOutlet weak var fontSizePopUpButton: NSPopUpButton!
 	@IBOutlet weak var uiLanguageButton: NSPopUpButton!
-	@IBOutlet weak var basisKeyboardLayoutButton: NSPopUpButton!
+	@IBOutlet weak var basicKeyboardLayoutButton: NSPopUpButton!
 	@IBOutlet weak var selectionKeyComboBox: NSComboBox!
 	@IBOutlet weak var chkTrad2KangXi: NSButton!
 	@IBOutlet weak var chkTrad2JISShinjitai: NSButton!
@@ -77,22 +77,22 @@ import Cocoa
 		var usKeyboardLayoutItem: NSMenuItem? = nil
 		var chosenBaseKeyboardLayoutItem: NSMenuItem? = nil
 
-		basisKeyboardLayoutButton.menu?.removeAllItems()
+		basicKeyboardLayoutButton.menu?.removeAllItems()
 
 		let itmAppleZhuyinBopomofo = NSMenuItem()
 		itmAppleZhuyinBopomofo.title = String(
 			format: NSLocalizedString("Apple Zhuyin Bopomofo (Dachen)", comment: ""))
 		itmAppleZhuyinBopomofo.representedObject = String(
 			"com.apple.keylayout.ZhuyinBopomofo")
-		basisKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinBopomofo)
+		basicKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinBopomofo)
 
 		let itmAppleZhuyinEten = NSMenuItem()
 		itmAppleZhuyinEten.title = String(
 			format: NSLocalizedString("Apple Zhuyin Eten (Traditional)", comment: ""))
 		itmAppleZhuyinEten.representedObject = String("com.apple.keylayout.ZhuyinEten")
-		basisKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinEten)
+		basicKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinEten)
 
-		let basisKeyboardLayoutID = mgrPrefs.basisKeyboardLayout
+		let basicKeyboardLayoutID = mgrPrefs.basicKeyboardLayout
 
 		for source in list {
 			if let categoryPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceCategory) {
@@ -142,13 +142,13 @@ import Cocoa
 			if sourceID == "com.apple.keylayout.US" {
 				usKeyboardLayoutItem = menuItem
 			}
-			if basisKeyboardLayoutID == sourceID {
+			if basicKeyboardLayoutID == sourceID {
 				chosenBaseKeyboardLayoutItem = menuItem
 			}
-			basisKeyboardLayoutButton.menu?.addItem(menuItem)
+			basicKeyboardLayoutButton.menu?.addItem(menuItem)
 		}
 
-		switch basisKeyboardLayoutID {
+		switch basicKeyboardLayoutID {
 			case "com.apple.keylayout.ZhuyinBopomofo":
 				chosenBaseKeyboardLayoutItem = itmAppleZhuyinBopomofo
 			case "com.apple.keylayout.ZhuyinEten":
@@ -157,7 +157,7 @@ import Cocoa
 				break  // nothing to do
 		}
 
-		basisKeyboardLayoutButton.select(chosenBaseKeyboardLayoutItem ?? usKeyboardLayoutItem)
+		basicKeyboardLayoutButton.select(chosenBaseKeyboardLayoutItem ?? usKeyboardLayoutItem)
 
 		selectionKeyComboBox.usesDataSource = false
 		selectionKeyComboBox.removeAllItems()
@@ -193,9 +193,9 @@ import Cocoa
 		}
 	}
 
-	@IBAction func updateBasisKeyboardLayoutAction(_ sender: Any) {
-		if let sourceID = basisKeyboardLayoutButton.selectedItem?.representedObject as? String {
-			mgrPrefs.basisKeyboardLayout = sourceID
+	@IBAction func updateBasicKeyboardLayoutAction(_ sender: Any) {
+		if let sourceID = basicKeyboardLayoutButton.selectedItem?.representedObject as? String {
+			mgrPrefs.basicKeyboardLayout = sourceID
 		}
 	}
 

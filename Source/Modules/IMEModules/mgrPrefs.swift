@@ -30,8 +30,8 @@ struct UserDef {
 	static let kIsDebugModeEnabled = "_DebugMode"
 	static let kUserDataFolderSpecified = "UserDataFolderSpecified"
 	static let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
-	static let kKeyboardLayout = "KeyboardLayout"
-	static let kBasisKeyboardLayout = "BasisKeyboardLayout"
+	static let kMandarinParser = "MandarinParser"
+	static let kBasicKeyboardLayout = "BasicKeyboardLayout"
 	static let kShowPageButtonsInCandidateWindow = "ShowPageButtonsInCandidateWindow"
 	static let kCandidateListTextSize = "CandidateListTextSize"
 	static let kAppleLanguages = "AppleLanguages"
@@ -167,7 +167,7 @@ struct ComposingBufferSize {
 
 // MARK: -
 
-@objc enum KeyboardLayout: Int {
+@objc enum MandarinParser: Int {
 	case ofStandard = 0
 	case ofEten = 1
 	case ofHsu = 2
@@ -205,8 +205,8 @@ struct ComposingBufferSize {
 		[
 			UserDef.kIsDebugModeEnabled,
 			UserDef.kUserDataFolderSpecified,
-			UserDef.kKeyboardLayout,
-			UserDef.kBasisKeyboardLayout,
+			UserDef.kMandarinParser,
+			UserDef.kBasicKeyboardLayout,
 			UserDef.kShowPageButtonsInCandidateWindow,
 			UserDef.kCandidateListTextSize,
 			UserDef.kAppleLanguages,
@@ -289,16 +289,16 @@ struct ComposingBufferSize {
 	@UserDefault(key: UserDef.kAppleLanguages, defaultValue: [])
 	@objc static var appleLanguages: [String]
 
-	@UserDefault(key: UserDef.kKeyboardLayout, defaultValue: 0)
-	@objc static var keyboardLayout: Int
+	@UserDefault(key: UserDef.kMandarinParser, defaultValue: 0)
+	@objc static var mandarinParser: Int
 
-	@objc static var keyboardLayoutName: String {
-		(KeyboardLayout(rawValue: self.keyboardLayout) ?? KeyboardLayout.ofStandard).name
+	@objc static var mandarinParserName: String {
+		(MandarinParser(rawValue: self.mandarinParser) ?? MandarinParser.ofStandard).name
 	}
 
 	@UserDefault(
-		key: UserDef.kBasisKeyboardLayout, defaultValue: "com.apple.keylayout.ZhuyinBopomofo")
-	@objc static var basisKeyboardLayout: String
+		key: UserDef.kBasicKeyboardLayout, defaultValue: "com.apple.keylayout.ZhuyinBopomofo")
+	@objc static var basicKeyboardLayout: String
 
 	@UserDefault(key: UserDef.kShowPageButtonsInCandidateWindow, defaultValue: true)
 	@objc static var showPageButtonsInCandidateWindow: Bool

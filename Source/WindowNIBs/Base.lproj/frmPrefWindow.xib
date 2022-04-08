@@ -8,7 +8,7 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ctlPrefWindow">
             <connections>
-                <outlet property="basisKeyboardLayoutButton" destination="124" id="135"/>
+                <outlet property="basicKeyboardLayoutButton" destination="124" id="135"/>
                 <outlet property="chkTrad2JISShinjitai" destination="h4r-Sp-LBI" id="pk8-xi-IJi"/>
                 <outlet property="chkTrad2KangXi" destination="5IL-zZ-CL9" id="PGS-Dy-BBY"/>
                 <outlet property="fontSizePopUpButton" destination="90" id="108"/>
@@ -764,7 +764,7 @@
                                                                 </items>
                                                             </menu>
                                                             <connections>
-                                                                <binding destination="32" name="selectedTag" keyPath="values.KeyboardLayout" id="103"/>
+                                                                <binding destination="32" name="selectedTag" keyPath="values.MandarinParser" id="n3r-9x-E3p"/>
                                                             </connections>
                                                         </popUpButtonCell>
                                                     </popUpButton>
@@ -779,7 +779,7 @@
                                                             <menu key="menu" title="OtherViews" id="128"/>
                                                         </popUpButtonCell>
                                                         <connections>
-                                                            <action selector="updateBasisKeyboardLayoutAction:" target="-2" id="136"/>
+                                                            <action selector="updateBasicKeyboardLayoutAction:" target="-2" id="136"/>
                                                         </connections>
                                                     </popUpButton>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="125">
