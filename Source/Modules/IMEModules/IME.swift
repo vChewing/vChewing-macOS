@@ -22,6 +22,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import Carbon
 import Cocoa
 
 @objc public class IME: NSObject {
@@ -222,6 +223,75 @@ import Cocoa
 					: "Cannot enable all input sources for \(bundleID), but this is ignored")
 		}
 		return 0
+	}
+
+	// MARK: - 準備枚舉系統內所有的 ASCII 鍵盤佈局
+	struct CarbonKeyboardLayout {
+		var strName: String = ""
+		var strValue: String = ""
+	}
+	static var arrEnumerateSystemKeyboardLayouts: [IME.CarbonKeyboardLayout] {
+		// 提前塞入 macOS 內建的兩款動態鍵盤佈局
+		var arrKeyLayouts: [IME.CarbonKeyboardLayout] = []
+		arrKeyLayouts += [
+			IME.CarbonKeyboardLayout.init(
+				strName: NSLocalizedString("Apple Chewing - Dachen", comment: ""),
+				strValue: "com.apple.keylayout.ZhuyinBopomofo"),
+			IME.CarbonKeyboardLayout.init(
+				strName: NSLocalizedString("Apple Chewing - Eten Traditional", comment: ""),
+				strValue: "com.apple.keylayout.ZhuyinEten"),
+		]
+
+		// 準備枚舉系統內所有的 ASCII 鍵盤佈局
+		var arrKeyLayoutsASCII: [IME.CarbonKeyboardLayout] = []
+		let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
+		for source in list {
+			if let ptrCategory = TISGetInputSourceProperty(source, kTISPropertyInputSourceCategory) {
+				let category = Unmanaged<CFString>.fromOpaque(ptrCategory).takeUnretainedValue()
+				if category != kTISCategoryKeyboardInputSource {
+					continue
+				}
+			} else {
+				continue
+			}
+
+			if let ptrASCIICapable = TISGetInputSourceProperty(
+				source, kTISPropertyInputSourceIsASCIICapable)
+			{
+				let asciiCapable = Unmanaged<CFBoolean>.fromOpaque(ptrASCIICapable)
+					.takeUnretainedValue()
+				if asciiCapable != kCFBooleanTrue {
+					continue
+				}
+			} else {
+				continue
+			}
+
+			if let ptrSourceType = TISGetInputSourceProperty(source, kTISPropertyInputSourceType) {
+				let sourceType = Unmanaged<CFString>.fromOpaque(ptrSourceType).takeUnretainedValue()
+				if sourceType != kTISTypeKeyboardLayout {
+					continue
+				}
+			} else {
+				continue
+			}
+
+			guard let ptrSourceID = TISGetInputSourceProperty(source, kTISPropertyInputSourceID),
+				let localizedNamePtr = TISGetInputSourceProperty(source, kTISPropertyLocalizedName)
+			else {
+				continue
+			}
+
+			let sourceID = String(Unmanaged<CFString>.fromOpaque(ptrSourceID).takeUnretainedValue())
+			let localizedName = String(
+				Unmanaged<CFString>.fromOpaque(localizedNamePtr).takeUnretainedValue())
+
+			arrKeyLayoutsASCII += [
+				IME.CarbonKeyboardLayout.init(strName: localizedName, strValue: sourceID)
+			]
+		}
+		arrKeyLayouts += arrKeyLayoutsASCII
+		return arrKeyLayouts
 	}
 
 }
