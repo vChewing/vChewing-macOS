@@ -50,6 +50,7 @@
 		5BA9FD4A27FEF3C9002DE248 /* PreferencesTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD3D27FEF3C8002DE248 /* PreferencesTabViewController.swift */; };
 		5BA9FD8B28006B41002DE248 /* VDKComboBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD8A28006B41002DE248 /* VDKComboBox.swift */; };
 		5BAD0CD527D701F6003D127F /* vChewingKeyLayout.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */; };
+		5BAEFAD028012565001F42C9 /* mgrLangModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BAEFACF28012565001F42C9 /* mgrLangModel.swift */; };
 		5BB802DA27FABA8300CF1C19 /* ctlInputMethod_Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */; };
 		5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75D27AED54C0023B93A /* Beep.m4a */; };
 		5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75E27AED54C0023B93A /* Fart.m4a */; };
@@ -227,6 +228,7 @@
 		5BA9FD3C27FEF3C8002DE248 /* Section.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Section.swift; sourceTree = "<group>"; };
 		5BA9FD3D27FEF3C8002DE248 /* PreferencesTabViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesTabViewController.swift; sourceTree = "<group>"; };
 		5BA9FD8A28006B41002DE248 /* VDKComboBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VDKComboBox.swift; sourceTree = "<group>"; };
+		5BAEFACF28012565001F42C9 /* mgrLangModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mgrLangModel.swift; sourceTree = "<group>"; };
 		5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_Menu.swift; sourceTree = "<group>"; };
 		5BBBB75D27AED54C0023B93A /* Beep.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.m4a; sourceTree = "<group>"; };
 		5BBBB75E27AED54C0023B93A /* Fart.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.m4a; sourceTree = "<group>"; };
@@ -478,6 +480,7 @@
 				D41355D6278D7409005E5CBD /* mgrLangModel.h */,
 				D495583A27A5C6C4006ADE1C /* mgrLangModel_Privates.h */,
 				D41355D7278D7409005E5CBD /* mgrLangModel.mm */,
+				5BAEFACF28012565001F42C9 /* mgrLangModel.swift */,
 				5B62A32527AE758000A19448 /* SubLanguageModels */,
 			);
 			path = LangModelRelated;
@@ -1086,6 +1089,7 @@
 				5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */,
 				D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */,
 				5B62A33627AE795800A19448 /* mgrPrefs.swift in Sources */,
+				5BAEFAD028012565001F42C9 /* mgrLangModel.swift in Sources */,
 				5B62A33827AE79CD00A19448 /* NSStringUtils.swift in Sources */,
 				5BA9FD0F27FEDB6B002DE248 /* suiPrefPaneGeneral.swift in Sources */,
 				5BA9FD4927FEF3C9002DE248 /* Section.swift in Sources */,

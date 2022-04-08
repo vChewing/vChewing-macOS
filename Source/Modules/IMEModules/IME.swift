@@ -85,7 +85,9 @@ import Cocoa
 	// MARK: - Open a phrase data file.
 	static func openPhraseFile(userFileAt path: String) {
 		func checkIfUserFilesExist() -> Bool {
-			if !mgrLangModel.checkIfUserLanguageModelFilesExist() {
+			if !mgrLangModel.chkUserLMFilesExist(InputMode.imeModeCHS)
+				|| !mgrLangModel.chkUserLMFilesExist(InputMode.imeModeCHT)
+			{
 				let content = String(
 					format: NSLocalizedString(
 						"Please check the permission at \"%@\".", comment: ""),
