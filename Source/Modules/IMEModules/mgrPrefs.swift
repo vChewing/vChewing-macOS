@@ -281,6 +281,11 @@ struct ComposingBufferSize {
 		UserDefaults.standard.object(forKey: UserDef.kUserDataFolderSpecified) != nil
 	}
 
+	@objc static func resetSpecifiedUserDataFolder() {
+		UserDefaults.standard.removeObject(forKey: "UserDataFolderSpecified")
+		IME.initLangModels(userOnly: true)
+	}
+
 	@UserDefault(key: UserDef.kAppleLanguages, defaultValue: [])
 	@objc static var appleLanguages: [String]
 
