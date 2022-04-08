@@ -46,9 +46,7 @@ static double FindHighestScore(const std::vector<Gramambular::NodeAnchor> &nodes
     {
         double score = ni->node->highestUnigramScore();
         if (score > highestScore)
-        {
             highestScore = score;
-        }
     }
     return highestScore + epsilon;
 }
@@ -98,14 +96,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
 - (BOOL)isBuilderEmpty
 {
-    if (_builder->grid().width() == 0)
-    {
-        return YES;
-    }
-    else
-    {
-        return NO;
-    }
+    return (_builder->grid().width() == 0);
 }
 
 - (void)setInputMode:(NSString *)value
@@ -114,25 +105,17 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     vChewing::LMInstantiator *newLanguageModel;
     vChewing::UserOverrideModel *newUserOverrideModel;
 
-    if ([value isKindOfClass:[NSString class]] && [value isEqual:imeModeCHS])
-    {
-        newInputMode = imeModeCHS;
-        newLanguageModel = [mgrLangModel lmCHS];
-        newUserOverrideModel = [mgrLangModel userOverrideModelCHS];
-    }
-    else
-    {
-        newInputMode = imeModeCHT;
-        newLanguageModel = [mgrLangModel lmCHT];
-        newUserOverrideModel = [mgrLangModel userOverrideModelCHT];
-    }
+    BOOL isCHS = [value isKindOfClass:[NSString class]] && [value isEqual:imeModeCHS];
+
+    newInputMode = isCHS ? imeModeCHS : imeModeCHT;
+    newLanguageModel = isCHS ? [mgrLangModel lmCHS] : [mgrLangModel lmCHT];
+    newUserOverrideModel = isCHS ? [mgrLangModel userOverrideModelCHS] : [mgrLangModel userOverrideModelCHT];
 
     // Report the current Input Mode to ctlInputMethod:
     ctlInputMethod.currentInputMode = newInputMode;
 
-    // Synchronize the Preference Setting "setPhraseReplacementEnabled" to the new LM.
+    // Synchronize the sub-languageModel state settings to the new LM.
     newLanguageModel->setPhraseReplacementEnabled(mgrPrefs.phraseReplacementEnabled);
-    // Also other sub language models:
     newLanguageModel->setSymbolEnabled(mgrPrefs.symbolInputEnabled);
     newLanguageModel->setCNSEnabled(mgrPrefs.cns11643Enabled);
 
@@ -151,24 +134,16 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         }
 
         if (!_bpmfReadingBuffer->isEmpty())
-        {
             _bpmfReadingBuffer->clear();
-        }
     }
 }
 
 - (void)dealloc
-{
-    // clean up everything
+{ // clean up everything
     if (_bpmfReadingBuffer)
-    {
         delete _bpmfReadingBuffer;
-    }
-
     if (_builder)
-    {
         delete _builder;
-    }
 }
 
 - (instancetype)init
@@ -196,36 +171,35 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
 - (void)syncWithPreferences
 {
-    NSInteger layout = mgrPrefs.keyboardLayout;
-    switch (layout)
+    switch (mgrPrefs.mandarinParser)
     {
-    case KeyboardLayoutOfStandard:
+    case MandarinParserOfStandard:
         _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::StandardLayout());
         break;
-    case KeyboardLayoutOfEten:
+    case MandarinParserOfEten:
         _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::ETenLayout());
         break;
-    case KeyboardLayoutOfHsu:
+    case MandarinParserOfHsu:
         _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::HsuLayout());
         break;
-    case KeyboardLayoutOfEen26:
+    case MandarinParserOfEen26:
         _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::ETen26Layout());
         break;
-    case KeyboardLayoutOfIBM:
+    case MandarinParserOfIBM:
         _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::IBMLayout());
         break;
-    case KeyboardLayoutOfMiTAC:
+    case MandarinParserOfMiTAC:
         _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::MiTACLayout());
         break;
-    case KeyboardLayoutOfFakeSeigyou:
+    case MandarinParserOfFakeSeigyou:
         _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::FakeSeigyouLayout());
         break;
-    case KeyboardLayoutOfHanyuPinyin:
+    case MandarinParserOfHanyuPinyin:
         _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::HanyuPinyinLayout());
         break;
     default:
         _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::StandardLayout());
-        mgrPrefs.keyboardLayout = KeyboardLayoutOfStandard;
+        mgrPrefs.mandarinParser = MandarinParserOfStandard;
     }
 }
 
@@ -241,21 +215,16 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         // in the user override model.
         BOOL addToOverrideModel = YES;
         if (selectedNode.spanningLength != [value count])
-        {
             addToOverrideModel = NO;
-        }
+
         if (addToOverrideModel)
         {
             double score = selectedNode.node->scoreForCandidate(stringValue);
-            if (score <= -12)
-            { // 威注音的 SymbolLM 的 Score 是 -12。
+            if (score <= -12) // 威注音的 SymbolLM 的 Score 是 -12。
                 addToOverrideModel = NO;
-            }
         }
         if (addToOverrideModel)
-        {
             _userOverrideModel->observe(_walkedNodes, cursorIndex, stringValue, [[NSDate date] timeIntervalSince1970]);
-        }
     }
     [self _walk];
 
@@ -265,15 +234,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         for (auto node : _walkedNodes)
         {
             if (nextPosition >= cursorIndex)
-            {
                 break;
-            }
             nextPosition += node.spanningLength;
         }
         if (nextPosition <= _builder->length())
-        {
             _builder->setCursorIndex(nextPosition);
-        }
     }
 }
 
@@ -284,12 +249,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     _walkedNodes.clear();
 }
 
-- (std::string)_currentLayout
+- (std::string)_currentMandarinParser
 {
-    NSString *keyboardLayoutName = mgrPrefs.keyboardLayoutName;
-    std::string layout = std::string(keyboardLayoutName.UTF8String) + std::string("_");
-    return layout;
+    return std::string(mgrPrefs.mandarinParserName.UTF8String) + std::string("_");
 }
+
+// MARK: - Handling Input
 
 - (BOOL)handleInput:(keyParser *)input
               state:(InputState *)inState
@@ -302,18 +267,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     // if the inputText is empty, it's a function key combination, we ignore it
     if (!input.inputText.length)
-    {
         return NO;
-    }
 
     // if the composing buffer is empty and there's no reading, and there is some function key combination, we ignore it
     BOOL isFunctionKey =
         ([input isCommandHold] || [input isOptionHotKey] || [input isNumericPad]) || [input isControlHotKey];
     if (![state isKindOfClass:[InputStateNotEmpty class]] &&
         ![state isKindOfClass:[InputStateAssociatedPhrases class]] && isFunctionKey)
-    {
         return NO;
-    }
 
     // Caps Lock processing: if Caps Lock is ON, temporarily disable bopomofo.
     // Note: Alphanumerical mode processing.
@@ -331,16 +292,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
         // When shift is pressed, don't do further processing, since it outputs capital letter anyway.
         if ([input isShiftHold])
-        {
             return NO;
-        }
 
         // if ASCII but not printable, don't use insertText:replacementRange: as many apps don't handle non-ASCII char
         // insertions.
         if (charCode < 0x80 && !isprint(charCode))
-        {
             return NO;
-        }
 
         // commit everything in the buffer.
         InputStateCommitting *committingState =
@@ -369,9 +326,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     // MARK: Handle Candidates
     if ([state isKindOfClass:[InputStateChoosingCandidate class]])
-    {
         return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
-    }
 
     // MARK: Handle Associated Phrases
     if ([state isKindOfClass:[InputStateAssociatedPhrases class]])
@@ -381,9 +336,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                                     stateCallback:stateCallback
                                     errorCallback:errorCallback];
         if (result)
-        {
             return YES;
-        }
         state = [[InputStateEmpty alloc] init];
         stateCallback(state);
     }
@@ -396,9 +349,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                                 input:input
                         stateCallback:stateCallback
                         errorCallback:errorCallback])
-        {
             return YES;
-        }
         state = [marking convertToInputting];
         stateCallback(state);
     }
@@ -493,9 +444,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                         (InputStateAssociatedPhrases *)[self buildAssociatePhraseStateWithKey:text
                                                                               useVerticalMode:input.useVerticalMode];
                     if (associatedPhrases)
-                    {
                         stateCallback(associatedPhrases);
-                    }
                     else
                     {
                         InputStateEmpty *empty = [[InputStateEmpty alloc] init];
@@ -504,9 +453,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                 }
             }
             else
-            {
                 stateCallback(choosingCandidates);
-            }
         }
 
         // and tells the client that the key is consumed
@@ -558,82 +505,54 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     // MARK: Esc
     if ([input isESC])
-    {
         return [self _handleEscWithState:state stateCallback:stateCallback errorCallback:errorCallback];
-    }
 
     // MARK: Cursor backward
     if ([input isCursorBackward] || emacsKey == vChewingEmacsKeyBackward)
-    {
         return [self _handleBackwardWithState:state
                                         input:input
                                 stateCallback:stateCallback
                                 errorCallback:errorCallback];
-    }
 
     // MARK:  Cursor forward
     if ([input isCursorForward] || emacsKey == vChewingEmacsKeyForward)
-    {
         return [self _handleForwardWithState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
-    }
 
     // MARK: Home
     if ([input isHome] || emacsKey == vChewingEmacsKeyHome)
-    {
         return [self _handleHomeWithState:state stateCallback:stateCallback errorCallback:errorCallback];
-    }
 
     // MARK: End
     if ([input isEnd] || emacsKey == vChewingEmacsKeyEnd)
-    {
         return [self _handleEndWithState:state stateCallback:stateCallback errorCallback:errorCallback];
-    }
 
     // MARK: Ctrl+PgLf or Shift+PgLf
-    if ([input isControlHold] || [input isShiftHold])
-    {
-        if ([input isOptionHold] && [input isLeft])
-        {
-            return [self _handleHomeWithState:state stateCallback:stateCallback errorCallback:errorCallback];
-        }
-    }
+    if (([input isControlHold] || [input isShiftHold]) && ([input isOptionHold] && [input isLeft]))
+        return [self _handleHomeWithState:state stateCallback:stateCallback errorCallback:errorCallback];
 
     // MARK: Ctrl+PgRt or Shift+PgRt
-    if ([input isControlHold] || [input isShiftHold])
-    {
-        if ([input isOptionHold] && [input isRight])
-        {
-            return [self _handleEndWithState:state stateCallback:stateCallback errorCallback:errorCallback];
-        }
-    }
+    if (([input isControlHold] || [input isShiftHold]) && ([input isOptionHold] && [input isRight]))
+        return [self _handleEndWithState:state stateCallback:stateCallback errorCallback:errorCallback];
 
     // MARK: AbsorbedArrowKey
     if ([input isAbsorbedArrowKey] || [input isExtraChooseCandidateKey] || [input isExtraChooseCandidateKeyReverse])
-    {
         return [self _handleAbsorbedArrowKeyWithState:state stateCallback:stateCallback errorCallback:errorCallback];
-    }
 
     // MARK: Backspace
     if ([input isBackSpace])
-    {
         return [self _handleBackspaceWithState:state stateCallback:stateCallback errorCallback:errorCallback];
-    }
 
     // MARK: Delete
     if ([input isDelete] || emacsKey == vChewingEmacsKeyDelete)
-    {
         return [self _handleDeleteWithState:state stateCallback:stateCallback errorCallback:errorCallback];
-    }
 
     // MARK: Enter
     if ([input isEnter])
-    {
         return ([input isControlHold] && [input isCommandHold])
                    ? [self _handleCtrlCommandEnterWithState:state
                                               stateCallback:stateCallback
                                               errorCallback:errorCallback]
                    : [self _handleEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
-    }
 
     // MARK: Punctuation list
     if ([input isSymbolMenuPhysicalKey] && ![input isShiftHold])
@@ -679,32 +598,24 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // if nothing is matched, see if it's a punctuation key for current layout.
 
     std::string punctuationNamePrefix;
+
     if ([input isOptionHold])
-    {
         punctuationNamePrefix = std::string("_alt_punctuation_");
-    }
     else if ([input isControlHold])
-    {
         punctuationNamePrefix = std::string("_ctrl_punctuation_");
-    }
     else if (mgrPrefs.halfWidthPunctuationEnabled)
-    {
         punctuationNamePrefix = std::string("_half_punctuation_");
-    }
     else
-    {
         punctuationNamePrefix = std::string("_punctuation_");
-    }
-    std::string layout = [self _currentLayout];
-    std::string customPunctuation = punctuationNamePrefix + layout + std::string(1, (char)charCode);
+
+    std::string parser = [self _currentMandarinParser];
+    std::string customPunctuation = punctuationNamePrefix + parser + std::string(1, (char)charCode);
     if ([self _handlePunctuation:customPunctuation
                            state:state
                usingVerticalMode:input.useVerticalMode
                    stateCallback:stateCallback
                    errorCallback:errorCallback])
-    {
         return YES;
-    }
 
     // if nothing is matched, see if it's a punctuation key.
     std::string punctuation = punctuationNamePrefix + std::string(1, (char)charCode);
@@ -713,9 +624,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                usingVerticalMode:input.useVerticalMode
                    stateCallback:stateCallback
                    errorCallback:errorCallback])
-    {
         return YES;
-    }
 
     // Lukhnos 這裡的處理反而會使得 Apple 倚天注音動態鍵盤佈局「敲不了半形大寫英文」的缺點曝露無疑，所以注釋掉。
     // 至於他試圖用這種處理來解決的上游 UPR293
@@ -728,9 +637,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                    usingVerticalMode:input.useVerticalMode
                        stateCallback:stateCallback
                        errorCallback:errorCallback])
-        {
             return YES;
-        }
     }
 
     // still nothing, then we update the composing buffer (some app has strange behavior if we don't do this, "thinking"
@@ -754,9 +661,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
               errorCallback:(void (^)(void))errorCallback
 {
     if (![state isKindOfClass:[InputStateInputting class]])
-    {
         return NO;
-    }
 
     BOOL escToClearInputBufferEnabled = mgrPrefs.escToCleanInputBuffer;
 
@@ -800,9 +705,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                    errorCallback:(void (^)(void))errorCallback
 {
     if (![state isKindOfClass:[InputStateInputting class]])
-    {
         return NO;
-    }
 
     if (!_bpmfReadingBuffer->isEmpty())
     {
@@ -859,9 +762,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                   errorCallback:(void (^)(void))errorCallback
 {
     if (![state isKindOfClass:[InputStateInputting class]])
-    {
         return NO;
-    }
 
     if (!_bpmfReadingBuffer->isEmpty())
     {
@@ -917,9 +818,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                errorCallback:(void (^)(void))errorCallback
 {
     if (![state isKindOfClass:[InputStateInputting class]])
-    {
         return NO;
-    }
 
     if (!_bpmfReadingBuffer->isEmpty())
     {
@@ -950,9 +849,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
               errorCallback:(void (^)(void))errorCallback
 {
     if (![state isKindOfClass:[InputStateInputting class]])
-    {
         return NO;
-    }
 
     if (!_bpmfReadingBuffer->isEmpty())
     {
@@ -983,9 +880,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                            errorCallback:(void (^)(void))errorCallback
 {
     if (![state isKindOfClass:[InputStateInputting class]])
-    {
         return NO;
-    }
 
     if (!_bpmfReadingBuffer->isEmpty())
     {
@@ -1001,9 +896,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                     errorCallback:(void (^)(void))errorCallback
 {
     if (![state isKindOfClass:[InputStateInputting class]])
-    {
         return NO;
-    }
 
     if (_bpmfReadingBuffer->isEmpty())
     {
@@ -1021,9 +914,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         }
     }
     else
-    {
         _bpmfReadingBuffer->backspace();
-    }
 
     if (_bpmfReadingBuffer->isEmpty() && !_builder->length())
     {
@@ -1043,9 +934,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                  errorCallback:(void (^)(void))errorCallback
 {
     if (![state isKindOfClass:[InputStateInputting class]])
-    {
         return NO;
-    }
 
     if (_bpmfReadingBuffer->isEmpty())
     {
@@ -1106,9 +995,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                 errorCallback:(void (^)(void))errorCallback
 {
     if (![state isKindOfClass:[InputStateInputting class]])
-    {
         return NO;
-    }
 
     [self clear];
 
@@ -1128,9 +1015,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
              errorCallback:(void (^)(void))errorCallback
 {
     if (!_languageModel->hasUnigramsForKey(customPunctuation))
-    {
         return NO;
-    }
 
     NSString *poppedText;
     if (_bpmfReadingBuffer->isEmpty())
@@ -1165,9 +1050,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             stateCallback(empty);
         }
         else
-        {
             stateCallback(candidateState);
-        }
     }
     return YES;
 }
@@ -1218,9 +1101,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                 stateCallback(inputting);
             }
             else
-            {
                 stateCallback(marking);
-            }
         }
         else
         {
@@ -1249,9 +1130,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                 stateCallback(inputting);
             }
             else
-            {
                 stateCallback(marking);
-            }
         }
         else
         {
@@ -1495,9 +1374,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             errorCallback();
         }
         else
-        {
             ctlCandidateCurrent.selectedCandidateIndex = 0;
-        }
 
         return YES;
     }
@@ -1505,18 +1382,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     NSArray *candidates;
 
     if ([state isKindOfClass:[InputStateChoosingCandidate class]])
-    {
         candidates = [(InputStateChoosingCandidate *)state candidates];
-    }
     else if ([state isKindOfClass:[InputStateAssociatedPhrases class]])
-    {
         candidates = [(InputStateAssociatedPhrases *)state candidates];
-    }
 
     if (!candidates)
-    {
         return NO;
-    }
 
     if (([input isEnd] || input.emacsKey == vChewingEmacsKeyEnd) && candidates.count > 0)
     {
@@ -1526,30 +1397,23 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             errorCallback();
         }
         else
-        {
             ctlCandidateCurrent.selectedCandidateIndex = candidates.count - 1;
-        }
+
         return YES;
     }
 
     if ([state isKindOfClass:[InputStateAssociatedPhrases class]])
     {
         if (![input isShiftHold])
-        {
             return NO;
-        }
     }
 
     NSInteger index = NSNotFound;
     NSString *match;
     if ([state isKindOfClass:[InputStateAssociatedPhrases class]])
-    {
         match = input.inputTextIgnoringModifiers;
-    }
     else
-    {
         match = inputText;
-    }
 
     for (NSUInteger j = 0, c = [ctlCandidateCurrent.keyLabels count]; j < c; j++)
     {
@@ -1572,31 +1436,22 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     if ([state isKindOfClass:[InputStateAssociatedPhrases class]])
-    {
         return NO;
-    }
 
     if (mgrPrefs.useSCPCTypingMode)
     {
-        std::string layout = [self _currentLayout];
         std::string punctuationNamePrefix;
         if ([input isOptionHold])
-        {
             punctuationNamePrefix = std::string("_alt_punctuation_");
-        }
         else if ([input isControlHold])
-        {
             punctuationNamePrefix = std::string("_ctrl_punctuation_");
-        }
         else if (mgrPrefs.halfWidthPunctuationEnabled)
-        {
             punctuationNamePrefix = std::string("_half_punctuation_");
-        }
         else
-        {
             punctuationNamePrefix = std::string("_punctuation_");
-        }
-        std::string customPunctuation = punctuationNamePrefix + layout + std::string(1, (char)charCode);
+
+        std::string parser = [self _currentMandarinParser];
+        std::string customPunctuation = punctuationNamePrefix + parser + std::string(1, (char)charCode);
         std::string punctuation = punctuationNamePrefix + std::string(1, (char)charCode);
 
         BOOL shouldAutoSelectCandidate = _bpmfReadingBuffer->isValidKey((char)charCode) ||
@@ -1607,9 +1462,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         {
             std::string letter = std::string("_letter_") + std::string(1, (char)charCode);
             if (_languageModel->hasUnigramsForKey(letter))
-            {
                 shouldAutoSelectCandidate = YES;
-            }
         }
 
         if (shouldAutoSelectCandidate)
@@ -1813,9 +1666,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         const std::vector<Gramambular::KeyValuePair> &candidates = (*ni).node->candidates();
         for (std::vector<Gramambular::KeyValuePair>::const_iterator ci = candidates.begin(), ce = candidates.end();
              ci != ce; ++ci)
-        {
             [candidatesArray addObject:[NSString stringWithUTF8String:(*ci).value.c_str()]];
-        }
     }
 
     InputStateChoosingCandidate *state =
@@ -1831,9 +1682,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     size_t cursorIndex = _builder->cursorIndex();
     // MS Phonetics IME style, phrase is *after* the cursor, i.e. cursor is always *before* the phrase
     if ((mgrPrefs.selectPhraseAfterCursorAsCandidate && (cursorIndex < _builder->length())) || !cursorIndex)
-    {
         ++cursorIndex;
-    }
 
     return cursorIndex;
 }
@@ -1843,9 +1692,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     NSMutableArray *readingsArray = [[NSMutableArray alloc] init];
     std::vector<std::string> v = _builder->readings();
     for (std::vector<std::string>::iterator it_i = v.begin(); it_i != v.end(); ++it_i)
-    {
         [readingsArray addObject:[NSString stringWithUTF8String:it_i->c_str()]];
-    }
     return readingsArray;
 }
 

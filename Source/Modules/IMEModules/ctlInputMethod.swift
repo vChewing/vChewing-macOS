@@ -66,7 +66,7 @@ class ctlInputMethod: IMKInputController {
 
 	@objc func setKeyLayout() {
 		let client = client().self as IMKTextInput
-		client.overrideKeyboard(withKeyboardNamed: mgrPrefs.basisKeyboardLayout)
+		client.overrideKeyboard(withKeyboardNamed: mgrPrefs.basicKeyboardLayout)
 	}
 
 	// MARK: - IMKInputController methods
