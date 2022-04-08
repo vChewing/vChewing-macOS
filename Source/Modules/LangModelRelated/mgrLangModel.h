@@ -35,28 +35,14 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)loadUserPhrases;
 + (void)loadUserAssociatedPhrases;
 + (void)loadUserPhraseReplacement;
-+ (BOOL)checkIfUserLanguageModelFilesExist;
-+ (BOOL)checkIfUserDataFolderExists;
-+ (BOOL)checkIfSpecifiedUserDataFolderValid:(NSString *)folderPath;
-+ (NSString *)dataFolderPath:(bool)isDefaultFolder NS_SWIFT_NAME(dataFolderPath(isDefaultFolder:));
 
 + (BOOL)checkIfUserPhraseExist:(NSString *)userPhrase
                      inputMode:(InputMode)mode
                            key:(NSString *)key NS_SWIFT_NAME(checkIfUserPhraseExist(userPhrase:mode:key:));
-+ (BOOL)writeUserPhrase:(NSString *)userPhrase
-              inputMode:(InputMode)mode
-       areWeDuplicating:(BOOL)areWeDuplicating
-          areWeDeleting:(BOOL)areWeDeleting;
++ (void)consolidateGivenFile:(NSString *)path shouldCheckPragma:(BOOL)shouldCheckPragma;
 + (void)setPhraseReplacementEnabled:(BOOL)phraseReplacementEnabled;
 + (void)setCNSEnabled:(BOOL)cnsEnabled;
 + (void)setSymbolEnabled:(BOOL)symbolEnabled;
-
-+ (NSString *)specifyBundleDataPath:(NSString *)filename;
-+ (NSString *)userPhrasesDataPath:(InputMode)mode;
-+ (NSString *)userSymbolDataPath:(InputMode)mode;
-+ (NSString *)userAssociatedPhrasesDataPath:(InputMode)mode;
-+ (NSString *)excludedPhrasesDataPath:(InputMode)mode;
-+ (NSString *)phraseReplacementDataPath:(InputMode)mode;
 
 @end
 
