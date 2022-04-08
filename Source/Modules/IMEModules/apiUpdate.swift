@@ -143,8 +143,7 @@ struct VersionUpdateApi {
 				let versionDescriptions = plist[kVersionDescription] as? [AnyHashable: Any]
 				if let versionDescriptions = versionDescriptions {
 					var locale = "en"
-					let supportedLocales = ["en", "zh-Hant", "zh-Hans", "ja"]
-					let preferredTags = Bundle.preferredLocalizations(from: supportedLocales)
+					let preferredTags = Bundle.preferredLocalizations(from: IME.arrSupportedLocales)
 					if let first = preferredTags.first {
 						locale = first
 					}

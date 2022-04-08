@@ -26,7 +26,7 @@ import Carbon
 import Cocoa
 
 @objc public class IME: NSObject {
-
+	static let arrSupportedLocales = ["en", "zh-Hant", "zh-Hans", "ja"]
 	static let dlgOpenPath = NSOpenPanel()
 
 	// MARK: - 開關判定當前應用究竟是？
