@@ -266,10 +266,12 @@ import Cocoa
 			IME.dlgOpenPath.beginSheetModal(for: self.window!) { result in
 				if result == NSApplication.ModalResponse.OK {
 					if IME.dlgOpenPath.url != nil {
-						if mgrLangModel.checkIfSpecifiedUserDataFolderValid(
-							IME.dlgOpenPath.url!.path)
-						{
-							mgrPrefs.userDataFolderSpecified = IME.dlgOpenPath.url!.path
+						// CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
+						// 所以要手動補回來。
+						var newPath = IME.dlgOpenPath.url!.path
+						newPath.ensureTrailingSlash()
+						if mgrLangModel.checkIfSpecifiedUserDataFolderValid(newPath) {
+							mgrPrefs.userDataFolderSpecified = newPath
 							IME.initLangModels(userOnly: true)
 						} else {
 							clsSFX.beep()
