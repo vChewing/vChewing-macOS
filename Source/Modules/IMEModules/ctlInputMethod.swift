@@ -65,8 +65,9 @@ class ctlInputMethod: IMKInputController {
 	// MARK: - Keyboard Layout Specifier
 
 	@objc func setKeyLayout() {
-		let client = client().self as IMKTextInput
-		client.overrideKeyboard(withKeyboardNamed: mgrPrefs.basicKeyboardLayout)
+		if let client = currentClient {
+			(client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.basicKeyboardLayout)
+		}
 	}
 
 	// MARK: - IMKInputController methods
@@ -90,14 +91,18 @@ class ctlInputMethod: IMKInputController {
 	override func activateServer(_ client: Any!) {
 		UserDefaults.standard.synchronize()
 
-		// Override the keyboard layout to the basic one.
-		setKeyLayout()
 		// reset the state
 		currentClient = client
 
 		keyHandler.clear()
 		keyHandler.syncWithPreferences()
-		self.handle(state: .Empty(), client: client)
+		if let bundleCheckID = (client as? IMKTextInput)?.bundleIdentifier() {
+			if bundleCheckID != Bundle.main.bundleIdentifier {
+				// Override the keyboard layout to the basic one.
+				setKeyLayout()
+				self.handle(state: .Empty(), client: client)
+			}
+		}
 		(NSApp.delegate as? AppDelegate)?.checkForUpdate()
 	}
 
@@ -120,14 +125,18 @@ class ctlInputMethod: IMKInputController {
 		}
 		mgrLangModel.loadDataModel(newInputMode)
 
-		// Remember to override the keyboard layout again -- treat this as an activate event.
-		setKeyLayout()
-
 		if keyHandler.inputMode != newInputMode {
+
 			UserDefaults.standard.synchronize()
 			keyHandler.clear()
 			keyHandler.inputMode = newInputMode
-			self.handle(state: .Empty(), client: client)
+			if let bundleCheckID = (client as? IMKTextInput)?.bundleIdentifier() {
+				if bundleCheckID != Bundle.main.bundleIdentifier {
+					// Remember to override the keyboard layout again -- treat this as an activate event.
+					setKeyLayout()
+					self.handle(state: .Empty(), client: client)
+				}
+			}
 		}
 
 		// 讓外界知道目前的簡繁體輸入模式。
