@@ -445,7 +445,7 @@
                                                             </column>
                                                         </cells>
                                                         <connections>
-                                                            <binding destination="32" name="selectedTag" keyPath="values.SpecifyTabKeyBehavior" id="ZDp-6s-2lR"/>
+                                                            <binding destination="32" name="selectedTag" keyPath="values.SpecifyShiftTabKeyBehavior" id="R1A-Ji-8i2"/>
                                                         </connections>
                                                     </matrix>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TMn-LX-3Ub">
@@ -478,7 +478,7 @@
                                                             </column>
                                                         </cells>
                                                         <connections>
-                                                            <binding destination="32" name="selectedTag" keyPath="values.SpecifySpaceKeyBehavior" id="yBI-fc-n36"/>
+                                                            <binding destination="32" name="selectedTag" keyPath="values.SpecifyShiftSpaceKeyBehavior" id="Ajq-3d-Lh1"/>
                                                         </connections>
                                                     </matrix>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J0f-Aw-dxC">
