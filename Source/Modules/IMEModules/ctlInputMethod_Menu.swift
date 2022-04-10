@@ -163,6 +163,7 @@ extension ctlInputMethod {
 				mgrPrefs.toggleSCPCTypingModeEnabled()
 					? NSLocalizedString("NotificationSwitchON", comment: "")
 					: NSLocalizedString("NotificationSwitchOFF", comment: "")))
+		resetKeyHandler()
 	}
 
 	@objc func toggleChineseConverter(_ sender: Any?) {
@@ -172,6 +173,7 @@ extension ctlInputMethod {
 				mgrPrefs.toggleChineseConversionEnabled()
 					? NSLocalizedString("NotificationSwitchON", comment: "")
 					: NSLocalizedString("NotificationSwitchOFF", comment: "")))
+		resetKeyHandler()
 	}
 
 	@objc func toggleShiftJISShinjitaiOutput(_ sender: Any?) {
@@ -181,6 +183,7 @@ extension ctlInputMethod {
 				mgrPrefs.toggleShiftJISShinjitaiOutputEnabled()
 					? NSLocalizedString("NotificationSwitchON", comment: "")
 					: NSLocalizedString("NotificationSwitchOFF", comment: "")))
+		resetKeyHandler()
 	}
 
 	@objc func toggleHalfWidthPunctuation(_ sender: Any?) {
@@ -191,6 +194,7 @@ extension ctlInputMethod {
 				mgrPrefs.toggleHalfWidthPunctuationEnabled()
 					? NSLocalizedString("NotificationSwitchON", comment: "")
 					: NSLocalizedString("NotificationSwitchOFF", comment: "")))
+		resetKeyHandler()
 	}
 
 	@objc func toggleCNS11643Enabled(_ sender: Any?) {
@@ -200,6 +204,7 @@ extension ctlInputMethod {
 				mgrPrefs.toggleCNS11643Enabled()
 					? NSLocalizedString("NotificationSwitchON", comment: "")
 					: NSLocalizedString("NotificationSwitchOFF", comment: "")))
+		resetKeyHandler()
 	}
 
 	@objc func toggleSymbolEnabled(_ sender: Any?) {
@@ -209,6 +214,7 @@ extension ctlInputMethod {
 				mgrPrefs.toggleSymbolInputEnabled()
 					? NSLocalizedString("NotificationSwitchON", comment: "")
 					: NSLocalizedString("NotificationSwitchOFF", comment: "")))
+		resetKeyHandler()
 	}
 
 	@objc func toggleAssociatedPhrasesEnabled(_ sender: Any?) {
@@ -219,6 +225,7 @@ extension ctlInputMethod {
 				mgrPrefs.toggleAssociatedPhrasesEnabled()
 					? NSLocalizedString("NotificationSwitchON", comment: "")
 					: NSLocalizedString("NotificationSwitchOFF", comment: "")))
+		resetKeyHandler()
 	}
 
 	@objc func togglePhraseReplacement(_ sender: Any?) {
@@ -228,6 +235,7 @@ extension ctlInputMethod {
 				mgrPrefs.togglePhraseReplacementEnabled()
 					? NSLocalizedString("NotificationSwitchON", comment: "")
 					: NSLocalizedString("NotificationSwitchOFF", comment: "")))
+		resetKeyHandler()
 	}
 
 	@objc func selfUninstall(_ sender: Any?) {
