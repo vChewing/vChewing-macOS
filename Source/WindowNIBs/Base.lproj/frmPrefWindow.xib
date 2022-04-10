@@ -163,7 +163,7 @@
                                                         </connections>
                                                     </matrix>
                                                     <button verticalHuggingPriority="750" id="233">
-                                                        <rect key="frame" x="169" y="25.5" width="245" height="17"/>
+                                                        <rect key="frame" x="169" y="26.5" width="245" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Show page buttons in candidate list" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="shc-Nu-UsM">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -234,22 +234,8 @@
                                                 <rect key="frame" x="3" y="3" width="445" height="134"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Yaj-QY-7xV" userLabel="chkCNSSupport">
-                                                        <rect key="frame" x="19" y="104.5" width="406" height="17"/>
-                                                        <constraints>
-                                                            <constraint firstAttribute="height" constant="16" id="KdE-Vd-Y50"/>
-                                                        </constraints>
-                                                        <buttonCell key="cell" type="check" title="Enable CNS11643 Support (2022-01-07)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="W24-T4-cg0">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="cellTitle"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="toggleCNSSupport:" target="-2" id="mcY-ma-N0c"/>
-                                                            <binding destination="32" name="value" keyPath="values.CNS11643Enabled" id="Pbx-Gt-upm"/>
-                                                        </connections>
-                                                    </button>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5IL-zZ-CL9" userLabel="chkTrad2KangXi">
-                                                        <rect key="frame" x="19" y="83.5" width="406" height="16"/>
+                                                        <rect key="frame" x="19" y="99.5" width="406" height="16"/>
                                                         <buttonCell key="cell" type="check" title="Auto-convert traditional Chinese glyphs to KangXi characters" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="BSK-bH-Gct">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="cellTitle"/>
@@ -260,7 +246,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="h4r-Sp-LBI" userLabel="chkTrad2JISShinjitai">
-                                                        <rect key="frame" x="19" y="62.5" width="406" height="16"/>
+                                                        <rect key="frame" x="19" y="78.5" width="406" height="16"/>
                                                         <buttonCell key="cell" type="check" title="Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="eia-1F-Do0">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="cellTitle"/>
@@ -271,7 +257,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pYB-E5-4Nv">
-                                                        <rect key="frame" x="19" y="41.5" width="406" height="16"/>
+                                                        <rect key="frame" x="19" y="57.5" width="406" height="16"/>
                                                         <buttonCell key="cell" type="check" title="Stop farting (when typed phonetic combination is invalid, etc.)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="62u-jY-BRh">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="cellTitle"/>
@@ -283,17 +269,14 @@
                                                     </button>
                                                 </subviews>
                                                 <constraints>
-                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="leading" secondItem="5IL-zZ-CL9" secondAttribute="leading" id="4Bc-Yl-MiB"/>
-                                                    <constraint firstItem="5IL-zZ-CL9" firstAttribute="top" secondItem="Yaj-QY-7xV" secondAttribute="bottom" constant="6" symbolic="YES" id="7iI-Gm-cGt"/>
                                                     <constraint firstItem="h4r-Sp-LBI" firstAttribute="top" secondItem="5IL-zZ-CL9" secondAttribute="bottom" constant="6" symbolic="YES" id="8Pq-i7-vK8"/>
-                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="trailing" secondItem="5IL-zZ-CL9" secondAttribute="trailing" id="8QP-dq-cfD"/>
                                                     <constraint firstItem="pYB-E5-4Nv" firstAttribute="trailing" secondItem="h4r-Sp-LBI" secondAttribute="trailing" id="IWM-hB-AeP"/>
-                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="top" secondItem="brd-6J-saN" secondAttribute="top" constant="13.5" id="Qf7-x1-bcp"/>
-                                                    <constraint firstAttribute="trailing" secondItem="Yaj-QY-7xV" secondAttribute="trailing" constant="20" symbolic="YES" id="jqe-y8-arB"/>
+                                                    <constraint firstItem="5IL-zZ-CL9" firstAttribute="top" secondItem="brd-6J-saN" secondAttribute="top" constant="19.5" id="i7s-ez-iKF"/>
                                                     <constraint firstItem="pYB-E5-4Nv" firstAttribute="leading" secondItem="h4r-Sp-LBI" secondAttribute="leading" id="jsE-BB-mo7"/>
-                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="leading" secondItem="brd-6J-saN" secondAttribute="leading" constant="20" symbolic="YES" id="mjS-PE-C1d"/>
+                                                    <constraint firstAttribute="trailing" secondItem="5IL-zZ-CL9" secondAttribute="trailing" constant="20" symbolic="YES" id="kZf-wi-ijB"/>
                                                     <constraint firstItem="pYB-E5-4Nv" firstAttribute="top" secondItem="h4r-Sp-LBI" secondAttribute="bottom" constant="6" symbolic="YES" id="unl-l5-LUF"/>
                                                     <constraint firstItem="5IL-zZ-CL9" firstAttribute="leading" secondItem="h4r-Sp-LBI" secondAttribute="leading" id="v0c-Cb-FH7"/>
+                                                    <constraint firstItem="5IL-zZ-CL9" firstAttribute="leading" secondItem="brd-6J-saN" secondAttribute="leading" constant="20" symbolic="YES" id="xAB-f3-f0e"/>
                                                     <constraint firstItem="5IL-zZ-CL9" firstAttribute="trailing" secondItem="h4r-Sp-LBI" secondAttribute="trailing" id="z2C-jk-sNa"/>
                                                 </constraints>
                                             </view>
@@ -666,9 +649,24 @@
                                                             <action selector="resetSpecifiedUserDataFolder:" target="-2" id="pqR-AG-4cm"/>
                                                         </connections>
                                                     </button>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Yaj-QY-7xV" userLabel="chkCNSSupport">
+                                                        <rect key="frame" x="19" y="249.5" width="406" height="17"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="16" id="KdE-Vd-Y50"/>
+                                                        </constraints>
+                                                        <buttonCell key="cell" type="check" title="Enable CNS11643 Support (2022-01-07)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="W24-T4-cg0">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="toggleCNSSupport:" target="-2" id="mcY-ma-N0c"/>
+                                                            <binding destination="32" name="value" keyPath="values.CNS11643Enabled" id="Pbx-Gt-upm"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                                 <constraints>
                                                     <constraint firstItem="s7t-Kk-EPu" firstAttribute="bottom" secondItem="MPN-np-SbT" secondAttribute="bottom" id="0Fo-ya-hQ9"/>
+                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="top" secondItem="O4B-Z2-XYi" secondAttribute="bottom" constant="6" symbolic="YES" id="2RJ-v9-tO3"/>
                                                     <constraint firstAttribute="trailing" secondItem="FUV-qx-xkC" secondAttribute="trailing" constant="20" symbolic="YES" id="6QR-tj-5cH"/>
                                                     <constraint firstItem="MPN-np-SbT" firstAttribute="leading" secondItem="p7V-IN-OTr" secondAttribute="leading" constant="346" id="7xl-xX-CEQ"/>
                                                     <constraint firstItem="s7t-Kk-EPu" firstAttribute="leading" secondItem="MPN-np-SbT" secondAttribute="trailing" constant="-376" id="9at-E8-Bt1"/>
@@ -682,7 +680,9 @@
                                                     <constraint firstItem="p7V-IN-OTr" firstAttribute="trailing" secondItem="O4B-Z2-XYi" secondAttribute="trailing" id="auY-l9-U7h"/>
                                                     <constraint firstItem="jXe-xz-9Sd" firstAttribute="leading" secondItem="MPN-np-SbT" secondAttribute="trailing" constant="-1" id="cYQ-Rx-tuG"/>
                                                     <constraint firstItem="s7t-Kk-EPu" firstAttribute="trailing" secondItem="p7V-IN-OTr" secondAttribute="trailing" constant="-60" id="eIn-kD-FGz"/>
+                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="leading" secondItem="O4B-Z2-XYi" secondAttribute="leading" id="kPh-vq-asr"/>
                                                     <constraint firstItem="p7V-IN-OTr" firstAttribute="leading" secondItem="O4B-Z2-XYi" secondAttribute="leading" id="mmu-SS-jac"/>
+                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="trailing" secondItem="O4B-Z2-XYi" secondAttribute="trailing" id="r6q-3h-41a"/>
                                                     <constraint firstItem="s7t-Kk-EPu" firstAttribute="trailing" secondItem="FUV-qx-xkC" secondAttribute="trailing" constant="-60" id="vIO-x1-7Q2"/>
                                                     <constraint firstItem="jXe-xz-9Sd" firstAttribute="baseline" secondItem="MPN-np-SbT" secondAttribute="baseline" id="wys-ML-2Q2"/>
                                                 </constraints>
@@ -755,9 +755,9 @@
                                                                 <items>
                                                                     <menuItem title="Standard" state="on" id="6"/>
                                                                     <menuItem title="ETen" tag="1" id="7"/>
-                                                                    <menuItem title="Hsu" tag="2" id="8"/>
                                                                     <menuItem title="ETen26" tag="3" id="9"/>
                                                                     <menuItem title="IBM" tag="4" id="137"/>
+                                                                    <menuItem title="Hsu" tag="2" id="8"/>
                                                                     <menuItem title="MiTAC" tag="5" id="7fV-x8-WHQ"/>
                                                                     <menuItem title="Fake Seigyou" tag="6" id="27F-8T-FkQ"/>
                                                                     <menuItem title="Hanyu Pinyin" tag="10" id="10"/>
