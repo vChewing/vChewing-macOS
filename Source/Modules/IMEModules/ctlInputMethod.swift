@@ -539,14 +539,17 @@ extension ctlInputMethod: KeyHandlerDelegate {
 		let refInputModeReversed: InputMode =
 			(keyHandler.inputMode == InputMode.imeModeCHT)
 			? InputMode.imeModeCHS : InputMode.imeModeCHT
-		mgrLangModel.writeUserPhrase(
+		if !mgrLangModel.writeUserPhrase(
 			state.userPhrase, inputMode: keyHandler.inputMode,
 			areWeDuplicating: state.chkIfUserPhraseExists,
 			areWeDeleting: ctlInputMethod.areWeDeleting)
-		mgrLangModel.writeUserPhrase(
-			state.userPhraseConverted, inputMode: refInputModeReversed,
-			areWeDuplicating: false,
-			areWeDeleting: ctlInputMethod.areWeDeleting)
+			|| !mgrLangModel.writeUserPhrase(
+				state.userPhraseConverted, inputMode: refInputModeReversed,
+				areWeDuplicating: false,
+				areWeDeleting: ctlInputMethod.areWeDeleting)
+		{
+			return false
+		}
 		return true
 	}
 }
