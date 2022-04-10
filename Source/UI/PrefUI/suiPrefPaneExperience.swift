@@ -45,7 +45,18 @@ struct suiPrefPaneExperience: View {
 	@State private var selKeyBehaviorESCForClearingTheBuffer = UserDefaults.standard.bool(
 		forKey: UserDef.kEscToCleanInputBuffer)
 	@State private var selEnableSCPCTypingMode = UserDefaults.standard.bool(forKey: UserDef.kUseSCPCTypingMode)
-	private let contentWidth: Double = 560.0
+	private let contentWidth: Double = {
+		switch mgrPrefs.appleLanguages[0] {
+			case "ja":
+				return 520
+			default:
+				if mgrPrefs.appleLanguages[0].contains("zh-Han") {
+					return 480
+				} else {
+					return 550
+				}
+		}
+	}()
 
 	var body: some View {
 		Preferences.Container(contentWidth: contentWidth) {

@@ -29,7 +29,18 @@ struct suiPrefPaneKeyboard: View {
 	@State private var selMandarinParser = UserDefaults.standard.integer(forKey: UserDef.kMandarinParser)
 	@State private var selBasicKeyboardLayout: String =
 		UserDefaults.standard.string(forKey: UserDef.kBasicKeyboardLayout) ?? mgrPrefs.basicKeyboardLayout
-	private let contentWidth: Double = 560.0
+	private let contentWidth: Double = {
+		switch mgrPrefs.appleLanguages[0] {
+			case "ja":
+				return 520
+			default:
+				if mgrPrefs.appleLanguages[0].contains("zh-Han") {
+					return 480
+				} else {
+					return 550
+				}
+		}
+	}()
 
 	var body: some View {
 		Preferences.Container(contentWidth: contentWidth) {

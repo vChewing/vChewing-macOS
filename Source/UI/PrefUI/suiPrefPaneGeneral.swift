@@ -46,8 +46,18 @@ struct suiPrefPaneGeneral: View {
 	@State private var selEnableFartSuppressor = UserDefaults.standard.bool(forKey: UserDef.kShouldNotFartInLieuOfBeep)
 	@State private var selEnableAutoUpdateCheck = UserDefaults.standard.bool(forKey: UserDef.kCheckUpdateAutomatically)
 	@State private var selEnableDebugMode = UserDefaults.standard.bool(forKey: UserDef.kIsDebugModeEnabled)
-
-	private let contentWidth: Double = 560.0
+	private let contentWidth: Double = {
+		switch mgrPrefs.appleLanguages[0] {
+			case "ja":
+				return 465
+			default:
+				if mgrPrefs.appleLanguages[0].contains("zh-Han") {
+					return 450
+				} else {
+					return 550
+				}
+		}
+	}()
 
 	var body: some View {
 		Preferences.Container(contentWidth: contentWidth) {

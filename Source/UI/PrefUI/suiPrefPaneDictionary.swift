@@ -35,7 +35,18 @@ struct suiPrefPaneDictionary: View {
 	@State private var selEnableCNS11643: Bool = UserDefaults.standard.bool(forKey: UserDef.kCNS11643Enabled)
 	@State private var selEnableSymbolInputSupport: Bool = UserDefaults.standard.bool(
 		forKey: UserDef.kSymbolInputEnabled)
-	private let contentWidth: Double = 560.0
+	private let contentWidth: Double = {
+		switch mgrPrefs.appleLanguages[0] {
+			case "ja":
+				return 520
+			default:
+				if mgrPrefs.appleLanguages[0].contains("zh-Han") {
+					return 480
+				} else {
+					return 550
+				}
+		}
+	}()
 
 	var body: some View {
 		Preferences.Container(contentWidth: contentWidth) {
