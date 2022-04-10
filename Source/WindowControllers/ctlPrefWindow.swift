@@ -145,7 +145,9 @@ import Cocoa
 			if basicKeyboardLayoutID == sourceID {
 				chosenBaseKeyboardLayoutItem = menuItem
 			}
-			basicKeyboardLayoutButton.menu?.addItem(menuItem)
+			if IME.arrWhitelistedKeyLayoutsASCII.contains(sourceID) || sourceID.contains("vChewing") {
+				basicKeyboardLayoutButton.menu?.addItem(menuItem)
+			}
 		}
 
 		switch basicKeyboardLayoutID {
