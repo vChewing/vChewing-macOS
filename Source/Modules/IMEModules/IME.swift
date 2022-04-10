@@ -230,6 +230,17 @@ import Cocoa
 		var strName: String = ""
 		var strValue: String = ""
 	}
+	static let arrWhitelistedKeyLayoutsASCII: [String] = [
+		"com.apple.keylayout.ABC",
+		"com.apple.keylayout.ABC-AZERTY",
+		"com.apple.keylayout.ABC-QWERTZ",
+		"com.apple.keylayout.British",
+		"com.apple.keylayout.Colemak",
+		"com.apple.keylayout.Dvorak",
+		"com.apple.keylayout.Dvorak-Left",
+		"com.apple.keylayout.DVORAK-QWERTYCMD",
+		"com.apple.keylayout.Dvorak-Right",
+	]
 	static var arrEnumerateSystemKeyboardLayouts: [IME.CarbonKeyboardLayout] {
 		// 提前塞入 macOS 內建的兩款動態鍵盤佈局
 		var arrKeyLayouts: [IME.CarbonKeyboardLayout] = []
@@ -243,6 +254,7 @@ import Cocoa
 		]
 
 		// 準備枚舉系統內所有的 ASCII 鍵盤佈局
+		var arrKeyLayoutsMACV: [IME.CarbonKeyboardLayout] = []
 		var arrKeyLayoutsASCII: [IME.CarbonKeyboardLayout] = []
 		let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
 		for source in list {
@@ -286,10 +298,19 @@ import Cocoa
 			let localizedName = String(
 				Unmanaged<CFString>.fromOpaque(localizedNamePtr).takeUnretainedValue())
 
-			arrKeyLayoutsASCII += [
-				IME.CarbonKeyboardLayout.init(strName: localizedName, strValue: sourceID)
-			]
+			if sourceID.contains("vChewing") {
+				arrKeyLayoutsMACV += [
+					IME.CarbonKeyboardLayout.init(strName: localizedName, strValue: sourceID)
+				]
+			}
+
+			if IME.arrWhitelistedKeyLayoutsASCII.contains(sourceID) {
+				arrKeyLayoutsASCII += [
+					IME.CarbonKeyboardLayout.init(strName: localizedName, strValue: sourceID)
+				]
+			}
 		}
+		arrKeyLayouts += arrKeyLayoutsMACV
 		arrKeyLayouts += arrKeyLayoutsASCII
 		return arrKeyLayouts
 	}
