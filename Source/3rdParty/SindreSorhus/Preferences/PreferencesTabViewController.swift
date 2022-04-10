@@ -114,13 +114,16 @@ final class PreferencesTabViewController: NSViewController, PreferencesStyleCont
 
 	private func updateWindowTitle(tabIndex: Int) {
 		window.title = {
-			if preferencePanes.count > 1 {
-				return preferencePanes[tabIndex].preferencePaneTitle
-			} else {
-				let preferences = Localization[.preferences]
-				let appName = Bundle.main.appName
-				return "\(appName) \(preferences)"
-			}
+			//			if preferencePanes.count > 1 {
+			//				return preferencePanes[tabIndex].preferencePaneTitle
+			//			} else {
+			//				let preferences = Localization[.preferences]
+			//				let appName = Bundle.main.appName
+			//				return "\(appName) \(preferences)"
+			//			}
+			var preferencesTitleName = NSLocalizedString("vChewing Preferences…", comment: "")
+			preferencesTitleName.removeLast()
+			return preferencesTitleName
 		}()
 	}
 
