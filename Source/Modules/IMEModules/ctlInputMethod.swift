@@ -49,7 +49,7 @@ class ctlInputMethod: IMKInputController {
 
 	// MARK: -
 
-	private var currentCandidateClient: Any?
+	private var currentClient: Any?
 
 	private var keyHandler: KeyHandler = KeyHandler()
 	private var state: InputState = InputState.Empty()
@@ -76,6 +76,15 @@ class ctlInputMethod: IMKInputController {
 		keyHandler.delegate = self
 	}
 
+	// MARK: - KeyHandler Reset Command
+
+	func resetKeyHandler() {
+		if let currentClient = currentClient {
+			keyHandler.clear()
+			self.handle(state: InputState.Empty(), client: currentClient)
+		}
+	}
+
 	// MARK: - IMKStateSetting protocol methods
 
 	override func activateServer(_ client: Any!) {
@@ -84,7 +93,7 @@ class ctlInputMethod: IMKInputController {
 		// Override the keyboard layout to the basic one.
 		setKeyLayout()
 		// reset the state
-		currentCandidateClient = nil
+		currentClient = client
 
 		keyHandler.clear()
 		keyHandler.syncWithPreferences()
@@ -94,6 +103,7 @@ class ctlInputMethod: IMKInputController {
 
 	override func deactivateServer(_ client: Any!) {
 		keyHandler.clear()
+		currentClient = nil
 		self.handle(state: .Empty(), client: client)
 		self.handle(state: .Deactivated(), client: client)
 	}
@@ -225,7 +235,7 @@ extension ctlInputMethod {
 	}
 
 	private func handle(state: InputState.Deactivated, previous: InputState, client: Any?) {
-		currentCandidateClient = nil
+		currentClient = nil
 
 		ctlCandidateCurrent?.delegate = nil
 		ctlCandidateCurrent?.visible = false
@@ -441,7 +451,7 @@ extension ctlInputMethod {
 
 		ctlCandidateCurrent?.delegate = self
 		ctlCandidateCurrent?.reloadData()
-		currentCandidateClient = client
+		currentClient = client
 
 		ctlCandidateCurrent?.visible = true
 
@@ -558,7 +568,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
 	}
 
 	func ctlCandidate(_ controller: ctlCandidate, didSelectCandidateAtIndex index: UInt) {
-		let client = currentCandidateClient
+		let client = currentClient
 
 		if let state = state as? InputState.SymbolTable,
 			let node = state.node.children?[Int(index)]
@@ -566,7 +576,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
 			if let children = node.children, !children.isEmpty {
 				self.handle(
 					state: .SymbolTable(node: node, useVerticalMode: state.useVerticalMode),
-					client: currentCandidateClient)
+					client: currentClient)
 			} else {
 				self.handle(state: .Committing(poppedText: node.title), client: client)
 				self.handle(state: .Empty(), client: client)
@@ -603,7 +613,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
 
 		if let state = state as? InputState.AssociatedPhrases {
 			let selectedValue = state.candidates[Int(index)]
-			handle(state: .Committing(poppedText: selectedValue), client: currentCandidateClient)
+			handle(state: .Committing(poppedText: selectedValue), client: currentClient)
 			if mgrPrefs.associatedPhrasesEnabled,
 				let associatePhrases = keyHandler.buildAssociatePhraseState(
 					withKey: selectedValue, useVerticalMode: state.useVerticalMode)
