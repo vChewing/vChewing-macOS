@@ -39,7 +39,7 @@ import Cocoa
 	@IBOutlet weak var chkTrad2JISShinjitai: NSButton!
 	@IBOutlet weak var lblCurrentlySpecifiedUserDataFolder: NSTextFieldCell!
 
-	var currentLanguageSelectItem: NSMenuItem? = nil
+	var currentLanguageSelectItem: NSMenuItem?
 
 	override func windowDidLoad() {
 		super.windowDidLoad()
@@ -48,8 +48,8 @@ import Cocoa
 			isDefaultFolder: true)
 
 		let languages = ["auto", "en", "zh-Hans", "zh-Hant", "ja"]
-		var autoMUISelectItem: NSMenuItem? = nil
-		var chosenLanguageItem: NSMenuItem? = nil
+		var autoMUISelectItem: NSMenuItem?
+		var chosenLanguageItem: NSMenuItem?
 		uiLanguageButton.menu?.removeAllItems()
 
 		let appleLanguages = mgrPrefs.appleLanguages
@@ -74,8 +74,8 @@ import Cocoa
 		uiLanguageButton.select(currentLanguageSelectItem)
 
 		let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
-		var usKeyboardLayoutItem: NSMenuItem? = nil
-		var chosenBaseKeyboardLayoutItem: NSMenuItem? = nil
+		var usKeyboardLayoutItem: NSMenuItem?
+		var chosenBaseKeyboardLayoutItem: NSMenuItem?
 
 		basicKeyboardLayoutButton.menu?.removeAllItems()
 
@@ -239,7 +239,7 @@ import Cocoa
 		} catch {
 			if let window = window {
 				let alert = NSAlert(error: error)
-				alert.beginSheetModal(for: window) { response in
+				alert.beginSheetModal(for: window) { _ in
 					self.selectionKeyComboBox.stringValue = mgrPrefs.candidateKeys
 				}
 				clsSFX.beep()
