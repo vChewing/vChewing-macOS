@@ -47,7 +47,7 @@ public class FSEventStreamHelper: NSObject {
 		self.dispatchQueue = queue
 	}
 
-	private var stream: FSEventStreamRef? = nil
+	private var stream: FSEventStreamRef?
 
 	public func start() -> Bool {
 		if stream != nil {
@@ -59,7 +59,7 @@ public class FSEventStreamHelper: NSObject {
 			let stream = FSEventStreamCreate(
 				nil,
 				{
-					(stream, clientCallBackInfo, eventCount, eventPaths, eventFlags, eventIds) in
+					(_, clientCallBackInfo, eventCount, eventPaths, eventFlags, eventIds) in
 					let helper = Unmanaged<FSEventStreamHelper>.fromOpaque(clientCallBackInfo!)
 						.takeUnretainedValue()
 					let pathsBase = eventPaths.assumingMemoryBound(to: UnsafePointer<CChar>.self)

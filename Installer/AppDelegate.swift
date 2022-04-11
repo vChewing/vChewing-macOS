@@ -321,7 +321,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 				ntfPostInstall.addButton(withTitle: NSLocalizedString("OK", comment: ""))
 			}
 		}
-		ntfPostInstall.beginSheetModal(for: window!) { response in
+		ntfPostInstall.beginSheetModal(for: window!) { _ in
 			self.endAppWithDelay()
 		}
 	}
