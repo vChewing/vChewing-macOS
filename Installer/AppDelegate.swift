@@ -78,7 +78,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 			return
 		}
 		self.installingVersion = installingVersion
-		self.archiveUtil = ArchiveUtil(appName: kTargetBin, targetAppBundleName: kTargetBundle)
+		archiveUtil = ArchiveUtil(appName: kTargetBin, targetAppBundleName: kTargetBundle)
 		_ = archiveUtil?.validateIfNotarizedArchiveExists()
 
 		cancelButton.nextKeyView = installButton
@@ -153,7 +153,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 			atPath: (kTargetPartialPath as NSString).expandingTildeInPath)
 			== false
 		{
-			self.installInputMethod(
+			installInputMethod(
 				previousExists: false, previousVersionNotFullyDeactivatedWarning: false)
 			return
 		}
@@ -208,7 +208,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 				timeInterval: kTranslocationRemovalTickInterval, target: self,
 				selector: #selector(timerTick(_:)), userInfo: nil, repeats: true)
 		} else {
-			self.installInputMethod(
+			installInputMethod(
 				previousExists: false, previousVersionNotFullyDeactivatedWarning: false)
 		}
 	}

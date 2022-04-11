@@ -41,7 +41,7 @@ extension Content {
 	}
 
 	func data() -> Data? {
-		return contentString.data(using: .utf8)
+		contentString.data(using: .utf8)
 	}
 
 }

@@ -23,7 +23,7 @@ class WeakValueCache<Key: Hashable, Value: AnyObject> {
 	private var lock = NSLock()
 
 	func value(for key: Key) -> Value? {
-		return storage[key]?.value
+		storage[key]?.value
 	}
 
 	func value(for key: Key, make: () throws -> Value) rethrows -> Value {

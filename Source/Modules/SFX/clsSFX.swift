@@ -26,7 +26,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
 
-@objc public class clsSFX: NSObject, NSSoundDelegate {
+public class clsSFX: NSObject, NSSoundDelegate {
 	private static let shared = clsSFX()
 	private override init() {
 		super.init()

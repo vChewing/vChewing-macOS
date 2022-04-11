@@ -28,7 +28,7 @@ import Cocoa
 
 	// MARK: - 獲取當前輸入法封包內的原廠核心語彙檔案所在路徑
 	static func getBundleDataPath(_ filenameSansExt: String) -> String {
-		return Bundle.main.path(forResource: filenameSansExt, ofType: "txt")!
+		Bundle.main.path(forResource: filenameSansExt, ofType: "txt")!
 	}
 
 	// MARK: - 使用者語彙檔案的具體檔案名稱路徑定義
@@ -36,27 +36,27 @@ import Cocoa
 
 	static func userPhrasesDataPath(_ mode: InputMode) -> String {
 		let fileName = (mode == InputMode.imeModeCHT) ? "userdata-cht.txt" : "userdata-chs.txt"
-		return URL(fileURLWithPath: self.dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
+		return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
 	}
 
 	static func userSymbolDataPath(_ mode: InputMode) -> String {
 		let fileName = (mode == InputMode.imeModeCHT) ? "usersymbolphrases-cht.txt" : "usersymbolphrases-chs.txt"
-		return URL(fileURLWithPath: self.dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
+		return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
 	}
 
 	static func userAssociatedPhrasesDataPath(_ mode: InputMode) -> String {
 		let fileName = (mode == InputMode.imeModeCHT) ? "associatedPhrases-cht.txt" : "associatedPhrases-chs.txt"
-		return URL(fileURLWithPath: self.dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
+		return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
 	}
 
 	static func excludedPhrasesDataPath(_ mode: InputMode) -> String {
 		let fileName = (mode == InputMode.imeModeCHT) ? "exclude-phrases-cht.txt" : "exclude-phrases-chs.txt"
-		return URL(fileURLWithPath: self.dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
+		return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
 	}
 
 	static func phraseReplacementDataPath(_ mode: InputMode) -> String {
 		let fileName = (mode == InputMode.imeModeCHT) ? "phrases-replacement-cht.txt" : "phrases-replacement-chs.txt"
-		return URL(fileURLWithPath: self.dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
+		return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
 	}
 
 	// MARK: - 檢查具體的使用者語彙檔案是否存在
@@ -86,7 +86,7 @@ import Cocoa
 	}
 
 	static func chkUserLMFilesExist(_ mode: InputMode) -> Bool {
-		if !self.checkIfUserDataFolderExists() {
+		if !checkIfUserDataFolderExists() {
 			return false
 		}
 		if !ensureFileExists(userPhrasesDataPath(mode))
@@ -136,8 +136,8 @@ import Cocoa
 		// 如果要找的目標路徑不是原廠目標路徑的話，則直接報錯。
 		if folderExist && !isFolder.boolValue {
 			do {
-				if self.dataFolderPath(isDefaultFolder: false)
-					== self.dataFolderPath(isDefaultFolder: true)
+				if dataFolderPath(isDefaultFolder: false)
+					== dataFolderPath(isDefaultFolder: true)
 				{
 					let formatter = DateFormatter.init()
 					formatter.dateFormat = "YYYYMMDD-HHMM'Hrs'-ss's'"
@@ -199,13 +199,13 @@ import Cocoa
 		_ userPhrase: String?, inputMode mode: InputMode, areWeDuplicating: Bool, areWeDeleting: Bool
 	) -> Bool {
 		if var currentMarkedPhrase: String = userPhrase {
-			if !self.chkUserLMFilesExist(InputMode.imeModeCHS)
-				|| !self.chkUserLMFilesExist(InputMode.imeModeCHT)
+			if !chkUserLMFilesExist(InputMode.imeModeCHS)
+				|| !chkUserLMFilesExist(InputMode.imeModeCHT)
 			{
 				return false
 			}
 
-			let path = areWeDeleting ? self.excludedPhrasesDataPath(mode) : self.userPhrasesDataPath(mode)
+			let path = areWeDeleting ? excludedPhrasesDataPath(mode) : userPhrasesDataPath(mode)
 
 			if areWeDuplicating && !areWeDeleting {
 				// Do not use ASCII characters to comment here.
@@ -227,12 +227,12 @@ import Cocoa
 
 			// We enforce the format consolidation here, since the pragma header
 			// will let the UserPhraseLM bypasses the consolidating process on load.
-			self.consolidate(givenFile: path, shouldCheckPragma: false)
+			consolidate(givenFile: path, shouldCheckPragma: false)
 
 			// We use FSEventStream to monitor possible changes of the user phrase folder, hence the
 			// lack of the needs of manually load data here unless FSEventStream is disabled by user.
 			if !mgrPrefs.shouldAutoReloadUserDataFiles {
-				self.loadUserPhrases()
+				loadUserPhrases()
 			}
 			return true
 		}

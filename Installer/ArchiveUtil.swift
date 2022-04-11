@@ -83,7 +83,7 @@ struct ArchiveUtil {
 	}
 
 	func unzipNotarizedArchive() -> String? {
-		if !self.validateIfNotarizedArchiveExists() {
+		if !validateIfNotarizedArchiveExists() {
 			return nil
 		}
 		guard let notarizedArchive = notarizedArchive,

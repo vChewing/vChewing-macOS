@@ -30,7 +30,7 @@ extension String {
 	}
 }
 
-@objc class vChewingKanjiConverter: NSObject {
+class vChewingKanjiConverter: NSObject {
 	@objc class func cnvTradToKangXi(_ strObj: String) -> String {
 		var strObj = strObj
 		strObj.selfReplace("偽", "僞")

@@ -56,7 +56,7 @@ extension Preferences {
 			minimumLabelWidth: Double = 0,
 			@SectionBuilder builder: @escaping () -> [Section]
 		) {
-			self.sectionBuilder = builder
+			sectionBuilder = builder
 			self.contentWidth = contentWidth
 			self.minimumLabelWidth = minimumLabelWidth
 		}

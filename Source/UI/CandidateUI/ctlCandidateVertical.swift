@@ -122,7 +122,7 @@ private class VerticalCandidateView: NSView {
 	}
 
 	override func draw(_ dirtyRect: NSRect) {
-		let bounds = self.bounds
+		let bounds = bounds
 		NSColor.controlBackgroundColor.setFill()  // Candidate list panel base background
 		NSBezierPath.fill(bounds)
 
@@ -195,7 +195,7 @@ private class VerticalCandidateView: NSView {
 
 	private func findHitIndex(event: NSEvent) -> UInt? {
 		let location = convert(event.locationInWindow, to: nil)
-		if !NSPointInRect(location, self.bounds) {
+		if !bounds.contains(location) {
 			return nil
 		}
 		var accuHeight: CGFloat = 0.0
@@ -217,7 +217,7 @@ private class VerticalCandidateView: NSView {
 			return
 		}
 		highlightedIndex = newIndex
-		self.setNeedsDisplay(self.bounds)
+		setNeedsDisplay(bounds)
 	}
 
 	override func mouseDown(with event: NSEvent) {
@@ -232,7 +232,7 @@ private class VerticalCandidateView: NSView {
 		}
 
 		trackingHighlightedIndex = 0
-		self.setNeedsDisplay(self.bounds)
+		setNeedsDisplay(bounds)
 		if triggerAction {
 			if let target = target as? NSObject, let action = action {
 				target.perform(action, with: self)
@@ -241,7 +241,7 @@ private class VerticalCandidateView: NSView {
 	}
 }
 
-@objc public class ctlCandidateVertical: ctlCandidate {
+public class ctlCandidateVertical: ctlCandidate {
 	private var candidateView: VerticalCandidateView
 	private var prevPageButton: NSButton
 	private var nextPageButton: NSButton
@@ -443,7 +443,7 @@ extension ctlCandidateVertical {
 		let topLeftPoint = NSPoint(x: frameRect.origin.x, y: frameRect.origin.y + frameRect.size.height)
 		frameRect.size = newSize
 		frameRect.origin = NSPoint(x: topLeftPoint.x, y: topLeftPoint.y - frameRect.size.height)
-		self.window?.setFrame(frameRect, display: false)
+		window?.setFrame(frameRect, display: false)
 		candidateView.setNeedsDisplay(candidateView.bounds)
 	}
 

@@ -264,8 +264,8 @@ import Cocoa
 		let bolPreviousFolderValidity = mgrLangModel.checkIfSpecifiedUserDataFolderValid(
 			NSString(string: mgrPrefs.userDataFolderSpecified).expandingTildeInPath)
 
-		if self.window != nil {
-			IME.dlgOpenPath.beginSheetModal(for: self.window!) { result in
+		if window != nil {
+			IME.dlgOpenPath.beginSheetModal(for: window!) { result in
 				if result == NSApplication.ModalResponse.OK {
 					if IME.dlgOpenPath.url != nil {
 						// CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。

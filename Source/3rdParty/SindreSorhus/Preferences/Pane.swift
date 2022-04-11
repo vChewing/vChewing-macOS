@@ -52,7 +52,7 @@ extension Preferences {
 			self.identifier = identifier
 			self.title = title
 			self.toolbarIcon = toolbarIcon
-			self.content = contentView()
+			content = contentView()
 		}
 
 		public var body: some View { content }
@@ -76,9 +76,9 @@ extension Preferences {
 			toolbarIcon: NSImage,
 			content: Content
 		) {
-			self.preferencePaneIdentifier = identifier
-			self.preferencePaneTitle = title
-			self.toolbarItemIcon = toolbarIcon
+			preferencePaneIdentifier = identifier
+			preferencePaneTitle = title
+			toolbarItemIcon = toolbarIcon
 			super.init(rootView: content)
 		}
 

@@ -44,7 +44,7 @@ public class FSEventStreamHelper: NSObject {
 
 	@objc public init(path: String, queue: DispatchQueue) {
 		self.path = path
-		self.dispatchQueue = queue
+		dispatchQueue = queue
 	}
 
 	private var stream: FSEventStreamRef?
