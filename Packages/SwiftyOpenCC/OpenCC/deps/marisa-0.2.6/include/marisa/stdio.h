@@ -3,13 +3,14 @@
 
 #include <cstdio>
 
-namespace marisa {
+namespace marisa
+{
 
 class Trie;
 
 void fread(std::FILE *file, Trie *trie);
 void fwrite(std::FILE *file, const Trie &trie);
 
-}  // namespace marisa
+} // namespace marisa
 
-#endif  // MARISA_MYSTDIO_H_
+#endif // MARISA_MYSTDIO_H_

@@ -21,33 +21,40 @@
 #include "Common.hpp"
 #include "SerializableDict.hpp"
 
-namespace opencc {
+namespace opencc
+{
 /**
  * Binary dictionary for faster deserialization
  * @ingroup opencc_cpp_api
  */
-class OPENCC_EXPORT BinaryDict : public SerializableDict {
-public:
-  BinaryDict(const LexiconPtr& _lexicon) : lexicon(_lexicon) {}
+class OPENCC_EXPORT BinaryDict : public SerializableDict
+{
+  public:
+    BinaryDict(const LexiconPtr &_lexicon) : lexicon(_lexicon)
+    {
+    }
 
-  virtual ~BinaryDict() {}
+    virtual ~BinaryDict()
+    {
+    }
 
-  virtual void SerializeToFile(FILE* fp) const;
+    virtual void SerializeToFile(FILE *fp) const;
 
-  static BinaryDictPtr NewFromFile(FILE* fp);
+    static BinaryDictPtr NewFromFile(FILE *fp);
 
-  const LexiconPtr& GetLexicon() const { return lexicon; }
+    const LexiconPtr &GetLexicon() const
+    {
+        return lexicon;
+    }
 
-  size_t KeyMaxLength() const;
+    size_t KeyMaxLength() const;
 
-private:
-  LexiconPtr lexicon;
-  std::string keyBuffer;
-  std::string valueBuffer;
+  private:
+    LexiconPtr lexicon;
+    std::string keyBuffer;
+    std::string valueBuffer;
 
-  void ConstructBuffer(std::string& keyBuffer, std::vector<size_t>& keyOffset,
-                       size_t& keyTotalLength, std::string& valueBuffer,
-                       std::vector<size_t>& valueOffset,
-                       size_t& valueTotalLength) const;
+    void ConstructBuffer(std::string &keyBuffer, std::vector<size_t> &keyOffset, size_t &keyTotalLength,
+                         std::string &valueBuffer, std::vector<size_t> &valueOffset, size_t &valueTotalLength) const;
 };
 } // namespace opencc

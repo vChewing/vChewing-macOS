@@ -27,15 +27,14 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 // A helper program for testing how Google Test determines whether to use
 // colors in the output.  It prints "YES" and returns 1 if Google Test
 // decides to use colors, and prints "NO" and returns 0 otherwise.
 
 #include <stdio.h>
 
-#include "gtest/gtest.h"
 #include "src/gtest-internal-inl.h"
+#include "gtest/gtest.h"
 
 using testing::internal::ShouldUseColor;
 
@@ -43,20 +42,25 @@ using testing::internal::ShouldUseColor;
 // created before main() is entered, and thus that ShouldUseColor()
 // works the same way as in a real Google-Test-based test.  We don't actual
 // run the TEST itself.
-TEST(GTestColorTest, Dummy) {
+TEST(GTestColorTest, Dummy)
+{
 }
 
-int main(int argc, char** argv) {
-  testing::InitGoogleTest(&argc, argv);
+int main(int argc, char **argv)
+{
+    testing::InitGoogleTest(&argc, argv);
 
-  if (ShouldUseColor(true)) {
-    // Google Test decides to use colors in the output (assuming it
-    // goes to a TTY).
-    printf("YES\n");
-    return 1;
-  } else {
-    // Google Test decides not to use colors in the output.
-    printf("NO\n");
-    return 0;
-  }
+    if (ShouldUseColor(true))
+    {
+        // Google Test decides to use colors in the output (assuming it
+        // goes to a TTY).
+        printf("YES\n");
+        return 1;
+    }
+    else
+    {
+        // Google Test decides not to use colors in the output.
+        printf("NO\n");
+        return 0;
+    }
 }

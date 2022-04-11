@@ -18,56 +18,62 @@
 
 #include "DictGroupTestBase.hpp"
 
-namespace opencc {
+namespace opencc
+{
 
-class DictGroupTest : public DictGroupTestBase {
-protected:
-  DictGroupTest() {}
+class DictGroupTest : public DictGroupTestBase
+{
+  protected:
+    DictGroupTest()
+    {
+    }
 };
 
-TEST_F(DictGroupTest, KeyMaxLength) {
-  const DictGroupPtr& dictGroup = CreateDictGroupForConversion();
-  EXPECT_EQ(6, dictGroup->KeyMaxLength());
-  EXPECT_EQ(6, dictGroup->GetDicts().front()->KeyMaxLength());
-  EXPECT_EQ(3, dictGroup->GetDicts().back()->KeyMaxLength());
+TEST_F(DictGroupTest, KeyMaxLength)
+{
+    const DictGroupPtr &dictGroup = CreateDictGroupForConversion();
+    EXPECT_EQ(6, dictGroup->KeyMaxLength());
+    EXPECT_EQ(6, dictGroup->GetDicts().front()->KeyMaxLength());
+    EXPECT_EQ(3, dictGroup->GetDicts().back()->KeyMaxLength());
 }
 
-TEST_F(DictGroupTest, SimpleGroupTest) {
-  const DictGroupPtr& dictGroup = CreateDictGroupForConversion();
-  {
-    const auto& entry = dictGroup->Dict::MatchPrefix(utf8("Unknown"));
-    EXPECT_TRUE(entry.IsNull());
-  }
-  {
-    const auto& entry = dictGroup->Dict::MatchPrefix(utf8("里面"));
-    EXPECT_FALSE(entry.IsNull());
-    EXPECT_EQ(3, entry.Get()->KeyLength());
-    EXPECT_EQ(utf8("裏"), entry.Get()->GetDefault());
-  }
-  {
-    const auto& matches = dictGroup->Dict::MatchAllPrefixes(utf8("干燥"));
-    EXPECT_EQ(2, matches.size());
-    EXPECT_EQ(utf8("乾燥"), matches.at(0)->GetDefault());
-    EXPECT_EQ(utf8("幹"), matches.at(1)->GetDefault());
-  }
+TEST_F(DictGroupTest, SimpleGroupTest)
+{
+    const DictGroupPtr &dictGroup = CreateDictGroupForConversion();
+    {
+        const auto &entry = dictGroup->Dict::MatchPrefix(utf8("Unknown"));
+        EXPECT_TRUE(entry.IsNull());
+    }
+    {
+        const auto &entry = dictGroup->Dict::MatchPrefix(utf8("里面"));
+        EXPECT_FALSE(entry.IsNull());
+        EXPECT_EQ(3, entry.Get()->KeyLength());
+        EXPECT_EQ(utf8("裏"), entry.Get()->GetDefault());
+    }
+    {
+        const auto &matches = dictGroup->Dict::MatchAllPrefixes(utf8("干燥"));
+        EXPECT_EQ(2, matches.size());
+        EXPECT_EQ(utf8("乾燥"), matches.at(0)->GetDefault());
+        EXPECT_EQ(utf8("幹"), matches.at(1)->GetDefault());
+    }
 }
 
-TEST_F(DictGroupTest, TaiwanPhraseGroupTest) {
-  const DictGroupPtr dictGroup(new DictGroup(
-      std::list<DictPtr>{CreateDictForPhrases(), CreateTaiwanPhraseDict()}));
-  {
-    const auto& entry = dictGroup->Dict::MatchPrefix(utf8("鼠标"));
-    EXPECT_EQ(utf8("鼠標"), entry.Get()->GetDefault());
-  }
-  {
-    const auto& entry = dictGroup->Dict::MatchPrefix(utf8("克罗地亚"));
-    EXPECT_EQ(utf8("克羅埃西亞"), entry.Get()->GetDefault());
-  }
-  {
-    const auto& matches = dictGroup->Dict::MatchAllPrefixes(utf8("鼠标"));
-    EXPECT_EQ(1, matches.size());
-    EXPECT_EQ(utf8("鼠標"), matches[0]->GetDefault());
-  }
+TEST_F(DictGroupTest, TaiwanPhraseGroupTest)
+{
+    const DictGroupPtr dictGroup(new DictGroup(std::list<DictPtr>{CreateDictForPhrases(), CreateTaiwanPhraseDict()}));
+    {
+        const auto &entry = dictGroup->Dict::MatchPrefix(utf8("鼠标"));
+        EXPECT_EQ(utf8("鼠標"), entry.Get()->GetDefault());
+    }
+    {
+        const auto &entry = dictGroup->Dict::MatchPrefix(utf8("克罗地亚"));
+        EXPECT_EQ(utf8("克羅埃西亞"), entry.Get()->GetDefault());
+    }
+    {
+        const auto &matches = dictGroup->Dict::MatchAllPrefixes(utf8("鼠标"));
+        EXPECT_EQ(1, matches.size());
+        EXPECT_EQ(utf8("鼠標"), matches[0]->GetDefault());
+    }
 }
 
 } // namespace opencc

@@ -23,21 +23,26 @@
 #include "Common.hpp"
 #include "Conversion.hpp"
 
-namespace opencc {
+namespace opencc
+{
 /**
  * Chain of conversions
  * Consists of a list of conversions. Converts input in sequence.
  * @ingroup opencc_cpp_api
  */
-class OPENCC_EXPORT ConversionChain {
-public:
-  ConversionChain(const std::list<ConversionPtr> _conversions);
+class OPENCC_EXPORT ConversionChain
+{
+  public:
+    ConversionChain(const std::list<ConversionPtr> _conversions);
 
-  SegmentsPtr Convert(const SegmentsPtr& input) const;
+    SegmentsPtr Convert(const SegmentsPtr &input) const;
 
-  const std::list<ConversionPtr> GetConversions() const { return conversions; }
+    const std::list<ConversionPtr> GetConversions() const
+    {
+        return conversions;
+    }
 
-private:
-  const std::list<ConversionPtr> conversions;
+  private:
+    const std::list<ConversionPtr> conversions;
 };
 } // namespace opencc

@@ -19,63 +19,71 @@
 #include "TestUtilsUTF8.hpp"
 #include "TextDictTestBase.hpp"
 
-namespace opencc {
+namespace opencc
+{
 
-class TextDictTest : public TextDictTestBase {
-protected:
-  TextDictTest() : fileName("dict.txt"){};
+class TextDictTest : public TextDictTestBase
+{
+  protected:
+    TextDictTest() : fileName("dict.txt"){};
 
-  const std::string fileName;
+    const std::string fileName;
 };
 
-TEST_F(TextDictTest, DictTest) { TestDict(textDict); }
-
-TEST_F(TextDictTest, Serialization) {
-  textDict->opencc::SerializableDict::SerializeToFile(fileName);
+TEST_F(TextDictTest, DictTest)
+{
+    TestDict(textDict);
 }
 
-TEST_F(TextDictTest, Deserialization) {
-  const TextDictPtr& deserialized =
-      SerializableDict::NewFromFile<TextDict>(fileName);
-  TestDict(deserialized);
+TEST_F(TextDictTest, Serialization)
+{
+    textDict->opencc::SerializableDict::SerializeToFile(fileName);
 }
 
-TEST_F(TextDictTest, ExactMatch) {
-  auto there = textDict->Match("積羽沉舟", 12);
-  EXPECT_FALSE(there.IsNull());
-  auto dictEntry = there.Get();
-  EXPECT_EQ(1, dictEntry->NumValues());
-  EXPECT_EQ(utf8("羣輕折軸"), dictEntry->GetDefault());
-
-  auto nowhere = textDict->Match("積羽沉舟衆口鑠金", 24);
-  EXPECT_TRUE(nowhere.IsNull());
+TEST_F(TextDictTest, Deserialization)
+{
+    const TextDictPtr &deserialized = SerializableDict::NewFromFile<TextDict>(fileName);
+    TestDict(deserialized);
 }
 
-TEST_F(TextDictTest, MatchPrefix) {
-  {
-    auto there = textDict->MatchPrefix("清華", 3);
+TEST_F(TextDictTest, ExactMatch)
+{
+    auto there = textDict->Match("積羽沉舟", 12);
     EXPECT_FALSE(there.IsNull());
     auto dictEntry = there.Get();
-    EXPECT_EQ(utf8("Tsing"), dictEntry->GetDefault());
-  }
-  {
-    auto there = textDict->MatchPrefix("清華", 5);
-    EXPECT_FALSE(there.IsNull());
-    auto dictEntry = there.Get();
-    EXPECT_EQ(utf8("Tsing"), dictEntry->GetDefault());
-  }
-  {
-    auto there = textDict->MatchPrefix("清華", 6);
-    EXPECT_FALSE(there.IsNull());
-    auto dictEntry = there.Get();
-    EXPECT_EQ(utf8("Tsinghua"), dictEntry->GetDefault());
-  }
-  {
-    auto there = textDict->MatchPrefix("清華", 100);
-    EXPECT_FALSE(there.IsNull());
-    auto dictEntry = there.Get();
-    EXPECT_EQ(utf8("Tsinghua"), dictEntry->GetDefault());
-  }
+    EXPECT_EQ(1, dictEntry->NumValues());
+    EXPECT_EQ(utf8("羣輕折軸"), dictEntry->GetDefault());
+
+    auto nowhere = textDict->Match("積羽沉舟衆口鑠金", 24);
+    EXPECT_TRUE(nowhere.IsNull());
+}
+
+TEST_F(TextDictTest, MatchPrefix)
+{
+    {
+        auto there = textDict->MatchPrefix("清華", 3);
+        EXPECT_FALSE(there.IsNull());
+        auto dictEntry = there.Get();
+        EXPECT_EQ(utf8("Tsing"), dictEntry->GetDefault());
+    }
+    {
+        auto there = textDict->MatchPrefix("清華", 5);
+        EXPECT_FALSE(there.IsNull());
+        auto dictEntry = there.Get();
+        EXPECT_EQ(utf8("Tsing"), dictEntry->GetDefault());
+    }
+    {
+        auto there = textDict->MatchPrefix("清華", 6);
+        EXPECT_FALSE(there.IsNull());
+        auto dictEntry = there.Get();
+        EXPECT_EQ(utf8("Tsinghua"), dictEntry->GetDefault());
+    }
+    {
+        auto there = textDict->MatchPrefix("清華", 100);
+        EXPECT_FALSE(there.IsNull());
+        auto dictEntry = there.Get();
+        EXPECT_EQ(utf8("Tsinghua"), dictEntry->GetDefault());
+    }
 }
 
 } // namespace opencc

@@ -5,14 +5,16 @@
 #include "marisa/grimoire/io/reader.h"
 #include "marisa/grimoire/io/writer.h"
 
-namespace marisa {
-namespace grimoire {
+namespace marisa
+{
+namespace grimoire
+{
 
 using io::Mapper;
 using io::Reader;
 using io::Writer;
 
-}  // namespace grimoire
-}  // namespace marisa
+} // namespace grimoire
+} // namespace marisa
 
-#endif  // MARISA_GRIMOIRE_IO_H_
+#endif // MARISA_GRIMOIRE_IO_H_

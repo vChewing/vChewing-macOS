@@ -24,82 +24,97 @@
 #include "check.h"
 #include "string_util.h"
 
-namespace benchmark {
+namespace benchmark
+{
 
-BenchmarkReporter::BenchmarkReporter()
-    : output_stream_(&std::cout), error_stream_(&std::cerr) {}
+BenchmarkReporter::BenchmarkReporter() : output_stream_(&std::cout), error_stream_(&std::cerr)
+{
+}
 
-BenchmarkReporter::~BenchmarkReporter() {}
+BenchmarkReporter::~BenchmarkReporter()
+{
+}
 
-void BenchmarkReporter::PrintBasicContext(std::ostream *out,
-                                          Context const &context) {
-  CHECK(out) << "cannot be null";
-  auto &Out = *out;
+void BenchmarkReporter::PrintBasicContext(std::ostream *out, Context const &context)
+{
+    CHECK(out) << "cannot be null";
+    auto &Out = *out;
 
-  Out << LocalDateTimeString() << "\n";
+    Out << LocalDateTimeString() << "\n";
 
-  if (context.executable_name)
-    Out << "Running " << context.executable_name << "\n";
+    if (context.executable_name)
+        Out << "Running " << context.executable_name << "\n";
 
-  const CPUInfo &info = context.cpu_info;
-  Out << "Run on (" << info.num_cpus << " X "
-      << (info.cycles_per_second / 1000000.0) << " MHz CPU "
-      << ((info.num_cpus > 1) ? "s" : "") << ")\n";
-  if (info.caches.size() != 0) {
-    Out << "CPU Caches:\n";
-    for (auto &CInfo : info.caches) {
-      Out << "  L" << CInfo.level << " " << CInfo.type << " "
-          << (CInfo.size / 1024) << " KiB";
-      if (CInfo.num_sharing != 0)
-        Out << " (x" << (info.num_cpus / CInfo.num_sharing) << ")";
-      Out << "\n";
+    const CPUInfo &info = context.cpu_info;
+    Out << "Run on (" << info.num_cpus << " X " << (info.cycles_per_second / 1000000.0) << " MHz CPU "
+        << ((info.num_cpus > 1) ? "s" : "") << ")\n";
+    if (info.caches.size() != 0)
+    {
+        Out << "CPU Caches:\n";
+        for (auto &CInfo : info.caches)
+        {
+            Out << "  L" << CInfo.level << " " << CInfo.type << " " << (CInfo.size / 1024) << " KiB";
+            if (CInfo.num_sharing != 0)
+                Out << " (x" << (info.num_cpus / CInfo.num_sharing) << ")";
+            Out << "\n";
+        }
     }
-  }
-  if (!info.load_avg.empty()) {
-    Out << "Load Average: ";
-    for (auto It = info.load_avg.begin(); It != info.load_avg.end();) {
-      Out << StrFormat("%.2f", *It++);
-      if (It != info.load_avg.end()) Out << ", ";
+    if (!info.load_avg.empty())
+    {
+        Out << "Load Average: ";
+        for (auto It = info.load_avg.begin(); It != info.load_avg.end();)
+        {
+            Out << StrFormat("%.2f", *It++);
+            if (It != info.load_avg.end())
+                Out << ", ";
+        }
+        Out << "\n";
     }
-    Out << "\n";
-  }
 
-  if (info.scaling_enabled) {
-    Out << "***WARNING*** CPU scaling is enabled, the benchmark "
-           "real time measurements may be noisy and will incur extra "
-           "overhead.\n";
-  }
+    if (info.scaling_enabled)
+    {
+        Out << "***WARNING*** CPU scaling is enabled, the benchmark "
+               "real time measurements may be noisy and will incur extra "
+               "overhead.\n";
+    }
 
 #ifndef NDEBUG
-  Out << "***WARNING*** Library was built as DEBUG. Timings may be "
-         "affected.\n";
+    Out << "***WARNING*** Library was built as DEBUG. Timings may be "
+           "affected.\n";
 #endif
 }
 
 // No initializer because it's already initialized to NULL.
 const char *BenchmarkReporter::Context::executable_name;
 
-BenchmarkReporter::Context::Context()
-    : cpu_info(CPUInfo::Get()), sys_info(SystemInfo::Get()) {}
-
-std::string BenchmarkReporter::Run::benchmark_name() const {
-  std::string name = run_name.str();
-  if (run_type == RT_Aggregate) {
-    name += "_" + aggregate_name;
-  }
-  return name;
+BenchmarkReporter::Context::Context() : cpu_info(CPUInfo::Get()), sys_info(SystemInfo::Get())
+{
 }
 
-double BenchmarkReporter::Run::GetAdjustedRealTime() const {
-  double new_time = real_accumulated_time * GetTimeUnitMultiplier(time_unit);
-  if (iterations != 0) new_time /= static_cast<double>(iterations);
-  return new_time;
+std::string BenchmarkReporter::Run::benchmark_name() const
+{
+    std::string name = run_name.str();
+    if (run_type == RT_Aggregate)
+    {
+        name += "_" + aggregate_name;
+    }
+    return name;
 }
 
-double BenchmarkReporter::Run::GetAdjustedCPUTime() const {
-  double new_time = cpu_accumulated_time * GetTimeUnitMultiplier(time_unit);
-  if (iterations != 0) new_time /= static_cast<double>(iterations);
-  return new_time;
+double BenchmarkReporter::Run::GetAdjustedRealTime() const
+{
+    double new_time = real_accumulated_time * GetTimeUnitMultiplier(time_unit);
+    if (iterations != 0)
+        new_time /= static_cast<double>(iterations);
+    return new_time;
 }
 
-}  // end namespace benchmark
+double BenchmarkReporter::Run::GetAdjustedCPUTime() const
+{
+    double new_time = cpu_accumulated_time * GetTimeUnitMultiplier(time_unit);
+    if (iterations != 0)
+        new_time /= static_cast<double>(iterations);
+    return new_time;
+}
+
+} // end namespace benchmark

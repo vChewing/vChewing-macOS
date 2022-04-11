@@ -46,13 +46,13 @@ extension ChineseConverter.DictionaryLoader {
 	func conversionChain(options: ChineseConverter.Options) throws -> [ConversionDictionary] {
 		try options.conversionChain.compactMap { names in
 			switch names.count {
-			case 0:
-				return nil
-			case 1:
-				return try dict(names.first!)
-			case _:
-				let dicts = try names.map(dict)
-				return ConversionDictionary(group: dicts)
+				case 0:
+					return nil
+				case 1:
+					return try dict(names.first!)
+				case _:
+					let dicts = try names.map(dict)
+					return ConversionDictionary(group: dicts)
 			}
 		}
 	}

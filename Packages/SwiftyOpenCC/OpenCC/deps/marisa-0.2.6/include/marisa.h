@@ -11,4 +11,4 @@
 // above I/O interfaces and don't want to include the above I/O headers.
 #include "marisa/trie.h"
 
-#endif  // MARISA_H_
+#endif // MARISA_H_

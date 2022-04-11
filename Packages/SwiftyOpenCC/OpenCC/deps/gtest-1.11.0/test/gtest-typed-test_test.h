@@ -27,7 +27,6 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #ifndef GTEST_TEST_GTEST_TYPED_TEST_TEST_H_
 #define GTEST_TEST_GTEST_TYPED_TEST_TEST_H_
 
@@ -42,24 +41,25 @@ using testing::Test;
 // ContainerTest will be instantiated in both gtest-typed-test_test.cc
 // and gtest-typed-test2_test.cc.
 
-template <typename T>
-class ContainerTest : public Test {
+template <typename T> class ContainerTest : public Test
+{
 };
 
 TYPED_TEST_SUITE_P(ContainerTest);
 
-TYPED_TEST_P(ContainerTest, CanBeDefaultConstructed) {
-  TypeParam container;
+TYPED_TEST_P(ContainerTest, CanBeDefaultConstructed)
+{
+    TypeParam container;
 }
 
-TYPED_TEST_P(ContainerTest, InitialSizeIsZero) {
-  TypeParam container;
-  EXPECT_EQ(0U, container.size());
+TYPED_TEST_P(ContainerTest, InitialSizeIsZero)
+{
+    TypeParam container;
+    EXPECT_EQ(0U, container.size());
 }
 
-REGISTER_TYPED_TEST_SUITE_P(ContainerTest,
-                            CanBeDefaultConstructed, InitialSizeIsZero);
+REGISTER_TYPED_TEST_SUITE_P(ContainerTest, CanBeDefaultConstructed, InitialSizeIsZero);
 
-#endif  // GTEST_HAS_TYPED_TEST_P
+#endif // GTEST_HAS_TYPED_TEST_P
 
-#endif  // GTEST_TEST_GTEST_TYPED_TEST_TEST_H_
+#endif // GTEST_TEST_GTEST_TYPED_TEST_TEST_H_

@@ -21,7 +21,7 @@ let package = Package(
 			dependencies: ["OpenCC"],
 			resources: [
 				.copy("benchmark"),
-				.copy("testcases")
+				.copy("testcases"),
 			]),
 		.target(
 			name: "copencc",
@@ -66,20 +66,20 @@ let package = Package(
 				"deps/marisa-0.2.6/AUTHORS",
 				"deps/marisa-0.2.6/CMakeLists.txt",
 				"deps/marisa-0.2.6/COPYING.md",
-				"deps/marisa-0.2.6/README.md"
+				"deps/marisa-0.2.6/README.md",
 			],
 			sources: [
 				"source.cpp",
 				"src",
-				"deps/marisa-0.2.6"
+				"deps/marisa-0.2.6",
 			],
 			cxxSettings: [
 				.headerSearchPath("src"),
 				.headerSearchPath("deps/darts-clone"),
 				.headerSearchPath("deps/marisa-0.2.6/include"),
 				.headerSearchPath("deps/marisa-0.2.6/lib"),
-				.define("ENABLE_DARTS")
-			])
+				.define("ENABLE_DARTS"),
+			]),
 	],
 	cxxLanguageStandard: .cxx14
 )

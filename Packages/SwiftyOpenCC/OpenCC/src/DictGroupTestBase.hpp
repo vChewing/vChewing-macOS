@@ -21,17 +21,19 @@
 #include "DictGroup.hpp"
 #include "TextDictTestBase.hpp"
 
-namespace opencc {
+namespace opencc
+{
 
-class DictGroupTestBase : public TextDictTestBase {
-protected:
-  DictGroupPtr CreateDictGroupForConversion() const {
-    DictPtr phrasesDict = CreateDictForPhrases();
-    DictPtr charactersDict = CreateDictForCharacters();
-    DictGroupPtr dictGroup(
-        new DictGroup(std::list<DictPtr>{phrasesDict, charactersDict}));
-    return dictGroup;
-  }
+class DictGroupTestBase : public TextDictTestBase
+{
+  protected:
+    DictGroupPtr CreateDictGroupForConversion() const
+    {
+        DictPtr phrasesDict = CreateDictForPhrases();
+        DictPtr charactersDict = CreateDictForCharacters();
+        DictGroupPtr dictGroup(new DictGroup(std::list<DictPtr>{phrasesDict, charactersDict}));
+        return dictGroup;
+    }
 };
 
 } // namespace opencc

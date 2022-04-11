@@ -27,27 +27,28 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #include "sample4.h"
 #include "gtest/gtest.h"
 
-namespace {
+namespace
+{
 // Tests the Increment() method.
 
-TEST(Counter, Increment) {
-  Counter c;
+TEST(Counter, Increment)
+{
+    Counter c;
 
-  // Test that counter 0 returns 0
-  EXPECT_EQ(0, c.Decrement());
+    // Test that counter 0 returns 0
+    EXPECT_EQ(0, c.Decrement());
 
-  // EXPECT_EQ() evaluates its arguments exactly once, so they
-  // can have side effects.
+    // EXPECT_EQ() evaluates its arguments exactly once, so they
+    // can have side effects.
 
-  EXPECT_EQ(0, c.Increment());
-  EXPECT_EQ(1, c.Increment());
-  EXPECT_EQ(2, c.Increment());
+    EXPECT_EQ(0, c.Increment());
+    EXPECT_EQ(1, c.Increment());
+    EXPECT_EQ(2, c.Increment());
 
-  EXPECT_EQ(3, c.Decrement());
+    EXPECT_EQ(3, c.Decrement());
 }
 
-}  // namespace
+} // namespace

@@ -20,32 +20,38 @@
 
 using namespace opencc;
 
-SegmentsPtr MaxMatchSegmentation::Segment(const std::string& text) const {
-  SegmentsPtr segments(new Segments);
-  const char* segStart = text.c_str();
-  size_t segLength = 0;
-  auto clearBuffer = [&segments, &segStart, &segLength]() {
-    if (segLength > 0) {
-      segments->AddSegment(UTF8Util::FromSubstr(segStart, segLength));
-      segLength = 0;
+SegmentsPtr MaxMatchSegmentation::Segment(const std::string &text) const
+{
+    SegmentsPtr segments(new Segments);
+    const char *segStart = text.c_str();
+    size_t segLength = 0;
+    auto clearBuffer = [&segments, &segStart, &segLength]() {
+        if (segLength > 0)
+        {
+            segments->AddSegment(UTF8Util::FromSubstr(segStart, segLength));
+            segLength = 0;
+        }
+    };
+    size_t length = text.length();
+    for (const char *pstr = text.c_str(); *pstr != '\0';)
+    {
+        const Optional<const DictEntry *> &matched = dict->MatchPrefix(pstr, length);
+        size_t matchedLength;
+        if (matched.IsNull())
+        {
+            matchedLength = UTF8Util::NextCharLength(pstr);
+            segLength += matchedLength;
+        }
+        else
+        {
+            clearBuffer();
+            matchedLength = matched.Get()->KeyLength();
+            segments->AddSegment(matched.Get()->Key());
+            segStart = pstr + matchedLength;
+        }
+        pstr += matchedLength;
+        length -= matchedLength;
     }
-  };
-  size_t length = text.length();
-  for (const char* pstr = text.c_str(); *pstr != '\0';) {
-    const Optional<const DictEntry*>& matched = dict->MatchPrefix(pstr, length);
-    size_t matchedLength;
-    if (matched.IsNull()) {
-      matchedLength = UTF8Util::NextCharLength(pstr);
-      segLength += matchedLength;
-    } else {
-      clearBuffer();
-      matchedLength = matched.Get()->KeyLength();
-      segments->AddSegment(matched.Get()->Key());
-      segStart = pstr + matchedLength;
-    }
-    pstr += matchedLength;
-    length -= matchedLength;
-  }
-  clearBuffer();
-  return segments;
+    clearBuffer();
+    return segments;
 }

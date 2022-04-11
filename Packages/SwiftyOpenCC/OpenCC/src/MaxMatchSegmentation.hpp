@@ -22,22 +22,31 @@
 #include "DictGroup.hpp"
 #include "Segmentation.hpp"
 
-namespace opencc {
+namespace opencc
+{
 /**
  * Implementation of maximal match segmentation
  * @ingroup opencc_cpp_api
  */
-class OPENCC_EXPORT MaxMatchSegmentation : public Segmentation {
-public:
-  MaxMatchSegmentation(const DictPtr _dict) : dict(_dict) {}
+class OPENCC_EXPORT MaxMatchSegmentation : public Segmentation
+{
+  public:
+    MaxMatchSegmentation(const DictPtr _dict) : dict(_dict)
+    {
+    }
 
-  virtual ~MaxMatchSegmentation() {}
+    virtual ~MaxMatchSegmentation()
+    {
+    }
 
-  virtual SegmentsPtr Segment(const std::string& text) const;
+    virtual SegmentsPtr Segment(const std::string &text) const;
 
-  const DictPtr GetDict() const { return dict; }
+    const DictPtr GetDict() const
+    {
+        return dict;
+    }
 
-private:
-  const DictPtr dict;
+  private:
+    const DictPtr dict;
 };
 } // namespace opencc

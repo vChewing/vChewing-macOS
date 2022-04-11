@@ -18,4 +18,6 @@
 
 #include "UTF8StringSlice.hpp"
 
-namespace opencc {} // namespace opencc
+namespace opencc
+{
+} // namespace opencc

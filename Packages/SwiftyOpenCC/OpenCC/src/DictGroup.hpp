@@ -23,35 +23,38 @@
 #include "Common.hpp"
 #include "Dict.hpp"
 
-namespace opencc {
+namespace opencc
+{
 /**
  * Group of dictionaries
  * @ingroup opencc_cpp_api
  */
-class OPENCC_EXPORT DictGroup : public Dict {
-public:
-  DictGroup(const std::list<DictPtr>& dicts);
+class OPENCC_EXPORT DictGroup : public Dict
+{
+  public:
+    DictGroup(const std::list<DictPtr> &dicts);
 
-  static DictGroupPtr NewFromDict(const Dict& dict);
+    static DictGroupPtr NewFromDict(const Dict &dict);
 
-  virtual ~DictGroup();
+    virtual ~DictGroup();
 
-  virtual size_t KeyMaxLength() const;
+    virtual size_t KeyMaxLength() const;
 
-  virtual Optional<const DictEntry*> Match(const char* word, size_t len) const;
+    virtual Optional<const DictEntry *> Match(const char *word, size_t len) const;
 
-  virtual Optional<const DictEntry*> MatchPrefix(const char* word,
-                                                 size_t len) const;
+    virtual Optional<const DictEntry *> MatchPrefix(const char *word, size_t len) const;
 
-  virtual std::vector<const DictEntry*> MatchAllPrefixes(const char* word,
-                                                         size_t len) const;
+    virtual std::vector<const DictEntry *> MatchAllPrefixes(const char *word, size_t len) const;
 
-  virtual LexiconPtr GetLexicon() const;
+    virtual LexiconPtr GetLexicon() const;
 
-  const std::list<DictPtr> GetDicts() const { return dicts; }
+    const std::list<DictPtr> GetDicts() const
+    {
+        return dicts;
+    }
 
-private:
-  const size_t keyMaxLength;
-  const std::list<DictPtr> dicts;
+  private:
+    const size_t keyMaxLength;
+    const std::list<DictPtr> dicts;
 };
 } // namespace opencc

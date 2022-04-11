@@ -23,13 +23,16 @@
 
 using namespace opencc;
 
-ConversionChain::ConversionChain(const std::list<ConversionPtr> _conversions)
-    : conversions(_conversions) {}
+ConversionChain::ConversionChain(const std::list<ConversionPtr> _conversions) : conversions(_conversions)
+{
+}
 
-SegmentsPtr ConversionChain::Convert(const SegmentsPtr& input) const {
-  SegmentsPtr output = input;
-  for (auto conversion : conversions) {
-    output = conversion->Convert(output);
-  }
-  return output;
+SegmentsPtr ConversionChain::Convert(const SegmentsPtr &input) const
+{
+    SegmentsPtr output = input;
+    for (auto conversion : conversions)
+    {
+        output = conversion->Convert(output);
+    }
+    return output;
 }
