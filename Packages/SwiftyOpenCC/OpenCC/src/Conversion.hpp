@@ -21,27 +21,34 @@
 #include "Common.hpp"
 #include "Segmentation.hpp"
 
-namespace opencc {
+namespace opencc
+{
 /**
  * Conversion interface
  * @ingroup opencc_cpp_api
  */
-class OPENCC_EXPORT Conversion {
-public:
-  Conversion(DictPtr _dict) : dict(_dict) {}
+class OPENCC_EXPORT Conversion
+{
+  public:
+    Conversion(DictPtr _dict) : dict(_dict)
+    {
+    }
 
-  // Convert single phrase
-  std::string Convert(const std::string& phrase) const;
+    // Convert single phrase
+    std::string Convert(const std::string &phrase) const;
 
-  // Convert single phrase
-  std::string Convert(const char* phrase) const;
+    // Convert single phrase
+    std::string Convert(const char *phrase) const;
 
-  // Convert segmented text
-  SegmentsPtr Convert(const SegmentsPtr& input) const;
+    // Convert segmented text
+    SegmentsPtr Convert(const SegmentsPtr &input) const;
 
-  const DictPtr GetDict() const { return dict; }
+    const DictPtr GetDict() const
+    {
+        return dict;
+    }
 
-private:
-  const DictPtr dict;
+  private:
+    const DictPtr dict;
 };
 } // namespace opencc

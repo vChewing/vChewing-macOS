@@ -27,27 +27,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Carbon
 import Cocoa
 
-// Extend the RangeReplaceableCollection to allow it clean duplicated characters.
-extension RangeReplaceableCollection where Element: Hashable {
-	var charDeDuplicate: Self {
-		var set = Set<Element>()
-		return filter { set.insert($0).inserted }
-	}
-}
-
 // Please note that the class should be exposed using the same class name
 // in Objective-C in order to let IMK to see the same class name as
 // the "InputMethodServerPreferencesWindowControllerClass" in Info.plist.
 @objc(ctlPrefWindow) class ctlPrefWindow: NSWindowController {
 	@IBOutlet weak var fontSizePopUpButton: NSPopUpButton!
 	@IBOutlet weak var uiLanguageButton: NSPopUpButton!
-	@IBOutlet weak var basisKeyboardLayoutButton: NSPopUpButton!
+	@IBOutlet weak var basicKeyboardLayoutButton: NSPopUpButton!
 	@IBOutlet weak var selectionKeyComboBox: NSComboBox!
 	@IBOutlet weak var chkTrad2KangXi: NSButton!
 	@IBOutlet weak var chkTrad2JISShinjitai: NSButton!
 	@IBOutlet weak var lblCurrentlySpecifiedUserDataFolder: NSTextFieldCell!
 
-	var currentLanguageSelectItem: NSMenuItem? = nil
+	var currentLanguageSelectItem: NSMenuItem?
 
 	override func windowDidLoad() {
 		super.windowDidLoad()
@@ -56,8 +48,8 @@ extension RangeReplaceableCollection where Element: Hashable {
 			isDefaultFolder: true)
 
 		let languages = ["auto", "en", "zh-Hans", "zh-Hant", "ja"]
-		var autoMUISelectItem: NSMenuItem? = nil
-		var chosenLanguageItem: NSMenuItem? = nil
+		var autoMUISelectItem: NSMenuItem?
+		var chosenLanguageItem: NSMenuItem?
 		uiLanguageButton.menu?.removeAllItems()
 
 		let appleLanguages = mgrPrefs.appleLanguages
@@ -82,25 +74,25 @@ extension RangeReplaceableCollection where Element: Hashable {
 		uiLanguageButton.select(currentLanguageSelectItem)
 
 		let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
-		var usKeyboardLayoutItem: NSMenuItem? = nil
-		var chosenBaseKeyboardLayoutItem: NSMenuItem? = nil
+		var usKeyboardLayoutItem: NSMenuItem?
+		var chosenBaseKeyboardLayoutItem: NSMenuItem?
 
-		basisKeyboardLayoutButton.menu?.removeAllItems()
+		basicKeyboardLayoutButton.menu?.removeAllItems()
 
 		let itmAppleZhuyinBopomofo = NSMenuItem()
 		itmAppleZhuyinBopomofo.title = String(
 			format: NSLocalizedString("Apple Zhuyin Bopomofo (Dachen)", comment: ""))
 		itmAppleZhuyinBopomofo.representedObject = String(
 			"com.apple.keylayout.ZhuyinBopomofo")
-		basisKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinBopomofo)
+		basicKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinBopomofo)
 
 		let itmAppleZhuyinEten = NSMenuItem()
 		itmAppleZhuyinEten.title = String(
 			format: NSLocalizedString("Apple Zhuyin Eten (Traditional)", comment: ""))
 		itmAppleZhuyinEten.representedObject = String("com.apple.keylayout.ZhuyinEten")
-		basisKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinEten)
+		basicKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinEten)
 
-		let basisKeyboardLayoutID = mgrPrefs.basisKeyboardLayout
+		let basicKeyboardLayoutID = mgrPrefs.basicKeyboardLayout
 
 		for source in list {
 			if let categoryPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceCategory) {
@@ -150,13 +142,15 @@ extension RangeReplaceableCollection where Element: Hashable {
 			if sourceID == "com.apple.keylayout.US" {
 				usKeyboardLayoutItem = menuItem
 			}
-			if basisKeyboardLayoutID == sourceID {
+			if basicKeyboardLayoutID == sourceID {
 				chosenBaseKeyboardLayoutItem = menuItem
 			}
-			basisKeyboardLayoutButton.menu?.addItem(menuItem)
+			if IME.arrWhitelistedKeyLayoutsASCII.contains(sourceID) || sourceID.contains("vChewing") {
+				basicKeyboardLayoutButton.menu?.addItem(menuItem)
+			}
 		}
 
-		switch basisKeyboardLayoutID {
+		switch basicKeyboardLayoutID {
 			case "com.apple.keylayout.ZhuyinBopomofo":
 				chosenBaseKeyboardLayoutItem = itmAppleZhuyinBopomofo
 			case "com.apple.keylayout.ZhuyinEten":
@@ -165,7 +159,7 @@ extension RangeReplaceableCollection where Element: Hashable {
 				break  // nothing to do
 		}
 
-		basisKeyboardLayoutButton.select(chosenBaseKeyboardLayoutItem ?? usKeyboardLayoutItem)
+		basicKeyboardLayoutButton.select(chosenBaseKeyboardLayoutItem ?? usKeyboardLayoutItem)
 
 		selectionKeyComboBox.usesDataSource = false
 		selectionKeyComboBox.removeAllItems()
@@ -201,9 +195,9 @@ extension RangeReplaceableCollection where Element: Hashable {
 		}
 	}
 
-	@IBAction func updateBasisKeyboardLayoutAction(_ sender: Any) {
-		if let sourceID = basisKeyboardLayoutButton.selectedItem?.representedObject as? String {
-			mgrPrefs.basisKeyboardLayout = sourceID
+	@IBAction func updateBasicKeyboardLayoutAction(_ sender: Any) {
+		if let sourceID = basicKeyboardLayoutButton.selectedItem?.representedObject as? String {
+			mgrPrefs.basicKeyboardLayout = sourceID
 		}
 	}
 
@@ -247,7 +241,7 @@ extension RangeReplaceableCollection where Element: Hashable {
 		} catch {
 			if let window = window {
 				let alert = NSAlert(error: error)
-				alert.beginSheetModal(for: window) { response in
+				alert.beginSheetModal(for: window) { _ in
 					self.selectionKeyComboBox.stringValue = mgrPrefs.candidateKeys
 				}
 				clsSFX.beep()
@@ -256,8 +250,7 @@ extension RangeReplaceableCollection where Element: Hashable {
 	}
 
 	@IBAction func resetSpecifiedUserDataFolder(_ sender: Any) {
-		UserDefaults.standard.removeObject(forKey: "UserDataFolderSpecified")
-		IME.initLangModels(userOnly: true)
+		mgrPrefs.resetSpecifiedUserDataFolder()
 	}
 
 	@IBAction func chooseUserDataFolderToSpecify(_ sender: Any) {
@@ -271,26 +264,28 @@ extension RangeReplaceableCollection where Element: Hashable {
 		let bolPreviousFolderValidity = mgrLangModel.checkIfSpecifiedUserDataFolderValid(
 			NSString(string: mgrPrefs.userDataFolderSpecified).expandingTildeInPath)
 
-		if self.window != nil {
-			IME.dlgOpenPath.beginSheetModal(for: self.window!) { result in
+		if window != nil {
+			IME.dlgOpenPath.beginSheetModal(for: window!) { result in
 				if result == NSApplication.ModalResponse.OK {
 					if IME.dlgOpenPath.url != nil {
-						if mgrLangModel.checkIfSpecifiedUserDataFolderValid(
-							IME.dlgOpenPath.url!.path)
-						{
-							mgrPrefs.userDataFolderSpecified = IME.dlgOpenPath.url!.path
+						// CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
+						// 所以要手動補回來。
+						var newPath = IME.dlgOpenPath.url!.path
+						newPath.ensureTrailingSlash()
+						if mgrLangModel.checkIfSpecifiedUserDataFolderValid(newPath) {
+							mgrPrefs.userDataFolderSpecified = newPath
 							IME.initLangModels(userOnly: true)
 						} else {
 							clsSFX.beep()
 							if !bolPreviousFolderValidity {
-								self.resetSpecifiedUserDataFolder(self)
+								mgrPrefs.resetSpecifiedUserDataFolder()
 							}
 							return
 						}
 					}
 				} else {
 					if !bolPreviousFolderValidity {
-						self.resetSpecifiedUserDataFolder(self)
+						mgrPrefs.resetSpecifiedUserDataFolder()
 					}
 					return
 				}

@@ -20,18 +20,21 @@
 
 using namespace opencc;
 
-std::string MultiValueDictEntry::ToString() const {
-  // TODO escape space
-  size_t i = 0;
-  size_t length = Values().size();
-  std::ostringstream buffer;
-  buffer << Key() << '\t';
-  for (const std::string& value : Values()) {
-    buffer << value;
-    if (i < length - 1) {
-      buffer << ' ';
+std::string MultiValueDictEntry::ToString() const
+{
+    // TODO escape space
+    size_t i = 0;
+    size_t length = Values().size();
+    std::ostringstream buffer;
+    buffer << Key() << '\t';
+    for (const std::string &value : Values())
+    {
+        buffer << value;
+        if (i < length - 1)
+        {
+            buffer << ' ';
+        }
+        i++;
     }
-    i++;
-  }
-  return buffer.str();
+    return buffer.str();
 }

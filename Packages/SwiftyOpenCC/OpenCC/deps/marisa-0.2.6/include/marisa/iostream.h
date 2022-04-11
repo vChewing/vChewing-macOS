@@ -3,7 +3,8 @@
 
 #include <iosfwd>
 
-namespace marisa {
+namespace marisa
+{
 
 class Trie;
 
@@ -13,6 +14,6 @@ std::ostream &write(std::ostream &stream, const Trie &trie);
 std::istream &operator>>(std::istream &stream, Trie &trie);
 std::ostream &operator<<(std::ostream &stream, const Trie &trie);
 
-}  // namespace marisa
+} // namespace marisa
 
-#endif  // MARISA_IOSTREAM_H_
+#endif // MARISA_IOSTREAM_H_

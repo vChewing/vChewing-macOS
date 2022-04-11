@@ -17,64 +17,80 @@
 #define TEST_HAS_NO_EXCEPTIONS
 #endif
 
-void TestHandler() {
+void TestHandler()
+{
 #ifndef TEST_HAS_NO_EXCEPTIONS
-  throw std::logic_error("");
+    throw std::logic_error("");
 #else
-  std::abort();
+    std::abort();
 #endif
 }
 
-void try_invalid_pause_resume(benchmark::State& state) {
+void try_invalid_pause_resume(benchmark::State &state)
+{
 #if !defined(TEST_BENCHMARK_LIBRARY_HAS_NO_ASSERTIONS) && !defined(TEST_HAS_NO_EXCEPTIONS)
-  try {
-    state.PauseTiming();
-    std::abort();
-  } catch (std::logic_error const&) {
-  }
-  try {
-    state.ResumeTiming();
-    std::abort();
-  } catch (std::logic_error const&) {
-  }
+    try
+    {
+        state.PauseTiming();
+        std::abort();
+    }
+    catch (std::logic_error const &)
+    {
+    }
+    try
+    {
+        state.ResumeTiming();
+        std::abort();
+    }
+    catch (std::logic_error const &)
+    {
+    }
 #else
-  (void)state;  // avoid unused warning
+    (void)state; // avoid unused warning
 #endif
 }
 
-void BM_diagnostic_test(benchmark::State& state) {
-  static bool called_once = false;
+void BM_diagnostic_test(benchmark::State &state)
+{
+    static bool called_once = false;
 
-  if (called_once == false) try_invalid_pause_resume(state);
+    if (called_once == false)
+        try_invalid_pause_resume(state);
 
-  for (auto _ : state) {
-    benchmark::DoNotOptimize(state.iterations());
-  }
+    for (auto _ : state)
+    {
+        benchmark::DoNotOptimize(state.iterations());
+    }
 
-  if (called_once == false) try_invalid_pause_resume(state);
+    if (called_once == false)
+        try_invalid_pause_resume(state);
 
-  called_once = true;
+    called_once = true;
 }
 BENCHMARK(BM_diagnostic_test);
 
+void BM_diagnostic_test_keep_running(benchmark::State &state)
+{
+    static bool called_once = false;
 
-void BM_diagnostic_test_keep_running(benchmark::State& state) {
-  static bool called_once = false;
+    if (called_once == false)
+        try_invalid_pause_resume(state);
 
-  if (called_once == false) try_invalid_pause_resume(state);
+    while (state.KeepRunning())
+    {
+        benchmark::DoNotOptimize(state.iterations());
+    }
 
-  while(state.KeepRunning()) {
-    benchmark::DoNotOptimize(state.iterations());
-  }
+    if (called_once == false)
+        try_invalid_pause_resume(state);
 
-  if (called_once == false) try_invalid_pause_resume(state);
-
-  called_once = true;
+    called_once = true;
 }
 BENCHMARK(BM_diagnostic_test_keep_running);
 
-int main(int argc, char* argv[]) {
-  benchmark::internal::GetAbortHandler() = &TestHandler;
-  benchmark::Initialize(&argc, argv);
-  benchmark::RunSpecifiedBenchmarks();
+int main(int argc, char *argv[])
+{
+    benchmark::internal::GetAbortHandler() = &TestHandler;
+    benchmark::Initialize(&argc, argv);
+    benchmark::RunSpecifiedBenchmarks();
 }

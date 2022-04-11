@@ -20,21 +20,22 @@ PYBIND11_MAKE_OPAQUE(std::vector<std::string, std::allocator<std::string>>);
 
 using StringList = std::vector<std::string, std::allocator<std::string>>;
 
-TEST_SUBMODULE(opaque_types, m) {
+TEST_SUBMODULE(opaque_types, m)
+{
     // test_string_list
     py::class_<StringList>(m, "StringList")
         .def(py::init<>())
         .def("pop_back", &StringList::pop_back)
         /* There are multiple versions of push_back(), etc. Select the right ones. */
-        .def("push_back", (void (StringList::*)(const std::string &)) &StringList::push_back)
-        .def("back", (std::string &(StringList::*)()) &StringList::back)
+        .def("push_back", (void(StringList::*)(const std::string &)) & StringList::push_back)
+        .def("back", (std::string & (StringList::*)()) & StringList::back)
         .def("__len__", [](const StringList &v) { return v.size(); })
-        .def("__iter__", [](StringList &v) {
-           return py::make_iterator(v.begin(), v.end());
-        }, py::keep_alive<0, 1>());
+        .def(
+            "__iter__", [](StringList &v) { return py::make_iterator(v.begin(), v.end()); }, py::keep_alive<0, 1>());
 
-    class ClassWithSTLVecProperty {
-    public:
+    class ClassWithSTLVecProperty
+    {
+      public:
         StringList stringList;
     };
     py::class_<ClassWithSTLVecProperty>(m, "ClassWithSTLVecProperty")
@@ -44,7 +45,8 @@ TEST_SUBMODULE(opaque_types, m) {
     m.def("print_opaque_list", [](const StringList &l) {
         std::string ret = "Opaque list: [";
         bool first = true;
-        for (auto entry : l) {
+        for (auto entry : l)
+        {
             if (!first)
                 ret += ", ";
             ret += entry;
@@ -54,9 +56,9 @@ TEST_SUBMODULE(opaque_types, m) {
     });
 
     // test_pointers
-    m.def("return_void_ptr", []() { return (void *) 0x1234; });
+    m.def("return_void_ptr", []() { return (void *)0x1234; });
     m.def("get_void_ptr_value", [](void *ptr) { return reinterpret_cast<std::intptr_t>(ptr); });
-    m.def("return_null_str", []() { return (char *) nullptr; });
+    m.def("return_null_str", []() { return (char *)nullptr; });
     m.def("get_null_str_value", [](char *ptr) { return reinterpret_cast<std::intptr_t>(ptr); });
 
     m.def("return_unique_ptr", []() -> std::unique_ptr<StringList> {

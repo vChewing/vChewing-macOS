@@ -26,26 +26,28 @@ DECLARE_bool(benchmark_report_aggregates_only);
 
 DECLARE_bool(benchmark_display_aggregates_only);
 
-namespace benchmark {
+namespace benchmark
+{
 
-namespace internal {
+namespace internal
+{
 
-extern MemoryManager* memory_manager;
+extern MemoryManager *memory_manager;
 
-struct RunResults {
-  std::vector<BenchmarkReporter::Run> non_aggregates;
-  std::vector<BenchmarkReporter::Run> aggregates_only;
+struct RunResults
+{
+    std::vector<BenchmarkReporter::Run> non_aggregates;
+    std::vector<BenchmarkReporter::Run> aggregates_only;
 
-  bool display_report_aggregates_only = false;
-  bool file_report_aggregates_only = false;
+    bool display_report_aggregates_only = false;
+    bool file_report_aggregates_only = false;
 };
 
-RunResults RunBenchmark(
-    const benchmark::internal::BenchmarkInstance& b,
-    std::vector<BenchmarkReporter::Run>* complexity_reports);
+RunResults RunBenchmark(const benchmark::internal::BenchmarkInstance &b,
+                        std::vector<BenchmarkReporter::Run> *complexity_reports);
 
-}  // namespace internal
+} // namespace internal
 
-}  // end namespace benchmark
+} // end namespace benchmark
 
-#endif  // BENCHMARK_RUNNER_H_
+#endif // BENCHMARK_RUNNER_H_

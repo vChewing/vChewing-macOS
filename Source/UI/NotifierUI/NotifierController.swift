@@ -1,5 +1,6 @@
 // Copyright (c) 2021 and onwards Weizhong Yang (MIT License).
-// All possible vChewing-specific modifications are (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// All possible vChewing-specific modifications are of:
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 /*
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -68,12 +69,12 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
 	private var shouldStay: Bool = false
 	private var backgroundColor: NSColor = .textBackgroundColor {
 		didSet {
-			self.window?.backgroundColor = backgroundColor
+			window?.backgroundColor = backgroundColor
 		}
 	}
 	private var foregroundColor: NSColor = .controlTextColor {
 		didSet {
-			self.messageTextField.textColor = foregroundColor
+			messageTextField.textColor = foregroundColor
 		}
 	}
 	private var waitTimer: Timer?
@@ -123,7 +124,7 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
 		panel.titlebarAppearsTransparent = true
 		panel.titleVisibility = .hidden
 		panel.showsToolbarButton = false
-		panel.standardWindowButton(NSWindow.ButtonType.fullScreenButton)?.isHidden = true
+		panel.standardWindowButton(NSWindow.ButtonType.zoomButton)?.isHidden = true
 		panel.standardWindowButton(NSWindow.ButtonType.miniaturizeButton)?.isHidden = true
 		panel.standardWindowButton(NSWindow.ButtonType.closeButton)?.isHidden = true
 		panel.standardWindowButton(NSWindow.ButtonType.zoomButton)?.isHidden = true
@@ -154,7 +155,7 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
 			}
 			let lastLocation = NotifierController.lastLocation
 			let screenRect = NSScreen.main?.visibleFrame ?? NSRect.zero
-			var windowRect = self.window?.frame ?? NSRect.zero
+			var windowRect = window?.frame ?? NSRect.zero
 			windowRect.origin.x = lastLocation.x
 			windowRect.origin.y = lastLocation.y - 10 - windowRect.height
 
@@ -162,11 +163,11 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
 				return
 			}
 
-			self.window?.setFrame(windowRect, display: true)
+			window?.setFrame(windowRect, display: true)
 		}
 
 		func moveIn() {
-			let afterRect = self.window?.frame ?? NSRect.zero
+			let afterRect = window?.frame ?? NSRect.zero
 			NotifierController.lastLocation = afterRect.origin
 			var beforeRect = afterRect
 			beforeRect.origin.y += 10
@@ -185,11 +186,11 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
 	}
 
 	@objc private func doFadeOut(_ timer: Timer) {
-		let opacity = self.window?.alphaValue ?? 0
+		let opacity = window?.alphaValue ?? 0
 		if opacity <= 0 {
-			self.close()
+			close()
 		} else {
-			self.window?.alphaValue = opacity - 0.2
+			window?.alphaValue = opacity - 0.2
 		}
 	}
 
@@ -211,6 +212,6 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
 	}
 
 	fileprivate func windowDidBecomeClicked(_ window: NotifierWindow) {
-		self.fadeOut()
+		fadeOut()
 	}
 }

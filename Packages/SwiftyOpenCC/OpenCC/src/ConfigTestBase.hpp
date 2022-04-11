@@ -20,15 +20,17 @@
 
 #include "TestUtils.hpp"
 
-namespace opencc {
+namespace opencc
+{
 
-class ConfigTestBase : public ::testing::Test {
-protected:
-  ConfigTestBase()
-      : CONFIG_TEST_PATH(CMAKE_SOURCE_DIR
-                         "/test/config_test/config_test.json") {}
+class ConfigTestBase : public ::testing::Test
+{
+  protected:
+    ConfigTestBase() : CONFIG_TEST_PATH(CMAKE_SOURCE_DIR "/test/config_test/config_test.json")
+    {
+    }
 
-  const std::string CONFIG_TEST_PATH;
+    const std::string CONFIG_TEST_PATH;
 };
 
 } // namespace opencc

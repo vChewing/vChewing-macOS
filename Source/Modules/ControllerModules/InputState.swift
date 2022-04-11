@@ -243,7 +243,7 @@ class InputState: NSObject {
 			self.markerIndex = markerIndex
 			let begin = min(cursorIndex, markerIndex)
 			let end = max(cursorIndex, markerIndex)
-			markedRange = NSMakeRange(Int(begin), Int(end - begin))
+			markedRange = NSRange(location: Int(begin), length: Int(end - begin))
 			self.readings = readings
 			super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
 		}
@@ -410,7 +410,7 @@ class InputState: NSObject {
 
 }
 
-@objc class SymbolNode: NSObject {
+class SymbolNode: NSObject {
 	@objc var title: String
 	@objc var children: [SymbolNode]?
 
@@ -422,7 +422,7 @@ class InputState: NSObject {
 
 	@objc init(_ title: String, symbols: String) {
 		self.title = title
-		self.children = Array(symbols).map { SymbolNode(String($0), nil) }
+		children = Array(symbols).map { SymbolNode(String($0), nil) }
 		super.init()
 	}
 

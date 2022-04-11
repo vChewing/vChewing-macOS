@@ -18,13 +18,13 @@ class ConversionDictionary {
 		guard let dict = CCDictCreateMarisaWithPath(path) else {
 			throw ConversionError(ccErrorno)
 		}
-		self.group = []
+		group = []
 		self.dict = dict
 	}
 
 	init(group: [ConversionDictionary]) {
 		var rawGroup = group.map { $0.dict }
 		self.group = group
-		self.dict = CCDictCreateWithGroup(&rawGroup, rawGroup.count)
+		dict = CCDictCreateWithGroup(&rawGroup, rawGroup.count)
 	}
 }

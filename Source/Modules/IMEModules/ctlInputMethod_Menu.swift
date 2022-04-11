@@ -123,10 +123,14 @@ extension ctlInputMethod {
 
 		menu.addItem(NSMenuItem.separator())  // ---------------------
 
-		menu.addItem(
-			withTitle: NSLocalizedString("vChewing Preferences…", comment: ""),
-			action: #selector(showPreferences(_:)), keyEquivalent: "")
-		if !optionKeyPressed {
+		if optionKeyPressed {
+			menu.addItem(
+				withTitle: NSLocalizedString("vChewing Preferences…", comment: ""),
+				action: #selector(showLegacyPreferences(_:)), keyEquivalent: "")
+		} else {
+			menu.addItem(
+				withTitle: NSLocalizedString("vChewing Preferences…", comment: ""),
+				action: #selector(showPreferences(_:)), keyEquivalent: "")
 			menu.addItem(
 				withTitle: NSLocalizedString("Check for Updates…", comment: ""),
 				action: #selector(checkForUpdate(_:)), keyEquivalent: "")
@@ -152,6 +156,20 @@ extension ctlInputMethod {
 	// MARK: - IME Menu Items
 
 	@objc override func showPreferences(_ sender: Any?) {
+		if #available(macOS 11.0, *) {
+			NSApp.setActivationPolicy(.accessory)
+			ctlPrefUI.shared.controller.show(preferencePane: Preferences.PaneIdentifier(rawValue: "General"))
+			ctlPrefUI.shared.controller.window?.level = .floating
+		} else {
+			showPrefWindowTraditional()
+		}
+	}
+
+	@objc func showLegacyPreferences(_ sender: Any?) {
+		showPrefWindowTraditional()
+	}
+
+	private func showPrefWindowTraditional() {
 		(NSApp.delegate as? AppDelegate)?.showPreferences()
 		NSApp.activate(ignoringOtherApps: true)
 	}
@@ -163,6 +181,7 @@ extension ctlInputMethod {
 				mgrPrefs.toggleSCPCTypingModeEnabled()
 					? NSLocalizedString("NotificationSwitchON", comment: "")
 					: NSLocalizedString("NotificationSwitchOFF", comment: "")))
+		resetKeyHandler()
 	}
 
 	@objc func toggleChineseConverter(_ sender: Any?) {
@@ -172,6 +191,7 @@ extension ctlInputMethod {
 				mgrPrefs.toggleChineseConversionEnabled()
 					? NSLocalizedString("NotificationSwitchON", comment: "")
 					: NSLocalizedString("NotificationSwitchOFF", comment: "")))
+		resetKeyHandler()
 	}
 
 	@objc func toggleShiftJISShinjitaiOutput(_ sender: Any?) {
@@ -181,6 +201,7 @@ extension ctlInputMethod {
 				mgrPrefs.toggleShiftJISShinjitaiOutputEnabled()
 					? NSLocalizedString("NotificationSwitchON", comment: "")
 					: NSLocalizedString("NotificationSwitchOFF", comment: "")))
+		resetKeyHandler()
 	}
 
 	@objc func toggleHalfWidthPunctuation(_ sender: Any?) {
@@ -191,6 +212,7 @@ extension ctlInputMethod {
 				mgrPrefs.toggleHalfWidthPunctuationEnabled()
 					? NSLocalizedString("NotificationSwitchON", comment: "")
 					: NSLocalizedString("NotificationSwitchOFF", comment: "")))
+		resetKeyHandler()
 	}
 
 	@objc func toggleCNS11643Enabled(_ sender: Any?) {
@@ -200,6 +222,7 @@ extension ctlInputMethod {
 				mgrPrefs.toggleCNS11643Enabled()
 					? NSLocalizedString("NotificationSwitchON", comment: "")
 					: NSLocalizedString("NotificationSwitchOFF", comment: "")))
+		resetKeyHandler()
 	}
 
 	@objc func toggleSymbolEnabled(_ sender: Any?) {
@@ -209,6 +232,7 @@ extension ctlInputMethod {
 				mgrPrefs.toggleSymbolInputEnabled()
 					? NSLocalizedString("NotificationSwitchON", comment: "")
 					: NSLocalizedString("NotificationSwitchOFF", comment: "")))
+		resetKeyHandler()
 	}
 
 	@objc func toggleAssociatedPhrasesEnabled(_ sender: Any?) {
@@ -219,6 +243,7 @@ extension ctlInputMethod {
 				mgrPrefs.toggleAssociatedPhrasesEnabled()
 					? NSLocalizedString("NotificationSwitchON", comment: "")
 					: NSLocalizedString("NotificationSwitchOFF", comment: "")))
+		resetKeyHandler()
 	}
 
 	@objc func togglePhraseReplacement(_ sender: Any?) {
@@ -228,6 +253,7 @@ extension ctlInputMethod {
 				mgrPrefs.togglePhraseReplacementEnabled()
 					? NSLocalizedString("NotificationSwitchON", comment: "")
 					: NSLocalizedString("NotificationSwitchOFF", comment: "")))
+		resetKeyHandler()
 	}
 
 	@objc func selfUninstall(_ sender: Any?) {

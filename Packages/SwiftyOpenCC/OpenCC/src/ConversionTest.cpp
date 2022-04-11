@@ -19,32 +19,38 @@
 #include "Conversion.hpp"
 #include "DictGroupTestBase.hpp"
 
-namespace opencc {
+namespace opencc
+{
 
-class ConversionTest : public DictGroupTestBase {
-protected:
-  ConversionTest()
-      : input(utf8("太后的头发干燥")), expected(utf8("太后的頭髮乾燥")) {}
+class ConversionTest : public DictGroupTestBase
+{
+  protected:
+    ConversionTest() : input(utf8("太后的头发干燥")), expected(utf8("太后的頭髮乾燥"))
+    {
+    }
 
-  virtual void SetUp() {
-    dict = CreateDictGroupForConversion();
-    conversion = ConversionPtr(new Conversion(dict));
-  }
+    virtual void SetUp()
+    {
+        dict = CreateDictGroupForConversion();
+        conversion = ConversionPtr(new Conversion(dict));
+    }
 
-  DictPtr dict;
-  ConversionPtr conversion;
-  const std::string input;
-  const std::string expected;
+    DictPtr dict;
+    ConversionPtr conversion;
+    const std::string input;
+    const std::string expected;
 };
 
-TEST_F(ConversionTest, ConvertString) {
-  const std::string converted = conversion->Convert(input);
-  EXPECT_EQ(expected, converted);
+TEST_F(ConversionTest, ConvertString)
+{
+    const std::string converted = conversion->Convert(input);
+    EXPECT_EQ(expected, converted);
 }
 
-TEST_F(ConversionTest, ConvertCString) {
-  const std::string converted = conversion->Convert(input.c_str());
-  EXPECT_EQ(expected, converted);
+TEST_F(ConversionTest, ConvertCString)
+{
+    const std::string converted = conversion->Convert(input.c_str());
+    EXPECT_EQ(expected, converted);
 }
 
 } // namespace opencc

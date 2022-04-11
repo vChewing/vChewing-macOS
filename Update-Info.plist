@@ -2,13 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleShortVersionString</key>
+	<string>1.5.0</string>
+	<key>CFBundleVersion</key>
+	<string>1950</string>
 	<key>UpdateInfoEndpoint</key>
 	<string>https://gitee.com/vchewing/vChewing-macOS/raw/main/Update-Info.plist</string>
 	<key>UpdateInfoSite</key>
 	<string>https://gitee.com/vChewing/vChewing-macOS/releases</string>
-	<key>CFBundleVersion</key>
-	<string>1948</string>
-	<key>CFBundleShortVersionString</key>
-	<string>1.4.7</string>
 </dict>
 </plist>

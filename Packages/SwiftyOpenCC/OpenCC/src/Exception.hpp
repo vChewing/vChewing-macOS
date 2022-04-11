@@ -30,59 +30,82 @@
 #define noexcept
 #endif // ifdef _MSC_VER
 
-namespace opencc {
+namespace opencc
+{
 
-class OPENCC_EXPORT Exception {
-public:
-  Exception() {}
+class OPENCC_EXPORT Exception
+{
+  public:
+    Exception()
+    {
+    }
 
-  virtual ~Exception() throw() {}
+    virtual ~Exception() throw()
+    {
+    }
 
-  Exception(const std::string& _message) : message(_message) {}
+    Exception(const std::string &_message) : message(_message)
+    {
+    }
 
-  virtual const char* what() const noexcept { return message.c_str(); }
+    virtual const char *what() const noexcept
+    {
+        return message.c_str();
+    }
 
-protected:
-  std::string message;
+  protected:
+    std::string message;
 };
 
-class OPENCC_EXPORT FileNotFound : public Exception {
-public:
-  FileNotFound(const std::string& fileName)
-      : Exception(fileName + " not found or not accessible.") {}
+class OPENCC_EXPORT FileNotFound : public Exception
+{
+  public:
+    FileNotFound(const std::string &fileName) : Exception(fileName + " not found or not accessible.")
+    {
+    }
 };
 
-class OPENCC_EXPORT FileNotWritable : public Exception {
-public:
-  FileNotWritable(const std::string& fileName)
-      : Exception(fileName + " not writable.") {}
+class OPENCC_EXPORT FileNotWritable : public Exception
+{
+  public:
+    FileNotWritable(const std::string &fileName) : Exception(fileName + " not writable.")
+    {
+    }
 };
 
-class OPENCC_EXPORT InvalidFormat : public Exception {
-public:
-  InvalidFormat(const std::string& message)
-      : Exception("Invalid format: " + message) {}
+class OPENCC_EXPORT InvalidFormat : public Exception
+{
+  public:
+    InvalidFormat(const std::string &message) : Exception("Invalid format: " + message)
+    {
+    }
 };
 
-class OPENCC_EXPORT InvalidTextDictionary : public InvalidFormat {
-public:
-  InvalidTextDictionary(const std::string& _message, size_t lineNum)
-      : InvalidFormat("") {
-    std::ostringstream buffer;
-    buffer << "Invalid text dictionary at line " << lineNum << ": " << _message;
-    message = buffer.str();
-  }
+class OPENCC_EXPORT InvalidTextDictionary : public InvalidFormat
+{
+  public:
+    InvalidTextDictionary(const std::string &_message, size_t lineNum) : InvalidFormat("")
+    {
+        std::ostringstream buffer;
+        buffer << "Invalid text dictionary at line " << lineNum << ": " << _message;
+        message = buffer.str();
+    }
 };
 
-class OPENCC_EXPORT InvalidUTF8 : public Exception {
-public:
-  InvalidUTF8(const std::string& _message)
-      : Exception("Invalid UTF8: " + _message) {}
+class OPENCC_EXPORT InvalidUTF8 : public Exception
+{
+  public:
+    InvalidUTF8(const std::string &_message) : Exception("Invalid UTF8: " + _message)
+    {
+    }
 };
 
-class OPENCC_EXPORT ShouldNotBeHere : public Exception {
-public:
-  ShouldNotBeHere() : Exception("ShouldNotBeHere! This must be a bug.") {}
+class OPENCC_EXPORT ShouldNotBeHere : public Exception
+{
+  public:
+    ShouldNotBeHere() : Exception("ShouldNotBeHere! This must be a bug.")
+    {
+    }
 };
 
 } // namespace opencc

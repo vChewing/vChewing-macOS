@@ -30,7 +30,7 @@ extension String {
 		do {
 			let regex = try NSRegularExpression(
 				pattern: pattern, options: [.caseInsensitive, .anchorsMatchLines])
-			let range = NSRange(self.startIndex..., in: self)
+			let range = NSRange(startIndex..., in: self)
 			self = regex.stringByReplacingMatches(
 				in: self, options: [], range: range, withTemplate: replaceWith)
 		} catch { return }
