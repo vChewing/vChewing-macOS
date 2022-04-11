@@ -377,14 +377,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     // see if we have composition if Enter/Space is hit and buffer is not empty
-    // this is bit-OR'ed so that the tone marker key is also taken into account
+    // we use "OR" conditioning so that the tone marker key is also taken into account
     composeReading |= (!_bpmfReadingBuffer->isEmpty() && ([input isSpace] || [input isEnter]));
     if (composeReading)
     {
         // combine the reading
         std::string reading = _bpmfReadingBuffer->syllable().composedString();
 
-        // see if we have a unigram for this
+        // see if we have an unigram for this
         if (!_languageModel->hasUnigramsForKey(reading))
         {
             [IME prtDebugIntel:@"B49C0979"];
@@ -1599,7 +1599,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 - (void)_walk
 {
     // retrieve the most likely trellis, i.e. a Maximum Likelihood Estimation
-    // of the best possible Mandarain characters given the input syllables,
+    // of the best possible Mandarin characters given the input syllables,
     // using the Viterbi algorithm implemented in the Gramambular library
     Gramambular::Walker walker(&_builder->grid());
 
