@@ -10,7 +10,7 @@ let testCases: [(String, ChineseConverter.Options)] = [
 	("s2tw", [.traditionalize, .twStandard]),
 	("tw2s", [.simplify, .twStandard]),
 	("s2twp", [.traditionalize, .twStandard, .twIdiom]),
-	("tw2sp", [.simplify, .twStandard, .twIdiom]),
+	("tw2sp", [.simplify, .twStandard, .twIdiom])
 ]
 
 class OpenCCTests: XCTestCase {
