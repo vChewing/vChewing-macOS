@@ -86,6 +86,9 @@
 	- `"lineLength" : 120,`
 	- `"NoBlockComments" : false,`
 	- `"tabWidth" : 4,`
+    - `"OnlyOneTrailingClosureArgument" : false,` // SwiftUI 相容
+    - `"UseTripleSlashForDocumentationComments" : false,`
+    - `"DontRepeatTypeInStaticProperties" : false,`
 - (Obj)C(++) 系語言：使用 clang-format 命令、且採 Microsoft 行文規範。該規範以四個西文半形空格為行縮進單位。
 
 ## 特殊勸告
