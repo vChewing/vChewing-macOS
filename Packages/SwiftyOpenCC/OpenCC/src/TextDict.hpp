@@ -21,40 +21,42 @@
 #include "Common.hpp"
 #include "SerializableDict.hpp"
 
-namespace opencc {
+namespace opencc
+{
 /**
  * Text dictionary
  * @ingroup opencc_cpp_api
  */
-class OPENCC_EXPORT TextDict : public Dict, public SerializableDict {
-public:
-  /**
-   * Constructor of TextDict.
-   * _lexicon must be sorted.
-   */
-  TextDict(const LexiconPtr& _lexicon);
+class OPENCC_EXPORT TextDict : public Dict, public SerializableDict
+{
+  public:
+    /**
+     * Constructor of TextDict.
+     * _lexicon must be sorted.
+     */
+    TextDict(const LexiconPtr &_lexicon);
 
-  virtual ~TextDict();
+    virtual ~TextDict();
 
-  virtual size_t KeyMaxLength() const;
+    virtual size_t KeyMaxLength() const;
 
-  virtual Optional<const DictEntry*> Match(const char* word, size_t len) const;
+    virtual Optional<const DictEntry *> Match(const char *word, size_t len) const;
 
-  virtual LexiconPtr GetLexicon() const;
+    virtual LexiconPtr GetLexicon() const;
 
-  virtual void SerializeToFile(FILE* fp) const;
+    virtual void SerializeToFile(FILE *fp) const;
 
-  /**
-   * Constructs a TextDict from another dictionary.
-   */
-  static TextDictPtr NewFromDict(const Dict& dict);
+    /**
+     * Constructs a TextDict from another dictionary.
+     */
+    static TextDictPtr NewFromDict(const Dict &dict);
 
-  static TextDictPtr NewFromFile(FILE* fp);
+    static TextDictPtr NewFromFile(FILE *fp);
 
-  static TextDictPtr NewFromSortedFile(FILE* fp);
+    static TextDictPtr NewFromSortedFile(FILE *fp);
 
-private:
-  const size_t maxLength;
-  const LexiconPtr lexicon;
+  private:
+    const size_t maxLength;
+    const LexiconPtr lexicon;
 };
 } // namespace opencc

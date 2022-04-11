@@ -9,9 +9,11 @@
 
 #include "pybind11_tests.h"
 
-TEST_SUBMODULE(enums, m) {
+TEST_SUBMODULE(enums, m)
+{
     // test_unscoped_enum
-    enum UnscopedEnum {
+    enum UnscopedEnum
+    {
         EOne = 1,
         ETwo,
         EThree
@@ -23,7 +25,8 @@ TEST_SUBMODULE(enums, m) {
         .export_values();
 
     // test_scoped_enum
-    enum class ScopedEnum {
+    enum class ScopedEnum
+    {
         Two = 2,
         Three
     };
@@ -31,12 +34,12 @@ TEST_SUBMODULE(enums, m) {
         .value("Two", ScopedEnum::Two)
         .value("Three", ScopedEnum::Three);
 
-    m.def("test_scoped_enum", [](ScopedEnum z) {
-        return "ScopedEnum::" + std::string(z == ScopedEnum::Two ? "Two" : "Three");
-    });
+    m.def("test_scoped_enum",
+          [](ScopedEnum z) { return "ScopedEnum::" + std::string(z == ScopedEnum::Two ? "Two" : "Three"); });
 
     // test_binary_operators
-    enum Flags {
+    enum Flags
+    {
         Read = 4,
         Write = 2,
         Execute = 1
@@ -48,14 +51,17 @@ TEST_SUBMODULE(enums, m) {
         .export_values();
 
     // test_implicit_conversion
-    class ClassWithUnscopedEnum {
-    public:
-        enum EMode {
+    class ClassWithUnscopedEnum
+    {
+      public:
+        enum EMode
+        {
             EFirstMode = 1,
             ESecondMode
         };
 
-        static EMode test_function(EMode mode) {
+        static EMode test_function(EMode mode)
+        {
             return mode;
         }
     };
@@ -67,19 +73,22 @@ TEST_SUBMODULE(enums, m) {
         .export_values();
 
     // test_enum_to_int
-    m.def("test_enum_to_int", [](int) { });
-    m.def("test_enum_to_uint", [](uint32_t) { });
-    m.def("test_enum_to_long_long", [](long long) { });
+    m.def("test_enum_to_int", [](int) {});
+    m.def("test_enum_to_uint", [](uint32_t) {});
+    m.def("test_enum_to_long_long", [](long long) {});
 
     // test_duplicate_enum_name
     enum SimpleEnum
     {
-        ONE, TWO, THREE
+        ONE,
+        TWO,
+        THREE
     };
 
     m.def("register_bad_enum", [m]() {
         py::enum_<SimpleEnum>(m, "SimpleEnum")
-            .value("ONE", SimpleEnum::ONE)          //NOTE: all value function calls are called with the same first parameter value
+            .value("ONE",
+                   SimpleEnum::ONE) // NOTE: all value function calls are called with the same first parameter value
             .value("ONE", SimpleEnum::TWO)
             .value("ONE", SimpleEnum::THREE)
             .export_values();

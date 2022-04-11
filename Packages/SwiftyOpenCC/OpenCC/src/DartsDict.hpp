@@ -21,40 +21,41 @@
 #include "Common.hpp"
 #include "SerializableDict.hpp"
 
-namespace opencc {
+namespace opencc
+{
 /**
  * Darts dictionary
  * @ingroup opencc_cpp_api
  */
-class OPENCC_EXPORT DartsDict : public Dict, public SerializableDict {
-public:
-  virtual ~DartsDict();
+class OPENCC_EXPORT DartsDict : public Dict, public SerializableDict
+{
+  public:
+    virtual ~DartsDict();
 
-  virtual size_t KeyMaxLength() const;
+    virtual size_t KeyMaxLength() const;
 
-  virtual Optional<const DictEntry*> Match(const char* word, size_t len) const;
+    virtual Optional<const DictEntry *> Match(const char *word, size_t len) const;
 
-  virtual Optional<const DictEntry*> MatchPrefix(const char* word,
-                                                 size_t len) const;
+    virtual Optional<const DictEntry *> MatchPrefix(const char *word, size_t len) const;
 
-  virtual LexiconPtr GetLexicon() const;
+    virtual LexiconPtr GetLexicon() const;
 
-  virtual void SerializeToFile(FILE* fp) const;
+    virtual void SerializeToFile(FILE *fp) const;
 
-  /**
-   * Constructs a DartsDict from another dictionary.
-   */
-  static DartsDictPtr NewFromDict(const Dict& thatDict);
+    /**
+     * Constructs a DartsDict from another dictionary.
+     */
+    static DartsDictPtr NewFromDict(const Dict &thatDict);
 
-  static DartsDictPtr NewFromFile(FILE* fp);
+    static DartsDictPtr NewFromFile(FILE *fp);
 
-private:
-  DartsDict();
+  private:
+    DartsDict();
 
-  size_t maxLength;
-  LexiconPtr lexicon;
+    size_t maxLength;
+    LexiconPtr lexicon;
 
-  class DartsInternal;
-  DartsInternal* internal;
+    class DartsInternal;
+    DartsInternal *internal;
 };
 } // namespace opencc

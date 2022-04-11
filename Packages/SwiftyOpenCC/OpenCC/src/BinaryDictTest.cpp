@@ -19,36 +19,39 @@
 #include "BinaryDict.hpp"
 #include "TextDictTestBase.hpp"
 
-namespace opencc {
+namespace opencc
+{
 
-class BinaryDictTest : public TextDictTestBase {
-protected:
-  BinaryDictTest()
-      : binDict(new BinaryDict(textDict->GetLexicon())), fileName("dict.bin"){};
+class BinaryDictTest : public TextDictTestBase
+{
+  protected:
+    BinaryDictTest() : binDict(new BinaryDict(textDict->GetLexicon())), fileName("dict.bin"){};
 
-  const BinaryDictPtr binDict;
-  const std::string fileName;
+    const BinaryDictPtr binDict;
+    const std::string fileName;
 };
 
-TEST_F(BinaryDictTest, Serialization) {
-  binDict->opencc::SerializableDict::SerializeToFile(fileName);
+TEST_F(BinaryDictTest, Serialization)
+{
+    binDict->opencc::SerializableDict::SerializeToFile(fileName);
 }
 
-TEST_F(BinaryDictTest, Deserialization) {
-  const BinaryDictPtr& deserialized =
-      SerializableDict::NewFromFile<BinaryDict>(fileName);
-  const LexiconPtr& lex1 = binDict->GetLexicon();
-  const LexiconPtr& lex2 = deserialized->GetLexicon();
+TEST_F(BinaryDictTest, Deserialization)
+{
+    const BinaryDictPtr &deserialized = SerializableDict::NewFromFile<BinaryDict>(fileName);
+    const LexiconPtr &lex1 = binDict->GetLexicon();
+    const LexiconPtr &lex2 = deserialized->GetLexicon();
 
-  // Compare every entry
-  EXPECT_EQ(lex1->Length(), lex2->Length());
-  for (size_t i = 0; i < lex1->Length(); i++) {
-    EXPECT_EQ(lex1->At(i)->Key(), lex2->At(i)->Key());
-    EXPECT_EQ(lex1->At(i)->NumValues(), lex2->At(i)->NumValues());
-  }
+    // Compare every entry
+    EXPECT_EQ(lex1->Length(), lex2->Length());
+    for (size_t i = 0; i < lex1->Length(); i++)
+    {
+        EXPECT_EQ(lex1->At(i)->Key(), lex2->At(i)->Key());
+        EXPECT_EQ(lex1->At(i)->NumValues(), lex2->At(i)->NumValues());
+    }
 
-  const TextDictPtr deserializedTextDict(new TextDict(lex2));
-  TestDict(deserializedTextDict);
+    const TextDictPtr deserializedTextDict(new TextDict(lex2));
+    TestDict(deserializedTextDict);
 }
 
 } // namespace opencc

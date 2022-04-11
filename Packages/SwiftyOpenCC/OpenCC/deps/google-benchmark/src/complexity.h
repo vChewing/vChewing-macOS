@@ -23,12 +23,12 @@
 
 #include "benchmark/benchmark.h"
 
-namespace benchmark {
+namespace benchmark
+{
 
 // Return a vector containing the bigO and RMS information for the specified
 // list of reports. If 'reports.size() < 2' an empty vector is returned.
-std::vector<BenchmarkReporter::Run> ComputeBigO(
-    const std::vector<BenchmarkReporter::Run>& reports);
+std::vector<BenchmarkReporter::Run> ComputeBigO(const std::vector<BenchmarkReporter::Run> &reports);
 
 // This data structure will contain the result returned by MinimalLeastSq
 //   - coef        : Estimated coeficient for the high-order term as
@@ -39,17 +39,20 @@ std::vector<BenchmarkReporter::Run> ComputeBigO(
 //                   the same value. In case BigO::oAuto has been selected, this
 //                   parameter will return the best fitting curve detected.
 
-struct LeastSq {
-  LeastSq() : coef(0.0), rms(0.0), complexity(oNone) {}
+struct LeastSq
+{
+    LeastSq() : coef(0.0), rms(0.0), complexity(oNone)
+    {
+    }
 
-  double coef;
-  double rms;
-  BigO complexity;
+    double coef;
+    double rms;
+    BigO complexity;
 };
 
 // Function to return an string for the calculated complexity
 std::string GetBigOString(BigO complexity);
 
-}  // end namespace benchmark
+} // end namespace benchmark
 
-#endif  // COMPLEXITY_H_
+#endif // COMPLEXITY_H_

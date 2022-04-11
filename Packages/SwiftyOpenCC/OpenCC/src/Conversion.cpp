@@ -21,31 +21,39 @@
 
 using namespace opencc;
 
-std::string Conversion::Convert(const char* phrase) const {
-  std::ostringstream buffer;
-  for (const char* pstr = phrase; *pstr != '\0';) {
-    Optional<const DictEntry*> matched = dict->MatchPrefix(pstr);
-    size_t matchedLength;
-    if (matched.IsNull()) {
-      matchedLength = UTF8Util::NextCharLength(pstr);
-      buffer << UTF8Util::FromSubstr(pstr, matchedLength);
-    } else {
-      matchedLength = matched.Get()->KeyLength();
-      buffer << matched.Get()->GetDefault();
+std::string Conversion::Convert(const char *phrase) const
+{
+    std::ostringstream buffer;
+    for (const char *pstr = phrase; *pstr != '\0';)
+    {
+        Optional<const DictEntry *> matched = dict->MatchPrefix(pstr);
+        size_t matchedLength;
+        if (matched.IsNull())
+        {
+            matchedLength = UTF8Util::NextCharLength(pstr);
+            buffer << UTF8Util::FromSubstr(pstr, matchedLength);
+        }
+        else
+        {
+            matchedLength = matched.Get()->KeyLength();
+            buffer << matched.Get()->GetDefault();
+        }
+        pstr += matchedLength;
     }
-    pstr += matchedLength;
-  }
-  return buffer.str();
+    return buffer.str();
 }
 
-std::string Conversion::Convert(const std::string& phrase) const {
-  return Convert(phrase.c_str());
+std::string Conversion::Convert(const std::string &phrase) const
+{
+    return Convert(phrase.c_str());
 }
 
-SegmentsPtr Conversion::Convert(const SegmentsPtr& input) const {
-  SegmentsPtr output(new Segments);
-  for (const char* segment : *input) {
-    output->AddSegment(Convert(segment));
-  }
-  return output;
+SegmentsPtr Conversion::Convert(const SegmentsPtr &input) const
+{
+    SegmentsPtr output(new Segments);
+    for (const char *segment : *input)
+    {
+        output->AddSegment(Convert(segment));
+    }
+    return output;
 }

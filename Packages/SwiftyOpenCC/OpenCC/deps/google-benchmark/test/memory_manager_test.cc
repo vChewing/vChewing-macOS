@@ -4,18 +4,24 @@
 #include "benchmark/benchmark.h"
 #include "output_test.h"
 
-class TestMemoryManager : public benchmark::MemoryManager {
-  void Start() {}
-  void Stop(Result* result) {
-    result->num_allocs = 42;
-    result->max_bytes_used = 42000;
-  }
+class TestMemoryManager : public benchmark::MemoryManager
+{
+    void Start()
+    {
+    }
+    void Stop(Result *result)
+    {
+        result->num_allocs = 42;
+        result->max_bytes_used = 42000;
+    }
 };
 
-void BM_empty(benchmark::State& state) {
-  for (auto _ : state) {
-    benchmark::DoNotOptimize(state.iterations());
-  }
+void BM_empty(benchmark::State &state)
+{
+    for (auto _ : state)
+    {
+        benchmark::DoNotOptimize(state.iterations());
+    }
 }
 BENCHMARK(BM_empty);
 
@@ -35,10 +41,11 @@ ADD_CASES(TC_JSONOut, {{"\"name\": \"BM_empty\",$"},
                        {"}", MR_Next}});
 ADD_CASES(TC_CSVOut, {{"^\"BM_empty\",%csv_report$"}});
 
-int main(int argc, char* argv[]) {
-  std::unique_ptr<benchmark::MemoryManager> mm(new TestMemoryManager());
+int main(int argc, char *argv[])
+{
+    std::unique_ptr<benchmark::MemoryManager> mm(new TestMemoryManager());
 
-  benchmark::RegisterMemoryManager(mm.get());
-  RunOutputTests(argc, argv);
-  benchmark::RegisterMemoryManager(nullptr);
+    benchmark::RegisterMemoryManager(mm.get());
+    RunOutputTests(argc, argv);
+    benchmark::RegisterMemoryManager(nullptr);
 }

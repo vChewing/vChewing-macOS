@@ -21,47 +21,64 @@
 #include "Common.hpp"
 #include "DictEntry.hpp"
 
-namespace opencc {
+namespace opencc
+{
 /**
  * Storage of all entries
  * @ingroup opencc_cpp_api
  */
-class OPENCC_EXPORT Lexicon {
-public:
-  Lexicon() {}
-  Lexicon(std::vector<std::unique_ptr<DictEntry>> entries_)
-      : entries(std::move(entries_)) {}
-  Lexicon(const Lexicon&) = delete;
-  Lexicon& operator=(const Lexicon&) = delete;
+class OPENCC_EXPORT Lexicon
+{
+  public:
+    Lexicon()
+    {
+    }
+    Lexicon(std::vector<std::unique_ptr<DictEntry>> entries_) : entries(std::move(entries_))
+    {
+    }
+    Lexicon(const Lexicon &) = delete;
+    Lexicon &operator=(const Lexicon &) = delete;
 
-  // Lexicon will take the ownership of the entry.
-  void Add(DictEntry* entry) { entries.emplace_back(entry); }
+    // Lexicon will take the ownership of the entry.
+    void Add(DictEntry *entry)
+    {
+        entries.emplace_back(entry);
+    }
 
-  void Add(std::unique_ptr<DictEntry> entry) {
-    entries.push_back(std::move(entry));
-  }
+    void Add(std::unique_ptr<DictEntry> entry)
+    {
+        entries.push_back(std::move(entry));
+    }
 
-  void Sort();
+    void Sort();
 
-  // Returns true if the lexicon is sorted by key.
-  bool IsSorted();
+    // Returns true if the lexicon is sorted by key.
+    bool IsSorted();
 
-  // Returns true if every key unique (after sorted).
-  bool IsUnique();
+    // Returns true if every key unique (after sorted).
+    bool IsUnique();
 
-  const DictEntry* At(size_t index) const { return entries.at(index).get(); }
+    const DictEntry *At(size_t index) const
+    {
+        return entries.at(index).get();
+    }
 
-  size_t Length() const { return entries.size(); }
+    size_t Length() const
+    {
+        return entries.size();
+    }
 
-  std::vector<std::unique_ptr<DictEntry>>::const_iterator begin() const {
-    return entries.begin();
-  }
+    std::vector<std::unique_ptr<DictEntry>>::const_iterator begin() const
+    {
+        return entries.begin();
+    }
 
-  std::vector<std::unique_ptr<DictEntry>>::const_iterator end() const {
-    return entries.end();
-  }
+    std::vector<std::unique_ptr<DictEntry>>::const_iterator end() const
+    {
+        return entries.end();
+    }
 
-private:
-  std::vector<std::unique_ptr<DictEntry>> entries;
+  private:
+    std::vector<std::unique_ptr<DictEntry>> entries;
 };
 } // namespace opencc

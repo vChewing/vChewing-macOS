@@ -27,7 +27,6 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 // This program is meant to be run by gtest_test_filter_test.py.  Do not run
 // it directly.
 
@@ -36,8 +35,11 @@
 // These tests are used to detect if filtering is working. Only
 // 'TestThatSucceeds' should ever run.
 
-TEST(TestFilterTest, TestThatSucceeds) {}
+TEST(TestFilterTest, TestThatSucceeds)
+{
+}
 
-TEST(TestFilterTest, TestThatFails) {
-  ASSERT_TRUE(false) << "This test should never be run.";
+TEST(TestFilterTest, TestThatFails)
+{
+    ASSERT_TRUE(false) << "This test should never be run.";
 }

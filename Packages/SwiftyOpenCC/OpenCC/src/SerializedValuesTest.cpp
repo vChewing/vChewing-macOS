@@ -19,33 +19,35 @@
 #include "SerializedValues.hpp"
 #include "TextDictTestBase.hpp"
 
-namespace opencc {
+namespace opencc
+{
 
-class SerializedValuesTest : public TextDictTestBase {
-protected:
-  SerializedValuesTest()
-      : binDict(new SerializedValues(textDict->GetLexicon())),
-        fileName("dict.bin"){};
+class SerializedValuesTest : public TextDictTestBase
+{
+  protected:
+    SerializedValuesTest() : binDict(new SerializedValues(textDict->GetLexicon())), fileName("dict.bin"){};
 
-  const std::shared_ptr<SerializedValues> binDict;
-  const std::string fileName;
+    const std::shared_ptr<SerializedValues> binDict;
+    const std::string fileName;
 };
 
-TEST_F(SerializedValuesTest, Serialization) {
-  binDict->opencc::SerializableDict::SerializeToFile(fileName);
+TEST_F(SerializedValuesTest, Serialization)
+{
+    binDict->opencc::SerializableDict::SerializeToFile(fileName);
 }
 
-TEST_F(SerializedValuesTest, Deserialization) {
-  const std::shared_ptr<SerializedValues>& deserialized =
-      SerializableDict::NewFromFile<SerializedValues>(fileName);
-  const LexiconPtr& lex1 = binDict->GetLexicon();
-  const LexiconPtr& lex2 = deserialized->GetLexicon();
+TEST_F(SerializedValuesTest, Deserialization)
+{
+    const std::shared_ptr<SerializedValues> &deserialized = SerializableDict::NewFromFile<SerializedValues>(fileName);
+    const LexiconPtr &lex1 = binDict->GetLexicon();
+    const LexiconPtr &lex2 = deserialized->GetLexicon();
 
-  // Compare every entry
-  EXPECT_EQ(lex1->Length(), lex2->Length());
-  for (size_t i = 0; i < lex1->Length(); i++) {
-    EXPECT_EQ(lex1->At(i)->NumValues(), lex2->At(i)->NumValues());
-  }
+    // Compare every entry
+    EXPECT_EQ(lex1->Length(), lex2->Length());
+    for (size_t i = 0; i < lex1->Length(); i++)
+    {
+        EXPECT_EQ(lex1->At(i)->NumValues(), lex2->At(i)->NumValues());
+    }
 }
 
 } // namespace opencc

@@ -21,31 +21,37 @@
 #include "Common.hpp"
 #include "Segmentation.hpp"
 
-namespace opencc {
+namespace opencc
+{
 /**
  * Controller of segmentation and conversion
  * @ingroup opencc_cpp_api
  */
-class OPENCC_EXPORT Converter {
-public:
-  Converter(const std::string& _name, SegmentationPtr _segmentation,
-            ConversionChainPtr _conversionChain)
-      : name(_name), segmentation(_segmentation),
-        conversionChain(_conversionChain) {}
+class OPENCC_EXPORT Converter
+{
+  public:
+    Converter(const std::string &_name, SegmentationPtr _segmentation, ConversionChainPtr _conversionChain)
+        : name(_name), segmentation(_segmentation), conversionChain(_conversionChain)
+    {
+    }
 
-  std::string Convert(const std::string& text) const;
+    std::string Convert(const std::string &text) const;
 
-  size_t Convert(const char* input, char* output) const;
+    size_t Convert(const char *input, char *output) const;
 
-  const SegmentationPtr GetSegmentation() const { return segmentation; }
+    const SegmentationPtr GetSegmentation() const
+    {
+        return segmentation;
+    }
 
-  const ConversionChainPtr GetConversionChain() const {
-    return conversionChain;
-  }
+    const ConversionChainPtr GetConversionChain() const
+    {
+        return conversionChain;
+    }
 
-private:
-  const std::string name;
-  const SegmentationPtr segmentation;
-  const ConversionChainPtr conversionChain;
+  private:
+    const std::string name;
+    const SegmentationPtr segmentation;
+    const ConversionChainPtr conversionChain;
 };
 } // namespace opencc

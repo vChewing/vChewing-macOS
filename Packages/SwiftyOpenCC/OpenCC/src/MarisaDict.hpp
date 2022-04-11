@@ -21,43 +21,43 @@
 #include "Common.hpp"
 #include "SerializableDict.hpp"
 
-namespace opencc {
+namespace opencc
+{
 /**
  * Darts dictionary
  * @ingroup opencc_cpp_api
  */
-class OPENCC_EXPORT MarisaDict : public Dict, public SerializableDict {
-public:
-  virtual ~MarisaDict();
+class OPENCC_EXPORT MarisaDict : public Dict, public SerializableDict
+{
+  public:
+    virtual ~MarisaDict();
 
-  virtual size_t KeyMaxLength() const;
+    virtual size_t KeyMaxLength() const;
 
-  virtual Optional<const DictEntry*> Match(const char* word, size_t len) const;
+    virtual Optional<const DictEntry *> Match(const char *word, size_t len) const;
 
-  virtual Optional<const DictEntry*> MatchPrefix(const char* word,
-                                                 size_t len) const;
+    virtual Optional<const DictEntry *> MatchPrefix(const char *word, size_t len) const;
 
-  virtual std::vector<const DictEntry*> MatchAllPrefixes(const char* word,
-                                                         size_t len) const;
+    virtual std::vector<const DictEntry *> MatchAllPrefixes(const char *word, size_t len) const;
 
-  virtual LexiconPtr GetLexicon() const;
+    virtual LexiconPtr GetLexicon() const;
 
-  virtual void SerializeToFile(FILE* fp) const;
+    virtual void SerializeToFile(FILE *fp) const;
 
-  /**
-   * Constructs a MarisaDict from another dictionary.
-   */
-  static MarisaDictPtr NewFromDict(const Dict& thatDict);
+    /**
+     * Constructs a MarisaDict from another dictionary.
+     */
+    static MarisaDictPtr NewFromDict(const Dict &thatDict);
 
-  static MarisaDictPtr NewFromFile(FILE* fp);
+    static MarisaDictPtr NewFromFile(FILE *fp);
 
-private:
-  MarisaDict();
+  private:
+    MarisaDict();
 
-  size_t maxLength;
-  LexiconPtr lexicon;
+    size_t maxLength;
+    LexiconPtr lexicon;
 
-  class MarisaInternal;
-  std::unique_ptr<MarisaInternal> internal;
+    class MarisaInternal;
+    std::unique_ptr<MarisaInternal> internal;
 };
 } // namespace opencc

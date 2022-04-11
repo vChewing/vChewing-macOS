@@ -27,18 +27,19 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #include "gtest/gtest.h"
 
 // Tests that we don't have to define main() when we link to
 // gtest_main instead of gtest.
 
-namespace {
+namespace
+{
 
-TEST(GTestMainTest, ShouldSucceed) {
+TEST(GTestMainTest, ShouldSucceed)
+{
 }
 
-}  // namespace
+} // namespace
 
 // We are using the main() function defined in gtest_main.cc, so we
 // don't define it here.

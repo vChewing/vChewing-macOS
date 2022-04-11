@@ -32,7 +32,8 @@
 #include "Optional.hpp"
 
 // Forward decalarations and alias
-namespace opencc {
+namespace opencc
+{
 class Config;
 class Conversion;
 class ConversionChain;

@@ -21,92 +21,115 @@
 #include "Common.hpp"
 #include "gtest/gtest.h"
 
-namespace opencc {
+namespace opencc
+{
 
-class CommandLineConvertTest : public ::testing::Test {
-protected:
-  CommandLineConvertTest() { GetCurrentWorkingDirectory(); }
+class CommandLineConvertTest : public ::testing::Test
+{
+  protected:
+    CommandLineConvertTest()
+    {
+        GetCurrentWorkingDirectory();
+    }
 
-  virtual ~CommandLineConvertTest() { free(originalWorkingDirectory); }
+    virtual ~CommandLineConvertTest()
+    {
+        free(originalWorkingDirectory);
+    }
 
-  virtual void SetUp() {
-    ASSERT_NE("", PROJECT_BINARY_DIR);
-    ASSERT_NE("", CMAKE_SOURCE_DIR);
-    ASSERT_EQ(0, chdir(PROJECT_BINARY_DIR "/data"));
-  }
+    virtual void SetUp()
+    {
+        ASSERT_NE("", PROJECT_BINARY_DIR);
+        ASSERT_NE("", CMAKE_SOURCE_DIR);
+        ASSERT_EQ(0, chdir(PROJECT_BINARY_DIR "/data"));
+    }
 
-  virtual void TearDown() { ASSERT_EQ(0, chdir(originalWorkingDirectory)); }
+    virtual void TearDown()
+    {
+        ASSERT_EQ(0, chdir(originalWorkingDirectory));
+    }
 
-  std::string GetFileContents(const std::string& fileName) const {
-    std::ifstream fs(fileName);
-    EXPECT_TRUE(fs.is_open());
-    const std::string content((std::istreambuf_iterator<char>(fs)),
-                              (std::istreambuf_iterator<char>()));
-    fs.close();
-    return content;
-  }
+    std::string GetFileContents(const std::string &fileName) const
+    {
+        std::ifstream fs(fileName);
+        EXPECT_TRUE(fs.is_open());
+        const std::string content((std::istreambuf_iterator<char>(fs)), (std::istreambuf_iterator<char>()));
+        fs.close();
+        return content;
+    }
 
-  void GetCurrentWorkingDirectory() {
-    originalWorkingDirectory = getcwd(nullptr, 0);
-  }
+    void GetCurrentWorkingDirectory()
+    {
+        originalWorkingDirectory = getcwd(nullptr, 0);
+    }
 
-  const char* OpenccCommand() const {
+    const char *OpenccCommand() const
+    {
 #ifndef _MSC_VER
-    return PROJECT_BINARY_DIR "/src/tools/opencc";
+        return PROJECT_BINARY_DIR "/src/tools/opencc";
 #else
 #ifdef NDEBUG
-    return PROJECT_BINARY_DIR "/src/tools/Release/opencc.exe";
+        return PROJECT_BINARY_DIR "/src/tools/Release/opencc.exe";
 #else
-    return PROJECT_BINARY_DIR "/src/tools/Debug/opencc.exe";
+        return PROJECT_BINARY_DIR "/src/tools/Debug/opencc.exe";
 #endif
 #endif
-  }
+    }
 
-  const char* InputDirectory() const {
-    return CMAKE_SOURCE_DIR "/test/testcases/";
-  }
+    const char *InputDirectory() const
+    {
+        return CMAKE_SOURCE_DIR "/test/testcases/";
+    }
 
-  const char* OutputDirectory() const { return PROJECT_BINARY_DIR "/test/"; }
+    const char *OutputDirectory() const
+    {
+        return PROJECT_BINARY_DIR "/test/";
+    }
 
-  const char* AnswerDirectory() const {
-    return CMAKE_SOURCE_DIR "/test/testcases/";
-  }
+    const char *AnswerDirectory() const
+    {
+        return CMAKE_SOURCE_DIR "/test/testcases/";
+    }
 
-  const char* ConfigurationDirectory() const {
-    return CMAKE_SOURCE_DIR "/data/config/";
-  }
+    const char *ConfigurationDirectory() const
+    {
+        return CMAKE_SOURCE_DIR "/data/config/";
+    }
 
-  std::string OutputFile(const char* config) const {
-    return std::string(OutputDirectory()) + config + ".out";
-  }
+    std::string OutputFile(const char *config) const
+    {
+        return std::string(OutputDirectory()) + config + ".out";
+    }
 
-  std::string AnswerFile(const char* config) const {
-    return std::string(AnswerDirectory()) + config + ".ans";
-  }
+    std::string AnswerFile(const char *config) const
+    {
+        return std::string(AnswerDirectory()) + config + ".ans";
+    }
 
-  std::string TestCommand(const char* config) const {
-    return OpenccCommand() + std::string("") + " -i " + InputDirectory() +
-           config + ".in" + " -o " + OutputFile(config) + " -c " +
-           ConfigurationDirectory() + config + ".json";
-  }
+    std::string TestCommand(const char *config) const
+    {
+        return OpenccCommand() + std::string("") + " -i " + InputDirectory() + config + ".in" + " -o " +
+               OutputFile(config) + " -c " + ConfigurationDirectory() + config + ".json";
+    }
 
-  char* originalWorkingDirectory;
+    char *originalWorkingDirectory;
 };
 
-class ConfigurationTest : public CommandLineConvertTest,
-                          public ::testing::WithParamInterface<const char*> {};
+class ConfigurationTest : public CommandLineConvertTest, public ::testing::WithParamInterface<const char *>
+{
+};
 
-TEST_P(ConfigurationTest, Convert) {
-  const char* config = GetParam();
-  ASSERT_EQ(0, system(TestCommand(config).c_str()));
-  const std::string& output = GetFileContents(OutputFile(config));
-  const std::string& answer = GetFileContents(AnswerFile(config));
-  ASSERT_EQ(answer, output);
+TEST_P(ConfigurationTest, Convert)
+{
+    const char *config = GetParam();
+    ASSERT_EQ(0, system(TestCommand(config).c_str()));
+    const std::string &output = GetFileContents(OutputFile(config));
+    const std::string &answer = GetFileContents(AnswerFile(config));
+    ASSERT_EQ(answer, output);
 }
 
 INSTANTIATE_TEST_CASE_P(CommandLine, ConfigurationTest,
-                        ::testing::Values("hk2s", "hk2t", "jp2t", "s2hk", "s2t",
-                                          "s2tw", "s2twp", "t2hk", "t2jp",
-                                          "t2s", "tw2s", "tw2sp", "tw2t"));
+                        ::testing::Values("hk2s", "hk2t", "jp2t", "s2hk", "s2t", "s2tw", "s2twp", "t2hk", "t2jp", "t2s",
+                                          "tw2s", "tw2sp", "tw2t"));
 
 } // namespace opencc

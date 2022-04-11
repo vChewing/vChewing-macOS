@@ -1,14 +1,15 @@
 #ifndef BENCHMARK_STRING_UTIL_H_
 #define BENCHMARK_STRING_UTIL_H_
 
+#include "internal_macros.h"
 #include <sstream>
 #include <string>
 #include <utility>
-#include "internal_macros.h"
 
-namespace benchmark {
+namespace benchmark
+{
 
-void AppendHumanReadable(int n, std::string* str);
+void AppendHumanReadable(int n, std::string *str);
 
 std::string HumanReadableNumber(double n, double one_k = 1024.0);
 
@@ -18,23 +19,24 @@ __attribute__((format(__MINGW_PRINTF_FORMAT, 1, 2)))
 __attribute__((format(printf, 1, 2)))
 #endif
 std::string
-StrFormat(const char* format, ...);
+StrFormat(const char *format, ...);
 
-inline std::ostream& StrCatImp(std::ostream& out) BENCHMARK_NOEXCEPT {
-  return out;
+inline std::ostream &StrCatImp(std::ostream &out) BENCHMARK_NOEXCEPT
+{
+    return out;
 }
 
-template <class First, class... Rest>
-inline std::ostream& StrCatImp(std::ostream& out, First&& f, Rest&&... rest) {
-  out << std::forward<First>(f);
-  return StrCatImp(out, std::forward<Rest>(rest)...);
+template <class First, class... Rest> inline std::ostream &StrCatImp(std::ostream &out, First &&f, Rest &&...rest)
+{
+    out << std::forward<First>(f);
+    return StrCatImp(out, std::forward<Rest>(rest)...);
 }
 
-template <class... Args>
-inline std::string StrCat(Args&&... args) {
-  std::ostringstream ss;
-  StrCatImp(ss, std::forward<Args>(args)...);
-  return ss.str();
+template <class... Args> inline std::string StrCat(Args &&...args)
+{
+    std::ostringstream ss;
+    StrCatImp(ss, std::forward<Args>(args)...);
+    return ss.str();
 }
 
 #ifdef BENCHMARK_STL_ANDROID_GNUSTL
@@ -44,16 +46,15 @@ inline std::string StrCat(Args&&... args) {
  * strtol, strtod. Note that reimplemented functions are in benchmark::
  * namespace, not std:: namespace.
  */
-unsigned long stoul(const std::string& str, size_t* pos = nullptr,
-                           int base = 10);
-int stoi(const std::string& str, size_t* pos = nullptr, int base = 10);
-double stod(const std::string& str, size_t* pos = nullptr);
+unsigned long stoul(const std::string &str, size_t *pos = nullptr, int base = 10);
+int stoi(const std::string &str, size_t *pos = nullptr, int base = 10);
+double stod(const std::string &str, size_t *pos = nullptr);
 #else
-using std::stoul;
-using std::stoi;
 using std::stod;
+using std::stoi;
+using std::stoul;
 #endif
 
-}  // end namespace benchmark
+} // end namespace benchmark
 
-#endif  // BENCHMARK_STRING_UTIL_H_
+#endif // BENCHMARK_STRING_UTIL_H_

@@ -19,24 +19,29 @@
 #include <algorithm>
 
 #include "Lexicon.hpp"
-namespace opencc {
+namespace opencc
+{
 
-void Lexicon::Sort() {
-  std::sort(entries.begin(), entries.end(), DictEntry::UPtrLessThan);
+void Lexicon::Sort()
+{
+    std::sort(entries.begin(), entries.end(), DictEntry::UPtrLessThan);
 }
 
-bool Lexicon::IsSorted() {
-  return std::is_sorted(entries.begin(), entries.end(),
-                        DictEntry::UPtrLessThan);
+bool Lexicon::IsSorted()
+{
+    return std::is_sorted(entries.begin(), entries.end(), DictEntry::UPtrLessThan);
 }
 
-bool Lexicon::IsUnique() {
-  for (size_t i = 1; i < entries.size(); ++i) {
-    if (entries[i - 1]->Key() == entries[i]->Key()) {
-      return false;
+bool Lexicon::IsUnique()
+{
+    for (size_t i = 1; i < entries.size(); ++i)
+    {
+        if (entries[i - 1]->Key() == entries[i]->Key())
+        {
+            return false;
+        }
     }
-  }
-  return true;
+    return true;
 }
 
 } // namespace opencc
