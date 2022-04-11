@@ -333,3 +333,12 @@ extension String: Error {}
 extension String: LocalizedError {
 	public var errorDescription: String? { return self }
 }
+
+// MARK: - Ensuring trailing slash of a string:
+extension String {
+	mutating func ensureTrailingSlash() {
+		if !self.hasSuffix("/") {
+			self += "/"
+		}
+	}
+}
