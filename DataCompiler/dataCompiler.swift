@@ -40,11 +40,6 @@ extension String {
 	}
 }
 
-private func getDocumentsDirectory() -> URL {
-	let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-	return paths[0]
-}
-
 // MARK: - 引入小數點位數控制函數
 // Ref: https://stackoverflow.com/a/32581409/4162914
 extension Float {
