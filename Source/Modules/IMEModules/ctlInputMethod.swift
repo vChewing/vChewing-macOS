@@ -245,8 +245,8 @@ extension ctlInputMethod {
 			commit(text: previous.composingBuffer, client: client)
 		}
 		(client as? IMKTextInput)?.setMarkedText(
-			"", selectionRange: NSMakeRange(0, 0),
-			replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+			"", selectionRange: NSRange(location: 0, length: 0),
+			replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
 	}
 
 	private func handle(state: InputState.Empty, previous: InputState, client: Any?) {
@@ -261,8 +261,8 @@ extension ctlInputMethod {
 			commit(text: previous.composingBuffer, client: client)
 		}
 		client.setMarkedText(
-			"", selectionRange: NSMakeRange(0, 0),
-			replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+			"", selectionRange: NSRange(location: 0, length: 0),
+			replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
 	}
 
 	private func handle(
@@ -276,8 +276,8 @@ extension ctlInputMethod {
 		}
 
 		client.setMarkedText(
-			"", selectionRange: NSMakeRange(0, 0),
-			replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+			"", selectionRange: NSRange(location: 0, length: 0),
+			replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
 	}
 
 	private func handle(state: InputState.Committing, previous: InputState, client: Any?) {
@@ -293,8 +293,8 @@ extension ctlInputMethod {
 			commit(text: poppedText, client: client)
 		}
 		client.setMarkedText(
-			"", selectionRange: NSMakeRange(0, 0),
-			replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+			"", selectionRange: NSRange(location: 0, length: 0),
+			replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
 	}
 
 	private func handle(state: InputState.Inputting, previous: InputState, client: Any?) {
@@ -313,8 +313,8 @@ extension ctlInputMethod {
 		// the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
 		// i.e. the client app needs to take care of where to put this composing buffer
 		client.setMarkedText(
-			state.attributedString, selectionRange: NSMakeRange(Int(state.cursorIndex), 0),
-			replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+			state.attributedString, selectionRange: NSRange(location: Int(state.cursorIndex), length: 0),
+			replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
 		if !state.tooltip.isEmpty {
 			show(
 				tooltip: state.tooltip, composingBuffer: state.composingBuffer,
@@ -332,8 +332,8 @@ extension ctlInputMethod {
 		// the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
 		// i.e. the client app needs to take care of where to put this composing buffer
 		client.setMarkedText(
-			state.attributedString, selectionRange: NSMakeRange(Int(state.cursorIndex), 0),
-			replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+			state.attributedString, selectionRange: NSRange(location: Int(state.cursorIndex), length: 0),
+			replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
 
 		if state.tooltip.isEmpty {
 			hideTooltip()
@@ -354,8 +354,8 @@ extension ctlInputMethod {
 		// the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
 		// i.e. the client app needs to take care of where to put this composing buffer
 		client.setMarkedText(
-			state.attributedString, selectionRange: NSMakeRange(Int(state.cursorIndex), 0),
-			replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+			state.attributedString, selectionRange: NSRange(location: Int(state.cursorIndex), length: 0),
+			replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
 		show(candidateWindowWith: state, client: client)
 	}
 
@@ -366,8 +366,8 @@ extension ctlInputMethod {
 			return
 		}
 		client.setMarkedText(
-			"", selectionRange: NSMakeRange(0, 0),
-			replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+			"", selectionRange: NSRange(location: 0, length: 0),
+			replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
 		show(candidateWindowWith: state, client: client)
 	}
 }
@@ -455,7 +455,7 @@ extension ctlInputMethod {
 
 		ctlCandidateCurrent?.visible = true
 
-		var lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0)
+		var lineHeightRect = NSRect(x: 0.0, y: 0.0, width: 16.0, height: 16.0)
 		var cursor: Int = 0
 
 		if let state = state as? InputState.ChoosingCandidate {
@@ -473,20 +473,18 @@ extension ctlInputMethod {
 
 		if useVerticalMode {
 			ctlCandidateCurrent?.set(
-				windowTopLeftPoint: NSMakePoint(
-					lineHeightRect.origin.x + lineHeightRect.size.width + 4.0,
-					lineHeightRect.origin.y - 4.0),
+				windowTopLeftPoint: NSPoint(
+					x: lineHeightRect.origin.x + lineHeightRect.size.width + 4.0, y: lineHeightRect.origin.y - 4.0),
 				bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0)
 		} else {
 			ctlCandidateCurrent?.set(
-				windowTopLeftPoint: NSMakePoint(
-					lineHeightRect.origin.x, lineHeightRect.origin.y - 4.0),
+				windowTopLeftPoint: NSPoint(x: lineHeightRect.origin.x, y: lineHeightRect.origin.y - 4.0),
 				bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0)
 		}
 	}
 
 	private func show(tooltip: String, composingBuffer: String, cursorIndex: UInt, client: Any!) {
-		var lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0)
+		var lineHeightRect = NSRect(x: 0.0, y: 0.0, width: 16.0, height: 16.0)
 		var cursor: Int = Int(cursorIndex)
 		if cursor == composingBuffer.count && cursor != 0 {
 			cursor -= 1
