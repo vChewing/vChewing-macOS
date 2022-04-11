@@ -24,7 +24,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
 
-@objc class AppleKeyboardConverter: NSObject {
+class AppleKeyboardConverter: NSObject {
 	static let arrDynamicBasicKeyLayout: [String] = [
 		"com.apple.keylayout.ZhuyinBopomofo",
 		"com.apple.keylayout.ZhuyinEten",
@@ -40,13 +40,13 @@ import Cocoa
 		"org.unknown.keylayout.vChewingMiTAC",
 	]
 	@objc class func isDynamicBasicKeyboardLayoutEnabled() -> Bool {
-		return AppleKeyboardConverter.arrDynamicBasicKeyLayout.contains(mgrPrefs.basicKeyboardLayout)
+		AppleKeyboardConverter.arrDynamicBasicKeyLayout.contains(mgrPrefs.basicKeyboardLayout)
 	}
 	// 處理 Apple 注音鍵盤佈局類型。
 	@objc class func cnvApple2ABC(_ charCode: UniChar) -> UniChar {
 		var charCode = charCode
 		// 在按鍵資訊被送往 OVMandarin 之前，先轉換為可以被 OVMandarin 正常處理的資訊。
-		if self.isDynamicBasicKeyboardLayoutEnabled() {
+		if isDynamicBasicKeyboardLayoutEnabled() {
 			// 針對不同的 Apple 動態鍵盤佈局糾正大寫英文輸入。
 			switch mgrPrefs.basicKeyboardLayout {
 				case "com.apple.keylayout.ZhuyinBopomofo":
@@ -186,7 +186,7 @@ import Cocoa
 
 	@objc class func cnvStringApple2ABC(_ strProcessed: String) -> String {
 		var strProcessed = strProcessed
-		if self.isDynamicBasicKeyboardLayoutEnabled() {
+		if isDynamicBasicKeyboardLayoutEnabled() {
 			// 針對不同的 Apple 動態鍵盤佈局糾正大寫英文輸入。
 			switch mgrPrefs.basicKeyboardLayout {
 				case "com.apple.keylayout.ZhuyinBopomofo":

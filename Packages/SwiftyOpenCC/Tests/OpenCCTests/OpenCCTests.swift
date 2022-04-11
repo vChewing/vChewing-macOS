@@ -16,7 +16,7 @@ let testCases: [(String, ChineseConverter.Options)] = [
 class OpenCCTests: XCTestCase {
 
 	func converter(option: ChineseConverter.Options) throws -> ChineseConverter {
-		return try ChineseConverter(options: option)
+		try ChineseConverter(options: option)
 	}
 
 	func testConversion() throws {

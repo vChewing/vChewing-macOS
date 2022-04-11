@@ -410,7 +410,7 @@ class InputState: NSObject {
 
 }
 
-@objc class SymbolNode: NSObject {
+class SymbolNode: NSObject {
 	@objc var title: String
 	@objc var children: [SymbolNode]?
 
@@ -422,7 +422,7 @@ class InputState: NSObject {
 
 	@objc init(_ title: String, symbols: String) {
 		self.title = title
-		self.children = Array(symbols).map { SymbolNode(String($0), nil) }
+		children = Array(symbols).map { SymbolNode(String($0), nil) }
 		super.init()
 	}
 

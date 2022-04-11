@@ -400,7 +400,7 @@ extension ctlInputMethod {
 				return true
 			}
 			candidates.sort {
-				return $0.count > $1.count
+				$0.count > $1.count
 			}
 			// If there is a candidate which is too long, we use the vertical
 			// candidate list window automatically.

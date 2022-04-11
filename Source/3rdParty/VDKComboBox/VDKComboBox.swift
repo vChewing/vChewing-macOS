@@ -18,7 +18,7 @@ struct ComboBox: NSViewRepresentable {
 	@Binding var text: String
 
 	func makeCoordinator() -> Coordinator {
-		return Coordinator(self)
+		Coordinator(self)
 	}
 
 	func makeNSView(context: Context) -> NSComboBox {

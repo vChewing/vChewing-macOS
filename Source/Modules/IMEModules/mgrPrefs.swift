@@ -81,7 +81,7 @@ private let kDefaultKeys = "123456789"
 
 @objc extension UserDefaults {
 	func setDefault(_ value: Any?, forKey defaultName: String) {
-		if self.object(forKey: defaultName) == nil {
+		if object(forKey: defaultName) == nil {
 			self.set(value, forKey: defaultName)
 		}
 	}
@@ -200,7 +200,7 @@ struct ComposingBufferSize {
 }
 
 // MARK: -
-@objc public class mgrPrefs: NSObject {
+public class mgrPrefs: NSObject {
 	static var allKeys: [String] {
 		[
 			UserDef.kIsDebugModeEnabled,
@@ -293,7 +293,7 @@ struct ComposingBufferSize {
 	@objc static var mandarinParser: Int
 
 	@objc static var mandarinParserName: String {
-		(MandarinParser(rawValue: self.mandarinParser) ?? MandarinParser.ofStandard).name
+		(MandarinParser(rawValue: mandarinParser) ?? MandarinParser.ofStandard).name
 	}
 
 	@UserDefault(
@@ -372,7 +372,7 @@ struct ComposingBufferSize {
 		chineseConversionEnabled = !chineseConversionEnabled
 		// 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
 		if chineseConversionEnabled && shiftJISShinjitaiOutputEnabled {
-			self.toggleShiftJISShinjitaiOutputEnabled()
+			toggleShiftJISShinjitaiOutputEnabled()
 			UserDefaults.standard.set(
 				shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled)
 		}
@@ -387,7 +387,7 @@ struct ComposingBufferSize {
 		shiftJISShinjitaiOutputEnabled = !shiftJISShinjitaiOutputEnabled
 		// 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
 		if shiftJISShinjitaiOutputEnabled && chineseConversionEnabled {
-			self.toggleChineseConversionEnabled()
+			toggleChineseConversionEnabled()
 		}
 		UserDefaults.standard.set(
 			shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled)

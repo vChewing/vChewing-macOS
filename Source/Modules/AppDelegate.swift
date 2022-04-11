@@ -127,13 +127,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
 
 		checkTask = VersionUpdateApi.check(forced: forced) { [self] result in
 			defer {
-				self.checkTask = nil
+				checkTask = nil
 			}
 			switch result {
 				case .success(let apiResult):
 					switch apiResult {
 						case .shouldUpdate(let report):
-							self.updateNextStepURL = report.siteUrl
+							updateNextStepURL = report.siteUrl
 							let content = String(
 								format: NSLocalizedString(
 									"You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@",
@@ -144,7 +144,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
 								report.remoteVersion,
 								report.versionDescription)
 							IME.prtDebugIntel("vChewingDebug: \(content)")
-							self.currentAlertType = "Update"
+							currentAlertType = "Update"
 							ctlNonModalAlertWindow.shared.show(
 								title: NSLocalizedString(
 									"New Version Available", comment: ""),
@@ -170,7 +170,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
 									comment: ""), message)
 							let buttonTitle = NSLocalizedString("Dismiss", comment: "")
 							IME.prtDebugIntel("vChewingDebug: \(content)")
-							self.currentAlertType = "Update"
+							currentAlertType = "Update"
 							ctlNonModalAlertWindow.shared.show(
 								title: title, content: content,
 								confirmButtonTitle: buttonTitle,
@@ -185,7 +185,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
 	}
 
 	func selfUninstall() {
-		self.currentAlertType = "Uninstall"
+		currentAlertType = "Uninstall"
 		let content = String(
 			format: NSLocalizedString(
 				"This will remove vChewing Input Method from this user account, requiring your confirmation.",
@@ -199,25 +199,25 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
 	}
 
 	func ctlNonModalAlertWindowDidConfirm(_ controller: ctlNonModalAlertWindow) {
-		switch self.currentAlertType {
+		switch currentAlertType {
 			case "Uninstall":
 				NSWorkspace.shared.openFile(
 					mgrLangModel.dataFolderPath(isDefaultFolder: true), withApplication: "Finder")
 				IME.uninstall(isSudo: false, selfKill: true)
 			case "Update":
-				if let updateNextStepURL = self.updateNextStepURL {
+				if let updateNextStepURL = updateNextStepURL {
 					NSWorkspace.shared.open(updateNextStepURL)
 				}
-				self.updateNextStepURL = nil
+				updateNextStepURL = nil
 			default:
 				break
 		}
 	}
 
 	func ctlNonModalAlertWindowDidCancel(_ controller: ctlNonModalAlertWindow) {
-		switch self.currentAlertType {
+		switch currentAlertType {
 			case "Update":
-				self.updateNextStepURL = nil
+				updateNextStepURL = nil
 			default:
 				break
 		}

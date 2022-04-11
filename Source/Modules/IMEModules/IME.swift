@@ -25,7 +25,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Carbon
 import Cocoa
 
-@objc public class IME: NSObject {
+public class IME: NSObject {
 	static let arrSupportedLocales = ["en", "zh-Hant", "zh-Hans", "ja"]
 	static let dlgOpenPath = NSOpenPanel()
 
@@ -34,7 +34,7 @@ import Cocoa
 
 	// MARK: - 自 ctlInputMethod 讀取當前輸入法的簡繁體模式
 	static func getInputMode() -> InputMode {
-		return ctlInputMethod.currentKeyHandler.inputMode
+		ctlInputMethod.currentKeyHandler.inputMode
 	}
 
 	// MARK: - Print debug information to the console.
@@ -333,13 +333,15 @@ extension RangeReplaceableCollection where Element: Hashable {
 // MARK: - Error Extension
 extension String: Error {}
 extension String: LocalizedError {
-	public var errorDescription: String? { return self }
+	public var errorDescription: String? {
+		self
+	}
 }
 
 // MARK: - Ensuring trailing slash of a string:
 extension String {
 	mutating func ensureTrailingSlash() {
-		if !self.hasSuffix("/") {
+		if !hasSuffix("/") {
 			self += "/"
 		}
 	}

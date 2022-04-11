@@ -78,6 +78,7 @@ extension Preferences {
 		- Parameters:
 			- bottomDivider: Whether to place a `Divider` after the section content. Default is `false`.
 			- verticalAlignement: The vertical alignment of the section content.
+			- verticalAlignment:
 			- label: A view describing preference handled by this section.
 			- content: A content view.
 		*/
@@ -103,6 +104,7 @@ extension Preferences {
 			- title: A string describing preference handled by this section.
 			- bottomDivider: Whether to place a `Divider` after the section content. Default is `false`.
 			- verticalAlignement: The vertical alignment of the section content.
+			- verticalAlignment:
 			- content: A content view.
 		*/
 		public init<Content: View>(
