@@ -22,10 +22,11 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import Carbon
 import Cocoa
 
 @objc public class IME: NSObject {
-
+	static let arrSupportedLocales = ["en", "zh-Hant", "zh-Hans", "ja"]
 	static let dlgOpenPath = NSOpenPanel()
 
 	// MARK: - 開關判定當前應用究竟是？
@@ -84,7 +85,9 @@ import Cocoa
 	// MARK: - Open a phrase data file.
 	static func openPhraseFile(userFileAt path: String) {
 		func checkIfUserFilesExist() -> Bool {
-			if !mgrLangModel.checkIfUserLanguageModelFilesExist() {
+			if !mgrLangModel.chkUserLMFilesExist(InputMode.imeModeCHS)
+				|| !mgrLangModel.chkUserLMFilesExist(InputMode.imeModeCHT)
+			{
 				let content = String(
 					format: NSLocalizedString(
 						"Please check the permission at \"%@\".", comment: ""),
@@ -224,4 +227,120 @@ import Cocoa
 		return 0
 	}
 
+	// MARK: - 準備枚舉系統內所有的 ASCII 鍵盤佈局
+	struct CarbonKeyboardLayout {
+		var strName: String = ""
+		var strValue: String = ""
+	}
+	static let arrWhitelistedKeyLayoutsASCII: [String] = [
+		"com.apple.keylayout.ABC",
+		"com.apple.keylayout.ABC-AZERTY",
+		"com.apple.keylayout.ABC-QWERTZ",
+		"com.apple.keylayout.British",
+		"com.apple.keylayout.Colemak",
+		"com.apple.keylayout.Dvorak",
+		"com.apple.keylayout.Dvorak-Left",
+		"com.apple.keylayout.DVORAK-QWERTYCMD",
+		"com.apple.keylayout.Dvorak-Right",
+	]
+	static var arrEnumerateSystemKeyboardLayouts: [IME.CarbonKeyboardLayout] {
+		// 提前塞入 macOS 內建的兩款動態鍵盤佈局
+		var arrKeyLayouts: [IME.CarbonKeyboardLayout] = []
+		arrKeyLayouts += [
+			IME.CarbonKeyboardLayout.init(
+				strName: NSLocalizedString("Apple Chewing - Dachen", comment: ""),
+				strValue: "com.apple.keylayout.ZhuyinBopomofo"),
+			IME.CarbonKeyboardLayout.init(
+				strName: NSLocalizedString("Apple Chewing - Eten Traditional", comment: ""),
+				strValue: "com.apple.keylayout.ZhuyinEten"),
+		]
+
+		// 準備枚舉系統內所有的 ASCII 鍵盤佈局
+		var arrKeyLayoutsMACV: [IME.CarbonKeyboardLayout] = []
+		var arrKeyLayoutsASCII: [IME.CarbonKeyboardLayout] = []
+		let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
+		for source in list {
+			if let ptrCategory = TISGetInputSourceProperty(source, kTISPropertyInputSourceCategory) {
+				let category = Unmanaged<CFString>.fromOpaque(ptrCategory).takeUnretainedValue()
+				if category != kTISCategoryKeyboardInputSource {
+					continue
+				}
+			} else {
+				continue
+			}
+
+			if let ptrASCIICapable = TISGetInputSourceProperty(
+				source, kTISPropertyInputSourceIsASCIICapable)
+			{
+				let asciiCapable = Unmanaged<CFBoolean>.fromOpaque(ptrASCIICapable)
+					.takeUnretainedValue()
+				if asciiCapable != kCFBooleanTrue {
+					continue
+				}
+			} else {
+				continue
+			}
+
+			if let ptrSourceType = TISGetInputSourceProperty(source, kTISPropertyInputSourceType) {
+				let sourceType = Unmanaged<CFString>.fromOpaque(ptrSourceType).takeUnretainedValue()
+				if sourceType != kTISTypeKeyboardLayout {
+					continue
+				}
+			} else {
+				continue
+			}
+
+			guard let ptrSourceID = TISGetInputSourceProperty(source, kTISPropertyInputSourceID),
+				let localizedNamePtr = TISGetInputSourceProperty(source, kTISPropertyLocalizedName)
+			else {
+				continue
+			}
+
+			let sourceID = String(Unmanaged<CFString>.fromOpaque(ptrSourceID).takeUnretainedValue())
+			let localizedName = String(
+				Unmanaged<CFString>.fromOpaque(localizedNamePtr).takeUnretainedValue())
+
+			if sourceID.contains("vChewing") {
+				arrKeyLayoutsMACV += [
+					IME.CarbonKeyboardLayout.init(strName: localizedName, strValue: sourceID)
+				]
+			}
+
+			if IME.arrWhitelistedKeyLayoutsASCII.contains(sourceID) {
+				arrKeyLayoutsASCII += [
+					IME.CarbonKeyboardLayout.init(strName: localizedName, strValue: sourceID)
+				]
+			}
+		}
+		arrKeyLayouts += arrKeyLayoutsMACV
+		arrKeyLayouts += arrKeyLayoutsASCII
+		return arrKeyLayouts
+	}
+
+}
+
+// MARK: - Root Extensions
+
+// Extend the RangeReplaceableCollection to allow it clean duplicated characters.
+// Ref: https://stackoverflow.com/questions/25738817/
+extension RangeReplaceableCollection where Element: Hashable {
+	var charDeDuplicate: Self {
+		var set = Set<Element>()
+		return filter { set.insert($0).inserted }
+	}
+}
+
+// MARK: - Error Extension
+extension String: Error {}
+extension String: LocalizedError {
+	public var errorDescription: String? { return self }
+}
+
+// MARK: - Ensuring trailing slash of a string:
+extension String {
+	mutating func ensureTrailingSlash() {
+		if !self.hasSuffix("/") {
+			self += "/"
+		}
+	}
 }

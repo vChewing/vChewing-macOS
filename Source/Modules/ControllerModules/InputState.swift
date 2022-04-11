@@ -243,7 +243,7 @@ class InputState: NSObject {
 			self.markerIndex = markerIndex
 			let begin = min(cursorIndex, markerIndex)
 			let end = max(cursorIndex, markerIndex)
-			markedRange = NSMakeRange(Int(begin), Int(end - begin))
+			markedRange = NSRange(location: Int(begin), length: Int(end - begin))
 			self.readings = readings
 			super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
 		}
