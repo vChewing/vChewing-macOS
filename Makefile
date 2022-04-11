@@ -25,22 +25,14 @@ VC_APP_ROOT = $(DSTROOT)/vChewing.app
 format: batchfix clang-format lint
 
 clang-format:
-	@swift-format format --in-place --configuration ./.clang-format-swift.json --recursive ./DataCompiler/
-	@swift-format format --in-place --configuration ./.clang-format-swift.json --recursive ./Installer/
-	@swift-format format --in-place --configuration ./.clang-format-swift.json --recursive ./Source/
-	@swift-format format --in-place --configuration ./.clang-format-swift.json --recursive ./UserPhraseEditor/
-	@find ./Installer/ -iname '*.h' -o -iname '*.m' | xargs clang-format -i -style=Microsoft
-	@find ./Source/3rdParty/OVMandarin -iname '*.h' -o -iname '*.cpp' -o -iname '*.mm' -o -iname '*.m' | xargs clang-format -i -style=Microsoft
-	@find ./Source/Modules/ -iname '*.h' -o -iname '*.cpp' -o -iname '*.mm' -o -iname '*.m' | xargs clang-format -i -style=Microsoft
+	@git ls-files --exclude-standard | grep -E '\.swift$$' | xargs swift-format format --in-place --configuration ./.clang-format-swift.json --parallel
+	@git ls-files --exclude-standard | grep -E '\.(cpp|hpp|c|cc|cxx|hxx|ixx|h|m|mm|hh)$$' | xargs clang-format -i -style=Microsoft
 
 lint:
-	@swift-format lint --configuration ./.clang-format-swift.json --recursive --parallel ./DataCompiler/
-	@swift-format lint --configuration ./.clang-format-swift.json --recursive --parallel ./Installer/
-	@swift-format lint --configuration ./.clang-format-swift.json --recursive --parallel ./Source/
-	@swift-format lint --configuration ./.clang-format-swift.json --recursive --parallel ./UserPhraseEditor/
+	@git ls-files --exclude-standard | grep -E '\.swift$$' | xargs swift-format lint --configuration ./.clang-format-swift.json --parallel 
 
 batchfix:
-	@swiftlint --fix ./
+	@git ls-files --exclude-standard | grep -E '\.swift$$' | swiftlint --fix --autocorrect
 
 .PHONY: permission-check install-debug install-release
 
