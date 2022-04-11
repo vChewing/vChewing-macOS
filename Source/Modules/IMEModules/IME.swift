@@ -327,3 +327,9 @@ extension RangeReplaceableCollection where Element: Hashable {
 		return filter { set.insert($0).inserted }
 	}
 }
+
+// MARK: - Error Extension
+extension String: Error {}
+extension String: LocalizedError {
+	public var errorDescription: String? { return self }
+}
