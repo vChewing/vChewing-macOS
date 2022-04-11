@@ -30,7 +30,7 @@ extension ChineseConverter {
 				throw ConversionError.fileNotFound
 			}
 			return try DictionaryLoader.dictCache.value(for: path) {
-				return try ConversionDictionary(path: path)
+				try ConversionDictionary(path: path)
 			}
 		}
 	}
@@ -44,7 +44,7 @@ extension ChineseConverter.DictionaryLoader {
 	}
 
 	func conversionChain(options: ChineseConverter.Options) throws -> [ConversionDictionary] {
-		return try options.conversionChain.compactMap { names in
+		try options.conversionChain.compactMap { names in
 			switch names.count {
 				case 0:
 					return nil

@@ -6,7 +6,7 @@
 #ifdef _MSC_VER
 // Silence MSVC C++17 deprecation warning from Catch regarding std::uncaught_exceptions (up to catch
 // 2.0.1; this should be fixed in the next catch release after 2.0.1).
-#  pragma warning(disable: 4996)
+#pragma warning(disable : 4996)
 #endif
 
 #define CATCH_CONFIG_RUNNER
@@ -14,7 +14,8 @@
 
 namespace py = pybind11;
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     py::scoped_interpreter guard{};
     auto result = Catch::Session().run(argc, argv);
 

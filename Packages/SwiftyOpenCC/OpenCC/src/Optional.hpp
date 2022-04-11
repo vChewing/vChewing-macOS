@@ -18,38 +18,53 @@
 
 #pragma once
 
-namespace opencc {
+namespace opencc
+{
 /**
  * A class that wraps type T into a nullable type.
  * @ingroup opencc_cpp_api
  */
-template <typename T> class Optional {
-public:
-  /**
-   * The constructor of Optional.
-   */
-  Optional(T actual) : isNull(false), data(actual) {}
+template <typename T> class Optional
+{
+  public:
+    /**
+     * The constructor of Optional.
+     */
+    Optional(T actual) : isNull(false), data(actual)
+    {
+    }
 
-  /**
-   * Returns true if the instance is null.
-   */
-  bool IsNull() const { return isNull; }
+    /**
+     * Returns true if the instance is null.
+     */
+    bool IsNull() const
+    {
+        return isNull;
+    }
 
-  /**
-   * Returns the containing data of the instance.
-   */
-  const T& Get() const { return data; }
+    /**
+     * Returns the containing data of the instance.
+     */
+    const T &Get() const
+    {
+        return data;
+    }
 
-  /**
-   * Constructs a null instance.
-   */
-  static Optional<T> Null() { return Optional(); }
+    /**
+     * Constructs a null instance.
+     */
+    static Optional<T> Null()
+    {
+        return Optional();
+    }
 
-private:
-  Optional() : isNull(true) {}
+  private:
+    Optional() : isNull(true)
+    {
+    }
 
-  bool isNull;
-  T data;
+    bool isNull;
+    T data;
 };
 
 /**
@@ -57,20 +72,34 @@ private:
  *
  * Reduce a bool.
  */
-template <typename T> class Optional<T*> {
-private:
-  Optional() : data(nullptr) {}
+template <typename T> class Optional<T *>
+{
+  private:
+    Optional() : data(nullptr)
+    {
+    }
 
-  typedef T* TPtr;
-  TPtr data;
+    typedef T *TPtr;
+    TPtr data;
 
-public:
-  Optional(TPtr actual) : data(actual) {}
+  public:
+    Optional(TPtr actual) : data(actual)
+    {
+    }
 
-  bool IsNull() const { return data == nullptr; }
+    bool IsNull() const
+    {
+        return data == nullptr;
+    }
 
-  const TPtr& Get() const { return data; }
+    const TPtr &Get() const
+    {
+        return data;
+    }
 
-  static Optional<TPtr> Null() { return Optional(); }
+    static Optional<TPtr> Null()
+    {
+        return Optional();
+    }
 };
 } // namespace opencc

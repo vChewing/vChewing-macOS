@@ -7,17 +7,20 @@
 #endif
 #include <cassert>
 
-void BM_basic(benchmark::State& state) {
-  for (auto _ : state) {
-  }
+void BM_basic(benchmark::State &state)
+{
+    for (auto _ : state)
+    {
+    }
 }
 
-void BM_basic_slow(benchmark::State& state) {
-  std::chrono::milliseconds sleep_duration(state.range(0));
-  for (auto _ : state) {
-    std::this_thread::sleep_for(
-        std::chrono::duration_cast<std::chrono::nanoseconds>(sleep_duration));
-  }
+void BM_basic_slow(benchmark::State &state)
+{
+    std::chrono::milliseconds sleep_duration(state.range(0));
+    for (auto _ : state)
+    {
+        std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(sleep_duration));
+    }
 }
 
 BENCHMARK(BM_basic);
@@ -37,8 +40,7 @@ BENCHMARK(BM_basic)->ThreadPerCpu();
 BENCHMARK(BM_basic)->Repetitions(3);
 BENCHMARK(BM_basic)
     ->RangeMultiplier(std::numeric_limits<int>::max())
-    ->Range(std::numeric_limits<int64_t>::min(),
-            std::numeric_limits<int64_t>::max());
+    ->Range(std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max());
 
 // Negative ranges
 BENCHMARK(BM_basic)->Range(-64, -1);
@@ -46,29 +48,31 @@ BENCHMARK(BM_basic)->RangeMultiplier(4)->Range(-8, 8);
 BENCHMARK(BM_basic)->DenseRange(-2, 2, 1);
 BENCHMARK(BM_basic)->Ranges({{-64, 1}, {-8, -1}});
 
-void CustomArgs(benchmark::internal::Benchmark* b) {
-  for (int i = 0; i < 10; ++i) {
-    b->Arg(i);
-  }
+void CustomArgs(benchmark::internal::Benchmark *b)
+{
+    for (int i = 0; i < 10; ++i)
+    {
+        b->Arg(i);
+    }
 }
 
 BENCHMARK(BM_basic)->Apply(CustomArgs);
 
-void BM_explicit_iteration_count(benchmark::State& state) {
-  // Test that benchmarks specified with an explicit iteration count are
-  // only run once.
-  static bool invoked_before = false;
-  assert(!invoked_before);
-  invoked_before = true;
+void BM_explicit_iteration_count(benchmark::State &state)
+{
+    // Test that benchmarks specified with an explicit iteration count are
+    // only run once.
+    static bool invoked_before = false;
+    assert(!invoked_before);
+    invoked_before = true;
 
-  // Test that the requested iteration count is respected.
-  assert(state.max_iterations == 42);
-  size_t actual_iterations = 0;
-  for (auto _ : state)
-    ++actual_iterations;
-  assert(state.iterations() == state.max_iterations);
-  assert(state.iterations() == 42);
-
+    // Test that the requested iteration count is respected.
+    assert(state.max_iterations == 42);
+    size_t actual_iterations = 0;
+    for (auto _ : state)
+        ++actual_iterations;
+    assert(state.iterations() == state.max_iterations);
+    assert(state.iterations() == 42);
 }
 BENCHMARK(BM_explicit_iteration_count)->Iterations(42);
 

@@ -24,14 +24,16 @@
 
 using namespace opencc;
 
-std::string Converter::Convert(const std::string& text) const {
-  const SegmentsPtr& segments = segmentation->Segment(text);
-  const SegmentsPtr& converted = conversionChain->Convert(segments);
-  return converted->ToString();
+std::string Converter::Convert(const std::string &text) const
+{
+    const SegmentsPtr &segments = segmentation->Segment(text);
+    const SegmentsPtr &converted = conversionChain->Convert(segments);
+    return converted->ToString();
 }
 
-size_t Converter::Convert(const char* input, char* output) const {
-  const std::string& converted = Convert(input);
-  strcpy(output, converted.c_str());
-  return converted.length();
+size_t Converter::Convert(const char *input, char *output) const
+{
+    const std::string &converted = Convert(input);
+    strcpy(output, converted.c_str());
+    return converted.length();
 }

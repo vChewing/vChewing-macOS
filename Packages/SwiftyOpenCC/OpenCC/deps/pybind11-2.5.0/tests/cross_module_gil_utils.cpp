@@ -6,8 +6,8 @@
     All rights reserved. Use of this source code is governed by a
     BSD-style license that can be found in the LICENSE file.
 */
-#include <pybind11/pybind11.h>
 #include <cstdint>
+#include <pybind11/pybind11.h>
 
 // This file mimics a DSO that makes pybind11 calls but does not define a
 // PYBIND11_MODULE. The purpose is to test that such a DSO can create a
@@ -17,54 +17,46 @@
 // this need not be the case. The typical scenario would be a DSO that implements
 // shared logic used internally by multiple pybind11 modules.
 
-namespace {
+namespace
+{
 
 namespace py = pybind11;
-void gil_acquire() { py::gil_scoped_acquire gil; }
+void gil_acquire()
+{
+    py::gil_scoped_acquire gil;
+}
 
 constexpr char kModuleName[] = "cross_module_gil_utils";
 
 #if PY_MAJOR_VERSION >= 3
-struct PyModuleDef moduledef = {
-    PyModuleDef_HEAD_INIT,
-    kModuleName,
-    NULL,
-    0,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL
-};
+struct PyModuleDef moduledef = {PyModuleDef_HEAD_INIT, kModuleName, NULL, 0, NULL, NULL, NULL, NULL, NULL};
 #else
-PyMethodDef module_methods[] = {
-    {NULL, NULL, 0, NULL}
-};
+PyMethodDef module_methods[] = {{NULL, NULL, 0, NULL}};
 #endif
 
-}  // namespace
+} // namespace
 
 extern "C" PYBIND11_EXPORT
 #if PY_MAJOR_VERSION >= 3
-PyObject* PyInit_cross_module_gil_utils()
+    PyObject *
+    PyInit_cross_module_gil_utils()
 #else
-void initcross_module_gil_utils()
+    void
+    initcross_module_gil_utils()
 #endif
 {
 
-    PyObject* m =
+    PyObject *m =
 #if PY_MAJOR_VERSION >= 3
         PyModule_Create(&moduledef);
 #else
         Py_InitModule(kModuleName, module_methods);
 #endif
 
-    if (m != NULL) {
-        static_assert(
-            sizeof(&gil_acquire) == sizeof(void*),
-            "Function pointer must have the same size as void*");
-        PyModule_AddObject(m, "gil_acquire_funcaddr",
-                           PyLong_FromVoidPtr(reinterpret_cast<void*>(&gil_acquire)));
+    if (m != NULL)
+    {
+        static_assert(sizeof(&gil_acquire) == sizeof(void *), "Function pointer must have the same size as void*");
+        PyModule_AddObject(m, "gil_acquire_funcaddr", PyLong_FromVoidPtr(reinterpret_cast<void *>(&gil_acquire)));
     }
 
 #if PY_MAJOR_VERSION >= 3

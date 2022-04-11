@@ -20,23 +20,24 @@
 
 #include "Common.hpp"
 
-namespace opencc {
+namespace opencc
+{
 /**
  * Configuration loader
  * @ingroup opencc_cpp_api
  */
-class OPENCC_EXPORT Config {
-public:
-  Config();
+class OPENCC_EXPORT Config
+{
+  public:
+    Config();
 
-  virtual ~Config();
+    virtual ~Config();
 
-  ConverterPtr NewFromString(const std::string& json,
-                             const std::string& configDirectory);
+    ConverterPtr NewFromString(const std::string &json, const std::string &configDirectory);
 
-  ConverterPtr NewFromFile(const std::string& fileName);
+    ConverterPtr NewFromFile(const std::string &fileName);
 
-private:
-  void* internal;
+  private:
+    void *internal;
 };
 } // namespace opencc

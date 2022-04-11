@@ -27,21 +27,26 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <cstdio>
 #include "gtest/gtest.h"
+#include <cstdio>
 
 #ifdef ARDUINO
-void setup() {
-  testing::InitGoogleTest();
+void setup()
+{
+    testing::InitGoogleTest();
 }
 
-void loop() { RUN_ALL_TESTS(); }
+void loop()
+{
+    RUN_ALL_TESTS();
+}
 
 #else
 
-GTEST_API_ int main(int argc, char **argv) {
-  printf("Running main() from %s\n", __FILE__);
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+GTEST_API_ int main(int argc, char **argv)
+{
+    printf("Running main() from %s\n", __FILE__);
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
 #endif

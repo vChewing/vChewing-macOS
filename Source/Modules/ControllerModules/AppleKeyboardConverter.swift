@@ -24,44 +24,31 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
 
-@objc class AppleKeyboardConverter: NSObject {
-	@objc class func isDynamicBaseKeyboardLayoutEnabled() -> Bool {
-		switch mgrPrefs.basisKeyboardLayout {
-			case "com.apple.keylayout.ZhuyinBopomofo":
-				return true
-			case "com.apple.keylayout.ZhuyinEten":
-				return true
-			case "org.atelierInmu.vChewing.keyLayouts.vchewingdachen":
-				return true
-			case "org.atelierInmu.vChewing.keyLayouts.vchewingmitac":
-				return true
-			case "org.atelierInmu.vChewing.keyLayouts.vchewingibm":
-				return true
-			case "org.atelierInmu.vChewing.keyLayouts.vchewingseigyou":
-				return true
-			case "org.atelierInmu.vChewing.keyLayouts.vchewingeten":
-				return true
-			case "org.unknown.keylayout.vChewingDachen":
-				return true
-			case "org.unknown.keylayout.vChewingFakeSeigyou":
-				return true
-			case "org.unknown.keylayout.vChewingETen":
-				return true
-			case "org.unknown.keylayout.vChewingIBM":
-				return true
-			case "org.unknown.keylayout.vChewingMiTAC":
-				return true
-			default:
-				return false
-		}
+class AppleKeyboardConverter: NSObject {
+	static let arrDynamicBasicKeyLayout: [String] = [
+		"com.apple.keylayout.ZhuyinBopomofo",
+		"com.apple.keylayout.ZhuyinEten",
+		"org.atelierInmu.vChewing.keyLayouts.vchewingdachen",
+		"org.atelierInmu.vChewing.keyLayouts.vchewingmitac",
+		"org.atelierInmu.vChewing.keyLayouts.vchewingibm",
+		"org.atelierInmu.vChewing.keyLayouts.vchewingseigyou",
+		"org.atelierInmu.vChewing.keyLayouts.vchewingeten",
+		"org.unknown.keylayout.vChewingDachen",
+		"org.unknown.keylayout.vChewingFakeSeigyou",
+		"org.unknown.keylayout.vChewingETen",
+		"org.unknown.keylayout.vChewingIBM",
+		"org.unknown.keylayout.vChewingMiTAC",
+	]
+	@objc class func isDynamicBasicKeyboardLayoutEnabled() -> Bool {
+		AppleKeyboardConverter.arrDynamicBasicKeyLayout.contains(mgrPrefs.basicKeyboardLayout)
 	}
 	// 處理 Apple 注音鍵盤佈局類型。
 	@objc class func cnvApple2ABC(_ charCode: UniChar) -> UniChar {
 		var charCode = charCode
 		// 在按鍵資訊被送往 OVMandarin 之前，先轉換為可以被 OVMandarin 正常處理的資訊。
-		if self.isDynamicBaseKeyboardLayoutEnabled() {
+		if isDynamicBasicKeyboardLayoutEnabled() {
 			// 針對不同的 Apple 動態鍵盤佈局糾正大寫英文輸入。
-			switch mgrPrefs.basisKeyboardLayout {
+			switch mgrPrefs.basicKeyboardLayout {
 				case "com.apple.keylayout.ZhuyinBopomofo":
 					do {
 						if charCode == 97 { charCode = UniChar(65) }
@@ -186,7 +173,7 @@ import Cocoa
 			// 摁了 Alt 的符號。
 			if charCode == 8212 { charCode = UniChar(45) }
 			// Apple 倚天注音佈局追加符號糾正項目。
-			if mgrPrefs.basisKeyboardLayout == "com.apple.keylayout.ZhuyinEten" {
+			if mgrPrefs.basicKeyboardLayout == "com.apple.keylayout.ZhuyinEten" {
 				if charCode == 65343 { charCode = UniChar(95) }
 				if charCode == 65306 { charCode = UniChar(58) }
 				if charCode == 65311 { charCode = UniChar(63) }
@@ -199,9 +186,9 @@ import Cocoa
 
 	@objc class func cnvStringApple2ABC(_ strProcessed: String) -> String {
 		var strProcessed = strProcessed
-		if self.isDynamicBaseKeyboardLayoutEnabled() {
+		if isDynamicBasicKeyboardLayoutEnabled() {
 			// 針對不同的 Apple 動態鍵盤佈局糾正大寫英文輸入。
-			switch mgrPrefs.basisKeyboardLayout {
+			switch mgrPrefs.basicKeyboardLayout {
 				case "com.apple.keylayout.ZhuyinBopomofo":
 					do {
 						if strProcessed == "a" { strProcessed = "A" }
@@ -326,7 +313,7 @@ import Cocoa
 			// 摁了 Alt 的符號。
 			if strProcessed == "—" { strProcessed = "-" }
 			// Apple 倚天注音佈局追加符號糾正項目。
-			if mgrPrefs.basisKeyboardLayout == "com.apple.keylayout.ZhuyinEten" {
+			if mgrPrefs.basicKeyboardLayout == "com.apple.keylayout.ZhuyinEten" {
 				if strProcessed == "＿" { strProcessed = "_" }
 				if strProcessed == "：" { strProcessed = ":" }
 				if strProcessed == "？" { strProcessed = "?" }

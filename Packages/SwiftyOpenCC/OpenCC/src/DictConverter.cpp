@@ -26,44 +26,55 @@
 
 using namespace opencc;
 
-DictPtr LoadDictionary(const std::string& format,
-                       const std::string& inputFileName) {
-  if (format == "text") {
-    return SerializableDict::NewFromFile<TextDict>(inputFileName);
-  } else if (format == "ocd") {
+DictPtr LoadDictionary(const std::string &format, const std::string &inputFileName)
+{
+    if (format == "text")
+    {
+        return SerializableDict::NewFromFile<TextDict>(inputFileName);
+    }
+    else if (format == "ocd")
+    {
 #ifdef ENABLE_DARTS
-    return SerializableDict::NewFromFile<DartsDict>(inputFileName);
+        return SerializableDict::NewFromFile<DartsDict>(inputFileName);
 #endif
-  } else if (format == "ocd2") {
-    return SerializableDict::NewFromFile<MarisaDict>(inputFileName);
-  }
-  fprintf(stderr, "Unknown dictionary format: %s\n", format.c_str());
-  exit(2);
-  return nullptr;
+    }
+    else if (format == "ocd2")
+    {
+        return SerializableDict::NewFromFile<MarisaDict>(inputFileName);
+    }
+    fprintf(stderr, "Unknown dictionary format: %s\n", format.c_str());
+    exit(2);
+    return nullptr;
 }
 
-SerializableDictPtr ConvertDict(const std::string& format, const DictPtr dict) {
-  if (format == "text") {
-    return TextDict::NewFromDict(*dict.get());
-  } else if (format == "ocd") {
+SerializableDictPtr ConvertDict(const std::string &format, const DictPtr dict)
+{
+    if (format == "text")
+    {
+        return TextDict::NewFromDict(*dict.get());
+    }
+    else if (format == "ocd")
+    {
 #ifdef ENABLE_DARTS
-    return DartsDict::NewFromDict(*dict.get());
+        return DartsDict::NewFromDict(*dict.get());
 #endif
-  } else if (format == "ocd2") {
-    return MarisaDict::NewFromDict(*dict.get());
-  }
-  fprintf(stderr, "Unknown dictionary format: %s\n", format.c_str());
-  exit(2);
-  return nullptr;
+    }
+    else if (format == "ocd2")
+    {
+        return MarisaDict::NewFromDict(*dict.get());
+    }
+    fprintf(stderr, "Unknown dictionary format: %s\n", format.c_str());
+    exit(2);
+    return nullptr;
 }
 
-namespace opencc {
-void ConvertDictionary(const std::string inputFileName,
-                       const std::string outputFileName,
-                       const std::string formatFrom,
-                       const std::string formatTo) {
-  DictPtr dictFrom = LoadDictionary(formatFrom, inputFileName);
-  SerializableDictPtr dictTo = ConvertDict(formatTo, dictFrom);
-  dictTo->SerializeToFile(outputFileName);
+namespace opencc
+{
+void ConvertDictionary(const std::string inputFileName, const std::string outputFileName, const std::string formatFrom,
+                       const std::string formatTo)
+{
+    DictPtr dictFrom = LoadDictionary(formatFrom, inputFileName);
+    SerializableDictPtr dictTo = ConvertDict(formatTo, dictFrom);
+    dictTo->SerializeToFile(outputFileName);
 }
 } // namespace opencc

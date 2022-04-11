@@ -21,30 +21,37 @@
 #include "Common.hpp"
 #include "SerializableDict.hpp"
 
-namespace opencc {
+namespace opencc
+{
 /**
  * Binary format for dictionary values serialization.
  * @ingroup opencc_cpp_api
  */
-class OPENCC_EXPORT SerializedValues : public SerializableDict {
-public:
-  SerializedValues(const LexiconPtr& _lexicon) : lexicon(_lexicon) {}
+class OPENCC_EXPORT SerializedValues : public SerializableDict
+{
+  public:
+    SerializedValues(const LexiconPtr &_lexicon) : lexicon(_lexicon)
+    {
+    }
 
-  virtual ~SerializedValues() {}
+    virtual ~SerializedValues()
+    {
+    }
 
-  virtual void SerializeToFile(FILE* fp) const;
+    virtual void SerializeToFile(FILE *fp) const;
 
-  static std::shared_ptr<SerializedValues> NewFromFile(FILE* fp);
+    static std::shared_ptr<SerializedValues> NewFromFile(FILE *fp);
 
-  const LexiconPtr& GetLexicon() const { return lexicon; }
+    const LexiconPtr &GetLexicon() const
+    {
+        return lexicon;
+    }
 
-  size_t KeyMaxLength() const;
+    size_t KeyMaxLength() const;
 
-private:
-  LexiconPtr lexicon;
+  private:
+    LexiconPtr lexicon;
 
-  void ConstructBuffer(std::string* valueBuffer,
-                       std::vector<uint16_t>* valueBytes,
-                       uint32_t* valueTotalLength) const;
+    void ConstructBuffer(std::string *valueBuffer, std::vector<uint16_t> *valueBytes, uint32_t *valueTotalLength) const;
 };
 } // namespace opencc

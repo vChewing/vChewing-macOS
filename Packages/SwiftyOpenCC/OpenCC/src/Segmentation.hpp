@@ -20,13 +20,15 @@
 
 #include "Common.hpp"
 
-namespace opencc {
+namespace opencc
+{
 /**
  * Abstract segmentation
  * @ingroup opencc_cpp_api
  */
-class OPENCC_EXPORT Segmentation {
-public:
-  virtual SegmentsPtr Segment(const std::string& text) const = 0;
+class OPENCC_EXPORT Segmentation
+{
+  public:
+    virtual SegmentsPtr Segment(const std::string &text) const = 0;
 };
 } // namespace opencc

@@ -19,42 +19,45 @@
 #include "ConversionChain.hpp"
 #include "DictGroupTestBase.hpp"
 
-namespace opencc {
+namespace opencc
+{
 
-class ConversionChainTest : public DictGroupTestBase {
-protected:
-  ConversionChainTest() {}
-
-  virtual void SetUp() {
-    dict = CreateDictGroupForConversion();
-    conversion = ConversionPtr(new Conversion(dict));
-  }
-
-  void SegmentsAssertEquals(const SegmentsPtr& expected,
-                            const SegmentsPtr& actual) {
-    const size_t length = expected->Length();
-    EXPECT_TRUE(length == actual->Length());
-    for (size_t i = 0; i < length; i++) {
-      EXPECT_EQ(std::string(expected->At(i)), std::string(actual->At(i)))
-          << "i = " << i;
+class ConversionChainTest : public DictGroupTestBase
+{
+  protected:
+    ConversionChainTest()
+    {
     }
-  }
 
-  DictPtr dict;
-  ConversionPtr conversion;
+    virtual void SetUp()
+    {
+        dict = CreateDictGroupForConversion();
+        conversion = ConversionPtr(new Conversion(dict));
+    }
+
+    void SegmentsAssertEquals(const SegmentsPtr &expected, const SegmentsPtr &actual)
+    {
+        const size_t length = expected->Length();
+        EXPECT_TRUE(length == actual->Length());
+        for (size_t i = 0; i < length; i++)
+        {
+            EXPECT_EQ(std::string(expected->At(i)), std::string(actual->At(i))) << "i = " << i;
+        }
+    }
+
+    DictPtr dict;
+    ConversionPtr conversion;
 };
 
-TEST_F(ConversionChainTest, Convert) {
-  // Variants
-  const DictPtr& dictVariants = CreateDictForTaiwanVariants();
-  const ConversionPtr& conversionVariants =
-      ConversionPtr(new Conversion(dictVariants));
-  const std::list<ConversionPtr> conversions{conversion, conversionVariants};
-  const ConversionChainPtr& conversionChain =
-      ConversionChainPtr(new ConversionChain(conversions));
-  const SegmentsPtr& converted =
-      conversionChain->Convert(SegmentsPtr(new Segments{utf8("里面")}));
-  SegmentsAssertEquals(SegmentsPtr(new Segments{utf8("裡面")}), converted);
+TEST_F(ConversionChainTest, Convert)
+{
+    // Variants
+    const DictPtr &dictVariants = CreateDictForTaiwanVariants();
+    const ConversionPtr &conversionVariants = ConversionPtr(new Conversion(dictVariants));
+    const std::list<ConversionPtr> conversions{conversion, conversionVariants};
+    const ConversionChainPtr &conversionChain = ConversionChainPtr(new ConversionChain(conversions));
+    const SegmentsPtr &converted = conversionChain->Convert(SegmentsPtr(new Segments{utf8("里面")}));
+    SegmentsAssertEquals(SegmentsPtr(new Segments{utf8("裡面")}), converted);
 }
 
 } // namespace opencc

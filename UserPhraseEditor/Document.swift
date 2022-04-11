@@ -38,19 +38,19 @@ class Document: NSDocument {
 
 	// This enables auto save.
 	override class var autosavesInPlace: Bool {
-		return true
+		true
 	}
 
 	// This enables asynchronous-writing.
 	override func canAsynchronouslyWrite(
 		to url: URL, ofType typeName: String, for saveOperation: NSDocument.SaveOperationType
 	) -> Bool {
-		return true
+		true
 	}
 
 	// This enables asynchronous reading.
 	override class func canConcurrentlyReadDocuments(ofType: String) -> Bool {
-		return ofType == "public.plain-text"
+		ofType == "public.plain-text"
 	}
 
 	// MARK: - User Interface

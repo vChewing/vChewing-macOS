@@ -20,7 +20,8 @@
 
 #include <string>
 
-namespace opencc {
+namespace opencc
+{
 
 #define utf8(str) std::string(str)
 

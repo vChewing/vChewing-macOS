@@ -9,7 +9,8 @@
 
 #include "pybind11_tests.h"
 
-TEST_SUBMODULE(union_, m) {
+TEST_SUBMODULE(union_, m)
+{
     union TestUnion {
         int value_int;
         unsigned value_uint;

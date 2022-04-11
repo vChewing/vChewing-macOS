@@ -38,10 +38,10 @@
 
 #include "gtest/gtest.h"
 
-GTEST_DISABLE_MSC_WARNINGS_PUSH_(4251 \
-/* class A needs to have dll-interface to be used by clients of class B */)
+GTEST_DISABLE_MSC_WARNINGS_PUSH_(4251 /* class A needs to have dll-interface to be used by clients of class B */)
 
-namespace testing {
+namespace testing
+{
 
 // This helper class can be used to mock out Google Test failure reporting
 // so that we can test Google Test or code that builds on Google Test.
@@ -52,71 +52,73 @@ namespace testing {
 // generated in the same thread that created this object or it can intercept
 // all generated failures. The scope of this mock object can be controlled with
 // the second argument to the two arguments constructor.
-class GTEST_API_ ScopedFakeTestPartResultReporter
-    : public TestPartResultReporterInterface {
- public:
-  // The two possible mocking modes of this object.
-  enum InterceptMode {
-    INTERCEPT_ONLY_CURRENT_THREAD,  // Intercepts only thread local failures.
-    INTERCEPT_ALL_THREADS           // Intercepts all failures.
-  };
+class GTEST_API_ ScopedFakeTestPartResultReporter : public TestPartResultReporterInterface
+{
+  public:
+    // The two possible mocking modes of this object.
+    enum InterceptMode
+    {
+        INTERCEPT_ONLY_CURRENT_THREAD, // Intercepts only thread local failures.
+        INTERCEPT_ALL_THREADS          // Intercepts all failures.
+    };
 
-  // The c'tor sets this object as the test part result reporter used
-  // by Google Test.  The 'result' parameter specifies where to report the
-  // results. This reporter will only catch failures generated in the current
-  // thread. DEPRECATED
-  explicit ScopedFakeTestPartResultReporter(TestPartResultArray* result);
+    // The c'tor sets this object as the test part result reporter used
+    // by Google Test.  The 'result' parameter specifies where to report the
+    // results. This reporter will only catch failures generated in the current
+    // thread. DEPRECATED
+    explicit ScopedFakeTestPartResultReporter(TestPartResultArray *result);
 
-  // Same as above, but you can choose the interception scope of this object.
-  ScopedFakeTestPartResultReporter(InterceptMode intercept_mode,
-                                   TestPartResultArray* result);
+    // Same as above, but you can choose the interception scope of this object.
+    ScopedFakeTestPartResultReporter(InterceptMode intercept_mode, TestPartResultArray *result);
 
-  // The d'tor restores the previous test part result reporter.
-  ~ScopedFakeTestPartResultReporter() override;
+    // The d'tor restores the previous test part result reporter.
+    ~ScopedFakeTestPartResultReporter() override;
 
-  // Appends the TestPartResult object to the TestPartResultArray
-  // received in the constructor.
-  //
-  // This method is from the TestPartResultReporterInterface
-  // interface.
-  void ReportTestPartResult(const TestPartResult& result) override;
+    // Appends the TestPartResult object to the TestPartResultArray
+    // received in the constructor.
+    //
+    // This method is from the TestPartResultReporterInterface
+    // interface.
+    void ReportTestPartResult(const TestPartResult &result) override;
 
- private:
-  void Init();
+  private:
+    void Init();
 
-  const InterceptMode intercept_mode_;
-  TestPartResultReporterInterface* old_reporter_;
-  TestPartResultArray* const result_;
+    const InterceptMode intercept_mode_;
+    TestPartResultReporterInterface *old_reporter_;
+    TestPartResultArray *const result_;
 
-  GTEST_DISALLOW_COPY_AND_ASSIGN_(ScopedFakeTestPartResultReporter);
+    GTEST_DISALLOW_COPY_AND_ASSIGN_(ScopedFakeTestPartResultReporter);
 };
 
-namespace internal {
+namespace internal
+{
 
 // A helper class for implementing EXPECT_FATAL_FAILURE() and
 // EXPECT_NONFATAL_FAILURE().  Its destructor verifies that the given
 // TestPartResultArray contains exactly one failure that has the given
 // type and contains the given substring.  If that's not the case, a
 // non-fatal failure will be generated.
-class GTEST_API_ SingleFailureChecker {
- public:
-  // The constructor remembers the arguments.
-  SingleFailureChecker(const TestPartResultArray* results,
-                       TestPartResult::Type type, const std::string& substr);
-  ~SingleFailureChecker();
- private:
-  const TestPartResultArray* const results_;
-  const TestPartResult::Type type_;
-  const std::string substr_;
+class GTEST_API_ SingleFailureChecker
+{
+  public:
+    // The constructor remembers the arguments.
+    SingleFailureChecker(const TestPartResultArray *results, TestPartResult::Type type, const std::string &substr);
+    ~SingleFailureChecker();
 
-  GTEST_DISALLOW_COPY_AND_ASSIGN_(SingleFailureChecker);
+  private:
+    const TestPartResultArray *const results_;
+    const TestPartResult::Type type_;
+    const std::string substr_;
+
+    GTEST_DISALLOW_COPY_AND_ASSIGN_(SingleFailureChecker);
 };
 
-}  // namespace internal
+} // namespace internal
 
-}  // namespace testing
+} // namespace testing
 
-GTEST_DISABLE_MSC_WARNINGS_POP_()  //  4251
+GTEST_DISABLE_MSC_WARNINGS_POP_() //  4251
 
 // A set of macros for testing Google Test assertions or code that's expected
 // to generate Google Test fatal failures.  It verifies that the given
@@ -141,39 +143,47 @@ GTEST_DISABLE_MSC_WARNINGS_POP_()  //  4251
 // helper macro, due to some peculiarity in how the preprocessor
 // works.  The AcceptsMacroThatExpandsToUnprotectedComma test in
 // gtest_unittest.cc will fail to compile if we do that.
-#define EXPECT_FATAL_FAILURE(statement, substr) \
-  do { \
-    class GTestExpectFatalFailureHelper {\
-     public:\
-      static void Execute() { statement; }\
-    };\
-    ::testing::TestPartResultArray gtest_failures;\
-    ::testing::internal::SingleFailureChecker gtest_checker(\
-        &gtest_failures, ::testing::TestPartResult::kFatalFailure, (substr));\
-    {\
-      ::testing::ScopedFakeTestPartResultReporter gtest_reporter(\
-          ::testing::ScopedFakeTestPartResultReporter:: \
-          INTERCEPT_ONLY_CURRENT_THREAD, &gtest_failures);\
-      GTestExpectFatalFailureHelper::Execute();\
-    }\
-  } while (::testing::internal::AlwaysFalse())
+#define EXPECT_FATAL_FAILURE(statement, substr)                                                                        \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        class GTestExpectFatalFailureHelper                                                                            \
+        {                                                                                                              \
+          public:                                                                                                      \
+            static void Execute()                                                                                      \
+            {                                                                                                          \
+                statement;                                                                                             \
+            }                                                                                                          \
+        };                                                                                                             \
+        ::testing::TestPartResultArray gtest_failures;                                                                 \
+        ::testing::internal::SingleFailureChecker gtest_checker(&gtest_failures,                                       \
+                                                                ::testing::TestPartResult::kFatalFailure, (substr));   \
+        {                                                                                                              \
+            ::testing::ScopedFakeTestPartResultReporter gtest_reporter(                                                \
+                ::testing::ScopedFakeTestPartResultReporter::INTERCEPT_ONLY_CURRENT_THREAD, &gtest_failures);          \
+            GTestExpectFatalFailureHelper::Execute();                                                                  \
+        }                                                                                                              \
+    } while (::testing::internal::AlwaysFalse())
 
-#define EXPECT_FATAL_FAILURE_ON_ALL_THREADS(statement, substr) \
-  do { \
-    class GTestExpectFatalFailureHelper {\
-     public:\
-      static void Execute() { statement; }\
-    };\
-    ::testing::TestPartResultArray gtest_failures;\
-    ::testing::internal::SingleFailureChecker gtest_checker(\
-        &gtest_failures, ::testing::TestPartResult::kFatalFailure, (substr));\
-    {\
-      ::testing::ScopedFakeTestPartResultReporter gtest_reporter(\
-          ::testing::ScopedFakeTestPartResultReporter:: \
-          INTERCEPT_ALL_THREADS, &gtest_failures);\
-      GTestExpectFatalFailureHelper::Execute();\
-    }\
-  } while (::testing::internal::AlwaysFalse())
+#define EXPECT_FATAL_FAILURE_ON_ALL_THREADS(statement, substr)                                                         \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        class GTestExpectFatalFailureHelper                                                                            \
+        {                                                                                                              \
+          public:                                                                                                      \
+            static void Execute()                                                                                      \
+            {                                                                                                          \
+                statement;                                                                                             \
+            }                                                                                                          \
+        };                                                                                                             \
+        ::testing::TestPartResultArray gtest_failures;                                                                 \
+        ::testing::internal::SingleFailureChecker gtest_checker(&gtest_failures,                                       \
+                                                                ::testing::TestPartResult::kFatalFailure, (substr));   \
+        {                                                                                                              \
+            ::testing::ScopedFakeTestPartResultReporter gtest_reporter(                                                \
+                ::testing::ScopedFakeTestPartResultReporter::INTERCEPT_ALL_THREADS, &gtest_failures);                  \
+            GTestExpectFatalFailureHelper::Execute();                                                                  \
+        }                                                                                                              \
+    } while (::testing::internal::AlwaysFalse())
 
 // A macro for testing Google Test assertions or code that's expected to
 // generate Google Test non-fatal failures.  It asserts that the given
@@ -207,32 +217,36 @@ GTEST_DISABLE_MSC_WARNINGS_POP_()  //  4251
 // instead of
 //   GTEST_SUPPRESS_UNREACHABLE_CODE_WARNING_BELOW_(statement)
 // to avoid an MSVC warning on unreachable code.
-#define EXPECT_NONFATAL_FAILURE(statement, substr) \
-  do {\
-    ::testing::TestPartResultArray gtest_failures;\
-    ::testing::internal::SingleFailureChecker gtest_checker(\
-        &gtest_failures, ::testing::TestPartResult::kNonFatalFailure, \
-        (substr));\
-    {\
-      ::testing::ScopedFakeTestPartResultReporter gtest_reporter(\
-          ::testing::ScopedFakeTestPartResultReporter:: \
-          INTERCEPT_ONLY_CURRENT_THREAD, &gtest_failures);\
-      if (::testing::internal::AlwaysTrue()) { statement; }\
-    }\
-  } while (::testing::internal::AlwaysFalse())
+#define EXPECT_NONFATAL_FAILURE(statement, substr)                                                                     \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        ::testing::TestPartResultArray gtest_failures;                                                                 \
+        ::testing::internal::SingleFailureChecker gtest_checker(                                                       \
+            &gtest_failures, ::testing::TestPartResult::kNonFatalFailure, (substr));                                   \
+        {                                                                                                              \
+            ::testing::ScopedFakeTestPartResultReporter gtest_reporter(                                                \
+                ::testing::ScopedFakeTestPartResultReporter::INTERCEPT_ONLY_CURRENT_THREAD, &gtest_failures);          \
+            if (::testing::internal::AlwaysTrue())                                                                     \
+            {                                                                                                          \
+                statement;                                                                                             \
+            }                                                                                                          \
+        }                                                                                                              \
+    } while (::testing::internal::AlwaysFalse())
 
-#define EXPECT_NONFATAL_FAILURE_ON_ALL_THREADS(statement, substr) \
-  do {\
-    ::testing::TestPartResultArray gtest_failures;\
-    ::testing::internal::SingleFailureChecker gtest_checker(\
-        &gtest_failures, ::testing::TestPartResult::kNonFatalFailure, \
-        (substr));\
-    {\
-      ::testing::ScopedFakeTestPartResultReporter gtest_reporter(\
-          ::testing::ScopedFakeTestPartResultReporter::INTERCEPT_ALL_THREADS, \
-          &gtest_failures);\
-      if (::testing::internal::AlwaysTrue()) { statement; }\
-    }\
-  } while (::testing::internal::AlwaysFalse())
+#define EXPECT_NONFATAL_FAILURE_ON_ALL_THREADS(statement, substr)                                                      \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        ::testing::TestPartResultArray gtest_failures;                                                                 \
+        ::testing::internal::SingleFailureChecker gtest_checker(                                                       \
+            &gtest_failures, ::testing::TestPartResult::kNonFatalFailure, (substr));                                   \
+        {                                                                                                              \
+            ::testing::ScopedFakeTestPartResultReporter gtest_reporter(                                                \
+                ::testing::ScopedFakeTestPartResultReporter::INTERCEPT_ALL_THREADS, &gtest_failures);                  \
+            if (::testing::internal::AlwaysTrue())                                                                     \
+            {                                                                                                          \
+                statement;                                                                                             \
+            }                                                                                                          \
+        }                                                                                                              \
+    } while (::testing::internal::AlwaysFalse())
 
-#endif  // GTEST_INCLUDE_GTEST_GTEST_SPI_H_
+#endif // GTEST_INCLUDE_GTEST_GTEST_SPI_H_

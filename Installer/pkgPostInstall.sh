@@ -1,7 +1,7 @@
 #!/bin/sh
 
 TARGET='vChewing'
-login_user=`/usr/bin/stat -f%Su /dev/console`
+login_user=$(/usr/bin/stat -f%Su /dev/console)
 
 # First, copy the wrongfully installed contents to the right location:
 cp -r /Library/Input\ Methods/"${TARGET}".app /Users/"${login_user}"/Library/Input\ Methods/ || true

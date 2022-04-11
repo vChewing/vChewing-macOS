@@ -14,45 +14,53 @@
 
 #include <benchmark/benchmark.h>
 
-namespace benchmark {
+namespace benchmark
+{
 
-namespace {
+namespace
+{
 
 // Compute the total size of a pack of std::strings
-size_t size_impl() { return 0; }
+size_t size_impl()
+{
+    return 0;
+}
 
-template <typename Head, typename... Tail>
-size_t size_impl(const Head& head, const Tail&... tail) {
-  return head.size() + size_impl(tail...);
+template <typename Head, typename... Tail> size_t size_impl(const Head &head, const Tail &...tail)
+{
+    return head.size() + size_impl(tail...);
 }
 
 // Join a pack of std::strings using a delimiter
 // TODO: use absl::StrJoin
-void join_impl(std::string&, char) {}
+void join_impl(std::string &, char)
+{
+}
 
 template <typename Head, typename... Tail>
-void join_impl(std::string& s, const char delimiter, const Head& head,
-               const Tail&... tail) {
-  if (!s.empty() && !head.empty()) {
-    s += delimiter;
-  }
+void join_impl(std::string &s, const char delimiter, const Head &head, const Tail &...tail)
+{
+    if (!s.empty() && !head.empty())
+    {
+        s += delimiter;
+    }
 
-  s += head;
+    s += head;
 
-  join_impl(s, delimiter, tail...);
+    join_impl(s, delimiter, tail...);
 }
 
-template <typename... Ts>
-std::string join(char delimiter, const Ts&... ts) {
-  std::string s;
-  s.reserve(sizeof...(Ts) + size_impl(ts...));
-  join_impl(s, delimiter, ts...);
-  return s;
+template <typename... Ts> std::string join(char delimiter, const Ts &...ts)
+{
+    std::string s;
+    s.reserve(sizeof...(Ts) + size_impl(ts...));
+    join_impl(s, delimiter, ts...);
+    return s;
 }
-}  // namespace
+} // namespace
 
-std::string BenchmarkName::str() const {
-  return join('/', function_name, args, min_time, iterations, repetitions,
-              time_type, threads);
+std::string BenchmarkName::str() const
+{
+    return join('/', function_name, args, min_time, iterations, repetitions, time_type, threads);
 }
-}  // namespace benchmark
+} // namespace benchmark

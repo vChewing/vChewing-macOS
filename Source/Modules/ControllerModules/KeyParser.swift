@@ -116,7 +116,7 @@ class keyParser: NSObject {
 		self.inputText = inputText
 		self.inputTextIgnoringModifiers = inputTextIgnoringModifiers
 		self.flags = flags
-		self.isFlagChanged = false
+		isFlagChanged = false
 		useVerticalMode = isVerticalMode
 		self.keyCode = keyCode
 		self.charCode = AppleKeyboardConverter.cnvApple2ABC(charCode)
@@ -295,7 +295,7 @@ class keyParser: NSObject {
 
 	@objc var isUpperCaseASCIILetterKey: Bool {
 		// 這裡必須加上「flags == .shift」，否則會出現某些情況下輸入法「誤判當前鍵入的非 Shift 字符為大寫」的問題。
-		self.charCode >= 65 && self.charCode <= 90 && flags == .shift
+		charCode >= 65 && charCode <= 90 && flags == .shift
 	}
 
 	@objc var isSymbolMenuPhysicalKey: Bool {

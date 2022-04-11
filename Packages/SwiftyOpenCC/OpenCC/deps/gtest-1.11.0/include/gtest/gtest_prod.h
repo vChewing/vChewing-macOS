@@ -55,7 +55,6 @@
 // Note: The test class must be in the same namespace as the class being tested.
 // For example, putting MyClassTest in an anonymous namespace will not work.
 
-#define FRIEND_TEST(test_case_name, test_name)\
-friend class test_case_name##_##test_name##_Test
+#define FRIEND_TEST(test_case_name, test_name) friend class test_case_name##_##test_name##_Test
 
-#endif  // GTEST_INCLUDE_GTEST_GTEST_PROD_H_
+#endif // GTEST_INCLUDE_GTEST_GTEST_PROD_H_
