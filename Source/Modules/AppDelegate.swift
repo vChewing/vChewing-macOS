@@ -27,156 +27,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 import InputMethodKit
 
-private let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
-private let kNextUpdateCheckDateKey = "NextUpdateCheckDate"
-private let kUpdateInfoEndpointKey = "UpdateInfoEndpoint"
-private let kUpdateInfoSiteKey = "UpdateInfoSite"
-private let kVersionDescription = "VersionDescription"
-private let kNextCheckInterval: TimeInterval = 86400.0
-private let kTimeoutInterval: TimeInterval = 60.0
-
-struct VersionUpdateReport {
-	var siteUrl: URL?
-	var currentShortVersion: String = ""
-	var currentVersion: String = ""
-	var remoteShortVersion: String = ""
-	var remoteVersion: String = ""
-	var versionDescription: String = ""
-}
-
-enum VersionUpdateApiResult {
-	case shouldUpdate(report: VersionUpdateReport)
-	case noNeedToUpdate
-	case ignored
-}
-
-enum VersionUpdateApiError: Error, LocalizedError {
-	case connectionError(message: String)
-
-	var errorDescription: String? {
-		switch self {
-			case .connectionError(let message):
-				return String(
-					format: NSLocalizedString(
-						"There may be no internet connection or the server failed to respond.\n\nError message: %@",
-						comment: ""), message)
-		}
-	}
-}
-
-struct VersionUpdateApi {
-	static func check(
-		forced: Bool, callback: @escaping (Result<VersionUpdateApiResult, Error>) -> Void
-	) -> URLSessionTask? {
-		guard let infoDict = Bundle.main.infoDictionary,
-			let updateInfoURLString = infoDict[kUpdateInfoEndpointKey] as? String,
-			let updateInfoURL = URL(string: updateInfoURLString)
-		else {
-			return nil
-		}
-
-		let request = URLRequest(
-			url: updateInfoURL, cachePolicy: .reloadIgnoringLocalCacheData,
-			timeoutInterval: kTimeoutInterval)
-		let task = URLSession.shared.dataTask(with: request) { data, response, error in
-			if let error = error {
-				DispatchQueue.main.async {
-					forced
-						? callback(
-							.failure(
-								VersionUpdateApiError.connectionError(
-									message: error.localizedDescription)))
-						: callback(.success(.ignored))
-				}
-				return
-			}
-
-			do {
-				guard
-					let plist = try PropertyListSerialization.propertyList(
-						from: data ?? Data(), options: [], format: nil) as? [AnyHashable: Any],
-					let remoteVersion = plist[kCFBundleVersionKey] as? String,
-					let infoDict = Bundle.main.infoDictionary
-				else {
-					DispatchQueue.main.async {
-						forced
-							? callback(.success(.noNeedToUpdate))
-							: callback(.success(.ignored))
-					}
-					return
-				}
-
-				// TODO: Validate info (e.g. bundle identifier)
-				// TODO: Use HTML to display change log, need a new key like UpdateInfoChangeLogURL for this
-
-				let currentVersion = infoDict[kCFBundleVersionKey as String] as? String ?? ""
-				let result = currentVersion.compare(
-					remoteVersion, options: .numeric, range: nil, locale: nil)
-
-				if result != .orderedAscending {
-					DispatchQueue.main.async {
-						forced
-							? callback(.success(.noNeedToUpdate))
-							: callback(.success(.ignored))
-					}
-					IME.prtDebugIntel(
-						"vChewingDebug: Update // Order is not Ascending, assuming that there's no new version available."
-					)
-					return
-				}
-				IME.prtDebugIntel(
-					"vChewingDebug: Update // New version detected, proceeding to the next phase.")
-				guard let siteInfoURLString = plist[kUpdateInfoSiteKey] as? String,
-					let siteInfoURL = URL(string: siteInfoURLString)
-				else {
-					DispatchQueue.main.async {
-						forced
-							? callback(.success(.noNeedToUpdate))
-							: callback(.success(.ignored))
-					}
-					IME.prtDebugIntel(
-						"vChewingDebug: Update // Failed from retrieving / parsing URL intel.")
-					return
-				}
-				IME.prtDebugIntel(
-					"vChewingDebug: Update // URL intel retrieved, proceeding to the next phase.")
-				var report = VersionUpdateReport(siteUrl: siteInfoURL)
-				var versionDescription = ""
-				let versionDescriptions = plist[kVersionDescription] as? [AnyHashable: Any]
-				if let versionDescriptions = versionDescriptions {
-					var locale = "en"
-					let supportedLocales = ["en", "zh-Hant", "zh-Hans", "ja"]
-					let preferredTags = Bundle.preferredLocalizations(from: supportedLocales)
-					if let first = preferredTags.first {
-						locale = first
-					}
-					versionDescription =
-						versionDescriptions[locale] as? String ?? versionDescriptions["en"]
-						as? String ?? ""
-					if !versionDescription.isEmpty {
-						versionDescription = "\n\n" + versionDescription
-					}
-				}
-				report.currentShortVersion = infoDict["CFBundleShortVersionString"] as? String ?? ""
-				report.currentVersion = currentVersion
-				report.remoteShortVersion = plist["CFBundleShortVersionString"] as? String ?? ""
-				report.remoteVersion = remoteVersion
-				report.versionDescription = versionDescription
-				DispatchQueue.main.async {
-					callback(.success(.shouldUpdate(report: report)))
-				}
-				IME.prtDebugIntel("vChewingDebug: Update // Callbck Complete.")
-			} catch {
-				DispatchQueue.main.async {
-					forced ? callback(.success(.noNeedToUpdate)) : callback(.success(.ignored))
-				}
-			}
-		}
-		task.resume()
-		return task
-	}
-}
-
 @objc(AppDelegate)
 class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelegate,
 	FSEventStreamHelperDelegate
@@ -220,7 +70,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
 		mgrPrefs.setMissingDefaults()
 
 		// 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
-		if (UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) != nil) == true {
+		if (UserDefaults.standard.object(forKey: VersionUpdateApi.kCheckUpdateAutomatically) != nil) == true {
 			checkForUpdate()
 		}
 	}
@@ -262,18 +112,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
 
 		// time for update?
 		if !forced {
-			if UserDefaults.standard.bool(forKey: kCheckUpdateAutomatically) == false {
+			if UserDefaults.standard.bool(forKey: VersionUpdateApi.kCheckUpdateAutomatically) == false {
 				return
 			}
 			let now = Date()
-			let date = UserDefaults.standard.object(forKey: kNextUpdateCheckDateKey) as? Date ?? now
+			let date = UserDefaults.standard.object(forKey: VersionUpdateApi.kNextUpdateCheckDateKey) as? Date ?? now
 			if now.compare(date) == .orderedAscending {
 				return
 			}
 		}
 
-		let nextUpdateDate = Date(timeInterval: kNextCheckInterval, since: Date())
-		UserDefaults.standard.set(nextUpdateDate, forKey: kNextUpdateCheckDateKey)
+		let nextUpdateDate = Date(timeInterval: VersionUpdateApi.kNextCheckInterval, since: Date())
+		UserDefaults.standard.set(nextUpdateDate, forKey: VersionUpdateApi.kNextUpdateCheckDateKey)
 
 		checkTask = VersionUpdateApi.check(forced: forced) { [self] result in
 			defer {

@@ -1,5 +1,6 @@
 // Copyright (c) 2021 and onwards Weizhong Yang (MIT License).
-// All possible vChewing-specific modifications are (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// All possible vChewing-specific modifications are of:
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 /*
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -123,7 +124,7 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
 		panel.titlebarAppearsTransparent = true
 		panel.titleVisibility = .hidden
 		panel.showsToolbarButton = false
-		panel.standardWindowButton(NSWindow.ButtonType.fullScreenButton)?.isHidden = true
+		panel.standardWindowButton(NSWindow.ButtonType.zoomButton)?.isHidden = true
 		panel.standardWindowButton(NSWindow.ButtonType.miniaturizeButton)?.isHidden = true
 		panel.standardWindowButton(NSWindow.ButtonType.closeButton)?.isHidden = true
 		panel.standardWindowButton(NSWindow.ButtonType.zoomButton)?.isHidden = true
