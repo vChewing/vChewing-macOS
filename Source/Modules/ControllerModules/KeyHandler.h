@@ -53,7 +53,7 @@ extern InputMode imeModeNULL;
       errorCallback:(void (^)(void))errorCallback
     NS_SWIFT_NAME(handle(input:state:stateCallback:errorCallback:));
 
-- (void)syncWithPreferences;
+- (void)ensurePhoneticParser;
 - (void)fixNodeWithValue:(NSString *)value NS_SWIFT_NAME(fixNode(value:));
 - (void)clear;
 
@@ -62,6 +62,7 @@ extern InputMode imeModeNULL;
 
 @property(strong, nonatomic) InputMode inputMode;
 @property(weak, nonatomic) id<KeyHandlerDelegate> delegate;
+
 @end
 
 NS_ASSUME_NONNULL_END

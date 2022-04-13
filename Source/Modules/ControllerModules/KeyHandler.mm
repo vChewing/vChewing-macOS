@@ -37,6 +37,11 @@ InputMode imeModeCHS = ctlInputMethod.kIMEModeCHS;
 InputMode imeModeCHT = ctlInputMethod.kIMEModeCHT;
 InputMode imeModeNULL = ctlInputMethod.kIMEModeNULL;
 
+typedef vChewing::LMInstantiator BaseLM;
+typedef vChewing::UserOverrideModel UserOverrideLM;
+typedef Gramambular::BlockReadingBuilder BlockBuilder;
+typedef Mandarin::BopomofoReadingBuffer PhoneticBuffer;
+
 static const double kEpsilon = 0.000001;
 
 static double FindHighestScore(const std::vector<Gramambular::NodeAnchor> &nodes, double epsilon)
@@ -69,16 +74,16 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 @implementation KeyHandler
 {
     // the reading buffer that takes user input
-    Mandarin::BopomofoReadingBuffer *_bpmfReadingBuffer;
+    PhoneticBuffer *_bpmfReadingBuffer;
 
     // language model
-    vChewing::LMInstantiator *_languageModel;
+    BaseLM *_languageModel;
 
     // user override model
-    vChewing::UserOverrideModel *_userOverrideModel;
+    UserOverrideLM *_userOverrideModel;
 
     // the grid (lattice) builder for the unigrams (and bigrams)
-    Gramambular::BlockReadingBuilder *_builder;
+    BlockBuilder *_builder;
 
     // latest walked path (trellis) using the Viterbi algorithm
     std::vector<Gramambular::NodeAnchor> _walkedNodes;
@@ -101,40 +106,28 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
 - (void)setInputMode:(NSString *)value
 {
-    NSString *newInputMode;
-    vChewing::LMInstantiator *newLanguageModel;
-    vChewing::UserOverrideModel *newUserOverrideModel;
-
+    // 下面這句的「isKindOfClass」是做類型檢查，
+    // 為了應對出現輸入法 plist 被改壞掉這樣的極端情況。
     BOOL isCHS = [value isKindOfClass:[NSString class]] && [value isEqual:imeModeCHS];
 
-    newInputMode = isCHS ? imeModeCHS : imeModeCHT;
-    newLanguageModel = isCHS ? [mgrLangModel lmCHS] : [mgrLangModel lmCHT];
-    newUserOverrideModel = isCHS ? [mgrLangModel userOverrideModelCHS] : [mgrLangModel userOverrideModelCHT];
+    // 緊接著將新的簡繁輸入模式提報給 ctlInputMethod:
+    ctlInputMethod.currentInputMode = isCHS ? imeModeCHS : imeModeCHT;
 
-    // Report the current Input Mode to ctlInputMethod:
-    ctlInputMethod.currentInputMode = newInputMode;
-
-    // Synchronize the sub-languageModel state settings to the new LM.
-    newLanguageModel->setPhraseReplacementEnabled(mgrPrefs.phraseReplacementEnabled);
-    newLanguageModel->setSymbolEnabled(mgrPrefs.symbolInputEnabled);
-    newLanguageModel->setCNSEnabled(mgrPrefs.cns11643Enabled);
-
-    // Only apply the changes if the value is changed
-    if (![_inputMode isEqualToString:newInputMode])
+    // 拿當前的 _inputMode 與 ctlInputMethod 的提報結果對比，不同的話則套用新設定：
+    if (![_inputMode isEqualToString:ctlInputMethod.currentInputMode])
     {
-        _inputMode = newInputMode;
-        _languageModel = newLanguageModel;
-        _userOverrideModel = newUserOverrideModel;
+        _inputMode = ctlInputMethod.currentInputMode;
 
-        if (_builder)
-        {
-            delete _builder;
-            _builder = new Gramambular::BlockReadingBuilder(_languageModel);
-            _builder->setJoinSeparator("-");
-        }
+        // Reinitiate language models if necessary
+        [self setInputModesToLM:isCHS];
 
-        if (!_bpmfReadingBuffer->isEmpty())
-            _bpmfReadingBuffer->clear();
+        // Synchronize the sub-languageModel state settings to the new LM.
+        [self syncBaseLMPrefs];
+
+        [self removeBuilderAndReset:YES];
+
+        if (![self isPhoneticReadingBufferEmpty])
+            [self clearPhoneticReadingBuffer];
     }
 }
 
@@ -143,7 +136,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if (_bpmfReadingBuffer)
         delete _bpmfReadingBuffer;
     if (_builder)
-        delete _builder;
+        [self removeBuilderAndReset:NO];
 }
 
 - (instancetype)init
@@ -151,58 +144,13 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     self = [super init];
     if (self)
     {
-        _bpmfReadingBuffer = new Mandarin::BopomofoReadingBuffer(Mandarin::BopomofoKeyboardLayout::StandardLayout());
-
-        // create the lattice builder
-        _languageModel = [mgrLangModel lmCHT];
-        _languageModel->setPhraseReplacementEnabled(mgrPrefs.phraseReplacementEnabled);
-        _languageModel->setCNSEnabled(mgrPrefs.cns11643Enabled);
-        _languageModel->setSymbolEnabled(mgrPrefs.symbolInputEnabled);
-        _userOverrideModel = [mgrLangModel userOverrideModelCHT];
-
-        _builder = new Gramambular::BlockReadingBuilder(_languageModel);
-
-        // each Mandarin syllable is separated by a hyphen
-        _builder->setJoinSeparator("-");
-        _inputMode = imeModeCHT;
+        [self ensurePhoneticParser];
+        [self setInputMode:ctlInputMethod.currentInputMode];
     }
     return self;
 }
 
-- (void)syncWithPreferences
-{
-    switch (mgrPrefs.mandarinParser)
-    {
-    case MandarinParserOfStandard:
-        _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::StandardLayout());
-        break;
-    case MandarinParserOfEten:
-        _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::ETenLayout());
-        break;
-    case MandarinParserOfHsu:
-        _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::HsuLayout());
-        break;
-    case MandarinParserOfEen26:
-        _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::ETen26Layout());
-        break;
-    case MandarinParserOfIBM:
-        _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::IBMLayout());
-        break;
-    case MandarinParserOfMiTAC:
-        _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::MiTACLayout());
-        break;
-    case MandarinParserOfFakeSeigyou:
-        _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::FakeSeigyouLayout());
-        break;
-    case MandarinParserOfHanyuPinyin:
-        _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::HanyuPinyinLayout());
-        break;
-    default:
-        _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::StandardLayout());
-        mgrPrefs.mandarinParser = MandarinParserOfStandard;
-    }
-}
-
+// NON-SWIFTIFIABLE
 - (void)fixNodeWithValue:(NSString *)value
 {
     size_t cursorIndex = [self _actualCandidateCursorIndex];
@@ -242,9 +190,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 }
 
+// NON-SWIFTIFIABLE
 - (void)clear
 {
-    _bpmfReadingBuffer->clear();
+    [self clearPhoneticReadingBuffer];
     _builder->clear();
     _walkedNodes.clear();
 }
@@ -360,14 +309,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // MARK: Handle BPMF Keys
 
     // see if it's valid BPMF reading
-    if (!skipBpmfHandling && _bpmfReadingBuffer->isValidKey((char)charCode))
+    if (!skipBpmfHandling && [self chkKeyValidity:charCode])
     {
-        _bpmfReadingBuffer->combineKey((char)charCode);
+        [self combinePhoneticReadingBufferKey:charCode];
 
         // if we have a tone marker, we have to insert the reading to the
         // builder in other words, if we don't have a tone marker, we just
         // update the composing buffer
-        composeReading = _bpmfReadingBuffer->hasToneMarker();
+        composeReading = [self checkWhetherToneMarkerConfirmsPhoneticReadingBuffer];
         if (!composeReading)
         {
             InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
@@ -378,11 +327,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     // see if we have composition if Enter/Space is hit and buffer is not empty
     // we use "OR" conditioning so that the tone marker key is also taken into account
-    composeReading |= (!_bpmfReadingBuffer->isEmpty() && ([input isSpace] || [input isEnter]));
+    composeReading |= (![self isPhoneticReadingBufferEmpty] && ([input isSpace] || [input isEnter]));
     if (composeReading)
     {
         // combine the reading
-        std::string reading = _bpmfReadingBuffer->syllable().composedString();
+        std::string reading = [[self getSyllableCompositionFromPhoneticReadingBuffer] UTF8String];
 
         // see if we have an unigram for this
         if (!_languageModel->hasUnigramsForKey(reading))
@@ -416,7 +365,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         }
 
         // then update the text
-        _bpmfReadingBuffer->clear();
+        [self clearPhoneticReadingBuffer];
 
         InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
         inputting.poppedText = poppedText;
@@ -461,7 +410,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 
     // MARK: Calling candidate window using Space or Down or PageUp / PageDn.
-    if (_bpmfReadingBuffer->isEmpty() && [state isKindOfClass:[InputStateNotEmpty class]] &&
+    if ([self isPhoneticReadingBufferEmpty] && [state isKindOfClass:[InputStateNotEmpty class]] &&
         ([input isExtraChooseCandidateKey] || [input isExtraChooseCandidateKeyReverse] || [input isSpace] ||
          [input isPageDown] || [input isPageUp] || [input isTab] ||
          (input.useVerticalMode && ([input isVerticalModeOnlyChooseCandidateKey]))))
@@ -561,7 +510,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         {
             if (_languageModel->hasUnigramsForKey("_punctuation_list"))
             {
-                if (_bpmfReadingBuffer->isEmpty())
+                if ([self isPhoneticReadingBufferEmpty])
                 {
                     _builder->insertReadingAtCursor(string("_punctuation_list"));
                     NSString *poppedText = [self _popOverflowComposingTextAndWalk];
@@ -643,7 +592,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // still nothing, then we update the composing buffer (some app has strange behavior if we don't do this, "thinking"
     // the key is not actually consumed) 砍掉這一段會導致「F1-F12
     // 按鍵干擾組字區」的問題。暫時只能先恢復這段，且補上偵錯彙報機制，方便今後排查故障。
-    if ([state isKindOfClass:[InputStateNotEmpty class]] || !_bpmfReadingBuffer->isEmpty())
+    if ([state isKindOfClass:[InputStateNotEmpty class]] || ![self isPhoneticReadingBufferEmpty])
     {
         [IME prtDebugIntel:[NSString
                                stringWithFormat:@"Blocked data: charCode: %c, keyCode: %c", charCode, input.keyCode]];
@@ -681,9 +630,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         // Bopomofo reading, in odds with the expectation of users from
         // other platforms
 
-        if (!_bpmfReadingBuffer->isEmpty())
+        if (![self isPhoneticReadingBufferEmpty])
         {
-            _bpmfReadingBuffer->clear();
+            [self clearPhoneticReadingBuffer];
             if (!_builder->length())
             {
                 InputStateEmpty *empty = [[InputStateEmpty alloc] init];
@@ -707,7 +656,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if (![state isKindOfClass:[InputStateInputting class]])
         return NO;
 
-    if (!_bpmfReadingBuffer->isEmpty())
+    if (![self isPhoneticReadingBufferEmpty])
     {
         [IME prtDebugIntel:@"6ED95318"];
         errorCallback();
@@ -764,7 +713,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if (![state isKindOfClass:[InputStateInputting class]])
         return NO;
 
-    if (!_bpmfReadingBuffer->isEmpty())
+    if (![self isPhoneticReadingBufferEmpty])
     {
         [IME prtDebugIntel:@"B3BA5257"];
         errorCallback();
@@ -820,7 +769,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if (![state isKindOfClass:[InputStateInputting class]])
         return NO;
 
-    if (!_bpmfReadingBuffer->isEmpty())
+    if (![self isPhoneticReadingBufferEmpty])
     {
         [IME prtDebugIntel:@"ABC44080"];
         errorCallback();
@@ -851,7 +800,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if (![state isKindOfClass:[InputStateInputting class]])
         return NO;
 
-    if (!_bpmfReadingBuffer->isEmpty())
+    if (![self isPhoneticReadingBufferEmpty])
     {
         [IME prtDebugIntel:@"9B69908D"];
         errorCallback();
@@ -882,7 +831,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if (![state isKindOfClass:[InputStateInputting class]])
         return NO;
 
-    if (!_bpmfReadingBuffer->isEmpty())
+    if (![self isPhoneticReadingBufferEmpty])
     {
         [IME prtDebugIntel:@"9B6F908D"];
         errorCallback();
@@ -898,7 +847,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if (![state isKindOfClass:[InputStateInputting class]])
         return NO;
 
-    if (_bpmfReadingBuffer->isEmpty())
+    if ([self isPhoneticReadingBufferEmpty])
     {
         if (_builder->cursorIndex())
         {
@@ -914,9 +863,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         }
     }
     else
-        _bpmfReadingBuffer->backspace();
+        [self doBackSpaceToPhoneticReadingBuffer];
 
-    if (_bpmfReadingBuffer->isEmpty() && !_builder->length())
+    if ([self isPhoneticReadingBufferEmpty] && !_builder->length())
     {
         InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
         stateCallback(empty);
@@ -936,7 +885,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if (![state isKindOfClass:[InputStateInputting class]])
         return NO;
 
-    if (_bpmfReadingBuffer->isEmpty())
+    if ([self isPhoneticReadingBufferEmpty])
     {
         if (_builder->cursorIndex() != _builder->length())
         {
@@ -1018,7 +967,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return NO;
 
     NSString *poppedText;
-    if (_bpmfReadingBuffer->isEmpty())
+    if ([self isPhoneticReadingBufferEmpty])
     {
         _builder->insertReadingAtCursor(customPunctuation);
         poppedText = [self _popOverflowComposingTextAndWalk];
@@ -1035,7 +984,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     inputting.poppedText = poppedText;
     stateCallback(inputting);
 
-    if (mgrPrefs.useSCPCTypingMode && _bpmfReadingBuffer->isEmpty())
+    if (mgrPrefs.useSCPCTypingMode && [self isPhoneticReadingBufferEmpty])
     {
         InputStateChoosingCandidate *candidateState = [self _buildCandidateState:inputting
                                                                  useVerticalMode:useVerticalMode];
@@ -1454,7 +1403,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         std::string customPunctuation = punctuationNamePrefix + parser + std::string(1, (char)charCode);
         std::string punctuation = punctuationNamePrefix + std::string(1, (char)charCode);
 
-        BOOL shouldAutoSelectCandidate = _bpmfReadingBuffer->isValidKey((char)charCode) ||
+        BOOL shouldAutoSelectCandidate = [self chkKeyValidity:charCode] ||
                                          _languageModel->hasUnigramsForKey(customPunctuation) ||
                                          _languageModel->hasUnigramsForKey(punctuation);
 
@@ -1585,7 +1534,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // and insert the reading text (the Mandarin syllable) in between them;
     // the reading text is what the user is typing
     NSString *head = [composingBuffer substringToIndex:composedStringCursorIndex];
-    NSString *reading = [NSString stringWithUTF8String:_bpmfReadingBuffer->composedString().c_str()];
+    NSString *reading = [self getCompositionFromPhoneticReadingBuffer];
     NSString *tail = [composingBuffer substringFromIndex:composedStringCursorIndex];
     NSString *composedText = [head stringByAppendingString:[reading stringByAppendingString:tail]];
     NSInteger cursorIndex = composedStringCursorIndex + [reading length];
@@ -1627,10 +1576,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // in an ideal world, we can as well let the user type forever,
     // but because the Viterbi algorithm has a complexity of O(N^2),
     // the walk will become slower as the number of nodes increase,
-    // therefore we need to "pop out" overflown text -- they usually
+    // therefore we need to auto-commit overflown texts which usually
     // lose their influence over the whole MLE anyway -- so that when
-    // the user type along, the already composed text at front will
-    // be popped out
+    // the user type along, the already composed text in the rear side
+    // of the buffer will be committed (i.e. "popped out").
 
     NSString *poppedText = @"";
     NSInteger composingBufferSize = mgrPrefs.composingBufferSize;
@@ -1677,6 +1626,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     return state;
 }
 
+// NON-SWIFTIFIABLE
 - (size_t)_actualCandidateCursorIndex
 {
     size_t cursorIndex = _builder->cursorIndex();
@@ -1687,6 +1637,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     return cursorIndex;
 }
 
+// NON-SWIFTIFIABLE
 - (NSArray *)_currentReadings
 {
     NSMutableArray *readingsArray = [[NSMutableArray alloc] init];
@@ -1696,6 +1647,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     return readingsArray;
 }
 
+// NON-SWIFTIFIABLE
 - (nullable InputState *)buildAssociatePhraseStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode
 {
     std::string cppKey = std::string(key.UTF8String);
@@ -1714,5 +1666,127 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
     return nil;
 }
+
+#pragma mark - 必須用 ObjCpp 處理的部分: Mandarin
+
+- (BOOL)chkKeyValidity:(UniChar)charCode
+{
+    return _bpmfReadingBuffer->isValidKey((char)charCode);
+}
+
+- (BOOL)isPhoneticReadingBufferEmpty
+{
+    return _bpmfReadingBuffer->isEmpty();
+}
+
+- (void)clearPhoneticReadingBuffer
+{
+    _bpmfReadingBuffer->clear();
+}
+
+- (void)combinePhoneticReadingBufferKey:(UniChar)charCode
+{
+    _bpmfReadingBuffer->combineKey((char)charCode);
+}
+
+- (BOOL)checkWhetherToneMarkerConfirmsPhoneticReadingBuffer
+{
+    return _bpmfReadingBuffer->hasToneMarker();
+}
+
+- (NSString *)getSyllableCompositionFromPhoneticReadingBuffer
+{
+    return [NSString stringWithUTF8String:_bpmfReadingBuffer->syllable().composedString().c_str()];
+}
+
+- (void)doBackSpaceToPhoneticReadingBuffer
+{
+    _bpmfReadingBuffer->backspace();
+}
+
+- (NSString *)getCompositionFromPhoneticReadingBuffer
+{
+    return [NSString stringWithUTF8String:_bpmfReadingBuffer->composedString().c_str()];
+}
+
+- (void)ensurePhoneticParser
+{
+    if (_bpmfReadingBuffer)
+    {
+        switch (mgrPrefs.mandarinParser)
+        {
+        case MandarinParserOfStandard:
+            _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::StandardLayout());
+            break;
+        case MandarinParserOfEten:
+            _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::ETenLayout());
+            break;
+        case MandarinParserOfHsu:
+            _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::HsuLayout());
+            break;
+        case MandarinParserOfEen26:
+            _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::ETen26Layout());
+            break;
+        case MandarinParserOfIBM:
+            _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::IBMLayout());
+            break;
+        case MandarinParserOfMiTAC:
+            _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::MiTACLayout());
+            break;
+        case MandarinParserOfFakeSeigyou:
+            _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::FakeSeigyouLayout());
+            break;
+        case MandarinParserOfHanyuPinyin:
+            _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::HanyuPinyinLayout());
+            break;
+        default:
+            _bpmfReadingBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::StandardLayout());
+            mgrPrefs.mandarinParser = MandarinParserOfStandard;
+        }
+    }
+    else
+    {
+        _bpmfReadingBuffer = new Mandarin::BopomofoReadingBuffer(Mandarin::BopomofoKeyboardLayout::StandardLayout());
+    }
+}
+
+#pragma mark - 必須用 ObjCpp 處理的部分: Gramambular 等
+
+- (void)removeBuilderAndReset:(BOOL)shouldReset
+{
+    if (_builder)
+    {
+        delete _builder;
+        if (shouldReset)
+            [self createNewBuilder];
+    }
+    else if (shouldReset)
+        [self createNewBuilder];
+}
+
+- (void)createNewBuilder
+{
+    _builder = new Gramambular::BlockReadingBuilder(_languageModel);
+    // Each Mandarin syllable is separated by a hyphen.
+    _builder->setJoinSeparator("-");
+}
+
+- (void)setInputModesToLM:(BOOL)isCHS
+{
+    _languageModel = isCHS ? [mgrLangModel lmCHS] : [mgrLangModel lmCHT];
+    _userOverrideModel = isCHS ? [mgrLangModel userOverrideModelCHS] : [mgrLangModel userOverrideModelCHT];
+}
+
+- (void)syncBaseLMPrefs
+{
+    if (_languageModel)
+    {
+        _languageModel->setPhraseReplacementEnabled(mgrPrefs.phraseReplacementEnabled);
+        _languageModel->setSymbolEnabled(mgrPrefs.symbolInputEnabled);
+        _languageModel->setCNSEnabled(mgrPrefs.cns11643Enabled);
+    }
+}
+
+#pragma mark - 威注音認為有必要單獨拿出來處理的部分。
 
 @end
