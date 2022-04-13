@@ -1434,7 +1434,6 @@
 					"$(OTHER_CFLAGS)",
 					"-fcxx-modules",
 				);
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -1475,8 +1474,6 @@
 					"$(OTHER_CFLAGS)",
 					"-fcxx-modules",
 				);
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Release;
 		};
