@@ -324,7 +324,7 @@
 		D4E33D8927A838CF006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D4E33D8E27A838F0006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D4E569DA27A34CC100AC2CEF /* KeyHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyHandler.h; sourceTree = "<group>"; };
-		D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = KeyHandler.mm; sourceTree = "<group>"; };
+		D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = KeyHandler.mm; sourceTree = "<group>"; usesTabs = 0; };
 		D4F0BBDE279AF1AF0071253C /* ArchiveUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveUtil.swift; sourceTree = "<group>"; };
 		D4F0BBE0279AF8B30071253C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D4F0BBE2279B08900071253C /* Chronosphere.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Chronosphere.h; sourceTree = "<group>"; };
