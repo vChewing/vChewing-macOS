@@ -28,6 +28,7 @@ import Cocoa
 
 struct UserDef {
 	static let kIsDebugModeEnabled = "_DebugMode"
+	static let kMostRecentInputMode = "MostRecentInputMode"
 	static let kUserDataFolderSpecified = "UserDataFolderSpecified"
 	static let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
 	static let kMandarinParser = "MandarinParser"
@@ -204,6 +205,7 @@ public class mgrPrefs: NSObject {
 	static var allKeys: [String] {
 		[
 			UserDef.kIsDebugModeEnabled,
+			UserDef.kMostRecentInputMode,
 			UserDef.kUserDataFolderSpecified,
 			UserDef.kMandarinParser,
 			UserDef.kBasicKeyboardLayout,
@@ -238,6 +240,7 @@ public class mgrPrefs: NSObject {
 	// MARK: - 既然 Preferences Module 的預設屬性不自動寫入 plist，那這邊就先寫入了。
 	@objc public static func setMissingDefaults() {
 		UserDefaults.standard.setDefault(mgrPrefs.isDebugModeEnabled, forKey: UserDef.kIsDebugModeEnabled)
+		UserDefaults.standard.setDefault(mgrPrefs.mostRecentInputMode, forKey: UserDef.kMostRecentInputMode)
 		UserDefaults.standard.setDefault(mgrPrefs.checkUpdateAutomatically, forKey: UserDef.kCheckUpdateAutomatically)
 		UserDefaults.standard.setDefault(
 			mgrPrefs.showPageButtonsInCandidateWindow, forKey: UserDef.kShowPageButtonsInCandidateWindow)
@@ -270,6 +273,9 @@ public class mgrPrefs: NSObject {
 
 	@UserDefault(key: UserDef.kIsDebugModeEnabled, defaultValue: false)
 	@objc static var isDebugModeEnabled: Bool
+
+	@UserDefault(key: UserDef.kMostRecentInputMode, defaultValue: "")
+	@objc static var mostRecentInputMode: String
 
 	@UserDefault(key: UserDef.kCheckUpdateAutomatically, defaultValue: false)
 	@objc static var checkUpdateAutomatically: Bool
