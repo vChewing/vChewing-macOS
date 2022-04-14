@@ -75,6 +75,9 @@ class ctlInputMethod: IMKInputController {
 	override init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
 		super.init(server: server, delegate: delegate, client: inputClient)
 		keyHandler.delegate = self
+		// 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
+		activateServer(inputClient)
+		resetKeyHandler()
 	}
 
 	// MARK: - KeyHandler Reset Command
