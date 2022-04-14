@@ -60,7 +60,7 @@ class ctlInputMethod: IMKInputController {
 	// 所以才需要「currentKeyHandler」這個假 keyHandler。
 	// 這個「currentKeyHandler」僅用來讓其他模組知道當前的輸入模式是什麼模式，除此之外別無屌用。
 	static var currentKeyHandler: KeyHandler = KeyHandler()
-	@objc static var currentInputMode = ""
+	@objc static var currentInputMode = mgrPrefs.mostRecentInputMode
 
 	// MARK: - Keyboard Layout Specifier
 

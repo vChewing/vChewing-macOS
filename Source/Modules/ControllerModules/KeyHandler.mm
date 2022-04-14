@@ -112,11 +112,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     // 緊接著將新的簡繁輸入模式提報給 ctlInputMethod:
     ctlInputMethod.currentInputMode = isCHS ? imeModeCHS : imeModeCHT;
+    mgrPrefs.mostRecentInputMode = ctlInputMethod.currentInputMode;
 
     // 拿當前的 _inputMode 與 ctlInputMethod 的提報結果對比，不同的話則套用新設定：
     if (![_inputMode isEqualToString:ctlInputMethod.currentInputMode])
     {
-
         // Reinitiate language models if necessary
         [self setInputModesToLM:isCHS];
 
