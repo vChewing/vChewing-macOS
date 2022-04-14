@@ -116,7 +116,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // 拿當前的 _inputMode 與 ctlInputMethod 的提報結果對比，不同的話則套用新設定：
     if (![_inputMode isEqualToString:ctlInputMethod.currentInputMode])
     {
-        _inputMode = ctlInputMethod.currentInputMode;
 
         // Reinitiate language models if necessary
         [self setInputModesToLM:isCHS];
@@ -129,6 +128,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         if (![self isPhoneticReadingBufferEmpty])
             [self clearPhoneticReadingBuffer];
     }
+    _inputMode = ctlInputMethod.currentInputMode;
 }
 
 - (void)dealloc
