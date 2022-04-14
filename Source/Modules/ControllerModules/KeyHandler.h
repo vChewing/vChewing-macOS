@@ -63,6 +63,9 @@ extern InputMode imeModeNULL;
 @property(strong, nonatomic) InputMode inputMode;
 @property(weak, nonatomic) id<KeyHandlerDelegate> delegate;
 
+- (BOOL)isPhoneticReadingBufferEmpty;
+- (BOOL)isPrintable:(UniChar)charCode;
+
 @end
 
 NS_ASSUME_NONNULL_END
