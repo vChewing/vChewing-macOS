@@ -1789,4 +1789,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
 #pragma mark - 威注音認為有必要單獨拿出來處理的部分。
 
+- (BOOL)isPrintable:(UniChar)charCode
+{
+    return isprint(charCode);
+}
+
 @end
