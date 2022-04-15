@@ -29,13 +29,15 @@ import Cocoa
 @objc extension KeyHandler {
 	func handleInputSwift(
 		input: keyParser,
-		state: InputState,
+		state inState: InputState,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback: @escaping () -> Void
 	) -> Bool {
 		let charCode: UniChar = input.charCode
-		// let emacsKey: vChewingEmacsKey = input.emacsKey
+		var state = inState  // Turn this incoming constant to variable.
+		let emacsKey: vChewingEmacsKey = input.emacsKey
 		let inputText: String = input.inputText ?? ""
+		let emptyState = InputState.Empty()
 
 		// Ignore the input if its inputText is empty.
 		// Reason: such inputs may be functional key combinations.
@@ -62,7 +64,6 @@ import Cocoa
 		} else if input.isCapsLockOn {
 			// Process all possible combination, we hope.
 			clear()
-			let emptyState = InputState.Empty()
 			stateCallback(emptyState)
 
 			// When shift is pressed, don't do further processing...
@@ -91,7 +92,6 @@ import Cocoa
 				&& !input.isUp && !input.isSpace && isPrintable(charCode)
 			{
 				clear()
-				let emptyState = InputState.Empty()
 				stateCallback(emptyState)
 				let committing = InputState.Committing(poppedText: inputText.lowercased())
 				stateCallback(committing)
@@ -99,6 +99,161 @@ import Cocoa
 				return true
 			}
 		}
+
+		// MARK: - Handle Candidates.
+		if state is InputState.ChoosingCandidate {
+			return handleCandidate(
+				state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
+		}
+
+		// MARK: - Handle Associated Phrases.
+		if state is InputState.AssociatedPhrases {
+			let result = handleCandidate(
+				state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
+			if result {
+				return true
+			} else {
+				stateCallback(emptyState)
+			}
+		}
+
+		// MARK: - Handle Marking.
+		if state is InputState.Marking {
+			let marking = state as! InputState.Marking
+
+			if handleMarking(
+				state: state as! InputState.Marking, input: input, stateCallback: stateCallback,
+				errorCallback: errorCallback)
+			{
+				return true
+			}
+
+			state = marking.convertToInputting()
+			stateCallback(state)
+		}
+
+		// MARK: - Handle BPMF Keys.
+		var composeReading: Bool = false
+		let skipPhoneticHandling = input.isReservedKey || input.isControlHold || input.isOptionHold
+
+		// See if Phonetic reading is valid.
+		if !skipPhoneticHandling && chkKeyValidity(charCode) {
+			combinePhoneticReadingBufferKey(charCode)
+
+			// If we have a tone marker, we have to insert the reading to the
+			// builder in other words, if we don't have a tone marker, we just
+			// update the composing buffer.
+			composeReading = checkWhetherToneMarkerConfirmsPhoneticReadingBuffer()
+			if !composeReading {
+				let inputting = buildInputtingState() as! InputState.Inputting
+				stateCallback(inputting)
+				return true
+			}
+
+		}
+
+		// See if we have composition if Enter/Space is hit and buffer is not empty.
+		// We use "|=" conditioning so that the tone marker key is also taken into account.
+        // However, Swift does not support "|=".
+		composeReading = composeReading || (!isPhoneticReadingBufferEmpty() && (input.isSpace || input.isEnter))
+		if composeReading {
+			let reading = getSyllableCompositionFromPhoneticReadingBuffer()
+
+			if !ifLangModelHasUnigrams(forKey: reading) {
+				IME.prtDebugIntel("B49C0979")
+				errorCallback()
+				let inputting = buildInputtingState() as! InputState.Inputting
+				stateCallback(inputting)
+				return true
+			}
+
+			// ... and insert it into the lattice grid...
+			insertReadingToBuilder(atCursor: reading)
+
+			// ... then walk the lattice grid...
+			let poppedText = _popOverflowComposingTextAndWalk()
+
+			// ... get and tweak override model suggestion if possible...
+			dealWithOverrideModelSuggestions()
+
+			// ... then update the text.
+			clearPhoneticReadingBuffer()
+
+			let inputting = buildInputtingState() as! InputState.Inputting
+			inputting.poppedText = poppedText
+			stateCallback(inputting)
+
+			if mgrPrefs.useSCPCTypingMode {
+				let choosingCandidates: InputState.ChoosingCandidate = _buildCandidateState(
+					inputting,
+					useVerticalMode: input.useVerticalMode)
+				if choosingCandidates.candidates.count == 1 {
+					clear()
+                    let text: String = choosingCandidates.candidates.first ?? ""
+					let committing = InputState.Committing(poppedText: text)
+					stateCallback(committing)
+
+					if !mgrPrefs.associatedPhrasesEnabled {
+						stateCallback(emptyState)
+					} else {
+						let associatedPhrases =
+							buildAssociatePhraseState(
+								withKey: text,
+								useVerticalMode: input.useVerticalMode) as? InputState.AssociatedPhrases
+						if let associatedPhrases = associatedPhrases {
+							stateCallback(associatedPhrases)
+						} else {
+							stateCallback(emptyState)
+						}
+					}
+				} else {
+					stateCallback(choosingCandidates)
+				}
+			}
+			return true
+		}
+
+		// MARK: - Calling candidate window using Space or Down or PageUp / PageDn.
+
+		if isPhoneticReadingBufferEmpty() && (state is InputState.NotEmpty)
+			&& (input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
+				|| input.isPageDown || input.isPageUp || input.isTab
+				|| (input.useVerticalMode && (input.isVerticalModeOnlyChooseCandidateKey)))
+		{
+			if input.isSpace {
+				// If the spacebar is NOT set to be a selection key
+				if input.isShiftHold || !mgrPrefs.chooseCandidateUsingSpace {
+					if getBuilderCursorIndex() >= getBuilderLength() {
+                        let composingBuffer = (state as! InputState.NotEmpty).composingBuffer
+                        if (composingBuffer.count) != 0 {
+							let committing = InputState.Committing(poppedText: composingBuffer)
+							stateCallback(committing)
+						}
+						clear()
+						let committing = InputState.Committing(poppedText: " ")
+						stateCallback(committing)
+						let empty = InputState.Empty()
+						stateCallback(empty)
+					} else if ifLangModelHasUnigrams(forKey: " ") {
+						insertReadingToBuilder(atCursor: " ")
+						let poppedText = _popOverflowComposingTextAndWalk()
+						let inputting = buildInputtingState() as! InputState.Inputting
+						inputting.poppedText = poppedText
+						stateCallback(inputting)
+					}
+					return true
+				}
+			}
+			let choosingCandidates = _buildCandidateState(
+				state as! InputState.NotEmpty,
+				useVerticalMode: input.useVerticalMode)
+			stateCallback(choosingCandidates)
+			return true
+		}
+
+		// MARK: - Function Keys.
+
+		// MARK: Esc
 
 		// MARK: - Still Nothing.
 		// Still nothing? Then we update the composing buffer.
@@ -117,4 +272,22 @@ import Cocoa
 
 		return false
 	}
+}
+
+// MARK: - State managements.
+@objc extension KeyHandler {
+	func _buildCandidateState(
+		_ currentState: InputState.NotEmpty,
+		useVerticalMode: Bool
+	) -> InputState.ChoosingCandidate {
+		let candidatesArray = getCandidatesArray()
+
+		let state = InputState.ChoosingCandidate(
+			composingBuffer: currentState.composingBuffer,
+			cursorIndex: currentState.cursorIndex,
+			candidates: candidatesArray as! [String],
+			useVerticalMode: useVerticalMode)
+		return state
+	}
+
 }
