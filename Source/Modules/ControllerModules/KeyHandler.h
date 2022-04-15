@@ -50,10 +50,8 @@ extern InputMode imeModeNULL;
 - (BOOL)handleInput:(keyParser *)input
               state:(InputState *)state
       stateCallback:(void (^)(InputState *))stateCallback
-      errorCallback:(void (^)(void))errorCallback
-    NS_SWIFT_NAME(handle(input:state:stateCallback:errorCallback:));
+      errorCallback:(void (^)(void))errorCallback NS_SWIFT_NAME(handle(input:state:stateCallback:errorCallback:));
 
-- (void)ensurePhoneticParser;
 - (void)fixNodeWithValue:(NSString *)value NS_SWIFT_NAME(fixNode(value:));
 - (void)clear;
 
@@ -63,8 +61,40 @@ extern InputMode imeModeNULL;
 @property(strong, nonatomic) InputMode inputMode;
 @property(weak, nonatomic) id<KeyHandlerDelegate> delegate;
 
+// The following items need to be exposed to Swift:
+- (NSString *)_popOverflowComposingTextAndWalk;
+
+- (BOOL)_handleCandidateState:(InputState *)state
+                        input:(keyParser *)input
+                stateCallback:(void (^)(InputState *))stateCallback
+                errorCallback:(void (^)(void))errorCallback
+    NS_SWIFT_NAME(handleCandidate(state:input:stateCallback:errorCallback:));
+- (BOOL)_handleMarkingState:(InputState *)state
+                      input:(keyParser *)input
+              stateCallback:(void (^)(InputState *))stateCallback
+              errorCallback:(void (^)(void))errorCallback
+    NS_SWIFT_NAME(handleMarking(state:input:stateCallback:errorCallback:));
+
+- (BOOL)checkWhetherToneMarkerConfirmsPhoneticReadingBuffer;
+- (BOOL)chkKeyValidity:(UniChar)value;
 - (BOOL)isPhoneticReadingBufferEmpty;
+- (NSString *)getCompositionFromPhoneticReadingBuffer;
+- (NSString *)getSyllableCompositionFromPhoneticReadingBuffer;
+- (void)clearPhoneticReadingBuffer;
+- (void)combinePhoneticReadingBufferKey:(UniChar)charCode;
+- (void)doBackSpaceToPhoneticReadingBuffer;
+- (void)removeBuilderAndReset:(BOOL)shouldReset;
+- (void)createNewBuilder;
+- (void)setInputModesToLM:(BOOL)isCHS;
+- (void)syncBaseLMPrefs;
+- (void)ensurePhoneticParser;
+- (BOOL)ifLangModelHasUnigramsForKey:(NSString *)reading;
+- (void)insertReadingToBuilderAtCursor:(NSString *)reading;
 - (BOOL)isPrintable:(UniChar)charCode;
+- (void)dealWithOverrideModelSuggestions;
+- (NSMutableArray *)getCandidatesArray;
+- (NSInteger)getBuilderCursorIndex;
+- (NSInteger)getBuilderLength;
 
 @end
 

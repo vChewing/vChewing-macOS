@@ -198,9 +198,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     _walkedNodes.clear();
 }
 
-- (std::string)_currentMandarinParser
+- (NSString *)_currentMandarinParser
 {
-    return std::string(mgrPrefs.mandarinParserName.UTF8String) + std::string("_");
+    return [mgrPrefs.mandarinParserName stringByAppendingString:@"_"];
 }
 
 // MARK: - Handling Input
@@ -331,10 +331,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if (composeReading)
     {
         // combine the reading
-        std::string reading = [[self getSyllableCompositionFromPhoneticReadingBuffer] UTF8String];
+        NSString *reading = [self getSyllableCompositionFromPhoneticReadingBuffer];
 
         // see if we have an unigram for this
-        if (!_languageModel->hasUnigramsForKey(reading))
+        if (![self ifLangModelHasUnigramsForKey:reading])
         {
             [IME prtDebugIntel:@"B49C0979"];
             errorCallback();
@@ -344,25 +344,13 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         }
 
         // and insert it into the lattice
-        _builder->insertReadingAtCursor(reading);
+        [self insertReadingToBuilderAtCursor:reading];
 
         // then walk the lattice
         NSString *poppedText = [self _popOverflowComposingTextAndWalk];
 
         // get user override model suggestion
-        std::string overrideValue = (mgrPrefs.useSCPCTypingMode)
-                                        ? ""
-                                        : _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(),
-                                                                      [[NSDate date] timeIntervalSince1970]);
-
-        if (!overrideValue.empty())
-        {
-            size_t cursorIndex = [self _actualCandidateCursorIndex];
-            std::vector<Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
-            double highestScore = FindHighestScore(nodes, kEpsilon);
-            _builder->grid().overrideNodeScoreForSelectedCandidate(cursorIndex, overrideValue,
-                                                                   static_cast<float>(highestScore));
-        }
+        [self dealWithOverrideModelSuggestions];
 
         // then update the text
         [self clearPhoneticReadingBuffer];
@@ -420,7 +408,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             // if the spacebar is NOT set to be a selection key
             if ([input isShiftHold] || !mgrPrefs.chooseCandidateUsingSpace)
             {
-                if (_builder->cursorIndex() >= _builder->length())
+                if ([self getBuilderCursorIndex] >= [self getBuilderLength])
                 {
                     NSString *composingBuffer = [(InputStateNotEmpty *)state composingBuffer];
                     if (composingBuffer.length)
@@ -435,9 +423,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                     InputStateEmpty *empty = [[InputStateEmpty alloc] init];
                     stateCallback(empty);
                 }
-                else if (_languageModel->hasUnigramsForKey(" "))
+                else if ([self ifLangModelHasUnigramsForKey:@" "])
                 {
-                    _builder->insertReadingAtCursor(" ");
+                    [self insertReadingToBuilderAtCursor:@" "];
                     NSString *poppedText = [self _popOverflowComposingTextAndWalk];
                     InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
                     inputting.poppedText = poppedText;
@@ -508,11 +496,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     {
         if (![input isOptionHold])
         {
-            if (_languageModel->hasUnigramsForKey("_punctuation_list"))
+            if ([self ifLangModelHasUnigramsForKey:@"_punctuation_list "])
             {
                 if ([self isPhoneticReadingBufferEmpty])
                 {
-                    _builder->insertReadingAtCursor(string("_punctuation_list"));
+                    [self insertReadingToBuilderAtCursor:@"_punctuation_list"];
                     NSString *poppedText = [self _popOverflowComposingTextAndWalk];
                     InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
                     inputting.poppedText = poppedText;
@@ -546,19 +534,21 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     // MARK: Punctuation
     // if nothing is matched, see if it's a punctuation key for current layout.
 
-    std::string punctuationNamePrefix;
+    NSString *punctuationNamePrefix;
 
     if ([input isOptionHold])
-        punctuationNamePrefix = std::string("_alt_punctuation_");
+        punctuationNamePrefix = @"_alt_punctuation_";
     else if ([input isControlHold])
-        punctuationNamePrefix = std::string("_ctrl_punctuation_");
+        punctuationNamePrefix = @"_ctrl_punctuation_";
     else if (mgrPrefs.halfWidthPunctuationEnabled)
-        punctuationNamePrefix = std::string("_half_punctuation_");
+        punctuationNamePrefix = @"_half_punctuation_";
     else
-        punctuationNamePrefix = std::string("_punctuation_");
+        punctuationNamePrefix = @"_punctuation_";
 
-    std::string parser = [self _currentMandarinParser];
-    std::string customPunctuation = punctuationNamePrefix + parser + std::string(1, (char)charCode);
+    NSString *parser = [self _currentMandarinParser];
+    NSArray *arrCustomPunctuations =
+        @[ punctuationNamePrefix, parser, [NSString stringWithFormat:@"%c", (char)charCode] ];
+    NSString *customPunctuation = [arrCustomPunctuations componentsJoinedByString:@""];
     if ([self _handlePunctuation:customPunctuation
                            state:state
                usingVerticalMode:input.useVerticalMode
@@ -567,7 +557,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         return YES;
 
     // if nothing is matched, see if it's a punctuation key.
-    std::string punctuation = punctuationNamePrefix + std::string(1, (char)charCode);
+    NSArray *arrPunctuations = @[ punctuationNamePrefix, [NSString stringWithFormat:@"%c", (char)charCode] ];
+    NSString *punctuation = [arrPunctuations componentsJoinedByString:@""];
+
     if ([self _handlePunctuation:punctuation
                            state:state
                usingVerticalMode:input.useVerticalMode
@@ -575,12 +567,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                    errorCallback:errorCallback])
         return YES;
 
-    // Lukhnos 這裡的處理反而會使得 Apple 倚天注音動態鍵盤佈局「敲不了半形大寫英文」的缺點曝露無疑，所以注釋掉。
-    // 至於他試圖用這種處理來解決的上游 UPR293
-    // 的問題，其實針對詞庫檔案的排序做點手腳就可以解決。威注音本來也就是這麼做的。
-    if (/*[state isKindOfClass:[InputStateNotEmpty class]] && */ [input isUpperCaseASCIILetterKey])
+    // 這裡不使用小麥注音 2.2. 的組字區處理方式，而是直接由詞庫負責。
+    if ([input isUpperCaseASCIILetterKey])
     {
-        std::string letter = std::string("_letter_") + std::string(1, (char)charCode);
+        NSString *letter = [NSString stringWithFormat:@"%@%c", @"_letter_", (char)charCode];
         if ([self _handlePunctuation:letter
                                state:state
                    usingVerticalMode:input.useVerticalMode
@@ -957,19 +947,19 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     return YES;
 }
 
-- (BOOL)_handlePunctuation:(std::string)customPunctuation
+- (BOOL)_handlePunctuation:(NSString *)customPunctuation
                      state:(InputState *)state
          usingVerticalMode:(BOOL)useVerticalMode
              stateCallback:(void (^)(InputState *))stateCallback
              errorCallback:(void (^)(void))errorCallback
 {
-    if (!_languageModel->hasUnigramsForKey(customPunctuation))
+    if (![self ifLangModelHasUnigramsForKey:customPunctuation])
         return NO;
 
     NSString *poppedText;
     if ([self isPhoneticReadingBufferEmpty])
     {
-        _builder->insertReadingAtCursor(customPunctuation);
+        [self insertReadingToBuilderAtCursor:customPunctuation];
         poppedText = [self _popOverflowComposingTextAndWalk];
     }
     else
@@ -1389,28 +1379,34 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if (mgrPrefs.useSCPCTypingMode)
     {
-        std::string punctuationNamePrefix;
-        if ([input isOptionHold])
-            punctuationNamePrefix = std::string("_alt_punctuation_");
-        else if ([input isControlHold])
-            punctuationNamePrefix = std::string("_ctrl_punctuation_");
-        else if (mgrPrefs.halfWidthPunctuationEnabled)
-            punctuationNamePrefix = std::string("_half_punctuation_");
-        else
-            punctuationNamePrefix = std::string("_punctuation_");
+        NSString *punctuationNamePrefix;
 
-        std::string parser = [self _currentMandarinParser];
-        std::string customPunctuation = punctuationNamePrefix + parser + std::string(1, (char)charCode);
-        std::string punctuation = punctuationNamePrefix + std::string(1, (char)charCode);
+        if ([input isOptionHold])
+            punctuationNamePrefix = @"_alt_punctuation_";
+        else if ([input isControlHold])
+            punctuationNamePrefix = @"_ctrl_punctuation_";
+        else if (mgrPrefs.halfWidthPunctuationEnabled)
+            punctuationNamePrefix = @"_half_punctuation_";
+        else
+            punctuationNamePrefix = @"_punctuation_";
+
+        NSString *parser = [self _currentMandarinParser];
+
+        NSArray *arrCustomPunctuations =
+            @[ punctuationNamePrefix, parser, [NSString stringWithFormat:@"%c", (char)charCode] ];
+        NSString *customPunctuation = [arrCustomPunctuations componentsJoinedByString:@""];
+
+        NSArray *arrPunctuations = @[ punctuationNamePrefix, [NSString stringWithFormat:@"%c", (char)charCode] ];
+        NSString *punctuation = [arrPunctuations componentsJoinedByString:@""];
 
         BOOL shouldAutoSelectCandidate = [self chkKeyValidity:charCode] ||
-                                         _languageModel->hasUnigramsForKey(customPunctuation) ||
-                                         _languageModel->hasUnigramsForKey(punctuation);
+                                         [self ifLangModelHasUnigramsForKey:customPunctuation] ||
+                                         [self ifLangModelHasUnigramsForKey:punctuation];
 
         if (!shouldAutoSelectCandidate && [input isUpperCaseASCIILetterKey])
         {
-            std::string letter = std::string("_letter_") + std::string(1, (char)charCode);
-            if (_languageModel->hasUnigramsForKey(letter))
+            NSString *letter = [NSString stringWithFormat:@"%@%c", @"_letter_", (char)charCode];
+            if ([self ifLangModelHasUnigramsForKey:letter])
                 shouldAutoSelectCandidate = YES;
         }
 
@@ -1598,34 +1594,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     return poppedText;
 }
 
-- (InputStateChoosingCandidate *)_buildCandidateState:(InputStateNotEmpty *)currentState
-                                      useVerticalMode:(BOOL)useVerticalMode
-{
-    NSMutableArray *candidatesArray = [[NSMutableArray alloc] init];
-
-    size_t cursorIndex = [self _actualCandidateCursorIndex];
-    std::vector<Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
-
-    // sort the nodes, so that longer nodes (representing longer phrases) are placed at the top of the candidate list
-    stable_sort(nodes.begin(), nodes.end(), NodeAnchorDescendingSorter());
-
-    // then use the C++ trick to retrieve the candidates for each node at/crossing the cursor
-    for (std::vector<Gramambular::NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni)
-    {
-        const std::vector<Gramambular::KeyValuePair> &candidates = (*ni).node->candidates();
-        for (std::vector<Gramambular::KeyValuePair>::const_iterator ci = candidates.begin(), ce = candidates.end();
-             ci != ce; ++ci)
-            [candidatesArray addObject:[NSString stringWithUTF8String:(*ci).value.c_str()]];
-    }
-
-    InputStateChoosingCandidate *state =
-        [[InputStateChoosingCandidate alloc] initWithComposingBuffer:currentState.composingBuffer
-                                                         cursorIndex:currentState.cursorIndex
-                                                          candidates:candidatesArray
-                                                     useVerticalMode:useVerticalMode];
-    return state;
-}
-
 // NON-SWIFTIFIABLE
 - (size_t)_actualCandidateCursorIndex
 {
@@ -1787,7 +1755,69 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     }
 }
 
-#pragma mark - 威注音認為有必要單獨拿出來處理的部分。
+// ----
+
+- (BOOL)ifLangModelHasUnigramsForKey:(NSString *)reading
+{
+    return _languageModel->hasUnigramsForKey((std::string)[reading UTF8String]);
+}
+
+- (void)insertReadingToBuilderAtCursor:(NSString *)reading
+{
+    _builder->insertReadingAtCursor((std::string)[reading UTF8String]);
+}
+
+- (void)dealWithOverrideModelSuggestions
+{
+    // 這一整段都太 C++ 且只出現一次，就整個端過來了。
+    // 拆開封裝的話，只會把問題搞得更麻煩而已。
+    std::string overrideValue =
+        (mgrPrefs.useSCPCTypingMode)
+            ? ""
+            : _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
+
+    if (!overrideValue.empty())
+    {
+        size_t cursorIndex = [self _actualCandidateCursorIndex];
+        std::vector<Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
+        double highestScore = FindHighestScore(nodes, kEpsilon);
+        _builder->grid().overrideNodeScoreForSelectedCandidate(cursorIndex, overrideValue,
+                                                               static_cast<float>(highestScore));
+    }
+}
+
+- (NSInteger)getBuilderCursorIndex
+{
+    return _builder->cursorIndex();
+}
+
+- (NSInteger)getBuilderLength
+{
+    return _builder->length();
+}
+
+- (NSMutableArray *)getCandidatesArray
+{
+    NSMutableArray<NSString *> *candidatesArray = [[NSMutableArray alloc] init];
+
+    size_t cursorIndex = [self _actualCandidateCursorIndex];
+    std::vector<Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
+
+    // sort the nodes, so that longer nodes (representing longer phrases) are placed at the top of the candidate list
+    stable_sort(nodes.begin(), nodes.end(), NodeAnchorDescendingSorter());
+
+    // then use the C++ trick to retrieve the candidates for each node at/crossing the cursor
+    for (std::vector<Gramambular::NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni)
+    {
+        const std::vector<Gramambular::KeyValuePair> &candidates = (*ni).node->candidates();
+        for (std::vector<Gramambular::KeyValuePair>::const_iterator ci = candidates.begin(), ce = candidates.end();
+             ci != ce; ++ci)
+            [candidatesArray addObject:[NSString stringWithUTF8String:(*ci).value.c_str()]];
+    }
+    return candidatesArray;
+}
+
+#pragma mark - 威注音認為有必要單獨拿出來處理的部分，交給 Swift 則有些困難。
 
 - (BOOL)isPrintable:(UniChar)charCode
 {
