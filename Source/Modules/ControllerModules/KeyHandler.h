@@ -50,7 +50,8 @@ extern InputMode imeModeNULL;
 - (BOOL)handleInput:(keyParser *)input
               state:(InputState *)state
       stateCallback:(void (^)(InputState *))stateCallback
-      errorCallback:(void (^)(void))errorCallback NS_SWIFT_NAME(handle(input:state:stateCallback:errorCallback:));
+      errorCallback:(void (^)(void))errorCallback
+    NS_SWIFT_NAME(handle(input:state:stateCallback:errorCallback:));
 
 - (void)fixNodeWithValue:(NSString *)value NS_SWIFT_NAME(fixNode(value:));
 - (void)clear;
@@ -69,11 +70,6 @@ extern InputMode imeModeNULL;
                 stateCallback:(void (^)(InputState *))stateCallback
                 errorCallback:(void (^)(void))errorCallback
     NS_SWIFT_NAME(handleCandidate(state:input:stateCallback:errorCallback:));
-- (BOOL)_handleMarkingState:(InputState *)state
-                      input:(keyParser *)input
-              stateCallback:(void (^)(InputState *))stateCallback
-              errorCallback:(void (^)(void))errorCallback
-    NS_SWIFT_NAME(handleMarking(state:input:stateCallback:errorCallback:));
 
 - (BOOL)checkWhetherToneMarkerConfirmsPhoneticReadingBuffer;
 - (BOOL)chkKeyValidity:(UniChar)value;
