@@ -1,6 +1,6 @@
-// Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are of:
-// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// Refactored from the ObjCpp-version of this class by:
+// (c) 2011 and onwards The OpenVanilla Project (MIT License).
 /*
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -26,6 +26,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
 
+// MARK: - § Handle Inputs (WIP).
 @objc extension KeyHandler {
 	func handleInputSwift(
 		input: keyParser,
@@ -35,7 +36,6 @@ import Cocoa
 	) -> Bool {
 		let charCode: UniChar = input.charCode
 		var state = inState  // Turn this incoming constant to variable.
-		let emacsKey: vChewingEmacsKey = input.emacsKey
 		let inputText: String = input.inputText ?? ""
 		let emptyState = InputState.Empty()
 
@@ -54,7 +54,7 @@ import Cocoa
 			return false
 		}
 
-		// MARK: - Caps Lock processing.
+		// MARK: Caps Lock processing.
 		// If Caps Lock is ON, temporarily disable bopomofo.
 		// Note: Alphanumerical mode processing.
 		if input.isBackSpace || input.isEnter || input.isAbsorbedArrowKey || input.isExtraChooseCandidateKey
@@ -86,7 +86,7 @@ import Cocoa
 			return true
 		}
 
-		// MARK: - Numeric Pad Processing.
+		// MARK: Numeric Pad Processing.
 		if input.isNumericPad {
 			if !input.isLeft && !input.isRight && !input.isDown
 				&& !input.isUp && !input.isSpace && isPrintable(charCode)
@@ -100,13 +100,13 @@ import Cocoa
 			}
 		}
 
-		// MARK: - Handle Candidates.
+		// MARK: Handle Candidates.
 		if state is InputState.ChoosingCandidate {
 			return handleCandidate(
 				state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
-		// MARK: - Handle Associated Phrases.
+		// MARK: Handle Associated Phrases.
 		if state is InputState.AssociatedPhrases {
 			let result = handleCandidate(
 				state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
@@ -117,12 +117,12 @@ import Cocoa
 			}
 		}
 
-		// MARK: - Handle Marking.
+		// MARK: Handle Marking.
 		if state is InputState.Marking {
 			let marking = state as! InputState.Marking
 
-			if handleMarking(
-				state: state as! InputState.Marking, input: input, stateCallback: stateCallback,
+			if _handleMarkingState(
+				state as! InputState.Marking, input: input, stateCallback: stateCallback,
 				errorCallback: errorCallback)
 			{
 				return true
@@ -132,7 +132,7 @@ import Cocoa
 			stateCallback(state)
 		}
 
-		// MARK: - Handle BPMF Keys.
+		// MARK: Handle BPMF Keys.
 		var composeReading: Bool = false
 		let skipPhoneticHandling = input.isReservedKey || input.isControlHold || input.isOptionHold
 
@@ -154,7 +154,7 @@ import Cocoa
 
 		// See if we have composition if Enter/Space is hit and buffer is not empty.
 		// We use "|=" conditioning so that the tone marker key is also taken into account.
-        // However, Swift does not support "|=".
+		// However, Swift does not support "|=".
 		composeReading = composeReading || (!isPhoneticReadingBufferEmpty() && (input.isSpace || input.isEnter))
 		if composeReading {
 			let reading = getSyllableCompositionFromPhoneticReadingBuffer()
@@ -189,7 +189,7 @@ import Cocoa
 					useVerticalMode: input.useVerticalMode)
 				if choosingCandidates.candidates.count == 1 {
 					clear()
-                    let text: String = choosingCandidates.candidates.first ?? ""
+					let text: String = choosingCandidates.candidates.first ?? ""
 					let committing = InputState.Committing(poppedText: text)
 					stateCallback(committing)
 
@@ -213,7 +213,7 @@ import Cocoa
 			return true
 		}
 
-		// MARK: - Calling candidate window using Space or Down or PageUp / PageDn.
+		// MARK: Calling candidate window using Space or Down or PageUp / PageDn.
 
 		if isPhoneticReadingBufferEmpty() && (state is InputState.NotEmpty)
 			&& (input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
@@ -224,8 +224,8 @@ import Cocoa
 				// If the spacebar is NOT set to be a selection key
 				if input.isShiftHold || !mgrPrefs.chooseCandidateUsingSpace {
 					if getBuilderCursorIndex() >= getBuilderLength() {
-                        let composingBuffer = (state as! InputState.NotEmpty).composingBuffer
-                        if (composingBuffer.count) != 0 {
+						let composingBuffer = (state as! InputState.NotEmpty).composingBuffer
+						if (composingBuffer.count) != 0 {
 							let committing = InputState.Committing(poppedText: composingBuffer)
 							stateCallback(committing)
 						}
@@ -251,14 +251,14 @@ import Cocoa
 			return true
 		}
 
-		// MARK: - Function Keys.
+		// MARK: Function Keys.
 
 		// MARK: Esc
 
-		// MARK: - Still Nothing.
+		// MARK: Still Nothing.
 		// Still nothing? Then we update the composing buffer.
 		// Note that some app has strange behavior if we don't do this,
-		// "thinking" that the key is not actually consumed).
+		// "thinking" that the key is not actually consumed.
 		// 砍掉這一段會導致「F1-F12 按鍵干擾組字區」的問題。
 		// 暫時只能先恢復這段，且補上偵錯彙報機制，方便今後排查故障。
 		if (state is InputState.NotEmpty) || !isPhoneticReadingBufferEmpty() {
@@ -272,22 +272,4 @@ import Cocoa
 
 		return false
 	}
-}
-
-// MARK: - State managements.
-@objc extension KeyHandler {
-	func _buildCandidateState(
-		_ currentState: InputState.NotEmpty,
-		useVerticalMode: Bool
-	) -> InputState.ChoosingCandidate {
-		let candidatesArray = getCandidatesArray()
-
-		let state = InputState.ChoosingCandidate(
-			composingBuffer: currentState.composingBuffer,
-			cursorIndex: currentState.cursorIndex,
-			candidates: candidatesArray as! [String],
-			useVerticalMode: useVerticalMode)
-		return state
-	}
-
 }

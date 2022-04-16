@@ -13,6 +13,7 @@
 		5B27AD6B27CB1F9B000ED75B /* data-zhuyinwen.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B27AD6927CB1F9B000ED75B /* data-zhuyinwen.txt */; };
 		5B2DB16F27AF6891006D874E /* data-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16D27AF6891006D874E /* data-chs.txt */; };
 		5B2DB17027AF6891006D874E /* data-cht.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16E27AF6891006D874E /* data-cht.txt */; };
+		5B3133BF280B229700A4A505 /* KeyHandler_States.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3133BE280B229700A4A505 /* KeyHandler_States.swift */; };
 		5B5E535227EF261400C6AA1E /* IME.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E535127EF261400C6AA1E /* IME.swift */; };
 		5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */; };
 		5B62A32F27AE78B000A19448 /* CoreLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32D27AE78B000A19448 /* CoreLM.mm */; };
@@ -186,6 +187,7 @@
 		5B2DB16E27AF6891006D874E /* data-cht.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-cht.txt"; path = "Data/data-cht.txt"; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
+		5B3133BE280B229700A4A505 /* KeyHandler_States.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyHandler_States.swift; sourceTree = "<group>"; };
 		5B5E535127EF261400C6AA1E /* IME.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IME.swift; sourceTree = "<group>"; };
 		5B62A32627AE77BB00A19448 /* LMConsolidator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LMConsolidator.h; sourceTree = "<group>"; };
 		5B62A32727AE77BB00A19448 /* LMConsolidator.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LMConsolidator.mm; sourceTree = "<group>"; };
@@ -426,6 +428,7 @@
 				D4E569DA27A34CC100AC2CEF /* KeyHandler.h */,
 				D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */,
 				5B7F225C2808501000DDD3CB /* KeyHandler.swift */,
+				5B3133BE280B229700A4A505 /* KeyHandler_States.swift */,
 				D456576D279E4F7B00DF6BC9 /* KeyParser.swift */,
 				6ACC3D3E27914F2400F1B140 /* KeyValueBlobReader.cpp */,
 				6ACC3D3C27914AAB00F1B140 /* KeyValueBlobReader.h */,
@@ -1080,6 +1083,7 @@
 				5BE78BE027B38804005EA1BE /* LMConsolidator.mm in Sources */,
 				D456576E279E4F7B00DF6BC9 /* KeyParser.swift in Sources */,
 				5BA9FD1027FEDB6B002DE248 /* suiPrefPaneKeyboard.swift in Sources */,
+				5B3133BF280B229700A4A505 /* KeyHandler_States.swift in Sources */,
 				5BA9FD4327FEF3C8002DE248 /* Preferences.swift in Sources */,
 				5BA9FD4427FEF3C8002DE248 /* SegmentedControlStyleViewController.swift in Sources */,
 				D47F7DCE278BFB57002F9DD7 /* ctlPrefWindow.swift in Sources */,
