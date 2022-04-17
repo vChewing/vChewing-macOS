@@ -261,6 +261,7 @@ extension ctlInputMethod {
 	}
 
 	@objc func selfTerminate(_ sender: Any?) {
+		NSApp.activate(ignoringOtherApps: true)
 		NSApp.terminate(nil)
 	}
 
