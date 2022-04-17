@@ -99,11 +99,11 @@ extension ctlInputMethod {
 		menu.addItem(
 			withTitle: NSLocalizedString("Edit User Phrases…", comment: ""),
 			action: #selector(openUserPhrases(_:)), keyEquivalent: "")
+		menu.addItem(
+			withTitle: NSLocalizedString("Edit Excluded Phrases…", comment: ""),
+			action: #selector(openExcludedPhrases(_:)), keyEquivalent: "")
 
 		if optionKeyPressed {
-			menu.addItem(
-				withTitle: NSLocalizedString("Edit Excluded Phrases…", comment: ""),
-				action: #selector(openExcludedPhrases(_:)), keyEquivalent: "")
 			menu.addItem(
 				withTitle: NSLocalizedString("Edit Phrase Replacement Table…", comment: ""),
 				action: #selector(openPhraseReplacement(_:)), keyEquivalent: "")
