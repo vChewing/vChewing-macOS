@@ -210,7 +210,7 @@ typedef BopomofoSyllable BPMF;
 typedef std::map<char, std::vector<BPMF::Component>> BopomofoKeyToComponentMap;
 typedef std::map<BPMF::Component, char> BopomofoComponentToKeyMap;
 
-class BopomofoKeyboardLayout
+extern "C" class BopomofoKeyboardLayout
 {
   public:
     static const BopomofoKeyboardLayout *StandardLayout();
@@ -438,7 +438,7 @@ class BopomofoKeyboardLayout
     BopomofoComponentToKeyMap m_componentToKey;
 };
 
-class BopomofoReadingBuffer
+extern "C" class BopomofoReadingBuffer
 {
   public:
     explicit BopomofoReadingBuffer(const BopomofoKeyboardLayout *layout) : layout_(layout), pinyin_mode_(false)

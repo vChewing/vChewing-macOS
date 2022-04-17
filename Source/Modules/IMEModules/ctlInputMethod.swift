@@ -60,7 +60,7 @@ class ctlInputMethod: IMKInputController {
 	// 所以才需要「currentKeyHandler」這個假 keyHandler。
 	// 這個「currentKeyHandler」僅用來讓其他模組知道當前的輸入模式是什麼模式，除此之外別無屌用。
 	static var currentKeyHandler: KeyHandler = KeyHandler()
-	@objc static var currentInputMode = ""
+	@objc static var currentInputMode = mgrPrefs.mostRecentInputMode
 
 	// MARK: - Keyboard Layout Specifier
 
@@ -75,6 +75,9 @@ class ctlInputMethod: IMKInputController {
 	override init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
 		super.init(server: server, delegate: delegate, client: inputClient)
 		keyHandler.delegate = self
+		// 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
+		activateServer(inputClient)
+		resetKeyHandler()
 	}
 
 	// MARK: - KeyHandler Reset Command
@@ -95,7 +98,7 @@ class ctlInputMethod: IMKInputController {
 		currentClient = client
 
 		keyHandler.clear()
-		keyHandler.syncWithPreferences()
+		keyHandler.ensurePhoneticParser()
 		if let bundleCheckID = (client as? IMKTextInput)?.bundleIdentifier() {
 			if bundleCheckID != Bundle.main.bundleIdentifier {
 				// Override the keyboard layout to the basic one.
@@ -598,9 +601,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
 			let selectedValue = state.candidates[Int(index)]
 			keyHandler.fixNode(value: selectedValue)
 
-			guard let inputting = keyHandler.buildInputtingState() as? InputState.Inputting else {
-				return
-			}
+			let inputting = keyHandler.buildInputtingState()
 
 			if mgrPrefs.useSCPCTypingMode {
 				keyHandler.clear()
