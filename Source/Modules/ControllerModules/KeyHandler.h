@@ -36,6 +36,14 @@ extern InputMode imeModeCHT;
 extern InputMode imeModeCHS;
 extern InputMode imeModeNULL;
 
+struct BufferStatePackage
+{
+    NSString *composedText;
+    NSInteger cursorIndex;
+    NSString *resultOfBefore;
+    NSString *resultOfAfter;
+};
+
 @class KeyHandler;
 
 @protocol KeyHandlerDelegate <NSObject>
@@ -51,7 +59,6 @@ extern InputMode imeModeNULL;
 - (void)fixNodeWithValue:(NSString *)value NS_SWIFT_NAME(fixNode(value:));
 - (void)clear;
 
-- (InputState *)buildInputtingState;
 - (nullable InputState *)buildAssociatePhraseStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode;
 
 @property(strong, nonatomic) InputMode inputMode;
@@ -70,8 +77,10 @@ extern InputMode imeModeNULL;
 - (NSArray<NSString *> *)getCandidatesArray;
 - (NSInteger)getBuilderCursorIndex;
 - (NSInteger)getBuilderLength;
-- (NSString *)_currentMandarinParser;
+- (NSInteger)getPackagedCursorIndex;
+- (NSString *)getComposedText;
 - (NSString *)getCompositionFromPhoneticReadingBuffer;
+- (NSString *)getStrLocationResult:(BOOL)isAfter NS_SWIFT_NAME(getStrLocationResult(isAfter:));
 - (NSString *)getSyllableCompositionFromPhoneticReadingBuffer;
 - (void)clearPhoneticReadingBuffer;
 - (void)combinePhoneticReadingBufferKey:(UniChar)charCode;
@@ -82,6 +91,7 @@ extern InputMode imeModeNULL;
 - (void)doBackSpaceToPhoneticReadingBuffer;
 - (void)ensurePhoneticParser;
 - (void)insertReadingToBuilderAtCursor:(NSString *)reading;
+- (void)packageBufferStateMaterials;
 - (void)removeBuilderAndReset:(BOOL)shouldReset;
 - (void)setBuilderCursorIndex:(NSInteger)value;
 - (void)setInputModesToLM:(BOOL)isCHS;
