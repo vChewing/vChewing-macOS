@@ -44,6 +44,12 @@ typedef Mandarin::BopomofoReadingBuffer PhoneticBuffer;
 
 static const double kEpsilon = 0.000001;
 
+NSString *packagedComposedText;
+NSInteger packagedCursorIndex;
+NSString *packagedResultOfBefore;
+NSString *packagedResultOfAfter;
+
+// NON-SWIFTIFIABLE
 static double FindHighestScore(const std::vector<Gramambular::NodeAnchor> &nodes, double epsilon)
 {
     double highestScore = 0.0;
@@ -56,6 +62,7 @@ static double FindHighestScore(const std::vector<Gramambular::NodeAnchor> &nodes
     return highestScore + epsilon;
 }
 
+// NON-SWIFTIFIABLE
 class NodeAnchorDescendingSorter
 {
   public:
@@ -71,6 +78,7 @@ class NodeAnchorDescendingSorter
 static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 #endif
 
+// NON-SWIFTIFIABLE
 @implementation KeyHandler
 {
     // the reading buffer that takes user input
@@ -91,19 +99,23 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     NSString *_inputMode;
 }
 
-//@synthesize inputMode = _inputMode;
 @synthesize delegate = _delegate;
 
+// NON-SWIFTIFIABLE DUE TO VARIABLE AVAILABLE ACCESSIBILITY RANGE.
+// VARIABLE: "_inputMode"
 - (NSString *)inputMode
 {
     return _inputMode;
 }
 
+// NON-SWIFTIFIABLE
 - (BOOL)isBuilderEmpty
 {
     return (_builder->grid().width() == 0);
 }
 
+// NON-SWIFTIFIABLE DUE TO VARIABLE AVAILABLE ACCESSIBILITY RANGE.
+// VARIABLE: "_inputMode"
 - (void)setInputMode:(NSString *)value
 {
     // 下面這句的「isKindOfClass」是做類型檢查，
@@ -131,6 +143,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     _inputMode = ctlInputMethod.currentInputMode;
 }
 
+// NON-SWIFTIFIABLE: Required by an ObjC(pp)-based class.
 - (void)dealloc
 { // clean up everything
     if (_bpmfReadingBuffer)
@@ -139,6 +152,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
         [self removeBuilderAndReset:NO];
 }
 
+// NON-SWIFTIFIABLE: Not placeable in swift extensions.
 - (instancetype)init
 {
     self = [super init];
@@ -198,21 +212,19 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     _walkedNodes.clear();
 }
 
-- (NSString *)_currentMandarinParser
-{
-    return [mgrPrefs.mandarinParserName stringByAppendingString:@"_"];
-}
-
 #pragma mark - States Building
 
 // NON-SWIFTIFIABLE
-- (InputStateInputting *)buildInputtingState
+- (void)packageBufferStateMaterials
 {
+    // We gather the data through this function, package it,
+    // and sent it to our Swift extension to build the InputState.Inputting there.
+    // Otherwise, ObjC++ always bugs for "expecting a type".
+
     // "updating the composing buffer" means to request the client to "refresh" the text input buffer
     // with our "composing text"
     NSMutableString *composingBuffer = [[NSMutableString alloc] init];
     NSInteger composedStringCursorIndex = 0;
-    NSString *tooltip = @"";
 
     // we must do some Unicode codepoint counting to find the actual cursor location for the client
     // i.e. we need to take UTF-16 into consideration, for which a surrogate pair takes 2 UniChars
@@ -220,6 +232,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     size_t readingCursorIndex = 0;
     size_t builderCursorIndex = [self getBuilderCursorIndex];
+
+    NSString *resultOfBefore = @"";
+    NSString *resultOfAfter = @"";
 
     for (std::vector<Gramambular::NodeAnchor>::iterator wi = _walkedNodes.begin(), we = _walkedNodes.end(); wi != we;
          ++wi)
@@ -267,30 +282,20 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                         }
                         if (builderCursorIndex == 0)
                         {
-                            tooltip = [NSString
-                                stringWithFormat:NSLocalizedString(@"Cursor is before \"%@\".", @""),
-                                                 [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex]
-                                                                                    .c_str()]];
+                            resultOfBefore =
+                                [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex].c_str()];
                         }
                         else if (builderCursorIndex >= _builder->readings().size())
                         {
-                            tooltip = [NSString
-                                stringWithFormat:NSLocalizedString(@"Cursor is after \"%@\".", @""),
-                                                 [NSString
-                                                     stringWithUTF8String:_builder
-                                                                              ->readings()[_builder->readings().size() -
-                                                                                           1]
-                                                                              .c_str()]];
+                            resultOfAfter = [NSString
+                                stringWithUTF8String:_builder->readings()[_builder->readings().size() - 1].c_str()];
                         }
                         else
                         {
-                            tooltip = [NSString
-                                stringWithFormat:NSLocalizedString(@"Cursor is between \"%@\" and \"%@\".", @""),
-                                                 [NSString
-                                                     stringWithUTF8String:_builder->readings()[builderCursorIndex - 1]
-                                                                              .c_str()],
-                                                 [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex]
-                                                                                    .c_str()]];
+                            resultOfBefore =
+                                [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex].c_str()];
+                            resultOfAfter =
+                                [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex - 1].c_str()];
                         }
                     }
                 }
@@ -307,10 +312,31 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     NSString *composedText = [head stringByAppendingString:[reading stringByAppendingString:tail]];
     NSInteger cursorIndex = composedStringCursorIndex + [reading length];
 
-    InputStateInputting *newState = [[InputStateInputting alloc] initWithComposingBuffer:composedText
-                                                                             cursorIndex:cursorIndex];
-    newState.tooltip = tooltip;
-    return newState;
+    packagedComposedText = composedText;
+    packagedCursorIndex = cursorIndex;
+    packagedResultOfBefore = resultOfBefore;
+    packagedResultOfAfter = resultOfAfter;
+}
+
+// NON-SWIFTIFIABLE DUE TO VARIABLE AVAILABLE ACCESSIBILITY RANGE.
+- (NSString *)getStrLocationResult:(BOOL)isAfter
+{
+    if (isAfter)
+        return packagedResultOfAfter;
+    else
+        return packagedResultOfBefore;
+}
+
+// NON-SWIFTIFIABLE DUE TO VARIABLE AVAILABLE ACCESSIBILITY RANGE.
+- (NSString *)getComposedText
+{
+    return packagedComposedText;
+}
+
+// NON-SWIFTIFIABLE DUE TO VARIABLE AVAILABLE ACCESSIBILITY RANGE.
+- (NSInteger)getPackagedCursorIndex
+{
+    return packagedCursorIndex;
 }
 
 // NON-SWIFTIFIABLE

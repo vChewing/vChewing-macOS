@@ -29,6 +29,38 @@ import Cocoa
 // MARK: - § State managements.
 @objc extension KeyHandler {
 
+	// MARK: - 構築狀態（State Building）
+	func buildInputtingState() -> InputState.Inputting {
+		// 觸發資料封裝更新，否則下文拿到的數據會是錯的。
+		packageBufferStateMaterials()
+		// 獲取封裝好的資料
+		let composedText = getComposedText()
+		let packagedCursorIndex = UInt(getPackagedCursorIndex())
+		let resultOfBefore = getStrLocationResult(isAfter: false)
+		let resultOfAfter = getStrLocationResult(isAfter: true)
+
+		// 初期化狀態
+		let newState = InputState.Inputting(composingBuffer: composedText, cursorIndex: packagedCursorIndex)
+
+		// 組建提示文本
+		var tooltip = ""
+		if (resultOfBefore == "") && (resultOfAfter != "") {
+			tooltip = String(format: NSLocalizedString("Cursor is after \"%@\".", comment: ""), resultOfAfter)
+		}
+		if (resultOfBefore != "") && (resultOfAfter == "") {
+			tooltip = String(format: NSLocalizedString("Cursor is before \"%@\".", comment: ""), resultOfBefore)
+		}
+		if (resultOfBefore != "") && (resultOfAfter != "") {
+			tooltip = String(
+				format: NSLocalizedString("Cursor is between \"%@\" and \"%@\".", comment: ""),
+				resultOfAfter, resultOfBefore)
+		}
+
+		// 給新狀態安插配置好的提示文本、且送出新狀態
+		newState.tooltip = tooltip
+		return newState
+	}
+
 	// MARK: - 用以生成候選詞數組
 	func _buildCandidateState(
 		_ currentState: InputState.NotEmpty,
@@ -53,7 +85,7 @@ import Cocoa
 	) -> Bool {
 
 		if input.isESC {
-			let inputting = buildInputtingState() as! InputState.Inputting
+			let inputting = buildInputtingState()
 			stateCallback(inputting)
 			return true
 		}
@@ -68,7 +100,7 @@ import Cocoa
 				}
 			}
 
-			let inputting = buildInputtingState() as! InputState.Inputting
+			let inputting = buildInputtingState()
 			stateCallback(inputting)
 			return true
 		}
@@ -143,7 +175,7 @@ import Cocoa
 		if isPhoneticReadingBufferEmpty() {
 			insertReadingToBuilder(atCursor: customPunctuation)
 			let poppedText = _popOverflowComposingTextAndWalk()
-			let inputting = buildInputtingState() as! InputState.Inputting
+			let inputting = buildInputtingState()
 			inputting.poppedText = poppedText
 			stateCallback(inputting)
 
@@ -198,7 +230,7 @@ import Cocoa
 	}
 
 	// MARK: - CMD+Enter 鍵處理
-	func _handleCommandEnterWithState(
+	func _handleCtrlCommandEnterWithState(
 		_ state: InputState,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback: @escaping () -> Void
@@ -250,7 +282,7 @@ import Cocoa
 			let empty = InputState.EmptyIgnoringPreviousState()
 			stateCallback(empty)
 		} else {
-			let inputting = buildInputtingState() as! InputState.Inputting
+			let inputting = buildInputtingState()
 			stateCallback(inputting)
 		}
 		return true
@@ -270,7 +302,7 @@ import Cocoa
 			if getBuilderCursorIndex() != getBuilderLength() {
 				deleteBuilderReadingAfterCursor()
 				_walk()
-				let inputting = buildInputtingState() as! InputState.Inputting
+				let inputting = buildInputtingState()
 				if inputting.composingBuffer.count == 0 {
 					let empty = InputState.EmptyIgnoringPreviousState()
 					stateCallback(empty)
@@ -327,7 +359,7 @@ import Cocoa
 
 		if getBuilderCursorIndex() != 0 {
 			setBuilderCursorIndex(0)
-			let inputting = buildInputtingState() as! InputState.Inputting
+			let inputting = buildInputtingState()
 			stateCallback(inputting)
 		} else {
 			IME.prtDebugIntel("66D97F90")
@@ -357,7 +389,7 @@ import Cocoa
 
 		if getBuilderCursorIndex() != getBuilderLength() {
 			setBuilderCursorIndex(getBuilderLength())
-			let inputting = buildInputtingState() as! InputState.Inputting
+			let inputting = buildInputtingState()
 			stateCallback(inputting)
 		} else {
 			IME.prtDebugIntel("9B69908E")
@@ -440,7 +472,7 @@ import Cocoa
 		} else {
 			if getBuilderCursorIndex() < getBuilderLength() {
 				setBuilderCursorIndex(getBuilderCursorIndex() + 1)
-				let inputting = buildInputtingState() as! InputState.Inputting
+				let inputting = buildInputtingState()
 				stateCallback(inputting)
 			} else {
 				IME.prtDebugIntel("A96AAD58")
@@ -490,7 +522,7 @@ import Cocoa
 		} else {
 			if getBuilderCursorIndex() > 0 {
 				setBuilderCursorIndex(getBuilderCursorIndex() - 1)
-				let inputting = buildInputtingState() as! InputState.Inputting
+				let inputting = buildInputtingState()
 				stateCallback(inputting)
 			} else {
 				IME.prtDebugIntel("7045E6F3")
@@ -500,5 +532,4 @@ import Cocoa
 		}
 		return true
 	}
-
 }

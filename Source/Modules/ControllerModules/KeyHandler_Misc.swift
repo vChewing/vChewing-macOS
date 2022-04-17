@@ -28,6 +28,11 @@ import Cocoa
 
 // MARK: - § Misc functions.
 @objc extension KeyHandler {
+
+	func getCurrentMandarinParser() -> String {
+		return (mgrPrefs.mandarinParserName + "_")
+	}
+
 	func _actualCandidateCursorIndex() -> Int {
 		var cursorIndex = getBuilderCursorIndex()
 		// MS Phonetics IME style, phrase is *after* the cursor.

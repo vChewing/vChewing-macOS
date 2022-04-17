@@ -59,7 +59,7 @@ import Cocoa
 				let empty = InputState.EmptyIgnoringPreviousState()
 				stateCallback(empty)
 			} else {
-				let inputting = buildInputtingState() as! InputState.Inputting
+				let inputting = buildInputtingState()
 				stateCallback(inputting)
 			}
 			return true
@@ -286,7 +286,7 @@ import Cocoa
 				punctuationNamePrefix = "_punctuation_"
 			}
 
-			let parser: String! = _currentMandarinParser()
+			let parser = getCurrentMandarinParser()
 
 			let arrCustomPunctuations: [String] = [
 				punctuationNamePrefix, parser, String(format: "%c", CChar(charCode)),
@@ -315,7 +315,8 @@ import Cocoa
 					clear()
 					let empty = InputState.EmptyIgnoringPreviousState()
 					stateCallback(empty)
-					return handle(input: input, state: empty, stateCallback: stateCallback, errorCallback: errorCallback)
+					return handle(
+						input: input, state: empty, stateCallback: stateCallback, errorCallback: errorCallback)
 				}
 				return true
 			}

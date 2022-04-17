@@ -146,7 +146,7 @@ import Cocoa
 			// update the composing buffer.
 			composeReading = checkWhetherToneMarkerConfirmsPhoneticReadingBuffer()
 			if !composeReading {
-				let inputting = buildInputtingState() as! InputState.Inputting
+				let inputting = buildInputtingState()
 				stateCallback(inputting)
 				return true
 			}
@@ -163,7 +163,7 @@ import Cocoa
 			if !ifLangModelHasUnigrams(forKey: reading) {
 				IME.prtDebugIntel("B49C0979")
 				errorCallback()
-				let inputting = buildInputtingState() as! InputState.Inputting
+				let inputting = buildInputtingState()
 				stateCallback(inputting)
 				return true
 			}
@@ -180,7 +180,7 @@ import Cocoa
 			// ... then update the text.
 			clearPhoneticReadingBuffer()
 
-			let inputting = buildInputtingState() as! InputState.Inputting
+			let inputting = buildInputtingState()
 			inputting.poppedText = poppedText
 			stateCallback(inputting)
 
@@ -238,7 +238,7 @@ import Cocoa
 					} else if ifLangModelHasUnigrams(forKey: " ") {
 						insertReadingToBuilder(atCursor: " ")
 						let poppedText = _popOverflowComposingTextAndWalk()
-						let inputting = buildInputtingState() as! InputState.Inputting
+						let inputting = buildInputtingState()
 						inputting.poppedText = poppedText
 						stateCallback(inputting)
 					}
@@ -309,8 +309,8 @@ import Cocoa
 
 		// MARK: Enter
 		if input.isEnter {
-			return (input.isCommandHold)
-				? _handleCommandEnterWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+			return (input.isCommandHold && input.isControlHold)
+				? _handleCtrlCommandEnterWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
 				: _handleEnterWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
@@ -323,7 +323,7 @@ import Cocoa
 					if isPhoneticReadingBufferEmpty() {
 						insertReadingToBuilder(atCursor: "_punctuation_list")
 						let poppedText: String! = _popOverflowComposingTextAndWalk()
-						let inputting = buildInputtingState() as! InputState.Inputting
+						let inputting = buildInputtingState()
 						inputting.poppedText = poppedText
 						stateCallback(inputting)
 						let choosingCandidate =
@@ -363,7 +363,7 @@ import Cocoa
 			punctuationNamePrefix = "_punctuation_"
 		}
 
-		let parser: String! = _currentMandarinParser()
+		let parser = getCurrentMandarinParser()
 		let arrCustomPunctuations: [String] = [
 			punctuationNamePrefix, parser, String(format: "%c", CChar(charCode)),
 		]
