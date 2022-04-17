@@ -26,16 +26,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
 
-// MARK: - § Handle Inputs (WIP).
+// MARK: - § Handle Input with States.
+
 @objc extension KeyHandler {
-	func handleInputSwift(
+	func handle(
 		input: keyParser,
 		state inState: InputState,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback: @escaping () -> Void
 	) -> Bool {
 		let charCode: UniChar = input.charCode
-		var state = inState  // Turn this incoming constant to variable.
+		var state = inState  // Turn this incoming constant into variable.
 		let inputText: String = input.inputText ?? ""
 		let emptyState = InputState.Empty()
 
@@ -102,14 +103,14 @@ import Cocoa
 
 		// MARK: Handle Candidates.
 		if state is InputState.ChoosingCandidate {
-			return handleCandidate(
-				state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
+			return _handleCandidateState(
+				state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: Handle Associated Phrases.
 		if state is InputState.AssociatedPhrases {
-			let result = handleCandidate(
-				state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
+			let result = _handleCandidateState(
+				state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
 			if result {
 				return true
 			} else {
@@ -221,7 +222,7 @@ import Cocoa
 				|| (input.useVerticalMode && (input.isVerticalModeOnlyChooseCandidateKey)))
 		{
 			if input.isSpace {
-				// If the spacebar is NOT set to be a selection key
+				// If the Space key is NOT set to be a selection key
 				if input.isShiftHold || !mgrPrefs.chooseCandidateUsingSpace {
 					if getBuilderCursorIndex() >= getBuilderLength() {
 						let composingBuffer = (state as! InputState.NotEmpty).composingBuffer
@@ -251,11 +252,161 @@ import Cocoa
 			return true
 		}
 
-		// MARK: Function Keys.
+		// MARK: -
 
 		// MARK: Esc
+		if input.isESC { return _handleEscWithState(state, stateCallback: stateCallback, errorCallback: errorCallback) }
 
-		// MARK: Still Nothing.
+		// MARK: Cursor backward
+		if input.isCursorBackward || input.emacsKey == vChewingEmacsKey.backward {
+			return _handleBackwardWithState(
+				state,
+				input: input,
+				stateCallback: stateCallback,
+				errorCallback: errorCallback)
+		}
+
+		// MARK: Cursor forward
+		if input.isCursorForward || input.emacsKey == vChewingEmacsKey.forward {
+			return _handleForwardWithState(
+				state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
+		}
+
+		// MARK: Home
+		if input.isHome || input.emacsKey == vChewingEmacsKey.home {
+			return _handleHomeWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+		}
+
+		// MARK: End
+		if input.isEnd || input.emacsKey == vChewingEmacsKey.end {
+			return _handleEndWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+		}
+
+		// MARK: Ctrl+PgLf or Shift+PgLf
+		if (input.isControlHold || input.isShiftHold) && (input.isOptionHold && input.isLeft) {
+			return _handleHomeWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+		}
+
+		// MARK: Ctrl+PgRt or Shift+PgRt
+		if (input.isControlHold || input.isShiftHold) && (input.isOptionHold && input.isRight) {
+			return _handleEndWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+		}
+
+		// MARK: AbsorbedArrowKey
+		if input.isAbsorbedArrowKey || input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse {
+			return _handleAbsorbedArrowKeyWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+		}
+
+		// MARK: Backspace
+		if input.isBackSpace {
+			return _handleBackspaceWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+		}
+
+		// MARK: Delete
+		if input.isDelete || input.emacsKey == vChewingEmacsKey.delete {
+			return _handleDeleteWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+		}
+
+		// MARK: Enter
+		if input.isEnter {
+			return (input.isCommandHold)
+				? _handleCommandEnterWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+				: _handleEnterWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+		}
+
+		// MARK: -
+
+		// MARK: Punctuation list
+		if input.isSymbolMenuPhysicalKey && !input.isShiftHold {
+			if !input.isOptionHold {
+				if ifLangModelHasUnigrams(forKey: "_punctuation_list") {
+					if isPhoneticReadingBufferEmpty() {
+						insertReadingToBuilder(atCursor: "_punctuation_list")
+						let poppedText: String! = _popOverflowComposingTextAndWalk()
+						let inputting = buildInputtingState() as! InputState.Inputting
+						inputting.poppedText = poppedText
+						stateCallback(inputting)
+						let choosingCandidate =
+							_buildCandidateState(inputting, useVerticalMode: input.useVerticalMode)
+						stateCallback(choosingCandidate)
+					} else {  // If there is still unfinished bpmf reading, ignore the punctuation
+						IME.prtDebugIntel("17446655")
+						errorCallback()
+					}
+					return true
+				}
+			} else {
+				// 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
+				// 於是這裡用「模擬一次 Enter 鍵的操作」使其代為執行這個 commit buffer 的動作。
+				// 這裡不需要該函數所傳回的 bool 結果，所以用「_ =」解消掉。
+				_ = _handleEnterWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+				let root: SymbolNode! = SymbolNode.root
+				let symbolState =
+					InputState.SymbolTable(node: root, useVerticalMode: input.useVerticalMode)
+				stateCallback(symbolState)
+				return true
+			}
+		}
+
+		// MARK: Punctuation
+		// if nothing is matched, see if it's a punctuation key for current layout.
+
+		var punctuationNamePrefix = ""
+
+		if input.isOptionHold {
+			punctuationNamePrefix = "_alt_punctuation_"
+		} else if input.isControlHold {
+			punctuationNamePrefix = "_ctrl_punctuation_"
+		} else if mgrPrefs.halfWidthPunctuationEnabled {
+			punctuationNamePrefix = "_half_punctuation_"
+		} else {
+			punctuationNamePrefix = "_punctuation_"
+		}
+
+		let parser: String! = _currentMandarinParser()
+		let arrCustomPunctuations: [String] = [
+			punctuationNamePrefix, parser, String(format: "%c", CChar(charCode)),
+		]
+		let customPunctuation: String = arrCustomPunctuations.joined(separator: "")
+		if _handlePunctuation(
+			customPunctuation,
+			state: state,
+			usingVerticalMode: input.useVerticalMode,
+			stateCallback: stateCallback,
+			errorCallback: errorCallback)
+		{
+			return true
+		}
+
+		// if nothing is matched, see if it's a punctuation key.
+		let arrPunctuations: [String] = [punctuationNamePrefix, String(format: "%c", CChar(charCode))]
+		let punctuation: String = arrPunctuations.joined(separator: "")
+
+		if _handlePunctuation(
+			punctuation,
+			state: state,
+			usingVerticalMode: input.useVerticalMode,
+			stateCallback: stateCallback,
+			errorCallback: errorCallback)
+		{
+			return true
+		}
+
+		// 這裡不使用小麥注音 2.2 版的組字區處理方式，而是直接由詞庫負責。
+		if input.isUpperCaseASCIILetterKey {
+			let letter: String! = String(format: "%@%c", "_letter_", CChar(charCode))
+			if _handlePunctuation(
+				letter,
+				state: state,
+				usingVerticalMode: input.useVerticalMode,
+				stateCallback: stateCallback,
+				errorCallback: errorCallback)
+			{
+				return true
+			}
+		}
+
+		// MARK: - Still Nothing.
 		// Still nothing? Then we update the composing buffer.
 		// Note that some app has strange behavior if we don't do this,
 		// "thinking" that the key is not actually consumed.
