@@ -90,7 +90,7 @@ enum CharCode: UInt /* 16 */ {
 	// ... but only focuses on which physical key is pressed.
 }
 
-class keyParser: NSObject {
+class InputHandler: NSObject {
 	@objc private(set) var useVerticalMode: Bool
 	@objc private(set) var inputText: String?
 	@objc private(set) var inputTextIgnoringModifiers: String?
