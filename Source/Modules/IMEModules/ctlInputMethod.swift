@@ -53,10 +53,10 @@ class ctlInputMethod: IMKInputController {
 	private var keyHandler: KeyHandler = .init()
 	private var state: InputState = .Empty()
 
-	// 想讓 keyHandler 能夠被外界調查狀態與參數的話，就得對 keyHandler 做常態處理。
+	// 想讓 KeyHandler 能夠被外界調查狀態與參數的話，就得對 KeyHandler 做常態處理。
 	// 這樣 InputState 可以藉由這個 ctlInputMethod 了解到當前的輸入模式是簡體中文還是繁體中文。
-	// 然而，要是直接對 keyHandler 做常態處理的話，反而會導致 keyParser 無法協同處理。
-	// 所以才需要「currentKeyHandler」這個假 keyHandler。
+	// 然而，要是直接對 keyHandler 做常態處理的話，反而會導致 InputHandler 無法協同處理。
+	// 所以才需要「currentKeyHandler」這個假 KeyHandler。
 	// 這個「currentKeyHandler」僅用來讓其他模組知道當前的輸入模式是什麼模式，除此之外別無屌用。
 	static var currentKeyHandler: KeyHandler = .init()
 	@objc static var currentInputMode = mgrPrefs.mostRecentInputMode
@@ -178,7 +178,7 @@ class ctlInputMethod: IMKInputController {
 			IME.areWeUsingOurOwnPhraseEditor = false
 		}
 
-		let input = keyParser(event: event, isVerticalMode: useVerticalMode)
+		let input = InputHandler(event: event, isVerticalMode: useVerticalMode)
 
 		let result = keyHandler.handle(input: input, state: state) { newState in
 			self.handle(state: newState, client: client)

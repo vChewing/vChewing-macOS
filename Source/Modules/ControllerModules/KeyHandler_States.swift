@@ -84,7 +84,7 @@ import Cocoa
 
 	func _handleMarkingState(
 		_ state: InputState.Marking,
-		input: keyParser,
+		input: InputHandler,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback: @escaping () -> Void
 	) -> Bool {
@@ -455,7 +455,7 @@ import Cocoa
 
 	func _handleForwardWithState(
 		_ state: InputState,
-		input: keyParser,
+		input: InputHandler,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback: @escaping () -> Void
 	) -> Bool {
@@ -506,7 +506,7 @@ import Cocoa
 
 	func _handleBackwardWithState(
 		_ state: InputState,
-		input: keyParser,
+		input: InputHandler,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback: @escaping () -> Void
 	) -> Bool {

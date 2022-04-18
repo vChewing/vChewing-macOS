@@ -97,7 +97,7 @@
 		D41355DE278EA3ED005E5CBD /* UserPhrasesLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355DC278EA3ED005E5CBD /* UserPhrasesLM.mm */; };
 		D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427F76B278CA1BA004A2160 /* AppDelegate.swift */; };
 		D44FB74D2792189A003C80A6 /* PhraseReplacementMap.mm in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74B2792189A003C80A6 /* PhraseReplacementMap.mm */; };
-		D456576E279E4F7B00DF6BC9 /* KeyParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D456576D279E4F7B00DF6BC9 /* KeyParser.swift */; };
+		D456576E279E4F7B00DF6BC9 /* InputHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D456576D279E4F7B00DF6BC9 /* InputHandler.swift */; };
 		D461B792279DAC010070E734 /* InputState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D461B791279DAC010070E734 /* InputState.swift */; };
 		D47B92C027972AD100458394 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47B92BF27972AC800458394 /* main.swift */; };
 		D47D73AC27A6CAE600255A50 /* AssociatedPhrases.mm in Sources */ = {isa = PBXBuildFile; fileRef = D47D73AA27A6CAE600255A50 /* AssociatedPhrases.mm */; };
@@ -318,7 +318,7 @@
 		D427F76B278CA1BA004A2160 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		D44FB74B2792189A003C80A6 /* PhraseReplacementMap.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = PhraseReplacementMap.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		D44FB74C2792189A003C80A6 /* PhraseReplacementMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = PhraseReplacementMap.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		D456576D279E4F7B00DF6BC9 /* KeyParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = KeyParser.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
+		D456576D279E4F7B00DF6BC9 /* InputHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = InputHandler.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		D461B791279DAC010070E734 /* InputState.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = InputState.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		D47B92BF27972AC800458394 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = main.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		D47D73AA27A6CAE600255A50 /* AssociatedPhrases.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = AssociatedPhrases.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
@@ -429,13 +429,13 @@
 			children = (
 				5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */,
 				D461B791279DAC010070E734 /* InputState.swift */,
+				D456576D279E4F7B00DF6BC9 /* InputHandler.swift */,
 				D4E569DA27A34CC100AC2CEF /* KeyHandler.h */,
 				D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */,
 				5B7F225C2808501000DDD3CB /* KeyHandler_HandleInput.swift */,
 				5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */,
 				5B61B0C9280BEFD4002E3CFA /* KeyHandler_Misc.swift */,
 				5B3133BE280B229700A4A505 /* KeyHandler_States.swift */,
-				D456576D279E4F7B00DF6BC9 /* KeyParser.swift */,
 				6ACC3D3E27914F2400F1B140 /* KeyValueBlobReader.cpp */,
 				6ACC3D3C27914AAB00F1B140 /* KeyValueBlobReader.h */,
 				5B62A33727AE79CD00A19448 /* NSStringUtils.swift */,
@@ -1087,7 +1087,7 @@
 				D47F7DD0278C0897002F9DD7 /* ctlNonModalAlertWindow.swift in Sources */,
 				5B62A32F27AE78B000A19448 /* CoreLM.mm in Sources */,
 				5BE78BE027B38804005EA1BE /* LMConsolidator.mm in Sources */,
-				D456576E279E4F7B00DF6BC9 /* KeyParser.swift in Sources */,
+				D456576E279E4F7B00DF6BC9 /* InputHandler.swift in Sources */,
 				5BA9FD1027FEDB6B002DE248 /* suiPrefPaneKeyboard.swift in Sources */,
 				5B3133BF280B229700A4A505 /* KeyHandler_States.swift in Sources */,
 				5BA9FD4327FEF3C8002DE248 /* Preferences.swift in Sources */,

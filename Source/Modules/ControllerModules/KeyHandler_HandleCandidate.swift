@@ -31,7 +31,7 @@ import Cocoa
 @objc extension KeyHandler {
 	func _handleCandidateState(
 		_ state: InputState,
-		input: keyParser,
+		input: InputHandler,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback: @escaping () -> Void
 	) -> Bool {
