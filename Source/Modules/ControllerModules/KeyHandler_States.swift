@@ -27,9 +27,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 
 // MARK: - § State managements.
-@objc extension KeyHandler {
 
+@objc extension KeyHandler {
 	// MARK: - 構築狀態（State Building）
+
 	func buildInputtingState() -> InputState.Inputting {
 		// 觸發資料封裝更新，否則下文拿到的數據會是錯的。
 		packageBufferStateMaterials()
@@ -44,16 +45,17 @@ import Cocoa
 
 		// 組建提示文本
 		var tooltip = ""
-		if (resultOfBefore == "") && (resultOfAfter != "") {
+		if resultOfBefore == "", resultOfAfter != "" {
 			tooltip = String(format: NSLocalizedString("Cursor is after \"%@\".", comment: ""), resultOfAfter)
 		}
-		if (resultOfBefore != "") && (resultOfAfter == "") {
+		if resultOfBefore != "", resultOfAfter == "" {
 			tooltip = String(format: NSLocalizedString("Cursor is before \"%@\".", comment: ""), resultOfBefore)
 		}
-		if (resultOfBefore != "") && (resultOfAfter != "") {
+		if resultOfBefore != "", resultOfAfter != "" {
 			tooltip = String(
 				format: NSLocalizedString("Cursor is between \"%@\" and \"%@\".", comment: ""),
-				resultOfAfter, resultOfBefore)
+				resultOfAfter, resultOfBefore
+			)
 		}
 
 		// 給新狀態安插配置好的提示文本、且送出新狀態
@@ -62,6 +64,7 @@ import Cocoa
 	}
 
 	// MARK: - 用以生成候選詞數組
+
 	func _buildCandidateState(
 		_ currentState: InputState.NotEmpty,
 		useVerticalMode: Bool
@@ -72,18 +75,19 @@ import Cocoa
 			composingBuffer: currentState.composingBuffer,
 			cursorIndex: currentState.cursorIndex,
 			candidates: candidatesArray,
-			useVerticalMode: useVerticalMode)
+			useVerticalMode: useVerticalMode
+		)
 		return state
 	}
 
 	// MARK: - 用以處理就地新增自訂語彙時的行為
+
 	func _handleMarkingState(
 		_ state: InputState.Marking,
 		input: keyParser,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback: @escaping () -> Void
 	) -> Bool {
-
 		if input.isESC {
 			let inputting = buildInputtingState()
 			stateCallback(inputting)
@@ -106,7 +110,7 @@ import Cocoa
 		}
 
 		// Shift + Left
-		if (input.isCursorBackward || input.emacsKey == vChewingEmacsKey.backward) && (input.isShiftHold) {
+		if input.isCursorBackward || input.emacsKey == vChewingEmacsKey.backward, input.isShiftHold {
 			var index = state.markerIndex
 			if index > 0 {
 				index = UInt((state.composingBuffer as NSString).previousUtf16Position(for: Int(index)))
@@ -114,7 +118,8 @@ import Cocoa
 					composingBuffer: state.composingBuffer,
 					cursorIndex: state.cursorIndex,
 					markerIndex: index,
-					readings: state.readings)
+					readings: state.readings
+				)
 				marking.tooltipForInputting = state.tooltipForInputting
 
 				if marking.markedRange.length == 0 {
@@ -132,7 +137,7 @@ import Cocoa
 		}
 
 		// Shift + Right
-		if (input.isCursorForward || input.emacsKey == vChewingEmacsKey.forward) && (input.isShiftHold) {
+		if input.isCursorForward || input.emacsKey == vChewingEmacsKey.forward, input.isShiftHold {
 			var index = state.markerIndex
 			// 這裡繼續用 NSString 是為了與 Zonble 之前引入的 NSStringUtils 相容。
 			// 不然的話，這行判斷會失敗、引發「9B51408D」錯誤。
@@ -142,7 +147,8 @@ import Cocoa
 					composingBuffer: state.composingBuffer,
 					cursorIndex: state.cursorIndex,
 					markerIndex: index,
-					readings: state.readings)
+					readings: state.readings
+				)
 				marking.tooltipForInputting = state.tooltipForInputting
 				if marking.markedRange.length == 0 {
 					let inputting = marking.convertToInputting()
@@ -161,6 +167,7 @@ import Cocoa
 	}
 
 	// MARK: - 標點輸入處理
+
 	func _handlePunctuation(
 		_ customPunctuation: String,
 		state: InputState,
@@ -179,9 +186,10 @@ import Cocoa
 			inputting.poppedText = poppedText
 			stateCallback(inputting)
 
-			if mgrPrefs.useSCPCTypingMode && isPhoneticReadingBufferEmpty() {
+			if mgrPrefs.useSCPCTypingMode, isPhoneticReadingBufferEmpty() {
 				let candidateState = _buildCandidateState(
-					inputting, useVerticalMode: useVerticalMode)
+					inputting, useVerticalMode: useVerticalMode
+				)
 				if candidateState.candidates.count == 1 {
 					clear()
 					if let strPoppedText: String = candidateState.candidates.first {
@@ -208,10 +216,11 @@ import Cocoa
 	}
 
 	// MARK: - Enter 鍵處理
+
 	@discardableResult func _handleEnterWithState(
 		_ state: InputState,
 		stateCallback: @escaping (InputState) -> Void,
-		errorCallback: @escaping () -> Void
+		errorCallback _: @escaping () -> Void
 	) -> Bool {
 		if !(state is InputState.Inputting) {
 			return false
@@ -230,10 +239,11 @@ import Cocoa
 	}
 
 	// MARK: - CMD+Enter 鍵處理
+
 	func _handleCtrlCommandEnterWithState(
 		_ state: InputState,
 		stateCallback: @escaping (InputState) -> Void,
-		errorCallback: @escaping () -> Void
+		errorCallback _: @escaping () -> Void
 	) -> Bool {
 		if !(state is InputState.Inputting) {
 			return false
@@ -255,6 +265,7 @@ import Cocoa
 	}
 
 	// MARK: - 處理 Backspace (macOS Delete) 按鍵行為
+
 	func _handleBackspaceWithState(
 		_ state: InputState,
 		stateCallback: @escaping (InputState) -> Void,
@@ -278,7 +289,7 @@ import Cocoa
 			doBackSpaceToPhoneticReadingBuffer()
 		}
 
-		if isPhoneticReadingBufferEmpty() && (getBuilderLength() == 0) {
+		if isPhoneticReadingBufferEmpty(), getBuilderLength() == 0 {
 			let empty = InputState.EmptyIgnoringPreviousState()
 			stateCallback(empty)
 		} else {
@@ -289,6 +300,7 @@ import Cocoa
 	}
 
 	// MARK: - 處理 PC Delete (macOS Fn+BackSpace) 按鍵行為
+
 	func _handleDeleteWithState(
 		_ state: InputState,
 		stateCallback: @escaping (InputState) -> Void,
@@ -303,7 +315,8 @@ import Cocoa
 				deleteBuilderReadingAfterCursor()
 				_walk()
 				let inputting = buildInputtingState()
-				if inputting.composingBuffer.count == 0 {
+				// 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
+				if !inputting.composingBuffer.isEmpty {
 					let empty = InputState.EmptyIgnoringPreviousState()
 					stateCallback(empty)
 				} else {
@@ -324,6 +337,7 @@ import Cocoa
 	}
 
 	// MARK: - 處理與當前文字輸入排版前後方向呈 90 度的那兩個方向鍵的按鍵行為
+
 	func _handleAbsorbedArrowKeyWithState(
 		_ state: InputState,
 		stateCallback: @escaping (InputState) -> Void,
@@ -341,6 +355,7 @@ import Cocoa
 	}
 
 	// MARK: - 處理 Home 鍵行為
+
 	func _handleHomeWithState(
 		_ state: InputState,
 		stateCallback: @escaping (InputState) -> Void,
@@ -371,6 +386,7 @@ import Cocoa
 	}
 
 	// MARK: - 處理 End 鍵行為
+
 	func _handleEndWithState(
 		_ state: InputState,
 		stateCallback: @escaping (InputState) -> Void,
@@ -401,10 +417,11 @@ import Cocoa
 	}
 
 	// MARK: - 處理 Esc 鍵行為
+
 	func _handleEscWithState(
 		_ state: InputState,
 		stateCallback: @escaping (InputState) -> Void,
-		errorCallback: @escaping () -> Void
+		errorCallback _: @escaping () -> Void
 	) -> Bool {
 		if !(state is InputState.Inputting) { return false }
 
@@ -433,14 +450,15 @@ import Cocoa
 		}
 		return true
 	}
+
 	// MARK: - 處理向前方向鍵的行為
+
 	func _handleForwardWithState(
 		_ state: InputState,
 		input: keyParser,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback: @escaping () -> Void
 	) -> Bool {
-
 		if !(state is InputState.Inputting) { return false }
 
 		if !isPhoneticReadingBufferEmpty() {
@@ -461,7 +479,8 @@ import Cocoa
 					composingBuffer: currentState.composingBuffer,
 					cursorIndex: currentState.cursorIndex,
 					markerIndex: UInt(nextPosition),
-					readings: _currentReadings())
+					readings: _currentReadings()
+				)
 				marking.tooltipForInputting = currentState.tooltip
 				stateCallback(marking)
 			} else {
@@ -484,13 +503,13 @@ import Cocoa
 	}
 
 	// MARK: - 處理向後方向鍵的行為
+
 	func _handleBackwardWithState(
 		_ state: InputState,
 		input: keyParser,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback: @escaping () -> Void
 	) -> Bool {
-
 		if !(state is InputState.Inputting) { return false }
 
 		if !isPhoneticReadingBufferEmpty() {
@@ -511,7 +530,8 @@ import Cocoa
 					composingBuffer: currentState.composingBuffer,
 					cursorIndex: currentState.cursorIndex,
 					markerIndex: UInt(previousPosition),
-					readings: _currentReadings())
+					readings: _currentReadings()
+				)
 				marking.tooltipForInputting = currentState.tooltip
 				stateCallback(marking)
 			} else {

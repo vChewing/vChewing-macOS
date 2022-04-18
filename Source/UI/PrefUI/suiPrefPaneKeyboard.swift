@@ -54,7 +54,7 @@ struct suiPrefPaneKeyboard: View {
 					Text(LocalizedStringKey("MiTAC")).tag(5)
 					Text(LocalizedStringKey("Fake Seigyou")).tag(6)
 					Text(LocalizedStringKey("Hanyu Pinyin with Numeral Intonation")).tag(10)
-				}.onChange(of: selMandarinParser) { (value) in
+				}.onChange(of: selMandarinParser) { value in
 					mgrPrefs.mandarinParser = value
 				}
 				.labelsHidden()
@@ -69,7 +69,7 @@ struct suiPrefPaneKeyboard: View {
 							Text(IME.arrEnumerateSystemKeyboardLayouts[id].strName).tag(
 								IME.arrEnumerateSystemKeyboardLayouts[id].strValue)
 						}.id(UUID())
-					}.onChange(of: selBasicKeyboardLayout) { (value) in
+					}.onChange(of: selBasicKeyboardLayout) { value in
 						mgrPrefs.basicKeyboardLayout = value
 					}
 					.labelsHidden()

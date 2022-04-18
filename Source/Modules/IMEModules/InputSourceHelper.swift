@@ -28,9 +28,8 @@ import Carbon
 import Cocoa
 
 public class InputSourceHelper: NSObject {
-
 	@available(*, unavailable)
-	public override init() {
+	override public init() {
 		super.init()
 	}
 
@@ -89,7 +88,7 @@ public class InputSourceHelper: NSObject {
 			}
 			let bundleID = Unmanaged<CFString>.fromOpaque(bundleIDPtr).takeUnretainedValue()
 			if String(bundleID) == inputSourceBundleD {
-				let modeEnabled = self.enable(inputSource: source)
+				let modeEnabled = enable(inputSource: source)
 				if !modeEnabled {
 					return false
 				}
@@ -111,18 +110,16 @@ public class InputSourceHelper: NSObject {
 			let inputsSourceBundleID = Unmanaged<CFString>.fromOpaque(bundleIDPtr)
 				.takeUnretainedValue()
 			let inputsSourceModeID = Unmanaged<CFString>.fromOpaque(modePtr).takeUnretainedValue()
-			if modeID == String(inputsSourceModeID) && bundleID == String(inputsSourceBundleID) {
+			if modeID == String(inputsSourceModeID), bundleID == String(inputsSourceBundleID) {
 				let enabled = enable(inputSource: source)
 				print(
 					"Attempt to enable input source of mode: \(modeID), bundle ID: \(bundleID), result: \(enabled)"
 				)
 				return enabled
 			}
-
 		}
 		print("Failed to find any matching input source of mode: \(modeID), bundle ID: \(bundleID)")
 		return false
-
 	}
 
 	@objc(disableInputSource:)
@@ -136,5 +133,4 @@ public class InputSourceHelper: NSObject {
 		let status = TISRegisterInputSource(url as CFURL)
 		return status == noErr
 	}
-
 }

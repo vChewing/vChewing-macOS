@@ -31,11 +31,9 @@ class Content: NSObject {
 	public init(contentString: String) {
 		self.contentString = contentString
 	}
-
 }
 
 extension Content {
-
 	func read(from data: Data) {
 		contentString = String(bytes: data, encoding: .utf8)!
 	}
@@ -43,5 +41,4 @@ extension Content {
 	func data() -> Data? {
 		contentString.data(using: .utf8)
 	}
-
 }

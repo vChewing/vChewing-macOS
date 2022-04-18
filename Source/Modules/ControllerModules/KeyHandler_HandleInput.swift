@@ -43,7 +43,7 @@ import Cocoa
 		// Ignore the input if its inputText is empty.
 		// Reason: such inputs may be functional key combinations.
 
-		if (inputText).isEmpty {
+		if inputText.isEmpty {
 			return false
 		}
 
@@ -56,6 +56,7 @@ import Cocoa
 		}
 
 		// MARK: Caps Lock processing.
+
 		// If Caps Lock is ON, temporarily disable bopomofo.
 		// Note: Alphanumerical mode processing.
 		if input.isBackSpace || input.isEnter || input.isAbsorbedArrowKey || input.isExtraChooseCandidateKey
@@ -75,7 +76,7 @@ import Cocoa
 
 			// If ASCII but not printable, don't use insertText:replacementRange:
 			// Certain apps don't handle non-ASCII char insertions.
-			if charCode < 0x80 && !isPrintable(charCode) {
+			if charCode < 0x80, !isPrintable(charCode) {
 				return false
 			}
 
@@ -88,9 +89,10 @@ import Cocoa
 		}
 
 		// MARK: Numeric Pad Processing.
+
 		if input.isNumericPad {
-			if !input.isLeft && !input.isRight && !input.isDown
-				&& !input.isUp && !input.isSpace && isPrintable(charCode)
+			if !input.isLeft, !input.isRight, !input.isDown,
+				!input.isUp, !input.isSpace, isPrintable(charCode)
 			{
 				clear()
 				stateCallback(emptyState)
@@ -102,15 +104,19 @@ import Cocoa
 		}
 
 		// MARK: Handle Candidates.
+
 		if state is InputState.ChoosingCandidate {
 			return _handleCandidateState(
-				state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
+				state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
+			)
 		}
 
 		// MARK: Handle Associated Phrases.
+
 		if state is InputState.AssociatedPhrases {
 			let result = _handleCandidateState(
-				state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
+				state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
+			)
 			if result {
 				return true
 			} else {
@@ -119,13 +125,14 @@ import Cocoa
 		}
 
 		// MARK: Handle Marking.
+
 		if state is InputState.Marking {
 			let marking = state as! InputState.Marking
 
 			if _handleMarkingState(
 				state as! InputState.Marking, input: input, stateCallback: stateCallback,
-				errorCallback: errorCallback)
-			{
+				errorCallback: errorCallback
+			) {
 				return true
 			}
 
@@ -134,7 +141,8 @@ import Cocoa
 		}
 
 		// MARK: Handle BPMF Keys.
-		var composeReading: Bool = false
+
+		var composeReading = false
 		let skipPhoneticHandling = input.isReservedKey || input.isControlHold || input.isOptionHold
 
 		// See if Phonetic reading is valid.
@@ -150,7 +158,6 @@ import Cocoa
 				stateCallback(inputting)
 				return true
 			}
-
 		}
 
 		// See if we have composition if Enter/Space is hit and buffer is not empty.
@@ -187,7 +194,8 @@ import Cocoa
 			if mgrPrefs.useSCPCTypingMode {
 				let choosingCandidates: InputState.ChoosingCandidate = _buildCandidateState(
 					inputting,
-					useVerticalMode: input.useVerticalMode)
+					useVerticalMode: input.useVerticalMode
+				)
 				if choosingCandidates.candidates.count == 1 {
 					clear()
 					let text: String = choosingCandidates.candidates.first ?? ""
@@ -200,7 +208,8 @@ import Cocoa
 						let associatedPhrases =
 							buildAssociatePhraseState(
 								withKey: text,
-								useVerticalMode: input.useVerticalMode) as? InputState.AssociatedPhrases
+								useVerticalMode: input.useVerticalMode
+							) as? InputState.AssociatedPhrases
 						if let associatedPhrases = associatedPhrases {
 							stateCallback(associatedPhrases)
 						} else {
@@ -247,7 +256,8 @@ import Cocoa
 			}
 			let choosingCandidates = _buildCandidateState(
 				state as! InputState.NotEmpty,
-				useVerticalMode: input.useVerticalMode)
+				useVerticalMode: input.useVerticalMode
+			)
 			stateCallback(choosingCandidates)
 			return true
 		}
@@ -255,59 +265,72 @@ import Cocoa
 		// MARK: -
 
 		// MARK: Esc
+
 		if input.isESC { return _handleEscWithState(state, stateCallback: stateCallback, errorCallback: errorCallback) }
 
 		// MARK: Cursor backward
+
 		if input.isCursorBackward || input.emacsKey == vChewingEmacsKey.backward {
 			return _handleBackwardWithState(
 				state,
 				input: input,
 				stateCallback: stateCallback,
-				errorCallback: errorCallback)
+				errorCallback: errorCallback
+			)
 		}
 
 		// MARK: Cursor forward
+
 		if input.isCursorForward || input.emacsKey == vChewingEmacsKey.forward {
 			return _handleForwardWithState(
-				state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
+				state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
+			)
 		}
 
 		// MARK: Home
+
 		if input.isHome || input.emacsKey == vChewingEmacsKey.home {
 			return _handleHomeWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: End
+
 		if input.isEnd || input.emacsKey == vChewingEmacsKey.end {
 			return _handleEndWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: Ctrl+PgLf or Shift+PgLf
+
 		if (input.isControlHold || input.isShiftHold) && (input.isOptionHold && input.isLeft) {
 			return _handleHomeWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: Ctrl+PgRt or Shift+PgRt
+
 		if (input.isControlHold || input.isShiftHold) && (input.isOptionHold && input.isRight) {
 			return _handleEndWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: AbsorbedArrowKey
+
 		if input.isAbsorbedArrowKey || input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse {
 			return _handleAbsorbedArrowKeyWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: Backspace
+
 		if input.isBackSpace {
 			return _handleBackspaceWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: Delete
+
 		if input.isDelete || input.emacsKey == vChewingEmacsKey.delete {
 			return _handleDeleteWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: Enter
+
 		if input.isEnter {
 			return (input.isCommandHold && input.isControlHold)
 				? _handleCtrlCommandEnterWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
@@ -317,6 +340,7 @@ import Cocoa
 		// MARK: -
 
 		// MARK: Punctuation list
+
 		if input.isSymbolMenuPhysicalKey && !input.isShiftHold {
 			if !input.isOptionHold {
 				if ifLangModelHasUnigrams(forKey: "_punctuation_list") {
@@ -349,6 +373,7 @@ import Cocoa
 		}
 
 		// MARK: Punctuation
+
 		// if nothing is matched, see if it's a punctuation key for current layout.
 
 		var punctuationNamePrefix = ""
@@ -373,8 +398,8 @@ import Cocoa
 			state: state,
 			usingVerticalMode: input.useVerticalMode,
 			stateCallback: stateCallback,
-			errorCallback: errorCallback)
-		{
+			errorCallback: errorCallback
+		) {
 			return true
 		}
 
@@ -387,8 +412,8 @@ import Cocoa
 			state: state,
 			usingVerticalMode: input.useVerticalMode,
 			stateCallback: stateCallback,
-			errorCallback: errorCallback)
-		{
+			errorCallback: errorCallback
+		) {
 			return true
 		}
 
@@ -400,13 +425,14 @@ import Cocoa
 				state: state,
 				usingVerticalMode: input.useVerticalMode,
 				stateCallback: stateCallback,
-				errorCallback: errorCallback)
-			{
+				errorCallback: errorCallback
+			) {
 				return true
 			}
 		}
 
 		// MARK: - Still Nothing.
+
 		// Still nothing? Then we update the composing buffer.
 		// Note that some app has strange behavior if we don't do this,
 		// "thinking" that the key is not actually consumed.

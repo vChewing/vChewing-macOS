@@ -26,20 +26,20 @@ import Cocoa
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-
 	private var ctlAboutWindowInstance: ctlAboutWindow?  // New About Window
 
-	func applicationDidFinishLaunching(_ aNotification: Notification) {
+	func applicationDidFinishLaunching(_: Notification) {
 		// Insert code here to initialize your application
 	}
 
-	func applicationWillTerminate(_ aNotification: Notification) {
+	func applicationWillTerminate(_: Notification) {
 		// Insert code here to tear down your application
 	}
 
-	func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+	func applicationShouldTerminate(_: NSApplication) -> NSApplication.TerminateReply {
 		.terminateNow
 	}
+
 	// New About Window
 	@objc func showAbout() {
 		if ctlAboutWindowInstance == nil {
@@ -49,8 +49,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 		ctlAboutWindowInstance?.window?.orderFrontRegardless()  // 逼著關於視窗往最前方顯示
 		ctlAboutWindowInstance?.window?.level = .statusBar
 	}
+
 	// Call the New About Window
-	@IBAction func about(_ sender: Any) {
+	@IBAction func about(_: Any) {
 		(NSApp.delegate as? AppDelegate)?.showAbout()
 		NSApplication.shared.activate(ignoringOtherApps: true)
 	}

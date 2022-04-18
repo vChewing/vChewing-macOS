@@ -6,6 +6,7 @@
 import SwiftUI
 
 // MARK: - NSComboBox
+
 // Ref: https://stackoverflow.com/a/71058587/4162914
 @available(macOS 11.0, *)
 struct ComboBox: NSViewRepresentable {

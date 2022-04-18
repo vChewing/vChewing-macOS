@@ -83,7 +83,7 @@ private let kDefaultKeys = "123456789"
 @objc extension UserDefaults {
 	func setDefault(_ value: Any?, forKey defaultName: String) {
 		if object(forKey: defaultName) == nil {
-			self.set(value, forKey: defaultName)
+			set(value, forKey: defaultName)
 		}
 	}
 }
@@ -110,9 +110,7 @@ struct UserDefault<Value> {
 struct CandidateListTextSize {
 	let key: String
 	let defaultValue: CGFloat = kDefaultCandidateListTextSize
-	lazy var container: UserDefault = {
-		UserDefault(key: key, defaultValue: defaultValue)
-	}()
+	lazy var container: UserDefault = .init(key: key, defaultValue: defaultValue)
 
 	var wrappedValue: CGFloat {
 		mutating get {
@@ -140,9 +138,7 @@ struct CandidateListTextSize {
 struct ComposingBufferSize {
 	let key: String
 	let defaultValue: Int = kDefaultComposingBufferSize
-	lazy var container: UserDefault = {
-		UserDefault(key: key, defaultValue: defaultValue)
-	}()
+	lazy var container: UserDefault = .init(key: key, defaultValue: defaultValue)
 
 	var wrappedValue: Int {
 		mutating get {
@@ -201,6 +197,7 @@ struct ComposingBufferSize {
 }
 
 // MARK: -
+
 public class mgrPrefs: NSObject {
 	static var allKeys: [String] {
 		[
@@ -238,33 +235,42 @@ public class mgrPrefs: NSObject {
 	}
 
 	// MARK: - 既然 Preferences Module 的預設屬性不自動寫入 plist，那這邊就先寫入了。
+
 	@objc public static func setMissingDefaults() {
 		UserDefaults.standard.setDefault(mgrPrefs.isDebugModeEnabled, forKey: UserDef.kIsDebugModeEnabled)
 		UserDefaults.standard.setDefault(mgrPrefs.mostRecentInputMode, forKey: UserDef.kMostRecentInputMode)
 		UserDefaults.standard.setDefault(mgrPrefs.checkUpdateAutomatically, forKey: UserDef.kCheckUpdateAutomatically)
 		UserDefaults.standard.setDefault(
-			mgrPrefs.showPageButtonsInCandidateWindow, forKey: UserDef.kShowPageButtonsInCandidateWindow)
+			mgrPrefs.showPageButtonsInCandidateWindow, forKey: UserDef.kShowPageButtonsInCandidateWindow
+		)
 		UserDefaults.standard.setDefault(mgrPrefs.symbolInputEnabled, forKey: UserDef.kSymbolInputEnabled)
 		UserDefaults.standard.setDefault(mgrPrefs.candidateListTextSize, forKey: UserDef.kCandidateListTextSize)
 		UserDefaults.standard.setDefault(mgrPrefs.chooseCandidateUsingSpace, forKey: UserDef.kChooseCandidateUsingSpace)
 		UserDefaults.standard.setDefault(
-			mgrPrefs.shouldAutoReloadUserDataFiles, forKey: UserDef.kShouldAutoReloadUserDataFiles)
+			mgrPrefs.shouldAutoReloadUserDataFiles, forKey: UserDef.kShouldAutoReloadUserDataFiles
+		)
 		UserDefaults.standard.setDefault(
-			mgrPrefs.specifyShiftTabKeyBehavior, forKey: UserDef.kSpecifyShiftTabKeyBehavior)
+			mgrPrefs.specifyShiftTabKeyBehavior, forKey: UserDef.kSpecifyShiftTabKeyBehavior
+		)
 		UserDefaults.standard.setDefault(
-			mgrPrefs.specifyShiftSpaceKeyBehavior, forKey: UserDef.kSpecifyShiftSpaceKeyBehavior)
+			mgrPrefs.specifyShiftSpaceKeyBehavior, forKey: UserDef.kSpecifyShiftSpaceKeyBehavior
+		)
 		UserDefaults.standard.setDefault(mgrPrefs.useSCPCTypingMode, forKey: UserDef.kUseSCPCTypingMode)
 		UserDefaults.standard.setDefault(mgrPrefs.associatedPhrasesEnabled, forKey: UserDef.kAssociatedPhrasesEnabled)
 		UserDefaults.standard.setDefault(
-			mgrPrefs.selectPhraseAfterCursorAsCandidate, forKey: UserDef.kSelectPhraseAfterCursorAsCandidate)
+			mgrPrefs.selectPhraseAfterCursorAsCandidate, forKey: UserDef.kSelectPhraseAfterCursorAsCandidate
+		)
 		UserDefaults.standard.setDefault(
-			mgrPrefs.moveCursorAfterSelectingCandidate, forKey: UserDef.kMoveCursorAfterSelectingCandidate)
+			mgrPrefs.moveCursorAfterSelectingCandidate, forKey: UserDef.kMoveCursorAfterSelectingCandidate
+		)
 		UserDefaults.standard.setDefault(
-			mgrPrefs.useHorizontalCandidateList, forKey: UserDef.kUseHorizontalCandidateList)
+			mgrPrefs.useHorizontalCandidateList, forKey: UserDef.kUseHorizontalCandidateList
+		)
 		UserDefaults.standard.setDefault(mgrPrefs.cns11643Enabled, forKey: UserDef.kCNS11643Enabled)
 		UserDefaults.standard.setDefault(mgrPrefs.chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled)
 		UserDefaults.standard.setDefault(
-			mgrPrefs.shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled)
+			mgrPrefs.shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled
+		)
 		UserDefaults.standard.setDefault(mgrPrefs.phraseReplacementEnabled, forKey: UserDef.kPhraseReplacementEnabled)
 		UserDefaults.standard.setDefault(mgrPrefs.shouldNotFartInLieuOfBeep, forKey: UserDef.kShouldNotFartInLieuOfBeep)
 
@@ -303,7 +309,8 @@ public class mgrPrefs: NSObject {
 	}
 
 	@UserDefault(
-		key: UserDef.kBasicKeyboardLayout, defaultValue: "com.apple.keylayout.ZhuyinBopomofo")
+		key: UserDef.kBasicKeyboardLayout, defaultValue: "com.apple.keylayout.ZhuyinBopomofo"
+	)
 	@objc static var basicKeyboardLayout: String
 
 	@UserDefault(key: UserDef.kShowPageButtonsInCandidateWindow, defaultValue: true)
@@ -377,10 +384,11 @@ public class mgrPrefs: NSObject {
 	@objc @discardableResult static func toggleChineseConversionEnabled() -> Bool {
 		chineseConversionEnabled = !chineseConversionEnabled
 		// 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
-		if chineseConversionEnabled && shiftJISShinjitaiOutputEnabled {
+		if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
 			toggleShiftJISShinjitaiOutputEnabled()
 			UserDefaults.standard.set(
-				shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled)
+				shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled
+			)
 		}
 		UserDefaults.standard.set(chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled)
 		return chineseConversionEnabled
@@ -392,11 +400,12 @@ public class mgrPrefs: NSObject {
 	@objc @discardableResult static func toggleShiftJISShinjitaiOutputEnabled() -> Bool {
 		shiftJISShinjitaiOutputEnabled = !shiftJISShinjitaiOutputEnabled
 		// 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
-		if shiftJISShinjitaiOutputEnabled && chineseConversionEnabled {
+		if shiftJISShinjitaiOutputEnabled, chineseConversionEnabled {
 			toggleChineseConversionEnabled()
 		}
 		UserDefaults.standard.set(
-			shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled)
+			shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled
+		)
 		return shiftJISShinjitaiOutputEnabled
 	}
 
@@ -418,6 +427,7 @@ public class mgrPrefs: NSObject {
 	@objc static var specifyShiftSpaceKeyBehavior: Bool
 
 	// MARK: - Optional settings
+
 	@UserDefault(key: UserDef.kCandidateTextFontName, defaultValue: nil)
 	@objc static var candidateTextFontName: String?
 
@@ -430,6 +440,7 @@ public class mgrPrefs: NSObject {
 	@objc static var defaultCandidateKeys: String {
 		kDefaultKeys
 	}
+
 	@objc static var suggestedCandidateKeys: [String] {
 		[kDefaultKeys, "234567890", "QWERTYUIO", "QWERTASDF", "ASDFGHJKL", "ASDFZXCVB"]
 	}
@@ -472,19 +483,20 @@ public class mgrPrefs: NSObject {
 				case .invalidCharacters:
 					return NSLocalizedString(
 						"Candidate keys can only contain ASCII characters like alphanumericals.",
-						comment: "")
+						comment: ""
+					)
 				case .containSpace:
 					return NSLocalizedString("Candidate keys cannot contain space.", comment: "")
 				case .duplicatedCharacters:
 					return NSLocalizedString("There should not be duplicated keys.", comment: "")
 				case .tooShort:
 					return NSLocalizedString(
-						"Please specify at least 4 candidate keys.", comment: "")
+						"Please specify at least 4 candidate keys.", comment: ""
+					)
 				case .tooLong:
 					return NSLocalizedString("Maximum 15 candidate keys allowed.", comment: "")
 			}
 		}
-
 	}
 
 	@UserDefault(key: UserDef.kPhraseReplacementEnabled, defaultValue: false)
@@ -505,5 +517,4 @@ public class mgrPrefs: NSObject {
 		UserDefaults.standard.set(associatedPhrasesEnabled, forKey: UserDef.kAssociatedPhrasesEnabled)
 		return associatedPhrasesEnabled
 	}
-
 }

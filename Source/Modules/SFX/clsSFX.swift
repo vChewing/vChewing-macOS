@@ -28,9 +28,10 @@ import Cocoa
 
 public class clsSFX: NSObject, NSSoundDelegate {
 	private static let shared = clsSFX()
-	private override init() {
+	override private init() {
 		super.init()
 	}
+
 	private var currentBeep: NSSound?
 	private func beep() {
 		// Stop existing beep
@@ -57,9 +58,11 @@ public class clsSFX: NSObject, NSSoundDelegate {
 		beep.play()
 		currentBeep = beep
 	}
-	@objc public func sound(_ sound: NSSound, didFinishPlaying flag: Bool) {
+
+	@objc public func sound(_: NSSound, didFinishPlaying _: Bool) {
 		currentBeep = nil
 	}
+
 	@objc static func beep() {
 		shared.beep()
 	}

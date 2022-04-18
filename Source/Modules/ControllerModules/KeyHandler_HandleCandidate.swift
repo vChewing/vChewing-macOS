@@ -27,6 +27,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 
 // MARK: - § Handle Candidate State.
+
 @objc extension KeyHandler {
 	func _handleCandidateState(
 		_ state: InputState,
@@ -75,7 +76,8 @@ import Cocoa
 			delegate!.keyHandler(
 				self,
 				didSelectCandidateAt: Int(ctlCandidateCurrent.selectedCandidateIndex),
-				ctlCandidate: ctlCandidateCurrent)
+				ctlCandidate: ctlCandidateCurrent
+			)
 			return true
 		}
 
@@ -232,17 +234,18 @@ import Cocoa
 			candidates = (state as! InputState.AssociatedPhrases).candidates
 		}
 
-		if candidates.isEmpty { return false }
-
-		if (input.isEnd || input.emacsKey == vChewingEmacsKey.end) && candidates.count > 0 {
-			if ctlCandidateCurrent.selectedCandidateIndex == UInt(candidates.count - 1) {
-				IME.prtDebugIntel("9B69AAAD")
-				errorCallback()
-			} else {
-				ctlCandidateCurrent.selectedCandidateIndex = UInt(candidates.count - 1)
+		if candidates.isEmpty {
+			return false
+		} else {  // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
+			if input.isEnd || input.emacsKey == vChewingEmacsKey.end {
+				if ctlCandidateCurrent.selectedCandidateIndex == UInt(candidates.count - 1) {
+					IME.prtDebugIntel("9B69AAAD")
+					errorCallback()
+				} else {
+					ctlCandidateCurrent.selectedCandidateIndex = UInt(candidates.count - 1)
+				}
+				return true
 			}
-
-			return true
 		}
 
 		if state is InputState.AssociatedPhrases {
@@ -300,7 +303,7 @@ import Cocoa
 				chkKeyValidity(charCode) || ifLangModelHasUnigrams(forKey: customPunctuation)
 				|| ifLangModelHasUnigrams(forKey: punctuation)
 
-			if !shouldAutoSelectCandidate && input.isUpperCaseASCIILetterKey {
+			if !shouldAutoSelectCandidate, input.isUpperCaseASCIILetterKey {
 				let letter: String! = String(format: "%@%c", "_letter_", CChar(charCode))
 				if ifLangModelHasUnigrams(forKey: letter) { shouldAutoSelectCandidate = true }
 			}
@@ -311,12 +314,14 @@ import Cocoa
 					delegate!.keyHandler(
 						self,
 						didSelectCandidateAt: Int(candidateIndex),
-						ctlCandidate: ctlCandidateCurrent)
+						ctlCandidate: ctlCandidateCurrent
+					)
 					clear()
 					let empty = InputState.EmptyIgnoringPreviousState()
 					stateCallback(empty)
 					return handle(
-						input: input, state: empty, stateCallback: stateCallback, errorCallback: errorCallback)
+						input: input, state: empty, stateCallback: stateCallback, errorCallback: errorCallback
+					)
 				}
 				return true
 			}

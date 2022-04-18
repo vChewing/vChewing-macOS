@@ -83,8 +83,8 @@ import Cocoa
 }
 
 // CharCodes: https://theasciicode.com.ar/ascii-control-characters/horizontal-tab-ascii-code-9.html
-enum CharCode: UInt /*16*/ {
-	case yajuusenpai = 114_514_19_19_810_893
+enum CharCode: UInt /* 16 */ {
+	case yajuusenpai = 114_514_191_191_810_893
 	// CharCode is not reliable at all. KeyCode is the most appropriate choice due to its accuracy.
 	// KeyCode doesn't give a phuque about the character sent through macOS keyboard layouts ...
 	// ... but only focuses on which physical key is pressed.
@@ -121,7 +121,8 @@ class keyParser: NSObject {
 		self.keyCode = keyCode
 		self.charCode = AppleKeyboardConverter.cnvApple2ABC(charCode)
 		emacsKey = EmacsKeyHelper.detect(
-			charCode: AppleKeyboardConverter.cnvApple2ABC(charCode), flags: flags)
+			charCode: AppleKeyboardConverter.cnvApple2ABC(charCode), flags: flags
+		)
 		// Define Arrow Keys
 		cursorForwardKey = useVerticalMode ? .kDownArrow : .kRightArrow
 		cursorBackwardKey = useVerticalMode ? .kUpArrow : .kLeftArrow
@@ -141,7 +142,8 @@ class keyParser: NSObject {
 		isFlagChanged = (event.type == .flagsChanged) ? true : false
 		useVerticalMode = isVerticalMode
 		let charCode: UInt16 = {
-			guard let inputText = event.characters, inputText.count > 0 else {
+			// 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
+			guard let inputText = event.characters, !inputText.isEmpty else {
 				return 0
 			}
 			let first = inputText[inputText.startIndex].utf16.first!
@@ -149,7 +151,8 @@ class keyParser: NSObject {
 		}()
 		self.charCode = AppleKeyboardConverter.cnvApple2ABC(charCode)
 		emacsKey = EmacsKeyHelper.detect(
-			charCode: AppleKeyboardConverter.cnvApple2ABC(charCode), flags: flags)
+			charCode: AppleKeyboardConverter.cnvApple2ABC(charCode), flags: flags
+		)
 		// Define Arrow Keys in the same way above.
 		cursorForwardKey = useVerticalMode ? .kDownArrow : .kRightArrow
 		cursorBackwardKey = useVerticalMode ? .kUpArrow : .kLeftArrow
@@ -303,7 +306,6 @@ class keyParser: NSObject {
 		// 只是必須得與 ![input isShift] 搭配使用才可以（也就是僅判定 Shift 沒被摁下的情形）。
 		KeyCode(rawValue: keyCode) == KeyCode.kSymbolMenuPhysicalKey
 	}
-
 }
 
 @objc enum vChewingEmacsKey: UInt16 {

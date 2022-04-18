@@ -27,10 +27,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 
 // MARK: - § Misc functions.
-@objc extension KeyHandler {
 
+@objc extension KeyHandler {
 	func getCurrentMandarinParser() -> String {
-		return (mgrPrefs.mandarinParserName + "_")
+		mgrPrefs.mandarinParserName + "_"
 	}
 
 	func _actualCandidateCursorIndex() -> Int {

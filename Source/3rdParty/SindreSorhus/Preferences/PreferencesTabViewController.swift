@@ -112,7 +112,7 @@ final class PreferencesTabViewController: NSViewController, PreferencesStyleCont
 		}
 	}
 
-	private func updateWindowTitle(tabIndex: Int) {
+	private func updateWindowTitle(tabIndex _: Int) {
 		window.title = {
 			//			if preferencePanes.count > 1 {
 			//				return preferencePanes[tabIndex].preferencePaneTitle
@@ -200,7 +200,8 @@ final class PreferencesTabViewController: NSViewController, PreferencesStyleCont
 						options: options,
 						completionHandler: completion
 					)
-				}, completionHandler: nil)
+				}, completionHandler: nil
+			)
 		} else {
 			super.transition(
 				from: fromViewController,
@@ -234,22 +235,22 @@ final class PreferencesTabViewController: NSViewController, PreferencesStyleCont
 }
 
 extension PreferencesTabViewController: NSToolbarDelegate {
-	func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+	func toolbarDefaultItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
 		toolbarItemIdentifiers
 	}
 
-	func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+	func toolbarAllowedItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
 		toolbarItemIdentifiers
 	}
 
-	func toolbarSelectableItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+	func toolbarSelectableItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
 		style == .segmentedControl ? [] : toolbarItemIdentifiers
 	}
 
 	public func toolbar(
-		_ toolbar: NSToolbar,
+		_: NSToolbar,
 		itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier,
-		willBeInsertedIntoToolbar flag: Bool
+		willBeInsertedIntoToolbar _: Bool
 	) -> NSToolbarItem? {
 		if itemIdentifier == .flexibleSpace {
 			return nil

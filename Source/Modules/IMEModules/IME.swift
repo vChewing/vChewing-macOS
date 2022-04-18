@@ -30,14 +30,17 @@ public class IME: NSObject {
 	static let dlgOpenPath = NSOpenPanel()
 
 	// MARK: - 開關判定當前應用究竟是？
+
 	@objc static var areWeUsingOurOwnPhraseEditor: Bool = false
 
 	// MARK: - 自 ctlInputMethod 讀取當前輸入法的簡繁體模式
+
 	static func getInputMode() -> InputMode {
 		ctlInputMethod.currentKeyHandler.inputMode
 	}
 
 	// MARK: - Print debug information to the console.
+
 	@objc static func prtDebugIntel(_ strPrint: String) {
 		if mgrPrefs.isDebugModeEnabled {
 			NSLog("vChewingErrorCallback: %@", strPrint)
@@ -45,11 +48,13 @@ public class IME: NSObject {
 	}
 
 	// MARK: - Tell whether this IME is running with Root privileges.
+
 	@objc static var isSudoMode: Bool {
 		NSUserName() == "root"
 	}
 
 	// MARK: - Initializing Language Models.
+
 	@objc static func initLangModels(userOnly: Bool) {
 		if !userOnly {
 			mgrLangModel.loadDataModels()  // 這句還是不要砍了。
@@ -63,6 +68,7 @@ public class IME: NSObject {
 	}
 
 	// MARK: - System Dark Mode Status Detector.
+
 	@objc static func isDarkMode() -> Bool {
 		if #available(macOS 10.15, *) {
 			let appearanceDescription = NSApplication.shared.effectiveAppearance.debugDescription
@@ -83,6 +89,7 @@ public class IME: NSObject {
 	}
 
 	// MARK: - Open a phrase data file.
+
 	static func openPhraseFile(userFileAt path: String) {
 		func checkIfUserFilesExist() -> Bool {
 			if !mgrLangModel.chkUserLMFilesExist(InputMode.imeModeCHS)
@@ -90,12 +97,15 @@ public class IME: NSObject {
 			{
 				let content = String(
 					format: NSLocalizedString(
-						"Please check the permission at \"%@\".", comment: ""),
-					mgrLangModel.dataFolderPath(isDefaultFolder: false))
+						"Please check the permission at \"%@\".", comment: ""
+					),
+					mgrLangModel.dataFolderPath(isDefaultFolder: false)
+				)
 				ctlNonModalAlertWindow.shared.show(
 					title: NSLocalizedString("Unable to create the user phrase file.", comment: ""),
 					content: content, confirmButtonTitle: NSLocalizedString("OK", comment: ""),
-					cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
+					cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil
+				)
 				NSApp.setActivationPolicy(.accessory)
 				return false
 			}
@@ -109,12 +119,14 @@ public class IME: NSObject {
 	}
 
 	// MARK: - Trash a file if it exists.
+
 	@discardableResult static func trashTargetIfExists(_ path: String) -> Bool {
 		do {
 			if FileManager.default.fileExists(atPath: path) {
 				// 塞入垃圾桶
 				try FileManager.default.trashItem(
-					at: URL(fileURLWithPath: path), resultingItemURL: nil)
+					at: URL(fileURLWithPath: path), resultingItemURL: nil
+				)
 			} else {
 				NSLog("Item doesn't exist: \(path)")
 			}
@@ -126,6 +138,7 @@ public class IME: NSObject {
 	}
 
 	// MARK: - Uninstall the input method.
+
 	@discardableResult static func uninstall(isSudo: Bool = false, selfKill: Bool = true) -> Int32 {
 		// 輸入法自毀處理。這裡不用「Bundle.main.bundleURL」是為了方便使用者以 sudo 身分來移除被錯誤安裝到系統目錄內的輸入法。
 		guard let bundleID = Bundle.main.bundleIdentifier else {
@@ -155,8 +168,8 @@ public class IME: NSObject {
 			let objFullPath = pathLibrary + pathUnitKeyboardLayouts + objPath
 			if !IME.trashTargetIfExists(objFullPath) { return -1 }
 		}
-		if CommandLine.arguments.count > 2 && CommandLine.arguments[2] == "--all"
-			&& CommandLine.arguments[1] == "uninstall"
+		if CommandLine.arguments.count > 2, CommandLine.arguments[2] == "--all",
+			CommandLine.arguments[1] == "uninstall"
 		{
 			// 再處理是否需要移除放在預設使用者資料夾內的檔案的情況。
 			// 如果使用者有在輸入法偏好設定內將該目錄改到別的地方（而不是用 symbol link）的話，則不處理。
@@ -177,6 +190,7 @@ public class IME: NSObject {
 	}
 
 	// MARK: - Registering the input method.
+
 	@discardableResult static func registerInputMethod() -> Int32 {
 		guard let bundleID = Bundle.main.bundleIdentifier else {
 			return -1
@@ -217,7 +231,7 @@ public class IME: NSObject {
 			}
 		}
 
-		if CommandLine.arguments.count > 2 && CommandLine.arguments[2] == "--all" {
+		if CommandLine.arguments.count > 2, CommandLine.arguments[2] == "--all" {
 			let enabled = InputSourceHelper.enableAllInputMode(for: bundleID)
 			NSLog(
 				enabled
@@ -228,10 +242,12 @@ public class IME: NSObject {
 	}
 
 	// MARK: - 準備枚舉系統內所有的 ASCII 鍵盤佈局
+
 	struct CarbonKeyboardLayout {
 		var strName: String = ""
 		var strValue: String = ""
 	}
+
 	static let arrWhitelistedKeyLayoutsASCII: [String] = [
 		"com.apple.keylayout.ABC",
 		"com.apple.keylayout.ABC-AZERTY",
@@ -247,12 +263,14 @@ public class IME: NSObject {
 		// 提前塞入 macOS 內建的兩款動態鍵盤佈局
 		var arrKeyLayouts: [IME.CarbonKeyboardLayout] = []
 		arrKeyLayouts += [
-			IME.CarbonKeyboardLayout.init(
+			IME.CarbonKeyboardLayout(
 				strName: NSLocalizedString("Apple Chewing - Dachen", comment: ""),
-				strValue: "com.apple.keylayout.ZhuyinBopomofo"),
-			IME.CarbonKeyboardLayout.init(
+				strValue: "com.apple.keylayout.ZhuyinBopomofo"
+			),
+			IME.CarbonKeyboardLayout(
 				strName: NSLocalizedString("Apple Chewing - Eten Traditional", comment: ""),
-				strValue: "com.apple.keylayout.ZhuyinEten"),
+				strValue: "com.apple.keylayout.ZhuyinEten"
+			),
 		]
 
 		// 準備枚舉系統內所有的 ASCII 鍵盤佈局
@@ -270,8 +288,8 @@ public class IME: NSObject {
 			}
 
 			if let ptrASCIICapable = TISGetInputSourceProperty(
-				source, kTISPropertyInputSourceIsASCIICapable)
-			{
+				source, kTISPropertyInputSourceIsASCIICapable
+			) {
 				let asciiCapable = Unmanaged<CFBoolean>.fromOpaque(ptrASCIICapable)
 					.takeUnretainedValue()
 				if asciiCapable != kCFBooleanTrue {
@@ -302,13 +320,13 @@ public class IME: NSObject {
 
 			if sourceID.contains("vChewing") {
 				arrKeyLayoutsMACV += [
-					IME.CarbonKeyboardLayout.init(strName: localizedName, strValue: sourceID)
+					IME.CarbonKeyboardLayout(strName: localizedName, strValue: sourceID)
 				]
 			}
 
 			if IME.arrWhitelistedKeyLayoutsASCII.contains(sourceID) {
 				arrKeyLayoutsASCII += [
-					IME.CarbonKeyboardLayout.init(strName: localizedName, strValue: sourceID)
+					IME.CarbonKeyboardLayout(strName: localizedName, strValue: sourceID)
 				]
 			}
 		}
@@ -316,7 +334,6 @@ public class IME: NSObject {
 		arrKeyLayouts += arrKeyLayoutsASCII
 		return arrKeyLayouts
 	}
-
 }
 
 // MARK: - Root Extensions
@@ -331,6 +348,7 @@ extension RangeReplaceableCollection where Element: Hashable {
 }
 
 // MARK: - Error Extension
+
 extension String: Error {}
 extension String: LocalizedError {
 	public var errorDescription: String? {
@@ -339,6 +357,7 @@ extension String: LocalizedError {
 }
 
 // MARK: - Ensuring trailing slash of a string:
+
 extension String {
 	mutating func ensureTrailingSlash() {
 		if !hasSuffix("/") {

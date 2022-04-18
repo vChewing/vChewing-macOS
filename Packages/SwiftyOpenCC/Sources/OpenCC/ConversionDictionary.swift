@@ -9,7 +9,6 @@ import Foundation
 import copencc
 
 class ConversionDictionary {
-
 	let group: [ConversionDictionary]
 
 	let dict: CCDictRef
@@ -23,7 +22,7 @@ class ConversionDictionary {
 	}
 
 	init(group: [ConversionDictionary]) {
-		var rawGroup = group.map { $0.dict }
+		var rawGroup = group.map(\.dict)
 		self.group = group
 		dict = CCDictCreateWithGroup(&rawGroup, rawGroup.count)
 	}

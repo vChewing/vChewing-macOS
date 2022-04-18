@@ -26,7 +26,7 @@ import Cocoa
 
 extension String {
 	fileprivate mutating func selfReplace(_ strOf: String, _ strWith: String = "") {
-		self = self.replacingOccurrences(of: strOf, with: strWith)
+		self = replacingOccurrences(of: strOf, with: strWith)
 	}
 }
 

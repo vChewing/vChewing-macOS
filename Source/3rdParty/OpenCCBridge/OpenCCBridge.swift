@@ -36,7 +36,7 @@ public class OpenCCBridge: NSObject {
 	private var simplify: ChineseConverter?
 	private var traditionalize: ChineseConverter?
 
-	private override init() {
+	override private init() {
 		try? simplify = ChineseConverter(options: .simplify)
 		try? traditionalize = ChineseConverter(options: [.traditionalize, .twStandard])
 		super.init()

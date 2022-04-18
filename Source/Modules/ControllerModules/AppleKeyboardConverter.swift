@@ -42,6 +42,7 @@ class AppleKeyboardConverter: NSObject {
 	@objc class func isDynamicBasicKeyboardLayoutEnabled() -> Bool {
 		AppleKeyboardConverter.arrDynamicBasicKeyLayout.contains(mgrPrefs.basicKeyboardLayout)
 	}
+
 	// 處理 Apple 注音鍵盤佈局類型。
 	@objc class func cnvApple2ABC(_ charCode: UniChar) -> UniChar {
 		var charCode = charCode

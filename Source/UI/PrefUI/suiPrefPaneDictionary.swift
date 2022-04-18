@@ -57,7 +57,8 @@ struct suiPrefPaneDictionary: View {
 						.help(tbxUserDataPathSpecified)
 					Button {
 						IME.dlgOpenPath.title = NSLocalizedString(
-							"Choose your desired user data folder.", comment: "")
+							"Choose your desired user data folder.", comment: ""
+						)
 						IME.dlgOpenPath.showsResizeIndicator = true
 						IME.dlgOpenPath.showsHiddenFiles = true
 						IME.dlgOpenPath.canChooseFiles = false
@@ -103,27 +104,25 @@ struct suiPrefPaneDictionary: View {
 					} label: {
 						Text("↻")
 					}
-
 				}
 				Toggle(
 					LocalizedStringKey("Automatically reload user data files if changes detected"),
 					isOn: $selAutoReloadUserData
-				).controlSize(.small).onChange(of: selAutoReloadUserData) { (value) in
+				).controlSize(.small).onChange(of: selAutoReloadUserData) { value in
 					mgrPrefs.shouldAutoReloadUserDataFiles = value
 				}
 				Divider()
 				Toggle(LocalizedStringKey("Enable CNS11643 Support (2022-01-27)"), isOn: $selEnableCNS11643)
-					.onChange(of: selEnableCNS11643) { (value) in
+					.onChange(of: selEnableCNS11643) { value in
 						mgrPrefs.cns11643Enabled = value
 					}
 				Toggle(
 					LocalizedStringKey("Enable symbol input support (incl. certain emoji symbols)"),
 					isOn: $selEnableSymbolInputSupport
 				)
-				.onChange(of: selEnableSymbolInputSupport) { (value) in
+				.onChange(of: selEnableSymbolInputSupport) { value in
 					mgrPrefs.symbolInputEnabled = value
 				}
-
 			}
 		}
 	}
