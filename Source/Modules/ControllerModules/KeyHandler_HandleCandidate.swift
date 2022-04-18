@@ -2,27 +2,27 @@
 // Refactored from the ObjCpp-version of this class by:
 // (c) 2011 and onwards The OpenVanilla Project (MIT License).
 /*
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy of
+ this software and associated documentation files (the "Software"), to deal in
+ the Software without restriction, including without limitation the rights to
+ use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ the Software, and to permit persons to whom the Software is furnished to do so,
+ subject to the following conditions:
 
-1. The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+ 1. The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
 
-2. No trademark license is granted to use the trade names, trademarks, service
-marks, or product names of Contributor, except as required to fulfill notice
-requirements above.
+ 2. No trademark license is granted to use the trade names, trademarks, service
+ marks, or product names of Contributor, except as required to fulfill notice
+ requirements above.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 import Cocoa
 
@@ -39,38 +39,35 @@ import Cocoa
 		let charCode: UniChar = input.charCode
 		let ctlCandidateCurrent = delegate!.ctlCandidate(for: self) as! ctlCandidate
 
+		// MARK: Cancel Candidate
+
 		let cancelCandidateKey =
 			input.isBackSpace || input.isESC || input.isDelete
 			|| ((input.isCursorBackward || input.isCursorForward) && input.isShiftHold)
 
 		if cancelCandidateKey {
-			if state is InputState.AssociatedPhrases {
-				clear()
-				let empty = InputState.EmptyIgnoringPreviousState()
-				stateCallback(empty)
-			} else if mgrPrefs.useSCPCTypingMode {
-				clear()
-				let empty = InputState.EmptyIgnoringPreviousState()
-				stateCallback(empty)
-			} else if isBuilderEmpty() {
+			if (state is InputState.AssociatedPhrases)
+				|| mgrPrefs.useSCPCTypingMode
+				|| isBuilderEmpty()
+			{
 				// 如果此時發現當前組字緩衝區為真空的情況的話，
 				// 就將當前的組字緩衝區析構處理、強制重設輸入狀態。
 				// 否則，一個本不該出現的真空組字緩衝區會使前後方向鍵與 BackSpace 鍵失靈。
+				// 所以這裡需要對 isBuilderEmpty() 做判定。
 				clear()
-				let empty = InputState.EmptyIgnoringPreviousState()
-				stateCallback(empty)
+				stateCallback(InputState.EmptyIgnoringPreviousState())
 			} else {
-				let inputting = buildInputtingState()
-				stateCallback(inputting)
+				stateCallback(buildInputtingState())
 			}
 			return true
 		}
 
+		// MARK: Enter
+
 		if input.isEnter {
 			if state is InputState.AssociatedPhrases {
 				clear()
-				let empty = InputState.EmptyIgnoringPreviousState()
-				stateCallback(empty)
+				stateCallback(InputState.EmptyIgnoringPreviousState())
 				return true
 			}
 			delegate!.keyHandler(
@@ -81,10 +78,14 @@ import Cocoa
 			return true
 		}
 
+		// MARK: Tab
+
 		if input.isTab {
 			let updated: Bool =
 				mgrPrefs.specifyShiftTabKeyBehavior
-				? (input.isShiftHold ? ctlCandidateCurrent.showPreviousPage() : ctlCandidateCurrent.showNextPage())
+				? (input.isShiftHold
+					? ctlCandidateCurrent.showPreviousPage()
+					: ctlCandidateCurrent.showNextPage())
 				: (input.isShiftHold
 					? ctlCandidateCurrent.highlightPreviousCandidate()
 					: ctlCandidateCurrent.highlightNextCandidate())
@@ -94,6 +95,8 @@ import Cocoa
 			}
 			return true
 		}
+
+		// MARK: Space
 
 		if input.isSpace {
 			let updated: Bool =
@@ -111,6 +114,8 @@ import Cocoa
 			return true
 		}
 
+		// MARK: PgDn
+
 		if input.isPageDown || input.emacsKey == vChewingEmacsKey.nextPage {
 			let updated: Bool = ctlCandidateCurrent.showNextPage()
 			if !updated {
@@ -120,6 +125,8 @@ import Cocoa
 			return true
 		}
 
+		// MARK: PgUp
+
 		if input.isPageUp {
 			let updated: Bool = ctlCandidateCurrent.showPreviousPage()
 			if !updated {
@@ -128,6 +135,8 @@ import Cocoa
 			}
 			return true
 		}
+
+		// MARK: Left Arrow
 
 		if input.isLeft {
 			if ctlCandidateCurrent is ctlCandidateHorizontal {
@@ -146,6 +155,8 @@ import Cocoa
 			return true
 		}
 
+		// MARK: EmacsKey Backward
+
 		if input.emacsKey == vChewingEmacsKey.backward {
 			let updated: Bool = ctlCandidateCurrent.highlightPreviousCandidate()
 			if !updated {
@@ -154,6 +165,8 @@ import Cocoa
 			}
 			return true
 		}
+
+		// MARK: Right Arrow
 
 		if input.isRight {
 			if ctlCandidateCurrent is ctlCandidateHorizontal {
@@ -172,6 +185,8 @@ import Cocoa
 			return true
 		}
 
+		// MARK: EmacsKey Forward
+
 		if input.emacsKey == vChewingEmacsKey.forward {
 			let updated: Bool = ctlCandidateCurrent.highlightNextCandidate()
 			if !updated {
@@ -180,6 +195,8 @@ import Cocoa
 			}
 			return true
 		}
+
+		// MARK: Up Arrow
 
 		if input.isUp {
 			if ctlCandidateCurrent is ctlCandidateHorizontal {
@@ -198,6 +215,8 @@ import Cocoa
 			return true
 		}
 
+		// MARK: Down Arrow
+
 		if input.isDown {
 			if ctlCandidateCurrent is ctlCandidateHorizontal {
 				let updated: Bool = ctlCandidateCurrent.showNextPage()
@@ -214,6 +233,8 @@ import Cocoa
 			}
 			return true
 		}
+
+		// MARK: Home Key
 
 		if input.isHome || input.emacsKey == vChewingEmacsKey.home {
 			if ctlCandidateCurrent.selectedCandidateIndex == 0 {
@@ -234,6 +255,8 @@ import Cocoa
 			candidates = (state as! InputState.AssociatedPhrases).candidates
 		}
 
+		// MARK: End Key
+
 		if candidates.isEmpty {
 			return false
 		} else {  // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
@@ -247,6 +270,8 @@ import Cocoa
 				return true
 			}
 		}
+
+		// MARK: - Associated Phrases
 
 		if state is InputState.AssociatedPhrases {
 			if !input.isShiftHold { return false }
@@ -275,6 +300,8 @@ import Cocoa
 		}
 
 		if state is InputState.AssociatedPhrases { return false }
+
+		// MARK: SCPC Mode Processing
 
 		if mgrPrefs.useSCPCTypingMode {
 			var punctuationNamePrefix = ""
