@@ -50,38 +50,23 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
 + (void)loadDataModels
 {
     if (!gLangModelCHT.isDataModelLoaded())
-    {
         LTLoadLanguageModelFile(@"data-cht", gLangModelCHT);
-    }
     if (!gLangModelCHT.isMiscDataLoaded())
-    {
         gLangModelCHT.loadMiscData([[self getBundleDataPath:@"data-zhuyinwen"] UTF8String]);
-    }
     if (!gLangModelCHT.isSymbolDataLoaded())
-    {
         gLangModelCHT.loadSymbolData([[self getBundleDataPath:@"data-symbols"] UTF8String]);
-    }
     if (!gLangModelCHT.isCNSDataLoaded())
-    {
         gLangModelCHT.loadCNSData([[self getBundleDataPath:@"char-kanji-cns"] UTF8String]);
-    }
+
     // -----------------
     if (!gLangModelCHS.isDataModelLoaded())
-    {
         LTLoadLanguageModelFile(@"data-chs", gLangModelCHS);
-    }
     if (!gLangModelCHS.isMiscDataLoaded())
-    {
         gLangModelCHS.loadMiscData([[self getBundleDataPath:@"data-zhuyinwen"] UTF8String]);
-    }
     if (!gLangModelCHS.isSymbolDataLoaded())
-    {
         gLangModelCHS.loadSymbolData([[self getBundleDataPath:@"data-symbols"] UTF8String]);
-    }
     if (!gLangModelCHS.isCNSDataLoaded())
-    {
         gLangModelCHS.loadCNSData([[self getBundleDataPath:@"char-kanji-cns"] UTF8String]);
-    }
 }
 
 // 這個函數無法遷移至 Swift
@@ -90,41 +75,25 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
     if ([mode isEqualToString:imeModeCHT])
     {
         if (!gLangModelCHT.isDataModelLoaded())
-        {
             LTLoadLanguageModelFile(@"data-cht", gLangModelCHT);
-        }
         if (!gLangModelCHT.isMiscDataLoaded())
-        {
             gLangModelCHT.loadMiscData([[self getBundleDataPath:@"data-zhuyinwen"] UTF8String]);
-        }
         if (!gLangModelCHT.isSymbolDataLoaded())
-        {
             gLangModelCHT.loadSymbolData([[self getBundleDataPath:@"data-symbols"] UTF8String]);
-        }
         if (!gLangModelCHT.isCNSDataLoaded())
-        {
             gLangModelCHT.loadCNSData([[self getBundleDataPath:@"char-kanji-cns"] UTF8String]);
-        }
     }
 
     if ([mode isEqualToString:imeModeCHS])
     {
         if (!gLangModelCHS.isDataModelLoaded())
-        {
             LTLoadLanguageModelFile(@"data-chs", gLangModelCHS);
-        }
         if (!gLangModelCHS.isMiscDataLoaded())
-        {
             gLangModelCHS.loadMiscData([[self getBundleDataPath:@"data-zhuyinwen"] UTF8String]);
-        }
         if (!gLangModelCHS.isSymbolDataLoaded())
-        {
             gLangModelCHS.loadSymbolData([[self getBundleDataPath:@"data-symbols"] UTF8String]);
-        }
         if (!gLangModelCHS.isCNSDataLoaded())
-        {
             gLangModelCHS.loadCNSData([[self getBundleDataPath:@"char-kanji-cns"] UTF8String]);
-        }
     }
 }
 
