@@ -721,6 +721,9 @@
                             <constraint firstItem="yLp-eY-fSk" firstAttribute="leading" secondItem="ERx-hH-rdd" secondAttribute="leading" id="x50-d0-FBr"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="edtDocument" destination="E0u-iA-KeT" id="keh-oC-FVk"/>
+                    </connections>
                 </viewController>
                 <customObject id="2Tp-Fl-jBw" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
