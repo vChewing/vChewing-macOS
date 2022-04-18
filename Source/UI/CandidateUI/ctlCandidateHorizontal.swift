@@ -42,7 +42,7 @@ private class HorizontalCandidateView: NSView {
 	private var candidateAttrDict: [NSAttributedString.Key: AnyObject] = [:]
 	private var candidateWithLabelAttrDict: [NSAttributedString.Key: AnyObject] = [:]
 	private var elementWidths: [CGFloat] = []
-	private var trackingHighlightedIndex: UInt = UInt.max
+	private var trackingHighlightedIndex: UInt = .max
 
 	override var isFlipped: Bool {
 		true
@@ -71,7 +71,8 @@ private class HorizontalCandidateView: NSView {
 		for index in 0..<count {
 			let rctCandidate = (dispCandidatesWithLabels[index] as NSString).boundingRect(
 				with: baseSize, options: .usesLineFragmentOrigin,
-				attributes: candidateWithLabelAttrDict)
+				attributes: candidateWithLabelAttrDict
+			)
 			var cellWidth = rctCandidate.size.width + cellPadding
 			let cellHeight = rctCandidate.size.height + cellPadding
 			if cellWidth < cellHeight * 1.35 {
@@ -115,7 +116,7 @@ private class HorizontalCandidateView: NSView {
 		cellPadding = ceil(biggestSize / 2.0)
 	}
 
-	override func draw(_ dirtyRect: NSRect) {
+	override func draw(_: NSRect) {
 		let bounds = bounds
 		NSColor.controlBackgroundColor.setFill()  // Candidate list panel base background
 		NSBezierPath.fill(bounds)
@@ -124,21 +125,25 @@ private class HorizontalCandidateView: NSView {
 
 		NSBezierPath.strokeLine(
 			from: NSPoint(x: bounds.size.width, y: 0.0),
-			to: NSPoint(x: bounds.size.width, y: bounds.size.height))
+			to: NSPoint(x: bounds.size.width, y: bounds.size.height)
+		)
 
 		var accuWidth: CGFloat = 0
 		for index in 0..<elementWidths.count {
 			let currentWidth = elementWidths[index]
 			let rctCandidateArea = NSRect(
 				x: accuWidth, y: 0.0, width: currentWidth + 1.0,
-				height: candidateTextHeight + cellPadding)
+				height: candidateTextHeight + cellPadding
+			)
 			let rctLabel = NSRect(
 				x: accuWidth + cellPadding / 2 - 1, y: cellPadding / 2, width: keyLabelWidth,
-				height: keyLabelHeight * 2.0)
+				height: keyLabelHeight * 2.0
+			)
 			let rctCandidatePhrase = NSRect(
 				x: accuWidth + keyLabelWidth - 1, y: cellPadding / 2,
 				width: currentWidth - keyLabelWidth,
-				height: candidateTextHeight)
+				height: candidateTextHeight
+			)
 
 			var activeCandidateIndexAttr = keyLabelAttrDict
 			var activeCandidateAttr = candidateAttrDict
@@ -149,13 +154,15 @@ private class HorizontalCandidateView: NSView {
 					case InputMode.imeModeCHS:
 						NSColor.systemRed.blended(
 							withFraction: colorBlendAmount,
-							of: NSColor.controlBackgroundColor)!
-							.setFill()
+							of: NSColor.controlBackgroundColor
+						)!
+						.setFill()
 					case InputMode.imeModeCHT:
 						NSColor.systemBlue.blended(
 							withFraction: colorBlendAmount,
-							of: NSColor.controlBackgroundColor)!
-							.setFill()
+							of: NSColor.controlBackgroundColor
+						)!
+						.setFill()
 					default:
 						NSColor.alternateSelectedControlColor.setFill()
 				}
@@ -181,9 +188,11 @@ private class HorizontalCandidateView: NSView {
 			}
 			NSBezierPath.fill(rctCandidateArea)
 			(keyLabels[index] as NSString).draw(
-				in: rctLabel, withAttributes: activeCandidateIndexAttr)
+				in: rctLabel, withAttributes: activeCandidateIndexAttr
+			)
 			(displayedCandidates[index] as NSString).draw(
-				in: rctCandidatePhrase, withAttributes: activeCandidateAttr)
+				in: rctCandidatePhrase, withAttributes: activeCandidateAttr
+			)
 			accuWidth += currentWidth + 1.0
 		}
 	}
@@ -197,13 +206,12 @@ private class HorizontalCandidateView: NSView {
 		for index in 0..<elementWidths.count {
 			let currentWidth = elementWidths[index]
 
-			if location.x >= accuWidth && location.x <= accuWidth + currentWidth {
+			if location.x >= accuWidth, location.x <= accuWidth + currentWidth {
 				return UInt(index)
 			}
 			accuWidth += currentWidth + 1.0
 		}
 		return nil
-
 	}
 
 	override func mouseUp(with event: NSEvent) {
@@ -246,7 +254,8 @@ public class ctlCandidateHorizontal: ctlCandidate {
 		var contentRect = NSRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
 		let styleMask: NSWindow.StyleMask = [.nonactivatingPanel]
 		let panel = NSPanel(
-			contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false)
+			contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false
+		)
 		panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel) + 1)
 		panel.hasShadow = true
 		panel.isOpaque = false
@@ -279,7 +288,8 @@ public class ctlCandidateHorizontal: ctlCandidate {
 		nextPageButton.bezelStyle = .disclosure
 		nextPageButton.userInterfaceLayoutDirection = .leftToRight
 		nextPageButton.attributedTitle = NSMutableAttributedString(
-			string: " ", attributes: buttonAttribute)  // Next Page Arrow
+			string: " ", attributes: buttonAttribute
+		)  // Next Page Arrow
 		prevPageButton = NSButton(frame: contentRect)
 		NSColor.controlBackgroundColor.setFill()
 		NSBezierPath.fill(prevPageButton.bounds)
@@ -291,7 +301,8 @@ public class ctlCandidateHorizontal: ctlCandidate {
 		prevPageButton.bezelStyle = .disclosure
 		prevPageButton.userInterfaceLayoutDirection = .rightToLeft
 		prevPageButton.attributedTitle = NSMutableAttributedString(
-			string: " ", attributes: buttonAttribute)  // Previous Page Arrow
+			string: " ", attributes: buttonAttribute
+		)  // Previous Page Arrow
 		panel.contentView?.addSubview(nextPageButton)
 		panel.contentView?.addSubview(prevPageButton)
 
@@ -307,17 +318,18 @@ public class ctlCandidateHorizontal: ctlCandidate {
 		prevPageButton.action = #selector(pageButtonAction(_:))
 	}
 
-	required init?(coder: NSCoder) {
+	@available(*, unavailable)
+	required init?(coder _: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
 
-	public override func reloadData() {
+	override public func reloadData() {
 		candidateView.highlightedIndex = 0
 		currentPage = 0
 		layoutCandidateView()
 	}
 
-	public override func showNextPage() -> Bool {
+	override public func showNextPage() -> Bool {
 		guard delegate != nil else { return false }
 		if pageCount == 1 { return highlightNextCandidate() }
 		currentPage = (currentPage + 1 >= pageCount) ? 0 : currentPage + 1
@@ -326,7 +338,7 @@ public class ctlCandidateHorizontal: ctlCandidate {
 		return true
 	}
 
-	public override func showPreviousPage() -> Bool {
+	override public func showPreviousPage() -> Bool {
 		guard delegate != nil else { return false }
 		if pageCount == 1 { return highlightPreviousCandidate() }
 		currentPage = (currentPage == 0) ? pageCount - 1 : currentPage - 1
@@ -335,7 +347,7 @@ public class ctlCandidateHorizontal: ctlCandidate {
 		return true
 	}
 
-	public override func highlightNextCandidate() -> Bool {
+	override public func highlightNextCandidate() -> Bool {
 		guard let delegate = delegate else { return false }
 		selectedCandidateIndex =
 			(selectedCandidateIndex + 1 >= delegate.candidateCountForController(self))
@@ -343,7 +355,7 @@ public class ctlCandidateHorizontal: ctlCandidate {
 		return true
 	}
 
-	public override func highlightPreviousCandidate() -> Bool {
+	override public func highlightPreviousCandidate() -> Bool {
 		guard let delegate = delegate else { return false }
 		selectedCandidateIndex =
 			(selectedCandidateIndex == 0)
@@ -351,7 +363,7 @@ public class ctlCandidateHorizontal: ctlCandidate {
 		return true
 	}
 
-	public override func candidateIndexAtKeyLabelIndex(_ index: UInt) -> UInt {
+	override public func candidateIndexAtKeyLabelIndex(_ index: UInt) -> UInt {
 		guard let delegate = delegate else {
 			return UInt.max
 		}
@@ -360,7 +372,7 @@ public class ctlCandidateHorizontal: ctlCandidate {
 		return result < delegate.candidateCountForController(self) ? result : UInt.max
 	}
 
-	public override var selectedCandidateIndex: UInt {
+	override public var selectedCandidateIndex: UInt {
 		get {
 			currentPage * UInt(keyLabels.count) + candidateView.highlightedIndex
 		}
@@ -379,7 +391,6 @@ public class ctlCandidateHorizontal: ctlCandidate {
 }
 
 extension ctlCandidateHorizontal {
-
 	private var pageCount: UInt {
 		guard let delegate = delegate else {
 			return 0
@@ -405,13 +416,14 @@ extension ctlCandidateHorizontal {
 			candidates.append(candidate)
 		}
 		candidateView.set(
-			keyLabels: keyLabels.map { $0.displayedText }, displayedCandidates: candidates)
+			keyLabels: keyLabels.map(\.displayedText), displayedCandidates: candidates
+		)
 		var newSize = candidateView.sizeForView
 		var frameRect = candidateView.frame
 		frameRect.size = newSize
 		candidateView.frame = frameRect
 
-		if pageCount > 1 && mgrPrefs.showPageButtonsInCandidateWindow {
+		if pageCount > 1, mgrPrefs.showPageButtonsInCandidateWindow {
 			var buttonRect = nextPageButton.frame
 			let spacing: CGFloat = 0.0
 
@@ -422,7 +434,8 @@ extension ctlCandidateHorizontal {
 			nextPageButton.frame = buttonRect
 
 			buttonRect.origin = NSPoint(
-				x: newSize.width, y: buttonOriginY + buttonRect.size.height + spacing)
+				x: newSize.width, y: buttonOriginY + buttonRect.size.height + spacing
+			)
 			prevPageButton.frame = buttonRect
 
 			newSize.width += 20
@@ -442,7 +455,7 @@ extension ctlCandidateHorizontal {
 		candidateView.setNeedsDisplay(candidateView.bounds)
 	}
 
-	@objc fileprivate func pageButtonAction(_ sender: Any) {
+	@objc private func pageButtonAction(_ sender: Any) {
 		guard let sender = sender as? NSButton else {
 			return
 		}
@@ -453,8 +466,7 @@ extension ctlCandidateHorizontal {
 		}
 	}
 
-	@objc fileprivate func candidateViewMouseDidClick(_ sender: Any) {
+	@objc private func candidateViewMouseDidClick(_: Any) {
 		delegate?.ctlCandidate(self, didSelectCandidateAtIndex: selectedCandidateIndex)
 	}
-
 }

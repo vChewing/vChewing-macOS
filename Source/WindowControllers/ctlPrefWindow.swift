@@ -31,13 +31,13 @@ import Cocoa
 // in Objective-C in order to let IMK to see the same class name as
 // the "InputMethodServerPreferencesWindowControllerClass" in Info.plist.
 @objc(ctlPrefWindow) class ctlPrefWindow: NSWindowController {
-	@IBOutlet weak var fontSizePopUpButton: NSPopUpButton!
-	@IBOutlet weak var uiLanguageButton: NSPopUpButton!
-	@IBOutlet weak var basicKeyboardLayoutButton: NSPopUpButton!
-	@IBOutlet weak var selectionKeyComboBox: NSComboBox!
-	@IBOutlet weak var chkTrad2KangXi: NSButton!
-	@IBOutlet weak var chkTrad2JISShinjitai: NSButton!
-	@IBOutlet weak var lblCurrentlySpecifiedUserDataFolder: NSTextFieldCell!
+	@IBOutlet var fontSizePopUpButton: NSPopUpButton!
+	@IBOutlet var uiLanguageButton: NSPopUpButton!
+	@IBOutlet var basicKeyboardLayoutButton: NSPopUpButton!
+	@IBOutlet var selectionKeyComboBox: NSComboBox!
+	@IBOutlet var chkTrad2KangXi: NSButton!
+	@IBOutlet var chkTrad2JISShinjitai: NSButton!
+	@IBOutlet var lblCurrentlySpecifiedUserDataFolder: NSTextFieldCell!
 
 	var currentLanguageSelectItem: NSMenuItem?
 
@@ -55,7 +55,7 @@ import Cocoa
 		let appleLanguages = mgrPrefs.appleLanguages
 		for language in languages {
 			let menuItem = NSMenuItem()
-			menuItem.title = NSLocalizedString(language, comment: "")
+			menuItem.title = NSLocalizedString(language, comment: language)
 			menuItem.representedObject = language
 
 			if language == "auto" {
@@ -105,8 +105,8 @@ import Cocoa
 			}
 
 			if let asciiCapablePtr = TISGetInputSourceProperty(
-				source, kTISPropertyInputSourceIsASCIICapable)
-			{
+				source, kTISPropertyInputSourceIsASCIICapable
+			) {
 				let asciiCapable = Unmanaged<CFBoolean>.fromOpaque(asciiCapablePtr)
 					.takeUnretainedValue()
 				if asciiCapable != kCFBooleanTrue {
@@ -175,33 +175,33 @@ import Cocoa
 
 	// 這裡有必要加上這段處理，用來確保藉由偏好設定介面動過的 CNS 開關能夠立刻生效。
 	// 所有涉及到語言模型開關的內容均需要這樣處理。
-	@IBAction func toggleCNSSupport(_ sender: Any) {
+	@IBAction func toggleCNSSupport(_: Any) {
 		mgrLangModel.setCNSEnabled(mgrPrefs.cns11643Enabled)
 	}
 
-	@IBAction func toggleSymbolInputEnabled(_ sender: Any) {
+	@IBAction func toggleSymbolInputEnabled(_: Any) {
 		mgrLangModel.setSymbolEnabled(mgrPrefs.symbolInputEnabled)
 	}
 
-	@IBAction func toggleTrad2KangXiAction(_ sender: Any) {
-		if chkTrad2KangXi.state == .on && chkTrad2JISShinjitai.state == .on {
+	@IBAction func toggleTrad2KangXiAction(_: Any) {
+		if chkTrad2KangXi.state == .on, chkTrad2JISShinjitai.state == .on {
 			mgrPrefs.toggleShiftJISShinjitaiOutputEnabled()
 		}
 	}
 
-	@IBAction func toggleTrad2JISShinjitaiAction(_ sender: Any) {
-		if chkTrad2KangXi.state == .on && chkTrad2JISShinjitai.state == .on {
+	@IBAction func toggleTrad2JISShinjitaiAction(_: Any) {
+		if chkTrad2KangXi.state == .on, chkTrad2JISShinjitai.state == .on {
 			mgrPrefs.toggleChineseConversionEnabled()
 		}
 	}
 
-	@IBAction func updateBasicKeyboardLayoutAction(_ sender: Any) {
+	@IBAction func updateBasicKeyboardLayoutAction(_: Any) {
 		if let sourceID = basicKeyboardLayoutButton.selectedItem?.representedObject as? String {
 			mgrPrefs.basicKeyboardLayout = sourceID
 		}
 	}
 
-	@IBAction func updateUiLanguageAction(_ sender: Any) {
+	@IBAction func updateUiLanguageAction(_: Any) {
 		if let selectItem = uiLanguageButton.selectedItem {
 			if currentLanguageSelectItem == selectItem {
 				return
@@ -219,7 +219,7 @@ import Cocoa
 		}
 	}
 
-	@IBAction func clickedWhetherIMEShouldNotFartToggleAction(_ sender: Any) {
+	@IBAction func clickedWhetherIMEShouldNotFartToggleAction(_: Any) {
 		clsSFX.beep()
 	}
 
@@ -249,13 +249,14 @@ import Cocoa
 		}
 	}
 
-	@IBAction func resetSpecifiedUserDataFolder(_ sender: Any) {
+	@IBAction func resetSpecifiedUserDataFolder(_: Any) {
 		mgrPrefs.resetSpecifiedUserDataFolder()
 	}
 
-	@IBAction func chooseUserDataFolderToSpecify(_ sender: Any) {
+	@IBAction func chooseUserDataFolderToSpecify(_: Any) {
 		IME.dlgOpenPath.title = NSLocalizedString(
-			"Choose your desired user data folder.", comment: "")
+			"Choose your desired user data folder.", comment: ""
+		)
 		IME.dlgOpenPath.showsResizeIndicator = true
 		IME.dlgOpenPath.showsHiddenFiles = true
 		IME.dlgOpenPath.canChooseFiles = false
@@ -292,5 +293,4 @@ import Cocoa
 			}
 		}  // End If self.window != nil
 	}  // End IBAction
-
 }

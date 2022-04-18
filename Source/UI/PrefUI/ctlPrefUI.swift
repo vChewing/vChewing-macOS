@@ -32,7 +32,8 @@ class ctlPrefUI {
 				identifier: Preferences.PaneIdentifier(rawValue: "General"),
 				title: NSLocalizedString("General", comment: ""),
 				toolbarIcon: NSImage(
-					systemSymbolName: "wrench.and.screwdriver.fill", accessibilityDescription: "General Preferences")
+					systemSymbolName: "wrench.and.screwdriver.fill", accessibilityDescription: "General Preferences"
+				)
 					?? NSImage(named: NSImage.homeTemplateName)!
 			) {
 				suiPrefPaneGeneral()
@@ -41,7 +42,8 @@ class ctlPrefUI {
 				identifier: Preferences.PaneIdentifier(rawValue: "Experiences"),
 				title: NSLocalizedString("Experience", comment: ""),
 				toolbarIcon: NSImage(
-					systemSymbolName: "person.fill.questionmark", accessibilityDescription: "Experiences Preferences")
+					systemSymbolName: "person.fill.questionmark", accessibilityDescription: "Experiences Preferences"
+				)
 					?? NSImage(named: NSImage.listViewTemplateName)!
 			) {
 				suiPrefPaneExperience()
@@ -50,7 +52,8 @@ class ctlPrefUI {
 				identifier: Preferences.PaneIdentifier(rawValue: "Dictionary"),
 				title: NSLocalizedString("Dictionary", comment: ""),
 				toolbarIcon: NSImage(
-					systemSymbolName: "character.book.closed.fill", accessibilityDescription: "Dictionary Preferences")
+					systemSymbolName: "character.book.closed.fill", accessibilityDescription: "Dictionary Preferences"
+				)
 					?? NSImage(named: NSImage.bookmarksTemplateName)!
 			) {
 				suiPrefPaneDictionary()
@@ -59,7 +62,8 @@ class ctlPrefUI {
 				identifier: Preferences.PaneIdentifier(rawValue: "Keyboard"),
 				title: NSLocalizedString("Keyboard", comment: ""),
 				toolbarIcon: NSImage(
-					systemSymbolName: "keyboard.macwindow", accessibilityDescription: "Keyboard Preferences")
+					systemSymbolName: "keyboard.macwindow", accessibilityDescription: "Keyboard Preferences"
+				)
 					?? NSImage(named: NSImage.actionTemplateName)!
 			) {
 				suiPrefPaneKeyboard()

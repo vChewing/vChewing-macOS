@@ -44,7 +44,8 @@ public protocol ctlCandidateDelegate: AnyObject {
 	func ctlCandidate(_ controller: ctlCandidate, candidateAtIndex index: UInt)
 		-> String
 	func ctlCandidate(
-		_ controller: ctlCandidate, didSelectCandidateAtIndex index: UInt)
+		_ controller: ctlCandidate, didSelectCandidateAtIndex index: UInt
+	)
 }
 
 @objc(ctlCandidate)
@@ -54,7 +55,8 @@ public class ctlCandidate: NSWindowController {
 			reloadData()
 		}
 	}
-	@objc public var selectedCandidateIndex: UInt = UInt.max
+
+	@objc public var selectedCandidateIndex: UInt = .max
 	@objc public var visible: Bool = false {
 		didSet {
 			NSObject.cancelPreviousPerformRequests(withTarget: self)
@@ -65,6 +67,7 @@ public class ctlCandidate: NSWindowController {
 			}
 		}
 	}
+
 	@objc public var windowTopLeftPoint: NSPoint {
 		get {
 			guard let frameRect = window?.frame else {
@@ -83,13 +86,14 @@ public class ctlCandidate: NSWindowController {
 		.map {
 			CandidateKeyLabel(key: $0, displayedText: $0)
 		}
+
 	@objc public var keyLabelFont: NSFont = NSFont.monospacedDigitSystemFont(
-		ofSize: 14, weight: .medium)
+		ofSize: 14, weight: .medium
+	)
 	@objc public var candidateFont: NSFont = NSFont.systemFont(ofSize: 18)
 	@objc public var tooltip: String = ""
 
-	@objc public func reloadData() {
-	}
+	@objc public func reloadData() {}
 
 	@objc public func showNextPage() -> Bool {
 		false
@@ -107,7 +111,7 @@ public class ctlCandidate: NSWindowController {
 		false
 	}
 
-	@objc public func candidateIndexAtKeyLabelIndex(_ index: UInt) -> UInt {
+	@objc public func candidateIndexAtKeyLabelIndex(_: UInt) -> UInt {
 		UInt.max
 	}
 
@@ -125,7 +129,8 @@ public class ctlCandidate: NSWindowController {
 	public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
 		DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
 			self.doSet(
-				windowTopLeftPoint: windowTopLeftPoint, bottomOutOfScreenAdjustmentHeight: height)
+				windowTopLeftPoint: windowTopLeftPoint, bottomOutOfScreenAdjustmentHeight: height
+			)
 		}
 	}
 
@@ -136,8 +141,8 @@ public class ctlCandidate: NSWindowController {
 		var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.zero
 		for screen in NSScreen.screens {
 			let frame = screen.visibleFrame
-			if windowTopLeftPoint.x >= frame.minX && windowTopLeftPoint.x <= frame.maxX
-				&& windowTopLeftPoint.y >= frame.minY && windowTopLeftPoint.y <= frame.maxY
+			if windowTopLeftPoint.x >= frame.minX, windowTopLeftPoint.x <= frame.maxX,
+				windowTopLeftPoint.y >= frame.minY, windowTopLeftPoint.y <= frame.maxY
 			{
 				screenFrame = frame
 				break
@@ -172,5 +177,4 @@ public class ctlCandidate: NSWindowController {
 
 		window?.setFrameTopLeftPoint(adjustedPoint)
 	}
-
 }

@@ -26,7 +26,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
 
-@class keyParser;
+@class InputHandler;
 @class InputState;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -35,6 +35,14 @@ typedef NSString *const InputMode NS_TYPED_ENUM;
 extern InputMode imeModeCHT;
 extern InputMode imeModeCHS;
 extern InputMode imeModeNULL;
+
+struct BufferStatePackage
+{
+    NSString *composedText;
+    NSInteger cursorIndex;
+    NSString *resultOfBefore;
+    NSString *resultOfAfter;
+};
 
 @class KeyHandler;
 
@@ -47,21 +55,48 @@ extern InputMode imeModeNULL;
 @interface KeyHandler : NSObject
 
 - (BOOL)isBuilderEmpty;
-- (BOOL)handleInput:(keyParser *)input
-              state:(InputState *)state
-      stateCallback:(void (^)(InputState *))stateCallback
-      errorCallback:(void (^)(void))errorCallback
-    NS_SWIFT_NAME(handle(input:state:stateCallback:errorCallback:));
 
-- (void)syncWithPreferences;
 - (void)fixNodeWithValue:(NSString *)value NS_SWIFT_NAME(fixNode(value:));
 - (void)clear;
 
-- (InputState *)buildInputtingState;
 - (nullable InputState *)buildAssociatePhraseStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode;
 
 @property(strong, nonatomic) InputMode inputMode;
 @property(weak, nonatomic) id<KeyHandlerDelegate> delegate;
+
+// The following items need to be exposed to Swift:
+- (void)_walk;
+- (NSString *)_popOverflowComposingTextAndWalk;
+- (NSArray<NSString *> *)_currentReadings;
+
+- (BOOL)checkWhetherToneMarkerConfirmsPhoneticReadingBuffer;
+- (BOOL)chkKeyValidity:(UniChar)value;
+- (BOOL)ifLangModelHasUnigramsForKey:(NSString *)reading;
+- (BOOL)isPhoneticReadingBufferEmpty;
+- (BOOL)isPrintable:(UniChar)charCode;
+- (NSArray<NSString *> *)getCandidatesArray;
+- (NSInteger)getBuilderCursorIndex;
+- (NSInteger)getBuilderLength;
+- (NSInteger)getPackagedCursorIndex;
+- (NSString *)getComposedText;
+- (NSString *)getCompositionFromPhoneticReadingBuffer;
+- (NSString *)getStrLocationResult:(BOOL)isAfter NS_SWIFT_NAME(getStrLocationResult(isAfter:));
+- (NSString *)getSyllableCompositionFromPhoneticReadingBuffer;
+- (void)clearPhoneticReadingBuffer;
+- (void)combinePhoneticReadingBufferKey:(UniChar)charCode;
+- (void)createNewBuilder;
+- (void)dealWithOverrideModelSuggestions;
+- (void)deleteBuilderReadingAfterCursor;
+- (void)deleteBuilderReadingInFrontOfCursor;
+- (void)doBackSpaceToPhoneticReadingBuffer;
+- (void)ensurePhoneticParser;
+- (void)insertReadingToBuilderAtCursor:(NSString *)reading;
+- (void)packageBufferStateMaterials;
+- (void)removeBuilderAndReset:(BOOL)shouldReset;
+- (void)setBuilderCursorIndex:(NSInteger)value;
+- (void)setInputModesToLM:(BOOL)isCHS;
+- (void)syncBaseLMPrefs;
+
 @end
 
 NS_ASSUME_NONNULL_END

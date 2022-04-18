@@ -14,7 +14,6 @@ let testCases: [(String, ChineseConverter.Options)] = [
 ]
 
 class OpenCCTests: XCTestCase {
-
 	func converter(option: ChineseConverter.Options) throws -> ChineseConverter {
 		try ChineseConverter(options: option)
 	}
@@ -22,7 +21,8 @@ class OpenCCTests: XCTestCase {
 	func testConversion() throws {
 		func testCase(name: String, ext: String) -> String {
 			let url = Bundle.module.url(
-				forResource: name, withExtension: ext, subdirectory: "testcases")!
+				forResource: name, withExtension: ext, subdirectory: "testcases"
+			)!
 			return try! String(contentsOf: url)
 		}
 		for (name, opt) in testCases {
@@ -47,7 +47,7 @@ class OpenCCTests: XCTestCase {
 		let options: ChineseConverter.Options = [.traditionalize, .twStandard, .twIdiom]
 		let holder = try! ChineseConverter(options: options)
 		measure {
-			for _ in 0..<1_000 {
+			for _ in 0..<1000 {
 				_ = try! ChineseConverter(options: options)
 			}
 		}
@@ -57,7 +57,8 @@ class OpenCCTests: XCTestCase {
 	func testConversionPerformance() throws {
 		let cov = try converter(option: [.traditionalize, .twStandard, .twIdiom])
 		let url = Bundle.module.url(
-			forResource: "zuozhuan", withExtension: "txt", subdirectory: "benchmark")!
+			forResource: "zuozhuan", withExtension: "txt", subdirectory: "benchmark"
+		)!
 		// 1.9 MB, 624k word
 		let str = try String(contentsOf: url)
 		measure {

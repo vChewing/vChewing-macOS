@@ -29,15 +29,19 @@ extension String {
 		// Ref: https://stackoverflow.com/a/40993403/4162914 && https://stackoverflow.com/a/71291137/4162914
 		do {
 			let regex = try NSRegularExpression(
-				pattern: pattern, options: [.caseInsensitive, .anchorsMatchLines])
+				pattern: pattern, options: [.caseInsensitive, .anchorsMatchLines]
+			)
 			let range = NSRange(startIndex..., in: self)
 			self = regex.stringByReplacingMatches(
-				in: self, options: [], range: range, withTemplate: replaceWith)
+				in: self, options: [], range: range, withTemplate: replaceWith
+			)
 		} catch { return }
 	}
+
 	mutating func selfReplace(_ strOf: String, _ strWith: String = "") {
-		self = self.replacingOccurrences(of: strOf, with: strWith)
+		self = replacingOccurrences(of: strOf, with: strWith)
 	}
+
 	mutating func formatConsolidate(cnvHYPYtoBPMF: Bool) {
 		// Step 1: Consolidating formats per line.
 		var strProcessed = self
