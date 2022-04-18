@@ -299,10 +299,6 @@ extension ctlInputMethod {
 		(NSApp.delegate as? AppDelegate)?.checkForUpdate(forced: true)
 	}
 
-	@objc func openUserPhrases(_: Any?) {
-		IME.openPhraseFile(userFileAt: mgrLangModel.userPhrasesDataPath(IME.getInputMode()))
-	}
-
 	@objc func openUserDataFolder(_: Any?) {
 		if !mgrLangModel.checkIfUserDataFolderExists() {
 			return
@@ -312,20 +308,40 @@ extension ctlInputMethod {
 		)
 	}
 
+	@objc func openUserPhrases(_: Any?) {
+		IME.openPhraseFile(userFileAt: mgrLangModel.userPhrasesDataPath(IME.getInputMode()))
+		if NSEvent.modifierFlags.contains(.option), mgrPrefs.isDebugModeEnabled {
+			IME.openPhraseFile(userFileAt: mgrLangModel.userPhrasesDataPath(IME.getInputMode(isReversed: true)))
+		}
+	}
+
 	@objc func openExcludedPhrases(_: Any?) {
 		IME.openPhraseFile(userFileAt: mgrLangModel.excludedPhrasesDataPath(IME.getInputMode()))
+		if NSEvent.modifierFlags.contains(.option), mgrPrefs.isDebugModeEnabled {
+			IME.openPhraseFile(userFileAt: mgrLangModel.excludedPhrasesDataPath(IME.getInputMode(isReversed: true)))
+		}
 	}
 
 	@objc func openUserSymbols(_: Any?) {
 		IME.openPhraseFile(userFileAt: mgrLangModel.userSymbolDataPath(IME.getInputMode()))
+		if NSEvent.modifierFlags.contains(.option), mgrPrefs.isDebugModeEnabled {
+			IME.openPhraseFile(userFileAt: mgrLangModel.userSymbolDataPath(IME.getInputMode(isReversed: true)))
+		}
 	}
 
 	@objc func openPhraseReplacement(_: Any?) {
 		IME.openPhraseFile(userFileAt: mgrLangModel.phraseReplacementDataPath(IME.getInputMode()))
+		if NSEvent.modifierFlags.contains(.option), mgrPrefs.isDebugModeEnabled {
+			IME.openPhraseFile(userFileAt: mgrLangModel.phraseReplacementDataPath(IME.getInputMode(isReversed: true)))
+		}
 	}
 
 	@objc func openAssociatedPhrases(_: Any?) {
 		IME.openPhraseFile(userFileAt: mgrLangModel.userAssociatedPhrasesDataPath(IME.getInputMode()))
+		if NSEvent.modifierFlags.contains(.option), mgrPrefs.isDebugModeEnabled {
+			IME.openPhraseFile(
+				userFileAt: mgrLangModel.userAssociatedPhrasesDataPath(IME.getInputMode(isReversed: true)))
+		}
 	}
 
 	@objc func reloadUserPhrases(_: Any?) {
