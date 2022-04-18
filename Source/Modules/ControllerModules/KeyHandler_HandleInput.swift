@@ -31,14 +31,13 @@ import Cocoa
 @objc extension KeyHandler {
 	func handle(
 		input: keyParser,
-		state inState: InputState,
+		state: InputState,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback: @escaping () -> Void
 	) -> Bool {
 		let charCode: UniChar = input.charCode
-		var state = inState  // Turn this incoming constant into variable.
+		var state = state  // Turn this incoming constant into variable.
 		let inputText: String = input.inputText ?? ""
-		let emptyState = InputState.Empty()
 
 		// Ignore the input if its inputText is empty.
 		// Reason: such inputs may be functional key combinations.
@@ -66,7 +65,7 @@ import Cocoa
 		} else if input.isCapsLockOn {
 			// Process all possible combination, we hope.
 			clear()
-			stateCallback(emptyState)
+			stateCallback(InputState.Empty())
 
 			// When shift is pressed, don't do further processing...
 			// ...since it outputs capital letter anyway.
@@ -83,7 +82,7 @@ import Cocoa
 			// Commit the entire input buffer.
 			let committingState = InputState.Committing(poppedText: inputText.lowercased())
 			stateCallback(committingState)
-			stateCallback(emptyState)
+			stateCallback(InputState.Empty())
 
 			return true
 		}
@@ -95,10 +94,10 @@ import Cocoa
 				!input.isUp, !input.isSpace, isPrintable(charCode)
 			{
 				clear()
-				stateCallback(emptyState)
+				stateCallback(InputState.Empty())
 				let committing = InputState.Committing(poppedText: inputText.lowercased())
 				stateCallback(committing)
-				stateCallback(emptyState)
+				stateCallback(InputState.Empty())
 				return true
 			}
 		}
@@ -120,7 +119,7 @@ import Cocoa
 			if result {
 				return true
 			} else {
-				stateCallback(emptyState)
+				stateCallback(InputState.Empty())
 			}
 		}
 
@@ -203,7 +202,7 @@ import Cocoa
 					stateCallback(committing)
 
 					if !mgrPrefs.associatedPhrasesEnabled {
-						stateCallback(emptyState)
+						stateCallback(InputState.Empty())
 					} else {
 						let associatedPhrases =
 							buildAssociatePhraseState(
@@ -213,7 +212,7 @@ import Cocoa
 						if let associatedPhrases = associatedPhrases {
 							stateCallback(associatedPhrases)
 						} else {
-							stateCallback(emptyState)
+							stateCallback(InputState.Empty())
 						}
 					}
 				} else {
