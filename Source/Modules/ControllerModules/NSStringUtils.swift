@@ -27,7 +27,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 
 extension NSString {
-
 	/// Converts the index in an NSString to the index in a Swift string.
 	///
 	/// An Emoji might be compose by more than one UTF-16 code points, however

@@ -33,7 +33,7 @@ private protocol NotifierWindowDelegate: AnyObject {
 private class NotifierWindow: NSWindow {
 	weak var clickDelegate: NotifierWindowDelegate?
 
-	override func mouseDown(with event: NSEvent) {
+	override func mouseDown(with _: NSEvent) {
 		clickDelegate?.windowDidBecomeClicked(self)
 	}
 }
@@ -58,7 +58,8 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
 			messageTextField.attributedStringValue = attrString
 			let width = window?.frame.width ?? kWindowWidth
 			let rect = attrString.boundingRect(
-				with: NSSize(width: width, height: 1600), options: .usesLineFragmentOrigin)
+				with: NSSize(width: width, height: 1600), options: .usesLineFragmentOrigin
+			)
 			let height = rect.height
 			let x = messageTextField.frame.origin.x
 			let y = ((window?.frame.height ?? kWindowHeight) - height) / 2
@@ -66,17 +67,20 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
 			messageTextField.frame = newFrame
 		}
 	}
+
 	private var shouldStay: Bool = false
 	private var backgroundColor: NSColor = .textBackgroundColor {
 		didSet {
 			window?.backgroundColor = backgroundColor
 		}
 	}
+
 	private var foregroundColor: NSColor = .controlTextColor {
 		didSet {
 			messageTextField.textColor = foregroundColor
 		}
 	}
+
 	private var waitTimer: Timer?
 	private var fadeTimer: Timer?
 
@@ -114,7 +118,8 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
 		transparentVisualEffect.state = .active
 
 		let panel = NotifierWindow(
-			contentRect: windowRect, styleMask: styleMask, backing: .buffered, defer: false)
+			contentRect: windowRect, styleMask: styleMask, backing: .buffered, defer: false
+		)
 		panel.contentView = transparentVisualEffect
 		panel.isMovableByWindowBackground = true
 		panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel))
@@ -144,7 +149,8 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
 		panel.clickDelegate = self
 	}
 
-	required init?(coder: NSCoder) {
+	@available(*, unavailable)
+	required init?(coder _: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
 
@@ -182,10 +188,11 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
 		waitTimer = Timer.scheduledTimer(
 			timeInterval: shouldStay ? 5 : 1, target: self, selector: #selector(fadeOut),
 			userInfo: nil,
-			repeats: false)
+			repeats: false
+		)
 	}
 
-	@objc private func doFadeOut(_ timer: Timer) {
+	@objc private func doFadeOut(_: Timer) {
 		let opacity = window?.alphaValue ?? 0
 		if opacity <= 0 {
 			close()
@@ -200,10 +207,11 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
 		NotifierController.decreaseInstanceCount()
 		fadeTimer = Timer.scheduledTimer(
 			timeInterval: 0.01, target: self, selector: #selector(doFadeOut(_:)), userInfo: nil,
-			repeats: true)
+			repeats: true
+		)
 	}
 
-	public override func close() {
+	override public func close() {
 		waitTimer?.invalidate()
 		waitTimer = nil
 		fadeTimer?.invalidate()
@@ -211,7 +219,7 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
 		super.close()
 	}
 
-	fileprivate func windowDidBecomeClicked(_ window: NotifierWindow) {
+	fileprivate func windowDidBecomeClicked(_: NotifierWindow) {
 		fadeOut()
 	}
 }

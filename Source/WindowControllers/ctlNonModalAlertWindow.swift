@@ -35,10 +35,10 @@ class ctlNonModalAlertWindow: NSWindowController {
 	@objc(sharedInstance)
 	static let shared = ctlNonModalAlertWindow(windowNibName: "frmNonModalAlertWindow")
 
-	@IBOutlet weak var titleTextField: NSTextField!
-	@IBOutlet weak var contentTextField: NSTextField!
-	@IBOutlet weak var confirmButton: NSButton!
-	@IBOutlet weak var cancelButton: NSButton!
+	@IBOutlet var titleTextField: NSTextField!
+	@IBOutlet var contentTextField: NSTextField!
+	@IBOutlet var confirmButton: NSButton!
+	@IBOutlet var cancelButton: NSButton!
 	weak var delegate: ctlNonModalAlertWindowDelegate?
 
 	@objc func show(
@@ -96,7 +96,8 @@ class ctlNonModalAlertWindow: NSWindowController {
 		infiniteHeightFrame.size.height = 10240
 		newFrame = (content as NSString).boundingRect(
 			with: infiniteHeightFrame.size, options: [.usesLineFragmentOrigin],
-			attributes: [.font: contentTextField.font!])
+			attributes: [.font: contentTextField.font!]
+		)
 		newFrame.size.width = max(newFrame.size.width, oldFrame.size.width)
 		newFrame.size.height += 4.0
 		newFrame.origin = oldFrame.origin
@@ -112,7 +113,7 @@ class ctlNonModalAlertWindow: NSWindowController {
 		NSApp.activate(ignoringOtherApps: true)
 	}
 
-	@IBAction func confirmButtonAction(_ sender: Any) {
+	@IBAction func confirmButtonAction(_: Any) {
 		delegate?.ctlNonModalAlertWindowDidConfirm(self)
 		window?.orderOut(self)
 	}
@@ -121,10 +122,9 @@ class ctlNonModalAlertWindow: NSWindowController {
 		cancel(sender)
 	}
 
-	func cancel(_ sender: Any) {
+	func cancel(_: Any) {
 		delegate?.ctlNonModalAlertWindowDidCancel(self)
 		delegate = nil
 		window?.orderOut(self)
 	}
-
 }

@@ -36,11 +36,13 @@ extension NSView {
 		result.append(
 			contentsOf: NSLayoutConstraint.constraints(
 				withVisualFormat: "H:|-0-[subview]-0-|", options: .directionLeadingToTrailing, metrics: nil,
-				views: ["subview": self]))
+				views: ["subview": self]
+			))
 		result.append(
 			contentsOf: NSLayoutConstraint.constraints(
 				withVisualFormat: "V:|-0-[subview]-0-|", options: .directionLeadingToTrailing, metrics: nil,
-				views: ["subview": self]))
+				views: ["subview": self]
+			))
 		translatesAutoresizingMaskIntoConstraints = false
 		superview.addConstraints(result)
 
@@ -104,7 +106,7 @@ extension Bundle {
 /// A window that allows you to disable all user interactions via `isUserInteractionEnabled`.
 ///
 /// Used to avoid breaking animations when the user clicks too fast. Disable user interactions during animations and you're set.
-class UserInteractionPausableWindow: NSWindow {  // swiftlint:disable:this final_class
+class UserInteractionPausableWindow: NSWindow {
 	var isUserInteractionEnabled = true
 
 	override func sendEvent(_ event: NSEvent) {

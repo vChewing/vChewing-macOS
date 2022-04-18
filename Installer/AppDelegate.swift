@@ -31,7 +31,8 @@ private let kTargetType = "app"
 private let kTargetBundle = "vChewing.app"
 
 private let urlDestinationPartial = FileManager.default.urls(
-	for: .inputMethodsDirectory, in: .userDomainMask)[0]
+	for: .inputMethodsDirectory, in: .userDomainMask
+)[0]
 private let urlTargetPartial = urlDestinationPartial.appendingPathComponent(kTargetBundle)
 private let urlTargetFullBinPartial = urlTargetPartial.appendingPathComponent("Contents/MacOS/")
 	.appendingPathComponent(kTargetBin)
@@ -46,12 +47,12 @@ private let kTranslocationRemovalDeadline: TimeInterval = 60.0
 @NSApplicationMain
 @objc(AppDelegate)
 class AppDelegate: NSWindowController, NSApplicationDelegate {
-	@IBOutlet weak private var installButton: NSButton!
-	@IBOutlet weak private var cancelButton: NSButton!
-	@IBOutlet weak private var progressSheet: NSWindow!
-	@IBOutlet weak private var progressIndicator: NSProgressIndicator!
-	@IBOutlet weak private var appVersionLabel: NSTextField!
-	@IBOutlet weak private var appCopyrightLabel: NSTextField!
+	@IBOutlet private var installButton: NSButton!
+	@IBOutlet private var cancelButton: NSButton!
+	@IBOutlet private var progressSheet: NSWindow!
+	@IBOutlet private var progressIndicator: NSProgressIndicator!
+	@IBOutlet private var appVersionLabel: NSTextField!
+	@IBOutlet private var appCopyrightLabel: NSTextField!
 	@IBOutlet private var appEULAContent: NSTextView!
 
 	private var archiveUtil: ArchiveUtil?
@@ -69,7 +70,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 		alert.runModal()
 	}
 
-	func applicationDidFinishLaunching(_ notification: Notification) {
+	func applicationDidFinishLaunching(_: Notification) {
 		guard
 			let installingVersion = Bundle.main.infoDictionary?[kCFBundleVersionKey as String]
 				as? String,
@@ -96,11 +97,13 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 			appEULAContent.string = eulaContent
 		}
 		appVersionLabel.stringValue = String(
-			format: "%@ Build %@", versionString, installingVersion)
+			format: "%@ Build %@", versionString, installingVersion
+		)
 
 		window?.title = String(
 			format: NSLocalizedString("%@ (for version %@, r%@)", comment: ""), window?.title ?? "",
-			versionString, installingVersion)
+			versionString, installingVersion
+		)
 		window?.standardWindowButton(.closeButton)?.isHidden = true
 		window?.standardWindowButton(.miniaturizeButton)?.isHidden = true
 		window?.standardWindowButton(.zoomButton)?.isHidden = true
@@ -130,7 +133,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 		NSApp.activate(ignoringOtherApps: true)
 	}
 
-	@IBAction func agreeAndInstallAction(_ sender: AnyObject) {
+	@IBAction func agreeAndInstallAction(_: AnyObject) {
 		cancelButton.isEnabled = false
 		installButton.isEnabled = false
 		removeThenInstallInputMethod()
@@ -154,7 +157,8 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 			== false
 		{
 			installInputMethod(
-				previousExists: false, previousVersionNotFullyDeactivatedWarning: false)
+				previousExists: false, previousVersionNotFullyDeactivatedWarning: false
+			)
 			return
 		}
 
@@ -194,11 +198,13 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 					if returnCode == .continue {
 						self.installInputMethod(
 							previousExists: true,
-							previousVersionNotFullyDeactivatedWarning: false)
+							previousVersionNotFullyDeactivatedWarning: false
+						)
 					} else {
 						self.installInputMethod(
 							previousExists: true,
-							previousVersionNotFullyDeactivatedWarning: true)
+							previousVersionNotFullyDeactivatedWarning: true
+						)
 					}
 				}
 			}
@@ -206,15 +212,17 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 			translocationRemovalStartTime = Date()
 			Timer.scheduledTimer(
 				timeInterval: kTranslocationRemovalTickInterval, target: self,
-				selector: #selector(timerTick(_:)), userInfo: nil, repeats: true)
+				selector: #selector(timerTick(_:)), userInfo: nil, repeats: true
+			)
 		} else {
 			installInputMethod(
-				previousExists: false, previousVersionNotFullyDeactivatedWarning: false)
+				previousExists: false, previousVersionNotFullyDeactivatedWarning: false
+			)
 		}
 	}
 
 	func installInputMethod(
-		previousExists: Bool, previousVersionNotFullyDeactivatedWarning warning: Bool
+		previousExists _: Bool, previousVersionNotFullyDeactivatedWarning warning: Bool
 	) {
 		guard
 			let targetBundle = archiveUtil?.unzipNotarizedArchive()
@@ -234,7 +242,8 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 			runAlertPanel(
 				title: NSLocalizedString("Install Failed", comment: ""),
 				message: NSLocalizedString("Cannot copy the file to the destination.", comment: ""),
-				buttonTitle: NSLocalizedString("Cancel", comment: ""))
+				buttonTitle: NSLocalizedString("Cancel", comment: "")
+			)
 			endAppWithDelay()
 		}
 
@@ -254,11 +263,14 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 			if !status {
 				let message = String(
 					format: NSLocalizedString(
-						"Cannot find input source %@ after registration.", comment: ""),
-					imeIdentifier)
+						"Cannot find input source %@ after registration.", comment: ""
+					),
+					imeIdentifier
+				)
 				runAlertPanel(
 					title: NSLocalizedString("Fatal Error", comment: ""), message: message,
-					buttonTitle: NSLocalizedString("Abort", comment: ""))
+					buttonTitle: NSLocalizedString("Abort", comment: "")
+				)
 				endAppWithDelay()
 				return
 			}
@@ -267,11 +279,14 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 			if inputSource == nil {
 				let message = String(
 					format: NSLocalizedString(
-						"Cannot find input source %@ after registration.", comment: ""),
-					imeIdentifier)
+						"Cannot find input source %@ after registration.", comment: ""
+					),
+					imeIdentifier
+				)
 				runAlertPanel(
 					title: NSLocalizedString("Fatal Error", comment: ""), message: message,
-					buttonTitle: NSLocalizedString("Abort", comment: ""))
+					buttonTitle: NSLocalizedString("Abort", comment: "")
+				)
 			}
 		}
 
@@ -304,20 +319,24 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 			ntfPostInstall.messageText = NSLocalizedString("Attention", comment: "")
 			ntfPostInstall.informativeText = NSLocalizedString(
 				"vChewing is upgraded, but please log out or reboot for the new version to be fully functional.",
-				comment: "")
+				comment: ""
+			)
 			ntfPostInstall.addButton(withTitle: NSLocalizedString("OK", comment: ""))
 		} else {
-			if !mainInputSourceEnabled && !isMacOS12OrAbove {
+			if !mainInputSourceEnabled, !isMacOS12OrAbove {
 				ntfPostInstall.messageText = NSLocalizedString("Warning", comment: "")
 				ntfPostInstall.informativeText = NSLocalizedString(
 					"Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources.",
-					comment: "")
+					comment: ""
+				)
 				ntfPostInstall.addButton(withTitle: NSLocalizedString("Continue", comment: ""))
 			} else {
 				ntfPostInstall.messageText = NSLocalizedString(
-					"Installation Successful", comment: "")
+					"Installation Successful", comment: ""
+				)
 				ntfPostInstall.informativeText = NSLocalizedString(
-					"vChewing is ready to use.", comment: "")
+					"vChewing is ready to use.", comment: ""
+				)
 				ntfPostInstall.addButton(withTitle: NSLocalizedString("OK", comment: ""))
 			}
 		}
@@ -332,12 +351,11 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 		}
 	}
 
-	@IBAction func cancelAction(_ sender: AnyObject) {
+	@IBAction func cancelAction(_: AnyObject) {
 		NSApp.terminate(self)
 	}
 
-	func windowWillClose(_ notification: Notification) {
+	func windowWillClose(_: Notification) {
 		NSApp.terminate(self)
 	}
-
 }

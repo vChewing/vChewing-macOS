@@ -27,8 +27,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 
 @objc(AboutWindow) class ctlAboutWindow: NSWindowController {
-	@IBOutlet weak var appVersionLabel: NSTextField!
-	@IBOutlet weak var appCopyrightLabel: NSTextField!
+	@IBOutlet var appVersionLabel: NSTextField!
+	@IBOutlet var appCopyrightLabel: NSTextField!
 	@IBOutlet var appEULAContent: NSTextView!
 
 	override func windowDidLoad() {
@@ -53,10 +53,11 @@ import Cocoa
 			appEULAContent.string = eulaContent
 		}
 		appVersionLabel.stringValue = String(
-			format: "%@ Build %@", versionString, installingVersion)
+			format: "%@ Build %@", versionString, installingVersion
+		)
 	}
 
-	@IBAction func btnWiki(_ sender: NSButton) {
+	@IBAction func btnWiki(_: NSButton) {
 		if let url = URL(string: "https://gitee.com/vchewing/vChewing-macOS/wikis") {
 			NSWorkspace.shared.open(url)
 		}

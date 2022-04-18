@@ -11,7 +11,7 @@
 - 相比中州韻（鼠須管）而言，威注音能夠做到真正的大千聲韻並擊。
 
 >威注音有很多特色功能。在此僅列舉部分：
->- 支援 macOS 熒幕模擬鍵盤（僅傳統大千與傳統倚天佈局）。
+>- 支援 macOS 螢幕模擬鍵盤（僅傳統大千與傳統倚天佈局）。
 >- 可以將自己打的繁體中文自動轉成日本 JIS 新字體來輸出（包括基礎的字詞轉換）、也可以轉成康熙繁體來輸出。
 >- 簡繁體中文語料庫彼此分離，徹底杜絕任何繁簡轉換過程可能造成的失誤。
 >- 支援最新的全字型檔漢字輸入。
@@ -76,20 +76,11 @@
 
 使用者可自由使用、散播本軟體，惟散播時必須完整保留版權聲明及軟體授權、且一旦經過修改便不可以再繼續使用威注音的產品名稱。
 
-## 格式規範：
+## 格式規範等與參與研發時需要注意的事項：
 
 該專案對源碼格式有規範，且 Swift 與其他 (Obj)C(++) 系語言持不同規範：
 
-- Swift: 採 [Apple 官方 Swift-Format](https://github.com/apple/swift-format)，且施加如下例外修改項目：
-	- Indentation 僅使用 `"indentation" : {     "tabs" : 1   },`，不以空格來縮進。
-	- `"indentSwitchCaseLabels" : true,`
-	- `"lineLength" : 120,`
-	- `"NoBlockComments" : false,`
-	- `"tabWidth" : 4,`
-    - `"OnlyOneTrailingClosureArgument" : false,` // SwiftUI 相容
-    - `"UseTripleSlashForDocumentationComments" : false,`
-    - `"DontRepeatTypeInStaticProperties" : false,`
-- (Obj)C(++) 系語言：使用 clang-format 命令、且採 Microsoft 行文規範。該規範以四個西文半形空格為行縮進單位。
+請洽該倉庫內的「[CONTRIBUTING.md](./CONTRIBUTING.md)」檔案。
 
 ## 特殊勸告
 

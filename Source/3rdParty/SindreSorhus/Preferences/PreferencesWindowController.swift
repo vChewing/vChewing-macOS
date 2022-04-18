@@ -87,12 +87,12 @@ public final class PreferencesWindowController: NSWindowController {
 	}
 
 	@available(*, unavailable)
-	override public init(window: NSWindow?) {
+	override public init(window _: NSWindow?) {
 		fatalError("init(window:) is not supported, use init(preferences:style:animated:)")
 	}
 
 	@available(*, unavailable)
-	public required init?(coder: NSCoder) {
+	public required init?(coder _: NSCoder) {
 		fatalError("init(coder:) is not supported, use init(preferences:style:animated:)")
 	}
 
@@ -140,7 +140,7 @@ public final class PreferencesWindowController: NSWindowController {
 
 extension PreferencesWindowController {
 	/// Returns the active pane if it responds to the given action.
-	override public func supplementalTarget(forAction action: Selector, sender: Any?) -> Any? {
+	public override func supplementalTarget(forAction action: Selector, sender: Any?) -> Any? {
 		if let target = super.supplementalTarget(forAction: action, sender: sender) {
 			return target
 		}

@@ -1,4 +1,6 @@
 // Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// Refactored from the ObjCpp-version of this class by:
+// (c) 2011 and onwards The OpenVanilla Project (MIT License).
 /*
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -25,13 +27,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 
 @objc extension mgrLangModel {
-
 	// MARK: - 獲取當前輸入法封包內的原廠核心語彙檔案所在路徑
+
 	static func getBundleDataPath(_ filenameSansExt: String) -> String {
 		Bundle.main.path(forResource: filenameSansExt, ofType: "txt")!
 	}
 
 	// MARK: - 使用者語彙檔案的具體檔案名稱路徑定義
+
 	// Swift 的 appendingPathComponent 需要藉由 URL 完成，最後再用 .path 轉為路徑。
 
 	static func userPhrasesDataPath(_ mode: InputMode) -> String {
@@ -134,12 +137,12 @@ import Cocoa
 		// 發現目標路徑不是目錄的話：
 		// 如果要找的目標路徑是原廠目標路徑的話，先將這個路徑的所指對象更名、再認為目錄不存在。
 		// 如果要找的目標路徑不是原廠目標路徑的話，則直接報錯。
-		if folderExist && !isFolder.boolValue {
+		if folderExist, !isFolder.boolValue {
 			do {
 				if dataFolderPath(isDefaultFolder: false)
 					== dataFolderPath(isDefaultFolder: true)
 				{
-					let formatter = DateFormatter.init()
+					let formatter = DateFormatter()
 					formatter.dateFormat = "YYYYMMDD-HHMM'Hrs'-ss's'"
 					let dirAlternative = folderPath + formatter.string(from: Date())
 					try FileManager.default.moveItem(atPath: folderPath, toPath: dirAlternative)
@@ -157,7 +160,8 @@ import Cocoa
 				try FileManager.default.createDirectory(
 					atPath: folderPath,
 					withIntermediateDirectories: true,
-					attributes: nil)
+					attributes: nil
+				)
 			} catch {
 				print("Failed to create folder: \(error)")
 				return false
@@ -167,6 +171,7 @@ import Cocoa
 	}
 
 	// MARK: - 用以讀取使用者語彙檔案目錄的函數，會自動對 mgrPrefs 當中的參數糾偏。
+
 	// 當且僅當 mgrPrefs 當中的參數不合規（比如非實在路徑、或者無權限寫入）時，才會糾偏。
 
 	static func dataFolderPath(isDefaultFolder: Bool) -> String {
@@ -195,6 +200,7 @@ import Cocoa
 	}
 
 	// MARK: - 寫入使用者檔案
+
 	static func writeUserPhrase(
 		_ userPhrase: String?, inputMode mode: InputMode, areWeDuplicating: Bool, areWeDeleting: Bool
 	) -> Bool {
@@ -207,7 +213,7 @@ import Cocoa
 
 			let path = areWeDeleting ? excludedPhrasesDataPath(mode) : userPhrasesDataPath(mode)
 
-			if areWeDuplicating && !areWeDeleting {
+			if areWeDuplicating, !areWeDeleting {
 				// Do not use ASCII characters to comment here.
 				// Otherwise, it will be scrambled by cnvHYPYtoBPMF
 				// module shipped in the vChewing Phrase Editor.
@@ -238,5 +244,4 @@ import Cocoa
 		}
 		return false
 	}
-
 }

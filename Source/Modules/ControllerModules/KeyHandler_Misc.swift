@@ -1,4 +1,6 @@
 // Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// Refactored from the ObjCpp-version of this class by:
+// (c) 2011 and onwards The OpenVanilla Project (MIT License).
 /*
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -23,22 +25,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import Cocoa
-import Foundation
 
-class Content: NSObject {
-	@objc dynamic var contentString = ""
+// MARK: - § Misc functions.
 
-	public init(contentString: String) {
-		self.contentString = contentString
-	}
-}
-
-extension Content {
-	func read(from data: Data) {
-		contentString = String(bytes: data, encoding: .utf8)!
+@objc extension KeyHandler {
+	func getCurrentMandarinParser() -> String {
+		mgrPrefs.mandarinParserName + "_"
 	}
 
-	func data() -> Data? {
-		contentString.data(using: .utf8)
+	func _actualCandidateCursorIndex() -> Int {
+		var cursorIndex = getBuilderCursorIndex()
+		// MS Phonetics IME style, phrase is *after* the cursor.
+		// (i.e. the cursor is always *before* the phrase.)
+		if (mgrPrefs.selectPhraseAfterCursorAsCandidate
+			&& (cursorIndex < getBuilderLength()))
+			|| cursorIndex == 0
+		{
+			cursorIndex += 1
+		}
+		return cursorIndex
 	}
 }

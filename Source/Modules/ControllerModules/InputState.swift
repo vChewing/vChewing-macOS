@@ -58,7 +58,6 @@ import Cocoa
 /// - Choosing Candidate: The candidate window is open to let the user to choose
 ///   one among the candidates.
 class InputState: NSObject {
-
 	/// Represents that the input controller is deactivated.
 	@objc(InputStateDeactivated)
 	class Deactivated: InputState {
@@ -89,6 +88,7 @@ class InputState: NSObject {
 		@objc var composingBuffer: String {
 			""
 		}
+
 		override var description: String {
 			"<InputState.EmptyIgnoringPreviousState>"
 		}
@@ -147,7 +147,8 @@ class InputState: NSObject {
 				attributes: [
 					.underlineStyle: NSUnderlineStyle.single.rawValue,
 					.markedClauseSegment: 0,
-				])
+				]
+			)
 			return attributedSting
 		}
 
@@ -164,18 +165,18 @@ class InputState: NSObject {
 	/// Represents that the user is marking a range in the composing buffer.
 	@objc(InputStateMarking)
 	class Marking: NotEmpty {
-
 		@objc private(set) var markerIndex: UInt
 		@objc private(set) var markedRange: NSRange
 		@objc private var deleteTargetExists = false
 		@objc var tooltip: String {
-
 			if composingBuffer.count != readings.count {
 				TooltipController.backgroundColor = NSColor(
-					red: 0.55, green: 0.00, blue: 0.00, alpha: 1.00)
+					red: 0.55, green: 0.00, blue: 0.00, alpha: 1.00
+				)
 				TooltipController.textColor = NSColor.white
 				return NSLocalizedString(
-					"⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.", comment: "")
+					"⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.", comment: ""
+				)
 			}
 
 			if mgrPrefs.phraseReplacementEnabled {
@@ -192,21 +193,29 @@ class InputState: NSObject {
 			let text = (composingBuffer as NSString).substring(with: markedRange)
 			if markedRange.length < kMinMarkRangeLength {
 				TooltipController.backgroundColor = NSColor(
-					red: 0.18, green: 0.18, blue: 0.18, alpha: 1.00)
+					red: 0.18, green: 0.18, blue: 0.18, alpha: 1.00
+				)
 				TooltipController.textColor = NSColor(
-					red: 0.86, green: 0.86, blue: 0.86, alpha: 1.00)
+					red: 0.86, green: 0.86, blue: 0.86, alpha: 1.00
+				)
 				return String(
 					format: NSLocalizedString(
-						"\"%@\" length must ≥ 2 for a user phrase.", comment: ""), text)
+						"\"%@\" length must ≥ 2 for a user phrase.", comment: ""
+					), text
+				)
 			} else if markedRange.length > kMaxMarkRangeLength {
 				TooltipController.backgroundColor = NSColor(
-					red: 0.26, green: 0.16, blue: 0.00, alpha: 1.00)
+					red: 0.26, green: 0.16, blue: 0.00, alpha: 1.00
+				)
 				TooltipController.textColor = NSColor(
-					red: 1.00, green: 0.60, blue: 0.00, alpha: 1.00)
+					red: 1.00, green: 0.60, blue: 0.00, alpha: 1.00
+				)
 				return String(
 					format: NSLocalizedString(
-						"\"%@\" length should ≤ %d for a user phrase.", comment: ""),
-					text, kMaxMarkRangeLength)
+						"\"%@\" length should ≤ %d for a user phrase.", comment: ""
+					),
+					text, kMaxMarkRangeLength
+				)
 			}
 
 			let (exactBegin, _) = (composingBuffer as NSString).characterIndex(
@@ -216,24 +225,30 @@ class InputState: NSObject {
 			let selectedReadings = readings[exactBegin..<exactEnd]
 			let joined = selectedReadings.joined(separator: "-")
 			let exist = mgrLangModel.checkIfUserPhraseExist(
-				userPhrase: text, mode: ctlInputMethod.currentKeyHandler.inputMode, key: joined)
+				userPhrase: text, mode: ctlInputMethod.currentKeyHandler.inputMode, key: joined
+			)
 			if exist {
 				deleteTargetExists = exist
 				TooltipController.backgroundColor = NSColor(
-					red: 0.00, green: 0.18, blue: 0.13, alpha: 1.00)
+					red: 0.00, green: 0.18, blue: 0.13, alpha: 1.00
+				)
 				TooltipController.textColor = NSColor(
-					red: 0.00, green: 1.00, blue: 0.74, alpha: 1.00)
+					red: 0.00, green: 1.00, blue: 0.74, alpha: 1.00
+				)
 				return String(
 					format: NSLocalizedString(
-						"\"%@\" already exists: ↩ to boost, ⇧⌘↩ to exclude.", comment: ""), text
+						"\"%@\" already exists: ↩ to boost, ⇧⌘↩ to exclude.", comment: ""
+					), text
 				)
 			}
 			TooltipController.backgroundColor = NSColor(
-				red: 0.18, green: 0.18, blue: 0.18, alpha: 1.00)
+				red: 0.18, green: 0.18, blue: 0.18, alpha: 1.00
+			)
 			TooltipController.textColor = NSColor.white
 			return String(
 				format: NSLocalizedString("\"%@\" selected. ↩ to add user phrase.", comment: ""),
-				text)
+				text
+			)
 		}
 
 		@objc var tooltipForInputting: String = ""
@@ -256,12 +271,14 @@ class InputState: NSObject {
 				[
 					.underlineStyle: NSUnderlineStyle.single.rawValue,
 					.markedClauseSegment: 0,
-				], range: NSRange(location: 0, length: markedRange.location))
+				], range: NSRange(location: 0, length: markedRange.location)
+			)
 			attributedSting.setAttributes(
 				[
 					.underlineStyle: NSUnderlineStyle.thick.rawValue,
 					.markedClauseSegment: 1,
-				], range: markedRange)
+				], range: markedRange
+			)
 			attributedSting.setAttributes(
 				[
 					.underlineStyle: NSUnderlineStyle.single.rawValue,
@@ -269,7 +286,9 @@ class InputState: NSObject {
 				],
 				range: NSRange(
 					location: end,
-					length: (composingBuffer as NSString).length - end))
+					length: (composingBuffer as NSString).length - end
+				)
+			)
 			return attributedSting
 		}
 
@@ -297,7 +316,7 @@ class InputState: NSObject {
 			if markedRange.length > kMaxMarkRangeLength {
 				return false
 			}
-			if ctlInputMethod.areWeDeleting && !deleteTargetExists {
+			if ctlInputMethod.areWeDeleting, !deleteTargetExists {
 				return false
 			}
 			return markedRange.length >= kMinMarkRangeLength
@@ -313,7 +332,8 @@ class InputState: NSObject {
 			let selectedReadings = readings[exactBegin..<exactEnd]
 			let joined = selectedReadings.joined(separator: "-")
 			return mgrLangModel.checkIfUserPhraseExist(
-				userPhrase: text, mode: ctlInputMethod.currentKeyHandler.inputMode, key: joined)
+				userPhrase: text, mode: ctlInputMethod.currentKeyHandler.inputMode, key: joined
+			)
 				== true
 		}
 
@@ -363,7 +383,8 @@ class InputState: NSObject {
 				attributes: [
 					.underlineStyle: NSUnderlineStyle.single.rawValue,
 					.markedClauseSegment: 0,
-				])
+				]
+			)
 			return attributedSting
 		}
 
@@ -397,17 +418,17 @@ class InputState: NSObject {
 
 		@objc init(node: SymbolNode, useVerticalMode: Bool) {
 			self.node = node
-			let candidates = node.children?.map { $0.title } ?? [String]()
+			let candidates = node.children?.map(\.title) ?? [String]()
 			super.init(
 				composingBuffer: "", cursorIndex: 0, candidates: candidates,
-				useVerticalMode: useVerticalMode)
+				useVerticalMode: useVerticalMode
+			)
 		}
 
 		override var description: String {
 			"<InputState.SymbolTable, candidates:\(candidates), useVerticalMode:\(useVerticalMode),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
 		}
 	}
-
 }
 
 class SymbolNode: NSObject {
@@ -457,7 +478,7 @@ class SymbolNode: NSObject {
 	@objc static let catLineSegments = String(
 		format: NSLocalizedString("catLineSegments", comment: ""))
 
-	@objc static let root: SymbolNode = SymbolNode(
+	@objc static let root: SymbolNode = .init(
 		"/",
 		[
 			SymbolNode("｀"),
@@ -465,18 +486,21 @@ class SymbolNode: NSObject {
 			SymbolNode(catHoriBrackets, symbols: "（）「」〔〕｛｝〈〉『』《》【】﹙﹚﹝﹞﹛﹜"),
 			SymbolNode(catVertBrackets, symbols: "︵︶﹁﹂︹︺︷︸︿﹀﹃﹄︽︾︻︼"),
 			SymbolNode(
-				catGreekLetters, symbols: "αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ"),
+				catGreekLetters, symbols: "αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ"
+			),
 			SymbolNode(catMathSymbols, symbols: "＋－×÷＝≠≒∞±√＜＞﹤﹥≦≧∩∪ˇ⊥∠∟⊿㏒㏑∫∮∵∴╳﹢"),
 			SymbolNode(catCurrencyUnits, symbols: "$€¥¢£₽₨₩฿₺₮₱₭₴₦৲৳૱௹﷼₹₲₪₡₫៛₵₢₸₤₳₥₠₣₰₧₯₶₷"),
 			SymbolNode(catSpecialSymbols, symbols: "↑↓←→↖↗↙↘↺⇧⇩⇦⇨⇄⇆⇅⇵↻◎○●⊕⊙※△▲☆★◇◆□■▽▼§￥〒￠￡♀♂↯"),
 			SymbolNode(catUnicodeSymbols, symbols: "♨☀☁☂☃♠♥♣♦♩♪♫♬☺☻"),
 			SymbolNode(catCircledKanjis, symbols: "㊟㊞㊚㊛㊊㊋㊌㊍㊎㊏㊐㊑㊒㊓㊔㊕㊖㊗︎㊘㊙︎㊜㊝㊠㊡㊢㊣㊤㊥㊦㊧㊨㊩㊪㊫㊬㊭㊮㊯㊰🈚︎🈯︎"),
 			SymbolNode(
-				catCircledKataKana, symbols: "㋐㋑㋒㋓㋔㋕㋖㋗㋘㋙㋚㋛㋜㋝㋞㋟㋠㋡㋢㋣㋤㋥㋦㋧㋨㋩㋪㋫㋬㋭㋮㋯㋰㋱㋲㋳㋴㋵㋶㋷㋸㋹㋺㋻㋼㋾"),
+				catCircledKataKana, symbols: "㋐㋑㋒㋓㋔㋕㋖㋗㋘㋙㋚㋛㋜㋝㋞㋟㋠㋡㋢㋣㋤㋥㋦㋧㋨㋩㋪㋫㋬㋭㋮㋯㋰㋱㋲㋳㋴㋵㋶㋷㋸㋹㋺㋻㋼㋾"
+			),
 			SymbolNode(catBracketKanjis, symbols: "㈪㈫㈬㈭㈮㈯㈰㈱㈲㈳㈴㈵㈶㈷㈸㈹㈺㈻㈼㈽㈾㈿㉀㉁㉂㉃"),
 			SymbolNode(catSingleTableLines, symbols: "├─┼┴┬┤┌┐╞═╪╡│▕└┘╭╮╰╯"),
 			SymbolNode(catDoubleTableLines, symbols: "╔╦╗╠═╬╣╓╥╖╒╤╕║╚╩╝╟╫╢╙╨╜╞╪╡╘╧╛"),
 			SymbolNode(catFillingBlocks, symbols: "＿ˍ▁▂▃▄▅▆▇█▏▎▍▌▋▊▉◢◣◥◤"),
 			SymbolNode(catLineSegments, symbols: "﹣﹦≡｜∣∥–︱—︳╴¯￣﹉﹊﹍﹎﹋﹌﹏︴∕﹨╱╲／＼"),
-		])
+		]
+	)
 }

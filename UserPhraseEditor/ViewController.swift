@@ -25,7 +25,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 
 class ViewController: NSViewController, NSTextViewDelegate {
-
+	@IBOutlet var edtDocument: NSTextView!
 	/// - Tag: setRepresentedObjectExample
 	override var representedObject: Any? {
 		didSet {
@@ -46,6 +46,7 @@ class ViewController: NSViewController, NSTextViewDelegate {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		// Do any additional setup after loading the view.
+		edtDocument.font = NSFont(name: "Monaco", size: 16)
 	}
 
 	override func viewDidAppear() {
@@ -54,12 +55,11 @@ class ViewController: NSViewController, NSTextViewDelegate {
 
 	// MARK: - NSTextViewDelegate
 
-	func textDidBeginEditing(_ notification: Notification) {
+	func textDidBeginEditing(_: Notification) {
 		document?.objectDidBeginEditing(self)
 	}
 
-	func textDidEndEditing(_ notification: Notification) {
+	func textDidEndEditing(_: Notification) {
 		document?.objectDidEndEditing(self)
 	}
-
 }

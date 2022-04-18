@@ -25,7 +25,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 
 class WindowController: NSWindowController, NSWindowDelegate {
-
 	override func windowDidLoad() {
 		super.windowDidLoad()
 	}
@@ -37,5 +36,4 @@ class WindowController: NSWindowController, NSWindowDelegate {
          */
 		shouldCascadeWindows = true
 	}
-
 }

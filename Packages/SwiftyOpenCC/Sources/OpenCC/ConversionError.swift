@@ -9,7 +9,6 @@ import Foundation
 import copencc
 
 public enum ConversionError: Error {
-
 	case fileNotFound
 
 	case invalidFormat

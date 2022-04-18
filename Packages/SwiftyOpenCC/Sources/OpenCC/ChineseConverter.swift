@@ -22,10 +22,8 @@ import copencc
 /// However, the string on which it is operating should not be mutated
 /// during the course of a conversion.
 public class ChineseConverter {
-
 	/// These constants define the ChineseConverter options.
 	public struct Options: OptionSet {
-
 		public let rawValue: Int
 
 		public init(rawValue: Int) {
@@ -62,7 +60,7 @@ public class ChineseConverter {
 	private init(loader: DictionaryLoader, options: Options) throws {
 		seg = try loader.segmentation(options: options)
 		chain = try loader.conversionChain(options: options)
-		var rawChain = chain.map { $0.dict }
+		var rawChain = chain.map(\.dict)
 		converter = CCConverterCreate("SwiftyOpenCC", seg.dict, &rawChain, rawChain.count)
 	}
 
@@ -85,5 +83,4 @@ public class ChineseConverter {
 		defer { STLStringDestroy(stlStr) }
 		return String(utf8String: STLStringGetUTF8String(stlStr))!
 	}
-
 }

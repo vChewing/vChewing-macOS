@@ -8,9 +8,7 @@
 import Foundation
 
 extension ChineseConverter {
-
 	enum DictionaryName: CustomStringConvertible {
-
 		case hkVariants
 		case hkVariantsRev
 		case hkVariantsRevPhrases
@@ -46,7 +44,6 @@ extension ChineseConverter {
 }
 
 extension ChineseConverter.Options {
-
 	var segmentationDictName: ChineseConverter.DictionaryName {
 		if contains(.traditionalize) {
 			return .stPhrases

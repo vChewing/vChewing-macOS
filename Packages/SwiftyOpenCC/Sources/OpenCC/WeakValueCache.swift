@@ -8,7 +8,6 @@
 import Foundation
 
 class WeakBox<Value: AnyObject> {
-
 	private(set) weak var value: Value?
 
 	init(_ value: Value) {
@@ -17,7 +16,6 @@ class WeakBox<Value: AnyObject> {
 }
 
 class WeakValueCache<Key: Hashable, Value: AnyObject> {
-
 	private var storage: [Key: WeakBox<Value>] = [:]
 
 	private var lock = NSLock()
