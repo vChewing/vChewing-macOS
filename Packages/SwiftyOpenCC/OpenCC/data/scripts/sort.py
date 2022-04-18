@@ -6,14 +6,14 @@ from common import sort_items
 
 if len(sys.argv) < 2:
     print("Sort the dictionary")
-    print(("Usage: ", sys.argv[0], "[input] ([output])"))
+    print(("Usage: ", sys.argv[0], "[inputVal] ([outputVal])"))
     exit(1)
 
-input = sys.argv[1]
+inputVal = sys.argv[1]
 
 if len(sys.argv) < 3:
-    output = input
+    outputVal = inputVal
 else:
-    output = sys.argv[2]
+    outputVal = sys.argv[2]
 
-sort_items(input, output)
+sort_items(inputVal, outputVal)
