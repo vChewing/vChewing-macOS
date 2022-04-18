@@ -35,8 +35,13 @@ public class IME: NSObject {
 
 	// MARK: - 自 ctlInputMethod 讀取當前輸入法的簡繁體模式
 
-	static func getInputMode() -> InputMode {
-		ctlInputMethod.currentKeyHandler.inputMode
+	static func getInputMode(isReversed: Bool = false) -> InputMode {
+		if isReversed {
+			return (ctlInputMethod.currentKeyHandler.inputMode == InputMode.imeModeCHT)
+				? InputMode.imeModeCHS : InputMode.imeModeCHT
+		} else {
+			return ctlInputMethod.currentKeyHandler.inputMode
+		}
 	}
 
 	// MARK: - Print debug information to the console.
