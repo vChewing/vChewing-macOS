@@ -63,7 +63,7 @@ struct suiPrefPaneExperience: View {
 			Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Selection Keys:")) }) {
 				ComboBox(items: mgrPrefs.suggestedCandidateKeys, text: $selSelectionKeys).frame(width: 180).onChange(
 					of: selSelectionKeys
-				) { (value) in
+				) { value in
 					let keys: String = (value.trimmingCharacters(in: .whitespacesAndNewlines) as String).charDeDuplicate
 					do {
 						try mgrPrefs.validate(candidateKeys: keys)
@@ -92,7 +92,7 @@ struct suiPrefPaneExperience: View {
 				Picker("", selection: $selCursorPosition) {
 					Text(LocalizedStringKey("to the front of the phrase (like Matsushita Hanin IME)")).tag(0)
 					Text(LocalizedStringKey("to the rear of the phrase (like MS New-Phonetic IME)")).tag(1)
-				}.onChange(of: selCursorPosition) { (value) in
+				}.onChange(of: selCursorPosition) { value in
 					mgrPrefs.selectPhraseAfterCursorAsCandidate = (value == 1) ? true : false
 				}
 				.labelsHidden()
@@ -102,7 +102,7 @@ struct suiPrefPaneExperience: View {
 				Toggle(
 					LocalizedStringKey("Push the cursor to the front of the phrase after selection"),
 					isOn: $selPushCursorAfterSelection
-				).onChange(of: selPushCursorAfterSelection) { (value) in
+				).onChange(of: selPushCursorAfterSelection) { value in
 					mgrPrefs.moveCursorAfterSelectingCandidate = value
 				}.controlSize(.small)
 			}
@@ -110,7 +110,7 @@ struct suiPrefPaneExperience: View {
 				Picker("", selection: $selKeyBehaviorShiftTab) {
 					Text(LocalizedStringKey("for cycling candidates")).tag(0)
 					Text(LocalizedStringKey("for cycling pages")).tag(1)
-				}.onChange(of: selKeyBehaviorShiftTab) { (value) in
+				}.onChange(of: selKeyBehaviorShiftTab) { value in
 					mgrPrefs.specifyShiftTabKeyBehavior = (value == 1) ? true : false
 				}
 				.labelsHidden()
@@ -123,7 +123,7 @@ struct suiPrefPaneExperience: View {
 				Picker("", selection: $selKeyBehaviorShiftSpace) {
 					Text(LocalizedStringKey("Space to +cycle candidates, Shift+Space to +cycle pages")).tag(0)
 					Text(LocalizedStringKey("Space to +cycle pages, Shift+Space to +cycle candidates")).tag(1)
-				}.onChange(of: selKeyBehaviorShiftSpace) { (value) in
+				}.onChange(of: selKeyBehaviorShiftSpace) { value in
 					mgrPrefs.specifyShiftSpaceKeyBehavior = (value == 1) ? true : false
 				}
 				.labelsHidden()
@@ -135,20 +135,20 @@ struct suiPrefPaneExperience: View {
 				Toggle(
 					LocalizedStringKey("Enable Space key for calling candidate window"),
 					isOn: $selKeyBehaviorSpaceForCallingCandidate
-				).onChange(of: selKeyBehaviorSpaceForCallingCandidate) { (value) in
+				).onChange(of: selKeyBehaviorSpaceForCallingCandidate) { value in
 					mgrPrefs.chooseCandidateUsingSpace = value
 				}
 				Toggle(
 					LocalizedStringKey("Use ESC key to clear the entire input buffer"),
 					isOn: $selKeyBehaviorESCForClearingTheBuffer
-				).onChange(of: selKeyBehaviorESCForClearingTheBuffer) { (value) in
+				).onChange(of: selKeyBehaviorESCForClearingTheBuffer) { value in
 					mgrPrefs.escToCleanInputBuffer = value
 				}
 			}
 			Preferences.Section(label: { Text(LocalizedStringKey("Typing Style:")) }) {
 				Toggle(
 					LocalizedStringKey("Emulating select-candidate-per-character mode"), isOn: $selEnableSCPCTypingMode
-				).onChange(of: selEnableSCPCTypingMode) { (value) in
+				).onChange(of: selEnableSCPCTypingMode) { value in
 					mgrPrefs.useSCPCTypingMode = value
 				}
 				Text(LocalizedStringKey("An accomodation for elder computer users."))

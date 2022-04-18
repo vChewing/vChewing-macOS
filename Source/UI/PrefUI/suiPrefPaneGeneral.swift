@@ -71,7 +71,7 @@ struct suiPrefPaneGeneral: View {
 					Text("32").tag(32)
 					Text("64").tag(64)
 					Text("96").tag(96)
-				}.onChange(of: selCandidateUIFontSize) { (value) in
+				}.onChange(of: selCandidateUIFontSize) { value in
 					mgrPrefs.candidateListTextSize = CGFloat(value)
 				}
 				.labelsHidden()
@@ -86,7 +86,7 @@ struct suiPrefPaneGeneral: View {
 					Text(LocalizedStringKey("Traditional Chinese")).tag(["zh-Hant"])
 					Text(LocalizedStringKey("Japanese")).tag(["ja"])
 					Text(LocalizedStringKey("English")).tag(["en"])
-				}.onChange(of: selUILanguage) { (value) in
+				}.onChange(of: selUILanguage) { value in
 					IME.prtDebugIntel(value[0])
 					if selUILanguage == mgrPrefs.appleLanguages
 						|| (selUILanguage[0] == "auto"
@@ -112,7 +112,7 @@ struct suiPrefPaneGeneral: View {
 				Picker("", selection: $selEnableHorizontalCandidateLayout) {
 					Text(LocalizedStringKey("Vertical")).tag(false)
 					Text(LocalizedStringKey("Horizontal")).tag(true)
-				}.onChange(of: selEnableHorizontalCandidateLayout) { (value) in
+				}.onChange(of: selEnableHorizontalCandidateLayout) { value in
 					mgrPrefs.useHorizontalCandidateList = value
 				}
 				.labelsHidden()
@@ -128,31 +128,31 @@ struct suiPrefPaneGeneral: View {
 				Toggle(
 					LocalizedStringKey("Auto-convert traditional Chinese glyphs to KangXi characters"),
 					isOn: $selEnableKanjiConvToKangXi
-				).onChange(of: selEnableKanjiConvToKangXi) { (value) in
+				).onChange(of: selEnableKanjiConvToKangXi) { value in
 					mgrPrefs.chineseConversionEnabled = value
 				}
 				Toggle(
 					LocalizedStringKey("Auto-convert traditional Chinese glyphs to JIS Shinjitai characters"),
 					isOn: $selEnableKanjiConvToJIS
-				).onChange(of: selEnableKanjiConvToJIS) { (value) in
+				).onChange(of: selEnableKanjiConvToJIS) { value in
 					mgrPrefs.shiftJISShinjitaiOutputEnabled = value
 				}
 				Toggle(
 					LocalizedStringKey("Stop farting (when typed phonetic combination is invalid, etc.)"),
 					isOn: $selEnableFartSuppressor
-				).onChange(of: selEnableFartSuppressor) { (value) in
+				).onChange(of: selEnableFartSuppressor) { value in
 					mgrPrefs.shouldNotFartInLieuOfBeep = value
 					clsSFX.beep()
 				}
 			}
 			Preferences.Section(label: { Text(LocalizedStringKey("Misc Settings:")).controlSize(.small) }) {
 				Toggle(LocalizedStringKey("Check for updates automatically"), isOn: $selEnableAutoUpdateCheck)
-					.onChange(of: selEnableAutoUpdateCheck) { (value) in
+					.onChange(of: selEnableAutoUpdateCheck) { value in
 						mgrPrefs.checkUpdateAutomatically = value
 					}
 					.controlSize(.small)
 				Toggle(LocalizedStringKey("Debug Mode"), isOn: $selEnableDebugMode).controlSize(.small)
-					.onChange(of: selEnableDebugMode) { (value) in
+					.onChange(of: selEnableDebugMode) { value in
 						mgrPrefs.isDebugModeEnabled = value
 					}
 			}

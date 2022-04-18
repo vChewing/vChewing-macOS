@@ -50,12 +50,14 @@ enum VersionUpdateApiError: Error, LocalizedError {
 				return String(
 					format: NSLocalizedString(
 						"There may be no internet connection or the server failed to respond.\n\nError message: %@",
-						comment: ""), message)
+						comment: ""
+					), message
+				)
 		}
 	}
 }
 
-struct VersionUpdateApi {
+enum VersionUpdateApi {
 	static let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
 	static let kNextUpdateCheckDateKey = "NextUpdateCheckDate"
 	static let kUpdateInfoEndpointKey = "UpdateInfoEndpoint"
@@ -75,7 +77,8 @@ struct VersionUpdateApi {
 
 		let request = URLRequest(
 			url: updateInfoURL, cachePolicy: .reloadIgnoringLocalCacheData,
-			timeoutInterval: kTimeoutInterval)
+			timeoutInterval: kTimeoutInterval
+		)
 		let task = URLSession.shared.dataTask(with: request) { data, _, error in
 			if let error = error {
 				DispatchQueue.main.async {
@@ -92,7 +95,8 @@ struct VersionUpdateApi {
 			do {
 				guard
 					let plist = try PropertyListSerialization.propertyList(
-						from: data ?? Data(), options: [], format: nil) as? [AnyHashable: Any],
+						from: data ?? Data(), options: [], format: nil
+					) as? [AnyHashable: Any],
 					let remoteVersion = plist[kCFBundleVersionKey] as? String,
 					let infoDict = Bundle.main.infoDictionary
 				else {
@@ -109,7 +113,8 @@ struct VersionUpdateApi {
 
 				let currentVersion = infoDict[kCFBundleVersionKey as String] as? String ?? ""
 				let result = currentVersion.compare(
-					remoteVersion, options: .numeric, range: nil, locale: nil)
+					remoteVersion, options: .numeric, range: nil, locale: nil
+				)
 
 				if result != .orderedAscending {
 					DispatchQueue.main.async {

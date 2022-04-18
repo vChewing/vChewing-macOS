@@ -27,20 +27,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Foundation
 
 // MARK: - 前導工作
+
 extension String {
 	fileprivate mutating func regReplace(pattern: String, replaceWith: String = "") {
 		// Ref: https://stackoverflow.com/a/40993403/4162914 && https://stackoverflow.com/a/71291137/4162914
 		do {
 			let regex = try NSRegularExpression(
-				pattern: pattern, options: [.caseInsensitive, .anchorsMatchLines])
-			let range = NSRange(self.startIndex..., in: self)
+				pattern: pattern, options: [.caseInsensitive, .anchorsMatchLines]
+			)
+			let range = NSRange(startIndex..., in: self)
 			self = regex.stringByReplacingMatches(
-				in: self, options: [], range: range, withTemplate: replaceWith)
+				in: self, options: [], range: range, withTemplate: replaceWith
+			)
 		} catch { return }
 	}
 }
 
 // MARK: - 引入小數點位數控制函數
+
 // Ref: https://stackoverflow.com/a/32581409/4162914
 extension Float {
 	fileprivate func rounded(toPlaces places: Int) -> Float {
@@ -50,6 +54,7 @@ extension Float {
 }
 
 // MARK: - 引入幂乘函數
+
 // Ref: https://stackoverflow.com/a/41581695/4162914
 precedencegroup ExponentiationPrecedence {
 	associativity: right
@@ -59,11 +64,11 @@ precedencegroup ExponentiationPrecedence {
 infix operator **: ExponentiationPrecedence
 
 func ** (_ base: Double, _ exp: Double) -> Double {
-	return pow(base, exp)
+	pow(base, exp)
 }
 
 func ** (_ base: Float, _ exp: Float) -> Float {
-	return pow(base, exp)
+	pow(base, exp)
 }
 
 // MARK: - 定義檔案結構
@@ -101,7 +106,7 @@ private let urlOutputCHT: String = "./data-cht.txt"
 
 func rawDictForPhrases(isCHS: Bool) -> [Entry] {
 	var arrEntryRAW: [Entry] = []
-	var strRAW: String = ""
+	var strRAW = ""
 	let urlCustom: String = isCHS ? urlCHSforCustom : urlCHTforCustom
 	let urlMCBP: String = isCHS ? urlCHSforMCBP : urlCHTforMCBP
 	let urlMOE: String = isCHS ? urlCHSforMOE : urlCHTforMOE
@@ -136,7 +141,7 @@ func rawDictForPhrases(isCHS: Bool) -> [Entry] {
 	for lineData in arrData {
 		// 第三欄開始是注音
 		let arrLineData = lineData.components(separatedBy: " ")
-		var varLineDataProcessed: String = ""
+		var varLineDataProcessed = ""
 		var count = 0
 		for currentCell in arrLineData {
 			count += 1
@@ -165,9 +170,10 @@ func rawDictForPhrases(isCHS: Bool) -> [Entry] {
 		}
 		if phrase != "" {  // 廢掉空數據；之後無須再這樣處理。
 			arrEntryRAW += [
-				Entry.init(
+				Entry(
 					valPhone: phone, valPhrase: phrase, valWeight: 0.0,
-					valCount: occurrence)
+					valCount: occurrence
+				)
 			]
 		}
 	}
@@ -179,7 +185,7 @@ func rawDictForPhrases(isCHS: Bool) -> [Entry] {
 
 func rawDictForKanjis(isCHS: Bool) -> [Entry] {
 	var arrEntryRAW: [Entry] = []
-	var strRAW: String = ""
+	var strRAW = ""
 	let i18n: String = isCHS ? "簡體中文" : "繁體中文"
 	// 讀取內容
 	do {
@@ -201,7 +207,7 @@ func rawDictForKanjis(isCHS: Bool) -> [Entry] {
 	// 正式整理格式，現在就開始去重複：
 	let arrData = Array(
 		NSOrderedSet(array: strRAW.components(separatedBy: "\n")).array as! [String])
-	var varLineData: String = ""
+	var varLineData = ""
 	for lineData in arrData {
 		// 簡體中文的話，提取 1,2,4；繁體中文的話，提取 1,3,4。
 		let varLineDataPre = lineData.components(separatedBy: " ").prefix(isCHS ? 2 : 1)
@@ -212,7 +218,7 @@ func rawDictForKanjis(isCHS: Bool) -> [Entry] {
 				separator: "\t")
 		varLineData = varLineDataPre + "\t" + varLineDataPost
 		let arrLineData = varLineData.components(separatedBy: " ")
-		var varLineDataProcessed: String = ""
+		var varLineDataProcessed = ""
 		var count = 0
 		for currentCell in arrLineData {
 			count += 1
@@ -241,9 +247,10 @@ func rawDictForKanjis(isCHS: Bool) -> [Entry] {
 		}
 		if phrase != "" {  // 廢掉空數據；之後無須再這樣處理。
 			arrEntryRAW += [
-				Entry.init(
+				Entry(
 					valPhone: phone, valPhrase: phrase, valWeight: 0.0,
-					valCount: occurrence)
+					valCount: occurrence
+				)
 			]
 		}
 	}
@@ -255,7 +262,7 @@ func rawDictForKanjis(isCHS: Bool) -> [Entry] {
 
 func rawDictForNonKanjis(isCHS: Bool) -> [Entry] {
 	var arrEntryRAW: [Entry] = []
-	var strRAW: String = ""
+	var strRAW = ""
 	let i18n: String = isCHS ? "簡體中文" : "繁體中文"
 	// 讀取內容
 	do {
@@ -279,14 +286,14 @@ func rawDictForNonKanjis(isCHS: Bool) -> [Entry] {
 	// 正式整理格式，現在就開始去重複：
 	let arrData = Array(
 		NSOrderedSet(array: strRAW.components(separatedBy: "\n")).array as! [String])
-	var varLineData: String = ""
+	var varLineData = ""
 	for lineData in arrData {
 		varLineData = lineData
 		// 先完成某兩步需要分行處理才能完成的格式整理。
 		varLineData = varLineData.components(separatedBy: " ").prefix(3).joined(
 			separator: "\t")  // 提取前三欄的內容。
 		let arrLineData = varLineData.components(separatedBy: " ")
-		var varLineDataProcessed: String = ""
+		var varLineDataProcessed = ""
 		var count = 0
 		for currentCell in arrLineData {
 			count += 1
@@ -315,9 +322,10 @@ func rawDictForNonKanjis(isCHS: Bool) -> [Entry] {
 		}
 		if phrase != "" {  // 廢掉空數據；之後無須再這樣處理。
 			arrEntryRAW += [
-				Entry.init(
+				Entry(
 					valPhone: phone, valPhrase: phrase, valWeight: 0.0,
-					valCount: occurrence)
+					valCount: occurrence
+				)
 			]
 		}
 	}
@@ -356,16 +364,17 @@ func weightAndSort(_ arrStructUncalculated: [Entry], isCHS: Bool) -> [Entry] {
 		}
 		let weightRounded: Float = weight.rounded(toPlaces: 3)  // 為了節省生成的檔案體積，僅保留小數點後三位。
 		arrStructCalculated += [
-			Entry.init(
+			Entry(
 				valPhone: entry.valPhone, valPhrase: entry.valPhrase, valWeight: weightRounded,
-				valCount: entry.valCount)
+				valCount: entry.valCount
+			)
 		]
 	}
 	NSLog(" - \(i18n): 成功計算權重。")
 	// ==========================================
 	// 接下來是排序，先按照注音遞減排序一遍、再按照權重遞減排序一遍。
-	let arrStructSorted: [Entry] = arrStructCalculated.sorted(by: { (lhs, rhs) -> Bool in
-		return (lhs.valPhone, rhs.valCount) < (rhs.valPhone, lhs.valCount)
+	let arrStructSorted: [Entry] = arrStructCalculated.sorted(by: { lhs, rhs -> Bool in
+		(lhs.valPhone, rhs.valCount) < (rhs.valPhone, lhs.valCount)
 	})
 	NSLog(" - \(i18n): 排序整理完畢，準備編譯要寫入的檔案內容。")
 	return arrStructSorted
@@ -406,6 +415,7 @@ func fileOutput(isCHS: Bool) {
 }
 
 // MARK: - 主执行绪
+
 func main() {
 	NSLog("// 準備編譯繁體中文核心語料檔案。")
 	fileOutput(isCHS: false)

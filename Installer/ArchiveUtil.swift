@@ -53,7 +53,8 @@ struct ArchiveUtil {
 		let notarizedArchiveExists = FileManager.default.fileExists(atPath: notarizedArchive)
 		let devModeAppBundleExists = FileManager.default.fileExists(atPath: devModeAppBundlePath)
 
-		if count > 0 {
+		if !notarizedArchivesContent.isEmpty {
+			// 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
 			if count != 1 || !notarizedArchiveExists || devModeAppBundleExists {
 				let alert = NSAlert()
 				alert.alertStyle = .informational
@@ -105,7 +106,8 @@ struct ArchiveUtil {
 		let result = (tempFilePath as NSString).appendingPathComponent(targetAppBundleName)
 		assert(
 			FileManager.default.fileExists(atPath: result),
-			"App bundle must be unzipped at \(result).")
+			"App bundle must be unzipped at \(result)."
+		)
 		return result
 	}
 
@@ -130,5 +132,4 @@ struct ArchiveUtil {
 			notarizedArchiveBasename)
 		return notarizedArchive
 	}
-
 }

@@ -7,7 +7,8 @@ let package = Package(
 	products: [
 		.library(
 			name: "OpenCC",
-			targets: ["OpenCC"])
+			targets: ["OpenCC"]
+		)
 	],
 	targets: [
 		.target(
@@ -15,14 +16,16 @@ let package = Package(
 			dependencies: ["copencc"],
 			resources: [
 				.copy("Dictionary")
-			]),
+			]
+		),
 		.testTarget(
 			name: "OpenCCTests",
 			dependencies: ["OpenCC"],
 			resources: [
 				.copy("benchmark"),
 				.copy("testcases"),
-			]),
+			]
+		),
 		.target(
 			name: "copencc",
 			exclude: [
@@ -79,7 +82,8 @@ let package = Package(
 				.headerSearchPath("deps/marisa-0.2.6/include"),
 				.headerSearchPath("deps/marisa-0.2.6/lib"),
 				.define("ENABLE_DARTS"),
-			]),
+			]
+		),
 	],
 	cxxLanguageStandard: .cxx14
 )

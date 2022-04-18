@@ -25,7 +25,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 
 class ViewController: NSViewController, NSTextViewDelegate {
-
 	/// - Tag: setRepresentedObjectExample
 	override var representedObject: Any? {
 		didSet {
@@ -54,12 +53,11 @@ class ViewController: NSViewController, NSTextViewDelegate {
 
 	// MARK: - NSTextViewDelegate
 
-	func textDidBeginEditing(_ notification: Notification) {
+	func textDidBeginEditing(_: Notification) {
 		document?.objectDidBeginEditing(self)
 	}
 
-	func textDidEndEditing(_ notification: Notification) {
+	func textDidEndEditing(_: Notification) {
 		document?.objectDidEndEditing(self)
 	}
-
 }

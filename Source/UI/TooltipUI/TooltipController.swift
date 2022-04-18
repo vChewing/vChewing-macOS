@@ -41,7 +41,8 @@ public class TooltipController: NSWindowController {
 		let contentRect = NSRect(x: 128.0, y: 128.0, width: 300.0, height: 20.0)
 		let styleMask: NSWindow.StyleMask = [.borderless, .nonactivatingPanel]
 		let panel = NSPanel(
-			contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false)
+			contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false
+		)
 		panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel) + 1)
 		panel.hasShadow = true
 
@@ -58,7 +59,8 @@ public class TooltipController: NSWindowController {
 		super.init(window: panel)
 	}
 
-	public required init?(coder: NSCoder) {
+	@available(*, unavailable)
+	public required init?(coder _: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
 
@@ -77,15 +79,14 @@ public class TooltipController: NSWindowController {
 	}
 
 	private func set(windowLocation windowTopLeftPoint: NSPoint) {
-
 		var adjustedPoint = windowTopLeftPoint
 		adjustedPoint.y -= 5
 
 		var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.zero
 		for screen in NSScreen.screens {
 			let frame = screen.visibleFrame
-			if windowTopLeftPoint.x >= frame.minX && windowTopLeftPoint.x <= frame.maxX
-				&& windowTopLeftPoint.y >= frame.minY && windowTopLeftPoint.y <= frame.maxY
+			if windowTopLeftPoint.x >= frame.minX, windowTopLeftPoint.x <= frame.maxX,
+				windowTopLeftPoint.y >= frame.minY, windowTopLeftPoint.y <= frame.maxY
 			{
 				screenFrame = frame
 				break
@@ -115,16 +116,15 @@ public class TooltipController: NSWindowController {
 		}
 
 		window?.setFrameTopLeftPoint(adjustedPoint)
-
 	}
 
 	private func adjustSize() {
 		let attrString = messageTextField.attributedStringValue
 		var rect = attrString.boundingRect(
-			with: NSSize(width: 1600.0, height: 1600.0), options: .usesLineFragmentOrigin)
+			with: NSSize(width: 1600.0, height: 1600.0), options: .usesLineFragmentOrigin
+		)
 		rect.size.width += 10
 		messageTextField.frame = rect
 		window?.setFrame(rect, display: true)
 	}
-
 }

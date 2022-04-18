@@ -31,7 +31,6 @@ public protocol FSEventStreamHelperDelegate: AnyObject {
 }
 
 public class FSEventStreamHelper: NSObject {
-
 	public struct Event {
 		var path: String
 		var flags: FSEventStreamEventFlags
@@ -59,7 +58,7 @@ public class FSEventStreamHelper: NSObject {
 			let stream = FSEventStreamCreate(
 				nil,
 				{
-					(_, clientCallBackInfo, eventCount, eventPaths, eventFlags, eventIds) in
+					_, clientCallBackInfo, eventCount, eventPaths, eventFlags, eventIds in
 					let helper = Unmanaged<FSEventStreamHelper>.fromOpaque(clientCallBackInfo!)
 						.takeUnretainedValue()
 					let pathsBase = eventPaths.assumingMemoryBound(to: UnsafePointer<CChar>.self)
@@ -70,7 +69,8 @@ public class FSEventStreamHelper: NSObject {
 						FSEventStreamHelper.Event(
 							path: String(cString: pathsPtr[$0]),
 							flags: flagsPtr[$0],
-							id: eventIDsPtr[$0])
+							id: eventIDsPtr[$0]
+						)
 					}
 					helper.delegate?.helper(helper, didReceive: events)
 				},
