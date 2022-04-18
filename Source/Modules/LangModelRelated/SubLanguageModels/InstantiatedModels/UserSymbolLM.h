@@ -39,11 +39,11 @@ namespace vChewing
 class UserSymbolLM : public UserPhrasesLM
 {
   public:
-    virtual bool allowConsolidation() override
+    bool allowConsolidation() override
     {
         return true;
     }
-    virtual float overridedValue() override
+    float overridedValue() override
     {
         return -12.0;
     }
