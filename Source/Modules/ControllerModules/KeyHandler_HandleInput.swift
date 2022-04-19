@@ -105,16 +105,16 @@ import Cocoa
 		// MARK: Handle Candidates.
 
 		if state is InputState.ChoosingCandidate {
-			return _handleCandidateState(
-				state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
+			return handleCandidate(
+				state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
 			)
 		}
 
 		// MARK: Handle Associated Phrases.
 
 		if state is InputState.AssociatedPhrases {
-			let result = _handleCandidateState(
-				state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
+			let result = handleCandidate(
+				state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
 			)
 			if result {
 				return true
@@ -126,7 +126,7 @@ import Cocoa
 		// MARK: Handle Marking.
 
 		if let marking = state as? InputState.Marking {
-			if _handleMarkingState(
+			if handleMarkingState(
 				marking, input: input, stateCallback: stateCallback,
 				errorCallback: errorCallback
 			) {
@@ -188,8 +188,8 @@ import Cocoa
 			stateCallback(inputting)
 
 			if mgrPrefs.useSCPCTypingMode {
-				let choosingCandidates: InputState.ChoosingCandidate = _buildCandidateState(
-					inputting,
+				let choosingCandidates: InputState.ChoosingCandidate = buildCandidate(
+					state: inputting,
 					useVerticalMode: input.useVerticalMode
 				)
 				if choosingCandidates.candidates.count == 1 {
@@ -251,8 +251,8 @@ import Cocoa
 						return true
 					}
 				}
-				let choosingCandidates = _buildCandidateState(
-					currentState,
+				let choosingCandidates = buildCandidate(
+					state: currentState,
 					useVerticalMode: input.useVerticalMode
 				)
 				stateCallback(choosingCandidates)
@@ -264,13 +264,13 @@ import Cocoa
 
 		// MARK: Esc
 
-		if input.isESC { return _handleEscWithState(state, stateCallback: stateCallback, errorCallback: errorCallback) }
+		if input.isESC { return handleEsc(state: state, stateCallback: stateCallback, errorCallback: errorCallback) }
 
 		// MARK: Cursor backward
 
 		if input.isCursorBackward || input.emacsKey == vChewingEmacsKey.backward {
-			return _handleBackwardWithState(
-				state,
+			return handleBackward(
+				state: state,
 				input: input,
 				stateCallback: stateCallback,
 				errorCallback: errorCallback
@@ -280,59 +280,59 @@ import Cocoa
 		// MARK: Cursor forward
 
 		if input.isCursorForward || input.emacsKey == vChewingEmacsKey.forward {
-			return _handleForwardWithState(
-				state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
+			return handleForward(
+				state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
 			)
 		}
 
 		// MARK: Home
 
 		if input.isHome || input.emacsKey == vChewingEmacsKey.home {
-			return _handleHomeWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+			return handleHome(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: End
 
 		if input.isEnd || input.emacsKey == vChewingEmacsKey.end {
-			return _handleEndWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+			return handleEnd(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: Ctrl+PgLf or Shift+PgLf
 
 		if (input.isControlHold || input.isShiftHold) && (input.isOptionHold && input.isLeft) {
-			return _handleHomeWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+			return handleHome(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: Ctrl+PgRt or Shift+PgRt
 
 		if (input.isControlHold || input.isShiftHold) && (input.isOptionHold && input.isRight) {
-			return _handleEndWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+			return handleEnd(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: AbsorbedArrowKey
 
 		if input.isAbsorbedArrowKey || input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse {
-			return _handleAbsorbedArrowKeyWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+			return handleAbsorbedArrowKey(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: Backspace
 
 		if input.isBackSpace {
-			return _handleBackspaceWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+			return handleBackspace(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: Delete
 
 		if input.isDelete || input.emacsKey == vChewingEmacsKey.delete {
-			return _handleDeleteWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+			return handleDelete(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: Enter
 
 		if input.isEnter {
 			return (input.isCommandHold && input.isControlHold)
-				? _handleCtrlCommandEnterWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
-				: _handleEnterWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+				? handleCtrlCommandEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+				: handleEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: -
@@ -348,8 +348,10 @@ import Cocoa
 						let inputting = buildInputtingState()
 						inputting.poppedText = poppedText
 						stateCallback(inputting)
-						let choosingCandidate =
-							_buildCandidateState(inputting, useVerticalMode: input.useVerticalMode)
+						let choosingCandidate = buildCandidate(
+							state: inputting,
+							useVerticalMode: input.useVerticalMode
+						)
 						stateCallback(choosingCandidate)
 					} else {  // If there is still unfinished bpmf reading, ignore the punctuation
 						IME.prtDebugIntel("17446655")
@@ -361,7 +363,7 @@ import Cocoa
 				// 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
 				// 於是這裡用「模擬一次 Enter 鍵的操作」使其代為執行這個 commit buffer 的動作。
 				// 這裡不需要該函數所傳回的 bool 結果，所以用「_ =」解消掉。
-				_ = _handleEnterWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+				_ = handleEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
 				let root: SymbolNode! = SymbolNode.root
 				let symbolState =
 					InputState.SymbolTable(node: root, useVerticalMode: input.useVerticalMode)
@@ -391,7 +393,7 @@ import Cocoa
 			punctuationNamePrefix, parser, String(format: "%c", CChar(charCode)),
 		]
 		let customPunctuation: String = arrCustomPunctuations.joined(separator: "")
-		if _handlePunctuation(
+		if handlePunctuation(
 			customPunctuation,
 			state: state,
 			usingVerticalMode: input.useVerticalMode,
@@ -405,7 +407,7 @@ import Cocoa
 		let arrPunctuations: [String] = [punctuationNamePrefix, String(format: "%c", CChar(charCode))]
 		let punctuation: String = arrPunctuations.joined(separator: "")
 
-		if _handlePunctuation(
+		if handlePunctuation(
 			punctuation,
 			state: state,
 			usingVerticalMode: input.useVerticalMode,
@@ -418,7 +420,7 @@ import Cocoa
 		// 這裡不使用小麥注音 2.2 版的組字區處理方式，而是直接由詞庫負責。
 		if input.isUpperCaseASCIILetterKey {
 			let letter: String! = String(format: "%@%c", "_letter_", CChar(charCode))
-			if _handlePunctuation(
+			if handlePunctuation(
 				letter,
 				state: state,
 				usingVerticalMode: input.useVerticalMode,
