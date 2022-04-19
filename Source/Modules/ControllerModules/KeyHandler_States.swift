@@ -228,11 +228,13 @@ import Cocoa
 
 		clear()
 
-		let current = state as! InputState.Inputting
-		let composingBuffer = current.composingBuffer
+		if let current = state as? InputState.Inputting {
+			let composingBuffer = current.composingBuffer
 
-		let committing = InputState.Committing(poppedText: composingBuffer)
-		stateCallback(committing)
+			let committing = InputState.Committing(poppedText: composingBuffer)
+			stateCallback(committing)
+		}
+
 		let empty = InputState.Empty()
 		stateCallback(empty)
 		return true
@@ -468,37 +470,38 @@ import Cocoa
 			return true
 		}
 
-		let currentState = state as! InputState.Inputting
-
-		if input.isShiftHold {
-			// Shift + Right
-			if currentState.cursorIndex < (currentState.composingBuffer as NSString).length {
-				let nextPosition = (currentState.composingBuffer as NSString).nextUtf16Position(
-					for: Int(currentState.cursorIndex))
-				let marking: InputState.Marking! = InputState.Marking(
-					composingBuffer: currentState.composingBuffer,
-					cursorIndex: currentState.cursorIndex,
-					markerIndex: UInt(nextPosition),
-					readings: _currentReadings()
-				)
-				marking.tooltipForInputting = currentState.tooltip
-				stateCallback(marking)
+		if let currentState = state as? InputState.Inputting {
+			if input.isShiftHold {
+				// Shift + Right
+				if currentState.cursorIndex < (currentState.composingBuffer as NSString).length {
+					let nextPosition = (currentState.composingBuffer as NSString).nextUtf16Position(
+						for: Int(currentState.cursorIndex))
+					let marking: InputState.Marking! = InputState.Marking(
+						composingBuffer: currentState.composingBuffer,
+						cursorIndex: currentState.cursorIndex,
+						markerIndex: UInt(nextPosition),
+						readings: _currentReadings()
+					)
+					marking.tooltipForInputting = currentState.tooltip
+					stateCallback(marking)
+				} else {
+					IME.prtDebugIntel("BB7F6DB9")
+					errorCallback()
+					stateCallback(state)
+				}
 			} else {
-				IME.prtDebugIntel("BB7F6DB9")
-				errorCallback()
-				stateCallback(state)
-			}
-		} else {
-			if getBuilderCursorIndex() < getBuilderLength() {
-				setBuilderCursorIndex(getBuilderCursorIndex() + 1)
-				let inputting = buildInputtingState()
-				stateCallback(inputting)
-			} else {
-				IME.prtDebugIntel("A96AAD58")
-				errorCallback()
-				stateCallback(state)
+				if getBuilderCursorIndex() < getBuilderLength() {
+					setBuilderCursorIndex(getBuilderCursorIndex() + 1)
+					let inputting = buildInputtingState()
+					stateCallback(inputting)
+				} else {
+					IME.prtDebugIntel("A96AAD58")
+					errorCallback()
+					stateCallback(state)
+				}
 			}
 		}
+
 		return true
 	}
 
@@ -519,37 +522,38 @@ import Cocoa
 			return true
 		}
 
-		let currentState = state as! InputState.Inputting
-
-		if input.isShiftHold {
-			// Shift + left
-			if currentState.cursorIndex > 0 {
-				let previousPosition = (currentState.composingBuffer as NSString).previousUtf16Position(
-					for: Int(currentState.cursorIndex))
-				let marking: InputState.Marking! = InputState.Marking(
-					composingBuffer: currentState.composingBuffer,
-					cursorIndex: currentState.cursorIndex,
-					markerIndex: UInt(previousPosition),
-					readings: _currentReadings()
-				)
-				marking.tooltipForInputting = currentState.tooltip
-				stateCallback(marking)
+		if let currentState = state as? InputState.Inputting {
+			if input.isShiftHold {
+				// Shift + left
+				if currentState.cursorIndex > 0 {
+					let previousPosition = (currentState.composingBuffer as NSString).previousUtf16Position(
+						for: Int(currentState.cursorIndex))
+					let marking: InputState.Marking! = InputState.Marking(
+						composingBuffer: currentState.composingBuffer,
+						cursorIndex: currentState.cursorIndex,
+						markerIndex: UInt(previousPosition),
+						readings: _currentReadings()
+					)
+					marking.tooltipForInputting = currentState.tooltip
+					stateCallback(marking)
+				} else {
+					IME.prtDebugIntel("D326DEA3")
+					errorCallback()
+					stateCallback(state)
+				}
 			} else {
-				IME.prtDebugIntel("D326DEA3")
-				errorCallback()
-				stateCallback(state)
-			}
-		} else {
-			if getBuilderCursorIndex() > 0 {
-				setBuilderCursorIndex(getBuilderCursorIndex() - 1)
-				let inputting = buildInputtingState()
-				stateCallback(inputting)
-			} else {
-				IME.prtDebugIntel("7045E6F3")
-				errorCallback()
-				stateCallback(state)
+				if getBuilderCursorIndex() > 0 {
+					setBuilderCursorIndex(getBuilderCursorIndex() - 1)
+					let inputting = buildInputtingState()
+					stateCallback(inputting)
+				} else {
+					IME.prtDebugIntel("7045E6F3")
+					errorCallback()
+					stateCallback(state)
+				}
 			}
 		}
+
 		return true
 	}
 }

@@ -125,16 +125,13 @@ import Cocoa
 
 		// MARK: Handle Marking.
 
-		if state is InputState.Marking {
-			let marking = state as! InputState.Marking
-
+		if let marking = state as? InputState.Marking {
 			if _handleMarkingState(
-				state as! InputState.Marking, input: input, stateCallback: stateCallback,
+				marking, input: input, stateCallback: stateCallback,
 				errorCallback: errorCallback
 			) {
 				return true
 			}
-
 			state = marking.convertToInputting()
 			stateCallback(state)
 		}
@@ -224,41 +221,43 @@ import Cocoa
 
 		// MARK: Calling candidate window using Space or Down or PageUp / PageDn.
 
-		if isPhoneticReadingBufferEmpty() && (state is InputState.NotEmpty)
-			&& (input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
-				|| input.isPageDown || input.isPageUp || input.isTab
-				|| (input.useVerticalMode && (input.isVerticalModeOnlyChooseCandidateKey)))
-		{
-			if input.isSpace {
-				// If the Space key is NOT set to be a selection key
-				if input.isShiftHold || !mgrPrefs.chooseCandidateUsingSpace {
-					if getBuilderCursorIndex() >= getBuilderLength() {
-						let composingBuffer = (state as! InputState.NotEmpty).composingBuffer
-						if (composingBuffer.count) != 0 {
-							let committing = InputState.Committing(poppedText: composingBuffer)
+		if let currentState = state as? InputState.NotEmpty {
+			if isPhoneticReadingBufferEmpty(),
+				input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
+					|| input.isPageDown || input.isPageUp || input.isTab
+					|| (input.useVerticalMode && (input.isVerticalModeOnlyChooseCandidateKey))
+			{
+				if input.isSpace {
+					// If the Space key is NOT set to be a selection key
+					if input.isShiftHold || !mgrPrefs.chooseCandidateUsingSpace {
+						if getBuilderCursorIndex() >= getBuilderLength() {
+							let composingBuffer = currentState.composingBuffer
+							if (composingBuffer.count) != 0 {
+								let committing = InputState.Committing(poppedText: composingBuffer)
+								stateCallback(committing)
+							}
+							clear()
+							let committing = InputState.Committing(poppedText: " ")
 							stateCallback(committing)
+							let empty = InputState.Empty()
+							stateCallback(empty)
+						} else if ifLangModelHasUnigrams(forKey: " ") {
+							insertReadingToBuilder(atCursor: " ")
+							let poppedText = _popOverflowComposingTextAndWalk()
+							let inputting = buildInputtingState()
+							inputting.poppedText = poppedText
+							stateCallback(inputting)
 						}
-						clear()
-						let committing = InputState.Committing(poppedText: " ")
-						stateCallback(committing)
-						let empty = InputState.Empty()
-						stateCallback(empty)
-					} else if ifLangModelHasUnigrams(forKey: " ") {
-						insertReadingToBuilder(atCursor: " ")
-						let poppedText = _popOverflowComposingTextAndWalk()
-						let inputting = buildInputtingState()
-						inputting.poppedText = poppedText
-						stateCallback(inputting)
+						return true
 					}
-					return true
 				}
+				let choosingCandidates = _buildCandidateState(
+					currentState,
+					useVerticalMode: input.useVerticalMode
+				)
+				stateCallback(choosingCandidates)
+				return true
 			}
-			let choosingCandidates = _buildCandidateState(
-				state as! InputState.NotEmpty,
-				useVerticalMode: input.useVerticalMode
-			)
-			stateCallback(choosingCandidates)
-			return true
 		}
 
 		// MARK: -
