@@ -421,15 +421,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     return array;
 }
 
-- (nullable InputState *)buildAssociatePhraseStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode
-{
-    NSArray<NSString *> *array = [self buildAssociatePhraseArrayWithKey:key];
-    if (array == nil || [array count] == 0)
-        return nil;
-    else
-        return [[InputStateAssociatedPhrases alloc] initWithCandidates:array useVerticalMode:useVerticalMode];
-}
-
 #pragma mark - 必須用 ObjCpp 處理的部分: Mandarin
 
 - (BOOL)chkKeyValidity:(UniChar)charCode

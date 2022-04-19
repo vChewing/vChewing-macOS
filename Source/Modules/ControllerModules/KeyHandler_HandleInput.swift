@@ -201,12 +201,12 @@ import Cocoa
 					if !mgrPrefs.associatedPhrasesEnabled {
 						stateCallback(InputState.Empty())
 					} else {
-						let associatedPhrases =
+						if let associatedPhrases =
 							buildAssociatePhraseState(
 								withKey: text,
 								useVerticalMode: input.useVerticalMode
-							) as? InputState.AssociatedPhrases
-						if let associatedPhrases = associatedPhrases {
+							), !associatedPhrases.candidates.isEmpty
+						{
 							stateCallback(associatedPhrases)
 						} else {
 							stateCallback(InputState.Empty())

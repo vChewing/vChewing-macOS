@@ -32,7 +32,7 @@ import Cocoa
 	// MARK: - 構築狀態（State Building）
 
 	func buildInputtingState() -> InputState.Inputting {
-		// 觸發資料封裝更新，否則下文拿到的數據會是錯的。
+		// 觸發資料封裝更新，否則下文拿到的資料會是過期的。
 		packageBufferStateMaterials()
 		// 獲取封裝好的資料
 		let composedText = getComposedText()
@@ -63,7 +63,7 @@ import Cocoa
 		return newState
 	}
 
-	// MARK: - 用以生成候選詞數組及狀態
+	// MARK: - 用以生成候選詞陣列及狀態
 
 	func _buildCandidateState(
 		_ currentState: InputState.NotEmpty,
@@ -80,7 +80,23 @@ import Cocoa
 		return state
 	}
 
-	// MARK: - 用以接收聯想詞數組且生成狀態
+	// MARK: - 用以接收聯想詞陣列且生成狀態
+
+	// 這次重寫時，針對「buildAssociatePhraseStateWithKey」這個（用以生成帶有
+	// 聯想詞候選清單的結果的狀態回呼的）函數進行了小幅度的重構處理，使其始終
+	// 可以從 ObjC 部分的「buildAssociatePhraseArray」函數獲取到一個內容類型
+	// 為「String」的標準 Swift 陣列。這樣一來，該聯想詞狀態回呼函數將始終能
+	// 夠傳回正確的結果形態、永遠也無法傳回 nil。於是，所有在用到該函數時以
+	// 回傳結果類型判斷作為合法性判斷依據的函數，全都將依據改為檢查傳回的陣列
+	// 是否為空：如果陣列為空的話，直接回呼一個空狀態。
+	func buildAssociatePhraseState(
+		withKey key: String!,
+		useVerticalMode: Bool
+	) -> InputState.AssociatedPhrases! {
+		// 上一行必須要用驚嘆號，否則 Xcode 會誤導你砍掉某些實際上必需的語句。
+		return InputState.AssociatedPhrases(
+			candidates: buildAssociatePhraseArray(withKey: key), useVerticalMode: useVerticalMode)
+	}
 
 	// MARK: - 用以處理就地新增自訂語彙時的行為
 
