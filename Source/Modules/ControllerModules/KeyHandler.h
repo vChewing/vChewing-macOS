@@ -59,8 +59,6 @@ struct BufferStatePackage
 - (void)fixNodeWithValue:(NSString *)value NS_SWIFT_NAME(fixNode(value:));
 - (void)clear;
 
-- (nullable InputState *)buildAssociatePhraseStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode;
-
 @property(strong, nonatomic) InputMode inputMode;
 @property(weak, nonatomic) id<KeyHandlerDelegate> delegate;
 
