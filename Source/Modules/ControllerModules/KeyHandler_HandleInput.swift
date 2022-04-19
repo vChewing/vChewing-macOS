@@ -80,8 +80,7 @@ import Cocoa
 			}
 
 			// Commit the entire input buffer.
-			let committingState = InputState.Committing(poppedText: inputText.lowercased())
-			stateCallback(committingState)
+			stateCallback(InputState.Committing(poppedText: inputText.lowercased()))
 			stateCallback(InputState.Empty())
 
 			return true
@@ -95,8 +94,7 @@ import Cocoa
 			{
 				clear()
 				stateCallback(InputState.Empty())
-				let committing = InputState.Committing(poppedText: inputText.lowercased())
-				stateCallback(committing)
+				stateCallback(InputState.Committing(poppedText: inputText.lowercased()))
 				stateCallback(InputState.Empty())
 				return true
 			}
@@ -113,10 +111,9 @@ import Cocoa
 		// MARK: Handle Associated Phrases.
 
 		if state is InputState.AssociatedPhrases {
-			let result = handleCandidate(
+			if handleCandidate(
 				state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
-			)
-			if result {
+			) {
 				return true
 			} else {
 				stateCallback(InputState.Empty())
@@ -150,8 +147,7 @@ import Cocoa
 			// update the composing buffer.
 			composeReading = checkWhetherToneMarkerConfirmsPhoneticReadingBuffer()
 			if !composeReading {
-				let inputting = buildInputtingState()
-				stateCallback(inputting)
+				stateCallback(buildInputtingState())
 				return true
 			}
 		}
@@ -166,8 +162,7 @@ import Cocoa
 			if !ifLangModelHasUnigrams(forKey: reading) {
 				IME.prtDebugIntel("B49C0979")
 				errorCallback()
-				let inputting = buildInputtingState()
-				stateCallback(inputting)
+				stateCallback(buildInputtingState())
 				return true
 			}
 
@@ -195,8 +190,7 @@ import Cocoa
 				if choosingCandidates.candidates.count == 1 {
 					clear()
 					let text: String = choosingCandidates.candidates.first ?? ""
-					let committing = InputState.Committing(poppedText: text)
-					stateCallback(committing)
+					stateCallback(InputState.Committing(poppedText: text))
 
 					if !mgrPrefs.associatedPhrasesEnabled {
 						stateCallback(InputState.Empty())
@@ -233,14 +227,11 @@ import Cocoa
 						if getBuilderCursorIndex() >= getBuilderLength() {
 							let composingBuffer = currentState.composingBuffer
 							if (composingBuffer.count) != 0 {
-								let committing = InputState.Committing(poppedText: composingBuffer)
-								stateCallback(committing)
+								stateCallback(InputState.Committing(poppedText: composingBuffer))
 							}
 							clear()
-							let committing = InputState.Committing(poppedText: " ")
-							stateCallback(committing)
-							let empty = InputState.Empty()
-							stateCallback(empty)
+							stateCallback(InputState.Committing(poppedText: " "))
+							stateCallback(InputState.Empty())
 						} else if ifLangModelHasUnigrams(forKey: " ") {
 							insertReadingToBuilder(atCursor: " ")
 							let poppedText = _popOverflowComposingTextAndWalk()
@@ -251,11 +242,7 @@ import Cocoa
 						return true
 					}
 				}
-				let choosingCandidates = buildCandidate(
-					state: currentState,
-					useVerticalMode: input.useVerticalMode
-				)
-				stateCallback(choosingCandidates)
+				stateCallback(buildCandidate(state: currentState, useVerticalMode: input.useVerticalMode))
 				return true
 			}
 		}
@@ -348,11 +335,7 @@ import Cocoa
 						let inputting = buildInputtingState()
 						inputting.poppedText = poppedText
 						stateCallback(inputting)
-						let choosingCandidate = buildCandidate(
-							state: inputting,
-							useVerticalMode: input.useVerticalMode
-						)
-						stateCallback(choosingCandidate)
+						stateCallback(buildCandidate(state: inputting, useVerticalMode: input.useVerticalMode))
 					} else {  // If there is still unfinished bpmf reading, ignore the punctuation
 						IME.prtDebugIntel("17446655")
 						errorCallback()
@@ -364,10 +347,7 @@ import Cocoa
 				// 於是這裡用「模擬一次 Enter 鍵的操作」使其代為執行這個 commit buffer 的動作。
 				// 這裡不需要該函數所傳回的 bool 結果，所以用「_ =」解消掉。
 				_ = handleEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
-				let root: SymbolNode! = SymbolNode.root
-				let symbolState =
-					InputState.SymbolTable(node: root, useVerticalMode: input.useVerticalMode)
-				stateCallback(symbolState)
+				stateCallback(InputState.SymbolTable(node: SymbolNode.root, useVerticalMode: input.useVerticalMode))
 				return true
 			}
 		}

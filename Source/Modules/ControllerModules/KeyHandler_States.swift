@@ -69,15 +69,12 @@ import Cocoa
 		state currentState: InputState.NotEmpty,
 		useVerticalMode: Bool
 	) -> InputState.ChoosingCandidate {
-		let candidatesArray = getCandidatesArray()
-
-		let state = InputState.ChoosingCandidate(
+		InputState.ChoosingCandidate(
 			composingBuffer: currentState.composingBuffer,
 			cursorIndex: currentState.cursorIndex,
-			candidates: candidatesArray,
+			candidates: getCandidatesArray(),
 			useVerticalMode: useVerticalMode
 		)
-		return state
 	}
 
 	// MARK: - 用以接收聯想詞陣列且生成狀態
@@ -94,7 +91,7 @@ import Cocoa
 		useVerticalMode: Bool
 	) -> InputState.AssociatedPhrases! {
 		// 上一行必須要用驚嘆號，否則 Xcode 會誤導你砍掉某些實際上必需的語句。
-		return InputState.AssociatedPhrases(
+		InputState.AssociatedPhrases(
 			candidates: buildAssociatePhraseArray(withKey: key), useVerticalMode: useVerticalMode)
 	}
 
@@ -107,8 +104,7 @@ import Cocoa
 		errorCallback: @escaping () -> Void
 	) -> Bool {
 		if input.isESC {
-			let inputting = buildInputtingState()
-			stateCallback(inputting)
+			stateCallback(buildInputtingState())
 			return true
 		}
 
@@ -121,9 +117,7 @@ import Cocoa
 					return true
 				}
 			}
-
-			let inputting = buildInputtingState()
-			stateCallback(inputting)
+			stateCallback(buildInputtingState())
 			return true
 		}
 
@@ -139,13 +133,7 @@ import Cocoa
 					readings: state.readings
 				)
 				marking.tooltipForInputting = state.tooltipForInputting
-
-				if marking.markedRange.length == 0 {
-					let inputting = marking.convertToInputting()
-					stateCallback(inputting)
-				} else {
-					stateCallback(marking)
-				}
+				stateCallback(marking.markedRange.length == 0 ? marking.convertToInputting() : marking)
 			} else {
 				IME.prtDebugIntel("1149908D")
 				errorCallback()
@@ -168,12 +156,7 @@ import Cocoa
 					readings: state.readings
 				)
 				marking.tooltipForInputting = state.tooltipForInputting
-				if marking.markedRange.length == 0 {
-					let inputting = marking.convertToInputting()
-					stateCallback(inputting)
-				} else {
-					stateCallback(marking)
-				}
+				stateCallback(marking.markedRange.length == 0 ? marking.convertToInputting() : marking)
 			} else {
 				IME.prtDebugIntel("9B51408D")
 				errorCallback()
@@ -212,11 +195,8 @@ import Cocoa
 				if candidateState.candidates.count == 1 {
 					clear()
 					if let strPoppedText: String = candidateState.candidates.first {
-						let committing =
-							InputState.Committing(poppedText: strPoppedText) as InputState.Committing
-						stateCallback(committing)
-						let empty = InputState.Empty()
-						stateCallback(empty)
+						stateCallback(InputState.Committing(poppedText: strPoppedText) as InputState.Committing)
+						stateCallback(InputState.Empty())
 					} else {
 						stateCallback(candidateState)
 					}
@@ -236,7 +216,7 @@ import Cocoa
 
 	// MARK: - Enter 鍵處理
 
-	@discardableResult func handleEnter(
+	func handleEnter(
 		state: InputState,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback _: @escaping () -> Void
@@ -248,14 +228,10 @@ import Cocoa
 		clear()
 
 		if let current = state as? InputState.Inputting {
-			let composingBuffer = current.composingBuffer
-
-			let committing = InputState.Committing(poppedText: composingBuffer)
-			stateCallback(committing)
+			stateCallback(InputState.Committing(poppedText: current.composingBuffer))
 		}
 
-		let empty = InputState.Empty()
-		stateCallback(empty)
+		stateCallback(InputState.Empty())
 		return true
 	}
 
@@ -278,10 +254,8 @@ import Cocoa
 
 		clear()
 
-		let committing = InputState.Committing(poppedText: composingBuffer)
-		stateCallback(committing)
-		let empty = InputState.Empty()
-		stateCallback(empty)
+		stateCallback(InputState.Committing(poppedText: composingBuffer))
+		stateCallback(InputState.Empty())
 		return true
 	}
 
@@ -311,11 +285,9 @@ import Cocoa
 		}
 
 		if isPhoneticReadingBufferEmpty(), getBuilderLength() == 0 {
-			let empty = InputState.EmptyIgnoringPreviousState()
-			stateCallback(empty)
+			stateCallback(InputState.EmptyIgnoringPreviousState())
 		} else {
-			let inputting = buildInputtingState()
-			stateCallback(inputting)
+			stateCallback(buildInputtingState())
 		}
 		return true
 	}
@@ -338,8 +310,7 @@ import Cocoa
 				let inputting = buildInputtingState()
 				// 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
 				if !inputting.composingBuffer.isEmpty {
-					let empty = InputState.EmptyIgnoringPreviousState()
-					stateCallback(empty)
+					stateCallback(InputState.EmptyIgnoringPreviousState())
 				} else {
 					stateCallback(inputting)
 				}
@@ -395,8 +366,7 @@ import Cocoa
 
 		if getBuilderCursorIndex() != 0 {
 			setBuilderCursorIndex(0)
-			let inputting = buildInputtingState()
-			stateCallback(inputting)
+			stateCallback(buildInputtingState())
 		} else {
 			IME.prtDebugIntel("66D97F90")
 			errorCallback()
@@ -426,8 +396,7 @@ import Cocoa
 
 		if getBuilderCursorIndex() != getBuilderLength() {
 			setBuilderCursorIndex(getBuilderLength())
-			let inputting = buildInputtingState()
-			stateCallback(inputting)
+			stateCallback(buildInputtingState())
 		} else {
 			IME.prtDebugIntel("9B69908E")
 			errorCallback()
@@ -454,18 +423,15 @@ import Cocoa
 			// is by default in macOS 10.0-10.5 built-in Panasonic Hanin and later macOS Zhuyin.
 			// Some Windows users hate this design, hence the option here to disable it.
 			clear()
-			let empty = InputState.EmptyIgnoringPreviousState()
-			stateCallback(empty)
+			stateCallback(InputState.EmptyIgnoringPreviousState())
 		} else {
 			// If reading is not empty, we cancel the reading.
 			if !isPhoneticReadingBufferEmpty() {
 				clearPhoneticReadingBuffer()
 				if getBuilderLength() == 0 {
-					let empty = InputState.Empty()
-					stateCallback(empty)
+					stateCallback(InputState.Empty())
 				} else {
-					let inputting = buildInputtingState()
-					stateCallback(inputting)
+					stateCallback(buildInputtingState())
 				}
 			}
 		}
@@ -511,8 +477,7 @@ import Cocoa
 			} else {
 				if getBuilderCursorIndex() < getBuilderLength() {
 					setBuilderCursorIndex(getBuilderCursorIndex() + 1)
-					let inputting = buildInputtingState()
-					stateCallback(inputting)
+					stateCallback(buildInputtingState())
 				} else {
 					IME.prtDebugIntel("A96AAD58")
 					errorCallback()
@@ -563,8 +528,7 @@ import Cocoa
 			} else {
 				if getBuilderCursorIndex() > 0 {
 					setBuilderCursorIndex(getBuilderCursorIndex() - 1)
-					let inputting = buildInputtingState()
-					stateCallback(inputting)
+					stateCallback(buildInputtingState())
 				} else {
 					IME.prtDebugIntel("7045E6F3")
 					errorCallback()
