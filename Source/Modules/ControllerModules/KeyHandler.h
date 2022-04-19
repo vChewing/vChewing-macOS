@@ -74,6 +74,7 @@ struct BufferStatePackage
 - (BOOL)ifLangModelHasUnigramsForKey:(NSString *)reading;
 - (BOOL)isPhoneticReadingBufferEmpty;
 - (BOOL)isPrintable:(UniChar)charCode;
+- (NSArray<NSString *> *)buildAssociatePhraseArrayWithKey:(NSString *)key;
 - (NSArray<NSString *> *)getCandidatesArray;
 - (NSInteger)getBuilderCursorIndex;
 - (NSInteger)getBuilderLength;

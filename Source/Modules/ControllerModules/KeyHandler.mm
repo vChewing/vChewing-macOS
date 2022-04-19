@@ -405,23 +405,29 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 }
 
 // NON-SWIFTIFIABLE
-- (nullable InputState *)buildAssociatePhraseStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode
+- (NSArray<NSString *> *)buildAssociatePhraseArrayWithKey:(NSString *)key
 {
+    NSMutableArray<NSString *> *array = [NSMutableArray array];
     std::string cppKey = std::string(key.UTF8String);
     if (_languageModel->hasAssociatedPhrasesForKey(cppKey))
     {
         std::vector<std::string> phrases = _languageModel->associatedPhrasesForKey(cppKey);
-        NSMutableArray<NSString *> *array = [NSMutableArray array];
         for (auto phrase : phrases)
         {
             NSString *item = [[NSString alloc] initWithUTF8String:phrase.c_str()];
             [array addObject:item];
         }
-        InputStateAssociatedPhrases *associatedPhrases =
-            [[InputStateAssociatedPhrases alloc] initWithCandidates:array useVerticalMode:useVerticalMode];
-        return associatedPhrases;
     }
-    return nil;
+    return array;
+}
+
+- (nullable InputState *)buildAssociatePhraseStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode
+{
+    NSArray<NSString *> *array = [self buildAssociatePhraseArrayWithKey:key];
+    if (array == nil || [array count] == 0)
+        return nil;
+    else
+        return [[InputStateAssociatedPhrases alloc] initWithCandidates:array useVerticalMode:useVerticalMode];
 }
 
 #pragma mark - 必須用 ObjCpp 處理的部分: Mandarin
