@@ -63,7 +63,7 @@ import Cocoa
 		return newState
 	}
 
-	// MARK: - 用以生成候選詞數組
+	// MARK: - 用以生成候選詞數組及狀態
 
 	func _buildCandidateState(
 		_ currentState: InputState.NotEmpty,
@@ -79,6 +79,8 @@ import Cocoa
 		)
 		return state
 	}
+
+	// MARK: - 用以接收聯想詞數組且生成狀態
 
 	// MARK: - 用以處理就地新增自訂語彙時的行為
 
