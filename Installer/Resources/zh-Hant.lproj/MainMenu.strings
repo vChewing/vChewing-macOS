@@ -58,7 +58,7 @@
 
 /* Class = "NSTextFieldCell"; title = "McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.\nvChewing macOS Development: Shiki Suen, Hiraku Wang, etc.
 vChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "VW8-s5-Wpn"; */
-"VW8-s5-Wpn.title" = "小麥注音引擎研發：Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, 等。\n威注音 macOS 程式研發：Shiki Suen, Hiraku Wang, 等。\n威注音詞庫維護：Shiki Suen。";
+"VW8-s5-Wpn.title" = "小麥注音引擎研發：Mengjuei Hsieh, 劉燈, 楊維中, 等。\n威注音 macOS 程式研發：Shiki Suen, Hiraku Wang, 等。\n威注音詞庫維護：Shiki Suen。";
 
 /* Class = "NSTextFieldCell"; title = "Placeholder for showing copyright information."; ObjectID = "eo3-TK-0rB"; */
 // "eo3-TK-0rB.title" = "Placeholder for showing copyright information.";

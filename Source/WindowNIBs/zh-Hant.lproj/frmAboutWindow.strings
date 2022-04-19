@@ -24,4 +24,4 @@
 // "lblCopyright.title" = "© 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project.";
 
 /* Class = "NSTextFieldCell"; title = "McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.\nvChewing macOS Development: Shiki Suen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "lblCredits"; */
-"lblCredits.title" = "小麥注音引擎研發：Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, 等。\n威注音 macOS 程式研發：Shiki Suen, Hiraku Wang, 等。\n威注音詞庫維護：Shiki Suen。";
+"lblCredits.title" = "小麥注音引擎研發：Mengjuei Hsieh, 劉燈, 楊維中, 等。\n威注音 macOS 程式研發：Shiki Suen, Hiraku Wang, 等。\n威注音詞庫維護：Shiki Suen。";

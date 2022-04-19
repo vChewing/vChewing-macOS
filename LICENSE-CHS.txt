@@ -3,7 +3,7 @@
 vChewing macOS: MIT-NTL License 麻理（去商标）授权合约
 
 © 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project.
-小麦注音引擎研发：Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, 等。
+小麦注音引擎研发：Mengjuei Hsieh, 刘灯, 杨维中, 等。
 威注音 macOS 程式研发：Shiki Suen, Hiraku Wang, 等。
 威注音词库维护：Shiki Suen。
 

@@ -3,7 +3,7 @@
 vChewing macOS: ＭＩＴ商標不許可ライセンス (MIT-NTL License)
 
 © 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project.
-小麦注音入力エンジン開発：Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, など。
+小麦注音入力エンジン開発：Mengjuei Hsieh, 劉燈, 楊維中, など。
 macOS 版威注音の開発：Hiraku Wang, Shiki Suen, など。
 威注音語彙データの維持：Shiki Suen。
 
