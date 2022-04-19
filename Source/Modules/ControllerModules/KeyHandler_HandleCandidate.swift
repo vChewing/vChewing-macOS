@@ -29,8 +29,8 @@ import Cocoa
 // MARK: - § Handle Candidate State.
 
 @objc extension KeyHandler {
-	func _handleCandidateState(
-		_ state: InputState,
+	func handleCandidate(
+		state: InputState,
 		input: InputHandler,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback: @escaping () -> Void

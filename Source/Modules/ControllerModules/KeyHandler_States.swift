@@ -65,8 +65,8 @@ import Cocoa
 
 	// MARK: - 用以生成候選詞陣列及狀態
 
-	func _buildCandidateState(
-		_ currentState: InputState.NotEmpty,
+	func buildCandidate(
+		state currentState: InputState.NotEmpty,
 		useVerticalMode: Bool
 	) -> InputState.ChoosingCandidate {
 		let candidatesArray = getCandidatesArray()
@@ -100,7 +100,7 @@ import Cocoa
 
 	// MARK: - 用以處理就地新增自訂語彙時的行為
 
-	func _handleMarkingState(
+	func handleMarkingState(
 		_ state: InputState.Marking,
 		input: InputHandler,
 		stateCallback: @escaping (InputState) -> Void,
@@ -186,7 +186,7 @@ import Cocoa
 
 	// MARK: - 標點輸入處理
 
-	func _handlePunctuation(
+	func handlePunctuation(
 		_ customPunctuation: String,
 		state: InputState,
 		usingVerticalMode useVerticalMode: Bool,
@@ -205,8 +205,9 @@ import Cocoa
 			stateCallback(inputting)
 
 			if mgrPrefs.useSCPCTypingMode, isPhoneticReadingBufferEmpty() {
-				let candidateState = _buildCandidateState(
-					inputting, useVerticalMode: useVerticalMode
+				let candidateState = buildCandidate(
+					state: inputting,
+					useVerticalMode: useVerticalMode
 				)
 				if candidateState.candidates.count == 1 {
 					clear()
@@ -235,8 +236,8 @@ import Cocoa
 
 	// MARK: - Enter 鍵處理
 
-	@discardableResult func _handleEnterWithState(
-		_ state: InputState,
+	@discardableResult func handleEnter(
+		state: InputState,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback _: @escaping () -> Void
 	) -> Bool {
@@ -260,8 +261,8 @@ import Cocoa
 
 	// MARK: - CMD+Enter 鍵處理
 
-	func _handleCtrlCommandEnterWithState(
-		_ state: InputState,
+	func handleCtrlCommandEnter(
+		state: InputState,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback _: @escaping () -> Void
 	) -> Bool {
@@ -286,8 +287,8 @@ import Cocoa
 
 	// MARK: - 處理 Backspace (macOS Delete) 按鍵行為
 
-	func _handleBackspaceWithState(
-		_ state: InputState,
+	func handleBackspace(
+		state: InputState,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback: @escaping () -> Void
 	) -> Bool {
@@ -321,8 +322,8 @@ import Cocoa
 
 	// MARK: - 處理 PC Delete (macOS Fn+BackSpace) 按鍵行為
 
-	func _handleDeleteWithState(
-		_ state: InputState,
+	func handleDelete(
+		state: InputState,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback: @escaping () -> Void
 	) -> Bool {
@@ -358,8 +359,8 @@ import Cocoa
 
 	// MARK: - 處理與當前文字輸入排版前後方向呈 90 度的那兩個方向鍵的按鍵行為
 
-	func _handleAbsorbedArrowKeyWithState(
-		_ state: InputState,
+	func handleAbsorbedArrowKey(
+		state: InputState,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback: @escaping () -> Void
 	) -> Bool {
@@ -376,8 +377,8 @@ import Cocoa
 
 	// MARK: - 處理 Home 鍵行為
 
-	func _handleHomeWithState(
-		_ state: InputState,
+	func handleHome(
+		state: InputState,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback: @escaping () -> Void
 	) -> Bool {
@@ -407,8 +408,8 @@ import Cocoa
 
 	// MARK: - 處理 End 鍵行為
 
-	func _handleEndWithState(
-		_ state: InputState,
+	func handleEnd(
+		state: InputState,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback: @escaping () -> Void
 	) -> Bool {
@@ -438,8 +439,8 @@ import Cocoa
 
 	// MARK: - 處理 Esc 鍵行為
 
-	func _handleEscWithState(
-		_ state: InputState,
+	func handleEsc(
+		state: InputState,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback _: @escaping () -> Void
 	) -> Bool {
@@ -473,8 +474,8 @@ import Cocoa
 
 	// MARK: - 處理向前方向鍵的行為
 
-	func _handleForwardWithState(
-		_ state: InputState,
+	func handleForward(
+		state: InputState,
 		input: InputHandler,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback: @escaping () -> Void
@@ -525,8 +526,8 @@ import Cocoa
 
 	// MARK: - 處理向後方向鍵的行為
 
-	func _handleBackwardWithState(
-		_ state: InputState,
+	func handleBackward(
+		state: InputState,
 		input: InputHandler,
 		stateCallback: @escaping (InputState) -> Void,
 		errorCallback: @escaping () -> Void
