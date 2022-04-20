@@ -24,7 +24,7 @@
 "10.title" = "漢語拼音二式（字母拼音＋數字標調）";
 
 /* Class = "NSTextFieldCell"; title = "BPMF Parser:"; ObjectID = "12"; */
-"12.title" = "注音配列:";
+"12.title" = "注音排列:";
 
 /* Class = "NSTextFieldCell"; title = "Choose the cursor position where you want to list possible candidates."; ObjectID = "14"; */
 "14.title" = "用以觸發選字的游標相對位置：";
@@ -141,7 +141,7 @@
 "QUQ-oY-4Hc.label" = "一般";
 
 /* Class = "NSTextFieldCell"; title = "Choose your preferred keyboard layout and phonetic parser."; ObjectID = "RQ6-MS-m4C"; */
-"RQ6-MS-m4C.title" = "選擇您所偏好的系統鍵盤佈局與注音分析器配列。";
+"RQ6-MS-m4C.title" = "選擇您所偏好的系統鍵盤佈局與注音分析器排列。";
 
 /* Class = "NSButtonCell"; title = "Push the cursor to the front of the phrase after selection"; ObjectID = "RUG-ls-KyA"; */
 "RUG-ls-KyA.title" = "在選字後將游標置於該字詞的前方";
@@ -201,7 +201,7 @@
 "2iG-Ic-gbl.label" = "辭典";
 
 /* Class = "NSTextFieldCell"; title = "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional."; ObjectID = "wQ9-px-b07"; */
-"wQ9-px-b07.title" = "Apple 動態注音鍵盤佈局（大千與倚天）要求普通話/國音分析器的注音配列得配置為大千配列。";
+"wQ9-px-b07.title" = "Apple 動態注音鍵盤佈局（大千與倚天）要求普通話/國音分析器的注音排列得配置為大千排列。";
 
 /* Class = "NSTextFieldCell"; title = "Choose the behavior of (Shift+)Tab key in the candidate window."; ObjectID = "ueU-Rz-a1C"; */
 "ueU-Rz-a1C.title" = "指定 (Shift+)Tab 熱鍵在選字窗內的輪替操作對象。";
