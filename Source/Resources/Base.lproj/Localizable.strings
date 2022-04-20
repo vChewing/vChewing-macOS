@@ -56,6 +56,9 @@
 "Symbol & Emoji Input" = "Symbol & Emoji Input";
 "Edit User Symbol & Emoji Data…" = "Edit User Symbol & Emoji Data…";
 "Choose your desired user data folder." = "Choose your desired user data folder.";
+"Cursor is after \"%@\"." = "Cursor is after \"%@\".";
+"Cursor is before \"%@\"." = "Cursor is before \"%@\".";
+"Cursor is between \"%@\" and \"%@\"." = "Cursor is between \"%@\" and \"%@\".";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "CommonSymbols";
