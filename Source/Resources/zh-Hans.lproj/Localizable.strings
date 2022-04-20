@@ -133,7 +133,7 @@
 "Space & ESC Key:" = "ESC 与空格键:";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+空格键 换下一页，空格键 换选下一个后选字";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "空格键 换下一页，Shift+空格键 换选下一个后选字";
-"Stop farting (when typed phonetic combination is invalid, etc.)" = "不要放屁 // 例：当输入的音韵有误时，等";
+"Stop farting (when typed phonetic combination is invalid, etc.)" = "廉耻模式 // 取消勾选的话，敲错字时会有异音";
 "to the front of the phrase (like Matsushita Hanin IME)" = "将游标置于词语前方 // 松下汉音风格";
 "to the rear of the phrase (like MS New-Phonetic IME)" = "将游标置于词语后方 // 微软新注音风格";
 "Traditional Chinese" = "繁体中文";
