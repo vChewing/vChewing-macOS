@@ -120,10 +120,10 @@
 "ArK-Vk-OoT.title" = "漢字１つづつ全候補選択入力モード";
 
 /* Class = "NSButtonCell"; title = "Auto-convert traditional Chinese glyphs to KangXi characters"; ObjectID = "BSK-bH-Gct"; */
-"BSK-bH-Gct.title" = "自動的に繁体漢字を康熙文字と変換する";
+"BSK-bH-Gct.title" = "入力した繁体字を康熙字体と自動変換";
 
 /* Class = "NSButtonCell"; title = "Auto-convert traditional Chinese glyphs to KangXi characters"; ObjectID = "eia-1F-Do0"; */
-"eia-1F-Do0.title" = "自動的に繁体漢字をJIS 新字体と変換する";
+"eia-1F-Do0.title" = "入力した繁体字を日文 JIS 新字体と自動変換";
 
 /* Class = "NSBox"; title = "Advanced Settings"; ObjectID = "E1l-m8-xgb"; */
 "E1l-m8-xgb.title" = "詳細設定";

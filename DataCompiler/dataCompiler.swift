@@ -102,7 +102,7 @@ private let urlMiscNonKanji: String = "./components/common/char-misc-nonkanji.tx
 private let urlOutputCHS: String = "./data-chs.txt"
 private let urlOutputCHT: String = "./data-cht.txt"
 
-// MARK: - 載入詞組檔案且輸出數組
+// MARK: - 載入詞組檔案且輸出陣列
 
 func rawDictForPhrases(isCHS: Bool) -> [Entry] {
 	var arrEntryRAW: [Entry] = []
@@ -181,7 +181,7 @@ func rawDictForPhrases(isCHS: Bool) -> [Entry] {
 	return arrEntryRAW
 }
 
-// MARK: - 載入單字檔案且輸出數組
+// MARK: - 載入單字檔案且輸出陣列
 
 func rawDictForKanjis(isCHS: Bool) -> [Entry] {
 	var arrEntryRAW: [Entry] = []
@@ -258,7 +258,7 @@ func rawDictForKanjis(isCHS: Bool) -> [Entry] {
 	return arrEntryRAW
 }
 
-// MARK: - 載入非漢字檔案且輸出數組
+// MARK: - 載入非漢字檔案且輸出陣列
 
 func rawDictForNonKanjis(isCHS: Bool) -> [Entry] {
 	var arrEntryRAW: [Entry] = []

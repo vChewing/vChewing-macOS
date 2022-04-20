@@ -626,8 +626,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
 				if mgrPrefs.associatedPhrasesEnabled,
 					let associatePhrases = keyHandler.buildAssociatePhraseState(
 						withKey: composingBuffer, useVerticalMode: state.useVerticalMode
-					)
-						as? InputState.AssociatedPhrases
+					), !associatePhrases.candidates.isEmpty
 				{
 					handle(state: associatePhrases, client: client)
 				} else {
@@ -645,8 +644,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
 			if mgrPrefs.associatedPhrasesEnabled,
 				let associatePhrases = keyHandler.buildAssociatePhraseState(
 					withKey: selectedValue, useVerticalMode: state.useVerticalMode
-				)
-					as? InputState.AssociatedPhrases
+				), !associatePhrases.candidates.isEmpty
 			{
 				handle(state: associatePhrases, client: client)
 			} else {

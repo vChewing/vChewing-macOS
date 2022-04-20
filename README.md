@@ -66,7 +66,7 @@
 
 ## 應用授權
 
-小麥注音引擎程式版權（MIT 授權）：© 2011-2021 OpenVanilla 專案團隊。
+小麥注音引擎程式版權（MIT 授權）：© 2011-2021 OpenVanilla 專案團隊（Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, 等）。
 
 威注音輸入法 macOS 版以 MIT-NTL License 授權釋出 (與 MIT 相容)：© 2021-2022 vChewing 專案。
 

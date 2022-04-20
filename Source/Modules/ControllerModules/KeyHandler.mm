@@ -167,7 +167,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 // NON-SWIFTIFIABLE
 - (void)fixNodeWithValue:(NSString *)value
 {
-    NSInteger cursorIndex = [self _actualCandidateCursorIndex];
+    NSInteger cursorIndex = [self getActualCandidateCursorIndex];
     std::string stringValue(value.UTF8String);
     Gramambular::NodeAnchor selectedNode = _builder->grid().fixNodeSelectedCandidate(cursorIndex, stringValue);
     if (!mgrPrefs.useSCPCTypingMode)
@@ -405,23 +405,20 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 }
 
 // NON-SWIFTIFIABLE
-- (nullable InputState *)buildAssociatePhraseStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode
+- (NSArray<NSString *> *)buildAssociatePhraseArrayWithKey:(NSString *)key
 {
+    NSMutableArray<NSString *> *array = [NSMutableArray array];
     std::string cppKey = std::string(key.UTF8String);
     if (_languageModel->hasAssociatedPhrasesForKey(cppKey))
     {
         std::vector<std::string> phrases = _languageModel->associatedPhrasesForKey(cppKey);
-        NSMutableArray<NSString *> *array = [NSMutableArray array];
         for (auto phrase : phrases)
         {
             NSString *item = [[NSString alloc] initWithUTF8String:phrase.c_str()];
             [array addObject:item];
         }
-        InputStateAssociatedPhrases *associatedPhrases =
-            [[InputStateAssociatedPhrases alloc] initWithCandidates:array useVerticalMode:useVerticalMode];
-        return associatedPhrases;
     }
-    return nil;
+    return array;
 }
 
 #pragma mark - 必須用 ObjCpp 處理的部分: Mandarin
@@ -558,6 +555,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
 - (void)dealWithOverrideModelSuggestions
 {
+    // 讓 grid 知道目前的游標候選字判定是前置還是後置
+    _builder->grid().setHaninInputEnabled(!mgrPrefs.selectPhraseAfterCursorAsCandidate);
     // 這一整段都太 C++ 且只出現一次，就整個端過來了。
     // 拆開封裝的話，只會把問題搞得更麻煩而已。
     std::string overrideValue = (mgrPrefs.useSCPCTypingMode)
@@ -567,7 +566,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     if (!overrideValue.empty())
     {
-        NSInteger cursorIndex = [self _actualCandidateCursorIndex];
+        NSInteger cursorIndex = [self getActualCandidateCursorIndex];
         std::vector<Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
         double highestScore = FindHighestScore(nodes, kEpsilon);
         _builder->grid().overrideNodeScoreForSelectedCandidate(cursorIndex, overrideValue,
@@ -602,9 +601,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
 - (NSArray<NSString *> *)getCandidatesArray
 {
+    // 讓 grid 知道目前的游標候選字判定是前置還是後置
+    _builder->grid().setHaninInputEnabled(!mgrPrefs.selectPhraseAfterCursorAsCandidate);
+
     NSMutableArray<NSString *> *candidatesArray = [[NSMutableArray alloc] init];
 
-    NSInteger cursorIndex = [self _actualCandidateCursorIndex];
+    NSInteger cursorIndex = [self getActualCandidateCursorIndex];
     std::vector<Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
 
     // sort the nodes, so that longer nodes (representing longer phrases) are placed at the top of the candidate list

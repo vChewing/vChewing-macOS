@@ -59,8 +59,6 @@ struct BufferStatePackage
 - (void)fixNodeWithValue:(NSString *)value NS_SWIFT_NAME(fixNode(value:));
 - (void)clear;
 
-- (nullable InputState *)buildAssociatePhraseStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode;
-
 @property(strong, nonatomic) InputMode inputMode;
 @property(weak, nonatomic) id<KeyHandlerDelegate> delegate;
 
@@ -74,6 +72,7 @@ struct BufferStatePackage
 - (BOOL)ifLangModelHasUnigramsForKey:(NSString *)reading;
 - (BOOL)isPhoneticReadingBufferEmpty;
 - (BOOL)isPrintable:(UniChar)charCode;
+- (NSArray<NSString *> *)buildAssociatePhraseArrayWithKey:(NSString *)key;
 - (NSArray<NSString *> *)getCandidatesArray;
 - (NSInteger)getBuilderCursorIndex;
 - (NSInteger)getBuilderLength;
