@@ -120,7 +120,7 @@
 "ArK-Vk-OoT.title" = "模擬 90 年代前期注音逐字選字輸入風格";
 
 /* Class = "NSButtonCell"; title = "Auto-convert traditional Chinese glyphs to KangXi characters"; ObjectID = "BSK-bH-Gct"; */
-"BSK-bH-Gct.title" = "自動將繁體中文字轉換為康熙字";
+"BSK-bH-Gct.title" = "自動將繁體中文字轉換為康熙正體字";
 
 /* Class = "NSButtonCell"; title = "Auto-convert traditional Chinese glyphs to KangXi characters"; ObjectID = "eia-1F-Do0"; */
 "eia-1F-Do0.title" = "自動將繁體中文字轉換為日本簡化字（JIS 新字體）";
