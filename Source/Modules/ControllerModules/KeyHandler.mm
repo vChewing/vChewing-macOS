@@ -555,6 +555,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
 - (void)dealWithOverrideModelSuggestions
 {
+    // 讓 grid 知道目前的游標候選字判定是前置還是後置
+    _builder->grid().setHaninInputEnabled(!mgrPrefs.selectPhraseAfterCursorAsCandidate);
     // 這一整段都太 C++ 且只出現一次，就整個端過來了。
     // 拆開封裝的話，只會把問題搞得更麻煩而已。
     std::string overrideValue = (mgrPrefs.useSCPCTypingMode)
@@ -599,6 +601,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
 - (NSArray<NSString *> *)getCandidatesArray
 {
+    // 讓 grid 知道目前的游標候選字判定是前置還是後置
+    _builder->grid().setHaninInputEnabled(!mgrPrefs.selectPhraseAfterCursorAsCandidate);
+
     NSMutableArray<NSString *> *candidatesArray = [[NSMutableArray alloc] init];
 
     NSInteger cursorIndex = [self getActualCandidateCursorIndex];
