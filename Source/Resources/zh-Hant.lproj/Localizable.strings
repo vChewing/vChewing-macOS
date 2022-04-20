@@ -133,7 +133,7 @@
 "Space & ESC Key:" = "ESC 與空格鍵:";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+空格鍵 換下一頁，空格鍵 換選下一個後選字";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "空格鍵 換下一頁，Shift+空格鍵 換選下一個後選字";
-"Stop farting (when typed phonetic combination is invalid, etc.)" = "不要放屁 // 例：當輸入的音韻有誤時，等";
+"Stop farting (when typed phonetic combination is invalid, etc.)" = "廉恥模式 // 取消勾選的話，敲錯字時會有異音";
 "to the front of the phrase (like Matsushita Hanin IME)" = "將游標置於詞語前方 // 松下漢音風格";
 "to the rear of the phrase (like MS New-Phonetic IME)" = "將游標置於詞語後方 // 微軟新注音風格";
 "Traditional Chinese" = "繁體中文";

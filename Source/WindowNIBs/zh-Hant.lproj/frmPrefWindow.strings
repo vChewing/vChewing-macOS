@@ -111,7 +111,7 @@
 "2pS-nv-te4.title" = "選擇您所偏好的用來選字的按鍵組合。";
 
 /* Class = "NSButtonCell"; title = "Stop farting (when typed phonetic combination is invalid, etc.)"; ObjectID = "62u-jY-BRh"; */
-"62u-jY-BRh.title" = "不要放屁 // 例：當輸入的音韻有誤時，等";
+"62u-jY-BRh.title" = "廉恥模式 // 取消勾選的話，敲錯字時會有異音";
 
 /* Class = "NSTextFieldCell"; title = "UI language setting:"; ObjectID = "9DS-Rc-TXq"; */
 "9DS-Rc-TXq.title" = "介面語言設定:";
