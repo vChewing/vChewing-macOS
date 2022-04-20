@@ -657,8 +657,9 @@
                     <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="Ckk-yw-fiv">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-                        <rect key="contentRect" x="89" y="664" width="480" height="270"/>
+                        <rect key="contentRect" x="89" y="664" width="640" height="480"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+                        <value key="minSize" type="size" width="640" height="480"/>
                         <connections>
                             <outlet property="delegate" destination="jGA-0Y-lOj" id="98r-iN-zZc"/>
                         </connections>
@@ -686,12 +687,12 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" usesFontPanel="YES" usesInspectorBar="YES" findStyle="panel" allowsUndo="YES" textCompletion="NO" id="E0u-iA-KeT">
-                                            <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="480" height="540"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             <size key="minSize" width="480" height="270"/>
-                                            <size key="maxSize" width="490" height="10000000"/>
+                                            <size key="maxSize" width="800" height="10000000"/>
                                             <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                             <connections>
                                                 <binding destination="5gI-5U-AMq" name="value" keyPath="representedObject.contentString" id="Hfd-3x-ikM">

@@ -33,7 +33,7 @@ import Cocoa
 		mgrPrefs.mandarinParserName + "_"
 	}
 
-	func _actualCandidateCursorIndex() -> Int {
+	func getActualCandidateCursorIndex() -> Int {
 		var cursorIndex = getBuilderCursorIndex()
 		// MS Phonetics IME style, phrase is *after* the cursor.
 		// (i.e. the cursor is always *before* the phrase.)

@@ -80,8 +80,7 @@ import Cocoa
 			}
 
 			// Commit the entire input buffer.
-			let committingState = InputState.Committing(poppedText: inputText.lowercased())
-			stateCallback(committingState)
+			stateCallback(InputState.Committing(poppedText: inputText.lowercased()))
 			stateCallback(InputState.Empty())
 
 			return true
@@ -95,8 +94,7 @@ import Cocoa
 			{
 				clear()
 				stateCallback(InputState.Empty())
-				let committing = InputState.Committing(poppedText: inputText.lowercased())
-				stateCallback(committing)
+				stateCallback(InputState.Committing(poppedText: inputText.lowercased()))
 				stateCallback(InputState.Empty())
 				return true
 			}
@@ -105,18 +103,17 @@ import Cocoa
 		// MARK: Handle Candidates.
 
 		if state is InputState.ChoosingCandidate {
-			return _handleCandidateState(
-				state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
+			return handleCandidate(
+				state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
 			)
 		}
 
 		// MARK: Handle Associated Phrases.
 
 		if state is InputState.AssociatedPhrases {
-			let result = _handleCandidateState(
-				state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
-			)
-			if result {
+			if handleCandidate(
+				state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
+			) {
 				return true
 			} else {
 				stateCallback(InputState.Empty())
@@ -125,16 +122,13 @@ import Cocoa
 
 		// MARK: Handle Marking.
 
-		if state is InputState.Marking {
-			let marking = state as! InputState.Marking
-
-			if _handleMarkingState(
-				state as! InputState.Marking, input: input, stateCallback: stateCallback,
+		if let marking = state as? InputState.Marking {
+			if handleMarkingState(
+				marking, input: input, stateCallback: stateCallback,
 				errorCallback: errorCallback
 			) {
 				return true
 			}
-
 			state = marking.convertToInputting()
 			stateCallback(state)
 		}
@@ -153,8 +147,7 @@ import Cocoa
 			// update the composing buffer.
 			composeReading = checkWhetherToneMarkerConfirmsPhoneticReadingBuffer()
 			if !composeReading {
-				let inputting = buildInputtingState()
-				stateCallback(inputting)
+				stateCallback(buildInputtingState())
 				return true
 			}
 		}
@@ -169,8 +162,7 @@ import Cocoa
 			if !ifLangModelHasUnigrams(forKey: reading) {
 				IME.prtDebugIntel("B49C0979")
 				errorCallback()
-				let inputting = buildInputtingState()
-				stateCallback(inputting)
+				stateCallback(buildInputtingState())
 				return true
 			}
 
@@ -191,25 +183,24 @@ import Cocoa
 			stateCallback(inputting)
 
 			if mgrPrefs.useSCPCTypingMode {
-				let choosingCandidates: InputState.ChoosingCandidate = _buildCandidateState(
-					inputting,
+				let choosingCandidates: InputState.ChoosingCandidate = buildCandidate(
+					state: inputting,
 					useVerticalMode: input.useVerticalMode
 				)
 				if choosingCandidates.candidates.count == 1 {
 					clear()
 					let text: String = choosingCandidates.candidates.first ?? ""
-					let committing = InputState.Committing(poppedText: text)
-					stateCallback(committing)
+					stateCallback(InputState.Committing(poppedText: text))
 
 					if !mgrPrefs.associatedPhrasesEnabled {
 						stateCallback(InputState.Empty())
 					} else {
-						let associatedPhrases =
+						if let associatedPhrases =
 							buildAssociatePhraseState(
 								withKey: text,
 								useVerticalMode: input.useVerticalMode
-							) as? InputState.AssociatedPhrases
-						if let associatedPhrases = associatedPhrases {
+							), !associatedPhrases.candidates.isEmpty
+						{
 							stateCallback(associatedPhrases)
 						} else {
 							stateCallback(InputState.Empty())
@@ -224,54 +215,49 @@ import Cocoa
 
 		// MARK: Calling candidate window using Space or Down or PageUp / PageDn.
 
-		if isPhoneticReadingBufferEmpty() && (state is InputState.NotEmpty)
-			&& (input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
-				|| input.isPageDown || input.isPageUp || input.isTab
-				|| (input.useVerticalMode && (input.isVerticalModeOnlyChooseCandidateKey)))
-		{
-			if input.isSpace {
-				// If the Space key is NOT set to be a selection key
-				if input.isShiftHold || !mgrPrefs.chooseCandidateUsingSpace {
-					if getBuilderCursorIndex() >= getBuilderLength() {
-						let composingBuffer = (state as! InputState.NotEmpty).composingBuffer
-						if (composingBuffer.count) != 0 {
-							let committing = InputState.Committing(poppedText: composingBuffer)
-							stateCallback(committing)
+		if let currentState = state as? InputState.NotEmpty {
+			if isPhoneticReadingBufferEmpty(),
+				input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
+					|| input.isPageDown || input.isPageUp || input.isTab
+					|| (input.useVerticalMode && (input.isVerticalModeOnlyChooseCandidateKey))
+			{
+				if input.isSpace {
+					// If the Space key is NOT set to be a selection key
+					if input.isShiftHold || !mgrPrefs.chooseCandidateUsingSpace {
+						if getBuilderCursorIndex() >= getBuilderLength() {
+							let composingBuffer = currentState.composingBuffer
+							if (composingBuffer.count) != 0 {
+								stateCallback(InputState.Committing(poppedText: composingBuffer))
+							}
+							clear()
+							stateCallback(InputState.Committing(poppedText: " "))
+							stateCallback(InputState.Empty())
+						} else if ifLangModelHasUnigrams(forKey: " ") {
+							insertReadingToBuilder(atCursor: " ")
+							let poppedText = _popOverflowComposingTextAndWalk()
+							let inputting = buildInputtingState()
+							inputting.poppedText = poppedText
+							stateCallback(inputting)
 						}
-						clear()
-						let committing = InputState.Committing(poppedText: " ")
-						stateCallback(committing)
-						let empty = InputState.Empty()
-						stateCallback(empty)
-					} else if ifLangModelHasUnigrams(forKey: " ") {
-						insertReadingToBuilder(atCursor: " ")
-						let poppedText = _popOverflowComposingTextAndWalk()
-						let inputting = buildInputtingState()
-						inputting.poppedText = poppedText
-						stateCallback(inputting)
+						return true
 					}
-					return true
 				}
+				stateCallback(buildCandidate(state: currentState, useVerticalMode: input.useVerticalMode))
+				return true
 			}
-			let choosingCandidates = _buildCandidateState(
-				state as! InputState.NotEmpty,
-				useVerticalMode: input.useVerticalMode
-			)
-			stateCallback(choosingCandidates)
-			return true
 		}
 
 		// MARK: -
 
 		// MARK: Esc
 
-		if input.isESC { return _handleEscWithState(state, stateCallback: stateCallback, errorCallback: errorCallback) }
+		if input.isESC { return handleEsc(state: state, stateCallback: stateCallback, errorCallback: errorCallback) }
 
 		// MARK: Cursor backward
 
 		if input.isCursorBackward || input.emacsKey == vChewingEmacsKey.backward {
-			return _handleBackwardWithState(
-				state,
+			return handleBackward(
+				state: state,
 				input: input,
 				stateCallback: stateCallback,
 				errorCallback: errorCallback
@@ -281,59 +267,59 @@ import Cocoa
 		// MARK: Cursor forward
 
 		if input.isCursorForward || input.emacsKey == vChewingEmacsKey.forward {
-			return _handleForwardWithState(
-				state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
+			return handleForward(
+				state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
 			)
 		}
 
 		// MARK: Home
 
 		if input.isHome || input.emacsKey == vChewingEmacsKey.home {
-			return _handleHomeWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+			return handleHome(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: End
 
 		if input.isEnd || input.emacsKey == vChewingEmacsKey.end {
-			return _handleEndWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+			return handleEnd(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: Ctrl+PgLf or Shift+PgLf
 
 		if (input.isControlHold || input.isShiftHold) && (input.isOptionHold && input.isLeft) {
-			return _handleHomeWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+			return handleHome(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: Ctrl+PgRt or Shift+PgRt
 
 		if (input.isControlHold || input.isShiftHold) && (input.isOptionHold && input.isRight) {
-			return _handleEndWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+			return handleEnd(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: AbsorbedArrowKey
 
 		if input.isAbsorbedArrowKey || input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse {
-			return _handleAbsorbedArrowKeyWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+			return handleAbsorbedArrowKey(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: Backspace
 
 		if input.isBackSpace {
-			return _handleBackspaceWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+			return handleBackspace(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: Delete
 
 		if input.isDelete || input.emacsKey == vChewingEmacsKey.delete {
-			return _handleDeleteWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+			return handleDelete(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: Enter
 
 		if input.isEnter {
 			return (input.isCommandHold && input.isControlHold)
-				? _handleCtrlCommandEnterWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
-				: _handleEnterWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
+				? handleCtrlCommandEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+				: handleEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
 		}
 
 		// MARK: -
@@ -349,9 +335,7 @@ import Cocoa
 						let inputting = buildInputtingState()
 						inputting.poppedText = poppedText
 						stateCallback(inputting)
-						let choosingCandidate =
-							_buildCandidateState(inputting, useVerticalMode: input.useVerticalMode)
-						stateCallback(choosingCandidate)
+						stateCallback(buildCandidate(state: inputting, useVerticalMode: input.useVerticalMode))
 					} else {  // If there is still unfinished bpmf reading, ignore the punctuation
 						IME.prtDebugIntel("17446655")
 						errorCallback()
@@ -362,11 +346,8 @@ import Cocoa
 				// 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
 				// 於是這裡用「模擬一次 Enter 鍵的操作」使其代為執行這個 commit buffer 的動作。
 				// 這裡不需要該函數所傳回的 bool 結果，所以用「_ =」解消掉。
-				_ = _handleEnterWithState(state, stateCallback: stateCallback, errorCallback: errorCallback)
-				let root: SymbolNode! = SymbolNode.root
-				let symbolState =
-					InputState.SymbolTable(node: root, useVerticalMode: input.useVerticalMode)
-				stateCallback(symbolState)
+				_ = handleEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+				stateCallback(InputState.SymbolTable(node: SymbolNode.root, useVerticalMode: input.useVerticalMode))
 				return true
 			}
 		}
@@ -392,7 +373,7 @@ import Cocoa
 			punctuationNamePrefix, parser, String(format: "%c", CChar(charCode)),
 		]
 		let customPunctuation: String = arrCustomPunctuations.joined(separator: "")
-		if _handlePunctuation(
+		if handlePunctuation(
 			customPunctuation,
 			state: state,
 			usingVerticalMode: input.useVerticalMode,
@@ -406,7 +387,7 @@ import Cocoa
 		let arrPunctuations: [String] = [punctuationNamePrefix, String(format: "%c", CChar(charCode))]
 		let punctuation: String = arrPunctuations.joined(separator: "")
 
-		if _handlePunctuation(
+		if handlePunctuation(
 			punctuation,
 			state: state,
 			usingVerticalMode: input.useVerticalMode,
@@ -419,7 +400,7 @@ import Cocoa
 		// 這裡不使用小麥注音 2.2 版的組字區處理方式，而是直接由詞庫負責。
 		if input.isUpperCaseASCIILetterKey {
 			let letter: String! = String(format: "%@%c", "_letter_", CChar(charCode))
-			if _handlePunctuation(
+			if handlePunctuation(
 				letter,
 				state: state,
 				usingVerticalMode: input.useVerticalMode,
