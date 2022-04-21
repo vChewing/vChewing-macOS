@@ -555,8 +555,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
 - (void)dealWithOverrideModelSuggestions
 {
-    // 讓 grid 知道目前的游標候選字判定是前置還是後置
-    _builder->grid().setRearCursorModeEnabled(mgrPrefs.setRearCursorMode);
     // 這一整段都太 C++ 且只出現一次，就整個端過來了。
     // 拆開封裝的話，只會把問題搞得更麻煩而已。
     std::string overrideValue = (mgrPrefs.useSCPCTypingMode)
@@ -567,7 +565,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if (!overrideValue.empty())
     {
         NSInteger cursorIndex = [self getActualCandidateCursorIndex];
-        std::vector<Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
+        std::vector<Gramambular::NodeAnchor> nodes = mgrPrefs.setRearCursorMode
+                                                         ? _builder->grid().nodesCrossingOrEndingAt(cursorIndex)
+                                                         : _builder->grid().nodesEndingAt(cursorIndex);
         double highestScore = FindHighestScore(nodes, kEpsilon);
         _builder->grid().overrideNodeScoreForSelectedCandidate(cursorIndex, overrideValue,
                                                                static_cast<float>(highestScore));
@@ -601,13 +601,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
 - (NSArray<NSString *> *)getCandidatesArray
 {
-    // 讓 grid 知道目前的游標候選字判定是前置還是後置
-    _builder->grid().setRearCursorModeEnabled(mgrPrefs.setRearCursorMode);
-
     NSMutableArray<NSString *> *candidatesArray = [[NSMutableArray alloc] init];
 
     NSInteger cursorIndex = [self getActualCandidateCursorIndex];
-    std::vector<Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
+    std::vector<Gramambular::NodeAnchor> nodes = mgrPrefs.setRearCursorMode
+                                                     ? _builder->grid().nodesCrossingOrEndingAt(cursorIndex)
+                                                     : _builder->grid().nodesEndingAt(cursorIndex);
 
     // sort the nodes, so that longer nodes (representing longer phrases) are placed at the top of the candidate list
     stable_sort(nodes.begin(), nodes.end(), NodeAnchorDescendingSorter());
