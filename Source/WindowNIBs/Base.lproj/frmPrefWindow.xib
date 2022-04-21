@@ -378,11 +378,11 @@
                                                         </buttonCell>
                                                         <cells>
                                                             <column>
-                                                                <buttonCell type="radio" title="Cursor in front of the phrase (like Matsushita Hanin IME)" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="16">
+                                                                <buttonCell type="radio" title="Cursor in front of the phrase (like macOS built-in Zhuyin IME)" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="16">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="cellTitle"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="radio" title="Cursor at the rear of the phrase (like MS New-Phonetic IME)" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="17">
+                                                                <buttonCell type="radio" title="Cursor at anyplace else (like Windows Yahoo KeyKey)" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="17">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="cellTitle"/>
                                                                 </buttonCell>

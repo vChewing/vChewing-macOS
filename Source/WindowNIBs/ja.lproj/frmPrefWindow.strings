@@ -29,11 +29,11 @@
 /* Class = "NSTextFieldCell"; title = "Choose the cursor position where you want to list possible candidates."; ObjectID = "14"; */
 "14.title" = "カーソルはどこで入力候補を呼び出すかとご選択ください：";
 
-/* Class = "NSButtonCell"; title = "Cursor in front of the phrase (like Matsushita Hanin IME)"; ObjectID = "16"; */
-"16.title" = "単語の前で // パナソニック漢音の入力スタイル";
+/* Class = "NSButtonCell"; title = "Cursor in front of the phrase (like macOS built-in Zhuyin IME)"; ObjectID = "16"; */
+"16.title" = "単語の前で // macOS 内蔵注音入力の入力スタイル";
 
-/* Class = "NSButtonCell"; title = "Cursor at the rear of the phrase (like MS New-Phonetic IME)"; ObjectID = "17"; */
-"17.title" = "単語の後で // Microsoft 新注音の入力スタイル";
+/* Class = "NSButtonCell"; title = "Cursor at anyplace else (like Windows Yahoo KeyKey)"; ObjectID = "17"; */
+"17.title" = "単語の中・後で // Windows Yahoo KeyKey の入力スタイル";
 
 /* Class = "NSButtonCell"; title = "Radio"; ObjectID = "18"; */
 "18.title" = "Radio";

@@ -135,8 +135,8 @@
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Space to +cycle candidates, Shift+Space to +cycle pages";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "Space to +cycle pages, Shift+Space to +cycle candidates";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "Stop farting (when typed phonetic combination is invalid, etc.)";
-"in front of the phrase (like Matsushita Hanin IME)" = "in front of the phrase (like Matsushita Hanin IME)";
-"at the rear of the phrase (like MS New-Phonetic IME)" = "at the rear of the phrase (like MS New-Phonetic IME)";
+"in front of the phrase (like macOS built-in Zhuyin IME)" = "in front of the phrase (like macOS built-in Zhuyin IME)";
+"at anyplace else (like Windows Yahoo KeyKey)" = "at anyplace else (like Windows Yahoo KeyKey)";
 "Traditional Chinese" = "Traditional Chinese";
 "Typing Style:" = "Typing Style:";
 "UI Language:" = "UI Language:";

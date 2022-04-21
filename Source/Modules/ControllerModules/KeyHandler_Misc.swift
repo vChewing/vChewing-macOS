@@ -35,8 +35,10 @@ import Cocoa
 
 	func getActualCandidateCursorIndex() -> Int {
 		var cursorIndex = getBuilderCursorIndex()
-		// MS Phonetics IME style, phrase is *at the rear of* the cursor.
+		// Windows Yahoo Kimo IME style, phrase is *at the rear of* the cursor.
 		// (i.e. the cursor is always *before* the phrase.)
+		// This is different from MS Phonetics IME style ...
+		// ... since Windows Yahoo Kimo allows "node crossing".
 		if (mgrPrefs.setRearCursorMode
 			&& (cursorIndex < getBuilderLength()))
 			|| cursorIndex == 0

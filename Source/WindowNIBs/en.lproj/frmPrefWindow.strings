@@ -29,11 +29,11 @@
 /* Class = "NSTextFieldCell"; title = "Choose the cursor position where you want to list possible candidates."; ObjectID = "14"; */
 "14.title" = "Choose the cursor position where you want to list possible candidates.";
 
-/* Class = "NSButtonCell"; title = "Cursor in front of the phrase (like Matsushita Hanin IME)"; ObjectID = "16"; */
-"16.title" = "Cursor in front of the phrase (like Matsushita Hanin IME)";
+/* Class = "NSButtonCell"; title = "Cursor in front of the phrase (like macOS built-in Zhuyin IME)"; ObjectID = "16"; */
+"16.title" = "Cursor in front of the phrase (like macOS built-in Zhuyin IME)";
 
-/* Class = "NSButtonCell"; title = "Cursor at the rear of the phrase (like MS New-Phonetic IME)"; ObjectID = "17"; */
-"17.title" = "Cursor at the rear of the phrase (like MS New-Phonetic IME)";
+/* Class = "NSButtonCell"; title = "Cursor at anyplace else (like Windows Yahoo KeyKey)"; ObjectID = "17"; */
+"17.title" = "Cursor at anyplace else (like Windows Yahoo KeyKey)";
 
 /* Class = "NSButtonCell"; title = "Radio"; ObjectID = "18"; */
 "18.title" = "Radio";

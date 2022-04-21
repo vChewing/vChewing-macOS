@@ -29,11 +29,11 @@
 /* Class = "NSTextFieldCell"; title = "Choose the cursor position where you want to list possible candidates."; ObjectID = "14"; */
 "14.title" = "用以触发选字的光标相对位置：";
 
-/* Class = "NSButtonCell"; title = "Cursor in front of the phrase (like Matsushita Hanin IME)"; ObjectID = "16"; */
-"16.title" = "光标置于词语前方 // 松下汉音风格";
+/* Class = "NSButtonCell"; title = "Cursor in front of the phrase (like macOS built-in Zhuyin IME)"; ObjectID = "16"; */
+"16.title" = "光标置于词语前方 // macOS 内建注音风格";
 
-/* Class = "NSButtonCell"; title = "Cursor at the rear of the phrase (like MS New-Phonetic IME)"; ObjectID = "17"; */
-"17.title" = "光标置于词语后方 // 微软新注音风格";
+/* Class = "NSButtonCell"; title = "Cursor at anyplace else (like Windows Yahoo KeyKey)"; ObjectID = "17"; */
+"17.title" = "光标置于词语中后方 // Windows 奇摩注音风格";
 
 /* Class = "NSButtonCell"; title = "Radio"; ObjectID = "18"; */
 "18.title" = "Radio";

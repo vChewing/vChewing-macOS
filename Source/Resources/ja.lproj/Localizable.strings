@@ -135,8 +135,8 @@
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+Space で次のページ、Space で次の候補文字を";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "Space で次のページ、Shift+Space で次の候補文字を";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "マナーモード // 外すと入力間違った時に変な声が出る";
-"in front of the phrase (like Matsushita Hanin IME)" = "単語の前で // パナソニック漢音のやり方";
-"at the rear of the phrase (like MS New-Phonetic IME)" = "単語の後で // Microsoft 新注音のやり方";
+"in front of the phrase (like macOS built-in Zhuyin IME)" = "単語の前で // macOS 内蔵注音入力のやり方";
+"at anyplace else (like Windows Yahoo KeyKey)" = "単語の中・後で // Windows Yahoo KeyKey のやり方";
 "Traditional Chinese" = "繁体中国語";
 "Typing Style:" = "入力習慣:";
 "UI Language:" = "表示用言語:";
