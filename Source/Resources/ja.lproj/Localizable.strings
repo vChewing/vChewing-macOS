@@ -56,8 +56,8 @@
 "Symbol & Emoji Input" = "符号＆絵文字入力";
 "Edit User Symbol & Emoji Data…" = "ユーザー符号＆絵文字辞書を編集…";
 "Choose your desired user data folder." = "欲しがるユーザー辞書フォルダをお選びください。";
-"Cursor is after \"%@\"." = "カーソルは「%@」の後に。";
-"Cursor is before \"%@\"." = "カーソル「%@」の前に。";
+"Cursor is in front of \"%@\"." = "カーソルは「%@」の後に。";
+"Cursor is at the rear of \"%@\"." = "カーソル「%@」の前に。";
 "Cursor is between \"%@\" and \"%@\"." = "カーソルは「%@」と「%@」に間れ。";
 
 // The followings are the category names used in the Symbol menu.
@@ -129,7 +129,7 @@
 "Non-QWERTY alphanumeral keyboard layouts are for Hanyu Pinyin parser only." = "QWERTY 以外の英数キーボードは漢語弁音以外の配列に不適用。";
 "Output Settings:" = "出力設定:";
 "Phonetic Parser:" = "注音配列:";
-"Push the cursor to the front of the phrase after selection" = "候補選択の直後、すぐカーソルを単語の向こうに推し進める";
+"Push the cursor in front of the phrase after selection" = "候補選択の直後、すぐカーソルを単語の向こうに推し進める";
 "Selection Keys:" = "言選り用キー:";
 "Show page buttons in candidate window" = "入力候補陳列の側にページボタンを表示";
 "Simplified Chinese" = "簡体中国語";
@@ -137,8 +137,8 @@
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+Space で次のページ、Space で次の候補文字を";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "Space で次のページ、Shift+Space で次の候補文字を";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "マナーモード // 外すと入力間違った時に変な声が出る";
-"to the front of the phrase (like Matsushita Hanin IME)" = "単語の前で // パナソニック漢音のやり方";
-"to the rear of the phrase (like MS New-Phonetic IME)" = "単語の後で // Microsoft 新注音のやり方";
+"in front of the phrase (like Matsushita Hanin IME)" = "単語の前で // パナソニック漢音のやり方";
+"at the rear of the phrase (like MS New-Phonetic IME)" = "単語の後で // Microsoft 新注音のやり方";
 "Traditional Chinese" = "繁体中国語";
 "Typing Style:" = "入力習慣:";
 "UI Language:" = "表示用言語:";

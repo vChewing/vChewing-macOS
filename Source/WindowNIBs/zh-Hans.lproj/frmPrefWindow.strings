@@ -29,10 +29,10 @@
 /* Class = "NSTextFieldCell"; title = "Choose the cursor position where you want to list possible candidates."; ObjectID = "14"; */
 "14.title" = "用以触发选字的光标相对位置：";
 
-/* Class = "NSButtonCell"; title = "Cursor to the front of the phrase (like Matsushita Hanin IME)"; ObjectID = "16"; */
+/* Class = "NSButtonCell"; title = "Cursor in front of the phrase (like Matsushita Hanin IME)"; ObjectID = "16"; */
 "16.title" = "光标置于词语前方 // 松下汉音风格";
 
-/* Class = "NSButtonCell"; title = "Cursor to the rear of the phrase (like MS New-Phonetic IME)"; ObjectID = "17"; */
+/* Class = "NSButtonCell"; title = "Cursor at the rear of the phrase (like MS New-Phonetic IME)"; ObjectID = "17"; */
 "17.title" = "光标置于词语后方 // 微软新注音风格";
 
 /* Class = "NSButtonCell"; title = "Radio"; ObjectID = "18"; */
@@ -143,7 +143,7 @@
 /* Class = "NSTextFieldCell"; title = "Choose your preferred keyboard layout and phonetic parser."; ObjectID = "RQ6-MS-m4C"; */
 "RQ6-MS-m4C.title" = "选择您所偏好的系统键盘布局与注音分析器排列。";
 
-/* Class = "NSButtonCell"; title = "Push the cursor to the front of the phrase after selection"; ObjectID = "RUG-ls-KyA"; */
+/* Class = "NSButtonCell"; title = "Push the cursor in front of the phrase after selection"; ObjectID = "RUG-ls-KyA"; */
 "RUG-ls-KyA.title" = "在选字后将光标置于该字词的前方";
 
 /* Class = "NSMenuItem"; title = "Traditional Chinese"; ObjectID = "TXr-FF-ehw"; */

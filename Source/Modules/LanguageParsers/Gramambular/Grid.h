@@ -44,8 +44,8 @@ class Grid
     void insertNode(const Node &node, size_t location, size_t spanningLength);
     bool hasNodeAtLocationSpanningLengthMatchingKey(size_t location, size_t spanningLength, const std::string &key);
 
-    void setHaninInputEnabled(bool enabled);
-    bool HaninInputEnabled();
+    void setRearCursorModeEnabled(bool enabled);
+    bool RearCursorModeEnabled();
 
     void expandGridByOneAtLocation(size_t location);
     void shrinkGridByOneAtLocation(size_t location);
@@ -119,17 +119,17 @@ class Grid
 
   protected:
     std::vector<Span> m_spans;
-    bool m_bolHaninEnabled;
+    bool m_rearCursorMode;
 };
 
-inline void Grid::setHaninInputEnabled(bool enabled)
+inline void Grid::setRearCursorModeEnabled(bool enabled)
 {
-    m_bolHaninEnabled = enabled;
+    m_rearCursorMode = enabled;
 }
 
-inline bool Grid::HaninInputEnabled()
+inline bool Grid::RearCursorModeEnabled()
 {
-    return m_bolHaninEnabled;
+    return m_rearCursorMode;
 }
 
 inline void Grid::clear()
@@ -250,7 +250,7 @@ inline std::vector<NodeAnchor> Grid::nodesCrossingOrEndingAt(size_t location)
                 {
                     // 左半是漢音模式，已經自威注音 1.5.2 版開始解決了可以在詞中間叫出候選字的問題。
                     // TODO: 右半是微軟新注音模式，仍有可以在詞中間叫出候選字的問題。
-                    if (((i + j != location) && m_bolHaninEnabled) || ((i + j < location) && !m_bolHaninEnabled))
+                    if (((i + j != location) && !m_rearCursorMode) || ((i + j < location) && m_rearCursorMode))
                     {
                         continue;
                     }

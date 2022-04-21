@@ -37,24 +37,24 @@ import Cocoa
 		// 獲取封裝好的資料
 		let composedText = getComposedText()
 		let packagedCursorIndex = UInt(getPackagedCursorIndex())
-		let resultOfBefore = getStrLocationResult(isAfter: false)
-		let resultOfAfter = getStrLocationResult(isAfter: true)
+		let resultOfRear = getStrLocationResult(isFront: false)
+		let resultOfFront = getStrLocationResult(isFront: true)
 
 		// 初期化狀態
 		let newState = InputState.Inputting(composingBuffer: composedText, cursorIndex: packagedCursorIndex)
 
 		// 組建提示文本
 		var tooltip = ""
-		if resultOfBefore == "", resultOfAfter != "" {
-			tooltip = String(format: NSLocalizedString("Cursor is after \"%@\".", comment: ""), resultOfAfter)
+		if resultOfRear == "", resultOfFront != "" {
+			tooltip = String(format: NSLocalizedString("Cursor is in front of \"%@\".", comment: ""), resultOfFront)
 		}
-		if resultOfBefore != "", resultOfAfter == "" {
-			tooltip = String(format: NSLocalizedString("Cursor is before \"%@\".", comment: ""), resultOfBefore)
+		if resultOfRear != "", resultOfFront == "" {
+			tooltip = String(format: NSLocalizedString("Cursor is at the rear of \"%@\".", comment: ""), resultOfRear)
 		}
-		if resultOfBefore != "", resultOfAfter != "" {
+		if resultOfRear != "", resultOfFront != "" {
 			tooltip = String(
 				format: NSLocalizedString("Cursor is between \"%@\" and \"%@\".", comment: ""),
-				resultOfAfter, resultOfBefore
+				resultOfFront, resultOfRear
 			)
 		}
 

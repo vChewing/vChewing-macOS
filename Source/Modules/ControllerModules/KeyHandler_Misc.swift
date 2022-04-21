@@ -35,9 +35,9 @@ import Cocoa
 
 	func getActualCandidateCursorIndex() -> Int {
 		var cursorIndex = getBuilderCursorIndex()
-		// MS Phonetics IME style, phrase is *after* the cursor.
+		// MS Phonetics IME style, phrase is *at the rear of* the cursor.
 		// (i.e. the cursor is always *before* the phrase.)
-		if (mgrPrefs.selectPhraseAfterCursorAsCandidate
+		if (mgrPrefs.setRearCursorMode
 			&& (cursorIndex < getBuilderLength()))
 			|| cursorIndex == 0
 		{

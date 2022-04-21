@@ -29,11 +29,11 @@
 /* Class = "NSTextFieldCell"; title = "Choose the cursor position where you want to list possible candidates."; ObjectID = "14"; */
 "14.title" = "Choose the cursor position where you want to list possible candidates.";
 
-/* Class = "NSButtonCell"; title = "Cursor to the front of the phrase (like Matsushita Hanin IME)"; ObjectID = "16"; */
-"16.title" = "Cursor to the front of the phrase (like Matsushita Hanin IME)";
+/* Class = "NSButtonCell"; title = "Cursor in front of the phrase (like Matsushita Hanin IME)"; ObjectID = "16"; */
+"16.title" = "Cursor in front of the phrase (like Matsushita Hanin IME)";
 
-/* Class = "NSButtonCell"; title = "Cursor to the rear of the phrase (like MS New-Phonetic IME)"; ObjectID = "17"; */
-"17.title" = "Cursor to the rear of the phrase (like MS New-Phonetic IME)";
+/* Class = "NSButtonCell"; title = "Cursor at the rear of the phrase (like MS New-Phonetic IME)"; ObjectID = "17"; */
+"17.title" = "Cursor at the rear of the phrase (like MS New-Phonetic IME)";
 
 /* Class = "NSButtonCell"; title = "Radio"; ObjectID = "18"; */
 "18.title" = "Radio";
@@ -143,8 +143,8 @@
 /* Class = "NSTextFieldCell"; title = "Choose your preferred keyboard layout and phonetic parser."; ObjectID = "RQ6-MS-m4C"; */
 "RQ6-MS-m4C.title" = "Choose your preferred keyboard layout and phonetic parser.";
 
-/* Class = "NSButtonCell"; title = "Push the cursor to the front of the phrase after selection"; ObjectID = "RUG-ls-KyA"; */
-"RUG-ls-KyA.title" = "Push the cursor to the front of the phrase after selection";
+/* Class = "NSButtonCell"; title = "Push the cursor in front of the phrase after selection"; ObjectID = "RUG-ls-KyA"; */
+"RUG-ls-KyA.title" = "Push the cursor in front of the phrase after selection";
 
 /* Class = "NSMenuItem"; title = "Traditional Chinese"; ObjectID = "TXr-FF-ehw"; */
 "TXr-FF-ehw.title" = "Traditional Chinese";

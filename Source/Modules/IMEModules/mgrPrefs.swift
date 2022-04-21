@@ -37,7 +37,7 @@ struct UserDef {
 	static let kCandidateListTextSize = "CandidateListTextSize"
 	static let kAppleLanguages = "AppleLanguages"
 	static let kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
-	static let kSelectPhraseAfterCursorAsCandidate = "SelectPhraseAfterCursorAsCandidate"
+	static let kSetRearCursorMode = "SetRearCursorMode"
 	static let kUseHorizontalCandidateList = "UseHorizontalCandidateList"
 	static let kComposingBufferSize = "ComposingBufferSize"
 	static let kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
@@ -210,7 +210,7 @@ public class mgrPrefs: NSObject {
 			UserDef.kCandidateListTextSize,
 			UserDef.kAppleLanguages,
 			UserDef.kShouldAutoReloadUserDataFiles,
-			UserDef.kSelectPhraseAfterCursorAsCandidate,
+			UserDef.kSetRearCursorMode,
 			UserDef.kUseHorizontalCandidateList,
 			UserDef.kComposingBufferSize,
 			UserDef.kChooseCandidateUsingSpace,
@@ -258,7 +258,7 @@ public class mgrPrefs: NSObject {
 		UserDefaults.standard.setDefault(mgrPrefs.useSCPCTypingMode, forKey: UserDef.kUseSCPCTypingMode)
 		UserDefaults.standard.setDefault(mgrPrefs.associatedPhrasesEnabled, forKey: UserDef.kAssociatedPhrasesEnabled)
 		UserDefaults.standard.setDefault(
-			mgrPrefs.selectPhraseAfterCursorAsCandidate, forKey: UserDef.kSelectPhraseAfterCursorAsCandidate
+			mgrPrefs.setRearCursorMode, forKey: UserDef.kSetRearCursorMode
 		)
 		UserDefaults.standard.setDefault(
 			mgrPrefs.moveCursorAfterSelectingCandidate, forKey: UserDef.kMoveCursorAfterSelectingCandidate
@@ -322,8 +322,8 @@ public class mgrPrefs: NSObject {
 	@UserDefault(key: UserDef.kShouldAutoReloadUserDataFiles, defaultValue: true)
 	@objc static var shouldAutoReloadUserDataFiles: Bool
 
-	@UserDefault(key: UserDef.kSelectPhraseAfterCursorAsCandidate, defaultValue: false)
-	@objc static var selectPhraseAfterCursorAsCandidate: Bool
+	@UserDefault(key: UserDef.kSetRearCursorMode, defaultValue: false)
+	@objc static var setRearCursorMode: Bool
 
 	@UserDefault(key: UserDef.kMoveCursorAfterSelectingCandidate, defaultValue: true)
 	@objc static var moveCursorAfterSelectingCandidate: Bool
