@@ -56,8 +56,6 @@
 "Symbol & Emoji Input" = "符号＆絵文字入力";
 "Edit User Symbol & Emoji Data…" = "ユーザー符号＆絵文字辞書を編集…";
 "Choose your desired user data folder." = "欲しがるユーザー辞書フォルダをお選びください。";
-"Cursor is in front of \"%@\"." = "カーソルは「%@」の後に。";
-"Cursor is at the rear of \"%@\"." = "カーソル「%@」の前に。";
 "Cursor is between \"%@\" and \"%@\"." = "カーソルは「%@」と「%@」に間れ。";
 
 // The followings are the category names used in the Symbol menu.

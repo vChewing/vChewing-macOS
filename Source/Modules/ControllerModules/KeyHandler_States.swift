@@ -45,20 +45,15 @@ import Cocoa
 
 		// 組建提示文本
 		var tooltip = ""
-		if resultOfRear == "", resultOfFront != "" {
-			tooltip = String(format: NSLocalizedString("Cursor is in front of \"%@\".", comment: ""), resultOfFront)
-		}
-		if resultOfRear != "", resultOfFront == "" {
-			tooltip = String(format: NSLocalizedString("Cursor is at the rear of \"%@\".", comment: ""), resultOfRear)
-		}
-		if resultOfRear != "", resultOfFront != "" {
+		// 備註：因為目前的輸入法已經有了 NSString Emoji 支援，所以這個工具提示可能不會出現了。
+		// 姑且留下來用作萬一時的偵錯用途。
+		if resultOfRear != "" || resultOfFront != "" {
 			tooltip = String(
 				format: NSLocalizedString("Cursor is between \"%@\" and \"%@\".", comment: ""),
 				resultOfFront, resultOfRear
 			)
 		}
 
-		// 給新狀態安插配置好的提示文本、且送出新狀態
 		newState.tooltip = tooltip
 		return newState
 	}

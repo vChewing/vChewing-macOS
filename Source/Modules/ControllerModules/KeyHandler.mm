@@ -282,19 +282,19 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                         }
                         if (builderCursorIndex == 0)
                         {
-                            resultOfRear =
+                            resultOfFront =
                                 [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex].c_str()];
                         }
                         else if (builderCursorIndex >= _builder->readings().size())
                         {
-                            resultOfFront = [NSString
+                            resultOfRear = [NSString
                                 stringWithUTF8String:_builder->readings()[_builder->readings().size() - 1].c_str()];
                         }
                         else
                         {
-                            resultOfRear =
-                                [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex].c_str()];
                             resultOfFront =
+                                [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex].c_str()];
+                            resultOfRear =
                                 [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex - 1].c_str()];
                         }
                     }
