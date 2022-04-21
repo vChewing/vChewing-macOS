@@ -37,28 +37,23 @@ import Cocoa
 		// 獲取封裝好的資料
 		let composedText = getComposedText()
 		let packagedCursorIndex = UInt(getPackagedCursorIndex())
-		let resultOfBefore = getStrLocationResult(isAfter: false)
-		let resultOfAfter = getStrLocationResult(isAfter: true)
+		let resultOfRear = getStrLocationResult(isFront: false)
+		let resultOfFront = getStrLocationResult(isFront: true)
 
 		// 初期化狀態
 		let newState = InputState.Inputting(composingBuffer: composedText, cursorIndex: packagedCursorIndex)
 
 		// 組建提示文本
 		var tooltip = ""
-		if resultOfBefore == "", resultOfAfter != "" {
-			tooltip = String(format: NSLocalizedString("Cursor is after \"%@\".", comment: ""), resultOfAfter)
-		}
-		if resultOfBefore != "", resultOfAfter == "" {
-			tooltip = String(format: NSLocalizedString("Cursor is before \"%@\".", comment: ""), resultOfBefore)
-		}
-		if resultOfBefore != "", resultOfAfter != "" {
+		// 備註：因為目前的輸入法已經有了 NSString Emoji 支援，所以這個工具提示可能不會出現了。
+		// 姑且留下來用作萬一時的偵錯用途。
+		if resultOfRear != "" || resultOfFront != "" {
 			tooltip = String(
 				format: NSLocalizedString("Cursor is between \"%@\" and \"%@\".", comment: ""),
-				resultOfAfter, resultOfBefore
+				resultOfFront, resultOfRear
 			)
 		}
 
-		// 給新狀態安插配置好的提示文本、且送出新狀態
 		newState.tooltip = tooltip
 		return newState
 	}

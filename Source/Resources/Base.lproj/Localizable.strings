@@ -56,8 +56,6 @@
 "Symbol & Emoji Input" = "Symbol & Emoji Input";
 "Edit User Symbol & Emoji Data…" = "Edit User Symbol & Emoji Data…";
 "Choose your desired user data folder." = "Choose your desired user data folder.";
-"Cursor is after \"%@\"." = "Cursor is after \"%@\".";
-"Cursor is before \"%@\"." = "Cursor is before \"%@\".";
 "Cursor is between \"%@\" and \"%@\"." = "Cursor is between \"%@\" and \"%@\".";
 
 // The followings are the category names used in the Symbol menu.
@@ -129,7 +127,7 @@
 "Non-QWERTY alphanumeral keyboard layouts are for Hanyu Pinyin parser only." = "Non-QWERTY alphanumeral keyboard layouts are for Hanyu Pinyin parser only.";
 "Output Settings:" = "Output Settings:";
 "Phonetic Parser:" = "Phonetic Parser:";
-"Push the cursor to the front of the phrase after selection" = "Push the cursor to the front of the phrase after selection";
+"Push the cursor in front of the phrase after selection" = "Push the cursor in front of the phrase after selection";
 "Selection Keys:" = "Selection Keys:";
 "Show page buttons in candidate window" = "Show page buttons in candidate window";
 "Simplified Chinese" = "Simplified Chinese";
@@ -137,8 +135,8 @@
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Space to +cycle candidates, Shift+Space to +cycle pages";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "Space to +cycle pages, Shift+Space to +cycle candidates";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "Stop farting (when typed phonetic combination is invalid, etc.)";
-"to the front of the phrase (like Matsushita Hanin IME)" = "to the front of the phrase (like Matsushita Hanin IME)";
-"to the rear of the phrase (like MS New-Phonetic IME)" = "to the rear of the phrase (like MS New-Phonetic IME)";
+"in front of the phrase (like macOS built-in Zhuyin IME)" = "in front of the phrase (like macOS built-in Zhuyin IME)";
+"at anyplace else (like Windows Yahoo KeyKey)" = "at anyplace else (like Windows Yahoo KeyKey)";
 "Traditional Chinese" = "Traditional Chinese";
 "Typing Style:" = "Typing Style:";
 "UI Language:" = "UI Language:";

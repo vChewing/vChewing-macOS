@@ -44,9 +44,6 @@ class Grid
     void insertNode(const Node &node, size_t location, size_t spanningLength);
     bool hasNodeAtLocationSpanningLengthMatchingKey(size_t location, size_t spanningLength, const std::string &key);
 
-    void setHaninInputEnabled(bool enabled);
-    bool HaninInputEnabled();
-
     void expandGridByOneAtLocation(size_t location);
     void shrinkGridByOneAtLocation(size_t location);
 
@@ -119,18 +116,7 @@ class Grid
 
   protected:
     std::vector<Span> m_spans;
-    bool m_bolHaninEnabled;
 };
-
-inline void Grid::setHaninInputEnabled(bool enabled)
-{
-    m_bolHaninEnabled = enabled;
-}
-
-inline bool Grid::HaninInputEnabled()
-{
-    return m_bolHaninEnabled;
-}
 
 inline void Grid::clear()
 {
@@ -206,6 +192,7 @@ inline size_t Grid::width() const
     return m_spans.size();
 }
 
+// macOS 10.6 開始的內建注音的游標前置選字風格
 inline std::vector<NodeAnchor> Grid::nodesEndingAt(size_t location)
 {
     std::vector<NodeAnchor> result;
@@ -234,6 +221,8 @@ inline std::vector<NodeAnchor> Grid::nodesEndingAt(size_t location)
     return result;
 }
 
+// Windows 版奇摩注音輸入法的游標後置的選字風格。
+// 與微軟新注音相異的是，這個風格允許在詞的中間叫出候選字窗。
 inline std::vector<NodeAnchor> Grid::nodesCrossingOrEndingAt(size_t location)
 {
     std::vector<NodeAnchor> result;
@@ -248,9 +237,7 @@ inline std::vector<NodeAnchor> Grid::nodesCrossingOrEndingAt(size_t location)
             {
                 for (size_t j = 1, m = span.maximumLength(); j <= m; j++)
                 {
-                    // 左半是漢音模式，已經自威注音 1.5.2 版開始解決了可以在詞中間叫出候選字的問題。
-                    // TODO: 右半是微軟新注音模式，仍有可以在詞中間叫出候選字的問題。
-                    if (((i + j != location) && m_bolHaninEnabled) || ((i + j < location) && !m_bolHaninEnabled))
+                    if (i + j < location)
                     {
                         continue;
                     }

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -379,11 +378,11 @@
                                                         </buttonCell>
                                                         <cells>
                                                             <column>
-                                                                <buttonCell type="radio" title="Cursor to the front of the phrase (like Matsushita Hanin IME)" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="16">
+                                                                <buttonCell type="radio" title="Cursor in front of the phrase (like macOS built-in Zhuyin IME)" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="16">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="cellTitle"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="radio" title="Cursor to the rear of the phrase (like MS New-Phonetic IME)" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="17">
+                                                                <buttonCell type="radio" title="Cursor at anyplace else (like Windows Yahoo KeyKey)" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="17">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="cellTitle"/>
                                                                 </buttonCell>
@@ -398,7 +397,7 @@
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="16" id="0iq-1M-a8l"/>
                                                         </constraints>
-                                                        <buttonCell key="cell" type="check" title="Push the cursor to the front of the phrase after selection" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="RUG-ls-KyA">
+                                                        <buttonCell key="cell" type="check" title="Push the cursor in front of the phrase after selection" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="RUG-ls-KyA">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="cellTitle"/>
                                                         </buttonCell>
