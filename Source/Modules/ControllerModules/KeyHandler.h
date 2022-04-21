@@ -74,6 +74,7 @@ struct BufferStatePackage
 - (BOOL)isPrintable:(UniChar)charCode;
 - (NSArray<NSString *> *)buildAssociatePhraseArrayWithKey:(NSString *)key;
 - (NSArray<NSString *> *)getCandidatesArray;
+- (NSInteger)getKeyLengthAtIndexZero;
 - (NSInteger)getBuilderCursorIndex;
 - (NSInteger)getBuilderLength;
 - (NSInteger)getPackagedCursorIndex;

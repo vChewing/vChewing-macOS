@@ -623,6 +623,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     return candidatesArray;
 }
 
+- (NSInteger)getKeyLengthAtIndexZero
+{
+    return [NSString stringWithUTF8String:_walkedNodes[0].node->currentKeyValue().value.c_str()].length;
+}
+
 #pragma mark - 威注音認為有必要單獨拿出來處理的部分，交給 Swift 則有些困難。
 
 - (BOOL)isPrintable:(UniChar)charCode
