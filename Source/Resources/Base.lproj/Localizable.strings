@@ -26,8 +26,8 @@
 "Half-Width Punctuation Mode" = "Half-Width Punctuation Mode";
 "\"%@\" length must ≥ 2 for a user phrase." = "\"%@\" length must ≥ 2 for a user phrase.";
 "\"%@\" length should ≤ %d for a user phrase." = "\"%@\" length should ≤ %d for a user phrase.";
-"\"%@\" selected. ↩ to add user phrase." = "\"%@\" selected. ↩ to add user phrase.";
-"\"%@\" already exists: ↩ to boost, ⇧⌘↩ to exclude." = "\"%@\" already exists: ↩ to boost, ⇧⌘↩ to exclude.";
+"\"%@\" selected. ENTER to add user phrase." = "\"%@\" selected. ENTER to add user phrase.";
+"\"%@\" already exists: ENTER to boost, \n SHIFT+CMD+ENTER to exclude." = "\"%@\" already exists: ENTER to boost, \n SHIFT+CMD+ENTER to exclude.";
 "Edit Phrase Replacement Table…" = "Edit Phrase Replacement Table…";
 "Use Phrase Replacement" = "Use Phrase Replacement";
 "Candidates keys cannot be empty." = "Candidates keys cannot be empty.";

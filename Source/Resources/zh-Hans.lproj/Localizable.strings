@@ -26,8 +26,8 @@
 "Half-Width Punctuation Mode" = "半角标点模式";
 "\"%@\" length must ≥ 2 for a user phrase." = "「%@」字数不足以自订语汇。";
 "\"%@\" length should ≤ %d for a user phrase." = "「%@」字数超过 %d、无法自订。";
-"\"%@\" selected. ↩ to add user phrase." = "「%@」敲 Enter 添入自订语汇。";
-"\"%@\" already exists: ↩ to boost, ⇧⌘↩ to exclude." = "「%@」已存在：敲 ↩ 以升权；敲 ⇧⌘↩ 以排除。";
+"\"%@\" selected. ENTER to add user phrase." = "「%@」敲 Enter 添入自订语汇。";
+"\"%@\" already exists: ENTER to boost, \n SHIFT+CMD+ENTER to exclude." = "「%@」已存在：敲 Enter 以升权；\n　敲 Shift+CMD+Enter 以排除。";
 "Edit Phrase Replacement Table…" = "编辑语汇置换表…";
 "Use Phrase Replacement" = "使用语汇置换";
 "Candidates keys cannot be empty." = "您必须指定选字键。";
