@@ -389,9 +389,9 @@
 		5B4D47B627C9186900220DDC /* InstantiatedModels */ = {
 			isa = PBXGroup;
 			children = (
+				5B62A32B27AE78B000A19448 /* CNSLM.h */,
 				5B8F43ED27C9BC220069AC27 /* SymbolLM.h */,
 				5B7111C727DEF9FF00444310 /* UserSymbolLM.h */,
-				5B62A32B27AE78B000A19448 /* CNSLM.h */,
 			);
 			path = InstantiatedModels;
 			sourceTree = "<group>";
@@ -399,10 +399,10 @@
 		5B62A30127AE732800A19448 /* 3rdParty */ = {
 			isa = PBXGroup;
 			children = (
-				5BA9FD8C28006BA7002DE248 /* VDKComboBox */,
 				5B707CE627D9F43E0099EF99 /* OpenCCBridge */,
 				5B62A30227AE733500A19448 /* OVMandarin */,
 				5BA9FCEA27FED652002DE248 /* SindreSorhus */,
+				5BA9FD8C28006BA7002DE248 /* VDKComboBox */,
 			);
 			path = 3rdParty;
 			sourceTree = "<group>";
@@ -428,14 +428,14 @@
 			isa = PBXGroup;
 			children = (
 				5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */,
-				D461B791279DAC010070E734 /* InputState.swift */,
 				D456576D279E4F7B00DF6BC9 /* InputHandler.swift */,
-				D4E569DA27A34CC100AC2CEF /* KeyHandler.h */,
-				D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */,
-				5B7F225C2808501000DDD3CB /* KeyHandler_HandleInput.swift */,
+				D461B791279DAC010070E734 /* InputState.swift */,
 				5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */,
+				5B7F225C2808501000DDD3CB /* KeyHandler_HandleInput.swift */,
 				5B61B0C9280BEFD4002E3CFA /* KeyHandler_Misc.swift */,
 				5B3133BE280B229700A4A505 /* KeyHandler_States.swift */,
+				D4E569DA27A34CC100AC2CEF /* KeyHandler.h */,
+				D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */,
 				6ACC3D3E27914F2400F1B140 /* KeyValueBlobReader.cpp */,
 				6ACC3D3C27914AAB00F1B140 /* KeyValueBlobReader.h */,
 				5B62A33727AE79CD00A19448 /* NSStringUtils.swift */,
@@ -447,8 +447,8 @@
 		5B62A32027AE752000A19448 /* Headers */ = {
 			isa = PBXGroup;
 			children = (
-				6A0D4EF615FC0DA600ABF4B3 /* vChewing-Prefix.pch */,
 				D427A9BF25ED28CC005D43E0 /* vChewing-Bridging-Header.h */,
+				6A0D4EF615FC0DA600ABF4B3 /* vChewing-Prefix.pch */,
 			);
 			path = Headers;
 			sourceTree = "<group>";
@@ -467,8 +467,8 @@
 			isa = PBXGroup;
 			children = (
 				5BDC1CF927FDF1310052C2B9 /* apiUpdate.swift */,
-				D4A13D5927A59D5C003BE359 /* ctlInputMethod.swift */,
 				5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */,
+				D4A13D5927A59D5C003BE359 /* ctlInputMethod.swift */,
 				5B5E535127EF261400C6AA1E /* IME.swift */,
 				5B62A33127AE792F00A19448 /* InputSourceHelper.swift */,
 				5B62A33527AE795800A19448 /* mgrPrefs.swift */,
@@ -487,13 +487,13 @@
 		5B62A32427AE757300A19448 /* LangModelRelated */ = {
 			isa = PBXGroup;
 			children = (
-				D41355D9278E6D17005E5CBD /* LMInstantiator.mm */,
+				5B62A32527AE758000A19448 /* SubLanguageModels */,
 				D41355DA278E6D17005E5CBD /* LMInstantiator.h */,
-				D41355D6278D7409005E5CBD /* mgrLangModel.h */,
+				D41355D9278E6D17005E5CBD /* LMInstantiator.mm */,
 				D495583A27A5C6C4006ADE1C /* mgrLangModel_Privates.h */,
+				D41355D6278D7409005E5CBD /* mgrLangModel.h */,
 				D41355D7278D7409005E5CBD /* mgrLangModel.mm */,
 				5BAEFACF28012565001F42C9 /* mgrLangModel.swift */,
-				5B62A32527AE758000A19448 /* SubLanguageModels */,
 			);
 			path = LangModelRelated;
 			sourceTree = "<group>";
@@ -502,20 +502,20 @@
 			isa = PBXGroup;
 			children = (
 				5B4D47B627C9186900220DDC /* InstantiatedModels */,
+				D47D73AB27A6CAE600255A50 /* AssociatedPhrases.h */,
+				D47D73AA27A6CAE600255A50 /* AssociatedPhrases.mm */,
 				5B62A32C27AE78B000A19448 /* CoreLM.h */,
 				5B62A32D27AE78B000A19448 /* CoreLM.mm */,
-				D41355DC278EA3ED005E5CBD /* UserPhrasesLM.mm */,
-				D41355DD278EA3ED005E5CBD /* UserPhrasesLM.h */,
 				6ACC3D422793701600F1B140 /* ParselessLM.cpp */,
 				6ACC3D432793701600F1B140 /* ParselessLM.h */,
 				6ACC3D402793701600F1B140 /* ParselessPhraseDB.cpp */,
 				6ACC3D412793701600F1B140 /* ParselessPhraseDB.h */,
-				D44FB74B2792189A003C80A6 /* PhraseReplacementMap.mm */,
 				D44FB74C2792189A003C80A6 /* PhraseReplacementMap.h */,
+				D44FB74B2792189A003C80A6 /* PhraseReplacementMap.mm */,
 				D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */,
 				D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */,
-				D47D73AA27A6CAE600255A50 /* AssociatedPhrases.mm */,
-				D47D73AB27A6CAE600255A50 /* AssociatedPhrases.h */,
+				D41355DD278EA3ED005E5CBD /* UserPhrasesLM.h */,
+				D41355DC278EA3ED005E5CBD /* UserPhrasesLM.mm */,
 			);
 			path = SubLanguageModels;
 			sourceTree = "<group>";
@@ -537,9 +537,9 @@
 			isa = PBXGroup;
 			children = (
 				5B62A33E27AE7CD900A19448 /* CandidateUI */,
+				5B62A34427AE7CD900A19448 /* NotifierUI */,
 				5BA9FD0927FED9F3002DE248 /* PrefUI */,
 				5B62A34227AE7CD900A19448 /* TooltipUI */,
-				5B62A34427AE7CD900A19448 /* NotifierUI */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -681,10 +681,10 @@
 		5BBBB76E27AED70B0023B93A /* MenuIcons */ = {
 			isa = PBXGroup;
 			children = (
-				5BBBB76F27AED70B0023B93A /* MenuIcon-TCVIM@2x.png */,
-				5BBBB77027AED70B0023B93A /* MenuIcon-SCVIM@2x.png */,
 				5BBBB77127AED70B0023B93A /* MenuIcon-SCVIM.png */,
+				5BBBB77027AED70B0023B93A /* MenuIcon-SCVIM@2x.png */,
 				5BBBB77227AED70B0023B93A /* MenuIcon-TCVIM.png */,
+				5BBBB76F27AED70B0023B93A /* MenuIcon-TCVIM@2x.png */,
 			);
 			name = MenuIcons;
 			path = Source/Resources/MenuIcons;
@@ -825,13 +825,13 @@
 				5BBBB77827AEDB330023B93A /* Resources */,
 				D4F0BBE0279AF8B30071253C /* AppDelegate.swift */,
 				D4F0BBDE279AF1AF0071253C /* ArchiveUtil.swift */,
+				D4F0BBE2279B08900071253C /* Chronosphere.h */,
+				D4F0BBE3279B08900071253C /* Chronosphere.m */,
 				6ACA41F215FC1D9000935EF6 /* Installer-Info.plist */,
 				6ACA41F315FC1D9000935EF6 /* Installer-Prefix.pch */,
 				5BC0AACA27F58472002D33E9 /* pkgPostInstall.sh */,
 				5BC0AAC927F58472002D33E9 /* pkgPreInstall.sh */,
 				6A93050C279877FF00D370DA /* vChewingInstaller-Bridging-Header.h */,
-				D4F0BBE2279B08900071253C /* Chronosphere.h */,
-				D4F0BBE3279B08900071253C /* Chronosphere.m */,
 			);
 			path = Installer;
 			sourceTree = "<group>";
