@@ -45,6 +45,21 @@ import Cocoa
 
 		// 組建提示文本
 		var tooltip = ""
+
+		// 如果在用特定的模式的話，則始終顯示對應的提示。
+		// TODO: 該功能無法正常運作，暫時註釋掉。
+		//		if ctlInputMethod.currentKeyHandler.inputMode == InputMode.imeModeCHT {
+		//			if mgrPrefs.chineseConversionEnabled && !mgrPrefs.shiftJISShinjitaiOutputEnabled {
+		//				tooltip = String(
+		//					format: "%@%@%@", NSLocalizedString("Force KangXi Writing", comment: ""), "\n",
+		//					NSLocalizedString("NotificationSwitchON", comment: ""))
+		//			} else if mgrPrefs.shiftJISShinjitaiOutputEnabled {
+		//				tooltip = String(
+		//					format: "%@%@%@", NSLocalizedString("JIS Shinjitai Output", comment: ""), "\n",
+		//					NSLocalizedString("NotificationSwitchON", comment: ""))
+		//			}
+		//		}
+
 		// 備註：因為目前的輸入法已經有了 NSString Emoji 支援，所以這個工具提示可能不會出現了。
 		// 姑且留下來用作萬一時的偵錯用途。
 		if resultOfRear != "" || resultOfFront != "" {
