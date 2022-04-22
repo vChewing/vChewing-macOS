@@ -237,7 +237,7 @@ class InputState: NSObject {
 				)
 				return String(
 					format: NSLocalizedString(
-						"\"%@\" already exists: ↩ to boost, ⇧⌘↩ to exclude.", comment: ""
+						"\"%@\" already exists: ENTER to boost, \n SHIFT+CMD+ENTER to exclude.", comment: ""
 					), text
 				)
 			}
@@ -246,7 +246,7 @@ class InputState: NSObject {
 			)
 			TooltipController.textColor = NSColor.white
 			return String(
-				format: NSLocalizedString("\"%@\" selected. ↩ to add user phrase.", comment: ""),
+				format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: ""),
 				text
 			)
 		}

@@ -46,8 +46,8 @@ static const double kEpsilon = 0.000001;
 
 NSString *packagedComposedText;
 NSInteger packagedCursorIndex;
-NSString *packagedResultOfBefore;
-NSString *packagedResultOfAfter;
+NSString *packagedResultOfRear;
+NSString *packagedResultOfFront;
 
 // NON-SWIFTIFIABLE
 static double FindHighestScore(const std::vector<Gramambular::NodeAnchor> &nodes, double epsilon)
@@ -233,8 +233,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     size_t readingCursorIndex = 0;
     size_t builderCursorIndex = [self getBuilderCursorIndex];
 
-    NSString *resultOfBefore = @"";
-    NSString *resultOfAfter = @"";
+    NSString *resultOfRear = @"";
+    NSString *resultOfFront = @"";
 
     for (std::vector<Gramambular::NodeAnchor>::iterator wi = _walkedNodes.begin(), we = _walkedNodes.end(); wi != we;
          ++wi)
@@ -282,19 +282,19 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
                         }
                         if (builderCursorIndex == 0)
                         {
-                            resultOfBefore =
+                            resultOfFront =
                                 [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex].c_str()];
                         }
                         else if (builderCursorIndex >= _builder->readings().size())
                         {
-                            resultOfAfter = [NSString
+                            resultOfRear = [NSString
                                 stringWithUTF8String:_builder->readings()[_builder->readings().size() - 1].c_str()];
                         }
                         else
                         {
-                            resultOfBefore =
+                            resultOfFront =
                                 [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex].c_str()];
-                            resultOfAfter =
+                            resultOfRear =
                                 [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex - 1].c_str()];
                         }
                     }
@@ -314,17 +314,17 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
     packagedComposedText = composedText;
     packagedCursorIndex = cursorIndex;
-    packagedResultOfBefore = resultOfBefore;
-    packagedResultOfAfter = resultOfAfter;
+    packagedResultOfRear = resultOfRear;
+    packagedResultOfFront = resultOfFront;
 }
 
 // NON-SWIFTIFIABLE DUE TO VARIABLE AVAILABLE ACCESSIBILITY RANGE.
-- (NSString *)getStrLocationResult:(BOOL)isAfter
+- (NSString *)getStrLocationResult:(BOOL)isFront
 {
-    if (isAfter)
-        return packagedResultOfAfter;
+    if (isFront)
+        return packagedResultOfFront;
     else
-        return packagedResultOfBefore;
+        return packagedResultOfRear;
 }
 
 // NON-SWIFTIFIABLE DUE TO VARIABLE AVAILABLE ACCESSIBILITY RANGE.
@@ -555,8 +555,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
 - (void)dealWithOverrideModelSuggestions
 {
-    // 讓 grid 知道目前的游標候選字判定是前置還是後置
-    _builder->grid().setHaninInputEnabled(!mgrPrefs.selectPhraseAfterCursorAsCandidate);
     // 這一整段都太 C++ 且只出現一次，就整個端過來了。
     // 拆開封裝的話，只會把問題搞得更麻煩而已。
     std::string overrideValue = (mgrPrefs.useSCPCTypingMode)
@@ -567,7 +565,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
     if (!overrideValue.empty())
     {
         NSInteger cursorIndex = [self getActualCandidateCursorIndex];
-        std::vector<Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
+        std::vector<Gramambular::NodeAnchor> nodes = mgrPrefs.setRearCursorMode
+                                                         ? _builder->grid().nodesCrossingOrEndingAt(cursorIndex)
+                                                         : _builder->grid().nodesEndingAt(cursorIndex);
         double highestScore = FindHighestScore(nodes, kEpsilon);
         _builder->grid().overrideNodeScoreForSelectedCandidate(cursorIndex, overrideValue,
                                                                static_cast<float>(highestScore));
@@ -601,13 +601,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
 
 - (NSArray<NSString *> *)getCandidatesArray
 {
-    // 讓 grid 知道目前的游標候選字判定是前置還是後置
-    _builder->grid().setHaninInputEnabled(!mgrPrefs.selectPhraseAfterCursorAsCandidate);
-
     NSMutableArray<NSString *> *candidatesArray = [[NSMutableArray alloc] init];
 
     NSInteger cursorIndex = [self getActualCandidateCursorIndex];
-    std::vector<Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
+    std::vector<Gramambular::NodeAnchor> nodes = mgrPrefs.setRearCursorMode
+                                                     ? _builder->grid().nodesCrossingOrEndingAt(cursorIndex)
+                                                     : _builder->grid().nodesEndingAt(cursorIndex);
 
     // sort the nodes, so that longer nodes (representing longer phrases) are placed at the top of the candidate list
     stable_sort(nodes.begin(), nodes.end(), NodeAnchorDescendingSorter());
@@ -621,6 +620,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/vChewing-visualization.dot";
             [candidatesArray addObject:[NSString stringWithUTF8String:(*ci).value.c_str()]];
     }
     return candidatesArray;
+}
+
+- (NSInteger)getKeyLengthAtIndexZero
+{
+    return [NSString stringWithUTF8String:_walkedNodes[0].node->currentKeyValue().value.c_str()].length;
 }
 
 #pragma mark - 威注音認為有必要單獨拿出來處理的部分，交給 Swift 則有些困難。

@@ -32,7 +32,7 @@ struct suiPrefPaneExperience: View {
 		(UserDefaults.standard.string(forKey: UserDef.kCandidateKeys) ?? mgrPrefs.defaultCandidateKeys) as String
 	@State private var selCursorPosition =
 		UserDefaults.standard.bool(
-			forKey: UserDef.kSelectPhraseAfterCursorAsCandidate) ? 1 : 0
+			forKey: UserDef.kSetRearCursorMode) ? 1 : 0
 	@State private var selPushCursorAfterSelection = UserDefaults.standard.bool(
 		forKey: UserDef.kMoveCursorAfterSelectingCandidate)
 	@State private var selKeyBehaviorShiftTab =
@@ -90,17 +90,17 @@ struct suiPrefPaneExperience: View {
 			}
 			Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Cursor Selection:")) }) {
 				Picker("", selection: $selCursorPosition) {
-					Text(LocalizedStringKey("to the front of the phrase (like Matsushita Hanin IME)")).tag(0)
-					Text(LocalizedStringKey("to the rear of the phrase (like MS New-Phonetic IME)")).tag(1)
+					Text(LocalizedStringKey("in front of the phrase (like macOS built-in Zhuyin IME)")).tag(0)
+					Text(LocalizedStringKey("at anyplace else (like Windows Yahoo KeyKey)")).tag(1)
 				}.onChange(of: selCursorPosition) { value in
-					mgrPrefs.selectPhraseAfterCursorAsCandidate = (value == 1) ? true : false
+					mgrPrefs.setRearCursorMode = (value == 1) ? true : false
 				}
 				.labelsHidden()
 				.pickerStyle(RadioGroupPickerStyle())
 				Text(LocalizedStringKey("Choose the cursor position where you want to list possible candidates."))
 					.preferenceDescription()
 				Toggle(
-					LocalizedStringKey("Push the cursor to the front of the phrase after selection"),
+					LocalizedStringKey("Push the cursor in front of the phrase after selection"),
 					isOn: $selPushCursorAfterSelection
 				).onChange(of: selPushCursorAfterSelection) { value in
 					mgrPrefs.moveCursorAfterSelectingCandidate = value

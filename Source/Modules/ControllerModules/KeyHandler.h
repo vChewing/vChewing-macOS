@@ -40,8 +40,8 @@ struct BufferStatePackage
 {
     NSString *composedText;
     NSInteger cursorIndex;
-    NSString *resultOfBefore;
-    NSString *resultOfAfter;
+    NSString *resultOfRear;
+    NSString *resultOfFront;
 };
 
 @class KeyHandler;
@@ -74,12 +74,13 @@ struct BufferStatePackage
 - (BOOL)isPrintable:(UniChar)charCode;
 - (NSArray<NSString *> *)buildAssociatePhraseArrayWithKey:(NSString *)key;
 - (NSArray<NSString *> *)getCandidatesArray;
+- (NSInteger)getKeyLengthAtIndexZero;
 - (NSInteger)getBuilderCursorIndex;
 - (NSInteger)getBuilderLength;
 - (NSInteger)getPackagedCursorIndex;
 - (NSString *)getComposedText;
 - (NSString *)getCompositionFromPhoneticReadingBuffer;
-- (NSString *)getStrLocationResult:(BOOL)isAfter NS_SWIFT_NAME(getStrLocationResult(isAfter:));
+- (NSString *)getStrLocationResult:(BOOL)isFront NS_SWIFT_NAME(getStrLocationResult(isFront:));
 - (NSString *)getSyllableCompositionFromPhoneticReadingBuffer;
 - (void)clearPhoneticReadingBuffer;
 - (void)combinePhoneticReadingBufferKey:(UniChar)charCode;

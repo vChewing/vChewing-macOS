@@ -130,12 +130,22 @@ struct suiPrefPaneGeneral: View {
 					isOn: $selEnableKanjiConvToKangXi
 				).onChange(of: selEnableKanjiConvToKangXi) { value in
 					mgrPrefs.chineseConversionEnabled = value
+					selEnableKanjiConvToKangXi = value
+					if value {
+						mgrPrefs.shiftJISShinjitaiOutputEnabled = !value
+						selEnableKanjiConvToJIS = !value
+					}
 				}
 				Toggle(
 					LocalizedStringKey("Auto-convert traditional Chinese glyphs to JIS Shinjitai characters"),
 					isOn: $selEnableKanjiConvToJIS
 				).onChange(of: selEnableKanjiConvToJIS) { value in
 					mgrPrefs.shiftJISShinjitaiOutputEnabled = value
+					selEnableKanjiConvToJIS = value
+					if value {
+						mgrPrefs.chineseConversionEnabled = !value
+						selEnableKanjiConvToKangXi = !value
+					}
 				}
 				Toggle(
 					LocalizedStringKey("Stop farting (when typed phonetic combination is invalid, etc.)"),
