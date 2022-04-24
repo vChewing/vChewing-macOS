@@ -436,8 +436,6 @@
 				5B3133BE280B229700A4A505 /* KeyHandler_States.swift */,
 				D4E569DA27A34CC100AC2CEF /* KeyHandler.h */,
 				D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */,
-				6ACC3D3E27914F2400F1B140 /* KeyValueBlobReader.cpp */,
-				6ACC3D3C27914AAB00F1B140 /* KeyValueBlobReader.h */,
 				5B62A33727AE79CD00A19448 /* NSStringUtils.swift */,
 				5BF8423027BAA942008E7E4C /* vChewingKanjiConverter.swift */,
 			);
@@ -488,6 +486,8 @@
 			isa = PBXGroup;
 			children = (
 				5B62A32527AE758000A19448 /* SubLanguageModels */,
+				6ACC3D3E27914F2400F1B140 /* KeyValueBlobReader.cpp */,
+				6ACC3D3C27914AAB00F1B140 /* KeyValueBlobReader.h */,
 				D41355DA278E6D17005E5CBD /* LMInstantiator.h */,
 				D41355D9278E6D17005E5CBD /* LMInstantiator.mm */,
 				D495583A27A5C6C4006ADE1C /* mgrLangModel_Privates.h */,
