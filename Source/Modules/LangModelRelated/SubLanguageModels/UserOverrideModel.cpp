@@ -34,7 +34,7 @@ namespace vChewing
 {
 
 // About 20 generations.
-static const double DecayThreshould = 1.0 / 1048576.0;
+static const double DecayThreshold = 1.0 / 1048576.0;
 
 static double Score(size_t eventCount, size_t totalCount, double eventTimestamp, double timestamp, double lambda);
 static bool IsEndingPunctuation(const std::string &value);
@@ -126,7 +126,7 @@ void UserOverrideModel::Observation::update(const std::string &candidate, double
 static double Score(size_t eventCount, size_t totalCount, double eventTimestamp, double timestamp, double lambda)
 {
     double decay = exp((timestamp - eventTimestamp) * lambda);
-    if (decay < DecayThreshould)
+    if (decay < DecayThreshold)
     {
         return 0.0;
     }
