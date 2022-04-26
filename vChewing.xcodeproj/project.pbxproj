@@ -100,7 +100,6 @@
 		6ACC3D3F27914F2400F1B140 /* KeyValueBlobReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ACC3D3E27914F2400F1B140 /* KeyValueBlobReader.cpp */; };
 		6ACC3D442793701600F1B140 /* ParselessPhraseDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ACC3D402793701600F1B140 /* ParselessPhraseDB.cpp */; };
 		6ACC3D452793701600F1B140 /* ParselessLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ACC3D422793701600F1B140 /* ParselessLM.cpp */; };
-		D41355D8278D74B5005E5CBD /* mgrLangModel.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355D7278D7409005E5CBD /* mgrLangModel.mm */; };
 		D41355DB278E6D17005E5CBD /* LMInstantiator.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355D9278E6D17005E5CBD /* LMInstantiator.mm */; };
 		D41355DE278EA3ED005E5CBD /* UserPhrasesLM.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355DC278EA3ED005E5CBD /* UserPhrasesLM.mm */; };
 		D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427F76B278CA1BA004A2160 /* AppDelegate.swift */; };
@@ -324,8 +323,6 @@
 		6ACC3D412793701600F1B140 /* ParselessPhraseDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = ParselessPhraseDB.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		6ACC3D422793701600F1B140 /* ParselessLM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = ParselessLM.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		6ACC3D432793701600F1B140 /* ParselessLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = ParselessLM.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		D41355D6278D7409005E5CBD /* mgrLangModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = mgrLangModel.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		D41355D7278D7409005E5CBD /* mgrLangModel.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = mgrLangModel.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		D41355D9278E6D17005E5CBD /* LMInstantiator.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = LMInstantiator.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		D41355DA278E6D17005E5CBD /* LMInstantiator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = LMInstantiator.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		D41355DC278EA3ED005E5CBD /* UserPhrasesLM.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = UserPhrasesLM.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
@@ -343,7 +340,6 @@
 		D47F7DCF278C0897002F9DD7 /* ctlNonModalAlertWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ctlNonModalAlertWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = UserOverrideModel.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = UserOverrideModel.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		D495583A27A5C6C4006ADE1C /* mgrLangModel_Privates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = mgrLangModel_Privates.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		D4A13D5927A59D5C003BE359 /* ctlInputMethod.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ctlInputMethod.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		D4E33D8927A838CF006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D4E33D8E27A838F0006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -522,9 +518,6 @@
 				5BD0113A28180D6100609769 /* LMInstantiator.swift */,
 				D41355DA278E6D17005E5CBD /* LMInstantiator.h */,
 				D41355D9278E6D17005E5CBD /* LMInstantiator.mm */,
-				D495583A27A5C6C4006ADE1C /* mgrLangModel_Privates.h */,
-				D41355D6278D7409005E5CBD /* mgrLangModel.h */,
-				D41355D7278D7409005E5CBD /* mgrLangModel.mm */,
 				5BAEFACF28012565001F42C9 /* mgrLangModel.swift */,
 			);
 			path = LangModelRelated;
@@ -1176,7 +1169,6 @@
 				5BB802DA27FABA8300CF1C19 /* ctlInputMethod_Menu.swift in Sources */,
 				D41355DE278EA3ED005E5CBD /* UserPhrasesLM.mm in Sources */,
 				6ACC3D3F27914F2400F1B140 /* KeyValueBlobReader.cpp in Sources */,
-				D41355D8278D74B5005E5CBD /* mgrLangModel.mm in Sources */,
 				5BDC1CFA27FDF1310052C2B9 /* apiUpdate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
