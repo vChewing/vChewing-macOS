@@ -33,8 +33,8 @@ extension vChewing {
 				let fileHandle = FileHandle(forReadingAtPath: path)!
 				do {
 					let lineReader = try LineReader(file: fileHandle)
-					IME.prtDebugIntel("Header Seen ||\(lineReader)")
 					for strLine in lineReader {  // 不需要 i=0，因為第一遍迴圈就出結果。
+						IME.prtDebugIntel("Header Seen ||\(strLine)")
 						if strLine != kPragmaHeader {
 							IME.prtDebugIntel("Header Mismatch, Starting In-Place Consolidation.")
 							return false
@@ -68,7 +68,7 @@ extension vChewing {
 					IME.prtDebugIntel("EOF Fix Failed w/ Error: \(error).")
 					return false
 				}
-				IME.prtDebugIntel("Either EOF Fix Successful Or No-Need-To-Fix.")
+				IME.prtDebugIntel("EOF Successfully Ensured (with possible autofixes performed).")
 				return true
 			}
 			IME.prtDebugIntel("EOF Fix Failed: File Missing at \(path).")

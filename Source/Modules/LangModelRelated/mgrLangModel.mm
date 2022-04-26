@@ -142,12 +142,6 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, vChewing
 }
 
 // 這個函數無法遷移至 Swift
-+ (void)consolidateGivenFile:(NSString *)path shouldCheckPragma:(BOOL)shouldCheckPragma
-{
-    vChewing::LMConsolidator::ConsolidateContent([path UTF8String], shouldCheckPragma);
-}
-
-// 這個函數無法遷移至 Swift
 + (vChewing::LMInstantiator *)lmCHT
 {
     return &gLangModelCHT;

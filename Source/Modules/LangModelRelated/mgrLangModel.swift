@@ -233,7 +233,9 @@ import Cocoa
 
 			// We enforce the format consolidation here, since the pragma header
 			// will let the UserPhraseLM bypasses the consolidating process on load.
-			consolidate(givenFile: path, shouldCheckPragma: false)
+			if !vChewing.LMConsolidator.consolidate(path: path, pragma: false) {
+				return false
+			}
 
 			// We use FSEventStream to monitor possible changes of the user phrase folder, hence the
 			// lack of the needs of manually load data here unless FSEventStream is disabled by user.
