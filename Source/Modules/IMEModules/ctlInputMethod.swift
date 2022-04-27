@@ -38,10 +38,6 @@ extension ctlCandidate {
 
 @objc(ctlInputMethod)
 class ctlInputMethod: IMKInputController {
-	@objc static let kIMEModeCHS = "org.atelierInmu.inputmethod.vChewing.IMECHS"
-	@objc static let kIMEModeCHT = "org.atelierInmu.inputmethod.vChewing.IMECHT"
-	@objc static let kIMEModeNULL = "org.atelierInmu.inputmethod.vChewing.IMENULL"
-
 	@objc static var areWeDeleting = false
 
 	private static let tooltipController = TooltipController()
