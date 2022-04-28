@@ -29,6 +29,10 @@ import Megrez
 
 // MARK: - KeyHandler Sputnik.
 
+// Swift Extension 不允許直接存放這些變數，所以就寫了這個衛星型別。
+// 一旦 Mandarin 模組被 Swift 化，整個 KeyHandler 就可以都用 Swift。
+// 屆時會考慮將該衛星型別內的變數與常數都挪回 KeyHandler_Kernel 內。
+
 class KeyHandlerSputnik: NSObject {
 	static let kEpsilon: Double = 0.000001
 	static var inputMode: String = ""

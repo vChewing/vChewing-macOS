@@ -160,17 +160,17 @@ import Cocoa
 			let reading = getSyllableCompositionFromPhoneticReadingBuffer()
 
 			if !ifLangModelHasUnigrams(forKey: reading) {
-				IME.prtDebugIntel("B49C0979")
+				IME.prtDebugIntel("B49C0979：語彙庫內無「\(reading)」的匹配記錄。")
 				errorCallback()
 				stateCallback(buildInputtingState())
 				return true
 			}
 
 			// ... and insert it into the lattice grid...
-			insertReadingToBuilder(atCursor: reading)
+			insertReadingToBuilderAtCursor(reading: reading)
 
 			// ... then walk the lattice grid...
-			let poppedText = _popOverflowComposingTextAndWalk()
+			let poppedText = popOverflowComposingTextAndWalk()
 
 			// ... get and tweak override model suggestion if possible...
 			dealWithOverrideModelSuggestions()
@@ -233,8 +233,8 @@ import Cocoa
 							stateCallback(InputState.Committing(poppedText: " "))
 							stateCallback(InputState.Empty())
 						} else if ifLangModelHasUnigrams(forKey: " ") {
-							insertReadingToBuilder(atCursor: " ")
-							let poppedText = _popOverflowComposingTextAndWalk()
+							insertReadingToBuilderAtCursor(reading: " ")
+							let poppedText = popOverflowComposingTextAndWalk()
 							let inputting = buildInputtingState()
 							inputting.poppedText = poppedText
 							stateCallback(inputting)
@@ -330,8 +330,8 @@ import Cocoa
 			if !input.isOptionHold {
 				if ifLangModelHasUnigrams(forKey: "_punctuation_list") {
 					if isPhoneticReadingBufferEmpty() {
-						insertReadingToBuilder(atCursor: "_punctuation_list")
-						let poppedText: String! = _popOverflowComposingTextAndWalk()
+						insertReadingToBuilderAtCursor(reading: "_punctuation_list")
+						let poppedText: String! = popOverflowComposingTextAndWalk()
 						let inputting = buildInputtingState()
 						inputting.poppedText = poppedText
 						stateCallback(inputting)
@@ -354,7 +354,7 @@ import Cocoa
 
 		// MARK: Punctuation
 
-		// if nothing is matched, see if it's a punctuation key for current layout.
+		// If nothing is matched, see if it's a punctuation key for current layout.
 
 		var punctuationNamePrefix = ""
 
