@@ -112,7 +112,7 @@ class ctlInputMethod: IMKInputController {
 	}
 
 	override func setValue(_ value: Any!, forTag _: Int, client: Any!) {
-		var newInputMode = InputMode(rawValue: value as? String ?? InputMode.imeModeNULL.rawValue)
+		var newInputMode: InputMode = InputMode(rawValue: value as? String ?? "") ?? InputMode.imeModeNULL
 		switch newInputMode {
 			case InputMode.imeModeCHS:
 				newInputMode = InputMode.imeModeCHS
