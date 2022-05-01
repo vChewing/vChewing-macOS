@@ -1,6 +1,5 @@
-// Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are of:
-// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// Swiftified by (c) 2022 and onwards The vChewing Project (MIT-NTL License).
+// Rebranded from (c) Lukhnos Liu's C++ library "Gramambular" (MIT License).
 /*
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -24,17 +23,52 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#import "LMInstantiator.h"
-#import "UserOverrideModel.h"
-#import "mgrLangModel.h"
+extension Megrez {
+	public class Walker {
+		var mutGrid: Grid
 
-NS_ASSUME_NONNULL_BEGIN
+		public init(grid: Megrez.Grid = Megrez.Grid()) {
+			mutGrid = grid
+		}
 
-@interface mgrLangModel ()
-@property(class, readonly, nonatomic) vChewing::LMInstantiator *lmCHT;
-@property(class, readonly, nonatomic) vChewing::LMInstantiator *lmCHS;
-@property(class, readonly, nonatomic) vChewing::UserOverrideModel *userOverrideModelCHS;
-@property(class, readonly, nonatomic) vChewing::UserOverrideModel *userOverrideModelCHT;
-@end
+		public func reverseWalk(at location: Int, score accumulatedScore: Double = 0.0) -> [NodeAnchor] {
+			if location == 0 || location > mutGrid.width() {
+				return [] as [NodeAnchor]
+			}
 
-NS_ASSUME_NONNULL_END
+			var paths: [[NodeAnchor]] = []
+			let nodes: [NodeAnchor] = mutGrid.nodesEndingAt(location: location)
+
+			for n in nodes {
+				var n = n
+				if n.node == nil {
+					continue
+				}
+
+				n.accumulatedScore = accumulatedScore + n.node!.score()
+
+				var path: [NodeAnchor] = reverseWalk(
+					at: location - n.spanningLength,
+					score: n.accumulatedScore
+				)
+				path.insert(n, at: 0)
+
+				paths.append(path)
+			}
+
+			if !paths.isEmpty {
+				if var result = paths.first {
+					for value in paths {
+						if let vLast = value.last, let rLast = result.last {
+							if vLast.accumulatedScore > rLast.accumulatedScore {
+								result = value
+							}
+						}
+					}
+					return result
+				}
+			}
+			return [] as [NodeAnchor]
+		}
+	}
+}

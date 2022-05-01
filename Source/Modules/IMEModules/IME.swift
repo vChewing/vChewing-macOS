@@ -25,6 +25,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Carbon
 import Cocoa
 
+// The namespace of this input method.
+public enum vChewing {}
+
 public class IME: NSObject {
 	static let arrSupportedLocales = ["en", "zh-Hant", "zh-Hans", "ja"]
 	static let dlgOpenPath = NSOpenPanel()

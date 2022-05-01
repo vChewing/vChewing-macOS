@@ -28,6 +28,7 @@ clang-format: clang-format-swift clang-format-cpp
 
 clang-format-swift:
 	@git ls-files --exclude-standard | grep -E '\.swift$$' | xargs swift-format format --in-place --configuration ./.clang-format-swift.json --parallel
+	@git ls-files --exclude-standard | grep -E '\.swift$$' | xargs swift-format lint --configuration ./.clang-format-swift.json --parallel
 
 clang-format-cpp:
 	@git ls-files --exclude-standard | grep -E '\.(cpp|hpp|c|cc|cxx|hxx|ixx|h|m|mm|hh)$$' | xargs clang-format -i

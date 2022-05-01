@@ -26,7 +26,158 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
 
-@objc extension mgrLangModel {
+/// 我們不能讓 mgrLangModel 這個靜態管理器來承載下面這些副本變數。
+/// 所以，這些副本變數只能放在 mgrLangModel 的外部。
+/// 同時，這些變數不對外開放任意存取權限。
+/// 我們只在 mgrLangModel 內部寫幾個回傳函數、供其餘控制模組來讀取。
+
+private let kUserOverrideModelCapacity: Int = 500
+private let kObservedOverrideHalflife: Double = 5400.0
+
+private var gLangModelCHS = vChewing.LMInstantiator()
+private var gLangModelCHT = vChewing.LMInstantiator()
+private var gUserOverrideModelCHS = vChewing.LMUserOverride(
+	capacity: kUserOverrideModelCapacity, decayExponent: kObservedOverrideHalflife
+)
+private var gUserOverrideModelCHT = vChewing.LMUserOverride(
+	capacity: kUserOverrideModelCapacity, decayExponent: kObservedOverrideHalflife
+)
+
+@objc class mgrLangModel: NSObject {
+	/// 寫幾個回傳函數、供其餘控制模組來讀取那些被設為 fileprivate 的器外變數。
+	public static var lmCHS: vChewing.LMInstantiator { gLangModelCHS }
+	public static var lmCHT: vChewing.LMInstantiator { gLangModelCHT }
+	public static var uomCHS: vChewing.LMUserOverride { gUserOverrideModelCHS }
+	public static var uomCHT: vChewing.LMUserOverride { gUserOverrideModelCHT }
+
+	// MARK: - Functions reacting directly with language models.
+
+	static func loadCoreLanguageModelFile(filenameSansExtension: String, langModel lm: inout vChewing.LMInstantiator) {
+		let dataPath: String = mgrLangModel.getBundleDataPath(filenameSansExtension)
+		lm.loadLanguageModel(path: dataPath)
+	}
+
+	public static func loadDataModels() {
+		if !gLangModelCHT.isDataModelLoaded() {
+			loadCoreLanguageModelFile(filenameSansExtension: "data-cht", langModel: &gLangModelCHT)
+		}
+		if !gLangModelCHT.isMiscDataLoaded() {
+			gLangModelCHT.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
+		}
+		if !gLangModelCHT.isSymbolDataLoaded() {
+			gLangModelCHT.loadSymbolData(path: getBundleDataPath("data-symbols"))
+		}
+		if !gLangModelCHT.isCNSDataLoaded() {
+			gLangModelCHT.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
+		}
+
+		// -----------------
+		if !gLangModelCHS.isDataModelLoaded() {
+			loadCoreLanguageModelFile(filenameSansExtension: "data-chs", langModel: &gLangModelCHS)
+		}
+		if !gLangModelCHS.isMiscDataLoaded() {
+			gLangModelCHS.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
+		}
+		if !gLangModelCHS.isSymbolDataLoaded() {
+			gLangModelCHS.loadSymbolData(path: getBundleDataPath("data-symbols"))
+		}
+		if !gLangModelCHS.isCNSDataLoaded() {
+			gLangModelCHS.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
+		}
+	}
+
+	public static func loadDataModel(_ mode: InputMode) {
+		if mode == InputMode.imeModeCHS {
+			if !gLangModelCHS.isDataModelLoaded() {
+				loadCoreLanguageModelFile(filenameSansExtension: "data-chs", langModel: &gLangModelCHS)
+			}
+			if !gLangModelCHS.isMiscDataLoaded() {
+				gLangModelCHS.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
+			}
+			if !gLangModelCHS.isSymbolDataLoaded() {
+				gLangModelCHS.loadSymbolData(path: getBundleDataPath("data-symbols"))
+			}
+			if !gLangModelCHS.isCNSDataLoaded() {
+				gLangModelCHS.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
+			}
+		} else if mode == InputMode.imeModeCHT {
+			if !gLangModelCHT.isDataModelLoaded() {
+				loadCoreLanguageModelFile(filenameSansExtension: "data-cht", langModel: &gLangModelCHT)
+			}
+			if !gLangModelCHT.isMiscDataLoaded() {
+				gLangModelCHT.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
+			}
+			if !gLangModelCHT.isSymbolDataLoaded() {
+				gLangModelCHT.loadSymbolData(path: getBundleDataPath("data-symbols"))
+			}
+			if !gLangModelCHT.isCNSDataLoaded() {
+				gLangModelCHT.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
+			}
+		}
+	}
+
+	public static func loadUserPhrases() {
+		gLangModelCHT.loadUserPhrases(
+			path: userSymbolDataPath(InputMode.imeModeCHT),
+			filterPath: excludedPhrasesDataPath(InputMode.imeModeCHT)
+		)
+		gLangModelCHS.loadUserPhrases(
+			path: userPhrasesDataPath(InputMode.imeModeCHS),
+			filterPath: excludedPhrasesDataPath(InputMode.imeModeCHS)
+		)
+		gLangModelCHT.loadUserSymbolData(path: userSymbolDataPath(InputMode.imeModeCHT))
+		gLangModelCHS.loadUserSymbolData(path: userSymbolDataPath(InputMode.imeModeCHS))
+	}
+
+	public static func loadUserAssociatedPhrases() {
+		gLangModelCHT.loadUserAssociatedPhrases(
+			path: mgrLangModel.userAssociatedPhrasesDataPath(InputMode.imeModeCHT)
+		)
+		gLangModelCHT.loadUserAssociatedPhrases(
+			path: mgrLangModel.userAssociatedPhrasesDataPath(InputMode.imeModeCHS)
+		)
+	}
+
+	public static func loadUserPhraseReplacement() {
+		gLangModelCHT.loadPhraseReplacementMap(
+			path: mgrLangModel.phraseReplacementDataPath(InputMode.imeModeCHT)
+		)
+		gLangModelCHT.loadPhraseReplacementMap(
+			path: mgrLangModel.phraseReplacementDataPath(InputMode.imeModeCHS)
+		)
+	}
+
+	public static func checkIfUserPhraseExist(
+		userPhrase: String,
+		mode: InputMode,
+		key unigramKey: String
+	) -> Bool {
+		let unigrams: [Megrez.Unigram] =
+			(mode == InputMode.imeModeCHT)
+			? gLangModelCHT.unigramsFor(key: unigramKey) : gLangModelCHS.unigramsFor(key: unigramKey)
+		for unigram in unigrams {
+			if unigram.keyValue.value == userPhrase {
+				return true
+			}
+		}
+		return false
+	}
+
+	public static func setPhraseReplacementEnabled(_ state: Bool) {
+		gLangModelCHT.isPhraseReplacementEnabled = state
+		gLangModelCHS.isPhraseReplacementEnabled = state
+	}
+
+	public static func setCNSEnabled(_ state: Bool) {
+		gLangModelCHT.isCNSEnabled = state
+		gLangModelCHS.isCNSEnabled = state
+	}
+
+	public static func setSymbolEnabled(_ state: Bool) {
+		gLangModelCHT.isSymbolEnabled = state
+		gLangModelCHS.isSymbolEnabled = state
+	}
+
 	// MARK: - 獲取當前輸入法封包內的原廠核心語彙檔案所在路徑
 
 	static func getBundleDataPath(_ filenameSansExt: String) -> String {
@@ -233,7 +384,9 @@ import Cocoa
 
 			// We enforce the format consolidation here, since the pragma header
 			// will let the UserPhraseLM bypasses the consolidating process on load.
-			consolidate(givenFile: path, shouldCheckPragma: false)
+			if !vChewing.LMConsolidator.consolidate(path: path, pragma: false) {
+				return false
+			}
 
 			// We use FSEventStream to monitor possible changes of the user phrase folder, hence the
 			// lack of the needs of manually load data here unless FSEventStream is disabled by user.

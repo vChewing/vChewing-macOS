@@ -1,6 +1,5 @@
-// Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are of:
-// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// Swiftified by (c) 2022 and onwards The vChewing Project (MIT-NTL License).
+// Rebranded from (c) Lukhnos Liu's C++ library "Gramambular" (MIT License).
 /*
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -24,46 +23,22 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef ASSOCIATEDPHRASES_H
-#define ASSOCIATEDPHRASES_H
+extension Megrez {
+	// 這裡充其量只是框架，回頭實際使用時需要派生一個型別、且重寫相關函數。
+	// 這裡寫了一點假內容，不然有些 Swift 格式化工具會破壞掉函數的參數設計。
+	open class LanguageModel {
+		public init() {}
 
-#include <iostream>
-#include <map>
-#include <string>
-#include <vector>
+		open func unigramsFor(key: String) -> [Megrez.Unigram] {
+			key.isEmpty ? [Megrez.Unigram]() : [Megrez.Unigram]()
+		}
 
-namespace vChewing
-{
+		open func bigramsForKeys(precedingKey: String, key: String) -> [Megrez.Bigram] {
+			precedingKey == key ? [Megrez.Bigram]() : [Megrez.Bigram]()
+		}
 
-class AssociatedPhrases
-{
-  public:
-    AssociatedPhrases();
-    ~AssociatedPhrases();
-
-    const bool isLoaded();
-    bool open(const char *path);
-    void close();
-    const std::vector<std::string> valuesForKey(const std::string &key);
-    const bool hasValuesForKey(const std::string &key);
-
-  protected:
-    struct Row
-    {
-        Row(std::string_view &k, std::string_view &v) : key(k), value(v)
-        {
-        }
-        std::string_view key;
-        std::string_view value;
-    };
-
-    std::map<std::string_view, std::vector<Row>> keyRowMap;
-
-    int fd;
-    void *data;
-    size_t length;
-};
-
-} // namespace vChewing
-
-#endif /* AssociatedPhrases_hpp */
+		open func hasUnigramsFor(key: String) -> Bool {
+			key.count != 0
+		}
+	}
+}

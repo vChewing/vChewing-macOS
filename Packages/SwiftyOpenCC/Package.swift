@@ -48,10 +48,6 @@ let package = Package(
 				"src/UTF8StringSliceTest.cpp",
 				"src/UTF8UtilTest.cpp",
 				"deps/google-benchmark",
-				"deps/gtest-1.11.0",
-				"deps/pybind11-2.5.0",
-				"deps/rapidjson-1.1.0",
-				"deps/tclap-1.2.2",
 
 				"src/CmdLineOutput.hpp",
 				"src/Config.hpp",

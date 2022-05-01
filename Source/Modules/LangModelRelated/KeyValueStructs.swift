@@ -1,6 +1,4 @@
-// Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are of:
-// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 /*
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -24,52 +22,42 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef NODEANCHOR_H_
-#define NODEANCHOR_H_
+import Foundation
 
-#include <vector>
+extension vChewing {
+	@frozen public struct KeyValue: Equatable {
+		var key: String
+		var value: String
 
-#include "Node.h"
+		public init(key: String = "", value: String = "") {
+			self.key = key
+			self.value = value
+		}
 
-namespace Gramambular
-{
+		public static func == (lhs: KeyValue, rhs: KeyValue) -> Bool {
+			lhs.key == rhs.key && lhs.value == rhs.value
+		}
+	}
 
-struct NodeAnchor
-{
-    const Node *node = nullptr;
-    size_t location = 0;
-    size_t spanningLength = 0;
-    double accumulatedScore = 0.0;
-};
+	@frozen public struct KeyValueRate: Equatable {
+		var key: String
+		var value: String
+		var rate: Double
 
-inline std::ostream &operator<<(std::ostream &stream, const NodeAnchor &anchor)
-{
-    stream << "{@(" << anchor.location << "," << anchor.spanningLength << "),";
-    if (anchor.node)
-    {
-        stream << *(anchor.node);
-    }
-    else
-    {
-        stream << "null";
-    }
-    stream << "}";
-    return stream;
+		public init(key: String = "", value: String = "", rate: Double = 0.0) {
+			self.key = key
+			self.value = value
+			self.rate = rate
+		}
+
+		public init(keyValue: KeyValue = KeyValue(key: "", value: ""), rate: Double = 0.0) {
+			key = keyValue.key
+			value = keyValue.value
+			self.rate = rate
+		}
+
+		public static func == (lhs: KeyValueRate, rhs: KeyValueRate) -> Bool {
+			lhs.key == rhs.key && lhs.value == rhs.value && lhs.rate == rhs.rate
+		}
+	}
 }
-
-inline std::ostream &operator<<(std::ostream &stream, const std::vector<NodeAnchor> &anchor)
-{
-    for (std::vector<NodeAnchor>::const_iterator i = anchor.begin(); i != anchor.end(); ++i)
-    {
-        stream << *i;
-        if (i + 1 != anchor.end())
-        {
-            stream << "<-";
-        }
-    }
-
-    return stream;
-}
-} // namespace Gramambular
-
-#endif

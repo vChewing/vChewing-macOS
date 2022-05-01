@@ -32,45 +32,67 @@ import Cocoa
 	// MARK: - 構築狀態（State Building）
 
 	func buildInputtingState() -> InputState.Inputting {
-		// 觸發資料封裝更新，否則下文拿到的資料會是過期的。
-		packageBufferStateMaterials()
-		// 獲取封裝好的資料
-		let composedText = getComposedText()
-		let packagedCursorIndex = UInt(getPackagedCursorIndex())
-		let resultOfRear = getStrLocationResult(isFront: false)
-		let resultOfFront = getStrLocationResult(isFront: true)
+		// "Updating the composing buffer" means to request the client
+		// to "refresh" the text input buffer with our "composing text"
+		var composingBuffer = ""
+		var composedStringCursorIndex = 0
 
-		// 初期化狀態
-		let newState = InputState.Inputting(composingBuffer: composedText, cursorIndex: packagedCursorIndex)
+		var readingCursorIndex: size_t = 0
+		let builderCursorIndex: size_t = getBuilderCursorIndex()
 
-		// 組建提示文本
-		var tooltip = ""
+		// We must do some Unicode codepoint counting to find the actual cursor location for the client
+		// i.e. we need to take UTF-16 into consideration, for which a surrogate pair takes 2 UniChars
+		// locations. These processes are inherited from the ObjC++ version of this class and might be
+		// unnecessary in Swift, but this deduction requires further experiments.
+		for walkedNode in KeyHandlerSputnik.walkedNodes {
+			if let theNode = walkedNode.node {
+				let strNodeValue = theNode.currentKeyValue().value
+				composingBuffer += strNodeValue
 
-		// 如果在用特定的模式的話，則始終顯示對應的提示。
-		// TODO: 該功能無法正常運作，暫時註釋掉。
-		//		if ctlInputMethod.currentKeyHandler.inputMode == InputMode.imeModeCHT {
-		//			if mgrPrefs.chineseConversionEnabled && !mgrPrefs.shiftJISShinjitaiOutputEnabled {
-		//				tooltip = String(
-		//					format: "%@%@%@", NSLocalizedString("Force KangXi Writing", comment: ""), "\n",
-		//					NSLocalizedString("NotificationSwitchON", comment: ""))
-		//			} else if mgrPrefs.shiftJISShinjitaiOutputEnabled {
-		//				tooltip = String(
-		//					format: "%@%@%@", NSLocalizedString("JIS Shinjitai Output", comment: ""), "\n",
-		//					NSLocalizedString("NotificationSwitchON", comment: ""))
-		//			}
-		//		}
+				let arrSplit: [NSString] = (strNodeValue as NSString).split()
+				let codepointCount = arrSplit.count
 
-		// 備註：因為目前的輸入法已經有了 NSString Emoji 支援，所以這個工具提示可能不會出現了。
-		// 姑且留下來用作萬一時的偵錯用途。
-		if resultOfRear != "" || resultOfFront != "" {
-			tooltip = String(
-				format: NSLocalizedString("Cursor is between \"%@\" and \"%@\".", comment: ""),
-				resultOfFront, resultOfRear
-			)
+				// This re-aligns the cursor index in the composed string
+				// (the actual cursor on the screen) with the builder's logical
+				// cursor (reading) cursor; each built node has a "spanning length"
+				// (e.g. two reading blocks has a spanning length of 2), and we
+				// accumulate those lengths to calculate the displayed cursor
+				// index.
+				let spanningLength: Int = walkedNode.spanningLength
+				if readingCursorIndex + spanningLength <= builderCursorIndex {
+					composedStringCursorIndex += (strNodeValue as NSString).length
+					readingCursorIndex += spanningLength
+				} else {
+					if codepointCount == spanningLength {
+						var i = 0
+						while i < codepointCount, readingCursorIndex < builderCursorIndex {
+							composedStringCursorIndex += arrSplit[i].length
+							readingCursorIndex += 1
+							i += 1
+						}
+					} else {
+						if readingCursorIndex < builderCursorIndex {
+							composedStringCursorIndex += (strNodeValue as NSString).length
+							readingCursorIndex += spanningLength
+							if readingCursorIndex > builderCursorIndex {
+								readingCursorIndex = builderCursorIndex
+							}
+						}
+					}
+				}
+			}
 		}
+		// Now, we gather all the intel, separate the composing buffer to two parts (head and tail),
+		// and insert the reading text (the Mandarin syllable) in between them.
+		// The reading text is what the user is typing.
 
-		newState.tooltip = tooltip
-		return newState
+		let head = String((composingBuffer as NSString).substring(to: composedStringCursorIndex))
+		let reading = getCompositionFromPhoneticReadingBuffer()
+		let tail = String((composingBuffer as NSString).substring(from: composedStringCursorIndex))
+		let composedText = head + reading + tail
+		let cursorIndex = composedStringCursorIndex + reading.count
+
+		return InputState.Inputting(composingBuffer: composedText, cursorIndex: UInt(cursorIndex))
 	}
 
 	// MARK: - 用以生成候選詞陣列及狀態
@@ -102,7 +124,8 @@ import Cocoa
 	) -> InputState.AssociatedPhrases! {
 		// 上一行必須要用驚嘆號，否則 Xcode 會誤導你砍掉某些實際上必需的語句。
 		InputState.AssociatedPhrases(
-			candidates: buildAssociatePhraseArray(withKey: key), useVerticalMode: useVerticalMode)
+			candidates: buildAssociatePhraseArray(withKey: key), useVerticalMode: useVerticalMode
+		)
 	}
 
 	// MARK: - 用以處理就地新增自訂語彙時的行為
@@ -191,8 +214,8 @@ import Cocoa
 		}
 
 		if isPhoneticReadingBufferEmpty() {
-			insertReadingToBuilder(atCursor: customPunctuation)
-			let poppedText = _popOverflowComposingTextAndWalk()
+			insertReadingToBuilderAtCursor(reading: customPunctuation)
+			let poppedText = popOverflowComposingTextAndWalk()
 			let inputting = buildInputtingState()
 			inputting.poppedText = poppedText
 			stateCallback(inputting)
@@ -256,7 +279,7 @@ import Cocoa
 			return false
 		}
 
-		let readings: [String] = _currentReadings()
+		let readings: [String] = currentReadings()
 		let composingBuffer =
 			(IME.areWeUsingOurOwnPhraseEditor)
 			? readings.joined(separator: "-")
@@ -283,7 +306,7 @@ import Cocoa
 		if isPhoneticReadingBufferEmpty() {
 			if getBuilderCursorIndex() >= 0 {
 				deleteBuilderReadingInFrontOfCursor()
-				_walk()
+				walk()
 			} else {
 				IME.prtDebugIntel("9D69908D")
 				errorCallback()
@@ -316,7 +339,7 @@ import Cocoa
 		if isPhoneticReadingBufferEmpty() {
 			if getBuilderCursorIndex() != getBuilderLength() {
 				deleteBuilderReadingAfterCursor()
-				_walk()
+				walk()
 				let inputting = buildInputtingState()
 				// 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
 				if !inputting.composingBuffer.isEmpty {
@@ -375,7 +398,7 @@ import Cocoa
 		}
 
 		if getBuilderCursorIndex() != 0 {
-			setBuilderCursorIndex(0)
+			setBuilderCursorIndex(value: 0)
 			stateCallback(buildInputtingState())
 		} else {
 			IME.prtDebugIntel("66D97F90")
@@ -405,7 +428,7 @@ import Cocoa
 		}
 
 		if getBuilderCursorIndex() != getBuilderLength() {
-			setBuilderCursorIndex(getBuilderLength())
+			setBuilderCursorIndex(value: getBuilderLength())
 			stateCallback(buildInputtingState())
 		} else {
 			IME.prtDebugIntel("9B69908E")
@@ -475,7 +498,7 @@ import Cocoa
 						composingBuffer: currentState.composingBuffer,
 						cursorIndex: currentState.cursorIndex,
 						markerIndex: UInt(nextPosition),
-						readings: _currentReadings()
+						readings: currentReadings()
 					)
 					marking.tooltipForInputting = currentState.tooltip
 					stateCallback(marking)
@@ -486,7 +509,7 @@ import Cocoa
 				}
 			} else {
 				if getBuilderCursorIndex() < getBuilderLength() {
-					setBuilderCursorIndex(getBuilderCursorIndex() + 1)
+					setBuilderCursorIndex(value: getBuilderCursorIndex() + 1)
 					stateCallback(buildInputtingState())
 				} else {
 					IME.prtDebugIntel("A96AAD58")
@@ -526,7 +549,7 @@ import Cocoa
 						composingBuffer: currentState.composingBuffer,
 						cursorIndex: currentState.cursorIndex,
 						markerIndex: UInt(previousPosition),
-						readings: _currentReadings()
+						readings: currentReadings()
 					)
 					marking.tooltipForInputting = currentState.tooltip
 					stateCallback(marking)
@@ -537,7 +560,7 @@ import Cocoa
 				}
 			} else {
 				if getBuilderCursorIndex() > 0 {
-					setBuilderCursorIndex(getBuilderCursorIndex() - 1)
+					setBuilderCursorIndex(value: getBuilderCursorIndex() - 1)
 					stateCallback(buildInputtingState())
 				} else {
 					IME.prtDebugIntel("7045E6F3")

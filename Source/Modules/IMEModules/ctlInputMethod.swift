@@ -38,10 +38,6 @@ extension ctlCandidate {
 
 @objc(ctlInputMethod)
 class ctlInputMethod: IMKInputController {
-	@objc static let kIMEModeCHS = "org.atelierInmu.inputmethod.vChewing.IMECHS"
-	@objc static let kIMEModeCHT = "org.atelierInmu.inputmethod.vChewing.IMECHT"
-	@objc static let kIMEModeNULL = "org.atelierInmu.inputmethod.vChewing.IMENULL"
-
 	@objc static var areWeDeleting = false
 
 	private static let tooltipController = TooltipController()
@@ -116,7 +112,7 @@ class ctlInputMethod: IMKInputController {
 	}
 
 	override func setValue(_ value: Any!, forTag _: Int, client: Any!) {
-		var newInputMode = InputMode(rawValue: value as? String ?? InputMode.imeModeNULL.rawValue)
+		var newInputMode: InputMode = InputMode(rawValue: value as? String ?? "") ?? InputMode.imeModeNULL
 		switch newInputMode {
 			case InputMode.imeModeCHS:
 				newInputMode = InputMode.imeModeCHS

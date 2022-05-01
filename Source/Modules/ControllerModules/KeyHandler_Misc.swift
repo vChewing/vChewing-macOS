@@ -43,7 +43,7 @@ import Cocoa
 			&& (cursorIndex < getBuilderLength()))
 			|| cursorIndex == 0
 		{
-			if cursorIndex == 0 && !mgrPrefs.setRearCursorMode {
+			if cursorIndex == 0, !mgrPrefs.setRearCursorMode {
 				cursorIndex += getKeyLengthAtIndexZero()
 			} else {
 				cursorIndex += 1

@@ -1,6 +1,5 @@
-// Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are of:
-// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// Swiftified by (c) 2022 and onwards The vChewing Project (MIT-NTL License).
+// Rebranded from (c) Lukhnos Liu's C++ library "Gramambular" (MIT License).
 /*
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -24,29 +23,52 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef LANGUAGEMODEL_H_
-#define LANGUAGEMODEL_H_
+extension Megrez {
+	@frozen public struct Span {
+		private var mutLengthNodeMap: [Int: Megrez.Node]
+		private var mutMaximumLength: Int
+		var maximumLength: Int {
+			mutMaximumLength
+		}
 
-#include <string>
-#include <vector>
+		public init() {
+			mutLengthNodeMap = [:]
+			mutMaximumLength = 0
+		}
 
-#include "Bigram.h"
-#include "Unigram.h"
+		mutating func clear() {
+			mutLengthNodeMap.removeAll()
+			mutMaximumLength = 0
+		}
 
-namespace Gramambular
-{
+		mutating func insert(node: Node, length: Int) {
+			mutLengthNodeMap[length] = node
+			if length > mutMaximumLength {
+				mutMaximumLength = length
+			}
+		}
 
-class LanguageModel
-{
-  public:
-    virtual ~LanguageModel()
-    {
-    }
+		mutating func removeNodeOfLengthGreaterThan(_ length: Int) {
+			if length > mutMaximumLength { return }
+			var max = 0
+			var removalList: [Int: Megrez.Node] = [:]
+			for key in mutLengthNodeMap.keys {
+				if key > length {
+					removalList[key] = mutLengthNodeMap[key]
+				} else {
+					if key > max {
+						max = key
+					}
+				}
+			}
+			for key in removalList.keys {
+				mutLengthNodeMap.removeValue(forKey: key)
+			}
+			mutMaximumLength = max
+		}
 
-    virtual const std::vector<Bigram> bigramsForKeys(const std::string &preceedingKey, const std::string &key) = 0;
-    virtual const std::vector<Unigram> unigramsForKey(const std::string &key) = 0;
-    virtual bool hasUnigramsForKey(const std::string &key) = 0;
-};
-} // namespace Gramambular
-
-#endif
+		public func node(length: Int) -> Node? {
+			mutLengthNodeMap[length]
+		}
+	}
+}
