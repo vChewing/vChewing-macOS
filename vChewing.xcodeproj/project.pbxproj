@@ -206,12 +206,7 @@
 		5B5D28AB281EA1E800523D4D /* lmLite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lmLite.swift; sourceTree = "<group>"; };
 		5B5E535127EF261400C6AA1E /* IME.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = IME.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		5B61B0C9280BEFD4002E3CFA /* KeyHandler_Misc.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_Misc.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
-		5B62A32627AE77BB00A19448 /* LMConsolidator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = LMConsolidator.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		5B62A32727AE77BB00A19448 /* LMConsolidator.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = LMConsolidator.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = FSEventStreamHelper.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
-		5B62A32B27AE78B000A19448 /* CNSLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = CNSLM.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		5B62A32C27AE78B000A19448 /* CoreLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = CoreLM.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		5B62A32D27AE78B000A19448 /* CoreLM.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = CoreLM.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		5B62A33127AE792F00A19448 /* InputSourceHelper.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputSourceHelper.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		5B62A33527AE795800A19448 /* mgrPrefs.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = mgrPrefs.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		5B62A33727AE79CD00A19448 /* NSStringUtils.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = NSStringUtils.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
@@ -223,14 +218,12 @@
 		5B62A34527AE7CD900A19448 /* NotifierController.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = NotifierController.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		5B707CE527D9F3A10099EF99 /* SwiftyOpenCC */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SwiftyOpenCC; path = Packages/SwiftyOpenCC; sourceTree = "<group>"; };
 		5B707CE727D9F4590099EF99 /* OpenCCBridge.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = OpenCCBridge.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
-		5B7111C727DEF9FF00444310 /* UserSymbolLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = UserSymbolLM.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		5B73FB5427B2BD6900E9BF49 /* PhraseEditor-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "PhraseEditor-Info.plist"; path = "UserPhraseEditor/PhraseEditor-Info.plist"; sourceTree = SOURCE_ROOT; };
 		5B73FB5F27B2BE1300E9BF49 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_HandleCandidate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		5B7BC4AF27AFFBE800F66C24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmPrefWindow.xib; sourceTree = "<group>"; };
 		5B7BC4B227AFFC0B00F66C24 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmPrefWindow.strings; sourceTree = "<group>"; };
 		5B7F225C2808501000DDD3CB /* KeyHandler_HandleInput.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_HandleInput.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
-		5B8F43ED27C9BC220069AC27 /* SymbolLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SymbolLM.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		5B949BD82816DC5400D87B5D /* LineReader.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = LineReader.swift; sourceTree = "<group>"; usesTabs = 1; };
 		5B949BDA2816DDBC00D87B5D /* LMConsolidator.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = LMConsolidator.swift; sourceTree = "<group>"; usesTabs = 1; };
 		5BA0DF2E2817857D009E73BB /* lmUserOverride.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = lmUserOverride.swift; sourceTree = "<group>"; usesTabs = 1; };
@@ -324,25 +317,15 @@
 		6ACA41EF15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6ACA41F215FC1D9000935EF6 /* Installer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Installer-Info.plist"; path = "Installer/Installer-Info.plist"; sourceTree = SOURCE_ROOT; };
 		6ACA41F315FC1D9000935EF6 /* Installer-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Installer-Prefix.pch"; path = "Installer/Installer-Prefix.pch"; sourceTree = SOURCE_ROOT; };
-		6ACC3D3C27914AAB00F1B140 /* KeyValueBlobReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = KeyValueBlobReader.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		6ACC3D3E27914F2400F1B140 /* KeyValueBlobReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = KeyValueBlobReader.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		6ACC3D402793701600F1B140 /* ParselessPhraseDB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = ParselessPhraseDB.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		6ACC3D412793701600F1B140 /* ParselessPhraseDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = ParselessPhraseDB.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		6ACC3D422793701600F1B140 /* ParselessLM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = ParselessLM.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		6ACC3D432793701600F1B140 /* ParselessLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = ParselessLM.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		D41355D9278E6D17005E5CBD /* LMInstantiator.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = LMInstantiator.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		D41355DA278E6D17005E5CBD /* LMInstantiator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = LMInstantiator.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		D41355DC278EA3ED005E5CBD /* UserPhrasesLM.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = UserPhrasesLM.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		D41355DD278EA3ED005E5CBD /* UserPhrasesLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = UserPhrasesLM.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		D427A9BF25ED28CC005D43E0 /* vChewing-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "vChewing-Bridging-Header.h"; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		D427F76B278CA1BA004A2160 /* AppDelegate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
-		D44FB74B2792189A003C80A6 /* PhraseReplacementMap.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = PhraseReplacementMap.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		D44FB74C2792189A003C80A6 /* PhraseReplacementMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = PhraseReplacementMap.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		D456576D279E4F7B00DF6BC9 /* InputHandler.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputHandler.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		D461B791279DAC010070E734 /* InputState.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputState.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		D47B92BF27972AC800458394 /* main.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = main.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
-		D47D73AA27A6CAE600255A50 /* AssociatedPhrases.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = AssociatedPhrases.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		D47D73AB27A6CAE600255A50 /* AssociatedPhrases.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = AssociatedPhrases.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		D47F7DCD278BFB57002F9DD7 /* ctlPrefWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlPrefWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		D47F7DCF278C0897002F9DD7 /* ctlNonModalAlertWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlNonModalAlertWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = UserOverrideModel.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
@@ -417,16 +400,6 @@
 			path = SubLMs;
 			sourceTree = "<group>";
 		};
-		5B4D47B627C9186900220DDC /* InstantiatedModels */ = {
-			isa = PBXGroup;
-			children = (
-				5B62A32B27AE78B000A19448 /* CNSLM.h */,
-				5B8F43ED27C9BC220069AC27 /* SymbolLM.h */,
-				5B7111C727DEF9FF00444310 /* UserSymbolLM.h */,
-			);
-			path = InstantiatedModels;
-			sourceTree = "<group>";
-		};
 		5B62A30127AE732800A19448 /* 3rdParty */ = {
 			isa = PBXGroup;
 			children = (
@@ -489,8 +462,6 @@
 			isa = PBXGroup;
 			children = (
 				5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */,
-				5B62A32627AE77BB00A19448 /* LMConsolidator.h */,
-				5B62A32727AE77BB00A19448 /* LMConsolidator.mm */,
 				5B949BDA2816DDBC00D87B5D /* LMConsolidator.swift */,
 			);
 			path = FileHandlers;
@@ -520,39 +491,26 @@
 		5B62A32427AE757300A19448 /* LangModelRelated */ = {
 			isa = PBXGroup;
 			children = (
-				5B62A32527AE758000A19448 /* SubLanguageModels */,
+				5B62A32527AE758000A19448 /* OldFileReferences */,
 				5B407308281672610023DFFF /* SubLMs */,
-				6ACC3D3E27914F2400F1B140 /* KeyValueBlobReader.cpp */,
-				6ACC3D3C27914AAB00F1B140 /* KeyValueBlobReader.h */,
 				5BE33BEC28169B5D00CE5BB0 /* KeyValueStructs.swift */,
 				5BD0113A28180D6100609769 /* LMInstantiator.swift */,
-				D41355DA278E6D17005E5CBD /* LMInstantiator.h */,
-				D41355D9278E6D17005E5CBD /* LMInstantiator.mm */,
 				5BAEFACF28012565001F42C9 /* mgrLangModel.swift */,
 			);
 			path = LangModelRelated;
 			sourceTree = "<group>";
 		};
-		5B62A32527AE758000A19448 /* SubLanguageModels */ = {
+		5B62A32527AE758000A19448 /* OldFileReferences */ = {
 			isa = PBXGroup;
 			children = (
-				5B4D47B627C9186900220DDC /* InstantiatedModels */,
-				D47D73AB27A6CAE600255A50 /* AssociatedPhrases.h */,
-				D47D73AA27A6CAE600255A50 /* AssociatedPhrases.mm */,
-				5B62A32C27AE78B000A19448 /* CoreLM.h */,
-				5B62A32D27AE78B000A19448 /* CoreLM.mm */,
 				6ACC3D422793701600F1B140 /* ParselessLM.cpp */,
 				6ACC3D432793701600F1B140 /* ParselessLM.h */,
 				6ACC3D402793701600F1B140 /* ParselessPhraseDB.cpp */,
 				6ACC3D412793701600F1B140 /* ParselessPhraseDB.h */,
-				D44FB74C2792189A003C80A6 /* PhraseReplacementMap.h */,
-				D44FB74B2792189A003C80A6 /* PhraseReplacementMap.mm */,
 				D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */,
 				D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */,
-				D41355DD278EA3ED005E5CBD /* UserPhrasesLM.h */,
-				D41355DC278EA3ED005E5CBD /* UserPhrasesLM.mm */,
 			);
-			path = SubLanguageModels;
+			path = OldFileReferences;
 			sourceTree = "<group>";
 		};
 		5B62A33027AE78E500A19448 /* Resources */ = {
