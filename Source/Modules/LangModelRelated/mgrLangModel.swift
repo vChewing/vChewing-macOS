@@ -25,7 +25,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import Cocoa
-import Megrez
 
 /// 我們不能讓 mgrLangModel 這個靜態管理器來承載下面這些副本變數。
 /// 所以，這些副本變數只能放在 mgrLangModel 的外部。

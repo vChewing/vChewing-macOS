@@ -1,6 +1,5 @@
-// Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
-// Refactored from the ObjCpp-version of this class by:
-// (c) 2011 and onwards The OpenVanilla Project (MIT License).
+// Swiftified by (c) 2022 and onwards The vChewing Project (MIT-NTL License).
+// Rebranded from (c) Lukhnos Liu's C++ library "Gramambular" (MIT License).
 /*
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -24,19 +23,52 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import Cocoa
+extension Megrez {
+	public class Walker {
+		var mutGrid: Grid
 
-// MARK: - KeyHandler Sputnik.
+		public init(grid: Megrez.Grid = Megrez.Grid()) {
+			mutGrid = grid
+		}
 
-// Swift Extension 不允許直接存放這些變數，所以就寫了這個衛星型別。
-// 一旦 Mandarin 模組被 Swift 化，整個 KeyHandler 就可以都用 Swift。
-// 屆時會考慮將該衛星型別內的變數與常數都挪回 KeyHandler_Kernel 內。
+		public func reverseWalk(at location: Int, score accumulatedScore: Double = 0.0) -> [NodeAnchor] {
+			if location == 0 || location > mutGrid.width() {
+				return [] as [NodeAnchor]
+			}
 
-class KeyHandlerSputnik: NSObject {
-	static let kEpsilon: Double = 0.000001
-	static var inputMode: String = ""
-	static var languageModel: vChewing.LMInstantiator = .init()
-	static var userOverrideModel: vChewing.LMUserOverride = .init()
-	static var builder: Megrez.BlockReadingBuilder = .init(lm: languageModel)
-	static var walkedNodes: [Megrez.NodeAnchor] = []
+			var paths: [[NodeAnchor]] = []
+			let nodes: [NodeAnchor] = mutGrid.nodesEndingAt(location: location)
+
+			for n in nodes {
+				var n = n
+				if n.node == nil {
+					continue
+				}
+
+				n.accumulatedScore = accumulatedScore + n.node!.score()
+
+				var path: [NodeAnchor] = reverseWalk(
+					at: location - n.spanningLength,
+					score: n.accumulatedScore
+				)
+				path.insert(n, at: 0)
+
+				paths.append(path)
+			}
+
+			if !paths.isEmpty {
+				if var result = paths.first {
+					for value in paths {
+						if let vLast = value.last, let rLast = result.last {
+							if vLast.accumulatedScore > rLast.accumulatedScore {
+								result = value
+							}
+						}
+					}
+					return result
+				}
+			}
+			return [] as [NodeAnchor]
+		}
+	}
 }

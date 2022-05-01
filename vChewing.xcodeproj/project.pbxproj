@@ -14,6 +14,17 @@
 		5B2DB16F27AF6891006D874E /* data-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16D27AF6891006D874E /* data-chs.txt */; };
 		5B2DB17027AF6891006D874E /* data-cht.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16E27AF6891006D874E /* data-cht.txt */; };
 		5B3133BF280B229700A4A505 /* KeyHandler_States.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3133BE280B229700A4A505 /* KeyHandler_States.swift */; };
+		5B38F59A281E2E49007D5F5D /* 6_Unigram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1D15FC0EB100ABF4B3 /* 6_Unigram.swift */; };
+		5B38F59B281E2E49007D5F5D /* 7_KeyValuePair.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1815FC0EB100ABF4B3 /* 7_KeyValuePair.swift */; };
+		5B38F59C281E2E49007D5F5D /* 2_Grid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1715FC0EB100ABF4B3 /* 2_Grid.swift */; };
+		5B38F59D281E2E49007D5F5D /* 4_Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1A15FC0EB100ABF4B3 /* 4_Node.swift */; };
+		5B38F59E281E2E49007D5F5D /* 6_Bigram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1415FC0EB100ABF4B3 /* 6_Bigram.swift */; };
+		5B38F59F281E2E49007D5F5D /* 3_NodeAnchor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1B15FC0EB100ABF4B3 /* 3_NodeAnchor.swift */; };
+		5B38F5A0281E2E49007D5F5D /* 1_Walker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1E15FC0EB100ABF4B3 /* 1_Walker.swift */; };
+		5B38F5A1281E2E49007D5F5D /* 1_BlockReadingBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1515FC0EB100ABF4B3 /* 1_BlockReadingBuilder.swift */; };
+		5B38F5A2281E2E49007D5F5D /* 0_Megrez.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1615FC0EB100ABF4B3 /* 0_Megrez.swift */; };
+		5B38F5A3281E2E49007D5F5D /* 3_Span.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1C15FC0EB100ABF4B3 /* 3_Span.swift */; };
+		5B38F5A4281E2E49007D5F5D /* 5_LanguageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1915FC0EB100ABF4B3 /* 5_LanguageModel.swift */; };
 		5B40730C281672610023DFFF /* lmAssociates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B407309281672610023DFFF /* lmAssociates.swift */; };
 		5B40730D281672610023DFFF /* lmReplacements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B40730A281672610023DFFF /* lmReplacements.swift */; };
 		5B5E535227EF261400C6AA1E /* IME.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E535127EF261400C6AA1E /* IME.swift */; };
@@ -288,17 +299,17 @@
 		6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A0D4EF515FC0DA600ABF4B3 /* IME-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IME-Info.plist"; sourceTree = "<group>"; };
 		6A0D4EF615FC0DA600ABF4B3 /* vChewing-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vChewing-Prefix.pch"; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		6A0D4F1415FC0EB100ABF4B3 /* Bigram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = Bigram.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		6A0D4F1515FC0EB100ABF4B3 /* BlockReadingBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = BlockReadingBuilder.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		6A0D4F1615FC0EB100ABF4B3 /* Gramambular.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = Gramambular.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		6A0D4F1715FC0EB100ABF4B3 /* Grid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = Grid.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		6A0D4F1815FC0EB100ABF4B3 /* KeyValuePair.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = KeyValuePair.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		6A0D4F1915FC0EB100ABF4B3 /* LanguageModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = LanguageModel.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		6A0D4F1A15FC0EB100ABF4B3 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = Node.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		6A0D4F1B15FC0EB100ABF4B3 /* NodeAnchor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = NodeAnchor.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		6A0D4F1C15FC0EB100ABF4B3 /* Span.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = Span.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		6A0D4F1D15FC0EB100ABF4B3 /* Unigram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = Unigram.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		6A0D4F1E15FC0EB100ABF4B3 /* Walker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = Walker.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
+		6A0D4F1415FC0EB100ABF4B3 /* 6_Bigram.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = 6_Bigram.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
+		6A0D4F1515FC0EB100ABF4B3 /* 1_BlockReadingBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = 1_BlockReadingBuilder.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
+		6A0D4F1615FC0EB100ABF4B3 /* 0_Megrez.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = 0_Megrez.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
+		6A0D4F1715FC0EB100ABF4B3 /* 2_Grid.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = 2_Grid.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
+		6A0D4F1815FC0EB100ABF4B3 /* 7_KeyValuePair.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = 7_KeyValuePair.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
+		6A0D4F1915FC0EB100ABF4B3 /* 5_LanguageModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = 5_LanguageModel.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
+		6A0D4F1A15FC0EB100ABF4B3 /* 4_Node.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = 4_Node.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
+		6A0D4F1B15FC0EB100ABF4B3 /* 3_NodeAnchor.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = 3_NodeAnchor.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
+		6A0D4F1C15FC0EB100ABF4B3 /* 3_Span.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = 3_Span.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
+		6A0D4F1D15FC0EB100ABF4B3 /* 6_Unigram.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = 6_Unigram.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
+		6A0D4F1E15FC0EB100ABF4B3 /* 1_Walker.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = 1_Walker.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		6A0D4F2015FC0EB100ABF4B3 /* Mandarin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = Mandarin.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		6A0D4F2115FC0EB100ABF4B3 /* Mandarin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = Mandarin.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		6A15B32421A51F2300B92CD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -498,7 +509,7 @@
 		5B62A32327AE756800A19448 /* LanguageParsers */ = {
 			isa = PBXGroup;
 			children = (
-				6A0D4F1315FC0EB100ABF4B3 /* Gramambular */,
+				6A0D4F1315FC0EB100ABF4B3 /* Megrez */,
 			);
 			path = LanguageParsers;
 			sourceTree = "<group>";
@@ -829,22 +840,22 @@
 			path = Modules;
 			sourceTree = "<group>";
 		};
-		6A0D4F1315FC0EB100ABF4B3 /* Gramambular */ = {
+		6A0D4F1315FC0EB100ABF4B3 /* Megrez */ = {
 			isa = PBXGroup;
 			children = (
-				6A0D4F1415FC0EB100ABF4B3 /* Bigram.h */,
-				6A0D4F1515FC0EB100ABF4B3 /* BlockReadingBuilder.h */,
-				6A0D4F1615FC0EB100ABF4B3 /* Gramambular.h */,
-				6A0D4F1715FC0EB100ABF4B3 /* Grid.h */,
-				6A0D4F1815FC0EB100ABF4B3 /* KeyValuePair.h */,
-				6A0D4F1915FC0EB100ABF4B3 /* LanguageModel.h */,
-				6A0D4F1A15FC0EB100ABF4B3 /* Node.h */,
-				6A0D4F1B15FC0EB100ABF4B3 /* NodeAnchor.h */,
-				6A0D4F1C15FC0EB100ABF4B3 /* Span.h */,
-				6A0D4F1D15FC0EB100ABF4B3 /* Unigram.h */,
-				6A0D4F1E15FC0EB100ABF4B3 /* Walker.h */,
+				6A0D4F1615FC0EB100ABF4B3 /* 0_Megrez.swift */,
+				6A0D4F1515FC0EB100ABF4B3 /* 1_BlockReadingBuilder.swift */,
+				6A0D4F1E15FC0EB100ABF4B3 /* 1_Walker.swift */,
+				6A0D4F1715FC0EB100ABF4B3 /* 2_Grid.swift */,
+				6A0D4F1B15FC0EB100ABF4B3 /* 3_NodeAnchor.swift */,
+				6A0D4F1C15FC0EB100ABF4B3 /* 3_Span.swift */,
+				6A0D4F1A15FC0EB100ABF4B3 /* 4_Node.swift */,
+				6A0D4F1915FC0EB100ABF4B3 /* 5_LanguageModel.swift */,
+				6A0D4F1415FC0EB100ABF4B3 /* 6_Bigram.swift */,
+				6A0D4F1D15FC0EB100ABF4B3 /* 6_Unigram.swift */,
+				6A0D4F1815FC0EB100ABF4B3 /* 7_KeyValuePair.swift */,
 			);
-			path = Gramambular;
+			path = Megrez;
 			sourceTree = "<group>";
 		};
 		6ACA41E715FC1D9000935EF6 /* Installer */ = {
@@ -1098,6 +1109,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5B38F59D281E2E49007D5F5D /* 4_Node.swift in Sources */,
+				5B38F5A3281E2E49007D5F5D /* 3_Span.swift in Sources */,
 				5B40730C281672610023DFFF /* lmAssociates.swift in Sources */,
 				5B707CE827D9F4590099EF99 /* OpenCCBridge.swift in Sources */,
 				D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */,
@@ -1116,6 +1129,7 @@
 				D4E569DC27A34D0E00AC2CEF /* KeyHandler.mm in Sources */,
 				5BA9FD4627FEF3C9002DE248 /* Container.swift in Sources */,
 				D47F7DD0278C0897002F9DD7 /* ctlNonModalAlertWindow.swift in Sources */,
+				5B38F5A2281E2E49007D5F5D /* 0_Megrez.swift in Sources */,
 				5B949BD92816DC5400D87B5D /* LineReader.swift in Sources */,
 				D456576E279E4F7B00DF6BC9 /* InputHandler.swift in Sources */,
 				5BA9FD1027FEDB6B002DE248 /* suiPrefPaneKeyboard.swift in Sources */,
@@ -1131,7 +1145,9 @@
 				5B62A34A27AE7CD900A19448 /* NotifierController.swift in Sources */,
 				5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */,
 				5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */,
+				5B38F59B281E2E49007D5F5D /* 7_KeyValuePair.swift in Sources */,
 				5B62A33627AE795800A19448 /* mgrPrefs.swift in Sources */,
+				5B38F5A4281E2E49007D5F5D /* 5_LanguageModel.swift in Sources */,
 				5BAEFAD028012565001F42C9 /* mgrLangModel.swift in Sources */,
 				5B782EC4280C243C007276DE /* KeyHandler_HandleCandidate.swift in Sources */,
 				5B62A33827AE79CD00A19448 /* NSStringUtils.swift in Sources */,
@@ -1139,13 +1155,17 @@
 				5BA9FD4927FEF3C9002DE248 /* Section.swift in Sources */,
 				5BA9FD3E27FEF3C8002DE248 /* Utilities.swift in Sources */,
 				5BA9FD1127FEDB6B002DE248 /* ctlPrefUI.swift in Sources */,
+				5B38F59C281E2E49007D5F5D /* 2_Grid.swift in Sources */,
 				5B40730D281672610023DFFF /* lmReplacements.swift in Sources */,
+				5B38F59E281E2E49007D5F5D /* 6_Bigram.swift in Sources */,
 				5B62A33227AE792F00A19448 /* InputSourceHelper.swift in Sources */,
 				5BE33BED28169B5D00CE5BB0 /* KeyValueStructs.swift in Sources */,
 				5B5E535227EF261400C6AA1E /* IME.swift in Sources */,
 				5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
 				5B61B0CA280BEFD4002E3CFA /* KeyHandler_Misc.swift in Sources */,
+				5B38F59A281E2E49007D5F5D /* 6_Unigram.swift in Sources */,
+				5B38F5A0281E2E49007D5F5D /* 1_Walker.swift in Sources */,
 				5B62A34827AE7CD900A19448 /* ctlCandidateVertical.swift in Sources */,
 				5BA9FD4027FEF3C8002DE248 /* Localization.swift in Sources */,
 				5BA9FD1327FEDB6B002DE248 /* suiPrefPaneDictionary.swift in Sources */,
@@ -1153,10 +1173,12 @@
 				5BA9FD4727FEF3C9002DE248 /* PreferencesStyleController.swift in Sources */,
 				5BF8423127BAA942008E7E4C /* vChewingKanjiConverter.swift in Sources */,
 				5B949BDB2816DDBC00D87B5D /* LMConsolidator.swift in Sources */,
+				5B38F59F281E2E49007D5F5D /* 3_NodeAnchor.swift in Sources */,
 				5B62A34627AE7CD900A19448 /* ctlCandidateHorizontal.swift in Sources */,
 				5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */,
 				5BA9FD3F27FEF3C8002DE248 /* Pane.swift in Sources */,
 				5BB802DA27FABA8300CF1C19 /* ctlInputMethod_Menu.swift in Sources */,
+				5B38F5A1281E2E49007D5F5D /* 1_BlockReadingBuilder.swift in Sources */,
 				5BDC1CFA27FDF1310052C2B9 /* apiUpdate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

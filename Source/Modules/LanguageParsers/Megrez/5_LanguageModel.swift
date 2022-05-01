@@ -1,6 +1,5 @@
-// Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are of:
-// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// Swiftified by (c) 2022 and onwards The vChewing Project (MIT-NTL License).
+// Rebranded from (c) Lukhnos Liu's C++ library "Gramambular" (MIT License).
 /*
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -24,18 +23,22 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef GRAMAMBULAR_H_
-#define GRAMAMBULAR_H_
+extension Megrez {
+	// 這裡充其量只是框架，回頭實際使用時需要派生一個型別、且重寫相關函數。
+	// 這裡寫了一點假內容，不然有些 Swift 格式化工具會破壞掉函數的參數設計。
+	open class LanguageModel {
+		public init() {}
 
-#include "Bigram.h"
-#include "BlockReadingBuilder.h"
-#include "Grid.h"
-#include "KeyValuePair.h"
-#include "LanguageModel.h"
-#include "Node.h"
-#include "NodeAnchor.h"
-#include "Span.h"
-#include "Unigram.h"
-#include "Walker.h"
+		open func unigramsFor(key: String) -> [Megrez.Unigram] {
+			key.isEmpty ? [Megrez.Unigram]() : [Megrez.Unigram]()
+		}
 
-#endif
+		open func bigramsForKeys(precedingKey: String, key: String) -> [Megrez.Bigram] {
+			precedingKey == key ? [Megrez.Bigram]() : [Megrez.Bigram]()
+		}
+
+		open func hasUnigramsFor(key: String) -> Bool {
+			key.count != 0
+		}
+	}
+}

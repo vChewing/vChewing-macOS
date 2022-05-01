@@ -25,7 +25,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import Cocoa
-import Megrez
 
 public enum InputMode: String {
 	case imeModeCHS = "org.atelierInmu.inputmethod.vChewing.IMECHS"
