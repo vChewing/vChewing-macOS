@@ -289,6 +289,7 @@
 		5BE78BD827B37750005EA1BE /* ctlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		5BE78BDB27B37764005EA1BE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmAboutWindow.xib; sourceTree = "<group>"; };
 		5BE78BDF27B37968005EA1BE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmAboutWindow.strings; sourceTree = "<group>"; };
+		5BE8A8C4281EE65300197741 /* CONTRIBUTING.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
 		5BF8423027BAA942008E7E4C /* vChewingKanjiConverter.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = vChewingKanjiConverter.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		5BFDF48C27B51867009523B6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Main.strings"; sourceTree = "<group>"; };
 		6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -379,6 +380,7 @@
 			isa = PBXGroup;
 			children = (
 				5BC2652127E04B7B00700291 /* uninstall.sh */,
+				5BE8A8C4281EE65300197741 /* CONTRIBUTING.md */,
 				5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */,
 				5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */,
 				5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */,
