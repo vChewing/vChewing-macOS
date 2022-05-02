@@ -87,7 +87,7 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
 	private static var instanceCount = 0
 	private static var lastLocation = NSPoint.zero
 
-	@objc public static func notify(message: String, stay: Bool = false) {
+	public static func notify(message: String, stay: Bool = false) {
 		let controller = NotifierController()
 		controller.message = message
 		controller.shouldStay = stay

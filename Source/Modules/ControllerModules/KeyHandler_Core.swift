@@ -84,7 +84,7 @@ class KeyHandler: NSObject {
 	}
 
 	// 這個函數得獨立出來給 ObjC 使用。
-	@objc func setInputMode(_ value: String) {
+	func setInputMode(_ value: String) {
 		// 下面這句的「isKindOfClass」是做類型檢查，
 		// 為了應對出現輸入法 plist 被改壞掉這樣的極端情況。
 		let isCHS: Bool = (value == InputMode.imeModeCHS.rawValue)

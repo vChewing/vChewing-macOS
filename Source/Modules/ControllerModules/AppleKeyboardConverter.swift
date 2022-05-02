@@ -39,12 +39,12 @@ class AppleKeyboardConverter: NSObject {
 		"org.unknown.keylayout.vChewingIBM",
 		"org.unknown.keylayout.vChewingMiTAC",
 	]
-	@objc class func isDynamicBasicKeyboardLayoutEnabled() -> Bool {
+	class func isDynamicBasicKeyboardLayoutEnabled() -> Bool {
 		AppleKeyboardConverter.arrDynamicBasicKeyLayout.contains(mgrPrefs.basicKeyboardLayout)
 	}
 
 	// 處理 Apple 注音鍵盤佈局類型。
-	@objc class func cnvApple2ABC(_ charCode: UniChar) -> UniChar {
+	class func cnvApple2ABC(_ charCode: UniChar) -> UniChar {
 		var charCode = charCode
 		// 在按鍵資訊被送往 OVMandarin 之前，先轉換為可以被 OVMandarin 正常處理的資訊。
 		if isDynamicBasicKeyboardLayoutEnabled() {
@@ -185,7 +185,7 @@ class AppleKeyboardConverter: NSObject {
 		return charCode
 	}
 
-	@objc class func cnvStringApple2ABC(_ strProcessed: String) -> String {
+	class func cnvStringApple2ABC(_ strProcessed: String) -> String {
 		var strProcessed = strProcessed
 		if isDynamicBasicKeyboardLayoutEnabled() {
 			// 針對不同的 Apple 動態鍵盤佈局糾正大寫英文輸入。

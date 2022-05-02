@@ -26,7 +26,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
 
-@objc(AboutWindow) class ctlAboutWindow: NSWindowController {
+class ctlAboutWindow: NSWindowController {
 	@IBOutlet var appVersionLabel: NSTextField!
 	@IBOutlet var appCopyrightLabel: NSTextField!
 	@IBOutlet var appEULAContent: NSTextView!

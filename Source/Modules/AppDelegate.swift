@@ -76,7 +76,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
 		}
 	}
 
-	@objc func showPreferences() {
+	func showPreferences() {
 		if ctlPrefWindowInstance == nil {
 			ctlPrefWindowInstance = ctlPrefWindow.init(windowNibName: "frmPrefWindow")
 		}
@@ -88,7 +88,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
 	}
 
 	// New About Window
-	@objc func showAbout() {
+	func showAbout() {
 		if ctlAboutWindowInstance == nil {
 			ctlAboutWindowInstance = ctlAboutWindow.init(windowNibName: "frmAboutWindow")
 		}
@@ -98,12 +98,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
 		NSApp.setActivationPolicy(.accessory)
 	}
 
-	@objc(checkForUpdate)
 	func checkForUpdate() {
 		checkForUpdate(forced: false)
 	}
 
-	@objc(checkForUpdateForced:)
 	func checkForUpdate(forced: Bool) {
 		if checkTask != nil {
 			// busy

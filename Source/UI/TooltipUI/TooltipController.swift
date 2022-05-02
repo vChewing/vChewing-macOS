@@ -64,7 +64,6 @@ public class TooltipController: NSWindowController {
 		fatalError("init(coder:) has not been implemented")
 	}
 
-	@objc(showTooltip:atPoint:)
 	public func show(tooltip: String, at point: NSPoint) {
 		messageTextField.textColor = TooltipController.textColor
 		messageTextField.backgroundColor = TooltipController.backgroundColor

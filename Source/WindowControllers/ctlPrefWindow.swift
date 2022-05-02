@@ -30,7 +30,7 @@ import Cocoa
 // Please note that the class should be exposed using the same class name
 // in Objective-C in order to let IMK to see the same class name as
 // the "InputMethodServerPreferencesWindowControllerClass" in Info.plist.
-@objc(ctlPrefWindow) class ctlPrefWindow: NSWindowController {
+class ctlPrefWindow: NSWindowController {
 	@IBOutlet var fontSizePopUpButton: NSPopUpButton!
 	@IBOutlet var uiLanguageButton: NSPopUpButton!
 	@IBOutlet var basicKeyboardLayoutButton: NSPopUpButton!

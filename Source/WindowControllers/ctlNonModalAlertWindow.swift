@@ -26,13 +26,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
 
-@objc protocol ctlNonModalAlertWindowDelegate: AnyObject {
+protocol ctlNonModalAlertWindowDelegate: AnyObject {
 	func ctlNonModalAlertWindowDidConfirm(_ controller: ctlNonModalAlertWindow)
 	func ctlNonModalAlertWindowDidCancel(_ controller: ctlNonModalAlertWindow)
 }
 
 class ctlNonModalAlertWindow: NSWindowController {
-	@objc(sharedInstance)
 	static let shared = ctlNonModalAlertWindow(windowNibName: "frmNonModalAlertWindow")
 
 	@IBOutlet var titleTextField: NSTextField!
@@ -41,7 +40,7 @@ class ctlNonModalAlertWindow: NSWindowController {
 	@IBOutlet var cancelButton: NSButton!
 	weak var delegate: ctlNonModalAlertWindowDelegate?
 
-	@objc func show(
+	func show(
 		title: String, content: String, confirmButtonTitle: String, cancelButtonTitle: String?,
 		cancelAsDefault: Bool, delegate: ctlNonModalAlertWindowDelegate?
 	) {

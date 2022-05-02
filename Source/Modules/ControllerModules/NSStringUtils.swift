@@ -47,7 +47,7 @@ extension NSString {
 		return (string.count, string)
 	}
 
-	@objc public func nextUtf16Position(for index: Int) -> Int {
+	public func nextUtf16Position(for index: Int) -> Int {
 		var (fixedIndex, string) = characterIndex(from: index)
 		if fixedIndex < string.count {
 			fixedIndex += 1
@@ -55,7 +55,7 @@ extension NSString {
 		return string[..<string.index(string.startIndex, offsetBy: fixedIndex)].utf16.count
 	}
 
-	@objc public func previousUtf16Position(for index: Int) -> Int {
+	public func previousUtf16Position(for index: Int) -> Int {
 		var (fixedIndex, string) = characterIndex(from: index)
 		if fixedIndex > 0 {
 			fixedIndex -= 1
@@ -63,11 +63,11 @@ extension NSString {
 		return string[..<string.index(string.startIndex, offsetBy: fixedIndex)].utf16.count
 	}
 
-	@objc public var count: Int {
+	public var count: Int {
 		(self as String).count
 	}
 
-	@objc public func split() -> [NSString] {
+	public func split() -> [NSString] {
 		Array(self as String).map {
 			NSString(string: String($0))
 		}

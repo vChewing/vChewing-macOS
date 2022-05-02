@@ -80,7 +80,7 @@ private let kDefaultKeys = "123456789"
 
 // MARK: - UserDefaults extension.
 
-@objc extension UserDefaults {
+extension UserDefaults {
 	func setDefault(_ value: Any?, forKey defaultName: String) {
 		if object(forKey: defaultName) == nil {
 			set(value, forKey: defaultName)
@@ -236,7 +236,7 @@ public class mgrPrefs: NSObject {
 
 	// MARK: - 既然 Preferences Module 的預設屬性不自動寫入 plist，那這邊就先寫入了。
 
-	@objc public static func setMissingDefaults() {
+	public static func setMissingDefaults() {
 		UserDefaults.standard.setDefault(mgrPrefs.isDebugModeEnabled, forKey: UserDef.kIsDebugModeEnabled)
 		UserDefaults.standard.setDefault(mgrPrefs.mostRecentInputMode, forKey: UserDef.kMostRecentInputMode)
 		UserDefaults.standard.setDefault(mgrPrefs.checkUpdateAutomatically, forKey: UserDef.kCheckUpdateAutomatically)
@@ -278,90 +278,90 @@ public class mgrPrefs: NSObject {
 	}
 
 	@UserDefault(key: UserDef.kIsDebugModeEnabled, defaultValue: false)
-	@objc static var isDebugModeEnabled: Bool
+	static var isDebugModeEnabled: Bool
 
 	@UserDefault(key: UserDef.kMostRecentInputMode, defaultValue: "")
-	@objc static var mostRecentInputMode: String
+	static var mostRecentInputMode: String
 
 	@UserDefault(key: UserDef.kCheckUpdateAutomatically, defaultValue: false)
-	@objc static var checkUpdateAutomatically: Bool
+	static var checkUpdateAutomatically: Bool
 
 	@UserDefault(key: UserDef.kUserDataFolderSpecified, defaultValue: "")
-	@objc static var userDataFolderSpecified: String
+	static var userDataFolderSpecified: String
 
-	@objc static func ifSpecifiedUserDataPathExistsInPlist() -> Bool {
+	static func ifSpecifiedUserDataPathExistsInPlist() -> Bool {
 		UserDefaults.standard.object(forKey: UserDef.kUserDataFolderSpecified) != nil
 	}
 
-	@objc static func resetSpecifiedUserDataFolder() {
+	static func resetSpecifiedUserDataFolder() {
 		UserDefaults.standard.removeObject(forKey: "UserDataFolderSpecified")
 		IME.initLangModels(userOnly: true)
 	}
 
 	@UserDefault(key: UserDef.kAppleLanguages, defaultValue: [])
-	@objc static var appleLanguages: [String]
+	static var appleLanguages: [String]
 
 	@UserDefault(key: UserDef.kMandarinParser, defaultValue: 0)
 	@objc static var mandarinParser: Int
 
-	@objc static var mandarinParserName: String {
+	static var mandarinParserName: String {
 		(MandarinParser(rawValue: mandarinParser) ?? MandarinParser.ofStandard).name
 	}
 
 	@UserDefault(
 		key: UserDef.kBasicKeyboardLayout, defaultValue: "com.apple.keylayout.ZhuyinBopomofo"
 	)
-	@objc static var basicKeyboardLayout: String
+	static var basicKeyboardLayout: String
 
 	@UserDefault(key: UserDef.kShowPageButtonsInCandidateWindow, defaultValue: true)
-	@objc static var showPageButtonsInCandidateWindow: Bool
+	static var showPageButtonsInCandidateWindow: Bool
 
 	@CandidateListTextSize(key: UserDef.kCandidateListTextSize)
-	@objc static var candidateListTextSize: CGFloat
+	static var candidateListTextSize: CGFloat
 
 	@UserDefault(key: UserDef.kShouldAutoReloadUserDataFiles, defaultValue: true)
-	@objc static var shouldAutoReloadUserDataFiles: Bool
+	static var shouldAutoReloadUserDataFiles: Bool
 
 	@UserDefault(key: UserDef.kSetRearCursorMode, defaultValue: false)
-	@objc static var setRearCursorMode: Bool
+	static var setRearCursorMode: Bool
 
 	@UserDefault(key: UserDef.kMoveCursorAfterSelectingCandidate, defaultValue: true)
-	@objc static var moveCursorAfterSelectingCandidate: Bool
+	static var moveCursorAfterSelectingCandidate: Bool
 
 	@UserDefault(key: UserDef.kUseHorizontalCandidateList, defaultValue: true)
-	@objc static var useHorizontalCandidateList: Bool
+	static var useHorizontalCandidateList: Bool
 
 	@ComposingBufferSize(key: UserDef.kComposingBufferSize)
-	@objc static var composingBufferSize: Int
+	static var composingBufferSize: Int
 
 	@UserDefault(key: UserDef.kChooseCandidateUsingSpace, defaultValue: true)
-	@objc static var chooseCandidateUsingSpace: Bool
+	static var chooseCandidateUsingSpace: Bool
 
 	@UserDefault(key: UserDef.kUseSCPCTypingMode, defaultValue: false)
-	@objc static var useSCPCTypingMode: Bool
+	static var useSCPCTypingMode: Bool
 
-	@objc static func toggleSCPCTypingModeEnabled() -> Bool {
+	static func toggleSCPCTypingModeEnabled() -> Bool {
 		useSCPCTypingMode = !useSCPCTypingMode
 		UserDefaults.standard.set(useSCPCTypingMode, forKey: UserDef.kUseSCPCTypingMode)
 		return useSCPCTypingMode
 	}
 
 	@UserDefault(key: UserDef.kMaxCandidateLength, defaultValue: kDefaultComposingBufferSize * 2)
-	@objc static var maxCandidateLength: Int
+	static var maxCandidateLength: Int
 
 	@UserDefault(key: UserDef.kShouldNotFartInLieuOfBeep, defaultValue: true)
-	@objc static var shouldNotFartInLieuOfBeep: Bool
+	static var shouldNotFartInLieuOfBeep: Bool
 
-	@objc static func toggleShouldNotFartInLieuOfBeep() -> Bool {
+	static func toggleShouldNotFartInLieuOfBeep() -> Bool {
 		shouldNotFartInLieuOfBeep = !shouldNotFartInLieuOfBeep
 		UserDefaults.standard.set(shouldNotFartInLieuOfBeep, forKey: UserDef.kShouldNotFartInLieuOfBeep)
 		return shouldNotFartInLieuOfBeep
 	}
 
 	@UserDefault(key: UserDef.kCNS11643Enabled, defaultValue: false)
-	@objc static var cns11643Enabled: Bool
+	static var cns11643Enabled: Bool
 
-	@objc static func toggleCNS11643Enabled() -> Bool {
+	static func toggleCNS11643Enabled() -> Bool {
 		cns11643Enabled = !cns11643Enabled
 		mgrLangModel.setCNSEnabled(cns11643Enabled)  // 很重要
 		UserDefaults.standard.set(cns11643Enabled, forKey: UserDef.kCNS11643Enabled)
@@ -369,9 +369,9 @@ public class mgrPrefs: NSObject {
 	}
 
 	@UserDefault(key: UserDef.kSymbolInputEnabled, defaultValue: true)
-	@objc static var symbolInputEnabled: Bool
+	static var symbolInputEnabled: Bool
 
-	@objc static func toggleSymbolInputEnabled() -> Bool {
+	static func toggleSymbolInputEnabled() -> Bool {
 		symbolInputEnabled = !symbolInputEnabled
 		mgrLangModel.setSymbolEnabled(symbolInputEnabled)  // 很重要
 		UserDefaults.standard.set(symbolInputEnabled, forKey: UserDef.kSymbolInputEnabled)
@@ -379,9 +379,9 @@ public class mgrPrefs: NSObject {
 	}
 
 	@UserDefault(key: UserDef.kChineseConversionEnabled, defaultValue: false)
-	@objc static var chineseConversionEnabled: Bool
+	static var chineseConversionEnabled: Bool
 
-	@objc @discardableResult static func toggleChineseConversionEnabled() -> Bool {
+	@discardableResult static func toggleChineseConversionEnabled() -> Bool {
 		chineseConversionEnabled = !chineseConversionEnabled
 		// 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
 		if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
@@ -395,9 +395,9 @@ public class mgrPrefs: NSObject {
 	}
 
 	@UserDefault(key: UserDef.kShiftJISShinjitaiOutputEnabled, defaultValue: false)
-	@objc static var shiftJISShinjitaiOutputEnabled: Bool
+	static var shiftJISShinjitaiOutputEnabled: Bool
 
-	@objc @discardableResult static func toggleShiftJISShinjitaiOutputEnabled() -> Bool {
+	@discardableResult static func toggleShiftJISShinjitaiOutputEnabled() -> Bool {
 		shiftJISShinjitaiOutputEnabled = !shiftJISShinjitaiOutputEnabled
 		// 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
 		if shiftJISShinjitaiOutputEnabled, chineseConversionEnabled {
@@ -410,42 +410,42 @@ public class mgrPrefs: NSObject {
 	}
 
 	@UserDefault(key: UserDef.kHalfWidthPunctuationEnabled, defaultValue: false)
-	@objc static var halfWidthPunctuationEnabled: Bool
+	static var halfWidthPunctuationEnabled: Bool
 
-	@objc static func toggleHalfWidthPunctuationEnabled() -> Bool {
+	static func toggleHalfWidthPunctuationEnabled() -> Bool {
 		halfWidthPunctuationEnabled = !halfWidthPunctuationEnabled
 		return halfWidthPunctuationEnabled
 	}
 
 	@UserDefault(key: UserDef.kEscToCleanInputBuffer, defaultValue: true)
-	@objc static var escToCleanInputBuffer: Bool
+	static var escToCleanInputBuffer: Bool
 
 	@UserDefault(key: UserDef.kSpecifyShiftTabKeyBehavior, defaultValue: false)
-	@objc static var specifyShiftTabKeyBehavior: Bool
+	static var specifyShiftTabKeyBehavior: Bool
 
 	@UserDefault(key: UserDef.kSpecifyShiftSpaceKeyBehavior, defaultValue: false)
-	@objc static var specifyShiftSpaceKeyBehavior: Bool
+	static var specifyShiftSpaceKeyBehavior: Bool
 
 	// MARK: - Optional settings
 
 	@UserDefault(key: UserDef.kCandidateTextFontName, defaultValue: nil)
-	@objc static var candidateTextFontName: String?
+	static var candidateTextFontName: String?
 
 	@UserDefault(key: UserDef.kCandidateKeyLabelFontName, defaultValue: nil)
-	@objc static var candidateKeyLabelFontName: String?
+	static var candidateKeyLabelFontName: String?
 
 	@UserDefault(key: UserDef.kCandidateKeys, defaultValue: kDefaultKeys)
-	@objc static var candidateKeys: String
+	static var candidateKeys: String
 
-	@objc static var defaultCandidateKeys: String {
+	static var defaultCandidateKeys: String {
 		kDefaultKeys
 	}
 
-	@objc static var suggestedCandidateKeys: [String] {
+	static var suggestedCandidateKeys: [String] {
 		[kDefaultKeys, "234567890", "QWERTYUIO", "QWERTASDF", "ASDFGHJKL", "ASDFZXCVB"]
 	}
 
-	@objc static func validate(candidateKeys: String) throws {
+	static func validate(candidateKeys: String) throws {
 		let trimmed = candidateKeys.trimmingCharacters(in: .whitespacesAndNewlines)
 		if trimmed.isEmpty {
 			throw CandidateKeyError.empty
@@ -500,9 +500,9 @@ public class mgrPrefs: NSObject {
 	}
 
 	@UserDefault(key: UserDef.kPhraseReplacementEnabled, defaultValue: false)
-	@objc static var phraseReplacementEnabled: Bool
+	static var phraseReplacementEnabled: Bool
 
-	@objc static func togglePhraseReplacementEnabled() -> Bool {
+	static func togglePhraseReplacementEnabled() -> Bool {
 		phraseReplacementEnabled = !phraseReplacementEnabled
 		mgrLangModel.setPhraseReplacementEnabled(phraseReplacementEnabled)
 		UserDefaults.standard.set(phraseReplacementEnabled, forKey: UserDef.kPhraseReplacementEnabled)
@@ -510,9 +510,9 @@ public class mgrPrefs: NSObject {
 	}
 
 	@UserDefault(key: UserDef.kAssociatedPhrasesEnabled, defaultValue: false)
-	@objc static var associatedPhrasesEnabled: Bool
+	static var associatedPhrasesEnabled: Bool
 
-	@objc static func toggleAssociatedPhrasesEnabled() -> Bool {
+	static func toggleAssociatedPhrasesEnabled() -> Bool {
 		associatedPhrasesEnabled = !associatedPhrasesEnabled
 		UserDefaults.standard.set(associatedPhrasesEnabled, forKey: UserDef.kAssociatedPhrasesEnabled)
 		return associatedPhrasesEnabled

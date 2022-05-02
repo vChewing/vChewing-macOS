@@ -29,7 +29,7 @@ import Cocoa
 // Use KeyCodes as much as possible since its recognition won't be affected by macOS Base Keyboard Layouts.
 // KeyCodes: https://eastmanreference.com/complete-list-of-applescript-key-codes
 // Also: HIToolbox.framework/Versions/A/Headers/Events.h
-@objc enum KeyCode: UInt16 {
+enum KeyCode: UInt16 {
 	case kNone = 0
 	case kCarriageReturn = 36  // Renamed from "kReturn" to avoid nomenclatural confusions.
 	case kTab = 48
@@ -91,11 +91,11 @@ enum CharCode: UInt /* 16 */ {
 }
 
 class InputHandler: NSObject {
-	@objc private(set) var useVerticalMode: Bool
-	@objc private(set) var inputText: String?
-	@objc private(set) var inputTextIgnoringModifiers: String?
-	@objc private(set) var charCode: UInt16
-	@objc private(set) var keyCode: UInt16
+	private(set) var useVerticalMode: Bool
+	private(set) var inputText: String?
+	private(set) var inputTextIgnoringModifiers: String?
+	private(set) var charCode: UInt16
+	private(set) var keyCode: UInt16
 	private var isFlagChanged: Bool
 	private var flags: NSEvent.ModifierFlags
 	private var cursorForwardKey: KeyCode
@@ -104,9 +104,9 @@ class InputHandler: NSObject {
 	private var extraChooseCandidateKeyReverse: KeyCode
 	private var absorbedArrowKey: KeyCode
 	private var verticalModeOnlyChooseCandidateKey: KeyCode
-	@objc private(set) var emacsKey: vChewingEmacsKey
+	private(set) var emacsKey: vChewingEmacsKey
 
-	@objc init(
+	init(
 		inputText: String?, keyCode: UInt16, charCode: UInt16, flags: NSEvent.ModifierFlags,
 		isVerticalMode: Bool, inputTextIgnoringModifiers: String? = nil
 	) {
@@ -133,7 +133,7 @@ class InputHandler: NSObject {
 		super.init()
 	}
 
-	@objc init(event: NSEvent, isVerticalMode: Bool) {
+	init(event: NSEvent, isVerticalMode: Bool) {
 		inputText = AppleKeyboardConverter.cnvStringApple2ABC(event.characters ?? "")
 		inputTextIgnoringModifiers = AppleKeyboardConverter.cnvStringApple2ABC(
 			event.charactersIgnoringModifiers ?? "")
@@ -172,143 +172,143 @@ class InputHandler: NSObject {
 			"<\(super.description) inputText:\(String(describing: inputText)), inputTextIgnoringModifiers:\(String(describing: inputTextIgnoringModifiers)) charCode:\(charCode), keyCode:\(keyCode), flags:\(flags), cursorForwardKey:\(cursorForwardKey), cursorBackwardKey:\(cursorBackwardKey), extraChooseCandidateKey:\(extraChooseCandidateKey), extraChooseCandidateKeyReverse:\(extraChooseCandidateKeyReverse), absorbedArrowKey:\(absorbedArrowKey),  verticalModeOnlyChooseCandidateKey:\(verticalModeOnlyChooseCandidateKey), emacsKey:\(emacsKey), useVerticalMode:\(useVerticalMode)>"
 	}
 
-	@objc var isShiftHold: Bool {
+	var isShiftHold: Bool {
 		flags.contains([.shift])
 	}
 
-	@objc var isCommandHold: Bool {
+	var isCommandHold: Bool {
 		flags.contains([.command])
 	}
 
-	@objc var isControlHold: Bool {
+	var isControlHold: Bool {
 		flags.contains([.control])
 	}
 
-	@objc var isControlHotKey: Bool {
+	var isControlHotKey: Bool {
 		flags.contains([.control]) && inputText?.first?.isLetter ?? false
 	}
 
-	@objc var isOptionHotKey: Bool {
+	var isOptionHotKey: Bool {
 		flags.contains([.option]) && inputText?.first?.isLetter ?? false
 	}
 
-	@objc var isOptionHold: Bool {
+	var isOptionHold: Bool {
 		flags.contains([.option])
 	}
 
-	@objc var isCapsLockOn: Bool {
+	var isCapsLockOn: Bool {
 		flags.contains([.capsLock])
 	}
 
-	@objc var isNumericPad: Bool {
+	var isNumericPad: Bool {
 		flags.contains([.numericPad])
 	}
 
-	@objc var isFunctionKeyHold: Bool {
+	var isFunctionKeyHold: Bool {
 		flags.contains([.function])
 	}
 
-	@objc var isReservedKey: Bool {
+	var isReservedKey: Bool {
 		guard let code = KeyCode(rawValue: keyCode) else {
 			return false
 		}
 		return code.rawValue != KeyCode.kNone.rawValue
 	}
 
-	@objc var isTab: Bool {
+	var isTab: Bool {
 		KeyCode(rawValue: keyCode) == KeyCode.kTab
 	}
 
-	@objc var isEnter: Bool {
+	var isEnter: Bool {
 		(KeyCode(rawValue: keyCode) == KeyCode.kCarriageReturn)
 			|| (KeyCode(rawValue: keyCode) == KeyCode.kLineFeed)
 	}
 
-	@objc var isUp: Bool {
+	var isUp: Bool {
 		KeyCode(rawValue: keyCode) == KeyCode.kUpArrow
 	}
 
-	@objc var isDown: Bool {
+	var isDown: Bool {
 		KeyCode(rawValue: keyCode) == KeyCode.kDownArrow
 	}
 
-	@objc var isLeft: Bool {
+	var isLeft: Bool {
 		KeyCode(rawValue: keyCode) == KeyCode.kLeftArrow
 	}
 
-	@objc var isRight: Bool {
+	var isRight: Bool {
 		KeyCode(rawValue: keyCode) == KeyCode.kRightArrow
 	}
 
-	@objc var isPageUp: Bool {
+	var isPageUp: Bool {
 		KeyCode(rawValue: keyCode) == KeyCode.kPageUp
 	}
 
-	@objc var isPageDown: Bool {
+	var isPageDown: Bool {
 		KeyCode(rawValue: keyCode) == KeyCode.kPageDown
 	}
 
-	@objc var isSpace: Bool {
+	var isSpace: Bool {
 		KeyCode(rawValue: keyCode) == KeyCode.kSpace
 	}
 
-	@objc var isBackSpace: Bool {
+	var isBackSpace: Bool {
 		KeyCode(rawValue: keyCode) == KeyCode.kBackSpace
 	}
 
-	@objc var isESC: Bool {
+	var isESC: Bool {
 		KeyCode(rawValue: keyCode) == KeyCode.kEscape
 	}
 
-	@objc var isHome: Bool {
+	var isHome: Bool {
 		KeyCode(rawValue: keyCode) == KeyCode.kHome
 	}
 
-	@objc var isEnd: Bool {
+	var isEnd: Bool {
 		KeyCode(rawValue: keyCode) == KeyCode.kEnd
 	}
 
-	@objc var isDelete: Bool {
+	var isDelete: Bool {
 		KeyCode(rawValue: keyCode) == KeyCode.kWindowDelete
 	}
 
-	@objc var isCursorBackward: Bool {
+	var isCursorBackward: Bool {
 		KeyCode(rawValue: keyCode) == cursorBackwardKey
 	}
 
-	@objc var isCursorForward: Bool {
+	var isCursorForward: Bool {
 		KeyCode(rawValue: keyCode) == cursorForwardKey
 	}
 
-	@objc var isAbsorbedArrowKey: Bool {
+	var isAbsorbedArrowKey: Bool {
 		KeyCode(rawValue: keyCode) == absorbedArrowKey
 	}
 
-	@objc var isExtraChooseCandidateKey: Bool {
+	var isExtraChooseCandidateKey: Bool {
 		KeyCode(rawValue: keyCode) == extraChooseCandidateKey
 	}
 
-	@objc var isExtraChooseCandidateKeyReverse: Bool {
+	var isExtraChooseCandidateKeyReverse: Bool {
 		KeyCode(rawValue: keyCode) == extraChooseCandidateKeyReverse
 	}
 
-	@objc var isVerticalModeOnlyChooseCandidateKey: Bool {
+	var isVerticalModeOnlyChooseCandidateKey: Bool {
 		KeyCode(rawValue: keyCode) == verticalModeOnlyChooseCandidateKey
 	}
 
-	@objc var isUpperCaseASCIILetterKey: Bool {
+	var isUpperCaseASCIILetterKey: Bool {
 		// 這裡必須加上「flags == .shift」，否則會出現某些情況下輸入法「誤判當前鍵入的非 Shift 字符為大寫」的問題。
 		charCode >= 65 && charCode <= 90 && flags == .shift
 	}
 
-	@objc var isSymbolMenuPhysicalKey: Bool {
+	var isSymbolMenuPhysicalKey: Bool {
 		// 這裡必須用 KeyCode，這樣才不會受隨 macOS 版本更動的 Apple 動態注音鍵盤排列內容的影響。
 		// 只是必須得與 ![input isShift] 搭配使用才可以（也就是僅判定 Shift 沒被摁下的情形）。
 		KeyCode(rawValue: keyCode) == KeyCode.kSymbolMenuPhysicalKey
 	}
 }
 
-@objc enum vChewingEmacsKey: UInt16 {
+enum vChewingEmacsKey: UInt16 {
 	case none = 0
 	case forward = 6  // F
 	case backward = 2  // B
@@ -319,7 +319,7 @@ class InputHandler: NSObject {
 }
 
 class EmacsKeyHelper: NSObject {
-	@objc static func detect(charCode: UniChar, flags: NSEvent.ModifierFlags) -> vChewingEmacsKey {
+	static func detect(charCode: UniChar, flags: NSEvent.ModifierFlags) -> vChewingEmacsKey {
 		let charCode = AppleKeyboardConverter.cnvApple2ABC(charCode)
 		if flags.contains(.control) {
 			return vChewingEmacsKey(rawValue: charCode) ?? .none

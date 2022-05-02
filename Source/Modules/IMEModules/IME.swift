@@ -34,7 +34,7 @@ public class IME: NSObject {
 
 	// MARK: - 開關判定當前應用究竟是？
 
-	@objc static var areWeUsingOurOwnPhraseEditor: Bool = false
+	static var areWeUsingOurOwnPhraseEditor: Bool = false
 
 	// MARK: - 自 ctlInputMethod 讀取當前輸入法的簡繁體模式
 
@@ -49,7 +49,7 @@ public class IME: NSObject {
 
 	// MARK: - Print debug information to the console.
 
-	@objc static func prtDebugIntel(_ strPrint: String) {
+	static func prtDebugIntel(_ strPrint: String) {
 		if mgrPrefs.isDebugModeEnabled {
 			NSLog("vChewingErrorCallback: %@", strPrint)
 		}
@@ -57,13 +57,13 @@ public class IME: NSObject {
 
 	// MARK: - Tell whether this IME is running with Root privileges.
 
-	@objc static var isSudoMode: Bool {
+	static var isSudoMode: Bool {
 		NSUserName() == "root"
 	}
 
 	// MARK: - Initializing Language Models.
 
-	@objc static func initLangModels(userOnly: Bool) {
+	static func initLangModels(userOnly: Bool) {
 		if !userOnly {
 			mgrLangModel.loadDataModels()  // 這句還是不要砍了。
 		}
@@ -77,7 +77,7 @@ public class IME: NSObject {
 
 	// MARK: - System Dark Mode Status Detector.
 
-	@objc static func isDarkMode() -> Bool {
+	static func isDarkMode() -> Bool {
 		if #available(macOS 10.15, *) {
 			let appearanceDescription = NSApplication.shared.effectiveAppearance.debugDescription
 				.lowercased()

@@ -26,10 +26,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
 
-@objc(VTCandidateKeyLabel)
 public class CandidateKeyLabel: NSObject {
-	@objc public private(set) var key: String
-	@objc public private(set) var displayedText: String
+	public private(set) var key: String
+	public private(set) var displayedText: String
 
 	public init(key: String, displayedText: String) {
 		self.key = key
@@ -38,7 +37,6 @@ public class CandidateKeyLabel: NSObject {
 	}
 }
 
-@objc(ctlCandidateDelegate)
 public protocol ctlCandidateDelegate: AnyObject {
 	func candidateCountForController(_ controller: ctlCandidate) -> UInt
 	func ctlCandidate(_ controller: ctlCandidate, candidateAtIndex index: UInt)
@@ -48,16 +46,15 @@ public protocol ctlCandidateDelegate: AnyObject {
 	)
 }
 
-@objc(ctlCandidate)
 public class ctlCandidate: NSWindowController {
-	@objc public weak var delegate: ctlCandidateDelegate? {
+	public weak var delegate: ctlCandidateDelegate? {
 		didSet {
 			reloadData()
 		}
 	}
 
-	@objc public var selectedCandidateIndex: UInt = .max
-	@objc public var visible: Bool = false {
+	public var selectedCandidateIndex: UInt = .max
+	public var visible: Bool = false {
 		didSet {
 			NSObject.cancelPreviousPerformRequests(withTarget: self)
 			if visible {
@@ -68,7 +65,7 @@ public class ctlCandidate: NSWindowController {
 		}
 	}
 
-	@objc public var windowTopLeftPoint: NSPoint {
+	public var windowTopLeftPoint: NSPoint {
 		get {
 			guard let frameRect = window?.frame else {
 				return NSPoint.zero
@@ -82,36 +79,36 @@ public class ctlCandidate: NSWindowController {
 		}
 	}
 
-	@objc public var keyLabels: [CandidateKeyLabel] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+	public var keyLabels: [CandidateKeyLabel] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 		.map {
 			CandidateKeyLabel(key: $0, displayedText: $0)
 		}
 
-	@objc public var keyLabelFont: NSFont = NSFont.monospacedDigitSystemFont(
+	public var keyLabelFont: NSFont = NSFont.monospacedDigitSystemFont(
 		ofSize: 14, weight: .medium
 	)
-	@objc public var candidateFont: NSFont = NSFont.systemFont(ofSize: 18)
-	@objc public var tooltip: String = ""
+	public var candidateFont: NSFont = NSFont.systemFont(ofSize: 18)
+	public var tooltip: String = ""
 
-	@objc public func reloadData() {}
+	public func reloadData() {}
 
-	@objc public func showNextPage() -> Bool {
+	public func showNextPage() -> Bool {
 		false
 	}
 
-	@objc public func showPreviousPage() -> Bool {
+	public func showPreviousPage() -> Bool {
 		false
 	}
 
-	@objc public func highlightNextCandidate() -> Bool {
+	public func highlightNextCandidate() -> Bool {
 		false
 	}
 
-	@objc public func highlightPreviousCandidate() -> Bool {
+	public func highlightPreviousCandidate() -> Bool {
 		false
 	}
 
-	@objc public func candidateIndexAtKeyLabelIndex(_: UInt) -> UInt {
+	public func candidateIndexAtKeyLabelIndex(_: UInt) -> UInt {
 		UInt.max
 	}
 
@@ -125,7 +122,6 @@ public class ctlCandidate: NSWindowController {
 	///   - windowTopLeftPoint: The given location.
 	///   - height: The height that helps the window not to be out of the bottom
 	///     of a screen.
-	@objc(setWindowTopLeftPoint:bottomOutOfScreenAdjustmentHeight:)
 	public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
 		DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
 			self.doSet(

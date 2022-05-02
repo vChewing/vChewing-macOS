@@ -59,7 +59,6 @@ import Cocoa
 ///   one among the candidates.
 class InputState: NSObject {
 	/// Represents that the input controller is deactivated.
-	@objc(InputStateDeactivated)
 	class Deactivated: InputState {
 		override var description: String {
 			"<InputState.Deactivated>"
@@ -69,9 +68,8 @@ class InputState: NSObject {
 	// MARK: -
 
 	/// Represents that the composing buffer is empty.
-	@objc(InputStateEmpty)
 	class Empty: InputState {
-		@objc var composingBuffer: String {
+		var composingBuffer: String {
 			""
 		}
 
@@ -83,9 +81,8 @@ class InputState: NSObject {
 	// MARK: -
 
 	/// Represents that the composing buffer is empty.
-	@objc(InputStateEmptyIgnoringPreviousState)
 	class EmptyIgnoringPreviousState: InputState {
-		@objc var composingBuffer: String {
+		var composingBuffer: String {
 			""
 		}
 
@@ -97,11 +94,10 @@ class InputState: NSObject {
 	// MARK: -
 
 	/// Represents that the input controller is committing text into client app.
-	@objc(InputStateCommitting)
 	class Committing: InputState {
-		@objc private(set) var poppedText: String = ""
+		private(set) var poppedText: String = ""
 
-		@objc convenience init(poppedText: String) {
+		convenience init(poppedText: String) {
 			self.init()
 			self.poppedText = poppedText
 		}
@@ -114,12 +110,11 @@ class InputState: NSObject {
 	// MARK: -
 
 	/// Represents that the composing buffer is not empty.
-	@objc(InputStateNotEmpty)
 	class NotEmpty: InputState {
-		@objc private(set) var composingBuffer: String
-		@objc private(set) var cursorIndex: UInt
+		private(set) var composingBuffer: String
+		private(set) var cursorIndex: UInt
 
-		@objc init(composingBuffer: String, cursorIndex: UInt) {
+		init(composingBuffer: String, cursorIndex: UInt) {
 			self.composingBuffer = composingBuffer
 			self.cursorIndex = cursorIndex
 		}
@@ -132,16 +127,15 @@ class InputState: NSObject {
 	// MARK: -
 
 	/// Represents that the user is inputting text.
-	@objc(InputStateInputting)
 	class Inputting: NotEmpty {
-		@objc var poppedText: String = ""
-		@objc var tooltip: String = ""
+		var poppedText: String = ""
+		var tooltip: String = ""
 
-		@objc override init(composingBuffer: String, cursorIndex: UInt) {
+		override init(composingBuffer: String, cursorIndex: UInt) {
 			super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
 		}
 
-		@objc var attributedString: NSAttributedString {
+		var attributedString: NSAttributedString {
 			let attributedSting = NSAttributedString(
 				string: composingBuffer,
 				attributes: [
@@ -163,12 +157,11 @@ class InputState: NSObject {
 	private let kMaxMarkRangeLength = mgrPrefs.maxCandidateLength
 
 	/// Represents that the user is marking a range in the composing buffer.
-	@objc(InputStateMarking)
 	class Marking: NotEmpty {
-		@objc private(set) var markerIndex: UInt
-		@objc private(set) var markedRange: NSRange
-		@objc private var deleteTargetExists = false
-		@objc var tooltip: String {
+		private(set) var markerIndex: UInt
+		private(set) var markedRange: NSRange
+		private var deleteTargetExists = false
+		var tooltip: String {
 			if composingBuffer.count != readings.count {
 				TooltipController.backgroundColor = NSColor(
 					red: 0.55, green: 0.00, blue: 0.00, alpha: 1.00
@@ -251,10 +244,10 @@ class InputState: NSObject {
 			)
 		}
 
-		@objc var tooltipForInputting: String = ""
-		@objc private(set) var readings: [String]
+		var tooltipForInputting: String = ""
+		private(set) var readings: [String]
 
-		@objc init(composingBuffer: String, cursorIndex: UInt, markerIndex: UInt, readings: [String]) {
+		init(composingBuffer: String, cursorIndex: UInt, markerIndex: UInt, readings: [String]) {
 			self.markerIndex = markerIndex
 			let begin = min(cursorIndex, markerIndex)
 			let end = max(cursorIndex, markerIndex)
@@ -263,7 +256,7 @@ class InputState: NSObject {
 			super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
 		}
 
-		@objc var attributedString: NSAttributedString {
+		var attributedString: NSAttributedString {
 			let attributedSting = NSMutableAttributedString(string: composingBuffer)
 			let end = markedRange.location + markedRange.length
 
@@ -296,13 +289,13 @@ class InputState: NSObject {
 			"<InputState.Marking, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), markedRange:\(markedRange)>"
 		}
 
-		@objc func convertToInputting() -> Inputting {
+		func convertToInputting() -> Inputting {
 			let state = Inputting(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
 			state.tooltip = tooltipForInputting
 			return state
 		}
 
-		@objc var validToWrite: Bool {
+		var validToWrite: Bool {
 			/// vChewing allows users to input a string whose length differs
 			/// from the amount of Bopomofo readings. In this case, the range
 			/// in the composing buffer and the readings could not match, so
@@ -323,7 +316,7 @@ class InputState: NSObject {
 				&& markedRange.length <= kMaxMarkRangeLength
 		}
 
-		@objc var chkIfUserPhraseExists: Bool {
+		var chkIfUserPhraseExists: Bool {
 			let text = (composingBuffer as NSString).substring(with: markedRange)
 			let (exactBegin, _) = (composingBuffer as NSString).characterIndex(
 				from: markedRange.location)
@@ -337,7 +330,7 @@ class InputState: NSObject {
 				== true
 		}
 
-		@objc var userPhrase: String {
+		var userPhrase: String {
 			let text = (composingBuffer as NSString).substring(with: markedRange)
 			let (exactBegin, _) = (composingBuffer as NSString).characterIndex(
 				from: markedRange.location)
@@ -348,7 +341,7 @@ class InputState: NSObject {
 			return "\(text) \(joined)"
 		}
 
-		@objc var userPhraseConverted: String {
+		var userPhraseConverted: String {
 			let text =
 				OpenCCBridge.crossConvert(
 					(composingBuffer as NSString).substring(with: markedRange)) ?? ""
@@ -366,18 +359,17 @@ class InputState: NSObject {
 	// MARK: -
 
 	/// Represents that the user is choosing in a candidates list.
-	@objc(InputStateChoosingCandidate)
 	class ChoosingCandidate: NotEmpty {
-		@objc private(set) var candidates: [String]
-		@objc private(set) var useVerticalMode: Bool
+		private(set) var candidates: [String]
+		private(set) var useVerticalMode: Bool
 
-		@objc init(composingBuffer: String, cursorIndex: UInt, candidates: [String], useVerticalMode: Bool) {
+		init(composingBuffer: String, cursorIndex: UInt, candidates: [String], useVerticalMode: Bool) {
 			self.candidates = candidates
 			self.useVerticalMode = useVerticalMode
 			super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
 		}
 
-		@objc var attributedString: NSAttributedString {
+		var attributedString: NSAttributedString {
 			let attributedSting = NSAttributedString(
 				string: composingBuffer,
 				attributes: [
@@ -397,11 +389,10 @@ class InputState: NSObject {
 
 	/// Represents that the user is choosing in a candidates list
 	/// in the associated phrases mode.
-	@objc(InputStateAssociatedPhrases)
 	class AssociatedPhrases: InputState {
-		@objc private(set) var candidates: [String] = []
-		@objc private(set) var useVerticalMode: Bool = false
-		@objc init(candidates: [String], useVerticalMode: Bool) {
+		private(set) var candidates: [String] = []
+		private(set) var useVerticalMode: Bool = false
+		init(candidates: [String], useVerticalMode: Bool) {
 			self.candidates = candidates
 			self.useVerticalMode = useVerticalMode
 			super.init()
@@ -412,11 +403,10 @@ class InputState: NSObject {
 		}
 	}
 
-	@objc(InputStateSymbolTable)
 	class SymbolTable: ChoosingCandidate {
-		@objc var node: SymbolNode
+		var node: SymbolNode
 
-		@objc init(node: SymbolNode, useVerticalMode: Bool) {
+		init(node: SymbolNode, useVerticalMode: Bool) {
 			self.node = node
 			let candidates = node.children?.map(\.title) ?? [String]()
 			super.init(
@@ -432,53 +422,53 @@ class InputState: NSObject {
 }
 
 class SymbolNode: NSObject {
-	@objc var title: String
-	@objc var children: [SymbolNode]?
+	var title: String
+	var children: [SymbolNode]?
 
-	@objc init(_ title: String, _ children: [SymbolNode]? = nil) {
+	init(_ title: String, _ children: [SymbolNode]? = nil) {
 		self.title = title
 		self.children = children
 		super.init()
 	}
 
-	@objc init(_ title: String, symbols: String) {
+	init(_ title: String, symbols: String) {
 		self.title = title
 		children = Array(symbols).map { SymbolNode(String($0), nil) }
 		super.init()
 	}
 
-	@objc static let catCommonSymbols = String(
+	static let catCommonSymbols = String(
 		format: NSLocalizedString("catCommonSymbols", comment: ""))
-	@objc static let catHoriBrackets = String(
+	static let catHoriBrackets = String(
 		format: NSLocalizedString("catHoriBrackets", comment: ""))
-	@objc static let catVertBrackets = String(
+	static let catVertBrackets = String(
 		format: NSLocalizedString("catVertBrackets", comment: ""))
-	@objc static let catGreekLetters = String(
+	static let catGreekLetters = String(
 		format: NSLocalizedString("catGreekLetters", comment: ""))
-	@objc static let catMathSymbols = String(
+	static let catMathSymbols = String(
 		format: NSLocalizedString("catMathSymbols", comment: ""))
-	@objc static let catCurrencyUnits = String(
+	static let catCurrencyUnits = String(
 		format: NSLocalizedString("catCurrencyUnits", comment: ""))
-	@objc static let catSpecialSymbols = String(
+	static let catSpecialSymbols = String(
 		format: NSLocalizedString("catSpecialSymbols", comment: ""))
-	@objc static let catUnicodeSymbols = String(
+	static let catUnicodeSymbols = String(
 		format: NSLocalizedString("catUnicodeSymbols", comment: ""))
-	@objc static let catCircledKanjis = String(
+	static let catCircledKanjis = String(
 		format: NSLocalizedString("catCircledKanjis", comment: ""))
-	@objc static let catCircledKataKana = String(
+	static let catCircledKataKana = String(
 		format: NSLocalizedString("catCircledKataKana", comment: ""))
-	@objc static let catBracketKanjis = String(
+	static let catBracketKanjis = String(
 		format: NSLocalizedString("catBracketKanjis", comment: ""))
-	@objc static let catSingleTableLines = String(
+	static let catSingleTableLines = String(
 		format: NSLocalizedString("catSingleTableLines", comment: ""))
-	@objc static let catDoubleTableLines = String(
+	static let catDoubleTableLines = String(
 		format: NSLocalizedString("catDoubleTableLines", comment: ""))
-	@objc static let catFillingBlocks = String(
+	static let catFillingBlocks = String(
 		format: NSLocalizedString("catFillingBlocks", comment: ""))
-	@objc static let catLineSegments = String(
+	static let catLineSegments = String(
 		format: NSLocalizedString("catLineSegments", comment: ""))
 
-	@objc static let root: SymbolNode = .init(
+	static let root: SymbolNode = .init(
 		"/",
 		[
 			SymbolNode("｀"),

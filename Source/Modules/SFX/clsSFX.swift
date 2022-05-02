@@ -59,11 +59,11 @@ public class clsSFX: NSObject, NSSoundDelegate {
 		currentBeep = beep
 	}
 
-	@objc public func sound(_: NSSound, didFinishPlaying _: Bool) {
+	public func sound(_: NSSound, didFinishPlaying _: Bool) {
 		currentBeep = nil
 	}
 
-	@objc static func beep() {
+	static func beep() {
 		shared.beep()
 	}
 }

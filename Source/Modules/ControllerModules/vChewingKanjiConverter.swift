@@ -31,7 +31,7 @@ extension String {
 }
 
 class vChewingKanjiConverter: NSObject {
-	@objc class func cnvTradToKangXi(_ strObj: String) -> String {
+	class func cnvTradToKangXi(_ strObj: String) -> String {
 		var strObj = strObj
 		strObj.selfReplace("偽", "僞")
 		strObj.selfReplace("啟", "啓")
@@ -217,7 +217,7 @@ class vChewingKanjiConverter: NSObject {
 		return strObj
 	}
 
-	@objc class func cnvTradToJIS(_ strObj: String) -> String {
+	class func cnvTradToJIS(_ strObj: String) -> String {
 		// 該轉換是由康熙繁體轉換至日語當用漢字的，所以需要先跑一遍康熙轉換。
 		var strObj = cnvTradToKangXi(strObj)
 		strObj.selfReplace("兩", "両")
