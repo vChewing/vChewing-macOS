@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5B00A230282011980058E5DB /* lmLite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B00A22F282011980058E5DB /* lmLite.swift */; };
 		5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0AF8B427B2C8290096FE54 /* StringExtension.swift */; };
 		5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */; };
 		5B27AD6A27CB1F9B000ED75B /* data-symbols.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B27AD6827CB1F9B000ED75B /* data-symbols.txt */; };
@@ -28,7 +29,7 @@
 		5B407153281F94E6009C24CB /* Composer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B407152281F94E6009C24CB /* Composer.mm */; };
 		5B40730C281672610023DFFF /* lmAssociates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B407309281672610023DFFF /* lmAssociates.swift */; };
 		5B40730D281672610023DFFF /* lmReplacements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B40730A281672610023DFFF /* lmReplacements.swift */; };
-		5B5D28AC281EA1E900523D4D /* lmLite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5D28AB281EA1E800523D4D /* lmLite.swift */; };
+		5B5D28AC281EA1E900523D4D /* lmLiteMono.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5D28AB281EA1E800523D4D /* lmLiteMono.swift */; };
 		5B5E535227EF261400C6AA1E /* IME.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E535127EF261400C6AA1E /* IME.swift */; };
 		5B61B0CA280BEFD4002E3CFA /* KeyHandler_Misc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B61B0C9280BEFD4002E3CFA /* KeyHandler_Misc.swift */; };
 		5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */; };
@@ -162,6 +163,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5B00A22F282011980058E5DB /* lmLite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lmLite.swift; sourceTree = "<group>"; };
 		5B04305327B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5B04305427B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5B04305527B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
@@ -205,7 +207,7 @@
 		5B407152281F94E6009C24CB /* Composer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Composer.mm; sourceTree = "<group>"; };
 		5B407309281672610023DFFF /* lmAssociates.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = lmAssociates.swift; sourceTree = "<group>"; usesTabs = 1; };
 		5B40730A281672610023DFFF /* lmReplacements.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = lmReplacements.swift; sourceTree = "<group>"; usesTabs = 1; };
-		5B5D28AB281EA1E800523D4D /* lmLite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lmLite.swift; sourceTree = "<group>"; };
+		5B5D28AB281EA1E800523D4D /* lmLiteMono.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lmLiteMono.swift; sourceTree = "<group>"; };
 		5B5E535127EF261400C6AA1E /* IME.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = IME.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		5B61B0C9280BEFD4002E3CFA /* KeyHandler_Misc.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_Misc.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = FSEventStreamHelper.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
@@ -396,7 +398,8 @@
 			children = (
 				5B407309281672610023DFFF /* lmAssociates.swift */,
 				5BA0DF2F2817857D009E73BB /* lmCore.swift */,
-				5B5D28AB281EA1E800523D4D /* lmLite.swift */,
+				5B5D28AB281EA1E800523D4D /* lmLiteMono.swift */,
+				5B00A22F282011980058E5DB /* lmLite.swift */,
 				5B40730A281672610023DFFF /* lmReplacements.swift */,
 				5BA0DF2E2817857D009E73BB /* lmUserOverride.swift */,
 			);
@@ -1079,7 +1082,7 @@
 				5B40730C281672610023DFFF /* lmAssociates.swift in Sources */,
 				5B707CE827D9F4590099EF99 /* OpenCCBridge.swift in Sources */,
 				D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */,
-				5B5D28AC281EA1E900523D4D /* lmLite.swift in Sources */,
+				5B5D28AC281EA1E900523D4D /* lmLiteMono.swift in Sources */,
 				5BA9FD4527FEF3C9002DE248 /* ToolbarItemStyleViewController.swift in Sources */,
 				5BA0DF322817857D009E73BB /* lmCore.swift in Sources */,
 				5BA9FD4127FEF3C8002DE248 /* PreferencesStyle.swift in Sources */,
@@ -1135,6 +1138,7 @@
 				5B62A34827AE7CD900A19448 /* ctlCandidateVertical.swift in Sources */,
 				5BA9FD4027FEF3C8002DE248 /* Localization.swift in Sources */,
 				5BA9FD1327FEDB6B002DE248 /* suiPrefPaneDictionary.swift in Sources */,
+				5B00A230282011980058E5DB /* lmLite.swift in Sources */,
 				5BBBB77A27AEDC690023B93A /* clsSFX.swift in Sources */,
 				5BA9FD4727FEF3C9002DE248 /* PreferencesStyleController.swift in Sources */,
 				5BF8423127BAA942008E7E4C /* vChewingKanjiConverter.swift in Sources */,

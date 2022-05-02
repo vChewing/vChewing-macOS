@@ -85,45 +85,51 @@ extension vChewing {
 			}
 
 			let arrData = theData.components(separatedBy: "\n")
-			for (lineID, lineContent) in arrData.enumerated() {
-				if !lineContent.hasPrefix("#") {
-					let lineContent = lineContent.replacingOccurrences(of: "\t", with: " ")
-					if lineContent.components(separatedBy: " ").count < 2 {
-						if arrData.last != "" {
-							IME.prtDebugIntel("Line #\(lineID + 1) Wrecked: \(lineContent)")
+			DispatchQueue.global(qos: .userInitiated).async {
+				for (lineID, lineContent) in arrData.enumerated() {
+					if !lineContent.hasPrefix("#") {
+						let lineContent = lineContent.replacingOccurrences(of: "\t", with: " ")
+						if lineContent.components(separatedBy: " ").count < 2 {
+							if arrData.last != "" {
+								IME.prtDebugIntel("Line #\(lineID + 1) Wrecked: \(lineContent)")
+							}
+							continue
 						}
-						continue
-					}
-					var currentUnigram = Megrez.Unigram(keyValue: Megrez.KeyValuePair(), score: defaultScore)
-					var columnOne = ""
-					var columnTwo = ""
-					for (unitID, unitContent) in lineContent.components(separatedBy: " ").enumerated() {
-						switch unitID {
-							case 0:
-								columnOne = unitContent
-							case 1:
-								columnTwo = unitContent
-							case 2:
-								if !shouldForceDefaultScore {
-									if let unitContentConverted = Double(unitContent) {
-										currentUnigram.score = unitContentConverted
-									} else {
-										IME.prtDebugIntel("Line #\(lineID) Score Data Wrecked: \(lineContent)")
-									}
+						var currentUnigram = Megrez.Unigram(keyValue: Megrez.KeyValuePair(), score: self.defaultScore)
+						var columnOne = ""
+						var columnTwo = ""
+						DispatchQueue.global(qos: .userInitiated).async {
+							for (unitID, unitContent) in lineContent.components(separatedBy: " ").enumerated() {
+								switch unitID {
+									case 0:
+										columnOne = unitContent
+									case 1:
+										columnTwo = unitContent
+									case 2:
+										if !self.shouldForceDefaultScore {
+											if let unitContentConverted = Double(unitContent) {
+												currentUnigram.score = unitContentConverted
+											} else {
+												IME.prtDebugIntel("Line #\(lineID) Score Data Wrecked: \(lineContent)")
+											}
+										}
+									default: break
 								}
-							default: break
+							}
+							DispatchQueue.main.async {
+								let kvPair =
+									self.shouldReverse
+									? Megrez.KeyValuePair(key: columnTwo, value: columnOne)
+									: Megrez.KeyValuePair(key: columnOne, value: columnTwo)
+								currentUnigram.keyValue = kvPair
+								let key = self.shouldReverse ? columnTwo : columnOne
+								self.keyValueScoreMap[key, default: []].append(currentUnigram)
+							}
 						}
 					}
-					let kvPair =
-						shouldReverse
-						? Megrez.KeyValuePair(key: columnTwo, value: columnOne)
-						: Megrez.KeyValuePair(key: columnOne, value: columnTwo)
-					currentUnigram.keyValue = kvPair
-					let key = shouldReverse ? columnTwo : columnOne
-					keyValueScoreMap[key, default: []].append(currentUnigram)
 				}
+				// IME.prtDebugIntel("\(self.keyValueScoreMap.count) entries of data loaded from: \(path)")
 			}
-			IME.prtDebugIntel("\(keyValueScoreMap.count) entries of data loaded from: \(path)")
 			theData = ""
 			return true
 		}

@@ -27,13 +27,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Foundation
 
 extension vChewing {
-	public class LMAssociates {
+	public class LMLiteMono {
 		var keyValueMap: [String: [Megrez.KeyValuePair]] = [:]
 		var theData: String = ""
+		var allowConsolidation = false
 
-		public init() {
+		public init(consolidate: Bool = false) {
 			keyValueMap = [:]
 			theData = ""
+			allowConsolidation = consolidate
 		}
 
 		deinit {
@@ -51,11 +53,13 @@ extension vChewing {
 				return false
 			}
 
-			if !LMConsolidator.fixEOF(path: path) {
-				return false
-			}
-			if !LMConsolidator.consolidate(path: path, pragma: true) {
-				return false
+			if allowConsolidation {
+				if !LMConsolidator.fixEOF(path: path) {
+					return false
+				}
+				if !LMConsolidator.consolidate(path: path, pragma: true) {
+					return false
+				}
 			}
 
 			do {
@@ -84,9 +88,9 @@ extension vChewing {
 					for (unitID, unitContent) in lineContent.components(separatedBy: " ").enumerated() {
 						switch unitID {
 							case 0:
-								currentKV.key = unitContent
-							case 1:
 								currentKV.value = unitContent
+							case 1:
+								currentKV.key = unitContent
 							default: break
 						}
 					}
@@ -95,6 +99,9 @@ extension vChewing {
 			}
 			// IME.prtDebugIntel("\(self.keyValueMap.count) entries of data loaded from: \(path)")
 			theData = ""
+			if path.contains("vChewing/") {
+				dump()
+			}
 			return true
 		}
 
@@ -104,17 +111,29 @@ extension vChewing {
 			}
 		}
 
-		public func valuesFor(key: String) -> [String]? {
-			var v: [String] = []
+		public func dump() {
+			var strDump = ""
+			for entry in keyValueMap {
+				let rows: [Megrez.KeyValuePair] = entry.1
+				for row in rows {
+					let addline = row.key + " " + row.value + "\n"
+					strDump += addline
+				}
+			}
+			IME.prtDebugIntel(strDump)
+		}
+
+		public func unigramsFor(key: String, score givenScore: Double = 0.0) -> [Megrez.Unigram] {
+			var v: [Megrez.Unigram] = []
 			if let matched = keyValueMap[key] {
 				for entry in matched as [Megrez.KeyValuePair] {
-					v.append(entry.value)
+					v.append(Megrez.Unigram(keyValue: entry, score: givenScore))
 				}
 			}
 			return v
 		}
 
-		public func hasValuesFor(key: String) -> Bool {
+		public func hasUnigramsFor(key: String) -> Bool {
 			keyValueMap[key] != nil
 		}
 	}
