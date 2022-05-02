@@ -29,6 +29,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Foundation
 
+// 簡體中文模式與繁體中文模式共用全字庫擴展模組，故單獨處理。
+// 塞在 LMInstantiator 內的話，每個模式都會讀入一份全字庫，會多佔用 100MB 記憶體。
+private let lmCNS = vChewing.LMLite(consolidate: false)
+private let lmSymbols = vChewing.LMCore(reverse: true, consolidate: false, defaultScore: -13.0, forceDefaultScore: true)
+
 extension vChewing {
 	/// LMInstantiator is a facade for managing a set of models including
 	/// the input method language model, user phrases and excluded phrases.
@@ -57,18 +62,27 @@ extension vChewing {
 		public var isCNSEnabled = false
 		public var isSymbolEnabled = false
 
+		/// 介紹一下三個通用的語言模組型別：
+		/// LMCore 是全功能通用型的模組，每一筆辭典記錄以 key 為注音、以 [Unigram] 陣列作為記錄內容。
+		/// 比較適合那種每筆記錄都有不同的權重數值的語言模組，雖然也可以強制施加權重數值就是了。
+		/// 然而缺點是：哪怕你強制施加權重數值，也不會減輕記憶體佔用。
+		/// 至於像全字庫這樣所有記錄都使用同一權重數值的模組，可以用 LMLite 以節省記憶體佔用。
+		/// LMLite 的辭典內不會存儲權重資料，只會在每次讀取記錄時施加您給定的權重數值。
+		/// LMLite 與 LMCore 都會用到多執行緒、以加速載入（不然的話，全部資料載入會耗費八秒左右）。
+		/// 然而，對於使用者語彙模型檔案而言，多執行緒可能會出現意料之外的問題，所以有了 LMLiteMono。
+		/// LMReplacements 與 LMAssociates 均為特種模組，分別擔當語彙置換表資料與使用者聯想詞的資料承載工作。
+
 		// 聲明原廠語言模組
 		/// Reverse 的話，第一欄是注音，第二欄是對應的漢字，第三欄是可能的權重。
 		/// 不 Reverse 的話，第一欄是漢字，第二欄是對應的注音，第三欄是可能的權重。
 		let lmCore = LMCore(reverse: false, consolidate: false, defaultScore: -9.5, forceDefaultScore: false)
 		let lmMisc = LMCore(reverse: true, consolidate: false, defaultScore: -1, forceDefaultScore: false)
-		let lmSymbols = LMLite(consolidate: true)
-		let lmCNS = LMLite(consolidate: true)
 
-		// 聲明使用者語言模組
-		let lmUserPhrases = LMLite(consolidate: true)
-		let lmFiltered = LMLite(consolidate: true)
-		let lmUserSymbols = LMLite(consolidate: true)
+		// 聲明使用者語言模組。
+		// 使用者語言模組使用多執行緒的話，可能會導致一些問題。有時間再仔細排查看看。
+		let lmUserPhrases = LMLiteMono(consolidate: true)
+		let lmFiltered = LMLiteMono(consolidate: true)
+		let lmUserSymbols = LMLiteMono(consolidate: true)
 		let lmReplacements = LMReplacments()
 		let lmAssociates = LMAssociates()
 
@@ -77,10 +91,11 @@ extension vChewing {
 
 		// 自我析構前要關掉全部的語言模組
 		deinit {
+			// 原則上而言，只要不是歸 LMInstantiator 親自初期化的語言模組，都不要在這裡關掉。
+			// lmCNS.close()  // <--比如左邊這個模組。
+			// lmSymbols.close()  // <--左邊這個模組也是。
 			lmCore.close()
 			lmMisc.close()
-			lmSymbols.close()
-			lmCNS.close()
 			lmUserPhrases.close()
 			lmFiltered.close()
 			lmUserSymbols.close()
@@ -194,7 +209,7 @@ extension vChewing {
 					IME.prtDebugIntel("Not found in UserSymbolUnigram: \(key)")
 				}
 
-				rawAllUnigrams += lmSymbols.unigramsFor(key: key, score: -11.0)
+				rawAllUnigrams += lmSymbols.unigramsFor(key: key)
 				if lmSymbols.unigramsFor(key: key).isEmpty {
 					IME.prtDebugIntel("Not found in UserUnigram: \(key)")
 				}
