@@ -29,14 +29,12 @@ import Foundation
 extension vChewing {
 	public class LMLite {
 		var keyValueMap: [String: [Megrez.KeyValuePair]] = [:]
-		var defaultScore: Double = 0
 		var theData: String = ""
 		var allowConsolidation = false
 
-		public init(defaultScore scoreDefault: Double = 0, consolidate: Bool = false) {
+		public init(consolidate: Bool = false) {
 			keyValueMap = [:]
 			theData = ""
-			defaultScore = scoreDefault
 			allowConsolidation = consolidate
 		}
 
@@ -125,11 +123,11 @@ extension vChewing {
 			IME.prtDebugIntel(strDump)
 		}
 
-		public func unigramsFor(key: String) -> [Megrez.Unigram] {
+		public func unigramsFor(key: String, score givenScore: Double = 0.0) -> [Megrez.Unigram] {
 			var v: [Megrez.Unigram] = []
 			if let matched = keyValueMap[key] {
 				for entry in matched as [Megrez.KeyValuePair] {
-					v.append(Megrez.Unigram(keyValue: entry, score: defaultScore))
+					v.append(Megrez.Unigram(keyValue: entry, score: givenScore))
 				}
 			}
 			return v
