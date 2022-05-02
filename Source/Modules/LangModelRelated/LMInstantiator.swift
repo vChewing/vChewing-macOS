@@ -45,13 +45,12 @@ extension vChewing {
 	/// 1) Get the original unigrams.
 	/// 2) Drop the unigrams whose value is contained in the exclusion map.
 	/// 3) Replace the values of the unigrams using the phrase replacement map.
-	/// 4) Replace the values of the unigrams using an external converter lambda.
-	/// 5) Drop the duplicated phrases.
+	/// 4) Drop the duplicated phrases from the generated unigram array.
 	///
 	/// The controller can ask the model to load the primary input method language
 	/// model while launching and to load the user phrases anytime if the custom
 	/// files are modified. It does not keep the reference of the data pathes but
-	/// you have to pass the paths when you ask it to do loading.
+	/// you have to pass the paths when you ask it to load.
 	public class LMInstantiator: Megrez.LanguageModel {
 		// 在函數內部用以記錄狀態的開關。
 		public var isPhraseReplacementEnabled = false
@@ -63,13 +62,13 @@ extension vChewing {
 		/// 不 Reverse 的話，第一欄是漢字，第二欄是對應的注音，第三欄是可能的權重。
 		let lmCore = LMCore(reverse: false, consolidate: false, defaultScore: -9.5, forceDefaultScore: false)
 		let lmMisc = LMCore(reverse: true, consolidate: false, defaultScore: -1, forceDefaultScore: false)
-		let lmSymbols = LMLite(defaultScore: -13.0, consolidate: true)
-		let lmCNS = LMLite(defaultScore: -11.0, consolidate: true)
+		let lmSymbols = LMLite(consolidate: true)
+		let lmCNS = LMLite(consolidate: true)
 
 		// 聲明使用者語言模組
-		let lmUserPhrases = LMLite(defaultScore: 0.0, consolidate: true)
-		let lmFiltered = LMLite(defaultScore: 0.0, consolidate: true)
-		let lmUserSymbols = LMLite(defaultScore: -12.0, consolidate: true)
+		let lmUserPhrases = LMLite(consolidate: true)
+		let lmFiltered = LMLite(consolidate: true)
+		let lmUserSymbols = LMLite(consolidate: true)
 		let lmReplacements = LMReplacments()
 		let lmAssociates = LMAssociates()
 
@@ -173,87 +172,47 @@ extension vChewing {
 				return [spaceUnigram]
 			}
 
-			/// 準備不同的語言模組容器。
-			var coreUnigrams: [Megrez.Unigram] = []
-			var miscUnigrams: [Megrez.Unigram] = []
-			var symbolUnigrams: [Megrez.Unigram] = []
-			var userUnigrams: [Megrez.Unigram] = []
-			var userSymbolUnigrams: [Megrez.Unigram] = []
-			var cnsUnigrams: [Megrez.Unigram] = []
+			/// 準備不同的語言模組容器，開始逐漸往容器陣列內塞入資料。
+			var rawAllUnigrams: [Megrez.Unigram] = []
 
-			var insertedPairs: Set<Megrez.KeyValuePair> = []  // 具體用途有待商榷
-			var filteredPairs: Set<Megrez.KeyValuePair> = []
+			// 用 reversed 指令讓使用者語彙檔案內的詞條優先順序隨著行數增加而逐漸增高。
+			// 這樣一來就可以在就地新增語彙時徹底複寫優先權。
+			// 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
+			rawAllUnigrams += lmUserPhrases.unigramsFor(key: key, score: 0.0).reversed()
 
-			// 開始逐漸往容器陣列內塞入資料
-			let filteredUnigrams: [Megrez.Unigram] =
-				lmFiltered.hasUnigramsFor(key: key) ? lmFiltered.unigramsFor(key: key) : []
-			for unigram in filteredUnigrams {
-				filteredPairs.insert(unigram.keyValue)
-			}
+			// LMMisc 與 LMCore 的 score 在 (-10.0, 0.0) 這個區間內。
+			rawAllUnigrams += lmMisc.unigramsFor(key: key)
+			rawAllUnigrams += lmCore.unigramsFor(key: key)
 
-			if lmUserPhrases.hasUnigramsFor(key: key) {
-				var rawUserUnigrams: [Megrez.Unigram] = []
-				// 用 reversed 指令讓使用者語彙檔案內的詞條優先順序隨著行數增加而逐漸增高。
-				// 這樣一來就可以在就地新增語彙時徹底複寫優先權。
-				// 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
-				rawUserUnigrams.append(contentsOf: lmUserPhrases.unigramsFor(key: key).reversed())
-				userUnigrams = filterAndTransform(
-					unigrams: rawUserUnigrams, filter: filteredPairs, inserted: &insertedPairs
-				)
-			}
-
-			if lmUserPhrases.hasUnigramsFor(key: key) {
-				let rawUserUnigrams: [Megrez.Unigram] = lmUserPhrases.unigramsFor(key: key)
-				userUnigrams = filterAndTransform(
-					unigrams: rawUserUnigrams, filter: filteredPairs, inserted: &insertedPairs
-				)
-			}
-
-			if lmMisc.hasUnigramsFor(key: key) {
-				let rawMiscUnigrams: [Megrez.Unigram] = lmMisc.unigramsFor(key: key)
-				miscUnigrams = filterAndTransform(
-					unigrams: rawMiscUnigrams, filter: filteredPairs, inserted: &insertedPairs
-				)
-			}
-
-			if lmCore.hasUnigramsFor(key: key) {
-				let rawCoreUnigrams: [Megrez.Unigram] = lmCore.unigramsFor(key: key)
-				coreUnigrams = filterAndTransform(
-					unigrams: rawCoreUnigrams, filter: filteredPairs, inserted: &insertedPairs
-				)
+			if isCNSEnabled {
+				rawAllUnigrams += lmCNS.unigramsFor(key: key, score: -11)
 			}
 
 			if isSymbolEnabled {
-				if lmUserSymbols.hasUnigramsFor(key: key) {
-					let rawUserSymbolUnigrams: [Megrez.Unigram] = lmUserSymbols.unigramsFor(key: key)
-					userSymbolUnigrams = filterAndTransform(
-						unigrams: rawUserSymbolUnigrams, filter: filteredPairs, inserted: &insertedPairs
-					)
-				} else {
+				rawAllUnigrams += lmUserSymbols.unigramsFor(key: key, score: -12.0)
+				if lmUserSymbols.unigramsFor(key: key).isEmpty {
 					IME.prtDebugIntel("Not found in UserSymbolUnigram: \(key)")
 				}
 
-				if lmSymbols.hasUnigramsFor(key: key) {
-					let rawSymbolUnigrams: [Megrez.Unigram] = lmSymbols.unigramsFor(key: key)
-					symbolUnigrams = filterAndTransform(
-						unigrams: rawSymbolUnigrams, filter: filteredPairs, inserted: &insertedPairs
-					)
-				} else {
+				rawAllUnigrams += lmSymbols.unigramsFor(key: key, score: -11.0)
+				if lmSymbols.unigramsFor(key: key).isEmpty {
 					IME.prtDebugIntel("Not found in UserUnigram: \(key)")
 				}
 			}
 
-			if lmCNS.hasUnigramsFor(key: key), isCNSEnabled {
-				let rawCNSUnigrams: [Megrez.Unigram] = lmCNS.unigramsFor(key: key)
-				cnsUnigrams = filterAndTransform(
-					unigrams: rawCNSUnigrams, filter: filteredPairs, inserted: &insertedPairs
-				)
+			// 準備過濾清單與統計清單
+			var insertedPairs: Set<Megrez.KeyValuePair> = []  // 統計清單
+			var filteredPairs: Set<Megrez.KeyValuePair> = []  // 過濾清單
+
+			// 載入要過濾的 KeyValuePair 清單。
+			for unigram in lmFiltered.unigramsFor(key: key) {
+				filteredPairs.insert(unigram.keyValue)
 			}
 
-			let allUnigrams: [Megrez.Unigram] =
-				userUnigrams + miscUnigrams + coreUnigrams + cnsUnigrams + userSymbolUnigrams + symbolUnigrams
-
-			return allUnigrams
+			return filterAndTransform(
+				unigrams: rawAllUnigrams,
+				filter: filteredPairs, inserted: &insertedPairs
+			)
 		}
 
 		/// If the model has unigrams for the given key.
@@ -286,16 +245,15 @@ extension vChewing {
 			var results: [Megrez.Unigram] = []
 
 			for unigram in unigrams {
-				let pairToDealWith: Megrez.KeyValuePair = unigram.keyValue
-				if filteredPairs.contains(pairToDealWith) {
+				var pair: Megrez.KeyValuePair = unigram.keyValue
+				if filteredPairs.contains(pair) {
 					continue
 				}
 
-				var pair: Megrez.KeyValuePair = pairToDealWith
 				if isPhraseReplacementEnabled {
-					let replacement = lmReplacements.valuesFor(key: pair.key)
-					if !replacement.isEmpty {
-						IME.prtDebugIntel(replacement)
+					let replacement = lmReplacements.valuesFor(key: pair.value)
+					if !replacement.isEmpty, pair.value.count == replacement.count {
+						IME.prtDebugIntel("\(pair.value) -> \(replacement)")
 						pair.value = replacement
 					}
 				}
