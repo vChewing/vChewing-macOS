@@ -121,7 +121,7 @@ class ctlInputMethod: IMKInputController {
 			default:
 				newInputMode = InputMode.imeModeNULL
 		}
-		mgrLangModel.loadDataModel(newInputMode)
+		// mgrLangModel.loadDataModel(newInputMode)
 
 		if keyHandler.inputMode != newInputMode {
 			UserDefaults.standard.synchronize()
