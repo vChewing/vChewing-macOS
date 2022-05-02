@@ -395,9 +395,9 @@
 			children = (
 				5B407309281672610023DFFF /* lmAssociates.swift */,
 				5BA0DF2F2817857D009E73BB /* lmCore.swift */,
+				5B5D28AB281EA1E800523D4D /* lmLite.swift */,
 				5B40730A281672610023DFFF /* lmReplacements.swift */,
 				5BA0DF2E2817857D009E73BB /* lmUserOverride.swift */,
-				5B5D28AB281EA1E800523D4D /* lmLite.swift */,
 			);
 			path = SubLMs;
 			sourceTree = "<group>";
