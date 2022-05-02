@@ -28,7 +28,7 @@ import Cocoa
 
 // MARK: - § State managements.
 
-@objc extension KeyHandler {
+extension KeyHandler {
 	// MARK: - 構築狀態（State Building）
 
 	func buildInputtingState() -> InputState.Inputting {
@@ -44,7 +44,7 @@ import Cocoa
 		// i.e. we need to take UTF-16 into consideration, for which a surrogate pair takes 2 UniChars
 		// locations. These processes are inherited from the ObjC++ version of this class and might be
 		// unnecessary in Swift, but this deduction requires further experiments.
-		for walkedNode in KeyHandlerSputnik.walkedNodes {
+		for walkedNode in _walkedNodes {
 			if let theNode = walkedNode.node {
 				let strNodeValue = theNode.currentKeyValue().value
 				composingBuffer += strNodeValue
@@ -87,7 +87,7 @@ import Cocoa
 		// The reading text is what the user is typing.
 
 		let head = String((composingBuffer as NSString).substring(to: composedStringCursorIndex))
-		let reading = getCompositionFromPhoneticReadingBuffer()
+		let reading = Composer.getComposition()
 		let tail = String((composingBuffer as NSString).substring(from: composedStringCursorIndex))
 		let composedText = head + reading + tail
 		let cursorIndex = composedStringCursorIndex + reading.count
@@ -213,14 +213,14 @@ import Cocoa
 			return false
 		}
 
-		if isPhoneticReadingBufferEmpty() {
+		if Composer.isBufferEmpty() {
 			insertReadingToBuilderAtCursor(reading: customPunctuation)
 			let poppedText = popOverflowComposingTextAndWalk()
 			let inputting = buildInputtingState()
 			inputting.poppedText = poppedText
 			stateCallback(inputting)
 
-			if mgrPrefs.useSCPCTypingMode, isPhoneticReadingBufferEmpty() {
+			if mgrPrefs.useSCPCTypingMode, Composer.isBufferEmpty() {
 				let candidateState = buildCandidate(
 					state: inputting,
 					useVerticalMode: useVerticalMode
@@ -303,7 +303,7 @@ import Cocoa
 			return false
 		}
 
-		if isPhoneticReadingBufferEmpty() {
+		if Composer.isBufferEmpty() {
 			if getBuilderCursorIndex() >= 0 {
 				deleteBuilderReadingInFrontOfCursor()
 				walk()
@@ -314,10 +314,10 @@ import Cocoa
 				return true
 			}
 		} else {
-			doBackSpaceToPhoneticReadingBuffer()
+			Composer.doBackSpaceToBuffer()
 		}
 
-		if isPhoneticReadingBufferEmpty(), getBuilderLength() == 0 {
+		if Composer.isBufferEmpty(), getBuilderLength() == 0 {
 			stateCallback(InputState.EmptyIgnoringPreviousState())
 		} else {
 			stateCallback(buildInputtingState())
@@ -336,7 +336,7 @@ import Cocoa
 			return false
 		}
 
-		if isPhoneticReadingBufferEmpty() {
+		if Composer.isBufferEmpty() {
 			if getBuilderCursorIndex() != getBuilderLength() {
 				deleteBuilderReadingAfterCursor()
 				walk()
@@ -371,7 +371,7 @@ import Cocoa
 		if !(state is InputState.Inputting) {
 			return false
 		}
-		if !isPhoneticReadingBufferEmpty() {
+		if !Composer.isBufferEmpty() {
 			IME.prtDebugIntel("9B6F908D")
 			errorCallback()
 		}
@@ -390,7 +390,7 @@ import Cocoa
 			return false
 		}
 
-		if !isPhoneticReadingBufferEmpty() {
+		if !Composer.isBufferEmpty() {
 			IME.prtDebugIntel("ABC44080")
 			errorCallback()
 			stateCallback(state)
@@ -420,7 +420,7 @@ import Cocoa
 			return false
 		}
 
-		if !isPhoneticReadingBufferEmpty() {
+		if !Composer.isBufferEmpty() {
 			IME.prtDebugIntel("9B69908D")
 			errorCallback()
 			stateCallback(state)
@@ -459,8 +459,8 @@ import Cocoa
 			stateCallback(InputState.EmptyIgnoringPreviousState())
 		} else {
 			// If reading is not empty, we cancel the reading.
-			if !isPhoneticReadingBufferEmpty() {
-				clearPhoneticReadingBuffer()
+			if !Composer.isBufferEmpty() {
+				Composer.clearBuffer()
 				if getBuilderLength() == 0 {
 					stateCallback(InputState.Empty())
 				} else {
@@ -481,7 +481,7 @@ import Cocoa
 	) -> Bool {
 		if !(state is InputState.Inputting) { return false }
 
-		if !isPhoneticReadingBufferEmpty() {
+		if !Composer.isBufferEmpty() {
 			IME.prtDebugIntel("B3BA5257")
 			errorCallback()
 			stateCallback(state)
@@ -532,7 +532,7 @@ import Cocoa
 	) -> Bool {
 		if !(state is InputState.Inputting) { return false }
 
-		if !isPhoneticReadingBufferEmpty() {
+		if !Composer.isBufferEmpty() {
 			IME.prtDebugIntel("6ED95318")
 			errorCallback()
 			stateCallback(state)

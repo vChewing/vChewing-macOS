@@ -1,6 +1,6 @@
-// Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
-// Refactored from the ObjCpp-version of this class by:
-// (c) 2011 and onwards The OpenVanilla Project (MIT License).
+// Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
+// All possible vChewing-specific modifications are of:
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 /*
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -24,31 +24,20 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import Cocoa
+#import <Foundation/Foundation.h>
 
-// MARK: - § Misc functions.
+NS_ASSUME_NONNULL_BEGIN
 
-extension KeyHandler {
-	func getCurrentMandarinParser() -> String {
-		mgrPrefs.mandarinParserName + "_"
-	}
+@interface Composer : NSObject
++ (BOOL)chkKeyValidity:(UniChar)charCode;
++ (BOOL)isBufferEmpty;
++ (void)clearBuffer;
++ (void)combineReadingKey:(UniChar)charCode;
++ (BOOL)checkWhetherToneMarkerConfirms;
++ (NSString *)getSyllableComposition;
++ (void)doBackSpaceToBuffer;
++ (NSString *)getComposition;
++ (void)ensureParser;
+@end
 
-	func getActualCandidateCursorIndex() -> Int {
-		var cursorIndex = getBuilderCursorIndex()
-		// Windows Yahoo Kimo IME style, phrase is *at the rear of* the cursor.
-		// (i.e. the cursor is always *before* the phrase.)
-		// This is different from MS Phonetics IME style ...
-		// ... since Windows Yahoo Kimo allows "node crossing".
-		if (mgrPrefs.setRearCursorMode
-			&& (cursorIndex < getBuilderLength()))
-			|| cursorIndex == 0
-		{
-			if cursorIndex == 0, !mgrPrefs.setRearCursorMode {
-				cursorIndex += getKeyLengthAtIndexZero()
-			} else {
-				cursorIndex += 1
-			}
-		}
-		return cursorIndex
-	}
-}
+NS_ASSUME_NONNULL_END

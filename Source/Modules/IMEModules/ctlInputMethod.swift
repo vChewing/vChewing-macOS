@@ -93,7 +93,7 @@ class ctlInputMethod: IMKInputController {
 		currentClient = client
 
 		keyHandler.clear()
-		keyHandler.ensurePhoneticParser()
+		Composer.ensureParser()
 		if let bundleCheckID = (client as? IMKTextInput)?.bundleIdentifier() {
 			if bundleCheckID != Bundle.main.bundleIdentifier {
 				// Override the keyboard layout to the basic one.

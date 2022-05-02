@@ -28,7 +28,7 @@ import Cocoa
 
 // MARK: - § Handle Input with States.
 
-@objc extension KeyHandler {
+extension KeyHandler {
 	func handle(
 		input: InputHandler,
 		state: InputState,
@@ -75,7 +75,7 @@ import Cocoa
 
 			// If ASCII but not printable, don't use insertText:replacementRange:
 			// Certain apps don't handle non-ASCII char insertions.
-			if charCode < 0x80, !isPrintable(charCode) {
+			if charCode < 0x80, !CTools.isPrintable(charCode) {
 				return false
 			}
 
@@ -90,7 +90,7 @@ import Cocoa
 
 		if input.isNumericPad {
 			if !input.isLeft, !input.isRight, !input.isDown,
-				!input.isUp, !input.isSpace, isPrintable(charCode)
+				!input.isUp, !input.isSpace, CTools.isPrintable(charCode)
 			{
 				clear()
 				stateCallback(InputState.Empty())
@@ -139,13 +139,13 @@ import Cocoa
 		let skipPhoneticHandling = input.isReservedKey || input.isControlHold || input.isOptionHold
 
 		// See if Phonetic reading is valid.
-		if !skipPhoneticHandling && chkKeyValidity(charCode) {
-			combinePhoneticReadingBufferKey(charCode)
+		if !skipPhoneticHandling && Composer.chkKeyValidity(charCode) {
+			Composer.combineReadingKey(charCode)
 
 			// If we have a tone marker, we have to insert the reading to the
 			// builder in other words, if we don't have a tone marker, we just
 			// update the composing buffer.
-			composeReading = checkWhetherToneMarkerConfirmsPhoneticReadingBuffer()
+			composeReading = Composer.checkWhetherToneMarkerConfirms()
 			if !composeReading {
 				stateCallback(buildInputtingState())
 				return true
@@ -155,9 +155,9 @@ import Cocoa
 		// See if we have composition if Enter/Space is hit and buffer is not empty.
 		// We use "|=" conditioning so that the tone marker key is also taken into account.
 		// However, Swift does not support "|=".
-		composeReading = composeReading || (!isPhoneticReadingBufferEmpty() && (input.isSpace || input.isEnter))
+		composeReading = composeReading || (!Composer.isBufferEmpty() && (input.isSpace || input.isEnter))
 		if composeReading {
-			let reading = getSyllableCompositionFromPhoneticReadingBuffer()
+			let reading = Composer.getSyllableComposition()
 
 			if !ifLangModelHasUnigrams(forKey: reading) {
 				IME.prtDebugIntel("B49C0979：語彙庫內無「\(reading)」的匹配記錄。")
@@ -176,7 +176,7 @@ import Cocoa
 			dealWithOverrideModelSuggestions()
 
 			// ... then update the text.
-			clearPhoneticReadingBuffer()
+			Composer.clearBuffer()
 
 			let inputting = buildInputtingState()
 			inputting.poppedText = poppedText
@@ -216,7 +216,7 @@ import Cocoa
 		// MARK: Calling candidate window using Space or Down or PageUp / PageDn.
 
 		if let currentState = state as? InputState.NotEmpty {
-			if isPhoneticReadingBufferEmpty(),
+			if Composer.isBufferEmpty(),
 				input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
 					|| input.isPageDown || input.isPageUp || input.isTab
 					|| (input.useVerticalMode && (input.isVerticalModeOnlyChooseCandidateKey))
@@ -329,7 +329,7 @@ import Cocoa
 		if input.isSymbolMenuPhysicalKey && !input.isShiftHold {
 			if !input.isOptionHold {
 				if ifLangModelHasUnigrams(forKey: "_punctuation_list") {
-					if isPhoneticReadingBufferEmpty() {
+					if Composer.isBufferEmpty() {
 						insertReadingToBuilderAtCursor(reading: "_punctuation_list")
 						let poppedText: String! = popOverflowComposingTextAndWalk()
 						let inputting = buildInputtingState()
@@ -418,7 +418,7 @@ import Cocoa
 		// "thinking" that the key is not actually consumed.
 		// 砍掉這一段會導致「F1-F12 按鍵干擾組字區」的問題。
 		// 暫時只能先恢復這段，且補上偵錯彙報機制，方便今後排查故障。
-		if (state is InputState.NotEmpty) || !isPhoneticReadingBufferEmpty() {
+		if (state is InputState.NotEmpty) || !Composer.isBufferEmpty() {
 			IME.prtDebugIntel(
 				"Blocked data: charCode: \(charCode), keyCode: \(input.keyCode)")
 			IME.prtDebugIntel("A9BFF20E")

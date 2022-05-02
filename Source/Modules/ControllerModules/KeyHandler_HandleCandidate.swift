@@ -28,7 +28,7 @@ import Cocoa
 
 // MARK: - § Handle Candidate State.
 
-@objc extension KeyHandler {
+extension KeyHandler {
 	func handleCandidate(
 		state: InputState,
 		input: InputHandler,
@@ -331,7 +331,7 @@ import Cocoa
 				let punctuation: String = arrPunctuations.joined(separator: "")
 
 				var shouldAutoSelectCandidate: Bool =
-					chkKeyValidity(charCode) || ifLangModelHasUnigrams(forKey: customPunctuation)
+					Composer.chkKeyValidity(charCode) || ifLangModelHasUnigrams(forKey: customPunctuation)
 					|| ifLangModelHasUnigrams(forKey: punctuation)
 
 				if !shouldAutoSelectCandidate, input.isUpperCaseASCIILetterKey {

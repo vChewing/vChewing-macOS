@@ -25,6 +25,7 @@
 		5B38F5A2281E2E49007D5F5D /* 0_Megrez.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1615FC0EB100ABF4B3 /* 0_Megrez.swift */; };
 		5B38F5A3281E2E49007D5F5D /* 3_Span.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1C15FC0EB100ABF4B3 /* 3_Span.swift */; };
 		5B38F5A4281E2E49007D5F5D /* 5_LanguageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1915FC0EB100ABF4B3 /* 5_LanguageModel.swift */; };
+		5B407153281F94E6009C24CB /* Composer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B407152281F94E6009C24CB /* Composer.mm */; };
 		5B40730C281672610023DFFF /* lmAssociates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B407309281672610023DFFF /* lmAssociates.swift */; };
 		5B40730D281672610023DFFF /* lmReplacements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B40730A281672610023DFFF /* lmReplacements.swift */; };
 		5B5D28AC281EA1E900523D4D /* lmLite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5D28AB281EA1E800523D4D /* lmLite.swift */; };
@@ -83,9 +84,8 @@
 		5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77227AED70B0023B93A /* MenuIcon-TCVIM.png */; };
 		5BBBB77A27AEDC690023B93A /* clsSFX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBBB77927AEDC690023B93A /* clsSFX.swift */; };
 		5BC2652227E04B7E00700291 /* uninstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 5BC2652127E04B7B00700291 /* uninstall.sh */; };
-		5BC4F6382819FF4500A2514A /* KeyHandlerSputnik.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC4F6372819FF4500A2514A /* KeyHandlerSputnik.swift */; };
 		5BD0113B28180D6100609769 /* LMInstantiator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0113A28180D6100609769 /* LMInstantiator.swift */; };
-		5BD0113D2818543900609769 /* KeyHandler_Kernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0113C2818543900609769 /* KeyHandler_Kernel.swift */; };
+		5BD0113D2818543900609769 /* KeyHandler_Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0113C2818543900609769 /* KeyHandler_Core.swift */; };
 		5BD05B8127B22F3C004C4F1D /* char-kanji-cns.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BD05B8027B22F3C004C4F1D /* char-kanji-cns.txt */; };
 		5BD05BCA27B2A43D004C4F1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
 		5BD05C5D27B2BBA9004C4F1D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5BD05C5B27B2BBA9004C4F1D /* Main.storyboard */; };
@@ -118,7 +118,7 @@
 		D4A13D5A27A59F0B003BE359 /* ctlInputMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A13D5927A59D5C003BE359 /* ctlInputMethod.swift */; };
 		D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8827A838CF006DB1CF /* Localizable.strings */; };
 		D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8D27A838F0006DB1CF /* InfoPlist.strings */; };
-		D4E569DC27A34D0E00AC2CEF /* KeyHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */; };
+		D4E569DC27A34D0E00AC2CEF /* CTools.m in Sources */ = {isa = PBXBuildFile; fileRef = D4E569DB27A34CC100AC2CEF /* CTools.m */; };
 		D4F0BBDF279AF1AF0071253C /* ArchiveUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F0BBDE279AF1AF0071253C /* ArchiveUtil.swift */; };
 		D4F0BBE1279AF8B30071253C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F0BBE0279AF8B30071253C /* AppDelegate.swift */; };
 		D4F0BBE4279B08900071253C /* Chronosphere.m in Sources */ = {isa = PBXBuildFile; fileRef = D4F0BBE3279B08900071253C /* Chronosphere.m */; };
@@ -201,6 +201,8 @@
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
 		5B3133BE280B229700A4A505 /* KeyHandler_States.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_States.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
+		5B407151281F94E6009C24CB /* Composer.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Composer.hh; sourceTree = "<group>"; };
+		5B407152281F94E6009C24CB /* Composer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Composer.mm; sourceTree = "<group>"; };
 		5B407309281672610023DFFF /* lmAssociates.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = lmAssociates.swift; sourceTree = "<group>"; usesTabs = 1; };
 		5B40730A281672610023DFFF /* lmReplacements.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = lmReplacements.swift; sourceTree = "<group>"; usesTabs = 1; };
 		5B5D28AB281EA1E800523D4D /* lmLite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lmLite.swift; sourceTree = "<group>"; };
@@ -263,9 +265,8 @@
 		5BC0AAC927F58472002D33E9 /* pkgPreInstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = pkgPreInstall.sh; sourceTree = "<group>"; };
 		5BC0AACA27F58472002D33E9 /* pkgPostInstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = pkgPostInstall.sh; sourceTree = "<group>"; };
 		5BC2652127E04B7B00700291 /* uninstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; lineEnding = 0; path = uninstall.sh; sourceTree = "<group>"; };
-		5BC4F6372819FF4500A2514A /* KeyHandlerSputnik.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = KeyHandlerSputnik.swift; sourceTree = "<group>"; usesTabs = 1; };
 		5BD0113A28180D6100609769 /* LMInstantiator.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = LMInstantiator.swift; sourceTree = "<group>"; usesTabs = 1; };
-		5BD0113C2818543900609769 /* KeyHandler_Kernel.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = KeyHandler_Kernel.swift; sourceTree = "<group>"; usesTabs = 1; };
+		5BD0113C2818543900609769 /* KeyHandler_Core.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = KeyHandler_Core.swift; sourceTree = "<group>"; usesTabs = 1; };
 		5BD05B8027B22F3C004C4F1D /* char-kanji-cns.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "char-kanji-cns.txt"; path = "Data/components/common/char-kanji-cns.txt"; sourceTree = "<group>"; };
 		5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingPhraseEditor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5BD05BC627B2A42A004C4F1D /* vChewingPhraseEditor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewingPhraseEditor.entitlements; sourceTree = "<group>"; };
@@ -334,8 +335,8 @@
 		D4A13D5927A59D5C003BE359 /* ctlInputMethod.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlInputMethod.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		D4E33D8927A838CF006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D4E33D8E27A838F0006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		D4E569DA27A34CC100AC2CEF /* KeyHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = KeyHandler.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = KeyHandler.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
+		D4E569DA27A34CC100AC2CEF /* CTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = CTools.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
+		D4E569DB27A34CC100AC2CEF /* CTools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = CTools.m; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		D4F0BBDE279AF1AF0071253C /* ArchiveUtil.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ArchiveUtil.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		D4F0BBE0279AF8B30071253C /* AppDelegate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 1; };
 		D4F0BBE2279B08900071253C /* Chronosphere.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = Chronosphere.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
@@ -419,6 +420,8 @@
 			children = (
 				6A0D4F2015FC0EB100ABF4B3 /* Mandarin.cpp */,
 				6A0D4F2115FC0EB100ABF4B3 /* Mandarin.h */,
+				5B407151281F94E6009C24CB /* Composer.hh */,
+				5B407152281F94E6009C24CB /* Composer.mm */,
 			);
 			path = OVMandarin;
 			sourceTree = "<group>";
@@ -435,16 +438,15 @@
 			isa = PBXGroup;
 			children = (
 				5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */,
+				D4E569DA27A34CC100AC2CEF /* CTools.h */,
+				D4E569DB27A34CC100AC2CEF /* CTools.m */,
 				D456576D279E4F7B00DF6BC9 /* InputHandler.swift */,
 				D461B791279DAC010070E734 /* InputState.swift */,
+				5BD0113C2818543900609769 /* KeyHandler_Core.swift */,
 				5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */,
 				5B7F225C2808501000DDD3CB /* KeyHandler_HandleInput.swift */,
-				5BD0113C2818543900609769 /* KeyHandler_Kernel.swift */,
 				5B61B0C9280BEFD4002E3CFA /* KeyHandler_Misc.swift */,
 				5B3133BE280B229700A4A505 /* KeyHandler_States.swift */,
-				5BC4F6372819FF4500A2514A /* KeyHandlerSputnik.swift */,
-				D4E569DA27A34CC100AC2CEF /* KeyHandler.h */,
-				D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */,
 				5B62A33727AE79CD00A19448 /* NSStringUtils.swift */,
 				5BF8423027BAA942008E7E4C /* vChewingKanjiConverter.swift */,
 			);
@@ -1088,9 +1090,8 @@
 				D47B92C027972AD100458394 /* main.swift in Sources */,
 				D4A13D5A27A59F0B003BE359 /* ctlInputMethod.swift in Sources */,
 				5BA9FD4827FEF3C9002DE248 /* PreferencesWindowController.swift in Sources */,
-				5BC4F6382819FF4500A2514A /* KeyHandlerSputnik.swift in Sources */,
 				5BD0113B28180D6100609769 /* LMInstantiator.swift in Sources */,
-				D4E569DC27A34D0E00AC2CEF /* KeyHandler.mm in Sources */,
+				D4E569DC27A34D0E00AC2CEF /* CTools.m in Sources */,
 				5BA9FD4627FEF3C9002DE248 /* Container.swift in Sources */,
 				D47F7DD0278C0897002F9DD7 /* ctlNonModalAlertWindow.swift in Sources */,
 				5B38F5A2281E2E49007D5F5D /* 0_Megrez.swift in Sources */,
@@ -1101,7 +1102,7 @@
 				5BA9FD4327FEF3C8002DE248 /* Preferences.swift in Sources */,
 				5BA9FD4427FEF3C8002DE248 /* SegmentedControlStyleViewController.swift in Sources */,
 				D47F7DCE278BFB57002F9DD7 /* ctlPrefWindow.swift in Sources */,
-				5BD0113D2818543900609769 /* KeyHandler_Kernel.swift in Sources */,
+				5BD0113D2818543900609769 /* KeyHandler_Core.swift in Sources */,
 				5BA9FD4227FEF3C8002DE248 /* PreferencePane.swift in Sources */,
 				5BA0DF312817857D009E73BB /* lmUserOverride.swift in Sources */,
 				5BA9FD8B28006B41002DE248 /* VDKComboBox.swift in Sources */,
@@ -1117,6 +1118,7 @@
 				5B62A33827AE79CD00A19448 /* NSStringUtils.swift in Sources */,
 				5BA9FD0F27FEDB6B002DE248 /* suiPrefPaneGeneral.swift in Sources */,
 				5BA9FD4927FEF3C9002DE248 /* Section.swift in Sources */,
+				5B407153281F94E6009C24CB /* Composer.mm in Sources */,
 				5BA9FD3E27FEF3C8002DE248 /* Utilities.swift in Sources */,
 				5BA9FD1127FEDB6B002DE248 /* ctlPrefUI.swift in Sources */,
 				5B38F59C281E2E49007D5F5D /* 2_Grid.swift in Sources */,

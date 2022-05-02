@@ -34,16 +34,31 @@ public enum InputMode: String {
 
 // MARK: - Delegate.
 
+protocol KeyHandlerDelegate: NSObjectProtocol {
+	func ctlCandidate(for _: KeyHandler) -> Any
+	func keyHandler(
+		_: KeyHandler, didSelectCandidateAt index: Int,
+		ctlCandidate controller: Any
+	)
+	func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputState)
+		-> Bool
+}
+
 // MARK: - Kernel.
 
-extension KeyHandler {
-	var kEpsilon: Double {
-		KeyHandlerSputnik.kEpsilon
-	}
+class KeyHandler: NSObject {
+	let kEpsilon: Double = 0.000001
+	var _inputMode: String = ""
+	var _languageModel: vChewing.LMInstantiator = .init()
+	var _userOverrideModel: vChewing.LMUserOverride = .init()
+	var _builder: Megrez.BlockReadingBuilder
+	var _walkedNodes: [Megrez.NodeAnchor] = []
+
+	weak var delegate: KeyHandlerDelegate?
 
 	var inputMode: InputMode {
 		get {
-			switch KeyHandlerSputnik.inputMode {
+			switch _inputMode {
 				case "org.atelierInmu.inputmethod.vChewing.IMECHS":
 					return InputMode.imeModeCHS
 				case "org.atelierInmu.inputmethod.vChewing.IMECHT":
@@ -55,17 +70,17 @@ extension KeyHandler {
 		set { setInputMode(newValue.rawValue) }
 	}
 
-	//	TODO: Will reenable this once Mandarin gets Swiftified.
-	//	override public init() {
-	//		self.ensurePhoneticParser()
-	//		self.setInputMode(ctlInputMethod.currentInputMode)
-	//		super.init()
-	//	}
+	override init() {
+		_builder = Megrez.BlockReadingBuilder(lm: _languageModel)
+		super.init()
+		Composer.ensureParser()
+		setInputMode(ctlInputMethod.currentInputMode)
+	}
 
 	func clear() {
-		clearPhoneticReadingBuffer()
-		KeyHandlerSputnik.builder.clear()
-		KeyHandlerSputnik.walkedNodes.removeAll()
+		Composer.clearBuffer()
+		_builder.clear()
+		_walkedNodes.removeAll()
 	}
 
 	// 這個函數得獨立出來給 ObjC 使用。
@@ -79,7 +94,7 @@ extension KeyHandler {
 		mgrPrefs.mostRecentInputMode = ctlInputMethod.currentInputMode
 
 		// 拿當前的 _inputMode 與 ctlInputMethod 的提報結果對比，不同的話則套用新設定：
-		if KeyHandlerSputnik.inputMode != ctlInputMethod.currentInputMode {
+		if _inputMode != ctlInputMethod.currentInputMode {
 			// Reinitiate language models if necessary
 			setInputModesToLM(isCHS: isCHS)
 
@@ -89,12 +104,12 @@ extension KeyHandler {
 			// Create new grid builder.
 			createNewBuilder()
 
-			if !isPhoneticReadingBufferEmpty() {
-				clearPhoneticReadingBuffer()
+			if !Composer.isBufferEmpty() {
+				Composer.clearBuffer()
 			}
 		}
 		// 直接寫到衛星模組內，省得類型轉換
-		KeyHandlerSputnik.inputMode = ctlInputMethod.currentInputMode
+		_inputMode = ctlInputMethod.currentInputMode
 	}
 
 	// MARK: - Functions dealing with Megrez.
@@ -103,14 +118,14 @@ extension KeyHandler {
 		// Retrieve the most likely trellis, i.e. a Maximum Likelihood Estimation
 		// of the best possible Mandarin characters given the input syllables,
 		// using the Viterbi algorithm implemented in the Gramambular library
-		let walker = Megrez.Walker(grid: KeyHandlerSputnik.builder.grid())
+		let walker = Megrez.Walker(grid: _builder.grid())
 
 		// the reverse walk traces the trellis from the end
-		let walked: [Megrez.NodeAnchor] = walker.reverseWalk(at: KeyHandlerSputnik.builder.grid().width())
+		let walked: [Megrez.NodeAnchor] = walker.reverseWalk(at: _builder.grid().width())
 
 		// then we use ".reversed()" to reverse the nodes so that we get the forward-walked nodes
-		KeyHandlerSputnik.walkedNodes.removeAll()
-		KeyHandlerSputnik.walkedNodes.append(contentsOf: walked.reversed())
+		_walkedNodes.removeAll()
+		_walkedNodes.append(contentsOf: walked.reversed())
 	}
 
 	func popOverflowComposingTextAndWalk() -> String {
@@ -123,13 +138,13 @@ extension KeyHandler {
 		// (i.e. popped out.)
 
 		var poppedText = ""
-		if KeyHandlerSputnik.builder.grid().width() > mgrPrefs.composingBufferSize {
-			if KeyHandlerSputnik.walkedNodes.count > 0 {
-				let anchor: Megrez.NodeAnchor = KeyHandlerSputnik.walkedNodes[0]
+		if _builder.grid().width() > mgrPrefs.composingBufferSize {
+			if _walkedNodes.count > 0 {
+				let anchor: Megrez.NodeAnchor = _walkedNodes[0]
 				if let theNode = anchor.node {
 					poppedText = theNode.currentKeyValue().value
 				}
-				KeyHandlerSputnik.builder.removeHeadReadings(count: anchor.spanningLength)
+				_builder.removeHeadReadings(count: anchor.spanningLength)
 			}
 		}
 		walk()
@@ -138,15 +153,15 @@ extension KeyHandler {
 
 	func buildAssociatePhraseArray(withKey key: String) -> [String] {
 		var arrResult: [String] = []
-		if KeyHandlerSputnik.languageModel.hasAssociatedPhrasesForKey(key) {
-			arrResult.append(contentsOf: KeyHandlerSputnik.languageModel.associatedPhrasesForKey(key))
+		if _languageModel.hasAssociatedPhrasesForKey(key) {
+			arrResult.append(contentsOf: _languageModel.associatedPhrasesForKey(key))
 		}
 		return arrResult
 	}
 
 	func fixNode(value: String) {
 		let cursorIndex: Int = getActualCandidateCursorIndex()
-		let selectedNode: Megrez.NodeAnchor = KeyHandlerSputnik.builder.grid().fixNodeSelectedCandidate(
+		let selectedNode: Megrez.NodeAnchor = _builder.grid().fixNodeSelectedCandidate(
 			location: cursorIndex, value: value
 		)
 		// 不要針對逐字選字模式啟用臨時半衰記憶模型。
@@ -167,8 +182,8 @@ extension KeyHandler {
 				}
 			}
 			if addToUserOverrideModel {
-				KeyHandlerSputnik.userOverrideModel.observe(
-					walkedNodes: KeyHandlerSputnik.walkedNodes, cursorIndex: cursorIndex, candidate: value,
+				_userOverrideModel.observe(
+					walkedNodes: _walkedNodes, cursorIndex: cursorIndex, candidate: value,
 					timestamp: NSDate().timeIntervalSince1970
 				)
 			}
@@ -177,7 +192,7 @@ extension KeyHandler {
 
 		if mgrPrefs.moveCursorAfterSelectingCandidate {
 			var nextPosition = 0
-			for node in KeyHandlerSputnik.walkedNodes {
+			for node in _walkedNodes {
 				if nextPosition >= cursorIndex { break }
 				nextPosition += node.spanningLength
 			}
@@ -216,13 +231,13 @@ extension KeyHandler {
 		var overrideValue =
 			mgrPrefs.useSCPCTypingMode
 			? ""
-			: KeyHandlerSputnik.userOverrideModel.suggest(
-				walkedNodes: KeyHandlerSputnik.walkedNodes, cursorIndex: getBuilderCursorIndex(),
+			: _userOverrideModel.suggest(
+				walkedNodes: _walkedNodes, cursorIndex: getBuilderCursorIndex(),
 				timestamp: NSDate().timeIntervalSince1970
 			)
 
 		if !overrideValue.isEmpty {
-			KeyHandlerSputnik.builder.grid().overrideNodeScoreForSelectedCandidate(
+			_builder.grid().overrideNodeScoreForSelectedCandidate(
 				location: getActualCandidateCursorIndex(),
 				value: &overrideValue,
 				overridingScore: findHighestScore(nodes: getRawNodes(), epsilon: kEpsilon)
@@ -245,65 +260,65 @@ extension KeyHandler {
 
 	// MARK: - Extracted methods and functions.
 
-	func isBuilderEmpty() -> Bool { KeyHandlerSputnik.builder.grid().width() == 0 }
+	func isBuilderEmpty() -> Bool { _builder.grid().width() == 0 }
 
 	func getRawNodes() -> [Megrez.NodeAnchor] {
 		/// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
 		/// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的，但目前 Megrez 暫時缺乏對該特性的支援。
 		/// 所以暫時只能將威注音的游標後置風格描述成「跟 Windows 版雅虎奇摩注音一致」。
 		mgrPrefs.setRearCursorMode
-			? KeyHandlerSputnik.builder.grid().nodesCrossingOrEndingAt(location: getActualCandidateCursorIndex())
-			: KeyHandlerSputnik.builder.grid().nodesEndingAt(location: getActualCandidateCursorIndex())
+			? _builder.grid().nodesCrossingOrEndingAt(location: getActualCandidateCursorIndex())
+			: _builder.grid().nodesEndingAt(location: getActualCandidateCursorIndex())
 	}
 
 	func setInputModesToLM(isCHS: Bool) {
-		KeyHandlerSputnik.languageModel = isCHS ? mgrLangModel.lmCHS : mgrLangModel.lmCHT
-		KeyHandlerSputnik.userOverrideModel = isCHS ? mgrLangModel.uomCHS : mgrLangModel.uomCHT
+		_languageModel = isCHS ? mgrLangModel.lmCHS : mgrLangModel.lmCHT
+		_userOverrideModel = isCHS ? mgrLangModel.uomCHS : mgrLangModel.uomCHT
 	}
 
 	func syncBaseLMPrefs() {
-		KeyHandlerSputnik.languageModel.isPhraseReplacementEnabled = mgrPrefs.phraseReplacementEnabled
-		KeyHandlerSputnik.languageModel.isCNSEnabled = mgrPrefs.cns11643Enabled
-		KeyHandlerSputnik.languageModel.isSymbolEnabled = mgrPrefs.symbolInputEnabled
+		_languageModel.isPhraseReplacementEnabled = mgrPrefs.phraseReplacementEnabled
+		_languageModel.isCNSEnabled = mgrPrefs.cns11643Enabled
+		_languageModel.isSymbolEnabled = mgrPrefs.symbolInputEnabled
 	}
 
 	func createNewBuilder() {
-		KeyHandlerSputnik.builder = Megrez.BlockReadingBuilder(lm: KeyHandlerSputnik.languageModel)
+		_builder = Megrez.BlockReadingBuilder(lm: _languageModel)
 		// Each Mandarin syllable is separated by a hyphen.
-		KeyHandlerSputnik.builder.setJoinSeparator(separator: "-")
+		_builder.setJoinSeparator(separator: "-")
 	}
 
-	func currentReadings() -> [String] { KeyHandlerSputnik.builder.readings() }
+	func currentReadings() -> [String] { _builder.readings() }
 
 	func ifLangModelHasUnigrams(forKey reading: String) -> Bool {
-		KeyHandlerSputnik.languageModel.hasUnigramsFor(key: reading)
+		_languageModel.hasUnigramsFor(key: reading)
 	}
 
 	func insertReadingToBuilderAtCursor(reading: String) {
-		KeyHandlerSputnik.builder.insertReadingAtCursor(reading: reading)
+		_builder.insertReadingAtCursor(reading: reading)
 	}
 
 	func setBuilderCursorIndex(value: Int) {
-		KeyHandlerSputnik.builder.setCursorIndex(newIndex: value)
+		_builder.setCursorIndex(newIndex: value)
 	}
 
 	func getBuilderCursorIndex() -> Int {
-		KeyHandlerSputnik.builder.cursorIndex()
+		_builder.cursorIndex()
 	}
 
 	func getBuilderLength() -> Int {
-		KeyHandlerSputnik.builder.length()
+		_builder.length()
 	}
 
 	func deleteBuilderReadingInFrontOfCursor() {
-		KeyHandlerSputnik.builder.deleteReadingBeforeCursor()
+		_builder.deleteReadingBeforeCursor()
 	}
 
 	func deleteBuilderReadingAfterCursor() {
-		KeyHandlerSputnik.builder.deleteReadingAfterCursor()
+		_builder.deleteReadingAfterCursor()
 	}
 
 	func getKeyLengthAtIndexZero() -> Int {
-		KeyHandlerSputnik.walkedNodes[0].node?.currentKeyValue().value.count ?? 0
+		_walkedNodes[0].node?.currentKeyValue().value.count ?? 0
 	}
 }

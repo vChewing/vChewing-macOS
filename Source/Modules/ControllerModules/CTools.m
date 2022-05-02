@@ -1,6 +1,4 @@
 // Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
-// Refactored from the ObjCpp-version of this class by:
-// (c) 2011 and onwards The OpenVanilla Project (MIT License).
 /*
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -24,19 +22,11 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import Cocoa
+#import "CTools.h"
 
-// MARK: - KeyHandler Sputnik.
-
-// Swift Extension 不允許直接存放這些變數，所以就寫了這個衛星型別。
-// 一旦 Mandarin 模組被 Swift 化，整個 KeyHandler 就可以都用 Swift。
-// 屆時會考慮將該衛星型別內的變數與常數都挪回 KeyHandler_Kernel 內。
-
-class KeyHandlerSputnik: NSObject {
-	static let kEpsilon: Double = 0.000001
-	static var inputMode: String = ""
-	static var languageModel: vChewing.LMInstantiator = .init()
-	static var userOverrideModel: vChewing.LMUserOverride = .init()
-	static var builder: Megrez.BlockReadingBuilder = .init(lm: languageModel)
-	static var walkedNodes: [Megrez.NodeAnchor] = []
+@implementation CTools
++ (BOOL)isPrintable:(UniChar)charCode
+{
+    return isprint(charCode);
 }
+@end

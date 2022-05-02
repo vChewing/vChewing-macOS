@@ -1,6 +1,4 @@
-// Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are of:
-// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 /*
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -26,37 +24,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
 
-@class InputHandler;
-@class InputState;
-@class KeyHandlerSputnik;
-
 NS_ASSUME_NONNULL_BEGIN
 
-@class KeyHandler;
-
-@protocol KeyHandlerDelegate <NSObject>
-- (id)ctlCandidateForKeyHandler:(KeyHandler *)keyHandler;
-- (void)keyHandler:(KeyHandler *)keyHandler didSelectCandidateAtIndex:(NSInteger)index ctlCandidate:(id)controller;
-- (BOOL)keyHandler:(KeyHandler *)keyHandler didRequestWriteUserPhraseWithState:(InputState *)state;
-@end
-
-@interface KeyHandler : NSObject
-
-@property(weak, nonatomic) id<KeyHandlerDelegate> delegate;
-
-// The following items need to be exposed to Swift:
-
-- (BOOL)checkWhetherToneMarkerConfirmsPhoneticReadingBuffer;
-- (BOOL)chkKeyValidity:(UniChar)value;
-- (BOOL)isPhoneticReadingBufferEmpty;
-- (BOOL)isPrintable:(UniChar)charCode;
-- (NSString *)getCompositionFromPhoneticReadingBuffer;
-- (NSString *)getSyllableCompositionFromPhoneticReadingBuffer;
-- (void)clearPhoneticReadingBuffer;
-- (void)combinePhoneticReadingBufferKey:(UniChar)charCode;
-- (void)doBackSpaceToPhoneticReadingBuffer;
-- (void)ensurePhoneticParser;
-
+@interface CTools : NSObject
++ (BOOL)isPrintable:(UniChar)charCode;
 @end
 
 NS_ASSUME_NONNULL_END
