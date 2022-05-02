@@ -159,10 +159,7 @@ extension vChewing {
 		}
 
 		open func hasUnigramsFor(key: String) -> Bool {
-			if let arrEntry = keyValueScoreMap[key] {
-				return !arrEntry.isEmpty
-			}
-			return false
+			keyValueScoreMap[key] != nil
 		}
 	}
 }

@@ -115,10 +115,7 @@ extension vChewing {
 		}
 
 		public func hasValuesFor(key: String) -> Bool {
-			if let arrEntry = keyValueMap[key] {
-				return !arrEntry.isEmpty
-			}
-			return false
+			keyValueMap[key] != nil
 		}
 	}
 }

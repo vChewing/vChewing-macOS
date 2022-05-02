@@ -105,11 +105,7 @@ extension vChewing {
 		}
 
 		public func valuesFor(key: String) -> String {
-			var v = ""
-			if let matched = keyValueMap[key] {
-				v = matched
-			}
-			return v
+			keyValueMap[key] ?? ""
 		}
 	}
 }
