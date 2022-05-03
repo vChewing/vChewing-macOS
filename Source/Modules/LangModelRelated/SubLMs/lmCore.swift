@@ -116,15 +116,17 @@ extension vChewing {
                   default: break
                 }
               }
-              DispatchQueue.main.async {
-                let kvPair =
-                  self.shouldReverse
-                  ? Megrez.KeyValuePair(key: columnTwo, value: columnOne)
-                  : Megrez.KeyValuePair(key: columnOne, value: columnTwo)
-                currentUnigram.keyValue = kvPair
-                let key = self.shouldReverse ? columnTwo : columnOne
-                self.keyValueScoreMap[key, default: []].append(currentUnigram)
+              // 標點符號的頻率最好鎖定一下。
+              if columnOne.contains("_punctuation_") {
+                currentUnigram.score -= (Double(lineID) * 0.000001)
               }
+              let kvPair =
+                self.shouldReverse
+                ? Megrez.KeyValuePair(key: columnTwo, value: columnOne)
+                : Megrez.KeyValuePair(key: columnOne, value: columnTwo)
+              currentUnigram.keyValue = kvPair
+              let key = self.shouldReverse ? columnTwo : columnOne
+              self.keyValueScoreMap[key, default: []].append(currentUnigram)
             }
           }
         }
