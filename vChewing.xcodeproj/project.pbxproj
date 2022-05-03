@@ -29,7 +29,6 @@
 		5B407153281F94E6009C24CB /* Composer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B407152281F94E6009C24CB /* Composer.mm */; };
 		5B40730C281672610023DFFF /* lmAssociates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B407309281672610023DFFF /* lmAssociates.swift */; };
 		5B40730D281672610023DFFF /* lmReplacements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B40730A281672610023DFFF /* lmReplacements.swift */; };
-		5B5D28AC281EA1E900523D4D /* lmLiteMono.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5D28AB281EA1E800523D4D /* lmLiteMono.swift */; };
 		5B5E535227EF261400C6AA1E /* IME.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E535127EF261400C6AA1E /* IME.swift */; };
 		5B61B0CA280BEFD4002E3CFA /* KeyHandler_Misc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B61B0C9280BEFD4002E3CFA /* KeyHandler_Misc.swift */; };
 		5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */; };
@@ -207,7 +206,6 @@
 		5B407152281F94E6009C24CB /* Composer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Composer.mm; sourceTree = "<group>"; };
 		5B407309281672610023DFFF /* lmAssociates.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = lmAssociates.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5B40730A281672610023DFFF /* lmReplacements.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = lmReplacements.swift; sourceTree = "<group>"; usesTabs = 0; };
-		5B5D28AB281EA1E800523D4D /* lmLiteMono.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lmLiteMono.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5B5E535127EF261400C6AA1E /* IME.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = IME.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B61B0C9280BEFD4002E3CFA /* KeyHandler_Misc.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_Misc.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = FSEventStreamHelper.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -398,7 +396,6 @@
 			children = (
 				5B407309281672610023DFFF /* lmAssociates.swift */,
 				5BA0DF2F2817857D009E73BB /* lmCore.swift */,
-				5B5D28AB281EA1E800523D4D /* lmLiteMono.swift */,
 				5B00A22F282011980058E5DB /* lmLite.swift */,
 				5B40730A281672610023DFFF /* lmReplacements.swift */,
 				5BA0DF2E2817857D009E73BB /* lmUserOverride.swift */,
@@ -1082,7 +1079,6 @@
 				5B40730C281672610023DFFF /* lmAssociates.swift in Sources */,
 				5B707CE827D9F4590099EF99 /* OpenCCBridge.swift in Sources */,
 				D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */,
-				5B5D28AC281EA1E900523D4D /* lmLiteMono.swift in Sources */,
 				5BA9FD4527FEF3C9002DE248 /* ToolbarItemStyleViewController.swift in Sources */,
 				5BA0DF322817857D009E73BB /* lmCore.swift in Sources */,
 				5BA9FD4127FEF3C8002DE248 /* PreferencesStyle.swift in Sources */,

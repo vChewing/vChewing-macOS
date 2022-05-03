@@ -85,53 +85,49 @@ extension vChewing {
       }
 
       let arrData = theData.components(separatedBy: "\n")
-      DispatchQueue.global(qos: .userInitiated).async {
-        for (lineID, lineContent) in arrData.enumerated() {
-          if !lineContent.hasPrefix("#") {
-            let lineContent = lineContent.replacingOccurrences(of: "\t", with: " ")
-            if lineContent.components(separatedBy: " ").count < 2 {
-              if arrData.last != "" {
-                IME.prtDebugIntel("Line #\(lineID + 1) Wrecked: \(lineContent)")
-              }
-              continue
+      for (lineID, lineContent) in arrData.enumerated() {
+        if !lineContent.hasPrefix("#") {
+          let lineContent = lineContent.replacingOccurrences(of: "\t", with: " ")
+          if lineContent.components(separatedBy: " ").count < 2 {
+            if arrData.last != "" {
+              IME.prtDebugIntel("Line #\(lineID + 1) Wrecked: \(lineContent)")
             }
-            var currentUnigram = Megrez.Unigram(keyValue: Megrez.KeyValuePair(), score: self.defaultScore)
-            var columnOne = ""
-            var columnTwo = ""
-            DispatchQueue.global(qos: .userInitiated).async {
-              for (unitID, unitContent) in lineContent.components(separatedBy: " ").enumerated() {
-                switch unitID {
-                  case 0:
-                    columnOne = unitContent
-                  case 1:
-                    columnTwo = unitContent
-                  case 2:
-                    if !self.shouldForceDefaultScore {
-                      if let unitContentConverted = Double(unitContent) {
-                        currentUnigram.score = unitContentConverted
-                      } else {
-                        IME.prtDebugIntel("Line #\(lineID) Score Data Wrecked: \(lineContent)")
-                      }
-                    }
-                  default: break
+            continue
+          }
+          var currentUnigram = Megrez.Unigram(keyValue: Megrez.KeyValuePair(), score: self.defaultScore)
+          var columnOne = ""
+          var columnTwo = ""
+          for (unitID, unitContent) in lineContent.components(separatedBy: " ").enumerated() {
+            switch unitID {
+              case 0:
+                columnOne = unitContent
+              case 1:
+                columnTwo = unitContent
+              case 2:
+                if !self.shouldForceDefaultScore {
+                  if let unitContentConverted = Double(unitContent) {
+                    currentUnigram.score = unitContentConverted
+                  } else {
+                    IME.prtDebugIntel("Line #\(lineID) Score Data Wrecked: \(lineContent)")
+                  }
                 }
-              }
-              // 標點符號的頻率最好鎖定一下。
-              if columnOne.contains("_punctuation_") {
-                currentUnigram.score -= (Double(lineID) * 0.000001)
-              }
-              let kvPair =
-                self.shouldReverse
-                ? Megrez.KeyValuePair(key: columnTwo, value: columnOne)
-                : Megrez.KeyValuePair(key: columnOne, value: columnTwo)
-              currentUnigram.keyValue = kvPair
-              let key = self.shouldReverse ? columnTwo : columnOne
-              self.keyValueScoreMap[key, default: []].append(currentUnigram)
+              default: break
             }
           }
+          // 標點符號的頻率最好鎖定一下。
+          if columnOne.contains("_punctuation_") {
+            currentUnigram.score -= (Double(lineID) * 0.000001)
+          }
+          let kvPair =
+            self.shouldReverse
+            ? Megrez.KeyValuePair(key: columnTwo, value: columnOne)
+            : Megrez.KeyValuePair(key: columnOne, value: columnTwo)
+          currentUnigram.keyValue = kvPair
+          let key = self.shouldReverse ? columnTwo : columnOne
+          self.keyValueScoreMap[key, default: []].append(currentUnigram)
         }
-        // IME.prtDebugIntel("\(self.keyValueScoreMap.count) entries of data loaded from: \(path)")
       }
+      IME.prtDebugIntel("\(self.keyValueScoreMap.count) entries of data loaded from: \(path)")
       theData = ""
       return true
     }

@@ -76,34 +76,28 @@ extension vChewing {
       }
 
       let arrData = theData.components(separatedBy: "\n")
-      DispatchQueue.global(qos: .userInitiated).async {
-        for (lineID, lineContent) in arrData.enumerated() {
-          if !lineContent.hasPrefix("#") {
-            if lineContent.components(separatedBy: " ").count < 2 {
-              if arrData.last != "" {
-                IME.prtDebugIntel("Line #\(lineID + 1) Wrecked: \(lineContent)")
-              }
-              continue
+      for (lineID, lineContent) in arrData.enumerated() {
+        if !lineContent.hasPrefix("#") {
+          if lineContent.components(separatedBy: " ").count < 2 {
+            if arrData.last != "" {
+              IME.prtDebugIntel("Line #\(lineID + 1) Wrecked: \(lineContent)")
             }
-            var currentKV = Megrez.KeyValuePair()
-            DispatchQueue.global(qos: .userInitiated).async {
-              for (unitID, unitContent) in lineContent.components(separatedBy: " ").enumerated() {
-                switch unitID {
-                  case 0:
-                    currentKV.value = unitContent
-                  case 1:
-                    currentKV.key = unitContent
-                  default: break
-                }
-              }
-              DispatchQueue.main.async {
-                self.keyValueMap[currentKV.key, default: []].append(currentKV)
-              }
+            continue
+          }
+          var currentKV = Megrez.KeyValuePair()
+          for (unitID, unitContent) in lineContent.components(separatedBy: " ").enumerated() {
+            switch unitID {
+              case 0:
+                currentKV.value = unitContent
+              case 1:
+                currentKV.key = unitContent
+              default: break
             }
           }
+          keyValueMap[currentKV.key, default: []].append(currentKV)
         }
-        // IME.prtDebugIntel("\(self.keyValueMap.count) entries of data loaded from: \(path)")
       }
+      IME.prtDebugIntel("\(self.keyValueMap.count) entries of data loaded from: \(path)")
       theData = ""
       if path.contains("vChewing/") {
         dump()
