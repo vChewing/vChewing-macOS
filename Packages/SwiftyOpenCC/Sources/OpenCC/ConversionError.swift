@@ -9,28 +9,28 @@ import Foundation
 import copencc
 
 public enum ConversionError: Error {
-	case fileNotFound
+  case fileNotFound
 
-	case invalidFormat
+  case invalidFormat
 
-	case invalidTextDictionary
+  case invalidTextDictionary
 
-	case invalidUTF8
+  case invalidUTF8
 
-	case unknown
+  case unknown
 
-	init(_ code: CCErrorCode) {
-		switch code {
-			case .fileNotFound:
-				self = .fileNotFound
-			case .invalidFormat:
-				self = .invalidFormat
-			case .invalidTextDictionary:
-				self = .invalidTextDictionary
-			case .invalidUTF8:
-				self = .invalidUTF8
-			case .unknown, _:
-				self = .unknown
-		}
-	}
+  init(_ code: CCErrorCode) {
+    switch code {
+      case .fileNotFound:
+        self = .fileNotFound
+      case .invalidFormat:
+        self = .invalidFormat
+      case .invalidTextDictionary:
+        self = .invalidTextDictionary
+      case .invalidUTF8:
+        self = .invalidUTF8
+      case .unknown, _:
+        self = .unknown
+    }
+  }
 }

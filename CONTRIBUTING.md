@@ -25,11 +25,9 @@
 該專案對源碼格式有規範，且 Swift 與其他 (Obj)C(++) 系語言持不同規範：
 
 - Swift: 採 [Apple 官方 Swift-Format](https://github.com/apple/swift-format)，且施加如下例外修改項目：
-	- Indentation 僅使用 `"indentation" : {     "tabs" : 1   },`，不以空格來縮進。
 	- `"indentSwitchCaseLabels" : true,`
 	- `"lineLength" : 120,`
 	- `"NoBlockComments" : false,`
-	- `"tabWidth" : 4,`
     - `"OnlyOneTrailingClosureArgument" : false,` // SwiftUI 相容
     - `"UseTripleSlashForDocumentationComments" : false,`
     - `"DontRepeatTypeInStaticProperties" : false,`
@@ -37,6 +35,6 @@
 	- 該規範以四個西文半形空格為行縮進單位。
 	- 由於今後不會再用這類語言給該倉庫新增內容，所以相關規範就不改動了。
 
-至於對 Swift 檔案改採 1-Tab 縮進，則是為了在尊重所有用戶的需求的同時、最大程度上節約檔案體積。使用者可自行修改 Xcode 的預設 Tab 縮進尺寸。
+之前，為了節省檔案體積，曾經對 Swift 檔案改採 1-Tab 縮進。然而，這會導致 Gitee 等線上 git 專案管理網站內的顯示變成 8-Space 縮進。於是，該專案對 Swift 檔案又改回了 2-Spaces 縮進。
 
 $ EOF.

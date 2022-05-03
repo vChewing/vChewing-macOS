@@ -24,51 +24,51 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 extension Megrez {
-	@frozen public struct Span {
-		private var mutLengthNodeMap: [Int: Megrez.Node]
-		private var mutMaximumLength: Int
-		var maximumLength: Int {
-			mutMaximumLength
-		}
+  @frozen public struct Span {
+    private var mutLengthNodeMap: [Int: Megrez.Node]
+    private var mutMaximumLength: Int
+    var maximumLength: Int {
+      mutMaximumLength
+    }
 
-		public init() {
-			mutLengthNodeMap = [:]
-			mutMaximumLength = 0
-		}
+    public init() {
+      mutLengthNodeMap = [:]
+      mutMaximumLength = 0
+    }
 
-		mutating func clear() {
-			mutLengthNodeMap.removeAll()
-			mutMaximumLength = 0
-		}
+    mutating func clear() {
+      mutLengthNodeMap.removeAll()
+      mutMaximumLength = 0
+    }
 
-		mutating func insert(node: Node, length: Int) {
-			mutLengthNodeMap[length] = node
-			if length > mutMaximumLength {
-				mutMaximumLength = length
-			}
-		}
+    mutating func insert(node: Node, length: Int) {
+      mutLengthNodeMap[length] = node
+      if length > mutMaximumLength {
+        mutMaximumLength = length
+      }
+    }
 
-		mutating func removeNodeOfLengthGreaterThan(_ length: Int) {
-			if length > mutMaximumLength { return }
-			var max = 0
-			var removalList: [Int: Megrez.Node] = [:]
-			for key in mutLengthNodeMap.keys {
-				if key > length {
-					removalList[key] = mutLengthNodeMap[key]
-				} else {
-					if key > max {
-						max = key
-					}
-				}
-			}
-			for key in removalList.keys {
-				mutLengthNodeMap.removeValue(forKey: key)
-			}
-			mutMaximumLength = max
-		}
+    mutating func removeNodeOfLengthGreaterThan(_ length: Int) {
+      if length > mutMaximumLength { return }
+      var max = 0
+      var removalList: [Int: Megrez.Node] = [:]
+      for key in mutLengthNodeMap.keys {
+        if key > length {
+          removalList[key] = mutLengthNodeMap[key]
+        } else {
+          if key > max {
+            max = key
+          }
+        }
+      }
+      for key in removalList.keys {
+        mutLengthNodeMap.removeValue(forKey: key)
+      }
+      mutMaximumLength = max
+    }
 
-		public func node(length: Int) -> Node? {
-			mutLengthNodeMap[length]
-		}
-	}
+    public func node(length: Int) -> Node? {
+      mutLengthNodeMap[length]
+    }
+  }
 }

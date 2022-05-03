@@ -27,190 +27,189 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Foundation
 
 extension vChewing {
-	public class LMUserOverride {
+  public class LMUserOverride {
+    // MARK: - Private Structures
 
-		// MARK: - Private Structures
+    var mutCapacity: Int
+    var mutDecayExponent: Double
+    var mutLRUList = [KeyObservationPair]()
+    var mutLRUMap: [String: KeyObservationPair] = [:]
+    let kDecayThreshold: Double = 1.0 / 1_048_576.0
 
-		var mutCapacity: Int
-		var mutDecayExponent: Double
-		var mutLRUList = [KeyObservationPair]()
-		var mutLRUMap: [String: KeyObservationPair] = [:]
-		let kDecayThreshold: Double = 1.0 / 1_048_576.0
+    struct Override {
+      var count: Int = 0
+      var timestamp: Double = 0.0
+    }
 
-		struct Override {
-			var count: Int = 0
-			var timestamp: Double = 0.0
-		}
+    struct Observation {
+      var count: Int = 0
+      var overrides: [String: Override] = [:]
 
-		struct Observation {
-			var count: Int = 0
-			var overrides: [String: Override] = [:]
+      mutating func update(candidate: String, timestamp: Double) {
+        count += 1
+        if var neta = overrides[candidate] {
+          neta.timestamp = timestamp
+          neta.count += 1
+        }
+      }
+    }
 
-			mutating func update(candidate: String, timestamp: Double) {
-				count += 1
-				if var neta = overrides[candidate] {
-					neta.timestamp = timestamp
-					neta.count += 1
-				}
-			}
-		}
+    struct KeyObservationPair: Equatable {
+      var key: String
+      var observation: Observation
 
-		struct KeyObservationPair: Equatable {
-			var key: String
-			var observation: Observation
+      var hashValue: Int { key.hashValue }
 
-			var hashValue: Int { key.hashValue }
+      init(key: String, observation: Observation) {
+        self.key = key
+        self.observation = observation
+      }
 
-			init(key: String, observation: Observation) {
-				self.key = key
-				self.observation = observation
-			}
+      static func == (lhs: KeyObservationPair, rhs: KeyObservationPair) -> Bool {
+        lhs.key == rhs.key
+      }
+    }
 
-			static func == (lhs: KeyObservationPair, rhs: KeyObservationPair) -> Bool {
-				lhs.key == rhs.key
-			}
-		}
+    public init(capacity: Int = 500, decayConstant: Double = 5400.0) {
+      mutCapacity = abs(capacity)  // Ensures that this value is always > 0.
+      mutDecayExponent = log(0.5) / decayConstant
+    }
 
-		public init(capacity: Int = 500, decayConstant: Double = 5400.0) {
-			mutCapacity = abs(capacity)  // Ensures that this value is always > 0.
-			mutDecayExponent = log(0.5) / decayConstant
-		}
+    public func observe(
+      walkedNodes: [Megrez.NodeAnchor],
+      cursorIndex: Int,
+      candidate: String,
+      timestamp: Double
+    ) {
+      let key = getWalkedNodesToKey(walkedNodes: walkedNodes, cursorIndex: cursorIndex)
+      guard key != "((),(),())" else { return }
+      guard let map = mutLRUMap[key] else {
+        var observation: Observation = .init()
+        observation.update(candidate: candidate, timestamp: timestamp)
+        mutLRUMap[key] = KeyObservationPair(key: key, observation: observation)
+        mutLRUList.insert(KeyObservationPair(key: key, observation: observation), at: 0)
 
-		public func observe(
-			walkedNodes: [Megrez.NodeAnchor],
-			cursorIndex: Int,
-			candidate: String,
-			timestamp: Double
-		) {
-			let key = getWalkedNodesToKey(walkedNodes: walkedNodes, cursorIndex: cursorIndex)
-			guard key != "((),(),())" else { return }
-			guard let map = mutLRUMap[key] else {
-				var observation: Observation = .init()
-				observation.update(candidate: candidate, timestamp: timestamp)
-				mutLRUMap[key] = KeyObservationPair(key: key, observation: observation)
-				mutLRUList.insert(KeyObservationPair(key: key, observation: observation), at: 0)
+        if mutLRUList.count > mutCapacity {
+          mutLRUMap[mutLRUList.reversed()[0].key] = nil
+          mutLRUList.removeLast()
+        }
+        return
+      }
+      var obs = map.observation
+      obs.update(candidate: candidate, timestamp: timestamp)
+      let pair = KeyObservationPair(key: key, observation: obs)
+      mutLRUList.insert(pair, at: 0)
+    }
 
-				if mutLRUList.count > mutCapacity {
-					mutLRUMap[mutLRUList.reversed()[0].key] = nil
-					mutLRUList.removeLast()
-				}
-				return
-			}
-			var obs = map.observation
-			obs.update(candidate: candidate, timestamp: timestamp)
-			let pair = KeyObservationPair.init(key: key, observation: obs)
-			mutLRUList.insert(pair, at: 0)
-		}
+    public func suggest(
+      walkedNodes: [Megrez.NodeAnchor],
+      cursorIndex: Int,
+      timestamp: Double
+    ) -> String {
+      let key = getWalkedNodesToKey(walkedNodes: walkedNodes, cursorIndex: cursorIndex)
+      guard let keyValuePair = mutLRUMap[key] else {
+        return ""
+      }
 
-		public func suggest(
-			walkedNodes: [Megrez.NodeAnchor],
-			cursorIndex: Int,
-			timestamp: Double
-		) -> String {
-			let key = getWalkedNodesToKey(walkedNodes: walkedNodes, cursorIndex: cursorIndex)
-			guard let keyValuePair = mutLRUMap[key] else {
-				return ""
-			}
+      IME.prtDebugIntel("Suggest - A: \(key)")
+      IME.prtDebugIntel("Suggest - B: \(keyValuePair.key)")
 
-			IME.prtDebugIntel("Suggest - A: \(key)")
-			IME.prtDebugIntel("Suggest - B: \(keyValuePair.key)")
+      guard key != "((),(),())" else { return "" }
 
-			guard key != "((),(),())" else { return "" }
+      let observation = keyValuePair.observation
 
-			let observation = keyValuePair.observation
+      var candidate = ""
+      var score = 0.0
+      for overrideNeta in Array(observation.overrides) {
+        let overrideScore = getScore(
+          eventCount: overrideNeta.value.count,
+          totalCount: observation.count,
+          eventTimestamp: overrideNeta.value.timestamp,
+          timestamp: timestamp,
+          lambda: mutDecayExponent
+        )
 
-			var candidate = ""
-			var score = 0.0
-			for overrideNeta in Array(observation.overrides) {
-				let overrideScore = getScore(
-					eventCount: overrideNeta.value.count,
-					totalCount: observation.count,
-					eventTimestamp: overrideNeta.value.timestamp,
-					timestamp: timestamp,
-					lambda: mutDecayExponent
-				)
+        if overrideScore == 0.0 {
+          continue
+        }
 
-				if overrideScore == 0.0 {
-					continue
-				}
+        if overrideScore > score {
+          candidate = overrideNeta.key
+          score = overrideScore
+        }
+      }
+      return candidate
+    }
 
-				if overrideScore > score {
-					candidate = overrideNeta.key
-					score = overrideScore
-				}
-			}
-			return candidate
-		}
+    func isEndingPunctuation(value: String) -> Bool {
+      ["，", "。", "！", "？", "」", "』", "”", "’"].contains(value)
+    }
 
-		func isEndingPunctuation(value: String) -> Bool {
-			["，", "。", "！", "？", "」", "』", "”", "’"].contains(value)
-		}
+    public func getScore(
+      eventCount: Int,
+      totalCount: Int,
+      eventTimestamp: Double,
+      timestamp: Double,
+      lambda: Double
+    ) -> Double {
+      let decay = exp((timestamp - eventTimestamp) * lambda)
+      if decay < kDecayThreshold {
+        return 0.0
+      }
 
-		public func getScore(
-			eventCount: Int,
-			totalCount: Int,
-			eventTimestamp: Double,
-			timestamp: Double,
-			lambda: Double
-		) -> Double {
-			let decay = exp((timestamp - eventTimestamp) * lambda)
-			if decay < kDecayThreshold {
-				return 0.0
-			}
+      let prob = Double(eventCount) / Double(totalCount)
+      return prob * decay
+    }
 
-			let prob = Double(eventCount) / Double(totalCount)
-			return prob * decay
-		}
+    func getWalkedNodesToKey(
+      walkedNodes: [Megrez.NodeAnchor], cursorIndex: Int
+    ) -> String {
+      var strOutput = ""
+      var arrNodes: [Megrez.NodeAnchor] = []
+      var intLength = 0
+      for nodeNeta in walkedNodes {
+        arrNodes.append(nodeNeta)
+        intLength += nodeNeta.spanningLength
+        if intLength >= cursorIndex {
+          break
+        }
+      }
 
-		func getWalkedNodesToKey(
-			walkedNodes: [Megrez.NodeAnchor], cursorIndex: Int
-		) -> String {
-			var strOutput = ""
-			var arrNodes: [Megrez.NodeAnchor] = []
-			var intLength = 0
-			for nodeNeta in walkedNodes {
-				arrNodes.append(nodeNeta)
-				intLength += nodeNeta.spanningLength
-				if intLength >= cursorIndex {
-					break
-				}
-			}
+      // 一個被 .reversed 過的陣列不能直接使用，因為不是正常的 Swift 陣列。
+      // 那就新開一個正常的陣列、然後將內容拓印過去。
+      var arrNodesReversed: [Megrez.NodeAnchor] = []
+      arrNodesReversed.append(contentsOf: arrNodes.reversed())
 
-			// 一個被 .reversed 過的陣列不能直接使用，因為不是正常的 Swift 陣列。
-			// 那就新開一個正常的陣列、然後將內容拓印過去。
-			var arrNodesReversed: [Megrez.NodeAnchor] = []
-			arrNodesReversed.append(contentsOf: arrNodes.reversed())
+      if arrNodesReversed.isEmpty {
+        return ""
+      }
 
-			if arrNodesReversed.isEmpty {
-				return ""
-			}
+      var strCurrent = "()"
+      var strPrev = "()"
+      var strAnterior = "()"
 
-			var strCurrent = "()"
-			var strPrev = "()"
-			var strAnterior = "()"
+      for (theIndex, theAnchor) in arrNodesReversed.enumerated() {
+        if strCurrent != "()", let nodeCurrent = theAnchor.node {
+          let keyCurrent = nodeCurrent.currentKeyValue().key
+          let valCurrent = nodeCurrent.currentKeyValue().value
+          strCurrent = "(\(keyCurrent), \(valCurrent))"
+          if let nodePrev = arrNodesReversed[theIndex + 1].node {
+            let keyPrev = nodePrev.currentKeyValue().key
+            let valPrev = nodePrev.currentKeyValue().value
+            strPrev = "(\(keyPrev), \(valPrev))"
+          }
+          if let nodeAnterior = arrNodesReversed[theIndex + 2].node {
+            let keyAnterior = nodeAnterior.currentKeyValue().key
+            let valAnterior = nodeAnterior.currentKeyValue().value
+            strAnterior = "(\(keyAnterior), \(valAnterior))"
+          }
+          break  // 我們只取第一個有效結果。
+        }
+      }
 
-			for (theIndex, theAnchor) in arrNodesReversed.enumerated() {
-				if strCurrent != "()", let nodeCurrent = theAnchor.node {
-					let keyCurrent = nodeCurrent.currentKeyValue().key
-					let valCurrent = nodeCurrent.currentKeyValue().value
-					strCurrent = "(\(keyCurrent), \(valCurrent))"
-					if let nodePrev = arrNodesReversed[theIndex + 1].node {
-						let keyPrev = nodePrev.currentKeyValue().key
-						let valPrev = nodePrev.currentKeyValue().value
-						strPrev = "(\(keyPrev), \(valPrev))"
-					}
-					if let nodeAnterior = arrNodesReversed[theIndex + 2].node {
-						let keyAnterior = nodeAnterior.currentKeyValue().key
-						let valAnterior = nodeAnterior.currentKeyValue().value
-						strAnterior = "(\(keyAnterior), \(valAnterior))"
-					}
-					break  // 我們只取第一個有效結果。
-				}
-			}
+      strOutput = "(\(strAnterior),\(strPrev),\(strCurrent))"
 
-			strOutput = "(\(strAnterior),\(strPrev),\(strCurrent))"
-
-			return strOutput
-		}
-	}
+      return strOutput
+    }
+  }
 }

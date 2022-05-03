@@ -35,250 +35,250 @@ private let lmCNS = vChewing.LMLite(consolidate: false)
 private let lmSymbols = vChewing.LMCore(reverse: true, consolidate: false, defaultScore: -13.0, forceDefaultScore: true)
 
 extension vChewing {
-	/// LMInstantiator is a facade for managing a set of models including
-	/// the input method language model, user phrases and excluded phrases.
-	///
-	/// It is the primary model class that the input controller and grammar builder
-	/// of vChewing talks to. When the grammar builder starts to build a sentence
-	/// from a series of BPMF readings, it passes the readings to the model to see
-	/// if there are valid unigrams, and use returned unigrams to produce the final
-	/// results.
-	///
-	/// LMInstantiator combine and transform the unigrams from the primary language
-	/// model and user phrases. The process is
-	///
-	/// 1) Get the original unigrams.
-	/// 2) Drop the unigrams whose value is contained in the exclusion map.
-	/// 3) Replace the values of the unigrams using the phrase replacement map.
-	/// 4) Drop the duplicated phrases from the generated unigram array.
-	///
-	/// The controller can ask the model to load the primary input method language
-	/// model while launching and to load the user phrases anytime if the custom
-	/// files are modified. It does not keep the reference of the data pathes but
-	/// you have to pass the paths when you ask it to load.
-	public class LMInstantiator: Megrez.LanguageModel {
-		// 在函數內部用以記錄狀態的開關。
-		public var isPhraseReplacementEnabled = false
-		public var isCNSEnabled = false
-		public var isSymbolEnabled = false
+  /// LMInstantiator is a facade for managing a set of models including
+  /// the input method language model, user phrases and excluded phrases.
+  ///
+  /// It is the primary model class that the input controller and grammar builder
+  /// of vChewing talks to. When the grammar builder starts to build a sentence
+  /// from a series of BPMF readings, it passes the readings to the model to see
+  /// if there are valid unigrams, and use returned unigrams to produce the final
+  /// results.
+  ///
+  /// LMInstantiator combine and transform the unigrams from the primary language
+  /// model and user phrases. The process is
+  ///
+  /// 1) Get the original unigrams.
+  /// 2) Drop the unigrams whose value is contained in the exclusion map.
+  /// 3) Replace the values of the unigrams using the phrase replacement map.
+  /// 4) Drop the duplicated phrases from the generated unigram array.
+  ///
+  /// The controller can ask the model to load the primary input method language
+  /// model while launching and to load the user phrases anytime if the custom
+  /// files are modified. It does not keep the reference of the data pathes but
+  /// you have to pass the paths when you ask it to load.
+  public class LMInstantiator: Megrez.LanguageModel {
+    // 在函數內部用以記錄狀態的開關。
+    public var isPhraseReplacementEnabled = false
+    public var isCNSEnabled = false
+    public var isSymbolEnabled = false
 
-		/// 介紹一下三個通用的語言模組型別：
-		/// LMCore 是全功能通用型的模組，每一筆辭典記錄以 key 為注音、以 [Unigram] 陣列作為記錄內容。
-		/// 比較適合那種每筆記錄都有不同的權重數值的語言模組，雖然也可以強制施加權重數值就是了。
-		/// 然而缺點是：哪怕你強制施加權重數值，也不會減輕記憶體佔用。
-		/// 至於像全字庫這樣所有記錄都使用同一權重數值的模組，可以用 LMLite 以節省記憶體佔用。
-		/// LMLite 的辭典內不會存儲權重資料，只會在每次讀取記錄時施加您給定的權重數值。
-		/// LMLite 與 LMCore 都會用到多執行緒、以加速載入（不然的話，全部資料載入會耗費八秒左右）。
-		/// 然而，對於使用者語彙模型檔案而言，多執行緒可能會出現意料之外的問題，所以有了 LMLiteMono。
-		/// LMReplacements 與 LMAssociates 均為特種模組，分別擔當語彙置換表資料與使用者聯想詞的資料承載工作。
+    /// 介紹一下三個通用的語言模組型別：
+    /// LMCore 是全功能通用型的模組，每一筆辭典記錄以 key 為注音、以 [Unigram] 陣列作為記錄內容。
+    /// 比較適合那種每筆記錄都有不同的權重數值的語言模組，雖然也可以強制施加權重數值就是了。
+    /// 然而缺點是：哪怕你強制施加權重數值，也不會減輕記憶體佔用。
+    /// 至於像全字庫這樣所有記錄都使用同一權重數值的模組，可以用 LMLite 以節省記憶體佔用。
+    /// LMLite 的辭典內不會存儲權重資料，只會在每次讀取記錄時施加您給定的權重數值。
+    /// LMLite 與 LMCore 都會用到多執行緒、以加速載入（不然的話，全部資料載入會耗費八秒左右）。
+    /// 然而，對於使用者語彙模型檔案而言，多執行緒可能會出現意料之外的問題，所以有了 LMLiteMono。
+    /// LMReplacements 與 LMAssociates 均為特種模組，分別擔當語彙置換表資料與使用者聯想詞的資料承載工作。
 
-		// 聲明原廠語言模組
-		/// Reverse 的話，第一欄是注音，第二欄是對應的漢字，第三欄是可能的權重。
-		/// 不 Reverse 的話，第一欄是漢字，第二欄是對應的注音，第三欄是可能的權重。
-		let lmCore = LMCore(reverse: false, consolidate: false, defaultScore: -9.5, forceDefaultScore: false)
-		let lmMisc = LMCore(reverse: true, consolidate: false, defaultScore: -1, forceDefaultScore: false)
+    // 聲明原廠語言模組
+    /// Reverse 的話，第一欄是注音，第二欄是對應的漢字，第三欄是可能的權重。
+    /// 不 Reverse 的話，第一欄是漢字，第二欄是對應的注音，第三欄是可能的權重。
+    let lmCore = LMCore(reverse: false, consolidate: false, defaultScore: -9.5, forceDefaultScore: false)
+    let lmMisc = LMCore(reverse: true, consolidate: false, defaultScore: -1, forceDefaultScore: false)
 
-		// 聲明使用者語言模組。
-		// 使用者語言模組使用多執行緒的話，可能會導致一些問題。有時間再仔細排查看看。
-		let lmUserPhrases = LMLiteMono(consolidate: true)
-		let lmFiltered = LMLiteMono(consolidate: true)
-		let lmUserSymbols = LMLiteMono(consolidate: true)
-		let lmReplacements = LMReplacments()
-		let lmAssociates = LMAssociates()
+    // 聲明使用者語言模組。
+    // 使用者語言模組使用多執行緒的話，可能會導致一些問題。有時間再仔細排查看看。
+    let lmUserPhrases = LMLiteMono(consolidate: true)
+    let lmFiltered = LMLiteMono(consolidate: true)
+    let lmUserSymbols = LMLiteMono(consolidate: true)
+    let lmReplacements = LMReplacments()
+    let lmAssociates = LMAssociates()
 
-		// 初期化的函數先保留
-		override init() {}
+    // 初期化的函數先保留
+    override init() {}
 
-		// 自我析構前要關掉全部的語言模組
-		deinit {
-			// 原則上而言，只要不是歸 LMInstantiator 親自初期化的語言模組，都不要在這裡關掉。
-			// lmCNS.close()  // <--比如左邊這個模組。
-			// lmSymbols.close()  // <--左邊這個模組也是。
-			lmCore.close()
-			lmMisc.close()
-			lmUserPhrases.close()
-			lmFiltered.close()
-			lmUserSymbols.close()
-			lmReplacements.close()
-			lmAssociates.close()
-		}
+    // 自我析構前要關掉全部的語言模組
+    deinit {
+      // 原則上而言，只要不是歸 LMInstantiator 親自初期化的語言模組，都不要在這裡關掉。
+      // lmCNS.close()  // <--比如左邊這個模組。
+      // lmSymbols.close()  // <--左邊這個模組也是。
+      lmCore.close()
+      lmMisc.close()
+      lmUserPhrases.close()
+      lmFiltered.close()
+      lmUserSymbols.close()
+      lmReplacements.close()
+      lmAssociates.close()
+    }
 
-		// 以下這些函數命名暫時保持原樣，等弒神行動徹底結束了再調整。
+    // 以下這些函數命名暫時保持原樣，等弒神行動徹底結束了再調整。
 
-		public func isDataModelLoaded() -> Bool { lmCore.isLoaded() }
-		public func loadLanguageModel(path: String) {
-			if FileManager.default.isReadableFile(atPath: path) {
-				lmCore.close()
-				lmCore.open(path)
-			}
-		}
+    public func isDataModelLoaded() -> Bool { lmCore.isLoaded() }
+    public func loadLanguageModel(path: String) {
+      if FileManager.default.isReadableFile(atPath: path) {
+        lmCore.close()
+        lmCore.open(path)
+      }
+    }
 
-		public func isCNSDataLoaded() -> Bool { lmCNS.isLoaded() }
-		public func loadCNSData(path: String) {
-			if FileManager.default.isReadableFile(atPath: path) {
-				lmCNS.close()
-				lmCNS.open(path)
-			}
-		}
+    public func isCNSDataLoaded() -> Bool { lmCNS.isLoaded() }
+    public func loadCNSData(path: String) {
+      if FileManager.default.isReadableFile(atPath: path) {
+        lmCNS.close()
+        lmCNS.open(path)
+      }
+    }
 
-		public func isMiscDataLoaded() -> Bool { lmMisc.isLoaded() }
-		public func loadMiscData(path: String) {
-			if FileManager.default.isReadableFile(atPath: path) {
-				lmMisc.close()
-				lmMisc.open(path)
-			}
-		}
+    public func isMiscDataLoaded() -> Bool { lmMisc.isLoaded() }
+    public func loadMiscData(path: String) {
+      if FileManager.default.isReadableFile(atPath: path) {
+        lmMisc.close()
+        lmMisc.open(path)
+      }
+    }
 
-		public func isSymbolDataLoaded() -> Bool { lmSymbols.isLoaded() }
-		public func loadSymbolData(path: String) {
-			if FileManager.default.isReadableFile(atPath: path) {
-				lmSymbols.close()
-				lmSymbols.open(path)
-			}
-		}
+    public func isSymbolDataLoaded() -> Bool { lmSymbols.isLoaded() }
+    public func loadSymbolData(path: String) {
+      if FileManager.default.isReadableFile(atPath: path) {
+        lmSymbols.close()
+        lmSymbols.open(path)
+      }
+    }
 
-		public func loadUserPhrases(path: String, filterPath: String) {
-			if FileManager.default.isReadableFile(atPath: path) {
-				lmUserPhrases.close()
-				lmUserPhrases.open(path)
-			}
-			if FileManager.default.isReadableFile(atPath: filterPath) {
-				lmFiltered.close()
-				lmFiltered.open(filterPath)
-			}
-		}
+    public func loadUserPhrases(path: String, filterPath: String) {
+      if FileManager.default.isReadableFile(atPath: path) {
+        lmUserPhrases.close()
+        lmUserPhrases.open(path)
+      }
+      if FileManager.default.isReadableFile(atPath: filterPath) {
+        lmFiltered.close()
+        lmFiltered.open(filterPath)
+      }
+    }
 
-		public func loadUserSymbolData(path: String) {
-			if FileManager.default.isReadableFile(atPath: path) {
-				lmUserSymbols.close()
-				lmUserSymbols.open(path)
-			}
-		}
+    public func loadUserSymbolData(path: String) {
+      if FileManager.default.isReadableFile(atPath: path) {
+        lmUserSymbols.close()
+        lmUserSymbols.open(path)
+      }
+    }
 
-		public func loadUserAssociatedPhrases(path: String) {
-			if FileManager.default.isReadableFile(atPath: path) {
-				lmAssociates.close()
-				lmAssociates.open(path)
-			}
-		}
+    public func loadUserAssociatedPhrases(path: String) {
+      if FileManager.default.isReadableFile(atPath: path) {
+        lmAssociates.close()
+        lmAssociates.open(path)
+      }
+    }
 
-		public func loadPhraseReplacementMap(path: String) {
-			if FileManager.default.isReadableFile(atPath: path) {
-				lmReplacements.close()
-				lmReplacements.open(path)
-			}
-		}
+    public func loadPhraseReplacementMap(path: String) {
+      if FileManager.default.isReadableFile(atPath: path) {
+        lmReplacements.close()
+        lmReplacements.open(path)
+      }
+    }
 
-		// MARK: - Core Functions (Public)
+    // MARK: - Core Functions (Public)
 
-		/// Not implemented since we do not have data to provide bigram function.
-		// public func bigramsForKeys(preceedingKey: String, key: String) -> [Megrez.Bigram] { }
+    /// Not implemented since we do not have data to provide bigram function.
+    // public func bigramsForKeys(preceedingKey: String, key: String) -> [Megrez.Bigram] { }
 
-		/// Returns a list of available unigram for the given key.
-		/// @param key:String represents the BPMF reading or a symbol key.
-		/// For instance, it you pass "ㄉㄨㄟˇ", it returns "㨃" and other possible candidates.
-		override open func unigramsFor(key: String) -> [Megrez.Unigram] {
-			if key == " " {
-				/// 給空格鍵指定輸出值。
-				let spaceUnigram = Megrez.Unigram(
-					keyValue: Megrez.KeyValuePair(key: " ", value: " "),
-					score: 0
-				)
-				return [spaceUnigram]
-			}
+    /// Returns a list of available unigram for the given key.
+    /// @param key:String represents the BPMF reading or a symbol key.
+    /// For instance, it you pass "ㄉㄨㄟˇ", it returns "㨃" and other possible candidates.
+    override open func unigramsFor(key: String) -> [Megrez.Unigram] {
+      if key == " " {
+        /// 給空格鍵指定輸出值。
+        let spaceUnigram = Megrez.Unigram(
+          keyValue: Megrez.KeyValuePair(key: " ", value: " "),
+          score: 0
+        )
+        return [spaceUnigram]
+      }
 
-			/// 準備不同的語言模組容器，開始逐漸往容器陣列內塞入資料。
-			var rawAllUnigrams: [Megrez.Unigram] = []
+      /// 準備不同的語言模組容器，開始逐漸往容器陣列內塞入資料。
+      var rawAllUnigrams: [Megrez.Unigram] = []
 
-			// 用 reversed 指令讓使用者語彙檔案內的詞條優先順序隨著行數增加而逐漸增高。
-			// 這樣一來就可以在就地新增語彙時徹底複寫優先權。
-			// 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
-			rawAllUnigrams += lmUserPhrases.unigramsFor(key: key, score: 0.0).reversed()
+      // 用 reversed 指令讓使用者語彙檔案內的詞條優先順序隨著行數增加而逐漸增高。
+      // 這樣一來就可以在就地新增語彙時徹底複寫優先權。
+      // 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
+      rawAllUnigrams += lmUserPhrases.unigramsFor(key: key, score: 0.0).reversed()
 
-			// LMMisc 與 LMCore 的 score 在 (-10.0, 0.0) 這個區間內。
-			rawAllUnigrams += lmMisc.unigramsFor(key: key)
-			rawAllUnigrams += lmCore.unigramsFor(key: key)
+      // LMMisc 與 LMCore 的 score 在 (-10.0, 0.0) 這個區間內。
+      rawAllUnigrams += lmMisc.unigramsFor(key: key)
+      rawAllUnigrams += lmCore.unigramsFor(key: key)
 
-			if isCNSEnabled {
-				rawAllUnigrams += lmCNS.unigramsFor(key: key, score: -11)
-			}
+      if isCNSEnabled {
+        rawAllUnigrams += lmCNS.unigramsFor(key: key, score: -11)
+      }
 
-			if isSymbolEnabled {
-				rawAllUnigrams += lmUserSymbols.unigramsFor(key: key, score: -12.0)
-				if lmUserSymbols.unigramsFor(key: key).isEmpty {
-					IME.prtDebugIntel("Not found in UserSymbolUnigram: \(key)")
-				}
+      if isSymbolEnabled {
+        rawAllUnigrams += lmUserSymbols.unigramsFor(key: key, score: -12.0)
+        if lmUserSymbols.unigramsFor(key: key).isEmpty {
+          IME.prtDebugIntel("Not found in UserSymbolUnigram: \(key)")
+        }
 
-				rawAllUnigrams += lmSymbols.unigramsFor(key: key)
-				if lmSymbols.unigramsFor(key: key).isEmpty {
-					IME.prtDebugIntel("Not found in UserUnigram: \(key)")
-				}
-			}
+        rawAllUnigrams += lmSymbols.unigramsFor(key: key)
+        if lmSymbols.unigramsFor(key: key).isEmpty {
+          IME.prtDebugIntel("Not found in UserUnigram: \(key)")
+        }
+      }
 
-			// 準備過濾清單與統計清單
-			var insertedPairs: Set<Megrez.KeyValuePair> = []  // 統計清單
-			var filteredPairs: Set<Megrez.KeyValuePair> = []  // 過濾清單
+      // 準備過濾清單與統計清單
+      var insertedPairs: Set<Megrez.KeyValuePair> = []  // 統計清單
+      var filteredPairs: Set<Megrez.KeyValuePair> = []  // 過濾清單
 
-			// 載入要過濾的 KeyValuePair 清單。
-			for unigram in lmFiltered.unigramsFor(key: key) {
-				filteredPairs.insert(unigram.keyValue)
-			}
+      // 載入要過濾的 KeyValuePair 清單。
+      for unigram in lmFiltered.unigramsFor(key: key) {
+        filteredPairs.insert(unigram.keyValue)
+      }
 
-			return filterAndTransform(
-				unigrams: rawAllUnigrams,
-				filter: filteredPairs, inserted: &insertedPairs
-			)
-		}
+      return filterAndTransform(
+        unigrams: rawAllUnigrams,
+        filter: filteredPairs, inserted: &insertedPairs
+      )
+    }
 
-		/// If the model has unigrams for the given key.
-		/// @param key The key.
-		override open func hasUnigramsFor(key: String) -> Bool {
-			if key == " " { return true }
+    /// If the model has unigrams for the given key.
+    /// @param key The key.
+    override open func hasUnigramsFor(key: String) -> Bool {
+      if key == " " { return true }
 
-			if !lmFiltered.hasUnigramsFor(key: key) {
-				return lmUserPhrases.hasUnigramsFor(key: key) || lmCore.hasUnigramsFor(key: key)
-			}
+      if !lmFiltered.hasUnigramsFor(key: key) {
+        return lmUserPhrases.hasUnigramsFor(key: key) || lmCore.hasUnigramsFor(key: key)
+      }
 
-			return !unigramsFor(key: key).isEmpty
-		}
+      return !unigramsFor(key: key).isEmpty
+    }
 
-		public func associatedPhrasesForKey(_ key: String) -> [String] {
-			lmAssociates.valuesFor(key: key) ?? []
-		}
+    public func associatedPhrasesForKey(_ key: String) -> [String] {
+      lmAssociates.valuesFor(key: key) ?? []
+    }
 
-		public func hasAssociatedPhrasesForKey(_ key: String) -> Bool {
-			lmAssociates.hasValuesFor(key: key)
-		}
+    public func hasAssociatedPhrasesForKey(_ key: String) -> Bool {
+      lmAssociates.hasValuesFor(key: key)
+    }
 
-		// MARK: - Core Functions (Private)
+    // MARK: - Core Functions (Private)
 
-		func filterAndTransform(
-			unigrams: [Megrez.Unigram],
-			filter filteredPairs: Set<Megrez.KeyValuePair>,
-			inserted insertedPairs: inout Set<Megrez.KeyValuePair>
-		) -> [Megrez.Unigram] {
-			var results: [Megrez.Unigram] = []
+    func filterAndTransform(
+      unigrams: [Megrez.Unigram],
+      filter filteredPairs: Set<Megrez.KeyValuePair>,
+      inserted insertedPairs: inout Set<Megrez.KeyValuePair>
+    ) -> [Megrez.Unigram] {
+      var results: [Megrez.Unigram] = []
 
-			for unigram in unigrams {
-				var pair: Megrez.KeyValuePair = unigram.keyValue
-				if filteredPairs.contains(pair) {
-					continue
-				}
+      for unigram in unigrams {
+        var pair: Megrez.KeyValuePair = unigram.keyValue
+        if filteredPairs.contains(pair) {
+          continue
+        }
 
-				if isPhraseReplacementEnabled {
-					let replacement = lmReplacements.valuesFor(key: pair.value)
-					if !replacement.isEmpty, pair.value.count == replacement.count {
-						IME.prtDebugIntel("\(pair.value) -> \(replacement)")
-						pair.value = replacement
-					}
-				}
+        if isPhraseReplacementEnabled {
+          let replacement = lmReplacements.valuesFor(key: pair.value)
+          if !replacement.isEmpty, pair.value.count == replacement.count {
+            IME.prtDebugIntel("\(pair.value) -> \(replacement)")
+            pair.value = replacement
+          }
+        }
 
-				if !insertedPairs.contains(pair) {
-					results.append(Megrez.Unigram(keyValue: pair, score: unigram.score))
-					insertedPairs.insert(pair)
-				}
-			}
-			return results
-		}
-	}
+        if !insertedPairs.contains(pair) {
+          results.append(Megrez.Unigram(keyValue: pair, score: unigram.score))
+          insertedPairs.insert(pair)
+        }
+      }
+      return results
+    }
+  }
 }

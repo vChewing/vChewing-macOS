@@ -25,41 +25,41 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 
 class ViewController: NSViewController, NSTextViewDelegate {
-	@IBOutlet var edtDocument: NSTextView!
-	/// - Tag: setRepresentedObjectExample
-	override var representedObject: Any? {
-		didSet {
-			// Pass down the represented object to all of the child view controllers.
-			for child in children {
-				child.representedObject = representedObject
-			}
-		}
-	}
+  @IBOutlet var edtDocument: NSTextView!
+  /// - Tag: setRepresentedObjectExample
+  override var representedObject: Any? {
+    didSet {
+      // Pass down the represented object to all of the child view controllers.
+      for child in children {
+        child.representedObject = representedObject
+      }
+    }
+  }
 
-	weak var document: Document? {
-		if let docRepresentedObject = representedObject as? Document {
-			return docRepresentedObject
-		}
-		return nil
-	}
+  weak var document: Document? {
+    if let docRepresentedObject = representedObject as? Document {
+      return docRepresentedObject
+    }
+    return nil
+  }
 
-	override func viewDidLoad() {
-		super.viewDidLoad()
-		// Do any additional setup after loading the view.
-		edtDocument.font = NSFont(name: "Monaco", size: 16)
-	}
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    // Do any additional setup after loading the view.
+    edtDocument.font = NSFont(name: "Monaco", size: 16)
+  }
 
-	override func viewDidAppear() {
-		super.viewDidAppear()
-	}
+  override func viewDidAppear() {
+    super.viewDidAppear()
+  }
 
-	// MARK: - NSTextViewDelegate
+  // MARK: - NSTextViewDelegate
 
-	func textDidBeginEditing(_: Notification) {
-		document?.objectDidBeginEditing(self)
-	}
+  func textDidBeginEditing(_: Notification) {
+    document?.objectDidBeginEditing(self)
+  }
 
-	func textDidEndEditing(_: Notification) {
-		document?.objectDidEndEditing(self)
-	}
+  func textDidEndEditing(_: Notification) {
+    document?.objectDidEndEditing(self)
+  }
 }

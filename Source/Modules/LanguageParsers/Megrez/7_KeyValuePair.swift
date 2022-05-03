@@ -24,49 +24,49 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 extension Megrez {
-	@frozen public struct KeyValuePair: Equatable, Hashable, Comparable {
-		public var key: String
-		public var value: String
-		// public var paired: String
+  @frozen public struct KeyValuePair: Equatable, Hashable, Comparable {
+    public var key: String
+    public var value: String
+    // public var paired: String
 
-		public init(key: String = "", value: String = "") {
-			self.key = key
-			self.value = value
-			// paired = "(" + key + "," + value + ")"
-		}
+    public init(key: String = "", value: String = "") {
+      self.key = key
+      self.value = value
+      // paired = "(" + key + "," + value + ")"
+    }
 
-		public func hash(into hasher: inout Hasher) {
-			hasher.combine(key)
-			hasher.combine(value)
-			// hasher.combine(paired)
-		}
+    public func hash(into hasher: inout Hasher) {
+      hasher.combine(key)
+      hasher.combine(value)
+      // hasher.combine(paired)
+    }
 
-		public static func == (lhs: KeyValuePair, rhs: KeyValuePair) -> Bool {
-			lhs.key.count == rhs.key.count && lhs.value == rhs.value
-		}
+    public static func == (lhs: KeyValuePair, rhs: KeyValuePair) -> Bool {
+      lhs.key.count == rhs.key.count && lhs.value == rhs.value
+    }
 
-		public static func < (lhs: KeyValuePair, rhs: KeyValuePair) -> Bool {
-			(lhs.key.count < rhs.key.count) || (lhs.key.count == rhs.key.count && lhs.value < rhs.value)
-		}
+    public static func < (lhs: KeyValuePair, rhs: KeyValuePair) -> Bool {
+      (lhs.key.count < rhs.key.count) || (lhs.key.count == rhs.key.count && lhs.value < rhs.value)
+    }
 
-		public static func > (lhs: KeyValuePair, rhs: KeyValuePair) -> Bool {
-			(lhs.key.count > rhs.key.count) || (lhs.key.count == rhs.key.count && lhs.value > rhs.value)
-		}
+    public static func > (lhs: KeyValuePair, rhs: KeyValuePair) -> Bool {
+      (lhs.key.count > rhs.key.count) || (lhs.key.count == rhs.key.count && lhs.value > rhs.value)
+    }
 
-		public static func <= (lhs: KeyValuePair, rhs: KeyValuePair) -> Bool {
-			(lhs.key.count <= rhs.key.count) || (lhs.key.count == rhs.key.count && lhs.value <= rhs.value)
-		}
+    public static func <= (lhs: KeyValuePair, rhs: KeyValuePair) -> Bool {
+      (lhs.key.count <= rhs.key.count) || (lhs.key.count == rhs.key.count && lhs.value <= rhs.value)
+    }
 
-		public static func >= (lhs: KeyValuePair, rhs: KeyValuePair) -> Bool {
-			(lhs.key.count >= rhs.key.count) || (lhs.key.count == rhs.key.count && lhs.value >= rhs.value)
-		}
+    public static func >= (lhs: KeyValuePair, rhs: KeyValuePair) -> Bool {
+      (lhs.key.count >= rhs.key.count) || (lhs.key.count == rhs.key.count && lhs.value >= rhs.value)
+    }
 
-		public var description: String {
-			"(\(key), \(value))"
-		}
+    public var description: String {
+      "(\(key), \(value))"
+    }
 
-		public var debugDescription: String {
-			"KeyValuePair(key: \(key), value: \(value))"
-		}
-	}
+    public var debugDescription: String {
+      "KeyValuePair(key: \(key), value: \(value))"
+    }
+  }
 }

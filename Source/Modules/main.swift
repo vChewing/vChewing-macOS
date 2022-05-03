@@ -30,32 +30,32 @@ import InputMethodKit
 let kConnectionName = "vChewing_1_Connection"
 
 if CommandLine.arguments.count > 1 {
-	if CommandLine.arguments[1] == "install" {
-		let exitCode = IME.registerInputMethod()
-		exit(exitCode)
-	}
-	if CommandLine.arguments[1] == "uninstall" {
-		let exitCode = IME.uninstall(isSudo: IME.isSudoMode)
-		exit(exitCode)
-	}
+  if CommandLine.arguments[1] == "install" {
+    let exitCode = IME.registerInputMethod()
+    exit(exitCode)
+  }
+  if CommandLine.arguments[1] == "uninstall" {
+    let exitCode = IME.uninstall(isSudo: IME.isSudoMode)
+    exit(exitCode)
+  }
 }
 
 guard let mainNibName = Bundle.main.infoDictionary?["NSMainNibFile"] as? String else {
-	NSLog("Fatal error: NSMainNibFile key not defined in Info.plist.")
-	exit(-1)
+  NSLog("Fatal error: NSMainNibFile key not defined in Info.plist.")
+  exit(-1)
 }
 
 let loaded = Bundle.main.loadNibNamed(mainNibName, owner: NSApp, topLevelObjects: nil)
 if !loaded {
-	NSLog("Fatal error: Cannot load \(mainNibName).")
-	exit(-1)
+  NSLog("Fatal error: Cannot load \(mainNibName).")
+  exit(-1)
 }
 
 guard let bundleID = Bundle.main.bundleIdentifier,
-	let server = IMKServer(name: kConnectionName, bundleIdentifier: bundleID)
+  let server = IMKServer(name: kConnectionName, bundleIdentifier: bundleID)
 else {
-	NSLog("Fatal error: Cannot initialize input method server with connection \(kConnectionName).")
-	exit(-1)
+  NSLog("Fatal error: Cannot initialize input method server with connection \(kConnectionName).")
+  exit(-1)
 }
 
 NSApp.run()

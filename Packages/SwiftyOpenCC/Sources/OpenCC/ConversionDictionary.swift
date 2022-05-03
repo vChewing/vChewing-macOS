@@ -9,21 +9,21 @@ import Foundation
 import copencc
 
 class ConversionDictionary {
-	let group: [ConversionDictionary]
+  let group: [ConversionDictionary]
 
-	let dict: CCDictRef
+  let dict: CCDictRef
 
-	init(path: String) throws {
-		guard let dict = CCDictCreateMarisaWithPath(path) else {
-			throw ConversionError(ccErrorno)
-		}
-		group = []
-		self.dict = dict
-	}
+  init(path: String) throws {
+    guard let dict = CCDictCreateMarisaWithPath(path) else {
+      throw ConversionError(ccErrorno)
+    }
+    group = []
+    self.dict = dict
+  }
 
-	init(group: [ConversionDictionary]) {
-		var rawGroup = group.map(\.dict)
-		self.group = group
-		dict = CCDictCreateWithGroup(&rawGroup, rawGroup.count)
-	}
+  init(group: [ConversionDictionary]) {
+    var rawGroup = group.map(\.dict)
+    self.group = group
+    dict = CCDictCreateWithGroup(&rawGroup, rawGroup.count)
+  }
 }

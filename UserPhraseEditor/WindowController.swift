@@ -25,12 +25,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 
 class WindowController: NSWindowController, NSWindowDelegate {
-	override func windowDidLoad() {
-		super.windowDidLoad()
-	}
+  override func windowDidLoad() {
+    super.windowDidLoad()
+  }
 
-	required init?(coder aDecoder: NSCoder) {
-		super.init(coder: aDecoder)
-		shouldCascadeWindows = true
-	}
+  required init?(coder aDecoder: NSCoder) {
+    super.init(coder: aDecoder)
+    shouldCascadeWindows = true
+  }
 }

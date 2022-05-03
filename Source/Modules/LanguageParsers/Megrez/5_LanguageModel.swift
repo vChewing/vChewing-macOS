@@ -24,21 +24,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 extension Megrez {
-	// 這裡充其量只是框架，回頭實際使用時需要派生一個型別、且重寫相關函數。
-	// 這裡寫了一點假內容，不然有些 Swift 格式化工具會破壞掉函數的參數設計。
-	open class LanguageModel {
-		public init() {}
+  // 這裡充其量只是框架，回頭實際使用時需要派生一個型別、且重寫相關函數。
+  // 這裡寫了一點假內容，不然有些 Swift 格式化工具會破壞掉函數的參數設計。
+  open class LanguageModel {
+    public init() {}
 
-		open func unigramsFor(key: String) -> [Megrez.Unigram] {
-			key.isEmpty ? [Megrez.Unigram]() : [Megrez.Unigram]()
-		}
+    open func unigramsFor(key: String) -> [Megrez.Unigram] {
+      key.isEmpty ? [Megrez.Unigram]() : [Megrez.Unigram]()
+    }
 
-		open func bigramsForKeys(precedingKey: String, key: String) -> [Megrez.Bigram] {
-			precedingKey == key ? [Megrez.Bigram]() : [Megrez.Bigram]()
-		}
+    open func bigramsForKeys(precedingKey: String, key: String) -> [Megrez.Bigram] {
+      precedingKey == key ? [Megrez.Bigram]() : [Megrez.Bigram]()
+    }
 
-		open func hasUnigramsFor(key: String) -> Bool {
-			key.count != 0
-		}
-	}
+    open func hasUnigramsFor(key: String) -> Bool {
+      key.count != 0
+    }
+  }
 }

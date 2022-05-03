@@ -22,57 +22,57 @@ import SwiftUI
 
 @available(macOS 10.15, *)
 extension Preferences {
-	/**
+  /**
 	Represents a section with right-aligned title and optional bottom divider.
 	*/
-	@available(macOS 10.15, *)
-	public struct Section: View {
-		/**
+  @available(macOS 10.15, *)
+  public struct Section: View {
+    /**
 		Preference key holding max width of section labels.
 		*/
-		private struct LabelWidthPreferenceKey: PreferenceKey {
-			typealias Value = Double
+    private struct LabelWidthPreferenceKey: PreferenceKey {
+      typealias Value = Double
 
-			static var defaultValue = 0.0
+      static var defaultValue = 0.0
 
-			static func reduce(value: inout Double, nextValue: () -> Double) {
-				let next = nextValue()
-				value = next > value ? next : value
-			}
-		}
+      static func reduce(value: inout Double, nextValue: () -> Double) {
+        let next = nextValue()
+        value = next > value ? next : value
+      }
+    }
 
-		/**
+    /**
 		Convenience overlay for finding a label's dimensions using `GeometryReader`.
 		*/
-		private struct LabelOverlay: View {
-			var body: some View {
-				GeometryReader { geometry in
-					Color.clear
-						.preference(key: LabelWidthPreferenceKey.self, value: Double(geometry.size.width))
-				}
-			}
-		}
+    private struct LabelOverlay: View {
+      var body: some View {
+        GeometryReader { geometry in
+          Color.clear
+            .preference(key: LabelWidthPreferenceKey.self, value: Double(geometry.size.width))
+        }
+      }
+    }
 
-		/**
+    /**
 		Convenience modifier for applying `LabelWidthPreferenceKey`.
 		*/
-		struct LabelWidthModifier: ViewModifier {
-			@Binding var maximumWidth: Double
+    struct LabelWidthModifier: ViewModifier {
+      @Binding var maximumWidth: Double
 
-			func body(content: Content) -> some View {
-				content
-					.onPreferenceChange(LabelWidthPreferenceKey.self) { newMaximumWidth in
-						maximumWidth = Double(newMaximumWidth)
-					}
-			}
-		}
+      func body(content: Content) -> some View {
+        content
+          .onPreferenceChange(LabelWidthPreferenceKey.self) { newMaximumWidth in
+            maximumWidth = Double(newMaximumWidth)
+          }
+      }
+    }
 
-		public let label: AnyView
-		public let content: AnyView
-		public let bottomDivider: Bool
-		public let verticalAlignment: VerticalAlignment
+    public let label: AnyView
+    public let content: AnyView
+    public let bottomDivider: Bool
+    public let verticalAlignment: VerticalAlignment
 
-		/**
+    /**
 		A section is responsible for controlling a single preference.
 
 		- Parameters:
@@ -82,22 +82,22 @@ extension Preferences {
 			- label: A view describing preference handled by this section.
 			- content: A content view.
 		*/
-		public init<Label: View, Content: View>(
-			bottomDivider: Bool = false,
-			verticalAlignment: VerticalAlignment = .firstTextBaseline,
-			label: @escaping () -> Label,
-			@ViewBuilder content: @escaping () -> Content
-		) {
-			self.label = label()
-				.overlay(LabelOverlay())
-				.eraseToAnyView()  // TODO: Remove use of `AnyView`.
-			self.bottomDivider = bottomDivider
-			self.verticalAlignment = verticalAlignment
-			let stack = VStack(alignment: .leading) { content() }
-			self.content = stack.eraseToAnyView()
-		}
+    public init<Label: View, Content: View>(
+      bottomDivider: Bool = false,
+      verticalAlignment: VerticalAlignment = .firstTextBaseline,
+      label: @escaping () -> Label,
+      @ViewBuilder content: @escaping () -> Content
+    ) {
+      self.label = label()
+        .overlay(LabelOverlay())
+        .eraseToAnyView()  // TODO: Remove use of `AnyView`.
+      self.bottomDivider = bottomDivider
+      self.verticalAlignment = verticalAlignment
+      let stack = VStack(alignment: .leading) { content() }
+      self.content = stack.eraseToAnyView()
+    }
 
-		/**
+    /**
 		Creates instance of section, responsible for controling single preference with `Text` as  a `Label`.
 
 		- Parameters:
@@ -107,34 +107,34 @@ extension Preferences {
 			- verticalAlignment:
 			- content: A content view.
 		*/
-		public init<Content: View>(
-			title: String,
-			bottomDivider: Bool = false,
-			verticalAlignment: VerticalAlignment = .firstTextBaseline,
-			@ViewBuilder content: @escaping () -> Content
-		) {
-			let textLabel = {
-				Text(title)
-					.font(.system(size: 13.0))
-					.overlay(LabelOverlay())
-					.eraseToAnyView()
-			}
+    public init<Content: View>(
+      title: String,
+      bottomDivider: Bool = false,
+      verticalAlignment: VerticalAlignment = .firstTextBaseline,
+      @ViewBuilder content: @escaping () -> Content
+    ) {
+      let textLabel = {
+        Text(title)
+          .font(.system(size: 13.0))
+          .overlay(LabelOverlay())
+          .eraseToAnyView()
+      }
 
-			self.init(
-				bottomDivider: bottomDivider,
-				verticalAlignment: verticalAlignment,
-				label: textLabel,
-				content: content
-			)
-		}
+      self.init(
+        bottomDivider: bottomDivider,
+        verticalAlignment: verticalAlignment,
+        label: textLabel,
+        content: content
+      )
+    }
 
-		public var body: some View {
-			HStack(alignment: verticalAlignment) {
-				label
-					.alignmentGuide(.preferenceSectionLabel) { $0[.trailing] }
-				content
-				Spacer()
-			}
-		}
-	}
+    public var body: some View {
+      HStack(alignment: verticalAlignment) {
+        label
+          .alignmentGuide(.preferenceSectionLabel) { $0[.trailing] }
+        content
+        Spacer()
+      }
+    }
+  }
 }

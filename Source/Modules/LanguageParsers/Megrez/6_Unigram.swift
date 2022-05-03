@@ -24,52 +24,52 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 extension Megrez {
-	@frozen public struct Unigram: Equatable {
-		public var keyValue: KeyValuePair
-		public var score: Double
-		// var paired: String
+  @frozen public struct Unigram: Equatable {
+    public var keyValue: KeyValuePair
+    public var score: Double
+    // var paired: String
 
-		public init(keyValue: KeyValuePair, score: Double) {
-			self.keyValue = keyValue
-			self.score = score
-			// paired = "(" + keyValue.paired + "," + String(score) + ")"
-		}
+    public init(keyValue: KeyValuePair, score: Double) {
+      self.keyValue = keyValue
+      self.score = score
+      // paired = "(" + keyValue.paired + "," + String(score) + ")"
+    }
 
-		public func hash(into hasher: inout Hasher) {
-			hasher.combine(keyValue)
-			hasher.combine(score)
-			// hasher.combine(paired)
-		}
+    public func hash(into hasher: inout Hasher) {
+      hasher.combine(keyValue)
+      hasher.combine(score)
+      // hasher.combine(paired)
+    }
 
-		// 這個函數不再需要了。
-		public static func compareScore(a: Unigram, b: Unigram) -> Bool {
-			a.score > b.score
-		}
+    // 這個函數不再需要了。
+    public static func compareScore(a: Unigram, b: Unigram) -> Bool {
+      a.score > b.score
+    }
 
-		//    static func getPairedUnigrams(grams: [Unigram]) -> String {
-		//      var arrOutputContent = [""]
-		//      var index = 0
-		//      for gram in grams {
-		//        arrOutputContent.append(contentsOf: [String(index) + "=>" + gram.paired])
-		//        index += 1
-		//      }
-		//      return "[" + String(grams.count) + "]=>{" + arrOutputContent.joined(separator: ",") + "}"
-		//    }
+    //    static func getPairedUnigrams(grams: [Unigram]) -> String {
+    //      var arrOutputContent = [""]
+    //      var index = 0
+    //      for gram in grams {
+    //        arrOutputContent.append(contentsOf: [String(index) + "=>" + gram.paired])
+    //        index += 1
+    //      }
+    //      return "[" + String(grams.count) + "]=>{" + arrOutputContent.joined(separator: ",") + "}"
+    //    }
 
-		public static func == (lhs: Unigram, rhs: Unigram) -> Bool {
-			lhs.keyValue == rhs.keyValue && lhs.score == rhs.score
-		}
+    public static func == (lhs: Unigram, rhs: Unigram) -> Bool {
+      lhs.keyValue == rhs.keyValue && lhs.score == rhs.score
+    }
 
-		public static func < (lhs: Unigram, rhs: Unigram) -> Bool {
-			lhs.keyValue < rhs.keyValue || (lhs.keyValue == rhs.keyValue && lhs.keyValue < rhs.keyValue)
-		}
+    public static func < (lhs: Unigram, rhs: Unigram) -> Bool {
+      lhs.keyValue < rhs.keyValue || (lhs.keyValue == rhs.keyValue && lhs.keyValue < rhs.keyValue)
+    }
 
-		var description: String {
-			"\(keyValue):\(score)"
-		}
+    var description: String {
+      "\(keyValue):\(score)"
+    }
 
-		var debugDescription: String {
-			"Unigram(keyValue: \(keyValue), score: \(score))"
-		}
-	}
+    var debugDescription: String {
+      "Unigram(keyValue: \(keyValue), score: \(score))"
+    }
+  }
 }

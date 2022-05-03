@@ -24,51 +24,51 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 extension Megrez {
-	public class Walker {
-		var mutGrid: Grid
+  public class Walker {
+    var mutGrid: Grid
 
-		public init(grid: Megrez.Grid = Megrez.Grid()) {
-			mutGrid = grid
-		}
+    public init(grid: Megrez.Grid = Megrez.Grid()) {
+      mutGrid = grid
+    }
 
-		public func reverseWalk(at location: Int, score accumulatedScore: Double = 0.0) -> [NodeAnchor] {
-			if location == 0 || location > mutGrid.width() {
-				return [] as [NodeAnchor]
-			}
+    public func reverseWalk(at location: Int, score accumulatedScore: Double = 0.0) -> [NodeAnchor] {
+      if location == 0 || location > mutGrid.width() {
+        return [] as [NodeAnchor]
+      }
 
-			var paths: [[NodeAnchor]] = []
-			let nodes: [NodeAnchor] = mutGrid.nodesEndingAt(location: location)
+      var paths: [[NodeAnchor]] = []
+      let nodes: [NodeAnchor] = mutGrid.nodesEndingAt(location: location)
 
-			for n in nodes {
-				var n = n
-				if n.node == nil {
-					continue
-				}
+      for n in nodes {
+        var n = n
+        if n.node == nil {
+          continue
+        }
 
-				n.accumulatedScore = accumulatedScore + n.node!.score()
+        n.accumulatedScore = accumulatedScore + n.node!.score()
 
-				var path: [NodeAnchor] = reverseWalk(
-					at: location - n.spanningLength,
-					score: n.accumulatedScore
-				)
-				path.insert(n, at: 0)
+        var path: [NodeAnchor] = reverseWalk(
+          at: location - n.spanningLength,
+          score: n.accumulatedScore
+        )
+        path.insert(n, at: 0)
 
-				paths.append(path)
-			}
+        paths.append(path)
+      }
 
-			if !paths.isEmpty {
-				if var result = paths.first {
-					for value in paths {
-						if let vLast = value.last, let rLast = result.last {
-							if vLast.accumulatedScore > rLast.accumulatedScore {
-								result = value
-							}
-						}
-					}
-					return result
-				}
-			}
-			return [] as [NodeAnchor]
-		}
-	}
+      if !paths.isEmpty {
+        if var result = paths.first {
+          for value in paths {
+            if let vLast = value.last, let rLast = result.last {
+              if vLast.accumulatedScore > rLast.accumulatedScore {
+                result = value
+              }
+            }
+          }
+          return result
+        }
+      }
+      return [] as [NodeAnchor]
+    }
+  }
 }

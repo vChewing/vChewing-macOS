@@ -29,26 +29,26 @@ import Cocoa
 // MARK: - § Misc functions.
 
 extension KeyHandler {
-	func getCurrentMandarinParser() -> String {
-		mgrPrefs.mandarinParserName + "_"
-	}
+  func getCurrentMandarinParser() -> String {
+    mgrPrefs.mandarinParserName + "_"
+  }
 
-	func getActualCandidateCursorIndex() -> Int {
-		var cursorIndex = getBuilderCursorIndex()
-		// Windows Yahoo Kimo IME style, phrase is *at the rear of* the cursor.
-		// (i.e. the cursor is always *before* the phrase.)
-		// This is different from MS Phonetics IME style ...
-		// ... since Windows Yahoo Kimo allows "node crossing".
-		if (mgrPrefs.setRearCursorMode
-			&& (cursorIndex < getBuilderLength()))
-			|| cursorIndex == 0
-		{
-			if cursorIndex == 0, !mgrPrefs.setRearCursorMode {
-				cursorIndex += getKeyLengthAtIndexZero()
-			} else {
-				cursorIndex += 1
-			}
-		}
-		return cursorIndex
-	}
+  func getActualCandidateCursorIndex() -> Int {
+    var cursorIndex = getBuilderCursorIndex()
+    // Windows Yahoo Kimo IME style, phrase is *at the rear of* the cursor.
+    // (i.e. the cursor is always *before* the phrase.)
+    // This is different from MS Phonetics IME style ...
+    // ... since Windows Yahoo Kimo allows "node crossing".
+    if (mgrPrefs.setRearCursorMode
+      && (cursorIndex < getBuilderLength()))
+      || cursorIndex == 0
+    {
+      if cursorIndex == 0, !mgrPrefs.setRearCursorMode {
+        cursorIndex += getKeyLengthAtIndexZero()
+      } else {
+        cursorIndex += 1
+      }
+    }
+    return cursorIndex
+  }
 }

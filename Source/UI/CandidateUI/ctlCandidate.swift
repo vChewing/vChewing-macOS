@@ -27,150 +27,150 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 
 public class CandidateKeyLabel: NSObject {
-	public private(set) var key: String
-	public private(set) var displayedText: String
+  public private(set) var key: String
+  public private(set) var displayedText: String
 
-	public init(key: String, displayedText: String) {
-		self.key = key
-		self.displayedText = displayedText
-		super.init()
-	}
+  public init(key: String, displayedText: String) {
+    self.key = key
+    self.displayedText = displayedText
+    super.init()
+  }
 }
 
 public protocol ctlCandidateDelegate: AnyObject {
-	func candidateCountForController(_ controller: ctlCandidate) -> UInt
-	func ctlCandidate(_ controller: ctlCandidate, candidateAtIndex index: UInt)
-		-> String
-	func ctlCandidate(
-		_ controller: ctlCandidate, didSelectCandidateAtIndex index: UInt
-	)
+  func candidateCountForController(_ controller: ctlCandidate) -> UInt
+  func ctlCandidate(_ controller: ctlCandidate, candidateAtIndex index: UInt)
+    -> String
+  func ctlCandidate(
+    _ controller: ctlCandidate, didSelectCandidateAtIndex index: UInt
+  )
 }
 
 public class ctlCandidate: NSWindowController {
-	public weak var delegate: ctlCandidateDelegate? {
-		didSet {
-			reloadData()
-		}
-	}
+  public weak var delegate: ctlCandidateDelegate? {
+    didSet {
+      reloadData()
+    }
+  }
 
-	public var selectedCandidateIndex: UInt = .max
-	public var visible: Bool = false {
-		didSet {
-			NSObject.cancelPreviousPerformRequests(withTarget: self)
-			if visible {
-				window?.perform(#selector(NSWindow.orderFront(_:)), with: self, afterDelay: 0.0)
-			} else {
-				window?.perform(#selector(NSWindow.orderOut(_:)), with: self, afterDelay: 0.0)
-			}
-		}
-	}
+  public var selectedCandidateIndex: UInt = .max
+  public var visible: Bool = false {
+    didSet {
+      NSObject.cancelPreviousPerformRequests(withTarget: self)
+      if visible {
+        window?.perform(#selector(NSWindow.orderFront(_:)), with: self, afterDelay: 0.0)
+      } else {
+        window?.perform(#selector(NSWindow.orderOut(_:)), with: self, afterDelay: 0.0)
+      }
+    }
+  }
 
-	public var windowTopLeftPoint: NSPoint {
-		get {
-			guard let frameRect = window?.frame else {
-				return NSPoint.zero
-			}
-			return NSPoint(x: frameRect.minX, y: frameRect.maxY)
-		}
-		set {
-			DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
-				self.set(windowTopLeftPoint: newValue, bottomOutOfScreenAdjustmentHeight: 0)
-			}
-		}
-	}
+  public var windowTopLeftPoint: NSPoint {
+    get {
+      guard let frameRect = window?.frame else {
+        return NSPoint.zero
+      }
+      return NSPoint(x: frameRect.minX, y: frameRect.maxY)
+    }
+    set {
+      DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
+        self.set(windowTopLeftPoint: newValue, bottomOutOfScreenAdjustmentHeight: 0)
+      }
+    }
+  }
 
-	public var keyLabels: [CandidateKeyLabel] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-		.map {
-			CandidateKeyLabel(key: $0, displayedText: $0)
-		}
+  public var keyLabels: [CandidateKeyLabel] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    .map {
+      CandidateKeyLabel(key: $0, displayedText: $0)
+    }
 
-	public var keyLabelFont: NSFont = NSFont.monospacedDigitSystemFont(
-		ofSize: 14, weight: .medium
-	)
-	public var candidateFont: NSFont = NSFont.systemFont(ofSize: 18)
-	public var tooltip: String = ""
+  public var keyLabelFont: NSFont = NSFont.monospacedDigitSystemFont(
+    ofSize: 14, weight: .medium
+  )
+  public var candidateFont: NSFont = NSFont.systemFont(ofSize: 18)
+  public var tooltip: String = ""
 
-	public func reloadData() {}
+  public func reloadData() {}
 
-	public func showNextPage() -> Bool {
-		false
-	}
+  public func showNextPage() -> Bool {
+    false
+  }
 
-	public func showPreviousPage() -> Bool {
-		false
-	}
+  public func showPreviousPage() -> Bool {
+    false
+  }
 
-	public func highlightNextCandidate() -> Bool {
-		false
-	}
+  public func highlightNextCandidate() -> Bool {
+    false
+  }
 
-	public func highlightPreviousCandidate() -> Bool {
-		false
-	}
+  public func highlightPreviousCandidate() -> Bool {
+    false
+  }
 
-	public func candidateIndexAtKeyLabelIndex(_: UInt) -> UInt {
-		UInt.max
-	}
+  public func candidateIndexAtKeyLabelIndex(_: UInt) -> UInt {
+    UInt.max
+  }
 
-	/// Sets the location of the candidate window.
-	///
-	/// Please note that the method has side effects that modifies
-	/// `windowTopLeftPoint` to make the candidate window to stay in at least
-	/// in a screen.
-	///
-	/// - Parameters:
-	///   - windowTopLeftPoint: The given location.
-	///   - height: The height that helps the window not to be out of the bottom
-	///     of a screen.
-	public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
-		DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
-			self.doSet(
-				windowTopLeftPoint: windowTopLeftPoint, bottomOutOfScreenAdjustmentHeight: height
-			)
-		}
-	}
+  /// Sets the location of the candidate window.
+  ///
+  /// Please note that the method has side effects that modifies
+  /// `windowTopLeftPoint` to make the candidate window to stay in at least
+  /// in a screen.
+  ///
+  /// - Parameters:
+  ///   - windowTopLeftPoint: The given location.
+  ///   - height: The height that helps the window not to be out of the bottom
+  ///     of a screen.
+  public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
+    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
+      self.doSet(
+        windowTopLeftPoint: windowTopLeftPoint, bottomOutOfScreenAdjustmentHeight: height
+      )
+    }
+  }
 
-	func doSet(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
-		var adjustedPoint = windowTopLeftPoint
-		var adjustedHeight = height
+  func doSet(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
+    var adjustedPoint = windowTopLeftPoint
+    var adjustedHeight = height
 
-		var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.zero
-		for screen in NSScreen.screens {
-			let frame = screen.visibleFrame
-			if windowTopLeftPoint.x >= frame.minX, windowTopLeftPoint.x <= frame.maxX,
-				windowTopLeftPoint.y >= frame.minY, windowTopLeftPoint.y <= frame.maxY
-			{
-				screenFrame = frame
-				break
-			}
-		}
+    var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.zero
+    for screen in NSScreen.screens {
+      let frame = screen.visibleFrame
+      if windowTopLeftPoint.x >= frame.minX, windowTopLeftPoint.x <= frame.maxX,
+        windowTopLeftPoint.y >= frame.minY, windowTopLeftPoint.y <= frame.maxY
+      {
+        screenFrame = frame
+        break
+      }
+    }
 
-		if adjustedHeight > screenFrame.size.height / 2.0 {
-			adjustedHeight = 0.0
-		}
+    if adjustedHeight > screenFrame.size.height / 2.0 {
+      adjustedHeight = 0.0
+    }
 
-		let windowSize = window?.frame.size ?? NSSize.zero
+    let windowSize = window?.frame.size ?? NSSize.zero
 
-		// bottom beneath the screen?
-		if adjustedPoint.y - windowSize.height < screenFrame.minY {
-			adjustedPoint.y = windowTopLeftPoint.y + adjustedHeight + windowSize.height
-		}
+    // bottom beneath the screen?
+    if adjustedPoint.y - windowSize.height < screenFrame.minY {
+      adjustedPoint.y = windowTopLeftPoint.y + adjustedHeight + windowSize.height
+    }
 
-		// top over the screen?
-		if adjustedPoint.y >= screenFrame.maxY {
-			adjustedPoint.y = screenFrame.maxY - 1.0
-		}
+    // top over the screen?
+    if adjustedPoint.y >= screenFrame.maxY {
+      adjustedPoint.y = screenFrame.maxY - 1.0
+    }
 
-		// right
-		if adjustedPoint.x + windowSize.width >= screenFrame.maxX {
-			adjustedPoint.x = screenFrame.maxX - windowSize.width
-		}
+    // right
+    if adjustedPoint.x + windowSize.width >= screenFrame.maxX {
+      adjustedPoint.x = screenFrame.maxX - windowSize.width
+    }
 
-		// left
-		if adjustedPoint.x < screenFrame.minX {
-			adjustedPoint.x = screenFrame.minX
-		}
+    // left
+    if adjustedPoint.x < screenFrame.minX {
+      adjustedPoint.x = screenFrame.minX
+    }
 
-		window?.setFrameTopLeftPoint(adjustedPoint)
-	}
+    window?.setFrameTopLeftPoint(adjustedPoint)
+  }
 }

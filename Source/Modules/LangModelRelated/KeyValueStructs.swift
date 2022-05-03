@@ -25,39 +25,39 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Foundation
 
 extension vChewing {
-	@frozen public struct KeyValue: Equatable {
-		var key: String
-		var value: String
+  @frozen public struct KeyValue: Equatable {
+    var key: String
+    var value: String
 
-		public init(key: String = "", value: String = "") {
-			self.key = key
-			self.value = value
-		}
+    public init(key: String = "", value: String = "") {
+      self.key = key
+      self.value = value
+    }
 
-		public static func == (lhs: KeyValue, rhs: KeyValue) -> Bool {
-			lhs.key == rhs.key && lhs.value == rhs.value
-		}
-	}
+    public static func == (lhs: KeyValue, rhs: KeyValue) -> Bool {
+      lhs.key == rhs.key && lhs.value == rhs.value
+    }
+  }
 
-	@frozen public struct KeyValueRate: Equatable {
-		var key: String
-		var value: String
-		var rate: Double
+  @frozen public struct KeyValueRate: Equatable {
+    var key: String
+    var value: String
+    var rate: Double
 
-		public init(key: String = "", value: String = "", rate: Double = 0.0) {
-			self.key = key
-			self.value = value
-			self.rate = rate
-		}
+    public init(key: String = "", value: String = "", rate: Double = 0.0) {
+      self.key = key
+      self.value = value
+      self.rate = rate
+    }
 
-		public init(keyValue: KeyValue = KeyValue(key: "", value: ""), rate: Double = 0.0) {
-			key = keyValue.key
-			value = keyValue.value
-			self.rate = rate
-		}
+    public init(keyValue: KeyValue = KeyValue(key: "", value: ""), rate: Double = 0.0) {
+      key = keyValue.key
+      value = keyValue.value
+      self.rate = rate
+    }
 
-		public static func == (lhs: KeyValueRate, rhs: KeyValueRate) -> Bool {
-			lhs.key == rhs.key && lhs.value == rhs.value && lhs.rate == rhs.rate
-		}
-	}
+    public static func == (lhs: KeyValueRate, rhs: KeyValueRate) -> Bool {
+      lhs.key == rhs.key && lhs.value == rhs.value && lhs.rate == rhs.rate
+    }
+  }
 }
