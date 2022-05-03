@@ -73,7 +73,7 @@ public class IME: NSObject {
       mgrLangModel.loadUserPhrases()
     }
     if !userOnly {
-      mgrLangModel.loadDataModels()  // 這句還是不要砍了。
+      // mgrLangModel.loadDataModels()
     }
   }
 
