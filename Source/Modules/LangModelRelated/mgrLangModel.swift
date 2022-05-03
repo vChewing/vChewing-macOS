@@ -403,13 +403,15 @@ class mgrLangModel: NSObject {
 				// module shipped in the vChewing Phrase Editor.
 				currentMarkedPhrase += "\t#𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎"
 			}
-			currentMarkedPhrase += "\n"
 
 			if let writeFile = FileHandle(forUpdatingAtPath: path),
-				let data = currentMarkedPhrase.data(using: .utf8)
+				let data = currentMarkedPhrase.data(using: .utf8),
+				let endl = "\n".data(using: .utf8)
 			{
 				writeFile.seekToEndOfFile()
+				writeFile.write(endl)
 				writeFile.write(data)
+				writeFile.write(endl)
 				writeFile.closeFile()
 			} else {
 				return false
