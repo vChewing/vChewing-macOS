@@ -31,17 +31,10 @@ import Cocoa
 /// 同時，這些變數不對外開放任意存取權限。
 /// 我們只在 mgrLangModel 內部寫幾個回傳函數、供其餘控制模組來讀取。
 
-private let kUserOverrideModelCapacity: Int = 500
-private let kObservedOverrideHalflife: Double = 5400.0
-
 private var gLangModelCHS = vChewing.LMInstantiator()
 private var gLangModelCHT = vChewing.LMInstantiator()
-private var gUserOverrideModelCHS = vChewing.LMUserOverride(
-	capacity: kUserOverrideModelCapacity, decayExponent: kObservedOverrideHalflife
-)
-private var gUserOverrideModelCHT = vChewing.LMUserOverride(
-	capacity: kUserOverrideModelCapacity, decayExponent: kObservedOverrideHalflife
-)
+private var gUserOverrideModelCHS = vChewing.LMUserOverride()
+private var gUserOverrideModelCHT = vChewing.LMUserOverride()
 
 class mgrLangModel: NSObject {
 	/// 寫幾個回傳函數、供其餘控制模組來讀取那些被設為 fileprivate 的器外變數。

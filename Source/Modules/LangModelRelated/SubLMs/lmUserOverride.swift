@@ -28,11 +28,52 @@ import Foundation
 
 extension vChewing {
 	public class LMUserOverride {
+
+		// MARK: - Private Structures
+
+		var mutCapacity: Int
+		var mutDecayExponent: Double
+		var mutLRUList = [KeyObservationPair]()
+		var mutLRUMap: [String: KeyObservationPair] = [:]
 		let kDecayThreshold: Double = 1.0 / 1_048_576.0
 
-		public init(capacity: Int = 0, decayExponent: Double = 0) {
-			mutCapacity = capacity
-			mutDecayExponent = decayExponent
+		struct Override {
+			var count: Int = 0
+			var timestamp: Double = 0.0
+		}
+
+		struct Observation {
+			var count: Int = 0
+			var overrides: [String: Override] = [:]
+
+			mutating func update(candidate: String, timestamp: Double) {
+				count += 1
+				if var neta = overrides[candidate] {
+					neta.timestamp = timestamp
+					neta.count += 1
+				}
+			}
+		}
+
+		struct KeyObservationPair: Equatable {
+			var key: String
+			var observation: Observation
+
+			var hashValue: Int { key.hashValue }
+
+			init(key: String, observation: Observation) {
+				self.key = key
+				self.observation = observation
+			}
+
+			static func == (lhs: KeyObservationPair, rhs: KeyObservationPair) -> Bool {
+				lhs.key == rhs.key
+			}
+		}
+
+		public init(capacity: Int = 500, decayConstant: Double = 5400.0) {
+			mutCapacity = abs(capacity)  // Ensures that this value is always > 0.
+			mutDecayExponent = log(0.5) / decayConstant
 		}
 
 		public func observe(
@@ -42,24 +83,23 @@ extension vChewing {
 			timestamp: Double
 		) {
 			let key = getWalkedNodesToKey(walkedNodes: walkedNodes, cursorIndex: cursorIndex)
-			if mutLRUMap[key] == nil {
-				let keyValuePair = KeyObservationPair(key: key, observation: Observation())
-				var observation: Observation = keyValuePair.observation
+			guard key != "((),(),())" else { return }
+			guard let map = mutLRUMap[key] else {
+				var observation: Observation = .init()
 				observation.update(candidate: candidate, timestamp: timestamp)
-
-				mutLRUList.insert(keyValuePair, at: 0)
 				mutLRUMap[key] = KeyObservationPair(key: key, observation: observation)
+				mutLRUList.insert(KeyObservationPair(key: key, observation: observation), at: 0)
 
 				if mutLRUList.count > mutCapacity {
 					mutLRUMap[mutLRUList.reversed()[0].key] = nil
 					mutLRUList.removeLast()
 				}
-			} else {
-				var obs = mutLRUMap[key]!.observation
-				obs.update(candidate: candidate, timestamp: timestamp)
-				let pair = KeyObservationPair.init(key: key, observation: obs)
-				mutLRUList.insert(pair, at: 0)
+				return
 			}
+			var obs = map.observation
+			obs.update(candidate: candidate, timestamp: timestamp)
+			let pair = KeyObservationPair.init(key: key, observation: obs)
+			mutLRUList.insert(pair, at: 0)
 		}
 
 		public func suggest(
@@ -71,6 +111,12 @@ extension vChewing {
 			guard let keyValuePair = mutLRUMap[key] else {
 				return ""
 			}
+
+			IME.prtDebugIntel("Suggest - A: \(key)")
+			IME.prtDebugIntel("Suggest - B: \(keyValuePair.key)")
+
+			guard key != "((),(),())" else { return "" }
+
 			let observation = keyValuePair.observation
 
 			var candidate = ""
@@ -119,104 +165,52 @@ extension vChewing {
 		func getWalkedNodesToKey(
 			walkedNodes: [Megrez.NodeAnchor], cursorIndex: Int
 		) -> String {
-			var s = ""
-			var n: [Megrez.NodeAnchor] = []
-			var ll = 0
-			for i in walkedNodes {
-				let nn = i
-				n.append(nn)
-				ll += nn.spanningLength
-				if ll >= cursorIndex {
+			var strOutput = ""
+			var arrNodes: [Megrez.NodeAnchor] = []
+			var intLength = 0
+			for nodeNeta in walkedNodes {
+				arrNodes.append(nodeNeta)
+				intLength += nodeNeta.spanningLength
+				if intLength >= cursorIndex {
 					break
 				}
 			}
 
-			var r: [Megrez.NodeAnchor] = []
-			r.append(contentsOf: n.reversed())
+			// 一個被 .reversed 過的陣列不能直接使用，因為不是正常的 Swift 陣列。
+			// 那就新開一個正常的陣列、然後將內容拓印過去。
+			var arrNodesReversed: [Megrez.NodeAnchor] = []
+			arrNodesReversed.append(contentsOf: arrNodes.reversed())
 
-			if r.isEmpty {
+			if arrNodesReversed.isEmpty {
 				return ""
 			}
 
-			if let theAnchor = r.first, theAnchor.node != nil {
-				let theNode = theAnchor.node!
-				let current = theNode.currentKeyValue().key
-				r.removeFirst()
+			var strCurrent = "()"
+			var strPrev = "()"
+			var strAnterior = "()"
 
-				s = ""  // 保險起見，這裡也清空 s。
-				if !r.isEmpty {
-					let value = theNode.currentKeyValue().value
-					if isEndingPunctuation(value: value) {
-						s = "()"
-						r = []
-					} else {
-						s = "(\(theNode.currentKeyValue().key),\(value))"
-						r.removeFirst()
+			for (theIndex, theAnchor) in arrNodesReversed.enumerated() {
+				if strCurrent != "()", let nodeCurrent = theAnchor.node {
+					let keyCurrent = nodeCurrent.currentKeyValue().key
+					let valCurrent = nodeCurrent.currentKeyValue().value
+					strCurrent = "(\(keyCurrent), \(valCurrent))"
+					if let nodePrev = arrNodesReversed[theIndex + 1].node {
+						let keyPrev = nodePrev.currentKeyValue().key
+						let valPrev = nodePrev.currentKeyValue().value
+						strPrev = "(\(keyPrev), \(valPrev))"
 					}
-				} else {
-					s = "()"
-				}
-				let prev = s
-
-				s = ""
-				if !r.isEmpty {
-					let value = theNode.currentKeyValue().value
-					if isEndingPunctuation(value: value) {
-						s = "()"
-						r = []
-					} else {
-						s = "(\(theNode.currentKeyValue().key),\(value))"
-						r.removeFirst()
+					if let nodeAnterior = arrNodesReversed[theIndex + 2].node {
+						let keyAnterior = nodeAnterior.currentKeyValue().key
+						let valAnterior = nodeAnterior.currentKeyValue().value
+						strAnterior = "(\(keyAnterior), \(valAnterior))"
 					}
-				} else {
-					s = "()"
-				}
-				let anterior = s
-
-				s = "(\(anterior),\(prev),\(current))"
-			}
-			return s
-		}
-
-		// MARK: - Private Structures
-
-		var mutCapacity: Int
-		var mutDecayExponent: Double
-		var mutLRUList = [KeyObservationPair]()
-		var mutLRUMap: [String: KeyObservationPair] = [:]
-
-		struct Override {
-			var count: Int = 0
-			var timestamp: Double = 0.0
-		}
-
-		struct Observation {
-			var count: Int = 0
-			var overrides: [String: Override] = [:]
-
-			mutating func update(candidate: String, timestamp: Double) {
-				count += 1
-				if var neta = overrides[candidate] {
-					neta.timestamp = timestamp
-					neta.count += 1
+					break  // 我們只取第一個有效結果。
 				}
 			}
-		}
 
-		struct KeyObservationPair: Equatable {
-			var key: String
-			var observation: Observation
+			strOutput = "(\(strAnterior),\(strPrev),\(strCurrent))"
 
-			var hashValue: Int { key.hashValue }
-
-			init(key: String, observation: Observation) {
-				self.key = key
-				self.observation = observation
-			}
-
-			static func == (lhs: KeyObservationPair, rhs: KeyObservationPair) -> Bool {
-				lhs.key == rhs.key
-			}
+			return strOutput
 		}
 	}
 }
