@@ -27,7 +27,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Foundation
 
 extension vChewing {
-  public class LMCore {
+  @frozen public struct LMCore {
     var keyValueScoreMap: [String: [Megrez.Unigram]] = [:]
     var theData: String = ""
     var shouldReverse: Bool = false
@@ -47,17 +47,11 @@ extension vChewing {
       shouldForceDefaultScore = forceDefaultScore
     }
 
-    deinit {
-      if isLoaded() {
-        close()
-      }
-    }
-
     public func isLoaded() -> Bool {
       !keyValueScoreMap.isEmpty
     }
 
-    @discardableResult public func open(_ path: String) -> Bool {
+    @discardableResult mutating public func open(_ path: String) -> Bool {
       if isLoaded() {
         return false
       }
@@ -132,7 +126,7 @@ extension vChewing {
       return true
     }
 
-    public func close() {
+    mutating public func close() {
       if isLoaded() {
         keyValueScoreMap.removeAll()
       }
@@ -152,17 +146,17 @@ extension vChewing {
       IME.prtDebugIntel(strDump)
     }
 
-    open func bigramsForKeys(precedingKey: String, key: String) -> [Megrez.Bigram] {
+    public func bigramsForKeys(precedingKey: String, key: String) -> [Megrez.Bigram] {
       // 這裡用了點廢話處理，不然函數構建體會被 Swift 格式整理工具給毀掉。
       // 其實只要一句「[Megrez.Bigram]()」就夠了。
       precedingKey == key ? [Megrez.Bigram]() : [Megrez.Bigram]()
     }
 
-    open func unigramsFor(key: String) -> [Megrez.Unigram] {
+    public func unigramsFor(key: String) -> [Megrez.Unigram] {
       keyValueScoreMap[key] ?? [Megrez.Unigram]()
     }
 
-    open func hasUnigramsFor(key: String) -> Bool {
+    public func hasUnigramsFor(key: String) -> Bool {
       keyValueScoreMap[key] != nil
     }
   }

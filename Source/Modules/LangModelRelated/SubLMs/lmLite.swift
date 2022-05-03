@@ -27,7 +27,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Foundation
 
 extension vChewing {
-  public class LMLite {
+  @frozen public struct LMLite {
     var keyValueMap: [String: [Megrez.KeyValuePair]] = [:]
     var theData: String = ""
     var allowConsolidation = false
@@ -38,17 +38,11 @@ extension vChewing {
       allowConsolidation = consolidate
     }
 
-    deinit {
-      if isLoaded() {
-        close()
-      }
-    }
-
     public func isLoaded() -> Bool {
       !keyValueMap.isEmpty
     }
 
-    @discardableResult public func open(_ path: String) -> Bool {
+    @discardableResult mutating public func open(_ path: String) -> Bool {
       if isLoaded() {
         return false
       }
@@ -105,7 +99,7 @@ extension vChewing {
       return true
     }
 
-    public func close() {
+    mutating public func close() {
       if isLoaded() {
         keyValueMap.removeAll()
       }

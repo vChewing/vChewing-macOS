@@ -27,7 +27,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Foundation
 
 extension vChewing {
-  public class LMAssociates {
+  @frozen public struct LMAssociates {
     var keyValueMap: [String: [Megrez.KeyValuePair]] = [:]
     var theData: String = ""
 
@@ -36,17 +36,11 @@ extension vChewing {
       theData = ""
     }
 
-    deinit {
-      if isLoaded() {
-        close()
-      }
-    }
-
     public func isLoaded() -> Bool {
       !keyValueMap.isEmpty
     }
 
-    @discardableResult public func open(_ path: String) -> Bool {
+    @discardableResult mutating public func open(_ path: String) -> Bool {
       if isLoaded() {
         return false
       }
@@ -98,7 +92,7 @@ extension vChewing {
       return true
     }
 
-    public func close() {
+    mutating public func close() {
       if isLoaded() {
         keyValueMap.removeAll()
       }
