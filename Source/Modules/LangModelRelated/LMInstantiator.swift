@@ -193,6 +193,9 @@ extension vChewing {
       // 這樣一來就可以在就地新增語彙時徹底複寫優先權。
       // 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
       rawAllUnigrams += lmUserPhrases.unigramsFor(key: key, score: 0.0).reversed()
+      if lmUserPhrases.unigramsFor(key: key).isEmpty {
+        IME.prtDebugIntel("Not found in UserPhrasesUnigram(\(lmUserPhrases.count)): \(key)")
+      }
 
       // LMMisc 與 LMCore 的 score 在 (-10.0, 0.0) 這個區間內。
       rawAllUnigrams += lmMisc.unigramsFor(key: key)
@@ -205,13 +208,10 @@ extension vChewing {
       if isSymbolEnabled {
         rawAllUnigrams += lmUserSymbols.unigramsFor(key: key, score: -12.0)
         if lmUserSymbols.unigramsFor(key: key).isEmpty {
-          IME.prtDebugIntel("Not found in UserSymbolUnigram: \(key)")
+          IME.prtDebugIntel("Not found in UserSymbolUnigram(\(lmUserSymbols.count)): \(key)")
         }
 
         rawAllUnigrams += lmSymbols.unigramsFor(key: key)
-        if lmSymbols.unigramsFor(key: key).isEmpty {
-          IME.prtDebugIntel("Not found in UserUnigram: \(key)")
-        }
       }
 
       // 準備過濾清單與統計清單
@@ -222,6 +222,15 @@ extension vChewing {
       for unigram in lmFiltered.unigramsFor(key: key) {
         filteredPairs.insert(unigram.keyValue)
       }
+
+      var debugOutput = "\n"
+      for neta in rawAllUnigrams {
+        debugOutput += "RAW: \(neta.keyValue.key) \(neta.keyValue.value) \(neta.score)\n"
+      }
+      if debugOutput == "\n" {
+        debugOutput = "RAW: No match found in all unigrams."
+      }
+      IME.prtDebugIntel(debugOutput)
 
       return filterAndTransform(
         unigrams: rawAllUnigrams,
