@@ -64,15 +64,17 @@ public class IME: NSObject {
 	// MARK: - Initializing Language Models.
 
 	static func initLangModels(userOnly: Bool) {
+		DispatchQueue.global(qos: .userInitiated).async {
+			// mgrLangModel 的 loadUserPhrases 等函數在自動讀取 dataFolderPath 時，
+			// 如果發現自訂目錄不可用，則會自動抹去自訂目錄設定、改採預設目錄。
+			// 所以這裡不需要特別處理。
+			mgrLangModel.loadUserAssociatedPhrases()
+			mgrLangModel.loadUserPhraseReplacement()
+			mgrLangModel.loadUserPhrases()
+		}
 		if !userOnly {
 			mgrLangModel.loadDataModels()  // 這句還是不要砍了。
 		}
-		// mgrLangModel 的 loadUserPhrases 等函數在自動讀取 dataFolderPath 時，
-		// 如果發現自訂目錄不可用，則會自動抹去自訂目錄設定、改採預設目錄。
-		// 所以這裡不需要特別處理。
-		mgrLangModel.loadUserPhrases()
-		mgrLangModel.loadUserPhraseReplacement()
-		mgrLangModel.loadUserAssociatedPhrases()
 	}
 
 	// MARK: - System Dark Mode Status Detector.
