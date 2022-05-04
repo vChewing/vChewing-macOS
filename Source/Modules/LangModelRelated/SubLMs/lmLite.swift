@@ -46,6 +46,7 @@ extension vChewing {
 
     @discardableResult public mutating func open(_ path: String) -> Bool {
       if isLoaded() {
+        IME.prtDebugIntel("Not loading this one due to isLoaded result of true: \(path)")
         return false
       }
 
@@ -85,10 +86,6 @@ extension vChewing {
           keyValueMap[currentKV.key, default: []].append(currentKV)
         }
       }
-      IME.prtDebugIntel("\(count) entries of data loaded from: \(path)")
-      if path.contains("vChewing/") {
-        dump()
-      }
       return true
     }
 
@@ -101,7 +98,7 @@ extension vChewing {
     public func dump() {
       var strDump = ""
       for entry in keyValueMap {
-        let rows: [Megrez.KeyValuePair] = entry.1
+        let rows: [Megrez.KeyValuePair] = entry.value
         for row in rows {
           let addline = row.key + " " + row.value + "\n"
           strDump += addline

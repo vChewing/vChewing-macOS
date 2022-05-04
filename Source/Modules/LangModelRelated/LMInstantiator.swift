@@ -109,6 +109,10 @@ extension vChewing {
       if FileManager.default.isReadableFile(atPath: path) {
         lmCore.close()
         lmCore.open(path)
+        IME.prtDebugIntel("lmCore: \(lmCore.count) entries of data loaded from: \(path)")
+        if path.contains("vChewing/") {
+          lmCore.dump()
+        }
       }
     }
 
@@ -117,6 +121,10 @@ extension vChewing {
       if FileManager.default.isReadableFile(atPath: path) {
         lmCNS.close()
         lmCNS.open(path)
+        IME.prtDebugIntel("lmCNS: \(lmCNS.count) entries of data loaded from: \(path)")
+        if path.contains("vChewing/") {
+          lmCNS.dump()
+        }
       }
     }
 
@@ -125,6 +133,10 @@ extension vChewing {
       if FileManager.default.isReadableFile(atPath: path) {
         lmMisc.close()
         lmMisc.open(path)
+        IME.prtDebugIntel("lmMisc: \(lmMisc.count) entries of data loaded from: \(path)")
+        if path.contains("vChewing/") {
+          lmMisc.dump()
+        }
       }
     }
 
@@ -133,6 +145,10 @@ extension vChewing {
       if FileManager.default.isReadableFile(atPath: path) {
         lmSymbols.close()
         lmSymbols.open(path)
+        IME.prtDebugIntel("lmSymbol: \(lmSymbols.count) entries of data loaded from: \(path)")
+        if path.contains("vChewing/") {
+          lmSymbols.dump()
+        }
       }
     }
 
@@ -140,10 +156,18 @@ extension vChewing {
       if FileManager.default.isReadableFile(atPath: path) {
         lmUserPhrases.close()
         lmUserPhrases.open(path)
+        IME.prtDebugIntel("lmUserPhrases: \(lmUserPhrases.count) entries of data loaded from: \(path)")
+        if path.contains("vChewing/") {
+          lmUserPhrases.dump()
+        }
       }
       if FileManager.default.isReadableFile(atPath: filterPath) {
         lmFiltered.close()
         lmFiltered.open(filterPath)
+        IME.prtDebugIntel("lmFiltered: \(lmFiltered.count) entries of data loaded from: \(path)")
+        if path.contains("vChewing/") {
+          lmFiltered.dump()
+        }
       }
     }
 
@@ -151,6 +175,10 @@ extension vChewing {
       if FileManager.default.isReadableFile(atPath: path) {
         lmUserSymbols.close()
         lmUserSymbols.open(path)
+        IME.prtDebugIntel("lmUserSymbol: \(lmUserSymbols.count) entries of data loaded from: \(path)")
+        if path.contains("vChewing/") {
+          lmUserSymbols.dump()
+        }
       }
     }
 
@@ -158,6 +186,10 @@ extension vChewing {
       if FileManager.default.isReadableFile(atPath: path) {
         lmAssociates.close()
         lmAssociates.open(path)
+        IME.prtDebugIntel("lmAssociates: \(lmAssociates.count) entries of data loaded from: \(path)")
+        if path.contains("vChewing/") {
+          lmAssociates.dump()
+        }
       }
     }
 
@@ -165,6 +197,10 @@ extension vChewing {
       if FileManager.default.isReadableFile(atPath: path) {
         lmReplacements.close()
         lmReplacements.open(path)
+        IME.prtDebugIntel("lmReplacements: \(lmReplacements.count) entries of data loaded from: \(path)")
+        if path.contains("vChewing/") {
+          lmReplacements.dump()
+        }
       }
     }
 

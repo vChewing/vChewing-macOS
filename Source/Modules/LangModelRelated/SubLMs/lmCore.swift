@@ -115,7 +115,6 @@ extension vChewing {
           keyValueScoreMap[key, default: []].append(currentUnigram)
         }
       }
-      IME.prtDebugIntel("\(count) entries of data loaded from: \(path)")
       return true
     }
 
@@ -130,7 +129,7 @@ extension vChewing {
     public func dump() {
       var strDump = ""
       for entry in keyValueScoreMap {
-        let rows: [Megrez.Unigram] = entry.1
+        let rows: [Megrez.Unigram] = entry.value
         for row in rows {
           let addline = row.keyValue.key + " " + row.keyValue.value + " " + String(row.score) + "\n"
           strDump += addline

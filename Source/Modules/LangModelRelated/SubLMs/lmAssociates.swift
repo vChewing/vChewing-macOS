@@ -81,7 +81,6 @@ extension vChewing {
           keyValueMap[currentKV.key, default: []].append(currentKV)
         }
       }
-      IME.prtDebugIntel("\(count) entries of data loaded from: \(path)")
       return true
     }
 
@@ -89,6 +88,18 @@ extension vChewing {
       if isLoaded() {
         keyValueMap.removeAll()
       }
+    }
+
+    public func dump() {
+      var strDump = ""
+      for entry in keyValueMap {
+        let rows: [Megrez.KeyValuePair] = entry.value
+        for row in rows {
+          let addline = row.key + " " + row.value + "\n"
+          strDump += addline
+        }
+      }
+      IME.prtDebugIntel(strDump)
     }
 
     public func valuesFor(key: String) -> [String]? {
