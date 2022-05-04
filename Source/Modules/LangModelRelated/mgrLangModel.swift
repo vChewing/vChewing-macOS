@@ -268,7 +268,7 @@ class mgrLangModel: NSObject {
         do {
           try templateData.write(to: URL(fileURLWithPath: filePath))
         } catch {
-          IME.prtDebugIntel("Failed to write file")
+          IME.prtDebugIntel("Failed to write template data to: \(filePath)")
           return false
         }
       }
