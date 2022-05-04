@@ -30,267 +30,267 @@ import Cocoa
 // Please note that the class should be exposed using the same class name
 // in Objective-C in order to let IMK to see the same class name as
 // the "InputMethodServerPreferencesWindowControllerClass" in Info.plist.
-@objc(ctlPrefWindow) class ctlPrefWindow: NSWindowController {
-	@IBOutlet var fontSizePopUpButton: NSPopUpButton!
-	@IBOutlet var uiLanguageButton: NSPopUpButton!
-	@IBOutlet var basicKeyboardLayoutButton: NSPopUpButton!
-	@IBOutlet var selectionKeyComboBox: NSComboBox!
-	@IBOutlet var chkTrad2KangXi: NSButton!
-	@IBOutlet var chkTrad2JISShinjitai: NSButton!
-	@IBOutlet var lblCurrentlySpecifiedUserDataFolder: NSTextFieldCell!
+class ctlPrefWindow: NSWindowController {
+  @IBOutlet var fontSizePopUpButton: NSPopUpButton!
+  @IBOutlet var uiLanguageButton: NSPopUpButton!
+  @IBOutlet var basicKeyboardLayoutButton: NSPopUpButton!
+  @IBOutlet var selectionKeyComboBox: NSComboBox!
+  @IBOutlet var chkTrad2KangXi: NSButton!
+  @IBOutlet var chkTrad2JISShinjitai: NSButton!
+  @IBOutlet var lblCurrentlySpecifiedUserDataFolder: NSTextFieldCell!
 
-	var currentLanguageSelectItem: NSMenuItem?
+  var currentLanguageSelectItem: NSMenuItem?
 
-	override func windowDidLoad() {
-		super.windowDidLoad()
+  override func windowDidLoad() {
+    super.windowDidLoad()
 
-		lblCurrentlySpecifiedUserDataFolder.placeholderString = mgrLangModel.dataFolderPath(
-			isDefaultFolder: true)
+    lblCurrentlySpecifiedUserDataFolder.placeholderString = mgrLangModel.dataFolderPath(
+      isDefaultFolder: true)
 
-		let languages = ["auto", "en", "zh-Hans", "zh-Hant", "ja"]
-		var autoMUISelectItem: NSMenuItem?
-		var chosenLanguageItem: NSMenuItem?
-		uiLanguageButton.menu?.removeAllItems()
+    let languages = ["auto", "en", "zh-Hans", "zh-Hant", "ja"]
+    var autoMUISelectItem: NSMenuItem?
+    var chosenLanguageItem: NSMenuItem?
+    uiLanguageButton.menu?.removeAllItems()
 
-		let appleLanguages = mgrPrefs.appleLanguages
-		for language in languages {
-			let menuItem = NSMenuItem()
-			menuItem.title = NSLocalizedString(language, comment: language)
-			menuItem.representedObject = language
+    let appleLanguages = mgrPrefs.appleLanguages
+    for language in languages {
+      let menuItem = NSMenuItem()
+      menuItem.title = NSLocalizedString(language, comment: language)
+      menuItem.representedObject = language
 
-			if language == "auto" {
-				autoMUISelectItem = menuItem
-			}
+      if language == "auto" {
+        autoMUISelectItem = menuItem
+      }
 
-			if !appleLanguages.isEmpty {
-				if appleLanguages[0] == language {
-					chosenLanguageItem = menuItem
-				}
-			}
-			uiLanguageButton.menu?.addItem(menuItem)
-		}
+      if !appleLanguages.isEmpty {
+        if appleLanguages[0] == language {
+          chosenLanguageItem = menuItem
+        }
+      }
+      uiLanguageButton.menu?.addItem(menuItem)
+    }
 
-		currentLanguageSelectItem = chosenLanguageItem ?? autoMUISelectItem
-		uiLanguageButton.select(currentLanguageSelectItem)
+    currentLanguageSelectItem = chosenLanguageItem ?? autoMUISelectItem
+    uiLanguageButton.select(currentLanguageSelectItem)
 
-		let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
-		var usKeyboardLayoutItem: NSMenuItem?
-		var chosenBaseKeyboardLayoutItem: NSMenuItem?
+    let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
+    var usKeyboardLayoutItem: NSMenuItem?
+    var chosenBaseKeyboardLayoutItem: NSMenuItem?
 
-		basicKeyboardLayoutButton.menu?.removeAllItems()
+    basicKeyboardLayoutButton.menu?.removeAllItems()
 
-		let itmAppleZhuyinBopomofo = NSMenuItem()
-		itmAppleZhuyinBopomofo.title = String(
-			format: NSLocalizedString("Apple Zhuyin Bopomofo (Dachen)", comment: ""))
-		itmAppleZhuyinBopomofo.representedObject = String(
-			"com.apple.keylayout.ZhuyinBopomofo")
-		basicKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinBopomofo)
+    let itmAppleZhuyinBopomofo = NSMenuItem()
+    itmAppleZhuyinBopomofo.title = String(
+      format: NSLocalizedString("Apple Zhuyin Bopomofo (Dachen)", comment: ""))
+    itmAppleZhuyinBopomofo.representedObject = String(
+      "com.apple.keylayout.ZhuyinBopomofo")
+    basicKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinBopomofo)
 
-		let itmAppleZhuyinEten = NSMenuItem()
-		itmAppleZhuyinEten.title = String(
-			format: NSLocalizedString("Apple Zhuyin Eten (Traditional)", comment: ""))
-		itmAppleZhuyinEten.representedObject = String("com.apple.keylayout.ZhuyinEten")
-		basicKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinEten)
+    let itmAppleZhuyinEten = NSMenuItem()
+    itmAppleZhuyinEten.title = String(
+      format: NSLocalizedString("Apple Zhuyin Eten (Traditional)", comment: ""))
+    itmAppleZhuyinEten.representedObject = String("com.apple.keylayout.ZhuyinEten")
+    basicKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinEten)
 
-		let basicKeyboardLayoutID = mgrPrefs.basicKeyboardLayout
+    let basicKeyboardLayoutID = mgrPrefs.basicKeyboardLayout
 
-		for source in list {
-			if let categoryPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceCategory) {
-				let category = Unmanaged<CFString>.fromOpaque(categoryPtr).takeUnretainedValue()
-				if category != kTISCategoryKeyboardInputSource {
-					continue
-				}
-			} else {
-				continue
-			}
+    for source in list {
+      if let categoryPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceCategory) {
+        let category = Unmanaged<CFString>.fromOpaque(categoryPtr).takeUnretainedValue()
+        if category != kTISCategoryKeyboardInputSource {
+          continue
+        }
+      } else {
+        continue
+      }
 
-			if let asciiCapablePtr = TISGetInputSourceProperty(
-				source, kTISPropertyInputSourceIsASCIICapable
-			) {
-				let asciiCapable = Unmanaged<CFBoolean>.fromOpaque(asciiCapablePtr)
-					.takeUnretainedValue()
-				if asciiCapable != kCFBooleanTrue {
-					continue
-				}
-			} else {
-				continue
-			}
+      if let asciiCapablePtr = TISGetInputSourceProperty(
+        source, kTISPropertyInputSourceIsASCIICapable
+      ) {
+        let asciiCapable = Unmanaged<CFBoolean>.fromOpaque(asciiCapablePtr)
+          .takeUnretainedValue()
+        if asciiCapable != kCFBooleanTrue {
+          continue
+        }
+      } else {
+        continue
+      }
 
-			if let sourceTypePtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceType) {
-				let sourceType = Unmanaged<CFString>.fromOpaque(sourceTypePtr).takeUnretainedValue()
-				if sourceType != kTISTypeKeyboardLayout {
-					continue
-				}
-			} else {
-				continue
-			}
+      if let sourceTypePtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceType) {
+        let sourceType = Unmanaged<CFString>.fromOpaque(sourceTypePtr).takeUnretainedValue()
+        if sourceType != kTISTypeKeyboardLayout {
+          continue
+        }
+      } else {
+        continue
+      }
 
-			guard let sourceIDPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceID),
-				let localizedNamePtr = TISGetInputSourceProperty(source, kTISPropertyLocalizedName)
-			else {
-				continue
-			}
+      guard let sourceIDPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceID),
+        let localizedNamePtr = TISGetInputSourceProperty(source, kTISPropertyLocalizedName)
+      else {
+        continue
+      }
 
-			let sourceID = String(Unmanaged<CFString>.fromOpaque(sourceIDPtr).takeUnretainedValue())
-			let localizedName = String(
-				Unmanaged<CFString>.fromOpaque(localizedNamePtr).takeUnretainedValue())
+      let sourceID = String(Unmanaged<CFString>.fromOpaque(sourceIDPtr).takeUnretainedValue())
+      let localizedName = String(
+        Unmanaged<CFString>.fromOpaque(localizedNamePtr).takeUnretainedValue())
 
-			let menuItem = NSMenuItem()
-			menuItem.title = localizedName
-			menuItem.representedObject = sourceID
+      let menuItem = NSMenuItem()
+      menuItem.title = localizedName
+      menuItem.representedObject = sourceID
 
-			if sourceID == "com.apple.keylayout.US" {
-				usKeyboardLayoutItem = menuItem
-			}
-			if basicKeyboardLayoutID == sourceID {
-				chosenBaseKeyboardLayoutItem = menuItem
-			}
-			if IME.arrWhitelistedKeyLayoutsASCII.contains(sourceID) || sourceID.contains("vChewing") {
-				basicKeyboardLayoutButton.menu?.addItem(menuItem)
-			}
-		}
+      if sourceID == "com.apple.keylayout.US" {
+        usKeyboardLayoutItem = menuItem
+      }
+      if basicKeyboardLayoutID == sourceID {
+        chosenBaseKeyboardLayoutItem = menuItem
+      }
+      if IME.arrWhitelistedKeyLayoutsASCII.contains(sourceID) || sourceID.contains("vChewing") {
+        basicKeyboardLayoutButton.menu?.addItem(menuItem)
+      }
+    }
 
-		switch basicKeyboardLayoutID {
-			case "com.apple.keylayout.ZhuyinBopomofo":
-				chosenBaseKeyboardLayoutItem = itmAppleZhuyinBopomofo
-			case "com.apple.keylayout.ZhuyinEten":
-				chosenBaseKeyboardLayoutItem = itmAppleZhuyinEten
-			default:
-				break  // nothing to do
-		}
+    switch basicKeyboardLayoutID {
+      case "com.apple.keylayout.ZhuyinBopomofo":
+        chosenBaseKeyboardLayoutItem = itmAppleZhuyinBopomofo
+      case "com.apple.keylayout.ZhuyinEten":
+        chosenBaseKeyboardLayoutItem = itmAppleZhuyinEten
+      default:
+        break  // nothing to do
+    }
 
-		basicKeyboardLayoutButton.select(chosenBaseKeyboardLayoutItem ?? usKeyboardLayoutItem)
+    basicKeyboardLayoutButton.select(chosenBaseKeyboardLayoutItem ?? usKeyboardLayoutItem)
 
-		selectionKeyComboBox.usesDataSource = false
-		selectionKeyComboBox.removeAllItems()
-		selectionKeyComboBox.addItems(withObjectValues: mgrPrefs.suggestedCandidateKeys)
+    selectionKeyComboBox.usesDataSource = false
+    selectionKeyComboBox.removeAllItems()
+    selectionKeyComboBox.addItems(withObjectValues: mgrPrefs.suggestedCandidateKeys)
 
-		var candidateSelectionKeys = mgrPrefs.candidateKeys
-		if candidateSelectionKeys.isEmpty {
-			candidateSelectionKeys = mgrPrefs.defaultCandidateKeys
-		}
+    var candidateSelectionKeys = mgrPrefs.candidateKeys
+    if candidateSelectionKeys.isEmpty {
+      candidateSelectionKeys = mgrPrefs.defaultCandidateKeys
+    }
 
-		selectionKeyComboBox.stringValue = candidateSelectionKeys
-	}
+    selectionKeyComboBox.stringValue = candidateSelectionKeys
+  }
 
-	// 這裡有必要加上這段處理，用來確保藉由偏好設定介面動過的 CNS 開關能夠立刻生效。
-	// 所有涉及到語言模型開關的內容均需要這樣處理。
-	@IBAction func toggleCNSSupport(_: Any) {
-		mgrLangModel.setCNSEnabled(mgrPrefs.cns11643Enabled)
-	}
+  // 這裡有必要加上這段處理，用來確保藉由偏好設定介面動過的 CNS 開關能夠立刻生效。
+  // 所有涉及到語言模型開關的內容均需要這樣處理。
+  @IBAction func toggleCNSSupport(_: Any) {
+    mgrLangModel.setCNSEnabled(mgrPrefs.cns11643Enabled)
+  }
 
-	@IBAction func toggleSymbolInputEnabled(_: Any) {
-		mgrLangModel.setSymbolEnabled(mgrPrefs.symbolInputEnabled)
-	}
+  @IBAction func toggleSymbolInputEnabled(_: Any) {
+    mgrLangModel.setSymbolEnabled(mgrPrefs.symbolInputEnabled)
+  }
 
-	@IBAction func toggleTrad2KangXiAction(_: Any) {
-		if chkTrad2KangXi.state == .on, chkTrad2JISShinjitai.state == .on {
-			mgrPrefs.toggleShiftJISShinjitaiOutputEnabled()
-		}
-	}
+  @IBAction func toggleTrad2KangXiAction(_: Any) {
+    if chkTrad2KangXi.state == .on, chkTrad2JISShinjitai.state == .on {
+      mgrPrefs.toggleShiftJISShinjitaiOutputEnabled()
+    }
+  }
 
-	@IBAction func toggleTrad2JISShinjitaiAction(_: Any) {
-		if chkTrad2KangXi.state == .on, chkTrad2JISShinjitai.state == .on {
-			mgrPrefs.toggleChineseConversionEnabled()
-		}
-	}
+  @IBAction func toggleTrad2JISShinjitaiAction(_: Any) {
+    if chkTrad2KangXi.state == .on, chkTrad2JISShinjitai.state == .on {
+      mgrPrefs.toggleChineseConversionEnabled()
+    }
+  }
 
-	@IBAction func updateBasicKeyboardLayoutAction(_: Any) {
-		if let sourceID = basicKeyboardLayoutButton.selectedItem?.representedObject as? String {
-			mgrPrefs.basicKeyboardLayout = sourceID
-		}
-	}
+  @IBAction func updateBasicKeyboardLayoutAction(_: Any) {
+    if let sourceID = basicKeyboardLayoutButton.selectedItem?.representedObject as? String {
+      mgrPrefs.basicKeyboardLayout = sourceID
+    }
+  }
 
-	@IBAction func updateUiLanguageAction(_: Any) {
-		if let selectItem = uiLanguageButton.selectedItem {
-			if currentLanguageSelectItem == selectItem {
-				return
-			}
-		}
-		if let language = uiLanguageButton.selectedItem?.representedObject as? String {
-			if language != "auto" {
-				mgrPrefs.appleLanguages = [language]
-			} else {
-				UserDefaults.standard.removeObject(forKey: "AppleLanguages")
-			}
+  @IBAction func updateUiLanguageAction(_: Any) {
+    if let selectItem = uiLanguageButton.selectedItem {
+      if currentLanguageSelectItem == selectItem {
+        return
+      }
+    }
+    if let language = uiLanguageButton.selectedItem?.representedObject as? String {
+      if language != "auto" {
+        mgrPrefs.appleLanguages = [language]
+      } else {
+        UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+      }
 
-			NSLog("vChewing App self-terminated due to UI language change.")
-			NSApplication.shared.terminate(nil)
-		}
-	}
+      NSLog("vChewing App self-terminated due to UI language change.")
+      NSApplication.shared.terminate(nil)
+    }
+  }
 
-	@IBAction func clickedWhetherIMEShouldNotFartToggleAction(_: Any) {
-		clsSFX.beep()
-	}
+  @IBAction func clickedWhetherIMEShouldNotFartToggleAction(_: Any) {
+    clsSFX.beep()
+  }
 
-	@IBAction func changeSelectionKeyAction(_ sender: Any) {
-		guard
-			let keys = (sender as AnyObject).stringValue?.trimmingCharacters(
-				in: .whitespacesAndNewlines
-			)
-			.charDeDuplicate
-		else {
-			return
-		}
-		do {
-			try mgrPrefs.validate(candidateKeys: keys)
-			mgrPrefs.candidateKeys = keys
-			selectionKeyComboBox.stringValue = mgrPrefs.candidateKeys
-		} catch mgrPrefs.CandidateKeyError.empty {
-			selectionKeyComboBox.stringValue = mgrPrefs.candidateKeys
-		} catch {
-			if let window = window {
-				let alert = NSAlert(error: error)
-				alert.beginSheetModal(for: window) { _ in
-					self.selectionKeyComboBox.stringValue = mgrPrefs.candidateKeys
-				}
-				clsSFX.beep()
-			}
-		}
-	}
+  @IBAction func changeSelectionKeyAction(_ sender: Any) {
+    guard
+      let keys = (sender as AnyObject).stringValue?.trimmingCharacters(
+        in: .whitespacesAndNewlines
+      )
+      .charDeDuplicate
+    else {
+      return
+    }
+    do {
+      try mgrPrefs.validate(candidateKeys: keys)
+      mgrPrefs.candidateKeys = keys
+      selectionKeyComboBox.stringValue = mgrPrefs.candidateKeys
+    } catch mgrPrefs.CandidateKeyError.empty {
+      selectionKeyComboBox.stringValue = mgrPrefs.candidateKeys
+    } catch {
+      if let window = window {
+        let alert = NSAlert(error: error)
+        alert.beginSheetModal(for: window) { _ in
+          self.selectionKeyComboBox.stringValue = mgrPrefs.candidateKeys
+        }
+        clsSFX.beep()
+      }
+    }
+  }
 
-	@IBAction func resetSpecifiedUserDataFolder(_: Any) {
-		mgrPrefs.resetSpecifiedUserDataFolder()
-	}
+  @IBAction func resetSpecifiedUserDataFolder(_: Any) {
+    mgrPrefs.resetSpecifiedUserDataFolder()
+  }
 
-	@IBAction func chooseUserDataFolderToSpecify(_: Any) {
-		IME.dlgOpenPath.title = NSLocalizedString(
-			"Choose your desired user data folder.", comment: ""
-		)
-		IME.dlgOpenPath.showsResizeIndicator = true
-		IME.dlgOpenPath.showsHiddenFiles = true
-		IME.dlgOpenPath.canChooseFiles = false
-		IME.dlgOpenPath.canChooseDirectories = true
+  @IBAction func chooseUserDataFolderToSpecify(_: Any) {
+    IME.dlgOpenPath.title = NSLocalizedString(
+      "Choose your desired user data folder.", comment: ""
+    )
+    IME.dlgOpenPath.showsResizeIndicator = true
+    IME.dlgOpenPath.showsHiddenFiles = true
+    IME.dlgOpenPath.canChooseFiles = false
+    IME.dlgOpenPath.canChooseDirectories = true
 
-		let bolPreviousFolderValidity = mgrLangModel.checkIfSpecifiedUserDataFolderValid(
-			NSString(string: mgrPrefs.userDataFolderSpecified).expandingTildeInPath)
+    let bolPreviousFolderValidity = mgrLangModel.checkIfSpecifiedUserDataFolderValid(
+      NSString(string: mgrPrefs.userDataFolderSpecified).expandingTildeInPath)
 
-		if window != nil {
-			IME.dlgOpenPath.beginSheetModal(for: window!) { result in
-				if result == NSApplication.ModalResponse.OK {
-					if IME.dlgOpenPath.url != nil {
-						// CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
-						// 所以要手動補回來。
-						var newPath = IME.dlgOpenPath.url!.path
-						newPath.ensureTrailingSlash()
-						if mgrLangModel.checkIfSpecifiedUserDataFolderValid(newPath) {
-							mgrPrefs.userDataFolderSpecified = newPath
-							IME.initLangModels(userOnly: true)
-						} else {
-							clsSFX.beep()
-							if !bolPreviousFolderValidity {
-								mgrPrefs.resetSpecifiedUserDataFolder()
-							}
-							return
-						}
-					}
-				} else {
-					if !bolPreviousFolderValidity {
-						mgrPrefs.resetSpecifiedUserDataFolder()
-					}
-					return
-				}
-			}
-		}  // End If self.window != nil
-	}  // End IBAction
+    if window != nil {
+      IME.dlgOpenPath.beginSheetModal(for: window!) { result in
+        if result == NSApplication.ModalResponse.OK {
+          if IME.dlgOpenPath.url != nil {
+            // CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
+            // 所以要手動補回來。
+            var newPath = IME.dlgOpenPath.url!.path
+            newPath.ensureTrailingSlash()
+            if mgrLangModel.checkIfSpecifiedUserDataFolderValid(newPath) {
+              mgrPrefs.userDataFolderSpecified = newPath
+              IME.initLangModels(userOnly: true)
+            } else {
+              clsSFX.beep()
+              if !bolPreviousFolderValidity {
+                mgrPrefs.resetSpecifiedUserDataFolder()
+              }
+              return
+            }
+          }
+        } else {
+          if !bolPreviousFolderValidity {
+            mgrPrefs.resetSpecifiedUserDataFolder()
+          }
+          return
+        }
+      }
+    }  // End If self.window != nil
+  }  // End IBAction
 }

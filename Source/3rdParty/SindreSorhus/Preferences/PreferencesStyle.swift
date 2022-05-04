@@ -21,8 +21,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 
 extension Preferences {
-	public enum Style {
-		case toolbarItems
-		case segmentedControl
-	}
+  public enum Style {
+    case toolbarItems
+    case segmentedControl
+  }
 }

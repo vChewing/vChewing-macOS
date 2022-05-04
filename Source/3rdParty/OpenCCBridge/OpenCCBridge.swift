@@ -32,28 +32,28 @@ import OpenCC
 /// Since SwiftyOpenCC only provide Swift classes, we create an NSObject subclass
 /// in Swift in order to bridge the Swift classes into our Objective-C++ project.
 public class OpenCCBridge: NSObject {
-	private static let shared = OpenCCBridge()
-	private var simplify: ChineseConverter?
-	private var traditionalize: ChineseConverter?
+  private static let shared = OpenCCBridge()
+  private var simplify: ChineseConverter?
+  private var traditionalize: ChineseConverter?
 
-	override private init() {
-		try? simplify = ChineseConverter(options: .simplify)
-		try? traditionalize = ChineseConverter(options: [.traditionalize, .twStandard])
-		super.init()
-	}
+  override private init() {
+    try? simplify = ChineseConverter(options: .simplify)
+    try? traditionalize = ChineseConverter(options: [.traditionalize, .twStandard])
+    super.init()
+  }
 
-	/// CrossConvert.
-	///
-	/// - Parameter string: Text in Original Script.
-	/// - Returns: Text converted to Different Script.
-	@objc public static func crossConvert(_ string: String) -> String? {
-		switch ctlInputMethod.currentKeyHandler.inputMode {
-			case InputMode.imeModeCHS:
-				return shared.traditionalize?.convert(string)
-			case InputMode.imeModeCHT:
-				return shared.simplify?.convert(string)
-			default:
-				return string
-		}
-	}
+  /// CrossConvert.
+  ///
+  /// - Parameter string: Text in Original Script.
+  /// - Returns: Text converted to Different Script.
+  public static func crossConvert(_ string: String) -> String? {
+    switch ctlInputMethod.currentKeyHandler.inputMode {
+      case InputMode.imeModeCHS:
+        return shared.traditionalize?.convert(string)
+      case InputMode.imeModeCHT:
+        return shared.simplify?.convert(string)
+      default:
+        return string
+    }
+  }
 }
