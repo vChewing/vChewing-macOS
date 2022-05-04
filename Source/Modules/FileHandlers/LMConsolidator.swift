@@ -34,12 +34,11 @@ extension vChewing {
         do {
           let lineReader = try LineReader(file: fileHandle)
           for strLine in lineReader {  // 不需要 i=0，因為第一遍迴圈就出結果。
-            IME.prtDebugIntel("Header Seen ||\(strLine)")
             if strLine != kPragmaHeader {
               IME.prtDebugIntel("Header Mismatch, Starting In-Place Consolidation.")
               return false
             } else {
-              IME.prtDebugIntel("Header Verification Successful.")
+              IME.prtDebugIntel("Header Verification Succeeded: \(strLine).")
               return true
             }
           }
