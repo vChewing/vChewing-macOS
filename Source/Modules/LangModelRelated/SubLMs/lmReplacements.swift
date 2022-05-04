@@ -29,7 +29,6 @@ import Foundation
 extension vChewing {
   @frozen public struct LMReplacments {
     var keyValueMap: [String: String] = [:]
-    var theData: String = ""
 
     public var count: Int {
       keyValueMap.count
@@ -37,7 +36,6 @@ extension vChewing {
 
     public init() {
       keyValueMap = [:]
-      theData = ""
     }
 
     public func isLoaded() -> Bool {
@@ -52,20 +50,17 @@ extension vChewing {
       LMConsolidator.fixEOF(path: path)
       LMConsolidator.consolidate(path: path, pragma: true)
 
+      var arrData: [String] = []
+
       do {
-        theData = try String(contentsOfFile: path, encoding: .utf8)
+        arrData = try String(contentsOfFile: path, encoding: .utf8).components(separatedBy: "\n")
+
       } catch {
         IME.prtDebugIntel("\(error)")
         IME.prtDebugIntel("↑ Exception happened when reading Associated Phrases data.")
         return false
       }
 
-      let length = theData.count
-      guard length > 0 else {
-        return false
-      }
-
-      let arrData = theData.components(separatedBy: "\n")
       for (lineID, lineContent) in arrData.enumerated() {
         if !lineContent.hasPrefix("#") {
           if lineContent.components(separatedBy: " ").count < 2 {
@@ -88,7 +83,6 @@ extension vChewing {
         }
       }
       IME.prtDebugIntel("\(count) entries of data loaded from: \(path)")
-      theData = ""
       return true
     }
 

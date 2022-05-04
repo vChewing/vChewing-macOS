@@ -29,7 +29,6 @@ import Foundation
 extension vChewing {
   @frozen public struct LMLite {
     var keyValueMap: [String: [Megrez.KeyValuePair]] = [:]
-    var theData: String = ""
     var allowConsolidation = false
 
     public var count: Int {
@@ -38,7 +37,6 @@ extension vChewing {
 
     public init(consolidate: Bool = false) {
       keyValueMap = [:]
-      theData = ""
       allowConsolidation = consolidate
     }
 
@@ -56,20 +54,16 @@ extension vChewing {
         LMConsolidator.consolidate(path: path, pragma: true)
       }
 
+      var arrData: [String] = []
+
       do {
-        theData = try String(contentsOfFile: path, encoding: .utf8)
+        arrData = try String(contentsOfFile: path, encoding: .utf8).components(separatedBy: "\n")
       } catch {
         IME.prtDebugIntel("\(error)")
         IME.prtDebugIntel("↑ Exception happened when reading Associated Phrases data.")
         return false
       }
 
-      let length = theData.count
-      guard length > 0 else {
-        return false
-      }
-
-      let arrData = theData.components(separatedBy: "\n")
       for (lineID, lineContent) in arrData.enumerated() {
         if !lineContent.hasPrefix("#") {
           if lineContent.components(separatedBy: " ").count < 2 {
@@ -92,7 +86,6 @@ extension vChewing {
         }
       }
       IME.prtDebugIntel("\(count) entries of data loaded from: \(path)")
-      theData = ""
       if path.contains("vChewing/") {
         dump()
       }

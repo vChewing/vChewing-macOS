@@ -29,7 +29,6 @@ import Foundation
 extension vChewing {
   @frozen public struct LMCore {
     var keyValueScoreMap: [String: [Megrez.Unigram]] = [:]
-    var theData: String = ""
     var shouldReverse: Bool = false
     var allowConsolidation: Bool = false
     var defaultScore: Double = 0
@@ -44,7 +43,6 @@ extension vChewing {
       forceDefaultScore: Bool = false
     ) {
       keyValueScoreMap = [:]
-      theData = ""
       allowConsolidation = consolidate
       shouldReverse = reverse
       defaultScore = scoreDefault
@@ -65,20 +63,16 @@ extension vChewing {
         LMConsolidator.consolidate(path: path, pragma: true)
       }
 
+      var arrData: [String] = []
+
       do {
-        theData = try String(contentsOfFile: path, encoding: .utf8)
+        arrData = try String(contentsOfFile: path, encoding: .utf8).components(separatedBy: "\n")
       } catch {
         IME.prtDebugIntel("\(error)")
         IME.prtDebugIntel("↑ Exception happened when reading Associated Phrases data.")
         return false
       }
 
-      let length = theData.count
-      guard length > 0 else {
-        return false
-      }
-
-      let arrData = theData.components(separatedBy: "\n")
       for (lineID, lineContent) in arrData.enumerated() {
         if !lineContent.hasPrefix("#") {
           let lineContent = lineContent.replacingOccurrences(of: "\t", with: " ")
@@ -122,7 +116,6 @@ extension vChewing {
         }
       }
       IME.prtDebugIntel("\(count) entries of data loaded from: \(path)")
-      theData = ""
       return true
     }
 
