@@ -95,9 +95,6 @@ extension vChewing {
       if FileManager.default.isReadableFile(atPath: path) {
         lmCore.open(path)
         IME.prtDebugIntel("lmCore: \(lmCore.count) entries of data loaded from: \(path)")
-        if path.contains("vChewing/") {
-          lmCore.dump()
-        }
       } else {
         IME.prtDebugIntel("lmCore: File access failure: \(path)")
       }
@@ -108,9 +105,6 @@ extension vChewing {
       if FileManager.default.isReadableFile(atPath: path) {
         lmCNS.open(path)
         IME.prtDebugIntel("lmCNS: \(lmCNS.count) entries of data loaded from: \(path)")
-        if path.contains("vChewing/") {
-          lmCNS.dump()
-        }
       } else {
         IME.prtDebugIntel("lmCNS: File access failure: \(path)")
       }
@@ -121,9 +115,6 @@ extension vChewing {
       if FileManager.default.isReadableFile(atPath: path) {
         lmMisc.open(path)
         IME.prtDebugIntel("lmMisc: \(lmMisc.count) entries of data loaded from: \(path)")
-        if path.contains("vChewing/") {
-          lmMisc.dump()
-        }
       } else {
         IME.prtDebugIntel("lmMisc: File access failure: \(path)")
       }
@@ -134,9 +125,6 @@ extension vChewing {
       if FileManager.default.isReadableFile(atPath: path) {
         lmSymbols.open(path)
         IME.prtDebugIntel("lmSymbol: \(lmSymbols.count) entries of data loaded from: \(path)")
-        if path.contains("vChewing/") {
-          lmSymbols.dump()
-        }
       } else {
         IME.prtDebugIntel("lmSymbols: File access failure: \(path)")
       }
@@ -147,9 +135,6 @@ extension vChewing {
         lmUserPhrases.close()
         lmUserPhrases.open(path)
         IME.prtDebugIntel("lmUserPhrases: \(lmUserPhrases.count) entries of data loaded from: \(path)")
-        if path.contains("vChewing/") {
-          lmUserPhrases.dump()
-        }
       } else {
         IME.prtDebugIntel("lmUserPhrases: File access failure: \(path)")
       }
@@ -157,9 +142,6 @@ extension vChewing {
         lmFiltered.close()
         lmFiltered.open(filterPath)
         IME.prtDebugIntel("lmFiltered: \(lmFiltered.count) entries of data loaded from: \(path)")
-        if path.contains("vChewing/") {
-          lmFiltered.dump()
-        }
       } else {
         IME.prtDebugIntel("lmFiltered: File access failure: \(path)")
       }
@@ -170,9 +152,6 @@ extension vChewing {
         lmUserSymbols.close()
         lmUserSymbols.open(path)
         IME.prtDebugIntel("lmUserSymbol: \(lmUserSymbols.count) entries of data loaded from: \(path)")
-        if path.contains("vChewing/") {
-          lmUserSymbols.dump()
-        }
       } else {
         IME.prtDebugIntel("lmUserSymbol: File access failure: \(path)")
       }
@@ -183,9 +162,6 @@ extension vChewing {
         lmAssociates.close()
         lmAssociates.open(path)
         IME.prtDebugIntel("lmAssociates: \(lmAssociates.count) entries of data loaded from: \(path)")
-        if path.contains("vChewing/") {
-          lmAssociates.dump()
-        }
       } else {
         IME.prtDebugIntel("lmAssociates: File access failure: \(path)")
       }
@@ -196,9 +172,6 @@ extension vChewing {
         lmReplacements.close()
         lmReplacements.open(path)
         IME.prtDebugIntel("lmReplacements: \(lmReplacements.count) entries of data loaded from: \(path)")
-        if path.contains("vChewing/") {
-          lmReplacements.dump()
-        }
       } else {
         IME.prtDebugIntel("lmReplacements: File access failure: \(path)")
       }
