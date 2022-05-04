@@ -77,7 +77,7 @@ extension vChewing {
         if !lineContent.hasPrefix("#") {
           let lineContent = lineContent.replacingOccurrences(of: "\t", with: " ")
           if lineContent.components(separatedBy: " ").count < 2 {
-            if arrData.last != "" {
+            if lineContent != "", lineContent != " " {
               IME.prtDebugIntel("Line #\(lineID + 1) Wrecked: \(lineContent)")
             }
             continue
