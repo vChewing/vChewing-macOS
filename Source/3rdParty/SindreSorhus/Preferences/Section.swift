@@ -23,13 +23,13 @@ import SwiftUI
 @available(macOS 10.15, *)
 extension Preferences {
   /**
-	Represents a section with right-aligned title and optional bottom divider.
-	*/
+     Represents a section with right-aligned title and optional bottom divider.
+     */
   @available(macOS 10.15, *)
   public struct Section: View {
     /**
-		Preference key holding max width of section labels.
-		*/
+         Preference key holding max width of section labels.
+         */
     private struct LabelWidthPreferenceKey: PreferenceKey {
       typealias Value = Double
 
@@ -42,8 +42,8 @@ extension Preferences {
     }
 
     /**
-		Convenience overlay for finding a label's dimensions using `GeometryReader`.
-		*/
+         Convenience overlay for finding a label's dimensions using `GeometryReader`.
+         */
     private struct LabelOverlay: View {
       var body: some View {
         GeometryReader { geometry in
@@ -54,8 +54,8 @@ extension Preferences {
     }
 
     /**
-		Convenience modifier for applying `LabelWidthPreferenceKey`.
-		*/
+         Convenience modifier for applying `LabelWidthPreferenceKey`.
+         */
     struct LabelWidthModifier: ViewModifier {
       @Binding var maximumWidth: Double
 
@@ -73,15 +73,15 @@ extension Preferences {
     public let verticalAlignment: VerticalAlignment
 
     /**
-		A section is responsible for controlling a single preference.
+         A section is responsible for controlling a single preference.
 
-		- Parameters:
-			- bottomDivider: Whether to place a `Divider` after the section content. Default is `false`.
-			- verticalAlignement: The vertical alignment of the section content.
-			- verticalAlignment:
-			- label: A view describing preference handled by this section.
-			- content: A content view.
-		*/
+         - Parameters:
+         	- bottomDivider: Whether to place a `Divider` after the section content. Default is `false`.
+         	- verticalAlignement: The vertical alignment of the section content.
+         	- verticalAlignment:
+         	- label: A view describing preference handled by this section.
+         	- content: A content view.
+         */
     public init<Label: View, Content: View>(
       bottomDivider: Bool = false,
       verticalAlignment: VerticalAlignment = .firstTextBaseline,
@@ -98,15 +98,15 @@ extension Preferences {
     }
 
     /**
-		Creates instance of section, responsible for controling single preference with `Text` as  a `Label`.
+         Creates instance of section, responsible for controling single preference with `Text` as  a `Label`.
 
-		- Parameters:
-			- title: A string describing preference handled by this section.
-			- bottomDivider: Whether to place a `Divider` after the section content. Default is `false`.
-			- verticalAlignement: The vertical alignment of the section content.
-			- verticalAlignment:
-			- content: A content view.
-		*/
+         - Parameters:
+         	- title: A string describing preference handled by this section.
+         	- bottomDivider: Whether to place a `Divider` after the section content. Default is `false`.
+         	- verticalAlignement: The vertical alignment of the section content.
+         	- verticalAlignment:
+         	- content: A content view.
+         */
     public init<Content: View>(
       title: String,
       bottomDivider: Bool = false,

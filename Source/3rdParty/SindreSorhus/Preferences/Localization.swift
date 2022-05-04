@@ -112,12 +112,12 @@ struct Localization {
   ]
 
   /**
-	Returns the localized version of the given string.
+     Returns the localized version of the given string.
 
-	- Parameter identifier: Identifier of the string to localize.
+     - Parameter identifier: Identifier of the string to localize.
 
-	- Note: If the system's locale can't be determined, the English localization of the string will be returned.
-	*/
+     - Note: If the system's locale can't be determined, the English localization of the string will be returned.
+     */
   static subscript(identifier: Identifier) -> String {
     // Force-unwrapped since all of the involved code is under our control.
     let localizedDict = Localization.localizedStrings[identifier]!
