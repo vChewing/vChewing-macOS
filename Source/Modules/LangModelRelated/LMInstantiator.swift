@@ -88,26 +88,11 @@ extension vChewing {
     // 初期化的函數先保留
     override init() {}
 
-    // 自我析構前要關掉全部的語言模組
-    deinit {
-      // 原則上而言，只要不是歸 LMInstantiator 親自初期化的語言模組，都不要在這裡關掉。
-      // lmCNS.close()  // <--比如左邊這個模組。
-      // lmSymbols.close()  // <--左邊這個模組也是。
-      lmCore.close()
-      lmMisc.close()
-      lmUserPhrases.close()
-      lmFiltered.close()
-      lmUserSymbols.close()
-      lmReplacements.close()
-      lmAssociates.close()
-    }
-
     // 以下這些函數命名暫時保持原樣，等弒神行動徹底結束了再調整。
 
     public func isDataModelLoaded() -> Bool { lmCore.isLoaded() }
     public func loadLanguageModel(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
-        lmCore.close()
         lmCore.open(path)
         IME.prtDebugIntel("lmCore: \(lmCore.count) entries of data loaded from: \(path)")
         if path.contains("vChewing/") {
@@ -119,7 +104,6 @@ extension vChewing {
     public func isCNSDataLoaded() -> Bool { lmCNS.isLoaded() }
     public func loadCNSData(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
-        lmCNS.close()
         lmCNS.open(path)
         IME.prtDebugIntel("lmCNS: \(lmCNS.count) entries of data loaded from: \(path)")
         if path.contains("vChewing/") {
@@ -131,7 +115,6 @@ extension vChewing {
     public func isMiscDataLoaded() -> Bool { lmMisc.isLoaded() }
     public func loadMiscData(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
-        lmMisc.close()
         lmMisc.open(path)
         IME.prtDebugIntel("lmMisc: \(lmMisc.count) entries of data loaded from: \(path)")
         if path.contains("vChewing/") {
@@ -143,7 +126,6 @@ extension vChewing {
     public func isSymbolDataLoaded() -> Bool { lmSymbols.isLoaded() }
     public func loadSymbolData(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
-        lmSymbols.close()
         lmSymbols.open(path)
         IME.prtDebugIntel("lmSymbol: \(lmSymbols.count) entries of data loaded from: \(path)")
         if path.contains("vChewing/") {
@@ -154,7 +136,6 @@ extension vChewing {
 
     public func loadUserPhrases(path: String, filterPath: String) {
       if FileManager.default.isReadableFile(atPath: path) {
-        lmUserPhrases.close()
         lmUserPhrases.open(path)
         IME.prtDebugIntel("lmUserPhrases: \(lmUserPhrases.count) entries of data loaded from: \(path)")
         if path.contains("vChewing/") {
@@ -162,7 +143,6 @@ extension vChewing {
         }
       }
       if FileManager.default.isReadableFile(atPath: filterPath) {
-        lmFiltered.close()
         lmFiltered.open(filterPath)
         IME.prtDebugIntel("lmFiltered: \(lmFiltered.count) entries of data loaded from: \(path)")
         if path.contains("vChewing/") {
@@ -173,7 +153,6 @@ extension vChewing {
 
     public func loadUserSymbolData(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
-        lmUserSymbols.close()
         lmUserSymbols.open(path)
         IME.prtDebugIntel("lmUserSymbol: \(lmUserSymbols.count) entries of data loaded from: \(path)")
         if path.contains("vChewing/") {
@@ -184,7 +163,6 @@ extension vChewing {
 
     public func loadUserAssociatedPhrases(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
-        lmAssociates.close()
         lmAssociates.open(path)
         IME.prtDebugIntel("lmAssociates: \(lmAssociates.count) entries of data loaded from: \(path)")
         if path.contains("vChewing/") {
@@ -195,7 +173,6 @@ extension vChewing {
 
     public func loadPhraseReplacementMap(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
-        lmReplacements.close()
         lmReplacements.open(path)
         IME.prtDebugIntel("lmReplacements: \(lmReplacements.count) entries of data loaded from: \(path)")
         if path.contains("vChewing/") {
