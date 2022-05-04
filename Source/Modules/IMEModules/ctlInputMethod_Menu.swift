@@ -345,8 +345,7 @@ extension ctlInputMethod {
   }
 
   @objc func reloadUserPhrases(_: Any?) {
-    mgrLangModel.loadUserPhrases()
-    mgrLangModel.loadUserPhraseReplacement()
+    IME.initLangModels(userOnly: true)
   }
 
   @objc func showAbout(_: Any?) {
