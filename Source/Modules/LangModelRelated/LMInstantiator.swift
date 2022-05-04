@@ -311,7 +311,7 @@ extension vChewing {
 
         if isPhraseReplacementEnabled {
           let replacement = lmReplacements.valuesFor(key: pair.value)
-          if !replacement.isEmpty, pair.value.count == replacement.count {
+          if !replacement.isEmpty {
             IME.prtDebugIntel("\(pair.value) -> \(replacement)")
             pair.value = replacement
           }
