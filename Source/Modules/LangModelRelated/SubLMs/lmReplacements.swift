@@ -70,7 +70,7 @@ extension vChewing {
             }
             continue
           }
-          var currentKV = KeyValue()
+          var currentKV = Megrez.KeyValuePair()
           for (unitID, unitContent) in lineContent.components(separatedBy: " ").enumerated() {
             switch unitID {
               case 0:

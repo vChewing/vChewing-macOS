@@ -96,7 +96,6 @@
 		5BD05C6A27B2BBEF004C4F1D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD05C6527B2BBEF004C4F1D /* ViewController.swift */; };
 		5BDC1CFA27FDF1310052C2B9 /* apiUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDC1CF927FDF1310052C2B9 /* apiUpdate.swift */; };
 		5BDCBB2E27B4E67A00D0CC59 /* vChewingPhraseEditor.app in Resources */ = {isa = PBXBuildFile; fileRef = 5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */; };
-		5BE33BED28169B5D00CE5BB0 /* KeyValueStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE33BEC28169B5D00CE5BB0 /* KeyValueStructs.swift */; };
 		5BE78BD927B3775B005EA1BE /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE78BD827B37750005EA1BE /* ctlAboutWindow.swift */; };
 		5BE78BDD27B3776D005EA1BE /* frmAboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BE78BDA27B37764005EA1BE /* frmAboutWindow.xib */; };
 		5BF8423127BAA942008E7E4C /* vChewingKanjiConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF8423027BAA942008E7E4C /* vChewingKanjiConverter.swift */; };
@@ -286,7 +285,6 @@
 		5BDCBB4A27B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5BDCBB4B27B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/frmAboutWindow.strings"; sourceTree = "<group>"; };
 		5BDCBB4D27B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
-		5BE33BEC28169B5D00CE5BB0 /* KeyValueStructs.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = KeyValueStructs.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5BE78BD827B37750005EA1BE /* ctlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BE78BDB27B37764005EA1BE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmAboutWindow.xib; sourceTree = "<group>"; };
 		5BE78BDF27B37968005EA1BE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmAboutWindow.strings; sourceTree = "<group>"; };
@@ -496,7 +494,6 @@
 			children = (
 				5B62A32527AE758000A19448 /* OldFileReferences */,
 				5B407308281672610023DFFF /* SubLMs */,
-				5BE33BEC28169B5D00CE5BB0 /* KeyValueStructs.swift */,
 				5B949BDA2816DDBC00D87B5D /* LMConsolidator.swift */,
 				5BD0113A28180D6100609769 /* LMInstantiator.swift */,
 				5BAEFACF28012565001F42C9 /* mgrLangModel.swift */,
@@ -1124,7 +1121,6 @@
 				5B40730D281672610023DFFF /* lmReplacements.swift in Sources */,
 				5B38F59E281E2E49007D5F5D /* 6_Bigram.swift in Sources */,
 				5B62A33227AE792F00A19448 /* InputSourceHelper.swift in Sources */,
-				5BE33BED28169B5D00CE5BB0 /* KeyValueStructs.swift in Sources */,
 				5B5E535227EF261400C6AA1E /* IME.swift in Sources */,
 				5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
