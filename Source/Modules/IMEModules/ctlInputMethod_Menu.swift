@@ -86,13 +86,15 @@ extension ctlInputMethod {
     halfWidthPunctuationItem.keyEquivalentModifierMask = [.command, .control]
     halfWidthPunctuationItem.state = mgrPrefs.halfWidthPunctuationEnabled.state
 
-    if optionKeyPressed {
+    if optionKeyPressed || mgrPrefs.phraseReplacementEnabled {
       let phaseReplacementItem = menu.addItem(
         withTitle: NSLocalizedString("Use Phrase Replacement", comment: ""),
         action: #selector(togglePhraseReplacement(_:)), keyEquivalent: ""
       )
       phaseReplacementItem.state = mgrPrefs.phraseReplacementEnabled.state
+    }
 
+    if optionKeyPressed {
       let toggleSymbolInputItem = menu.addItem(
         withTitle: NSLocalizedString("Symbol & Emoji Input", comment: ""),
         action: #selector(toggleSymbolEnabled(_:)), keyEquivalent: ""
