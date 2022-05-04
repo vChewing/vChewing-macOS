@@ -30,12 +30,6 @@ extension vChewing {
   public class LMUserOverride {
     // MARK: - Private Structures
 
-    var mutCapacity: Int
-    var mutDecayExponent: Double
-    var mutLRUList = [KeyObservationPair]()
-    var mutLRUMap: [String: KeyObservationPair] = [:]
-    let kDecayThreshold: Double = 1.0 / 1_048_576.0
-
     struct Override {
       var count: Int = 0
       var timestamp: Double = 0.0
@@ -70,6 +64,14 @@ extension vChewing {
       }
     }
 
+    // MARK: - Main
+
+    var mutCapacity: Int
+    var mutDecayExponent: Double
+    var mutLRUList = [KeyObservationPair]()
+    var mutLRUMap: [String: KeyObservationPair] = [:]
+    let kDecayThreshold: Double = 1.0 / 1_048_576.0
+
     public init(capacity: Int = 500, decayConstant: Double = 5400.0) {
       mutCapacity = abs(capacity)  // Ensures that this value is always > 0.
       mutDecayExponent = log(0.5) / decayConstant
@@ -82,7 +84,10 @@ extension vChewing {
       timestamp: Double
     ) {
       let key = getWalkedNodesToKey(walkedNodes: walkedNodes, cursorIndex: cursorIndex)
-      guard key != "((),(),())" else { return }
+      guard !key.isEmpty
+      else {
+        return
+      }
       guard let map = mutLRUMap[key] else {
         var observation: Observation = .init()
         observation.update(candidate: candidate, timestamp: timestamp)
@@ -107,14 +112,14 @@ extension vChewing {
       timestamp: Double
     ) -> String {
       let key = getWalkedNodesToKey(walkedNodes: walkedNodes, cursorIndex: cursorIndex)
-      guard let keyValuePair = mutLRUMap[key] else {
+      guard let keyValuePair = mutLRUMap[key],
+        !key.isEmpty
+      else {
         return ""
       }
 
       IME.prtDebugIntel("Suggest - A: \(key)")
       IME.prtDebugIntel("Suggest - B: \(keyValuePair.key)")
-
-      guard key != "((),(),())" else { return "" }
 
       let observation = keyValuePair.observation
 
@@ -208,6 +213,9 @@ extension vChewing {
       }
 
       strOutput = "(\(strAnterior),\(strPrev),\(strCurrent))"
+      if strOutput == "((),(),())" {
+        strOutput = ""
+      }
 
       return strOutput
     }
