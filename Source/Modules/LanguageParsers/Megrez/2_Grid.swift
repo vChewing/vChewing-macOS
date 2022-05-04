@@ -157,7 +157,7 @@ extension Megrez {
       return node
     }
 
-    public func overrideNodeScoreForSelectedCandidate(location: Int, value: inout String, overridingScore: Double) {
+    public func overrideNodeScoreForSelectedCandidate(location: Int, value: String, overridingScore: Double) {
       for nodeAnchor in nodesCrossingOrEndingAt(location: location) {
         var nodeAnchor = nodeAnchor
         if let theNode = nodeAnchor.node {

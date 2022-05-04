@@ -228,7 +228,7 @@ class KeyHandler: NSObject {
   }
 
   func dealWithOverrideModelSuggestions() {
-    var overrideValue =
+    let overrideValue =
       mgrPrefs.useSCPCTypingMode
       ? ""
       : _userOverrideModel.suggest(
@@ -239,7 +239,7 @@ class KeyHandler: NSObject {
     if !overrideValue.isEmpty {
       _builder.grid().overrideNodeScoreForSelectedCandidate(
         location: getActualCandidateCursorIndex(),
-        value: &overrideValue,
+        value: overrideValue,
         overridingScore: findHighestScore(nodes: getRawNodes(), epsilon: kEpsilon)
       )
     }
