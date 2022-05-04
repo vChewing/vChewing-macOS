@@ -46,7 +46,6 @@ extension vChewing {
 
     @discardableResult public mutating func open(_ path: String) -> Bool {
       if isLoaded() {
-        IME.prtDebugIntel("Not loading this one due to isLoaded result of true: \(path)")
         return false
       }
 

@@ -151,7 +151,7 @@ class mgrLangModel: NSObject {
 
   public static func loadUserPhrases() {
     gLangModelCHT.loadUserPhrases(
-      path: userSymbolDataPath(InputMode.imeModeCHT),
+      path: userPhrasesDataPath(InputMode.imeModeCHT),
       filterPath: excludedPhrasesDataPath(InputMode.imeModeCHT)
     )
     gLangModelCHS.loadUserPhrases(
@@ -166,7 +166,7 @@ class mgrLangModel: NSObject {
     gLangModelCHT.loadUserAssociatedPhrases(
       path: mgrLangModel.userAssociatedPhrasesDataPath(InputMode.imeModeCHT)
     )
-    gLangModelCHT.loadUserAssociatedPhrases(
+    gLangModelCHS.loadUserAssociatedPhrases(
       path: mgrLangModel.userAssociatedPhrasesDataPath(InputMode.imeModeCHS)
     )
   }
@@ -175,7 +175,7 @@ class mgrLangModel: NSObject {
     gLangModelCHT.loadPhraseReplacementMap(
       path: mgrLangModel.phraseReplacementDataPath(InputMode.imeModeCHT)
     )
-    gLangModelCHT.loadPhraseReplacementMap(
+    gLangModelCHS.loadPhraseReplacementMap(
       path: mgrLangModel.phraseReplacementDataPath(InputMode.imeModeCHS)
     )
   }

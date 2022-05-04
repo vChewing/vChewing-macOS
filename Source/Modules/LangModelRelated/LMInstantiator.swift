@@ -98,6 +98,8 @@ extension vChewing {
         if path.contains("vChewing/") {
           lmCore.dump()
         }
+      } else {
+        IME.prtDebugIntel("lmCore: File access failure: \(path)")
       }
     }
 
@@ -109,6 +111,8 @@ extension vChewing {
         if path.contains("vChewing/") {
           lmCNS.dump()
         }
+      } else {
+        IME.prtDebugIntel("lmCNS: File access failure: \(path)")
       }
     }
 
@@ -120,6 +124,8 @@ extension vChewing {
         if path.contains("vChewing/") {
           lmMisc.dump()
         }
+      } else {
+        IME.prtDebugIntel("lmMisc: File access failure: \(path)")
       }
     }
 
@@ -131,53 +137,70 @@ extension vChewing {
         if path.contains("vChewing/") {
           lmSymbols.dump()
         }
+      } else {
+        IME.prtDebugIntel("lmSymbols: File access failure: \(path)")
       }
     }
 
     public func loadUserPhrases(path: String, filterPath: String) {
       if FileManager.default.isReadableFile(atPath: path) {
+        lmUserPhrases.close()
         lmUserPhrases.open(path)
         IME.prtDebugIntel("lmUserPhrases: \(lmUserPhrases.count) entries of data loaded from: \(path)")
         if path.contains("vChewing/") {
           lmUserPhrases.dump()
         }
+      } else {
+        IME.prtDebugIntel("lmUserPhrases: File access failure: \(path)")
       }
       if FileManager.default.isReadableFile(atPath: filterPath) {
+        lmFiltered.close()
         lmFiltered.open(filterPath)
         IME.prtDebugIntel("lmFiltered: \(lmFiltered.count) entries of data loaded from: \(path)")
         if path.contains("vChewing/") {
           lmFiltered.dump()
         }
+      } else {
+        IME.prtDebugIntel("lmFiltered: File access failure: \(path)")
       }
     }
 
     public func loadUserSymbolData(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
+        lmUserSymbols.close()
         lmUserSymbols.open(path)
         IME.prtDebugIntel("lmUserSymbol: \(lmUserSymbols.count) entries of data loaded from: \(path)")
         if path.contains("vChewing/") {
           lmUserSymbols.dump()
         }
+      } else {
+        IME.prtDebugIntel("lmUserSymbol: File access failure: \(path)")
       }
     }
 
     public func loadUserAssociatedPhrases(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
+        lmAssociates.close()
         lmAssociates.open(path)
         IME.prtDebugIntel("lmAssociates: \(lmAssociates.count) entries of data loaded from: \(path)")
         if path.contains("vChewing/") {
           lmAssociates.dump()
         }
+      } else {
+        IME.prtDebugIntel("lmAssociates: File access failure: \(path)")
       }
     }
 
     public func loadPhraseReplacementMap(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
+        lmReplacements.close()
         lmReplacements.open(path)
         IME.prtDebugIntel("lmReplacements: \(lmReplacements.count) entries of data loaded from: \(path)")
         if path.contains("vChewing/") {
           lmReplacements.dump()
         }
+      } else {
+        IME.prtDebugIntel("lmReplacements: File access failure: \(path)")
       }
     }
 
