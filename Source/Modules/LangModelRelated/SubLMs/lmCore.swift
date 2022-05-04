@@ -55,7 +55,7 @@ extension vChewing {
       !keyValueScoreMap.isEmpty
     }
 
-    @discardableResult mutating public func open(_ path: String) -> Bool {
+    @discardableResult public mutating func open(_ path: String) -> Bool {
       if isLoaded() {
         return false
       }
@@ -92,7 +92,7 @@ extension vChewing {
             }
             continue
           }
-          var currentUnigram = Megrez.Unigram(keyValue: Megrez.KeyValuePair(), score: self.defaultScore)
+          var currentUnigram = Megrez.Unigram(keyValue: Megrez.KeyValuePair(), score: defaultScore)
           var columnOne = ""
           var columnTwo = ""
           for (unitID, unitContent) in lineContent.components(separatedBy: " ").enumerated() {
@@ -102,7 +102,7 @@ extension vChewing {
               case 1:
                 columnTwo = unitContent
               case 2:
-                if !self.shouldForceDefaultScore {
+                if !shouldForceDefaultScore {
                   if let unitContentConverted = Double(unitContent) {
                     currentUnigram.score = unitContentConverted
                   } else {
@@ -117,20 +117,20 @@ extension vChewing {
             currentUnigram.score -= (Double(lineID) * 0.000001)
           }
           let kvPair =
-            self.shouldReverse
+            shouldReverse
             ? Megrez.KeyValuePair(key: columnTwo, value: columnOne)
             : Megrez.KeyValuePair(key: columnOne, value: columnTwo)
           currentUnigram.keyValue = kvPair
-          let key = self.shouldReverse ? columnTwo : columnOne
-          self.keyValueScoreMap[key, default: []].append(currentUnigram)
+          let key = shouldReverse ? columnTwo : columnOne
+          keyValueScoreMap[key, default: []].append(currentUnigram)
         }
       }
-      IME.prtDebugIntel("\(self.keyValueScoreMap.count) entries of data loaded from: \(path)")
+      IME.prtDebugIntel("\(keyValueScoreMap.count) entries of data loaded from: \(path)")
       theData = ""
       return true
     }
 
-    mutating public func close() {
+    public mutating func close() {
       if isLoaded() {
         keyValueScoreMap.removeAll()
       }

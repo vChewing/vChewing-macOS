@@ -44,7 +44,7 @@ extension vChewing {
       !keyValueMap.isEmpty
     }
 
-    @discardableResult mutating public func open(_ path: String) -> Bool {
+    @discardableResult public mutating func open(_ path: String) -> Bool {
       if isLoaded() {
         return false
       }
@@ -91,12 +91,12 @@ extension vChewing {
           keyValueMap[currentKV.key, default: []].append(currentKV)
         }
       }
-      IME.prtDebugIntel("\(self.keyValueMap.count) entries of data loaded from: \(path)")
+      IME.prtDebugIntel("\(keyValueMap.count) entries of data loaded from: \(path)")
       theData = ""
       return true
     }
 
-    mutating public func close() {
+    public mutating func close() {
       if isLoaded() {
         keyValueMap.removeAll()
       }
