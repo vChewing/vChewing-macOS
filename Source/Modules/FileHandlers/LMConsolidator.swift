@@ -52,7 +52,7 @@ extension vChewing {
       return false
     }
 
-    public static func fixEOF(path: String) -> Bool {
+    @discardableResult public static func fixEOF(path: String) -> Bool {
       let urlPath = URL(fileURLWithPath: path)
       if FileManager.default.fileExists(atPath: path) {
         var strIncoming = ""
@@ -75,7 +75,7 @@ extension vChewing {
       return false
     }
 
-    public static func consolidate(path: String, pragma shouldCheckPragma: Bool) -> Bool {
+    @discardableResult public static func consolidate(path: String, pragma shouldCheckPragma: Bool) -> Bool {
       var pragmaResult = false
       if shouldCheckPragma {
         pragmaResult = checkPragma(path: path)

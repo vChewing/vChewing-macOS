@@ -52,12 +52,8 @@ extension vChewing {
       }
 
       if allowConsolidation {
-        if !LMConsolidator.fixEOF(path: path) {
-          return false
-        }
-        if !LMConsolidator.consolidate(path: path, pragma: true) {
-          return false
-        }
+        LMConsolidator.fixEOF(path: path)
+        LMConsolidator.consolidate(path: path, pragma: true)
       }
 
       do {
