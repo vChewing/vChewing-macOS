@@ -125,7 +125,7 @@ extension vChewing {
           keyValueScoreMap[key, default: []].append(currentUnigram)
         }
       }
-      IME.prtDebugIntel("\(keyValueScoreMap.count) entries of data loaded from: \(path)")
+      IME.prtDebugIntel("\(count) entries of data loaded from: \(path)")
       theData = ""
       return true
     }

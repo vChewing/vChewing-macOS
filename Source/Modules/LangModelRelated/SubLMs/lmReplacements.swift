@@ -91,7 +91,7 @@ extension vChewing {
           keyValueMap[currentKV.key] = currentKV.value
         }
       }
-      IME.prtDebugIntel("\(keyValueMap.count) entries of data loaded from: \(path)")
+      IME.prtDebugIntel("\(count) entries of data loaded from: \(path)")
       theData = ""
       return true
     }
