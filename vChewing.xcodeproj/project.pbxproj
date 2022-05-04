@@ -466,7 +466,6 @@
 			isa = PBXGroup;
 			children = (
 				5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */,
-				5B949BDA2816DDBC00D87B5D /* LMConsolidator.swift */,
 			);
 			path = FileHandlers;
 			sourceTree = "<group>";
@@ -498,6 +497,7 @@
 				5B62A32527AE758000A19448 /* OldFileReferences */,
 				5B407308281672610023DFFF /* SubLMs */,
 				5BE33BEC28169B5D00CE5BB0 /* KeyValueStructs.swift */,
+				5B949BDA2816DDBC00D87B5D /* LMConsolidator.swift */,
 				5BD0113A28180D6100609769 /* LMInstantiator.swift */,
 				5BAEFACF28012565001F42C9 /* mgrLangModel.swift */,
 			);
