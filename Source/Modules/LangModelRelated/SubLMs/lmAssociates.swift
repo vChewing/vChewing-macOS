@@ -31,6 +31,10 @@ extension vChewing {
     var keyValueMap: [String: [Megrez.KeyValuePair]] = [:]
     var theData: String = ""
 
+    public var count: Int {
+      keyValueMap.count
+    }
+
     public init() {
       keyValueMap = [:]
       theData = ""

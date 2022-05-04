@@ -32,6 +32,10 @@ extension vChewing {
     var theData: String = ""
     var allowConsolidation = false
 
+    public var count: Int {
+      keyValueMap.count
+    }
+
     public init(consolidate: Bool = false) {
       keyValueMap = [:]
       theData = ""

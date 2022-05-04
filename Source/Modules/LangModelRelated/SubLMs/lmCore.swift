@@ -35,6 +35,10 @@ extension vChewing {
     var defaultScore: Double = 0
     var shouldForceDefaultScore: Bool = false
 
+    public var count: Int {
+      keyValueScoreMap.count
+    }
+
     public init(
       reverse: Bool = false, consolidate: Bool = false, defaultScore scoreDefault: Double = 0,
       forceDefaultScore: Bool = false
