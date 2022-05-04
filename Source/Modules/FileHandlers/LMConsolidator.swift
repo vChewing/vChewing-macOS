@@ -59,8 +59,15 @@ extension vChewing {
           strIncoming += try String(contentsOf: urlPath, encoding: .utf8)
           if !strIncoming.hasSuffix("\n") {
             IME.prtDebugIntel("EOF Fix Necessity Confirmed, Start Fixing.")
-            strIncoming += "\n"
-            try strIncoming.write(to: urlPath, atomically: false, encoding: .utf8)
+            if let writeFile = FileHandle(forUpdatingAtPath: path),
+              let endl = "\n".data(using: .utf8)
+            {
+              writeFile.seekToEndOfFile()
+              writeFile.write(endl)
+              writeFile.closeFile()
+            } else {
+              return false
+            }
           }
         } catch {
           IME.prtDebugIntel("EOF Fix Failed w/ File: \(path)")
