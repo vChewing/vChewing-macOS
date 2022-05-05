@@ -106,6 +106,7 @@ static Mandarin::BopomofoReadingBuffer *PhoneticBuffer;
             PhoneticBuffer->setKeyboardLayout(Mandarin::BopomofoKeyboardLayout::StandardLayout());
             mgrPrefs.mandarinParser = MandarinParserOfStandard;
         }
+        PhoneticBuffer->clear();
     }
     else
     {
