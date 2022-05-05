@@ -47,7 +47,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
   private var ctlAboutWindowInstance: ctlAboutWindow?  // New About Window
   private var checkTask: URLSessionTask?
   private var updateNextStepURL: URL?
-  private var fsStreamHelper = FSEventStreamHelper(
+  public var fsStreamHelper = FSEventStreamHelper(
     path: mgrLangModel.dataFolderPath(isDefaultFolder: false),
     queue: DispatchQueue(label: "vChewing User Phrases")
   )
@@ -74,6 +74,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
     if (UserDefaults.standard.object(forKey: VersionUpdateApi.kCheckUpdateAutomatically) != nil) == true {
       checkForUpdate()
     }
+  }
+
+  func updateStreamHelperPath() {
+    fsStreamHelper.path = mgrPrefs.userDataFolderSpecified
   }
 
   func showPreferences() {

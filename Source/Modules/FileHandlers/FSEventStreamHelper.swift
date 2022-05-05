@@ -37,7 +37,7 @@ public class FSEventStreamHelper: NSObject {
     var id: FSEventStreamEventId
   }
 
-  public let path: String
+  public var path: String
   public let dispatchQueue: DispatchQueue
   public weak var delegate: FSEventStreamHelperDelegate?
 

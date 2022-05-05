@@ -79,6 +79,7 @@ struct suiPrefPaneDictionary: View {
                       mgrPrefs.userDataFolderSpecified = newPath
                       tbxUserDataPathSpecified = mgrPrefs.userDataFolderSpecified
                       IME.initLangModels(userOnly: true)
+                      (NSApplication.shared.delegate as! AppDelegate).updateStreamHelperPath()
                     } else {
                       clsSFX.beep()
                       if !bolPreviousFolderValidity {

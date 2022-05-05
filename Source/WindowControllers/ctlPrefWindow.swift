@@ -276,6 +276,7 @@ class ctlPrefWindow: NSWindowController {
             if mgrLangModel.checkIfSpecifiedUserDataFolderValid(newPath) {
               mgrPrefs.userDataFolderSpecified = newPath
               IME.initLangModels(userOnly: true)
+              (NSApplication.shared.delegate as! AppDelegate).updateStreamHelperPath()
             } else {
               clsSFX.beep()
               if !bolPreviousFolderValidity {
