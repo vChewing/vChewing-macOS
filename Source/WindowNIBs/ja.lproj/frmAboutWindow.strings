@@ -23,5 +23,5 @@
 /* Class = "NSTextFieldCell"; title = "© 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project."; ObjectID = "lblCopyright"; */
 // "lblCopyright.title" = "© 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project.";
 
-/* Class = "NSTextFieldCell"; title = "McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.\nvChewing macOS Development: Shiki Suen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "lblCredits"; */
-"lblCredits.title" = "小麦注音入力エンジン開発：Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, など。\nmacOS 版威注音の開発：Shiki Suen, Hiraku Wang, など。\n威注音語彙データの維持：Shiki Suen。";
+/* Class = "NSTextFieldCell"; title = "Mandarin Syllable Composer Engine by Lukhnos Liu.\nInput State Management Architecture by Zonble Yang.\nvChewing macOS Development: Shiki Suen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen.\nMegrez is a rewritten unigram engine by Shiki Suen using Swift, replacing Lukhnos' C++ Gramambular engine."; ObjectID = "lblCredits"; */
+"lblCredits.title" = "ボポモフォエンジン開発：Lukhnos Liu。\n入力状態管理システム開発：Zonble Yang。\nmacOS 版威注音の開発：Shiki Suen, Hiraku Wang, など。\n威注音語彙データの維持：Shiki Suen。\nMegrez 辞書処理エンジン：Shiki Suen（Lukhnos の Gramambular C++ エンジンを Swift で再開発したものである）。";

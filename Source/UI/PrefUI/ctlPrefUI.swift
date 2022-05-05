@@ -26,50 +26,50 @@ import Cocoa
 
 @available(macOS 11.0, *)
 class ctlPrefUI {
-	lazy var controller = PreferencesWindowController(
-		panes: [
-			Preferences.Pane(
-				identifier: Preferences.PaneIdentifier(rawValue: "General"),
-				title: NSLocalizedString("General", comment: ""),
-				toolbarIcon: NSImage(
-					systemSymbolName: "wrench.and.screwdriver.fill", accessibilityDescription: "General Preferences"
-				)
-					?? NSImage(named: NSImage.homeTemplateName)!
-			) {
-				suiPrefPaneGeneral()
-			},
-			Preferences.Pane(
-				identifier: Preferences.PaneIdentifier(rawValue: "Experiences"),
-				title: NSLocalizedString("Experience", comment: ""),
-				toolbarIcon: NSImage(
-					systemSymbolName: "person.fill.questionmark", accessibilityDescription: "Experiences Preferences"
-				)
-					?? NSImage(named: NSImage.listViewTemplateName)!
-			) {
-				suiPrefPaneExperience()
-			},
-			Preferences.Pane(
-				identifier: Preferences.PaneIdentifier(rawValue: "Dictionary"),
-				title: NSLocalizedString("Dictionary", comment: ""),
-				toolbarIcon: NSImage(
-					systemSymbolName: "character.book.closed.fill", accessibilityDescription: "Dictionary Preferences"
-				)
-					?? NSImage(named: NSImage.bookmarksTemplateName)!
-			) {
-				suiPrefPaneDictionary()
-			},
-			Preferences.Pane(
-				identifier: Preferences.PaneIdentifier(rawValue: "Keyboard"),
-				title: NSLocalizedString("Keyboard", comment: ""),
-				toolbarIcon: NSImage(
-					systemSymbolName: "keyboard.macwindow", accessibilityDescription: "Keyboard Preferences"
-				)
-					?? NSImage(named: NSImage.actionTemplateName)!
-			) {
-				suiPrefPaneKeyboard()
-			},
-		],
-		style: .toolbarItems
-	)
-	static let shared = ctlPrefUI()
+  lazy var controller = PreferencesWindowController(
+    panes: [
+      Preferences.Pane(
+        identifier: Preferences.PaneIdentifier(rawValue: "General"),
+        title: NSLocalizedString("General", comment: ""),
+        toolbarIcon: NSImage(
+          systemSymbolName: "wrench.and.screwdriver.fill", accessibilityDescription: "General Preferences"
+        )
+          ?? NSImage(named: NSImage.homeTemplateName)!
+      ) {
+        suiPrefPaneGeneral()
+      },
+      Preferences.Pane(
+        identifier: Preferences.PaneIdentifier(rawValue: "Experiences"),
+        title: NSLocalizedString("Experience", comment: ""),
+        toolbarIcon: NSImage(
+          systemSymbolName: "person.fill.questionmark", accessibilityDescription: "Experiences Preferences"
+        )
+          ?? NSImage(named: NSImage.listViewTemplateName)!
+      ) {
+        suiPrefPaneExperience()
+      },
+      Preferences.Pane(
+        identifier: Preferences.PaneIdentifier(rawValue: "Dictionary"),
+        title: NSLocalizedString("Dictionary", comment: ""),
+        toolbarIcon: NSImage(
+          systemSymbolName: "character.book.closed.fill", accessibilityDescription: "Dictionary Preferences"
+        )
+          ?? NSImage(named: NSImage.bookmarksTemplateName)!
+      ) {
+        suiPrefPaneDictionary()
+      },
+      Preferences.Pane(
+        identifier: Preferences.PaneIdentifier(rawValue: "Keyboard"),
+        title: NSLocalizedString("Keyboard", comment: ""),
+        toolbarIcon: NSImage(
+          systemSymbolName: "keyboard.macwindow", accessibilityDescription: "Keyboard Preferences"
+        )
+          ?? NSImage(named: NSImage.actionTemplateName)!
+      ) {
+        suiPrefPaneKeyboard()
+      },
+    ],
+    style: .toolbarItems
+  )
+  static let shared = ctlPrefUI()
 }

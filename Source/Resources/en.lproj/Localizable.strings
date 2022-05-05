@@ -57,6 +57,9 @@
 "Edit User Symbol & Emoji Data…" = "Edit User Symbol & Emoji Data…";
 "Choose your desired user data folder." = "Choose your desired user data folder.";
 "Cursor is between \"%@\" and \"%@\"." = "Cursor is between \"%@\" and \"%@\".";
+"Loading CHS Core Dict..." = "Loading CHS Core Dict...";
+"Loading CHT Core Dict..." = "Loading CHT Core Dict...";
+"Core Dict loading complete." = "Core Dict loading complete.";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "CommonSymbols";

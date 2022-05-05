@@ -27,43 +27,43 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 
 public class clsSFX: NSObject, NSSoundDelegate {
-	private static let shared = clsSFX()
-	override private init() {
-		super.init()
-	}
+  private static let shared = clsSFX()
+  override private init() {
+    super.init()
+  }
 
-	private var currentBeep: NSSound?
-	private func beep() {
-		// Stop existing beep
-		if let beep = currentBeep {
-			if beep.isPlaying {
-				beep.stop()
-			}
-		}
-		// Create a new beep sound if possible
-		var sndBeep: String
-		if mgrPrefs.shouldNotFartInLieuOfBeep == false {
-			sndBeep = "Fart"
-		} else {
-			sndBeep = "Beep"
-		}
-		guard
-			let beep = NSSound(named: sndBeep)
-		else {
-			NSSound.beep()
-			return
-		}
-		beep.delegate = self
-		beep.volume = 0.4
-		beep.play()
-		currentBeep = beep
-	}
+  private var currentBeep: NSSound?
+  private func beep() {
+    // Stop existing beep
+    if let beep = currentBeep {
+      if beep.isPlaying {
+        beep.stop()
+      }
+    }
+    // Create a new beep sound if possible
+    var sndBeep: String
+    if mgrPrefs.shouldNotFartInLieuOfBeep == false {
+      sndBeep = "Fart"
+    } else {
+      sndBeep = "Beep"
+    }
+    guard
+      let beep = NSSound(named: sndBeep)
+    else {
+      NSSound.beep()
+      return
+    }
+    beep.delegate = self
+    beep.volume = 0.4
+    beep.play()
+    currentBeep = beep
+  }
 
-	@objc public func sound(_: NSSound, didFinishPlaying _: Bool) {
-		currentBeep = nil
-	}
+  public func sound(_: NSSound, didFinishPlaying _: Bool) {
+    currentBeep = nil
+  }
 
-	@objc static func beep() {
-		shared.beep()
-	}
+  static func beep() {
+    shared.beep()
+  }
 }
