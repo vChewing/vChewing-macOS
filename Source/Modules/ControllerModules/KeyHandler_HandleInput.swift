@@ -135,22 +135,25 @@ extension KeyHandler {
 
     // MARK: Handle BPMF Keys.
 
-    var composeReading = false
+    var keyConsumedByReading = false
     let skipPhoneticHandling = input.isReservedKey || input.isControlHold || input.isOptionHold
 
     // See if Phonetic reading is valid.
     if !skipPhoneticHandling && Composer.chkKeyValidity(charCode) {
       Composer.combineReadingKey(charCode)
+      keyConsumedByReading = true
 
       // If we have a tone marker, we have to insert the reading to the
       // builder in other words, if we don't have a tone marker, we just
       // update the composing buffer.
-      composeReading = Composer.checkWhetherToneMarkerConfirms()
+      let composeReading = Composer.hasToneMarker()
       if !composeReading {
         stateCallback(buildInputtingState())
         return true
       }
     }
+
+    var composeReading = Composer.hasToneMarker() || Composer.hasToneMarkerOnly()
 
     // See if we have composition if Enter/Space is hit and buffer is not empty.
     // We use "|=" conditioning so that the tone marker key is also taken into account.
@@ -159,10 +162,12 @@ extension KeyHandler {
     if composeReading {
       let reading = Composer.getSyllableComposition()
 
+      // See whether we have a unigram for this...
       if !ifLangModelHasUnigrams(forKey: reading) {
         IME.prtDebugIntel("B49C0979：語彙庫內無「\(reading)」的匹配記錄。")
         errorCallback()
-        stateCallback(buildInputtingState())
+        Composer.clearBuffer()
+        stateCallback((getBuilderLength() == 0) ? InputState.EmptyIgnoringPreviousState() : buildInputtingState())
         return true
       }
 
@@ -210,6 +215,16 @@ extension KeyHandler {
           stateCallback(choosingCandidates)
         }
       }
+      return true  // Telling the client that the key is consumed.
+    }
+
+    // The only possibility for this to be true is that the Bopomofo reading
+    // already has a tone marker but the last key is *not* a tone marker key. An
+    // example is the sequence "6u" with the Standard layout, which produces "ㄧˊ"
+    // but does not compose. Only sequences such as "ㄧˊ", "ˊㄧˊ", "ˊㄧˇ", or "ˊㄧ "
+    // would compose.
+    if keyConsumedByReading {
+      stateCallback(buildInputtingState())
       return true
     }
 
