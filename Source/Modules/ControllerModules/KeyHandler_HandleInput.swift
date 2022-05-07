@@ -56,7 +56,7 @@ extension KeyHandler {
 
     // MARK: Caps Lock processing.
 
-    // If Caps Lock is ON, temporarily disable bopomofo.
+    // If Caps Lock is ON, temporarily disable phonetic reading.
     // Note: Alphanumerical mode processing.
     if input.isBackSpace || input.isEnter || input.isAbsorbedArrowKey || input.isExtraChooseCandidateKey
       || input.isExtraChooseCandidateKeyReverse || input.isCursorForward || input.isCursorBackward
@@ -171,10 +171,10 @@ extension KeyHandler {
         return true
       }
 
-      // ... and insert it into the lattice grid...
+      // ... and insert it into the grid...
       insertReadingToBuilderAtCursor(reading: reading)
 
-      // ... then walk the lattice grid...
+      // ... then walk the grid...
       let poppedText = popOverflowComposingTextAndWalk()
 
       // ... get and tweak override model suggestion if possible...
@@ -218,7 +218,7 @@ extension KeyHandler {
       return true  // Telling the client that the key is consumed.
     }
 
-    // The only possibility for this to be true is that the Bopomofo reading
+    // The only possibility for this to be true is that the Phonetic reading
     // already has a tone marker but the last key is *not* a tone marker key. An
     // example is the sequence "6u" with the Standard layout, which produces "ㄧˊ"
     // but does not compose. Only sequences such as "ㄧˊ", "ˊㄧˊ", "ˊㄧˇ", or "ˊㄧ "
