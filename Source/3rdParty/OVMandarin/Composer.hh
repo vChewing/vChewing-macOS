@@ -33,7 +33,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)isBufferEmpty;
 + (void)clearBuffer;
 + (void)combineReadingKey:(UniChar)charCode;
-+ (BOOL)checkWhetherToneMarkerConfirms;
++ (BOOL)hasToneMarker;
++ (BOOL)hasToneMarkerOnly;
 + (NSString *)getSyllableComposition;
 + (void)doBackSpaceToBuffer;
 + (NSString *)getComposition;

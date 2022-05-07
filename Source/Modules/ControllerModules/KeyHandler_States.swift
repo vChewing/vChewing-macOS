@@ -303,7 +303,9 @@ extension KeyHandler {
       return false
     }
 
-    if Composer.isBufferEmpty() {
+    if Composer.hasToneMarkerOnly() {
+      Composer.clearBuffer()
+    } else if Composer.isBufferEmpty() {
       if getBuilderCursorIndex() >= 0 {
         deleteBuilderReadingInFrontOfCursor()
         walk()
@@ -462,7 +464,7 @@ extension KeyHandler {
       if !Composer.isBufferEmpty() {
         Composer.clearBuffer()
         if getBuilderLength() == 0 {
-          stateCallback(InputState.Empty())
+          stateCallback(InputState.EmptyIgnoringPreviousState())
         } else {
           stateCallback(buildInputtingState())
         }

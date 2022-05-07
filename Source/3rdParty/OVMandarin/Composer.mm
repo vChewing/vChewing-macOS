@@ -52,9 +52,14 @@ static Mandarin::BopomofoReadingBuffer *PhoneticBuffer;
     PhoneticBuffer->combineKey((char)charCode);
 }
 
-+ (BOOL)checkWhetherToneMarkerConfirms
++ (BOOL)hasToneMarker
 {
     return PhoneticBuffer->hasToneMarker();
+}
+
++ (BOOL)hasToneMarkerOnly
+{
+    return PhoneticBuffer->hasToneMarkerOnly();
 }
 
 + (NSString *)getSyllableComposition
