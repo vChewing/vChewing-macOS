@@ -56,9 +56,9 @@
 /* Class = "NSTextFieldCell"; title = "Derived from OpenVanilla McBopopmofo Project."; ObjectID = "QYf-Nf-hoi"; */
 "QYf-Nf-hoi.title" = "该专案由 OpenVanilla 小麦注音专案衍生而来。";
 
-/* Class = "NSTextFieldCell"; title = "McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.\nvChewing macOS Development: Shiki Suen, Hiraku Wang, etc.
+/* Class = "NSTextFieldCell"; title = "McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.\nvChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.
 vChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "VW8-s5-Wpn"; */
-"VW8-s5-Wpn.title" = "注音拼音输入处理引擎研发：Lukhnos Liu。\n输入法状态管理引擎研发：Zonble Yang。\n威注音 macOS 程式研发：Shiki Suen, Hiraku Wang, 等。\n威注音词库维护：Shiki Suen。\n天权星语汇引擎：Shiki Suen，用 Swift 将 Lukhnos 的 C++ Gramambular 重写而得。";
+"VW8-s5-Wpn.title" = "注音拼音输入处理引擎研发：Lukhnos Liu。\n输入法状态管理引擎研发：Zonble Yang。\n威注音 macOS 程式研发：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n威注音词库维护：Shiki Suen。\n天权星语汇引擎：Shiki Suen，用 Swift 将 Lukhnos 的 C++ Gramambular 重写而得。";
 
 /* Class = "NSTextFieldCell"; title = "Placeholder for showing copyright information."; ObjectID = "eo3-TK-0rB"; */
 // "eo3-TK-0rB.title" = "Placeholder for showing copyright information.";

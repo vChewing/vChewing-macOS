@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -58,7 +57,7 @@
                         <textFieldCell key="cell" selectable="YES" id="lblCredits">
                             <font key="font" metaFont="cellTitle"/>
                             <string key="title">McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.
-vChewing macOS Development: Shiki Suen, Hiraku Wang, etc.
+vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.
 vChewing Phrase Database Maintained by Shiki Suen.</string>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -125,7 +124,7 @@ DQ
                         <rect key="frame" x="91" y="143" width="427" height="183"/>
                         <clipView key="contentView" drawsBackground="NO" id="35U-hd-B9v">
                             <rect key="frame" x="1" y="1" width="425" height="181"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" smartInsertDelete="YES" id="cEu-uC-XnV" userLabel="appEULAContent">
                                     <rect key="frame" x="0.0" y="0.0" width="425" height="181"/>
