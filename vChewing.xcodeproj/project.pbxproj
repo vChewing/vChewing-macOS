@@ -48,6 +48,7 @@
 		5B782EC4280C243C007276DE /* KeyHandler_HandleCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */; };
 		5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */; };
 		5B7F225D2808501000DDD3CB /* KeyHandler_HandleInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7F225C2808501000DDD3CB /* KeyHandler_HandleInput.swift */; };
+		5B887F302826AEA400B6651E /* lmCoreEX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B887F2F2826AEA400B6651E /* lmCoreEX.swift */; };
 		5B949BD92816DC5400D87B5D /* LineReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B949BD82816DC5400D87B5D /* LineReader.swift */; };
 		5B949BDB2816DDBC00D87B5D /* LMConsolidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B949BDA2816DDBC00D87B5D /* LMConsolidator.swift */; };
 		5BA0DF312817857D009E73BB /* lmUserOverride.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA0DF2E2817857D009E73BB /* lmUserOverride.swift */; };
@@ -225,6 +226,7 @@
 		5B7BC4AF27AFFBE800F66C24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmPrefWindow.xib; sourceTree = "<group>"; };
 		5B7BC4B227AFFC0B00F66C24 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmPrefWindow.strings; sourceTree = "<group>"; };
 		5B7F225C2808501000DDD3CB /* KeyHandler_HandleInput.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_HandleInput.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		5B887F2F2826AEA400B6651E /* lmCoreEX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lmCoreEX.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5B949BD82816DC5400D87B5D /* LineReader.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = LineReader.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5B949BDA2816DDBC00D87B5D /* LMConsolidator.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = LMConsolidator.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5BA0DF2E2817857D009E73BB /* lmUserOverride.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = lmUserOverride.swift; sourceTree = "<group>"; usesTabs = 0; };
@@ -394,6 +396,7 @@
 			children = (
 				5B407309281672610023DFFF /* lmAssociates.swift */,
 				5BA0DF2F2817857D009E73BB /* lmCore.swift */,
+				5B887F2F2826AEA400B6651E /* lmCoreEX.swift */,
 				5B00A22F282011980058E5DB /* lmLite.swift */,
 				5B40730A281672610023DFFF /* lmReplacements.swift */,
 				5BA0DF2E2817857D009E73BB /* lmUserOverride.swift */,
@@ -1088,6 +1091,7 @@
 				5BA9FD4827FEF3C9002DE248 /* PreferencesWindowController.swift in Sources */,
 				5BD0113B28180D6100609769 /* LMInstantiator.swift in Sources */,
 				D4E569DC27A34D0E00AC2CEF /* CTools.m in Sources */,
+				5B887F302826AEA400B6651E /* lmCoreEX.swift in Sources */,
 				5BA9FD4627FEF3C9002DE248 /* Container.swift in Sources */,
 				D47F7DD0278C0897002F9DD7 /* ctlNonModalAlertWindow.swift in Sources */,
 				5B38F5A2281E2E49007D5F5D /* 0_Megrez.swift in Sources */,
