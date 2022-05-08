@@ -1,6 +1,5 @@
 // Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
-// Refactored from the ObjCpp-version of this class by:
-// (c) 2011 and onwards The OpenVanilla Project (MIT License).
+// StringView Ranges extension by (c) 2022 and onwards Isaac Xen (MIT License).
 /*
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -28,18 +27,19 @@ import Foundation
 
 extension vChewing {
   @frozen public struct LMAssociates {
-    var keyValueMap: [String: [Megrez.KeyValuePair]] = [:]
+    var rangeMap: [String: [Range<String.Index>]] = [:]
+    var strData: String = ""
 
     public var count: Int {
-      keyValueMap.count
+      rangeMap.count
     }
 
     public init() {
-      keyValueMap = [:]
+      rangeMap = [:]
     }
 
     public func isLoaded() -> Bool {
-      !keyValueMap.isEmpty
+      !rangeMap.isEmpty
     }
 
     @discardableResult public mutating func open(_ path: String) -> Bool {
@@ -50,53 +50,40 @@ extension vChewing {
       LMConsolidator.fixEOF(path: path)
       LMConsolidator.consolidate(path: path, pragma: true)
 
-      var arrData: [String] = []
-
       do {
-        arrData = try String(contentsOfFile: path, encoding: .utf8).components(separatedBy: "\n")
+        strData = try String(contentsOfFile: path, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
+        strData.ranges(splitBy: "\n").forEach {
+          let neta = strData[$0].components(separatedBy: " ")
+          if neta.count >= 2 {
+            let theKey = neta[0]
+            if !neta[0].isEmpty, !neta[1].isEmpty, theKey.first != "#" {
+              let theValue = $0
+              rangeMap[theKey, default: []].append(theValue)
+            }
+          }
+        }
       } catch {
         IME.prtDebugIntel("\(error)")
         IME.prtDebugIntel("↑ Exception happened when reading data at: \(path).")
         return false
       }
 
-      for (lineID, lineContent) in arrData.enumerated() {
-        if !lineContent.hasPrefix("#") {
-          let lineContent = lineContent.replacingOccurrences(of: "\t", with: " ")
-          if lineContent.components(separatedBy: " ").count < 2 {
-            if lineContent != "", lineContent != " " {
-              IME.prtDebugIntel("Line #\(lineID + 1) Wrecked: \(lineContent)")
-            }
-            continue
-          }
-          var currentKV = Megrez.KeyValuePair()
-          for (unitID, unitContent) in lineContent.components(separatedBy: " ").enumerated() {
-            switch unitID {
-              case 0:
-                currentKV.key = unitContent
-              case 1:
-                currentKV.value = unitContent
-              default: break
-            }
-          }
-          keyValueMap[currentKV.key, default: []].append(currentKV)
-        }
-      }
       return true
     }
 
     public mutating func close() {
       if isLoaded() {
-        keyValueMap.removeAll()
+        rangeMap.removeAll()
       }
     }
 
     public func dump() {
       var strDump = ""
-      for entry in keyValueMap {
-        let rows: [Megrez.KeyValuePair] = entry.value
-        for row in rows {
-          let addline = row.key + " " + row.value + "\n"
+      for entry in rangeMap {
+        let netaRanges: [Range<String.Index>] = entry.value
+        for netaRange in netaRanges {
+          let neta = strData[netaRange]
+          let addline = neta + "\n"
           strDump += addline
         }
       }
@@ -104,17 +91,33 @@ extension vChewing {
     }
 
     public func valuesFor(key: String) -> [String]? {
-      var v: [String] = []
-      if let matched = keyValueMap[key] {
-        for entry in matched as [Megrez.KeyValuePair] {
-          v.append(entry.value)
+      var pairs: [String] = []
+      if let arrRangeRecords: [Range<String.Index>] = rangeMap[key] {
+        for netaRange in arrRangeRecords {
+          let neta = strData[netaRange].components(separatedBy: " ")
+          let theValue: String = neta[1]
+          pairs.append(theValue)
         }
       }
-      return v
+      return pairs
     }
 
     public func hasValuesFor(key: String) -> Bool {
-      keyValueMap[key] != nil
+      rangeMap[key] != nil
+    }
+  }
+}
+
+// MARK: - StringView Ranges Extension (by Isaac Xen)
+
+extension String {
+  fileprivate func ranges(splitBy separator: Element) -> [Range<String.Index>] {
+    var startIndex = startIndex
+    return split(separator: separator).reduce(into: []) { ranges, substring in
+      _ = range(of: substring, range: startIndex..<endIndex).map { range in
+        ranges.append(range)
+        startIndex = range.upperBound
+      }
     }
   }
 }
