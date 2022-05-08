@@ -31,8 +31,10 @@ import Foundation
 
 // 簡體中文模式與繁體中文模式共用全字庫擴展模組，故單獨處理。
 // 塞在 LMInstantiator 內的話，每個模式都會讀入一份全字庫，會多佔用 100MB 記憶體。
-private var lmCNS = vChewing.LMLite(consolidate: false)
-private var lmSymbols = vChewing.LMCore(reverse: true, consolidate: false, defaultScore: -13.0, forceDefaultScore: true)
+private var lmCNS = vChewing.LMCoreEX(
+  reverse: true, consolidate: false, defaultScore: -11.0, forceDefaultScore: false)
+private var lmSymbols = vChewing.LMCoreEX(
+  reverse: true, consolidate: false, defaultScore: -13.0, forceDefaultScore: false)
 
 extension vChewing {
   /// LMInstantiator is a facade for managing a set of models including
@@ -62,26 +64,30 @@ extension vChewing {
     public var isCNSEnabled = false
     public var isSymbolEnabled = false
 
-    /// 介紹一下三個通用的語言模組型別：
-    /// LMCore 是全功能通用型的模組，每一筆辭典記錄以 key 為注音、以 [Unigram] 陣列作為記錄內容。
+    /// 介紹一下幾個通用的語言模組型別：
+    /// ----------------------
+    /// LMCoreEX 是全功能通用型的模組，每一筆辭典記錄以 key 為注音、以 [Unigram] 陣列作為記錄內容。
     /// 比較適合那種每筆記錄都有不同的權重數值的語言模組，雖然也可以強制施加權重數值就是了。
-    /// 然而缺點是：哪怕你強制施加權重數值，也不會減輕記憶體佔用。
-    /// 至於像全字庫這樣所有記錄都使用同一權重數值的模組，可以用 LMLite 以節省記憶體佔用。
-    /// LMLite 的辭典內不會存儲權重資料，只會在每次讀取記錄時施加您給定的權重數值。
-    /// LMLite 與 LMCore 都會用到多執行緒、以加速載入（不然的話，全部資料載入會耗費八秒左右）。
-    /// LMReplacements 與 LMAssociates 均為特種模組，分別擔當語彙置換表資料與使用者聯想詞的資料承載工作。
+    /// LMCoreEX 的辭典陣列不承載 Unigram 本體、而是承載索引範圍，這樣可以節約記憶體。
+    /// 一個 LMCoreEX 就可以滿足威注音幾乎所有語言模組副本的需求，當然也有這兩個例外：
+    /// LMReplacements 與 LMAssociates 分別擔當語彙置換表資料與使用者聯想詞的資料承載工作。
 
     // 聲明原廠語言模組
     /// Reverse 的話，第一欄是注音，第二欄是對應的漢字，第三欄是可能的權重。
     /// 不 Reverse 的話，第一欄是漢字，第二欄是對應的注音，第三欄是可能的權重。
-    var lmCore = LMCore(reverse: false, consolidate: false, defaultScore: -9.5, forceDefaultScore: false)
-    var lmMisc = LMCore(reverse: true, consolidate: false, defaultScore: -1, forceDefaultScore: false)
+    var lmCore = LMCoreEX(
+      reverse: false, consolidate: false, defaultScore: -9.9, forceDefaultScore: false)
+    var lmMisc = LMCoreEX(
+      reverse: true, consolidate: false, defaultScore: -1.0, forceDefaultScore: false)
 
     // 聲明使用者語言模組。
     // 使用者語言模組使用多執行緒的話，可能會導致一些問題。有時間再仔細排查看看。
-    var lmUserPhrases = LMLite(consolidate: true)
-    var lmFiltered = LMLite(consolidate: true)
-    var lmUserSymbols = LMLite(consolidate: true)
+    var lmUserPhrases = LMCoreEX(
+      reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: true)
+    var lmFiltered = LMCoreEX(
+      reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: true)
+    var lmUserSymbols = LMCoreEX(
+      reverse: true, consolidate: true, defaultScore: -12.0, forceDefaultScore: true)
     var lmReplacements = LMReplacments()
     var lmAssociates = LMAssociates()
 
@@ -201,7 +207,7 @@ extension vChewing {
       // 用 reversed 指令讓使用者語彙檔案內的詞條優先順序隨著行數增加而逐漸增高。
       // 這樣一來就可以在就地新增語彙時徹底複寫優先權。
       // 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
-      rawAllUnigrams += lmUserPhrases.unigramsFor(key: key, score: 0.0).reversed()
+      rawAllUnigrams += lmUserPhrases.unigramsFor(key: key).reversed()
       if lmUserPhrases.unigramsFor(key: key).isEmpty {
         IME.prtDebugIntel("Not found in UserPhrasesUnigram(\(lmUserPhrases.count)): \(key)")
       }
@@ -211,11 +217,11 @@ extension vChewing {
       rawAllUnigrams += lmCore.unigramsFor(key: key)
 
       if isCNSEnabled {
-        rawAllUnigrams += lmCNS.unigramsFor(key: key, score: -11)
+        rawAllUnigrams += lmCNS.unigramsFor(key: key)
       }
 
       if isSymbolEnabled {
-        rawAllUnigrams += lmUserSymbols.unigramsFor(key: key, score: -12.0)
+        rawAllUnigrams += lmUserSymbols.unigramsFor(key: key)
         if lmUserSymbols.unigramsFor(key: key).isEmpty {
           IME.prtDebugIntel("Not found in UserSymbolUnigram(\(lmUserSymbols.count)): \(key)")
         }
@@ -231,15 +237,6 @@ extension vChewing {
       for unigram in lmFiltered.unigramsFor(key: key) {
         filteredPairs.insert(unigram.keyValue)
       }
-
-      var debugOutput = "\n"
-      for neta in rawAllUnigrams {
-        debugOutput += "RAW: \(neta.keyValue.key) \(neta.keyValue.value) \(neta.score)\n"
-      }
-      if debugOutput == "\n" {
-        debugOutput = "RAW: No match found in all unigrams."
-      }
-      IME.prtDebugIntel(debugOutput)
 
       return filterAndTransform(
         unigrams: rawAllUnigrams,
