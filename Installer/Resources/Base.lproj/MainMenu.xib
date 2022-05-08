@@ -198,7 +198,7 @@
                         <textFieldCell key="cell" selectable="YES" id="VW8-s5-Wpn">
                             <font key="font" metaFont="cellTitle"/>
                             <string key="title">McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.
-vChewing macOS Development: Shiki Suen, Hiraku Wang, etc. vChewing Phrase Database Maintained by Shiki Suen.</string>
+vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc. vChewing Phrase Database Maintained by Shiki Suen.</string>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>

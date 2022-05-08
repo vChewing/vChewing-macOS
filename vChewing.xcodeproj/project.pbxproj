@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5B00A230282011980058E5DB /* lmLite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B00A22F282011980058E5DB /* lmLite.swift */; };
 		5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0AF8B427B2C8290096FE54 /* StringExtension.swift */; };
 		5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */; };
 		5B27AD6A27CB1F9B000ED75B /* data-symbols.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B27AD6827CB1F9B000ED75B /* data-symbols.txt */; };
@@ -48,10 +47,10 @@
 		5B782EC4280C243C007276DE /* KeyHandler_HandleCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */; };
 		5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */; };
 		5B7F225D2808501000DDD3CB /* KeyHandler_HandleInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7F225C2808501000DDD3CB /* KeyHandler_HandleInput.swift */; };
+		5B887F302826AEA400B6651E /* lmCoreEX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B887F2F2826AEA400B6651E /* lmCoreEX.swift */; };
 		5B949BD92816DC5400D87B5D /* LineReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B949BD82816DC5400D87B5D /* LineReader.swift */; };
 		5B949BDB2816DDBC00D87B5D /* LMConsolidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B949BDA2816DDBC00D87B5D /* LMConsolidator.swift */; };
 		5BA0DF312817857D009E73BB /* lmUserOverride.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA0DF2E2817857D009E73BB /* lmUserOverride.swift */; };
-		5BA0DF322817857D009E73BB /* lmCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA0DF2F2817857D009E73BB /* lmCore.swift */; };
 		5BA9FD0F27FEDB6B002DE248 /* suiPrefPaneGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0A27FEDB6B002DE248 /* suiPrefPaneGeneral.swift */; };
 		5BA9FD1027FEDB6B002DE248 /* suiPrefPaneKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0B27FEDB6B002DE248 /* suiPrefPaneKeyboard.swift */; };
 		5BA9FD1127FEDB6B002DE248 /* ctlPrefUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0C27FEDB6B002DE248 /* ctlPrefUI.swift */; };
@@ -161,7 +160,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		5B00A22F282011980058E5DB /* lmLite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lmLite.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5B04305327B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5B04305427B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5B04305527B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
@@ -225,10 +223,10 @@
 		5B7BC4AF27AFFBE800F66C24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmPrefWindow.xib; sourceTree = "<group>"; };
 		5B7BC4B227AFFC0B00F66C24 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmPrefWindow.strings; sourceTree = "<group>"; };
 		5B7F225C2808501000DDD3CB /* KeyHandler_HandleInput.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_HandleInput.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		5B887F2F2826AEA400B6651E /* lmCoreEX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lmCoreEX.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5B949BD82816DC5400D87B5D /* LineReader.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = LineReader.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5B949BDA2816DDBC00D87B5D /* LMConsolidator.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = LMConsolidator.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5BA0DF2E2817857D009E73BB /* lmUserOverride.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = lmUserOverride.swift; sourceTree = "<group>"; usesTabs = 0; };
-		5BA0DF2F2817857D009E73BB /* lmCore.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = lmCore.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5BA9FD0A27FEDB6B002DE248 /* suiPrefPaneGeneral.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = suiPrefPaneGeneral.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BA9FD0B27FEDB6B002DE248 /* suiPrefPaneKeyboard.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = suiPrefPaneKeyboard.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BA9FD0C27FEDB6B002DE248 /* ctlPrefUI.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlPrefUI.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -393,8 +391,7 @@
 			isa = PBXGroup;
 			children = (
 				5B407309281672610023DFFF /* lmAssociates.swift */,
-				5BA0DF2F2817857D009E73BB /* lmCore.swift */,
-				5B00A22F282011980058E5DB /* lmLite.swift */,
+				5B887F2F2826AEA400B6651E /* lmCoreEX.swift */,
 				5B40730A281672610023DFFF /* lmReplacements.swift */,
 				5BA0DF2E2817857D009E73BB /* lmUserOverride.swift */,
 			);
@@ -1077,7 +1074,6 @@
 				5B707CE827D9F4590099EF99 /* OpenCCBridge.swift in Sources */,
 				D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */,
 				5BA9FD4527FEF3C9002DE248 /* ToolbarItemStyleViewController.swift in Sources */,
-				5BA0DF322817857D009E73BB /* lmCore.swift in Sources */,
 				5BA9FD4127FEF3C8002DE248 /* PreferencesStyle.swift in Sources */,
 				5B7F225D2808501000DDD3CB /* KeyHandler_HandleInput.swift in Sources */,
 				5BA9FD1227FEDB6B002DE248 /* suiPrefPaneExperience.swift in Sources */,
@@ -1088,6 +1084,7 @@
 				5BA9FD4827FEF3C9002DE248 /* PreferencesWindowController.swift in Sources */,
 				5BD0113B28180D6100609769 /* LMInstantiator.swift in Sources */,
 				D4E569DC27A34D0E00AC2CEF /* CTools.m in Sources */,
+				5B887F302826AEA400B6651E /* lmCoreEX.swift in Sources */,
 				5BA9FD4627FEF3C9002DE248 /* Container.swift in Sources */,
 				D47F7DD0278C0897002F9DD7 /* ctlNonModalAlertWindow.swift in Sources */,
 				5B38F5A2281E2E49007D5F5D /* 0_Megrez.swift in Sources */,
@@ -1130,7 +1127,6 @@
 				5B62A34827AE7CD900A19448 /* ctlCandidateVertical.swift in Sources */,
 				5BA9FD4027FEF3C8002DE248 /* Localization.swift in Sources */,
 				5BA9FD1327FEDB6B002DE248 /* suiPrefPaneDictionary.swift in Sources */,
-				5B00A230282011980058E5DB /* lmLite.swift in Sources */,
 				5BBBB77A27AEDC690023B93A /* clsSFX.swift in Sources */,
 				5BA9FD4727FEF3C9002DE248 /* PreferencesStyleController.swift in Sources */,
 				5BF8423127BAA942008E7E4C /* vChewingKanjiConverter.swift in Sources */,

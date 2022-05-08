@@ -1,4 +1,5 @@
 // Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// StringView Ranges extension by (c) 2022 and onwards Isaac Xen (MIT License).
 /*
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -22,27 +23,31 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-// 威注音重新設計原廠詞庫語言模組。不排序，但使用 Swift 內建的 String 處理。
+/// 與之前的 LMCore 不同，LMCoreEX 不在辭典內記錄實體，而是記錄 range 範圍。
+/// 需要資料的時候，直接拿 range 去 strData 取資料。
+/// 資料記錄原理與上游 C++ 的 ParselessLM 差不多，但用的是 Swift 原生手段。
+/// 主要時間消耗仍在 For 迴圈，但這個算法可以顯著減少記憶體佔用。
 
 import Foundation
 
 extension vChewing {
-  @frozen public struct LMCore {
-    var keyValueScoreMap: [String: [Megrez.Unigram]] = [:]
+  @frozen public struct LMCoreEX {
+    var rangeMap: [String: [Range<String.Index>]] = [:]
+    var strData: String = ""
     var shouldReverse: Bool = false
     var allowConsolidation: Bool = false
     var defaultScore: Double = 0
     var shouldForceDefaultScore: Bool = false
 
     public var count: Int {
-      keyValueScoreMap.count
+      rangeMap.count
     }
 
     public init(
       reverse: Bool = false, consolidate: Bool = false, defaultScore scoreDefault: Double = 0,
       forceDefaultScore: Bool = false
     ) {
-      keyValueScoreMap = [:]
+      rangeMap = [:]
       allowConsolidation = consolidate
       shouldReverse = reverse
       defaultScore = scoreDefault
@@ -50,7 +55,7 @@ extension vChewing {
     }
 
     public func isLoaded() -> Bool {
-      !keyValueScoreMap.isEmpty
+      !rangeMap.isEmpty
     }
 
     @discardableResult public mutating func open(_ path: String) -> Bool {
@@ -63,64 +68,30 @@ extension vChewing {
         LMConsolidator.consolidate(path: path, pragma: true)
       }
 
-      var arrData: [String] = []
-
       do {
-        arrData = try String(contentsOfFile: path, encoding: .utf8).components(separatedBy: "\n")
+        strData = try String(contentsOfFile: path, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
+        strData.ranges(splitBy: "\n").forEach {
+          let neta = strData[$0].components(separatedBy: " ")
+          if neta.count >= 2 {
+            let theKey = shouldReverse ? neta[1] : neta[0]
+            if !neta[0].isEmpty, !neta[1].isEmpty, theKey.first != "#" {
+              let theValue = $0
+              rangeMap[theKey, default: []].append(theValue)
+            }
+          }
+        }
       } catch {
         IME.prtDebugIntel("\(error)")
-        IME.prtDebugIntel("↑ Exception happened when reading Associated Phrases data.")
+        IME.prtDebugIntel("↑ Exception happened when reading data at: \(path).")
         return false
       }
 
-      for (lineID, lineContent) in arrData.enumerated() {
-        if !lineContent.hasPrefix("#") {
-          let lineContent = lineContent.replacingOccurrences(of: "\t", with: " ")
-          if lineContent.components(separatedBy: " ").count < 2 {
-            if lineContent != "", lineContent != " " {
-              IME.prtDebugIntel("Line #\(lineID + 1) Wrecked: \(lineContent)")
-            }
-            continue
-          }
-          var currentUnigram = Megrez.Unigram(keyValue: Megrez.KeyValuePair(), score: defaultScore)
-          var columnOne = ""
-          var columnTwo = ""
-          for (unitID, unitContent) in lineContent.components(separatedBy: " ").enumerated() {
-            switch unitID {
-              case 0:
-                columnOne = unitContent
-              case 1:
-                columnTwo = unitContent
-              case 2:
-                if !shouldForceDefaultScore {
-                  if let unitContentConverted = Double(unitContent) {
-                    currentUnigram.score = unitContentConverted
-                  } else {
-                    IME.prtDebugIntel("Line #\(lineID) Score Data Wrecked: \(lineContent)")
-                  }
-                }
-              default: break
-            }
-          }
-          // 標點符號的頻率最好鎖定一下。
-          if columnOne.contains("_punctuation_") {
-            currentUnigram.score -= (Double(lineID) * 0.000001)
-          }
-          let kvPair =
-            shouldReverse
-            ? Megrez.KeyValuePair(key: columnTwo, value: columnOne)
-            : Megrez.KeyValuePair(key: columnOne, value: columnTwo)
-          currentUnigram.keyValue = kvPair
-          let key = shouldReverse ? columnTwo : columnOne
-          keyValueScoreMap[key, default: []].append(currentUnigram)
-        }
-      }
       return true
     }
 
     public mutating func close() {
       if isLoaded() {
-        keyValueScoreMap.removeAll()
+        rangeMap.removeAll()
       }
     }
 
@@ -128,10 +99,11 @@ extension vChewing {
 
     public func dump() {
       var strDump = ""
-      for entry in keyValueScoreMap {
-        let rows: [Megrez.Unigram] = entry.value
-        for row in rows {
-          let addline = row.keyValue.key + " " + row.keyValue.value + " " + String(row.score) + "\n"
+      for entry in rangeMap {
+        let netaRanges: [Range<String.Index>] = entry.value
+        for netaRange in netaRanges {
+          let neta = strData[netaRange]
+          let addline = neta + "\n"
           strDump += addline
         }
       }
@@ -145,11 +117,38 @@ extension vChewing {
     }
 
     public func unigramsFor(key: String) -> [Megrez.Unigram] {
-      keyValueScoreMap[key] ?? [Megrez.Unigram]()
+      var grams: [Megrez.Unigram] = []
+      if let arrRangeRecords: [Range<String.Index>] = rangeMap[key] {
+        for netaRange in arrRangeRecords {
+          let neta = strData[netaRange].components(separatedBy: " ")
+          let theValue: String = shouldReverse ? neta[0] : neta[1]
+          let kvPair = Megrez.KeyValuePair(key: key, value: theValue)
+          var theScore = defaultScore
+          if neta.count >= 3, !shouldForceDefaultScore {
+            theScore = .init(neta[2]) ?? defaultScore
+          }
+          grams.append(Megrez.Unigram(keyValue: kvPair, score: theScore))
+        }
+      }
+      return grams
     }
 
     public func hasUnigramsFor(key: String) -> Bool {
-      keyValueScoreMap[key] != nil
+      rangeMap[key] != nil
+    }
+  }
+}
+
+// MARK: - StringView Ranges Extension (by Isaac Xen)
+
+extension String {
+  fileprivate func ranges(splitBy separator: Element) -> [Range<String.Index>] {
+    var startIndex = startIndex
+    return split(separator: separator).reduce(into: []) { ranges, substring in
+      _ = range(of: substring, range: startIndex..<endIndex).map { range in
+        ranges.append(range)
+        startIndex = range.upperBound
+      }
     }
   }
 }

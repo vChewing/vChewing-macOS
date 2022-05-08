@@ -51,25 +51,23 @@ class mgrLangModel: NSObject {
   }
 
   public static func loadDataModels() {
-    DispatchQueue.global(qos: .userInitiated).async {
-      if !gLangModelCHT.isCNSDataLoaded() {
-        gLangModelCHT.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
-      }
-      if !gLangModelCHT.isMiscDataLoaded() {
-        gLangModelCHT.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
-      }
-      if !gLangModelCHT.isSymbolDataLoaded() {
-        gLangModelCHT.loadSymbolData(path: getBundleDataPath("data-symbols"))
-      }
-      if !gLangModelCHS.isCNSDataLoaded() {
-        gLangModelCHS.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
-      }
-      if !gLangModelCHS.isMiscDataLoaded() {
-        gLangModelCHS.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
-      }
-      if !gLangModelCHS.isSymbolDataLoaded() {
-        gLangModelCHS.loadSymbolData(path: getBundleDataPath("data-symbols"))
-      }
+    if !gLangModelCHT.isCNSDataLoaded() {
+      gLangModelCHT.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
+    }
+    if !gLangModelCHT.isMiscDataLoaded() {
+      gLangModelCHT.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
+    }
+    if !gLangModelCHT.isSymbolDataLoaded() {
+      gLangModelCHT.loadSymbolData(path: getBundleDataPath("data-symbols"))
+    }
+    if !gLangModelCHS.isCNSDataLoaded() {
+      gLangModelCHS.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
+    }
+    if !gLangModelCHS.isMiscDataLoaded() {
+      gLangModelCHS.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
+    }
+    if !gLangModelCHS.isSymbolDataLoaded() {
+      gLangModelCHS.loadSymbolData(path: getBundleDataPath("data-symbols"))
     }
     if !gLangModelCHT.isDataModelLoaded() {
       NotifierController.notify(
@@ -101,16 +99,14 @@ class mgrLangModel: NSObject {
 
   public static func loadDataModel(_ mode: InputMode) {
     if mode == InputMode.imeModeCHS {
-      DispatchQueue.global(qos: .userInitiated).async {
-        if !gLangModelCHS.isMiscDataLoaded() {
-          gLangModelCHS.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
-        }
-        if !gLangModelCHS.isSymbolDataLoaded() {
-          gLangModelCHS.loadSymbolData(path: getBundleDataPath("data-symbols"))
-        }
-        if !gLangModelCHS.isCNSDataLoaded() {
-          gLangModelCHS.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
-        }
+      if !gLangModelCHS.isMiscDataLoaded() {
+        gLangModelCHS.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
+      }
+      if !gLangModelCHS.isSymbolDataLoaded() {
+        gLangModelCHS.loadSymbolData(path: getBundleDataPath("data-symbols"))
+      }
+      if !gLangModelCHS.isCNSDataLoaded() {
+        gLangModelCHS.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
       }
       if !gLangModelCHS.isDataModelLoaded() {
         NotifierController.notify(
@@ -126,16 +122,14 @@ class mgrLangModel: NSObject {
         )
       }
     } else if mode == InputMode.imeModeCHT {
-      DispatchQueue.global(qos: .userInitiated).async {
-        if !gLangModelCHT.isMiscDataLoaded() {
-          gLangModelCHT.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
-        }
-        if !gLangModelCHT.isSymbolDataLoaded() {
-          gLangModelCHT.loadSymbolData(path: getBundleDataPath("data-symbols"))
-        }
-        if !gLangModelCHT.isCNSDataLoaded() {
-          gLangModelCHT.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
-        }
+      if !gLangModelCHT.isMiscDataLoaded() {
+        gLangModelCHT.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
+      }
+      if !gLangModelCHT.isSymbolDataLoaded() {
+        gLangModelCHT.loadSymbolData(path: getBundleDataPath("data-symbols"))
+      }
+      if !gLangModelCHT.isCNSDataLoaded() {
+        gLangModelCHT.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
       }
       if !gLangModelCHT.isDataModelLoaded() {
         NotifierController.notify(
