@@ -57,7 +57,7 @@ extension vChewing {
 
       } catch {
         IME.prtDebugIntel("\(error)")
-        IME.prtDebugIntel("↑ Exception happened when reading Associated Phrases data.")
+        IME.prtDebugIntel("↑ Exception happened when reading data at: \(path).")
         return false
       }
 
