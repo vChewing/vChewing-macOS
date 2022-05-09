@@ -341,7 +341,9 @@ extension KeyHandler {
 
     if input.isEnter {
       return (input.isCommandHold && input.isControlHold)
-        ? handleCtrlCommandEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+        ? (input.isOptionHold
+          ? handleCtrlOptionCommandEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+          : handleCtrlCommandEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback))
         : handleEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 

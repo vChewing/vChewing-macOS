@@ -268,7 +268,7 @@ extension KeyHandler {
     return true
   }
 
-  // MARK: - CMD+Enter 鍵處理
+  // MARK: - CMD+Enter 鍵處理（注音文）
 
   func handleCtrlCommandEnter(
     state: InputState,
@@ -288,6 +288,38 @@ extension KeyHandler {
     clear()
 
     stateCallback(InputState.Committing(poppedText: composingBuffer))
+    stateCallback(InputState.Empty())
+    return true
+  }
+
+  // MARK: - CMD+Alt+Enter 鍵處理（網頁 Ruby 注音文標記）
+
+  func handleCtrlOptionCommandEnter(
+    state: InputState,
+    stateCallback: @escaping (InputState) -> Void,
+    errorCallback _: @escaping () -> Void
+  ) -> Bool {
+    if !(state is InputState.Inputting) {
+      return false
+    }
+
+    var composed = ""
+
+    for theAnchor in _walkedNodes {
+      if let node = theAnchor.node {
+        let key = node.currentKeyValue().key.replacingOccurrences(of: "-", with: " ")
+        let value = node.currentKeyValue().value
+        if key.contains("_") {  // 不要給標點符號等特殊元素加注音
+          composed += value
+        } else {
+          composed += "<ruby>\(value)<rp>(</rp><rt>\(key)</rt><rp>)</rp></ruby>"
+        }
+      }
+    }
+
+    clear()
+
+    stateCallback(InputState.Committing(poppedText: composed))
     stateCallback(InputState.Empty())
     return true
   }
