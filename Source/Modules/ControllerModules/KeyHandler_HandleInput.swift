@@ -46,6 +46,14 @@ extension KeyHandler {
       return false
     }
 
+    // 提前過濾掉一些不合規的按鍵訊號輸入，免得相關按鍵訊號被送給 Megrez 引發輸入法崩潰。
+    if input.isInvalidInput {
+      IME.prtDebugIntel("550BCF7B: KeyHandler just refused an invalid input.")
+      errorCallback()
+      stateCallback(state)
+      return true
+    }
+
     // Ignore the input if the composing buffer is empty with no reading
     // and there is some function key combination.
     let isFunctionKey: Bool =
