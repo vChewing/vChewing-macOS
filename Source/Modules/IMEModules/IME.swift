@@ -51,7 +51,7 @@ public class IME: NSObject {
 
   static func prtDebugIntel(_ strPrint: String) {
     if mgrPrefs.isDebugModeEnabled {
-      NSLog("vChewingErrorCallback: %@", strPrint)
+      NSLog("vChewingDebug: %@", strPrint)
     }
   }
 
