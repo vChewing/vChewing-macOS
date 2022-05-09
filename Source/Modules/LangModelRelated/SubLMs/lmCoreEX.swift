@@ -127,6 +127,9 @@ extension vChewing {
           if neta.count >= 3, !shouldForceDefaultScore {
             theScore = .init(neta[2]) ?? defaultScore
           }
+          if theScore > 0 {
+            theScore *= -1  // 應對可能忘記寫負號的情形
+          }
           grams.append(Megrez.Unigram(keyValue: kvPair, score: theScore))
         }
       }
