@@ -51,27 +51,25 @@ class mgrLangModel: NSObject {
   }
 
   public static func loadDataModels() {
-    DispatchQueue.global(qos: .userInitiated).async {
-      if !gLangModelCHT.isCNSDataLoaded() {
-        gLangModelCHT.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
-      }
-      if !gLangModelCHT.isMiscDataLoaded() {
-        gLangModelCHT.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
-      }
-      if !gLangModelCHT.isSymbolDataLoaded() {
-        gLangModelCHT.loadSymbolData(path: getBundleDataPath("data-symbols"))
-      }
-      if !gLangModelCHS.isCNSDataLoaded() {
-        gLangModelCHS.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
-      }
-      if !gLangModelCHS.isMiscDataLoaded() {
-        gLangModelCHS.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
-      }
-      if !gLangModelCHS.isSymbolDataLoaded() {
-        gLangModelCHS.loadSymbolData(path: getBundleDataPath("data-symbols"))
-      }
+    if !gLangModelCHT.isCNSDataLoaded() {
+      gLangModelCHT.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
     }
-    if !gLangModelCHT.isDataModelLoaded() {
+    if !gLangModelCHT.isMiscDataLoaded() {
+      gLangModelCHT.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
+    }
+    if !gLangModelCHT.isSymbolDataLoaded() {
+      gLangModelCHT.loadSymbolData(path: getBundleDataPath("data-symbols"))
+    }
+    if !gLangModelCHS.isCNSDataLoaded() {
+      gLangModelCHS.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
+    }
+    if !gLangModelCHS.isMiscDataLoaded() {
+      gLangModelCHS.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
+    }
+    if !gLangModelCHS.isSymbolDataLoaded() {
+      gLangModelCHS.loadSymbolData(path: getBundleDataPath("data-symbols"))
+    }
+    if !gLangModelCHT.isLanguageModelLoaded() {
       NotifierController.notify(
         message: String(
           format: "%@", NSLocalizedString("Loading CHT Core Dict...", comment: "")
@@ -84,7 +82,7 @@ class mgrLangModel: NSObject {
         )
       )
     }
-    if !gLangModelCHS.isDataModelLoaded() {
+    if !gLangModelCHS.isLanguageModelLoaded() {
       NotifierController.notify(
         message: String(
           format: "%@", NSLocalizedString("Loading CHS Core Dict...", comment: "")
@@ -101,18 +99,16 @@ class mgrLangModel: NSObject {
 
   public static func loadDataModel(_ mode: InputMode) {
     if mode == InputMode.imeModeCHS {
-      DispatchQueue.global(qos: .userInitiated).async {
-        if !gLangModelCHS.isMiscDataLoaded() {
-          gLangModelCHS.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
-        }
-        if !gLangModelCHS.isSymbolDataLoaded() {
-          gLangModelCHS.loadSymbolData(path: getBundleDataPath("data-symbols"))
-        }
-        if !gLangModelCHS.isCNSDataLoaded() {
-          gLangModelCHS.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
-        }
+      if !gLangModelCHS.isMiscDataLoaded() {
+        gLangModelCHS.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
       }
-      if !gLangModelCHS.isDataModelLoaded() {
+      if !gLangModelCHS.isSymbolDataLoaded() {
+        gLangModelCHS.loadSymbolData(path: getBundleDataPath("data-symbols"))
+      }
+      if !gLangModelCHS.isCNSDataLoaded() {
+        gLangModelCHS.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
+      }
+      if !gLangModelCHS.isLanguageModelLoaded() {
         NotifierController.notify(
           message: String(
             format: "%@", NSLocalizedString("Loading CHS Core Dict...", comment: "")
@@ -126,18 +122,16 @@ class mgrLangModel: NSObject {
         )
       }
     } else if mode == InputMode.imeModeCHT {
-      DispatchQueue.global(qos: .userInitiated).async {
-        if !gLangModelCHT.isMiscDataLoaded() {
-          gLangModelCHT.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
-        }
-        if !gLangModelCHT.isSymbolDataLoaded() {
-          gLangModelCHT.loadSymbolData(path: getBundleDataPath("data-symbols"))
-        }
-        if !gLangModelCHT.isCNSDataLoaded() {
-          gLangModelCHT.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
-        }
+      if !gLangModelCHT.isMiscDataLoaded() {
+        gLangModelCHT.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
       }
-      if !gLangModelCHT.isDataModelLoaded() {
+      if !gLangModelCHT.isSymbolDataLoaded() {
+        gLangModelCHT.loadSymbolData(path: getBundleDataPath("data-symbols"))
+      }
+      if !gLangModelCHT.isCNSDataLoaded() {
+        gLangModelCHT.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
+      }
+      if !gLangModelCHT.isLanguageModelLoaded() {
         NotifierController.notify(
           message: String(
             format: "%@", NSLocalizedString("Loading CHT Core Dict...", comment: "")
@@ -153,12 +147,12 @@ class mgrLangModel: NSObject {
     }
   }
 
-  public static func loadUserPhrases() {
-    gLangModelCHT.loadUserPhrases(
+  public static func loadUserPhrasesData() {
+    gLangModelCHT.loadUserPhrasesData(
       path: userPhrasesDataPath(InputMode.imeModeCHT),
       filterPath: excludedPhrasesDataPath(InputMode.imeModeCHT)
     )
-    gLangModelCHS.loadUserPhrases(
+    gLangModelCHS.loadUserPhrasesData(
       path: userPhrasesDataPath(InputMode.imeModeCHS),
       filterPath: excludedPhrasesDataPath(InputMode.imeModeCHS)
     )
@@ -166,20 +160,20 @@ class mgrLangModel: NSObject {
     gLangModelCHS.loadUserSymbolData(path: userSymbolDataPath(InputMode.imeModeCHS))
   }
 
-  public static func loadUserAssociatedPhrases() {
-    gLangModelCHT.loadUserAssociatedPhrases(
+  public static func loadUserAssociatesData() {
+    gLangModelCHT.loadUserAssociatesData(
       path: mgrLangModel.userAssociatedPhrasesDataPath(InputMode.imeModeCHT)
     )
-    gLangModelCHS.loadUserAssociatedPhrases(
+    gLangModelCHS.loadUserAssociatesData(
       path: mgrLangModel.userAssociatedPhrasesDataPath(InputMode.imeModeCHS)
     )
   }
 
   public static func loadUserPhraseReplacement() {
-    gLangModelCHT.loadPhraseReplacementMap(
+    gLangModelCHT.loadReplacementsData(
       path: mgrLangModel.phraseReplacementDataPath(InputMode.imeModeCHT)
     )
-    gLangModelCHS.loadPhraseReplacementMap(
+    gLangModelCHS.loadReplacementsData(
       path: mgrLangModel.phraseReplacementDataPath(InputMode.imeModeCHS)
     )
   }
@@ -430,7 +424,7 @@ class mgrLangModel: NSObject {
       // We use FSEventStream to monitor possible changes of the user phrase folder, hence the
       // lack of the needs of manually load data here unless FSEventStream is disabled by user.
       if !mgrPrefs.shouldAutoReloadUserDataFiles {
-        loadUserPhrases()
+        loadUserPhrasesData()
       }
       return true
     }

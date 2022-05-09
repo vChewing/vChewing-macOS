@@ -51,7 +51,7 @@ public class IME: NSObject {
 
   static func prtDebugIntel(_ strPrint: String) {
     if mgrPrefs.isDebugModeEnabled {
-      NSLog("vChewingErrorCallback: %@", strPrint)
+      NSLog("vChewingDebug: %@", strPrint)
     }
   }
 
@@ -64,14 +64,12 @@ public class IME: NSObject {
   // MARK: - Initializing Language Models.
 
   static func initLangModels(userOnly: Bool) {
-    DispatchQueue.global(qos: .userInitiated).async {
-      // mgrLangModel 的 loadUserPhrases 等函數在自動讀取 dataFolderPath 時，
-      // 如果發現自訂目錄不可用，則會自動抹去自訂目錄設定、改採預設目錄。
-      // 所以這裡不需要特別處理。
-      mgrLangModel.loadUserAssociatedPhrases()
-      mgrLangModel.loadUserPhraseReplacement()
-      mgrLangModel.loadUserPhrases()
-    }
+    // mgrLangModel 的 loadUserPhrases 等函數在自動讀取 dataFolderPath 時，
+    // 如果發現自訂目錄不可用，則會自動抹去自訂目錄設定、改採預設目錄。
+    // 所以這裡不需要特別處理。
+    mgrLangModel.loadUserAssociatesData()
+    mgrLangModel.loadUserPhraseReplacement()
+    mgrLangModel.loadUserPhrasesData()
     if !userOnly {
       // mgrLangModel.loadDataModels()
     }

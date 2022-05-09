@@ -116,6 +116,7 @@ struct suiPrefPaneDictionary: View {
         Toggle(LocalizedStringKey("Enable CNS11643 Support (2022-01-27)"), isOn: $selEnableCNS11643)
           .onChange(of: selEnableCNS11643) { value in
             mgrPrefs.cns11643Enabled = value
+            mgrLangModel.setCNSEnabled(value)
           }
         Toggle(
           LocalizedStringKey("Enable symbol input support (incl. certain emoji symbols)"),
@@ -123,6 +124,7 @@ struct suiPrefPaneDictionary: View {
         )
         .onChange(of: selEnableSymbolInputSupport) { value in
           mgrPrefs.symbolInputEnabled = value
+          mgrLangModel.setSymbolEnabled(value)
         }
       }
     }

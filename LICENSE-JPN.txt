@@ -4,7 +4,7 @@ vChewing macOS: ＭＩＴ商標不許可ライセンス (MIT-NTL License)
 
 ボポモフォエンジン開発：Lukhnos Liu。
 入力状態管理システム開発：Zonble Yang。
-macOS 版威注音の開発：Shiki Suen, Hiraku Wang, など。
+macOS 版威注音の開発：Shiki Suen, Isaac Xen, Hiraku Wang, など。
 威注音語彙データの維持：Shiki Suen。
 Megrez 辞書処理エンジン：Shiki Suen（Lukhnos の Gramambular C++ エンジンを Swift で再開発したものである）。
 

@@ -5,7 +5,7 @@ vChewing macOS: MIT-NTL License
 © 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project.
 Mandarin Syllable Composer Engine by Lukhnos Liu.
 Input State Management Architecture by Zonble Yang.
-vChewing macOS Development: Shiki Suen, Hiraku Wang, etc.
+vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.
 vChewing Phrase Database Maintained by Shiki Suen.
 Megrez is a rewritten unigram engine by Shiki Suen using Swift, replacing Lukhnos' C++ Gramambular engine.
 

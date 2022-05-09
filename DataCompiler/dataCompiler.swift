@@ -356,7 +356,7 @@ func weightAndSort(_ arrStructUncalculated: [Entry], isCHS: Bool) -> [Entry] {
         weight = -13
       case 0:  // 墊底低頻漢字與詞語
         weight = log10(
-          fscale ** (Float(entry.valPhrase.count) / 3.0 - 1.0) * 0.5 / norm)
+          fscale ** (Float(entry.valPhrase.count) / 3.0 - 1.0) * 0.25 / norm)
       default:
         weight = log10(
           fscale ** (Float(entry.valPhrase.count) / 3.0 - 1.0)

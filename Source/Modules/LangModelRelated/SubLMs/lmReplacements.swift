@@ -1,6 +1,5 @@
 // Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
-// Refactored from the ObjCpp-version of this class by:
-// (c) 2011 and onwards The OpenVanilla Project (MIT License).
+// StringView Ranges extension by (c) 2022 and onwards Isaac Xen (MIT License).
 /*
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -28,18 +27,19 @@ import Foundation
 
 extension vChewing {
   @frozen public struct LMReplacments {
-    var keyValueMap: [String: String] = [:]
+    var rangeMap: [String: Range<String.Index>] = [:]
+    var strData: String = ""
 
     public var count: Int {
-      keyValueMap.count
+      rangeMap.count
     }
 
     public init() {
-      keyValueMap = [:]
+      rangeMap = [:]
     }
 
     public func isLoaded() -> Bool {
-      !keyValueMap.isEmpty
+      !rangeMap.isEmpty
     }
 
     @discardableResult public mutating func open(_ path: String) -> Bool {
@@ -50,58 +50,68 @@ extension vChewing {
       LMConsolidator.fixEOF(path: path)
       LMConsolidator.consolidate(path: path, pragma: true)
 
-      var arrData: [String] = []
-
       do {
-        arrData = try String(contentsOfFile: path, encoding: .utf8).components(separatedBy: "\n")
-
+        strData = try String(contentsOfFile: path, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
+        strData.ranges(splitBy: "\n").forEach {
+          let neta = strData[$0].components(separatedBy: " ")
+          if neta.count >= 2 {
+            let theKey = neta[0]
+            if !neta[0].isEmpty, !neta[1].isEmpty, theKey.first != "#" {
+              let theValue = $0
+              rangeMap[theKey] = theValue
+            }
+          }
+        }
       } catch {
         IME.prtDebugIntel("\(error)")
-        IME.prtDebugIntel("↑ Exception happened when reading Associated Phrases data.")
+        IME.prtDebugIntel("↑ Exception happened when reading data at: \(path).")
         return false
       }
 
-      for (lineID, lineContent) in arrData.enumerated() {
-        if !lineContent.hasPrefix("#") {
-          let lineContent = lineContent.replacingOccurrences(of: "\t", with: " ")
-          if lineContent.components(separatedBy: " ").count < 2 {
-            if lineContent != "", lineContent != " " {
-              IME.prtDebugIntel("Line #\(lineID + 1) Wrecked: \(lineContent)")
-            }
-            continue
-          }
-          var currentKV = Megrez.KeyValuePair()
-          for (unitID, unitContent) in lineContent.components(separatedBy: " ").enumerated() {
-            switch unitID {
-              case 0:
-                currentKV.key = unitContent
-              case 1:
-                currentKV.value = unitContent
-              default: break
-            }
-          }
-          keyValueMap[currentKV.key] = currentKV.value
-        }
-      }
       return true
     }
 
     public mutating func close() {
       if isLoaded() {
-        keyValueMap.removeAll()
+        rangeMap.removeAll()
       }
     }
 
     public func dump() {
       var strDump = ""
-      for entry in keyValueMap {
-        strDump += entry.key + " " + entry.value + "\n"
+      for entry in rangeMap {
+        strDump += strData[entry.value] + "\n"
       }
       IME.prtDebugIntel(strDump)
     }
 
     public func valuesFor(key: String) -> String {
-      keyValueMap[key] ?? ""
+      guard let range = rangeMap[key] else {
+        return ""
+      }
+      let arrNeta = strData[range].components(separatedBy: " ")
+      guard arrNeta.count >= 2 else {
+        return ""
+      }
+      return String(arrNeta[1])
+    }
+
+    public func hasValuesFor(key: String) -> Bool {
+      rangeMap[key] != nil
+    }
+  }
+}
+
+// MARK: - StringView Ranges Extension (by Isaac Xen)
+
+extension String {
+  fileprivate func ranges(splitBy separator: Element) -> [Range<String.Index>] {
+    var startIndex = startIndex
+    return split(separator: separator).reduce(into: []) { ranges, substring in
+      _ = range(of: substring, range: startIndex..<endIndex).map { range in
+        ranges.append(range)
+        startIndex = range.upperBound
+      }
     }
   }
 }

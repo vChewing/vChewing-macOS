@@ -61,16 +61,16 @@ enum KeyCode: UInt16 {
   case kF8 = 100
   case kF9 = 101
   case kF11 = 103
-  case kF13 = 105
+  case kF13 = 105  // PrtSc
   case kF16 = 106
   case kF14 = 107
   case kF10 = 109
   case kF12 = 111
   case kF15 = 113
-  case kHelp = 114
+  case kHelp = 114  // Insert
   case kHome = 115
   case kPageUp = 116
-  case kWindowDelete = 117  // Renamed from "kForwardDelete" to avoid nomenclatural confusions.
+  case kWindowsDelete = 117  // Renamed from "kForwardDelete" to avoid nomenclatural confusions.
   case kF4 = 118
   case kEnd = 119
   case kF2 = 120
@@ -80,6 +80,33 @@ enum KeyCode: UInt16 {
   case kRightArrow = 124
   case kDownArrow = 125
   case kUpArrow = 126
+}
+
+enum KeyCodeBlackListed: UInt16 {
+  case kF17 = 64
+  case kVolumeUp = 72
+  case kVolumeDown = 73
+  case kMute = 74
+  case kF18 = 79
+  case kF19 = 80
+  case kF20 = 90
+  case kF5 = 96
+  case kF6 = 97
+  case kF7 = 98
+  case kF3 = 99
+  case kF8 = 100
+  case kF9 = 101
+  case kF11 = 103
+  case kF13 = 105  // PrtSc
+  case kF16 = 106
+  case kF14 = 107
+  case kF10 = 109
+  case kF12 = 111
+  case kF15 = 113
+  case kHelp = 114  // Insert
+  case kF4 = 118
+  case kF2 = 120
+  case kF1 = 122
 }
 
 // CharCodes: https://theasciicode.com.ar/ascii-control-characters/horizontal-tab-ascii-code-9.html
@@ -170,6 +197,26 @@ class InputHandler: NSObject {
       inputTextIgnoringModifiers ?? "")
     return
       "<\(super.description) inputText:\(String(describing: inputText)), inputTextIgnoringModifiers:\(String(describing: inputTextIgnoringModifiers)) charCode:\(charCode), keyCode:\(keyCode), flags:\(flags), cursorForwardKey:\(cursorForwardKey), cursorBackwardKey:\(cursorBackwardKey), extraChooseCandidateKey:\(extraChooseCandidateKey), extraChooseCandidateKeyReverse:\(extraChooseCandidateKeyReverse), absorbedArrowKey:\(absorbedArrowKey),  verticalModeOnlyChooseCandidateKey:\(verticalModeOnlyChooseCandidateKey), emacsKey:\(emacsKey), useVerticalMode:\(useVerticalMode)>"
+  }
+
+  // 除了 ANSI charCode 以外，其餘一律過濾掉，免得純 Swift 版 KeyHandler 被餵屎。
+  var isInvalidInput: Bool {
+    switch charCode {
+      case 0x20...0xFF:  // ANSI charCode 範圍
+        return false
+      default:
+        if isReservedKey, !isKeyCodeBlacklisted {
+          return false
+        }
+        return true
+    }
+  }
+
+  var isKeyCodeBlacklisted: Bool {
+    guard let code = KeyCodeBlackListed(rawValue: keyCode) else {
+      return false
+    }
+    return code.rawValue != KeyCode.kNone.rawValue
   }
 
   var isShiftHold: Bool {
@@ -269,7 +316,7 @@ class InputHandler: NSObject {
   }
 
   var isDelete: Bool {
-    KeyCode(rawValue: keyCode) == KeyCode.kWindowDelete
+    KeyCode(rawValue: keyCode) == KeyCode.kWindowsDelete
   }
 
   var isCursorBackward: Bool {

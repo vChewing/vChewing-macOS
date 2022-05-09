@@ -115,12 +115,12 @@ class KeyHandler: NSObject {
   // MARK: - Functions dealing with Megrez.
 
   func walk() {
-    // Retrieve the most likely trellis, i.e. a Maximum Likelihood Estimation
+    // Retrieve the most likely grid, i.e. a Maximum Likelihood Estimation
     // of the best possible Mandarin characters given the input syllables,
-    // using the Viterbi algorithm implemented in the Gramambular library
+    // using the Viterbi algorithm implemented in the Megrez library
     let walker = Megrez.Walker(grid: _builder.grid())
 
-    // the reverse walk traces the trellis from the end
+    // the reverse walk traces the grid from the end
     let walked: [Megrez.NodeAnchor] = walker.reverseWalk(at: _builder.grid().width())
 
     // then we use ".reversed()" to reverse the nodes so that we get the forward-walked nodes

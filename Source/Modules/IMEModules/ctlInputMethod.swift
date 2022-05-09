@@ -407,10 +407,19 @@ extension ctlInputMethod {
       candidates.sort {
         $0.count > $1.count
       }
-      // If there is a candidate which is too long, we use the vertical
-      // candidate list window automatically.
-      if candidates.first?.count ?? 0 > 8 {
-        // return true // 禁用這一項。威注音回頭會換候選窗格。
+      if let candidateFirst = candidates.first {
+        // If there is a candidate which is too long, we use the vertical
+        // candidate list window automatically.
+        if candidateFirst.count > 8 {
+          // return true // 禁用這一項。威注音回頭會換候選窗格。
+        }
+      }
+      // 如果是顏文字選單的話，則強行使用縱排候選字窗。
+      // 有些顏文字會比較長，所以這裡用 for 判斷。
+      for candidate in candidates {
+        if ["顏文字", "颜文字"].contains(candidate), mgrPrefs.symbolInputEnabled {
+          return true
+        }
       }
       return false
     }()

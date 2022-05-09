@@ -5,7 +5,7 @@ vChewing macOS: MIT-NTL License 麻理（去商標）授權合約
 © 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project.
 注音拼音輸入處理引擎研發：Lukhnos Liu。
 輸入法狀態管理引擎研發：Zonble Yang。
-威注音 macOS 程式研發：Shiki Suen, Hiraku Wang, 等。
+威注音 macOS 程式研發：Shiki Suen, Isaac Xen, Hiraku Wang, 等。
 威注音詞庫維護：Shiki Suen。
 天權星語彙引擎：Shiki Suen，用 Swift 將 Lukhnos 的 C++ Gramambular 重寫而得。
 

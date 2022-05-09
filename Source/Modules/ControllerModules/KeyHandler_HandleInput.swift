@@ -46,6 +46,14 @@ extension KeyHandler {
       return false
     }
 
+    // 提前過濾掉一些不合規的按鍵訊號輸入，免得相關按鍵訊號被送給 Megrez 引發輸入法崩潰。
+    if input.isInvalidInput {
+      IME.prtDebugIntel("550BCF7B: KeyHandler just refused an invalid input.")
+      errorCallback()
+      stateCallback(state)
+      return true
+    }
+
     // Ignore the input if the composing buffer is empty with no reading
     // and there is some function key combination.
     let isFunctionKey: Bool =
@@ -56,7 +64,7 @@ extension KeyHandler {
 
     // MARK: Caps Lock processing.
 
-    // If Caps Lock is ON, temporarily disable bopomofo.
+    // If Caps Lock is ON, temporarily disable phonetic reading.
     // Note: Alphanumerical mode processing.
     if input.isBackSpace || input.isEnter || input.isAbsorbedArrowKey || input.isExtraChooseCandidateKey
       || input.isExtraChooseCandidateKeyReverse || input.isCursorForward || input.isCursorBackward
@@ -135,22 +143,25 @@ extension KeyHandler {
 
     // MARK: Handle BPMF Keys.
 
-    var composeReading = false
+    var keyConsumedByReading = false
     let skipPhoneticHandling = input.isReservedKey || input.isControlHold || input.isOptionHold
 
     // See if Phonetic reading is valid.
     if !skipPhoneticHandling && Composer.chkKeyValidity(charCode) {
       Composer.combineReadingKey(charCode)
+      keyConsumedByReading = true
 
       // If we have a tone marker, we have to insert the reading to the
       // builder in other words, if we don't have a tone marker, we just
       // update the composing buffer.
-      composeReading = Composer.checkWhetherToneMarkerConfirms()
+      let composeReading = Composer.hasToneMarker()
       if !composeReading {
         stateCallback(buildInputtingState())
         return true
       }
     }
+
+    var composeReading = Composer.hasToneMarker() || Composer.hasToneMarkerOnly()
 
     // See if we have composition if Enter/Space is hit and buffer is not empty.
     // We use "|=" conditioning so that the tone marker key is also taken into account.
@@ -159,17 +170,19 @@ extension KeyHandler {
     if composeReading {
       let reading = Composer.getSyllableComposition()
 
+      // See whether we have a unigram for this...
       if !ifLangModelHasUnigrams(forKey: reading) {
         IME.prtDebugIntel("B49C0979：語彙庫內無「\(reading)」的匹配記錄。")
         errorCallback()
-        stateCallback(buildInputtingState())
+        Composer.clearBuffer()
+        stateCallback((getBuilderLength() == 0) ? InputState.EmptyIgnoringPreviousState() : buildInputtingState())
         return true
       }
 
-      // ... and insert it into the lattice grid...
+      // ... and insert it into the grid...
       insertReadingToBuilderAtCursor(reading: reading)
 
-      // ... then walk the lattice grid...
+      // ... then walk the grid...
       let poppedText = popOverflowComposingTextAndWalk()
 
       // ... get and tweak override model suggestion if possible...
@@ -210,6 +223,16 @@ extension KeyHandler {
           stateCallback(choosingCandidates)
         }
       }
+      return true  // Telling the client that the key is consumed.
+    }
+
+    // The only possibility for this to be true is that the Phonetic reading
+    // already has a tone marker but the last key is *not* a tone marker key. An
+    // example is the sequence "6u" with the Standard layout, which produces "ㄧˊ"
+    // but does not compose. Only sequences such as "ㄧˊ", "ˊㄧˊ", "ˊㄧˇ", or "ˊㄧ "
+    // would compose.
+    if keyConsumedByReading {
+      stateCallback(buildInputtingState())
       return true
     }
 
@@ -318,7 +341,9 @@ extension KeyHandler {
 
     if input.isEnter {
       return (input.isCommandHold && input.isControlHold)
-        ? handleCtrlCommandEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+        ? (input.isOptionHold
+          ? handleCtrlOptionCommandEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+          : handleCtrlCommandEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback))
         : handleEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 
