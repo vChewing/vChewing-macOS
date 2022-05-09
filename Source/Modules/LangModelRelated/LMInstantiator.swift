@@ -32,9 +32,11 @@ import Foundation
 // 簡體中文模式與繁體中文模式共用全字庫擴展模組，故單獨處理。
 // 塞在 LMInstantiator 內的話，每個模式都會讀入一份全字庫，會多佔用 100MB 記憶體。
 private var lmCNS = vChewing.LMCoreEX(
-  reverse: true, consolidate: false, defaultScore: -11.0, forceDefaultScore: false)
+  reverse: true, consolidate: false, defaultScore: -11.0, forceDefaultScore: false
+)
 private var lmSymbols = vChewing.LMCoreEX(
-  reverse: true, consolidate: false, defaultScore: -13.0, forceDefaultScore: false)
+  reverse: true, consolidate: false, defaultScore: -13.0, forceDefaultScore: false
+)
 
 extension vChewing {
   /// LMInstantiator is a facade for managing a set of models including
@@ -76,18 +78,23 @@ extension vChewing {
     /// Reverse 的話，第一欄是注音，第二欄是對應的漢字，第三欄是可能的權重。
     /// 不 Reverse 的話，第一欄是漢字，第二欄是對應的注音，第三欄是可能的權重。
     var lmCore = LMCoreEX(
-      reverse: false, consolidate: false, defaultScore: -9.9, forceDefaultScore: false)
+      reverse: false, consolidate: false, defaultScore: -9.9, forceDefaultScore: false
+    )
     var lmMisc = LMCoreEX(
-      reverse: true, consolidate: false, defaultScore: -1.0, forceDefaultScore: false)
+      reverse: true, consolidate: false, defaultScore: -1.0, forceDefaultScore: false
+    )
 
     // 聲明使用者語言模組。
     // 使用者語言模組使用多執行緒的話，可能會導致一些問題。有時間再仔細排查看看。
     var lmUserPhrases = LMCoreEX(
-      reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: true)
+      reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: true
+    )
     var lmFiltered = LMCoreEX(
-      reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: true)
+      reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: true
+    )
     var lmUserSymbols = LMCoreEX(
-      reverse: true, consolidate: true, defaultScore: -12.0, forceDefaultScore: true)
+      reverse: true, consolidate: true, defaultScore: -12.0, forceDefaultScore: true
+    )
     var lmReplacements = LMReplacments()
     var lmAssociates = LMAssociates()
 
@@ -96,7 +103,7 @@ extension vChewing {
 
     // 以下這些函數命名暫時保持原樣，等弒神行動徹底結束了再調整。
 
-    public func isDataModelLoaded() -> Bool { lmCore.isLoaded() }
+    public func isLanguageModelLoaded() -> Bool { lmCore.isLoaded() }
     public func loadLanguageModel(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
         lmCore.open(path)
@@ -136,7 +143,7 @@ extension vChewing {
       }
     }
 
-    public func loadUserPhrases(path: String, filterPath: String) {
+    public func loadUserPhrasesData(path: String, filterPath: String) {
       if FileManager.default.isReadableFile(atPath: path) {
         lmUserPhrases.close()
         lmUserPhrases.open(path)
@@ -163,7 +170,7 @@ extension vChewing {
       }
     }
 
-    public func loadUserAssociatedPhrases(path: String) {
+    public func loadUserAssociatesData(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
         lmAssociates.close()
         lmAssociates.open(path)
@@ -173,7 +180,7 @@ extension vChewing {
       }
     }
 
-    public func loadPhraseReplacementMap(path: String) {
+    public func loadReplacementsData(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
         lmReplacements.close()
         lmReplacements.open(path)

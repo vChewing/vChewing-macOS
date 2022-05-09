@@ -135,7 +135,7 @@ extension ctlInputMethod {
     if optionKeyPressed || !mgrPrefs.shouldAutoReloadUserDataFiles {
       menu.addItem(
         withTitle: NSLocalizedString("Reload User Phrases", comment: ""),
-        action: #selector(reloadUserPhrases(_:)), keyEquivalent: ""
+        action: #selector(reloadUserPhrasesData(_:)), keyEquivalent: ""
       )
     }
 
@@ -346,7 +346,7 @@ extension ctlInputMethod {
     }
   }
 
-  @objc func reloadUserPhrases(_: Any?) {
+  @objc func reloadUserPhrasesData(_: Any?) {
     IME.initLangModels(userOnly: true)
   }
 

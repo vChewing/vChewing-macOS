@@ -99,7 +99,6 @@ extension vChewing {
     public func hasValuesFor(key: String) -> Bool {
       rangeMap[key] != nil
     }
-
   }
 }
 
