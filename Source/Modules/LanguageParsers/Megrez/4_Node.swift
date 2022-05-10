@@ -36,6 +36,8 @@ extension Megrez {
     var mutCandidateFixed: Bool = false
     var mutSelectedUnigramIndex: Int = 0
 
+    let kSelectedCandidateScore: Double = 99
+
     public init(key: String, unigrams: [Megrez.Unigram], bigrams: [Megrez.Bigram] = []) {
       mutLM = LanguageModel()
 
@@ -112,7 +114,7 @@ extension Megrez {
     public func selectCandidateAt(index: Int = 0, fix: Bool = false) {
       mutSelectedUnigramIndex = index >= mutUnigrams.count ? 0 : index
       mutCandidateFixed = fix
-      mutScore = 99
+      mutScore = kSelectedCandidateScore
     }
 
     public func resetCandidate() {
