@@ -71,9 +71,9 @@ extension vChewing {
       do {
         strData = try String(contentsOfFile: path, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
         strData.ranges(splitBy: "\n").forEach {
-          let neta = strData[$0].components(separatedBy: " ")
+          let neta = strData[$0].split(separator: " ")
           if neta.count >= 2 {
-            let theKey = shouldReverse ? neta[1] : neta[0]
+            let theKey = shouldReverse ? String(neta[1]) : String(neta[0])
             if !neta[0].isEmpty, !neta[1].isEmpty, theKey.first != "#" {
               let theValue = $0
               rangeMap[theKey, default: []].append(theValue)
@@ -120,12 +120,12 @@ extension vChewing {
       var grams: [Megrez.Unigram] = []
       if let arrRangeRecords: [Range<String.Index>] = rangeMap[key] {
         for netaRange in arrRangeRecords {
-          let neta = strData[netaRange].components(separatedBy: " ")
-          let theValue: String = shouldReverse ? neta[0] : neta[1]
+          let neta = strData[netaRange].split(separator: " ")
+          let theValue: String = shouldReverse ? String(neta[0]) : String(neta[1])
           let kvPair = Megrez.KeyValuePair(key: key, value: theValue)
           var theScore = defaultScore
           if neta.count >= 3, !shouldForceDefaultScore {
-            theScore = .init(neta[2]) ?? defaultScore
+            theScore = .init(String(neta[2])) ?? defaultScore
           }
           if theScore > 0 {
             theScore *= -1  // 應對可能忘記寫負號的情形

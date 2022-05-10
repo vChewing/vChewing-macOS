@@ -53,9 +53,9 @@ extension vChewing {
       do {
         strData = try String(contentsOfFile: path, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
         strData.ranges(splitBy: "\n").forEach {
-          let neta = strData[$0].components(separatedBy: " ")
+          let neta = strData[$0].split(separator: " ")
           if neta.count >= 2 {
-            let theKey = neta[0]
+            let theKey = String(neta[0])
             if !neta[0].isEmpty, !neta[1].isEmpty, theKey.first != "#" {
               let theValue = $0
               rangeMap[theKey, default: []].append(theValue)
@@ -94,8 +94,8 @@ extension vChewing {
       var pairs: [String] = []
       if let arrRangeRecords: [Range<String.Index>] = rangeMap[key] {
         for netaRange in arrRangeRecords {
-          let neta = strData[netaRange].components(separatedBy: " ")
-          let theValue: String = neta[1]
+          let neta = strData[netaRange].split(separator: " ")
+          let theValue: String = String(neta[1])
           pairs.append(theValue)
         }
       }
