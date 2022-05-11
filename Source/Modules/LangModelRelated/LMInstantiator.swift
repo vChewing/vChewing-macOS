@@ -236,9 +236,8 @@ extension vChewing {
         rawAllUnigrams += lmSymbols.unigramsFor(key: key)
       }
 
-      // 準備過濾清單與統計清單
-      var insertedPairs: Set<Megrez.KeyValuePair> = []  // 統計清單
-      var filteredPairs: Set<Megrez.KeyValuePair> = []  // 過濾清單
+      // 準備過濾清單。因為我們在 Swift 使用 NSOrderedSet，所以就不需要統計清單了。
+      var filteredPairs: Set<Megrez.KeyValuePair> = []
 
       // 載入要過濾的 KeyValuePair 清單。
       for unigram in lmFiltered.unigramsFor(key: key) {
@@ -247,7 +246,7 @@ extension vChewing {
 
       return filterAndTransform(
         unigrams: rawAllUnigrams,
-        filter: filteredPairs, inserted: &insertedPairs
+        filter: filteredPairs
       )
     }
 
@@ -275,8 +274,7 @@ extension vChewing {
 
     func filterAndTransform(
       unigrams: [Megrez.Unigram],
-      filter filteredPairs: Set<Megrez.KeyValuePair>,
-      inserted insertedPairs: inout Set<Megrez.KeyValuePair>
+      filter filteredPairs: Set<Megrez.KeyValuePair>
     ) -> [Megrez.Unigram] {
       var results: [Megrez.Unigram] = []
 
@@ -293,13 +291,12 @@ extension vChewing {
             pair.value = replacement
           }
         }
-
-        if !insertedPairs.contains(pair) {
-          results.append(Megrez.Unigram(keyValue: pair, score: unigram.score))
-          insertedPairs.insert(pair)
-        }
+        results.append(Megrez.Unigram(keyValue: pair, score: unigram.score))
       }
-      return results
+      // Swift 不見得非得用 Swift-Collections 才可以用 OrderedSet，還有 NSOrderedSet 可用來去重複。
+      let resultsDeduplicated = Array(NSOrderedSet(array: results).array as! [Megrez.Unigram])
+
+      return resultsDeduplicated
     }
   }
 }

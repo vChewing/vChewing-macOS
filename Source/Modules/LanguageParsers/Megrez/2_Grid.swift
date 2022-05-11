@@ -140,16 +140,15 @@ extension Megrez {
 
     public func fixNodeSelectedCandidate(location: Int, value: String) -> NodeAnchor {
       var node = NodeAnchor()
-      let nodes = nodesCrossingOrEndingAt(location: location)
-      for nodeAnchor in nodes {
+      for (index, nodeAnchor) in nodesCrossingOrEndingAt(location: location).enumerated() {
         // Reset the candidate-fixed state of every node at the location.
         let candidates = nodeAnchor.node?.candidates() ?? []
-        nodeAnchor.node?.resetCandidate()
+        nodesCrossingOrEndingAt(location: location)[index].node?.resetCandidate()
 
         for (i, candidate) in candidates.enumerated() {
           if candidate.value == value {
-            nodeAnchor.node?.selectCandidateAt(index: i)
-            node = nodeAnchor
+            nodesCrossingOrEndingAt(location: location)[index].node?.selectCandidateAt(index: i)
+            node = nodesCrossingOrEndingAt(location: location)[index]
             break
           }
         }
@@ -158,18 +157,17 @@ extension Megrez {
     }
 
     public func overrideNodeScoreForSelectedCandidate(location: Int, value: String, overridingScore: Double) {
-      for nodeAnchor in nodesCrossingOrEndingAt(location: location) {
-        var nodeAnchor = nodeAnchor
+      for (index, nodeAnchor) in nodesCrossingOrEndingAt(location: location).enumerated() {
         if let theNode = nodeAnchor.node {
           let candidates = theNode.candidates()
           // Reset the candidate-fixed state of every node at the location.
-          theNode.resetCandidate()
-          nodeAnchor.node = theNode
+          nodesCrossingOrEndingAt(location: location)[index].node?.resetCandidate()
 
           for (i, candidate) in candidates.enumerated() {
             if candidate.value == value {
-              theNode.selectFloatingCandidateAt(index: i, score: overridingScore)
-              nodeAnchor.node = theNode
+              nodesCrossingOrEndingAt(location: location)[index].node?.selectFloatingCandidateAt(
+                index: i, score: overridingScore
+              )
               break
             }
           }

@@ -32,5 +32,11 @@ extension Megrez {
     public var keyLength: Int {
       node?.key().count ?? 0
     }
+
+    public var balancedScore: Double {
+      let weightedScore: Double = (Double(spanningLength) - 1) * 2
+      let nodeScore: Double = node?.score() ?? 0
+      return weightedScore + nodeScore
+    }
   }
 }

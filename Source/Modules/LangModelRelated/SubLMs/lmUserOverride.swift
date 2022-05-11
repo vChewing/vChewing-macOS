@@ -74,6 +74,9 @@ extension vChewing {
 
     public init(capacity: Int = 500, decayConstant: Double = 5400.0) {
       mutCapacity = abs(capacity)  // Ensures that this value is always > 0.
+      if mutCapacity == 0 {
+        mutCapacity = 1
+      }
       mutDecayExponent = log(0.5) / decayConstant
     }
 
@@ -88,7 +91,7 @@ extension vChewing {
       else {
         return
       }
-      guard let map = mutLRUMap[key] else {
+      guard mutLRUMap[key] != nil else {
         var observation: Observation = .init()
         observation.update(candidate: candidate, timestamp: timestamp)
         mutLRUMap[key] = KeyObservationPair(key: key, observation: observation)
@@ -100,10 +103,11 @@ extension vChewing {
         }
         return
       }
-      var obs = map.observation
-      obs.update(candidate: candidate, timestamp: timestamp)
-      let pair = KeyObservationPair(key: key, observation: obs)
-      mutLRUList.insert(pair, at: 0)
+      mutLRUList.insert(contentsOf: mutLRUMap.values, at: 0)
+
+      if mutLRUMap[key] != nil {
+        mutLRUMap[key]?.observation.update(candidate: candidate, timestamp: timestamp)
+      }
     }
 
     public func suggest(
