@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="UTF-8"?>
 <!DOCTYPE keyboard SYSTEM "file://localhost/System/Library/DTDs/KeyboardLayout.dtd">
-<!--Last edited by Ukelele version 351 on 2022-03-08 at 13:26 (GMT+8)-->
-<keyboard group="126" id="-17519" name="vChewing FakeSeigyou" maxout="1">
+<!--Last edited by Ukelele version 351 on 2022-05-12 at 11:52 (GMT+8)-->
+<keyboard group="126" id="-30406" name="vChewing FakeSeigyou" maxout="1">
     <layouts>
         <layout first="0" last="17" mapSet="16c" modifiers="f4"/>
         <layout first="18" last="18" mapSet="a88" modifiers="f4"/>
@@ -84,7 +84,7 @@
             <key code="36" output="&#x000D;"/>
             <key code="37" output="ㄠ"/>
             <key code="38" output="ㄘ"/>
-            <key code="39" output="ㄩ"/>
+            <key code="39" output="&#x0027;"/>
             <key code="40" output="ㄜ"/>
             <key code="41" output="ㄤ"/>
             <key code="42" output="、"/>
