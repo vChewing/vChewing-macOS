@@ -37,58 +37,60 @@ extension KeyHandler {
     var composingBuffer = ""
     var composedStringCursorIndex = 0
 
-    var readingCursorIndex: size_t = 0
-    let builderCursorIndex: size_t = getBuilderCursorIndex()
+    var readingCursorIndex = 0
+    let builderCursorIndex = getBuilderCursorIndex()
 
-    // We must do some Unicode codepoint counting to find the actual cursor location for the client
-    // i.e. we need to take UTF-16 into consideration, for which a surrogate pair takes 2 UniChars
-    // locations. These processes are inherited from the ObjC++ version of this class and might be
-    // unnecessary in Swift, but this deduction requires further experiments.
-    for walkedNode in _walkedNodes {
-      if let theNode = walkedNode.node {
-        let strNodeValue = theNode.currentKeyValue().value
-        composingBuffer += strNodeValue
+    for theAnchor in _walkedNodes {
+      guard let node = theAnchor.node else {
+        continue
+      }
 
-        let arrSplit: [NSString] = (strNodeValue as NSString).split()
-        let codepointCount = arrSplit.count
+      let valueString = node.currentKeyValue().value
+      composingBuffer += valueString
+      let codepointCount = valueString.count
 
-        // This re-aligns the cursor index in the composed string
-        // (the actual cursor on the screen) with the builder's logical
-        // cursor (reading) cursor; each built node has a "spanning length"
-        // (e.g. two reading blocks has a spanning length of 2), and we
-        // accumulate those lengths to calculate the displayed cursor
-        // index.
-        let spanningLength: Int = walkedNode.spanningLength
-        if readingCursorIndex + spanningLength <= builderCursorIndex {
-          composedStringCursorIndex += (strNodeValue as NSString).length
-          readingCursorIndex += spanningLength
-        } else {
-          if codepointCount == spanningLength {
-            var i = 0
-            while i < codepointCount, readingCursorIndex < builderCursorIndex {
-              composedStringCursorIndex += arrSplit[i].length
-              readingCursorIndex += 1
-              i += 1
-            }
-          } else {
+      let spanningLength = theAnchor.spanningLength
+      if readingCursorIndex + spanningLength <= builderCursorIndex {
+        composedStringCursorIndex += valueString.count
+        readingCursorIndex += spanningLength
+      } else {
+        if codepointCount == spanningLength {
+          for _ in 0..<codepointCount {
             if readingCursorIndex < builderCursorIndex {
-              composedStringCursorIndex += (strNodeValue as NSString).length
-              readingCursorIndex += spanningLength
-              if readingCursorIndex > builderCursorIndex {
-                readingCursorIndex = builderCursorIndex
-              }
+              composedStringCursorIndex += 1
+              readingCursorIndex += 1
+            }
+          }
+        } else {
+          if readingCursorIndex < builderCursorIndex {
+            composedStringCursorIndex += valueString.count
+            readingCursorIndex += spanningLength
+            if readingCursorIndex > builderCursorIndex {
+              readingCursorIndex = builderCursorIndex
             }
           }
         }
       }
     }
+
     // Now, we gather all the intel, separate the composing buffer to two parts (head and tail),
     // and insert the reading text (the Mandarin syllable) in between them.
     // The reading text is what the user is typing.
 
-    let head = String((composingBuffer as NSString).substring(to: composedStringCursorIndex))
+    var rawHead = ""
+    var rawEnd = ""
+
+    for (i, n) in composingBuffer.enumerated() {
+      if i < composedStringCursorIndex {
+        rawHead += String(n)
+      } else {
+        rawEnd += String(n)
+      }
+    }
+
+    let head = rawHead
     let reading = _composer.getDisplayedComposition()
-    let tail = String((composingBuffer as NSString).substring(from: composedStringCursorIndex))
+    let tail = rawEnd
     let composedText = head + reading + tail
     let cursorIndex = composedStringCursorIndex + reading.count
 
