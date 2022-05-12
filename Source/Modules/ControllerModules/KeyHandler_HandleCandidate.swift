@@ -331,7 +331,7 @@ extension KeyHandler {
         let punctuation: String = arrPunctuations.joined(separator: "")
 
         var shouldAutoSelectCandidate: Bool =
-          Composer.chkKeyValidity(charCode) || ifLangModelHasUnigrams(forKey: customPunctuation)
+          _composer.inputValidityCheck(key: charCode) || ifLangModelHasUnigrams(forKey: customPunctuation)
           || ifLangModelHasUnigrams(forKey: punctuation)
 
         if !shouldAutoSelectCandidate, input.isUpperCaseASCIILetterKey {

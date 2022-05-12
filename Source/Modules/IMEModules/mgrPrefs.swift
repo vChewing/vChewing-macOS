@@ -168,7 +168,7 @@ struct ComposingBufferSize {
   case ofStandard = 0
   case ofEten = 1
   case ofHsu = 2
-  case ofEen26 = 3
+  case ofEten26 = 3
   case ofIBM = 4
   case ofMiTAC = 5
   case ofFakeSeigyou = 6
@@ -182,7 +182,7 @@ struct ComposingBufferSize {
         return "ETen"
       case .ofHsu:
         return "Hsu"
-      case .ofEen26:
+      case .ofEten26:
         return "ETen26"
       case .ofIBM:
         return "IBM"

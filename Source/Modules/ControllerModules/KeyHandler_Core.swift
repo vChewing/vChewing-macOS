@@ -48,6 +48,7 @@ protocol KeyHandlerDelegate: NSObjectProtocol {
 
 class KeyHandler: NSObject {
   let kEpsilon: Double = 0.000001
+  var _composer: Tekkon.Composer = .init()
   var _inputMode: String = ""
   var _languageModel: vChewing.LMInstantiator = .init()
   var _userOverrideModel: vChewing.LMUserOverride = .init()
@@ -73,12 +74,12 @@ class KeyHandler: NSObject {
   override init() {
     _builder = Megrez.BlockReadingBuilder(lm: _languageModel)
     super.init()
-    Composer.ensureParser()
+    ensureParser()
     setInputMode(ctlInputMethod.currentInputMode)
   }
 
   func clear() {
-    Composer.clearBuffer()
+    _composer.clear()
     _builder.clear()
     _walkedNodes.removeAll()
   }
@@ -104,8 +105,8 @@ class KeyHandler: NSObject {
       // Create new grid builder.
       createNewBuilder()
 
-      if !Composer.isBufferEmpty() {
-        Composer.clearBuffer()
+      if !_composer.isEmpty {
+        _composer.clear()
       }
     }
     // 直接寫到衛星模組內，省得類型轉換
@@ -121,7 +122,7 @@ class KeyHandler: NSObject {
     let walker = Megrez.Walker(grid: _builder.grid())
 
     // the reverse walk traces the grid from the end
-    let walked: [Megrez.NodeAnchor] = walker.reverseWalk(at: _builder.grid().width(), nodesLimit: 10)
+    let walked: [Megrez.NodeAnchor] = walker.reverseWalk(at: _builder.grid().width(), balanced: true)
 
     // then we use ".reversed()" to reverse the nodes so that we get the forward-walked nodes
     _walkedNodes.removeAll()
@@ -258,7 +259,7 @@ class KeyHandler: NSObject {
     return highestScore + epsilon
   }
 
-  // MARK: - Extracted methods and functions.
+  // MARK: - Extracted methods and functions (Megrez).
 
   func isBuilderEmpty() -> Bool { _builder.grid().width() == 0 }
 
@@ -321,4 +322,30 @@ class KeyHandler: NSObject {
   func getKeyLengthAtIndexZero() -> Int {
     _walkedNodes[0].node?.currentKeyValue().value.count ?? 0
   }
+
+  // MARK: - Extracted methods and functions (Tekkon).
+
+  func ensureParser() {
+    switch mgrPrefs.mandarinParser {
+      case MandarinParser.ofStandard.rawValue:
+        _composer.ensureParser(arrange: .ofDachen)
+      case MandarinParser.ofEten.rawValue:
+        _composer.ensureParser(arrange: .ofEten)
+      case MandarinParser.ofHsu.rawValue:
+        _composer.ensureParser(arrange: .ofHsu)
+      case MandarinParser.ofEten26.rawValue:
+        _composer.ensureParser(arrange: .ofEten26)
+      case MandarinParser.ofIBM.rawValue:
+        _composer.ensureParser(arrange: .ofIBM)
+      case MandarinParser.ofMiTAC.rawValue:
+        _composer.ensureParser(arrange: .ofMiTAC)
+      case MandarinParser.ofFakeSeigyou.rawValue:
+        _composer.ensureParser(arrange: .ofFakeSeigyou)
+      default:
+        _composer.ensureParser(arrange: .ofDachen)
+        mgrPrefs.mandarinParser = MandarinParser.ofStandard.rawValue
+    }
+    _composer.clear()
+  }
+
 }

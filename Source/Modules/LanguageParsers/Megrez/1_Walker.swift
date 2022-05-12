@@ -31,9 +31,12 @@ extension Megrez {
       mutGrid = grid
     }
 
-    public func reverseWalk(at location: Int, score accumulatedScore: Double = 0.0, nodesLimit: Int = 0)
-      -> [NodeAnchor]
-    {
+    public func reverseWalk(
+      at location: Int,
+      score accumulatedScore: Double = 0.0,
+      nodesLimit: Int = 0,
+      balanced: Bool = false
+    ) -> [NodeAnchor] {
       if location == 0 || location > mutGrid.width() {
         return [] as [NodeAnchor]
       }
@@ -41,8 +44,10 @@ extension Megrez {
       var paths: [[NodeAnchor]] = []
       var nodes: [NodeAnchor] = mutGrid.nodesEndingAt(location: location)
 
-      nodes.sort {
-        $0.balancedScore > $1.balancedScore  // 排序規則已經在 NodeAnchor 內定義了。
+      if balanced {
+        nodes.sort {
+          $0.balancedScore > $1.balancedScore  // 排序規則已經在 NodeAnchor 內定義了。
+        }
       }
 
       // 只檢查前 X 個 NodeAnchor 是否有 node。
@@ -58,10 +63,13 @@ extension Megrez {
           continue
         }
 
+        n.accumulatedScore = accumulatedScore + nNode.score()
         // 利用 Spanning Length 來決定權重。
         // 這樣一來，例：「再見」比「在」與「見」的權重更高。
-        let weightedScore: Double = (Double(n.spanningLength) - 1) * 2
-        n.accumulatedScore = accumulatedScore + nNode.score() + weightedScore
+        if balanced {
+          let weightedScore: Double = (Double(n.spanningLength) - 1) * 2
+          n.accumulatedScore += weightedScore
+        }
 
         var path: [NodeAnchor] = reverseWalk(
           at: location - n.spanningLength,
@@ -72,7 +80,7 @@ extension Megrez {
         paths.append(path)
 
         // 始終使用固定的候選字
-        if nNode.score() >= 0 {
+        if balanced, nNode.score() >= 0 {
           break
         }
       }

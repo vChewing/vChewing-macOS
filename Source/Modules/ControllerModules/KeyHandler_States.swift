@@ -87,7 +87,7 @@ extension KeyHandler {
     // The reading text is what the user is typing.
 
     let head = String((composingBuffer as NSString).substring(to: composedStringCursorIndex))
-    let reading = Composer.getComposition()
+    let reading = _composer.getDisplayedComposition()
     let tail = String((composingBuffer as NSString).substring(from: composedStringCursorIndex))
     let composedText = head + reading + tail
     let cursorIndex = composedStringCursorIndex + reading.count
@@ -213,14 +213,14 @@ extension KeyHandler {
       return false
     }
 
-    if Composer.isBufferEmpty() {
+    if _composer.isEmpty {
       insertReadingToBuilderAtCursor(reading: customPunctuation)
       let poppedText = popOverflowComposingTextAndWalk()
       let inputting = buildInputtingState()
       inputting.poppedText = poppedText
       stateCallback(inputting)
 
-      if mgrPrefs.useSCPCTypingMode, Composer.isBufferEmpty() {
+      if mgrPrefs.useSCPCTypingMode, _composer.isEmpty {
         let candidateState = buildCandidate(
           state: inputting,
           useVerticalMode: useVerticalMode
@@ -335,9 +335,9 @@ extension KeyHandler {
       return false
     }
 
-    if Composer.hasToneMarkerOnly() {
-      Composer.clearBuffer()
-    } else if Composer.isBufferEmpty() {
+    if _composer.hasToneMarker(withNothingElse: true) {
+      _composer.clear()
+    } else if _composer.isEmpty {
       if getBuilderCursorIndex() >= 0 {
         deleteBuilderReadingInFrontOfCursor()
         walk()
@@ -348,10 +348,10 @@ extension KeyHandler {
         return true
       }
     } else {
-      Composer.doBackSpaceToBuffer()
+      _composer.doBackSpace()
     }
 
-    if Composer.isBufferEmpty(), getBuilderLength() == 0 {
+    if _composer.isEmpty, getBuilderLength() == 0 {
       stateCallback(InputState.EmptyIgnoringPreviousState())
     } else {
       stateCallback(buildInputtingState())
@@ -370,7 +370,7 @@ extension KeyHandler {
       return false
     }
 
-    if Composer.isBufferEmpty() {
+    if _composer.isEmpty {
       if getBuilderCursorIndex() != getBuilderLength() {
         deleteBuilderReadingAfterCursor()
         walk()
@@ -405,7 +405,7 @@ extension KeyHandler {
     if !(state is InputState.Inputting) {
       return false
     }
-    if !Composer.isBufferEmpty() {
+    if !_composer.isEmpty {
       IME.prtDebugIntel("9B6F908D")
       errorCallback()
     }
@@ -424,7 +424,7 @@ extension KeyHandler {
       return false
     }
 
-    if !Composer.isBufferEmpty() {
+    if !_composer.isEmpty {
       IME.prtDebugIntel("ABC44080")
       errorCallback()
       stateCallback(state)
@@ -454,7 +454,7 @@ extension KeyHandler {
       return false
     }
 
-    if !Composer.isBufferEmpty() {
+    if !_composer.isEmpty {
       IME.prtDebugIntel("9B69908D")
       errorCallback()
       stateCallback(state)
@@ -493,8 +493,8 @@ extension KeyHandler {
       stateCallback(InputState.EmptyIgnoringPreviousState())
     } else {
       // If reading is not empty, we cancel the reading.
-      if !Composer.isBufferEmpty() {
-        Composer.clearBuffer()
+      if !_composer.isEmpty {
+        _composer.clear()
         if getBuilderLength() == 0 {
           stateCallback(InputState.EmptyIgnoringPreviousState())
         } else {
@@ -515,7 +515,7 @@ extension KeyHandler {
   ) -> Bool {
     if !(state is InputState.Inputting) { return false }
 
-    if !Composer.isBufferEmpty() {
+    if !_composer.isEmpty {
       IME.prtDebugIntel("B3BA5257")
       errorCallback()
       stateCallback(state)
@@ -566,7 +566,7 @@ extension KeyHandler {
   ) -> Bool {
     if !(state is InputState.Inputting) { return false }
 
-    if !Composer.isBufferEmpty() {
+    if !_composer.isEmpty {
       IME.prtDebugIntel("6ED95318")
       errorCallback()
       stateCallback(state)

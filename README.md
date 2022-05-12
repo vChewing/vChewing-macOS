@@ -68,11 +68,23 @@
 
 小麥注音引擎程式版權（MIT 授權）：© 2011-2021 OpenVanilla 專案團隊（Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, 等）。
 
+威注音專案僅用到小麥注音的下述程式組件：
+
+- 狀態管理引擎 & NSStringUtils & FSEventStreamHelper (by Zonble Yang)。
+
+- 半衰記憶模組，因故障暫時無法啟用 (by Mengjuei Hsieh)。
+
+- 僅供研發人員調試方便而使用的 App 版安裝程式 (by Zonble Yang)。
+
 威注音輸入法 macOS 版以 MIT-NTL License 授權釋出 (與 MIT 相容)：© 2021-2022 vChewing 專案。
 
-威注音輸入法 macOS 版程式維護：Shiki Suen。特別感謝 Hiraku Wong 等人的技術協力。
+- 威注音輸入法 macOS 版程式維護：Shiki Suen。特別感謝 Isaac Xen 與 Hiraku Wong 等人的技術協力。
 
-威注音詞庫由 Shiki Suen 維護，以 3-Clause BSD License 授權釋出。其中的詞頻數據[由 NAER 授權用於非商業用途](https://twitter.com/ShikiSuen/status/1479329302713831424)。
+- 鐵恨注音並擊處理引擎：Shiki Suen (MIT-NTL License)。
+
+- 天權星語彙處理引擎：Shiki Suen (MIT-NTL License)，針對「Lukhnos Liu 用 C++ 寫的 Gramambular」用 Swift 徹底重寫而成。
+
+- 威注音詞庫由 Shiki Suen 維護，以 3-Clause BSD License 授權釋出。其中的詞頻數據[由 NAER 授權用於非商業用途](https://twitter.com/ShikiSuen/status/1479329302713831424)。
 
 使用者可自由使用、散播本軟體，惟散播時必須完整保留版權聲明及軟體授權、且一旦經過修改便不可以再繼續使用威注音的產品名稱。
 

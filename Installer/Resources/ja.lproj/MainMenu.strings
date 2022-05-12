@@ -56,8 +56,8 @@
 /* Class = "NSTextFieldCell"; title = "Derived from OpenVanilla McBopopmofo Project."; ObjectID = "QYf-Nf-hoi"; */
 "QYf-Nf-hoi.title" = "OpenVanilla 小麦注音プロジェクトから派生。";
 
-/* Class = "NSTextFieldCell"; title = "Mandarin Syllable Composer Engine by Lukhnos Liu.\nInput State Management Architecture by Zonble Yang.\nvChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen.\nMegrez is a rewritten unigram engine by Shiki Suen using Swift, replacing Lukhnos' C++ Gramambular engine."; ObjectID = "VW8-s5-Wpn"; */
-"VW8-s5-Wpn.title" = "ボポモフォエンジン開発：Lukhnos Liu。\n入力状態管理システム開発：Zonble Yang。\nmacOS 版威注音の開発：Shiki Suen, Isaac Xen, Hiraku Wang, など。\n威注音語彙データの維持：Shiki Suen。\nMegrez 辞書処理エンジン：Shiki Suen（Lukhnos の Gramambular C++ エンジンを Swift で再開発したものである）。";
+/* Class = "NSTextFieldCell"; title = "Tekkon Syllable Composition Engine by Shiki Suen.\nInput State Management Architecture by Zonble Yang.\nvChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen.\nMegrez is a rewritten unigram engine by Shiki Suen using Swift, replacing Lukhnos' C++ Gramambular engine."; ObjectID = "VW8-s5-Wpn"; */
+"VW8-s5-Wpn.title" = "鉄恨ボポモフォエンジン開発：Shiki Suen。\n入力状態管理システム開発：Zonble Yang。\nmacOS 版威注音の開発：Shiki Suen, Isaac Xen, Hiraku Wang, など。\n威注音語彙データの維持：Shiki Suen。\nMegrez 辞書処理エンジン：Shiki Suen（Lukhnos の Gramambular C++ エンジンを Swift で再開発したものである）。";
 
 /* Class = "NSTextFieldCell"; title = "Placeholder for showing copyright information."; ObjectID = "eo3-TK-0rB"; */
 "eo3-TK-0rB.title" = "Placeholder for showing copyright information.";
