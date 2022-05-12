@@ -315,10 +315,6 @@
 		6ACA41EF15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6ACA41F215FC1D9000935EF6 /* Installer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Installer-Info.plist"; path = "Installer/Installer-Info.plist"; sourceTree = SOURCE_ROOT; };
 		6ACA41F315FC1D9000935EF6 /* Installer-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Installer-Prefix.pch"; path = "Installer/Installer-Prefix.pch"; sourceTree = SOURCE_ROOT; };
-		6ACC3D402793701600F1B140 /* ParselessPhraseDB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = ParselessPhraseDB.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		6ACC3D412793701600F1B140 /* ParselessPhraseDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = ParselessPhraseDB.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		6ACC3D422793701600F1B140 /* ParselessLM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = ParselessLM.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
-		6ACC3D432793701600F1B140 /* ParselessLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = ParselessLM.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		D427A9BF25ED28CC005D43E0 /* vChewing-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "vChewing-Bridging-Header.h"; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		D427F76B278CA1BA004A2160 /* AppDelegate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D456576D279E4F7B00DF6BC9 /* InputHandler.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputHandler.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -501,10 +497,6 @@
 		5B62A32527AE758000A19448 /* OldFileReferences */ = {
 			isa = PBXGroup;
 			children = (
-				6ACC3D422793701600F1B140 /* ParselessLM.cpp */,
-				6ACC3D432793701600F1B140 /* ParselessLM.h */,
-				6ACC3D402793701600F1B140 /* ParselessPhraseDB.cpp */,
-				6ACC3D412793701600F1B140 /* ParselessPhraseDB.h */,
 				D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */,
 				D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */,
 			);
