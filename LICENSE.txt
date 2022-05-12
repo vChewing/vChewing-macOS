@@ -3,7 +3,7 @@ DISCLAIMER: The vChewing project, having no relationship of cooperation or affil
 vChewing macOS: MIT-NTL License
 
 © 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project.
-Mandarin Syllable Composer Engine by Lukhnos Liu.
+Tekkon Syllable Composition Engine by Shiki Suen.
 Input State Management Architecture by Zonble Yang.
 vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.
 vChewing Phrase Database Maintained by Shiki Suen.

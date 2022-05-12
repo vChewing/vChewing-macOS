@@ -132,17 +132,17 @@
                         </connections>
                     </button>
                     <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" findBarPosition="belowContent" translatesAutoresizingMaskIntoConstraints="NO" id="YCR-wo-M5a">
-                        <rect key="frame" x="91" y="166" width="427" height="160"/>
+                        <rect key="frame" x="91" y="166" width="427" height="190"/>
                         <clipView key="contentView" drawsBackground="NO" id="NrY-FL-PVu" userLabel="appEULAContentClip">
-                            <rect key="frame" x="1" y="1" width="425" height="158"/>
+                            <rect key="frame" x="1" y="1" width="425" height="188"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="bar" smartInsertDelete="YES" id="47J-tO-8TZ" userLabel="appEULAContent">
-                                    <rect key="frame" x="0.0" y="-2" width="425" height="158"/>
+                                    <rect key="frame" x="0.0" y="-2" width="425" height="188"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="minSize" width="425" height="158"/>
+                                    <size key="minSize" width="425" height="188"/>
                                     <size key="maxSize" width="427" height="10000000"/>
                                     <attributedString key="textStorage">
                                         <fragment content="Placeholder for EULA Texts.">
@@ -162,7 +162,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" controlSize="mini" horizontal="NO" id="E5B-3B-faV">
-                            <rect key="frame" x="412" y="1" width="14" height="158"/>
+                            <rect key="frame" x="412" y="1" width="14" height="188"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
@@ -194,11 +194,9 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XLb-mv-73s">
-                        <rect key="frame" x="89" y="357" width="431" height="45"/>
-                        <textFieldCell key="cell" selectable="YES" id="VW8-s5-Wpn">
+                        <rect key="frame" x="89" y="387" width="431" height="15"/>
+                        <textFieldCell key="cell" selectable="YES" title="Placeholder for detailed credits." id="VW8-s5-Wpn">
                             <font key="font" metaFont="cellTitle"/>
-                            <string key="title">McBopomofo Engine by Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, et al.
-vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc. vChewing Phrase Database Maintained by Shiki Suen.</string>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -207,7 +205,7 @@ vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc. vChewing 
                         <rect key="frame" x="15" y="137" width="503" height="5"/>
                     </box>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="k5O-zZ-gQY">
-                        <rect key="frame" x="89" y="334" width="431" height="15"/>
+                        <rect key="frame" x="89" y="364" width="431" height="15"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="MIT-NTL License:" id="AVS-ih-FXM">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
