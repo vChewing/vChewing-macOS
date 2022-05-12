@@ -38,10 +38,8 @@ extension Megrez {
     public func insertNode(node: Node, location: Int, spanningLength: Int) {
       if location >= mutSpans.count {
         let diff = location - mutSpans.count + 1
-        var i = 0
-        while i < diff {
+        for _ in 0..<diff {
           mutSpans.append(Span())
-          i += 1
         }
       }
       mutSpans[location].insert(node: node, length: spanningLength)
@@ -59,11 +57,9 @@ extension Megrez {
     public func expandGridByOneAt(location: Int) {
       mutSpans.append(Span())
       if location > 0, location < mutSpans.count {
-        var i = 0
-        while i < location {
+        for i in 0..<location {
           // zaps overlapping spans
           mutSpans[i].removeNodeOfLengthGreaterThan(location - i)
-          i += 1
         }
       }
     }
@@ -74,11 +70,9 @@ extension Megrez {
       }
 
       mutSpans.remove(at: location)
-      var i = 0
-      while i < location {
+      for i in 0..<location {
         // zaps overlapping spans
         mutSpans[i].removeNodeOfLengthGreaterThan(location - i)
-        i += 1
       }
     }
 
@@ -87,8 +81,7 @@ extension Megrez {
     public func nodesEndingAt(location: Int) -> [NodeAnchor] {
       var results: [NodeAnchor] = []
       if !mutSpans.isEmpty, location <= mutSpans.count {
-        var i = 0
-        while i < location {
+        for i in 0..<location {
           let span = mutSpans[i]
           if i + span.maximumLength >= location {
             if let np = span.node(length: location - i) {
@@ -101,7 +94,6 @@ extension Megrez {
               )
             }
           }
-          i += 1
         }
       }
       return results
@@ -110,14 +102,11 @@ extension Megrez {
     public func nodesCrossingOrEndingAt(location: Int) -> [NodeAnchor] {
       var results: [NodeAnchor] = []
       if !mutSpans.isEmpty, location <= mutSpans.count {
-        var i = 0
-        while i < location {
+        for i in 0..<location {
           let span = mutSpans[i]
           if i + span.maximumLength >= location {
-            var j = 1
-            while j <= span.maximumLength {
+            for j in 1...span.maximumLength {
               if i + j < location {
-                j += 1
                 continue
               }
               if let np = span.node(length: j) {
@@ -129,10 +118,8 @@ extension Megrez {
                   )
                 )
               }
-              j += 1
             }
           }
-          i += 1
         }
       }
       return results

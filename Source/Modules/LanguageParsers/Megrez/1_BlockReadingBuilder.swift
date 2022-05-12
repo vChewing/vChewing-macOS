@@ -25,15 +25,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 extension Megrez {
   public class BlockReadingBuilder {
-    let kMaximumBuildSpanLength = 10  // 規定最多可以組成的詞的字數上限為 10
+    var mutMaximumBuildSpanLength = 10
     var mutCursorIndex: Int = 0
     var mutReadings: [String] = []
     var mutGrid: Grid = .init()
     var mutLM: LanguageModel
     var mutJoinSeparator: String = ""
 
-    public init(lm: LanguageModel) {
+    public init(lm: LanguageModel, length: Int = 10) {
       mutLM = lm
+      mutMaximumBuildSpanLength = length
     }
 
     public func clear() {
@@ -87,15 +88,13 @@ extension Megrez {
         return false
       }
 
-      var i = 0
-      while i < count {
-        if mutCursorIndex != 0 {
+      for _ in 0..<count {
+        if mutCursorIndex > 0 {
           mutCursorIndex -= 1
         }
         mutReadings.removeFirst()
         mutGrid.shrinkGridByOneAt(location: 0)
         build()
-        i += 1
       }
 
       return true
@@ -113,15 +112,17 @@ extension Megrez {
       // if (mutLM == nil) { return } // 這個出不了 nil，所以註釋掉。
 
       let itrBegin: Int =
-        (mutCursorIndex < kMaximumBuildSpanLength) ? 0 : mutCursorIndex - kMaximumBuildSpanLength
-      let itrEnd: Int = min(mutCursorIndex + kMaximumBuildSpanLength, mutReadings.count)
+        (mutCursorIndex < mutMaximumBuildSpanLength) ? 0 : mutCursorIndex - mutMaximumBuildSpanLength
+      let itrEnd: Int = min(mutCursorIndex + mutMaximumBuildSpanLength, mutReadings.count)
 
-      var p = itrBegin
-      while p < itrEnd {
-        var q = 1
-        while q <= kMaximumBuildSpanLength, p + q <= itrEnd {
+      for p in itrBegin..<itrEnd {
+        for q in 1..<mutMaximumBuildSpanLength {
+          if p + q > itrEnd {
+            break
+          }
           let strSlice = mutReadings[p..<(p + q)]
           let combinedReading: String = join(slice: strSlice, separator: mutJoinSeparator)
+
           if !mutGrid.hasMatchedNode(location: p, spanningLength: q, key: combinedReading) {
             let unigrams: [Unigram] = mutLM.unigramsFor(key: combinedReading)
             if !unigrams.isEmpty {
@@ -129,9 +130,7 @@ extension Megrez {
               mutGrid.insertNode(node: n, location: p, spanningLength: q)
             }
           }
-          q += 1
         }
-        p += 1
       }
     }
 
