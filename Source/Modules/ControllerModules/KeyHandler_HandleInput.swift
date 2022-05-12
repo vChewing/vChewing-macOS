@@ -147,34 +147,34 @@ extension KeyHandler {
     let skipPhoneticHandling = input.isReservedKey || input.isControlHold || input.isOptionHold
 
     // See if Phonetic reading is valid.
-    if !skipPhoneticHandling && Composer.chkKeyValidity(charCode) {
-      Composer.combineReadingKey(charCode)
+    if !skipPhoneticHandling && _composer.inputValidityCheck(key: charCode) {
+      _composer.receiveKey(fromCharCode: charCode)
       keyConsumedByReading = true
 
       // If we have a tone marker, we have to insert the reading to the
       // builder in other words, if we don't have a tone marker, we just
       // update the composing buffer.
-      let composeReading = Composer.hasToneMarker()
+      let composeReading = _composer.hasToneMarker()
       if !composeReading {
         stateCallback(buildInputtingState())
         return true
       }
     }
 
-    var composeReading = Composer.hasToneMarker() || Composer.hasToneMarkerOnly()
+    var composeReading = _composer.hasToneMarker()  // 這裡不需要做排他性判斷。
 
     // See if we have composition if Enter/Space is hit and buffer is not empty.
     // We use "|=" conditioning so that the tone marker key is also taken into account.
     // However, Swift does not support "|=".
-    composeReading = composeReading || (!Composer.isBufferEmpty() && (input.isSpace || input.isEnter))
+    composeReading = composeReading || (!_composer.isEmpty && (input.isSpace || input.isEnter))
     if composeReading {
-      let reading = Composer.getSyllableComposition()
+      let reading = _composer.getRealComposition()
 
       // See whether we have a unigram for this...
       if !ifLangModelHasUnigrams(forKey: reading) {
         IME.prtDebugIntel("B49C0979：語彙庫內無「\(reading)」的匹配記錄。")
         errorCallback()
-        Composer.clearBuffer()
+        _composer.clear()
         stateCallback((getBuilderLength() == 0) ? InputState.EmptyIgnoringPreviousState() : buildInputtingState())
         return true
       }
@@ -189,7 +189,7 @@ extension KeyHandler {
       dealWithOverrideModelSuggestions()
 
       // ... then update the text.
-      Composer.clearBuffer()
+      _composer.clear()
 
       let inputting = buildInputtingState()
       inputting.poppedText = poppedText
@@ -239,7 +239,7 @@ extension KeyHandler {
     // MARK: Calling candidate window using Space or Down or PageUp / PageDn.
 
     if let currentState = state as? InputState.NotEmpty {
-      if Composer.isBufferEmpty(),
+      if _composer.isEmpty,
         input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
           || input.isPageDown || input.isPageUp || input.isTab
           || (input.useVerticalMode && (input.isVerticalModeOnlyChooseCandidateKey))
@@ -354,7 +354,7 @@ extension KeyHandler {
     if input.isSymbolMenuPhysicalKey && !input.isShiftHold {
       if !input.isOptionHold {
         if ifLangModelHasUnigrams(forKey: "_punctuation_list") {
-          if Composer.isBufferEmpty() {
+          if _composer.isEmpty {
             insertReadingToBuilderAtCursor(reading: "_punctuation_list")
             let poppedText: String! = popOverflowComposingTextAndWalk()
             let inputting = buildInputtingState()
@@ -443,7 +443,7 @@ extension KeyHandler {
     // "thinking" that the key is not actually consumed.
     // 砍掉這一段會導致「F1-F12 按鍵干擾組字區」的問題。
     // 暫時只能先恢復這段，且補上偵錯彙報機制，方便今後排查故障。
-    if (state is InputState.NotEmpty) || !Composer.isBufferEmpty() {
+    if (state is InputState.NotEmpty) || !_composer.isEmpty {
       IME.prtDebugIntel(
         "Blocked data: charCode: \(charCode), keyCode: \(input.keyCode)")
       IME.prtDebugIntel("A9BFF20E")
