@@ -76,6 +76,8 @@
 
 - 僅供研發人員調試方便而使用的 App 版安裝程式 (by Zonble Yang)。
 
+- Voltaire MK2 選字窗、飄雲通知視窗、工具提示 (by Zonble Yang)，有大幅度修改。
+
 威注音輸入法 macOS 版以 MIT-NTL License 授權釋出 (與 MIT 相容)：© 2021-2022 vChewing 專案。
 
 - 威注音輸入法 macOS 版程式維護：Shiki Suen。特別感謝 Isaac Xen 與 Hiraku Wong 等人的技術協力。
