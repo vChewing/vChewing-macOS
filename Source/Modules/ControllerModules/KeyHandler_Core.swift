@@ -84,7 +84,6 @@ class KeyHandler: NSObject {
     _walkedNodes.removeAll()
   }
 
-  // 這個函數得獨立出來給 ObjC 使用。
   func setInputMode(_ value: String) {
     // 下面這句的「isKindOfClass」是做類型檢查，
     // 為了應對出現輸入法 plist 被改壞掉這樣的極端情況。
@@ -122,7 +121,7 @@ class KeyHandler: NSObject {
     let walker = Megrez.Walker(grid: _builder.grid())
 
     // the reverse walk traces the grid from the end
-    let walked: [Megrez.NodeAnchor] = walker.reverseWalk(at: _builder.grid().width(), nodesLimit: 3, balanced: true)
+    let walked = walker.reverseWalk(at: _builder.grid().width(), nodesLimit: 3, balanced: true)
 
     // then we use ".reversed()" to reverse the nodes so that we get the forward-walked nodes
     _walkedNodes.removeAll()

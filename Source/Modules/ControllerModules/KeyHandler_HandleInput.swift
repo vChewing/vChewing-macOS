@@ -37,12 +37,10 @@ extension KeyHandler {
   ) -> Bool {
     let charCode: UniChar = input.charCode
     var state = state  // Turn this incoming constant into variable.
-    let inputText: String = input.inputText ?? ""
 
     // Ignore the input if its inputText is empty.
     // Reason: such inputs may be functional key combinations.
-
-    if inputText.isEmpty {
+    guard let inputText: String = input.inputText, !inputText.isEmpty else {
       return false
     }
 
@@ -238,36 +236,34 @@ extension KeyHandler {
 
     // MARK: Calling candidate window using Space or Down or PageUp / PageDn.
 
-    if let currentState = state as? InputState.NotEmpty {
-      if _composer.isEmpty,
-        input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
-          || input.isPageDown || input.isPageUp || input.isTab
-          || (input.useVerticalMode && (input.isVerticalModeOnlyChooseCandidateKey))
-      {
-        if input.isSpace {
-          // If the Space key is NOT set to be a selection key
-          if input.isShiftHold || !mgrPrefs.chooseCandidateUsingSpace {
-            if getBuilderCursorIndex() >= getBuilderLength() {
-              let composingBuffer = currentState.composingBuffer
-              if (composingBuffer.count) != 0 {
-                stateCallback(InputState.Committing(poppedText: composingBuffer))
-              }
-              clear()
-              stateCallback(InputState.Committing(poppedText: " "))
-              stateCallback(InputState.Empty())
-            } else if ifLangModelHasUnigrams(forKey: " ") {
-              insertReadingToBuilderAtCursor(reading: " ")
-              let poppedText = popOverflowComposingTextAndWalk()
-              let inputting = buildInputtingState()
-              inputting.poppedText = poppedText
-              stateCallback(inputting)
+    if let currentState = state as? InputState.NotEmpty, _composer.isEmpty,
+      input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
+        || input.isPageDown || input.isPageUp || input.isTab
+        || (input.useVerticalMode && (input.isVerticalModeOnlyChooseCandidateKey))
+    {
+      if input.isSpace {
+        // If the Space key is NOT set to be a selection key
+        if input.isShiftHold || !mgrPrefs.chooseCandidateUsingSpace {
+          if getBuilderCursorIndex() >= getBuilderLength() {
+            let composingBuffer = currentState.composingBuffer
+            if !composingBuffer.isEmpty {
+              stateCallback(InputState.Committing(poppedText: composingBuffer))
             }
-            return true
+            clear()
+            stateCallback(InputState.Committing(poppedText: " "))
+            stateCallback(InputState.Empty())
+          } else if ifLangModelHasUnigrams(forKey: " ") {
+            insertReadingToBuilderAtCursor(reading: " ")
+            let poppedText = popOverflowComposingTextAndWalk()
+            let inputting = buildInputtingState()
+            inputting.poppedText = poppedText
+            stateCallback(inputting)
           }
+          return true
         }
-        stateCallback(buildCandidate(state: currentState, useVerticalMode: input.useVerticalMode))
-        return true
       }
+      stateCallback(buildCandidate(state: currentState, useVerticalMode: input.useVerticalMode))
+      return true
     }
 
     // MARK: -
