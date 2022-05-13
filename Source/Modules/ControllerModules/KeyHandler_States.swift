@@ -372,7 +372,7 @@ extension KeyHandler {
 
     if _composer.isEmpty {
       if getBuilderCursorIndex() != getBuilderLength() {
-        deleteBuilderReadingAfterCursor()
+        deleteBuilderReadingToTheFrontOfCursor()
         walk()
         let inputting = buildInputtingState()
         // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。

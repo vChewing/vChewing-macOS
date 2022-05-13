@@ -60,7 +60,7 @@ extension Megrez {
 
     public func readings() -> [String] { mutReadings }
 
-    @discardableResult public func deleteReadingBeforeCursor() -> Bool {
+    @discardableResult public func deleteReadingAtTheRearOfCursor() -> Bool {
       if mutCursorIndex == 0 {
         return false
       }
@@ -72,7 +72,7 @@ extension Megrez {
       return true
     }
 
-    @discardableResult public func deleteReadingAfterCursor() -> Bool {
+    @discardableResult public func deleteReadingToTheFrontOfCursor() -> Bool {
       if mutCursorIndex == mutReadings.count {
         return false
       }

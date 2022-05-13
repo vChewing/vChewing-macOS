@@ -312,11 +312,11 @@ class KeyHandler: NSObject {
   }
 
   func deleteBuilderReadingInFrontOfCursor() {
-    _builder.deleteReadingBeforeCursor()
+    _builder.deleteReadingAtTheRearOfCursor()
   }
 
-  func deleteBuilderReadingAfterCursor() {
-    _builder.deleteReadingAfterCursor()
+  func deleteBuilderReadingToTheFrontOfCursor() {
+    _builder.deleteReadingToTheFrontOfCursor()
   }
 
   func getKeyLengthAtIndexZero() -> Int {
