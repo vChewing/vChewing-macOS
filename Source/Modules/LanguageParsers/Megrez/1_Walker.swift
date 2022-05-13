@@ -46,7 +46,7 @@ extension Megrez {
 
       if balanced {
         nodes.sort {
-          $0.balancedScore > $1.balancedScore  // 排序規則已經在 NodeAnchor 內定義了。
+          $0.balancedScore > $1.balancedScore
         }
       }
 

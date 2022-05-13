@@ -55,11 +55,12 @@ extension Megrez {
     }
 
     public func expandGridByOneAt(location: Int) {
-      mutSpans.append(Span())
-      if location > 0, location < mutSpans.count {
-        for i in 0..<location {
+      // 這裡加入 abs 完全是一個防呆設計
+      mutSpans.insert(Span(), at: abs(location))
+      if location != 0, abs(location) != mutSpans.count {
+        for i in 0..<abs(location) {
           // zaps overlapping spans
-          mutSpans[i].removeNodeOfLengthGreaterThan(location - i)
+          mutSpans[i].removeNodeOfLengthGreaterThan(abs(location) - i)
         }
       }
     }
