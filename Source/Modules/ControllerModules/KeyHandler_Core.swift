@@ -122,7 +122,7 @@ class KeyHandler: NSObject {
     let walker = Megrez.Walker(grid: _builder.grid())
 
     // the reverse walk traces the grid from the end
-    let walked: [Megrez.NodeAnchor] = walker.reverseWalk(at: _builder.grid().width(), balanced: true)
+    let walked: [Megrez.NodeAnchor] = walker.reverseWalk(at: _builder.grid().width(), nodesLimit: 3, balanced: true)
 
     // then we use ".reversed()" to reverse the nodes so that we get the forward-walked nodes
     _walkedNodes.removeAll()
