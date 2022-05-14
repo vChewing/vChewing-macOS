@@ -226,3 +226,9 @@
 
 /* Class = "NSTextFieldCell"; title = "Choose your desired user data folder path. Will be omitted if invalid."; ObjectID = "wN3-k3-b2a"; */
 "wN3-k3-b2a.title" = "請在此指定您想指定的使用者語彙檔案目錄。無效值會被忽略。";
+
+/* Class = "NSButtonCell"; title = "Show Hanyu-Pinyin in the inline composition buffer"; ObjectID = "wFR-zX-M8H"; */
+"wFR-zX-M8H.title" = "拼音並擊模式（組字區內看到的是漢語拼音）";
+
+/* Class = "NSButtonCell"; title = "Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter"; ObjectID = "iWy-Nw-QKB"; */
+"iWy-Nw-QKB.title" = "Ctrl(+Alt)+CMD+Enter 輸出漢語拼音而非注音";
