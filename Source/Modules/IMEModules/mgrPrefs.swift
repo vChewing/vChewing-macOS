@@ -54,6 +54,7 @@ struct UserDef {
   static let kMaxCandidateLength = "MaxCandidateLength"
   static let kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
   static let kShowHanyuPinyinInCompositionBuffer = "ShowHanyuPinyinInCompositionBuffer"
+  static let kInlineDumpPinyinInLieuOfZhuyin = "InlineDumpPinyinInLieuOfZhuyin"
 
   static let kCandidateTextFontName = "CandidateTextFontName"
   static let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
@@ -232,6 +233,7 @@ public class mgrPrefs: NSObject {
       UserDef.kMaxCandidateLength,
       UserDef.kShouldNotFartInLieuOfBeep,
       UserDef.kShowHanyuPinyinInCompositionBuffer,
+      UserDef.kInlineDumpPinyinInLieuOfZhuyin,
       UserDef.kAssociatedPhrasesEnabled,
     ]
   }
@@ -277,6 +279,8 @@ public class mgrPrefs: NSObject {
     UserDefaults.standard.setDefault(mgrPrefs.shouldNotFartInLieuOfBeep, forKey: UserDef.kShouldNotFartInLieuOfBeep)
     UserDefaults.standard.setDefault(
       mgrPrefs.showHanyuPinyinInCompositionBuffer, forKey: UserDef.kShowHanyuPinyinInCompositionBuffer)
+    UserDefaults.standard.setDefault(
+      mgrPrefs.inlineDumpPinyinInLieuOfZhuyin, forKey: UserDef.kInlineDumpPinyinInLieuOfZhuyin)
 
     UserDefaults.standard.synchronize()
   }
@@ -358,6 +362,9 @@ public class mgrPrefs: NSObject {
 
   @UserDefault(key: UserDef.kShowHanyuPinyinInCompositionBuffer, defaultValue: false)
   static var showHanyuPinyinInCompositionBuffer: Bool
+
+  @UserDefault(key: UserDef.kInlineDumpPinyinInLieuOfZhuyin, defaultValue: false)
+  static var inlineDumpPinyinInLieuOfZhuyin: Bool
 
   static func toggleShouldNotFartInLieuOfBeep() -> Bool {
     shouldNotFartInLieuOfBeep = !shouldNotFartInLieuOfBeep
