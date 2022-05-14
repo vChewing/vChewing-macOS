@@ -89,7 +89,7 @@ extension KeyHandler {
     }
 
     let head = rawHead
-    let reading = _composer.getDisplayedComposition()
+    let reading = _composer.getComposition(isHanyuPinyin: mgrPrefs.showHanyuPinyinInCompositionBuffer)
     let tail = rawEnd
     let composedText = head + reading + tail
     let cursorIndex = composedStringCursorIndex + reading.count
