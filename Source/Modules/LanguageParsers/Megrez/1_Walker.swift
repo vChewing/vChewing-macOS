@@ -46,24 +46,24 @@ extension Megrez {
 
       if balanced {
         nodes.sort {
-          $0.balancedScore > $1.balancedScore  // 排序規則已經在 NodeAnchor 內定義了。
+          $0.balancedScore > $1.balancedScore
         }
       }
 
-      // 只檢查前 X 個 NodeAnchor 是否有 node。
-      // 這裡有 abs 是為了防止有白癡填負數。
-      var border: Int = nodes.count
-      if nodesLimit > 0 {
-        border = min(nodes.count, abs(nodesLimit))
-      }
+      for (i, n) in nodes.enumerated() {
+        // 只檢查前 X 個 NodeAnchor 是否有 node。
+        // 這裡有 abs 是為了防止有白癡填負數。
+        if abs(nodesLimit) > 0, i == abs(nodesLimit) - 1 {
+          break
+        }
 
-      for n in nodes[0..<border] {
         var n = n
         guard let nNode = n.node else {
           continue
         }
 
         n.accumulatedScore = accumulatedScore + nNode.score()
+
         // 利用 Spanning Length 來決定權重。
         // 這樣一來，例：「再見」比「在」與「見」的權重更高。
         if balanced {
@@ -75,6 +75,7 @@ extension Megrez {
           at: location - n.spanningLength,
           score: n.accumulatedScore
         )
+
         path.insert(n, at: 0)
 
         paths.append(path)

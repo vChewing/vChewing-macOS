@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -162,7 +163,7 @@
                                                         </connections>
                                                     </matrix>
                                                     <button verticalHuggingPriority="750" id="233">
-                                                        <rect key="frame" x="169" y="26.5" width="245" height="17"/>
+                                                        <rect key="frame" x="169" y="27.5" width="245" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Show page buttons in candidate list" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="shc-Nu-UsM">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -234,7 +235,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5IL-zZ-CL9" userLabel="chkTrad2KangXi">
-                                                        <rect key="frame" x="19" y="99.5" width="406" height="16"/>
+                                                        <rect key="frame" x="19" y="105.5" width="406" height="16"/>
                                                         <buttonCell key="cell" type="check" title="Auto-convert traditional Chinese glyphs to KangXi characters" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="BSK-bH-Gct">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="cellTitle"/>
@@ -245,7 +246,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="h4r-Sp-LBI" userLabel="chkTrad2JISShinjitai">
-                                                        <rect key="frame" x="19" y="78.5" width="406" height="16"/>
+                                                        <rect key="frame" x="19" y="84.5" width="406" height="16"/>
                                                         <buttonCell key="cell" type="check" title="Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="eia-1F-Do0">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="cellTitle"/>
@@ -256,7 +257,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pYB-E5-4Nv">
-                                                        <rect key="frame" x="19" y="57.5" width="406" height="16"/>
+                                                        <rect key="frame" x="19" y="63.5" width="406" height="16"/>
                                                         <buttonCell key="cell" type="check" title="Stop farting (when typed phonetic combination is invalid, etc.)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="62u-jY-BRh">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="cellTitle"/>
@@ -266,17 +267,45 @@
                                                             <binding destination="32" name="value" keyPath="values.ShouldNotFartInLieuOfBeep" id="EOH-Pc-8Hk"/>
                                                         </connections>
                                                     </button>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vwf-Kq-s8M" userLabel="chkShowHanyuPinyinInCompositionBuffer">
+                                                        <rect key="frame" x="19" y="42.5" width="406" height="16"/>
+                                                        <buttonCell key="cell" type="check" title="Show Hanyu-Pinyin in the inline composition buffer" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="wFR-zX-M8H">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="toggleTrad2KangXiAction:" target="-2" id="Bko-rV-Ygf"/>
+                                                            <binding destination="32" name="value" keyPath="values.ShowHanyuPinyinInCompositionBuffer" id="uDq-eC-wan"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gZ0-OK-r7a" userLabel="InlineDumpPinyinInLieuOfZhuyin">
+                                                        <rect key="frame" x="19" y="21.5" width="406" height="16"/>
+                                                        <buttonCell key="cell" type="check" title="Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="iWy-Nw-QKB">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="toggleTrad2KangXiAction:" target="-2" id="ACW-LL-i6G"/>
+                                                            <binding destination="32" name="value" keyPath="values.InlineDumpPinyinInLieuOfZhuyin" id="MtZ-L5-uvv"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                                 <constraints>
-                                                    <constraint firstItem="h4r-Sp-LBI" firstAttribute="top" secondItem="5IL-zZ-CL9" secondAttribute="bottom" constant="6" symbolic="YES" id="8Pq-i7-vK8"/>
-                                                    <constraint firstItem="pYB-E5-4Nv" firstAttribute="trailing" secondItem="h4r-Sp-LBI" secondAttribute="trailing" id="IWM-hB-AeP"/>
-                                                    <constraint firstItem="5IL-zZ-CL9" firstAttribute="top" secondItem="brd-6J-saN" secondAttribute="top" constant="19.5" id="i7s-ez-iKF"/>
-                                                    <constraint firstItem="pYB-E5-4Nv" firstAttribute="leading" secondItem="h4r-Sp-LBI" secondAttribute="leading" id="jsE-BB-mo7"/>
-                                                    <constraint firstAttribute="trailing" secondItem="5IL-zZ-CL9" secondAttribute="trailing" constant="20" symbolic="YES" id="kZf-wi-ijB"/>
-                                                    <constraint firstItem="pYB-E5-4Nv" firstAttribute="top" secondItem="h4r-Sp-LBI" secondAttribute="bottom" constant="6" symbolic="YES" id="unl-l5-LUF"/>
-                                                    <constraint firstItem="5IL-zZ-CL9" firstAttribute="leading" secondItem="h4r-Sp-LBI" secondAttribute="leading" id="v0c-Cb-FH7"/>
-                                                    <constraint firstItem="5IL-zZ-CL9" firstAttribute="leading" secondItem="brd-6J-saN" secondAttribute="leading" constant="20" symbolic="YES" id="xAB-f3-f0e"/>
-                                                    <constraint firstItem="5IL-zZ-CL9" firstAttribute="trailing" secondItem="h4r-Sp-LBI" secondAttribute="trailing" id="z2C-jk-sNa"/>
+                                                    <constraint firstItem="pYB-E5-4Nv" firstAttribute="leading" secondItem="vwf-Kq-s8M" secondAttribute="leading" id="1rZ-f3-1zX"/>
+                                                    <constraint firstItem="vwf-Kq-s8M" firstAttribute="trailing" secondItem="gZ0-OK-r7a" secondAttribute="trailing" id="5cy-8X-7Au"/>
+                                                    <constraint firstItem="h4r-Sp-LBI" firstAttribute="leading" secondItem="pYB-E5-4Nv" secondAttribute="leading" id="7hd-5d-da4"/>
+                                                    <constraint firstItem="pYB-E5-4Nv" firstAttribute="top" secondItem="h4r-Sp-LBI" secondAttribute="bottom" constant="6" symbolic="YES" id="9wj-ZN-icr"/>
+                                                    <constraint firstItem="pYB-E5-4Nv" firstAttribute="trailing" secondItem="vwf-Kq-s8M" secondAttribute="trailing" id="CIn-2X-pob"/>
+                                                    <constraint firstAttribute="trailing" secondItem="5IL-zZ-CL9" secondAttribute="trailing" constant="20" symbolic="YES" id="LS4-To-vob"/>
+                                                    <constraint firstItem="gZ0-OK-r7a" firstAttribute="top" secondItem="vwf-Kq-s8M" secondAttribute="bottom" constant="6" symbolic="YES" id="Rsh-wh-py3"/>
+                                                    <constraint firstItem="5IL-zZ-CL9" firstAttribute="leading" secondItem="brd-6J-saN" secondAttribute="leading" constant="20" symbolic="YES" id="TZx-QY-h2O"/>
+                                                    <constraint firstItem="5IL-zZ-CL9" firstAttribute="trailing" secondItem="h4r-Sp-LBI" secondAttribute="trailing" id="WW0-Yz-JzI"/>
+                                                    <constraint firstItem="vwf-Kq-s8M" firstAttribute="leading" secondItem="gZ0-OK-r7a" secondAttribute="leading" id="Yig-Jx-L3P"/>
+                                                    <constraint firstItem="vwf-Kq-s8M" firstAttribute="top" secondItem="pYB-E5-4Nv" secondAttribute="bottom" constant="6" symbolic="YES" id="cbL-Tb-hUr"/>
+                                                    <constraint firstItem="5IL-zZ-CL9" firstAttribute="top" secondItem="brd-6J-saN" secondAttribute="top" constant="13" id="hsK-pj-HMJ"/>
+                                                    <constraint firstItem="h4r-Sp-LBI" firstAttribute="trailing" secondItem="pYB-E5-4Nv" secondAttribute="trailing" id="hsW-zt-ozX"/>
+                                                    <constraint firstItem="h4r-Sp-LBI" firstAttribute="top" secondItem="5IL-zZ-CL9" secondAttribute="bottom" constant="6" symbolic="YES" id="qhu-6f-Ncy"/>
+                                                    <constraint firstItem="5IL-zZ-CL9" firstAttribute="leading" secondItem="h4r-Sp-LBI" secondAttribute="leading" id="sPQ-GZ-39w"/>
                                                 </constraints>
                                             </view>
                                         </box>
