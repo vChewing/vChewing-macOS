@@ -128,6 +128,7 @@
 "Misc Settings:" = "雜項:";
 "MiTAC" = "神通排列";
 "Non-QWERTY alphanumeral keyboard layouts are for Hanyu Pinyin parser only." = "QWERTY 以外的英數佈局是為了漢語拼音排列使用者而準備的。";
+"Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter" = "Ctrl(+Alt)+CMD+Enter 輸出漢語拼音而非注音";
 "Output Settings:" = "輸出設定:";
 "Phonetic Parser:" = "注音排列:";
 "Push the cursor in front of the phrase after selection" = "在選字後將游標置於該字詞的前方";

@@ -128,6 +128,7 @@
 "Misc Settings:" = "Misc Settings:";
 "MiTAC" = "MiTAC";
 "Non-QWERTY alphanumeral keyboard layouts are for Hanyu Pinyin parser only." = "Non-QWERTY alphanumeral keyboard layouts are for Hanyu Pinyin parser only.";
+"Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter" = "Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter";
 "Output Settings:" = "Output Settings:";
 "Phonetic Parser:" = "Phonetic Parser:";
 "Push the cursor in front of the phrase after selection" = "Push the cursor in front of the phrase after selection";
