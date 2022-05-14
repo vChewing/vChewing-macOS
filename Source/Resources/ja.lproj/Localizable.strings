@@ -132,6 +132,7 @@
 "Phonetic Parser:" = "注音配列:";
 "Push the cursor in front of the phrase after selection" = "候補選択の直後、すぐカーソルを単語の向こうに推し進める";
 "Selection Keys:" = "言選り用キー:";
+"Show Hanyu-Pinyin in the inline composition buffer" = "弁音合併入力（入力緩衝列で代わりに漢語弁音の音読み）";
 "Show page buttons in candidate window" = "入力候補陳列の側にページボタンを表示";
 "Simplified Chinese" = "簡体中国語";
 "Space & ESC Key:" = "ESC と Space:";

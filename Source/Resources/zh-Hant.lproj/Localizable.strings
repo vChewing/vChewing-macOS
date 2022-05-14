@@ -132,6 +132,7 @@
 "Phonetic Parser:" = "注音排列:";
 "Push the cursor in front of the phrase after selection" = "在選字後將游標置於該字詞的前方";
 "Selection Keys:" = "選字鍵:";
+"Show Hanyu-Pinyin in the inline composition buffer" = "拼音並擊模式（組字區內看到的是漢語拼音）";
 "Show page buttons in candidate window" = "在選字窗內顯示翻頁按鈕";
 "Simplified Chinese" = "簡體中文";
 "Space & ESC Key:" = "ESC 與空格鍵:";

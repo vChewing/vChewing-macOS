@@ -43,6 +43,8 @@ struct suiPrefPaneGeneral: View {
     forKey: UserDef.kChineseConversionEnabled)
   @State private var selEnableKanjiConvToJIS = UserDefaults.standard.bool(
     forKey: UserDef.kShiftJISShinjitaiOutputEnabled)
+  @State private var selShowHanyuPinyinInCompositionBuffer = UserDefaults.standard.bool(
+    forKey: UserDef.kShowHanyuPinyinInCompositionBuffer)
   @State private var selEnableFartSuppressor = UserDefaults.standard.bool(forKey: UserDef.kShouldNotFartInLieuOfBeep)
   @State private var selEnableAutoUpdateCheck = UserDefaults.standard.bool(forKey: UserDef.kCheckUpdateAutomatically)
   @State private var selEnableDebugMode = UserDefaults.standard.bool(forKey: UserDef.kIsDebugModeEnabled)
@@ -146,6 +148,13 @@ struct suiPrefPaneGeneral: View {
             mgrPrefs.chineseConversionEnabled = !value
             selEnableKanjiConvToKangXi = !value
           }
+        }
+        Toggle(
+          LocalizedStringKey("Show Hanyu-Pinyin in the inline composition buffer"),
+          isOn: $selShowHanyuPinyinInCompositionBuffer
+        ).onChange(of: selShowHanyuPinyinInCompositionBuffer) { value in
+          mgrPrefs.showHanyuPinyinInCompositionBuffer = value
+          selShowHanyuPinyinInCompositionBuffer = value
         }
         Toggle(
           LocalizedStringKey("Stop farting (when typed phonetic combination is invalid, etc.)"),
