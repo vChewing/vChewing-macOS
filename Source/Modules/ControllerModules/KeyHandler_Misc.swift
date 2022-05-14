@@ -51,4 +51,31 @@ extension KeyHandler {
     }
     return cursorIndex
   }
+
+  // 用於網頁 Ruby 的注音需要按照教科書印刷的方式來顯示輕聲，所以這裡處理一下。
+  func cnvZhuyinKeyToTextbookReading(target: String, newSeparator: String = "-") -> String {
+    var arrReturn: [String] = []
+    for neta in target.split(separator: "-") {
+      var newString = String(neta)
+      if String(neta.reversed()[0]) == "˙" {
+        newString = String(neta.dropLast())
+        newString.insert("˙", at: newString.startIndex)
+      }
+      arrReturn.append(newString)
+    }
+    return arrReturn.joined(separator: newSeparator)
+  }
+
+  // 用於網頁 Ruby 的拼音的陰平必須顯示，這裡處理一下。
+  func restoreToneOneInZhuyinKey(target: String, newSeparator: String = "-") -> String {
+    var arrReturn: [String] = []
+    for neta in target.split(separator: "-") {
+      var newNeta = String(neta)
+      if !"ˊˇˋ˙".contains(String(neta.reversed()[0])), !neta.contains("_") {
+        newNeta += "1"
+      }
+      arrReturn.append(newNeta)
+    }
+    return arrReturn.joined(separator: newSeparator)
+  }
 }

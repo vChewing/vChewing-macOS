@@ -281,11 +281,15 @@ extension KeyHandler {
       return false
     }
 
-    let readings: [String] = currentReadings()
-    let composingBuffer =
-      (IME.areWeUsingOurOwnPhraseEditor)
-      ? readings.joined(separator: "-")
-      : readings.joined(separator: " ")
+    var composingBuffer = currentReadings().joined(separator: "-")
+    if mgrPrefs.inlineDumpPinyinInLieuOfZhuyin {
+      composingBuffer = restoreToneOneInZhuyinKey(target: composingBuffer)  // 恢復陰平標記
+      composingBuffer = Tekkon.cnvPhonaToHanyuPinyin(target: composingBuffer)  // 注音轉拼音
+    }
+
+    if !IME.areWeUsingOurOwnPhraseEditor {
+      composingBuffer = composingBuffer.replacingOccurrences(of: "-", with: " ")
+    }
 
     clear()
 
@@ -309,7 +313,16 @@ extension KeyHandler {
 
     for theAnchor in _walkedNodes {
       if let node = theAnchor.node {
-        let key = node.currentKeyValue().key.replacingOccurrences(of: "-", with: " ")
+        var key = node.currentKeyValue().key
+        if mgrPrefs.inlineDumpPinyinInLieuOfZhuyin {
+          key = restoreToneOneInZhuyinKey(target: key)  // 恢復陰平標記
+          key = Tekkon.cnvPhonaToHanyuPinyin(target: key)  // 注音轉拼音
+          key = Tekkon.cnvHanyuPinyinToTextbookStyle(target: key)  // 轉教科書式標調
+          key = key.replacingOccurrences(of: "-", with: " ")
+        } else {
+          key = cnvZhuyinKeyToTextbookReading(target: key, newSeparator: " ")
+        }
+
         let value = node.currentKeyValue().value
         if key.contains("_") {  // 不要給標點符號等特殊元素加注音
           composed += value
