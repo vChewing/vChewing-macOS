@@ -64,7 +64,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
   }
 
   func applicationDidFinishLaunching(_: Notification) {
-    IME.initLangModels(userOnly: false)
+    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
+      IME.initLangModels(userOnly: false)
+    }
+
     fsStreamHelper.delegate = self
     _ = fsStreamHelper.start()
 
