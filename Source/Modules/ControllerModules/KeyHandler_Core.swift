@@ -328,6 +328,8 @@ class KeyHandler: NSObject {
     switch mgrPrefs.mandarinParser {
       case MandarinParser.ofStandard.rawValue:
         _composer.ensureParser(arrange: .ofDachen)
+      case MandarinParser.ofDachen26.rawValue:
+        _composer.ensureParser(arrange: .ofDachen26)
       case MandarinParser.ofEten.rawValue:
         _composer.ensureParser(arrange: .ofEten)
       case MandarinParser.ofHsu.rawValue:
@@ -340,6 +342,8 @@ class KeyHandler: NSObject {
         _composer.ensureParser(arrange: .ofMiTAC)
       case MandarinParser.ofFakeSeigyou.rawValue:
         _composer.ensureParser(arrange: .ofFakeSeigyou)
+      case MandarinParser.ofHanyuPinyin.rawValue:
+        _composer.ensureParser(arrange: .ofHanyuPinyin)
       default:
         _composer.ensureParser(arrange: .ofDachen)
         mgrPrefs.mandarinParser = MandarinParser.ofStandard.rawValue

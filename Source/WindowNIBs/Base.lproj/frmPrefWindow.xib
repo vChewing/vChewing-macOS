@@ -782,6 +782,7 @@
                                                             <menu key="menu" title="OtherViews" id="5">
                                                                 <items>
                                                                     <menuItem title="Standard" state="on" id="6"/>
+                                                                    <menuItem title="Dachen 26" tag="7" id="xjP-r7-GaK"/>
                                                                     <menuItem title="ETen" tag="1" id="7"/>
                                                                     <menuItem title="ETen26" tag="3" id="9"/>
                                                                     <menuItem title="IBM" tag="4" id="137"/>

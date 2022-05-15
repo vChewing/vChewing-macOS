@@ -104,6 +104,7 @@
 "Choose your preferred layout of the candidate window." = "選擇您所偏好的候選字窗佈局。";
 "Cursor Selection:" = "選字游標:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千排列 (微軟標準/王安/零壹/仲鼎/國喬)";
+"Dachen 26 (libChewing)" = "酷音大千二十六鍵";
 "Debug Mode" = "偵錯模式";
 "Dictionary" = "辭典";
 "Emulating select-candidate-per-character mode" = "模擬 90 年代前期注音逐字選字輸入風格";

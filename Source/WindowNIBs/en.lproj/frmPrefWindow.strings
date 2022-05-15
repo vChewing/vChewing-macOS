@@ -232,3 +232,6 @@
 
 /* Class = "NSButtonCell"; title = "Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter"; ObjectID = "iWy-Nw-QKB"; */
 "iWy-Nw-QKB.title" = "Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter";
+
+/* Class = "NSMenuItem"; title = "Dachen 26 (libChewing)"; ObjectID = "xjP-r7-GaK"; */
+"xjP-r7-GaK.title" = "Dachen 26 (libChewing)";

@@ -104,6 +104,7 @@
 "Choose your preferred layout of the candidate window." = "入力候補陳列の仕様をご指定ください。";
 "Cursor Selection:" = "カーソル候補呼出:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千配列 (Microsoft 標準・王安・零壹など)";
+"Dachen 26 (libChewing)" = "酷音大千二十六キー";
 "Debug Mode" = "欠陥辿着モード";
 "Dictionary" = "辞書設定";
 "Emulating select-candidate-per-character mode" = "漢字１つづつ全候補選択入力モード";

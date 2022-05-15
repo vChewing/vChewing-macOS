@@ -104,6 +104,7 @@
 "Choose your preferred layout of the candidate window." = "Choose your preferred layout of the candidate window.";
 "Cursor Selection:" = "Cursor Selection:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "Dachen (Microsoft Standard / Wang / 01, etc.)";
+"Dachen 26 (libChewing)" = "Dachen 26 (libChewing)";
 "Debug Mode" = "Debug Mode";
 "Dictionary" = "Dictionary";
 "Emulating select-candidate-per-character mode" = "Emulating select-candidate-per-character mode";

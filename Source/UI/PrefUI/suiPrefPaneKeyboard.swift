@@ -47,6 +47,7 @@ struct suiPrefPaneKeyboard: View {
       Preferences.Section(label: { Text(LocalizedStringKey("Phonetic Parser:")) }) {
         Picker("", selection: $selMandarinParser) {
           Text(LocalizedStringKey("Dachen (Microsoft Standard / Wang / 01, etc.)")).tag(0)
+          Text(LocalizedStringKey("Dachen 26 (libChewing)")).tag(7)
           Text(LocalizedStringKey("Eten Traditional")).tag(1)
           Text(LocalizedStringKey("Eten 26")).tag(3)
           Text(LocalizedStringKey("IBM")).tag(4)
