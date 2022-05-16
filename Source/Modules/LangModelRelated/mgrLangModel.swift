@@ -36,7 +36,7 @@ private var gLangModelCHT = vChewing.LMInstantiator()
 private var gUserOverrideModelCHS = vChewing.LMUserOverride()
 private var gUserOverrideModelCHT = vChewing.LMUserOverride()
 
-class mgrLangModel: NSObject {
+class mgrLangModel {
   /// 寫幾個回傳函數、供其餘控制模組來讀取那些被設為 fileprivate 的器外變數。
   public static var lmCHS: vChewing.LMInstantiator { gLangModelCHS }
   public static var lmCHT: vChewing.LMInstantiator { gLangModelCHT }

@@ -34,7 +34,7 @@ public enum InputMode: String {
 
 // MARK: - Delegate.
 
-protocol KeyHandlerDelegate: NSObjectProtocol {
+protocol KeyHandlerDelegate {
   func ctlCandidate(for _: KeyHandler) -> Any
   func keyHandler(
     _: KeyHandler, didSelectCandidateAt index: Int,
@@ -46,7 +46,7 @@ protocol KeyHandlerDelegate: NSObjectProtocol {
 
 // MARK: - Kernel.
 
-class KeyHandler: NSObject {
+class KeyHandler {
   let kEpsilon: Double = 0.000001
   var _composer: Tekkon.Composer = .init()
   var _inputMode: String = ""
@@ -55,7 +55,7 @@ class KeyHandler: NSObject {
   var _builder: Megrez.BlockReadingBuilder
   var _walkedNodes: [Megrez.NodeAnchor] = []
 
-  weak var delegate: KeyHandlerDelegate?
+  var delegate: KeyHandlerDelegate?
 
   var inputMode: InputMode {
     get {
@@ -71,9 +71,8 @@ class KeyHandler: NSObject {
     set { setInputMode(newValue.rawValue) }
   }
 
-  override init() {
+  public init() {
     _builder = Megrez.BlockReadingBuilder(lm: _languageModel)
-    super.init()
     ensureParser()
     setInputMode(ctlInputMethod.currentInputMode)
   }

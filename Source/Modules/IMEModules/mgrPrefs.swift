@@ -215,7 +215,7 @@ struct ComposingBufferSize {
 
 // MARK: -
 
-public class mgrPrefs: NSObject {
+public class mgrPrefs {
   static var allKeys: [String] {
     [
       UserDef.kIsDebugModeEnabled,

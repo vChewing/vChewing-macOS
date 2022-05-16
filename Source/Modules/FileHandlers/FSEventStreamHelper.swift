@@ -30,7 +30,7 @@ public protocol FSEventStreamHelperDelegate: AnyObject {
   func helper(_ helper: FSEventStreamHelper, didReceive events: [FSEventStreamHelper.Event])
 }
 
-public class FSEventStreamHelper: NSObject {
+public class FSEventStreamHelper {
   public struct Event {
     var path: String
     var flags: FSEventStreamEventFlags
