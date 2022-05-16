@@ -31,6 +31,25 @@ extension Megrez {
       mutGrid = grid
     }
 
+    public func walk(
+      at location: Int,
+      score accumulatedScore: Double = 0.0,
+      nodesLimit: Int = 0,
+      balanced: Bool = false
+    ) -> [NodeAnchor] {
+      var arrReturn: [NodeAnchor] = []
+      let arrReversedSource = reverseWalk(
+        at: location, score: accumulatedScore,
+        nodesLimit: nodesLimit, balanced: balanced
+      ).reversed()
+
+      for neta in arrReversedSource {
+        arrReturn.append(neta)
+      }
+
+      return arrReturn
+    }
+
     public func reverseWalk(
       at location: Int,
       score accumulatedScore: Double = 0.0,
