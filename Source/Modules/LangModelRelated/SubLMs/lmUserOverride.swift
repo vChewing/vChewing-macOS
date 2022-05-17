@@ -1,6 +1,5 @@
 // Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
-// Refactored from the ObjCpp-version of this class by:
-// (c) 2011 and onwards The OpenVanilla Project (MIT License).
+// Refactored from the ObjCpp-version of this class by Mengjuei Hsieh (MIT License).
 /*
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -68,7 +67,7 @@ extension vChewing {
 
     var mutCapacity: Int
     var mutDecayExponent: Double
-    var mutLRUList = [KeyObservationPair]()
+    var mutLRUList: [KeyObservationPair] = []
     var mutLRUMap: [String: KeyObservationPair] = [:]
     let kDecayThreshold: Double = 1.0 / 1_048_576.0
 
@@ -86,27 +85,27 @@ extension vChewing {
       candidate: String,
       timestamp: Double
     ) {
-      let key = getWalkedNodesToKey(walkedNodes: walkedNodes, cursorIndex: cursorIndex)
-      guard !key.isEmpty
-      else {
-        return
-      }
+      let key = convertKeyFrom(walkedNodes: walkedNodes, cursorIndex: cursorIndex)
+
       guard mutLRUMap[key] != nil else {
         var observation: Observation = .init()
         observation.update(candidate: candidate, timestamp: timestamp)
-        mutLRUMap[key] = KeyObservationPair(key: key, observation: observation)
-        mutLRUList.insert(KeyObservationPair(key: key, observation: observation), at: 0)
+        let koPair = KeyObservationPair(key: key, observation: observation)
+        mutLRUMap[key] = koPair
+        mutLRUList.insert(koPair, at: 0)
 
         if mutLRUList.count > mutCapacity {
-          mutLRUMap[mutLRUList.reversed()[0].key] = nil
+          mutLRUMap[mutLRUList[mutLRUList.endIndex].key] = nil
           mutLRUList.removeLast()
         }
+        IME.prtDebugIntel("UOM: Observation finished with new observation: \(key)")
         return
       }
-      mutLRUList.insert(contentsOf: mutLRUMap.values, at: 0)
-
-      if mutLRUMap[key] != nil {
-        mutLRUMap[key]?.observation.update(candidate: candidate, timestamp: timestamp)
+      if var theNeta = mutLRUMap[key] {
+        theNeta.observation.update(candidate: candidate, timestamp: timestamp)
+        mutLRUList.insert(theNeta, at: 0)
+        mutLRUMap[key] = theNeta
+        IME.prtDebugIntel("UOM: Observation finished with existing observation: \(key)")
       }
     }
 
@@ -115,25 +114,22 @@ extension vChewing {
       cursorIndex: Int,
       timestamp: Double
     ) -> String {
-      let key = getWalkedNodesToKey(walkedNodes: walkedNodes, cursorIndex: cursorIndex)
-      guard let keyValuePair = mutLRUMap[key],
-        !key.isEmpty
-      else {
+      let key = convertKeyFrom(walkedNodes: walkedNodes, cursorIndex: cursorIndex)
+      guard let koPair = mutLRUMap[key] else {
+        IME.prtDebugIntel("UOM: mutLRUMap[key] is nil, throwing blank suggestion for key: \(key).")
         return ""
       }
 
-      IME.prtDebugIntel("Suggest - A: \(key)")
-      IME.prtDebugIntel("Suggest - B: \(keyValuePair.key)")
-
-      let observation = keyValuePair.observation
+      let observation = koPair.observation
 
       var candidate = ""
       var score = 0.0
       for overrideNeta in Array(observation.overrides) {
-        let overrideScore = getScore(
-          eventCount: overrideNeta.value.count,
+        let override: Override = overrideNeta.value
+        let overrideScore: Double = getScore(
+          eventCount: override.count,
           totalCount: observation.count,
-          eventTimestamp: overrideNeta.value.timestamp,
+          eventTimestamp: override.timestamp,
           timestamp: timestamp,
           lambda: mutDecayExponent
         )
@@ -147,11 +143,10 @@ extension vChewing {
           score = overrideScore
         }
       }
+      if candidate.isEmpty {
+        IME.prtDebugIntel("UOM: No usable suggestions in the result for key: \(key).")
+      }
       return candidate
-    }
-
-    func isEndingPunctuation(value: String) -> Bool {
-      ["，", "。", "！", "？", "」", "』", "”", "’"].contains(value)
     }
 
     public func getScore(
@@ -170,58 +165,51 @@ extension vChewing {
       return prob * decay
     }
 
-    func getWalkedNodesToKey(
+    func convertKeyFrom(
       walkedNodes: [Megrez.NodeAnchor], cursorIndex: Int
     ) -> String {
-      var strOutput = ""
-      var arrNodes: [Megrez.NodeAnchor] = []
+      let arrEndingPunctuation = ["，", "。", "！", "？", "」", "』", "”", "’"]
+      var arrNodesReversed: [Megrez.NodeAnchor] = []
       var intLength = 0
-      for nodeNeta in walkedNodes {
-        arrNodes.append(nodeNeta)
-        intLength += nodeNeta.spanningLength
+      for theNodeAnchor in walkedNodes {
+        // 這裡直接生成一個反向排序的陣列，之後就不用再「.reverse()」了。
+        arrNodesReversed = [theNodeAnchor] + arrNodesReversed
+        intLength += theNodeAnchor.spanningLength
         if intLength >= cursorIndex {
           break
         }
       }
 
-      // 一個被 .reversed 過的陣列不能直接使用，因為不是正常的 Swift 陣列。
-      // 那就新開一個正常的陣列、然後將內容拓印過去。
-      var arrNodesReversed: [Megrez.NodeAnchor] = []
-      arrNodesReversed.append(contentsOf: arrNodes.reversed())
+      if arrNodesReversed.isEmpty { return "" }
 
-      if arrNodesReversed.isEmpty {
+      var strCurrent = "()"
+      var strPrevious = "()"
+      var strAnterior = "()"
+
+      guard let kvCurrent = arrNodesReversed[0].node?.currentKeyValue(),
+        !arrEndingPunctuation.contains(kvCurrent.value)
+      else {
         return ""
       }
 
-      var strCurrent = "()"
-      var strPrev = "()"
-      var strAnterior = "()"
+      // 前置單元只記錄讀音，在其後的單元則同時記錄讀音與字詞
+      strCurrent = kvCurrent.key
 
-      for (theIndex, theAnchor) in arrNodesReversed.enumerated() {
-        if strCurrent != "()", let nodeCurrent = theAnchor.node {
-          let keyCurrent = nodeCurrent.currentKeyValue().key
-          let valCurrent = nodeCurrent.currentKeyValue().value
-          strCurrent = "(\(keyCurrent), \(valCurrent))"
-          if let nodePrev = arrNodesReversed[theIndex + 1].node {
-            let keyPrev = nodePrev.currentKeyValue().key
-            let valPrev = nodePrev.currentKeyValue().value
-            strPrev = "(\(keyPrev), \(valPrev))"
-          }
-          if let nodeAnterior = arrNodesReversed[theIndex + 2].node {
-            let keyAnterior = nodeAnterior.currentKeyValue().key
-            let valAnterior = nodeAnterior.currentKeyValue().value
-            strAnterior = "(\(keyAnterior), \(valAnterior))"
-          }
-          break  // 我們只取第一個有效結果。
-        }
+      if arrNodesReversed.count >= 2,
+        let kvPrevious = arrNodesReversed[1].node?.currentKeyValue(),
+        !arrEndingPunctuation.contains(kvPrevious.value)
+      {
+        strPrevious = "(\(kvPrevious.key),\(kvPrevious.value))"
       }
 
-      strOutput = "(\(strAnterior),\(strPrev),\(strCurrent))"
-      if strOutput == "((),(),())" {
-        strOutput = ""
+      if arrNodesReversed.count >= 3,
+        let kvAnterior = arrNodesReversed[2].node?.currentKeyValue(),
+        !arrEndingPunctuation.contains(kvAnterior.value)
+      {
+        strAnterior = "(\(kvAnterior.key),\(kvAnterior.value))"
       }
 
-      return strOutput
+      return "(\(strAnterior),\(strPrevious),\(strCurrent))"
     }
   }
 }
