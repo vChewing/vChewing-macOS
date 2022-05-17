@@ -171,17 +171,20 @@ class KeyHandler: NSObject {
       // in the user override model.
       var addToUserOverrideModel = true
       if selectedNode.spanningLength != value.count {
+        IME.prtDebugIntel("UOM: SpanningLength != value.count, dismissing.")
         addToUserOverrideModel = false
       }
       if addToUserOverrideModel {
         if let theNode = selectedNode.node {
           // 威注音的 SymbolLM 的 Score 是 -12。
           if theNode.scoreFor(candidate: value) <= -12 {
+            IME.prtDebugIntel("UOM: Score <= -12, dismissing.")
             addToUserOverrideModel = false
           }
         }
       }
       if addToUserOverrideModel {
+        IME.prtDebugIntel("UOM: Start Observation.")
         _userOverrideModel.observe(
           walkedNodes: _walkedNodes, cursorIndex: cursorIndex, candidate: value,
           timestamp: NSDate().timeIntervalSince1970
@@ -237,11 +240,15 @@ class KeyHandler: NSObject {
       )
 
     if !overrideValue.isEmpty {
+      IME.prtDebugIntel(
+        "UOM: Suggestion retrieved, overriding the node score of the selected candidate.")
       _builder.grid().overrideNodeScoreForSelectedCandidate(
         location: getActualCandidateCursorIndex(),
         value: overrideValue,
         overridingScore: findHighestScore(nodes: getRawNodes(), epsilon: kEpsilon)
       )
+    } else {
+      IME.prtDebugIntel("UOM: Blank suggestion retrieved, dismissing.")
     }
   }
 
