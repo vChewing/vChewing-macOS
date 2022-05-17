@@ -41,7 +41,7 @@ public class FSEventStreamHelper {
   public let dispatchQueue: DispatchQueue
   public weak var delegate: FSEventStreamHelperDelegate?
 
-  @objc public init(path: String, queue: DispatchQueue) {
+  public init(path: String, queue: DispatchQueue) {
     self.path = path
     dispatchQueue = queue
   }

@@ -166,7 +166,7 @@ struct ComposingBufferSize {
 
 // MARK: -
 
-@objc enum MandarinParser: Int {
+enum MandarinParser: Int {
   case ofStandard = 0
   case ofEten = 1
   case ofHsu = 2
@@ -327,7 +327,7 @@ public enum mgrPrefs {
   static var appleLanguages: [String]
 
   @UserDefault(key: UserDef.kMandarinParser, defaultValue: 0)
-  @objc static var mandarinParser: Int
+  static var mandarinParser: Int
 
   static var mandarinParserName: String {
     (MandarinParser(rawValue: mandarinParser) ?? MandarinParser.ofStandard).name
