@@ -28,7 +28,7 @@ import Cocoa
 // The namespace of this input method.
 public enum vChewing {}
 
-public class IME {
+public enum IME {
   static let arrSupportedLocales = ["en", "zh-Hant", "zh-Hans", "ja"]
   static let dlgOpenPath = NSOpenPanel()
 

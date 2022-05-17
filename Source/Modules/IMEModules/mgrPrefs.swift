@@ -215,7 +215,7 @@ struct ComposingBufferSize {
 
 // MARK: -
 
-public class mgrPrefs {
+public enum mgrPrefs {
   static var allKeys: [String] {
     [
       UserDef.kIsDebugModeEnabled,
@@ -293,9 +293,11 @@ public class mgrPrefs {
     UserDefaults.standard.setDefault(mgrPrefs.phraseReplacementEnabled, forKey: UserDef.kPhraseReplacementEnabled)
     UserDefaults.standard.setDefault(mgrPrefs.shouldNotFartInLieuOfBeep, forKey: UserDef.kShouldNotFartInLieuOfBeep)
     UserDefaults.standard.setDefault(
-      mgrPrefs.showHanyuPinyinInCompositionBuffer, forKey: UserDef.kShowHanyuPinyinInCompositionBuffer)
+      mgrPrefs.showHanyuPinyinInCompositionBuffer, forKey: UserDef.kShowHanyuPinyinInCompositionBuffer
+    )
     UserDefaults.standard.setDefault(
-      mgrPrefs.inlineDumpPinyinInLieuOfZhuyin, forKey: UserDef.kInlineDumpPinyinInLieuOfZhuyin)
+      mgrPrefs.inlineDumpPinyinInLieuOfZhuyin, forKey: UserDef.kInlineDumpPinyinInLieuOfZhuyin
+    )
 
     UserDefaults.standard.synchronize()
   }
