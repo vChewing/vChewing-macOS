@@ -117,15 +117,11 @@ class KeyHandler: NSObject {
   func walk() {
     // Retrieve the most likely grid, i.e. a Maximum Likelihood Estimation
     // of the best possible Mandarin characters given the input syllables,
-    // using the Viterbi algorithm implemented in the Megrez library
-    let walker = Megrez.Walker(grid: _builder.grid())
-
-    // the reverse walk traces the grid from the end
-    let walked = walker.reverseWalk(at: _builder.grid().width(), nodesLimit: 3, balanced: true)
-
-    // then we use ".reversed()" to reverse the nodes so that we get the forward-walked nodes
-    _walkedNodes.removeAll()
-    _walkedNodes.append(contentsOf: walked.reversed())
+    // using the Viterbi algorithm implemented in the Megrez library.
+    // The walk() traces the grid to the end, hence no need to use .reversed() here.
+    _walkedNodes = Megrez.Walker(
+      grid: _builder.grid()
+    ).walk(at: _builder.grid().width(), nodesLimit: 3, balanced: true)
   }
 
   func popOverflowComposingTextAndWalk() -> String {
@@ -365,5 +361,4 @@ class KeyHandler: NSObject {
     }
     _composer.clear()
   }
-
 }
