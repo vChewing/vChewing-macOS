@@ -95,7 +95,7 @@ extension vChewing {
       if let arrRangeRecords: [Range<String.Index>] = rangeMap[key] {
         for netaRange in arrRangeRecords {
           let neta = strData[netaRange].split(separator: " ")
-          let theValue: String = String(neta[1])
+          let theValue: String = .init(neta[1])
           pairs.append(theValue)
         }
       }
