@@ -24,20 +24,18 @@ VC_APP_ROOT = $(DSTROOT)/vChewing.app
 
 format: batchfix clang-format lint
 
-clang-format: clang-format-swift clang-format-cpp
-
-clang-format-swift:
+clang-format:
 	@git ls-files --exclude-standard | grep -E '\.swift$$' | xargs swift-format format --in-place --configuration ./.clang-format-swift.json --parallel
 	@git ls-files --exclude-standard | grep -E '\.swift$$' | xargs swift-format lint --configuration ./.clang-format-swift.json --parallel
-
-clang-format-cpp:
-	@git ls-files --exclude-standard | grep -E '\.(cpp|hpp|c|cc|cxx|hxx|ixx|h|m|mm|hh)$$' | xargs clang-format -i
 
 lint:
 	@git ls-files --exclude-standard | grep -E '\.swift$$' | xargs swift-format lint --configuration ./.clang-format-swift.json --parallel 
 
 batchfix:
 	@git ls-files --exclude-standard | grep -E '\.swift$$' | swiftlint --fix --autocorrect
+
+advanced-lint:
+	@swiftformat --swiftversion 5.5 --indent 2 ./
 
 .PHONY: permission-check install-debug install-release
 
