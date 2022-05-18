@@ -344,6 +344,14 @@ class KeyHandler: NSObject {
         _composer.ensureParser(arrange: .ofFakeSeigyou)
       case MandarinParser.ofHanyuPinyin.rawValue:
         _composer.ensureParser(arrange: .ofHanyuPinyin)
+      case MandarinParser.ofSecondaryPinyin.rawValue:
+        _composer.ensureParser(arrange: .ofSecondaryPinyin)
+      case MandarinParser.ofYalePinyin.rawValue:
+        _composer.ensureParser(arrange: .ofYalePinyin)
+      case MandarinParser.ofHualuoPinyin.rawValue:
+        _composer.ensureParser(arrange: .ofHualuoPinyin)
+      case MandarinParser.ofUniversalPinyin.rawValue:
+        _composer.ensureParser(arrange: .ofUniversalPinyin)
       default:
         _composer.ensureParser(arrange: .ofDachen)
         mgrPrefs.mandarinParser = MandarinParser.ofStandard.rawValue

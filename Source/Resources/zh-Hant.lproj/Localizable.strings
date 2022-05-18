@@ -85,6 +85,7 @@
 "Apple Chewing - Dachen" = "Apple 大千注音鍵盤佈局";
 "Apple Chewing - Eten Traditional" = "Apple 倚天傳統鍵盤佈局";
 "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional." = "Apple 動態注音鍵盤佈局（大千與倚天）要求普通話/國音分析器得配置為大千排列。";
+"at anyplace else (like Windows Yahoo KeyKey)" = "將游標置於詞語中後方 // Windows 奇摩注音風格";
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "自動將繁體中文字轉為日文 JIS 新字體";
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "自動將繁體中文字轉為康熙正體字";
 "Automatically reload user data files if changes detected" = "自動檢測並載入使用者語彙檔案變更";
@@ -123,7 +124,9 @@
 "Hanyu Pinyin with Numeral Intonation" = "漢語拼音+數字標調";
 "Horizontal" = "橫向佈局";
 "Hsu" = "許氏國音自然排列";
+"Hualuo Pinyin with Numeral Intonation" = "華羅拼音+數字標調";
 "IBM" = "IBM 排列";
+"in front of the phrase (like macOS built-in Zhuyin IME)" = "將游標置於詞語前方 // macOS 內建注音風格";
 "Japanese" = "和語";
 "Keyboard" = "鍵盤";
 "Misc Settings:" = "雜項:";
@@ -133,6 +136,7 @@
 "Output Settings:" = "輸出設定:";
 "Phonetic Parser:" = "注音排列:";
 "Push the cursor in front of the phrase after selection" = "在選字後將游標置於該字詞的前方";
+"Secondary Pinyin with Numeral Intonation" = "國音二式+數字標調";
 "Selection Keys:" = "選字鍵:";
 "Show Hanyu-Pinyin in the inline composition buffer" = "拼音並擊模式（組字區內看到的是漢語拼音）";
 "Show page buttons in candidate window" = "在選字窗內顯示翻頁按鈕";
@@ -141,10 +145,10 @@
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+空格鍵 換下一頁，空格鍵 換選下一個後選字";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "空格鍵 換下一頁，Shift+空格鍵 換選下一個後選字";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉恥模式 // 取消勾選的話，敲錯字時會有異音";
-"in front of the phrase (like macOS built-in Zhuyin IME)" = "將游標置於詞語前方 // macOS 內建注音風格";
-"at anyplace else (like Windows Yahoo KeyKey)" = "將游標置於詞語中後方 // Windows 奇摩注音風格";
 "Traditional Chinese" = "繁體中文";
 "Typing Style:" = "輸入風格:";
 "UI Language:" = "介面語言:";
+"Universal Pinyin with Numeral Intonation" = "通用拼音+數字標調";
 "Use ESC key to clear the entire input buffer" = "敲 ESC 鍵以清空整個組字緩衝區";
 "Vertical" = "縱向佈局";
+"Yale Pinyin with Numeral Intonation" = "耶魯拼音+數字標調";
