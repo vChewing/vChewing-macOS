@@ -54,7 +54,7 @@ struct suiPrefPaneKeyboard: View {
           Text(LocalizedStringKey("Hsu")).tag(2)
           Text(LocalizedStringKey("MiTAC")).tag(5)
           Text(LocalizedStringKey("Fake Seigyou")).tag(6)
-          // Text(LocalizedStringKey("Hanyu Pinyin with Numeral Intonation")).tag(10)
+          Text(LocalizedStringKey("Hanyu Pinyin with Numeral Intonation")).tag(10)
         }.onChange(of: selMandarinParser) { value in
           mgrPrefs.mandarinParser = value
         }
