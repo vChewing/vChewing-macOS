@@ -166,6 +166,9 @@ extension KeyHandler {
     // However, Swift does not support "|=".
     composeReading = composeReading || (!_composer.isEmpty && (input.isSpace || input.isEnter))
     if composeReading {
+      if input.isSpace && !_composer.hasToneMarker() {
+        _composer.receiveKey(fromString: " ")  // 補上空格。
+      }
       let reading = _composer.getComposition()
 
       // See whether we have a unigram for this...
