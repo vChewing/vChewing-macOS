@@ -85,6 +85,7 @@
 "Apple Chewing - Dachen" = "Apple 大千注音键盘排列";
 "Apple Chewing - Eten Traditional" = "Apple 倚天传统键盘排列";
 "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional." = "Apple 动态注音键盘布局（大千与倚天）要求普通话/国音分析器得配置为大千排列。";
+"at anyplace else (like Windows Yahoo KeyKey)" = "将游标置于词语中后方 // Windows 奇摩注音风格";
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "自动将繁体中文字转为日文 JIS 新字体";
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "自动将繁体中文字转为康熙正体字";
 "Automatically reload user data files if changes detected" = "自动检测并载入使用者语汇档案变更";
@@ -104,6 +105,7 @@
 "Choose your preferred layout of the candidate window." = "选择您所偏好的候选字窗布局。";
 "Cursor Selection:" = "选字游标:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千排列 (微软标准/王安/零壹/仲鼎/国乔)";
+"Dachen 26 (libChewing)" = "酷音大千二十六键";
 "Debug Mode" = "侦错模式";
 "Dictionary" = "辞典";
 "Emulating select-candidate-per-character mode" = "模拟 90 年代前期注音逐字选字输入风格";
@@ -122,7 +124,10 @@
 "Hanyu Pinyin with Numeral Intonation" = "汉语拼音+数字标调";
 "Horizontal" = "横向布局";
 "Hsu" = "许氏国音自然排列";
+"Hualuo Pinyin with Numeral Intonation" = "华罗拼音+数字标调";
+"Hualuo Pinyin with Numeral Intonation" = "華羅拼音+数字标调";
 "IBM" = "IBM 排列";
+"in front of the phrase (like macOS built-in Zhuyin IME)" = "将游标置于词语前方 // macOS 内建注音风格";
 "Japanese" = "和语";
 "Keyboard" = "键盘";
 "Misc Settings:" = "杂项:";
@@ -132,6 +137,7 @@
 "Output Settings:" = "输出设定:";
 "Phonetic Parser:" = "注音排列:";
 "Push the cursor in front of the phrase after selection" = "在选字后将游标置于该字词的前方";
+"Secondary Pinyin with Numeral Intonation" = "国音二式+数字标调";
 "Selection Keys:" = "选字键:";
 "Show Hanyu-Pinyin in the inline composition buffer" = "拼音并击模式（组字区内看到的是汉语拼音）";
 "Show page buttons in candidate window" = "在选字窗内显示翻页按钮";
@@ -140,10 +146,11 @@
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+空格键 换下一页，空格键 换选下一个后选字";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "空格键 换下一页，Shift+空格键 换选下一个后选字";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉耻模式 // 取消勾选的话，敲错字时会有异音";
-"in front of the phrase (like macOS built-in Zhuyin IME)" = "将游标置于词语前方 // macOS 内建注音风格";
-"at anyplace else (like Windows Yahoo KeyKey)" = "将游标置于词语中后方 // Windows 奇摩注音风格";
 "Traditional Chinese" = "繁体中文";
 "Typing Style:" = "输入风格:";
 "UI Language:" = "介面语言:";
+"Universal Pinyin with Numeral Intonation" = "通用拼音+数字标调";
+"Universal Pinyin with Numeral Intonation" = "通用拼音+数字标调";
 "Use ESC key to clear the entire input buffer" = "敲 ESC 键以清空整个组字缓冲区";
 "Vertical" = "纵向布局";
+"Yale Pinyin with Numeral Intonation" = "耶鲁拼音+数字标调";

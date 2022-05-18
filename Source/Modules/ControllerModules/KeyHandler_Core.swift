@@ -34,7 +34,7 @@ public enum InputMode: String {
 
 // MARK: - Delegate.
 
-protocol KeyHandlerDelegate: NSObjectProtocol {
+protocol KeyHandlerDelegate {
   func ctlCandidate(for _: KeyHandler) -> Any
   func keyHandler(
     _: KeyHandler, didSelectCandidateAt index: Int,
@@ -46,7 +46,7 @@ protocol KeyHandlerDelegate: NSObjectProtocol {
 
 // MARK: - Kernel.
 
-class KeyHandler: NSObject {
+class KeyHandler {
   let kEpsilon: Double = 0.000001
   var _composer: Tekkon.Composer = .init()
   var _inputMode: String = ""
@@ -55,7 +55,7 @@ class KeyHandler: NSObject {
   var _builder: Megrez.BlockReadingBuilder
   var _walkedNodes: [Megrez.NodeAnchor] = []
 
-  weak var delegate: KeyHandlerDelegate?
+  var delegate: KeyHandlerDelegate?
 
   var inputMode: InputMode {
     get {
@@ -71,9 +71,8 @@ class KeyHandler: NSObject {
     set { setInputMode(newValue.rawValue) }
   }
 
-  override init() {
+  public init() {
     _builder = Megrez.BlockReadingBuilder(lm: _languageModel)
-    super.init()
     ensureParser()
     setInputMode(ctlInputMethod.currentInputMode)
   }
@@ -117,15 +116,11 @@ class KeyHandler: NSObject {
   func walk() {
     // Retrieve the most likely grid, i.e. a Maximum Likelihood Estimation
     // of the best possible Mandarin characters given the input syllables,
-    // using the Viterbi algorithm implemented in the Megrez library
-    let walker = Megrez.Walker(grid: _builder.grid())
-
-    // the reverse walk traces the grid from the end
-    let walked = walker.reverseWalk(at: _builder.grid().width(), nodesLimit: 3, balanced: true)
-
-    // then we use ".reversed()" to reverse the nodes so that we get the forward-walked nodes
-    _walkedNodes.removeAll()
-    _walkedNodes.append(contentsOf: walked.reversed())
+    // using the Viterbi algorithm implemented in the Megrez library.
+    // The walk() traces the grid to the end, hence no need to use .reversed() here.
+    _walkedNodes = Megrez.Walker(
+      grid: _builder.grid()
+    ).walk(at: _builder.grid().width(), nodesLimit: 3, balanced: true)
   }
 
   func popOverflowComposingTextAndWalk() -> String {
@@ -171,17 +166,20 @@ class KeyHandler: NSObject {
       // in the user override model.
       var addToUserOverrideModel = true
       if selectedNode.spanningLength != value.count {
+        IME.prtDebugIntel("UOM: SpanningLength != value.count, dismissing.")
         addToUserOverrideModel = false
       }
       if addToUserOverrideModel {
         if let theNode = selectedNode.node {
           // 威注音的 SymbolLM 的 Score 是 -12。
           if theNode.scoreFor(candidate: value) <= -12 {
+            IME.prtDebugIntel("UOM: Score <= -12, dismissing.")
             addToUserOverrideModel = false
           }
         }
       }
       if addToUserOverrideModel {
+        IME.prtDebugIntel("UOM: Start Observation.")
         _userOverrideModel.observe(
           walkedNodes: _walkedNodes, cursorIndex: cursorIndex, candidate: value,
           timestamp: NSDate().timeIntervalSince1970
@@ -237,11 +235,15 @@ class KeyHandler: NSObject {
       )
 
     if !overrideValue.isEmpty {
+      IME.prtDebugIntel(
+        "UOM: Suggestion retrieved, overriding the node score of the selected candidate.")
       _builder.grid().overrideNodeScoreForSelectedCandidate(
         location: getActualCandidateCursorIndex(),
         value: overrideValue,
         overridingScore: findHighestScore(nodes: getRawNodes(), epsilon: kEpsilon)
       )
+    } else {
+      IME.prtDebugIntel("UOM: Blank suggestion retrieved, dismissing.")
     }
   }
 
@@ -328,6 +330,8 @@ class KeyHandler: NSObject {
     switch mgrPrefs.mandarinParser {
       case MandarinParser.ofStandard.rawValue:
         _composer.ensureParser(arrange: .ofDachen)
+      case MandarinParser.ofDachen26.rawValue:
+        _composer.ensureParser(arrange: .ofDachen26)
       case MandarinParser.ofEten.rawValue:
         _composer.ensureParser(arrange: .ofEten)
       case MandarinParser.ofHsu.rawValue:
@@ -340,11 +344,20 @@ class KeyHandler: NSObject {
         _composer.ensureParser(arrange: .ofMiTAC)
       case MandarinParser.ofFakeSeigyou.rawValue:
         _composer.ensureParser(arrange: .ofFakeSeigyou)
+      case MandarinParser.ofHanyuPinyin.rawValue:
+        _composer.ensureParser(arrange: .ofHanyuPinyin)
+      case MandarinParser.ofSecondaryPinyin.rawValue:
+        _composer.ensureParser(arrange: .ofSecondaryPinyin)
+      case MandarinParser.ofYalePinyin.rawValue:
+        _composer.ensureParser(arrange: .ofYalePinyin)
+      case MandarinParser.ofHualuoPinyin.rawValue:
+        _composer.ensureParser(arrange: .ofHualuoPinyin)
+      case MandarinParser.ofUniversalPinyin.rawValue:
+        _composer.ensureParser(arrange: .ofUniversalPinyin)
       default:
         _composer.ensureParser(arrange: .ofDachen)
         mgrPrefs.mandarinParser = MandarinParser.ofStandard.rawValue
     }
     _composer.clear()
   }
-
 }

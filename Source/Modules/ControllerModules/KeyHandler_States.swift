@@ -89,7 +89,7 @@ extension KeyHandler {
     }
 
     let head = rawHead
-    let reading = _composer.getComposition(isHanyuPinyin: mgrPrefs.showHanyuPinyinInCompositionBuffer)
+    let reading = _composer.getInlineCompositionForIMK(isHanyuPinyin: mgrPrefs.showHanyuPinyinInCompositionBuffer)
     let tail = rawEnd
     let composedText = head + reading + tail
     let cursorIndex = composedStringCursorIndex + reading.count
@@ -256,16 +256,10 @@ extension KeyHandler {
     stateCallback: @escaping (InputState) -> Void,
     errorCallback _: @escaping () -> Void
   ) -> Bool {
-    if !(state is InputState.Inputting) {
-      return false
-    }
+    guard let currentState = state as? InputState.Inputting else { return false }
 
     clear()
-
-    if let current = state as? InputState.Inputting {
-      stateCallback(InputState.Committing(poppedText: current.composingBuffer))
-    }
-
+    stateCallback(InputState.Committing(poppedText: currentState.composingBuffer))
     stateCallback(InputState.Empty())
     return true
   }
@@ -277,9 +271,7 @@ extension KeyHandler {
     stateCallback: @escaping (InputState) -> Void,
     errorCallback _: @escaping () -> Void
   ) -> Bool {
-    if !(state is InputState.Inputting) {
-      return false
-    }
+    guard state is InputState.Inputting else { return false }
 
     var composingBuffer = currentReadings().joined(separator: "-")
     if mgrPrefs.inlineDumpPinyinInLieuOfZhuyin {
@@ -305,9 +297,7 @@ extension KeyHandler {
     stateCallback: @escaping (InputState) -> Void,
     errorCallback _: @escaping () -> Void
   ) -> Bool {
-    if !(state is InputState.Inputting) {
-      return false
-    }
+    guard state is InputState.Inputting else { return false }
 
     var composed = ""
 
@@ -346,9 +336,7 @@ extension KeyHandler {
     stateCallback: @escaping (InputState) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    if !(state is InputState.Inputting) {
-      return false
-    }
+    guard state is InputState.Inputting else { return false }
 
     if _composer.hasToneMarker(withNothingElse: true) {
       _composer.clear()
@@ -381,9 +369,7 @@ extension KeyHandler {
     stateCallback: @escaping (InputState) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    if !(state is InputState.Inputting) {
-      return false
-    }
+    guard state is InputState.Inputting else { return false }
 
     if _composer.isEmpty {
       if getBuilderCursorIndex() != getBuilderLength() {
@@ -417,9 +403,7 @@ extension KeyHandler {
     stateCallback: @escaping (InputState) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    if !(state is InputState.Inputting) {
-      return false
-    }
+    guard state is InputState.Inputting else { return false }
     if !_composer.isEmpty {
       IME.prtDebugIntel("9B6F908D")
       errorCallback()
@@ -435,9 +419,7 @@ extension KeyHandler {
     stateCallback: @escaping (InputState) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    if !(state is InputState.Inputting) {
-      return false
-    }
+    guard state is InputState.Inputting else { return false }
 
     if !_composer.isEmpty {
       IME.prtDebugIntel("ABC44080")
@@ -465,9 +447,7 @@ extension KeyHandler {
     stateCallback: @escaping (InputState) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    if !(state is InputState.Inputting) {
-      return false
-    }
+    guard state is InputState.Inputting else { return false }
 
     if !_composer.isEmpty {
       IME.prtDebugIntel("9B69908D")
@@ -495,7 +475,7 @@ extension KeyHandler {
     stateCallback: @escaping (InputState) -> Void,
     errorCallback _: @escaping () -> Void
   ) -> Bool {
-    if !(state is InputState.Inputting) { return false }
+    guard state is InputState.Inputting else { return false }
 
     let escToClearInputBufferEnabled: Bool = mgrPrefs.escToCleanInputBuffer
 
@@ -528,7 +508,7 @@ extension KeyHandler {
     stateCallback: @escaping (InputState) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    if !(state is InputState.Inputting) { return false }
+    guard let currentState = state as? InputState.Inputting else { return false }
 
     if !_composer.isEmpty {
       IME.prtDebugIntel("B3BA5257")
@@ -537,34 +517,32 @@ extension KeyHandler {
       return true
     }
 
-    if let currentState = state as? InputState.Inputting {
-      if input.isShiftHold {
-        // Shift + Right
-        if currentState.cursorIndex < (currentState.composingBuffer as NSString).length {
-          let nextPosition = (currentState.composingBuffer as NSString).nextUtf16Position(
-            for: Int(currentState.cursorIndex))
-          let marking: InputState.Marking! = InputState.Marking(
-            composingBuffer: currentState.composingBuffer,
-            cursorIndex: currentState.cursorIndex,
-            markerIndex: UInt(nextPosition),
-            readings: currentReadings()
-          )
-          marking.tooltipForInputting = currentState.tooltip
-          stateCallback(marking)
-        } else {
-          IME.prtDebugIntel("BB7F6DB9")
-          errorCallback()
-          stateCallback(state)
-        }
+    if input.isShiftHold {
+      // Shift + Right
+      if currentState.cursorIndex < (currentState.composingBuffer as NSString).length {
+        let nextPosition = (currentState.composingBuffer as NSString).nextUtf16Position(
+          for: Int(currentState.cursorIndex))
+        let marking: InputState.Marking! = InputState.Marking(
+          composingBuffer: currentState.composingBuffer,
+          cursorIndex: currentState.cursorIndex,
+          markerIndex: UInt(nextPosition),
+          readings: currentReadings()
+        )
+        marking.tooltipForInputting = currentState.tooltip
+        stateCallback(marking)
       } else {
-        if getBuilderCursorIndex() < getBuilderLength() {
-          setBuilderCursorIndex(value: getBuilderCursorIndex() + 1)
-          stateCallback(buildInputtingState())
-        } else {
-          IME.prtDebugIntel("A96AAD58")
-          errorCallback()
-          stateCallback(state)
-        }
+        IME.prtDebugIntel("BB7F6DB9")
+        errorCallback()
+        stateCallback(state)
+      }
+    } else {
+      if getBuilderCursorIndex() < getBuilderLength() {
+        setBuilderCursorIndex(value: getBuilderCursorIndex() + 1)
+        stateCallback(buildInputtingState())
+      } else {
+        IME.prtDebugIntel("A96AAD58")
+        errorCallback()
+        stateCallback(state)
       }
     }
 
@@ -579,7 +557,7 @@ extension KeyHandler {
     stateCallback: @escaping (InputState) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    if !(state is InputState.Inputting) { return false }
+    guard let currentState = state as? InputState.Inputting else { return false }
 
     if !_composer.isEmpty {
       IME.prtDebugIntel("6ED95318")
@@ -588,34 +566,32 @@ extension KeyHandler {
       return true
     }
 
-    if let currentState = state as? InputState.Inputting {
-      if input.isShiftHold {
-        // Shift + left
-        if currentState.cursorIndex > 0 {
-          let previousPosition = (currentState.composingBuffer as NSString).previousUtf16Position(
-            for: Int(currentState.cursorIndex))
-          let marking: InputState.Marking! = InputState.Marking(
-            composingBuffer: currentState.composingBuffer,
-            cursorIndex: currentState.cursorIndex,
-            markerIndex: UInt(previousPosition),
-            readings: currentReadings()
-          )
-          marking.tooltipForInputting = currentState.tooltip
-          stateCallback(marking)
-        } else {
-          IME.prtDebugIntel("D326DEA3")
-          errorCallback()
-          stateCallback(state)
-        }
+    if input.isShiftHold {
+      // Shift + left
+      if currentState.cursorIndex > 0 {
+        let previousPosition = (currentState.composingBuffer as NSString).previousUtf16Position(
+          for: Int(currentState.cursorIndex))
+        let marking: InputState.Marking! = InputState.Marking(
+          composingBuffer: currentState.composingBuffer,
+          cursorIndex: currentState.cursorIndex,
+          markerIndex: UInt(previousPosition),
+          readings: currentReadings()
+        )
+        marking.tooltipForInputting = currentState.tooltip
+        stateCallback(marking)
       } else {
-        if getBuilderCursorIndex() > 0 {
-          setBuilderCursorIndex(value: getBuilderCursorIndex() - 1)
-          stateCallback(buildInputtingState())
-        } else {
-          IME.prtDebugIntel("7045E6F3")
-          errorCallback()
-          stateCallback(state)
-        }
+        IME.prtDebugIntel("D326DEA3")
+        errorCallback()
+        stateCallback(state)
+      }
+    } else {
+      if getBuilderCursorIndex() > 0 {
+        setBuilderCursorIndex(value: getBuilderCursorIndex() - 1)
+        stateCallback(buildInputtingState())
+      } else {
+        IME.prtDebugIntel("7045E6F3")
+        errorCallback()
+        stateCallback(state)
       }
     }
 

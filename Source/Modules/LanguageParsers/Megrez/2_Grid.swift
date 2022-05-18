@@ -128,15 +128,17 @@ extension Megrez {
 
     public func fixNodeSelectedCandidate(location: Int, value: String) -> NodeAnchor {
       var node = NodeAnchor()
-      for (index, nodeAnchor) in nodesCrossingOrEndingAt(location: location).enumerated() {
+      for nodeAnchor in nodesCrossingOrEndingAt(location: location) {
+        guard let theNode = nodeAnchor.node else {
+          continue
+        }
+        let candidates = theNode.candidates()
         // Reset the candidate-fixed state of every node at the location.
-        let candidates = nodeAnchor.node?.candidates() ?? []
-        nodesCrossingOrEndingAt(location: location)[index].node?.resetCandidate()
-
+        theNode.resetCandidate()
         for (i, candidate) in candidates.enumerated() {
           if candidate.value == value {
-            nodesCrossingOrEndingAt(location: location)[index].node?.selectCandidateAt(index: i)
-            node = nodesCrossingOrEndingAt(location: location)[index]
+            theNode.selectCandidateAt(index: i)
+            node = nodeAnchor
             break
           }
         }
@@ -145,19 +147,17 @@ extension Megrez {
     }
 
     public func overrideNodeScoreForSelectedCandidate(location: Int, value: String, overridingScore: Double) {
-      for (index, nodeAnchor) in nodesCrossingOrEndingAt(location: location).enumerated() {
-        if let theNode = nodeAnchor.node {
-          let candidates = theNode.candidates()
-          // Reset the candidate-fixed state of every node at the location.
-          nodesCrossingOrEndingAt(location: location)[index].node?.resetCandidate()
-
-          for (i, candidate) in candidates.enumerated() {
-            if candidate.value == value {
-              nodesCrossingOrEndingAt(location: location)[index].node?.selectFloatingCandidateAt(
-                index: i, score: overridingScore
-              )
-              break
-            }
+      for nodeAnchor in nodesCrossingOrEndingAt(location: location) {
+        guard let theNode = nodeAnchor.node else {
+          continue
+        }
+        let candidates = theNode.candidates()
+        // Reset the candidate-fixed state of every node at the location.
+        theNode.resetCandidate()
+        for (i, candidate) in candidates.enumerated() {
+          if candidate.value == value {
+            theNode.selectFloatingCandidateAt(index: i, score: overridingScore)
+            break
           }
         }
       }

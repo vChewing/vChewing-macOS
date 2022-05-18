@@ -20,8 +20,8 @@
 /* Class = "NSMenuItem"; title = "ETen26"; ObjectID = "9"; */
 "9.title" = "ETen26";
 
-/* Class = "NSMenuItem"; title = "Hanyu Pinyin"; ObjectID = "10"; */
-"10.title" = "Hanyu Pinyin";
+/* Class = "NSMenuItem"; title = "Hanyu Pinyin with Numeral Intonation"; ObjectID = "10"; */
+"10.title" = "Hanyu Pinyin with Numeral Intonation";
 
 /* Class = "NSTextFieldCell"; title = "BPMF Parser:"; ObjectID = "12"; */
 "12.title" = "BPMF Parser:";
@@ -232,3 +232,18 @@
 
 /* Class = "NSButtonCell"; title = "Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter"; ObjectID = "iWy-Nw-QKB"; */
 "iWy-Nw-QKB.title" = "Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter";
+
+/* Class = "NSMenuItem"; title = "Dachen 26 (libChewing)"; ObjectID = "xjP-r7-GaK"; */
+"xjP-r7-GaK.title" = "Dachen 26 (libChewing)";
+
+/* Class = "NSMenuItem"; title = "Secondary Pinyin with Numeral Intonation"; ObjectID = "Parser11"; */
+"Parser11.title" = "Secondary Pinyin with Numeral Intonation";
+
+/* Class = "NSMenuItem"; title = "Yale Pinyin with Numeral Intonation"; ObjectID = "Parser12"; */
+"Parser12.title" = "Yale Pinyin with Numeral Intonation";
+
+/* Class = "NSMenuItem"; title = "Hualuo Pinyin with Numeral Intonation"; ObjectID = "Parser13"; */
+"Parser13.title" = "Hualuo Pinyin with Numeral Intonation";
+
+/* Class = "NSMenuItem"; title = "Universal Pinyin with Numeral Intonation"; ObjectID = "Parser14"; */
+"Parser14.title" = "Universal Pinyin with Numeral Intonation";

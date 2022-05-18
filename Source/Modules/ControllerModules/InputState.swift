@@ -57,10 +57,10 @@ import Cocoa
 ///   create a new user phrase.
 /// - Choosing Candidate: The candidate window is open to let the user to choose
 ///   one among the candidates.
-class InputState: NSObject {
+class InputState {
   /// Represents that the input controller is deactivated.
   class Deactivated: InputState {
-    override var description: String {
+    var description: String {
       "<InputState.Deactivated>"
     }
   }
@@ -73,7 +73,7 @@ class InputState: NSObject {
       ""
     }
 
-    override var description: String {
+    var description: String {
       "<InputState.Empty>"
     }
   }
@@ -86,7 +86,7 @@ class InputState: NSObject {
       ""
     }
 
-    override var description: String {
+    var description: String {
       "<InputState.EmptyIgnoringPreviousState>"
     }
   }
@@ -102,7 +102,7 @@ class InputState: NSObject {
       self.poppedText = poppedText
     }
 
-    override var description: String {
+    var description: String {
       "<InputState.Committing poppedText:\(poppedText)>"
     }
   }
@@ -119,7 +119,7 @@ class InputState: NSObject {
       self.cursorIndex = cursorIndex
     }
 
-    override var description: String {
+    var description: String {
       "<InputState.NotEmpty, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
     }
   }
@@ -398,7 +398,7 @@ class InputState: NSObject {
       super.init()
     }
 
-    override var description: String {
+    var description: String {
       "<InputState.AssociatedPhrases, candidates:\(candidates), useVerticalMode:\(useVerticalMode)>"
     }
   }
@@ -421,20 +421,18 @@ class InputState: NSObject {
   }
 }
 
-class SymbolNode: NSObject {
+class SymbolNode {
   var title: String
   var children: [SymbolNode]?
 
   init(_ title: String, _ children: [SymbolNode]? = nil) {
     self.title = title
     self.children = children
-    super.init()
   }
 
   init(_ title: String, symbols: String) {
     self.title = title
     children = Array(symbols).map { SymbolNode(String($0), nil) }
-    super.init()
   }
 
   static let catCommonSymbols = String(

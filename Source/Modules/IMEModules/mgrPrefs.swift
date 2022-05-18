@@ -166,7 +166,7 @@ struct ComposingBufferSize {
 
 // MARK: -
 
-@objc enum MandarinParser: Int {
+enum MandarinParser: Int {
   case ofStandard = 0
   case ofEten = 1
   case ofHsu = 2
@@ -174,7 +174,12 @@ struct ComposingBufferSize {
   case ofIBM = 4
   case ofMiTAC = 5
   case ofFakeSeigyou = 6
+  case ofDachen26 = 7
   case ofHanyuPinyin = 10
+  case ofSecondaryPinyin = 11
+  case ofYalePinyin = 12
+  case ofHualuoPinyin = 13
+  case ofUniversalPinyin = 14
 
   var name: String {
     switch self {
@@ -192,15 +197,25 @@ struct ComposingBufferSize {
         return "MiTAC"
       case .ofFakeSeigyou:
         return "FakeSeigyou"
+      case .ofDachen26:
+        return "Dachen26"
       case .ofHanyuPinyin:
         return "HanyuPinyin"
+      case .ofSecondaryPinyin:
+        return "SecondaryPinyin"
+      case .ofYalePinyin:
+        return "YalePinyin"
+      case .ofHualuoPinyin:
+        return "HualuoPinyin"
+      case .ofUniversalPinyin:
+        return "UniversalPinyin"
     }
   }
 }
 
 // MARK: -
 
-public class mgrPrefs: NSObject {
+public enum mgrPrefs {
   static var allKeys: [String] {
     [
       UserDef.kIsDebugModeEnabled,
@@ -278,9 +293,11 @@ public class mgrPrefs: NSObject {
     UserDefaults.standard.setDefault(mgrPrefs.phraseReplacementEnabled, forKey: UserDef.kPhraseReplacementEnabled)
     UserDefaults.standard.setDefault(mgrPrefs.shouldNotFartInLieuOfBeep, forKey: UserDef.kShouldNotFartInLieuOfBeep)
     UserDefaults.standard.setDefault(
-      mgrPrefs.showHanyuPinyinInCompositionBuffer, forKey: UserDef.kShowHanyuPinyinInCompositionBuffer)
+      mgrPrefs.showHanyuPinyinInCompositionBuffer, forKey: UserDef.kShowHanyuPinyinInCompositionBuffer
+    )
     UserDefaults.standard.setDefault(
-      mgrPrefs.inlineDumpPinyinInLieuOfZhuyin, forKey: UserDef.kInlineDumpPinyinInLieuOfZhuyin)
+      mgrPrefs.inlineDumpPinyinInLieuOfZhuyin, forKey: UserDef.kInlineDumpPinyinInLieuOfZhuyin
+    )
 
     UserDefaults.standard.synchronize()
   }
@@ -310,7 +327,7 @@ public class mgrPrefs: NSObject {
   static var appleLanguages: [String]
 
   @UserDefault(key: UserDef.kMandarinParser, defaultValue: 0)
-  @objc static var mandarinParser: Int
+  static var mandarinParser: Int
 
   static var mandarinParserName: String {
     (MandarinParser(rawValue: mandarinParser) ?? MandarinParser.ofStandard).name

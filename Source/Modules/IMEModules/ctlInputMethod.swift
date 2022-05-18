@@ -148,7 +148,7 @@ class ctlInputMethod: IMKInputController {
     return Int(events.rawValue)
   }
 
-  override func handle(_ event: NSEvent!, client: Any!) -> Bool {
+  @objc(handleEvent:client:) override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
     // 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
     // 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
     // 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
@@ -161,13 +161,18 @@ class ctlInputMethod: IMKInputController {
     ctlInputMethod.areWeDeleting = event.modifierFlags.contains([.shift, .command])
 
     var textFrame = NSRect.zero
-    let attributes: [AnyHashable: Any]? = (client as? IMKTextInput)?.attributes(
+    guard let client = sender as? IMKTextInput else {
+      return false
+    }
+
+    let attributes: [AnyHashable: Any]? = client.attributes(
       forCharacterIndex: 0, lineHeightRectangle: &textFrame
     )
+
     let useVerticalMode =
       (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
 
-    if (client as? IMKTextInput)?.bundleIdentifier()
+    if client.bundleIdentifier()
       == "org.atelierInmu.vChewing.vChewingPhraseEditor"
     {
       IME.areWeUsingOurOwnPhraseEditor = true
@@ -176,6 +181,12 @@ class ctlInputMethod: IMKInputController {
     }
 
     let input = InputHandler(event: event, isVerticalMode: useVerticalMode)
+
+    // 無法列印的訊號輸入，一概不作處理。
+    // 這個過程不能放在 KeyHandler 內，否則不會起作用。
+    if !input.charCode.isPrintable() {
+      return false
+    }
 
     let result = keyHandler.handle(input: input, state: state) { newState in
       self.handle(state: newState, client: client)

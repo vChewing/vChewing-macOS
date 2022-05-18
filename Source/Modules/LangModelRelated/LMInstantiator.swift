@@ -270,6 +270,7 @@ extension vChewing {
       filter filteredPairs: Set<Megrez.KeyValuePair>
     ) -> [Megrez.Unigram] {
       var results: [Megrez.Unigram] = []
+      var insertedPairs: Set<Megrez.KeyValuePair> = []
 
       for unigram in unigrams {
         var pair: Megrez.KeyValuePair = unigram.keyValue
@@ -284,12 +285,13 @@ extension vChewing {
             pair.value = replacement
           }
         }
-        results.append(Megrez.Unigram(keyValue: pair, score: unigram.score))
-      }
-      // Swift 不見得非得用 Swift-Collections 才可以用 OrderedSet，還有 NSOrderedSet 可用來去重複。
-      let resultsDeduplicated = Array(NSOrderedSet(array: results).array as! [Megrez.Unigram])
 
-      return resultsDeduplicated
+        if !insertedPairs.contains(pair) {
+          results.append(Megrez.Unigram(keyValue: pair, score: unigram.score))
+          insertedPairs.insert(pair)
+        }
+      }
+      return results
     }
   }
 }

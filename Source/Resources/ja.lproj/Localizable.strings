@@ -85,6 +85,7 @@
 "Apple Chewing - Dachen" = "Apple 大千注音キーボード";
 "Apple Chewing - Eten Traditional" = "Apple 倚天傳統キーボード";
 "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional." = "Apple 動態注音キーボード (大千と倚天伝統) を使うには、共通語分析器の配列を大千と設定すべきである。";
+"at anyplace else (like Windows Yahoo KeyKey)" = "単語の中・後で // Windows Yahoo KeyKey のやり方";
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "入力した繁体字を日文 JIS 新字体と自動変換";
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "入力した繁体字を康熙字体と自動変換";
 "Automatically reload user data files if changes detected" = "ユーザー辞書データの変更を自動検出し、自動的に再読込";
@@ -104,6 +105,7 @@
 "Choose your preferred layout of the candidate window." = "入力候補陳列の仕様をご指定ください。";
 "Cursor Selection:" = "カーソル候補呼出:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千配列 (Microsoft 標準・王安・零壹など)";
+"Dachen 26 (libChewing)" = "酷音大千 26 キー配列";
 "Debug Mode" = "欠陥辿着モード";
 "Dictionary" = "辞書設定";
 "Emulating select-candidate-per-character mode" = "漢字１つづつ全候補選択入力モード";
@@ -122,7 +124,9 @@
 "Hanyu Pinyin with Numeral Intonation" = "漢語弁音 (ローマ字+数字音調)";
 "Horizontal" = "横型陳列";
 "Hsu" = "許氏国音自然配列";
+"Hualuo Pinyin with Numeral Intonation" = "中華ローマ弁音 (ローマ字+数字音調)";
 "IBM" = "IBM 配列";
+"in front of the phrase (like macOS built-in Zhuyin IME)" = "単語の前で // macOS 内蔵注音入力のやり方";
 "Japanese" = "和語";
 "Keyboard" = "配列設定";
 "Misc Settings:" = "他の設定:";
@@ -132,6 +136,7 @@
 "Output Settings:" = "出力設定:";
 "Phonetic Parser:" = "注音配列:";
 "Push the cursor in front of the phrase after selection" = "候補選択の直後、すぐカーソルを単語の向こうに推し進める";
+"Secondary Pinyin with Numeral Intonation" = "国音二式 (ローマ字+数字音調)";
 "Selection Keys:" = "言選り用キー:";
 "Show Hanyu-Pinyin in the inline composition buffer" = "弁音合併入力（入力緩衝列で代わりに漢語弁音の音読み）";
 "Show page buttons in candidate window" = "入力候補陳列の側にページボタンを表示";
@@ -140,10 +145,10 @@
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+Space で次のページ、Space で次の候補文字を";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "Space で次のページ、Shift+Space で次の候補文字を";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "マナーモード // 外すと入力間違った時に変な声が出る";
-"in front of the phrase (like macOS built-in Zhuyin IME)" = "単語の前で // macOS 内蔵注音入力のやり方";
-"at anyplace else (like Windows Yahoo KeyKey)" = "単語の中・後で // Windows Yahoo KeyKey のやり方";
 "Traditional Chinese" = "繁体中国語";
 "Typing Style:" = "入力習慣:";
 "UI Language:" = "表示用言語:";
+"Universal Pinyin with Numeral Intonation" = "汎用弁音 (ローマ字+数字音調)";
 "Use ESC key to clear the entire input buffer" = "ESC キーで入力緩衝列を消す";
 "Vertical" = "縦型陳列";
+"Yale Pinyin with Numeral Intonation" = "イェール弁音 (ローマ字+数字音調)";

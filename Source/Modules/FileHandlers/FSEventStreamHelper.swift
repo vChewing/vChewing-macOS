@@ -30,7 +30,7 @@ public protocol FSEventStreamHelperDelegate: AnyObject {
   func helper(_ helper: FSEventStreamHelper, didReceive events: [FSEventStreamHelper.Event])
 }
 
-public class FSEventStreamHelper: NSObject {
+public class FSEventStreamHelper {
   public struct Event {
     var path: String
     var flags: FSEventStreamEventFlags
@@ -41,7 +41,7 @@ public class FSEventStreamHelper: NSObject {
   public let dispatchQueue: DispatchQueue
   public weak var delegate: FSEventStreamHelperDelegate?
 
-  @objc public init(path: String, queue: DispatchQueue) {
+  public init(path: String, queue: DispatchQueue) {
     self.path = path
     dispatchQueue = queue
   }

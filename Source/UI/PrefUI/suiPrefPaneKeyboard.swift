@@ -45,20 +45,60 @@ struct suiPrefPaneKeyboard: View {
   var body: some View {
     Preferences.Container(contentWidth: contentWidth) {
       Preferences.Section(label: { Text(LocalizedStringKey("Phonetic Parser:")) }) {
-        Picker("", selection: $selMandarinParser) {
-          Text(LocalizedStringKey("Dachen (Microsoft Standard / Wang / 01, etc.)")).tag(0)
-          Text(LocalizedStringKey("Eten Traditional")).tag(1)
-          Text(LocalizedStringKey("Eten 26")).tag(3)
-          Text(LocalizedStringKey("IBM")).tag(4)
-          Text(LocalizedStringKey("Hsu")).tag(2)
-          Text(LocalizedStringKey("MiTAC")).tag(5)
-          Text(LocalizedStringKey("Fake Seigyou")).tag(6)
-          // Text(LocalizedStringKey("Hanyu Pinyin with Numeral Intonation")).tag(10)
-        }.onChange(of: selMandarinParser) { value in
-          mgrPrefs.mandarinParser = value
+        HStack {
+          Picker("", selection: $selMandarinParser) {
+            Group {
+              Text(LocalizedStringKey("Dachen (Microsoft Standard / Wang / 01, etc.)")).tag(0)
+              Text(LocalizedStringKey("Dachen 26 (libChewing)")).tag(7)
+              Text(LocalizedStringKey("Eten Traditional")).tag(1)
+              Text(LocalizedStringKey("Eten 26")).tag(3)
+              Text(LocalizedStringKey("IBM")).tag(4)
+              Text(LocalizedStringKey("Hsu")).tag(2)
+              Text(LocalizedStringKey("MiTAC")).tag(5)
+              Text(LocalizedStringKey("Fake Seigyou")).tag(6)
+            }
+            Divider()
+            Group {
+              Text(LocalizedStringKey("Hanyu Pinyin with Numeral Intonation")).tag(10)
+              Text(LocalizedStringKey("Secondary Pinyin with Numeral Intonation")).tag(11)
+              Text(LocalizedStringKey("Yale Pinyin with Numeral Intonation")).tag(12)
+              Text(LocalizedStringKey("Hualuo Pinyin with Numeral Intonation")).tag(13)
+              Text(LocalizedStringKey("Universal Pinyin with Numeral Intonation")).tag(14)
+            }
+          }.onChange(of: selMandarinParser) { value in
+            mgrPrefs.mandarinParser = value
+            switch value {
+              case 0:
+                if !AppleKeyboardConverter.arrDynamicBasicKeyLayout.contains(mgrPrefs.basicKeyboardLayout) {
+                  mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
+                  selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
+                }
+              default:
+                if AppleKeyboardConverter.arrDynamicBasicKeyLayout.contains(mgrPrefs.basicKeyboardLayout) {
+                  mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ABC"
+                  selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
+                }
+            }
+          }
+          .labelsHidden()
+          Button {
+            mgrPrefs.mandarinParser = 0
+            selMandarinParser = mgrPrefs.mandarinParser
+            mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
+            selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
+          } label: {
+            Text("↻ㄅ")
+          }
+          Button {
+            mgrPrefs.mandarinParser = 10
+            selMandarinParser = mgrPrefs.mandarinParser
+            mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ABC"
+            selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
+          } label: {
+            Text("↻Ａ")
+          }
         }
-        .labelsHidden()
-        .frame(width: 320.0)
+        .frame(width: 380.0)
         Text(LocalizedStringKey("Choose the phonetic layout for Mandarin parser."))
           .preferenceDescription()
       }
@@ -71,6 +111,10 @@ struct suiPrefPaneKeyboard: View {
             }.id(UUID())
           }.onChange(of: selBasicKeyboardLayout) { value in
             mgrPrefs.basicKeyboardLayout = value
+            if AppleKeyboardConverter.arrDynamicBasicKeyLayout.contains(value) {
+              mgrPrefs.mandarinParser = 0
+              selMandarinParser = mgrPrefs.mandarinParser
+            }
           }
           .labelsHidden()
           .frame(width: 240.0)

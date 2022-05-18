@@ -28,7 +28,7 @@ import Cocoa
 // The namespace of this input method.
 public enum vChewing {}
 
-public class IME: NSObject {
+public enum IME {
   static let arrSupportedLocales = ["en", "zh-Hant", "zh-Hans", "ja"]
   static let dlgOpenPath = NSOpenPanel()
 
@@ -364,12 +364,25 @@ extension String: LocalizedError {
   }
 }
 
-// MARK: - Ensuring trailing slash of a string:
+// MARK: - Ensuring trailing slash of a string
 
 extension String {
   mutating func ensureTrailingSlash() {
     if !hasSuffix("/") {
       self += "/"
     }
+  }
+}
+
+// MARK: - CharCode printability check
+
+// Ref: https://forums.swift.org/t/57085/5
+extension UniChar {
+  public func isPrintable() -> Bool {
+    guard Unicode.Scalar(UInt32(self)) != nil else {
+      struct NotAWholeScalar: Error {}
+      return false
+    }
+    return true
   }
 }
