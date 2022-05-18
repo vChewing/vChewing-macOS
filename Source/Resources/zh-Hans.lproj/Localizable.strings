@@ -138,7 +138,6 @@
 "Phonetic Parser:" = "注音排列:";
 "Push the cursor in front of the phrase after selection" = "在选字后将游标置于该字词的前方";
 "Secondary Pinyin with Numeral Intonation" = "国音二式+数字标调";
-"Secondary Pinyin with Numeral Intonation" = "國音二式+数字标调";
 "Selection Keys:" = "选字键:";
 "Show Hanyu-Pinyin in the inline composition buffer" = "拼音并击模式（组字区内看到的是汉语拼音）";
 "Show page buttons in candidate window" = "在选字窗内显示翻页按钮";
@@ -155,4 +154,3 @@
 "Use ESC key to clear the entire input buffer" = "敲 ESC 键以清空整个组字缓冲区";
 "Vertical" = "纵向布局";
 "Yale Pinyin with Numeral Intonation" = "耶鲁拼音+数字标调";
-"Yale Pinyin with Numeral Intonation" = "耶魯拼音+数字标调";
