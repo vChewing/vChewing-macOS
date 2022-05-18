@@ -176,6 +176,10 @@ struct ComposingBufferSize {
   case ofFakeSeigyou = 6
   case ofDachen26 = 7
   case ofHanyuPinyin = 10
+  case ofSecondaryPinyin = 11
+  case ofYalePinyin = 12
+  case ofHualuoPinyin = 13
+  case ofUniversalPinyin = 14
 
   var name: String {
     switch self {
@@ -197,6 +201,14 @@ struct ComposingBufferSize {
         return "Dachen26"
       case .ofHanyuPinyin:
         return "HanyuPinyin"
+      case .ofSecondaryPinyin:
+        return "SecondaryPinyin"
+      case .ofYalePinyin:
+        return "YalePinyin"
+      case .ofHualuoPinyin:
+        return "HualuoPinyin"
+      case .ofUniversalPinyin:
+        return "UniversalPinyin"
     }
   }
 }
