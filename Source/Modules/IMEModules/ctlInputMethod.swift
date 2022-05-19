@@ -77,9 +77,11 @@ class ctlInputMethod: IMKInputController {
 
   // MARK: - KeyHandler Reset Command
 
-  func resetKeyHandler() {
-    if let currentClient = currentClient {
-      keyHandler.clear()
+  func resetKeyHandler(client sender: Any? = nil) {
+    keyHandler.clear()
+    if let client = sender as? IMKTextInput {
+      handle(state: InputState.Empty(), client: client)
+    } else if let currentClient = currentClient {
       handle(state: InputState.Empty(), client: currentClient)
     }
   }
