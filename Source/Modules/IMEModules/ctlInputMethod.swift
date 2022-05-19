@@ -197,6 +197,13 @@ class ctlInputMethod: IMKInputController {
     }
     return result
   }
+
+  // 有時會出現某些 App 攔截輸入法的 Ctrl+Enter / Shift+Enter 熱鍵的情況。
+  // 也就是說 handle(event:) 完全抓不到這個 Event。
+  // 這時需要在 commitComposition 這一關做一些收尾處理。
+  override func commitComposition(_ sender: Any!) {
+    resetKeyHandler(client: sender)
+  }
 }
 
 // MARK: - State Handling
