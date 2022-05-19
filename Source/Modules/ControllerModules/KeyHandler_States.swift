@@ -45,7 +45,7 @@ extension KeyHandler {
         continue
       }
 
-      let valueString = node.currentKeyValue().value
+      let valueString = node.currentKeyValue.value
       composingBuffer += valueString
       let codepointCount = valueString.count
 
@@ -303,7 +303,7 @@ extension KeyHandler {
 
     for theAnchor in _walkedNodes {
       if let node = theAnchor.node {
-        var key = node.currentKeyValue().key
+        var key = node.currentKeyValue.key
         if mgrPrefs.inlineDumpPinyinInLieuOfZhuyin {
           key = restoreToneOneInZhuyinKey(target: key)  // 恢復陰平標記
           key = Tekkon.cnvPhonaToHanyuPinyin(target: key)  // 注音轉拼音
@@ -313,7 +313,7 @@ extension KeyHandler {
           key = cnvZhuyinKeyToTextbookReading(target: key, newSeparator: " ")
         }
 
-        let value = node.currentKeyValue().value
+        let value = node.currentKeyValue.value
         if key.contains("_") {  // 不要給標點符號等特殊元素加注音
           composed += value
         } else {

@@ -24,23 +24,28 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 extension Megrez {
+  /// 幅位。
   @frozen public struct Span {
-    private var mutLengthNodeMap: [Int: Megrez.Node]
-    private var mutMaximumLength: Int
+    /// 辭典：以節點長度為索引，以節點為資料值。
+    private var mutLengthNodeMap: [Int: Megrez.Node] = [:]
+    /// 最大節點長度。
+    private var mutMaximumLength: Int = 0
+
+    /// 公開：最長幅距（唯讀）。
     var maximumLength: Int {
       mutMaximumLength
     }
 
-    public init() {
-      mutLengthNodeMap = [:]
-      mutMaximumLength = 0
-    }
-
+    /// 自我清空，各項參數歸零。
     mutating func clear() {
       mutLengthNodeMap.removeAll()
       mutMaximumLength = 0
     }
 
+    /// 往自身插入一個節點、及給定的節點長度。
+    /// - Parameters:
+    ///   - node: 節點。
+    ///   - length: 給定的節點長度。
     mutating func insert(node: Node, length: Int) {
       mutLengthNodeMap[length] = node
       if length > mutMaximumLength {
@@ -48,6 +53,9 @@ extension Megrez {
       }
     }
 
+    /// 移除任何比給定的長度更長的節點。
+    /// - Parameters:
+    ///   - length: 給定的節點長度。
     mutating func removeNodeOfLengthGreaterThan(_ length: Int) {
       if length > mutMaximumLength { return }
       var max = 0
@@ -67,6 +75,9 @@ extension Megrez {
       mutMaximumLength = max
     }
 
+    /// 給定節點長度，獲取節點。
+    /// - Parameters:
+    ///   - length: 給定的節點長度。
     public func node(length: Int) -> Node? {
       mutLengthNodeMap[length]
     }

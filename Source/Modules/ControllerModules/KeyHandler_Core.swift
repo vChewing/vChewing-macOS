@@ -72,7 +72,7 @@ class KeyHandler {
   }
 
   public init() {
-    _builder = Megrez.BlockReadingBuilder(lm: _languageModel)
+    _builder = Megrez.BlockReadingBuilder(lm: _languageModel, separator: "-")
     ensureParser()
     setInputMode(ctlInputMethod.currentInputMode)
   }
@@ -118,9 +118,7 @@ class KeyHandler {
     // of the best possible Mandarin characters given the input syllables,
     // using the Viterbi algorithm implemented in the Megrez library.
     // The walk() traces the grid to the end, hence no need to use .reversed() here.
-    _walkedNodes = Megrez.Walker(
-      grid: _builder.grid()
-    ).walk(at: _builder.grid().width(), nodesLimit: 3, balanced: true)
+    _walkedNodes = _builder.walk(at: _builder.grid.width, nodesLimit: 3, balanced: true)
   }
 
   func popOverflowComposingTextAndWalk() -> String {
@@ -133,11 +131,11 @@ class KeyHandler {
     // (i.e. popped out.)
 
     var poppedText = ""
-    if _builder.grid().width() > mgrPrefs.composingBufferSize {
+    if _builder.grid.width > mgrPrefs.composingBufferSize {
       if _walkedNodes.count > 0 {
         let anchor: Megrez.NodeAnchor = _walkedNodes[0]
         if let theNode = anchor.node {
-          poppedText = theNode.currentKeyValue().value
+          poppedText = theNode.currentKeyValue.value
         }
         _builder.removeHeadReadings(count: anchor.spanningLength)
       }
@@ -156,7 +154,7 @@ class KeyHandler {
 
   func fixNode(value: String) {
     let cursorIndex: Int = getActualCandidateCursorIndex()
-    let selectedNode: Megrez.NodeAnchor = _builder.grid().fixNodeSelectedCandidate(
+    let selectedNode: Megrez.NodeAnchor = _builder.grid.fixNodeSelectedCandidate(
       location: cursorIndex, value: value
     )
     // 不要針對逐字選字模式啟用臨時半衰記憶模型。
@@ -216,7 +214,7 @@ class KeyHandler {
       // then use the Swift trick to retrieve the candidates for each node at/crossing the cursor
       for currentNodeAnchor in arrNodes {
         if let currentNode = currentNodeAnchor.node {
-          for currentCandidate in currentNode.candidates() {
+          for currentCandidate in currentNode.candidates {
             arrCandidates.append(currentCandidate.value)
           }
         }
@@ -237,7 +235,7 @@ class KeyHandler {
     if !overrideValue.isEmpty {
       IME.prtDebugIntel(
         "UOM: Suggestion retrieved, overriding the node score of the selected candidate.")
-      _builder.grid().overrideNodeScoreForSelectedCandidate(
+      _builder.grid.overrideNodeScoreForSelectedCandidate(
         location: getActualCandidateCursorIndex(),
         value: overrideValue,
         overridingScore: findHighestScore(nodes: getRawNodes(), epsilon: kEpsilon)
@@ -251,7 +249,7 @@ class KeyHandler {
     var highestScore: Double = 0
     for currentAnchor in nodes {
       if let theNode = currentAnchor.node {
-        let score = theNode.highestUnigramScore()
+        let score = theNode.highestUnigramScore
         if score > highestScore {
           highestScore = score
         }
@@ -262,15 +260,15 @@ class KeyHandler {
 
   // MARK: - Extracted methods and functions (Megrez).
 
-  func isBuilderEmpty() -> Bool { _builder.grid().width() == 0 }
+  func isBuilderEmpty() -> Bool { _builder.grid.width == 0 }
 
   func getRawNodes() -> [Megrez.NodeAnchor] {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的，但目前 Megrez 暫時缺乏對該特性的支援。
     /// 所以暫時只能將威注音的游標後置風格描述成「跟 Windows 版雅虎奇摩注音一致」。
     mgrPrefs.setRearCursorMode
-      ? _builder.grid().nodesCrossingOrEndingAt(location: getActualCandidateCursorIndex())
-      : _builder.grid().nodesEndingAt(location: getActualCandidateCursorIndex())
+      ? _builder.grid.nodesCrossingOrEndingAt(location: getActualCandidateCursorIndex())
+      : _builder.grid.nodesEndingAt(location: getActualCandidateCursorIndex())
   }
 
   func setInputModesToLM(isCHS: Bool) {
@@ -285,12 +283,11 @@ class KeyHandler {
   }
 
   func createNewBuilder() {
-    _builder = Megrez.BlockReadingBuilder(lm: _languageModel)
     // Each Mandarin syllable is separated by a hyphen.
-    _builder.setJoinSeparator(separator: "-")
+    _builder = Megrez.BlockReadingBuilder(lm: _languageModel, separator: "-")
   }
 
-  func currentReadings() -> [String] { _builder.readings() }
+  func currentReadings() -> [String] { _builder.readings }
 
   func ifLangModelHasUnigrams(forKey reading: String) -> Bool {
     _languageModel.hasUnigramsFor(key: reading)
@@ -301,15 +298,15 @@ class KeyHandler {
   }
 
   func setBuilderCursorIndex(value: Int) {
-    _builder.setCursorIndex(newIndex: value)
+    _builder.cursorIndex = value
   }
 
   func getBuilderCursorIndex() -> Int {
-    _builder.cursorIndex()
+    _builder.cursorIndex
   }
 
   func getBuilderLength() -> Int {
-    _builder.length()
+    _builder.length
   }
 
   func deleteBuilderReadingInFrontOfCursor() {
@@ -321,7 +318,7 @@ class KeyHandler {
   }
 
   func getKeyLengthAtIndexZero() -> Int {
-    _walkedNodes[0].node?.currentKeyValue().value.count ?? 0
+    _walkedNodes[0].node?.currentKeyValue.value.count ?? 0
   }
 
   // MARK: - Extracted methods and functions (Tekkon).

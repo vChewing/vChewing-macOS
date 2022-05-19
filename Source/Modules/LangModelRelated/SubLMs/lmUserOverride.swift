@@ -186,7 +186,7 @@ extension vChewing {
       var strPrevious = "()"
       var strAnterior = "()"
 
-      guard let kvCurrent = arrNodesReversed[0].node?.currentKeyValue(),
+      guard let kvCurrent = arrNodesReversed[0].node?.currentKeyValue,
         !arrEndingPunctuation.contains(kvCurrent.value)
       else {
         return ""
@@ -196,14 +196,14 @@ extension vChewing {
       strCurrent = kvCurrent.key
 
       if arrNodesReversed.count >= 2,
-        let kvPrevious = arrNodesReversed[1].node?.currentKeyValue(),
+        let kvPrevious = arrNodesReversed[1].node?.currentKeyValue,
         !arrEndingPunctuation.contains(kvPrevious.value)
       {
         strPrevious = "(\(kvPrevious.key),\(kvPrevious.value))"
       }
 
       if arrNodesReversed.count >= 3,
-        let kvAnterior = arrNodesReversed[2].node?.currentKeyValue(),
+        let kvAnterior = arrNodesReversed[2].node?.currentKeyValue,
         !arrEndingPunctuation.contains(kvAnterior.value)
       {
         strAnterior = "(\(kvAnterior.key),\(kvAnterior.value))"
