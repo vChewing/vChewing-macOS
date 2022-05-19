@@ -204,6 +204,11 @@ class ctlInputMethod: IMKInputController {
   override func commitComposition(_ sender: Any!) {
     resetKeyHandler(client: sender)
   }
+
+  // 這個函數必須得在對應的狀態下給出對應的內容。
+  override func composedString(_ sender: Any!) -> Any! {
+    (state as? InputState.NotEmpty)?.composingBuffer ?? ""
+  }
 }
 
 // MARK: - State Handling
