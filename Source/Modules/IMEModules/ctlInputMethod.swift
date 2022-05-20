@@ -234,6 +234,8 @@ extension ctlInputMethod {
       handle(state: newState, previous: previous, client: client)
     } else if let newState = newState as? InputState.AssociatedPhrases {
       handle(state: newState, previous: previous, client: client)
+    } else if let newState = newState as? InputState.SymbolTable {
+      handle(state: newState, previous: previous, client: client)
     }
   }
 
@@ -396,6 +398,22 @@ extension ctlInputMethod {
   }
 
   private func handle(state: InputState.ChoosingCandidate, previous _: InputState, client: Any?) {
+    hideTooltip()
+    guard let client = client as? IMKTextInput else {
+      ctlCandidateCurrent?.visible = false
+      return
+    }
+
+    // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
+    // i.e. the client app needs to take care of where to put this composing buffer
+    client.setMarkedText(
+      state.attributedString, selectionRange: NSRange(location: Int(state.cursorIndex), length: 0),
+      replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
+    )
+    show(candidateWindowWith: state, client: client)
+  }
+
+  private func handle(state: InputState.SymbolTable, previous _: InputState, client: Any?) {
     hideTooltip()
     guard let client = client as? IMKTextInput else {
       ctlCandidateCurrent?.visible = false

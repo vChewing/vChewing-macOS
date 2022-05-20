@@ -415,6 +415,22 @@ class InputState {
       )
     }
 
+    // InputState.SymbolTable 這個狀態比較特殊，不能把真空組字區交出去。
+    // 不然的話，在絕大多數終端機類應用當中、以及在 MS Word 等軟體當中
+    // 會出現符號選字窗無法響應方向鍵的問題。
+    // 如有誰要修奇摩注音的一點通選單的話，修復原理也是一樣的。
+    // Crediting Qwertyyb: https://github.com/qwertyyb/Fire/issues/55#issuecomment-1133497700
+    override var attributedString: NSAttributedString {
+      let attributedSting = NSAttributedString(
+        string: " ",
+        attributes: [
+          .underlineStyle: NSUnderlineStyle.single.rawValue,
+          .markedClauseSegment: 0,
+        ]
+      )
+      return attributedSting
+    }
+
     override var description: String {
       "<InputState.SymbolTable, candidates:\(candidates), useVerticalMode:\(useVerticalMode),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
     }
