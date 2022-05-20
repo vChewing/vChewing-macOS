@@ -351,7 +351,7 @@ extension KeyHandler {
     // MARK: Punctuation list
 
     if input.isSymbolMenuPhysicalKey && !input.isShiftHold {
-      if !input.isOptionHold {
+      if input.isOptionHold {
         if ifLangModelHasUnigrams(forKey: "_punctuation_list") {
           if _composer.isEmpty {
             insertReadingToBuilderAtCursor(reading: "_punctuation_list")
