@@ -31,14 +31,14 @@ import Cocoa
 extension KeyHandler {
   // MARK: - 構築狀態（State Building）
 
-  func buildInputtingState() -> InputState.Inputting {
+  var buildInputtingState: InputState.Inputting {
     // "Updating the composing buffer" means to request the client
     // to "refresh" the text input buffer with our "composing text"
     var composingBuffer = ""
     var composedStringCursorIndex = 0
 
     var readingCursorIndex = 0
-    let builderCursorIndex = getBuilderCursorIndex()
+    let builderCursorIndex = builderCursorIndex
 
     for theAnchor in _walkedNodes {
       guard let node = theAnchor.node else {
@@ -106,7 +106,7 @@ extension KeyHandler {
     InputState.ChoosingCandidate(
       composingBuffer: currentState.composingBuffer,
       cursorIndex: currentState.cursorIndex,
-      candidates: getCandidatesArray(),
+      candidates: candidatesArray,
       useVerticalMode: useVerticalMode
     )
   }
@@ -115,7 +115,7 @@ extension KeyHandler {
 
   // 這次重寫時，針對「buildAssociatePhraseStateWithKey」這個（用以生成帶有
   // 聯想詞候選清單的結果的狀態回呼的）函數進行了小幅度的重構處理，使其始終
-  // 可以從 ObjC 部分的「buildAssociatePhraseArray」函數獲取到一個內容類型
+  // 可以從 Core 部分的「buildAssociatePhraseArray」函數獲取到一個內容類型
   // 為「String」的標準 Swift 陣列。這樣一來，該聯想詞狀態回呼函數將始終能
   // 夠傳回正確的結果形態、永遠也無法傳回 nil。於是，所有在用到該函數時以
   // 回傳結果類型判斷作為合法性判斷依據的函數，全都將依據改為檢查傳回的陣列
@@ -139,7 +139,7 @@ extension KeyHandler {
     errorCallback: @escaping () -> Void
   ) -> Bool {
     if input.isESC {
-      stateCallback(buildInputtingState())
+      stateCallback(buildInputtingState)
       return true
     }
 
@@ -152,7 +152,7 @@ extension KeyHandler {
           return true
         }
       }
-      stateCallback(buildInputtingState())
+      stateCallback(buildInputtingState)
       return true
     }
 
@@ -168,7 +168,7 @@ extension KeyHandler {
           readings: state.readings
         )
         marking.tooltipForInputting = state.tooltipForInputting
-        stateCallback(marking.markedRange.length == 0 ? marking.convertToInputting() : marking)
+        stateCallback(marking.markedRange.length == 0 ? marking.convertedToInputting : marking)
       } else {
         IME.prtDebugIntel("1149908D")
         errorCallback()
@@ -191,7 +191,7 @@ extension KeyHandler {
           readings: state.readings
         )
         marking.tooltipForInputting = state.tooltipForInputting
-        stateCallback(marking.markedRange.length == 0 ? marking.convertToInputting() : marking)
+        stateCallback(marking.markedRange.length == 0 ? marking.convertedToInputting : marking)
       } else {
         IME.prtDebugIntel("9B51408D")
         errorCallback()
@@ -217,8 +217,8 @@ extension KeyHandler {
 
     if _composer.isEmpty {
       insertReadingToBuilderAtCursor(reading: customPunctuation)
-      let poppedText = popOverflowComposingTextAndWalk()
-      let inputting = buildInputtingState()
+      let poppedText = popOverflowComposingTextAndWalk
+      let inputting = buildInputtingState
       inputting.poppedText = poppedText
       stateCallback(inputting)
 
@@ -273,7 +273,7 @@ extension KeyHandler {
   ) -> Bool {
     guard state is InputState.Inputting else { return false }
 
-    var composingBuffer = currentReadings().joined(separator: "-")
+    var composingBuffer = currentReadings.joined(separator: "-")
     if mgrPrefs.inlineDumpPinyinInLieuOfZhuyin {
       composingBuffer = restoreToneOneInZhuyinKey(target: composingBuffer)  // 恢復陰平標記
       composingBuffer = Tekkon.cnvPhonaToHanyuPinyin(target: composingBuffer)  // 注音轉拼音
@@ -341,7 +341,7 @@ extension KeyHandler {
     if _composer.hasToneMarker(withNothingElse: true) {
       _composer.clear()
     } else if _composer.isEmpty {
-      if getBuilderCursorIndex() >= 0 {
+      if builderCursorIndex >= 0 {
         deleteBuilderReadingInFrontOfCursor()
         walk()
       } else {
@@ -354,10 +354,10 @@ extension KeyHandler {
       _composer.doBackSpace()
     }
 
-    if _composer.isEmpty, getBuilderLength() == 0 {
+    if _composer.isEmpty, builderLength == 0 {
       stateCallback(InputState.EmptyIgnoringPreviousState())
     } else {
-      stateCallback(buildInputtingState())
+      stateCallback(buildInputtingState)
     }
     return true
   }
@@ -372,10 +372,10 @@ extension KeyHandler {
     guard state is InputState.Inputting else { return false }
 
     if _composer.isEmpty {
-      if getBuilderCursorIndex() != getBuilderLength() {
+      if builderCursorIndex != builderLength {
         deleteBuilderReadingToTheFrontOfCursor()
         walk()
-        let inputting = buildInputtingState()
+        let inputting = buildInputtingState
         // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
         if inputting.composingBuffer.isEmpty {
           stateCallback(InputState.EmptyIgnoringPreviousState())
@@ -428,9 +428,9 @@ extension KeyHandler {
       return true
     }
 
-    if getBuilderCursorIndex() != 0 {
-      setBuilderCursorIndex(value: 0)
-      stateCallback(buildInputtingState())
+    if builderCursorIndex != 0 {
+      builderCursorIndex = 0
+      stateCallback(buildInputtingState)
     } else {
       IME.prtDebugIntel("66D97F90")
       errorCallback()
@@ -456,9 +456,9 @@ extension KeyHandler {
       return true
     }
 
-    if getBuilderCursorIndex() != getBuilderLength() {
-      setBuilderCursorIndex(value: getBuilderLength())
-      stateCallback(buildInputtingState())
+    if builderCursorIndex != builderLength {
+      builderCursorIndex = builderLength
+      stateCallback(buildInputtingState)
     } else {
       IME.prtDebugIntel("9B69908E")
       errorCallback()
@@ -490,10 +490,10 @@ extension KeyHandler {
       // If reading is not empty, we cancel the reading.
       if !_composer.isEmpty {
         _composer.clear()
-        if getBuilderLength() == 0 {
+        if builderLength == 0 {
           stateCallback(InputState.EmptyIgnoringPreviousState())
         } else {
-          stateCallback(buildInputtingState())
+          stateCallback(buildInputtingState)
         }
       }
     }
@@ -526,7 +526,7 @@ extension KeyHandler {
           composingBuffer: currentState.composingBuffer,
           cursorIndex: currentState.cursorIndex,
           markerIndex: UInt(nextPosition),
-          readings: currentReadings()
+          readings: currentReadings
         )
         marking.tooltipForInputting = currentState.tooltip
         stateCallback(marking)
@@ -536,9 +536,9 @@ extension KeyHandler {
         stateCallback(state)
       }
     } else {
-      if getBuilderCursorIndex() < getBuilderLength() {
-        setBuilderCursorIndex(value: getBuilderCursorIndex() + 1)
-        stateCallback(buildInputtingState())
+      if builderCursorIndex < builderLength {
+        builderCursorIndex += 1
+        stateCallback(buildInputtingState)
       } else {
         IME.prtDebugIntel("A96AAD58")
         errorCallback()
@@ -575,7 +575,7 @@ extension KeyHandler {
           composingBuffer: currentState.composingBuffer,
           cursorIndex: currentState.cursorIndex,
           markerIndex: UInt(previousPosition),
-          readings: currentReadings()
+          readings: currentReadings
         )
         marking.tooltipForInputting = currentState.tooltip
         stateCallback(marking)
@@ -585,9 +585,9 @@ extension KeyHandler {
         stateCallback(state)
       }
     } else {
-      if getBuilderCursorIndex() > 0 {
-        setBuilderCursorIndex(value: getBuilderCursorIndex() - 1)
-        stateCallback(buildInputtingState())
+      if builderCursorIndex > 0 {
+        builderCursorIndex -= 1
+        stateCallback(buildInputtingState)
       } else {
         IME.prtDebugIntel("7045E6F3")
         errorCallback()

@@ -289,7 +289,7 @@ class InputState {
       "<InputState.Marking, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), markedRange:\(markedRange)>"
     }
 
-    func convertToInputting() -> Inputting {
+    var convertedToInputting: Inputting {
       let state = Inputting(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
       state.tooltip = tooltipForInputting
       return state

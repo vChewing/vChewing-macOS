@@ -648,7 +648,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
       let selectedValue = state.candidates[Int(index)]
       keyHandler.fixNode(value: selectedValue)
 
-      let inputting = keyHandler.buildInputtingState()
+      let inputting = keyHandler.buildInputtingState
 
       if mgrPrefs.useSCPCTypingMode {
         keyHandler.clear()
