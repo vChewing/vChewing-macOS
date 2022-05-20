@@ -96,7 +96,7 @@ public struct Tekkon {
   ]
 
   /// 引擎僅接受這些記號作為介母
-  public static let allowedsemivowels = ["ㄧ", "ㄨ", "ㄩ"]
+  public static let allowedSemivowels = ["ㄧ", "ㄨ", "ㄩ"]
 
   /// 引擎僅接受這些記號作為韻母
   public static let allowedVowels = [
@@ -109,7 +109,7 @@ public struct Tekkon {
 
   /// 引擎僅接受這些記號作為注音（聲介韻調四個集合加起來）
   public static var allowedPhonabets: [String] {
-    allowedConsonants + allowedsemivowels + allowedVowels + allowedIntonations
+    allowedConsonants + allowedSemivowels + allowedVowels + allowedIntonations
   }
 
   // MARK: - Phonabet Structure
@@ -132,18 +132,7 @@ public struct Tekkon {
       if !input.isEmpty {
         if allowedPhonabets.contains(String(input.reversed()[0])) {
           valueStorage = String(input.reversed()[0])
-          if Tekkon.allowedConsonants.contains(value) {
-            type = .consonant
-          } else if Tekkon.allowedsemivowels.contains(value) {
-            type = .semivowel
-          } else if Tekkon.allowedVowels.contains(value) {
-            type = .vowel
-          } else if Tekkon.allowedIntonations.contains(value) {
-            type = .intonation
-          } else {
-            type = .null
-            valueStorage = ""
-          }
+          ensureType()
         }
       }
     }
@@ -159,6 +148,23 @@ public struct Tekkon {
     ///   - strWith: 要取代成的內容。
     mutating func selfReplace(_ strOf: String, _ strWith: String = "") {
       valueStorage = valueStorage.replacingOccurrences(of: strOf, with: strWith)
+      ensureType()
+    }
+
+    /// 用來自動更新自身的屬性值的函數。
+    mutating func ensureType() {
+      if Tekkon.allowedConsonants.contains(value) {
+        type = .consonant
+      } else if Tekkon.allowedSemivowels.contains(value) {
+        type = .semivowel
+      } else if Tekkon.allowedVowels.contains(value) {
+        type = .vowel
+      } else if Tekkon.allowedIntonations.contains(value) {
+        type = .intonation
+      } else {
+        type = .null
+        valueStorage = ""
+      }
     }
 
     // MARK: - Misc Definitions
@@ -192,7 +198,7 @@ public struct Tekkon {
   /// 注音並擊處理的對外介面以注拼槽（Syllable Composer）的形式存在。
   /// 使用時需要單獨初期化為一個副本變數（因為是 Struct 所以必須得是變數）。
   /// 注拼槽只有四格：聲、介、韻、調。
-  /// @--DISCUSSION--@
+  ///
   /// 因為是 String Literal，所以初期化時可以藉由 @input 參數指定初期已經傳入的按鍵訊號。
   /// 還可以在初期化時藉由 @arrange 參數來指定注音排列（預設為「.ofDachen」大千佈局）。
   @frozen public struct Composer: Equatable, Hashable, ExpressibleByStringLiteral {
@@ -303,7 +309,7 @@ public struct Tekkon {
     // MARK: - Public Functions
 
     /// 用於檢測「某個輸入字符訊號的合規性」的函數。
-    /// @--DISCUSSION--@
+    ///
     /// 注意：回傳結果會受到當前注音排列 parser 屬性的影響。
     /// - Parameters:
     ///   - key: 傳入的 UniChar 內容。
@@ -338,7 +344,7 @@ public struct Tekkon {
 
     /// 接受傳入的按鍵訊號時的處理，處理對象為 String。
     /// 另有同名函數可處理 UniChar 訊號。
-    /// @--DISCUSSION--@
+    ///
     /// 如果是諸如複合型注音排列的話，翻譯結果有可能為空，但翻譯過程已經處理好聲介韻調分配了。
     /// - Parameters:
     ///   - fromString: 傳入的 String 內容。
@@ -364,7 +370,7 @@ public struct Tekkon {
 
     /// 接受傳入的按鍵訊號時的處理，處理對象為 UniChar。
     /// 其實也就是先將 UniChar 轉為 String 再交給某個同名異參的函數來處理而已。
-    /// @--DISCUSSION--@
+    ///
     /// 如果是諸如複合型注音排列的話，翻譯結果有可能為空，但翻譯過程已經處理好聲介韻調分配了。
     /// - Parameters:
     ///   - fromCharCode: 傳入的 UniChar 內容。
@@ -446,7 +452,7 @@ public struct Tekkon {
 
     /// 專門用來響應使用者摁下 BackSpace 按鍵時的行為。
     /// 刪除順序：調、韻、介、聲。
-    /// @--DISCUSSION--@
+    ///
     /// 基本上就是按順序從游標前方開始往後刪。
     public mutating func doBackSpace() {
       if [.ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin].contains(parser),
@@ -490,7 +496,7 @@ public struct Tekkon {
     // 注拼槽對內處理用函數都在這一小節。
 
     /// 根據目前的注音排列設定來翻譯傳入的 String 訊號。
-    /// @--DISCUSSION--@
+    ///
     /// 倚天或許氏鍵盤的處理函數會將分配過程代為處理過，此時回傳結果為空字串。
     /// - Parameters:
     ///   - key: 傳入的 String 訊號。
@@ -521,7 +527,7 @@ public struct Tekkon {
     }
 
     /// 倚天忘形注音排列比較麻煩，需要單獨處理。
-    /// @--DISCUSSION--@
+    ///
     /// 回傳結果是空字串的話，不要緊，因為該函數內部已經處理過分配過程了。
     /// - Parameters:
     ///   - key: 傳入的 String 訊號。
@@ -605,7 +611,7 @@ public struct Tekkon {
     }
 
     /// 許氏鍵盤與倚天忘形一樣同樣也比較麻煩，需要單獨處理。
-    /// @--DISCUSSION--@
+    ///
     /// 回傳結果是空的話，不要緊，因為該函數內部已經處理過分配過程了。
     /// - Parameters:
     ///   - key: 傳入的 String 訊號。
@@ -726,7 +732,7 @@ public struct Tekkon {
     }
 
     /// 大千忘形一樣同樣也比較麻煩，需要單獨處理。
-    /// @--DISCUSSION--@
+    ///
     /// 回傳結果是空的話，不要緊，因為該函數內部已經處理過分配過程了。
     /// - Parameters:
     ///   - key: 傳入的 String 訊號。
@@ -1237,7 +1243,7 @@ public struct Tekkon {
   // MARK: - Maps for Keyboard-to-Phonabet parsers
 
   /// 標準大千排列專用處理陣列。
-  /// @--DISCUSSION--@
+  ///
   /// 威注音輸入法 macOS 版使用了 Ukelele 佈局來完成對諸如倚天傳統等其它注音鍵盤排列的支援。
   /// 如果要將鐵恨模組拿給別的平台的輸入法使用的話，恐怕需要針對這些注音鍵盤排列各自新增專用陣列才可以。
   static let mapQwertyDachen: [String: String] = [
@@ -1248,7 +1254,7 @@ public struct Tekkon {
   ]
 
   /// 大千忘形排列專用處理陣列，但未包含全部的處理內容。
-  /// @--DISCUSSION--@
+  ///
   /// 在這裡將二十六個字母寫全，也只是為了方便做 validity check。
   /// 這裡提前對複音按鍵做處理，然後再用程式判斷介母類型、據此判斷是否需要做複音切換。
   static let mapDachenCP26StaticKeys: [String: String] = [
@@ -1258,7 +1264,7 @@ public struct Tekkon {
   ]
 
   /// 許氏排列專用處理陣列，但未包含全部的映射內容。
-  /// @--DISCUSSION--@
+  ///
   /// 在這裡將二十六個字母寫全，也只是為了方便做 validity check。
   /// 這裡提前對複音按鍵做處理，然後再用程式判斷介母類型、據此判斷是否需要做複音切換。
   static let mapHsuStaticKeys: [String: String] = [
@@ -1268,7 +1274,7 @@ public struct Tekkon {
   ]
 
   /// 倚天忘形排列預處理專用陣列，但未包含全部的映射內容。
-  /// @--DISCUSSION--@
+  ///
   /// 在這裡將二十六個字母寫全，也只是為了方便做 validity check。
   /// 這裡提前對ㄓ/ㄍ/ㄕ做處理，然後再用程式判斷介母類型、據此判斷是否需要換成ㄒ/ㄑ/ㄐ。
   static let mapEten26StaticKeys: [String: String] = [
