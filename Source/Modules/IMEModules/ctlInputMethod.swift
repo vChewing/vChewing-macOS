@@ -114,7 +114,8 @@ class ctlInputMethod: IMKInputController {
     handle(state: .Deactivated(), client: client)
   }
 
-  override func setValue(_ value: Any!, forTag _: Int, client: Any!) {
+  override func setValue(_ value: Any!, forTag tag: Int, client: Any!) {
+    _ = tag  // Stop clang-format from ruining the parameters of this function.
     var newInputMode = InputMode(rawValue: value as? String ?? "") ?? InputMode.imeModeNULL
     switch newInputMode {
       case InputMode.imeModeCHS:
@@ -145,7 +146,8 @@ class ctlInputMethod: IMKInputController {
 
   // MARK: - IMKServerInput protocol methods
 
-  override func recognizedEvents(_: Any!) -> Int {
+  override func recognizedEvents(_ sender: Any!) -> Int {
+    _ = sender  // Stop clang-format from ruining the parameters of this function.
     let events: NSEvent.EventTypeMask = [.keyDown, .flagsChanged]
     return Int(events.rawValue)
   }
@@ -207,7 +209,8 @@ class ctlInputMethod: IMKInputController {
 
   // 這個函數必須得在對應的狀態下給出對應的內容。
   override func composedString(_ sender: Any!) -> Any! {
-    (state as? InputState.NotEmpty)?.composingBuffer ?? ""
+    _ = sender  // Stop clang-format from ruining the parameters of this function.
+    return (state as? InputState.NotEmpty)?.composingBuffer ?? ""
   }
 }
 
@@ -279,7 +282,8 @@ extension ctlInputMethod {
     )
   }
 
-  private func handle(state _: InputState.Deactivated, previous: InputState, client: Any?) {
+  private func handle(state: InputState.Deactivated, previous: InputState, client: Any?) {
+    _ = state  // Stop clang-format from ruining the parameters of this function.
     currentClient = nil
 
     ctlCandidateCurrent?.delegate = nil
@@ -295,7 +299,8 @@ extension ctlInputMethod {
     )
   }
 
-  private func handle(state _: InputState.Empty, previous: InputState, client: Any?) {
+  private func handle(state: InputState.Empty, previous: InputState, client: Any?) {
+    _ = state  // Stop clang-format from ruining the parameters of this function.
     ctlCandidateCurrent?.visible = false
     hideTooltip()
 
@@ -313,8 +318,10 @@ extension ctlInputMethod {
   }
 
   private func handle(
-    state _: InputState.EmptyIgnoringPreviousState, previous _: InputState, client: Any!
+    state: InputState.EmptyIgnoringPreviousState, previous: InputState, client: Any!
   ) {
+    _ = state  // Stop clang-format from ruining the parameters of this function.
+    _ = previous  // Stop clang-format from ruining the parameters of this function.
     ctlCandidateCurrent?.visible = false
     hideTooltip()
 
@@ -328,7 +335,8 @@ extension ctlInputMethod {
     )
   }
 
-  private func handle(state: InputState.Committing, previous _: InputState, client: Any?) {
+  private func handle(state: InputState.Committing, previous: InputState, client: Any?) {
+    _ = previous  // Stop clang-format from ruining the parameters of this function.
     ctlCandidateCurrent?.visible = false
     hideTooltip()
 
@@ -346,7 +354,8 @@ extension ctlInputMethod {
     )
   }
 
-  private func handle(state: InputState.Inputting, previous _: InputState, client: Any?) {
+  private func handle(state: InputState.Inputting, previous: InputState, client: Any?) {
+    _ = previous  // Stop clang-format from ruining the parameters of this function.
     ctlCandidateCurrent?.visible = false
     hideTooltip()
 
@@ -373,7 +382,8 @@ extension ctlInputMethod {
     }
   }
 
-  private func handle(state: InputState.Marking, previous _: InputState, client: Any?) {
+  private func handle(state: InputState.Marking, previous: InputState, client: Any?) {
+    _ = previous  // Stop clang-format from ruining the parameters of this function.
     ctlCandidateCurrent?.visible = false
     guard let client = client as? IMKTextInput else {
       hideTooltip()
@@ -397,7 +407,8 @@ extension ctlInputMethod {
     }
   }
 
-  private func handle(state: InputState.ChoosingCandidate, previous _: InputState, client: Any?) {
+  private func handle(state: InputState.ChoosingCandidate, previous: InputState, client: Any?) {
+    _ = previous  // Stop clang-format from ruining the parameters of this function.
     hideTooltip()
     guard let client = client as? IMKTextInput else {
       ctlCandidateCurrent?.visible = false
@@ -413,7 +424,8 @@ extension ctlInputMethod {
     show(candidateWindowWith: state, client: client)
   }
 
-  private func handle(state: InputState.SymbolTable, previous _: InputState, client: Any?) {
+  private func handle(state: InputState.SymbolTable, previous: InputState, client: Any?) {
+    _ = previous  // Stop clang-format from ruining the parameters of this function.
     hideTooltip()
     guard let client = client as? IMKTextInput else {
       ctlCandidateCurrent?.visible = false
@@ -429,7 +441,8 @@ extension ctlInputMethod {
     show(candidateWindowWith: state, client: client)
   }
 
-  private func handle(state: InputState.AssociatedPhrases, previous _: InputState, client: Any?) {
+  private func handle(state: InputState.AssociatedPhrases, previous: InputState, client: Any?) {
+    _ = previous  // Stop clang-format from ruining the parameters of this function.
     hideTooltip()
     guard let client = client as? IMKTextInput else {
       ctlCandidateCurrent?.visible = false
@@ -591,14 +604,16 @@ extension ctlInputMethod {
 // MARK: -
 
 extension ctlInputMethod: KeyHandlerDelegate {
-  func ctlCandidate(for _: KeyHandler) -> Any {
-    ctlCandidateCurrent ?? .vertical
+  func ctlCandidate(for keyHandler: KeyHandler) -> Any {
+    _ = keyHandler  // Stop clang-format from ruining the parameters of this function.
+    return ctlCandidateCurrent ?? .vertical
   }
 
   func keyHandler(
-    _: KeyHandler, didSelectCandidateAt index: Int,
+    _ keyHandler: KeyHandler, didSelectCandidateAt index: Int,
     ctlCandidate controller: Any
   ) {
+    _ = keyHandler  // Stop clang-format from ruining the parameters of this function.
     if let controller = controller as? ctlCandidate {
       ctlCandidate(controller, didSelectCandidateAtIndex: UInt(index))
     }
@@ -636,7 +651,8 @@ extension ctlInputMethod: KeyHandlerDelegate {
 // MARK: -
 
 extension ctlInputMethod: ctlCandidateDelegate {
-  func candidateCountForController(_: ctlCandidate) -> UInt {
+  func candidateCountForController(_ controller: ctlCandidate) -> UInt {
+    _ = controller  // Stop clang-format from ruining the parameters of this function.
     if let state = state as? InputState.ChoosingCandidate {
       return UInt(state.candidates.count)
     } else if let state = state as? InputState.AssociatedPhrases {
@@ -645,9 +661,10 @@ extension ctlInputMethod: ctlCandidateDelegate {
     return 0
   }
 
-  func ctlCandidate(_: ctlCandidate, candidateAtIndex index: UInt)
+  func ctlCandidate(_ controller: ctlCandidate, candidateAtIndex index: UInt)
     -> String
   {
+    _ = controller  // Stop clang-format from ruining the parameters of this function.
     if let state = state as? InputState.ChoosingCandidate {
       return state.candidates[Int(index)]
     } else if let state = state as? InputState.AssociatedPhrases {
@@ -656,7 +673,8 @@ extension ctlInputMethod: ctlCandidateDelegate {
     return ""
   }
 
-  func ctlCandidate(_: ctlCandidate, didSelectCandidateAtIndex index: UInt) {
+  func ctlCandidate(_ controller: ctlCandidate, didSelectCandidateAtIndex index: UInt) {
+    _ = controller  // Stop clang-format from ruining the parameters of this function.
     let client = currentClient
 
     if let state = state as? InputState.SymbolTable,
