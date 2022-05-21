@@ -26,6 +26,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
 
+// 註：所有 InputState 型別均不適合使用 Struct，因為 Struct 無法相互繼承派生。
+
 /// Represents the states for the input method controller.
 ///
 /// An input method is actually a finite state machine. It receives the inputs
@@ -44,10 +46,10 @@ import Cocoa
 /// create a new state object to replace the current state instead of modifying
 /// the existing one.
 ///
-/// vChewing's input controller has following possible states:
+/// The input controller has following possible states:
 ///
-/// - Deactivated: The user is not using vChewing yet.
-/// - Empty: The user has switched to vChewing but did not input anything yet,
+/// - Deactivated: The user is not using the input method yet.
+/// - Empty: The user has switched to this input method but inputted nothing yet,
 ///   or, he or she has committed text into the client apps and starts a new
 ///   input phase.
 /// - Committing: The input controller is sending text to the client apps.
@@ -136,14 +138,14 @@ class InputState {
     }
 
     var attributedString: NSAttributedString {
-      let attributedSting = NSAttributedString(
+      let attributedString = NSAttributedString(
         string: composingBuffer,
         attributes: [
           .underlineStyle: NSUnderlineStyle.single.rawValue,
           .markedClauseSegment: 0,
         ]
       )
-      return attributedSting
+      return attributedString
     }
 
     override var description: String {
@@ -257,22 +259,22 @@ class InputState {
     }
 
     var attributedString: NSAttributedString {
-      let attributedSting = NSMutableAttributedString(string: composingBuffer)
+      let attributedString = NSMutableAttributedString(string: composingBuffer)
       let end = markedRange.location + markedRange.length
 
-      attributedSting.setAttributes(
+      attributedString.setAttributes(
         [
           .underlineStyle: NSUnderlineStyle.single.rawValue,
           .markedClauseSegment: 0,
         ], range: NSRange(location: 0, length: markedRange.location)
       )
-      attributedSting.setAttributes(
+      attributedString.setAttributes(
         [
           .underlineStyle: NSUnderlineStyle.thick.rawValue,
           .markedClauseSegment: 1,
         ], range: markedRange
       )
-      attributedSting.setAttributes(
+      attributedString.setAttributes(
         [
           .underlineStyle: NSUnderlineStyle.single.rawValue,
           .markedClauseSegment: 2,
@@ -282,7 +284,7 @@ class InputState {
           length: (composingBuffer as NSString).length - end
         )
       )
-      return attributedSting
+      return attributedString
     }
 
     override var description: String {
@@ -296,7 +298,7 @@ class InputState {
     }
 
     var validToWrite: Bool {
-      /// vChewing allows users to input a string whose length differs
+      /// The input method allows users to input a string whose length differs
       /// from the amount of Bopomofo readings. In this case, the range
       /// in the composing buffer and the readings could not match, so
       /// we disable the function to write user phrases in this case.
@@ -370,14 +372,14 @@ class InputState {
     }
 
     var attributedString: NSAttributedString {
-      let attributedSting = NSAttributedString(
+      let attributedString = NSAttributedString(
         string: composingBuffer,
         attributes: [
           .underlineStyle: NSUnderlineStyle.single.rawValue,
           .markedClauseSegment: 0,
         ]
       )
-      return attributedSting
+      return attributedString
     }
 
     override var description: String {
@@ -421,14 +423,14 @@ class InputState {
     // 如有誰要修奇摩注音的一點通選單的話，修復原理也是一樣的。
     // Crediting Qwertyyb: https://github.com/qwertyyb/Fire/issues/55#issuecomment-1133497700
     override var attributedString: NSAttributedString {
-      let attributedSting = NSAttributedString(
+      let attributedString = NSAttributedString(
         string: " ",
         attributes: [
           .underlineStyle: NSUnderlineStyle.single.rawValue,
           .markedClauseSegment: 0,
         ]
       )
-      return attributedSting
+      return attributedString
     }
 
     override var description: String {
