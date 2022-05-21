@@ -118,7 +118,7 @@ class KeyHandler {
     // of the best possible Mandarin characters given the input syllables,
     // using the Viterbi algorithm implemented in the Megrez library.
     // The walk() traces the grid to the end, hence no need to use .reversed() here.
-    _walkedNodes = _builder.walk(at: _builder.grid.width, nodesLimit: 3, balanced: true)
+    _walkedNodes = _builder.walk(at: _builder.grid.width, nodesLimit: 10, balanced: true)
   }
 
   func popOverflowComposingTextAndWalk() -> String {
