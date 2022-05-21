@@ -109,7 +109,7 @@
 "Debug Mode" = "侦错模式";
 "Dictionary" = "辞典";
 "Emulating select-candidate-per-character mode" = "模拟 90 年代前期注音逐字选字输入风格";
-"Enable CNS11643 Support (2022-01-27)" = "启用 CNS11643 全字库支援 (2022-01-07)";
+"Enable CNS11643 Support (2022-04-27)" = "启用 CNS11643 全字库支援 (2022-04-27)";
 "Enable Space key for calling candidate window" = "敲空格键以呼出候选字窗";
 "Enable symbol input support (incl. certain emoji symbols)" = "启用包括少许绘文字在内的符号输入支援";
 "English" = "英语";

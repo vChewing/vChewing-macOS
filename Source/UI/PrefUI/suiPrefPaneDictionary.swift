@@ -113,7 +113,7 @@ struct suiPrefPaneDictionary: View {
           mgrPrefs.shouldAutoReloadUserDataFiles = value
         }
         Divider()
-        Toggle(LocalizedStringKey("Enable CNS11643 Support (2022-01-27)"), isOn: $selEnableCNS11643)
+        Toggle(LocalizedStringKey("Enable CNS11643 Support (2022-04-27)"), isOn: $selEnableCNS11643)
           .onChange(of: selEnableCNS11643) { value in
             mgrPrefs.cns11643Enabled = value
             mgrLangModel.setCNSEnabled(value)
