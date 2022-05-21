@@ -271,7 +271,7 @@ enum mgrLangModel {
   }
 
   static func chkUserLMFilesExist(_ mode: InputMode) -> Bool {
-    if !checkIfUserDataFolderExists() {
+    if !userDataFolderExists {
       return false
     }
     if !ensureFileExists(userPhrasesDataPath(mode))
@@ -309,9 +309,8 @@ enum mgrLangModel {
     return true
   }
 
-  // ⚠︎ 私有函數：檢查且糾偏，不接受任何傳入變數。該函數不用於其他型別。
-  // 待辦事項：擇日合併至另一個同類型的函數當中。
-  static func checkIfUserDataFolderExists() -> Bool {
+  // 檢查給定的目錄是否存在寫入合規性、且糾偏，不接受任何傳入變數。
+  static var userDataFolderExists: Bool {
     let folderPath = mgrLangModel.dataFolderPath(isDefaultFolder: false)
     var isFolder = ObjCBool(false)
     var folderExist = FileManager.default.fileExists(atPath: folderPath, isDirectory: &isFolder)
