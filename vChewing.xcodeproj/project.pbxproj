@@ -106,7 +106,7 @@
 		6ACA41FD15FC1D9000935EF6 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41F015FC1D9000935EF6 /* MainMenu.xib */; };
 		6ACA420215FC1E5200935EF6 /* vChewing.app in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */; };
 		D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427F76B278CA1BA004A2160 /* AppDelegate.swift */; };
-		D456576E279E4F7B00DF6BC9 /* InputHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D456576D279E4F7B00DF6BC9 /* InputHandler.swift */; };
+		D456576E279E4F7B00DF6BC9 /* InputSignal.swift in Sources */ = {isa = PBXBuildFile; fileRef = D456576D279E4F7B00DF6BC9 /* InputSignal.swift */; };
 		D461B792279DAC010070E734 /* InputState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D461B791279DAC010070E734 /* InputState.swift */; };
 		D47B92C027972AD100458394 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47B92BF27972AC800458394 /* main.swift */; };
 		D47F7DCE278BFB57002F9DD7 /* ctlPrefWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCD278BFB57002F9DD7 /* ctlPrefWindow.swift */; };
@@ -311,7 +311,7 @@
 		6ACA41F315FC1D9000935EF6 /* Installer-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Installer-Prefix.pch"; path = "Installer/Installer-Prefix.pch"; sourceTree = SOURCE_ROOT; };
 		D427A9BF25ED28CC005D43E0 /* vChewing-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "vChewing-Bridging-Header.h"; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		D427F76B278CA1BA004A2160 /* AppDelegate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		D456576D279E4F7B00DF6BC9 /* InputHandler.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputHandler.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		D456576D279E4F7B00DF6BC9 /* InputSignal.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputSignal.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D461B791279DAC010070E734 /* InputState.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputState.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D47B92BF27972AC800458394 /* main.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = main.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D47F7DCD278BFB57002F9DD7 /* ctlPrefWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlPrefWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -411,7 +411,7 @@
 				5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */,
 				D4E569DA27A34CC100AC2CEF /* CTools.h */,
 				D4E569DB27A34CC100AC2CEF /* CTools.m */,
-				D456576D279E4F7B00DF6BC9 /* InputHandler.swift */,
+				D456576D279E4F7B00DF6BC9 /* InputSignal.swift */,
 				D461B791279DAC010070E734 /* InputState.swift */,
 				5BD0113C2818543900609769 /* KeyHandler_Core.swift */,
 				5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */,
@@ -1051,7 +1051,7 @@
 				D47F7DD0278C0897002F9DD7 /* ctlNonModalAlertWindow.swift in Sources */,
 				5B38F5A2281E2E49007D5F5D /* 0_Megrez.swift in Sources */,
 				5B949BD92816DC5400D87B5D /* LineReader.swift in Sources */,
-				D456576E279E4F7B00DF6BC9 /* InputHandler.swift in Sources */,
+				D456576E279E4F7B00DF6BC9 /* InputSignal.swift in Sources */,
 				5BA9FD1027FEDB6B002DE248 /* suiPrefPaneKeyboard.swift in Sources */,
 				5B3133BF280B229700A4A505 /* KeyHandler_States.swift in Sources */,
 				5BA9FD4327FEF3C8002DE248 /* Preferences.swift in Sources */,

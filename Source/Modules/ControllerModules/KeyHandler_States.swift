@@ -134,7 +134,7 @@ extension KeyHandler {
 
   func handleMarkingState(
     _ state: InputState.Marking,
-    input: InputHandler,
+    input: InputSignal,
     stateCallback: @escaping (InputState) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
@@ -504,7 +504,7 @@ extension KeyHandler {
 
   func handleForward(
     state: InputState,
-    input: InputHandler,
+    input: InputSignal,
     stateCallback: @escaping (InputState) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
@@ -553,7 +553,7 @@ extension KeyHandler {
 
   func handleBackward(
     state: InputState,
-    input: InputHandler,
+    input: InputSignal,
     stateCallback: @escaping (InputState) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {

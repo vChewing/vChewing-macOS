@@ -30,7 +30,7 @@ import Cocoa
 
 extension KeyHandler {
   func handle(
-    input: InputHandler,
+    input: InputSignal,
     state: InputState,
     stateCallback: @escaping (InputState) -> Void,
     errorCallback: @escaping () -> Void
