@@ -105,11 +105,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
     NSApp.setActivationPolicy(.accessory)
   }
 
-  func checkForUpdate() {
-    checkForUpdate(forced: false)
-  }
-
-  func checkForUpdate(forced: Bool) {
+  func checkForUpdate(forced: Bool = false) {
     if checkTask != nil {
       // busy
       return
