@@ -24,17 +24,28 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 extension Megrez {
+  /// 軌格。
   public class Grid {
-    var mutSpans: [Megrez.Span]
+    /// 幅位陣列。
+    private var mutSpans: [Megrez.Span]
+
+    /// 軌格的寬度，也就是其內的幅位陣列當中的幅位數量。
+    var width: Int { mutSpans.count }
 
     public init() {
       mutSpans = [Megrez.Span]()
     }
 
+    /// 自我清空該軌格的內容。
     public func clear() {
       mutSpans = [Megrez.Span]()
     }
 
+    /// 往該軌格的指定位置插入指定幅位長度的指定節點。
+    /// - Parameters:
+    ///   - node: 節點。
+    ///   - location: 位置。
+    ///   - spanningLength: 給定的幅位長度。
     public func insertNode(node: Node, location: Int, spanningLength: Int) {
       if location >= mutSpans.count {
         let diff = location - mutSpans.count + 1
@@ -45,15 +56,23 @@ extension Megrez {
       mutSpans[location].insert(node: node, length: spanningLength)
     }
 
+    /// 給定索引鍵、位置、幅位長度，在該軌格內確認是否有對應的節點存在。
+    /// - Parameters:
+    ///   - location: 位置。
+    ///   - spanningLength: 給定的幅位長度。
+    ///   - key: 索引鍵。
     public func hasMatchedNode(location: Int, spanningLength: Int, key: String) -> Bool {
       if location > mutSpans.count {
         return false
       }
 
       let n = mutSpans[location].node(length: spanningLength)
-      return n == nil ? false : key == n?.key()
+      return n == nil ? false : key == n?.key
     }
 
+    /// 在該軌格的指定位置擴增一個幅位。
+    /// - Parameters:
+    ///   - location: 位置。
     public func expandGridByOneAt(location: Int) {
       // 這裡加入 abs 完全是一個防呆設計
       mutSpans.insert(Span(), at: abs(location))
@@ -65,6 +84,9 @@ extension Megrez {
       }
     }
 
+    /// 在該軌格的指定位置減少一個幅位。
+    /// - Parameters:
+    ///   - location: 位置。
     public func shrinkGridByOneAt(location: Int) {
       if location >= mutSpans.count {
         return
@@ -77,8 +99,9 @@ extension Megrez {
       }
     }
 
-    public func width() -> Int { mutSpans.count }
-
+    /// 給定位置，枚舉出所有在這個位置結尾的節點。
+    /// - Parameters:
+    ///   - location: 位置。
     public func nodesEndingAt(location: Int) -> [NodeAnchor] {
       var results: [NodeAnchor] = []
       if !mutSpans.isEmpty, location <= mutSpans.count {
@@ -100,6 +123,9 @@ extension Megrez {
       return results
     }
 
+    /// 給定位置，枚舉出所有在這個位置結尾、或者橫跨該位置的節點。
+    /// - Parameters:
+    ///   - location: 位置。
     public func nodesCrossingOrEndingAt(location: Int) -> [NodeAnchor] {
       var results: [NodeAnchor] = []
       if !mutSpans.isEmpty, location <= mutSpans.count {
@@ -126,14 +152,18 @@ extension Megrez {
       return results
     }
 
-    public func fixNodeSelectedCandidate(location: Int, value: String) -> NodeAnchor {
+    /// 將給定位置的節點的候選字詞改為與給定的字串一致的候選字詞。
+    /// - Parameters:
+    ///   - location: 位置。
+    ///   - value: 給定字串。
+    @discardableResult public func fixNodeSelectedCandidate(location: Int, value: String) -> NodeAnchor {
       var node = NodeAnchor()
       for nodeAnchor in nodesCrossingOrEndingAt(location: location) {
         guard let theNode = nodeAnchor.node else {
           continue
         }
-        let candidates = theNode.candidates()
-        // Reset the candidate-fixed state of every node at the location.
+        let candidates = theNode.candidates
+        // 將該位置的所有節點的候選字詞鎖定狀態全部重設。
         theNode.resetCandidate()
         for (i, candidate) in candidates.enumerated() {
           if candidate.value == value {
@@ -146,13 +176,18 @@ extension Megrez {
       return node
     }
 
+    /// 將給定位置的節點的與給定的字串一致的候選字詞的權重複寫為給定權重數值。
+    /// - Parameters:
+    ///   - location: 位置。
+    ///   - value: 給定字串。
+    ///   - overridingScore: 給定權重數值。
     public func overrideNodeScoreForSelectedCandidate(location: Int, value: String, overridingScore: Double) {
       for nodeAnchor in nodesCrossingOrEndingAt(location: location) {
         guard let theNode = nodeAnchor.node else {
           continue
         }
-        let candidates = theNode.candidates()
-        // Reset the candidate-fixed state of every node at the location.
+        let candidates = theNode.candidates
+        // 將該位置的所有節點的候選字詞鎖定狀態全部重設。
         theNode.resetCandidate()
         for (i, candidate) in candidates.enumerated() {
           if candidate.value == value {
@@ -162,5 +197,40 @@ extension Megrez {
         }
       }
     }
+  }
+}
+
+// MARK: - DumpDOT-related functions.
+
+extension Megrez.Grid {
+  public var dumpDOT: String {
+    var sst = "digraph {\ngraph [ rankdir=LR ];\nBOS;\n"
+    for (p, span) in mutSpans.enumerated() {
+      for ni in 0...(span.maximumLength) {
+        guard let np: Megrez.Node = span.node(length: ni) else {
+          continue
+        }
+        if p == 0 {
+          sst += "BOS -> \(np.currentKeyValue.value);\n"
+        }
+
+        sst += "\(np.currentKeyValue.value);\n"
+
+        if (p + ni) < mutSpans.count {
+          let dstSpan = mutSpans[p + ni]
+          for q in 0...(dstSpan.maximumLength) {
+            if let dn = dstSpan.node(length: q) {
+              sst += np.currentKeyValue.value + " -> " + dn.currentKeyValue.value + ";\n"
+            }
+          }
+        }
+
+        if (p + ni) == mutSpans.count {
+          sst += np.currentKeyValue.value + " -> EOS;\n"
+        }
+      }
+    }
+    sst += "EOS;\n}\n"
+    return sst
   }
 }

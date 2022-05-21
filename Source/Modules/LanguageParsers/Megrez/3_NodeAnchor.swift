@@ -24,19 +24,52 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 extension Megrez {
-  @frozen public struct NodeAnchor {
+  /// 節锚。
+  @frozen public struct NodeAnchor: CustomStringConvertible {
+    /// 節點。一個節锚內不一定有節點。
     public var node: Node?
+    /// 節锚所在的位置。
     public var location: Int = 0
+    /// 幅位長度。
     public var spanningLength: Int = 0
+    /// 累計權重。
     public var accumulatedScore: Double = 0.0
+    /// 索引鍵的長度。
     public var keyLength: Int {
-      node?.key().count ?? 0
+      node?.key.count ?? 0
     }
 
+    /// 將當前節锚列印成一個字串。
+    public var description: String {
+      var stream = ""
+      stream += "{@(" + String(location) + "," + String(spanningLength) + "),"
+      if let node = node {
+        stream += node.description
+      } else {
+        stream += "null"
+      }
+      stream += "}"
+      return stream
+    }
+
+    /// 獲取平衡權重。
     public var balancedScore: Double {
       let weightedScore: Double = (Double(spanningLength) - 1) * 2
-      let nodeScore: Double = node?.score() ?? 0
+      let nodeScore: Double = node?.score ?? 0
       return weightedScore + nodeScore
     }
+  }
+}
+
+// MARK: - DumpDOT-related functions.
+
+extension Array where Element == Megrez.NodeAnchor {
+  /// 將節锚陣列列印成一個字串。
+  public var description: String {
+    var arrOutputContent = [""]
+    for anchor in self {
+      arrOutputContent.append(anchor.description)
+    }
+    return arrOutputContent.joined(separator: "<-")
   }
 }

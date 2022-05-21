@@ -30,7 +30,7 @@ import Cocoa
 
 extension KeyHandler {
   func handle(
-    input: InputHandler,
+    input: InputSignal,
     state: InputState,
     stateCallback: @escaping (InputState) -> Void,
     errorCallback: @escaping () -> Void
@@ -135,7 +135,7 @@ extension KeyHandler {
       ) {
         return true
       }
-      state = marking.convertToInputting()
+      state = marking.convertedToInputting
       stateCallback(state)
     }
 
@@ -154,7 +154,7 @@ extension KeyHandler {
       // update the composing buffer.
       let composeReading = _composer.hasToneMarker()
       if !composeReading {
-        stateCallback(buildInputtingState())
+        stateCallback(buildInputtingState)
         return true
       }
     }
@@ -166,7 +166,7 @@ extension KeyHandler {
     // However, Swift does not support "|=".
     composeReading = composeReading || (!_composer.isEmpty && (input.isSpace || input.isEnter))
     if composeReading {
-      if input.isSpace && !_composer.hasToneMarker() {
+      if input.isSpace, !_composer.hasToneMarker() {
         _composer.receiveKey(fromString: " ")  // 補上空格。
       }
       let reading = _composer.getComposition()
@@ -176,7 +176,7 @@ extension KeyHandler {
         IME.prtDebugIntel("B49C0979：語彙庫內無「\(reading)」的匹配記錄。")
         errorCallback()
         _composer.clear()
-        stateCallback((getBuilderLength() == 0) ? InputState.EmptyIgnoringPreviousState() : buildInputtingState())
+        stateCallback((builderLength == 0) ? InputState.EmptyIgnoringPreviousState() : buildInputtingState)
         return true
       }
 
@@ -184,7 +184,7 @@ extension KeyHandler {
       insertReadingToBuilderAtCursor(reading: reading)
 
       // ... then walk the grid...
-      let poppedText = popOverflowComposingTextAndWalk()
+      let poppedText = popOverflowComposingTextAndWalk
 
       // ... get and tweak override model suggestion if possible...
       dealWithOverrideModelSuggestions()
@@ -192,7 +192,7 @@ extension KeyHandler {
       // ... then update the text.
       _composer.clear()
 
-      let inputting = buildInputtingState()
+      let inputting = buildInputtingState
       inputting.poppedText = poppedText
       stateCallback(inputting)
 
@@ -233,7 +233,7 @@ extension KeyHandler {
     // but does not compose. Only sequences such as "ㄧˊ", "ˊㄧˊ", "ˊㄧˇ", or "ˊㄧ "
     // would compose.
     if keyConsumedByReading {
-      stateCallback(buildInputtingState())
+      stateCallback(buildInputtingState)
       return true
     }
 
@@ -247,7 +247,7 @@ extension KeyHandler {
       if input.isSpace {
         // If the Space key is NOT set to be a selection key
         if input.isShiftHold || !mgrPrefs.chooseCandidateUsingSpace {
-          if getBuilderCursorIndex() >= getBuilderLength() {
+          if builderCursorIndex >= builderLength {
             let composingBuffer = currentState.composingBuffer
             if !composingBuffer.isEmpty {
               stateCallback(InputState.Committing(poppedText: composingBuffer))
@@ -257,8 +257,8 @@ extension KeyHandler {
             stateCallback(InputState.Empty())
           } else if ifLangModelHasUnigrams(forKey: " ") {
             insertReadingToBuilderAtCursor(reading: " ")
-            let poppedText = popOverflowComposingTextAndWalk()
-            let inputting = buildInputtingState()
+            let poppedText = popOverflowComposingTextAndWalk
+            let inputting = buildInputtingState
             inputting.poppedText = poppedText
             stateCallback(inputting)
           }
@@ -351,12 +351,12 @@ extension KeyHandler {
     // MARK: Punctuation list
 
     if input.isSymbolMenuPhysicalKey && !input.isShiftHold {
-      if !input.isOptionHold {
+      if input.isOptionHold {
         if ifLangModelHasUnigrams(forKey: "_punctuation_list") {
           if _composer.isEmpty {
             insertReadingToBuilderAtCursor(reading: "_punctuation_list")
-            let poppedText: String! = popOverflowComposingTextAndWalk()
-            let inputting = buildInputtingState()
+            let poppedText: String! = popOverflowComposingTextAndWalk
+            let inputting = buildInputtingState
             inputting.poppedText = poppedText
             stateCallback(inputting)
             stateCallback(buildCandidate(state: inputting, useVerticalMode: input.useVerticalMode))
@@ -392,7 +392,7 @@ extension KeyHandler {
       punctuationNamePrefix = "_punctuation_"
     }
 
-    let parser = getCurrentMandarinParser()
+    let parser = currentMandarinParser
     let arrCustomPunctuations: [String] = [
       punctuationNamePrefix, parser, String(format: "%c", CChar(charCode)),
     ]

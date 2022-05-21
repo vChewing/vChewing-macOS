@@ -24,17 +24,28 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 extension Megrez {
-  @frozen public struct Bigram: Equatable {
+  /// 雙元圖。
+  @frozen public struct Bigram: Equatable, CustomStringConvertible {
+    /// 當前鍵值。
     public var keyValue: KeyValuePair
+    /// 前述鍵值。
     public var precedingKeyValue: KeyValuePair
+    /// 權重。
     public var score: Double
-    // var paired: String
+    /// 將當前雙元圖列印成一個字串。
+    public var description: String {
+      "(" + keyValue.description + "|" + precedingKeyValue.description + "," + String(score) + ")"
+    }
 
+    /// 初期化一筆「雙元圖」。一筆雙元圖由一組前述鍵值配對、一組當前鍵值配對、與一筆權重數值組成。
+    /// - Parameters:
+    ///   - precedingKeyValue: 前述鍵值。
+    ///   - keyValue: 當前鍵值。
+    ///   - score: 權重（雙精度小數）。
     public init(precedingKeyValue: KeyValuePair, keyValue: KeyValuePair, score: Double) {
       self.keyValue = keyValue
       self.precedingKeyValue = precedingKeyValue
       self.score = score
-      // paired = "(" + keyValue.paired + "|" + precedingKeyValue.paired + "," + String(score) + ")"
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -44,16 +55,6 @@ extension Megrez {
       // hasher.combine(paired)
     }
 
-    //    static func getPairedBigrams(grams: [Bigram]) -> String {
-    //      var arrOutputContent = [""]
-    //      var index = 0
-    //      for gram in grams {
-    //        arrOutputContent.append(contentsOf: [String(index) + "=>" + gram.paired])
-    //        index += 1
-    //      }
-    //      return "[" + String(grams.count) + "]=>{" + arrOutputContent.joined(separator: ",") + "}"
-    //    }
-
     public static func == (lhs: Bigram, rhs: Bigram) -> Bool {
       lhs.precedingKeyValue == rhs.precedingKeyValue && lhs.keyValue == rhs.keyValue && lhs.score == rhs.score
     }
@@ -62,13 +63,18 @@ extension Megrez {
       lhs.precedingKeyValue < rhs.precedingKeyValue
         || (lhs.keyValue < rhs.keyValue || (lhs.keyValue == rhs.keyValue && lhs.keyValue < rhs.keyValue))
     }
+  }
+}
 
-    var description: String {
-      "\(keyValue):\(score)"
-    }
+// MARK: - DumpDOT-related functions.
 
-    var debugDescription: String {
-      "Bigram(keyValue: \(keyValue), score: \(score))"
+extension Array where Element == Megrez.Bigram {
+  /// 將雙元圖陣列列印成一個字串。
+  public var description: String {
+    var arrOutputContent = [""]
+    for (index, gram) in enumerated() {
+      arrOutputContent.append(contentsOf: [String(index) + "=>" + gram.description])
     }
+    return "[" + String(count) + "]=>{" + arrOutputContent.joined(separator: ",") + "}"
   }
 }

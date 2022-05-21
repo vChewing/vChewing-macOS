@@ -68,47 +68,41 @@ class KeyHandler {
           return InputMode.imeModeNULL
       }
     }
-    set { setInputMode(newValue.rawValue) }
+    set {
+      let isCHS: Bool = (newValue == InputMode.imeModeCHS)
+
+      // 緊接著將新的簡繁輸入模式提報給 ctlInputMethod:
+      ctlInputMethod.currentInputMode = isCHS ? InputMode.imeModeCHS.rawValue : InputMode.imeModeCHT.rawValue
+      mgrPrefs.mostRecentInputMode = ctlInputMethod.currentInputMode
+
+      // 拿當前的 _inputMode 與 ctlInputMethod 的提報結果對比，不同的話則套用新設定：
+      if _inputMode != ctlInputMethod.currentInputMode {
+        // Reinitiate language models if necessary
+        _languageModel = isCHS ? mgrLangModel.lmCHS : mgrLangModel.lmCHT
+        _userOverrideModel = isCHS ? mgrLangModel.uomCHS : mgrLangModel.uomCHT
+
+        // Synchronize the sub-languageModel state settings to the new LM.
+        syncBaseLMPrefs()
+
+        // Create new grid builder and clear the composer.
+        createNewBuilder()
+        _composer.clear()
+      }
+      // 直接寫到衛星模組內，省得類型轉換
+      _inputMode = ctlInputMethod.currentInputMode
+    }
   }
 
   public init() {
-    _builder = Megrez.BlockReadingBuilder(lm: _languageModel)
+    _builder = Megrez.BlockReadingBuilder(lm: _languageModel, separator: "-")
     ensureParser()
-    setInputMode(ctlInputMethod.currentInputMode)
+    inputMode = InputMode(rawValue: ctlInputMethod.currentInputMode) ?? InputMode.imeModeNULL
   }
 
   func clear() {
     _composer.clear()
     _builder.clear()
     _walkedNodes.removeAll()
-  }
-
-  func setInputMode(_ value: String) {
-    // 下面這句的「isKindOfClass」是做類型檢查，
-    // 為了應對出現輸入法 plist 被改壞掉這樣的極端情況。
-    let isCHS: Bool = (value == InputMode.imeModeCHS.rawValue)
-
-    // 緊接著將新的簡繁輸入模式提報給 ctlInputMethod:
-    ctlInputMethod.currentInputMode = isCHS ? InputMode.imeModeCHS.rawValue : InputMode.imeModeCHT.rawValue
-    mgrPrefs.mostRecentInputMode = ctlInputMethod.currentInputMode
-
-    // 拿當前的 _inputMode 與 ctlInputMethod 的提報結果對比，不同的話則套用新設定：
-    if _inputMode != ctlInputMethod.currentInputMode {
-      // Reinitiate language models if necessary
-      setInputModesToLM(isCHS: isCHS)
-
-      // Synchronize the sub-languageModel state settings to the new LM.
-      syncBaseLMPrefs()
-
-      // Create new grid builder.
-      createNewBuilder()
-
-      if !_composer.isEmpty {
-        _composer.clear()
-      }
-    }
-    // 直接寫到衛星模組內，省得類型轉換
-    _inputMode = ctlInputMethod.currentInputMode
   }
 
   // MARK: - Functions dealing with Megrez.
@@ -118,12 +112,10 @@ class KeyHandler {
     // of the best possible Mandarin characters given the input syllables,
     // using the Viterbi algorithm implemented in the Megrez library.
     // The walk() traces the grid to the end, hence no need to use .reversed() here.
-    _walkedNodes = Megrez.Walker(
-      grid: _builder.grid()
-    ).walk(at: _builder.grid().width(), nodesLimit: 3, balanced: true)
+    _walkedNodes = _builder.walk(at: _builder.grid.width, nodesLimit: 10, balanced: true)
   }
 
-  func popOverflowComposingTextAndWalk() -> String {
+  var popOverflowComposingTextAndWalk: String {
     // In ideal situations we can allow users to type infinitely in a buffer.
     // However, Viberti algorithm has a complexity of O(N^2), the walk will
     // become slower as the number of nodes increase. Therefore, we need to
@@ -133,11 +125,11 @@ class KeyHandler {
     // (i.e. popped out.)
 
     var poppedText = ""
-    if _builder.grid().width() > mgrPrefs.composingBufferSize {
+    if _builder.grid.width > mgrPrefs.composingBufferSize {
       if _walkedNodes.count > 0 {
         let anchor: Megrez.NodeAnchor = _walkedNodes[0]
         if let theNode = anchor.node {
-          poppedText = theNode.currentKeyValue().value
+          poppedText = theNode.currentKeyValue.value
         }
         _builder.removeHeadReadings(count: anchor.spanningLength)
       }
@@ -155,8 +147,8 @@ class KeyHandler {
   }
 
   func fixNode(value: String) {
-    let cursorIndex: Int = getActualCandidateCursorIndex()
-    let selectedNode: Megrez.NodeAnchor = _builder.grid().fixNodeSelectedCandidate(
+    let cursorIndex: Int = actualCandidateCursorIndex
+    let selectedNode: Megrez.NodeAnchor = _builder.grid.fixNodeSelectedCandidate(
       location: cursorIndex, value: value
     )
     // 不要針對逐字選字模式啟用臨時半衰記憶模型。
@@ -194,16 +186,16 @@ class KeyHandler {
         if nextPosition >= cursorIndex { break }
         nextPosition += node.spanningLength
       }
-      if nextPosition <= getBuilderLength() {
-        setBuilderCursorIndex(value: nextPosition)
+      if nextPosition <= builderLength {
+        builderCursorIndex = nextPosition
       }
     }
   }
 
-  func getCandidatesArray() -> [String] {
+  var candidatesArray: [String] {
     var arrCandidates: [String] = []
     var arrNodes: [Megrez.NodeAnchor] = []
-    arrNodes.append(contentsOf: getRawNodes())
+    arrNodes.append(contentsOf: rawNodes)
 
     /// 原理：nodes 這個回饋結果包含一堆子陣列，分別對應不同詞長的候選字。
     /// 這裡先對陣列排序、讓最長候選字的子陣列的優先權最高。
@@ -216,7 +208,7 @@ class KeyHandler {
       // then use the Swift trick to retrieve the candidates for each node at/crossing the cursor
       for currentNodeAnchor in arrNodes {
         if let currentNode = currentNodeAnchor.node {
-          for currentCandidate in currentNode.candidates() {
+          for currentCandidate in currentNode.candidates {
             arrCandidates.append(currentCandidate.value)
           }
         }
@@ -230,17 +222,17 @@ class KeyHandler {
       mgrPrefs.useSCPCTypingMode
       ? ""
       : _userOverrideModel.suggest(
-        walkedNodes: _walkedNodes, cursorIndex: getBuilderCursorIndex(),
+        walkedNodes: _walkedNodes, cursorIndex: builderCursorIndex,
         timestamp: NSDate().timeIntervalSince1970
       )
 
     if !overrideValue.isEmpty {
       IME.prtDebugIntel(
         "UOM: Suggestion retrieved, overriding the node score of the selected candidate.")
-      _builder.grid().overrideNodeScoreForSelectedCandidate(
-        location: getActualCandidateCursorIndex(),
+      _builder.grid.overrideNodeScoreForSelectedCandidate(
+        location: actualCandidateCursorIndex,
         value: overrideValue,
-        overridingScore: findHighestScore(nodes: getRawNodes(), epsilon: kEpsilon)
+        overridingScore: findHighestScore(nodes: rawNodes, epsilon: kEpsilon)
       )
     } else {
       IME.prtDebugIntel("UOM: Blank suggestion retrieved, dismissing.")
@@ -251,77 +243,13 @@ class KeyHandler {
     var highestScore: Double = 0
     for currentAnchor in nodes {
       if let theNode = currentAnchor.node {
-        let score = theNode.highestUnigramScore()
+        let score = theNode.highestUnigramScore
         if score > highestScore {
           highestScore = score
         }
       }
     }
     return highestScore + epsilon
-  }
-
-  // MARK: - Extracted methods and functions (Megrez).
-
-  func isBuilderEmpty() -> Bool { _builder.grid().width() == 0 }
-
-  func getRawNodes() -> [Megrez.NodeAnchor] {
-    /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
-    /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的，但目前 Megrez 暫時缺乏對該特性的支援。
-    /// 所以暫時只能將威注音的游標後置風格描述成「跟 Windows 版雅虎奇摩注音一致」。
-    mgrPrefs.setRearCursorMode
-      ? _builder.grid().nodesCrossingOrEndingAt(location: getActualCandidateCursorIndex())
-      : _builder.grid().nodesEndingAt(location: getActualCandidateCursorIndex())
-  }
-
-  func setInputModesToLM(isCHS: Bool) {
-    _languageModel = isCHS ? mgrLangModel.lmCHS : mgrLangModel.lmCHT
-    _userOverrideModel = isCHS ? mgrLangModel.uomCHS : mgrLangModel.uomCHT
-  }
-
-  func syncBaseLMPrefs() {
-    _languageModel.isPhraseReplacementEnabled = mgrPrefs.phraseReplacementEnabled
-    _languageModel.isCNSEnabled = mgrPrefs.cns11643Enabled
-    _languageModel.isSymbolEnabled = mgrPrefs.symbolInputEnabled
-  }
-
-  func createNewBuilder() {
-    _builder = Megrez.BlockReadingBuilder(lm: _languageModel)
-    // Each Mandarin syllable is separated by a hyphen.
-    _builder.setJoinSeparator(separator: "-")
-  }
-
-  func currentReadings() -> [String] { _builder.readings() }
-
-  func ifLangModelHasUnigrams(forKey reading: String) -> Bool {
-    _languageModel.hasUnigramsFor(key: reading)
-  }
-
-  func insertReadingToBuilderAtCursor(reading: String) {
-    _builder.insertReadingAtCursor(reading: reading)
-  }
-
-  func setBuilderCursorIndex(value: Int) {
-    _builder.setCursorIndex(newIndex: value)
-  }
-
-  func getBuilderCursorIndex() -> Int {
-    _builder.cursorIndex()
-  }
-
-  func getBuilderLength() -> Int {
-    _builder.length()
-  }
-
-  func deleteBuilderReadingInFrontOfCursor() {
-    _builder.deleteReadingAtTheRearOfCursor()
-  }
-
-  func deleteBuilderReadingToTheFrontOfCursor() {
-    _builder.deleteReadingToTheFrontOfCursor()
-  }
-
-  func getKeyLengthAtIndexZero() -> Int {
-    _walkedNodes[0].node?.currentKeyValue().value.count ?? 0
   }
 
   // MARK: - Extracted methods and functions (Tekkon).
@@ -359,5 +287,60 @@ class KeyHandler {
         mgrPrefs.mandarinParser = MandarinParser.ofStandard.rawValue
     }
     _composer.clear()
+  }
+
+  // MARK: - Extracted methods and functions (Megrez).
+
+  var isBuilderEmpty: Bool { _builder.grid.width == 0 }
+
+  var rawNodes: [Megrez.NodeAnchor] {
+    /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
+    /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的，但目前 Megrez 暫時缺乏對該特性的支援。
+    /// 所以暫時只能將威注音的游標後置風格描述成「跟 Windows 版雅虎奇摩注音一致」。
+    mgrPrefs.setRearCursorMode
+      ? _builder.grid.nodesCrossingOrEndingAt(location: actualCandidateCursorIndex)
+      : _builder.grid.nodesEndingAt(location: actualCandidateCursorIndex)
+  }
+
+  func syncBaseLMPrefs() {
+    _languageModel.isPhraseReplacementEnabled = mgrPrefs.phraseReplacementEnabled
+    _languageModel.isCNSEnabled = mgrPrefs.cns11643Enabled
+    _languageModel.isSymbolEnabled = mgrPrefs.symbolInputEnabled
+  }
+
+  func createNewBuilder() {
+    // Each Mandarin syllable is separated by a hyphen.
+    _builder = Megrez.BlockReadingBuilder(lm: _languageModel, separator: "-")
+  }
+
+  var currentReadings: [String] { _builder.readings }
+
+  func ifLangModelHasUnigrams(forKey reading: String) -> Bool {
+    _languageModel.hasUnigramsFor(key: reading)
+  }
+
+  func insertReadingToBuilderAtCursor(reading: String) {
+    _builder.insertReadingAtCursor(reading: reading)
+  }
+
+  var builderCursorIndex: Int {
+    get { _builder.cursorIndex }
+    set { _builder.cursorIndex = newValue }
+  }
+
+  var builderLength: Int {
+    _builder.length
+  }
+
+  func deleteBuilderReadingInFrontOfCursor() {
+    _builder.deleteReadingAtTheRearOfCursor()
+  }
+
+  func deleteBuilderReadingToTheFrontOfCursor() {
+    _builder.deleteReadingToTheFrontOfCursor()
+  }
+
+  var keyLengthAtIndexZero: Int {
+    _walkedNodes[0].node?.currentKeyValue.value.count ?? 0
   }
 }

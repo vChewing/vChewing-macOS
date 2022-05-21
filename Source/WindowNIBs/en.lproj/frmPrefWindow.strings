@@ -152,8 +152,8 @@
 /* Class = "NSBox"; title = "Output Settings"; ObjectID = "Uyz-xL-TVN"; */
 "Uyz-xL-TVN.title" = "Output Settings";
 
-/* Class = "NSButtonCell"; title = "Enable CNS11643 Support (2022-01-07)"; ObjectID = "W24-T4-cg0"; */
-"W24-T4-cg0.title" = "Enable CNS11643 Support (2022-01-07)";
+/* Class = "NSButtonCell"; title = "Enable CNS11643 Support (2022-04-27)"; ObjectID = "W24-T4-cg0"; */
+"W24-T4-cg0.title" = "Enable CNS11643 Support (2022-04-27)";
 
 /* Class = "NSBox"; title = "Keyboard Layout"; ObjectID = "Wvt-HE-LOv"; */
 "Wvt-HE-LOv.title" = "Keyboard Layout";

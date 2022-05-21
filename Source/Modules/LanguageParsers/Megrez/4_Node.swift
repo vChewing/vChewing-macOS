@@ -24,55 +24,69 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 extension Megrez {
-  public class Node {
-    let mutLM: LanguageModel
-    var mutKey: String
-    var mutScore: Double = 0
-    var mutUnigrams: [Unigram]
-    var mutCandidates: [KeyValuePair]
-    var mutValueUnigramIndexMap: [String: Int]
-    var mutPrecedingBigramMap: [KeyValuePair: [Megrez.Bigram]]
-
-    var mutCandidateFixed: Bool = false
-    var mutSelectedUnigramIndex: Int = 0
-
-    let kSelectedCandidateScore: Double = 99
-
-    public init(key: String, unigrams: [Megrez.Unigram], bigrams: [Megrez.Bigram] = []) {
-      mutLM = LanguageModel()
-
-      mutKey = key
-      mutScore = 0
-
-      mutUnigrams = unigrams
-      mutCandidates = []
-      mutValueUnigramIndexMap = [:]
-      mutPrecedingBigramMap = [:]
-
-      mutCandidateFixed = false
-      mutSelectedUnigramIndex = 0
-
-      if bigrams == [] {
-        node(key: key, unigrams: unigrams, bigrams: bigrams)
-      } else {
-        node(key: key, unigrams: unigrams)
-      }
+  /// 節點。
+  public class Node: CustomStringConvertible {
+    /// 當前節點對應的語言模型。
+    private let mutLM: LanguageModel = .init()
+    /// 鍵。
+    private var mutKey: String = ""
+    /// 當前節點的當前被選中的候選字詞「在該節點內的」目前的權重。
+    private var mutScore: Double = 0
+    /// 單元圖陣列。
+    private var mutUnigrams: [Unigram]
+    /// 雙元圖陣列。
+    private var mutBigrams: [Bigram]
+    /// 候選字詞陣列，以鍵值陣列的形式存在。
+    private var mutCandidates: [KeyValuePair] = []
+    /// 專門「用單元圖資料值來調查索引值」的辭典。
+    private var mutValueUnigramIndexMap: [String: Int] = [:]
+    /// 專門「用給定鍵值來取對應的雙元圖陣列」的辭典。
+    private var mutPrecedingBigramMap: [KeyValuePair: [Megrez.Bigram]] = [:]
+    /// 狀態標記變數，用來記載當前節點是否處於候選字詞鎖定狀態。
+    private var mutCandidateFixed: Bool = false
+    /// 用來登記「當前選中的單元圖」的索引值的變數。
+    private var mutSelectedUnigramIndex: Int = 0
+    /// 用來登記要施加給「『被標記為選中狀態』的候選字詞」的複寫權重的數值。
+    private let kSelectedCandidateScore: Double = 99
+    /// 將當前節點列印成一個字串。
+    public var description: String {
+      "(node,key:\(mutKey),fixed:\(mutCandidateFixed ? "true" : "false"),selected:\(mutSelectedUnigramIndex),\(mutUnigrams))"
     }
 
-    public func node(key: String, unigrams: [Megrez.Unigram], bigrams: [Megrez.Bigram] = []) {
-      var unigrams = unigrams
+    /// 公開：候選字詞陣列（唯讀），以鍵值陣列的形式存在。
+    var candidates: [KeyValuePair] { mutCandidates }
+    /// 公開：用來登記「當前選中的單元圖」的索引值的變數（唯讀）。
+    var isCandidateFixed: Bool { mutCandidateFixed }
+
+    /// 公開：鍵（唯讀）。
+    var key: String { mutKey }
+    /// 公開：當前節點的當前被選中的候選字詞「在該節點內的」目前的權重（唯讀）。
+    var score: Double { mutScore }
+    /// 公開：當前被選中的候選字詞的鍵值配對。
+    var currentKeyValue: KeyValuePair {
+      mutSelectedUnigramIndex >= mutUnigrams.count ? KeyValuePair() : mutCandidates[mutSelectedUnigramIndex]
+    }
+
+    /// 公開：給出當前單元圖陣列內最高的權重數值。
+    var highestUnigramScore: Double { mutUnigrams.isEmpty ? 0.0 : mutUnigrams[0].score }
+
+    /// 初期化一個節點。
+    /// - Parameters:
+    ///   - key: 索引鍵。
+    ///   - unigrams: 單元圖陣列。
+    ///   - bigrams: 雙元圖陣列（非必填）。
+    public init(key: String, unigrams: [Megrez.Unigram], bigrams: [Megrez.Bigram] = []) {
       mutKey = key
-      unigrams.sort {
+      mutUnigrams = unigrams
+      mutBigrams = bigrams
+
+      mutUnigrams.sort {
         $0.score > $1.score
       }
 
-      if !mutUnigrams.isEmpty {
-        mutScore = mutUnigrams[0].score
-      }
-
-      for (i, theGram) in unigrams.enumerated() {
-        mutValueUnigramIndexMap[theGram.keyValue.value] = i
-        mutCandidates.append(theGram.keyValue)
+      for (i, gram) in mutUnigrams.enumerated() {
+        mutValueUnigramIndexMap[gram.keyValue.value] = i
+        mutCandidates.append(gram.keyValue)
       }
 
       for gram in bigrams {
@@ -80,11 +94,14 @@ extension Megrez {
       }
     }
 
+    /// 對擁有「給定的前述鍵值陣列」的節點提權。
+    /// - Parameters:
+    ///   - precedingKeyValues: 前述鍵值陣列。
     public func primeNodeWith(precedingKeyValues: [KeyValuePair]) {
       var newIndex = mutSelectedUnigramIndex
       var max = mutScore
 
-      if !isCandidateFixed() {
+      if !isCandidateFixed {
         for neta in precedingKeyValues {
           let bigrams = mutPrecedingBigramMap[neta] ?? []
           for bigram in bigrams {
@@ -107,16 +124,17 @@ extension Megrez {
       }
     }
 
-    public func isCandidateFixed() -> Bool { mutCandidateFixed }
-
-    public func candidates() -> [KeyValuePair] { mutCandidates }
-
+    /// 選中位於給定索引位置的候選字詞。
+    /// - Parameters:
+    ///   - index: 索引位置。
+    ///   - fix: 是否將當前解點標記為「候選詞已鎖定」的狀態。
     public func selectCandidateAt(index: Int = 0, fix: Bool = false) {
       mutSelectedUnigramIndex = index >= mutUnigrams.count ? 0 : index
       mutCandidateFixed = fix
       mutScore = kSelectedCandidateScore
     }
 
+    /// 重設該節點的候選字詞狀態。
     public func resetCandidate() {
       mutSelectedUnigramIndex = 0
       mutCandidateFixed = false
@@ -125,16 +143,19 @@ extension Megrez {
       }
     }
 
+    /// 選中位於給定索引位置的候選字詞、且施加給定的權重。
+    /// - Parameters:
+    ///   - index: 索引位置。
+    ///   - score: 給定權重條件。
     public func selectFloatingCandidateAt(index: Int, score: Double) {
       mutSelectedUnigramIndex = index >= mutUnigrams.count ? 0 : index
       mutCandidateFixed = false
       mutScore = score
     }
 
-    public func key() -> String { mutKey }
-
-    public func score() -> Double { mutScore }
-
+    /// 藉由給定的候選字詞字串，找出在庫的單元圖權重數值。沒有的話就找零。
+    /// - Parameters:
+    ///   - candidate: 給定的候選字詞字串。
     public func scoreFor(candidate: String) -> Double {
       for unigram in mutUnigrams {
         if unigram.keyValue.value == candidate {
@@ -142,14 +163,6 @@ extension Megrez {
         }
       }
       return 0.0
-    }
-
-    public func currentKeyValue() -> KeyValuePair {
-      mutSelectedUnigramIndex >= mutUnigrams.count ? KeyValuePair() : mutCandidates[mutSelectedUnigramIndex]
-    }
-
-    public func highestUnigramScore() -> Double {
-      mutUnigrams.isEmpty ? 0.0 : mutUnigrams[0].score
     }
 
     public static func == (lhs: Node, rhs: Node) -> Bool {

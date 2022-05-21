@@ -302,7 +302,7 @@ extension ctlInputMethod {
   }
 
   @objc func openUserDataFolder(_: Any?) {
-    if !mgrLangModel.checkIfUserDataFolderExists() {
+    if !mgrLangModel.userDataFolderExists {
       return
     }
     NSWorkspace.shared.openFile(

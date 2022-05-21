@@ -117,7 +117,7 @@ enum CharCode: UInt /* 16 */ {
   // ... but only focuses on which physical key is pressed.
 }
 
-class InputHandler: NSObject {
+struct InputSignal: CustomStringConvertible {
   private(set) var useVerticalMode: Bool
   private(set) var inputText: String?
   private(set) var inputTextIgnoringModifiers: String?
@@ -125,15 +125,15 @@ class InputHandler: NSObject {
   private(set) var keyCode: UInt16
   private var isFlagChanged: Bool
   private var flags: NSEvent.ModifierFlags
-  private var cursorForwardKey: KeyCode
-  private var cursorBackwardKey: KeyCode
-  private var extraChooseCandidateKey: KeyCode
-  private var extraChooseCandidateKeyReverse: KeyCode
-  private var absorbedArrowKey: KeyCode
-  private var verticalModeOnlyChooseCandidateKey: KeyCode
+  private var cursorForwardKey: KeyCode = .kNone
+  private var cursorBackwardKey: KeyCode = .kNone
+  private var extraChooseCandidateKey: KeyCode = .kNone
+  private var extraChooseCandidateKeyReverse: KeyCode = .kNone
+  private var absorbedArrowKey: KeyCode = .kNone
+  private var verticalModeOnlyChooseCandidateKey: KeyCode = .kNone
   private(set) var emacsKey: vChewingEmacsKey
 
-  init(
+  public init(
     inputText: String?, keyCode: UInt16, charCode: UInt16, flags: NSEvent.ModifierFlags,
     isVerticalMode: Bool, inputTextIgnoringModifiers: String? = nil
   ) {
@@ -150,17 +150,11 @@ class InputHandler: NSObject {
     emacsKey = EmacsKeyHelper.detect(
       charCode: AppleKeyboardConverter.cnvApple2ABC(charCode), flags: flags
     )
-    // Define Arrow Keys
-    cursorForwardKey = useVerticalMode ? .kDownArrow : .kRightArrow
-    cursorBackwardKey = useVerticalMode ? .kUpArrow : .kLeftArrow
-    extraChooseCandidateKey = useVerticalMode ? .kLeftArrow : .kDownArrow
-    extraChooseCandidateKeyReverse = useVerticalMode ? .kRightArrow : .kUpArrow
-    absorbedArrowKey = useVerticalMode ? .kRightArrow : .kUpArrow
-    verticalModeOnlyChooseCandidateKey = useVerticalMode ? absorbedArrowKey : .kNone
-    super.init()
+    // Define Arrow Keys in the same way above.
+    defineArrowKeys()
   }
 
-  init(event: NSEvent, isVerticalMode: Bool) {
+  public init(event: NSEvent, isVerticalMode: Bool) {
     inputText = AppleKeyboardConverter.cnvStringApple2ABC(event.characters ?? "")
     inputTextIgnoringModifiers = AppleKeyboardConverter.cnvStringApple2ABC(
       event.charactersIgnoringModifiers ?? "")
@@ -181,22 +175,20 @@ class InputHandler: NSObject {
       charCode: AppleKeyboardConverter.cnvApple2ABC(charCode), flags: flags
     )
     // Define Arrow Keys in the same way above.
+    defineArrowKeys()
+  }
+
+  mutating func defineArrowKeys() {
     cursorForwardKey = useVerticalMode ? .kDownArrow : .kRightArrow
     cursorBackwardKey = useVerticalMode ? .kUpArrow : .kLeftArrow
     extraChooseCandidateKey = useVerticalMode ? .kLeftArrow : .kDownArrow
     extraChooseCandidateKeyReverse = useVerticalMode ? .kRightArrow : .kUpArrow
     absorbedArrowKey = useVerticalMode ? .kRightArrow : .kUpArrow
     verticalModeOnlyChooseCandidateKey = useVerticalMode ? absorbedArrowKey : .kNone
-    super.init()
   }
 
-  override var description: String {
-    charCode = AppleKeyboardConverter.cnvApple2ABC(charCode)
-    inputText = AppleKeyboardConverter.cnvStringApple2ABC(inputText ?? "")
-    inputTextIgnoringModifiers = AppleKeyboardConverter.cnvStringApple2ABC(
-      inputTextIgnoringModifiers ?? "")
-    return
-      "<\(super.description) inputText:\(String(describing: inputText)), inputTextIgnoringModifiers:\(String(describing: inputTextIgnoringModifiers)) charCode:\(charCode), keyCode:\(keyCode), flags:\(flags), cursorForwardKey:\(cursorForwardKey), cursorBackwardKey:\(cursorBackwardKey), extraChooseCandidateKey:\(extraChooseCandidateKey), extraChooseCandidateKeyReverse:\(extraChooseCandidateKeyReverse), absorbedArrowKey:\(absorbedArrowKey),  verticalModeOnlyChooseCandidateKey:\(verticalModeOnlyChooseCandidateKey), emacsKey:\(emacsKey), useVerticalMode:\(useVerticalMode)>"
+  var description: String {
+    "<inputText:\(String(describing: inputText)), inputTextIgnoringModifiers:\(String(describing: inputTextIgnoringModifiers)) charCode:\(charCode), keyCode:\(keyCode), flags:\(flags), cursorForwardKey:\(cursorForwardKey), cursorBackwardKey:\(cursorBackwardKey), extraChooseCandidateKey:\(extraChooseCandidateKey), extraChooseCandidateKeyReverse:\(extraChooseCandidateKeyReverse), absorbedArrowKey:\(absorbedArrowKey),  verticalModeOnlyChooseCandidateKey:\(verticalModeOnlyChooseCandidateKey), emacsKey:\(emacsKey), useVerticalMode:\(useVerticalMode)>"
   }
 
   // 除了 ANSI charCode 以外，其餘一律過濾掉，免得純 Swift 版 KeyHandler 被餵屎。
@@ -365,7 +357,7 @@ enum vChewingEmacsKey: UInt16 {
   case nextPage = 22  // V
 }
 
-class EmacsKeyHelper: NSObject {
+enum EmacsKeyHelper {
   static func detect(charCode: UniChar, flags: NSEvent.ModifierFlags) -> vChewingEmacsKey {
     let charCode = AppleKeyboardConverter.cnvApple2ABC(charCode)
     if flags.contains(.control) {
