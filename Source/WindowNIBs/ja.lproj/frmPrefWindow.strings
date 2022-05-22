@@ -247,3 +247,6 @@
 
 /* Class = "NSMenuItem"; title = "Universal Pinyin with Numeral Intonation"; ObjectID = "Parser14"; */
 "Parser14.title" = "汎用弁音 (ローマ字+数字音調)";
+
+/* Class = "NSButtonCell"; title = "Balance the score according to candidate length"; ObjectID = "Wh1-iz-pwM"; */
+"Wh1-iz-pwM.title" = "候補文字の長さによる重みの調整";

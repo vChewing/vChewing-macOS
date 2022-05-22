@@ -623,9 +623,9 @@
                                                         </connections>
                                                     </textField>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p7V-IN-OTr">
-                                                        <rect key="frame" x="19" y="294.5" width="406" height="17"/>
+                                                        <rect key="frame" x="19" y="295.5" width="406" height="17"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="height" constant="16" id="4e2-n5-KWF"/>
+                                                            <constraint firstAttribute="height" constant="16" id="KGx-QR-wgI"/>
                                                         </constraints>
                                                         <buttonCell key="cell" type="check" title="Automatically reload user data files if changes detected" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="f8i-69-zxm">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -636,9 +636,9 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="O4B-Z2-XYi">
-                                                        <rect key="frame" x="19" y="271.5" width="406" height="17"/>
+                                                        <rect key="frame" x="19" y="273.5" width="406" height="17"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="height" constant="16" id="45X-6Q-Dm8"/>
+                                                            <constraint firstAttribute="height" constant="16" id="60g-xI-n1n"/>
                                                         </constraints>
                                                         <buttonCell key="cell" type="check" title="Enable symbol input support (incl. certain emoji symbols)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="hSv-LJ-Cq3" userLabel="chkSymbolEnabled">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -678,9 +678,9 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Yaj-QY-7xV" userLabel="chkCNSSupport">
-                                                        <rect key="frame" x="19" y="249.5" width="406" height="17"/>
+                                                        <rect key="frame" x="19" y="251.5" width="406" height="17"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="height" constant="16" id="KdE-Vd-Y50"/>
+                                                            <constraint firstAttribute="height" constant="16" id="XP3-SR-9Ha"/>
                                                         </constraints>
                                                         <buttonCell key="cell" type="check" title="Enable CNS11643 Support (2022-04-27)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="W24-T4-cg0">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -691,28 +691,45 @@
                                                             <binding destination="32" name="value" keyPath="values.CNS11643Enabled" id="Pbx-Gt-upm"/>
                                                         </connections>
                                                     </button>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="O2c-HS-d9s" userLabel="chkCNSSupport">
+                                                        <rect key="frame" x="19" y="229.5" width="406" height="17"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="16" id="g8o-4X-IR5"/>
+                                                        </constraints>
+                                                        <buttonCell key="cell" type="check" title="Balance the score according to candidate length" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="Wh1-iz-pwM">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="toggleCNSSupport:" target="-2" id="S0T-uD-fde"/>
+                                                            <binding destination="32" name="value" keyPath="values.UseScoreBalancing" id="mnq-pX-2PH"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                                 <constraints>
                                                     <constraint firstItem="s7t-Kk-EPu" firstAttribute="bottom" secondItem="MPN-np-SbT" secondAttribute="bottom" id="0Fo-ya-hQ9"/>
-                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="top" secondItem="O4B-Z2-XYi" secondAttribute="bottom" constant="6" symbolic="YES" id="2RJ-v9-tO3"/>
+                                                    <constraint firstItem="O4B-Z2-XYi" firstAttribute="trailing" secondItem="Yaj-QY-7xV" secondAttribute="trailing" id="2VU-kM-5xJ"/>
+                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="trailing" secondItem="O2c-HS-d9s" secondAttribute="trailing" id="4Ma-Ni-LJP"/>
                                                     <constraint firstAttribute="trailing" secondItem="FUV-qx-xkC" secondAttribute="trailing" constant="20" symbolic="YES" id="6QR-tj-5cH"/>
-                                                    <constraint firstItem="MPN-np-SbT" firstAttribute="leading" secondItem="p7V-IN-OTr" secondAttribute="leading" constant="346" id="7xl-xX-CEQ"/>
+                                                    <constraint firstItem="O4B-Z2-XYi" firstAttribute="top" secondItem="p7V-IN-OTr" secondAttribute="bottom" constant="6" id="6tf-H0-CKc"/>
                                                     <constraint firstItem="s7t-Kk-EPu" firstAttribute="leading" secondItem="MPN-np-SbT" secondAttribute="trailing" constant="-376" id="9at-E8-Bt1"/>
                                                     <constraint firstItem="FUV-qx-xkC" firstAttribute="top" secondItem="cy4-aV-hhk" secondAttribute="top" constant="15" id="BZE-dD-V2R"/>
                                                     <constraint firstItem="MPN-np-SbT" firstAttribute="top" secondItem="FUV-qx-xkC" secondAttribute="bottom" constant="14" id="Bp9-2u-f9E"/>
                                                     <constraint firstItem="FUV-qx-xkC" firstAttribute="leading" secondItem="cy4-aV-hhk" secondAttribute="leading" constant="20" symbolic="YES" id="Hy2-ZC-cvb"/>
                                                     <constraint firstItem="s7t-Kk-EPu" firstAttribute="firstBaseline" secondItem="MPN-np-SbT" secondAttribute="baseline" id="OYH-gA-WcA"/>
-                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="top" secondItem="s7t-Kk-EPu" secondAttribute="bottom" constant="16" id="PBC-ZC-ahn"/>
+                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="trailing" secondItem="O4B-Z2-XYi" secondAttribute="trailing" id="Phu-Qi-Xup"/>
+                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="top" secondItem="s7t-Kk-EPu" secondAttribute="bottom" constant="15" id="PyP-N9-MWb"/>
+                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="leading" secondItem="s7t-Kk-EPu" secondAttribute="leading" id="QMQ-hR-c5W"/>
                                                     <constraint firstItem="FUV-qx-xkC" firstAttribute="leading" secondItem="MPN-np-SbT" secondAttribute="leading" constant="-346" id="Zet-wH-kmC"/>
-                                                    <constraint firstItem="O4B-Z2-XYi" firstAttribute="top" secondItem="p7V-IN-OTr" secondAttribute="bottom" constant="7" id="ZsG-Rv-Xjo"/>
-                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="trailing" secondItem="O4B-Z2-XYi" secondAttribute="trailing" id="auY-l9-U7h"/>
+                                                    <constraint firstItem="O2c-HS-d9s" firstAttribute="top" secondItem="Yaj-QY-7xV" secondAttribute="bottom" constant="6" symbolic="YES" id="cBe-nI-2F7"/>
                                                     <constraint firstItem="jXe-xz-9Sd" firstAttribute="leading" secondItem="MPN-np-SbT" secondAttribute="trailing" constant="-1" id="cYQ-Rx-tuG"/>
-                                                    <constraint firstItem="s7t-Kk-EPu" firstAttribute="trailing" secondItem="p7V-IN-OTr" secondAttribute="trailing" constant="-60" id="eIn-kD-FGz"/>
-                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="leading" secondItem="O4B-Z2-XYi" secondAttribute="leading" id="kPh-vq-asr"/>
-                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="leading" secondItem="O4B-Z2-XYi" secondAttribute="leading" id="mmu-SS-jac"/>
-                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="trailing" secondItem="O4B-Z2-XYi" secondAttribute="trailing" id="r6q-3h-41a"/>
+                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="leading" secondItem="O4B-Z2-XYi" secondAttribute="leading" id="dm5-TK-PRw"/>
+                                                    <constraint firstItem="O4B-Z2-XYi" firstAttribute="leading" secondItem="Yaj-QY-7xV" secondAttribute="leading" id="qHY-fz-P9H"/>
+                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="leading" secondItem="O2c-HS-d9s" secondAttribute="leading" id="tap-dN-5Nu"/>
+                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="trailing" secondItem="jXe-xz-9Sd" secondAttribute="trailing" id="uuG-Bg-2Vi"/>
                                                     <constraint firstItem="s7t-Kk-EPu" firstAttribute="trailing" secondItem="FUV-qx-xkC" secondAttribute="trailing" constant="-60" id="vIO-x1-7Q2"/>
                                                     <constraint firstItem="jXe-xz-9Sd" firstAttribute="baseline" secondItem="MPN-np-SbT" secondAttribute="baseline" id="wys-ML-2Q2"/>
+                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="top" secondItem="O4B-Z2-XYi" secondAttribute="bottom" constant="6" symbolic="YES" id="zZg-M3-hSk"/>
                                                 </constraints>
                                             </view>
                                         </box>
@@ -789,6 +806,7 @@
                                                                     <menuItem title="Hsu" tag="2" id="8"/>
                                                                     <menuItem title="MiTAC" tag="5" id="7fV-x8-WHQ"/>
                                                                     <menuItem title="Fake Seigyou" tag="6" id="27F-8T-FkQ"/>
+                                                                    <menuItem isSeparatorItem="YES" id="DuR-GO-lab"/>
                                                                     <menuItem title="Hanyu Pinyin" tag="10" id="10"/>
                                                                     <menuItem title="Secondary Pinyin" tag="11" id="Parser11"/>
                                                                     <menuItem title="Yale Pinyin" tag="12" id="Parser12"/>
