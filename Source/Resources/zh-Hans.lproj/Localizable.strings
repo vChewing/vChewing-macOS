@@ -89,6 +89,7 @@
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "自动将繁体中文字转为日文 JIS 新字体";
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "自动将繁体中文字转为康熙正体字";
 "Automatically reload user data files if changes detected" = "自动检测并载入使用者语汇档案变更";
+"Balance the score according to candidate length" = "按候选字词的长度调整权重";
 "Basic Keyboard Layout:" = "基础键盘布局:";
 "Candidate Layout:" = "候选字窗布局:";
 "Candidate Size:" = "候选字窗字号:";

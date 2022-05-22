@@ -89,6 +89,7 @@
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters";
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "Auto-convert traditional Chinese glyphs to KangXi characters";
 "Automatically reload user data files if changes detected" = "Automatically reload user data files if changes detected";
+"Balance the score according to candidate length" = "Balance the score according to candidate length";
 "Basic Keyboard Layout:" = "Basic Keyboard Layout:";
 "Candidate Layout:" = "Candidate Layout:";
 "Candidate Size:" = "Candidate Size:";
