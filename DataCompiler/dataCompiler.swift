@@ -43,6 +43,20 @@ extension String {
   }
 }
 
+// MARK: - StringView Ranges Extension (by Isaac Xen)
+
+extension String {
+  fileprivate func ranges(splitBy separator: Element) -> [Range<String.Index>] {
+    var startIndex = startIndex
+    return split(separator: separator).reduce(into: []) { ranges, substring in
+      _ = range(of: substring, range: startIndex..<endIndex).map { range in
+        ranges.append(range)
+        startIndex = range.upperBound
+      }
+    }
+  }
+}
+
 // MARK: - 引入小數點位數控制函數
 
 // Ref: https://stackoverflow.com/a/32581409/4162914
@@ -53,7 +67,7 @@ extension Float {
   }
 }
 
-// MARK: - 引入幂乘函數
+// MARK: - 引入冪乘函數
 
 // Ref: https://stackoverflow.com/a/41581695/4162914
 precedencegroup ExponentiationPrecedence {
@@ -80,6 +94,24 @@ struct Entry {
   var valCount: Int = 0
 }
 
+// MARK: - 注音加密，減少 plist 體積
+
+func cnvPhonabetToASCII(_ incoming: String) -> String {
+  let dicPhonabet2ASCII = [
+    "ㄅ": "b", "ㄆ": "p", "ㄇ": "m", "ㄈ": "f", "ㄉ": "d", "ㄊ": "t", "ㄋ": "n", "ㄌ": "l", "ㄍ": "g", "ㄎ": "k", "ㄏ": "h",
+    "ㄐ": "j", "ㄑ": "q", "ㄒ": "x", "ㄓ": "Z", "ㄔ": "C", "ㄕ": "S", "ㄖ": "r", "ㄗ": "z", "ㄘ": "c", "ㄙ": "s", "ㄧ": "i",
+    "ㄨ": "u", "ㄩ": "v", "ㄚ": "a", "ㄛ": "o", "ㄜ": "e", "ㄝ": "E", "ㄞ": "B", "ㄟ": "P", "ㄠ": "M", "ㄡ": "F", "ㄢ": "D",
+    "ㄣ": "T", "ㄤ": "N", "ㄥ": "L", "ㄦ": "R", "ˊ": "2", "ˇ": "3", "ˋ": "4", "˙": "5",
+  ]
+  var strOutput = incoming
+  if !strOutput.contains("_") {
+    for entry in dicPhonabet2ASCII {
+      strOutput = strOutput.replacingOccurrences(of: entry.key, with: entry.value)
+    }
+  }
+  return strOutput
+}
+
 // MARK: - 登記全局根常數變數
 
 private let urlCurrentFolder = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
@@ -95,12 +127,22 @@ private let urlCHTforMOE: String = "./components/cht/phrases-moe-cht.txt"
 private let urlCHTforVCHEW: String = "./components/cht/phrases-vchewing-cht.txt"
 
 private let urlKanjiCore: String = "./components/common/char-kanji-core.txt"
-private let urlPunctuation: String = "./components/common/data-punctuations.txt"
 private let urlMiscBPMF: String = "./components/common/char-misc-bpmf.txt"
 private let urlMiscNonKanji: String = "./components/common/char-misc-nonkanji.txt"
 
+private let urlPunctuation: String = "./components/common/data-punctuations.txt"
+private let urlSymbols: String = "./components/common/data-symbols.txt"
+private let urlZhuyinwen: String = "./components/common/data-zhuyinwen.txt"
+private let urlCNS: String = "./components/common/char-kanji-cns.txt"
+
+private let urlPlistSymbols: String = "./data-symbols.plist"
+private let urlPlistZhuyinwen: String = "./data-zhuyinwen.plist"
+private let urlPlistCNS: String = "./data-cns.plist"
+
 private let urlOutputCHS: String = "./data-chs.txt"
+private let urlPlistCHS: String = "./data-chs.plist"
 private let urlOutputCHT: String = "./data-cht.txt"
+private let urlPlistCHT: String = "./data-cht.plist"
 
 // MARK: - 載入詞組檔案且輸出陣列
 
@@ -382,41 +424,130 @@ func weightAndSort(_ arrStructUncalculated: [Entry], isCHS: Bool) -> [Entry] {
 
 func fileOutput(isCHS: Bool) {
   let i18n: String = isCHS ? "簡體中文" : "繁體中文"
+  var strPunctuation = ""
+  var rangeMap: [String: [Data]] = [:]
   let pathOutput = urlCurrentFolder.appendingPathComponent(
     isCHS ? urlOutputCHS : urlOutputCHT)
+  let plistURL = urlCurrentFolder.appendingPathComponent(
+    isCHS ? urlPlistCHS : urlPlistCHT)
   var strPrintLine = ""
   // 讀取標點內容
   do {
-    strPrintLine += try String(contentsOfFile: urlPunctuation, encoding: .utf8)
+    strPunctuation = try String(contentsOfFile: urlPunctuation, encoding: .utf8).replacingOccurrences(
+      of: "\t", with: " ")
+    strPrintLine += try String(contentsOfFile: urlPunctuation, encoding: .utf8).replacingOccurrences(
+      of: "\t", with: " ")
   } catch {
     NSLog(" - \(i18n): Exception happened when reading raw punctuation data.")
   }
-  NSLog(" - \(i18n): 成功插入標點符號與西文字母數據。")
+  NSLog(" - \(i18n): 成功插入標點符號與西文字母數據（txt）。")
   // 統合辭典內容
+  strPunctuation.ranges(splitBy: "\n").forEach {
+    let neta = strPunctuation[$0].split(separator: " ")
+    let line = String(strPunctuation[$0])
+    if neta.count >= 2 {
+      let theKey = String(neta[0])
+      let theValue = String(neta[1])
+      if !neta[0].isEmpty, !neta[1].isEmpty, line.first != "#" {
+        rangeMap[cnvPhonabetToASCII(theKey), default: []].append(theValue.data(using: .utf8)!)
+      }
+    }
+  }
   var arrStructUnified: [Entry] = []
   arrStructUnified += rawDictForKanjis(isCHS: isCHS)
   arrStructUnified += rawDictForNonKanjis(isCHS: isCHS)
   arrStructUnified += rawDictForPhrases(isCHS: isCHS)
   // 計算權重且排序
   arrStructUnified = weightAndSort(arrStructUnified, isCHS: isCHS)
-
   for entry in arrStructUnified {
+    let theKey = entry.valPhone
+    let theValue = (String(entry.valWeight) + " " + entry.valPhrase)
+    rangeMap[cnvPhonabetToASCII(theKey), default: []].append(theValue.data(using: .utf8)!)
     strPrintLine +=
       entry.valPhone + " " + entry.valPhrase + " " + String(entry.valWeight)
       + "\n"
   }
-  NSLog(" - \(i18n): 要寫入檔案的內容編譯完畢。")
+  NSLog(" - \(i18n): 要寫入檔案的 txt 內容編譯完畢。")
   do {
     try strPrintLine.write(to: pathOutput, atomically: false, encoding: .utf8)
+    let plistData = try PropertyListSerialization.data(fromPropertyList: rangeMap, format: .binary, options: 0)
+    try plistData.write(to: plistURL)
   } catch {
     NSLog(" - \(i18n): Error on writing strings to file: \(error)")
   }
   NSLog(" - \(i18n): 寫入完成。")
 }
 
-// MARK: - 主执行绪
+func commonFileOutput() {
+  let i18n = "語言中性"
+  var strSymbols = ""
+  var strZhuyinwen = ""
+  var strCNS = ""
+  var mapSymbols: [String: [Data]] = [:]
+  var mapZhuyinwen: [String: [Data]] = [:]
+  var mapCNS: [String: [Data]] = [:]
+  // 讀取標點內容
+  do {
+    strSymbols = try String(contentsOfFile: urlSymbols, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
+    strZhuyinwen = try String(contentsOfFile: urlZhuyinwen, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
+    strCNS = try String(contentsOfFile: urlCNS, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
+  } catch {
+    NSLog(" - \(i18n): Exception happened when reading raw punctuation data.")
+  }
+  NSLog(" - \(i18n): 成功取得標點符號與西文字母原始資料（plist）。")
+  // 統合辭典內容
+  strSymbols.ranges(splitBy: "\n").forEach {
+    let neta = strSymbols[$0].split(separator: " ")
+    let line = String(strSymbols[$0])
+    if neta.count >= 2 {
+      let theKey = String(neta[1])
+      let theValue = String(neta[0])
+      if !neta[0].isEmpty, !neta[1].isEmpty, line.first != "#" {
+        mapSymbols[cnvPhonabetToASCII(theKey), default: []].append(theValue.data(using: .utf8)!)
+      }
+    }
+  }
+  strZhuyinwen.ranges(splitBy: "\n").forEach {
+    let neta = strZhuyinwen[$0].split(separator: " ")
+    let line = String(strZhuyinwen[$0])
+    if neta.count >= 2 {
+      let theKey = String(neta[1])
+      let theValue = String(neta[0])
+      if !neta[0].isEmpty, !neta[1].isEmpty, line.first != "#" {
+        mapZhuyinwen[cnvPhonabetToASCII(theKey), default: []].append(theValue.data(using: .utf8)!)
+      }
+    }
+  }
+  strCNS.ranges(splitBy: "\n").forEach {
+    let neta = strCNS[$0].split(separator: " ")
+    let line = String(strCNS[$0])
+    if neta.count >= 2 {
+      let theKey = String(neta[1])
+      let theValue = String(neta[0])
+      if !neta[0].isEmpty, !neta[1].isEmpty, line.first != "#" {
+        mapCNS[cnvPhonabetToASCII(theKey), default: []].append(theValue.data(using: .utf8)!)
+      }
+    }
+  }
+  NSLog(" - \(i18n): 要寫入檔案的內容編譯完畢。")
+  do {
+    try PropertyListSerialization.data(fromPropertyList: mapSymbols, format: .binary, options: 0).write(
+      to: URL(fileURLWithPath: urlPlistSymbols))
+    try PropertyListSerialization.data(fromPropertyList: mapZhuyinwen, format: .binary, options: 0).write(
+      to: URL(fileURLWithPath: urlPlistZhuyinwen))
+    try PropertyListSerialization.data(fromPropertyList: mapCNS, format: .binary, options: 0).write(
+      to: URL(fileURLWithPath: urlPlistCNS))
+  } catch {
+    NSLog(" - \(i18n): Error on writing strings to file: \(error)")
+  }
+  NSLog(" - \(i18n): 寫入完成。")
+}
+
+// MARK: - 主執行緒
 
 func main() {
+  NSLog("// 準備編譯符號表情ㄅ文語料檔案。")
+  commonFileOutput()
   NSLog("// 準備編譯繁體中文核心語料檔案。")
   fileOutput(isCHS: false)
   NSLog("// 準備編譯簡體中文核心語料檔案。")
