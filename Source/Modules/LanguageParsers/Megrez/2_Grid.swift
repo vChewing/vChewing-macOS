@@ -204,33 +204,33 @@ extension Megrez {
 
 extension Megrez.Grid {
   public var dumpDOT: String {
-    var sst = "digraph {\ngraph [ rankdir=LR ];\nBOS;\n"
+    var strOutput = "digraph {\ngraph [ rankdir=LR ];\nBOS;\n"
     for (p, span) in mutSpans.enumerated() {
       for ni in 0...(span.maximumLength) {
         guard let np: Megrez.Node = span.node(length: ni) else {
           continue
         }
         if p == 0 {
-          sst += "BOS -> \(np.currentKeyValue.value);\n"
+          strOutput += "BOS -> \(np.currentKeyValue.value);\n"
         }
 
-        sst += "\(np.currentKeyValue.value);\n"
+        strOutput += "\(np.currentKeyValue.value);\n"
 
         if (p + ni) < mutSpans.count {
-          let dstSpan = mutSpans[p + ni]
-          for q in 0...(dstSpan.maximumLength) {
-            if let dn = dstSpan.node(length: q) {
-              sst += np.currentKeyValue.value + " -> " + dn.currentKeyValue.value + ";\n"
+          let destinatedSpan = mutSpans[p + ni]
+          for q in 0...(destinatedSpan.maximumLength) {
+            if let dn = destinatedSpan.node(length: q) {
+              strOutput += np.currentKeyValue.value + " -> " + dn.currentKeyValue.value + ";\n"
             }
           }
         }
 
         if (p + ni) == mutSpans.count {
-          sst += np.currentKeyValue.value + " -> EOS;\n"
+          strOutput += np.currentKeyValue.value + " -> EOS;\n"
         }
       }
     }
-    sst += "EOS;\n}\n"
-    return sst
+    strOutput += "EOS;\n}\n"
+    return strOutput
   }
 }
