@@ -31,10 +31,10 @@ import Foundation
 
 // 簡體中文模式與繁體中文模式共用全字庫擴展模組，故單獨處理。
 // 塞在 LMInstantiator 內的話，每個模式都會讀入一份全字庫，會多佔用 100MB 記憶體。
-private var lmCNS = vChewing.LMCoreEX(
+private var lmCNS = vChewing.LMCoreNS(
   reverse: true, consolidate: false, defaultScore: -11.0, forceDefaultScore: false
 )
-private var lmSymbols = vChewing.LMCoreEX(
+private var lmSymbols = vChewing.LMCoreNS(
   reverse: true, consolidate: false, defaultScore: -13.0, forceDefaultScore: false
 )
 
@@ -73,14 +73,16 @@ extension vChewing {
     /// LMCoreEX 的辭典陣列不承載 Unigram 本體、而是承載索引範圍，這樣可以節約記憶體。
     /// 一個 LMCoreEX 就可以滿足威注音幾乎所有語言模組副本的需求，當然也有這兩個例外：
     /// LMReplacements 與 LMAssociates 分別擔當語彙置換表資料與使用者聯想詞的資料承載工作。
+    /// 但是，LMCoreEX 對 2010-2013 年等舊 mac 機種而言，讀取速度異常緩慢。
+    /// 於是 LMCoreNS 就出場了，專門用來讀取原廠的 plist 格式的辭典。
 
     // 聲明原廠語言模組
     /// Reverse 的話，第一欄是注音，第二欄是對應的漢字，第三欄是可能的權重。
     /// 不 Reverse 的話，第一欄是漢字，第二欄是對應的注音，第三欄是可能的權重。
-    var lmCore = LMCoreEX(
+    var lmCore = LMCoreNS(
       reverse: false, consolidate: false, defaultScore: -9.9, forceDefaultScore: false
     )
-    var lmMisc = LMCoreEX(
+    var lmMisc = LMCoreNS(
       reverse: true, consolidate: false, defaultScore: -1.0, forceDefaultScore: false
     )
 
@@ -103,7 +105,7 @@ extension vChewing {
 
     // 以下這些函數命名暫時保持原樣，等弒神行動徹底結束了再調整。
 
-    public func isLanguageModelLoaded() -> Bool { lmCore.isLoaded() }
+    public var isLanguageModelLoaded: Bool { lmCore.isLoaded() }
     public func loadLanguageModel(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
         lmCore.open(path)
@@ -113,7 +115,7 @@ extension vChewing {
       }
     }
 
-    public func isCNSDataLoaded() -> Bool { lmCNS.isLoaded() }
+    public var isCNSDataLoaded: Bool { lmCNS.isLoaded() }
     public func loadCNSData(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
         lmCNS.open(path)
@@ -123,7 +125,7 @@ extension vChewing {
       }
     }
 
-    public func isMiscDataLoaded() -> Bool { lmMisc.isLoaded() }
+    public var isMiscDataLoaded: Bool { lmMisc.isLoaded() }
     public func loadMiscData(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
         lmMisc.open(path)
@@ -133,7 +135,7 @@ extension vChewing {
       }
     }
 
-    public func isSymbolDataLoaded() -> Bool { lmSymbols.isLoaded() }
+    public var isSymbolDataLoaded: Bool { lmSymbols.isLoaded() }
     public func loadSymbolData(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
         lmSymbols.open(path)
