@@ -9,10 +9,6 @@
 /* Begin PBXBuildFile section */
 		5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0AF8B427B2C8290096FE54 /* StringExtension.swift */; };
 		5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */; };
-		5B27AD6A27CB1F9B000ED75B /* data-symbols.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B27AD6827CB1F9B000ED75B /* data-symbols.txt */; };
-		5B27AD6B27CB1F9B000ED75B /* data-zhuyinwen.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B27AD6927CB1F9B000ED75B /* data-zhuyinwen.txt */; };
-		5B2DB16F27AF6891006D874E /* data-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16D27AF6891006D874E /* data-chs.txt */; };
-		5B2DB17027AF6891006D874E /* data-cht.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B2DB16E27AF6891006D874E /* data-cht.txt */; };
 		5B3133BF280B229700A4A505 /* KeyHandler_States.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3133BE280B229700A4A505 /* KeyHandler_States.swift */; };
 		5B38F59A281E2E49007D5F5D /* 6_Unigram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1D15FC0EB100ABF4B3 /* 6_Unigram.swift */; };
 		5B38F59B281E2E49007D5F5D /* 7_KeyValuePair.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1815FC0EB100ABF4B3 /* 7_KeyValuePair.swift */; };
@@ -26,6 +22,7 @@
 		5B38F5A4281E2E49007D5F5D /* 5_LanguageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1915FC0EB100ABF4B3 /* 5_LanguageModel.swift */; };
 		5B40730C281672610023DFFF /* lmAssociates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B407309281672610023DFFF /* lmAssociates.swift */; };
 		5B40730D281672610023DFFF /* lmReplacements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B40730A281672610023DFFF /* lmReplacements.swift */; };
+		5B54E743283A7D89001ECBDC /* lmCoreNS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B54E742283A7D89001ECBDC /* lmCoreNS.swift */; };
 		5B5E535227EF261400C6AA1E /* IME.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E535127EF261400C6AA1E /* IME.swift */; };
 		5B61B0CA280BEFD4002E3CFA /* KeyHandler_Misc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B61B0C9280BEFD4002E3CFA /* KeyHandler_Misc.swift */; };
 		5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */; };
@@ -84,7 +81,6 @@
 		5BC2652227E04B7E00700291 /* uninstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 5BC2652127E04B7B00700291 /* uninstall.sh */; };
 		5BD0113B28180D6100609769 /* LMInstantiator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0113A28180D6100609769 /* LMInstantiator.swift */; };
 		5BD0113D2818543900609769 /* KeyHandler_Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0113C2818543900609769 /* KeyHandler_Core.swift */; };
-		5BD05B8127B22F3C004C4F1D /* char-kanji-cns.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BD05B8027B22F3C004C4F1D /* char-kanji-cns.txt */; };
 		5BD05BCA27B2A43D004C4F1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
 		5BD05C5D27B2BBA9004C4F1D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5BD05C5B27B2BBA9004C4F1D /* Main.storyboard */; };
 		5BD05C6627B2BBEF004C4F1D /* Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD05C6127B2BBEF004C4F1D /* Document.swift */; };
@@ -96,6 +92,11 @@
 		5BDCBB2E27B4E67A00D0CC59 /* vChewingPhraseEditor.app in Resources */ = {isa = PBXBuildFile; fileRef = 5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */; };
 		5BE78BD927B3775B005EA1BE /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE78BD827B37750005EA1BE /* ctlAboutWindow.swift */; };
 		5BE78BDD27B3776D005EA1BE /* frmAboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BE78BDA27B37764005EA1BE /* frmAboutWindow.xib */; };
+		5BEDB721283B4C250078EB25 /* data-cns.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71D283B4AEA0078EB25 /* data-cns.plist */; };
+		5BEDB722283B4C250078EB25 /* data-zhuyinwen.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.plist */; };
+		5BEDB723283B4C250078EB25 /* data-cht.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB720283B4AEA0078EB25 /* data-cht.plist */; };
+		5BEDB724283B4C250078EB25 /* data-symbols.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71E283B4AEA0078EB25 /* data-symbols.plist */; };
+		5BEDB725283B4C250078EB25 /* data-chs.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71C283B4AEA0078EB25 /* data-chs.plist */; };
 		5BF8423127BAA942008E7E4C /* vChewingKanjiConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF8423027BAA942008E7E4C /* vChewingKanjiConverter.swift */; };
 		6A187E2616004C5900466B2E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A187E2816004C5900466B2E /* MainMenu.xib */; };
 		6A225A1F23679F2600F685C6 /* NotarizedArchives in Resources */ = {isa = PBXBuildFile; fileRef = 6A225A1E23679F2600F685C6 /* NotarizedArchives */; };
@@ -190,15 +191,12 @@
 		5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-JPN.txt"; sourceTree = "<group>"; };
 		5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHT.txt"; sourceTree = "<group>"; };
-		5B27AD6827CB1F9B000ED75B /* data-symbols.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-symbols.txt"; path = "Data/components/common/data-symbols.txt"; sourceTree = "<group>"; };
-		5B27AD6927CB1F9B000ED75B /* data-zhuyinwen.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-zhuyinwen.txt"; path = "Data/components/common/data-zhuyinwen.txt"; sourceTree = "<group>"; };
-		5B2DB16D27AF6891006D874E /* data-chs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-chs.txt"; path = "Data/data-chs.txt"; sourceTree = "<group>"; };
-		5B2DB16E27AF6891006D874E /* data-cht.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "data-cht.txt"; path = "Data/data-cht.txt"; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
 		5B3133BE280B229700A4A505 /* KeyHandler_States.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_States.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B407309281672610023DFFF /* lmAssociates.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = lmAssociates.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5B40730A281672610023DFFF /* lmReplacements.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = lmReplacements.swift; sourceTree = "<group>"; usesTabs = 0; };
+		5B54E742283A7D89001ECBDC /* lmCoreNS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lmCoreNS.swift; sourceTree = "<group>"; };
 		5B5E535127EF261400C6AA1E /* IME.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = IME.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B61B0C9280BEFD4002E3CFA /* KeyHandler_Misc.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_Misc.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = FSEventStreamHelper.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -261,7 +259,6 @@
 		5BC2652127E04B7B00700291 /* uninstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; lineEnding = 0; path = uninstall.sh; sourceTree = "<group>"; };
 		5BD0113A28180D6100609769 /* LMInstantiator.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = LMInstantiator.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5BD0113C2818543900609769 /* KeyHandler_Core.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = KeyHandler_Core.swift; sourceTree = "<group>"; usesTabs = 0; };
-		5BD05B8027B22F3C004C4F1D /* char-kanji-cns.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "char-kanji-cns.txt"; path = "Data/components/common/char-kanji-cns.txt"; sourceTree = "<group>"; };
 		5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingPhraseEditor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5BD05BC627B2A42A004C4F1D /* vChewingPhraseEditor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewingPhraseEditor.entitlements; sourceTree = "<group>"; };
 		5BD05C5C27B2BBA9004C4F1D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -284,6 +281,11 @@
 		5BE78BDB27B37764005EA1BE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmAboutWindow.xib; sourceTree = "<group>"; };
 		5BE78BDF27B37968005EA1BE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmAboutWindow.strings; sourceTree = "<group>"; };
 		5BE8A8C4281EE65300197741 /* CONTRIBUTING.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
+		5BEDB71C283B4AEA0078EB25 /* data-chs.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-chs.plist"; path = "Data/data-chs.plist"; sourceTree = "<group>"; };
+		5BEDB71D283B4AEA0078EB25 /* data-cns.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-cns.plist"; path = "Data/data-cns.plist"; sourceTree = "<group>"; };
+		5BEDB71E283B4AEA0078EB25 /* data-symbols.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-symbols.plist"; path = "Data/data-symbols.plist"; sourceTree = "<group>"; };
+		5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-zhuyinwen.plist"; path = "Data/data-zhuyinwen.plist"; sourceTree = "<group>"; };
+		5BEDB720283B4AEA0078EB25 /* data-cht.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-cht.plist"; path = "Data/data-cht.plist"; sourceTree = "<group>"; };
 		5BF8423027BAA942008E7E4C /* vChewingKanjiConverter.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = vChewingKanjiConverter.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BFDF48C27B51867009523B6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Main.strings"; sourceTree = "<group>"; };
 		6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -380,6 +382,7 @@
 			children = (
 				5B407309281672610023DFFF /* lmAssociates.swift */,
 				5B887F2F2826AEA400B6651E /* lmCoreEX.swift */,
+				5B54E742283A7D89001ECBDC /* lmCoreNS.swift */,
 				5B40730A281672610023DFFF /* lmReplacements.swift */,
 				5BA0DF2E2817857D009E73BB /* lmUserOverride.swift */,
 			);
@@ -548,11 +551,11 @@
 		5B62A35027AE7F6600A19448 /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				5BD05B8027B22F3C004C4F1D /* char-kanji-cns.txt */,
-				5B2DB16D27AF6891006D874E /* data-chs.txt */,
-				5B2DB16E27AF6891006D874E /* data-cht.txt */,
-				5B27AD6827CB1F9B000ED75B /* data-symbols.txt */,
-				5B27AD6927CB1F9B000ED75B /* data-zhuyinwen.txt */,
+				5BEDB71C283B4AEA0078EB25 /* data-chs.plist */,
+				5BEDB720283B4AEA0078EB25 /* data-cht.plist */,
+				5BEDB71D283B4AEA0078EB25 /* data-cns.plist */,
+				5BEDB71E283B4AEA0078EB25 /* data-symbols.plist */,
+				5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.plist */,
 				5B2DB17127AF8771006D874E /* Makefile */,
 			);
 			name = Data;
@@ -956,23 +959,23 @@
 				D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */,
 				5BDCBB2E27B4E67A00D0CC59 /* vChewingPhraseEditor.app in Resources */,
 				5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */,
-				5B27AD6A27CB1F9B000ED75B /* data-symbols.txt in Resources */,
 				6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */,
 				D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */,
 				5BBBB76B27AED5DB0023B93A /* frmNonModalAlertWindow.xib in Resources */,
+				5BEDB723283B4C250078EB25 /* data-cht.plist in Resources */,
+				5BEDB721283B4C250078EB25 /* data-cns.plist in Resources */,
+				5BEDB725283B4C250078EB25 /* data-chs.plist in Resources */,
 				5BBBB76D27AED5DB0023B93A /* frmAboutWindow.xib in Resources */,
 				5BBBB77527AED70B0023B93A /* MenuIcon-SCVIM.png in Resources */,
+				5BEDB722283B4C250078EB25 /* data-zhuyinwen.plist in Resources */,
+				5BEDB724283B4C250078EB25 /* data-symbols.plist in Resources */,
 				5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */,
-				5BD05B8127B22F3C004C4F1D /* char-kanji-cns.txt in Resources */,
-				5B27AD6B27CB1F9B000ED75B /* data-zhuyinwen.txt in Resources */,
-				5B2DB17027AF6891006D874E /* data-cht.txt in Resources */,
 				5BBBB77327AED70B0023B93A /* MenuIcon-TCVIM@2x.png in Resources */,
 				5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.png in Resources */,
 				6A187E2616004C5900466B2E /* MainMenu.xib in Resources */,
 				5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */,
 				5BC2652227E04B7E00700291 /* uninstall.sh in Resources */,
 				5BAD0CD527D701F6003D127F /* vChewingKeyLayout.bundle in Resources */,
-				5B2DB16F27AF6891006D874E /* data-chs.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1064,6 +1067,7 @@
 				5BA9FD4A27FEF3C9002DE248 /* PreferencesTabViewController.swift in Sources */,
 				5B62A34A27AE7CD900A19448 /* NotifierController.swift in Sources */,
 				5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */,
+				5B54E743283A7D89001ECBDC /* lmCoreNS.swift in Sources */,
 				5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */,
 				5B38F59B281E2E49007D5F5D /* 7_KeyValuePair.swift in Sources */,
 				5B62A33627AE795800A19448 /* mgrPrefs.swift in Sources */,
@@ -1292,7 +1296,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1960;
+				CURRENT_PROJECT_VERSION = 1961;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1315,7 +1319,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.6.0;
+				MARKETING_VERSION = 1.6.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
@@ -1348,7 +1352,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1960;
+				CURRENT_PROJECT_VERSION = 1961;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1367,7 +1371,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.6.0;
+				MARKETING_VERSION = 1.6.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
@@ -1482,7 +1486,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1960;
+				CURRENT_PROJECT_VERSION = 1961;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1517,7 +1521,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.6.0;
+				MARKETING_VERSION = 1.6.1;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1549,7 +1553,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1960;
+				CURRENT_PROJECT_VERSION = 1961;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1579,7 +1583,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.6.0;
+				MARKETING_VERSION = 1.6.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1662,7 +1666,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1960;
+				CURRENT_PROJECT_VERSION = 1961;
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1687,7 +1691,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.6.0;
+				MARKETING_VERSION = 1.6.1;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.atelierInmu.vChewing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1714,7 +1718,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1960;
+				CURRENT_PROJECT_VERSION = 1961;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1734,7 +1738,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.6.0;
+				MARKETING_VERSION = 1.6.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.atelierInmu.vChewing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

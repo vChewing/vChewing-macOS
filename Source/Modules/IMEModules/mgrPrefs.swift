@@ -28,6 +28,7 @@ import Cocoa
 
 struct UserDef {
   static let kIsDebugModeEnabled = "_DebugMode"
+  static let kUseScoreBalancing = "UseScoreBalancing"
   static let kMostRecentInputMode = "MostRecentInputMode"
   static let kUserDataFolderSpecified = "UserDataFolderSpecified"
   static let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
@@ -219,6 +220,7 @@ public enum mgrPrefs {
   static var allKeys: [String] {
     [
       UserDef.kIsDebugModeEnabled,
+      UserDef.kUseScoreBalancing,
       UserDef.kMostRecentInputMode,
       UserDef.kUserDataFolderSpecified,
       UserDef.kMandarinParser,
@@ -257,6 +259,7 @@ public enum mgrPrefs {
 
   public static func setMissingDefaults() {
     UserDefaults.standard.setDefault(mgrPrefs.isDebugModeEnabled, forKey: UserDef.kIsDebugModeEnabled)
+    UserDefaults.standard.setDefault(mgrPrefs.useScoreBalancing, forKey: UserDef.kUseScoreBalancing)
     UserDefaults.standard.setDefault(mgrPrefs.mostRecentInputMode, forKey: UserDef.kMostRecentInputMode)
     UserDefaults.standard.setDefault(mgrPrefs.checkUpdateAutomatically, forKey: UserDef.kCheckUpdateAutomatically)
     UserDefaults.standard.setDefault(
@@ -304,6 +307,9 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kIsDebugModeEnabled, defaultValue: false)
   static var isDebugModeEnabled: Bool
+
+  @UserDefault(key: UserDef.kUseScoreBalancing, defaultValue: false)
+  static var useScoreBalancing: Bool
 
   @UserDefault(key: UserDef.kMostRecentInputMode, defaultValue: "")
   static var mostRecentInputMode: String

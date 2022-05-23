@@ -51,25 +51,25 @@ enum mgrLangModel {
   }
 
   public static func loadDataModels() {
-    if !gLangModelCHT.isCNSDataLoaded() {
-      gLangModelCHT.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
+    if !gLangModelCHT.isCNSDataLoaded {
+      gLangModelCHT.loadCNSData(path: getBundleDataPath("data-cns"))
     }
-    if !gLangModelCHT.isMiscDataLoaded() {
+    if !gLangModelCHT.isMiscDataLoaded {
       gLangModelCHT.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
     }
-    if !gLangModelCHT.isSymbolDataLoaded() {
+    if !gLangModelCHT.isSymbolDataLoaded {
       gLangModelCHT.loadSymbolData(path: getBundleDataPath("data-symbols"))
     }
-    if !gLangModelCHS.isCNSDataLoaded() {
-      gLangModelCHS.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
+    if !gLangModelCHS.isCNSDataLoaded {
+      gLangModelCHS.loadCNSData(path: getBundleDataPath("data-cns"))
     }
-    if !gLangModelCHS.isMiscDataLoaded() {
+    if !gLangModelCHS.isMiscDataLoaded {
       gLangModelCHS.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
     }
-    if !gLangModelCHS.isSymbolDataLoaded() {
+    if !gLangModelCHS.isSymbolDataLoaded {
       gLangModelCHS.loadSymbolData(path: getBundleDataPath("data-symbols"))
     }
-    if !gLangModelCHT.isLanguageModelLoaded() {
+    if !gLangModelCHT.isLanguageModelLoaded {
       NotifierController.notify(
         message: String(
           format: "%@", NSLocalizedString("Loading CHT Core Dict...", comment: "")
@@ -82,7 +82,7 @@ enum mgrLangModel {
         )
       )
     }
-    if !gLangModelCHS.isLanguageModelLoaded() {
+    if !gLangModelCHS.isLanguageModelLoaded {
       NotifierController.notify(
         message: String(
           format: "%@", NSLocalizedString("Loading CHS Core Dict...", comment: "")
@@ -99,16 +99,16 @@ enum mgrLangModel {
 
   public static func loadDataModel(_ mode: InputMode) {
     if mode == InputMode.imeModeCHS {
-      if !gLangModelCHS.isMiscDataLoaded() {
+      if !gLangModelCHS.isMiscDataLoaded {
         gLangModelCHS.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
       }
-      if !gLangModelCHS.isSymbolDataLoaded() {
+      if !gLangModelCHS.isSymbolDataLoaded {
         gLangModelCHS.loadSymbolData(path: getBundleDataPath("data-symbols"))
       }
-      if !gLangModelCHS.isCNSDataLoaded() {
-        gLangModelCHS.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
+      if !gLangModelCHS.isCNSDataLoaded {
+        gLangModelCHS.loadCNSData(path: getBundleDataPath("data-cns"))
       }
-      if !gLangModelCHS.isLanguageModelLoaded() {
+      if !gLangModelCHS.isLanguageModelLoaded {
         NotifierController.notify(
           message: String(
             format: "%@", NSLocalizedString("Loading CHS Core Dict...", comment: "")
@@ -122,16 +122,16 @@ enum mgrLangModel {
         )
       }
     } else if mode == InputMode.imeModeCHT {
-      if !gLangModelCHT.isMiscDataLoaded() {
+      if !gLangModelCHT.isMiscDataLoaded {
         gLangModelCHT.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
       }
-      if !gLangModelCHT.isSymbolDataLoaded() {
+      if !gLangModelCHT.isSymbolDataLoaded {
         gLangModelCHT.loadSymbolData(path: getBundleDataPath("data-symbols"))
       }
-      if !gLangModelCHT.isCNSDataLoaded() {
-        gLangModelCHT.loadCNSData(path: getBundleDataPath("char-kanji-cns"))
+      if !gLangModelCHT.isCNSDataLoaded {
+        gLangModelCHT.loadCNSData(path: getBundleDataPath("data-cns"))
       }
-      if !gLangModelCHT.isLanguageModelLoaded() {
+      if !gLangModelCHT.isLanguageModelLoaded {
         NotifierController.notify(
           message: String(
             format: "%@", NSLocalizedString("Loading CHT Core Dict...", comment: "")
@@ -212,7 +212,7 @@ enum mgrLangModel {
   // MARK: - 獲取當前輸入法封包內的原廠核心語彙檔案所在路徑
 
   static func getBundleDataPath(_ filenameSansExt: String) -> String {
-    Bundle.main.path(forResource: filenameSansExt, ofType: "txt")!
+    Bundle.main.path(forResource: filenameSansExt, ofType: "plist")!
   }
 
   // MARK: - 使用者語彙檔案的具體檔案名稱路徑定義
