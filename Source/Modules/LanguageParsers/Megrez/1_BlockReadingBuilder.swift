@@ -179,7 +179,7 @@ extension Megrez {
       for (i, n) in nodes.enumerated() {
         // 只檢查前 X 個 NodeAnchor 是否有 node。
         // 這裡有 abs 是為了防止有白癡填負數。
-        if abs(nodesLimit) > 0, i == abs(nodesLimit) - 1 {
+        if abs(nodesLimit) > 0, i == abs(nodesLimit) {
           break
         }
 
