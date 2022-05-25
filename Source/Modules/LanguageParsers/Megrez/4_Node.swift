@@ -84,6 +84,10 @@ extension Megrez {
         $0.score > $1.score
       }
 
+      if mutUnigrams.count > 0 {
+        mutScore = mutUnigrams[0].score
+      }
+
       for (i, gram) in mutUnigrams.enumerated() {
         mutValueUnigramIndexMap[gram.keyValue.value] = i
         mutCandidates.append(gram.keyValue)
