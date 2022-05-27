@@ -44,21 +44,21 @@ extension ctlInputMethod {
 
     let useSCPCTypingModeItem = menu.addItem(
       withTitle: NSLocalizedString("Per-Char Select Mode", comment: ""),
-      action: #selector(toggleSCPCTypingMode(_:)), keyEquivalent: "P"
+      action: #selector(toggleSCPCTypingMode(_:)), keyEquivalent: mgrPrefs.usingHotKeySCPC ? "P" : ""
     )
     useSCPCTypingModeItem.keyEquivalentModifierMask = [.command, .control]
     useSCPCTypingModeItem.state = mgrPrefs.useSCPCTypingMode.state
 
     let userAssociatedPhrasesItem = menu.addItem(
       withTitle: NSLocalizedString("Per-Char Associated Phrases", comment: ""),
-      action: #selector(toggleAssociatedPhrasesEnabled(_:)), keyEquivalent: "O"
+      action: #selector(toggleAssociatedPhrasesEnabled(_:)), keyEquivalent: mgrPrefs.usingHotKeyAssociates ? "O" : ""
     )
     userAssociatedPhrasesItem.keyEquivalentModifierMask = [.command, .control]
     userAssociatedPhrasesItem.state = mgrPrefs.associatedPhrasesEnabled.state
 
     let useCNS11643SupportItem = menu.addItem(
       withTitle: NSLocalizedString("CNS11643 Mode", comment: ""),
-      action: #selector(toggleCNS11643Enabled(_:)), keyEquivalent: "L"
+      action: #selector(toggleCNS11643Enabled(_:)), keyEquivalent: mgrPrefs.usingHotKeyCNS ? "L" : ""
     )
     useCNS11643SupportItem.keyEquivalentModifierMask = [.command, .control]
     useCNS11643SupportItem.state = mgrPrefs.cns11643Enabled.state
@@ -66,14 +66,14 @@ extension ctlInputMethod {
     if IME.getInputMode() == InputMode.imeModeCHT {
       let chineseConversionItem = menu.addItem(
         withTitle: NSLocalizedString("Force KangXi Writing", comment: ""),
-        action: #selector(toggleChineseConverter(_:)), keyEquivalent: "K"
+        action: #selector(toggleChineseConverter(_:)), keyEquivalent: mgrPrefs.usingHotKeyKangXi ? "K" : ""
       )
       chineseConversionItem.keyEquivalentModifierMask = [.command, .control]
       chineseConversionItem.state = mgrPrefs.chineseConversionEnabled.state
 
       let shiftJISConversionItem = menu.addItem(
         withTitle: NSLocalizedString("JIS Shinjitai Output", comment: ""),
-        action: #selector(toggleShiftJISShinjitaiOutput(_:)), keyEquivalent: "J"
+        action: #selector(toggleShiftJISShinjitaiOutput(_:)), keyEquivalent: mgrPrefs.usingHotKeyJIS ? "J" : ""
       )
       shiftJISConversionItem.keyEquivalentModifierMask = [.command, .control]
       shiftJISConversionItem.state = mgrPrefs.shiftJISShinjitaiOutputEnabled.state
@@ -81,7 +81,7 @@ extension ctlInputMethod {
 
     let halfWidthPunctuationItem = menu.addItem(
       withTitle: NSLocalizedString("Half-Width Punctuation Mode", comment: ""),
-      action: #selector(toggleHalfWidthPunctuation(_:)), keyEquivalent: "H"
+      action: #selector(toggleHalfWidthPunctuation(_:)), keyEquivalent: mgrPrefs.usingHotKeyHalfWidthASCII ? "H" : ""
     )
     halfWidthPunctuationItem.keyEquivalentModifierMask = [.command, .control]
     halfWidthPunctuationItem.state = mgrPrefs.halfWidthPunctuationEnabled.state
