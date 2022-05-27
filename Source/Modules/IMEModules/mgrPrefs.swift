@@ -63,6 +63,13 @@ struct UserDef {
 
   static let kAssociatedPhrasesEnabled = "AssociatedPhrasesEnabled"
   static let kPhraseReplacementEnabled = "PhraseReplacementEnabled"
+
+  static let kUsingHotKeySCPC = "UsingHotKeySCPC"
+  static let kUsingHotKeyAssociates = "UsingHotKeyAssociates"
+  static let kUsingHotKeyCNS = "UsingHotKeyCNS"
+  static let kUsingHotKeyKangXi = "UsingHotKeyKangXi"
+  static let kUsingHotKeyJIS = "UsingHotKeyJIS"
+  static let kUsingHotKeyHalfWidthASCII = "UsingHotKeyHalfWidthASCII"
 }
 
 private let kDefaultCandidateListTextSize: CGFloat = 18
@@ -217,46 +224,6 @@ enum MandarinParser: Int {
 // MARK: -
 
 public enum mgrPrefs {
-  static var allKeys: [String] {
-    [
-      UserDef.kIsDebugModeEnabled,
-      UserDef.kUseScoreBalancing,
-      UserDef.kMostRecentInputMode,
-      UserDef.kUserDataFolderSpecified,
-      UserDef.kMandarinParser,
-      UserDef.kBasicKeyboardLayout,
-      UserDef.kShowPageButtonsInCandidateWindow,
-      UserDef.kCandidateListTextSize,
-      UserDef.kAppleLanguages,
-      UserDef.kShouldAutoReloadUserDataFiles,
-      UserDef.kSetRearCursorMode,
-      UserDef.kUseHorizontalCandidateList,
-      UserDef.kComposingBufferSize,
-      UserDef.kChooseCandidateUsingSpace,
-      UserDef.kCNS11643Enabled,
-      UserDef.kSymbolInputEnabled,
-      UserDef.kChineseConversionEnabled,
-      UserDef.kShiftJISShinjitaiOutputEnabled,
-      UserDef.kHalfWidthPunctuationEnabled,
-      UserDef.kSpecifyShiftTabKeyBehavior,
-      UserDef.kSpecifyShiftSpaceKeyBehavior,
-      UserDef.kEscToCleanInputBuffer,
-      UserDef.kCandidateTextFontName,
-      UserDef.kCandidateKeyLabelFontName,
-      UserDef.kCandidateKeys,
-      UserDef.kMoveCursorAfterSelectingCandidate,
-      UserDef.kPhraseReplacementEnabled,
-      UserDef.kUseSCPCTypingMode,
-      UserDef.kMaxCandidateLength,
-      UserDef.kShouldNotFartInLieuOfBeep,
-      UserDef.kShowHanyuPinyinInCompositionBuffer,
-      UserDef.kInlineDumpPinyinInLieuOfZhuyin,
-      UserDef.kAssociatedPhrasesEnabled,
-    ]
-  }
-
-  // MARK: - 既然 Preferences Module 的預設屬性不自動寫入 plist，那這邊就先寫入了。
-
   public static func setMissingDefaults() {
     UserDefaults.standard.setDefault(mgrPrefs.isDebugModeEnabled, forKey: UserDef.kIsDebugModeEnabled)
     UserDefaults.standard.setDefault(mgrPrefs.useScoreBalancing, forKey: UserDef.kUseScoreBalancing)
@@ -301,6 +268,13 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.inlineDumpPinyinInLieuOfZhuyin, forKey: UserDef.kInlineDumpPinyinInLieuOfZhuyin
     )
+
+    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeySCPC, forKey: UserDef.kUsingHotKeySCPC)
+    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyAssociates, forKey: UserDef.kUsingHotKeyAssociates)
+    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyCNS, forKey: UserDef.kUsingHotKeyCNS)
+    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyKangXi, forKey: UserDef.kUsingHotKeyKangXi)
+    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyJIS, forKey: UserDef.kUsingHotKeyJIS)
+    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyHalfWidthASCII, forKey: UserDef.kUsingHotKeyHalfWidthASCII)
 
     UserDefaults.standard.synchronize()
   }
@@ -554,4 +528,24 @@ public enum mgrPrefs {
     UserDefaults.standard.set(associatedPhrasesEnabled, forKey: UserDef.kAssociatedPhrasesEnabled)
     return associatedPhrasesEnabled
   }
+
+  // MARK: - Keyboard HotKey Enable / Disable
+
+  @UserDefault(key: UserDef.kUsingHotKeySCPC, defaultValue: true)
+  static var usingHotKeySCPC: Bool
+
+  @UserDefault(key: UserDef.kUsingHotKeyAssociates, defaultValue: true)
+  static var usingHotKeyAssociates: Bool
+
+  @UserDefault(key: UserDef.kUsingHotKeyCNS, defaultValue: true)
+  static var usingHotKeyCNS: Bool
+
+  @UserDefault(key: UserDef.kUsingHotKeyKangXi, defaultValue: true)
+  static var usingHotKeyKangXi: Bool
+
+  @UserDefault(key: UserDef.kUsingHotKeyJIS, defaultValue: true)
+  static var usingHotKeyJIS: Bool
+
+  @UserDefault(key: UserDef.kUsingHotKeyHalfWidthASCII, defaultValue: true)
+  static var usingHotKeyHalfWidthASCII: Bool
 }
