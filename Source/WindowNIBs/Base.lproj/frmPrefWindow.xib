@@ -878,7 +878,6 @@
                                                             <font key="font" metaFont="cellTitle"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="toggleTrad2KangXiAction:" target="-2" id="sDG-fU-cEw"/>
                                                             <binding destination="32" name="value" keyPath="values.UsingHotKeySCPC" id="Bda-2Q-cWF"/>
                                                         </connections>
                                                     </button>
@@ -889,7 +888,6 @@
                                                             <font key="font" metaFont="cellTitle"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="toggleTrad2JISShinjitaiAction:" target="-2" id="Fee-OE-ZQH"/>
                                                             <binding destination="32" name="value" keyPath="values.UsingHotKeyAssociates" id="knj-hU-irv"/>
                                                         </connections>
                                                     </button>
@@ -900,7 +898,6 @@
                                                             <font key="font" metaFont="cellTitle"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="clickedWhetherIMEShouldNotFartToggleAction:" target="-2" id="6HM-Pj-Adh"/>
                                                             <binding destination="32" name="value" keyPath="values.UsingHotKeyCNS" id="TDq-V9-Ojp"/>
                                                         </connections>
                                                     </button>
@@ -911,7 +908,6 @@
                                                             <font key="font" metaFont="cellTitle"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="toggleTrad2KangXiAction:" target="-2" id="lW3-bZ-pZY"/>
                                                             <binding destination="32" name="value" keyPath="values.UsingHotKeyKangXi" id="gy4-ge-8R1"/>
                                                         </connections>
                                                     </button>
@@ -922,7 +918,6 @@
                                                             <font key="font" metaFont="cellTitle"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="toggleTrad2KangXiAction:" target="-2" id="EG7-JC-MMH"/>
                                                             <binding destination="32" name="value" keyPath="values.UsingHotKeyJIS" id="RBH-UU-T8y"/>
                                                         </connections>
                                                     </button>
@@ -933,7 +928,6 @@
                                                             <font key="font" metaFont="cellTitle"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="toggleTrad2KangXiAction:" target="-2" id="Cr0-9E-XnE"/>
                                                             <binding destination="32" name="value" keyPath="values.UsingHotKeyHalfWidthASCII" id="Bwk-BZ-dX5"/>
                                                         </connections>
                                                     </button>
