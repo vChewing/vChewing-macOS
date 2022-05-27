@@ -250,3 +250,11 @@
 
 /* Class = "NSButtonCell"; title = "Balance the score according to candidate length"; ObjectID = "Wh1-iz-pwM"; */
 "Wh1-iz-pwM.title" = "Balance the score according to candidate length";
+
+"xibKeyboardShortcuts.title" = "Keyboard Shortcuts";
+"xibUsingHotKeySCPC.title" = "Per-Char Select Mode";
+"xibUsingHotKeyAssociates.title" = "Per-Char Associated Phrases";
+"xibUsingHotKeyCNS.title" = "CNS11643 Mode";
+"xibUsingHotKeyKangXi.title" = "Force KangXi Writing";
+"xibUsingHotKeyJIS.title" = "JIS Shinjitai Output";
+"xibUsingHotKeyHalfWidthASCII.title" = "Half-Width Punctuation Mode";

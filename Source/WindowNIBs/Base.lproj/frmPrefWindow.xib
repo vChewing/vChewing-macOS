@@ -748,13 +748,13 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box title="Keyboard Layout" translatesAutoresizingMaskIntoConstraints="NO" id="Wvt-HE-LOv">
-                                            <rect key="frame" x="6" y="10" width="451" height="409"/>
+                                            <rect key="frame" x="6" y="198" width="451" height="221"/>
                                             <view key="contentView" id="mE9-SY-ijS">
-                                                <rect key="frame" x="3" y="3" width="445" height="391"/>
+                                                <rect key="frame" x="3" y="3" width="445" height="203"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="onD-QP-KPf">
-                                                        <rect key="frame" x="18" y="361" width="345" height="15"/>
+                                                        <rect key="frame" x="18" y="173" width="345" height="15"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="242" id="7Fg-39-CRo"/>
                                                         </constraints>
@@ -765,7 +765,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="hab-1o-1kS">
-                                                        <rect key="frame" x="18" y="253" width="409" height="37"/>
+                                                        <rect key="frame" x="18" y="65" width="409" height="37"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="37" id="DuE-Bj-q43"/>
                                                         </constraints>
@@ -777,7 +777,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="11">
-                                                        <rect key="frame" x="18" y="334" width="86" height="17"/>
+                                                        <rect key="frame" x="18" y="146" width="86" height="17"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="17" id="3Lz-Gj-jiD"/>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="82" id="Vfj-gd-B0r"/>
@@ -789,7 +789,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3">
-                                                        <rect key="frame" x="107" y="328" width="277" height="26"/>
+                                                        <rect key="frame" x="107" y="140" width="277" height="26"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="270" id="s83-aB-x7j"/>
                                                         </constraints>
@@ -820,7 +820,7 @@
                                                         </popUpButtonCell>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="124">
-                                                        <rect key="frame" x="107" y="300" width="277" height="26"/>
+                                                        <rect key="frame" x="107" y="112" width="277" height="26"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="21" id="MHr-9M-m65"/>
                                                         </constraints>
@@ -834,7 +834,7 @@
                                                         </connections>
                                                     </popUpButton>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="125">
-                                                        <rect key="frame" x="18" y="308" width="86" height="15"/>
+                                                        <rect key="frame" x="18" y="120" width="86" height="15"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Basic Layout:" id="126">
                                                             <font key="font" metaFont="cellTitle"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -864,9 +864,105 @@
                                                 </constraints>
                                             </view>
                                         </box>
+                                        <box fixedFrame="YES" title="Keyboard Shortcuts" translatesAutoresizingMaskIntoConstraints="NO" id="xibKeyboardShortcuts">
+                                            <rect key="frame" x="6" y="10" width="451" height="184"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView" id="rZK-cU-6Y0">
+                                                <rect key="frame" x="3" y="3" width="445" height="166"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qAe-7E-PPO" userLabel="UsingHotKeySCPC">
+                                                        <rect key="frame" x="19" y="138.5" width="406" height="16"/>
+                                                        <buttonCell key="cell" type="check" title="Per-Char Select Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeySCPC">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="toggleTrad2KangXiAction:" target="-2" id="sDG-fU-cEw"/>
+                                                            <binding destination="32" name="value" keyPath="values.UsingHotKeySCPC" id="Bda-2Q-cWF"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LeH-0u-c97" userLabel="UsingHotKeyAssociates">
+                                                        <rect key="frame" x="19" y="117.5" width="406" height="16"/>
+                                                        <buttonCell key="cell" type="check" title="Per-Char Associated Phrases" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyAssociates">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="toggleTrad2JISShinjitaiAction:" target="-2" id="Fee-OE-ZQH"/>
+                                                            <binding destination="32" name="value" keyPath="values.UsingHotKeyAssociates" id="knj-hU-irv"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OwI-YY-9pZ" userLabel="UsingHotKeyCNS">
+                                                        <rect key="frame" x="19" y="96.5" width="406" height="16"/>
+                                                        <buttonCell key="cell" type="check" title="CNS11643 Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyCNS">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="clickedWhetherIMEShouldNotFartToggleAction:" target="-2" id="6HM-Pj-Adh"/>
+                                                            <binding destination="32" name="value" keyPath="values.UsingHotKeyCNS" id="TDq-V9-Ojp"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eNN-a4-bj8" userLabel="UsingHotKeyKangXi">
+                                                        <rect key="frame" x="19" y="75.5" width="406" height="16"/>
+                                                        <buttonCell key="cell" type="check" title="Force KangXi Writing" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyKangXi">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="toggleTrad2KangXiAction:" target="-2" id="lW3-bZ-pZY"/>
+                                                            <binding destination="32" name="value" keyPath="values.UsingHotKeyKangXi" id="gy4-ge-8R1"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="AMy-dJ-qCK" userLabel="UsingHotKeyJIS">
+                                                        <rect key="frame" x="19" y="54.5" width="406" height="16"/>
+                                                        <buttonCell key="cell" type="check" title="JIS Shinjitai Output" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyJIS">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="toggleTrad2KangXiAction:" target="-2" id="EG7-JC-MMH"/>
+                                                            <binding destination="32" name="value" keyPath="values.UsingHotKeyJIS" id="RBH-UU-T8y"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Dsq-el-pj8" userLabel="UsingHotKeyHalfWidthASCII">
+                                                        <rect key="frame" x="19" y="33.5" width="406" height="16"/>
+                                                        <buttonCell key="cell" type="check" title="Half-Width Punctuation Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyHalfWidthASCII">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="toggleTrad2KangXiAction:" target="-2" id="Cr0-9E-XnE"/>
+                                                            <binding destination="32" name="value" keyPath="values.UsingHotKeyHalfWidthASCII" id="Bwk-BZ-dX5"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                                <constraints>
+                                                    <constraint firstItem="Dsq-el-pj8" firstAttribute="top" secondItem="AMy-dJ-qCK" secondAttribute="bottom" constant="6" symbolic="YES" id="0J0-wy-BA0"/>
+                                                    <constraint firstItem="AMy-dJ-qCK" firstAttribute="top" secondItem="eNN-a4-bj8" secondAttribute="bottom" constant="6" symbolic="YES" id="0mV-hQ-FOz"/>
+                                                    <constraint firstItem="OwI-YY-9pZ" firstAttribute="trailing" secondItem="eNN-a4-bj8" secondAttribute="trailing" id="2b4-sC-KTr"/>
+                                                    <constraint firstItem="eNN-a4-bj8" firstAttribute="centerY" secondItem="rZK-cU-6Y0" secondAttribute="centerY" id="8Ux-vD-PZ9"/>
+                                                    <constraint firstItem="qAe-7E-PPO" firstAttribute="leading" secondItem="LeH-0u-c97" secondAttribute="leading" id="ApK-f6-5DU"/>
+                                                    <constraint firstItem="qAe-7E-PPO" firstAttribute="trailing" secondItem="LeH-0u-c97" secondAttribute="trailing" id="ERV-uG-xmS"/>
+                                                    <constraint firstItem="AMy-dJ-qCK" firstAttribute="leading" secondItem="Dsq-el-pj8" secondAttribute="leading" id="KVZ-bV-wd0"/>
+                                                    <constraint firstItem="qAe-7E-PPO" firstAttribute="leading" secondItem="rZK-cU-6Y0" secondAttribute="leading" constant="20" symbolic="YES" id="KdT-pB-fkI"/>
+                                                    <constraint firstItem="OwI-YY-9pZ" firstAttribute="top" secondItem="LeH-0u-c97" secondAttribute="bottom" constant="6" symbolic="YES" id="LVw-1O-jqY"/>
+                                                    <constraint firstItem="LeH-0u-c97" firstAttribute="top" secondItem="qAe-7E-PPO" secondAttribute="bottom" constant="6" symbolic="YES" id="Lny-6z-dUo"/>
+                                                    <constraint firstItem="LeH-0u-c97" firstAttribute="leading" secondItem="OwI-YY-9pZ" secondAttribute="leading" id="NqS-74-MvJ"/>
+                                                    <constraint firstItem="eNN-a4-bj8" firstAttribute="trailing" secondItem="AMy-dJ-qCK" secondAttribute="trailing" id="UOq-a5-ve5"/>
+                                                    <constraint firstItem="LeH-0u-c97" firstAttribute="trailing" secondItem="OwI-YY-9pZ" secondAttribute="trailing" id="VXD-Q0-Srz"/>
+                                                    <constraint firstItem="AMy-dJ-qCK" firstAttribute="trailing" secondItem="Dsq-el-pj8" secondAttribute="trailing" id="iLB-X2-YmS"/>
+                                                    <constraint firstItem="eNN-a4-bj8" firstAttribute="leading" secondItem="AMy-dJ-qCK" secondAttribute="leading" id="m1a-0D-ynq"/>
+                                                    <constraint firstItem="eNN-a4-bj8" firstAttribute="top" secondItem="OwI-YY-9pZ" secondAttribute="bottom" constant="6" symbolic="YES" id="m7Y-ZA-TO6"/>
+                                                    <constraint firstItem="OwI-YY-9pZ" firstAttribute="leading" secondItem="eNN-a4-bj8" secondAttribute="leading" id="oiD-6a-yTH"/>
+                                                    <constraint firstAttribute="trailing" secondItem="qAe-7E-PPO" secondAttribute="trailing" constant="20" symbolic="YES" id="vlT-hN-v8l"/>
+                                                </constraints>
+                                            </view>
+                                        </box>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstAttribute="bottom" secondItem="Wvt-HE-LOv" secondAttribute="bottom" constant="14" id="Qmp-GR-eW4"/>
+                                        <constraint firstAttribute="bottom" secondItem="Wvt-HE-LOv" secondAttribute="bottom" constant="202" id="Qmp-GR-eW4"/>
                                         <constraint firstItem="Wvt-HE-LOv" firstAttribute="leading" secondItem="FxL-ZG-Eue" secondAttribute="leading" constant="9" id="gBD-pe-hba"/>
                                         <constraint firstItem="Wvt-HE-LOv" firstAttribute="top" secondItem="FxL-ZG-Eue" secondAttribute="top" constant="5" id="mpD-ld-a8z"/>
                                         <constraint firstAttribute="trailing" secondItem="Wvt-HE-LOv" secondAttribute="trailing" constant="9" id="v0g-ad-cjW"/>

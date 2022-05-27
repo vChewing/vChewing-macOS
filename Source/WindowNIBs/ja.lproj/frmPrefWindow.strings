@@ -250,3 +250,11 @@
 
 /* Class = "NSButtonCell"; title = "Balance the score according to candidate length"; ObjectID = "Wh1-iz-pwM"; */
 "Wh1-iz-pwM.title" = "候補文字の長さによる重みの調整";
+
+"xibKeyboardShortcuts.title" = "ショートカット";
+"xibUsingHotKeySCPC.title" = "全候補入力モード";
+"xibUsingHotKeyAssociates.title" = "全候補入力で連想語彙";
+"xibUsingHotKeyCNS.title" = "全字庫モード";
+"xibUsingHotKeyKangXi.title" = "康熙文字変換モード";
+"xibUsingHotKeyJIS.title" = "JIS 新字体モード";
+"xibUsingHotKeyHalfWidthASCII.title" = "半角句読モード";
