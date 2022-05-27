@@ -130,6 +130,7 @@
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "単語の前で // macOS 内蔵注音入力のやり方";
 "Japanese" = "和語";
 "Keyboard" = "配列設定";
+"Keyboard Shortcuts:" = "ショートカット:";
 "Misc Settings:" = "他の設定:";
 "MiTAC" = "神通配列";
 "Non-QWERTY alphanumeral keyboard layouts are for Hanyu Pinyin parser only." = "QWERTY 以外の英数キーボードは漢語弁音以外の配列に不適用。";

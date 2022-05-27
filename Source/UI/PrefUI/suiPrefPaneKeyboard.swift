@@ -29,6 +29,15 @@ struct suiPrefPaneKeyboard: View {
   @State private var selMandarinParser = UserDefaults.standard.integer(forKey: UserDef.kMandarinParser)
   @State private var selBasicKeyboardLayout: String =
     UserDefaults.standard.string(forKey: UserDef.kBasicKeyboardLayout) ?? mgrPrefs.basicKeyboardLayout
+
+  @State private var selUsingHotKeySCPC = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeySCPC)
+  @State private var selUsingHotKeyAssociates = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyAssociates)
+  @State private var selUsingHotKeyCNS = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyCNS)
+  @State private var selUsingHotKeyKangXi = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyKangXi)
+  @State private var selUsingHotKeyJIS = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyJIS)
+  @State private var selUsingHotKeyHalfWidthASCII = UserDefaults.standard.bool(
+    forKey: UserDef.kUsingHotKeyHalfWidthASCII)
+
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -121,6 +130,50 @@ struct suiPrefPaneKeyboard: View {
         }
         Text(LocalizedStringKey("Choose the macOS-level basic keyboard layout."))
           .preferenceDescription()
+      }
+      Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Keyboard Shortcuts:")) }) {
+        Toggle(
+          LocalizedStringKey("Per-Char Select Mode"),
+          isOn: $selUsingHotKeySCPC
+        ).onChange(of: selUsingHotKeySCPC) { value in
+          mgrPrefs.usingHotKeySCPC = value
+          selUsingHotKeySCPC = value
+        }
+        Toggle(
+          LocalizedStringKey("Per-Char Associated Phrases"),
+          isOn: $selUsingHotKeyAssociates
+        ).onChange(of: selUsingHotKeyAssociates) { value in
+          mgrPrefs.usingHotKeyAssociates = value
+          selUsingHotKeyAssociates = value
+        }
+        Toggle(
+          LocalizedStringKey("CNS11643 Mode"),
+          isOn: $selUsingHotKeyCNS
+        ).onChange(of: selUsingHotKeyCNS) { value in
+          mgrPrefs.usingHotKeyCNS = value
+          selUsingHotKeyCNS = value
+        }
+        Toggle(
+          LocalizedStringKey("Force KangXi Writing"),
+          isOn: $selUsingHotKeyKangXi
+        ).onChange(of: selUsingHotKeyKangXi) { value in
+          mgrPrefs.usingHotKeyKangXi = value
+          selUsingHotKeyKangXi = value
+        }
+        Toggle(
+          LocalizedStringKey("JIS Shinjitai Output"),
+          isOn: $selUsingHotKeyJIS
+        ).onChange(of: selUsingHotKeyJIS) { value in
+          mgrPrefs.usingHotKeyJIS = value
+          selUsingHotKeyJIS = value
+        }
+        Toggle(
+          LocalizedStringKey("Half-Width Punctuation Mode"),
+          isOn: $selUsingHotKeyHalfWidthASCII
+        ).onChange(of: selUsingHotKeyHalfWidthASCII) { value in
+          mgrPrefs.usingHotKeyHalfWidthASCII = value
+          selUsingHotKeyHalfWidthASCII = value
+        }
       }
     }
     Divider()

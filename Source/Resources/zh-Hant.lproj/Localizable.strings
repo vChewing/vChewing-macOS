@@ -15,7 +15,7 @@
 "Not Now" = "以後再說";
 "Visit Website" = "前往網站";
 "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@" = "目前使用的威注音官方版本是 %1$@ (%2$@)，網路上有更新版本 %3$@ (%4$@) 可供下載。是否要前往威注音網站下載新版來安裝？%5$@";
-"Force KangXi Writing" = "康熙繁體字模式";
+"Force KangXi Writing" = "康熙正體字模式";
 "NotificationSwitchON" = "✔ 已啟用";
 "NotificationSwitchOFF" = "✘ 已停用";
 "Edit User Phrases…" = "編輯自訂語彙…";
@@ -130,6 +130,7 @@
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "將游標置於詞語前方 // macOS 內建注音風格";
 "Japanese" = "和語";
 "Keyboard" = "鍵盤";
+"Keyboard Shortcuts:" = "鍵盤快速鍵:";
 "Misc Settings:" = "雜項:";
 "MiTAC" = "神通排列";
 "Non-QWERTY alphanumeral keyboard layouts are for Hanyu Pinyin parser only." = "QWERTY 以外的英數佈局是為了漢語拼音排列使用者而準備的。";
