@@ -310,10 +310,12 @@ extension KeyHandler {
       if mgrPrefs.useSCPCTypingMode {
         var punctuationNamePrefix = ""
 
-        if input.isOptionHold {
+        if input.isOptionHold && !input.isControlHold {
           punctuationNamePrefix = "_alt_punctuation_"
-        } else if input.isControlHold {
+        } else if input.isControlHold && !input.isOptionHold {
           punctuationNamePrefix = "_ctrl_punctuation_"
+        } else if input.isControlHold && input.isOptionHold {
+          punctuationNamePrefix = "_alt_ctrl_punctuation_"
         } else if mgrPrefs.halfWidthPunctuationEnabled {
           punctuationNamePrefix = "_half_punctuation_"
         } else {
