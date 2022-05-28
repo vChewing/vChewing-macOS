@@ -248,7 +248,7 @@ public class ctlCandidateHorizontal: ctlCandidate {
   private var candidateView: HorizontalCandidateView
   private var prevPageButton: NSButton
   private var nextPageButton: NSButton
-  private var currentPage: UInt = 0
+  private var currentPageIndex: UInt = 0
 
   public init() {
     var contentRect = NSRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
@@ -325,14 +325,15 @@ public class ctlCandidateHorizontal: ctlCandidate {
 
   override public func reloadData() {
     candidateView.highlightedIndex = 0
-    currentPage = 0
+    currentPageIndex = 0
     layoutCandidateView()
   }
 
   override public func showNextPage() -> Bool {
     guard delegate != nil else { return false }
     if pageCount == 1 { return highlightNextCandidate() }
-    currentPage = (currentPage + 1 >= pageCount) ? 0 : currentPage + 1
+    if currentPageIndex + 1 >= pageCount { clsSFX.beep() }
+    currentPageIndex = (currentPageIndex + 1 >= pageCount) ? 0 : currentPageIndex + 1
     candidateView.highlightedIndex = 0
     layoutCandidateView()
     return true
@@ -341,7 +342,8 @@ public class ctlCandidateHorizontal: ctlCandidate {
   override public func showPreviousPage() -> Bool {
     guard delegate != nil else { return false }
     if pageCount == 1 { return highlightPreviousCandidate() }
-    currentPage = (currentPage == 0) ? pageCount - 1 : currentPage - 1
+    if currentPageIndex == 0 { clsSFX.beep() }
+    currentPageIndex = (currentPageIndex == 0) ? pageCount - 1 : currentPageIndex - 1
     candidateView.highlightedIndex = 0
     layoutCandidateView()
     return true
@@ -368,13 +370,13 @@ public class ctlCandidateHorizontal: ctlCandidate {
       return UInt.max
     }
 
-    let result = currentPage * UInt(keyLabels.count) + index
+    let result = currentPageIndex * UInt(keyLabels.count) + index
     return result < delegate.candidateCountForController(self) ? result : UInt.max
   }
 
   override public var selectedCandidateIndex: UInt {
     get {
-      currentPage * UInt(keyLabels.count) + candidateView.highlightedIndex
+      currentPageIndex * UInt(keyLabels.count) + candidateView.highlightedIndex
     }
     set {
       guard let delegate = delegate else {
@@ -382,7 +384,7 @@ public class ctlCandidateHorizontal: ctlCandidate {
       }
       let keyLabelCount = UInt(keyLabels.count)
       if newValue < delegate.candidateCountForController(self) {
-        currentPage = newValue / keyLabelCount
+        currentPageIndex = newValue / keyLabelCount
         candidateView.highlightedIndex = newValue % keyLabelCount
         layoutCandidateView()
       }
@@ -410,7 +412,7 @@ extension ctlCandidateHorizontal {
     let count = delegate.candidateCountForController(self)
     let keyLabelCount = UInt(keyLabels.count)
 
-    let begin = currentPage * keyLabelCount
+    let begin = currentPageIndex * keyLabelCount
     for index in begin..<min(begin + keyLabelCount, count) {
       let candidate = delegate.ctlCandidate(self, candidateAtIndex: index)
       candidates.append(candidate)
