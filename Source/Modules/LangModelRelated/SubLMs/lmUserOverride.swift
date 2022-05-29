@@ -47,20 +47,9 @@ extension vChewing {
       }
     }
 
-    struct KeyObservationPair: Equatable {
+    struct KeyObservationPair {
       var key: String
       var observation: Observation
-
-      var hashValue: Int { key.hashValue }
-
-      init(key: String, observation: Observation) {
-        self.key = key
-        self.observation = observation
-      }
-
-      static func == (lhs: KeyObservationPair, rhs: KeyObservationPair) -> Bool {
-        lhs.key == rhs.key
-      }
     }
 
     // MARK: - Main
@@ -72,10 +61,7 @@ extension vChewing {
     let kDecayThreshold: Double = 1.0 / 1_048_576.0
 
     public init(capacity: Int = 500, decayConstant: Double = 5400.0) {
-      mutCapacity = abs(capacity)  // Ensures that this value is always > 0.
-      if mutCapacity == 0 {
-        mutCapacity = 1
-      }
+      mutCapacity = max(capacity, 1)  // Ensures that this integer value is always > 0.
       mutDecayExponent = log(0.5) / decayConstant
     }
 
@@ -157,10 +143,7 @@ extension vChewing {
       lambda: Double
     ) -> Double {
       let decay = exp((timestamp - eventTimestamp) * lambda)
-      if decay < kDecayThreshold {
-        return 0.0
-      }
-
+      if decay < kDecayThreshold { return 0.0 }
       let prob = Double(eventCount) / Double(totalCount)
       return prob * decay
     }
