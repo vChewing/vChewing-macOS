@@ -52,8 +52,7 @@ private class HorizontalCandidateView: NSView {
     var result = NSSize.zero
 
     if !elementWidths.isEmpty {
-      result.width = elementWidths.reduce(0, +)
-      result.width += CGFloat(elementWidths.count)
+      result.width = elementWidths.reduce(0, +) + CGFloat(elementWidths.count)
       result.height = candidateTextHeight + cellPadding
     }
     return result
@@ -78,7 +77,7 @@ private class HorizontalCandidateView: NSView {
       if cellWidth < cellHeight * 1.35 {
         cellWidth = cellHeight * 1.35
       }
-      newWidths.append(cellWidth)
+      newWidths.append(round(cellWidth))
     }
     elementWidths = newWidths
   }
