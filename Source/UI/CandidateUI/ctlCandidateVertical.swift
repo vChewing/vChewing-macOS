@@ -86,7 +86,7 @@ private class VerticalCandidateView: NSView {
     }
     elementWidths = newWidths
     elementHeights = newHeights
-    windowWidth = calculatedWindowWidth + cellPadding
+    windowWidth = round(calculatedWindowWidth + cellPadding)  // 防止邊框粗細不一
   }
 
   @objc(setKeyLabelFont:candidateFont:)
