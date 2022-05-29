@@ -112,7 +112,7 @@ private class HorizontalCandidateView: NSView {
     keyLabelWidth = ceil(labelFontSize)
     keyLabelHeight = ceil(labelFontSize * 2)
     candidateTextHeight = ceil(candidateFontSize * 1.20)
-    cellPadding = ceil(biggestSize / 2.0)
+    cellPadding = ceil(biggestSize / 4.0) * 2
   }
 
   override func draw(_: NSRect) {
