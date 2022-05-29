@@ -139,7 +139,7 @@ private class HorizontalCandidateView: NSView {
         height: keyLabelHeight * 2.0
       )
       let rctCandidatePhrase = NSRect(
-        x: accuWidth + keyLabelWidth - 1, y: cellPadding / 2,
+        x: accuWidth + keyLabelWidth - 1, y: cellPadding / 2 - 1,
         width: currentWidth - keyLabelWidth,
         height: candidateTextHeight
       )
