@@ -270,7 +270,7 @@ public class ctlCandidateVertical: ctlCandidate {
 
     candidateView.wantsLayer = true
     candidateView.layer?.borderColor =
-      NSColor.selectedMenuItemTextColor.withAlphaComponent(0.30).cgColor
+      NSColor.selectedMenuItemTextColor.withAlphaComponent(0.10).cgColor
     candidateView.layer?.borderWidth = 1.0
     if #available(macOS 10.13, *) {
       candidateView.layer?.cornerRadius = 6.0
