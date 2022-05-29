@@ -135,8 +135,8 @@ private class VerticalCandidateView: NSView {
     )
 
     var accuHeight: CGFloat = 0
-    for index in 0..<elementHeights.count {
-      let currentHeight = elementHeights[index]
+    for (index, elementHeight) in elementHeights.enumerated() {
+      let currentHeight = elementHeight
       let rctCandidateArea = NSRect(
         x: 0.0, y: accuHeight, width: windowWidth, height: candidateTextHeight + cellPadding
       )
@@ -207,8 +207,8 @@ private class VerticalCandidateView: NSView {
       return nil
     }
     var accuHeight: CGFloat = 0.0
-    for index in 0..<elementHeights.count {
-      let currentHeight = elementHeights[index]
+    for (index, elementHeight) in elementHeights.enumerated() {
+      let currentHeight = elementHeight
 
       if location.y >= accuHeight, location.y <= accuHeight + currentHeight {
         return UInt(index)

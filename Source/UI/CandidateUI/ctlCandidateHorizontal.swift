@@ -129,8 +129,8 @@ private class HorizontalCandidateView: NSView {
     )
 
     var accuWidth: CGFloat = 0
-    for index in 0..<elementWidths.count {
-      let currentWidth = elementWidths[index]
+    for (index, elementWidth) in elementWidths.enumerated() {
+      let currentWidth = elementWidth
       let rctCandidateArea = NSRect(
         x: accuWidth, y: 0.0, width: currentWidth + 1.0,
         height: candidateTextHeight + cellPadding
@@ -203,8 +203,8 @@ private class HorizontalCandidateView: NSView {
       return nil
     }
     var accuWidth: CGFloat = 0.0
-    for index in 0..<elementWidths.count {
-      let currentWidth = elementWidths[index]
+    for (index, elementWidth) in elementWidths.enumerated() {
+      let currentWidth = elementWidth
 
       if location.x >= accuWidth, location.x <= accuWidth + currentWidth {
         return UInt(index)
