@@ -237,11 +237,11 @@ extension KeyHandler {
       return true
     }
 
-    // MARK: Calling candidate window using Space or Down or PageUp / PageDn.
+    // MARK: Calling candidate window using Up / Down or PageUp / PageDn.
 
     if let currentState = state as? InputState.NotEmpty, _composer.isEmpty,
       input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
-        || input.isPageDown || input.isPageUp || input.isTab
+        || input.isPageDown || input.isPageUp || (input.isTab && mgrPrefs.specifyShiftTabKeyBehavior)
         || (input.useVerticalMode && (input.isVerticalModeOnlyChooseCandidateKey))
     {
       if input.isSpace {
