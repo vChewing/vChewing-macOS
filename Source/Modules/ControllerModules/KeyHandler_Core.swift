@@ -48,6 +48,7 @@ protocol KeyHandlerDelegate {
 
 class KeyHandler {
   let kEpsilon: Double = 0.000001
+  let kMaxComposingBufferNeedsToWalkSize: Int = 10
   var _composer: Tekkon.Composer = .init()
   var _inputMode: String = ""
   var _languageModel: vChewing.LMInstantiator = .init()
@@ -111,10 +112,21 @@ class KeyHandler {
     // Retrieve the most likely grid, i.e. a Maximum Likelihood Estimation
     // of the best possible Mandarin characters given the input syllables,
     // using the Viterbi algorithm implemented in the Megrez library.
-    // The walk() traces the grid to the end, hence no need to use .reversed() here.
-    _walkedNodes = _builder.walk(
-      at: _builder.grid.width, nodesLimit: 10, balanced: mgrPrefs.useScoreBalancing
-    )
+    // The walk() traces the grid to the end.
+    _walkedNodes = _builder.walk()
+
+    // if DEBUG mode is enabled, a GraphViz file is written to kGraphVizOutputfile.
+    if mgrPrefs.isDebugModeEnabled {
+      let result = _builder.grid.dumpDOT
+      do {
+        try result.write(
+          toFile: "/private/var/tmp/vChewing-visualization.dot",
+          atomically: true, encoding: .utf8
+        )
+      } catch {
+        IME.prtDebugIntel("Failed from writing dumpDOT results.")
+      }
+    }
   }
 
   var popOverflowComposingTextAndWalk: String {
