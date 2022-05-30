@@ -160,7 +160,7 @@ class KeyHandler {
     return arrResult
   }
 
-  func fixNode(value: String) {
+  func fixNode(value: String, respectCursorPushing: Bool = true) {
     let cursorIndex: Int = actualCandidateCursorIndex
     let selectedNode: Megrez.NodeAnchor = _builder.grid.fixNodeSelectedCandidate(
       location: cursorIndex, value: value
@@ -194,7 +194,7 @@ class KeyHandler {
     }
     walk()
 
-    if mgrPrefs.moveCursorAfterSelectingCandidate {
+    if mgrPrefs.moveCursorAfterSelectingCandidate, respectCursorPushing {
       var nextPosition = 0
       for node in _walkedNodes {
         if nextPosition >= cursorIndex { break }
