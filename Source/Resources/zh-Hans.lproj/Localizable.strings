@@ -97,7 +97,7 @@
 "Check for updates automatically" = "自动检查软体更新";
 "Choose candidate font size for better visual clarity." = "变更候选字窗的字型大小。";
 "Choose or hit Enter to confim your prefered keys for selecting candidates." = "请选择您所偏好的用来选字的按键组合。自订组合需敲 Enter 键生效。";
-"Choose the behavior of (Shift+)Space key in the candidate window." = "指定 (Shift+)空格键 在选字窗内的轮替操作对象。";
+"Choose the behavior of (Shift+)Space key with candidates." = "指定 (Shift+)空格键 对候选字词而言的轮替操作对象。";
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "指定 (Shift+)Tab 在选字窗内的轮替操作对象。";
 "Choose the cursor position where you want to list possible candidates." = "请选择用以触发选字的游标相对位置。";
 "Choose the macOS-level basic keyboard layout." = "请选择 macOS 基础键盘布局。";

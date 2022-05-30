@@ -494,7 +494,7 @@
                                                     </matrix>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J0f-Aw-dxC">
                                                         <rect key="frame" x="18" y="149" width="383" height="15"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the behavior of (Shift+)Space key in the candidate window." id="Pg5-G9-pY5">
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the behavior of (Shift+)Space key with candidates." id="Pg5-G9-pY5">
                                                             <font key="font" metaFont="cellTitle"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

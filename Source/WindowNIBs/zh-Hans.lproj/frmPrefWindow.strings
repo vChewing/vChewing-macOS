@@ -69,7 +69,7 @@
 "ueU-Rz-a1C.title" = "指定 (Shift+)Tab 热键在选字窗内的轮替操作对象。";
 "s7u-Fm-dVg.title" = "轮替页面";
 "FVC-br-H57.title" = "轮替候选字";
-"Pg5-G9-pY5.title" = "指定 (Shift+)Space 热键在选字窗内的轮替操作对象。";
+"Pg5-G9-pY5.title" = "指定 (Shift+)Space 热键对候选字词而言的轮替操作对象。";
 "XqL-rf-X6d.title" = "Space 换下一页，Shift+Space 换选下一个候选字。";
 "dIN-TZ-67g.title" = "Shift+Space 换下一页，Space 换选下一个候选字。";
 "hSv-LJ-Cq3.title" = "启用包括少许绘文字在内的符号输入支援";

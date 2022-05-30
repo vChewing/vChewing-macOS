@@ -128,7 +128,7 @@ struct suiPrefPaneExperience: View {
         }
         .labelsHidden()
         .pickerStyle(RadioGroupPickerStyle())
-        Text(LocalizedStringKey("Choose the behavior of (Shift+)Space key in the candidate window."))
+        Text(LocalizedStringKey("Choose the behavior of (Shift+)Space key with candidates."))
           .preferenceDescription()
       }
       Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Space & ESC Key:")) }) {

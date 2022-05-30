@@ -97,7 +97,7 @@
 "Check for updates automatically" = "Check for updates automatically";
 "Choose candidate font size for better visual clarity." = "Choose candidate font size for better visual clarity.";
 "Choose or hit Enter to confim your prefered keys for selecting candidates." = "Choose or hit Enter to confim your prefered keys for selecting candidates.";
-"Choose the behavior of (Shift+)Space key in the candidate window." = "Choose the behavior of (Shift+)Space key in the candidate window.";
+"Choose the behavior of (Shift+)Space key with candidates." = "Choose the behavior of (Shift+)Space key with candidates.";
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "Choose the behavior of (Shift+)Tab key in the candidate window.";
 "Choose the cursor position where you want to list possible candidates." = "Choose the cursor position where you want to list possible candidates.";
 "Choose the macOS-level basic keyboard layout." = "Choose the macOS-level basic keyboard layout.";
