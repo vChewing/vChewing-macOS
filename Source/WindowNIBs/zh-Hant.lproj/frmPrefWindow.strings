@@ -88,3 +88,4 @@
 "xibUsingHotKeyKangXi.title" = "康熙正體字模式";
 "xibUsingHotKeyJIS.title" = "JIS 新字體模式";
 "xibUsingHotKeyHalfWidthASCII.title" = "半形標點模式";
+"xibLabelBufferLimit.title" = "組字區容量:";

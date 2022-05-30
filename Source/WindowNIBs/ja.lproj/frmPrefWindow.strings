@@ -88,3 +88,4 @@
 "xibUsingHotKeyKangXi.title" = "康熙文字変換モード";
 "xibUsingHotKeyJIS.title" = "JIS 新字体モード";
 "xibUsingHotKeyHalfWidthASCII.title" = "半角句読モード";
+"xibLabelBufferLimit.title" = "緩衝列の容量:";

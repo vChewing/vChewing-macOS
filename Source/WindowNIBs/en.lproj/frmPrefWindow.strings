@@ -88,3 +88,4 @@
 "xibUsingHotKeyKangXi.title" = "Force KangXi Writing";
 "xibUsingHotKeyJIS.title" = "JIS Shinjitai Output";
 "xibUsingHotKeyHalfWidthASCII.title" = "Half-Width Punctuation Mode";
+"xibLabelBufferLimit.title" = "Buffer Limit:";
