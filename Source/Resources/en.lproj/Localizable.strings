@@ -90,6 +90,7 @@
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "Auto-convert traditional Chinese glyphs to KangXi characters";
 "Automatically reload user data files if changes detected" = "Automatically reload user data files if changes detected";
 "Basic Keyboard Layout:" = "Basic Keyboard Layout:";
+"Buffer Limit:" = "Buffer Limit:";
 "Candidate Layout:" = "Candidate Layout:";
 "Candidate Size:" = "Candidate Size:";
 "Change user interface language (will reboot the IME)." = "Change user interface language (will reboot the IME).";
@@ -145,6 +146,7 @@
 "Space & ESC Key:" = "Space & ESC Key:";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Space to +cycle candidates, Shift+Space to +cycle pages";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "Space to +cycle pages, Shift+Space to +cycle candidates";
+"Specify the maximum characters allowed in the composition buffer." = "Specify the maximum characters allowed in the composition buffer.";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "Stop farting (when typed phonetic combination is invalid, etc.)";
 "Traditional Chinese" = "Traditional Chinese";
 "Typing Style:" = "Typing Style:";

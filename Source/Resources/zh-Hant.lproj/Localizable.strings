@@ -90,6 +90,7 @@
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "自動將繁體中文字轉為康熙正體字";
 "Automatically reload user data files if changes detected" = "自動檢測並載入使用者語彙檔案變更";
 "Basic Keyboard Layout:" = "基礎鍵盤佈局:";
+"Buffer Limit:" = "組字區容量:";
 "Candidate Layout:" = "候選字窗佈局:";
 "Candidate Size:" = "候選字窗字號:";
 "Change user interface language (will reboot the IME)." = "變更輸入法介面語言，會自動重啟輸入法。";
@@ -145,6 +146,7 @@
 "Space & ESC Key:" = "ESC 與空格鍵:";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+空格鍵 換下一頁，空格鍵 換選下一個後選字";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "空格鍵 換下一頁，Shift+空格鍵 換選下一個後選字";
+"Specify the maximum characters allowed in the composition buffer." = "請指定組字緩衝區內的文字數的上限。";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉恥模式 // 取消勾選的話，敲錯字時會有異音";
 "Traditional Chinese" = "繁體中文";
 "Typing Style:" = "輸入風格:";
