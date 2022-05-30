@@ -94,7 +94,7 @@ extension KeyHandler {
 
   func buildCandidate(
     state currentState: InputState.NotEmpty,
-    useVerticalMode: Bool
+    useVerticalMode: Bool = false
   ) -> InputState.ChoosingCandidate {
     InputState.ChoosingCandidate(
       composingBuffer: currentState.composingBuffer,
@@ -588,6 +588,104 @@ extension KeyHandler {
       }
     }
 
+    return true
+  }
+
+  // MARK: - 處理 Tab 按鍵行為
+
+  func handleTab(
+    state: InputState,
+    isShiftHold: Bool,
+    stateCallback: @escaping (InputState) -> Void,
+    errorCallback: @escaping () -> Void
+  ) -> Bool {
+    guard let state = state as? InputState.Inputting else {
+      guard state is InputState.Empty else {
+        IME.prtDebugIntel("6044F081")
+        errorCallback()
+        return true
+      }
+      // 不妨礙使用者平時輸入 Tab 的需求。
+      return false
+    }
+
+    guard _composer.isEmpty else {
+      IME.prtDebugIntel("A2DAF7BC")
+      errorCallback()
+      return true
+    }
+
+    // 此處僅借用該函數生成結果內的某個物件，不用糾結「是否縱排輸入」。
+    let candidates = buildCandidate(state: state).candidates
+    guard !candidates.isEmpty else {
+      IME.prtDebugIntel("3378A6DF")
+      errorCallback()
+      return true
+    }
+
+    var length = 0
+    var currentAnchor = Megrez.NodeAnchor()
+    for anchor in _walkedNodes {
+      length += anchor.spanningLength
+      if length >= actualCandidateCursorIndex {
+        currentAnchor = anchor
+        break
+      }
+    }
+
+    guard let currentNode = currentAnchor.node else {
+      IME.prtDebugIntel("4F2DEC2F")
+      errorCallback()
+      return true
+    }
+
+    let currentValue = currentNode.currentKeyValue.value
+
+    var currentIndex = 0
+    if currentNode.score < currentNode.kSelectedCandidateScore {
+      // Once the user never select a candidate for the node,
+      // we start from the first candidate, so the user has a
+      // chance to use the unigram with two or more characters
+      // when type the tab key for the first time.
+      //
+      // In other words, if a user type two BPMF readings,
+      // but the score of seeing them as two unigrams is higher
+      // than a phrase with two characters, the user can just
+      // use the longer phrase by tapping the tab key.
+      if candidates[0] == currentValue {
+        // If the first candidate is the value of the
+        // current node, we use next one.
+        if isShiftHold {
+          currentIndex = candidates.count - 1
+        } else {
+          currentIndex = 1
+        }
+      }
+    } else {
+      for candidate in candidates {
+        if candidate == currentValue {
+          if isShiftHold {
+            if currentIndex == 0 {
+              currentIndex = candidates.count - 1
+            } else {
+              currentIndex -= 1
+            }
+          } else {
+            currentIndex += 1
+          }
+          break
+        }
+        currentIndex += 1
+      }
+    }
+
+    if currentIndex >= candidates.count {
+      currentIndex = 0
+    }
+
+    fixNode(value: candidates[currentIndex], respectCursorPushing: false)
+
+    stateCallback(buildInputtingState)
     return true
   }
 }

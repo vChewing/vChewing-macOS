@@ -25,6 +25,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import Cocoa
+import SwiftUI
 
 // MARK: - § Handle Input with States.
 
@@ -274,6 +275,14 @@ extension KeyHandler {
     // MARK: Esc
 
     if input.isESC { return handleEsc(state: state, stateCallback: stateCallback, errorCallback: errorCallback) }
+
+    // MARK: Tab
+
+    if input.isTab {
+      return handleTab(
+        state: state, isShiftHold: input.isShiftHold, stateCallback: stateCallback, errorCallback: errorCallback
+      )
+    }
 
     // MARK: Cursor backward
 
