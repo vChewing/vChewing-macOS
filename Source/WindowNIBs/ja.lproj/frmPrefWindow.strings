@@ -81,7 +81,6 @@
 "Parser12.title" = "イェール弁音 (ローマ字+数字音調)";
 "Parser13.title" = "中華ローマ弁音 (ローマ字+数字音調)";
 "Parser14.title" = "汎用弁音 (ローマ字+数字音調)";
-"Wh1-iz-pwM.title" = "候補文字の長さによる重みの調整";
 "xibKeyboardShortcuts.title" = "ショートカット";
 "xibUsingHotKeySCPC.title" = "全候補入力モード";
 "xibUsingHotKeyAssociates.title" = "全候補入力で連想語彙";

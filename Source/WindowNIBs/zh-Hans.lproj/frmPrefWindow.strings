@@ -81,7 +81,6 @@
 "Parser12.title" = "耶鲁拼音+数字标调";
 "Parser13.title" = "华罗拼音+数字标调";
 "Parser14.title" = "通用拼音+数字标调";
-"Wh1-iz-pwM.title" = "按候选字词的长度调整权重";
 "xibKeyboardShortcuts.title" = "键盘快捷键";
 "xibUsingHotKeySCPC.title" = "模拟逐字选字输入";
 "xibUsingHotKeyAssociates.title" = "逐字选字联想模式";

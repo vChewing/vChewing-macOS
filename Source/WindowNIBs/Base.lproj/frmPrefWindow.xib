@@ -691,25 +691,10 @@
                                                             <binding destination="32" name="value" keyPath="values.CNS11643Enabled" id="Pbx-Gt-upm"/>
                                                         </connections>
                                                     </button>
-                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="O2c-HS-d9s" userLabel="chkCNSSupport">
-                                                        <rect key="frame" x="19" y="229.5" width="406" height="17"/>
-                                                        <constraints>
-                                                            <constraint firstAttribute="height" constant="16" id="g8o-4X-IR5"/>
-                                                        </constraints>
-                                                        <buttonCell key="cell" type="check" title="Balance the score according to candidate length" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="Wh1-iz-pwM">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="cellTitle"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="toggleCNSSupport:" target="-2" id="S0T-uD-fde"/>
-                                                            <binding destination="32" name="value" keyPath="values.UseScoreBalancing" id="mnq-pX-2PH"/>
-                                                        </connections>
-                                                    </button>
                                                 </subviews>
                                                 <constraints>
                                                     <constraint firstItem="s7t-Kk-EPu" firstAttribute="bottom" secondItem="MPN-np-SbT" secondAttribute="bottom" id="0Fo-ya-hQ9"/>
                                                     <constraint firstItem="O4B-Z2-XYi" firstAttribute="trailing" secondItem="Yaj-QY-7xV" secondAttribute="trailing" id="2VU-kM-5xJ"/>
-                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="trailing" secondItem="O2c-HS-d9s" secondAttribute="trailing" id="4Ma-Ni-LJP"/>
                                                     <constraint firstAttribute="trailing" secondItem="FUV-qx-xkC" secondAttribute="trailing" constant="20" symbolic="YES" id="6QR-tj-5cH"/>
                                                     <constraint firstItem="O4B-Z2-XYi" firstAttribute="top" secondItem="p7V-IN-OTr" secondAttribute="bottom" constant="6" id="6tf-H0-CKc"/>
                                                     <constraint firstItem="s7t-Kk-EPu" firstAttribute="leading" secondItem="MPN-np-SbT" secondAttribute="trailing" constant="-376" id="9at-E8-Bt1"/>
@@ -721,11 +706,9 @@
                                                     <constraint firstItem="p7V-IN-OTr" firstAttribute="top" secondItem="s7t-Kk-EPu" secondAttribute="bottom" constant="15" id="PyP-N9-MWb"/>
                                                     <constraint firstItem="p7V-IN-OTr" firstAttribute="leading" secondItem="s7t-Kk-EPu" secondAttribute="leading" id="QMQ-hR-c5W"/>
                                                     <constraint firstItem="FUV-qx-xkC" firstAttribute="leading" secondItem="MPN-np-SbT" secondAttribute="leading" constant="-346" id="Zet-wH-kmC"/>
-                                                    <constraint firstItem="O2c-HS-d9s" firstAttribute="top" secondItem="Yaj-QY-7xV" secondAttribute="bottom" constant="6" symbolic="YES" id="cBe-nI-2F7"/>
                                                     <constraint firstItem="jXe-xz-9Sd" firstAttribute="leading" secondItem="MPN-np-SbT" secondAttribute="trailing" constant="-1" id="cYQ-Rx-tuG"/>
                                                     <constraint firstItem="p7V-IN-OTr" firstAttribute="leading" secondItem="O4B-Z2-XYi" secondAttribute="leading" id="dm5-TK-PRw"/>
                                                     <constraint firstItem="O4B-Z2-XYi" firstAttribute="leading" secondItem="Yaj-QY-7xV" secondAttribute="leading" id="qHY-fz-P9H"/>
-                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="leading" secondItem="O2c-HS-d9s" secondAttribute="leading" id="tap-dN-5Nu"/>
                                                     <constraint firstItem="p7V-IN-OTr" firstAttribute="trailing" secondItem="jXe-xz-9Sd" secondAttribute="trailing" id="uuG-Bg-2Vi"/>
                                                     <constraint firstItem="s7t-Kk-EPu" firstAttribute="trailing" secondItem="FUV-qx-xkC" secondAttribute="trailing" constant="-60" id="vIO-x1-7Q2"/>
                                                     <constraint firstItem="jXe-xz-9Sd" firstAttribute="baseline" secondItem="MPN-np-SbT" secondAttribute="baseline" id="wys-ML-2Q2"/>

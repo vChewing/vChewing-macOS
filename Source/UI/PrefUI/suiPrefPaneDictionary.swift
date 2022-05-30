@@ -35,8 +35,6 @@ struct suiPrefPaneDictionary: View {
   @State private var selEnableCNS11643: Bool = UserDefaults.standard.bool(forKey: UserDef.kCNS11643Enabled)
   @State private var selEnableSymbolInputSupport: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kSymbolInputEnabled)
-  @State private var selUseScoreBalancing: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kUseScoreBalancing)
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -127,13 +125,6 @@ struct suiPrefPaneDictionary: View {
         .onChange(of: selEnableSymbolInputSupport) { value in
           mgrPrefs.symbolInputEnabled = value
           mgrLangModel.setSymbolEnabled(value)
-        }
-        Toggle(
-          LocalizedStringKey("Balance the score according to candidate length"),
-          isOn: $selUseScoreBalancing
-        )
-        .onChange(of: selUseScoreBalancing) { value in
-          mgrPrefs.useScoreBalancing = value
         }
       }
     }
