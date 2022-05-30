@@ -29,16 +29,23 @@ extension Megrez {
     /// 幅位陣列。
     private var mutSpans: [Megrez.Span]
 
+    /// 該幅位內可以允許的最大詞長。
+    private var mutMaxBuildSpanLength = 10
+
+    /// 公開：該幅位內可以允許的最大詞長。
+    public var maxBuildSpanLength: Int { mutMaxBuildSpanLength }
+
     /// 軌格的寬度，也就是其內的幅位陣列當中的幅位數量。
     var width: Int { mutSpans.count }
 
-    public init() {
+    public init(spanLength: Int = 10) {
+      mutMaxBuildSpanLength = spanLength
       mutSpans = [Megrez.Span]()
     }
 
     /// 自我清空該軌格的內容。
     public func clear() {
-      mutSpans = [Megrez.Span]()
+      mutSpans.removeAll()
     }
 
     /// 往該軌格的指定位置插入指定幅位長度的指定節點。
@@ -47,6 +54,8 @@ extension Megrez {
     ///   - location: 位置。
     ///   - spanningLength: 給定的幅位長度。
     public func insertNode(node: Node, location: Int, spanningLength: Int) {
+      let location = abs(location)  // 防呆
+      let spanningLength = abs(spanningLength)  // 防呆
       if location >= mutSpans.count {
         let diff = location - mutSpans.count + 1
         for _ in 0..<diff {
@@ -62,24 +71,26 @@ extension Megrez {
     ///   - spanningLength: 給定的幅位長度。
     ///   - key: 索引鍵。
     public func hasMatchedNode(location: Int, spanningLength: Int, key: String) -> Bool {
+      let location = abs(location)  // 防呆
+      let spanningLength = abs(spanningLength)  // 防呆
       if location > mutSpans.count {
         return false
       }
 
       let n = mutSpans[location].node(length: spanningLength)
-      return n == nil ? false : key == n?.key
+      return n != nil && key == n?.key
     }
 
     /// 在該軌格的指定位置擴增一個幅位。
     /// - Parameters:
     ///   - location: 位置。
     public func expandGridByOneAt(location: Int) {
-      // 這裡加入 abs 完全是一個防呆設計
-      mutSpans.insert(Span(), at: abs(location))
-      if location != 0, abs(location) != mutSpans.count {
-        for i in 0..<abs(location) {
+      let location = abs(location)  // 防呆
+      mutSpans.insert(Span(), at: location)
+      if location != 0, location != mutSpans.count {
+        for i in 0..<location {
           // zaps overlapping spans
-          mutSpans[i].removeNodeOfLengthGreaterThan(abs(location) - i)
+          mutSpans[i].removeNodeOfLengthGreaterThan(location - i)
         }
       }
     }
@@ -88,6 +99,7 @@ extension Megrez {
     /// - Parameters:
     ///   - location: 位置。
     public func shrinkGridByOneAt(location: Int) {
+      let location = abs(location)  // 防呆
       if location >= mutSpans.count {
         return
       }
@@ -99,11 +111,35 @@ extension Megrez {
       }
     }
 
+    /// 給定位置，枚舉出所有在這個位置開始的節點。
+    /// - Parameters:
+    ///   - location: 位置。
+    public func nodesBeginningAt(location: Int) -> [NodeAnchor] {
+      let location = abs(location)  // 防呆
+      var results = [NodeAnchor]()
+      if location < mutSpans.count {  // 此時 mutSpans 必然不為空
+        let span = mutSpans[location]
+        for i in 1...maxBuildSpanLength {
+          if let np = span.node(length: i) {
+            results.append(
+              NodeAnchor(
+                node: np,
+                location: location,
+                spanningLength: i
+              )
+            )
+          }
+        }
+      }
+      return results
+    }
+
     /// 給定位置，枚舉出所有在這個位置結尾的節點。
     /// - Parameters:
     ///   - location: 位置。
     public func nodesEndingAt(location: Int) -> [NodeAnchor] {
-      var results: [NodeAnchor] = []
+      let location = abs(location)  // 防呆
+      var results = [NodeAnchor]()
       if !mutSpans.isEmpty, location <= mutSpans.count {
         for i in 0..<location {
           let span = mutSpans[i]
@@ -127,7 +163,8 @@ extension Megrez {
     /// - Parameters:
     ///   - location: 位置。
     public func nodesCrossingOrEndingAt(location: Int) -> [NodeAnchor] {
-      var results: [NodeAnchor] = []
+      let location = abs(location)  // 防呆
+      var results = [NodeAnchor]()
       if !mutSpans.isEmpty, location <= mutSpans.count {
         for i in 0..<location {
           let span = mutSpans[i]
@@ -157,6 +194,7 @@ extension Megrez {
     ///   - location: 位置。
     ///   - value: 給定字串。
     @discardableResult public func fixNodeSelectedCandidate(location: Int, value: String) -> NodeAnchor {
+      let location = abs(location)  // 防呆
       var node = NodeAnchor()
       for nodeAnchor in nodesCrossingOrEndingAt(location: location) {
         guard let theNode = nodeAnchor.node else {
@@ -182,6 +220,7 @@ extension Megrez {
     ///   - value: 給定字串。
     ///   - overridingScore: 給定權重數值。
     public func overrideNodeScoreForSelectedCandidate(location: Int, value: String, overridingScore: Double) {
+      let location = abs(location)  // 防呆
       for nodeAnchor in nodesCrossingOrEndingAt(location: location) {
         guard let theNode = nodeAnchor.node else {
           continue

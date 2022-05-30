@@ -26,8 +26,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 extension Megrez {
   /// 分節讀音槽。
   public class BlockReadingBuilder {
-    /// 該分節讀音曹內可以允許的最大詞長。
-    private var mutMaximumBuildSpanLength = 10
+    /// 給被丟掉的節點路徑施加的負權重。
+    private let kDroppedPathScore: Double = -999
     /// 該分節讀音槽的游標位置。
     private var mutCursorIndex: Int = 0
     /// 該分節讀音槽的讀音陣列。
@@ -37,6 +37,8 @@ extension Megrez {
     /// 該分節讀音槽所使用的語言模型。
     private var mutLM: LanguageModel
 
+    /// 公開該分節讀音槽內可以允許的最大詞長。
+    public var maxBuildSpanLength: Int { mutGrid.maxBuildSpanLength }
     /// 公開：多字讀音鍵當中用以分割漢字讀音的記號，預設為空。
     public var joinSeparator: String = ""
     /// 公開：該分節讀音槽的游標位置。
@@ -55,11 +57,11 @@ extension Megrez {
     /// 分節讀音槽。
     /// - Parameters:
     ///   - lm: 語言模型。可以是任何基於 Megrez.LanguageModel 的衍生型別。
-    ///   - length: 指定該分節讀音曹內可以允許的最大詞長，預設為 10 字。
+    ///   - length: 指定該分節讀音槽內可以允許的最大詞長，預設為 10 字。
     ///   - separator: 多字讀音鍵當中用以分割漢字讀音的記號，預設為空。
     public init(lm: LanguageModel, length: Int = 10, separator: String = "") {
       mutLM = lm
-      mutMaximumBuildSpanLength = length
+      mutGrid = .init(spanLength: abs(length))  // 防呆
       joinSeparator = separator
     }
 
@@ -112,6 +114,7 @@ extension Megrez {
     /// 用於輸入法組字區長度上限處理：
     /// 將該位置要溢出的敲字內容遞交之後、再執行這個函數。
     @discardableResult public func removeHeadReadings(count: Int) -> Bool {
+      let count = abs(count)  // 防呆
       if count > length {
         return false
       }
@@ -120,8 +123,10 @@ extension Megrez {
         if mutCursorIndex > 0 {
           mutCursorIndex -= 1
         }
-        mutReadings.removeFirst()
-        mutGrid.shrinkGridByOneAt(location: 0)
+        if !mutReadings.isEmpty {
+          mutReadings.removeFirst()
+          mutGrid.shrinkGridByOneAt(location: 0)
+        }
         build()
       }
 
@@ -131,23 +136,22 @@ extension Megrez {
     // MARK: - Walker
 
     /// 對已給定的軌格按照給定的位置與條件進行正向爬軌。
-    ///
-    /// 其實就是將反向爬軌的結果顛倒順序再給出來而已，省得使用者自己再顛倒一遍。
     /// - Parameters:
     ///   - at: 開始爬軌的位置。
     ///   - score: 給定累計權重，非必填參數。預設值為 0。
-    ///   - nodesLimit: 限定最多只爬多少個節點。
-    ///   - balanced: 啟用平衡權重，在節點權重的基礎上根據節點幅位長度來加權。
+    ///   - joinedPhrase: 用以統計累計長詞的內部參數，請勿主動使用。
+    ///   - longPhrases: 用以統計累計長詞的內部參數，請勿主動使用。
     public func walk(
-      at location: Int,
+      at location: Int = 0,
       score accumulatedScore: Double = 0.0,
-      nodesLimit: Int = 0,
-      balanced: Bool = false
+      joinedPhrase: String = "",
+      longPhrases: [String] = .init()
     ) -> [NodeAnchor] {
-      Array(
+      let newLocation = (mutGrid.width) - abs(location)  // 防呆
+      return Array(
         reverseWalk(
-          at: location, score: accumulatedScore,
-          nodesLimit: nodesLimit, balanced: balanced
+          at: newLocation, score: accumulatedScore,
+          joinedPhrase: joinedPhrase, longPhrases: longPhrases
         ).reversed())
     }
 
@@ -155,91 +159,125 @@ extension Megrez {
     /// - Parameters:
     ///   - at: 開始爬軌的位置。
     ///   - score: 給定累計權重，非必填參數。預設值為 0。
-    ///   - nodesLimit: 限定最多只爬多少個節點。
-    ///   - balanced: 啟用平衡權重，在節點權重的基礎上根據節點幅位長度來加權。
+    ///   - joinedPhrase: 用以統計累計長詞的內部參數，請勿主動使用。
+    ///   - longPhrases: 用以統計累計長詞的內部參數，請勿主動使用。
     public func reverseWalk(
       at location: Int,
       score accumulatedScore: Double = 0.0,
-      nodesLimit: Int = 0,
-      balanced: Bool = false
+      joinedPhrase: String = "",
+      longPhrases: [String] = .init()
     ) -> [NodeAnchor] {
+      let location = abs(location)  // 防呆
       if location == 0 || location > mutGrid.width {
-        return [] as [NodeAnchor]
+        return .init()
       }
 
-      var paths: [[NodeAnchor]] = []
-      var nodes: [NodeAnchor] = mutGrid.nodesEndingAt(location: location)
+      var paths = [[NodeAnchor]]()
+      var nodes = mutGrid.nodesEndingAt(location: location)
 
-      if balanced {
-        nodes.sort {
-          $0.balancedScore > $1.balancedScore
-        }
+      nodes = nodes.stableSorted {
+        $0.scoreForSort > $1.scoreForSort
       }
 
-      for (i, n) in nodes.enumerated() {
-        // 只檢查前 X 個 NodeAnchor 是否有 node。
-        // 這裡有 abs 是為了防止有白癡填負數。
-        if abs(nodesLimit) > 0, i == abs(nodesLimit) {
-          break
-        }
-
-        var n = n
-        guard let nNode = n.node else {
-          continue
-        }
-
-        n.accumulatedScore = accumulatedScore + nNode.score
-
-        // 利用幅位長度來決定權重。
-        // 這樣一來，例：「再見」比「在」與「見」的權重更高。
-        if balanced {
-          n.accumulatedScore += n.additionalWeights
-        }
-
-        var path: [NodeAnchor] = reverseWalk(
-          at: location - n.spanningLength,
-          score: n.accumulatedScore
-        )
-
-        path.insert(n, at: 0)
-
+      if let nodeOfNodeZero = nodes[0].node, nodeOfNodeZero.score >= nodeOfNodeZero.kSelectedCandidateScore {
+        // 在使用者有選過候選字詞的情況下，摒棄非依此據而成的節點路徑。
+        var nodeZero = nodes[0]
+        nodeZero.accumulatedScore = accumulatedScore + nodeOfNodeZero.score
+        var path: [NodeAnchor] = reverseWalk(at: location - nodeZero.spanningLength, score: nodeZero.accumulatedScore)
+        path.insert(nodeZero, at: 0)
         paths.append(path)
-
-        // 始終使用固定的候選字詞
-        if balanced, nNode.score >= 0 {
-          break
-        }
-      }
-
-      if !paths.isEmpty {
-        if var result = paths.first {
-          for value in paths {
-            if let vLast = value.last, let rLast = result.last {
-              if vLast.accumulatedScore > rLast.accumulatedScore {
-                result = value
-              }
-            }
+      } else if !longPhrases.isEmpty {
+        var path = [NodeAnchor]()
+        for theAnchor in nodes {
+          guard let theNode = theAnchor.node else { continue }
+          var theAnchor = theAnchor
+          let joinedValue = theNode.currentKeyValue.value + joinedPhrase
+          // 如果只是一堆單漢字的節點組成了同樣的長詞的話，直接棄用這個節點路徑。
+          // 打比方說「八/月/中/秋/山/林/涼」與「八月/中秋/山林/涼」在使用者來看
+          // 是「結果等價」的，那就扔掉前者。
+          if longPhrases.contains(joinedValue) {
+            theAnchor.accumulatedScore = kDroppedPathScore
+            path.insert(theAnchor, at: 0)
+            paths.append(path)
+            continue
           }
-          return result
+          theAnchor.accumulatedScore = accumulatedScore + theNode.score
+          if joinedValue.count >= longPhrases[0].count {
+            path = reverseWalk(
+              at: location - theAnchor.spanningLength, score: theAnchor.accumulatedScore, joinedPhrase: "",
+              longPhrases: .init()
+            )
+          } else {
+            path = reverseWalk(
+              at: location - theAnchor.spanningLength, score: theAnchor.accumulatedScore, joinedPhrase: joinedValue,
+              longPhrases: longPhrases
+            )
+          }
+          path.insert(theAnchor, at: 0)
+          paths.append(path)
+        }
+      } else {
+        // 看看當前格位有沒有更長的候選字詞。
+        var longPhrases = [String]()
+        for theAnchor in nodes {
+          guard let theNode = theAnchor.node else { continue }
+          if theAnchor.spanningLength > 1 {
+            longPhrases.append(theNode.currentKeyValue.value)
+          }
+        }
+
+        longPhrases = longPhrases.stableSorted {
+          $0.count > $1.count
+        }
+        for theAnchor in nodes {
+          var theAnchor = theAnchor
+          guard let theNode = theAnchor.node else { continue }
+          theAnchor.accumulatedScore = accumulatedScore + theNode.score
+          var path = [NodeAnchor]()
+          if theAnchor.spanningLength > 1 {
+            path = reverseWalk(
+              at: location - theAnchor.spanningLength, score: theAnchor.accumulatedScore, joinedPhrase: "",
+              longPhrases: .init()
+            )
+          } else {
+            path = reverseWalk(
+              at: location - theAnchor.spanningLength, score: theAnchor.accumulatedScore,
+              joinedPhrase: theNode.currentKeyValue.value, longPhrases: longPhrases
+            )
+          }
+          path.insert(theAnchor, at: 0)
+          paths.append(path)
         }
       }
-      return [] as [NodeAnchor]
+
+      guard !paths.isEmpty else {
+        return .init()
+      }
+
+      var result: [NodeAnchor] = paths[0]
+      for neta in paths {
+        if neta.last!.accumulatedScore > result.last!.accumulatedScore {
+          result = neta
+        }
+      }
+
+      return result
     }
 
     // MARK: - Private functions
 
     private func build() {
       let itrBegin: Int =
-        (mutCursorIndex < mutMaximumBuildSpanLength) ? 0 : mutCursorIndex - mutMaximumBuildSpanLength
-      let itrEnd: Int = min(mutCursorIndex + mutMaximumBuildSpanLength, mutReadings.count)
+        (mutCursorIndex < maxBuildSpanLength) ? 0 : mutCursorIndex - maxBuildSpanLength
+      let itrEnd: Int = min(mutCursorIndex + maxBuildSpanLength, mutReadings.count)
 
       for p in itrBegin..<itrEnd {
-        for q in 1..<mutMaximumBuildSpanLength {
+        for q in 1..<maxBuildSpanLength {
           if p + q > itrEnd {
             break
           }
-          let strSlice = mutReadings[p..<(p + q)]
-          let combinedReading: String = join(slice: strSlice, separator: joinSeparator)
+          let arrSlice = mutReadings[p..<(p + q)]
+          let combinedReading: String = join(slice: arrSlice, separator: joinSeparator)
 
           if !mutGrid.hasMatchedNode(location: p, spanningLength: q, key: combinedReading) {
             let unigrams: [Unigram] = mutLM.unigramsFor(key: combinedReading)
@@ -252,12 +290,35 @@ extension Megrez {
       }
     }
 
-    private func join(slice strSlice: ArraySlice<String>, separator: String) -> String {
+    private func join(slice arrSlice: ArraySlice<String>, separator: String) -> String {
       var arrResult: [String] = []
-      for value in strSlice {
+      for value in arrSlice {
         arrResult.append(value)
       }
       return arrResult.joined(separator: separator)
     }
+  }
+}
+
+// MARK: - Stable Sort Extension
+
+// Reference: https://stackoverflow.com/a/50545761/4162914
+
+extension Sequence {
+  /// Return a stable-sorted collection.
+  ///
+  /// - Parameter areInIncreasingOrder: Return nil when two element are equal.
+  /// - Returns: The sorted collection.
+  func stableSorted(
+    by areInIncreasingOrder: (Element, Element) throws -> Bool
+  )
+    rethrows -> [Element]
+  {
+    try enumerated()
+      .sorted { a, b -> Bool in
+        try areInIncreasingOrder(a.element, b.element)
+          || (a.offset < b.offset && !areInIncreasingOrder(b.element, a.element))
+      }
+      .map(\.element)
   }
 }
