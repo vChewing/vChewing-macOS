@@ -85,7 +85,7 @@
 "Apple Chewing - Dachen" = "Apple 大千注音キーボード";
 "Apple Chewing - Eten Traditional" = "Apple 倚天傳統キーボード";
 "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional." = "Apple 動態注音キーボード (大千と倚天伝統) を使うには、共通語分析器の配列を大千と設定すべきである。";
-"at anyplace else (like Windows Yahoo KeyKey)" = "単語の中・後で // Windows Yahoo KeyKey のやり方";
+"at the rear of the phrase (like Microsoft New Phonetic)" = "単語の後で // Microsoft 新注音入力のやり方";
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "入力した繁体字を日文 JIS 新字体と自動変換";
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "入力した繁体字を康熙字体と自動変換";
 "Automatically reload user data files if changes detected" = "ユーザー辞書データの変更を自動検出し、自動的に再読込";

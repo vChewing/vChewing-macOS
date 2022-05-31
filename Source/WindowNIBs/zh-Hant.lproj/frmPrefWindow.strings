@@ -9,7 +9,7 @@
 "12.title" = "注音排列:";
 "14.title" = "用以觸發選字的游標相對位置：";
 "16.title" = "游標置於詞語前方 // macOS 內建注音風格";
-"17.title" = "游標置於詞語中後方 // Windows 奇摩注音風格";
+"17.title" = "游標置於詞語後方 // Windows 微軟新注音風格";
 "18.title" = "Radio";
 "20.title" = "Radio";
 "21.title" = "橫向佈局";

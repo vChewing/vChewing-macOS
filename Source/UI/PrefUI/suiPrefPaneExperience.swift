@@ -110,7 +110,7 @@ struct suiPrefPaneExperience: View {
       Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Cursor Selection:")) }) {
         Picker("", selection: $selCursorPosition) {
           Text(LocalizedStringKey("in front of the phrase (like macOS built-in Zhuyin IME)")).tag(0)
-          Text(LocalizedStringKey("at anyplace else (like Windows Yahoo KeyKey)")).tag(1)
+          Text(LocalizedStringKey("at the rear of the phrase (like Microsoft New Phonetic)")).tag(1)
         }.onChange(of: selCursorPosition) { value in
           mgrPrefs.setRearCursorMode = (value == 1) ? true : false
         }

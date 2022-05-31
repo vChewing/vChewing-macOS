@@ -9,7 +9,7 @@
 "12.title" = "BPMF Parser:";
 "14.title" = "Choose the cursor position where you want to list possible candidates.";
 "16.title" = "Cursor in front of the phrase (like macOS built-in Zhuyin IME)";
-"17.title" = "Cursor at anyplace else (like Windows Yahoo KeyKey)";
+"17.title" = "Cursor at the rear of the phrase (like Microsoft New Phonetic)";
 "18.title" = "Radio";
 "20.title" = "Radio";
 "21.title" = "Horizontal";

@@ -85,7 +85,7 @@
 "Apple Chewing - Dachen" = "Apple 大千注音键盘排列";
 "Apple Chewing - Eten Traditional" = "Apple 倚天传统键盘排列";
 "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional." = "Apple 动态注音键盘布局（大千与倚天）要求普通话/国音分析器得配置为大千排列。";
-"at anyplace else (like Windows Yahoo KeyKey)" = "将游标置于词语中后方 // Windows 奇摩注音风格";
+"at the rear of the phrase (like Microsoft New Phonetic)" = "将游标置于词语后方 // Windows 微软新注音风格";
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "自动将繁体中文字转为日文 JIS 新字体";
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "自动将繁体中文字转为康熙正体字";
 "Automatically reload user data files if changes detected" = "自动检测并载入使用者语汇档案变更";
