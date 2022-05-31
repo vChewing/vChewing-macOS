@@ -52,8 +52,7 @@ private class HorizontalCandidateView: NSView {
     var result = NSSize.zero
 
     if !elementWidths.isEmpty {
-      result.width = elementWidths.reduce(0, +)
-      result.width += CGFloat(elementWidths.count)
+      result.width = elementWidths.reduce(0, +) + CGFloat(elementWidths.count)
       result.height = candidateTextHeight + cellPadding
     }
     return result
@@ -78,7 +77,7 @@ private class HorizontalCandidateView: NSView {
       if cellWidth < cellHeight * 1.35 {
         cellWidth = cellHeight * 1.35
       }
-      newWidths.append(cellWidth)
+      newWidths.append(round(cellWidth))
     }
     elementWidths = newWidths
   }
@@ -113,7 +112,7 @@ private class HorizontalCandidateView: NSView {
     keyLabelWidth = ceil(labelFontSize)
     keyLabelHeight = ceil(labelFontSize * 2)
     candidateTextHeight = ceil(candidateFontSize * 1.20)
-    cellPadding = ceil(biggestSize / 2.0)
+    cellPadding = ceil(biggestSize / 4.0) * 2
   }
 
   override func draw(_: NSRect) {
@@ -129,8 +128,8 @@ private class HorizontalCandidateView: NSView {
     )
 
     var accuWidth: CGFloat = 0
-    for index in 0..<elementWidths.count {
-      let currentWidth = elementWidths[index]
+    for (index, elementWidth) in elementWidths.enumerated() {
+      let currentWidth = elementWidth
       let rctCandidateArea = NSRect(
         x: accuWidth, y: 0.0, width: currentWidth + 1.0,
         height: candidateTextHeight + cellPadding
@@ -140,7 +139,7 @@ private class HorizontalCandidateView: NSView {
         height: keyLabelHeight * 2.0
       )
       let rctCandidatePhrase = NSRect(
-        x: accuWidth + keyLabelWidth - 1, y: cellPadding / 2,
+        x: accuWidth + keyLabelWidth - 1, y: cellPadding / 2 - 1,
         width: currentWidth - keyLabelWidth,
         height: candidateTextHeight
       )
@@ -203,8 +202,8 @@ private class HorizontalCandidateView: NSView {
       return nil
     }
     var accuWidth: CGFloat = 0.0
-    for index in 0..<elementWidths.count {
-      let currentWidth = elementWidths[index]
+    for (index, elementWidth) in elementWidths.enumerated() {
+      let currentWidth = elementWidth
 
       if location.x >= accuWidth, location.x <= accuWidth + currentWidth {
         return UInt(index)
@@ -248,7 +247,7 @@ public class ctlCandidateHorizontal: ctlCandidate {
   private var candidateView: HorizontalCandidateView
   private var prevPageButton: NSButton
   private var nextPageButton: NSButton
-  private var currentPage: UInt = 0
+  private var currentPageIndex: UInt = 0
 
   public init() {
     var contentRect = NSRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
@@ -266,7 +265,7 @@ public class ctlCandidateHorizontal: ctlCandidate {
 
     candidateView.wantsLayer = true
     candidateView.layer?.borderColor =
-      NSColor.selectedMenuItemTextColor.withAlphaComponent(0.30).cgColor
+      NSColor.selectedMenuItemTextColor.withAlphaComponent(0.10).cgColor
     candidateView.layer?.borderWidth = 1.0
     if #available(macOS 10.13, *) {
       candidateView.layer?.cornerRadius = 6.0
@@ -325,14 +324,15 @@ public class ctlCandidateHorizontal: ctlCandidate {
 
   override public func reloadData() {
     candidateView.highlightedIndex = 0
-    currentPage = 0
+    currentPageIndex = 0
     layoutCandidateView()
   }
 
   override public func showNextPage() -> Bool {
     guard delegate != nil else { return false }
     if pageCount == 1 { return highlightNextCandidate() }
-    currentPage = (currentPage + 1 >= pageCount) ? 0 : currentPage + 1
+    if currentPageIndex + 1 >= pageCount { clsSFX.beep() }
+    currentPageIndex = (currentPageIndex + 1 >= pageCount) ? 0 : currentPageIndex + 1
     candidateView.highlightedIndex = 0
     layoutCandidateView()
     return true
@@ -341,7 +341,8 @@ public class ctlCandidateHorizontal: ctlCandidate {
   override public func showPreviousPage() -> Bool {
     guard delegate != nil else { return false }
     if pageCount == 1 { return highlightPreviousCandidate() }
-    currentPage = (currentPage == 0) ? pageCount - 1 : currentPage - 1
+    if currentPageIndex == 0 { clsSFX.beep() }
+    currentPageIndex = (currentPageIndex == 0) ? pageCount - 1 : currentPageIndex - 1
     candidateView.highlightedIndex = 0
     layoutCandidateView()
     return true
@@ -368,13 +369,13 @@ public class ctlCandidateHorizontal: ctlCandidate {
       return UInt.max
     }
 
-    let result = currentPage * UInt(keyLabels.count) + index
+    let result = currentPageIndex * UInt(keyLabels.count) + index
     return result < delegate.candidateCountForController(self) ? result : UInt.max
   }
 
   override public var selectedCandidateIndex: UInt {
     get {
-      currentPage * UInt(keyLabels.count) + candidateView.highlightedIndex
+      currentPageIndex * UInt(keyLabels.count) + candidateView.highlightedIndex
     }
     set {
       guard let delegate = delegate else {
@@ -382,7 +383,7 @@ public class ctlCandidateHorizontal: ctlCandidate {
       }
       let keyLabelCount = UInt(keyLabels.count)
       if newValue < delegate.candidateCountForController(self) {
-        currentPage = newValue / keyLabelCount
+        currentPageIndex = newValue / keyLabelCount
         candidateView.highlightedIndex = newValue % keyLabelCount
         layoutCandidateView()
       }
@@ -410,7 +411,7 @@ extension ctlCandidateHorizontal {
     let count = delegate.candidateCountForController(self)
     let keyLabelCount = UInt(keyLabels.count)
 
-    let begin = currentPage * keyLabelCount
+    let begin = currentPageIndex * keyLabelCount
     for index in begin..<min(begin + keyLabelCount, count) {
       let candidate = delegate.ctlCandidate(self, candidateAtIndex: index)
       candidates.append(candidate)

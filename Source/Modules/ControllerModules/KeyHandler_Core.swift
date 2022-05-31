@@ -48,6 +48,7 @@ protocol KeyHandlerDelegate {
 
 class KeyHandler {
   let kEpsilon: Double = 0.000001
+  let kMaxComposingBufferNeedsToWalkSize: Int = 10
   var _composer: Tekkon.Composer = .init()
   var _inputMode: String = ""
   var _languageModel: vChewing.LMInstantiator = .init()
@@ -111,10 +112,21 @@ class KeyHandler {
     // Retrieve the most likely grid, i.e. a Maximum Likelihood Estimation
     // of the best possible Mandarin characters given the input syllables,
     // using the Viterbi algorithm implemented in the Megrez library.
-    // The walk() traces the grid to the end, hence no need to use .reversed() here.
-    _walkedNodes = _builder.walk(
-      at: _builder.grid.width, nodesLimit: 10, balanced: mgrPrefs.useScoreBalancing
-    )
+    // The walk() traces the grid to the end.
+    _walkedNodes = _builder.walk()
+
+    // if DEBUG mode is enabled, a GraphViz file is written to kGraphVizOutputfile.
+    if mgrPrefs.isDebugModeEnabled {
+      let result = _builder.grid.dumpDOT
+      do {
+        try result.write(
+          toFile: "/private/var/tmp/vChewing-visualization.dot",
+          atomically: true, encoding: .utf8
+        )
+      } catch {
+        IME.prtDebugIntel("Failed from writing dumpDOT results.")
+      }
+    }
   }
 
   var popOverflowComposingTextAndWalk: String {
@@ -128,7 +140,7 @@ class KeyHandler {
 
     var poppedText = ""
     if _builder.grid.width > mgrPrefs.composingBufferSize {
-      if _walkedNodes.count > 0 {
+      if !_walkedNodes.isEmpty {
         let anchor: Megrez.NodeAnchor = _walkedNodes[0]
         if let theNode = anchor.node {
           poppedText = theNode.currentKeyValue.value
@@ -148,8 +160,8 @@ class KeyHandler {
     return arrResult
   }
 
-  func fixNode(value: String) {
-    let cursorIndex: Int = actualCandidateCursorIndex
+  func fixNode(value: String, respectCursorPushing: Bool = true) {
+    let cursorIndex = min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), builderLength)
     let selectedNode: Megrez.NodeAnchor = _builder.grid.fixNodeSelectedCandidate(
       location: cursorIndex, value: value
     )
@@ -182,7 +194,7 @@ class KeyHandler {
     }
     walk()
 
-    if mgrPrefs.moveCursorAfterSelectingCandidate {
+    if mgrPrefs.moveCursorAfterSelectingCandidate, respectCursorPushing {
       var nextPosition = 0
       for node in _walkedNodes {
         if nextPosition >= cursorIndex { break }
@@ -232,7 +244,7 @@ class KeyHandler {
       IME.prtDebugIntel(
         "UOM: Suggestion retrieved, overriding the node score of the selected candidate.")
       _builder.grid.overrideNodeScoreForSelectedCandidate(
-        location: actualCandidateCursorIndex,
+        location: min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), builderLength),
         value: overrideValue,
         overridingScore: findHighestScore(nodes: rawNodes, epsilon: kEpsilon)
       )
@@ -297,10 +309,9 @@ class KeyHandler {
 
   var rawNodes: [Megrez.NodeAnchor] {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
-    /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的，但目前 Megrez 暫時缺乏對該特性的支援。
-    /// 所以暫時只能將威注音的游標後置風格描述成「跟 Windows 版雅虎奇摩注音一致」。
-    mgrPrefs.setRearCursorMode
-      ? _builder.grid.nodesCrossingOrEndingAt(location: actualCandidateCursorIndex)
+    /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
+    mgrPrefs.useRearCursorMode
+      ? _builder.grid.nodesBeginningAt(location: actualCandidateCursorIndex)
       : _builder.grid.nodesEndingAt(location: actualCandidateCursorIndex)
   }
 

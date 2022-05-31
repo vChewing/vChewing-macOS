@@ -28,7 +28,6 @@ import Cocoa
 
 struct UserDef {
   static let kIsDebugModeEnabled = "_DebugMode"
-  static let kUseScoreBalancing = "UseScoreBalancing"
   static let kMostRecentInputMode = "MostRecentInputMode"
   static let kUserDataFolderSpecified = "UserDataFolderSpecified"
   static let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
@@ -38,7 +37,7 @@ struct UserDef {
   static let kCandidateListTextSize = "CandidateListTextSize"
   static let kAppleLanguages = "AppleLanguages"
   static let kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
-  static let kSetRearCursorMode = "SetRearCursorMode"
+  static let kuseRearCursorMode = "useRearCursorMode"
   static let kUseHorizontalCandidateList = "UseHorizontalCandidateList"
   static let kComposingBufferSize = "ComposingBufferSize"
   static let kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
@@ -63,6 +62,13 @@ struct UserDef {
 
   static let kAssociatedPhrasesEnabled = "AssociatedPhrasesEnabled"
   static let kPhraseReplacementEnabled = "PhraseReplacementEnabled"
+
+  static let kUsingHotKeySCPC = "UsingHotKeySCPC"
+  static let kUsingHotKeyAssociates = "UsingHotKeyAssociates"
+  static let kUsingHotKeyCNS = "UsingHotKeyCNS"
+  static let kUsingHotKeyKangXi = "UsingHotKeyKangXi"
+  static let kUsingHotKeyJIS = "UsingHotKeyJIS"
+  static let kUsingHotKeyHalfWidthASCII = "UsingHotKeyHalfWidthASCII"
 }
 
 private let kDefaultCandidateListTextSize: CGFloat = 18
@@ -76,8 +82,8 @@ private let kMaxCandidateListTextSize: CGFloat = 196
 // will start to sputter beyond 12 such is the algorithmatic complexity
 // of the Viterbi algorithm used in the builder library (at O(N^2))
 private let kDefaultComposingBufferSize = 20
-private let kMinComposingBufferSize = 4
-private let kMaxComposingBufferSize = 30
+private let kMinComposingBufferSize = 10
+private let kMaxComposingBufferSize = 40
 
 private let kDefaultKeys = "123456789"
 
@@ -217,49 +223,8 @@ enum MandarinParser: Int {
 // MARK: -
 
 public enum mgrPrefs {
-  static var allKeys: [String] {
-    [
-      UserDef.kIsDebugModeEnabled,
-      UserDef.kUseScoreBalancing,
-      UserDef.kMostRecentInputMode,
-      UserDef.kUserDataFolderSpecified,
-      UserDef.kMandarinParser,
-      UserDef.kBasicKeyboardLayout,
-      UserDef.kShowPageButtonsInCandidateWindow,
-      UserDef.kCandidateListTextSize,
-      UserDef.kAppleLanguages,
-      UserDef.kShouldAutoReloadUserDataFiles,
-      UserDef.kSetRearCursorMode,
-      UserDef.kUseHorizontalCandidateList,
-      UserDef.kComposingBufferSize,
-      UserDef.kChooseCandidateUsingSpace,
-      UserDef.kCNS11643Enabled,
-      UserDef.kSymbolInputEnabled,
-      UserDef.kChineseConversionEnabled,
-      UserDef.kShiftJISShinjitaiOutputEnabled,
-      UserDef.kHalfWidthPunctuationEnabled,
-      UserDef.kSpecifyShiftTabKeyBehavior,
-      UserDef.kSpecifyShiftSpaceKeyBehavior,
-      UserDef.kEscToCleanInputBuffer,
-      UserDef.kCandidateTextFontName,
-      UserDef.kCandidateKeyLabelFontName,
-      UserDef.kCandidateKeys,
-      UserDef.kMoveCursorAfterSelectingCandidate,
-      UserDef.kPhraseReplacementEnabled,
-      UserDef.kUseSCPCTypingMode,
-      UserDef.kMaxCandidateLength,
-      UserDef.kShouldNotFartInLieuOfBeep,
-      UserDef.kShowHanyuPinyinInCompositionBuffer,
-      UserDef.kInlineDumpPinyinInLieuOfZhuyin,
-      UserDef.kAssociatedPhrasesEnabled,
-    ]
-  }
-
-  // MARK: - 既然 Preferences Module 的預設屬性不自動寫入 plist，那這邊就先寫入了。
-
   public static func setMissingDefaults() {
     UserDefaults.standard.setDefault(mgrPrefs.isDebugModeEnabled, forKey: UserDef.kIsDebugModeEnabled)
-    UserDefaults.standard.setDefault(mgrPrefs.useScoreBalancing, forKey: UserDef.kUseScoreBalancing)
     UserDefaults.standard.setDefault(mgrPrefs.mostRecentInputMode, forKey: UserDef.kMostRecentInputMode)
     UserDefaults.standard.setDefault(mgrPrefs.checkUpdateAutomatically, forKey: UserDef.kCheckUpdateAutomatically)
     UserDefaults.standard.setDefault(
@@ -280,7 +245,7 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(mgrPrefs.useSCPCTypingMode, forKey: UserDef.kUseSCPCTypingMode)
     UserDefaults.standard.setDefault(mgrPrefs.associatedPhrasesEnabled, forKey: UserDef.kAssociatedPhrasesEnabled)
     UserDefaults.standard.setDefault(
-      mgrPrefs.setRearCursorMode, forKey: UserDef.kSetRearCursorMode
+      mgrPrefs.useRearCursorMode, forKey: UserDef.kuseRearCursorMode
     )
     UserDefaults.standard.setDefault(
       mgrPrefs.moveCursorAfterSelectingCandidate, forKey: UserDef.kMoveCursorAfterSelectingCandidate
@@ -302,14 +267,18 @@ public enum mgrPrefs {
       mgrPrefs.inlineDumpPinyinInLieuOfZhuyin, forKey: UserDef.kInlineDumpPinyinInLieuOfZhuyin
     )
 
+    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeySCPC, forKey: UserDef.kUsingHotKeySCPC)
+    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyAssociates, forKey: UserDef.kUsingHotKeyAssociates)
+    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyCNS, forKey: UserDef.kUsingHotKeyCNS)
+    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyKangXi, forKey: UserDef.kUsingHotKeyKangXi)
+    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyJIS, forKey: UserDef.kUsingHotKeyJIS)
+    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyHalfWidthASCII, forKey: UserDef.kUsingHotKeyHalfWidthASCII)
+
     UserDefaults.standard.synchronize()
   }
 
   @UserDefault(key: UserDef.kIsDebugModeEnabled, defaultValue: false)
   static var isDebugModeEnabled: Bool
-
-  @UserDefault(key: UserDef.kUseScoreBalancing, defaultValue: false)
-  static var useScoreBalancing: Bool
 
   @UserDefault(key: UserDef.kMostRecentInputMode, defaultValue: "")
   static var mostRecentInputMode: String
@@ -353,8 +322,8 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kShouldAutoReloadUserDataFiles, defaultValue: true)
   static var shouldAutoReloadUserDataFiles: Bool
 
-  @UserDefault(key: UserDef.kSetRearCursorMode, defaultValue: false)
-  static var setRearCursorMode: Bool
+  @UserDefault(key: UserDef.kuseRearCursorMode, defaultValue: false)
+  static var useRearCursorMode: Bool
 
   @UserDefault(key: UserDef.kMoveCursorAfterSelectingCandidate, defaultValue: true)
   static var moveCursorAfterSelectingCandidate: Bool
@@ -554,4 +523,24 @@ public enum mgrPrefs {
     UserDefaults.standard.set(associatedPhrasesEnabled, forKey: UserDef.kAssociatedPhrasesEnabled)
     return associatedPhrasesEnabled
   }
+
+  // MARK: - Keyboard HotKey Enable / Disable
+
+  @UserDefault(key: UserDef.kUsingHotKeySCPC, defaultValue: true)
+  static var usingHotKeySCPC: Bool
+
+  @UserDefault(key: UserDef.kUsingHotKeyAssociates, defaultValue: true)
+  static var usingHotKeyAssociates: Bool
+
+  @UserDefault(key: UserDef.kUsingHotKeyCNS, defaultValue: true)
+  static var usingHotKeyCNS: Bool
+
+  @UserDefault(key: UserDef.kUsingHotKeyKangXi, defaultValue: true)
+  static var usingHotKeyKangXi: Bool
+
+  @UserDefault(key: UserDef.kUsingHotKeyJIS, defaultValue: true)
+  static var usingHotKeyJIS: Bool
+
+  @UserDefault(key: UserDef.kUsingHotKeyHalfWidthASCII, defaultValue: true)
+  static var usingHotKeyHalfWidthASCII: Bool
 }

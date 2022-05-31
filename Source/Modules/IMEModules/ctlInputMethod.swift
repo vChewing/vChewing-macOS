@@ -308,7 +308,9 @@ extension ctlInputMethod {
       return
     }
 
-    if let previous = previous as? InputState.NotEmpty {
+    if let previous = previous as? InputState.NotEmpty,
+      !(state is InputState.EmptyIgnoringPreviousState)
+    {
       commit(text: previous.composingBuffer, client: client)
     }
     client.setMarkedText(
@@ -694,7 +696,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
 
     if let state = state as? InputState.ChoosingCandidate {
       let selectedValue = state.candidates[Int(index)]
-      keyHandler.fixNode(value: selectedValue)
+      keyHandler.fixNode(value: selectedValue, respectCursorPushing: true)
 
       let inputting = keyHandler.buildInputtingState
 

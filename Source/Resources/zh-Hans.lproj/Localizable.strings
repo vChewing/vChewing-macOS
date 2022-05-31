@@ -15,7 +15,7 @@
 "Not Now" = "以后再说";
 "Visit Website" = "前往网站";
 "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@" = "目前使用的威注音官方版本是 %1$@ (%2$@)，网路上有更新版本 %3$@ (%4$@) 可供下载。是否要前往威注音网站下载新版来安装？%5$@";
-"Force KangXi Writing" = "康熙繁体字模式";
+"Force KangXi Writing" = "康熙正体字模式";
 "NotificationSwitchON" = "✔ 已启用";
 "NotificationSwitchOFF" = "✘ 已停用";
 "Edit User Phrases…" = "编辑自订语汇…";
@@ -85,19 +85,19 @@
 "Apple Chewing - Dachen" = "Apple 大千注音键盘排列";
 "Apple Chewing - Eten Traditional" = "Apple 倚天传统键盘排列";
 "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional." = "Apple 动态注音键盘布局（大千与倚天）要求普通话/国音分析器得配置为大千排列。";
-"at anyplace else (like Windows Yahoo KeyKey)" = "将游标置于词语中后方 // Windows 奇摩注音风格";
+"at the rear of the phrase (like Microsoft New Phonetic)" = "将游标置于词语后方 // Windows 微软新注音风格";
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "自动将繁体中文字转为日文 JIS 新字体";
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "自动将繁体中文字转为康熙正体字";
 "Automatically reload user data files if changes detected" = "自动检测并载入使用者语汇档案变更";
-"Balance the score according to candidate length" = "按候选字词的长度调整权重";
 "Basic Keyboard Layout:" = "基础键盘布局:";
+"Buffer Limit:" = "组字区容量:";
 "Candidate Layout:" = "候选字窗布局:";
 "Candidate Size:" = "候选字窗字号:";
 "Change user interface language (will reboot the IME)." = "变更输入法介面语言，会自动重启输入法。";
 "Check for updates automatically" = "自动检查软体更新";
 "Choose candidate font size for better visual clarity." = "变更候选字窗的字型大小。";
 "Choose or hit Enter to confim your prefered keys for selecting candidates." = "请选择您所偏好的用来选字的按键组合。自订组合需敲 Enter 键生效。";
-"Choose the behavior of (Shift+)Space key in the candidate window." = "指定 (Shift+)空格键 在选字窗内的轮替操作对象。";
+"Choose the behavior of (Shift+)Space key with candidates." = "指定 (Shift+)空格键 对候选字词而言的轮替操作对象。";
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "指定 (Shift+)Tab 在选字窗内的轮替操作对象。";
 "Choose the cursor position where you want to list possible candidates." = "请选择用以触发选字的游标相对位置。";
 "Choose the macOS-level basic keyboard layout." = "请选择 macOS 基础键盘布局。";
@@ -131,6 +131,7 @@
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "将游标置于词语前方 // macOS 内建注音风格";
 "Japanese" = "和语";
 "Keyboard" = "键盘";
+"Keyboard Shortcuts:" = "键盘快捷键:";
 "Misc Settings:" = "杂项:";
 "MiTAC" = "神通排列";
 "Non-QWERTY alphanumeral keyboard layouts are for Hanyu Pinyin parser only." = "QWERTY 以外的英数布局是为了汉语拼音排列使用者而准备的。";
@@ -146,6 +147,7 @@
 "Space & ESC Key:" = "ESC 与空格键:";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+空格键 换下一页，空格键 换选下一个后选字";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "空格键 换下一页，Shift+空格键 换选下一个后选字";
+"Specify the maximum characters allowed in the composition buffer." = "请指定组字缓冲区内的文字数的上限。";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉耻模式 // 取消勾选的话，敲错字时会有异音";
 "Traditional Chinese" = "繁体中文";
 "Typing Style:" = "输入风格:";

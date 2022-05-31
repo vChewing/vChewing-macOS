@@ -47,6 +47,7 @@ extension Megrez {
     ///   - node: 節點。
     ///   - length: 給定的節點長度。
     mutating func insert(node: Node, length: Int) {
+      let length = abs(length)  // 防呆
       mutLengthNodeMap[length] = node
       if length > mutMaximumLength {
         mutMaximumLength = length
@@ -57,6 +58,7 @@ extension Megrez {
     /// - Parameters:
     ///   - length: 給定的節點長度。
     mutating func removeNodeOfLengthGreaterThan(_ length: Int) {
+      let length = abs(length)  // 防呆
       if length > mutMaximumLength { return }
       var max = 0
       var removalList: [Int: Megrez.Node] = [:]
@@ -79,7 +81,7 @@ extension Megrez {
     /// - Parameters:
     ///   - length: 給定的節點長度。
     public func node(length: Int) -> Node? {
-      mutLengthNodeMap[length]
+      mutLengthNodeMap[abs(length)]  // 防呆
     }
   }
 }

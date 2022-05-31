@@ -34,10 +34,16 @@ public class clsSFX: NSObject, NSSoundDelegate {
 
   private var currentBeep: NSSound?
   private func beep() {
+    let defaultVolume: Float = 0.4
     // Stop existing beep
     if let beep = currentBeep {
       if beep.isPlaying {
+        for i in 1..<30 {
+          beep.volume = (defaultVolume / Float(i))
+          usleep(1000)
+        }
         beep.stop()
+        beep.volume = defaultVolume
       }
     }
     // Create a new beep sound if possible
@@ -54,7 +60,7 @@ public class clsSFX: NSObject, NSSoundDelegate {
       return
     }
     beep.delegate = self
-    beep.volume = 0.4
+    beep.volume = defaultVolume
     beep.play()
     currentBeep = beep
   }

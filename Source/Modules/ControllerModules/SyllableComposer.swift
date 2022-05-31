@@ -719,6 +719,10 @@ public struct Tekkon {
           consonant.selfReplace("ㄒ", "ㄕ")
         }
         if vowel == "ㄜ", semivowel.isEmpty { consonant.selfReplace("ㄑ", "ㄔ") }
+        if consonant == "ㄏ", semivowel.isEmpty, vowel.isEmpty {
+          consonant = ""
+          vowel = "ㄛ"
+        }
       }
 
       // 後置修正

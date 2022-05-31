@@ -25,6 +25,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import Cocoa
+import SwiftUI
 
 // MARK: - § Handle Input with States.
 
@@ -237,11 +238,11 @@ extension KeyHandler {
       return true
     }
 
-    // MARK: Calling candidate window using Space or Down or PageUp / PageDn.
+    // MARK: Calling candidate window using Up / Down or PageUp / PageDn.
 
     if let currentState = state as? InputState.NotEmpty, _composer.isEmpty,
       input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
-        || input.isPageDown || input.isPageUp || input.isTab
+        || input.isPageDown || input.isPageUp || (input.isTab && mgrPrefs.specifyShiftTabKeyBehavior)
         || (input.useVerticalMode && (input.isVerticalModeOnlyChooseCandidateKey))
     {
       if input.isSpace {
@@ -274,6 +275,14 @@ extension KeyHandler {
     // MARK: Esc
 
     if input.isESC { return handleEsc(state: state, stateCallback: stateCallback, errorCallback: errorCallback) }
+
+    // MARK: Tab
+
+    if input.isTab {
+      return handleTab(
+        state: state, isShiftHold: input.isShiftHold, stateCallback: stateCallback, errorCallback: errorCallback
+      )
+    }
 
     // MARK: Cursor backward
 
@@ -382,10 +391,12 @@ extension KeyHandler {
 
     var punctuationNamePrefix = ""
 
-    if input.isOptionHold {
+    if input.isOptionHold && !input.isControlHold {
       punctuationNamePrefix = "_alt_punctuation_"
-    } else if input.isControlHold {
+    } else if input.isControlHold && !input.isOptionHold {
       punctuationNamePrefix = "_ctrl_punctuation_"
+    } else if input.isControlHold && input.isOptionHold {
+      punctuationNamePrefix = "_alt_ctrl_punctuation_"
     } else if mgrPrefs.halfWidthPunctuationEnabled {
       punctuationNamePrefix = "_half_punctuation_"
     } else {

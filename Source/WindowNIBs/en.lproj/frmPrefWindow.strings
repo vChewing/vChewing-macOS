@@ -1,252 +1,91 @@
-
-/* Class = "NSWindow"; title = "vChewing Preferences"; ObjectID = "1"; */
 "1.title" = "vChewing Preferences";
-
-/* Class = "NSButtonCell"; title = "Debug Mode"; ObjectID = "sZx-18-8dO"; */
 "sZx-18-8dO.title" = "Debug Mode";
-
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "5"; */
 "5.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Standard"; ObjectID = "6"; */
 "6.title" = "Microsoft, Dachen, Wang, etc.";
-
-/* Class = "NSMenuItem"; title = "ETen"; ObjectID = "7"; */
 "7.title" = "ETen";
-
-/* Class = "NSMenuItem"; title = "Hsu"; ObjectID = "8"; */
 "8.title" = "Hsu";
-
-/* Class = "NSMenuItem"; title = "ETen26"; ObjectID = "9"; */
 "9.title" = "ETen26";
-
-/* Class = "NSMenuItem"; title = "Hanyu Pinyin with Numeral Intonation"; ObjectID = "10"; */
 "10.title" = "Hanyu Pinyin with Numeral Intonation";
-
-/* Class = "NSTextFieldCell"; title = "BPMF Parser:"; ObjectID = "12"; */
 "12.title" = "BPMF Parser:";
-
-/* Class = "NSTextFieldCell"; title = "Choose the cursor position where you want to list possible candidates."; ObjectID = "14"; */
 "14.title" = "Choose the cursor position where you want to list possible candidates.";
-
-/* Class = "NSButtonCell"; title = "Cursor in front of the phrase (like macOS built-in Zhuyin IME)"; ObjectID = "16"; */
 "16.title" = "Cursor in front of the phrase (like macOS built-in Zhuyin IME)";
-
-/* Class = "NSButtonCell"; title = "Cursor at anyplace else (like Windows Yahoo KeyKey)"; ObjectID = "17"; */
-"17.title" = "Cursor at anyplace else (like Windows Yahoo KeyKey)";
-
-/* Class = "NSButtonCell"; title = "Radio"; ObjectID = "18"; */
+"17.title" = "Cursor at the rear of the phrase (like Microsoft New Phonetic)";
 "18.title" = "Radio";
-
-/* Class = "NSButtonCell"; title = "Radio"; ObjectID = "20"; */
 "20.title" = "Radio";
-
-/* Class = "NSButtonCell"; title = "Horizontal"; ObjectID = "21"; */
 "21.title" = "Horizontal";
-
-/* Class = "NSButtonCell"; title = "Vertical"; ObjectID = "22"; */
 "22.title" = "Vertical";
-
-/* Class = "NSButtonCell"; title = "Show page buttons in candidate list"; ObjectID = "shc-Nu-UsM"; */
 "shc-Nu-UsM.title" = "Show page buttons in candidate list";
-
-/* Class = "NSTextFieldCell"; title = "Candidate List Layout:"; ObjectID = "24"; */
 "24.title" = "Candidate List Layout:";
-
-/* Class = "NSTextFieldCell"; title = "Candidate UI font size:"; ObjectID = "29"; */
 "29.title" = "Candidate UI font size:";
-
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "92"; */
 "92.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "12"; ObjectID = "93"; */
 "93.title" = "12";
-
-/* Class = "NSMenuItem"; title = "14"; ObjectID = "94"; */
 "94.title" = "14";
-
-/* Class = "NSMenuItem"; title = "16"; ObjectID = "95"; */
 "95.title" = "16";
-
-/* Class = "NSMenuItem"; title = "18"; ObjectID = "96"; */
 "96.title" = "18";
-
-/* Class = "NSMenuItem"; title = "24"; ObjectID = "98"; */
 "98.title" = "24";
-
-/* Class = "NSMenuItem"; title = "32"; ObjectID = "99"; */
 "99.title" = "32";
-
-/* Class = "NSMenuItem"; title = "64"; ObjectID = "100"; */
 "100.title" = "64";
-
-/* Class = "NSMenuItem"; title = "96"; ObjectID = "101"; */
 "101.title" = "96";
-
-/* Class = "NSButtonCell"; title = "Enable Space key for calling candidate window"; ObjectID = "110"; */
 "110.title" = "Enable Space key for calling candidate window";
-
-/* Class = "NSTextFieldCell"; title = "Basic Layout:"; ObjectID = "126"; */
 "126.title" = "Basic Layout:";
-
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "128"; */
 "128.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "IBM"; ObjectID = "137"; */
 "137.title" = "IBM";
-
-/* Class = "NSMenuItem"; title = "MiTAC"; ObjectID = "7fV-x8-WHQ"; */
 "7fV-x8-WHQ.title" = "MiTAC";
-
-/* Class = "NSMenuItem"; title = "Fake Seigyou"; ObjectID = "27F-8T-FkQ"; */
 "27F-8T-FkQ.title" = "Fake Seigyou (similar to JinYei)";
-
-/* Class = "NSTabViewItem"; label = "Keyboard"; ObjectID = "1AW-xf-c2f"; */
 "1AW-xf-c2f.label" = "Keyboard";
-
-/* Class = "NSBox"; title = "General Settings"; ObjectID = "2Y6-Am-WM1"; */
 "2Y6-Am-WM1.title" = "General Settings";
-
-/* Class = "NSTextFieldCell"; title = "Choose which keys you prefer for selecting candidates."; ObjectID = "2pS-nv-te4"; */
 "2pS-nv-te4.title" = "Choose which keys you prefer for selecting candidates.";
-
-/* Class = "NSButtonCell"; title = "Stop farting (when typed phonetic combination is invalid, etc.)"; ObjectID = "62u-jY-BRh"; */
 "62u-jY-BRh.title" = "Stop farting (when typed phonetic combination is invalid, etc.)";
-
-/* Class = "NSTextFieldCell"; title = "UI language setting:"; ObjectID = "9DS-Rc-TXq"; */
 "9DS-Rc-TXq.title" = "UI language setting:";
-
-/* Class = "NSButtonCell"; title = "Emulating select-candidate-per-character mode"; ObjectID = "ArK-Vk-OoT"; */
 "ArK-Vk-OoT.title" = "Emulating select-candidate-per-character mode";
-
-/* Class = "NSButtonCell"; title = "Auto-convert traditional Chinese glyphs to KangXi characters"; ObjectID = "BSK-bH-Gct"; */
 "BSK-bH-Gct.title" = "Auto-convert traditional Chinese glyphs to KangXi characters";
-
-/* Class = "NSButtonCell"; title = "Auto-convert traditional Chinese glyphs to KangXi characters"; ObjectID = "eia-1F-Do0"; */
 "eia-1F-Do0.title" = "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters";
-
-/* Class = "NSBox"; title = "Advanced Settings"; ObjectID = "E1l-m8-xgb"; */
 "E1l-m8-xgb.title" = "Advanced Settings";
-
-/* Class = "NSMenuItem"; title = "English"; ObjectID = "FSG-lN-CJO"; */
 "FSG-lN-CJO.title" = "English";
-
-/* Class = "NSTextFieldCell"; title = "Selection Keys:"; ObjectID = "FnD-oH-El5"; */
 "FnD-oH-El5.title" = "Selection Keys:";
-
-/* Class = "NSMenuItem"; title = "Auto-Select"; ObjectID = "GlJ-Ns-9eE"; */
 "GlJ-Ns-9eE.title" = "Auto-Select";
-
-/* Class = "NSTabViewItem"; label = "General"; ObjectID = "QUQ-oY-4Hc"; */
 "QUQ-oY-4Hc.label" = "General";
-
-/* Class = "NSTextFieldCell"; title = "Choose your preferred keyboard layout and phonetic parser."; ObjectID = "RQ6-MS-m4C"; */
 "RQ6-MS-m4C.title" = "Choose your preferred keyboard layout and phonetic parser.";
-
-/* Class = "NSButtonCell"; title = "Push the cursor in front of the phrase after selection"; ObjectID = "RUG-ls-KyA"; */
 "RUG-ls-KyA.title" = "Push the cursor in front of the phrase after selection";
-
-/* Class = "NSMenuItem"; title = "Traditional Chinese"; ObjectID = "TXr-FF-ehw"; */
 "TXr-FF-ehw.title" = "Traditional Chinese";
-
-/* Class = "NSBox"; title = "Output Settings"; ObjectID = "Uyz-xL-TVN"; */
 "Uyz-xL-TVN.title" = "Output Settings";
-
-/* Class = "NSButtonCell"; title = "Enable CNS11643 Support (2022-04-27)"; ObjectID = "W24-T4-cg0"; */
 "W24-T4-cg0.title" = "Enable CNS11643 Support (2022-04-27)";
-
-/* Class = "NSBox"; title = "Keyboard Layout"; ObjectID = "Wvt-HE-LOv"; */
 "Wvt-HE-LOv.title" = "Keyboard Layout";
-
-/* Class = "NSButtonCell"; title = "Check for updates automatically"; ObjectID = "Z9t-P0-BLF"; */
 "Z9t-P0-BLF.title" = "Check for updates automatically";
-
-/* Class = "NSTextFieldCell"; title = "Change user interface language (will reboot the IME)."; ObjectID = "ZEv-Q2-mYL"; */
 "ZEv-Q2-mYL.title" = "Change user interface language (will reboot the IME).";
-
-/* Class = "NSMenuItem"; title = "Simplified Chinese"; ObjectID = "akC-2g-ybz"; */
 "akC-2g-ybz.title" = "Simplified Chinese";
-
-/* Class = "NSButtonCell"; title = "Use ESC key to clear the entire input buffer"; ObjectID = "f2j-xD-4xK"; */
 "f2j-xD-4xK.title" = "Use ESC key to clear the entire input buffer";
-
-/* Class = "NSButtonCell"; title = "Automatically reload user data files if changes detected"; ObjectID = "f8i-69-zxm"; */
 "f8i-69-zxm.title" = "Automatically reload user data files if changes detected";
-
-/* Class = "NSTextFieldCell"; title = "Change UI font size of candidate window for a better visual clarity."; ObjectID = "iRg-wx-Nx2"; */
 "iRg-wx-Nx2.title" = "Change UI font size of candidate window for a better visual clarity.";
-
-/* Class = "NSComboBoxCell"; jQC-12-UuK.ibShadowedObjectValues[0] = "Item 1"; ObjectID = "jQC-12-UuK"; */
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
-
-/* Class = "NSComboBoxCell"; jQC-12-UuK.ibShadowedObjectValues[1] = "Item 2"; ObjectID = "jQC-12-UuK"; */
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
-
-/* Class = "NSComboBoxCell"; jQC-12-UuK.ibShadowedObjectValues[2] = "Item 3"; ObjectID = "jQC-12-UuK"; */
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
-
-/* Class = "NSMenuItem"; title = "Japanese"; ObjectID = "rVQ-Hx-cGi"; */
 "rVQ-Hx-cGi.title" = "Japanese";
-
-/* Class = "NSBox"; title = "Dictionary and Language Models"; ObjectID = "cf2-se-PDO"; */
 "cf2-se-PDO.title" = "Dictionary and Language Models";
-
-/* Class = "NSTextFieldCell"; title = "Choose your preferred layout of the candidate window."; ObjectID = "xC5-yV-1W1"; */
 "xC5-yV-1W1.title" = "Choose your preferred layout of the candidate window.";
-
-/* Class = "NSTabViewItem"; label = "Advanced"; ObjectID = "xrE-8T-WKO"; */
 "xrE-8T-WKO.label" = "Advanced";
-
-/* Class = "NSTabViewItem"; label = "Dictionary"; ObjectID = "2iG-Ic-gbl"; */
 "2iG-Ic-gbl.label" = "Dictionary";
-
-/* Class = "NSTextFieldCell"; title = "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional."; ObjectID = "wQ9-px-b07"; */
 "wQ9-px-b07.title" = "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional.";
-
-/* Class = "NSTextFieldCell"; title = "Choose the behavior of (Shift+)Tab key in the candidate window."; ObjectID = "ueU-Rz-a1C"; */
 "ueU-Rz-a1C.title" = "Choose the behavior of (Shift+)Tab key in the candidate window.";
-
-/* Class = "NSButtonCell"; title = "Cycling Pages"; ObjectID = "s7u-Fm-dVg"; */
 "s7u-Fm-dVg.title" = "Cycling Pages";
-
-/* Class = "NSButtonCell"; title = "Cycling Candidates"; ObjectID = "FVC-br-H57"; */
 "FVC-br-H57.title" = "Cycling Candidates";
-
-/* Class = "NSTextFieldCell"; title = "Choose the behavior of (Shift+)Space key in the candidate window."; ObjectID = "Pg5-G9-pY5"; */
-"Pg5-G9-pY5.title" = "Choose the behavior of (Shift+)Space key in the candidate window.";
-
-/* Class = "NSButtonCell"; title = "Space to +cycle pages, Shift+Space to +cycle candidates"; ObjectID = "XqL-rf-X6d"; */
+"Pg5-G9-pY5.title" = "Choose the behavior of (Shift+)Space key with candidates.";
 "XqL-rf-X6d.title" = "Space to +cycle pages, Shift+Space to +cycle candidates";
-
-/* Class = "NSButtonCell"; title = "Space to +cycle candidates, Shift+Space to +cycle pages"; ObjectID = "dIN-TZ-67g"; */
 "dIN-TZ-67g.title" = "Space to +cycle candidates, Shift+Space to +cycle pages";
-
-/* Class = "NSButtonCell"; title = "Enable symbol input support (incl. certain emoji symbols)"; ObjectID = "hSv-LJ-Cq3"; */
 "hSv-LJ-Cq3.title" = "Enable symbol input support (incl. certain emoji symbols)";
-
-/* Class = "NSTextFieldCell"; title = "Choose your desired user data folder path. Will be omitted if invalid."; ObjectID = "wN3-k3-b2a"; */
 "wN3-k3-b2a.title" = "Choose your desired user data folder path. Will be omitted if invalid.";
-
-/* Class = "NSButtonCell"; title = "Show Hanyu-Pinyin in the inline composition buffer"; ObjectID = "wFR-zX-M8H"; */
 "wFR-zX-M8H.title" = "Show Hanyu-Pinyin in the inline composition buffer";
-
-/* Class = "NSButtonCell"; title = "Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter"; ObjectID = "iWy-Nw-QKB"; */
 "iWy-Nw-QKB.title" = "Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter";
-
-/* Class = "NSMenuItem"; title = "Dachen 26 (libChewing)"; ObjectID = "xjP-r7-GaK"; */
 "xjP-r7-GaK.title" = "Dachen 26 (libChewing)";
-
-/* Class = "NSMenuItem"; title = "Secondary Pinyin with Numeral Intonation"; ObjectID = "Parser11"; */
 "Parser11.title" = "Secondary Pinyin with Numeral Intonation";
-
-/* Class = "NSMenuItem"; title = "Yale Pinyin with Numeral Intonation"; ObjectID = "Parser12"; */
 "Parser12.title" = "Yale Pinyin with Numeral Intonation";
-
-/* Class = "NSMenuItem"; title = "Hualuo Pinyin with Numeral Intonation"; ObjectID = "Parser13"; */
 "Parser13.title" = "Hualuo Pinyin with Numeral Intonation";
-
-/* Class = "NSMenuItem"; title = "Universal Pinyin with Numeral Intonation"; ObjectID = "Parser14"; */
 "Parser14.title" = "Universal Pinyin with Numeral Intonation";
-
-/* Class = "NSButtonCell"; title = "Balance the score according to candidate length"; ObjectID = "Wh1-iz-pwM"; */
-"Wh1-iz-pwM.title" = "Balance the score according to candidate length";
+"xibKeyboardShortcuts.title" = "Keyboard Shortcuts";
+"xibUsingHotKeySCPC.title" = "Per-Char Select Mode";
+"xibUsingHotKeyAssociates.title" = "Per-Char Associated Phrases";
+"xibUsingHotKeyCNS.title" = "CNS11643 Mode";
+"xibUsingHotKeyKangXi.title" = "Force KangXi Writing";
+"xibUsingHotKeyJIS.title" = "JIS Shinjitai Output";
+"xibUsingHotKeyHalfWidthASCII.title" = "Half-Width Punctuation Mode";
+"xibLabelBufferLimit.title" = "Buffer Limit:";

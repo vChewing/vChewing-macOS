@@ -80,14 +80,10 @@ extension vChewing {
         return false
       }
 
-      if allowConsolidation {
-        LMConsolidator.fixEOF(path: path)
-        LMConsolidator.consolidate(path: path, pragma: true)
-      }
-
       do {
         let rawData = try Data(contentsOf: URL(fileURLWithPath: path))
-        let rawPlist = try PropertyListSerialization.propertyList(from: rawData, format: nil) as! [String: [Data]]
+        let rawPlist: [String: [Data]] =
+          try PropertyListSerialization.propertyList(from: rawData, format: nil) as? [String: [Data]] ?? .init()
         rangeMap = rawPlist
       } catch {
         IME.prtDebugIntel("↑ Exception happened when reading plist file at: \(path).")

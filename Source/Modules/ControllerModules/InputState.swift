@@ -83,12 +83,8 @@ class InputState {
   // MARK: -
 
   /// Represents that the composing buffer is empty.
-  class EmptyIgnoringPreviousState: InputState {
-    var composingBuffer: String {
-      ""
-    }
-
-    var description: String {
+  class EmptyIgnoringPreviousState: Empty {
+    override var description: String {
       "<InputState.EmptyIgnoringPreviousState>"
     }
   }

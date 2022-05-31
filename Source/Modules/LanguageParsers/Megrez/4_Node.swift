@@ -47,7 +47,7 @@ extension Megrez {
     /// 用來登記「當前選中的單元圖」的索引值的變數。
     private var mutSelectedUnigramIndex: Int = 0
     /// 用來登記要施加給「『被標記為選中狀態』的候選字詞」的複寫權重的數值。
-    private let kSelectedCandidateScore: Double = 99
+    public let kSelectedCandidateScore: Double = 99
     /// 將當前節點列印成一個字串。
     public var description: String {
       "(node,key:\(mutKey),fixed:\(mutCandidateFixed ? "true" : "false"),selected:\(mutSelectedUnigramIndex),\(mutUnigrams))"
@@ -84,7 +84,7 @@ extension Megrez {
         $0.score > $1.score
       }
 
-      if mutUnigrams.count > 0 {
+      if !mutUnigrams.isEmpty {
         mutScore = mutUnigrams[0].score
       }
 
@@ -133,6 +133,7 @@ extension Megrez {
     ///   - index: 索引位置。
     ///   - fix: 是否將當前解點標記為「候選詞已鎖定」的狀態。
     public func selectCandidateAt(index: Int = 0, fix: Bool = false) {
+      let index = abs(index)
       mutSelectedUnigramIndex = index >= mutUnigrams.count ? 0 : index
       mutCandidateFixed = fix
       mutScore = kSelectedCandidateScore
@@ -152,6 +153,7 @@ extension Megrez {
     ///   - index: 索引位置。
     ///   - score: 給定權重條件。
     public func selectFloatingCandidateAt(index: Int, score: Double) {
+      let index = abs(index)  // 防呆
       mutSelectedUnigramIndex = index >= mutUnigrams.count ? 0 : index
       mutCandidateFixed = false
       mutScore = score

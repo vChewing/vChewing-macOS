@@ -32,7 +32,7 @@ struct suiPrefPaneExperience: View {
     (UserDefaults.standard.string(forKey: UserDef.kCandidateKeys) ?? mgrPrefs.defaultCandidateKeys) as String
   @State private var selCursorPosition =
     UserDefaults.standard.bool(
-      forKey: UserDef.kSetRearCursorMode) ? 1 : 0
+      forKey: UserDef.kuseRearCursorMode) ? 1 : 0
   @State private var selPushCursorAfterSelection = UserDefaults.standard.bool(
     forKey: UserDef.kMoveCursorAfterSelectingCandidate)
   @State private var selKeyBehaviorShiftTab =
@@ -45,6 +45,7 @@ struct suiPrefPaneExperience: View {
   @State private var selKeyBehaviorESCForClearingTheBuffer = UserDefaults.standard.bool(
     forKey: UserDef.kEscToCleanInputBuffer)
   @State private var selEnableSCPCTypingMode = UserDefaults.standard.bool(forKey: UserDef.kUseSCPCTypingMode)
+  @State private var selComposingBufferSize = UserDefaults.standard.integer(forKey: UserDef.kComposingBufferSize)
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -88,12 +89,30 @@ struct suiPrefPaneExperience: View {
         )
         .preferenceDescription()
       }
+      Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Buffer Limit:")) }) {
+        Picker("", selection: $selComposingBufferSize) {
+          Text("10").tag(10)
+          Text("15").tag(15)
+          Text("20").tag(20)
+          Text("25").tag(25)
+          Text("30").tag(30)
+          Text("35").tag(35)
+          Text("40").tag(40)
+        }.onChange(of: selComposingBufferSize) { value in
+          mgrPrefs.composingBufferSize = value
+        }
+        .labelsHidden()
+        .horizontalRadioGroupLayout()
+        .pickerStyle(RadioGroupPickerStyle())
+        Text(LocalizedStringKey("Specify the maximum characters allowed in the composition buffer."))
+          .preferenceDescription()
+      }
       Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Cursor Selection:")) }) {
         Picker("", selection: $selCursorPosition) {
           Text(LocalizedStringKey("in front of the phrase (like macOS built-in Zhuyin IME)")).tag(0)
-          Text(LocalizedStringKey("at anyplace else (like Windows Yahoo KeyKey)")).tag(1)
+          Text(LocalizedStringKey("at the rear of the phrase (like Microsoft New Phonetic)")).tag(1)
         }.onChange(of: selCursorPosition) { value in
-          mgrPrefs.setRearCursorMode = (value == 1) ? true : false
+          mgrPrefs.useRearCursorMode = (value == 1) ? true : false
         }
         .labelsHidden()
         .pickerStyle(RadioGroupPickerStyle())
@@ -128,7 +147,7 @@ struct suiPrefPaneExperience: View {
         }
         .labelsHidden()
         .pickerStyle(RadioGroupPickerStyle())
-        Text(LocalizedStringKey("Choose the behavior of (Shift+)Space key in the candidate window."))
+        Text(LocalizedStringKey("Choose the behavior of (Shift+)Space key with candidates."))
           .preferenceDescription()
       }
       Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Space & ESC Key:")) }) {
