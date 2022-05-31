@@ -161,7 +161,7 @@ class KeyHandler {
   }
 
   func fixNode(value: String, respectCursorPushing: Bool = true) {
-    let cursorIndex = min(actualCandidateCursorIndex + (mgrPrefs.setRearCursorMode ? 1 : 0), builderLength)
+    let cursorIndex = min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), builderLength)
     let selectedNode: Megrez.NodeAnchor = _builder.grid.fixNodeSelectedCandidate(
       location: cursorIndex, value: value
     )
@@ -244,7 +244,7 @@ class KeyHandler {
       IME.prtDebugIntel(
         "UOM: Suggestion retrieved, overriding the node score of the selected candidate.")
       _builder.grid.overrideNodeScoreForSelectedCandidate(
-        location: min(actualCandidateCursorIndex + (mgrPrefs.setRearCursorMode ? 1 : 0), builderLength),
+        location: min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), builderLength),
         value: overrideValue,
         overridingScore: findHighestScore(nodes: rawNodes, epsilon: kEpsilon)
       )
@@ -310,7 +310,7 @@ class KeyHandler {
   var rawNodes: [Megrez.NodeAnchor] {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
-    mgrPrefs.setRearCursorMode
+    mgrPrefs.useRearCursorMode
       ? _builder.grid.nodesBeginningAt(location: actualCandidateCursorIndex)
       : _builder.grid.nodesEndingAt(location: actualCandidateCursorIndex)
   }

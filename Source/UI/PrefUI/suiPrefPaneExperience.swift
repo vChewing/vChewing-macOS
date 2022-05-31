@@ -32,7 +32,7 @@ struct suiPrefPaneExperience: View {
     (UserDefaults.standard.string(forKey: UserDef.kCandidateKeys) ?? mgrPrefs.defaultCandidateKeys) as String
   @State private var selCursorPosition =
     UserDefaults.standard.bool(
-      forKey: UserDef.kSetRearCursorMode) ? 1 : 0
+      forKey: UserDef.kuseRearCursorMode) ? 1 : 0
   @State private var selPushCursorAfterSelection = UserDefaults.standard.bool(
     forKey: UserDef.kMoveCursorAfterSelectingCandidate)
   @State private var selKeyBehaviorShiftTab =
@@ -112,7 +112,7 @@ struct suiPrefPaneExperience: View {
           Text(LocalizedStringKey("in front of the phrase (like macOS built-in Zhuyin IME)")).tag(0)
           Text(LocalizedStringKey("at the rear of the phrase (like Microsoft New Phonetic)")).tag(1)
         }.onChange(of: selCursorPosition) { value in
-          mgrPrefs.setRearCursorMode = (value == 1) ? true : false
+          mgrPrefs.useRearCursorMode = (value == 1) ? true : false
         }
         .labelsHidden()
         .pickerStyle(RadioGroupPickerStyle())

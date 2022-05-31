@@ -37,7 +37,7 @@ struct UserDef {
   static let kCandidateListTextSize = "CandidateListTextSize"
   static let kAppleLanguages = "AppleLanguages"
   static let kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
-  static let kSetRearCursorMode = "SetRearCursorMode"
+  static let kuseRearCursorMode = "useRearCursorMode"
   static let kUseHorizontalCandidateList = "UseHorizontalCandidateList"
   static let kComposingBufferSize = "ComposingBufferSize"
   static let kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
@@ -245,7 +245,7 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(mgrPrefs.useSCPCTypingMode, forKey: UserDef.kUseSCPCTypingMode)
     UserDefaults.standard.setDefault(mgrPrefs.associatedPhrasesEnabled, forKey: UserDef.kAssociatedPhrasesEnabled)
     UserDefaults.standard.setDefault(
-      mgrPrefs.setRearCursorMode, forKey: UserDef.kSetRearCursorMode
+      mgrPrefs.useRearCursorMode, forKey: UserDef.kuseRearCursorMode
     )
     UserDefaults.standard.setDefault(
       mgrPrefs.moveCursorAfterSelectingCandidate, forKey: UserDef.kMoveCursorAfterSelectingCandidate
@@ -322,8 +322,8 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kShouldAutoReloadUserDataFiles, defaultValue: true)
   static var shouldAutoReloadUserDataFiles: Bool
 
-  @UserDefault(key: UserDef.kSetRearCursorMode, defaultValue: false)
-  static var setRearCursorMode: Bool
+  @UserDefault(key: UserDef.kuseRearCursorMode, defaultValue: false)
+  static var useRearCursorMode: Bool
 
   @UserDefault(key: UserDef.kMoveCursorAfterSelectingCandidate, defaultValue: true)
   static var moveCursorAfterSelectingCandidate: Bool

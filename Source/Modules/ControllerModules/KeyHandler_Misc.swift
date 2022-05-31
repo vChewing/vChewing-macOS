@@ -35,7 +35,7 @@ extension KeyHandler {
 
   var actualCandidateCursorIndex: Int {
     var cursorIndex = builderCursorIndex
-    switch mgrPrefs.setRearCursorMode {
+    switch mgrPrefs.useRearCursorMode {
       case false:
         do {
           // macOS built-in Zhuyin style.
