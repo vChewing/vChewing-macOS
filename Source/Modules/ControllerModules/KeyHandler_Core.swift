@@ -140,7 +140,7 @@ class KeyHandler {
 
     var poppedText = ""
     if _builder.grid.width > mgrPrefs.composingBufferSize {
-      if _walkedNodes.count > 0 {
+      if !_walkedNodes.isEmpty {
         let anchor: Megrez.NodeAnchor = _walkedNodes[0]
         if let theNode = anchor.node {
           poppedText = theNode.currentKeyValue.value
