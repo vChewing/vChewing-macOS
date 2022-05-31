@@ -35,19 +35,27 @@ extension KeyHandler {
 
   var actualCandidateCursorIndex: Int {
     var cursorIndex = builderCursorIndex
-    // Windows Yahoo Kimo IME style, phrase is *at the rear of* the cursor.
-    // (i.e. the cursor is always *before* the phrase.)
-    // This is different from MS Phonetics IME style ...
-    // ... since Windows Yahoo Kimo allows "node crossing".
-    if (mgrPrefs.setRearCursorMode
-      && (cursorIndex < builderLength))
-      || cursorIndex == 0
-    {
-      if cursorIndex == 0, !mgrPrefs.setRearCursorMode {
-        cursorIndex += keyLengthAtIndexZero
-      } else {
-        cursorIndex += 1
-      }
+    switch mgrPrefs.setRearCursorMode {
+      case false:
+        do {
+          // macOS built-in Zhuyin style.
+          // (i.e. the cursor is always in front of the phrase.)
+          // No crossing.
+          switch cursorIndex {
+            case 0: cursorIndex = 1
+            default: break
+          }
+        }
+      case true:
+        do {
+          // Microsoft new phonetics style.
+          // (i.e. the cursor is always at the rear of the phrase.)
+          // No crossing.
+          switch cursorIndex {
+            case builderLength: cursorIndex -= 1
+            default: break
+          }
+        }
     }
     return cursorIndex
   }

@@ -625,9 +625,12 @@ extension KeyHandler {
 
     var length = 0
     var currentAnchor = Megrez.NodeAnchor()
+    let cursorIndex = min(
+      actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), builderLength
+    )
     for anchor in _walkedNodes {
       length += anchor.spanningLength
-      if length >= actualCandidateCursorIndex {
+      if length >= cursorIndex {
         currentAnchor = anchor
         break
       }
