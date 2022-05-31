@@ -308,7 +308,9 @@ extension ctlInputMethod {
       return
     }
 
-    if let previous = previous as? InputState.NotEmpty {
+    if let previous = previous as? InputState.NotEmpty,
+      !(state is InputState.EmptyIgnoringPreviousState)
+    {
       commit(text: previous.composingBuffer, client: client)
     }
     client.setMarkedText(
