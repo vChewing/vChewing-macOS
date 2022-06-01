@@ -40,12 +40,12 @@ extension KeyHandler {
     var readingCursorIndex = 0
     // We must do some Unicode codepoint counting to find the actual cursor location for the client
     // i.e. we need to take UTF-16 into consideration, for which a surrogate pair takes 2 UniChars
-    // locations. Even if we are using Swift, NSString is still necessary here.
+    // locations. Since we are using Swift, we use .utf16 as the equivalent of NSString.length().
     for walkedNode in _walkedNodes {
       if let theNode = walkedNode.node {
         let strNodeValue = theNode.currentKeyValue.value
         composingBuffer += strNodeValue
-        let arrSplit: [NSString] = (strNodeValue as NSString).split()
+        let arrSplit: [String] = Array(strNodeValue).map { String($0) }
         let codepointCount = arrSplit.count
         // This re-aligns the cursor index in the composed string
         // (the actual cursor on the screen) with the builder's logical
@@ -55,19 +55,19 @@ extension KeyHandler {
         // index.
         let spanningLength: Int = walkedNode.spanningLength
         if readingCursorIndex + spanningLength <= builderCursorIndex {
-          composedStringCursorIndex += (strNodeValue as NSString).length
+          composedStringCursorIndex += strNodeValue.utf16.count
           readingCursorIndex += spanningLength
         } else {
           if codepointCount == spanningLength {
             var i = 0
             while i < codepointCount, readingCursorIndex < builderCursorIndex {
-              composedStringCursorIndex += arrSplit[i].length
+              composedStringCursorIndex += arrSplit[i].utf16.count
               readingCursorIndex += 1
               i += 1
             }
           } else {
             if readingCursorIndex < builderCursorIndex {
-              composedStringCursorIndex += (strNodeValue as NSString).length
+              composedStringCursorIndex += strNodeValue.utf16.count
               readingCursorIndex += spanningLength
               if readingCursorIndex > builderCursorIndex {
                 readingCursorIndex = builderCursorIndex
@@ -76,7 +76,7 @@ extension KeyHandler {
               // in cases of moving cursors across certain emojis which emoji
               // char count is inequal to the reading count.
               // Example in McBopomofo: Typing 王建民 (3 readings) gets a tree emoji.
-              // Example in vChewing: Typing 義麵 (two readings) gets a pasta emoji.
+              // Example in vChewing: Typing 義麵 (2 readings) gets a pasta emoji.
               switch builderCursorIndex {
                 case _builder.readings.count...:
                   tooltipParameterRef[0] = _builder.readings[_builder.readings.count - 1]
@@ -97,11 +97,22 @@ extension KeyHandler {
     // Now, we gather all the intel, separate the composing buffer to two parts (head and tail),
     // and insert the reading text (the Mandarin syllable) in between them.
     // The reading text is what the user is typing.
-    let head = String((composingBuffer as NSString).substring(to: composedStringCursorIndex))
+    var arrHead = [String.UTF16View.Element]()
+    var arrTail = [String.UTF16View.Element]()
+
+    for (i, n) in composingBuffer.utf16.enumerated() {
+      if i < composedStringCursorIndex {
+        arrHead.append(n)
+      } else {
+        arrTail.append(n)
+      }
+    }
+
+    let head = String(utf16CodeUnits: arrHead, count: arrHead.count)
     let reading = _composer.getInlineCompositionForIMK(isHanyuPinyin: mgrPrefs.showHanyuPinyinInCompositionBuffer)
-    let tail = String((composingBuffer as NSString).substring(from: composedStringCursorIndex))
+    let tail = String(utf16CodeUnits: arrTail, count: arrTail.count)
     let composedText = head + reading + tail
-    let cursorIndex = composedStringCursorIndex + reading.count
+    let cursorIndex = composedStringCursorIndex + reading.utf16.count
 
     let stateResult = InputState.Inputting(composingBuffer: composedText, cursorIndex: UInt(cursorIndex))
 
