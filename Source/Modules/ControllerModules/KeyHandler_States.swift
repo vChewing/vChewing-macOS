@@ -34,13 +34,13 @@ extension KeyHandler {
   var buildInputtingState: InputState.Inputting {
     // "Updating the composing buffer" means to request the client
     // to "refresh" the text input buffer with our "composing text"
+    var tooltipParameterRef: [String] = ["", ""]
     var composingBuffer = ""
     var composedStringCursorIndex = 0
     var readingCursorIndex = 0
     // We must do some Unicode codepoint counting to find the actual cursor location for the client
     // i.e. we need to take UTF-16 into consideration, for which a surrogate pair takes 2 UniChars
-    // locations. These processes are inherited from the ObjC++ version of this class and might be
-    // unnecessary in Swift, but this deduction requires further experiments.
+    // locations. Even if we are using Swift, NSString is still necessary here.
     for walkedNode in _walkedNodes {
       if let theNode = walkedNode.node {
         let strNodeValue = theNode.currentKeyValue.value
@@ -72,6 +72,22 @@ extension KeyHandler {
               if readingCursorIndex > builderCursorIndex {
                 readingCursorIndex = builderCursorIndex
               }
+              // Now we start preparing the contents of the tooltips used
+              // in cases of moving cursors across certain emojis which emoji
+              // char count is inequal to the reading count.
+              // Example in McBopomofo: Typing 王建民 (3 readings) gets a tree emoji.
+              // Example in vChewing: Typing 義麵 (two readings) gets a pasta emoji.
+              switch builderCursorIndex {
+                case _builder.readings.count...:
+                  tooltipParameterRef[0] = _builder.readings[_builder.readings.count - 1]
+                case 0:
+                  tooltipParameterRef[1] = _builder.readings[builderCursorIndex]
+                default:
+                  do {
+                    tooltipParameterRef[0] = _builder.readings[builderCursorIndex - 1]
+                    tooltipParameterRef[1] = _builder.readings[builderCursorIndex]
+                  }
+              }
             }
           }
         }
@@ -87,7 +103,29 @@ extension KeyHandler {
     let composedText = head + reading + tail
     let cursorIndex = composedStringCursorIndex + reading.count
 
-    return InputState.Inputting(composingBuffer: composedText, cursorIndex: UInt(cursorIndex))
+    let stateResult = InputState.Inputting(composingBuffer: composedText, cursorIndex: UInt(cursorIndex))
+
+    // Now we start weaving the contents of the tooltip.
+    if tooltipParameterRef[0].isEmpty, tooltipParameterRef[1].isEmpty {
+      stateResult.tooltip = ""
+    } else if tooltipParameterRef[0].isEmpty {
+      stateResult.tooltip = String(
+        format: NSLocalizedString("Cursor is to the rear of \"%@\".", comment: ""),
+        tooltipParameterRef[1]
+      )
+    } else if tooltipParameterRef[1].isEmpty {
+      stateResult.tooltip = String(
+        format: NSLocalizedString("Cursor is in front of \"%@\".", comment: ""),
+        tooltipParameterRef[0]
+      )
+    } else {
+      stateResult.tooltip = String(
+        format: NSLocalizedString("Cursor is between \"%@\" and \"%@\".", comment: ""),
+        tooltipParameterRef[0], tooltipParameterRef[1]
+      )
+    }
+
+    return stateResult
   }
 
   // MARK: - 用以生成候選詞陣列及狀態

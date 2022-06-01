@@ -57,6 +57,8 @@
 "Edit User Symbol & Emoji Data…" = "編輯自訂符號&繪文字資料…";
 "Choose your desired user data folder." = "請選擇您想指定的使用者語彙檔案目錄。";
 "Cursor is between \"%@\" and \"%@\"." = "游標介於「%@」與「%@」之間。";
+"Cursor is to the rear of \"%@\"." = "游標在「%@」的後方。";
+"Cursor is in front of \"%@\"." = "游標在「%@」的前方。.";
 "Loading CHS Core Dict..." = "載入簡體中文核心辭典…";
 "Loading CHT Core Dict..." = "載入繁體中文核心辭典…";
 "Core Dict loading complete." = "核心辭典載入完畢";

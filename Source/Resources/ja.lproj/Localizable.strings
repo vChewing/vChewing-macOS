@@ -57,6 +57,8 @@
 "Edit User Symbol & Emoji Data…" = "ユーザー符号＆絵文字辞書を編集…";
 "Choose your desired user data folder." = "欲しがるユーザー辞書フォルダをお選びください。";
 "Cursor is between \"%@\" and \"%@\"." = "カーソルは「%@」と「%@」に間れ。";
+"Cursor is to the rear of \"%@\"." = "カーソルは「%@」の後ろに。";
+"Cursor is in front of \"%@\"." = "カーソルは「%@」の前に。";
 "Loading CHS Core Dict..." = "簡体中国語核心辞書読込中…";
 "Loading CHT Core Dict..." = "繁体中国語核心辞書読込中…";
 "Core Dict loading complete." = "核心辞書読込完了";
