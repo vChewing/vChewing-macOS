@@ -176,7 +176,7 @@ class InputState {
         return ""
       }
 
-      let text = (composingBuffer as NSString).substring(with: markedRange)
+      let text = composingBuffer.substring(with: markedRange)
       if markedRange.length < kMinMarkRangeLength {
         ctlInputMethod.tooltipController.setColor(state: .denialInsufficiency)
         return String(
@@ -194,9 +194,8 @@ class InputState {
         )
       }
 
-      let (exactBegin, _) = (composingBuffer as NSString).characterIndex(
-        from: markedRange.location)
-      let (exactEnd, _) = (composingBuffer as NSString).characterIndex(
+      let (exactBegin, _) = composingBuffer.utf16CharIndex(from: markedRange.location)
+      let (exactEnd, _) = composingBuffer.utf16CharIndex(
         from: markedRange.location + markedRange.length)
       let selectedReadings = readings[exactBegin..<exactEnd]
       let joined = selectedReadings.joined(separator: "-")
@@ -254,7 +253,7 @@ class InputState {
         ],
         range: NSRange(
           location: end,
-          length: (composingBuffer as NSString).length - end
+          length: composingBuffer.utf16.count - end
         )
       )
       return attributedString
@@ -292,10 +291,9 @@ class InputState {
     }
 
     var chkIfUserPhraseExists: Bool {
-      let text = (composingBuffer as NSString).substring(with: markedRange)
-      let (exactBegin, _) = (composingBuffer as NSString).characterIndex(
-        from: markedRange.location)
-      let (exactEnd, _) = (composingBuffer as NSString).characterIndex(
+      let text = composingBuffer.substring(with: markedRange)
+      let (exactBegin, _) = composingBuffer.utf16CharIndex(from: markedRange.location)
+      let (exactEnd, _) = composingBuffer.utf16CharIndex(
         from: markedRange.location + markedRange.length)
       let selectedReadings = readings[exactBegin..<exactEnd]
       let joined = selectedReadings.joined(separator: "-")
@@ -306,10 +304,9 @@ class InputState {
     }
 
     var userPhrase: String {
-      let text = (composingBuffer as NSString).substring(with: markedRange)
-      let (exactBegin, _) = (composingBuffer as NSString).characterIndex(
-        from: markedRange.location)
-      let (exactEnd, _) = (composingBuffer as NSString).characterIndex(
+      let text = composingBuffer.substring(with: markedRange)
+      let (exactBegin, _) = composingBuffer.utf16CharIndex(from: markedRange.location)
+      let (exactEnd, _) = composingBuffer.utf16CharIndex(
         from: markedRange.location + markedRange.length)
       let selectedReadings = readings[exactBegin..<exactEnd]
       let joined = selectedReadings.joined(separator: "-")
@@ -318,11 +315,9 @@ class InputState {
 
     var userPhraseConverted: String {
       let text =
-        OpenCCBridge.crossConvert(
-          (composingBuffer as NSString).substring(with: markedRange)) ?? ""
-      let (exactBegin, _) = (composingBuffer as NSString).characterIndex(
-        from: markedRange.location)
-      let (exactEnd, _) = (composingBuffer as NSString).characterIndex(
+        OpenCCBridge.crossConvert(composingBuffer.substring(with: markedRange)) ?? ""
+      let (exactBegin, _) = composingBuffer.utf16CharIndex(from: markedRange.location)
+      let (exactEnd, _) = composingBuffer.utf16CharIndex(
         from: markedRange.location + markedRange.length)
       let selectedReadings = readings[exactBegin..<exactEnd]
       let joined = selectedReadings.joined(separator: "-")

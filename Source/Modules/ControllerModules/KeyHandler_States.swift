@@ -206,7 +206,7 @@ extension KeyHandler {
     if input.isCursorBackward || input.emacsKey == vChewingEmacsKey.backward, input.isShiftHold {
       var index = state.markerIndex
       if index > 0 {
-        index = UInt((state.composingBuffer as NSString).previousUtf16Position(for: Int(index)))
+        index = UInt(state.composingBuffer.utf16PreviousPosition(for: Int(index)))
         let marking = InputState.Marking(
           composingBuffer: state.composingBuffer,
           cursorIndex: state.cursorIndex,
@@ -226,10 +226,8 @@ extension KeyHandler {
     // Shift + Right
     if input.isCursorForward || input.emacsKey == vChewingEmacsKey.forward, input.isShiftHold {
       var index = state.markerIndex
-      // 這裡繼續用 NSString 是為了與 Zonble 之前引入的 NSStringUtils 相容。
-      // 不然的話，這行判斷會失敗、引發「9B51408D」錯誤。
-      if index < ((state.composingBuffer as NSString).length) {
-        index = UInt((state.composingBuffer as NSString).nextUtf16Position(for: Int(index)))
+      if index < (state.composingBuffer.utf16.count) {
+        index = UInt(state.composingBuffer.utf16NextPosition(for: Int(index)))
         let marking = InputState.Marking(
           composingBuffer: state.composingBuffer,
           cursorIndex: state.cursorIndex,
@@ -565,8 +563,8 @@ extension KeyHandler {
 
     if input.isShiftHold {
       // Shift + Right
-      if currentState.cursorIndex < (currentState.composingBuffer as NSString).length {
-        let nextPosition = (currentState.composingBuffer as NSString).nextUtf16Position(
+      if currentState.cursorIndex < currentState.composingBuffer.utf16.count {
+        let nextPosition = currentState.composingBuffer.utf16NextPosition(
           for: Int(currentState.cursorIndex))
         let marking: InputState.Marking! = InputState.Marking(
           composingBuffer: currentState.composingBuffer,
@@ -615,7 +613,7 @@ extension KeyHandler {
     if input.isShiftHold {
       // Shift + left
       if currentState.cursorIndex > 0 {
-        let previousPosition = (currentState.composingBuffer as NSString).previousUtf16Position(
+        let previousPosition = currentState.composingBuffer.utf16PreviousPosition(
           for: Int(currentState.cursorIndex))
         let marking: InputState.Marking! = InputState.Marking(
           composingBuffer: currentState.composingBuffer,

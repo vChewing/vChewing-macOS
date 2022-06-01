@@ -26,8 +26,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
 
-extension NSString {
-  /// Converts the index in an NSString to the index in a Swift string.
+extension String {
+  /// Converts the index in an NSString or .utf16 to the index in a Swift string.
   ///
   /// An Emoji might be compose by more than one UTF-16 code points, however
   /// the length of an NSString is only the sum of the UTF-16 code points. It
@@ -35,8 +35,8 @@ extension NSString {
   /// string have different lengths once the string contains such Emoji. The
   /// method helps to find the index in a Swift string by passing the index
   /// in an NSString.
-  public func characterIndex(from utf16Index: Int) -> (Int, String) {
-    let string = (self as String)
+  public func utf16CharIndex(from utf16Index: Int) -> (Int, String) {
+    let string = self
     var length = 0
     for (i, character) in string.enumerated() {
       length += character.utf16.count
@@ -47,29 +47,27 @@ extension NSString {
     return (string.count, string)
   }
 
-  public func nextUtf16Position(for index: Int) -> Int {
-    var (fixedIndex, string) = characterIndex(from: index)
+  public func utf16NextPosition(for index: Int) -> Int {
+    var (fixedIndex, string) = utf16CharIndex(from: index)
     if fixedIndex < string.count {
       fixedIndex += 1
     }
     return string[..<string.index(string.startIndex, offsetBy: fixedIndex)].utf16.count
   }
 
-  public func previousUtf16Position(for index: Int) -> Int {
-    var (fixedIndex, string) = characterIndex(from: index)
+  public func utf16PreviousPosition(for index: Int) -> Int {
+    var (fixedIndex, string) = utf16CharIndex(from: index)
     if fixedIndex > 0 {
       fixedIndex -= 1
     }
     return string[..<string.index(string.startIndex, offsetBy: fixedIndex)].utf16.count
   }
 
-  public var count: Int {
-    (self as String).count
+  public var expandingTildeInPath: String {
+    (self as NSString).expandingTildeInPath
   }
 
-  public func split() -> [NSString] {
-    Array(self as String).map {
-      NSString(string: String($0))
-    }
+  public func substring(with nsRange: NSRange) -> String {
+    (self as NSString).substring(with: nsRange)
   }
 }

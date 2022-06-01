@@ -28,7 +28,7 @@
 		5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */; };
 		5B62A33227AE792F00A19448 /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33127AE792F00A19448 /* InputSourceHelper.swift */; };
 		5B62A33627AE795800A19448 /* mgrPrefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33527AE795800A19448 /* mgrPrefs.swift */; };
-		5B62A33827AE79CD00A19448 /* NSStringUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33727AE79CD00A19448 /* NSStringUtils.swift */; };
+		5B62A33827AE79CD00A19448 /* StringUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33727AE79CD00A19448 /* StringUtils.swift */; };
 		5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */; };
 		5B62A34627AE7CD900A19448 /* ctlCandidateHorizontal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33F27AE7CD900A19448 /* ctlCandidateHorizontal.swift */; };
 		5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34027AE7CD900A19448 /* ctlCandidate.swift */; };
@@ -202,7 +202,7 @@
 		5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = FSEventStreamHelper.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A33127AE792F00A19448 /* InputSourceHelper.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputSourceHelper.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A33527AE795800A19448 /* mgrPrefs.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = mgrPrefs.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5B62A33727AE79CD00A19448 /* NSStringUtils.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = NSStringUtils.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		5B62A33727AE79CD00A19448 /* StringUtils.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = StringUtils.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A33F27AE7CD900A19448 /* ctlCandidateHorizontal.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlCandidateHorizontal.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A34027AE7CD900A19448 /* ctlCandidate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlCandidate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -421,7 +421,7 @@
 				5B7F225C2808501000DDD3CB /* KeyHandler_HandleInput.swift */,
 				5B61B0C9280BEFD4002E3CFA /* KeyHandler_Misc.swift */,
 				5B3133BE280B229700A4A505 /* KeyHandler_States.swift */,
-				5B62A33727AE79CD00A19448 /* NSStringUtils.swift */,
+				5B62A33727AE79CD00A19448 /* StringUtils.swift */,
 				5BAA8FBD282CAF380066C406 /* SyllableComposer.swift */,
 				5BF8423027BAA942008E7E4C /* vChewingKanjiConverter.swift */,
 			);
@@ -1074,7 +1074,7 @@
 				5B38F5A4281E2E49007D5F5D /* 5_LanguageModel.swift in Sources */,
 				5BAEFAD028012565001F42C9 /* mgrLangModel.swift in Sources */,
 				5B782EC4280C243C007276DE /* KeyHandler_HandleCandidate.swift in Sources */,
-				5B62A33827AE79CD00A19448 /* NSStringUtils.swift in Sources */,
+				5B62A33827AE79CD00A19448 /* StringUtils.swift in Sources */,
 				5BA9FD0F27FEDB6B002DE248 /* suiPrefPaneGeneral.swift in Sources */,
 				5BA9FD4927FEF3C9002DE248 /* Section.swift in Sources */,
 				5BA9FD3E27FEF3C8002DE248 /* Utilities.swift in Sources */,
