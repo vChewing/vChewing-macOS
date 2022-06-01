@@ -40,7 +40,7 @@ extension ctlCandidate {
 class ctlInputMethod: IMKInputController {
   @objc static var areWeDeleting = false
 
-  private static let tooltipController = TooltipController()
+  static let tooltipController = TooltipController()
 
   // MARK: -
 
