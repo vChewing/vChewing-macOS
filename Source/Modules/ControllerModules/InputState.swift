@@ -300,7 +300,6 @@ class InputState {
       return mgrLangModel.checkIfUserPhraseExist(
         userPhrase: text, mode: ctlInputMethod.currentKeyHandler.inputMode, key: joined
       )
-        == true
     }
 
     var userPhrase: String {

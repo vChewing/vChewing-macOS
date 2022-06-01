@@ -74,7 +74,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
     mgrPrefs.setMissingDefaults()
 
     // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
-    if (UserDefaults.standard.object(forKey: VersionUpdateApi.kCheckUpdateAutomatically) != nil) == true {
+    if UserDefaults.standard.object(forKey: VersionUpdateApi.kCheckUpdateAutomatically) != nil {
       checkForUpdate()
     }
   }

@@ -472,9 +472,7 @@ extension ctlInputMethod {
         useVerticalMode = state.useVerticalMode
         candidates = state.candidates
       }
-      if useVerticalMode == true {
-        return true
-      }
+      if useVerticalMode { return true }
       candidates.sort {
         $0.count > $1.count
       }
