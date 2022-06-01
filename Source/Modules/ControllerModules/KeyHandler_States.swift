@@ -136,6 +136,10 @@ extension KeyHandler {
       )
     }
 
+    if !stateResult.tooltip.isEmpty {
+      ctlInputMethod.tooltipController.setColor(state: .denialOverflow)
+    }
+
     return stateResult
   }
 
