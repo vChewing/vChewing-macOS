@@ -161,18 +161,13 @@ class InputState {
     private var deleteTargetExists = false
     var tooltip: String {
       if composingBuffer.count != readings.count {
-        TooltipController.backgroundColor = NSColor(
-          red: 0.55, green: 0.00, blue: 0.00, alpha: 1.00
-        )
-        TooltipController.textColor = NSColor.white
+        ctlInputMethod.tooltipController.setColor(state: .redAlert)
         return NSLocalizedString(
           "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.", comment: ""
         )
       }
-
       if mgrPrefs.phraseReplacementEnabled {
-        TooltipController.backgroundColor = NSColor.purple
-        TooltipController.textColor = NSColor.white
+        ctlInputMethod.tooltipController.setColor(state: .warning)
         return NSLocalizedString(
           "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.", comment: ""
         )
@@ -183,24 +178,14 @@ class InputState {
 
       let text = (composingBuffer as NSString).substring(with: markedRange)
       if markedRange.length < kMinMarkRangeLength {
-        TooltipController.backgroundColor = NSColor(
-          red: 0.18, green: 0.18, blue: 0.18, alpha: 1.00
-        )
-        TooltipController.textColor = NSColor(
-          red: 0.86, green: 0.86, blue: 0.86, alpha: 1.00
-        )
+        ctlInputMethod.tooltipController.setColor(state: .denialInsufficiency)
         return String(
           format: NSLocalizedString(
             "\"%@\" length must ≥ 2 for a user phrase.", comment: ""
           ), text
         )
       } else if markedRange.length > kMaxMarkRangeLength {
-        TooltipController.backgroundColor = NSColor(
-          red: 0.26, green: 0.16, blue: 0.00, alpha: 1.00
-        )
-        TooltipController.textColor = NSColor(
-          red: 1.00, green: 0.60, blue: 0.00, alpha: 1.00
-        )
+        ctlInputMethod.tooltipController.setColor(state: .denialOverflow)
         return String(
           format: NSLocalizedString(
             "\"%@\" length should ≤ %d for a user phrase.", comment: ""
@@ -220,22 +205,14 @@ class InputState {
       )
       if exist {
         deleteTargetExists = exist
-        TooltipController.backgroundColor = NSColor(
-          red: 0.00, green: 0.18, blue: 0.13, alpha: 1.00
-        )
-        TooltipController.textColor = NSColor(
-          red: 0.00, green: 1.00, blue: 0.74, alpha: 1.00
-        )
+        ctlInputMethod.tooltipController.setColor(state: .prompt)
         return String(
           format: NSLocalizedString(
             "\"%@\" already exists: ENTER to boost, \n SHIFT+CMD+ENTER to exclude.", comment: ""
           ), text
         )
       }
-      TooltipController.backgroundColor = NSColor(
-        red: 0.18, green: 0.18, blue: 0.18, alpha: 1.00
-      )
-      TooltipController.textColor = NSColor.white
+      ctlInputMethod.tooltipController.resetColor()
       return String(
         format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: ""),
         text
