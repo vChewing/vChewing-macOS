@@ -355,9 +355,16 @@ extension RangeReplaceableCollection where Element: Hashable {
   }
 }
 
-// MARK: - Error Extension
+// MARK: - String Tildes Expansion Extension
 
-extension String: Error {}
+extension String {
+  public var expandingTildeInPath: String {
+    (self as NSString).expandingTildeInPath
+  }
+}
+
+// MARK: - String Localized Error Extension
+
 extension String: LocalizedError {
   public var errorDescription: String? {
     self

@@ -63,10 +63,6 @@ extension String {
     return string[..<string.index(string.startIndex, offsetBy: fixedIndex)].utf16.count
   }
 
-  public var expandingTildeInPath: String {
-    (self as NSString).expandingTildeInPath
-  }
-
   public func utf16SubString(with range: NSRange) -> String {
     (self as NSString).substring(with: range)
   }
