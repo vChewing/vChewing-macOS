@@ -26,15 +26,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
 
+/// Shiki's Notes: The cursor index in the IMK inline composition buffer
+/// still uses UTF16 index measurements. This means that any attempt of
+/// using Swift native UTF8 handlings to replace Zonble's NSString (or
+/// .utf16) handlings below will still result in unavoidable necessities
+/// of solving the UTF16->UTF8 conversions in another approach. Therefore,
+/// I strongly advise against any attempt of such until the day that IMK is
+/// capable of handling the cursor index in its inline composition buffer using
+/// UTF8 measurements.
+
 extension String {
   /// Converts the index in an NSString or .utf16 to the index in a Swift string.
   ///
-  /// An Emoji might be compose by more than one UTF-16 code points, however
+  /// An Emoji might be compose by more than one UTF-16 code points. However,
   /// the length of an NSString is only the sum of the UTF-16 code points. It
   /// causes that the NSString and Swift string representation of the same
   /// string have different lengths once the string contains such Emoji. The
   /// method helps to find the index in a Swift string by passing the index
-  /// in an NSString.
+  /// in an NSString (or .utf16).
   public func utf16CharIndex(from utf16Index: Int) -> (Int, String) {
     let string = self
     var length = 0
