@@ -670,7 +670,7 @@ public struct Tekkon {
                   default: break
                 }
               }
-            case "ㄑ":
+            case "ㄔ":
               if intonation.isEmpty {
                 switch incomingPhonabet {
                   case "ㄧ": consonant = "ㄑ"  // ㄐㄧ
@@ -718,7 +718,6 @@ public struct Tekkon {
           consonant.selfReplace("ㄑ", "ㄔ")
           consonant.selfReplace("ㄒ", "ㄕ")
         }
-        if vowel == "ㄜ", semivowel.isEmpty { consonant.selfReplace("ㄑ", "ㄔ") }
         if consonant == "ㄏ", semivowel.isEmpty, vowel.isEmpty {
           consonant = ""
           vowel = "ㄛ"
@@ -1289,7 +1288,7 @@ public struct Tekkon {
   /// 這裡提前對複音按鍵做處理，然後再用程式判斷介母類型、據此判斷是否需要做複音切換。
   static let mapHsuStaticKeys: [String: String] = [
     "a": "ㄘ", "b": "ㄅ", "c": "ㄒ", "d": "ㄉ", "e": "ㄧ", "f": "ㄈ", "g": "ㄍ", "h": "ㄏ", "i": "ㄞ", "j": "ㄐ", "k": "ㄎ",
-    "l": "ㄌ", "m": "ㄇ", "n": "ㄋ", "o": "ㄡ", "p": "ㄆ", "r": "ㄖ", "s": "ㄙ", "t": "ㄊ", "u": "ㄩ", "v": "ㄑ", "w": "ㄠ",
+    "l": "ㄌ", "m": "ㄇ", "n": "ㄋ", "o": "ㄡ", "p": "ㄆ", "r": "ㄖ", "s": "ㄙ", "t": "ㄊ", "u": "ㄩ", "v": "ㄔ", "w": "ㄠ",
     "x": "ㄨ", "y": "ㄚ", "z": "ㄗ", " ": " ",
   ]
 
