@@ -44,35 +44,29 @@ extension String {
   /// string have different lengths once the string contains such Emoji. The
   /// method helps to find the index in a Swift string by passing the index
   /// in an NSString (or .utf16).
-  public func utf16CharIndex(from utf16Index: Int) -> (Int, String) {
-    let string = self
+  public func utf16CharIndex(from utf16Index: Int) -> Int {
     var length = 0
-    for (i, character) in string.enumerated() {
+    for (i, character) in self.enumerated() {
       length += character.utf16.count
       if length > utf16Index {
-        return (i, string)
+        return (i)
       }
     }
-    return (string.count, string)
+    return count
   }
 
   public func utf16NextPosition(for index: Int) -> Int {
-    var (fixedIndex, string) = utf16CharIndex(from: index)
-    if fixedIndex < string.count {
-      fixedIndex += 1
-    }
-    return string[..<string.index(string.startIndex, offsetBy: fixedIndex)].utf16.count
+    let fixedIndex = min(utf16CharIndex(from: index) + 1, count)
+    return self[..<self.index(startIndex, offsetBy: fixedIndex)].utf16.count
   }
 
   public func utf16PreviousPosition(for index: Int) -> Int {
-    var (fixedIndex, string) = utf16CharIndex(from: index)
-    if fixedIndex > 0 {
-      fixedIndex -= 1
-    }
-    return string[..<string.index(string.startIndex, offsetBy: fixedIndex)].utf16.count
+    let fixedIndex = max(utf16CharIndex(from: index) - 1, 0)
+    return self[..<self.index(startIndex, offsetBy: fixedIndex)].utf16.count
   }
 
-  public func utf16SubString(with range: NSRange) -> String {
-    (self as NSString).substring(with: range)
+  func utf16SubString(with r: Range<Int>) -> String {
+    let arr = Array(self.utf16)[r].map { $0 }
+    return String(utf16CodeUnits: arr, count: arr.count)
   }
 }

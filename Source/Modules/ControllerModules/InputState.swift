@@ -157,7 +157,7 @@ class InputState {
   /// Represents that the user is marking a range in the composing buffer.
   class Marking: NotEmpty {
     private(set) var markerIndex: Int = 0 { didSet { markerIndex = max(markerIndex, 0) } }
-    private(set) var markedRange: NSRange
+    private(set) var markedRange: Range<Int>
     private var deleteTargetExists = false
     var tooltip: String {
       if composingBuffer.count != readings.count {
@@ -172,19 +172,19 @@ class InputState {
           "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.", comment: ""
         )
       }
-      if markedRange.length == 0 {
+      if markedRange.isEmpty {
         return ""
       }
 
       let text = composingBuffer.utf16SubString(with: markedRange)
-      if markedRange.length < kMinMarkRangeLength {
+      if markedRange.count < kMinMarkRangeLength {
         ctlInputMethod.tooltipController.setColor(state: .denialInsufficiency)
         return String(
           format: NSLocalizedString(
             "\"%@\" length must ≥ 2 for a user phrase.", comment: ""
           ), text
         )
-      } else if markedRange.length > kMaxMarkRangeLength {
+      } else if markedRange.count > kMaxMarkRangeLength {
         ctlInputMethod.tooltipController.setColor(state: .denialOverflow)
         return String(
           format: NSLocalizedString(
@@ -194,9 +194,8 @@ class InputState {
         )
       }
 
-      let (exactBegin, _) = composingBuffer.utf16CharIndex(from: markedRange.location)
-      let (exactEnd, _) = composingBuffer.utf16CharIndex(
-        from: markedRange.location + markedRange.length)
+      let exactBegin = composingBuffer.utf16CharIndex(from: markedRange.lowerBound)
+      let exactEnd = composingBuffer.utf16CharIndex(from: markedRange.upperBound)
       let selectedReadings = readings[exactBegin..<exactEnd]
       let joined = selectedReadings.joined(separator: "-")
       let exist = mgrLangModel.checkIfUserPhraseExist(
@@ -225,26 +224,30 @@ class InputState {
       self.markerIndex = markerIndex
       let begin = min(cursorIndex, markerIndex)
       let end = max(cursorIndex, markerIndex)
-      markedRange = NSRange(location: begin, length: end - begin)
+      markedRange = begin..<end
       self.readings = readings
       super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
     }
 
     var attributedString: NSAttributedString {
       let attributedString = NSMutableAttributedString(string: composingBuffer)
-      let end = markedRange.location + markedRange.length
+      let end = markedRange.upperBound
 
       attributedString.setAttributes(
         [
           .underlineStyle: NSUnderlineStyle.single.rawValue,
           .markedClauseSegment: 0,
-        ], range: NSRange(location: 0, length: markedRange.location)
+        ], range: NSRange(location: 0, length: markedRange.lowerBound)
       )
       attributedString.setAttributes(
         [
           .underlineStyle: NSUnderlineStyle.thick.rawValue,
           .markedClauseSegment: 1,
-        ], range: markedRange
+        ],
+        range: NSRange(
+          location: markedRange.lowerBound,
+          length: markedRange.upperBound - markedRange.lowerBound
+        )
       )
       attributedString.setAttributes(
         [
@@ -277,24 +280,23 @@ class InputState {
       if composingBuffer.count != readings.count {
         return false
       }
-      if markedRange.length < kMinMarkRangeLength {
+      if markedRange.count < kMinMarkRangeLength {
         return false
       }
-      if markedRange.length > kMaxMarkRangeLength {
+      if markedRange.count > kMaxMarkRangeLength {
         return false
       }
       if ctlInputMethod.areWeDeleting, !deleteTargetExists {
         return false
       }
-      return markedRange.length >= kMinMarkRangeLength
-        && markedRange.length <= kMaxMarkRangeLength
+      return markedRange.count >= kMinMarkRangeLength
+        && markedRange.count <= kMaxMarkRangeLength
     }
 
     var chkIfUserPhraseExists: Bool {
       let text = composingBuffer.utf16SubString(with: markedRange)
-      let (exactBegin, _) = composingBuffer.utf16CharIndex(from: markedRange.location)
-      let (exactEnd, _) = composingBuffer.utf16CharIndex(
-        from: markedRange.location + markedRange.length)
+      let exactBegin = composingBuffer.utf16CharIndex(from: markedRange.lowerBound)
+      let exactEnd = composingBuffer.utf16CharIndex(from: markedRange.upperBound)
       let selectedReadings = readings[exactBegin..<exactEnd]
       let joined = selectedReadings.joined(separator: "-")
       return mgrLangModel.checkIfUserPhraseExist(
@@ -304,9 +306,8 @@ class InputState {
 
     var userPhrase: String {
       let text = composingBuffer.utf16SubString(with: markedRange)
-      let (exactBegin, _) = composingBuffer.utf16CharIndex(from: markedRange.location)
-      let (exactEnd, _) = composingBuffer.utf16CharIndex(
-        from: markedRange.location + markedRange.length)
+      let exactBegin = composingBuffer.utf16CharIndex(from: markedRange.lowerBound)
+      let exactEnd = composingBuffer.utf16CharIndex(from: markedRange.upperBound)
       let selectedReadings = readings[exactBegin..<exactEnd]
       let joined = selectedReadings.joined(separator: "-")
       return "\(text) \(joined)"
@@ -315,9 +316,8 @@ class InputState {
     var userPhraseConverted: String {
       let text =
         OpenCCBridge.crossConvert(composingBuffer.utf16SubString(with: markedRange)) ?? ""
-      let (exactBegin, _) = composingBuffer.utf16CharIndex(from: markedRange.location)
-      let (exactEnd, _) = composingBuffer.utf16CharIndex(
-        from: markedRange.location + markedRange.length)
+      let exactBegin = composingBuffer.utf16CharIndex(from: markedRange.lowerBound)
+      let exactEnd = composingBuffer.utf16CharIndex(from: markedRange.upperBound)
       let selectedReadings = readings[exactBegin..<exactEnd]
       let joined = selectedReadings.joined(separator: "-")
       let convertedMark = "#𝙊𝙥𝙚𝙣𝘾𝘾"

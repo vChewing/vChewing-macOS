@@ -214,7 +214,7 @@ extension KeyHandler {
           readings: state.readings
         )
         marking.tooltipForInputting = state.tooltipForInputting
-        stateCallback(marking.markedRange.length == 0 ? marking.convertedToInputting : marking)
+        stateCallback(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
       } else {
         IME.prtDebugIntel("1149908D")
         errorCallback()
@@ -235,7 +235,7 @@ extension KeyHandler {
           readings: state.readings
         )
         marking.tooltipForInputting = state.tooltipForInputting
-        stateCallback(marking.markedRange.length == 0 ? marking.convertedToInputting : marking)
+        stateCallback(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
       } else {
         IME.prtDebugIntel("9B51408D")
         errorCallback()
