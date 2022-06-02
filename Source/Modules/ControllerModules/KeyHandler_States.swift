@@ -114,7 +114,7 @@ extension KeyHandler {
     let composedText = head + reading + tail
     let cursorIndex = composedStringCursorIndex + reading.utf16.count
 
-    let stateResult = InputState.Inputting(composingBuffer: composedText, cursorIndex: UInt(cursorIndex))
+    let stateResult = InputState.Inputting(composingBuffer: composedText, cursorIndex: cursorIndex)
 
     // Now we start weaving the contents of the tooltip.
     if tooltipParameterRef[0].isEmpty, tooltipParameterRef[1].isEmpty {
@@ -206,7 +206,7 @@ extension KeyHandler {
     if input.isCursorBackward || input.emacsKey == vChewingEmacsKey.backward, input.isShiftHold {
       var index = state.markerIndex
       if index > 0 {
-        index = UInt(state.composingBuffer.utf16PreviousPosition(for: Int(index)))
+        index = state.composingBuffer.utf16PreviousPosition(for: index)
         let marking = InputState.Marking(
           composingBuffer: state.composingBuffer,
           cursorIndex: state.cursorIndex,
@@ -227,7 +227,7 @@ extension KeyHandler {
     if input.isCursorForward || input.emacsKey == vChewingEmacsKey.forward, input.isShiftHold {
       var index = state.markerIndex
       if index < (state.composingBuffer.utf16.count) {
-        index = UInt(state.composingBuffer.utf16NextPosition(for: Int(index)))
+        index = state.composingBuffer.utf16NextPosition(for: index)
         let marking = InputState.Marking(
           composingBuffer: state.composingBuffer,
           cursorIndex: state.cursorIndex,
@@ -565,11 +565,11 @@ extension KeyHandler {
       // Shift + Right
       if currentState.cursorIndex < currentState.composingBuffer.utf16.count {
         let nextPosition = currentState.composingBuffer.utf16NextPosition(
-          for: Int(currentState.cursorIndex))
+          for: currentState.cursorIndex)
         let marking: InputState.Marking! = InputState.Marking(
           composingBuffer: currentState.composingBuffer,
           cursorIndex: currentState.cursorIndex,
-          markerIndex: UInt(nextPosition),
+          markerIndex: nextPosition,
           readings: currentReadings
         )
         marking.tooltipForInputting = currentState.tooltip
@@ -614,11 +614,11 @@ extension KeyHandler {
       // Shift + left
       if currentState.cursorIndex > 0 {
         let previousPosition = currentState.composingBuffer.utf16PreviousPosition(
-          for: Int(currentState.cursorIndex))
+          for: currentState.cursorIndex)
         let marking: InputState.Marking! = InputState.Marking(
           composingBuffer: currentState.composingBuffer,
           cursorIndex: currentState.cursorIndex,
-          markerIndex: UInt(previousPosition),
+          markerIndex: previousPosition,
           readings: currentReadings
         )
         marking.tooltipForInputting = currentState.tooltip

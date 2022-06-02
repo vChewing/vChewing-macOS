@@ -67,7 +67,7 @@ extension String {
     (self as NSString).expandingTildeInPath
   }
 
-  public func substring(with nsRange: NSRange) -> String {
-    (self as NSString).substring(with: nsRange)
+  public func utf16SubString(with range: NSRange) -> String {
+    (self as NSString).substring(with: range)
   }
 }

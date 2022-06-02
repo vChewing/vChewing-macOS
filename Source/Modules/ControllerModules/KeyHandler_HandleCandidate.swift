@@ -71,7 +71,7 @@ extension KeyHandler {
         }
         delegate!.keyHandler(
           self,
-          didSelectCandidateAt: Int(ctlCandidateCurrent.selectedCandidateIndex),
+          didSelectCandidateAt: ctlCandidateCurrent.selectedCandidateIndex,
           ctlCandidate: ctlCandidateCurrent
         )
         return true
@@ -260,11 +260,11 @@ extension KeyHandler {
         return false
       } else {  // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
         if input.isEnd || input.emacsKey == vChewingEmacsKey.end {
-          if ctlCandidateCurrent.selectedCandidateIndex == UInt(candidates.count - 1) {
+          if ctlCandidateCurrent.selectedCandidateIndex == candidates.count - 1 {
             IME.prtDebugIntel("9B69AAAD")
             errorCallback()
           } else {
-            ctlCandidateCurrent.selectedCandidateIndex = UInt(candidates.count - 1)
+            ctlCandidateCurrent.selectedCandidateIndex = candidates.count - 1
           }
         }
       }
@@ -294,10 +294,10 @@ extension KeyHandler {
       }
 
       if index != NSNotFound {
-        let candidateIndex: UInt = ctlCandidateCurrent.candidateIndexAtKeyLabelIndex(UInt(index))
-        if candidateIndex != UInt.max {
+        let candidateIndex = ctlCandidateCurrent.candidateIndexAtKeyLabelIndex(index)
+        if candidateIndex != Int.max {
           delegate!.keyHandler(
-            self, didSelectCandidateAt: Int(candidateIndex), ctlCandidate: ctlCandidateCurrent
+            self, didSelectCandidateAt: candidateIndex, ctlCandidate: ctlCandidateCurrent
           )
           return true
         }
@@ -342,11 +342,11 @@ extension KeyHandler {
         }
 
         if shouldAutoSelectCandidate {
-          let candidateIndex: UInt = ctlCandidateCurrent.candidateIndexAtKeyLabelIndex(0)
-          if candidateIndex != UInt.max {
+          let candidateIndex = ctlCandidateCurrent.candidateIndexAtKeyLabelIndex(0)
+          if candidateIndex != Int.max {
             delegate!.keyHandler(
               self,
-              didSelectCandidateAt: Int(candidateIndex),
+              didSelectCandidateAt: candidateIndex,
               ctlCandidate: ctlCandidateCurrent
             )
             clear()

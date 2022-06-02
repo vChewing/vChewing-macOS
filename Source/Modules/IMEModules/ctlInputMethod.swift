@@ -373,7 +373,7 @@ extension ctlInputMethod {
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put this composing buffer
     client.setMarkedText(
-      state.attributedString, selectionRange: NSRange(location: Int(state.cursorIndex), length: 0),
+      state.attributedString, selectionRange: NSRange(location: state.cursorIndex, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
     if !state.tooltip.isEmpty {
@@ -395,7 +395,7 @@ extension ctlInputMethod {
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put this composing buffer
     client.setMarkedText(
-      state.attributedString, selectionRange: NSRange(location: Int(state.cursorIndex), length: 0),
+      state.attributedString, selectionRange: NSRange(location: state.cursorIndex, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
 
@@ -420,7 +420,7 @@ extension ctlInputMethod {
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put this composing buffer
     client.setMarkedText(
-      state.attributedString, selectionRange: NSRange(location: Int(state.cursorIndex), length: 0),
+      state.attributedString, selectionRange: NSRange(location: state.cursorIndex, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
     show(candidateWindowWith: state, client: client)
@@ -437,7 +437,7 @@ extension ctlInputMethod {
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put this composing buffer
     client.setMarkedText(
-      state.attributedString, selectionRange: NSRange(location: Int(state.cursorIndex), length: 0),
+      state.attributedString, selectionRange: NSRange(location: state.cursorIndex, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
     show(candidateWindowWith: state, client: client)
@@ -553,7 +553,7 @@ extension ctlInputMethod {
     var cursor = 0
 
     if let state = state as? InputState.ChoosingCandidate {
-      cursor = Int(state.cursorIndex)
+      cursor = state.cursorIndex
       if cursor == state.composingBuffer.count, cursor != 0 {
         cursor -= 1
       }
@@ -581,9 +581,9 @@ extension ctlInputMethod {
     }
   }
 
-  private func show(tooltip: String, composingBuffer: String, cursorIndex: UInt, client: Any!) {
+  private func show(tooltip: String, composingBuffer: String, cursorIndex: Int, client: Any!) {
     var lineHeightRect = NSRect(x: 0.0, y: 0.0, width: 16.0, height: 16.0)
-    var cursor = Int(cursorIndex)
+    var cursor = cursorIndex
     if cursor == composingBuffer.count, cursor != 0 {
       cursor -= 1
     }
@@ -615,7 +615,7 @@ extension ctlInputMethod: KeyHandlerDelegate {
   ) {
     _ = keyHandler  // Stop clang-format from ruining the parameters of this function.
     if let controller = controller as? ctlCandidate {
-      ctlCandidate(controller, didSelectCandidateAtIndex: UInt(index))
+      ctlCandidate(controller, didSelectCandidateAtIndex: index)
     }
   }
 
@@ -651,34 +651,34 @@ extension ctlInputMethod: KeyHandlerDelegate {
 // MARK: -
 
 extension ctlInputMethod: ctlCandidateDelegate {
-  func candidateCountForController(_ controller: ctlCandidate) -> UInt {
+  func candidateCountForController(_ controller: ctlCandidate) -> Int {
     _ = controller  // Stop clang-format from ruining the parameters of this function.
     if let state = state as? InputState.ChoosingCandidate {
-      return UInt(state.candidates.count)
+      return state.candidates.count
     } else if let state = state as? InputState.AssociatedPhrases {
-      return UInt(state.candidates.count)
+      return state.candidates.count
     }
     return 0
   }
 
-  func ctlCandidate(_ controller: ctlCandidate, candidateAtIndex index: UInt)
+  func ctlCandidate(_ controller: ctlCandidate, candidateAtIndex index: Int)
     -> String
   {
     _ = controller  // Stop clang-format from ruining the parameters of this function.
     if let state = state as? InputState.ChoosingCandidate {
-      return state.candidates[Int(index)]
+      return state.candidates[index]
     } else if let state = state as? InputState.AssociatedPhrases {
-      return state.candidates[Int(index)]
+      return state.candidates[index]
     }
     return ""
   }
 
-  func ctlCandidate(_ controller: ctlCandidate, didSelectCandidateAtIndex index: UInt) {
+  func ctlCandidate(_ controller: ctlCandidate, didSelectCandidateAtIndex index: Int) {
     _ = controller  // Stop clang-format from ruining the parameters of this function.
     let client = currentClient
 
     if let state = state as? InputState.SymbolTable,
-      let node = state.node.children?[Int(index)]
+      let node = state.node.children?[index]
     {
       if let children = node.children, !children.isEmpty {
         handle(
@@ -693,7 +693,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
     }
 
     if let state = state as? InputState.ChoosingCandidate {
-      let selectedValue = state.candidates[Int(index)]
+      let selectedValue = state.candidates[index]
       keyHandler.fixNode(value: selectedValue, respectCursorPushing: true)
 
       let inputting = keyHandler.buildInputtingState
@@ -718,7 +718,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
     }
 
     if let state = state as? InputState.AssociatedPhrases {
-      let selectedValue = state.candidates[Int(index)]
+      let selectedValue = state.candidates[index]
       handle(state: .Committing(poppedText: selectedValue), client: currentClient)
       if mgrPrefs.associatedPhrasesEnabled,
         let associatePhrases = keyHandler.buildAssociatePhraseState(

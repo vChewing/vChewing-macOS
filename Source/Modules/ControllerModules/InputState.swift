@@ -110,9 +110,9 @@ class InputState {
   /// Represents that the composing buffer is not empty.
   class NotEmpty: InputState {
     private(set) var composingBuffer: String
-    private(set) var cursorIndex: UInt
+    private(set) var cursorIndex: Int = 0 { didSet { cursorIndex = max(cursorIndex, 0) } }
 
-    init(composingBuffer: String, cursorIndex: UInt) {
+    init(composingBuffer: String, cursorIndex: Int) {
       self.composingBuffer = composingBuffer
       self.cursorIndex = cursorIndex
     }
@@ -129,7 +129,7 @@ class InputState {
     var poppedText: String = ""
     var tooltip: String = ""
 
-    override init(composingBuffer: String, cursorIndex: UInt) {
+    override init(composingBuffer: String, cursorIndex: Int) {
       super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
     }
 
@@ -156,7 +156,7 @@ class InputState {
 
   /// Represents that the user is marking a range in the composing buffer.
   class Marking: NotEmpty {
-    private(set) var markerIndex: UInt
+    private(set) var markerIndex: Int = 0 { didSet { markerIndex = max(markerIndex, 0) } }
     private(set) var markedRange: NSRange
     private var deleteTargetExists = false
     var tooltip: String {
@@ -176,7 +176,7 @@ class InputState {
         return ""
       }
 
-      let text = composingBuffer.substring(with: markedRange)
+      let text = composingBuffer.utf16SubString(with: markedRange)
       if markedRange.length < kMinMarkRangeLength {
         ctlInputMethod.tooltipController.setColor(state: .denialInsufficiency)
         return String(
@@ -221,11 +221,11 @@ class InputState {
     var tooltipForInputting: String = ""
     private(set) var readings: [String]
 
-    init(composingBuffer: String, cursorIndex: UInt, markerIndex: UInt, readings: [String]) {
+    init(composingBuffer: String, cursorIndex: Int, markerIndex: Int, readings: [String]) {
       self.markerIndex = markerIndex
       let begin = min(cursorIndex, markerIndex)
       let end = max(cursorIndex, markerIndex)
-      markedRange = NSRange(location: Int(begin), length: Int(end - begin))
+      markedRange = NSRange(location: begin, length: end - begin)
       self.readings = readings
       super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
     }
@@ -291,7 +291,7 @@ class InputState {
     }
 
     var chkIfUserPhraseExists: Bool {
-      let text = composingBuffer.substring(with: markedRange)
+      let text = composingBuffer.utf16SubString(with: markedRange)
       let (exactBegin, _) = composingBuffer.utf16CharIndex(from: markedRange.location)
       let (exactEnd, _) = composingBuffer.utf16CharIndex(
         from: markedRange.location + markedRange.length)
@@ -303,7 +303,7 @@ class InputState {
     }
 
     var userPhrase: String {
-      let text = composingBuffer.substring(with: markedRange)
+      let text = composingBuffer.utf16SubString(with: markedRange)
       let (exactBegin, _) = composingBuffer.utf16CharIndex(from: markedRange.location)
       let (exactEnd, _) = composingBuffer.utf16CharIndex(
         from: markedRange.location + markedRange.length)
@@ -314,7 +314,7 @@ class InputState {
 
     var userPhraseConverted: String {
       let text =
-        OpenCCBridge.crossConvert(composingBuffer.substring(with: markedRange)) ?? ""
+        OpenCCBridge.crossConvert(composingBuffer.utf16SubString(with: markedRange)) ?? ""
       let (exactBegin, _) = composingBuffer.utf16CharIndex(from: markedRange.location)
       let (exactEnd, _) = composingBuffer.utf16CharIndex(
         from: markedRange.location + markedRange.length)
@@ -332,7 +332,7 @@ class InputState {
     private(set) var candidates: [String]
     private(set) var useVerticalMode: Bool
 
-    init(composingBuffer: String, cursorIndex: UInt, candidates: [String], useVerticalMode: Bool) {
+    init(composingBuffer: String, cursorIndex: Int, candidates: [String], useVerticalMode: Bool) {
       self.candidates = candidates
       self.useVerticalMode = useVerticalMode
       super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)

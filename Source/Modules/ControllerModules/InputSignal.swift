@@ -110,8 +110,11 @@ enum KeyCodeBlackListed: UInt16 {
 }
 
 // CharCodes: https://theasciicode.com.ar/ascii-control-characters/horizontal-tab-ascii-code-9.html
-enum CharCode: UInt /* 16 */ {
-  case yajuusenpai = 114_514_191_191_810_893
+enum CharCode: UInt16 {
+  case yajuusenpaiA = 114
+  case yajuusenpaiB = 514
+  case yajuusenpaiC = 1919
+  case yajuusenpaiD = 810
   // CharCode is not reliable at all. KeyCode is the most appropriate choice due to its accuracy.
   // KeyCode doesn't give a phuque about the character sent through macOS keyboard layouts ...
   // ... but only focuses on which physical key is pressed.

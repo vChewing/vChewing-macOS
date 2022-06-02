@@ -27,7 +27,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 
 private class VerticalCandidateView: NSView {
-  var highlightedIndex: UInt = 0
+  var highlightedIndex: Int = 0 { didSet { highlightedIndex = max(highlightedIndex, 0) } }
   var action: Selector?
   weak var target: AnyObject?
 
@@ -44,7 +44,9 @@ private class VerticalCandidateView: NSView {
   private var windowWidth: CGFloat = 0
   private var elementWidths: [CGFloat] = []
   private var elementHeights: [CGFloat] = []
-  private var trackingHighlightedIndex: UInt = .max
+  private var trackingHighlightedIndex: Int = .max {
+    didSet { trackingHighlightedIndex = max(trackingHighlightedIndex, 0) }
+  }
 
   override var isFlipped: Bool {
     true
@@ -201,26 +203,27 @@ private class VerticalCandidateView: NSView {
     }
   }
 
-  private func findHitIndex(event: NSEvent) -> UInt? {
+  private func findHitIndex(event: NSEvent) -> Int {
     let location = convert(event.locationInWindow, to: nil)
     if !bounds.contains(location) {
-      return nil
+      return NSNotFound
     }
     var accuHeight: CGFloat = 0.0
     for (index, elementHeight) in elementHeights.enumerated() {
       let currentHeight = elementHeight
 
       if location.y >= accuHeight, location.y <= accuHeight + currentHeight {
-        return UInt(index)
+        return index
       }
       accuHeight += currentHeight
     }
-    return nil
+    return NSNotFound
   }
 
   override func mouseUp(with event: NSEvent) {
     trackingHighlightedIndex = highlightedIndex
-    guard let newIndex = findHitIndex(event: event) else {
+    let newIndex = findHitIndex(event: event)
+    guard newIndex != NSNotFound else {
       return
     }
     highlightedIndex = newIndex
@@ -228,7 +231,8 @@ private class VerticalCandidateView: NSView {
   }
 
   override func mouseDown(with event: NSEvent) {
-    guard let newIndex = findHitIndex(event: event) else {
+    let newIndex = findHitIndex(event: event)
+    guard newIndex != NSNotFound else {
       return
     }
     var triggerAction = false
@@ -252,7 +256,7 @@ public class ctlCandidateVertical: ctlCandidate {
   private var candidateView: VerticalCandidateView
   private var prevPageButton: NSButton
   private var nextPageButton: NSButton
-  private var currentPageIndex: UInt = 0
+  private var currentPageIndex: Int = 0
 
   public init() {
     var contentRect = NSRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
@@ -369,24 +373,24 @@ public class ctlCandidateVertical: ctlCandidate {
     return true
   }
 
-  override public func candidateIndexAtKeyLabelIndex(_ index: UInt) -> UInt {
+  override public func candidateIndexAtKeyLabelIndex(_ index: Int) -> Int {
     guard let delegate = delegate else {
-      return UInt.max
+      return Int.max
     }
 
-    let result = currentPageIndex * UInt(keyLabels.count) + index
-    return result < delegate.candidateCountForController(self) ? result : UInt.max
+    let result = currentPageIndex * keyLabels.count + index
+    return result < delegate.candidateCountForController(self) ? result : Int.max
   }
 
-  override public var selectedCandidateIndex: UInt {
+  override public var selectedCandidateIndex: Int {
     get {
-      currentPageIndex * UInt(keyLabels.count) + candidateView.highlightedIndex
+      currentPageIndex * keyLabels.count + candidateView.highlightedIndex
     }
     set {
       guard let delegate = delegate else {
         return
       }
-      let keyLabelCount = UInt(keyLabels.count)
+      let keyLabelCount = keyLabels.count
       if newValue < delegate.candidateCountForController(self) {
         currentPageIndex = newValue / keyLabelCount
         candidateView.highlightedIndex = newValue % keyLabelCount
@@ -397,12 +401,12 @@ public class ctlCandidateVertical: ctlCandidate {
 }
 
 extension ctlCandidateVertical {
-  private var pageCount: UInt {
+  private var pageCount: Int {
     guard let delegate = delegate else {
       return 0
     }
     let totalCount = delegate.candidateCountForController(self)
-    let keyLabelCount = UInt(keyLabels.count)
+    let keyLabelCount = keyLabels.count
     return totalCount / keyLabelCount + ((totalCount % keyLabelCount) != 0 ? 1 : 0)
   }
 
@@ -414,7 +418,7 @@ extension ctlCandidateVertical {
     candidateView.set(keyLabelFont: keyLabelFont, candidateFont: candidateFont)
     var candidates = [String]()
     let count = delegate.candidateCountForController(self)
-    let keyLabelCount = UInt(keyLabels.count)
+    let keyLabelCount = keyLabels.count
 
     let begin = currentPageIndex * keyLabelCount
     for index in begin..<min(begin + keyLabelCount, count) {

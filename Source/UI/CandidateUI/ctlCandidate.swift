@@ -38,11 +38,11 @@ public class CandidateKeyLabel: NSObject {
 }
 
 public protocol ctlCandidateDelegate: AnyObject {
-  func candidateCountForController(_ controller: ctlCandidate) -> UInt
-  func ctlCandidate(_ controller: ctlCandidate, candidateAtIndex index: UInt)
+  func candidateCountForController(_ controller: ctlCandidate) -> Int
+  func ctlCandidate(_ controller: ctlCandidate, candidateAtIndex index: Int)
     -> String
   func ctlCandidate(
-    _ controller: ctlCandidate, didSelectCandidateAtIndex index: UInt
+    _ controller: ctlCandidate, didSelectCandidateAtIndex index: Int
   )
 }
 
@@ -53,7 +53,7 @@ public class ctlCandidate: NSWindowController {
     }
   }
 
-  public var selectedCandidateIndex: UInt = .max
+  public var selectedCandidateIndex: Int = .max
   public var visible: Bool = false {
     didSet {
       NSObject.cancelPreviousPerformRequests(withTarget: self)
@@ -108,8 +108,8 @@ public class ctlCandidate: NSWindowController {
     false
   }
 
-  public func candidateIndexAtKeyLabelIndex(_: UInt) -> UInt {
-    UInt.max
+  public func candidateIndexAtKeyLabelIndex(_: Int) -> Int {
+    Int.max
   }
 
   /// Sets the location of the candidate window.
