@@ -151,11 +151,9 @@ class InputState {
 
   // MARK: -
 
-  private let kMinMarkRangeLength = 2
-  private let kMaxMarkRangeLength = mgrPrefs.maxCandidateLength
-
   /// Represents that the user is marking a range in the composing buffer.
   class Marking: NotEmpty {
+    private var allowedMarkRange = 2...mgrPrefs.maxCandidateLength
     private(set) var markerIndex: Int = 0 { didSet { markerIndex = max(markerIndex, 0) } }
     private(set) var markedRange: Range<Int>
     private var deleteTargetExists = false
@@ -177,20 +175,20 @@ class InputState {
       }
 
       let text = composingBuffer.utf16SubString(with: markedRange)
-      if markedRange.count < kMinMarkRangeLength {
+      if markedRange.count < allowedMarkRange.lowerBound {
         ctlInputMethod.tooltipController.setColor(state: .denialInsufficiency)
         return String(
           format: NSLocalizedString(
             "\"%@\" length must ≥ 2 for a user phrase.", comment: ""
           ), text
         )
-      } else if markedRange.count > kMaxMarkRangeLength {
+      } else if markedRange.count > allowedMarkRange.upperBound {
         ctlInputMethod.tooltipController.setColor(state: .denialOverflow)
         return String(
           format: NSLocalizedString(
             "\"%@\" length should ≤ %d for a user phrase.", comment: ""
           ),
-          text, kMaxMarkRangeLength
+          text, allowedMarkRange.upperBound
         )
       }
 
@@ -277,20 +275,12 @@ class InputState {
       /// from the amount of Bopomofo readings. In this case, the range
       /// in the composing buffer and the readings could not match, so
       /// we disable the function to write user phrases in this case.
-      if composingBuffer.count != readings.count {
-        return false
-      }
-      if markedRange.count < kMinMarkRangeLength {
-        return false
-      }
-      if markedRange.count > kMaxMarkRangeLength {
-        return false
-      }
-      if ctlInputMethod.areWeDeleting, !deleteTargetExists {
-        return false
-      }
-      return markedRange.count >= kMinMarkRangeLength
-        && markedRange.count <= kMaxMarkRangeLength
+      /// 這裡的 deleteTargetExists 是防止使用者排除「詞庫內尚未存在的詞」，
+      /// 免得使用者誤操作之後靠北「我怎麼敲不了這個詞？」之類的。
+      ((composingBuffer.count != readings.count)
+        || (ctlInputMethod.areWeDeleting && !deleteTargetExists))
+        ? false
+        : allowedMarkRange.contains(markedRange.count)
     }
 
     var chkIfUserPhraseExists: Bool {
