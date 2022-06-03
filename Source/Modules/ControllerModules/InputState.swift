@@ -156,6 +156,11 @@ class InputState {
     private var allowedMarkRange = 2...mgrPrefs.maxCandidateLength
     private(set) var markerIndex: Int = 0 { didSet { markerIndex = max(markerIndex, 0) } }
     private(set) var markedRange: Range<Int>
+    private var literalMarkedRange: Range<Int> {
+      let lowerBoundLiteral = composingBuffer.charIndexLiteral(from: markedRange.lowerBound)
+      let upperBoundLiteral = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
+      return lowerBoundLiteral..<upperBoundLiteral
+    }
     private var deleteTargetExists = false
     var tooltip: String {
       if composingBuffer.count != readings.count {
@@ -175,14 +180,14 @@ class InputState {
       }
 
       let text = composingBuffer.utf16SubString(with: markedRange)
-      if markedRange.count < allowedMarkRange.lowerBound {
+      if literalMarkedRange.count < allowedMarkRange.lowerBound {
         ctlInputMethod.tooltipController.setColor(state: .denialInsufficiency)
         return String(
           format: NSLocalizedString(
             "\"%@\" length must ≥ 2 for a user phrase.", comment: ""
           ), text
         )
-      } else if markedRange.count > allowedMarkRange.upperBound {
+      } else if literalMarkedRange.count > allowedMarkRange.upperBound {
         ctlInputMethod.tooltipController.setColor(state: .denialOverflow)
         return String(
           format: NSLocalizedString(
@@ -192,9 +197,7 @@ class InputState {
         )
       }
 
-      let literalBegin = composingBuffer.charIndexLiteral(from: markedRange.lowerBound)
-      let literalEnd = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
-      let selectedReadings = readings[literalBegin..<literalEnd]
+      let selectedReadings = readings[literalMarkedRange]
       let joined = selectedReadings.joined(separator: "-")
       let exist = mgrLangModel.checkIfUserPhraseExist(
         userPhrase: text, mode: ctlInputMethod.currentKeyHandler.inputMode, key: joined
@@ -280,14 +283,12 @@ class InputState {
       ((composingBuffer.count != readings.count)
         || (ctlInputMethod.areWeDeleting && !deleteTargetExists))
         ? false
-        : allowedMarkRange.contains(markedRange.count)
+        : allowedMarkRange.contains(literalMarkedRange.count)
     }
 
     var chkIfUserPhraseExists: Bool {
       let text = composingBuffer.utf16SubString(with: markedRange)
-      let literalBegin = composingBuffer.charIndexLiteral(from: markedRange.lowerBound)
-      let literalEnd = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
-      let selectedReadings = readings[literalBegin..<literalEnd]
+      let selectedReadings = readings[literalMarkedRange]
       let joined = selectedReadings.joined(separator: "-")
       return mgrLangModel.checkIfUserPhraseExist(
         userPhrase: text, mode: ctlInputMethod.currentKeyHandler.inputMode, key: joined
@@ -296,9 +297,7 @@ class InputState {
 
     var userPhrase: String {
       let text = composingBuffer.utf16SubString(with: markedRange)
-      let literalBegin = composingBuffer.charIndexLiteral(from: markedRange.lowerBound)
-      let literalEnd = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
-      let selectedReadings = readings[literalBegin..<literalEnd]
+      let selectedReadings = readings[literalMarkedRange]
       let joined = selectedReadings.joined(separator: "-")
       return "\(text) \(joined)"
     }
@@ -306,9 +305,7 @@ class InputState {
     var userPhraseConverted: String {
       let text =
         OpenCCBridge.crossConvert(composingBuffer.utf16SubString(with: markedRange)) ?? ""
-      let literalBegin = composingBuffer.charIndexLiteral(from: markedRange.lowerBound)
-      let literalEnd = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
-      let selectedReadings = readings[literalBegin..<literalEnd]
+      let selectedReadings = readings[literalMarkedRange]
       let joined = selectedReadings.joined(separator: "-")
       let convertedMark = "#𝙊𝙥𝙚𝙣𝘾𝘾"
       return "\(text) \(joined)\t\(convertedMark)"
