@@ -194,9 +194,9 @@ class InputState {
         )
       }
 
-      let exactBegin = composingBuffer.charIndexLiteral(from: markedRange.lowerBound)
-      let exactEnd = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
-      let selectedReadings = readings[exactBegin..<exactEnd]
+      let literalBegin = composingBuffer.charIndexLiteral(from: markedRange.lowerBound)
+      let literalEnd = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
+      let selectedReadings = readings[literalBegin..<literalEnd]
       let joined = selectedReadings.joined(separator: "-")
       let exist = mgrLangModel.checkIfUserPhraseExist(
         userPhrase: text, mode: ctlInputMethod.currentKeyHandler.inputMode, key: joined
@@ -295,9 +295,9 @@ class InputState {
 
     var chkIfUserPhraseExists: Bool {
       let text = composingBuffer.utf16SubString(with: markedRange)
-      let exactBegin = composingBuffer.charIndexLiteral(from: markedRange.lowerBound)
-      let exactEnd = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
-      let selectedReadings = readings[exactBegin..<exactEnd]
+      let literalBegin = composingBuffer.charIndexLiteral(from: markedRange.lowerBound)
+      let literalEnd = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
+      let selectedReadings = readings[literalBegin..<literalEnd]
       let joined = selectedReadings.joined(separator: "-")
       return mgrLangModel.checkIfUserPhraseExist(
         userPhrase: text, mode: ctlInputMethod.currentKeyHandler.inputMode, key: joined
@@ -306,9 +306,9 @@ class InputState {
 
     var userPhrase: String {
       let text = composingBuffer.utf16SubString(with: markedRange)
-      let exactBegin = composingBuffer.charIndexLiteral(from: markedRange.lowerBound)
-      let exactEnd = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
-      let selectedReadings = readings[exactBegin..<exactEnd]
+      let literalBegin = composingBuffer.charIndexLiteral(from: markedRange.lowerBound)
+      let literalEnd = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
+      let selectedReadings = readings[literalBegin..<literalEnd]
       let joined = selectedReadings.joined(separator: "-")
       return "\(text) \(joined)"
     }
@@ -316,9 +316,9 @@ class InputState {
     var userPhraseConverted: String {
       let text =
         OpenCCBridge.crossConvert(composingBuffer.utf16SubString(with: markedRange)) ?? ""
-      let exactBegin = composingBuffer.charIndexLiteral(from: markedRange.lowerBound)
-      let exactEnd = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
-      let selectedReadings = readings[exactBegin..<exactEnd]
+      let literalBegin = composingBuffer.charIndexLiteral(from: markedRange.lowerBound)
+      let literalEnd = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
+      let selectedReadings = readings[literalBegin..<literalEnd]
       let joined = selectedReadings.joined(separator: "-")
       let convertedMark = "#𝙊𝙥𝙚𝙣𝘾𝘾"
       return "\(text) \(joined)\t\(convertedMark)"
