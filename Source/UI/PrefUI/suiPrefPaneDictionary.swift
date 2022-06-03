@@ -65,7 +65,7 @@ struct suiPrefPaneDictionary: View {
             IME.dlgOpenPath.canChooseDirectories = true
 
             let bolPreviousFolderValidity = mgrLangModel.checkIfSpecifiedUserDataFolderValid(
-              NSString(string: mgrPrefs.userDataFolderSpecified).expandingTildeInPath)
+              mgrPrefs.userDataFolderSpecified.expandingTildeInPath)
 
             if let window = ctlPrefUI.shared.controller.window {
               IME.dlgOpenPath.beginSheetModal(for: window) { result in
