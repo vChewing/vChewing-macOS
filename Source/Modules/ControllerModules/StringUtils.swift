@@ -44,7 +44,7 @@ extension String {
   /// string have different lengths once the string contains such Emoji. The
   /// method helps to find the index in a Swift string by passing the index
   /// in an NSString (or .utf16).
-  public func utf16CharIndex(from utf16Index: Int) -> Int {
+  public func charIndexLiteral(from utf16Index: Int) -> Int {
     var length = 0
     for (i, character) in self.enumerated() {
       length += character.utf16.count
@@ -56,12 +56,12 @@ extension String {
   }
 
   public func utf16NextPosition(for index: Int) -> Int {
-    let fixedIndex = min(utf16CharIndex(from: index) + 1, count)
+    let fixedIndex = min(charIndexLiteral(from: index) + 1, count)
     return self[..<self.index(startIndex, offsetBy: fixedIndex)].utf16.count
   }
 
   public func utf16PreviousPosition(for index: Int) -> Int {
-    let fixedIndex = max(utf16CharIndex(from: index) - 1, 0)
+    let fixedIndex = max(charIndexLiteral(from: index) - 1, 0)
     return self[..<self.index(startIndex, offsetBy: fixedIndex)].utf16.count
   }
 

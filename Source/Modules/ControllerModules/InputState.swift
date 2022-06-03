@@ -194,8 +194,8 @@ class InputState {
         )
       }
 
-      let exactBegin = composingBuffer.utf16CharIndex(from: markedRange.lowerBound)
-      let exactEnd = composingBuffer.utf16CharIndex(from: markedRange.upperBound)
+      let exactBegin = composingBuffer.charIndexLiteral(from: markedRange.lowerBound)
+      let exactEnd = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
       let selectedReadings = readings[exactBegin..<exactEnd]
       let joined = selectedReadings.joined(separator: "-")
       let exist = mgrLangModel.checkIfUserPhraseExist(
@@ -295,8 +295,8 @@ class InputState {
 
     var chkIfUserPhraseExists: Bool {
       let text = composingBuffer.utf16SubString(with: markedRange)
-      let exactBegin = composingBuffer.utf16CharIndex(from: markedRange.lowerBound)
-      let exactEnd = composingBuffer.utf16CharIndex(from: markedRange.upperBound)
+      let exactBegin = composingBuffer.charIndexLiteral(from: markedRange.lowerBound)
+      let exactEnd = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
       let selectedReadings = readings[exactBegin..<exactEnd]
       let joined = selectedReadings.joined(separator: "-")
       return mgrLangModel.checkIfUserPhraseExist(
@@ -306,8 +306,8 @@ class InputState {
 
     var userPhrase: String {
       let text = composingBuffer.utf16SubString(with: markedRange)
-      let exactBegin = composingBuffer.utf16CharIndex(from: markedRange.lowerBound)
-      let exactEnd = composingBuffer.utf16CharIndex(from: markedRange.upperBound)
+      let exactBegin = composingBuffer.charIndexLiteral(from: markedRange.lowerBound)
+      let exactEnd = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
       let selectedReadings = readings[exactBegin..<exactEnd]
       let joined = selectedReadings.joined(separator: "-")
       return "\(text) \(joined)"
@@ -316,8 +316,8 @@ class InputState {
     var userPhraseConverted: String {
       let text =
         OpenCCBridge.crossConvert(composingBuffer.utf16SubString(with: markedRange)) ?? ""
-      let exactBegin = composingBuffer.utf16CharIndex(from: markedRange.lowerBound)
-      let exactEnd = composingBuffer.utf16CharIndex(from: markedRange.upperBound)
+      let exactBegin = composingBuffer.charIndexLiteral(from: markedRange.lowerBound)
+      let exactEnd = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
       let selectedReadings = readings[exactBegin..<exactEnd]
       let joined = selectedReadings.joined(separator: "-")
       let convertedMark = "#𝙊𝙥𝙚𝙣𝘾𝘾"
