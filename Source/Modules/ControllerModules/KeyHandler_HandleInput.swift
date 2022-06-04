@@ -200,7 +200,7 @@ extension KeyHandler {
       if mgrPrefs.useSCPCTypingMode {
         let choosingCandidates: InputState.ChoosingCandidate = buildCandidate(
           state: inputting,
-          useVerticalMode: input.useVerticalMode
+          isTypingVertical: input.isTypingVertical
         )
         if choosingCandidates.candidates.count == 1 {
           clear()
@@ -213,7 +213,7 @@ extension KeyHandler {
             if let associatedPhrases =
               buildAssociatePhraseState(
                 withKey: text,
-                useVerticalMode: input.useVerticalMode
+                isTypingVertical: input.isTypingVertical
               ), !associatedPhrases.candidates.isEmpty
             {
               stateCallback(associatedPhrases)
@@ -243,7 +243,7 @@ extension KeyHandler {
     if let currentState = state as? InputState.NotEmpty, _composer.isEmpty,
       input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
         || input.isPageDown || input.isPageUp || (input.isTab && mgrPrefs.specifyShiftTabKeyBehavior)
-        || (input.useVerticalMode && (input.isVerticalModeOnlyChooseCandidateKey))
+        || (input.isTypingVertical && (input.isverticalTypingOnlyChooseCandidateKey))
     {
       if input.isSpace {
         // If the Space key is NOT set to be a selection key
@@ -266,7 +266,7 @@ extension KeyHandler {
           return true
         }
       }
-      stateCallback(buildCandidate(state: currentState, useVerticalMode: input.useVerticalMode))
+      stateCallback(buildCandidate(state: currentState, isTypingVertical: input.isTypingVertical))
       return true
     }
 
@@ -368,7 +368,7 @@ extension KeyHandler {
             let inputting = buildInputtingState
             inputting.poppedText = poppedText
             stateCallback(inputting)
-            stateCallback(buildCandidate(state: inputting, useVerticalMode: input.useVerticalMode))
+            stateCallback(buildCandidate(state: inputting, isTypingVertical: input.isTypingVertical))
           } else {  // If there is still unfinished bpmf reading, ignore the punctuation
             IME.prtDebugIntel("17446655")
             errorCallback()
@@ -380,7 +380,7 @@ extension KeyHandler {
         // 於是這裡用「模擬一次 Enter 鍵的操作」使其代為執行這個 commit buffer 的動作。
         // 這裡不需要該函數所傳回的 bool 結果，所以用「_ =」解消掉。
         _ = handleEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
-        stateCallback(InputState.SymbolTable(node: SymbolNode.root, useVerticalMode: input.useVerticalMode))
+        stateCallback(InputState.SymbolTable(node: SymbolNode.root, isTypingVertical: input.isTypingVertical))
         return true
       }
     }
@@ -411,7 +411,7 @@ extension KeyHandler {
     if handlePunctuation(
       customPunctuation,
       state: state,
-      usingVerticalMode: input.useVerticalMode,
+      usingVerticalTyping: input.isTypingVertical,
       stateCallback: stateCallback,
       errorCallback: errorCallback
     ) {
@@ -425,7 +425,7 @@ extension KeyHandler {
     if handlePunctuation(
       punctuation,
       state: state,
-      usingVerticalMode: input.useVerticalMode,
+      usingVerticalTyping: input.isTypingVertical,
       stateCallback: stateCallback,
       errorCallback: errorCallback
     ) {
@@ -438,7 +438,7 @@ extension KeyHandler {
       if handlePunctuation(
         letter,
         state: state,
-        usingVerticalMode: input.useVerticalMode,
+        usingVerticalTyping: input.isTypingVertical,
         stateCallback: stateCallback,
         errorCallback: errorCallback
       ) {

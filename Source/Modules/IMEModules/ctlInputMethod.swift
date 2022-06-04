@@ -168,7 +168,7 @@ class ctlInputMethod: IMKInputController {
       forCharacterIndex: 0, lineHeightRectangle: &textFrame
     )
 
-    let useVerticalMode =
+    let isTypingVertical =
       (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
 
     if client.bundleIdentifier()
@@ -179,7 +179,7 @@ class ctlInputMethod: IMKInputController {
       IME.areWeUsingOurOwnPhraseEditor = false
     }
 
-    let input = InputSignal(event: event, isVerticalMode: useVerticalMode)
+    let input = InputSignal(event: event, isVerticalTyping: isTypingVertical)
 
     // 無法列印的訊號輸入，一概不作處理。
     // 這個過程不能放在 KeyHandler 內，否則不會起作用。
@@ -457,17 +457,17 @@ extension ctlInputMethod {
 
 extension ctlInputMethod {
   private func show(candidateWindowWith state: InputState, client: Any!) {
-    var useVerticalMode: Bool {
-      var useVerticalMode = false
+    var isTypingVertical: Bool {
+      var isTypingVertical = false
       var candidates: [String] = []
       if let state = state as? InputState.ChoosingCandidate {
-        useVerticalMode = state.useVerticalMode
+        isTypingVertical = state.isTypingVertical
         candidates = state.candidates
       } else if let state = state as? InputState.AssociatedPhrases {
-        useVerticalMode = state.useVerticalMode
+        isTypingVertical = state.isTypingVertical
         candidates = state.candidates
       }
-      if useVerticalMode { return true }
+      if isTypingVertical { return true }
       candidates.sort {
         $0.count > $1.count
       }
@@ -481,7 +481,7 @@ extension ctlInputMethod {
 
     ctlCandidateCurrent.delegate = nil
 
-    if useVerticalMode {
+    if isTypingVertical {
       ctlCandidateCurrent.currentLayout = .vertical
     } else if mgrPrefs.useHorizontalCandidateList {
       ctlCandidateCurrent.currentLayout = .horizontal
@@ -552,7 +552,7 @@ extension ctlInputMethod {
       cursor -= 1
     }
 
-    if useVerticalMode {
+    if isTypingVertical {
       ctlCandidateCurrent.set(
         windowTopLeftPoint: NSPoint(
           x: lineHeightRect.origin.x + lineHeightRect.size.width + 4.0, y: lineHeightRect.origin.y - 4.0
@@ -662,7 +662,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
     {
       if let children = node.children, !children.isEmpty {
         handle(
-          state: .SymbolTable(node: node, useVerticalMode: state.useVerticalMode),
+          state: .SymbolTable(node: node, isTypingVertical: state.isTypingVertical),
           client: currentClient
         )
       } else {
@@ -684,7 +684,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
         handle(state: .Committing(poppedText: composingBuffer), client: client)
         if mgrPrefs.associatedPhrasesEnabled,
           let associatePhrases = keyHandler.buildAssociatePhraseState(
-            withKey: composingBuffer, useVerticalMode: state.useVerticalMode
+            withKey: composingBuffer, isTypingVertical: state.isTypingVertical
           ), !associatePhrases.candidates.isEmpty
         {
           handle(state: associatePhrases, client: client)
@@ -702,7 +702,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
       handle(state: .Committing(poppedText: selectedValue), client: currentClient)
       if mgrPrefs.associatedPhrasesEnabled,
         let associatePhrases = keyHandler.buildAssociatePhraseState(
-          withKey: selectedValue, useVerticalMode: state.useVerticalMode
+          withKey: selectedValue, isTypingVertical: state.isTypingVertical
         ), !associatePhrases.candidates.isEmpty
       {
         handle(state: associatePhrases, client: client)

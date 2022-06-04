@@ -317,11 +317,11 @@ class InputState {
   /// Represents that the user is choosing in a candidates list.
   class ChoosingCandidate: NotEmpty {
     private(set) var candidates: [String]
-    private(set) var useVerticalMode: Bool
+    private(set) var isTypingVertical: Bool
 
-    init(composingBuffer: String, cursorIndex: Int, candidates: [String], useVerticalMode: Bool) {
+    init(composingBuffer: String, cursorIndex: Int, candidates: [String], isTypingVertical: Bool) {
       self.candidates = candidates
-      self.useVerticalMode = useVerticalMode
+      self.isTypingVertical = isTypingVertical
       super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
     }
 
@@ -337,7 +337,7 @@ class InputState {
     }
 
     override var description: String {
-      "<InputState.ChoosingCandidate, candidates:\(candidates), useVerticalMode:\(useVerticalMode),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
+      "<InputState.ChoosingCandidate, candidates:\(candidates), isTypingVertical:\(isTypingVertical),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
     }
   }
 
@@ -347,27 +347,27 @@ class InputState {
   /// in the associated phrases mode.
   class AssociatedPhrases: InputState {
     private(set) var candidates: [String] = []
-    private(set) var useVerticalMode: Bool = false
-    init(candidates: [String], useVerticalMode: Bool) {
+    private(set) var isTypingVertical: Bool = false
+    init(candidates: [String], isTypingVertical: Bool) {
       self.candidates = candidates
-      self.useVerticalMode = useVerticalMode
+      self.isTypingVertical = isTypingVertical
       super.init()
     }
 
     var description: String {
-      "<InputState.AssociatedPhrases, candidates:\(candidates), useVerticalMode:\(useVerticalMode)>"
+      "<InputState.AssociatedPhrases, candidates:\(candidates), isTypingVertical:\(isTypingVertical)>"
     }
   }
 
   class SymbolTable: ChoosingCandidate {
     var node: SymbolNode
 
-    init(node: SymbolNode, useVerticalMode: Bool) {
+    init(node: SymbolNode, isTypingVertical: Bool) {
       self.node = node
       let candidates = node.children?.map(\.title) ?? [String]()
       super.init(
         composingBuffer: "", cursorIndex: 0, candidates: candidates,
-        useVerticalMode: useVerticalMode
+        isTypingVertical: isTypingVertical
       )
     }
 
@@ -388,7 +388,7 @@ class InputState {
     }
 
     override var description: String {
-      "<InputState.SymbolTable, candidates:\(candidates), useVerticalMode:\(useVerticalMode),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
+      "<InputState.SymbolTable, candidates:\(candidates), isTypingVertical:\(isTypingVertical),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
     }
   }
 }

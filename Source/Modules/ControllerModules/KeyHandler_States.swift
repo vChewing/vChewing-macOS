@@ -147,13 +147,13 @@ extension KeyHandler {
 
   func buildCandidate(
     state currentState: InputState.NotEmpty,
-    useVerticalMode: Bool = false
+    isTypingVertical: Bool = false
   ) -> InputState.ChoosingCandidate {
     InputState.ChoosingCandidate(
       composingBuffer: currentState.composingBuffer,
       cursorIndex: currentState.cursorIndex,
       candidates: candidatesArray,
-      useVerticalMode: useVerticalMode
+      isTypingVertical: isTypingVertical
     )
   }
 
@@ -168,11 +168,11 @@ extension KeyHandler {
   // 是否為空：如果陣列為空的話，直接回呼一個空狀態。
   func buildAssociatePhraseState(
     withKey key: String!,
-    useVerticalMode: Bool
+    isTypingVertical: Bool
   ) -> InputState.AssociatedPhrases! {
     // 上一行必須要用驚嘆號，否則 Xcode 會誤導你砍掉某些實際上必需的語句。
     InputState.AssociatedPhrases(
-      candidates: buildAssociatePhraseArray(withKey: key), useVerticalMode: useVerticalMode
+      candidates: buildAssociatePhraseArray(withKey: key), isTypingVertical: isTypingVertical
     )
   }
 
@@ -251,7 +251,7 @@ extension KeyHandler {
   func handlePunctuation(
     _ customPunctuation: String,
     state: InputState,
-    usingVerticalMode useVerticalMode: Bool,
+    usingVerticalTyping isTypingVertical: Bool,
     stateCallback: @escaping (InputState) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
@@ -269,7 +269,7 @@ extension KeyHandler {
       if mgrPrefs.useSCPCTypingMode, _composer.isEmpty {
         let candidateState = buildCandidate(
           state: inputting,
-          useVerticalMode: useVerticalMode
+          isTypingVertical: isTypingVertical
         )
         if candidateState.candidates.count == 1 {
           clear()
