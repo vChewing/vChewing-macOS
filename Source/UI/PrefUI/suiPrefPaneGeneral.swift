@@ -126,7 +126,13 @@ struct suiPrefPaneGeneral: View {
           .preferenceDescription()
         Toggle(
           LocalizedStringKey("Show page buttons in candidate window"), isOn: $selShowPageButtonsInCandidateUI
-        ).controlSize(.small)
+        ).onChange(
+          of: selShowPageButtonsInCandidateUI,
+          perform: { value in
+            mgrPrefs.showPageButtonsInCandidateWindow = value
+          }
+        )
+        .controlSize(.small)
       }
       Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Output Settings:")) }) {
         Toggle(
