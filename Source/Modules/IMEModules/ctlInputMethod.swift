@@ -32,8 +32,8 @@ private let kMinKeyLabelSize: CGFloat = 10
 private var ctlCandidateCurrent: ctlCandidate?
 
 extension ctlCandidate {
-  fileprivate static let horizontal = ctlCandidateHorizontal()
-  fileprivate static let vertical = ctlCandidateVertical()
+  static let horizontal = ctlCandidateUniversal(.horizontal)
+  static let vertical = ctlCandidateUniversal(.vertical)
 }
 
 @objc(ctlInputMethod)

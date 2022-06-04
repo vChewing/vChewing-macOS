@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0AF8B427B2C8290096FE54 /* StringExtension.swift */; };
 		5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */; };
+		5B242403284B0D6500520FE4 /* ctlCandidateUniversal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B242402284B0D6500520FE4 /* ctlCandidateUniversal.swift */; };
 		5B3133BF280B229700A4A505 /* KeyHandler_States.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3133BE280B229700A4A505 /* KeyHandler_States.swift */; };
 		5B38F59A281E2E49007D5F5D /* 6_Unigram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1D15FC0EB100ABF4B3 /* 6_Unigram.swift */; };
 		5B38F59B281E2E49007D5F5D /* 7_KeyValuePair.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1815FC0EB100ABF4B3 /* 7_KeyValuePair.swift */; };
@@ -191,6 +192,7 @@
 		5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-JPN.txt"; sourceTree = "<group>"; };
 		5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHT.txt"; sourceTree = "<group>"; };
+		5B242402284B0D6500520FE4 /* ctlCandidateUniversal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlCandidateUniversal.swift; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
 		5B3133BE280B229700A4A505 /* KeyHandler_States.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_States.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -527,6 +529,7 @@
 			children = (
 				5B62A34027AE7CD900A19448 /* ctlCandidate.swift */,
 				5B62A33F27AE7CD900A19448 /* ctlCandidateHorizontal.swift */,
+				5B242402284B0D6500520FE4 /* ctlCandidateUniversal.swift */,
 				5B62A34127AE7CD900A19448 /* ctlCandidateVertical.swift */,
 			);
 			path = CandidateUI;
@@ -1078,6 +1081,7 @@
 				5BA9FD0F27FEDB6B002DE248 /* suiPrefPaneGeneral.swift in Sources */,
 				5BA9FD4927FEF3C9002DE248 /* Section.swift in Sources */,
 				5BA9FD3E27FEF3C8002DE248 /* Utilities.swift in Sources */,
+				5B242403284B0D6500520FE4 /* ctlCandidateUniversal.swift in Sources */,
 				5BA9FD1127FEDB6B002DE248 /* ctlPrefUI.swift in Sources */,
 				5B38F59C281E2E49007D5F5D /* 2_Grid.swift in Sources */,
 				5B40730D281672610023DFFF /* lmReplacements.swift in Sources */,

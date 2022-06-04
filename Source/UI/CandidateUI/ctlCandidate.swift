@@ -47,6 +47,11 @@ public protocol ctlCandidateDelegate: AnyObject {
 }
 
 public class ctlCandidate: NSWindowController {
+  public enum Layout {
+    case horizontal
+    case vertical
+  }
+  public var currentLayout: Layout = .horizontal
   public weak var delegate: ctlCandidateDelegate? {
     didSet {
       reloadData()
