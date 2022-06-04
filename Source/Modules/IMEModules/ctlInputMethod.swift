@@ -462,7 +462,7 @@ extension ctlInputMethod {
 
 extension ctlInputMethod {
   private func show(candidateWindowWith state: InputState, client: Any!) {
-    let useVerticalMode: Bool = {
+    var useVerticalMode: Bool {
       var useVerticalMode = false
       var candidates: [String] = []
       if let state = state as? InputState.ChoosingCandidate {
@@ -476,22 +476,13 @@ extension ctlInputMethod {
       candidates.sort {
         $0.count > $1.count
       }
-      if let candidateFirst = candidates.first {
-        // If there is a candidate which is too long, we use the vertical
-        // candidate list window automatically.
-        if candidateFirst.count > 8 {
-          // return true // 禁用這一項。威注音回頭會換候選窗格。
-        }
-      }
-      // 如果是顏文字選單的話，則強行使用縱排候選字窗。
-      // 有些顏文字會比較長，所以這裡用 for 判斷。
-      for candidate in candidates {
-        if ["顏文字", "颜文字"].contains(candidate), mgrPrefs.symbolInputEnabled {
-          return true
-        }
-      }
-      return false
-    }()
+      // 測量每頁顯示候選字的累計總長度。如果太長的話就強制使用縱排候選字窗。
+      // 範例：「屬實牛逼」（會有一大串各種各樣的「鼠食牛Beer」的 emoji）。
+      let maxCandidatesPerPage = mgrPrefs.candidateKeys.count
+      let firstPageCandidates = candidates[0..<min(maxCandidatesPerPage, candidates.count)]
+      return firstPageCandidates.joined().count > Int(round(Double(maxCandidatesPerPage) * 1.8))
+      // 上面這句如果是 true 的話，就會是縱排；反之則為橫排。
+    }
 
     ctlCandidateCurrent?.delegate = nil
 
