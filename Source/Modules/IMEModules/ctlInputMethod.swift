@@ -458,16 +458,22 @@ extension ctlInputMethod {
 extension ctlInputMethod {
   private func show(candidateWindowWith state: InputState, client: Any!) {
     var isTypingVertical: Bool {
-      var isTypingVertical = false
+      if let state = state as? InputState.ChoosingCandidate {
+        return state.isTypingVertical
+      } else if let state = state as? InputState.AssociatedPhrases {
+        return state.isTypingVertical
+      }
+      return false
+    }
+    var isCandidateWindowVertical: Bool {
       var candidates: [String] = []
       if let state = state as? InputState.ChoosingCandidate {
-        isTypingVertical = state.isTypingVertical
         candidates = state.candidates
       } else if let state = state as? InputState.AssociatedPhrases {
-        isTypingVertical = state.isTypingVertical
         candidates = state.candidates
       }
       if isTypingVertical { return true }
+      // 以上是通用情形。接下來決定橫排輸入時是否使用縱排選字窗。
       candidates.sort {
         $0.count > $1.count
       }
@@ -481,7 +487,7 @@ extension ctlInputMethod {
 
     ctlCandidateCurrent.delegate = nil
 
-    if isTypingVertical {
+    if isCandidateWindowVertical {  // 縱排輸入時強制使用縱排選字窗
       ctlCandidateCurrent.currentLayout = .vertical
     } else if mgrPrefs.useHorizontalCandidateList {
       ctlCandidateCurrent.currentLayout = .horizontal
