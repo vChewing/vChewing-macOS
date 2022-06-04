@@ -487,12 +487,18 @@ extension ctlInputMethod {
 
     ctlCandidateCurrent.delegate = nil
 
+    /// 下面這一段本可直接指定 currentLayout，但這樣的話翻頁按鈕位置無法精準地重新繪製。
+    /// 所以只能重新初期化。壞處就是得在 ctlCandidate() 當中與 SymbolTable 控制有關的地方
+    /// 新增一個空狀態請求、防止縱排與橫排選字窗同時出現。
+    /// layoutCandidateView 在這裡無法起到糾正作用。
+    /// 該問題徹底解決的價值並不大，直接等到 macOS 10.x 全線淘汰之後用 SwiftUI 重寫選字窗吧。
+
     if isCandidateWindowVertical {  // 縱排輸入時強制使用縱排選字窗
-      ctlCandidateCurrent.currentLayout = .vertical
+      ctlCandidateCurrent = .init(.vertical)
     } else if mgrPrefs.useHorizontalCandidateList {
-      ctlCandidateCurrent.currentLayout = .horizontal
+      ctlCandidateCurrent = .init(.horizontal)
     } else {
-      ctlCandidateCurrent.currentLayout = .vertical
+      ctlCandidateCurrent = .init(.vertical)
     }
 
     // set the attributes for the candidate panel (which uses NSAttributedString)
@@ -667,6 +673,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
       let node = state.node.children?[index]
     {
       if let children = node.children, !children.isEmpty {
+        handle(state: .Empty(), client: client)  // 防止縱橫排選字窗同時出現
         handle(
           state: .SymbolTable(node: node, isTypingVertical: state.isTypingVertical),
           client: currentClient

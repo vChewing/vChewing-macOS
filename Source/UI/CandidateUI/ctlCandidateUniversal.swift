@@ -33,6 +33,7 @@ private class vwrCandidateUniversal: NSView {
   var action: Selector?
   weak var target: AnyObject?
   var isVerticalLayout: Bool = false
+  var fractionFontSize: CGFloat = 12.0
 
   private var keyLabels: [String] = []
   private var displayedCandidates: [String] = []
@@ -135,6 +136,7 @@ private class vwrCandidateUniversal: NSView {
     let labelFontSize = labelFont.pointSize
     let candidateFontSize = candidateFont.pointSize
     let biggestSize = max(labelFontSize, candidateFontSize)
+    fractionFontSize = round(biggestSize * 0.75)
     keyLabelWidth = ceil(labelFontSize)
     keyLabelHeight = ceil(labelFontSize * 2)
     candidateTextHeight = ceil(candidateFontSize * 1.20)
@@ -365,6 +367,7 @@ public class ctlCandidateUniversal: ctlCandidate {
   private var candidateView: vwrCandidateUniversal
   private var prevPageButton: NSButton
   private var nextPageButton: NSButton
+  private var pageCounterLabel: NSTextField
   private var currentPageIndex: Int = 0
   override public var currentLayout: Layout {
     get { candidateView.isVerticalLayout ? .vertical : .horizontal }
@@ -400,10 +403,12 @@ public class ctlCandidateUniversal: ctlCandidate {
 
     panel.contentView?.addSubview(candidateView)
 
+    // MARK: Add Buttons
+
     contentRect.size = NSSize(width: 20.0, height: 10.0)  // Reduce the button width
     let buttonAttribute: [NSAttributedString.Key: Any] = [.font: NSFont.systemFont(ofSize: 9.0)]
 
-    nextPageButton = NSButton(frame: contentRect)
+    nextPageButton = .init(frame: contentRect)
     NSColor.controlBackgroundColor.setFill()
     NSBezierPath.fill(nextPageButton.bounds)
     nextPageButton.wantsLayer = true
@@ -416,7 +421,7 @@ public class ctlCandidateUniversal: ctlCandidate {
     nextPageButton.attributedTitle = NSMutableAttributedString(
       string: " ", attributes: buttonAttribute
     )  // Next Page Arrow
-    prevPageButton = NSButton(frame: contentRect)
+    prevPageButton = .init(frame: contentRect)
     NSColor.controlBackgroundColor.setFill()
     NSBezierPath.fill(prevPageButton.bounds)
     prevPageButton.wantsLayer = true
@@ -432,6 +437,24 @@ public class ctlCandidateUniversal: ctlCandidate {
     panel.contentView?.addSubview(nextPageButton)
     panel.contentView?.addSubview(prevPageButton)
 
+    // MARK: Add Page Counter
+
+    contentRect.size = NSSize(width: 40.0, height: 20.0)
+    pageCounterLabel = .init(frame: contentRect)
+    pageCounterLabel.isEditable = false
+    pageCounterLabel.isSelectable = false
+    pageCounterLabel.isBezeled = false
+    pageCounterLabel.textColor = NSColor(
+      red: 0.86, green: 0.86, blue: 0.86, alpha: 1.00
+    )
+    pageCounterLabel.drawsBackground = true
+    pageCounterLabel.backgroundColor = NSColor(
+      red: 0.18, green: 0.18, blue: 0.18, alpha: 1.00
+    )
+    panel.contentView?.addSubview(pageCounterLabel)
+
+    // MARK: Post-Init()
+
     super.init(window: panel)
     currentLayout = layout
 
@@ -443,6 +466,8 @@ public class ctlCandidateUniversal: ctlCandidate {
 
     prevPageButton.target = self
     prevPageButton.action = #selector(pageButtonAction(_:))
+
+    pageCounterLabel.font = pageCounterFont
   }
 
   @available(*, unavailable)
@@ -529,6 +554,30 @@ extension ctlCandidateUniversal {
     return totalCount / keyLabelCount + ((totalCount % keyLabelCount) != 0 ? 1 : 0)
   }
 
+  // 用來顯示頁面計數器的 NSFont。因為結果可 nil，所以最好 guard-let 再用。
+  private var pageCounterFont: NSFont? {
+    var pointSize: CGFloat { candidateView.fractionFontSize }
+    let systemFontDesc = NSFont.systemFont(ofSize: pointSize, weight: .light).fontDescriptor
+    let fractionFontDesc = systemFontDesc.addingAttributes(
+      [
+        NSFontDescriptor.AttributeName.traits: [
+          [
+            NSFontDescriptor.FeatureKey.typeIdentifier: kFractionsType,
+            NSFontDescriptor.FeatureKey.selectorIdentifier: kDiagonalFractionsSelector,
+          ]
+        ]
+      ]
+    )
+    return NSFont(descriptor: fractionFontDesc, size: pointSize) ?? nil
+  }
+
+  // 用來生成拿給頁面計數器用的顯示字串。
+  // TODO: 這衰洨的 pageCount 總是返回空字串，需要調查。
+  private var pageCounterText: String {
+    if pageCount < 2 { return .init() }
+    return "\(currentPageIndex + 1)/"
+  }
+
   private func layoutCandidateView() {
     guard let delegate = delegate else {
       return
@@ -551,29 +600,61 @@ extension ctlCandidateUniversal {
     var frameRect = candidateView.frame
     frameRect.size = newSize
     candidateView.frame = frameRect
+    let counterHeight: CGFloat = newSize.height - 24
 
     if pageCount > 1, mgrPrefs.showPageButtonsInCandidateWindow {
       var buttonRect = nextPageButton.frame
       let spacing: CGFloat = 0.0
 
       if currentLayout == .horizontal { buttonRect.size.height = floor(newSize.height / 2) }
-      var buttonOriginY = newSize.height - (buttonRect.size.height * 2.0 + spacing)
-      if currentLayout == .horizontal { buttonOriginY /= 2.0 }
-
+      let buttonOriginY: CGFloat = {
+        if currentLayout == .vertical {
+          return counterHeight
+        }
+        return (newSize.height - (buttonRect.size.height * 2.0 + spacing)) / 2.0
+      }()
       buttonRect.origin = NSPoint(x: newSize.width, y: buttonOriginY)
       nextPageButton.frame = buttonRect
-
       buttonRect.origin = NSPoint(
         x: newSize.width, y: buttonOriginY + buttonRect.size.height + spacing
       )
       prevPageButton.frame = buttonRect
-
       newSize.width += 20
       nextPageButton.isHidden = false
       prevPageButton.isHidden = false
     } else {
       nextPageButton.isHidden = true
       prevPageButton.isHidden = true
+    }
+
+    if !pageCounterText.isEmpty {
+      let attrString = NSAttributedString(
+        string: pageCounterText.appending(String(pageCount)),
+        attributes: [
+          .font: pageCounterFont as AnyObject
+        ]
+      )
+      pageCounterLabel.attributedStringValue = attrString
+      var rect = attrString.boundingRect(
+        with: NSSize(width: 1600.0, height: 1600.0),
+        options: .usesLineFragmentOrigin
+      )
+
+      rect.size.height += 3
+      let rectOriginY: CGFloat =
+        (currentLayout == .horizontal)
+        ? (newSize.height - rect.height) / 2
+        : counterHeight
+      let rectOriginX: CGFloat =
+        mgrPrefs.showPageButtonsInCandidateWindow
+        ? newSize.width
+        : newSize.width + 4
+      rect.origin = NSPoint(x: rectOriginX, y: rectOriginY)
+      pageCounterLabel.frame = rect
+      newSize.width += rect.width + 4
+      pageCounterLabel.isHidden = false
+    } else {
+      pageCounterLabel.isHidden = true
     }
 
     frameRect = window?.frame ?? NSRect.zero
