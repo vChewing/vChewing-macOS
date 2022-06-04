@@ -29,12 +29,7 @@ import InputMethodKit
 
 private let kMinKeyLabelSize: CGFloat = 10
 
-private var ctlCandidateCurrent: ctlCandidate?
-
-extension ctlCandidate {
-  static let horizontal = ctlCandidateUniversal(.horizontal)
-  static let vertical = ctlCandidateUniversal(.vertical)
-}
+private var ctlCandidateCurrent = ctlCandidateUniversal.init(.horizontal)
 
 @objc(ctlInputMethod)
 class ctlInputMethod: IMKInputController {
@@ -286,8 +281,8 @@ extension ctlInputMethod {
     _ = state  // Stop clang-format from ruining the parameters of this function.
     currentClient = nil
 
-    ctlCandidateCurrent?.delegate = nil
-    ctlCandidateCurrent?.visible = false
+    ctlCandidateCurrent.delegate = nil
+    ctlCandidateCurrent.visible = false
     hideTooltip()
 
     if let previous = previous as? InputState.NotEmpty {
@@ -301,7 +296,7 @@ extension ctlInputMethod {
 
   private func handle(state: InputState.Empty, previous: InputState, client: Any?) {
     _ = state  // Stop clang-format from ruining the parameters of this function.
-    ctlCandidateCurrent?.visible = false
+    ctlCandidateCurrent.visible = false
     hideTooltip()
 
     guard let client = client as? IMKTextInput else {
@@ -324,7 +319,7 @@ extension ctlInputMethod {
   ) {
     _ = state  // Stop clang-format from ruining the parameters of this function.
     _ = previous  // Stop clang-format from ruining the parameters of this function.
-    ctlCandidateCurrent?.visible = false
+    ctlCandidateCurrent.visible = false
     hideTooltip()
 
     guard let client = client as? IMKTextInput else {
@@ -339,7 +334,7 @@ extension ctlInputMethod {
 
   private func handle(state: InputState.Committing, previous: InputState, client: Any?) {
     _ = previous  // Stop clang-format from ruining the parameters of this function.
-    ctlCandidateCurrent?.visible = false
+    ctlCandidateCurrent.visible = false
     hideTooltip()
 
     guard let client = client as? IMKTextInput else {
@@ -358,7 +353,7 @@ extension ctlInputMethod {
 
   private func handle(state: InputState.Inputting, previous: InputState, client: Any?) {
     _ = previous  // Stop clang-format from ruining the parameters of this function.
-    ctlCandidateCurrent?.visible = false
+    ctlCandidateCurrent.visible = false
     hideTooltip()
 
     guard let client = client as? IMKTextInput else {
@@ -386,7 +381,7 @@ extension ctlInputMethod {
 
   private func handle(state: InputState.Marking, previous: InputState, client: Any?) {
     _ = previous  // Stop clang-format from ruining the parameters of this function.
-    ctlCandidateCurrent?.visible = false
+    ctlCandidateCurrent.visible = false
     guard let client = client as? IMKTextInput else {
       hideTooltip()
       return
@@ -413,7 +408,7 @@ extension ctlInputMethod {
     _ = previous  // Stop clang-format from ruining the parameters of this function.
     hideTooltip()
     guard let client = client as? IMKTextInput else {
-      ctlCandidateCurrent?.visible = false
+      ctlCandidateCurrent.visible = false
       return
     }
 
@@ -430,7 +425,7 @@ extension ctlInputMethod {
     _ = previous  // Stop clang-format from ruining the parameters of this function.
     hideTooltip()
     guard let client = client as? IMKTextInput else {
-      ctlCandidateCurrent?.visible = false
+      ctlCandidateCurrent.visible = false
       return
     }
 
@@ -447,7 +442,7 @@ extension ctlInputMethod {
     _ = previous  // Stop clang-format from ruining the parameters of this function.
     hideTooltip()
     guard let client = client as? IMKTextInput else {
-      ctlCandidateCurrent?.visible = false
+      ctlCandidateCurrent.visible = false
       return
     }
     client.setMarkedText(
@@ -484,14 +479,14 @@ extension ctlInputMethod {
       // 上面這句如果是 true 的話，就會是縱排；反之則為橫排。
     }
 
-    ctlCandidateCurrent?.delegate = nil
+    ctlCandidateCurrent.delegate = nil
 
     if useVerticalMode {
-      ctlCandidateCurrent = .vertical
+      ctlCandidateCurrent.currentLayout = .vertical
     } else if mgrPrefs.useHorizontalCandidateList {
-      ctlCandidateCurrent = .horizontal
+      ctlCandidateCurrent.currentLayout = .horizontal
     } else {
-      ctlCandidateCurrent = .vertical
+      ctlCandidateCurrent.currentLayout = .vertical
     }
 
     // set the attributes for the candidate panel (which uses NSAttributedString)
@@ -519,10 +514,10 @@ extension ctlInputMethod {
       return finalReturnFont
     }
 
-    ctlCandidateCurrent?.keyLabelFont = labelFont(
+    ctlCandidateCurrent.keyLabelFont = labelFont(
       name: mgrPrefs.candidateKeyLabelFontName, size: keyLabelSize
     )
-    ctlCandidateCurrent?.candidateFont = candidateFont(
+    ctlCandidateCurrent.candidateFont = candidateFont(
       name: mgrPrefs.candidateTextFontName, size: textSize
     )
 
@@ -530,15 +525,15 @@ extension ctlInputMethod {
     let keyLabels =
       candidateKeys.count > 4 ? Array(candidateKeys) : Array(mgrPrefs.defaultCandidateKeys)
     let keyLabelSuffix = state is InputState.AssociatedPhrases ? "^" : ""
-    ctlCandidateCurrent?.keyLabels = keyLabels.map {
+    ctlCandidateCurrent.keyLabels = keyLabels.map {
       CandidateKeyLabel(key: String($0), displayedText: String($0) + keyLabelSuffix)
     }
 
-    ctlCandidateCurrent?.delegate = self
-    ctlCandidateCurrent?.reloadData()
+    ctlCandidateCurrent.delegate = self
+    ctlCandidateCurrent.reloadData()
     currentClient = client
 
-    ctlCandidateCurrent?.visible = true
+    ctlCandidateCurrent.visible = true
 
     var lineHeightRect = NSRect(x: 0.0, y: 0.0, width: 16.0, height: 16.0)
     var cursor = 0
@@ -558,14 +553,14 @@ extension ctlInputMethod {
     }
 
     if useVerticalMode {
-      ctlCandidateCurrent?.set(
+      ctlCandidateCurrent.set(
         windowTopLeftPoint: NSPoint(
           x: lineHeightRect.origin.x + lineHeightRect.size.width + 4.0, y: lineHeightRect.origin.y - 4.0
         ),
         bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0
       )
     } else {
-      ctlCandidateCurrent?.set(
+      ctlCandidateCurrent.set(
         windowTopLeftPoint: NSPoint(x: lineHeightRect.origin.x, y: lineHeightRect.origin.y - 4.0),
         bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0
       )
@@ -595,19 +590,13 @@ extension ctlInputMethod {
 // MARK: -
 
 extension ctlInputMethod: KeyHandlerDelegate {
-  func ctlCandidate(for keyHandler: KeyHandler) -> Any {
-    _ = keyHandler  // Stop clang-format from ruining the parameters of this function.
-    return ctlCandidateCurrent ?? .vertical
-  }
+  func ctlCandidate() -> ctlCandidate { ctlCandidateCurrent }
 
   func keyHandler(
-    _ keyHandler: KeyHandler, didSelectCandidateAt index: Int,
-    ctlCandidate controller: Any
+    _: KeyHandler, didSelectCandidateAt index: Int,
+    ctlCandidate controller: ctlCandidate
   ) {
-    _ = keyHandler  // Stop clang-format from ruining the parameters of this function.
-    if let controller = controller as? ctlCandidate {
-      ctlCandidate(controller, didSelectCandidateAtIndex: index)
-    }
+    ctlCandidate(controller, didSelectCandidateAtIndex: index)
   }
 
   func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputState)

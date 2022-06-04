@@ -37,7 +37,7 @@ extension KeyHandler {
   ) -> Bool {
     let inputText = input.inputText
     let charCode: UniChar = input.charCode
-    if let ctlCandidateCurrent = delegate!.ctlCandidate(for: self) as? ctlCandidate {
+    if let ctlCandidateCurrent = delegate?.ctlCandidate() {
       // MARK: Cancel Candidate
 
       let cancelCandidateKey =
@@ -138,18 +138,21 @@ extension KeyHandler {
       // MARK: Left Arrow
 
       if input.isLeft {
-        if ctlCandidateCurrent is ctlCandidateHorizontal {
-          let updated: Bool = ctlCandidateCurrent.highlightPreviousCandidate()
-          if !updated {
-            IME.prtDebugIntel("1145148D")
-            errorCallback()
-          }
-        } else {
-          let updated: Bool = ctlCandidateCurrent.showPreviousPage()
-          if !updated {
-            IME.prtDebugIntel("1919810D")
-            errorCallback()
-          }
+        switch ctlCandidateCurrent.currentLayout {
+          case .horizontal:
+            do {
+              if !ctlCandidateCurrent.highlightPreviousCandidate() {
+                IME.prtDebugIntel("1145148D")
+                errorCallback()
+              }
+            }
+          case .vertical:
+            do {
+              if !ctlCandidateCurrent.showPreviousPage() {
+                IME.prtDebugIntel("1919810D")
+                errorCallback()
+              }
+            }
         }
         return true
       }
@@ -168,18 +171,21 @@ extension KeyHandler {
       // MARK: Right Arrow
 
       if input.isRight {
-        if ctlCandidateCurrent is ctlCandidateHorizontal {
-          let updated: Bool = ctlCandidateCurrent.highlightNextCandidate()
-          if !updated {
-            IME.prtDebugIntel("9B65138D")
-            errorCallback()
-          }
-        } else {
-          let updated: Bool = ctlCandidateCurrent.showNextPage()
-          if !updated {
-            IME.prtDebugIntel("9244908D")
-            errorCallback()
-          }
+        switch ctlCandidateCurrent.currentLayout {
+          case .horizontal:
+            do {
+              if !ctlCandidateCurrent.highlightNextCandidate() {
+                IME.prtDebugIntel("9B65138D")
+                errorCallback()
+              }
+            }
+          case .vertical:
+            do {
+              if !ctlCandidateCurrent.showNextPage() {
+                IME.prtDebugIntel("9244908D")
+                errorCallback()
+              }
+            }
         }
         return true
       }
@@ -198,18 +204,21 @@ extension KeyHandler {
       // MARK: Up Arrow
 
       if input.isUp {
-        if ctlCandidateCurrent is ctlCandidateHorizontal {
-          let updated: Bool = ctlCandidateCurrent.showPreviousPage()
-          if !updated {
-            IME.prtDebugIntel("9B614524")
-            errorCallback()
-          }
-        } else {
-          let updated: Bool = ctlCandidateCurrent.highlightPreviousCandidate()
-          if !updated {
-            IME.prtDebugIntel("ASD9908D")
-            errorCallback()
-          }
+        switch ctlCandidateCurrent.currentLayout {
+          case .horizontal:
+            do {
+              if !ctlCandidateCurrent.showPreviousPage() {
+                IME.prtDebugIntel("9B614524")
+                errorCallback()
+              }
+            }
+          case .vertical:
+            do {
+              if !ctlCandidateCurrent.highlightPreviousCandidate() {
+                IME.prtDebugIntel("ASD9908D")
+                errorCallback()
+              }
+            }
         }
         return true
       }
@@ -217,18 +226,21 @@ extension KeyHandler {
       // MARK: Down Arrow
 
       if input.isDown {
-        if ctlCandidateCurrent is ctlCandidateHorizontal {
-          let updated: Bool = ctlCandidateCurrent.showNextPage()
-          if !updated {
-            IME.prtDebugIntel("92B990DD")
-            errorCallback()
-          }
-        } else {
-          let updated: Bool = ctlCandidateCurrent.highlightNextCandidate()
-          if !updated {
-            IME.prtDebugIntel("6B99908D")
-            errorCallback()
-          }
+        switch ctlCandidateCurrent.currentLayout {
+          case .horizontal:
+            do {
+              if !ctlCandidateCurrent.showNextPage() {
+                IME.prtDebugIntel("92B990DD")
+                errorCallback()
+              }
+            }
+          case .vertical:
+            do {
+              if !ctlCandidateCurrent.highlightNextCandidate() {
+                IME.prtDebugIntel("6B99908D")
+                errorCallback()
+              }
+            }
         }
         return true
       }
