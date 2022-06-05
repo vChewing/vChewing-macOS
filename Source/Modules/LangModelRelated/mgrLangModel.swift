@@ -357,10 +357,9 @@ enum mgrLangModel {
 
   static func dataFolderPath(isDefaultFolder: Bool) -> String {
     let appSupportPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].path
-    var userDictPathSpecified = (mgrPrefs.userDataFolderSpecified as NSString).expandingTildeInPath
+    var userDictPathSpecified = mgrPrefs.userDataFolderSpecified.expandingTildeInPath
     var userDictPathDefault =
-      (URL(fileURLWithPath: appSupportPath).appendingPathComponent("vChewing").path as NSString)
-      .expandingTildeInPath
+      URL(fileURLWithPath: appSupportPath).appendingPathComponent("vChewing").path.expandingTildeInPath
 
     userDictPathDefault.ensureTrailingSlash()
     userDictPathSpecified.ensureTrailingSlash()

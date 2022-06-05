@@ -56,8 +56,8 @@
 /* Class = "NSTextFieldCell"; title = "Derived from OpenVanilla McBopopmofo Project."; ObjectID = "QYf-Nf-hoi"; */
 "QYf-Nf-hoi.title" = "Derived from OpenVanilla McBopopmofo Project.";
 
-/* Class = "NSTextFieldCell"; title = "Tekkon Syllable Composition Engine by Shiki Suen.\nInput State Management Architecture by Zonble Yang.\nvChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen.\nMegrez is a rewritten unigram engine by Shiki Suen using Swift, replacing Lukhnos' C++ Gramambular engine."; ObjectID = "VW8-s5-Wpn"; */
-"VW8-s5-Wpn.title" = "Tekkon Syllable Composition Engine by Shiki Suen.\nInput State Management Architecture by Zonble Yang.\nvChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen.\nMegrez is a rewritten unigram engine by Shiki Suen using Swift, replacing Lukhnos' C++ Gramambular engine.";
+/* Class = "NSTextFieldCell"; title = "vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "VW8-s5-Wpn"; */
+"VW8-s5-Wpn.title" = "vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen.";
 
 /* Class = "NSTextFieldCell"; title = "Placeholder for showing copyright information."; ObjectID = "eo3-TK-0rB"; */
 // "eo3-TK-0rB.title" = "Placeholder for showing copyright information.";

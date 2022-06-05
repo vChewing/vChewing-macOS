@@ -145,7 +145,7 @@ extension vChewing {
         for netaSet in arrRangeRecords {
           let strNetaSet = String(decoding: netaSet, as: UTF8.self)
           let neta = Array(strNetaSet.split(separator: " ").reversed())
-          let theValue: String = String(neta[0])
+          let theValue: String = .init(neta[0])
           let kvPair = Megrez.KeyValuePair(key: key, value: theValue)
           var theScore = defaultScore
           if neta.count >= 2, !shouldForceDefaultScore {

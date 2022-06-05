@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -680,9 +681,9 @@
                                                         </connections>
                                                     </textField>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p7V-IN-OTr">
-                                                        <rect key="frame" x="19" y="295.5" width="406" height="17"/>
+                                                        <rect key="frame" x="19" y="296.5" width="406" height="17"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="height" constant="16" id="KGx-QR-wgI"/>
+                                                            <constraint firstAttribute="height" constant="16" id="Ieq-hl-01l"/>
                                                         </constraints>
                                                         <buttonCell key="cell" type="check" title="Automatically reload user data files if changes detected" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="f8i-69-zxm">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -693,9 +694,9 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="O4B-Z2-XYi">
-                                                        <rect key="frame" x="19" y="273.5" width="406" height="17"/>
+                                                        <rect key="frame" x="19" y="274.5" width="406" height="17"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="height" constant="16" id="60g-xI-n1n"/>
+                                                            <constraint firstAttribute="height" constant="16" id="2gi-B5-vjz"/>
                                                         </constraints>
                                                         <buttonCell key="cell" type="check" title="Enable symbol input support (incl. certain emoji symbols)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="hSv-LJ-Cq3" userLabel="chkSymbolEnabled">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -735,9 +736,9 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Yaj-QY-7xV" userLabel="chkCNSSupport">
-                                                        <rect key="frame" x="19" y="251.5" width="406" height="17"/>
+                                                        <rect key="frame" x="19" y="252.5" width="406" height="17"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="height" constant="16" id="XP3-SR-9Ha"/>
+                                                            <constraint firstAttribute="height" constant="16" id="vin-Cj-dDq"/>
                                                         </constraints>
                                                         <buttonCell key="cell" type="check" title="Enable CNS11643 Support (2022-04-27)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="W24-T4-cg0">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -748,28 +749,44 @@
                                                             <binding destination="32" name="value" keyPath="values.CNS11643Enabled" id="Pbx-Gt-upm"/>
                                                         </connections>
                                                     </button>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Hyc-Nw-dET">
+                                                        <rect key="frame" x="19" y="230.5" width="406" height="17"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="16" id="drz-HW-cX1"/>
+                                                        </constraints>
+                                                        <buttonCell key="cell" type="check" title="Allow boosting / excluding a candidate of single kanji" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="chkAllowBoostingSingleKanjiAsUserPhrase" userLabel="chkAllowBoostingSingleKanjiAsUserPhrase">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <binding destination="32" name="value" keyPath="values.AllowBoostingSingleKanjiAsUserPhrase" id="jiw-1V-C7x"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                                 <constraints>
                                                     <constraint firstItem="s7t-Kk-EPu" firstAttribute="bottom" secondItem="MPN-np-SbT" secondAttribute="bottom" id="0Fo-ya-hQ9"/>
-                                                    <constraint firstItem="O4B-Z2-XYi" firstAttribute="trailing" secondItem="Yaj-QY-7xV" secondAttribute="trailing" id="2VU-kM-5xJ"/>
+                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="leading" secondItem="O4B-Z2-XYi" secondAttribute="leading" id="6GG-yw-MYi"/>
+                                                    <constraint firstItem="O4B-Z2-XYi" firstAttribute="top" secondItem="p7V-IN-OTr" secondAttribute="bottom" constant="6" symbolic="YES" id="6H0-cT-DDa"/>
                                                     <constraint firstAttribute="trailing" secondItem="FUV-qx-xkC" secondAttribute="trailing" constant="20" symbolic="YES" id="6QR-tj-5cH"/>
-                                                    <constraint firstItem="O4B-Z2-XYi" firstAttribute="top" secondItem="p7V-IN-OTr" secondAttribute="bottom" constant="6" id="6tf-H0-CKc"/>
+                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="trailing" secondItem="Hyc-Nw-dET" secondAttribute="trailing" id="6ty-e2-2yl"/>
+                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="leading" secondItem="s7t-Kk-EPu" secondAttribute="leading" id="7KG-BW-e6E"/>
                                                     <constraint firstItem="s7t-Kk-EPu" firstAttribute="leading" secondItem="MPN-np-SbT" secondAttribute="trailing" constant="-376" id="9at-E8-Bt1"/>
                                                     <constraint firstItem="FUV-qx-xkC" firstAttribute="top" secondItem="cy4-aV-hhk" secondAttribute="top" constant="15" id="BZE-dD-V2R"/>
                                                     <constraint firstItem="MPN-np-SbT" firstAttribute="top" secondItem="FUV-qx-xkC" secondAttribute="bottom" constant="14" id="Bp9-2u-f9E"/>
+                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="leading" secondItem="Hyc-Nw-dET" secondAttribute="leading" id="DJV-E7-Wgv"/>
+                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="top" secondItem="O4B-Z2-XYi" secondAttribute="bottom" constant="6" symbolic="YES" id="F6l-lB-OT5"/>
                                                     <constraint firstItem="FUV-qx-xkC" firstAttribute="leading" secondItem="cy4-aV-hhk" secondAttribute="leading" constant="20" symbolic="YES" id="Hy2-ZC-cvb"/>
+                                                    <constraint firstItem="Hyc-Nw-dET" firstAttribute="top" secondItem="Yaj-QY-7xV" secondAttribute="bottom" constant="6" symbolic="YES" id="OCz-SW-av6"/>
                                                     <constraint firstItem="s7t-Kk-EPu" firstAttribute="firstBaseline" secondItem="MPN-np-SbT" secondAttribute="baseline" id="OYH-gA-WcA"/>
-                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="trailing" secondItem="O4B-Z2-XYi" secondAttribute="trailing" id="Phu-Qi-Xup"/>
-                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="top" secondItem="s7t-Kk-EPu" secondAttribute="bottom" constant="15" id="PyP-N9-MWb"/>
-                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="leading" secondItem="s7t-Kk-EPu" secondAttribute="leading" id="QMQ-hR-c5W"/>
+                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="trailing" secondItem="jXe-xz-9Sd" secondAttribute="trailing" id="QQv-cA-dO9"/>
                                                     <constraint firstItem="FUV-qx-xkC" firstAttribute="leading" secondItem="MPN-np-SbT" secondAttribute="leading" constant="-346" id="Zet-wH-kmC"/>
+                                                    <constraint firstItem="O4B-Z2-XYi" firstAttribute="leading" secondItem="Yaj-QY-7xV" secondAttribute="leading" id="aI8-ll-ybr"/>
                                                     <constraint firstItem="jXe-xz-9Sd" firstAttribute="leading" secondItem="MPN-np-SbT" secondAttribute="trailing" constant="-1" id="cYQ-Rx-tuG"/>
-                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="leading" secondItem="O4B-Z2-XYi" secondAttribute="leading" id="dm5-TK-PRw"/>
-                                                    <constraint firstItem="O4B-Z2-XYi" firstAttribute="leading" secondItem="Yaj-QY-7xV" secondAttribute="leading" id="qHY-fz-P9H"/>
-                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="trailing" secondItem="jXe-xz-9Sd" secondAttribute="trailing" id="uuG-Bg-2Vi"/>
+                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="top" secondItem="s7t-Kk-EPu" secondAttribute="bottom" constant="14.5" id="hJ9-p8-clP"/>
+                                                    <constraint firstItem="O4B-Z2-XYi" firstAttribute="trailing" secondItem="Yaj-QY-7xV" secondAttribute="trailing" id="pZC-Vr-DTa"/>
+                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="trailing" secondItem="O4B-Z2-XYi" secondAttribute="trailing" id="s0C-8F-wWy"/>
                                                     <constraint firstItem="s7t-Kk-EPu" firstAttribute="trailing" secondItem="FUV-qx-xkC" secondAttribute="trailing" constant="-60" id="vIO-x1-7Q2"/>
                                                     <constraint firstItem="jXe-xz-9Sd" firstAttribute="baseline" secondItem="MPN-np-SbT" secondAttribute="baseline" id="wys-ML-2Q2"/>
-                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="top" secondItem="O4B-Z2-XYi" secondAttribute="bottom" constant="6" symbolic="YES" id="zZg-M3-hSk"/>
                                                 </constraints>
                                             </view>
                                         </box>

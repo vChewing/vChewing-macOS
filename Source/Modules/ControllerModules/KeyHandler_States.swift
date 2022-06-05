@@ -34,18 +34,18 @@ extension KeyHandler {
   var buildInputtingState: InputState.Inputting {
     // "Updating the composing buffer" means to request the client
     // to "refresh" the text input buffer with our "composing text"
+    var tooltipParameterRef: [String] = ["", ""]
     var composingBuffer = ""
     var composedStringCursorIndex = 0
     var readingCursorIndex = 0
     // We must do some Unicode codepoint counting to find the actual cursor location for the client
     // i.e. we need to take UTF-16 into consideration, for which a surrogate pair takes 2 UniChars
-    // locations. These processes are inherited from the ObjC++ version of this class and might be
-    // unnecessary in Swift, but this deduction requires further experiments.
+    // locations. Since we are using Swift, we use .utf16 as the equivalent of NSString.length().
     for walkedNode in _walkedNodes {
       if let theNode = walkedNode.node {
         let strNodeValue = theNode.currentKeyValue.value
         composingBuffer += strNodeValue
-        let arrSplit: [NSString] = (strNodeValue as NSString).split()
+        let arrSplit: [String] = Array(strNodeValue).map { String($0) }
         let codepointCount = arrSplit.count
         // This re-aligns the cursor index in the composed string
         // (the actual cursor on the screen) with the builder's logical
@@ -55,22 +55,38 @@ extension KeyHandler {
         // index.
         let spanningLength: Int = walkedNode.spanningLength
         if readingCursorIndex + spanningLength <= builderCursorIndex {
-          composedStringCursorIndex += (strNodeValue as NSString).length
+          composedStringCursorIndex += strNodeValue.utf16.count
           readingCursorIndex += spanningLength
         } else {
           if codepointCount == spanningLength {
             var i = 0
             while i < codepointCount, readingCursorIndex < builderCursorIndex {
-              composedStringCursorIndex += arrSplit[i].length
+              composedStringCursorIndex += arrSplit[i].utf16.count
               readingCursorIndex += 1
               i += 1
             }
           } else {
             if readingCursorIndex < builderCursorIndex {
-              composedStringCursorIndex += (strNodeValue as NSString).length
+              composedStringCursorIndex += strNodeValue.utf16.count
               readingCursorIndex += spanningLength
               if readingCursorIndex > builderCursorIndex {
                 readingCursorIndex = builderCursorIndex
+              }
+              // Now we start preparing the contents of the tooltips used
+              // in cases of moving cursors across certain emojis which emoji
+              // char count is inequal to the reading count.
+              // Example in McBopomofo: Typing 王建民 (3 readings) gets a tree emoji.
+              // Example in vChewing: Typing 義麵 (2 readings) gets a pasta emoji.
+              switch builderCursorIndex {
+                case _builder.readings.count...:
+                  tooltipParameterRef[0] = _builder.readings[_builder.readings.count - 1]
+                case 0:
+                  tooltipParameterRef[1] = _builder.readings[builderCursorIndex]
+                default:
+                  do {
+                    tooltipParameterRef[0] = _builder.readings[builderCursorIndex - 1]
+                    tooltipParameterRef[1] = _builder.readings[builderCursorIndex]
+                  }
               }
             }
           }
@@ -81,26 +97,63 @@ extension KeyHandler {
     // Now, we gather all the intel, separate the composing buffer to two parts (head and tail),
     // and insert the reading text (the Mandarin syllable) in between them.
     // The reading text is what the user is typing.
-    let head = String((composingBuffer as NSString).substring(to: composedStringCursorIndex))
-    let reading = _composer.getInlineCompositionForIMK(isHanyuPinyin: mgrPrefs.showHanyuPinyinInCompositionBuffer)
-    let tail = String((composingBuffer as NSString).substring(from: composedStringCursorIndex))
-    let composedText = head + reading + tail
-    let cursorIndex = composedStringCursorIndex + reading.count
+    var arrHead = [String.UTF16View.Element]()
+    var arrTail = [String.UTF16View.Element]()
 
-    return InputState.Inputting(composingBuffer: composedText, cursorIndex: UInt(cursorIndex))
+    for (i, n) in composingBuffer.utf16.enumerated() {
+      if i < composedStringCursorIndex {
+        arrHead.append(n)
+      } else {
+        arrTail.append(n)
+      }
+    }
+
+    let head = String(utf16CodeUnits: arrHead, count: arrHead.count)
+    let reading = _composer.getInlineCompositionForIMK(isHanyuPinyin: mgrPrefs.showHanyuPinyinInCompositionBuffer)
+    let tail = String(utf16CodeUnits: arrTail, count: arrTail.count)
+    let composedText = head + reading + tail
+    let cursorIndex = composedStringCursorIndex + reading.utf16.count
+
+    let stateResult = InputState.Inputting(composingBuffer: composedText, cursorIndex: cursorIndex)
+
+    // Now we start weaving the contents of the tooltip.
+    if tooltipParameterRef[0].isEmpty, tooltipParameterRef[1].isEmpty {
+      stateResult.tooltip = ""
+    } else if tooltipParameterRef[0].isEmpty {
+      stateResult.tooltip = String(
+        format: NSLocalizedString("Cursor is to the rear of \"%@\".", comment: ""),
+        tooltipParameterRef[1]
+      )
+    } else if tooltipParameterRef[1].isEmpty {
+      stateResult.tooltip = String(
+        format: NSLocalizedString("Cursor is in front of \"%@\".", comment: ""),
+        tooltipParameterRef[0]
+      )
+    } else {
+      stateResult.tooltip = String(
+        format: NSLocalizedString("Cursor is between \"%@\" and \"%@\".", comment: ""),
+        tooltipParameterRef[0], tooltipParameterRef[1]
+      )
+    }
+
+    if !stateResult.tooltip.isEmpty {
+      ctlInputMethod.tooltipController.setColor(state: .denialOverflow)
+    }
+
+    return stateResult
   }
 
   // MARK: - 用以生成候選詞陣列及狀態
 
   func buildCandidate(
     state currentState: InputState.NotEmpty,
-    useVerticalMode: Bool = false
+    isTypingVertical: Bool = false
   ) -> InputState.ChoosingCandidate {
     InputState.ChoosingCandidate(
       composingBuffer: currentState.composingBuffer,
       cursorIndex: currentState.cursorIndex,
       candidates: candidatesArray,
-      useVerticalMode: useVerticalMode
+      isTypingVertical: isTypingVertical
     )
   }
 
@@ -115,11 +168,11 @@ extension KeyHandler {
   // 是否為空：如果陣列為空的話，直接回呼一個空狀態。
   func buildAssociatePhraseState(
     withKey key: String!,
-    useVerticalMode: Bool
+    isTypingVertical: Bool
   ) -> InputState.AssociatedPhrases! {
     // 上一行必須要用驚嘆號，否則 Xcode 會誤導你砍掉某些實際上必需的語句。
     InputState.AssociatedPhrases(
-      candidates: buildAssociatePhraseArray(withKey: key), useVerticalMode: useVerticalMode
+      candidates: buildAssociatePhraseArray(withKey: key), isTypingVertical: isTypingVertical
     )
   }
 
@@ -153,7 +206,7 @@ extension KeyHandler {
     if input.isCursorBackward || input.emacsKey == vChewingEmacsKey.backward, input.isShiftHold {
       var index = state.markerIndex
       if index > 0 {
-        index = UInt((state.composingBuffer as NSString).previousUtf16Position(for: Int(index)))
+        index = state.composingBuffer.utf16PreviousPosition(for: index)
         let marking = InputState.Marking(
           composingBuffer: state.composingBuffer,
           cursorIndex: state.cursorIndex,
@@ -161,7 +214,7 @@ extension KeyHandler {
           readings: state.readings
         )
         marking.tooltipForInputting = state.tooltipForInputting
-        stateCallback(marking.markedRange.length == 0 ? marking.convertedToInputting : marking)
+        stateCallback(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
       } else {
         IME.prtDebugIntel("1149908D")
         errorCallback()
@@ -173,10 +226,8 @@ extension KeyHandler {
     // Shift + Right
     if input.isCursorForward || input.emacsKey == vChewingEmacsKey.forward, input.isShiftHold {
       var index = state.markerIndex
-      // 這裡繼續用 NSString 是為了與 Zonble 之前引入的 NSStringUtils 相容。
-      // 不然的話，這行判斷會失敗、引發「9B51408D」錯誤。
-      if index < ((state.composingBuffer as NSString).length) {
-        index = UInt((state.composingBuffer as NSString).nextUtf16Position(for: Int(index)))
+      if index < (state.composingBuffer.utf16.count) {
+        index = state.composingBuffer.utf16NextPosition(for: index)
         let marking = InputState.Marking(
           composingBuffer: state.composingBuffer,
           cursorIndex: state.cursorIndex,
@@ -184,7 +235,7 @@ extension KeyHandler {
           readings: state.readings
         )
         marking.tooltipForInputting = state.tooltipForInputting
-        stateCallback(marking.markedRange.length == 0 ? marking.convertedToInputting : marking)
+        stateCallback(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
       } else {
         IME.prtDebugIntel("9B51408D")
         errorCallback()
@@ -200,7 +251,7 @@ extension KeyHandler {
   func handlePunctuation(
     _ customPunctuation: String,
     state: InputState,
-    usingVerticalMode useVerticalMode: Bool,
+    usingVerticalTyping isTypingVertical: Bool,
     stateCallback: @escaping (InputState) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
@@ -218,7 +269,7 @@ extension KeyHandler {
       if mgrPrefs.useSCPCTypingMode, _composer.isEmpty {
         let candidateState = buildCandidate(
           state: inputting,
-          useVerticalMode: useVerticalMode
+          isTypingVertical: isTypingVertical
         )
         if candidateState.candidates.count == 1 {
           clear()
@@ -512,13 +563,13 @@ extension KeyHandler {
 
     if input.isShiftHold {
       // Shift + Right
-      if currentState.cursorIndex < (currentState.composingBuffer as NSString).length {
-        let nextPosition = (currentState.composingBuffer as NSString).nextUtf16Position(
-          for: Int(currentState.cursorIndex))
+      if currentState.cursorIndex < currentState.composingBuffer.utf16.count {
+        let nextPosition = currentState.composingBuffer.utf16NextPosition(
+          for: currentState.cursorIndex)
         let marking: InputState.Marking! = InputState.Marking(
           composingBuffer: currentState.composingBuffer,
           cursorIndex: currentState.cursorIndex,
-          markerIndex: UInt(nextPosition),
+          markerIndex: nextPosition,
           readings: currentReadings
         )
         marking.tooltipForInputting = currentState.tooltip
@@ -562,12 +613,12 @@ extension KeyHandler {
     if input.isShiftHold {
       // Shift + left
       if currentState.cursorIndex > 0 {
-        let previousPosition = (currentState.composingBuffer as NSString).previousUtf16Position(
-          for: Int(currentState.cursorIndex))
+        let previousPosition = currentState.composingBuffer.utf16PreviousPosition(
+          for: currentState.cursorIndex)
         let marking: InputState.Marking! = InputState.Marking(
           composingBuffer: currentState.composingBuffer,
           cursorIndex: currentState.cursorIndex,
-          markerIndex: UInt(previousPosition),
+          markerIndex: previousPosition,
           readings: currentReadings
         )
         marking.tooltipForInputting = currentState.tooltip

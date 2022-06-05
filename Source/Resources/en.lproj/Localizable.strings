@@ -57,6 +57,8 @@
 "Edit User Symbol & Emoji Data…" = "Edit User Symbol & Emoji Data…";
 "Choose your desired user data folder." = "Choose your desired user data folder.";
 "Cursor is between \"%@\" and \"%@\"." = "Cursor is between \"%@\" and \"%@\".";
+"Cursor is to the rear of \"%@\"." = "Cursor is to the rear of \"%@\".";
+"Cursor is in front of \"%@\"." = "Cursor is in front of \"%@\".";
 "Loading CHS Core Dict..." = "Loading CHS Core Dict...";
 "Loading CHT Core Dict..." = "Loading CHT Core Dict...";
 "Core Dict loading complete." = "Core Dict loading complete.";
@@ -80,6 +82,7 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)Space:";
+"Allow boosting / excluding a candidate of single kanji" = "Allow boosting / excluding a candidate of single kanji";
 "An accomodation for elder computer users." = "An accomodation for elder computer users.";
 "Apple ABC (equivalent to English US)" = "Apple ABC (equivalent to English US)";
 "Apple Chewing - Dachen" = "Apple Chewing - Dachen";

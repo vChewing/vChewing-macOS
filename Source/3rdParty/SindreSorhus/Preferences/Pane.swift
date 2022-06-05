@@ -25,18 +25,18 @@ import SwiftUI
 /// Acts as type-eraser for `Preferences.Pane<T>`.
 public protocol PreferencePaneConvertible {
   /**
-     Convert `self` to equivalent `PreferencePane`.
-     */
+   Convert `self` to equivalent `PreferencePane`.
+   */
   func asPreferencePane() -> PreferencePane
 }
 
 @available(macOS 10.15, *)
 extension Preferences {
   /**
-     Create a SwiftUI-based preference pane.
+   Create a SwiftUI-based preference pane.
 
-     SwiftUI equivalent of the `PreferencePane` protocol.
-     */
+   SwiftUI equivalent of the `PreferencePane` protocol.
+   */
   public struct Pane<Content: View>: View, PreferencePaneConvertible {
     let identifier: PaneIdentifier
     let title: String
@@ -63,8 +63,8 @@ extension Preferences {
   }
 
   /**
-     Hosting controller enabling `Preferences.Pane` to be used alongside AppKit `NSViewController`'s.
-     */
+   Hosting controller enabling `Preferences.Pane` to be used alongside AppKit `NSViewController`'s.
+   */
   public final class PaneHostingController<Content: View>: NSHostingController<Content>, PreferencePane {
     public let preferencePaneIdentifier: PaneIdentifier
     public let preferencePaneTitle: String
@@ -102,8 +102,8 @@ extension Preferences {
 @available(macOS 10.15, *)
 extension View {
   /**
-     Applies font and color for a label used for describing a preference.
-     */
+   Applies font and color for a label used for describing a preference.
+   */
   public func preferenceDescription() -> some View {
     font(.system(size: 11.0))
       // TODO: Use `.foregroundStyle` when targeting macOS 12.

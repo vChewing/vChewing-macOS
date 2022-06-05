@@ -27,8 +27,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 
 public class TooltipController: NSWindowController {
-  static var backgroundColor = NSColor.windowBackgroundColor
-  static var textColor = NSColor.windowBackgroundColor
+  public enum ColorStates {
+    case normal
+    case redAlert
+    case warning
+    case denialOverflow
+    case denialInsufficiency
+    case prompt
+  }
+
+  private var backgroundColor = NSColor.windowBackgroundColor
+  private var textColor = NSColor.windowBackgroundColor
   private var messageTextField: NSTextField
   private var tooltip: String = "" {
     didSet {
@@ -50,12 +59,11 @@ public class TooltipController: NSWindowController {
     messageTextField.isEditable = false
     messageTextField.isSelectable = false
     messageTextField.isBezeled = false
-    messageTextField.textColor = TooltipController.textColor
+    messageTextField.textColor = textColor
     messageTextField.drawsBackground = true
-    messageTextField.backgroundColor = TooltipController.backgroundColor
+    messageTextField.backgroundColor = backgroundColor
     messageTextField.font = .systemFont(ofSize: NSFont.systemFontSize(for: .small))
     panel.contentView?.addSubview(messageTextField)
-
     super.init(window: panel)
   }
 
@@ -65,11 +73,54 @@ public class TooltipController: NSWindowController {
   }
 
   public func show(tooltip: String, at point: NSPoint) {
-    messageTextField.textColor = TooltipController.textColor
-    messageTextField.backgroundColor = TooltipController.backgroundColor
+    messageTextField.textColor = textColor
+    messageTextField.backgroundColor = backgroundColor
     self.tooltip = tooltip
     window?.orderFront(nil)
     set(windowLocation: point)
+  }
+
+  public func setColor(state: ColorStates) {
+    switch state {
+      case .normal:
+        backgroundColor = NSColor(
+          red: 0.18, green: 0.18, blue: 0.18, alpha: 1.00
+        )
+        textColor = NSColor.white
+      case .redAlert:
+        backgroundColor = NSColor(
+          red: 0.55, green: 0.00, blue: 0.00, alpha: 1.00
+        )
+        textColor = NSColor.white
+      case .warning:
+        backgroundColor = NSColor.purple
+        textColor = NSColor.white
+      case .denialOverflow:
+        backgroundColor = NSColor(
+          red: 0.13, green: 0.08, blue: 0.00, alpha: 1.00
+        )
+        textColor = NSColor(
+          red: 1.00, green: 0.60, blue: 0.00, alpha: 1.00
+        )
+      case .denialInsufficiency:
+        backgroundColor = NSColor(
+          red: 0.18, green: 0.18, blue: 0.18, alpha: 1.00
+        )
+        textColor = NSColor(
+          red: 0.86, green: 0.86, blue: 0.86, alpha: 1.00
+        )
+      case .prompt:
+        backgroundColor = NSColor(
+          red: 0.00, green: 0.18, blue: 0.13, alpha: 1.00
+        )
+        textColor = NSColor(
+          red: 0.00, green: 1.00, blue: 0.74, alpha: 1.00
+        )
+    }
+  }
+
+  public func resetColor() {
+    setColor(state: .normal)
   }
 
   @objc

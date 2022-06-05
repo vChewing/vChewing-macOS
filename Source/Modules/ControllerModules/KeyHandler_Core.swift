@@ -35,10 +35,10 @@ public enum InputMode: String {
 // MARK: - Delegate.
 
 protocol KeyHandlerDelegate {
-  func ctlCandidate(for _: KeyHandler) -> Any
+  func ctlCandidate() -> ctlCandidate
   func keyHandler(
     _: KeyHandler, didSelectCandidateAt index: Int,
-    ctlCandidate controller: Any
+    ctlCandidate controller: ctlCandidate
   )
   func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputState)
     -> Bool

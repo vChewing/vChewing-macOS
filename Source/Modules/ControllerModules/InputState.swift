@@ -110,9 +110,9 @@ class InputState {
   /// Represents that the composing buffer is not empty.
   class NotEmpty: InputState {
     private(set) var composingBuffer: String
-    private(set) var cursorIndex: UInt
+    private(set) var cursorIndex: Int = 0 { didSet { cursorIndex = max(cursorIndex, 0) } }
 
-    init(composingBuffer: String, cursorIndex: UInt) {
+    init(composingBuffer: String, cursorIndex: Int) {
       self.composingBuffer = composingBuffer
       self.cursorIndex = cursorIndex
     }
@@ -129,7 +129,7 @@ class InputState {
     var poppedText: String = ""
     var tooltip: String = ""
 
-    override init(composingBuffer: String, cursorIndex: UInt) {
+    override init(composingBuffer: String, cursorIndex: Int) {
       super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
     }
 
@@ -151,91 +151,68 @@ class InputState {
 
   // MARK: -
 
-  private let kMinMarkRangeLength = 2
-  private let kMaxMarkRangeLength = mgrPrefs.maxCandidateLength
-
   /// Represents that the user is marking a range in the composing buffer.
   class Marking: NotEmpty {
-    private(set) var markerIndex: UInt
-    private(set) var markedRange: NSRange
+    private var allowedMarkRange: ClosedRange<Int> = mgrPrefs.minCandidateLength...mgrPrefs.maxCandidateLength
+    private(set) var markerIndex: Int = 0 { didSet { markerIndex = max(markerIndex, 0) } }
+    private(set) var markedRange: Range<Int>
+    private var literalMarkedRange: Range<Int> {
+      let lowerBoundLiteral = composingBuffer.charIndexLiteral(from: markedRange.lowerBound)
+      let upperBoundLiteral = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
+      return lowerBoundLiteral..<upperBoundLiteral
+    }
+
     private var deleteTargetExists = false
     var tooltip: String {
       if composingBuffer.count != readings.count {
-        TooltipController.backgroundColor = NSColor(
-          red: 0.55, green: 0.00, blue: 0.00, alpha: 1.00
-        )
-        TooltipController.textColor = NSColor.white
+        ctlInputMethod.tooltipController.setColor(state: .redAlert)
         return NSLocalizedString(
           "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.", comment: ""
         )
       }
-
       if mgrPrefs.phraseReplacementEnabled {
-        TooltipController.backgroundColor = NSColor.purple
-        TooltipController.textColor = NSColor.white
+        ctlInputMethod.tooltipController.setColor(state: .warning)
         return NSLocalizedString(
           "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.", comment: ""
         )
       }
-      if markedRange.length == 0 {
+      if markedRange.isEmpty {
         return ""
       }
 
-      let text = (composingBuffer as NSString).substring(with: markedRange)
-      if markedRange.length < kMinMarkRangeLength {
-        TooltipController.backgroundColor = NSColor(
-          red: 0.18, green: 0.18, blue: 0.18, alpha: 1.00
-        )
-        TooltipController.textColor = NSColor(
-          red: 0.86, green: 0.86, blue: 0.86, alpha: 1.00
-        )
+      let text = composingBuffer.utf16SubString(with: markedRange)
+      if literalMarkedRange.count < allowedMarkRange.lowerBound {
+        ctlInputMethod.tooltipController.setColor(state: .denialInsufficiency)
         return String(
           format: NSLocalizedString(
             "\"%@\" length must ≥ 2 for a user phrase.", comment: ""
           ), text
         )
-      } else if markedRange.length > kMaxMarkRangeLength {
-        TooltipController.backgroundColor = NSColor(
-          red: 0.26, green: 0.16, blue: 0.00, alpha: 1.00
-        )
-        TooltipController.textColor = NSColor(
-          red: 1.00, green: 0.60, blue: 0.00, alpha: 1.00
-        )
+      } else if literalMarkedRange.count > allowedMarkRange.upperBound {
+        ctlInputMethod.tooltipController.setColor(state: .denialOverflow)
         return String(
           format: NSLocalizedString(
             "\"%@\" length should ≤ %d for a user phrase.", comment: ""
           ),
-          text, kMaxMarkRangeLength
+          text, allowedMarkRange.upperBound
         )
       }
 
-      let (exactBegin, _) = (composingBuffer as NSString).characterIndex(
-        from: markedRange.location)
-      let (exactEnd, _) = (composingBuffer as NSString).characterIndex(
-        from: markedRange.location + markedRange.length)
-      let selectedReadings = readings[exactBegin..<exactEnd]
+      let selectedReadings = readings[literalMarkedRange]
       let joined = selectedReadings.joined(separator: "-")
       let exist = mgrLangModel.checkIfUserPhraseExist(
         userPhrase: text, mode: ctlInputMethod.currentKeyHandler.inputMode, key: joined
       )
       if exist {
         deleteTargetExists = exist
-        TooltipController.backgroundColor = NSColor(
-          red: 0.00, green: 0.18, blue: 0.13, alpha: 1.00
-        )
-        TooltipController.textColor = NSColor(
-          red: 0.00, green: 1.00, blue: 0.74, alpha: 1.00
-        )
+        ctlInputMethod.tooltipController.setColor(state: .prompt)
         return String(
           format: NSLocalizedString(
             "\"%@\" already exists: ENTER to boost, \n SHIFT+CMD+ENTER to exclude.", comment: ""
           ), text
         )
       }
-      TooltipController.backgroundColor = NSColor(
-        red: 0.18, green: 0.18, blue: 0.18, alpha: 1.00
-      )
-      TooltipController.textColor = NSColor.white
+      ctlInputMethod.tooltipController.resetColor()
       return String(
         format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: ""),
         text
@@ -245,30 +222,34 @@ class InputState {
     var tooltipForInputting: String = ""
     private(set) var readings: [String]
 
-    init(composingBuffer: String, cursorIndex: UInt, markerIndex: UInt, readings: [String]) {
+    init(composingBuffer: String, cursorIndex: Int, markerIndex: Int, readings: [String]) {
       self.markerIndex = markerIndex
       let begin = min(cursorIndex, markerIndex)
       let end = max(cursorIndex, markerIndex)
-      markedRange = NSRange(location: Int(begin), length: Int(end - begin))
+      markedRange = begin..<end
       self.readings = readings
       super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
     }
 
     var attributedString: NSAttributedString {
       let attributedString = NSMutableAttributedString(string: composingBuffer)
-      let end = markedRange.location + markedRange.length
+      let end = markedRange.upperBound
 
       attributedString.setAttributes(
         [
           .underlineStyle: NSUnderlineStyle.single.rawValue,
           .markedClauseSegment: 0,
-        ], range: NSRange(location: 0, length: markedRange.location)
+        ], range: NSRange(location: 0, length: markedRange.lowerBound)
       )
       attributedString.setAttributes(
         [
           .underlineStyle: NSUnderlineStyle.thick.rawValue,
           .markedClauseSegment: 1,
-        ], range: markedRange
+        ],
+        range: NSRange(
+          location: markedRange.lowerBound,
+          length: markedRange.upperBound - markedRange.lowerBound
+        )
       )
       attributedString.setAttributes(
         [
@@ -277,7 +258,7 @@ class InputState {
         ],
         range: NSRange(
           location: end,
-          length: (composingBuffer as NSString).length - end
+          length: composingBuffer.utf16.count - end
         )
       )
       return attributedString
@@ -298,56 +279,34 @@ class InputState {
       /// from the amount of Bopomofo readings. In this case, the range
       /// in the composing buffer and the readings could not match, so
       /// we disable the function to write user phrases in this case.
-      if composingBuffer.count != readings.count {
-        return false
-      }
-      if markedRange.length < kMinMarkRangeLength {
-        return false
-      }
-      if markedRange.length > kMaxMarkRangeLength {
-        return false
-      }
-      if ctlInputMethod.areWeDeleting, !deleteTargetExists {
-        return false
-      }
-      return markedRange.length >= kMinMarkRangeLength
-        && markedRange.length <= kMaxMarkRangeLength
+      /// 這裡的 deleteTargetExists 是防止使用者排除「詞庫內尚未存在的詞」，
+      /// 免得使用者誤操作之後靠北「我怎麼敲不了這個詞？」之類的。
+      ((composingBuffer.count != readings.count)
+        || (ctlInputMethod.areWeDeleting && !deleteTargetExists))
+        ? false
+        : allowedMarkRange.contains(literalMarkedRange.count)
     }
 
     var chkIfUserPhraseExists: Bool {
-      let text = (composingBuffer as NSString).substring(with: markedRange)
-      let (exactBegin, _) = (composingBuffer as NSString).characterIndex(
-        from: markedRange.location)
-      let (exactEnd, _) = (composingBuffer as NSString).characterIndex(
-        from: markedRange.location + markedRange.length)
-      let selectedReadings = readings[exactBegin..<exactEnd]
+      let text = composingBuffer.utf16SubString(with: markedRange)
+      let selectedReadings = readings[literalMarkedRange]
       let joined = selectedReadings.joined(separator: "-")
       return mgrLangModel.checkIfUserPhraseExist(
         userPhrase: text, mode: ctlInputMethod.currentKeyHandler.inputMode, key: joined
       )
-        == true
     }
 
     var userPhrase: String {
-      let text = (composingBuffer as NSString).substring(with: markedRange)
-      let (exactBegin, _) = (composingBuffer as NSString).characterIndex(
-        from: markedRange.location)
-      let (exactEnd, _) = (composingBuffer as NSString).characterIndex(
-        from: markedRange.location + markedRange.length)
-      let selectedReadings = readings[exactBegin..<exactEnd]
+      let text = composingBuffer.utf16SubString(with: markedRange)
+      let selectedReadings = readings[literalMarkedRange]
       let joined = selectedReadings.joined(separator: "-")
       return "\(text) \(joined)"
     }
 
     var userPhraseConverted: String {
       let text =
-        OpenCCBridge.crossConvert(
-          (composingBuffer as NSString).substring(with: markedRange)) ?? ""
-      let (exactBegin, _) = (composingBuffer as NSString).characterIndex(
-        from: markedRange.location)
-      let (exactEnd, _) = (composingBuffer as NSString).characterIndex(
-        from: markedRange.location + markedRange.length)
-      let selectedReadings = readings[exactBegin..<exactEnd]
+        OpenCCBridge.crossConvert(composingBuffer.utf16SubString(with: markedRange)) ?? ""
+      let selectedReadings = readings[literalMarkedRange]
       let joined = selectedReadings.joined(separator: "-")
       let convertedMark = "#𝙊𝙥𝙚𝙣𝘾𝘾"
       return "\(text) \(joined)\t\(convertedMark)"
@@ -359,11 +318,11 @@ class InputState {
   /// Represents that the user is choosing in a candidates list.
   class ChoosingCandidate: NotEmpty {
     private(set) var candidates: [String]
-    private(set) var useVerticalMode: Bool
+    private(set) var isTypingVertical: Bool
 
-    init(composingBuffer: String, cursorIndex: UInt, candidates: [String], useVerticalMode: Bool) {
+    init(composingBuffer: String, cursorIndex: Int, candidates: [String], isTypingVertical: Bool) {
       self.candidates = candidates
-      self.useVerticalMode = useVerticalMode
+      self.isTypingVertical = isTypingVertical
       super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
     }
 
@@ -379,7 +338,7 @@ class InputState {
     }
 
     override var description: String {
-      "<InputState.ChoosingCandidate, candidates:\(candidates), useVerticalMode:\(useVerticalMode),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
+      "<InputState.ChoosingCandidate, candidates:\(candidates), isTypingVertical:\(isTypingVertical),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
     }
   }
 
@@ -389,27 +348,27 @@ class InputState {
   /// in the associated phrases mode.
   class AssociatedPhrases: InputState {
     private(set) var candidates: [String] = []
-    private(set) var useVerticalMode: Bool = false
-    init(candidates: [String], useVerticalMode: Bool) {
+    private(set) var isTypingVertical: Bool = false
+    init(candidates: [String], isTypingVertical: Bool) {
       self.candidates = candidates
-      self.useVerticalMode = useVerticalMode
+      self.isTypingVertical = isTypingVertical
       super.init()
     }
 
     var description: String {
-      "<InputState.AssociatedPhrases, candidates:\(candidates), useVerticalMode:\(useVerticalMode)>"
+      "<InputState.AssociatedPhrases, candidates:\(candidates), isTypingVertical:\(isTypingVertical)>"
     }
   }
 
   class SymbolTable: ChoosingCandidate {
     var node: SymbolNode
 
-    init(node: SymbolNode, useVerticalMode: Bool) {
+    init(node: SymbolNode, isTypingVertical: Bool) {
       self.node = node
       let candidates = node.children?.map(\.title) ?? [String]()
       super.init(
         composingBuffer: "", cursorIndex: 0, candidates: candidates,
-        useVerticalMode: useVerticalMode
+        isTypingVertical: isTypingVertical
       )
     }
 
@@ -430,7 +389,7 @@ class InputState {
     }
 
     override var description: String {
-      "<InputState.SymbolTable, candidates:\(candidates), useVerticalMode:\(useVerticalMode),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
+      "<InputState.SymbolTable, candidates:\(candidates), isTypingVertical:\(isTypingVertical),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
     }
   }
 }

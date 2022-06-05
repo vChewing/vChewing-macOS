@@ -29,18 +29,13 @@ import InputMethodKit
 
 private let kMinKeyLabelSize: CGFloat = 10
 
-private var ctlCandidateCurrent: ctlCandidate?
-
-extension ctlCandidate {
-  fileprivate static let horizontal = ctlCandidateHorizontal()
-  fileprivate static let vertical = ctlCandidateVertical()
-}
+private var ctlCandidateCurrent = ctlCandidateUniversal.init(.horizontal)
 
 @objc(ctlInputMethod)
 class ctlInputMethod: IMKInputController {
   @objc static var areWeDeleting = false
 
-  private static let tooltipController = TooltipController()
+  static let tooltipController = TooltipController()
 
   // MARK: -
 
@@ -173,7 +168,7 @@ class ctlInputMethod: IMKInputController {
       forCharacterIndex: 0, lineHeightRectangle: &textFrame
     )
 
-    let useVerticalMode =
+    let isTypingVertical =
       (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
 
     if client.bundleIdentifier()
@@ -184,7 +179,7 @@ class ctlInputMethod: IMKInputController {
       IME.areWeUsingOurOwnPhraseEditor = false
     }
 
-    let input = InputSignal(event: event, isVerticalMode: useVerticalMode)
+    let input = InputSignal(event: event, isVerticalTyping: isTypingVertical)
 
     // 無法列印的訊號輸入，一概不作處理。
     // 這個過程不能放在 KeyHandler 內，否則不會起作用。
@@ -286,8 +281,8 @@ extension ctlInputMethod {
     _ = state  // Stop clang-format from ruining the parameters of this function.
     currentClient = nil
 
-    ctlCandidateCurrent?.delegate = nil
-    ctlCandidateCurrent?.visible = false
+    ctlCandidateCurrent.delegate = nil
+    ctlCandidateCurrent.visible = false
     hideTooltip()
 
     if let previous = previous as? InputState.NotEmpty {
@@ -301,7 +296,7 @@ extension ctlInputMethod {
 
   private func handle(state: InputState.Empty, previous: InputState, client: Any?) {
     _ = state  // Stop clang-format from ruining the parameters of this function.
-    ctlCandidateCurrent?.visible = false
+    ctlCandidateCurrent.visible = false
     hideTooltip()
 
     guard let client = client as? IMKTextInput else {
@@ -324,7 +319,7 @@ extension ctlInputMethod {
   ) {
     _ = state  // Stop clang-format from ruining the parameters of this function.
     _ = previous  // Stop clang-format from ruining the parameters of this function.
-    ctlCandidateCurrent?.visible = false
+    ctlCandidateCurrent.visible = false
     hideTooltip()
 
     guard let client = client as? IMKTextInput else {
@@ -339,7 +334,7 @@ extension ctlInputMethod {
 
   private func handle(state: InputState.Committing, previous: InputState, client: Any?) {
     _ = previous  // Stop clang-format from ruining the parameters of this function.
-    ctlCandidateCurrent?.visible = false
+    ctlCandidateCurrent.visible = false
     hideTooltip()
 
     guard let client = client as? IMKTextInput else {
@@ -358,7 +353,7 @@ extension ctlInputMethod {
 
   private func handle(state: InputState.Inputting, previous: InputState, client: Any?) {
     _ = previous  // Stop clang-format from ruining the parameters of this function.
-    ctlCandidateCurrent?.visible = false
+    ctlCandidateCurrent.visible = false
     hideTooltip()
 
     guard let client = client as? IMKTextInput else {
@@ -373,7 +368,7 @@ extension ctlInputMethod {
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put this composing buffer
     client.setMarkedText(
-      state.attributedString, selectionRange: NSRange(location: Int(state.cursorIndex), length: 0),
+      state.attributedString, selectionRange: NSRange(location: state.cursorIndex, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
     if !state.tooltip.isEmpty {
@@ -386,7 +381,7 @@ extension ctlInputMethod {
 
   private func handle(state: InputState.Marking, previous: InputState, client: Any?) {
     _ = previous  // Stop clang-format from ruining the parameters of this function.
-    ctlCandidateCurrent?.visible = false
+    ctlCandidateCurrent.visible = false
     guard let client = client as? IMKTextInput else {
       hideTooltip()
       return
@@ -395,7 +390,7 @@ extension ctlInputMethod {
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put this composing buffer
     client.setMarkedText(
-      state.attributedString, selectionRange: NSRange(location: Int(state.cursorIndex), length: 0),
+      state.attributedString, selectionRange: NSRange(location: state.cursorIndex, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
 
@@ -413,14 +408,14 @@ extension ctlInputMethod {
     _ = previous  // Stop clang-format from ruining the parameters of this function.
     hideTooltip()
     guard let client = client as? IMKTextInput else {
-      ctlCandidateCurrent?.visible = false
+      ctlCandidateCurrent.visible = false
       return
     }
 
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put this composing buffer
     client.setMarkedText(
-      state.attributedString, selectionRange: NSRange(location: Int(state.cursorIndex), length: 0),
+      state.attributedString, selectionRange: NSRange(location: state.cursorIndex, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
     show(candidateWindowWith: state, client: client)
@@ -430,14 +425,14 @@ extension ctlInputMethod {
     _ = previous  // Stop clang-format from ruining the parameters of this function.
     hideTooltip()
     guard let client = client as? IMKTextInput else {
-      ctlCandidateCurrent?.visible = false
+      ctlCandidateCurrent.visible = false
       return
     }
 
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put this composing buffer
     client.setMarkedText(
-      state.attributedString, selectionRange: NSRange(location: Int(state.cursorIndex), length: 0),
+      state.attributedString, selectionRange: NSRange(location: state.cursorIndex, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
     show(candidateWindowWith: state, client: client)
@@ -447,7 +442,7 @@ extension ctlInputMethod {
     _ = previous  // Stop clang-format from ruining the parameters of this function.
     hideTooltip()
     guard let client = client as? IMKTextInput else {
-      ctlCandidateCurrent?.visible = false
+      ctlCandidateCurrent.visible = false
       return
     }
     client.setMarkedText(
@@ -462,47 +457,48 @@ extension ctlInputMethod {
 
 extension ctlInputMethod {
   private func show(candidateWindowWith state: InputState, client: Any!) {
-    let useVerticalMode: Bool = {
-      var useVerticalMode = false
+    var isTypingVertical: Bool {
+      if let state = state as? InputState.ChoosingCandidate {
+        return state.isTypingVertical
+      } else if let state = state as? InputState.AssociatedPhrases {
+        return state.isTypingVertical
+      }
+      return false
+    }
+    var isCandidateWindowVertical: Bool {
       var candidates: [String] = []
       if let state = state as? InputState.ChoosingCandidate {
-        useVerticalMode = state.useVerticalMode
         candidates = state.candidates
       } else if let state = state as? InputState.AssociatedPhrases {
-        useVerticalMode = state.useVerticalMode
         candidates = state.candidates
       }
-      if useVerticalMode == true {
-        return true
-      }
+      if isTypingVertical { return true }
+      // 以上是通用情形。接下來決定橫排輸入時是否使用縱排選字窗。
       candidates.sort {
         $0.count > $1.count
       }
-      if let candidateFirst = candidates.first {
-        // If there is a candidate which is too long, we use the vertical
-        // candidate list window automatically.
-        if candidateFirst.count > 8 {
-          // return true // 禁用這一項。威注音回頭會換候選窗格。
-        }
-      }
-      // 如果是顏文字選單的話，則強行使用縱排候選字窗。
-      // 有些顏文字會比較長，所以這裡用 for 判斷。
-      for candidate in candidates {
-        if ["顏文字", "颜文字"].contains(candidate), mgrPrefs.symbolInputEnabled {
-          return true
-        }
-      }
-      return false
-    }()
+      // 測量每頁顯示候選字的累計總長度。如果太長的話就強制使用縱排候選字窗。
+      // 範例：「屬實牛逼」（會有一大串各種各樣的「鼠食牛Beer」的 emoji）。
+      let maxCandidatesPerPage = mgrPrefs.candidateKeys.count
+      let firstPageCandidates = candidates[0..<min(maxCandidatesPerPage, candidates.count)]
+      return firstPageCandidates.joined().count > Int(round(Double(maxCandidatesPerPage) * 1.8))
+      // 上面這句如果是 true 的話，就會是縱排；反之則為橫排。
+    }
 
-    ctlCandidateCurrent?.delegate = nil
+    ctlCandidateCurrent.delegate = nil
 
-    if useVerticalMode {
-      ctlCandidateCurrent = .vertical
+    /// 下面這一段本可直接指定 currentLayout，但這樣的話翻頁按鈕位置無法精準地重新繪製。
+    /// 所以只能重新初期化。壞處就是得在 ctlCandidate() 當中與 SymbolTable 控制有關的地方
+    /// 新增一個空狀態請求、防止縱排與橫排選字窗同時出現。
+    /// layoutCandidateView 在這裡無法起到糾正作用。
+    /// 該問題徹底解決的價值並不大，直接等到 macOS 10.x 全線淘汰之後用 SwiftUI 重寫選字窗吧。
+
+    if isCandidateWindowVertical {  // 縱排輸入時強制使用縱排選字窗
+      ctlCandidateCurrent = .init(.vertical)
     } else if mgrPrefs.useHorizontalCandidateList {
-      ctlCandidateCurrent = .horizontal
+      ctlCandidateCurrent = .init(.horizontal)
     } else {
-      ctlCandidateCurrent = .vertical
+      ctlCandidateCurrent = .init(.vertical)
     }
 
     // set the attributes for the candidate panel (which uses NSAttributedString)
@@ -530,10 +526,10 @@ extension ctlInputMethod {
       return finalReturnFont
     }
 
-    ctlCandidateCurrent?.keyLabelFont = labelFont(
+    ctlCandidateCurrent.keyLabelFont = labelFont(
       name: mgrPrefs.candidateKeyLabelFontName, size: keyLabelSize
     )
-    ctlCandidateCurrent?.candidateFont = candidateFont(
+    ctlCandidateCurrent.candidateFont = candidateFont(
       name: mgrPrefs.candidateTextFontName, size: textSize
     )
 
@@ -541,21 +537,21 @@ extension ctlInputMethod {
     let keyLabels =
       candidateKeys.count > 4 ? Array(candidateKeys) : Array(mgrPrefs.defaultCandidateKeys)
     let keyLabelSuffix = state is InputState.AssociatedPhrases ? "^" : ""
-    ctlCandidateCurrent?.keyLabels = keyLabels.map {
+    ctlCandidateCurrent.keyLabels = keyLabels.map {
       CandidateKeyLabel(key: String($0), displayedText: String($0) + keyLabelSuffix)
     }
 
-    ctlCandidateCurrent?.delegate = self
-    ctlCandidateCurrent?.reloadData()
+    ctlCandidateCurrent.delegate = self
+    ctlCandidateCurrent.reloadData()
     currentClient = client
 
-    ctlCandidateCurrent?.visible = true
+    ctlCandidateCurrent.visible = true
 
     var lineHeightRect = NSRect(x: 0.0, y: 0.0, width: 16.0, height: 16.0)
     var cursor = 0
 
     if let state = state as? InputState.ChoosingCandidate {
-      cursor = Int(state.cursorIndex)
+      cursor = state.cursorIndex
       if cursor == state.composingBuffer.count, cursor != 0 {
         cursor -= 1
       }
@@ -568,24 +564,24 @@ extension ctlInputMethod {
       cursor -= 1
     }
 
-    if useVerticalMode {
-      ctlCandidateCurrent?.set(
+    if isTypingVertical {
+      ctlCandidateCurrent.set(
         windowTopLeftPoint: NSPoint(
           x: lineHeightRect.origin.x + lineHeightRect.size.width + 4.0, y: lineHeightRect.origin.y - 4.0
         ),
         bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0
       )
     } else {
-      ctlCandidateCurrent?.set(
+      ctlCandidateCurrent.set(
         windowTopLeftPoint: NSPoint(x: lineHeightRect.origin.x, y: lineHeightRect.origin.y - 4.0),
         bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0
       )
     }
   }
 
-  private func show(tooltip: String, composingBuffer: String, cursorIndex: UInt, client: Any!) {
+  private func show(tooltip: String, composingBuffer: String, cursorIndex: Int, client: Any!) {
     var lineHeightRect = NSRect(x: 0.0, y: 0.0, width: 16.0, height: 16.0)
-    var cursor = Int(cursorIndex)
+    var cursor = cursorIndex
     if cursor == composingBuffer.count, cursor != 0 {
       cursor -= 1
     }
@@ -606,19 +602,13 @@ extension ctlInputMethod {
 // MARK: -
 
 extension ctlInputMethod: KeyHandlerDelegate {
-  func ctlCandidate(for keyHandler: KeyHandler) -> Any {
-    _ = keyHandler  // Stop clang-format from ruining the parameters of this function.
-    return ctlCandidateCurrent ?? .vertical
-  }
+  func ctlCandidate() -> ctlCandidate { ctlCandidateCurrent }
 
   func keyHandler(
-    _ keyHandler: KeyHandler, didSelectCandidateAt index: Int,
-    ctlCandidate controller: Any
+    _: KeyHandler, didSelectCandidateAt index: Int,
+    ctlCandidate controller: ctlCandidate
   ) {
-    _ = keyHandler  // Stop clang-format from ruining the parameters of this function.
-    if let controller = controller as? ctlCandidate {
-      ctlCandidate(controller, didSelectCandidateAtIndex: UInt(index))
-    }
+    ctlCandidate(controller, didSelectCandidateAtIndex: index)
   }
 
   func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputState)
@@ -653,38 +643,39 @@ extension ctlInputMethod: KeyHandlerDelegate {
 // MARK: -
 
 extension ctlInputMethod: ctlCandidateDelegate {
-  func candidateCountForController(_ controller: ctlCandidate) -> UInt {
+  func candidateCountForController(_ controller: ctlCandidate) -> Int {
     _ = controller  // Stop clang-format from ruining the parameters of this function.
     if let state = state as? InputState.ChoosingCandidate {
-      return UInt(state.candidates.count)
+      return state.candidates.count
     } else if let state = state as? InputState.AssociatedPhrases {
-      return UInt(state.candidates.count)
+      return state.candidates.count
     }
     return 0
   }
 
-  func ctlCandidate(_ controller: ctlCandidate, candidateAtIndex index: UInt)
+  func ctlCandidate(_ controller: ctlCandidate, candidateAtIndex index: Int)
     -> String
   {
     _ = controller  // Stop clang-format from ruining the parameters of this function.
     if let state = state as? InputState.ChoosingCandidate {
-      return state.candidates[Int(index)]
+      return state.candidates[index]
     } else if let state = state as? InputState.AssociatedPhrases {
-      return state.candidates[Int(index)]
+      return state.candidates[index]
     }
     return ""
   }
 
-  func ctlCandidate(_ controller: ctlCandidate, didSelectCandidateAtIndex index: UInt) {
+  func ctlCandidate(_ controller: ctlCandidate, didSelectCandidateAtIndex index: Int) {
     _ = controller  // Stop clang-format from ruining the parameters of this function.
     let client = currentClient
 
     if let state = state as? InputState.SymbolTable,
-      let node = state.node.children?[Int(index)]
+      let node = state.node.children?[index]
     {
       if let children = node.children, !children.isEmpty {
+        handle(state: .Empty(), client: client)  // 防止縱橫排選字窗同時出現
         handle(
-          state: .SymbolTable(node: node, useVerticalMode: state.useVerticalMode),
+          state: .SymbolTable(node: node, isTypingVertical: state.isTypingVertical),
           client: currentClient
         )
       } else {
@@ -695,7 +686,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
     }
 
     if let state = state as? InputState.ChoosingCandidate {
-      let selectedValue = state.candidates[Int(index)]
+      let selectedValue = state.candidates[index]
       keyHandler.fixNode(value: selectedValue, respectCursorPushing: true)
 
       let inputting = keyHandler.buildInputtingState
@@ -706,7 +697,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
         handle(state: .Committing(poppedText: composingBuffer), client: client)
         if mgrPrefs.associatedPhrasesEnabled,
           let associatePhrases = keyHandler.buildAssociatePhraseState(
-            withKey: composingBuffer, useVerticalMode: state.useVerticalMode
+            withKey: composingBuffer, isTypingVertical: state.isTypingVertical
           ), !associatePhrases.candidates.isEmpty
         {
           handle(state: associatePhrases, client: client)
@@ -720,11 +711,11 @@ extension ctlInputMethod: ctlCandidateDelegate {
     }
 
     if let state = state as? InputState.AssociatedPhrases {
-      let selectedValue = state.candidates[Int(index)]
+      let selectedValue = state.candidates[index]
       handle(state: .Committing(poppedText: selectedValue), client: currentClient)
       if mgrPrefs.associatedPhrasesEnabled,
         let associatePhrases = keyHandler.buildAssociatePhraseState(
-          withKey: selectedValue, useVerticalMode: state.useVerticalMode
+          withKey: selectedValue, isTypingVertical: state.isTypingVertical
         ), !associatePhrases.candidates.isEmpty
       {
         handle(state: associatePhrases, client: client)

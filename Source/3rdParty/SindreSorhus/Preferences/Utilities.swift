@@ -130,8 +130,8 @@ class UserInteractionPausableWindow: NSWindow {
 @available(macOS 10.15, *)
 extension View {
   /**
-     Equivalent to `.eraseToAnyPublisher()` from the Combine framework.
-     */
+   Equivalent to `.eraseToAnyPublisher()` from the Combine framework.
+   */
   func eraseToAnyView() -> AnyView {
     AnyView(self)
   }

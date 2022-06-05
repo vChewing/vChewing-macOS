@@ -263,7 +263,7 @@ class ctlPrefWindow: NSWindowController {
     IME.dlgOpenPath.canChooseDirectories = true
 
     let bolPreviousFolderValidity = mgrLangModel.checkIfSpecifiedUserDataFolderValid(
-      NSString(string: mgrPrefs.userDataFolderSpecified).expandingTildeInPath)
+      mgrPrefs.userDataFolderSpecified.expandingTildeInPath)
 
     if window != nil {
       IME.dlgOpenPath.beginSheetModal(for: window!) { result in

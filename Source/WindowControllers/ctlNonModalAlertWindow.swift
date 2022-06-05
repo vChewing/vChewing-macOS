@@ -44,7 +44,8 @@ class ctlNonModalAlertWindow: NSWindowController {
     title: String, content: String, confirmButtonTitle: String, cancelButtonTitle: String?,
     cancelAsDefault: Bool, delegate: ctlNonModalAlertWindowDelegate?
   ) {
-    if window?.isVisible == true {
+    guard let window = window else { return }
+    if window.isVisible == true {
       self.delegate?.ctlNonModalAlertWindowDidCancel(self)
     }
 
@@ -76,13 +77,13 @@ class ctlNonModalAlertWindow: NSWindowController {
 
     if cancelButtonTitle != nil {
       if cancelAsDefault {
-        window?.defaultButtonCell = cancelButton.cell as? NSButtonCell
+        window.defaultButtonCell = cancelButton.cell as? NSButtonCell
       } else {
         cancelButton.keyEquivalent = " "
-        window?.defaultButtonCell = confirmButton.cell as? NSButtonCell
+        window.defaultButtonCell = confirmButton.cell as? NSButtonCell
       }
     } else {
-      window?.defaultButtonCell = confirmButton.cell as? NSButtonCell
+      window.defaultButtonCell = confirmButton.cell as? NSButtonCell
     }
 
     titleTextField.stringValue = title
@@ -103,12 +104,12 @@ class ctlNonModalAlertWindow: NSWindowController {
     newFrame.origin.y -= (newFrame.size.height - oldFrame.size.height)
     contentTextField.frame = newFrame
 
-    var windowFrame = window?.frame ?? NSRect.zero
+    var windowFrame = window.frame
     windowFrame.size.height += (newFrame.size.height - oldFrame.size.height)
-    window?.level = NSWindow.Level(Int(CGShieldingWindowLevel()) + 1)
-    window?.setFrame(windowFrame, display: true)
-    window?.center()
-    window?.makeKeyAndOrderFront(self)
+    window.level = NSWindow.Level(Int(CGShieldingWindowLevel()) + 1)
+    window.setFrame(windowFrame, display: true)
+    window.center()
+    window.makeKeyAndOrderFront(self)
     NSApp.activate(ignoringOtherApps: true)
   }
 

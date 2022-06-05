@@ -110,15 +110,18 @@ enum KeyCodeBlackListed: UInt16 {
 }
 
 // CharCodes: https://theasciicode.com.ar/ascii-control-characters/horizontal-tab-ascii-code-9.html
-enum CharCode: UInt /* 16 */ {
-  case yajuusenpai = 114_514_191_191_810_893
+enum CharCode: UInt16 {
+  case yajuusenpaiA = 114
+  case yajuusenpaiB = 514
+  case yajuusenpaiC = 1919
+  case yajuusenpaiD = 810
   // CharCode is not reliable at all. KeyCode is the most appropriate choice due to its accuracy.
   // KeyCode doesn't give a phuque about the character sent through macOS keyboard layouts ...
   // ... but only focuses on which physical key is pressed.
 }
 
 struct InputSignal: CustomStringConvertible {
-  private(set) var useVerticalMode: Bool
+  private(set) var isTypingVertical: Bool
   private(set) var inputText: String?
   private(set) var inputTextIgnoringModifiers: String?
   private(set) var charCode: UInt16
@@ -130,12 +133,12 @@ struct InputSignal: CustomStringConvertible {
   private var extraChooseCandidateKey: KeyCode = .kNone
   private var extraChooseCandidateKeyReverse: KeyCode = .kNone
   private var absorbedArrowKey: KeyCode = .kNone
-  private var verticalModeOnlyChooseCandidateKey: KeyCode = .kNone
+  private var verticalTypingOnlyChooseCandidateKey: KeyCode = .kNone
   private(set) var emacsKey: vChewingEmacsKey
 
   public init(
     inputText: String?, keyCode: UInt16, charCode: UInt16, flags: NSEvent.ModifierFlags,
-    isVerticalMode: Bool, inputTextIgnoringModifiers: String? = nil
+    isVerticalTyping: Bool, inputTextIgnoringModifiers: String? = nil
   ) {
     let inputText = AppleKeyboardConverter.cnvStringApple2ABC(inputText ?? "")
     let inputTextIgnoringModifiers = AppleKeyboardConverter.cnvStringApple2ABC(
@@ -144,7 +147,7 @@ struct InputSignal: CustomStringConvertible {
     self.inputTextIgnoringModifiers = inputTextIgnoringModifiers
     self.flags = flags
     isFlagChanged = false
-    useVerticalMode = isVerticalMode
+    isTypingVertical = isVerticalTyping
     self.keyCode = keyCode
     self.charCode = AppleKeyboardConverter.cnvApple2ABC(charCode)
     emacsKey = EmacsKeyHelper.detect(
@@ -154,14 +157,14 @@ struct InputSignal: CustomStringConvertible {
     defineArrowKeys()
   }
 
-  public init(event: NSEvent, isVerticalMode: Bool) {
+  public init(event: NSEvent, isVerticalTyping: Bool) {
     inputText = AppleKeyboardConverter.cnvStringApple2ABC(event.characters ?? "")
     inputTextIgnoringModifiers = AppleKeyboardConverter.cnvStringApple2ABC(
       event.charactersIgnoringModifiers ?? "")
     keyCode = event.keyCode
     flags = event.modifierFlags
     isFlagChanged = (event.type == .flagsChanged) ? true : false
-    useVerticalMode = isVerticalMode
+    isTypingVertical = isVerticalTyping
     let charCode: UInt16 = {
       // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
       guard let inputText = event.characters, !inputText.isEmpty else {
@@ -179,16 +182,16 @@ struct InputSignal: CustomStringConvertible {
   }
 
   mutating func defineArrowKeys() {
-    cursorForwardKey = useVerticalMode ? .kDownArrow : .kRightArrow
-    cursorBackwardKey = useVerticalMode ? .kUpArrow : .kLeftArrow
-    extraChooseCandidateKey = useVerticalMode ? .kLeftArrow : .kDownArrow
-    extraChooseCandidateKeyReverse = useVerticalMode ? .kRightArrow : .kUpArrow
-    absorbedArrowKey = useVerticalMode ? .kRightArrow : .kUpArrow
-    verticalModeOnlyChooseCandidateKey = useVerticalMode ? absorbedArrowKey : .kNone
+    cursorForwardKey = isTypingVertical ? .kDownArrow : .kRightArrow
+    cursorBackwardKey = isTypingVertical ? .kUpArrow : .kLeftArrow
+    extraChooseCandidateKey = isTypingVertical ? .kLeftArrow : .kDownArrow
+    extraChooseCandidateKeyReverse = isTypingVertical ? .kRightArrow : .kUpArrow
+    absorbedArrowKey = isTypingVertical ? .kRightArrow : .kUpArrow
+    verticalTypingOnlyChooseCandidateKey = isTypingVertical ? absorbedArrowKey : .kNone
   }
 
   var description: String {
-    "<inputText:\(String(describing: inputText)), inputTextIgnoringModifiers:\(String(describing: inputTextIgnoringModifiers)) charCode:\(charCode), keyCode:\(keyCode), flags:\(flags), cursorForwardKey:\(cursorForwardKey), cursorBackwardKey:\(cursorBackwardKey), extraChooseCandidateKey:\(extraChooseCandidateKey), extraChooseCandidateKeyReverse:\(extraChooseCandidateKeyReverse), absorbedArrowKey:\(absorbedArrowKey),  verticalModeOnlyChooseCandidateKey:\(verticalModeOnlyChooseCandidateKey), emacsKey:\(emacsKey), useVerticalMode:\(useVerticalMode)>"
+    "<inputText:\(String(describing: inputText)), inputTextIgnoringModifiers:\(String(describing: inputTextIgnoringModifiers)) charCode:\(charCode), keyCode:\(keyCode), flags:\(flags), cursorForwardKey:\(cursorForwardKey), cursorBackwardKey:\(cursorBackwardKey), extraChooseCandidateKey:\(extraChooseCandidateKey), extraChooseCandidateKeyReverse:\(extraChooseCandidateKeyReverse), absorbedArrowKey:\(absorbedArrowKey),  verticalTypingOnlyChooseCandidateKey:\(verticalTypingOnlyChooseCandidateKey), emacsKey:\(emacsKey), isTypingVertical:\(isTypingVertical)>"
   }
 
   // 除了 ANSI charCode 以外，其餘一律過濾掉，免得純 Swift 版 KeyHandler 被餵屎。
@@ -331,8 +334,8 @@ struct InputSignal: CustomStringConvertible {
     KeyCode(rawValue: keyCode) == extraChooseCandidateKeyReverse
   }
 
-  var isVerticalModeOnlyChooseCandidateKey: Bool {
-    KeyCode(rawValue: keyCode) == verticalModeOnlyChooseCandidateKey
+  var isverticalTypingOnlyChooseCandidateKey: Bool {
+    KeyCode(rawValue: keyCode) == verticalTypingOnlyChooseCandidateKey
   }
 
   var isUpperCaseASCIILetterKey: Bool {

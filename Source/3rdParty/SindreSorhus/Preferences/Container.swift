@@ -23,8 +23,8 @@ import SwiftUI
 @available(macOS 10.15, *)
 extension Preferences {
   /**
-     Function builder for `Preferences` components used in order to restrict types of child views to be of type `Section`.
-     */
+   Function builder for `Preferences` components used in order to restrict types of child views to be of type `Section`.
+   */
   @resultBuilder
   public enum SectionBuilder {
     public static func buildBlock(_ sections: Section...) -> [Section] {
@@ -33,8 +33,8 @@ extension Preferences {
   }
 
   /**
-     A view which holds `Preferences.Section` views and does all the alignment magic similar to `NSGridView` from AppKit.
-     */
+   A view which holds `Preferences.Section` views and does all the alignment magic similar to `NSGridView` from AppKit.
+   */
   public struct Container: View {
     private let sectionBuilder: () -> [Section]
     private let contentWidth: Double
@@ -42,15 +42,15 @@ extension Preferences {
     @State private var maximumLabelWidth = 0.0
 
     /**
-         Creates an instance of container component, which handles layout of stacked `Preferences.Section` views.
+     Creates an instance of container component, which handles layout of stacked `Preferences.Section` views.
 
-         Custom alignment requires content width to be specified beforehand.
+     Custom alignment requires content width to be specified beforehand.
 
-         - Parameters:
-         	- contentWidth: A fixed width of the container's content (excluding paddings).
-         	- minimumLabelWidth: A minimum width for labels within this container. By default, it will fit to the largest label.
-         	- builder: A view builder that creates `Preferences.Section`'s of this container.
-         */
+     - Parameters:
+     	- contentWidth: A fixed width of the container's content (excluding paddings).
+     	- minimumLabelWidth: A minimum width for labels within this container. By default, it will fit to the largest label.
+     	- builder: A view builder that creates `Preferences.Section`'s of this container.
+     */
     public init(
       contentWidth: Double,
       minimumLabelWidth: Double = 0,
