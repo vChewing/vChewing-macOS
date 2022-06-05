@@ -50,6 +50,7 @@ struct UserDef {
   static let kEscToCleanInputBuffer = "EscToCleanInputBuffer"
   static let kSpecifyShiftTabKeyBehavior = "SpecifyShiftTabKeyBehavior"
   static let kSpecifyShiftSpaceKeyBehavior = "SpecifyShiftSpaceKeyBehavior"
+  static let kAllowBoostingSingleKanjiAsUserPhrase = "AllowBoostingSingleKanjiAsUserPhrase"
   static let kUseSCPCTypingMode = "UseSCPCTypingMode"
   static let kMaxCandidateLength = "MaxCandidateLength"
   static let kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
@@ -266,6 +267,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.inlineDumpPinyinInLieuOfZhuyin, forKey: UserDef.kInlineDumpPinyinInLieuOfZhuyin
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.allowBoostingSingleKanjiAsUserPhrase, forKey: UserDef.kAllowBoostingSingleKanjiAsUserPhrase
+    )
 
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeySCPC, forKey: UserDef.kUsingHotKeySCPC)
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyAssociates, forKey: UserDef.kUsingHotKeyAssociates)
@@ -336,6 +340,13 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kChooseCandidateUsingSpace, defaultValue: true)
   static var chooseCandidateUsingSpace: Bool
+
+  @UserDefault(key: UserDef.kAllowBoostingSingleKanjiAsUserPhrase, defaultValue: false)
+  static var allowBoostingSingleKanjiAsUserPhrase: Bool
+
+  static var minCandidateLength: Int {
+    mgrPrefs.allowBoostingSingleKanjiAsUserPhrase ? 1 : 2
+  }
 
   @UserDefault(key: UserDef.kUseSCPCTypingMode, defaultValue: false)
   static var useSCPCTypingMode: Bool
