@@ -346,7 +346,7 @@ public enum mgrPrefs {
     return useSCPCTypingMode
   }
 
-  @UserDefault(key: UserDef.kMaxCandidateLength, defaultValue: kDefaultComposingBufferSize * 2)
+  @UserDefault(key: UserDef.kMaxCandidateLength, defaultValue: 10)
   static var maxCandidateLength: Int
 
   @UserDefault(key: UserDef.kShouldNotFartInLieuOfBeep, defaultValue: true)
