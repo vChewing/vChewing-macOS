@@ -153,7 +153,7 @@ class InputState {
 
   /// Represents that the user is marking a range in the composing buffer.
   class Marking: NotEmpty {
-    private var allowedMarkRange = 2...mgrPrefs.maxCandidateLength
+    private var allowedMarkRange: ClosedRange<Int> = mgrPrefs.minCandidateLength...mgrPrefs.maxCandidateLength
     private(set) var markerIndex: Int = 0 { didSet { markerIndex = max(markerIndex, 0) } }
     private(set) var markedRange: Range<Int>
     private var literalMarkedRange: Range<Int> {
@@ -161,6 +161,7 @@ class InputState {
       let upperBoundLiteral = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
       return lowerBoundLiteral..<upperBoundLiteral
     }
+
     private var deleteTargetExists = false
     var tooltip: String {
       if composingBuffer.count != readings.count {
