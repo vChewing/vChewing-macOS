@@ -80,9 +80,7 @@
 
 ## 應用授權
 
-小麥注音引擎程式版權（MIT 授權）：© 2011-2021 OpenVanilla 專案團隊（Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, 等）。
-
-威注音專案僅用到小麥注音的下述程式組件：
+威注音專案僅用到小麥注音的下述程式組件（MIT License）：
 
 - 狀態管理引擎 & NSStringUtils & FSEventStreamHelper (by Zonble Yang)。
 
@@ -98,7 +96,7 @@
 
 - 鐵恨注音並擊處理引擎：Shiki Suen (MIT-NTL License)。
 
-- 天權星語彙處理引擎：Shiki Suen (MIT-NTL License)，針對「Lukhnos Liu 用 C++ 寫的 Gramambular」用 Swift 徹底重寫而成。
+- 天權星語彙處理引擎：Shiki Suen (MIT-NTL License)。
 
 - 威注音詞庫由 Shiki Suen 維護，以 3-Clause BSD License 授權釋出。其中的詞頻數據[由 NAER 授權用於非商業用途](https://twitter.com/ShikiSuen/status/1479329302713831424)。
 
@@ -115,9 +113,5 @@
 為了您的精神衛生，任何使用威注音輸入法時遇到的產品問題、請勿提報至小麥注音。哪怕您確信小麥注音也有該問題。
 
 濫用沉默權來浪費對方的時間與熱情，也是一種暴力。**當對方最最最開始就把你當敵人的時候，你連呼吸都是錯的**。
-
-其實我滿懷念上游專案還沒被 Lukhnos Liu 接管收入 OpenVanilla 的那個年代。MJHsieh 主導開發小麥注音的時候，且不討論他立場怎樣，但基礎的技術交流是完全沒問題的。LibChewing 那邊也是，正常交流完全沒問題。
-
-有些事情，繼續爭論下去也沒用。本來我想著重寫 ctlInputMethod 撤掉 zonble 的狀態管理引擎的，畢竟有大陸同鄉寫的火山五筆輸入法的框架套上我的鐵恨注音並擊引擎可以直接用。但這樣賭氣對誰都沒好處。眼下，威注音 macOS 版還需要一些小維護。之後我就得開始考慮用 Windows 平台可用的除了 C++ 以外的語言重寫鐵恨注音並擊引擎與天權星語彙引擎、方便接下來威注音的 Windows 版本的研發。能將 Lukhnos 的 C++ 內容全部換掉、徹底砸碎套在威注音身上的名為 C++ 的枷鎖、讓威注音有一個自由的未來，我已經知足了。讓更多的人用上好用的輸入法，才是最重要的。**這個重要性，不是 zonble 用「私人需求」這種帽子扣過來、就可以泯滅了的**。
 
 $ EOF.

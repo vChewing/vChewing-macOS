@@ -28,7 +28,7 @@
 >- 可以自动整理用户语汇文档格式、自订联想词。
 >- ……
 
-威注音分支项目及威注音词库由孙志贵（Shiki Suen）维护。小麦注音官方原始仓库内的词库的内容均与孙志贵无关。
+威注音分支专案及威注音词库由孙志贵（Shiki Suen）维护。小麦注音官方原始仓库内的词库的内容均与孙志贵无关。
 
 ## 系统需求
 
@@ -60,45 +60,43 @@
  
 ## 建置流程
 
-安装 Xcode 之后，请先配置 Xcode 允许其直接构建在项目所在的文档夹下的 build 文档夹内。步骤：
+安装 Xcode 之后，请先配置 Xcode 允许其直接构建在专案所在的文档夹下的 build 文档夹内。步骤：
 ```
 「Xcode」->「Preferences...」->「Locations」；
 「File」->「Project/WorkspaceSettings...」->「Advanced」；
 选「Custom」->「Relative to Workspace」即可。否则，make 的过程会出错。
 ```
-在终端机内定位到威注音的克隆本地项目的本地仓库的目录之后，运行 `make update` 以获取最新词库。
+在终端机内定位到威注音的克隆本地专案的本地仓库的目录之后，运行 `make update` 以获取最新词库。
 
-接下来就是直接开 Xcode 项目，Product -> Scheme 选「vChewingInstaller」，编译即可。
+接下来就是直接开 Xcode 专案，Product -> Scheme 选「vChewingInstaller」，编译即可。
 
-> 之前说「在成功之后运行 `make` 即可组建、再运行 `make install` 可以触发威注音的安装进程」，这对新版威注音而言**当且仅当**使用纯 Swift 编译脚本工序时方可使用。目前的 libvchewing-data 模块已经针对 macOS 版威注音实装了纯 Swift 词库编译脚本。
+> 之前说「在成功之后运行 `make` 即可组建、再运行 `make install` 可以触发威注音的安装程序」，这对新版威注音而言**当且仅当**使用纯 Swift 编译脚本工序时方可使用。目前的 libvchewing-data 模块已经针对 macOS 版威注音实装了纯 Swift 词库编译脚本。
 
 第一次安装完，日后代码或词库有任何修改，只要重复上述流程，再次安装威注音即可。
 
-要注意的是 macOS 可能会限制同一次 login session 能终结同一个输入法的运行进程的次数（安装进程通过 kill input method process 来让新版的输入法生效）。如果安装若干次后，发现进程修改的结果并没有出现、或甚至输入法已无法再选用，只需要注销目前的 macOS 系统帐号、再重新登录即可。
+要注意的是 macOS 可能会限制同一次 login session 能终结同一个输入法的进程的次数（安装程序通过 kill input method process 来让新版的输入法生效）。如果安装若干次后，发现程序修改的结果并没有出现、或甚至输入法已无法再选用，只需要登出目前的 macOS 系统帐号、再重新登入即可。
 
-补记: 该输入法是在 2021 年 11 月初「28ae7deb4092f067539cff600397292e66a5dd56」这一版小麦注音建置的基础上完成的。因为在清洗词库的时候清洗了全部的 git commit 历史，所以无法自动从小麦注音官方仓库上游继承任何改动，只能手动同步任何在此之后的进程修正。最近一次同步参照是上游主仓库的 2.2.2 版、以及 zonble 的分支「5cb6819e132a02bbcba77dbf083ada418750dab7」。
+补记: 该输入法是在 2021 年 11 月初「28ae7deb4092f067539cff600397292e66a5dd56」这一版小麦注音建置的基础上完成的。因为在清洗词库的时候清洗了全部的 git commit 历史，所以无法自动从小麦注音官方仓库上游继承任何改动，只能手动同步任何在此之后的程序修正。最近一次同步参照是上游主仓库的 2.2.2 版、以及 zonble 的分支「5cb6819e132a02bbcba77dbf083ada418750dab7」。
 
 ## 应用授权
 
-小麦注音引擎进程版权（MIT 授权）：© 2011-2021 OpenVanilla 项目团队（Mengjuei Hsieh, Lukhnos Liu, Zonble Yang, 等）。
-
-威注音项目仅用到小麦注音的下述进程组件：
+威注音专案仅用到小麦注音的下述程序组件（MIT License）：
 
 - 状态管理引擎 & NSStringUtils & FSEventStreamHelper (by Zonble Yang)。
 
 - 半衰记忆模块，因故障暂时无法激活 (by Mengjuei Hsieh)。
 
-- 仅供研发人员调试方便而使用的 App 版安装进程 (by Zonble Yang)。
+- 仅供研发人员调试方便而使用的 App 版安装程序 (by Zonble Yang)。
 
 - Voltaire MK2 选字窗、飘云通知窗口、工具提示 (by Zonble Yang)，有大幅度修改。
 
-威注音输入法 macOS 版以 MIT-NTL License 授权发布 (与 MIT 兼容)：© 2021-2022 vChewing 项目。
+威注音输入法 macOS 版以 MIT-NTL License 授权发布 (与 MIT 兼容)：© 2021-2022 vChewing 专案。
 
-- 威注音输入法 macOS 版进程维护：Shiki Suen。特别感谢 Isaac Xen 与 Hiraku Wong 等人的技术协力。
+- 威注音输入法 macOS 版程序维护：Shiki Suen。特别感谢 Isaac Xen 与 Hiraku Wong 等人的技术协力。
 
 - 铁恨注音并击处理引擎：Shiki Suen (MIT-NTL License)。
 
-- 天权星语汇处理引擎：Shiki Suen (MIT-NTL License)，针对「Lukhnos Liu 用 C++ 写的 Gramambular」用 Swift 彻底重写而成。
+- 天权星语汇处理引擎：Shiki Suen (MIT-NTL License)。
 
 - 威注音词库由 Shiki Suen 维护，以 3-Clause BSD License 授权发布。其中的词频数据[由 NAER 授权用于非商业用途](https://twitter.com/ShikiSuen/status/1479329302713831424)。
 
@@ -106,7 +104,7 @@
 
 ## 格式规范等与参与研发时需要注意的事项
 
-该项目对源码格式有规范，且 Swift 与其他 (Obj)C(++) 系语言持不同规范：
+该专案对源码格式有规范，且 Swift 与其他 (Obj)C(++) 系语言持不同规范：
 
 请查看该仓库内的「[CONTRIBUTING.md](./CONTRIBUTING.md)」文档。
 
@@ -115,9 +113,5 @@
 为了您的精神卫生，任何使用威注音输入法时遇到的产品问题、请勿提报至小麦注音。哪怕您确信小麦注音也有该问题。
 
 滥用沉默权来浪费对方的时间与热情，也是一种暴力。**当对方最最最开始就把你当敌人的时候，你连呼吸都是错的**。
-
-其实我满怀念上游项目还没被 Lukhnos Liu 接管收入 OpenVanilla 的那个年代。MJHsieh 主导开发小麦注音的时候，且不讨论他立场怎样，但基础的技术交流是完全没问题的。LibChewing 那边也是，正常交流完全没问题。
-
-有些事情，继续争论下去也没用。本来我想着重写 ctlInputMethod 撤掉 zonble 的状态管理引擎的，毕竟有大陆同乡写的火山五笔输入法的框架套上我的铁恨注音并击引擎可以直接用。但这样赌气对谁都没好处。眼下，威注音 macOS 版还需要一些小维护。之后我就得开始考虑用 Windows 平台可用的除了 C++ 以外的语言重写铁恨注音并击引擎与天权星语汇引擎、方便接下来威注音的 Windows 版本的研发。能将 Lukhnos 的 C++ 内容全部换掉、彻底砸碎套在威注音身上的名为 C++ 的枷锁、让威注音有一个自由的未来，我已经知足了。让更多的人用上好用的输入法，才是最重要的。**这个重要性，不是 zonble 用「私人需求」这种帽子扣过来、就可以泯灭了的**。
 
 $ EOF.

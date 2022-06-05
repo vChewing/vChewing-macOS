@@ -2,12 +2,9 @@
 
 vChewing macOS: MIT-NTL License 麻理（去商標）授權合約
 
-© 2011-2022 OpenVanilla Project & © 2021-2022 vChewing Project.
-鐵恨注音並擊輸入處理引擎研發：Shiki Suen。
-輸入法狀態管理引擎研發：Zonble Yang。
+© 2021-2022 vChewing Project.
 威注音 macOS 程式研發：Shiki Suen, Isaac Xen, Hiraku Wang, 等。
 威注音詞庫維護：Shiki Suen。
-天權星語彙引擎：Shiki Suen，用 Swift 將 Lukhnos 的 C++ Gramambular 重寫而得。
 
 軟體之著作權利人依此麻理授權條款，將其對於軟體之著作權利授權釋出，只須使用者踐履以下二項麻理授權條款敘明之義務性規定，其即享有對此軟體程式及其相關說明文檔自由不受限制地進行利用之權利，範圍包括「使用、重製、修改、合併、出版、散布、再授權、及販售程式重製作品」等諸多方面之應用，而散布程式之人、更可將上述權利傳遞予其後收受程式之後手，倘若其後收受程式之人亦服膺以下二項麻理授權條款之義務性規定，則其對程式亦享有與前手運用範圍相同之同一權利。
 
