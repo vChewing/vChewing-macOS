@@ -35,6 +35,8 @@ struct suiPrefPaneDictionary: View {
   @State private var selEnableCNS11643: Bool = UserDefaults.standard.bool(forKey: UserDef.kCNS11643Enabled)
   @State private var selEnableSymbolInputSupport: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kSymbolInputEnabled)
+  @State private var selAllowBoostingSingleKanjiAsUserPhrase: Bool = UserDefaults.standard.bool(
+    forKey: UserDef.kAllowBoostingSingleKanjiAsUserPhrase)
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -113,11 +115,14 @@ struct suiPrefPaneDictionary: View {
           mgrPrefs.shouldAutoReloadUserDataFiles = value
         }
         Divider()
-        Toggle(LocalizedStringKey("Enable CNS11643 Support (2022-04-27)"), isOn: $selEnableCNS11643)
-          .onChange(of: selEnableCNS11643) { value in
-            mgrPrefs.cns11643Enabled = value
-            mgrLangModel.setCNSEnabled(value)
-          }
+        Toggle(
+          LocalizedStringKey("Enable CNS11643 Support (2022-04-27)"),
+          isOn: $selEnableCNS11643
+        )
+        .onChange(of: selEnableCNS11643) { value in
+          mgrPrefs.cns11643Enabled = value
+          mgrLangModel.setCNSEnabled(value)
+        }
         Toggle(
           LocalizedStringKey("Enable symbol input support (incl. certain emoji symbols)"),
           isOn: $selEnableSymbolInputSupport
@@ -125,6 +130,13 @@ struct suiPrefPaneDictionary: View {
         .onChange(of: selEnableSymbolInputSupport) { value in
           mgrPrefs.symbolInputEnabled = value
           mgrLangModel.setSymbolEnabled(value)
+        }
+        Toggle(
+          LocalizedStringKey("Allow boosting / excluding a candidate of single kanji"),
+          isOn: $selAllowBoostingSingleKanjiAsUserPhrase
+        )
+        .onChange(of: selAllowBoostingSingleKanjiAsUserPhrase) { value in
+          mgrPrefs.allowBoostingSingleKanjiAsUserPhrase = value
         }
       }
     }

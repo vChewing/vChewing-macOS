@@ -82,6 +82,7 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)空格键:";
+"Allow boosting / excluding a candidate of single kanji" = "将可以就地升权/排除的候选字词的最短词长设为单个汉字";
 "An accomodation for elder computer users." = "针对年长使用者的习惯而提供。";
 "Apple ABC (equivalent to English US)" = "Apple ABC (与 Apple 美规键盘等价)";
 "Apple Chewing - Dachen" = "Apple 大千注音键盘排列";
