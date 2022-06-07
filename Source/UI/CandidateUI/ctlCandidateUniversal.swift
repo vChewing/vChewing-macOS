@@ -409,8 +409,6 @@ public class ctlCandidateUniversal: ctlCandidate {
     let buttonAttribute: [NSAttributedString.Key: Any] = [.font: NSFont.systemFont(ofSize: 9.0)]
 
     nextPageButton = .init(frame: contentRect)
-    NSColor.controlBackgroundColor.setFill()
-    NSBezierPath.fill(nextPageButton.bounds)
     nextPageButton.wantsLayer = true
     nextPageButton.layer?.masksToBounds = true
     nextPageButton.layer?.borderColor = NSColor.clear.cgColor
@@ -422,8 +420,6 @@ public class ctlCandidateUniversal: ctlCandidate {
       string: " ", attributes: buttonAttribute
     )  // Next Page Arrow
     prevPageButton = .init(frame: contentRect)
-    NSColor.controlBackgroundColor.setFill()
-    NSBezierPath.fill(prevPageButton.bounds)
     prevPageButton.wantsLayer = true
     prevPageButton.layer?.masksToBounds = true
     prevPageButton.layer?.borderColor = NSColor.clear.cgColor
@@ -441,8 +437,6 @@ public class ctlCandidateUniversal: ctlCandidate {
 
     contentRect = NSRect(x: 128.0, y: 128.0, width: 48.0, height: 20.0)
     pageCounterLabel = .init(frame: contentRect)
-    NSColor.controlBackgroundColor.setFill()
-    NSBezierPath.fill(pageCounterLabel.bounds)
     pageCounterLabel.isEditable = false
     pageCounterLabel.isSelectable = false
     pageCounterLabel.isBezeled = false
