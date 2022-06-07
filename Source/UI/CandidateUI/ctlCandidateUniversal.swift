@@ -439,17 +439,15 @@ public class ctlCandidateUniversal: ctlCandidate {
 
     // MARK: Add Page Counter
 
-    contentRect.size = NSSize(width: 40.0, height: 20.0)
+    contentRect = NSRect(x: 128.0, y: 128.0, width: 48.0, height: 20.0)
     pageCounterLabel = .init(frame: contentRect)
+    NSColor.controlBackgroundColor.setFill()
+    NSBezierPath.fill(pageCounterLabel.bounds)
     pageCounterLabel.isEditable = false
     pageCounterLabel.isSelectable = false
     pageCounterLabel.isBezeled = false
-    pageCounterLabel.textColor = NSColor(
-      red: 0.86, green: 0.86, blue: 0.86, alpha: 1.00
-    )
-    pageCounterLabel.drawsBackground = true
-    pageCounterLabel.backgroundColor = NSColor(
-      red: 0.18, green: 0.18, blue: 0.18, alpha: 1.00
+    pageCounterLabel.attributedStringValue = NSMutableAttributedString(
+      string: " ", attributes: buttonAttribute
     )
     panel.contentView?.addSubview(pageCounterLabel)
 
@@ -466,8 +464,6 @@ public class ctlCandidateUniversal: ctlCandidate {
 
     prevPageButton.target = self
     prevPageButton.action = #selector(pageButtonAction(_:))
-
-    pageCounterLabel.font = pageCounterFont
   }
 
   @available(*, unavailable)
@@ -554,30 +550,6 @@ extension ctlCandidateUniversal {
     return totalCount / keyLabelCount + ((totalCount % keyLabelCount) != 0 ? 1 : 0)
   }
 
-  // 用來顯示頁面計數器的 NSFont。因為結果可 nil，所以最好 guard-let 再用。
-  private var pageCounterFont: NSFont? {
-    var pointSize: CGFloat { candidateView.fractionFontSize }
-    let systemFontDesc = NSFont.systemFont(ofSize: pointSize, weight: .light).fontDescriptor
-    let fractionFontDesc = systemFontDesc.addingAttributes(
-      [
-        NSFontDescriptor.AttributeName.traits: [
-          [
-            NSFontDescriptor.FeatureKey.typeIdentifier: kFractionsType,
-            NSFontDescriptor.FeatureKey.selectorIdentifier: kDiagonalFractionsSelector,
-          ]
-        ]
-      ]
-    )
-    return NSFont(descriptor: fractionFontDesc, size: pointSize) ?? nil
-  }
-
-  // 用來生成拿給頁面計數器用的顯示字串。
-  // TODO: 這衰洨的 pageCount 總是返回空字串，需要調查。
-  private var pageCounterText: String {
-    if pageCount < 2 { return .init() }
-    return "\(currentPageIndex + 1)/"
-  }
-
   private func layoutCandidateView() {
     guard let delegate = delegate else {
       return
@@ -627,11 +599,11 @@ extension ctlCandidateUniversal {
       prevPageButton.isHidden = true
     }
 
-    if !pageCounterText.isEmpty {
-      let attrString = NSAttributedString(
-        string: pageCounterText.appending(String(pageCount)),
+    if pageCount >= 2 {
+      let attrString = NSMutableAttributedString(
+        string: "\(currentPageIndex + 1)/\(pageCount)",
         attributes: [
-          .font: pageCounterFont as AnyObject
+          .font: NSFont.systemFont(ofSize: candidateView.fractionFontSize)
         ]
       )
       pageCounterLabel.attributedStringValue = attrString
@@ -641,6 +613,7 @@ extension ctlCandidateUniversal {
       )
 
       rect.size.height += 3
+      rect.size.width += 4
       let rectOriginY: CGFloat =
         (currentLayout == .horizontal)
         ? (newSize.height - rect.height) / 2
