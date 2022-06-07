@@ -162,36 +162,38 @@ class KeyHandler {
 
   func fixNode(value: String, respectCursorPushing: Bool = true) {
     let cursorIndex = min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), builderLength)
-    let selectedNode: Megrez.NodeAnchor = _builder.grid.fixNodeSelectedCandidate(
-      location: cursorIndex, value: value
-    )
-    // 不要針對逐字選字模式啟用臨時半衰記憶模型。
-    if !mgrPrefs.useSCPCTypingMode {
-      // If the length of the readings and the characters do not match,
-      // it often means it is a special symbol and it should not be stored
-      // in the user override model.
-      var addToUserOverrideModel = true
-      if selectedNode.spanningLength != value.count {
-        IME.prtDebugIntel("UOM: SpanningLength != value.count, dismissing.")
-        addToUserOverrideModel = false
-      }
-      if addToUserOverrideModel {
-        if let theNode = selectedNode.node {
-          // 威注音的 SymbolLM 的 Score 是 -12。
-          if theNode.scoreFor(candidate: value) <= -12 {
-            IME.prtDebugIntel("UOM: Score <= -12, dismissing.")
-            addToUserOverrideModel = false
-          }
-        }
-      }
-      if addToUserOverrideModel {
-        IME.prtDebugIntel("UOM: Start Observation.")
-        _userOverrideModel.observe(
-          walkedNodes: _walkedNodes, cursorIndex: cursorIndex, candidate: value,
-          timestamp: NSDate().timeIntervalSince1970
-        )
-      }
-    }
+    _builder.grid.fixNodeSelectedCandidate(location: cursorIndex, value: value)
+    //  // 因半衰模組失能，故禁用之。
+    // let selectedNode: Megrez.NodeAnchor = _builder.grid.fixNodeSelectedCandidate(
+    //  location: cursorIndex, value: value
+    // )
+    //  // 不要針對逐字選字模式啟用臨時半衰記憶模型。
+    // if !mgrPrefs.useSCPCTypingMode {
+    //  // If the length of the readings and the characters do not match,
+    //  // it often means it is a special symbol and it should not be stored
+    //  // in the user override model.
+    //  var addToUserOverrideModel = true
+    //  if selectedNode.spanningLength != value.count {
+    //    IME.prtDebugIntel("UOM: SpanningLength != value.count, dismissing.")
+    //    addToUserOverrideModel = false
+    //  }
+    //  if addToUserOverrideModel {
+    //    if let theNode = selectedNode.node {
+    //      // 威注音的 SymbolLM 的 Score 是 -12。
+    //      if theNode.scoreFor(candidate: value) <= -12 {
+    //        IME.prtDebugIntel("UOM: Score <= -12, dismissing.")
+    //        addToUserOverrideModel = false
+    //      }
+    //    }
+    //  }
+    //  if addToUserOverrideModel {
+    //    IME.prtDebugIntel("UOM: Start Observation.")
+    //    _userOverrideModel.observe(
+    //      walkedNodes: _walkedNodes, cursorIndex: cursorIndex, candidate: value,
+    //      timestamp: NSDate().timeIntervalSince1970
+    //    )
+    //  }
+    // }
     walk()
 
     if mgrPrefs.moveCursorAfterSelectingCandidate, respectCursorPushing {

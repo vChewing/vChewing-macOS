@@ -1,6 +1,4 @@
-// Copyright (c) 2022 and onwards Isaac Xen (MIT License).
-// All possible vChewing-specific modifications are of:
-// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 /*
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -24,52 +22,15 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import Cocoa
+import AVFoundation
+import Foundation
 
-public class clsSFX: NSObject, NSSoundDelegate {
-  private static let shared = clsSFX()
-  override private init() {
-    super.init()
-  }
-
-  private var currentBeep: NSSound?
-  private func beep() {
-    let defaultVolume: Float = 0.4
-    // Stop existing beep
-    if let beep = currentBeep {
-      if beep.isPlaying {
-        for i in 1..<30 {
-          beep.volume = (defaultVolume / Float(i))
-          usleep(1000)
-        }
-        beep.stop()
-        beep.volume = defaultVolume
-      }
-    }
-    // Create a new beep sound if possible
-    var sndBeep: String
-    if mgrPrefs.shouldNotFartInLieuOfBeep == false {
-      sndBeep = "Fart"
-    } else {
-      sndBeep = "Beep"
-    }
-    guard
-      let beep = NSSound(named: sndBeep)
-    else {
-      NSSound.beep()
-      return
-    }
-    beep.delegate = self
-    beep.volume = defaultVolume
-    beep.play()
-    currentBeep = beep
-  }
-
-  public func sound(_: NSSound, didFinishPlaying _: Bool) {
-    currentBeep = nil
-  }
-
+public class clsSFX {
   static func beep() {
-    shared.beep()
+    let filePath = Bundle.main.path(forResource: mgrPrefs.shouldNotFartInLieuOfBeep ? "Beep" : "Fart", ofType: "m4a")!
+    let fileURL = URL(fileURLWithPath: filePath)
+    var soundID: SystemSoundID = 0
+    AudioServicesCreateSystemSoundID(fileURL as CFURL, &soundID)
+    AudioServicesPlaySystemSound(soundID)
   }
 }
