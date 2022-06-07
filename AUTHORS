@@ -2,7 +2,7 @@ $ Main contributors and volunteers of this repository (vChewing for macOS):
 
 - Shiki Suen // Main developer of vChewing for macOS, Megrez language engine, and Tekkon syllable composer engine.
 - Hiraku Wang // Technical reinforcement in Cocoa during the Object-Cpp dev period of this project.
-- Isaac Xen // Technical reinforcement in Swift: SFX Module and StringView Ranges Extension.
+- Isaac Xen // Technical reinforcement in Swift: SFX Module (NSSound ver.) and StringView Ranges Extension.
 
 $ Contributors and volunteeres of the upstream repo, having no responsibility in discussing anything in the current repo:
 
