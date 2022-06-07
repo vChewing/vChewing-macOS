@@ -188,7 +188,7 @@ extension KeyHandler {
       let poppedText = popOverflowComposingTextAndWalk
 
       // ... get and tweak override model suggestion if possible...
-      dealWithOverrideModelSuggestions()
+      // dealWithOverrideModelSuggestions()  // 暫時禁用，因為無法使其生效。
 
       // ... then update the text.
       _composer.clear()
