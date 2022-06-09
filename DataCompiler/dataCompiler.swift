@@ -117,12 +117,12 @@ func cnvPhonabetToASCII(_ incoming: String) -> String {
 private let urlCurrentFolder = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
 
 private let urlCHSforCustom: String = "./components/chs/phrases-custom-chs.txt"
-private let urlCHSforMCBP: String = "./components/chs/phrases-mcbp-chs.txt"
+private let urlCHSforTABE: String = "./components/chs/phrases-tabe-chs.txt"
 private let urlCHSforMOE: String = "./components/chs/phrases-moe-chs.txt"
 private let urlCHSforVCHEW: String = "./components/chs/phrases-vchewing-chs.txt"
 
 private let urlCHTforCustom: String = "./components/cht/phrases-custom-cht.txt"
-private let urlCHTforMCBP: String = "./components/cht/phrases-mcbp-cht.txt"
+private let urlCHTforTABE: String = "./components/cht/phrases-tabe-cht.txt"
 private let urlCHTforMOE: String = "./components/cht/phrases-moe-cht.txt"
 private let urlCHTforVCHEW: String = "./components/cht/phrases-vchewing-cht.txt"
 
@@ -150,7 +150,7 @@ func rawDictForPhrases(isCHS: Bool) -> [Entry] {
   var arrEntryRAW: [Entry] = []
   var strRAW = ""
   let urlCustom: String = isCHS ? urlCHSforCustom : urlCHTforCustom
-  let urlMCBP: String = isCHS ? urlCHSforMCBP : urlCHTforMCBP
+  let urlTABE: String = isCHS ? urlCHSforTABE : urlCHTforTABE
   let urlMOE: String = isCHS ? urlCHSforMOE : urlCHTforMOE
   let urlVCHEW: String = isCHS ? urlCHSforVCHEW : urlCHTforVCHEW
   let i18n: String = isCHS ? "簡體中文" : "繁體中文"
@@ -158,7 +158,7 @@ func rawDictForPhrases(isCHS: Bool) -> [Entry] {
   do {
     strRAW += try String(contentsOfFile: urlCustom, encoding: .utf8)
     strRAW += "\n"
-    strRAW += try String(contentsOfFile: urlMCBP, encoding: .utf8)
+    strRAW += try String(contentsOfFile: urlTABE, encoding: .utf8)
     strRAW += "\n"
     strRAW += try String(contentsOfFile: urlMOE, encoding: .utf8)
     strRAW += "\n"
