@@ -227,3 +227,4 @@ _TeamCity*
 _UpgradeReport_Files/
 __pycache__/
 ~$*
+DataCompiler/dataCompiler.exe

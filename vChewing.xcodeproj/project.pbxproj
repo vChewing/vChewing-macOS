@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -127,13 +127,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 5BD05BB727B2A429004C4F1D;
 			remoteInfo = vChewingPhraseEditor;
-		};
-		6A38BC2515FC131100A8A51F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 6A0D4E9415FC0CFA00ABF4B3 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 6A38BC2115FC12FD00A8A51F;
-			remoteInfo = Data;
 		};
 		6ACA420015FC1DCC00935EF6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -808,23 +801,6 @@
 		};
 /* End PBXGroup section */
 
-/* Begin PBXLegacyTarget section */
-		6A38BC2115FC12FD00A8A51F /* Data */ = {
-			isa = PBXLegacyTarget;
-			buildArgumentsString = "$(ACTION) ../../DataCompiler/dataCompiler.swift";
-			buildConfigurationList = 6A38BC2215FC12FD00A8A51F /* Build configuration list for PBXLegacyTarget "Data" */;
-			buildPhases = (
-			);
-			buildToolPath = /usr/bin/swift;
-			buildWorkingDirectory = "$(SRCROOT)/Source/Data";
-			dependencies = (
-			);
-			name = Data;
-			passBuildSettingsInEnvironment = 1;
-			productName = Data;
-		};
-/* End PBXLegacyTarget section */
-
 /* Begin PBXNativeTarget section */
 		5BD05BB727B2A429004C4F1D /* vChewingPhraseEditor */ = {
 			isa = PBXNativeTarget;
@@ -847,6 +823,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6A0D4EC015FC0D2E00ABF4B3 /* Build configuration list for PBXNativeTarget "vChewing" */;
 			buildPhases = (
+				5B9A5A00285184BB001FFCAF /* ShellScript */,
 				6A0D4E9E15FC0D2D00ABF4B3 /* Sources */,
 				6A0D4E9F15FC0D2D00ABF4B3 /* Frameworks */,
 				6A0D4EA015FC0D2D00ABF4B3 /* Resources */,
@@ -857,7 +834,6 @@
 			dependencies = (
 				5B707CEA27D9F47A0099EF99 /* PBXTargetDependency */,
 				5B0AF8B327B2C4E20096FE54 /* PBXTargetDependency */,
-				6A38BC2615FC131100A8A51F /* PBXTargetDependency */,
 			);
 			name = vChewing;
 			packageProductDependencies = (
@@ -933,7 +909,6 @@
 				6A0D4EA115FC0D2D00ABF4B3 /* vChewing */,
 				6ACA41CA15FC1D7500935EF6 /* vChewingInstaller */,
 				5BD05BB727B2A429004C4F1D /* vChewingPhraseEditor */,
-				6A38BC2115FC12FD00A8A51F /* Data */,
 			);
 		};
 /* End PBXProject section */
@@ -994,9 +969,49 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		6A225A2023679F5F00F685C6 /* ShellScript */ = {
+		5B9A5A00285184BB001FFCAF /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Source/Data/components/chs/phrases-custom-chs.txt",
+				"$(SRCROOT)/Source/Data/components/chs/phrases-moe-chs.txt",
+				"$(SRCROOT)/Source/Data/components/chs/phrases-tabe-chs.txt",
+				"$(SRCROOT)/Source/Data/components/chs/phrases-vchewing-chs.txt",
+				"$(SRCROOT)/Source/Data/components/cht/phrases-custom-cht.txt",
+				"$(SRCROOT)/Source/Data/components/cht/phrases-moe-cht.txt",
+				"$(SRCROOT)/Source/Data/components/cht/phrases-tabe-cht.txt",
+				"$(SRCROOT)/Source/Data/components/cht/phrases-vchewing-cht.txt",
+				"$(SRCROOT)/Source/Data/components/common/char-kanji-cns.txt",
+				"$(SRCROOT)/Source/Data/components/common/char-kanji-core.txt",
+				"$(SRCROOT)/Source/Data/components/common/char-kanji-phrasesonly.txt",
+				"$(SRCROOT)/Source/Data/components/common/char-misc-bpmf.txt",
+				"$(SRCROOT)/Source/Data/components/common/char-misc-nonkanji.txt",
+				"$(SRCROOT)/Source/Data/components/common/data-punctuations.txt",
+				"$(SRCROOT)/Source/Data/components/common/data-symbols.txt",
+				"$(SRCROOT)/Source/Data/components/common/data-zhuyinwen.txt",
+				"$(SRCROOT)/Source/Data/components/common/phone-header.txt",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(SRCROOT)/Source/Data/data-chs.plist",
+				"$(SRCROOT)/Source/Data/data-cht.plist",
+				"$(SRCROOT)/Source/Data/data-cns.plist",
+				"$(SRCROOT)/Source/Data/data-zhuyinwen.plist",
+				"$(SRCROOT)/Source/Data/data-symbols.plist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd ${SRCROOT}\nswiftc ${SRCROOT}/DataCompiler/dataCompiler.swift -o ${SRCROOT}/DataCompiler/cook_mac.exe\nmv ${SRCROOT}/DataCompiler/cook_mac.exe ${SRCROOT}/Source/Data/bin/cook_mac.exe\ncd ${SRCROOT}/Source/Data/\n./bin/cook_mac.exe\n";
+		};
+		6A225A2023679F5F00F685C6 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 12;
 			files = (
 			);
 			inputFileListPaths = (
@@ -1125,11 +1140,6 @@
 		5B707CEA27D9F47A0099EF99 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = 5B707CE927D9F47A0099EF99 /* OpenCC */;
-		};
-		6A38BC2615FC131100A8A51F /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 6A38BC2115FC12FD00A8A51F /* Data */;
-			targetProxy = 6A38BC2515FC131100A8A51F /* PBXContainerItemProxy */;
 		};
 		6ACA420115FC1DCC00935EF6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1600,65 +1610,6 @@
 			};
 			name = Release;
 		};
-		6A38BC2315FC12FD00A8A51F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COMBINE_HIDPI_IMAGES = YES;
-				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
-				DEBUGGING_SYMBOLS = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				ONLY_ACTIVE_ARCH = YES;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-			};
-			name = Debug;
-		};
-		6A38BC2415FC12FD00A8A51F /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COMBINE_HIDPI_IMAGES = YES;
-				COPY_PHASE_STRIP = YES;
-				DEAD_CODE_STRIPPING = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-			};
-			name = Release;
-		};
 		6ACA41E515FC1D7600935EF6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1785,15 +1736,6 @@
 			buildConfigurations = (
 				6A0D4EBE15FC0D2E00ABF4B3 /* Debug */,
 				6A0D4EBF15FC0D2E00ABF4B3 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		6A38BC2215FC12FD00A8A51F /* Build configuration list for PBXLegacyTarget "Data" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				6A38BC2315FC12FD00A8A51F /* Debug */,
-				6A38BC2415FC12FD00A8A51F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
