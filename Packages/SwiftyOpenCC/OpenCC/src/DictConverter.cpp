@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+#include <stdlib.h>
 #include "DictConverter.hpp"
 #include "MarisaDict.hpp"
 #include "TextDict.hpp"

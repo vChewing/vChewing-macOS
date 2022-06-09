@@ -28,36 +28,36 @@
 >- 可以自動整理使用者語彙檔案格式、自訂聯想詞。
 >- ……
 
-威注音分支專案及威注音詞庫由孫志貴（Shiki Suen）維護。小麥注音官方原始倉庫內的詞庫的內容均與孫志貴無關。
+威注音分支專案及威注音詞庫由孫志貴（Shiki Suen）維護，其內容屬於可在 Gitee 公開展示的合法內容。小麥注音官方原始倉庫內的詞庫的內容均與孫志貴無關。
 
 ## 系統需求
 
-建置用系統需求：至少 macOS 10.15 Catalina & Xcode 12。// 原因：Swift 封包管理支援所需。
+建置用系統需求：
+
+- 至少 macOS 11 Big Sur & Xcode 13。
+    - 原因：Swift 封包管理支援與 Swift 5.5 所需。
+    - 我們已經沒有條件測試 macOS 10.15 Catalina & Xcode 12 環境了。硬要在這個環境下編譯的話，可能需要額外安裝[新版 Swift](https://www.swift.org/download/) 才可以。
+- 請使用正式發行版 Xcode，且最小子版本號越高越好（因為 Bug 相對而言最少）。
+    - 如果是某個大版本的 Xcode 的 Release Candidate 版本的話，我們可能會對此做相容性測試。
 
 編譯出的成品對應系統需求：
 
 - 至少 macOS El Capitan 10.11.5，否則無法處理 Unicode 8.0 的漢字。即便如此，仍需手動升級蘋方至至少 macOS 10.12 開始隨贈的版本、以支援 Unicode 8.0 的通用規範漢字表用字（全字庫沒有「𫫇」字）。
-
-    - 保留該系統支援的原因：非 Unibody 體型的 MacBook Pro 支援的最後一版 macOS 就是 El Capitan。
+  - 保留該系統支援的原因：非 Unibody 機種的 MacBook Pro 支援的最後一版 macOS 就是 El Capitan。
 
 - **推薦最低系統版本**：macOS 10.12 Sierra，對 Unicode 8.0 開始的《通用規範漢字表》漢字有原生的蘋方支援。
 
-    - 同時建議**系統記憶體應至少 4GB**。威注音輸入法佔用記憶體約 115MB 左右（簡繁雙模式）、75MB左右（單模式），供參考。
-
-	- 請務必使用 SSD 硬碟，否則可能會影響每次開機之後輸入法首次載入的速度。從 10.10 Yosemite 開始，macOS 就已經是針對機械硬碟負優化的作業系統了。
-
+  - 同時建議**系統記憶體應至少 4GB**。威注音輸入法佔用記憶體約 115MB 左右（簡繁雙模式）、75MB左右（單模式），供參考。
+    - 請務必使用 SSD 硬碟，否則可能會影響每次開機之後輸入法首次載入的速度。從 10.10 Yosemite 開始，macOS 就已經是針對機械硬碟負優化的作業系統了。
     - 注：能裝 macOS 10.13 High Sierra 就不要去碰 macOS 10.12 Sierra 這個半成品。
 
 - 關於全字庫支援，因下述事實而在理論上很難做到最完美：
 
-    - 很可惜 GB18030-2005 並沒有官方提供的逐字讀音對照表，所以目前才用了全字庫。然而全字庫並不等於完美。
-
-    - 有條件者可以安裝全字庫字型與花園明朝，否則全字庫等高萬國碼碼位漢字恐無法在輸入法的選字窗內完整顯示。
- 
+  - 很可惜 GB18030-2005 並沒有官方提供的逐字讀音對照表，所以目前才用了全字庫。然而全字庫並不等於完美。
+  - 有條件者可以安裝全字庫字型與花園明朝，否則全字庫等高萬國碼碼位漢字恐無法在輸入法的選字窗內完整顯示。
     - 全字庫漢字顯示支援會受到具體系統版本對萬國碼版本的支援的限制。
- 
     - 有些全字庫漢字一開始會依賴萬國碼的私人造字區，且在之後被新版本萬國碼所支援。
- 
+
 ## 建置流程
 
 安裝 Xcode 之後，請先配置 Xcode 允許其直接構建在專案所在的資料夾下的 build 資料夾內。步驟：
@@ -83,30 +83,37 @@
 威注音專案僅用到小麥注音的下述程式組件（MIT License）：
 
 - 狀態管理引擎 & NSStringUtils & FSEventStreamHelper (by Zonble Yang)。
-
 - 半衰記憶模組，因故障暫時無法啟用 (by Mengjuei Hsieh)。
-
 - 僅供研發人員調試方便而使用的 App 版安裝程式 (by Zonble Yang)。
-
 - Voltaire MK2 選字窗、飄雲通知視窗、工具提示 (by Zonble Yang)，有大幅度修改。
 
 威注音輸入法 macOS 版以 MIT-NTL License 授權釋出 (與 MIT 相容)：© 2021-2022 vChewing 專案。
 
 - 威注音輸入法 macOS 版程式維護：Shiki Suen。特別感謝 Isaac Xen 與 Hiraku Wong 等人的技術協力。
-
 - 鐵恨注音並擊處理引擎：Shiki Suen (MIT-NTL License)。
-
 - 天權星語彙處理引擎：Shiki Suen (MIT-NTL License)。
-
 - 威注音詞庫由 Shiki Suen 維護，以 3-Clause BSD License 授權釋出。其中的詞頻數據[由 NAER 授權用於非商業用途](https://twitter.com/ShikiSuen/status/1479329302713831424)。
 
 使用者可自由使用、散播本軟體，惟散播時必須完整保留版權聲明及軟體授權、且一旦經過修改便不可以再繼續使用威注音的產品名稱。
 
-## 格式規範等與參與研發時需要注意的事項：
+## 資料來源
 
-該專案對源碼格式有規範，且 Swift 與其他 (Obj)C(++) 系語言持不同規範：
+原廠詞庫主要詞語資料來源：
 
-請洽該倉庫內的「[CONTRIBUTING.md](./CONTRIBUTING.md)」檔案。
+- 《重編國語辭典修訂本 2015》的六字以內的詞語資料 (CC BY-ND 3.0)。
+- 《CNS11643中文標準交換碼全字庫(簡稱全字庫)》 (OGDv1 License)。
+- LibTaBE (by Pai-Hsiang Hsiao under 3-Clause BSD License)。
+- [《新加坡華語資料庫》](https://www.languagecouncils.sg/mandarin/ch/learning-resources/singaporean-mandarin-database)。
+- 原始詞頻資料取自 NAER，有經過換算處理與按需調整。
+    - 威注音並未使用由 LibTaBE 內建的來自 Sinica 語料庫的詞頻資料。
+- 威注音語彙庫作者自行維護新增的詞語資料，包括：
+    - 盡可能所有字詞的陸規審音與齊鐵恨廣播讀音。
+    - 中國大陸常用資訊電子術語等常用語，以確保簡體中文母語者在使用輸入法時不會受到審音差異的困擾。
+- 其他使用者建議收錄的資料。
+
+## 格式規範等與參與研發時需要注意的事項
+
+該專案對源碼格式有規範，且 Swift 與其他 (Obj)C(++) 系語言持不同規範。請洽該倉庫內的「[CONTRIBUTING.md](./CONTRIBUTING.md)」檔案。
 
 ## 其他
 

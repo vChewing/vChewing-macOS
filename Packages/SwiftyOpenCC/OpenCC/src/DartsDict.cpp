@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <malloc/_malloc.h>
 
 #include "BinaryDict.hpp"
 #include "DartsDict.hpp"
