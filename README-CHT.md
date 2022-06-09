@@ -32,13 +32,19 @@
 
 ## 系統需求
 
-建置用系統需求：至少 macOS 10.15 Catalina & Xcode 12。// 原因：Swift 封包管理支援所需。
+建置用系統需求：
+
+- 至少 macOS 11 Big Sur & Xcode 13。
+    - 原因：Swift 封包管理支援與 Swift 5.5 所需。
+    - 我們已經沒有條件測試 macOS 10.15 Catalina & Xcode 12 環境了。硬要在這個環境下編譯的話，可能需要額外安裝[新版 Swift](https://www.swift.org/download/) 才可以。
+- 請使用正式發行版 Xcode，且最小子版本號越高越好（因為 Bug 相對而言最少）。
+    - 如果是某個大版本的 Xcode 的 Release Candidate 版本的話，我們可能會對此做相容性測試。
 
 編譯出的成品對應系統需求：
 
 - 至少 macOS El Capitan 10.11.5，否則無法處理 Unicode 8.0 的漢字。即便如此，仍需手動升級蘋方至至少 macOS 10.12 開始隨贈的版本、以支援 Unicode 8.0 的通用規範漢字表用字（全字庫沒有「𫫇」字）。
 
-    - 保留該系統支援的原因：非 Unibody 體型的 MacBook Pro 支援的最後一版 macOS 就是 El Capitan。
+    - 保留該系統支援的原因：非 Unibody 機種的 MacBook Pro 支援的最後一版 macOS 就是 El Capitan。
 
 - **推薦最低系統版本**：macOS 10.12 Sierra，對 Unicode 8.0 開始的《通用規範漢字表》漢字有原生的蘋方支援。
 
