@@ -176,9 +176,9 @@ struct ComposingBufferSize {
 
 enum MandarinParser: Int {
   case ofStandard = 0
-  case ofEten = 1
+  case ofETen = 1
   case ofHsu = 2
-  case ofEten26 = 3
+  case ofETen26 = 3
   case ofIBM = 4
   case ofMiTAC = 5
   case ofFakeSeigyou = 6
@@ -193,11 +193,11 @@ enum MandarinParser: Int {
     switch self {
       case .ofStandard:
         return "Standard"
-      case .ofEten:
+      case .ofETen:
         return "ETen"
       case .ofHsu:
         return "Hsu"
-      case .ofEten26:
+      case .ofETen26:
         return "ETen26"
       case .ofIBM:
         return "IBM"

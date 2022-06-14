@@ -276,12 +276,12 @@ class KeyHandler {
         _composer.ensureParser(arrange: .ofDachen)
       case MandarinParser.ofDachen26.rawValue:
         _composer.ensureParser(arrange: .ofDachen26)
-      case MandarinParser.ofEten.rawValue:
-        _composer.ensureParser(arrange: .ofEten)
+      case MandarinParser.ofETen.rawValue:
+        _composer.ensureParser(arrange: .ofETen)
       case MandarinParser.ofHsu.rawValue:
         _composer.ensureParser(arrange: .ofHsu)
-      case MandarinParser.ofEten26.rawValue:
-        _composer.ensureParser(arrange: .ofEten26)
+      case MandarinParser.ofETen26.rawValue:
+        _composer.ensureParser(arrange: .ofETen26)
       case MandarinParser.ofIBM.rawValue:
         _composer.ensureParser(arrange: .ofIBM)
       case MandarinParser.ofMiTAC.rawValue:
