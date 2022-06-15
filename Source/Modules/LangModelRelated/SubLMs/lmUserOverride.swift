@@ -28,7 +28,7 @@ import Foundation
 extension vChewing {
   public class LMUserOverride {
     // MARK: - Private Structures
-    
+
     // 這些型別必須得用 class，不然會導致拿不到有效建議。
 
     class Override {
