@@ -52,12 +52,12 @@ extension KeyHandler {
     if cancelCandidateKey {
       if (state is InputState.AssociatedPhrases)
         || mgrPrefs.useSCPCTypingMode
-        || isBuilderEmpty
+        || isCompositorEmpty
       {
         // 如果此時發現當前組字緩衝區為真空的情況的話，
         // 就將當前的組字緩衝區析構處理、強制重設輸入狀態。
         // 否則，一個本不該出現的真空組字緩衝區會使前後方向鍵與 BackSpace 鍵失靈。
-        // 所以這裡需要對 isBuilderEmpty 做判定。
+        // 所以這裡需要對 isCompositorEmpty 做判定。
         clear()
         stateCallback(InputState.EmptyIgnoringPreviousState())
       } else {

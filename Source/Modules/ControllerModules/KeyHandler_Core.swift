@@ -65,8 +65,10 @@ class KeyHandler {
       // Synchronize the sub-languageModel state settings to the new LM.
       syncBaseLMPrefs()
 
-      // Create new grid builder and clear the composer.
-      createNewBuilder()
+      // Create new compositor and clear the composer.
+      // When it recreates, it adapts to the latest imeMode settings.
+      // This allows it to work with correct LMs.
+      reinitCompositor()
       composer.clear()
     }
   }
@@ -139,7 +141,7 @@ class KeyHandler {
   }
 
   func fixNode(value: String, respectCursorPushing: Bool = true) {
-    let cursorIndex = min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), builderLength)
+    let cursorIndex = min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength)
     compositor.grid.fixNodeSelectedCandidate(location: cursorIndex, value: value)
     //  // 因半衰模組失能，故禁用之。
     // let selectedNode: Megrez.NodeAnchor = compositor.grid.fixNodeSelectedCandidate(
@@ -180,8 +182,8 @@ class KeyHandler {
         if nextPosition >= cursorIndex { break }
         nextPosition += node.spanningLength
       }
-      if nextPosition <= builderLength {
-        builderCursorIndex = nextPosition
+      if nextPosition <= compositorLength {
+        compositorCursorIndex = nextPosition
       }
     }
   }
@@ -216,7 +218,7 @@ class KeyHandler {
       mgrPrefs.useSCPCTypingMode
       ? ""
       : currentUOM.suggest(
-        walkedNodes: walkedAnchors, cursorIndex: builderCursorIndex,
+        walkedNodes: walkedAnchors, cursorIndex: compositorCursorIndex,
         timestamp: NSDate().timeIntervalSince1970
       )
 
@@ -224,7 +226,7 @@ class KeyHandler {
       IME.prtDebugIntel(
         "UOM: Suggestion retrieved, overriding the node score of the selected candidate.")
       compositor.grid.overrideNodeScoreForSelectedCandidate(
-        location: min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), builderLength),
+        location: min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength),
         value: overrideValue,
         overridingScore: findHighestScore(nodes: rawNodes, epsilon: kEpsilon)
       )
@@ -285,7 +287,7 @@ class KeyHandler {
 
   // MARK: - Extracted methods and functions (Megrez).
 
-  var isBuilderEmpty: Bool { compositor.grid.width == 0 }
+  var isCompositorEmpty: Bool { compositor.grid.width == 0 }
 
   var rawNodes: [Megrez.NodeAnchor] {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
@@ -301,7 +303,7 @@ class KeyHandler {
     currentLM.isSymbolEnabled = mgrPrefs.symbolInputEnabled
   }
 
-  func createNewBuilder() {
+  func reinitCompositor() {
     // Each Mandarin syllable is separated by a hyphen.
     compositor = Megrez.Compositor(lm: currentLM, separator: "-")
   }
@@ -312,16 +314,16 @@ class KeyHandler {
     currentLM.hasUnigramsFor(key: reading)
   }
 
-  func insertReadingToBuilderAtCursor(reading: String) {
+  func insertToCompositorAtCursor(reading: String) {
     compositor.insertReadingAtCursor(reading: reading)
   }
 
-  var builderCursorIndex: Int {
+  var compositorCursorIndex: Int {
     get { compositor.cursorIndex }
     set { compositor.cursorIndex = newValue }
   }
 
-  var builderLength: Int {
+  var compositorLength: Int {
     compositor.length
   }
 

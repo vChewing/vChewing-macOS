@@ -151,7 +151,7 @@ extension KeyHandler {
       keyConsumedByReading = true
 
       // If we have a tone marker, we have to insert the reading to the
-      // builder in other words, if we don't have a tone marker, we just
+      // compositor in other words, if we don't have a tone marker, we just
       // update the composing buffer.
       let composeReading = composer.hasToneMarker()
       if !composeReading {
@@ -177,12 +177,12 @@ extension KeyHandler {
         IME.prtDebugIntel("B49C0979：語彙庫內無「\(reading)」的匹配記錄。")
         errorCallback()
         composer.clear()
-        stateCallback((builderLength == 0) ? InputState.EmptyIgnoringPreviousState() : buildInputtingState)
+        stateCallback((compositorLength == 0) ? InputState.EmptyIgnoringPreviousState() : buildInputtingState)
         return true
       }
 
       // ... and insert it into the grid...
-      insertReadingToBuilderAtCursor(reading: reading)
+      insertToCompositorAtCursor(reading: reading)
 
       // ... then walk the grid...
       let poppedText = popOverflowComposingTextAndWalk
@@ -248,7 +248,7 @@ extension KeyHandler {
       if input.isSpace {
         // If the Space key is NOT set to be a selection key
         if input.isShiftHold || !mgrPrefs.chooseCandidateUsingSpace {
-          if builderCursorIndex >= builderLength {
+          if compositorCursorIndex >= compositorLength {
             let composingBuffer = currentState.composingBuffer
             if !composingBuffer.isEmpty {
               stateCallback(InputState.Committing(poppedText: composingBuffer))
@@ -257,7 +257,7 @@ extension KeyHandler {
             stateCallback(InputState.Committing(poppedText: " "))
             stateCallback(InputState.Empty())
           } else if ifLangModelHasUnigrams(forKey: " ") {
-            insertReadingToBuilderAtCursor(reading: " ")
+            insertToCompositorAtCursor(reading: " ")
             let poppedText = popOverflowComposingTextAndWalk
             let inputting = buildInputtingState
             inputting.poppedText = poppedText
@@ -363,7 +363,7 @@ extension KeyHandler {
       if input.isOptionHold {
         if ifLangModelHasUnigrams(forKey: "_punctuation_list") {
           if composer.isEmpty {
-            insertReadingToBuilderAtCursor(reading: "_punctuation_list")
+            insertToCompositorAtCursor(reading: "_punctuation_list")
             let poppedText: String! = popOverflowComposingTextAndWalk
             let inputting = buildInputtingState
             inputting.poppedText = poppedText

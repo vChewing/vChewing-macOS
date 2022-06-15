@@ -34,7 +34,7 @@ extension KeyHandler {
   }
 
   var actualCandidateCursorIndex: Int {
-    var cursorIndex = builderCursorIndex
+    var cursorIndex = compositorCursorIndex
     switch mgrPrefs.useRearCursorMode {
       case false:
         do {
@@ -52,7 +52,7 @@ extension KeyHandler {
           // (i.e. the cursor is always at the rear of the phrase.)
           // No crossing.
           switch cursorIndex {
-            case builderLength: cursorIndex -= 1
+            case compositorLength: cursorIndex -= 1
             default: break
           }
         }

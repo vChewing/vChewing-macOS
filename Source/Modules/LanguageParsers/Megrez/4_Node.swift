@@ -25,7 +25,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 extension Megrez {
   /// 節點。
-  public class Node: CustomStringConvertible {
+  public class Node {
     /// 當前節點對應的語言模型。
     private let mutLM: LanguageModel = .init()
     /// 鍵。
@@ -109,23 +109,16 @@ extension Megrez {
         for neta in precedingKeyValues {
           let bigrams = mutPrecedingBigramMap[neta] ?? []
           for bigram in bigrams {
-            if bigram.score > max {
-              if let valRetrieved = mutValueUnigramIndexMap[bigram.keyValue.value] {
-                newIndex = valRetrieved as Int
-                max = bigram.score
-              }
+            guard bigram.score > max else { continue }
+            if let valRetrieved = mutValueUnigramIndexMap[bigram.keyValue.value] {
+              newIndex = valRetrieved as Int
+              max = bigram.score
             }
           }
         }
       }
-
-      if mutScore != max {
-        mutScore = max
-      }
-
-      if mutSelectedUnigramIndex != newIndex {
-        mutSelectedUnigramIndex = newIndex
-      }
+      mutScore = max
+      mutSelectedUnigramIndex = newIndex
     }
 
     /// 選中位於給定索引位置的候選字詞。
@@ -169,14 +162,6 @@ extension Megrez {
         }
       }
       return 0.0
-    }
-
-    public static func == (lhs: Node, rhs: Node) -> Bool {
-      lhs.mutUnigrams == rhs.mutUnigrams && lhs.mutCandidates == rhs.mutCandidates
-        && lhs.mutValueUnigramIndexMap == rhs.mutValueUnigramIndexMap
-        && lhs.mutPrecedingBigramMap == rhs.mutPrecedingBigramMap
-        && lhs.mutCandidateFixed == rhs.mutCandidateFixed
-        && lhs.mutSelectedUnigramIndex == rhs.mutSelectedUnigramIndex
     }
   }
 }

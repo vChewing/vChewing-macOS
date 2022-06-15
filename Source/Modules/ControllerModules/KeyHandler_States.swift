@@ -48,44 +48,44 @@ extension KeyHandler {
         let arrSplit: [String] = Array(strNodeValue).map { String($0) }
         let codepointCount = arrSplit.count
         // This re-aligns the cursor index in the composed string
-        // (the actual cursor on the screen) with the builder's logical
+        // (the actual cursor on the screen) with the compositor's logical
         // cursor (reading) cursor; each built node has a "spanning length"
         // (e.g. two reading blocks has a spanning length of 2), and we
         // accumulate those lengths to calculate the displayed cursor
         // index.
         let spanningLength: Int = walkedNode.spanningLength
-        if readingCursorIndex + spanningLength <= builderCursorIndex {
+        if readingCursorIndex + spanningLength <= compositorCursorIndex {
           composedStringCursorIndex += strNodeValue.utf16.count
           readingCursorIndex += spanningLength
         } else {
           if codepointCount == spanningLength {
             var i = 0
-            while i < codepointCount, readingCursorIndex < builderCursorIndex {
+            while i < codepointCount, readingCursorIndex < compositorCursorIndex {
               composedStringCursorIndex += arrSplit[i].utf16.count
               readingCursorIndex += 1
               i += 1
             }
           } else {
-            if readingCursorIndex < builderCursorIndex {
+            if readingCursorIndex < compositorCursorIndex {
               composedStringCursorIndex += strNodeValue.utf16.count
               readingCursorIndex += spanningLength
-              if readingCursorIndex > builderCursorIndex {
-                readingCursorIndex = builderCursorIndex
+              if readingCursorIndex > compositorCursorIndex {
+                readingCursorIndex = compositorCursorIndex
               }
               // Now we start preparing the contents of the tooltips used
               // in cases of moving cursors across certain emojis which emoji
               // char count is inequal to the reading count.
               // Example in McBopomofo: Typing 王建民 (3 readings) gets a tree emoji.
               // Example in vChewing: Typing 義麵 (2 readings) gets a pasta emoji.
-              switch builderCursorIndex {
+              switch compositorCursorIndex {
                 case compositor.readings.count...:
                   tooltipParameterRef[0] = compositor.readings[compositor.readings.count - 1]
                 case 0:
-                  tooltipParameterRef[1] = compositor.readings[builderCursorIndex]
+                  tooltipParameterRef[1] = compositor.readings[compositorCursorIndex]
                 default:
                   do {
-                    tooltipParameterRef[0] = compositor.readings[builderCursorIndex - 1]
-                    tooltipParameterRef[1] = compositor.readings[builderCursorIndex]
+                    tooltipParameterRef[0] = compositor.readings[compositorCursorIndex - 1]
+                    tooltipParameterRef[1] = compositor.readings[compositorCursorIndex]
                   }
               }
             }
@@ -260,7 +260,7 @@ extension KeyHandler {
     }
 
     if composer.isEmpty {
-      insertReadingToBuilderAtCursor(reading: customPunctuation)
+      insertToCompositorAtCursor(reading: customPunctuation)
       let poppedText = popOverflowComposingTextAndWalk
       let inputting = buildInputtingState
       inputting.poppedText = poppedText
@@ -385,7 +385,7 @@ extension KeyHandler {
     if composer.hasToneMarker(withNothingElse: true) {
       composer.clear()
     } else if composer.isEmpty {
-      if builderCursorIndex >= 0 {
+      if compositorCursorIndex >= 0 {
         deleteBuilderReadingInFrontOfCursor()
         walk()
       } else {
@@ -398,7 +398,7 @@ extension KeyHandler {
       composer.doBackSpace()
     }
 
-    if composer.isEmpty, builderLength == 0 {
+    if composer.isEmpty, compositorLength == 0 {
       stateCallback(InputState.EmptyIgnoringPreviousState())
     } else {
       stateCallback(buildInputtingState)
@@ -416,7 +416,7 @@ extension KeyHandler {
     guard state is InputState.Inputting else { return false }
 
     if composer.isEmpty {
-      if builderCursorIndex != builderLength {
+      if compositorCursorIndex != compositorLength {
         deleteBuilderReadingToTheFrontOfCursor()
         walk()
         let inputting = buildInputtingState
@@ -472,8 +472,8 @@ extension KeyHandler {
       return true
     }
 
-    if builderCursorIndex != 0 {
-      builderCursorIndex = 0
+    if compositorCursorIndex != 0 {
+      compositorCursorIndex = 0
       stateCallback(buildInputtingState)
     } else {
       IME.prtDebugIntel("66D97F90")
@@ -500,8 +500,8 @@ extension KeyHandler {
       return true
     }
 
-    if builderCursorIndex != builderLength {
-      builderCursorIndex = builderLength
+    if compositorCursorIndex != compositorLength {
+      compositorCursorIndex = compositorLength
       stateCallback(buildInputtingState)
     } else {
       IME.prtDebugIntel("9B69908E")
@@ -534,7 +534,7 @@ extension KeyHandler {
       // If reading is not empty, we cancel the reading.
       if !composer.isEmpty {
         composer.clear()
-        if builderLength == 0 {
+        if compositorLength == 0 {
           stateCallback(InputState.EmptyIgnoringPreviousState())
         } else {
           stateCallback(buildInputtingState)
@@ -580,8 +580,8 @@ extension KeyHandler {
         stateCallback(state)
       }
     } else {
-      if builderCursorIndex < builderLength {
-        builderCursorIndex += 1
+      if compositorCursorIndex < compositorLength {
+        compositorCursorIndex += 1
         stateCallback(buildInputtingState)
       } else {
         IME.prtDebugIntel("A96AAD58")
@@ -629,8 +629,8 @@ extension KeyHandler {
         stateCallback(state)
       }
     } else {
-      if builderCursorIndex > 0 {
-        builderCursorIndex -= 1
+      if compositorCursorIndex > 0 {
+        compositorCursorIndex -= 1
         stateCallback(buildInputtingState)
       } else {
         IME.prtDebugIntel("7045E6F3")
@@ -677,7 +677,7 @@ extension KeyHandler {
     var length = 0
     var currentAnchor = Megrez.NodeAnchor()
     let cursorIndex = min(
-      actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), builderLength
+      actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength
     )
     for anchor in walkedAnchors {
       length += anchor.spanningLength
