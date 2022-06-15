@@ -201,7 +201,7 @@ class InputState {
       let selectedReadings = readings[literalMarkedRange]
       let joined = selectedReadings.joined(separator: "-")
       let exist = mgrLangModel.checkIfUserPhraseExist(
-        userPhrase: text, mode: ctlInputMethod.currentKeyHandler.inputMode, key: joined
+        userPhrase: text, mode: IME.currentInputMode, key: joined
       )
       if exist {
         deleteTargetExists = exist
@@ -292,7 +292,7 @@ class InputState {
       let selectedReadings = readings[literalMarkedRange]
       let joined = selectedReadings.joined(separator: "-")
       return mgrLangModel.checkIfUserPhraseExist(
-        userPhrase: text, mode: ctlInputMethod.currentKeyHandler.inputMode, key: joined
+        userPhrase: text, mode: IME.currentInputMode, key: joined
       )
     }
 

@@ -26,12 +26,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
 
-public enum InputMode: String {
-  case imeModeCHS = "org.atelierInmu.inputmethod.vChewing.IMECHS"
-  case imeModeCHT = "org.atelierInmu.inputmethod.vChewing.IMECHT"
-  case imeModeNULL = ""
-}
-
 // MARK: - Delegate.
 
 protocol KeyHandlerDelegate {
@@ -50,7 +44,6 @@ class KeyHandler {
   let kEpsilon: Double = 0.000001
   let kMaxComposingBufferNeedsToWalkSize: Int = 10
   var _composer: Tekkon.Composer = .init()
-  var _inputMode: String = ""
   var _languageModel: vChewing.LMInstantiator = .init()
   var _userOverrideModel: vChewing.LMUserOverride = .init()
   var _builder: Megrez.BlockReadingBuilder
@@ -58,46 +51,31 @@ class KeyHandler {
 
   var delegate: KeyHandlerDelegate?
 
-  var inputMode: InputMode {
-    get {
-      switch _inputMode {
-        case "org.atelierInmu.inputmethod.vChewing.IMECHS":
-          return InputMode.imeModeCHS
-        case "org.atelierInmu.inputmethod.vChewing.IMECHT":
-          return InputMode.imeModeCHT
-        default:
-          return InputMode.imeModeNULL
-      }
-    }
-    set {
+  var inputMode: InputMode = IME.currentInputMode {
+    willSet {
+      // 將新的簡繁輸入模式提報給 ctlInputMethod:
+      IME.currentInputMode = newValue
+      mgrPrefs.mostRecentInputMode = IME.currentInputMode.rawValue
+
       let isCHS: Bool = (newValue == InputMode.imeModeCHS)
+      // Reinitiate language models if necessary
+      _languageModel = isCHS ? mgrLangModel.lmCHS : mgrLangModel.lmCHT
+      _userOverrideModel = isCHS ? mgrLangModel.uomCHS : mgrLangModel.uomCHT
 
-      // 緊接著將新的簡繁輸入模式提報給 ctlInputMethod:
-      ctlInputMethod.currentInputMode = isCHS ? InputMode.imeModeCHS.rawValue : InputMode.imeModeCHT.rawValue
-      mgrPrefs.mostRecentInputMode = ctlInputMethod.currentInputMode
+      // Synchronize the sub-languageModel state settings to the new LM.
+      syncBaseLMPrefs()
 
-      // 拿當前的 _inputMode 與 ctlInputMethod 的提報結果對比，不同的話則套用新設定：
-      if _inputMode != ctlInputMethod.currentInputMode {
-        // Reinitiate language models if necessary
-        _languageModel = isCHS ? mgrLangModel.lmCHS : mgrLangModel.lmCHT
-        _userOverrideModel = isCHS ? mgrLangModel.uomCHS : mgrLangModel.uomCHT
-
-        // Synchronize the sub-languageModel state settings to the new LM.
-        syncBaseLMPrefs()
-
-        // Create new grid builder and clear the composer.
-        createNewBuilder()
-        _composer.clear()
-      }
-      // 直接寫到衛星模組內，省得類型轉換
-      _inputMode = ctlInputMethod.currentInputMode
+      // Create new grid builder and clear the composer.
+      createNewBuilder()
+      _composer.clear()
     }
   }
 
   public init() {
     _builder = Megrez.BlockReadingBuilder(lm: _languageModel, separator: "-")
     ensureParser()
-    inputMode = InputMode(rawValue: ctlInputMethod.currentInputMode) ?? InputMode.imeModeNULL
+    // 下面這句必須用 defer，否則不會觸發其 willSet 部分的內容。
+    defer { inputMode = IME.currentInputMode }
   }
 
   func clear() {

@@ -28,9 +28,20 @@ import Cocoa
 // The namespace of this input method.
 public enum vChewing {}
 
+// The type of input modes.
+public enum InputMode: String {
+  case imeModeCHS = "org.atelierInmu.inputmethod.vChewing.IMECHS"
+  case imeModeCHT = "org.atelierInmu.inputmethod.vChewing.IMECHT"
+  case imeModeNULL = ""
+}
+
 public enum IME {
   static let arrSupportedLocales = ["en", "zh-Hant", "zh-Hans", "ja"]
   static let dlgOpenPath = NSOpenPanel()
+
+  // MARK: - 輸入法的當前的簡繁體中文模式是？
+
+  static var currentInputMode: InputMode = .init(rawValue: mgrPrefs.mostRecentInputMode) ?? .imeModeNULL
 
   // MARK: - 開關判定當前應用究竟是？
 
@@ -40,10 +51,10 @@ public enum IME {
 
   static func getInputMode(isReversed: Bool = false) -> InputMode {
     if isReversed {
-      return (ctlInputMethod.currentKeyHandler.inputMode == InputMode.imeModeCHT)
+      return (IME.currentInputMode == InputMode.imeModeCHT)
         ? InputMode.imeModeCHS : InputMode.imeModeCHT
     } else {
-      return ctlInputMethod.currentKeyHandler.inputMode
+      return IME.currentInputMode
     }
   }
 

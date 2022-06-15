@@ -178,7 +178,7 @@ private class vwrCandidateUniversal: NSView {
             if index == highlightedIndex {
               let colorBlendAmount: CGFloat = IME.isDarkMode() ? 0.25 : 0
               // The background color of the highlightened candidate
-              switch ctlInputMethod.currentKeyHandler.inputMode {
+              switch IME.currentInputMode {
                 case InputMode.imeModeCHS:
                   NSColor.systemRed.blended(
                     withFraction: colorBlendAmount,
@@ -202,7 +202,7 @@ private class vwrCandidateUniversal: NSView {
             } else {
               NSColor.controlBackgroundColor.setFill()
             }
-            switch ctlInputMethod.currentKeyHandler.inputMode {
+            switch IME.currentInputMode {
               case InputMode.imeModeCHS:
                 if #available(macOS 12.0, *) {
                   activeCandidateAttr[.languageIdentifier] = "zh-Hans" as AnyObject
@@ -248,7 +248,7 @@ private class vwrCandidateUniversal: NSView {
             if index == highlightedIndex {
               let colorBlendAmount: CGFloat = IME.isDarkMode() ? 0.25 : 0
               // The background color of the highlightened candidate
-              switch ctlInputMethod.currentKeyHandler.inputMode {
+              switch IME.currentInputMode {
                 case InputMode.imeModeCHS:
                   NSColor.systemRed.blended(
                     withFraction: colorBlendAmount,
@@ -272,7 +272,7 @@ private class vwrCandidateUniversal: NSView {
             } else {
               NSColor.controlBackgroundColor.setFill()
             }
-            switch ctlInputMethod.currentKeyHandler.inputMode {
+            switch IME.currentInputMode {
               case InputMode.imeModeCHS:
                 if #available(macOS 12.0, *) {
                   activeCandidateAttr[.languageIdentifier] = "zh-Hans" as AnyObject

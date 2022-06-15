@@ -42,14 +42,6 @@ class ctlInputMethod: IMKInputController {
   private var keyHandler: KeyHandler = .init()
   private var state: InputState = .Empty()
 
-  // 想讓 KeyHandler 能夠被外界調查狀態與參數的話，就得對 KeyHandler 做常態處理。
-  // 這樣 InputState 可以藉由這個 ctlInputMethod 了解到當前的輸入模式是簡體中文還是繁體中文。
-  // 然而，要是直接對 keyHandler 做常態處理的話，反而會導致 InputSignal 無法協同處理。
-  // 所以才需要「currentKeyHandler」這個假 KeyHandler。
-  // 這個「currentKeyHandler」僅用來讓其他模組知道當前的輸入模式是什麼模式，除此之外別無屌用。
-  static var currentKeyHandler: KeyHandler = .init()
-  @objc static var currentInputMode = mgrPrefs.mostRecentInputMode
-
   // MARK: - Keyboard Layout Specifier
 
   @objc func setKeyLayout() {
@@ -123,7 +115,7 @@ class ctlInputMethod: IMKInputController {
     }
 
     // 讓外界知道目前的簡繁體輸入模式。
-    ctlInputMethod.currentKeyHandler.inputMode = keyHandler.inputMode
+    IME.currentInputMode = keyHandler.inputMode
   }
 
   // MARK: - IMKServerInput protocol methods
