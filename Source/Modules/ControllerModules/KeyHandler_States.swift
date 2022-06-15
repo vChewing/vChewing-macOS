@@ -41,7 +41,7 @@ extension KeyHandler {
     // We must do some Unicode codepoint counting to find the actual cursor location for the client
     // i.e. we need to take UTF-16 into consideration, for which a surrogate pair takes 2 UniChars
     // locations. Since we are using Swift, we use .utf16 as the equivalent of NSString.length().
-    for walkedNode in _walkedNodes {
+    for walkedNode in walkedAnchors {
       if let theNode = walkedNode.node {
         let strNodeValue = theNode.currentKeyValue.value
         composingBuffer += strNodeValue
@@ -78,14 +78,14 @@ extension KeyHandler {
               // Example in McBopomofo: Typing 王建民 (3 readings) gets a tree emoji.
               // Example in vChewing: Typing 義麵 (2 readings) gets a pasta emoji.
               switch builderCursorIndex {
-                case _builder.readings.count...:
-                  tooltipParameterRef[0] = _builder.readings[_builder.readings.count - 1]
+                case compositor.readings.count...:
+                  tooltipParameterRef[0] = compositor.readings[compositor.readings.count - 1]
                 case 0:
-                  tooltipParameterRef[1] = _builder.readings[builderCursorIndex]
+                  tooltipParameterRef[1] = compositor.readings[builderCursorIndex]
                 default:
                   do {
-                    tooltipParameterRef[0] = _builder.readings[builderCursorIndex - 1]
-                    tooltipParameterRef[1] = _builder.readings[builderCursorIndex]
+                    tooltipParameterRef[0] = compositor.readings[builderCursorIndex - 1]
+                    tooltipParameterRef[1] = compositor.readings[builderCursorIndex]
                   }
               }
             }
@@ -109,7 +109,7 @@ extension KeyHandler {
     }
 
     let head = String(utf16CodeUnits: arrHead, count: arrHead.count)
-    let reading = _composer.getInlineCompositionForIMK(isHanyuPinyin: mgrPrefs.showHanyuPinyinInCompositionBuffer)
+    let reading = composer.getInlineCompositionForIMK(isHanyuPinyin: mgrPrefs.showHanyuPinyinInCompositionBuffer)
     let tail = String(utf16CodeUnits: arrTail, count: arrTail.count)
     let composedText = head + reading + tail
     let cursorIndex = composedStringCursorIndex + reading.utf16.count
@@ -259,14 +259,14 @@ extension KeyHandler {
       return false
     }
 
-    if _composer.isEmpty {
+    if composer.isEmpty {
       insertReadingToBuilderAtCursor(reading: customPunctuation)
       let poppedText = popOverflowComposingTextAndWalk
       let inputting = buildInputtingState
       inputting.poppedText = poppedText
       stateCallback(inputting)
 
-      if mgrPrefs.useSCPCTypingMode, _composer.isEmpty {
+      if mgrPrefs.useSCPCTypingMode, composer.isEmpty {
         let candidateState = buildCandidate(
           state: inputting,
           isTypingVertical: isTypingVertical
@@ -345,7 +345,7 @@ extension KeyHandler {
 
     var composed = ""
 
-    for theAnchor in _walkedNodes {
+    for theAnchor in walkedAnchors {
       if let node = theAnchor.node {
         var key = node.currentKeyValue.key
         if mgrPrefs.inlineDumpPinyinInLieuOfZhuyin {
@@ -382,9 +382,9 @@ extension KeyHandler {
   ) -> Bool {
     guard state is InputState.Inputting else { return false }
 
-    if _composer.hasToneMarker(withNothingElse: true) {
-      _composer.clear()
-    } else if _composer.isEmpty {
+    if composer.hasToneMarker(withNothingElse: true) {
+      composer.clear()
+    } else if composer.isEmpty {
       if builderCursorIndex >= 0 {
         deleteBuilderReadingInFrontOfCursor()
         walk()
@@ -395,10 +395,10 @@ extension KeyHandler {
         return true
       }
     } else {
-      _composer.doBackSpace()
+      composer.doBackSpace()
     }
 
-    if _composer.isEmpty, builderLength == 0 {
+    if composer.isEmpty, builderLength == 0 {
       stateCallback(InputState.EmptyIgnoringPreviousState())
     } else {
       stateCallback(buildInputtingState)
@@ -415,7 +415,7 @@ extension KeyHandler {
   ) -> Bool {
     guard state is InputState.Inputting else { return false }
 
-    if _composer.isEmpty {
+    if composer.isEmpty {
       if builderCursorIndex != builderLength {
         deleteBuilderReadingToTheFrontOfCursor()
         walk()
@@ -448,7 +448,7 @@ extension KeyHandler {
     errorCallback: @escaping () -> Void
   ) -> Bool {
     guard state is InputState.Inputting else { return false }
-    if !_composer.isEmpty {
+    if !composer.isEmpty {
       IME.prtDebugIntel("9B6F908D")
       errorCallback()
     }
@@ -465,7 +465,7 @@ extension KeyHandler {
   ) -> Bool {
     guard state is InputState.Inputting else { return false }
 
-    if !_composer.isEmpty {
+    if !composer.isEmpty {
       IME.prtDebugIntel("ABC44080")
       errorCallback()
       stateCallback(state)
@@ -493,7 +493,7 @@ extension KeyHandler {
   ) -> Bool {
     guard state is InputState.Inputting else { return false }
 
-    if !_composer.isEmpty {
+    if !composer.isEmpty {
       IME.prtDebugIntel("9B69908D")
       errorCallback()
       stateCallback(state)
@@ -532,8 +532,8 @@ extension KeyHandler {
       stateCallback(InputState.EmptyIgnoringPreviousState())
     } else {
       // If reading is not empty, we cancel the reading.
-      if !_composer.isEmpty {
-        _composer.clear()
+      if !composer.isEmpty {
+        composer.clear()
         if builderLength == 0 {
           stateCallback(InputState.EmptyIgnoringPreviousState())
         } else {
@@ -554,7 +554,7 @@ extension KeyHandler {
   ) -> Bool {
     guard let currentState = state as? InputState.Inputting else { return false }
 
-    if !_composer.isEmpty {
+    if !composer.isEmpty {
       IME.prtDebugIntel("B3BA5257")
       errorCallback()
       stateCallback(state)
@@ -603,7 +603,7 @@ extension KeyHandler {
   ) -> Bool {
     guard let currentState = state as? InputState.Inputting else { return false }
 
-    if !_composer.isEmpty {
+    if !composer.isEmpty {
       IME.prtDebugIntel("6ED95318")
       errorCallback()
       stateCallback(state)
@@ -660,7 +660,7 @@ extension KeyHandler {
       return false
     }
 
-    guard _composer.isEmpty else {
+    guard composer.isEmpty else {
       IME.prtDebugIntel("A2DAF7BC")
       errorCallback()
       return true
@@ -679,7 +679,7 @@ extension KeyHandler {
     let cursorIndex = min(
       actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), builderLength
     )
-    for anchor in _walkedNodes {
+    for anchor in walkedAnchors {
       length += anchor.spanningLength
       if length >= cursorIndex {
         currentAnchor = anchor

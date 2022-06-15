@@ -43,11 +43,11 @@ protocol KeyHandlerDelegate {
 class KeyHandler {
   let kEpsilon: Double = 0.000001
   let kMaxComposingBufferNeedsToWalkSize: Int = 10
-  var _composer: Tekkon.Composer = .init()
-  var _languageModel: vChewing.LMInstantiator = .init()
-  var _userOverrideModel: vChewing.LMUserOverride = .init()
-  var _builder: Megrez.BlockReadingBuilder
-  var _walkedNodes: [Megrez.NodeAnchor] = []
+  var composer: Tekkon.Composer = .init()
+  var compositor: Megrez.Compositor
+  var currentLM: vChewing.LMInstantiator = .init()
+  var currentUOM: vChewing.LMUserOverride = .init()
+  var walkedAnchors: [Megrez.NodeAnchor] = []
 
   var delegate: KeyHandlerDelegate?
 
@@ -59,29 +59,29 @@ class KeyHandler {
 
       let isCHS: Bool = (newValue == InputMode.imeModeCHS)
       // Reinitiate language models if necessary
-      _languageModel = isCHS ? mgrLangModel.lmCHS : mgrLangModel.lmCHT
-      _userOverrideModel = isCHS ? mgrLangModel.uomCHS : mgrLangModel.uomCHT
+      currentLM = isCHS ? mgrLangModel.lmCHS : mgrLangModel.lmCHT
+      currentUOM = isCHS ? mgrLangModel.uomCHS : mgrLangModel.uomCHT
 
       // Synchronize the sub-languageModel state settings to the new LM.
       syncBaseLMPrefs()
 
       // Create new grid builder and clear the composer.
       createNewBuilder()
-      _composer.clear()
+      composer.clear()
     }
   }
 
   public init() {
-    _builder = Megrez.BlockReadingBuilder(lm: _languageModel, separator: "-")
+    compositor = Megrez.Compositor(lm: currentLM, separator: "-")
     ensureParser()
     // 下面這句必須用 defer，否則不會觸發其 willSet 部分的內容。
     defer { inputMode = IME.currentInputMode }
   }
 
   func clear() {
-    _composer.clear()
-    _builder.clear()
-    _walkedNodes.removeAll()
+    composer.clear()
+    compositor.clear()
+    walkedAnchors.removeAll()
   }
 
   // MARK: - Functions dealing with Megrez.
@@ -91,11 +91,11 @@ class KeyHandler {
     // of the best possible Mandarin characters given the input syllables,
     // using the Viterbi algorithm implemented in the Megrez library.
     // The walk() traces the grid to the end.
-    _walkedNodes = _builder.walk()
+    walkedAnchors = compositor.walk()
 
     // if DEBUG mode is enabled, a GraphViz file is written to kGraphVizOutputfile.
     if mgrPrefs.isDebugModeEnabled {
-      let result = _builder.grid.dumpDOT
+      let result = compositor.grid.dumpDOT
       do {
         try result.write(
           toFile: "/private/var/tmp/vChewing-visualization.dot",
@@ -117,13 +117,13 @@ class KeyHandler {
     // (i.e. popped out.)
 
     var poppedText = ""
-    if _builder.grid.width > mgrPrefs.composingBufferSize {
-      if !_walkedNodes.isEmpty {
-        let anchor: Megrez.NodeAnchor = _walkedNodes[0]
+    if compositor.grid.width > mgrPrefs.composingBufferSize {
+      if !walkedAnchors.isEmpty {
+        let anchor: Megrez.NodeAnchor = walkedAnchors[0]
         if let theNode = anchor.node {
           poppedText = theNode.currentKeyValue.value
         }
-        _builder.removeHeadReadings(count: anchor.spanningLength)
+        compositor.removeHeadReadings(count: anchor.spanningLength)
       }
     }
     walk()
@@ -132,17 +132,17 @@ class KeyHandler {
 
   func buildAssociatePhraseArray(withKey key: String) -> [String] {
     var arrResult: [String] = []
-    if _languageModel.hasAssociatedPhrasesForKey(key) {
-      arrResult.append(contentsOf: _languageModel.associatedPhrasesForKey(key))
+    if currentLM.hasAssociatedPhrasesForKey(key) {
+      arrResult.append(contentsOf: currentLM.associatedPhrasesForKey(key))
     }
     return arrResult
   }
 
   func fixNode(value: String, respectCursorPushing: Bool = true) {
     let cursorIndex = min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), builderLength)
-    _builder.grid.fixNodeSelectedCandidate(location: cursorIndex, value: value)
+    compositor.grid.fixNodeSelectedCandidate(location: cursorIndex, value: value)
     //  // 因半衰模組失能，故禁用之。
-    // let selectedNode: Megrez.NodeAnchor = _builder.grid.fixNodeSelectedCandidate(
+    // let selectedNode: Megrez.NodeAnchor = compositor.grid.fixNodeSelectedCandidate(
     //  location: cursorIndex, value: value
     // )
     //  // 不要針對逐字選字模式啟用臨時半衰記憶模型。
@@ -166,8 +166,8 @@ class KeyHandler {
     //  }
     //  if addToUserOverrideModel {
     //    IME.prtDebugIntel("UOM: Start Observation.")
-    //    _userOverrideModel.observe(
-    //      walkedNodes: _walkedNodes, cursorIndex: cursorIndex, candidate: value,
+    //    currentUOM.observe(
+    //      walkedNodes: walkedAnchors, cursorIndex: cursorIndex, candidate: value,
     //      timestamp: NSDate().timeIntervalSince1970
     //    )
     //  }
@@ -176,7 +176,7 @@ class KeyHandler {
 
     if mgrPrefs.moveCursorAfterSelectingCandidate, respectCursorPushing {
       var nextPosition = 0
-      for node in _walkedNodes {
+      for node in walkedAnchors {
         if nextPosition >= cursorIndex { break }
         nextPosition += node.spanningLength
       }
@@ -215,15 +215,15 @@ class KeyHandler {
     let overrideValue =
       mgrPrefs.useSCPCTypingMode
       ? ""
-      : _userOverrideModel.suggest(
-        walkedNodes: _walkedNodes, cursorIndex: builderCursorIndex,
+      : currentUOM.suggest(
+        walkedNodes: walkedAnchors, cursorIndex: builderCursorIndex,
         timestamp: NSDate().timeIntervalSince1970
       )
 
     if !overrideValue.isEmpty {
       IME.prtDebugIntel(
         "UOM: Suggestion retrieved, overriding the node score of the selected candidate.")
-      _builder.grid.overrideNodeScoreForSelectedCandidate(
+      compositor.grid.overrideNodeScoreForSelectedCandidate(
         location: min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), builderLength),
         value: overrideValue,
         overridingScore: findHighestScore(nodes: rawNodes, epsilon: kEpsilon)
@@ -251,89 +251,89 @@ class KeyHandler {
   func ensureParser() {
     switch mgrPrefs.mandarinParser {
       case MandarinParser.ofStandard.rawValue:
-        _composer.ensureParser(arrange: .ofDachen)
+        composer.ensureParser(arrange: .ofDachen)
       case MandarinParser.ofDachen26.rawValue:
-        _composer.ensureParser(arrange: .ofDachen26)
+        composer.ensureParser(arrange: .ofDachen26)
       case MandarinParser.ofETen.rawValue:
-        _composer.ensureParser(arrange: .ofETen)
+        composer.ensureParser(arrange: .ofETen)
       case MandarinParser.ofHsu.rawValue:
-        _composer.ensureParser(arrange: .ofHsu)
+        composer.ensureParser(arrange: .ofHsu)
       case MandarinParser.ofETen26.rawValue:
-        _composer.ensureParser(arrange: .ofETen26)
+        composer.ensureParser(arrange: .ofETen26)
       case MandarinParser.ofIBM.rawValue:
-        _composer.ensureParser(arrange: .ofIBM)
+        composer.ensureParser(arrange: .ofIBM)
       case MandarinParser.ofMiTAC.rawValue:
-        _composer.ensureParser(arrange: .ofMiTAC)
+        composer.ensureParser(arrange: .ofMiTAC)
       case MandarinParser.ofFakeSeigyou.rawValue:
-        _composer.ensureParser(arrange: .ofFakeSeigyou)
+        composer.ensureParser(arrange: .ofFakeSeigyou)
       case MandarinParser.ofHanyuPinyin.rawValue:
-        _composer.ensureParser(arrange: .ofHanyuPinyin)
+        composer.ensureParser(arrange: .ofHanyuPinyin)
       case MandarinParser.ofSecondaryPinyin.rawValue:
-        _composer.ensureParser(arrange: .ofSecondaryPinyin)
+        composer.ensureParser(arrange: .ofSecondaryPinyin)
       case MandarinParser.ofYalePinyin.rawValue:
-        _composer.ensureParser(arrange: .ofYalePinyin)
+        composer.ensureParser(arrange: .ofYalePinyin)
       case MandarinParser.ofHualuoPinyin.rawValue:
-        _composer.ensureParser(arrange: .ofHualuoPinyin)
+        composer.ensureParser(arrange: .ofHualuoPinyin)
       case MandarinParser.ofUniversalPinyin.rawValue:
-        _composer.ensureParser(arrange: .ofUniversalPinyin)
+        composer.ensureParser(arrange: .ofUniversalPinyin)
       default:
-        _composer.ensureParser(arrange: .ofDachen)
+        composer.ensureParser(arrange: .ofDachen)
         mgrPrefs.mandarinParser = MandarinParser.ofStandard.rawValue
     }
-    _composer.clear()
+    composer.clear()
   }
 
   // MARK: - Extracted methods and functions (Megrez).
 
-  var isBuilderEmpty: Bool { _builder.grid.width == 0 }
+  var isBuilderEmpty: Bool { compositor.grid.width == 0 }
 
   var rawNodes: [Megrez.NodeAnchor] {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
     mgrPrefs.useRearCursorMode
-      ? _builder.grid.nodesBeginningAt(location: actualCandidateCursorIndex)
-      : _builder.grid.nodesEndingAt(location: actualCandidateCursorIndex)
+      ? compositor.grid.nodesBeginningAt(location: actualCandidateCursorIndex)
+      : compositor.grid.nodesEndingAt(location: actualCandidateCursorIndex)
   }
 
   func syncBaseLMPrefs() {
-    _languageModel.isPhraseReplacementEnabled = mgrPrefs.phraseReplacementEnabled
-    _languageModel.isCNSEnabled = mgrPrefs.cns11643Enabled
-    _languageModel.isSymbolEnabled = mgrPrefs.symbolInputEnabled
+    currentLM.isPhraseReplacementEnabled = mgrPrefs.phraseReplacementEnabled
+    currentLM.isCNSEnabled = mgrPrefs.cns11643Enabled
+    currentLM.isSymbolEnabled = mgrPrefs.symbolInputEnabled
   }
 
   func createNewBuilder() {
     // Each Mandarin syllable is separated by a hyphen.
-    _builder = Megrez.BlockReadingBuilder(lm: _languageModel, separator: "-")
+    compositor = Megrez.Compositor(lm: currentLM, separator: "-")
   }
 
-  var currentReadings: [String] { _builder.readings }
+  var currentReadings: [String] { compositor.readings }
 
   func ifLangModelHasUnigrams(forKey reading: String) -> Bool {
-    _languageModel.hasUnigramsFor(key: reading)
+    currentLM.hasUnigramsFor(key: reading)
   }
 
   func insertReadingToBuilderAtCursor(reading: String) {
-    _builder.insertReadingAtCursor(reading: reading)
+    compositor.insertReadingAtCursor(reading: reading)
   }
 
   var builderCursorIndex: Int {
-    get { _builder.cursorIndex }
-    set { _builder.cursorIndex = newValue }
+    get { compositor.cursorIndex }
+    set { compositor.cursorIndex = newValue }
   }
 
   var builderLength: Int {
-    _builder.length
+    compositor.length
   }
 
   func deleteBuilderReadingInFrontOfCursor() {
-    _builder.deleteReadingAtTheRearOfCursor()
+    compositor.deleteReadingAtTheRearOfCursor()
   }
 
   func deleteBuilderReadingToTheFrontOfCursor() {
-    _builder.deleteReadingToTheFrontOfCursor()
+    compositor.deleteReadingToTheFrontOfCursor()
   }
 
   var keyLengthAtIndexZero: Int {
-    _walkedNodes[0].node?.currentKeyValue.value.count ?? 0
+    walkedAnchors[0].node?.currentKeyValue.value.count ?? 0
   }
 }
