@@ -39,10 +39,6 @@ class ctlInputMethod: IMKInputController {
 
   // MARK: -
 
-  private var currentClient: IMKTextInput {
-    client()
-  }
-
   private var keyHandler: KeyHandler = .init()
   private var state: InputState = .Empty()
 
@@ -57,7 +53,7 @@ class ctlInputMethod: IMKInputController {
   // MARK: - Keyboard Layout Specifier
 
   @objc func setKeyLayout() {
-    currentClient.overrideKeyboard(withKeyboardNamed: mgrPrefs.basicKeyboardLayout)
+    client().overrideKeyboard(withKeyboardNamed: mgrPrefs.basicKeyboardLayout)
   }
 
   // MARK: - IMKInputController methods
@@ -86,7 +82,7 @@ class ctlInputMethod: IMKInputController {
     keyHandler.clear()
     keyHandler.ensureParser()
 
-    if currentClient.bundleIdentifier() != Bundle.main.bundleIdentifier {
+    if client().bundleIdentifier() != Bundle.main.bundleIdentifier {
       // Override the keyboard layout to the basic one.
       setKeyLayout()
       handle(state: .Empty())
@@ -119,7 +115,7 @@ class ctlInputMethod: IMKInputController {
       UserDefaults.standard.synchronize()
       keyHandler.clear()
       keyHandler.inputMode = newInputMode
-      if currentClient.bundleIdentifier() != Bundle.main.bundleIdentifier {
+      if client().bundleIdentifier() != Bundle.main.bundleIdentifier {
         // Remember to override the keyboard layout again -- treat this as an activate event.
         setKeyLayout()
         handle(state: .Empty())
@@ -153,14 +149,14 @@ class ctlInputMethod: IMKInputController {
 
     var textFrame = NSRect.zero
 
-    let attributes: [AnyHashable: Any]? = currentClient.attributes(
+    let attributes: [AnyHashable: Any]? = client().attributes(
       forCharacterIndex: 0, lineHeightRectangle: &textFrame
     )
 
     let isTypingVertical =
       (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
 
-    if currentClient.bundleIdentifier()
+    if client().bundleIdentifier()
       == "org.atelierInmu.vChewing.vChewingPhraseEditor"
     {
       IME.areWeUsingOurOwnPhraseEditor = true
@@ -267,7 +263,7 @@ extension ctlInputMethod {
       }
     }
 
-    currentClient.insertText(
+    client().insertText(
       bufferOutput, replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
   }
@@ -282,7 +278,7 @@ extension ctlInputMethod {
     if let previous = previous as? InputState.NotEmpty {
       commit(text: previous.composingBuffer)
     }
-    currentClient.setMarkedText(
+    client().setMarkedText(
       "", selectionRange: NSRange(location: 0, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
@@ -298,7 +294,7 @@ extension ctlInputMethod {
     {
       commit(text: previous.composingBuffer)
     }
-    currentClient.setMarkedText(
+    client().setMarkedText(
       "", selectionRange: NSRange(location: 0, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
@@ -312,7 +308,7 @@ extension ctlInputMethod {
     ctlCandidateCurrent.visible = false
     hideTooltip()
 
-    currentClient.setMarkedText(
+    client().setMarkedText(
       "", selectionRange: NSRange(location: 0, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
@@ -327,7 +323,7 @@ extension ctlInputMethod {
     if !poppedText.isEmpty {
       commit(text: poppedText)
     }
-    currentClient.setMarkedText(
+    client().setMarkedText(
       "", selectionRange: NSRange(location: 0, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
@@ -345,7 +341,7 @@ extension ctlInputMethod {
 
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put this composing buffer
-    currentClient.setMarkedText(
+    client().setMarkedText(
       state.attributedString, selectionRange: NSRange(location: state.cursorIndex, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
@@ -363,7 +359,7 @@ extension ctlInputMethod {
 
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put this composing buffer
-    currentClient.setMarkedText(
+    client().setMarkedText(
       state.attributedString, selectionRange: NSRange(location: state.cursorIndex, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
@@ -384,7 +380,7 @@ extension ctlInputMethod {
 
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put this composing buffer
-    currentClient.setMarkedText(
+    client().setMarkedText(
       state.attributedString, selectionRange: NSRange(location: state.cursorIndex, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
@@ -397,7 +393,7 @@ extension ctlInputMethod {
 
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put this composing buffer
-    currentClient.setMarkedText(
+    client().setMarkedText(
       state.attributedString, selectionRange: NSRange(location: state.cursorIndex, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
@@ -408,7 +404,7 @@ extension ctlInputMethod {
     _ = previous  // Stop clang-format from ruining the parameters of this function.
     hideTooltip()
 
-    currentClient.setMarkedText(
+    client().setMarkedText(
       "", selectionRange: NSRange(location: 0, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
@@ -520,7 +516,7 @@ extension ctlInputMethod {
     }
 
     while lineHeightRect.origin.x == 0, lineHeightRect.origin.y == 0, cursor >= 0 {
-      currentClient.attributes(
+      client().attributes(
         forCharacterIndex: cursor, lineHeightRectangle: &lineHeightRect
       )
       cursor -= 1
@@ -548,7 +544,7 @@ extension ctlInputMethod {
       cursor -= 1
     }
     while lineHeightRect.origin.x == 0, lineHeightRect.origin.y == 0, cursor >= 0 {
-      currentClient.attributes(
+      client().attributes(
         forCharacterIndex: cursor, lineHeightRectangle: &lineHeightRect
       )
       cursor -= 1
