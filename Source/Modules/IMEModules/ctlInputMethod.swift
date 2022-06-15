@@ -231,18 +231,13 @@ extension ctlInputMethod {
   private func commit(text: String) {
     func kanjiConversionIfRequired(_ text: String) -> String {
       if keyHandler.inputMode == InputMode.imeModeCHT {
-        if !mgrPrefs.chineseConversionEnabled, mgrPrefs.shiftJISShinjitaiOutputEnabled {
-          return vChewingKanjiConverter.cnvTradToJIS(text)
+        switch (mgrPrefs.chineseConversionEnabled, mgrPrefs.shiftJISShinjitaiOutputEnabled) {
+          case (false, true): return vChewingKanjiConverter.cnvTradToJIS(text)
+          case (true, false): return vChewingKanjiConverter.cnvTradToKangXi(text)
+          // 本來這兩個開關不該同時開啟的，但萬一被開啟了的話就這樣處理：
+          case (true, true): return vChewingKanjiConverter.cnvTradToJIS(text)
+          case (false, false): return text
         }
-        if mgrPrefs.chineseConversionEnabled, !mgrPrefs.shiftJISShinjitaiOutputEnabled {
-          return vChewingKanjiConverter.cnvTradToKangXi(text)
-        }
-        // 本來這兩個開關不該同時開啟的，但萬一被開啟了的話就這樣處理：
-        if mgrPrefs.chineseConversionEnabled, mgrPrefs.shiftJISShinjitaiOutputEnabled {
-          return vChewingKanjiConverter.cnvTradToJIS(text)
-        }
-        // if (!mgrPrefs.chineseConversionEnabled && !mgrPrefs.shiftJISShinjitaiOutputEnabled) || (keyHandler.inputMode != InputMode.imeModeCHT);
-        return text
       }
       return text
     }
