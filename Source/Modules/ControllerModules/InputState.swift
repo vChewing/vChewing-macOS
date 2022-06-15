@@ -28,39 +28,40 @@ import Cocoa
 
 // 註：所有 InputState 型別均不適合使用 Struct，因為 Struct 無法相互繼承派生。
 
-/// Represents the states for the input method controller.
+/// 此型別用以呈現輸入法控制器（ctlInputMethod）的各種狀態。
 ///
-/// An input method is actually a finite state machine. It receives the inputs
-/// from hardware like keyboard and mouse, changes its state, updates user
-/// interface by the state, and finally produces the text output and then them
-/// to the client apps. It should be a one-way data flow, and the user interface
-/// and text output should follow unconditionally one single data source.
+/// 從實際角度來看，輸入法屬於有限態械（Finite State Machine）。其藉由滑鼠/鍵盤
+/// 等輸入裝置接收輸入訊號，據此切換至對應的狀態，再根據狀態更新使用者介面內容，
+/// 最終生成文字輸出、遞交給接收文字輸入行為的客體應用。此乃單向資訊流序，且使用
+/// 者介面內容與文字輸出均無條件地遵循某一個指定的資料來源。
 ///
-/// The InputState class is for representing what the input controller is doing,
-/// and the place to store the variables that could be used. For example, the
-/// array for the candidate list is useful only when the user is choosing a
-/// candidate, and the array should not exist when the input controller is in
-/// another state.
+/// InputState 型別用以呈現輸入法控制器正在做的事情，且分狀態儲存各種狀態限定的
+/// 常數與變數。對輸入法而言，使用狀態模式（而非策略模式）來做這種常數變數隔離，
+/// 可能會讓新手覺得會有些牛鼎烹雞，卻實際上變相減少了在程式維護方面的管理難度、
+/// 不需要再在某個狀態下為了該狀態不需要的變數與常數的處置策略而煩惱。
 ///
-/// They are immutable objects. When the state changes, the controller should
-/// create a new state object to replace the current state instead of modifying
-/// the existing one.
+/// 對 InputState 型別下的諸多狀態的切換，應以生成新副本來取代舊有副本的形式來完
+/// 成。唯一例外是 InputState.Marking、擁有可以將自身轉變為 InputState.Inputting
+/// 的成員函式，但也只是生成副本、來交給輸入法控制器來處理而已。
 ///
-/// The input controller has following possible states:
+/// 輸入法控制器持下述狀態：
 ///
-/// - Deactivated: The user is not using the input method yet.
-/// - Empty: The user has switched to this input method but inputted nothing yet,
-///   or, he or she has committed text into the client apps and starts a new
-///   input phase.
-/// - Committing: The input controller is sending text to the client apps.
-/// - Inputting: The user has inputted something and the input buffer is
-///   visible.
-/// - Marking: The user is creating a area in the input buffer and about to
-///   create a new user phrase.
-/// - Choosing Candidate: The candidate window is open to let the user to choose
-///   one among the candidates.
+/// - .Deactivated: 使用者沒在使用輸入法。
+/// - .AssociatedPhrases: 逐字選字模式內的聯想詞輸入狀態。因為逐字選字模式不需要在
+///   組字區內存入任何東西，所以該狀態不受 .NotEmpty 的管轄。
+/// - .Empty: 使用者剛剛切換至該輸入法、卻還沒有任何輸入行為。抑或是剛剛敲字遞交給
+///   客體應用、準備新的輸入行為。
+/// - .EmptyIgnorePreviousState: 與 Empty 類似，但會扔掉上一個狀態的內容、不將這些
+///   內容遞交給客體應用。
+/// - .Committing: 該狀態會承載要遞交出去的內容，讓輸入法控制器處理時代為遞交。
+/// - .NotEmpty: 非空狀態，是一種狀態大類、用以派生且代表下述諸狀態。
+/// - .Inputting: 使用者輸入了內容。此時會出現組字區（Compositor）。
+/// - .Marking: 使用者在組字區內標記某段範圍，可以決定是添入新詞、還是將這個範圍的
+///   詞音組合放入語彙濾除清單。
+/// - .ChoosingCandidate: 叫出選字窗、允許使用者選字。
+/// - .SymbolTable: 波浪鍵符號選單專用的狀態，有自身的特殊處理。
 class InputState {
-  /// Represents that the input controller is deactivated.
+  /// .Deactivated: 使用者沒在使用輸入法。
   class Deactivated: InputState {
     var description: String {
       "<InputState.Deactivated>"
@@ -69,7 +70,8 @@ class InputState {
 
   // MARK: -
 
-  /// Represents that the composing buffer is empty.
+  /// .Empty: 使用者剛剛切換至該輸入法、卻還沒有任何輸入行為。
+  /// 抑或是剛剛敲字遞交給客體應用、準備新的輸入行為。
   class Empty: InputState {
     var composingBuffer: String {
       ""
@@ -82,7 +84,8 @@ class InputState {
 
   // MARK: -
 
-  /// Represents that the composing buffer is empty.
+  /// .EmptyIgnorePreviousState: 與 Empty 類似，
+  /// 但會扔掉上一個狀態的內容、不將這些內容遞交給客體應用。
   class EmptyIgnoringPreviousState: Empty {
     override var description: String {
       "<InputState.EmptyIgnoringPreviousState>"
@@ -91,7 +94,7 @@ class InputState {
 
   // MARK: -
 
-  /// Represents that the input controller is committing text into client app.
+  /// .Committing: 該狀態會承載要遞交出去的內容，讓輸入法控制器處理時代為遞交。
   class Committing: InputState {
     private(set) var poppedText: String = ""
 
@@ -107,7 +110,30 @@ class InputState {
 
   // MARK: -
 
-  /// Represents that the composing buffer is not empty.
+  /// .AssociatedPhrases: 逐字選字模式內的聯想詞輸入狀態。
+  /// 因為逐字選字模式不需要在組字區內存入任何東西，所以該狀態不受 .NotEmpty 的管轄。
+  class AssociatedPhrases: InputState {
+    private(set) var candidates: [String] = []
+    private(set) var isTypingVertical: Bool = false
+    init(candidates: [String], isTypingVertical: Bool) {
+      self.candidates = candidates
+      self.isTypingVertical = isTypingVertical
+      super.init()
+    }
+
+    var description: String {
+      "<InputState.AssociatedPhrases, candidates:\(candidates), isTypingVertical:\(isTypingVertical)>"
+    }
+  }
+
+  // MARK: -
+
+  /// .NotEmpty: 非空狀態，是一種狀態大類、用以派生且代表下述諸狀態。
+  /// - .Inputting: 使用者輸入了內容。此時會出現組字區（Compositor）。
+  /// - .Marking: 使用者在組字區內標記某段範圍，可以決定是添入新詞、
+  ///   還是將這個範圍的詞音組合放入語彙濾除清單。
+  /// - .ChoosingCandidate: 叫出選字窗、允許使用者選字。
+  /// - .SymbolTable: 波浪鍵符號選單專用的狀態，有自身的特殊處理。
   class NotEmpty: InputState {
     private(set) var composingBuffer: String
     private(set) var cursorIndex: Int = 0 { didSet { cursorIndex = max(cursorIndex, 0) } }
@@ -136,7 +162,7 @@ class InputState {
 
   // MARK: -
 
-  /// Represents that the user is inputting text.
+  /// .Inputting: 使用者輸入了內容。此時會出現組字區（Compositor）。
   class Inputting: NotEmpty {
     var poppedText: String = ""
     var tooltip: String = ""
@@ -152,7 +178,8 @@ class InputState {
 
   // MARK: -
 
-  /// Represents that the user is marking a range in the composing buffer.
+  /// .Marking: 使用者在組字區內標記某段範圍，可以決定是添入新詞、
+  /// 還是將這個範圍的詞音組合放入語彙濾除清單。
   class Marking: NotEmpty {
     private var allowedMarkRange: ClosedRange<Int> = mgrPrefs.minCandidateLength...mgrPrefs.maxCandidateLength
     private(set) var markerIndex: Int = 0 { didSet { markerIndex = max(markerIndex, 0) } }
@@ -316,7 +343,7 @@ class InputState {
 
   // MARK: -
 
-  /// Represents that the user is choosing in a candidates list.
+  /// .ChoosingCandidate: 叫出選字窗、允許使用者選字。
   class ChoosingCandidate: NotEmpty {
     private(set) var candidates: [String]
     private(set) var isTypingVertical: Bool
@@ -334,22 +361,7 @@ class InputState {
 
   // MARK: -
 
-  /// Represents that the user is choosing in a candidates list
-  /// in the associated phrases mode.
-  class AssociatedPhrases: InputState {
-    private(set) var candidates: [String] = []
-    private(set) var isTypingVertical: Bool = false
-    init(candidates: [String], isTypingVertical: Bool) {
-      self.candidates = candidates
-      self.isTypingVertical = isTypingVertical
-      super.init()
-    }
-
-    var description: String {
-      "<InputState.AssociatedPhrases, candidates:\(candidates), isTypingVertical:\(isTypingVertical)>"
-    }
-  }
-
+  /// .SymbolTable: 波浪鍵符號選單專用的狀態，有自身的特殊處理。
   class SymbolTable: ChoosingCandidate {
     var node: SymbolNode
 
