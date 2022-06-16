@@ -642,11 +642,11 @@ extension KeyHandler {
     return true
   }
 
-  // MARK: - 處理 Tab 按鍵行為
+  // MARK: - 處理上下文候選字詞輪替（Tab 按鍵，或者 Shift+Space）
 
-  func handleTab(
+  func handleInlineCandidateRotation(
     state: InputState,
-    isShiftHold: Bool,
+    reverseModifier: Bool,
     stateCallback: @escaping (InputState) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
@@ -709,7 +709,7 @@ extension KeyHandler {
       if candidates[0] == currentValue {
         // If the first candidate is the value of the
         // current node, we use next one.
-        if isShiftHold {
+        if reverseModifier {
           currentIndex = candidates.count - 1
         } else {
           currentIndex = 1
@@ -718,7 +718,7 @@ extension KeyHandler {
     } else {
       for candidate in candidates {
         if candidate == currentValue {
-          if isShiftHold {
+          if reverseModifier {
             if currentIndex == 0 {
               currentIndex = candidates.count - 1
             } else {

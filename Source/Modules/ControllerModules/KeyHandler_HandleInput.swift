@@ -247,7 +247,7 @@ extension KeyHandler {
     {
       if input.isSpace {
         // If the Space key is NOT set to be a selection key
-        if input.isShiftHold || !mgrPrefs.chooseCandidateUsingSpace {
+        if !mgrPrefs.chooseCandidateUsingSpace {
           if compositorCursorIndex >= compositorLength {
             let composingBuffer = currentState.composingBuffer
             if !composingBuffer.isEmpty {
@@ -264,6 +264,11 @@ extension KeyHandler {
             stateCallback(inputting)
           }
           return true
+        } else if input.isShiftHold {  // 臉書等網站會攔截 Tab 鍵，所以用 Shift+CMD+Space 對候選字詞做正向/反向輪替。
+          return handleInlineCandidateRotation(
+            state: state, reverseModifier: input.isCommandHold, stateCallback: stateCallback,
+            errorCallback: errorCallback
+          )
         }
       }
       stateCallback(buildCandidate(state: currentState, isTypingVertical: input.isTypingVertical))
@@ -279,8 +284,8 @@ extension KeyHandler {
     // MARK: Tab
 
     if input.isTab {
-      return handleTab(
-        state: state, isShiftHold: input.isShiftHold, stateCallback: stateCallback, errorCallback: errorCallback
+      return handleInlineCandidateRotation(
+        state: state, reverseModifier: input.isShiftHold, stateCallback: stateCallback, errorCallback: errorCallback
       )
     }
 
