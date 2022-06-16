@@ -114,7 +114,8 @@ class InputState {
 
     init(composingBuffer: String, cursorIndex: Int) {
       self.composingBuffer = composingBuffer
-      self.cursorIndex = cursorIndex
+      super.init()
+      defer { self.cursorIndex = cursorIndex }
     }
 
     var description: String {
@@ -223,12 +224,12 @@ class InputState {
     private(set) var readings: [String]
 
     init(composingBuffer: String, cursorIndex: Int, markerIndex: Int, readings: [String]) {
-      self.markerIndex = markerIndex
       let begin = min(cursorIndex, markerIndex)
       let end = max(cursorIndex, markerIndex)
       markedRange = begin..<end
       self.readings = readings
       super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
+      defer { self.markerIndex = markerIndex }
     }
 
     var attributedString: NSAttributedString {
