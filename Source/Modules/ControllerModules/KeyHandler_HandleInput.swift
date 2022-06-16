@@ -190,6 +190,9 @@ extension KeyHandler {
       // ... get and tweak override model suggestion if possible...
       // dealWithOverrideModelSuggestions()  // 暫時禁用，因為無法使其生效。
 
+      // ... fix nodes if necessary...
+      markNodesFixedIfNecessary()
+
       // ... then update the text.
       composer.clear()
 

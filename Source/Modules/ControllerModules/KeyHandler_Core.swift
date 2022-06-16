@@ -42,7 +42,7 @@ protocol KeyHandlerDelegate {
 
 class KeyHandler {
   let kEpsilon: Double = 0.000001
-  let kMaxComposingBufferNeedsToWalkSize: Int = 10
+  let kMaxComposingBufferNeedsToWalkSize = Int(max(12, ceil(Double(mgrPrefs.composingBufferSize) / 2)))
   var composer: Tekkon.Composer = .init()
   var compositor: Megrez.Compositor
   var currentLM: vChewing.LMInstantiator = .init()
@@ -185,6 +185,23 @@ class KeyHandler {
       if nextPosition <= compositorLength {
         compositorCursorIndex = nextPosition
       }
+    }
+  }
+
+  func markNodesFixedIfNecessary() {
+    let width = compositor.grid.width
+    if width <= kMaxComposingBufferNeedsToWalkSize {
+      return
+    }
+    var index: Int = 0
+    for anchor in walkedAnchors {
+      guard let node = anchor.node else { break }
+      if index >= width - kMaxComposingBufferNeedsToWalkSize { break }
+      if node.score < node.kSelectedCandidateScore {
+        compositor.grid.fixNodeSelectedCandidate(
+          location: index + anchor.spanningLength, value: node.currentKeyValue.value)
+      }
+      index += anchor.spanningLength
     }
   }
 
