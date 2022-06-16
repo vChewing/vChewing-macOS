@@ -34,30 +34,7 @@ extension KeyHandler {
   }
 
   var actualCandidateCursorIndex: Int {
-    var cursorIndex = compositorCursorIndex
-    switch mgrPrefs.useRearCursorMode {
-      case false:
-        do {
-          // macOS built-in Zhuyin style.
-          // (i.e. the cursor is always in front of the phrase.)
-          // No crossing.
-          switch cursorIndex {
-            case 0: cursorIndex = 1
-            default: break
-          }
-        }
-      case true:
-        do {
-          // Microsoft new phonetics style.
-          // (i.e. the cursor is always at the rear of the phrase.)
-          // No crossing.
-          switch cursorIndex {
-            case compositorLength: cursorIndex -= 1
-            default: break
-          }
-        }
-    }
-    return cursorIndex
+    mgrPrefs.useRearCursorMode ? min(compositorCursorIndex, compositorLength - 1) : max(compositorCursorIndex, 1)
   }
 
   // 用於網頁 Ruby 的注音需要按照教科書印刷的方式來顯示輕聲，所以這裡處理一下。
