@@ -25,7 +25,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import Cocoa
-import SwiftUI
 
 // MARK: - § Handle Input with States.
 

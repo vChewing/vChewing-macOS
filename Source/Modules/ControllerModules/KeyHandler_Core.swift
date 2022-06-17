@@ -88,6 +88,10 @@ class KeyHandler {
 
   // MARK: - Functions dealing with Megrez.
 
+  var actualCandidateCursorIndex: Int {
+    mgrPrefs.useRearCursorMode ? min(compositorCursorIndex, compositorLength - 1) : max(compositorCursorIndex, 1)
+  }
+
   func walk() {
     // Retrieve the most likely grid, i.e. a Maximum Likelihood Estimation
     // of the best possible Mandarin characters given the input syllables,
@@ -267,6 +271,10 @@ class KeyHandler {
 
   // MARK: - Extracted methods and functions (Tekkon).
 
+  var currentMandarinParser: String {
+    mgrPrefs.mandarinParserName + "_"
+  }
+
   func ensureParser() {
     switch mgrPrefs.mandarinParser {
       case MandarinParser.ofStandard.rawValue:
@@ -300,6 +308,33 @@ class KeyHandler {
         mgrPrefs.mandarinParser = MandarinParser.ofStandard.rawValue
     }
     composer.clear()
+  }
+
+  /// 用於網頁 Ruby 的注音需要按照教科書印刷的方式來顯示輕聲，所以這裡處理一下。
+  func cnvZhuyinKeyToTextbookReading(target: String, newSeparator: String = "-") -> String {
+    var arrReturn: [String] = []
+    for neta in target.split(separator: "-") {
+      var newString = String(neta)
+      if String(neta.reversed()[0]) == "˙" {
+        newString = String(neta.dropLast())
+        newString.insert("˙", at: newString.startIndex)
+      }
+      arrReturn.append(newString)
+    }
+    return arrReturn.joined(separator: newSeparator)
+  }
+
+  // 用於網頁 Ruby 的拼音的陰平必須顯示，這裡處理一下。
+  func restoreToneOneInZhuyinKey(target: String, newSeparator: String = "-") -> String {
+    var arrReturn: [String] = []
+    for neta in target.split(separator: "-") {
+      var newNeta = String(neta)
+      if !"ˊˇˋ˙".contains(String(neta.reversed()[0])), !neta.contains("_") {
+        newNeta += "1"
+      }
+      arrReturn.append(newNeta)
+    }
+    return arrReturn.joined(separator: newSeparator)
   }
 
   // MARK: - Extracted methods and functions (Megrez).
