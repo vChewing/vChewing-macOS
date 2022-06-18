@@ -118,6 +118,17 @@ class InputState {
       defer { self.cursorIndex = cursorIndex }
     }
 
+    var attributedString: NSAttributedString {
+      let attributedString = NSAttributedString(
+        string: composingBuffer,
+        attributes: [
+          .underlineStyle: NSUnderlineStyle.single.rawValue,
+          .markedClauseSegment: 0,
+        ]
+      )
+      return attributedString
+    }
+
     var description: String {
       "<InputState.NotEmpty, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
     }
@@ -132,17 +143,6 @@ class InputState {
 
     override init(composingBuffer: String, cursorIndex: Int) {
       super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
-    }
-
-    var attributedString: NSAttributedString {
-      let attributedString = NSAttributedString(
-        string: composingBuffer,
-        attributes: [
-          .underlineStyle: NSUnderlineStyle.single.rawValue,
-          .markedClauseSegment: 0,
-        ]
-      )
-      return attributedString
     }
 
     override var description: String {
@@ -232,7 +232,7 @@ class InputState {
       defer { self.markerIndex = markerIndex }
     }
 
-    var attributedString: NSAttributedString {
+    override var attributedString: NSAttributedString {
       let attributedString = NSMutableAttributedString(string: composingBuffer)
       let end = markedRange.upperBound
 
@@ -325,17 +325,6 @@ class InputState {
       self.candidates = candidates
       self.isTypingVertical = isTypingVertical
       super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
-    }
-
-    var attributedString: NSAttributedString {
-      let attributedString = NSAttributedString(
-        string: composingBuffer,
-        attributes: [
-          .underlineStyle: NSUnderlineStyle.single.rawValue,
-          .markedClauseSegment: 0,
-        ]
-      )
-      return attributedString
     }
 
     override var description: String {
