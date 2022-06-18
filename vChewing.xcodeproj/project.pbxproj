@@ -111,7 +111,7 @@
 		D47B92C027972AD100458394 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47B92BF27972AC800458394 /* main.swift */; };
 		D47F7DCE278BFB57002F9DD7 /* ctlPrefWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCD278BFB57002F9DD7 /* ctlPrefWindow.swift */; };
 		D47F7DD0278C0897002F9DD7 /* ctlNonModalAlertWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCF278C0897002F9DD7 /* ctlNonModalAlertWindow.swift */; };
-		D4A13D5A27A59F0B003BE359 /* ctlInputMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A13D5927A59D5C003BE359 /* ctlInputMethod.swift */; };
+		D4A13D5A27A59F0B003BE359 /* ctlInputMethod_Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A13D5927A59D5C003BE359 /* ctlInputMethod_Core.swift */; };
 		D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8827A838CF006DB1CF /* Localizable.strings */; };
 		D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8D27A838F0006DB1CF /* InfoPlist.strings */; };
 		D4E569DC27A34D0E00AC2CEF /* CTools.m in Sources */ = {isa = PBXBuildFile; fileRef = D4E569DB27A34CC100AC2CEF /* CTools.m */; };
@@ -310,7 +310,7 @@
 		D47B92BF27972AC800458394 /* main.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = main.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D47F7DCD278BFB57002F9DD7 /* ctlPrefWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlPrefWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D47F7DCF278C0897002F9DD7 /* ctlNonModalAlertWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlNonModalAlertWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		D4A13D5927A59D5C003BE359 /* ctlInputMethod.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlInputMethod.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		D4A13D5927A59D5C003BE359 /* ctlInputMethod_Core.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlInputMethod_Core.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D4E33D8927A838CF006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D4E33D8E27A838F0006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D4E569DA27A34CC100AC2CEF /* CTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = CTools.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
@@ -405,6 +405,8 @@
 			isa = PBXGroup;
 			children = (
 				5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */,
+				D4A13D5927A59D5C003BE359 /* ctlInputMethod_Core.swift */,
+				5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */,
 				D4E569DA27A34CC100AC2CEF /* CTools.h */,
 				D4E569DB27A34CC100AC2CEF /* CTools.m */,
 				D456576D279E4F7B00DF6BC9 /* InputSignal.swift */,
@@ -441,8 +443,6 @@
 			isa = PBXGroup;
 			children = (
 				5BDC1CF927FDF1310052C2B9 /* apiUpdate.swift */,
-				5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */,
-				D4A13D5927A59D5C003BE359 /* ctlInputMethod.swift */,
 				5B5E535127EF261400C6AA1E /* IME.swift */,
 				5B62A33127AE792F00A19448 /* InputSourceHelper.swift */,
 				5B62A33527AE795800A19448 /* mgrPrefs.swift */,
@@ -1059,7 +1059,7 @@
 				D461B792279DAC010070E734 /* InputState.swift in Sources */,
 				5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */,
 				D47B92C027972AD100458394 /* main.swift in Sources */,
-				D4A13D5A27A59F0B003BE359 /* ctlInputMethod.swift in Sources */,
+				D4A13D5A27A59F0B003BE359 /* ctlInputMethod_Core.swift in Sources */,
 				5BA9FD4827FEF3C9002DE248 /* PreferencesWindowController.swift in Sources */,
 				5BD0113B28180D6100609769 /* LMInstantiator.swift in Sources */,
 				D4E569DC27A34D0E00AC2CEF /* CTools.m in Sources */,
