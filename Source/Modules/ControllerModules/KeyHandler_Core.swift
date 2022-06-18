@@ -446,4 +446,19 @@ class KeyHandler {
   func deleteCompositorReadingToTheFrontOfCursor() {
     compositor.deleteReadingToTheFrontOfCursor()
   }
+
+  // MARK: - 其他工具函式
+
+  func kanjiConversionIfRequired(_ text: String) -> String {
+    if inputMode == InputMode.imeModeCHT {
+      switch (mgrPrefs.chineseConversionEnabled, mgrPrefs.shiftJISShinjitaiOutputEnabled) {
+        case (false, true): return vChewingKanjiConverter.cnvTradToJIS(text)
+        case (true, false): return vChewingKanjiConverter.cnvTradToKangXi(text)
+        // 本來這兩個開關不該同時開啟的，但萬一被開啟了的話就這樣處理：
+        case (true, true): return vChewingKanjiConverter.cnvTradToJIS(text)
+        case (false, false): return text
+      }
+    }
+    return text
+  }
 }

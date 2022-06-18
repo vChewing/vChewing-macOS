@@ -146,7 +146,7 @@ class InputState {
 
     var attributedString: NSAttributedString {
       let attributedString = NSAttributedString(
-        string: composingBuffer,
+        string: IME.kanjiConversionIfRequired(composingBuffer),
         attributes: [
           .underlineStyle: NSUnderlineStyle.single.rawValue,
           .markedClauseSegment: 0,
@@ -260,7 +260,7 @@ class InputState {
     }
 
     override var attributedString: NSAttributedString {
-      let attributedString = NSMutableAttributedString(string: composingBuffer)
+      let attributedString = NSMutableAttributedString(string: IME.kanjiConversionIfRequired(composingBuffer))
       let end = markedRange.upperBound
 
       attributedString.setAttributes(
