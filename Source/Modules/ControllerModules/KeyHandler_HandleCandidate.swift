@@ -24,9 +24,11 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/// 該檔案乃按鍵調度模組當中「用來規定在選字窗出現時的按鍵行為」的部分。
+
 import Cocoa
 
-// MARK: - § Handle Candidate State.
+// MARK: - § 對選字狀態進行調度 (Handle Candidate State).
 
 extension KeyHandler {
   func handleCandidate(
@@ -43,7 +45,7 @@ extension KeyHandler {
       return true
     }
 
-    // MARK: Cancel Candidate
+    // MARK: 取消選字 (Cancel Candidate)
 
     let cancelCandidateKey =
       input.isBackSpace || input.isESC || input.isDelete
@@ -286,7 +288,7 @@ extension KeyHandler {
       }
     }
 
-    // MARK: - Associated Phrases
+    // MARK: 聯想詞處理 (Associated Phrases)
 
     if state is InputState.AssociatedPhrases {
       if !input.isShiftHold { return false }
@@ -322,9 +324,13 @@ extension KeyHandler {
 
     if state is InputState.AssociatedPhrases { return false }
 
-    // MARK: SCPC Mode Processing
+    // MARK: 逐字選字模式的處理 (SCPC Mode Processing)
 
     if mgrPrefs.useSCPCTypingMode {
+      /// 檢查：
+      /// - 是否是針對當前注音排列/拼音輸入種類專門提供的標點符號。
+      /// - 是否是需要摁修飾鍵才可以輸入的那種標點符號。
+
       var punctuationNamePrefix = ""
 
       if input.isOptionHold && !input.isControlHold {
@@ -345,6 +351,8 @@ extension KeyHandler {
         punctuationNamePrefix, parser, String(format: "%c", CChar(charCode)),
       ]
       let customPunctuation: String = arrCustomPunctuations.joined(separator: "")
+
+      /// 如果仍無匹配結果的話，看看這個輸入是否是不需要修飾鍵的那種標點鍵輸入。
 
       let arrPunctuations: [String] = [punctuationNamePrefix, String(format: "%c", CChar(charCode))]
       let punctuation: String = arrPunctuations.joined(separator: "")

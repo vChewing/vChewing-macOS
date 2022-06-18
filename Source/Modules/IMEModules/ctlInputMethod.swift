@@ -178,7 +178,7 @@ class ctlInputMethod: IMKInputController {
   override func commitComposition(_ sender: Any!) {
     _ = sender  // Stop clang-format from ruining the parameters of this function.
     if let state = state as? InputState.NotEmpty {
-      handle(state: InputState.Committing(poppedText: state.composingBuffer))
+      handle(state: InputState.Committing(textToCommit: state.composingBuffer))
     }
     resetKeyHandler()
   }
@@ -306,9 +306,9 @@ extension ctlInputMethod {
     ctlCandidateCurrent.visible = false
     hideTooltip()
 
-    let poppedText = state.poppedText
-    if !poppedText.isEmpty {
-      commit(text: poppedText)
+    let textToCommit = state.textToCommit
+    if !textToCommit.isEmpty {
+      commit(text: textToCommit)
     }
     client().setMarkedText(
       "", selectionRange: NSRange(location: 0, length: 0),
@@ -321,9 +321,9 @@ extension ctlInputMethod {
     ctlCandidateCurrent.visible = false
     hideTooltip()
 
-    let poppedText = state.poppedText
-    if !poppedText.isEmpty {
-      commit(text: poppedText)
+    let textToCommit = state.textToCommit
+    if !textToCommit.isEmpty {
+      commit(text: textToCommit)
     }
 
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
@@ -622,7 +622,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
           state: .SymbolTable(node: node, isTypingVertical: state.isTypingVertical)
         )
       } else {
-        handle(state: .Committing(poppedText: node.title))
+        handle(state: .Committing(textToCommit: node.title))
         handle(state: .Empty())
       }
       return
@@ -637,7 +637,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
       if mgrPrefs.useSCPCTypingMode {
         keyHandler.clear()
         let composingBuffer = inputting.composingBuffer
-        handle(state: .Committing(poppedText: composingBuffer))
+        handle(state: .Committing(textToCommit: composingBuffer))
         if mgrPrefs.associatedPhrasesEnabled,
           let associatePhrases = keyHandler.buildAssociatePhraseState(
             withKey: composingBuffer, isTypingVertical: state.isTypingVertical
@@ -655,7 +655,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
 
     if let state = state as? InputState.AssociatedPhrases {
       let selectedValue = state.candidates[index]
-      handle(state: .Committing(poppedText: selectedValue))
+      handle(state: .Committing(textToCommit: selectedValue))
       if mgrPrefs.associatedPhrasesEnabled,
         let associatePhrases = keyHandler.buildAssociatePhraseState(
           withKey: selectedValue, isTypingVertical: state.isTypingVertical

@@ -96,15 +96,15 @@ class InputState {
 
   /// .Committing: 該狀態會承載要遞交出去的內容，讓輸入法控制器處理時代為遞交。
   class Committing: InputState {
-    private(set) var poppedText: String = ""
+    private(set) var textToCommit: String = ""
 
-    convenience init(poppedText: String) {
+    convenience init(textToCommit: String) {
       self.init()
-      self.poppedText = poppedText
+      self.textToCommit = textToCommit
     }
 
     var description: String {
-      "<InputState.Committing poppedText:\(poppedText)>"
+      "<InputState.Committing textToCommit:\(textToCommit)>"
     }
   }
 
@@ -164,7 +164,7 @@ class InputState {
 
   /// .Inputting: 使用者輸入了內容。此時會出現組字區（Compositor）。
   class Inputting: NotEmpty {
-    var poppedText: String = ""
+    var textToCommit: String = ""
     var tooltip: String = ""
 
     override init(composingBuffer: String, cursorIndex: Int) {
@@ -172,7 +172,7 @@ class InputState {
     }
 
     override var description: String {
-      "<InputState.Inputting, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>, poppedText:\(poppedText)>"
+      "<InputState.Inputting, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>, textToCommit:\(textToCommit)>"
     }
   }
 
