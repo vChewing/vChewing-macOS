@@ -298,7 +298,7 @@ extension ctlInputMethod {
 
   /// 遞交組字區內容。
   private func commit(text: String) {
-    let buffer = keyHandler.kanjiConversionIfRequired(text)
+    let buffer = IME.kanjiConversionIfRequired(text)
     if buffer.isEmpty {
       return
     }

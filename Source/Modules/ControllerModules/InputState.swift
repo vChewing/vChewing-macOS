@@ -137,6 +137,15 @@ class InputState {
   class NotEmpty: InputState {
     private(set) var composingBuffer: String
     private(set) var cursorIndex: Int = 0 { didSet { cursorIndex = max(cursorIndex, 0) } }
+    var composingBufferConverted: String {
+      let converted = IME.kanjiConversionIfRequired(composingBuffer)
+      if converted.utf16.count != composingBuffer.utf16.count
+        || converted.count != composingBuffer.count
+      {
+        return composingBuffer
+      }
+      return converted
+    }
 
     init(composingBuffer: String, cursorIndex: Int) {
       self.composingBuffer = composingBuffer
@@ -145,8 +154,10 @@ class InputState {
     }
 
     var attributedString: NSAttributedString {
+      /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
+      /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
       let attributedString = NSAttributedString(
-        string: IME.kanjiConversionIfRequired(composingBuffer),
+        string: composingBufferConverted,
         attributes: [
           .underlineStyle: NSUnderlineStyle.single.rawValue,
           .markedClauseSegment: 0,
@@ -260,7 +271,9 @@ class InputState {
     }
 
     override var attributedString: NSAttributedString {
-      let attributedString = NSMutableAttributedString(string: IME.kanjiConversionIfRequired(composingBuffer))
+      /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
+      /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
+      let attributedString = NSMutableAttributedString(string: composingBufferConverted)
       let end = markedRange.upperBound
 
       attributedString.setAttributes(
