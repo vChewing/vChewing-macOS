@@ -24,9 +24,6 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-// NOTE: We still keep some of the comments left by Zonble,
-// regardless that he is not in charge of this Swift module。
-
 import Foundation
 
 // 簡體中文模式與繁體中文模式共用全字庫擴展模組，故單獨處理。
@@ -39,29 +36,25 @@ private var lmSymbols = vChewing.LMCoreNS(
 )
 
 extension vChewing {
-  /// LMInstantiator is a facade for managing a set of models including
-  /// the input method language model, user phrases and excluded phrases.
+  /// 語言模組副本化模組（LMInstantiator，下稱「LMI」）自身為符合天權星組字引擎內
+  /// 的 LanguageModel 協定的模組、統籌且整理來自其它子模組的資料（包括使用者語彙、
+  /// 繪文字模組、語彙濾除表、原廠語言模組等）。
   ///
-  /// It is the primary model class that the input controller and grammar builder
-  /// of vChewing talks to. When the grammar builder starts to build a sentence
-  /// from a series of BPMF readings, it passes the readings to the model to see
-  /// if there are valid unigrams, and use returned unigrams to produce the final
-  /// results.
+  /// LMI 型別為與輸入法按鍵調度模組直接溝通之唯一語言模組。當組字器開始根據給定的
+  /// 讀音鏈構築語句時，LMI 會接收來自組字器的讀音、輪流檢查自身是否有可以匹配到的
+  /// 單元圖結果，然後將結果整理為陣列、再回饋給組字器。
   ///
-  /// LMInstantiator combine and transform the unigrams from the primary language
-  /// model and user phrases. The process is
+  /// LMI 還會在將單元圖結果整理成陣列時做出下述處理轉換步驟：
   ///
-  /// 1) Get the original unigrams.
-  /// 2) Drop the unigrams whose value is contained in the exclusion map.
-  /// 3) Replace the values of the unigrams using the phrase replacement map.
-  /// 4) Drop the duplicated phrases from the generated unigram array.
+  /// 1. 獲取原始結果陣列。
+  /// 2. 如果有原始結果也出現在濾除表當中的話，則自結果陣列丟棄這類結果。
+  /// 3. 如果啟用了語彙置換的話，則對目前經過處理的結果陣列套用語彙置換。
+  /// 4. 擁有相同讀音與詞語資料值的單元圖只會留下權重最大的那一筆，其餘重複值會被丟棄。
   ///
-  /// The controller can ask the model to load the primary input method language
-  /// model while launching and to load the user phrases anytime if the custom
-  /// files are modified. It does not keep the reference of the data pathes but
-  /// you have to pass the paths when you ask it to load.
+  /// LMI 會根據需要分別載入原廠語言模組和其他個別的子語言模組。LMI 本身不會記錄這些
+  /// 語言模組的相關資料的存放位置，僅藉由參數來讀取相關訊息。
   public class LMInstantiator: Megrez.LanguageModel {
-    // 在函數內部用以記錄狀態的開關。
+    // 在函式內部用以記錄狀態的開關。
     public var isPhraseReplacementEnabled = false
     public var isCNSEnabled = false
     public var isSymbolEnabled = false
@@ -76,9 +69,9 @@ extension vChewing {
     /// 但是，LMCoreEX 對 2010-2013 年等舊 mac 機種而言，讀取速度異常緩慢。
     /// 於是 LMCoreNS 就出場了，專門用來讀取原廠的 plist 格式的辭典。
 
-    // 聲明原廠語言模組
-    /// Reverse 的話，第一欄是注音，第二欄是對應的漢字，第三欄是可能的權重。
-    /// 不 Reverse 的話，第一欄是漢字，第二欄是對應的注音，第三欄是可能的權重。
+    // 聲明原廠語言模組：
+    // Reverse 的話，第一欄是注音，第二欄是對應的漢字，第三欄是可能的權重。
+    // 不 Reverse 的話，第一欄是漢字，第二欄是對應的注音，第三欄是可能的權重。
     var lmCore = LMCoreNS(
       reverse: false, consolidate: false, defaultScore: -9.9, forceDefaultScore: false
     )
@@ -100,10 +93,10 @@ extension vChewing {
     var lmReplacements = LMReplacments()
     var lmAssociates = LMAssociates()
 
-    // 初期化的函數先保留
+    // 初期化的函式先保留
     override init() {}
 
-    // 以下這些函數命名暫時保持原樣，等弒神行動徹底結束了再調整。
+    // 以下這些函式命名暫時保持原樣，等弒神行動徹底結束了再調整。
 
     public var isLanguageModelLoaded: Bool { lmCore.isLoaded() }
     public func loadLanguageModel(path: String) {
@@ -194,12 +187,12 @@ extension vChewing {
 
     // MARK: - Core Functions (Public)
 
-    /// Not implemented since we do not have data to provide bigram function.
+    /// 威注音輸入法目前尚未具備對雙元圖的處理能力，故停用該函式。
     // public func bigramsForKeys(preceedingKey: String, key: String) -> [Megrez.Bigram] { }
 
-    /// Returns a list of available unigram for the given key.
-    /// @param key:String represents the BPMF reading or a symbol key.
-    /// For instance, it you pass "ㄉㄨㄟˇ", it returns "㨃" and other possible candidates.
+    /// 給定讀音字串，讓 LMI 給出對應的經過處理的單元圖陣列。
+    /// - Parameter key: 給定的讀音字串。
+    /// - Returns: 對應的經過處理的單元圖陣列。
     override open func unigramsFor(key: String) -> [Megrez.Unigram] {
       if key == " " {
         /// 給空格鍵指定輸出值。
@@ -267,6 +260,11 @@ extension vChewing {
 
     // MARK: - Core Functions (Private)
 
+    /// 給定單元圖原始結果陣列，經過語彙過濾處理＋置換處理＋去重複處理之後，給出單元圖結果陣列。
+    /// - Parameters:
+    ///   - unigrams: 傳入的單元圖原始結果陣列
+    ///   - filteredPairs: 傳入的要過濾掉的鍵值配對陣列
+    /// - Returns: 經過語彙過濾處理＋置換處理＋去重複處理的單元圖結果陣列
     func filterAndTransform(
       unigrams: [Megrez.Unigram],
       filter filteredPairs: Set<Megrez.KeyValuePair>

@@ -29,27 +29,34 @@ extension vChewing {
   public class LMUserOverride {
     // MARK: - Private Structures
 
-    struct Override {
+    // 這些型別必須得用 class，不然會導致拿不到有效建議。
+
+    class Override {
       var count: Int = 0
       var timestamp: Double = 0.0
     }
 
-    struct Observation {
+    class Observation {
       var count: Int = 0
       var overrides: [String: Override] = [:]
 
-      mutating func update(candidate: String, timestamp: Double) {
+      func update(candidate: String, timestamp: Double) {
         count += 1
-        if var neta = overrides[candidate] {
+        if let neta = overrides[candidate] {
           neta.timestamp = timestamp
           neta.count += 1
+          overrides[candidate] = neta
         }
       }
     }
 
-    struct KeyObservationPair {
+    class KeyObservationPair {
       var key: String
       var observation: Observation
+      init(key: String, observation: Observation) {
+        self.key = key
+        self.observation = observation
+      }
     }
 
     // MARK: - Main
@@ -74,7 +81,7 @@ extension vChewing {
       let key = convertKeyFrom(walkedNodes: walkedNodes, cursorIndex: cursorIndex)
 
       guard mutLRUMap[key] != nil else {
-        var observation: Observation = .init()
+        let observation: Observation = .init()
         observation.update(candidate: candidate, timestamp: timestamp)
         let koPair = KeyObservationPair(key: key, observation: observation)
         mutLRUMap[key] = koPair
@@ -87,7 +94,7 @@ extension vChewing {
         IME.prtDebugIntel("UOM: Observation finished with new observation: \(key)")
         return
       }
-      if var theNeta = mutLRUMap[key] {
+      if let theNeta = mutLRUMap[key] {
         theNeta.observation.update(candidate: candidate, timestamp: timestamp)
         mutLRUList.insert(theNeta, at: 0)
         mutLRUMap[key] = theNeta

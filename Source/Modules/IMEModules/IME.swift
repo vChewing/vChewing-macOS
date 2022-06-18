@@ -28,9 +28,33 @@ import Cocoa
 // The namespace of this input method.
 public enum vChewing {}
 
+// The type of input modes.
+public enum InputMode: String {
+  case imeModeCHS = "org.atelierInmu.inputmethod.vChewing.IMECHS"
+  case imeModeCHT = "org.atelierInmu.inputmethod.vChewing.IMECHT"
+  case imeModeNULL = ""
+}
+
 public enum IME {
   static let arrSupportedLocales = ["en", "zh-Hant", "zh-Hans", "ja"]
   static let dlgOpenPath = NSOpenPanel()
+
+  // MARK: - 輸入法的當前的簡繁體中文模式是？
+
+  static var currentInputMode: InputMode = .init(rawValue: mgrPrefs.mostRecentInputMode) ?? .imeModeNULL
+
+  static func kanjiConversionIfRequired(_ text: String) -> String {
+    if currentInputMode == InputMode.imeModeCHT {
+      switch (mgrPrefs.chineseConversionEnabled, mgrPrefs.shiftJISShinjitaiOutputEnabled) {
+        case (false, true): return vChewingKanjiConverter.cnvTradToJIS(text)
+        case (true, false): return vChewingKanjiConverter.cnvTradToKangXi(text)
+        // 本來這兩個開關不該同時開啟的，但萬一被開啟了的話就這樣處理：
+        case (true, true): return vChewingKanjiConverter.cnvTradToJIS(text)
+        case (false, false): return text
+      }
+    }
+    return text
+  }
 
   // MARK: - 開關判定當前應用究竟是？
 
@@ -40,10 +64,10 @@ public enum IME {
 
   static func getInputMode(isReversed: Bool = false) -> InputMode {
     if isReversed {
-      return (ctlInputMethod.currentKeyHandler.inputMode == InputMode.imeModeCHT)
+      return (IME.currentInputMode == InputMode.imeModeCHT)
         ? InputMode.imeModeCHS : InputMode.imeModeCHT
     } else {
-      return ctlInputMethod.currentKeyHandler.inputMode
+      return IME.currentInputMode
     }
   }
 
@@ -64,7 +88,7 @@ public enum IME {
   // MARK: - Initializing Language Models.
 
   static func initLangModels(userOnly: Bool) {
-    // mgrLangModel 的 loadUserPhrases 等函數在自動讀取 dataFolderPath 時，
+    // mgrLangModel 的 loadUserPhrases 等函式在自動讀取 dataFolderPath 時，
     // 如果發現自訂目錄不可用，則會自動抹去自訂目錄設定、改採預設目錄。
     // 所以這裡不需要特別處理。
     mgrLangModel.loadUserAssociatesData()

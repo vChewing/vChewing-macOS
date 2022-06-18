@@ -47,7 +47,7 @@ public class OpenCCBridge: NSObject {
   /// - Parameter string: Text in Original Script.
   /// - Returns: Text converted to Different Script.
   public static func crossConvert(_ string: String) -> String? {
-    switch ctlInputMethod.currentKeyHandler.inputMode {
+    switch IME.currentInputMode {
       case InputMode.imeModeCHS:
         return shared.traditionalize?.convert(string)
       case InputMode.imeModeCHT:

@@ -132,12 +132,12 @@ extension vChewing {
 
     /// 【該功能無法使用】根據給定的前述讀音索引鍵與當前讀音索引鍵，來獲取資料庫陣列內的對應資料陣列的字串首尾範圍資料、據此自 strData 取得字串形式的資料、生成雙元圖陣列。
     ///
-    /// 威注音輸入法尚未引入雙元圖支援，所以該函數並未擴充相關功能，自然不會起作用。
+    /// 威注音輸入法尚未引入雙元圖支援，所以該函式並未擴充相關功能，自然不會起作用。
     /// - parameters:
     ///   - precedingKey: 前述讀音索引鍵
     ///   - key: 當前讀音索引鍵
     public func bigramsForKeys(precedingKey: String, key: String) -> [Megrez.Bigram] {
-      // 這裡用了點廢話處理，不然函數構建體會被 Swift 格式整理工具給毀掉。
+      // 這裡用了點廢話處理，不然函式構建體會被 Swift 格式整理工具給毀掉。
       // 其實只要一句「[Megrez.Bigram]()」就夠了。
       precedingKey == key ? [Megrez.Bigram]() : [Megrez.Bigram]()
     }

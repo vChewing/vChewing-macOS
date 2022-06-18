@@ -38,6 +38,9 @@ extension Megrez {
     /// 軌格的寬度，也就是其內的幅位陣列當中的幅位數量。
     var width: Int { mutSpans.count }
 
+    /// 軌格是否為空。
+    var isEmpty: Bool { mutSpans.isEmpty }
+
     public init(spanLength: Int = 10) {
       mutMaxBuildSpanLength = spanLength
       mutSpans = [Megrez.Span]()
@@ -256,9 +259,9 @@ extension Megrez.Grid {
         strOutput += "\(np.currentKeyValue.value);\n"
 
         if (p + ni) < mutSpans.count {
-          let destinatedSpan = mutSpans[p + ni]
-          for q in 0...(destinatedSpan.maximumLength) {
-            if let dn = destinatedSpan.node(length: q) {
+          let destinationSpan = mutSpans[p + ni]
+          for q in 0...(destinationSpan.maximumLength) {
+            if let dn = destinationSpan.node(length: q) {
               strOutput += np.currentKeyValue.value + " -> " + dn.currentKeyValue.value + ";\n"
             }
           }

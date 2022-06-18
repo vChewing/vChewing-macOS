@@ -41,8 +41,8 @@ public struct Tekkon {
   public enum MandarinParser: Int {
     case ofDachen = 0
     case ofDachen26 = 1
-    case ofEten = 2
-    case ofEten26 = 3
+    case ofETen = 2
+    case ofETen26 = 3
     case ofHsu = 4
     case ofIBM = 5
     case ofMiTAC = 6
@@ -60,11 +60,11 @@ public struct Tekkon {
           return "Dachen"
         case .ofDachen26:
           return "Dachen26"
-        case .ofEten:
+        case .ofETen:
           return "ETen"
         case .ofHsu:
           return "Hsu"
-        case .ofEten26:
+        case .ofETen26:
           return "ETen26"
         case .ofIBM:
           return "IBM"
@@ -140,6 +140,7 @@ public struct Tekkon {
     /// 自我清空內容。
     public mutating func clear() {
       valueStorage = ""
+      type = .null
     }
 
     /// 自我變換資料值。
@@ -151,7 +152,7 @@ public struct Tekkon {
       ensureType()
     }
 
-    /// 用來自動更新自身的屬性值的函數。
+    /// 用來自動更新自身的屬性值的函式。
     mutating func ensureType() {
       if Tekkon.allowedConsonants.contains(value) {
         type = .consonant
@@ -214,7 +215,7 @@ public struct Tekkon {
     /// 聲調。
     public var intonation: Phonabet = ""
 
-    /// 為拉丁字母專用的組音區
+    /// 為拉丁字母專用的組音區。
     public var romajiBuffer: String = ""
 
     /// 注音排列種類。預設情況下是大千排列（Windows / macOS 預設注音排列）。
@@ -227,7 +228,7 @@ public struct Tekkon {
       consonant.value + semivowel.value + vowel.value + intonation.value
     }
 
-    /// 與 value 類似，這個函數就是用來決定輸入法組字區內顯示的注音/拼音內容，
+    /// 與 value 類似，這個函式就是用來決定輸入法組字區內顯示的注音/拼音內容，
     /// 但可以指定是否輸出教科書格式（拼音的調號在字母上方、注音的輕聲寫在左側）。
     /// - Parameters:
     ///   - isHanyuPinyin: 是否將輸出結果轉成漢語拼音。
@@ -250,7 +251,7 @@ public struct Tekkon {
       }
     }
 
-    // 該函數僅用來獲取給 macOS InputMethod Kit 的內文組字區使用的顯示字串。
+    // 該函式僅用來獲取給 macOS InputMethod Kit 的內文組字區使用的顯示字串。
     /// - Parameters:
     ///   - isHanyuPinyin: 是否將輸出結果轉成漢語拼音。
     public func getInlineCompositionForIMK(isHanyuPinyin: Bool = false) -> String {
@@ -279,12 +280,12 @@ public struct Tekkon {
       }
     }
 
-    /// 注拼槽內容是否為空。
+    /// 注拼槽內容是否可唸。
     public var isPronouncable: Bool {
       !vowel.isEmpty || !semivowel.isEmpty || !consonant.isEmpty
     }
 
-    // MARK: 注拼槽對外處理函數
+    // MARK: 注拼槽對外處理函式
 
     /// 初期化一個新的注拼槽。可以藉由 @input 參數指定初期已經傳入的按鍵訊號。
     /// 還可以在初期化時藉由 @arrange 參數來指定注音排列（預設為「.ofDachen」大千佈局）。
@@ -308,7 +309,7 @@ public struct Tekkon {
 
     // MARK: - Public Functions
 
-    /// 用於檢測「某個輸入字符訊號的合規性」的函數。
+    /// 用於檢測「某個輸入字符訊號的合規性」的函式。
     ///
     /// 注意：回傳結果會受到當前注音排列 parser 屬性的影響。
     /// - Parameters:
@@ -321,12 +322,12 @@ public struct Tekkon {
             return Tekkon.mapQwertyDachen[input] != nil
           case .ofDachen26:
             return Tekkon.mapDachenCP26StaticKeys[input] != nil
-          case .ofEten:
-            return Tekkon.mapQwertyEtenTraditional[input] != nil
+          case .ofETen:
+            return Tekkon.mapQwertyETenTraditional[input] != nil
           case .ofHsu:
             return Tekkon.mapHsuStaticKeys[input] != nil
-          case .ofEten26:
-            return Tekkon.mapEten26StaticKeys[input] != nil
+          case .ofETen26:
+            return Tekkon.mapETen26StaticKeys[input] != nil
           case .ofIBM:
             return Tekkon.mapQwertyIBM[input] != nil
           case .ofMiTAC:
@@ -343,7 +344,7 @@ public struct Tekkon {
     }
 
     /// 接受傳入的按鍵訊號時的處理，處理對象為 String。
-    /// 另有同名函數可處理 UniChar 訊號。
+    /// 另有同名函式可處理 UniChar 訊號。
     ///
     /// 如果是諸如複合型注音排列的話，翻譯結果有可能為空，但翻譯過程已經處理好聲介韻調分配了。
     /// - Parameters:
@@ -356,7 +357,7 @@ public struct Tekkon {
               intonation = Phonabet(theTone)
             }
           } else {
-            // 為了防止 romajiBuffer 越敲越長帶來算力負擔，這裡讓它在要溢出時自動丟掉先取音頭。
+            // 為了防止 romajiBuffer 越敲越長帶來算力負擔，這裡讓它在要溢出時自動丟掉最早輸入的音頭。
             if romajiBuffer.count > 5 {
               romajiBuffer = String(romajiBuffer.dropFirst())
             }
@@ -364,12 +365,12 @@ public struct Tekkon {
             receiveSequence(romajiBufferBackup, isRomaji: true)
             romajiBuffer = romajiBufferBackup
           }
-        default: receiveKey(fromPhonabet: translate(key: String(input)))
+        default: receiveKey(fromPhonabet: translate(key: input))
       }
     }
 
     /// 接受傳入的按鍵訊號時的處理，處理對象為 UniChar。
-    /// 其實也就是先將 UniChar 轉為 String 再交給某個同名異參的函數來處理而已。
+    /// 其實也就是先將 UniChar 轉為 String 再交給某個同名異參的函式來處理而已。
     ///
     /// 如果是諸如複合型注音排列的話，翻譯結果有可能為空，但翻譯過程已經處理好聲介韻調分配了。
     /// - Parameters:
@@ -474,7 +475,7 @@ public struct Tekkon {
       }
     }
 
-    /// 用來檢測是否有調號的函數，預設情況下不判定聲調以外的內容的存無。
+    /// 用來檢測是否有調號的函式，預設情況下不判定聲調以外的內容的存無。
     /// - Parameters:
     ///   - withNothingElse: 追加判定「槽內是否僅有調號」。
     public func hasToneMarker(withNothingElse: Bool = false) -> Bool {
@@ -493,11 +494,11 @@ public struct Tekkon {
 
     // MARK: - Parser Processings
 
-    // 注拼槽對內處理用函數都在這一小節。
+    // 注拼槽對內處理用函式都在這一小節。
 
     /// 根據目前的注音排列設定來翻譯傳入的 String 訊號。
     ///
-    /// 倚天或許氏鍵盤的處理函數會將分配過程代為處理過，此時回傳結果為空字串。
+    /// 倚天或許氏鍵盤的處理函式會將分配過程代為處理過，此時回傳結果為空字串。
     /// - Parameters:
     ///   - key: 傳入的 String 訊號。
     mutating func translate(key: String = "") -> String {
@@ -506,12 +507,12 @@ public struct Tekkon {
           return Tekkon.mapQwertyDachen[key] ?? ""
         case .ofDachen26:
           return handleDachen26(key: key)
-        case .ofEten:
-          return Tekkon.mapQwertyEtenTraditional[key] ?? ""
+        case .ofETen:
+          return Tekkon.mapQwertyETenTraditional[key] ?? ""
         case .ofHsu:
           return handleHsu(key: key)
-        case .ofEten26:
-          return handleEten26(key: key)
+        case .ofETen26:
+          return handleETen26(key: key)
         case .ofIBM:
           return Tekkon.mapQwertyIBM[key] ?? ""
         case .ofMiTAC:
@@ -521,19 +522,18 @@ public struct Tekkon {
         case .ofFakeSeigyou:
           return Tekkon.mapFakeSeigyou[key] ?? ""
         case .ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin:
-          break  // 漢語拼音單獨用另外的函數處理
+          break  // 漢語拼音單獨用另外的函式處理
       }
       return ""
     }
 
     /// 倚天忘形注音排列比較麻煩，需要單獨處理。
     ///
-    /// 回傳結果是空字串的話，不要緊，因為該函數內部已經處理過分配過程了。
+    /// 回傳結果是空字串的話，不要緊，因為該函式內部已經處理過分配過程了。
     /// - Parameters:
     ///   - key: 傳入的 String 訊號。
-    mutating func handleEten26(key: String = "") -> String {
-      var strReturn = ""
-      strReturn = Tekkon.mapEten26StaticKeys[key] ?? ""
+    mutating func handleETen26(key: String = "") -> String {
+      var strReturn = Tekkon.mapETen26StaticKeys[key] ?? ""
       let incomingPhonabet = Phonabet(strReturn)
 
       switch key {
@@ -612,16 +612,15 @@ public struct Tekkon {
 
     /// 許氏鍵盤與倚天忘形一樣同樣也比較麻煩，需要單獨處理。
     ///
-    /// 回傳結果是空的話，不要緊，因為該函數內部已經處理過分配過程了。
+    /// 回傳結果是空的話，不要緊，因為該函式內部已經處理過分配過程了。
     /// - Parameters:
     ///   - key: 傳入的 String 訊號。
     mutating func handleHsu(key: String = "") -> String {
-      var strReturn = ""
-      strReturn = Tekkon.mapHsuStaticKeys[key] ?? ""
+      var strReturn = Tekkon.mapHsuStaticKeys[key] ?? ""
       let incomingPhonabet = Phonabet(strReturn)
 
       if key == " ", value == "ㄋ" {
-        consonant = ""
+        consonant.clear()
         vowel = "ㄣ"
       }
 
@@ -719,7 +718,7 @@ public struct Tekkon {
           consonant.selfReplace("ㄒ", "ㄕ")
         }
         if consonant == "ㄏ", semivowel.isEmpty, vowel.isEmpty {
-          consonant = ""
+          consonant.clear()
           vowel = "ㄛ"
         }
       }
@@ -736,12 +735,11 @@ public struct Tekkon {
 
     /// 大千忘形一樣同樣也比較麻煩，需要單獨處理。
     ///
-    /// 回傳結果是空的話，不要緊，因為該函數內部已經處理過分配過程了。
+    /// 回傳結果是空的話，不要緊，因為該函式內部已經處理過分配過程了。
     /// - Parameters:
     ///   - key: 傳入的 String 訊號。
     mutating func handleDachen26(key: String = "") -> String {
-      var strReturn = ""
-      strReturn = Tekkon.mapDachenCP26StaticKeys[key] ?? ""
+      var strReturn = Tekkon.mapDachenCP26StaticKeys[key] ?? ""
 
       switch key {
         case "e": if isPronouncable { intonation = "ˊ" } else { consonant = "ㄍ" }
@@ -759,11 +757,11 @@ public struct Tekkon {
         case "w": if consonant.isEmpty || consonant == "ㄉ" { consonant = "ㄊ" } else { consonant = "ㄉ" }
         case "m":
           if semivowel == "ㄩ", vowel != "ㄡ" {
-            semivowel = ""
+            semivowel.clear()
             vowel = "ㄡ"
           } else if semivowel != "ㄩ", vowel == "ㄡ" {
             semivowel = "ㄩ"
-            vowel = ""
+            vowel.clear()
           } else if !semivowel.isEmpty {
             vowel = "ㄡ"
           } else {
@@ -771,13 +769,13 @@ public struct Tekkon {
           }
         case "u":
           if semivowel == "ㄧ", vowel != "ㄚ" {
-            semivowel = ""
+            semivowel.clear()
             vowel = "ㄚ"
           } else if semivowel != "ㄧ", vowel == "ㄚ" {
             semivowel = "ㄧ"
           } else if semivowel == "ㄧ", vowel == "ㄚ" {
-            semivowel = ""
-            vowel = ""
+            semivowel.clear()
+            vowel.clear()
           } else if !semivowel.isEmpty {
             vowel = "ㄚ"
           } else {
@@ -834,6 +832,9 @@ public struct Tekkon {
     return targetConverted
   }
 
+  /// 漢語拼音數字標調式轉漢語拼音教科書格式，要求陰平必須是數字 1。
+  /// - Parameters:
+  ///   - target: 傳入的 String 對象物件。
   static func cnvHanyuPinyinToTextbookStyle(target: String) -> String {
     var targetConverted = target
     for pair in arrHanyuPinyinTextbookStyleConversionTable {
@@ -1296,14 +1297,14 @@ public struct Tekkon {
   ///
   /// 在這裡將二十六個字母寫全，也只是為了方便做 validity check。
   /// 這裡提前對ㄓ/ㄍ/ㄕ做處理，然後再用程式判斷介母類型、據此判斷是否需要換成ㄒ/ㄑ/ㄐ。
-  static let mapEten26StaticKeys: [String: String] = [
+  static let mapETen26StaticKeys: [String: String] = [
     "a": "ㄚ", "b": "ㄅ", "c": "ㄕ", "d": "ㄉ", "e": "ㄧ", "f": "ㄈ", "g": "ㄓ", "h": "ㄏ", "i": "ㄞ", "j": "ㄖ", "k": "ㄎ",
     "l": "ㄌ", "m": "ㄇ", "n": "ㄋ", "o": "ㄛ", "p": "ㄆ", "q": "ㄗ", "r": "ㄜ", "s": "ㄙ", "t": "ㄊ", "u": "ㄩ", "v": "ㄍ",
     "w": "ㄘ", "x": "ㄨ", "y": "ㄔ", "z": "ㄠ", " ": " ",
   ]
 
   /// 倚天傳統排列專用處理陣列。
-  static let mapQwertyEtenTraditional: [String: String] = [
+  static let mapQwertyETenTraditional: [String: String] = [
     "'": "ㄘ", ",": "ㄓ", "-": "ㄥ", ".": "ㄔ", "/": "ㄕ", "0": "ㄤ", "1": "˙", "2": "ˊ", "3": "ˇ", "4": "ˋ", "7": "ㄑ",
     "8": "ㄢ", "9": "ㄣ", ";": "ㄗ", "=": "ㄦ", "a": "ㄚ", "b": "ㄅ", "c": "ㄒ", "d": "ㄉ", "e": "ㄧ", "f": "ㄈ", "g": "ㄐ",
     "h": "ㄏ", "i": "ㄞ", "j": "ㄖ", "k": "ㄎ", "l": "ㄌ", "m": "ㄇ", "n": "ㄋ", "o": "ㄛ", "p": "ㄆ", "q": "ㄟ", "r": "ㄜ",

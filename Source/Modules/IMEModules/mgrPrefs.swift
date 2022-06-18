@@ -78,10 +78,10 @@ private let kMinCandidateListTextSize: CGFloat = 12
 private let kMaxCandidateListTextSize: CGFloat = 196
 
 // default, min and max composing buffer size (in codepoints)
-// modern Macs can usually work up to 16 codepoints when the builder still
+// modern Macs can usually work up to 16 codepoints when the compositor still
 // walks the grid with good performance slower Macs (like old PowerBooks)
 // will start to sputter beyond 12 such is the algorithmatic complexity
-// of the Viterbi algorithm used in the builder library (at O(N^2))
+// of the Viterbi algorithm used in the Megrez library (at O(N^2))
 private let kDefaultComposingBufferSize = 20
 private let kMinComposingBufferSize = 10
 private let kMaxComposingBufferSize = 40
@@ -176,9 +176,9 @@ struct ComposingBufferSize {
 
 enum MandarinParser: Int {
   case ofStandard = 0
-  case ofEten = 1
+  case ofETen = 1
   case ofHsu = 2
-  case ofEten26 = 3
+  case ofETen26 = 3
   case ofIBM = 4
   case ofMiTAC = 5
   case ofFakeSeigyou = 6
@@ -193,11 +193,11 @@ enum MandarinParser: Int {
     switch self {
       case .ofStandard:
         return "Standard"
-      case .ofEten:
+      case .ofETen:
         return "ETen"
       case .ofHsu:
         return "Hsu"
-      case .ofEten26:
+      case .ofETen26:
         return "ETen26"
       case .ofIBM:
         return "IBM"

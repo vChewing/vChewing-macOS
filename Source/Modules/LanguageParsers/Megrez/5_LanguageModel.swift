@@ -24,11 +24,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 extension Megrez {
-  /// 語言模型框架，回頭實際使用時需要派生一個型別、且重寫相關函數。
+  /// 語言模型框架，回頭實際使用時需要派生一個型別、且重寫相關函式。
   open class LanguageModel {
     public init() {}
 
-    // 這裡寫了一點假內容，不然有些 Swift 格式化工具會破壞掉函數的參數設計。
+    // 這裡寫了一點假內容，不然有些 Swift 格式化工具會破壞掉函式的參數設計。
 
     /// 給定鍵，讓語言模型找給一筆單元圖。
     open func unigramsFor(key: String) -> [Megrez.Unigram] {

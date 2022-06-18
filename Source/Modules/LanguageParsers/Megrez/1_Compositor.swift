@@ -24,40 +24,43 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 extension Megrez {
-  /// 分節讀音槽。
-  public class BlockReadingBuilder {
+  /// 組字器。
+  public class Compositor {
     /// 給被丟掉的節點路徑施加的負權重。
     private let kDroppedPathScore: Double = -999
-    /// 該分節讀音槽的游標位置。
+    /// 該組字器的游標位置。
     private var mutCursorIndex: Int = 0
-    /// 該分節讀音槽的讀音陣列。
+    /// 該組字器的讀音陣列。
     private var mutReadings: [String] = []
-    /// 該分節讀音槽的軌格。
+    /// 該組字器的軌格。
     private var mutGrid: Grid = .init()
-    /// 該分節讀音槽所使用的語言模型。
+    /// 該組字器所使用的語言模型。
     private var mutLM: LanguageModel
 
-    /// 公開該分節讀音槽內可以允許的最大詞長。
+    /// 公開該組字器內可以允許的最大詞長。
     public var maxBuildSpanLength: Int { mutGrid.maxBuildSpanLength }
     /// 公開：多字讀音鍵當中用以分割漢字讀音的記號，預設為空。
     public var joinSeparator: String = ""
-    /// 公開：該分節讀音槽的游標位置。
+    /// 公開：該組字器的游標位置。
     public var cursorIndex: Int {
       get { mutCursorIndex }
       set { mutCursorIndex = (newValue < 0) ? 0 : min(newValue, mutReadings.count) }
     }
 
-    /// 公開：該分節讀音槽的軌格（唯讀）。
+    /// 公開：該組字器是否為空。
+    public var isEmpty: Bool { grid.isEmpty }
+
+    /// 公開：該組字器的軌格（唯讀）。
     public var grid: Grid { mutGrid }
-    /// 公開：該分節讀音槽的長度，也就是內建漢字讀音的數量（唯讀）。
+    /// 公開：該組字器的長度，也就是內建漢字讀音的數量（唯讀）。
     public var length: Int { mutReadings.count }
-    /// 公開：該分節讀音槽的讀音陣列（唯讀）。
+    /// 公開：該組字器的讀音陣列（唯讀）。
     public var readings: [String] { mutReadings }
 
-    /// 分節讀音槽。
+    /// 組字器。
     /// - Parameters:
     ///   - lm: 語言模型。可以是任何基於 Megrez.LanguageModel 的衍生型別。
-    ///   - length: 指定該分節讀音槽內可以允許的最大詞長，預設為 10 字。
+    ///   - length: 指定該組字器內可以允許的最大詞長，預設為 10 字。
     ///   - separator: 多字讀音鍵當中用以分割漢字讀音的記號，預設為空。
     public init(lm: LanguageModel, length: Int = 10, separator: String = "") {
       mutLM = lm
@@ -65,7 +68,7 @@ extension Megrez {
       joinSeparator = separator
     }
 
-    /// 分節讀音槽自我清空專用函數。
+    /// 組字器自我清空專用函式。
     public func clear() {
       mutCursorIndex = 0
       mutReadings.removeAll()
@@ -109,10 +112,10 @@ extension Megrez {
       return true
     }
 
-    /// 移除該分節讀音槽的第一個讀音單元。
+    /// 移除該組字器的第一個讀音單元。
     ///
     /// 用於輸入法組字區長度上限處理：
-    /// 將該位置要溢出的敲字內容遞交之後、再執行這個函數。
+    /// 將該位置要溢出的敲字內容遞交之後、再執行這個函式。
     @discardableResult public func removeHeadReadings(count: Int) -> Bool {
       let count = abs(count)  // 防呆
       if count > length {
@@ -179,12 +182,14 @@ extension Megrez {
         $0.scoreForSort > $1.scoreForSort
       }
 
-      if let nodeOfNodeZero = nodes[0].node, nodeOfNodeZero.score >= nodeOfNodeZero.kSelectedCandidateScore {
+      if let nodeZero = nodes[0].node, nodeZero.score >= nodeZero.kSelectedCandidateScore {
         // 在使用者有選過候選字詞的情況下，摒棄非依此據而成的節點路徑。
-        var nodeZero = nodes[0]
-        nodeZero.accumulatedScore = accumulatedScore + nodeOfNodeZero.score
-        var path: [NodeAnchor] = reverseWalk(at: location - nodeZero.spanningLength, score: nodeZero.accumulatedScore)
-        path.insert(nodeZero, at: 0)
+        var anchorZero = nodes[0]
+        anchorZero.accumulatedScore = accumulatedScore + nodeZero.score
+        var path: [NodeAnchor] = reverseWalk(
+          at: location - anchorZero.spanningLength, score: anchorZero.accumulatedScore
+        )
+        path.insert(anchorZero, at: 0)
         paths.append(path)
       } else if !longPhrases.isEmpty {
         var path = [NodeAnchor]()
@@ -202,17 +207,12 @@ extension Megrez {
             continue
           }
           theAnchor.accumulatedScore = accumulatedScore + theNode.score
-          if joinedValue.count >= longPhrases[0].count {
-            path = reverseWalk(
-              at: location - theAnchor.spanningLength, score: theAnchor.accumulatedScore, joinedPhrase: "",
-              longPhrases: .init()
-            )
-          } else {
-            path = reverseWalk(
-              at: location - theAnchor.spanningLength, score: theAnchor.accumulatedScore, joinedPhrase: joinedValue,
-              longPhrases: longPhrases
-            )
-          }
+          path = reverseWalk(
+            at: location - theAnchor.spanningLength,
+            score: theAnchor.accumulatedScore,
+            joinedPhrase: (joinedValue.count >= longPhrases[0].count) ? "" : joinedValue,
+            longPhrases: .init()
+          )
           path.insert(theAnchor, at: 0)
           paths.append(path)
         }
@@ -234,17 +234,11 @@ extension Megrez {
           guard let theNode = theAnchor.node else { continue }
           theAnchor.accumulatedScore = accumulatedScore + theNode.score
           var path = [NodeAnchor]()
-          if theAnchor.spanningLength > 1 {
-            path = reverseWalk(
-              at: location - theAnchor.spanningLength, score: theAnchor.accumulatedScore, joinedPhrase: "",
-              longPhrases: .init()
-            )
-          } else {
-            path = reverseWalk(
-              at: location - theAnchor.spanningLength, score: theAnchor.accumulatedScore,
-              joinedPhrase: theNode.currentKeyValue.value, longPhrases: longPhrases
-            )
-          }
+          path = reverseWalk(
+            at: location - theAnchor.spanningLength, score: theAnchor.accumulatedScore,
+            joinedPhrase: (theAnchor.spanningLength > 1) ? "" : theNode.currentKeyValue.value,
+            longPhrases: .init()
+          )
           path.insert(theAnchor, at: 0)
           paths.append(path)
         }

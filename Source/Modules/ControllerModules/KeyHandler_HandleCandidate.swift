@@ -24,9 +24,11 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/// 該檔案乃按鍵調度模組當中「用來規定在選字窗出現時的按鍵行為」的部分。
+
 import Cocoa
 
-// MARK: - § Handle Candidate State.
+// MARK: - § 對選字狀態進行調度 (Handle Candidate State).
 
 extension KeyHandler {
   func handleCandidate(
@@ -43,7 +45,7 @@ extension KeyHandler {
       return true
     }
 
-    // MARK: Cancel Candidate
+    // MARK: 取消選字 (Cancel Candidate)
 
     let cancelCandidateKey =
       input.isBackSpace || input.isESC || input.isDelete
@@ -52,12 +54,12 @@ extension KeyHandler {
     if cancelCandidateKey {
       if (state is InputState.AssociatedPhrases)
         || mgrPrefs.useSCPCTypingMode
-        || isBuilderEmpty
+        || isCompositorEmpty
       {
         // 如果此時發現當前組字緩衝區為真空的情況的話，
         // 就將當前的組字緩衝區析構處理、強制重設輸入狀態。
         // 否則，一個本不該出現的真空組字緩衝區會使前後方向鍵與 BackSpace 鍵失靈。
-        // 所以這裡需要對 isBuilderEmpty 做判定。
+        // 所以這裡需要對 isCompositorEmpty 做判定。
         clear()
         stateCallback(InputState.EmptyIgnoringPreviousState())
       } else {
@@ -286,7 +288,7 @@ extension KeyHandler {
       }
     }
 
-    // MARK: - Associated Phrases
+    // MARK: 聯想詞處理 (Associated Phrases)
 
     if state is InputState.AssociatedPhrases {
       if !input.isShiftHold { return false }
@@ -322,9 +324,13 @@ extension KeyHandler {
 
     if state is InputState.AssociatedPhrases { return false }
 
-    // MARK: SCPC Mode Processing
+    // MARK: 逐字選字模式的處理 (SCPC Mode Processing)
 
     if mgrPrefs.useSCPCTypingMode {
+      /// 檢查：
+      /// - 是否是針對當前注音排列/拼音輸入種類專門提供的標點符號。
+      /// - 是否是需要摁修飾鍵才可以輸入的那種標點符號。
+
       var punctuationNamePrefix = ""
 
       if input.isOptionHold && !input.isControlHold {
@@ -346,11 +352,13 @@ extension KeyHandler {
       ]
       let customPunctuation: String = arrCustomPunctuations.joined(separator: "")
 
+      /// 如果仍無匹配結果的話，看看這個輸入是否是不需要修飾鍵的那種標點鍵輸入。
+
       let arrPunctuations: [String] = [punctuationNamePrefix, String(format: "%c", CChar(charCode))]
       let punctuation: String = arrPunctuations.joined(separator: "")
 
       var shouldAutoSelectCandidate: Bool =
-        _composer.inputValidityCheck(key: charCode) || ifLangModelHasUnigrams(forKey: customPunctuation)
+        composer.inputValidityCheck(key: charCode) || ifLangModelHasUnigrams(forKey: customPunctuation)
         || ifLangModelHasUnigrams(forKey: punctuation)
 
       if !shouldAutoSelectCandidate, input.isUpperCaseASCIILetterKey {

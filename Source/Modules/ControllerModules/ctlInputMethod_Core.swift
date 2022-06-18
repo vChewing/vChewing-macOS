@@ -27,41 +27,58 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 import InputMethodKit
 
+/// 最小選字鍵字號。
 private let kMinKeyLabelSize: CGFloat = 10
 
+/// 目前在用的的選字窗副本。
 private var ctlCandidateCurrent = ctlCandidateUniversal.init(.horizontal)
 
-@objc(ctlInputMethod)
+/// 輸入法控制模組，乃在輸入法端用以控制輸入行為的基礎型別。
+///
+/// IMKInputController 完全實現了相關協定所定義的內容。
+/// 一般情況下，研發者不會複寫此型別，而是提供一個委任物件、
+/// 藉此實現研發者想製作的方法/函式。協定方法的 IMKInputController 版本
+/// 檢查委任物件是否實現了方法：若存在的話，就調用委任物件內的版本。
+/// - Remark: 在輸入法的主函式中分配的 IMKServer 型別為客體應用程式創建的每個
+/// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
+@objc(ctlInputMethod)  // 必須加上 ObjC，因為 IMK 是用 ObjC 寫的。
 class ctlInputMethod: IMKInputController {
-  @objc static var areWeDeleting = false
+  /// 標記狀態來聲明目前是在新增使用者語彙、還是準備要濾除使用者語彙。
+  static var areWeDeleting = false
 
+  /// 工具提示視窗的副本。
   static let tooltipController = TooltipController()
 
   // MARK: -
 
-  private var currentClient: Any?
-
+  /// 按鍵調度模組的副本。
   private var keyHandler: KeyHandler = .init()
+  /// 用以記錄當前輸入法狀態的變數。
   private var state: InputState = .Empty()
 
-  // 想讓 KeyHandler 能夠被外界調查狀態與參數的話，就得對 KeyHandler 做常態處理。
-  // 這樣 InputState 可以藉由這個 ctlInputMethod 了解到當前的輸入模式是簡體中文還是繁體中文。
-  // 然而，要是直接對 keyHandler 做常態處理的話，反而會導致 InputSignal 無法協同處理。
-  // 所以才需要「currentKeyHandler」這個假 KeyHandler。
-  // 這個「currentKeyHandler」僅用來讓其他模組知道當前的輸入模式是什麼模式，除此之外別無屌用。
-  static var currentKeyHandler: KeyHandler = .init()
-  @objc static var currentInputMode = mgrPrefs.mostRecentInputMode
+  // MARK: - 工具函式
 
-  // MARK: - Keyboard Layout Specifier
-
-  @objc func setKeyLayout() {
-    if let client = currentClient {
-      (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: mgrPrefs.basicKeyboardLayout)
-    }
+  /// 指定鍵盤佈局。
+  func setKeyLayout() {
+    client().overrideKeyboard(withKeyboardNamed: mgrPrefs.basicKeyboardLayout)
   }
 
-  // MARK: - IMKInputController methods
+  /// 重設按鍵調度模組。
+  func resetKeyHandler() {
+    keyHandler.clear()
+    handle(state: InputState.Empty())
+  }
 
+  // MARK: - IMKInputController 方法
+
+  /// 對用以設定委任物件的控制器型別進行初期化處理。
+  ///
+  /// inputClient 參數是客體應用側存在的用以藉由 IMKServer 伺服器向輸入法傳訊的物件。該物件始終遵守 IMKTextInput 協定。
+  /// - Remark: 所有由委任物件實裝的「被協定要求實裝的方法」都會有一個用來接受客體物件的參數。在 IMKInputController 內部的型別不需要接受這個參數，因為已經有「client()」這個參數存在了。
+  /// - Parameters:
+  ///   - server: IMKServer
+  ///   - delegate: 客體物件
+  ///   - inputClient: 用以接受輸入的客體應用物件
   override init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
     super.init(server: server, delegate: delegate, client: inputClient)
     keyHandler.delegate = self
@@ -70,47 +87,44 @@ class ctlInputMethod: IMKInputController {
     resetKeyHandler()
   }
 
-  // MARK: - KeyHandler Reset Command
+  // MARK: - IMKStateSetting 協定規定的方法
 
-  func resetKeyHandler(client sender: Any? = nil) {
-    keyHandler.clear()
-    if let client = sender as? IMKTextInput {
-      handle(state: InputState.Empty(), client: client)
-    } else if let currentClient = currentClient {
-      handle(state: InputState.Empty(), client: currentClient)
-    }
-  }
-
-  // MARK: - IMKStateSetting protocol methods
-
-  override func activateServer(_ client: Any!) {
+  /// 啟用輸入法時，會觸發該函式。
+  /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
+  override func activateServer(_ sender: Any!) {
+    _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     UserDefaults.standard.synchronize()
-
-    // reset the state
-    currentClient = client
 
     keyHandler.clear()
     keyHandler.ensureParser()
 
-    if let bundleCheckID = (client as? IMKTextInput)?.bundleIdentifier() {
-      if bundleCheckID != Bundle.main.bundleIdentifier {
-        // Override the keyboard layout to the basic one.
-        setKeyLayout()
-        handle(state: .Empty(), client: client)
-      }
-    }
+    /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
+    /// 這是很多 macOS 副廠輸入法的常見失誤之處。
+    if client().bundleIdentifier() != Bundle.main.bundleIdentifier {
+      // Override the keyboard layout to the basic one.
+      setKeyLayout()
+      handle(state: .Empty())
+    }  // 除此之外就不要動了，免得在點開輸入法自身的視窗時卡死。
     (NSApp.delegate as? AppDelegate)?.checkForUpdate()
   }
 
-  override func deactivateServer(_ client: Any!) {
+  /// 停用輸入法時，會觸發該函式。
+  /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
+  override func deactivateServer(_ sender: Any!) {
+    _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     keyHandler.clear()
-    currentClient = nil
-    handle(state: .Empty(), client: client)
-    handle(state: .Deactivated(), client: client)
+    handle(state: .Empty())
+    handle(state: .Deactivated())
   }
 
-  override func setValue(_ value: Any!, forTag tag: Int, client: Any!) {
-    _ = tag  // Stop clang-format from ruining the parameters of this function.
+  /// 切換至某一個輸入法的某個副本時（比如威注音的簡體輸入法副本與繁體輸入法副本），會觸發該函式。
+  /// - Parameters:
+  ///   - value: 輸入法在系統偏好設定當中的副本的 identifier，與 bundle identifier 類似。在輸入法的 info.plist 內定義。
+  ///   - tag: 標記（無須使用）。
+  ///   - sender: 呼叫了該函式的客體（無須使用）。
+  override func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
+    _ = tag  // 防止格式整理工具毀掉與此對應的參數。
+    _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     var newInputMode = InputMode(rawValue: value as? String ?? "") ?? InputMode.imeModeNULL
     switch newInputMode {
       case InputMode.imeModeCHS:
@@ -126,32 +140,47 @@ class ctlInputMethod: IMKInputController {
       UserDefaults.standard.synchronize()
       keyHandler.clear()
       keyHandler.inputMode = newInputMode
-      if let bundleCheckID = (client as? IMKTextInput)?.bundleIdentifier() {
-        if bundleCheckID != Bundle.main.bundleIdentifier {
-          // Remember to override the keyboard layout again -- treat this as an activate event.
-          setKeyLayout()
-          handle(state: .Empty(), client: client)
-        }
-      }
+      /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
+      /// 這是很多 macOS 副廠輸入法的常見失誤之處。
+      if client().bundleIdentifier() != Bundle.main.bundleIdentifier {
+        // Remember to override the keyboard layout again -- treat this as an activate event.
+        setKeyLayout()
+        handle(state: .Empty())
+      }  // 除此之外就不要動了，免得在點開輸入法自身的視窗時卡死。
     }
 
     // 讓外界知道目前的簡繁體輸入模式。
-    ctlInputMethod.currentKeyHandler.inputMode = keyHandler.inputMode
+    IME.currentInputMode = keyHandler.inputMode
   }
 
-  // MARK: - IMKServerInput protocol methods
+  // MARK: - IMKServerInput 協定規定的方法
 
+  /// 該函式的回饋結果決定了輸入法會攔截且捕捉哪些類型的輸入裝置操作事件。
+  ///
+  /// 一個客體應用會與輸入法共同確認某個輸入裝置操作事件是否可以觸發輸入法內的某個方法。預設情況下，
+  /// 該函式僅響應 Swift 的「`NSEvent.EventTypeMask = [.keyDown]`」，也就是 ObjC 當中的「`NSKeyDownMask`」。
+  /// 如果您的輸入法「僅攔截」鍵盤按鍵事件處理的話，IMK 會預設啟用這些對滑鼠的操作：當組字區存在時，
+  /// 如果使用者用滑鼠點擊了該文字輸入區內的組字區以外的區域的話，則該組字區的顯示內容會被直接藉由
+  /// 「`commitComposition(_ message)`」遞交給客體。
+  /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
+  /// - Returns: 返回一個 uint，其中承載了與系統 NSEvent 操作事件有關的掩碼集合（詳見 NSEvent.h）。
   override func recognizedEvents(_ sender: Any!) -> Int {
-    _ = sender  // Stop clang-format from ruining the parameters of this function.
+    _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     let events: NSEvent.EventTypeMask = [.keyDown, .flagsChanged]
     return Int(events.rawValue)
   }
 
+  /// 接受所有鍵鼠事件為 NSEvent，讓輸入法判斷是否要處理、該怎樣處理。
+  /// - Parameters:
+  ///   - event: 裝置操作輸入事件。
+  ///   - sender: 呼叫了該函式的客體（無須使用）。
+  /// - Returns: 回「`true`」以將該案件已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
   @objc(handleEvent:client:) override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
-    // 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
-    // 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
-    // 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
-    // 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
+    _ = sender  // 防止格式整理工具毀掉與此對應的參數。
+    /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
+    /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
+    /// 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
+    /// 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
     if event.type == .flagsChanged {
       return false
     }
@@ -160,18 +189,15 @@ class ctlInputMethod: IMKInputController {
     ctlInputMethod.areWeDeleting = event.modifierFlags.contains([.shift, .command])
 
     var textFrame = NSRect.zero
-    guard let client = sender as? IMKTextInput else {
-      return false
-    }
 
-    let attributes: [AnyHashable: Any]? = client.attributes(
+    let attributes: [AnyHashable: Any]? = client().attributes(
       forCharacterIndex: 0, lineHeightRectangle: &textFrame
     )
 
     let isTypingVertical =
       (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
 
-    if client.bundleIdentifier()
+    if client().bundleIdentifier()
       == "org.atelierInmu.vChewing.vChewingPhraseEditor"
     {
       IME.areWeUsingOurOwnPhraseEditor = true
@@ -187,276 +213,202 @@ class ctlInputMethod: IMKInputController {
       return false
     }
 
+    /// 將按鍵行為與當前輸入法狀態結合起來、交給按鍵調度模組來處理。
+    /// 再根據返回的 result bool 數值來告知 IMK「這個按鍵事件是被處理了還是被放行了」。
     let result = keyHandler.handle(input: input, state: state) { newState in
-      self.handle(state: newState, client: client)
+      self.handle(state: newState)
     } errorCallback: {
       clsSFX.beep()
     }
     return result
   }
 
-  // 有時會出現某些 App 攔截輸入法的 Ctrl+Enter / Shift+Enter 熱鍵的情況。
-  // 也就是說 handle(event:) 完全抓不到這個 Event。
-  // 這時需要在 commitComposition 這一關做一些收尾處理。
+  /// 有時會出現某些 App 攔截輸入法的 Ctrl+Enter / Shift+Enter 熱鍵的情況。
+  /// 也就是說 handle(event:) 完全抓不到這個 Event。
+  /// 這時需要在 commitComposition 這一關做一些收尾處理。
+  /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   override func commitComposition(_ sender: Any!) {
-    resetKeyHandler(client: sender)
-  }
-
-  // 這個函數必須得在對應的狀態下給出對應的內容。
-  override func composedString(_ sender: Any!) -> Any! {
-    _ = sender  // Stop clang-format from ruining the parameters of this function.
-    return (state as? InputState.NotEmpty)?.composingBuffer ?? ""
+    _ = sender  // 防止格式整理工具毀掉與此對應的參數。
+    if let state = state as? InputState.NotEmpty {
+      /// 將傳回的新狀態交給調度函式。
+      handle(state: InputState.Committing(textToCommit: state.composingBuffer))
+    }
+    resetKeyHandler()
   }
 }
 
-// MARK: - State Handling
+// MARK: - 狀態調度 (State Handling)
 
 extension ctlInputMethod {
-  private func handle(state newState: InputState, client: Any?) {
-    let previous = state
+  /// 針對傳入的新狀態進行調度。
+  ///
+  /// 先將舊狀態單獨記錄起來，再將新舊狀態作為參數，
+  /// 根據新狀態本身的狀態種類來判斷交給哪一個專門的函式來處理。
+  /// - Parameter newState: 新狀態。
+  private func handle(state newState: InputState) {
+    let prevState = state
     state = newState
 
-    if let newState = newState as? InputState.Deactivated {
-      handle(state: newState, previous: previous, client: client)
-    } else if let newState = newState as? InputState.Empty {
-      handle(state: newState, previous: previous, client: client)
-    } else if let newState = newState as? InputState.EmptyIgnoringPreviousState {
-      handle(state: newState, previous: previous, client: client)
-    } else if let newState = newState as? InputState.Committing {
-      handle(state: newState, previous: previous, client: client)
-    } else if let newState = newState as? InputState.Inputting {
-      handle(state: newState, previous: previous, client: client)
-    } else if let newState = newState as? InputState.Marking {
-      handle(state: newState, previous: previous, client: client)
-    } else if let newState = newState as? InputState.ChoosingCandidate {
-      handle(state: newState, previous: previous, client: client)
-    } else if let newState = newState as? InputState.AssociatedPhrases {
-      handle(state: newState, previous: previous, client: client)
-    } else if let newState = newState as? InputState.SymbolTable {
-      handle(state: newState, previous: previous, client: client)
+    switch newState {
+      case let newState as InputState.Deactivated:
+        handle(state: newState, previous: prevState)
+      case let newState as InputState.Empty:
+        handle(state: newState, previous: prevState)
+      case let newState as InputState.EmptyIgnoringPreviousState:
+        handle(state: newState, previous: prevState)
+      case let newState as InputState.Committing:
+        handle(state: newState, previous: prevState)
+      case let newState as InputState.Inputting:
+        handle(state: newState, previous: prevState)
+      case let newState as InputState.Marking:
+        handle(state: newState, previous: prevState)
+      case let newState as InputState.ChoosingCandidate:
+        handle(state: newState, previous: prevState)
+      case let newState as InputState.AssociatedPhrases:
+        handle(state: newState, previous: prevState)
+      case let newState as InputState.SymbolTable:
+        handle(state: newState, previous: prevState)
+      default: break
     }
   }
 
-  private func commit(text: String, client: Any!) {
-    func kanjiConversionIfRequired(_ text: String) -> String {
-      if keyHandler.inputMode == InputMode.imeModeCHT {
-        if !mgrPrefs.chineseConversionEnabled, mgrPrefs.shiftJISShinjitaiOutputEnabled {
-          return vChewingKanjiConverter.cnvTradToJIS(text)
-        }
-        if mgrPrefs.chineseConversionEnabled, !mgrPrefs.shiftJISShinjitaiOutputEnabled {
-          return vChewingKanjiConverter.cnvTradToKangXi(text)
-        }
-        // 本來這兩個開關不該同時開啟的，但萬一被開啟了的話就這樣處理：
-        if mgrPrefs.chineseConversionEnabled, mgrPrefs.shiftJISShinjitaiOutputEnabled {
-          return vChewingKanjiConverter.cnvTradToJIS(text)
-        }
-        // if (!mgrPrefs.chineseConversionEnabled && !mgrPrefs.shiftJISShinjitaiOutputEnabled) || (keyHandler.inputMode != InputMode.imeModeCHT);
-        return text
-      }
-      return text
+  /// 針對受 .NotEmpty() 管轄的非空狀態，在組字區內顯示游標。
+  private func setInlineDisplayWithCursor() {
+    guard let state = state as? InputState.NotEmpty else {
+      clearInlineDisplay()
+      return
     }
+    /// 所謂選區「selectionRange」，就是「可見游標位置」的位置，只不過長度
+    /// 是 0 且取代範圍（replacementRange）為「NSNotFound」罷了。
+    /// 也就是說，內文組字區該在哪裡出現，得由客體軟體來作主。
+    client().setMarkedText(
+      state.attributedString, selectionRange: NSRange(location: state.cursorIndex, length: 0),
+      replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
+    )
+  }
 
-    let buffer = kanjiConversionIfRequired(text)
+  /// 在處理不受 .NotEmpty() 管轄的狀態時可能要用到的函式，會清空螢幕上顯示的內文組字區。
+  /// 當 setInlineDisplayWithCursor() 在錯誤的狀態下被呼叫時，也會觸發這個函式。
+  private func clearInlineDisplay() {
+    client().setMarkedText(
+      "", selectionRange: NSRange(location: 0, length: 0),
+      replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
+    )
+  }
+
+  /// 遞交組字區內容。
+  private func commit(text: String) {
+    let buffer = IME.kanjiConversionIfRequired(text)
     if buffer.isEmpty {
       return
     }
 
-    var bufferOutput = ""
-
-    // 防止輸入法輸出不可列印的字元。
-    for theChar in buffer {
-      if let charCode = theChar.utf16.first {
-        if !(theChar.isASCII && !(charCode.isPrintable())) {
-          bufferOutput += String(theChar)
-        }
-      }
-    }
-
-    (client as? IMKTextInput)?.insertText(
-      bufferOutput, replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
+    client().insertText(
+      buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
   }
 
-  private func handle(state: InputState.Deactivated, previous: InputState, client: Any?) {
-    _ = state  // Stop clang-format from ruining the parameters of this function.
-    currentClient = nil
-
+  private func handle(state: InputState.Deactivated, previous: InputState) {
+    _ = state  // 防止格式整理工具毀掉與此對應的參數。
     ctlCandidateCurrent.delegate = nil
     ctlCandidateCurrent.visible = false
     hideTooltip()
-
     if let previous = previous as? InputState.NotEmpty {
-      commit(text: previous.composingBuffer, client: client)
+      commit(text: previous.composingBuffer)
     }
-    (client as? IMKTextInput)?.setMarkedText(
-      "", selectionRange: NSRange(location: 0, length: 0),
-      replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
-    )
+    clearInlineDisplay()
   }
 
-  private func handle(state: InputState.Empty, previous: InputState, client: Any?) {
-    _ = state  // Stop clang-format from ruining the parameters of this function.
+  private func handle(state: InputState.Empty, previous: InputState) {
+    _ = state  // 防止格式整理工具毀掉與此對應的參數。
     ctlCandidateCurrent.visible = false
     hideTooltip()
-
-    guard let client = client as? IMKTextInput else {
-      return
-    }
-
     if let previous = previous as? InputState.NotEmpty,
       !(state is InputState.EmptyIgnoringPreviousState)
     {
-      commit(text: previous.composingBuffer, client: client)
+      commit(text: previous.composingBuffer)
     }
-    client.setMarkedText(
-      "", selectionRange: NSRange(location: 0, length: 0),
-      replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
-    )
+    clearInlineDisplay()
   }
 
   private func handle(
-    state: InputState.EmptyIgnoringPreviousState, previous: InputState, client: Any!
+    state: InputState.EmptyIgnoringPreviousState, previous: InputState
   ) {
-    _ = state  // Stop clang-format from ruining the parameters of this function.
-    _ = previous  // Stop clang-format from ruining the parameters of this function.
+    _ = state  // 防止格式整理工具毀掉與此對應的參數。
+    _ = previous  // 防止格式整理工具毀掉與此對應的參數。
     ctlCandidateCurrent.visible = false
     hideTooltip()
-
-    guard let client = client as? IMKTextInput else {
-      return
-    }
-
-    client.setMarkedText(
-      "", selectionRange: NSRange(location: 0, length: 0),
-      replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
-    )
+    clearInlineDisplay()
   }
 
-  private func handle(state: InputState.Committing, previous: InputState, client: Any?) {
-    _ = previous  // Stop clang-format from ruining the parameters of this function.
+  private func handle(state: InputState.Committing, previous: InputState) {
+    _ = previous  // 防止格式整理工具毀掉與此對應的參數。
     ctlCandidateCurrent.visible = false
     hideTooltip()
-
-    guard let client = client as? IMKTextInput else {
-      return
+    let textToCommit = state.textToCommit
+    if !textToCommit.isEmpty {
+      commit(text: textToCommit)
     }
-
-    let poppedText = state.poppedText
-    if !poppedText.isEmpty {
-      commit(text: poppedText, client: client)
-    }
-    client.setMarkedText(
-      "", selectionRange: NSRange(location: 0, length: 0),
-      replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
-    )
+    clearInlineDisplay()
   }
 
-  private func handle(state: InputState.Inputting, previous: InputState, client: Any?) {
-    _ = previous  // Stop clang-format from ruining the parameters of this function.
+  private func handle(state: InputState.Inputting, previous: InputState) {
+    _ = previous  // 防止格式整理工具毀掉與此對應的參數。
     ctlCandidateCurrent.visible = false
     hideTooltip()
-
-    guard let client = client as? IMKTextInput else {
-      return
+    let textToCommit = state.textToCommit
+    if !textToCommit.isEmpty {
+      commit(text: textToCommit)
     }
-
-    let poppedText = state.poppedText
-    if !poppedText.isEmpty {
-      commit(text: poppedText, client: client)
-    }
-
-    // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
-    // i.e. the client app needs to take care of where to put this composing buffer
-    client.setMarkedText(
-      state.attributedString, selectionRange: NSRange(location: state.cursorIndex, length: 0),
-      replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
-    )
+    setInlineDisplayWithCursor()
     if !state.tooltip.isEmpty {
       show(
         tooltip: state.tooltip, composingBuffer: state.composingBuffer,
-        cursorIndex: state.cursorIndex, client: client
+        cursorIndex: state.cursorIndex
       )
     }
   }
 
-  private func handle(state: InputState.Marking, previous: InputState, client: Any?) {
-    _ = previous  // Stop clang-format from ruining the parameters of this function.
+  private func handle(state: InputState.Marking, previous: InputState) {
+    _ = previous  // 防止格式整理工具毀掉與此對應的參數。
     ctlCandidateCurrent.visible = false
-    guard let client = client as? IMKTextInput else {
-      hideTooltip()
-      return
-    }
-
-    // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
-    // i.e. the client app needs to take care of where to put this composing buffer
-    client.setMarkedText(
-      state.attributedString, selectionRange: NSRange(location: state.cursorIndex, length: 0),
-      replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
-    )
-
+    setInlineDisplayWithCursor()
     if state.tooltip.isEmpty {
       hideTooltip()
     } else {
       show(
         tooltip: state.tooltip, composingBuffer: state.composingBuffer,
-        cursorIndex: state.markerIndex, client: client
+        cursorIndex: state.markerIndex
       )
     }
   }
 
-  private func handle(state: InputState.ChoosingCandidate, previous: InputState, client: Any?) {
-    _ = previous  // Stop clang-format from ruining the parameters of this function.
+  private func handle(state: InputState.ChoosingCandidate, previous: InputState) {
+    _ = previous  // 防止格式整理工具毀掉與此對應的參數。
     hideTooltip()
-    guard let client = client as? IMKTextInput else {
-      ctlCandidateCurrent.visible = false
-      return
-    }
-
-    // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
-    // i.e. the client app needs to take care of where to put this composing buffer
-    client.setMarkedText(
-      state.attributedString, selectionRange: NSRange(location: state.cursorIndex, length: 0),
-      replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
-    )
-    show(candidateWindowWith: state, client: client)
+    setInlineDisplayWithCursor()
+    show(candidateWindowWith: state)
   }
 
-  private func handle(state: InputState.SymbolTable, previous: InputState, client: Any?) {
-    _ = previous  // Stop clang-format from ruining the parameters of this function.
+  private func handle(state: InputState.SymbolTable, previous: InputState) {
+    _ = previous  // 防止格式整理工具毀掉與此對應的參數。
     hideTooltip()
-    guard let client = client as? IMKTextInput else {
-      ctlCandidateCurrent.visible = false
-      return
-    }
-
-    // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
-    // i.e. the client app needs to take care of where to put this composing buffer
-    client.setMarkedText(
-      state.attributedString, selectionRange: NSRange(location: state.cursorIndex, length: 0),
-      replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
-    )
-    show(candidateWindowWith: state, client: client)
+    setInlineDisplayWithCursor()
+    show(candidateWindowWith: state)
   }
 
-  private func handle(state: InputState.AssociatedPhrases, previous: InputState, client: Any?) {
-    _ = previous  // Stop clang-format from ruining the parameters of this function.
+  private func handle(state: InputState.AssociatedPhrases, previous: InputState) {
+    _ = previous  // 防止格式整理工具毀掉與此對應的參數。
     hideTooltip()
-    guard let client = client as? IMKTextInput else {
-      ctlCandidateCurrent.visible = false
-      return
-    }
-    client.setMarkedText(
-      "", selectionRange: NSRange(location: 0, length: 0),
-      replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
-    )
-    show(candidateWindowWith: state, client: client)
+    clearInlineDisplay()
+    show(candidateWindowWith: state)
   }
 }
 
 // MARK: -
 
 extension ctlInputMethod {
-  private func show(candidateWindowWith state: InputState, client: Any!) {
+  private func show(candidateWindowWith state: InputState) {
     var isTypingVertical: Bool {
       if let state = state as? InputState.ChoosingCandidate {
         return state.isTypingVertical
@@ -518,7 +470,7 @@ extension ctlInputMethod {
         ? "Sarasa Term Slab SC" : "Sarasa Term Slab TC"
       var finalReturnFont =
         NSFont(name: currentMUIFont, size: size) ?? NSFont.systemFont(ofSize: size)
-      // 對更紗黑體的依賴到 macOS 11 Big Sur 為止。macOS 12 Monterey 開始則依賴系統內建的函數使用蘋方來處理。
+      // 對更紗黑體的依賴到 macOS 11 Big Sur 為止。macOS 12 Monterey 開始則依賴系統內建的函式使用蘋方來處理。
       if #available(macOS 12.0, *) { finalReturnFont = NSFont.systemFont(ofSize: size) }
       if let name = name {
         return NSFont(name: name, size: size) ?? finalReturnFont
@@ -543,7 +495,6 @@ extension ctlInputMethod {
 
     ctlCandidateCurrent.delegate = self
     ctlCandidateCurrent.reloadData()
-    currentClient = client
 
     ctlCandidateCurrent.visible = true
 
@@ -558,7 +509,7 @@ extension ctlInputMethod {
     }
 
     while lineHeightRect.origin.x == 0, lineHeightRect.origin.y == 0, cursor >= 0 {
-      (client as? IMKTextInput)?.attributes(
+      client().attributes(
         forCharacterIndex: cursor, lineHeightRectangle: &lineHeightRect
       )
       cursor -= 1
@@ -579,14 +530,14 @@ extension ctlInputMethod {
     }
   }
 
-  private func show(tooltip: String, composingBuffer: String, cursorIndex: Int, client: Any!) {
+  private func show(tooltip: String, composingBuffer: String, cursorIndex: Int) {
     var lineHeightRect = NSRect(x: 0.0, y: 0.0, width: 16.0, height: 16.0)
     var cursor = cursorIndex
     if cursor == composingBuffer.count, cursor != 0 {
       cursor -= 1
     }
     while lineHeightRect.origin.x == 0, lineHeightRect.origin.y == 0, cursor >= 0 {
-      (client as? IMKTextInput)?.attributes(
+      client().attributes(
         forCharacterIndex: cursor, lineHeightRectangle: &lineHeightRect
       )
       cursor -= 1
@@ -644,7 +595,7 @@ extension ctlInputMethod: KeyHandlerDelegate {
 
 extension ctlInputMethod: ctlCandidateDelegate {
   func candidateCountForController(_ controller: ctlCandidate) -> Int {
-    _ = controller  // Stop clang-format from ruining the parameters of this function.
+    _ = controller  // 防止格式整理工具毀掉與此對應的參數。
     if let state = state as? InputState.ChoosingCandidate {
       return state.candidates.count
     } else if let state = state as? InputState.AssociatedPhrases {
@@ -656,7 +607,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
   func ctlCandidate(_ controller: ctlCandidate, candidateAtIndex index: Int)
     -> String
   {
-    _ = controller  // Stop clang-format from ruining the parameters of this function.
+    _ = controller  // 防止格式整理工具毀掉與此對應的參數。
     if let state = state as? InputState.ChoosingCandidate {
       return state.candidates[index]
     } else if let state = state as? InputState.AssociatedPhrases {
@@ -666,21 +617,19 @@ extension ctlInputMethod: ctlCandidateDelegate {
   }
 
   func ctlCandidate(_ controller: ctlCandidate, didSelectCandidateAtIndex index: Int) {
-    _ = controller  // Stop clang-format from ruining the parameters of this function.
-    let client = currentClient
+    _ = controller  // 防止格式整理工具毀掉與此對應的參數。
 
     if let state = state as? InputState.SymbolTable,
       let node = state.node.children?[index]
     {
       if let children = node.children, !children.isEmpty {
-        handle(state: .Empty(), client: client)  // 防止縱橫排選字窗同時出現
+        handle(state: .Empty())  // 防止縱橫排選字窗同時出現
         handle(
-          state: .SymbolTable(node: node, isTypingVertical: state.isTypingVertical),
-          client: currentClient
+          state: .SymbolTable(node: node, isTypingVertical: state.isTypingVertical)
         )
       } else {
-        handle(state: .Committing(poppedText: node.title), client: client)
-        handle(state: .Empty(), client: client)
+        handle(state: .Committing(textToCommit: node.title))
+        handle(state: .Empty())
       }
       return
     }
@@ -694,33 +643,33 @@ extension ctlInputMethod: ctlCandidateDelegate {
       if mgrPrefs.useSCPCTypingMode {
         keyHandler.clear()
         let composingBuffer = inputting.composingBuffer
-        handle(state: .Committing(poppedText: composingBuffer), client: client)
+        handle(state: .Committing(textToCommit: composingBuffer))
         if mgrPrefs.associatedPhrasesEnabled,
           let associatePhrases = keyHandler.buildAssociatePhraseState(
             withKey: composingBuffer, isTypingVertical: state.isTypingVertical
           ), !associatePhrases.candidates.isEmpty
         {
-          handle(state: associatePhrases, client: client)
+          handle(state: associatePhrases)
         } else {
-          handle(state: .Empty(), client: client)
+          handle(state: .Empty())
         }
       } else {
-        handle(state: inputting, client: client)
+        handle(state: inputting)
       }
       return
     }
 
     if let state = state as? InputState.AssociatedPhrases {
       let selectedValue = state.candidates[index]
-      handle(state: .Committing(poppedText: selectedValue), client: currentClient)
+      handle(state: .Committing(textToCommit: selectedValue))
       if mgrPrefs.associatedPhrasesEnabled,
         let associatePhrases = keyHandler.buildAssociatePhraseState(
           withKey: selectedValue, isTypingVertical: state.isTypingVertical
         ), !associatePhrases.candidates.isEmpty
       {
-        handle(state: associatePhrases, client: client)
+        handle(state: associatePhrases)
       } else {
-        handle(state: .Empty(), client: client)
+        handle(state: .Empty())
       }
     }
   }

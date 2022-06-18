@@ -17,15 +17,15 @@
 		5B38F59D281E2E49007D5F5D /* 4_Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1A15FC0EB100ABF4B3 /* 4_Node.swift */; };
 		5B38F59E281E2E49007D5F5D /* 6_Bigram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1415FC0EB100ABF4B3 /* 6_Bigram.swift */; };
 		5B38F59F281E2E49007D5F5D /* 3_NodeAnchor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1B15FC0EB100ABF4B3 /* 3_NodeAnchor.swift */; };
-		5B38F5A1281E2E49007D5F5D /* 1_BlockReadingBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1515FC0EB100ABF4B3 /* 1_BlockReadingBuilder.swift */; };
+		5B38F5A1281E2E49007D5F5D /* 1_Compositor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1515FC0EB100ABF4B3 /* 1_Compositor.swift */; };
 		5B38F5A2281E2E49007D5F5D /* 0_Megrez.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1615FC0EB100ABF4B3 /* 0_Megrez.swift */; };
 		5B38F5A3281E2E49007D5F5D /* 3_Span.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1C15FC0EB100ABF4B3 /* 3_Span.swift */; };
 		5B38F5A4281E2E49007D5F5D /* 5_LanguageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1915FC0EB100ABF4B3 /* 5_LanguageModel.swift */; };
+		5B3A87BC28597CDB0090E163 /* SymbolNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3A87BB28597CDB0090E163 /* SymbolNode.swift */; };
 		5B40730C281672610023DFFF /* lmAssociates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B407309281672610023DFFF /* lmAssociates.swift */; };
 		5B40730D281672610023DFFF /* lmReplacements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B40730A281672610023DFFF /* lmReplacements.swift */; };
 		5B54E743283A7D89001ECBDC /* lmCoreNS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B54E742283A7D89001ECBDC /* lmCoreNS.swift */; };
 		5B5E535227EF261400C6AA1E /* IME.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E535127EF261400C6AA1E /* IME.swift */; };
-		5B61B0CA280BEFD4002E3CFA /* KeyHandler_Misc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B61B0C9280BEFD4002E3CFA /* KeyHandler_Misc.swift */; };
 		5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */; };
 		5B62A33227AE792F00A19448 /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33127AE792F00A19448 /* InputSourceHelper.swift */; };
 		5B62A33627AE795800A19448 /* mgrPrefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33527AE795800A19448 /* mgrPrefs.swift */; };
@@ -111,7 +111,7 @@
 		D47B92C027972AD100458394 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47B92BF27972AC800458394 /* main.swift */; };
 		D47F7DCE278BFB57002F9DD7 /* ctlPrefWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCD278BFB57002F9DD7 /* ctlPrefWindow.swift */; };
 		D47F7DD0278C0897002F9DD7 /* ctlNonModalAlertWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCF278C0897002F9DD7 /* ctlNonModalAlertWindow.swift */; };
-		D4A13D5A27A59F0B003BE359 /* ctlInputMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A13D5927A59D5C003BE359 /* ctlInputMethod.swift */; };
+		D4A13D5A27A59F0B003BE359 /* ctlInputMethod_Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A13D5927A59D5C003BE359 /* ctlInputMethod_Core.swift */; };
 		D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8827A838CF006DB1CF /* Localizable.strings */; };
 		D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8D27A838F0006DB1CF /* InfoPlist.strings */; };
 		D4E569DC27A34D0E00AC2CEF /* CTools.m in Sources */ = {isa = PBXBuildFile; fileRef = D4E569DB27A34CC100AC2CEF /* CTools.m */; };
@@ -187,11 +187,11 @@
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
 		5B3133BE280B229700A4A505 /* KeyHandler_States.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_States.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		5B3A87BB28597CDB0090E163 /* SymbolNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolNode.swift; sourceTree = "<group>"; };
 		5B407309281672610023DFFF /* lmAssociates.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = lmAssociates.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5B40730A281672610023DFFF /* lmReplacements.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = lmReplacements.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5B54E742283A7D89001ECBDC /* lmCoreNS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lmCoreNS.swift; sourceTree = "<group>"; };
 		5B5E535127EF261400C6AA1E /* IME.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = IME.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5B61B0C9280BEFD4002E3CFA /* KeyHandler_Misc.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_Misc.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = FSEventStreamHelper.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A33127AE792F00A19448 /* InputSourceHelper.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputSourceHelper.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A33527AE795800A19448 /* mgrPrefs.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = mgrPrefs.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -284,7 +284,7 @@
 		6A0D4EF515FC0DA600ABF4B3 /* IME-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IME-Info.plist"; sourceTree = "<group>"; };
 		6A0D4EF615FC0DA600ABF4B3 /* vChewing-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vChewing-Prefix.pch"; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		6A0D4F1415FC0EB100ABF4B3 /* 6_Bigram.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 6_Bigram.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		6A0D4F1515FC0EB100ABF4B3 /* 1_BlockReadingBuilder.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 1_BlockReadingBuilder.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		6A0D4F1515FC0EB100ABF4B3 /* 1_Compositor.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 1_Compositor.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		6A0D4F1615FC0EB100ABF4B3 /* 0_Megrez.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = 0_Megrez.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		6A0D4F1715FC0EB100ABF4B3 /* 2_Grid.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 2_Grid.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		6A0D4F1815FC0EB100ABF4B3 /* 7_KeyValuePair.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 7_KeyValuePair.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -310,7 +310,7 @@
 		D47B92BF27972AC800458394 /* main.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = main.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D47F7DCD278BFB57002F9DD7 /* ctlPrefWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlPrefWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D47F7DCF278C0897002F9DD7 /* ctlNonModalAlertWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlNonModalAlertWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		D4A13D5927A59D5C003BE359 /* ctlInputMethod.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlInputMethod.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		D4A13D5927A59D5C003BE359 /* ctlInputMethod_Core.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlInputMethod_Core.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D4E33D8927A838CF006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D4E33D8E27A838F0006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D4E569DA27A34CC100AC2CEF /* CTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = CTools.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
@@ -405,6 +405,8 @@
 			isa = PBXGroup;
 			children = (
 				5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */,
+				D4A13D5927A59D5C003BE359 /* ctlInputMethod_Core.swift */,
+				5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */,
 				D4E569DA27A34CC100AC2CEF /* CTools.h */,
 				D4E569DB27A34CC100AC2CEF /* CTools.m */,
 				D456576D279E4F7B00DF6BC9 /* InputSignal.swift */,
@@ -412,7 +414,6 @@
 				5BD0113C2818543900609769 /* KeyHandler_Core.swift */,
 				5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */,
 				5B7F225C2808501000DDD3CB /* KeyHandler_HandleInput.swift */,
-				5B61B0C9280BEFD4002E3CFA /* KeyHandler_Misc.swift */,
 				5B3133BE280B229700A4A505 /* KeyHandler_States.swift */,
 				5B62A33727AE79CD00A19448 /* StringUtils.swift */,
 				5BAA8FBD282CAF380066C406 /* SyllableComposer.swift */,
@@ -442,8 +443,6 @@
 			isa = PBXGroup;
 			children = (
 				5BDC1CF927FDF1310052C2B9 /* apiUpdate.swift */,
-				5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */,
-				D4A13D5927A59D5C003BE359 /* ctlInputMethod.swift */,
 				5B5E535127EF261400C6AA1E /* IME.swift */,
 				5B62A33127AE792F00A19448 /* InputSourceHelper.swift */,
 				5B62A33527AE795800A19448 /* mgrPrefs.swift */,
@@ -466,6 +465,7 @@
 				5B949BDA2816DDBC00D87B5D /* LMConsolidator.swift */,
 				5BD0113A28180D6100609769 /* LMInstantiator.swift */,
 				5BAEFACF28012565001F42C9 /* mgrLangModel.swift */,
+				5B3A87BB28597CDB0090E163 /* SymbolNode.swift */,
 			);
 			path = LangModelRelated;
 			sourceTree = "<group>";
@@ -761,7 +761,7 @@
 			isa = PBXGroup;
 			children = (
 				6A0D4F1615FC0EB100ABF4B3 /* 0_Megrez.swift */,
-				6A0D4F1515FC0EB100ABF4B3 /* 1_BlockReadingBuilder.swift */,
+				6A0D4F1515FC0EB100ABF4B3 /* 1_Compositor.swift */,
 				6A0D4F1715FC0EB100ABF4B3 /* 2_Grid.swift */,
 				6A0D4F1B15FC0EB100ABF4B3 /* 3_NodeAnchor.swift */,
 				6A0D4F1C15FC0EB100ABF4B3 /* 3_Span.swift */,
@@ -1059,7 +1059,7 @@
 				D461B792279DAC010070E734 /* InputState.swift in Sources */,
 				5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */,
 				D47B92C027972AD100458394 /* main.swift in Sources */,
-				D4A13D5A27A59F0B003BE359 /* ctlInputMethod.swift in Sources */,
+				D4A13D5A27A59F0B003BE359 /* ctlInputMethod_Core.swift in Sources */,
 				5BA9FD4827FEF3C9002DE248 /* PreferencesWindowController.swift in Sources */,
 				5BD0113B28180D6100609769 /* LMInstantiator.swift in Sources */,
 				D4E569DC27A34D0E00AC2CEF /* CTools.m in Sources */,
@@ -1071,6 +1071,7 @@
 				D456576E279E4F7B00DF6BC9 /* InputSignal.swift in Sources */,
 				5BA9FD1027FEDB6B002DE248 /* suiPrefPaneKeyboard.swift in Sources */,
 				5B3133BF280B229700A4A505 /* KeyHandler_States.swift in Sources */,
+				5B3A87BC28597CDB0090E163 /* SymbolNode.swift in Sources */,
 				5BA9FD4327FEF3C8002DE248 /* Preferences.swift in Sources */,
 				5BA9FD4427FEF3C8002DE248 /* SegmentedControlStyleViewController.swift in Sources */,
 				D47F7DCE278BFB57002F9DD7 /* ctlPrefWindow.swift in Sources */,
@@ -1100,7 +1101,6 @@
 				5B62A33227AE792F00A19448 /* InputSourceHelper.swift in Sources */,
 				5B5E535227EF261400C6AA1E /* IME.swift in Sources */,
 				5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */,
-				5B61B0CA280BEFD4002E3CFA /* KeyHandler_Misc.swift in Sources */,
 				5B38F59A281E2E49007D5F5D /* 6_Unigram.swift in Sources */,
 				5BA9FD4027FEF3C8002DE248 /* Localization.swift in Sources */,
 				5BAA8FBE282CAF380066C406 /* SyllableComposer.swift in Sources */,
@@ -1113,7 +1113,7 @@
 				5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */,
 				5BA9FD3F27FEF3C8002DE248 /* Pane.swift in Sources */,
 				5BB802DA27FABA8300CF1C19 /* ctlInputMethod_Menu.swift in Sources */,
-				5B38F5A1281E2E49007D5F5D /* 1_BlockReadingBuilder.swift in Sources */,
+				5B38F5A1281E2E49007D5F5D /* 1_Compositor.swift in Sources */,
 				5BDC1CFA27FDF1310052C2B9 /* apiUpdate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1304,7 +1304,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1970;
+				CURRENT_PROJECT_VERSION = 1971;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1328,7 +1328,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.7.0;
+				MARKETING_VERSION = 1.7.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
@@ -1361,7 +1361,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1970;
+				CURRENT_PROJECT_VERSION = 1971;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -1381,7 +1381,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.7.0;
+				MARKETING_VERSION = 1.7.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
@@ -1499,7 +1499,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1970;
+				CURRENT_PROJECT_VERSION = 1971;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1535,7 +1535,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.7.0;
+				MARKETING_VERSION = 1.7.1;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1567,7 +1567,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1970;
+				CURRENT_PROJECT_VERSION = 1971;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -1598,7 +1598,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.7.0;
+				MARKETING_VERSION = 1.7.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1625,7 +1625,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1970;
+				CURRENT_PROJECT_VERSION = 1971;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1651,7 +1651,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.7.0;
+				MARKETING_VERSION = 1.7.1;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.atelierInmu.vChewing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1678,7 +1678,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1970;
+				CURRENT_PROJECT_VERSION = 1971;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
@@ -1699,7 +1699,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11.5;
-				MARKETING_VERSION = 1.7.0;
+				MARKETING_VERSION = 1.7.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.atelierInmu.vChewing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
