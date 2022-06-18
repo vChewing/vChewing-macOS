@@ -113,8 +113,19 @@ extension KeyHandler {
     let composedText = head + reading + tail
     let cursorIndex = composedStringCursorIndex + reading.utf16.count
 
+    var cleanedComposition = ""
+
+    // 防止組字區內出現不可列印的字元。
+    for theChar in composedText {
+      if let charCode = theChar.utf16.first {
+        if !(theChar.isASCII && !(charCode.isPrintable())) {
+          cleanedComposition += String(theChar)
+        }
+      }
+    }
+
     /// 這裡生成準備要拿來回呼的「正在輸入」狀態，但還不能立即使用，因為工具提示仍未完成。
-    let stateResult = InputState.Inputting(composingBuffer: composedText, cursorIndex: cursorIndex)
+    let stateResult = InputState.Inputting(composingBuffer: cleanedComposition, cursorIndex: cursorIndex)
 
     /// 根據上文的參數結果來決定生成怎樣的工具提示。
     switch (tooltipParameterRef[0].isEmpty, tooltipParameterRef[1].isEmpty) {

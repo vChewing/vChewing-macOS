@@ -303,19 +303,8 @@ extension ctlInputMethod {
       return
     }
 
-    var bufferOutput = ""
-
-    // 防止輸入法輸出不可列印的字元。
-    for theChar in buffer {
-      if let charCode = theChar.utf16.first {
-        if !(theChar.isASCII && !(charCode.isPrintable())) {
-          bufferOutput += String(theChar)
-        }
-      }
-    }
-
     client().insertText(
-      bufferOutput, replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
+      buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
   }
 
