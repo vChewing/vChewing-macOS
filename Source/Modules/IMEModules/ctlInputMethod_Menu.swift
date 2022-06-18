@@ -171,7 +171,7 @@ extension ctlInputMethod {
       )
     }
 
-    // NSMenu 會阻止任何 modified key 相關的訊號傳回輸入法，所以咱們在此重設鍵盤佈局
+    // NSMenu 會阻止任何修飾鍵狀態切換訊號傳回輸入法，所以咱們在此重設鍵盤佈局。
     setKeyLayout()
 
     return menu
