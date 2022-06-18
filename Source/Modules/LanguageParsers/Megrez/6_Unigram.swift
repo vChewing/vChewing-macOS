@@ -49,11 +49,6 @@ extension Megrez {
       hasher.combine(score)
     }
 
-    // 這個函式不再需要了。
-    public static func compareScore(a: Unigram, b: Unigram) -> Bool {
-      a.score > b.score
-    }
-
     public static func == (lhs: Unigram, rhs: Unigram) -> Bool {
       lhs.keyValue == rhs.keyValue && lhs.score == rhs.score
     }

@@ -30,17 +30,17 @@ extension Megrez {
 
     // 這裡寫了一點假內容，不然有些 Swift 格式化工具會破壞掉函式的參數設計。
 
-    /// 給定鍵，讓語言模型找給一筆單元圖。
+    /// 給定鍵，讓語言模型找給一組單元圖陣列。
     open func unigramsFor(key: String) -> [Megrez.Unigram] {
       key.isEmpty ? [Megrez.Unigram]() : [Megrez.Unigram]()
     }
 
-    /// 給定當前鍵與前述鍵，讓語言模型找給一筆雙元圖。
+    /// 給定當前鍵與前述鍵，讓語言模型找給一組雙元圖陣列。
     open func bigramsForKeys(precedingKey: String, key: String) -> [Megrez.Bigram] {
       precedingKey == key ? [Megrez.Bigram]() : [Megrez.Bigram]()
     }
 
-    /// 給定鍵，
+    /// 給定鍵，確認是否有單元圖記錄在庫。
     open func hasUnigramsFor(key: String) -> Bool {
       key.count != 0
     }

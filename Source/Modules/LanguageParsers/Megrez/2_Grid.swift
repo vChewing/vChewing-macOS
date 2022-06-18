@@ -32,15 +32,16 @@ extension Megrez {
     /// 該幅位內可以允許的最大詞長。
     private var mutMaxBuildSpanLength = 10
 
-    /// 公開：該幅位內可以允許的最大詞長。
+    /// 公開：該軌格內可以允許的最大幅位長度。
     public var maxBuildSpanLength: Int { mutMaxBuildSpanLength }
 
-    /// 軌格的寬度，也就是其內的幅位陣列當中的幅位數量。
-    var width: Int { mutSpans.count }
+    /// 公開：軌格的寬度，也就是其內的幅位陣列當中的幅位數量。
+    public var width: Int { mutSpans.count }
 
-    /// 軌格是否為空。
-    var isEmpty: Bool { mutSpans.isEmpty }
+    /// 公開：軌格是否為空。
+    public var isEmpty: Bool { mutSpans.isEmpty }
 
+    /// 初期化轨格。
     public init(spanLength: Int = 10) {
       mutMaxBuildSpanLength = spanLength
       mutSpans = [Megrez.Span]()
@@ -193,6 +194,8 @@ extension Megrez {
     }
 
     /// 將給定位置的節點的候選字詞改為與給定的字串一致的候選字詞。
+    ///
+    /// 該函式可以僅用作過程函式。
     /// - Parameters:
     ///   - location: 位置。
     ///   - value: 給定字串。
@@ -245,6 +248,7 @@ extension Megrez {
 // MARK: - DumpDOT-related functions.
 
 extension Megrez.Grid {
+  /// 生成用以交給 GraphViz 診斷的資料檔案內容，純文字。
   public var dumpDOT: String {
     var strOutput = "digraph {\ngraph [ rankdir=LR ];\nBOS;\n"
     for (p, span) in mutSpans.enumerated() {

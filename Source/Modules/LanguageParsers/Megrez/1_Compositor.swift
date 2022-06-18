@@ -37,7 +37,7 @@ extension Megrez {
     /// 該組字器所使用的語言模型。
     private var mutLM: LanguageModel
 
-    /// 公開該組字器內可以允許的最大詞長。
+    /// 公開：該組字器內可以允許的最大詞長。
     public var maxBuildSpanLength: Int { mutGrid.maxBuildSpanLength }
     /// 公開：多字讀音鍵當中用以分割漢字讀音的記號，預設為空。
     public var joinSeparator: String = ""
@@ -48,7 +48,7 @@ extension Megrez {
     }
 
     /// 公開：該組字器是否為空。
-    public var isEmpty: Bool { grid.isEmpty }
+    public var isEmpty: Bool { mutGrid.isEmpty }
 
     /// 公開：該組字器的軌格（唯讀）。
     public var grid: Grid { mutGrid }
@@ -112,7 +112,7 @@ extension Megrez {
       return true
     }
 
-    /// 移除該組字器的第一個讀音單元。
+    /// 移除該組字器最先被輸入的第 X 個讀音單元。
     ///
     /// 用於輸入法組字區長度上限處理：
     /// 將該位置要溢出的敲字內容遞交之後、再執行這個函式。

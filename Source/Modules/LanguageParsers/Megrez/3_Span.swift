@@ -32,7 +32,7 @@ extension Megrez {
     private var mutMaximumLength: Int = 0
 
     /// 公開：最長幅距（唯讀）。
-    var maximumLength: Int {
+    public var maximumLength: Int {
       mutMaximumLength
     }
 
