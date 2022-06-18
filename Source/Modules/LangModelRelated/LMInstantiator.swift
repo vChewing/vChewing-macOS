@@ -61,7 +61,7 @@ extension vChewing {
   /// files are modified. It does not keep the reference of the data pathes but
   /// you have to pass the paths when you ask it to load.
   public class LMInstantiator: Megrez.LanguageModel {
-    // 在函數內部用以記錄狀態的開關。
+    // 在函式內部用以記錄狀態的開關。
     public var isPhraseReplacementEnabled = false
     public var isCNSEnabled = false
     public var isSymbolEnabled = false
@@ -100,10 +100,10 @@ extension vChewing {
     var lmReplacements = LMReplacments()
     var lmAssociates = LMAssociates()
 
-    // 初期化的函數先保留
+    // 初期化的函式先保留
     override init() {}
 
-    // 以下這些函數命名暫時保持原樣，等弒神行動徹底結束了再調整。
+    // 以下這些函式命名暫時保持原樣，等弒神行動徹底結束了再調整。
 
     public var isLanguageModelLoaded: Bool { lmCore.isLoaded() }
     public func loadLanguageModel(path: String) {

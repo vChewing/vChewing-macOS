@@ -57,7 +57,7 @@ extension String {
   }
 }
 
-// MARK: - 引入小數點位數控制函數
+// MARK: - 引入小數點位數控制函式
 
 // Ref: https://stackoverflow.com/a/32581409/4162914
 extension Float {
@@ -67,7 +67,7 @@ extension Float {
   }
 }
 
-// MARK: - 引入冪乘函數
+// MARK: - 引入冪乘函式
 
 // Ref: https://stackoverflow.com/a/41581695/4162914
 precedencegroup ExponentiationPrecedence {

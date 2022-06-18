@@ -25,7 +25,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 /// 該檔案乃按鍵調度模組的核心部分，主要承接型別初期化內容、協定內容、以及
-/// 被封裝的「與 Megrez 組字引擎和 Tekkon 注拼引擎對接的」各種工具函數。
+/// 被封裝的「與 Megrez 組字引擎和 Tekkon 注拼引擎對接的」各種工具函式。
 /// 注意：不要把 composer 注拼槽與 compositor 組字器這兩個概念搞混。
 
 import Cocoa
@@ -57,7 +57,7 @@ class KeyHandler {
   var currentLM: vChewing.LMInstantiator = .init()  // 當前主語言模組
   var currentUOM: vChewing.LMUserOverride = .init()  // 當前半衰記憶模組
   var walkedAnchors: [Megrez.NodeAnchor] = []  // 用以記錄爬過的節錨的陣列
-  /// 委任物件 (ctlInputMethod)，以便呼叫其中的函數。
+  /// 委任物件 (ctlInputMethod)，以便呼叫其中的函式。
   var delegate: KeyHandlerDelegate?
 
   /// InputMode 需要在每次出現內容變更的時候都連帶重設組字器與各項語言模組，
@@ -111,7 +111,7 @@ class KeyHandler {
   ///
   /// 該過程讀取的權重資料是經過 Viterbi 演算法計算得到的結果。
   ///
-  /// 該函數的爬取順序是從頭到尾。
+  /// 該函式的爬取順序是從頭到尾。
   func walk() {
     walkedAnchors = compositor.walk()
 
@@ -153,7 +153,7 @@ class KeyHandler {
   /// 用以組建聯想詞陣列的函式。
   /// - Parameter key: 給定的聯想詞的開頭字。
   /// - Returns: 抓取到的聯想詞陣列。
-  /// 不會是 nil，但那些負責接收結果的函數會對空白陣列結果做出正確的處理。
+  /// 不會是 nil，但那些負責接收結果的函式會對空白陣列結果做出正確的處理。
   func buildAssociatePhraseArray(withKey key: String) -> [String] {
     var arrResult: [String] = []
     if currentLM.hasAssociatedPhrasesForKey(key) {
@@ -347,7 +347,7 @@ class KeyHandler {
     composer.clear()
   }
 
-  /// 用於網頁 Ruby 的注音需要按照教科書印刷的方式來顯示輕聲。該函數負責這種轉換。
+  /// 用於網頁 Ruby 的注音需要按照教科書印刷的方式來顯示輕聲。該函式負責這種轉換。
   /// - Parameters:
   ///   - target: 要拿來做轉換處理的讀音鏈。
   ///   - newSeparator: 新的讀音分隔符。

@@ -49,7 +49,7 @@ extension Megrez {
       hasher.combine(score)
     }
 
-    // 這個函數不再需要了。
+    // 這個函式不再需要了。
     public static func compareScore(a: Unigram, b: Unigram) -> Bool {
       a.score > b.score
     }

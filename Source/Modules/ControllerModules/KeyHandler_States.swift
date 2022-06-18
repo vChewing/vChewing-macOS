@@ -24,11 +24,11 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/// 該檔案乃按鍵調度模組的用以承載「根據按鍵行為來調控模式」的各種成員函數的部分。
+/// 該檔案乃按鍵調度模組的用以承載「根據按鍵行為來調控模式」的各種成員函式的部分。
 
 import Cocoa
 
-// MARK: - § 根據按鍵行為來調控模式的函數 (Functions Interact With States).
+// MARK: - § 根據按鍵行為來調控模式的函式 (Functions Interact With States).
 
 extension KeyHandler {
   // MARK: - 構築狀態（State Building）
@@ -168,11 +168,11 @@ extension KeyHandler {
   /// 拿著給定的聯想詞陣列資料內容，切換至聯想詞狀態。
   ///
   /// 這次重寫時，針對「buildAssociatePhraseStateWithKey」這個（用以生成帶有
-  /// 聯想詞候選清單的結果的狀態回呼的）函數進行了小幅度的重構處理，使其始終
-  /// 可以從 Core 部分的「buildAssociatePhraseArray」函數獲取到一個內容類型
-  /// 為「String」的標準 Swift 陣列。這樣一來，該聯想詞狀態回呼函數將始終能
-  /// 夠傳回正確的結果形態、永遠也無法傳回 nil。於是，所有在用到該函數時以
-  /// 回傳結果類型判斷作為合法性判斷依據的函數，全都將依據改為檢查傳回的陣列
+  /// 聯想詞候選清單的結果的狀態回呼的）函式進行了小幅度的重構處理，使其始終
+  /// 可以從 Core 部分的「buildAssociatePhraseArray」函式獲取到一個內容類型
+  /// 為「String」的標準 Swift 陣列。這樣一來，該聯想詞狀態回呼函式將始終能
+  /// 夠傳回正確的結果形態、永遠也無法傳回 nil。於是，所有在用到該函式時以
+  /// 回傳結果類型判斷作為合法性判斷依據的函式，全都將依據改為檢查傳回的陣列
   /// 是否為空：如果陣列為空的話，直接回呼一個空狀態。
   /// - Parameters:
   ///   - key: 給定的索引鍵（也就是給定的聯想詞的開頭字）。
@@ -760,7 +760,7 @@ extension KeyHandler {
       return true
     }
 
-    // 此處僅借用該函數生成結果內的某個物件，不用糾結「是否縱排輸入」。
+    // 此處僅借用該函式生成結果內的某個物件，不用糾結「是否縱排輸入」。
     let candidates = buildCandidate(state: state).candidates
     guard !candidates.isEmpty else {
       IME.prtDebugIntel("3378A6DF")
@@ -796,7 +796,7 @@ extension KeyHandler {
       /// 那些字詞長度不小於 2 的單元圖。換言之，如果使用者敲了兩個
       /// 注音讀音、卻發現這兩個注音讀音各自的單字權重遠高於由這兩個
       /// 讀音組成的雙字詞的權重、導致這個雙字詞並未在爬軌時被自動
-      /// 選中的話，則使用者可以直接摁下本函數對應的按鍵來輪替候選字即可。
+      /// 選中的話，則使用者可以直接摁下本函式對應的按鍵來輪替候選字即可。
       /// （預設情況下是 (Shift+)Tab 來做正 (反) 向切換，但也可以用
       /// Shift(+CMD)+Space 來切換、以應對臉書綁架 Tab 鍵的情況。
       if candidates[0] == currentValue {

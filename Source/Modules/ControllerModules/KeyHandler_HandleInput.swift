@@ -150,7 +150,7 @@ extension KeyHandler {
 
     // 這裡 inputValidityCheck() 是讓注拼槽檢查 charCode 這個 UniChar 是否是合法的注音輸入。
     // 如果是的話，就將這次傳入的這個按鍵訊號塞入注拼槽內且標記為「keyConsumedByReading」。
-    // 函數 composer.receiveKey() 可以既接收 String 又接收 UniChar。
+    // 函式 composer.receiveKey() 可以既接收 String 又接收 UniChar。
     if !skipPhoneticHandling && composer.inputValidityCheck(key: charCode) {
       composer.receiveKey(fromCharCode: charCode)
       keyConsumedByReading = true
@@ -397,7 +397,7 @@ extension KeyHandler {
       } else {
         // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
         // 於是這裡用「模擬一次 Enter 鍵的操作」使其代為執行這個 commit buffer 的動作。
-        // 這裡不需要該函數所傳回的 bool 結果，所以用「_ =」解消掉。
+        // 這裡不需要該函式所傳回的 bool 結果，所以用「_ =」解消掉。
         _ = handleEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
         stateCallback(InputState.SymbolTable(node: SymbolNode.root, isTypingVertical: input.isTypingVertical))
         return true

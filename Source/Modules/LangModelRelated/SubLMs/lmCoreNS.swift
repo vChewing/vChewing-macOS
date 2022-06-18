@@ -126,12 +126,12 @@ extension vChewing {
 
     /// 【該功能無法使用】根據給定的前述讀音索引鍵與當前讀音索引鍵，來獲取資料庫陣列內的對應資料陣列的 UTF8 資料、就地分析、生成雙元圖陣列。
     ///
-    /// 威注音輸入法尚未引入雙元圖支援，所以該函數並未擴充相關功能，自然不會起作用。
+    /// 威注音輸入法尚未引入雙元圖支援，所以該函式並未擴充相關功能，自然不會起作用。
     /// - parameters:
     ///   - precedingKey: 前述讀音索引鍵
     ///   - key: 當前讀音索引鍵
     public func bigramsForKeys(precedingKey: String, key: String) -> [Megrez.Bigram] {
-      // 這裡用了點廢話處理，不然函數構建體會被 Swift 格式整理工具給毀掉。
+      // 這裡用了點廢話處理，不然函式構建體會被 Swift 格式整理工具給毀掉。
       // 其實只要一句「[Megrez.Bigram]()」就夠了。
       precedingKey == key ? [Megrez.Bigram]() : [Megrez.Bigram]()
     }
@@ -167,7 +167,7 @@ extension vChewing {
       rangeMap[cnvPhonabetToASCII(key)] != nil
     }
 
-    /// 內部函數，用以將注音讀音索引鍵進行加密。
+    /// 內部函式，用以將注音讀音索引鍵進行加密。
     ///
     /// 使用這種加密字串作為索引鍵，可以增加對 plist 資料庫的存取速度。
     ///
@@ -190,7 +190,7 @@ extension vChewing {
       return strOutput
     }
 
-    /// 內部函數，用以將被加密的注音讀音索引鍵進行解密。
+    /// 內部函式，用以將被加密的注音讀音索引鍵進行解密。
     ///
     /// 如果傳入的字串當中包含 ASCII 下畫線符號的話，則表明該字串並非注音讀音字串，會被忽略處理。
     /// - parameters:

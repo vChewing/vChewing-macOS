@@ -68,7 +68,7 @@ extension Megrez {
       joinSeparator = separator
     }
 
-    /// 組字器自我清空專用函數。
+    /// 組字器自我清空專用函式。
     public func clear() {
       mutCursorIndex = 0
       mutReadings.removeAll()
@@ -115,7 +115,7 @@ extension Megrez {
     /// 移除該組字器的第一個讀音單元。
     ///
     /// 用於輸入法組字區長度上限處理：
-    /// 將該位置要溢出的敲字內容遞交之後、再執行這個函數。
+    /// 將該位置要溢出的敲字內容遞交之後、再執行這個函式。
     @discardableResult public func removeHeadReadings(count: Int) -> Bool {
       let count = abs(count)  // 防呆
       if count > length {

@@ -29,7 +29,7 @@ import Cocoa
 /// 我們不能讓 mgrLangModel 這個靜態管理器來承載下面這些副本變數。
 /// 所以，這些副本變數只能放在 mgrLangModel 的外部。
 /// 同時，這些變數不對外開放任意存取權限。
-/// 我們只在 mgrLangModel 內部寫幾個回傳函數、供其餘控制模組來讀取。
+/// 我們只在 mgrLangModel 內部寫幾個回傳函式、供其餘控制模組來讀取。
 
 private var gLangModelCHS = vChewing.LMInstantiator()
 private var gLangModelCHT = vChewing.LMInstantiator()
@@ -37,7 +37,7 @@ private var gUserOverrideModelCHS = vChewing.LMUserOverride()
 private var gUserOverrideModelCHT = vChewing.LMUserOverride()
 
 enum mgrLangModel {
-  /// 寫幾個回傳函數、供其餘控制模組來讀取那些被設為 fileprivate 的器外變數。
+  /// 寫幾個回傳函式、供其餘控制模組來讀取那些被設為 fileprivate 的器外變數。
   public static var lmCHS: vChewing.LMInstantiator { gLangModelCHS }
   public static var lmCHT: vChewing.LMInstantiator { gLangModelCHT }
   public static var uomCHS: vChewing.LMUserOverride { gUserOverrideModelCHS }
@@ -295,7 +295,7 @@ enum mgrLangModel {
     // The above "&" mutates the "isFolder" value to the real one received by the "folderExist".
 
     // 路徑沒有結尾斜槓的話，會導致目錄合規性判定失準。
-    // 出於每個型別每個函數的自我責任原則，這裡多檢查一遍也不壞。
+    // 出於每個型別每個函式的自我責任原則，這裡多檢查一遍也不壞。
     var folderPath = folderPath  // Convert the incoming constant to a variable.
     if isFolder.boolValue {
       folderPath?.ensureTrailingSlash()
@@ -351,7 +351,7 @@ enum mgrLangModel {
     return true
   }
 
-  // MARK: - 用以讀取使用者語彙檔案目錄的函數，會自動對 mgrPrefs 當中的參數糾偏。
+  // MARK: - 用以讀取使用者語彙檔案目錄的函式，會自動對 mgrPrefs 當中的參數糾偏。
 
   // 當且僅當 mgrPrefs 當中的參數不合規（比如非實在路徑、或者無權限寫入）時，才會糾偏。
 

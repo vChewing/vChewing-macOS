@@ -152,7 +152,7 @@ public struct Tekkon {
       ensureType()
     }
 
-    /// 用來自動更新自身的屬性值的函數。
+    /// 用來自動更新自身的屬性值的函式。
     mutating func ensureType() {
       if Tekkon.allowedConsonants.contains(value) {
         type = .consonant
@@ -228,7 +228,7 @@ public struct Tekkon {
       consonant.value + semivowel.value + vowel.value + intonation.value
     }
 
-    /// 與 value 類似，這個函數就是用來決定輸入法組字區內顯示的注音/拼音內容，
+    /// 與 value 類似，這個函式就是用來決定輸入法組字區內顯示的注音/拼音內容，
     /// 但可以指定是否輸出教科書格式（拼音的調號在字母上方、注音的輕聲寫在左側）。
     /// - Parameters:
     ///   - isHanyuPinyin: 是否將輸出結果轉成漢語拼音。
@@ -251,7 +251,7 @@ public struct Tekkon {
       }
     }
 
-    // 該函數僅用來獲取給 macOS InputMethod Kit 的內文組字區使用的顯示字串。
+    // 該函式僅用來獲取給 macOS InputMethod Kit 的內文組字區使用的顯示字串。
     /// - Parameters:
     ///   - isHanyuPinyin: 是否將輸出結果轉成漢語拼音。
     public func getInlineCompositionForIMK(isHanyuPinyin: Bool = false) -> String {
@@ -285,7 +285,7 @@ public struct Tekkon {
       !vowel.isEmpty || !semivowel.isEmpty || !consonant.isEmpty
     }
 
-    // MARK: 注拼槽對外處理函數
+    // MARK: 注拼槽對外處理函式
 
     /// 初期化一個新的注拼槽。可以藉由 @input 參數指定初期已經傳入的按鍵訊號。
     /// 還可以在初期化時藉由 @arrange 參數來指定注音排列（預設為「.ofDachen」大千佈局）。
@@ -309,7 +309,7 @@ public struct Tekkon {
 
     // MARK: - Public Functions
 
-    /// 用於檢測「某個輸入字符訊號的合規性」的函數。
+    /// 用於檢測「某個輸入字符訊號的合規性」的函式。
     ///
     /// 注意：回傳結果會受到當前注音排列 parser 屬性的影響。
     /// - Parameters:
@@ -344,7 +344,7 @@ public struct Tekkon {
     }
 
     /// 接受傳入的按鍵訊號時的處理，處理對象為 String。
-    /// 另有同名函數可處理 UniChar 訊號。
+    /// 另有同名函式可處理 UniChar 訊號。
     ///
     /// 如果是諸如複合型注音排列的話，翻譯結果有可能為空，但翻譯過程已經處理好聲介韻調分配了。
     /// - Parameters:
@@ -370,7 +370,7 @@ public struct Tekkon {
     }
 
     /// 接受傳入的按鍵訊號時的處理，處理對象為 UniChar。
-    /// 其實也就是先將 UniChar 轉為 String 再交給某個同名異參的函數來處理而已。
+    /// 其實也就是先將 UniChar 轉為 String 再交給某個同名異參的函式來處理而已。
     ///
     /// 如果是諸如複合型注音排列的話，翻譯結果有可能為空，但翻譯過程已經處理好聲介韻調分配了。
     /// - Parameters:
@@ -475,7 +475,7 @@ public struct Tekkon {
       }
     }
 
-    /// 用來檢測是否有調號的函數，預設情況下不判定聲調以外的內容的存無。
+    /// 用來檢測是否有調號的函式，預設情況下不判定聲調以外的內容的存無。
     /// - Parameters:
     ///   - withNothingElse: 追加判定「槽內是否僅有調號」。
     public func hasToneMarker(withNothingElse: Bool = false) -> Bool {
@@ -494,11 +494,11 @@ public struct Tekkon {
 
     // MARK: - Parser Processings
 
-    // 注拼槽對內處理用函數都在這一小節。
+    // 注拼槽對內處理用函式都在這一小節。
 
     /// 根據目前的注音排列設定來翻譯傳入的 String 訊號。
     ///
-    /// 倚天或許氏鍵盤的處理函數會將分配過程代為處理過，此時回傳結果為空字串。
+    /// 倚天或許氏鍵盤的處理函式會將分配過程代為處理過，此時回傳結果為空字串。
     /// - Parameters:
     ///   - key: 傳入的 String 訊號。
     mutating func translate(key: String = "") -> String {
@@ -522,14 +522,14 @@ public struct Tekkon {
         case .ofFakeSeigyou:
           return Tekkon.mapFakeSeigyou[key] ?? ""
         case .ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin:
-          break  // 漢語拼音單獨用另外的函數處理
+          break  // 漢語拼音單獨用另外的函式處理
       }
       return ""
     }
 
     /// 倚天忘形注音排列比較麻煩，需要單獨處理。
     ///
-    /// 回傳結果是空字串的話，不要緊，因為該函數內部已經處理過分配過程了。
+    /// 回傳結果是空字串的話，不要緊，因為該函式內部已經處理過分配過程了。
     /// - Parameters:
     ///   - key: 傳入的 String 訊號。
     mutating func handleETen26(key: String = "") -> String {
@@ -612,7 +612,7 @@ public struct Tekkon {
 
     /// 許氏鍵盤與倚天忘形一樣同樣也比較麻煩，需要單獨處理。
     ///
-    /// 回傳結果是空的話，不要緊，因為該函數內部已經處理過分配過程了。
+    /// 回傳結果是空的話，不要緊，因為該函式內部已經處理過分配過程了。
     /// - Parameters:
     ///   - key: 傳入的 String 訊號。
     mutating func handleHsu(key: String = "") -> String {
@@ -735,7 +735,7 @@ public struct Tekkon {
 
     /// 大千忘形一樣同樣也比較麻煩，需要單獨處理。
     ///
-    /// 回傳結果是空的話，不要緊，因為該函數內部已經處理過分配過程了。
+    /// 回傳結果是空的話，不要緊，因為該函式內部已經處理過分配過程了。
     /// - Parameters:
     ///   - key: 傳入的 String 訊號。
     mutating func handleDachen26(key: String = "") -> String {
