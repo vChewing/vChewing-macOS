@@ -69,7 +69,7 @@ class KeyHandler {
       // When it recreates, it adapts to the latest imeMode settings.
       // This allows it to work with correct LMs.
       reinitCompositor()
-      composer.clear()
+      ensureParser()
     }
   }
 
