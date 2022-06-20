@@ -170,37 +170,37 @@ class KeyHandler {
   func fixNode(value: String, respectCursorPushing: Bool = true) {
     let cursorIndex = min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength)
     compositor.grid.fixNodeSelectedCandidate(location: cursorIndex, value: value)
-    //  // 因半衰模組失能，故禁用之。
-    // let selectedNode: Megrez.NodeAnchor = compositor.grid.fixNodeSelectedCandidate(
-    //  location: cursorIndex, value: value
-    // )
-    //  // 不要針對逐字選字模式啟用臨時半衰記憶模型。
-    // if !mgrPrefs.useSCPCTypingMode {
-    //  // 所有讀音數與字符數不匹配的情況均不得塞入半衰記憶模組。
-    //  var addToUserOverrideModel = true
-    //  if selectedNode.spanningLength != value.count {
-    //    IME.prtDebugIntel("UOM: SpanningLength != value.count, dismissing.")
-    //    addToUserOverrideModel = false
-    //  }
-    //  if addToUserOverrideModel {
-    //    if let theNode = selectedNode.node {
-    //      // 威注音的 SymbolLM 的 Score 是 -12，符合該條件的內容不得塞入半衰記憶模組。
-    //      if theNode.scoreFor(candidate: value) <= -12 {
-    //        IME.prtDebugIntel("UOM: Score <= -12, dismissing.")
-    //        addToUserOverrideModel = false
-    //      }
-    //    }
-    //  }
-    //  if addToUserOverrideModel {
-    //    IME.prtDebugIntel("UOM: Start Observation.")
-    //    // 令半衰記憶模組觀測給定的 trigram。
-    //    // 這個過程會讓半衰引擎根據當前上下文生成 trigram 索引鍵。
-    //    currentUOM.observe(
-    //      walkedAnchors: walkedAnchors, cursorIndex: cursorIndex, candidate: value,
-    //      timestamp: NSDate().timeIntervalSince1970
-    //    )
-    //  }
-    // }
+    // 開始讓半衰模組觀察目前的狀況。
+    let selectedNode: Megrez.NodeAnchor = compositor.grid.fixNodeSelectedCandidate(
+      location: cursorIndex, value: value
+    )
+    // 不要針對逐字選字模式啟用臨時半衰記憶模型。
+    if !mgrPrefs.useSCPCTypingMode {
+      // 所有讀音數與字符數不匹配的情況均不得塞入半衰記憶模組。
+      var addToUserOverrideModel = true
+      if selectedNode.spanningLength != value.count {
+        IME.prtDebugIntel("UOM: SpanningLength != value.count, dismissing.")
+        addToUserOverrideModel = false
+      }
+      if addToUserOverrideModel {
+        if let theNode = selectedNode.node {
+          // 威注音的 SymbolLM 的 Score 是 -12，符合該條件的內容不得塞入半衰記憶模組。
+          if theNode.scoreFor(candidate: value) <= -12 {
+            IME.prtDebugIntel("UOM: Score <= -12, dismissing.")
+            addToUserOverrideModel = false
+          }
+        }
+      }
+      if addToUserOverrideModel {
+        IME.prtDebugIntel("UOM: Start Observation.")
+        // 令半衰記憶模組觀測給定的 trigram。
+        // 這個過程會讓半衰引擎根據當前上下文生成 trigram 索引鍵。
+        currentUOM.observe(
+          walkedAnchors: walkedAnchors, cursorIndex: cursorIndex, candidate: value,
+          timestamp: NSDate().timeIntervalSince1970
+        )
+      }
+    }
     walk()
 
     /// 若偏好設定內啟用了相關選項，則會在選字之後始終將游標推送至選字厚的節錨的前方。
