@@ -196,7 +196,7 @@ class KeyHandler {
     //    // 令半衰記憶模組觀測給定的 trigram。
     //    // 這個過程會讓半衰引擎根據當前上下文生成 trigram 索引鍵。
     //    currentUOM.observe(
-    //      walkedNodes: walkedAnchors, cursorIndex: cursorIndex, candidate: value,
+    //      walkedAnchors: walkedAnchors, cursorIndex: cursorIndex, candidate: value,
     //      timestamp: NSDate().timeIntervalSince1970
     //    )
     //  }
@@ -268,7 +268,7 @@ class KeyHandler {
       mgrPrefs.useSCPCTypingMode
       ? ""
       : currentUOM.suggest(
-        walkedNodes: walkedAnchors, cursorIndex: compositorCursorIndex,
+        walkedAnchors: walkedAnchors, cursorIndex: compositorCursorIndex,
         timestamp: NSDate().timeIntervalSince1970
       )
 

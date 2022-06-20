@@ -78,12 +78,12 @@ extension vChewing {
     }
 
     public func observe(
-      walkedNodes: [Megrez.NodeAnchor],
+      walkedAnchors: [Megrez.NodeAnchor],
       cursorIndex: Int,
       candidate: String,
       timestamp: Double
     ) {
-      let key = convertKeyFrom(walkedNodes: walkedNodes, cursorIndex: cursorIndex)
+      let key = convertKeyFrom(walkedAnchors: walkedAnchors, cursorIndex: cursorIndex)
 
       guard mutLRUMap[key] != nil else {
         let observation: Observation = .init()
@@ -108,11 +108,11 @@ extension vChewing {
     }
 
     public func suggest(
-      walkedNodes: [Megrez.NodeAnchor],
+      walkedAnchors: [Megrez.NodeAnchor],
       cursorIndex: Int,
       timestamp: Double
     ) -> String {
-      let key = convertKeyFrom(walkedNodes: walkedNodes, cursorIndex: cursorIndex)
+      let key = convertKeyFrom(walkedAnchors: walkedAnchors, cursorIndex: cursorIndex)
       guard let koPair = mutLRUMap[key] else {
         IME.prtDebugIntel("UOM: mutLRUMap[key] is nil, throwing blank suggestion for key: \(key).")
         return ""
@@ -161,12 +161,12 @@ extension vChewing {
     }
 
     func convertKeyFrom(
-      walkedNodes: [Megrez.NodeAnchor], cursorIndex: Int
+      walkedAnchors: [Megrez.NodeAnchor], cursorIndex: Int
     ) -> String {
       let arrEndingPunctuation = ["，", "。", "！", "？", "」", "』", "”", "’"]
       var arrNodes: [Megrez.NodeAnchor] = []
       var intLength = 0
-      for theNodeAnchor in walkedNodes {
+      for theNodeAnchor in walkedAnchors {
         arrNodes.append(theNodeAnchor)
         intLength += theNodeAnchor.spanningLength
         if intLength >= cursorIndex {
