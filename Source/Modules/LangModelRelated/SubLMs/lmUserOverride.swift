@@ -159,24 +159,25 @@ extension vChewing {
       walkedNodes: [Megrez.NodeAnchor], cursorIndex: Int
     ) -> String {
       let arrEndingPunctuation = ["，", "。", "！", "？", "」", "』", "”", "’"]
-      var arrNodesReversed: [Megrez.NodeAnchor] = []
+      var arrNodes: [Megrez.NodeAnchor] = []
       var intLength = 0
       for theNodeAnchor in walkedNodes {
-        // 這裡直接生成一個反向排序的陣列，之後就不用再「.reverse()」了。
-        arrNodesReversed = [theNodeAnchor] + arrNodesReversed
+        arrNodes.append(theNodeAnchor)
         intLength += theNodeAnchor.spanningLength
         if intLength >= cursorIndex {
           break
         }
       }
 
-      if arrNodesReversed.isEmpty { return "" }
+      if arrNodes.isEmpty { return "" }
+
+      arrNodes = Array(arrNodes.reversed())
 
       var strCurrent = "()"
       var strPrevious = "()"
       var strAnterior = "()"
 
-      guard let kvCurrent = arrNodesReversed[0].node?.currentKeyValue,
+      guard let kvCurrent = arrNodes[0].node?.currentKeyValue,
         !arrEndingPunctuation.contains(kvCurrent.value)
       else {
         return ""
@@ -185,15 +186,15 @@ extension vChewing {
       // 前置單元只記錄讀音，在其後的單元則同時記錄讀音與字詞
       strCurrent = kvCurrent.key
 
-      if arrNodesReversed.count >= 2,
-        let kvPrevious = arrNodesReversed[1].node?.currentKeyValue,
+      if arrNodes.count >= 2,
+        let kvPrevious = arrNodes[1].node?.currentKeyValue,
         !arrEndingPunctuation.contains(kvPrevious.value)
       {
         strPrevious = "(\(kvPrevious.key),\(kvPrevious.value))"
       }
 
-      if arrNodesReversed.count >= 3,
-        let kvAnterior = arrNodesReversed[2].node?.currentKeyValue,
+      if arrNodes.count >= 3,
+        let kvAnterior = arrNodes[2].node?.currentKeyValue,
         !arrEndingPunctuation.contains(kvAnterior.value)
       {
         strAnterior = "(\(kvAnterior.key),\(kvAnterior.value))"
