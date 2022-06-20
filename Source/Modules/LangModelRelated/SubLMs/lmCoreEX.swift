@@ -88,9 +88,9 @@ extension vChewing {
         strData = try String(contentsOfFile: path, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
         strData.ranges(splitBy: "\n").forEach {
           let neta = strData[$0].split(separator: " ")
-          if neta.count >= 2 {
-            let theKey = shouldReverse ? String(neta[1]) : String(neta[0])
-            if !neta[0].isEmpty, !neta[1].isEmpty, theKey.first != "#" {
+          if neta.count >= 2, String(neta[0]).first != "#" {
+            if !neta[0].isEmpty, !neta[1].isEmpty {
+              let theKey = shouldReverse ? String(neta[1]) : String(neta[0])
               let theValue = $0
               rangeMap[theKey, default: []].append(theValue)
             }
