@@ -34,6 +34,10 @@ extension vChewing {
     class Override {
       var count: Int = 0
       var timestamp: Double = 0.0
+      init(count: Int = 0, timestamp: Double = 0) {
+        self.count = count
+        self.timestamp = timestamp
+      }
     }
 
     class Observation {
@@ -42,10 +46,11 @@ extension vChewing {
 
       func update(candidate: String, timestamp: Double) {
         count += 1
-        if let neta = overrides[candidate] {
-          neta.timestamp = timestamp
-          neta.count += 1
-          overrides[candidate] = neta
+        if overrides.keys.contains(candidate) {
+          overrides[candidate]?.timestamp = timestamp
+          overrides[candidate]?.count += 1
+        } else {
+          overrides[candidate] = .init(count: 1, timestamp: timestamp)
         }
       }
     }
