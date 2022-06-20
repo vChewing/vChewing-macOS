@@ -175,26 +175,26 @@ extension KeyHandler {
         // 小麥注音因為使用 OVMandarin，所以不需要這樣補。但鐵恨引擎對所有聲調一視同仁。
         composer.receiveKey(fromString: " ")
       }
-      let reading = composer.getComposition()  // 拿取用來進行索引檢索用的注音
+      let reading = composer.getComposition()  // 拿取用來進行索引檢索用的注音。
       // 如果輸入法的辭典索引是漢語拼音的話，要注意上一行拿到的內容得是漢語拼音。
 
-      // 向語言模型詢問是否有對應的記錄
+      // 向語言模型詢問是否有對應的記錄。
       if !ifLangModelHasUnigrams(forKey: reading) {
         IME.prtDebugIntel("B49C0979：語彙庫內無「\(reading)」的匹配記錄。")
         errorCallback()
         composer.clear()
-        // 根據「組字器是否為空」來判定回呼哪一種狀態
+        // 根據「組字器是否為空」來判定回呼哪一種狀態。
         stateCallback((compositorLength == 0) ? InputState.EmptyIgnoringPreviousState() : buildInputtingState)
-        return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了
+        return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了。
       }
 
-      // 將該讀音插入至組字器內的軌格當中
+      // 將該讀音插入至組字器內的軌格當中。
       insertToCompositorAtCursor(reading: reading)
 
-      // 讓組字器反爬軌格
+      // 讓組字器反爬軌格。
       let textToCommit = popOverflowComposingTextAndWalk
 
-      // 看看半衰記憶模組是否會對目前的狀態給出自動選字建議
+      // 看看半衰記憶模組是否會對目前的狀態給出自動選字建議。
       dealWithOverrideModelSuggestions()
 
       // 將組字器內超出最大動態爬軌範圍的節錨都標記為「已經手動選字過」，減少之後的爬軌運算負擔。
