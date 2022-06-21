@@ -134,17 +134,15 @@ struct InputSignal: CustomStringConvertible {
   private var extraChooseCandidateKeyReverse: KeyCode = .kNone
   private var absorbedArrowKey: KeyCode = .kNone
   private var verticalTypingOnlyChooseCandidateKey: KeyCode = .kNone
-  private(set) var emacsKey: vChewingEmacsKey
+  private(set) var emacsKey: EmacsKey
 
   public init(
     inputText: String?, keyCode: UInt16, charCode: UInt16, flags: NSEvent.ModifierFlags,
     isVerticalTyping: Bool, inputTextIgnoringModifiers: String? = nil
   ) {
-    let inputText = AppleKeyboardConverter.cnvStringApple2ABC(inputText ?? "")
-    let inputTextIgnoringModifiers = AppleKeyboardConverter.cnvStringApple2ABC(
-      inputTextIgnoringModifiers ?? inputText)
-    self.inputText = inputText
-    self.inputTextIgnoringModifiers = inputTextIgnoringModifiers
+    self.inputText = AppleKeyboardConverter.cnvStringApple2ABC(inputText ?? "")
+    self.inputTextIgnoringModifiers = AppleKeyboardConverter.cnvStringApple2ABC(
+      inputTextIgnoringModifiers ?? inputText ?? "")
     self.flags = flags
     isFlagChanged = false
     isTypingVertical = isVerticalTyping
@@ -163,7 +161,7 @@ struct InputSignal: CustomStringConvertible {
       event.charactersIgnoringModifiers ?? "")
     keyCode = event.keyCode
     flags = event.modifierFlags
-    isFlagChanged = (event.type == .flagsChanged) ? true : false
+    isFlagChanged = (event.type == .flagsChanged)
     isTypingVertical = isVerticalTyping
     let charCode: UInt16 = {
       // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
@@ -230,12 +228,12 @@ struct InputSignal: CustomStringConvertible {
     flags.contains([.control]) && inputText?.first?.isLetter ?? false
   }
 
-  var isOptionHotKey: Bool {
-    flags.contains([.option]) && inputText?.first?.isLetter ?? false
-  }
-
   var isOptionHold: Bool {
     flags.contains([.option])
+  }
+
+  var isOptionHotKey: Bool {
+    flags.contains([.option]) && inputText?.first?.isLetter ?? false
   }
 
   var isCapsLockOn: Bool {
@@ -334,7 +332,7 @@ struct InputSignal: CustomStringConvertible {
     KeyCode(rawValue: keyCode) == extraChooseCandidateKeyReverse
   }
 
-  var isverticalTypingOnlyChooseCandidateKey: Bool {
+  var isVerticalTypingOnlyChooseCandidateKey: Bool {
     KeyCode(rawValue: keyCode) == verticalTypingOnlyChooseCandidateKey
   }
 
@@ -350,7 +348,7 @@ struct InputSignal: CustomStringConvertible {
   }
 }
 
-enum vChewingEmacsKey: UInt16 {
+enum EmacsKey: UInt16 {
   case none = 0
   case forward = 6  // F
   case backward = 2  // B
@@ -361,10 +359,10 @@ enum vChewingEmacsKey: UInt16 {
 }
 
 enum EmacsKeyHelper {
-  static func detect(charCode: UniChar, flags: NSEvent.ModifierFlags) -> vChewingEmacsKey {
+  static func detect(charCode: UniChar, flags: NSEvent.ModifierFlags) -> EmacsKey {
     let charCode = AppleKeyboardConverter.cnvApple2ABC(charCode)
     if flags.contains(.control) {
-      return vChewingEmacsKey(rawValue: charCode) ?? .none
+      return EmacsKey(rawValue: charCode) ?? .none
     }
     return .none
   }

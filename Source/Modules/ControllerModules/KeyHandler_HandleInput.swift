@@ -257,7 +257,7 @@ extension KeyHandler {
     if let currentState = state as? InputState.NotEmpty, composer.isEmpty,
       input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
         || input.isPageDown || input.isPageUp || (input.isTab && mgrPrefs.specifyShiftTabKeyBehavior)
-        || (input.isTypingVertical && (input.isverticalTypingOnlyChooseCandidateKey))
+        || (input.isTypingVertical && (input.isVerticalTypingOnlyChooseCandidateKey))
     {
       if input.isSpace {
         /// 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
@@ -305,7 +305,7 @@ extension KeyHandler {
 
     // MARK: Cursor backward
 
-    if input.isCursorBackward || input.emacsKey == vChewingEmacsKey.backward {
+    if input.isCursorBackward || input.emacsKey == EmacsKey.backward {
       return handleBackward(
         state: state,
         input: input,
@@ -316,7 +316,7 @@ extension KeyHandler {
 
     // MARK: Cursor forward
 
-    if input.isCursorForward || input.emacsKey == vChewingEmacsKey.forward {
+    if input.isCursorForward || input.emacsKey == EmacsKey.forward {
       return handleForward(
         state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
       )
@@ -324,13 +324,13 @@ extension KeyHandler {
 
     // MARK: Home
 
-    if input.isHome || input.emacsKey == vChewingEmacsKey.home {
+    if input.isHome || input.emacsKey == EmacsKey.home {
       return handleHome(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 
     // MARK: End
 
-    if input.isEnd || input.emacsKey == vChewingEmacsKey.end {
+    if input.isEnd || input.emacsKey == EmacsKey.end {
       return handleEnd(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 
@@ -360,7 +360,7 @@ extension KeyHandler {
 
     // MARK: Delete
 
-    if input.isDelete || input.emacsKey == vChewingEmacsKey.delete {
+    if input.isDelete || input.emacsKey == EmacsKey.delete {
       return handleDelete(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 

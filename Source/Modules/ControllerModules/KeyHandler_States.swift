@@ -233,7 +233,7 @@ extension KeyHandler {
     }
 
     // Shift + Left
-    if input.isCursorBackward || input.emacsKey == vChewingEmacsKey.backward, input.isShiftHold {
+    if input.isCursorBackward || input.emacsKey == EmacsKey.backward, input.isShiftHold {
       var index = state.markerIndex
       if index > 0 {
         index = state.composingBuffer.utf16PreviousPosition(for: index)
@@ -254,7 +254,7 @@ extension KeyHandler {
     }
 
     // Shift + Right
-    if input.isCursorForward || input.emacsKey == vChewingEmacsKey.forward, input.isShiftHold {
+    if input.isCursorForward || input.emacsKey == EmacsKey.forward, input.isShiftHold {
       var index = state.markerIndex
       if index < (state.composingBuffer.utf16.count) {
         index = state.composingBuffer.utf16NextPosition(for: index)
