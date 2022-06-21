@@ -91,11 +91,10 @@ extension Megrez {
     public func expandGridByOneAt(location: Int) {
       let location = abs(location)  // 防呆
       mutSpans.insert(Span(), at: location)
-      if location != 0, location != mutSpans.count {
-        for i in 0..<location {
-          // zaps overlapping spans
-          mutSpans[i].removeNodeOfLengthGreaterThan(location - i)
-        }
+      if location == 0 || location == mutSpans.count { return }
+      for i in 0..<location {
+        // zaps overlapping spans
+        mutSpans[i].removeNodeOfLengthGreaterThan(location - i)
       }
     }
 
@@ -121,18 +120,18 @@ extension Megrez {
     public func nodesBeginningAt(location: Int) -> [NodeAnchor] {
       let location = abs(location)  // 防呆
       var results = [NodeAnchor]()
-      if location < mutSpans.count {  // 此時 mutSpans 必然不為空
-        let span = mutSpans[location]
-        for i in 1...maxBuildSpanLength {
-          if let np = span.node(length: i) {
-            results.append(
-              NodeAnchor(
-                node: np,
-                location: location,
-                spanningLength: i
-              )
+      if location >= mutSpans.count { return results }
+      // 此時 mutSpans 必然不為空，因為 location 不可能小於 0。
+      let span = mutSpans[location]
+      for i in 1...maxBuildSpanLength {
+        if let np = span.node(length: i) {
+          results.append(
+            .init(
+              node: np,
+              location: location,
+              spanningLength: i
             )
-          }
+          )
         }
       }
       return results
@@ -144,20 +143,18 @@ extension Megrez {
     public func nodesEndingAt(location: Int) -> [NodeAnchor] {
       let location = abs(location)  // 防呆
       var results = [NodeAnchor]()
-      if !mutSpans.isEmpty, location <= mutSpans.count {
-        for i in 0..<location {
-          let span = mutSpans[i]
-          if i + span.maximumLength >= location {
-            if let np = span.node(length: location - i) {
-              results.append(
-                NodeAnchor(
-                  node: np,
-                  location: i,
-                  spanningLength: location - i
-                )
-              )
-            }
-          }
+      if mutSpans.isEmpty || location > mutSpans.count { return results }
+      for i in 0..<location {
+        let span = mutSpans[i]
+        if i + span.maximumLength < location { continue }
+        if let np = span.node(length: location - i) {
+          results.append(
+            .init(
+              node: np,
+              location: i,
+              spanningLength: location - i
+            )
+          )
         }
       }
       return results
@@ -169,24 +166,20 @@ extension Megrez {
     public func nodesCrossingOrEndingAt(location: Int) -> [NodeAnchor] {
       let location = abs(location)  // 防呆
       var results = [NodeAnchor]()
-      if !mutSpans.isEmpty, location <= mutSpans.count {
-        for i in 0..<location {
-          let span = mutSpans[i]
-          if i + span.maximumLength >= location {
-            for j in 1...span.maximumLength {
-              if i + j < location {
-                continue
-              }
-              if let np = span.node(length: j) {
-                results.append(
-                  NodeAnchor(
-                    node: np,
-                    location: i,
-                    spanningLength: location - i
-                  )
-                )
-              }
-            }
+      if mutSpans.isEmpty || location > mutSpans.count { return results }
+      for i in 0..<location {
+        let span = mutSpans[i]
+        if i + span.maximumLength < location { continue }
+        for j in 1...span.maximumLength {
+          if i + j < location { continue }
+          if let np = span.node(length: j) {
+            results.append(
+              .init(
+                node: np,
+                location: i,
+                spanningLength: location - i
+              )
+            )
           }
         }
       }

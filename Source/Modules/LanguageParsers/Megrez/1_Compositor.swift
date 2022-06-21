@@ -35,7 +35,7 @@ extension Megrez {
     /// 該組字器的軌格。
     private var mutGrid: Grid = .init()
     /// 該組字器所使用的語言模型。
-    private var mutLM: LanguageModel
+    private var mutLM: LanguageModelProtocol
 
     /// 公開：該組字器內可以允許的最大詞長。
     public var maxBuildSpanLength: Int { mutGrid.maxBuildSpanLength }
@@ -62,7 +62,7 @@ extension Megrez {
     ///   - lm: 語言模型。可以是任何基於 Megrez.LanguageModel 的衍生型別。
     ///   - length: 指定該組字器內可以允許的最大詞長，預設為 10 字。
     ///   - separator: 多字讀音鍵當中用以分割漢字讀音的記號，預設為空。
-    public init(lm: LanguageModel, length: Int = 10, separator: String = "") {
+    public init(lm: LanguageModelProtocol, length: Int = 10, separator: String = "") {
       mutLM = lm
       mutGrid = .init(spanLength: abs(length))  // 防呆
       joinSeparator = separator
@@ -140,8 +140,8 @@ extension Megrez {
 
     /// 對已給定的軌格按照給定的位置與條件進行正向爬軌。
     /// - Parameters:
-    ///   - at: 開始爬軌的位置。
-    ///   - score: 給定累計權重，非必填參數。預設值為 0。
+    ///   - location: 開始爬軌的位置。
+    ///   - accumulatedScore: 給定累計權重，非必填參數。預設值為 0。
     ///   - joinedPhrase: 用以統計累計長詞的內部參數，請勿主動使用。
     ///   - longPhrases: 用以統計累計長詞的內部參數，請勿主動使用。
     public func walk(
@@ -160,8 +160,8 @@ extension Megrez {
 
     /// 對已給定的軌格按照給定的位置與條件進行反向爬軌。
     /// - Parameters:
-    ///   - at: 開始爬軌的位置。
-    ///   - score: 給定累計權重，非必填參數。預設值為 0。
+    ///   - location: 開始爬軌的位置。
+    ///   - accumulatedScore: 給定累計權重，非必填參數。預設值為 0。
     ///   - joinedPhrase: 用以統計累計長詞的內部參數，請勿主動使用。
     ///   - longPhrases: 用以統計累計長詞的內部參數，請勿主動使用。
     public func reverseWalk(
@@ -219,11 +219,9 @@ extension Megrez {
       } else {
         // 看看當前格位有沒有更長的候選字詞。
         var longPhrases = [String]()
-        for theAnchor in nodes {
+        for theAnchor in nodes.lazy.filter({ $0.spanningLength > 1 }) {
           guard let theNode = theAnchor.node else { continue }
-          if theAnchor.spanningLength > 1 {
-            longPhrases.append(theNode.currentKeyValue.value)
-          }
+          longPhrases.append(theNode.currentKeyValue.value)
         }
 
         longPhrases = longPhrases.stableSorted {
@@ -249,10 +247,10 @@ extension Megrez {
       }
 
       var result: [NodeAnchor] = paths[0]
-      for neta in paths {
-        if neta.last!.accumulatedScore > result.last!.accumulatedScore {
-          result = neta
-        }
+      for neta in paths.lazy.filter({
+        $0.last!.accumulatedScore > result.last!.accumulatedScore
+      }) {
+        result = neta
       }
 
       return result
@@ -267,29 +265,20 @@ extension Megrez {
 
       for p in itrBegin..<itrEnd {
         for q in 1..<maxBuildSpanLength {
-          if p + q > itrEnd {
-            break
-          }
+          if p + q > itrEnd { break }
           let arrSlice = mutReadings[p..<(p + q)]
           let combinedReading: String = join(slice: arrSlice, separator: joinSeparator)
-
-          if !mutGrid.hasMatchedNode(location: p, spanningLength: q, key: combinedReading) {
-            let unigrams: [Unigram] = mutLM.unigramsFor(key: combinedReading)
-            if !unigrams.isEmpty {
-              let n = Node(key: combinedReading, unigrams: unigrams)
-              mutGrid.insertNode(node: n, location: p, spanningLength: q)
-            }
-          }
+          if mutGrid.hasMatchedNode(location: p, spanningLength: q, key: combinedReading) { continue }
+          let unigrams: [Unigram] = mutLM.unigramsFor(key: combinedReading)
+          if unigrams.isEmpty { continue }
+          let n = Node(key: combinedReading, unigrams: unigrams)
+          mutGrid.insertNode(node: n, location: p, spanningLength: q)
         }
       }
     }
 
     private func join(slice arrSlice: ArraySlice<String>, separator: String) -> String {
-      var arrResult: [String] = []
-      for value in arrSlice {
-        arrResult.append(value)
-      }
-      return arrResult.joined(separator: separator)
+      arrSlice.joined(separator: separator)
     }
   }
 }
@@ -303,7 +292,7 @@ extension Sequence {
   ///
   /// - Parameter areInIncreasingOrder: Return nil when two element are equal.
   /// - Returns: The sorted collection.
-  func stableSorted(
+  fileprivate func stableSorted(
     by areInIncreasingOrder: (Element, Element) throws -> Bool
   )
     rethrows -> [Element]

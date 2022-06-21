@@ -151,7 +151,7 @@ extension vChewing {
         for netaRange in arrRangeRecords {
           let neta = strData[netaRange].split(separator: " ")
           let theValue: String = shouldReverse ? String(neta[0]) : String(neta[1])
-          let kvPair = Megrez.KeyValuePair(key: key, value: theValue)
+          let kvPair = Megrez.KeyValuePaired(key: key, value: theValue)
           var theScore = defaultScore
           if neta.count >= 3, !shouldForceDefaultScore {
             theScore = .init(String(neta[2])) ?? defaultScore

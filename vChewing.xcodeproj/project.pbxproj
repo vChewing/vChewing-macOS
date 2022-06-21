@@ -12,7 +12,7 @@
 		5B242403284B0D6500520FE4 /* ctlCandidateUniversal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B242402284B0D6500520FE4 /* ctlCandidateUniversal.swift */; };
 		5B3133BF280B229700A4A505 /* KeyHandler_States.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3133BE280B229700A4A505 /* KeyHandler_States.swift */; };
 		5B38F59A281E2E49007D5F5D /* 6_Unigram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1D15FC0EB100ABF4B3 /* 6_Unigram.swift */; };
-		5B38F59B281E2E49007D5F5D /* 7_KeyValuePair.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1815FC0EB100ABF4B3 /* 7_KeyValuePair.swift */; };
+		5B38F59B281E2E49007D5F5D /* 7_KeyValuePaired.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1815FC0EB100ABF4B3 /* 7_KeyValuePaired.swift */; };
 		5B38F59C281E2E49007D5F5D /* 2_Grid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1715FC0EB100ABF4B3 /* 2_Grid.swift */; };
 		5B38F59D281E2E49007D5F5D /* 4_Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1A15FC0EB100ABF4B3 /* 4_Node.swift */; };
 		5B38F59E281E2E49007D5F5D /* 6_Bigram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1415FC0EB100ABF4B3 /* 6_Bigram.swift */; };
@@ -287,7 +287,7 @@
 		6A0D4F1515FC0EB100ABF4B3 /* 1_Compositor.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 1_Compositor.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		6A0D4F1615FC0EB100ABF4B3 /* 0_Megrez.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = 0_Megrez.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		6A0D4F1715FC0EB100ABF4B3 /* 2_Grid.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 2_Grid.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		6A0D4F1815FC0EB100ABF4B3 /* 7_KeyValuePair.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 7_KeyValuePair.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		6A0D4F1815FC0EB100ABF4B3 /* 7_KeyValuePaired.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 7_KeyValuePaired.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		6A0D4F1915FC0EB100ABF4B3 /* 5_LanguageModel.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 5_LanguageModel.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		6A0D4F1A15FC0EB100ABF4B3 /* 4_Node.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 4_Node.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		6A0D4F1B15FC0EB100ABF4B3 /* 3_NodeAnchor.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 3_NodeAnchor.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -769,7 +769,7 @@
 				6A0D4F1915FC0EB100ABF4B3 /* 5_LanguageModel.swift */,
 				6A0D4F1415FC0EB100ABF4B3 /* 6_Bigram.swift */,
 				6A0D4F1D15FC0EB100ABF4B3 /* 6_Unigram.swift */,
-				6A0D4F1815FC0EB100ABF4B3 /* 7_KeyValuePair.swift */,
+				6A0D4F1815FC0EB100ABF4B3 /* 7_KeyValuePaired.swift */,
 			);
 			path = Megrez;
 			sourceTree = "<group>";
@@ -1084,7 +1084,7 @@
 				5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */,
 				5B54E743283A7D89001ECBDC /* lmCoreNS.swift in Sources */,
 				5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */,
-				5B38F59B281E2E49007D5F5D /* 7_KeyValuePair.swift in Sources */,
+				5B38F59B281E2E49007D5F5D /* 7_KeyValuePaired.swift in Sources */,
 				5B62A33627AE795800A19448 /* mgrPrefs.swift in Sources */,
 				5B38F5A4281E2E49007D5F5D /* 5_LanguageModel.swift in Sources */,
 				5BAEFAD028012565001F42C9 /* mgrLangModel.swift in Sources */,

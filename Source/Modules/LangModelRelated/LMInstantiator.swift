@@ -197,7 +197,7 @@ extension vChewing {
       if key == " " {
         /// 給空格鍵指定輸出值。
         let spaceUnigram = Megrez.Unigram(
-          keyValue: Megrez.KeyValuePair(key: " ", value: " "),
+          keyValue: Megrez.KeyValuePaired(key: " ", value: " "),
           score: 0
         )
         return [spaceUnigram]
@@ -225,7 +225,7 @@ extension vChewing {
       }
 
       // 準備過濾清單。因為我們在 Swift 使用 NSOrderedSet，所以就不需要統計清單了。
-      var filteredPairs: Set<Megrez.KeyValuePair> = []
+      var filteredPairs: Set<Megrez.KeyValuePaired> = []
 
       // 載入要過濾的 KeyValuePair 清單。
       for unigram in lmFiltered.unigramsFor(key: key) {
@@ -268,12 +268,12 @@ extension vChewing {
     /// - Returns: 經過語彙過濾處理＋置換處理＋去重複處理的單元圖結果陣列。
     func filterAndTransform(
       unigrams: [Megrez.Unigram],
-      filter filteredPairs: Set<Megrez.KeyValuePair>
+      filter filteredPairs: Set<Megrez.KeyValuePaired>
     ) -> [Megrez.Unigram] {
       var results: [Megrez.Unigram] = []
-      var insertedPairs: Set<Megrez.KeyValuePair> = []
+      var insertedPairs: Set<Megrez.KeyValuePaired> = []
       for unigram in unigrams {
-        var pair: Megrez.KeyValuePair = unigram.keyValue
+        var pair: Megrez.KeyValuePaired = unigram.keyValue
         if filteredPairs.contains(pair) { continue }
         if isPhraseReplacementEnabled {
           let replacement = lmReplacements.valuesFor(key: pair.value)

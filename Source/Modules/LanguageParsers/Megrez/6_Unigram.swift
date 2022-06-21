@@ -27,7 +27,7 @@ extension Megrez {
   /// 單元圖。
   @frozen public struct Unigram: Equatable, CustomStringConvertible {
     /// 鍵值。
-    public var keyValue: KeyValuePair
+    public var keyValue: KeyValuePaired
     /// 權重。
     public var score: Double
     /// 將當前單元圖列印成一個字串。
@@ -39,7 +39,7 @@ extension Megrez {
     /// - Parameters:
     ///   - keyValue: 鍵值。
     ///   - score: 權重（雙精度小數）。
-    public init(keyValue: KeyValuePair, score: Double) {
+    public init(keyValue: KeyValuePaired, score: Double) {
       self.keyValue = keyValue
       self.score = score
     }

@@ -77,7 +77,8 @@ extension Megrez {
     /// - Parameters:
     ///   - length: 給定的節點長度。
     public func node(length: Int) -> Node? {
-      mutLengthNodeMap[abs(length)]  // 防呆
+      // 防呆 Abs()
+      mutLengthNodeMap.keys.contains(abs(length)) ? mutLengthNodeMap[abs(length)] : nil
     }
   }
 }
