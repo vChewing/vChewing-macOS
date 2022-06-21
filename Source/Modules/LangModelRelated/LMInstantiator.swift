@@ -26,15 +26,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Foundation
 
-// 簡體中文模式與繁體中文模式共用全字庫擴展模組，故單獨處理。
-// 塞在 LMInstantiator 內的話，每個模式都會讀入一份全字庫，會多佔用 100MB 記憶體。
-private var lmCNS = vChewing.LMCoreNS(
-  reverse: true, consolidate: false, defaultScore: -11.0, forceDefaultScore: false
-)
-private var lmSymbols = vChewing.LMCoreNS(
-  reverse: true, consolidate: false, defaultScore: -13.0, forceDefaultScore: false
-)
-
 extension vChewing {
   /// 語言模組副本化模組（LMInstantiator，下稱「LMI」）自身為符合天權星組字引擎內
   /// 的 LanguageModel 協定的模組、統籌且整理來自其它子模組的資料（包括使用者語彙、
@@ -79,6 +70,15 @@ extension vChewing {
       reverse: true, consolidate: false, defaultScore: -1.0, forceDefaultScore: false
     )
 
+    // 簡體中文模式與繁體中文模式共用全字庫擴展模組，故靜態處理。
+    // 不然，每個模式都會讀入一份全字庫，會多佔用 100MB 記憶體。
+    static var lmCNS = vChewing.LMCoreNS(
+      reverse: true, consolidate: false, defaultScore: -11.0, forceDefaultScore: false
+    )
+    static var lmSymbols = vChewing.LMCoreNS(
+      reverse: true, consolidate: false, defaultScore: -13.0, forceDefaultScore: false
+    )
+
     // 聲明使用者語言模組。
     // 使用者語言模組使用多執行緒的話，可能會導致一些問題。有時間再仔細排查看看。
     var lmUserPhrases = LMCoreEX(
@@ -108,11 +108,11 @@ extension vChewing {
       }
     }
 
-    public var isCNSDataLoaded: Bool { lmCNS.isLoaded() }
+    public var isCNSDataLoaded: Bool { vChewing.LMInstantiator.lmCNS.isLoaded() }
     public func loadCNSData(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
-        lmCNS.open(path)
-        IME.prtDebugIntel("lmCNS: \(lmCNS.count) entries of data loaded from: \(path)")
+        vChewing.LMInstantiator.lmCNS.open(path)
+        IME.prtDebugIntel("lmCNS: \(vChewing.LMInstantiator.lmCNS.count) entries of data loaded from: \(path)")
       } else {
         IME.prtDebugIntel("lmCNS: File access failure: \(path)")
       }
@@ -128,11 +128,11 @@ extension vChewing {
       }
     }
 
-    public var isSymbolDataLoaded: Bool { lmSymbols.isLoaded() }
+    public var isSymbolDataLoaded: Bool { vChewing.LMInstantiator.lmSymbols.isLoaded() }
     public func loadSymbolData(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
-        lmSymbols.open(path)
-        IME.prtDebugIntel("lmSymbol: \(lmSymbols.count) entries of data loaded from: \(path)")
+        vChewing.LMInstantiator.lmSymbols.open(path)
+        IME.prtDebugIntel("lmSymbol: \(vChewing.LMInstantiator.lmSymbols.count) entries of data loaded from: \(path)")
       } else {
         IME.prtDebugIntel("lmSymbols: File access failure: \(path)")
       }
@@ -216,12 +216,12 @@ extension vChewing {
       rawAllUnigrams += lmCore.unigramsFor(key: key)
 
       if isCNSEnabled {
-        rawAllUnigrams += lmCNS.unigramsFor(key: key)
+        rawAllUnigrams += vChewing.LMInstantiator.lmCNS.unigramsFor(key: key)
       }
 
       if isSymbolEnabled {
         rawAllUnigrams += lmUserSymbols.unigramsFor(key: key)
-        rawAllUnigrams += lmSymbols.unigramsFor(key: key)
+        rawAllUnigrams += vChewing.LMInstantiator.lmSymbols.unigramsFor(key: key)
       }
 
       // 準備過濾清單。因為我們在 Swift 使用 NSOrderedSet，所以就不需要統計清單了。
