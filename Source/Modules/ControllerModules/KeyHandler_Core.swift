@@ -156,8 +156,8 @@ class KeyHandler {
   /// 不會是 nil，但那些負責接收結果的函式會對空白陣列結果做出正確的處理。
   func buildAssociatePhraseArray(withKey key: String) -> [String] {
     var arrResult: [String] = []
-    if currentLM.hasAssociatedPhrasesForKey(key) {
-      arrResult.append(contentsOf: currentLM.associatedPhrasesForKey(key))
+    if currentLM.hasAssociatedPhrasesFor(key: key) {
+      arrResult.append(contentsOf: currentLM.associatedPhrasesFor(key: key))
     }
     return arrResult
   }

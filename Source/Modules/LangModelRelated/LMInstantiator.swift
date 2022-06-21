@@ -96,7 +96,7 @@ extension vChewing {
     // 初期化的函式先保留
     override init() {}
 
-    // 以下這些函式命名暫時保持原樣，等弒神行動徹底結束了再調整。
+    // MARK: - 工具函式
 
     public var isLanguageModelLoaded: Bool { lmCore.isLoaded() }
     public func loadLanguageModel(path: String) {
@@ -185,7 +185,7 @@ extension vChewing {
       }
     }
 
-    // MARK: - Core Functions (Public)
+    // MARK: - 核心函式（對外）
 
     /// 威注音輸入法目前尚未具備對雙元圖的處理能力，故停用該函式。
     // public func bigramsForKeys(preceedingKey: String, key: String) -> [Megrez.Bigram] { }
@@ -238,8 +238,9 @@ extension vChewing {
       )
     }
 
-    /// If the model has unigrams for the given key.
-    /// @param key The key.
+    /// 根據給定的索引鍵來確認各個資料庫陣列內是否存在對應的資料。
+    /// - Parameter key: 索引鍵。
+    /// - Returns: 是否在庫。
     override open func hasUnigramsFor(key: String) -> Bool {
       if key == " " { return true }
 
@@ -250,46 +251,37 @@ extension vChewing {
       return !unigramsFor(key: key).isEmpty
     }
 
-    public func associatedPhrasesForKey(_ key: String) -> [String] {
+    public func associatedPhrasesFor(key: String) -> [String] {
       lmAssociates.valuesFor(key: key) ?? []
     }
 
-    public func hasAssociatedPhrasesForKey(_ key: String) -> Bool {
+    public func hasAssociatedPhrasesFor(key: String) -> Bool {
       lmAssociates.hasValuesFor(key: key)
     }
 
-    // MARK: - Core Functions (Private)
+    // MARK: - 核心函式（對內）
 
     /// 給定單元圖原始結果陣列，經過語彙過濾處理＋置換處理＋去重複處理之後，給出單元圖結果陣列。
     /// - Parameters:
-    ///   - unigrams: 傳入的單元圖原始結果陣列
-    ///   - filteredPairs: 傳入的要過濾掉的鍵值配對陣列
-    /// - Returns: 經過語彙過濾處理＋置換處理＋去重複處理的單元圖結果陣列
+    ///   - unigrams: 傳入的單元圖原始結果陣列。
+    ///   - filteredPairs: 傳入的要過濾掉的鍵值配對陣列。
+    /// - Returns: 經過語彙過濾處理＋置換處理＋去重複處理的單元圖結果陣列。
     func filterAndTransform(
       unigrams: [Megrez.Unigram],
       filter filteredPairs: Set<Megrez.KeyValuePair>
     ) -> [Megrez.Unigram] {
       var results: [Megrez.Unigram] = []
       var insertedPairs: Set<Megrez.KeyValuePair> = []
-
       for unigram in unigrams {
         var pair: Megrez.KeyValuePair = unigram.keyValue
-        if filteredPairs.contains(pair) {
-          continue
-        }
-
+        if filteredPairs.contains(pair) { continue }
         if isPhraseReplacementEnabled {
           let replacement = lmReplacements.valuesFor(key: pair.value)
-          if !replacement.isEmpty {
-            IME.prtDebugIntel("\(pair.value) -> \(replacement)")
-            pair.value = replacement
-          }
+          if !replacement.isEmpty { pair.value = replacement }
         }
-
-        if !insertedPairs.contains(pair) {
-          results.append(Megrez.Unigram(keyValue: pair, score: unigram.score))
-          insertedPairs.insert(pair)
-        }
+        if insertedPairs.contains(pair) { continue }
+        results.append(Megrez.Unigram(keyValue: pair, score: unigram.score))
+        insertedPairs.insert(pair)
       }
       return results
     }
