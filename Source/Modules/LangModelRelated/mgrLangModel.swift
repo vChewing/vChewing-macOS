@@ -150,11 +150,11 @@ enum mgrLangModel {
   public static func loadUserPhrasesData() {
     gLangModelCHT.loadUserPhrasesData(
       path: userPhrasesDataPath(InputMode.imeModeCHT),
-      filterPath: excludedPhrasesDataPath(InputMode.imeModeCHT)
+      filterPath: userFilteredDataPath(InputMode.imeModeCHT)
     )
     gLangModelCHS.loadUserPhrasesData(
       path: userPhrasesDataPath(InputMode.imeModeCHS),
-      filterPath: excludedPhrasesDataPath(InputMode.imeModeCHS)
+      filterPath: userFilteredDataPath(InputMode.imeModeCHS)
     )
     gLangModelCHT.loadUserSymbolData(path: userSymbolDataPath(InputMode.imeModeCHT))
     gLangModelCHS.loadUserSymbolData(path: userSymbolDataPath(InputMode.imeModeCHS))
@@ -162,19 +162,19 @@ enum mgrLangModel {
 
   public static func loadUserAssociatesData() {
     gLangModelCHT.loadUserAssociatesData(
-      path: mgrLangModel.userAssociatedPhrasesDataPath(InputMode.imeModeCHT)
+      path: mgrLangModel.userAssociatesDataPath(InputMode.imeModeCHT)
     )
     gLangModelCHS.loadUserAssociatesData(
-      path: mgrLangModel.userAssociatedPhrasesDataPath(InputMode.imeModeCHS)
+      path: mgrLangModel.userAssociatesDataPath(InputMode.imeModeCHS)
     )
   }
 
   public static func loadUserPhraseReplacement() {
     gLangModelCHT.loadReplacementsData(
-      path: mgrLangModel.phraseReplacementDataPath(InputMode.imeModeCHT)
+      path: mgrLangModel.userReplacementsDataPath(InputMode.imeModeCHT)
     )
     gLangModelCHS.loadReplacementsData(
-      path: mgrLangModel.phraseReplacementDataPath(InputMode.imeModeCHS)
+      path: mgrLangModel.userReplacementsDataPath(InputMode.imeModeCHS)
     )
   }
 
@@ -229,17 +229,17 @@ enum mgrLangModel {
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
   }
 
-  static func userAssociatedPhrasesDataPath(_ mode: InputMode) -> String {
+  static func userAssociatesDataPath(_ mode: InputMode) -> String {
     let fileName = (mode == InputMode.imeModeCHT) ? "associatedPhrases-cht.txt" : "associatedPhrases-chs.txt"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
   }
 
-  static func excludedPhrasesDataPath(_ mode: InputMode) -> String {
+  static func userFilteredDataPath(_ mode: InputMode) -> String {
     let fileName = (mode == InputMode.imeModeCHT) ? "exclude-phrases-cht.txt" : "exclude-phrases-chs.txt"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
   }
 
-  static func phraseReplacementDataPath(_ mode: InputMode) -> String {
+  static func userReplacementsDataPath(_ mode: InputMode) -> String {
     let fileName = (mode == InputMode.imeModeCHT) ? "phrases-replacement-cht.txt" : "phrases-replacement-chs.txt"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
   }
@@ -275,9 +275,9 @@ enum mgrLangModel {
       return false
     }
     if !ensureFileExists(userPhrasesDataPath(mode))
-      || !ensureFileExists(userAssociatedPhrasesDataPath(mode))
-      || !ensureFileExists(excludedPhrasesDataPath(mode))
-      || !ensureFileExists(phraseReplacementDataPath(mode))
+      || !ensureFileExists(userAssociatesDataPath(mode))
+      || !ensureFileExists(userFilteredDataPath(mode))
+      || !ensureFileExists(userReplacementsDataPath(mode))
       || !ensureFileExists(userSymbolDataPath(mode))
     {
       return false
@@ -391,7 +391,7 @@ enum mgrLangModel {
         return false
       }
 
-      let path = areWeDeleting ? excludedPhrasesDataPath(mode) : userPhrasesDataPath(mode)
+      let path = areWeDeleting ? userFilteredDataPath(mode) : userPhrasesDataPath(mode)
 
       if areWeDuplicating, !areWeDeleting {
         // Do not use ASCII characters to comment here.

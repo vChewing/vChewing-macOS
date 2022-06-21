@@ -318,9 +318,9 @@ extension ctlInputMethod {
   }
 
   @objc func openExcludedPhrases(_: Any?) {
-    IME.openPhraseFile(userFileAt: mgrLangModel.excludedPhrasesDataPath(IME.getInputMode()))
+    IME.openPhraseFile(userFileAt: mgrLangModel.userFilteredDataPath(IME.getInputMode()))
     if NSEvent.modifierFlags.contains(.option), mgrPrefs.isDebugModeEnabled {
-      IME.openPhraseFile(userFileAt: mgrLangModel.excludedPhrasesDataPath(IME.getInputMode(isReversed: true)))
+      IME.openPhraseFile(userFileAt: mgrLangModel.userFilteredDataPath(IME.getInputMode(isReversed: true)))
     }
   }
 
@@ -332,17 +332,17 @@ extension ctlInputMethod {
   }
 
   @objc func openPhraseReplacement(_: Any?) {
-    IME.openPhraseFile(userFileAt: mgrLangModel.phraseReplacementDataPath(IME.getInputMode()))
+    IME.openPhraseFile(userFileAt: mgrLangModel.userReplacementsDataPath(IME.getInputMode()))
     if NSEvent.modifierFlags.contains(.option), mgrPrefs.isDebugModeEnabled {
-      IME.openPhraseFile(userFileAt: mgrLangModel.phraseReplacementDataPath(IME.getInputMode(isReversed: true)))
+      IME.openPhraseFile(userFileAt: mgrLangModel.userReplacementsDataPath(IME.getInputMode(isReversed: true)))
     }
   }
 
   @objc func openAssociatedPhrases(_: Any?) {
-    IME.openPhraseFile(userFileAt: mgrLangModel.userAssociatedPhrasesDataPath(IME.getInputMode()))
+    IME.openPhraseFile(userFileAt: mgrLangModel.userAssociatesDataPath(IME.getInputMode()))
     if NSEvent.modifierFlags.contains(.option), mgrPrefs.isDebugModeEnabled {
       IME.openPhraseFile(
-        userFileAt: mgrLangModel.userAssociatedPhrasesDataPath(IME.getInputMode(isReversed: true)))
+        userFileAt: mgrLangModel.userAssociatesDataPath(IME.getInputMode(isReversed: true)))
     }
   }
 
