@@ -47,6 +47,7 @@ extension vChewing {
       timestamp: Double
     ) {
       let key = convertKeyFrom(walkedAnchors: walkedAnchors, cursorIndex: cursorIndex)
+      guard !key.isEmpty else { return }
 
       guard mutLRUMap[key] != nil else {
         var observation: Observation = .init()
@@ -60,6 +61,7 @@ extension vChewing {
           mutLRUList.removeLast()
         }
         IME.prtDebugIntel("UOM: Observation finished with new observation: \(key)")
+        mgrLangModel.saveUserOverrideModelData()
         return
       }
       if var theNeta = mutLRUMap[key] {
@@ -67,6 +69,7 @@ extension vChewing {
         mutLRUList.insert(theNeta, at: 0)
         mutLRUMap[key] = theNeta
         IME.prtDebugIntel("UOM: Observation finished with existing observation: \(key)")
+        mgrLangModel.saveUserOverrideModelData()
       }
     }
 
