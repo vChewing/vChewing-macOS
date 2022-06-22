@@ -417,3 +417,25 @@ extension UniChar {
     return true
   }
 }
+
+// MARK: - Stable Sort Extension
+
+// Ref: https://stackoverflow.com/a/50545761/4162914
+extension Sequence {
+  /// Return a stable-sorted collection.
+  ///
+  /// - Parameter areInIncreasingOrder: Return nil when two element are equal.
+  /// - Returns: The sorted collection.
+  public func stableSort(
+    by areInIncreasingOrder: (Element, Element) throws -> Bool
+  )
+    rethrows -> [Element]
+  {
+    try enumerated()
+      .sorted { a, b -> Bool in
+        try areInIncreasingOrder(a.element, b.element)
+          || (a.offset < b.offset && !areInIncreasingOrder(b.element, a.element))
+      }
+      .map(\.element)
+  }
+}
