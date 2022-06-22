@@ -158,6 +158,7 @@ enum mgrLangModel {
     )
     gLangModelCHT.loadUserSymbolData(path: userSymbolDataPath(InputMode.imeModeCHT))
     gLangModelCHS.loadUserSymbolData(path: userSymbolDataPath(InputMode.imeModeCHS))
+    SymbolNode.parseUserSymbolNodeData()
   }
 
   public static func loadUserAssociatesData() {
@@ -241,6 +242,11 @@ enum mgrLangModel {
 
   static func userReplacementsDataPath(_ mode: InputMode) -> String {
     let fileName = (mode == InputMode.imeModeCHT) ? "phrases-replacement-cht.txt" : "phrases-replacement-chs.txt"
+    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
+  }
+
+  static func userSymbolNodeDataPath() -> String {
+    let fileName = "symbols.dat"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
   }
 
