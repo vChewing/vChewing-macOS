@@ -755,7 +755,7 @@ extension KeyHandler {
     stateCallback: @escaping (InputState) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    guard let state = state as? InputState.Inputting else {
+    guard state is InputState.Inputting else {
       guard state is InputState.Empty else {
         IME.prtDebugIntel("6044F081")
         errorCallback()
@@ -772,7 +772,7 @@ extension KeyHandler {
     }
 
     // 此處僅借用該函式生成結果內的某個物件，不用糾結「是否縱排輸入」。
-    let candidates = buildCandidate(state: state).candidates
+    let candidates = candidatesArray
     guard !candidates.isEmpty else {
       IME.prtDebugIntel("3378A6DF")
       errorCallback()
