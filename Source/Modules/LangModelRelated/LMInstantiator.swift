@@ -28,8 +28,8 @@ import Foundation
 
 extension vChewing {
   /// 語言模組副本化模組（LMInstantiator，下稱「LMI」）自身為符合天權星組字引擎內
-  /// 的 LanguageModel 協定的模組、統籌且整理來自其它子模組的資料（包括使用者語彙、
-  /// 繪文字模組、語彙濾除表、原廠語言模組等）。
+  /// 的 LanguageModelProtocol 協定的模組、統籌且整理來自其它子模組的資料（包括使
+  /// 用者語彙、繪文字模組、語彙濾除表、原廠語言模組等）。
   ///
   /// LMI 型別為與輸入法按鍵調度模組直接溝通之唯一語言模組。當組字器開始根據給定的
   /// 讀音鏈構築語句時，LMI 會接收來自組字器的讀音、輪流檢查自身是否有可以匹配到的
@@ -44,7 +44,7 @@ extension vChewing {
   ///
   /// LMI 會根據需要分別載入原廠語言模組和其他個別的子語言模組。LMI 本身不會記錄這些
   /// 語言模組的相關資料的存放位置，僅藉由參數來讀取相關訊息。
-  public class LMInstantiator: Megrez.LanguageModel {
+  public class LMInstantiator: LanguageModelProtocol {
     // 在函式內部用以記錄狀態的開關。
     public var isPhraseReplacementEnabled = false
     public var isCNSEnabled = false
@@ -92,9 +92,6 @@ extension vChewing {
     )
     var lmReplacements = LMReplacments()
     var lmAssociates = LMAssociates()
-
-    // 初期化的函式先保留
-    override init() {}
 
     // MARK: - 工具函式
 
@@ -193,7 +190,7 @@ extension vChewing {
     /// 給定讀音字串，讓 LMI 給出對應的經過處理的單元圖陣列。
     /// - Parameter key: 給定的讀音字串。
     /// - Returns: 對應的經過處理的單元圖陣列。
-    override open func unigramsFor(key: String) -> [Megrez.Unigram] {
+    public func unigramsFor(key: String) -> [Megrez.Unigram] {
       if key == " " {
         /// 給空格鍵指定輸出值。
         let spaceUnigram = Megrez.Unigram(
@@ -241,7 +238,7 @@ extension vChewing {
     /// 根據給定的索引鍵來確認各個資料庫陣列內是否存在對應的資料。
     /// - Parameter key: 索引鍵。
     /// - Returns: 是否在庫。
-    override open func hasUnigramsFor(key: String) -> Bool {
+    public func hasUnigramsFor(key: String) -> Bool {
       if key == " " { return true }
 
       if !lmFiltered.hasUnigramsFor(key: key) {
@@ -258,6 +255,9 @@ extension vChewing {
     public func hasAssociatedPhrasesFor(key: String) -> Bool {
       lmAssociates.hasValuesFor(key: key)
     }
+
+    /// 該函式不起作用，僅用來滿足 LanguageModelProtocol 協定的要求。
+    public func bigramsForKeys(precedingKey _: String, key _: String) -> [Megrez.Bigram] { .init() }
 
     // MARK: - 核心函式（對內）
 
