@@ -63,8 +63,12 @@ class ctlInputMethod: IMKInputController {
     client().overrideKeyboard(withKeyboardNamed: mgrPrefs.basicKeyboardLayout)
   }
 
-  /// 重設按鍵調度模組。
+  /// 重設按鍵調度模組，會將當前尚未遞交的內容遞交出去。
   func resetKeyHandler() {
+    if let state = state as? InputState.NotEmpty {
+      /// 將傳回的新狀態交給調度函式。
+      handle(state: InputState.Committing(textToCommit: state.composingBufferConverted))
+    }
     keyHandler.clear()
     handle(state: InputState.Empty())
   }
@@ -229,10 +233,6 @@ class ctlInputMethod: IMKInputController {
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   override func commitComposition(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-    if let state = state as? InputState.NotEmpty {
-      /// 將傳回的新狀態交給調度函式。
-      handle(state: InputState.Committing(textToCommit: state.composingBuffer))
-    }
     resetKeyHandler()
   }
 }
@@ -297,6 +297,7 @@ extension ctlInputMethod {
   }
 
   /// 遞交組字區內容。
+  /// 注意：必須在 IMK 的 commitComposition 函式當中也間接或者直接執行這個處理。
   private func commit(text: String) {
     let buffer = IME.kanjiConversionIfRequired(text)
     if buffer.isEmpty {
