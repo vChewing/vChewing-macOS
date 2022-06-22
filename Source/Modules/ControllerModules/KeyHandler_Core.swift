@@ -266,18 +266,22 @@ class KeyHandler {
     return arrCandidates
   }
 
-  /// 向半衰引擎詢問可能的選字建議。
-  func fetchSuggestionsFromUserOverrideModel() {
+  /// 向半衰引擎詢問可能的選字建議。拿到的結果會是一個單元圖陣列。
+  func fetchSuggestedCandidates() -> [Megrez.Unigram] {
+    currentUOM.suggest(
+      walkedAnchors: walkedAnchors, cursorIndex: compositorCursorIndex,
+      timestamp: NSDate().timeIntervalSince1970)
+  }
+
+  /// 向半衰引擎詢問可能的選字建議、且套用給組字器內的當前游標位置。
+  func fetchAndApplySuggestionsFromUserOverrideModel() {
     /// 如果這個開關沒打開的話，直接放棄執行這個函式。
     if !mgrPrefs.fetchSuggestionsFromUserOverrideModel { return }
     /// 先就當前上下文讓半衰引擎重新生成 trigram 索引鍵。
     let overrideValue =
       mgrPrefs.useSCPCTypingMode
       ? ""
-      : currentUOM.suggest(
-        walkedAnchors: walkedAnchors, cursorIndex: compositorCursorIndex,
-        timestamp: NSDate().timeIntervalSince1970
-      )
+      : fetchSuggestedCandidates().first?.keyValue.value ?? ""
 
     /// 再拿著索引鍵去問半衰模組有沒有選字建議。有的話就遵循之、讓天權星引擎對指定節錨下的節點複寫權重。
     if !overrideValue.isEmpty {
