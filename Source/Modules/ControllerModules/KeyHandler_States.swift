@@ -755,6 +755,7 @@ extension KeyHandler {
     stateCallback: @escaping (InputState) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
+    if composer.isEmpty && (compositor.isEmpty || walkedAnchors.isEmpty) { return false }
     guard state is InputState.Inputting else {
       guard state is InputState.Empty else {
         IME.prtDebugIntel("6044F081")
