@@ -158,6 +158,10 @@ enum mgrLangModel {
     )
     gLangModelCHT.loadUserSymbolData(path: userSymbolDataURL(InputMode.imeModeCHT).path)
     gLangModelCHS.loadUserSymbolData(path: userSymbolDataURL(InputMode.imeModeCHS).path)
+
+    gUserOverrideModelCHT.loadData(fromURL: userOverrideModelDataURL(InputMode.imeModeCHT))
+    gUserOverrideModelCHS.loadData(fromURL: userOverrideModelDataURL(InputMode.imeModeCHS))
+
     SymbolNode.parseUserSymbolNodeData()
   }
 
