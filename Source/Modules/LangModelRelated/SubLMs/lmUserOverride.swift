@@ -56,7 +56,7 @@ extension vChewing {
         mutLRUList.insert(koPair, at: 0)
 
         if mutLRUList.count > mutCapacity {
-          mutLRUMap[mutLRUList[mutLRUList.endIndex].key] = nil
+          mutLRUMap.removeValue(forKey: mutLRUList[mutLRUList.endIndex].key)
           mutLRUList.removeLast()
         }
         IME.prtDebugIntel("UOM: Observation finished with new observation: \(key)")
@@ -253,6 +253,41 @@ extension vChewing.LMUserOverride {
     func hash(into hasher: inout Hasher) {
       hasher.combine(key)
       hasher.combine(observation)
+    }
+  }
+}
+
+// MARK: - Hash and Dehash the entire UOM data
+
+extension vChewing.LMUserOverride {
+  public func saveData(toURL fileURL: URL) {
+    let encoder = JSONEncoder()
+    do {
+      if let jsonData = try? encoder.encode(mutLRUMap) {
+        try jsonData.write(to: fileURL, options: .atomic)
+      }
+    } catch {
+      IME.prtDebugIntel("UOM Error: Unable to save data, abort saving. Details: \(error)")
+      return
+    }
+  }
+
+  public func loadData(fromURL fileURL: URL) {
+    let decoder = JSONDecoder()
+    do {
+      let data = try Data(contentsOf: fileURL, options: .mappedIfSafe)
+      guard let jsonResult = try? decoder.decode(Dictionary<String, KeyObservationPair>.self, from: data) else {
+        IME.prtDebugIntel("UOM Error: Read file content type invalid, abort loading.")
+        return
+      }
+      mutLRUMap = jsonResult
+      mutLRUList.removeAll()
+      for neta in mutLRUMap.reversed() {
+        mutLRUList.append(neta.value)
+      }
+    } catch {
+      IME.prtDebugIntel("UOM Error: Unable to read file or parse the data, abort loading. Details: \(error)")
+      return
     }
   }
 }
