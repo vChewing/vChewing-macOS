@@ -311,38 +311,38 @@ extension ctlInputMethod {
   }
 
   @objc func openUserPhrases(_: Any?) {
-    IME.openPhraseFile(userFileAt: mgrLangModel.userPhrasesDataPath(IME.getInputMode()))
+    IME.openPhraseFile(fromURL: mgrLangModel.userPhrasesDataURL(IME.getInputMode()))
     if NSEvent.modifierFlags.contains(.option), mgrPrefs.isDebugModeEnabled {
-      IME.openPhraseFile(userFileAt: mgrLangModel.userPhrasesDataPath(IME.getInputMode(isReversed: true)))
+      IME.openPhraseFile(fromURL: mgrLangModel.userPhrasesDataURL(IME.getInputMode(isReversed: true)))
     }
   }
 
   @objc func openExcludedPhrases(_: Any?) {
-    IME.openPhraseFile(userFileAt: mgrLangModel.userFilteredDataPath(IME.getInputMode()))
+    IME.openPhraseFile(fromURL: mgrLangModel.userFilteredDataURL(IME.getInputMode()))
     if NSEvent.modifierFlags.contains(.option), mgrPrefs.isDebugModeEnabled {
-      IME.openPhraseFile(userFileAt: mgrLangModel.userFilteredDataPath(IME.getInputMode(isReversed: true)))
+      IME.openPhraseFile(fromURL: mgrLangModel.userFilteredDataURL(IME.getInputMode(isReversed: true)))
     }
   }
 
   @objc func openUserSymbols(_: Any?) {
-    IME.openPhraseFile(userFileAt: mgrLangModel.userSymbolDataPath(IME.getInputMode()))
+    IME.openPhraseFile(fromURL: mgrLangModel.userSymbolDataURL(IME.getInputMode()))
     if NSEvent.modifierFlags.contains(.option), mgrPrefs.isDebugModeEnabled {
-      IME.openPhraseFile(userFileAt: mgrLangModel.userSymbolDataPath(IME.getInputMode(isReversed: true)))
+      IME.openPhraseFile(fromURL: mgrLangModel.userSymbolDataURL(IME.getInputMode(isReversed: true)))
     }
   }
 
   @objc func openPhraseReplacement(_: Any?) {
-    IME.openPhraseFile(userFileAt: mgrLangModel.userReplacementsDataPath(IME.getInputMode()))
+    IME.openPhraseFile(fromURL: mgrLangModel.userReplacementsDataURL(IME.getInputMode()))
     if NSEvent.modifierFlags.contains(.option), mgrPrefs.isDebugModeEnabled {
-      IME.openPhraseFile(userFileAt: mgrLangModel.userReplacementsDataPath(IME.getInputMode(isReversed: true)))
+      IME.openPhraseFile(fromURL: mgrLangModel.userReplacementsDataURL(IME.getInputMode(isReversed: true)))
     }
   }
 
   @objc func openAssociatedPhrases(_: Any?) {
-    IME.openPhraseFile(userFileAt: mgrLangModel.userAssociatesDataPath(IME.getInputMode()))
+    IME.openPhraseFile(fromURL: mgrLangModel.userAssociatesDataURL(IME.getInputMode()))
     if NSEvent.modifierFlags.contains(.option), mgrPrefs.isDebugModeEnabled {
       IME.openPhraseFile(
-        userFileAt: mgrLangModel.userAssociatesDataPath(IME.getInputMode(isReversed: true)))
+        fromURL: mgrLangModel.userAssociatesDataURL(IME.getInputMode(isReversed: true)))
     }
   }
 

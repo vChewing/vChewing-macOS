@@ -41,13 +41,13 @@ class SymbolNode {
   }
 
   static func parseUserSymbolNodeData() {
-    let path = mgrLangModel.userSymbolNodeDataPath()
+    let url = mgrLangModel.userSymbolNodeDataURL()
     // 這兩個變數單獨拿出來，省得每次都重建還要浪費算力。
     var arrLines = [String.SubSequence]()
     var fieldSlice = [Substring.SubSequence]()
     var arrChildren = [SymbolNode]()
     do {
-      arrLines = try String(contentsOfFile: path, encoding: .utf8).split(separator: "\n")
+      arrLines = try String(contentsOfFile: url.path, encoding: .utf8).split(separator: "\n")
       for strLine in arrLines.lazy.filter({ !$0.isEmpty }) {
         fieldSlice = strLine.split(separator: "=")
         switch fieldSlice.count {

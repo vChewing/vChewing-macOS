@@ -122,6 +122,10 @@ public enum IME {
 
   // MARK: - Open a phrase data file.
 
+  static func openPhraseFile(fromURL url: URL) {
+    openPhraseFile(userFileAt: url.path)
+  }
+
   static func openPhraseFile(userFileAt path: String) {
     func checkIfUserFilesExist() -> Bool {
       if !mgrLangModel.chkUserLMFilesExist(InputMode.imeModeCHS)

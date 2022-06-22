@@ -149,33 +149,33 @@ enum mgrLangModel {
 
   public static func loadUserPhrasesData() {
     gLangModelCHT.loadUserPhrasesData(
-      path: userPhrasesDataPath(InputMode.imeModeCHT),
-      filterPath: userFilteredDataPath(InputMode.imeModeCHT)
+      path: userPhrasesDataURL(InputMode.imeModeCHT).path,
+      filterPath: userFilteredDataURL(InputMode.imeModeCHT).path
     )
     gLangModelCHS.loadUserPhrasesData(
-      path: userPhrasesDataPath(InputMode.imeModeCHS),
-      filterPath: userFilteredDataPath(InputMode.imeModeCHS)
+      path: userPhrasesDataURL(InputMode.imeModeCHS).path,
+      filterPath: userFilteredDataURL(InputMode.imeModeCHS).path
     )
-    gLangModelCHT.loadUserSymbolData(path: userSymbolDataPath(InputMode.imeModeCHT))
-    gLangModelCHS.loadUserSymbolData(path: userSymbolDataPath(InputMode.imeModeCHS))
+    gLangModelCHT.loadUserSymbolData(path: userSymbolDataURL(InputMode.imeModeCHT).path)
+    gLangModelCHS.loadUserSymbolData(path: userSymbolDataURL(InputMode.imeModeCHS).path)
     SymbolNode.parseUserSymbolNodeData()
   }
 
   public static func loadUserAssociatesData() {
     gLangModelCHT.loadUserAssociatesData(
-      path: mgrLangModel.userAssociatesDataPath(InputMode.imeModeCHT)
+      path: mgrLangModel.userAssociatesDataURL(InputMode.imeModeCHT).path
     )
     gLangModelCHS.loadUserAssociatesData(
-      path: mgrLangModel.userAssociatesDataPath(InputMode.imeModeCHS)
+      path: mgrLangModel.userAssociatesDataURL(InputMode.imeModeCHS).path
     )
   }
 
   public static func loadUserPhraseReplacement() {
     gLangModelCHT.loadReplacementsData(
-      path: mgrLangModel.userReplacementsDataPath(InputMode.imeModeCHT)
+      path: mgrLangModel.userReplacementsDataURL(InputMode.imeModeCHT).path
     )
     gLangModelCHS.loadReplacementsData(
-      path: mgrLangModel.userReplacementsDataPath(InputMode.imeModeCHS)
+      path: mgrLangModel.userReplacementsDataURL(InputMode.imeModeCHS).path
     )
   }
 
@@ -220,47 +220,48 @@ enum mgrLangModel {
 
   // Swift 的 appendingPathComponent 需要藉由 URL 完成，最後再用 .path 轉為路徑。
 
-  static func userPhrasesDataPath(_ mode: InputMode) -> String {
+  static func userPhrasesDataURL(_ mode: InputMode) -> URL {
     let fileName = (mode == InputMode.imeModeCHT) ? "userdata-cht.txt" : "userdata-chs.txt"
-    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
+    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
-  static func userSymbolDataPath(_ mode: InputMode) -> String {
+  static func userSymbolDataURL(_ mode: InputMode) -> URL {
     let fileName = (mode == InputMode.imeModeCHT) ? "usersymbolphrases-cht.txt" : "usersymbolphrases-chs.txt"
-    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
+    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
-  static func userAssociatesDataPath(_ mode: InputMode) -> String {
+  static func userAssociatesDataURL(_ mode: InputMode) -> URL {
     let fileName = (mode == InputMode.imeModeCHT) ? "associatedPhrases-cht.txt" : "associatedPhrases-chs.txt"
-    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
+    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
-  static func userFilteredDataPath(_ mode: InputMode) -> String {
+  static func userFilteredDataURL(_ mode: InputMode) -> URL {
     let fileName = (mode == InputMode.imeModeCHT) ? "exclude-phrases-cht.txt" : "exclude-phrases-chs.txt"
-    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
+    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
-  static func userReplacementsDataPath(_ mode: InputMode) -> String {
+  static func userReplacementsDataURL(_ mode: InputMode) -> URL {
     let fileName = (mode == InputMode.imeModeCHT) ? "phrases-replacement-cht.txt" : "phrases-replacement-chs.txt"
-    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
+    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
-  static func userSymbolNodeDataPath() -> String {
+  static func userSymbolNodeDataURL() -> URL {
     let fileName = "symbols.dat"
-    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
+    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
-  static func userOverrideModelDataPath(_ mode: InputMode) -> String {
+  static func userOverrideModelDataURL(_ mode: InputMode) -> URL {
     let fileName = (mode == InputMode.imeModeCHT) ? "override-model-data-chs.dat" : "override-model-data-cht.dat"
-    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName).path
+    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
   // MARK: - 檢查具體的使用者語彙檔案是否存在
 
   static func ensureFileExists(
-    _ filePath: String, populateWithTemplate templateBasename: String = "1145141919810",
+    _ fileURL: URL, populateWithTemplate templateBasename: String = "1145141919810",
     extension ext: String = "txt"
   ) -> Bool {
+    let filePath = fileURL.path
     if !FileManager.default.fileExists(atPath: filePath) {
       let templateURL = Bundle.main.url(forResource: templateBasename, withExtension: ext)
       var templateData = Data("".utf8)
@@ -285,11 +286,14 @@ enum mgrLangModel {
     if !userDataFolderExists {
       return false
     }
-    if !ensureFileExists(userPhrasesDataPath(mode))
-      || !ensureFileExists(userAssociatesDataPath(mode))
-      || !ensureFileExists(userFilteredDataPath(mode))
-      || !ensureFileExists(userReplacementsDataPath(mode))
-      || !ensureFileExists(userSymbolDataPath(mode))
+    /// SymbolNode 資料與 UserOverrideModel 半衰模組資料檔案不需要強行確保存在。
+    /// 前者的話，需要該檔案存在的人自己會建立。
+    /// 後者的話，你在敲字時自己就會建立。
+    if !ensureFileExists(userPhrasesDataURL(mode))
+      || !ensureFileExists(userAssociatesDataURL(mode))
+      || !ensureFileExists(userFilteredDataURL(mode))
+      || !ensureFileExists(userReplacementsDataURL(mode))
+      || !ensureFileExists(userSymbolDataURL(mode))
     {
       return false
     }
@@ -402,7 +406,7 @@ enum mgrLangModel {
         return false
       }
 
-      let path = areWeDeleting ? userFilteredDataPath(mode) : userPhrasesDataPath(mode)
+      let theURL = areWeDeleting ? userFilteredDataURL(mode) : userPhrasesDataURL(mode)
 
       if areWeDuplicating, !areWeDeleting {
         // Do not use ASCII characters to comment here.
@@ -411,7 +415,7 @@ enum mgrLangModel {
         currentMarkedPhrase += "\t#𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎"
       }
 
-      if let writeFile = FileHandle(forUpdatingAtPath: path),
+      if let writeFile = FileHandle(forUpdatingAtPath: theURL.path),
         let data = currentMarkedPhrase.data(using: .utf8),
         let endl = "\n".data(using: .utf8)
       {
@@ -426,7 +430,7 @@ enum mgrLangModel {
 
       // We enforce the format consolidation here, since the pragma header
       // will let the UserPhraseLM bypasses the consolidating process on load.
-      if !vChewing.LMConsolidator.consolidate(path: path, pragma: false) {
+      if !vChewing.LMConsolidator.consolidate(path: theURL.path, pragma: false) {
         return false
       }
 
