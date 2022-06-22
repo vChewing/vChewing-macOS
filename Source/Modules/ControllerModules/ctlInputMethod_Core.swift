@@ -278,6 +278,38 @@ extension ctlInputMethod {
       clearInlineDisplay()
       return
     }
+
+    var identifier: AnyObject {
+      switch IME.currentInputMode {
+        case InputMode.imeModeCHS:
+          if #available(macOS 12.0, *) {
+            return "zh-Hans" as AnyObject
+          }
+        case InputMode.imeModeCHT:
+          if #available(macOS 12.0, *) {
+            return (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
+              ? "ja" as AnyObject : "zh-Hant" as AnyObject
+          }
+        default:
+          break
+      }
+      return "" as AnyObject
+    }
+
+    // [Shiki's Note] This might needs to be bug-reported to Apple:
+    // The LanguageIdentifier attribute of an NSAttributeString designated to
+    // IMK Client().SetMarkedText won't let the actual font respect your languageIdentifier
+    // settings. Still, this might behaves as Apple's current expectation, I'm afraid.
+    if #available(macOS 12.0, *) {
+      state.attributedString.setAttributes(
+        [.languageIdentifier: identifier],
+        range: NSRange(
+          location: 0,
+          length: state.composingBuffer.utf16.count
+        )
+      )
+    }
+
     /// 所謂選區「selectionRange」，就是「可見游標位置」的位置，只不過長度
     /// 是 0 且取代範圍（replacementRange）為「NSNotFound」罷了。
     /// 也就是說，內文組字區該在哪裡出現，得由客體軟體來作主。
