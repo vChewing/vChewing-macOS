@@ -195,7 +195,7 @@ extension KeyHandler {
       let textToCommit = popOverflowComposingTextAndWalk
 
       // 看看半衰記憶模組是否會對目前的狀態給出自動選字建議。
-      dealWithOverrideModelSuggestions()
+      fetchSuggestionsFromUserOverrideModel()
 
       // 將組字器內超出最大動態爬軌範圍的節錨都標記為「已經手動選字過」，減少之後的爬軌運算負擔。
       markNodesFixedIfNecessary()

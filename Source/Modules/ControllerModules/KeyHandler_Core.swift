@@ -262,7 +262,9 @@ class KeyHandler {
   }
 
   /// 向半衰引擎詢問可能的選字建議。
-  func dealWithOverrideModelSuggestions() {
+  func fetchSuggestionsFromUserOverrideModel() {
+    /// 如果這個開關沒打開的話，直接放棄執行這個函式。
+    if !mgrPrefs.fetchSuggestionsFromUserOverrideModel { return }
     /// 先就當前上下文讓半衰引擎重新生成 trigram 索引鍵。
     let overrideValue =
       mgrPrefs.useSCPCTypingMode
