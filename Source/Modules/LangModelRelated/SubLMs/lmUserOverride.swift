@@ -53,6 +53,9 @@ extension vChewing {
         var observation: Observation = .init()
         observation.update(candidate: candidate, timestamp: timestamp)
         let koPair = KeyObservationPair(key: key, observation: observation)
+        // 先移除 key 再設定 key 的話，就可以影響這個 key 在辭典內的順位。
+        // Swift 原生的辭典是沒有數字索引排序的，但資料的插入順序卻有保存著。
+        mutLRUMap.removeValue(forKey: key)
         mutLRUMap[key] = koPair
         mutLRUList.insert(koPair, at: 0)
 
