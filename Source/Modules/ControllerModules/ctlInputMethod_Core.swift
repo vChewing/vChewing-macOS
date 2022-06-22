@@ -101,7 +101,7 @@ class ctlInputMethod: IMKInputController {
     /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
     /// 這是很多 macOS 副廠輸入法的常見失誤之處。
     if client().bundleIdentifier() != Bundle.main.bundleIdentifier {
-      // Override the keyboard layout to the basic one.
+      // 強制重設當前鍵盤佈局、使其與偏好設定同步。
       setKeyLayout()
       handle(state: .Empty())
     }  // 除此之外就不要動了，免得在點開輸入法自身的視窗時卡死。
@@ -143,7 +143,7 @@ class ctlInputMethod: IMKInputController {
       /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
       /// 這是很多 macOS 副廠輸入法的常見失誤之處。
       if client().bundleIdentifier() != Bundle.main.bundleIdentifier {
-        // Remember to override the keyboard layout again -- treat this as an activate event.
+        // 強制重設當前鍵盤佈局、使其與偏好設定同步。這裡的這一步也不能省略。
         setKeyLayout()
         handle(state: .Empty())
       }  // 除此之外就不要動了，免得在點開輸入法自身的視窗時卡死。
