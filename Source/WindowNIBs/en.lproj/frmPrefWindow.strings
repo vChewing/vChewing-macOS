@@ -41,6 +41,7 @@
 "BSK-bH-Gct.title" = "Auto-convert traditional Chinese glyphs to KangXi characters";
 "cf2-se-PDO.title" = "Dictionary and Language Models";
 "chkAllowBoostingSingleKanjiAsUserPhrase.title" = "Allow boosting / excluding a candidate of single kanji";
+"chkFetchSuggestionsFromUserOverrideModel.title" = "Applying typing suggestions from half-life user override model";
 "dIN-TZ-67g.title" = "Space to +cycle candidates, Shift+Space to +cycle pages";
 "E1l-m8-xgb.title" = "Advanced Settings";
 "eia-1F-Do0.title" = "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters";

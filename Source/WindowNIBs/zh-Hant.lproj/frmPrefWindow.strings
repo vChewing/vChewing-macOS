@@ -41,6 +41,7 @@
 "BSK-bH-Gct.title" = "自動將繁體中文字轉換為康熙正體字";
 "cf2-se-PDO.title" = "辭典＆語言模型";
 "chkAllowBoostingSingleKanjiAsUserPhrase.title" = "將可以就地升權/排除的候選字詞的最短詞長設為單個漢字";
+"chkFetchSuggestionsFromUserOverrideModel.title" = "在敲字時自動套用來自半衰記憶模組的建議";
 "dIN-TZ-67g.title" = "Shift+Space 換下一頁，Space 換選下一個候選字";
 "E1l-m8-xgb.title" = "進階設定";
 "eia-1F-Do0.title" = "自動將繁體中文字轉換為日本簡化字（JIS 新字體）";
