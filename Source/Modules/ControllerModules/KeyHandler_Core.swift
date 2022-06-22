@@ -201,6 +201,8 @@ class KeyHandler {
         )
       }
     }
+
+    // 開始爬軌。
     walk()
 
     /// 若偏好設定內啟用了相關選項，則會在選字之後始終將游標推送至選字厚的節錨的前方。
@@ -253,6 +255,9 @@ class KeyHandler {
       for currentNodeAnchor in arrNodes {
         if let currentNode = currentNodeAnchor.node {
           for currentCandidate in currentNode.candidates {
+            // 選字窗的內容的康熙轉換 / JIS 轉換不能放在這裡處理，會影響選字有效性。
+            // 選字的原理是拿著具體的候選字詞的字串去當前的節錨下找出對應的候選字詞（Ｘ元圖）。
+            // 一旦在這裡轉換了，節錨內的某些元圖就無法被選中。
             arrCandidates.append(currentCandidate.value)
           }
         }
