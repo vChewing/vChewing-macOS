@@ -25,12 +25,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import AVFoundation
 import Foundation
 
-public class clsSFX {
+public enum clsSFX {
   static func beep() {
     let filePath = Bundle.main.path(forResource: mgrPrefs.shouldNotFartInLieuOfBeep ? "Beep" : "Fart", ofType: "m4a")!
     let fileURL = URL(fileURLWithPath: filePath)
     var soundID: SystemSoundID = 0
     AudioServicesCreateSystemSoundID(fileURL as CFURL, &soundID)
     AudioServicesPlaySystemSound(soundID)
+  }
+
+  static func beep(count: Int = 1) {
+    if count <= 1 {
+      clsSFX.beep()
+      return
+    }
+    for _ in 0...count {
+      clsSFX.beep()
+      usleep(500_000)
+    }
   }
 }
