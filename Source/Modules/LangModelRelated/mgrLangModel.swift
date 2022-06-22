@@ -447,4 +447,9 @@ enum mgrLangModel {
     }
     return false
   }
+
+  static func saveUserOverrideModelData() {
+    gUserOverrideModelCHT.saveData(toURL: userOverrideModelDataURL(InputMode.imeModeCHT))
+    gUserOverrideModelCHS.saveData(toURL: userOverrideModelDataURL(InputMode.imeModeCHS))
+  }
 }
