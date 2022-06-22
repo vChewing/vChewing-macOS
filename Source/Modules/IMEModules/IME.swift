@@ -48,7 +48,7 @@ public enum IME {
       switch (mgrPrefs.chineseConversionEnabled, mgrPrefs.shiftJISShinjitaiOutputEnabled) {
         case (false, true): return vChewingKanjiConverter.cnvTradToJIS(text)
         case (true, false): return vChewingKanjiConverter.cnvTradToKangXi(text)
-        // 本來這兩個開關不該同時開啟的，但萬一被開啟了的話就這樣處理：
+        // 本來這兩個開關不該同時開啟的，但萬一被同時開啟了的話就這樣處理：
         case (true, true): return vChewingKanjiConverter.cnvTradToJIS(text)
         case (false, false): return text
       }
