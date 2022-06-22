@@ -111,17 +111,18 @@ extension vChewing {
       walkedAnchors: [Megrez.NodeAnchor],
       cursorIndex: Int,
       timestamp: Double
-    ) -> String {
+    ) -> [Megrez.Unigram] {
       let key = convertKeyFrom(walkedAnchors: walkedAnchors, cursorIndex: cursorIndex)
+      let currentReadingKey = convertKeyFrom(walkedAnchors: walkedAnchors, cursorIndex: cursorIndex, readingOnly: true)
       guard let koPair = mutLRUMap[key] else {
         IME.prtDebugIntel("UOM: mutLRUMap[key] is nil, throwing blank suggestion for key: \(key).")
-        return ""
+        return .init()
       }
 
       let observation = koPair.observation
 
-      var candidate = ""
-      var score = 0.0
+      var arrResults = [Megrez.Unigram]()
+      var currentHighScore = 0.0
       for overrideNeta in Array(observation.overrides) {
         let override: Override = overrideNeta.value
         let overrideScore: Double = getScore(
@@ -131,23 +132,20 @@ extension vChewing {
           timestamp: timestamp,
           lambda: mutDecayExponent
         )
-
-        if overrideScore == 0.0 {
-          continue
-        }
-
-        if overrideScore > score {
-          candidate = overrideNeta.key
-          score = overrideScore
-        }
+        if (0...currentHighScore).contains(overrideScore) { continue }
+        let newUnigram = Megrez.Unigram(
+          keyValue: .init(key: currentReadingKey, value: overrideNeta.key), score: overrideScore
+        )
+        arrResults.insert(newUnigram, at: 0)
+        currentHighScore = overrideScore
       }
-      if candidate.isEmpty {
+      if arrResults.isEmpty {
         IME.prtDebugIntel("UOM: No usable suggestions in the result for key: \(key).")
       }
-      return candidate
+      return arrResults
     }
 
-    public func getScore(
+    private func getScore(
       eventCount: Int,
       totalCount: Int,
       eventTimestamp: Double,
@@ -161,7 +159,7 @@ extension vChewing {
     }
 
     func convertKeyFrom(
-      walkedAnchors: [Megrez.NodeAnchor], cursorIndex: Int
+      walkedAnchors: [Megrez.NodeAnchor], cursorIndex: Int, readingOnly: Bool = false
     ) -> String {
       let arrEndingPunctuation = ["，", "。", "！", "？", "」", "』", "”", "’"]
       var arrNodes: [Megrez.NodeAnchor] = []
@@ -178,34 +176,45 @@ extension vChewing {
 
       arrNodes = Array(arrNodes.reversed())
 
-      var strCurrent = "()"
-      var strPrevious = "()"
-      var strAnterior = "()"
-
       guard let kvCurrent = arrNodes[0].node?.currentKeyValue,
         !arrEndingPunctuation.contains(kvCurrent.value)
       else {
         return ""
       }
 
+      // 字音數與字數不一致的內容會被拋棄。
+      if kvCurrent.key.split(separator: "-").count != kvCurrent.value.count { return "" }
+
       // 前置單元只記錄讀音，在其後的單元則同時記錄讀音與字詞
-      strCurrent = kvCurrent.key
+      let strCurrent = kvCurrent.key
+
+      var strPrevious = "()"
+      var strAnterior = "()"
+      var readingStack = ""
+      var trigramKey: String { "(\(strAnterior),\(strPrevious),\(strCurrent))" }
+      var result: String {
+        readingStack.contains("_") ? "" : (readingOnly ? strCurrent : trigramKey)
+      }
 
       if arrNodes.count >= 2,
         let kvPrevious = arrNodes[1].node?.currentKeyValue,
-        !arrEndingPunctuation.contains(kvPrevious.value)
+        !arrEndingPunctuation.contains(kvPrevious.value),
+        kvPrevious.key.split(separator: "-").count == kvPrevious.value.count
       {
         strPrevious = "(\(kvPrevious.key),\(kvPrevious.value))"
+        readingStack = kvPrevious.key + readingStack
       }
 
       if arrNodes.count >= 3,
         let kvAnterior = arrNodes[2].node?.currentKeyValue,
-        !arrEndingPunctuation.contains(kvAnterior.value)
+        !arrEndingPunctuation.contains(kvAnterior.value),
+        kvAnterior.key.split(separator: "-").count == kvAnterior.value.count
       {
         strAnterior = "(\(kvAnterior.key),\(kvAnterior.value))"
+        readingStack = kvAnterior.key + readingStack
       }
 
-      return "(\(strAnterior),\(strPrevious),\(strCurrent))"
+      return result
     }
   }
 }
