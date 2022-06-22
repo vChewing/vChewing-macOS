@@ -373,7 +373,7 @@ public enum IME {
 // Extend the RangeReplaceableCollection to allow it clean duplicated characters.
 // Ref: https://stackoverflow.com/questions/25738817/
 extension RangeReplaceableCollection where Element: Hashable {
-  var charDeDuplicate: Self {
+  var deduplicate: Self {
     var set = Set<Element>()
     return filter { set.insert($0).inserted }
   }

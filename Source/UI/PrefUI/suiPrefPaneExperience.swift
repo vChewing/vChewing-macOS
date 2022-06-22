@@ -65,7 +65,7 @@ struct suiPrefPaneExperience: View {
         ComboBox(items: mgrPrefs.suggestedCandidateKeys, text: $selSelectionKeys).frame(width: 180).onChange(
           of: selSelectionKeys
         ) { value in
-          let keys: String = (value.trimmingCharacters(in: .whitespacesAndNewlines) as String).charDeDuplicate
+          let keys: String = value.trimmingCharacters(in: .whitespacesAndNewlines).deduplicate
           do {
             try mgrPrefs.validate(candidateKeys: keys)
             mgrPrefs.candidateKeys = keys

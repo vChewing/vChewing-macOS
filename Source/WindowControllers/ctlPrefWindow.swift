@@ -228,7 +228,7 @@ class ctlPrefWindow: NSWindowController {
       let keys = (sender as AnyObject).stringValue?.trimmingCharacters(
         in: .whitespacesAndNewlines
       )
-      .charDeDuplicate
+      .deduplicate
     else {
       return
     }
