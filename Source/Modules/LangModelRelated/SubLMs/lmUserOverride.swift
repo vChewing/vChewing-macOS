@@ -27,43 +27,6 @@ import Foundation
 
 extension vChewing {
   public class LMUserOverride {
-    // MARK: - Private Structures
-
-    // 這些型別必須得用 class，不然會導致拿不到有效建議。
-
-    class Override {
-      var count: Int = 0
-      var timestamp: Double = 0.0
-      init(count: Int = 0, timestamp: Double = 0) {
-        self.count = count
-        self.timestamp = timestamp
-      }
-    }
-
-    class Observation {
-      var count: Int = 0
-      var overrides: [String: Override] = [:]
-
-      func update(candidate: String, timestamp: Double) {
-        count += 1
-        if overrides.keys.contains(candidate) {
-          overrides[candidate]?.timestamp = timestamp
-          overrides[candidate]?.count += 1
-        } else {
-          overrides[candidate] = .init(count: 1, timestamp: timestamp)
-        }
-      }
-    }
-
-    class KeyObservationPair {
-      var key: String
-      var observation: Observation
-      init(key: String, observation: Observation) {
-        self.key = key
-        self.observation = observation
-      }
-    }
-
     // MARK: - Main
 
     var mutCapacity: Int
@@ -86,7 +49,7 @@ extension vChewing {
       let key = convertKeyFrom(walkedAnchors: walkedAnchors, cursorIndex: cursorIndex)
 
       guard mutLRUMap[key] != nil else {
-        let observation: Observation = .init()
+        var observation: Observation = .init()
         observation.update(candidate: candidate, timestamp: timestamp)
         let koPair = KeyObservationPair(key: key, observation: observation)
         mutLRUMap[key] = koPair
@@ -99,7 +62,7 @@ extension vChewing {
         IME.prtDebugIntel("UOM: Observation finished with new observation: \(key)")
         return
       }
-      if let theNeta = mutLRUMap[key] {
+      if var theNeta = mutLRUMap[key] {
         theNeta.observation.update(candidate: candidate, timestamp: timestamp)
         mutLRUList.insert(theNeta, at: 0)
         mutLRUMap[key] = theNeta
@@ -215,6 +178,81 @@ extension vChewing {
       }
 
       return result
+    }
+  }
+}
+
+// MARK: - Private Structures
+
+extension vChewing.LMUserOverride {
+  enum OverrideUnit: CodingKey { case count, timestamp }
+  enum ObservationUnit: CodingKey { case count, overrides }
+  enum KeyObservationPairUnit: CodingKey { case key, observation }
+
+  struct Override: Hashable, Encodable, Decodable {
+    var count: Int = 0
+    var timestamp: Double = 0.0
+    static func == (lhs: Override, rhs: Override) -> Bool {
+      lhs.count == rhs.count && lhs.timestamp == rhs.timestamp
+    }
+
+    func encode(to encoder: Encoder) throws {
+      var container = encoder.container(keyedBy: OverrideUnit.self)
+      try container.encode(timestamp, forKey: .timestamp)
+      try container.encode(count, forKey: .count)
+    }
+
+    func hash(into hasher: inout Hasher) {
+      hasher.combine(count)
+      hasher.combine(timestamp)
+    }
+  }
+
+  struct Observation: Hashable, Encodable, Decodable {
+    var count: Int = 0
+    var overrides: [String: Override] = [:]
+    static func == (lhs: Observation, rhs: Observation) -> Bool {
+      lhs.count == rhs.count && lhs.overrides == rhs.overrides
+    }
+
+    func encode(to encoder: Encoder) throws {
+      var container = encoder.container(keyedBy: ObservationUnit.self)
+      try container.encode(count, forKey: .count)
+      try container.encode(overrides, forKey: .overrides)
+    }
+
+    func hash(into hasher: inout Hasher) {
+      hasher.combine(count)
+      hasher.combine(overrides)
+    }
+
+    mutating func update(candidate: String, timestamp: Double) {
+      count += 1
+      if overrides.keys.contains(candidate) {
+        overrides[candidate]?.timestamp = timestamp
+        overrides[candidate]?.count += 1
+      } else {
+        overrides[candidate] = .init(count: 1, timestamp: timestamp)
+      }
+    }
+  }
+
+  struct KeyObservationPair: Hashable, Encodable, Decodable {
+    var key: String
+    var observation: Observation
+    static func == (lhs: KeyObservationPair, rhs: KeyObservationPair) -> Bool {
+      lhs.key == rhs.key && lhs.observation == rhs.observation
+    }
+
+    func encode(to encoder: Encoder) throws {
+      var container = encoder.container(keyedBy: KeyObservationPairUnit.self)
+      try container.encode(key, forKey: .key)
+      try container.encode(observation, forKey: .observation)
+    }
+
+    func hash(into hasher: inout Hasher) {
+      hasher.combine(key)
+      hasher.combine(observation)
     }
   }
 }
