@@ -239,29 +239,35 @@ class KeyHandler {
 
   /// 獲取候選字詞陣列資料內容。
   var candidatesArray: [String] {
+    var arrNodes: [Megrez.NodeAnchor] = rawNodes
     var arrCandidates: [String] = []
-    var arrNodes: [Megrez.NodeAnchor] = []
-    arrNodes.append(contentsOf: rawNodes)
 
     /// 原理：nodes 這個回饋結果包含一堆子陣列，分別對應不同詞長的候選字。
     /// 這裡先對陣列排序、讓最長候選字的子陣列的優先權最高。
     /// 這個過程不會傷到子陣列內部的排序。
-    if !arrNodes.isEmpty {
-      // sort the nodes, so that longer nodes (representing longer phrases)
-      // are placed at the top of the candidate list
-      arrNodes.sort { $0.keyLength > $1.keyLength }
+    if arrNodes.isEmpty { return arrCandidates }
 
-      // then use the Swift trick to retrieve the candidates for each node at/crossing the cursor
-      for currentNodeAnchor in arrNodes {
-        if let currentNode = currentNodeAnchor.node {
-          for currentCandidate in currentNode.candidates {
-            // 選字窗的內容的康熙轉換 / JIS 轉換不能放在這裡處理，會影響選字有效性。
-            // 選字的原理是拿著具體的候選字詞的字串去當前的節錨下找出對應的候選字詞（Ｘ元圖）。
-            // 一旦在這裡轉換了，節錨內的某些元圖就無法被選中。
-            arrCandidates.append(currentCandidate.value)
-          }
+    // sort the nodes, so that longer nodes (representing longer phrases)
+    // are placed at the top of the candidate list
+    arrNodes = arrNodes.stableSort { $0.keyLength > $1.keyLength }
+
+    // then use the Swift trick to retrieve the candidates for each node at/crossing the cursor
+    for currentNodeAnchor in arrNodes {
+      if let currentNode = currentNodeAnchor.node {
+        for currentCandidate in currentNode.candidates {
+          // 選字窗的內容的康熙轉換 / JIS 轉換不能放在這裡處理，會影響選字有效性。
+          // 選字的原理是拿著具體的候選字詞的字串去當前的節錨下找出對應的候選字詞（Ｘ元圖）。
+          // 一旦在這裡轉換了，節錨內的某些元圖就無法被選中。
+          arrCandidates.append(currentCandidate.value)
         }
       }
+    }
+    if mgrPrefs.fetchSuggestionsFromUserOverrideModel, !mgrPrefs.useSCPCTypingMode {
+      let arrSuggestedUnigrams: [Megrez.Unigram] = fetchSuggestedCandidates().stableSort { $0.score > $1.score }
+      let arrSuggestedCandidates: [String] = arrSuggestedUnigrams.map { $0.keyValue.value }
+      arrCandidates = arrSuggestedCandidates.filter { arrCandidates.contains($0) } + arrCandidates
+      arrCandidates = arrCandidates.deduplicate
+      arrCandidates = arrCandidates.stableSort { $0.count > $1.count }
     }
     return arrCandidates
   }
