@@ -118,7 +118,7 @@ struct suiPrefPaneDictionary: View {
         }
         Divider()
         Toggle(
-          LocalizedStringKey("Enable CNS11643 Support (2022-04-27)"),
+          LocalizedStringKey("Enable CNS11643 Support (2022-06-15)"),
           isOn: $selEnableCNS11643
         )
         .onChange(of: selEnableCNS11643) { value in

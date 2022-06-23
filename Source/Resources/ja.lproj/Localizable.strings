@@ -115,7 +115,7 @@
 "Debug Mode" = "欠陥辿着モード";
 "Dictionary" = "辞書設定";
 "Emulating select-candidate-per-character mode" = "漢字１つづつ全候補選択入力モード";
-"Enable CNS11643 Support (2022-04-27)" = "全字庫モード // 入力可能な漢字数を倍増す (2022-04-27)";
+"Enable CNS11643 Support (2022-06-15)" = "全字庫モード // 入力可能な漢字数を倍増す (2022-06-15)";
 "Enable Space key for calling candidate window" = "Space キーで入力候補を呼び出す";
 "Enable symbol input support (incl. certain emoji symbols)" = "僅かなる絵文字も含む符号入力サポートを起用";
 "English" = "英語";
