@@ -52,14 +52,18 @@ extension String {
     // Tab to ASCII Space
     // 統整連續空格為一個 ASCII 空格
     strProcessed.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: " ")
-    strProcessed.regReplace(pattern: #"(^ | $)"#, replaceWith: "")  // 去除行尾行首空格
-    strProcessed.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n")  // CR & FF to LF, 且去除重複行
+    // 去除行尾行首空格
+    strProcessed.regReplace(pattern: #"(^ | $)"#, replaceWith: "")
+    strProcessed.regReplace(pattern: #"(\n | \n)"#, replaceWith: "\n")
+    // CR & FF to LF, 且去除重複行
+    strProcessed.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n")
     if strProcessed.prefix(1) == " " {  // 去除檔案開頭空格
       strProcessed.removeFirst()
     }
     if strProcessed.suffix(1) == " " {  // 去除檔案結尾空格
       strProcessed.removeLast()
     }
+
     if cnvHYPYtoBPMF {
       // Step 2: Convert HanyuPinyin to Bopomofo.
       // 漢語拼音轉注音，得先從最長的可能的拼音組合開始轉起，
