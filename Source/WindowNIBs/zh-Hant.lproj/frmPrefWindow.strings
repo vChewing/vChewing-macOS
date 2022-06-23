@@ -41,6 +41,7 @@
 "BSK-bH-Gct.title" = "自動將繁體中文字轉換為康熙正體字";
 "cf2-se-PDO.title" = "辭典＆語言模型";
 "chkAllowBoostingSingleKanjiAsUserPhrase.title" = "將可以就地升權/排除的候選字詞的最短詞長設為單個漢字";
+"chkFetchSuggestionsFromUserOverrideModel.title" = "在敲字時自動套用來自半衰記憶模組的建議";
 "dIN-TZ-67g.title" = "Shift+Space 換下一頁，Space 換選下一個候選字";
 "E1l-m8-xgb.title" = "進階設定";
 "eia-1F-Do0.title" = "自動將繁體中文字轉換為日本簡化字（JIS 新字體）";
@@ -71,7 +72,7 @@
 "TXr-FF-ehw.title" = "繁體中文";
 "ueU-Rz-a1C.title" = "指定 (Shift+)Tab 熱鍵在選字窗內的輪替操作對象。";
 "Uyz-xL-TVN.title" = "輸出設定";
-"W24-T4-cg0.title" = "啟用 CNS11643 全字庫支援 (2022-04-27)";
+"W24-T4-cg0.title" = "啟用 CNS11643 全字庫支援 (2022-06-15)";
 "wFR-zX-M8H.title" = "拼音並擊模式（組字區內看到的是漢語拼音）";
 "wN3-k3-b2a.title" = "請在此指定您想指定的使用者語彙檔案目錄。無效值會被忽略。";
 "wQ9-px-b07.title" = "Apple 動態注音鍵盤佈局（大千與倚天）要求普通話/國音分析器的注音排列得配置為大千排列。";

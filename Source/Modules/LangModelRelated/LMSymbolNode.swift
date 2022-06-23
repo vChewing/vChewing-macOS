@@ -40,6 +40,34 @@ class SymbolNode {
     children = Array(symbols).map { SymbolNode(String($0), nil) }
   }
 
+  static func parseUserSymbolNodeData() {
+    let url = mgrLangModel.userSymbolNodeDataURL()
+    // 這兩個變數單獨拿出來，省得每次都重建還要浪費算力。
+    var arrLines = [String.SubSequence]()
+    var fieldSlice = [Substring.SubSequence]()
+    var arrChildren = [SymbolNode]()
+    do {
+      arrLines = try String(contentsOfFile: url.path, encoding: .utf8).split(separator: "\n")
+      for strLine in arrLines.lazy.filter({ !$0.isEmpty }) {
+        fieldSlice = strLine.split(separator: "=")
+        switch fieldSlice.count {
+          case 1: arrChildren.append(.init(String(fieldSlice[0])))
+          case 2: arrChildren.append(.init(String(fieldSlice[0]), symbols: .init(fieldSlice[1])))
+          default: break
+        }
+      }
+      if arrChildren.isEmpty {
+        root = defaultSymbolRoot
+      } else {
+        root = .init("/", arrChildren)
+      }
+    } catch {
+      root = defaultSymbolRoot
+    }
+  }
+
+  // MARK: - Static data.
+
   static let catCommonSymbols = String(
     format: NSLocalizedString("catCommonSymbols", comment: ""))
   static let catHoriBrackets = String(
@@ -71,7 +99,9 @@ class SymbolNode {
   static let catLineSegments = String(
     format: NSLocalizedString("catLineSegments", comment: ""))
 
-  static let root: SymbolNode = .init(
+  private(set) static var root: SymbolNode = .init("/")
+
+  private static let defaultSymbolRoot: SymbolNode = .init(
     "/",
     [
       SymbolNode("｀"),

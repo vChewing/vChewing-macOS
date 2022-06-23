@@ -137,7 +137,7 @@ class InputState {
   class NotEmpty: InputState {
     private(set) var composingBuffer: String
     private(set) var cursorIndex: Int = 0 { didSet { cursorIndex = max(cursorIndex, 0) } }
-    var composingBufferConverted: String {
+    public var composingBufferConverted: String {
       let converted = IME.kanjiConversionIfRequired(composingBuffer)
       if converted.utf16.count != composingBuffer.utf16.count
         || converted.count != composingBuffer.count
@@ -153,10 +153,10 @@ class InputState {
       defer { self.cursorIndex = cursorIndex }
     }
 
-    var attributedString: NSAttributedString {
+    var attributedString: NSMutableAttributedString {
       /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
       /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
-      let attributedString = NSAttributedString(
+      let attributedString = NSMutableAttributedString(
         string: composingBufferConverted,
         attributes: [
           .underlineStyle: NSUnderlineStyle.single.rawValue,
@@ -270,7 +270,7 @@ class InputState {
       defer { self.markerIndex = markerIndex }
     }
 
-    override var attributedString: NSAttributedString {
+    override var attributedString: NSMutableAttributedString {
       /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
       /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
       let attributedString = NSMutableAttributedString(string: composingBufferConverted)
@@ -392,8 +392,8 @@ class InputState {
     // 會出現符號選字窗無法響應方向鍵的問題。
     // 如有誰要修奇摩注音的一點通選單的話，修復原理也是一樣的。
     // Crediting Qwertyyb: https://github.com/qwertyyb/Fire/issues/55#issuecomment-1133497700
-    override var attributedString: NSAttributedString {
-      let attributedString = NSAttributedString(
+    override var attributedString: NSMutableAttributedString {
+      let attributedString = NSMutableAttributedString(
         string: " ",
         attributes: [
           .underlineStyle: NSUnderlineStyle.single.rawValue,

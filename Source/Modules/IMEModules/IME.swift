@@ -48,7 +48,7 @@ public enum IME {
       switch (mgrPrefs.chineseConversionEnabled, mgrPrefs.shiftJISShinjitaiOutputEnabled) {
         case (false, true): return vChewingKanjiConverter.cnvTradToJIS(text)
         case (true, false): return vChewingKanjiConverter.cnvTradToKangXi(text)
-        // 本來這兩個開關不該同時開啟的，但萬一被開啟了的話就這樣處理：
+        // 本來這兩個開關不該同時開啟的，但萬一被同時開啟了的話就這樣處理：
         case (true, true): return vChewingKanjiConverter.cnvTradToJIS(text)
         case (false, false): return text
       }
@@ -121,6 +121,10 @@ public enum IME {
   }
 
   // MARK: - Open a phrase data file.
+
+  static func openPhraseFile(fromURL url: URL) {
+    openPhraseFile(userFileAt: url.path)
+  }
 
   static func openPhraseFile(userFileAt path: String) {
     func checkIfUserFilesExist() -> Bool {
@@ -373,7 +377,7 @@ public enum IME {
 // Extend the RangeReplaceableCollection to allow it clean duplicated characters.
 // Ref: https://stackoverflow.com/questions/25738817/
 extension RangeReplaceableCollection where Element: Hashable {
-  var charDeDuplicate: Self {
+  var deduplicate: Self {
     var set = Set<Element>()
     return filter { set.insert($0).inserted }
   }
@@ -415,5 +419,27 @@ extension UniChar {
       return false
     }
     return true
+  }
+}
+
+// MARK: - Stable Sort Extension
+
+// Ref: https://stackoverflow.com/a/50545761/4162914
+extension Sequence {
+  /// Return a stable-sorted collection.
+  ///
+  /// - Parameter areInIncreasingOrder: Return nil when two element are equal.
+  /// - Returns: The sorted collection.
+  public func stableSort(
+    by areInIncreasingOrder: (Element, Element) throws -> Bool
+  )
+    rethrows -> [Element]
+  {
+    try enumerated()
+      .sorted { a, b -> Bool in
+        try areInIncreasingOrder(a.element, b.element)
+          || (a.offset < b.offset && !areInIncreasingOrder(b.element, a.element))
+      }
+      .map(\.element)
   }
 }

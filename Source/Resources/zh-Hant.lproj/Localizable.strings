@@ -62,6 +62,7 @@
 "Loading CHS Core Dict..." = "載入簡體中文核心辭典…";
 "Loading CHT Core Dict..." = "載入繁體中文核心辭典…";
 "Core Dict loading complete." = "核心辭典載入完畢";
+"Optimize Memorized Phrases" = "精簡臨時記憶語彙資料";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";
@@ -88,6 +89,7 @@
 "Apple Chewing - Dachen" = "Apple 大千注音鍵盤佈局";
 "Apple Chewing - Eten Traditional" = "Apple 倚天傳統鍵盤佈局";
 "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional." = "Apple 動態注音鍵盤佈局（大千與倚天）要求普通話/國音分析器得配置為大千排列。";
+"Applying typing suggestions from half-life user override model" = "在敲字時自動套用來自半衰記憶模組的建議";
 "at the rear of the phrase (like Microsoft New Phonetic)" = "將游標置於詞語後方 // Windows 微軟新注音風格";
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "自動將繁體中文字轉為日文 JIS 新字體";
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "自動將繁體中文字轉為康熙正體字";
@@ -113,7 +115,7 @@
 "Debug Mode" = "偵錯模式";
 "Dictionary" = "辭典";
 "Emulating select-candidate-per-character mode" = "模擬 90 年代前期注音逐字選字輸入風格";
-"Enable CNS11643 Support (2022-04-27)" = "啟用 CNS11643 全字庫支援 (2022-04-27)";
+"Enable CNS11643 Support (2022-06-15)" = "啟用 CNS11643 全字庫支援 (2022-06-15)";
 "Enable Space key for calling candidate window" = "敲空格鍵以呼出候選字窗";
 "Enable symbol input support (incl. certain emoji symbols)" = "啟用包括少許繪文字在內的符號輸入支援";
 "English" = "英語";

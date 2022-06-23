@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -681,9 +680,9 @@
                                                         </connections>
                                                     </textField>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p7V-IN-OTr">
-                                                        <rect key="frame" x="19" y="296.5" width="406" height="17"/>
+                                                        <rect key="frame" x="19" y="297.5" width="406" height="17"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="height" constant="16" id="Ieq-hl-01l"/>
+                                                            <constraint firstAttribute="height" constant="16" id="reU-bw-htf"/>
                                                         </constraints>
                                                         <buttonCell key="cell" type="check" title="Automatically reload user data files if changes detected" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="f8i-69-zxm">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -694,9 +693,9 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="O4B-Z2-XYi">
-                                                        <rect key="frame" x="19" y="274.5" width="406" height="17"/>
+                                                        <rect key="frame" x="19" y="275.5" width="406" height="17"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="height" constant="16" id="2gi-B5-vjz"/>
+                                                            <constraint firstAttribute="height" constant="16" id="UxA-rj-D5M"/>
                                                         </constraints>
                                                         <buttonCell key="cell" type="check" title="Enable symbol input support (incl. certain emoji symbols)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="hSv-LJ-Cq3" userLabel="chkSymbolEnabled">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -736,11 +735,11 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Yaj-QY-7xV" userLabel="chkCNSSupport">
-                                                        <rect key="frame" x="19" y="252.5" width="406" height="17"/>
+                                                        <rect key="frame" x="19" y="253.5" width="406" height="17"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="height" constant="16" id="vin-Cj-dDq"/>
+                                                            <constraint firstAttribute="height" constant="16" id="guU-8E-HAX"/>
                                                         </constraints>
-                                                        <buttonCell key="cell" type="check" title="Enable CNS11643 Support (2022-04-27)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="W24-T4-cg0">
+                                                        <buttonCell key="cell" type="check" title="Enable CNS11643 Support (2022-06-15)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="W24-T4-cg0">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="cellTitle"/>
                                                         </buttonCell>
@@ -750,9 +749,9 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Hyc-Nw-dET">
-                                                        <rect key="frame" x="19" y="230.5" width="406" height="17"/>
+                                                        <rect key="frame" x="19" y="231.5" width="406" height="17"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="height" constant="16" id="drz-HW-cX1"/>
+                                                            <constraint firstAttribute="height" constant="16" id="B9v-pe-shJ"/>
                                                         </constraints>
                                                         <buttonCell key="cell" type="check" title="Allow boosting / excluding a candidate of single kanji" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="chkAllowBoostingSingleKanjiAsUserPhrase" userLabel="chkAllowBoostingSingleKanjiAsUserPhrase">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -762,29 +761,45 @@
                                                             <binding destination="32" name="value" keyPath="values.AllowBoostingSingleKanjiAsUserPhrase" id="jiw-1V-C7x"/>
                                                         </connections>
                                                     </button>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="D46-A7D-E0E">
+                                                        <rect key="frame" x="19" y="211.5" width="406" height="17"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="16" id="zkb-Rd-IZG"/>
+                                                        </constraints>
+                                                        <buttonCell key="cell" type="check" title="Applying typing suggestions from half-life user override model" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="chkFetchSuggestionsFromUserOverrideModel" userLabel="chkFetchSuggestionsFromUserOverrideModel">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <binding destination="32" name="value" keyPath="values.FetchSuggestionsFromUserOverrideModel" id="F53-CE5-A2E"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                                 <constraints>
                                                     <constraint firstItem="s7t-Kk-EPu" firstAttribute="bottom" secondItem="MPN-np-SbT" secondAttribute="bottom" id="0Fo-ya-hQ9"/>
-                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="leading" secondItem="O4B-Z2-XYi" secondAttribute="leading" id="6GG-yw-MYi"/>
-                                                    <constraint firstItem="O4B-Z2-XYi" firstAttribute="top" secondItem="p7V-IN-OTr" secondAttribute="bottom" constant="6" symbolic="YES" id="6H0-cT-DDa"/>
+                                                    <constraint firstItem="O4B-Z2-XYi" firstAttribute="leading" secondItem="Yaj-QY-7xV" secondAttribute="leading" id="0Rn-L2-gTb"/>
+                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="trailing" secondItem="Hyc-Nw-dET" secondAttribute="trailing" id="4S6-WJ-PoV"/>
+                                                    <constraint firstItem="D46-A7D-E0E" firstAttribute="top" secondItem="Hyc-Nw-dET" secondAttribute="bottom" constant="4" id="4TT-pB-2Xi"/>
                                                     <constraint firstAttribute="trailing" secondItem="FUV-qx-xkC" secondAttribute="trailing" constant="20" symbolic="YES" id="6QR-tj-5cH"/>
-                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="trailing" secondItem="Hyc-Nw-dET" secondAttribute="trailing" id="6ty-e2-2yl"/>
-                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="leading" secondItem="s7t-Kk-EPu" secondAttribute="leading" id="7KG-BW-e6E"/>
                                                     <constraint firstItem="s7t-Kk-EPu" firstAttribute="leading" secondItem="MPN-np-SbT" secondAttribute="trailing" constant="-376" id="9at-E8-Bt1"/>
+                                                    <constraint firstItem="O4B-Z2-XYi" firstAttribute="trailing" secondItem="Yaj-QY-7xV" secondAttribute="trailing" id="BP1-pw-lUK"/>
                                                     <constraint firstItem="FUV-qx-xkC" firstAttribute="top" secondItem="cy4-aV-hhk" secondAttribute="top" constant="15" id="BZE-dD-V2R"/>
                                                     <constraint firstItem="MPN-np-SbT" firstAttribute="top" secondItem="FUV-qx-xkC" secondAttribute="bottom" constant="14" id="Bp9-2u-f9E"/>
-                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="leading" secondItem="Hyc-Nw-dET" secondAttribute="leading" id="DJV-E7-Wgv"/>
-                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="top" secondItem="O4B-Z2-XYi" secondAttribute="bottom" constant="6" symbolic="YES" id="F6l-lB-OT5"/>
                                                     <constraint firstItem="FUV-qx-xkC" firstAttribute="leading" secondItem="cy4-aV-hhk" secondAttribute="leading" constant="20" symbolic="YES" id="Hy2-ZC-cvb"/>
-                                                    <constraint firstItem="Hyc-Nw-dET" firstAttribute="top" secondItem="Yaj-QY-7xV" secondAttribute="bottom" constant="6" symbolic="YES" id="OCz-SW-av6"/>
+                                                    <constraint firstItem="Hyc-Nw-dET" firstAttribute="top" secondItem="Yaj-QY-7xV" secondAttribute="bottom" constant="6" symbolic="YES" id="KH4-XR-ok1"/>
+                                                    <constraint firstItem="Hyc-Nw-dET" firstAttribute="leading" secondItem="D46-A7D-E0E" secondAttribute="leading" id="LER-hN-AwW"/>
                                                     <constraint firstItem="s7t-Kk-EPu" firstAttribute="firstBaseline" secondItem="MPN-np-SbT" secondAttribute="baseline" id="OYH-gA-WcA"/>
-                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="trailing" secondItem="jXe-xz-9Sd" secondAttribute="trailing" id="QQv-cA-dO9"/>
+                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="leading" secondItem="O4B-Z2-XYi" secondAttribute="leading" id="W70-cE-S0L"/>
                                                     <constraint firstItem="FUV-qx-xkC" firstAttribute="leading" secondItem="MPN-np-SbT" secondAttribute="leading" constant="-346" id="Zet-wH-kmC"/>
-                                                    <constraint firstItem="O4B-Z2-XYi" firstAttribute="leading" secondItem="Yaj-QY-7xV" secondAttribute="leading" id="aI8-ll-ybr"/>
+                                                    <constraint firstItem="Hyc-Nw-dET" firstAttribute="trailing" secondItem="D46-A7D-E0E" secondAttribute="trailing" id="byp-fz-9tg"/>
+                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="trailing" secondItem="O4B-Z2-XYi" secondAttribute="trailing" id="cWy-Ks-WmK"/>
                                                     <constraint firstItem="jXe-xz-9Sd" firstAttribute="leading" secondItem="MPN-np-SbT" secondAttribute="trailing" constant="-1" id="cYQ-Rx-tuG"/>
-                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="top" secondItem="s7t-Kk-EPu" secondAttribute="bottom" constant="14.5" id="hJ9-p8-clP"/>
-                                                    <constraint firstItem="O4B-Z2-XYi" firstAttribute="trailing" secondItem="Yaj-QY-7xV" secondAttribute="trailing" id="pZC-Vr-DTa"/>
-                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="trailing" secondItem="O4B-Z2-XYi" secondAttribute="trailing" id="s0C-8F-wWy"/>
+                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="leading" secondItem="Hyc-Nw-dET" secondAttribute="leading" id="ehf-lN-Jqs"/>
+                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="top" secondItem="s7t-Kk-EPu" secondAttribute="bottom" constant="13.5" id="ggR-mS-i0Q"/>
+                                                    <constraint firstItem="Yaj-QY-7xV" firstAttribute="top" secondItem="O4B-Z2-XYi" secondAttribute="bottom" constant="6" symbolic="YES" id="ixY-hj-v4X"/>
+                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="trailing" secondItem="jXe-xz-9Sd" secondAttribute="trailing" id="oB7-NT-vJZ"/>
+                                                    <constraint firstItem="O4B-Z2-XYi" firstAttribute="top" secondItem="p7V-IN-OTr" secondAttribute="bottom" constant="6" symbolic="YES" id="oZz-am-afB"/>
+                                                    <constraint firstItem="p7V-IN-OTr" firstAttribute="leading" secondItem="s7t-Kk-EPu" secondAttribute="leading" id="rUo-Bv-0Ey"/>
                                                     <constraint firstItem="s7t-Kk-EPu" firstAttribute="trailing" secondItem="FUV-qx-xkC" secondAttribute="trailing" constant="-60" id="vIO-x1-7Q2"/>
                                                     <constraint firstItem="jXe-xz-9Sd" firstAttribute="baseline" secondItem="MPN-np-SbT" secondAttribute="baseline" id="wys-ML-2Q2"/>
                                                 </constraints>

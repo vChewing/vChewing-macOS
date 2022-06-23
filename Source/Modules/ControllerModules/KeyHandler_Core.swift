@@ -156,8 +156,8 @@ class KeyHandler {
   /// 不會是 nil，但那些負責接收結果的函式會對空白陣列結果做出正確的處理。
   func buildAssociatePhraseArray(withKey key: String) -> [String] {
     var arrResult: [String] = []
-    if currentLM.hasAssociatedPhrasesForKey(key) {
-      arrResult.append(contentsOf: currentLM.associatedPhrasesForKey(key))
+    if currentLM.hasAssociatedPhrasesFor(key: key) {
+      arrResult.append(contentsOf: currentLM.associatedPhrasesFor(key: key))
     }
     return arrResult
   }
@@ -170,37 +170,39 @@ class KeyHandler {
   func fixNode(value: String, respectCursorPushing: Bool = true) {
     let cursorIndex = min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength)
     compositor.grid.fixNodeSelectedCandidate(location: cursorIndex, value: value)
-    //  // 因半衰模組失能，故禁用之。
-    // let selectedNode: Megrez.NodeAnchor = compositor.grid.fixNodeSelectedCandidate(
-    //  location: cursorIndex, value: value
-    // )
-    //  // 不要針對逐字選字模式啟用臨時半衰記憶模型。
-    // if !mgrPrefs.useSCPCTypingMode {
-    //  // 所有讀音數與字符數不匹配的情況均不得塞入半衰記憶模組。
-    //  var addToUserOverrideModel = true
-    //  if selectedNode.spanningLength != value.count {
-    //    IME.prtDebugIntel("UOM: SpanningLength != value.count, dismissing.")
-    //    addToUserOverrideModel = false
-    //  }
-    //  if addToUserOverrideModel {
-    //    if let theNode = selectedNode.node {
-    //      // 威注音的 SymbolLM 的 Score 是 -12，符合該條件的內容不得塞入半衰記憶模組。
-    //      if theNode.scoreFor(candidate: value) <= -12 {
-    //        IME.prtDebugIntel("UOM: Score <= -12, dismissing.")
-    //        addToUserOverrideModel = false
-    //      }
-    //    }
-    //  }
-    //  if addToUserOverrideModel {
-    //    IME.prtDebugIntel("UOM: Start Observation.")
-    //    // 令半衰記憶模組觀測給定的 trigram。
-    //    // 這個過程會讓半衰引擎根據當前上下文生成 trigram 索引鍵。
-    //    currentUOM.observe(
-    //      walkedNodes: walkedAnchors, cursorIndex: cursorIndex, candidate: value,
-    //      timestamp: NSDate().timeIntervalSince1970
-    //    )
-    //  }
-    // }
+    // 開始讓半衰模組觀察目前的狀況。
+    let selectedNode: Megrez.NodeAnchor = compositor.grid.fixNodeSelectedCandidate(
+      location: cursorIndex, value: value
+    )
+    // 不要針對逐字選字模式啟用臨時半衰記憶模型。
+    if !mgrPrefs.useSCPCTypingMode {
+      // 所有讀音數與字符數不匹配的情況均不得塞入半衰記憶模組。
+      var addToUserOverrideModel = true
+      if selectedNode.spanningLength != value.count {
+        IME.prtDebugIntel("UOM: SpanningLength != value.count, dismissing.")
+        addToUserOverrideModel = false
+      }
+      if addToUserOverrideModel {
+        if let theNode = selectedNode.node {
+          // 威注音的 SymbolLM 的 Score 是 -12，符合該條件的內容不得塞入半衰記憶模組。
+          if theNode.scoreFor(candidate: value) <= -12 {
+            IME.prtDebugIntel("UOM: Score <= -12, dismissing.")
+            addToUserOverrideModel = false
+          }
+        }
+      }
+      if addToUserOverrideModel {
+        IME.prtDebugIntel("UOM: Start Observation.")
+        // 令半衰記憶模組觀測給定的 trigram。
+        // 這個過程會讓半衰引擎根據當前上下文生成 trigram 索引鍵。
+        currentUOM.observe(
+          walkedAnchors: walkedAnchors, cursorIndex: cursorIndex, candidate: value,
+          timestamp: NSDate().timeIntervalSince1970
+        )
+      }
+    }
+
+    // 開始爬軌。
     walk()
 
     /// 若偏好設定內啟用了相關選項，則會在選字之後始終將游標推送至選字厚的節錨的前方。
@@ -237,40 +239,54 @@ class KeyHandler {
 
   /// 獲取候選字詞陣列資料內容。
   var candidatesArray: [String] {
+    var arrNodes: [Megrez.NodeAnchor] = rawNodes
     var arrCandidates: [String] = []
-    var arrNodes: [Megrez.NodeAnchor] = []
-    arrNodes.append(contentsOf: rawNodes)
 
     /// 原理：nodes 這個回饋結果包含一堆子陣列，分別對應不同詞長的候選字。
     /// 這裡先對陣列排序、讓最長候選字的子陣列的優先權最高。
     /// 這個過程不會傷到子陣列內部的排序。
-    if !arrNodes.isEmpty {
-      // sort the nodes, so that longer nodes (representing longer phrases)
-      // are placed at the top of the candidate list
-      arrNodes.sort { $0.keyLength > $1.keyLength }
+    if arrNodes.isEmpty { return arrCandidates }
 
-      // then use the Swift trick to retrieve the candidates for each node at/crossing the cursor
-      for currentNodeAnchor in arrNodes {
-        if let currentNode = currentNodeAnchor.node {
-          for currentCandidate in currentNode.candidates {
-            arrCandidates.append(currentCandidate.value)
-          }
+    // sort the nodes, so that longer nodes (representing longer phrases)
+    // are placed at the top of the candidate list
+    arrNodes = arrNodes.stableSort { $0.keyLength > $1.keyLength }
+
+    // then use the Swift trick to retrieve the candidates for each node at/crossing the cursor
+    for currentNodeAnchor in arrNodes {
+      if let currentNode = currentNodeAnchor.node {
+        for currentCandidate in currentNode.candidates {
+          // 選字窗的內容的康熙轉換 / JIS 轉換不能放在這裡處理，會影響選字有效性。
+          // 選字的原理是拿著具體的候選字詞的字串去當前的節錨下找出對應的候選字詞（Ｘ元圖）。
+          // 一旦在這裡轉換了，節錨內的某些元圖就無法被選中。
+          arrCandidates.append(currentCandidate.value)
         }
       }
+    }
+    if mgrPrefs.fetchSuggestionsFromUserOverrideModel, !mgrPrefs.useSCPCTypingMode {
+      let arrSuggestedUnigrams: [Megrez.Unigram] = fetchSuggestedCandidates().stableSort { $0.score > $1.score }
+      let arrSuggestedCandidates: [String] = arrSuggestedUnigrams.map { $0.keyValue.value }
+      arrCandidates = arrSuggestedCandidates.filter { arrCandidates.contains($0) } + arrCandidates
+      arrCandidates = arrCandidates.deduplicate
+      arrCandidates = arrCandidates.stableSort { $0.count > $1.count }
     }
     return arrCandidates
   }
 
-  /// 向半衰引擎詢問可能的選字建議。
-  func dealWithOverrideModelSuggestions() {
+  /// 向半衰引擎詢問可能的選字建議。拿到的結果會是一個單元圖陣列。
+  func fetchSuggestedCandidates() -> [Megrez.Unigram] {
+    currentUOM.suggest(
+      walkedAnchors: walkedAnchors, cursorIndex: compositorCursorIndex,
+      timestamp: NSDate().timeIntervalSince1970)
+  }
+
+  /// 向半衰引擎詢問可能的選字建議、且套用給組字器內的當前游標位置。
+  func fetchAndApplySuggestionsFromUserOverrideModel() {
+    /// 如果逐字選字模式有啟用的話，直接放棄執行這個函式。
+    if mgrPrefs.useSCPCTypingMode { return }
+    /// 如果這個開關沒打開的話，直接放棄執行這個函式。
+    if !mgrPrefs.fetchSuggestionsFromUserOverrideModel { return }
     /// 先就當前上下文讓半衰引擎重新生成 trigram 索引鍵。
-    let overrideValue =
-      mgrPrefs.useSCPCTypingMode
-      ? ""
-      : currentUOM.suggest(
-        walkedNodes: walkedAnchors, cursorIndex: compositorCursorIndex,
-        timestamp: NSDate().timeIntervalSince1970
-      )
+    let overrideValue = fetchSuggestedCandidates().first?.keyValue.value ?? ""
 
     /// 再拿著索引鍵去問半衰模組有沒有選字建議。有的話就遵循之、讓天權星引擎對指定節錨下的節點複寫權重。
     if !overrideValue.isEmpty {

@@ -32,15 +32,16 @@ extension Megrez {
     /// 該幅位內可以允許的最大詞長。
     private var mutMaxBuildSpanLength = 10
 
-    /// 公開：該幅位內可以允許的最大詞長。
+    /// 公開：該軌格內可以允許的最大幅位長度。
     public var maxBuildSpanLength: Int { mutMaxBuildSpanLength }
 
-    /// 軌格的寬度，也就是其內的幅位陣列當中的幅位數量。
-    var width: Int { mutSpans.count }
+    /// 公開：軌格的寬度，也就是其內的幅位陣列當中的幅位數量。
+    public var width: Int { mutSpans.count }
 
-    /// 軌格是否為空。
-    var isEmpty: Bool { mutSpans.isEmpty }
+    /// 公開：軌格是否為空。
+    public var isEmpty: Bool { mutSpans.isEmpty }
 
+    /// 初期化轨格。
     public init(spanLength: Int = 10) {
       mutMaxBuildSpanLength = spanLength
       mutSpans = [Megrez.Span]()
@@ -90,11 +91,10 @@ extension Megrez {
     public func expandGridByOneAt(location: Int) {
       let location = abs(location)  // 防呆
       mutSpans.insert(Span(), at: location)
-      if location != 0, location != mutSpans.count {
-        for i in 0..<location {
-          // zaps overlapping spans
-          mutSpans[i].removeNodeOfLengthGreaterThan(location - i)
-        }
+      if location == 0 || location == mutSpans.count { return }
+      for i in 0..<location {
+        // zaps overlapping spans
+        mutSpans[i].removeNodeOfLengthGreaterThan(location - i)
       }
     }
 
@@ -120,18 +120,18 @@ extension Megrez {
     public func nodesBeginningAt(location: Int) -> [NodeAnchor] {
       let location = abs(location)  // 防呆
       var results = [NodeAnchor]()
-      if location < mutSpans.count {  // 此時 mutSpans 必然不為空
-        let span = mutSpans[location]
-        for i in 1...maxBuildSpanLength {
-          if let np = span.node(length: i) {
-            results.append(
-              NodeAnchor(
-                node: np,
-                location: location,
-                spanningLength: i
-              )
+      if location >= mutSpans.count { return results }
+      // 此時 mutSpans 必然不為空，因為 location 不可能小於 0。
+      let span = mutSpans[location]
+      for i in 1...maxBuildSpanLength {
+        if let np = span.node(length: i) {
+          results.append(
+            .init(
+              node: np,
+              location: location,
+              spanningLength: i
             )
-          }
+          )
         }
       }
       return results
@@ -143,20 +143,18 @@ extension Megrez {
     public func nodesEndingAt(location: Int) -> [NodeAnchor] {
       let location = abs(location)  // 防呆
       var results = [NodeAnchor]()
-      if !mutSpans.isEmpty, location <= mutSpans.count {
-        for i in 0..<location {
-          let span = mutSpans[i]
-          if i + span.maximumLength >= location {
-            if let np = span.node(length: location - i) {
-              results.append(
-                NodeAnchor(
-                  node: np,
-                  location: i,
-                  spanningLength: location - i
-                )
-              )
-            }
-          }
+      if mutSpans.isEmpty || location > mutSpans.count { return results }
+      for i in 0..<location {
+        let span = mutSpans[i]
+        if i + span.maximumLength < location { continue }
+        if let np = span.node(length: location - i) {
+          results.append(
+            .init(
+              node: np,
+              location: i,
+              spanningLength: location - i
+            )
+          )
         }
       }
       return results
@@ -168,24 +166,20 @@ extension Megrez {
     public func nodesCrossingOrEndingAt(location: Int) -> [NodeAnchor] {
       let location = abs(location)  // 防呆
       var results = [NodeAnchor]()
-      if !mutSpans.isEmpty, location <= mutSpans.count {
-        for i in 0..<location {
-          let span = mutSpans[i]
-          if i + span.maximumLength >= location {
-            for j in 1...span.maximumLength {
-              if i + j < location {
-                continue
-              }
-              if let np = span.node(length: j) {
-                results.append(
-                  NodeAnchor(
-                    node: np,
-                    location: i,
-                    spanningLength: location - i
-                  )
-                )
-              }
-            }
+      if mutSpans.isEmpty || location > mutSpans.count { return results }
+      for i in 0..<location {
+        let span = mutSpans[i]
+        if i + span.maximumLength < location { continue }
+        for j in 1...span.maximumLength {
+          if i + j < location { continue }
+          if let np = span.node(length: j) {
+            results.append(
+              .init(
+                node: np,
+                location: i,
+                spanningLength: location - i
+              )
+            )
           }
         }
       }
@@ -193,6 +187,8 @@ extension Megrez {
     }
 
     /// 將給定位置的節點的候選字詞改為與給定的字串一致的候選字詞。
+    ///
+    /// 該函式可以僅用作過程函式。
     /// - Parameters:
     ///   - location: 位置。
     ///   - value: 給定字串。
@@ -245,6 +241,7 @@ extension Megrez {
 // MARK: - DumpDOT-related functions.
 
 extension Megrez.Grid {
+  /// 生成用以交給 GraphViz 診斷的資料檔案內容，純文字。
   public var dumpDOT: String {
     var strOutput = "digraph {\ngraph [ rankdir=LR ];\nBOS;\n"
     for (p, span) in mutSpans.enumerated() {

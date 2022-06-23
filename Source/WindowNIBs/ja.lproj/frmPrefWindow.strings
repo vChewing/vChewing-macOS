@@ -41,6 +41,7 @@
 "BSK-bH-Gct.title" = "入力した繁体字を康熙字体と自動変換";
 "cf2-se-PDO.title" = "辞書と言語モデル";
 "chkAllowBoostingSingleKanjiAsUserPhrase.title" = "即排除/即最優先にできる候補の文字数の最低限は１字とする";
+"chkFetchSuggestionsFromUserOverrideModel.title" = "入力中で臨時記憶モジュールからお薦めの候補を自動的に選ぶ";
 "dIN-TZ-67g.title" = "Shift+Space で次のページ、Space で次の候補文字を";
 "E1l-m8-xgb.title" = "詳細設定";
 "eia-1F-Do0.title" = "入力した繁体字を日文 JIS 新字体と自動変換";
@@ -71,7 +72,7 @@
 "TXr-FF-ehw.title" = "繁体中国語";
 "ueU-Rz-a1C.title" = "入力候補陳列での (Shift+)Tab キーの輪番切替対象をご指定ください。";
 "Uyz-xL-TVN.title" = "出力設定";
-"W24-T4-cg0.title" = "全字庫モード // 入力可能の漢字数倍増 (2022-04-27)";
+"W24-T4-cg0.title" = "全字庫モード // 入力可能の漢字数倍増 (2022-06-15)";
 "wFR-zX-M8H.title" = "弁音合併入力（入力緩衝列で代わりに漢語弁音の音読み）";
 "wN3-k3-b2a.title" = "欲しがるユーザー辞書保存先をご指定ください。無効の保存先設定は効かぬ。";
 "wQ9-px-b07.title" = "Apple 動態注音キーボード (大千と倚天伝統) を使うには、共通語分析器の注音配列を大千と設定すべきである。";

@@ -41,6 +41,7 @@
 "BSK-bH-Gct.title" = "Auto-convert traditional Chinese glyphs to KangXi characters";
 "cf2-se-PDO.title" = "Dictionary and Language Models";
 "chkAllowBoostingSingleKanjiAsUserPhrase.title" = "Allow boosting / excluding a candidate of single kanji";
+"chkFetchSuggestionsFromUserOverrideModel.title" = "Applying typing suggestions from half-life user override model";
 "dIN-TZ-67g.title" = "Space to +cycle candidates, Shift+Space to +cycle pages";
 "E1l-m8-xgb.title" = "Advanced Settings";
 "eia-1F-Do0.title" = "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters";
@@ -71,7 +72,7 @@
 "TXr-FF-ehw.title" = "Traditional Chinese";
 "ueU-Rz-a1C.title" = "Choose the behavior of (Shift+)Tab key in the candidate window.";
 "Uyz-xL-TVN.title" = "Output Settings";
-"W24-T4-cg0.title" = "Enable CNS11643 Support (2022-04-27)";
+"W24-T4-cg0.title" = "Enable CNS11643 Support (2022-06-15)";
 "wFR-zX-M8H.title" = "Show Hanyu-Pinyin in the inline composition buffer";
 "wN3-k3-b2a.title" = "Choose your desired user data folder path. Will be omitted if invalid.";
 "wQ9-px-b07.title" = "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional.";

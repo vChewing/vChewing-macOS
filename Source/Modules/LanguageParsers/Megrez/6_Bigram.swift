@@ -27,9 +27,9 @@ extension Megrez {
   /// 雙元圖。
   @frozen public struct Bigram: Equatable, CustomStringConvertible {
     /// 當前鍵值。
-    public var keyValue: KeyValuePair
+    public var keyValue: KeyValuePaired
     /// 前述鍵值。
-    public var precedingKeyValue: KeyValuePair
+    public var precedingKeyValue: KeyValuePaired
     /// 權重。
     public var score: Double
     /// 將當前雙元圖列印成一個字串。
@@ -42,7 +42,7 @@ extension Megrez {
     ///   - precedingKeyValue: 前述鍵值。
     ///   - keyValue: 當前鍵值。
     ///   - score: 權重（雙精度小數）。
-    public init(precedingKeyValue: KeyValuePair, keyValue: KeyValuePair, score: Double) {
+    public init(precedingKeyValue: KeyValuePaired, keyValue: KeyValuePaired, score: Double) {
       self.keyValue = keyValue
       self.precedingKeyValue = precedingKeyValue
       self.score = score

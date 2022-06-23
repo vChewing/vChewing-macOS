@@ -56,6 +56,7 @@ struct UserDef {
   static let kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
   static let kShowHanyuPinyinInCompositionBuffer = "ShowHanyuPinyinInCompositionBuffer"
   static let kInlineDumpPinyinInLieuOfZhuyin = "InlineDumpPinyinInLieuOfZhuyin"
+  static let kFetchSuggestionsFromUserOverrideModel = "FetchSuggestionsFromUserOverrideModel"
 
   static let kCandidateTextFontName = "CandidateTextFontName"
   static let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
@@ -270,6 +271,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.allowBoostingSingleKanjiAsUserPhrase, forKey: UserDef.kAllowBoostingSingleKanjiAsUserPhrase
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.fetchSuggestionsFromUserOverrideModel, forKey: UserDef.kFetchSuggestionsFromUserOverrideModel
+    )
 
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeySCPC, forKey: UserDef.kUsingHotKeySCPC)
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyAssociates, forKey: UserDef.kUsingHotKeyAssociates)
@@ -343,6 +347,9 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kAllowBoostingSingleKanjiAsUserPhrase, defaultValue: false)
   static var allowBoostingSingleKanjiAsUserPhrase: Bool
+
+  @UserDefault(key: UserDef.kFetchSuggestionsFromUserOverrideModel, defaultValue: true)
+  static var fetchSuggestionsFromUserOverrideModel: Bool
 
   static var minCandidateLength: Int {
     mgrPrefs.allowBoostingSingleKanjiAsUserPhrase ? 1 : 2

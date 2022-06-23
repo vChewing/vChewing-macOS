@@ -31,7 +31,7 @@ extension vChewing {
   /// 資料記錄原理與上游 C++ 的 ParselessLM 差不多，但用的是 Swift 原生手段。
   /// 主要時間消耗仍在 For 迴圈，但這個算法可以顯著減少記憶體佔用。
   @frozen public struct LMCoreEX {
-    /// 資料庫陣列。索引內容為注音字串，資料內容則為字串首尾範圍、方便自 strData 取資料。
+    /// 資料庫辭典。索引內容為注音字串，資料內容則為字串首尾範圍、方便自 strData 取資料。
     var rangeMap: [String: [Range<String.Index>]] = [:]
     /// 資料庫字串陣列。
     var strData: String = ""
@@ -66,12 +66,12 @@ extension vChewing {
       shouldForceDefaultScore = forceDefaultScore
     }
 
-    /// 檢測資料庫陣列內是否已經有載入的資料。
+    /// 檢測資料庫辭典內是否已經有載入的資料。
     public func isLoaded() -> Bool {
       !rangeMap.isEmpty
     }
 
-    /// 將資料從檔案讀入至資料庫陣列內。
+    /// 將資料從檔案讀入至資料庫辭典內。
     /// - parameters:
     ///   - path: 給定路徑
     @discardableResult public mutating func open(_ path: String) -> Bool {
@@ -88,9 +88,9 @@ extension vChewing {
         strData = try String(contentsOfFile: path, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
         strData.ranges(splitBy: "\n").forEach {
           let neta = strData[$0].split(separator: " ")
-          if neta.count >= 2 {
-            let theKey = shouldReverse ? String(neta[1]) : String(neta[0])
-            if !neta[0].isEmpty, !neta[1].isEmpty, theKey.first != "#" {
+          if neta.count >= 2, String(neta[0]).first != "#" {
+            if !neta[0].isEmpty, !neta[1].isEmpty {
+              let theKey = shouldReverse ? String(neta[1]) : String(neta[0])
               let theValue = $0
               rangeMap[theKey, default: []].append(theValue)
             }
@@ -105,7 +105,7 @@ extension vChewing {
       return true
     }
 
-    /// 將當前語言模組的資料庫陣列自記憶體內卸除。
+    /// 將當前語言模組的資料庫辭典自記憶體內卸除。
     public mutating func close() {
       if isLoaded() {
         rangeMap.removeAll()
@@ -114,7 +114,7 @@ extension vChewing {
 
     // MARK: - Advanced features
 
-    /// 將當前資料庫陣列的內容以文本的形式輸出至 macOS 內建的 Console.app。
+    /// 將當前資料庫辭典的內容以文本的形式輸出至 macOS 內建的 Console.app。
     ///
     /// 該功能僅作偵錯之用途。
     public func dump() {
@@ -130,7 +130,7 @@ extension vChewing {
       IME.prtDebugIntel(strDump)
     }
 
-    /// 【該功能無法使用】根據給定的前述讀音索引鍵與當前讀音索引鍵，來獲取資料庫陣列內的對應資料陣列的字串首尾範圍資料、據此自 strData 取得字串形式的資料、生成雙元圖陣列。
+    /// 【該功能無法使用】根據給定的前述讀音索引鍵與當前讀音索引鍵，來獲取資料庫辭典內的對應資料陣列的字串首尾範圍資料、據此自 strData 取得字串形式的資料、生成雙元圖陣列。
     ///
     /// 威注音輸入法尚未引入雙元圖支援，所以該函式並未擴充相關功能，自然不會起作用。
     /// - parameters:
@@ -142,7 +142,7 @@ extension vChewing {
       precedingKey == key ? [Megrez.Bigram]() : [Megrez.Bigram]()
     }
 
-    /// 根據給定的讀音索引鍵，來獲取資料庫陣列內的對應資料陣列的字串首尾範圍資料、據此自 strData 取得字串形式的資料、生成單元圖陣列。
+    /// 根據給定的讀音索引鍵，來獲取資料庫辭典內的對應資料陣列的字串首尾範圍資料、據此自 strData 取得字串形式的資料、生成單元圖陣列。
     /// - parameters:
     ///   - key: 讀音索引鍵
     public func unigramsFor(key: String) -> [Megrez.Unigram] {
@@ -151,7 +151,7 @@ extension vChewing {
         for netaRange in arrRangeRecords {
           let neta = strData[netaRange].split(separator: " ")
           let theValue: String = shouldReverse ? String(neta[0]) : String(neta[1])
-          let kvPair = Megrez.KeyValuePair(key: key, value: theValue)
+          let kvPair = Megrez.KeyValuePaired(key: key, value: theValue)
           var theScore = defaultScore
           if neta.count >= 3, !shouldForceDefaultScore {
             theScore = .init(String(neta[2])) ?? defaultScore
@@ -165,7 +165,7 @@ extension vChewing {
       return grams
     }
 
-    /// 根據給定的讀音索引鍵來確認資料庫陣列內是否存在對應的資料。
+    /// 根據給定的讀音索引鍵來確認資料庫辭典內是否存在對應的資料。
     /// - parameters:
     ///   - key: 讀音索引鍵
     public func hasUnigramsFor(key: String) -> Bool {

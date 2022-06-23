@@ -29,7 +29,7 @@ extension vChewing {
   /// 這樣一來可以節省在舊 mac 機種內的資料讀入速度。
   /// 目前僅針對輸入法原廠語彙資料檔案使用 plist 格式。
   @frozen public struct LMCoreNS {
-    /// 資料庫陣列。索引內容為經過加密的注音字串，資料內容則為 UTF8 資料陣列。
+    /// 資料庫辭典。索引內容為經過加密的注音字串，資料內容則為 UTF8 資料陣列。
     var rangeMap: [String: [Data]] = [:]
     /// 【已作廢】資料庫字串陣列。在 LMCoreNS 內沒有作用。
     var strData: String = ""
@@ -67,12 +67,12 @@ extension vChewing {
       shouldForceDefaultScore = forceDefaultScore
     }
 
-    /// 檢測資料庫陣列內是否已經有載入的資料。
+    /// 檢測資料庫辭典內是否已經有載入的資料。
     public func isLoaded() -> Bool {
       !rangeMap.isEmpty
     }
 
-    /// 將資料從檔案讀入至資料庫陣列內。
+    /// 將資料從檔案讀入至資料庫辭典內。
     /// - parameters:
     ///   - path: 給定路徑
     @discardableResult public mutating func open(_ path: String) -> Bool {
@@ -93,7 +93,7 @@ extension vChewing {
       return true
     }
 
-    /// 將當前語言模組的資料庫陣列自記憶體內卸除。
+    /// 將當前語言模組的資料庫辭典自記憶體內卸除。
     public mutating func close() {
       if isLoaded() {
         rangeMap.removeAll()
@@ -102,7 +102,7 @@ extension vChewing {
 
     // MARK: - Advanced features
 
-    /// 將當前資料庫陣列的內容以文本的形式輸出至 macOS 內建的 Console.app。
+    /// 將當前資料庫辭典的內容以文本的形式輸出至 macOS 內建的 Console.app。
     ///
     /// 該功能僅作偵錯之用途。
     public func dump() {
@@ -124,7 +124,7 @@ extension vChewing {
       IME.prtDebugIntel(strDump)
     }
 
-    /// 【該功能無法使用】根據給定的前述讀音索引鍵與當前讀音索引鍵，來獲取資料庫陣列內的對應資料陣列的 UTF8 資料、就地分析、生成雙元圖陣列。
+    /// 【該功能無法使用】根據給定的前述讀音索引鍵與當前讀音索引鍵，來獲取資料庫辭典內的對應資料陣列的 UTF8 資料、就地分析、生成雙元圖陣列。
     ///
     /// 威注音輸入法尚未引入雙元圖支援，所以該函式並未擴充相關功能，自然不會起作用。
     /// - parameters:
@@ -136,7 +136,7 @@ extension vChewing {
       precedingKey == key ? [Megrez.Bigram]() : [Megrez.Bigram]()
     }
 
-    /// 根據給定的讀音索引鍵，來獲取資料庫陣列內的對應資料陣列的 UTF8 資料、就地分析、生成單元圖陣列。
+    /// 根據給定的讀音索引鍵，來獲取資料庫辭典內的對應資料陣列的 UTF8 資料、就地分析、生成單元圖陣列。
     /// - parameters:
     ///   - key: 讀音索引鍵
     public func unigramsFor(key: String) -> [Megrez.Unigram] {
@@ -146,7 +146,7 @@ extension vChewing {
           let strNetaSet = String(decoding: netaSet, as: UTF8.self)
           let neta = Array(strNetaSet.split(separator: " ").reversed())
           let theValue: String = .init(neta[0])
-          let kvPair = Megrez.KeyValuePair(key: key, value: theValue)
+          let kvPair = Megrez.KeyValuePaired(key: key, value: theValue)
           var theScore = defaultScore
           if neta.count >= 2, !shouldForceDefaultScore {
             theScore = .init(String(neta[1])) ?? defaultScore
@@ -160,7 +160,7 @@ extension vChewing {
       return grams
     }
 
-    /// 根據給定的讀音索引鍵來確認資料庫陣列內是否存在對應的資料。
+    /// 根據給定的讀音索引鍵來確認資料庫辭典內是否存在對應的資料。
     /// - parameters:
     ///   - key: 讀音索引鍵
     public func hasUnigramsFor(key: String) -> Bool {

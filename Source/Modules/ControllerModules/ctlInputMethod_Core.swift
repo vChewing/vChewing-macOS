@@ -63,8 +63,12 @@ class ctlInputMethod: IMKInputController {
     client().overrideKeyboard(withKeyboardNamed: mgrPrefs.basicKeyboardLayout)
   }
 
-  /// 重設按鍵調度模組。
+  /// 重設按鍵調度模組，會將當前尚未遞交的內容遞交出去。
   func resetKeyHandler() {
+    if let state = state as? InputState.NotEmpty {
+      /// 將傳回的新狀態交給調度函式。
+      handle(state: InputState.Committing(textToCommit: state.composingBufferConverted))
+    }
     keyHandler.clear()
     handle(state: InputState.Empty())
   }
@@ -101,7 +105,7 @@ class ctlInputMethod: IMKInputController {
     /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
     /// 這是很多 macOS 副廠輸入法的常見失誤之處。
     if client().bundleIdentifier() != Bundle.main.bundleIdentifier {
-      // Override the keyboard layout to the basic one.
+      // 強制重設當前鍵盤佈局、使其與偏好設定同步。
       setKeyLayout()
       handle(state: .Empty())
     }  // 除此之外就不要動了，免得在點開輸入法自身的視窗時卡死。
@@ -143,7 +147,7 @@ class ctlInputMethod: IMKInputController {
       /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
       /// 這是很多 macOS 副廠輸入法的常見失誤之處。
       if client().bundleIdentifier() != Bundle.main.bundleIdentifier {
-        // Remember to override the keyboard layout again -- treat this as an activate event.
+        // 強制重設當前鍵盤佈局、使其與偏好設定同步。這裡的這一步也不能省略。
         setKeyLayout()
         handle(state: .Empty())
       }  // 除此之外就不要動了，免得在點開輸入法自身的視窗時卡死。
@@ -229,10 +233,6 @@ class ctlInputMethod: IMKInputController {
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   override func commitComposition(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-    if let state = state as? InputState.NotEmpty {
-      /// 將傳回的新狀態交給調度函式。
-      handle(state: InputState.Committing(textToCommit: state.composingBuffer))
-    }
     resetKeyHandler()
   }
 }
@@ -278,6 +278,38 @@ extension ctlInputMethod {
       clearInlineDisplay()
       return
     }
+
+    var identifier: AnyObject {
+      switch IME.currentInputMode {
+        case InputMode.imeModeCHS:
+          if #available(macOS 12.0, *) {
+            return "zh-Hans" as AnyObject
+          }
+        case InputMode.imeModeCHT:
+          if #available(macOS 12.0, *) {
+            return (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
+              ? "ja" as AnyObject : "zh-Hant" as AnyObject
+          }
+        default:
+          break
+      }
+      return "" as AnyObject
+    }
+
+    // [Shiki's Note] This might needs to be bug-reported to Apple:
+    // The LanguageIdentifier attribute of an NSAttributeString designated to
+    // IMK Client().SetMarkedText won't let the actual font respect your languageIdentifier
+    // settings. Still, this might behaves as Apple's current expectation, I'm afraid.
+    if #available(macOS 12.0, *) {
+      state.attributedString.setAttributes(
+        [.languageIdentifier: identifier],
+        range: NSRange(
+          location: 0,
+          length: state.composingBuffer.utf16.count
+        )
+      )
+    }
+
     /// 所謂選區「selectionRange」，就是「可見游標位置」的位置，只不過長度
     /// 是 0 且取代範圍（replacementRange）為「NSNotFound」罷了。
     /// 也就是說，內文組字區該在哪裡出現，得由客體軟體來作主。
@@ -297,6 +329,7 @@ extension ctlInputMethod {
   }
 
   /// 遞交組字區內容。
+  /// 注意：必須在 IMK 的 commitComposition 函式當中也間接或者直接執行這個處理。
   private func commit(text: String) {
     let buffer = IME.kanjiConversionIfRequired(text)
     if buffer.isEmpty {

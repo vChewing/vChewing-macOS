@@ -74,6 +74,11 @@ private class vwrCandidateUniversal: NSView {
 
   @objc(setKeyLabels:displayedCandidates:)
   func set(keyLabels labels: [String], displayedCandidates candidates: [String]) {
+    let candidates = candidates.map { theCandidate -> String in
+      let theConverted = IME.kanjiConversionIfRequired(theCandidate)
+      return (theCandidate == theConverted) ? theCandidate : "\(theConverted)(\(theCandidate))"
+    }
+
     let count = min(labels.count, candidates.count)
     keyLabels = Array(labels[0..<count])
     displayedCandidates = Array(candidates[0..<count])
@@ -209,7 +214,9 @@ private class vwrCandidateUniversal: NSView {
                 }
               case InputMode.imeModeCHT:
                 if #available(macOS 12.0, *) {
-                  activeCandidateAttr[.languageIdentifier] = "zh-Hant" as AnyObject
+                  activeCandidateAttr[.languageIdentifier] =
+                    (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
+                    ? "ja" as AnyObject : "zh-Hant" as AnyObject
                 }
               default:
                 break
@@ -279,7 +286,9 @@ private class vwrCandidateUniversal: NSView {
                 }
               case InputMode.imeModeCHT:
                 if #available(macOS 12.0, *) {
-                  activeCandidateAttr[.languageIdentifier] = "zh-Hant" as AnyObject
+                  activeCandidateAttr[.languageIdentifier] =
+                    (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
+                    ? "ja" as AnyObject : "zh-Hant" as AnyObject
                 }
               default:
                 break

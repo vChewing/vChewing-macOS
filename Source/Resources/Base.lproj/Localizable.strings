@@ -62,6 +62,7 @@
 "Loading CHS Core Dict..." = "Loading CHS Core Dict...";
 "Loading CHT Core Dict..." = "Loading CHT Core Dict...";
 "Core Dict loading complete." = "Core Dict loading complete.";
+"Optimize Memorized Phrases" = "Optimize Memorized Phrases";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "CommonSymbols";
@@ -88,6 +89,7 @@
 "Apple Chewing - Dachen" = "Apple Chewing - Dachen";
 "Apple Chewing - Eten Traditional" = "Apple Chewing - Eten Traditional";
 "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional." = "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional.";
+"Applying typing suggestions from half-life user override model" = "Applying typing suggestions from half-life user override model";
 "at the rear of the phrase (like Microsoft New Phonetic)" = "at the rear of the phrase (like Microsoft New Phonetic)";
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters";
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "Auto-convert traditional Chinese glyphs to KangXi characters";
@@ -113,7 +115,7 @@
 "Debug Mode" = "Debug Mode";
 "Dictionary" = "Dictionary";
 "Emulating select-candidate-per-character mode" = "Emulating select-candidate-per-character mode";
-"Enable CNS11643 Support (2022-04-27)" = "Enable CNS11643 Support (2022-04-27)";
+"Enable CNS11643 Support (2022-06-15)" = "Enable CNS11643 Support (2022-06-15)";
 "Enable Space key for calling candidate window" = "Enable Space key for calling candidate window";
 "Enable symbol input support (incl. certain emoji symbols)" = "Enable symbol input support (incl. certain emoji symbols)";
 "English" = "English";

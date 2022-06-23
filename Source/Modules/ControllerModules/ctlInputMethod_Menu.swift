@@ -139,6 +139,11 @@ extension ctlInputMethod {
       )
     }
 
+    menu.addItem(
+      withTitle: NSLocalizedString("Optimize Memorized Phrases", comment: ""),
+      action: #selector(removeUnigramsFromUOM(_:)), keyEquivalent: ""
+    )
+
     menu.addItem(NSMenuItem.separator())  // ---------------------
 
     if optionKeyPressed {
@@ -199,6 +204,7 @@ extension ctlInputMethod {
   }
 
   @objc func toggleSCPCTypingMode(_: Any?) {
+    resetKeyHandler()
     NotifierController.notify(
       message: String(
         format: "%@%@%@", NSLocalizedString("Per-Char Select Mode", comment: ""), "\n",
@@ -206,10 +212,10 @@ extension ctlInputMethod {
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: "")
       ))
-    resetKeyHandler()
   }
 
   @objc func toggleChineseConverter(_: Any?) {
+    resetKeyHandler()
     NotifierController.notify(
       message: String(
         format: "%@%@%@", NSLocalizedString("Force KangXi Writing", comment: ""), "\n",
@@ -217,10 +223,10 @@ extension ctlInputMethod {
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: "")
       ))
-    resetKeyHandler()
   }
 
   @objc func toggleShiftJISShinjitaiOutput(_: Any?) {
+    resetKeyHandler()
     NotifierController.notify(
       message: String(
         format: "%@%@%@", NSLocalizedString("JIS Shinjitai Output", comment: ""), "\n",
@@ -228,10 +234,10 @@ extension ctlInputMethod {
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: "")
       ))
-    resetKeyHandler()
   }
 
   @objc func toggleHalfWidthPunctuation(_: Any?) {
+    resetKeyHandler()
     NotifierController.notify(
       message: String(
         format: "%@%@%@", NSLocalizedString("Half-Width Punctuation Mode", comment: ""),
@@ -240,10 +246,10 @@ extension ctlInputMethod {
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: "")
       ))
-    resetKeyHandler()
   }
 
   @objc func toggleCNS11643Enabled(_: Any?) {
+    resetKeyHandler()
     NotifierController.notify(
       message: String(
         format: "%@%@%@", NSLocalizedString("CNS11643 Mode", comment: ""), "\n",
@@ -251,10 +257,10 @@ extension ctlInputMethod {
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: "")
       ))
-    resetKeyHandler()
   }
 
   @objc func toggleSymbolEnabled(_: Any?) {
+    resetKeyHandler()
     NotifierController.notify(
       message: String(
         format: "%@%@%@", NSLocalizedString("Symbol & Emoji Input", comment: ""), "\n",
@@ -262,10 +268,10 @@ extension ctlInputMethod {
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: "")
       ))
-    resetKeyHandler()
   }
 
   @objc func toggleAssociatedPhrasesEnabled(_: Any?) {
+    resetKeyHandler()
     NotifierController.notify(
       message: String(
         format: "%@%@%@", NSLocalizedString("Per-Char Associated Phrases", comment: ""),
@@ -274,10 +280,10 @@ extension ctlInputMethod {
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: "")
       ))
-    resetKeyHandler()
   }
 
   @objc func togglePhraseReplacement(_: Any?) {
+    resetKeyHandler()
     NotifierController.notify(
       message: String(
         format: "%@%@%@", NSLocalizedString("Use Phrase Replacement", comment: ""), "\n",
@@ -285,7 +291,6 @@ extension ctlInputMethod {
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: "")
       ))
-    resetKeyHandler()
   }
 
   @objc func selfUninstall(_: Any?) {
@@ -311,43 +316,50 @@ extension ctlInputMethod {
   }
 
   @objc func openUserPhrases(_: Any?) {
-    IME.openPhraseFile(userFileAt: mgrLangModel.userPhrasesDataPath(IME.getInputMode()))
-    if NSEvent.modifierFlags.contains(.option), mgrPrefs.isDebugModeEnabled {
-      IME.openPhraseFile(userFileAt: mgrLangModel.userPhrasesDataPath(IME.getInputMode(isReversed: true)))
+    IME.openPhraseFile(fromURL: mgrLangModel.userPhrasesDataURL(IME.getInputMode()))
+    if NSEvent.modifierFlags.contains(.option) {
+      IME.openPhraseFile(fromURL: mgrLangModel.userPhrasesDataURL(IME.getInputMode(isReversed: true)))
     }
   }
 
   @objc func openExcludedPhrases(_: Any?) {
-    IME.openPhraseFile(userFileAt: mgrLangModel.excludedPhrasesDataPath(IME.getInputMode()))
-    if NSEvent.modifierFlags.contains(.option), mgrPrefs.isDebugModeEnabled {
-      IME.openPhraseFile(userFileAt: mgrLangModel.excludedPhrasesDataPath(IME.getInputMode(isReversed: true)))
+    IME.openPhraseFile(fromURL: mgrLangModel.userFilteredDataURL(IME.getInputMode()))
+    if NSEvent.modifierFlags.contains(.option) {
+      IME.openPhraseFile(fromURL: mgrLangModel.userFilteredDataURL(IME.getInputMode(isReversed: true)))
     }
   }
 
   @objc func openUserSymbols(_: Any?) {
-    IME.openPhraseFile(userFileAt: mgrLangModel.userSymbolDataPath(IME.getInputMode()))
-    if NSEvent.modifierFlags.contains(.option), mgrPrefs.isDebugModeEnabled {
-      IME.openPhraseFile(userFileAt: mgrLangModel.userSymbolDataPath(IME.getInputMode(isReversed: true)))
+    IME.openPhraseFile(fromURL: mgrLangModel.userSymbolDataURL(IME.getInputMode()))
+    if NSEvent.modifierFlags.contains(.option) {
+      IME.openPhraseFile(fromURL: mgrLangModel.userSymbolDataURL(IME.getInputMode(isReversed: true)))
     }
   }
 
   @objc func openPhraseReplacement(_: Any?) {
-    IME.openPhraseFile(userFileAt: mgrLangModel.phraseReplacementDataPath(IME.getInputMode()))
-    if NSEvent.modifierFlags.contains(.option), mgrPrefs.isDebugModeEnabled {
-      IME.openPhraseFile(userFileAt: mgrLangModel.phraseReplacementDataPath(IME.getInputMode(isReversed: true)))
+    IME.openPhraseFile(fromURL: mgrLangModel.userReplacementsDataURL(IME.getInputMode()))
+    if NSEvent.modifierFlags.contains(.option) {
+      IME.openPhraseFile(fromURL: mgrLangModel.userReplacementsDataURL(IME.getInputMode(isReversed: true)))
     }
   }
 
   @objc func openAssociatedPhrases(_: Any?) {
-    IME.openPhraseFile(userFileAt: mgrLangModel.userAssociatedPhrasesDataPath(IME.getInputMode()))
-    if NSEvent.modifierFlags.contains(.option), mgrPrefs.isDebugModeEnabled {
+    IME.openPhraseFile(fromURL: mgrLangModel.userAssociatesDataURL(IME.getInputMode()))
+    if NSEvent.modifierFlags.contains(.option) {
       IME.openPhraseFile(
-        userFileAt: mgrLangModel.userAssociatedPhrasesDataPath(IME.getInputMode(isReversed: true)))
+        fromURL: mgrLangModel.userAssociatesDataURL(IME.getInputMode(isReversed: true)))
     }
   }
 
   @objc func reloadUserPhrasesData(_: Any?) {
     IME.initLangModels(userOnly: true)
+  }
+
+  @objc func removeUnigramsFromUOM(_: Any?) {
+    mgrLangModel.removeUnigramsFromUserOverrideModel(IME.getInputMode())
+    if NSEvent.modifierFlags.contains(.option) {
+      mgrLangModel.removeUnigramsFromUserOverrideModel(IME.getInputMode(isReversed: true))
+    }
   }
 
   @objc func showAbout(_: Any?) {

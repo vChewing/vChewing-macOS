@@ -233,7 +233,7 @@ extension KeyHandler {
     }
 
     // Shift + Left
-    if input.isCursorBackward || input.emacsKey == vChewingEmacsKey.backward, input.isShiftHold {
+    if input.isCursorBackward || input.emacsKey == EmacsKey.backward, input.isShiftHold {
       var index = state.markerIndex
       if index > 0 {
         index = state.composingBuffer.utf16PreviousPosition(for: index)
@@ -254,7 +254,7 @@ extension KeyHandler {
     }
 
     // Shift + Right
-    if input.isCursorForward || input.emacsKey == vChewingEmacsKey.forward, input.isShiftHold {
+    if input.isCursorForward || input.emacsKey == EmacsKey.forward, input.isShiftHold {
       var index = state.markerIndex
       if index < (state.composingBuffer.utf16.count) {
         index = state.composingBuffer.utf16NextPosition(for: index)
@@ -755,7 +755,8 @@ extension KeyHandler {
     stateCallback: @escaping (InputState) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    guard let state = state as? InputState.Inputting else {
+    if composer.isEmpty && (compositor.isEmpty || walkedAnchors.isEmpty) { return false }
+    guard state is InputState.Inputting else {
       guard state is InputState.Empty else {
         IME.prtDebugIntel("6044F081")
         errorCallback()
@@ -772,7 +773,7 @@ extension KeyHandler {
     }
 
     // 此處僅借用該函式生成結果內的某個物件，不用糾結「是否縱排輸入」。
-    let candidates = buildCandidate(state: state).candidates
+    let candidates = candidatesArray
     guard !candidates.isEmpty else {
       IME.prtDebugIntel("3378A6DF")
       errorCallback()

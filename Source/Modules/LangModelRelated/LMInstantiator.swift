@@ -26,19 +26,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Foundation
 
-// 簡體中文模式與繁體中文模式共用全字庫擴展模組，故單獨處理。
-// 塞在 LMInstantiator 內的話，每個模式都會讀入一份全字庫，會多佔用 100MB 記憶體。
-private var lmCNS = vChewing.LMCoreNS(
-  reverse: true, consolidate: false, defaultScore: -11.0, forceDefaultScore: false
-)
-private var lmSymbols = vChewing.LMCoreNS(
-  reverse: true, consolidate: false, defaultScore: -13.0, forceDefaultScore: false
-)
-
 extension vChewing {
   /// 語言模組副本化模組（LMInstantiator，下稱「LMI」）自身為符合天權星組字引擎內
-  /// 的 LanguageModel 協定的模組、統籌且整理來自其它子模組的資料（包括使用者語彙、
-  /// 繪文字模組、語彙濾除表、原廠語言模組等）。
+  /// 的 LanguageModelProtocol 協定的模組、統籌且整理來自其它子模組的資料（包括使
+  /// 用者語彙、繪文字模組、語彙濾除表、原廠語言模組等）。
   ///
   /// LMI 型別為與輸入法按鍵調度模組直接溝通之唯一語言模組。當組字器開始根據給定的
   /// 讀音鏈構築語句時，LMI 會接收來自組字器的讀音、輪流檢查自身是否有可以匹配到的
@@ -53,7 +44,7 @@ extension vChewing {
   ///
   /// LMI 會根據需要分別載入原廠語言模組和其他個別的子語言模組。LMI 本身不會記錄這些
   /// 語言模組的相關資料的存放位置，僅藉由參數來讀取相關訊息。
-  public class LMInstantiator: Megrez.LanguageModel {
+  public class LMInstantiator: LanguageModelProtocol {
     // 在函式內部用以記錄狀態的開關。
     public var isPhraseReplacementEnabled = false
     public var isCNSEnabled = false
@@ -79,6 +70,15 @@ extension vChewing {
       reverse: true, consolidate: false, defaultScore: -1.0, forceDefaultScore: false
     )
 
+    // 簡體中文模式與繁體中文模式共用全字庫擴展模組，故靜態處理。
+    // 不然，每個模式都會讀入一份全字庫，會多佔用 100MB 記憶體。
+    static var lmCNS = vChewing.LMCoreNS(
+      reverse: true, consolidate: false, defaultScore: -11.0, forceDefaultScore: false
+    )
+    static var lmSymbols = vChewing.LMCoreNS(
+      reverse: true, consolidate: false, defaultScore: -13.0, forceDefaultScore: false
+    )
+
     // 聲明使用者語言模組。
     // 使用者語言模組使用多執行緒的話，可能會導致一些問題。有時間再仔細排查看看。
     var lmUserPhrases = LMCoreEX(
@@ -93,10 +93,7 @@ extension vChewing {
     var lmReplacements = LMReplacments()
     var lmAssociates = LMAssociates()
 
-    // 初期化的函式先保留
-    override init() {}
-
-    // 以下這些函式命名暫時保持原樣，等弒神行動徹底結束了再調整。
+    // MARK: - 工具函式
 
     public var isLanguageModelLoaded: Bool { lmCore.isLoaded() }
     public func loadLanguageModel(path: String) {
@@ -108,11 +105,11 @@ extension vChewing {
       }
     }
 
-    public var isCNSDataLoaded: Bool { lmCNS.isLoaded() }
+    public var isCNSDataLoaded: Bool { vChewing.LMInstantiator.lmCNS.isLoaded() }
     public func loadCNSData(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
-        lmCNS.open(path)
-        IME.prtDebugIntel("lmCNS: \(lmCNS.count) entries of data loaded from: \(path)")
+        vChewing.LMInstantiator.lmCNS.open(path)
+        IME.prtDebugIntel("lmCNS: \(vChewing.LMInstantiator.lmCNS.count) entries of data loaded from: \(path)")
       } else {
         IME.prtDebugIntel("lmCNS: File access failure: \(path)")
       }
@@ -128,11 +125,11 @@ extension vChewing {
       }
     }
 
-    public var isSymbolDataLoaded: Bool { lmSymbols.isLoaded() }
+    public var isSymbolDataLoaded: Bool { vChewing.LMInstantiator.lmSymbols.isLoaded() }
     public func loadSymbolData(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
-        lmSymbols.open(path)
-        IME.prtDebugIntel("lmSymbol: \(lmSymbols.count) entries of data loaded from: \(path)")
+        vChewing.LMInstantiator.lmSymbols.open(path)
+        IME.prtDebugIntel("lmSymbol: \(vChewing.LMInstantiator.lmSymbols.count) entries of data loaded from: \(path)")
       } else {
         IME.prtDebugIntel("lmSymbols: File access failure: \(path)")
       }
@@ -185,7 +182,7 @@ extension vChewing {
       }
     }
 
-    // MARK: - Core Functions (Public)
+    // MARK: - 核心函式（對外）
 
     /// 威注音輸入法目前尚未具備對雙元圖的處理能力，故停用該函式。
     // public func bigramsForKeys(preceedingKey: String, key: String) -> [Megrez.Bigram] { }
@@ -193,11 +190,11 @@ extension vChewing {
     /// 給定讀音字串，讓 LMI 給出對應的經過處理的單元圖陣列。
     /// - Parameter key: 給定的讀音字串。
     /// - Returns: 對應的經過處理的單元圖陣列。
-    override open func unigramsFor(key: String) -> [Megrez.Unigram] {
+    public func unigramsFor(key: String) -> [Megrez.Unigram] {
       if key == " " {
         /// 給空格鍵指定輸出值。
         let spaceUnigram = Megrez.Unigram(
-          keyValue: Megrez.KeyValuePair(key: " ", value: " "),
+          keyValue: Megrez.KeyValuePaired(key: " ", value: " "),
           score: 0
         )
         return [spaceUnigram]
@@ -216,16 +213,16 @@ extension vChewing {
       rawAllUnigrams += lmCore.unigramsFor(key: key)
 
       if isCNSEnabled {
-        rawAllUnigrams += lmCNS.unigramsFor(key: key)
+        rawAllUnigrams += vChewing.LMInstantiator.lmCNS.unigramsFor(key: key)
       }
 
       if isSymbolEnabled {
         rawAllUnigrams += lmUserSymbols.unigramsFor(key: key)
-        rawAllUnigrams += lmSymbols.unigramsFor(key: key)
+        rawAllUnigrams += vChewing.LMInstantiator.lmSymbols.unigramsFor(key: key)
       }
 
       // 準備過濾清單。因為我們在 Swift 使用 NSOrderedSet，所以就不需要統計清單了。
-      var filteredPairs: Set<Megrez.KeyValuePair> = []
+      var filteredPairs: Set<Megrez.KeyValuePaired> = []
 
       // 載入要過濾的 KeyValuePair 清單。
       for unigram in lmFiltered.unigramsFor(key: key) {
@@ -238,9 +235,10 @@ extension vChewing {
       )
     }
 
-    /// If the model has unigrams for the given key.
-    /// @param key The key.
-    override open func hasUnigramsFor(key: String) -> Bool {
+    /// 根據給定的索引鍵來確認各個資料庫陣列內是否存在對應的資料。
+    /// - Parameter key: 索引鍵。
+    /// - Returns: 是否在庫。
+    public func hasUnigramsFor(key: String) -> Bool {
       if key == " " { return true }
 
       if !lmFiltered.hasUnigramsFor(key: key) {
@@ -250,46 +248,40 @@ extension vChewing {
       return !unigramsFor(key: key).isEmpty
     }
 
-    public func associatedPhrasesForKey(_ key: String) -> [String] {
+    public func associatedPhrasesFor(key: String) -> [String] {
       lmAssociates.valuesFor(key: key) ?? []
     }
 
-    public func hasAssociatedPhrasesForKey(_ key: String) -> Bool {
+    public func hasAssociatedPhrasesFor(key: String) -> Bool {
       lmAssociates.hasValuesFor(key: key)
     }
 
-    // MARK: - Core Functions (Private)
+    /// 該函式不起作用，僅用來滿足 LanguageModelProtocol 協定的要求。
+    public func bigramsForKeys(precedingKey _: String, key _: String) -> [Megrez.Bigram] { .init() }
+
+    // MARK: - 核心函式（對內）
 
     /// 給定單元圖原始結果陣列，經過語彙過濾處理＋置換處理＋去重複處理之後，給出單元圖結果陣列。
     /// - Parameters:
-    ///   - unigrams: 傳入的單元圖原始結果陣列
-    ///   - filteredPairs: 傳入的要過濾掉的鍵值配對陣列
-    /// - Returns: 經過語彙過濾處理＋置換處理＋去重複處理的單元圖結果陣列
+    ///   - unigrams: 傳入的單元圖原始結果陣列。
+    ///   - filteredPairs: 傳入的要過濾掉的鍵值配對陣列。
+    /// - Returns: 經過語彙過濾處理＋置換處理＋去重複處理的單元圖結果陣列。
     func filterAndTransform(
       unigrams: [Megrez.Unigram],
-      filter filteredPairs: Set<Megrez.KeyValuePair>
+      filter filteredPairs: Set<Megrez.KeyValuePaired>
     ) -> [Megrez.Unigram] {
       var results: [Megrez.Unigram] = []
-      var insertedPairs: Set<Megrez.KeyValuePair> = []
-
+      var insertedPairs: Set<Megrez.KeyValuePaired> = []
       for unigram in unigrams {
-        var pair: Megrez.KeyValuePair = unigram.keyValue
-        if filteredPairs.contains(pair) {
-          continue
-        }
-
+        var pair: Megrez.KeyValuePaired = unigram.keyValue
+        if filteredPairs.contains(pair) { continue }
         if isPhraseReplacementEnabled {
           let replacement = lmReplacements.valuesFor(key: pair.value)
-          if !replacement.isEmpty {
-            IME.prtDebugIntel("\(pair.value) -> \(replacement)")
-            pair.value = replacement
-          }
+          if !replacement.isEmpty { pair.value = replacement }
         }
-
-        if !insertedPairs.contains(pair) {
-          results.append(Megrez.Unigram(keyValue: pair, score: unigram.score))
-          insertedPairs.insert(pair)
-        }
+        if insertedPairs.contains(pair) { continue }
+        results.append(Megrez.Unigram(keyValue: pair, score: unigram.score))
+        insertedPairs.insert(pair)
       }
       return results
     }

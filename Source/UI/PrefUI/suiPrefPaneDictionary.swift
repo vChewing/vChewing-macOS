@@ -37,6 +37,8 @@ struct suiPrefPaneDictionary: View {
     forKey: UserDef.kSymbolInputEnabled)
   @State private var selAllowBoostingSingleKanjiAsUserPhrase: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kAllowBoostingSingleKanjiAsUserPhrase)
+  @State private var selFetchSuggestionsFromUserOverrideModel: Bool = UserDefaults.standard.bool(
+    forKey: UserDef.kFetchSuggestionsFromUserOverrideModel)
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -116,7 +118,7 @@ struct suiPrefPaneDictionary: View {
         }
         Divider()
         Toggle(
-          LocalizedStringKey("Enable CNS11643 Support (2022-04-27)"),
+          LocalizedStringKey("Enable CNS11643 Support (2022-06-15)"),
           isOn: $selEnableCNS11643
         )
         .onChange(of: selEnableCNS11643) { value in
@@ -137,6 +139,13 @@ struct suiPrefPaneDictionary: View {
         )
         .onChange(of: selAllowBoostingSingleKanjiAsUserPhrase) { value in
           mgrPrefs.allowBoostingSingleKanjiAsUserPhrase = value
+        }
+        Toggle(
+          LocalizedStringKey("Applying typing suggestions from half-life user override model"),
+          isOn: $selFetchSuggestionsFromUserOverrideModel
+        )
+        .onChange(of: selFetchSuggestionsFromUserOverrideModel) { value in
+          mgrPrefs.fetchSuggestionsFromUserOverrideModel = value
         }
       }
     }

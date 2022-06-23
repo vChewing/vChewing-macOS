@@ -83,8 +83,8 @@ extension KeyHandler {
 
       /// 如果是 ASCII 當中的不可列印的字元的話，不使用「insertText:replacementRange:」。
       /// 某些應用無法正常處理非 ASCII 字符的輸入。
-      /// 注意：這裡一定要用 Objective-C 的 isPrintable() 函數來處理，否則無效。
-      /// 這個函數已經包裝在 CTools.h 裡面了，這樣就可以拿給 Swift 用。
+      /// 注意：這裡一定要用 Objective-C 的 isPrintable() 函式來處理，否則無效。
+      /// 這個函式已經包裝在 CTools.h 裡面了，這樣就可以拿給 Swift 用。
       if charCode < 0x80, !CTools.isPrintable(charCode) {
         return false
       }
@@ -175,27 +175,27 @@ extension KeyHandler {
         // 小麥注音因為使用 OVMandarin，所以不需要這樣補。但鐵恨引擎對所有聲調一視同仁。
         composer.receiveKey(fromString: " ")
       }
-      let reading = composer.getComposition()  // 拿取用來進行索引檢索用的注音
+      let reading = composer.getComposition()  // 拿取用來進行索引檢索用的注音。
       // 如果輸入法的辭典索引是漢語拼音的話，要注意上一行拿到的內容得是漢語拼音。
 
-      // 向語言模型詢問是否有對應的記錄
+      // 向語言模型詢問是否有對應的記錄。
       if !ifLangModelHasUnigrams(forKey: reading) {
         IME.prtDebugIntel("B49C0979：語彙庫內無「\(reading)」的匹配記錄。")
         errorCallback()
         composer.clear()
-        // 根據「組字器是否為空」來判定回呼哪一種狀態
+        // 根據「組字器是否為空」來判定回呼哪一種狀態。
         stateCallback((compositorLength == 0) ? InputState.EmptyIgnoringPreviousState() : buildInputtingState)
-        return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了
+        return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了。
       }
 
-      // 將該讀音插入至組字器內的軌格當中
+      // 將該讀音插入至組字器內的軌格當中。
       insertToCompositorAtCursor(reading: reading)
 
-      // 讓組字器反爬軌格
+      // 讓組字器反爬軌格。
       let textToCommit = popOverflowComposingTextAndWalk
 
-      // 看看半衰記憶模組是否會對目前的狀態給出自動選字建議
-      // dealWithOverrideModelSuggestions()  // 暫時禁用，因為無法使其生效。
+      // 看看半衰記憶模組是否會對目前的狀態給出自動選字建議。
+      fetchAndApplySuggestionsFromUserOverrideModel()
 
       // 將組字器內超出最大動態爬軌範圍的節錨都標記為「已經手動選字過」，減少之後的爬軌運算負擔。
       markNodesFixedIfNecessary()
@@ -257,7 +257,7 @@ extension KeyHandler {
     if let currentState = state as? InputState.NotEmpty, composer.isEmpty,
       input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
         || input.isPageDown || input.isPageUp || (input.isTab && mgrPrefs.specifyShiftTabKeyBehavior)
-        || (input.isTypingVertical && (input.isverticalTypingOnlyChooseCandidateKey))
+        || (input.isTypingVertical && (input.isVerticalTypingOnlyChooseCandidateKey))
     {
       if input.isSpace {
         /// 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
@@ -305,7 +305,7 @@ extension KeyHandler {
 
     // MARK: Cursor backward
 
-    if input.isCursorBackward || input.emacsKey == vChewingEmacsKey.backward {
+    if input.isCursorBackward || input.emacsKey == EmacsKey.backward {
       return handleBackward(
         state: state,
         input: input,
@@ -316,7 +316,7 @@ extension KeyHandler {
 
     // MARK: Cursor forward
 
-    if input.isCursorForward || input.emacsKey == vChewingEmacsKey.forward {
+    if input.isCursorForward || input.emacsKey == EmacsKey.forward {
       return handleForward(
         state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
       )
@@ -324,13 +324,13 @@ extension KeyHandler {
 
     // MARK: Home
 
-    if input.isHome || input.emacsKey == vChewingEmacsKey.home {
+    if input.isHome || input.emacsKey == EmacsKey.home {
       return handleHome(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 
     // MARK: End
 
-    if input.isEnd || input.emacsKey == vChewingEmacsKey.end {
+    if input.isEnd || input.emacsKey == EmacsKey.end {
       return handleEnd(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 
@@ -360,7 +360,7 @@ extension KeyHandler {
 
     // MARK: Delete
 
-    if input.isDelete || input.emacsKey == vChewingEmacsKey.delete {
+    if input.isDelete || input.emacsKey == EmacsKey.delete {
       return handleDelete(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 
