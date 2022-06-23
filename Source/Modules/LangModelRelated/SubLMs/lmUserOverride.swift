@@ -131,6 +131,7 @@ extension vChewing {
       walkedAnchors: [Megrez.NodeAnchor], cursorIndex: Int, readingOnly: Bool = false
     ) -> String {
       let arrEndingPunctuation = ["，", "。", "！", "？", "」", "』", "”", "’"]
+      let whiteList = "你他妳她祢她它牠再在"
       var arrNodes: [Megrez.NodeAnchor] = []
       var intLength = 0
       for theNodeAnchor in walkedAnchors {
@@ -156,30 +157,36 @@ extension vChewing {
 
       // 前置單元只記錄讀音，在其後的單元則同時記錄讀音與字詞
       let strCurrent = kvCurrent.key
-
-      var strPrevious = "()"
-      var strAnterior = "()"
+      var kvPrevious = Megrez.KeyValuePaired()
+      var kvAnterior = Megrez.KeyValuePaired()
       var readingStack = ""
-      var trigramKey: String { "(\(strAnterior),\(strPrevious),\(strCurrent))" }
+      var trigramKey: String { "(\(kvAnterior.toNGramKey),\(kvPrevious.toNGramKey),\(strCurrent))" }
       var result: String {
-        readingStack.contains("_") ? "" : (readingOnly ? strCurrent : trigramKey)
+        // 不要把單個漢字的 kvCurrent 當前鍵值領頭的單元圖記入資料庫，不然對敲字體驗破壞太大。
+        if readingStack.contains("_")
+          || (!kvPrevious.isValid && kvCurrent.value.count == 1 && !whiteList.contains(kvCurrent.value))
+        {
+          return ""
+        } else {
+          return (readingOnly ? strCurrent : trigramKey)
+        }
       }
 
       if arrNodes.count >= 2,
-        let kvPrevious = arrNodes[1].node?.currentKeyValue,
+        let kvPreviousThisOne = arrNodes[1].node?.currentKeyValue,
         !arrEndingPunctuation.contains(kvPrevious.value),
         kvPrevious.key.split(separator: "-").count == kvPrevious.value.count
       {
-        strPrevious = "(\(kvPrevious.key),\(kvPrevious.value))"
+        kvPrevious = kvPreviousThisOne
         readingStack = kvPrevious.key + readingStack
       }
 
       if arrNodes.count >= 3,
-        let kvAnterior = arrNodes[2].node?.currentKeyValue,
+        let kvAnteriorThisOne = arrNodes[2].node?.currentKeyValue,
         !arrEndingPunctuation.contains(kvAnterior.value),
         kvAnterior.key.split(separator: "-").count == kvAnterior.value.count
       {
-        strAnterior = "(\(kvAnterior.key),\(kvAnterior.value))"
+        kvAnterior = kvAnteriorThisOne
         readingStack = kvAnterior.key + readingStack
       }
 
@@ -282,7 +289,7 @@ extension vChewing.LMUserOverride {
     let decoder = JSONDecoder()
     do {
       let data = try Data(contentsOf: fileURL, options: .mappedIfSafe)
-      guard let jsonResult = try? decoder.decode(Dictionary<String, KeyObservationPair>.self, from: data) else {
+      guard let jsonResult = try? decoder.decode([String: KeyObservationPair].self, from: data) else {
         IME.prtDebugIntel("UOM Error: Read file content type invalid, abort loading.")
         return
       }
