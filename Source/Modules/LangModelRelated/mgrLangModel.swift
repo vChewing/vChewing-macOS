@@ -251,7 +251,7 @@ enum mgrLangModel {
   }
 
   static func userOverrideModelDataURL(_ mode: InputMode) -> URL {
-    let fileName = (mode == InputMode.imeModeCHT) ? "override-model-data-chs.dat" : "override-model-data-cht.dat"
+    let fileName = (mode == InputMode.imeModeCHT) ? "override-model-data-cht.dat" : "override-model-data-chs.dat"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
