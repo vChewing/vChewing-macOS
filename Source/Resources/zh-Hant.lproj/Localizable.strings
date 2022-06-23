@@ -62,6 +62,7 @@
 "Loading CHS Core Dict..." = "載入簡體中文核心辭典…";
 "Loading CHT Core Dict..." = "載入繁體中文核心辭典…";
 "Core Dict loading complete." = "核心辭典載入完畢";
+"Optimize Memorized Phrases" = "精簡臨時記憶語彙資料";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";

@@ -62,6 +62,7 @@
 "Loading CHS Core Dict..." = "Loading CHS Core Dict...";
 "Loading CHT Core Dict..." = "Loading CHT Core Dict...";
 "Core Dict loading complete." = "Core Dict loading complete.";
+"Optimize Memorized Phrases" = "Optimize Memorized Phrases";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "CommonSymbols";
