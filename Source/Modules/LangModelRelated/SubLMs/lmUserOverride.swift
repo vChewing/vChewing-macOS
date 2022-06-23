@@ -273,6 +273,23 @@ extension vChewing.LMUserOverride {
 // MARK: - Hash and Dehash the entire UOM data
 
 extension vChewing.LMUserOverride {
+  /// 自 LRU 辭典內移除所有的單元圖。
+  public func bleachUnigrams() {
+    for key in mutLRUMap.keys {
+      if !key.contains("(),()") { continue }
+      mutLRUMap.removeValue(forKey: key)
+    }
+    resetMRUList()
+    mgrLangModel.saveUserOverrideModelData()
+  }
+
+  internal func resetMRUList() {
+    mutLRUList.removeAll()
+    for neta in mutLRUMap.reversed() {
+      mutLRUList.append(neta.value)
+    }
+  }
+
   public func saveData(toURL fileURL: URL) {
     let encoder = JSONEncoder()
     do {
@@ -294,10 +311,7 @@ extension vChewing.LMUserOverride {
         return
       }
       mutLRUMap = jsonResult
-      mutLRUList.removeAll()
-      for neta in mutLRUMap.reversed() {
-        mutLRUList.append(neta.value)
-      }
+      resetMRUList()
     } catch {
       IME.prtDebugIntel("UOM Error: Unable to read file or parse the data, abort loading. Details: \(error)")
       return
