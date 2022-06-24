@@ -10,7 +10,6 @@
 		5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0AF8B427B2C8290096FE54 /* StringExtension.swift */; };
 		5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */; };
 		5B242403284B0D6500520FE4 /* ctlCandidateUniversal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B242402284B0D6500520FE4 /* ctlCandidateUniversal.swift */; };
-		5B2F2BB6286216A500B8557B /* vChewingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2F2BB5286216A500B8557B /* vChewingTests.swift */; };
 		5B3133BF280B229700A4A505 /* KeyHandler_States.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3133BE280B229700A4A505 /* KeyHandler_States.swift */; };
 		5B38F59A281E2E49007D5F5D /* 6_Unigram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1D15FC0EB100ABF4B3 /* 6_Unigram.swift */; };
 		5B38F59B281E2E49007D5F5D /* 7_KeyValuePaired.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1815FC0EB100ABF4B3 /* 7_KeyValuePaired.swift */; };
@@ -79,6 +78,15 @@
 		5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77227AED70B0023B93A /* MenuIcon-TCVIM.png */; };
 		5BBBB77A27AEDC690023B93A /* clsSFX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBBB77927AEDC690023B93A /* clsSFX.swift */; };
 		5BC2652227E04B7E00700291 /* uninstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 5BC2652127E04B7B00700291 /* uninstall.sh */; };
+		5BC4479D2865686500EDC323 /* data-chs.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71C283B4AEA0078EB25 /* data-chs.plist */; };
+		5BC4479E2865686500EDC323 /* data-cht.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB720283B4AEA0078EB25 /* data-cht.plist */; };
+		5BC4479F2865686500EDC323 /* data-cns.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71D283B4AEA0078EB25 /* data-cns.plist */; };
+		5BC447A02865686500EDC323 /* data-symbols.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71E283B4AEA0078EB25 /* data-symbols.plist */; };
+		5BC447A12865686500EDC323 /* data-zhuyinwen.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.plist */; };
+		5BC447A628656A1900EDC323 /* PrefManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC447A228656A1900EDC323 /* PrefManagerTests.swift */; };
+		5BC447A928656A1900EDC323 /* UpdateAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC447A528656A1900EDC323 /* UpdateAPITests.swift */; };
+		5BC447AE2865CFC200EDC323 /* KeyHandlerTestsNormalCHS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC447A428656A1900EDC323 /* KeyHandlerTestsNormalCHS.swift */; };
+		5BC6E03C286692BE00291771 /* KeyHandlerTestsSCPCCHT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC447A328656A1900EDC323 /* KeyHandlerTestsSCPCCHT.swift */; };
 		5BD0113B28180D6100609769 /* LMInstantiator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0113A28180D6100609769 /* LMInstantiator.swift */; };
 		5BD0113D2818543900609769 /* KeyHandler_Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0113C2818543900609769 /* KeyHandler_Core.swift */; };
 		5BD05BCA27B2A43D004C4F1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
@@ -194,7 +202,6 @@
 		5B242402284B0D6500520FE4 /* ctlCandidateUniversal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlCandidateUniversal.swift; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
 		5B2F2BB3286216A500B8557B /* vChewingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vChewingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		5B2F2BB5286216A500B8557B /* vChewingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vChewingTests.swift; sourceTree = "<group>"; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
 		5B3133BE280B229700A4A505 /* KeyHandler_States.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_States.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B3A87BB28597CDB0090E163 /* LMSymbolNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMSymbolNode.swift; sourceTree = "<group>"; };
@@ -259,6 +266,10 @@
 		5BC0AAC927F58472002D33E9 /* pkgPreInstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = pkgPreInstall.sh; sourceTree = "<group>"; };
 		5BC0AACA27F58472002D33E9 /* pkgPostInstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = pkgPostInstall.sh; sourceTree = "<group>"; };
 		5BC2652127E04B7B00700291 /* uninstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; lineEnding = 0; path = uninstall.sh; sourceTree = "<group>"; };
+		5BC447A228656A1900EDC323 /* PrefManagerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrefManagerTests.swift; sourceTree = "<group>"; };
+		5BC447A328656A1900EDC323 /* KeyHandlerTestsSCPCCHT.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyHandlerTestsSCPCCHT.swift; sourceTree = "<group>"; };
+		5BC447A428656A1900EDC323 /* KeyHandlerTestsNormalCHS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyHandlerTestsNormalCHS.swift; sourceTree = "<group>"; };
+		5BC447A528656A1900EDC323 /* UpdateAPITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateAPITests.swift; sourceTree = "<group>"; };
 		5BD0113A28180D6100609769 /* LMInstantiator.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = LMInstantiator.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5BD0113C2818543900609769 /* KeyHandler_Core.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = KeyHandler_Core.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingPhraseEditor.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -390,7 +401,10 @@
 		5B2F2BB4286216A500B8557B /* vChewingTests */ = {
 			isa = PBXGroup;
 			children = (
-				5B2F2BB5286216A500B8557B /* vChewingTests.swift */,
+				5BC447A428656A1900EDC323 /* KeyHandlerTestsNormalCHS.swift */,
+				5BC447A328656A1900EDC323 /* KeyHandlerTestsSCPCCHT.swift */,
+				5BC447A228656A1900EDC323 /* PrefManagerTests.swift */,
+				5BC447A528656A1900EDC323 /* UpdateAPITests.swift */,
 			);
 			path = vChewingTests;
 			sourceTree = "<group>";
@@ -968,6 +982,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5BC4479D2865686500EDC323 /* data-chs.plist in Resources */,
+				5BC4479E2865686500EDC323 /* data-cht.plist in Resources */,
+				5BC4479F2865686500EDC323 /* data-cns.plist in Resources */,
+				5BC447A02865686500EDC323 /* data-symbols.plist in Resources */,
+				5BC447A12865686500EDC323 /* data-zhuyinwen.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1090,7 +1109,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B2F2BB6286216A500B8557B /* vChewingTests.swift in Sources */,
+				5BC447A628656A1900EDC323 /* PrefManagerTests.swift in Sources */,
+				5BC6E03C286692BE00291771 /* KeyHandlerTestsSCPCCHT.swift in Sources */,
+				5BC447A928656A1900EDC323 /* UpdateAPITests.swift in Sources */,
+				5BC447AE2865CFC200EDC323 /* KeyHandlerTestsNormalCHS.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
