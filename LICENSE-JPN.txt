@@ -13,3 +13,11 @@ macOS 版威注音の開発：Shiki Suen, Isaac Xen, Hiraku Wang, など。
 ロ）上記の通知要件を満たすために必要な場合を除き、コントリビューターの商号、商標、サービスマーク、または製品名を使用するための商標ライセンスは付与されていません。
 
 ソフトウェアは「現状のまま」で、明示であるか暗黙であるかを問わず、何らの保証もなく提供されます。ここでいう保証とは、商品性、特定の目的への適合性、および権利非侵害についての保証も含みますが、それに限定されるものではありません。 作者または著作権者は、契約行為、不法行為、またはそれ以外であろうと、ソフトウェアに起因または関連し、あるいはソフトウェアの使用またはその他の扱いによって生じる一切の請求、損害、その他の義務について何らの責任も負わないものとします。
+
+$ 他の用いたモジュール:
+
+- LineReader: (c) 2019 and onwards Robert Muckle-Jones (Apache 2.0 License).
+- OpenCC: (c) 2010 and onwards Jiabao Guo, codename "Byvoid" (Apache-2.0 license).
+- SwiftyOpenCC: (c) 2017 and onwards ddddxxx (MIT License).
+- SwiftUI Preferences UI Framework: (c) 2018 and onwards Sindre Sorhus (MIT License).
+- SwiftUI VDKComboBox: (c) 2022 and onwards Bryan Jones (CC BY-SA 4.0)
