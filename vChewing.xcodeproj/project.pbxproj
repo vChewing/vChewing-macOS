@@ -270,6 +270,7 @@
 		5BC447A328656A1900EDC323 /* KeyHandlerTestsSCPCCHT.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyHandlerTestsSCPCCHT.swift; sourceTree = "<group>"; };
 		5BC447A428656A1900EDC323 /* KeyHandlerTestsNormalCHS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyHandlerTestsNormalCHS.swift; sourceTree = "<group>"; };
 		5BC447A528656A1900EDC323 /* UpdateAPITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateAPITests.swift; sourceTree = "<group>"; };
+		5BC447AB2865BEF500EDC323 /* AUTHORS */ = {isa = PBXFileReference; lastKnownFileType = text; path = AUTHORS; sourceTree = "<group>"; };
 		5BD0113A28180D6100609769 /* LMInstantiator.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = LMInstantiator.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5BD0113C2818543900609769 /* KeyHandler_Core.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = KeyHandler_Core.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingPhraseEditor.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -387,6 +388,7 @@
 			isa = PBXGroup;
 			children = (
 				5BC2652127E04B7B00700291 /* uninstall.sh */,
+				5BC447AB2865BEF500EDC323 /* AUTHORS */,
 				5BE8A8C4281EE65300197741 /* CONTRIBUTING.md */,
 				5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */,
 				5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */,
