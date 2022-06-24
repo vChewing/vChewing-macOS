@@ -444,7 +444,7 @@ extension KeyHandler {
     if composer.hasToneMarker(withNothingElse: true) {
       composer.clear()
     } else if composer.isEmpty {
-      if compositorCursorIndex >= 0 {
+      if compositorCursorIndex > 0 {
         deleteCompositorReadingAtTheRearOfCursor()
         walk()
       } else {
