@@ -28,6 +28,25 @@ import Cocoa
 
 // 註：所有 InputState 型別均不適合使用 Struct，因為 Struct 無法相互繼承派生。
 
+// 用以讓每個狀態自描述的 enum。
+enum StateType {
+  case ofDeactivated
+  case ofAssociatedPhrases
+  case ofEmpty
+  case ofEmptyIgnorePreviousState
+  case ofCommitting
+  case ofNotEmpty
+  case ofInputting
+  case ofMarking
+  case ofChooseCandidate
+  case ofSymbolTable
+}
+
+// 所有 InputState 均遵守该协定：
+protocol InputStateProtocol {
+  var type: StateType { get }
+}
+
 /// 此型別用以呈現輸入法控制器（ctlInputMethod）的各種狀態。
 ///
 /// 從實際角度來看，輸入法屬於有限態械（Finite State Machine）。其藉由滑鼠/鍵盤
@@ -60,9 +79,10 @@ import Cocoa
 ///   詞音組合放入語彙濾除清單。
 /// - .ChoosingCandidate: 叫出選字窗、允許使用者選字。
 /// - .SymbolTable: 波浪鍵符號選單專用的狀態，有自身的特殊處理。
-class InputState {
+enum InputState {
   /// .Deactivated: 使用者沒在使用輸入法。
-  class Deactivated: InputState {
+  class Deactivated: InputStateProtocol {
+    public var type: StateType { .ofDeactivated }
     var description: String {
       "<InputState.Deactivated>"
     }
@@ -72,7 +92,9 @@ class InputState {
 
   /// .Empty: 使用者剛剛切換至該輸入法、卻還沒有任何輸入行為。
   /// 抑或是剛剛敲字遞交給客體應用、準備新的輸入行為。
-  class Empty: InputState {
+  class Empty: InputStateProtocol {
+    public var type: StateType { .ofEmpty }
+
     var composingBuffer: String {
       ""
     }
@@ -87,6 +109,7 @@ class InputState {
   /// .EmptyIgnorePreviousState: 與 Empty 類似，
   /// 但會扔掉上一個狀態的內容、不將這些內容遞交給客體應用。
   class EmptyIgnoringPreviousState: Empty {
+    override public var type: StateType { .ofEmptyIgnorePreviousState }
     override var description: String {
       "<InputState.EmptyIgnoringPreviousState>"
     }
@@ -95,7 +118,8 @@ class InputState {
   // MARK: -
 
   /// .Committing: 該狀態會承載要遞交出去的內容，讓輸入法控制器處理時代為遞交。
-  class Committing: InputState {
+  class Committing: InputStateProtocol {
+    public var type: StateType { .ofCommitting }
     private(set) var textToCommit: String = ""
 
     convenience init(textToCommit: String) {
@@ -112,13 +136,13 @@ class InputState {
 
   /// .AssociatedPhrases: 逐字選字模式內的聯想詞輸入狀態。
   /// 因為逐字選字模式不需要在組字區內存入任何東西，所以該狀態不受 .NotEmpty 的管轄。
-  class AssociatedPhrases: InputState {
+  class AssociatedPhrases: InputStateProtocol {
+    public var type: StateType { .ofAssociatedPhrases }
     private(set) var candidates: [String] = []
     private(set) var isTypingVertical: Bool = false
     init(candidates: [String], isTypingVertical: Bool) {
       self.candidates = candidates
       self.isTypingVertical = isTypingVertical
-      super.init()
     }
 
     var description: String {
@@ -134,7 +158,8 @@ class InputState {
   ///   還是將這個範圍的詞音組合放入語彙濾除清單。
   /// - .ChoosingCandidate: 叫出選字窗、允許使用者選字。
   /// - .SymbolTable: 波浪鍵符號選單專用的狀態，有自身的特殊處理。
-  class NotEmpty: InputState {
+  class NotEmpty: InputStateProtocol {
+    public var type: StateType { .ofNotEmpty }
     private(set) var composingBuffer: String
     private(set) var cursorIndex: Int = 0 { didSet { cursorIndex = max(cursorIndex, 0) } }
     public var composingBufferConverted: String {
@@ -149,7 +174,6 @@ class InputState {
 
     init(composingBuffer: String, cursorIndex: Int) {
       self.composingBuffer = composingBuffer
-      super.init()
       defer { self.cursorIndex = cursorIndex }
     }
 
@@ -175,6 +199,7 @@ class InputState {
 
   /// .Inputting: 使用者輸入了內容。此時會出現組字區（Compositor）。
   class Inputting: NotEmpty {
+    override public var type: StateType { .ofInputting }
     var textToCommit: String = ""
     var tooltip: String = ""
 
@@ -192,6 +217,7 @@ class InputState {
   /// .Marking: 使用者在組字區內標記某段範圍，可以決定是添入新詞、
   /// 還是將這個範圍的詞音組合放入語彙濾除清單。
   class Marking: NotEmpty {
+    override public var type: StateType { .ofMarking }
     private var allowedMarkRange: ClosedRange<Int> = mgrPrefs.minCandidateLength...mgrPrefs.maxCandidateLength
     private(set) var markerIndex: Int = 0 { didSet { markerIndex = max(markerIndex, 0) } }
     private(set) var markedRange: Range<Int>
@@ -358,6 +384,7 @@ class InputState {
 
   /// .ChoosingCandidate: 叫出選字窗、允許使用者選字。
   class ChoosingCandidate: NotEmpty {
+    override public var type: StateType { .ofChooseCandidate }
     private(set) var candidates: [String]
     private(set) var isTypingVertical: Bool
 
@@ -376,6 +403,7 @@ class InputState {
 
   /// .SymbolTable: 波浪鍵符號選單專用的狀態，有自身的特殊處理。
   class SymbolTable: ChoosingCandidate {
+    override public var type: StateType { .ofSymbolTable }
     var node: SymbolNode
 
     init(node: SymbolNode, isTypingVertical: Bool) {

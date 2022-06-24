@@ -51,6 +51,7 @@ public class ctlCandidate: NSWindowController {
     case horizontal
     case vertical
   }
+
   public var currentLayout: Layout = .horizontal
   public weak var delegate: ctlCandidateDelegate? {
     didSet {

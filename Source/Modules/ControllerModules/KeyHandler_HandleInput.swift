@@ -34,8 +34,8 @@ import Cocoa
 extension KeyHandler {
   func handle(
     input: InputSignal,
-    state: InputState,
-    stateCallback: @escaping (InputState) -> Void,
+    state: InputStateProtocol,
+    stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
     let charCode: UniChar = input.charCode

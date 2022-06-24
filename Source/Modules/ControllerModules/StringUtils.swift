@@ -46,7 +46,7 @@ extension String {
   /// in an NSString (or .utf16).
   public func charIndexLiteral(from utf16Index: Int) -> Int {
     var length = 0
-    for (i, character) in self.enumerated() {
+    for (i, character) in enumerated() {
       length += character.utf16.count
       if length > utf16Index {
         return (i)
@@ -65,8 +65,8 @@ extension String {
     return self[..<self.index(startIndex, offsetBy: fixedIndex)].utf16.count
   }
 
-  func utf16SubString(with r: Range<Int>) -> String {
-    let arr = Array(self.utf16)[r].map { $0 }
+  internal func utf16SubString(with r: Range<Int>) -> String {
+    let arr = Array(utf16)[r].map { $0 }
     return String(utf16CodeUnits: arr, count: arr.count)
   }
 }
