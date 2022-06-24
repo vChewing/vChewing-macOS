@@ -138,7 +138,7 @@ struct InputSignal: CustomStringConvertible {
 
   public init(
     inputText: String?, keyCode: UInt16, charCode: UInt16, flags: NSEvent.ModifierFlags,
-    isVerticalTyping: Bool, inputTextIgnoringModifiers: String? = nil
+    isVerticalTyping: Bool = false, inputTextIgnoringModifiers: String? = nil
   ) {
     self.inputText = AppleKeyboardConverter.cnvStringApple2ABC(inputText ?? "")
     self.inputTextIgnoringModifiers = AppleKeyboardConverter.cnvStringApple2ABC(
@@ -155,7 +155,7 @@ struct InputSignal: CustomStringConvertible {
     defineArrowKeys()
   }
 
-  public init(event: NSEvent, isVerticalTyping: Bool) {
+  public init(event: NSEvent, isVerticalTyping: Bool = false) {
     inputText = AppleKeyboardConverter.cnvStringApple2ABC(event.characters ?? "")
     inputTextIgnoringModifiers = AppleKeyboardConverter.cnvStringApple2ABC(
       event.charactersIgnoringModifiers ?? "")
