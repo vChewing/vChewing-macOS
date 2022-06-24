@@ -190,7 +190,7 @@ extension KeyHandler {
         errorCallback()
         composer.clear()
         // 根據「組字器是否為空」來判定回呼哪一種狀態。
-        stateCallback((compositorLength == 0) ? InputState.EmptyIgnoringPreviousState() : buildInputtingState)
+        stateCallback((compositor.isEmpty) ? InputState.EmptyIgnoringPreviousState() : buildInputtingState)
         return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了。
       }
 
