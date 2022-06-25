@@ -13,3 +13,11 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 2. No trademark license is granted to use the trade names, trademarks, service marks, or product names of Contributor, except as required to fulfill notice requirements above.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+$ 3rd-Party Modules Used:
+
+- LineReader: (c) 2019 and onwards Robert Muckle-Jones (Apache 2.0 License).
+- OpenCC: (c) 2010 and onwards Jiabao Guo, codename "Byvoid" (Apache-2.0 license).
+- SwiftyOpenCC: (c) 2017 and onwards ddddxxx (MIT License).
+- SwiftUI Preferences UI Framework: (c) 2018 and onwards Sindre Sorhus (MIT License).
+- SwiftUI VDKComboBox: (c) 2022 and onwards Bryan Jones (CC BY-SA 4.0)

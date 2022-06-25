@@ -29,15 +29,30 @@ import InputMethodKit
 
 let kConnectionName = "vChewing_1_Connection"
 
-if CommandLine.arguments.count > 1 {
-  if CommandLine.arguments[1] == "install" {
-    let exitCode = IME.registerInputMethod()
-    exit(exitCode)
-  }
-  if CommandLine.arguments[1] == "uninstall" {
-    let exitCode = IME.uninstall(isSudo: IME.isSudoMode)
-    exit(exitCode)
-  }
+switch max(CommandLine.arguments.count - 1, 0) {
+  case 0: break
+  case 1, 2:
+    do {
+      switch CommandLine.arguments[1] {
+        case "install":
+          do {
+            if CommandLine.arguments[1] == "install" {
+              let exitCode = IME.registerInputMethod()
+              exit(exitCode)
+            }
+          }
+        case "uninstall":
+          do {
+            if CommandLine.arguments[1] == "uninstall" {
+              let exitCode = IME.uninstall(isSudo: IME.isSudoMode)
+              exit(exitCode)
+            }
+          }
+        default: break
+      }
+    }
+    exit(0)
+  default: exit(0)
 }
 
 guard let mainNibName = Bundle.main.infoDictionary?["NSMainNibFile"] as? String else {

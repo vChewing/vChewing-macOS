@@ -131,7 +131,7 @@ extension vChewing {
       walkedAnchors: [Megrez.NodeAnchor], cursorIndex: Int, readingOnly: Bool = false
     ) -> String {
       let arrEndingPunctuation = ["，", "。", "！", "？", "」", "』", "”", "’"]
-      let whiteList = "你他妳她祢她它牠再在"
+      let whiteList = "你他妳她祢衪它牠再在"
       var arrNodes: [Megrez.NodeAnchor] = []
       var intLength = 0
       for theNodeAnchor in walkedAnchors {

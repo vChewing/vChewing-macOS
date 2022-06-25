@@ -443,3 +443,29 @@ extension Sequence {
       .map(\.element)
   }
 }
+
+extension NSApplication {
+  public static func shell(_ command: String) throws -> String {
+    let task = Process()
+    let pipe = Pipe()
+
+    task.standardOutput = pipe
+    task.standardError = pipe
+    task.arguments = ["-c", command]
+    if #available(macOS 10.13, *) {
+      task.executableURL = URL(fileURLWithPath: "/bin/zsh")
+    } else {
+      task.launchPath = "/bin/zsh"
+    }
+    task.standardInput = nil
+
+    if #available(macOS 10.13, *) {
+      try task.run()
+    }
+
+    let data = pipe.fileHandleForReading.readDataToEndOfFile()
+    let output = String(data: data, encoding: .utf8)!
+
+    return output
+  }
+}

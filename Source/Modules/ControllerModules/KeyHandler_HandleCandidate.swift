@@ -32,9 +32,9 @@ import Cocoa
 
 extension KeyHandler {
   func handleCandidate(
-    state: InputState,
+    state: InputStateProtocol,
     input: InputSignal,
-    stateCallback: @escaping (InputState) -> Void,
+    stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
     let inputText = input.inputText

@@ -13,3 +13,11 @@ vChewing macOS: MIT-NTL License 麻理（去商标）授权合约
 乙、敝授权合约不提供对「贡献者」之商品名称、商标、服务标志或产品名称之商标许可，除非用以满足履行上文所述义务之必要。
 
 因麻理软件程式之授权模式乃是无偿提供，是以在现行法律之架构下可以主张合理之免除担保责任。麻理软件之著作权人或任何之后续散布者，对于其所散布之麻理软件程式皆不负任何形式上实质上之担保责任，明示亦或隐喻、商业利用性亦或特定目之使用性，这些均不在保障之列。利用麻理软件程式之所有风险均由使用者自行担负。假如所使用之麻理程式发生缺陷性问题，使用者需自行担负修正、改正及必要之服务支出。麻理软件程式之著作权人不负任何形式上实质上之担保责任，无论任何一般之、特殊之、偶发之、因果关系式之损害，或是麻理软件程式之不适用性，均须由使用者自行负担。
+
+$ 在本专案内用到了下述第三方模组:
+
+- LineReader: (c) 2019 and onwards Robert Muckle-Jones (Apache 2.0 License).
+- OpenCC: (c) 2010 and onwards Jiabao Guo, codename "Byvoid" (Apache-2.0 license).
+- SwiftyOpenCC: (c) 2017 and onwards ddddxxx (MIT License).
+- SwiftUI Preferences UI Framework: (c) 2018 and onwards Sindre Sorhus (MIT License).
+- SwiftUI VDKComboBox: (c) 2022 and onwards Bryan Jones (CC BY-SA 4.0)

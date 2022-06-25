@@ -39,7 +39,7 @@ protocol KeyHandlerDelegate {
     _: KeyHandler, didSelectCandidateAt index: Int,
     ctlCandidate controller: ctlCandidate
   )
-  func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputState)
+  func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputStateProtocol)
     -> Bool
 }
 
@@ -264,7 +264,7 @@ class KeyHandler {
     }
     if mgrPrefs.fetchSuggestionsFromUserOverrideModel, !mgrPrefs.useSCPCTypingMode {
       let arrSuggestedUnigrams: [Megrez.Unigram] = fetchSuggestedCandidates().stableSort { $0.score > $1.score }
-      let arrSuggestedCandidates: [String] = arrSuggestedUnigrams.map { $0.keyValue.value }
+      let arrSuggestedCandidates: [String] = arrSuggestedUnigrams.map(\.keyValue.value)
       arrCandidates = arrSuggestedCandidates.filter { arrCandidates.contains($0) } + arrCandidates
       arrCandidates = arrCandidates.deduplicate
       arrCandidates = arrCandidates.stableSort { $0.count > $1.count }
@@ -276,7 +276,8 @@ class KeyHandler {
   func fetchSuggestedCandidates() -> [Megrez.Unigram] {
     currentUOM.suggest(
       walkedAnchors: walkedAnchors, cursorIndex: compositorCursorIndex,
-      timestamp: NSDate().timeIntervalSince1970)
+      timestamp: NSDate().timeIntervalSince1970
+    )
   }
 
   /// 向半衰引擎詢問可能的選字建議、且套用給組字器內的當前游標位置。

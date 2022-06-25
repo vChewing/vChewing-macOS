@@ -562,3 +562,49 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kUsingHotKeyHalfWidthASCII, defaultValue: true)
   static var usingHotKeyHalfWidthASCII: Bool
 }
+
+// MARK: Snapshot Extension
+
+var snapshot: [String: Any]?
+
+extension mgrPrefs {
+  static var allKeys: [String] {
+    [
+      UserDef.kIsDebugModeEnabled, UserDef.kMostRecentInputMode, UserDef.kUserDataFolderSpecified,
+      UserDef.kCheckUpdateAutomatically, UserDef.kMandarinParser, UserDef.kBasicKeyboardLayout,
+      UserDef.kShowPageButtonsInCandidateWindow, UserDef.kCandidateListTextSize, UserDef.kAppleLanguages,
+      UserDef.kShouldAutoReloadUserDataFiles, UserDef.kuseRearCursorMode, UserDef.kUseHorizontalCandidateList,
+      UserDef.kComposingBufferSize, UserDef.kChooseCandidateUsingSpace, UserDef.kCNS11643Enabled,
+      UserDef.kSymbolInputEnabled, UserDef.kChineseConversionEnabled, UserDef.kShiftJISShinjitaiOutputEnabled,
+      UserDef.kHalfWidthPunctuationEnabled, UserDef.kMoveCursorAfterSelectingCandidate, UserDef.kEscToCleanInputBuffer,
+      UserDef.kSpecifyShiftTabKeyBehavior, UserDef.kSpecifyShiftSpaceKeyBehavior,
+      UserDef.kAllowBoostingSingleKanjiAsUserPhrase, UserDef.kUseSCPCTypingMode, UserDef.kMaxCandidateLength,
+      UserDef.kShouldNotFartInLieuOfBeep, UserDef.kShowHanyuPinyinInCompositionBuffer,
+      UserDef.kInlineDumpPinyinInLieuOfZhuyin, UserDef.kFetchSuggestionsFromUserOverrideModel,
+      UserDef.kCandidateTextFontName, UserDef.kCandidateKeyLabelFontName, UserDef.kCandidateKeys,
+      UserDef.kAssociatedPhrasesEnabled, UserDef.kPhraseReplacementEnabled, UserDef.kUsingHotKeySCPC,
+      UserDef.kUsingHotKeyAssociates, UserDef.kUsingHotKeyCNS, UserDef.kUsingHotKeyKangXi, UserDef.kUsingHotKeyJIS,
+      UserDef.kUsingHotKeyHalfWidthASCII,
+    ]
+  }
+
+  func reset() {
+    mgrPrefs.allKeys.forEach {
+      UserDefaults.standard.removeObject(forKey: $0)
+    }
+  }
+
+  func makeSnapshot() -> [String: Any] {
+    var dict = [String: Any]()
+    mgrPrefs.allKeys.forEach {
+      dict[$0] = UserDefaults.standard.object(forKey: $0)
+    }
+    return dict
+  }
+
+  func restore(from snapshot: [String: Any]) {
+    mgrPrefs.allKeys.forEach {
+      UserDefaults.standard.set(snapshot[$0], forKey: $0)
+    }
+  }
+}

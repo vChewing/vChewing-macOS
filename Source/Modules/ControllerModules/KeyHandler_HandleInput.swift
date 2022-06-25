@@ -34,8 +34,8 @@ import Cocoa
 extension KeyHandler {
   func handle(
     input: InputSignal,
-    state: InputState,
-    stateCallback: @escaping (InputState) -> Void,
+    state: InputStateProtocol,
+    stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
     let charCode: UniChar = input.charCode
@@ -48,6 +48,12 @@ extension KeyHandler {
 
     // 提前過濾掉一些不合規的按鍵訊號輸入，免得相關按鍵訊號被送給 Megrez 引發輸入法崩潰。
     if input.isInvalidInput {
+      // 在「.Empty(IgnoringPreviousState) 與 .Deactivated」狀態下的首次不合規按鍵輸入可以直接放行。
+      if state is InputState.Empty || state is InputState.Deactivated
+        || state is InputState.EmptyIgnoringPreviousState
+      {
+        return false
+      }
       IME.prtDebugIntel("550BCF7B: KeyHandler just refused an invalid input.")
       errorCallback()
       stateCallback(state)
@@ -184,7 +190,7 @@ extension KeyHandler {
         errorCallback()
         composer.clear()
         // 根據「組字器是否為空」來判定回呼哪一種狀態。
-        stateCallback((compositorLength == 0) ? InputState.EmptyIgnoringPreviousState() : buildInputtingState)
+        stateCallback((compositor.isEmpty) ? InputState.EmptyIgnoringPreviousState() : buildInputtingState)
         return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了。
       }
 

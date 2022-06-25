@@ -54,7 +54,7 @@ class ctlInputMethod: IMKInputController {
   /// 按鍵調度模組的副本。
   private var keyHandler: KeyHandler = .init()
   /// 用以記錄當前輸入法狀態的變數。
-  private var state: InputState = .Empty()
+  private var state: InputStateProtocol = InputState.Empty()
 
   // MARK: - 工具函式
 
@@ -107,7 +107,7 @@ class ctlInputMethod: IMKInputController {
     if client().bundleIdentifier() != Bundle.main.bundleIdentifier {
       // 強制重設當前鍵盤佈局、使其與偏好設定同步。
       setKeyLayout()
-      handle(state: .Empty())
+      handle(state: InputState.Empty())
     }  // 除此之外就不要動了，免得在點開輸入法自身的視窗時卡死。
     (NSApp.delegate as? AppDelegate)?.checkForUpdate()
   }
@@ -117,8 +117,8 @@ class ctlInputMethod: IMKInputController {
   override func deactivateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     keyHandler.clear()
-    handle(state: .Empty())
-    handle(state: .Deactivated())
+    handle(state: InputState.Empty())
+    handle(state: InputState.Deactivated())
   }
 
   /// 切換至某一個輸入法的某個副本時（比如威注音的簡體輸入法副本與繁體輸入法副本），會觸發該函式。
@@ -149,7 +149,7 @@ class ctlInputMethod: IMKInputController {
       if client().bundleIdentifier() != Bundle.main.bundleIdentifier {
         // 強制重設當前鍵盤佈局、使其與偏好設定同步。這裡的這一步也不能省略。
         setKeyLayout()
-        handle(state: .Empty())
+        handle(state: InputState.Empty())
       }  // 除此之外就不要動了，免得在點開輸入法自身的視窗時卡死。
     }
 
@@ -245,7 +245,7 @@ extension ctlInputMethod {
   /// 先將舊狀態單獨記錄起來，再將新舊狀態作為參數，
   /// 根據新狀態本身的狀態種類來判斷交給哪一個專門的函式來處理。
   /// - Parameter newState: 新狀態。
-  private func handle(state newState: InputState) {
+  private func handle(state newState: InputStateProtocol) {
     let prevState = state
     state = newState
 
@@ -341,7 +341,7 @@ extension ctlInputMethod {
     )
   }
 
-  private func handle(state: InputState.Deactivated, previous: InputState) {
+  private func handle(state: InputState.Deactivated, previous: InputStateProtocol) {
     _ = state  // 防止格式整理工具毀掉與此對應的參數。
     ctlCandidateCurrent.delegate = nil
     ctlCandidateCurrent.visible = false
@@ -352,7 +352,7 @@ extension ctlInputMethod {
     clearInlineDisplay()
   }
 
-  private func handle(state: InputState.Empty, previous: InputState) {
+  private func handle(state: InputState.Empty, previous: InputStateProtocol) {
     _ = state  // 防止格式整理工具毀掉與此對應的參數。
     ctlCandidateCurrent.visible = false
     hideTooltip()
@@ -365,7 +365,7 @@ extension ctlInputMethod {
   }
 
   private func handle(
-    state: InputState.EmptyIgnoringPreviousState, previous: InputState
+    state: InputState.EmptyIgnoringPreviousState, previous: InputStateProtocol
   ) {
     _ = state  // 防止格式整理工具毀掉與此對應的參數。
     _ = previous  // 防止格式整理工具毀掉與此對應的參數。
@@ -374,7 +374,7 @@ extension ctlInputMethod {
     clearInlineDisplay()
   }
 
-  private func handle(state: InputState.Committing, previous: InputState) {
+  private func handle(state: InputState.Committing, previous: InputStateProtocol) {
     _ = previous  // 防止格式整理工具毀掉與此對應的參數。
     ctlCandidateCurrent.visible = false
     hideTooltip()
@@ -385,7 +385,7 @@ extension ctlInputMethod {
     clearInlineDisplay()
   }
 
-  private func handle(state: InputState.Inputting, previous: InputState) {
+  private func handle(state: InputState.Inputting, previous: InputStateProtocol) {
     _ = previous  // 防止格式整理工具毀掉與此對應的參數。
     ctlCandidateCurrent.visible = false
     hideTooltip()
@@ -402,7 +402,7 @@ extension ctlInputMethod {
     }
   }
 
-  private func handle(state: InputState.Marking, previous: InputState) {
+  private func handle(state: InputState.Marking, previous: InputStateProtocol) {
     _ = previous  // 防止格式整理工具毀掉與此對應的參數。
     ctlCandidateCurrent.visible = false
     setInlineDisplayWithCursor()
@@ -416,21 +416,21 @@ extension ctlInputMethod {
     }
   }
 
-  private func handle(state: InputState.ChoosingCandidate, previous: InputState) {
+  private func handle(state: InputState.ChoosingCandidate, previous: InputStateProtocol) {
     _ = previous  // 防止格式整理工具毀掉與此對應的參數。
     hideTooltip()
     setInlineDisplayWithCursor()
     show(candidateWindowWith: state)
   }
 
-  private func handle(state: InputState.SymbolTable, previous: InputState) {
+  private func handle(state: InputState.SymbolTable, previous: InputStateProtocol) {
     _ = previous  // 防止格式整理工具毀掉與此對應的參數。
     hideTooltip()
     setInlineDisplayWithCursor()
     show(candidateWindowWith: state)
   }
 
-  private func handle(state: InputState.AssociatedPhrases, previous: InputState) {
+  private func handle(state: InputState.AssociatedPhrases, previous: InputStateProtocol) {
     _ = previous  // 防止格式整理工具毀掉與此對應的參數。
     hideTooltip()
     clearInlineDisplay()
@@ -441,7 +441,7 @@ extension ctlInputMethod {
 // MARK: -
 
 extension ctlInputMethod {
-  private func show(candidateWindowWith state: InputState) {
+  private func show(candidateWindowWith state: InputStateProtocol) {
     var isTypingVertical: Bool {
       if let state = state as? InputState.ChoosingCandidate {
         return state.isTypingVertical
@@ -595,7 +595,7 @@ extension ctlInputMethod: KeyHandlerDelegate {
     ctlCandidate(controller, didSelectCandidateAtIndex: index)
   }
 
-  func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputState)
+  func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputStateProtocol)
     -> Bool
   {
     guard let state = state as? InputState.Marking else {
@@ -656,13 +656,13 @@ extension ctlInputMethod: ctlCandidateDelegate {
       let node = state.node.children?[index]
     {
       if let children = node.children, !children.isEmpty {
-        handle(state: .Empty())  // 防止縱橫排選字窗同時出現
+        handle(state: InputState.Empty())  // 防止縱橫排選字窗同時出現
         handle(
-          state: .SymbolTable(node: node, isTypingVertical: state.isTypingVertical)
+          state: InputState.SymbolTable(node: node, isTypingVertical: state.isTypingVertical)
         )
       } else {
-        handle(state: .Committing(textToCommit: node.title))
-        handle(state: .Empty())
+        handle(state: InputState.Committing(textToCommit: node.title))
+        handle(state: InputState.Empty())
       }
       return
     }
@@ -676,7 +676,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
       if mgrPrefs.useSCPCTypingMode {
         keyHandler.clear()
         let composingBuffer = inputting.composingBuffer
-        handle(state: .Committing(textToCommit: composingBuffer))
+        handle(state: InputState.Committing(textToCommit: composingBuffer))
         if mgrPrefs.associatedPhrasesEnabled,
           let associatePhrases = keyHandler.buildAssociatePhraseState(
             withKey: composingBuffer, isTypingVertical: state.isTypingVertical
@@ -684,7 +684,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
         {
           handle(state: associatePhrases)
         } else {
-          handle(state: .Empty())
+          handle(state: InputState.Empty())
         }
       } else {
         handle(state: inputting)
@@ -694,7 +694,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
 
     if let state = state as? InputState.AssociatedPhrases {
       let selectedValue = state.candidates[index]
-      handle(state: .Committing(textToCommit: selectedValue))
+      handle(state: InputState.Committing(textToCommit: selectedValue))
       if mgrPrefs.associatedPhrasesEnabled,
         let associatePhrases = keyHandler.buildAssociatePhraseState(
           withKey: selectedValue, isTypingVertical: state.isTypingVertical
@@ -702,7 +702,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
       {
         handle(state: associatePhrases)
       } else {
-        handle(state: .Empty())
+        handle(state: InputState.Empty())
       }
     }
   }
