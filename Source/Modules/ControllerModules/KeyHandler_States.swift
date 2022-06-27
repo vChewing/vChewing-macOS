@@ -169,7 +169,7 @@ extension KeyHandler {
     InputState.ChoosingCandidate(
       composingBuffer: currentState.composingBuffer,
       cursorIndex: currentState.cursorIndex,
-      candidates: candidatesArray,
+      candidates: candidatesArray(fixOrder: mgrPrefs.useFixecCandidateOrderOnSelection),
       isTypingVertical: isTypingVertical
     )
   }
@@ -772,8 +772,7 @@ extension KeyHandler {
       return true
     }
 
-    // 此處僅借用該函式生成結果內的某個物件，不用糾結「是否縱排輸入」。
-    let candidates = candidatesArray
+    let candidates = candidatesArray(fixOrder: true)
     guard !candidates.isEmpty else {
       IME.prtDebugIntel("3378A6DF")
       errorCallback()

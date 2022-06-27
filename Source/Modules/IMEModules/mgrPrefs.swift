@@ -57,6 +57,7 @@ struct UserDef {
   static let kShowHanyuPinyinInCompositionBuffer = "ShowHanyuPinyinInCompositionBuffer"
   static let kInlineDumpPinyinInLieuOfZhuyin = "InlineDumpPinyinInLieuOfZhuyin"
   static let kFetchSuggestionsFromUserOverrideModel = "FetchSuggestionsFromUserOverrideModel"
+  static let kUseFixecCandidateOrderOnSelection = "UseFixecCandidateOrderOnSelection"
 
   static let kCandidateTextFontName = "CandidateTextFontName"
   static let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
@@ -274,6 +275,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.fetchSuggestionsFromUserOverrideModel, forKey: UserDef.kFetchSuggestionsFromUserOverrideModel
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.useFixecCandidateOrderOnSelection, forKey: UserDef.kUseFixecCandidateOrderOnSelection
+    )
 
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeySCPC, forKey: UserDef.kUsingHotKeySCPC)
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyAssociates, forKey: UserDef.kUsingHotKeyAssociates)
@@ -350,6 +354,9 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kFetchSuggestionsFromUserOverrideModel, defaultValue: true)
   static var fetchSuggestionsFromUserOverrideModel: Bool
+
+  @UserDefault(key: UserDef.kUseFixecCandidateOrderOnSelection, defaultValue: false)
+  static var useFixecCandidateOrderOnSelection: Bool
 
   static var minCandidateLength: Int {
     mgrPrefs.allowBoostingSingleKanjiAsUserPhrase ? 1 : 2
@@ -584,7 +591,7 @@ extension mgrPrefs {
       UserDef.kCandidateTextFontName, UserDef.kCandidateKeyLabelFontName, UserDef.kCandidateKeys,
       UserDef.kAssociatedPhrasesEnabled, UserDef.kPhraseReplacementEnabled, UserDef.kUsingHotKeySCPC,
       UserDef.kUsingHotKeyAssociates, UserDef.kUsingHotKeyCNS, UserDef.kUsingHotKeyKangXi, UserDef.kUsingHotKeyJIS,
-      UserDef.kUsingHotKeyHalfWidthASCII,
+      UserDef.kUsingHotKeyHalfWidthASCII, UserDef.kUseFixecCandidateOrderOnSelection,
     ]
   }
 

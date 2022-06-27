@@ -42,6 +42,7 @@
 "cf2-se-PDO.title" = "辞典＆語言模型";
 "chkAllowBoostingSingleKanjiAsUserPhrase.title" = "将可以就地升权/排除的候选字词的最短词长设为单个汉字";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "在敲字时自动套用来自半衰记忆模组的建议";
+"chkUseFixecCandidateOrderOnSelection.title" = "以固定顺序来陈列选字窗内的候选字";
 "dIN-TZ-67g.title" = "Shift+Space 换下一页，Space 换选下一个候选字。";
 "E1l-m8-xgb.title" = "进阶设定";
 "eia-1F-Do0.title" = "自动将繁体中文字转换为日本简化字（JIS 新字体）";

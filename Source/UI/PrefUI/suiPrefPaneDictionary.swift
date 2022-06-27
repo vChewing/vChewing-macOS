@@ -39,6 +39,8 @@ struct suiPrefPaneDictionary: View {
     forKey: UserDef.kAllowBoostingSingleKanjiAsUserPhrase)
   @State private var selFetchSuggestionsFromUserOverrideModel: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kFetchSuggestionsFromUserOverrideModel)
+  @State private var selUseFixecCandidateOrderOnSelection: Bool = UserDefaults.standard.bool(
+    forKey: UserDef.kUseFixecCandidateOrderOnSelection)
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -146,6 +148,13 @@ struct suiPrefPaneDictionary: View {
         )
         .onChange(of: selFetchSuggestionsFromUserOverrideModel) { value in
           mgrPrefs.fetchSuggestionsFromUserOverrideModel = value
+        }
+        Toggle(
+          LocalizedStringKey("Always use fixed listing order in candidate window"),
+          isOn: $selUseFixecCandidateOrderOnSelection
+        )
+        .onChange(of: selUseFixecCandidateOrderOnSelection) { value in
+          mgrPrefs.useFixecCandidateOrderOnSelection = value
         }
       }
     }

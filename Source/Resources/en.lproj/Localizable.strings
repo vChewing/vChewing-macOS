@@ -84,6 +84,7 @@
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)Space:";
 "Allow boosting / excluding a candidate of single kanji" = "Allow boosting / excluding a candidate of single kanji";
+"Always use fixed listing order in candidate window" = "Always use fixed listing order in candidate window";
 "An accomodation for elder computer users." = "An accomodation for elder computer users.";
 "Apple ABC (equivalent to English US)" = "Apple ABC (equivalent to English US)";
 "Apple Chewing - Dachen" = "Apple Chewing - Dachen";
