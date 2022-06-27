@@ -238,7 +238,7 @@ class KeyHandler {
   }
 
   /// 獲取候選字詞陣列資料內容。
-  var candidatesArray: [String] {
+  func candidatesArray(fixOrder: Bool = true) -> [String] {
     var arrNodes: [Megrez.NodeAnchor] = rawNodes
     var arrCandidates: [String] = []
 
@@ -262,7 +262,7 @@ class KeyHandler {
         }
       }
     }
-    if mgrPrefs.fetchSuggestionsFromUserOverrideModel, !mgrPrefs.useSCPCTypingMode {
+    if mgrPrefs.fetchSuggestionsFromUserOverrideModel, !mgrPrefs.useSCPCTypingMode, !fixOrder {
       let arrSuggestedUnigrams: [Megrez.Unigram] = fetchSuggestedCandidates().stableSort { $0.score > $1.score }
       let arrSuggestedCandidates: [String] = arrSuggestedUnigrams.map(\.keyValue.value)
       arrCandidates = arrSuggestedCandidates.filter { arrCandidates.contains($0) } + arrCandidates
