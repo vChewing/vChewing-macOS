@@ -169,7 +169,7 @@ extension KeyHandler {
     InputState.ChoosingCandidate(
       composingBuffer: currentState.composingBuffer,
       cursorIndex: currentState.cursorIndex,
-      candidates: candidatesArray(fixOrder: false),
+      candidates: candidatesArray(fixOrder: mgrPrefs.useFixecCandidateOrderOnSelection),
       isTypingVertical: isTypingVertical
     )
   }
