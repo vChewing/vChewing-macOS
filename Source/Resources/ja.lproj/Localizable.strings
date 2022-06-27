@@ -84,6 +84,7 @@
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)Space:";
 "Allow boosting / excluding a candidate of single kanji" = "即排除/即最優先にできる候補の文字数の最低限は１字とする";
+"Always use fixed listing order in candidate window" = "候補文字を固定順番で陳列する";
 "An accomodation for elder computer users." = "年配なるユーザーのために提供した機能である。";
 "Apple ABC (equivalent to English US)" = "Apple ABC (Apple U.S. キーボードと同じ)";
 "Apple Chewing - Dachen" = "Apple 大千注音キーボード";
