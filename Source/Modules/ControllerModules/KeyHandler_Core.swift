@@ -249,13 +249,12 @@ class KeyHandler {
 
     // 將節錨內的候選字詞資料拓印到輸出陣列內。
     for currentNodeAnchor in arrAnchors {
-      if let currentNode = currentNodeAnchor.node {
-        for currentCandidate in currentNode.candidates {
-          // 選字窗的內容的康熙轉換 / JIS 轉換不能放在這裡處理，會影響選字有效性。
-          // 選字的原理是拿著具體的候選字詞的字串去當前的節錨下找出對應的候選字詞（Ｘ元圖）。
-          // 一旦在這裡轉換了，節錨內的某些元圖就無法被選中。
-          arrCandidates.append(currentCandidate.value)
-        }
+      guard let currentNode = currentNodeAnchor.node else { continue }
+      for currentCandidate in currentNode.candidates {
+        // 選字窗的內容的康熙轉換 / JIS 轉換不能放在這裡處理，會影響選字有效性。
+        // 選字的原理是拿著具體的候選字詞的字串去當前的節錨下找出對應的候選字詞（Ｘ元圖）。
+        // 一旦在這裡轉換了，節錨內的某些元圖就無法被選中。
+        arrCandidates.append(currentCandidate.value)
       }
     }
     // 決定是否根據半衰記憶模組的建議來調整候選字詞的順序。
