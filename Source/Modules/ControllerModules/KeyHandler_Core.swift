@@ -205,9 +205,9 @@ class KeyHandler {
     /// 若偏好設定內啟用了相關選項，則會在選字之後始終將游標推送至選字厚的節錨的前方。
     if mgrPrefs.moveCursorAfterSelectingCandidate, respectCursorPushing {
       var nextPosition = 0
-      for node in walkedAnchors {
+      for theAnchor in walkedAnchors {
         if nextPosition >= cursorIndex { break }
-        nextPosition += node.spanningLength
+        nextPosition += theAnchor.spanningLength
       }
       if nextPosition <= compositorLength {
         compositorCursorIndex = nextPosition
