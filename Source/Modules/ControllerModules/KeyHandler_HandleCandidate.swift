@@ -302,12 +302,8 @@ extension KeyHandler {
     }
 
     var index: Int = NSNotFound
-    var match: String!
-    if state is InputState.AssociatedPhrases {
-      match = input.inputTextIgnoringModifiers
-    } else {
-      match = inputText
-    }
+    let match: String =
+      (state is InputState.AssociatedPhrases) ? input.inputTextIgnoringModifiers ?? "" : inputText ?? ""
 
     var j = 0
     while j < ctlCandidateCurrent.keyLabels.count {
