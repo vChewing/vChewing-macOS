@@ -244,11 +244,10 @@ class KeyHandler {
     /// 這個過程不會傷到子陣列內部的排序。
     if arrAnchors.isEmpty { return arrCandidates }
 
-    // sort the nodes, so that longer nodes (representing longer phrases)
-    // are placed at the top of the candidate list
+    // 讓更長的節錨排序靠前。
     arrAnchors = arrAnchors.stableSort { $0.keyLength > $1.keyLength }
 
-    // then use the Swift trick to retrieve the candidates for each node at/crossing the cursor
+    // 將節錨內的候選字詞資料拓印到輸出陣列內。
     for currentNodeAnchor in arrAnchors {
       if let currentNode = currentNodeAnchor.node {
         for currentCandidate in currentNode.candidates {
@@ -259,6 +258,7 @@ class KeyHandler {
         }
       }
     }
+    // 決定是否根據半衰記憶模組的建議來調整候選字詞的順序。
     if mgrPrefs.fetchSuggestionsFromUserOverrideModel, !mgrPrefs.useSCPCTypingMode, !fixOrder {
       let arrSuggestedUnigrams: [Megrez.Unigram] = fetchSuggestedCandidates().stableSort { $0.score > $1.score }
       let arrSuggestedCandidates: [String] = arrSuggestedUnigrams.map(\.keyValue.value)
