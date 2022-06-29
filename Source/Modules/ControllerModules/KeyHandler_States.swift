@@ -44,8 +44,8 @@ extension KeyHandler {
     /// IMK 協定的內文組字區的游標長度與游標位置無法正確統計 UTF8 高萬字（比如 emoji）的長度，
     /// 所以在這裡必須做糾偏處理。因為在用 Swift，所以可以用「.utf16」取代「NSString.length()」。
     /// 這樣就可以免除不必要的類型轉換。
-    for walkedNode in walkedAnchors {
-      if let theNode = walkedNode.node {
+    for theAnchor in walkedAnchors {
+      if let theNode = theAnchor.node {
         let strNodeValue = theNode.currentKeyValue.value
         composingBuffer += strNodeValue
         let arrSplit: [String] = Array(strNodeValue).map { String($0) }
@@ -53,7 +53,7 @@ extension KeyHandler {
         /// 藉下述步驟重新將「可見游標位置」對齊至「組字器內的游標所在的讀音位置」。
         /// 每個節錨（NodeAnchor）都有自身的幅位長度（spanningLength），可以用來
         /// 累加、以此為依據，來校正「可見游標位置」。
-        let spanningLength: Int = walkedNode.spanningLength
+        let spanningLength: Int = theAnchor.spanningLength
         if readingCursorIndex + spanningLength <= compositorCursorIndex {
           composedStringCursorIndex += strNodeValue.utf16.count
           readingCursorIndex += spanningLength

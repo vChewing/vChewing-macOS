@@ -236,20 +236,20 @@ class KeyHandler {
 
   /// 獲取候選字詞陣列資料內容。
   func candidatesArray(fixOrder: Bool = true) -> [String] {
-    var arrNodes: [Megrez.NodeAnchor] = rawNodes
+    var arrAnchors: [Megrez.NodeAnchor] = rawAnchorsOfNodes
     var arrCandidates: [String] = []
 
     /// 原理：nodes 這個回饋結果包含一堆子陣列，分別對應不同詞長的候選字。
     /// 這裡先對陣列排序、讓最長候選字的子陣列的優先權最高。
     /// 這個過程不會傷到子陣列內部的排序。
-    if arrNodes.isEmpty { return arrCandidates }
+    if arrAnchors.isEmpty { return arrCandidates }
 
     // sort the nodes, so that longer nodes (representing longer phrases)
     // are placed at the top of the candidate list
-    arrNodes = arrNodes.stableSort { $0.keyLength > $1.keyLength }
+    arrAnchors = arrAnchors.stableSort { $0.keyLength > $1.keyLength }
 
     // then use the Swift trick to retrieve the candidates for each node at/crossing the cursor
-    for currentNodeAnchor in arrNodes {
+    for currentNodeAnchor in arrAnchors {
       if let currentNode = currentNodeAnchor.node {
         for currentCandidate in currentNode.candidates {
           // 選字窗的內容的康熙轉換 / JIS 轉換不能放在這裡處理，會影響選字有效性。
@@ -293,7 +293,7 @@ class KeyHandler {
       compositor.grid.overrideNodeScoreForSelectedCandidate(
         location: min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength),
         value: overrideValue,
-        overridingScore: findHighestScore(nodes: rawNodes, epsilon: kEpsilon)
+        overridingScore: findHighestScore(nodes: rawAnchorsOfNodes, epsilon: kEpsilon)
       )
     } else {
       IME.prtDebugIntel("UOM: Blank suggestion retrieved, dismissing.")
@@ -402,7 +402,7 @@ class KeyHandler {
   var isCompositorEmpty: Bool { compositor.isEmpty }
 
   /// 獲取原始節錨資料陣列。
-  var rawNodes: [Megrez.NodeAnchor] {
+  var rawAnchorsOfNodes: [Megrez.NodeAnchor] {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
     mgrPrefs.useRearCursorMode
