@@ -66,7 +66,7 @@ class KeyHandler {
     willSet {
       // 這個標籤在下文會用到。
       let isCHS: Bool = (newValue == InputMode.imeModeCHS)
-      /// 將新的簡繁輸入模式提報給 ctlInputMethod 與 IME 模組。
+      /// 將新的簡繁輸入模式提報給 Prefs 與 IME 模組。
       IME.currentInputMode = newValue
       mgrPrefs.mostRecentInputMode = IME.currentInputMode.rawValue
       /// 重設所有語言模組。這裡不需要做按需重設，因為對運算量沒有影響。
@@ -176,8 +176,8 @@ class KeyHandler {
     )
     // 不要針對逐字選字模式啟用臨時半衰記憶模型。
     if !mgrPrefs.useSCPCTypingMode {
-      // 所有讀音數與字符數不匹配的情況均不得塞入半衰記憶模組。
       var addToUserOverrideModel = true
+      // 所有讀音數與字符數不匹配的情況均不得塞入半衰記憶模組。
       if selectedNode.spanningLength != value.count {
         IME.prtDebugIntel("UOM: SpanningLength != value.count, dismissing.")
         addToUserOverrideModel = false

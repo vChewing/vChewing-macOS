@@ -32,6 +32,13 @@ import Cocoa
 // MARK: - § 根據狀態調度按鍵輸入 (Handle Input with States)
 
 extension KeyHandler {
+  /// 對於輸入訊號的第一關處理均藉由此函式來進行。
+  /// - Parameters:
+  ///   - input: 輸入訊號。
+  ///   - state: 給定狀態（通常為當前狀態）。
+  ///   - stateCallback: 狀態回呼，交給對應的型別內的專有函數來處理。
+  ///   - errorCallback: 錯誤回呼。
+  /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handle(
     input: InputSignal,
     state: InputStateProtocol,
@@ -78,7 +85,7 @@ extension KeyHandler {
     {
       // 略過對 BackSpace 的處理。
     } else if input.isCapsLockOn {
-      // 但願能夠處理這種情況下所有可能的案件組合。
+      // 但願能夠處理這種情況下所有可能的按鍵組合。
       clear()
       stateCallback(InputState.Empty())
 
@@ -256,9 +263,7 @@ extension KeyHandler {
       return true
     }
 
-    // MARK: Calling candidate window using Up / Down or PageUp / PageDn.
-
-    // 用上下左右鍵呼叫選字窗。
+    // MARK: 用上下左右鍵呼叫選字窗 (Calling candidate window using Up / Down or PageUp / PageDn.)
 
     if let currentState = state as? InputState.NotEmpty, composer.isEmpty,
       input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
@@ -394,7 +399,7 @@ extension KeyHandler {
             inputting.textToCommit = textToCommit
             stateCallback(inputting)
             stateCallback(buildCandidate(state: inputting, isTypingVertical: input.isTypingVertical))
-          } else {  // If there is still unfinished bpmf reading, ignore the punctuation
+          } else {  // 不要在注音沒敲完整的情況下叫出統合符號選單。
             IME.prtDebugIntel("17446655")
             errorCallback()
           }
