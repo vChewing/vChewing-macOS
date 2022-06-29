@@ -35,7 +35,7 @@ extension KeyHandler {
   /// - Parameters:
   ///   - input: 輸入訊號。
   ///   - state: 給定狀態（通常為當前狀態）。
-  ///   - stateCallback: 狀態回呼，交給對應的型別內的專有函數來處理。
+  ///   - stateCallback: 狀態回呼，交給對應的型別內的專有函式來處理。
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleCandidate(
