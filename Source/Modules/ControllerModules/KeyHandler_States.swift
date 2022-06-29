@@ -113,9 +113,8 @@ extension KeyHandler {
     let composedText = head + reading + tail
     let cursorIndex = composedStringCursorIndex + reading.utf16.count
 
-    var cleanedComposition = ""
-
     // 防止組字區內出現不可列印的字元。
+    var cleanedComposition = ""
     for theChar in composedText {
       if let charCode = theChar.utf16.first {
         if !(theChar.isASCII && !(charCode.isPrintable())) {
