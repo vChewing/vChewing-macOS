@@ -42,7 +42,7 @@ enum StateType {
   case ofSymbolTable
 }
 
-// 所有 InputState 均遵守该协定：
+// 所有 InputState 均遵守該協定：
 protocol InputStateProtocol {
   var type: StateType { get }
 }
