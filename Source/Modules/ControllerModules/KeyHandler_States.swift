@@ -45,47 +45,46 @@ extension KeyHandler {
     /// 所以在這裡必須做糾偏處理。因為在用 Swift，所以可以用「.utf16」取代「NSString.length()」。
     /// 這樣就可以免除不必要的類型轉換。
     for theAnchor in walkedAnchors {
-      if let theNode = theAnchor.node {
-        let strNodeValue = theNode.currentKeyValue.value
-        composingBuffer += strNodeValue
-        let arrSplit: [String] = Array(strNodeValue).map { String($0) }
-        let codepointCount = arrSplit.count
-        /// 藉下述步驟重新將「可見游標位置」對齊至「組字器內的游標所在的讀音位置」。
-        /// 每個節錨（NodeAnchor）都有自身的幅位長度（spanningLength），可以用來
-        /// 累加、以此為依據，來校正「可見游標位置」。
-        let spanningLength: Int = theAnchor.spanningLength
-        if readingCursorIndex + spanningLength <= compositorCursorIndex {
-          composedStringCursorIndex += strNodeValue.utf16.count
-          readingCursorIndex += spanningLength
+      guard let theNode = theAnchor.node else { continue }
+      let strNodeValue = theNode.currentKeyValue.value
+      composingBuffer += strNodeValue
+      let arrSplit: [String] = Array(strNodeValue).map { String($0) }
+      let codepointCount = arrSplit.count
+      /// 藉下述步驟重新將「可見游標位置」對齊至「組字器內的游標所在的讀音位置」。
+      /// 每個節錨（NodeAnchor）都有自身的幅位長度（spanningLength），可以用來
+      /// 累加、以此為依據，來校正「可見游標位置」。
+      let spanningLength: Int = theAnchor.spanningLength
+      if readingCursorIndex + spanningLength <= compositorCursorIndex {
+        composedStringCursorIndex += strNodeValue.utf16.count
+        readingCursorIndex += spanningLength
+      } else {
+        if codepointCount == spanningLength {
+          var i = 0
+          while i < codepointCount, readingCursorIndex < compositorCursorIndex {
+            composedStringCursorIndex += arrSplit[i].utf16.count
+            readingCursorIndex += 1
+            i += 1
+          }
         } else {
-          if codepointCount == spanningLength {
-            var i = 0
-            while i < codepointCount, readingCursorIndex < compositorCursorIndex {
-              composedStringCursorIndex += arrSplit[i].utf16.count
-              readingCursorIndex += 1
-              i += 1
-            }
-          } else {
-            if readingCursorIndex < compositorCursorIndex {
-              composedStringCursorIndex += strNodeValue.utf16.count
-              readingCursorIndex += spanningLength
-              readingCursorIndex = min(readingCursorIndex, compositorCursorIndex)
-              /// 接下來再處理這麼一種情況：
-              /// 某些錨點內的當前候選字詞長度與讀音長度不相等。
-              /// 但此時游標還是按照每個讀音單位來移動的，
-              /// 所以需要上下文工具提示來顯示游標的相對位置。
-              /// 這裡先計算一下要用在工具提示當中的顯示參數的內容。
-              switch compositorCursorIndex {
-                case compositor.readings.count...:
-                  tooltipParameterRef[0] = compositor.readings[compositor.readings.count - 1]
-                case 0:
+          if readingCursorIndex < compositorCursorIndex {
+            composedStringCursorIndex += strNodeValue.utf16.count
+            readingCursorIndex += spanningLength
+            readingCursorIndex = min(readingCursorIndex, compositorCursorIndex)
+            /// 接下來再處理這麼一種情況：
+            /// 某些錨點內的當前候選字詞長度與讀音長度不相等。
+            /// 但此時游標還是按照每個讀音單位來移動的，
+            /// 所以需要上下文工具提示來顯示游標的相對位置。
+            /// 這裡先計算一下要用在工具提示當中的顯示參數的內容。
+            switch compositorCursorIndex {
+              case compositor.readings.count...:
+                tooltipParameterRef[0] = compositor.readings[compositor.readings.count - 1]
+              case 0:
+                tooltipParameterRef[1] = compositor.readings[compositorCursorIndex]
+              default:
+                do {
+                  tooltipParameterRef[0] = compositor.readings[compositorCursorIndex - 1]
                   tooltipParameterRef[1] = compositor.readings[compositorCursorIndex]
-                default:
-                  do {
-                    tooltipParameterRef[0] = compositor.readings[compositorCursorIndex - 1]
-                    tooltipParameterRef[1] = compositor.readings[compositorCursorIndex]
-                  }
-              }
+                }
             }
           }
         }
