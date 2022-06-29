@@ -310,10 +310,7 @@ class KeyHandler {
     var highestScore: Double = 0
     for currentAnchor in nodes {
       if let theNode = currentAnchor.node {
-        let score = theNode.highestUnigramScore
-        if score > highestScore {
-          highestScore = score
-        }
+        highestScore = max(theNode.highestUnigramScore, highestScore)
       }
     }
     return highestScore + epsilon
