@@ -167,7 +167,6 @@ class KeyHandler {
   ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字厚的節錨的前方。
   func fixNode(value: String, respectCursorPushing: Bool = true) {
     let cursorIndex = min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength)
-    compositor.grid.fixNodeSelectedCandidate(location: cursorIndex, value: value)
     // 開始讓半衰模組觀察目前的狀況。
     let selectedNode: Megrez.NodeAnchor = compositor.grid.fixNodeSelectedCandidate(
       location: cursorIndex, value: value
