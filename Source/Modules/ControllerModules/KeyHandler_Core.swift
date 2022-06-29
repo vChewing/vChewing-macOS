@@ -137,14 +137,12 @@ class KeyHandler {
   /// 估算對象範圍。用比較形象且生動卻有點噁心的解釋的話，蒼蠅一邊吃一邊屙。
   var popOverflowComposingTextAndWalk: String {
     var textToCommit = ""
-    if compositor.grid.width > mgrPrefs.composingBufferSize {
-      if !walkedAnchors.isEmpty {
-        let anchor: Megrez.NodeAnchor = walkedAnchors[0]
-        if let theNode = anchor.node {
-          textToCommit = theNode.currentKeyValue.value
-        }
-        compositor.removeHeadReadings(count: anchor.spanningLength)
+    if compositor.grid.width > mgrPrefs.composingBufferSize, !walkedAnchors.isEmpty {
+      let anchor: Megrez.NodeAnchor = walkedAnchors[0]
+      if let theNode = anchor.node {
+        textToCommit = theNode.currentKeyValue.value
       }
+      compositor.removeHeadReadings(count: anchor.spanningLength)
     }
     walk()
     return textToCommit
