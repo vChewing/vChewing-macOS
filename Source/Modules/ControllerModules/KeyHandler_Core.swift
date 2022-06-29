@@ -135,7 +135,7 @@ class KeyHandler {
   /// 會使得運算壓力隨著節錨數量的增加而增大。於是，有必要限定組字區的長度。
   /// 超過該長度的內容會在爬軌之前先遞交出去，使其不再記入最大相似度估算的
   /// 估算對象範圍。用比較形象且生動卻有點噁心的解釋的話，蒼蠅一邊吃一邊屙。
-  var popOverflowComposingTextAndWalk: String {
+  var commitOverflownCompositionAndWalk: String {
     var textToCommit = ""
     if compositor.grid.width > mgrPrefs.composingBufferSize, !walkedAnchors.isEmpty {
       let anchor: Megrez.NodeAnchor = walkedAnchors[0]

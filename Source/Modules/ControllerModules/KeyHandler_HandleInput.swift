@@ -205,7 +205,7 @@ extension KeyHandler {
       insertToCompositorAtCursor(reading: reading)
 
       // 讓組字器反爬軌格。
-      let textToCommit = popOverflowComposingTextAndWalk
+      let textToCommit = commitOverflownCompositionAndWalk
 
       // 看看半衰記憶模組是否會對目前的狀態給出自動選字建議。
       fetchAndApplySuggestionsFromUserOverrideModel()
@@ -283,7 +283,7 @@ extension KeyHandler {
             stateCallback(InputState.Empty())
           } else if ifLangModelHasUnigrams(forKey: " ") {
             insertToCompositorAtCursor(reading: " ")
-            let textToCommit = popOverflowComposingTextAndWalk
+            let textToCommit = commitOverflownCompositionAndWalk
             let inputting = buildInputtingState
             inputting.textToCommit = textToCommit
             stateCallback(inputting)
@@ -394,7 +394,7 @@ extension KeyHandler {
         if ifLangModelHasUnigrams(forKey: "_punctuation_list") {
           if composer.isEmpty {
             insertToCompositorAtCursor(reading: "_punctuation_list")
-            let textToCommit: String! = popOverflowComposingTextAndWalk
+            let textToCommit: String! = commitOverflownCompositionAndWalk
             let inputting = buildInputtingState
             inputting.textToCommit = textToCommit
             stateCallback(inputting)

@@ -298,7 +298,7 @@ extension KeyHandler {
 
     if composer.isEmpty {
       insertToCompositorAtCursor(reading: customPunctuation)
-      let textToCommit = popOverflowComposingTextAndWalk
+      let textToCommit = commitOverflownCompositionAndWalk
       let inputting = buildInputtingState
       inputting.textToCommit = textToCommit
       stateCallback(inputting)
