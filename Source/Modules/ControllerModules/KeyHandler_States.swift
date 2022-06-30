@@ -605,15 +605,10 @@ extension KeyHandler {
       clear()
       stateCallback(InputState.EmptyIgnoringPreviousState())
     } else {
+      if composer.isEmpty { return true }
       /// 如果注拼槽不是空的話，則清空之。
-      if !composer.isEmpty {
-        composer.clear()
-        if compositorLength == 0 {
-          stateCallback(InputState.EmptyIgnoringPreviousState())
-        } else {
-          stateCallback(buildInputtingState)
-        }
-      }
+      composer.clear()
+      stateCallback(compositor.isEmpty ? InputState.EmptyIgnoringPreviousState() : buildInputtingState)
     }
     return true
   }
