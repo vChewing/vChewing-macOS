@@ -296,7 +296,7 @@ struct InputSignal: CustomStringConvertible {
     KeyCode(rawValue: keyCode) == KeyCode.kBackSpace
   }
 
-  var isESC: Bool {
+  var isEsc: Bool {
     KeyCode(rawValue: keyCode) == KeyCode.kEscape
   }
 

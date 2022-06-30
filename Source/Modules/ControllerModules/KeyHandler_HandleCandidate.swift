@@ -55,7 +55,7 @@ extension KeyHandler {
     // MARK: 取消選字 (Cancel Candidate)
 
     let cancelCandidateKey =
-      input.isBackSpace || input.isESC || input.isDelete
+      input.isBackSpace || input.isEsc || input.isDelete
       || ((input.isCursorBackward || input.isCursorForward) && input.isShiftHold)
 
     if cancelCandidateKey {

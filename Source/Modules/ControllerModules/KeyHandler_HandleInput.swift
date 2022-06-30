@@ -303,7 +303,7 @@ extension KeyHandler {
 
     // MARK: Esc
 
-    if input.isESC { return handleEsc(state: state, stateCallback: stateCallback, errorCallback: errorCallback) }
+    if input.isEsc { return handleEsc(state: state, stateCallback: stateCallback, errorCallback: errorCallback) }
 
     // MARK: Tab
 
