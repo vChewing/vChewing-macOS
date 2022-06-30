@@ -798,11 +798,7 @@ extension KeyHandler {
       if candidates[0] == currentValue {
         /// 如果第一個候選字詞是當前節點的候選字詞的值的話，
         /// 那就切到下一個（或上一個，也就是最後一個）候選字詞。
-        if reverseModifier {
-          currentIndex = candidates.count - 1
-        } else {
-          currentIndex = 1
-        }
+        currentIndex = reverseModifier ? candidates.count - 1 : 1
       }
     } else {
       for candidate in candidates {
