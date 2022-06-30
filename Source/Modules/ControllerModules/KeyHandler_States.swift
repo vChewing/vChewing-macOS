@@ -212,7 +212,7 @@ extension KeyHandler {
     stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    if input.isESC {
+    if input.isEsc {
       stateCallback(buildInputtingState)
       return true
     }
