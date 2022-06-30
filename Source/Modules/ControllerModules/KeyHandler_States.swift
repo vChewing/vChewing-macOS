@@ -399,7 +399,7 @@ extension KeyHandler {
 
     for theAnchor in walkedAnchors {
       if let node = theAnchor.node {
-        var key = node.currentKeyValue.key
+        var key = node.key
         if mgrPrefs.inlineDumpPinyinInLieuOfZhuyin {
           key = restoreToneOneInZhuyinKey(target: key)  // 恢復陰平標記
           key = Tekkon.cnvPhonaToHanyuPinyin(target: key)  // 注音轉拼音
@@ -410,11 +410,8 @@ extension KeyHandler {
         }
 
         let value = node.currentKeyValue.value
-        if key.contains("_") {  // 不要給標點符號等特殊元素加注音
-          composed += value
-        } else {
-          composed += "<ruby>\(value)<rp>(</rp><rt>\(key)</rt><rp>)</rp></ruby>"
-        }
+        // 不要給標點符號等特殊元素加注音
+        composed += key.contains("_") ? value : "<ruby>\(value)<rp>(</rp><rt>\(key)</rt><rp>)</rp></ruby>"
       }
     }
 
