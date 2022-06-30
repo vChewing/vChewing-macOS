@@ -369,9 +369,8 @@ extension ctlInputMethod {
   ) {
     _ = state  // 防止格式整理工具毀掉與此對應的參數。
     _ = previous  // 防止格式整理工具毀掉與此對應的參數。
-    ctlCandidateCurrent.visible = false
-    hideTooltip()
-    clearInlineDisplay()
+    // 這個函式就是去掉 previous state 使得沒有任何東西可以 commit。
+    handle(state: InputState.Empty())
   }
 
   private func handle(state: InputState.Committing, previous: InputStateProtocol) {
