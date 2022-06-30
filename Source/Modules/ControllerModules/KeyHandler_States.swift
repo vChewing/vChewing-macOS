@@ -168,7 +168,7 @@ extension KeyHandler {
     InputState.ChoosingCandidate(
       composingBuffer: currentState.composingBuffer,
       cursorIndex: currentState.cursorIndex,
-      candidates: candidatesArray(fixOrder: mgrPrefs.useFixecCandidateOrderOnSelection),
+      candidates: getCandidatesArray(fixOrder: mgrPrefs.useFixecCandidateOrderOnSelection),
       isTypingVertical: isTypingVertical
     )
   }
@@ -771,7 +771,7 @@ extension KeyHandler {
       return true
     }
 
-    let candidates = candidatesArray(fixOrder: true)
+    let candidates = getCandidatesArray(fixOrder: true)
     guard !candidates.isEmpty else {
       IME.prtDebugIntel("3378A6DF")
       errorCallback()

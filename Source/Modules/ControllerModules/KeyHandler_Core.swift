@@ -235,7 +235,7 @@ class KeyHandler {
   }
 
   /// 獲取候選字詞陣列資料內容。
-  func candidatesArray(fixOrder: Bool = true) -> [String] {
+  func getCandidatesArray(fixOrder: Bool = true) -> [String] {
     var arrAnchors: [Megrez.NodeAnchor] = rawAnchorsOfNodes
     var arrCandidates: [String] = []
 
@@ -259,13 +259,15 @@ class KeyHandler {
       }
     }
     // 決定是否根據半衰記憶模組的建議來調整候選字詞的順序。
-    if mgrPrefs.fetchSuggestionsFromUserOverrideModel, !mgrPrefs.useSCPCTypingMode, !fixOrder {
-      let arrSuggestedUnigrams: [Megrez.Unigram] = fetchSuggestedCandidates().stableSort { $0.score > $1.score }
-      let arrSuggestedCandidates: [String] = arrSuggestedUnigrams.map(\.keyValue.value)
-      arrCandidates = arrSuggestedCandidates.filter { arrCandidates.contains($0) } + arrCandidates
-      arrCandidates = arrCandidates.deduplicate
-      arrCandidates = arrCandidates.stableSort { $0.count > $1.count }
+    if !mgrPrefs.fetchSuggestionsFromUserOverrideModel || mgrPrefs.useSCPCTypingMode || fixOrder {
+      return arrCandidates
     }
+
+    let arrSuggestedUnigrams: [Megrez.Unigram] = fetchSuggestedCandidates().stableSort { $0.score > $1.score }
+    let arrSuggestedCandidates: [String] = arrSuggestedUnigrams.map(\.keyValue.value)
+    arrCandidates = arrSuggestedCandidates.filter { arrCandidates.contains($0) } + arrCandidates
+    arrCandidates = arrCandidates.deduplicate
+    arrCandidates = arrCandidates.stableSort { $0.count > $1.count }
     return arrCandidates
   }
 
