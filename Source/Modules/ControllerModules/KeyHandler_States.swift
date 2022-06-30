@@ -295,38 +295,39 @@ extension KeyHandler {
       return false
     }
 
-    if composer.isEmpty {
-      insertToCompositorAtCursor(reading: customPunctuation)
-      let textToCommit = commitOverflownCompositionAndWalk
-      let inputting = buildInputtingState
-      inputting.textToCommit = textToCommit
-      stateCallback(inputting)
-
-      if mgrPrefs.useSCPCTypingMode, composer.isEmpty {
-        let candidateState = buildCandidate(
-          state: inputting,
-          isTypingVertical: isTypingVertical
-        )
-        if candidateState.candidates.count == 1 {
-          clear()
-          if let strtextToCommit: String = candidateState.candidates.first {
-            stateCallback(InputState.Committing(textToCommit: strtextToCommit) as InputState.Committing)
-            stateCallback(InputState.Empty())
-          } else {
-            stateCallback(candidateState)
-          }
-        } else {
-          stateCallback(candidateState)
-        }
-      }
-      return true
-    } else {
-      // If there is still unfinished bpmf reading, ignore the punctuation
+    guard composer.isEmpty else {
+      // 注音沒敲完的情況下，無視標點輸入。
       IME.prtDebugIntel("A9B69908D")
       errorCallback()
       stateCallback(state)
       return true
     }
+
+    insertToCompositorAtCursor(reading: customPunctuation)
+    let textToCommit = commitOverflownCompositionAndWalk
+    let inputting = buildInputtingState
+    inputting.textToCommit = textToCommit
+    stateCallback(inputting)
+
+    // 從這一行之後開始，就是針對逐字選字模式的單獨處理。
+    guard mgrPrefs.useSCPCTypingMode, composer.isEmpty else { return true }
+
+    let candidateState = buildCandidate(
+      state: inputting,
+      isTypingVertical: isTypingVertical
+    )
+    if candidateState.candidates.count == 1 {
+      clear()
+      if let strtextToCommit: String = candidateState.candidates.first {
+        stateCallback(InputState.Committing(textToCommit: strtextToCommit))
+        stateCallback(InputState.Empty())
+      } else {
+        stateCallback(candidateState)
+      }
+    } else {
+      stateCallback(candidateState)
+    }
+    return true
   }
 
   // MARK: - Enter 鍵的處理
