@@ -453,11 +453,8 @@ extension KeyHandler {
       composer.doBackSpace()
     }
 
-    if composer.isEmpty, compositorLength == 0 {
-      stateCallback(InputState.EmptyIgnoringPreviousState())
-    } else {
-      stateCallback(buildInputtingState)
-    }
+    stateCallback(
+      composer.isEmpty && compositor.isEmpty ? InputState.EmptyIgnoringPreviousState() : buildInputtingState)
     return true
   }
 
