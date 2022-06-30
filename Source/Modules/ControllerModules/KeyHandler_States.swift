@@ -473,28 +473,25 @@ extension KeyHandler {
   ) -> Bool {
     guard state is InputState.Inputting else { return false }
 
-    if composer.isEmpty {
-      if compositorCursorIndex != compositorLength {
-        deleteCompositorReadingToTheFrontOfCursor()
-        walk()
-        let inputting = buildInputtingState
-        // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
-        if inputting.composingBuffer.isEmpty {
-          stateCallback(InputState.EmptyIgnoringPreviousState())
-        } else {
-          stateCallback(inputting)
-        }
-      } else {
-        IME.prtDebugIntel("9B69938D")
-        errorCallback()
-        stateCallback(state)
-      }
-    } else {
+    guard composer.isEmpty else {
       IME.prtDebugIntel("9C69908D")
       errorCallback()
       stateCallback(state)
+      return true
     }
 
+    guard compositorCursorIndex != compositorLength else {
+      IME.prtDebugIntel("9B69938D")
+      errorCallback()
+      stateCallback(state)
+      return true
+    }
+
+    deleteCompositorReadingToTheFrontOfCursor()
+    walk()
+    let inputting = buildInputtingState
+    // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
+    stateCallback(inputting.composingBuffer.isEmpty ? InputState.EmptyIgnoringPreviousState() : inputting)
     return true
   }
 
