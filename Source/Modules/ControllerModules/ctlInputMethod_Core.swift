@@ -356,6 +356,7 @@ extension ctlInputMethod {
     _ = state  // 防止格式整理工具毀掉與此對應的參數。
     ctlCandidateCurrent.visible = false
     hideTooltip()
+    // 全專案用以判斷「.EmptyIgnoringPreviousState」的地方僅此一處。
     if let previous = previous as? InputState.NotEmpty,
       !(state is InputState.EmptyIgnoringPreviousState)
     {

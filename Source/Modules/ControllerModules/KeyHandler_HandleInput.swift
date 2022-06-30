@@ -56,9 +56,8 @@ extension KeyHandler {
     // 提前過濾掉一些不合規的按鍵訊號輸入，免得相關按鍵訊號被送給 Megrez 引發輸入法崩潰。
     if input.isInvalidInput {
       // 在「.Empty(IgnoringPreviousState) 與 .Deactivated」狀態下的首次不合規按鍵輸入可以直接放行。
-      if state is InputState.Empty || state is InputState.Deactivated
-        || state is InputState.EmptyIgnoringPreviousState
-      {
+      // 因為「.EmptyIgnorePreviousState」會在處理之後被自動轉為「.Empty」，所以不需要單獨判斷。
+      if state is InputState.Empty || state is InputState.Deactivated {
         return false
       }
       IME.prtDebugIntel("550BCF7B: KeyHandler just refused an invalid input.")
