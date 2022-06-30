@@ -365,7 +365,7 @@ extension KeyHandler {
     // MARK: Backspace
 
     if input.isBackSpace {
-      return handleBackspace(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+      return handleBackSpace(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 
     // MARK: Delete
