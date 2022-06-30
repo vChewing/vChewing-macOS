@@ -493,7 +493,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
       } errorCallback: {
       }
     }
-    XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
+    XCTAssertTrue(state is InputState.Empty, "\(state)")
   }
 
   func testInputting() {
@@ -673,7 +673,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
     } errorCallback: {
     }
 
-    XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
+    XCTAssertTrue(state is InputState.Empty, "\(state)")
   }
 
   func testBackspaceToDeleteReading() {
@@ -707,7 +707,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
       state = newState
     } errorCallback: {
     }
-    XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
+    XCTAssertTrue(state is InputState.Empty, "\(state)")
   }
 
   func testBackspaceAtBegin() {
@@ -829,7 +829,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
     } errorCallback: {
     }
 
-    XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
+    XCTAssertTrue(state is InputState.Empty, "\(state)")
   }
 
   func testCursorWithReading() {
@@ -1543,7 +1543,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
     } errorCallback: {
     }
 
-    XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
+    XCTAssertTrue(state is InputState.Empty, "\(state)")
     mgrPrefs.escToCleanInputBuffer = enabled
   }
 
@@ -1611,7 +1611,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
     } errorCallback: {
     }
 
-    XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
+    XCTAssertTrue(state is InputState.Empty, "\(state)")
     mgrPrefs.escToCleanInputBuffer = enabled
   }
 }
