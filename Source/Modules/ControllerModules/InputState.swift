@@ -433,7 +433,7 @@ enum InputState {
     }
 
     override var description: String {
-      "<InputState.SymbolTable, candidates:\(candidates), isTypingVertical:\(isTypingVertical),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
+      "<InputState.SymbolTable, candidates:\(candidates), isTypingVertical:\(isTypingVertical)>"
     }
   }
 }
