@@ -169,8 +169,7 @@ extension KeyHandler {
 
       // 沒有調號的話，只需要 updateClientComposingBuffer() 且終止處理（return true）即可。
       // 有調號的話，則不需要這樣，而是轉而繼續在此之後的處理。
-      let composeReading = composer.hasToneMarker()
-      if !composeReading {
+      if !composer.hasToneMarker() {
         stateCallback(buildInputtingState)
         return true
       }
@@ -317,10 +316,7 @@ extension KeyHandler {
 
     if input.isCursorBackward || input.emacsKey == EmacsKey.backward {
       return handleBackward(
-        state: state,
-        input: input,
-        stateCallback: stateCallback,
-        errorCallback: errorCallback
+        state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
       )
     }
 
