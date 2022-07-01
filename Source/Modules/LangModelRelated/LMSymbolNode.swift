@@ -56,11 +56,7 @@ class SymbolNode {
           default: break
         }
       }
-      if arrChildren.isEmpty {
-        root = defaultSymbolRoot
-      } else {
-        root = .init("/", arrChildren)
-      }
+      root = arrChildren.isEmpty ? defaultSymbolRoot : .init("/", arrChildren)
     } catch {
       root = defaultSymbolRoot
     }
