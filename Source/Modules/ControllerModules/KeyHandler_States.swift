@@ -339,8 +339,7 @@ extension KeyHandler {
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleEnter(
     state: InputStateProtocol,
-    stateCallback: @escaping (InputStateProtocol) -> Void,
-    errorCallback _: @escaping () -> Void
+    stateCallback: @escaping (InputStateProtocol) -> Void
   ) -> Bool {
     guard let currentState = state as? InputState.Inputting else { return false }
 
@@ -359,8 +358,7 @@ extension KeyHandler {
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleCtrlCommandEnter(
     state: InputStateProtocol,
-    stateCallback: @escaping (InputStateProtocol) -> Void,
-    errorCallback _: @escaping () -> Void
+    stateCallback: @escaping (InputStateProtocol) -> Void
   ) -> Bool {
     guard state is InputState.Inputting else { return false }
 
@@ -390,8 +388,7 @@ extension KeyHandler {
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleCtrlOptionCommandEnter(
     state: InputStateProtocol,
-    stateCallback: @escaping (InputStateProtocol) -> Void,
-    errorCallback _: @escaping () -> Void
+    stateCallback: @escaping (InputStateProtocol) -> Void
   ) -> Bool {
     guard state is InputState.Inputting else { return false }
 
@@ -594,8 +591,7 @@ extension KeyHandler {
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleEsc(
     state: InputStateProtocol,
-    stateCallback: @escaping (InputStateProtocol) -> Void,
-    errorCallback _: @escaping () -> Void
+    stateCallback: @escaping (InputStateProtocol) -> Void
   ) -> Bool {
     guard state is InputState.Inputting else { return false }
 
