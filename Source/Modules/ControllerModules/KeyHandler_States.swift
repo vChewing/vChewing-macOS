@@ -107,7 +107,7 @@ extension KeyHandler {
     /// 現在呢，咱們拿到了游標前後的 stringview 資料，準備著手生成要在組字區內顯示用的內容。
     /// 在這對前後資料當中插入目前正在輸入的讀音資料即可。
     let head = String(utf16CodeUnits: arrHead, count: arrHead.count)
-    let reading = composer.getInlineCompositionForIMK(isHanyuPinyin: mgrPrefs.showHanyuPinyinInCompositionBuffer)
+    let reading = composer.getInlineCompositionForDisplay(isHanyuPinyin: mgrPrefs.showHanyuPinyinInCompositionBuffer)
     let tail = String(utf16CodeUnits: arrTail, count: arrTail.count)
     let composedText = head + reading + tail
     let cursorIndex = composedStringCursorIndex + reading.utf16.count
