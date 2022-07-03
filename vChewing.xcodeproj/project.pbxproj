@@ -41,6 +41,9 @@
 		5B782EC4280C243C007276DE /* KeyHandler_HandleCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */; };
 		5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */; };
 		5B7F225D2808501000DDD3CB /* KeyHandler_HandleInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7F225C2808501000DDD3CB /* KeyHandler_HandleInput.swift */; };
+		5B84579E2871AD2200C93B01 /* convdict.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B84579C2871AD2200C93B01 /* convdict.plist */; };
+		5B84579F2871AD2200C93B01 /* HotenkaChineseConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B84579D2871AD2200C93B01 /* HotenkaChineseConverter.swift */; };
+		5B8457A12871ADBE00C93B01 /* HotenkaCCBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8457A02871ADBE00C93B01 /* HotenkaCCBridge.swift */; };
 		5B887F302826AEA400B6651E /* lmCoreEX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B887F2F2826AEA400B6651E /* lmCoreEX.swift */; };
 		5B949BD92816DC5400D87B5D /* LineReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B949BD82816DC5400D87B5D /* LineReader.swift */; };
 		5B949BDB2816DDBC00D87B5D /* LMConsolidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B949BDA2816DDBC00D87B5D /* LMConsolidator.swift */; };
@@ -105,7 +108,6 @@
 		5BEDB723283B4C250078EB25 /* data-cht.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB720283B4AEA0078EB25 /* data-cht.plist */; };
 		5BEDB724283B4C250078EB25 /* data-symbols.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71E283B4AEA0078EB25 /* data-symbols.plist */; };
 		5BEDB725283B4C250078EB25 /* data-chs.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71C283B4AEA0078EB25 /* data-chs.plist */; };
-		5BF8423127BAA942008E7E4C /* vChewingKanjiConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF8423027BAA942008E7E4C /* vChewingKanjiConverter.swift */; };
 		6A187E2616004C5900466B2E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A187E2816004C5900466B2E /* MainMenu.xib */; };
 		6A225A1F23679F2600F685C6 /* NotarizedArchives in Resources */ = {isa = PBXBuildFile; fileRef = 6A225A1E23679F2600F685C6 /* NotarizedArchives */; };
 		6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
@@ -226,6 +228,9 @@
 		5B7BC4AF27AFFBE800F66C24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmPrefWindow.xib; sourceTree = "<group>"; };
 		5B7BC4B227AFFC0B00F66C24 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmPrefWindow.strings; sourceTree = "<group>"; };
 		5B7F225C2808501000DDD3CB /* KeyHandler_HandleInput.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_HandleInput.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		5B84579C2871AD2200C93B01 /* convdict.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = convdict.plist; sourceTree = "<group>"; };
+		5B84579D2871AD2200C93B01 /* HotenkaChineseConverter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HotenkaChineseConverter.swift; sourceTree = "<group>"; };
+		5B8457A02871ADBE00C93B01 /* HotenkaCCBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotenkaCCBridge.swift; sourceTree = "<group>"; };
 		5B887F2F2826AEA400B6651E /* lmCoreEX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lmCoreEX.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5B949BD82816DC5400D87B5D /* LineReader.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = LineReader.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5B949BDA2816DDBC00D87B5D /* LMConsolidator.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = LMConsolidator.swift; sourceTree = "<group>"; usesTabs = 0; };
@@ -300,7 +305,6 @@
 		5BEDB71E283B4AEA0078EB25 /* data-symbols.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-symbols.plist"; path = "Data/data-symbols.plist"; sourceTree = "<group>"; };
 		5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-zhuyinwen.plist"; path = "Data/data-zhuyinwen.plist"; sourceTree = "<group>"; };
 		5BEDB720283B4AEA0078EB25 /* data-cht.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-cht.plist"; path = "Data/data-cht.plist"; sourceTree = "<group>"; };
-		5BF8423027BAA942008E7E4C /* vChewingKanjiConverter.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = vChewingKanjiConverter.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BFDF48C27B51867009523B6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Main.strings"; sourceTree = "<group>"; };
 		6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A0D4EF515FC0DA600ABF4B3 /* IME-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IME-Info.plist"; sourceTree = "<group>"; };
@@ -426,6 +430,7 @@
 		5B62A30127AE732800A19448 /* 3rdParty */ = {
 			isa = PBXGroup;
 			children = (
+				5B84579B2871AD2200C93B01 /* HotenkaChineseConverter */,
 				5B949BD72816DC4400D87B5D /* LineReader */,
 				5B707CE627D9F43E0099EF99 /* OpenCCBridge */,
 				5BA9FCEA27FED652002DE248 /* SindreSorhus */,
@@ -458,7 +463,6 @@
 				5B3133BE280B229700A4A505 /* KeyHandler_States.swift */,
 				5B62A33727AE79CD00A19448 /* StringUtils.swift */,
 				5BAA8FBD282CAF380066C406 /* SyllableComposer.swift */,
-				5BF8423027BAA942008E7E4C /* vChewingKanjiConverter.swift */,
 			);
 			path = ControllerModules;
 			sourceTree = "<group>";
@@ -608,6 +612,16 @@
 				5B707CE727D9F4590099EF99 /* OpenCCBridge.swift */,
 			);
 			path = OpenCCBridge;
+			sourceTree = "<group>";
+		};
+		5B84579B2871AD2200C93B01 /* HotenkaChineseConverter */ = {
+			isa = PBXGroup;
+			children = (
+				5B84579C2871AD2200C93B01 /* convdict.plist */,
+				5B8457A02871ADBE00C93B01 /* HotenkaCCBridge.swift */,
+				5B84579D2871AD2200C93B01 /* HotenkaChineseConverter.swift */,
+			);
+			path = HotenkaChineseConverter;
 			sourceTree = "<group>";
 		};
 		5B949BD72816DC4400D87B5D /* LineReader */ = {
@@ -1007,6 +1021,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5B84579E2871AD2200C93B01 /* convdict.plist in Resources */,
 				5BBBB77427AED70B0023B93A /* MenuIcon-SCVIM@2x.png in Resources */,
 				D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */,
 				5BDCBB2E27B4E67A00D0CC59 /* vChewingPhraseEditor.app in Resources */,
@@ -1152,6 +1167,7 @@
 				5BA9FD4827FEF3C9002DE248 /* PreferencesWindowController.swift in Sources */,
 				5BD0113B28180D6100609769 /* LMInstantiator.swift in Sources */,
 				D4E569DC27A34D0E00AC2CEF /* CTools.m in Sources */,
+				5B84579F2871AD2200C93B01 /* HotenkaChineseConverter.swift in Sources */,
 				5B887F302826AEA400B6651E /* lmCoreEX.swift in Sources */,
 				5BA9FD4627FEF3C9002DE248 /* Container.swift in Sources */,
 				D47F7DD0278C0897002F9DD7 /* ctlNonModalAlertWindow.swift in Sources */,
@@ -1184,6 +1200,7 @@
 				5BA9FD3E27FEF3C8002DE248 /* Utilities.swift in Sources */,
 				5B242403284B0D6500520FE4 /* ctlCandidateUniversal.swift in Sources */,
 				5BA9FD1127FEDB6B002DE248 /* ctlPrefUI.swift in Sources */,
+				5B8457A12871ADBE00C93B01 /* HotenkaCCBridge.swift in Sources */,
 				5B38F59C281E2E49007D5F5D /* 2_Grid.swift in Sources */,
 				5B40730D281672610023DFFF /* lmReplacements.swift in Sources */,
 				5B38F59E281E2E49007D5F5D /* 6_Bigram.swift in Sources */,
@@ -1196,7 +1213,6 @@
 				5BA9FD1327FEDB6B002DE248 /* suiPrefPaneDictionary.swift in Sources */,
 				5BBBB77A27AEDC690023B93A /* clsSFX.swift in Sources */,
 				5BA9FD4727FEF3C9002DE248 /* PreferencesStyleController.swift in Sources */,
-				5BF8423127BAA942008E7E4C /* vChewingKanjiConverter.swift in Sources */,
 				5B949BDB2816DDBC00D87B5D /* LMConsolidator.swift in Sources */,
 				5B38F59F281E2E49007D5F5D /* 3_NodeAnchor.swift in Sources */,
 				5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */,
