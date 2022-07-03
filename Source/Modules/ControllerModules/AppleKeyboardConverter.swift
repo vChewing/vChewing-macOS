@@ -53,62 +53,12 @@ enum AppleKeyboardConverter {
       switch mgrPrefs.basicKeyboardLayout {
         case "com.apple.keylayout.ZhuyinBopomofo":
           switch charCode {
-            case 97: charCode = UniChar(65)
-            case 98: charCode = UniChar(66)
-            case 99: charCode = UniChar(67)
-            case 100: charCode = UniChar(68)
-            case 101: charCode = UniChar(69)
-            case 102: charCode = UniChar(70)
-            case 103: charCode = UniChar(71)
-            case 104: charCode = UniChar(72)
-            case 105: charCode = UniChar(73)
-            case 106: charCode = UniChar(74)
-            case 107: charCode = UniChar(75)
-            case 108: charCode = UniChar(76)
-            case 109: charCode = UniChar(77)
-            case 110: charCode = UniChar(78)
-            case 111: charCode = UniChar(79)
-            case 112: charCode = UniChar(80)
-            case 113: charCode = UniChar(81)
-            case 114: charCode = UniChar(82)
-            case 115: charCode = UniChar(83)
-            case 116: charCode = UniChar(84)
-            case 117: charCode = UniChar(85)
-            case 118: charCode = UniChar(86)
-            case 119: charCode = UniChar(87)
-            case 120: charCode = UniChar(88)
-            case 121: charCode = UniChar(89)
-            case 122: charCode = UniChar(90)
+            case 97...122: charCode -= 32
             default: break
           }
         case "com.apple.keylayout.ZhuyinEten":
           switch charCode {
-            case 65345: charCode = UniChar(65)
-            case 65346: charCode = UniChar(66)
-            case 65347: charCode = UniChar(67)
-            case 65348: charCode = UniChar(68)
-            case 65349: charCode = UniChar(69)
-            case 65350: charCode = UniChar(70)
-            case 65351: charCode = UniChar(71)
-            case 65352: charCode = UniChar(72)
-            case 65353: charCode = UniChar(73)
-            case 65354: charCode = UniChar(74)
-            case 65355: charCode = UniChar(75)
-            case 65356: charCode = UniChar(76)
-            case 65357: charCode = UniChar(77)
-            case 65358: charCode = UniChar(78)
-            case 65359: charCode = UniChar(79)
-            case 65360: charCode = UniChar(80)
-            case 65361: charCode = UniChar(81)
-            case 65362: charCode = UniChar(82)
-            case 65363: charCode = UniChar(83)
-            case 65364: charCode = UniChar(84)
-            case 65365: charCode = UniChar(85)
-            case 65366: charCode = UniChar(86)
-            case 65367: charCode = UniChar(87)
-            case 65368: charCode = UniChar(88)
-            case 65369: charCode = UniChar(89)
-            case 65370: charCode = UniChar(90)
+            case 65345...65370: charCode -= 65280
             default: break
           }
         default: break
@@ -206,34 +156,8 @@ enum AppleKeyboardConverter {
       // 針對不同的 Apple 動態鍵盤佈局糾正大寫英文輸入。
       switch mgrPrefs.basicKeyboardLayout {
         case "com.apple.keylayout.ZhuyinBopomofo":
-          switch strProcessed {
-            case "a": strProcessed = "A"
-            case "b": strProcessed = "B"
-            case "c": strProcessed = "C"
-            case "d": strProcessed = "D"
-            case "e": strProcessed = "E"
-            case "f": strProcessed = "F"
-            case "g": strProcessed = "G"
-            case "h": strProcessed = "H"
-            case "i": strProcessed = "I"
-            case "j": strProcessed = "J"
-            case "k": strProcessed = "K"
-            case "l": strProcessed = "L"
-            case "m": strProcessed = "M"
-            case "n": strProcessed = "N"
-            case "o": strProcessed = "O"
-            case "p": strProcessed = "P"
-            case "q": strProcessed = "Q"
-            case "r": strProcessed = "R"
-            case "s": strProcessed = "S"
-            case "t": strProcessed = "T"
-            case "u": strProcessed = "U"
-            case "v": strProcessed = "V"
-            case "w": strProcessed = "W"
-            case "x": strProcessed = "X"
-            case "y": strProcessed = "Y"
-            case "z": strProcessed = "Z"
-            default: break
+          if strProcessed.count == 1, Character(strProcessed).isLowercase, Character(strProcessed).isASCII {
+            strProcessed = strProcessed.uppercased()
           }
         case "com.apple.keylayout.ZhuyinEten":
           switch strProcessed {
