@@ -1,4 +1,4 @@
-+.PHONY: all test
++.PHONY: all
 
 all: release
 install: install-release
@@ -16,9 +16,6 @@ release:
 
 debug: 
 	xcodebuild -project vChewing.xcodeproj -scheme vChewingInstaller -configuration Debug $(BUILD_SETTINGS) build
-
-test:
-	xcodebuild -project vChewing.xcodeproj -scheme vChewing -configuration Debug test
 
 DSTROOT = /Library/Input Methods
 VC_APP_ROOT = $(DSTROOT)/vChewing.app
@@ -62,3 +59,8 @@ clean:
 
 gc:
 	git reflog expire --expire=now --all && git gc --prune=now --aggressive
+
+.PHONY: test
+
+test:
+	xcodebuild -project vChewing.xcodeproj -scheme vChewing -configuration Debug test
