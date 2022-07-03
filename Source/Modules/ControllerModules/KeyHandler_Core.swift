@@ -66,7 +66,7 @@ class KeyHandler {
     willSet {
       // 這個標籤在下文會用到。
       let isCHS: Bool = (newValue == InputMode.imeModeCHS)
-      /// 將新的簡繁輸入模式提報給 ctlInputMethod 與 IME 模組。
+      /// 將新的簡繁輸入模式提報給 Prefs 與 IME 模組。
       IME.currentInputMode = newValue
       mgrPrefs.mostRecentInputMode = IME.currentInputMode.rawValue
       /// 重設所有語言模組。這裡不需要做按需重設，因為對運算量沒有影響。
@@ -135,16 +135,14 @@ class KeyHandler {
   /// 會使得運算壓力隨著節錨數量的增加而增大。於是，有必要限定組字區的長度。
   /// 超過該長度的內容會在爬軌之前先遞交出去，使其不再記入最大相似度估算的
   /// 估算對象範圍。用比較形象且生動卻有點噁心的解釋的話，蒼蠅一邊吃一邊屙。
-  var popOverflowComposingTextAndWalk: String {
+  var commitOverflownCompositionAndWalk: String {
     var textToCommit = ""
-    if compositor.grid.width > mgrPrefs.composingBufferSize {
-      if !walkedAnchors.isEmpty {
-        let anchor: Megrez.NodeAnchor = walkedAnchors[0]
-        if let theNode = anchor.node {
-          textToCommit = theNode.currentKeyValue.value
-        }
-        compositor.removeHeadReadings(count: anchor.spanningLength)
+    if compositor.grid.width > mgrPrefs.composingBufferSize, !walkedAnchors.isEmpty {
+      let anchor: Megrez.NodeAnchor = walkedAnchors[0]
+      if let theNode = anchor.node {
+        textToCommit = theNode.currentKeyValue.value
       }
+      compositor.removeHeadReadings(count: anchor.spanningLength)
     }
     walk()
     return textToCommit
@@ -169,15 +167,14 @@ class KeyHandler {
   ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字厚的節錨的前方。
   func fixNode(value: String, respectCursorPushing: Bool = true) {
     let cursorIndex = min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength)
-    compositor.grid.fixNodeSelectedCandidate(location: cursorIndex, value: value)
     // 開始讓半衰模組觀察目前的狀況。
     let selectedNode: Megrez.NodeAnchor = compositor.grid.fixNodeSelectedCandidate(
       location: cursorIndex, value: value
     )
     // 不要針對逐字選字模式啟用臨時半衰記憶模型。
     if !mgrPrefs.useSCPCTypingMode {
-      // 所有讀音數與字符數不匹配的情況均不得塞入半衰記憶模組。
       var addToUserOverrideModel = true
+      // 所有讀音數與字符數不匹配的情況均不得塞入半衰記憶模組。
       if selectedNode.spanningLength != value.count {
         IME.prtDebugIntel("UOM: SpanningLength != value.count, dismissing.")
         addToUserOverrideModel = false
@@ -208,9 +205,9 @@ class KeyHandler {
     /// 若偏好設定內啟用了相關選項，則會在選字之後始終將游標推送至選字厚的節錨的前方。
     if mgrPrefs.moveCursorAfterSelectingCandidate, respectCursorPushing {
       var nextPosition = 0
-      for node in walkedAnchors {
+      for theAnchor in walkedAnchors {
         if nextPosition >= cursorIndex { break }
-        nextPosition += node.spanningLength
+        nextPosition += theAnchor.spanningLength
       }
       if nextPosition <= compositorLength {
         compositorCursorIndex = nextPosition
@@ -238,37 +235,38 @@ class KeyHandler {
   }
 
   /// 獲取候選字詞陣列資料內容。
-  func candidatesArray(fixOrder: Bool = true) -> [String] {
-    var arrNodes: [Megrez.NodeAnchor] = rawNodes
+  func getCandidatesArray(fixOrder: Bool = true) -> [String] {
+    var arrAnchors: [Megrez.NodeAnchor] = rawAnchorsOfNodes
     var arrCandidates: [String] = []
 
     /// 原理：nodes 這個回饋結果包含一堆子陣列，分別對應不同詞長的候選字。
     /// 這裡先對陣列排序、讓最長候選字的子陣列的優先權最高。
     /// 這個過程不會傷到子陣列內部的排序。
-    if arrNodes.isEmpty { return arrCandidates }
+    if arrAnchors.isEmpty { return arrCandidates }
 
-    // sort the nodes, so that longer nodes (representing longer phrases)
-    // are placed at the top of the candidate list
-    arrNodes = arrNodes.stableSort { $0.keyLength > $1.keyLength }
+    // 讓更長的節錨排序靠前。
+    arrAnchors = arrAnchors.stableSort { $0.keyLength > $1.keyLength }
 
-    // then use the Swift trick to retrieve the candidates for each node at/crossing the cursor
-    for currentNodeAnchor in arrNodes {
-      if let currentNode = currentNodeAnchor.node {
-        for currentCandidate in currentNode.candidates {
-          // 選字窗的內容的康熙轉換 / JIS 轉換不能放在這裡處理，會影響選字有效性。
-          // 選字的原理是拿著具體的候選字詞的字串去當前的節錨下找出對應的候選字詞（Ｘ元圖）。
-          // 一旦在這裡轉換了，節錨內的某些元圖就無法被選中。
-          arrCandidates.append(currentCandidate.value)
-        }
+    // 將節錨內的候選字詞資料拓印到輸出陣列內。
+    for currentNodeAnchor in arrAnchors {
+      guard let currentNode = currentNodeAnchor.node else { continue }
+      for currentCandidate in currentNode.candidates {
+        // 選字窗的內容的康熙轉換 / JIS 轉換不能放在這裡處理，會影響選字有效性。
+        // 選字的原理是拿著具體的候選字詞的字串去當前的節錨下找出對應的候選字詞（Ｘ元圖）。
+        // 一旦在這裡轉換了，節錨內的某些元圖就無法被選中。
+        arrCandidates.append(currentCandidate.value)
       }
     }
-    if mgrPrefs.fetchSuggestionsFromUserOverrideModel, !mgrPrefs.useSCPCTypingMode, !fixOrder {
-      let arrSuggestedUnigrams: [Megrez.Unigram] = fetchSuggestedCandidates().stableSort { $0.score > $1.score }
-      let arrSuggestedCandidates: [String] = arrSuggestedUnigrams.map(\.keyValue.value)
-      arrCandidates = arrSuggestedCandidates.filter { arrCandidates.contains($0) } + arrCandidates
-      arrCandidates = arrCandidates.deduplicate
-      arrCandidates = arrCandidates.stableSort { $0.count > $1.count }
+    // 決定是否根據半衰記憶模組的建議來調整候選字詞的順序。
+    if !mgrPrefs.fetchSuggestionsFromUserOverrideModel || mgrPrefs.useSCPCTypingMode || fixOrder {
+      return arrCandidates
     }
+
+    let arrSuggestedUnigrams: [Megrez.Unigram] = fetchSuggestedCandidates().stableSort { $0.score > $1.score }
+    let arrSuggestedCandidates: [String] = arrSuggestedUnigrams.map(\.keyValue.value)
+    arrCandidates = arrSuggestedCandidates.filter { arrCandidates.contains($0) } + arrCandidates
+    arrCandidates = arrCandidates.deduplicate
+    arrCandidates = arrCandidates.stableSort { $0.count > $1.count }
     return arrCandidates
   }
 
@@ -296,7 +294,7 @@ class KeyHandler {
       compositor.grid.overrideNodeScoreForSelectedCandidate(
         location: min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength),
         value: overrideValue,
-        overridingScore: findHighestScore(nodes: rawNodes, epsilon: kEpsilon)
+        overridingScore: findHighestScore(nodes: rawAnchorsOfNodes, epsilon: kEpsilon)
       )
     } else {
       IME.prtDebugIntel("UOM: Blank suggestion retrieved, dismissing.")
@@ -312,10 +310,7 @@ class KeyHandler {
     var highestScore: Double = 0
     for currentAnchor in nodes {
       if let theNode = currentAnchor.node {
-        let score = theNode.highestUnigramScore
-        if score > highestScore {
-          highestScore = score
-        }
+        highestScore = max(theNode.highestUnigramScore, highestScore)
       }
     }
     return highestScore + epsilon
@@ -405,7 +400,7 @@ class KeyHandler {
   var isCompositorEmpty: Bool { compositor.isEmpty }
 
   /// 獲取原始節錨資料陣列。
-  var rawNodes: [Megrez.NodeAnchor] {
+  var rawAnchorsOfNodes: [Megrez.NodeAnchor] {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
     mgrPrefs.useRearCursorMode

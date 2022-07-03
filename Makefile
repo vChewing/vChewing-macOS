@@ -1,4 +1,4 @@
-+.PHONY: all
++.PHONY: all test
 
 all: release
 install: install-release
@@ -16,6 +16,9 @@ release:
 
 debug: 
 	xcodebuild -project vChewing.xcodeproj -scheme vChewingInstaller -configuration Debug $(BUILD_SETTINGS) build
+
+test:
+	xcodebuild -project vChewing.xcodeproj -scheme vChewing -configuration Debug test
 
 DSTROOT = /Library/Input Methods
 VC_APP_ROOT = $(DSTROOT)/vChewing.app

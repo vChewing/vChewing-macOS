@@ -31,6 +31,13 @@ import Cocoa
 // MARK: - § 對選字狀態進行調度 (Handle Candidate State).
 
 extension KeyHandler {
+  /// 當且僅當選字窗出現時，對於經過初次篩選處理的輸入訊號的處理均藉由此函式來進行。
+  /// - Parameters:
+  ///   - input: 輸入訊號。
+  ///   - state: 給定狀態（通常為當前狀態）。
+  ///   - stateCallback: 狀態回呼，交給對應的型別內的專有函式來處理。
+  ///   - errorCallback: 錯誤回呼。
+  /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleCandidate(
     state: InputStateProtocol,
     input: InputSignal,
@@ -48,7 +55,7 @@ extension KeyHandler {
     // MARK: 取消選字 (Cancel Candidate)
 
     let cancelCandidateKey =
-      input.isBackSpace || input.isESC || input.isDelete
+      input.isBackSpace || input.isEsc || input.isDelete
       || ((input.isCursorBackward || input.isCursorForward) && input.isShiftHold)
 
     if cancelCandidateKey {
@@ -295,12 +302,8 @@ extension KeyHandler {
     }
 
     var index: Int = NSNotFound
-    var match: String!
-    if state is InputState.AssociatedPhrases {
-      match = input.inputTextIgnoringModifiers
-    } else {
-      match = inputText
-    }
+    let match: String =
+      (state is InputState.AssociatedPhrases) ? input.inputTextIgnoringModifiers ?? "" : inputText ?? ""
 
     var j = 0
     while j < ctlCandidateCurrent.keyLabels.count {
@@ -352,7 +355,7 @@ extension KeyHandler {
       ]
       let customPunctuation: String = arrCustomPunctuations.joined(separator: "")
 
-      /// 如果仍無匹配結果的話，看看這個輸入是否是不需要修飾鍵的那種標點鍵輸入。
+      /// 看看這個輸入是否是不需要修飾鍵的那種標點鍵輸入。
 
       let arrPunctuations: [String] = [punctuationNamePrefix, String(format: "%c", CChar(charCode))]
       let punctuation: String = arrPunctuations.joined(separator: "")
