@@ -35,8 +35,6 @@
 		5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34327AE7CD900A19448 /* TooltipController.swift */; };
 		5B62A34A27AE7CD900A19448 /* NotifierController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34527AE7CD900A19448 /* NotifierController.swift */; };
 		5B62A35327AE89C400A19448 /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33127AE792F00A19448 /* InputSourceHelper.swift */; };
-		5B707CE827D9F4590099EF99 /* OpenCCBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B707CE727D9F4590099EF99 /* OpenCCBridge.swift */; };
-		5B707CEC27D9F4870099EF99 /* OpenCC in Frameworks */ = {isa = PBXBuildFile; productRef = 5B707CEB27D9F4870099EF99 /* OpenCC */; };
 		5B73FB5E27B2BE1300E9BF49 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */; };
 		5B782EC4280C243C007276DE /* KeyHandler_HandleCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */; };
 		5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */; };
@@ -220,8 +218,6 @@
 		5B62A34327AE7CD900A19448 /* TooltipController.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = TooltipController.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A34527AE7CD900A19448 /* NotifierController.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = NotifierController.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B65B919284D0185007C558B /* README-CHT.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README-CHT.md"; sourceTree = "<group>"; };
-		5B707CE527D9F3A10099EF99 /* SwiftyOpenCC */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SwiftyOpenCC; path = Packages/SwiftyOpenCC; sourceTree = "<group>"; };
-		5B707CE727D9F4590099EF99 /* OpenCCBridge.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = OpenCCBridge.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B73FB5427B2BD6900E9BF49 /* PhraseEditor-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "PhraseEditor-Info.plist"; path = "UserPhraseEditor/PhraseEditor-Info.plist"; sourceTree = SOURCE_ROOT; };
 		5B73FB5F27B2BE1300E9BF49 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_HandleCandidate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -366,7 +362,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B707CEC27D9F4870099EF99 /* OpenCC in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -432,7 +427,6 @@
 			children = (
 				5B84579B2871AD2200C93B01 /* HotenkaChineseConverter */,
 				5B949BD72816DC4400D87B5D /* LineReader */,
-				5B707CE627D9F43E0099EF99 /* OpenCCBridge */,
 				5BA9FCEA27FED652002DE248 /* SindreSorhus */,
 				5BA9FD8C28006BA7002DE248 /* VDKComboBox */,
 			);
@@ -598,22 +592,6 @@
 			name = Data;
 			sourceTree = "<group>";
 		};
-		5B707CE427D9F3A10099EF99 /* Packages */ = {
-			isa = PBXGroup;
-			children = (
-				5B707CE527D9F3A10099EF99 /* SwiftyOpenCC */,
-			);
-			name = Packages;
-			sourceTree = "<group>";
-		};
-		5B707CE627D9F43E0099EF99 /* OpenCCBridge */ = {
-			isa = PBXGroup;
-			children = (
-				5B707CE727D9F4590099EF99 /* OpenCCBridge.swift */,
-			);
-			path = OpenCCBridge;
-			sourceTree = "<group>";
-		};
 		5B84579B2871AD2200C93B01 /* HotenkaChineseConverter */ = {
 			isa = PBXGroup;
 			children = (
@@ -750,7 +728,6 @@
 		6A0D4E9215FC0CFA00ABF4B3 = {
 			isa = PBXGroup;
 			children = (
-				5B707CE427D9F3A10099EF99 /* Packages */,
 				5BBD627827B6C4D900271480 /* Update-Info.plist */,
 				5B18BA7027C7BD8B0056EB19 /* Makefile */,
 				5B0C5EDE27C7D94C0078037C /* DataCompiler */,
@@ -907,12 +884,10 @@
 			buildRules = (
 			);
 			dependencies = (
-				5B707CEA27D9F47A0099EF99 /* PBXTargetDependency */,
 				5B0AF8B327B2C4E20096FE54 /* PBXTargetDependency */,
 			);
 			name = vChewing;
 			packageProductDependencies = (
-				5B707CEB27D9F4870099EF99 /* OpenCC */,
 			);
 			productName = vChewing;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */;
@@ -1154,7 +1129,6 @@
 				5B38F59D281E2E49007D5F5D /* 4_Node.swift in Sources */,
 				5B38F5A3281E2E49007D5F5D /* 3_Span.swift in Sources */,
 				5B40730C281672610023DFFF /* lmAssociates.swift in Sources */,
-				5B707CE827D9F4590099EF99 /* OpenCCBridge.swift in Sources */,
 				D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */,
 				5BA9FD4527FEF3C9002DE248 /* ToolbarItemStyleViewController.swift in Sources */,
 				5BA9FD4127FEF3C8002DE248 /* PreferencesStyle.swift in Sources */,
@@ -1246,10 +1220,6 @@
 			isa = PBXTargetDependency;
 			target = 6A0D4EA115FC0D2D00ABF4B3 /* vChewing */;
 			targetProxy = 5B2F2BB7286216A500B8557B /* PBXContainerItemProxy */;
-		};
-		5B707CEA27D9F47A0099EF99 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = 5B707CE927D9F47A0099EF99 /* OpenCC */;
 		};
 		6ACA420115FC1DCC00935EF6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1947,17 +1917,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		5B707CE927D9F47A0099EF99 /* OpenCC */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = OpenCC;
-		};
-		5B707CEB27D9F4870099EF99 /* OpenCC */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = OpenCC;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6A0D4E9415FC0CFA00ABF4B3 /* Project object */;
 }
