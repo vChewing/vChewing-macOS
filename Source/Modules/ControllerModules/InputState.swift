@@ -373,10 +373,10 @@ enum InputState {
 
     var userPhraseConverted: String {
       let text =
-        OpenCCBridge.crossConvert(composingBuffer.utf16SubString(with: markedRange)) ?? ""
+        ChineseConverter.crossConvert(composingBuffer.utf16SubString(with: markedRange)) ?? ""
       let selectedReadings = readings[literalMarkedRange]
       let joined = selectedReadings.joined(separator: "-")
-      let convertedMark = "#𝙊𝙥𝙚𝙣𝘾𝘾"
+      let convertedMark = "#𝙃𝙪𝙢𝙖𝙣𝘾𝙝𝙚𝙘𝙠𝙍𝙚𝙦𝙪𝙞𝙧𝙚𝙙"
       return "\(text) \(joined)\t\(convertedMark)"
     }
   }
