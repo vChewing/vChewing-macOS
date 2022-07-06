@@ -75,7 +75,7 @@ struct UserDef {
 }
 
 private let kDefaultCandidateListTextSize: CGFloat = 18
-private let kMinKeyLabelSize: CGFloat = 10
+private let kDefaultMinKeyLabelSize: CGFloat = 10
 private let kMinCandidateListTextSize: CGFloat = 12
 private let kMaxCandidateListTextSize: CGFloat = 196
 
@@ -330,6 +330,8 @@ public enum mgrPrefs {
 
   @CandidateListTextSize(key: UserDef.kCandidateListTextSize)
   static var candidateListTextSize: CGFloat
+
+  static var minKeyLabelSize: CGFloat { kDefaultMinKeyLabelSize }
 
   @UserDefault(key: UserDef.kShouldAutoReloadUserDataFiles, defaultValue: true)
   static var shouldAutoReloadUserDataFiles: Bool

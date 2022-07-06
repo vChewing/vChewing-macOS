@@ -27,9 +27,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 import InputMethodKit
 
-/// 最小選字鍵字號。
-private let kMinKeyLabelSize: CGFloat = 10
-
 /// 目前在用的的選字窗副本。
 private var ctlCandidateCurrent = ctlCandidateUniversal.init(.horizontal)
 
@@ -488,7 +485,7 @@ extension ctlInputMethod {
 
     // set the attributes for the candidate panel (which uses NSAttributedString)
     let textSize = mgrPrefs.candidateListTextSize
-    let keyLabelSize = max(textSize / 2, kMinKeyLabelSize)
+    let keyLabelSize = max(textSize / 2, mgrPrefs.minKeyLabelSize)
 
     func labelFont(name: String?, size: CGFloat) -> NSFont {
       if let name = name {
