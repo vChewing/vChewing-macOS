@@ -27,9 +27,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Cocoa
 import InputMethodKit
 
-/// 目前在用的的選字窗副本。
-private var ctlCandidateCurrent = ctlCandidateUniversal.init(.horizontal)
-
 /// 輸入法控制模組，乃在輸入法端用以控制輸入行為的基礎型別。
 ///
 /// IMKInputController 完全實現了相關協定所定義的內容。
@@ -42,6 +39,9 @@ private var ctlCandidateCurrent = ctlCandidateUniversal.init(.horizontal)
 class ctlInputMethod: IMKInputController {
   /// 標記狀態來聲明目前是在新增使用者語彙、還是準備要濾除使用者語彙。
   static var areWeDeleting = false
+
+  /// 目前在用的的選字窗副本。
+  private var ctlCandidateCurrent = ctlCandidateUniversal.init(.horizontal)
 
   /// 工具提示視窗的副本。
   static let tooltipController = TooltipController()
