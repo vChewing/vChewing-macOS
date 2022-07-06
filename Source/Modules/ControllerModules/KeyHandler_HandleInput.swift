@@ -95,9 +95,7 @@ extension KeyHandler {
 
       /// 如果是 ASCII 當中的不可列印的字元的話，不使用「insertText:replacementRange:」。
       /// 某些應用無法正常處理非 ASCII 字符的輸入。
-      /// 注意：這裡一定要用 Objective-C 的 isPrintable() 函式來處理，否則無效。
-      /// 這個函式已經包裝在 CTools.h 裡面了，這樣就可以拿給 Swift 用。
-      if charCode < 0x80, !CTools.isPrintable(charCode) {
+      if charCode < 0x80, !charCode.isPrintableASCII {
         return false
       }
 
@@ -112,7 +110,7 @@ extension KeyHandler {
 
     if input.isNumericPad {
       if !input.isLeft, !input.isRight, !input.isDown,
-        !input.isUp, !input.isSpace, CTools.isPrintable(charCode)
+        !input.isUp, !input.isSpace, charCode.isPrintableASCII
       {
         clear()
         stateCallback(InputState.Empty())

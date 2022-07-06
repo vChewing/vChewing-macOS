@@ -420,6 +420,10 @@ extension UniChar {
     }
     return true
   }
+
+  public var isPrintableASCII: Bool {
+    (32...126).contains(self)
+  }
 }
 
 // MARK: - Stable Sort Extension
