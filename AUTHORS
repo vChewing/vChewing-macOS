@@ -1,22 +1,21 @@
 $ Main contributors and volunteers of this repository (vChewing for macOS):
 
-- Shiki Suen // Main developer of vChewing for macOS, Megrez language engine, and Tekkon syllable composer engine.
+- Shiki Suen // Main developer of vChewing for macOS, Megrez language engine, Hotenka Chinese Converter, and Tekkon syllable composer engine.
 - Hiraku Wang // Technical reinforcement in Cocoa during the Object-Cpp dev period of this project.
 - Isaac Xen // Technical reinforcement in Swift: SFX Module (NSSound ver.) and StringView Ranges Extension.
 
 $ 3rd-Party Modules Used:
 
 - LineReader: (c) 2019 and onwards Robert Muckle-Jones (Apache 2.0 License).
-- OpenCC: (c) 2010 and onwards Jiabao Guo, codename "Byvoid" (Apache-2.0 license).
-- SwiftyOpenCC: (c) 2017 and onwards ddddxxx (MIT License).
 - SwiftUI Preferences UI Framework: (c) 2018 and onwards Sindre Sorhus (MIT License).
 - SwiftUI VDKComboBox: (c) 2022 and onwards Bryan Jones (CC BY-SA 4.0)
+- Note that Hotenka Chinese Converter is rewritten by Shiki Suen (using Swift) from Nick Chen's Objective-C library "NCChineseConverter" (MIT License).
 
 $ Contributors and volunteers of the upstream repo, having no responsibility in discussing anything in the current repo:
 
 - Zonble Yang:
     - McBopomofo for macOS 2.x architect, especially state-based IME behavior management.
-    - Voltaire candidate window MK2 (massively modified in vChewing by Shiki Suen).
+    - Voltaire candidate window MK2 (massively modified as MK3 in vChewing by Shiki Suen).
     - InputHandler.
     - Notifier window and Tooltip UI.
     - NSStringUtils and FSEventStreamHelper.

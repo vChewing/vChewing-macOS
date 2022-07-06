@@ -59,3 +59,8 @@ clean:
 
 gc:
 	git reflog expire --expire=now --all && git gc --prune=now --aggressive
+
+.PHONY: test
+
+test:
+	xcodebuild -project vChewing.xcodeproj -scheme vChewing -configuration Debug test

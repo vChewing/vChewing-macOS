@@ -254,7 +254,7 @@ public struct Tekkon {
     // 該函式僅用來獲取給 macOS InputMethod Kit 的內文組字區使用的顯示字串。
     /// - Parameters:
     ///   - isHanyuPinyin: 是否將輸出結果轉成漢語拼音。
-    public func getInlineCompositionForIMK(isHanyuPinyin: Bool = false) -> String {
+    public func getInlineCompositionForDisplay(isHanyuPinyin: Bool = false) -> String {
       switch parser {
         case .ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin:
           var toneReturned = ""
@@ -387,6 +387,15 @@ public struct Tekkon {
     ///   - fromPhonabet: 傳入的單個注音符號字串。
     public mutating func receiveKey(fromPhonabet phonabet: String = "") {
       let thePhone: Phonabet = .init(phonabet)
+      switch phonabet {
+        case "ㄛ", "ㄥ":
+          if "ㄅㄆㄇㄈ".contains(consonant.value), semivowel.value == "ㄨ" { semivowel.clear() }
+        case "ㄨ":
+          if "ㄅㄆㄇㄈ".contains(consonant.value), "ㄛㄥ".contains(vowel.value) { vowel.clear() }
+        case "ㄅ", "ㄆ", "ㄇ", "ㄈ":
+          if ["ㄨㄛ", "ㄨㄥ"].contains(semivowel.value + vowel.value) { semivowel.clear() }
+        default: break
+      }
       switch thePhone.type {
         case .consonant: consonant = thePhone
         case .semivowel: semivowel = thePhone

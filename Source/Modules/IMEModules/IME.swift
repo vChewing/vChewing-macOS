@@ -46,10 +46,10 @@ public enum IME {
   static func kanjiConversionIfRequired(_ text: String) -> String {
     if currentInputMode == InputMode.imeModeCHT {
       switch (mgrPrefs.chineseConversionEnabled, mgrPrefs.shiftJISShinjitaiOutputEnabled) {
-        case (false, true): return vChewingKanjiConverter.cnvTradToJIS(text)
-        case (true, false): return vChewingKanjiConverter.cnvTradToKangXi(text)
+        case (false, true): return ChineseConverter.cnvTradToJIS(text)
+        case (true, false): return ChineseConverter.cnvTradToKangXi(text)
         // 本來這兩個開關不該同時開啟的，但萬一被同時開啟了的話就這樣處理：
-        case (true, true): return vChewingKanjiConverter.cnvTradToJIS(text)
+        case (true, true): return ChineseConverter.cnvTradToJIS(text)
         case (false, false): return text
       }
     }
@@ -413,12 +413,16 @@ extension String {
 
 // Ref: https://forums.swift.org/t/57085/5
 extension UniChar {
-  public func isPrintable() -> Bool {
+  public var isPrintable: Bool {
     guard Unicode.Scalar(UInt32(self)) != nil else {
       struct NotAWholeScalar: Error {}
       return false
     }
     return true
+  }
+
+  public var isPrintableASCII: Bool {
+    (32...126).contains(self)
   }
 }
 

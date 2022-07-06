@@ -24,7 +24,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
 
-class AppleKeyboardConverter: NSObject {
+enum AppleKeyboardConverter {
   static let arrDynamicBasicKeyLayout: [String] = [
     "com.apple.keylayout.ZhuyinBopomofo",
     "com.apple.keylayout.ZhuyinEten",
@@ -39,287 +39,240 @@ class AppleKeyboardConverter: NSObject {
     "org.unknown.keylayout.vChewingIBM",
     "org.unknown.keylayout.vChewingMiTAC",
   ]
-  class func isDynamicBasicKeyboardLayoutEnabled() -> Bool {
+
+  static var isDynamicBasicKeyboardLayoutEnabled: Bool {
     AppleKeyboardConverter.arrDynamicBasicKeyLayout.contains(mgrPrefs.basicKeyboardLayout)
   }
 
   // 處理 Apple 注音鍵盤佈局類型。
-  class func cnvApple2ABC(_ charCode: UniChar) -> UniChar {
+  static func cnvApple2ABC(_ charCode: UniChar) -> UniChar {
     var charCode = charCode
-    // 在按鍵資訊被送往 OVMandarin 之前，先轉換為可以被 OVMandarin 正常處理的資訊。
-    if isDynamicBasicKeyboardLayoutEnabled() {
+    // 在按鍵資訊被送往注拼引擎之前，先轉換為可以被注拼引擎正常處理的資訊。
+    if isDynamicBasicKeyboardLayoutEnabled {
       // 針對不同的 Apple 動態鍵盤佈局糾正大寫英文輸入。
       switch mgrPrefs.basicKeyboardLayout {
         case "com.apple.keylayout.ZhuyinBopomofo":
-          do {
-            if charCode == 97 { charCode = UniChar(65) }
-            if charCode == 98 { charCode = UniChar(66) }
-            if charCode == 99 { charCode = UniChar(67) }
-            if charCode == 100 { charCode = UniChar(68) }
-            if charCode == 101 { charCode = UniChar(69) }
-            if charCode == 102 { charCode = UniChar(70) }
-            if charCode == 103 { charCode = UniChar(71) }
-            if charCode == 104 { charCode = UniChar(72) }
-            if charCode == 105 { charCode = UniChar(73) }
-            if charCode == 106 { charCode = UniChar(74) }
-            if charCode == 107 { charCode = UniChar(75) }
-            if charCode == 108 { charCode = UniChar(76) }
-            if charCode == 109 { charCode = UniChar(77) }
-            if charCode == 110 { charCode = UniChar(78) }
-            if charCode == 111 { charCode = UniChar(79) }
-            if charCode == 112 { charCode = UniChar(80) }
-            if charCode == 113 { charCode = UniChar(81) }
-            if charCode == 114 { charCode = UniChar(82) }
-            if charCode == 115 { charCode = UniChar(83) }
-            if charCode == 116 { charCode = UniChar(84) }
-            if charCode == 117 { charCode = UniChar(85) }
-            if charCode == 118 { charCode = UniChar(86) }
-            if charCode == 119 { charCode = UniChar(87) }
-            if charCode == 120 { charCode = UniChar(88) }
-            if charCode == 121 { charCode = UniChar(89) }
-            if charCode == 122 { charCode = UniChar(90) }
+          switch charCode {
+            case 97...122: charCode -= 32
+            default: break
           }
         case "com.apple.keylayout.ZhuyinEten":
-          do {
-            if charCode == 65345 { charCode = UniChar(65) }
-            if charCode == 65346 { charCode = UniChar(66) }
-            if charCode == 65347 { charCode = UniChar(67) }
-            if charCode == 65348 { charCode = UniChar(68) }
-            if charCode == 65349 { charCode = UniChar(69) }
-            if charCode == 65350 { charCode = UniChar(70) }
-            if charCode == 65351 { charCode = UniChar(71) }
-            if charCode == 65352 { charCode = UniChar(72) }
-            if charCode == 65353 { charCode = UniChar(73) }
-            if charCode == 65354 { charCode = UniChar(74) }
-            if charCode == 65355 { charCode = UniChar(75) }
-            if charCode == 65356 { charCode = UniChar(76) }
-            if charCode == 65357 { charCode = UniChar(77) }
-            if charCode == 65358 { charCode = UniChar(78) }
-            if charCode == 65359 { charCode = UniChar(79) }
-            if charCode == 65360 { charCode = UniChar(80) }
-            if charCode == 65361 { charCode = UniChar(81) }
-            if charCode == 65362 { charCode = UniChar(82) }
-            if charCode == 65363 { charCode = UniChar(83) }
-            if charCode == 65364 { charCode = UniChar(84) }
-            if charCode == 65365 { charCode = UniChar(85) }
-            if charCode == 65366 { charCode = UniChar(86) }
-            if charCode == 65367 { charCode = UniChar(87) }
-            if charCode == 65368 { charCode = UniChar(88) }
-            if charCode == 65369 { charCode = UniChar(89) }
-            if charCode == 65370 { charCode = UniChar(90) }
+          switch charCode {
+            case 65345...65370: charCode -= 65280
+            default: break
           }
         default: break
       }
       // 注音鍵群。
-      if charCode == 12573 { charCode = UniChar(44) }
-      if charCode == 12582 { charCode = UniChar(45) }
-      if charCode == 12577 { charCode = UniChar(46) }
-      if charCode == 12581 { charCode = UniChar(47) }
-      if charCode == 12578 { charCode = UniChar(48) }
-      if charCode == 12549 { charCode = UniChar(49) }
-      if charCode == 12553 { charCode = UniChar(50) }
-      if charCode == 711 { charCode = UniChar(51) }
-      if charCode == 715 { charCode = UniChar(52) }
-      if charCode == 12563 { charCode = UniChar(53) }
-      if charCode == 714 { charCode = UniChar(54) }
-      if charCode == 729 { charCode = UniChar(55) }
-      if charCode == 12570 { charCode = UniChar(56) }
-      if charCode == 12574 { charCode = UniChar(57) }
-      if charCode == 12580 { charCode = UniChar(59) }
-      if charCode == 12551 { charCode = UniChar(97) }
-      if charCode == 12566 { charCode = UniChar(98) }
-      if charCode == 12559 { charCode = UniChar(99) }
-      if charCode == 12558 { charCode = UniChar(100) }
-      if charCode == 12557 { charCode = UniChar(101) }
-      if charCode == 12561 { charCode = UniChar(102) }
-      if charCode == 12565 { charCode = UniChar(103) }
-      if charCode == 12568 { charCode = UniChar(104) }
-      if charCode == 12571 { charCode = UniChar(105) }
-      if charCode == 12584 { charCode = UniChar(106) }
-      if charCode == 12572 { charCode = UniChar(107) }
-      if charCode == 12576 { charCode = UniChar(108) }
-      if charCode == 12585 { charCode = UniChar(109) }
-      if charCode == 12569 { charCode = UniChar(110) }
-      if charCode == 12575 { charCode = UniChar(111) }
-      if charCode == 12579 { charCode = UniChar(112) }
-      if charCode == 12550 { charCode = UniChar(113) }
-      if charCode == 12560 { charCode = UniChar(114) }
-      if charCode == 12555 { charCode = UniChar(115) }
-      if charCode == 12564 { charCode = UniChar(116) }
-      if charCode == 12583 { charCode = UniChar(117) }
-      if charCode == 12562 { charCode = UniChar(118) }
-      if charCode == 12554 { charCode = UniChar(119) }
-      if charCode == 12556 { charCode = UniChar(120) }
-      if charCode == 12567 { charCode = UniChar(121) }
-      if charCode == 12552 { charCode = UniChar(122) }
+      switch charCode {
+        case 12573: charCode = UniChar(44)
+        case 12582: charCode = UniChar(45)
+        case 12577: charCode = UniChar(46)
+        case 12581: charCode = UniChar(47)
+        case 12578: charCode = UniChar(48)
+        case 12549: charCode = UniChar(49)
+        case 12553: charCode = UniChar(50)
+        case 711: charCode = UniChar(51)
+        case 715: charCode = UniChar(52)
+        case 12563: charCode = UniChar(53)
+        case 714: charCode = UniChar(54)
+        case 729: charCode = UniChar(55)
+        case 12570: charCode = UniChar(56)
+        case 12574: charCode = UniChar(57)
+        case 12580: charCode = UniChar(59)
+        case 12551: charCode = UniChar(97)
+        case 12566: charCode = UniChar(98)
+        case 12559: charCode = UniChar(99)
+        case 12558: charCode = UniChar(100)
+        case 12557: charCode = UniChar(101)
+        case 12561: charCode = UniChar(102)
+        case 12565: charCode = UniChar(103)
+        case 12568: charCode = UniChar(104)
+        case 12571: charCode = UniChar(105)
+        case 12584: charCode = UniChar(106)
+        case 12572: charCode = UniChar(107)
+        case 12576: charCode = UniChar(108)
+        case 12585: charCode = UniChar(109)
+        case 12569: charCode = UniChar(110)
+        case 12575: charCode = UniChar(111)
+        case 12579: charCode = UniChar(112)
+        case 12550: charCode = UniChar(113)
+        case 12560: charCode = UniChar(114)
+        case 12555: charCode = UniChar(115)
+        case 12564: charCode = UniChar(116)
+        case 12583: charCode = UniChar(117)
+        case 12562: charCode = UniChar(118)
+        case 12554: charCode = UniChar(119)
+        case 12556: charCode = UniChar(120)
+        case 12567: charCode = UniChar(121)
+        case 12552: charCode = UniChar(122)
+        default: break
+      }
       // 除了數字鍵區以外的標點符號。
-      if charCode == 12289 { charCode = UniChar(92) }
-      if charCode == 12300 { charCode = UniChar(91) }
-      if charCode == 12301 { charCode = UniChar(93) }
-      if charCode == 12302 { charCode = UniChar(123) }
-      if charCode == 12303 { charCode = UniChar(125) }
-      if charCode == 65292 { charCode = UniChar(60) }
-      if charCode == 12290 { charCode = UniChar(62) }
+      switch charCode {
+        case 12289: charCode = UniChar(92)
+        case 12300: charCode = UniChar(91)
+        case 12301: charCode = UniChar(93)
+        case 12302: charCode = UniChar(123)
+        case 12303: charCode = UniChar(125)
+        case 65292: charCode = UniChar(60)
+        case 12290: charCode = UniChar(62)
+        default: break
+      }
       // 摁了 SHIFT 之後的數字區的符號。
-      if charCode == 65281 { charCode = UniChar(33) }
-      if charCode == 65312 { charCode = UniChar(64) }
-      if charCode == 65283 { charCode = UniChar(35) }
-      if charCode == 65284 { charCode = UniChar(36) }
-      if charCode == 65285 { charCode = UniChar(37) }
-      if charCode == 65087 { charCode = UniChar(94) }
-      if charCode == 65286 { charCode = UniChar(38) }
-      if charCode == 65290 { charCode = UniChar(42) }
-      if charCode == 65288 { charCode = UniChar(40) }
-      if charCode == 65289 { charCode = UniChar(41) }
+      switch charCode {
+        case 65281: charCode = UniChar(33)
+        case 65312: charCode = UniChar(64)
+        case 65283: charCode = UniChar(35)
+        case 65284: charCode = UniChar(36)
+        case 65285: charCode = UniChar(37)
+        case 65087: charCode = UniChar(94)
+        case 65286: charCode = UniChar(38)
+        case 65290: charCode = UniChar(42)
+        case 65288: charCode = UniChar(40)
+        case 65289: charCode = UniChar(41)
+        default: break
+      }
       // 摁了 Alt 的符號。
       if charCode == 8212 { charCode = UniChar(45) }
       // Apple 倚天注音佈局追加符號糾正項目。
       if mgrPrefs.basicKeyboardLayout == "com.apple.keylayout.ZhuyinEten" {
-        if charCode == 65343 { charCode = UniChar(95) }
-        if charCode == 65306 { charCode = UniChar(58) }
-        if charCode == 65311 { charCode = UniChar(63) }
-        if charCode == 65291 { charCode = UniChar(43) }
-        if charCode == 65372 { charCode = UniChar(124) }
+        switch charCode {
+          case 65343: charCode = UniChar(95)
+          case 65306: charCode = UniChar(58)
+          case 65311: charCode = UniChar(63)
+          case 65291: charCode = UniChar(43)
+          case 65372: charCode = UniChar(124)
+          default: break
+        }
       }
     }
     return charCode
   }
 
-  class func cnvStringApple2ABC(_ strProcessed: String) -> String {
+  static func cnvStringApple2ABC(_ strProcessed: String) -> String {
     var strProcessed = strProcessed
-    if isDynamicBasicKeyboardLayoutEnabled() {
+    if isDynamicBasicKeyboardLayoutEnabled {
       // 針對不同的 Apple 動態鍵盤佈局糾正大寫英文輸入。
       switch mgrPrefs.basicKeyboardLayout {
         case "com.apple.keylayout.ZhuyinBopomofo":
-          do {
-            if strProcessed == "a" { strProcessed = "A" }
-            if strProcessed == "b" { strProcessed = "B" }
-            if strProcessed == "c" { strProcessed = "C" }
-            if strProcessed == "d" { strProcessed = "D" }
-            if strProcessed == "e" { strProcessed = "E" }
-            if strProcessed == "f" { strProcessed = "F" }
-            if strProcessed == "g" { strProcessed = "G" }
-            if strProcessed == "h" { strProcessed = "H" }
-            if strProcessed == "i" { strProcessed = "I" }
-            if strProcessed == "j" { strProcessed = "J" }
-            if strProcessed == "k" { strProcessed = "K" }
-            if strProcessed == "l" { strProcessed = "L" }
-            if strProcessed == "m" { strProcessed = "M" }
-            if strProcessed == "n" { strProcessed = "N" }
-            if strProcessed == "o" { strProcessed = "O" }
-            if strProcessed == "p" { strProcessed = "P" }
-            if strProcessed == "q" { strProcessed = "Q" }
-            if strProcessed == "r" { strProcessed = "R" }
-            if strProcessed == "s" { strProcessed = "S" }
-            if strProcessed == "t" { strProcessed = "T" }
-            if strProcessed == "u" { strProcessed = "U" }
-            if strProcessed == "v" { strProcessed = "V" }
-            if strProcessed == "w" { strProcessed = "W" }
-            if strProcessed == "x" { strProcessed = "X" }
-            if strProcessed == "y" { strProcessed = "Y" }
-            if strProcessed == "z" { strProcessed = "Z" }
+          if strProcessed.count == 1, Character(strProcessed).isLowercase, Character(strProcessed).isASCII {
+            strProcessed = strProcessed.uppercased()
           }
         case "com.apple.keylayout.ZhuyinEten":
-          do {
-            if strProcessed == "ａ" { strProcessed = "A" }
-            if strProcessed == "ｂ" { strProcessed = "B" }
-            if strProcessed == "ｃ" { strProcessed = "C" }
-            if strProcessed == "ｄ" { strProcessed = "D" }
-            if strProcessed == "ｅ" { strProcessed = "E" }
-            if strProcessed == "ｆ" { strProcessed = "F" }
-            if strProcessed == "ｇ" { strProcessed = "G" }
-            if strProcessed == "ｈ" { strProcessed = "H" }
-            if strProcessed == "ｉ" { strProcessed = "I" }
-            if strProcessed == "ｊ" { strProcessed = "J" }
-            if strProcessed == "ｋ" { strProcessed = "K" }
-            if strProcessed == "ｌ" { strProcessed = "L" }
-            if strProcessed == "ｍ" { strProcessed = "M" }
-            if strProcessed == "ｎ" { strProcessed = "N" }
-            if strProcessed == "ｏ" { strProcessed = "O" }
-            if strProcessed == "ｐ" { strProcessed = "P" }
-            if strProcessed == "ｑ" { strProcessed = "Q" }
-            if strProcessed == "ｒ" { strProcessed = "R" }
-            if strProcessed == "ｓ" { strProcessed = "S" }
-            if strProcessed == "ｔ" { strProcessed = "T" }
-            if strProcessed == "ｕ" { strProcessed = "U" }
-            if strProcessed == "ｖ" { strProcessed = "V" }
-            if strProcessed == "ｗ" { strProcessed = "W" }
-            if strProcessed == "ｘ" { strProcessed = "X" }
-            if strProcessed == "ｙ" { strProcessed = "Y" }
-            if strProcessed == "ｚ" { strProcessed = "Z" }
+          switch strProcessed {
+            case "ａ": strProcessed = "A"
+            case "ｂ": strProcessed = "B"
+            case "ｃ": strProcessed = "C"
+            case "ｄ": strProcessed = "D"
+            case "ｅ": strProcessed = "E"
+            case "ｆ": strProcessed = "F"
+            case "ｇ": strProcessed = "G"
+            case "ｈ": strProcessed = "H"
+            case "ｉ": strProcessed = "I"
+            case "ｊ": strProcessed = "J"
+            case "ｋ": strProcessed = "K"
+            case "ｌ": strProcessed = "L"
+            case "ｍ": strProcessed = "M"
+            case "ｎ": strProcessed = "N"
+            case "ｏ": strProcessed = "O"
+            case "ｐ": strProcessed = "P"
+            case "ｑ": strProcessed = "Q"
+            case "ｒ": strProcessed = "R"
+            case "ｓ": strProcessed = "S"
+            case "ｔ": strProcessed = "T"
+            case "ｕ": strProcessed = "U"
+            case "ｖ": strProcessed = "V"
+            case "ｗ": strProcessed = "W"
+            case "ｘ": strProcessed = "X"
+            case "ｙ": strProcessed = "Y"
+            case "ｚ": strProcessed = "Z"
+            default: break
           }
         default: break
       }
       // 注音鍵群。
-      if strProcessed == "ㄝ" { strProcessed = "," }
-      if strProcessed == "ㄦ" { strProcessed = "-" }
-      if strProcessed == "ㄡ" { strProcessed = "." }
-      if strProcessed == "ㄥ" { strProcessed = "/" }
-      if strProcessed == "ㄢ" { strProcessed = "0" }
-      if strProcessed == "ㄅ" { strProcessed = "1" }
-      if strProcessed == "ㄉ" { strProcessed = "2" }
-      if strProcessed == "ˇ" { strProcessed = "3" }
-      if strProcessed == "ˋ" { strProcessed = "4" }
-      if strProcessed == "ㄓ" { strProcessed = "5" }
-      if strProcessed == "ˊ" { strProcessed = "6" }
-      if strProcessed == "˙" { strProcessed = "7" }
-      if strProcessed == "ㄚ" { strProcessed = "8" }
-      if strProcessed == "ㄞ" { strProcessed = "9" }
-      if strProcessed == "ㄤ" { strProcessed = ";" }
-      if strProcessed == "ㄇ" { strProcessed = "a" }
-      if strProcessed == "ㄖ" { strProcessed = "b" }
-      if strProcessed == "ㄏ" { strProcessed = "c" }
-      if strProcessed == "ㄎ" { strProcessed = "d" }
-      if strProcessed == "ㄍ" { strProcessed = "e" }
-      if strProcessed == "ㄑ" { strProcessed = "f" }
-      if strProcessed == "ㄕ" { strProcessed = "g" }
-      if strProcessed == "ㄘ" { strProcessed = "h" }
-      if strProcessed == "ㄛ" { strProcessed = "i" }
-      if strProcessed == "ㄨ" { strProcessed = "j" }
-      if strProcessed == "ㄜ" { strProcessed = "k" }
-      if strProcessed == "ㄠ" { strProcessed = "l" }
-      if strProcessed == "ㄩ" { strProcessed = "m" }
-      if strProcessed == "ㄙ" { strProcessed = "n" }
-      if strProcessed == "ㄟ" { strProcessed = "o" }
-      if strProcessed == "ㄣ" { strProcessed = "p" }
-      if strProcessed == "ㄆ" { strProcessed = "q" }
-      if strProcessed == "ㄐ" { strProcessed = "r" }
-      if strProcessed == "ㄋ" { strProcessed = "s" }
-      if strProcessed == "ㄔ" { strProcessed = "t" }
-      if strProcessed == "ㄧ" { strProcessed = "u" }
-      if strProcessed == "ㄒ" { strProcessed = "v" }
-      if strProcessed == "ㄊ" { strProcessed = "w" }
-      if strProcessed == "ㄌ" { strProcessed = "x" }
-      if strProcessed == "ㄗ" { strProcessed = "y" }
-      if strProcessed == "ㄈ" { strProcessed = "z" }
+      switch strProcessed {
+        case "ㄝ": strProcessed = ","
+        case "ㄦ": strProcessed = "-"
+        case "ㄡ": strProcessed = "."
+        case "ㄥ": strProcessed = "/"
+        case "ㄢ": strProcessed = "0"
+        case "ㄅ": strProcessed = "1"
+        case "ㄉ": strProcessed = "2"
+        case "ˇ": strProcessed = "3"
+        case "ˋ": strProcessed = "4"
+        case "ㄓ": strProcessed = "5"
+        case "ˊ": strProcessed = "6"
+        case "˙": strProcessed = "7"
+        case "ㄚ": strProcessed = "8"
+        case "ㄞ": strProcessed = "9"
+        case "ㄤ": strProcessed = ";"
+        case "ㄇ": strProcessed = "a"
+        case "ㄖ": strProcessed = "b"
+        case "ㄏ": strProcessed = "c"
+        case "ㄎ": strProcessed = "d"
+        case "ㄍ": strProcessed = "e"
+        case "ㄑ": strProcessed = "f"
+        case "ㄕ": strProcessed = "g"
+        case "ㄘ": strProcessed = "h"
+        case "ㄛ": strProcessed = "i"
+        case "ㄨ": strProcessed = "j"
+        case "ㄜ": strProcessed = "k"
+        case "ㄠ": strProcessed = "l"
+        case "ㄩ": strProcessed = "m"
+        case "ㄙ": strProcessed = "n"
+        case "ㄟ": strProcessed = "o"
+        case "ㄣ": strProcessed = "p"
+        case "ㄆ": strProcessed = "q"
+        case "ㄐ": strProcessed = "r"
+        case "ㄋ": strProcessed = "s"
+        case "ㄔ": strProcessed = "t"
+        case "ㄧ": strProcessed = "u"
+        case "ㄒ": strProcessed = "v"
+        case "ㄊ": strProcessed = "w"
+        case "ㄌ": strProcessed = "x"
+        case "ㄗ": strProcessed = "y"
+        case "ㄈ": strProcessed = "z"
+        default: break
+      }
       // 除了數字鍵區以外的標點符號。
-      if strProcessed == "、" { strProcessed = "\\" }
-      if strProcessed == "「" { strProcessed = "[" }
-      if strProcessed == "」" { strProcessed = "]" }
-      if strProcessed == "『" { strProcessed = "{" }
-      if strProcessed == "』" { strProcessed = "}" }
-      if strProcessed == "，" { strProcessed = "<" }
-      if strProcessed == "。" { strProcessed = ">" }
+      switch strProcessed {
+        case "、": strProcessed = "\\"
+        case "「": strProcessed = "["
+        case "」": strProcessed = "]"
+        case "『": strProcessed = "{"
+        case "』": strProcessed = "}"
+        case "，": strProcessed = "<"
+        case "。": strProcessed = ">"
+        default: break
+      }
       // 摁了 SHIFT 之後的數字區的符號。
-      if strProcessed == "！" { strProcessed = "!" }
-      if strProcessed == "＠" { strProcessed = "@" }
-      if strProcessed == "＃" { strProcessed = "#" }
-      if strProcessed == "＄" { strProcessed = "$" }
-      if strProcessed == "％" { strProcessed = "%" }
-      if strProcessed == "︿" { strProcessed = "^" }
-      if strProcessed == "＆" { strProcessed = "&" }
-      if strProcessed == "＊" { strProcessed = "*" }
-      if strProcessed == "（" { strProcessed = "(" }
-      if strProcessed == "）" { strProcessed = ")" }
+      switch strProcessed {
+        case "！": strProcessed = "!"
+        case "＠": strProcessed = "@"
+        case "＃": strProcessed = "#"
+        case "＄": strProcessed = "$"
+        case "％": strProcessed = "%"
+        case "︿": strProcessed = "^"
+        case "＆": strProcessed = "&"
+        case "＊": strProcessed = "*"
+        case "（": strProcessed = "("
+        case "）": strProcessed = ")"
+        default: break
+      }
       // 摁了 Alt 的符號。
       if strProcessed == "—" { strProcessed = "-" }
       // Apple 倚天注音佈局追加符號糾正項目。
       if mgrPrefs.basicKeyboardLayout == "com.apple.keylayout.ZhuyinEten" {
-        if strProcessed == "＿" { strProcessed = "_" }
-        if strProcessed == "：" { strProcessed = ":" }
-        if strProcessed == "？" { strProcessed = "?" }
-        if strProcessed == "＋" { strProcessed = "+" }
-        if strProcessed == "｜" { strProcessed = "|" }
+        switch strProcessed {
+          case "＿": strProcessed = "_"
+          case "：": strProcessed = ":"
+          case "？": strProcessed = "?"
+          case "＋": strProcessed = "+"
+          case "｜": strProcessed = "|"
+          default: break
+        }
       }
     }
     return strProcessed

@@ -42,7 +42,7 @@ enum StateType {
   case ofSymbolTable
 }
 
-// 所有 InputState 均遵守该协定：
+// 所有 InputState 均遵守該協定：
 protocol InputStateProtocol {
   var type: StateType { get }
 }
@@ -71,7 +71,7 @@ protocol InputStateProtocol {
 /// - .Empty: 使用者剛剛切換至該輸入法、卻還沒有任何輸入行為。抑或是剛剛敲字遞交給
 ///   客體應用、準備新的輸入行為。
 /// - .EmptyIgnorePreviousState: 與 Empty 類似，但會扔掉上一個狀態的內容、不將這些
-///   內容遞交給客體應用。
+///   內容遞交給客體應用。該狀態在處理完畢之後會被立刻切換至 .Empty()。
 /// - .Committing: 該狀態會承載要遞交出去的內容，讓輸入法控制器處理時代為遞交。
 /// - .NotEmpty: 非空狀態，是一種狀態大類、用以派生且代表下述諸狀態。
 /// - .Inputting: 使用者輸入了內容。此時會出現組字區（Compositor）。
@@ -108,6 +108,7 @@ enum InputState {
 
   /// .EmptyIgnorePreviousState: 與 Empty 類似，
   /// 但會扔掉上一個狀態的內容、不將這些內容遞交給客體應用。
+  /// 該狀態在處理完畢之後會被立刻切換至 .Empty()。
   class EmptyIgnoringPreviousState: Empty {
     override public var type: StateType { .ofEmptyIgnorePreviousState }
     override var description: String {
@@ -372,10 +373,10 @@ enum InputState {
 
     var userPhraseConverted: String {
       let text =
-        OpenCCBridge.crossConvert(composingBuffer.utf16SubString(with: markedRange)) ?? ""
+        ChineseConverter.crossConvert(composingBuffer.utf16SubString(with: markedRange)) ?? ""
       let selectedReadings = readings[literalMarkedRange]
       let joined = selectedReadings.joined(separator: "-")
-      let convertedMark = "#𝙊𝙥𝙚𝙣𝘾𝘾"
+      let convertedMark = "#𝙃𝙪𝙢𝙖𝙣𝘾𝙝𝙚𝙘𝙠𝙍𝙚𝙦𝙪𝙞𝙧𝙚𝙙"
       return "\(text) \(joined)\t\(convertedMark)"
     }
   }
@@ -432,7 +433,7 @@ enum InputState {
     }
 
     override var description: String {
-      "<InputState.SymbolTable, candidates:\(candidates), isTypingVertical:\(isTypingVertical),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
+      "<InputState.SymbolTable, candidates:\(candidates), isTypingVertical:\(isTypingVertical)>"
     }
   }
 }

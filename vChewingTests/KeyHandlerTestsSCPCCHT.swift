@@ -266,7 +266,7 @@ class KeyHandlerTestsSCPCCHT: XCTestCase {
     }
     print("Expecting EmptyIgnoringPreviousState.")
     print("\(state)")
-    // XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
+    // XCTAssertTrue(state is InputState.Empty, "\(state)")
   }
 
   // TODO: Further bug-hunting needed.
@@ -291,7 +291,7 @@ class KeyHandlerTestsSCPCCHT: XCTestCase {
     }
     print("Expecting EmptyIgnoringPreviousState.")
     print("\(state)")
-    // XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
+    // XCTAssertTrue(state is InputState.Empty, "\(state)")
   }
 
   // TODO: Further bug-hunting needed.
@@ -314,9 +314,9 @@ class KeyHandlerTestsSCPCCHT: XCTestCase {
     print("Expecting AssociatedPhrases.")
     print("\(state)")
     // XCTAssertTrue(state is InputState.AssociatedPhrases, "\(state)")
-    if let state = state as? InputState.AssociatedPhrases {
-      // XCTAssertTrue(state.candidates.contains("百五"))
-    }
+    // if let state = state as? InputState.AssociatedPhrases {
+    // XCTAssertTrue(state.candidates.contains("百五"))
+    // }
     mgrPrefs.associatedPhrasesEnabled = enabled
   }
 

@@ -32,6 +32,13 @@ import Cocoa
 // MARK: - § 根據狀態調度按鍵輸入 (Handle Input with States)
 
 extension KeyHandler {
+  /// 對於輸入訊號的第一關處理均藉由此函式來進行。
+  /// - Parameters:
+  ///   - input: 輸入訊號。
+  ///   - state: 給定狀態（通常為當前狀態）。
+  ///   - stateCallback: 狀態回呼，交給對應的型別內的專有函式來處理。
+  ///   - errorCallback: 錯誤回呼。
+  /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handle(
     input: InputSignal,
     state: InputStateProtocol,
@@ -49,9 +56,8 @@ extension KeyHandler {
     // 提前過濾掉一些不合規的按鍵訊號輸入，免得相關按鍵訊號被送給 Megrez 引發輸入法崩潰。
     if input.isInvalidInput {
       // 在「.Empty(IgnoringPreviousState) 與 .Deactivated」狀態下的首次不合規按鍵輸入可以直接放行。
-      if state is InputState.Empty || state is InputState.Deactivated
-        || state is InputState.EmptyIgnoringPreviousState
-      {
+      // 因為「.EmptyIgnorePreviousState」會在處理之後被自動轉為「.Empty」，所以不需要單獨判斷。
+      if state is InputState.Empty || state is InputState.Deactivated {
         return false
       }
       IME.prtDebugIntel("550BCF7B: KeyHandler just refused an invalid input.")
@@ -78,7 +84,7 @@ extension KeyHandler {
     {
       // 略過對 BackSpace 的處理。
     } else if input.isCapsLockOn {
-      // 但願能夠處理這種情況下所有可能的案件組合。
+      // 但願能夠處理這種情況下所有可能的按鍵組合。
       clear()
       stateCallback(InputState.Empty())
 
@@ -89,9 +95,7 @@ extension KeyHandler {
 
       /// 如果是 ASCII 當中的不可列印的字元的話，不使用「insertText:replacementRange:」。
       /// 某些應用無法正常處理非 ASCII 字符的輸入。
-      /// 注意：這裡一定要用 Objective-C 的 isPrintable() 函式來處理，否則無效。
-      /// 這個函式已經包裝在 CTools.h 裡面了，這樣就可以拿給 Swift 用。
-      if charCode < 0x80, !CTools.isPrintable(charCode) {
+      if charCode < 0x80, !charCode.isPrintableASCII {
         return false
       }
 
@@ -106,7 +110,7 @@ extension KeyHandler {
 
     if input.isNumericPad {
       if !input.isLeft, !input.isRight, !input.isDown,
-        !input.isUp, !input.isSpace, CTools.isPrintable(charCode)
+        !input.isUp, !input.isSpace, charCode.isPrintableASCII
       {
         clear()
         stateCallback(InputState.Empty())
@@ -163,8 +167,7 @@ extension KeyHandler {
 
       // 沒有調號的話，只需要 updateClientComposingBuffer() 且終止處理（return true）即可。
       // 有調號的話，則不需要這樣，而是轉而繼續在此之後的處理。
-      let composeReading = composer.hasToneMarker()
-      if !composeReading {
+      if !composer.hasToneMarker() {
         stateCallback(buildInputtingState)
         return true
       }
@@ -198,7 +201,7 @@ extension KeyHandler {
       insertToCompositorAtCursor(reading: reading)
 
       // 讓組字器反爬軌格。
-      let textToCommit = popOverflowComposingTextAndWalk
+      let textToCommit = commitOverflownCompositionAndWalk
 
       // 看看半衰記憶模組是否會對目前的狀態給出自動選字建議。
       fetchAndApplySuggestionsFromUserOverrideModel()
@@ -256,9 +259,7 @@ extension KeyHandler {
       return true
     }
 
-    // MARK: Calling candidate window using Up / Down or PageUp / PageDn.
-
-    // 用上下左右鍵呼叫選字窗。
+    // MARK: 用上下左右鍵呼叫選字窗 (Calling candidate window using Up / Down or PageUp / PageDn.)
 
     if let currentState = state as? InputState.NotEmpty, composer.isEmpty,
       input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
@@ -278,7 +279,7 @@ extension KeyHandler {
             stateCallback(InputState.Empty())
           } else if ifLangModelHasUnigrams(forKey: " ") {
             insertToCompositorAtCursor(reading: " ")
-            let textToCommit = popOverflowComposingTextAndWalk
+            let textToCommit = commitOverflownCompositionAndWalk
             let inputting = buildInputtingState
             inputting.textToCommit = textToCommit
             stateCallback(inputting)
@@ -299,7 +300,7 @@ extension KeyHandler {
 
     // MARK: Esc
 
-    if input.isESC { return handleEsc(state: state, stateCallback: stateCallback, errorCallback: errorCallback) }
+    if input.isEsc { return handleEsc(state: state, stateCallback: stateCallback) }
 
     // MARK: Tab
 
@@ -313,10 +314,7 @@ extension KeyHandler {
 
     if input.isCursorBackward || input.emacsKey == EmacsKey.backward {
       return handleBackward(
-        state: state,
-        input: input,
-        stateCallback: stateCallback,
-        errorCallback: errorCallback
+        state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
       )
     }
 
@@ -361,7 +359,7 @@ extension KeyHandler {
     // MARK: Backspace
 
     if input.isBackSpace {
-      return handleBackspace(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+      return handleBackSpace(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 
     // MARK: Delete
@@ -375,9 +373,9 @@ extension KeyHandler {
     if input.isEnter {
       return (input.isCommandHold && input.isControlHold)
         ? (input.isOptionHold
-          ? handleCtrlOptionCommandEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
-          : handleCtrlCommandEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback))
-        : handleEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+          ? handleCtrlOptionCommandEnter(state: state, stateCallback: stateCallback)
+          : handleCtrlCommandEnter(state: state, stateCallback: stateCallback))
+        : handleEnter(state: state, stateCallback: stateCallback)
     }
 
     // MARK: -
@@ -389,12 +387,12 @@ extension KeyHandler {
         if ifLangModelHasUnigrams(forKey: "_punctuation_list") {
           if composer.isEmpty {
             insertToCompositorAtCursor(reading: "_punctuation_list")
-            let textToCommit: String! = popOverflowComposingTextAndWalk
+            let textToCommit: String! = commitOverflownCompositionAndWalk
             let inputting = buildInputtingState
             inputting.textToCommit = textToCommit
             stateCallback(inputting)
             stateCallback(buildCandidate(state: inputting, isTypingVertical: input.isTypingVertical))
-          } else {  // If there is still unfinished bpmf reading, ignore the punctuation
+          } else {  // 不要在注音沒敲完整的情況下叫出統合符號選單。
             IME.prtDebugIntel("17446655")
             errorCallback()
           }
@@ -404,7 +402,7 @@ extension KeyHandler {
         // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
         // 於是這裡用「模擬一次 Enter 鍵的操作」使其代為執行這個 commit buffer 的動作。
         // 這裡不需要該函式所傳回的 bool 結果，所以用「_ =」解消掉。
-        _ = handleEnter(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+        _ = handleEnter(state: state, stateCallback: stateCallback)
         stateCallback(InputState.SymbolTable(node: SymbolNode.root, isTypingVertical: input.isTypingVertical))
         return true
       }
