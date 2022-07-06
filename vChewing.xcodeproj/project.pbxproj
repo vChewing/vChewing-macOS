@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0AF8B427B2C8290096FE54 /* StringExtension.swift */; };
 		5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */; };
+		5B21176C287539BB000443A9 /* ctlInputMethod_HandleStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176B287539BB000443A9 /* ctlInputMethod_HandleStates.swift */; };
+		5B21176E28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176D28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift */; };
+		5B21177028753B9D000443A9 /* ctlInputMethod_Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176F28753B9D000443A9 /* ctlInputMethod_Delegates.swift */; };
 		5B242403284B0D6500520FE4 /* ctlCandidateUniversal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B242402284B0D6500520FE4 /* ctlCandidateUniversal.swift */; };
 		5B3133BF280B229700A4A505 /* KeyHandler_States.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3133BE280B229700A4A505 /* KeyHandler_States.swift */; };
 		5B38F59A281E2E49007D5F5D /* 6_Unigram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1D15FC0EB100ABF4B3 /* 6_Unigram.swift */; };
@@ -199,6 +202,9 @@
 		5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-JPN.txt"; sourceTree = "<group>"; };
 		5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHT.txt"; sourceTree = "<group>"; };
+		5B21176B287539BB000443A9 /* ctlInputMethod_HandleStates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_HandleStates.swift; sourceTree = "<group>"; };
+		5B21176D28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_HandleDisplay.swift; sourceTree = "<group>"; };
+		5B21176F28753B9D000443A9 /* ctlInputMethod_Delegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_Delegates.swift; sourceTree = "<group>"; };
 		5B242402284B0D6500520FE4 /* ctlCandidateUniversal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlCandidateUniversal.swift; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
 		5B2F2BB3286216A500B8557B /* vChewingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vChewingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -446,6 +452,9 @@
 			children = (
 				5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */,
 				D4A13D5927A59D5C003BE359 /* ctlInputMethod_Core.swift */,
+				5B21176F28753B9D000443A9 /* ctlInputMethod_Delegates.swift */,
+				5B21176D28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift */,
+				5B21176B287539BB000443A9 /* ctlInputMethod_HandleStates.swift */,
 				5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */,
 				D4E569DA27A34CC100AC2CEF /* CTools.h */,
 				D4E569DB27A34CC100AC2CEF /* CTools.m */,
@@ -1141,6 +1150,8 @@
 				5BA9FD4827FEF3C9002DE248 /* PreferencesWindowController.swift in Sources */,
 				5BD0113B28180D6100609769 /* LMInstantiator.swift in Sources */,
 				D4E569DC27A34D0E00AC2CEF /* CTools.m in Sources */,
+				5B21177028753B9D000443A9 /* ctlInputMethod_Delegates.swift in Sources */,
+				5B21176E28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift in Sources */,
 				5B84579F2871AD2200C93B01 /* HotenkaChineseConverter.swift in Sources */,
 				5B887F302826AEA400B6651E /* lmCoreEX.swift in Sources */,
 				5BA9FD4627FEF3C9002DE248 /* Container.swift in Sources */,
@@ -1163,6 +1174,7 @@
 				5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */,
 				5B54E743283A7D89001ECBDC /* lmCoreNS.swift in Sources */,
 				5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */,
+				5B21176C287539BB000443A9 /* ctlInputMethod_HandleStates.swift in Sources */,
 				5B38F59B281E2E49007D5F5D /* 7_KeyValuePaired.swift in Sources */,
 				5B62A33627AE795800A19448 /* mgrPrefs.swift in Sources */,
 				5B38F5A4281E2E49007D5F5D /* 5_LanguageModel.swift in Sources */,
