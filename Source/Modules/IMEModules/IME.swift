@@ -413,7 +413,7 @@ extension String {
 
 // Ref: https://forums.swift.org/t/57085/5
 extension UniChar {
-  public func isPrintable() -> Bool {
+  public var isPrintable: Bool {
     guard Unicode.Scalar(UInt32(self)) != nil else {
       struct NotAWholeScalar: Error {}
       return false

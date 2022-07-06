@@ -210,7 +210,7 @@ class ctlInputMethod: IMKInputController {
 
     // 無法列印的訊號輸入，一概不作處理。
     // 這個過程不能放在 KeyHandler 內，否則不會起作用。
-    if !input.charCode.isPrintable() {
+    if !input.charCode.isPrintable {
       return false
     }
 

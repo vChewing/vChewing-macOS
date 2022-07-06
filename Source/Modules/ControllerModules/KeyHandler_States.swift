@@ -116,7 +116,7 @@ extension KeyHandler {
     var cleanedComposition = ""
     for theChar in composedText {
       if let charCode = theChar.utf16.first {
-        if !(theChar.isASCII && !(charCode.isPrintable())) {
+        if !(theChar.isASCII && !(charCode.isPrintable)) {
           cleanedComposition += String(theChar)
         }
       }
