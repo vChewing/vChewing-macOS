@@ -144,7 +144,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
     if elapsed >= kTranslocationRemovalDeadline {
       timer.invalidate()
       window?.endSheet(progressSheet, returnCode: .cancel)
-    } else if appBundleChronoshiftedToARandomizedPath(kTargetPartialPath) == false {
+    } else if readonlyAccessCheckGPR(kTargetPartialPath) == false {
       progressIndicator.doubleValue = 1.0
       timer.invalidate()
       window?.endSheet(progressSheet, returnCode: .continue)
@@ -163,7 +163,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
     }
 
     let shouldWaitForTranslocationRemoval =
-      appBundleChronoshiftedToARandomizedPath(kTargetPartialPath)
+      readonlyAccessCheckGPR(kTargetPartialPath)
       && (window?.responds(to: #selector(NSWindow.beginSheet(_:completionHandler:))) ?? false)
 
     // 將既存輸入法扔到垃圾桶內
@@ -357,5 +357,12 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 
   func windowWillClose(_: Notification) {
     NSApp.terminate(self)
+  }
+
+  // Determines if an app is translocated by Gatekeeper to a randomized path
+  // See https://weblog.rogueamoeba.com/2016/06/29/sierra-and-gatekeeper-path-randomization/
+  // Theoretically, if the path is a randomized path then it cannot be writable to FileManager.
+  func readonlyAccessCheckGPR(_ bundle: String) -> Bool {
+    !FileManager.default.isWritableFile(atPath: (bundle as NSString).expandingTildeInPath)
   }
 }
