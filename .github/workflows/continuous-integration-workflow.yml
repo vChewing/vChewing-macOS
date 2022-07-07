@@ -1,10 +1,14 @@
-name: Build
-on: [push]
+name: Build-with-macOS-12
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
-    name: Build
-    runs-on: macOS-latest
+    name: Build (macOS 12)
+    runs-on: macOS-12
     env:
         GIT_SSL_NO_VERIFY: true
         DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
