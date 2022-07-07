@@ -144,7 +144,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
     if elapsed >= kTranslocationRemovalDeadline {
       timer.invalidate()
       window?.endSheet(progressSheet, returnCode: .cancel)
-    } else if readonlyAccessCheckGPR(kTargetPartialPath) == false {
+    } else if isAppBundleTranslocated(atPath: kTargetPartialPath) == false {
       progressIndicator.doubleValue = 1.0
       timer.invalidate()
       window?.endSheet(progressSheet, returnCode: .continue)
@@ -163,7 +163,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
     }
 
     let shouldWaitForTranslocationRemoval =
-      readonlyAccessCheckGPR(kTargetPartialPath)
+      isAppBundleTranslocated(atPath: kTargetPartialPath)
       && (window?.responds(to: #selector(NSWindow.beginSheet(_:completionHandler:))) ?? false)
 
     // 將既存輸入法扔到垃圾桶內
@@ -359,10 +359,25 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
     NSApp.terminate(self)
   }
 
-  // Determines if an app is translocated by Gatekeeper to a randomized path
+  // Determines if an app is translocated by Gatekeeper to a randomized path.
   // See https://weblog.rogueamoeba.com/2016/06/29/sierra-and-gatekeeper-path-randomization/
-  // Theoretically, if the path is a randomized path then it cannot be writable to FileManager.
-  func readonlyAccessCheckGPR(_ bundle: String) -> Bool {
-    !FileManager.default.isWritableFile(atPath: (bundle as NSString).expandingTildeInPath)
+  // Originally written by Zonble Yang in Objective-C (MIT License).
+  // Swiftified by: Rob Mayoff. Ref: https://forums.swift.org/t/58719/5
+  func isAppBundleTranslocated(atPath bundlePath: String) -> Bool {
+    var entryCount = getfsstat(nil, 0, 0)
+    var entries: [statfs] = .init(repeating: .init(), count: Int(entryCount))
+    let absPath = (bundlePath as NSString).expandingTildeInPath.cString(using: .utf8)
+    entryCount = getfsstat(&entries, entryCount * Int32(MemoryLayout<statfs>.stride), MNT_NOWAIT)
+    for entry in entries.prefix(Int(entryCount)) {
+      let isMatch = withUnsafeBytes(of: entry.f_mntfromname) { mntFromName in
+        strcmp(absPath, mntFromName.baseAddress) == 0
+      }
+      if isMatch {
+        var stat = statfs()
+        let rc = statfs(absPath, &stat)
+        return rc == 0
+      }
+    }
+    return false
   }
 }
