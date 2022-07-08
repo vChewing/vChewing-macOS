@@ -294,7 +294,7 @@ class KeyHandler {
       compositor.grid.overrideNodeScoreForSelectedCandidate(
         location: min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength),
         value: overrideValue,
-        overridingScore: findHighestScore(nodes: rawAnchorsOfNodes, epsilon: kEpsilon)
+        overridingScore: findHighestScore(nodeAnchors: rawAnchorsOfNodes, epsilon: kEpsilon)
       )
     } else {
       IME.prtDebugIntel("UOM: Blank suggestion retrieved, dismissing.")
@@ -306,14 +306,8 @@ class KeyHandler {
   ///   - nodes: 給定的節錨陣列。
   ///   - epsilon: 半衰模組的衰減指數。
   /// - Returns: 尋獲的最高權重數值。
-  func findHighestScore(nodes: [Megrez.NodeAnchor], epsilon: Double) -> Double {
-    var highestScore: Double = 0
-    for currentAnchor in nodes {
-      if let theNode = currentAnchor.node {
-        highestScore = max(theNode.highestUnigramScore, highestScore)
-      }
-    }
-    return highestScore + epsilon
+  func findHighestScore(nodeAnchors: [Megrez.NodeAnchor], epsilon: Double) -> Double {
+    return nodeAnchors.compactMap(\.node?.highestUnigramScore).max() ?? 0 + epsilon
   }
 
   // MARK: - Extracted methods and functions (Tekkon).
