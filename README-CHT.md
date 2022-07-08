@@ -34,9 +34,9 @@
 
 建置用系統需求：
 
-- 至少 macOS 11 Big Sur & Xcode 13。
-    - 原因：Swift 封包管理支援與 Swift 5.5 所需。
-    - 我們已經沒有條件測試 macOS 10.15 Catalina & Xcode 12 環境了。硬要在這個環境下編譯的話，可能需要額外安裝[新版 Swift](https://www.swift.org/download/) 才可以。
+- 至少 macOS 12 Monterey & Xcode 13.4.1。
+    - 原因：Swift 封包管理支援與 Swift 5.5 所需，且倉庫內包含了需要 Xcode 13.4.1 才能正常編譯的內容（App 型安裝程式）。
+    - 我們已經沒有條件測試比 Xcode 13.4.1 更老的環境了。硬要在這個環境下編譯的話，可能需要額外安裝[新版 Swift](https://www.swift.org/download/) 才可以。
 - 請使用正式發行版 Xcode，且最小子版本號越高越好（因為 Bug 相對而言最少）。
     - 如果是某個大版本的 Xcode 的 Release Candidate 版本的話，我們可能會對此做相容性測試。
 
