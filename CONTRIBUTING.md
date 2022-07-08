@@ -15,6 +15,12 @@
 - 如果台澎金馬用戶無法註冊 Gitee 的話，請使用 GitLab China 的工單區。
   - 還可以使用電郵（理論上最快）：shikisuen◎yeah●net
 
+### 我想在小麥注音的基礎上開發新功能，該怎麼開始？
+
+首先，您得有 Swift 基礎、對設計模式（策略模式與狀態模式）與演算法都有一定的了解。無論是比較上層的使用體驗，還是比較底層的演算法，威注音都僅使用 Swift。
+
+威注音倉庫內可能會在未來不久新增與程式架構有關的百科說明文章，但對鐵恨注拼引擎與天權星語彙引擎的架構說明則會擇日放入對應的倉庫的百科內。然而，書寫這些百科，需要花費時間精力。威注音相信專案內已有的針對函式的中文註解應該已經足夠了。
+
 ## 參與說明：
 
 為了不讓參與者們浪費各自的熱情，特設此文以說明該專案目前最需要協助的地方。
@@ -29,7 +35,7 @@
 
 ## 格式規範：
 
-該專案對源碼格式有規範，且 Swift 與其他 (Obj)C(++) 系語言持不同規範：
+該專案對源碼格式有規範：
 
 - Swift: 採 [Apple 官方 Swift-Format](https://github.com/apple/swift-format)，且施加如下例外修改項目：
 	- `"indentSwitchCaseLabels" : true,`
@@ -38,9 +44,6 @@
     - `"OnlyOneTrailingClosureArgument" : false,` // SwiftUI 相容
     - `"UseTripleSlashForDocumentationComments" : false,`
     - `"DontRepeatTypeInStaticProperties" : false,`
-- (Obj)C(++) 系語言：使用 clang-format 命令、且採 Microsoft 行文規範。
-	- 該規範以四個西文半形空格為行縮進單位。
-	- 由於今後不會再用這類語言給該倉庫新增內容，所以相關規範就不改動了。
 
 之前，為了節省檔案體積，曾經對 Swift 檔案改採 1-Tab 縮進。然而，這會導致 Gitee 等線上 git 專案管理網站內的顯示變成 8-Space 縮進。於是，該專案對 Swift 檔案又改回了 2-Spaces 縮進。
 
