@@ -25,7 +25,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 extension Megrez {
   /// 單元圖。
-  @frozen public struct Unigram: Equatable, CustomStringConvertible {
+  @frozen public struct Unigram: Equatable, CustomStringConvertible, Hashable {
     /// 鍵值。
     public var keyValue: KeyValuePaired
     /// 權重。
@@ -54,7 +54,7 @@ extension Megrez {
     }
 
     public static func < (lhs: Unigram, rhs: Unigram) -> Bool {
-      lhs.keyValue < rhs.keyValue || (lhs.keyValue == rhs.keyValue && lhs.keyValue < rhs.keyValue)
+      lhs.keyValue < rhs.keyValue || (lhs.keyValue == rhs.keyValue && lhs.score < rhs.score)
     }
   }
 }

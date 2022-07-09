@@ -45,15 +45,15 @@ extension KeyHandler {
     /// 所以在這裡必須做糾偏處理。因為在用 Swift，所以可以用「.utf16」取代「NSString.length()」。
     /// 這樣就可以免除不必要的類型轉換。
     for theAnchor in walkedAnchors {
-      guard let theNode = theAnchor.node else { continue }
-      let strNodeValue = theNode.currentKeyValue.value
+      let theNode = theAnchor.node
+      let strNodeValue = theNode.currentPair.value
       composingBuffer += strNodeValue
       let arrSplit: [String] = Array(strNodeValue).map { String($0) }
       let codepointCount = arrSplit.count
       /// 藉下述步驟重新將「可見游標位置」對齊至「組字器內的游標所在的讀音位置」。
       /// 每個節錨（NodeAnchor）都有自身的幅位長度（spanningLength），可以用來
       /// 累加、以此為依據，來校正「可見游標位置」。
-      let spanningLength: Int = theAnchor.spanningLength
+      let spanningLength: Int = theAnchor.spanLength
       if readingCursorIndex + spanningLength <= compositorCursorIndex {
         composedStringCursorIndex += strNodeValue.utf16.count
         readingCursorIndex += spanningLength
@@ -406,22 +406,20 @@ extension KeyHandler {
 
     var composed = ""
 
-    for theAnchor in walkedAnchors {
-      if let node = theAnchor.node {
-        var key = node.key
-        if mgrPrefs.inlineDumpPinyinInLieuOfZhuyin {
-          key = Tekkon.restoreToneOneInZhuyinKey(target: key)  // 恢復陰平標記
-          key = Tekkon.cnvPhonaToHanyuPinyin(target: key)  // 注音轉拼音
-          key = Tekkon.cnvHanyuPinyinToTextbookStyle(target: key)  // 轉教科書式標調
-          key = key.replacingOccurrences(of: "-", with: " ")
-        } else {
-          key = Tekkon.cnvZhuyinChainToTextbookReading(target: key, newSeparator: " ")
-        }
-
-        let value = node.currentKeyValue.value
-        // 不要給標點符號等特殊元素加注音
-        composed += key.contains("_") ? value : "<ruby>\(value)<rp>(</rp><rt>\(key)</rt><rp>)</rp></ruby>"
+    for node in walkedAnchors.map(\.node) {
+      var key = node.key
+      if mgrPrefs.inlineDumpPinyinInLieuOfZhuyin {
+        key = Tekkon.restoreToneOneInZhuyinKey(target: key)  // 恢復陰平標記
+        key = Tekkon.cnvPhonaToHanyuPinyin(target: key)  // 注音轉拼音
+        key = Tekkon.cnvHanyuPinyinToTextbookStyle(target: key)  // 轉教科書式標調
+        key = key.replacingOccurrences(of: "-", with: " ")
+      } else {
+        key = Tekkon.cnvZhuyinChainToTextbookReading(target: key, newSeparator: " ")
       }
+
+      let value = node.currentPair.value
+      // 不要給標點符號等特殊元素加注音
+      composed += key.contains("_") ? value : "<ruby>\(value)<rp>(</rp><rt>\(key)</rt><rp>)</rp></ruby>"
     }
 
     clear()
@@ -796,26 +794,21 @@ extension KeyHandler {
     var length = 0
     var currentAnchor = Megrez.NodeAnchor()
     let cursorIndex = min(
-      actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength
+      actualCandidateCursor + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength
     )
     for anchor in walkedAnchors {
-      length += anchor.spanningLength
+      length += anchor.spanLength
       if length >= cursorIndex {
         currentAnchor = anchor
         break
       }
     }
 
-    guard let currentNode = currentAnchor.node else {
-      IME.prtDebugIntel("4F2DEC2F")
-      errorCallback()
-      return true
-    }
-
-    let currentValue = currentNode.currentKeyValue.value
+    let currentNode = currentAnchor.node
+    let currentValue = currentNode.currentPair.value
 
     var currentIndex = 0
-    if currentNode.score < currentNode.kSelectedCandidateScore {
+    if currentNode.score < Megrez.Node.kSelectedCandidateScore {
       /// 只要是沒有被使用者手動選字過的（節錨下的）節點，
       /// 就從第一個候選字詞開始，這樣使用者在敲字時就會優先匹配
       /// 那些字詞長度不小於 2 的單元圖。換言之，如果使用者敲了兩個

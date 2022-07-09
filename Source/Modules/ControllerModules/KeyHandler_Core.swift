@@ -56,7 +56,7 @@ class KeyHandler {
   var compositor: Megrez.Compositor  // 組字器
   var currentLM: vChewing.LMInstantiator = .init()  // 當前主語言模組
   var currentUOM: vChewing.LMUserOverride = .init()  // 當前半衰記憶模組
-  var walkedAnchors: [Megrez.NodeAnchor] = []  // 用以記錄爬過的節錨的陣列
+  var walkedAnchors: [Megrez.NodeAnchor] { compositor.walkedAnchors }  // 用以記錄爬過的節錨的陣列
   /// 委任物件 (ctlInputMethod)，以便呼叫其中的函式。
   var delegate: KeyHandlerDelegate?
 
@@ -95,7 +95,6 @@ class KeyHandler {
   func clear() {
     composer.clear()
     compositor.clear()
-    walkedAnchors.removeAll()
   }
 
   // MARK: - Functions dealing with Megrez.
@@ -103,7 +102,7 @@ class KeyHandler {
   /// 實際上要拿給 Megrez 使用的的滑鼠游標位址，以方便在組字器最開頭或者最末尾的時候始終能抓取候選字節點陣列。
   ///
   /// 威注音對游標前置與游標後置模式採取的候選字節點陣列抓取方法是分離的，且不使用 Node Crossing。
-  var actualCandidateCursorIndex: Int {
+  var actualCandidateCursor: Int {
     mgrPrefs.useRearCursorMode ? min(compositorCursorIndex, compositorLength - 1) : max(compositorCursorIndex, 1)
   }
 
@@ -113,11 +112,11 @@ class KeyHandler {
   ///
   /// 該函式的爬取順序是從頭到尾。
   func walk() {
-    walkedAnchors = compositor.walk()
+    compositor.walk()
 
     // 在偵錯模式開啟時，將 GraphViz 資料寫入至指定位置。
     if mgrPrefs.isDebugModeEnabled {
-      let result = compositor.grid.dumpDOT
+      let result = compositor.dumpDOT
       do {
         try result.write(
           toFile: "/private/var/tmp/vChewing-visualization.dot",
@@ -137,12 +136,10 @@ class KeyHandler {
   /// 估算對象範圍。用比較形象且生動卻有點噁心的解釋的話，蒼蠅一邊吃一邊屙。
   var commitOverflownCompositionAndWalk: String {
     var textToCommit = ""
-    if compositor.grid.width > mgrPrefs.composingBufferSize, !walkedAnchors.isEmpty {
+    if compositor.width > mgrPrefs.composingBufferSize, !walkedAnchors.isEmpty {
       let anchor: Megrez.NodeAnchor = walkedAnchors[0]
-      if let theNode = anchor.node {
-        textToCommit = theNode.currentKeyValue.value
-      }
-      compositor.removeHeadReadings(count: anchor.spanningLength)
+      textToCommit = anchor.node.currentPair.value
+      compositor.removeHeadReadings(count: anchor.spanLength)
     }
     walk()
     return textToCommit
@@ -166,26 +163,22 @@ class KeyHandler {
   ///   - value: 給定之候選字字串。
   ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字厚的節錨的前方。
   func fixNode(value: String, respectCursorPushing: Bool = true) {
-    let adjustedIndex = max(0, min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength))
+    let adjustedCursor = max(0, min(actualCandidateCursor + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength))
     // 開始讓半衰模組觀察目前的狀況。
-    let selectedNode: Megrez.NodeAnchor = compositor.grid.fixNodeSelectedCandidate(
-      location: adjustedIndex, value: value
-    )
+    let selectedNode: Megrez.NodeAnchor = compositor.fixNodeSelectedCandidate(value, at: adjustedCursor)
     // 不要針對逐字選字模式啟用臨時半衰記憶模型。
     if !mgrPrefs.useSCPCTypingMode {
       var addToUserOverrideModel = true
       // 所有讀音數與字符數不匹配的情況均不得塞入半衰記憶模組。
-      if selectedNode.spanningLength != value.count {
+      if selectedNode.spanLength != value.count {
         IME.prtDebugIntel("UOM: SpanningLength != value.count, dismissing.")
         addToUserOverrideModel = false
       }
       if addToUserOverrideModel {
-        if let theNode = selectedNode.node {
-          // 威注音的 SymbolLM 的 Score 是 -12，符合該條件的內容不得塞入半衰記憶模組。
-          if theNode.scoreFor(candidate: value) <= -12 {
-            IME.prtDebugIntel("UOM: Score <= -12, dismissing.")
-            addToUserOverrideModel = false
-          }
+        // 威注音的 SymbolLM 的 Score 是 -12，符合該條件的內容不得塞入半衰記憶模組。
+        if selectedNode.node.scoreFor(candidate: value) <= -12 {
+          IME.prtDebugIntel("UOM: Score <= -12, dismissing.")
+          addToUserOverrideModel = false
         }
       }
       if addToUserOverrideModel {
@@ -193,7 +186,7 @@ class KeyHandler {
         // 令半衰記憶模組觀測給定的三元圖。
         // 這個過程會讓半衰引擎根據當前上下文生成三元圖索引鍵。
         currentUOM.observe(
-          walkedAnchors: walkedAnchors, cursorIndex: adjustedIndex, candidate: value,
+          walkedAnchors: walkedAnchors, cursorIndex: adjustedCursor, candidate: value,
           timestamp: NSDate().timeIntervalSince1970
         )
       }
@@ -206,8 +199,8 @@ class KeyHandler {
     if mgrPrefs.moveCursorAfterSelectingCandidate, respectCursorPushing {
       var nextPosition = 0
       for theAnchor in walkedAnchors {
-        if nextPosition >= adjustedIndex { break }
-        nextPosition += theAnchor.spanningLength
+        if nextPosition >= adjustedCursor { break }
+        nextPosition += theAnchor.spanLength
       }
       if nextPosition <= compositorLength {
         compositorCursorIndex = nextPosition
@@ -217,20 +210,17 @@ class KeyHandler {
 
   /// 組字器內超出最大動態爬軌範圍的節錨都會被自動標記為「已經手動選字過」，減少爬軌運算負擔。
   func markNodesFixedIfNecessary() {
-    let width = compositor.grid.width
+    let width = compositor.width
     if width <= kMaxComposingBufferNeedsToWalkSize {
       return
     }
     var index = 0
     for anchor in walkedAnchors {
-      guard let node = anchor.node else { break }
       if index >= width - kMaxComposingBufferNeedsToWalkSize { break }
-      if node.score < node.kSelectedCandidateScore {
-        compositor.grid.fixNodeSelectedCandidate(
-          location: index + anchor.spanningLength, value: node.currentKeyValue.value
-        )
+      if anchor.node.score < Megrez.Node.kSelectedCandidateScore {
+        compositor.fixNodeSelectedCandidate(anchor.node.currentPair.value, at: index + anchor.spanLength)
       }
-      index += anchor.spanningLength
+      index += anchor.spanLength
     }
   }
 
@@ -248,14 +238,11 @@ class KeyHandler {
     arrAnchors = arrAnchors.stableSort { $0.keyLength > $1.keyLength }
 
     // 將節錨內的候選字詞資料拓印到輸出陣列內。
-    for currentNodeAnchor in arrAnchors {
-      guard let currentNode = currentNodeAnchor.node else { continue }
-      for currentCandidate in currentNode.candidates {
-        // 選字窗的內容的康熙轉換 / JIS 轉換不能放在這裡處理，會影響選字有效性。
-        // 選字的原理是拿著具體的候選字詞的字串去當前的節錨下找出對應的候選字詞（Ｘ元圖）。
-        // 一旦在這裡轉換了，節錨內的某些元圖就無法被選中。
-        arrCandidates.append(currentCandidate.value)
-      }
+    for currentCandidate in arrAnchors.map(\.node.candidates).joined() {
+      // 選字窗的內容的康熙轉換 / JIS 轉換不能放在這裡處理，會影響選字有效性。
+      // 選字的原理是拿著具體的候選字詞的字串去當前的節錨下找出對應的候選字詞（Ｘ元圖）。
+      // 一旦在這裡轉換了，節錨內的某些元圖就無法被選中。
+      arrCandidates.append(currentCandidate.value)
     }
     // 決定是否根據半衰記憶模組的建議來調整候選字詞的順序。
     if !mgrPrefs.fetchSuggestionsFromUserOverrideModel || mgrPrefs.useSCPCTypingMode || fixOrder {
@@ -291,8 +278,8 @@ class KeyHandler {
     if !overrideValue.isEmpty {
       IME.prtDebugIntel(
         "UOM: Suggestion retrieved, overriding the node score of the selected candidate.")
-      compositor.grid.overrideNodeScoreForSelectedCandidate(
-        location: min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength),
+      compositor.overrideNodeScoreForSelectedCandidate(
+        location: min(actualCandidateCursor + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength),
         value: overrideValue,
         overridingScore: findHighestScore(nodeAnchors: rawAnchorsOfNodes, epsilon: kEpsilon)
       )
@@ -307,7 +294,7 @@ class KeyHandler {
   ///   - epsilon: 半衰模組的衰減指數。
   /// - Returns: 尋獲的最高權重數值。
   func findHighestScore(nodeAnchors: [Megrez.NodeAnchor], epsilon: Double) -> Double {
-    return nodeAnchors.compactMap(\.node?.highestUnigramScore).max() ?? 0 + epsilon
+    return nodeAnchors.map(\.node.highestUnigramScore).max() ?? 0 + epsilon
   }
 
   // MARK: - Extracted methods and functions (Tekkon).
@@ -363,8 +350,8 @@ class KeyHandler {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
     mgrPrefs.useRearCursorMode
-      ? compositor.grid.nodesBeginningAt(location: actualCandidateCursorIndex)
-      : compositor.grid.nodesEndingAt(location: actualCandidateCursorIndex)
+      ? compositor.nodesBeginningAt(location: actualCandidateCursor)
+      : compositor.nodesEndingAt(location: actualCandidateCursor)
   }
 
   /// 將輸入法偏好設定同步至語言模組內。
@@ -390,7 +377,7 @@ class KeyHandler {
 
   /// 在組字器的給定游標位置內插入讀音。
   func insertToCompositorAtCursor(reading: String) {
-    compositor.insertReadingAtCursor(reading: reading)
+    compositor.insertReading(reading)
   }
 
   /// 組字器的游標位置。
@@ -408,28 +395,27 @@ class KeyHandler {
   ///
   /// 在威注音的術語體系當中，「與文字輸入方向相反的方向」為向後（Rear）。
   func deleteCompositorReadingAtTheRearOfCursor() {
-    compositor.deleteReadingAtTheRearOfCursor()
+    compositor.dropReading(direction: .rear)
   }
 
   /// 在組字器內，朝著往文字輸入方向、砍掉一個與游標相鄰的讀音。
   ///
   /// 在威注音的術語體系當中，「文字輸入方向」為向前（Front）。
   func deleteCompositorReadingToTheFrontOfCursor() {
-    compositor.deleteReadingToTheFrontOfCursor()
+    compositor.dropReading(direction: .front)
   }
 
   /// 獲取指定游標位置的鍵值長度。
   /// - Returns: 指定游標位置的鍵值長度。
   var keyLengthAtCurrentIndex: Int {
-    guard let node = walkedAnchors[compositorCursorIndex].node else { return 0 }
-    return node.key.split(separator: "-").count
+    walkedAnchors[compositorCursorIndex].node.key.split(separator: "-").count
   }
 
   var nextPhrasePosition: Int {
     var nextPosition = 0
     for theAnchor in walkedAnchors {
-      if nextPosition > actualCandidateCursorIndex { break }
-      nextPosition += theAnchor.spanningLength
+      if nextPosition > actualCandidateCursor { break }
+      nextPosition += theAnchor.spanLength
     }
     return min(nextPosition, compositorLength)
   }

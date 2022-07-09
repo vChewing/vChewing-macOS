@@ -130,13 +130,12 @@ extension vChewing {
     func convertKeyFrom(
       walkedAnchors: [Megrez.NodeAnchor], cursorIndex: Int, readingOnly: Bool = false
     ) -> String {
-      let arrEndingPunctuation = ["，", "。", "！", "？", "」", "』", "”", "’"]
       let whiteList = "你他妳她祢衪它牠再在"
       var arrNodes: [Megrez.NodeAnchor] = []
       var intLength = 0
       for theNodeAnchor in walkedAnchors {
         arrNodes.append(theNodeAnchor)
-        intLength += theNodeAnchor.spanningLength
+        intLength += theNodeAnchor.spanLength
         if intLength >= cursorIndex {
           break
         }
@@ -146,9 +145,8 @@ extension vChewing {
 
       arrNodes = Array(arrNodes.reversed())
 
-      guard let kvCurrent = arrNodes[0].node?.currentKeyValue,
-        !arrEndingPunctuation.contains(kvCurrent.value)
-      else {
+      let kvCurrent = arrNodes[0].node.currentPair
+      guard !kvCurrent.key.contains("_") else {
         return ""
       }
 
@@ -173,20 +171,18 @@ extension vChewing {
       }
 
       if arrNodes.count >= 2,
-        let kvPreviousThisOne = arrNodes[1].node?.currentKeyValue,
-        !arrEndingPunctuation.contains(kvPrevious.value),
+        !kvPrevious.key.contains("_"),
         kvPrevious.key.split(separator: "-").count == kvPrevious.value.count
       {
-        kvPrevious = kvPreviousThisOne
+        kvPrevious = arrNodes[1].node.currentPair
         readingStack = kvPrevious.key + readingStack
       }
 
       if arrNodes.count >= 3,
-        let kvAnteriorThisOne = arrNodes[2].node?.currentKeyValue,
-        !arrEndingPunctuation.contains(kvAnterior.value),
+        !kvAnterior.key.contains("_"),
         kvAnterior.key.split(separator: "-").count == kvAnterior.value.count
       {
-        kvAnterior = kvAnteriorThisOne
+        kvAnterior = arrNodes[2].node.currentPair
         readingStack = kvAnterior.key + readingStack
       }
 
