@@ -166,10 +166,10 @@ class KeyHandler {
   ///   - value: 給定之候選字字串。
   ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字厚的節錨的前方。
   func fixNode(value: String, respectCursorPushing: Bool = true) {
-    let cursorIndex = min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength)
+    let adjustedIndex = max(0, min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength))
     // 開始讓半衰模組觀察目前的狀況。
     let selectedNode: Megrez.NodeAnchor = compositor.grid.fixNodeSelectedCandidate(
-      location: cursorIndex, value: value
+      location: adjustedIndex, value: value
     )
     // 不要針對逐字選字模式啟用臨時半衰記憶模型。
     if !mgrPrefs.useSCPCTypingMode {
@@ -193,7 +193,7 @@ class KeyHandler {
         // 令半衰記憶模組觀測給定的三元圖。
         // 這個過程會讓半衰引擎根據當前上下文生成三元圖索引鍵。
         currentUOM.observe(
-          walkedAnchors: walkedAnchors, cursorIndex: cursorIndex, candidate: value,
+          walkedAnchors: walkedAnchors, cursorIndex: adjustedIndex, candidate: value,
           timestamp: NSDate().timeIntervalSince1970
         )
       }
@@ -206,7 +206,7 @@ class KeyHandler {
     if mgrPrefs.moveCursorAfterSelectingCandidate, respectCursorPushing {
       var nextPosition = 0
       for theAnchor in walkedAnchors {
-        if nextPosition >= cursorIndex { break }
+        if nextPosition >= adjustedIndex { break }
         nextPosition += theAnchor.spanningLength
       }
       if nextPosition <= compositorLength {
@@ -451,5 +451,21 @@ class KeyHandler {
   /// 在威注音的術語體系當中，「文字輸入方向」為向前（Front）。
   func deleteCompositorReadingToTheFrontOfCursor() {
     compositor.deleteReadingToTheFrontOfCursor()
+  }
+
+  /// 獲取指定游標位置的鍵值長度。
+  /// - Returns: 指定游標位置的鍵值長度。
+  var keyLengthAtCurrentIndex: Int {
+    guard let node = walkedAnchors[compositorCursorIndex].node else { return 0 }
+    return node.key.split(separator: "-").count
+  }
+
+  var nextPhrasePosition: Int {
+    var nextPosition = 0
+    for theAnchor in walkedAnchors {
+      if nextPosition > actualCandidateCursorIndex { break }
+      nextPosition += theAnchor.spanningLength
+    }
+    return min(nextPosition, compositorLength)
   }
 }

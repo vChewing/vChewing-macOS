@@ -651,6 +651,15 @@ extension KeyHandler {
         errorCallback()
         stateCallback(state)
       }
+    } else if input.isOptionHold {
+      if compositorCursorIndex < compositorLength {
+        compositorCursorIndex = nextPhrasePosition
+        stateCallback(buildInputtingState)
+      } else {
+        IME.prtDebugIntel("33C3B580")
+        errorCallback()
+        stateCallback(state)
+      }
     } else {
       if compositorCursorIndex < compositorLength {
         compositorCursorIndex += 1
@@ -704,6 +713,18 @@ extension KeyHandler {
         stateCallback(marking)
       } else {
         IME.prtDebugIntel("D326DEA3")
+        errorCallback()
+        stateCallback(state)
+      }
+    } else if input.isOptionHold {
+      if compositorCursorIndex > 1 {
+        compositorCursorIndex -= 2
+        stateCallback(buildInputtingState)
+      } else if compositorCursorIndex == 1 {
+        compositorCursorIndex = 0
+        stateCallback(buildInputtingState)
+      } else {
+        IME.prtDebugIntel("8D50DD9E")
         errorCallback()
         stateCallback(state)
       }
