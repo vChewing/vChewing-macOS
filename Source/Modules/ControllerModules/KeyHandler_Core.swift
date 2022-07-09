@@ -190,8 +190,8 @@ class KeyHandler {
       }
       if addToUserOverrideModel {
         IME.prtDebugIntel("UOM: Start Observation.")
-        // 令半衰記憶模組觀測給定的 trigram。
-        // 這個過程會讓半衰引擎根據當前上下文生成 trigram 索引鍵。
+        // 令半衰記憶模組觀測給定的三元圖。
+        // 這個過程會讓半衰引擎根據當前上下文生成三元圖索引鍵。
         currentUOM.observe(
           walkedAnchors: walkedAnchors, cursorIndex: cursorIndex, candidate: value,
           timestamp: NSDate().timeIntervalSince1970
@@ -284,7 +284,7 @@ class KeyHandler {
     if mgrPrefs.useSCPCTypingMode { return }
     /// 如果這個開關沒打開的話，直接放棄執行這個函式。
     if !mgrPrefs.fetchSuggestionsFromUserOverrideModel { return }
-    /// 先就當前上下文讓半衰引擎重新生成 trigram 索引鍵。
+    /// 先就當前上下文讓半衰引擎重新生成三元圖索引鍵。
     let overrideValue = fetchSuggestedCandidates().first?.keyValue.value ?? ""
 
     /// 再拿著索引鍵去問半衰模組有沒有選字建議。有的話就遵循之、讓天權星引擎對指定節錨下的節點複寫權重。
