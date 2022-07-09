@@ -86,6 +86,18 @@ extension KeyHandler {
                   tooltipParameterRef[1] = compositor.readings[compositorCursorIndex]
                 }
             }
+            /// 注音轉拼音
+            for (i, _) in tooltipParameterRef.enumerated() {
+              if tooltipParameterRef[i].isEmpty { continue }
+              if tooltipParameterRef[i].contains("_") { continue }
+              if mgrPrefs.showHanyuPinyinInCompositionBuffer {  // 恢復陰平標記->注音轉拼音->轉教科書式標調
+                tooltipParameterRef[i] = Tekkon.restoreToneOneInZhuyinKey(target: tooltipParameterRef[i])
+                tooltipParameterRef[i] = Tekkon.cnvPhonaToHanyuPinyin(target: tooltipParameterRef[i])
+                tooltipParameterRef[i] = Tekkon.cnvHanyuPinyinToTextbookStyle(target: tooltipParameterRef[i])
+              } else {
+                tooltipParameterRef[i] = Tekkon.cnvZhuyinChainToTextbookReading(target: tooltipParameterRef[i])
+              }
+            }
           }
         }
       }
@@ -364,7 +376,7 @@ extension KeyHandler {
 
     var composingBuffer = currentReadings.joined(separator: "-")
     if mgrPrefs.inlineDumpPinyinInLieuOfZhuyin {
-      composingBuffer = restoreToneOneInZhuyinKey(target: composingBuffer)  // 恢復陰平標記
+      composingBuffer = Tekkon.restoreToneOneInZhuyinKey(target: composingBuffer)  // 恢復陰平標記
       composingBuffer = Tekkon.cnvPhonaToHanyuPinyin(target: composingBuffer)  // 注音轉拼音
     }
 
@@ -398,12 +410,12 @@ extension KeyHandler {
       if let node = theAnchor.node {
         var key = node.key
         if mgrPrefs.inlineDumpPinyinInLieuOfZhuyin {
-          key = restoreToneOneInZhuyinKey(target: key)  // 恢復陰平標記
+          key = Tekkon.restoreToneOneInZhuyinKey(target: key)  // 恢復陰平標記
           key = Tekkon.cnvPhonaToHanyuPinyin(target: key)  // 注音轉拼音
           key = Tekkon.cnvHanyuPinyinToTextbookStyle(target: key)  // 轉教科書式標調
           key = key.replacingOccurrences(of: "-", with: " ")
         } else {
-          key = cnvZhuyinKeyToTextbookReading(target: key, newSeparator: " ")
+          key = Tekkon.cnvZhuyinChainToTextbookReading(target: key, newSeparator: " ")
         }
 
         let value = node.currentKeyValue.value
