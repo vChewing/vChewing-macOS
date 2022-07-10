@@ -228,6 +228,27 @@ enum InputState {
       return lowerBoundLiteral..<upperBoundLiteral
     }
 
+    var literalReadingThread: String {
+      var arrOutput = [String]()
+      for neta in readings[literalMarkedRange] {
+        var neta = neta
+        if neta.isEmpty { continue }
+        if neta.contains("_") {
+          arrOutput.append("??")
+          continue
+        }
+        if mgrPrefs.showHanyuPinyinInCompositionBuffer {  // 恢復陰平標記->注音轉拼音->轉教科書式標調
+          neta = Tekkon.restoreToneOneInZhuyinKey(target: neta)
+          neta = Tekkon.cnvPhonaToHanyuPinyin(target: neta)
+          neta = Tekkon.cnvHanyuPinyinToTextbookStyle(target: neta)
+        } else {
+          neta = Tekkon.cnvZhuyinChainToTextbookReading(target: neta)
+        }
+        arrOutput.append(neta)
+      }
+      return arrOutput.joined(separator: " ")
+    }
+
     private var deleteTargetExists = false
     var tooltip: String {
       if composingBuffer.count != readings.count {
@@ -252,15 +273,14 @@ enum InputState {
         return String(
           format: NSLocalizedString(
             "\"%@\" length must ≥ 2 for a user phrase.", comment: ""
-          ), text
+          ) + "\n//  " + literalReadingThread, text
         )
       } else if literalMarkedRange.count > allowedMarkRange.upperBound {
         ctlInputMethod.tooltipController.setColor(state: .denialOverflow)
         return String(
           format: NSLocalizedString(
             "\"%@\" length should ≤ %d for a user phrase.", comment: ""
-          ),
-          text, allowedMarkRange.upperBound
+          ) + "\n//  " + literalReadingThread, text, allowedMarkRange.upperBound
         )
       }
 
@@ -275,12 +295,13 @@ enum InputState {
         return String(
           format: NSLocalizedString(
             "\"%@\" already exists: ENTER to boost, \n SHIFT+CMD+ENTER to exclude.", comment: ""
-          ), text
+          ) + "\n//  " + literalReadingThread, text
         )
       }
       ctlInputMethod.tooltipController.resetColor()
       return String(
-        format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: ""),
+        format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: "") + "\n//  "
+          + literalReadingThread,
         text
       )
     }

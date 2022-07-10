@@ -146,7 +146,7 @@
 "Push the cursor in front of the phrase after selection" = "Push the cursor in front of the phrase after selection";
 "Secondary Pinyin with Numeral Intonation" = "Secondary Pinyin with Numeral Intonation";
 "Selection Keys:" = "Selection Keys:";
-"Show Hanyu-Pinyin in the inline composition buffer" = "Show Hanyu-Pinyin in the inline composition buffer";
+"Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "Show Hanyu-Pinyin in the inline composition buffer & tooltip";
 "Show page buttons in candidate window" = "Show page buttons in candidate window";
 "Simplified Chinese" = "Simplified Chinese";
 "Space & ESC Key:" = "Space & ESC Key:";

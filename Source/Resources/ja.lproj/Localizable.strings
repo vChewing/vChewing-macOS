@@ -146,7 +146,7 @@
 "Push the cursor in front of the phrase after selection" = "候補選択の直後、すぐカーソルを単語の向こうに推し進める";
 "Secondary Pinyin with Numeral Intonation" = "国音二式 (ローマ字+数字音調)";
 "Selection Keys:" = "言選り用キー:";
-"Show Hanyu-Pinyin in the inline composition buffer" = "弁音合併入力（入力緩衝列で代わりに漢語弁音の音読み）";
+"Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "弁音合併入力（入力緩衝列とヒントで音読みを漢語弁音に）";
 "Show page buttons in candidate window" = "入力候補陳列の側にページボタンを表示";
 "Simplified Chinese" = "簡体中国語";
 "Space & ESC Key:" = "ESC と Space:";

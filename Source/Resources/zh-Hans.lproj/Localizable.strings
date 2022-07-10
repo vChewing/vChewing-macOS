@@ -147,7 +147,7 @@
 "Push the cursor in front of the phrase after selection" = "在选字后将游标置于该字词的前方";
 "Secondary Pinyin with Numeral Intonation" = "国音二式+数字标调";
 "Selection Keys:" = "选字键:";
-"Show Hanyu-Pinyin in the inline composition buffer" = "拼音并击模式（组字区内看到的是汉语拼音）";
+"Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "拼音并击（组字区与工具提示内显示汉语拼音）";
 "Show page buttons in candidate window" = "在选字窗内显示翻页按钮";
 "Simplified Chinese" = "简体中文";
 "Space & ESC Key:" = "ESC 与空格键:";
