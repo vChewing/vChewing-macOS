@@ -81,7 +81,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
   }
 
   func ctlCandidate(_ controller: ctlCandidate, candidateAtIndex index: Int)
-    -> String
+    -> (String, String)
   {
     _ = controller  // 防止格式整理工具毀掉與此對應的參數。
     if let state = state as? InputState.ChoosingCandidate {
@@ -89,7 +89,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
     } else if let state = state as? InputState.AssociatedPhrases {
       return state.candidates[index]
     }
-    return ""
+    return ("", "")
   }
 
   func ctlCandidate(_ controller: ctlCandidate, didSelectCandidateAtIndex index: Int) {
@@ -112,7 +112,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
 
     if let state = state as? InputState.ChoosingCandidate {
       let selectedValue = state.candidates[index]
-      keyHandler.fixNode(value: selectedValue, respectCursorPushing: true)
+      keyHandler.fixNode(candidate: selectedValue, respectCursorPushing: true)
 
       let inputting = keyHandler.buildInputtingState
 
@@ -137,10 +137,10 @@ extension ctlInputMethod: ctlCandidateDelegate {
 
     if let state = state as? InputState.AssociatedPhrases {
       let selectedValue = state.candidates[index]
-      handle(state: InputState.Committing(textToCommit: selectedValue))
+      handle(state: InputState.Committing(textToCommit: selectedValue.1))
       if mgrPrefs.associatedPhrasesEnabled,
         let associatePhrases = keyHandler.buildAssociatePhraseState(
-          withKey: selectedValue, isTypingVertical: state.isTypingVertical
+          withKey: selectedValue.1, isTypingVertical: state.isTypingVertical
         ), !associatePhrases.candidates.isEmpty
       {
         handle(state: associatePhrases)

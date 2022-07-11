@@ -330,8 +330,8 @@ extension KeyHandler {
     )
     if candidateState.candidates.count == 1 {
       clear()
-      if let strtextToCommit: String = candidateState.candidates.first {
-        stateCallback(InputState.Committing(textToCommit: strtextToCommit))
+      if let candidateToCommit: (String, String) = candidateState.candidates.first {
+        stateCallback(InputState.Committing(textToCommit: candidateToCommit.1))
         stateCallback(InputState.Empty())
       } else {
         stateCallback(candidateState)
@@ -802,7 +802,7 @@ extension KeyHandler {
     }
 
     let currentNode = currentAnchor.node
-    let currentValue = currentNode.currentPair.value
+    let currentPaired: Megrez.KeyValuePaired = currentNode.currentPair
 
     var currentIndex = 0
     if currentNode.score < Megrez.Node.kSelectedCandidateScore {
@@ -814,14 +814,14 @@ extension KeyHandler {
       /// 選中的話，則使用者可以直接摁下本函式對應的按鍵來輪替候選字即可。
       /// （預設情況下是 (Shift+)Tab 來做正 (反) 向切換，但也可以用
       /// Shift(+CMD)+Space 來切換、以應對臉書綁架 Tab 鍵的情況。
-      if candidates[0] == currentValue {
+      if candidates[0].0 == currentPaired.key, candidates[0].1 == currentPaired.value {
         /// 如果第一個候選字詞是當前節點的候選字詞的值的話，
         /// 那就切到下一個（或上一個，也就是最後一個）候選字詞。
         currentIndex = reverseModifier ? candidates.count - 1 : 1
       }
     } else {
       for candidate in candidates {
-        if candidate == currentValue {
+        if candidate.0 == currentPaired.key, candidate.1 == currentPaired.value {
           if reverseModifier {
             if currentIndex == 0 {
               currentIndex = candidates.count - 1
@@ -841,7 +841,7 @@ extension KeyHandler {
       currentIndex = 0
     }
 
-    fixNode(value: candidates[currentIndex], respectCursorPushing: false)
+    fixNode(candidate: candidates[currentIndex], respectCursorPushing: false)
 
     stateCallback(buildInputtingState)
     return true

@@ -139,9 +139,9 @@ enum InputState {
   /// 因為逐字選字模式不需要在組字區內存入任何東西，所以該狀態不受 .NotEmpty 的管轄。
   class AssociatedPhrases: InputStateProtocol {
     public var type: StateType { .ofAssociatedPhrases }
-    private(set) var candidates: [String] = []
+    private(set) var candidates: [(String, String)] = []
     private(set) var isTypingVertical: Bool = false
-    init(candidates: [String], isTypingVertical: Bool) {
+    init(candidates: [(String, String)], isTypingVertical: Bool) {
       self.candidates = candidates
       self.isTypingVertical = isTypingVertical
     }
@@ -407,10 +407,10 @@ enum InputState {
   /// .ChoosingCandidate: 叫出選字窗、允許使用者選字。
   class ChoosingCandidate: NotEmpty {
     override public var type: StateType { .ofChooseCandidate }
-    private(set) var candidates: [String]
+    private(set) var candidates: [(String, String)]
     private(set) var isTypingVertical: Bool
 
-    init(composingBuffer: String, cursorIndex: Int, candidates: [String], isTypingVertical: Bool) {
+    init(composingBuffer: String, cursorIndex: Int, candidates: [(String, String)], isTypingVertical: Bool) {
       self.candidates = candidates
       self.isTypingVertical = isTypingVertical
       super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
@@ -432,7 +432,7 @@ enum InputState {
       self.node = node
       let candidates = node.children?.map(\.title) ?? [String]()
       super.init(
-        composingBuffer: "", cursorIndex: 0, candidates: candidates,
+        composingBuffer: "", cursorIndex: 0, candidates: candidates.map { ("", $0) },
         isTypingVertical: isTypingVertical
       )
     }

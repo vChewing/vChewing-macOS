@@ -225,7 +225,7 @@ extension KeyHandler {
         )
         if choosingCandidates.candidates.count == 1 {
           clear()
-          let text: String = choosingCandidates.candidates.first ?? ""
+          let text: String = choosingCandidates.candidates.first?.1 ?? ""
           stateCallback(InputState.Committing(textToCommit: text))
 
           if !mgrPrefs.associatedPhrasesEnabled {

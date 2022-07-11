@@ -40,7 +40,7 @@ public class CandidateKeyLabel: NSObject {
 public protocol ctlCandidateDelegate: AnyObject {
   func candidateCountForController(_ controller: ctlCandidate) -> Int
   func ctlCandidate(_ controller: ctlCandidate, candidateAtIndex index: Int)
-    -> String
+    -> (String, String)
   func ctlCandidate(
     _ controller: ctlCandidate, didSelectCandidateAtIndex index: Int
   )

@@ -365,7 +365,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
     XCTAssertTrue(state is InputState.ChoosingCandidate, "\(state)")
     if let state = state as? InputState.ChoosingCandidate {
-      XCTAssertTrue(state.candidates.contains("！"))
+      XCTAssertTrue(state.candidates.map(\.1).contains("！"))
     }
     mgrPrefs.halfWidthPunctuationEnabled = enabled
   }
@@ -993,7 +993,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
       XCTAssertEqual(state.composingBuffer, "你")
       XCTAssertEqual(state.cursorIndex, 1)
       let candidates = state.candidates
-      XCTAssertTrue(candidates.contains("你"))
+      XCTAssertTrue(candidates.map(\.1).contains("你"))
     }
   }
 
@@ -1030,7 +1030,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
       XCTAssertEqual(state.composingBuffer, "你")
       XCTAssertEqual(state.cursorIndex, 1)
       let candidates = state.candidates
-      XCTAssertTrue(candidates.contains("你"))
+      XCTAssertTrue(candidates.map(\.1).contains("你"))
     }
     mgrPrefs.chooseCandidateUsingSpace = enabled
   }

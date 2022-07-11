@@ -149,10 +149,10 @@ class KeyHandler {
   /// - Parameter key: 給定的聯想詞的開頭字。
   /// - Returns: 抓取到的聯想詞陣列。
   /// 不會是 nil，但那些負責接收結果的函式會對空白陣列結果做出正確的處理。
-  func buildAssociatePhraseArray(withKey key: String) -> [String] {
-    var arrResult: [String] = []
+  func buildAssociatePhraseArray(withKey key: String) -> [(String, String)] {
+    var arrResult: [(String, String)] = []
     if currentLM.hasAssociatedPhrasesFor(key: key) {
-      arrResult.append(contentsOf: currentLM.associatedPhrasesFor(key: key))
+      arrResult = currentLM.associatedPhrasesFor(key: key).map { ("", $0) }
     }
     return arrResult
   }
@@ -162,21 +162,22 @@ class KeyHandler {
   /// - Parameters:
   ///   - value: 給定之候選字字串。
   ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字厚的節錨的前方。
-  func fixNode(value: String, respectCursorPushing: Bool = true) {
+  func fixNode(candidate: (String, String), respectCursorPushing: Bool = true) {
+    let theCandidate: Megrez.KeyValuePaired = .init(key: candidate.0, value: candidate.1)
     let adjustedCursor = max(0, min(actualCandidateCursor + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength))
     // 開始讓半衰模組觀察目前的狀況。
-    let selectedNode: Megrez.NodeAnchor = compositor.fixNodeSelectedCandidate(value, at: adjustedCursor)
+    let selectedNode: Megrez.NodeAnchor = compositor.fixNodeWithCandidate(theCandidate, at: adjustedCursor)
     // 不要針對逐字選字模式啟用臨時半衰記憶模型。
     if !mgrPrefs.useSCPCTypingMode {
       var addToUserOverrideModel = true
       // 所有讀音數與字符數不匹配的情況均不得塞入半衰記憶模組。
-      if selectedNode.spanLength != value.count {
+      if selectedNode.spanLength != theCandidate.value.count {
         IME.prtDebugIntel("UOM: SpanningLength != value.count, dismissing.")
         addToUserOverrideModel = false
       }
       if addToUserOverrideModel {
         // 威注音的 SymbolLM 的 Score 是 -12，符合該條件的內容不得塞入半衰記憶模組。
-        if selectedNode.node.scoreFor(candidate: value) <= -12 {
+        if selectedNode.node.scoreForPaired(candidate: theCandidate) <= -12 {
           IME.prtDebugIntel("UOM: Score <= -12, dismissing.")
           addToUserOverrideModel = false
         }
@@ -186,7 +187,7 @@ class KeyHandler {
         // 令半衰記憶模組觀測給定的三元圖。
         // 這個過程會讓半衰引擎根據當前上下文生成三元圖索引鍵。
         currentUOM.observe(
-          walkedAnchors: walkedAnchors, cursorIndex: adjustedCursor, candidate: value,
+          walkedAnchors: walkedAnchors, cursorIndex: adjustedCursor, candidate: theCandidate.value,
           timestamp: NSDate().timeIntervalSince1970
         )
       }
@@ -211,21 +212,21 @@ class KeyHandler {
     for anchor in walkedAnchors {
       if index >= width - kMaxComposingBufferNeedsToWalkSize { break }
       if anchor.node.score < Megrez.Node.kSelectedCandidateScore {
-        compositor.fixNodeSelectedCandidate(anchor.node.currentPair.value, at: index + anchor.spanLength)
+        compositor.fixNodeWithCandidate(anchor.node.currentPair, at: index + anchor.spanLength)
       }
       index += anchor.spanLength
     }
   }
 
-  /// 獲取候選字詞陣列資料內容。
-  func getCandidatesArray(fixOrder: Bool = true) -> [String] {
+  /// 獲取候選字詞（包含讀音）陣列資料內容。
+  func getCandidatesArray(fixOrder: Bool = true) -> [(String, String)] {
     var arrAnchors: [Megrez.NodeAnchor] = rawAnchorsOfNodes
-    var arrCandidates: [String] = []
+    var arrCandidates: [Megrez.KeyValuePaired] = .init()
 
     /// 原理：nodes 這個回饋結果包含一堆子陣列，分別對應不同詞長的候選字。
     /// 這裡先對陣列排序、讓最長候選字的子陣列的優先權最高。
     /// 這個過程不會傷到子陣列內部的排序。
-    if arrAnchors.isEmpty { return arrCandidates }
+    if arrAnchors.isEmpty { return .init() }
 
     // 讓更長的節錨排序靠前。
     arrAnchors = arrAnchors.stableSort { $0.keyLength > $1.keyLength }
@@ -235,19 +236,19 @@ class KeyHandler {
       // 選字窗的內容的康熙轉換 / JIS 轉換不能放在這裡處理，會影響選字有效性。
       // 選字的原理是拿著具體的候選字詞的字串去當前的節錨下找出對應的候選字詞（Ｘ元圖）。
       // 一旦在這裡轉換了，節錨內的某些元圖就無法被選中。
-      arrCandidates.append(currentCandidate.value)
+      arrCandidates.append(.init(key: currentCandidate.key, value: currentCandidate.value))
     }
     // 決定是否根據半衰記憶模組的建議來調整候選字詞的順序。
     if !mgrPrefs.fetchSuggestionsFromUserOverrideModel || mgrPrefs.useSCPCTypingMode || fixOrder {
-      return arrCandidates
+      return arrCandidates.map { ($0.key, $0.value) }
     }
 
     let arrSuggestedUnigrams: [Megrez.Unigram] = fetchSuggestedCandidates().stableSort { $0.score > $1.score }
-    let arrSuggestedCandidates: [String] = arrSuggestedUnigrams.map(\.keyValue.value)
+    let arrSuggestedCandidates: [Megrez.KeyValuePaired] = arrSuggestedUnigrams.map(\.keyValue)
     arrCandidates = arrSuggestedCandidates.filter { arrCandidates.contains($0) } + arrCandidates
     arrCandidates = arrCandidates.deduplicate
-    arrCandidates = arrCandidates.stableSort { $0.count > $1.count }
-    return arrCandidates
+    arrCandidates = arrCandidates.stableSort { $0.key.split(separator: "-").count > $1.key.split(separator: "-").count }
+    return arrCandidates.map { ($0.key, $0.value) }
   }
 
   /// 向半衰引擎詢問可能的選字建議。拿到的結果會是一個單元圖陣列。

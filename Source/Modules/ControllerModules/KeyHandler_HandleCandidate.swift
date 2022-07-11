@@ -274,7 +274,7 @@ extension KeyHandler {
 
     // MARK: End Key
 
-    var candidates: [String]!
+    var candidates: [(String, String)]!
 
     if let state = state as? InputState.ChoosingCandidate {
       candidates = state.candidates

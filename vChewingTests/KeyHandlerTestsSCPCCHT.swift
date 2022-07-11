@@ -85,7 +85,7 @@ class KeyHandlerTestsSCPCCHT: XCTestCase {
 
     XCTAssertTrue(state is InputState.ChoosingCandidate, "\(state)")
     if let state = state as? InputState.ChoosingCandidate {
-      XCTAssertTrue(state.candidates.contains("，"))
+      XCTAssertTrue(state.candidates.map(\.1).contains("，"))
     }
   }
 
@@ -238,7 +238,7 @@ class KeyHandlerTestsSCPCCHT: XCTestCase {
 
     XCTAssertTrue(state is InputState.ChoosingCandidate, "\(state)")
     if let state = state as? InputState.ChoosingCandidate {
-      XCTAssertTrue(state.candidates.contains("你"))
+      XCTAssertTrue(state.candidates.map(\.1).contains("你"))
     }
   }
 
@@ -315,7 +315,7 @@ class KeyHandlerTestsSCPCCHT: XCTestCase {
     print("\(state)")
     // XCTAssertTrue(state is InputState.AssociatedPhrases, "\(state)")
     // if let state = state as? InputState.AssociatedPhrases {
-    // XCTAssertTrue(state.candidates.contains("百五"))
+    // XCTAssertTrue(state.candidates.map(\.1).contains("百五"))
     // }
     mgrPrefs.associatedPhrasesEnabled = enabled
   }

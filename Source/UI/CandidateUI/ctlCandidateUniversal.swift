@@ -559,7 +559,7 @@ extension ctlCandidateUniversal {
     }
 
     candidateView.set(keyLabelFont: keyLabelFont, candidateFont: candidateFont)
-    var candidates = [String]()
+    var candidates = [(String, String)]()
     let count = delegate.candidateCountForController(self)
     let keyLabelCount = keyLabels.count
 
@@ -569,7 +569,7 @@ extension ctlCandidateUniversal {
       candidates.append(candidate)
     }
     candidateView.set(
-      keyLabels: keyLabels.map(\.displayedText), displayedCandidates: candidates
+      keyLabels: keyLabels.map(\.displayedText), displayedCandidates: candidates.map(\.1)
     )
     var newSize = candidateView.sizeForView
     var frameRect = candidateView.frame

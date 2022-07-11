@@ -55,7 +55,7 @@ extension ctlInputMethod {
       return false
     }
     var isCandidateWindowVertical: Bool {
-      var candidates: [String] = []
+      var candidates: [(String, String)] = .init()
       if let state = state as? InputState.ChoosingCandidate {
         candidates = state.candidates
       } else if let state = state as? InputState.AssociatedPhrases {
@@ -63,13 +63,11 @@ extension ctlInputMethod {
       }
       if isTypingVertical { return true }
       // 以上是通用情形。接下來決定橫排輸入時是否使用縱排選字窗。
-      candidates.sort {
-        $0.count > $1.count
-      }
+      // 因為在拿候選字陣列時已經排序過了，所以這裡不用再多排序。
       // 測量每頁顯示候選字的累計總長度。如果太長的話就強制使用縱排候選字窗。
       // 範例：「屬實牛逼」（會有一大串各種各樣的「鼠食牛Beer」的 emoji）。
       let maxCandidatesPerPage = mgrPrefs.candidateKeys.count
-      let firstPageCandidates = candidates[0..<min(maxCandidatesPerPage, candidates.count)]
+      let firstPageCandidates = candidates[0..<min(maxCandidatesPerPage, candidates.count)].map(\.1)
       return firstPageCandidates.joined().count > Int(round(Double(maxCandidatesPerPage) * 1.8))
       // 上面這句如果是 true 的話，就會是縱排；反之則為橫排。
     }
