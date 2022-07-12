@@ -63,6 +63,7 @@
 "Loading CHT Core Dict..." = "繁体中国語核心辞書読込中…";
 "Core Dict loading complete." = "核心辞書読込完了";
 "Optimize Memorized Phrases" = "臨時記憶資料を整う";
+"Clear Memorized Phrases" = "臨時記憶資料を削除";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";

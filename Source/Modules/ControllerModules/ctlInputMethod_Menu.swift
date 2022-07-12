@@ -143,6 +143,10 @@ extension ctlInputMethod {
       withTitle: NSLocalizedString("Optimize Memorized Phrases", comment: ""),
       action: #selector(removeUnigramsFromUOM(_:)), keyEquivalent: ""
     )
+    menu.addItem(
+      withTitle: NSLocalizedString("Clear Memorized Phrases", comment: ""),
+      action: #selector(clearUOM(_:)), keyEquivalent: ""
+    )
 
     menu.addItem(NSMenuItem.separator())  // ---------------------
 
@@ -359,6 +363,13 @@ extension ctlInputMethod {
     mgrLangModel.removeUnigramsFromUserOverrideModel(IME.getInputMode())
     if NSEvent.modifierFlags.contains(.option) {
       mgrLangModel.removeUnigramsFromUserOverrideModel(IME.getInputMode(isReversed: true))
+    }
+  }
+
+  @objc func clearUOM(_: Any?) {
+    mgrLangModel.clearUserOverrideModelData(IME.getInputMode())
+    if NSEvent.modifierFlags.contains(.option) {
+      mgrLangModel.clearUserOverrideModelData(IME.getInputMode(isReversed: true))
     }
   }
 
