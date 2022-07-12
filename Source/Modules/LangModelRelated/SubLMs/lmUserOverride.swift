@@ -286,6 +286,18 @@ extension vChewing.LMUserOverride {
     }
   }
 
+  public func clearData(withURL fileURL: URL) {
+    mutLRUMap = .init()
+    mutLRUList = .init()
+    do {
+      let nullData = "{}"
+      try nullData.write(to: fileURL, atomically: false, encoding: .utf8)
+    } catch {
+      IME.prtDebugIntel("UOM Error: Unable to clear data. Details: \(error)")
+      return
+    }
+  }
+
   public func saveData(toURL fileURL: URL) {
     let encoder = JSONEncoder()
     do {
