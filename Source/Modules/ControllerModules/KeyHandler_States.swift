@@ -662,6 +662,9 @@ extension KeyHandler {
         stateCallback(state)
       }
     } else if input.isOptionHold {
+      if input.isControlHold {
+        return handleEnd(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+      }
       // 游標跳轉動作無論怎樣都會執行，但如果出了執行失敗的結果的話則觸發報錯流程。
       if !compositor.jumpCursorBySpan(to: .front) {
         IME.prtDebugIntel("33C3B580")
@@ -727,6 +730,9 @@ extension KeyHandler {
         stateCallback(state)
       }
     } else if input.isOptionHold {
+      if input.isControlHold {
+        return handleHome(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+      }
       // 游標跳轉動作無論怎樣都會執行，但如果出了執行失敗的結果的話則觸發報錯流程。
       if !compositor.jumpCursorBySpan(to: .rear) {
         IME.prtDebugIntel("8D50DD9E")
