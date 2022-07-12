@@ -28,7 +28,7 @@ import Foundation
 
 extension vChewing {
   /// 語言模組副本化模組（LMInstantiator，下稱「LMI」）自身為符合天權星組字引擎內
-  /// 的 LanguageModelProtocol 協定的模組、統籌且整理來自其它子模組的資料（包括使
+  /// 的 LangModelProtocol 協定的模組、統籌且整理來自其它子模組的資料（包括使
   /// 用者語彙、繪文字模組、語彙濾除表、原廠語言模組等）。
   ///
   /// LMI 型別為與輸入法按鍵調度模組直接溝通之唯一語言模組。當組字器開始根據給定的
@@ -44,7 +44,7 @@ extension vChewing {
   ///
   /// LMI 會根據需要分別載入原廠語言模組和其他個別的子語言模組。LMI 本身不會記錄這些
   /// 語言模組的相關資料的存放位置，僅藉由參數來讀取相關訊息。
-  public class LMInstantiator: LanguageModelProtocol {
+  public class LMInstantiator: LangModelProtocol {
     // 在函式內部用以記錄狀態的開關。
     public var isPhraseReplacementEnabled = false
     public var isCNSEnabled = false
@@ -256,7 +256,7 @@ extension vChewing {
       lmAssociates.hasValuesFor(key: key)
     }
 
-    /// 該函式不起作用，僅用來滿足 LanguageModelProtocol 協定的要求。
+    /// 該函式不起作用，僅用來滿足 LangModelProtocol 協定的要求。
     public func bigramsForKeys(precedingKey _: String, key _: String) -> [Megrez.Bigram] { .init() }
 
     // MARK: - 核心函式（對內）

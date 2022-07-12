@@ -56,7 +56,7 @@ class KeyHandler {
   var compositor: Megrez.Compositor  // 組字器
   var currentLM: vChewing.LMInstantiator = .init()  // 當前主語言模組
   var currentUOM: vChewing.LMUserOverride = .init()  // 當前半衰記憶模組
-  var walkedAnchors: [Megrez.NodeAnchor] = []  // 用以記錄爬過的節錨的陣列
+  var walkedAnchors: [Megrez.NodeAnchor] { compositor.walkedAnchors }  // 用以記錄爬過的節錨的陣列
   /// 委任物件 (ctlInputMethod)，以便呼叫其中的函式。
   var delegate: KeyHandlerDelegate?
 
@@ -95,7 +95,6 @@ class KeyHandler {
   func clear() {
     composer.clear()
     compositor.clear()
-    walkedAnchors.removeAll()
   }
 
   // MARK: - Functions dealing with Megrez.
@@ -103,7 +102,7 @@ class KeyHandler {
   /// 實際上要拿給 Megrez 使用的的滑鼠游標位址，以方便在組字器最開頭或者最末尾的時候始終能抓取候選字節點陣列。
   ///
   /// 威注音對游標前置與游標後置模式採取的候選字節點陣列抓取方法是分離的，且不使用 Node Crossing。
-  var actualCandidateCursorIndex: Int {
+  var actualCandidateCursor: Int {
     mgrPrefs.useRearCursorMode ? min(compositorCursorIndex, compositorLength - 1) : max(compositorCursorIndex, 1)
   }
 
@@ -113,11 +112,11 @@ class KeyHandler {
   ///
   /// 該函式的爬取順序是從頭到尾。
   func walk() {
-    walkedAnchors = compositor.walk()
+    compositor.walk()
 
     // 在偵錯模式開啟時，將 GraphViz 資料寫入至指定位置。
     if mgrPrefs.isDebugModeEnabled {
-      let result = compositor.grid.dumpDOT
+      let result = compositor.dumpDOT
       do {
         try result.write(
           toFile: "/private/var/tmp/vChewing-visualization.dot",
@@ -137,12 +136,10 @@ class KeyHandler {
   /// 估算對象範圍。用比較形象且生動卻有點噁心的解釋的話，蒼蠅一邊吃一邊屙。
   var commitOverflownCompositionAndWalk: String {
     var textToCommit = ""
-    if compositor.grid.width > mgrPrefs.composingBufferSize, !walkedAnchors.isEmpty {
+    if compositor.width > mgrPrefs.composingBufferSize, !walkedAnchors.isEmpty {
       let anchor: Megrez.NodeAnchor = walkedAnchors[0]
-      if let theNode = anchor.node {
-        textToCommit = theNode.currentKeyValue.value
-      }
-      compositor.removeHeadReadings(count: anchor.spanningLength)
+      textToCommit = anchor.node.currentPair.value
+      compositor.removeHeadReadings(count: anchor.spanLength)
     }
     walk()
     return textToCommit
@@ -152,10 +149,10 @@ class KeyHandler {
   /// - Parameter key: 給定的聯想詞的開頭字。
   /// - Returns: 抓取到的聯想詞陣列。
   /// 不會是 nil，但那些負責接收結果的函式會對空白陣列結果做出正確的處理。
-  func buildAssociatePhraseArray(withKey key: String) -> [String] {
-    var arrResult: [String] = []
+  func buildAssociatePhraseArray(withKey key: String) -> [(String, String)] {
+    var arrResult: [(String, String)] = []
     if currentLM.hasAssociatedPhrasesFor(key: key) {
-      arrResult.append(contentsOf: currentLM.associatedPhrasesFor(key: key))
+      arrResult = currentLM.associatedPhrasesFor(key: key).map { ("", $0) }
     }
     return arrResult
   }
@@ -165,35 +162,32 @@ class KeyHandler {
   /// - Parameters:
   ///   - value: 給定之候選字字串。
   ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字厚的節錨的前方。
-  func fixNode(value: String, respectCursorPushing: Bool = true) {
-    let cursorIndex = min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength)
+  func fixNode(candidate: (String, String), respectCursorPushing: Bool = true) {
+    let theCandidate: Megrez.KeyValuePaired = .init(key: candidate.0, value: candidate.1)
+    let adjustedCursor = max(0, min(actualCandidateCursor + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength))
     // 開始讓半衰模組觀察目前的狀況。
-    let selectedNode: Megrez.NodeAnchor = compositor.grid.fixNodeSelectedCandidate(
-      location: cursorIndex, value: value
-    )
+    let selectedNode: Megrez.NodeAnchor = compositor.fixNodeWithCandidate(theCandidate, at: adjustedCursor)
     // 不要針對逐字選字模式啟用臨時半衰記憶模型。
     if !mgrPrefs.useSCPCTypingMode {
       var addToUserOverrideModel = true
       // 所有讀音數與字符數不匹配的情況均不得塞入半衰記憶模組。
-      if selectedNode.spanningLength != value.count {
+      if selectedNode.spanLength != theCandidate.value.count {
         IME.prtDebugIntel("UOM: SpanningLength != value.count, dismissing.")
         addToUserOverrideModel = false
       }
       if addToUserOverrideModel {
-        if let theNode = selectedNode.node {
-          // 威注音的 SymbolLM 的 Score 是 -12，符合該條件的內容不得塞入半衰記憶模組。
-          if theNode.scoreFor(candidate: value) <= -12 {
-            IME.prtDebugIntel("UOM: Score <= -12, dismissing.")
-            addToUserOverrideModel = false
-          }
+        // 威注音的 SymbolLM 的 Score 是 -12，符合該條件的內容不得塞入半衰記憶模組。
+        if selectedNode.node.scoreForPaired(candidate: theCandidate) <= -12 {
+          IME.prtDebugIntel("UOM: Score <= -12, dismissing.")
+          addToUserOverrideModel = false
         }
       }
       if addToUserOverrideModel {
         IME.prtDebugIntel("UOM: Start Observation.")
-        // 令半衰記憶模組觀測給定的 trigram。
-        // 這個過程會讓半衰引擎根據當前上下文生成 trigram 索引鍵。
+        // 令半衰記憶模組觀測給定的三元圖。
+        // 這個過程會讓半衰引擎根據當前上下文生成三元圖索引鍵。
         currentUOM.observe(
-          walkedAnchors: walkedAnchors, cursorIndex: cursorIndex, candidate: value,
+          walkedAnchors: walkedAnchors, cursorIndex: adjustedCursor, candidate: theCandidate.value,
           timestamp: NSDate().timeIntervalSince1970
         )
       }
@@ -204,70 +198,57 @@ class KeyHandler {
 
     /// 若偏好設定內啟用了相關選項，則會在選字之後始終將游標推送至選字厚的節錨的前方。
     if mgrPrefs.moveCursorAfterSelectingCandidate, respectCursorPushing {
-      var nextPosition = 0
-      for theAnchor in walkedAnchors {
-        if nextPosition >= cursorIndex { break }
-        nextPosition += theAnchor.spanningLength
-      }
-      if nextPosition <= compositorLength {
-        compositorCursorIndex = nextPosition
-      }
+      compositor.jumpCursorBySpan(to: .front)
     }
   }
 
   /// 組字器內超出最大動態爬軌範圍的節錨都會被自動標記為「已經手動選字過」，減少爬軌運算負擔。
   func markNodesFixedIfNecessary() {
-    let width = compositor.grid.width
+    let width = compositor.width
     if width <= kMaxComposingBufferNeedsToWalkSize {
       return
     }
     var index = 0
     for anchor in walkedAnchors {
-      guard let node = anchor.node else { break }
       if index >= width - kMaxComposingBufferNeedsToWalkSize { break }
-      if node.score < node.kSelectedCandidateScore {
-        compositor.grid.fixNodeSelectedCandidate(
-          location: index + anchor.spanningLength, value: node.currentKeyValue.value
-        )
+      if anchor.node.score < Megrez.Node.kSelectedCandidateScore {
+        compositor.fixNodeWithCandidate(anchor.node.currentPair, at: index + anchor.spanLength)
       }
-      index += anchor.spanningLength
+      index += anchor.spanLength
     }
   }
 
-  /// 獲取候選字詞陣列資料內容。
-  func getCandidatesArray(fixOrder: Bool = true) -> [String] {
+  /// 獲取候選字詞（包含讀音）陣列資料內容。
+  func getCandidatesArray(fixOrder: Bool = true) -> [(String, String)] {
     var arrAnchors: [Megrez.NodeAnchor] = rawAnchorsOfNodes
-    var arrCandidates: [String] = []
+    var arrCandidates: [Megrez.KeyValuePaired] = .init()
 
     /// 原理：nodes 這個回饋結果包含一堆子陣列，分別對應不同詞長的候選字。
     /// 這裡先對陣列排序、讓最長候選字的子陣列的優先權最高。
     /// 這個過程不會傷到子陣列內部的排序。
-    if arrAnchors.isEmpty { return arrCandidates }
+    if arrAnchors.isEmpty { return .init() }
 
     // 讓更長的節錨排序靠前。
     arrAnchors = arrAnchors.stableSort { $0.keyLength > $1.keyLength }
 
     // 將節錨內的候選字詞資料拓印到輸出陣列內。
-    for currentNodeAnchor in arrAnchors {
-      guard let currentNode = currentNodeAnchor.node else { continue }
-      for currentCandidate in currentNode.candidates {
-        // 選字窗的內容的康熙轉換 / JIS 轉換不能放在這裡處理，會影響選字有效性。
-        // 選字的原理是拿著具體的候選字詞的字串去當前的節錨下找出對應的候選字詞（Ｘ元圖）。
-        // 一旦在這裡轉換了，節錨內的某些元圖就無法被選中。
-        arrCandidates.append(currentCandidate.value)
-      }
+    for currentCandidate in arrAnchors.map(\.node.candidates).joined() {
+      // 選字窗的內容的康熙轉換 / JIS 轉換不能放在這裡處理，會影響選字有效性。
+      // 選字的原理是拿著具體的候選字詞的字串去當前的節錨下找出對應的候選字詞（Ｘ元圖）。
+      // 一旦在這裡轉換了，節錨內的某些元圖就無法被選中。
+      arrCandidates.append(.init(key: currentCandidate.key, value: currentCandidate.value))
     }
     // 決定是否根據半衰記憶模組的建議來調整候選字詞的順序。
     if !mgrPrefs.fetchSuggestionsFromUserOverrideModel || mgrPrefs.useSCPCTypingMode || fixOrder {
-      return arrCandidates
+      return arrCandidates.map { ($0.key, $0.value) }
     }
 
     let arrSuggestedUnigrams: [Megrez.Unigram] = fetchSuggestedCandidates().stableSort { $0.score > $1.score }
-    let arrSuggestedCandidates: [String] = arrSuggestedUnigrams.map(\.keyValue.value)
+    let arrSuggestedCandidates: [Megrez.KeyValuePaired] = arrSuggestedUnigrams.map(\.keyValue)
     arrCandidates = arrSuggestedCandidates.filter { arrCandidates.contains($0) } + arrCandidates
     arrCandidates = arrCandidates.deduplicate
-    arrCandidates = arrCandidates.stableSort { $0.count > $1.count }
-    return arrCandidates
+    arrCandidates = arrCandidates.stableSort { $0.key.split(separator: "-").count > $1.key.split(separator: "-").count }
+    return arrCandidates.map { ($0.key, $0.value) }
   }
 
   /// 向半衰引擎詢問可能的選字建議。拿到的結果會是一個單元圖陣列。
@@ -284,17 +265,17 @@ class KeyHandler {
     if mgrPrefs.useSCPCTypingMode { return }
     /// 如果這個開關沒打開的話，直接放棄執行這個函式。
     if !mgrPrefs.fetchSuggestionsFromUserOverrideModel { return }
-    /// 先就當前上下文讓半衰引擎重新生成 trigram 索引鍵。
+    /// 先就當前上下文讓半衰引擎重新生成三元圖索引鍵。
     let overrideValue = fetchSuggestedCandidates().first?.keyValue.value ?? ""
 
     /// 再拿著索引鍵去問半衰模組有沒有選字建議。有的話就遵循之、讓天權星引擎對指定節錨下的節點複寫權重。
     if !overrideValue.isEmpty {
       IME.prtDebugIntel(
         "UOM: Suggestion retrieved, overriding the node score of the selected candidate.")
-      compositor.grid.overrideNodeScoreForSelectedCandidate(
-        location: min(actualCandidateCursorIndex + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength),
+      compositor.overrideNodeScoreForSelectedCandidate(
+        location: min(actualCandidateCursor + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength),
         value: overrideValue,
-        overridingScore: findHighestScore(nodes: rawAnchorsOfNodes, epsilon: kEpsilon)
+        overridingScore: findHighestScore(nodeAnchors: rawAnchorsOfNodes, epsilon: kEpsilon)
       )
     } else {
       IME.prtDebugIntel("UOM: Blank suggestion retrieved, dismissing.")
@@ -306,14 +287,8 @@ class KeyHandler {
   ///   - nodes: 給定的節錨陣列。
   ///   - epsilon: 半衰模組的衰減指數。
   /// - Returns: 尋獲的最高權重數值。
-  func findHighestScore(nodes: [Megrez.NodeAnchor], epsilon: Double) -> Double {
-    var highestScore: Double = 0
-    for currentAnchor in nodes {
-      if let theNode = currentAnchor.node {
-        highestScore = max(theNode.highestUnigramScore, highestScore)
-      }
-    }
-    return highestScore + epsilon
+  func findHighestScore(nodeAnchors: [Megrez.NodeAnchor], epsilon: Double) -> Double {
+    return nodeAnchors.map(\.node.highestUnigramScore).max() ?? 0 + epsilon
   }
 
   // MARK: - Extracted methods and functions (Tekkon).
@@ -359,41 +334,6 @@ class KeyHandler {
     composer.clear()
   }
 
-  /// 用於網頁 Ruby 的注音需要按照教科書印刷的方式來顯示輕聲。該函式負責這種轉換。
-  /// - Parameters:
-  ///   - target: 要拿來做轉換處理的讀音鏈。
-  ///   - newSeparator: 新的讀音分隔符。
-  /// - Returns: 經過轉換處理的讀音鏈。
-  func cnvZhuyinKeyToTextbookReading(target: String, newSeparator: String = "-") -> String {
-    var arrReturn: [String] = []
-    for neta in target.split(separator: "-") {
-      var newString = String(neta)
-      if String(neta.reversed()[0]) == "˙" {
-        newString = String(neta.dropLast())
-        newString.insert("˙", at: newString.startIndex)
-      }
-      arrReturn.append(newString)
-    }
-    return arrReturn.joined(separator: newSeparator)
-  }
-
-  /// 用於網頁 Ruby 的拼音的陰平必須顯示，這裡處理一下。
-  /// - Parameters:
-  ///   - target: 要拿來做轉換處理的讀音鏈。
-  ///   - newSeparator: 新的讀音分隔符。
-  /// - Returns: 經過轉換處理的讀音鏈。
-  func restoreToneOneInZhuyinKey(target: String, newSeparator: String = "-") -> String {
-    var arrReturn: [String] = []
-    for neta in target.split(separator: "-") {
-      var newNeta = String(neta)
-      if !"ˊˇˋ˙".contains(String(neta.reversed()[0])), !neta.contains("_") {
-        newNeta += "1"
-      }
-      arrReturn.append(newNeta)
-    }
-    return arrReturn.joined(separator: newSeparator)
-  }
-
   // MARK: - Extracted methods and functions (Megrez).
 
   /// 組字器是否為空。
@@ -404,8 +344,8 @@ class KeyHandler {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
     mgrPrefs.useRearCursorMode
-      ? compositor.grid.nodesBeginningAt(location: actualCandidateCursorIndex)
-      : compositor.grid.nodesEndingAt(location: actualCandidateCursorIndex)
+      ? compositor.nodesBeginningAt(location: actualCandidateCursor)
+      : compositor.nodesEndingAt(location: actualCandidateCursor)
   }
 
   /// 將輸入法偏好設定同步至語言模組內。
@@ -431,13 +371,13 @@ class KeyHandler {
 
   /// 在組字器的給定游標位置內插入讀音。
   func insertToCompositorAtCursor(reading: String) {
-    compositor.insertReadingAtCursor(reading: reading)
+    compositor.insertReading(reading)
   }
 
   /// 組字器的游標位置。
   var compositorCursorIndex: Int {
-    get { compositor.cursorIndex }
-    set { compositor.cursorIndex = newValue }
+    get { compositor.cursor }
+    set { compositor.cursor = newValue }
   }
 
   /// 組字器的目前的長度。
@@ -449,13 +389,43 @@ class KeyHandler {
   ///
   /// 在威注音的術語體系當中，「與文字輸入方向相反的方向」為向後（Rear）。
   func deleteCompositorReadingAtTheRearOfCursor() {
-    compositor.deleteReadingAtTheRearOfCursor()
+    compositor.dropReading(direction: .rear)
   }
 
   /// 在組字器內，朝著往文字輸入方向、砍掉一個與游標相鄰的讀音。
   ///
   /// 在威注音的術語體系當中，「文字輸入方向」為向前（Front）。
   func deleteCompositorReadingToTheFrontOfCursor() {
-    compositor.deleteReadingToTheFrontOfCursor()
+    compositor.dropReading(direction: .front)
+  }
+
+  /// 獲取指定游標位置的鍵值長度。
+  /// - Returns: 指定游標位置的鍵值長度。
+  var keyLengthAtCurrentIndex: Int {
+    walkedAnchors[compositorCursorIndex].node.key.split(separator: "-").count
+  }
+
+  var nextPhrasePosition: Int {
+    var nextPosition = 0
+    for theAnchor in walkedAnchors {
+      if nextPosition > actualCandidateCursor { break }
+      nextPosition += theAnchor.spanLength
+    }
+    return min(nextPosition, compositorLength)
+  }
+
+  /// 生成標點符號索引鍵。
+  /// - Parameter input: 輸入的按鍵訊號。
+  /// - Returns: 生成的標點符號索引鍵。
+  func generatePunctuationNamePrefix(withKeyCondition input: InputSignal) -> String {
+    if mgrPrefs.halfWidthPunctuationEnabled {
+      return "_half_punctuation_"
+    }
+    switch (input.isControlHold, input.isOptionHold) {
+      case (true, true): return "_alt_ctrl_punctuation_"
+      case (true, false): return "_ctrl_punctuation_"
+      case (false, true): return "_alt_punctuation_"
+      case (false, false): return "_punctuation_"
+    }
   }
 }

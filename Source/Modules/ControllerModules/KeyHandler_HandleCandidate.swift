@@ -154,18 +154,14 @@ extension KeyHandler {
     if input.isLeft {
       switch ctlCandidateCurrent.currentLayout {
         case .horizontal:
-          do {
-            if !ctlCandidateCurrent.highlightPreviousCandidate() {
-              IME.prtDebugIntel("1145148D")
-              errorCallback()
-            }
+          if !ctlCandidateCurrent.highlightPreviousCandidate() {
+            IME.prtDebugIntel("1145148D")
+            errorCallback()
           }
         case .vertical:
-          do {
-            if !ctlCandidateCurrent.showPreviousPage() {
-              IME.prtDebugIntel("1919810D")
-              errorCallback()
-            }
+          if !ctlCandidateCurrent.showPreviousPage() {
+            IME.prtDebugIntel("1919810D")
+            errorCallback()
           }
       }
       return true
@@ -187,18 +183,14 @@ extension KeyHandler {
     if input.isRight {
       switch ctlCandidateCurrent.currentLayout {
         case .horizontal:
-          do {
-            if !ctlCandidateCurrent.highlightNextCandidate() {
-              IME.prtDebugIntel("9B65138D")
-              errorCallback()
-            }
+          if !ctlCandidateCurrent.highlightNextCandidate() {
+            IME.prtDebugIntel("9B65138D")
+            errorCallback()
           }
         case .vertical:
-          do {
-            if !ctlCandidateCurrent.showNextPage() {
-              IME.prtDebugIntel("9244908D")
-              errorCallback()
-            }
+          if !ctlCandidateCurrent.showNextPage() {
+            IME.prtDebugIntel("9244908D")
+            errorCallback()
           }
       }
       return true
@@ -220,18 +212,14 @@ extension KeyHandler {
     if input.isUp {
       switch ctlCandidateCurrent.currentLayout {
         case .horizontal:
-          do {
-            if !ctlCandidateCurrent.showPreviousPage() {
-              IME.prtDebugIntel("9B614524")
-              errorCallback()
-            }
+          if !ctlCandidateCurrent.showPreviousPage() {
+            IME.prtDebugIntel("9B614524")
+            errorCallback()
           }
         case .vertical:
-          do {
-            if !ctlCandidateCurrent.highlightPreviousCandidate() {
-              IME.prtDebugIntel("ASD9908D")
-              errorCallback()
-            }
+          if !ctlCandidateCurrent.highlightPreviousCandidate() {
+            IME.prtDebugIntel("ASD9908D")
+            errorCallback()
           }
       }
       return true
@@ -242,18 +230,14 @@ extension KeyHandler {
     if input.isDown {
       switch ctlCandidateCurrent.currentLayout {
         case .horizontal:
-          do {
-            if !ctlCandidateCurrent.showNextPage() {
-              IME.prtDebugIntel("92B990DD")
-              errorCallback()
-            }
+          if !ctlCandidateCurrent.showNextPage() {
+            IME.prtDebugIntel("92B990DD")
+            errorCallback()
           }
         case .vertical:
-          do {
-            if !ctlCandidateCurrent.highlightNextCandidate() {
-              IME.prtDebugIntel("6B99908D")
-              errorCallback()
-            }
+          if !ctlCandidateCurrent.highlightNextCandidate() {
+            IME.prtDebugIntel("6B99908D")
+            errorCallback()
           }
       }
       return true
@@ -274,7 +258,7 @@ extension KeyHandler {
 
     // MARK: End Key
 
-    var candidates: [String]!
+    var candidates: [(String, String)]!
 
     if let state = state as? InputState.ChoosingCandidate {
       candidates = state.candidates
@@ -334,22 +318,8 @@ extension KeyHandler {
       /// - 是否是針對當前注音排列/拼音輸入種類專門提供的標點符號。
       /// - 是否是需要摁修飾鍵才可以輸入的那種標點符號。
 
-      var punctuationNamePrefix = ""
-
-      if input.isOptionHold && !input.isControlHold {
-        punctuationNamePrefix = "_alt_punctuation_"
-      } else if input.isControlHold && !input.isOptionHold {
-        punctuationNamePrefix = "_ctrl_punctuation_"
-      } else if input.isControlHold && input.isOptionHold {
-        punctuationNamePrefix = "_alt_ctrl_punctuation_"
-      } else if mgrPrefs.halfWidthPunctuationEnabled {
-        punctuationNamePrefix = "_half_punctuation_"
-      } else {
-        punctuationNamePrefix = "_punctuation_"
-      }
-
+      let punctuationNamePrefix: String = generatePunctuationNamePrefix(withKeyCondition: input)
       let parser = currentMandarinParser
-
       let arrCustomPunctuations: [String] = [
         punctuationNamePrefix, parser, String(format: "%c", CChar(charCode)),
       ]

@@ -23,7 +23,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-public protocol LanguageModelProtocol {
+public protocol LangModelProtocol {
   /// 給定鍵，讓語言模型找給一組單元圖陣列。
   func unigramsFor(key: String) -> [Megrez.Unigram]
 
@@ -36,7 +36,7 @@ public protocol LanguageModelProtocol {
 
 extension Megrez {
   /// 語言模型框架，回頭實際使用時需要派生一個型別、且重寫相關函式。
-  open class LanguageModel: LanguageModelProtocol {
+  open class LangModel: LangModelProtocol {
     public init() {}
 
     // 這裡寫了一點假內容，不然有些 Swift 格式化工具會破壞掉函式的參數設計。

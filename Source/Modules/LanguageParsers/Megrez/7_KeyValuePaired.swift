@@ -52,7 +52,7 @@ extension Megrez {
     }
 
     public static func == (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
-      lhs.key.count == rhs.key.count && lhs.value == rhs.value
+      lhs.key == rhs.key && lhs.value == rhs.value
     }
 
     public static func < (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {

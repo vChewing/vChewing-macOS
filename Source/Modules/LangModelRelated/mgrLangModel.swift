@@ -224,39 +224,60 @@ enum mgrLangModel {
 
   // Swift 的 appendingPathComponent 需要藉由 URL 完成，最後再用 .path 轉為路徑。
 
+  /// 使用者語彙辭典資料路徑。
+  /// - Parameter mode: 簡繁體輸入模式。
+  /// - Returns: 資料路徑（URL）。
   static func userPhrasesDataURL(_ mode: InputMode) -> URL {
     let fileName = (mode == InputMode.imeModeCHT) ? "userdata-cht.txt" : "userdata-chs.txt"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
+  /// 使用者繪文字符號辭典資料路徑。
+  /// - Parameter mode: 簡繁體輸入模式。
+  /// - Returns: 資料路徑（URL）。
   static func userSymbolDataURL(_ mode: InputMode) -> URL {
     let fileName = (mode == InputMode.imeModeCHT) ? "usersymbolphrases-cht.txt" : "usersymbolphrases-chs.txt"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
+  /// 使用者聯想詞資料路徑。
+  /// - Parameter mode: 簡繁體輸入模式。
+  /// - Returns: 資料路徑（URL）。
   static func userAssociatesDataURL(_ mode: InputMode) -> URL {
     let fileName = (mode == InputMode.imeModeCHT) ? "associatedPhrases-cht.txt" : "associatedPhrases-chs.txt"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
+  /// 使用者語彙濾除表資料路徑。
+  /// - Parameter mode: 簡繁體輸入模式。
+  /// - Returns: 資料路徑（URL）。
   static func userFilteredDataURL(_ mode: InputMode) -> URL {
     let fileName = (mode == InputMode.imeModeCHT) ? "exclude-phrases-cht.txt" : "exclude-phrases-chs.txt"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
+  /// 使用者語彙置換表資料路徑。
+  /// - Parameter mode: 簡繁體輸入模式。
+  /// - Returns: 資料路徑（URL）。
   static func userReplacementsDataURL(_ mode: InputMode) -> URL {
     let fileName = (mode == InputMode.imeModeCHT) ? "phrases-replacement-cht.txt" : "phrases-replacement-chs.txt"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
+  /// 使用者波浪符號選單資料路徑。
+  /// - Returns: 資料路徑（URL）。
   static func userSymbolNodeDataURL() -> URL {
     let fileName = "symbols.dat"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
+  /// 使用者半衰記憶模組資料的存取頻次特別高，且資料新陳代謝速度快，所以只適合放在預設的使用者資料目錄下。
+  /// 也就是「~/Library/Application Support/vChewing/」目錄下，且不會隨著使用者辭典目錄的改變而改變。
+  /// - Parameter mode: 簡繁體輸入模式。
+  /// - Returns: 資料路徑（URL）。
   static func userOverrideModelDataURL(_ mode: InputMode) -> URL {
     let fileName = (mode == InputMode.imeModeCHT) ? "override-model-data-cht.dat" : "override-model-data-chs.dat"
-    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
+    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: true)).appendingPathComponent(fileName)
   }
 
   // MARK: - 檢查具體的使用者語彙檔案是否存在
@@ -459,6 +480,17 @@ enum mgrLangModel {
         gUserOverrideModelCHT.bleachUnigrams()
       case .imeModeCHT:
         gUserOverrideModelCHS.bleachUnigrams()
+      case .imeModeNULL:
+        break
+    }
+  }
+
+  static func clearUserOverrideModelData(_ mode: InputMode = .imeModeNULL) {
+    switch mode {
+      case .imeModeCHS:
+        gUserOverrideModelCHS.clearData(withURL: userOverrideModelDataURL(InputMode.imeModeCHS))
+      case .imeModeCHT:
+        gUserOverrideModelCHT.clearData(withURL: userOverrideModelDataURL(InputMode.imeModeCHT))
       case .imeModeNULL:
         break
     }

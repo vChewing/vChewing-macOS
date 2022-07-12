@@ -158,7 +158,7 @@ struct suiPrefPaneGeneral: View {
           }
         }
         Toggle(
-          LocalizedStringKey("Show Hanyu-Pinyin in the inline composition buffer"),
+          LocalizedStringKey("Show Hanyu-Pinyin in the inline composition buffer & tooltip"),
           isOn: $selShowHanyuPinyinInCompositionBuffer
         ).onChange(of: selShowHanyuPinyinInCompositionBuffer) { value in
           mgrPrefs.showHanyuPinyinInCompositionBuffer = value

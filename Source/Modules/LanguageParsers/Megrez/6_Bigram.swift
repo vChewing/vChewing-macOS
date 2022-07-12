@@ -25,7 +25,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 extension Megrez {
   /// 雙元圖。
-  @frozen public struct Bigram: Equatable, CustomStringConvertible {
+  @frozen public struct Bigram: Equatable, CustomStringConvertible, Hashable {
     /// 當前鍵值。
     public var keyValue: KeyValuePaired
     /// 前述鍵值。
@@ -61,7 +61,7 @@ extension Megrez {
 
     public static func < (lhs: Bigram, rhs: Bigram) -> Bool {
       lhs.precedingKeyValue < rhs.precedingKeyValue
-        || (lhs.keyValue < rhs.keyValue || (lhs.keyValue == rhs.keyValue && lhs.keyValue < rhs.keyValue))
+        || (lhs.keyValue < rhs.keyValue || (lhs.keyValue == rhs.keyValue && lhs.score < rhs.score))
     }
   }
 }

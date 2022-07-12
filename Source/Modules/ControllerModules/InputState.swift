@@ -139,9 +139,9 @@ enum InputState {
   /// 因為逐字選字模式不需要在組字區內存入任何東西，所以該狀態不受 .NotEmpty 的管轄。
   class AssociatedPhrases: InputStateProtocol {
     public var type: StateType { .ofAssociatedPhrases }
-    private(set) var candidates: [String] = []
+    private(set) var candidates: [(String, String)] = []
     private(set) var isTypingVertical: Bool = false
-    init(candidates: [String], isTypingVertical: Bool) {
+    init(candidates: [(String, String)], isTypingVertical: Bool) {
       self.candidates = candidates
       self.isTypingVertical = isTypingVertical
     }
@@ -228,6 +228,27 @@ enum InputState {
       return lowerBoundLiteral..<upperBoundLiteral
     }
 
+    var literalReadingThread: String {
+      var arrOutput = [String]()
+      for neta in readings[literalMarkedRange] {
+        var neta = neta
+        if neta.isEmpty { continue }
+        if neta.contains("_") {
+          arrOutput.append("??")
+          continue
+        }
+        if mgrPrefs.showHanyuPinyinInCompositionBuffer {  // 恢復陰平標記->注音轉拼音->轉教科書式標調
+          neta = Tekkon.restoreToneOneInZhuyinKey(target: neta)
+          neta = Tekkon.cnvPhonaToHanyuPinyin(target: neta)
+          neta = Tekkon.cnvHanyuPinyinToTextbookStyle(target: neta)
+        } else {
+          neta = Tekkon.cnvZhuyinChainToTextbookReading(target: neta)
+        }
+        arrOutput.append(neta)
+      }
+      return arrOutput.joined(separator: " ")
+    }
+
     private var deleteTargetExists = false
     var tooltip: String {
       if composingBuffer.count != readings.count {
@@ -252,15 +273,14 @@ enum InputState {
         return String(
           format: NSLocalizedString(
             "\"%@\" length must ≥ 2 for a user phrase.", comment: ""
-          ), text
+          ) + "\n//  " + literalReadingThread, text
         )
       } else if literalMarkedRange.count > allowedMarkRange.upperBound {
         ctlInputMethod.tooltipController.setColor(state: .denialOverflow)
         return String(
           format: NSLocalizedString(
             "\"%@\" length should ≤ %d for a user phrase.", comment: ""
-          ),
-          text, allowedMarkRange.upperBound
+          ) + "\n//  " + literalReadingThread, text, allowedMarkRange.upperBound
         )
       }
 
@@ -275,12 +295,13 @@ enum InputState {
         return String(
           format: NSLocalizedString(
             "\"%@\" already exists: ENTER to boost, \n SHIFT+CMD+ENTER to exclude.", comment: ""
-          ), text
+          ) + "\n//  " + literalReadingThread, text
         )
       }
       ctlInputMethod.tooltipController.resetColor()
       return String(
-        format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: ""),
+        format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: "") + "\n//  "
+          + literalReadingThread,
         text
       )
     }
@@ -386,10 +407,10 @@ enum InputState {
   /// .ChoosingCandidate: 叫出選字窗、允許使用者選字。
   class ChoosingCandidate: NotEmpty {
     override public var type: StateType { .ofChooseCandidate }
-    private(set) var candidates: [String]
+    private(set) var candidates: [(String, String)]
     private(set) var isTypingVertical: Bool
 
-    init(composingBuffer: String, cursorIndex: Int, candidates: [String], isTypingVertical: Bool) {
+    init(composingBuffer: String, cursorIndex: Int, candidates: [(String, String)], isTypingVertical: Bool) {
       self.candidates = candidates
       self.isTypingVertical = isTypingVertical
       super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
@@ -411,7 +432,7 @@ enum InputState {
       self.node = node
       let candidates = node.children?.map(\.title) ?? [String]()
       super.init(
-        composingBuffer: "", cursorIndex: 0, candidates: candidates,
+        composingBuffer: "", cursorIndex: 0, candidates: candidates.map { ("", $0) },
         isTypingVertical: isTypingVertical
       )
     }

@@ -25,21 +25,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 extension Megrez {
   /// 幅位。
-  @frozen public struct Span {
+  @frozen public struct SpanUnit {
     /// 辭典：以節點長度為索引，以節點為資料值。
-    private var mutLengthNodeMap: [Int: Megrez.Node] = [:]
-    /// 最大節點長度。
-    private var mutMaximumLength: Int = 0
-
-    /// 公開：最長幅距（唯讀）。
-    public var maximumLength: Int {
-      mutMaximumLength
-    }
+    private var lengthNodeMap: [Int: Megrez.Node] = [:]
+    /// 最長幅距。
+    private(set) var maxLength: Int = 0
 
     /// 自我清空，各項參數歸零。
     mutating func clear() {
-      mutLengthNodeMap.removeAll()
-      mutMaximumLength = 0
+      lengthNodeMap.removeAll()
+      maxLength = 0
     }
 
     /// 往自身插入一個節點、及給定的節點長度。
@@ -48,37 +43,37 @@ extension Megrez {
     ///   - length: 給定的節點長度。
     mutating func insert(node: Node, length: Int) {
       let length = abs(length)  // 防呆
-      mutLengthNodeMap[length] = node
-      mutMaximumLength = max(mutMaximumLength, length)
+      lengthNodeMap[length] = node
+      maxLength = max(maxLength, length)
     }
 
     /// 移除任何比給定的長度更長的節點。
     /// - Parameters:
     ///   - length: 給定的節點長度。
-    mutating func removeNodeOfLengthGreaterThan(_ length: Int) {
+    mutating func dropNodesBeyond(length: Int) {
       let length = abs(length)  // 防呆
-      if length > mutMaximumLength { return }
+      if length > maxLength { return }
       var lenMax = 0
       var removalList: [Int: Megrez.Node] = [:]
-      for key in mutLengthNodeMap.keys {
+      for key in lengthNodeMap.keys {
         if key > length {
-          removalList[key] = mutLengthNodeMap[key]
+          removalList[key] = lengthNodeMap[key]
         } else {
           lenMax = max(lenMax, key)
         }
       }
       for key in removalList.keys {
-        mutLengthNodeMap.removeValue(forKey: key)
+        lengthNodeMap.removeValue(forKey: key)
       }
-      mutMaximumLength = lenMax
+      maxLength = lenMax
     }
 
     /// 給定節點長度，獲取節點。
     /// - Parameters:
     ///   - length: 給定的節點長度。
-    public func node(length: Int) -> Node? {
+    public func nodeOf(length: Int) -> Node? {
       // 防呆 Abs()
-      mutLengthNodeMap.keys.contains(abs(length)) ? mutLengthNodeMap[abs(length)] : nil
+      lengthNodeMap.keys.contains(abs(length)) ? lengthNodeMap[abs(length)] : nil
     }
   }
 }

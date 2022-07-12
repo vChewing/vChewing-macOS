@@ -236,18 +236,11 @@ public struct Tekkon {
     public func getComposition(isHanyuPinyin: Bool = false, isTextBookStyle: Bool = false) -> String {
       switch isHanyuPinyin {
         case false:  // 注音輸出的場合
-          var valReturnZhuyin = value.replacingOccurrences(of: " ", with: "")
-          if isTextBookStyle, valReturnZhuyin.contains("˙") {
-            valReturnZhuyin = String(valReturnZhuyin.dropLast())
-            valReturnZhuyin.insert("˙", at: valReturnZhuyin.startIndex)
-          }
-          return valReturnZhuyin
+          let valReturnZhuyin = value.replacingOccurrences(of: " ", with: "")
+          return isTextBookStyle ? cnvZhuyinChainToTextbookReading(target: valReturnZhuyin) : valReturnZhuyin
         case true:  // 拼音輸出的場合
-          var valReturnPinyin = Tekkon.cnvPhonaToHanyuPinyin(target: value)
-          if isTextBookStyle {
-            valReturnPinyin = Tekkon.cnvHanyuPinyinToTextbookStyle(target: valReturnPinyin)
-          }
-          return valReturnPinyin
+          let valReturnPinyin = Tekkon.cnvPhonaToHanyuPinyin(target: value)
+          return isTextBookStyle ? Tekkon.cnvHanyuPinyinToTextbookStyle(target: valReturnPinyin) : valReturnPinyin
       }
     }
 
@@ -850,6 +843,41 @@ public struct Tekkon {
       targetConverted = targetConverted.replacingOccurrences(of: pair[0], with: pair[1])
     }
     return targetConverted
+  }
+
+  /// 該函式負責將注音轉為教科書印刷的方式（先寫輕聲）。
+  /// - Parameters:
+  ///   - target: 要拿來做轉換處理的讀音鏈，以英文減號來分隔每個讀音。
+  ///   - newSeparator: 新的讀音分隔符。
+  /// - Returns: 經過轉換處理的讀音鏈。
+  static func cnvZhuyinChainToTextbookReading(target: String, newSeparator: String = "-") -> String {
+    var arrReturn: [String] = []
+    for neta in target.split(separator: "-") {
+      var newString = String(neta)
+      if String(neta.reversed()[0]) == "˙" {
+        newString = String(neta.dropLast())
+        newString.insert("˙", at: newString.startIndex)
+      }
+      arrReturn.append(newString)
+    }
+    return arrReturn.joined(separator: newSeparator)
+  }
+
+  /// 該函式用來恢復注音當中的陰平聲調，恢復之後會以「1」表示陰平。
+  /// - Parameters:
+  ///   - target: 要拿來做轉換處理的讀音鏈，以英文減號來分隔每個讀音。
+  ///   - newSeparator: 新的讀音分隔符。
+  /// - Returns: 經過轉換處理的讀音鏈。
+  static func restoreToneOneInZhuyinKey(target: String, newSeparator: String = "-") -> String {
+    var arrReturn: [String] = []
+    for neta in target.split(separator: "-") {
+      var newNeta = String(neta)
+      if !"ˊˇˋ˙".contains(String(neta.reversed()[0])), !neta.contains("_") {
+        newNeta += "1"
+      }
+      arrReturn.append(newNeta)
+    }
+    return arrReturn.joined(separator: newSeparator)
   }
 
   /// 原始轉換對照表資料貯存專用佇列（數字標調格式）
