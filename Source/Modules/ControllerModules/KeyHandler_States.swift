@@ -81,10 +81,8 @@ extension KeyHandler {
               case 0:
                 tooltipParameterRef[1] = compositor.readings[compositorCursorIndex]
               default:
-                do {
-                  tooltipParameterRef[0] = compositor.readings[compositorCursorIndex - 1]
-                  tooltipParameterRef[1] = compositor.readings[compositorCursorIndex]
-                }
+                tooltipParameterRef[0] = compositor.readings[compositorCursorIndex - 1]
+                tooltipParameterRef[1] = compositor.readings[compositorCursorIndex]
             }
             /// 注音轉拼音
             for (i, _) in tooltipParameterRef.enumerated() {

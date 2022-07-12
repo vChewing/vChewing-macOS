@@ -162,146 +162,142 @@ private class vwrCandidateUniversal: NSView {
 
     switch isVerticalLayout {
       case true:
-        do {
-          var accuHeight: CGFloat = 0
-          for (index, elementHeight) in elementHeights.enumerated() {
-            let currentHeight = elementHeight
-            let rctCandidateArea = NSRect(
-              x: 0.0, y: accuHeight, width: windowWidth, height: candidateTextHeight + cellPadding
-            )
-            let rctLabel = NSRect(
-              x: cellPadding / 2 - 1, y: accuHeight + cellPadding / 2, width: keyLabelWidth,
-              height: keyLabelHeight * 2.0
-            )
-            let rctCandidatePhrase = NSRect(
-              x: cellPadding / 2 - 1 + keyLabelWidth, y: accuHeight + cellPadding / 2 - 1,
-              width: windowWidth - keyLabelWidth, height: candidateTextHeight
-            )
+        var accuHeight: CGFloat = 0
+        for (index, elementHeight) in elementHeights.enumerated() {
+          let currentHeight = elementHeight
+          let rctCandidateArea = NSRect(
+            x: 0.0, y: accuHeight, width: windowWidth, height: candidateTextHeight + cellPadding
+          )
+          let rctLabel = NSRect(
+            x: cellPadding / 2 - 1, y: accuHeight + cellPadding / 2, width: keyLabelWidth,
+            height: keyLabelHeight * 2.0
+          )
+          let rctCandidatePhrase = NSRect(
+            x: cellPadding / 2 - 1 + keyLabelWidth, y: accuHeight + cellPadding / 2 - 1,
+            width: windowWidth - keyLabelWidth, height: candidateTextHeight
+          )
 
-            var activeCandidateIndexAttr = keyLabelAttrDict
-            var activeCandidateAttr = candidateAttrDict
-            if index == highlightedIndex {
-              let colorBlendAmount: CGFloat = IME.isDarkMode() ? 0.25 : 0
-              // The background color of the highlightened candidate
-              switch IME.currentInputMode {
-                case InputMode.imeModeCHS:
-                  NSColor.systemRed.blended(
-                    withFraction: colorBlendAmount,
-                    of: NSColor.controlBackgroundColor
-                  )!
-                  .setFill()
-                case InputMode.imeModeCHT:
-                  NSColor.systemBlue.blended(
-                    withFraction: colorBlendAmount,
-                    of: NSColor.controlBackgroundColor
-                  )!
-                  .setFill()
-                default:
-                  NSColor.alternateSelectedControlColor.setFill()
-              }
-              // Highlightened index text color
-              activeCandidateIndexAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor
-                .withAlphaComponent(0.84)
-              // Highlightened phrase text color
-              activeCandidateAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor
-            } else {
-              NSColor.controlBackgroundColor.setFill()
-            }
+          var activeCandidateIndexAttr = keyLabelAttrDict
+          var activeCandidateAttr = candidateAttrDict
+          if index == highlightedIndex {
+            let colorBlendAmount: CGFloat = IME.isDarkMode() ? 0.25 : 0
+            // The background color of the highlightened candidate
             switch IME.currentInputMode {
               case InputMode.imeModeCHS:
-                if #available(macOS 12.0, *) {
-                  activeCandidateAttr[.languageIdentifier] = "zh-Hans" as AnyObject
-                }
+                NSColor.systemRed.blended(
+                  withFraction: colorBlendAmount,
+                  of: NSColor.controlBackgroundColor
+                )!
+                .setFill()
               case InputMode.imeModeCHT:
-                if #available(macOS 12.0, *) {
-                  activeCandidateAttr[.languageIdentifier] =
-                    (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
-                    ? "ja" as AnyObject : "zh-Hant" as AnyObject
-                }
+                NSColor.systemBlue.blended(
+                  withFraction: colorBlendAmount,
+                  of: NSColor.controlBackgroundColor
+                )!
+                .setFill()
               default:
-                break
+                NSColor.alternateSelectedControlColor.setFill()
             }
-            NSBezierPath.fill(rctCandidateArea)
-            (keyLabels[index] as NSString).draw(
-              in: rctLabel, withAttributes: activeCandidateIndexAttr
-            )
-            (displayedCandidates[index] as NSString).draw(
-              in: rctCandidatePhrase, withAttributes: activeCandidateAttr
-            )
-            accuHeight += currentHeight
+            // Highlightened index text color
+            activeCandidateIndexAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor
+              .withAlphaComponent(0.84)
+            // Highlightened phrase text color
+            activeCandidateAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor
+          } else {
+            NSColor.controlBackgroundColor.setFill()
           }
+          switch IME.currentInputMode {
+            case InputMode.imeModeCHS:
+              if #available(macOS 12.0, *) {
+                activeCandidateAttr[.languageIdentifier] = "zh-Hans" as AnyObject
+              }
+            case InputMode.imeModeCHT:
+              if #available(macOS 12.0, *) {
+                activeCandidateAttr[.languageIdentifier] =
+                  (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
+                  ? "ja" as AnyObject : "zh-Hant" as AnyObject
+              }
+            default:
+              break
+          }
+          NSBezierPath.fill(rctCandidateArea)
+          (keyLabels[index] as NSString).draw(
+            in: rctLabel, withAttributes: activeCandidateIndexAttr
+          )
+          (displayedCandidates[index] as NSString).draw(
+            in: rctCandidatePhrase, withAttributes: activeCandidateAttr
+          )
+          accuHeight += currentHeight
         }
       case false:
-        do {
-          var accuWidth: CGFloat = 0
-          for (index, elementWidth) in elementWidths.enumerated() {
-            let currentWidth = elementWidth
-            let rctCandidateArea = NSRect(
-              x: accuWidth, y: 0.0, width: currentWidth + 1.0,
-              height: candidateTextHeight + cellPadding
-            )
-            let rctLabel = NSRect(
-              x: accuWidth + cellPadding / 2 - 1, y: cellPadding / 2, width: keyLabelWidth,
-              height: keyLabelHeight * 2.0
-            )
-            let rctCandidatePhrase = NSRect(
-              x: accuWidth + keyLabelWidth - 1, y: cellPadding / 2 - 1,
-              width: currentWidth - keyLabelWidth,
-              height: candidateTextHeight
-            )
+        var accuWidth: CGFloat = 0
+        for (index, elementWidth) in elementWidths.enumerated() {
+          let currentWidth = elementWidth
+          let rctCandidateArea = NSRect(
+            x: accuWidth, y: 0.0, width: currentWidth + 1.0,
+            height: candidateTextHeight + cellPadding
+          )
+          let rctLabel = NSRect(
+            x: accuWidth + cellPadding / 2 - 1, y: cellPadding / 2, width: keyLabelWidth,
+            height: keyLabelHeight * 2.0
+          )
+          let rctCandidatePhrase = NSRect(
+            x: accuWidth + keyLabelWidth - 1, y: cellPadding / 2 - 1,
+            width: currentWidth - keyLabelWidth,
+            height: candidateTextHeight
+          )
 
-            var activeCandidateIndexAttr = keyLabelAttrDict
-            var activeCandidateAttr = candidateAttrDict
-            if index == highlightedIndex {
-              let colorBlendAmount: CGFloat = IME.isDarkMode() ? 0.25 : 0
-              // The background color of the highlightened candidate
-              switch IME.currentInputMode {
-                case InputMode.imeModeCHS:
-                  NSColor.systemRed.blended(
-                    withFraction: colorBlendAmount,
-                    of: NSColor.controlBackgroundColor
-                  )!
-                  .setFill()
-                case InputMode.imeModeCHT:
-                  NSColor.systemBlue.blended(
-                    withFraction: colorBlendAmount,
-                    of: NSColor.controlBackgroundColor
-                  )!
-                  .setFill()
-                default:
-                  NSColor.alternateSelectedControlColor.setFill()
-              }
-              // Highlightened index text color
-              activeCandidateIndexAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor
-                .withAlphaComponent(0.84)
-              // Highlightened phrase text color
-              activeCandidateAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor
-            } else {
-              NSColor.controlBackgroundColor.setFill()
-            }
+          var activeCandidateIndexAttr = keyLabelAttrDict
+          var activeCandidateAttr = candidateAttrDict
+          if index == highlightedIndex {
+            let colorBlendAmount: CGFloat = IME.isDarkMode() ? 0.25 : 0
+            // The background color of the highlightened candidate
             switch IME.currentInputMode {
               case InputMode.imeModeCHS:
-                if #available(macOS 12.0, *) {
-                  activeCandidateAttr[.languageIdentifier] = "zh-Hans" as AnyObject
-                }
+                NSColor.systemRed.blended(
+                  withFraction: colorBlendAmount,
+                  of: NSColor.controlBackgroundColor
+                )!
+                .setFill()
               case InputMode.imeModeCHT:
-                if #available(macOS 12.0, *) {
-                  activeCandidateAttr[.languageIdentifier] =
-                    (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
-                    ? "ja" as AnyObject : "zh-Hant" as AnyObject
-                }
+                NSColor.systemBlue.blended(
+                  withFraction: colorBlendAmount,
+                  of: NSColor.controlBackgroundColor
+                )!
+                .setFill()
               default:
-                break
+                NSColor.alternateSelectedControlColor.setFill()
             }
-            NSBezierPath.fill(rctCandidateArea)
-            (keyLabels[index] as NSString).draw(
-              in: rctLabel, withAttributes: activeCandidateIndexAttr
-            )
-            (displayedCandidates[index] as NSString).draw(
-              in: rctCandidatePhrase, withAttributes: activeCandidateAttr
-            )
-            accuWidth += currentWidth + 1.0
+            // Highlightened index text color
+            activeCandidateIndexAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor
+              .withAlphaComponent(0.84)
+            // Highlightened phrase text color
+            activeCandidateAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor
+          } else {
+            NSColor.controlBackgroundColor.setFill()
           }
+          switch IME.currentInputMode {
+            case InputMode.imeModeCHS:
+              if #available(macOS 12.0, *) {
+                activeCandidateAttr[.languageIdentifier] = "zh-Hans" as AnyObject
+              }
+            case InputMode.imeModeCHT:
+              if #available(macOS 12.0, *) {
+                activeCandidateAttr[.languageIdentifier] =
+                  (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
+                  ? "ja" as AnyObject : "zh-Hant" as AnyObject
+              }
+            default:
+              break
+          }
+          NSBezierPath.fill(rctCandidateArea)
+          (keyLabels[index] as NSString).draw(
+            in: rctLabel, withAttributes: activeCandidateIndexAttr
+          )
+          (displayedCandidates[index] as NSString).draw(
+            in: rctCandidatePhrase, withAttributes: activeCandidateAttr
+          )
+          accuWidth += currentWidth + 1.0
         }
     }
   }
@@ -313,28 +309,24 @@ private class vwrCandidateUniversal: NSView {
     }
     switch isVerticalLayout {
       case true:
-        do {
-          var accuHeight: CGFloat = 0.0
-          for (index, elementHeight) in elementHeights.enumerated() {
-            let currentHeight = elementHeight
+        var accuHeight: CGFloat = 0.0
+        for (index, elementHeight) in elementHeights.enumerated() {
+          let currentHeight = elementHeight
 
-            if location.y >= accuHeight, location.y <= accuHeight + currentHeight {
-              return index
-            }
-            accuHeight += currentHeight
+          if location.y >= accuHeight, location.y <= accuHeight + currentHeight {
+            return index
           }
+          accuHeight += currentHeight
         }
       case false:
-        do {
-          var accuWidth: CGFloat = 0.0
-          for (index, elementWidth) in elementWidths.enumerated() {
-            let currentWidth = elementWidth
+        var accuWidth: CGFloat = 0.0
+        for (index, elementWidth) in elementWidths.enumerated() {
+          let currentWidth = elementWidth
 
-            if location.x >= accuWidth, location.x <= accuWidth + currentWidth {
-              return index
-            }
-            accuWidth += currentWidth + 1.0
+          if location.x >= accuWidth, location.x <= accuWidth + currentWidth {
+            return index
           }
+          accuWidth += currentWidth + 1.0
         }
     }
     return NSNotFound

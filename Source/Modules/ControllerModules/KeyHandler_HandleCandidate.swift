@@ -154,18 +154,14 @@ extension KeyHandler {
     if input.isLeft {
       switch ctlCandidateCurrent.currentLayout {
         case .horizontal:
-          do {
-            if !ctlCandidateCurrent.highlightPreviousCandidate() {
-              IME.prtDebugIntel("1145148D")
-              errorCallback()
-            }
+          if !ctlCandidateCurrent.highlightPreviousCandidate() {
+            IME.prtDebugIntel("1145148D")
+            errorCallback()
           }
         case .vertical:
-          do {
-            if !ctlCandidateCurrent.showPreviousPage() {
-              IME.prtDebugIntel("1919810D")
-              errorCallback()
-            }
+          if !ctlCandidateCurrent.showPreviousPage() {
+            IME.prtDebugIntel("1919810D")
+            errorCallback()
           }
       }
       return true
@@ -187,18 +183,14 @@ extension KeyHandler {
     if input.isRight {
       switch ctlCandidateCurrent.currentLayout {
         case .horizontal:
-          do {
-            if !ctlCandidateCurrent.highlightNextCandidate() {
-              IME.prtDebugIntel("9B65138D")
-              errorCallback()
-            }
+          if !ctlCandidateCurrent.highlightNextCandidate() {
+            IME.prtDebugIntel("9B65138D")
+            errorCallback()
           }
         case .vertical:
-          do {
-            if !ctlCandidateCurrent.showNextPage() {
-              IME.prtDebugIntel("9244908D")
-              errorCallback()
-            }
+          if !ctlCandidateCurrent.showNextPage() {
+            IME.prtDebugIntel("9244908D")
+            errorCallback()
           }
       }
       return true
@@ -220,18 +212,14 @@ extension KeyHandler {
     if input.isUp {
       switch ctlCandidateCurrent.currentLayout {
         case .horizontal:
-          do {
-            if !ctlCandidateCurrent.showPreviousPage() {
-              IME.prtDebugIntel("9B614524")
-              errorCallback()
-            }
+          if !ctlCandidateCurrent.showPreviousPage() {
+            IME.prtDebugIntel("9B614524")
+            errorCallback()
           }
         case .vertical:
-          do {
-            if !ctlCandidateCurrent.highlightPreviousCandidate() {
-              IME.prtDebugIntel("ASD9908D")
-              errorCallback()
-            }
+          if !ctlCandidateCurrent.highlightPreviousCandidate() {
+            IME.prtDebugIntel("ASD9908D")
+            errorCallback()
           }
       }
       return true
@@ -242,18 +230,14 @@ extension KeyHandler {
     if input.isDown {
       switch ctlCandidateCurrent.currentLayout {
         case .horizontal:
-          do {
-            if !ctlCandidateCurrent.showNextPage() {
-              IME.prtDebugIntel("92B990DD")
-              errorCallback()
-            }
+          if !ctlCandidateCurrent.showNextPage() {
+            IME.prtDebugIntel("92B990DD")
+            errorCallback()
           }
         case .vertical:
-          do {
-            if !ctlCandidateCurrent.highlightNextCandidate() {
-              IME.prtDebugIntel("6B99908D")
-              errorCallback()
-            }
+          if !ctlCandidateCurrent.highlightNextCandidate() {
+            IME.prtDebugIntel("6B99908D")
+            errorCallback()
           }
       }
       return true
