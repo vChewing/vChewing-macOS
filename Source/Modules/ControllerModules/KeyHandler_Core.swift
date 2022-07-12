@@ -413,4 +413,19 @@ class KeyHandler {
     }
     return min(nextPosition, compositorLength)
   }
+
+  /// 生成標點符號索引鍵。
+  /// - Parameter input: 輸入的按鍵訊號。
+  /// - Returns: 生成的標點符號索引鍵。
+  func generatePunctuationNamePrefix(withKeyCondition input: InputSignal) -> String {
+    if mgrPrefs.halfWidthPunctuationEnabled {
+      return "_half_punctuation_"
+    }
+    switch (input.isControlHold, input.isOptionHold) {
+      case (true, true): return "_alt_ctrl_punctuation_"
+      case (true, false): return "_ctrl_punctuation_"
+      case (false, true): return "_alt_punctuation_"
+      case (false, false): return "_punctuation_"
+    }
+  }
 }

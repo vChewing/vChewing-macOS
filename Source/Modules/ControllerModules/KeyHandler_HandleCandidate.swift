@@ -334,22 +334,8 @@ extension KeyHandler {
       /// - 是否是針對當前注音排列/拼音輸入種類專門提供的標點符號。
       /// - 是否是需要摁修飾鍵才可以輸入的那種標點符號。
 
-      var punctuationNamePrefix = ""
-
-      if input.isOptionHold && !input.isControlHold {
-        punctuationNamePrefix = "_alt_punctuation_"
-      } else if input.isControlHold && !input.isOptionHold {
-        punctuationNamePrefix = "_ctrl_punctuation_"
-      } else if input.isControlHold && input.isOptionHold {
-        punctuationNamePrefix = "_alt_ctrl_punctuation_"
-      } else if mgrPrefs.halfWidthPunctuationEnabled {
-        punctuationNamePrefix = "_half_punctuation_"
-      } else {
-        punctuationNamePrefix = "_punctuation_"
-      }
-
+      let punctuationNamePrefix: String = generatePunctuationNamePrefix(withKeyCondition: input)
       let parser = currentMandarinParser
-
       let arrCustomPunctuations: [String] = [
         punctuationNamePrefix, parser, String(format: "%c", CChar(charCode)),
       ]
