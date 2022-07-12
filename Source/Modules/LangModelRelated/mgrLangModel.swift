@@ -484,4 +484,15 @@ enum mgrLangModel {
         break
     }
   }
+
+  static func clearUserOverrideModelData(_ mode: InputMode = .imeModeNULL) {
+    switch mode {
+      case .imeModeCHS:
+        gUserOverrideModelCHS.clearData(withURL: userOverrideModelDataURL(InputMode.imeModeCHS))
+      case .imeModeCHT:
+        gUserOverrideModelCHT.clearData(withURL: userOverrideModelDataURL(InputMode.imeModeCHT))
+      case .imeModeNULL:
+        break
+    }
+  }
 }
