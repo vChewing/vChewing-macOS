@@ -375,8 +375,8 @@ class KeyHandler {
 
   /// 組字器的游標位置。
   var compositorCursorIndex: Int {
-    get { compositor.cursorIndex }
-    set { compositor.cursorIndex = newValue }
+    get { compositor.cursor }
+    set { compositor.cursor = newValue }
   }
 
   /// 組字器的目前的長度。

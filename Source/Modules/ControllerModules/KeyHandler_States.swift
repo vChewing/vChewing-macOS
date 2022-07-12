@@ -662,14 +662,14 @@ extension KeyHandler {
         stateCallback(state)
       }
     } else if input.isOptionHold {
-      if compositorCursorIndex < compositorLength {
-        compositorCursorIndex = nextPhrasePosition
-        stateCallback(buildInputtingState)
-      } else {
+      // 游標跳轉動作無論怎樣都會執行，但如果出了執行失敗的結果的話則觸發報錯流程。
+      if !compositor.jumpCursorBySpan(to: .front) {
         IME.prtDebugIntel("33C3B580")
         errorCallback()
         stateCallback(state)
+        return true
       }
+      stateCallback(buildInputtingState)
     } else {
       if compositorCursorIndex < compositorLength {
         compositorCursorIndex += 1
@@ -727,17 +727,14 @@ extension KeyHandler {
         stateCallback(state)
       }
     } else if input.isOptionHold {
-      if compositorCursorIndex > 1 {
-        compositorCursorIndex -= 2
-        stateCallback(buildInputtingState)
-      } else if compositorCursorIndex == 1 {
-        compositorCursorIndex = 0
-        stateCallback(buildInputtingState)
-      } else {
+      // 游標跳轉動作無論怎樣都會執行，但如果出了執行失敗的結果的話則觸發報錯流程。
+      if !compositor.jumpCursorBySpan(to: .rear) {
         IME.prtDebugIntel("8D50DD9E")
         errorCallback()
         stateCallback(state)
+        return true
       }
+      stateCallback(buildInputtingState)
     } else {
       if compositorCursorIndex > 0 {
         compositorCursorIndex -= 1
