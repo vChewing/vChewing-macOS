@@ -28,7 +28,7 @@ public protocol LangModelProtocol {
   func unigramsFor(key: String) -> [Megrez.Unigram]
 
   /// 給定當前鍵與前述鍵，讓語言模型找給一組雙元圖陣列。
-  func bigramsForKeys(precedingKey: String, key: String) -> [Megrez.Bigram]
+  func bigramsFor(precedingKey: String, key: String) -> [Megrez.Bigram]
 
   /// 給定鍵，確認是否有單元圖記錄在庫。
   func hasUnigramsFor(key: String) -> Bool
@@ -47,7 +47,7 @@ extension Megrez {
     }
 
     /// 給定當前鍵與前述鍵，讓語言模型找給一組雙元圖陣列。
-    open func bigramsForKeys(precedingKey: String, key: String) -> [Megrez.Bigram] {
+    open func bigramsFor(precedingKey: String, key: String) -> [Megrez.Bigram] {
       precedingKey == key ? [Megrez.Bigram]() : [Megrez.Bigram]()
     }
 

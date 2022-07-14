@@ -136,7 +136,7 @@ extension vChewing {
     /// - parameters:
     ///   - precedingKey: 前述讀音索引鍵
     ///   - key: 當前讀音索引鍵
-    public func bigramsForKeys(precedingKey: String, key: String) -> [Megrez.Bigram] {
+    public func bigramsFor(precedingKey: String, key: String) -> [Megrez.Bigram] {
       // 這裡用了點廢話處理，不然函式構建體會被 Swift 格式整理工具給毀掉。
       // 其實只要一句「[Megrez.Bigram]()」就夠了。
       precedingKey == key ? [Megrez.Bigram]() : [Megrez.Bigram]()

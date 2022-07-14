@@ -30,28 +30,35 @@ extension Megrez {
     public var isEmpty: Bool { node.key.isEmpty }
     /// 節點。一個節锚內不一定有節點。
     public var node: Node = .init()
-    /// 節锚所在的位置。
-    public var location: Int = 0
     /// 指定的幅位長度。
-    public var spanLength: Int = 0
+    public var spanLength: Int { node.spanLength }
+    /// 獲取用來比較的權重。
+    public var scoreForSort: Double { node.score }
     /// 累計權重。
     public var mass: Double = 0.0
-    /// 索引鍵的長度。
-    public var keyLength: Int {
-      isEmpty ? node.key.count : 0
+    /// 單元圖陣列。
+    public var unigrams: [Unigram] { node.unigrams }
+    /// 雙元圖陣列。
+    public var bigrams: [Bigram] { node.bigrams }
+    /// 鍵。
+    public var key: String { node.key }
+
+    /// 初期化一個節錨。
+    public init(node: Node = .init(), mass: Double? = nil) {
+      self.node = node
+      self.mass = mass ?? self.node.score
     }
 
+    /// 將該節錨雜湊化。
     public func hash(into hasher: inout Hasher) {
       hasher.combine(node)
-      hasher.combine(location)
-      hasher.combine(spanLength)
       hasher.combine(mass)
     }
 
     /// 將當前節锚列印成一個字串。
     public var description: String {
       var stream = ""
-      stream += "{@(" + String(location) + "," + String(spanLength) + "),"
+      stream += "{@(" + String(spanLength) + "),"
       if node.key.isEmpty {
         stream += node.description
       } else {
@@ -59,11 +66,6 @@ extension Megrez {
       }
       stream += "}"
       return stream
-    }
-
-    /// 獲取用來比較的權重。
-    public var scoreForSort: Double {
-      isEmpty ? node.score : 0
     }
   }
 }
