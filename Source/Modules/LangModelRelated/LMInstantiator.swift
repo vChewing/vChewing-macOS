@@ -185,7 +185,7 @@ extension vChewing {
     // MARK: - 核心函式（對外）
 
     /// 威注音輸入法目前尚未具備對雙元圖的處理能力，故停用該函式。
-    // public func bigramsForKeys(preceedingKey: String, key: String) -> [Megrez.Bigram] { }
+    // public func bigramsFor(preceedingKey: String, key: String) -> [Megrez.Bigram] { }
 
     /// 給定讀音字串，讓 LMI 給出對應的經過處理的單元圖陣列。
     /// - Parameter key: 給定的讀音字串。
@@ -257,7 +257,7 @@ extension vChewing {
     }
 
     /// 該函式不起作用，僅用來滿足 LangModelProtocol 協定的要求。
-    public func bigramsForKeys(precedingKey _: String, key _: String) -> [Megrez.Bigram] { .init() }
+    public func bigramsFor(precedingKey _: String, key _: String) -> [Megrez.Bigram] { .init() }
 
     // MARK: - 核心函式（對內）
 

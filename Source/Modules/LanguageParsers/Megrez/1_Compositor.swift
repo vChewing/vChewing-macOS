@@ -26,7 +26,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 extension Megrez {
   /// 組字器。
   public class Compositor: Grid {
-    /// 文字輸入方向
+    /// 就文字輸入方向而言的方向。
     public enum TypingDirection { case front, rear }
     /// 給被丟掉的節點路徑施加的負權重。
     private let kDroppedPathScore: Double = -999
@@ -38,7 +38,14 @@ extension Megrez {
     private var langModel: LangModelProtocol
     /// 允許查詢當前游標位置屬於第幾個幅位座標（從 0 開始算）。
     private(set) var cursorRegionMap: [Int: Int] = .init()
-    private(set) var walkedAnchors: [Megrez.NodeAnchor] = []  // 用以記錄爬過的節錨的陣列
+    /// 用以記錄爬過的節錨的陣列。
+    private(set) var walkedAnchors: [NodeAnchor] = []
+
+    /// 該函式用以更新爬過的節錨的陣列。
+    /// - Parameter nodes: 傳入的節點陣列。
+    public func updateWalkedAnchors(with nodes: [Node]) {
+      walkedAnchors = nodes.map { Megrez.NodeAnchor(node: $0) }
+    }
 
     /// 公開：多字讀音鍵當中用以分割漢字讀音的記號，預設為空。
     public var joinSeparator: String = "-"
@@ -47,7 +54,7 @@ extension Megrez {
     public var length: Int { readings.count }
 
     /// 按幅位來前後移動游標。
-    /// - Parameter direction: 移動方向
+    /// - Parameter direction: 移動方向。
     /// - Returns: 該操作是否順利完成。
     @discardableResult public func jumpCursorBySpan(to direction: TypingDirection) -> Bool {
       switch direction {
@@ -88,7 +95,7 @@ extension Megrez {
     ///   - separator: 多字讀音鍵當中用以分割漢字讀音的記號，預設為空。
     public init(lm: LangModelProtocol, length: Int = 10, separator: String = "-") {
       langModel = lm
-      super.init(spanLength: abs(length))  // 防呆
+      super.init(spanLengthLimit: abs(length))  // 防呆
       joinSeparator = separator
     }
 
@@ -181,7 +188,7 @@ extension Megrez {
 
       var paths = [[NodeAnchor]]()
       let nodes = nodesEndingAt(location: location).stableSorted {
-        $0.scoreForSort > $1.scoreForSort
+        $0.node.score > $1.node.score
       }
 
       guard !nodes.isEmpty else { return .init() }  // 防止下文出現範圍外索引的錯誤
@@ -270,7 +277,7 @@ extension Megrez {
           if hasMatchedNode(location: p, spanLength: q, key: combinedReading) { continue }
           let unigrams: [Unigram] = langModel.unigramsFor(key: combinedReading)
           if unigrams.isEmpty { continue }
-          let n = Node(key: combinedReading, unigrams: unigrams)
+          let n: Node = .init(key: combinedReading, spanLength: q, unigrams: unigrams)
           insertNode(node: n, location: p, spanLength: q)
         }
       }
@@ -282,6 +289,7 @@ extension Megrez {
 
     internal func updateCursorJumpingTables(_ anchors: [NodeAnchor]) {
       var cursorRegionMapDict = [Int: Int]()
+      cursorRegionMapDict[-1] = 0  // 防呆
       var counter = 0
       for (i, anchor) in anchors.enumerated() {
         for _ in 0..<anchor.spanLength {
@@ -290,7 +298,6 @@ extension Megrez {
         }
       }
       cursorRegionMapDict[counter] = anchors.count
-      cursorRegionMapDict[-1] = 0  // 防呆
       cursorRegionMap = cursorRegionMapDict
     }
   }

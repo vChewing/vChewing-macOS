@@ -41,8 +41,8 @@ extension Megrez {
     public var isEmpty: Bool { spans.isEmpty }
 
     /// 初期化轨格。
-    public init(spanLength: Int = 10) {
-      maxBuildSpanLength = spanLength
+    public init(spanLengthLimit: Int = 10) {
+      maxBuildSpanLength = spanLengthLimit
       spans = [Megrez.SpanUnit]()
     }
 
@@ -98,7 +98,7 @@ extension Megrez {
           spans.remove(at: location)
       }
       for i in 0..<location {
-        // zaps overlapping spans
+        // 處理掉被損毀的或者重複的幅位。
         spans[i].dropNodesBeyond(length: location - i)
       }
     }
@@ -114,13 +114,7 @@ extension Megrez {
       let span = spans[location]
       for i in 1...maxBuildSpanLength {
         if let np = span.nodeOf(length: i) {
-          results.append(
-            .init(
-              node: np,
-              location: location,
-              spanLength: i
-            )
-          )
+          results.append(.init(node: np))
         }
       }
       return results  // 已證實不會有空節點產生。
@@ -137,13 +131,7 @@ extension Megrez {
         let span = spans[i]
         if i + span.maxLength < location { continue }
         if let np = span.nodeOf(length: location - i) {
-          results.append(
-            .init(
-              node: np,
-              location: i,
-              spanLength: location - i
-            )
-          )
+          results.append(.init(node: np))
         }
       }
       return results  // 已證實不會有空節點產生。
@@ -162,13 +150,7 @@ extension Megrez {
         for j in 1...span.maxLength {
           if i + j < location { continue }
           if let np = span.nodeOf(length: j) {
-            results.append(
-              .init(
-                node: np,
-                location: i,
-                spanLength: location - i
-              )
-            )
+            results.append(.init(node: np))
           }
         }
       }
@@ -193,7 +175,7 @@ extension Megrez {
     @discardableResult public func fixNodeWithCandidateLiteral(_ value: String, at location: Int) -> NodeAnchor {
       let location = abs(location)  // 防呆
       var node = NodeAnchor()
-      for theAnchor in nodesOverlappedAt(location: location) {
+      for theAnchor in nodesCrossingOrEndingAt(location: location) {
         let candidates = theAnchor.node.candidates
         // 將該位置的所有節點的候選字詞鎖定狀態全部重設。
         theAnchor.node.resetCandidate()
@@ -217,7 +199,7 @@ extension Megrez {
     @discardableResult public func fixNodeWithCandidate(_ pair: KeyValuePaired, at location: Int) -> NodeAnchor {
       let location = abs(location)  // 防呆
       var node = NodeAnchor()
-      for theAnchor in nodesOverlappedAt(location: location) {
+      for theAnchor in nodesCrossingOrEndingAt(location: location) {
         let candidates = theAnchor.node.candidates
         // 將該位置的所有節點的候選字詞鎖定狀態全部重設。
         theAnchor.node.resetCandidate()
