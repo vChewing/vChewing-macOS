@@ -229,7 +229,7 @@ class KeyHandler {
     if arrAnchors.isEmpty { return .init() }
 
     // 讓更長的節錨排序靠前。
-    arrAnchors = arrAnchors.stableSort { $0.keyLength > $1.keyLength }
+    arrAnchors = arrAnchors.stableSort { $0.spanLength > $1.spanLength }
 
     // 將節錨內的候選字詞資料拓印到輸出陣列內。
     for currentCandidate in arrAnchors.map(\.node.candidates).joined() {
