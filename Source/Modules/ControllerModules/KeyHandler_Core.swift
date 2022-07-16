@@ -149,10 +149,10 @@ class KeyHandler {
   /// - Parameter key: 給定的聯想詞的開頭字。
   /// - Returns: 抓取到的聯想詞陣列。
   /// 不會是 nil，但那些負責接收結果的函式會對空白陣列結果做出正確的處理。
-  func buildAssociatePhraseArray(withKey key: String) -> [(String, String)] {
+  func buildAssociatePhraseArray(withPair pair: Megrez.KeyValuePaired) -> [(String, String)] {
     var arrResult: [(String, String)] = []
-    if currentLM.hasAssociatedPhrasesFor(key: key) {
-      arrResult = currentLM.associatedPhrasesFor(key: key).map { ("", $0) }
+    if currentLM.hasAssociatedPhrasesFor(pair: pair) {
+      arrResult = currentLM.associatedPhrasesFor(pair: pair).map { ("", $0) }
     }
     return arrResult
   }

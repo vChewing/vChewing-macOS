@@ -249,11 +249,19 @@ extension vChewing {
     }
 
     public func associatedPhrasesFor(key: String) -> [String] {
-      lmAssociates.valuesFor(key: key) ?? []
+      lmAssociates.valuesFor(key: key)
     }
 
     public func hasAssociatedPhrasesFor(key: String) -> Bool {
       lmAssociates.hasValuesFor(key: key)
+    }
+
+    public func associatedPhrasesFor(pair: Megrez.KeyValuePaired) -> [String] {
+      lmAssociates.valuesFor(pair: pair)
+    }
+
+    public func hasAssociatedPhrasesFor(pair: Megrez.KeyValuePaired) -> Bool {
+      lmAssociates.hasValuesFor(pair: pair)
     }
 
     /// 該函式不起作用，僅用來滿足 LangModelProtocol 協定的要求。

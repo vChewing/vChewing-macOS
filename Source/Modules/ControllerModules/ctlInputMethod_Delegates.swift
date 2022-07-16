@@ -122,7 +122,8 @@ extension ctlInputMethod: ctlCandidateDelegate {
         handle(state: InputState.Committing(textToCommit: composingBuffer))
         if mgrPrefs.associatedPhrasesEnabled,
           let associatePhrases = keyHandler.buildAssociatePhraseState(
-            withKey: composingBuffer, isTypingVertical: state.isTypingVertical
+            withPair: .init(key: selectedValue.0, value: selectedValue.1),
+            isTypingVertical: state.isTypingVertical
           ), !associatePhrases.candidates.isEmpty
         {
           handle(state: associatePhrases)
@@ -140,7 +141,8 @@ extension ctlInputMethod: ctlCandidateDelegate {
       handle(state: InputState.Committing(textToCommit: selectedValue.1))
       if mgrPrefs.associatedPhrasesEnabled,
         let associatePhrases = keyHandler.buildAssociatePhraseState(
-          withKey: selectedValue.1, isTypingVertical: state.isTypingVertical
+          withPair: .init(key: selectedValue.0, value: selectedValue.1),
+          isTypingVertical: state.isTypingVertical
         ), !associatePhrases.candidates.isEmpty
       {
         handle(state: associatePhrases)

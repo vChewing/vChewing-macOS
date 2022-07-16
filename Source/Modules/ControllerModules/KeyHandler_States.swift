@@ -198,12 +198,12 @@ extension KeyHandler {
   ///   - isTypingVertical: 是否縱排輸入？
   /// - Returns: 回呼一個新的聯想詞狀態，來就給定的聯想詞陣列資料內容顯示選字窗。
   func buildAssociatePhraseState(
-    withKey key: String!,
+    withPair pair: Megrez.KeyValuePaired,
     isTypingVertical: Bool
   ) -> InputState.AssociatedPhrases! {
     // 上一行必須要用驚嘆號，否則 Xcode 會誤導你砍掉某些實際上必需的語句。
     InputState.AssociatedPhrases(
-      candidates: buildAssociatePhraseArray(withKey: key), isTypingVertical: isTypingVertical
+      candidates: buildAssociatePhraseArray(withPair: pair), isTypingVertical: isTypingVertical
     )
   }
 

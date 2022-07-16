@@ -90,7 +90,7 @@ extension vChewing {
       IME.prtDebugIntel(strDump)
     }
 
-    public func valuesFor(key: String) -> [String]? {
+    public func valuesFor(key: String) -> [String] {
       var pairs: [String] = []
       if let arrRangeRecords: [Range<String.Index>] = rangeMap[key] {
         for netaRange in arrRangeRecords {
@@ -104,6 +104,29 @@ extension vChewing {
 
     public func hasValuesFor(key: String) -> Bool {
       rangeMap[key] != nil
+    }
+
+    public func valuesFor(pair: Megrez.KeyValuePaired) -> [String] {
+      var pairs: [String] = []
+      if let arrRangeRecords: [Range<String.Index>] = rangeMap[pair.toNGramKey] {
+        for netaRange in arrRangeRecords {
+          let neta = strData[netaRange].split(separator: " ")
+          let theValue: String = .init(neta[1])
+          pairs.append(theValue)
+        }
+      } else if let arrRangeRecords: [Range<String.Index>] = rangeMap[pair.value] {
+        for netaRange in arrRangeRecords {
+          let neta = strData[netaRange].split(separator: " ")
+          let theValue: String = .init(neta[1])
+          pairs.append(theValue)
+        }
+      }
+      return pairs
+    }
+
+    public func hasValuesFor(pair: Megrez.KeyValuePaired) -> Bool {
+      if rangeMap[pair.toNGramKey] != nil { return true }
+      return rangeMap[pair.value] != nil
     }
   }
 }
