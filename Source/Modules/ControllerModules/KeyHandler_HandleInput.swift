@@ -262,7 +262,7 @@ extension KeyHandler {
 
     // MARK: 用上下左右鍵呼叫選字窗 (Calling candidate window using Up / Down or PageUp / PageDn.)
 
-    if let currentState = state as? InputState.NotEmpty, composer.isEmpty,
+    if let currentState = state as? InputState.NotEmpty, composer.isEmpty, !input.isOptionHold,
       input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
         || input.isPageDown || input.isPageUp || (input.isTab && mgrPrefs.specifyShiftTabKeyBehavior)
         || (input.isTypingVertical && (input.isVerticalTypingOnlyChooseCandidateKey))
@@ -354,6 +354,17 @@ extension KeyHandler {
     // MARK: AbsorbedArrowKey
 
     if input.isAbsorbedArrowKey || input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse {
+      if input.isOptionHold, state.type == .ofInputting {
+        if input.isExtraChooseCandidateKey {
+          return handleInlineCandidateRotation(
+            state: state, reverseModifier: false, stateCallback: stateCallback, errorCallback: errorCallback
+          )
+        } else if input.isExtraChooseCandidateKeyReverse {
+          return handleInlineCandidateRotation(
+            state: state, reverseModifier: true, stateCallback: stateCallback, errorCallback: errorCallback
+          )
+        }
+      }
       return handleAbsorbedArrowKey(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 
