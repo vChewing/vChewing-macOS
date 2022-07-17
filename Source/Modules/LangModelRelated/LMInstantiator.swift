@@ -82,7 +82,7 @@ extension vChewing {
     // 聲明使用者語言模組。
     // 使用者語言模組使用多執行緒的話，可能會導致一些問題。有時間再仔細排查看看。
     var lmUserPhrases = LMCoreEX(
-      reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: true
+      reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: false
     )
     var lmFiltered = LMCoreEX(
       reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: true
