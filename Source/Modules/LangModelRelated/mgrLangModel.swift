@@ -315,7 +315,7 @@ enum mgrLangModel {
     return true
   }
 
-  static func chkUserLMFilesExist(_ mode: InputMode) -> Bool {
+  @discardableResult static func chkUserLMFilesExist(_ mode: InputMode) -> Bool {
     if !userDataFolderExists {
       return false
     }
