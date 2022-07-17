@@ -78,11 +78,6 @@ extension KeyHandler {
     // MARK: Enter
 
     if input.isEnter {
-      if state is InputState.AssociatedPhrases {
-        clear()
-        stateCallback(InputState.EmptyIgnoringPreviousState())
-        return true
-      }
       delegate!.keyHandler(
         self,
         didSelectCandidateAt: ctlCandidateCurrent.selectedCandidateIndex,
