@@ -154,7 +154,7 @@ extension vChewing {
           let theValue: String = shouldReverse ? String(neta[0]) : String(neta[1])
           let kvPair = Megrez.KeyValuePaired(key: key, value: theValue)
           var theScore = defaultScore
-          if neta.count >= 3, !shouldForceDefaultScore {
+          if neta.count >= 3, !shouldForceDefaultScore, !neta[2].contains("#") {
             theScore = .init(String(neta[2])) ?? defaultScore
           }
           if theScore > 0 {
