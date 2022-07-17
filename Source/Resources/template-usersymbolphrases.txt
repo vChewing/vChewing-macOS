@@ -1,0 +1,12 @@
+# 𝙵𝙾𝚁𝙼𝙰𝚃 𝚘𝚛𝚐.𝚊𝚝𝚎𝚕𝚒𝚎𝚛𝙸𝚗𝚖𝚞.𝚟𝚌𝚑𝚎𝚠𝚒𝚗𝚐.𝚞𝚜𝚎𝚛𝙻𝚊𝚗𝚐𝚞𝚊𝚐𝚎𝙼𝚘𝚍𝚎𝚕𝙳𝚊𝚝𝚊.𝚏𝚘𝚛𝚖𝚊𝚝𝚝𝚎𝚍
+# 按照下述格式「字詞 注音-注音」的方式在本文內添入的字詞記錄才會生效。
+# 按照下述格式「字词 注音-注音」的方式在本文内添入的字词记录才会生效。
+# 下記の格式「候補 注音-注音」のよう、このファイルで登録した入力候補は効きます。
+# By using the format "Candidate Reading-Reading", all entries registered in this file will be effective.
+#
+#   ⚠︎ ㄐㄧㄥˇ-ㄍㄠˋ
+#
+# 如果任何一行以半形英數「#」或者空格開頭，則該行將被忽略。
+# 如果任何一行以半角英数「#」或者空格开头，则该行将被忽略。
+# 頭文字が半角英数「#」或いは「スペース」の行は効けません。
+# Lines begin with an ASCII sharp symbol or a space will be omitted.
