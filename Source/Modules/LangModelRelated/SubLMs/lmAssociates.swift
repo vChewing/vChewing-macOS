@@ -102,8 +102,17 @@ extension vChewing {
     }
 
     public func valuesFor(pair: Megrez.KeyValuePaired) -> [String] {
+      var pairPinyin = pair
+      pairPinyin.key = Tekkon.cnvPhonaToHanyuPinyin(target: pairPinyin.key)
       var pairs: [String] = []
       if let arrRangeRecords: [(Range<String.Index>, Int)] = rangeMap[pair.toNGramKey] {
+        for (netaRange, index) in arrRangeRecords {
+          let neta = strData[netaRange].split(separator: " ")
+          let theValue: String = .init(neta[index])
+          pairs.append(theValue)
+        }
+      }
+      if let arrRangeRecords: [(Range<String.Index>, Int)] = rangeMap[pairPinyin.toNGramKey] {
         for (netaRange, index) in arrRangeRecords {
           let neta = strData[netaRange].split(separator: " ")
           let theValue: String = .init(neta[index])
