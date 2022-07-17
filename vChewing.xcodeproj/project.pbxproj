@@ -860,9 +860,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6A0D4EC015FC0D2E00ABF4B3 /* Build configuration list for PBXNativeTarget "vChewing" */;
 			buildPhases = (
-				5B9A5A00285184BB001FFCAF /* ShellScript */,
 				6A0D4E9E15FC0D2D00ABF4B3 /* Sources */,
 				6A0D4E9F15FC0D2D00ABF4B3 /* Frameworks */,
+				5B9A5A00285184BB001FFCAF /* ShellScript */,
 				6A0D4EA015FC0D2D00ABF4B3 /* Resources */,
 				5BDC5CBE27C28E8B00E1CCE2 /* Embed Foundation Extensions */,
 			);
