@@ -27,7 +27,7 @@ import Foundation
 
 extension vChewing {
   @frozen public struct LMAssociates {
-    var rangeMap: [String: [Range<String.Index>]] = [:]
+    var rangeMap: [String: [(Range<String.Index>, Int)]] = [:]
     var strData: String = ""
 
     public var count: Int {
@@ -56,9 +56,11 @@ extension vChewing {
           let neta = strData[$0].split(separator: " ")
           if neta.count >= 2 {
             let theKey = String(neta[0])
-            if !neta[0].isEmpty, !neta[1].isEmpty, theKey.first != "#" {
-              let theValue = $0
-              rangeMap[theKey, default: []].append(theValue)
+            if !theKey.isEmpty, theKey.first != "#" {
+              for (i, _) in neta.filter({ $0.first != "#" && !$0.isEmpty }).enumerated() {
+                if i == 0 { continue }
+                rangeMap[theKey, default: []].append(($0, i))
+              }
             }
           }
         }
@@ -78,24 +80,16 @@ extension vChewing {
     }
 
     public func dump() {
-      var strDump = ""
-      for entry in rangeMap {
-        let netaRanges: [Range<String.Index>] = entry.value
-        for netaRange in netaRanges {
-          let neta = strData[netaRange]
-          let addline = neta + "\n"
-          strDump += addline
-        }
-      }
-      IME.prtDebugIntel(strDump)
+      // We remove this function in order to reduce out maintenance workload.
+      // This function will be implemented only if further hard-necessity comes.
     }
 
     public func valuesFor(key: String) -> [String] {
       var pairs: [String] = []
-      if let arrRangeRecords: [Range<String.Index>] = rangeMap[key] {
-        for netaRange in arrRangeRecords {
+      if let arrRangeRecords: [(Range<String.Index>, Int)] = rangeMap[key] {
+        for (netaRange, index) in arrRangeRecords {
           let neta = strData[netaRange].split(separator: " ")
-          let theValue: String = .init(neta[1])
+          let theValue: String = .init(neta[index])
           pairs.append(theValue)
         }
       }
@@ -108,20 +102,22 @@ extension vChewing {
 
     public func valuesFor(pair: Megrez.KeyValuePaired) -> [String] {
       var pairs: [String] = []
-      if let arrRangeRecords: [Range<String.Index>] = rangeMap[pair.toNGramKey] {
-        for netaRange in arrRangeRecords {
+      if let arrRangeRecords: [(Range<String.Index>, Int)] = rangeMap[pair.toNGramKey] {
+        for (netaRange, index) in arrRangeRecords {
           let neta = strData[netaRange].split(separator: " ")
-          let theValue: String = .init(neta[1])
-          pairs.append(theValue)
-        }
-      } else if let arrRangeRecords: [Range<String.Index>] = rangeMap[pair.value] {
-        for netaRange in arrRangeRecords {
-          let neta = strData[netaRange].split(separator: " ")
-          let theValue: String = .init(neta[1])
+          let theValue: String = .init(neta[index])
           pairs.append(theValue)
         }
       }
-      return pairs
+      if let arrRangeRecords: [(Range<String.Index>, Int)] = rangeMap[pair.value] {
+        for (netaRange, index) in arrRangeRecords {
+          let neta = strData[netaRange].split(separator: " ")
+          let theValue: String = .init(neta[index])
+          pairs.append(theValue)
+        }
+      }
+      var set = Set<String>()
+      return pairs.filter { set.insert($0).inserted }
     }
 
     public func hasValuesFor(pair: Megrez.KeyValuePaired) -> Bool {
