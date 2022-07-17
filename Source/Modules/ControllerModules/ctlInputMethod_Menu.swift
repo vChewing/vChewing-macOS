@@ -117,14 +117,17 @@ extension ctlInputMethod {
       action: #selector(openExcludedPhrases(_:)), keyEquivalent: ""
     )
 
+    if optionKeyPressed || mgrPrefs.associatedPhrasesEnabled {
+      menu.addItem(
+        withTitle: NSLocalizedString("Edit Associated Phrases…", comment: ""),
+        action: #selector(openAssociatedPhrases(_:)), keyEquivalent: ""
+      )
+    }
+
     if optionKeyPressed {
       menu.addItem(
         withTitle: NSLocalizedString("Edit Phrase Replacement Table…", comment: ""),
         action: #selector(openPhraseReplacement(_:)), keyEquivalent: ""
-      )
-      menu.addItem(
-        withTitle: NSLocalizedString("Edit Associated Phrases…", comment: ""),
-        action: #selector(openAssociatedPhrases(_:)), keyEquivalent: ""
       )
       menu.addItem(
         withTitle: NSLocalizedString("Edit User Symbol & Emoji Data…", comment: ""),
@@ -138,6 +141,8 @@ extension ctlInputMethod {
         action: #selector(reloadUserPhrasesData(_:)), keyEquivalent: ""
       )
     }
+
+    menu.addItem(NSMenuItem.separator())  // ---------------------
 
     menu.addItem(
       withTitle: NSLocalizedString("Optimize Memorized Phrases", comment: ""),
