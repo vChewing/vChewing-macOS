@@ -82,7 +82,7 @@ extension vChewing {
     // 聲明使用者語言模組。
     // 使用者語言模組使用多執行緒的話，可能會導致一些問題。有時間再仔細排查看看。
     var lmUserPhrases = LMCoreEX(
-      reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: true
+      reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: false
     )
     var lmFiltered = LMCoreEX(
       reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: true
@@ -249,11 +249,19 @@ extension vChewing {
     }
 
     public func associatedPhrasesFor(key: String) -> [String] {
-      lmAssociates.valuesFor(key: key) ?? []
+      lmAssociates.valuesFor(key: key)
     }
 
     public func hasAssociatedPhrasesFor(key: String) -> Bool {
       lmAssociates.hasValuesFor(key: key)
+    }
+
+    public func associatedPhrasesFor(pair: Megrez.KeyValuePaired) -> [String] {
+      lmAssociates.valuesFor(pair: pair)
+    }
+
+    public func hasAssociatedPhrasesFor(pair: Megrez.KeyValuePaired) -> Bool {
+      lmAssociates.hasValuesFor(pair: pair)
     }
 
     /// 該函式不起作用，僅用來滿足 LangModelProtocol 協定的要求。

@@ -60,9 +60,9 @@ extension String {
 // MARK: - 引入小數點位數控制函式
 
 // Ref: https://stackoverflow.com/a/32581409/4162914
-extension Float {
-  fileprivate func rounded(toPlaces places: Int) -> Float {
-    let divisor = pow(10.0, Float(places))
+extension Double {
+  fileprivate func rounded(toPlaces places: Int) -> Double {
+    let divisor = pow(10.0, Double(places))
     return (self * divisor).rounded() / divisor
   }
 }
@@ -81,17 +81,16 @@ func ** (_ base: Double, _ exp: Double) -> Double {
   pow(base, exp)
 }
 
-func ** (_ base: Float, _ exp: Float) -> Float {
-  pow(base, exp)
-}
-
 // MARK: - 定義檔案結構
 
-struct Entry {
-  var valPhone: String = ""
-  var valPhrase: String = ""
-  var valWeight: Float = -1.0
-  var valCount: Int = 0
+struct Unigram: CustomStringConvertible {
+  var key: String = ""
+  var value: String = ""
+  var score: Double = -1.0
+  var count: Int = 0
+  var description: String {
+    "(\(key), \(value), \(score))"
+  }
 }
 
 // MARK: - 注音加密，減少 plist 體積
@@ -105,8 +104,8 @@ func cnvPhonabetToASCII(_ incoming: String) -> String {
   ]
   var strOutput = incoming
   if !strOutput.contains("_") {
-    for entry in dicPhonabet2ASCII {
-      strOutput = strOutput.replacingOccurrences(of: entry.key, with: entry.value)
+    for Unigram in dicPhonabet2ASCII {
+      strOutput = strOutput.replacingOccurrences(of: Unigram.key, with: Unigram.value)
     }
   }
   return strOutput
@@ -146,8 +145,8 @@ private let urlPlistCHT: String = "./data-cht.plist"
 
 // MARK: - 載入詞組檔案且輸出陣列
 
-func rawDictForPhrases(isCHS: Bool) -> [Entry] {
-  var arrEntryRAW: [Entry] = []
+func rawDictForPhrases(isCHS: Bool) -> [Unigram] {
+  var arrUnigramRAW: [Unigram] = []
   var strRAW = ""
   let urlCustom: String = isCHS ? urlCHSforCustom : urlCHTforCustom
   let urlTABE: String = isCHS ? urlCHSforTABE : urlCHTforTABE
@@ -195,7 +194,7 @@ func rawDictForPhrases(isCHS: Bool) -> [Entry] {
         varLineDataProcessed += currentCell
       }
     }
-    // 然後直接乾脆就轉成 Entry 吧。
+    // 然後直接乾脆就轉成 Unigram 吧。
     let arrCells: [String] = varLineDataProcessed.components(separatedBy: "\t")
     count = 0  // 不需要再定義，因為之前已經有定義過了。
     var phone = ""
@@ -211,22 +210,22 @@ func rawDictForPhrases(isCHS: Bool) -> [Entry] {
       }
     }
     if phrase != "" {  // 廢掉空數據；之後無須再這樣處理。
-      arrEntryRAW += [
-        Entry(
-          valPhone: phone, valPhrase: phrase, valWeight: 0.0,
-          valCount: occurrence
+      arrUnigramRAW += [
+        Unigram(
+          key: phone, value: phrase, score: 0.0,
+          count: occurrence
         )
       ]
     }
   }
   NSLog(" - \(i18n): 成功生成詞語語料辭典（權重待計算）。")
-  return arrEntryRAW
+  return arrUnigramRAW
 }
 
 // MARK: - 載入單字檔案且輸出陣列
 
-func rawDictForKanjis(isCHS: Bool) -> [Entry] {
-  var arrEntryRAW: [Entry] = []
+func rawDictForKanjis(isCHS: Bool) -> [Unigram] {
+  var arrUnigramRAW: [Unigram] = []
   var strRAW = ""
   let i18n: String = isCHS ? "簡體中文" : "繁體中文"
   // 讀取內容
@@ -272,7 +271,7 @@ func rawDictForKanjis(isCHS: Bool) -> [Entry] {
         varLineDataProcessed += currentCell
       }
     }
-    // 然後直接乾脆就轉成 Entry 吧。
+    // 然後直接乾脆就轉成 Unigram 吧。
     let arrCells: [String] = varLineDataProcessed.components(separatedBy: "\t")
     count = 0  // 不需要再定義，因為之前已經有定義過了。
     var phone = ""
@@ -288,22 +287,22 @@ func rawDictForKanjis(isCHS: Bool) -> [Entry] {
       }
     }
     if phrase != "" {  // 廢掉空數據；之後無須再這樣處理。
-      arrEntryRAW += [
-        Entry(
-          valPhone: phone, valPhrase: phrase, valWeight: 0.0,
-          valCount: occurrence
+      arrUnigramRAW += [
+        Unigram(
+          key: phone, value: phrase, score: 0.0,
+          count: occurrence
         )
       ]
     }
   }
   NSLog(" - \(i18n): 成功生成單字語料辭典（權重待計算）。")
-  return arrEntryRAW
+  return arrUnigramRAW
 }
 
 // MARK: - 載入非漢字檔案且輸出陣列
 
-func rawDictForNonKanjis(isCHS: Bool) -> [Entry] {
-  var arrEntryRAW: [Entry] = []
+func rawDictForNonKanjis(isCHS: Bool) -> [Unigram] {
+  var arrUnigramRAW: [Unigram] = []
   var strRAW = ""
   let i18n: String = isCHS ? "簡體中文" : "繁體中文"
   // 讀取內容
@@ -347,7 +346,7 @@ func rawDictForNonKanjis(isCHS: Bool) -> [Entry] {
         varLineDataProcessed += currentCell
       }
     }
-    // 然後直接乾脆就轉成 Entry 吧。
+    // 然後直接乾脆就轉成 Unigram 吧。
     let arrCells: [String] = varLineDataProcessed.components(separatedBy: "\t")
     count = 0  // 不需要再定義，因為之前已經有定義過了。
     var phone = ""
@@ -363,60 +362,60 @@ func rawDictForNonKanjis(isCHS: Bool) -> [Entry] {
       }
     }
     if phrase != "" {  // 廢掉空數據；之後無須再這樣處理。
-      arrEntryRAW += [
-        Entry(
-          valPhone: phone, valPhrase: phrase, valWeight: 0.0,
-          valCount: occurrence
+      arrUnigramRAW += [
+        Unigram(
+          key: phone, value: phrase, score: 0.0,
+          count: occurrence
         )
       ]
     }
   }
   NSLog(" - \(i18n): 成功生成非漢字語料辭典（權重待計算）。")
-  return arrEntryRAW
+  return arrUnigramRAW
 }
 
-func weightAndSort(_ arrStructUncalculated: [Entry], isCHS: Bool) -> [Entry] {
+func weightAndSort(_ arrStructUncalculated: [Unigram], isCHS: Bool) -> [Unigram] {
   let i18n: String = isCHS ? "簡體中文" : "繁體中文"
-  var arrStructCalculated: [Entry] = []
-  let fscale: Float = 2.7
-  var norm: Float = 0.0
-  for entry in arrStructUncalculated {
-    if entry.valCount >= 0 {
-      norm += fscale ** (Float(entry.valPhrase.count) / 3.0 - 1.0)
-        * Float(entry.valCount)
+  var arrStructCalculated: [Unigram] = []
+  let fscale = 2.7
+  var norm = 0.0
+  for unigram in arrStructUncalculated {
+    if unigram.count >= 0 {
+      norm += fscale ** (Double(unigram.value.count) / 3.0 - 1.0)
+        * Double(unigram.count)
     }
   }
   // norm 計算完畢，開始將 norm 作為新的固定常數來為每個詞條記錄計算權重。
   // 將新酷音的詞語出現次數數據轉換成小麥引擎可讀的數據形式。
   // 對出現次數小於 1 的詞條，將 0 當成 0.5 來處理、以防止除零。
-  for entry in arrStructUncalculated {
-    var weight: Float = 0
-    switch entry.valCount {
+  for unigram in arrStructUncalculated {
+    var weight: Double = 0
+    switch unigram.count {
       case -2:  // 拗音假名
         weight = -13
       case -1:  // 單個假名
         weight = -13
       case 0:  // 墊底低頻漢字與詞語
         weight = log10(
-          fscale ** (Float(entry.valPhrase.count) / 3.0 - 1.0) * 0.25 / norm)
+          fscale ** (Double(unigram.value.count) / 3.0 - 1.0) * 0.25 / norm)
       default:
         weight = log10(
-          fscale ** (Float(entry.valPhrase.count) / 3.0 - 1.0)
-            * Float(entry.valCount) / norm)  // Credit: MJHsieh.
+          fscale ** (Double(unigram.value.count) / 3.0 - 1.0)
+            * Double(unigram.count) / norm)  // Credit: MJHsieh.
     }
-    let weightRounded: Float = weight.rounded(toPlaces: 3)  // 為了節省生成的檔案體積，僅保留小數點後三位。
+    let weightRounded: Double = weight.rounded(toPlaces: 3)  // 為了節省生成的檔案體積，僅保留小數點後三位。
     arrStructCalculated += [
-      Entry(
-        valPhone: entry.valPhone, valPhrase: entry.valPhrase, valWeight: weightRounded,
-        valCount: entry.valCount
+      Unigram(
+        key: unigram.key, value: unigram.value, score: weightRounded,
+        count: unigram.count
       )
     ]
   }
   NSLog(" - \(i18n): 成功計算權重。")
   // ==========================================
   // 接下來是排序，先按照注音遞減排序一遍、再按照權重遞減排序一遍。
-  let arrStructSorted: [Entry] = arrStructCalculated.sorted(by: { lhs, rhs -> Bool in
-    (lhs.valPhone, rhs.valCount) < (rhs.valPhone, lhs.valCount)
+  let arrStructSorted: [Unigram] = arrStructCalculated.sorted(by: { lhs, rhs -> Bool in
+    (lhs.key, rhs.count) < (rhs.key, lhs.count)
   })
   NSLog(" - \(i18n): 排序整理完畢，準備編譯要寫入的檔案內容。")
   return arrStructSorted
@@ -434,9 +433,11 @@ func fileOutput(isCHS: Bool) {
   // 讀取標點內容
   do {
     strPunctuation = try String(contentsOfFile: urlPunctuation, encoding: .utf8).replacingOccurrences(
-      of: "\t", with: " ")
+      of: "\t", with: " "
+    )
     strPrintLine += try String(contentsOfFile: urlPunctuation, encoding: .utf8).replacingOccurrences(
-      of: "\t", with: " ")
+      of: "\t", with: " "
+    )
   } catch {
     NSLog(" - \(i18n): Exception happened when reading raw punctuation data.")
   }
@@ -453,18 +454,33 @@ func fileOutput(isCHS: Bool) {
       }
     }
   }
-  var arrStructUnified: [Entry] = []
+  var arrStructUnified: [Unigram] = []
   arrStructUnified += rawDictForKanjis(isCHS: isCHS)
   arrStructUnified += rawDictForNonKanjis(isCHS: isCHS)
   arrStructUnified += rawDictForPhrases(isCHS: isCHS)
   // 計算權重且排序
   arrStructUnified = weightAndSort(arrStructUnified, isCHS: isCHS)
-  for entry in arrStructUnified {
-    let theKey = entry.valPhone
-    let theValue = (String(entry.valWeight) + " " + entry.valPhrase)
+
+  // 資料重複性檢查
+  NSLog(" - \(i18n): 執行資料重複性檢查，會在之後再給出對應的檢查結果。")
+  var setAlreadyInserted = Set<String>()
+  var arrFoundedDuplications = [String]()
+
+  // 健康狀況檢查
+  NSLog(" - \(i18n): 執行資料健康狀況檢查。")
+  print(healthCheck(arrStructUnified))
+  for unigram in arrStructUnified {
+    if setAlreadyInserted.contains(unigram.value + "\t" + unigram.key) {
+      arrFoundedDuplications.append(unigram.value + "\t" + unigram.key)
+    } else {
+      setAlreadyInserted.insert(unigram.value + "\t" + unigram.key)
+    }
+
+    let theKey = unigram.key
+    let theValue = (String(unigram.score) + " " + unigram.value)
     rangeMap[cnvPhonabetToASCII(theKey), default: []].append(theValue.data(using: .utf8)!)
     strPrintLine +=
-      entry.valPhone + " " + entry.valPhrase + " " + String(entry.valWeight)
+      unigram.key + " " + unigram.value + " " + String(unigram.score)
       + "\n"
   }
   NSLog(" - \(i18n): 要寫入檔案的 txt 內容編譯完畢。")
@@ -476,6 +492,12 @@ func fileOutput(isCHS: Bool) {
     NSLog(" - \(i18n): Error on writing strings to file: \(error)")
   }
   NSLog(" - \(i18n): 寫入完成。")
+  if !arrFoundedDuplications.isEmpty {
+    NSLog(" - \(i18n): 尋得下述重複項目，請務必手動排查：")
+    print("-------------------")
+    print(arrFoundedDuplications.joined(separator: "\n"))
+  }
+  print("===================")
 }
 
 func commonFileOutput() {
@@ -555,3 +577,268 @@ func main() {
 }
 
 main()
+
+// MARK: - 辭庫健康狀況檢查專用函式
+
+func healthCheck(_ data: [Unigram]) -> String {
+  var result = ""
+  var unigramMonoChar = [String: Unigram]()
+  var valueToScore = [String: Double]()
+  let unigramMonoCharCounter = data.filter { $0.score > -14 && $0.key.split(separator: "-").count == 1 }.count
+  let unigramPolyCharCounter = data.filter { $0.score > -14 && $0.key.split(separator: "-").count > 1 }.count
+
+  // 核心字詞庫的內容頻率一般大於 -10，但也得考慮某些包含假名的合成詞。
+  for neta in data.filter({ $0.score > -14 }) {
+    valueToScore[neta.value] = max(neta.score, valueToScore[neta.value] ?? -14)
+    let theKeySliceArr = neta.key.split(separator: "-")
+    guard let theKey = theKeySliceArr.first, theKeySliceArr.count == 1 else { continue }
+    if unigramMonoChar.keys.contains(String(theKey)), let theRecord = unigramMonoChar[String(theKey)] {
+      if neta.score > theRecord.score { unigramMonoChar[String(theKey)] = neta }
+    } else {
+      unigramMonoChar[String(theKey)] = neta
+    }
+  }
+
+  var faulty = [Unigram]()
+  var indifferents: [(String, String, Double, [Unigram], Double)] = []
+  var insufficients: [(String, String, Double, [Unigram], Double)] = []
+  var competingUnigrams = [(String, Double, String, Double)]()
+
+  for neta in data.filter({ $0.key.split(separator: "-").count >= 2 && $0.score > -14 }) {
+    var competants = [Unigram]()
+    var tscore: Double = 0
+    var bad = false
+    for x in neta.key.split(separator: "-") {
+      if !unigramMonoChar.keys.contains(String(x)) {
+        bad = true
+        break
+      }
+      guard let u = unigramMonoChar[String(x)] else { continue }
+      tscore += u.score
+      competants.append(u)
+    }
+    if bad {
+      faulty.append(neta)
+      continue
+    }
+    if tscore >= neta.score {
+      let instance = (neta.key, neta.value, neta.score, competants, neta.score - tscore)
+      let valueJoined = String(competants.map(\.value).joined(separator: ""))
+      if neta.value == valueJoined {
+        indifferents.append(instance)
+      } else {
+        if valueToScore.keys.contains(valueJoined), neta.value != valueJoined {
+          if let valueJoinedScore = valueToScore[valueJoined], neta.score < valueJoinedScore {
+            competingUnigrams.append((neta.value, neta.score, valueJoined, valueJoinedScore))
+          }
+        }
+        insufficients.append(instance)
+      }
+    }
+  }
+
+  insufficients = insufficients.sorted(by: { lhs, rhs -> Bool in
+    (lhs.2) > (rhs.2)
+  })
+  competingUnigrams = competingUnigrams.sorted(by: { lhs, rhs -> Bool in
+    (lhs.1 - lhs.3) > (rhs.1 - rhs.3)
+  })
+
+  let separator: String = {
+    var result = ""
+    for _ in 0..<72 { result += "-" }
+    return result
+  }()
+
+  func printl(_ input: String) {
+    result += input + "\n"
+  }
+
+  printl(separator)
+  printl("持單個字符的有效單元圖數量：\(unigramMonoCharCounter)")
+  printl("持多個字符的有效單元圖數量：\(unigramPolyCharCounter)")
+
+  printl(separator)
+  printl("總結一下那些容易被單個漢字的字頻干擾輸入的詞組單元圖：")
+  printl("因干擾組件和字詞本身完全重疊、而不需要處理的單元圖的數量：\(indifferents.count)")
+  printl(
+    "有 \(insufficients.count) 個複字單元圖被自身成分讀音對應的其它單字單元圖奪權，約佔全部有效單元圖的 \(insufficients.count / unigramPolyCharCounter * 100)%，"
+  )
+  printl("\n其中有：")
+
+  var insufficientsMap = [Int: [(String, String, Double, [Unigram], Double)]]()
+  for x in 2...10 {
+    insufficientsMap[x] = insufficients.filter { $0.0.split(separator: "-").count == x }
+  }
+
+  printl("  \(insufficientsMap[2]?.count ?? 0) 個有效雙字單元圖")
+  printl("  \(insufficientsMap[3]?.count ?? 0) 個有效三字單元圖")
+  printl("  \(insufficientsMap[4]?.count ?? 0) 個有效四字單元圖")
+  printl("  \(insufficientsMap[5]?.count ?? 0) 個有效五字單元圖")
+  printl("  \(insufficientsMap[6]?.count ?? 0) 個有效六字單元圖")
+  printl("  \(insufficientsMap[7]?.count ?? 0) 個有效七字單元圖")
+  printl("  \(insufficientsMap[8]?.count ?? 0) 個有效八字單元圖")
+  printl("  \(insufficientsMap[9]?.count ?? 0) 個有效九字單元圖")
+  printl("  \(insufficientsMap[10]?.count ?? 0) 個有效十字單元圖")
+
+  if let insufficientsMap2 = insufficientsMap[2], !insufficientsMap2.isEmpty {
+    printl(separator)
+    printl("前二十五個被奪權的有效雙字單元圖")
+    for (i, content) in insufficientsMap2.enumerated() {
+      if i == 25 { break }
+      var contentToPrint = "{"
+      contentToPrint += content.0 + ","
+      contentToPrint += content.1 + ","
+      contentToPrint += String(content.2) + ","
+      contentToPrint += "[" + content.3.map(\.description).joined(separator: ",") + "]" + ","
+      contentToPrint += String(content.4) + "}"
+      printl(contentToPrint)
+    }
+  }
+
+  if let insufficientsMap3 = insufficientsMap[3], !insufficientsMap3.isEmpty {
+    printl(separator)
+    printl("前二十五個被奪權的有效三字單元圖")
+    for (i, content) in insufficientsMap3.enumerated() {
+      if i == 25 { break }
+      var contentToPrint = "{"
+      contentToPrint += content.0 + ","
+      contentToPrint += content.1 + ","
+      contentToPrint += String(content.2) + ","
+      contentToPrint += "[" + content.3.map(\.description).joined(separator: ",") + "]" + ","
+      contentToPrint += String(content.4) + "}"
+      printl(contentToPrint)
+    }
+  }
+
+  if let insufficientsMap4 = insufficientsMap[4], !insufficientsMap4.isEmpty {
+    printl(separator)
+    printl("前二十五個被奪權的有效四字單元圖")
+    for (i, content) in insufficientsMap4.enumerated() {
+      if i == 25 { break }
+      var contentToPrint = "{"
+      contentToPrint += content.0 + ","
+      contentToPrint += content.1 + ","
+      contentToPrint += String(content.2) + ","
+      contentToPrint += "[" + content.3.map(\.description).joined(separator: ",") + "]" + ","
+      contentToPrint += String(content.4) + "}"
+      printl(contentToPrint)
+    }
+  }
+
+  if let insufficientsMap5 = insufficientsMap[5], !insufficientsMap5.isEmpty {
+    printl(separator)
+    printl("前二十五個被奪權的有效五字單元圖")
+    for (i, content) in insufficientsMap5.enumerated() {
+      if i == 25 { break }
+      var contentToPrint = "{"
+      contentToPrint += content.0 + ","
+      contentToPrint += content.1 + ","
+      contentToPrint += String(content.2) + ","
+      contentToPrint += "[" + content.3.map(\.description).joined(separator: ",") + "]" + ","
+      contentToPrint += String(content.4) + "}"
+      printl(contentToPrint)
+    }
+  }
+
+  if let insufficientsMap6 = insufficientsMap[6], !insufficientsMap6.isEmpty {
+    printl(separator)
+    printl("前二十五個被奪權的有效六字單元圖")
+    for (i, content) in insufficientsMap6.enumerated() {
+      if i == 25 { break }
+      var contentToPrint = "{"
+      contentToPrint += content.0 + ","
+      contentToPrint += content.1 + ","
+      contentToPrint += String(content.2) + ","
+      contentToPrint += "[" + content.3.map(\.description).joined(separator: ",") + "]" + ","
+      contentToPrint += String(content.4) + "}"
+      printl(contentToPrint)
+    }
+  }
+
+  if let insufficientsMap7 = insufficientsMap[7], !insufficientsMap7.isEmpty {
+    printl(separator)
+    printl("前二十五個被奪權的有效七字單元圖")
+    for (i, content) in insufficientsMap7.enumerated() {
+      if i == 25 { break }
+      var contentToPrint = "{"
+      contentToPrint += content.0 + ","
+      contentToPrint += content.1 + ","
+      contentToPrint += String(content.2) + ","
+      contentToPrint += "[" + content.3.map(\.description).joined(separator: ",") + "]" + ","
+      contentToPrint += String(content.4) + "}"
+      printl(contentToPrint)
+    }
+  }
+
+  if let insufficientsMap8 = insufficientsMap[8], !insufficientsMap8.isEmpty {
+    printl(separator)
+    printl("前二十五個被奪權的有效八字單元圖")
+    for (i, content) in insufficientsMap8.enumerated() {
+      if i == 25 { break }
+      var contentToPrint = "{"
+      contentToPrint += content.0 + ","
+      contentToPrint += content.1 + ","
+      contentToPrint += String(content.2) + ","
+      contentToPrint += "[" + content.3.map(\.description).joined(separator: ",") + "]" + ","
+      contentToPrint += String(content.4) + "}"
+      printl(contentToPrint)
+    }
+  }
+
+  if let insufficientsMap9 = insufficientsMap[9], !insufficientsMap9.isEmpty {
+    printl(separator)
+    printl("前二十五個被奪權的有效九字單元圖")
+    for (i, content) in insufficientsMap9.enumerated() {
+      if i == 25 { break }
+      var contentToPrint = "{"
+      contentToPrint += content.0 + ","
+      contentToPrint += content.1 + ","
+      contentToPrint += String(content.2) + ","
+      contentToPrint += "[" + content.3.map(\.description).joined(separator: ",") + "]" + ","
+      contentToPrint += String(content.4) + "}"
+      printl(contentToPrint)
+    }
+  }
+
+  if let insufficientsMap10 = insufficientsMap[10], !insufficientsMap10.isEmpty {
+    printl(separator)
+    printl("前二十五個被奪權的有效十字單元圖")
+    for (i, content) in insufficientsMap10.enumerated() {
+      if i == 25 { break }
+      var contentToPrint = "{"
+      contentToPrint += content.0 + ","
+      contentToPrint += content.1 + ","
+      contentToPrint += String(content.2) + ","
+      contentToPrint += "[" + content.3.map(\.description).joined(separator: ",") + "]" + ","
+      contentToPrint += String(content.4) + "}"
+      printl(contentToPrint)
+    }
+  }
+
+  if !competingUnigrams.isEmpty {
+    printl(separator)
+    printl("也發現有 \(competingUnigrams.count) 個複字單元圖被某些由高頻單字組成的複字單元圖奪權的情況，")
+    printl("例如（前二十五例）：")
+    for (i, content) in competingUnigrams.enumerated() {
+      if i == 25 { break }
+      var contentToPrint = "{"
+      contentToPrint += content.0 + ","
+      contentToPrint += String(content.1) + ","
+      contentToPrint += content.2 + ","
+      contentToPrint += String(content.3) + "}"
+      printl(contentToPrint)
+    }
+  }
+
+  if !faulty.isEmpty {
+    printl(separator)
+    printl("下述單元圖用到了漢字核心表當中尚未收錄的讀音，可能無法正常輸入：")
+    for content in faulty {
+      printl(content.description)
+    }
+  }
+
+  result += "\n"
+  return result
+}

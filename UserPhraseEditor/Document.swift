@@ -78,7 +78,7 @@ class Document: NSDocument {
   /// - Tag: readExample
   override func read(from data: Data, ofType _: String) throws {
     var strToDealWith = String(decoding: data, as: UTF8.self)
-    strToDealWith.formatConsolidate(cnvHYPYtoBPMF: false)
+    strToDealWith.formatConsolidate()
     let processedIncomingData = Data(strToDealWith.utf8)
     content.read(from: processedIncomingData)
   }
@@ -86,7 +86,7 @@ class Document: NSDocument {
   /// - Tag: writeExample
   override func data(ofType _: String) throws -> Data {
     var strToDealWith = content.contentString
-    strToDealWith.formatConsolidate(cnvHYPYtoBPMF: true)
+    strToDealWith.formatConsolidate()
     let outputData = Data(strToDealWith.utf8)
     return outputData
   }

@@ -86,11 +86,13 @@ extension vChewing {
 
       do {
         strData = try String(contentsOfFile: path, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
-        strData.ranges(splitBy: "\n").forEach {
+        strData = strData.replacingOccurrences(of: "\r", with: "\n")
+        strData.ranges(splitBy: "\n").filter({ !$0.isEmpty }).forEach {
           let neta = strData[$0].split(separator: " ")
           if neta.count >= 2, String(neta[0]).first != "#" {
             if !neta[0].isEmpty, !neta[1].isEmpty {
-              let theKey = shouldReverse ? String(neta[1]) : String(neta[0])
+              var theKey = shouldReverse ? String(neta[1]) : String(neta[0])
+              theKey.cnvPinyinToPhonabet()
               let theValue = $0
               rangeMap[theKey, default: []].append(theValue)
             }
@@ -153,7 +155,7 @@ extension vChewing {
           let theValue: String = shouldReverse ? String(neta[0]) : String(neta[1])
           let kvPair = Megrez.KeyValuePaired(key: key, value: theValue)
           var theScore = defaultScore
-          if neta.count >= 3, !shouldForceDefaultScore {
+          if neta.count >= 3, !shouldForceDefaultScore, !neta[2].contains("#") {
             theScore = .init(String(neta[2])) ?? defaultScore
           }
           if theScore > 0 {
@@ -187,6 +189,22 @@ extension String {
         ranges.append(range)
         startIndex = range.upperBound
       }
+    }
+  }
+}
+
+// MARK: - 拼音轉注音
+
+extension String {
+  fileprivate mutating func cnvPinyinToPhonabet() {
+    if contains("_") { return }
+    for key in Tekkon.mapHanyuPinyin.keys {
+      guard let value = Tekkon.mapHanyuPinyin[key] else { continue }
+      self = replacingOccurrences(of: key, with: value)
+    }
+    for key in Tekkon.mapArayuruPinyinIntonation.keys {
+      guard let value = Tekkon.mapArayuruPinyinIntonation[key] else { continue }
+      self = replacingOccurrences(of: key, with: value)
     }
   }
 }

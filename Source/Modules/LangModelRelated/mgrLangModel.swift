@@ -36,6 +36,14 @@ private var gLangModelCHT = vChewing.LMInstantiator()
 private var gUserOverrideModelCHS = vChewing.LMUserOverride()
 private var gUserOverrideModelCHT = vChewing.LMUserOverride()
 
+/// 使用者辭典資料預設範例檔案名稱。
+private let kTemplateNameUserPhrases = "template-userphrases"
+private let kTemplateNameUserReplacements = "template-replacements"
+private let kTemplateNameUserExclusions = "template-exclusions"
+private let kTemplateNameUserSymbolPhrases = "template-usersymbolphrases"
+private let kTemplateNameUserAssociatesCHS = "template-associatedPhrases-chs"
+private let kTemplateNameUserAssociatesCHT = "template-associatedPhrases-cht"
+
 enum mgrLangModel {
   /// 寫幾個回傳函式、供其餘控制模組來讀取那些被設為 fileprivate 的器外變數。
   public static var lmCHS: vChewing.LMInstantiator { gLangModelCHS }
@@ -307,18 +315,20 @@ enum mgrLangModel {
     return true
   }
 
-  static func chkUserLMFilesExist(_ mode: InputMode) -> Bool {
+  @discardableResult static func chkUserLMFilesExist(_ mode: InputMode) -> Bool {
     if !userDataFolderExists {
       return false
     }
     /// SymbolNode 資料與 UserOverrideModel 半衰模組資料檔案不需要強行確保存在。
     /// 前者的話，需要該檔案存在的人自己會建立。
     /// 後者的話，你在敲字時自己就會建立。
-    if !ensureFileExists(userPhrasesDataURL(mode))
-      || !ensureFileExists(userAssociatesDataURL(mode))
-      || !ensureFileExists(userFilteredDataURL(mode))
-      || !ensureFileExists(userReplacementsDataURL(mode))
-      || !ensureFileExists(userSymbolDataURL(mode))
+    if !ensureFileExists(userPhrasesDataURL(mode), populateWithTemplate: kTemplateNameUserPhrases)
+      || !ensureFileExists(
+        userAssociatesDataURL(mode),
+        populateWithTemplate: mode == .imeModeCHS ? kTemplateNameUserAssociatesCHS : kTemplateNameUserAssociatesCHT)
+      || !ensureFileExists(userFilteredDataURL(mode), populateWithTemplate: kTemplateNameUserExclusions)
+      || !ensureFileExists(userReplacementsDataURL(mode), populateWithTemplate: kTemplateNameUserReplacements)
+      || !ensureFileExists(userSymbolDataURL(mode), populateWithTemplate: kTemplateNameUserSymbolPhrases)
     {
       return false
     }
