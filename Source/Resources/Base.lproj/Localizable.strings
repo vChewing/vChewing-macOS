@@ -95,6 +95,7 @@
 "at the rear of the phrase (like Microsoft New Phonetic)" = "at the rear of the phrase (like Microsoft New Phonetic)";
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters";
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "Auto-convert traditional Chinese glyphs to KangXi characters";
+"Automatically correct reading combinations when typing" = "Automatically correct reading combinations when typing";
 "Automatically reload user data files if changes detected" = "Automatically reload user data files if changes detected";
 "Basic Keyboard Layout:" = "Basic Keyboard Layout:";
 "Buffer Limit:" = "Buffer Limit:";

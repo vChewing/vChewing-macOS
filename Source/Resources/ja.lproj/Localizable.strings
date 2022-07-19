@@ -95,6 +95,7 @@
 "at the rear of the phrase (like Microsoft New Phonetic)" = "単語の後で // Microsoft 新注音入力のやり方";
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "入力した繁体字を日文 JIS 新字体と自動変換";
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "入力した繁体字を康熙字体と自動変換";
+"Automatically correct reading combinations when typing" = "入力中で打ち間違った発音組み合わせを自動的に訂正する";
 "Automatically reload user data files if changes detected" = "ユーザー辞書データの変更を自動検出し、自動的に再読込";
 "Basic Keyboard Layout:" = "基礎キーボード:";
 "Buffer Limit:" = "緩衝列の容量:";
