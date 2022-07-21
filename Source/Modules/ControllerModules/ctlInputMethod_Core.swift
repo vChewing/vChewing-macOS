@@ -96,6 +96,10 @@ class ctlInputMethod: IMKInputController {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     UserDefaults.standard.synchronize()
 
+    // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
+    // 所以這裡添加這句、來試圖應對這種情況。
+    if keyHandler.delegate == nil { keyHandler.delegate = self }
+
     keyHandler.clear()
     keyHandler.ensureParser()
 
