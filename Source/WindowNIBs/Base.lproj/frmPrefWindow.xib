@@ -967,9 +967,8 @@
                                                 </constraints>
                                             </view>
                                         </box>
-                                        <box fixedFrame="YES" title="Keyboard Shortcuts" translatesAutoresizingMaskIntoConstraints="NO" id="xibKeyboardShortcuts">
+                                        <box title="Keyboard Shortcuts" translatesAutoresizingMaskIntoConstraints="NO" id="xibKeyboardShortcuts">
                                             <rect key="frame" x="6" y="11" width="451" height="184"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="rZK-cU-6Y0">
                                                 <rect key="frame" x="3" y="3" width="445" height="166"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1059,10 +1058,13 @@
                                         </box>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstAttribute="bottom" secondItem="Wvt-HE-LOv" secondAttribute="bottom" constant="202" id="Qmp-GR-eW4"/>
-                                        <constraint firstItem="Wvt-HE-LOv" firstAttribute="leading" secondItem="FxL-ZG-Eue" secondAttribute="leading" constant="9" id="gBD-pe-hba"/>
-                                        <constraint firstItem="Wvt-HE-LOv" firstAttribute="top" secondItem="FxL-ZG-Eue" secondAttribute="top" constant="5" id="mpD-ld-a8z"/>
-                                        <constraint firstAttribute="trailing" secondItem="Wvt-HE-LOv" secondAttribute="trailing" constant="9" id="v0g-ad-cjW"/>
+                                        <constraint firstItem="Wvt-HE-LOv" firstAttribute="top" secondItem="FxL-ZG-Eue" secondAttribute="top" constant="5" id="ZGQ-w1-NWd"/>
+                                        <constraint firstItem="Wvt-HE-LOv" firstAttribute="leading" secondItem="FxL-ZG-Eue" secondAttribute="leading" constant="9" id="c1K-BR-pHs"/>
+                                        <constraint firstItem="Wvt-HE-LOv" firstAttribute="leading" secondItem="xibKeyboardShortcuts" secondAttribute="leading" id="dSF-C3-6ff"/>
+                                        <constraint firstItem="xibKeyboardShortcuts" firstAttribute="top" secondItem="Wvt-HE-LOv" secondAttribute="bottom" constant="7" id="fIC-cx-jFC"/>
+                                        <constraint firstItem="Wvt-HE-LOv" firstAttribute="trailing" secondItem="xibKeyboardShortcuts" secondAttribute="trailing" id="gBC-j2-HVz"/>
+                                        <constraint firstItem="xibKeyboardShortcuts" firstAttribute="top" secondItem="FxL-ZG-Eue" secondAttribute="top" constant="230" id="ohS-qo-pUd"/>
+                                        <constraint firstAttribute="bottom" secondItem="xibKeyboardShortcuts" secondAttribute="bottom" constant="15" id="wOw-t0-07A"/>
                                     </constraints>
                                 </view>
                             </tabViewItem>
