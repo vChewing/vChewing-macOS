@@ -46,6 +46,8 @@ struct suiPrefPaneExperience: View {
     forKey: UserDef.kEscToCleanInputBuffer)
   @State private var selEnableSCPCTypingMode = UserDefaults.standard.bool(forKey: UserDef.kUseSCPCTypingMode)
   @State private var selComposingBufferSize = UserDefaults.standard.integer(forKey: UserDef.kComposingBufferSize)
+  @State private var selAutoCorrectReadingCombination = UserDefaults.standard.bool(
+    forKey: UserDef.kAutoCorrectReadingCombination)
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -165,6 +167,12 @@ struct suiPrefPaneExperience: View {
         }
       }
       Preferences.Section(label: { Text(LocalizedStringKey("Typing Style:")) }) {
+        Toggle(
+          LocalizedStringKey("Automatically correct reading combinations when typing"),
+          isOn: $selAutoCorrectReadingCombination
+        ).onChange(of: selAutoCorrectReadingCombination) { value in
+          mgrPrefs.autoCorrectReadingCombination = value
+        }
         Toggle(
           LocalizedStringKey("Emulating select-candidate-per-character mode"), isOn: $selEnableSCPCTypingMode
         ).onChange(of: selEnableSCPCTypingMode) { value in

@@ -41,7 +41,7 @@ class ctlInputMethod: IMKInputController {
   static var areWeDeleting = false
 
   /// 目前在用的的選字窗副本。
-  var ctlCandidateCurrent = ctlCandidateUniversal.init(.horizontal)
+  static var ctlCandidateCurrent = ctlCandidateUniversal.init(.horizontal)
 
   /// 工具提示視窗的副本。
   static let tooltipController = TooltipController()
@@ -95,6 +95,10 @@ class ctlInputMethod: IMKInputController {
   override func activateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     UserDefaults.standard.synchronize()
+
+    // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
+    // 所以這裡添加這句、來試圖應對這種情況。
+    if keyHandler.delegate == nil { keyHandler.delegate = self }
 
     keyHandler.clear()
     keyHandler.ensureParser()

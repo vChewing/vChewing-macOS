@@ -95,6 +95,7 @@
 "at the rear of the phrase (like Microsoft New Phonetic)" = "将游标置于词语后方 // Windows 微软新注音风格";
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "自动将繁体中文字转为日文 JIS 新字体";
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "自动将繁体中文字转为康熙正体字";
+"Automatically correct reading combinations when typing" = "敲字时自动纠正读音组合";
 "Automatically reload user data files if changes detected" = "自动检测并载入使用者语汇档案变更";
 "Basic Keyboard Layout:" = "基础键盘布局:";
 "Buffer Limit:" = "组字区容量:";

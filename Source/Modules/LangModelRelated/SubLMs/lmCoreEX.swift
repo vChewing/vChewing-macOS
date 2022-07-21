@@ -91,10 +91,9 @@ extension vChewing {
           let neta = strData[$0].split(separator: " ")
           if neta.count >= 2, String(neta[0]).first != "#" {
             if !neta[0].isEmpty, !neta[1].isEmpty {
-              var theKey = shouldReverse ? String(neta[1]) : String(neta[0])
-              theKey.cnvPinyinToPhonabet()
+              let theKey = shouldReverse ? String(neta[1]) : String(neta[0])
               let theValue = $0
-              rangeMap[theKey, default: []].append(theValue)
+              rangeMap[Tekkon.cnvHanyuPinyinToPhona(target: theKey), default: []].append(theValue)
             }
           }
         }
@@ -189,22 +188,6 @@ extension String {
         ranges.append(range)
         startIndex = range.upperBound
       }
-    }
-  }
-}
-
-// MARK: - 拼音轉注音
-
-extension String {
-  fileprivate mutating func cnvPinyinToPhonabet() {
-    if contains("_") { return }
-    for key in Tekkon.mapHanyuPinyin.keys {
-      guard let value = Tekkon.mapHanyuPinyin[key] else { continue }
-      self = replacingOccurrences(of: key, with: value)
-    }
-    for key in Tekkon.mapArayuruPinyinIntonation.keys {
-      guard let value = Tekkon.mapArayuruPinyinIntonation[key] else { continue }
-      self = replacingOccurrences(of: key, with: value)
     }
   }
 }

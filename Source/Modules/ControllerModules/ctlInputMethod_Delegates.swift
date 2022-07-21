@@ -29,7 +29,7 @@ import Foundation
 // MARK: - KeyHandler Delegate
 
 extension ctlInputMethod: KeyHandlerDelegate {
-  func ctlCandidate() -> ctlCandidate { ctlCandidateCurrent }
+  func ctlCandidate() -> ctlCandidate { ctlInputMethod.ctlCandidateCurrent }
 
   func keyHandler(
     _: KeyHandler, didSelectCandidateAt index: Int,

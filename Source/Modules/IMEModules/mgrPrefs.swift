@@ -58,6 +58,7 @@ struct UserDef {
   static let kInlineDumpPinyinInLieuOfZhuyin = "InlineDumpPinyinInLieuOfZhuyin"
   static let kFetchSuggestionsFromUserOverrideModel = "FetchSuggestionsFromUserOverrideModel"
   static let kUseFixecCandidateOrderOnSelection = "UseFixecCandidateOrderOnSelection"
+  static let kAutoCorrectReadingCombination = "AutoCorrectReadingCombination"
 
   static let kCandidateTextFontName = "CandidateTextFontName"
   static let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
@@ -278,6 +279,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.useFixecCandidateOrderOnSelection, forKey: UserDef.kUseFixecCandidateOrderOnSelection
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.autoCorrectReadingCombination, forKey: UserDef.kAutoCorrectReadingCombination
+    )
 
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeySCPC, forKey: UserDef.kUsingHotKeySCPC)
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyAssociates, forKey: UserDef.kUsingHotKeyAssociates)
@@ -359,6 +363,9 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kUseFixecCandidateOrderOnSelection, defaultValue: false)
   static var useFixecCandidateOrderOnSelection: Bool
+
+  @UserDefault(key: UserDef.kAutoCorrectReadingCombination, defaultValue: true)
+  static var autoCorrectReadingCombination: Bool
 
   static var minCandidateLength: Int {
     mgrPrefs.allowBoostingSingleKanjiAsUserPhrase ? 1 : 2

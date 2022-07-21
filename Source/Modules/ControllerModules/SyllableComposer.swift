@@ -221,6 +221,9 @@ public struct Tekkon {
     /// 注音排列種類。預設情況下是大千排列（Windows / macOS 預設注音排列）。
     public var parser: MandarinParser = .ofDachen
 
+    /// 是否對錯誤的注音讀音組合做出自動糾正處理。
+    public var phonabetCombinationCorrectionEnabled = false
+
     /// 內容值，會直接按照正確的順序拼裝自己的聲介韻調內容、再回傳。
     /// 注意：直接取這個參數的內容的話，陰平聲調會成為一個空格。
     /// 如果是要取不帶空格的注音的話，請使用「.getComposition()」而非「.value」。
@@ -285,7 +288,9 @@ public struct Tekkon {
     /// - Parameters:
     ///   - input: 傳入的 String 內容，用以處理單個字符。
     ///   - arrange: 要使用的注音排列。
-    public init(_ input: String = "", arrange parser: MandarinParser = .ofDachen) {
+    ///   - correction: 是否對錯誤的注音讀音組合做出自動糾正處理。
+    public init(_ input: String = "", arrange parser: MandarinParser = .ofDachen, correction: Bool = false) {
+      phonabetCombinationCorrectionEnabled = correction
       ensureParser(arrange: parser)
       receiveKey(fromString: input)
     }
@@ -379,15 +384,24 @@ public struct Tekkon {
     /// - Parameters:
     ///   - fromPhonabet: 傳入的單個注音符號字串。
     public mutating func receiveKey(fromPhonabet phonabet: String = "") {
-      let thePhone: Phonabet = .init(phonabet)
-      switch phonabet {
-        case "ㄛ", "ㄥ":
-          if "ㄅㄆㄇㄈ".contains(consonant.value), semivowel.value == "ㄨ" { semivowel.clear() }
-        case "ㄨ":
-          if "ㄅㄆㄇㄈ".contains(consonant.value), "ㄛㄥ".contains(vowel.value) { vowel.clear() }
-        case "ㄅ", "ㄆ", "ㄇ", "ㄈ":
-          if ["ㄨㄛ", "ㄨㄥ"].contains(semivowel.value + vowel.value) { semivowel.clear() }
-        default: break
+      var thePhone: Phonabet = .init(phonabet)
+      if phonabetCombinationCorrectionEnabled {
+        switch phonabet {
+          case "ㄧ", "ㄩ":
+            if vowel.value == "ㄜ" { vowel = "ㄝ" }
+          case "ㄜ":
+            if "ㄧㄩ".contains(semivowel.value) { thePhone = "ㄝ" }
+          case "ㄛ", "ㄥ":
+            if "ㄅㄆㄇㄈ".contains(consonant.value), semivowel.value == "ㄨ" { semivowel.clear() }
+          case "ㄟ":
+            if "ㄋㄌ".contains(consonant.value), semivowel.value == "ㄨ" { semivowel.clear() }
+          case "ㄨ":
+            if "ㄅㄆㄇㄈ".contains(consonant.value), "ㄛㄥ".contains(vowel.value) { vowel.clear() }
+            if "ㄋㄌ".contains(consonant.value), "ㄟ".contains(vowel.value) { vowel.clear() }
+          case "ㄅ", "ㄆ", "ㄇ", "ㄈ":
+            if ["ㄨㄛ", "ㄨㄥ"].contains(semivowel.value + vowel.value) { semivowel.clear() }
+          default: break
+        }
       }
       switch thePhone.type {
         case .consonant: consonant = thePhone
@@ -878,6 +892,23 @@ public struct Tekkon {
       arrReturn.append(newNeta)
     }
     return arrReturn.joined(separator: newSeparator)
+  }
+
+  /// 該函式用來將漢語拼音轉為注音。
+  /// - Parameter target: 要轉換的漢語拼音內容，要求必須帶有 12345 數字標調。
+  /// - Returns: 轉換結果。
+  static func cnvHanyuPinyinToPhona(target: String) -> String {
+    if target.contains("_") { return target }
+    var result = target
+    for key in Tekkon.mapHanyuPinyin.keys.sorted(by: { $0.count > $1.count }) {
+      guard let value = Tekkon.mapHanyuPinyin[key] else { continue }
+      result = result.replacingOccurrences(of: key, with: value)
+    }
+    for key in Tekkon.mapArayuruPinyinIntonation.keys.sorted(by: { $0.count > $1.count }) {
+      guard let value = Tekkon.mapArayuruPinyinIntonation[key] else { continue }
+      result = result.replacingOccurrences(of: key, with: value)
+    }
+    return result
   }
 
   /// 原始轉換對照表資料貯存專用佇列（數字標調格式）

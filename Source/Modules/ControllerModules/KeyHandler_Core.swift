@@ -332,6 +332,7 @@ class KeyHandler {
         mgrPrefs.mandarinParser = MandarinParser.ofStandard.rawValue
     }
     composer.clear()
+    composer.phonabetCombinationCorrectionEnabled = mgrPrefs.autoCorrectReadingCombination
   }
 
   // MARK: - Extracted methods and functions (Megrez).

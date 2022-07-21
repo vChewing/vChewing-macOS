@@ -72,7 +72,7 @@ extension ctlInputMethod {
       // 上面這句如果是 true 的話，就會是縱排；反之則為橫排。
     }
 
-    ctlCandidateCurrent.delegate = nil
+    ctlInputMethod.ctlCandidateCurrent.delegate = nil
 
     /// 下面這一段本可直接指定 currentLayout，但這樣的話翻頁按鈕位置無法精準地重新繪製。
     /// 所以只能重新初期化。壞處就是得在 ctlCandidate() 當中與 SymbolTable 控制有關的地方
@@ -81,11 +81,11 @@ extension ctlInputMethod {
     /// 該問題徹底解決的價值並不大，直接等到 macOS 10.x 全線淘汰之後用 SwiftUI 重寫選字窗吧。
 
     if isCandidateWindowVertical {  // 縱排輸入時強制使用縱排選字窗
-      ctlCandidateCurrent = .init(.vertical)
+      ctlInputMethod.ctlCandidateCurrent = .init(.vertical)
     } else if mgrPrefs.useHorizontalCandidateList {
-      ctlCandidateCurrent = .init(.horizontal)
+      ctlInputMethod.ctlCandidateCurrent = .init(.horizontal)
     } else {
-      ctlCandidateCurrent = .init(.vertical)
+      ctlInputMethod.ctlCandidateCurrent = .init(.vertical)
     }
 
     // set the attributes for the candidate panel (which uses NSAttributedString)
@@ -113,10 +113,10 @@ extension ctlInputMethod {
       return finalReturnFont
     }
 
-    ctlCandidateCurrent.keyLabelFont = labelFont(
+    ctlInputMethod.ctlCandidateCurrent.keyLabelFont = labelFont(
       name: mgrPrefs.candidateKeyLabelFontName, size: keyLabelSize
     )
-    ctlCandidateCurrent.candidateFont = candidateFont(
+    ctlInputMethod.ctlCandidateCurrent.candidateFont = candidateFont(
       name: mgrPrefs.candidateTextFontName, size: textSize
     )
 
@@ -124,14 +124,14 @@ extension ctlInputMethod {
     let keyLabels =
       candidateKeys.count > 4 ? Array(candidateKeys) : Array(mgrPrefs.defaultCandidateKeys)
     let keyLabelSuffix = state is InputState.AssociatedPhrases ? "^" : ""
-    ctlCandidateCurrent.keyLabels = keyLabels.map {
+    ctlInputMethod.ctlCandidateCurrent.keyLabels = keyLabels.map {
       CandidateKeyLabel(key: String($0), displayedText: String($0) + keyLabelSuffix)
     }
 
-    ctlCandidateCurrent.delegate = self
-    ctlCandidateCurrent.reloadData()
+    ctlInputMethod.ctlCandidateCurrent.delegate = self
+    ctlInputMethod.ctlCandidateCurrent.reloadData()
 
-    ctlCandidateCurrent.visible = true
+    ctlInputMethod.ctlCandidateCurrent.visible = true
 
     var lineHeightRect = NSRect(x: 0.0, y: 0.0, width: 16.0, height: 16.0)
     var cursor = 0
@@ -151,14 +151,14 @@ extension ctlInputMethod {
     }
 
     if isTypingVertical {
-      ctlCandidateCurrent.set(
+      ctlInputMethod.ctlCandidateCurrent.set(
         windowTopLeftPoint: NSPoint(
           x: lineHeightRect.origin.x + lineHeightRect.size.width + 4.0, y: lineHeightRect.origin.y - 4.0
         ),
         bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0
       )
     } else {
-      ctlCandidateCurrent.set(
+      ctlInputMethod.ctlCandidateCurrent.set(
         windowTopLeftPoint: NSPoint(x: lineHeightRect.origin.x, y: lineHeightRect.origin.y - 4.0),
         bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0
       )
