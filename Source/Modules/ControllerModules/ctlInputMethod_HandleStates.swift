@@ -132,8 +132,8 @@ extension ctlInputMethod {
 
   private func handle(state: InputState.Deactivated, previous: InputStateProtocol) {
     _ = state  // 防止格式整理工具毀掉與此對應的參數。
-    ctlCandidateCurrent.delegate = nil
-    ctlCandidateCurrent.visible = false
+    ctlInputMethod.ctlCandidateCurrent.delegate = nil
+    ctlInputMethod.ctlCandidateCurrent.visible = false
     ctlInputMethod.tooltipController.hide()
     if let previous = previous as? InputState.NotEmpty {
       commit(text: previous.composingBuffer)
@@ -143,7 +143,7 @@ extension ctlInputMethod {
 
   private func handle(state: InputState.Empty, previous: InputStateProtocol) {
     _ = state  // 防止格式整理工具毀掉與此對應的參數。
-    ctlCandidateCurrent.visible = false
+    ctlInputMethod.ctlCandidateCurrent.visible = false
     ctlInputMethod.tooltipController.hide()
     // 全專案用以判斷「.EmptyIgnoringPreviousState」的地方僅此一處。
     if let previous = previous as? InputState.NotEmpty,
@@ -165,7 +165,7 @@ extension ctlInputMethod {
 
   private func handle(state: InputState.Committing, previous: InputStateProtocol) {
     _ = previous  // 防止格式整理工具毀掉與此對應的參數。
-    ctlCandidateCurrent.visible = false
+    ctlInputMethod.ctlCandidateCurrent.visible = false
     ctlInputMethod.tooltipController.hide()
     let textToCommit = state.textToCommit
     if !textToCommit.isEmpty {
@@ -176,7 +176,7 @@ extension ctlInputMethod {
 
   private func handle(state: InputState.Inputting, previous: InputStateProtocol) {
     _ = previous  // 防止格式整理工具毀掉與此對應的參數。
-    ctlCandidateCurrent.visible = false
+    ctlInputMethod.ctlCandidateCurrent.visible = false
     ctlInputMethod.tooltipController.hide()
     let textToCommit = state.textToCommit
     if !textToCommit.isEmpty {
@@ -193,7 +193,7 @@ extension ctlInputMethod {
 
   private func handle(state: InputState.Marking, previous: InputStateProtocol) {
     _ = previous  // 防止格式整理工具毀掉與此對應的參數。
-    ctlCandidateCurrent.visible = false
+    ctlInputMethod.ctlCandidateCurrent.visible = false
     setInlineDisplayWithCursor()
     if state.tooltip.isEmpty {
       ctlInputMethod.tooltipController.hide()

@@ -41,7 +41,7 @@ class ctlInputMethod: IMKInputController {
   static var areWeDeleting = false
 
   /// 目前在用的的選字窗副本。
-  var ctlCandidateCurrent = ctlCandidateUniversal.init(.horizontal)
+  static var ctlCandidateCurrent = ctlCandidateUniversal.init(.horizontal)
 
   /// 工具提示視窗的副本。
   static let tooltipController = TooltipController()
