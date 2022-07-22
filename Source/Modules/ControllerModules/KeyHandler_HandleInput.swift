@@ -354,7 +354,7 @@ extension KeyHandler {
     // MARK: AbsorbedArrowKey
 
     if input.isAbsorbedArrowKey || input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse {
-      if input.isOptionHold, state.type == .ofInputting {
+      if input.isOptionHold, state is InputState.Inputting {
         if input.isExtraChooseCandidateKey {
           return handleInlineCandidateRotation(
             state: state, reverseModifier: false, stateCallback: stateCallback, errorCallback: errorCallback
