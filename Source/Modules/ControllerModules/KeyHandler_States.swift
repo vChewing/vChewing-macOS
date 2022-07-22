@@ -54,35 +54,35 @@ extension KeyHandler {
       /// 每個節錨（NodeAnchor）都有自身的幅位長度（spanningLength），可以用來
       /// 累加、以此為依據，來校正「可見游標位置」。
       let spanningLength: Int = theAnchor.spanLength
-      if readingCursorIndex + spanningLength <= compositorCursorIndex {
+      if readingCursorIndex + spanningLength <= compositor.cursor {
         composedStringCursorIndex += strNodeValue.utf16.count
         readingCursorIndex += spanningLength
       } else {
         if codepointCount == spanningLength {
           var i = 0
-          while i < codepointCount, readingCursorIndex < compositorCursorIndex {
+          while i < codepointCount, readingCursorIndex < compositor.cursor {
             composedStringCursorIndex += arrSplit[i].utf16.count
             readingCursorIndex += 1
             i += 1
           }
         } else {
-          if readingCursorIndex < compositorCursorIndex {
+          if readingCursorIndex < compositor.cursor {
             composedStringCursorIndex += strNodeValue.utf16.count
             readingCursorIndex += spanningLength
-            readingCursorIndex = min(readingCursorIndex, compositorCursorIndex)
+            readingCursorIndex = min(readingCursorIndex, compositor.cursor)
             /// 接下來再處理這麼一種情況：
             /// 某些錨點內的當前候選字詞長度與讀音長度不相等。
             /// 但此時游標還是按照每個讀音單位來移動的，
             /// 所以需要上下文工具提示來顯示游標的相對位置。
             /// 這裡先計算一下要用在工具提示當中的顯示參數的內容。
-            switch compositorCursorIndex {
+            switch compositor.cursor {
               case compositor.readings.count...:
-                tooltipParameterRef[0] = compositor.readings[compositorCursorIndex - 1]
+                tooltipParameterRef[0] = compositor.readings[compositor.cursor - 1]
               case 0:
-                tooltipParameterRef[1] = compositor.readings[compositorCursorIndex]
+                tooltipParameterRef[1] = compositor.readings[compositor.cursor]
               default:
-                tooltipParameterRef[0] = compositor.readings[compositorCursorIndex - 1]
-                tooltipParameterRef[1] = compositor.readings[compositorCursorIndex]
+                tooltipParameterRef[0] = compositor.readings[compositor.cursor - 1]
+                tooltipParameterRef[1] = compositor.readings[compositor.cursor]
             }
             /// 注音轉拼音
             for (i, _) in tooltipParameterRef.enumerated() {
@@ -301,7 +301,7 @@ extension KeyHandler {
     stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    if !ifLangModelHasUnigrams(forKey: customPunctuation) {
+    if !currentLM.hasUnigramsFor(key: customPunctuation) {
       return false
     }
 
@@ -313,7 +313,7 @@ extension KeyHandler {
       return true
     }
 
-    insertToCompositorAtCursor(reading: customPunctuation)
+    compositor.insertReading(customPunctuation)
     let textToCommit = commitOverflownCompositionAndWalk
     let inputting = buildInputtingState
     inputting.textToCommit = textToCommit
@@ -372,7 +372,7 @@ extension KeyHandler {
   ) -> Bool {
     guard state is InputState.Inputting else { return false }
 
-    var composingBuffer = currentReadings.joined(separator: "-")
+    var composingBuffer = compositor.readings.joined(separator: "-")
     if mgrPrefs.inlineDumpPinyinInLieuOfZhuyin {
       composingBuffer = Tekkon.restoreToneOneInZhuyinKey(target: composingBuffer)  // 恢復陰平標記
       composingBuffer = Tekkon.cnvPhonaToHanyuPinyin(target: composingBuffer)  // 注音轉拼音
@@ -445,8 +445,8 @@ extension KeyHandler {
     if composer.hasToneMarker(withNothingElse: true) {
       composer.clear()
     } else if composer.isEmpty {
-      if compositorCursorIndex > 0 {
-        deleteCompositorReadingAtTheRearOfCursor()
+      if compositor.cursor > 0 {
+        compositor.dropReading(direction: .rear)
         walk()
       } else {
         IME.prtDebugIntel("9D69908D")
@@ -485,14 +485,14 @@ extension KeyHandler {
       return true
     }
 
-    guard compositorCursorIndex != compositorLength else {
+    guard compositor.cursor != compositor.length else {
       IME.prtDebugIntel("9B69938D")
       errorCallback()
       stateCallback(state)
       return true
     }
 
-    deleteCompositorReadingToTheFrontOfCursor()
+    compositor.dropReading(direction: .front)
     walk()
     let inputting = buildInputtingState
     // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
@@ -544,8 +544,8 @@ extension KeyHandler {
       return true
     }
 
-    if compositorCursorIndex != 0 {
-      compositorCursorIndex = 0
+    if compositor.cursor != 0 {
+      compositor.cursor = 0
       stateCallback(buildInputtingState)
     } else {
       IME.prtDebugIntel("66D97F90")
@@ -578,8 +578,8 @@ extension KeyHandler {
       return true
     }
 
-    if compositorCursorIndex != compositorLength {
-      compositorCursorIndex = compositorLength
+    if compositor.cursor != compositor.length {
+      compositor.cursor = compositor.length
       stateCallback(buildInputtingState)
     } else {
       IME.prtDebugIntel("9B69908E")
@@ -650,7 +650,7 @@ extension KeyHandler {
           composingBuffer: currentState.composingBuffer,
           cursorIndex: currentState.cursorIndex,
           markerIndex: nextPosition,
-          readings: currentReadings
+          readings: compositor.readings
         )
         marking.tooltipForInputting = currentState.tooltip
         stateCallback(marking)
@@ -672,8 +672,8 @@ extension KeyHandler {
       }
       stateCallback(buildInputtingState)
     } else {
-      if compositorCursorIndex < compositorLength {
-        compositorCursorIndex += 1
+      if compositor.cursor < compositor.length {
+        compositor.cursor += 1
         stateCallback(buildInputtingState)
       } else {
         IME.prtDebugIntel("A96AAD58")
@@ -718,7 +718,7 @@ extension KeyHandler {
           composingBuffer: currentState.composingBuffer,
           cursorIndex: currentState.cursorIndex,
           markerIndex: previousPosition,
-          readings: currentReadings
+          readings: compositor.readings
         )
         marking.tooltipForInputting = currentState.tooltip
         stateCallback(marking)
@@ -740,8 +740,8 @@ extension KeyHandler {
       }
       stateCallback(buildInputtingState)
     } else {
-      if compositorCursorIndex > 0 {
-        compositorCursorIndex -= 1
+      if compositor.cursor > 0 {
+        compositor.cursor -= 1
         stateCallback(buildInputtingState)
       } else {
         IME.prtDebugIntel("7045E6F3")
@@ -795,7 +795,7 @@ extension KeyHandler {
     var length = 0
     var currentAnchor = Megrez.NodeAnchor()
     let cursorIndex = min(
-      actualCandidateCursor + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength
+      actualCandidateCursor + (mgrPrefs.useRearCursorMode ? 1 : 0), compositor.length
     )
     for anchor in walkedAnchors {
       length += anchor.spanLength

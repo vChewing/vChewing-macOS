@@ -61,12 +61,12 @@ extension KeyHandler {
     if cancelCandidateKey {
       if (state is InputState.AssociatedPhrases)
         || mgrPrefs.useSCPCTypingMode
-        || isCompositorEmpty
+        || compositor.isEmpty
       {
         // 如果此時發現當前組字緩衝區為真空的情況的話，
         // 就將當前的組字緩衝區析構處理、強制重設輸入狀態。
         // 否則，一個本不該出現的真空組字緩衝區會使前後方向鍵與 BackSpace 鍵失靈。
-        // 所以這裡需要對 isCompositorEmpty 做判定。
+        // 所以這裡需要對 compositor.isEmpty 做判定。
         clear()
         stateCallback(InputState.EmptyIgnoringPreviousState())
       } else {
@@ -326,12 +326,12 @@ extension KeyHandler {
       let punctuation: String = arrPunctuations.joined(separator: "")
 
       var shouldAutoSelectCandidate: Bool =
-        composer.inputValidityCheck(key: charCode) || ifLangModelHasUnigrams(forKey: customPunctuation)
-        || ifLangModelHasUnigrams(forKey: punctuation)
+        composer.inputValidityCheck(key: charCode) || currentLM.hasUnigramsFor(key: customPunctuation)
+        || currentLM.hasUnigramsFor(key: punctuation)
 
       if !shouldAutoSelectCandidate, input.isUpperCaseASCIILetterKey {
         let letter: String! = String(format: "%@%c", "_letter_", CChar(charCode))
-        if ifLangModelHasUnigrams(forKey: letter) { shouldAutoSelectCandidate = true }
+        if currentLM.hasUnigramsFor(key: letter) { shouldAutoSelectCandidate = true }
       }
 
       if shouldAutoSelectCandidate {

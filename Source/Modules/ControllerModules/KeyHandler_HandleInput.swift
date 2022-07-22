@@ -188,7 +188,7 @@ extension KeyHandler {
       // 如果輸入法的辭典索引是漢語拼音的話，要注意上一行拿到的內容得是漢語拼音。
 
       // 向語言模型詢問是否有對應的記錄。
-      if !ifLangModelHasUnigrams(forKey: reading) {
+      if !currentLM.hasUnigramsFor(key: reading) {
         IME.prtDebugIntel("B49C0979：語彙庫內無「\(reading)」的匹配記錄。")
         errorCallback()
         composer.clear()
@@ -198,7 +198,7 @@ extension KeyHandler {
       }
 
       // 將該讀音插入至組字器內的軌格當中。
-      insertToCompositorAtCursor(reading: reading)
+      compositor.insertReading(reading)
 
       // 讓組字器反爬軌格。
       let textToCommit = commitOverflownCompositionAndWalk
@@ -270,7 +270,7 @@ extension KeyHandler {
       if input.isSpace {
         /// 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
         if !mgrPrefs.chooseCandidateUsingSpace {
-          if compositorCursorIndex >= compositorLength {
+          if compositor.cursor >= compositor.length {
             let composingBuffer = currentState.composingBuffer
             if !composingBuffer.isEmpty {
               stateCallback(InputState.Committing(textToCommit: composingBuffer))
@@ -278,8 +278,8 @@ extension KeyHandler {
             clear()
             stateCallback(InputState.Committing(textToCommit: " "))
             stateCallback(InputState.Empty())
-          } else if ifLangModelHasUnigrams(forKey: " ") {
-            insertToCompositorAtCursor(reading: " ")
+          } else if currentLM.hasUnigramsFor(key: " ") {
+            compositor.insertReading(" ")
             let textToCommit = commitOverflownCompositionAndWalk
             let inputting = buildInputtingState
             inputting.textToCommit = textToCommit
@@ -396,9 +396,9 @@ extension KeyHandler {
 
     if input.isSymbolMenuPhysicalKey && !input.isShiftHold {
       if input.isOptionHold {
-        if ifLangModelHasUnigrams(forKey: "_punctuation_list") {
+        if currentLM.hasUnigramsFor(key: "_punctuation_list") {
           if composer.isEmpty {
-            insertToCompositorAtCursor(reading: "_punctuation_list")
+            compositor.insertReading("_punctuation_list")
             let textToCommit: String! = commitOverflownCompositionAndWalk
             let inputting = buildInputtingState
             inputting.textToCommit = textToCommit
