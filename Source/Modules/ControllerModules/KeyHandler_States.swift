@@ -77,7 +77,7 @@ extension KeyHandler {
             /// 這裡先計算一下要用在工具提示當中的顯示參數的內容。
             switch compositorCursorIndex {
               case compositor.readings.count...:
-                tooltipParameterRef[0] = compositor.readings[compositor.readings.count - 1]
+                tooltipParameterRef[0] = compositor.readings[compositorCursorIndex - 1]
               case 0:
                 tooltipParameterRef[1] = compositor.readings[compositorCursorIndex]
               default:
