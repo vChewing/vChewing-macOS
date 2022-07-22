@@ -400,15 +400,6 @@ class KeyHandler {
     compositor.dropReading(direction: .front)
   }
 
-  var nextPhrasePosition: Int {
-    var nextPosition = 0
-    for theAnchor in walkedAnchors {
-      if nextPosition > actualCandidateCursor { break }
-      nextPosition += theAnchor.spanLength
-    }
-    return min(nextPosition, compositorLength)
-  }
-
   /// 生成標點符號索引鍵。
   /// - Parameter input: 輸入的按鍵訊號。
   /// - Returns: 生成的標點符號索引鍵。
