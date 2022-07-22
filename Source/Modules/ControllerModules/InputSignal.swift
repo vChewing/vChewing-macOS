@@ -50,7 +50,7 @@ enum KeyCode: UInt16 {
   case kVolumeUp = 72
   case kVolumeDown = 73
   case kMute = 74
-  case kLineFeed = 76  // Another keyCode to identify the Enter Key.
+  case kLineFeed = 76  // Another keyCode to identify the Enter Key, typable by Fn+Enter.
   case kF18 = 79
   case kF19 = 80
   case kF20 = 90
