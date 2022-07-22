@@ -817,7 +817,8 @@ extension KeyHandler {
       /// 讀音組成的雙字詞的權重、導致這個雙字詞並未在爬軌時被自動
       /// 選中的話，則使用者可以直接摁下本函式對應的按鍵來輪替候選字即可。
       /// （預設情況下是 (Shift+)Tab 來做正 (反) 向切換，但也可以用
-      /// Shift(+CMD)+Space 來切換、以應對臉書綁架 Tab 鍵的情況。
+      /// Shift(+CMD)+Space 或 Alt+↑/↓ 來切換（縱排輸入時則是 Alt+←/→）、
+      /// 以應對臉書綁架 Tab 鍵的情況。
       if candidates[0].0 == currentPaired.key, candidates[0].1 == currentPaired.value {
         /// 如果第一個候選字詞是當前節點的候選字詞的值的話，
         /// 那就切到下一個（或上一個，也就是最後一個）候選字詞。

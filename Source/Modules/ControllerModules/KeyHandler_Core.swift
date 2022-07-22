@@ -161,7 +161,7 @@ class KeyHandler {
   /// 然後再將對應的節錨內的節點標記為「已經手動選字過」。
   /// - Parameters:
   ///   - value: 給定之候選字字串。
-  ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字厚的節錨的前方。
+  ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字後的節錨的前方。
   func fixNode(candidate: (String, String), respectCursorPushing: Bool = true) {
     let theCandidate: Megrez.KeyValuePaired = .init(key: candidate.0, value: candidate.1)
     let adjustedCursor = max(0, min(actualCandidateCursor + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength))
@@ -196,7 +196,7 @@ class KeyHandler {
     // 開始爬軌。
     walk()
 
-    /// 若偏好設定內啟用了相關選項，則會在選字之後始終將游標推送至選字厚的節錨的前方。
+    /// 若偏好設定內啟用了相關選項，則會在選字之後始終將游標推送至選字後的節錨的前方。
     if mgrPrefs.moveCursorAfterSelectingCandidate, respectCursorPushing {
       compositor.jumpCursorBySpan(to: .front)
     }
