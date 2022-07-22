@@ -288,7 +288,7 @@ class KeyHandler {
   ///   - epsilon: 半衰模組的衰減指數。
   /// - Returns: 尋獲的最高權重數值。
   func findHighestScore(nodeAnchors: [Megrez.NodeAnchor], epsilon: Double) -> Double {
-    return nodeAnchors.map(\.node.highestUnigramScore).max() ?? 0 + epsilon
+    nodeAnchors.map(\.node.highestUnigramScore).max() ?? 0 + epsilon
   }
 
   // MARK: - Extracted methods and functions (Tekkon).
