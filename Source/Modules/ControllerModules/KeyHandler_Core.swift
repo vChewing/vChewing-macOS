@@ -400,12 +400,6 @@ class KeyHandler {
     compositor.dropReading(direction: .front)
   }
 
-  /// 獲取指定游標位置的鍵值長度。
-  /// - Returns: 指定游標位置的鍵值長度。
-  var keyLengthAtCurrentIndex: Int {
-    walkedAnchors[compositorCursorIndex].node.key.split(separator: "-").count
-  }
-
   var nextPhrasePosition: Int {
     var nextPosition = 0
     for theAnchor in walkedAnchors {
