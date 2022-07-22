@@ -103,7 +103,7 @@ class KeyHandler {
   ///
   /// 威注音對游標前置與游標後置模式採取的候選字節點陣列抓取方法是分離的，且不使用 Node Crossing。
   var actualCandidateCursor: Int {
-    mgrPrefs.useRearCursorMode ? min(compositorCursorIndex, compositorLength - 1) : max(compositorCursorIndex, 1)
+    mgrPrefs.useRearCursorMode ? min(compositor.cursor, compositor.length - 1) : max(compositor.cursor, 1)
   }
 
   /// 利用給定的讀音鏈來試圖爬取最接近的組字結果（最大相似度估算）。
@@ -161,10 +161,10 @@ class KeyHandler {
   /// 然後再將對應的節錨內的節點標記為「已經手動選字過」。
   /// - Parameters:
   ///   - value: 給定之候選字字串。
-  ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字厚的節錨的前方。
+  ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字後的節錨的前方。
   func fixNode(candidate: (String, String), respectCursorPushing: Bool = true) {
     let theCandidate: Megrez.KeyValuePaired = .init(key: candidate.0, value: candidate.1)
-    let adjustedCursor = max(0, min(actualCandidateCursor + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength))
+    let adjustedCursor = max(0, min(actualCandidateCursor + (mgrPrefs.useRearCursorMode ? 1 : 0), compositor.length))
     // 開始讓半衰模組觀察目前的狀況。
     let selectedNode: Megrez.NodeAnchor = compositor.fixNodeWithCandidate(theCandidate, at: adjustedCursor)
     // 不要針對逐字選字模式啟用臨時半衰記憶模型。
@@ -196,7 +196,7 @@ class KeyHandler {
     // 開始爬軌。
     walk()
 
-    /// 若偏好設定內啟用了相關選項，則會在選字之後始終將游標推送至選字厚的節錨的前方。
+    /// 若偏好設定內啟用了相關選項，則會在選字之後始終將游標推送至選字後的節錨的前方。
     if mgrPrefs.moveCursorAfterSelectingCandidate, respectCursorPushing {
       compositor.jumpCursorBySpan(to: .front)
     }
@@ -254,7 +254,7 @@ class KeyHandler {
   /// 向半衰引擎詢問可能的選字建議。拿到的結果會是一個單元圖陣列。
   func fetchSuggestedCandidates() -> [Megrez.Unigram] {
     currentUOM.suggest(
-      walkedAnchors: walkedAnchors, cursorIndex: compositorCursorIndex,
+      walkedAnchors: walkedAnchors, cursorIndex: compositor.cursor,
       timestamp: NSDate().timeIntervalSince1970
     )
   }
@@ -273,7 +273,7 @@ class KeyHandler {
       IME.prtDebugIntel(
         "UOM: Suggestion retrieved, overriding the node score of the selected candidate.")
       compositor.overrideNodeScoreForSelectedCandidate(
-        location: min(actualCandidateCursor + (mgrPrefs.useRearCursorMode ? 1 : 0), compositorLength),
+        location: min(actualCandidateCursor + (mgrPrefs.useRearCursorMode ? 1 : 0), compositor.length),
         value: overrideValue,
         overridingScore: findHighestScore(nodeAnchors: rawAnchorsOfNodes, epsilon: kEpsilon)
       )
@@ -288,7 +288,7 @@ class KeyHandler {
   ///   - epsilon: 半衰模組的衰減指數。
   /// - Returns: 尋獲的最高權重數值。
   func findHighestScore(nodeAnchors: [Megrez.NodeAnchor], epsilon: Double) -> Double {
-    return nodeAnchors.map(\.node.highestUnigramScore).max() ?? 0 + epsilon
+    nodeAnchors.map(\.node.highestUnigramScore).max() ?? 0 + epsilon
   }
 
   // MARK: - Extracted methods and functions (Tekkon).
@@ -337,9 +337,6 @@ class KeyHandler {
 
   // MARK: - Extracted methods and functions (Megrez).
 
-  /// 組字器是否為空。
-  var isCompositorEmpty: Bool { compositor.isEmpty }
-
   /// 獲取原始節錨資料陣列。
   var rawAnchorsOfNodes: [Megrez.NodeAnchor] {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
@@ -360,59 +357,6 @@ class KeyHandler {
   func ensureCompositor() {
     // 每個漢字讀音都由一個西文半形減號分隔開。
     compositor = Megrez.Compositor(lm: currentLM, separator: "-")
-  }
-
-  /// 自組字器獲取目前的讀音陣列。
-  var currentReadings: [String] { compositor.readings }
-
-  /// 以給定的（讀音）索引鍵，來檢測當前主語言模型內是否有對應的資料在庫。
-  func ifLangModelHasUnigrams(forKey reading: String) -> Bool {
-    currentLM.hasUnigramsFor(key: reading)
-  }
-
-  /// 在組字器的給定游標位置內插入讀音。
-  func insertToCompositorAtCursor(reading: String) {
-    compositor.insertReading(reading)
-  }
-
-  /// 組字器的游標位置。
-  var compositorCursorIndex: Int {
-    get { compositor.cursor }
-    set { compositor.cursor = newValue }
-  }
-
-  /// 組字器的目前的長度。
-  var compositorLength: Int {
-    compositor.length
-  }
-
-  /// 在組字器內，朝著與文字輸入方向相反的方向、砍掉一個與游標相鄰的讀音。
-  ///
-  /// 在威注音的術語體系當中，「與文字輸入方向相反的方向」為向後（Rear）。
-  func deleteCompositorReadingAtTheRearOfCursor() {
-    compositor.dropReading(direction: .rear)
-  }
-
-  /// 在組字器內，朝著往文字輸入方向、砍掉一個與游標相鄰的讀音。
-  ///
-  /// 在威注音的術語體系當中，「文字輸入方向」為向前（Front）。
-  func deleteCompositorReadingToTheFrontOfCursor() {
-    compositor.dropReading(direction: .front)
-  }
-
-  /// 獲取指定游標位置的鍵值長度。
-  /// - Returns: 指定游標位置的鍵值長度。
-  var keyLengthAtCurrentIndex: Int {
-    walkedAnchors[compositorCursorIndex].node.key.split(separator: "-").count
-  }
-
-  var nextPhrasePosition: Int {
-    var nextPosition = 0
-    for theAnchor in walkedAnchors {
-      if nextPosition > actualCandidateCursor { break }
-      nextPosition += theAnchor.spanLength
-    }
-    return min(nextPosition, compositorLength)
   }
 
   /// 生成標點符號索引鍵。

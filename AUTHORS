@@ -16,7 +16,7 @@ $ Contributors and volunteers of the upstream repo, having no responsibility in 
 - Zonble Yang:
     - McBopomofo for macOS 2.x architect, especially state-based IME behavior management.
     - Voltaire candidate window MK2 (massively modified as MK3 in vChewing by Shiki Suen).
-    - InputHandler.
+    - InputSignal (previously "KeyHandlerInput").
     - Notifier window and Tooltip UI.
     - NSStringUtils and FSEventStreamHelper.
     - App-style installer (only preserved for developer purposes).

@@ -906,7 +906,7 @@ public struct Tekkon {
     }
     for key in Tekkon.mapArayuruPinyinIntonation.keys.sorted(by: { $0.count > $1.count }) {
       guard let value = Tekkon.mapArayuruPinyinIntonation[key] else { continue }
-      result = result.replacingOccurrences(of: key, with: value)
+      result = result.replacingOccurrences(of: key, with: (key == "1") ? "" : value)
     }
     return result
   }
