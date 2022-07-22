@@ -357,13 +357,15 @@ extension String {
 
 extension vChewing.LMAssociates {
   public mutating func forceOpenStringInstead(_ strData: String) {
-    strData.ranges(splitBy: "\n").forEach {
+    strData.ranges(splitBy: "\n").filter({ !$0.isEmpty }).forEach {
       let neta = strData[$0].split(separator: " ")
       if neta.count >= 2 {
         let theKey = String(neta[0])
-        if !neta[0].isEmpty, !neta[1].isEmpty, theKey.first != "#" {
-          let theValue = $0
-          rangeMap[theKey, default: []].append(theValue)
+        if !theKey.isEmpty, theKey.first != "#" {
+          for (i, _) in neta.filter({ $0.first != "#" && !$0.isEmpty }).enumerated() {
+            if i == 0 { continue }
+            rangeMap[theKey, default: []].append(($0, i))
+          }
         }
       }
     }
