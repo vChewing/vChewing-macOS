@@ -42,6 +42,15 @@ extension vChewing {
       !rangeMap.isEmpty
     }
 
+    internal func cnvNgramKeyFromPinyinToPhona(target: String) -> String {
+      guard target.contains("("), target.contains(","), target.contains(")") else {
+        return target
+      }
+      let arrTarget = target.dropLast().dropFirst().split(separator: ",")
+      guard arrTarget.count == 2 else { return target }
+      return "(\(Tekkon.cnvHanyuPinyinToPhona(target: String(arrTarget[0]))),\(arrTarget[1]))"
+    }
+
     @discardableResult public mutating func open(_ path: String) -> Bool {
       if isLoaded() {
         return false
@@ -60,7 +69,7 @@ extension vChewing {
             if !theKey.isEmpty, theKey.first != "#" {
               for (i, _) in neta.filter({ $0.first != "#" && !$0.isEmpty }).enumerated() {
                 if i == 0 { continue }
-                rangeMap[theKey, default: []].append(($0, i))
+                rangeMap[cnvNgramKeyFromPinyinToPhona(target: theKey), default: []].append(($0, i))
               }
             }
           }
@@ -102,17 +111,8 @@ extension vChewing {
     }
 
     public func valuesFor(pair: Megrez.KeyValuePaired) -> [String] {
-      var pairPinyin = pair
-      pairPinyin.key = Tekkon.cnvPhonaToHanyuPinyin(target: pairPinyin.key)
       var pairs: [String] = []
       if let arrRangeRecords: [(Range<String.Index>, Int)] = rangeMap[pair.toNGramKey] {
-        for (netaRange, index) in arrRangeRecords {
-          let neta = strData[netaRange].split(separator: " ")
-          let theValue: String = .init(neta[index])
-          pairs.append(theValue)
-        }
-      }
-      if let arrRangeRecords: [(Range<String.Index>, Int)] = rangeMap[pairPinyin.toNGramKey] {
         for (netaRange, index) in arrRangeRecords {
           let neta = strData[netaRange].split(separator: " ")
           let theValue: String = .init(neta[index])
