@@ -480,8 +480,12 @@ enum mgrLangModel {
   }
 
   static func saveUserOverrideModelData() {
-    gUserOverrideModelCHT.saveData(toURL: userOverrideModelDataURL(InputMode.imeModeCHT))
-    gUserOverrideModelCHS.saveData(toURL: userOverrideModelDataURL(InputMode.imeModeCHS))
+    DispatchQueue.main.async {
+      gUserOverrideModelCHT.saveData(toURL: userOverrideModelDataURL(InputMode.imeModeCHT))
+    }
+    DispatchQueue.main.async {
+      gUserOverrideModelCHS.saveData(toURL: userOverrideModelDataURL(InputMode.imeModeCHS))
+    }
   }
 
   static func removeUnigramsFromUserOverrideModel(_ mode: InputMode) {
