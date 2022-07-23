@@ -492,9 +492,9 @@ enum mgrLangModel {
   static func removeUnigramsFromUserOverrideModel(_ mode: InputMode) {
     switch mode {
       case .imeModeCHS:
-        gUserOverrideModelCHT.bleachUnigrams()
+        gUserOverrideModelCHT.bleachUnigrams(saveCallback: { mgrLangModel.saveUserOverrideModelData() })
       case .imeModeCHT:
-        gUserOverrideModelCHS.bleachUnigrams()
+        gUserOverrideModelCHS.bleachUnigrams(saveCallback: { mgrLangModel.saveUserOverrideModelData() })
       case .imeModeNULL:
         break
     }

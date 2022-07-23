@@ -188,7 +188,7 @@ class KeyHandler {
         // 這個過程會讓半衰引擎根據當前上下文生成三元圖索引鍵。
         currentUOM.observe(
           walkedAnchors: walkedAnchors, cursorIndex: adjustedCursor, candidate: theCandidate.value,
-          timestamp: NSDate().timeIntervalSince1970
+          timestamp: NSDate().timeIntervalSince1970, saveCallback: { mgrLangModel.saveUserOverrideModelData() }
         )
       }
     }

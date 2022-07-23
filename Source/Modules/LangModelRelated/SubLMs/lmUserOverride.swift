@@ -44,7 +44,8 @@ extension vChewing {
       walkedAnchors: [Megrez.NodeAnchor],
       cursorIndex: Int,
       candidate: String,
-      timestamp: Double
+      timestamp: Double,
+      saveCallback: @escaping () -> Void
     ) {
       let key = convertKeyFrom(walkedAnchors: walkedAnchors, cursorIndex: cursorIndex)
       guard !key.isEmpty else { return }
@@ -64,7 +65,7 @@ extension vChewing {
           mutLRUList.removeLast()
         }
         IME.prtDebugIntel("UOM: Observation finished with new observation: \(key)")
-        mgrLangModel.saveUserOverrideModelData()
+        saveCallback()
         return
       }
       if var theNeta = mutLRUMap[key] {
@@ -72,7 +73,7 @@ extension vChewing {
         mutLRUList.insert(theNeta, at: 0)
         mutLRUMap[key] = theNeta
         IME.prtDebugIntel("UOM: Observation finished with existing observation: \(key)")
-        mgrLangModel.saveUserOverrideModelData()
+        saveCallback()
       }
     }
 
@@ -270,13 +271,13 @@ extension vChewing.LMUserOverride {
 
 extension vChewing.LMUserOverride {
   /// 自 LRU 辭典內移除所有的單元圖。
-  public func bleachUnigrams() {
+  public func bleachUnigrams(saveCallback: @escaping () -> Void) {
     for key in mutLRUMap.keys {
       if !key.contains("(),()") { continue }
       mutLRUMap.removeValue(forKey: key)
     }
     resetMRUList()
-    mgrLangModel.saveUserOverrideModelData()
+    saveCallback()
   }
 
   internal func resetMRUList() {
