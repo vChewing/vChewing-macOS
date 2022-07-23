@@ -33,9 +33,11 @@ extension vChewing {
     var mutDecayExponent: Double
     var mutLRUList: [KeyObservationPair] = []
     var mutLRUMap: [String: KeyObservationPair] = [:]
-    let kDecayThreshold: Double = 1.0 / 1_048_576.0
+    let kDecayThreshold: Double = 1.0 / 1_048_576.0  // 衰減二十次之後差不多就失效了。
 
-    public init(capacity: Int = 500, decayConstant: Double = 5400.0) {
+    public static let kObservedOverrideHalfLife: Double = 3600.0 * 6  // 6 小時半衰一次，能持續不到六天的記憶。
+
+    public init(capacity: Int = 500, decayConstant: Double = LMUserOverride.kObservedOverrideHalfLife) {
       mutCapacity = max(capacity, 1)  // Ensures that this integer value is always > 0.
       mutDecayExponent = log(0.5) / decayConstant
     }
