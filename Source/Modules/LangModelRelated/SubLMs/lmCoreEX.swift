@@ -51,10 +51,10 @@ extension vChewing {
     /// 初期化該語言模型。
     ///
     /// - parameters:
-    ///   - reverse: 聲明原始檔案內第一、二縱列的內容是否彼此顛倒
-    ///   - consolidate: 請且僅請對使用者語言模組啟用該參數：是否自動整理格式
-    ///   - defaultScore: 當某一筆資料內的權重資料毀損時，要施加的預設權重
-    ///   - forceDefaultScore: 啟用該選項的話，會強制施加預設權重、而無視原始權重資料
+    ///   - reverse: 聲明原始檔案內第一、二縱列的內容是否彼此顛倒。
+    ///   - consolidate: 請且僅請對使用者語言模組啟用該參數：是否自動整理格式。
+    ///   - defaultScore: 當某一筆資料內的權重資料毀損時，要施加的預設權重。
+    ///   - forceDefaultScore: 啟用該選項的話，會強制施加預設權重、而無視原始權重資料。
     public init(
       reverse: Bool = false, consolidate: Bool = false, defaultScore scoreDefault: Double = 0,
       forceDefaultScore: Bool = false
@@ -73,7 +73,7 @@ extension vChewing {
 
     /// 將資料從檔案讀入至資料庫辭典內。
     /// - parameters:
-    ///   - path: 給定路徑
+    ///   - path: 給定路徑。
     @discardableResult public mutating func open(_ path: String) -> Bool {
       if isLoaded() {
         return false
@@ -135,8 +135,8 @@ extension vChewing {
     ///
     /// 威注音輸入法尚未引入雙元圖支援，所以該函式並未擴充相關功能，自然不會起作用。
     /// - parameters:
-    ///   - precedingKey: 前述讀音索引鍵
-    ///   - key: 當前讀音索引鍵
+    ///   - precedingKey: 前述讀音索引鍵。
+    ///   - key: 當前讀音索引鍵。
     public func bigramsFor(precedingKey: String, key: String) -> [Megrez.Bigram] {
       // 這裡用了點廢話處理，不然函式構建體會被 Swift 格式整理工具給毀掉。
       // 其實只要一句「[Megrez.Bigram]()」就夠了。
@@ -145,7 +145,7 @@ extension vChewing {
 
     /// 根據給定的讀音索引鍵，來獲取資料庫辭典內的對應資料陣列的字串首尾範圍資料、據此自 strData 取得字串形式的資料、生成單元圖陣列。
     /// - parameters:
-    ///   - key: 讀音索引鍵
+    ///   - key: 讀音索引鍵。
     public func unigramsFor(key: String) -> [Megrez.Unigram] {
       var grams: [Megrez.Unigram] = []
       if let arrRangeRecords: [Range<String.Index>] = rangeMap[key] {
@@ -168,7 +168,7 @@ extension vChewing {
 
     /// 根據給定的讀音索引鍵來確認資料庫辭典內是否存在對應的資料。
     /// - parameters:
-    ///   - key: 讀音索引鍵
+    ///   - key: 讀音索引鍵。
     public func hasUnigramsFor(key: String) -> Bool {
       rangeMap[key] != nil
     }
