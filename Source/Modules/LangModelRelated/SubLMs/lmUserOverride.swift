@@ -70,19 +70,26 @@ extension vChewing {
         saveCallback()
         return
       }
+      // 降低磁碟寫入次數。唯有失憶的情況下才會更新觀察且記憶。
       if var theNeta = mutLRUMap[key] {
-        theNeta.observation.update(candidate: candidate, timestamp: timestamp)
-        mutLRUList.insert(theNeta, at: 0)
-        mutLRUMap[key] = theNeta
-        IME.prtDebugIntel("UOM: Observation finished with existing observation: \(key)")
-        saveCallback()
+        _ = suggest(
+          walkedAnchors: walkedAnchors, cursorIndex: cursorIndex, timestamp: timestamp,
+          decayCallback: {
+            theNeta.observation.update(candidate: candidate, timestamp: timestamp)
+            self.mutLRUList.insert(theNeta, at: 0)
+            self.mutLRUMap[key] = theNeta
+            IME.prtDebugIntel("UOM: Observation finished with existing observation: \(key)")
+            saveCallback()
+          }
+        )
       }
     }
 
     public func suggest(
       walkedAnchors: [Megrez.NodeAnchor],
       cursorIndex: Int,
-      timestamp: Double
+      timestamp: Double,
+      decayCallback: @escaping () -> Void = {}
     ) -> [Megrez.Unigram] {
       let key = convertKeyFrom(walkedAnchors: walkedAnchors, cursorIndex: cursorIndex)
       let currentReadingKey = convertKeyFrom(walkedAnchors: walkedAnchors, cursorIndex: cursorIndex, readingOnly: true)
@@ -97,6 +104,7 @@ extension vChewing {
       var currentHighScore = 0.0
       for overrideNeta in Array(observation.overrides) {
         let override: Override = overrideNeta.value
+
         let overrideScore: Double = getScore(
           eventCount: override.count,
           totalCount: observation.count,
@@ -105,6 +113,16 @@ extension vChewing {
           lambda: mutDecayExponent
         )
         if (0...currentHighScore).contains(overrideScore) { continue }
+
+        let overrideDetectionScore: Double = getScore(
+          eventCount: override.count,
+          totalCount: observation.count,
+          eventTimestamp: override.timestamp,
+          timestamp: timestamp,
+          lambda: mutDecayExponent * 2
+        )
+        if (0...currentHighScore).contains(overrideDetectionScore) { decayCallback() }
+
         let newUnigram = Megrez.Unigram(
           keyValue: .init(key: currentReadingKey, value: overrideNeta.key), score: overrideScore
         )
