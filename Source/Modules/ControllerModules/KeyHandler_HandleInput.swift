@@ -359,7 +359,8 @@ extension KeyHandler {
           return handleInlineCandidateRotation(
             state: state, reverseModifier: false, stateCallback: stateCallback, errorCallback: errorCallback
           )
-        } else if input.isExtraChooseCandidateKeyReverse {
+        }
+        if input.isExtraChooseCandidateKeyReverse {
           return handleInlineCandidateRotation(
             state: state, reverseModifier: true, stateCallback: stateCallback, errorCallback: errorCallback
           )
