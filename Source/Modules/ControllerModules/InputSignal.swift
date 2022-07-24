@@ -34,7 +34,7 @@ enum KeyCode: UInt16 {
   case kCarriageReturn = 36  // Renamed from "kReturn" to avoid nomenclatural confusions.
   case kTab = 48
   case kSpace = 49
-  case kSymbolMenuPhysicalKey = 50  // vChewing Specific
+  case kSymbolMenuPhysicalKeyIntl = 50  // vChewing Specific (Non-JIS)
   case kBackSpace = 51  // Renamed from "kDelete" to avoid nomenclatural confusions.
   case kEscape = 53
   case kCommand = 55
@@ -54,6 +54,7 @@ enum KeyCode: UInt16 {
   case kF18 = 79
   case kF19 = 80
   case kF20 = 90
+  case kSymbolMenuPhysicalKeyJIS = 94  // vChewing Specific (JIS)
   case kF5 = 96
   case kF6 = 97
   case kF7 = 98
@@ -344,7 +345,7 @@ struct InputSignal: CustomStringConvertible {
   var isSymbolMenuPhysicalKey: Bool {
     // 這裡必須用 KeyCode，這樣才不會受隨 macOS 版本更動的 Apple 動態注音鍵盤排列內容的影響。
     // 只是必須得與 ![input isShift] 搭配使用才可以（也就是僅判定 Shift 沒被摁下的情形）。
-    KeyCode(rawValue: keyCode) == KeyCode.kSymbolMenuPhysicalKey
+    [KeyCode.kSymbolMenuPhysicalKeyIntl, KeyCode.kSymbolMenuPhysicalKeyJIS].contains(KeyCode(rawValue: keyCode))
   }
 }
 

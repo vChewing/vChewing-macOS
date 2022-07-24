@@ -75,7 +75,7 @@ class KeyHandlerTestsSCPCCHT: XCTestCase {
 
   func testPunctuationTable() {
     let input = InputSignal(
-      inputText: "`", keyCode: KeyCode.kSymbolMenuPhysicalKey.rawValue, charCode: 0, flags: .option
+      inputText: "`", keyCode: KeyCode.kSymbolMenuPhysicalKeyIntl.rawValue, charCode: 0, flags: .option
     )
     var state: InputStateProtocol = InputState.Empty()
     _ = handler.handle(input: input, state: state) { newState in
