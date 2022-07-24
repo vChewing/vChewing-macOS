@@ -42,7 +42,7 @@ extension vChewing {
       !rangeMap.isEmpty
     }
 
-    internal func cnvNgramKeyFromPinyinToPhona(target: String) -> String {
+    internal func cnvNGramKeyFromPinyinToPhona(target: String) -> String {
       guard target.contains("("), target.contains(","), target.contains(")") else {
         return target
       }
@@ -69,7 +69,7 @@ extension vChewing {
             if !theKey.isEmpty, theKey.first != "#" {
               for (i, _) in neta.filter({ $0.first != "#" && !$0.isEmpty }).enumerated() {
                 if i == 0 { continue }
-                rangeMap[cnvNgramKeyFromPinyinToPhona(target: theKey), default: []].append(($0, i))
+                rangeMap[cnvNGramKeyFromPinyinToPhona(target: theKey), default: []].append(($0, i))
               }
             }
           }
