@@ -151,6 +151,9 @@ extension ctlInputMethod {
     {
       commit(text: previous.composingBuffer)
     }
+    // 在這裡手動再取消一次選字窗與工具提示的顯示，可謂雙重保險。
+    ctlInputMethod.ctlCandidateCurrent.visible = false
+    ctlInputMethod.tooltipController.hide()
     clearInlineDisplay()
   }
 
