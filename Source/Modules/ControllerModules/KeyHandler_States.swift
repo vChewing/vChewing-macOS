@@ -329,7 +329,7 @@ extension KeyHandler {
     )
     if candidateState.candidates.count == 1 {
       clear()
-      if let candidateToCommit: (String, String) = candidateState.candidates.first {
+      if let candidateToCommit: (String, String) = candidateState.candidates.first, !candidateToCommit.1.isEmpty {
         stateCallback(InputState.Committing(textToCommit: candidateToCommit.1))
         stateCallback(InputState.Empty())
       } else {
