@@ -248,14 +248,6 @@ extension vChewing {
       return !unigramsFor(key: key).isEmpty
     }
 
-    public func associatedPhrasesFor(key: String) -> [String] {
-      lmAssociates.valuesFor(key: key)
-    }
-
-    public func hasAssociatedPhrasesFor(key: String) -> Bool {
-      lmAssociates.hasValuesFor(key: key)
-    }
-
     public func associatedPhrasesFor(pair: Megrez.KeyValuePaired) -> [String] {
       lmAssociates.valuesFor(pair: pair)
     }
