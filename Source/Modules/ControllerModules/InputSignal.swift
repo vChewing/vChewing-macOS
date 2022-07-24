@@ -110,6 +110,11 @@ enum KeyCodeBlackListed: UInt16 {
   case kF1 = 122
 }
 
+/// 數字小鍵盤區域的按鍵的 KeyCode。
+///
+/// 注意：第 95 號 Key Code（逗號）為 JIS 佈局特有的數字小鍵盤按鍵。
+let arrNumpadKeyCodes: [UInt16] = [65, 67, 69, 71, 75, 78, 81, 82, 83, 84, 85, 86, 87, 88, 89, 91, 92, 95]
+
 // CharCodes: https://theasciicode.com.ar/ascii-control-characters/horizontal-tab-ascii-code-9.html
 enum CharCode: UInt16 {
   case yajuusenpaiA = 114
@@ -254,6 +259,11 @@ struct InputSignal: CustomStringConvertible {
       return false
     }
     return code.rawValue != KeyCode.kNone.rawValue
+  }
+
+  /// 單獨用 flags 來判定數字小鍵盤輸入的方法已經失效了，所以必須再增補用 KeyCode 判定的方法。
+  var isNumericPadAreaKey: Bool {
+    arrNumpadKeyCodes.contains(keyCode)
   }
 
   var isTab: Bool {
