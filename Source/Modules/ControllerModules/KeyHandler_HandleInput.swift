@@ -108,7 +108,9 @@ extension KeyHandler {
 
     // MARK: 處理數字小鍵盤 (Numeric Pad Processing)
 
-    if input.isNumericPad {
+    // 這裡必須用「isNumericPadAreaKey」這個以 KeyCode 判定數字鍵區輸入的方法來鎖定按鍵範圍。
+    // 不然的話，會誤傷到在主鍵盤區域的功能鍵。
+    if input.isNumericPadAreaKey {
       if !input.isLeft, !input.isRight, !input.isDown,
         !input.isUp, !input.isSpace, charCode.isPrintableASCII
       {
