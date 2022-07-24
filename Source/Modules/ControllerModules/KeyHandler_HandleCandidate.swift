@@ -78,7 +78,7 @@ extension KeyHandler {
     // MARK: Enter
 
     if input.isEnter {
-      delegate!.keyHandler(
+      delegate?.keyHandler(
         self,
         didSelectCandidateAt: ctlCandidateCurrent.selectedCandidateIndex,
         ctlCandidate: ctlCandidateCurrent
@@ -297,7 +297,7 @@ extension KeyHandler {
     if index != NSNotFound {
       let candidateIndex = ctlCandidateCurrent.candidateIndexAtKeyLabelIndex(index)
       if candidateIndex != Int.max {
-        delegate!.keyHandler(
+        delegate?.keyHandler(
           self, didSelectCandidateAt: candidateIndex, ctlCandidate: ctlCandidateCurrent
         )
         return true
@@ -337,7 +337,7 @@ extension KeyHandler {
       if shouldAutoSelectCandidate {
         let candidateIndex = ctlCandidateCurrent.candidateIndexAtKeyLabelIndex(0)
         if candidateIndex != Int.max {
-          delegate!.keyHandler(
+          delegate?.keyHandler(
             self,
             didSelectCandidateAt: candidateIndex,
             ctlCandidate: ctlCandidateCurrent
