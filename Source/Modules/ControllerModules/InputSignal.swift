@@ -339,7 +339,7 @@ struct InputSignal: CustomStringConvertible {
 
   var isUpperCaseASCIILetterKey: Bool {
     // 這裡必須加上「flags == .shift」，否則會出現某些情況下輸入法「誤判當前鍵入的非 Shift 字符為大寫」的問題。
-    charCode >= 65 && charCode <= 90 && flags == .shift
+    (65...90).contains(charCode) && flags == .shift
   }
 
   var isSymbolMenuPhysicalKey: Bool {
