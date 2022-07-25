@@ -110,9 +110,10 @@ extension KeyHandler {
 
     // 這裡必須用「isNumericPadAreaKey」這個以 KeyCode 判定數字鍵區輸入的方法來鎖定按鍵範圍。
     // 不然的話，會誤傷到在主鍵盤區域的功能鍵。
+    // 我們先規定允許小鍵盤區域操縱選字窗，其餘場合一律直接放行。
     if input.isNumericPadAreaKey {
-      if !input.isLeft, !input.isRight, !input.isDown,
-        !input.isUp, !input.isSpace, charCode.isPrintableASCII
+      if !(state is InputState.ChoosingCandidate || state is InputState.AssociatedPhrases
+        || state is InputState.SymbolTable)
       {
         clear()
         stateCallback(InputState.Empty())
