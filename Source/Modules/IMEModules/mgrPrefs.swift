@@ -59,6 +59,7 @@ struct UserDef {
   static let kFetchSuggestionsFromUserOverrideModel = "FetchSuggestionsFromUserOverrideModel"
   static let kUseFixecCandidateOrderOnSelection = "UseFixecCandidateOrderOnSelection"
   static let kAutoCorrectReadingCombination = "AutoCorrectReadingCombination"
+  static let kAlsoConfirmAssociatedCandidatesByEnter = "AlsoConfirmAssociatedCandidatesByEnter"
 
   static let kCandidateTextFontName = "CandidateTextFontName"
   static let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
@@ -282,6 +283,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.autoCorrectReadingCombination, forKey: UserDef.kAutoCorrectReadingCombination
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.alsoConfirmAssociatedCandidatesByEnter, forKey: UserDef.kAlsoConfirmAssociatedCandidatesByEnter
+    )
 
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeySCPC, forKey: UserDef.kUsingHotKeySCPC)
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyAssociates, forKey: UserDef.kUsingHotKeyAssociates)
@@ -366,6 +370,9 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kAutoCorrectReadingCombination, defaultValue: true)
   static var autoCorrectReadingCombination: Bool
+
+  @UserDefault(key: UserDef.kAlsoConfirmAssociatedCandidatesByEnter, defaultValue: true)
+  static var alsoConfirmAssociatedCandidatesByEnter: Bool
 
   static var minCandidateLength: Int {
     mgrPrefs.allowBoostingSingleKanjiAsUserPhrase ? 1 : 2
@@ -601,6 +608,7 @@ extension mgrPrefs {
       UserDef.kAssociatedPhrasesEnabled, UserDef.kPhraseReplacementEnabled, UserDef.kUsingHotKeySCPC,
       UserDef.kUsingHotKeyAssociates, UserDef.kUsingHotKeyCNS, UserDef.kUsingHotKeyKangXi, UserDef.kUsingHotKeyJIS,
       UserDef.kUsingHotKeyHalfWidthASCII, UserDef.kUseFixecCandidateOrderOnSelection,
+      UserDef.kAutoCorrectReadingCombination, UserDef.kAlsoConfirmAssociatedCandidatesByEnter,
     ]
   }
 

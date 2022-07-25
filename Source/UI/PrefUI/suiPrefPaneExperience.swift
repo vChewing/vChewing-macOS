@@ -48,6 +48,8 @@ struct suiPrefPaneExperience: View {
   @State private var selComposingBufferSize = UserDefaults.standard.integer(forKey: UserDef.kComposingBufferSize)
   @State private var selAutoCorrectReadingCombination = UserDefaults.standard.bool(
     forKey: UserDef.kAutoCorrectReadingCombination)
+  @State private var selAlsoConfirmAssociatedCandidatesByEnter = UserDefaults.standard.bool(
+    forKey: UserDef.kAlsoConfirmAssociatedCandidatesByEnter)
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -180,6 +182,12 @@ struct suiPrefPaneExperience: View {
         }
         Text(LocalizedStringKey("An accomodation for elder computer users."))
           .preferenceDescription()
+        Toggle(
+          LocalizedStringKey("Allow using Enter key to confirm associated candidate selection"),
+          isOn: $selAlsoConfirmAssociatedCandidatesByEnter
+        ).onChange(of: selAlsoConfirmAssociatedCandidatesByEnter) { value in
+          mgrPrefs.alsoConfirmAssociatedCandidatesByEnter = value
+        }
       }
     }
   }

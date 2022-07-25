@@ -188,7 +188,7 @@ class KeyHandler {
         // 這個過程會讓半衰引擎根據當前上下文生成三元圖索引鍵。
         currentUOM.observe(
           walkedAnchors: walkedAnchors, cursorIndex: adjustedCursor, candidate: theCandidate.value,
-          timestamp: NSDate().timeIntervalSince1970
+          timestamp: NSDate().timeIntervalSince1970, saveCallback: { mgrLangModel.saveUserOverrideModelData() }
         )
       }
     }
@@ -236,7 +236,7 @@ class KeyHandler {
       // 選字窗的內容的康熙轉換 / JIS 轉換不能放在這裡處理，會影響選字有效性。
       // 選字的原理是拿著具體的候選字詞的字串去當前的節錨下找出對應的候選字詞（Ｘ元圖）。
       // 一旦在這裡轉換了，節錨內的某些元圖就無法被選中。
-      arrCandidates.append(.init(key: currentCandidate.key, value: currentCandidate.value))
+      arrCandidates.append(currentCandidate)
     }
     // 決定是否根據半衰記憶模組的建議來調整候選字詞的順序。
     if !mgrPrefs.fetchSuggestionsFromUserOverrideModel || mgrPrefs.useSCPCTypingMode || fixOrder {

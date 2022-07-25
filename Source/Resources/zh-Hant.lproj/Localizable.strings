@@ -85,6 +85,7 @@
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)空格鍵:";
 "Allow boosting / excluding a candidate of single kanji" = "將可以就地升權/排除的候選字詞的最短詞長設為單個漢字";
+"Allow using Enter key to confirm associated candidate selection" = "允許使用 Enter 確認當前選中的聯想詞";
 "Always use fixed listing order in candidate window" = "以固定順序來陳列選字窗內的候選字";
 "An accomodation for elder computer users." = "針對年長使用者的習慣而提供。";
 "Apple ABC (equivalent to English US)" = "Apple ABC (與 Apple 美規鍵盤等價)";
@@ -118,7 +119,7 @@
 "Debug Mode" = "偵錯模式";
 "Dictionary" = "辭典";
 "Emulating select-candidate-per-character mode" = "模擬 90 年代前期注音逐字選字輸入風格";
-"Enable CNS11643 Support (2022-06-15)" = "啟用 CNS11643 全字庫支援 (2022-06-15)";
+"Enable CNS11643 Support (2022-07-20)" = "啟用 CNS11643 全字庫支援 (2022-07-20)";
 "Enable Space key for calling candidate window" = "敲空格鍵以呼出候選字窗";
 "Enable symbol input support (incl. certain emoji symbols)" = "啟用包括少許繪文字在內的符號輸入支援";
 "English" = "英語";

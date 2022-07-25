@@ -325,7 +325,8 @@ enum mgrLangModel {
     if !ensureFileExists(userPhrasesDataURL(mode), populateWithTemplate: kTemplateNameUserPhrases)
       || !ensureFileExists(
         userAssociatesDataURL(mode),
-        populateWithTemplate: mode == .imeModeCHS ? kTemplateNameUserAssociatesCHS : kTemplateNameUserAssociatesCHT)
+        populateWithTemplate: mode == .imeModeCHS ? kTemplateNameUserAssociatesCHS : kTemplateNameUserAssociatesCHT
+      )
       || !ensureFileExists(userFilteredDataURL(mode), populateWithTemplate: kTemplateNameUserExclusions)
       || !ensureFileExists(userReplacementsDataURL(mode), populateWithTemplate: kTemplateNameUserReplacements)
       || !ensureFileExists(userSymbolDataURL(mode), populateWithTemplate: kTemplateNameUserSymbolPhrases)
@@ -480,16 +481,20 @@ enum mgrLangModel {
   }
 
   static func saveUserOverrideModelData() {
-    gUserOverrideModelCHT.saveData(toURL: userOverrideModelDataURL(InputMode.imeModeCHT))
-    gUserOverrideModelCHS.saveData(toURL: userOverrideModelDataURL(InputMode.imeModeCHS))
+    DispatchQueue.main.async {
+      gUserOverrideModelCHT.saveData(toURL: userOverrideModelDataURL(InputMode.imeModeCHT))
+    }
+    DispatchQueue.main.async {
+      gUserOverrideModelCHS.saveData(toURL: userOverrideModelDataURL(InputMode.imeModeCHS))
+    }
   }
 
   static func removeUnigramsFromUserOverrideModel(_ mode: InputMode) {
     switch mode {
       case .imeModeCHS:
-        gUserOverrideModelCHT.bleachUnigrams()
+        gUserOverrideModelCHT.bleachUnigrams(saveCallback: { mgrLangModel.saveUserOverrideModelData() })
       case .imeModeCHT:
-        gUserOverrideModelCHS.bleachUnigrams()
+        gUserOverrideModelCHS.bleachUnigrams(saveCallback: { mgrLangModel.saveUserOverrideModelData() })
       case .imeModeNULL:
         break
     }

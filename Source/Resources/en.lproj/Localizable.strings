@@ -85,6 +85,7 @@
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)Space:";
 "Allow boosting / excluding a candidate of single kanji" = "Allow boosting / excluding a candidate of single kanji";
+"Allow using Enter key to confirm associated candidate selection" = "Allow using Enter key to confirm associated candidate selection";
 "Always use fixed listing order in candidate window" = "Always use fixed listing order in candidate window";
 "An accomodation for elder computer users." = "An accomodation for elder computer users.";
 "Apple ABC (equivalent to English US)" = "Apple ABC (equivalent to English US)";
@@ -118,7 +119,7 @@
 "Debug Mode" = "Debug Mode";
 "Dictionary" = "Dictionary";
 "Emulating select-candidate-per-character mode" = "Emulating select-candidate-per-character mode";
-"Enable CNS11643 Support (2022-06-15)" = "Enable CNS11643 Support (2022-06-15)";
+"Enable CNS11643 Support (2022-07-20)" = "Enable CNS11643 Support (2022-07-20)";
 "Enable Space key for calling candidate window" = "Enable Space key for calling candidate window";
 "Enable symbol input support (incl. certain emoji symbols)" = "Enable symbol input support (incl. certain emoji symbols)";
 "English" = "English";

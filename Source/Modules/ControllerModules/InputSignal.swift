@@ -34,7 +34,7 @@ enum KeyCode: UInt16 {
   case kCarriageReturn = 36  // Renamed from "kReturn" to avoid nomenclatural confusions.
   case kTab = 48
   case kSpace = 49
-  case kSymbolMenuPhysicalKey = 50  // vChewing Specific
+  case kSymbolMenuPhysicalKeyIntl = 50  // vChewing Specific (Non-JIS)
   case kBackSpace = 51  // Renamed from "kDelete" to avoid nomenclatural confusions.
   case kEscape = 53
   case kCommand = 55
@@ -54,6 +54,7 @@ enum KeyCode: UInt16 {
   case kF18 = 79
   case kF19 = 80
   case kF20 = 90
+  case kSymbolMenuPhysicalKeyJIS = 94  // vChewing Specific (JIS)
   case kF5 = 96
   case kF6 = 97
   case kF7 = 98
@@ -108,6 +109,11 @@ enum KeyCodeBlackListed: UInt16 {
   case kF2 = 120
   case kF1 = 122
 }
+
+/// 數字小鍵盤區域的按鍵的 KeyCode。
+///
+/// 注意：第 95 號 Key Code（逗號）為 JIS 佈局特有的數字小鍵盤按鍵。
+let arrNumpadKeyCodes: [UInt16] = [65, 67, 69, 71, 75, 78, 81, 82, 83, 84, 85, 86, 87, 88, 89, 91, 92, 95]
 
 // CharCodes: https://theasciicode.com.ar/ascii-control-characters/horizontal-tab-ascii-code-9.html
 enum CharCode: UInt16 {
@@ -255,6 +261,11 @@ struct InputSignal: CustomStringConvertible {
     return code.rawValue != KeyCode.kNone.rawValue
   }
 
+  /// 單獨用 flags 來判定數字小鍵盤輸入的方法已經失效了，所以必須再增補用 KeyCode 判定的方法。
+  var isNumericPadAreaKey: Bool {
+    arrNumpadKeyCodes.contains(keyCode)
+  }
+
   var isTab: Bool {
     KeyCode(rawValue: keyCode) == KeyCode.kTab
   }
@@ -338,13 +349,13 @@ struct InputSignal: CustomStringConvertible {
 
   var isUpperCaseASCIILetterKey: Bool {
     // 這裡必須加上「flags == .shift」，否則會出現某些情況下輸入法「誤判當前鍵入的非 Shift 字符為大寫」的問題。
-    charCode >= 65 && charCode <= 90 && flags == .shift
+    (65...90).contains(charCode) && flags == .shift
   }
 
   var isSymbolMenuPhysicalKey: Bool {
     // 這裡必須用 KeyCode，這樣才不會受隨 macOS 版本更動的 Apple 動態注音鍵盤排列內容的影響。
     // 只是必須得與 ![input isShift] 搭配使用才可以（也就是僅判定 Shift 沒被摁下的情形）。
-    KeyCode(rawValue: keyCode) == KeyCode.kSymbolMenuPhysicalKey
+    [KeyCode.kSymbolMenuPhysicalKeyIntl, KeyCode.kSymbolMenuPhysicalKeyJIS].contains(KeyCode(rawValue: keyCode))
   }
 }
 

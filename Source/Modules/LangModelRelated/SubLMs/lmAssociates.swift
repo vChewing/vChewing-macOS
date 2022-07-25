@@ -42,7 +42,7 @@ extension vChewing {
       !rangeMap.isEmpty
     }
 
-    internal func cnvNgramKeyFromPinyinToPhona(target: String) -> String {
+    internal func cnvNGramKeyFromPinyinToPhona(target: String) -> String {
       guard target.contains("("), target.contains(","), target.contains(")") else {
         return target
       }
@@ -69,7 +69,7 @@ extension vChewing {
             if !theKey.isEmpty, theKey.first != "#" {
               for (i, _) in neta.filter({ $0.first != "#" && !$0.isEmpty }).enumerated() {
                 if i == 0 { continue }
-                rangeMap[cnvNgramKeyFromPinyinToPhona(target: theKey), default: []].append(($0, i))
+                rangeMap[cnvNGramKeyFromPinyinToPhona(target: theKey), default: []].append(($0, i))
               }
             }
           }
@@ -92,22 +92,6 @@ extension vChewing {
     public func dump() {
       // We remove this function in order to reduce out maintenance workload.
       // This function will be implemented only if further hard-necessity comes.
-    }
-
-    public func valuesFor(key: String) -> [String] {
-      var pairs: [String] = []
-      if let arrRangeRecords: [(Range<String.Index>, Int)] = rangeMap[key] {
-        for (netaRange, index) in arrRangeRecords {
-          let neta = strData[netaRange].split(separator: " ")
-          let theValue: String = .init(neta[index])
-          pairs.append(theValue)
-        }
-      }
-      return pairs
-    }
-
-    public func hasValuesFor(key: String) -> Bool {
-      rangeMap[key] != nil
     }
 
     public func valuesFor(pair: Megrez.KeyValuePaired) -> [String] {

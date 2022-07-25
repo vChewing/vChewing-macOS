@@ -20,7 +20,7 @@
 "29.title" = "字型大小設定:";
 "2iG-Ic-gbl.label" = "辭典";
 "2pS-nv-te4.title" = "選擇您所偏好的用來選字的按鍵組合。";
-"2Y6-Am-WM1.title" = "一般設定";
+"xibGeneralSettings.title" = "一般設定";
 "5.title" = "OtherViews";
 "6.title" = "微軟/大千/王安/國喬/零壹/仲鼎";
 "62u-jY-BRh.title" = "廉恥模式 // 取消勾選的話，敲錯字時會有異音";
@@ -41,6 +41,7 @@
 "BSK-bH-Gct.title" = "自動將繁體中文字轉換為康熙正體字";
 "cf2-se-PDO.title" = "辭典＆語言模型";
 "chkAllowBoostingSingleKanjiAsUserPhrase.title" = "將可以就地升權/排除的候選字詞的最短詞長設為單個漢字";
+"chkAlsoConfirmAssociatedCandidatesByEnter.title" = "允許使用 Enter 確認當前選中的聯想詞";
 "chkAutoCorrectReadingCombination.title" = "敲字時自動糾正讀音組合";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "在敲字時自動套用來自半衰記憶模組的建議";
 "chkUseFixecCandidateOrderOnSelection.title" = "以固定順序來陳列選字窗內的候選字";
@@ -48,7 +49,7 @@
 "E1l-m8-xgb.title" = "進階設定";
 "eia-1F-Do0.title" = "自動將繁體中文字轉換為日本簡化字（JIS 新字體）";
 "f2j-xD-4xK.title" = "敲 ESC 鍵以清空整個輸入緩衝區";
-"f8i-69-zxm.title" = "自動重新載入變更過的使用者數據內容";
+"f8i-69-zxm.title" = "自動重新載入變更過的使用者資料內容";
 "FnD-oH-El5.title" = "選字鍵:";
 "FSG-lN-CJO.title" = "英文";
 "FVC-br-H57.title" = "輪替候選字";
@@ -73,8 +74,8 @@
 "sZx-18-8dO.title" = "偵錯模式";
 "TXr-FF-ehw.title" = "繁體中文";
 "ueU-Rz-a1C.title" = "指定 (Shift+)Tab 熱鍵在選字窗內的輪替操作對象。";
-"Uyz-xL-TVN.title" = "輸出設定";
-"W24-T4-cg0.title" = "啟用 CNS11643 全字庫支援 (2022-06-15)";
+"xibOutputSettings.title" = "輸出設定";
+"W24-T4-cg0.title" = "啟用 CNS11643 全字庫支援 (2022-07-20)";
 "wFR-zX-M8H.title" = "拼音並擊（組字區與工具提示內顯示漢語拼音）";
 "wN3-k3-b2a.title" = "請在此指定您想指定的使用者語彙檔案目錄。無效值會被忽略。";
 "wQ9-px-b07.title" = "Apple 動態注音鍵盤佈局（大千與倚天）要求普通話/國音分析器的注音排列得配置為大千排列。";

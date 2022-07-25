@@ -157,10 +157,13 @@ DQ
                     </scrollView>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fbv-c6-gW8">
                         <rect key="frame" x="382" y="69" width="143" height="32"/>
-                        <buttonCell key="cell" type="push" title="Wiki" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ImH-h2-3FG">
+                        <buttonCell key="cell" type="push" title="Website" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ImH-h2-3FG">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <connections>
+                            <action selector="btnWebsite:" target="-1" id="WNO-E7-7UJ"/>
+                        </connections>
                     </button>
                 </subviews>
                 <constraints>

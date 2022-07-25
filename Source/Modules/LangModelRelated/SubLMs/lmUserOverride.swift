@@ -33,9 +33,11 @@ extension vChewing {
     var mutDecayExponent: Double
     var mutLRUList: [KeyObservationPair] = []
     var mutLRUMap: [String: KeyObservationPair] = [:]
-    let kDecayThreshold: Double = 1.0 / 1_048_576.0
+    let kDecayThreshold: Double = 1.0 / 1_048_576.0  // 衰減二十次之後差不多就失效了。
 
-    public init(capacity: Int = 500, decayConstant: Double = 5400.0) {
+    public static let kObservedOverrideHalfLife: Double = 3600.0 * 6  // 6 小時半衰一次，能持續不到六天的記憶。
+
+    public init(capacity: Int = 500, decayConstant: Double = LMUserOverride.kObservedOverrideHalfLife) {
       mutCapacity = max(capacity, 1)  // Ensures that this integer value is always > 0.
       mutDecayExponent = log(0.5) / decayConstant
     }
@@ -44,7 +46,8 @@ extension vChewing {
       walkedAnchors: [Megrez.NodeAnchor],
       cursorIndex: Int,
       candidate: String,
-      timestamp: Double
+      timestamp: Double,
+      saveCallback: @escaping () -> Void
     ) {
       let key = convertKeyFrom(walkedAnchors: walkedAnchors, cursorIndex: cursorIndex)
       guard !key.isEmpty else { return }
@@ -64,24 +67,35 @@ extension vChewing {
           mutLRUList.removeLast()
         }
         IME.prtDebugIntel("UOM: Observation finished with new observation: \(key)")
-        mgrLangModel.saveUserOverrideModelData()
+        saveCallback()
         return
       }
+      // 降低磁碟寫入次數。唯有失憶的情況下才會更新觀察且記憶。
       if var theNeta = mutLRUMap[key] {
-        theNeta.observation.update(candidate: candidate, timestamp: timestamp)
-        mutLRUList.insert(theNeta, at: 0)
-        mutLRUMap[key] = theNeta
-        IME.prtDebugIntel("UOM: Observation finished with existing observation: \(key)")
-        mgrLangModel.saveUserOverrideModelData()
+        _ = suggest(
+          walkedAnchors: walkedAnchors, cursorIndex: cursorIndex, timestamp: timestamp,
+          decayCallback: {
+            theNeta.observation.update(candidate: candidate, timestamp: timestamp)
+            self.mutLRUList.insert(theNeta, at: 0)
+            self.mutLRUMap[key] = theNeta
+            IME.prtDebugIntel("UOM: Observation finished with existing observation: \(key)")
+            saveCallback()
+          }
+        )
       }
     }
 
     public func suggest(
       walkedAnchors: [Megrez.NodeAnchor],
       cursorIndex: Int,
-      timestamp: Double
+      timestamp: Double,
+      decayCallback: @escaping () -> Void = {}
     ) -> [Megrez.Unigram] {
       let key = convertKeyFrom(walkedAnchors: walkedAnchors, cursorIndex: cursorIndex)
+      guard !key.isEmpty else {
+        IME.prtDebugIntel("UOM: Blank key generated on suggestion, aborting suggestion.")
+        return .init()
+      }
       let currentReadingKey = convertKeyFrom(walkedAnchors: walkedAnchors, cursorIndex: cursorIndex, readingOnly: true)
       guard let koPair = mutLRUMap[key] else {
         IME.prtDebugIntel("UOM: mutLRUMap[key] is nil, throwing blank suggestion for key: \(key).")
@@ -94,6 +108,7 @@ extension vChewing {
       var currentHighScore = 0.0
       for overrideNeta in Array(observation.overrides) {
         let override: Override = overrideNeta.value
+
         let overrideScore: Double = getScore(
           eventCount: override.count,
           totalCount: observation.count,
@@ -102,6 +117,16 @@ extension vChewing {
           lambda: mutDecayExponent
         )
         if (0...currentHighScore).contains(overrideScore) { continue }
+
+        let overrideDetectionScore: Double = getScore(
+          eventCount: override.count,
+          totalCount: observation.count,
+          eventTimestamp: override.timestamp,
+          timestamp: timestamp,
+          lambda: mutDecayExponent * 2
+        )
+        if (0...currentHighScore).contains(overrideDetectionScore) { decayCallback() }
+
         let newUnigram = Megrez.Unigram(
           keyValue: .init(key: currentReadingKey, value: overrideNeta.key), score: overrideScore
         )
@@ -270,13 +295,13 @@ extension vChewing.LMUserOverride {
 
 extension vChewing.LMUserOverride {
   /// 自 LRU 辭典內移除所有的單元圖。
-  public func bleachUnigrams() {
+  public func bleachUnigrams(saveCallback: @escaping () -> Void) {
     for key in mutLRUMap.keys {
       if !key.contains("(),()") { continue }
       mutLRUMap.removeValue(forKey: key)
     }
     resetMRUList()
-    mgrLangModel.saveUserOverrideModelData()
+    saveCallback()
   }
 
   internal func resetMRUList() {

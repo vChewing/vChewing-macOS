@@ -78,7 +78,12 @@ extension KeyHandler {
     // MARK: Enter
 
     if input.isEnter {
-      delegate!.keyHandler(
+      if state is InputState.AssociatedPhrases, !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter {
+        clear()
+        stateCallback(InputState.EmptyIgnoringPreviousState())
+        return true
+      }
+      delegate?.keyHandler(
         self,
         didSelectCandidateAt: ctlCandidateCurrent.selectedCandidateIndex,
         ctlCandidate: ctlCandidateCurrent
@@ -271,6 +276,7 @@ extension KeyHandler {
         } else {
           ctlCandidateCurrent.selectedCandidateIndex = candidates.count - 1
         }
+        return true
       }
     }
 
@@ -297,7 +303,7 @@ extension KeyHandler {
     if index != NSNotFound {
       let candidateIndex = ctlCandidateCurrent.candidateIndexAtKeyLabelIndex(index)
       if candidateIndex != Int.max {
-        delegate!.keyHandler(
+        delegate?.keyHandler(
           self, didSelectCandidateAt: candidateIndex, ctlCandidate: ctlCandidateCurrent
         )
         return true
@@ -337,7 +343,7 @@ extension KeyHandler {
       if shouldAutoSelectCandidate {
         let candidateIndex = ctlCandidateCurrent.candidateIndexAtKeyLabelIndex(0)
         if candidateIndex != Int.max {
-          delegate!.keyHandler(
+          delegate?.keyHandler(
             self,
             didSelectCandidateAt: candidateIndex,
             ctlCandidate: ctlCandidateCurrent

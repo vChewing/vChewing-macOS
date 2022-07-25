@@ -77,6 +77,7 @@ extension KeyHandler {
             /// 這裡先計算一下要用在工具提示當中的顯示參數的內容。
             switch compositor.cursor {
               case compositor.readings.count...:
+                // 這裡的 compositor.cursor 數值不可能大於 readings.count，因為會被 Megrez 自動糾正。
                 tooltipParameterRef[0] = compositor.readings[compositor.cursor - 1]
               case 0:
                 tooltipParameterRef[1] = compositor.readings[compositor.cursor]
@@ -328,7 +329,7 @@ extension KeyHandler {
     )
     if candidateState.candidates.count == 1 {
       clear()
-      if let candidateToCommit: (String, String) = candidateState.candidates.first {
+      if let candidateToCommit: (String, String) = candidateState.candidates.first, !candidateToCommit.1.isEmpty {
         stateCallback(InputState.Committing(textToCommit: candidateToCommit.1))
         stateCallback(InputState.Empty())
       } else {

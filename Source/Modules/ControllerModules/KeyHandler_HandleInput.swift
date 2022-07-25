@@ -108,9 +108,12 @@ extension KeyHandler {
 
     // MARK: 處理數字小鍵盤 (Numeric Pad Processing)
 
-    if input.isNumericPad {
-      if !input.isLeft, !input.isRight, !input.isDown,
-        !input.isUp, !input.isSpace, charCode.isPrintableASCII
+    // 這裡必須用「isNumericPadAreaKey」這個以 KeyCode 判定數字鍵區輸入的方法來鎖定按鍵範圍。
+    // 不然的話，會誤傷到在主鍵盤區域的功能鍵。
+    // 我們先規定允許小鍵盤區域操縱選字窗，其餘場合一律直接放行。
+    if input.isNumericPadAreaKey {
+      if !(state is InputState.ChoosingCandidate || state is InputState.AssociatedPhrases
+        || state is InputState.SymbolTable)
       {
         clear()
         stateCallback(InputState.Empty())
@@ -184,12 +187,12 @@ extension KeyHandler {
         // 小麥注音因為使用 OVMandarin，所以不需要這樣補。但鐵恨引擎對所有聲調一視同仁。
         composer.receiveKey(fromString: " ")
       }
-      let reading = composer.getComposition()  // 拿取用來進行索引檢索用的注音。
+      let readingKey = composer.getComposition()  // 拿取用來進行索引檢索用的注音。
       // 如果輸入法的辭典索引是漢語拼音的話，要注意上一行拿到的內容得是漢語拼音。
 
       // 向語言模型詢問是否有對應的記錄。
-      if !currentLM.hasUnigramsFor(key: reading) {
-        IME.prtDebugIntel("B49C0979：語彙庫內無「\(reading)」的匹配記錄。")
+      if !currentLM.hasUnigramsFor(key: readingKey) {
+        IME.prtDebugIntel("B49C0979：語彙庫內無「\(readingKey)」的匹配記錄。")
         errorCallback()
         composer.clear()
         // 根據「組字器是否為空」來判定回呼哪一種狀態。
@@ -198,7 +201,7 @@ extension KeyHandler {
       }
 
       // 將該讀音插入至組字器內的軌格當中。
-      compositor.insertReading(reading)
+      compositor.insertReading(readingKey)
 
       // 讓組字器反爬軌格。
       let textToCommit = commitOverflownCompositionAndWalk
@@ -359,7 +362,8 @@ extension KeyHandler {
           return handleInlineCandidateRotation(
             state: state, reverseModifier: false, stateCallback: stateCallback, errorCallback: errorCallback
           )
-        } else if input.isExtraChooseCandidateKeyReverse {
+        }
+        if input.isExtraChooseCandidateKeyReverse {
           return handleInlineCandidateRotation(
             state: state, reverseModifier: true, stateCallback: stateCallback, errorCallback: errorCallback
           )
@@ -469,6 +473,17 @@ extension KeyHandler {
       ) {
         return true
       }
+    }
+
+    // MARK: 全形/半形空白 (Full-Width / Half-Width Space)
+
+    /// 該功能僅可在當前組字區沒有任何內容的時候使用。
+    if state is InputState.Empty {
+      if input.isSpace, !input.isOptionHold, !input.isFunctionKeyHold, !input.isControlHold, !input.isCommandHold {
+        stateCallback(InputState.Committing(textToCommit: input.isShiftHold ? "　" : " "))
+      }
+      stateCallback(InputState.Empty())
+      return true
     }
 
     // MARK: - 終末處理 (Still Nothing)

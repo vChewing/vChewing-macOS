@@ -337,7 +337,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
     let enabled = mgrPrefs.halfWidthPunctuationEnabled
     mgrPrefs.halfWidthPunctuationEnabled = false
     let input = InputSignal(
-      inputText: " ", keyCode: KeyCode.kSymbolMenuPhysicalKey.rawValue, charCode: 0, flags: [],
+      inputText: " ", keyCode: KeyCode.kSymbolMenuPhysicalKeyIntl.rawValue, charCode: 0, flags: [],
       isVerticalTyping: false
     )
     var state: InputStateProtocol = InputState.Empty()
@@ -354,7 +354,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
     let enabled = mgrPrefs.halfWidthPunctuationEnabled
     mgrPrefs.halfWidthPunctuationEnabled = false
     let input = InputSignal(
-      inputText: " ", keyCode: KeyCode.kSymbolMenuPhysicalKey.rawValue, charCode: 0, flags: .option,
+      inputText: " ", keyCode: KeyCode.kSymbolMenuPhysicalKeyIntl.rawValue, charCode: 0, flags: .option,
       isVerticalTyping: false
     )
     var state: InputStateProtocol = InputState.Empty()
