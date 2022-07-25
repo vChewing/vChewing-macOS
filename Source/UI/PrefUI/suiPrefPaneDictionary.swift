@@ -101,7 +101,7 @@ struct suiPrefPaneDictionary: View {
                   return
                 }
               }
-            }  // End If self.window != nil
+            }
           } label: {
             Text("...")
           }
