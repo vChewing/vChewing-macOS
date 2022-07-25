@@ -276,6 +276,7 @@ extension KeyHandler {
         } else {
           ctlCandidateCurrent.selectedCandidateIndex = candidates.count - 1
         }
+        return true
       }
     }
 
