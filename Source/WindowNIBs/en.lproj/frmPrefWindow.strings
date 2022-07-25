@@ -41,6 +41,7 @@
 "BSK-bH-Gct.title" = "Auto-convert traditional Chinese glyphs to KangXi characters";
 "cf2-se-PDO.title" = "Dictionary and Language Models";
 "chkAllowBoostingSingleKanjiAsUserPhrase.title" = "Allow boosting / excluding a candidate of single kanji";
+"chkAlsoConfirmAssociatedCandidatesByEnter.title" = "Allow using Enter key to confirm associated candidate selection";
 "chkAutoCorrectReadingCombination.title" = "Automatically correct reading combinations when typing";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "Applying typing suggestions from half-life user override model";
 "chkUseFixecCandidateOrderOnSelection.title" = "Always use fixed listing order in candidate window";

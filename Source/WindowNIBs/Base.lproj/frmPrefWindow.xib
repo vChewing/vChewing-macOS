@@ -595,6 +595,16 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6MM-WC-Mpd">
+                    <rect key="frame" x="23" y="63.5" width="406" height="16"/>
+                    <buttonCell key="cell" type="check" title="Allow using Enter key to confirm associated candidate selection" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkAlsoConfirmAssociatedCandidatesByEnter">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="cellTitle"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="32" name="value" keyPath="values.AlsoConfirmAssociatedCandidatesByEnter" id="P1C-j9-N88"/>
+                    </connections>
+                </button>
             </subviews>
             <constraints>
                 <constraint firstItem="n7q-ew-DYu" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="37" id="2gT-9Z-6F4"/>
@@ -615,6 +625,7 @@
                 <constraint firstItem="13" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="24" id="T7d-82-oL1"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="j8R-Hj-3dj" secondAttribute="trailing" constant="20" symbolic="YES" id="Tbf-xc-NsF"/>
                 <constraint firstItem="j8R-Hj-3dj" firstAttribute="leading" secondItem="mzw-F2-aAQ" secondAttribute="leading" id="Tks-l3-dUt"/>
+                <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="6MM-WC-Mpd" secondAttribute="trailing" constant="34" id="VEQ-DQ-Fgq"/>
                 <constraint firstItem="7z2-DD-c58" firstAttribute="top" secondItem="15" secondAttribute="bottom" constant="4" id="VKv-YI-AS2"/>
                 <constraint firstItem="15" firstAttribute="top" secondItem="13" secondAttribute="bottom" constant="8" symbolic="YES" id="WHr-jO-a07"/>
                 <constraint firstItem="JG6-RM-ZdJ" firstAttribute="leading" secondItem="d5f-bq-dRQ" secondAttribute="trailing" constant="21" id="Y2r-b0-0l6"/>
@@ -622,6 +633,7 @@
                 <constraint firstItem="uHU-aL-du7" firstAttribute="top" secondItem="IpX-f7-rTL" secondAttribute="bottom" constant="8" symbolic="YES" id="aet-Zq-v6x"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="TMn-LX-3Ub" secondAttribute="trailing" constant="20" symbolic="YES" id="atz-4L-U9s"/>
                 <constraint firstItem="ETa-09-qWI" firstAttribute="top" secondItem="IpX-f7-rTL" secondAttribute="bottom" constant="11" id="cx2-US-uOU"/>
+                <constraint firstItem="6MM-WC-Mpd" firstAttribute="top" secondItem="j8R-Hj-3dj" secondAttribute="bottom" constant="5" id="dmy-Au-peI"/>
                 <constraint firstItem="YkJ-lr-EP6" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="37" id="e3v-m2-co7"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="109" secondAttribute="trailing" constant="20" symbolic="YES" id="ebL-Oq-Ode"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="bE0-Lq-Pj7" secondAttribute="trailing" constant="20" symbolic="YES" id="emk-wh-n8I"/>
@@ -629,6 +641,7 @@
                 <constraint firstItem="mzw-F2-aAQ" firstAttribute="top" secondItem="bE0-Lq-Pj7" secondAttribute="bottom" constant="6" symbolic="YES" id="hiH-dI-6Ql"/>
                 <constraint firstItem="bE0-Lq-Pj7" firstAttribute="top" secondItem="109" secondAttribute="bottom" constant="6" symbolic="YES" id="jRO-Gt-vAh"/>
                 <constraint firstItem="J0f-Aw-dxC" firstAttribute="top" secondItem="n7q-ew-DYu" secondAttribute="bottom" constant="8" symbolic="YES" id="m8L-ij-hQ9"/>
+                <constraint firstItem="6MM-WC-Mpd" firstAttribute="leading" secondItem="j8R-Hj-3dj" secondAttribute="leading" id="mbl-sV-kc8"/>
                 <constraint firstItem="mzw-F2-aAQ" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="24" id="pHT-DE-qdx"/>
                 <constraint firstItem="ETa-09-qWI" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="37" id="qFL-i6-eUT"/>
                 <constraint firstItem="JG6-RM-ZdJ" firstAttribute="top" secondItem="uHU-aL-du7" secondAttribute="bottom" constant="8" id="shS-7h-z7u"/>
@@ -639,7 +652,7 @@
                 <constraint firstItem="d5f-bq-dRQ" firstAttribute="top" secondItem="ETa-09-qWI" secondAttribute="bottom" constant="8" symbolic="YES" id="xCy-RL-joo"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="13" secondAttribute="trailing" constant="20" symbolic="YES" id="yxg-7J-xR5"/>
             </constraints>
-            <point key="canvasLocation" x="235" y="-158"/>
+            <point key="canvasLocation" x="234.5" y="-158"/>
         </visualEffectView>
         <visualEffectView blendingMode="behindWindow" material="sidebar" state="followsWindowActiveState" id="Rnp-LM-RIF" userLabel="vwrDictionary">
             <rect key="frame" x="0.0" y="0.0" width="463" height="250"/>

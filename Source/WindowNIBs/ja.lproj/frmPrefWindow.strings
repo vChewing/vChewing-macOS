@@ -41,6 +41,7 @@
 "BSK-bH-Gct.title" = "入力した繁体字を康熙字体と自動変換";
 "cf2-se-PDO.title" = "辞書と言語モデル";
 "chkAllowBoostingSingleKanjiAsUserPhrase.title" = "即排除/即最優先にできる候補の文字数の最低限は１字とする";
+"chkAlsoConfirmAssociatedCandidatesByEnter.title" = "Enter キーを連想語彙候補の確認のために使う";
 "chkAutoCorrectReadingCombination.title" = "入力中で打ち間違った発音組み合わせを自動的に訂正する";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "入力中で臨時記憶モジュールからお薦めの候補を自動的に選ぶ";
 "chkUseFixecCandidateOrderOnSelection.title" = "候補文字を固定順番で陳列する";
