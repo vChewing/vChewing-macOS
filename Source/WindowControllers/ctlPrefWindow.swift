@@ -287,6 +287,7 @@ class ctlPrefWindow: NSWindowController {
   }
 
   @IBAction func chooseUserDataFolderToSpecify(_: Any) {
+    guard let window = window else { return }
     IME.dlgOpenPath.title = NSLocalizedString(
       "Choose your desired user data folder.", comment: ""
     )
@@ -298,34 +299,32 @@ class ctlPrefWindow: NSWindowController {
     let bolPreviousFolderValidity = mgrLangModel.checkIfSpecifiedUserDataFolderValid(
       mgrPrefs.userDataFolderSpecified.expandingTildeInPath)
 
-    if window != nil {
-      IME.dlgOpenPath.beginSheetModal(for: window!) { result in
-        if result == NSApplication.ModalResponse.OK {
-          if IME.dlgOpenPath.url != nil {
-            // CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
-            // 所以要手動補回來。
-            var newPath = IME.dlgOpenPath.url!.path
-            newPath.ensureTrailingSlash()
-            if mgrLangModel.checkIfSpecifiedUserDataFolderValid(newPath) {
-              mgrPrefs.userDataFolderSpecified = newPath
-              IME.initLangModels(userOnly: true)
-              (NSApplication.shared.delegate as! AppDelegate).updateStreamHelperPath()
-            } else {
-              clsSFX.beep()
-              if !bolPreviousFolderValidity {
-                mgrPrefs.resetSpecifiedUserDataFolder()
-              }
-              return
+    IME.dlgOpenPath.beginSheetModal(for: window) { result in
+      if result == NSApplication.ModalResponse.OK {
+        if IME.dlgOpenPath.url != nil {
+          // CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
+          // 所以要手動補回來。
+          var newPath = IME.dlgOpenPath.url!.path
+          newPath.ensureTrailingSlash()
+          if mgrLangModel.checkIfSpecifiedUserDataFolderValid(newPath) {
+            mgrPrefs.userDataFolderSpecified = newPath
+            IME.initLangModels(userOnly: true)
+            (NSApplication.shared.delegate as! AppDelegate).updateStreamHelperPath()
+          } else {
+            clsSFX.beep()
+            if !bolPreviousFolderValidity {
+              mgrPrefs.resetSpecifiedUserDataFolder()
             }
+            return
           }
-        } else {
-          if !bolPreviousFolderValidity {
-            mgrPrefs.resetSpecifiedUserDataFolder()
-          }
-          return
         }
+      } else {
+        if !bolPreviousFolderValidity {
+          mgrPrefs.resetSpecifiedUserDataFolder()
+        }
+        return
       }
-    }  // End If self.window != nil
+    }
   }  // End IBAction
 }
 
