@@ -27,9 +27,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import Carbon
 import Cocoa
 
+private let kWindowTitleHeight: CGFloat = 78
+
+extension NSToolbarItem.Identifier {
+  fileprivate static let ofGeneral = NSToolbarItem.Identifier(rawValue: "tabGeneral")
+  fileprivate static let ofExperience = NSToolbarItem.Identifier(rawValue: "tabExperience")
+  fileprivate static let ofDictionary = NSToolbarItem.Identifier(rawValue: "tabDictionary")
+  fileprivate static let ofKeyboard = NSToolbarItem.Identifier(rawValue: "tabKeyboard")
+}
+
 // Please note that the class should be exposed using the same class name
 // in Objective-C in order to let IMK to see the same class name as
 // the "InputMethodServerPreferencesWindowControllerClass" in Info.plist.
+@objc(ctlPrefWindow)
 class ctlPrefWindow: NSWindowController {
   @IBOutlet var fontSizePopUpButton: NSPopUpButton!
   @IBOutlet var uiLanguageButton: NSPopUpButton!
@@ -39,10 +49,33 @@ class ctlPrefWindow: NSWindowController {
   @IBOutlet var chkTrad2JISShinjitai: NSButton!
   @IBOutlet var lblCurrentlySpecifiedUserDataFolder: NSTextFieldCell!
 
+  @IBOutlet var vwrGeneral: NSView!
+  @IBOutlet var vwrExperience: NSView!
+  @IBOutlet var vwrDictionary: NSView!
+  @IBOutlet var vwrKeyboard: NSView!
+
   var currentLanguageSelectItem: NSMenuItem?
 
   override func windowDidLoad() {
     super.windowDidLoad()
+
+    var preferencesTitleName = NSLocalizedString("vChewing Preferences…", comment: "")
+    preferencesTitleName.removeLast()
+
+    let toolbar = NSToolbar(identifier: "preference toolbar")
+    toolbar.allowsUserCustomization = false
+    toolbar.autosavesConfiguration = false
+    toolbar.sizeMode = .default
+    toolbar.delegate = self
+    toolbar.selectedItemIdentifier = .ofGeneral
+    toolbar.showsBaselineSeparator = true
+    window?.titlebarAppearsTransparent = false
+    if #available(macOS 11.0, *) {
+      window?.toolbarStyle = .preference
+    }
+    window?.toolbar = toolbar
+    window?.title = preferencesTitleName
+    use(view: vwrGeneral)
 
     lblCurrentlySpecifiedUserDataFolder.placeholderString = mgrLangModel.dataFolderPath(
       isDefaultFolder: true)
@@ -294,4 +327,109 @@ class ctlPrefWindow: NSWindowController {
       }
     }  // End If self.window != nil
   }  // End IBAction
+}
+
+extension ctlPrefWindow: NSToolbarDelegate {
+  func use(view: NSView) {
+    guard let window = window else {
+      return
+    }
+    window.contentView?.subviews.first?.removeFromSuperview()
+    let viewFrame = view.frame
+    var windowRect = window.frame
+    windowRect.size.height = kWindowTitleHeight + viewFrame.height
+    windowRect.size.width = viewFrame.width
+    windowRect.origin.y = window.frame.maxY - (viewFrame.height + kWindowTitleHeight)
+    window.setFrame(windowRect, display: true, animate: true)
+    window.contentView?.frame = view.bounds
+    window.contentView?.addSubview(view)
+  }
+
+  func toolbarDefaultItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
+    [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard]
+  }
+
+  func toolbarAllowedItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
+    [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard]
+  }
+
+  func toolbarSelectableItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
+    [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard]
+  }
+
+  @objc func showGeneralView(_: Any?) {
+    use(view: vwrGeneral)
+    window?.toolbar?.selectedItemIdentifier = .ofGeneral
+  }
+
+  @objc func showExperienceView(_: Any?) {
+    use(view: vwrExperience)
+    window?.toolbar?.selectedItemIdentifier = .ofExperience
+  }
+
+  @objc func showDictionaryView(_: Any?) {
+    use(view: vwrDictionary)
+    window?.toolbar?.selectedItemIdentifier = .ofDictionary
+  }
+
+  @objc func showKeyboardView(_: Any?) {
+    use(view: vwrKeyboard)
+    window?.toolbar?.selectedItemIdentifier = .ofKeyboard
+  }
+
+  func toolbar(
+    _: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier,
+    willBeInsertedIntoToolbar _: Bool
+  ) -> NSToolbarItem? {
+    let item = NSToolbarItem(itemIdentifier: itemIdentifier)
+    item.target = self
+    switch itemIdentifier {
+      case .ofGeneral:
+        let title = NSLocalizedString("General", comment: "")
+        item.label = title
+        if #available(macOS 11.0, *) {
+          item.image = NSImage(
+            systemSymbolName: "wrench.and.screwdriver.fill", accessibilityDescription: "General Preferences")
+        } else {
+          item.image = NSImage(named: NSImage.homeTemplateName)
+        }
+        item.action = #selector(showGeneralView(_:))
+
+      case .ofExperience:
+        let title = NSLocalizedString("Experience", comment: "")
+        item.label = title
+        if #available(macOS 11.0, *) {
+          item.image = NSImage(
+            systemSymbolName: "person.fill.questionmark", accessibilityDescription: "Experiences Preferences")
+        } else {
+          item.image = NSImage(named: NSImage.flowViewTemplateName)
+        }
+        item.action = #selector(showExperienceView(_:))
+
+      case .ofDictionary:
+        let title = NSLocalizedString("Dictionary", comment: "")
+        item.label = title
+        if #available(macOS 11.0, *) {
+          item.image = NSImage(
+            systemSymbolName: "character.book.closed.fill", accessibilityDescription: "Dictionary Preferences")
+        } else {
+          item.image = NSImage(named: NSImage.bookmarksTemplateName)
+        }
+        item.action = #selector(showDictionaryView(_:))
+
+      case .ofKeyboard:
+        let title = NSLocalizedString("Keyboard", comment: "")
+        item.label = title
+        if #available(macOS 11.0, *) {
+          item.image = NSImage(systemSymbolName: "keyboard.macwindow", accessibilityDescription: "Keyboard Preferences")
+        } else {
+          item.image = NSImage(named: NSImage.slideshowTemplateName)
+        }
+        item.action = #selector(showKeyboardView(_:))
+
+      default:
+        return nil
+    }
+    return item
+  }
 }
