@@ -120,6 +120,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
         keyHandler.clear()
         let composingBuffer = inputting.composingBuffer
         handle(state: InputState.Committing(textToCommit: composingBuffer))
+        // 此時是逐字選字模式，所以「selectedValue.1」是單個字、不用追加處理。
         if mgrPrefs.associatedPhrasesEnabled,
           let associatePhrases = keyHandler.buildAssociatePhraseState(
             withPair: .init(key: selectedValue.0, value: selectedValue.1),
@@ -139,16 +140,22 @@ extension ctlInputMethod: ctlCandidateDelegate {
     if let state = state as? InputState.AssociatedPhrases {
       let selectedValue = state.candidates[index]
       handle(state: InputState.Committing(textToCommit: selectedValue.1))
+      // 此時是聯想詞選字模式，所以「selectedValue.1」必須只保留最後一個字。
+      // 不然的話，一旦你選中了由多個字組成的聯想候選詞，則連續聯想會被打斷。
+      guard let valueKept = selectedValue.1.last else {
+        handle(state: InputState.Empty())
+        return
+      }
       if mgrPrefs.associatedPhrasesEnabled,
         let associatePhrases = keyHandler.buildAssociatePhraseState(
-          withPair: .init(key: selectedValue.0, value: selectedValue.1),
+          withPair: .init(key: selectedValue.0, value: String(valueKept)),
           isTypingVertical: state.isTypingVertical
         ), !associatePhrases.candidates.isEmpty
       {
         handle(state: associatePhrases)
-      } else {
-        handle(state: InputState.Empty())
+        return
       }
+      handle(state: InputState.Empty())
     }
   }
 }
