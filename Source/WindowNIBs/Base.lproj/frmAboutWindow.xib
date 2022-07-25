@@ -163,6 +163,16 @@ DQ
                             <action selector="btnWebsite:" target="-1" id="KjF-Ja-Vhz"/>
                         </connections>
                     </button>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OZj-DU-Oam">
+                        <rect key="frame" x="382" y="42" width="143" height="32"/>
+                        <buttonCell key="cell" type="push" title="Bug Report" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7SW-k9-sId">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="btnBugReport:" target="-1" id="ub1-rB-AED"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="9Pk-k3-0cO" secondAttribute="trailing" constant="20" symbolic="YES" id="0LE-Ck-Jy5"/>
@@ -174,6 +184,8 @@ DQ
                     <constraint firstItem="8M8-3C-BZO" firstAttribute="top" secondItem="8Ju-DR-2C8" secondAttribute="bottom" constant="8" symbolic="YES" id="82T-Pc-3db"/>
                     <constraint firstItem="2Gh-nq-Mng" firstAttribute="top" secondItem="bAv-ZO-Ihw" secondAttribute="bottom" constant="7" id="8EG-DW-AZM"/>
                     <constraint firstItem="Srh-ua-uQD" firstAttribute="top" secondItem="6Dx-DY-UG1" secondAttribute="bottom" constant="1" id="91b-Oo-tsv"/>
+                    <constraint firstItem="OZj-DU-Oam" firstAttribute="top" secondItem="8WL-H4-o1O" secondAttribute="bottom" constant="7" id="AeY-Pq-7ZD"/>
+                    <constraint firstItem="OZj-DU-Oam" firstAttribute="trailing" secondItem="8WL-H4-o1O" secondAttribute="trailing" id="BXO-np-u7F"/>
                     <constraint firstItem="d81-Fe-uNT" firstAttribute="top" secondItem="2Gh-nq-Mng" secondAttribute="bottom" constant="8" symbolic="YES" id="C6S-3S-QcT"/>
                     <constraint firstItem="2Gh-nq-Mng" firstAttribute="leading" secondItem="d81-Fe-uNT" secondAttribute="leading" id="CBk-Lx-b1d"/>
                     <constraint firstItem="bSu-np-tPT" firstAttribute="leading" secondItem="d81-Fe-uNT" secondAttribute="trailing" constant="18" id="E2b-7Z-Yjw"/>
@@ -190,6 +202,7 @@ DQ
                     <constraint firstItem="8Ju-DR-2C8" firstAttribute="leading" secondItem="8M8-3C-BZO" secondAttribute="leading" id="UrF-M2-wpG"/>
                     <constraint firstItem="eYM-F7-drf" firstAttribute="top" secondItem="8M8-3C-BZO" secondAttribute="bottom" constant="8" symbolic="YES" id="WIZ-YQ-chM"/>
                     <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="2Gh-nq-Mng" secondAttribute="bottom" constant="134" id="WJK-gw-zR7"/>
+                    <constraint firstItem="OZj-DU-Oam" firstAttribute="leading" secondItem="8WL-H4-o1O" secondAttribute="leading" id="Xhu-4a-33O"/>
                     <constraint firstItem="8WL-H4-o1O" firstAttribute="trailing" secondItem="bSu-np-tPT" secondAttribute="trailing" id="aEs-t7-H6v"/>
                     <constraint firstItem="9Pk-k3-0cO" firstAttribute="leading" secondItem="6Dx-DY-UG1" secondAttribute="trailing" constant="3" id="c3v-ZJ-usi"/>
                     <constraint firstItem="JkD-J1-Yeu" firstAttribute="top" secondItem="eYM-F7-drf" secondAttribute="bottom" constant="8" symbolic="YES" id="eqh-Gi-fS2"/>
