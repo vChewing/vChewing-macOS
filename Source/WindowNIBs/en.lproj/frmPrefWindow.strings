@@ -20,7 +20,7 @@
 "29.title" = "Candidate UI font size:";
 "2iG-Ic-gbl.label" = "Dictionary";
 "2pS-nv-te4.title" = "Choose which keys you prefer for selecting candidates.";
-"2Y6-Am-WM1.title" = "General Settings";
+"xibGeneralSettings.title" = "General Settings";
 "5.title" = "OtherViews";
 "6.title" = "Microsoft, Dachen, Wang, etc.";
 "62u-jY-BRh.title" = "Stop farting (when typed phonetic combination is invalid, etc.)";
@@ -74,7 +74,7 @@
 "sZx-18-8dO.title" = "Debug Mode";
 "TXr-FF-ehw.title" = "Traditional Chinese";
 "ueU-Rz-a1C.title" = "Choose the behavior of (Shift+)Tab key in the candidate window.";
-"Uyz-xL-TVN.title" = "Output Settings";
+"xibOutputSettings.title" = "Output Settings";
 "W24-T4-cg0.title" = "Enable CNS11643 Support (2022-06-15)";
 "wFR-zX-M8H.title" = "Show Hanyu-Pinyin in the inline composition buffer & tooltip";
 "wN3-k3-b2a.title" = "Choose your desired user data folder path. Will be omitted if invalid.";
