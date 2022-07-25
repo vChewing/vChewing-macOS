@@ -57,8 +57,8 @@ import Cocoa
     )
   }
 
-  @IBAction func btnWiki(_: NSButton) {
-    if let url = URL(string: "https://gitee.com/vchewing/vChewing-macOS/wikis") {
+  @IBAction func btnWebsite(_ sender: NSButton) {
+    if let url = URL(string: "https://vchewing.github.io/") {
       NSWorkspace.shared.open(url)
     }
   }
