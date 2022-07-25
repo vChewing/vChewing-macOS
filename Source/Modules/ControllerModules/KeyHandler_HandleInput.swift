@@ -475,6 +475,17 @@ extension KeyHandler {
       }
     }
 
+    // MARK: 全形/半形空白 (Full-Width / Half-Width Space)
+
+    /// 該功能僅可在當前組字區沒有任何內容的時候使用。
+    if state is InputState.Empty {
+      if input.isSpace, !input.isOptionHold, !input.isFunctionKeyHold, !input.isControlHold, !input.isCommandHold {
+        stateCallback(InputState.Committing(textToCommit: input.isShiftHold ? "　" : " "))
+      }
+      stateCallback(InputState.Empty())
+      return true
+    }
+
     // MARK: - 終末處理 (Still Nothing)
 
     /// 對剩下的漏網之魚做攔截處理、直接將當前狀態繼續回呼給 ctlInputMethod。
