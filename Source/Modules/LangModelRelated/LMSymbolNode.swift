@@ -100,6 +100,7 @@ class SymbolNode {
   private static let defaultSymbolRoot: SymbolNode = .init(
     "/",
     [
+      SymbolNode("　"),
       SymbolNode("｀"),
       SymbolNode(catCommonSymbols, symbols: "，、。．？！；：‧‥﹐﹒˙·‘’“”〝〞‵′〃～＄％＠＆＃＊"),
       SymbolNode(catHoriBrackets, symbols: "（）「」〔〕｛｝〈〉『』《》【】﹙﹚﹝﹞﹛﹜"),
