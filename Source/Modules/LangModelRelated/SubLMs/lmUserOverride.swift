@@ -92,6 +92,10 @@ extension vChewing {
       decayCallback: @escaping () -> Void = {}
     ) -> [Megrez.Unigram] {
       let key = convertKeyFrom(walkedAnchors: walkedAnchors, cursorIndex: cursorIndex)
+      guard !key.isEmpty else {
+        IME.prtDebugIntel("UOM: Blank key generated on suggestion, aborting suggestion.")
+        return .init()
+      }
       let currentReadingKey = convertKeyFrom(walkedAnchors: walkedAnchors, cursorIndex: cursorIndex, readingOnly: true)
       guard let koPair = mutLRUMap[key] else {
         IME.prtDebugIntel("UOM: mutLRUMap[key] is nil, throwing blank suggestion for key: \(key).")
