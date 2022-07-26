@@ -146,6 +146,17 @@ enum InputState {
       self.isTypingVertical = isTypingVertical
     }
 
+    var attributedString: NSMutableAttributedString {
+      let attributedString = NSMutableAttributedString(
+        string: " ",
+        attributes: [
+          .underlineStyle: NSUnderlineStyle.single.rawValue,
+          .markedClauseSegment: 0,
+        ]
+      )
+      return attributedString
+    }
+
     var description: String {
       "<InputState.AssociatedPhrases, candidates:\(candidates), isTypingVertical:\(isTypingVertical)>"
     }
