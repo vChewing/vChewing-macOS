@@ -37,6 +37,8 @@ struct suiPrefPaneKeyboard: View {
   @State private var selUsingHotKeyJIS = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyJIS)
   @State private var selUsingHotKeyHalfWidthASCII = UserDefaults.standard.bool(
     forKey: UserDef.kUsingHotKeyHalfWidthASCII)
+  @State private var selUsingHotKeyCurrencyNumerals = UserDefaults.standard.bool(
+    forKey: UserDef.kUsingHotKeyCurrencyNumerals)
 
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
@@ -173,6 +175,13 @@ struct suiPrefPaneKeyboard: View {
         ).onChange(of: selUsingHotKeyHalfWidthASCII) { value in
           mgrPrefs.usingHotKeyHalfWidthASCII = value
           selUsingHotKeyHalfWidthASCII = value
+        }
+        Toggle(
+          LocalizedStringKey("Currency Numeral Output"),
+          isOn: $selUsingHotKeyCurrencyNumerals
+        ).onChange(of: selUsingHotKeyCurrencyNumerals) { value in
+          mgrPrefs.usingHotKeyCurrencyNumerals = value
+          selUsingHotKeyCurrencyNumerals = value
         }
       }
     }
