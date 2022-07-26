@@ -64,6 +64,7 @@
 "Core Dict loading complete." = "核心辞典载入完毕";
 "Optimize Memorized Phrases" = "精简临时记忆语汇资料";
 "Clear Memorized Phrases" = "清除临时记忆语汇资料";
+"Currency Numeral Output" = "大写汉字数字输出";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";
