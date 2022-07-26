@@ -33,7 +33,7 @@ enum StateType {
   case ofDeactivated
   case ofAssociatedPhrases
   case ofEmpty
-  case ofEmptyIgnorePreviousState
+  case ofEmptyIgnoringPreviousState
   case ofCommitting
   case ofNotEmpty
   case ofInputting
@@ -70,7 +70,7 @@ protocol InputStateProtocol {
 ///   組字區內存入任何東西，所以該狀態不受 .NotEmpty 的管轄。
 /// - .Empty: 使用者剛剛切換至該輸入法、卻還沒有任何輸入行為。抑或是剛剛敲字遞交給
 ///   客體應用、準備新的輸入行為。
-/// - .EmptyIgnorePreviousState: 與 Empty 類似，但會扔掉上一個狀態的內容、不將這些
+/// - .EmptyIgnoringPreviousState: 與 Empty 類似，但會扔掉上一個狀態的內容、不將這些
 ///   內容遞交給客體應用。該狀態在處理完畢之後會被立刻切換至 .Empty()。
 /// - .Committing: 該狀態會承載要遞交出去的內容，讓輸入法控制器處理時代為遞交。
 /// - .NotEmpty: 非空狀態，是一種狀態大類、用以派生且代表下述諸狀態。
@@ -106,11 +106,11 @@ enum InputState {
 
   // MARK: -
 
-  /// .EmptyIgnorePreviousState: 與 Empty 類似，
+  /// .EmptyIgnoringPreviousState: 與 Empty 類似，
   /// 但會扔掉上一個狀態的內容、不將這些內容遞交給客體應用。
   /// 該狀態在處理完畢之後會被立刻切換至 .Empty()。
   class EmptyIgnoringPreviousState: Empty {
-    override public var type: StateType { .ofEmptyIgnorePreviousState }
+    override public var type: StateType { .ofEmptyIgnoringPreviousState }
     override var description: String {
       "<InputState.EmptyIgnoringPreviousState>"
     }
