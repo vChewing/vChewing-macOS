@@ -450,6 +450,8 @@ extension Sequence {
   }
 }
 
+// MARK: - Shell Extension
+
 extension NSApplication {
   public static func shell(_ command: String) throws -> String {
     let task = Process()
