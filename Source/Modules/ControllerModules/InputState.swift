@@ -126,6 +126,7 @@ enum InputState {
     convenience init(textToCommit: String) {
       self.init()
       self.textToCommit = textToCommit
+      ChineseConverter.ensureCurrencyNumerals(target: &self.textToCommit)
     }
 
     var description: String {
