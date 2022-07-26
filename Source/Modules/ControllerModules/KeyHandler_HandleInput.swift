@@ -78,8 +78,9 @@ extension KeyHandler {
     /// 這裡的處理原先是給威注音曾經有過的 Shift 切換英數模式來用的，但因為採 Chromium 核
     /// 心的瀏覽器會讓 IMK 無法徹底攔截對 Shift 鍵的單擊行為、導致這個模式的使用體驗非常糟
     /// 糕，故僅保留以 Caps Lock 驅動的英數模式。
-    if input.isBackSpace || input.isEnter || input.isAbsorbedArrowKey || input.isExtraChooseCandidateKey
-      || input.isExtraChooseCandidateKeyReverse || input.isCursorForward || input.isCursorBackward
+    if input.isBackSpace || input.isEnter
+      || input.isCursorClockLeft || input.isCursorClockRight
+      || input.isCursorForward || input.isCursorBackward
     {
       // 略過對 BackSpace 的處理。
     } else if input.isCapsLockOn {
@@ -265,9 +266,8 @@ extension KeyHandler {
     // MARK: 用上下左右鍵呼叫選字窗 (Calling candidate window using Up / Down or PageUp / PageDn.)
 
     if let currentState = state as? InputState.NotEmpty, composer.isEmpty, !input.isOptionHold,
-      input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
+      input.isCursorClockLeft || input.isCursorClockRight || input.isSpace
         || input.isPageDown || input.isPageUp || (input.isTab && mgrPrefs.specifyShiftTabKeyBehavior)
-        || (input.isTypingVertical && (input.isVerticalTypingCandidateKey))
     {
       if input.isSpace {
         /// 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
@@ -353,22 +353,22 @@ extension KeyHandler {
       return handleEnd(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 
-    // MARK: AbsorbedArrowKey
+    // MARK: Clock-Left & Clock-Right
 
-    if input.isAbsorbedArrowKey || input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse {
+    if input.isCursorClockLeft || input.isCursorClockRight {
       if input.isOptionHold, state is InputState.Inputting {
-        if input.isExtraChooseCandidateKey {
+        if input.isCursorClockRight {
           return handleInlineCandidateRotation(
             state: state, reverseModifier: false, stateCallback: stateCallback, errorCallback: errorCallback
           )
         }
-        if input.isExtraChooseCandidateKeyReverse {
+        if input.isCursorClockLeft {
           return handleInlineCandidateRotation(
             state: state, reverseModifier: true, stateCallback: stateCallback, errorCallback: errorCallback
           )
         }
       }
-      return handleAbsorbedArrowKey(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+      return handleClockKey(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 
     // MARK: Backspace

@@ -137,12 +137,10 @@ struct InputSignal: CustomStringConvertible {
   private(set) var keyCode: UInt16
   private var isFlagChanged: Bool
   private var flags: NSEvent.ModifierFlags
-  private var cursorForwardKey: KeyCode = .kNone
-  private var cursorBackwardKey: KeyCode = .kNone
-  private var extraChooseCandidateKey: KeyCode = .kNone
-  private var extraChooseCandidateKeyReverse: KeyCode = .kNone
-  private var absorbedArrowKey: KeyCode = .kNone
-  private var verticalTypingCandidateKey: KeyCode = .kNone
+  private var cursorForwardKey: KeyCode = .kNone  // 12 o'clock
+  private var cursorBackwardKey: KeyCode = .kNone  // 6 o'clock
+  private var cursorKeyClockRight: KeyCode = .kNone  // 3 o'clock
+  private var cursorKeyClockLeft: KeyCode = .kNone  // 9 o'clock
   private(set) var emacsKey: EmacsKey
 
   public init(
@@ -191,14 +189,25 @@ struct InputSignal: CustomStringConvertible {
   mutating func defineArrowKeys() {
     cursorForwardKey = isTypingVertical ? .kDownArrow : .kRightArrow
     cursorBackwardKey = isTypingVertical ? .kUpArrow : .kLeftArrow
-    extraChooseCandidateKey = isTypingVertical ? .kLeftArrow : .kDownArrow
-    extraChooseCandidateKeyReverse = isTypingVertical ? .kRightArrow : .kUpArrow
-    absorbedArrowKey = isTypingVertical ? .kRightArrow : .kUpArrow
-    verticalTypingCandidateKey = isTypingVertical ? absorbedArrowKey : .kNone
+    cursorKeyClockLeft = isTypingVertical ? .kRightArrow : .kUpArrow
+    cursorKeyClockRight = isTypingVertical ? .kLeftArrow : .kDownArrow
   }
 
   var description: String {
-    "<inputText:\(String(describing: inputText)), inputTextIgnoringModifiers:\(String(describing: inputTextIgnoringModifiers)) charCode:\(charCode), keyCode:\(keyCode), flags:\(flags), cursorForwardKey:\(cursorForwardKey), cursorBackwardKey:\(cursorBackwardKey), extraChooseCandidateKey:\(extraChooseCandidateKey), extraChooseCandidateKeyReverse:\(extraChooseCandidateKeyReverse), absorbedArrowKey:\(absorbedArrowKey),  verticalTypingCandidateKey:\(verticalTypingCandidateKey), emacsKey:\(emacsKey), isTypingVertical:\(isTypingVertical)>"
+    var result = "<[InputSignal] "
+    result += "inputText:\(String(describing: inputText)), "
+    result += "inputTextIgnoringModifiers:\(String(describing: inputTextIgnoringModifiers)), "
+    result += "charCode:\(charCode), "
+    result += "keyCode:\(keyCode), "
+    result += "flags:\(flags), "
+    result += "cursorForwardKey:\(cursorForwardKey), "
+    result += "cursorBackwardKey:\(cursorBackwardKey), "
+    result += "cursorKeyClockRight:\(cursorKeyClockRight), "
+    result += "cursorKeyClockLeft:\(cursorKeyClockLeft), "
+    result += "emacsKey:\(emacsKey), "
+    result += "isTypingVertical:\(isTypingVertical)"
+    result += ">"
+    return result
   }
 
   // 除了 ANSI charCode 以外，其餘一律過濾掉，免得純 Swift 版 KeyHandler 被餵屎。
@@ -248,10 +257,8 @@ struct InputSignal: CustomStringConvertible {
   var isDelete: Bool { KeyCode(rawValue: keyCode) == KeyCode.kWindowsDelete }
   var isCursorBackward: Bool { KeyCode(rawValue: keyCode) == cursorBackwardKey }
   var isCursorForward: Bool { KeyCode(rawValue: keyCode) == cursorForwardKey }
-  var isAbsorbedArrowKey: Bool { KeyCode(rawValue: keyCode) == absorbedArrowKey }
-  var isExtraChooseCandidateKey: Bool { KeyCode(rawValue: keyCode) == extraChooseCandidateKey }
-  var isExtraChooseCandidateKeyReverse: Bool { KeyCode(rawValue: keyCode) == extraChooseCandidateKeyReverse }
-  var isVerticalTypingCandidateKey: Bool { KeyCode(rawValue: keyCode) == verticalTypingCandidateKey }
+  var isCursorClockRight: Bool { KeyCode(rawValue: keyCode) == cursorKeyClockRight }
+  var isCursorClockLeft: Bool { KeyCode(rawValue: keyCode) == cursorKeyClockLeft }
 
   // 這裡必須加上「flags == .shift」，否則會出現某些情況下輸入法「誤判當前鍵入的非 Shift 字符為大寫」的問題。
   var isUpperCaseASCIILetterKey: Bool { (65...90).contains(charCode) && flags == .shift }
