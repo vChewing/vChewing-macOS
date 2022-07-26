@@ -44,7 +44,9 @@ extension KeyHandler {
     // MARK: 注音按鍵輸入處理 (Handle BPMF Keys)
 
     var keyConsumedByReading = false
-    let skipPhoneticHandling = input.isReservedKey || input.isControlHold || input.isOptionHold
+    let skipPhoneticHandling =
+      input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
+      || input.isControlHold || input.isOptionHold || input.isShiftHold || input.isCommandHold
 
     // 這裡 inputValidityCheck() 是讓注拼槽檢查 charCode 這個 UniChar 是否是合法的注音輸入。
     // 如果是的話，就將這次傳入的這個按鍵訊號塞入注拼槽內且標記為「keyConsumedByReading」。
