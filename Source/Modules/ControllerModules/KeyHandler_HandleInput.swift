@@ -45,16 +45,15 @@ extension KeyHandler {
     stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
+    // 如果按鍵訊號內的 inputTest 是空的話，則忽略該按鍵輸入，因為很可能是功能修飾鍵。
+    guard !input.inputText.isEmpty else { return false }
+
     let charCode: UniChar = input.charCode
+    let inputText: String = input.inputText
     var state = state  // 常數轉變數。
 
-    // 如果按鍵訊號內的 inputTest 是空的話，則忽略該按鍵輸入，因為很可能是功能修飾鍵。
-    guard let inputText: String = input.inputText, !inputText.isEmpty else {
-      return false
-    }
-
     // 提前過濾掉一些不合規的按鍵訊號輸入，免得相關按鍵訊號被送給 Megrez 引發輸入法崩潰。
-    if input.isInvalidInput {
+    if input.isInvalid {
       // 在「.Empty(IgnoringPreviousState) 與 .Deactivated」狀態下的首次不合規按鍵輸入可以直接放行。
       // 因為「.EmptyIgnorePreviousState」會在處理之後被自動轉為「.Empty」，所以不需要單獨判斷。
       if state is InputState.Empty || state is InputState.Deactivated {
@@ -68,7 +67,7 @@ extension KeyHandler {
 
     // 如果當前組字器為空的話，就不再攔截某些修飾鍵，畢竟這些鍵可能會會用來觸發某些功能。
     let isFunctionKey: Bool =
-      input.isControlHotKey || (input.isCommandHold || input.isOptionHotKey || input.isNumericPad)
+      input.isControlHotKey || (input.isCommandHold || input.isOptionHotKey || input.isNonLaptopFunctionKey)
     if !(state is InputState.NotEmpty) && !(state is InputState.AssociatedPhrases) && isFunctionKey {
       return false
     }
@@ -108,10 +107,10 @@ extension KeyHandler {
 
     // MARK: 處理數字小鍵盤 (Numeric Pad Processing)
 
-    // 這裡必須用「isNumericPadAreaKey」這個以 KeyCode 判定數字鍵區輸入的方法來鎖定按鍵範圍。
-    // 不然的話，會誤傷到在主鍵盤區域的功能鍵。
+    // 這裡的「isNumericPadKey」處理邏輯已經改成用 KeyCode 判定數字鍵區輸入、以鎖定按鍵範圍。
+    // 不然、使用 Cocoa 內建的 flags 的話，會誤傷到在主鍵盤區域的功能鍵。
     // 我們先規定允許小鍵盤區域操縱選字窗，其餘場合一律直接放行。
-    if input.isNumericPadAreaKey {
+    if input.isNumericPadKey {
       if !(state is InputState.ChoosingCandidate || state is InputState.AssociatedPhrases
         || state is InputState.SymbolTable)
       {
@@ -268,7 +267,7 @@ extension KeyHandler {
     if let currentState = state as? InputState.NotEmpty, composer.isEmpty, !input.isOptionHold,
       input.isExtraChooseCandidateKey || input.isExtraChooseCandidateKeyReverse || input.isSpace
         || input.isPageDown || input.isPageUp || (input.isTab && mgrPrefs.specifyShiftTabKeyBehavior)
-        || (input.isTypingVertical && (input.isVerticalTypingOnlyChooseCandidateKey))
+        || (input.isTypingVertical && (input.isVerticalTypingCandidateKey))
     {
       if input.isSpace {
         /// 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
@@ -479,11 +478,11 @@ extension KeyHandler {
 
     /// 該功能僅可在當前組字區沒有任何內容的時候使用。
     if state is InputState.Empty {
-      if input.isSpace, !input.isOptionHold, !input.isFunctionKeyHold, !input.isControlHold, !input.isCommandHold {
+      if input.isSpace, !input.isOptionHold, !input.isControlHold, !input.isCommandHold {
         stateCallback(InputState.Committing(textToCommit: input.isShiftHold ? "　" : " "))
+        stateCallback(InputState.Empty())
+        return true
       }
-      stateCallback(InputState.Empty())
-      return true
     }
 
     // MARK: - 終末處理 (Still Nothing)

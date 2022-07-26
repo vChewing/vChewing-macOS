@@ -288,7 +288,7 @@ extension KeyHandler {
 
     var index: Int = NSNotFound
     let match: String =
-      (state is InputState.AssociatedPhrases) ? input.inputTextIgnoringModifiers ?? "" : inputText ?? ""
+      (state is InputState.AssociatedPhrases) ? input.inputTextIgnoringModifiers ?? "" : inputText
 
     var j = 0
     while j < ctlCandidateCurrent.keyLabels.count {

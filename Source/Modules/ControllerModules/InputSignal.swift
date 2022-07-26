@@ -128,7 +128,7 @@ enum CharCode: UInt16 {
 
 struct InputSignal: CustomStringConvertible {
   private(set) var isTypingVertical: Bool
-  private(set) var inputText: String?
+  private(set) var inputText: String
   private(set) var inputTextIgnoringModifiers: String?
   private(set) var charCode: UInt16
   private(set) var keyCode: UInt16
@@ -139,16 +139,16 @@ struct InputSignal: CustomStringConvertible {
   private var extraChooseCandidateKey: KeyCode = .kNone
   private var extraChooseCandidateKeyReverse: KeyCode = .kNone
   private var absorbedArrowKey: KeyCode = .kNone
-  private var verticalTypingOnlyChooseCandidateKey: KeyCode = .kNone
+  private var verticalTypingCandidateKey: KeyCode = .kNone
   private(set) var emacsKey: EmacsKey
 
   public init(
-    inputText: String?, keyCode: UInt16, charCode: UInt16, flags: NSEvent.ModifierFlags,
+    inputText: String = "", keyCode: UInt16, charCode: UInt16, flags: NSEvent.ModifierFlags,
     isVerticalTyping: Bool = false, inputTextIgnoringModifiers: String? = nil
   ) {
-    self.inputText = AppleKeyboardConverter.cnvStringApple2ABC(inputText ?? "")
+    self.inputText = AppleKeyboardConverter.cnvStringApple2ABC(inputText)
     self.inputTextIgnoringModifiers = AppleKeyboardConverter.cnvStringApple2ABC(
-      inputTextIgnoringModifiers ?? inputText ?? "")
+      inputTextIgnoringModifiers ?? inputText)
     self.flags = flags
     isFlagChanged = false
     isTypingVertical = isVerticalTyping
@@ -164,7 +164,7 @@ struct InputSignal: CustomStringConvertible {
   public init(event: NSEvent, isVerticalTyping: Bool = false) {
     inputText = AppleKeyboardConverter.cnvStringApple2ABC(event.characters ?? "")
     inputTextIgnoringModifiers = AppleKeyboardConverter.cnvStringApple2ABC(
-      event.charactersIgnoringModifiers ?? "")
+      event.charactersIgnoringModifiers ?? inputText)
     keyCode = event.keyCode
     flags = event.modifierFlags
     isFlagChanged = (event.type == .flagsChanged)
@@ -191,170 +191,64 @@ struct InputSignal: CustomStringConvertible {
     extraChooseCandidateKey = isTypingVertical ? .kLeftArrow : .kDownArrow
     extraChooseCandidateKeyReverse = isTypingVertical ? .kRightArrow : .kUpArrow
     absorbedArrowKey = isTypingVertical ? .kRightArrow : .kUpArrow
-    verticalTypingOnlyChooseCandidateKey = isTypingVertical ? absorbedArrowKey : .kNone
+    verticalTypingCandidateKey = isTypingVertical ? absorbedArrowKey : .kNone
   }
 
   var description: String {
-    "<inputText:\(String(describing: inputText)), inputTextIgnoringModifiers:\(String(describing: inputTextIgnoringModifiers)) charCode:\(charCode), keyCode:\(keyCode), flags:\(flags), cursorForwardKey:\(cursorForwardKey), cursorBackwardKey:\(cursorBackwardKey), extraChooseCandidateKey:\(extraChooseCandidateKey), extraChooseCandidateKeyReverse:\(extraChooseCandidateKeyReverse), absorbedArrowKey:\(absorbedArrowKey),  verticalTypingOnlyChooseCandidateKey:\(verticalTypingOnlyChooseCandidateKey), emacsKey:\(emacsKey), isTypingVertical:\(isTypingVertical)>"
+    "<inputText:\(String(describing: inputText)), inputTextIgnoringModifiers:\(String(describing: inputTextIgnoringModifiers)) charCode:\(charCode), keyCode:\(keyCode), flags:\(flags), cursorForwardKey:\(cursorForwardKey), cursorBackwardKey:\(cursorBackwardKey), extraChooseCandidateKey:\(extraChooseCandidateKey), extraChooseCandidateKeyReverse:\(extraChooseCandidateKeyReverse), absorbedArrowKey:\(absorbedArrowKey),  verticalTypingCandidateKey:\(verticalTypingCandidateKey), emacsKey:\(emacsKey), isTypingVertical:\(isTypingVertical)>"
   }
 
   // 除了 ANSI charCode 以外，其餘一律過濾掉，免得純 Swift 版 KeyHandler 被餵屎。
-  var isInvalidInput: Bool {
-    switch charCode {
-      case 0x20...0xFF:  // ANSI charCode 範圍
-        return false
-      default:
-        if isReservedKey, !isKeyCodeBlacklisted {
-          return false
-        }
-        return true
-    }
-  }
+  var isInvalid: Bool { (0x20...0xFF).contains(charCode) ? false : !(isReservedKey && !isKeyCodeBlacklisted) }
 
   var isKeyCodeBlacklisted: Bool {
-    guard let code = KeyCodeBlackListed(rawValue: keyCode) else {
-      return false
-    }
+    guard let code = KeyCodeBlackListed(rawValue: keyCode) else { return false }
     return code.rawValue != KeyCode.kNone.rawValue
   }
 
-  var isShiftHold: Bool {
-    flags.contains([.shift])
-  }
-
-  var isCommandHold: Bool {
-    flags.contains([.command])
-  }
-
-  var isControlHold: Bool {
-    flags.contains([.control])
-  }
-
-  var isControlHotKey: Bool {
-    flags.contains([.control]) && inputText?.first?.isLetter ?? false
-  }
-
-  var isOptionHold: Bool {
-    flags.contains([.option])
-  }
-
-  var isOptionHotKey: Bool {
-    flags.contains([.option]) && inputText?.first?.isLetter ?? false
-  }
-
-  var isCapsLockOn: Bool {
-    flags.contains([.capsLock])
-  }
-
-  var isNumericPad: Bool {
-    flags.contains([.numericPad])
-  }
-
-  var isFunctionKeyHold: Bool {
-    flags.contains([.function])
-  }
-
   var isReservedKey: Bool {
-    guard let code = KeyCode(rawValue: keyCode) else {
-      return false
-    }
+    guard let code = KeyCode(rawValue: keyCode) else { return false }
     return code.rawValue != KeyCode.kNone.rawValue
   }
 
   /// 單獨用 flags 來判定數字小鍵盤輸入的方法已經失效了，所以必須再增補用 KeyCode 判定的方法。
-  var isNumericPadAreaKey: Bool {
-    arrNumpadKeyCodes.contains(keyCode)
-  }
+  var isNumericPadKey: Bool { arrNumpadKeyCodes.contains(keyCode) }
+  var isShiftHold: Bool { flags.contains([.shift]) }
+  var isCommandHold: Bool { flags.contains([.command]) }
+  var isControlHold: Bool { flags.contains([.control]) }
+  var isControlHotKey: Bool { flags.contains([.control]) && inputText.first?.isLetter ?? false }
+  var isOptionHold: Bool { flags.contains([.option]) }
+  var isOptionHotKey: Bool { flags.contains([.option]) && inputText.first?.isLetter ?? false }
+  var isCapsLockOn: Bool { flags.contains([.capsLock]) }
+  var isFunctionKeyHold: Bool { flags.contains([.function]) }
+  var isNonLaptopFunctionKey: Bool { flags.contains([.numericPad]) && !isNumericPadKey }
+  var isEnter: Bool { [KeyCode.kCarriageReturn, KeyCode.kLineFeed].contains(KeyCode(rawValue: keyCode)) }
+  var isTab: Bool { KeyCode(rawValue: keyCode) == KeyCode.kTab }
+  var isUp: Bool { KeyCode(rawValue: keyCode) == KeyCode.kUpArrow }
+  var isDown: Bool { KeyCode(rawValue: keyCode) == KeyCode.kDownArrow }
+  var isLeft: Bool { KeyCode(rawValue: keyCode) == KeyCode.kLeftArrow }
+  var isRight: Bool { KeyCode(rawValue: keyCode) == KeyCode.kRightArrow }
+  var isPageUp: Bool { KeyCode(rawValue: keyCode) == KeyCode.kPageUp }
+  var isPageDown: Bool { KeyCode(rawValue: keyCode) == KeyCode.kPageDown }
+  var isSpace: Bool { KeyCode(rawValue: keyCode) == KeyCode.kSpace }
+  var isBackSpace: Bool { KeyCode(rawValue: keyCode) == KeyCode.kBackSpace }
+  var isEsc: Bool { KeyCode(rawValue: keyCode) == KeyCode.kEscape }
+  var isHome: Bool { KeyCode(rawValue: keyCode) == KeyCode.kHome }
+  var isEnd: Bool { KeyCode(rawValue: keyCode) == KeyCode.kEnd }
+  var isDelete: Bool { KeyCode(rawValue: keyCode) == KeyCode.kWindowsDelete }
+  var isCursorBackward: Bool { KeyCode(rawValue: keyCode) == cursorBackwardKey }
+  var isCursorForward: Bool { KeyCode(rawValue: keyCode) == cursorForwardKey }
+  var isAbsorbedArrowKey: Bool { KeyCode(rawValue: keyCode) == absorbedArrowKey }
+  var isExtraChooseCandidateKey: Bool { KeyCode(rawValue: keyCode) == extraChooseCandidateKey }
+  var isExtraChooseCandidateKeyReverse: Bool { KeyCode(rawValue: keyCode) == extraChooseCandidateKeyReverse }
+  var isVerticalTypingCandidateKey: Bool { KeyCode(rawValue: keyCode) == verticalTypingCandidateKey }
 
-  var isTab: Bool {
-    KeyCode(rawValue: keyCode) == KeyCode.kTab
-  }
+  // 這裡必須加上「flags == .shift」，否則會出現某些情況下輸入法「誤判當前鍵入的非 Shift 字符為大寫」的問題。
+  var isUpperCaseASCIILetterKey: Bool { (65...90).contains(charCode) && flags == .shift }
 
-  var isEnter: Bool {
-    (KeyCode(rawValue: keyCode) == KeyCode.kCarriageReturn)
-      || (KeyCode(rawValue: keyCode) == KeyCode.kLineFeed)
-  }
-
-  var isUp: Bool {
-    KeyCode(rawValue: keyCode) == KeyCode.kUpArrow
-  }
-
-  var isDown: Bool {
-    KeyCode(rawValue: keyCode) == KeyCode.kDownArrow
-  }
-
-  var isLeft: Bool {
-    KeyCode(rawValue: keyCode) == KeyCode.kLeftArrow
-  }
-
-  var isRight: Bool {
-    KeyCode(rawValue: keyCode) == KeyCode.kRightArrow
-  }
-
-  var isPageUp: Bool {
-    KeyCode(rawValue: keyCode) == KeyCode.kPageUp
-  }
-
-  var isPageDown: Bool {
-    KeyCode(rawValue: keyCode) == KeyCode.kPageDown
-  }
-
-  var isSpace: Bool {
-    KeyCode(rawValue: keyCode) == KeyCode.kSpace
-  }
-
-  var isBackSpace: Bool {
-    KeyCode(rawValue: keyCode) == KeyCode.kBackSpace
-  }
-
-  var isEsc: Bool {
-    KeyCode(rawValue: keyCode) == KeyCode.kEscape
-  }
-
-  var isHome: Bool {
-    KeyCode(rawValue: keyCode) == KeyCode.kHome
-  }
-
-  var isEnd: Bool {
-    KeyCode(rawValue: keyCode) == KeyCode.kEnd
-  }
-
-  var isDelete: Bool {
-    KeyCode(rawValue: keyCode) == KeyCode.kWindowsDelete
-  }
-
-  var isCursorBackward: Bool {
-    KeyCode(rawValue: keyCode) == cursorBackwardKey
-  }
-
-  var isCursorForward: Bool {
-    KeyCode(rawValue: keyCode) == cursorForwardKey
-  }
-
-  var isAbsorbedArrowKey: Bool {
-    KeyCode(rawValue: keyCode) == absorbedArrowKey
-  }
-
-  var isExtraChooseCandidateKey: Bool {
-    KeyCode(rawValue: keyCode) == extraChooseCandidateKey
-  }
-
-  var isExtraChooseCandidateKeyReverse: Bool {
-    KeyCode(rawValue: keyCode) == extraChooseCandidateKeyReverse
-  }
-
-  var isVerticalTypingOnlyChooseCandidateKey: Bool {
-    KeyCode(rawValue: keyCode) == verticalTypingOnlyChooseCandidateKey
-  }
-
-  var isUpperCaseASCIILetterKey: Bool {
-    // 這裡必須加上「flags == .shift」，否則會出現某些情況下輸入法「誤判當前鍵入的非 Shift 字符為大寫」的問題。
-    (65...90).contains(charCode) && flags == .shift
-  }
-
+  // 這裡必須用 KeyCode，這樣才不會受隨 macOS 版本更動的 Apple 動態注音鍵盤排列內容的影響。
+  // 只是必須得與 ![input isShift] 搭配使用才可以（也就是僅判定 Shift 沒被摁下的情形）。
   var isSymbolMenuPhysicalKey: Bool {
-    // 這裡必須用 KeyCode，這樣才不會受隨 macOS 版本更動的 Apple 動態注音鍵盤排列內容的影響。
-    // 只是必須得與 ![input isShift] 搭配使用才可以（也就是僅判定 Shift 沒被摁下的情形）。
     [KeyCode.kSymbolMenuPhysicalKeyIntl, KeyCode.kSymbolMenuPhysicalKeyJIS].contains(KeyCode(rawValue: keyCode))
   }
 }
