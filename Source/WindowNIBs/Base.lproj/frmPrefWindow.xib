@@ -184,7 +184,7 @@
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vwf-Kq-s8M" userLabel="chkShowHanyuPinyinInCompositionBuffer">
-                    <rect key="frame" x="19" y="122.5" width="401" height="16"/>
+                    <rect key="frame" x="19" y="121.5" width="401" height="16"/>
                     <buttonCell key="cell" type="check" title="Show Hanyu-Pinyin in the inline composition buffer &amp; tooltip" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="wFR-zX-M8H">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="cellTitle"/>
@@ -195,7 +195,7 @@
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gZ0-OK-r7a" userLabel="InlineDumpPinyinInLieuOfZhuyin">
-                    <rect key="frame" x="19" y="101.5" width="401" height="16"/>
+                    <rect key="frame" x="19" y="100.5" width="401" height="16"/>
                     <buttonCell key="cell" type="check" title="Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="iWy-Nw-QKB">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="cellTitle"/>
@@ -281,7 +281,7 @@
                 <constraint firstItem="Ldp-U1-36g" firstAttribute="leading" secondItem="5Rz-c8-hp9" secondAttribute="leading" id="AJV-6w-zzb"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Ldp-U1-36g" secondAttribute="trailing" constant="20" symbolic="YES" id="CGs-3y-UKf"/>
                 <constraint firstItem="gZ0-OK-r7a" firstAttribute="leading" secondItem="E66-0o-wJZ" secondAttribute="leading" id="COA-Gy-V6W"/>
-                <constraint firstItem="E66-0o-wJZ" firstAttribute="top" secondItem="gZ0-OK-r7a" secondAttribute="bottom" constant="20" id="FEO-KC-ere"/>
+                <constraint firstItem="E66-0o-wJZ" firstAttribute="top" secondItem="gZ0-OK-r7a" secondAttribute="bottom" constant="19" id="FEO-KC-ere"/>
                 <constraint firstItem="da1-7e-els" firstAttribute="top" relation="lessThanOrEqual" secondItem="233" secondAttribute="bottom" constant="6" id="GPh-Pz-Koa"/>
                 <constraint firstItem="19" firstAttribute="top" secondItem="Yl4-Ar-L6r" secondAttribute="bottom" constant="6" id="HLS-hW-sXe"/>
                 <constraint firstItem="233" firstAttribute="top" secondItem="19" secondAttribute="bottom" constant="5" id="IRf-SV-AoA"/>
@@ -303,7 +303,7 @@
                 <constraint firstItem="h4r-Sp-LBI" firstAttribute="trailing" secondItem="pYB-E5-4Nv" secondAttribute="trailing" id="eyF-ME-nzz"/>
                 <constraint firstItem="23" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="BUt-lg-GPp" secondAttribute="leading" constant="20" symbolic="YES" id="fVo-zM-hxe"/>
                 <constraint firstItem="90" firstAttribute="leading" secondItem="oS6-u5-7dP" secondAttribute="leading" id="h1Q-UC-WWd"/>
-                <constraint firstItem="vwf-Kq-s8M" firstAttribute="top" secondItem="pYB-E5-4Nv" secondAttribute="bottom" constant="5" id="iDF-SS-g0P"/>
+                <constraint firstItem="vwf-Kq-s8M" firstAttribute="top" secondItem="pYB-E5-4Nv" secondAttribute="bottom" constant="6" id="iDF-SS-g0P"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="da1-7e-els" secondAttribute="trailing" constant="20" symbolic="YES" id="iM3-gf-fp7"/>
                 <constraint firstItem="L5M-VG-W1X" firstAttribute="top" secondItem="5Rz-c8-hp9" secondAttribute="bottom" constant="9" id="iZF-3e-q0g"/>
                 <constraint firstItem="L5M-VG-W1X" firstAttribute="baseline" secondItem="oS6-u5-7dP" secondAttribute="baseline" constant="-1" id="inK-mb-fEf"/>
