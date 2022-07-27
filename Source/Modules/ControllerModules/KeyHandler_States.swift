@@ -509,7 +509,7 @@ extension KeyHandler {
   ///   - stateCallback: 狀態回呼。
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
-  func handleAbsorbedArrowKey(
+  func handleClockKey(
     state: InputStateProtocol,
     stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void

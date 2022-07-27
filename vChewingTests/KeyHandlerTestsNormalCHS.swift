@@ -296,7 +296,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
     XCTAssertTrue(state is InputState.Empty, "\(state)")
   }
 
-  func testisNumericPad() {
+  func testisNumericPadKey() {
     var input = InputSignal(inputText: "b", keyCode: 0, charCode: charCode("b"), flags: [], isVerticalTyping: false)
     var state: InputStateProtocol = InputState.Empty()
     _ = handler.handle(input: input, state: state) { newState in
@@ -304,7 +304,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
     } errorCallback: {
     }
     input = InputSignal(
-      inputText: "1", keyCode: 0, charCode: charCode("1"), flags: .numericPad, isVerticalTyping: false
+      inputText: "1", keyCode: 83, charCode: charCode("1"), flags: [], isVerticalTyping: false
     )
     var count = 0
     var empty: InputStateProtocol = InputState.Empty()

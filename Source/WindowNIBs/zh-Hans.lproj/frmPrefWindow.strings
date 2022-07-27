@@ -20,7 +20,6 @@
 "29.title" = "字型大小设定:";
 "2iG-Ic-gbl.label" = "辞典";
 "2pS-nv-te4.title" = "选择您所偏好的用来选字的按键组合。";
-"xibGeneralSettings.title" = "一般设定";
 "5.title" = "OtherViews";
 "6.title" = "微软/大千/王安/国乔/零壹/仲鼎";
 "62u-jY-BRh.title" = "廉耻模式 // 取消勾选的话，敲错字时会有异音";
@@ -74,15 +73,17 @@
 "sZx-18-8dO.title" = "侦错模式";
 "TXr-FF-ehw.title" = "繁体中文";
 "ueU-Rz-a1C.title" = "指定 (Shift+)Tab 热键在选字窗内的轮替操作对象。";
-"xibOutputSettings.title" = "输出设定";
 "W24-T4-cg0.title" = "启用 CNS11643 全字库支援 (2022-07-20)";
 "wFR-zX-M8H.title" = "拼音并击（组字区与工具提示内显示汉语拼音）";
 "wN3-k3-b2a.title" = "请在此指定您想指定的使用者语汇档案目录。无效值会被忽略。";
 "wQ9-px-b07.title" = "Apple 动态注音键盘布局（大千与倚天）要求普通话/国音分析器的注音排列得配置为大千排列。";
 "Wvt-HE-LOv.title" = "键盘布局";
 "xC5-yV-1W1.title" = "选择您所偏好的候选字窗布局。";
+"xibGeneralSettings.title" = "一般设定";
 "xibKeyboardShortcuts.title" = "键盘快捷键";
 "xibLabelBufferLimit.title" = "组字区容量:";
+"xibOutputSettings.title" = "输出设定";
+"xibUsingCurrencyNumerals.title" = "大写汉字数字输出";
 "xibUsingHotKeyAssociates.title" = "逐字选字联想模式";
 "xibUsingHotKeyCNS.title" = "全字库模式";
 "xibUsingHotKeyHalfWidthASCII.title" = "半形标点模式";

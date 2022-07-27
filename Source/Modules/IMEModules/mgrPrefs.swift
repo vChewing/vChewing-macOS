@@ -45,6 +45,7 @@ struct UserDef {
   static let kSymbolInputEnabled = "SymbolInputEnabled"
   static let kChineseConversionEnabled = "ChineseConversionEnabled"
   static let kShiftJISShinjitaiOutputEnabled = "ShiftJISShinjitaiOutputEnabled"
+  static let kCurrencyNumeralsEnabled = "CurrencyNumeralsEnabled"
   static let kHalfWidthPunctuationEnabled = "HalfWidthPunctuationEnable"
   static let kMoveCursorAfterSelectingCandidate = "MoveCursorAfterSelectingCandidate"
   static let kEscToCleanInputBuffer = "EscToCleanInputBuffer"
@@ -74,6 +75,7 @@ struct UserDef {
   static let kUsingHotKeyKangXi = "UsingHotKeyKangXi"
   static let kUsingHotKeyJIS = "UsingHotKeyJIS"
   static let kUsingHotKeyHalfWidthASCII = "UsingHotKeyHalfWidthASCII"
+  static let kUsingHotKeyCurrencyNumerals = "UsingHotKeyCurrencyNumerals"
 }
 
 private let kDefaultCandidateListTextSize: CGFloat = 18
@@ -286,6 +288,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.alsoConfirmAssociatedCandidatesByEnter, forKey: UserDef.kAlsoConfirmAssociatedCandidatesByEnter
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.currencyNumeralsEnabled, forKey: UserDef.kCurrencyNumeralsEnabled
+    )
 
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeySCPC, forKey: UserDef.kUsingHotKeySCPC)
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyAssociates, forKey: UserDef.kUsingHotKeyAssociates)
@@ -293,6 +298,7 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyKangXi, forKey: UserDef.kUsingHotKeyKangXi)
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyJIS, forKey: UserDef.kUsingHotKeyJIS)
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyHalfWidthASCII, forKey: UserDef.kUsingHotKeyHalfWidthASCII)
+    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyCurrencyNumerals, forKey: UserDef.kUsingHotKeyCurrencyNumerals)
 
     UserDefaults.standard.synchronize()
   }
@@ -456,6 +462,14 @@ public enum mgrPrefs {
     return shiftJISShinjitaiOutputEnabled
   }
 
+  @UserDefault(key: UserDef.kCurrencyNumeralsEnabled, defaultValue: false)
+  static var currencyNumeralsEnabled: Bool
+
+  static func toggleCurrencyNumeralsEnabled() -> Bool {
+    currencyNumeralsEnabled = !currencyNumeralsEnabled
+    return currencyNumeralsEnabled
+  }
+
   @UserDefault(key: UserDef.kHalfWidthPunctuationEnabled, defaultValue: false)
   static var halfWidthPunctuationEnabled: Bool
 
@@ -584,6 +598,9 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kUsingHotKeyHalfWidthASCII, defaultValue: true)
   static var usingHotKeyHalfWidthASCII: Bool
+
+  @UserDefault(key: UserDef.kUsingHotKeyCurrencyNumerals, defaultValue: true)
+  static var usingHotKeyCurrencyNumerals: Bool
 }
 
 // MARK: Snapshot Extension
@@ -609,6 +626,7 @@ extension mgrPrefs {
       UserDef.kUsingHotKeyAssociates, UserDef.kUsingHotKeyCNS, UserDef.kUsingHotKeyKangXi, UserDef.kUsingHotKeyJIS,
       UserDef.kUsingHotKeyHalfWidthASCII, UserDef.kUseFixecCandidateOrderOnSelection,
       UserDef.kAutoCorrectReadingCombination, UserDef.kAlsoConfirmAssociatedCandidatesByEnter,
+      UserDef.kCurrencyNumeralsEnabled, UserDef.kUsingHotKeyCurrencyNumerals,
     ]
   }
 

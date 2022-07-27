@@ -79,6 +79,13 @@ extension ctlInputMethod {
       shiftJISConversionItem.state = mgrPrefs.shiftJISShinjitaiOutputEnabled.state
     }
 
+    let currencyNumeralsItem = menu.addItem(
+      withTitle: NSLocalizedString("Currency Numeral Output", comment: ""),
+      action: #selector(toggleCurrencyNumerals(_:)), keyEquivalent: mgrPrefs.usingHotKeyCurrencyNumerals ? "M" : ""
+    )
+    currencyNumeralsItem.keyEquivalentModifierMask = [.command, .control]
+    currencyNumeralsItem.state = mgrPrefs.currencyNumeralsEnabled.state
+
     let halfWidthPunctuationItem = menu.addItem(
       withTitle: NSLocalizedString("Half-Width Punctuation Mode", comment: ""),
       action: #selector(toggleHalfWidthPunctuation(_:)), keyEquivalent: mgrPrefs.usingHotKeyHalfWidthASCII ? "H" : ""
@@ -240,6 +247,17 @@ extension ctlInputMethod {
       message: String(
         format: "%@%@%@", NSLocalizedString("JIS Shinjitai Output", comment: ""), "\n",
         mgrPrefs.toggleShiftJISShinjitaiOutputEnabled()
+          ? NSLocalizedString("NotificationSwitchON", comment: "")
+          : NSLocalizedString("NotificationSwitchOFF", comment: "")
+      ))
+  }
+
+  @objc func toggleCurrencyNumerals(_: Any?) {
+    resetKeyHandler()
+    NotifierController.notify(
+      message: String(
+        format: "%@%@%@", NSLocalizedString("Currency Numeral Output", comment: ""), "\n",
+        mgrPrefs.toggleCurrencyNumeralsEnabled()
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: "")
       ))

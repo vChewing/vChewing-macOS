@@ -63,6 +63,14 @@ extension ctlInputMethod {
 
   /// 針對受 .NotEmpty() 管轄的非空狀態，在組字區內顯示游標。
   private func setInlineDisplayWithCursor() {
+    if let state = state as? InputState.AssociatedPhrases {
+      client().setMarkedText(
+        state.attributedString, selectionRange: NSRange(location: 0, length: 0),
+        replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
+      )
+      return
+    }
+
     guard let state = state as? InputState.NotEmpty else {
       clearInlineDisplay()
       return
@@ -225,7 +233,7 @@ extension ctlInputMethod {
   private func handle(state: InputState.AssociatedPhrases, previous: InputStateProtocol) {
     _ = previous  // 防止格式整理工具毀掉與此對應的參數。
     ctlInputMethod.tooltipController.hide()
-    clearInlineDisplay()
+    setInlineDisplayWithCursor()
     show(candidateWindowWith: state)
   }
 }

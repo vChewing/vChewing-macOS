@@ -29,6 +29,7 @@ import Foundation
 class SymbolNode {
   var title: String
   var children: [SymbolNode]?
+  var previous: SymbolNode?
 
   init(_ title: String, _ children: [SymbolNode]? = nil) {
     self.title = title
