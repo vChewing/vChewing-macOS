@@ -440,8 +440,11 @@ enum InputState {
     override public var type: StateType { .ofSymbolTable }
     var node: SymbolNode
 
-    init(node: SymbolNode, isTypingVertical: Bool) {
+    init(node: SymbolNode, previous: SymbolNode? = nil, isTypingVertical: Bool) {
       self.node = node
+      if let previous = previous {
+        self.node.previous = previous
+      }
       let candidates = node.children?.map(\.title) ?? [String]()
       super.init(
         composingBuffer: "", cursorIndex: 0, candidates: candidates.map { ("", $0) },

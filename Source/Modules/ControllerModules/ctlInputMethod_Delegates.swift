@@ -101,7 +101,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
       if let children = node.children, !children.isEmpty {
         handle(state: InputState.Empty())  // 防止縱橫排選字窗同時出現
         handle(
-          state: InputState.SymbolTable(node: node, isTypingVertical: state.isTypingVertical)
+          state: InputState.SymbolTable(node: node, previous: state.node, isTypingVertical: state.isTypingVertical)
         )
       } else {
         handle(state: InputState.Committing(textToCommit: node.title))

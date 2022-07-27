@@ -59,7 +59,7 @@ extension KeyHandler {
       || ((input.isCursorBackward || input.isCursorForward) && input.isShiftHold)
 
     if cancelCandidateKey {
-      if (state is InputState.AssociatedPhrases)
+      if state is InputState.AssociatedPhrases
         || mgrPrefs.useSCPCTypingMode
         || compositor.isEmpty
       {
@@ -71,6 +71,9 @@ extension KeyHandler {
         stateCallback(InputState.EmptyIgnoringPreviousState())
       } else {
         stateCallback(buildInputtingState)
+      }
+      if let state = state as? InputState.SymbolTable, let nodePrevious = state.node.previous {
+        stateCallback(InputState.SymbolTable(node: nodePrevious, isTypingVertical: state.isTypingVertical))
       }
       return true
     }
