@@ -44,6 +44,7 @@
 "chkAutoCorrectReadingCombination.title" = "入力中で打ち間違った発音組み合わせを自動的に訂正する";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "入力中で臨時記憶モジュールからお薦めの候補を自動的に選ぶ";
 "chkUseFixecCandidateOrderOnSelection.title" = "候補文字を固定順番で陳列する";
+"DbW-eq-ZdB.title" = "星光";
 "dIN-TZ-67g.title" = "Shift+Space で次のページ、Space で次の候補文字を";
 "E1l-m8-xgb.title" = "詳細設定";
 "eia-1F-Do0.title" = "入力した繁体字を日文 JIS 新字体と自動変換";
@@ -73,6 +74,7 @@
 "sZx-18-8dO.title" = "欠陥辿着モード";
 "TXr-FF-ehw.title" = "繁体中国語";
 "ueU-Rz-a1C.title" = "入力候補陳列での (Shift+)Tab キーの輪番切替対象をご指定ください。";
+"vpd-zx-GIk.title" = "精業配列";
 "W24-T4-cg0.title" = "全字庫モード // 入力可能の漢字数倍増 (2022-07-20)";
 "wFR-zX-M8H.title" = "弁音合併入力（入力緩衝列とヒントで音読みを漢語弁音に）";
 "wN3-k3-b2a.title" = "欲しがるユーザー辞書保存先をご指定ください。無効の保存先設定は効かぬ。";
