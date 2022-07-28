@@ -127,7 +127,7 @@
 "Eten 26" = "Eten 26";
 "Eten Traditional" = "Eten Traditional";
 "Experience" = "Experience";
-"Fake Seigyou" = "Fake Seigyou";
+"Fake Seigyou" = "Fake Seigyou (Similar to JinYei)";
 "Follow OS settings" = "Follow OS settings";
 "for cycling candidates" = "for cycling candidates";
 "for cycling pages" = "for cycling pages";
@@ -149,6 +149,7 @@
 "Phonetic Parser:" = "Phonetic Parser:";
 "Push the cursor in front of the phrase after selection" = "Push the cursor in front of the phrase after selection";
 "Secondary Pinyin with Numeral Intonation" = "Secondary Pinyin with Numeral Intonation";
+"Seigyou" = "Seigyou (JinYei)";
 "Selection Keys:" = "Selection Keys:";
 "Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "Show Hanyu-Pinyin in the inline composition buffer & tooltip";
 "Show page buttons in candidate window" = "Show page buttons in candidate window";
@@ -157,6 +158,7 @@
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Space to +cycle candidates, Shift+Space to +cycle pages";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "Space to +cycle pages, Shift+Space to +cycle candidates";
 "Specify the maximum characters allowed in the composition buffer." = "Specify the maximum characters allowed in the composition buffer.";
+"Starlight" = "Starlight";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "Stop farting (when typed phonetic combination is invalid, etc.)";
 "Traditional Chinese" = "Traditional Chinese";
 "Typing Style:" = "Typing Style:";

@@ -150,6 +150,7 @@
 "Phonetic Parser:" = "注音排列:";
 "Push the cursor in front of the phrase after selection" = "在选字后将游标置于该字词的前方";
 "Secondary Pinyin with Numeral Intonation" = "国音二式+数字标调";
+"Seigyou" = "精业排列";
 "Selection Keys:" = "选字键:";
 "Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "拼音并击（组字区与工具提示内显示汉语拼音）";
 "Show page buttons in candidate window" = "在选字窗内显示翻页按钮";
@@ -158,6 +159,7 @@
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+空格键 换下一页，空格键 换选下一个后选字";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "空格键 换下一页，Shift+空格键 换选下一个后选字";
 "Specify the maximum characters allowed in the composition buffer." = "请指定组字缓冲区内的文字数的上限。";
+"Starlight" = "星光排列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉耻模式 // 取消勾选的话，敲错字时会有异音";
 "Traditional Chinese" = "繁体中文";
 "Typing Style:" = "输入风格:";

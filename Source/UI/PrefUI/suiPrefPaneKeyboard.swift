@@ -60,13 +60,18 @@ struct suiPrefPaneKeyboard: View {
           Picker("", selection: $selMandarinParser) {
             Group {
               Text(LocalizedStringKey("Dachen (Microsoft Standard / Wang / 01, etc.)")).tag(0)
-              Text(LocalizedStringKey("Dachen 26 (libChewing)")).tag(7)
               Text(LocalizedStringKey("Eten Traditional")).tag(1)
-              Text(LocalizedStringKey("Eten 26")).tag(3)
               Text(LocalizedStringKey("IBM")).tag(4)
-              Text(LocalizedStringKey("Hsu")).tag(2)
               Text(LocalizedStringKey("MiTAC")).tag(5)
+              Text(LocalizedStringKey("Seigyou")).tag(8)
               Text(LocalizedStringKey("Fake Seigyou")).tag(6)
+            }
+            Divider()
+            Group {
+              Text(LocalizedStringKey("Dachen 26 (libChewing)")).tag(7)
+              Text(LocalizedStringKey("Eten 26")).tag(3)
+              Text(LocalizedStringKey("Hsu")).tag(2)
+              Text(LocalizedStringKey("Starlight")).tag(9)
             }
             Divider()
             Group {
