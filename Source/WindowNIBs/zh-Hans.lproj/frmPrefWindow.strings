@@ -44,6 +44,7 @@
 "chkAutoCorrectReadingCombination.title" = "敲字时自动纠正读音组合";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "在敲字时自动套用来自半衰记忆模组的建议";
 "chkUseFixecCandidateOrderOnSelection.title" = "以固定顺序来陈列选字窗内的候选字";
+"DbW-eq-ZdB.title" = "星光";
 "dIN-TZ-67g.title" = "Shift+Space 换下一页，Space 换选下一个候选字。";
 "E1l-m8-xgb.title" = "进阶设定";
 "eia-1F-Do0.title" = "自动将繁体中文字转换为日本简化字（JIS 新字体）";
@@ -73,6 +74,7 @@
 "sZx-18-8dO.title" = "侦错模式";
 "TXr-FF-ehw.title" = "繁体中文";
 "ueU-Rz-a1C.title" = "指定 (Shift+)Tab 热键在选字窗内的轮替操作对象。";
+"vpd-zx-GIk.title" = "精业";
 "W24-T4-cg0.title" = "启用 CNS11643 全字库支援 (2022-07-20)";
 "wFR-zX-M8H.title" = "拼音并击（组字区与工具提示内显示汉语拼音）";
 "wN3-k3-b2a.title" = "请在此指定您想指定的使用者语汇档案目录。无效值会被忽略。";

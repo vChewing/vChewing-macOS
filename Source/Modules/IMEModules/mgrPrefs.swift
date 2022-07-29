@@ -189,6 +189,8 @@ enum MandarinParser: Int {
   case ofMiTAC = 5
   case ofFakeSeigyou = 6
   case ofDachen26 = 7
+  case ofSeigyou = 8
+  case ofStarlight = 9
   case ofHanyuPinyin = 10
   case ofSecondaryPinyin = 11
   case ofYalePinyin = 12
@@ -213,6 +215,10 @@ enum MandarinParser: Int {
         return "FakeSeigyou"
       case .ofDachen26:
         return "Dachen26"
+      case .ofSeigyou:
+        return "Seigyou"
+      case .ofStarlight:
+        return "Starlight"
       case .ofHanyuPinyin:
         return "HanyuPinyin"
       case .ofSecondaryPinyin:

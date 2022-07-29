@@ -149,6 +149,7 @@
 "Phonetic Parser:" = "注音配列:";
 "Push the cursor in front of the phrase after selection" = "候補選択の直後、すぐカーソルを単語の向こうに推し進める";
 "Secondary Pinyin with Numeral Intonation" = "国音二式 (ローマ字+数字音調)";
+"Seigyou" = "精業配列";
 "Selection Keys:" = "言選り用キー:";
 "Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "弁音合併入力（入力緩衝列とヒントで音読みを漢語弁音に）";
 "Show page buttons in candidate window" = "入力候補陳列の側にページボタンを表示";
@@ -157,6 +158,7 @@
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+Space で次のページ、Space で次の候補文字を";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "Space で次のページ、Shift+Space で次の候補文字を";
 "Specify the maximum characters allowed in the composition buffer." = "緩衝列に入れる文字の数の上限をご指定ください。";
+"Starlight" = "星光配列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "マナーモード // 外すと入力間違った時に変な声が出る";
 "Traditional Chinese" = "繁体中国語";
 "Typing Style:" = "入力習慣:";

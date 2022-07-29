@@ -317,6 +317,10 @@ class KeyHandler {
         composer.ensureParser(arrange: .ofMiTAC)
       case MandarinParser.ofFakeSeigyou.rawValue:
         composer.ensureParser(arrange: .ofFakeSeigyou)
+      case MandarinParser.ofSeigyou.rawValue:
+        composer.ensureParser(arrange: .ofSeigyou)
+      case MandarinParser.ofStarlight.rawValue:
+        composer.ensureParser(arrange: .ofStarlight)
       case MandarinParser.ofHanyuPinyin.rawValue:
         composer.ensureParser(arrange: .ofHanyuPinyin)
       case MandarinParser.ofSecondaryPinyin.rawValue:
