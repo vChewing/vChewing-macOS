@@ -49,6 +49,8 @@ protocol KeyHandlerDelegate {
 class KeyHandler {
   /// 半衰模組的衰減指數
   let kEpsilon: Double = 0.000001
+  /// 檢測是否出現游標切斷組字圈內字符的情況
+  var isCursorCuttingChar = false
 
   /// 規定最大動態爬軌範圍。組字器內超出該範圍的節錨都會被自動標記為「已經手動選字過」，減少爬軌運算負擔。
   let kMaxComposingBufferNeedsToWalkSize = Int(max(12, ceil(Double(mgrPrefs.composingBufferSize) / 2)))

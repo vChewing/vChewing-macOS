@@ -156,7 +156,11 @@ extension KeyHandler {
 
     /// 給工具提示設定提示配色。
     if !stateResult.tooltip.isEmpty {
+      isCursorCuttingChar = true
       ctlInputMethod.tooltipController.setColor(state: .denialOverflow)
+    } else {
+      isCursorCuttingChar = false
+      ctlInputMethod.tooltipController.setColor(state: .normal)
     }
 
     return stateResult
@@ -659,6 +663,7 @@ extension KeyHandler {
         stateCallback(state)
       }
     } else if input.isOptionHold {
+      isCursorCuttingChar = false
       if input.isControlHold {
         return handleEnd(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
       }
@@ -673,7 +678,12 @@ extension KeyHandler {
     } else {
       if compositor.cursor < compositor.length {
         compositor.cursor += 1
-        stateCallback(buildInputtingState)
+        var inputtingState = buildInputtingState
+        if isCursorCuttingChar == true {
+          compositor.jumpCursorBySpan(to: .front)
+          inputtingState = buildInputtingState
+        }
+        stateCallback(inputtingState)
       } else {
         IME.prtDebugIntel("A96AAD58")
         errorCallback()
@@ -727,6 +737,7 @@ extension KeyHandler {
         stateCallback(state)
       }
     } else if input.isOptionHold {
+      isCursorCuttingChar = false
       if input.isControlHold {
         return handleHome(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
       }
@@ -741,7 +752,12 @@ extension KeyHandler {
     } else {
       if compositor.cursor > 0 {
         compositor.cursor -= 1
-        stateCallback(buildInputtingState)
+        var inputtingState = buildInputtingState
+        if isCursorCuttingChar == true {
+          compositor.jumpCursorBySpan(to: .rear)
+          inputtingState = buildInputtingState
+        }
+        stateCallback(inputtingState)
       } else {
         IME.prtDebugIntel("7045E6F3")
         errorCallback()
