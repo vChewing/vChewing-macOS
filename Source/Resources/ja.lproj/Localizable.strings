@@ -37,7 +37,7 @@
 "Please specify at least 4 candidate keys." = "言選り用キー陣列に少なくとも４つのキーをご登録ください。";
 "Maximum 15 candidate keys allowed." = "言選り用キー陣列には最多１５つキー登録できます。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 言葉置換機能稼働中、新添付言葉にも影響。";
-"⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 緩衝列の字数は読みの数と不同等のため、対処不可。";
+"⚠︎ Beware: Chars and Readings in buffer doesn't match." = "⚠︎ 注意：緩衝列の字数は読みの数と不同等。";
 "Per-Char Select Mode" = "全候補入力モード";
 "CNS11643 Mode" = "全字庫モード";
 "JIS Shinjitai Output" = "JIS 新字体モード";

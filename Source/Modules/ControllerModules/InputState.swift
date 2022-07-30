@@ -264,9 +264,9 @@ enum InputState {
     private var deleteTargetExists = false
     var tooltip: String {
       if composingBuffer.count != readings.count {
-        ctlInputMethod.tooltipController.setColor(state: .redAlert)
+        ctlInputMethod.tooltipController.setColor(state: .denialOverflow)
         return NSLocalizedString(
-          "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.", comment: ""
+          "⚠︎ Beware: Chars and Readings in buffer doesn't match.", comment: ""
         )
       }
       if mgrPrefs.phraseReplacementEnabled {
@@ -376,14 +376,9 @@ enum InputState {
     }
 
     var validToWrite: Bool {
-      /// The input method allows users to input a string whose length differs
-      /// from the amount of Bopomofo readings. In this case, the range
-      /// in the composing buffer and the readings could not match, so
-      /// we disable the function to write user phrases in this case.
-      /// 這裡的 deleteTargetExists 是防止使用者排除「詞庫內尚未存在的詞」，
-      /// 免得使用者誤操作之後靠北「我怎麼敲不了這個詞？」之類的。
-      ((composingBuffer.count != readings.count)
-        || (ctlInputMethod.areWeDeleting && !deleteTargetExists))
+      /// 與小麥注音不同，威注音會自動解消「游標插斷字符」的異常狀態，所以允許在字音長度不相符的情況下加詞。
+      /// 這裡的 deleteTargetExists 是防止使用者排除「詞庫內尚未存在的詞」。
+      (ctlInputMethod.areWeDeleting && !deleteTargetExists)
         ? false
         : allowedMarkRange.contains(literalMarkedRange.count)
     }
