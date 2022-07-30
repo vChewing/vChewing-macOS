@@ -293,14 +293,12 @@ extension KeyHandler {
     let match: String =
       (state is InputState.AssociatedPhrases) ? input.inputTextIgnoringModifiers ?? "" : inputText
 
-    var j = 0
-    while j < ctlCandidateCurrent.keyLabels.count {
+    for j in 0..<ctlCandidateCurrent.keyLabels.count {
       let label: CandidateKeyLabel = ctlCandidateCurrent.keyLabels[j]
       if match.compare(label.key, options: .caseInsensitive, range: nil, locale: .current) == .orderedSame {
         index = j
         break
       }
-      j += 1
     }
 
     if index != NSNotFound {

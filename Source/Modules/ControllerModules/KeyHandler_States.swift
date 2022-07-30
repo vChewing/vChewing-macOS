@@ -57,47 +57,46 @@ extension KeyHandler {
       if readingCursorIndex + spanningLength <= compositor.cursor {
         composedStringCursorIndex += strNodeValue.utf16.count
         readingCursorIndex += spanningLength
-      } else {
-        if codepointCount == spanningLength {
-          var i = 0
-          while i < codepointCount, readingCursorIndex < compositor.cursor {
-            composedStringCursorIndex += arrSplit[i].utf16.count
-            readingCursorIndex += 1
-            i += 1
-          }
+        continue
+      }
+      if codepointCount == spanningLength {
+        for i in 0..<codepointCount {
+          guard readingCursorIndex < compositor.cursor else { continue }
+          composedStringCursorIndex += arrSplit[i].utf16.count
+          readingCursorIndex += 1
+        }
+        continue
+      }
+      guard readingCursorIndex < compositor.cursor else { continue }
+      composedStringCursorIndex += strNodeValue.utf16.count
+      readingCursorIndex += spanningLength
+      readingCursorIndex = min(readingCursorIndex, compositor.cursor)
+      /// 接下來再處理這麼一種情況：
+      /// 某些錨點內的當前候選字詞長度與讀音長度不相等。
+      /// 但此時游標還是按照每個讀音單位來移動的，
+      /// 所以需要上下文工具提示來顯示游標的相對位置。
+      /// 這裡先計算一下要用在工具提示當中的顯示參數的內容。
+      switch compositor.cursor {
+        case compositor.readings.count...:
+          // 這裡的 compositor.cursor 數值不可能大於 readings.count，因為會被 Megrez 自動糾正。
+          tooltipParameterRef[0] = compositor.readings[compositor.cursor - 1]
+        case 0:
+          tooltipParameterRef[1] = compositor.readings[compositor.cursor]
+        default:
+          tooltipParameterRef[0] = compositor.readings[compositor.cursor - 1]
+          tooltipParameterRef[1] = compositor.readings[compositor.cursor]
+      }
+      /// 注音轉拼音
+      guard tooltipParameterRef != ["", ""] else { continue }
+      for (i, _) in tooltipParameterRef.enumerated() {
+        if tooltipParameterRef[i].isEmpty { continue }
+        if tooltipParameterRef[i].contains("_") { continue }
+        if mgrPrefs.showHanyuPinyinInCompositionBuffer {  // 恢復陰平標記->注音轉拼音->轉教科書式標調
+          tooltipParameterRef[i] = Tekkon.restoreToneOneInZhuyinKey(target: tooltipParameterRef[i])
+          tooltipParameterRef[i] = Tekkon.cnvPhonaToHanyuPinyin(target: tooltipParameterRef[i])
+          tooltipParameterRef[i] = Tekkon.cnvHanyuPinyinToTextbookStyle(target: tooltipParameterRef[i])
         } else {
-          if readingCursorIndex < compositor.cursor {
-            composedStringCursorIndex += strNodeValue.utf16.count
-            readingCursorIndex += spanningLength
-            readingCursorIndex = min(readingCursorIndex, compositor.cursor)
-            /// 接下來再處理這麼一種情況：
-            /// 某些錨點內的當前候選字詞長度與讀音長度不相等。
-            /// 但此時游標還是按照每個讀音單位來移動的，
-            /// 所以需要上下文工具提示來顯示游標的相對位置。
-            /// 這裡先計算一下要用在工具提示當中的顯示參數的內容。
-            switch compositor.cursor {
-              case compositor.readings.count...:
-                // 這裡的 compositor.cursor 數值不可能大於 readings.count，因為會被 Megrez 自動糾正。
-                tooltipParameterRef[0] = compositor.readings[compositor.cursor - 1]
-              case 0:
-                tooltipParameterRef[1] = compositor.readings[compositor.cursor]
-              default:
-                tooltipParameterRef[0] = compositor.readings[compositor.cursor - 1]
-                tooltipParameterRef[1] = compositor.readings[compositor.cursor]
-            }
-            /// 注音轉拼音
-            for (i, _) in tooltipParameterRef.enumerated() {
-              if tooltipParameterRef[i].isEmpty { continue }
-              if tooltipParameterRef[i].contains("_") { continue }
-              if mgrPrefs.showHanyuPinyinInCompositionBuffer {  // 恢復陰平標記->注音轉拼音->轉教科書式標調
-                tooltipParameterRef[i] = Tekkon.restoreToneOneInZhuyinKey(target: tooltipParameterRef[i])
-                tooltipParameterRef[i] = Tekkon.cnvPhonaToHanyuPinyin(target: tooltipParameterRef[i])
-                tooltipParameterRef[i] = Tekkon.cnvHanyuPinyinToTextbookStyle(target: tooltipParameterRef[i])
-              } else {
-                tooltipParameterRef[i] = Tekkon.cnvZhuyinChainToTextbookReading(target: tooltipParameterRef[i])
-              }
-            }
-          }
+          tooltipParameterRef[i] = Tekkon.cnvZhuyinChainToTextbookReading(target: tooltipParameterRef[i])
         }
       }
     }
@@ -126,10 +125,9 @@ extension KeyHandler {
     // 防止組字區內出現不可列印的字元。
     var cleanedComposition = ""
     for theChar in composedText {
-      if let charCode = theChar.utf16.first {
-        if !(theChar.isASCII && !(charCode.isPrintable)) {
-          cleanedComposition += String(theChar)
-        }
+      guard let charCode = theChar.utf16.first else { continue }
+      if !(theChar.isASCII && !(charCode.isPrintable)) {
+        cleanedComposition += String(theChar)
       }
     }
 
