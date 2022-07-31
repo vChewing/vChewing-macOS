@@ -30,18 +30,14 @@ extension KeyHandler {
   /// 用來處理 KeyHandler.HandleInput() 當中的與組字有關的行為。
   /// - Parameters:
   ///   - input: 輸入訊號。
-  ///   - state: 給定狀態（通常為當前狀態）。
   ///   - stateCallback: 狀態回呼，交給對應的型別內的專有函式來處理。
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleComposition(
     input: InputSignal,
-    state: InputStateProtocol,
     stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool? {
-    guard [.ofInputting, .ofEmpty, .ofEmptyIgnoringPreviousState].contains(state.type) else { return nil }
-
     // MARK: 注音按鍵輸入處理 (Handle BPMF Keys)
 
     var keyConsumedByReading = false
@@ -84,7 +80,12 @@ extension KeyHandler {
         errorCallback()
         composer.clear()
         // 根據「組字器是否為空」來判定回呼哪一種狀態。
-        stateCallback((compositor.isEmpty) ? InputState.EmptyIgnoringPreviousState() : buildInputtingState)
+        switch compositor.isEmpty {
+          case false: stateCallback(buildInputtingState)
+          case true:
+            stateCallback(InputState.EmptyIgnoringPreviousState())
+            stateCallback(InputState.Empty())
+        }
         return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了。
       }
 

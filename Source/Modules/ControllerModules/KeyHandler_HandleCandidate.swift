@@ -69,6 +69,7 @@ extension KeyHandler {
         // 所以這裡需要對 compositor.isEmpty 做判定。
         clear()
         stateCallback(InputState.EmptyIgnoringPreviousState())
+        stateCallback(InputState.Empty())
       } else {
         stateCallback(buildInputtingState)
       }
@@ -84,6 +85,7 @@ extension KeyHandler {
       if state is InputState.AssociatedPhrases, !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter {
         clear()
         stateCallback(InputState.EmptyIgnoringPreviousState())
+        stateCallback(InputState.Empty())
         return true
       }
       delegate?.keyHandler(
@@ -350,10 +352,10 @@ extension KeyHandler {
             ctlCandidate: ctlCandidateCurrent
           )
           clear()
-          let empty = InputState.EmptyIgnoringPreviousState()
-          stateCallback(empty)
+          stateCallback(InputState.EmptyIgnoringPreviousState())
+          stateCallback(InputState.Empty())
           return handle(
-            input: input, state: empty, stateCallback: stateCallback, errorCallback: errorCallback
+            input: input, state: InputState.Empty(), stateCallback: stateCallback, errorCallback: errorCallback
           )
         }
         return true

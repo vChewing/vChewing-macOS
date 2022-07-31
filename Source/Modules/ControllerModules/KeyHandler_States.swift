@@ -419,8 +419,12 @@ extension KeyHandler {
       composer.doBackSpace()
     }
 
-    stateCallback(
-      composer.isEmpty && compositor.isEmpty ? InputState.EmptyIgnoringPreviousState() : buildInputtingState)
+    switch composer.isEmpty && compositor.isEmpty {
+      case false: stateCallback(buildInputtingState)
+      case true:
+        stateCallback(InputState.EmptyIgnoringPreviousState())
+        stateCallback(InputState.Empty())
+    }
     return true
   }
 
@@ -457,7 +461,12 @@ extension KeyHandler {
     walk()
     let inputting = buildInputtingState
     // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
-    stateCallback(inputting.composingBuffer.isEmpty ? InputState.EmptyIgnoringPreviousState() : inputting)
+    switch inputting.composingBuffer.isEmpty {
+      case false: stateCallback(inputting)
+      case true:
+        stateCallback(InputState.EmptyIgnoringPreviousState())
+        stateCallback(InputState.Empty())
+    }
     return true
   }
 
@@ -569,11 +578,17 @@ extension KeyHandler {
       /// 此乃 macOS 內建注音輸入法預設之行為，但不太受 Windows 使用者群體之待見。
       clear()
       stateCallback(InputState.EmptyIgnoringPreviousState())
+      stateCallback(InputState.Empty())
     } else {
       if composer.isEmpty { return true }
       /// 如果注拼槽不是空的話，則清空之。
       composer.clear()
-      stateCallback(compositor.isEmpty ? InputState.EmptyIgnoringPreviousState() : buildInputtingState)
+      switch compositor.isEmpty {
+        case false: stateCallback(buildInputtingState)
+        case true:
+          stateCallback(InputState.EmptyIgnoringPreviousState())
+          stateCallback(InputState.Empty())
+      }
     }
     return true
   }
