@@ -86,20 +86,9 @@ extension KeyHandler {
           tooltipParameterRef[0] = compositor.readings[compositor.cursor - 1]
           tooltipParameterRef[1] = compositor.readings[compositor.cursor]
       }
-      /// 注音轉拼音
-      guard tooltipParameterRef != ["", ""] else { continue }
-      for (i, _) in tooltipParameterRef.enumerated() {
-        if tooltipParameterRef[i].isEmpty { continue }
-        if tooltipParameterRef[i].contains("_") { continue }
-        if mgrPrefs.showHanyuPinyinInCompositionBuffer {  // 恢復陰平標記->注音轉拼音->轉教科書式標調
-          tooltipParameterRef[i] = Tekkon.restoreToneOneInZhuyinKey(target: tooltipParameterRef[i])
-          tooltipParameterRef[i] = Tekkon.cnvPhonaToHanyuPinyin(target: tooltipParameterRef[i])
-          tooltipParameterRef[i] = Tekkon.cnvHanyuPinyinToTextbookStyle(target: tooltipParameterRef[i])
-        } else {
-          tooltipParameterRef[i] = Tekkon.cnvZhuyinChainToTextbookReading(target: tooltipParameterRef[i])
-        }
-      }
     }
+
+    isCursorCuttingChar = !tooltipParameterRef[0].isEmpty || !tooltipParameterRef[1].isEmpty
 
     /// 再接下來，藉由已經計算成功的「可見游標位置」，咱們計算一下在這個游標之前與之後的
     /// 組字區內容，以便之後在這之間插入正在輸入的漢字讀音（藉由鐵恨 composer 注拼槽取得）。
@@ -132,38 +121,7 @@ extension KeyHandler {
     }
 
     /// 這裡生成準備要拿來回呼的「正在輸入」狀態，但還不能立即使用，因為工具提示仍未完成。
-    let stateResult = InputState.Inputting(composingBuffer: cleanedComposition, cursorIndex: cursorIndex)
-
-    /// 根據上文的參數結果來決定生成怎樣的工具提示。
-    switch (tooltipParameterRef[0].isEmpty, tooltipParameterRef[1].isEmpty) {
-      case (true, true): stateResult.tooltip.removeAll()
-      case (true, false):
-        stateResult.tooltip = String(
-          format: NSLocalizedString("Cursor is to the rear of \"%@\".", comment: ""),
-          tooltipParameterRef[1]
-        )
-      case (false, true):
-        stateResult.tooltip = String(
-          format: NSLocalizedString("Cursor is in front of \"%@\".", comment: ""),
-          tooltipParameterRef[0]
-        )
-      case (false, false):
-        stateResult.tooltip = String(
-          format: NSLocalizedString("Cursor is between \"%@\" and \"%@\".", comment: ""),
-          tooltipParameterRef[0], tooltipParameterRef[1]
-        )
-    }
-
-    /// 給工具提示設定提示配色。
-    if !stateResult.tooltip.isEmpty {
-      isCursorCuttingChar = true
-      ctlInputMethod.tooltipController.setColor(state: .denialOverflow)
-    } else {
-      isCursorCuttingChar = false
-      ctlInputMethod.tooltipController.setColor(state: .normal)
-    }
-
-    return stateResult
+    return InputState.Inputting(composingBuffer: cleanedComposition, cursorIndex: cursorIndex)
   }
 
   // MARK: - 用以生成候選詞陣列及狀態
