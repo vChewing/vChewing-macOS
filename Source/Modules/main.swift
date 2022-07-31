@@ -67,4 +67,6 @@ else {
   exit(-1)
 }
 
+public let theServer = server
+
 NSApp.run()
