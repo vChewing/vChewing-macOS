@@ -29,11 +29,11 @@ import Foundation
 // MARK: - KeyHandler Delegate
 
 extension ctlInputMethod: KeyHandlerDelegate {
-  func ctlCandidate() -> ctlCandidate { ctlInputMethod.ctlCandidateCurrent }
+  func ctlCandidate() -> ctlCandidateProtocol { ctlInputMethod.ctlCandidateCurrent }
 
   func keyHandler(
     _: KeyHandler, didSelectCandidateAt index: Int,
-    ctlCandidate controller: ctlCandidate
+    ctlCandidate controller: ctlCandidateProtocol
   ) {
     ctlCandidate(controller, didSelectCandidateAtIndex: index)
   }
@@ -70,7 +70,7 @@ extension ctlInputMethod: KeyHandlerDelegate {
 // MARK: - Candidate Controller Delegate
 
 extension ctlInputMethod: ctlCandidateDelegate {
-  func candidateCountForController(_ controller: ctlCandidate) -> Int {
+  func candidateCountForController(_ controller: ctlCandidateProtocol) -> Int {
     _ = controller  // 防止格式整理工具毀掉與此對應的參數。
     if let state = state as? InputState.ChoosingCandidate {
       return state.candidates.count
@@ -80,7 +80,20 @@ extension ctlInputMethod: ctlCandidateDelegate {
     return 0
   }
 
-  func ctlCandidate(_ controller: ctlCandidate, candidateAtIndex index: Int)
+  /// 直接給出全部的候選字詞的字音配對陣列
+  /// - Parameter controller: 對應的控制器。因為有唯一解，所以填錯了也不會有影響。
+  /// - Returns: 候選字詞陣列（字音配對）。
+  func candidatesForController(_ controller: ctlCandidateProtocol) -> [(String, String)] {
+    _ = controller  // 防止格式整理工具毀掉與此對應的參數。
+    if let state = state as? InputState.ChoosingCandidate {
+      return state.candidates
+    } else if let state = state as? InputState.AssociatedPhrases {
+      return state.candidates
+    }
+    return .init()
+  }
+
+  func ctlCandidate(_ controller: ctlCandidateProtocol, candidateAtIndex index: Int)
     -> (String, String)
   {
     _ = controller  // 防止格式整理工具毀掉與此對應的參數。
@@ -92,7 +105,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
     return ("", "")
   }
 
-  func ctlCandidate(_ controller: ctlCandidate, didSelectCandidateAtIndex index: Int) {
+  func ctlCandidate(_ controller: ctlCandidateProtocol, didSelectCandidateAtIndex index: Int) {
     _ = controller  // 防止格式整理工具毀掉與此對應的參數。
 
     if let state = state as? InputState.SymbolTable,

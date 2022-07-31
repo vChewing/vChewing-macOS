@@ -46,7 +46,7 @@ extension KeyHandler {
   ) -> Bool {
     let inputText = input.inputText
     let charCode: UniChar = input.charCode
-    guard let ctlCandidateCurrent = delegate?.ctlCandidate() else {
+    guard var ctlCandidateCurrent = delegate?.ctlCandidate() else {
       IME.prtDebugIntel("06661F6E")
       errorCallback()
       return true

@@ -81,11 +81,11 @@ extension ctlInputMethod {
     /// 該問題徹底解決的價值並不大，直接等到 macOS 10.x 全線淘汰之後用 SwiftUI 重寫選字窗吧。
 
     if isCandidateWindowVertical {  // 縱排輸入時強制使用縱排選字窗
-      ctlInputMethod.ctlCandidateCurrent = .init(.vertical)
+      ctlInputMethod.ctlCandidateCurrent = ctlCandidateUniversal.init(.vertical)
     } else if mgrPrefs.useHorizontalCandidateList {
-      ctlInputMethod.ctlCandidateCurrent = .init(.horizontal)
+      ctlInputMethod.ctlCandidateCurrent = ctlCandidateUniversal.init(.horizontal)
     } else {
-      ctlInputMethod.ctlCandidateCurrent = .init(.vertical)
+      ctlInputMethod.ctlCandidateCurrent = ctlCandidateUniversal.init(.vertical)
     }
 
     // set the attributes for the candidate panel (which uses NSAttributedString)

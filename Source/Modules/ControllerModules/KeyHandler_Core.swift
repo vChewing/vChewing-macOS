@@ -34,10 +34,10 @@ import Cocoa
 
 /// KeyHandler 委任協定
 protocol KeyHandlerDelegate {
-  func ctlCandidate() -> ctlCandidate
+  func ctlCandidate() -> ctlCandidateProtocol
   func keyHandler(
     _: KeyHandler, didSelectCandidateAt index: Int,
-    ctlCandidate controller: ctlCandidate
+    ctlCandidate controller: ctlCandidateProtocol
   )
   func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputStateProtocol)
     -> Bool

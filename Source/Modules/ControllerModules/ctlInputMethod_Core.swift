@@ -41,7 +41,7 @@ class ctlInputMethod: IMKInputController {
   static var areWeDeleting = false
 
   /// 目前在用的的選字窗副本。
-  static var ctlCandidateCurrent = ctlCandidateUniversal.init(.horizontal)
+  static var ctlCandidateCurrent: ctlCandidateProtocol = ctlCandidateUniversal.init(.horizontal)
 
   /// 工具提示視窗的副本。
   static let tooltipController = TooltipController()
@@ -235,5 +235,31 @@ class ctlInputMethod: IMKInputController {
   override func commitComposition(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     resetKeyHandler()
+  }
+
+  /// 生成 IMK 選字窗專用的候選字串陣列。
+  /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
+  /// - Returns: IMK 選字窗專用的候選字串陣列。
+  override func candidates(_ sender: Any!) -> [Any]! {
+    _ = sender  // 防止格式整理工具毀掉與此對應的參數。
+    if let state = state as? InputState.AssociatedPhrases {
+      return state.candidates.map { theCandidate -> String in
+        let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
+        return (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
+      }
+    }
+    if let state = state as? InputState.ChoosingCandidate {
+      return state.candidates.map { theCandidate -> String in
+        let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
+        return (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
+      }
+    }
+    if let state = state as? InputState.SymbolTable {
+      return state.candidates.map { theCandidate -> String in
+        let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
+        return (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
+      }
+    }
+    return .init()
   }
 }

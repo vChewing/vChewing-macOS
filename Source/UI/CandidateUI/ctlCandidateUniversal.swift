@@ -370,7 +370,7 @@ public class ctlCandidateUniversal: ctlCandidate {
   private var nextPageButton: NSButton
   private var pageCounterLabel: NSTextField
   private var currentPageIndex: Int = 0
-  override public var currentLayout: Layout {
+  override public var currentLayout: CandidateLayout {
     get { candidateView.isVerticalLayout ? .vertical : .horizontal }
     set {
       switch newValue {
@@ -380,7 +380,7 @@ public class ctlCandidateUniversal: ctlCandidate {
     }
   }
 
-  public init(_ layout: Layout = .horizontal) {
+  required public init(_ layout: CandidateLayout = .horizontal) {
     var contentRect = NSRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
     let styleMask: NSWindow.StyleMask = [.nonactivatingPanel]
     let panel = NSPanel(
@@ -448,7 +448,8 @@ public class ctlCandidateUniversal: ctlCandidate {
 
     // MARK: Post-Init()
 
-    super.init(window: panel)
+    super.init(layout)
+    self.window = panel
     currentLayout = layout
 
     candidateView.target = self
