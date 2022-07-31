@@ -100,12 +100,22 @@ extension ctlInputMethod {
     }
 
     func candidateFont(name: String?, size: CGFloat) -> NSFont {
-      let currentMUIFont =
-        (keyHandler.inputMode == InputMode.imeModeCHS)
-        ? "Sarasa Term Slab SC" : "Sarasa Term Slab TC"
-      var finalReturnFont =
-        NSFont(name: currentMUIFont, size: size) ?? NSFont.systemFont(ofSize: size)
-      // 對更紗黑體的依賴到 macOS 11 Big Sur 為止。macOS 12 Monterey 開始則依賴系統內建的函式使用蘋方來處理。
+      var finalReturnFont: NSFont =
+        {
+          switch IME.currentInputMode {
+            case InputMode.imeModeCHS:
+              return CTFontCreateUIFontForLanguage(.system, size, "zh-Hans" as CFString)
+            case InputMode.imeModeCHT:
+              return (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
+                ? CTFontCreateUIFontForLanguage(.system, size, "ja" as CFString)
+                : CTFontCreateUIFontForLanguage(.system, size, "zh-Hant" as CFString)
+            default:
+              return CTFontCreateUIFontForLanguage(.system, size, nil)
+          }
+        }()
+        ?? NSFont.systemFont(ofSize: size)
+      // 上述方法對 macOS 10.11-10.15 有效，但對 macOS 12 Monterey 無效（懷疑是 Bug）。
+      // macOS 12 Monterey 開始就用系統內建的函式來處理，相關流程直接寫在 ctlCandidateUniversal 內。
       if #available(macOS 12.0, *) { finalReturnFont = NSFont.systemFont(ofSize: size) }
       if let name = name {
         return NSFont(name: name, size: size) ?? finalReturnFont
