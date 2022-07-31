@@ -46,7 +46,7 @@ protocol KeyHandlerDelegate {
 // MARK: - 核心 (Kernel).
 
 /// KeyHandler 按鍵調度模組。
-class KeyHandler {
+public class KeyHandler {
   /// 半衰模組的衰減指數
   let kEpsilon: Double = 0.000001
   /// 檢測是否出現游標切斷組字圈內字符的情況

@@ -29,7 +29,7 @@ import Cocoa
 // 註：所有 InputState 型別均不適合使用 Struct，因為 Struct 無法相互繼承派生。
 
 // 用以讓每個狀態自描述的 enum。
-enum StateType {
+public enum StateType {
   case ofDeactivated
   case ofAssociatedPhrases
   case ofEmpty
@@ -43,7 +43,7 @@ enum StateType {
 }
 
 // 所有 InputState 均遵守該協定：
-protocol InputStateProtocol {
+public protocol InputStateProtocol {
   var type: StateType { get }
 }
 
@@ -79,7 +79,7 @@ protocol InputStateProtocol {
 ///   詞音組合放入語彙濾除清單。
 /// - .ChoosingCandidate: 叫出選字窗、允許使用者選字。
 /// - .SymbolTable: 波浪鍵符號選單專用的狀態，有自身的特殊處理。
-enum InputState {
+public enum InputState {
   /// .Deactivated: 使用者沒在使用輸入法。
   class Deactivated: InputStateProtocol {
     public var type: StateType { .ofDeactivated }

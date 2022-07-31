@@ -24,7 +24,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import Foundation
+import Cocoa
 
 // MARK: - KeyHandler Delegate
 
@@ -70,6 +70,53 @@ extension ctlInputMethod: KeyHandlerDelegate {
 // MARK: - Candidate Controller Delegate
 
 extension ctlInputMethod: ctlCandidateDelegate {
+  func handleDelegateEvent(_ event: NSEvent!) -> Bool {
+    /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
+    /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
+    /// 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
+    /// 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
+    if event.type == .flagsChanged {
+      return false
+    }
+
+    // 準備修飾鍵，用來判定是否需要利用就地新增語彙時的 Enter 鍵來砍詞。
+    ctlInputMethod.areWeDeleting = event.modifierFlags.contains([.shift, .command])
+
+    var textFrame = NSRect.zero
+
+    let attributes: [AnyHashable: Any]? = client().attributes(
+      forCharacterIndex: 0, lineHeightRectangle: &textFrame
+    )
+
+    let isTypingVertical =
+      (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
+
+    if client().bundleIdentifier()
+      == "org.atelierInmu.vChewing.vChewingPhraseEditor"
+    {
+      IME.areWeUsingOurOwnPhraseEditor = true
+    } else {
+      IME.areWeUsingOurOwnPhraseEditor = false
+    }
+
+    let input = InputSignal(event: event, isVerticalTyping: isTypingVertical)
+
+    // 無法列印的訊號輸入，一概不作處理。
+    // 這個過程不能放在 KeyHandler 內，否則不會起作用。
+    if !input.charCode.isPrintable {
+      return false
+    }
+
+    /// 將按鍵行為與當前輸入法狀態結合起來、交給按鍵調度模組來處理。
+    /// 再根據返回的 result bool 數值來告知 IMK「這個按鍵事件是被處理了還是被放行了」。
+    let result = keyHandler.handleCandidate(state: state, input: input) { newState in
+      self.handle(state: newState)
+    } errorCallback: {
+      clsSFX.beep()
+    }
+    return result
+  }
+
   func candidateCountForController(_ controller: ctlCandidateProtocol) -> Int {
     _ = controller  // 防止格式整理工具毀掉與此對應的參數。
     if let state = state as? InputState.ChoosingCandidate {
