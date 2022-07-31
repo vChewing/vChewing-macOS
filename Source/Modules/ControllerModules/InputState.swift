@@ -38,7 +38,7 @@ enum StateType {
   case ofNotEmpty
   case ofInputting
   case ofMarking
-  case ofChooseCandidate
+  case ofChoosingCandidate
   case ofSymbolTable
 }
 
@@ -413,7 +413,7 @@ enum InputState {
 
   /// .ChoosingCandidate: 叫出選字窗、允許使用者選字。
   class ChoosingCandidate: NotEmpty {
-    override public var type: StateType { .ofChooseCandidate }
+    override public var type: StateType { .ofChoosingCandidate }
     private(set) var candidates: [(String, String)]
     private(set) var isTypingVertical: Bool
 
