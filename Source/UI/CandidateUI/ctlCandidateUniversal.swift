@@ -380,7 +380,7 @@ public class ctlCandidateUniversal: ctlCandidate {
     }
   }
 
-  required public init(_ layout: CandidateLayout = .horizontal) {
+  public required init(_ layout: CandidateLayout = .horizontal) {
     var contentRect = NSRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
     let styleMask: NSWindow.StyleMask = [.nonactivatingPanel]
     let panel = NSPanel(
@@ -449,7 +449,7 @@ public class ctlCandidateUniversal: ctlCandidate {
     // MARK: Post-Init()
 
     super.init(layout)
-    self.window = panel
+    window = panel
     currentLayout = layout
 
     candidateView.target = self

@@ -159,8 +159,8 @@ extension KeyHandler {
     // MARK: 注音按鍵輸入處理 (Handle BPMF Keys)
 
     if let compositionHandled = handleComposition(
-      input: input, state: state, stateCallback: stateCallback, errorCallback: errorCallback)
-    {
+      input: input, state: state, stateCallback: stateCallback, errorCallback: errorCallback
+    ) {
       return compositionHandled
     }
 

@@ -107,12 +107,13 @@ public class ctlCandidate: NSWindowController, ctlCandidateProtocol {
     }
   }
 
-  required public init(_ layout: CandidateLayout = .horizontal) {
+  public required init(_: CandidateLayout = .horizontal) {
     super.init(window: .init())
     visible = false
   }
 
-  required init?(coder: NSCoder) {
+  @available(*, unavailable)
+  required init?(coder _: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 

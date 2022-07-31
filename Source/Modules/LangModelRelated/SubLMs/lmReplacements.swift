@@ -53,7 +53,7 @@ extension vChewing {
       do {
         strData = try String(contentsOfFile: path, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
         strData = strData.replacingOccurrences(of: "\r", with: "\n")
-        strData.ranges(splitBy: "\n").filter({ !$0.isEmpty }).forEach {
+        strData.ranges(splitBy: "\n").filter { !$0.isEmpty }.forEach {
           let neta = strData[$0].split(separator: " ")
           if neta.count >= 2 {
             let theKey = String(neta[0])

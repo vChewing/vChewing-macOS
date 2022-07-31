@@ -57,13 +57,13 @@ class ctlAboutWindow: NSWindowController {
     )
   }
 
-  @IBAction func btnBugReport(_ sender: NSButton) {
+  @IBAction func btnBugReport(_: NSButton) {
     if let url = URL(string: "https://vchewing.github.io/BUGREPORT.html") {
       NSWorkspace.shared.open(url)
     }
   }
 
-  @IBAction func btnWebsite(_ sender: NSButton) {
+  @IBAction func btnWebsite(_: NSButton) {
     if let url = URL(string: "https://vchewing.github.io/") {
       NSWorkspace.shared.open(url)
     }

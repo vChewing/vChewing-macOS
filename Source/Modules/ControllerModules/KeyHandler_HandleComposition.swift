@@ -40,6 +40,7 @@ extension KeyHandler {
     stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool? {
+    guard [.ofInputting, .ofEmpty, .ofEmptyIgnoringPreviousState].contains(state.type) else { return nil }
 
     // MARK: 注音按鍵輸入處理 (Handle BPMF Keys)
 
