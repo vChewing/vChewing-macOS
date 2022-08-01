@@ -61,6 +61,7 @@ struct UserDef {
   static let kUseFixecCandidateOrderOnSelection = "UseFixecCandidateOrderOnSelection"
   static let kAutoCorrectReadingCombination = "AutoCorrectReadingCombination"
   static let kAlsoConfirmAssociatedCandidatesByEnter = "AlsoConfirmAssociatedCandidatesByEnter"
+  static let kKeepReadingUponCompositionError = "KeepReadingUponCompositionError"
 
   static let kCandidateTextFontName = "CandidateTextFontName"
   static let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
@@ -297,6 +298,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.currencyNumeralsEnabled, forKey: UserDef.kCurrencyNumeralsEnabled
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.keepReadingUponCompositionError, forKey: UserDef.kKeepReadingUponCompositionError
+    )
 
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeySCPC, forKey: UserDef.kUsingHotKeySCPC)
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyAssociates, forKey: UserDef.kUsingHotKeyAssociates)
@@ -385,6 +389,9 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kAlsoConfirmAssociatedCandidatesByEnter, defaultValue: true)
   static var alsoConfirmAssociatedCandidatesByEnter: Bool
+
+  @UserDefault(key: UserDef.kAlsoConfirmAssociatedCandidatesByEnter, defaultValue: false)
+  static var keepReadingUponCompositionError: Bool
 
   static var minCandidateLength: Int {
     mgrPrefs.allowBoostingSingleKanjiAsUserPhrase ? 1 : 2
@@ -632,7 +639,7 @@ extension mgrPrefs {
       UserDef.kUsingHotKeyAssociates, UserDef.kUsingHotKeyCNS, UserDef.kUsingHotKeyKangXi, UserDef.kUsingHotKeyJIS,
       UserDef.kUsingHotKeyHalfWidthASCII, UserDef.kUseFixecCandidateOrderOnSelection,
       UserDef.kAutoCorrectReadingCombination, UserDef.kAlsoConfirmAssociatedCandidatesByEnter,
-      UserDef.kCurrencyNumeralsEnabled, UserDef.kUsingHotKeyCurrencyNumerals,
+      UserDef.kCurrencyNumeralsEnabled, UserDef.kUsingHotKeyCurrencyNumerals, UserDef.kKeepReadingUponCompositionError,
     ]
   }
 
