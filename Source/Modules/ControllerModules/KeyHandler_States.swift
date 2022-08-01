@@ -38,7 +38,7 @@ extension KeyHandler {
     /// 「更新內文組字區 (Update the composing buffer)」是指要求客體軟體將組字緩衝區的內容
     /// 換成由此處重新生成的組字字串（NSAttributeString，否則會不顯示）。
     var tooltipParameterRef: [String] = ["", ""]
-    var composingBuffer = ""
+    let nodeValuesArray: [String] = walkedAnchors.map(\.node.currentPair.value)
     var composedStringCursorIndex = 0
     var readingCursorIndex = 0
     /// IMK 協定的內文組字區的游標長度與游標位置無法正確統計 UTF8 高萬字（比如 emoji）的長度，
@@ -47,7 +47,6 @@ extension KeyHandler {
     for theAnchor in walkedAnchors {
       let theNode = theAnchor.node
       let strNodeValue = theNode.currentPair.value
-      composingBuffer += strNodeValue
       let arrSplit: [String] = Array(strNodeValue).map { String($0) }
       let codepointCount = arrSplit.count
       /// 藉下述步驟重新將「可見游標位置」對齊至「組字器內的游標所在的讀音位置」。
@@ -95,7 +94,7 @@ extension KeyHandler {
     var arrHead = [String.UTF16View.Element]()
     var arrTail = [String.UTF16View.Element]()
 
-    for (i, n) in composingBuffer.utf16.enumerated() {
+    for (i, n) in nodeValuesArray.joined().utf16.enumerated() {
       if i < composedStringCursorIndex {
         arrHead.append(n)
       } else {
@@ -121,7 +120,9 @@ extension KeyHandler {
     }
 
     /// 這裡生成準備要拿來回呼的「正在輸入」狀態，但還不能立即使用，因為工具提示仍未完成。
-    return InputState.Inputting(composingBuffer: cleanedComposition, cursorIndex: cursorIndex)
+    return InputState.Inputting(
+      composingBuffer: cleanedComposition, cursorIndex: cursorIndex, reading: reading, nodeValuesArray: nodeValuesArray
+    )
   }
 
   // MARK: - 用以生成候選詞陣列及狀態

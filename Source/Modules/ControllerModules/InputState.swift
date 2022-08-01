@@ -175,6 +175,8 @@ public enum InputState {
     public var type: StateType { .ofNotEmpty }
     private(set) var composingBuffer: String
     private(set) var cursorIndex: Int = 0 { didSet { cursorIndex = max(cursorIndex, 0) } }
+    private(set) var reading: String = ""
+    private(set) var nodeValuesArray = [String]()
     public var composingBufferConverted: String {
       let converted = IME.kanjiConversionIfRequired(composingBuffer)
       if converted.utf16.count != composingBuffer.utf16.count
@@ -185,21 +187,37 @@ public enum InputState {
       return converted
     }
 
-    init(composingBuffer: String, cursorIndex: Int) {
+    init(composingBuffer: String, cursorIndex: Int, reading: String = "", nodeValuesArray: [String] = []) {
       self.composingBuffer = composingBuffer
+      self.reading = reading
+      self.nodeValuesArray = nodeValuesArray
       defer { self.cursorIndex = cursorIndex }
     }
 
     var attributedString: NSMutableAttributedString {
       /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
       /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
-      let attributedString = NSMutableAttributedString(
-        string: composingBufferConverted,
-        attributes: [
-          .underlineStyle: NSUnderlineStyle.single.rawValue,
-          .markedClauseSegment: 0,
-        ]
-      )
+      guard reading.isEmpty else {
+        let attributedString = NSMutableAttributedString(
+          string: composingBufferConverted,
+          attributes: [
+            .underlineStyle: NSUnderlineStyle.thick.rawValue,
+            .markedClauseSegment: 0,
+          ]
+        )
+        return attributedString
+      }
+      let attributedString = NSMutableAttributedString(string: composingBufferConverted)
+      var newBegin = 0
+      for (i, neta) in nodeValuesArray.enumerated() {
+        attributedString.setAttributes(
+          [
+            .underlineStyle: NSUnderlineStyle.thick.rawValue,
+            .markedClauseSegment: i,
+          ], range: NSRange(location: newBegin, length: neta.utf16.count)
+        )
+        newBegin += neta.utf16.count
+      }
       return attributedString
     }
 
@@ -216,8 +234,9 @@ public enum InputState {
     var textToCommit: String = ""
     var tooltip: String = ""
 
-    override init(composingBuffer: String, cursorIndex: Int) {
-      super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
+    override init(composingBuffer: String, cursorIndex: Int, reading: String = "", nodeValuesArray: [String] = []) {
+      super.init(
+        composingBuffer: composingBuffer, cursorIndex: cursorIndex, reading: reading, nodeValuesArray: nodeValuesArray)
     }
 
     override var description: String {
