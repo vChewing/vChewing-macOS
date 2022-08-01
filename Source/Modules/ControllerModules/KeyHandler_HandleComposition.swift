@@ -60,7 +60,7 @@ extension KeyHandler {
       }
     }
 
-    var composeReading = composer.hasToneMarker()  // 這裡不需要做排他性判斷。
+    var composeReading = composer.hasToneMarker() && composer.inputValidityCheck(key: input.charCode)  // 這裡不需要做排他性判斷。
 
     // 如果當前的按鍵是 Enter 或 Space 的話，這時就可以取出 _composer 內的注音來做檢查了。
     // 來看看詞庫內到底有沒有對應的讀音索引。這裡用了類似「|=」的判斷處理方式。
@@ -78,6 +78,12 @@ extension KeyHandler {
       if !currentLM.hasUnigramsFor(key: readingKey) {
         IME.prtDebugIntel("B49C0979：語彙庫內無「\(readingKey)」的匹配記錄。")
         errorCallback()
+
+        if mgrPrefs.keepReadingUponCompositionError {
+          stateCallback(buildInputtingState)
+          return true
+        }
+
         composer.clear()
         // 根據「組字器是否為空」來判定回呼哪一種狀態。
         switch compositor.isEmpty {
@@ -143,9 +149,7 @@ extension KeyHandler {
       return true
     }
 
-    /// 如果此時這個選項是 true 的話，可知當前注拼槽輸入了聲調、且上一次按鍵不是聲調按鍵。
-    /// 比方說大千傳統佈局敲「6j」會出現「ˊㄨ」但並不會被認為是「ㄨˊ」，因為先輸入的調號
-    /// 並非用來確認這個注音的調號。除非是：「ㄨˊ」「ˊㄨˊ」「ˊㄨˇ」「ˊㄨ 」等。
+    /// 是說此時注拼槽並非為空、卻還沒組音。這種情況下只可能是「注拼槽內只有聲調」。
     if keyConsumedByReading {
       // 以回呼組字狀態的方式來執行 updateClientComposingBuffer()。
       stateCallback(buildInputtingState)
