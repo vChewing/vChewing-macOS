@@ -1,0 +1,25 @@
+The vChewing Input Method is derived from OpenVanilla McBopomofo project under:
+
+	SPDX-License-Identifier: MIT
+
+The vChewing Input Method is provided under:
+
+	SPDX-License-Identifier: MIT
+
+with one extra requirements (turning it into MIT-NTL license):
+
+	No trademark license is granted to use the trade names, trademarks, 
+	service marks, or product names of Contributor, except as required 
+	to fulfill notice requirements above.
+
+Being under the terms of the MIT-NTL License only, according with:
+
+	./LICENSES.txt
+
+Please see:
+
+	./AUTHORS
+
+for more details.
+
+All contributions to the vChewing Input Method are subject to ./AUTHORS file.
