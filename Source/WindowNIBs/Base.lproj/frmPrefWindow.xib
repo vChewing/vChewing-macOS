@@ -591,12 +591,23 @@
                         <binding destination="32" name="value" keyPath="values.AlsoConfirmAssociatedCandidatesByEnter" id="P1C-j9-N88"/>
                     </connections>
                 </button>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HaB-rc-AcW">
+                    <rect key="frame" x="19" y="40.5" width="388" height="16"/>
+                    <buttonCell key="cell" type="check" title="Allow backspace-editing miscomposed readings" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkKeepReadingUponCompositionError">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="cellTitle"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="32" name="value" keyPath="values.KeepReadingUponCompositionError" id="ddF-qg-jes"/>
+                    </connections>
+                </button>
             </subviews>
             <constraints>
                 <constraint firstItem="n7q-ew-DYu" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="33" id="2gT-9Z-6F4"/>
                 <constraint firstItem="109" firstAttribute="top" secondItem="YkJ-lr-EP6" secondAttribute="bottom" constant="9" id="3tl-Zc-C5n"/>
                 <constraint firstItem="13" firstAttribute="top" secondItem="d5f-bq-dRQ" secondAttribute="bottom" constant="8" symbolic="YES" id="4pp-NX-pCc"/>
                 <constraint firstItem="YkJ-lr-EP6" firstAttribute="top" secondItem="J0f-Aw-dxC" secondAttribute="bottom" constant="7" id="5fd-qi-hJ6"/>
+                <constraint firstItem="HaB-rc-AcW" firstAttribute="leading" secondItem="6MM-WC-Mpd" secondAttribute="leading" id="7Fs-9l-g66"/>
                 <constraint firstItem="d5f-bq-dRQ" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="20" id="9wo-7x-RKb"/>
                 <constraint firstItem="TMn-LX-3Ub" firstAttribute="top" secondItem="7z2-DD-c58" secondAttribute="bottom" constant="9" id="AXY-LV-HMX"/>
                 <constraint firstItem="7z2-DD-c58" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="34" id="BUo-Us-u2B"/>
@@ -618,6 +629,7 @@
                 <constraint firstItem="IpX-f7-rTL" firstAttribute="top" secondItem="XWo-36-xGi" secondAttribute="top" constant="20" id="YaG-ab-LJH"/>
                 <constraint firstItem="uHU-aL-du7" firstAttribute="top" secondItem="IpX-f7-rTL" secondAttribute="bottom" constant="8" symbolic="YES" id="aet-Zq-v6x"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="TMn-LX-3Ub" secondAttribute="trailing" constant="20" symbolic="YES" id="atz-4L-U9s"/>
+                <constraint firstItem="HaB-rc-AcW" firstAttribute="top" secondItem="6MM-WC-Mpd" secondAttribute="bottom" constant="6" symbolic="YES" id="cBa-57-gWH"/>
                 <constraint firstItem="ETa-09-qWI" firstAttribute="top" secondItem="IpX-f7-rTL" secondAttribute="bottom" constant="11" id="cx2-US-uOU"/>
                 <constraint firstItem="6MM-WC-Mpd" firstAttribute="top" secondItem="j8R-Hj-3dj" secondAttribute="bottom" constant="6" id="dmy-Au-peI"/>
                 <constraint firstItem="YkJ-lr-EP6" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="33" id="e3v-m2-co7"/>
@@ -630,6 +642,7 @@
                 <constraint firstItem="6MM-WC-Mpd" firstAttribute="leading" secondItem="j8R-Hj-3dj" secondAttribute="leading" id="mbl-sV-kc8"/>
                 <constraint firstItem="mzw-F2-aAQ" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="20" id="pHT-DE-qdx"/>
                 <constraint firstItem="ETa-09-qWI" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="33" id="qFL-i6-eUT"/>
+                <constraint firstItem="HaB-rc-AcW" firstAttribute="trailing" secondItem="6MM-WC-Mpd" secondAttribute="trailing" id="rA7-0f-akd"/>
                 <constraint firstItem="JG6-RM-ZdJ" firstAttribute="top" secondItem="uHU-aL-du7" secondAttribute="bottom" constant="8" id="shS-7h-z7u"/>
                 <constraint firstItem="TMn-LX-3Ub" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="20" id="tFX-Eg-X70"/>
                 <constraint firstItem="J0f-Aw-dxC" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="20" id="v75-cS-TsO"/>

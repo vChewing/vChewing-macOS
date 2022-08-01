@@ -80,6 +80,7 @@ extension KeyHandler {
         errorCallback()
 
         if mgrPrefs.keepReadingUponCompositionError {
+          composer.intonation.clear()  // 砍掉聲調。
           stateCallback(buildInputtingState)
           return true
         }

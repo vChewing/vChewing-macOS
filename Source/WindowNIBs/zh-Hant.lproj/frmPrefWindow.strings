@@ -43,6 +43,7 @@
 "chkAlsoConfirmAssociatedCandidatesByEnter.title" = "允許使用 Enter 確認當前選中的聯想詞";
 "chkAutoCorrectReadingCombination.title" = "敲字時自動糾正讀音組合";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "在敲字時自動套用來自半衰記憶模組的建議";
+"chkKeepReadingUponCompositionError.title" = "允許對無效的讀音使用 BackSpace 編輯";
 "chkUseFixecCandidateOrderOnSelection.title" = "以固定順序來陳列選字窗內的候選字";
 "DbW-eq-ZdB.title" = "星光";
 "dIN-TZ-67g.title" = "Shift+Space 換下一頁，Space 換選下一個候選字";
