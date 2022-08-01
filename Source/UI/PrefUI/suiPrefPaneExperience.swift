@@ -50,6 +50,8 @@ struct suiPrefPaneExperience: View {
     forKey: UserDef.kAutoCorrectReadingCombination)
   @State private var selAlsoConfirmAssociatedCandidatesByEnter = UserDefaults.standard.bool(
     forKey: UserDef.kAlsoConfirmAssociatedCandidatesByEnter)
+  @State private var selKeepReadingUponCompositionError = UserDefaults.standard.bool(
+    forKey: UserDef.kKeepReadingUponCompositionError)
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -187,6 +189,12 @@ struct suiPrefPaneExperience: View {
           isOn: $selAlsoConfirmAssociatedCandidatesByEnter
         ).onChange(of: selAlsoConfirmAssociatedCandidatesByEnter) { value in
           mgrPrefs.alsoConfirmAssociatedCandidatesByEnter = value
+        }
+        Toggle(
+          LocalizedStringKey("Allow backspace-editing miscomposed readings"),
+          isOn: $selKeepReadingUponCompositionError
+        ).onChange(of: selKeepReadingUponCompositionError) { value in
+          mgrPrefs.keepReadingUponCompositionError = value
         }
       }
     }

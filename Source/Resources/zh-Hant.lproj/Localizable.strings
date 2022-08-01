@@ -85,6 +85,7 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)空格鍵:";
+"Allow backspace-editing miscomposed readings" = "允許對無效的讀音使用 BackSpace 編輯";
 "Allow boosting / excluding a candidate of single kanji" = "將可以就地升權/排除的候選字詞的最短詞長設為單個漢字";
 "Allow using Enter key to confirm associated candidate selection" = "允許使用 Enter 確認當前選中的聯想詞";
 "Always use fixed listing order in candidate window" = "以固定順序來陳列選字窗內的候選字";
