@@ -64,6 +64,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
   }
 
   func applicationDidFinishLaunching(_: Notification) {
+    // 一旦發現與使用者半衰模組的觀察行為有關的崩潰標記被開啟，就清空既有的半衰記憶資料檔案。
+    if mgrPrefs.failureFlagForUOMObservation {
+      mgrLangModel.clearUserOverrideModelData(.imeModeCHS)
+      mgrLangModel.clearUserOverrideModelData(.imeModeCHT)
+      mgrPrefs.failureFlagForUOMObservation = false
+    }
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
       IME.initLangModels(userOnly: false)
     }
