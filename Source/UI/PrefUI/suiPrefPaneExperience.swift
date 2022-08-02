@@ -32,7 +32,7 @@ struct suiPrefPaneExperience: View {
     (UserDefaults.standard.string(forKey: UserDef.kCandidateKeys.rawValue) ?? mgrPrefs.defaultCandidateKeys) as String
   @State private var selCursorPosition =
     UserDefaults.standard.bool(
-      forKey: UserDef.kuseRearCursorMode.rawValue) ? 1 : 0
+      forKey: UserDef.kUseRearCursorMode.rawValue) ? 1 : 0
   @State private var selPushCursorAfterSelection = UserDefaults.standard.bool(
     forKey: UserDef.kMoveCursorAfterSelectingCandidate.rawValue)
   @State private var selKeyBehaviorShiftTab =

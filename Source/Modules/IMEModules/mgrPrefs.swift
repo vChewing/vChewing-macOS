@@ -28,6 +28,7 @@ import Cocoa
 
 public enum UserDef: String, CaseIterable {
   case kIsDebugModeEnabled = "_DebugMode"
+  case kFailureFlagForUOMObservation = "_FailureFlag_UOMObservation"
   case kMostRecentInputMode = "MostRecentInputMode"
   case kUserDataFolderSpecified = "UserDataFolderSpecified"
   case kCheckUpdateAutomatically = "CheckUpdateAutomatically"
@@ -37,7 +38,7 @@ public enum UserDef: String, CaseIterable {
   case kCandidateListTextSize = "CandidateListTextSize"
   case kAppleLanguages = "AppleLanguages"
   case kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
-  case kuseRearCursorMode = "useRearCursorMode"
+  case kUseRearCursorMode = "useRearCursorMode"
   case kUseHorizontalCandidateList = "UseHorizontalCandidateList"
   case kComposingBufferSize = "ComposingBufferSize"
   case kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
@@ -239,6 +240,9 @@ enum MandarinParser: Int {
 public enum mgrPrefs {
   public static func setMissingDefaults() {
     UserDefaults.standard.setDefault(mgrPrefs.isDebugModeEnabled, forKey: UserDef.kIsDebugModeEnabled.rawValue)
+    UserDefaults.standard.setDefault(
+      mgrPrefs.failureFlagForUOMObservation, forKey: UserDef.kFailureFlagForUOMObservation.rawValue
+    )
     UserDefaults.standard.setDefault(mgrPrefs.mostRecentInputMode, forKey: UserDef.kMostRecentInputMode.rawValue)
     UserDefaults.standard.setDefault(
       mgrPrefs.checkUpdateAutomatically, forKey: UserDef.kCheckUpdateAutomatically.rawValue
@@ -265,7 +269,7 @@ public enum mgrPrefs {
       mgrPrefs.associatedPhrasesEnabled, forKey: UserDef.kAssociatedPhrasesEnabled.rawValue
     )
     UserDefaults.standard.setDefault(
-      mgrPrefs.useRearCursorMode, forKey: UserDef.kuseRearCursorMode.rawValue
+      mgrPrefs.useRearCursorMode, forKey: UserDef.kUseRearCursorMode.rawValue
     )
     UserDefaults.standard.setDefault(
       mgrPrefs.moveCursorAfterSelectingCandidate, forKey: UserDef.kMoveCursorAfterSelectingCandidate.rawValue
@@ -332,6 +336,9 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kIsDebugModeEnabled.rawValue, defaultValue: false)
   static var isDebugModeEnabled: Bool
 
+  @UserDefault(key: UserDef.kFailureFlagForUOMObservation.rawValue, defaultValue: false)
+  static var failureFlagForUOMObservation: Bool
+
   @UserDefault(key: UserDef.kMostRecentInputMode.rawValue, defaultValue: "")
   static var mostRecentInputMode: String
 
@@ -376,7 +383,7 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kShouldAutoReloadUserDataFiles.rawValue, defaultValue: true)
   static var shouldAutoReloadUserDataFiles: Bool
 
-  @UserDefault(key: UserDef.kuseRearCursorMode.rawValue, defaultValue: false)
+  @UserDefault(key: UserDef.kUseRearCursorMode.rawValue, defaultValue: false)
   static var useRearCursorMode: Bool
 
   @UserDefault(key: UserDef.kMoveCursorAfterSelectingCandidate.rawValue, defaultValue: true)
