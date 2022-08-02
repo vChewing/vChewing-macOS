@@ -29,29 +29,30 @@ import SwiftUI
 struct suiPrefPaneExperience: View {
   @State private var selSelectionKeysList = mgrPrefs.suggestedCandidateKeys
   @State private var selSelectionKeys =
-    (UserDefaults.standard.string(forKey: UserDef.kCandidateKeys) ?? mgrPrefs.defaultCandidateKeys) as String
+    (UserDefaults.standard.string(forKey: UserDef.kCandidateKeys.rawValue) ?? mgrPrefs.defaultCandidateKeys) as String
   @State private var selCursorPosition =
     UserDefaults.standard.bool(
-      forKey: UserDef.kuseRearCursorMode) ? 1 : 0
+      forKey: UserDef.kuseRearCursorMode.rawValue) ? 1 : 0
   @State private var selPushCursorAfterSelection = UserDefaults.standard.bool(
-    forKey: UserDef.kMoveCursorAfterSelectingCandidate)
+    forKey: UserDef.kMoveCursorAfterSelectingCandidate.rawValue)
   @State private var selKeyBehaviorShiftTab =
-    UserDefaults.standard.bool(forKey: UserDef.kSpecifyShiftTabKeyBehavior) ? 1 : 0
+    UserDefaults.standard.bool(forKey: UserDef.kSpecifyShiftTabKeyBehavior.rawValue) ? 1 : 0
   @State private var selKeyBehaviorShiftSpace =
     UserDefaults.standard.bool(
-      forKey: UserDef.kSpecifyShiftSpaceKeyBehavior) ? 1 : 0
+      forKey: UserDef.kSpecifyShiftSpaceKeyBehavior.rawValue) ? 1 : 0
   @State private var selKeyBehaviorSpaceForCallingCandidate = UserDefaults.standard.bool(
-    forKey: UserDef.kChooseCandidateUsingSpace)
+    forKey: UserDef.kChooseCandidateUsingSpace.rawValue)
   @State private var selKeyBehaviorESCForClearingTheBuffer = UserDefaults.standard.bool(
-    forKey: UserDef.kEscToCleanInputBuffer)
-  @State private var selEnableSCPCTypingMode = UserDefaults.standard.bool(forKey: UserDef.kUseSCPCTypingMode)
-  @State private var selComposingBufferSize = UserDefaults.standard.integer(forKey: UserDef.kComposingBufferSize)
+    forKey: UserDef.kEscToCleanInputBuffer.rawValue)
+  @State private var selEnableSCPCTypingMode = UserDefaults.standard.bool(forKey: UserDef.kUseSCPCTypingMode.rawValue)
+  @State private var selComposingBufferSize = UserDefaults.standard.integer(
+    forKey: UserDef.kComposingBufferSize.rawValue)
   @State private var selAutoCorrectReadingCombination = UserDefaults.standard.bool(
-    forKey: UserDef.kAutoCorrectReadingCombination)
+    forKey: UserDef.kAutoCorrectReadingCombination.rawValue)
   @State private var selAlsoConfirmAssociatedCandidatesByEnter = UserDefaults.standard.bool(
-    forKey: UserDef.kAlsoConfirmAssociatedCandidatesByEnter)
+    forKey: UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue)
   @State private var selKeepReadingUponCompositionError = UserDefaults.standard.bool(
-    forKey: UserDef.kKeepReadingUponCompositionError)
+    forKey: UserDef.kKeepReadingUponCompositionError.rawValue)
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":

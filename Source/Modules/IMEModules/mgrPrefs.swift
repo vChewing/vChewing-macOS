@@ -26,57 +26,57 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
 
-struct UserDef {
-  static let kIsDebugModeEnabled = "_DebugMode"
-  static let kMostRecentInputMode = "MostRecentInputMode"
-  static let kUserDataFolderSpecified = "UserDataFolderSpecified"
-  static let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
-  static let kMandarinParser = "MandarinParser"
-  static let kBasicKeyboardLayout = "BasicKeyboardLayout"
-  static let kShowPageButtonsInCandidateWindow = "ShowPageButtonsInCandidateWindow"
-  static let kCandidateListTextSize = "CandidateListTextSize"
-  static let kAppleLanguages = "AppleLanguages"
-  static let kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
-  static let kuseRearCursorMode = "useRearCursorMode"
-  static let kUseHorizontalCandidateList = "UseHorizontalCandidateList"
-  static let kComposingBufferSize = "ComposingBufferSize"
-  static let kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
-  static let kCNS11643Enabled = "CNS11643Enabled"
-  static let kSymbolInputEnabled = "SymbolInputEnabled"
-  static let kChineseConversionEnabled = "ChineseConversionEnabled"
-  static let kShiftJISShinjitaiOutputEnabled = "ShiftJISShinjitaiOutputEnabled"
-  static let kCurrencyNumeralsEnabled = "CurrencyNumeralsEnabled"
-  static let kHalfWidthPunctuationEnabled = "HalfWidthPunctuationEnable"
-  static let kMoveCursorAfterSelectingCandidate = "MoveCursorAfterSelectingCandidate"
-  static let kEscToCleanInputBuffer = "EscToCleanInputBuffer"
-  static let kSpecifyShiftTabKeyBehavior = "SpecifyShiftTabKeyBehavior"
-  static let kSpecifyShiftSpaceKeyBehavior = "SpecifyShiftSpaceKeyBehavior"
-  static let kAllowBoostingSingleKanjiAsUserPhrase = "AllowBoostingSingleKanjiAsUserPhrase"
-  static let kUseSCPCTypingMode = "UseSCPCTypingMode"
-  static let kMaxCandidateLength = "MaxCandidateLength"
-  static let kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
-  static let kShowHanyuPinyinInCompositionBuffer = "ShowHanyuPinyinInCompositionBuffer"
-  static let kInlineDumpPinyinInLieuOfZhuyin = "InlineDumpPinyinInLieuOfZhuyin"
-  static let kFetchSuggestionsFromUserOverrideModel = "FetchSuggestionsFromUserOverrideModel"
-  static let kUseFixecCandidateOrderOnSelection = "UseFixecCandidateOrderOnSelection"
-  static let kAutoCorrectReadingCombination = "AutoCorrectReadingCombination"
-  static let kAlsoConfirmAssociatedCandidatesByEnter = "AlsoConfirmAssociatedCandidatesByEnter"
-  static let kKeepReadingUponCompositionError = "KeepReadingUponCompositionError"
+public enum UserDef: String, CaseIterable {
+  case kIsDebugModeEnabled = "_DebugMode"
+  case kMostRecentInputMode = "MostRecentInputMode"
+  case kUserDataFolderSpecified = "UserDataFolderSpecified"
+  case kCheckUpdateAutomatically = "CheckUpdateAutomatically"
+  case kMandarinParser = "MandarinParser"
+  case kBasicKeyboardLayout = "BasicKeyboardLayout"
+  case kShowPageButtonsInCandidateWindow = "ShowPageButtonsInCandidateWindow"
+  case kCandidateListTextSize = "CandidateListTextSize"
+  case kAppleLanguages = "AppleLanguages"
+  case kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
+  case kuseRearCursorMode = "useRearCursorMode"
+  case kUseHorizontalCandidateList = "UseHorizontalCandidateList"
+  case kComposingBufferSize = "ComposingBufferSize"
+  case kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
+  case kCNS11643Enabled = "CNS11643Enabled"
+  case kSymbolInputEnabled = "SymbolInputEnabled"
+  case kChineseConversionEnabled = "ChineseConversionEnabled"
+  case kShiftJISShinjitaiOutputEnabled = "ShiftJISShinjitaiOutputEnabled"
+  case kCurrencyNumeralsEnabled = "CurrencyNumeralsEnabled"
+  case kHalfWidthPunctuationEnabled = "HalfWidthPunctuationEnable"
+  case kMoveCursorAfterSelectingCandidate = "MoveCursorAfterSelectingCandidate"
+  case kEscToCleanInputBuffer = "EscToCleanInputBuffer"
+  case kSpecifyShiftTabKeyBehavior = "SpecifyShiftTabKeyBehavior"
+  case kSpecifyShiftSpaceKeyBehavior = "SpecifyShiftSpaceKeyBehavior"
+  case kAllowBoostingSingleKanjiAsUserPhrase = "AllowBoostingSingleKanjiAsUserPhrase"
+  case kUseSCPCTypingMode = "UseSCPCTypingMode"
+  case kMaxCandidateLength = "MaxCandidateLength"
+  case kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
+  case kShowHanyuPinyinInCompositionBuffer = "ShowHanyuPinyinInCompositionBuffer"
+  case kInlineDumpPinyinInLieuOfZhuyin = "InlineDumpPinyinInLieuOfZhuyin"
+  case kFetchSuggestionsFromUserOverrideModel = "FetchSuggestionsFromUserOverrideModel"
+  case kUseFixecCandidateOrderOnSelection = "UseFixecCandidateOrderOnSelection"
+  case kAutoCorrectReadingCombination = "AutoCorrectReadingCombination"
+  case kAlsoConfirmAssociatedCandidatesByEnter = "AlsoConfirmAssociatedCandidatesByEnter"
+  case kKeepReadingUponCompositionError = "KeepReadingUponCompositionError"
 
-  static let kCandidateTextFontName = "CandidateTextFontName"
-  static let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
-  static let kCandidateKeys = "CandidateKeys"
+  case kCandidateTextFontName = "CandidateTextFontName"
+  case kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
+  case kCandidateKeys = "CandidateKeys"
 
-  static let kAssociatedPhrasesEnabled = "AssociatedPhrasesEnabled"
-  static let kPhraseReplacementEnabled = "PhraseReplacementEnabled"
+  case kAssociatedPhrasesEnabled = "AssociatedPhrasesEnabled"
+  case kPhraseReplacementEnabled = "PhraseReplacementEnabled"
 
-  static let kUsingHotKeySCPC = "UsingHotKeySCPC"
-  static let kUsingHotKeyAssociates = "UsingHotKeyAssociates"
-  static let kUsingHotKeyCNS = "UsingHotKeyCNS"
-  static let kUsingHotKeyKangXi = "UsingHotKeyKangXi"
-  static let kUsingHotKeyJIS = "UsingHotKeyJIS"
-  static let kUsingHotKeyHalfWidthASCII = "UsingHotKeyHalfWidthASCII"
-  static let kUsingHotKeyCurrencyNumerals = "UsingHotKeyCurrencyNumerals"
+  case kUsingHotKeySCPC = "UsingHotKeySCPC"
+  case kUsingHotKeyAssociates = "UsingHotKeyAssociates"
+  case kUsingHotKeyCNS = "UsingHotKeyCNS"
+  case kUsingHotKeyKangXi = "UsingHotKeyKangXi"
+  case kUsingHotKeyJIS = "UsingHotKeyJIS"
+  case kUsingHotKeyHalfWidthASCII = "UsingHotKeyHalfWidthASCII"
+  case kUsingHotKeyCurrencyNumerals = "UsingHotKeyCurrencyNumerals"
 }
 
 private let kDefaultCandidateListTextSize: CGFloat = 18
@@ -238,95 +238,111 @@ enum MandarinParser: Int {
 
 public enum mgrPrefs {
   public static func setMissingDefaults() {
-    UserDefaults.standard.setDefault(mgrPrefs.isDebugModeEnabled, forKey: UserDef.kIsDebugModeEnabled)
-    UserDefaults.standard.setDefault(mgrPrefs.mostRecentInputMode, forKey: UserDef.kMostRecentInputMode)
-    UserDefaults.standard.setDefault(mgrPrefs.checkUpdateAutomatically, forKey: UserDef.kCheckUpdateAutomatically)
+    UserDefaults.standard.setDefault(mgrPrefs.isDebugModeEnabled, forKey: UserDef.kIsDebugModeEnabled.rawValue)
+    UserDefaults.standard.setDefault(mgrPrefs.mostRecentInputMode, forKey: UserDef.kMostRecentInputMode.rawValue)
     UserDefaults.standard.setDefault(
-      mgrPrefs.showPageButtonsInCandidateWindow, forKey: UserDef.kShowPageButtonsInCandidateWindow
-    )
-    UserDefaults.standard.setDefault(mgrPrefs.symbolInputEnabled, forKey: UserDef.kSymbolInputEnabled)
-    UserDefaults.standard.setDefault(mgrPrefs.candidateListTextSize, forKey: UserDef.kCandidateListTextSize)
-    UserDefaults.standard.setDefault(mgrPrefs.chooseCandidateUsingSpace, forKey: UserDef.kChooseCandidateUsingSpace)
-    UserDefaults.standard.setDefault(
-      mgrPrefs.shouldAutoReloadUserDataFiles, forKey: UserDef.kShouldAutoReloadUserDataFiles
+      mgrPrefs.checkUpdateAutomatically, forKey: UserDef.kCheckUpdateAutomatically.rawValue
     )
     UserDefaults.standard.setDefault(
-      mgrPrefs.specifyShiftTabKeyBehavior, forKey: UserDef.kSpecifyShiftTabKeyBehavior
+      mgrPrefs.showPageButtonsInCandidateWindow, forKey: UserDef.kShowPageButtonsInCandidateWindow.rawValue
+    )
+    UserDefaults.standard.setDefault(mgrPrefs.symbolInputEnabled, forKey: UserDef.kSymbolInputEnabled.rawValue)
+    UserDefaults.standard.setDefault(mgrPrefs.candidateListTextSize, forKey: UserDef.kCandidateListTextSize.rawValue)
+    UserDefaults.standard.setDefault(
+      mgrPrefs.chooseCandidateUsingSpace, forKey: UserDef.kChooseCandidateUsingSpace.rawValue
     )
     UserDefaults.standard.setDefault(
-      mgrPrefs.specifyShiftSpaceKeyBehavior, forKey: UserDef.kSpecifyShiftSpaceKeyBehavior
-    )
-    UserDefaults.standard.setDefault(mgrPrefs.useSCPCTypingMode, forKey: UserDef.kUseSCPCTypingMode)
-    UserDefaults.standard.setDefault(mgrPrefs.associatedPhrasesEnabled, forKey: UserDef.kAssociatedPhrasesEnabled)
-    UserDefaults.standard.setDefault(
-      mgrPrefs.useRearCursorMode, forKey: UserDef.kuseRearCursorMode
+      mgrPrefs.shouldAutoReloadUserDataFiles, forKey: UserDef.kShouldAutoReloadUserDataFiles.rawValue
     )
     UserDefaults.standard.setDefault(
-      mgrPrefs.moveCursorAfterSelectingCandidate, forKey: UserDef.kMoveCursorAfterSelectingCandidate
+      mgrPrefs.specifyShiftTabKeyBehavior, forKey: UserDef.kSpecifyShiftTabKeyBehavior.rawValue
     )
     UserDefaults.standard.setDefault(
-      mgrPrefs.useHorizontalCandidateList, forKey: UserDef.kUseHorizontalCandidateList
+      mgrPrefs.specifyShiftSpaceKeyBehavior, forKey: UserDef.kSpecifyShiftSpaceKeyBehavior.rawValue
     )
-    UserDefaults.standard.setDefault(mgrPrefs.cns11643Enabled, forKey: UserDef.kCNS11643Enabled)
-    UserDefaults.standard.setDefault(mgrPrefs.chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled)
+    UserDefaults.standard.setDefault(mgrPrefs.useSCPCTypingMode, forKey: UserDef.kUseSCPCTypingMode.rawValue)
     UserDefaults.standard.setDefault(
-      mgrPrefs.shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled
-    )
-    UserDefaults.standard.setDefault(mgrPrefs.phraseReplacementEnabled, forKey: UserDef.kPhraseReplacementEnabled)
-    UserDefaults.standard.setDefault(mgrPrefs.shouldNotFartInLieuOfBeep, forKey: UserDef.kShouldNotFartInLieuOfBeep)
-    UserDefaults.standard.setDefault(
-      mgrPrefs.showHanyuPinyinInCompositionBuffer, forKey: UserDef.kShowHanyuPinyinInCompositionBuffer
+      mgrPrefs.associatedPhrasesEnabled, forKey: UserDef.kAssociatedPhrasesEnabled.rawValue
     )
     UserDefaults.standard.setDefault(
-      mgrPrefs.inlineDumpPinyinInLieuOfZhuyin, forKey: UserDef.kInlineDumpPinyinInLieuOfZhuyin
+      mgrPrefs.useRearCursorMode, forKey: UserDef.kuseRearCursorMode.rawValue
     )
     UserDefaults.standard.setDefault(
-      mgrPrefs.allowBoostingSingleKanjiAsUserPhrase, forKey: UserDef.kAllowBoostingSingleKanjiAsUserPhrase
+      mgrPrefs.moveCursorAfterSelectingCandidate, forKey: UserDef.kMoveCursorAfterSelectingCandidate.rawValue
     )
     UserDefaults.standard.setDefault(
-      mgrPrefs.fetchSuggestionsFromUserOverrideModel, forKey: UserDef.kFetchSuggestionsFromUserOverrideModel
+      mgrPrefs.useHorizontalCandidateList, forKey: UserDef.kUseHorizontalCandidateList.rawValue
+    )
+    UserDefaults.standard.setDefault(mgrPrefs.cns11643Enabled, forKey: UserDef.kCNS11643Enabled.rawValue)
+    UserDefaults.standard.setDefault(
+      mgrPrefs.chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled.rawValue
     )
     UserDefaults.standard.setDefault(
-      mgrPrefs.useFixecCandidateOrderOnSelection, forKey: UserDef.kUseFixecCandidateOrderOnSelection
+      mgrPrefs.shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue
     )
     UserDefaults.standard.setDefault(
-      mgrPrefs.autoCorrectReadingCombination, forKey: UserDef.kAutoCorrectReadingCombination
+      mgrPrefs.phraseReplacementEnabled, forKey: UserDef.kPhraseReplacementEnabled.rawValue
     )
     UserDefaults.standard.setDefault(
-      mgrPrefs.alsoConfirmAssociatedCandidatesByEnter, forKey: UserDef.kAlsoConfirmAssociatedCandidatesByEnter
+      mgrPrefs.shouldNotFartInLieuOfBeep, forKey: UserDef.kShouldNotFartInLieuOfBeep.rawValue
     )
     UserDefaults.standard.setDefault(
-      mgrPrefs.currencyNumeralsEnabled, forKey: UserDef.kCurrencyNumeralsEnabled
+      mgrPrefs.showHanyuPinyinInCompositionBuffer, forKey: UserDef.kShowHanyuPinyinInCompositionBuffer.rawValue
     )
     UserDefaults.standard.setDefault(
-      mgrPrefs.keepReadingUponCompositionError, forKey: UserDef.kKeepReadingUponCompositionError
+      mgrPrefs.inlineDumpPinyinInLieuOfZhuyin, forKey: UserDef.kInlineDumpPinyinInLieuOfZhuyin.rawValue
+    )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.allowBoostingSingleKanjiAsUserPhrase, forKey: UserDef.kAllowBoostingSingleKanjiAsUserPhrase.rawValue
+    )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.fetchSuggestionsFromUserOverrideModel, forKey: UserDef.kFetchSuggestionsFromUserOverrideModel.rawValue
+    )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.useFixecCandidateOrderOnSelection, forKey: UserDef.kUseFixecCandidateOrderOnSelection.rawValue
+    )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.autoCorrectReadingCombination, forKey: UserDef.kAutoCorrectReadingCombination.rawValue
+    )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.alsoConfirmAssociatedCandidatesByEnter, forKey: UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue
+    )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.currencyNumeralsEnabled, forKey: UserDef.kCurrencyNumeralsEnabled.rawValue
+    )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.keepReadingUponCompositionError, forKey: UserDef.kKeepReadingUponCompositionError.rawValue
     )
 
-    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeySCPC, forKey: UserDef.kUsingHotKeySCPC)
-    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyAssociates, forKey: UserDef.kUsingHotKeyAssociates)
-    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyCNS, forKey: UserDef.kUsingHotKeyCNS)
-    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyKangXi, forKey: UserDef.kUsingHotKeyKangXi)
-    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyJIS, forKey: UserDef.kUsingHotKeyJIS)
-    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyHalfWidthASCII, forKey: UserDef.kUsingHotKeyHalfWidthASCII)
-    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyCurrencyNumerals, forKey: UserDef.kUsingHotKeyCurrencyNumerals)
+    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeySCPC, forKey: UserDef.kUsingHotKeySCPC.rawValue)
+    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyAssociates, forKey: UserDef.kUsingHotKeyAssociates.rawValue)
+    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyCNS, forKey: UserDef.kUsingHotKeyCNS.rawValue)
+    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyKangXi, forKey: UserDef.kUsingHotKeyKangXi.rawValue)
+    UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyJIS, forKey: UserDef.kUsingHotKeyJIS.rawValue)
+    UserDefaults.standard.setDefault(
+      mgrPrefs.usingHotKeyHalfWidthASCII, forKey: UserDef.kUsingHotKeyHalfWidthASCII.rawValue
+    )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.usingHotKeyCurrencyNumerals, forKey: UserDef.kUsingHotKeyCurrencyNumerals.rawValue
+    )
 
     UserDefaults.standard.synchronize()
   }
 
-  @UserDefault(key: UserDef.kIsDebugModeEnabled, defaultValue: false)
+  @UserDefault(key: UserDef.kIsDebugModeEnabled.rawValue, defaultValue: false)
   static var isDebugModeEnabled: Bool
 
-  @UserDefault(key: UserDef.kMostRecentInputMode, defaultValue: "")
+  @UserDefault(key: UserDef.kMostRecentInputMode.rawValue, defaultValue: "")
   static var mostRecentInputMode: String
 
-  @UserDefault(key: UserDef.kCheckUpdateAutomatically, defaultValue: false)
+  @UserDefault(key: UserDef.kCheckUpdateAutomatically.rawValue, defaultValue: false)
   static var checkUpdateAutomatically: Bool
 
-  @UserDefault(key: UserDef.kUserDataFolderSpecified, defaultValue: "")
+  @UserDefault(key: UserDef.kUserDataFolderSpecified.rawValue, defaultValue: "")
   static var userDataFolderSpecified: String
 
   static func ifSpecifiedUserDataPathExistsInPlist() -> Bool {
-    UserDefaults.standard.object(forKey: UserDef.kUserDataFolderSpecified) != nil
+    UserDefaults.standard.object(forKey: UserDef.kUserDataFolderSpecified.rawValue) != nil
   }
 
   static func resetSpecifiedUserDataFolder() {
@@ -334,10 +350,10 @@ public enum mgrPrefs {
     IME.initLangModels(userOnly: true)
   }
 
-  @UserDefault(key: UserDef.kAppleLanguages, defaultValue: [])
+  @UserDefault(key: UserDef.kAppleLanguages.rawValue, defaultValue: [])
   static var appleLanguages: [String]
 
-  @UserDefault(key: UserDef.kMandarinParser, defaultValue: 0)
+  @UserDefault(key: UserDef.kMandarinParser.rawValue, defaultValue: 0)
   static var mandarinParser: Int
 
   static var mandarinParserName: String {
@@ -345,106 +361,106 @@ public enum mgrPrefs {
   }
 
   @UserDefault(
-    key: UserDef.kBasicKeyboardLayout, defaultValue: "com.apple.keylayout.ZhuyinBopomofo"
+    key: UserDef.kBasicKeyboardLayout.rawValue, defaultValue: "com.apple.keylayout.ZhuyinBopomofo"
   )
   static var basicKeyboardLayout: String
 
-  @UserDefault(key: UserDef.kShowPageButtonsInCandidateWindow, defaultValue: true)
+  @UserDefault(key: UserDef.kShowPageButtonsInCandidateWindow.rawValue, defaultValue: true)
   static var showPageButtonsInCandidateWindow: Bool
 
-  @CandidateListTextSize(key: UserDef.kCandidateListTextSize)
+  @CandidateListTextSize(key: UserDef.kCandidateListTextSize.rawValue)
   static var candidateListTextSize: CGFloat
 
   static var minKeyLabelSize: CGFloat { kDefaultMinKeyLabelSize }
 
-  @UserDefault(key: UserDef.kShouldAutoReloadUserDataFiles, defaultValue: true)
+  @UserDefault(key: UserDef.kShouldAutoReloadUserDataFiles.rawValue, defaultValue: true)
   static var shouldAutoReloadUserDataFiles: Bool
 
-  @UserDefault(key: UserDef.kuseRearCursorMode, defaultValue: false)
+  @UserDefault(key: UserDef.kuseRearCursorMode.rawValue, defaultValue: false)
   static var useRearCursorMode: Bool
 
-  @UserDefault(key: UserDef.kMoveCursorAfterSelectingCandidate, defaultValue: true)
+  @UserDefault(key: UserDef.kMoveCursorAfterSelectingCandidate.rawValue, defaultValue: true)
   static var moveCursorAfterSelectingCandidate: Bool
 
-  @UserDefault(key: UserDef.kUseHorizontalCandidateList, defaultValue: true)
+  @UserDefault(key: UserDef.kUseHorizontalCandidateList.rawValue, defaultValue: true)
   static var useHorizontalCandidateList: Bool
 
-  @ComposingBufferSize(key: UserDef.kComposingBufferSize)
+  @ComposingBufferSize(key: UserDef.kComposingBufferSize.rawValue)
   static var composingBufferSize: Int
 
-  @UserDefault(key: UserDef.kChooseCandidateUsingSpace, defaultValue: true)
+  @UserDefault(key: UserDef.kChooseCandidateUsingSpace.rawValue, defaultValue: true)
   static var chooseCandidateUsingSpace: Bool
 
-  @UserDefault(key: UserDef.kAllowBoostingSingleKanjiAsUserPhrase, defaultValue: false)
+  @UserDefault(key: UserDef.kAllowBoostingSingleKanjiAsUserPhrase.rawValue, defaultValue: false)
   static var allowBoostingSingleKanjiAsUserPhrase: Bool
 
-  @UserDefault(key: UserDef.kFetchSuggestionsFromUserOverrideModel, defaultValue: true)
+  @UserDefault(key: UserDef.kFetchSuggestionsFromUserOverrideModel.rawValue, defaultValue: true)
   static var fetchSuggestionsFromUserOverrideModel: Bool
 
-  @UserDefault(key: UserDef.kUseFixecCandidateOrderOnSelection, defaultValue: false)
+  @UserDefault(key: UserDef.kUseFixecCandidateOrderOnSelection.rawValue, defaultValue: false)
   static var useFixecCandidateOrderOnSelection: Bool
 
-  @UserDefault(key: UserDef.kAutoCorrectReadingCombination, defaultValue: true)
+  @UserDefault(key: UserDef.kAutoCorrectReadingCombination.rawValue, defaultValue: true)
   static var autoCorrectReadingCombination: Bool
 
-  @UserDefault(key: UserDef.kAlsoConfirmAssociatedCandidatesByEnter, defaultValue: true)
+  @UserDefault(key: UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue, defaultValue: true)
   static var alsoConfirmAssociatedCandidatesByEnter: Bool
 
-  @UserDefault(key: UserDef.kAlsoConfirmAssociatedCandidatesByEnter, defaultValue: false)
+  @UserDefault(key: UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue, defaultValue: false)
   static var keepReadingUponCompositionError: Bool
 
   static var minCandidateLength: Int {
     mgrPrefs.allowBoostingSingleKanjiAsUserPhrase ? 1 : 2
   }
 
-  @UserDefault(key: UserDef.kUseSCPCTypingMode, defaultValue: false)
+  @UserDefault(key: UserDef.kUseSCPCTypingMode.rawValue, defaultValue: false)
   static var useSCPCTypingMode: Bool
 
   static func toggleSCPCTypingModeEnabled() -> Bool {
     useSCPCTypingMode = !useSCPCTypingMode
-    UserDefaults.standard.set(useSCPCTypingMode, forKey: UserDef.kUseSCPCTypingMode)
+    UserDefaults.standard.set(useSCPCTypingMode, forKey: UserDef.kUseSCPCTypingMode.rawValue)
     return useSCPCTypingMode
   }
 
-  @UserDefault(key: UserDef.kMaxCandidateLength, defaultValue: 10)
+  @UserDefault(key: UserDef.kMaxCandidateLength.rawValue, defaultValue: 10)
   static var maxCandidateLength: Int
 
-  @UserDefault(key: UserDef.kShouldNotFartInLieuOfBeep, defaultValue: true)
+  @UserDefault(key: UserDef.kShouldNotFartInLieuOfBeep.rawValue, defaultValue: true)
   static var shouldNotFartInLieuOfBeep: Bool
 
-  @UserDefault(key: UserDef.kShowHanyuPinyinInCompositionBuffer, defaultValue: false)
+  @UserDefault(key: UserDef.kShowHanyuPinyinInCompositionBuffer.rawValue, defaultValue: false)
   static var showHanyuPinyinInCompositionBuffer: Bool
 
-  @UserDefault(key: UserDef.kInlineDumpPinyinInLieuOfZhuyin, defaultValue: false)
+  @UserDefault(key: UserDef.kInlineDumpPinyinInLieuOfZhuyin.rawValue, defaultValue: false)
   static var inlineDumpPinyinInLieuOfZhuyin: Bool
 
   static func toggleShouldNotFartInLieuOfBeep() -> Bool {
     shouldNotFartInLieuOfBeep = !shouldNotFartInLieuOfBeep
-    UserDefaults.standard.set(shouldNotFartInLieuOfBeep, forKey: UserDef.kShouldNotFartInLieuOfBeep)
+    UserDefaults.standard.set(shouldNotFartInLieuOfBeep, forKey: UserDef.kShouldNotFartInLieuOfBeep.rawValue)
     return shouldNotFartInLieuOfBeep
   }
 
-  @UserDefault(key: UserDef.kCNS11643Enabled, defaultValue: false)
+  @UserDefault(key: UserDef.kCNS11643Enabled.rawValue, defaultValue: false)
   static var cns11643Enabled: Bool
 
   static func toggleCNS11643Enabled() -> Bool {
     cns11643Enabled = !cns11643Enabled
     mgrLangModel.setCNSEnabled(cns11643Enabled)  // 很重要
-    UserDefaults.standard.set(cns11643Enabled, forKey: UserDef.kCNS11643Enabled)
+    UserDefaults.standard.set(cns11643Enabled, forKey: UserDef.kCNS11643Enabled.rawValue)
     return cns11643Enabled
   }
 
-  @UserDefault(key: UserDef.kSymbolInputEnabled, defaultValue: true)
+  @UserDefault(key: UserDef.kSymbolInputEnabled.rawValue, defaultValue: true)
   static var symbolInputEnabled: Bool
 
   static func toggleSymbolInputEnabled() -> Bool {
     symbolInputEnabled = !symbolInputEnabled
     mgrLangModel.setSymbolEnabled(symbolInputEnabled)  // 很重要
-    UserDefaults.standard.set(symbolInputEnabled, forKey: UserDef.kSymbolInputEnabled)
+    UserDefaults.standard.set(symbolInputEnabled, forKey: UserDef.kSymbolInputEnabled.rawValue)
     return symbolInputEnabled
   }
 
-  @UserDefault(key: UserDef.kChineseConversionEnabled, defaultValue: false)
+  @UserDefault(key: UserDef.kChineseConversionEnabled.rawValue, defaultValue: false)
   static var chineseConversionEnabled: Bool
 
   @discardableResult static func toggleChineseConversionEnabled() -> Bool {
@@ -453,14 +469,14 @@ public enum mgrPrefs {
     if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
       toggleShiftJISShinjitaiOutputEnabled()
       UserDefaults.standard.set(
-        shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled
+        shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue
       )
     }
-    UserDefaults.standard.set(chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled)
+    UserDefaults.standard.set(chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled.rawValue)
     return chineseConversionEnabled
   }
 
-  @UserDefault(key: UserDef.kShiftJISShinjitaiOutputEnabled, defaultValue: false)
+  @UserDefault(key: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue, defaultValue: false)
   static var shiftJISShinjitaiOutputEnabled: Bool
 
   @discardableResult static func toggleShiftJISShinjitaiOutputEnabled() -> Bool {
@@ -470,12 +486,12 @@ public enum mgrPrefs {
       toggleChineseConversionEnabled()
     }
     UserDefaults.standard.set(
-      shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled
+      shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue
     )
     return shiftJISShinjitaiOutputEnabled
   }
 
-  @UserDefault(key: UserDef.kCurrencyNumeralsEnabled, defaultValue: false)
+  @UserDefault(key: UserDef.kCurrencyNumeralsEnabled.rawValue, defaultValue: false)
   static var currencyNumeralsEnabled: Bool
 
   static func toggleCurrencyNumeralsEnabled() -> Bool {
@@ -483,7 +499,7 @@ public enum mgrPrefs {
     return currencyNumeralsEnabled
   }
 
-  @UserDefault(key: UserDef.kHalfWidthPunctuationEnabled, defaultValue: false)
+  @UserDefault(key: UserDef.kHalfWidthPunctuationEnabled.rawValue, defaultValue: false)
   static var halfWidthPunctuationEnabled: Bool
 
   static func toggleHalfWidthPunctuationEnabled() -> Bool {
@@ -491,24 +507,24 @@ public enum mgrPrefs {
     return halfWidthPunctuationEnabled
   }
 
-  @UserDefault(key: UserDef.kEscToCleanInputBuffer, defaultValue: true)
+  @UserDefault(key: UserDef.kEscToCleanInputBuffer.rawValue, defaultValue: true)
   static var escToCleanInputBuffer: Bool
 
-  @UserDefault(key: UserDef.kSpecifyShiftTabKeyBehavior, defaultValue: false)
+  @UserDefault(key: UserDef.kSpecifyShiftTabKeyBehavior.rawValue, defaultValue: false)
   static var specifyShiftTabKeyBehavior: Bool
 
-  @UserDefault(key: UserDef.kSpecifyShiftSpaceKeyBehavior, defaultValue: false)
+  @UserDefault(key: UserDef.kSpecifyShiftSpaceKeyBehavior.rawValue, defaultValue: false)
   static var specifyShiftSpaceKeyBehavior: Bool
 
   // MARK: - Optional settings
 
-  @UserDefault(key: UserDef.kCandidateTextFontName, defaultValue: nil)
+  @UserDefault(key: UserDef.kCandidateTextFontName.rawValue, defaultValue: nil)
   static var candidateTextFontName: String?
 
-  @UserDefault(key: UserDef.kCandidateKeyLabelFontName, defaultValue: nil)
+  @UserDefault(key: UserDef.kCandidateKeyLabelFontName.rawValue, defaultValue: nil)
   static var candidateKeyLabelFontName: String?
 
-  @UserDefault(key: UserDef.kCandidateKeys, defaultValue: kDefaultKeys)
+  @UserDefault(key: UserDef.kCandidateKeys.rawValue, defaultValue: kDefaultKeys)
   static var candidateKeys: String
 
   static var defaultCandidateKeys: String {
@@ -573,46 +589,46 @@ public enum mgrPrefs {
     }
   }
 
-  @UserDefault(key: UserDef.kPhraseReplacementEnabled, defaultValue: false)
+  @UserDefault(key: UserDef.kPhraseReplacementEnabled.rawValue, defaultValue: false)
   static var phraseReplacementEnabled: Bool
 
   static func togglePhraseReplacementEnabled() -> Bool {
     phraseReplacementEnabled = !phraseReplacementEnabled
     mgrLangModel.setPhraseReplacementEnabled(phraseReplacementEnabled)
-    UserDefaults.standard.set(phraseReplacementEnabled, forKey: UserDef.kPhraseReplacementEnabled)
+    UserDefaults.standard.set(phraseReplacementEnabled, forKey: UserDef.kPhraseReplacementEnabled.rawValue)
     return phraseReplacementEnabled
   }
 
-  @UserDefault(key: UserDef.kAssociatedPhrasesEnabled, defaultValue: false)
+  @UserDefault(key: UserDef.kAssociatedPhrasesEnabled.rawValue, defaultValue: false)
   static var associatedPhrasesEnabled: Bool
 
   static func toggleAssociatedPhrasesEnabled() -> Bool {
     associatedPhrasesEnabled = !associatedPhrasesEnabled
-    UserDefaults.standard.set(associatedPhrasesEnabled, forKey: UserDef.kAssociatedPhrasesEnabled)
+    UserDefaults.standard.set(associatedPhrasesEnabled, forKey: UserDef.kAssociatedPhrasesEnabled.rawValue)
     return associatedPhrasesEnabled
   }
 
   // MARK: - Keyboard HotKey Enable / Disable
 
-  @UserDefault(key: UserDef.kUsingHotKeySCPC, defaultValue: true)
+  @UserDefault(key: UserDef.kUsingHotKeySCPC.rawValue, defaultValue: true)
   static var usingHotKeySCPC: Bool
 
-  @UserDefault(key: UserDef.kUsingHotKeyAssociates, defaultValue: true)
+  @UserDefault(key: UserDef.kUsingHotKeyAssociates.rawValue, defaultValue: true)
   static var usingHotKeyAssociates: Bool
 
-  @UserDefault(key: UserDef.kUsingHotKeyCNS, defaultValue: true)
+  @UserDefault(key: UserDef.kUsingHotKeyCNS.rawValue, defaultValue: true)
   static var usingHotKeyCNS: Bool
 
-  @UserDefault(key: UserDef.kUsingHotKeyKangXi, defaultValue: true)
+  @UserDefault(key: UserDef.kUsingHotKeyKangXi.rawValue, defaultValue: true)
   static var usingHotKeyKangXi: Bool
 
-  @UserDefault(key: UserDef.kUsingHotKeyJIS, defaultValue: true)
+  @UserDefault(key: UserDef.kUsingHotKeyJIS.rawValue, defaultValue: true)
   static var usingHotKeyJIS: Bool
 
-  @UserDefault(key: UserDef.kUsingHotKeyHalfWidthASCII, defaultValue: true)
+  @UserDefault(key: UserDef.kUsingHotKeyHalfWidthASCII.rawValue, defaultValue: true)
   static var usingHotKeyHalfWidthASCII: Bool
 
-  @UserDefault(key: UserDef.kUsingHotKeyCurrencyNumerals, defaultValue: true)
+  @UserDefault(key: UserDef.kUsingHotKeyCurrencyNumerals.rawValue, defaultValue: true)
   static var usingHotKeyCurrencyNumerals: Bool
 }
 
@@ -621,45 +637,23 @@ public enum mgrPrefs {
 var snapshot: [String: Any]?
 
 extension mgrPrefs {
-  static var allKeys: [String] {
-    [
-      UserDef.kIsDebugModeEnabled, UserDef.kMostRecentInputMode, UserDef.kUserDataFolderSpecified,
-      UserDef.kCheckUpdateAutomatically, UserDef.kMandarinParser, UserDef.kBasicKeyboardLayout,
-      UserDef.kShowPageButtonsInCandidateWindow, UserDef.kCandidateListTextSize, UserDef.kAppleLanguages,
-      UserDef.kShouldAutoReloadUserDataFiles, UserDef.kuseRearCursorMode, UserDef.kUseHorizontalCandidateList,
-      UserDef.kComposingBufferSize, UserDef.kChooseCandidateUsingSpace, UserDef.kCNS11643Enabled,
-      UserDef.kSymbolInputEnabled, UserDef.kChineseConversionEnabled, UserDef.kShiftJISShinjitaiOutputEnabled,
-      UserDef.kHalfWidthPunctuationEnabled, UserDef.kMoveCursorAfterSelectingCandidate, UserDef.kEscToCleanInputBuffer,
-      UserDef.kSpecifyShiftTabKeyBehavior, UserDef.kSpecifyShiftSpaceKeyBehavior,
-      UserDef.kAllowBoostingSingleKanjiAsUserPhrase, UserDef.kUseSCPCTypingMode, UserDef.kMaxCandidateLength,
-      UserDef.kShouldNotFartInLieuOfBeep, UserDef.kShowHanyuPinyinInCompositionBuffer,
-      UserDef.kInlineDumpPinyinInLieuOfZhuyin, UserDef.kFetchSuggestionsFromUserOverrideModel,
-      UserDef.kCandidateTextFontName, UserDef.kCandidateKeyLabelFontName, UserDef.kCandidateKeys,
-      UserDef.kAssociatedPhrasesEnabled, UserDef.kPhraseReplacementEnabled, UserDef.kUsingHotKeySCPC,
-      UserDef.kUsingHotKeyAssociates, UserDef.kUsingHotKeyCNS, UserDef.kUsingHotKeyKangXi, UserDef.kUsingHotKeyJIS,
-      UserDef.kUsingHotKeyHalfWidthASCII, UserDef.kUseFixecCandidateOrderOnSelection,
-      UserDef.kAutoCorrectReadingCombination, UserDef.kAlsoConfirmAssociatedCandidatesByEnter,
-      UserDef.kCurrencyNumeralsEnabled, UserDef.kUsingHotKeyCurrencyNumerals, UserDef.kKeepReadingUponCompositionError,
-    ]
-  }
-
   func reset() {
-    mgrPrefs.allKeys.forEach {
-      UserDefaults.standard.removeObject(forKey: $0)
+    UserDef.allCases.forEach {
+      UserDefaults.standard.removeObject(forKey: $0.rawValue)
     }
   }
 
   func makeSnapshot() -> [String: Any] {
     var dict = [String: Any]()
-    mgrPrefs.allKeys.forEach {
-      dict[$0] = UserDefaults.standard.object(forKey: $0)
+    UserDef.allCases.forEach {
+      dict[$0.rawValue] = UserDefaults.standard.object(forKey: $0.rawValue)
     }
     return dict
   }
 
   func restore(from snapshot: [String: Any]) {
-    mgrPrefs.allKeys.forEach {
-      UserDefaults.standard.set(snapshot[$0], forKey: $0)
+    UserDef.allCases.forEach {
+      UserDefaults.standard.set(snapshot[$0.rawValue], forKey: $0.rawValue)
     }
   }
 }

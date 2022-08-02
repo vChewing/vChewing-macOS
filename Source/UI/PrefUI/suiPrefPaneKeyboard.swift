@@ -26,19 +26,20 @@ import SwiftUI
 
 @available(macOS 11.0, *)
 struct suiPrefPaneKeyboard: View {
-  @State private var selMandarinParser = UserDefaults.standard.integer(forKey: UserDef.kMandarinParser)
+  @State private var selMandarinParser = UserDefaults.standard.integer(forKey: UserDef.kMandarinParser.rawValue)
   @State private var selBasicKeyboardLayout: String =
-    UserDefaults.standard.string(forKey: UserDef.kBasicKeyboardLayout) ?? mgrPrefs.basicKeyboardLayout
+    UserDefaults.standard.string(forKey: UserDef.kBasicKeyboardLayout.rawValue) ?? mgrPrefs.basicKeyboardLayout
 
-  @State private var selUsingHotKeySCPC = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeySCPC)
-  @State private var selUsingHotKeyAssociates = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyAssociates)
-  @State private var selUsingHotKeyCNS = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyCNS)
-  @State private var selUsingHotKeyKangXi = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyKangXi)
-  @State private var selUsingHotKeyJIS = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyJIS)
+  @State private var selUsingHotKeySCPC = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeySCPC.rawValue)
+  @State private var selUsingHotKeyAssociates = UserDefaults.standard.bool(
+    forKey: UserDef.kUsingHotKeyAssociates.rawValue)
+  @State private var selUsingHotKeyCNS = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyCNS.rawValue)
+  @State private var selUsingHotKeyKangXi = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyKangXi.rawValue)
+  @State private var selUsingHotKeyJIS = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyJIS.rawValue)
   @State private var selUsingHotKeyHalfWidthASCII = UserDefaults.standard.bool(
-    forKey: UserDef.kUsingHotKeyHalfWidthASCII)
+    forKey: UserDef.kUsingHotKeyHalfWidthASCII.rawValue)
   @State private var selUsingHotKeyCurrencyNumerals = UserDefaults.standard.bool(
-    forKey: UserDef.kUsingHotKeyCurrencyNumerals)
+    forKey: UserDef.kUsingHotKeyCurrencyNumerals.rawValue)
 
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
