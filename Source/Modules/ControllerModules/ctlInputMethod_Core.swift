@@ -85,6 +85,7 @@ class ctlInputMethod: IMKInputController {
     keyHandler.delegate = self
     // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
     activateServer(inputClient)
+    keyHandler.ensureParser()
     resetKeyHandler()
   }
 
@@ -99,7 +100,7 @@ class ctlInputMethod: IMKInputController {
     // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
     // 所以這裡添加這句、來試圖應對這種情況。
     if keyHandler.delegate == nil { keyHandler.delegate = self }
-
+    setValue(IME.currentInputMode.rawValue, forTag: 114514, client: client())
     keyHandler.clear()
     keyHandler.ensureParser()
 
