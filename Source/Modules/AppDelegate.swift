@@ -29,7 +29,7 @@ import InputMethodKit
 
 @objc(AppDelegate)
 class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelegate,
-  FSEventStreamHelperDelegate
+  FSEventStreamHelperDelegate, NSUserNotificationCenterDelegate
 {
   func helper(_: FSEventStreamHelper, didReceive _: [FSEventStreamHelper.Event]) {
     // 拖 100ms 再重載，畢竟有些有特殊需求的使用者可能會想使用巨型自訂語彙檔案。
@@ -63,13 +63,25 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
     fsStreamHelper.delegate = nil
   }
 
+  func userNotificationCenter(_: NSUserNotificationCenter, shouldPresent _: NSUserNotification) -> Bool {
+    return true
+  }
+
   func applicationDidFinishLaunching(_: Notification) {
+    NSUserNotificationCenter.default.delegate = self
     // 一旦發現與使用者半衰模組的觀察行為有關的崩潰標記被開啟，就清空既有的半衰記憶資料檔案。
     if mgrPrefs.failureFlagForUOMObservation {
       mgrLangModel.clearUserOverrideModelData(.imeModeCHS)
       mgrLangModel.clearUserOverrideModelData(.imeModeCHT)
       mgrPrefs.failureFlagForUOMObservation = false
+      let userNotification = NSUserNotification()
+      userNotification.title = NSLocalizedString("vChewing", comment: "")
+      userNotification.informativeText =
+        "\(NSLocalizedString("vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability.", comment: ""))"
+      userNotification.soundName = NSUserNotificationDefaultSoundName
+      NSUserNotificationCenter.default.deliver(userNotification)
     }
+
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
       IME.initLangModels(userOnly: false)
     }

@@ -1,3 +1,5 @@
+"vChewing" = "威注音入力アプリ";
+"vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability." = "臨時記憶モジュールの観測行為による威注音入力アプリの意外中止は発生した。威注音入力アプリの無事利用のために、既存臨時記憶データは全てお消しした。";
 "About vChewing…" = "威注音について…";
 "vChewing Preferences…" = "入力機能設定…";
 "Uninstallation" = "入力アプリの卸除（おろしのぞき）";

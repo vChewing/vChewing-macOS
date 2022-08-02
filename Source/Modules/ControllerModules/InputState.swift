@@ -201,7 +201,8 @@ public enum InputState {
         let attributedString = NSMutableAttributedString(
           string: composingBufferConverted,
           attributes: [
-            .underlineStyle: NSUnderlineStyle.thick.rawValue,
+            /// 不能用 .thick，否則會看不到游標。
+            .underlineStyle: NSUnderlineStyle.single.rawValue,
             .markedClauseSegment: 0,
           ]
         )
@@ -212,7 +213,8 @@ public enum InputState {
       for (i, neta) in nodeValuesArray.enumerated() {
         attributedString.setAttributes(
           [
-            .underlineStyle: NSUnderlineStyle.thick.rawValue,
+            /// 不能用 .thick，否則會看不到游標。
+            .underlineStyle: NSUnderlineStyle.single.rawValue,
             .markedClauseSegment: i,
           ], range: NSRange(location: newBegin, length: neta.utf16.count)
         )
