@@ -1,3 +1,5 @@
+"vChewing" = "威注音入力アプリ";
+"vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability." = "臨時記憶モジュールの観測行為による威注音入力アプリの意外中止は発生した。威注音入力アプリの無事利用のために、既存臨時記憶データは全てお消しした。";
 "About vChewing…" = "威注音について…";
 "vChewing Preferences…" = "入力機能設定…";
 "Uninstallation" = "入力アプリの卸除（おろしのぞき）";
@@ -37,7 +39,7 @@
 "Please specify at least 4 candidate keys." = "言選り用キー陣列に少なくとも４つのキーをご登録ください。";
 "Maximum 15 candidate keys allowed." = "言選り用キー陣列には最多１５つキー登録できます。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 言葉置換機能稼働中、新添付言葉にも影響。";
-"⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 緩衝列の字数は読みの数と不同等のため、対処不可。";
+"⚠︎ Beware: Chars and Readings in buffer doesn't match." = "⚠︎ 注意：緩衝列の字数は読みの数と不同等。";
 "Per-Char Select Mode" = "全候補入力モード";
 "CNS11643 Mode" = "全字庫モード";
 "JIS Shinjitai Output" = "JIS 新字体モード";
@@ -85,6 +87,7 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)Space:";
+"Allow backspace-editing miscomposed readings" = "効かぬ音読みを BackSpace で再編集";
 "Allow boosting / excluding a candidate of single kanji" = "即排除/即最優先にできる候補の文字数の最低限は１字とする";
 "Allow using Enter key to confirm associated candidate selection" = "Enter キーを連想語彙候補の確認のために使う";
 "Always use fixed listing order in candidate window" = "候補文字を固定順番で陳列する";

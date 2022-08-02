@@ -357,7 +357,7 @@ extension String {
 
 extension vChewing.LMAssociates {
   public mutating func forceOpenStringInstead(_ strData: String) {
-    strData.ranges(splitBy: "\n").filter({ !$0.isEmpty }).forEach {
+    strData.ranges(splitBy: "\n").filter { !$0.isEmpty }.forEach {
       let neta = strData[$0].split(separator: " ")
       if neta.count >= 2 {
         let theKey = String(neta[0])

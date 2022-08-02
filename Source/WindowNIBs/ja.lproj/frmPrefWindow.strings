@@ -43,6 +43,7 @@
 "chkAlsoConfirmAssociatedCandidatesByEnter.title" = "Enter キーを連想語彙候補の確認のために使う";
 "chkAutoCorrectReadingCombination.title" = "入力中で打ち間違った発音組み合わせを自動的に訂正する";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "入力中で臨時記憶モジュールからお薦めの候補を自動的に選ぶ";
+"chkKeepReadingUponCompositionError.title" = "効かぬ音読みを BackSpace で再編集";
 "chkUseFixecCandidateOrderOnSelection.title" = "候補文字を固定順番で陳列する";
 "DbW-eq-ZdB.title" = "星光";
 "dIN-TZ-67g.title" = "Shift+Space で次のページ、Space で次の候補文字を";

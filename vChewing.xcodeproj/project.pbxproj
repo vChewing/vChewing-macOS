@@ -116,6 +116,7 @@
 		5BF9DA2A28840E6200DBD48E /* template-replacements.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2528840E6200DBD48E /* template-replacements.txt */; };
 		5BF9DA2B28840E6200DBD48E /* template-userphrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2628840E6200DBD48E /* template-userphrases.txt */; };
 		5BF9DA2D288427E000DBD48E /* template-associatedPhrases-cht.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2C2884247800DBD48E /* template-associatedPhrases-cht.txt */; };
+		5BFDF011289635C100417BBC /* ctlCandidateIMK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFDF010289635C100417BBC /* ctlCandidateIMK.swift */; };
 		6A187E2616004C5900466B2E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A187E2816004C5900466B2E /* MainMenu.xib */; };
 		6A225A1F23679F2600F685C6 /* NotarizedArchives in Resources */ = {isa = PBXBuildFile; fileRef = 6A225A1E23679F2600F685C6 /* NotarizedArchives */; };
 		6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
@@ -320,6 +321,7 @@
 		5BF9DA2528840E6200DBD48E /* template-replacements.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-replacements.txt"; sourceTree = "<group>"; usesTabs = 0; };
 		5BF9DA2628840E6200DBD48E /* template-userphrases.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-userphrases.txt"; sourceTree = "<group>"; usesTabs = 0; };
 		5BF9DA2C2884247800DBD48E /* template-associatedPhrases-cht.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; name = "template-associatedPhrases-cht.txt"; path = "../Data/components/cht/template-associatedPhrases-cht.txt"; sourceTree = "<group>"; };
+		5BFDF010289635C100417BBC /* ctlCandidateIMK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlCandidateIMK.swift; sourceTree = "<group>"; };
 		5BFDF48C27B51867009523B6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Main.strings"; sourceTree = "<group>"; };
 		6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A0D4EF515FC0DA600ABF4B3 /* IME-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IME-Info.plist"; sourceTree = "<group>"; };
@@ -570,6 +572,7 @@
 			children = (
 				5B62A34027AE7CD900A19448 /* ctlCandidate.swift */,
 				5B242402284B0D6500520FE4 /* ctlCandidateUniversal.swift */,
+				5BFDF010289635C100417BBC /* ctlCandidateIMK.swift */,
 			);
 			path = CandidateUI;
 			sourceTree = "<group>";
@@ -1203,6 +1206,7 @@
 				5BA9FD4727FEF3C9002DE248 /* PreferencesStyleController.swift in Sources */,
 				5B949BDB2816DDBC00D87B5D /* LMConsolidator.swift in Sources */,
 				5B38F59F281E2E49007D5F5D /* 3_NodeAnchor.swift in Sources */,
+				5BFDF011289635C100417BBC /* ctlCandidateIMK.swift in Sources */,
 				5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */,
 				5BA9FD3F27FEF3C8002DE248 /* Pane.swift in Sources */,
 				5BB802DA27FABA8300CF1C19 /* ctlInputMethod_Menu.swift in Sources */,
@@ -1393,7 +1397,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1986;
+				CURRENT_PROJECT_VERSION = 1987;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1403,7 +1407,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.8.6;
+				MARKETING_VERSION = 1.8.7;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewingTests;
@@ -1432,13 +1436,13 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1986;
+				CURRENT_PROJECT_VERSION = 1987;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.8.6;
+				MARKETING_VERSION = 1.8.7;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewingTests;
@@ -1469,7 +1473,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1986;
+				CURRENT_PROJECT_VERSION = 1987;
 				DEAD_CODE_STRIPPING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1490,7 +1494,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.8.6;
+				MARKETING_VERSION = 1.8.7;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
@@ -1519,7 +1523,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1986;
+				CURRENT_PROJECT_VERSION = 1987;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1536,7 +1540,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.8.6;
+				MARKETING_VERSION = 1.8.7;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
@@ -1650,7 +1654,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1986;
+				CURRENT_PROJECT_VERSION = 1987;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1678,7 +1682,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.8.6;
+				MARKETING_VERSION = 1.8.7;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1705,7 +1709,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1986;
+				CURRENT_PROJECT_VERSION = 1987;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1727,7 +1731,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.8.6;
+				MARKETING_VERSION = 1.8.7;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1749,7 +1753,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1986;
+				CURRENT_PROJECT_VERSION = 1987;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1769,7 +1773,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.8.6;
+				MARKETING_VERSION = 1.8.7;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.atelierInmu.vChewing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1791,7 +1795,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1986;
+				CURRENT_PROJECT_VERSION = 1987;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1805,7 +1809,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.8.6;
+				MARKETING_VERSION = 1.8.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.atelierInmu.vChewing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

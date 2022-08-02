@@ -388,7 +388,8 @@ extension ctlPrefWindow: NSToolbarDelegate {
         item.label = title
         if #available(macOS 11.0, *) {
           item.image = NSImage(
-            systemSymbolName: "wrench.and.screwdriver.fill", accessibilityDescription: "General Preferences")
+            systemSymbolName: "wrench.and.screwdriver.fill", accessibilityDescription: "General Preferences"
+          )
         } else {
           item.image = NSImage(named: NSImage.homeTemplateName)
         }
@@ -399,7 +400,8 @@ extension ctlPrefWindow: NSToolbarDelegate {
         item.label = title
         if #available(macOS 11.0, *) {
           item.image = NSImage(
-            systemSymbolName: "person.fill.questionmark", accessibilityDescription: "Experiences Preferences")
+            systemSymbolName: "person.fill.questionmark", accessibilityDescription: "Experiences Preferences"
+          )
         } else {
           item.image = NSImage(named: NSImage.flowViewTemplateName)
         }
@@ -410,7 +412,8 @@ extension ctlPrefWindow: NSToolbarDelegate {
         item.label = title
         if #available(macOS 11.0, *) {
           item.image = NSImage(
-            systemSymbolName: "character.book.closed.fill", accessibilityDescription: "Dictionary Preferences")
+            systemSymbolName: "character.book.closed.fill", accessibilityDescription: "Dictionary Preferences"
+          )
         } else {
           item.image = NSImage(named: NSImage.bookmarksTemplateName)
         }

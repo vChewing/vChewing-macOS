@@ -34,10 +34,10 @@ import Cocoa
 
 /// KeyHandler 委任協定
 protocol KeyHandlerDelegate {
-  func ctlCandidate() -> ctlCandidate
+  func ctlCandidate() -> ctlCandidateProtocol
   func keyHandler(
     _: KeyHandler, didSelectCandidateAt index: Int,
-    ctlCandidate controller: ctlCandidate
+    ctlCandidate controller: ctlCandidateProtocol
   )
   func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputStateProtocol)
     -> Bool
@@ -46,9 +46,11 @@ protocol KeyHandlerDelegate {
 // MARK: - 核心 (Kernel).
 
 /// KeyHandler 按鍵調度模組。
-class KeyHandler {
+public class KeyHandler {
   /// 半衰模組的衰減指數
   let kEpsilon: Double = 0.000001
+  /// 檢測是否出現游標切斷組字圈內字符的情況
+  var isCursorCuttingChar = false
 
   /// 規定最大動態爬軌範圍。組字器內超出該範圍的節錨都會被自動標記為「已經手動選字過」，減少爬軌運算負擔。
   let kMaxComposingBufferNeedsToWalkSize = Int(max(12, ceil(Double(mgrPrefs.composingBufferSize) / 2)))
@@ -182,14 +184,20 @@ class KeyHandler {
           addToUserOverrideModel = false
         }
       }
-      if addToUserOverrideModel {
+      if addToUserOverrideModel, mgrPrefs.fetchSuggestionsFromUserOverrideModel {
         IME.prtDebugIntel("UOM: Start Observation.")
+        // 這個過程可能會因為使用者半衰記憶模組內部資料錯亂、而導致輸入法在選字時崩潰。
+        // 於是在這裡引入災後狀況察覺專用變數，且先開啟該開關。順利執行完觀察後會關閉。
+        // 一旦輸入法崩潰，會在重啟時發現這個開關是開著的，屆時 AppDelegate 會做出應對。
+        mgrPrefs.failureFlagForUOMObservation = true
         // 令半衰記憶模組觀測給定的三元圖。
         // 這個過程會讓半衰引擎根據當前上下文生成三元圖索引鍵。
         currentUOM.observe(
           walkedAnchors: walkedAnchors, cursorIndex: adjustedCursor, candidate: theCandidate.value,
           timestamp: NSDate().timeIntervalSince1970, saveCallback: { mgrLangModel.saveUserOverrideModelData() }
         )
+        // 如果沒有出現崩框的話，那就將這個開關復位。
+        mgrPrefs.failureFlagForUOMObservation = false
       }
     }
 

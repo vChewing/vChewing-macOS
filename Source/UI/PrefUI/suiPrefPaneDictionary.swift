@@ -28,19 +28,19 @@ import SwiftUI
 struct suiPrefPaneDictionary: View {
   private var fdrDefault = mgrLangModel.dataFolderPath(isDefaultFolder: true)
   @State private var tbxUserDataPathSpecified: String =
-    UserDefaults.standard.string(forKey: UserDef.kUserDataFolderSpecified)
+    UserDefaults.standard.string(forKey: UserDef.kUserDataFolderSpecified.rawValue)
     ?? mgrLangModel.dataFolderPath(isDefaultFolder: true)
   @State private var selAutoReloadUserData: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kShouldAutoReloadUserDataFiles)
-  @State private var selEnableCNS11643: Bool = UserDefaults.standard.bool(forKey: UserDef.kCNS11643Enabled)
+    forKey: UserDef.kShouldAutoReloadUserDataFiles.rawValue)
+  @State private var selEnableCNS11643: Bool = UserDefaults.standard.bool(forKey: UserDef.kCNS11643Enabled.rawValue)
   @State private var selEnableSymbolInputSupport: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kSymbolInputEnabled)
+    forKey: UserDef.kSymbolInputEnabled.rawValue)
   @State private var selAllowBoostingSingleKanjiAsUserPhrase: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kAllowBoostingSingleKanjiAsUserPhrase)
+    forKey: UserDef.kAllowBoostingSingleKanjiAsUserPhrase.rawValue)
   @State private var selFetchSuggestionsFromUserOverrideModel: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kFetchSuggestionsFromUserOverrideModel)
+    forKey: UserDef.kFetchSuggestionsFromUserOverrideModel.rawValue)
   @State private var selUseFixecCandidateOrderOnSelection: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kUseFixecCandidateOrderOnSelection)
+    forKey: UserDef.kUseFixecCandidateOrderOnSelection.rawValue)
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":

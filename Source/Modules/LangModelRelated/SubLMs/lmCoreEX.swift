@@ -87,7 +87,7 @@ extension vChewing {
       do {
         strData = try String(contentsOfFile: path, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
         strData = strData.replacingOccurrences(of: "\r", with: "\n")
-        strData.ranges(splitBy: "\n").filter({ !$0.isEmpty }).forEach {
+        strData.ranges(splitBy: "\n").filter { !$0.isEmpty }.forEach {
           let neta = strData[$0].split(separator: " ")
           if neta.count >= 2, String(neta[0]).first != "#" {
             if !neta[0].isEmpty, !neta[1].isEmpty {

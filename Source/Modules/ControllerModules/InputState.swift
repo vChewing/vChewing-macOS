@@ -29,7 +29,7 @@ import Cocoa
 // 註：所有 InputState 型別均不適合使用 Struct，因為 Struct 無法相互繼承派生。
 
 // 用以讓每個狀態自描述的 enum。
-enum StateType {
+public enum StateType {
   case ofDeactivated
   case ofAssociatedPhrases
   case ofEmpty
@@ -38,12 +38,12 @@ enum StateType {
   case ofNotEmpty
   case ofInputting
   case ofMarking
-  case ofChooseCandidate
+  case ofChoosingCandidate
   case ofSymbolTable
 }
 
 // 所有 InputState 均遵守該協定：
-protocol InputStateProtocol {
+public protocol InputStateProtocol {
   var type: StateType { get }
 }
 
@@ -79,7 +79,7 @@ protocol InputStateProtocol {
 ///   詞音組合放入語彙濾除清單。
 /// - .ChoosingCandidate: 叫出選字窗、允許使用者選字。
 /// - .SymbolTable: 波浪鍵符號選單專用的狀態，有自身的特殊處理。
-enum InputState {
+public enum InputState {
   /// .Deactivated: 使用者沒在使用輸入法。
   class Deactivated: InputStateProtocol {
     public var type: StateType { .ofDeactivated }
@@ -175,6 +175,8 @@ enum InputState {
     public var type: StateType { .ofNotEmpty }
     private(set) var composingBuffer: String
     private(set) var cursorIndex: Int = 0 { didSet { cursorIndex = max(cursorIndex, 0) } }
+    private(set) var reading: String = ""
+    private(set) var nodeValuesArray = [String]()
     public var composingBufferConverted: String {
       let converted = IME.kanjiConversionIfRequired(composingBuffer)
       if converted.utf16.count != composingBuffer.utf16.count
@@ -185,21 +187,39 @@ enum InputState {
       return converted
     }
 
-    init(composingBuffer: String, cursorIndex: Int) {
+    init(composingBuffer: String, cursorIndex: Int, reading: String = "", nodeValuesArray: [String] = []) {
       self.composingBuffer = composingBuffer
+      self.reading = reading
+      self.nodeValuesArray = nodeValuesArray
       defer { self.cursorIndex = cursorIndex }
     }
 
     var attributedString: NSMutableAttributedString {
       /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
       /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
-      let attributedString = NSMutableAttributedString(
-        string: composingBufferConverted,
-        attributes: [
-          .underlineStyle: NSUnderlineStyle.single.rawValue,
-          .markedClauseSegment: 0,
-        ]
-      )
+      guard reading.isEmpty else {
+        let attributedString = NSMutableAttributedString(
+          string: composingBufferConverted,
+          attributes: [
+            /// 不能用 .thick，否則會看不到游標。
+            .underlineStyle: NSUnderlineStyle.single.rawValue,
+            .markedClauseSegment: 0,
+          ]
+        )
+        return attributedString
+      }
+      let attributedString = NSMutableAttributedString(string: composingBufferConverted)
+      var newBegin = 0
+      for (i, neta) in nodeValuesArray.enumerated() {
+        attributedString.setAttributes(
+          [
+            /// 不能用 .thick，否則會看不到游標。
+            .underlineStyle: NSUnderlineStyle.single.rawValue,
+            .markedClauseSegment: i,
+          ], range: NSRange(location: newBegin, length: neta.utf16.count)
+        )
+        newBegin += neta.utf16.count
+      }
       return attributedString
     }
 
@@ -216,8 +236,9 @@ enum InputState {
     var textToCommit: String = ""
     var tooltip: String = ""
 
-    override init(composingBuffer: String, cursorIndex: Int) {
-      super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
+    override init(composingBuffer: String, cursorIndex: Int, reading: String = "", nodeValuesArray: [String] = []) {
+      super.init(
+        composingBuffer: composingBuffer, cursorIndex: cursorIndex, reading: reading, nodeValuesArray: nodeValuesArray)
     }
 
     override var description: String {
@@ -264,9 +285,9 @@ enum InputState {
     private var deleteTargetExists = false
     var tooltip: String {
       if composingBuffer.count != readings.count {
-        ctlInputMethod.tooltipController.setColor(state: .redAlert)
+        ctlInputMethod.tooltipController.setColor(state: .denialOverflow)
         return NSLocalizedString(
-          "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.", comment: ""
+          "⚠︎ Beware: Chars and Readings in buffer doesn't match.", comment: ""
         )
       }
       if mgrPrefs.phraseReplacementEnabled {
@@ -376,14 +397,9 @@ enum InputState {
     }
 
     var validToWrite: Bool {
-      /// The input method allows users to input a string whose length differs
-      /// from the amount of Bopomofo readings. In this case, the range
-      /// in the composing buffer and the readings could not match, so
-      /// we disable the function to write user phrases in this case.
-      /// 這裡的 deleteTargetExists 是防止使用者排除「詞庫內尚未存在的詞」，
-      /// 免得使用者誤操作之後靠北「我怎麼敲不了這個詞？」之類的。
-      ((composingBuffer.count != readings.count)
-        || (ctlInputMethod.areWeDeleting && !deleteTargetExists))
+      /// 與小麥注音不同，威注音會自動解消「游標插斷字符」的異常狀態，所以允許在字音長度不相符的情況下加詞。
+      /// 這裡的 deleteTargetExists 是防止使用者排除「詞庫內尚未存在的詞」。
+      (ctlInputMethod.areWeDeleting && !deleteTargetExists)
         ? false
         : allowedMarkRange.contains(literalMarkedRange.count)
     }
@@ -418,7 +434,7 @@ enum InputState {
 
   /// .ChoosingCandidate: 叫出選字窗、允許使用者選字。
   class ChoosingCandidate: NotEmpty {
-    override public var type: StateType { .ofChooseCandidate }
+    override public var type: StateType { .ofChoosingCandidate }
     private(set) var candidates: [(String, String)]
     private(set) var isTypingVertical: Bool
 

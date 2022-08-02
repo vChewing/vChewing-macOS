@@ -41,7 +41,7 @@ class ctlInputMethod: IMKInputController {
   static var areWeDeleting = false
 
   /// 目前在用的的選字窗副本。
-  static var ctlCandidateCurrent = ctlCandidateUniversal.init(.horizontal)
+  static var ctlCandidateCurrent: ctlCandidateProtocol = ctlCandidateUniversal.init(.horizontal)
 
   /// 工具提示視窗的副本。
   static let tooltipController = TooltipController()
@@ -85,6 +85,7 @@ class ctlInputMethod: IMKInputController {
     keyHandler.delegate = self
     // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
     activateServer(inputClient)
+    keyHandler.ensureParser()
     resetKeyHandler()
   }
 
@@ -99,7 +100,7 @@ class ctlInputMethod: IMKInputController {
     // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
     // 所以這裡添加這句、來試圖應對這種情況。
     if keyHandler.delegate == nil { keyHandler.delegate = self }
-
+    setValue(IME.currentInputMode.rawValue, forTag: 114514, client: client())
     keyHandler.clear()
     keyHandler.ensureParser()
 
@@ -235,5 +236,31 @@ class ctlInputMethod: IMKInputController {
   override func commitComposition(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     resetKeyHandler()
+  }
+
+  /// 生成 IMK 選字窗專用的候選字串陣列。
+  /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
+  /// - Returns: IMK 選字窗專用的候選字串陣列。
+  override func candidates(_ sender: Any!) -> [Any]! {
+    _ = sender  // 防止格式整理工具毀掉與此對應的參數。
+    if let state = state as? InputState.AssociatedPhrases {
+      return state.candidates.map { theCandidate -> String in
+        let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
+        return (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
+      }
+    }
+    if let state = state as? InputState.ChoosingCandidate {
+      return state.candidates.map { theCandidate -> String in
+        let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
+        return (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
+      }
+    }
+    if let state = state as? InputState.SymbolTable {
+      return state.candidates.map { theCandidate -> String in
+        let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
+        return (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
+      }
+    }
+    return .init()
   }
 }

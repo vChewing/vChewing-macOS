@@ -1,3 +1,5 @@
+"vChewing" = "威注音输入法";
+"vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability." = "威注音输入法的使用者半衰记忆模组在观测时崩溃，相关半衰记忆资料档案内容已全部清空。";
 "About vChewing…" = "关于威注音…";
 "vChewing Preferences…" = "威注音偏好设定…";
 "Uninstallation" = "卸除输入法";
@@ -37,7 +39,7 @@
 "Please specify at least 4 candidate keys." = "请至少指定四个选字键。";
 "Maximum 15 candidate keys allowed." = "选字键最多只能指定十五个。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 语汇置换功能已启用，会波及语汇自订。";
-"⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 无法处理组字区字数与读音数不对应的情形。";
+"⚠︎ Beware: Chars and Readings in buffer doesn't match." = "⚠︎ 注意：组字区字数与读音数不对应。";
 "Per-Char Select Mode" = "仿真逐字选字输入";
 "CNS11643 Mode" = "全字库模式";
 "JIS Shinjitai Output" = "JIS 新字体模式";
@@ -85,6 +87,7 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)空格键:";
+"Allow backspace-editing miscomposed readings" = "允许对无效的读音使用 BackSpace 编辑";
 "Allow boosting / excluding a candidate of single kanji" = "将可以就地升权/排除的候选字词的最短词长设为单个汉字";
 "Allow using Enter key to confirm associated candidate selection" = "允许使用 Enter 确认当前选中的联想词";
 "Always use fixed listing order in candidate window" = "以固定顺序来陈列选字窗内的候选字";

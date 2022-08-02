@@ -1,3 +1,5 @@
+"vChewing" = "vChewing";
+"vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability." = "vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability.";
 "About vChewing…" = "About vChewing…";
 "vChewing Preferences…" = "vChewing Preferences…";
 "Uninstallation" = "Uninstallation";
@@ -37,7 +39,7 @@
 "Please specify at least 4 candidate keys." = "Please specify at least 4 candidate keys.";
 "Maximum 15 candidate keys allowed." = "Maximum 15 candidate keys allowed.";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.";
-"⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.";
+"⚠︎ Beware: Chars and Readings in buffer doesn't match." = "⚠︎ Beware: Chars and Readings in buffer doesn't match.";
 "Per-Char Select Mode" = "Per-Char Select Mode";
 "CNS11643 Mode" = "CNS11643 Mode";
 "JIS Shinjitai Output" = "JIS Shinjitai Output";
@@ -85,6 +87,7 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)Space:";
+"Allow backspace-editing miscomposed readings" = "Allow backspace-editing miscomposed readings";
 "Allow boosting / excluding a candidate of single kanji" = "Allow boosting / excluding a candidate of single kanji";
 "Allow using Enter key to confirm associated candidate selection" = "Allow using Enter key to confirm associated candidate selection";
 "Always use fixed listing order in candidate window" = "Always use fixed listing order in candidate window";

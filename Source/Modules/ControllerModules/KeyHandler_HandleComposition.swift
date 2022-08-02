@@ -30,17 +30,14 @@ extension KeyHandler {
   /// 用來處理 KeyHandler.HandleInput() 當中的與組字有關的行為。
   /// - Parameters:
   ///   - input: 輸入訊號。
-  ///   - state: 給定狀態（通常為當前狀態）。
   ///   - stateCallback: 狀態回呼，交給對應的型別內的專有函式來處理。
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleComposition(
     input: InputSignal,
-    state: InputStateProtocol,
     stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool? {
-
     // MARK: 注音按鍵輸入處理 (Handle BPMF Keys)
 
     var keyConsumedByReading = false
@@ -63,7 +60,7 @@ extension KeyHandler {
       }
     }
 
-    var composeReading = composer.hasToneMarker()  // 這裡不需要做排他性判斷。
+    var composeReading = composer.hasToneMarker() && composer.inputValidityCheck(key: input.charCode)  // 這裡不需要做排他性判斷。
 
     // 如果當前的按鍵是 Enter 或 Space 的話，這時就可以取出 _composer 內的注音來做檢查了。
     // 來看看詞庫內到底有沒有對應的讀音索引。這裡用了類似「|=」的判斷處理方式。
@@ -81,9 +78,21 @@ extension KeyHandler {
       if !currentLM.hasUnigramsFor(key: readingKey) {
         IME.prtDebugIntel("B49C0979：語彙庫內無「\(readingKey)」的匹配記錄。")
         errorCallback()
+
+        if mgrPrefs.keepReadingUponCompositionError {
+          composer.intonation.clear()  // 砍掉聲調。
+          stateCallback(buildInputtingState)
+          return true
+        }
+
         composer.clear()
         // 根據「組字器是否為空」來判定回呼哪一種狀態。
-        stateCallback((compositor.isEmpty) ? InputState.EmptyIgnoringPreviousState() : buildInputtingState)
+        switch compositor.isEmpty {
+          case false: stateCallback(buildInputtingState)
+          case true:
+            stateCallback(InputState.EmptyIgnoringPreviousState())
+            stateCallback(InputState.Empty())
+        }
         return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了。
       }
 
@@ -141,9 +150,7 @@ extension KeyHandler {
       return true
     }
 
-    /// 如果此時這個選項是 true 的話，可知當前注拼槽輸入了聲調、且上一次按鍵不是聲調按鍵。
-    /// 比方說大千傳統佈局敲「6j」會出現「ˊㄨ」但並不會被認為是「ㄨˊ」，因為先輸入的調號
-    /// 並非用來確認這個注音的調號。除非是：「ㄨˊ」「ˊㄨˊ」「ˊㄨˇ」「ˊㄨ 」等。
+    /// 是說此時注拼槽並非為空、卻還沒組音。這種情況下只可能是「注拼槽內只有聲調」。
     if keyConsumedByReading {
       // 以回呼組字狀態的方式來執行 updateClientComposingBuffer()。
       stateCallback(buildInputtingState)

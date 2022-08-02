@@ -38,7 +38,7 @@ extension KeyHandler {
     /// 「更新內文組字區 (Update the composing buffer)」是指要求客體軟體將組字緩衝區的內容
     /// 換成由此處重新生成的組字字串（NSAttributeString，否則會不顯示）。
     var tooltipParameterRef: [String] = ["", ""]
-    var composingBuffer = ""
+    let nodeValuesArray: [String] = walkedAnchors.map(\.node.currentPair.value)
     var composedStringCursorIndex = 0
     var readingCursorIndex = 0
     /// IMK 協定的內文組字區的游標長度與游標位置無法正確統計 UTF8 高萬字（比如 emoji）的長度，
@@ -47,7 +47,6 @@ extension KeyHandler {
     for theAnchor in walkedAnchors {
       let theNode = theAnchor.node
       let strNodeValue = theNode.currentPair.value
-      composingBuffer += strNodeValue
       let arrSplit: [String] = Array(strNodeValue).map { String($0) }
       let codepointCount = arrSplit.count
       /// 藉下述步驟重新將「可見游標位置」對齊至「組字器內的游標所在的讀音位置」。
@@ -57,57 +56,45 @@ extension KeyHandler {
       if readingCursorIndex + spanningLength <= compositor.cursor {
         composedStringCursorIndex += strNodeValue.utf16.count
         readingCursorIndex += spanningLength
-      } else {
-        if codepointCount == spanningLength {
-          var i = 0
-          while i < codepointCount, readingCursorIndex < compositor.cursor {
-            composedStringCursorIndex += arrSplit[i].utf16.count
-            readingCursorIndex += 1
-            i += 1
-          }
-        } else {
-          if readingCursorIndex < compositor.cursor {
-            composedStringCursorIndex += strNodeValue.utf16.count
-            readingCursorIndex += spanningLength
-            readingCursorIndex = min(readingCursorIndex, compositor.cursor)
-            /// 接下來再處理這麼一種情況：
-            /// 某些錨點內的當前候選字詞長度與讀音長度不相等。
-            /// 但此時游標還是按照每個讀音單位來移動的，
-            /// 所以需要上下文工具提示來顯示游標的相對位置。
-            /// 這裡先計算一下要用在工具提示當中的顯示參數的內容。
-            switch compositor.cursor {
-              case compositor.readings.count...:
-                // 這裡的 compositor.cursor 數值不可能大於 readings.count，因為會被 Megrez 自動糾正。
-                tooltipParameterRef[0] = compositor.readings[compositor.cursor - 1]
-              case 0:
-                tooltipParameterRef[1] = compositor.readings[compositor.cursor]
-              default:
-                tooltipParameterRef[0] = compositor.readings[compositor.cursor - 1]
-                tooltipParameterRef[1] = compositor.readings[compositor.cursor]
-            }
-            /// 注音轉拼音
-            for (i, _) in tooltipParameterRef.enumerated() {
-              if tooltipParameterRef[i].isEmpty { continue }
-              if tooltipParameterRef[i].contains("_") { continue }
-              if mgrPrefs.showHanyuPinyinInCompositionBuffer {  // 恢復陰平標記->注音轉拼音->轉教科書式標調
-                tooltipParameterRef[i] = Tekkon.restoreToneOneInZhuyinKey(target: tooltipParameterRef[i])
-                tooltipParameterRef[i] = Tekkon.cnvPhonaToHanyuPinyin(target: tooltipParameterRef[i])
-                tooltipParameterRef[i] = Tekkon.cnvHanyuPinyinToTextbookStyle(target: tooltipParameterRef[i])
-              } else {
-                tooltipParameterRef[i] = Tekkon.cnvZhuyinChainToTextbookReading(target: tooltipParameterRef[i])
-              }
-            }
-          }
+        continue
+      }
+      if codepointCount == spanningLength {
+        for i in 0..<codepointCount {
+          guard readingCursorIndex < compositor.cursor else { continue }
+          composedStringCursorIndex += arrSplit[i].utf16.count
+          readingCursorIndex += 1
         }
+        continue
+      }
+      guard readingCursorIndex < compositor.cursor else { continue }
+      composedStringCursorIndex += strNodeValue.utf16.count
+      readingCursorIndex += spanningLength
+      readingCursorIndex = min(readingCursorIndex, compositor.cursor)
+      /// 接下來再處理這麼一種情況：
+      /// 某些錨點內的當前候選字詞長度與讀音長度不相等。
+      /// 但此時游標還是按照每個讀音單位來移動的，
+      /// 所以需要上下文工具提示來顯示游標的相對位置。
+      /// 這裡先計算一下要用在工具提示當中的顯示參數的內容。
+      switch compositor.cursor {
+        case compositor.readings.count...:
+          // 這裡的 compositor.cursor 數值不可能大於 readings.count，因為會被 Megrez 自動糾正。
+          tooltipParameterRef[0] = compositor.readings[compositor.cursor - 1]
+        case 0:
+          tooltipParameterRef[1] = compositor.readings[compositor.cursor]
+        default:
+          tooltipParameterRef[0] = compositor.readings[compositor.cursor - 1]
+          tooltipParameterRef[1] = compositor.readings[compositor.cursor]
       }
     }
+
+    isCursorCuttingChar = !tooltipParameterRef[0].isEmpty || !tooltipParameterRef[1].isEmpty
 
     /// 再接下來，藉由已經計算成功的「可見游標位置」，咱們計算一下在這個游標之前與之後的
     /// 組字區內容，以便之後在這之間插入正在輸入的漢字讀音（藉由鐵恨 composer 注拼槽取得）。
     var arrHead = [String.UTF16View.Element]()
     var arrTail = [String.UTF16View.Element]()
 
-    for (i, n) in composingBuffer.utf16.enumerated() {
+    for (i, n) in nodeValuesArray.joined().utf16.enumerated() {
       if i < composedStringCursorIndex {
         arrHead.append(n)
       } else {
@@ -126,42 +113,16 @@ extension KeyHandler {
     // 防止組字區內出現不可列印的字元。
     var cleanedComposition = ""
     for theChar in composedText {
-      if let charCode = theChar.utf16.first {
-        if !(theChar.isASCII && !(charCode.isPrintable)) {
-          cleanedComposition += String(theChar)
-        }
+      guard let charCode = theChar.utf16.first else { continue }
+      if !(theChar.isASCII && !(charCode.isPrintable)) {
+        cleanedComposition += String(theChar)
       }
     }
 
     /// 這裡生成準備要拿來回呼的「正在輸入」狀態，但還不能立即使用，因為工具提示仍未完成。
-    let stateResult = InputState.Inputting(composingBuffer: cleanedComposition, cursorIndex: cursorIndex)
-
-    /// 根據上文的參數結果來決定生成怎樣的工具提示。
-    switch (tooltipParameterRef[0].isEmpty, tooltipParameterRef[1].isEmpty) {
-      case (true, true): stateResult.tooltip.removeAll()
-      case (true, false):
-        stateResult.tooltip = String(
-          format: NSLocalizedString("Cursor is to the rear of \"%@\".", comment: ""),
-          tooltipParameterRef[1]
-        )
-      case (false, true):
-        stateResult.tooltip = String(
-          format: NSLocalizedString("Cursor is in front of \"%@\".", comment: ""),
-          tooltipParameterRef[0]
-        )
-      case (false, false):
-        stateResult.tooltip = String(
-          format: NSLocalizedString("Cursor is between \"%@\" and \"%@\".", comment: ""),
-          tooltipParameterRef[0], tooltipParameterRef[1]
-        )
-    }
-
-    /// 給工具提示設定提示配色。
-    if !stateResult.tooltip.isEmpty {
-      ctlInputMethod.tooltipController.setColor(state: .denialOverflow)
-    }
-
-    return stateResult
+    return InputState.Inputting(
+      composingBuffer: cleanedComposition, cursorIndex: cursorIndex, reading: reading, nodeValuesArray: nodeValuesArray
+    )
   }
 
   // MARK: - 用以生成候選詞陣列及狀態
@@ -459,8 +420,12 @@ extension KeyHandler {
       composer.doBackSpace()
     }
 
-    stateCallback(
-      composer.isEmpty && compositor.isEmpty ? InputState.EmptyIgnoringPreviousState() : buildInputtingState)
+    switch composer.isEmpty && compositor.isEmpty {
+      case false: stateCallback(buildInputtingState)
+      case true:
+        stateCallback(InputState.EmptyIgnoringPreviousState())
+        stateCallback(InputState.Empty())
+    }
     return true
   }
 
@@ -497,7 +462,12 @@ extension KeyHandler {
     walk()
     let inputting = buildInputtingState
     // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
-    stateCallback(inputting.composingBuffer.isEmpty ? InputState.EmptyIgnoringPreviousState() : inputting)
+    switch inputting.composingBuffer.isEmpty {
+      case false: stateCallback(inputting)
+      case true:
+        stateCallback(InputState.EmptyIgnoringPreviousState())
+        stateCallback(InputState.Empty())
+    }
     return true
   }
 
@@ -609,11 +579,17 @@ extension KeyHandler {
       /// 此乃 macOS 內建注音輸入法預設之行為，但不太受 Windows 使用者群體之待見。
       clear()
       stateCallback(InputState.EmptyIgnoringPreviousState())
+      stateCallback(InputState.Empty())
     } else {
       if composer.isEmpty { return true }
       /// 如果注拼槽不是空的話，則清空之。
       composer.clear()
-      stateCallback(compositor.isEmpty ? InputState.EmptyIgnoringPreviousState() : buildInputtingState)
+      switch compositor.isEmpty {
+        case false: stateCallback(buildInputtingState)
+        case true:
+          stateCallback(InputState.EmptyIgnoringPreviousState())
+          stateCallback(InputState.Empty())
+      }
     }
     return true
   }
@@ -661,6 +637,7 @@ extension KeyHandler {
         stateCallback(state)
       }
     } else if input.isOptionHold {
+      isCursorCuttingChar = false
       if input.isControlHold {
         return handleEnd(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
       }
@@ -675,7 +652,12 @@ extension KeyHandler {
     } else {
       if compositor.cursor < compositor.length {
         compositor.cursor += 1
-        stateCallback(buildInputtingState)
+        var inputtingState = buildInputtingState
+        if isCursorCuttingChar == true {
+          compositor.jumpCursorBySpan(to: .front)
+          inputtingState = buildInputtingState
+        }
+        stateCallback(inputtingState)
       } else {
         IME.prtDebugIntel("A96AAD58")
         errorCallback()
@@ -729,6 +711,7 @@ extension KeyHandler {
         stateCallback(state)
       }
     } else if input.isOptionHold {
+      isCursorCuttingChar = false
       if input.isControlHold {
         return handleHome(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
       }
@@ -743,7 +726,12 @@ extension KeyHandler {
     } else {
       if compositor.cursor > 0 {
         compositor.cursor -= 1
-        stateCallback(buildInputtingState)
+        var inputtingState = buildInputtingState
+        if isCursorCuttingChar == true {
+          compositor.jumpCursorBySpan(to: .rear)
+          inputtingState = buildInputtingState
+        }
+        stateCallback(inputtingState)
       } else {
         IME.prtDebugIntel("7045E6F3")
         errorCallback()

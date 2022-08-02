@@ -57,7 +57,7 @@ import Cocoa
     )
   }
 
-  @IBAction func btnWebsite(_ sender: NSButton) {
+  @IBAction func btnWebsite(_: NSButton) {
     if let url = URL(string: "https://vchewing.github.io/") {
       NSWorkspace.shared.open(url)
     }

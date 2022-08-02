@@ -26,6 +26,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
 
+public enum CandidateLayout {
+  case horizontal
+  case vertical
+}
+
 public class CandidateKeyLabel: NSObject {
   public private(set) var key: String
   public private(set) var displayedText: String
@@ -38,21 +43,39 @@ public class CandidateKeyLabel: NSObject {
 }
 
 public protocol ctlCandidateDelegate: AnyObject {
-  func candidateCountForController(_ controller: ctlCandidate) -> Int
-  func ctlCandidate(_ controller: ctlCandidate, candidateAtIndex index: Int)
+  func handleDelegateEvent(_ event: NSEvent!) -> Bool
+  func candidateCountForController(_ controller: ctlCandidateProtocol) -> Int
+  func candidatesForController(_ controller: ctlCandidateProtocol) -> [(String, String)]
+  func ctlCandidate(_ controller: ctlCandidateProtocol, candidateAtIndex index: Int)
     -> (String, String)
   func ctlCandidate(
-    _ controller: ctlCandidate, didSelectCandidateAtIndex index: Int
+    _ controller: ctlCandidateProtocol, didSelectCandidateAtIndex index: Int
   )
 }
 
-public class ctlCandidate: NSWindowController {
-  public enum Layout {
-    case horizontal
-    case vertical
-  }
+public protocol ctlCandidateProtocol {
+  var currentLayout: CandidateLayout { get set }
+  var delegate: ctlCandidateDelegate? { get set }
+  var selectedCandidateIndex: Int { get set }
+  var visible: Bool { get set }
+  var windowTopLeftPoint: NSPoint { get set }
+  var keyLabels: [CandidateKeyLabel] { get set }
+  var keyLabelFont: NSFont { get set }
+  var candidateFont: NSFont { get set }
+  var tooltip: String { get set }
 
-  public var currentLayout: Layout = .horizontal
+  init(_ layout: CandidateLayout)
+  func reloadData()
+  func showNextPage() -> Bool
+  func showPreviousPage() -> Bool
+  func highlightNextCandidate() -> Bool
+  func highlightPreviousCandidate() -> Bool
+  func candidateIndexAtKeyLabelIndex(_: Int) -> Int
+  func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat)
+}
+
+public class ctlCandidate: NSWindowController, ctlCandidateProtocol {
+  public var currentLayout: CandidateLayout = .horizontal
   public weak var delegate: ctlCandidateDelegate? {
     didSet {
       reloadData()
@@ -83,6 +106,16 @@ public class ctlCandidate: NSWindowController {
         self.set(windowTopLeftPoint: newValue, bottomOutOfScreenAdjustmentHeight: 0)
       }
     }
+  }
+
+  public required init(_: CandidateLayout = .horizontal) {
+    super.init(window: .init())
+    visible = false
+  }
+
+  @available(*, unavailable)
+  required init?(coder _: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
   }
 
   public var keyLabels: [CandidateKeyLabel] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]

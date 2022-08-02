@@ -27,29 +27,32 @@ import SwiftUI
 
 @available(macOS 11.0, *)
 struct suiPrefPaneGeneral: View {
-  @State private var selCandidateUIFontSize = UserDefaults.standard.integer(forKey: UserDef.kCandidateListTextSize)
+  @State private var selCandidateUIFontSize = UserDefaults.standard.integer(
+    forKey: UserDef.kCandidateListTextSize.rawValue)
   @State private var selUILanguage: [String] =
     IME.arrSupportedLocales.contains(
-      ((UserDefaults.standard.object(forKey: UserDef.kAppleLanguages) == nil)
-        ? ["auto"] : UserDefaults.standard.array(forKey: UserDef.kAppleLanguages) as? [String] ?? ["auto"])[0])
-    ? ((UserDefaults.standard.object(forKey: UserDef.kAppleLanguages) == nil)
-      ? ["auto"] : UserDefaults.standard.array(forKey: UserDef.kAppleLanguages) as? [String] ?? ["auto"])
+      ((UserDefaults.standard.object(forKey: UserDef.kAppleLanguages.rawValue) == nil)
+        ? ["auto"] : UserDefaults.standard.array(forKey: UserDef.kAppleLanguages.rawValue) as? [String] ?? ["auto"])[0])
+    ? ((UserDefaults.standard.object(forKey: UserDef.kAppleLanguages.rawValue) == nil)
+      ? ["auto"] : UserDefaults.standard.array(forKey: UserDef.kAppleLanguages.rawValue) as? [String] ?? ["auto"])
     : ["auto"]
   @State private var selEnableHorizontalCandidateLayout = UserDefaults.standard.bool(
-    forKey: UserDef.kUseHorizontalCandidateList)
+    forKey: UserDef.kUseHorizontalCandidateList.rawValue)
   @State private var selShowPageButtonsInCandidateUI = UserDefaults.standard.bool(
-    forKey: UserDef.kShowPageButtonsInCandidateWindow)
+    forKey: UserDef.kShowPageButtonsInCandidateWindow.rawValue)
   @State private var selEnableKanjiConvToKangXi = UserDefaults.standard.bool(
-    forKey: UserDef.kChineseConversionEnabled)
+    forKey: UserDef.kChineseConversionEnabled.rawValue)
   @State private var selEnableKanjiConvToJIS = UserDefaults.standard.bool(
-    forKey: UserDef.kShiftJISShinjitaiOutputEnabled)
+    forKey: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue)
   @State private var selShowHanyuPinyinInCompositionBuffer = UserDefaults.standard.bool(
-    forKey: UserDef.kShowHanyuPinyinInCompositionBuffer)
+    forKey: UserDef.kShowHanyuPinyinInCompositionBuffer.rawValue)
   @State private var selInlineDumpPinyinInLieuOfZhuyin = UserDefaults.standard.bool(
-    forKey: UserDef.kInlineDumpPinyinInLieuOfZhuyin)
-  @State private var selEnableFartSuppressor = UserDefaults.standard.bool(forKey: UserDef.kShouldNotFartInLieuOfBeep)
-  @State private var selEnableAutoUpdateCheck = UserDefaults.standard.bool(forKey: UserDef.kCheckUpdateAutomatically)
-  @State private var selEnableDebugMode = UserDefaults.standard.bool(forKey: UserDef.kIsDebugModeEnabled)
+    forKey: UserDef.kInlineDumpPinyinInLieuOfZhuyin.rawValue)
+  @State private var selEnableFartSuppressor = UserDefaults.standard.bool(
+    forKey: UserDef.kShouldNotFartInLieuOfBeep.rawValue)
+  @State private var selEnableAutoUpdateCheck = UserDefaults.standard.bool(
+    forKey: UserDef.kCheckUpdateAutomatically.rawValue)
+  @State private var selEnableDebugMode = UserDefaults.standard.bool(forKey: UserDef.kIsDebugModeEnabled.rawValue)
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -94,14 +97,14 @@ struct suiPrefPaneGeneral: View {
           IME.prtDebugIntel(value[0])
           if selUILanguage == mgrPrefs.appleLanguages
             || (selUILanguage[0] == "auto"
-              && UserDefaults.standard.object(forKey: UserDef.kAppleLanguages) == nil)
+              && UserDefaults.standard.object(forKey: UserDef.kAppleLanguages.rawValue) == nil)
           {
             return
           }
           if selUILanguage[0] != "auto" {
             mgrPrefs.appleLanguages = value
           } else {
-            UserDefaults.standard.removeObject(forKey: UserDef.kAppleLanguages)
+            UserDefaults.standard.removeObject(forKey: UserDef.kAppleLanguages.rawValue)
           }
           NSLog("vChewing App self-terminated due to UI language change.")
           NSApplication.shared.terminate(nil)
