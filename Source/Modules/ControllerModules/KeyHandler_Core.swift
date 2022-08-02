@@ -184,14 +184,20 @@ public class KeyHandler {
           addToUserOverrideModel = false
         }
       }
-      if addToUserOverrideModel {
+      if addToUserOverrideModel, mgrPrefs.fetchSuggestionsFromUserOverrideModel {
         IME.prtDebugIntel("UOM: Start Observation.")
+        // 這個過程可能會因為使用者半衰記憶模組內部資料錯亂、而導致輸入法在選字時崩潰。
+        // 於是在這裡引入災後狀況察覺專用變數，且先開啟該開關。順利執行完觀察後會關閉。
+        // 一旦輸入法崩潰，會在重啟時發現這個開關是開著的，屆時 AppDelegate 會做出應對。
+        mgrPrefs.failureFlagForUOMObservation = true
         // 令半衰記憶模組觀測給定的三元圖。
         // 這個過程會讓半衰引擎根據當前上下文生成三元圖索引鍵。
         currentUOM.observe(
           walkedAnchors: walkedAnchors, cursorIndex: adjustedCursor, candidate: theCandidate.value,
           timestamp: NSDate().timeIntervalSince1970, saveCallback: { mgrLangModel.saveUserOverrideModelData() }
         )
+        // 如果沒有出現崩框的話，那就將這個開關復位。
+        mgrPrefs.failureFlagForUOMObservation = false
       }
     }
 
