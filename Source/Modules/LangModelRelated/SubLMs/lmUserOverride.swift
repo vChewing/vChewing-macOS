@@ -326,9 +326,8 @@ extension vChewing.LMUserOverride {
   public func saveData(toURL fileURL: URL) {
     let encoder = JSONEncoder()
     do {
-      if let jsonData = try? encoder.encode(mutLRUMap) {
-        try jsonData.write(to: fileURL, options: .atomic)
-      }
+      guard let jsonData = try? encoder.encode(mutLRUMap) else { return }
+      try jsonData.write(to: fileURL, options: .atomic)
     } catch {
       IME.prtDebugIntel("UOM Error: Unable to save data, abort saving. Details: \(error)")
       return
