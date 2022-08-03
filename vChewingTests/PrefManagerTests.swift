@@ -14,22 +14,22 @@ import XCTest
 
 class PrefManagerTests: XCTestCase {
   func reset() {
-    mgrPrefs.allKeys.forEach {
-      UserDefaults.standard.removeObject(forKey: $0)
+    UserDef.allCases.forEach {
+      UserDefaults.standard.removeObject(forKey: $0.rawValue)
     }
   }
 
   func makeSnapshot() -> [String: Any] {
     var dict = [String: Any]()
-    mgrPrefs.allKeys.forEach {
-      dict[$0] = UserDefaults.standard.object(forKey: $0)
+    UserDef.allCases.forEach {
+      dict[$0.rawValue] = UserDefaults.standard.object(forKey: $0.rawValue)
     }
     return dict
   }
 
   func restore(from snapshot: [String: Any]) {
-    mgrPrefs.allKeys.forEach {
-      UserDefaults.standard.set(snapshot[$0], forKey: $0)
+    UserDef.allCases.forEach {
+      UserDefaults.standard.set(snapshot[$0.rawValue], forKey: $0.rawValue)
     }
   }
 
