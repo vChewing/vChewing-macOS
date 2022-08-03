@@ -29,8 +29,6 @@ struct suiPrefPaneExperience: View {
   @State private var selKeyBehaviorESCForClearingTheBuffer = UserDefaults.standard.bool(
     forKey: UserDef.kEscToCleanInputBuffer.rawValue)
   @State private var selEnableSCPCTypingMode = UserDefaults.standard.bool(forKey: UserDef.kUseSCPCTypingMode.rawValue)
-  @State private var selComposingBufferSize = UserDefaults.standard.integer(
-    forKey: UserDef.kComposingBufferSize.rawValue)
   @State private var selAutoCorrectReadingCombination = UserDefaults.standard.bool(
     forKey: UserDef.kAutoCorrectReadingCombination.rawValue)
   @State private var selAlsoConfirmAssociatedCandidatesByEnter = UserDefaults.standard.bool(
@@ -79,24 +77,6 @@ struct suiPrefPaneExperience: View {
           )
         )
         .preferenceDescription()
-      }
-      Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Buffer Limit:")) }) {
-        Picker("", selection: $selComposingBufferSize) {
-          Text("10").tag(10)
-          Text("15").tag(15)
-          Text("20").tag(20)
-          Text("25").tag(25)
-          Text("30").tag(30)
-          Text("35").tag(35)
-          Text("40").tag(40)
-        }.onChange(of: selComposingBufferSize) { value in
-          mgrPrefs.composingBufferSize = value
-        }
-        .labelsHidden()
-        .horizontalRadioGroupLayout()
-        .pickerStyle(RadioGroupPickerStyle())
-        Text(LocalizedStringKey("Specify the maximum characters allowed in the composition buffer."))
-          .preferenceDescription()
       }
       Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Cursor Selection:")) }) {
         Picker("", selection: $selCursorPosition) {

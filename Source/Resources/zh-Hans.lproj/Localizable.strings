@@ -103,7 +103,6 @@
 "Automatically correct reading combinations when typing" = "敲字时自动纠正读音组合";
 "Automatically reload user data files if changes detected" = "自动检测并载入使用者语汇档案变更";
 "Basic Keyboard Layout:" = "基础键盘布局:";
-"Buffer Limit:" = "组字区容量:";
 "Candidate Layout:" = "候选字窗布局:";
 "Candidate Size:" = "候选字窗字号:";
 "Change user interface language (will reboot the IME)." = "变更输入法介面语言，会自动重启输入法。";
@@ -161,7 +160,6 @@
 "Space & ESC Key:" = "ESC 与空格键:";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+空格键 换下一页，空格键 换选下一个后选字";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "空格键 换下一页，Shift+空格键 换选下一个后选字";
-"Specify the maximum characters allowed in the composition buffer." = "请指定组字缓冲区内的文字数的上限。";
 "Starlight" = "星光排列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉耻模式 // 取消勾选的话，敲错字时会有异音";
 "Traditional Chinese" = "繁体中文";

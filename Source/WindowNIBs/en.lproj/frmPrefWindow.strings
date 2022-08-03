@@ -84,7 +84,6 @@
 "xC5-yV-1W1.title" = "Choose your preferred layout of the candidate window.";
 "xibGeneralSettings.title" = "General Settings";
 "xibKeyboardShortcuts.title" = "Keyboard Shortcuts";
-"xibLabelBufferLimit.title" = "Buffer Limit:";
 "xibOutputSettings.title" = "Output Settings";
 "xibUsingCurrencyNumerals.title" = "Currency Numeral Output";
 "xibUsingHotKeyAssociates.title" = "Per-Char Associated Phrases";

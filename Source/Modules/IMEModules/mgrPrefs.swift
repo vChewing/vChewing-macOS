@@ -24,7 +24,6 @@ public enum UserDef: String, CaseIterable {
   case kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
   case kUseRearCursorMode = "useRearCursorMode"
   case kUseHorizontalCandidateList = "UseHorizontalCandidateList"
-  case kComposingBufferSize = "ComposingBufferSize"
   case kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
   case kCNS11643Enabled = "CNS11643Enabled"
   case kSymbolInputEnabled = "SymbolInputEnabled"
@@ -376,8 +375,7 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kUseHorizontalCandidateList.rawValue, defaultValue: true)
   static var useHorizontalCandidateList: Bool
 
-  @ComposingBufferSize(key: UserDef.kComposingBufferSize.rawValue)
-  static var composingBufferSize: Int
+  static var composingBufferSize: Int { 30 }
 
   @UserDefault(key: UserDef.kChooseCandidateUsingSpace.rawValue, defaultValue: true)
   static var chooseCandidateUsingSpace: Bool

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21219" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21219"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -28,7 +28,7 @@
         <window title="vChewing Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" animationBehavior="default" titlebarAppearsTransparent="YES" id="1" userLabel="frmPrefWindow">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" fullSizeContentView="YES"/>
             <rect key="contentRect" x="401" y="295" width="445" height="501"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
             <view key="contentView" id="2" customClass="NSVisualEffectView">
                 <rect key="frame" x="0.0" y="0.0" width="445" height="501"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -366,7 +366,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="13">
-                    <rect key="frame" x="18" y="353" width="403" height="15"/>
+                    <rect key="frame" x="18" y="373" width="403" height="15"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the cursor position where you want to list possible candidates." id="14">
                         <font key="font" metaFont="cellTitle"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -374,7 +374,7 @@
                     </textFieldCell>
                 </textField>
                 <matrix wantsLayer="YES" verticalHuggingPriority="751" tag="1" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="15">
-                    <rect key="frame" x="33" y="307" width="402" height="38"/>
+                    <rect key="frame" x="33" y="327" width="402" height="38"/>
                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     <size key="cellSize" width="402" height="18"/>
                     <size key="intercellSpacing" width="4" height="2"/>
@@ -399,7 +399,7 @@
                     </connections>
                 </matrix>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7z2-DD-c58">
-                    <rect key="frame" x="33" y="286.5" width="318" height="16"/>
+                    <rect key="frame" x="33" y="306.5" width="318" height="16"/>
                     <buttonCell key="cell" type="check" title="Push the cursor in front of the phrase after selection" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="RUG-ls-KyA">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="cellTitle"/>
@@ -409,7 +409,7 @@
                     </connections>
                 </button>
                 <matrix wantsLayer="YES" verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n7q-ew-DYu">
-                    <rect key="frame" x="33" y="238" width="352" height="18"/>
+                    <rect key="frame" x="33" y="258" width="352" height="18"/>
                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     <size key="cellSize" width="174" height="18"/>
                     <size key="intercellSpacing" width="4" height="2"/>
@@ -436,7 +436,7 @@
                     </connections>
                 </matrix>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TMn-LX-3Ub">
-                    <rect key="frame" x="18" y="263" width="369" height="15"/>
+                    <rect key="frame" x="18" y="283" width="369" height="15"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the behavior of (Shift+)Tab key in the candidate window." id="ueU-Rz-a1C">
                         <font key="font" metaFont="cellTitle"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -444,7 +444,7 @@
                     </textFieldCell>
                 </textField>
                 <matrix wantsLayer="YES" verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YkJ-lr-EP6">
-                    <rect key="frame" x="33" y="170" width="386" height="38"/>
+                    <rect key="frame" x="33" y="190" width="386" height="38"/>
                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     <size key="cellSize" width="386" height="18"/>
                     <size key="intercellSpacing" width="4" height="2"/>
@@ -469,7 +469,7 @@
                     </connections>
                 </matrix>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J0f-Aw-dxC">
-                    <rect key="frame" x="18" y="215" width="336" height="15"/>
+                    <rect key="frame" x="18" y="235" width="336" height="15"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the behavior of (Shift+)Space key with candidates." id="Pg5-G9-pY5">
                         <font key="font" metaFont="cellTitle"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -477,7 +477,7 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bE0-Lq-Pj7">
-                    <rect key="frame" x="19" y="124.5" width="266" height="16"/>
+                    <rect key="frame" x="19" y="144.5" width="266" height="16"/>
                     <buttonCell key="cell" type="check" title="Use ESC key to clear the entire input buffer" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="f2j-xD-4xK">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="cellTitle"/>
@@ -487,7 +487,7 @@
                     </connections>
                 </button>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="109">
-                    <rect key="frame" x="19" y="145.5" width="285" height="16"/>
+                    <rect key="frame" x="19" y="165.5" width="285" height="16"/>
                     <buttonCell key="cell" type="check" title="Enable Space key for calling candidate window" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="110">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="cellTitle"/>
@@ -497,7 +497,7 @@
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mzw-F2-aAQ">
-                    <rect key="frame" x="19" y="103.5" width="295" height="16"/>
+                    <rect key="frame" x="19" y="123.5" width="295" height="16"/>
                     <buttonCell key="cell" type="check" title="Emulating select-candidate-per-character mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="ArK-Vk-OoT">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="cellTitle"/>
@@ -506,65 +506,8 @@
                         <binding destination="32" name="value" keyPath="values.UseSCPCTypingMode" id="PbD-wq-OsN"/>
                     </connections>
                 </button>
-                <matrix wantsLayer="YES" verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JG6-RM-ZdJ">
-                    <rect key="frame" x="111" y="376" width="297" height="15"/>
-                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    <size key="cellSize" width="39" height="15"/>
-                    <size key="intercellSpacing" width="4" height="2"/>
-                    <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="small" inset="2" id="YLE-4b-HX3">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="cellTitle"/>
-                    </buttonCell>
-                    <cells>
-                        <column>
-                            <buttonCell type="radio" title="10" imagePosition="left" alignment="left" controlSize="small" state="on" tag="10" inset="2" id="QIi-jM-Mcm">
-                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                <font key="font" metaFont="cellTitle"/>
-                            </buttonCell>
-                        </column>
-                        <column>
-                            <buttonCell type="radio" title="15" imagePosition="left" alignment="left" controlSize="small" tag="15" inset="2" id="3ZE-2c-qjN">
-                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                <font key="font" metaFont="cellTitle"/>
-                            </buttonCell>
-                        </column>
-                        <column>
-                            <buttonCell type="radio" title="20" imagePosition="left" alignment="left" controlSize="small" tag="20" inset="2" id="FJI-A2-q4K">
-                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                <font key="font" metaFont="cellTitle"/>
-                            </buttonCell>
-                        </column>
-                        <column>
-                            <buttonCell type="radio" title="25" imagePosition="left" alignment="left" controlSize="small" tag="25" inset="2" id="cBE-ve-Cs5">
-                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                <font key="font" metaFont="cellTitle"/>
-                            </buttonCell>
-                        </column>
-                        <column>
-                            <buttonCell type="radio" title="30" imagePosition="left" alignment="left" controlSize="small" tag="30" inset="2" id="1YY-sv-ibi">
-                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                <font key="font" metaFont="cellTitle"/>
-                            </buttonCell>
-                        </column>
-                        <column>
-                            <buttonCell type="radio" title="35" imagePosition="left" alignment="left" controlSize="small" tag="35" inset="2" id="mx7-hu-Yzy">
-                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                <font key="font" metaFont="cellTitle"/>
-                            </buttonCell>
-                        </column>
-                        <column>
-                            <buttonCell type="radio" title="40" imagePosition="left" alignment="left" controlSize="small" tag="40" inset="2" id="qMD-KO-AMu">
-                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                <font key="font" metaFont="cellTitle"/>
-                            </buttonCell>
-                        </column>
-                    </cells>
-                    <connections>
-                        <binding destination="32" name="selectedTag" keyPath="values.ComposingBufferSize" id="DLu-Gr-ghB"/>
-                    </connections>
-                </matrix>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="j8R-Hj-3dj">
-                    <rect key="frame" x="19" y="82.5" width="340" height="16"/>
+                    <rect key="frame" x="19" y="102.5" width="340" height="16"/>
                     <buttonCell key="cell" type="check" title="Automatically correct reading combinations when typing" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkAutoCorrectReadingCombination">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="cellTitle"/>
@@ -573,16 +516,8 @@
                         <binding destination="32" name="value" keyPath="values.AutoCorrectReadingCombination" id="bix-eJ-jtV"/>
                     </connections>
                 </button>
-                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="d5f-bq-dRQ">
-                    <rect key="frame" x="18" y="376" width="74" height="15"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Buffer Limit:" id="xibLabelBufferLimit">
-                        <font key="font" metaFont="cellTitle"/>
-                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6MM-WC-Mpd">
-                    <rect key="frame" x="19" y="61.5" width="388" height="16"/>
+                    <rect key="frame" x="19" y="81.5" width="388" height="16"/>
                     <buttonCell key="cell" type="check" title="Allow using Enter key to confirm associated candidate selection" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkAlsoConfirmAssociatedCandidatesByEnter">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="cellTitle"/>
@@ -592,7 +527,7 @@
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HaB-rc-AcW">
-                    <rect key="frame" x="19" y="40.5" width="388" height="16"/>
+                    <rect key="frame" x="19" y="60.5" width="388" height="16"/>
                     <buttonCell key="cell" type="check" title="Allow backspace-editing miscomposed readings" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkKeepReadingUponCompositionError">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="cellTitle"/>
@@ -605,10 +540,9 @@
             <constraints>
                 <constraint firstItem="n7q-ew-DYu" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="33" id="2gT-9Z-6F4"/>
                 <constraint firstItem="109" firstAttribute="top" secondItem="YkJ-lr-EP6" secondAttribute="bottom" constant="9" id="3tl-Zc-C5n"/>
-                <constraint firstItem="13" firstAttribute="top" secondItem="d5f-bq-dRQ" secondAttribute="bottom" constant="8" symbolic="YES" id="4pp-NX-pCc"/>
                 <constraint firstItem="YkJ-lr-EP6" firstAttribute="top" secondItem="J0f-Aw-dxC" secondAttribute="bottom" constant="7" id="5fd-qi-hJ6"/>
+                <constraint firstItem="13" firstAttribute="top" secondItem="uHU-aL-du7" secondAttribute="bottom" constant="11" id="5uq-In-4bN"/>
                 <constraint firstItem="HaB-rc-AcW" firstAttribute="leading" secondItem="6MM-WC-Mpd" secondAttribute="leading" id="7Fs-9l-g66"/>
-                <constraint firstItem="d5f-bq-dRQ" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="20" id="9wo-7x-RKb"/>
                 <constraint firstItem="TMn-LX-3Ub" firstAttribute="top" secondItem="7z2-DD-c58" secondAttribute="bottom" constant="9" id="AXY-LV-HMX"/>
                 <constraint firstItem="7z2-DD-c58" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="34" id="BUo-Us-u2B"/>
                 <constraint firstItem="15" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="33" id="Be1-9m-alA"/>
@@ -625,7 +559,6 @@
                 <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="6MM-WC-Mpd" secondAttribute="trailing" constant="38" id="VEQ-DQ-Fgq"/>
                 <constraint firstItem="7z2-DD-c58" firstAttribute="top" secondItem="15" secondAttribute="bottom" constant="5" id="VKv-YI-AS2"/>
                 <constraint firstItem="15" firstAttribute="top" secondItem="13" secondAttribute="bottom" constant="8" symbolic="YES" id="WHr-jO-a07"/>
-                <constraint firstItem="JG6-RM-ZdJ" firstAttribute="leading" secondItem="d5f-bq-dRQ" secondAttribute="trailing" constant="21" id="Y2r-b0-0l6"/>
                 <constraint firstItem="IpX-f7-rTL" firstAttribute="top" secondItem="XWo-36-xGi" secondAttribute="top" constant="20" id="YaG-ab-LJH"/>
                 <constraint firstItem="uHU-aL-du7" firstAttribute="top" secondItem="IpX-f7-rTL" secondAttribute="bottom" constant="8" symbolic="YES" id="aet-Zq-v6x"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="TMn-LX-3Ub" secondAttribute="trailing" constant="20" symbolic="YES" id="atz-4L-U9s"/>
@@ -643,12 +576,10 @@
                 <constraint firstItem="mzw-F2-aAQ" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="20" id="pHT-DE-qdx"/>
                 <constraint firstItem="ETa-09-qWI" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="33" id="qFL-i6-eUT"/>
                 <constraint firstItem="HaB-rc-AcW" firstAttribute="trailing" secondItem="6MM-WC-Mpd" secondAttribute="trailing" id="rA7-0f-akd"/>
-                <constraint firstItem="JG6-RM-ZdJ" firstAttribute="top" secondItem="uHU-aL-du7" secondAttribute="bottom" constant="8" id="shS-7h-z7u"/>
                 <constraint firstItem="TMn-LX-3Ub" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="20" id="tFX-Eg-X70"/>
                 <constraint firstItem="J0f-Aw-dxC" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="20" id="v75-cS-TsO"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="mzw-F2-aAQ" secondAttribute="trailing" constant="20" symbolic="YES" id="vCa-4g-Zxq"/>
                 <constraint firstItem="uHU-aL-du7" firstAttribute="leading" secondItem="ETa-09-qWI" secondAttribute="trailing" constant="8" symbolic="YES" id="wZO-1b-2vC"/>
-                <constraint firstItem="d5f-bq-dRQ" firstAttribute="top" secondItem="ETa-09-qWI" secondAttribute="bottom" constant="8" symbolic="YES" id="xCy-RL-joo"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="13" secondAttribute="trailing" constant="20" symbolic="YES" id="yxg-7J-xR5"/>
             </constraints>
             <point key="canvasLocation" x="-376" y="-618"/>
