@@ -50,7 +50,7 @@ struct suiPrefPaneExperience: View {
 
   var body: some View {
     Preferences.Container(contentWidth: contentWidth) {
-      Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Selection Keys:")) }) {
+      Preferences.Section(label: { Text(LocalizedStringKey("Selection Keys:")) }) {
         ComboBox(items: mgrPrefs.suggestedCandidateKeys, text: $selSelectionKeys).frame(width: 180).onChange(
           of: selSelectionKeys
         ) { value in
@@ -78,7 +78,7 @@ struct suiPrefPaneExperience: View {
         )
         .preferenceDescription()
       }
-      Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Cursor Selection:")) }) {
+      Preferences.Section(label: { Text(LocalizedStringKey("Cursor Selection:")) }) {
         Picker("", selection: $selCursorPosition) {
           Text(LocalizedStringKey("in front of the phrase (like macOS built-in Zhuyin IME)")).tag(0)
           Text(LocalizedStringKey("at the rear of the phrase (like Microsoft New Phonetic)")).tag(1)
@@ -96,7 +96,7 @@ struct suiPrefPaneExperience: View {
           mgrPrefs.moveCursorAfterSelectingCandidate = value
         }.controlSize(.small)
       }
-      Preferences.Section(title: "(Shift+)Tab:", bottomDivider: true) {
+      Preferences.Section(title: "(Shift+)Tab:") {
         Picker("", selection: $selKeyBehaviorShiftTab) {
           Text(LocalizedStringKey("for cycling candidates")).tag(0)
           Text(LocalizedStringKey("for cycling pages")).tag(1)
@@ -109,7 +109,7 @@ struct suiPrefPaneExperience: View {
         Text(LocalizedStringKey("Choose the behavior of (Shift+)Tab key in the candidate window."))
           .preferenceDescription()
       }
-      Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("(Shift+)Space:")) }) {
+      Preferences.Section(label: { Text(LocalizedStringKey("(Shift+)Space:")) }) {
         Picker("", selection: $selKeyBehaviorShiftSpace) {
           Text(LocalizedStringKey("Space to +cycle candidates, Shift+Space to +cycle pages")).tag(0)
           Text(LocalizedStringKey("Space to +cycle pages, Shift+Space to +cycle candidates")).tag(1)
@@ -121,7 +121,7 @@ struct suiPrefPaneExperience: View {
         Text(LocalizedStringKey("Choose the behavior of (Shift+)Space key with candidates."))
           .preferenceDescription()
       }
-      Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Space & ESC Key:")) }) {
+      Preferences.Section(label: { Text(LocalizedStringKey("Misc Settings:")) }) {
         Toggle(
           LocalizedStringKey("Enable Space key for calling candidate window"),
           isOn: $selKeyBehaviorSpaceForCallingCandidate
@@ -134,21 +134,12 @@ struct suiPrefPaneExperience: View {
         ).onChange(of: selKeyBehaviorESCForClearingTheBuffer) { value in
           mgrPrefs.escToCleanInputBuffer = value
         }
-      }
-      Preferences.Section(label: { Text(LocalizedStringKey("Typing Style:")) }) {
         Toggle(
           LocalizedStringKey("Automatically correct reading combinations when typing"),
           isOn: $selAutoCorrectReadingCombination
         ).onChange(of: selAutoCorrectReadingCombination) { value in
           mgrPrefs.autoCorrectReadingCombination = value
         }
-        Toggle(
-          LocalizedStringKey("Emulating select-candidate-per-character mode"), isOn: $selEnableSCPCTypingMode
-        ).onChange(of: selEnableSCPCTypingMode) { value in
-          mgrPrefs.useSCPCTypingMode = value
-        }
-        Text(LocalizedStringKey("An accomodation for elder computer users."))
-          .preferenceDescription()
         Toggle(
           LocalizedStringKey("Allow using Enter key to confirm associated candidate selection"),
           isOn: $selAlsoConfirmAssociatedCandidatesByEnter
@@ -161,6 +152,13 @@ struct suiPrefPaneExperience: View {
         ).onChange(of: selKeepReadingUponCompositionError) { value in
           mgrPrefs.keepReadingUponCompositionError = value
         }
+        Toggle(
+          LocalizedStringKey("Emulating select-candidate-per-character mode"), isOn: $selEnableSCPCTypingMode
+        ).onChange(of: selEnableSCPCTypingMode) { value in
+          mgrPrefs.useSCPCTypingMode = value
+        }
+        Text(LocalizedStringKey("An accomodation for elder computer users."))
+          .preferenceDescription()
       }
     }
   }

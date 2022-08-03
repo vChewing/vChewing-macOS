@@ -156,7 +156,6 @@
 "Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "拼音並擊（組字區與工具提示內顯示漢語拼音）";
 "Show page buttons in candidate window" = "在選字窗內顯示翻頁按鈕";
 "Simplified Chinese" = "簡體中文";
-"Space & ESC Key:" = "ESC 與空格鍵:";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+空格鍵 換下一頁，空格鍵 換選下一個後選字";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "空格鍵 換下一頁，Shift+空格鍵 換選下一個後選字";
 "Starlight" = "星光排列";
