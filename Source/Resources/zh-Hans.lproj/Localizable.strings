@@ -67,6 +67,7 @@
 "Optimize Memorized Phrases" = "精简临时记忆语汇资料";
 "Clear Memorized Phrases" = "清除临时记忆语汇资料";
 "Currency Numeral Output" = "大写汉字数字输出";
+"Alphanumerical Mode" = "英数输入模式";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";
