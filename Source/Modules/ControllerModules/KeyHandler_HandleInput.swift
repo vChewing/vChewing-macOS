@@ -67,7 +67,7 @@ extension KeyHandler {
       || input.isCursorForward || input.isCursorBackward
     {
       // 略過對 BackSpace 的處理。
-    } else if input.isCapsLockOn {
+    } else if input.isCapsLockOn || input.isASCIIModeInput {
       // 但願能夠處理這種情況下所有可能的按鍵組合。
       clear()
       stateCallback(InputState.Empty())
