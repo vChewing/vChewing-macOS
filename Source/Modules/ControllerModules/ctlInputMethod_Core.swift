@@ -84,9 +84,8 @@ class ctlInputMethod: IMKInputController {
     super.init(server: server, delegate: delegate, client: inputClient)
     keyHandler.delegate = self
     // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
-    activateServer(inputClient)
-    keyHandler.ensureParser()
     resetKeyHandler()
+    activateServer(inputClient)
   }
 
   // MARK: - IMKStateSetting 協定規定的方法
