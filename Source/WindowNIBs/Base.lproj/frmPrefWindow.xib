@@ -536,6 +536,16 @@
                         <binding destination="32" name="value" keyPath="values.KeepReadingUponCompositionError" id="ddF-qg-jes"/>
                     </connections>
                 </button>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FCB-ax-ARZ">
+                    <rect key="frame" x="19" y="39.5" width="388" height="16"/>
+                    <buttonCell key="cell" type="check" title="Also toggle alphanumerical mode with Left-Shift" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkTogglingAlphanumericalModeWithLShift">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="cellTitle"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="32" name="value" keyPath="values.TogglingAlphanumericalModeWithLShift" id="XW6-un-l8B"/>
+                    </connections>
+                </button>
             </subviews>
             <constraints>
                 <constraint firstItem="n7q-ew-DYu" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="33" id="2gT-9Z-6F4"/>
@@ -548,6 +558,8 @@
                 <constraint firstItem="15" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="33" id="Be1-9m-alA"/>
                 <constraint firstItem="n7q-ew-DYu" firstAttribute="top" secondItem="TMn-LX-3Ub" secondAttribute="bottom" constant="7" id="BtQ-PX-1e1"/>
                 <constraint firstItem="109" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="20" id="Cu9-uO-BZG"/>
+                <constraint firstItem="FCB-ax-ARZ" firstAttribute="top" secondItem="HaB-rc-AcW" secondAttribute="bottom" constant="6" id="EAW-lg-2pb"/>
+                <constraint firstItem="FCB-ax-ARZ" firstAttribute="leading" secondItem="HaB-rc-AcW" secondAttribute="leading" id="GjC-qu-Nxe"/>
                 <constraint firstItem="j8R-Hj-3dj" firstAttribute="top" secondItem="mzw-F2-aAQ" secondAttribute="bottom" constant="6" id="H9h-Dz-FOL"/>
                 <constraint firstItem="bE0-Lq-Pj7" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="20" id="KKo-uq-jJx"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="7z2-DD-c58" secondAttribute="trailing" constant="20" symbolic="YES" id="O2M-YY-tO1"/>
@@ -581,6 +593,7 @@
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="mzw-F2-aAQ" secondAttribute="trailing" constant="20" symbolic="YES" id="vCa-4g-Zxq"/>
                 <constraint firstItem="uHU-aL-du7" firstAttribute="leading" secondItem="ETa-09-qWI" secondAttribute="trailing" constant="8" symbolic="YES" id="wZO-1b-2vC"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="13" secondAttribute="trailing" constant="20" symbolic="YES" id="yxg-7J-xR5"/>
+                <constraint firstItem="FCB-ax-ARZ" firstAttribute="trailing" secondItem="HaB-rc-AcW" secondAttribute="trailing" id="z0l-7W-j7D"/>
             </constraints>
             <point key="canvasLocation" x="-376" y="-618"/>
         </visualEffectView>

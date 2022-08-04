@@ -44,6 +44,7 @@
 "chkAutoCorrectReadingCombination.title" = "Automatically correct reading combinations when typing";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "Applying typing suggestions from half-life user override model";
 "chkKeepReadingUponCompositionError.title" = "Allow backspace-editing miscomposed readings";
+"chkTogglingAlphanumericalModeWithLShift.title" = "Also toggle alphanumerical mode with Left-Shift";
 "chkUseFixecCandidateOrderOnSelection.title" = "Always use fixed listing order in candidate window";
 "DbW-eq-ZdB.title" = "Starlight";
 "dIN-TZ-67g.title" = "Space to +cycle candidates, Shift+Space to +cycle pages";
