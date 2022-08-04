@@ -126,6 +126,7 @@ struct InputSignal: CustomStringConvertible {
   private var cursorKeyClockRight: KeyCode = .kNone  // 3 o'clock
   private var cursorKeyClockLeft: KeyCode = .kNone  // 9 o'clock
   private(set) var emacsKey: EmacsKey
+  public var isASCIIModeInput: Bool = false
 
   public init(
     inputText: String = "", keyCode: UInt16, charCode: UInt16, flags: NSEvent.ModifierFlags,
@@ -248,7 +249,7 @@ struct InputSignal: CustomStringConvertible {
   var isUpperCaseASCIILetterKey: Bool { (65...90).contains(charCode) && flags == .shift }
 
   // 這裡必須用 KeyCode，這樣才不會受隨 macOS 版本更動的 Apple 動態注音鍵盤排列內容的影響。
-  // 只是必須得與 ![input isShift] 搭配使用才可以（也就是僅判定 Shift 沒被摁下的情形）。
+  // 只是必須得與 ![input isShiftHold] 搭配使用才可以（也就是僅判定 Shift 沒被摁下的情形）。
   var isSymbolMenuPhysicalKey: Bool {
     [KeyCode.kSymbolMenuPhysicalKeyIntl, KeyCode.kSymbolMenuPhysicalKeyJIS].contains(KeyCode(rawValue: keyCode))
   }
