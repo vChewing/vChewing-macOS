@@ -91,6 +91,7 @@
 "Allow backspace-editing miscomposed readings" = "允許對無效的讀音使用 BackSpace 編輯";
 "Allow boosting / excluding a candidate of single kanji" = "將可以就地升權/排除的候選字詞的最短詞長設為單個漢字";
 "Allow using Enter key to confirm associated candidate selection" = "允許使用 Enter 確認當前選中的聯想詞";
+"Also toggle alphanumerical mode with Left-Shift" = "也允許使用左側的 Shift 鍵盤切換英數輸入模式";
 "Always use fixed listing order in candidate window" = "以固定順序來陳列選字窗內的候選字";
 "An accomodation for elder computer users." = "針對年長使用者的習慣而提供。";
 "Apple ABC (equivalent to English US)" = "Apple ABC (與 Apple 美規鍵盤等價)";

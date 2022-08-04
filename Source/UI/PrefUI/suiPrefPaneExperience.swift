@@ -35,6 +35,8 @@ struct suiPrefPaneExperience: View {
     forKey: UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue)
   @State private var selKeepReadingUponCompositionError = UserDefaults.standard.bool(
     forKey: UserDef.kKeepReadingUponCompositionError.rawValue)
+  @State private var selTogglingAlphanumericalModeWithLShift = UserDefaults.standard.bool(
+    forKey: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue)
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -147,10 +149,10 @@ struct suiPrefPaneExperience: View {
           mgrPrefs.alsoConfirmAssociatedCandidatesByEnter = value
         }
         Toggle(
-          LocalizedStringKey("Allow backspace-editing miscomposed readings"),
-          isOn: $selKeepReadingUponCompositionError
-        ).onChange(of: selKeepReadingUponCompositionError) { value in
-          mgrPrefs.keepReadingUponCompositionError = value
+          LocalizedStringKey("Also toggle alphanumerical mode with Left-Shift"),
+          isOn: $selTogglingAlphanumericalModeWithLShift
+        ).onChange(of: selTogglingAlphanumericalModeWithLShift) { value in
+          mgrPrefs.togglingAlphanumericalModeWithLShift = value
         }
         Toggle(
           LocalizedStringKey("Emulating select-candidate-per-character mode"), isOn: $selEnableSCPCTypingMode
