@@ -35,6 +35,8 @@ public class KeyHandler {
   let kEpsilon: Double = 0.000001
   /// 檢測是否出現游標切斷組字圈內字符的情況
   var isCursorCuttingChar = false
+  /// 檢測是否內容為空（注拼槽與組字器都是空的）
+  var isTypingContentEmpty: Bool { composer.isEmpty && compositor.isEmpty }
 
   /// 規定最大動態爬軌範圍。組字器內超出該範圍的節錨都會被自動標記為「已經手動選字過」，減少爬軌運算負擔。
   let kMaxComposingBufferNeedsToWalkSize = Int(max(12, ceil(Double(mgrPrefs.composingBufferSize) / 2)))
