@@ -15,7 +15,11 @@ extension Date {
 class ShiftKeyUpChecker {
   init() {}
   private static var checkModifier: NSEvent.ModifierFlags { NSEvent.ModifierFlags.shift }
-  private static var checkKeyCode: [UInt16] { [KeyCode.kShift.rawValue, KeyCode.kRightShift.rawValue] }
+  private static var checkKeyCode: [UInt16] {
+    mgrPrefs.togglingAlphanumericalModeWithLShift
+      ? [KeyCode.kShift.rawValue, KeyCode.kRightShift.rawValue]
+      : [KeyCode.kRightShift.rawValue]
+  }
 
   private static let delayInterval = 0.3
 
@@ -39,7 +43,7 @@ class ShiftKeyUpChecker {
     print("isLeftShift: \(isLeftShift), isRightShift: \(isRightShift)")
     let isKeyDown =
       event.type == .flagsChanged
-      && event.modifierFlags.intersection(.deviceIndependentFlagsMask) == checkModifier
+      && checkModifier.contains(event.modifierFlags.intersection(.deviceIndependentFlagsMask))
       && ShiftKeyUpChecker.checkKeyCode.contains(event.keyCode)
     if isKeyDown {
       // modifier keydown event

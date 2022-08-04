@@ -46,6 +46,7 @@ public enum UserDef: String, CaseIterable {
   case kAutoCorrectReadingCombination = "AutoCorrectReadingCombination"
   case kAlsoConfirmAssociatedCandidatesByEnter = "AlsoConfirmAssociatedCandidatesByEnter"
   case kKeepReadingUponCompositionError = "KeepReadingUponCompositionError"
+  case kTogglingAlphanumericalModeWithLShift = "TogglingAlphanumericalModeWithLShift"
 
   case kCandidateTextFontName = "CandidateTextFontName"
   case kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
@@ -300,6 +301,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.keepReadingUponCompositionError, forKey: UserDef.kKeepReadingUponCompositionError.rawValue
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.togglingAlphanumericalModeWithLShift, forKey: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue
+    )
 
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeySCPC, forKey: UserDef.kUsingHotKeySCPC.rawValue)
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyAssociates, forKey: UserDef.kUsingHotKeyAssociates.rawValue)
@@ -315,6 +319,8 @@ public enum mgrPrefs {
 
     UserDefaults.standard.synchronize()
   }
+
+  // MARK: - Settings (Tier 1)
 
   @UserDefault(key: UserDef.kIsDebugModeEnabled.rawValue, defaultValue: false)
   static var isDebugModeEnabled: Bool
@@ -397,6 +403,11 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue, defaultValue: false)
   static var keepReadingUponCompositionError: Bool
+
+  // MARK: - Settings (Tier 2)
+
+  @UserDefault(key: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue, defaultValue: true)
+  static var togglingAlphanumericalModeWithLShift: Bool
 
   static var minCandidateLength: Int {
     mgrPrefs.allowBoostingSingleKanjiAsUserPhrase ? 1 : 2
