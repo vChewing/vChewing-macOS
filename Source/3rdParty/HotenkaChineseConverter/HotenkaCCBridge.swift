@@ -38,6 +38,21 @@ public enum ChineseConverter {
     }
   }
 
+  private static let tableMappingArabicNumeralsToChinese: [String: String] = [
+    "0": "〇", "1": "一", "2": "二", "3": "三", "4": "四", "5": "五", "6": "六", "7": "七", "8": "八", "9": "九",
+  ]
+
+  /// 將給定的字串當中的阿拉伯數字轉為漢語小寫，逐字轉換。
+  /// - Parameter target: 要進行轉換操作的對象，會直接修改該對象。
+  public static func convertArabicNumeralsToChinese(target: String) -> String {
+    var target = target
+    for key in tableMappingArabicNumeralsToChinese.keys {
+      guard let result = tableMappingArabicNumeralsToChinese[key] else { continue }
+      target = target.replacingOccurrences(of: key, with: result)
+    }
+    return target
+  }
+
   /// CrossConvert.
   ///
   /// - Parameter string: Text in Original Script.
