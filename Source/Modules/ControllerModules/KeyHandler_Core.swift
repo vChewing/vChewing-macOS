@@ -1,28 +1,12 @@
 // Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // Refactored from the ObjCpp-version of this class by:
 // (c) 2011 and onwards The OpenVanilla Project (MIT License).
-/*
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-1. The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-2. No trademark license is granted to use the trade names, trademarks, service
-marks, or product names of Contributor, except as required to fulfill notice
-requirements above.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+// ====================
+// This code is released under the MIT license (SPDX-License-Identifier: MIT)
+// ... with NTL restriction stating that:
+// No trademark license is granted to use the trade names, trademarks, service
+// marks, or product names of Contributor, except as required to fulfill notice
+// requirements defined in MIT License.
 
 /// 該檔案乃按鍵調度模組的核心部分，主要承接型別初期化內容、協定內容、以及
 /// 被封裝的「與 Megrez 組字引擎和 Tekkon 注拼引擎對接的」各種工具函式。
@@ -51,6 +35,8 @@ public class KeyHandler {
   let kEpsilon: Double = 0.000001
   /// 檢測是否出現游標切斷組字圈內字符的情況
   var isCursorCuttingChar = false
+  /// 檢測是否內容為空（注拼槽與組字器都是空的）
+  var isTypingContentEmpty: Bool { composer.isEmpty && compositor.isEmpty }
 
   /// 規定最大動態爬軌範圍。組字器內超出該範圍的節錨都會被自動標記為「已經手動選字過」，減少爬軌運算負擔。
   let kMaxComposingBufferNeedsToWalkSize = Int(max(12, ceil(Double(mgrPrefs.composingBufferSize) / 2)))

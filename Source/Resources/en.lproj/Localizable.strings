@@ -67,6 +67,7 @@
 "Optimize Memorized Phrases" = "Optimize Memorized Phrases";
 "Clear Memorized Phrases" = "Clear Memorized Phrases";
 "Currency Numeral Output" = "Currency Numeral Output";
+"Alphanumerical Mode" = "Alphanumerical Mode";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "CommonSymbols";
@@ -90,6 +91,7 @@
 "Allow backspace-editing miscomposed readings" = "Allow backspace-editing miscomposed readings";
 "Allow boosting / excluding a candidate of single kanji" = "Allow boosting / excluding a candidate of single kanji";
 "Allow using Enter key to confirm associated candidate selection" = "Allow using Enter key to confirm associated candidate selection";
+"Also toggle alphanumerical mode with Left-Shift" = "Also toggle alphanumerical mode with Left-Shift";
 "Always use fixed listing order in candidate window" = "Always use fixed listing order in candidate window";
 "An accomodation for elder computer users." = "An accomodation for elder computer users.";
 "Apple ABC (equivalent to English US)" = "Apple ABC (equivalent to English US)";
@@ -103,7 +105,6 @@
 "Automatically correct reading combinations when typing" = "Automatically correct reading combinations when typing";
 "Automatically reload user data files if changes detected" = "Automatically reload user data files if changes detected";
 "Basic Keyboard Layout:" = "Basic Keyboard Layout:";
-"Buffer Limit:" = "Buffer Limit:";
 "Candidate Layout:" = "Candidate Layout:";
 "Candidate Size:" = "Candidate Size:";
 "Change user interface language (will reboot the IME)." = "Change user interface language (will reboot the IME).";
@@ -157,10 +158,8 @@
 "Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "Show Hanyu-Pinyin in the inline composition buffer & tooltip";
 "Show page buttons in candidate window" = "Show page buttons in candidate window";
 "Simplified Chinese" = "Simplified Chinese";
-"Space & ESC Key:" = "Space & ESC Key:";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Space to +cycle candidates, Shift+Space to +cycle pages";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "Space to +cycle pages, Shift+Space to +cycle candidates";
-"Specify the maximum characters allowed in the composition buffer." = "Specify the maximum characters allowed in the composition buffer.";
 "Starlight" = "Starlight";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "Stop farting (when typed phonetic combination is invalid, etc.)";
 "Traditional Chinese" = "Traditional Chinese";

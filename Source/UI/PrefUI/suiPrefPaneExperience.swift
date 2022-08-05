@@ -1,26 +1,10 @@
 // Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
-/*
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-1. The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-2. No trademark license is granted to use the trade names, trademarks, service
-marks, or product names of Contributor, except as required to fulfill notice
-requirements above.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+// ====================
+// This code is released under the MIT license (SPDX-License-Identifier: MIT)
+// ... with NTL restriction stating that:
+// No trademark license is granted to use the trade names, trademarks, service
+// marks, or product names of Contributor, except as required to fulfill notice
+// requirements defined in MIT License.
 
 import Cocoa
 import SwiftUI
@@ -45,14 +29,14 @@ struct suiPrefPaneExperience: View {
   @State private var selKeyBehaviorESCForClearingTheBuffer = UserDefaults.standard.bool(
     forKey: UserDef.kEscToCleanInputBuffer.rawValue)
   @State private var selEnableSCPCTypingMode = UserDefaults.standard.bool(forKey: UserDef.kUseSCPCTypingMode.rawValue)
-  @State private var selComposingBufferSize = UserDefaults.standard.integer(
-    forKey: UserDef.kComposingBufferSize.rawValue)
   @State private var selAutoCorrectReadingCombination = UserDefaults.standard.bool(
     forKey: UserDef.kAutoCorrectReadingCombination.rawValue)
   @State private var selAlsoConfirmAssociatedCandidatesByEnter = UserDefaults.standard.bool(
     forKey: UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue)
   @State private var selKeepReadingUponCompositionError = UserDefaults.standard.bool(
     forKey: UserDef.kKeepReadingUponCompositionError.rawValue)
+  @State private var selTogglingAlphanumericalModeWithLShift = UserDefaults.standard.bool(
+    forKey: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue)
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -68,7 +52,7 @@ struct suiPrefPaneExperience: View {
 
   var body: some View {
     Preferences.Container(contentWidth: contentWidth) {
-      Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Selection Keys:")) }) {
+      Preferences.Section(label: { Text(LocalizedStringKey("Selection Keys:")) }) {
         ComboBox(items: mgrPrefs.suggestedCandidateKeys, text: $selSelectionKeys).frame(width: 180).onChange(
           of: selSelectionKeys
         ) { value in
@@ -96,25 +80,7 @@ struct suiPrefPaneExperience: View {
         )
         .preferenceDescription()
       }
-      Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Buffer Limit:")) }) {
-        Picker("", selection: $selComposingBufferSize) {
-          Text("10").tag(10)
-          Text("15").tag(15)
-          Text("20").tag(20)
-          Text("25").tag(25)
-          Text("30").tag(30)
-          Text("35").tag(35)
-          Text("40").tag(40)
-        }.onChange(of: selComposingBufferSize) { value in
-          mgrPrefs.composingBufferSize = value
-        }
-        .labelsHidden()
-        .horizontalRadioGroupLayout()
-        .pickerStyle(RadioGroupPickerStyle())
-        Text(LocalizedStringKey("Specify the maximum characters allowed in the composition buffer."))
-          .preferenceDescription()
-      }
-      Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Cursor Selection:")) }) {
+      Preferences.Section(label: { Text(LocalizedStringKey("Cursor Selection:")) }) {
         Picker("", selection: $selCursorPosition) {
           Text(LocalizedStringKey("in front of the phrase (like macOS built-in Zhuyin IME)")).tag(0)
           Text(LocalizedStringKey("at the rear of the phrase (like Microsoft New Phonetic)")).tag(1)
@@ -132,7 +98,7 @@ struct suiPrefPaneExperience: View {
           mgrPrefs.moveCursorAfterSelectingCandidate = value
         }.controlSize(.small)
       }
-      Preferences.Section(title: "(Shift+)Tab:", bottomDivider: true) {
+      Preferences.Section(title: "(Shift+)Tab:") {
         Picker("", selection: $selKeyBehaviorShiftTab) {
           Text(LocalizedStringKey("for cycling candidates")).tag(0)
           Text(LocalizedStringKey("for cycling pages")).tag(1)
@@ -145,7 +111,7 @@ struct suiPrefPaneExperience: View {
         Text(LocalizedStringKey("Choose the behavior of (Shift+)Tab key in the candidate window."))
           .preferenceDescription()
       }
-      Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("(Shift+)Space:")) }) {
+      Preferences.Section(label: { Text(LocalizedStringKey("(Shift+)Space:")) }) {
         Picker("", selection: $selKeyBehaviorShiftSpace) {
           Text(LocalizedStringKey("Space to +cycle candidates, Shift+Space to +cycle pages")).tag(0)
           Text(LocalizedStringKey("Space to +cycle pages, Shift+Space to +cycle candidates")).tag(1)
@@ -157,7 +123,7 @@ struct suiPrefPaneExperience: View {
         Text(LocalizedStringKey("Choose the behavior of (Shift+)Space key with candidates."))
           .preferenceDescription()
       }
-      Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Space & ESC Key:")) }) {
+      Preferences.Section(label: { Text(LocalizedStringKey("Misc Settings:")) }) {
         Toggle(
           LocalizedStringKey("Enable Space key for calling candidate window"),
           isOn: $selKeyBehaviorSpaceForCallingCandidate
@@ -170,13 +136,23 @@ struct suiPrefPaneExperience: View {
         ).onChange(of: selKeyBehaviorESCForClearingTheBuffer) { value in
           mgrPrefs.escToCleanInputBuffer = value
         }
-      }
-      Preferences.Section(label: { Text(LocalizedStringKey("Typing Style:")) }) {
         Toggle(
           LocalizedStringKey("Automatically correct reading combinations when typing"),
           isOn: $selAutoCorrectReadingCombination
         ).onChange(of: selAutoCorrectReadingCombination) { value in
           mgrPrefs.autoCorrectReadingCombination = value
+        }
+        Toggle(
+          LocalizedStringKey("Allow using Enter key to confirm associated candidate selection"),
+          isOn: $selAlsoConfirmAssociatedCandidatesByEnter
+        ).onChange(of: selAlsoConfirmAssociatedCandidatesByEnter) { value in
+          mgrPrefs.alsoConfirmAssociatedCandidatesByEnter = value
+        }
+        Toggle(
+          LocalizedStringKey("Also toggle alphanumerical mode with Left-Shift"),
+          isOn: $selTogglingAlphanumericalModeWithLShift
+        ).onChange(of: selTogglingAlphanumericalModeWithLShift) { value in
+          mgrPrefs.togglingAlphanumericalModeWithLShift = value
         }
         Toggle(
           LocalizedStringKey("Emulating select-candidate-per-character mode"), isOn: $selEnableSCPCTypingMode
@@ -185,18 +161,6 @@ struct suiPrefPaneExperience: View {
         }
         Text(LocalizedStringKey("An accomodation for elder computer users."))
           .preferenceDescription()
-        Toggle(
-          LocalizedStringKey("Allow using Enter key to confirm associated candidate selection"),
-          isOn: $selAlsoConfirmAssociatedCandidatesByEnter
-        ).onChange(of: selAlsoConfirmAssociatedCandidatesByEnter) { value in
-          mgrPrefs.alsoConfirmAssociatedCandidatesByEnter = value
-        }
-        Toggle(
-          LocalizedStringKey("Allow backspace-editing miscomposed readings"),
-          isOn: $selKeepReadingUponCompositionError
-        ).onChange(of: selKeepReadingUponCompositionError) { value in
-          mgrPrefs.keepReadingUponCompositionError = value
-        }
       }
     }
   }

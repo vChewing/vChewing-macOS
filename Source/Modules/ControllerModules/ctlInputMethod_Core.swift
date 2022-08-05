@@ -1,28 +1,12 @@
 // Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
 // All possible vChewing-specific modifications are of:
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
-/*
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-1. The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-2. No trademark license is granted to use the trade names, trademarks, service
-marks, or product names of Contributor, except as required to fulfill notice
-requirements above.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+// ====================
+// This code is released under the MIT license (SPDX-License-Identifier: MIT)
+// ... with NTL restriction stating that:
+// No trademark license is granted to use the trade names, trademarks, service
+// marks, or product names of Contributor, except as required to fulfill notice
+// requirements defined in MIT License.
 
 import Cocoa
 import InputMethodKit
@@ -52,6 +36,15 @@ class ctlInputMethod: IMKInputController {
   var keyHandler: KeyHandler = .init()
   /// 用以記錄當前輸入法狀態的變數。
   var state: InputStateProtocol = InputState.Empty()
+  /// 當前這個 ctlInputMethod 副本是否處於英數輸入模式。
+  var isASCIIMode: Bool = false
+
+  /// 切換當前 ctlInputMethod 副本的英數輸入模式開關。
+  func toggleASCIIMode() -> Bool {
+    resetKeyHandler()
+    isASCIIMode = !isASCIIMode
+    return isASCIIMode
+  }
 
   // MARK: - 工具函式
 
@@ -84,9 +77,8 @@ class ctlInputMethod: IMKInputController {
     super.init(server: server, delegate: delegate, client: inputClient)
     keyHandler.delegate = self
     // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
-    activateServer(inputClient)
-    keyHandler.ensureParser()
     resetKeyHandler()
+    activateServer(inputClient)
   }
 
   // MARK: - IMKStateSetting 協定規定的方法
@@ -100,9 +92,19 @@ class ctlInputMethod: IMKInputController {
     // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
     // 所以這裡添加這句、來試圖應對這種情況。
     if keyHandler.delegate == nil { keyHandler.delegate = self }
-    setValue(IME.currentInputMode.rawValue, forTag: 114514, client: client())
+    setValue(IME.currentInputMode.rawValue, forTag: 114_514, client: client())
     keyHandler.clear()
     keyHandler.ensureParser()
+
+    if isASCIIMode {
+      NotifierController.notify(
+        message: String(
+          format: "%@%@%@", NSLocalizedString("Alphanumerical Mode", comment: ""), "\n",
+          isASCIIMode
+            ? NSLocalizedString("NotificationSwitchON", comment: "")
+            : NSLocalizedString("NotificationSwitchOFF", comment: "")
+        ))
+    }
 
     /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
     /// 這是很多 macOS 副廠輸入法的常見失誤之處。
@@ -183,13 +185,24 @@ class ctlInputMethod: IMKInputController {
   /// - Returns: 回「`true`」以將該案件已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
   @objc(handleEvent:client:) override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
+
+    // 用 Shift 開關半形英數模式。
+    if ShiftKeyUpChecker.check(event) {
+      NotifierController.notify(
+        message: String(
+          format: "%@%@%@", NSLocalizedString("Alphanumerical Mode", comment: ""), "\n",
+          toggleASCIIMode()
+            ? NSLocalizedString("NotificationSwitchON", comment: "")
+            : NSLocalizedString("NotificationSwitchOFF", comment: "")
+        ))
+      return false
+    }
+
     /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
     /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
     /// 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
     /// 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
-    if event.type == .flagsChanged {
-      return false
-    }
+    if event.type == .flagsChanged { return false }
 
     // 準備修飾鍵，用來判定是否需要利用就地新增語彙時的 Enter 鍵來砍詞。
     ctlInputMethod.areWeDeleting = event.modifierFlags.contains([.shift, .command])
@@ -211,7 +224,8 @@ class ctlInputMethod: IMKInputController {
       IME.areWeUsingOurOwnPhraseEditor = false
     }
 
-    let input = InputSignal(event: event, isVerticalTyping: isTypingVertical)
+    var input = InputSignal(event: event, isVerticalTyping: isTypingVertical)
+    input.isASCIIModeInput = isASCIIMode
 
     // 無法列印的訊號輸入，一概不作處理。
     // 這個過程不能放在 KeyHandler 內，否則不會起作用。

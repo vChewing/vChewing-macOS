@@ -1,34 +1,19 @@
 // Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
 // All possible vChewing-specific modifications are of:
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
-/*
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-1. The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-2. No trademark license is granted to use the trade names, trademarks, service
-marks, or product names of Contributor, except as required to fulfill notice
-requirements above.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+// ====================
+// This code is released under the MIT license (SPDX-License-Identifier: MIT)
+// ... with NTL restriction stating that:
+// No trademark license is granted to use the trade names, trademarks, service
+// marks, or product names of Contributor, except as required to fulfill notice
+// requirements defined in MIT License.
 
 import Cocoa
 
 public enum UserDef: String, CaseIterable {
   case kIsDebugModeEnabled = "_DebugMode"
   case kFailureFlagForUOMObservation = "_FailureFlag_UOMObservation"
+  case kDeltaOfCalendarYears = "DeltaOfCalendarYears"
   case kMostRecentInputMode = "MostRecentInputMode"
   case kUserDataFolderSpecified = "UserDataFolderSpecified"
   case kCheckUpdateAutomatically = "CheckUpdateAutomatically"
@@ -40,7 +25,6 @@ public enum UserDef: String, CaseIterable {
   case kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
   case kUseRearCursorMode = "useRearCursorMode"
   case kUseHorizontalCandidateList = "UseHorizontalCandidateList"
-  case kComposingBufferSize = "ComposingBufferSize"
   case kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
   case kCNS11643Enabled = "CNS11643Enabled"
   case kSymbolInputEnabled = "SymbolInputEnabled"
@@ -63,6 +47,7 @@ public enum UserDef: String, CaseIterable {
   case kAutoCorrectReadingCombination = "AutoCorrectReadingCombination"
   case kAlsoConfirmAssociatedCandidatesByEnter = "AlsoConfirmAssociatedCandidatesByEnter"
   case kKeepReadingUponCompositionError = "KeepReadingUponCompositionError"
+  case kTogglingAlphanumericalModeWithLShift = "TogglingAlphanumericalModeWithLShift"
 
   case kCandidateTextFontName = "CandidateTextFontName"
   case kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
@@ -243,6 +228,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.failureFlagForUOMObservation, forKey: UserDef.kFailureFlagForUOMObservation.rawValue
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.deltaOfCalendarYears, forKey: UserDef.kDeltaOfCalendarYears.rawValue
+    )
     UserDefaults.standard.setDefault(mgrPrefs.mostRecentInputMode, forKey: UserDef.kMostRecentInputMode.rawValue)
     UserDefaults.standard.setDefault(
       mgrPrefs.checkUpdateAutomatically, forKey: UserDef.kCheckUpdateAutomatically.rawValue
@@ -317,6 +305,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.keepReadingUponCompositionError, forKey: UserDef.kKeepReadingUponCompositionError.rawValue
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.togglingAlphanumericalModeWithLShift, forKey: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue
+    )
 
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeySCPC, forKey: UserDef.kUsingHotKeySCPC.rawValue)
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyAssociates, forKey: UserDef.kUsingHotKeyAssociates.rawValue)
@@ -333,11 +324,16 @@ public enum mgrPrefs {
     UserDefaults.standard.synchronize()
   }
 
+  // MARK: - Settings (Tier 1)
+
   @UserDefault(key: UserDef.kIsDebugModeEnabled.rawValue, defaultValue: false)
   static var isDebugModeEnabled: Bool
 
   @UserDefault(key: UserDef.kFailureFlagForUOMObservation.rawValue, defaultValue: false)
   static var failureFlagForUOMObservation: Bool
+
+  @UserDefault(key: UserDef.kDeltaOfCalendarYears.rawValue, defaultValue: -2000)
+  static var deltaOfCalendarYears: Int
 
   @UserDefault(key: UserDef.kMostRecentInputMode.rawValue, defaultValue: "")
   static var mostRecentInputMode: String
@@ -392,8 +388,7 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kUseHorizontalCandidateList.rawValue, defaultValue: true)
   static var useHorizontalCandidateList: Bool
 
-  @ComposingBufferSize(key: UserDef.kComposingBufferSize.rawValue)
-  static var composingBufferSize: Int
+  static var composingBufferSize: Int { 30 }
 
   @UserDefault(key: UserDef.kChooseCandidateUsingSpace.rawValue, defaultValue: true)
   static var chooseCandidateUsingSpace: Bool
@@ -415,6 +410,11 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue, defaultValue: false)
   static var keepReadingUponCompositionError: Bool
+
+  // MARK: - Settings (Tier 2)
+
+  @UserDefault(key: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue, defaultValue: true)
+  static var togglingAlphanumericalModeWithLShift: Bool
 
   static var minCandidateLength: Int {
     mgrPrefs.allowBoostingSingleKanjiAsUserPhrase ? 1 : 2

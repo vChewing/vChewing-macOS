@@ -44,6 +44,7 @@
 "chkAutoCorrectReadingCombination.title" = "敲字時自動糾正讀音組合";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "在敲字時自動套用來自半衰記憶模組的建議";
 "chkKeepReadingUponCompositionError.title" = "允許對無效的讀音使用 BackSpace 編輯";
+"chkTogglingAlphanumericalModeWithLShift.title" = "也允許使用左側的 Shift 鍵盤切換英數輸入模式";
 "chkUseFixecCandidateOrderOnSelection.title" = "以固定順序來陳列選字窗內的候選字";
 "DbW-eq-ZdB.title" = "星光";
 "dIN-TZ-67g.title" = "Shift+Space 換下一頁，Space 換選下一個候選字";
@@ -84,7 +85,6 @@
 "xC5-yV-1W1.title" = "選擇您所偏好的候選字窗佈局。";
 "xibGeneralSettings.title" = "一般設定";
 "xibKeyboardShortcuts.title" = "鍵盤快速鍵";
-"xibLabelBufferLimit.title" = "組字區容量:";
 "xibOutputSettings.title" = "輸出設定";
 "xibUsingCurrencyNumerals.title" = "大寫漢字數字輸出";
 "xibUsingHotKeyAssociates.title" = "逐字選字聯想模式";

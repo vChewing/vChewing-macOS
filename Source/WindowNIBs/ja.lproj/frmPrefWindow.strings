@@ -44,6 +44,7 @@
 "chkAutoCorrectReadingCombination.title" = "入力中で打ち間違った発音組み合わせを自動的に訂正する";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "入力中で臨時記憶モジュールからお薦めの候補を自動的に選ぶ";
 "chkKeepReadingUponCompositionError.title" = "効かぬ音読みを BackSpace で再編集";
+"chkTogglingAlphanumericalModeWithLShift.title" = "左側の Shift キーでも英数入力モードの切り替え";
 "chkUseFixecCandidateOrderOnSelection.title" = "候補文字を固定順番で陳列する";
 "DbW-eq-ZdB.title" = "星光";
 "dIN-TZ-67g.title" = "Shift+Space で次のページ、Space で次の候補文字を";
@@ -84,7 +85,6 @@
 "xC5-yV-1W1.title" = "入力候補陳列の仕様をご指定ください。";
 "xibGeneralSettings.title" = "全般設定";
 "xibKeyboardShortcuts.title" = "ショートカット";
-"xibLabelBufferLimit.title" = "緩衝列の容量:";
 "xibOutputSettings.title" = "出力設定";
 "xibUsingCurrencyNumerals.title" = "数字大字変換";
 "xibUsingHotKeyAssociates.title" = "全候補入力で連想語彙";

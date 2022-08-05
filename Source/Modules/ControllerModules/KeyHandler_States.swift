@@ -1,28 +1,12 @@
 // Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // Refactored from the ObjCpp-version of this class by:
 // (c) 2011 and onwards The OpenVanilla Project (MIT License).
-/*
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-1. The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-2. No trademark license is granted to use the trade names, trademarks, service
-marks, or product names of Contributor, except as required to fulfill notice
-requirements above.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+// ====================
+// This code is released under the MIT license (SPDX-License-Identifier: MIT)
+// ... with NTL restriction stating that:
+// No trademark license is granted to use the trade names, trademarks, service
+// marks, or product names of Contributor, except as required to fulfill notice
+// requirements defined in MIT License.
 
 /// 該檔案乃按鍵調度模組的用以承載「根據按鍵行為來調控模式」的各種成員函式的部分。
 
@@ -38,7 +22,7 @@ extension KeyHandler {
     /// 「更新內文組字區 (Update the composing buffer)」是指要求客體軟體將組字緩衝區的內容
     /// 換成由此處重新生成的組字字串（NSAttributeString，否則會不顯示）。
     var tooltipParameterRef: [String] = ["", ""]
-    let nodeValuesArray: [String] = walkedAnchors.map(\.node.currentPair.value)
+    let nodeValuesArray: [String] = walkedAnchors.values
     var composedStringCursorIndex = 0
     var readingCursorIndex = 0
     /// IMK 協定的內文組字區的游標長度與游標位置無法正確統計 UTF8 高萬字（比如 emoji）的長度，
@@ -140,7 +124,8 @@ extension KeyHandler {
       composingBuffer: currentState.composingBuffer,
       cursorIndex: currentState.cursorIndex,
       candidates: getCandidatesArray(fixOrder: mgrPrefs.useFixecCandidateOrderOnSelection),
-      isTypingVertical: isTypingVertical
+      isTypingVertical: isTypingVertical,
+      nodeValuesArray: walkedAnchors.values
     )
   }
 
@@ -211,7 +196,8 @@ extension KeyHandler {
           composingBuffer: state.composingBuffer,
           cursorIndex: state.cursorIndex,
           markerIndex: index,
-          readings: state.readings
+          readings: state.readings,
+          nodeValuesArray: walkedAnchors.values
         )
         marking.tooltipForInputting = state.tooltipForInputting
         stateCallback(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
@@ -232,7 +218,8 @@ extension KeyHandler {
           composingBuffer: state.composingBuffer,
           cursorIndex: state.cursorIndex,
           markerIndex: index,
-          readings: state.readings
+          readings: state.readings,
+          nodeValuesArray: walkedAnchors.values
         )
         marking.tooltipForInputting = state.tooltipForInputting
         stateCallback(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)

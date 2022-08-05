@@ -1,28 +1,12 @@
 // Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
 // All possible vChewing-specific modifications are of:
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
-/*
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-1. The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-2. No trademark license is granted to use the trade names, trademarks, service
-marks, or product names of Contributor, except as required to fulfill notice
-requirements above.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+// ====================
+// This code is released under the MIT license (SPDX-License-Identifier: MIT)
+// ... with NTL restriction stating that:
+// No trademark license is granted to use the trade names, trademarks, service
+// marks, or product names of Contributor, except as required to fulfill notice
+// requirements defined in MIT License.
 
 import Cocoa
 
@@ -190,24 +174,34 @@ public enum InputState {
     init(composingBuffer: String, cursorIndex: Int, reading: String = "", nodeValuesArray: [String] = []) {
       self.composingBuffer = composingBuffer
       self.reading = reading
-      self.nodeValuesArray = nodeValuesArray
+      // 為了簡化運算，將 reading 本身也變成一個字詞節點。
+      if !reading.isEmpty {
+        var newNodeValuesArray = [String]()
+        var temporaryNode = ""
+        var charCounter = 0
+        for node in nodeValuesArray {
+          for char in node {
+            if charCounter == cursorIndex - reading.utf16.count {
+              newNodeValuesArray.append(temporaryNode)
+              temporaryNode = ""
+              newNodeValuesArray.append(reading)
+            }
+            temporaryNode += String(char)
+            charCounter += 1
+          }
+          newNodeValuesArray.append(temporaryNode)
+          temporaryNode = ""
+        }
+        self.nodeValuesArray = newNodeValuesArray
+      } else {
+        self.nodeValuesArray = nodeValuesArray
+      }
       defer { self.cursorIndex = cursorIndex }
     }
 
     var attributedString: NSMutableAttributedString {
       /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
       /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
-      guard reading.isEmpty else {
-        let attributedString = NSMutableAttributedString(
-          string: composingBufferConverted,
-          attributes: [
-            /// 不能用 .thick，否則會看不到游標。
-            .underlineStyle: NSUnderlineStyle.single.rawValue,
-            .markedClauseSegment: 0,
-          ]
-        )
-        return attributedString
-      }
       let attributedString = NSMutableAttributedString(string: composingBufferConverted)
       var newBegin = 0
       for (i, neta) in nodeValuesArray.enumerated() {
@@ -238,7 +232,8 @@ public enum InputState {
 
     override init(composingBuffer: String, cursorIndex: Int, reading: String = "", nodeValuesArray: [String] = []) {
       super.init(
-        composingBuffer: composingBuffer, cursorIndex: cursorIndex, reading: reading, nodeValuesArray: nodeValuesArray)
+        composingBuffer: composingBuffer, cursorIndex: cursorIndex, reading: reading, nodeValuesArray: nodeValuesArray
+      )
     }
 
     override var description: String {
@@ -342,12 +337,16 @@ public enum InputState {
     var tooltipForInputting: String = ""
     private(set) var readings: [String]
 
-    init(composingBuffer: String, cursorIndex: Int, markerIndex: Int, readings: [String]) {
+    init(
+      composingBuffer: String, cursorIndex: Int, markerIndex: Int, readings: [String], nodeValuesArray: [String] = []
+    ) {
       let begin = min(cursorIndex, markerIndex)
       let end = max(cursorIndex, markerIndex)
       markedRange = begin..<end
       self.readings = readings
-      super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
+      super.init(
+        composingBuffer: composingBuffer, cursorIndex: cursorIndex, nodeValuesArray: nodeValuesArray
+      )
       defer { self.markerIndex = markerIndex }
     }
 
@@ -391,7 +390,9 @@ public enum InputState {
     }
 
     var convertedToInputting: Inputting {
-      let state = Inputting(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
+      let state = Inputting(
+        composingBuffer: composingBuffer, cursorIndex: cursorIndex, reading: reading, nodeValuesArray: nodeValuesArray
+      )
       state.tooltip = tooltipForInputting
       return state
     }
@@ -438,10 +439,13 @@ public enum InputState {
     private(set) var candidates: [(String, String)]
     private(set) var isTypingVertical: Bool
 
-    init(composingBuffer: String, cursorIndex: Int, candidates: [(String, String)], isTypingVertical: Bool) {
+    init(
+      composingBuffer: String, cursorIndex: Int, candidates: [(String, String)], isTypingVertical: Bool,
+      nodeValuesArray: [String] = []
+    ) {
       self.candidates = candidates
       self.isTypingVertical = isTypingVertical
-      super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
+      super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex, nodeValuesArray: nodeValuesArray)
     }
 
     override var description: String {
