@@ -205,6 +205,9 @@ extension vChewing {
         rawAllUnigrams += vChewing.LMInstantiator.lmSymbols.unigramsFor(key: key)
       }
 
+      // 新增與日期、時間、星期有關的單元圖資料
+      rawAllUnigrams.append(contentsOf: queryDateTimeUnigrams(with: key))
+
       // 準備過濾清單。因為我們在 Swift 使用 NSOrderedSet，所以就不需要統計清單了。
       var filteredPairs: Set<Megrez.KeyValuePaired> = []
 

@@ -28,6 +28,7 @@
 		5B40730C281672610023DFFF /* lmAssociates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B407309281672610023DFFF /* lmAssociates.swift */; };
 		5B40730D281672610023DFFF /* lmReplacements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B40730A281672610023DFFF /* lmReplacements.swift */; };
 		5B54E743283A7D89001ECBDC /* lmCoreNS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B54E742283A7D89001ECBDC /* lmCoreNS.swift */; };
+		5B5948CE289CC04500C85824 /* LMInstantiator_DateTimeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5948CD289CC04500C85824 /* LMInstantiator_DateTimeExtension.swift */; };
 		5B5E535227EF261400C6AA1E /* IME.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E535127EF261400C6AA1E /* IME.swift */; };
 		5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */; };
 		5B62A33227AE792F00A19448 /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33127AE792F00A19448 /* InputSourceHelper.swift */; };
@@ -222,6 +223,7 @@
 		5B407309281672610023DFFF /* lmAssociates.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = lmAssociates.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5B40730A281672610023DFFF /* lmReplacements.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = lmReplacements.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5B54E742283A7D89001ECBDC /* lmCoreNS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lmCoreNS.swift; sourceTree = "<group>"; };
+		5B5948CD289CC04500C85824 /* LMInstantiator_DateTimeExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMInstantiator_DateTimeExtension.swift; sourceTree = "<group>"; };
 		5B5E535127EF261400C6AA1E /* IME.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = IME.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = FSEventStreamHelper.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A33127AE792F00A19448 /* InputSourceHelper.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputSourceHelper.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -513,6 +515,7 @@
 				5B407308281672610023DFFF /* SubLMs */,
 				5B949BDA2816DDBC00D87B5D /* LMConsolidator.swift */,
 				5BD0113A28180D6100609769 /* LMInstantiator.swift */,
+				5B5948CD289CC04500C85824 /* LMInstantiator_DateTimeExtension.swift */,
 				5B3A87BB28597CDB0090E163 /* LMSymbolNode.swift */,
 				5BAEFACF28012565001F42C9 /* mgrLangModel.swift */,
 			);
@@ -1185,6 +1188,7 @@
 				5BA9FD4227FEF3C8002DE248 /* PreferencePane.swift in Sources */,
 				5BA0DF312817857D009E73BB /* lmUserOverride.swift in Sources */,
 				5BA9FD8B28006B41002DE248 /* VDKComboBox.swift in Sources */,
+				5B5948CE289CC04500C85824 /* LMInstantiator_DateTimeExtension.swift in Sources */,
 				5BA9FD4A27FEF3C9002DE248 /* PreferencesTabViewController.swift in Sources */,
 				5B62A34A27AE7CD900A19448 /* NotifierController.swift in Sources */,
 				5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */,
