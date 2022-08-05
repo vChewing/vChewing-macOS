@@ -195,7 +195,8 @@ extension KeyHandler {
           composingBuffer: state.composingBuffer,
           cursorIndex: state.cursorIndex,
           markerIndex: index,
-          readings: state.readings
+          readings: state.readings,
+          nodeValuesArray: walkedAnchors.map(\.node.currentPair.value)
         )
         marking.tooltipForInputting = state.tooltipForInputting
         stateCallback(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
@@ -216,7 +217,8 @@ extension KeyHandler {
           composingBuffer: state.composingBuffer,
           cursorIndex: state.cursorIndex,
           markerIndex: index,
-          readings: state.readings
+          readings: state.readings,
+          nodeValuesArray: walkedAnchors.map(\.node.currentPair.value)
         )
         marking.tooltipForInputting = state.tooltipForInputting
         stateCallback(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)

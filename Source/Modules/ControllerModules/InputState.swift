@@ -327,12 +327,16 @@ public enum InputState {
     var tooltipForInputting: String = ""
     private(set) var readings: [String]
 
-    init(composingBuffer: String, cursorIndex: Int, markerIndex: Int, readings: [String]) {
+    init(
+      composingBuffer: String, cursorIndex: Int, markerIndex: Int, readings: [String], nodeValuesArray: [String] = []
+    ) {
       let begin = min(cursorIndex, markerIndex)
       let end = max(cursorIndex, markerIndex)
       markedRange = begin..<end
       self.readings = readings
-      super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
+      super.init(
+        composingBuffer: composingBuffer, cursorIndex: cursorIndex, nodeValuesArray: nodeValuesArray
+      )
       defer { self.markerIndex = markerIndex }
     }
 
@@ -376,7 +380,9 @@ public enum InputState {
     }
 
     var convertedToInputting: Inputting {
-      let state = Inputting(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
+      let state = Inputting(
+        composingBuffer: composingBuffer, cursorIndex: cursorIndex, reading: reading, nodeValuesArray: nodeValuesArray
+      )
       state.tooltip = tooltipForInputting
       return state
     }
