@@ -13,6 +13,7 @@ import Cocoa
 public enum UserDef: String, CaseIterable {
   case kIsDebugModeEnabled = "_DebugMode"
   case kFailureFlagForUOMObservation = "_FailureFlag_UOMObservation"
+  case kDeltaOfCalendarYears = "DeltaOfCalendarYears"
   case kMostRecentInputMode = "MostRecentInputMode"
   case kUserDataFolderSpecified = "UserDataFolderSpecified"
   case kCheckUpdateAutomatically = "CheckUpdateAutomatically"
@@ -227,6 +228,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.failureFlagForUOMObservation, forKey: UserDef.kFailureFlagForUOMObservation.rawValue
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.deltaOfCalendarYears, forKey: UserDef.kDeltaOfCalendarYears.rawValue
+    )
     UserDefaults.standard.setDefault(mgrPrefs.mostRecentInputMode, forKey: UserDef.kMostRecentInputMode.rawValue)
     UserDefaults.standard.setDefault(
       mgrPrefs.checkUpdateAutomatically, forKey: UserDef.kCheckUpdateAutomatically.rawValue
@@ -327,6 +331,9 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kFailureFlagForUOMObservation.rawValue, defaultValue: false)
   static var failureFlagForUOMObservation: Bool
+
+  @UserDefault(key: UserDef.kDeltaOfCalendarYears.rawValue, defaultValue: -2000)
+  static var deltaOfCalendarYears: Int
 
   @UserDefault(key: UserDef.kMostRecentInputMode.rawValue, defaultValue: "")
   static var mostRecentInputMode: String
