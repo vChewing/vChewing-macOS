@@ -429,10 +429,13 @@ public enum InputState {
     private(set) var candidates: [(String, String)]
     private(set) var isTypingVertical: Bool
 
-    init(composingBuffer: String, cursorIndex: Int, candidates: [(String, String)], isTypingVertical: Bool) {
+    init(
+      composingBuffer: String, cursorIndex: Int, candidates: [(String, String)], isTypingVertical: Bool,
+      nodeValuesArray: [String] = []
+    ) {
       self.candidates = candidates
       self.isTypingVertical = isTypingVertical
-      super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
+      super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex, nodeValuesArray: nodeValuesArray)
     }
 
     override var description: String {
