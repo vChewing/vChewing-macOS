@@ -62,7 +62,6 @@ class ctlInputMethod: IMKInputController {
       /// 將傳回的新狀態交給調度函式。
       handle(state: InputState.Committing(textToCommit: state.composingBufferConverted))
     }
-    keyHandler.clear()
     handle(state: InputState.Empty())
   }
 
@@ -96,7 +95,7 @@ class ctlInputMethod: IMKInputController {
     // 所以這裡添加這句、來試圖應對這種情況。
     if keyHandler.delegate == nil { keyHandler.delegate = self }
     setValue(IME.currentInputMode.rawValue, forTag: 114_514, client: client())
-    keyHandler.clear()
+    keyHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
     keyHandler.ensureParser()
 
     if isASCIIMode {
@@ -123,7 +122,6 @@ class ctlInputMethod: IMKInputController {
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   override func deactivateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-    keyHandler.clear()
     handle(state: InputState.Empty())
     handle(state: InputState.Deactivated())
   }
@@ -149,7 +147,7 @@ class ctlInputMethod: IMKInputController {
 
     if keyHandler.inputMode != newInputMode {
       UserDefaults.standard.synchronize()
-      keyHandler.clear()
+      keyHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
       keyHandler.inputMode = newInputMode
       /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
       /// 這是很多 macOS 副廠輸入法的常見失誤之處。

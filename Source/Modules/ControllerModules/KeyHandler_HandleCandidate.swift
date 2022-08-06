@@ -51,7 +51,6 @@ extension KeyHandler {
         // 就將當前的組字緩衝區析構處理、強制重設輸入狀態。
         // 否則，一個本不該出現的真空組字緩衝區會使前後方向鍵與 BackSpace 鍵失靈。
         // 所以這裡需要對 compositor.isEmpty 做判定。
-        clear()
         stateCallback(InputState.EmptyIgnoringPreviousState())
         stateCallback(InputState.Empty())
       } else {
@@ -67,7 +66,6 @@ extension KeyHandler {
 
     if input.isEnter {
       if state is InputState.AssociatedPhrases, !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter {
-        clear()
         stateCallback(InputState.EmptyIgnoringPreviousState())
         stateCallback(InputState.Empty())
         return true
@@ -335,7 +333,6 @@ extension KeyHandler {
             didSelectCandidateAt: candidateIndex,
             ctlCandidate: ctlCandidateCurrent
           )
-          clear()
           stateCallback(InputState.EmptyIgnoringPreviousState())
           stateCallback(InputState.Empty())
           return handle(

@@ -107,7 +107,6 @@ extension KeyHandler {
           isTypingVertical: input.isTypingVertical
         )
         if choosingCandidates.candidates.count == 1 {
-          clear()
           let reading: String = choosingCandidates.candidates.first?.0 ?? ""
           let text: String = choosingCandidates.candidates.first?.1 ?? ""
           stateCallback(InputState.Committing(textToCommit: text))

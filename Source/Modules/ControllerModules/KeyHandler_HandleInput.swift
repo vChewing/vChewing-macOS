@@ -69,7 +69,6 @@ extension KeyHandler {
       // 略過對 BackSpace 的處理。
     } else if input.isCapsLockOn || input.isASCIIModeInput {
       // 但願能夠處理這種情況下所有可能的按鍵組合。
-      clear()
       stateCallback(InputState.Empty())
 
       // 摁 Shift 的話，無須額外處理，因為直接就會敲出大寫字母。
@@ -99,7 +98,6 @@ extension KeyHandler {
       if !(state is InputState.ChoosingCandidate || state is InputState.AssociatedPhrases
         || state is InputState.SymbolTable)
       {
-        clear()
         stateCallback(InputState.Empty())
         stateCallback(InputState.Committing(textToCommit: inputText.lowercased()))
         stateCallback(InputState.Empty())
@@ -162,7 +160,6 @@ extension KeyHandler {
             if !composingBuffer.isEmpty {
               stateCallback(InputState.Committing(textToCommit: composingBuffer))
             }
-            clear()
             stateCallback(InputState.Committing(textToCommit: " "))
             stateCallback(InputState.Empty())
           } else if currentLM.hasUnigramsFor(key: " ") {

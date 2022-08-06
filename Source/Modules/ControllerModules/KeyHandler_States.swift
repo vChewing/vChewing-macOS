@@ -276,7 +276,7 @@ extension KeyHandler {
       isTypingVertical: isTypingVertical
     )
     if candidateState.candidates.count == 1 {
-      clear()
+      clear()  // 這句不要砍，因為下文可能會回呼 candidateState。
       if let candidateToCommit: (String, String) = candidateState.candidates.first, !candidateToCommit.1.isEmpty {
         stateCallback(InputState.Committing(textToCommit: candidateToCommit.1))
         stateCallback(InputState.Empty())
@@ -302,7 +302,6 @@ extension KeyHandler {
   ) -> Bool {
     guard let currentState = state as? InputState.Inputting else { return false }
 
-    clear()
     stateCallback(InputState.Committing(textToCommit: currentState.composingBuffer))
     stateCallback(InputState.Empty())
     return true
@@ -330,8 +329,6 @@ extension KeyHandler {
     if !IME.areWeUsingOurOwnPhraseEditor {
       composingBuffer = composingBuffer.replacingOccurrences(of: "-", with: " ")
     }
-
-    clear()
 
     stateCallback(InputState.Committing(textToCommit: composingBuffer))
     stateCallback(InputState.Empty())
@@ -369,8 +366,6 @@ extension KeyHandler {
       composed += key.contains("_") ? value : "<ruby>\(value)<rp>(</rp><rt>\(key)</rt><rp>)</rp></ruby>"
     }
 
-    clear()
-
     stateCallback(InputState.Committing(textToCommit: composed))
     stateCallback(InputState.Empty())
     return true
@@ -394,7 +389,6 @@ extension KeyHandler {
     guard state is InputState.Inputting else { return false }
 
     if input.isShiftHold {
-      clear()
       stateCallback(InputState.EmptyIgnoringPreviousState())
       stateCallback(InputState.Empty())
       return true
@@ -443,7 +437,6 @@ extension KeyHandler {
     guard state is InputState.Inputting else { return false }
 
     if input.isShiftHold {
-      clear()
       stateCallback(InputState.EmptyIgnoringPreviousState())
       stateCallback(InputState.Empty())
       return true
@@ -580,7 +573,6 @@ extension KeyHandler {
     if mgrPrefs.escToCleanInputBuffer {
       /// 若啟用了該選項，則清空組字器的內容與注拼槽的內容。
       /// 此乃 macOS 內建注音輸入法預設之行為，但不太受 Windows 使用者群體之待見。
-      clear()
       stateCallback(InputState.EmptyIgnoringPreviousState())
       stateCallback(InputState.Empty())
     } else {
