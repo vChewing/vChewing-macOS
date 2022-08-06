@@ -23,7 +23,7 @@ protocol KeyHandlerDelegate {
     _: KeyHandler, didSelectCandidateAt index: Int,
     ctlCandidate controller: ctlCandidateProtocol
   )
-  func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputStateProtocol)
+  func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputStateProtocol, addToFilter: Bool)
     -> Bool
 }
 

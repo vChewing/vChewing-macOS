@@ -22,27 +22,22 @@ extension ctlInputMethod: KeyHandlerDelegate {
     ctlCandidate(controller, didSelectCandidateAtIndex: index)
   }
 
-  func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputStateProtocol)
+  func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputStateProtocol, addToFilter: Bool)
     -> Bool
   {
-    guard let state = state as? InputState.Marking else {
-      return false
-    }
-    if !state.validToWrite {
-      return false
-    }
+    guard let state = state as? InputState.Marking else { return false }
     let refInputModeReversed: InputMode =
       (keyHandler.inputMode == InputMode.imeModeCHT)
       ? InputMode.imeModeCHS : InputMode.imeModeCHT
     if !mgrLangModel.writeUserPhrase(
       state.userPhrase, inputMode: keyHandler.inputMode,
       areWeDuplicating: state.chkIfUserPhraseExists,
-      areWeDeleting: ctlInputMethod.areWeDeleting
+      areWeDeleting: addToFilter
     )
       || !mgrLangModel.writeUserPhrase(
         state.userPhraseConverted, inputMode: refInputModeReversed,
         areWeDuplicating: false,
-        areWeDeleting: ctlInputMethod.areWeDeleting
+        areWeDeleting: addToFilter
       )
     {
       return false

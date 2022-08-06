@@ -21,8 +21,8 @@ import InputMethodKit
 /// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
 @objc(ctlInputMethod)  // 必須加上 ObjC，因為 IMK 是用 ObjC 寫的。
 class ctlInputMethod: IMKInputController {
-  /// 標記狀態來聲明目前是在新增使用者語彙、還是準備要濾除使用者語彙。
-  static var areWeDeleting = false
+  /// 標記狀態來聲明目前新增的詞彙是否需要賦以非常低的權重。
+  static var areWeNerfing = false
 
   /// 目前在用的的選字窗副本。
   static var ctlCandidateCurrent: ctlCandidateProtocol = ctlCandidateUniversal.init(.horizontal)
@@ -209,8 +209,8 @@ class ctlInputMethod: IMKInputController {
     /// 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
     if event.type == .flagsChanged { return false }
 
-    // 準備修飾鍵，用來判定是否需要利用就地新增語彙時的 Enter 鍵來砍詞。
-    ctlInputMethod.areWeDeleting = event.modifierFlags.contains([.shift, .command])
+    // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
+    ctlInputMethod.areWeNerfing = event.modifierFlags.contains([.shift, .command])
 
     var textFrame = NSRect.zero
 

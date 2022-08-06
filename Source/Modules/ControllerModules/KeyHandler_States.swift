@@ -177,8 +177,26 @@ extension KeyHandler {
     // Enter
     if input.isEnter {
       if let keyHandlerDelegate = delegate {
-        if !keyHandlerDelegate.keyHandler(self, didRequestWriteUserPhraseWith: state) {
+        if !keyHandlerDelegate.keyHandler(self, didRequestWriteUserPhraseWith: state, addToFilter: false) {
           IME.prtDebugIntel("5B69CC8D")
+          errorCallback()
+          return true
+        }
+      }
+      stateCallback(buildInputtingState)
+      return true
+    }
+
+    // BackSpace & Delete
+    if input.isBackSpace || input.isDelete {
+      if let keyHandlerDelegate = delegate {
+        if !state.validToFilter {
+          IME.prtDebugIntel("1F88B191")
+          errorCallback()
+          return true
+        }
+        if !keyHandlerDelegate.keyHandler(self, didRequestWriteUserPhraseWith: state, addToFilter: true) {
+          IME.prtDebugIntel("68D3C6C8")
           errorCallback()
           return true
         }
