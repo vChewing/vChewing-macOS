@@ -381,15 +381,24 @@ extension KeyHandler {
   /// 處理 Backspace (macOS Delete) 按鍵行為。
   /// - Parameters:
   ///   - state: 當前狀態。
+  ///   - input: 輸入按鍵訊號。
   ///   - stateCallback: 狀態回呼。
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleBackSpace(
     state: InputStateProtocol,
+    input: InputSignal,
     stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
     guard state is InputState.Inputting else { return false }
+
+    if input.isShiftHold {
+      clear()
+      stateCallback(InputState.EmptyIgnoringPreviousState())
+      stateCallback(InputState.Empty())
+      return true
+    }
 
     if composer.hasToneMarker(withNothingElse: true) {
       composer.clear()
@@ -421,32 +430,39 @@ extension KeyHandler {
   /// 處理 PC Delete (macOS Fn+BackSpace) 按鍵行為。
   /// - Parameters:
   ///   - state: 當前狀態。
+  ///   - input: 輸入按鍵訊號。
   ///   - stateCallback: 狀態回呼。
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleDelete(
     state: InputStateProtocol,
+    input: InputSignal,
     stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
     guard state is InputState.Inputting else { return false }
 
-    guard composer.isEmpty else {
-      IME.prtDebugIntel("9C69908D")
-      errorCallback()
-      stateCallback(state)
+    if input.isShiftHold {
+      clear()
+      stateCallback(InputState.EmptyIgnoringPreviousState())
+      stateCallback(InputState.Empty())
       return true
     }
 
-    guard compositor.cursor != compositor.length else {
+    if compositor.cursor == compositor.length, composer.isEmpty {
       IME.prtDebugIntel("9B69938D")
       errorCallback()
       stateCallback(state)
       return true
     }
 
-    compositor.dropReading(direction: .front)
-    walk()
+    if composer.isEmpty {
+      compositor.dropReading(direction: .front)
+      walk()
+    } else {
+      composer.clear()
+    }
+
     let inputting = buildInputtingState
     // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
     switch inputting.composingBuffer.isEmpty {

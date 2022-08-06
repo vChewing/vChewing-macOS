@@ -259,13 +259,13 @@ extension KeyHandler {
     // MARK: Backspace
 
     if input.isBackSpace {
-      return handleBackSpace(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+      return handleBackSpace(state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 
     // MARK: Delete
 
     if input.isDelete || input.emacsKey == EmacsKey.delete {
-      return handleDelete(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+      return handleDelete(state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 
     // MARK: Enter
