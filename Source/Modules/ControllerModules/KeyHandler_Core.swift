@@ -38,13 +38,10 @@ public class KeyHandler {
   /// 檢測是否內容為空（注拼槽與組字器都是空的）
   var isTypingContentEmpty: Bool { composer.isEmpty && compositor.isEmpty }
 
-  /// 規定最大動態爬軌範圍。組字器內超出該範圍的節錨都會被自動標記為「已經手動選字過」，減少爬軌運算負擔。
-  let kMaxComposingBufferNeedsToWalkSize = Int(max(12, ceil(Double(mgrPrefs.composingBufferSize) / 2)))
   var composer: Tekkon.Composer = .init()  // 注拼槽
   var compositor: Megrez.Compositor  // 組字器
   var currentLM: vChewing.LMInstantiator = .init()  // 當前主語言模組
   var currentUOM: vChewing.LMUserOverride = .init()  // 當前半衰記憶模組
-  var walkedAnchors: [Megrez.NodeAnchor] { compositor.walkedAnchors }  // 用以記錄爬過的節錨的陣列
   /// 委任物件 (ctlInputMethod)，以便呼叫其中的函式。
   var delegate: KeyHandlerDelegate?
 
@@ -72,7 +69,7 @@ public class KeyHandler {
   /// 初期化。
   public init() {
     /// 組字器初期化。因為是首次初期化變數，所以這裡不能用 ensureCompositor() 代勞。
-    compositor = Megrez.Compositor(lm: currentLM, separator: "-")
+    compositor = Megrez.Compositor(with: currentLM, separator: "-")
     /// 注拼槽初期化。
     ensureParser()
     /// 讀取最近的簡繁體模式、且將該屬性內容塞到 inputMode 當中。
@@ -91,7 +88,8 @@ public class KeyHandler {
   ///
   /// 威注音對游標前置與游標後置模式採取的候選字節點陣列抓取方法是分離的，且不使用 Node Crossing。
   var actualCandidateCursor: Int {
-    mgrPrefs.useRearCursorMode ? min(compositor.cursor, compositor.length - 1) : max(compositor.cursor, 1)
+    compositor.cursor
+      - ((compositor.cursor == compositor.width || !mgrPrefs.useRearCursorMode) && compositor.cursor > 0 ? 1 : 0)
   }
 
   /// 利用給定的讀音鏈來試圖爬取最接近的組字結果（最大相似度估算）。
@@ -116,23 +114,6 @@ public class KeyHandler {
     }
   }
 
-  /// 在爬取組字結果之前，先將即將從組字區溢出的內容遞交出去。
-  ///
-  /// 在理想狀況之下，組字區多長都無所謂。但是，Viterbi 演算法使用 O(N^2)，
-  /// 會使得運算壓力隨著節錨數量的增加而增大。於是，有必要限定組字區的長度。
-  /// 超過該長度的內容會在爬軌之前先遞交出去，使其不再記入最大相似度估算的
-  /// 估算對象範圍。用比較形象且生動卻有點噁心的解釋的話，蒼蠅一邊吃一邊屙。
-  var commitOverflownCompositionAndWalk: String {
-    var textToCommit = ""
-    if compositor.width > mgrPrefs.composingBufferSize, !walkedAnchors.isEmpty {
-      let anchor: Megrez.NodeAnchor = walkedAnchors[0]
-      textToCommit = anchor.node.currentPair.value
-      compositor.removeHeadReadings(count: anchor.spanLength)
-    }
-    walk()
-    return textToCommit
-  }
-
   /// 用以組建聯想詞陣列的函式。
   /// - Parameter key: 給定的聯想詞的開頭字。
   /// - Returns: 抓取到的聯想詞陣列。
@@ -151,106 +132,86 @@ public class KeyHandler {
   ///   - value: 給定之候選字字串。
   ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字後的節錨的前方。
   func fixNode(candidate: (String, String), respectCursorPushing: Bool = true) {
-    let theCandidate: Megrez.KeyValuePaired = .init(key: candidate.0, value: candidate.1)
-    let adjustedCursor = max(0, min(actualCandidateCursor + (mgrPrefs.useRearCursorMode ? 1 : 0), compositor.length))
-    // 開始讓半衰模組觀察目前的狀況。
-    let selectedNode: Megrez.NodeAnchor = compositor.fixNodeWithCandidate(theCandidate, at: adjustedCursor)
-    // 不要針對逐字選字模式啟用臨時半衰記憶模型。
-    if !mgrPrefs.useSCPCTypingMode {
-      var addToUserOverrideModel = true
-      // 所有讀音數與字符數不匹配的情況均不得塞入半衰記憶模組。
-      if selectedNode.spanLength != theCandidate.value.count {
-        IME.prtDebugIntel("UOM: SpanningLength != value.count, dismissing.")
-        addToUserOverrideModel = false
-      }
-      if addToUserOverrideModel {
-        // 威注音的 SymbolLM 的 Score 是 -12，符合該條件的內容不得塞入半衰記憶模組。
-        if selectedNode.node.scoreForPaired(candidate: theCandidate) <= -12 {
-          IME.prtDebugIntel("UOM: Score <= -12, dismissing.")
-          addToUserOverrideModel = false
-        }
-      }
-      if addToUserOverrideModel, mgrPrefs.fetchSuggestionsFromUserOverrideModel {
-        IME.prtDebugIntel("UOM: Start Observation.")
-        // 這個過程可能會因為使用者半衰記憶模組內部資料錯亂、而導致輸入法在選字時崩潰。
-        // 於是在這裡引入災後狀況察覺專用變數，且先開啟該開關。順利執行完觀察後會關閉。
-        // 一旦輸入法崩潰，會在重啟時發現這個開關是開著的，屆時 AppDelegate 會做出應對。
-        mgrPrefs.failureFlagForUOMObservation = true
-        // 令半衰記憶模組觀測給定的三元圖。
-        // 這個過程會讓半衰引擎根據當前上下文生成三元圖索引鍵。
-        currentUOM.observe(
-          walkedAnchors: walkedAnchors, cursorIndex: adjustedCursor, candidate: theCandidate.value,
-          timestamp: NSDate().timeIntervalSince1970, saveCallback: { mgrLangModel.saveUserOverrideModelData() }
-        )
-        // 如果沒有出現崩框的話，那就將這個開關復位。
-        mgrPrefs.failureFlagForUOMObservation = false
-      }
-    }
-
+    let actualCursor = actualCandidateCursor
+    let theCandidate: Megrez.Compositor.Candidate = .init(key: candidate.0, value: candidate.1)
+    if !compositor.overrideCandidate(theCandidate, at: actualCursor) { return }
     // 開始爬軌。
     walk()
 
+    // 在可行的情況下更新使用者半衰記憶模組。
+    var accumulatedCursor = 0
+    var currentNode: Megrez.Compositor.Node?
+    for node in compositor.walkedNodes {
+      accumulatedCursor += node.spanLength
+      if accumulatedCursor > actualCursor {
+        currentNode = node
+        break
+      }
+    }
+    guard let currentNode = currentNode else { return }
+
+    if currentNode.currentUnigram.score > -12 {
+      IME.prtDebugIntel("UOM: Start Observation.")
+      // 這個過程可能會因為使用者半衰記憶模組內部資料錯亂、而導致輸入法在選字時崩潰。
+      // 於是在這裡引入災後狀況察覺專用變數，且先開啟該開關。順利執行完觀察後會關閉。
+      // 一旦輸入法崩潰，會在重啟時發現這個開關是開著的，屆時 AppDelegate 會做出應對。
+      mgrPrefs.failureFlagForUOMObservation = true
+      // 令半衰記憶模組觀測給定的三元圖。
+      // 這個過程會讓半衰引擎根據當前上下文生成三元圖索引鍵。
+      currentUOM.observe(
+        walkedNodes: compositor.walkedNodes, cursorIndex: actualCursor, candidate: theCandidate.value,
+        timestamp: NSDate().timeIntervalSince1970, saveCallback: { mgrLangModel.saveUserOverrideModelData() }
+      )
+      // 如果沒有出現崩框的話，那就將這個開關復位。
+      mgrPrefs.failureFlagForUOMObservation = false
+    }
+
     /// 若偏好設定內啟用了相關選項，則會在選字之後始終將游標推送至選字後的節錨的前方。
     if mgrPrefs.moveCursorAfterSelectingCandidate, respectCursorPushing {
+      // compositor.cursor = accumulatedCursor
       compositor.jumpCursorBySpan(to: .front)
-    }
-  }
-
-  /// 組字器內超出最大動態爬軌範圍的節錨都會被自動標記為「已經手動選字過」，減少爬軌運算負擔。
-  func markNodesFixedIfNecessary() {
-    let width = compositor.width
-    if width <= kMaxComposingBufferNeedsToWalkSize {
-      return
-    }
-    var index = 0
-    for anchor in walkedAnchors {
-      if index >= width - kMaxComposingBufferNeedsToWalkSize { break }
-      if anchor.node.score < Megrez.Node.kSelectedCandidateScore {
-        compositor.fixNodeWithCandidate(anchor.node.currentPair, at: index + anchor.spanLength)
-      }
-      index += anchor.spanLength
     }
   }
 
   /// 獲取候選字詞（包含讀音）陣列資料內容。
   func getCandidatesArray(fixOrder: Bool = true) -> [(String, String)] {
-    var arrAnchors: [Megrez.NodeAnchor] = rawAnchorsOfNodes
-    var arrCandidates: [Megrez.KeyValuePaired] = .init()
+    /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
+    /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
+    var arrCandidates: [Megrez.Compositor.Candidate] = {
+      switch mgrPrefs.useRearCursorMode {
+        case false:
+          return compositor.fetchCandidates(at: actualCandidateCursor, filter: .endAt)
+        case true:
+          return compositor.fetchCandidates(at: actualCandidateCursor, filter: .beginAt)
+      }
+    }()
 
     /// 原理：nodes 這個回饋結果包含一堆子陣列，分別對應不同詞長的候選字。
     /// 這裡先對陣列排序、讓最長候選字的子陣列的優先權最高。
     /// 這個過程不會傷到子陣列內部的排序。
-    if arrAnchors.isEmpty { return .init() }
+    if arrCandidates.isEmpty { return .init() }
 
-    // 讓更長的節錨排序靠前。
-    arrAnchors = arrAnchors.stableSort { $0.spanLength > $1.spanLength }
-
-    // 將節錨內的候選字詞資料拓印到輸出陣列內。
-    for currentCandidate in arrAnchors.map(\.node.candidates).joined() {
-      // 選字窗的內容的康熙轉換 / JIS 轉換不能放在這裡處理，會影響選字有效性。
-      // 選字的原理是拿著具體的候選字詞的字串去當前的節錨下找出對應的候選字詞（Ｘ元圖）。
-      // 一旦在這裡轉換了，節錨內的某些元圖就無法被選中。
-      arrCandidates.append(currentCandidate)
-    }
     // 決定是否根據半衰記憶模組的建議來調整候選字詞的順序。
     if !mgrPrefs.fetchSuggestionsFromUserOverrideModel || mgrPrefs.useSCPCTypingMode || fixOrder {
       return arrCandidates.map { ($0.key, $0.value) }
     }
 
-    let arrSuggestedUnigrams: [Megrez.Unigram] = fetchSuggestedCandidates().stableSort { $0.score > $1.score }
-    let arrSuggestedCandidates: [Megrez.KeyValuePaired] = arrSuggestedUnigrams.map(\.keyValue)
+    let arrSuggestedUnigrams: [(String, Megrez.Unigram)] = fetchSuggestedCandidates()
+    let arrSuggestedCandidates: [Megrez.Compositor.Candidate] = arrSuggestedUnigrams.map {
+      Megrez.Compositor.Candidate(key: $0.0, value: $0.1.value)
+    }
     arrCandidates = arrSuggestedCandidates.filter { arrCandidates.contains($0) } + arrCandidates
     arrCandidates = arrCandidates.deduplicate
     arrCandidates = arrCandidates.stableSort { $0.key.split(separator: "-").count > $1.key.split(separator: "-").count }
     return arrCandidates.map { ($0.key, $0.value) }
   }
 
-  /// 向半衰引擎詢問可能的選字建議。拿到的結果會是一個單元圖陣列。
-  func fetchSuggestedCandidates() -> [Megrez.Unigram] {
+  /// 向半衰引擎詢問可能的選字建議。拿到的結果會是一個單元圖陣列，會自動按權重排序。
+  func fetchSuggestedCandidates() -> [(String, Megrez.Unigram)] {
     currentUOM.suggest(
-      walkedAnchors: walkedAnchors, cursorIndex: compositor.cursor,
+      walkedNodes: compositor.walkedNodes, cursorIndex: compositor.cursor,
       timestamp: NSDate().timeIntervalSince1970
-    )
+    ).stableSort { $0.1.score > $1.1.score }
   }
 
   /// 向半衰引擎詢問可能的選字建議、且套用給組字器內的當前游標位置。
@@ -260,29 +221,17 @@ public class KeyHandler {
     /// 如果這個開關沒打開的話，直接放棄執行這個函式。
     if !mgrPrefs.fetchSuggestionsFromUserOverrideModel { return }
     /// 先就當前上下文讓半衰引擎重新生成三元圖索引鍵。
-    let overrideValue = fetchSuggestedCandidates().first?.keyValue.value ?? ""
+    let overrideValue = fetchSuggestedCandidates().first?.1.value ?? ""
 
     /// 再拿著索引鍵去問半衰模組有沒有選字建議。有的話就遵循之、讓天權星引擎對指定節錨下的節點複寫權重。
     if !overrideValue.isEmpty {
       IME.prtDebugIntel(
         "UOM: Suggestion retrieved, overriding the node score of the selected candidate.")
-      compositor.overrideNodeScoreForSelectedCandidate(
-        location: min(actualCandidateCursor + (mgrPrefs.useRearCursorMode ? 1 : 0), compositor.length),
-        value: overrideValue,
-        overridingScore: findHighestScore(nodeAnchors: rawAnchorsOfNodes, epsilon: kEpsilon)
-      )
+      // TODO: 這裡回頭改成用詞音配對來覆寫的形式。
+      compositor.overrideCandidateLiteral(overrideValue, at: actualCandidateCursor, overrideType: .withTopUnigramScore)
     } else {
       IME.prtDebugIntel("UOM: Blank suggestion retrieved, dismissing.")
     }
-  }
-
-  /// 就給定的節錨陣列，根據半衰模組的衰減指數，來找出最高權重數值。
-  /// - Parameters:
-  ///   - nodes: 給定的節錨陣列。
-  ///   - epsilon: 半衰模組的衰減指數。
-  /// - Returns: 尋獲的最高權重數值。
-  func findHighestScore(nodeAnchors: [Megrez.NodeAnchor], epsilon: Double) -> Double {
-    nodeAnchors.map(\.node.highestUnigramScore).max() ?? 0 + epsilon
   }
 
   // MARK: - Extracted methods and functions (Tekkon).
@@ -335,15 +284,6 @@ public class KeyHandler {
 
   // MARK: - Extracted methods and functions (Megrez).
 
-  /// 獲取原始節錨資料陣列。
-  var rawAnchorsOfNodes: [Megrez.NodeAnchor] {
-    /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
-    /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
-    mgrPrefs.useRearCursorMode
-      ? compositor.nodesBeginningAt(location: actualCandidateCursor)
-      : compositor.nodesEndingAt(location: actualCandidateCursor)
-  }
-
   /// 將輸入法偏好設定同步至語言模組內。
   func syncBaseLMPrefs() {
     currentLM.isPhraseReplacementEnabled = mgrPrefs.phraseReplacementEnabled
@@ -354,7 +294,7 @@ public class KeyHandler {
   /// 令組字器重新初期化，使其與被重新指派過的主語言模組對接。
   func ensureCompositor() {
     // 每個漢字讀音都由一個西文半形減號分隔開。
-    compositor = Megrez.Compositor(lm: currentLM, separator: "-")
+    compositor = Megrez.Compositor(with: currentLM, separator: "-")
   }
 
   /// 生成標點符號索引鍵。

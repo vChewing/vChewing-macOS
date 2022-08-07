@@ -163,10 +163,9 @@ extension KeyHandler {
             stateCallback(InputState.Committing(textToCommit: " "))
             stateCallback(InputState.Empty())
           } else if currentLM.hasUnigramsFor(key: " ") {
-            compositor.insertReading(" ")
-            let textToCommit = commitOverflownCompositionAndWalk
+            compositor.insertKey(" ")
+            walk()
             let inputting = buildInputtingState
-            inputting.textToCommit = textToCommit
             stateCallback(inputting)
           }
           return true
@@ -283,10 +282,9 @@ extension KeyHandler {
       if input.isOptionHold {
         if currentLM.hasUnigramsFor(key: "_punctuation_list") {
           if composer.isEmpty {
-            compositor.insertReading("_punctuation_list")
-            let textToCommit: String! = commitOverflownCompositionAndWalk
+            compositor.insertKey("_punctuation_list")
+            walk()
             let inputting = buildInputtingState
-            inputting.textToCommit = textToCommit
             stateCallback(inputting)
             stateCallback(buildCandidate(state: inputting, isTypingVertical: input.isTypingVertical))
           } else {  // 不要在注音沒敲完整的情況下叫出統合符號選單。

@@ -81,23 +81,19 @@ extension KeyHandler {
       }
 
       // 將該讀音插入至組字器內的軌格當中。
-      compositor.insertReading(readingKey)
+      compositor.insertKey(readingKey)
 
       // 讓組字器反爬軌格。
-      let textToCommit = commitOverflownCompositionAndWalk
+      walk()
 
       // 看看半衰記憶模組是否會對目前的狀態給出自動選字建議。
       fetchAndApplySuggestionsFromUserOverrideModel()
-
-      // 將組字器內超出最大動態爬軌範圍的節錨都標記為「已經手動選字過」，減少之後的爬軌運算負擔。
-      markNodesFixedIfNecessary()
 
       // 之後就是更新組字區了。先清空注拼槽的內容。
       composer.clear()
 
       // 再以回呼組字狀態的方式來執行 updateClientComposingBuffer()。
       let inputting = buildInputtingState
-      inputting.textToCommit = textToCommit
       stateCallback(inputting)
 
       /// 逐字選字模式的處理。
@@ -106,9 +102,9 @@ extension KeyHandler {
           state: inputting,
           isTypingVertical: input.isTypingVertical
         )
-        if choosingCandidates.candidates.count == 1 {
-          let reading: String = choosingCandidates.candidates.first?.0 ?? ""
-          let text: String = choosingCandidates.candidates.first?.1 ?? ""
+        if choosingCandidates.candidates.count == 1, let firstCandidate = choosingCandidates.candidates.first {
+          let reading: String = firstCandidate.0
+          let text: String = firstCandidate.1
           stateCallback(InputState.Committing(textToCommit: text))
 
           if !mgrPrefs.associatedPhrasesEnabled {

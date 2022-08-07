@@ -27,13 +27,13 @@ extension vChewing {
     }
 
     public func observe(
-      walkedAnchors: [Megrez.NodeAnchor],
+      walkedNodes: [Megrez.Compositor.Node],
       cursorIndex: Int,
       candidate: String,
       timestamp: Double,
       saveCallback: @escaping () -> Void
     ) {
-      let key = convertKeyFrom(walkedAnchors: walkedAnchors, cursorIndex: cursorIndex)
+      let key = convertKeyFrom(walkedNodes: walkedNodes, cursorIndex: cursorIndex)
       guard !key.isEmpty else { return }
 
       guard mutLRUMap[key] != nil else {
@@ -57,7 +57,7 @@ extension vChewing {
       // 降低磁碟寫入次數。唯有失憶的情況下才會更新觀察且記憶。
       if var theNeta = mutLRUMap[key] {
         _ = suggest(
-          walkedAnchors: walkedAnchors, cursorIndex: cursorIndex, timestamp: timestamp,
+          walkedNodes: walkedNodes, cursorIndex: cursorIndex, timestamp: timestamp,
           decayCallback: {
             theNeta.observation.update(candidate: candidate, timestamp: timestamp)
             self.mutLRUList.insert(theNeta, at: 0)
@@ -70,17 +70,17 @@ extension vChewing {
     }
 
     public func suggest(
-      walkedAnchors: [Megrez.NodeAnchor],
+      walkedNodes: [Megrez.Compositor.Node],
       cursorIndex: Int,
       timestamp: Double,
       decayCallback: @escaping () -> Void = {}
-    ) -> [Megrez.Unigram] {
-      let key = convertKeyFrom(walkedAnchors: walkedAnchors, cursorIndex: cursorIndex)
+    ) -> [(String, Megrez.Unigram)] {
+      let key = convertKeyFrom(walkedNodes: walkedNodes, cursorIndex: cursorIndex)
       guard !key.isEmpty else {
         IME.prtDebugIntel("UOM: Blank key generated on suggestion, aborting suggestion.")
         return .init()
       }
-      let currentReadingKey = convertKeyFrom(walkedAnchors: walkedAnchors, cursorIndex: cursorIndex, readingOnly: true)
+      let currentReadingKey = convertKeyFrom(walkedNodes: walkedNodes, cursorIndex: cursorIndex, readingOnly: true)
       guard let koPair = mutLRUMap[key] else {
         IME.prtDebugIntel("UOM: mutLRUMap[key] is nil, throwing blank suggestion for key: \(key).")
         return .init()
@@ -88,7 +88,7 @@ extension vChewing {
 
       let observation = koPair.observation
 
-      var arrResults = [Megrez.Unigram]()
+      var arrResults = [(String, Megrez.Unigram)]()
       var currentHighScore = 0.0
       for overrideNeta in Array(observation.overrides) {
         let override: Override = overrideNeta.value
@@ -111,10 +111,8 @@ extension vChewing {
         )
         if (0...currentHighScore).contains(overrideDetectionScore) { decayCallback() }
 
-        let newUnigram = Megrez.Unigram(
-          keyValue: .init(key: currentReadingKey, value: overrideNeta.key), score: overrideScore
-        )
-        arrResults.insert(newUnigram, at: 0)
+        let newUnigram = Megrez.Unigram(value: overrideNeta.key, score: overrideScore)
+        arrResults.insert((currentReadingKey, newUnigram), at: 0)
         currentHighScore = overrideScore
       }
       if arrResults.isEmpty {
@@ -137,12 +135,12 @@ extension vChewing {
     }
 
     func convertKeyFrom(
-      walkedAnchors: [Megrez.NodeAnchor], cursorIndex: Int, readingOnly: Bool = false
+      walkedNodes: [Megrez.Compositor.Node], cursorIndex: Int, readingOnly: Bool = false
     ) -> String {
       let whiteList = "你他妳她祢衪它牠再在"
-      var arrNodes: [Megrez.NodeAnchor] = []
+      var arrNodes: [Megrez.Compositor.Node] = []
       var intLength = 0
-      for theNodeAnchor in walkedAnchors {
+      for theNodeAnchor in walkedNodes {
         arrNodes.append(theNodeAnchor)
         intLength += theNodeAnchor.spanLength
         if intLength >= cursorIndex {
@@ -154,7 +152,7 @@ extension vChewing {
 
       arrNodes = Array(arrNodes.reversed())
 
-      let kvCurrent = arrNodes[0].node.currentPair
+      let kvCurrent = arrNodes[0].currentPair
       guard !kvCurrent.key.contains("_") else {
         return ""
       }
@@ -183,7 +181,7 @@ extension vChewing {
         !kvPrevious.key.contains("_"),
         kvPrevious.key.split(separator: "-").count == kvPrevious.value.count
       {
-        kvPrevious = arrNodes[1].node.currentPair
+        kvPrevious = arrNodes[1].currentPair
         readingStack = kvPrevious.key + readingStack
       }
 
@@ -191,7 +189,7 @@ extension vChewing {
         !kvAnterior.key.contains("_"),
         kvAnterior.key.split(separator: "-").count == kvAnterior.value.count
       {
-        kvAnterior = arrNodes[2].node.currentPair
+        kvAnterior = arrNodes[2].currentPair
         readingStack = kvAnterior.key + readingStack
       }
 

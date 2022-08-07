@@ -22,21 +22,20 @@ extension KeyHandler {
     /// 「更新內文組字區 (Update the composing buffer)」是指要求客體軟體將組字緩衝區的內容
     /// 換成由此處重新生成的組字字串（NSAttributeString，否則會不顯示）。
     var tooltipParameterRef: [String] = ["", ""]
-    let nodeValuesArray: [String] = walkedAnchors.values
+    let nodeValuesArray: [String] = compositor.walkedNodes.values
     var composedStringCursorIndex = 0
     var readingCursorIndex = 0
     /// IMK 協定的內文組字區的游標長度與游標位置無法正確統計 UTF8 高萬字（比如 emoji）的長度，
     /// 所以在這裡必須做糾偏處理。因為在用 Swift，所以可以用「.utf16」取代「NSString.length()」。
     /// 這樣就可以免除不必要的類型轉換。
-    for theAnchor in walkedAnchors {
-      let theNode = theAnchor.node
-      let strNodeValue = theNode.currentPair.value
+    for theNode in compositor.walkedNodes {
+      let strNodeValue = theNode.value
       let arrSplit: [String] = Array(strNodeValue).map { String($0) }
       let codepointCount = arrSplit.count
       /// 藉下述步驟重新將「可見游標位置」對齊至「組字器內的游標所在的讀音位置」。
       /// 每個節錨（NodeAnchor）都有自身的幅位長度（spanningLength），可以用來
       /// 累加、以此為依據，來校正「可見游標位置」。
-      let spanningLength: Int = theAnchor.spanLength
+      let spanningLength: Int = theNode.spanLength
       if readingCursorIndex + spanningLength <= compositor.cursor {
         composedStringCursorIndex += strNodeValue.utf16.count
         readingCursorIndex += spanningLength
@@ -60,14 +59,14 @@ extension KeyHandler {
       /// 所以需要上下文工具提示來顯示游標的相對位置。
       /// 這裡先計算一下要用在工具提示當中的顯示參數的內容。
       switch compositor.cursor {
-        case compositor.readings.count...:
+        case compositor.keys.count...:
           // 這裡的 compositor.cursor 數值不可能大於 readings.count，因為會被 Megrez 自動糾正。
-          tooltipParameterRef[0] = compositor.readings[compositor.cursor - 1]
+          tooltipParameterRef[0] = compositor.keys[compositor.cursor - 1]
         case 0:
-          tooltipParameterRef[1] = compositor.readings[compositor.cursor]
+          tooltipParameterRef[1] = compositor.keys[compositor.cursor]
         default:
-          tooltipParameterRef[0] = compositor.readings[compositor.cursor - 1]
-          tooltipParameterRef[1] = compositor.readings[compositor.cursor]
+          tooltipParameterRef[0] = compositor.keys[compositor.cursor - 1]
+          tooltipParameterRef[1] = compositor.keys[compositor.cursor]
       }
     }
 
@@ -125,7 +124,7 @@ extension KeyHandler {
       cursorIndex: currentState.cursorIndex,
       candidates: getCandidatesArray(fixOrder: mgrPrefs.useFixecCandidateOrderOnSelection),
       isTypingVertical: isTypingVertical,
-      nodeValuesArray: walkedAnchors.values
+      nodeValuesArray: compositor.walkedNodes.values
     )
   }
 
@@ -215,7 +214,7 @@ extension KeyHandler {
           cursorIndex: state.cursorIndex,
           markerIndex: index,
           readings: state.readings,
-          nodeValuesArray: walkedAnchors.values
+          nodeValuesArray: compositor.walkedNodes.values
         )
         marking.tooltipForInputting = state.tooltipForInputting
         stateCallback(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
@@ -237,7 +236,7 @@ extension KeyHandler {
           cursorIndex: state.cursorIndex,
           markerIndex: index,
           readings: state.readings,
-          nodeValuesArray: walkedAnchors.values
+          nodeValuesArray: compositor.walkedNodes.values
         )
         marking.tooltipForInputting = state.tooltipForInputting
         stateCallback(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
@@ -280,10 +279,9 @@ extension KeyHandler {
       return true
     }
 
-    compositor.insertReading(customPunctuation)
-    let textToCommit = commitOverflownCompositionAndWalk
+    compositor.insertKey(customPunctuation)
+    walk()
     let inputting = buildInputtingState
-    inputting.textToCommit = textToCommit
     stateCallback(inputting)
 
     // 從這一行之後開始，就是針對逐字選字模式的單獨處理。
@@ -338,7 +336,7 @@ extension KeyHandler {
   ) -> Bool {
     guard state is InputState.Inputting else { return false }
 
-    var composingBuffer = compositor.readings.joined(separator: "-")
+    var composingBuffer = compositor.keys.joined(separator: "-")
     if mgrPrefs.inlineDumpPinyinInLieuOfZhuyin {
       composingBuffer = Tekkon.restoreToneOneInZhuyinKey(target: composingBuffer)  // 恢復陰平標記
       composingBuffer = Tekkon.cnvPhonaToHanyuPinyin(target: composingBuffer)  // 注音轉拼音
@@ -368,7 +366,7 @@ extension KeyHandler {
 
     var composed = ""
 
-    for node in walkedAnchors.map(\.node) {
+    for node in compositor.walkedNodes {
       var key = node.key
       if mgrPrefs.inlineDumpPinyinInLieuOfZhuyin {
         key = Tekkon.restoreToneOneInZhuyinKey(target: key)  // 恢復陰平標記
@@ -379,7 +377,7 @@ extension KeyHandler {
         key = Tekkon.cnvZhuyinChainToTextbookReading(target: key, newSeparator: " ")
       }
 
-      let value = node.currentPair.value
+      let value = node.value
       // 不要給標點符號等特殊元素加注音
       composed += key.contains("_") ? value : "<ruby>\(value)<rp>(</rp><rt>\(key)</rt><rp>)</rp></ruby>"
     }
@@ -416,7 +414,7 @@ extension KeyHandler {
       composer.clear()
     } else if composer.isEmpty {
       if compositor.cursor > 0 {
-        compositor.dropReading(direction: .rear)
+        compositor.dropKey(direction: .rear)
         walk()
       } else {
         IME.prtDebugIntel("9D69908D")
@@ -468,7 +466,7 @@ extension KeyHandler {
     }
 
     if composer.isEmpty {
-      compositor.dropReading(direction: .front)
+      compositor.dropKey(direction: .front)
       walk()
     } else {
       composer.clear()
@@ -640,7 +638,7 @@ extension KeyHandler {
           composingBuffer: currentState.composingBuffer,
           cursorIndex: currentState.cursorIndex,
           markerIndex: nextPosition,
-          readings: compositor.readings
+          readings: compositor.keys
         )
         marking.tooltipForInputting = currentState.tooltip
         stateCallback(marking)
@@ -714,7 +712,7 @@ extension KeyHandler {
           composingBuffer: currentState.composingBuffer,
           cursorIndex: currentState.cursorIndex,
           markerIndex: previousPosition,
-          readings: compositor.readings
+          readings: compositor.keys
         )
         marking.tooltipForInputting = currentState.tooltip
         stateCallback(marking)
@@ -770,7 +768,7 @@ extension KeyHandler {
     stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    if composer.isEmpty, compositor.isEmpty || walkedAnchors.isEmpty { return false }
+    if composer.isEmpty, compositor.isEmpty || compositor.walkedNodes.isEmpty { return false }
     guard state is InputState.Inputting else {
       guard state is InputState.Empty else {
         IME.prtDebugIntel("6044F081")
@@ -795,24 +793,27 @@ extension KeyHandler {
     }
 
     var length = 0
-    var currentAnchor = Megrez.NodeAnchor()
-    let cursorIndex = min(
-      actualCandidateCursor + (mgrPrefs.useRearCursorMode ? 1 : 0), compositor.length
-    )
-    for anchor in walkedAnchors {
-      length += anchor.spanLength
-      if length >= cursorIndex {
-        currentAnchor = anchor
+    var currentNode: Megrez.Compositor.Node?
+    let cursorIndex = actualCandidateCursor
+    for node in compositor.walkedNodes {
+      length += node.spanLength
+      if length > cursorIndex {
+        currentNode = node
         break
       }
     }
 
-    let currentNode = currentAnchor.node
-    let currentPaired: Megrez.KeyValuePaired = currentNode.currentPair
+    guard let currentNode = currentNode else {
+      IME.prtDebugIntel("F58DEA95")
+      errorCallback()
+      return true
+    }
+
+    let currentPaired = (currentNode.key, currentNode.value)
 
     var currentIndex = 0
-    if currentNode.score < Megrez.Node.kSelectedCandidateScore {
-      /// 只要是沒有被使用者手動選字過的（節錨下的）節點，
+    if !currentNode.isOverriden {
+      /// 如果是沒有被使用者手動選字過的（節錨下的）節點，
       /// 就從第一個候選字詞開始，這樣使用者在敲字時就會優先匹配
       /// 那些字詞長度不小於 2 的單元圖。換言之，如果使用者敲了兩個
       /// 注音讀音、卻發現這兩個注音讀音各自的單字權重遠高於由這兩個
@@ -821,14 +822,14 @@ extension KeyHandler {
       /// （預設情況下是 (Shift+)Tab 來做正 (反) 向切換，但也可以用
       /// Shift(+CMD)+Space 或 Alt+↑/↓ 來切換（縱排輸入時則是 Alt+←/→）、
       /// 以應對臉書綁架 Tab 鍵的情況。
-      if candidates[0].0 == currentPaired.key, candidates[0].1 == currentPaired.value {
+      if candidates[0] == currentPaired {
         /// 如果第一個候選字詞是當前節點的候選字詞的值的話，
         /// 那就切到下一個（或上一個，也就是最後一個）候選字詞。
         currentIndex = reverseModifier ? candidates.count - 1 : 1
       }
     } else {
       for candidate in candidates {
-        if candidate.0 == currentPaired.key, candidate.1 == currentPaired.value {
+        if candidate == currentPaired {
           if reverseModifier {
             if currentIndex == 0 {
               currentIndex = candidates.count - 1
