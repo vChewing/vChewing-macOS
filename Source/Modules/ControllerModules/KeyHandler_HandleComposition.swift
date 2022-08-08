@@ -87,7 +87,7 @@ extension KeyHandler {
       walk()
 
       // 看看半衰記憶模組是否會對目前的狀態給出自動選字建議。
-      fetchAndApplySuggestionsFromUserOverrideModel()
+      fetchSuggestionsFromUOM(apply: true)
 
       // 之後就是更新組字區了。先清空注拼槽的內容。
       composer.clear()

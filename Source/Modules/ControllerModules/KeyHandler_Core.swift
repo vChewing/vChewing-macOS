@@ -126,31 +126,26 @@ public class KeyHandler {
     return arrResult
   }
 
-  /// 在組字器內，以給定之候選字字串、來試圖在給定游標位置所在之處指定選字處理過程。
+  /// 在組字器內，以給定之候選字（詞音配對）、來試圖在給定游標位置所在之處指定選字處理過程。
   /// 然後再將對應的節錨內的節點標記為「已經手動選字過」。
   /// - Parameters:
-  ///   - value: 給定之候選字字串。
+  ///   - value: 給定之候選字（詞音配對）。
   ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字後的節錨的前方。
   func fixNode(candidate: (String, String), respectCursorPushing: Bool = true) {
     let actualCursor = actualCandidateCursor
     let theCandidate: Megrez.Compositor.Candidate = .init(key: candidate.0, value: candidate.1)
-    if !compositor.overrideCandidate(theCandidate, at: actualCursor) { return }
+    if !compositor.overrideCandidate(theCandidate, at: actualCursor, overrideType: .withHighScore) { return }
+    let previousWalk = compositor.walkedNodes
     // 開始爬軌。
     walk()
+    let currentWalk = compositor.walkedNodes
 
     // 在可行的情況下更新使用者半衰記憶模組。
     var accumulatedCursor = 0
-    var currentNode: Megrez.Compositor.Node?
-    for node in compositor.walkedNodes {
-      accumulatedCursor += node.spanLength
-      if accumulatedCursor > actualCursor {
-        currentNode = node
-        break
-      }
-    }
+    let currentNode = currentWalk.findNode(at: actualCandidateCursor, target: &accumulatedCursor)
     guard let currentNode = currentNode else { return }
 
-    if currentNode.currentUnigram.score > -12 {
+    if currentNode.currentUnigram.score > -12, mgrPrefs.fetchSuggestionsFromUserOverrideModel {
       IME.prtDebugIntel("UOM: Start Observation.")
       // 這個過程可能會因為使用者半衰記憶模組內部資料錯亂、而導致輸入法在選字時崩潰。
       // 於是在這裡引入災後狀況察覺專用變數，且先開啟該開關。順利執行完觀察後會關閉。
@@ -158,9 +153,9 @@ public class KeyHandler {
       mgrPrefs.failureFlagForUOMObservation = true
       // 令半衰記憶模組觀測給定的三元圖。
       // 這個過程會讓半衰引擎根據當前上下文生成三元圖索引鍵。
-      currentUOM.observe(
-        walkedNodes: compositor.walkedNodes, cursorIndex: actualCursor, candidate: theCandidate.value,
-        timestamp: NSDate().timeIntervalSince1970, saveCallback: { mgrLangModel.saveUserOverrideModelData() }
+      currentUOM.performObservation(
+        walkedBefore: previousWalk, walkedAfter: currentWalk, cursor: actualCandidateCursor,
+        timestamp: Date().timeIntervalSince1970, saveCallback: { mgrLangModel.saveUserOverrideModelData() }
       )
       // 如果沒有出現崩框的話，那就將這個開關復位。
       mgrPrefs.failureFlagForUOMObservation = false
@@ -196,7 +191,7 @@ public class KeyHandler {
       return arrCandidates.map { ($0.key, $0.value) }
     }
 
-    let arrSuggestedUnigrams: [(String, Megrez.Unigram)] = fetchSuggestedCandidates()
+    let arrSuggestedUnigrams: [(String, Megrez.Unigram)] = fetchSuggestionsFromUOM(apply: false)
     let arrSuggestedCandidates: [Megrez.Compositor.Candidate] = arrSuggestedUnigrams.map {
       Megrez.Compositor.Candidate(key: $0.0, value: $0.1.value)
     }
@@ -206,32 +201,40 @@ public class KeyHandler {
     return arrCandidates.map { ($0.key, $0.value) }
   }
 
-  /// 向半衰引擎詢問可能的選字建議。拿到的結果會是一個單元圖陣列，會自動按權重排序。
-  func fetchSuggestedCandidates() -> [(String, Megrez.Unigram)] {
-    currentUOM.suggest(
-      walkedNodes: compositor.walkedNodes, cursorIndex: compositor.cursor,
-      timestamp: NSDate().timeIntervalSince1970
-    ).stableSort { $0.1.score > $1.1.score }
-  }
-
   /// 向半衰引擎詢問可能的選字建議、且套用給組字器內的當前游標位置。
-  func fetchAndApplySuggestionsFromUserOverrideModel() {
+  @discardableResult func fetchSuggestionsFromUOM(apply: Bool) -> [(String, Megrez.Unigram)] {
+    var arrResult = [(String, Megrez.Unigram)]()
     /// 如果逐字選字模式有啟用的話，直接放棄執行這個函式。
-    if mgrPrefs.useSCPCTypingMode { return }
+    if mgrPrefs.useSCPCTypingMode { return arrResult }
     /// 如果這個開關沒打開的話，直接放棄執行這個函式。
-    if !mgrPrefs.fetchSuggestionsFromUserOverrideModel { return }
-    /// 先就當前上下文讓半衰引擎重新生成三元圖索引鍵。
-    let overrideValue = fetchSuggestedCandidates().first?.1.value ?? ""
-
-    /// 再拿著索引鍵去問半衰模組有沒有選字建議。有的話就遵循之、讓天權星引擎對指定節錨下的節點複寫權重。
-    if !overrideValue.isEmpty {
-      IME.prtDebugIntel(
-        "UOM: Suggestion retrieved, overriding the node score of the selected candidate.")
-      // TODO: 這裡回頭改成用詞音配對來覆寫的形式。
-      compositor.overrideCandidateLiteral(overrideValue, at: actualCandidateCursor, overrideType: .withTopUnigramScore)
-    } else {
-      IME.prtDebugIntel("UOM: Blank suggestion retrieved, dismissing.")
+    if !mgrPrefs.fetchSuggestionsFromUserOverrideModel { return arrResult }
+    /// 獲取來自半衰記憶模組的建議結果
+    let suggestion = currentUOM.fetchSuggestion(
+      currentWalk: compositor.walkedNodes, cursor: actualCandidateCursor, timestamp: Date().timeIntervalSince1970
+    )
+    arrResult.append(contentsOf: suggestion.candidates)
+    if apply {
+      /// 再看有沒有選字建議。有的話就遵循之、讓天權星引擎對指定節錨下的節點複寫權重。
+      if !suggestion.isEmpty, let newestSuggestedCandidate = suggestion.candidates.last {
+        let overrideBehavior: Megrez.Compositor.Node.OverrideType =
+          suggestion.forceHighScoreOverride ? .withHighScore : .withTopUnigramScore
+        let suggestedPair: Megrez.Compositor.Candidate = .init(
+          key: newestSuggestedCandidate.0, value: newestSuggestedCandidate.1.value
+        )
+        IME.prtDebugIntel(
+          "UOM: Suggestion retrieved, overriding the node score of the selected candidate: \(suggestedPair.toNGramKey)")
+        if !compositor.overrideCandidate(suggestedPair, at: actualCandidateCursor, overrideType: overrideBehavior) {
+          compositor.overrideCandidateLiteral(
+            newestSuggestedCandidate.1.value, at: actualCandidateCursor, overrideType: overrideBehavior
+          )
+        }
+        walk()
+      } else {
+        IME.prtDebugIntel("UOM: Blank suggestion retrieved, dismissing.")
+      }
     }
+    arrResult = arrResult.stableSort { $0.1.score > $1.1.score }
+    return arrResult
   }
 
   // MARK: - Extracted methods and functions (Tekkon).
