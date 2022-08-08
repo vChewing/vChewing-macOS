@@ -280,33 +280,44 @@ extension vChewing.LMUserOverride {
     }
     // TODO: 降低磁碟寫入次數。唯有失憶的情況下才會更新觀察且記憶。
     if var theNeta = mutLRUMap[key] {
-      theNeta.observation.update(
-        candidate: candidate, timestamp: timestamp, forceHighScoreOverride: forceHighScoreOverride
+      _ = getSuggestion(
+        key: key, timestamp: timestamp, headReading: "",
+        decayCallback: {
+          theNeta.observation.update(
+            candidate: candidate, timestamp: timestamp, forceHighScoreOverride: forceHighScoreOverride
+          )
+          self.mutLRUList.insert(theNeta, at: 0)
+          self.mutLRUMap[key] = theNeta
+          IME.prtDebugIntel("UOM: Observation finished with existing observation: \(key)")
+          saveCallback()
+        }
       )
-      mutLRUList.insert(theNeta, at: 0)
-      mutLRUMap[key] = theNeta
-      IME.prtDebugIntel("UOM: Observation finished with existing observation: \(key)")
-      saveCallback()
     }
   }
 
-  private func getSuggestion(key: String, timestamp: Double, headReading: String) -> Suggestion {
+  private func getSuggestion(
+    key: String, timestamp: Double, headReading: String, decayCallback: @escaping () -> Void = {}
+  ) -> Suggestion {
     guard !key.isEmpty, let kvPair = mutLRUMap[key] else { return .init() }
     let observation: Observation = kvPair.observation
     var candidates: [(String, Megrez.Unigram)] = .init()
     var forceHighScoreOverride = false
-    var score: Double = 0
+    var currentHighScore: Double = 0
     for (i, theObservation) in observation.overrides {
       let overrideScore = getScore(
         eventCount: theObservation.count, totalCount: observation.count,
         eventTimestamp: theObservation.timestamp, timestamp: timestamp, lambda: mutDecayExponent
       )
-      if overrideScore == 0.0 { continue }
-      if overrideScore > score {
-        candidates.append((headReading, .init(value: i, score: overrideScore)))
-        forceHighScoreOverride = theObservation.forceHighScoreOverride
-        score = overrideScore
-      }
+      if (0...currentHighScore).contains(overrideScore) { continue }
+      let overrideDetectionScore: Double = getScore(
+        eventCount: theObservation.count, totalCount: observation.count,
+        eventTimestamp: theObservation.timestamp, timestamp: timestamp, lambda: mutDecayExponent * 2
+      )
+      if (0...currentHighScore).contains(overrideDetectionScore) { decayCallback() }
+
+      candidates.append((headReading, .init(value: i, score: overrideScore)))
+      forceHighScoreOverride = theObservation.forceHighScoreOverride
+      currentHighScore = overrideScore
     }
     return .init(candidates: candidates, forceHighScoreOverride: forceHighScoreOverride)
   }
