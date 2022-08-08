@@ -329,7 +329,7 @@ extension KeyHandler {
     let punctuationNamePrefix: String = generatePunctuationNamePrefix(withKeyCondition: input)
     let parser = currentMandarinParser
     let arrCustomPunctuations: [String] = [
-      punctuationNamePrefix, parser, String(format: "%c", CChar(charCode)),
+      punctuationNamePrefix, parser, String(format: "%c", charCode.isPrintableASCII ? CChar(charCode) : inputText),
     ]
     let customPunctuation: String = arrCustomPunctuations.joined(separator: "")
     if handlePunctuation(
@@ -344,7 +344,9 @@ extension KeyHandler {
 
     /// 如果仍無匹配結果的話，看看這個輸入是否是不需要修飾鍵的那種標點鍵輸入。
 
-    let arrPunctuations: [String] = [punctuationNamePrefix, String(format: "%c", CChar(charCode))]
+    let arrPunctuations: [String] = [
+      punctuationNamePrefix, String(format: "%c", charCode.isPrintableASCII ? CChar(charCode) : inputText),
+    ]
     let punctuation: String = arrPunctuations.joined(separator: "")
 
     if handlePunctuation(
@@ -359,7 +361,7 @@ extension KeyHandler {
 
     // 這裡不使用小麥注音 2.2 版的組字區處理方式，而是直接由詞庫負責。
     if input.isUpperCaseASCIILetterKey {
-      let letter: String! = String(format: "%@%c", "_letter_", CChar(charCode))
+      let letter: String! = String(format: "%@%c", "_letter_", charCode.isPrintableASCII ? CChar(charCode) : inputText)
       if handlePunctuation(
         letter,
         state: state,
