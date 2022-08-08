@@ -46,6 +46,9 @@ class ctlInputMethod: IMKInputController {
     return isASCIIMode
   }
 
+  /// `handle(event:)` 會利用這個參數判定某次 Shift 按鍵是否用來切換中英文輸入。
+  private var rencentKeyHandledByKeyHandler = false
+
   // MARK: - 工具函式
 
   /// 指定鍵盤佈局。
@@ -188,13 +191,17 @@ class ctlInputMethod: IMKInputController {
 
     // 用 Shift 開關半形英數模式。
     if ShiftKeyUpChecker.check(event) {
-      NotifierController.notify(
-        message: String(
-          format: "%@%@%@", NSLocalizedString("Alphanumerical Mode", comment: ""), "\n",
-          toggleASCIIMode()
-            ? NSLocalizedString("NotificationSwitchON", comment: "")
-            : NSLocalizedString("NotificationSwitchOFF", comment: "")
-        ))
+      if !rencentKeyHandledByKeyHandler {
+        NotifierController.notify(
+          message: String(
+            format: "%@%@%@", NSLocalizedString("Alphanumerical Mode", comment: ""), "\n",
+            toggleASCIIMode()
+              ? NSLocalizedString("NotificationSwitchON", comment: "")
+              : NSLocalizedString("NotificationSwitchOFF", comment: "")
+          )
+        )
+      }
+      rencentKeyHandledByKeyHandler = false
       return false
     }
 
@@ -240,6 +247,7 @@ class ctlInputMethod: IMKInputController {
     } errorCallback: {
       clsSFX.beep()
     }
+    rencentKeyHandledByKeyHandler = result
     return result
   }
 
