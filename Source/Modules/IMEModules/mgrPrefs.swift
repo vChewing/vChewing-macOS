@@ -70,15 +70,6 @@ private let kDefaultMinKeyLabelSize: CGFloat = 10
 private let kMinCandidateListTextSize: CGFloat = 12
 private let kMaxCandidateListTextSize: CGFloat = 196
 
-// default, min and max composing buffer size (in codepoints)
-// modern Macs can usually work up to 16 codepoints when the compositor still
-// walks the grid with good performance slower Macs (like old PowerBooks)
-// will start to sputter beyond 12 such is the algorithmatic complexity
-// of the Viterbi algorithm used in the Megrez library (at O(N^2))
-private let kDefaultComposingBufferSize = 20
-private let kMinComposingBufferSize = 10
-private let kMaxComposingBufferSize = 40
-
 private let kDefaultKeys = "123456789"
 
 // MARK: - UserDefaults extension.
@@ -131,34 +122,6 @@ struct CandidateListTextSize {
         value = kMinCandidateListTextSize
       } else if value > kMaxCandidateListTextSize {
         value = kMaxCandidateListTextSize
-      }
-      container.wrappedValue = value
-    }
-  }
-}
-
-@propertyWrapper
-struct ComposingBufferSize {
-  let key: String
-  let defaultValue: Int = kDefaultComposingBufferSize
-  lazy var container: UserDefault = .init(key: key, defaultValue: defaultValue)
-
-  var wrappedValue: Int {
-    mutating get {
-      let currentValue = container.wrappedValue
-      if currentValue < kMinComposingBufferSize {
-        return kMinComposingBufferSize
-      } else if currentValue > kMaxComposingBufferSize {
-        return kMaxComposingBufferSize
-      }
-      return currentValue
-    }
-    set {
-      var value = newValue
-      if value < kMinComposingBufferSize {
-        value = kMinComposingBufferSize
-      } else if value > kMaxComposingBufferSize {
-        value = kMaxComposingBufferSize
       }
       container.wrappedValue = value
     }
@@ -388,8 +351,6 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kUseHorizontalCandidateList.rawValue, defaultValue: true)
   static var useHorizontalCandidateList: Bool
 
-  static var composingBufferSize: Int { 30 }
-
   @UserDefault(key: UserDef.kChooseCandidateUsingSpace.rawValue, defaultValue: true)
   static var chooseCandidateUsingSpace: Bool
 
@@ -408,7 +369,7 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue, defaultValue: true)
   static var alsoConfirmAssociatedCandidatesByEnter: Bool
 
-  @UserDefault(key: UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue, defaultValue: false)
+  @UserDefault(key: UserDef.kKeepReadingUponCompositionError.rawValue, defaultValue: false)
   static var keepReadingUponCompositionError: Bool
 
   // MARK: - Settings (Tier 2)
