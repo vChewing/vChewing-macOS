@@ -176,7 +176,12 @@ extension KeyHandler {
     // Enter
     if input.isEnter {
       if let keyHandlerDelegate = delegate {
-        if !keyHandlerDelegate.keyHandler(self, didRequestWriteUserPhraseWith: state, addToFilter: false) {
+        // 先判斷是否是在摁了降權組合鍵的時候目標不在庫。
+        if input.isShiftHold, input.isCommandHold, !state.validToFilter {
+          IME.prtDebugIntel("2EAC1F7A")
+          errorCallback()
+          return true
+        } else if !keyHandlerDelegate.keyHandler(self, didRequestWriteUserPhraseWith: state, addToFilter: false) {
           IME.prtDebugIntel("5B69CC8D")
           errorCallback()
           return true
