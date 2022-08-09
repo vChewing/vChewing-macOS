@@ -48,6 +48,7 @@ public enum UserDef: String, CaseIterable {
   case kAlsoConfirmAssociatedCandidatesByEnter = "AlsoConfirmAssociatedCandidatesByEnter"
   case kKeepReadingUponCompositionError = "KeepReadingUponCompositionError"
   case kTogglingAlphanumericalModeWithLShift = "TogglingAlphanumericalModeWithLShift"
+  case kUpperCaseLetterKeyBehavior = "UpperCaseLetterKeyBehavior"
 
   case kCandidateTextFontName = "CandidateTextFontName"
   case kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
@@ -271,6 +272,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.togglingAlphanumericalModeWithLShift, forKey: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.upperCaseLetterKeyBehavior, forKey: UserDef.kUpperCaseLetterKeyBehavior.rawValue
+    )
 
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeySCPC, forKey: UserDef.kUsingHotKeySCPC.rawValue)
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyAssociates, forKey: UserDef.kUsingHotKeyAssociates.rawValue)
@@ -371,6 +375,9 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kKeepReadingUponCompositionError.rawValue, defaultValue: false)
   static var keepReadingUponCompositionError: Bool
+
+  @UserDefault(key: UserDef.kUpperCaseLetterKeyBehavior.rawValue, defaultValue: 0)
+  static var upperCaseLetterKeyBehavior: Int
 
   // MARK: - Settings (Tier 2)
 
