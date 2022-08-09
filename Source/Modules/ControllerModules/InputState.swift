@@ -277,7 +277,7 @@ public enum InputState {
       return arrOutput.joined(separator: " ")
     }
 
-    private var deleteTargetExists = false
+    private var markedTargetExists = false
     var tooltip: String {
       if composingBuffer.count != readings.count {
         ctlInputMethod.tooltipController.setColor(state: .denialOverflow)
@@ -318,11 +318,12 @@ public enum InputState {
         userPhrase: text, mode: IME.currentInputMode, key: joined
       )
       if exist {
-        deleteTargetExists = exist
+        markedTargetExists = exist
         ctlInputMethod.tooltipController.setColor(state: .prompt)
         return String(
           format: NSLocalizedString(
-            "\"%@\" already exists: ENTER to boost, \n SHIFT+CMD+ENTER to exclude.", comment: ""
+            "\"%@\" already exists: ENTER to boost, SHIFT+CMD+ENTER to nerf, \n BackSpace or Delete key to exclude.",
+            comment: ""
           ) + "\n//  " + literalReadingThread, text
         )
       }
@@ -397,12 +398,10 @@ public enum InputState {
       return state
     }
 
-    var validToWrite: Bool {
+    var validToFilter: Bool {
       /// 與小麥注音不同，威注音會自動解消「游標插斷字符」的異常狀態，所以允許在字音長度不相符的情況下加詞。
       /// 這裡的 deleteTargetExists 是防止使用者排除「詞庫內尚未存在的詞」。
-      (ctlInputMethod.areWeDeleting && !deleteTargetExists)
-        ? false
-        : allowedMarkRange.contains(literalMarkedRange.count)
+      markedTargetExists ? allowedMarkRange.contains(literalMarkedRange.count) : false
     }
 
     var chkIfUserPhraseExists: Bool {
@@ -418,7 +417,8 @@ public enum InputState {
       let text = composingBuffer.utf16SubString(with: markedRange)
       let selectedReadings = readings[literalMarkedRange]
       let joined = selectedReadings.joined(separator: "-")
-      return "\(text) \(joined)"
+      let nerfedScore = ctlInputMethod.areWeNerfing && markedTargetExists ? " -114.514" : ""
+      return "\(text) \(joined)\(nerfedScore)"
     }
 
     var userPhraseConverted: String {
@@ -426,8 +426,9 @@ public enum InputState {
         ChineseConverter.crossConvert(composingBuffer.utf16SubString(with: markedRange)) ?? ""
       let selectedReadings = readings[literalMarkedRange]
       let joined = selectedReadings.joined(separator: "-")
+      let nerfedScore = ctlInputMethod.areWeNerfing && markedTargetExists ? " -114.514" : ""
       let convertedMark = "#𝙃𝙪𝙢𝙖𝙣𝘾𝙝𝙚𝙘𝙠𝙍𝙚𝙦𝙪𝙞𝙧𝙚𝙙"
-      return "\(text) \(joined)\t\(convertedMark)"
+      return "\(text) \(joined)\(nerfedScore)\t\(convertedMark)"
     }
   }
 

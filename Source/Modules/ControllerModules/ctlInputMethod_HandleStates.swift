@@ -131,6 +131,8 @@ extension ctlInputMethod {
       commit(text: previous.composingBuffer)
     }
     clearInlineDisplay()
+    // 最後一道保險
+    keyHandler.clear()
   }
 
   private func handle(state: InputState.Empty, previous: InputStateProtocol) {
@@ -147,6 +149,8 @@ extension ctlInputMethod {
     ctlInputMethod.ctlCandidateCurrent.visible = false
     ctlInputMethod.tooltipController.hide()
     clearInlineDisplay()
+    // 最後一道保險
+    keyHandler.clear()
   }
 
   private func handle(
@@ -167,6 +171,8 @@ extension ctlInputMethod {
       commit(text: textToCommit)
     }
     clearInlineDisplay()
+    // 最後一道保險
+    keyHandler.clear()
   }
 
   private func handle(state: InputState.Inputting, previous: InputStateProtocol) {

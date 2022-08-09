@@ -21,8 +21,8 @@ import InputMethodKit
 /// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
 @objc(ctlInputMethod)  // 必須加上 ObjC，因為 IMK 是用 ObjC 寫的。
 class ctlInputMethod: IMKInputController {
-  /// 標記狀態來聲明目前是在新增使用者語彙、還是準備要濾除使用者語彙。
-  static var areWeDeleting = false
+  /// 標記狀態來聲明目前新增的詞彙是否需要賦以非常低的權重。
+  static var areWeNerfing = false
 
   /// 目前在用的的選字窗副本。
   static var ctlCandidateCurrent: ctlCandidateProtocol = ctlCandidateUniversal.init(.horizontal)
@@ -46,6 +46,9 @@ class ctlInputMethod: IMKInputController {
     return isASCIIMode
   }
 
+  /// `handle(event:)` 會利用這個參數判定某次 Shift 按鍵是否用來切換中英文輸入。
+  private var rencentKeyHandledByKeyHandler = false
+
   // MARK: - 工具函式
 
   /// 指定鍵盤佈局。
@@ -59,7 +62,6 @@ class ctlInputMethod: IMKInputController {
       /// 將傳回的新狀態交給調度函式。
       handle(state: InputState.Committing(textToCommit: state.composingBufferConverted))
     }
-    keyHandler.clear()
     handle(state: InputState.Empty())
   }
 
@@ -93,7 +95,7 @@ class ctlInputMethod: IMKInputController {
     // 所以這裡添加這句、來試圖應對這種情況。
     if keyHandler.delegate == nil { keyHandler.delegate = self }
     setValue(IME.currentInputMode.rawValue, forTag: 114_514, client: client())
-    keyHandler.clear()
+    keyHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
     keyHandler.ensureParser()
 
     if isASCIIMode {
@@ -120,7 +122,6 @@ class ctlInputMethod: IMKInputController {
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   override func deactivateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-    keyHandler.clear()
     handle(state: InputState.Empty())
     handle(state: InputState.Deactivated())
   }
@@ -146,7 +147,7 @@ class ctlInputMethod: IMKInputController {
 
     if keyHandler.inputMode != newInputMode {
       UserDefaults.standard.synchronize()
-      keyHandler.clear()
+      keyHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
       keyHandler.inputMode = newInputMode
       /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
       /// 這是很多 macOS 副廠輸入法的常見失誤之處。
@@ -188,13 +189,17 @@ class ctlInputMethod: IMKInputController {
 
     // 用 Shift 開關半形英數模式。
     if ShiftKeyUpChecker.check(event) {
-      NotifierController.notify(
-        message: String(
-          format: "%@%@%@", NSLocalizedString("Alphanumerical Mode", comment: ""), "\n",
-          toggleASCIIMode()
-            ? NSLocalizedString("NotificationSwitchON", comment: "")
-            : NSLocalizedString("NotificationSwitchOFF", comment: "")
-        ))
+      if !rencentKeyHandledByKeyHandler {
+        NotifierController.notify(
+          message: String(
+            format: "%@%@%@", NSLocalizedString("Alphanumerical Mode", comment: ""), "\n",
+            toggleASCIIMode()
+              ? NSLocalizedString("NotificationSwitchON", comment: "")
+              : NSLocalizedString("NotificationSwitchOFF", comment: "")
+          )
+        )
+      }
+      rencentKeyHandledByKeyHandler = false
       return false
     }
 
@@ -204,8 +209,8 @@ class ctlInputMethod: IMKInputController {
     /// 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
     if event.type == .flagsChanged { return false }
 
-    // 準備修飾鍵，用來判定是否需要利用就地新增語彙時的 Enter 鍵來砍詞。
-    ctlInputMethod.areWeDeleting = event.modifierFlags.contains([.shift, .command])
+    // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
+    ctlInputMethod.areWeNerfing = event.modifierFlags.contains([.shift, .command])
 
     var textFrame = NSRect.zero
 
@@ -240,6 +245,7 @@ class ctlInputMethod: IMKInputController {
     } errorCallback: {
       clsSFX.beep()
     }
+    rencentKeyHandledByKeyHandler = result
     return result
   }
 

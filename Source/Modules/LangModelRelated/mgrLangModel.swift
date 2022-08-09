@@ -184,7 +184,7 @@ enum mgrLangModel {
       (mode == InputMode.imeModeCHT)
       ? gLangModelCHT.unigramsFor(key: unigramKey) : gLangModelCHS.unigramsFor(key: unigramKey)
     for unigram in unigrams {
-      if unigram.keyValue.value == userPhrase {
+      if unigram.value == userPhrase {
         return true
       }
     }

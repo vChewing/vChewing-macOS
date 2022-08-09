@@ -12,18 +12,17 @@
 		5B21176C287539BB000443A9 /* ctlInputMethod_HandleStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176B287539BB000443A9 /* ctlInputMethod_HandleStates.swift */; };
 		5B21176E28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176D28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift */; };
 		5B21177028753B9D000443A9 /* ctlInputMethod_Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176F28753B9D000443A9 /* ctlInputMethod_Delegates.swift */; };
+		5B2170E0289FACAD00BE7304 /* 7_LangModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2170D7289FACAC00BE7304 /* 7_LangModel.swift */; };
+		5B2170E1289FACAD00BE7304 /* 0_Megrez.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2170D8289FACAC00BE7304 /* 0_Megrez.swift */; };
+		5B2170E2289FACAD00BE7304 /* 8_Unigram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2170D9289FACAC00BE7304 /* 8_Unigram.swift */; };
+		5B2170E3289FACAD00BE7304 /* 3_Candidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2170DA289FACAC00BE7304 /* 3_Candidate.swift */; };
+		5B2170E4289FACAD00BE7304 /* 2_Walker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2170DB289FACAC00BE7304 /* 2_Walker.swift */; };
+		5B2170E5289FACAD00BE7304 /* 6_Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2170DC289FACAC00BE7304 /* 6_Node.swift */; };
+		5B2170E6289FACAD00BE7304 /* 4_Span.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2170DD289FACAC00BE7304 /* 4_Span.swift */; };
+		5B2170E7289FACAD00BE7304 /* 1_Compositor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2170DE289FACAC00BE7304 /* 1_Compositor.swift */; };
+		5B2170E8289FACAD00BE7304 /* 5_Vertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2170DF289FACAC00BE7304 /* 5_Vertex.swift */; };
 		5B242403284B0D6500520FE4 /* ctlCandidateUniversal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B242402284B0D6500520FE4 /* ctlCandidateUniversal.swift */; };
 		5B3133BF280B229700A4A505 /* KeyHandler_States.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3133BE280B229700A4A505 /* KeyHandler_States.swift */; };
-		5B38F59A281E2E49007D5F5D /* 6_Unigram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1D15FC0EB100ABF4B3 /* 6_Unigram.swift */; };
-		5B38F59B281E2E49007D5F5D /* 7_KeyValuePaired.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1815FC0EB100ABF4B3 /* 7_KeyValuePaired.swift */; };
-		5B38F59C281E2E49007D5F5D /* 2_Grid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1715FC0EB100ABF4B3 /* 2_Grid.swift */; };
-		5B38F59D281E2E49007D5F5D /* 4_Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1A15FC0EB100ABF4B3 /* 4_Node.swift */; };
-		5B38F59E281E2E49007D5F5D /* 6_Bigram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1415FC0EB100ABF4B3 /* 6_Bigram.swift */; };
-		5B38F59F281E2E49007D5F5D /* 3_NodeAnchor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1B15FC0EB100ABF4B3 /* 3_NodeAnchor.swift */; };
-		5B38F5A1281E2E49007D5F5D /* 1_Compositor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1515FC0EB100ABF4B3 /* 1_Compositor.swift */; };
-		5B38F5A2281E2E49007D5F5D /* 0_Megrez.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1615FC0EB100ABF4B3 /* 0_Megrez.swift */; };
-		5B38F5A3281E2E49007D5F5D /* 3_Span.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1C15FC0EB100ABF4B3 /* 3_Span.swift */; };
-		5B38F5A4281E2E49007D5F5D /* 5_LanguageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F1915FC0EB100ABF4B3 /* 5_LanguageModel.swift */; };
 		5B3A87BC28597CDB0090E163 /* LMSymbolNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3A87BB28597CDB0090E163 /* LMSymbolNode.swift */; };
 		5B40730C281672610023DFFF /* lmAssociates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B407309281672610023DFFF /* lmAssociates.swift */; };
 		5B40730D281672610023DFFF /* lmReplacements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B40730A281672610023DFFF /* lmReplacements.swift */; };
@@ -213,6 +212,15 @@
 		5B21176B287539BB000443A9 /* ctlInputMethod_HandleStates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_HandleStates.swift; sourceTree = "<group>"; };
 		5B21176D28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_HandleDisplay.swift; sourceTree = "<group>"; };
 		5B21176F28753B9D000443A9 /* ctlInputMethod_Delegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_Delegates.swift; sourceTree = "<group>"; };
+		5B2170D7289FACAC00BE7304 /* 7_LangModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = 7_LangModel.swift; sourceTree = "<group>"; };
+		5B2170D8289FACAC00BE7304 /* 0_Megrez.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = 0_Megrez.swift; sourceTree = "<group>"; };
+		5B2170D9289FACAC00BE7304 /* 8_Unigram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = 8_Unigram.swift; sourceTree = "<group>"; };
+		5B2170DA289FACAC00BE7304 /* 3_Candidate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = 3_Candidate.swift; sourceTree = "<group>"; };
+		5B2170DB289FACAC00BE7304 /* 2_Walker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = 2_Walker.swift; sourceTree = "<group>"; };
+		5B2170DC289FACAC00BE7304 /* 6_Node.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = 6_Node.swift; sourceTree = "<group>"; };
+		5B2170DD289FACAC00BE7304 /* 4_Span.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = 4_Span.swift; sourceTree = "<group>"; };
+		5B2170DE289FACAC00BE7304 /* 1_Compositor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = 1_Compositor.swift; sourceTree = "<group>"; };
+		5B2170DF289FACAC00BE7304 /* 5_Vertex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = 5_Vertex.swift; sourceTree = "<group>"; };
 		5B242402284B0D6500520FE4 /* ctlCandidateUniversal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlCandidateUniversal.swift; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
 		5B2F2BB3286216A500B8557B /* vChewingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vChewingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -329,16 +337,6 @@
 		5BFDF48C27B51867009523B6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Main.strings"; sourceTree = "<group>"; };
 		6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A0D4EF515FC0DA600ABF4B3 /* IME-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IME-Info.plist"; sourceTree = "<group>"; };
-		6A0D4F1415FC0EB100ABF4B3 /* 6_Bigram.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 6_Bigram.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		6A0D4F1515FC0EB100ABF4B3 /* 1_Compositor.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 1_Compositor.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		6A0D4F1615FC0EB100ABF4B3 /* 0_Megrez.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = 0_Megrez.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		6A0D4F1715FC0EB100ABF4B3 /* 2_Grid.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 2_Grid.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		6A0D4F1815FC0EB100ABF4B3 /* 7_KeyValuePaired.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 7_KeyValuePaired.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		6A0D4F1915FC0EB100ABF4B3 /* 5_LanguageModel.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 5_LanguageModel.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		6A0D4F1A15FC0EB100ABF4B3 /* 4_Node.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 4_Node.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		6A0D4F1B15FC0EB100ABF4B3 /* 3_NodeAnchor.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 3_NodeAnchor.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		6A0D4F1C15FC0EB100ABF4B3 /* 3_Span.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 3_Span.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		6A0D4F1D15FC0EB100ABF4B3 /* 6_Unigram.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = 6_Unigram.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		6A15B32421A51F2300B92CD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		6A15B32521A51F2300B92CD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		6A225A1E23679F2600F685C6 /* NotarizedArchives */ = {isa = PBXFileReference; lastKnownFileType = folder; path = NotarizedArchives; sourceTree = "<group>"; };
@@ -821,16 +819,15 @@
 		6A0D4F1315FC0EB100ABF4B3 /* Megrez */ = {
 			isa = PBXGroup;
 			children = (
-				6A0D4F1615FC0EB100ABF4B3 /* 0_Megrez.swift */,
-				6A0D4F1515FC0EB100ABF4B3 /* 1_Compositor.swift */,
-				6A0D4F1715FC0EB100ABF4B3 /* 2_Grid.swift */,
-				6A0D4F1B15FC0EB100ABF4B3 /* 3_NodeAnchor.swift */,
-				6A0D4F1C15FC0EB100ABF4B3 /* 3_Span.swift */,
-				6A0D4F1A15FC0EB100ABF4B3 /* 4_Node.swift */,
-				6A0D4F1915FC0EB100ABF4B3 /* 5_LanguageModel.swift */,
-				6A0D4F1415FC0EB100ABF4B3 /* 6_Bigram.swift */,
-				6A0D4F1D15FC0EB100ABF4B3 /* 6_Unigram.swift */,
-				6A0D4F1815FC0EB100ABF4B3 /* 7_KeyValuePaired.swift */,
+				5B2170D8289FACAC00BE7304 /* 0_Megrez.swift */,
+				5B2170DE289FACAC00BE7304 /* 1_Compositor.swift */,
+				5B2170DB289FACAC00BE7304 /* 2_Walker.swift */,
+				5B2170DA289FACAC00BE7304 /* 3_Candidate.swift */,
+				5B2170DD289FACAC00BE7304 /* 4_Span.swift */,
+				5B2170DF289FACAC00BE7304 /* 5_Vertex.swift */,
+				5B2170DC289FACAC00BE7304 /* 6_Node.swift */,
+				5B2170D7289FACAC00BE7304 /* 7_LangModel.swift */,
+				5B2170D9289FACAC00BE7304 /* 8_Unigram.swift */,
 			);
 			path = Megrez;
 			sourceTree = "<group>";
@@ -1155,8 +1152,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B38F59D281E2E49007D5F5D /* 4_Node.swift in Sources */,
-				5B38F5A3281E2E49007D5F5D /* 3_Span.swift in Sources */,
 				5B40730C281672610023DFFF /* lmAssociates.swift in Sources */,
 				D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */,
 				5BA9FD4527FEF3C9002DE248 /* ToolbarItemStyleViewController.swift in Sources */,
@@ -1169,22 +1164,25 @@
 				D4A13D5A27A59F0B003BE359 /* ctlInputMethod_Core.swift in Sources */,
 				5BA9FD4827FEF3C9002DE248 /* PreferencesWindowController.swift in Sources */,
 				5BD0113B28180D6100609769 /* LMInstantiator.swift in Sources */,
+				5B2170E7289FACAD00BE7304 /* 1_Compositor.swift in Sources */,
 				5B21177028753B9D000443A9 /* ctlInputMethod_Delegates.swift in Sources */,
 				5B21176E28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift in Sources */,
 				5B84579F2871AD2200C93B01 /* HotenkaChineseConverter.swift in Sources */,
 				5B887F302826AEA400B6651E /* lmCoreEX.swift in Sources */,
 				5BA9FD4627FEF3C9002DE248 /* Container.swift in Sources */,
 				D47F7DD0278C0897002F9DD7 /* ctlNonModalAlertWindow.swift in Sources */,
-				5B38F5A2281E2E49007D5F5D /* 0_Megrez.swift in Sources */,
+				5B2170E5289FACAD00BE7304 /* 6_Node.swift in Sources */,
 				5B949BD92816DC5400D87B5D /* LineReader.swift in Sources */,
 				D456576E279E4F7B00DF6BC9 /* InputSignal.swift in Sources */,
 				5BA9FD1027FEDB6B002DE248 /* suiPrefPaneKeyboard.swift in Sources */,
 				5B3133BF280B229700A4A505 /* KeyHandler_States.swift in Sources */,
+				5B2170E1289FACAD00BE7304 /* 0_Megrez.swift in Sources */,
 				5B3A87BC28597CDB0090E163 /* LMSymbolNode.swift in Sources */,
 				5BA9FD4327FEF3C8002DE248 /* Preferences.swift in Sources */,
 				5BA9FD4427FEF3C8002DE248 /* SegmentedControlStyleViewController.swift in Sources */,
 				D47F7DCE278BFB57002F9DD7 /* ctlPrefWindow.swift in Sources */,
 				5BD0113D2818543900609769 /* KeyHandler_Core.swift in Sources */,
+				5B2170E4289FACAD00BE7304 /* 2_Walker.swift in Sources */,
 				5BA9FD4227FEF3C8002DE248 /* PreferencePane.swift in Sources */,
 				5BA0DF312817857D009E73BB /* lmUserOverride.swift in Sources */,
 				5BA9FD8B28006B41002DE248 /* VDKComboBox.swift in Sources */,
@@ -1194,39 +1192,37 @@
 				5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */,
 				5B54E743283A7D89001ECBDC /* lmCoreNS.swift in Sources */,
 				5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */,
+				5B2170E2289FACAD00BE7304 /* 8_Unigram.swift in Sources */,
 				5B21176C287539BB000443A9 /* ctlInputMethod_HandleStates.swift in Sources */,
-				5B38F59B281E2E49007D5F5D /* 7_KeyValuePaired.swift in Sources */,
 				5B62A33627AE795800A19448 /* mgrPrefs.swift in Sources */,
-				5B38F5A4281E2E49007D5F5D /* 5_LanguageModel.swift in Sources */,
 				5BAEFAD028012565001F42C9 /* mgrLangModel.swift in Sources */,
 				5B782EC4280C243C007276DE /* KeyHandler_HandleCandidate.swift in Sources */,
 				5B62A33827AE79CD00A19448 /* StringUtils.swift in Sources */,
+				5B2170E3289FACAD00BE7304 /* 3_Candidate.swift in Sources */,
 				5BA9FD0F27FEDB6B002DE248 /* suiPrefPaneGeneral.swift in Sources */,
+				5B2170E6289FACAD00BE7304 /* 4_Span.swift in Sources */,
 				5BA9FD4927FEF3C9002DE248 /* Section.swift in Sources */,
 				5BA9FD3E27FEF3C8002DE248 /* Utilities.swift in Sources */,
 				5B242403284B0D6500520FE4 /* ctlCandidateUniversal.swift in Sources */,
 				5BA9FD1127FEDB6B002DE248 /* ctlPrefUI.swift in Sources */,
 				5B8457A12871ADBE00C93B01 /* HotenkaCCBridge.swift in Sources */,
-				5B38F59C281E2E49007D5F5D /* 2_Grid.swift in Sources */,
 				5B40730D281672610023DFFF /* lmReplacements.swift in Sources */,
-				5B38F59E281E2E49007D5F5D /* 6_Bigram.swift in Sources */,
 				5B62A33227AE792F00A19448 /* InputSourceHelper.swift in Sources */,
 				5B5E535227EF261400C6AA1E /* IME.swift in Sources */,
+				5B2170E0289FACAD00BE7304 /* 7_LangModel.swift in Sources */,
 				5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */,
-				5B38F59A281E2E49007D5F5D /* 6_Unigram.swift in Sources */,
 				5BA9FD4027FEF3C8002DE248 /* Localization.swift in Sources */,
 				5BAA8FBE282CAF380066C406 /* SyllableComposer.swift in Sources */,
 				5BA9FD1327FEDB6B002DE248 /* suiPrefPaneDictionary.swift in Sources */,
+				5B2170E8289FACAD00BE7304 /* 5_Vertex.swift in Sources */,
 				5BBBB77A27AEDC690023B93A /* clsSFX.swift in Sources */,
 				5BA9FD4727FEF3C9002DE248 /* PreferencesStyleController.swift in Sources */,
 				5B949BDB2816DDBC00D87B5D /* LMConsolidator.swift in Sources */,
-				5B38F59F281E2E49007D5F5D /* 3_NodeAnchor.swift in Sources */,
 				5BFDF011289635C100417BBC /* ctlCandidateIMK.swift in Sources */,
 				5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */,
 				5BA58646289BCFAC0077D02F /* ShiftKeyUpChecker.swift in Sources */,
 				5BA9FD3F27FEF3C8002DE248 /* Pane.swift in Sources */,
 				5BB802DA27FABA8300CF1C19 /* ctlInputMethod_Menu.swift in Sources */,
-				5B38F5A1281E2E49007D5F5D /* 1_Compositor.swift in Sources */,
 				5BE377A0288FED8D0037365B /* KeyHandler_HandleComposition.swift in Sources */,
 				5BDC1CFA27FDF1310052C2B9 /* apiUpdate.swift in Sources */,
 			);
@@ -1413,7 +1409,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1988;
+				CURRENT_PROJECT_VERSION = 1990;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1423,7 +1419,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.8.8;
+				MARKETING_VERSION = 1.9.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewingTests;
@@ -1452,13 +1448,13 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1988;
+				CURRENT_PROJECT_VERSION = 1990;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.8.8;
+				MARKETING_VERSION = 1.9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewingTests;
@@ -1489,7 +1485,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1988;
+				CURRENT_PROJECT_VERSION = 1990;
 				DEAD_CODE_STRIPPING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1510,7 +1506,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.8.8;
+				MARKETING_VERSION = 1.9.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
@@ -1539,7 +1535,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1988;
+				CURRENT_PROJECT_VERSION = 1990;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1556,7 +1552,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.8.8;
+				MARKETING_VERSION = 1.9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
@@ -1670,7 +1666,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1988;
+				CURRENT_PROJECT_VERSION = 1990;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1698,7 +1694,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.8.8;
+				MARKETING_VERSION = 1.9.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1725,7 +1721,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1988;
+				CURRENT_PROJECT_VERSION = 1990;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1747,7 +1743,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.8.8;
+				MARKETING_VERSION = 1.9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1769,7 +1765,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1988;
+				CURRENT_PROJECT_VERSION = 1990;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1789,7 +1785,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.8.8;
+				MARKETING_VERSION = 1.9.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.atelierInmu.vChewing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1811,7 +1807,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1988;
+				CURRENT_PROJECT_VERSION = 1990;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1825,7 +1821,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.8.8;
+				MARKETING_VERSION = 1.9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.atelierInmu.vChewing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

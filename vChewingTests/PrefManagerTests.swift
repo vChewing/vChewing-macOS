@@ -98,16 +98,6 @@ class PrefManagerTests: XCTestCase {
     XCTAssert(mgrPrefs.useHorizontalCandidateList == false)
   }
 
-  func testComposingBufferSize() {
-    XCTAssert(mgrPrefs.composingBufferSize == 20)
-    mgrPrefs.composingBufferSize = 10
-    XCTAssert(mgrPrefs.composingBufferSize == 10)
-    mgrPrefs.composingBufferSize = 4
-    XCTAssert(mgrPrefs.composingBufferSize == 10)
-    mgrPrefs.composingBufferSize = 50
-    XCTAssert(mgrPrefs.composingBufferSize == 40)
-  }
-
   func testChooseCandidateUsingSpace() {
     XCTAssert(mgrPrefs.chooseCandidateUsingSpace == true)
     mgrPrefs.chooseCandidateUsingSpace = false

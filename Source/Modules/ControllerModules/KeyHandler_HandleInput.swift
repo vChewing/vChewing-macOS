@@ -69,7 +69,6 @@ extension KeyHandler {
       // 略過對 BackSpace 的處理。
     } else if input.isCapsLockOn || input.isASCIIModeInput {
       // 但願能夠處理這種情況下所有可能的按鍵組合。
-      clear()
       stateCallback(InputState.Empty())
 
       // 摁 Shift 的話，無須額外處理，因為直接就會敲出大寫字母。
@@ -99,7 +98,6 @@ extension KeyHandler {
       if !(state is InputState.ChoosingCandidate || state is InputState.AssociatedPhrases
         || state is InputState.SymbolTable)
       {
-        clear()
         stateCallback(InputState.Empty())
         stateCallback(InputState.Committing(textToCommit: inputText.lowercased()))
         stateCallback(InputState.Empty())
@@ -162,14 +160,12 @@ extension KeyHandler {
             if !composingBuffer.isEmpty {
               stateCallback(InputState.Committing(textToCommit: composingBuffer))
             }
-            clear()
             stateCallback(InputState.Committing(textToCommit: " "))
             stateCallback(InputState.Empty())
           } else if currentLM.hasUnigramsFor(key: " ") {
-            compositor.insertReading(" ")
-            let textToCommit = commitOverflownCompositionAndWalk
+            compositor.insertKey(" ")
+            walk()
             let inputting = buildInputtingState
-            inputting.textToCommit = textToCommit
             stateCallback(inputting)
           }
           return true
@@ -259,13 +255,13 @@ extension KeyHandler {
     // MARK: Backspace
 
     if input.isBackSpace {
-      return handleBackSpace(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+      return handleBackSpace(state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 
     // MARK: Delete
 
     if input.isDelete || input.emacsKey == EmacsKey.delete {
-      return handleDelete(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+      return handleDelete(state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 
     // MARK: Enter
@@ -286,10 +282,9 @@ extension KeyHandler {
       if input.isOptionHold {
         if currentLM.hasUnigramsFor(key: "_punctuation_list") {
           if composer.isEmpty {
-            compositor.insertReading("_punctuation_list")
-            let textToCommit: String! = commitOverflownCompositionAndWalk
+            compositor.insertKey("_punctuation_list")
+            walk()
             let inputting = buildInputtingState
-            inputting.textToCommit = textToCommit
             stateCallback(inputting)
             stateCallback(buildCandidate(state: inputting, isTypingVertical: input.isTypingVertical))
           } else {  // 不要在注音沒敲完整的情況下叫出統合符號選單。
@@ -334,7 +329,7 @@ extension KeyHandler {
     let punctuationNamePrefix: String = generatePunctuationNamePrefix(withKeyCondition: input)
     let parser = currentMandarinParser
     let arrCustomPunctuations: [String] = [
-      punctuationNamePrefix, parser, String(format: "%c", CChar(charCode)),
+      punctuationNamePrefix, parser, String(format: "%c", charCode.isPrintableASCII ? CChar(charCode) : inputText),
     ]
     let customPunctuation: String = arrCustomPunctuations.joined(separator: "")
     if handlePunctuation(
@@ -349,7 +344,9 @@ extension KeyHandler {
 
     /// 如果仍無匹配結果的話，看看這個輸入是否是不需要修飾鍵的那種標點鍵輸入。
 
-    let arrPunctuations: [String] = [punctuationNamePrefix, String(format: "%c", CChar(charCode))]
+    let arrPunctuations: [String] = [
+      punctuationNamePrefix, String(format: "%c", charCode.isPrintableASCII ? CChar(charCode) : inputText),
+    ]
     let punctuation: String = arrPunctuations.joined(separator: "")
 
     if handlePunctuation(
@@ -362,20 +359,6 @@ extension KeyHandler {
       return true
     }
 
-    // 這裡不使用小麥注音 2.2 版的組字區處理方式，而是直接由詞庫負責。
-    if input.isUpperCaseASCIILetterKey {
-      let letter: String! = String(format: "%@%c", "_letter_", CChar(charCode))
-      if handlePunctuation(
-        letter,
-        state: state,
-        usingVerticalTyping: input.isTypingVertical,
-        stateCallback: stateCallback,
-        errorCallback: errorCallback
-      ) {
-        return true
-      }
-    }
-
     // MARK: 全形/半形空白 (Full-Width / Half-Width Space)
 
     /// 該功能僅可在當前組字區沒有任何內容的時候使用。
@@ -384,6 +367,38 @@ extension KeyHandler {
         stateCallback(InputState.Committing(textToCommit: input.isShiftHold ? "　" : " "))
         stateCallback(InputState.Empty())
         return true
+      }
+    }
+
+    // MARK: 摁住 Shift+字母鍵 的處理 (Shift+Letter Processing)
+
+    // 這裡不使用小麥注音 2.2 版的組字區處理方式，而是直接由詞庫負責。
+    if input.isUpperCaseASCIILetterKey, !input.isCommandHold, !input.isControlHold {
+      if input.isShiftHold {  // 這裡先不要判斷 isOptionHold。
+        switch mgrPrefs.upperCaseLetterKeyBehavior {
+          case 1:
+            stateCallback(InputState.Empty())
+            stateCallback(InputState.Committing(textToCommit: inputText.lowercased()))
+            stateCallback(InputState.Empty())
+            return true
+          case 2:
+            stateCallback(InputState.Empty())
+            stateCallback(InputState.Committing(textToCommit: inputText.uppercased()))
+            stateCallback(InputState.Empty())
+            return true
+          default:  // 包括 case 0，直接塞給組字區。
+            let letter: String! = String(
+              format: "%@%c", "_letter_", charCode.isPrintableASCII ? CChar(charCode) : inputText)
+            if handlePunctuation(
+              letter,
+              state: state,
+              usingVerticalTyping: input.isTypingVertical,
+              stateCallback: stateCallback,
+              errorCallback: errorCallback
+            ) {
+              return true
+            }
+        }
       }
     }
 

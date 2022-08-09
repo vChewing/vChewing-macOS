@@ -31,9 +31,9 @@ extension vChewing.LMInstantiator {
         var date3 = ChineseConverter.convertArabicNumeralsToChinese(target: date2)
         date3 = date3.replacingOccurrences(of: "年〇", with: "年")
         date3 = date3.replacingOccurrences(of: "月〇", with: "月")
-        results.append(.init(keyValue: .init(key: key, value: date1), score: -94))
-        results.append(.init(keyValue: .init(key: key, value: date2), score: -95))
-        results.append(.init(keyValue: .init(key: key, value: date3), score: -96))
+        results.append(.init(value: date1, score: -94))
+        results.append(.init(value: date2, score: -95))
+        results.append(.init(value: date3, score: -96))
         if let currentDateShortened = currentDateShortened, delta.year != 0 {
           var dateAlt1: String = formatterDate1.string(from: currentDateShortened)
           dateAlt1.regReplace(pattern: #"^0+"#)
@@ -42,9 +42,9 @@ extension vChewing.LMInstantiator {
           var dateAlt3 = ChineseConverter.convertArabicNumeralsToChinese(target: dateAlt2)
           dateAlt3 = dateAlt3.replacingOccurrences(of: "年〇", with: "年")
           dateAlt3 = dateAlt3.replacingOccurrences(of: "月〇", with: "月")
-          results.append(.init(keyValue: .init(key: key, value: dateAlt1), score: -97))
-          results.append(.init(keyValue: .init(key: key, value: dateAlt2), score: -98))
-          results.append(.init(keyValue: .init(key: key, value: dateAlt3), score: -99))
+          results.append(.init(value: dateAlt1, score: -97))
+          results.append(.init(value: dateAlt2, score: -98))
+          results.append(.init(value: dateAlt3, score: -99))
         }
       case "ㄕˊ-ㄐㄧㄢ":
         let formatterTime1 = DateFormatter()
@@ -56,9 +56,9 @@ extension vChewing.LMInstantiator {
         let time1 = formatterTime1.string(from: currentDate)
         let time2 = formatterTime2.string(from: currentDate)
         let time3 = formatterTime3.string(from: currentDate)
-        results.append(.init(keyValue: .init(key: key, value: time1), score: -97))
-        results.append(.init(keyValue: .init(key: key, value: time2), score: -98))
-        results.append(.init(keyValue: .init(key: key, value: time3), score: -99))
+        results.append(.init(value: time1, score: -97))
+        results.append(.init(value: time2, score: -98))
+        results.append(.init(value: time3, score: -99))
       case "ㄒㄧㄥ-ㄑㄧ", "ㄒㄧㄥ-ㄑㄧˊ":
         let formatterWeek1 = DateFormatter()
         let formatterWeek2 = DateFormatter()
@@ -68,8 +68,8 @@ extension vChewing.LMInstantiator {
         formatterWeek2.locale = theLocale
         let week1 = formatterWeek1.string(from: currentDate)
         let week2 = formatterWeek2.string(from: currentDate)
-        results.append(.init(keyValue: .init(key: key, value: week1), score: -98))
-        results.append(.init(keyValue: .init(key: key, value: week2), score: -99))
+        results.append(.init(value: week1, score: -98))
+        results.append(.init(value: week2, score: -99))
       default: return .init()
     }
     return results

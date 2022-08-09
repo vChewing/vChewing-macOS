@@ -51,7 +51,6 @@ extension KeyHandler {
         // 就將當前的組字緩衝區析構處理、強制重設輸入狀態。
         // 否則，一個本不該出現的真空組字緩衝區會使前後方向鍵與 BackSpace 鍵失靈。
         // 所以這裡需要對 compositor.isEmpty 做判定。
-        clear()
         stateCallback(InputState.EmptyIgnoringPreviousState())
         stateCallback(InputState.Empty())
       } else {
@@ -67,7 +66,6 @@ extension KeyHandler {
 
     if input.isEnter {
       if state is InputState.AssociatedPhrases, !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter {
-        clear()
         stateCallback(InputState.EmptyIgnoringPreviousState())
         stateCallback(InputState.Empty())
         return true
@@ -309,13 +307,15 @@ extension KeyHandler {
       let punctuationNamePrefix: String = generatePunctuationNamePrefix(withKeyCondition: input)
       let parser = currentMandarinParser
       let arrCustomPunctuations: [String] = [
-        punctuationNamePrefix, parser, String(format: "%c", CChar(charCode)),
+        punctuationNamePrefix, parser, String(format: "%c", charCode.isPrintableASCII ? CChar(charCode) : inputText),
       ]
       let customPunctuation: String = arrCustomPunctuations.joined(separator: "")
 
       /// 看看這個輸入是否是不需要修飾鍵的那種標點鍵輸入。
 
-      let arrPunctuations: [String] = [punctuationNamePrefix, String(format: "%c", CChar(charCode))]
+      let arrPunctuations: [String] = [
+        punctuationNamePrefix, String(format: "%c", charCode.isPrintableASCII ? CChar(charCode) : inputText),
+      ]
       let punctuation: String = arrPunctuations.joined(separator: "")
 
       var shouldAutoSelectCandidate: Bool =
@@ -323,7 +323,9 @@ extension KeyHandler {
         || currentLM.hasUnigramsFor(key: punctuation)
 
       if !shouldAutoSelectCandidate, input.isUpperCaseASCIILetterKey {
-        let letter: String! = String(format: "%@%c", "_letter_", CChar(charCode))
+        let letter: String! = String(
+          format: "%@%c", "_letter_", charCode.isPrintableASCII ? CChar(charCode) : inputText
+        )
         if currentLM.hasUnigramsFor(key: letter) { shouldAutoSelectCandidate = true }
       }
 
@@ -335,7 +337,6 @@ extension KeyHandler {
             didSelectCandidateAt: candidateIndex,
             ctlCandidate: ctlCandidateCurrent
           )
-          clear()
           stateCallback(InputState.EmptyIgnoringPreviousState())
           stateCallback(InputState.Empty())
           return handle(

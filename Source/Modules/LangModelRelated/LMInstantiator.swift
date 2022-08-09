@@ -175,14 +175,8 @@ extension vChewing {
     /// - Parameter key: 給定的讀音字串。
     /// - Returns: 對應的經過處理的單元圖陣列。
     public func unigramsFor(key: String) -> [Megrez.Unigram] {
-      if key == " " {
-        /// 給空格鍵指定輸出值。
-        let spaceUnigram = Megrez.Unigram(
-          keyValue: Megrez.KeyValuePaired(key: " ", value: " "),
-          score: 0
-        )
-        return [spaceUnigram]
-      }
+      /// 給空格鍵指定輸出值。
+      if key == " " { return [.init(value: " ")] }
 
       /// 準備不同的語言模組容器，開始逐漸往容器陣列內塞入資料。
       var rawAllUnigrams: [Megrez.Unigram] = []
@@ -209,11 +203,11 @@ extension vChewing {
       rawAllUnigrams.append(contentsOf: queryDateTimeUnigrams(with: key))
 
       // 準備過濾清單。因為我們在 Swift 使用 NSOrderedSet，所以就不需要統計清單了。
-      var filteredPairs: Set<Megrez.KeyValuePaired> = []
+      var filteredPairs: Set<String> = []
 
       // 載入要過濾的 KeyValuePair 清單。
       for unigram in lmFiltered.unigramsFor(key: key) {
-        filteredPairs.insert(unigram.keyValue)
+        filteredPairs.insert(unigram.value)
       }
 
       return filterAndTransform(
@@ -243,9 +237,6 @@ extension vChewing {
       lmAssociates.hasValuesFor(pair: pair)
     }
 
-    /// 該函式不起作用，僅用來滿足 LangModelProtocol 協定的要求。
-    public func bigramsFor(precedingKey _: String, key _: String) -> [Megrez.Bigram] { .init() }
-
     // MARK: - 核心函式（對內）
 
     /// 給定單元圖原始結果陣列，經過語彙過濾處理＋置換處理＋去重複處理之後，給出單元圖結果陣列。
@@ -255,20 +246,20 @@ extension vChewing {
     /// - Returns: 經過語彙過濾處理＋置換處理＋去重複處理的單元圖結果陣列。
     func filterAndTransform(
       unigrams: [Megrez.Unigram],
-      filter filteredPairs: Set<Megrez.KeyValuePaired>
+      filter filteredPairs: Set<String>
     ) -> [Megrez.Unigram] {
       var results: [Megrez.Unigram] = []
-      var insertedPairs: Set<Megrez.KeyValuePaired> = []
+      var insertedPairs: Set<String> = []
       for unigram in unigrams {
-        var pair: Megrez.KeyValuePaired = unigram.keyValue
-        if filteredPairs.contains(pair) { continue }
+        var theValue: String = unigram.value
+        if filteredPairs.contains(theValue) { continue }
         if isPhraseReplacementEnabled {
-          let replacement = lmReplacements.valuesFor(key: pair.value)
-          if !replacement.isEmpty { pair.value = replacement }
+          let replacement = lmReplacements.valuesFor(key: theValue)
+          if !replacement.isEmpty { theValue = replacement }
         }
-        if insertedPairs.contains(pair) { continue }
-        results.append(Megrez.Unigram(keyValue: pair, score: unigram.score))
-        insertedPairs.insert(pair)
+        if insertedPairs.contains(theValue) { continue }
+        results.append(Megrez.Unigram(value: theValue, score: unigram.score))
+        insertedPairs.insert(theValue)
       }
       return results
     }

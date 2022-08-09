@@ -22,27 +22,22 @@ extension ctlInputMethod: KeyHandlerDelegate {
     ctlCandidate(controller, didSelectCandidateAtIndex: index)
   }
 
-  func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputStateProtocol)
+  func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputStateProtocol, addToFilter: Bool)
     -> Bool
   {
-    guard let state = state as? InputState.Marking else {
-      return false
-    }
-    if !state.validToWrite {
-      return false
-    }
+    guard let state = state as? InputState.Marking else { return false }
     let refInputModeReversed: InputMode =
       (keyHandler.inputMode == InputMode.imeModeCHT)
       ? InputMode.imeModeCHS : InputMode.imeModeCHT
     if !mgrLangModel.writeUserPhrase(
       state.userPhrase, inputMode: keyHandler.inputMode,
       areWeDuplicating: state.chkIfUserPhraseExists,
-      areWeDeleting: ctlInputMethod.areWeDeleting
+      areWeDeleting: addToFilter
     )
       || !mgrLangModel.writeUserPhrase(
         state.userPhraseConverted, inputMode: refInputModeReversed,
         areWeDuplicating: false,
-        areWeDeleting: ctlInputMethod.areWeDeleting
+        areWeDeleting: addToFilter
       )
     {
       return false
@@ -116,9 +111,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
       let inputting = keyHandler.buildInputtingState
 
       if mgrPrefs.useSCPCTypingMode {
-        keyHandler.clear()
-        let composingBuffer = inputting.composingBuffer
-        handle(state: InputState.Committing(textToCommit: composingBuffer))
+        handle(state: InputState.Committing(textToCommit: inputting.composingBuffer))
         // 此時是逐字選字模式，所以「selectedValue.1」是單個字、不用追加處理。
         if mgrPrefs.associatedPhrasesEnabled,
           let associatePhrases = keyHandler.buildAssociatePhraseState(

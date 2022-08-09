@@ -29,7 +29,7 @@
 "\"%@\" length must ≥ 2 for a user phrase." = "「%@」もう１つ文字のお選びを。";
 "\"%@\" length should ≤ %d for a user phrase." = "「%@」文字数過剰で登録不可、%d 文字以内にして下さい。";
 "\"%@\" selected. ENTER to add user phrase." = "「%@」を ENTER で辞書に登録。";
-"\"%@\" already exists: ENTER to boost, \n SHIFT+CMD+ENTER to exclude." = "「%@」は既存語彙：ENTER で最優先にし；\n　SHIFT+CMD+ENTER で排除。";
+"\"%@\" already exists: ENTER to boost, SHIFT+CMD+ENTER to nerf, \n BackSpace or Delete key to exclude." = "「%@」は既存語彙：ENTER で最優先にし、SHIFT+CMD+ENTER で優先順位を下げる；\n　BackSpace 或いは Delete で排除。";
 "Edit Phrase Replacement Table…" = "言葉置換表を編集…";
 "Use Phrase Replacement" = "言葉置換機能";
 "Candidates keys cannot be empty." = "言選り用キー陣列に何かキーをご登録ください。";
@@ -113,6 +113,7 @@
 "Choose or hit Enter to confim your prefered keys for selecting candidates." = "お好きなる言選り用キー陣列をご指定ください。新しい組み合わせは Enter で効かす。";
 "Choose the behavior of (Shift+)Space key with candidates." = "入力候補についての (Shift+)Space キーの輪番切替対象をご指定ください。";
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "入力候補陳列での (Shift+)Tab キーの輪番切替対象をご指定ください。";
+"Choose the behavior of Shift+Letter key with letter inputs." = "Shift+文字キーの行為をご指定ください。";
 "Choose the cursor position where you want to list possible candidates." = "カーソルはどこで入力候補を呼び出すかとご指定ださい。";
 "Choose the macOS-level basic keyboard layout." = "macOS 基礎キーボード配置をご指定ください。";
 "Choose the phonetic layout for Mandarin parser." = "共通語分析器の注音配列をご指定ください。";
@@ -123,6 +124,8 @@
 "Dachen 26 (libChewing)" = "酷音大千 26 キー配列";
 "Debug Mode" = "欠陥辿着モード";
 "Dictionary" = "辞書設定";
+"Directly commit lowercased letters" = "ローマ字（小文字）を直接出力";
+"Directly commit uppercased letters" = "ローマ字（大文字）を直接出力";
 "Emulating select-candidate-per-character mode" = "漢字１つづつ全候補選択入力モード";
 "Enable CNS11643 Support (2022-07-20)" = "全字庫モード // 入力可能な漢字数を倍増す (2022-07-20)";
 "Enable Space key for calling candidate window" = "Space キーで入力候補を呼び出す";
@@ -143,8 +146,8 @@
 "IBM" = "IBM 配列";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "単語の前で // macOS 内蔵注音入力のやり方";
 "Japanese" = "和語";
-"Keyboard" = "配列設定";
 "Keyboard Shortcuts:" = "ショートカット:";
+"Keyboard" = "配列設定";
 "Misc Settings:" = "他の設定:";
 "MiTAC" = "神通配列";
 "Non-QWERTY alphanumeral keyboard layouts are for Hanyu Pinyin parser only." = "QWERTY 以外の英数キーボードは漢語弁音以外の配列に不適用。";
@@ -155,6 +158,7 @@
 "Secondary Pinyin with Numeral Intonation" = "国音二式 (ローマ字+数字音調)";
 "Seigyou" = "精業配列";
 "Selection Keys:" = "言選り用キー:";
+"Shift+Letter:" = "Shift+文字キー:";
 "Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "弁音合併入力（入力緩衝列とヒントで音読みを漢語弁音に）";
 "Show page buttons in candidate window" = "入力候補陳列の側にページボタンを表示";
 "Simplified Chinese" = "簡体中国語";
@@ -163,6 +167,7 @@
 "Starlight" = "星光配列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "マナーモード // 外すと入力間違った時に変な声が出る";
 "Traditional Chinese" = "繁体中国語";
+"Type them into inline composition buffer" = "入力緩衝列にローマ字入力";
 "Typing Style:" = "入力習慣:";
 "UI Language:" = "表示用言語:";
 "Universal Pinyin with Numeral Intonation" = "汎用弁音 (ローマ字+数字音調)";

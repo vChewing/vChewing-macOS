@@ -37,6 +37,8 @@ struct suiPrefPaneExperience: View {
     forKey: UserDef.kKeepReadingUponCompositionError.rawValue)
   @State private var selTogglingAlphanumericalModeWithLShift = UserDefaults.standard.bool(
     forKey: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue)
+  @State private var selUpperCaseLetterKeyBehavior = UserDefaults.standard.integer(
+    forKey: UserDef.kUpperCaseLetterKeyBehavior.rawValue)
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -121,6 +123,19 @@ struct suiPrefPaneExperience: View {
         .labelsHidden()
         .pickerStyle(RadioGroupPickerStyle())
         Text(LocalizedStringKey("Choose the behavior of (Shift+)Space key with candidates."))
+          .preferenceDescription()
+      }
+      Preferences.Section(label: { Text(LocalizedStringKey("Shift+Letter:")) }) {
+        Picker("", selection: $selUpperCaseLetterKeyBehavior) {
+          Text(LocalizedStringKey("Type them into inline composition buffer")).tag(0)
+          Text(LocalizedStringKey("Directly commit lowercased letters")).tag(1)
+          Text(LocalizedStringKey("Directly commit uppercased letters")).tag(2)
+        }.onChange(of: selUpperCaseLetterKeyBehavior) { value in
+          mgrPrefs.upperCaseLetterKeyBehavior = value
+        }
+        .labelsHidden()
+        .pickerStyle(RadioGroupPickerStyle())
+        Text(LocalizedStringKey("Choose the behavior of Shift+Letter key with letter inputs."))
           .preferenceDescription()
       }
       Preferences.Section(label: { Text(LocalizedStringKey("Misc Settings:")) }) {
