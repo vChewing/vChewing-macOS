@@ -359,20 +359,6 @@ extension KeyHandler {
       return true
     }
 
-    // 這裡不使用小麥注音 2.2 版的組字區處理方式，而是直接由詞庫負責。
-    if input.isUpperCaseASCIILetterKey {
-      let letter: String! = String(format: "%@%c", "_letter_", charCode.isPrintableASCII ? CChar(charCode) : inputText)
-      if handlePunctuation(
-        letter,
-        state: state,
-        usingVerticalTyping: input.isTypingVertical,
-        stateCallback: stateCallback,
-        errorCallback: errorCallback
-      ) {
-        return true
-      }
-    }
-
     // MARK: 全形/半形空白 (Full-Width / Half-Width Space)
 
     /// 該功能僅可在當前組字區沒有任何內容的時候使用。
@@ -381,6 +367,38 @@ extension KeyHandler {
         stateCallback(InputState.Committing(textToCommit: input.isShiftHold ? "　" : " "))
         stateCallback(InputState.Empty())
         return true
+      }
+    }
+
+    // MARK: 摁住 Shift+字母鍵 的處理 (Shift+Letter Processing)
+
+    // 這裡不使用小麥注音 2.2 版的組字區處理方式，而是直接由詞庫負責。
+    if input.isUpperCaseASCIILetterKey, !input.isCommandHold, !input.isControlHold {
+      if input.isShiftHold {  // 這裡先不要判斷 isOptionHold。
+        switch mgrPrefs.upperCaseLetterKeyBehavior {
+          case 1:
+            stateCallback(InputState.Empty())
+            stateCallback(InputState.Committing(textToCommit: inputText.lowercased()))
+            stateCallback(InputState.Empty())
+            return true
+          case 2:
+            stateCallback(InputState.Empty())
+            stateCallback(InputState.Committing(textToCommit: inputText.uppercased()))
+            stateCallback(InputState.Empty())
+            return true
+          default:  // 包括 case 0，直接塞給組字區。
+            let letter: String! = String(
+              format: "%@%c", "_letter_", charCode.isPrintableASCII ? CChar(charCode) : inputText)
+            if handlePunctuation(
+              letter,
+              state: state,
+              usingVerticalTyping: input.isTypingVertical,
+              stateCallback: stateCallback,
+              errorCallback: errorCallback
+            ) {
+              return true
+            }
+        }
       }
     }
 
