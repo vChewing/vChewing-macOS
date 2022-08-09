@@ -113,6 +113,7 @@
 "Choose or hit Enter to confim your prefered keys for selecting candidates." = "Choose or hit Enter to confim your prefered keys for selecting candidates.";
 "Choose the behavior of (Shift+)Space key with candidates." = "Choose the behavior of (Shift+)Space key with candidates.";
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "Choose the behavior of (Shift+)Tab key in the candidate window.";
+"Choose the behavior of Shift+Letter key with letter inputs." = "Choose the behavior of Shift+Letter key with letter inputs.";
 "Choose the cursor position where you want to list possible candidates." = "Choose the cursor position where you want to list possible candidates.";
 "Choose the macOS-level basic keyboard layout." = "Choose the macOS-level basic keyboard layout.";
 "Choose the phonetic layout for Mandarin parser." = "Choose the phonetic layout for Mandarin parser.";
@@ -123,6 +124,8 @@
 "Dachen 26 (libChewing)" = "Dachen 26 (libChewing)";
 "Debug Mode" = "Debug Mode";
 "Dictionary" = "Dictionary";
+"Directly commit lowercased letters" = "Directly commit lowercased letters";
+"Directly commit uppercased letters" = "Directly commit uppercased letters";
 "Emulating select-candidate-per-character mode" = "Emulating select-candidate-per-character mode";
 "Enable CNS11643 Support (2022-07-20)" = "Enable CNS11643 Support (2022-07-20)";
 "Enable Space key for calling candidate window" = "Enable Space key for calling candidate window";
@@ -143,8 +146,8 @@
 "IBM" = "IBM";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "in front of the phrase (like macOS built-in Zhuyin IME)";
 "Japanese" = "Japanese";
-"Keyboard" = "Keyboard";
 "Keyboard Shortcuts:" = "Keyboard Shortcuts:";
+"Keyboard" = "Keyboard";
 "Misc Settings:" = "Misc Settings:";
 "MiTAC" = "MiTAC";
 "Non-QWERTY alphanumeral keyboard layouts are for Hanyu Pinyin parser only." = "Non-QWERTY alphanumeral keyboard layouts are for Hanyu Pinyin parser only.";
@@ -155,6 +158,7 @@
 "Secondary Pinyin with Numeral Intonation" = "Secondary Pinyin with Numeral Intonation";
 "Seigyou" = "Seigyou (JinYei)";
 "Selection Keys:" = "Selection Keys:";
+"Shift+Letter:" = "Shift+Letter:";
 "Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "Show Hanyu-Pinyin in the inline composition buffer & tooltip";
 "Show page buttons in candidate window" = "Show page buttons in candidate window";
 "Simplified Chinese" = "Simplified Chinese";
@@ -163,6 +167,7 @@
 "Starlight" = "Starlight";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "Stop farting (when typed phonetic combination is invalid, etc.)";
 "Traditional Chinese" = "Traditional Chinese";
+"Type them into inline composition buffer" = "Type them into inline composition buffer";
 "Typing Style:" = "Typing Style:";
 "UI Language:" = "UI Language:";
 "Universal Pinyin with Numeral Intonation" = "Universal Pinyin with Numeral Intonation";

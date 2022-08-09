@@ -113,6 +113,7 @@
 "Choose or hit Enter to confim your prefered keys for selecting candidates." = "請選擇您所偏好的用來選字的按鍵組合。自訂組合需敲 Enter 鍵生效。";
 "Choose the behavior of (Shift+)Space key with candidates." = "指定 (Shift+)空格鍵 對候選字詞而言的輪替操作對象。";
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "指定 (Shift+)Tab 在選字窗內的輪替操作對象。";
+"Choose the behavior of Shift+Letter key with letter inputs." = "指定 Shift+字母鍵 的行為。";
 "Choose the cursor position where you want to list possible candidates." = "請選擇用以觸發選字的游標相對位置。";
 "Choose the macOS-level basic keyboard layout." = "請選擇 macOS 基礎鍵盤佈局。";
 "Choose the phonetic layout for Mandarin parser." = "請指定普通話/國音分析器所使用的注音排列。";
@@ -123,6 +124,8 @@
 "Dachen 26 (libChewing)" = "酷音大千二十六鍵排列";
 "Debug Mode" = "偵錯模式";
 "Dictionary" = "辭典";
+"Directly commit lowercased letters" = "直接遞交小寫字母";
+"Directly commit uppercased letters" = "直接遞交大寫字母";
 "Emulating select-candidate-per-character mode" = "模擬 90 年代前期注音逐字選字輸入風格";
 "Enable CNS11643 Support (2022-07-20)" = "啟用 CNS11643 全字庫支援 (2022-07-20)";
 "Enable Space key for calling candidate window" = "敲空格鍵以呼出候選字窗";
@@ -143,8 +146,8 @@
 "IBM" = "IBM 排列";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "將游標置於詞語前方 // macOS 內建注音風格";
 "Japanese" = "和語";
-"Keyboard" = "鍵盤";
 "Keyboard Shortcuts:" = "鍵盤快速鍵:";
+"Keyboard" = "鍵盤";
 "Misc Settings:" = "雜項:";
 "MiTAC" = "神通排列";
 "Non-QWERTY alphanumeral keyboard layouts are for Hanyu Pinyin parser only." = "QWERTY 以外的英數佈局是為了漢語拼音排列使用者而準備的。";
@@ -155,6 +158,7 @@
 "Secondary Pinyin with Numeral Intonation" = "國音二式+數字標調";
 "Seigyou" = "精業排列";
 "Selection Keys:" = "選字鍵:";
+"Shift+Letter:" = "Shift+字母鍵:";
 "Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "拼音並擊（組字區與工具提示內顯示漢語拼音）";
 "Show page buttons in candidate window" = "在選字窗內顯示翻頁按鈕";
 "Simplified Chinese" = "簡體中文";
@@ -163,6 +167,7 @@
 "Starlight" = "星光排列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉恥模式 // 取消勾選的話，敲錯字時會有異音";
 "Traditional Chinese" = "繁體中文";
+"Type them into inline composition buffer" = "直接鍵入內文組字區";
 "Typing Style:" = "輸入風格:";
 "UI Language:" = "介面語言:";
 "Universal Pinyin with Numeral Intonation" = "通用拼音+數字標調";
