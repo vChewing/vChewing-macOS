@@ -79,6 +79,7 @@ public enum IME {
     // 所以這裡不需要特別處理。
     mgrLangModel.loadUserAssociatesData()
     mgrLangModel.loadUserPhraseReplacement()
+    mgrLangModel.loadUserSCPCSequencesData()
     mgrLangModel.loadUserPhrasesData()
     if !userOnly {
       // mgrLangModel.loadDataModels()
