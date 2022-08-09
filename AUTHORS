@@ -32,8 +32,8 @@ $ Contributors and volunteers of the upstream repo, having no responsibility in 
 Although there is no Lukhnos's codes left in the current repository, we still credit him for his previous work:
 
 - Lukhnos Liu:
-    - Developer of Gramambular language engine (removed since vChewing 1.5.4).
-        - Shiki Suen's Megrez engine is basically a Swift-rewritten version of Gramambular with further development.
+    - Developer of Gramambular 2 language engine (removed since vChewing 1.5.4).
+        - Shiki Suen's Megrez engine (MIT License) is basically a Swift-rewritten version of Gramambular 2 with further development.
     - Developer of Mandarin syllable composer (removed since vChewing 1.5.7).
         - Shiki Suen's Tekkon engine is made from scratch and has no relationship to Mandarin syllable composer.
 
