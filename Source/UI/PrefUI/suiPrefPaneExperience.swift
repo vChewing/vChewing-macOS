@@ -11,9 +11,7 @@ import SwiftUI
 
 @available(macOS 11.0, *)
 struct suiPrefPaneExperience: View {
-  @State private var selSelectionKeysList = mgrPrefs.suggestedCandidateKeys
-  @State private var selSelectionKeys =
-    (UserDefaults.standard.string(forKey: UserDef.kCandidateKeys.rawValue) ?? mgrPrefs.defaultCandidateKeys) as String
+
   @State private var selCursorPosition =
     UserDefaults.standard.bool(
       forKey: UserDef.kUseRearCursorMode.rawValue) ? 1 : 0
@@ -54,34 +52,6 @@ struct suiPrefPaneExperience: View {
 
   var body: some View {
     Preferences.Container(contentWidth: contentWidth) {
-      Preferences.Section(label: { Text(LocalizedStringKey("Selection Keys:")) }) {
-        ComboBox(items: mgrPrefs.suggestedCandidateKeys, text: $selSelectionKeys).frame(width: 180).onChange(
-          of: selSelectionKeys
-        ) { value in
-          let keys: String = value.trimmingCharacters(in: .whitespacesAndNewlines).deduplicate
-          do {
-            try mgrPrefs.validate(candidateKeys: keys)
-            mgrPrefs.candidateKeys = keys
-            selSelectionKeys = mgrPrefs.candidateKeys
-          } catch mgrPrefs.CandidateKeyError.empty {
-            selSelectionKeys = mgrPrefs.candidateKeys
-          } catch {
-            if let window = ctlPrefUI.shared.controller.window {
-              let alert = NSAlert(error: error)
-              alert.beginSheetModal(for: window) { _ in
-                selSelectionKeys = mgrPrefs.candidateKeys
-              }
-              clsSFX.beep()
-            }
-          }
-        }
-        Text(
-          LocalizedStringKey(
-            "Choose or hit Enter to confim your prefered keys for selecting candidates."
-          )
-        )
-        .preferenceDescription()
-      }
       Preferences.Section(label: { Text(LocalizedStringKey("Cursor Selection:")) }) {
         Picker("", selection: $selCursorPosition) {
           Text(LocalizedStringKey("in front of the phrase (like macOS built-in Zhuyin IME)")).tag(0)

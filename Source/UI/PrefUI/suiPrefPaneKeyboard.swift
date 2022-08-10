@@ -10,6 +10,9 @@ import SwiftUI
 
 @available(macOS 11.0, *)
 struct suiPrefPaneKeyboard: View {
+  @State private var selSelectionKeysList = mgrPrefs.suggestedCandidateKeys
+  @State private var selSelectionKeys =
+    UserDefaults.standard.string(forKey: UserDef.kCandidateKeys.rawValue) ?? mgrPrefs.defaultCandidateKeys
   @State private var selMandarinParser = UserDefaults.standard.integer(forKey: UserDef.kMandarinParser.rawValue)
   @State private var selBasicKeyboardLayout: String =
     UserDefaults.standard.string(forKey: UserDef.kBasicKeyboardLayout.rawValue) ?? mgrPrefs.basicKeyboardLayout
@@ -40,6 +43,34 @@ struct suiPrefPaneKeyboard: View {
 
   var body: some View {
     Preferences.Container(contentWidth: contentWidth) {
+      Preferences.Section(label: { Text(LocalizedStringKey("Selection Keys:")) }) {
+        ComboBox(items: mgrPrefs.suggestedCandidateKeys, text: $selSelectionKeys).frame(width: 180).onChange(
+          of: selSelectionKeys
+        ) { value in
+          let keys: String = value.trimmingCharacters(in: .whitespacesAndNewlines).deduplicate
+          do {
+            try mgrPrefs.validate(candidateKeys: keys)
+            mgrPrefs.candidateKeys = keys
+            selSelectionKeys = mgrPrefs.candidateKeys
+          } catch mgrPrefs.CandidateKeyError.empty {
+            selSelectionKeys = mgrPrefs.candidateKeys
+          } catch {
+            if let window = ctlPrefUI.shared.controller.window {
+              let alert = NSAlert(error: error)
+              alert.beginSheetModal(for: window) { _ in
+                selSelectionKeys = mgrPrefs.candidateKeys
+              }
+              clsSFX.beep()
+            }
+          }
+        }
+        Text(
+          LocalizedStringKey(
+            "Choose or hit Enter to confim your prefered keys for selecting candidates."
+          )
+        )
+        .preferenceDescription()
+      }
       Preferences.Section(label: { Text(LocalizedStringKey("Phonetic Parser:")) }) {
         HStack {
           Picker("", selection: $selMandarinParser) {
