@@ -150,7 +150,7 @@
 "Keyboard" = "配列設定";
 "Misc Settings:" = "他の設定:";
 "MiTAC" = "神通配列";
-"Non-QWERTY alphanumeral keyboard layouts are for Hanyu Pinyin parser only." = "QWERTY 以外の英数キーボードは漢語弁音以外の配列に不適用。";
+"Non-QWERTY alphanumerical keyboard layouts are for Hanyu Pinyin parser only." = "QWERTY 以外の英数キーボードは漢語弁音以外の配列に不適用。";
 "Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter" = "Ctrl(+Alt)+CMD+Enter で出すのを漢語弁音と変換";
 "Output Settings:" = "出力設定:";
 "Phonetic Parser:" = "注音配列:";

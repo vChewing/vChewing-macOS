@@ -181,7 +181,7 @@ struct suiPrefPaneKeyboard: View {
         VStack(alignment: .leading, spacing: 10) {
           Text(
             LocalizedStringKey(
-              "Non-QWERTY alphanumeral keyboard layouts are for Hanyu Pinyin parser only."
+              "Non-QWERTY alphanumerical keyboard layouts are for Hanyu Pinyin parser only."
             )
           )
           .preferenceDescription()
