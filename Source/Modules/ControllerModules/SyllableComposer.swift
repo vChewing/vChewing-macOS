@@ -922,7 +922,8 @@ public struct Tekkon {
   ///   - newToneOne: 對陰平指定新的標記。預設情況下該標記為空字串。
   /// - Returns: 轉換結果。
   static func cnvHanyuPinyinToPhona(target: String, newToneOne: String = "") -> String {
-    if target.contains("_") { return target }
+    /// 如果當前內容有任何除了半形英數內容以外的內容的話，就直接放棄轉換。
+    if target.contains("_") || !target.isNotPureAlphanumerical { return target }
     var result = target
     for key in Tekkon.mapHanyuPinyin.keys.sorted(by: { $0.count > $1.count }) {
       guard let value = Tekkon.mapHanyuPinyin[key] else { continue }
@@ -1445,4 +1446,13 @@ public struct Tekkon {
     "h": "ㄏ", "i": "ㄟ", "j": "ㄐ", "k": "ㄎ", "l": "ㄌ", "m": "ㄇ", "n": "ㄋ", "o": "ㄛ", "p": "ㄆ", "q": "ㄑ", "r": "ㄖ",
     "s": "ㄙ", "t": "ㄊ", "u": "ㄡ", "v": "ㄩ", "w": "ㄨ", "x": "ㄒ", "y": "ㄧ", "z": "ㄗ", " ": " ",
   ]
+}
+
+/// 檢測字串是否包含半形英數內容
+extension String {
+  fileprivate var isNotPureAlphanumerical: Bool {
+    let regex = ".*[^A-Za-z0-9].*"
+    let testString = NSPredicate(format: "SELF MATCHES %@", regex)
+    return testString.evaluate(with: self)
+  }
 }
