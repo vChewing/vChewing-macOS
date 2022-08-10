@@ -79,12 +79,8 @@ extension Megrez.Compositor {
     // 再獲取以當前位置結尾或開頭的節點。
     let begin: Int = location - min(location, Megrez.Compositor.maxSpanLength - 1)
     for theLocation in begin..<location {
-      let (A, B): (Int, Int) = {
-        (
-          min(location - theLocation + 1, spans[theLocation].maxLength),
-          max(location - theLocation + 1, spans[theLocation].maxLength)
-        )
-      }()
+      let (A, B): (Int, Int) = (location - theLocation + 1, spans[theLocation].maxLength)
+      guard A <= B else { continue }
       for theLength in A...B {
         guard let node = spans[theLocation].nodeOf(length: theLength) else { continue }
         results.append(.init(node: node, spanIndex: theLocation))
