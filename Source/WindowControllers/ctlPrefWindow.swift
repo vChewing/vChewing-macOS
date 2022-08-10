@@ -375,7 +375,7 @@ extension ctlPrefWindow: NSToolbarDelegate {
             systemSymbolName: "wrench.and.screwdriver.fill", accessibilityDescription: "General Preferences"
           )
         } else {
-          item.image = NSImage(named: NSImage.homeTemplateName)
+          item.image = NSImage(named: "PrefToolbar-General")
         }
         item.action = #selector(showGeneralView(_:))
 
@@ -387,7 +387,7 @@ extension ctlPrefWindow: NSToolbarDelegate {
             systemSymbolName: "person.fill.questionmark", accessibilityDescription: "Experiences Preferences"
           )
         } else {
-          item.image = NSImage(named: NSImage.flowViewTemplateName)
+          item.image = NSImage(named: "PrefToolbar-Experiences")
         }
         item.action = #selector(showExperienceView(_:))
 
@@ -399,7 +399,7 @@ extension ctlPrefWindow: NSToolbarDelegate {
             systemSymbolName: "character.book.closed.fill", accessibilityDescription: "Dictionary Preferences"
           )
         } else {
-          item.image = NSImage(named: NSImage.bookmarksTemplateName)
+          item.image = NSImage(named: "PrefToolbar-Dictionary")
         }
         item.action = #selector(showDictionaryView(_:))
 
@@ -409,7 +409,7 @@ extension ctlPrefWindow: NSToolbarDelegate {
         if #available(macOS 11.0, *) {
           item.image = NSImage(systemSymbolName: "keyboard.macwindow", accessibilityDescription: "Keyboard Preferences")
         } else {
-          item.image = NSImage(named: NSImage.slideshowTemplateName)
+          item.image = NSImage(named: "PrefToolbar-Keyboard")
         }
         item.action = #selector(showKeyboardView(_:))
 
