@@ -190,20 +190,6 @@ private class vwrCandidateUniversal: NSView {
           } else {
             NSColor.controlBackgroundColor.setFill()
           }
-          switch IME.currentInputMode {
-            case InputMode.imeModeCHS:
-              if #available(macOS 12.0, *) {
-                activeCandidateAttr[.languageIdentifier] = "zh-Hans" as AnyObject
-              }
-            case InputMode.imeModeCHT:
-              if #available(macOS 12.0, *) {
-                activeCandidateAttr[.languageIdentifier] =
-                  (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
-                  ? "ja" as AnyObject : "zh-Hant" as AnyObject
-              }
-            default:
-              break
-          }
           NSBezierPath.fill(rctCandidateArea)
           (keyLabels[index] as NSString).draw(
             in: rctLabel, withAttributes: activeCandidateIndexAttr
@@ -259,20 +245,6 @@ private class vwrCandidateUniversal: NSView {
             activeCandidateAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor
           } else {
             NSColor.controlBackgroundColor.setFill()
-          }
-          switch IME.currentInputMode {
-            case InputMode.imeModeCHS:
-              if #available(macOS 12.0, *) {
-                activeCandidateAttr[.languageIdentifier] = "zh-Hans" as AnyObject
-              }
-            case InputMode.imeModeCHT:
-              if #available(macOS 12.0, *) {
-                activeCandidateAttr[.languageIdentifier] =
-                  (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
-                  ? "ja" as AnyObject : "zh-Hant" as AnyObject
-              }
-            default:
-              break
           }
           NSBezierPath.fill(rctCandidateArea)
           (keyLabels[index] as NSString).draw(
