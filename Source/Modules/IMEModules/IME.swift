@@ -77,9 +77,15 @@ public enum IME {
     // mgrLangModel 的 loadUserPhrases 等函式在自動讀取 dataFolderPath 時，
     // 如果發現自訂目錄不可用，則會自動抹去自訂目錄設定、改採預設目錄。
     // 所以這裡不需要特別處理。
-    mgrLangModel.loadUserAssociatesData()
-    mgrLangModel.loadUserPhraseReplacement()
-    mgrLangModel.loadUserSCPCSequencesData()
+    if mgrPrefs.associatedPhrasesEnabled {
+      mgrLangModel.loadUserAssociatesData()
+    }
+    if mgrPrefs.phraseReplacementEnabled {
+      mgrLangModel.loadUserPhraseReplacement()
+    }
+    if mgrPrefs.useSCPCTypingMode {
+      mgrLangModel.loadUserSCPCSequencesData()
+    }
     mgrLangModel.loadUserPhrasesData()
     if !userOnly {
       // mgrLangModel.loadDataModels()
