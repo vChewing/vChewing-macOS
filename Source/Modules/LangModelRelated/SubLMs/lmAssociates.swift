@@ -32,7 +32,7 @@ extension vChewing {
       }
       let arrTarget = target.dropLast().dropFirst().split(separator: ",")
       guard arrTarget.count == 2 else { return target }
-      return "(\(Tekkon.cnvHanyuPinyinToPhona(target: String(arrTarget[0]))),\(arrTarget[1]))"
+      return "(\(Tekkon.cnvHanyuPinyinToPhona(target: String(arrTarget[0]).lowercased())),\(arrTarget[1]))"
     }
 
     @discardableResult public mutating func open(_ path: String) -> Bool {
