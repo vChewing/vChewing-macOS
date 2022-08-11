@@ -49,6 +49,7 @@ public enum UserDef: String, CaseIterable {
   case kKeepReadingUponCompositionError = "KeepReadingUponCompositionError"
   case kTogglingAlphanumericalModeWithLShift = "TogglingAlphanumericalModeWithLShift"
   case kUpperCaseLetterKeyBehavior = "UpperCaseLetterKeyBehavior"
+  case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
 
   case kCandidateTextFontName = "CandidateTextFontName"
   case kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
@@ -275,6 +276,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.upperCaseLetterKeyBehavior, forKey: UserDef.kUpperCaseLetterKeyBehavior.rawValue
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.useIMKCandidateWindow, forKey: UserDef.kUseIMKCandidateWindow.rawValue
+    )
 
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeySCPC, forKey: UserDef.kUsingHotKeySCPC.rawValue)
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyAssociates, forKey: UserDef.kUsingHotKeyAssociates.rawValue)
@@ -378,6 +382,14 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kUpperCaseLetterKeyBehavior.rawValue, defaultValue: 0)
   static var upperCaseLetterKeyBehavior: Int
+
+  @UserDefault(key: UserDef.kUseIMKCandidateWindow.rawValue, defaultValue: false)
+  static var useIMKCandidateWindow: Bool {
+    didSet {
+      NSLog("vChewing App self-terminated due to enabling / disabling IMK candidate window.")
+      NSApplication.shared.terminate(nil)
+    }
+  }
 
   // MARK: - Settings (Tier 2)
 
