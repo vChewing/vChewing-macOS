@@ -25,7 +25,8 @@ class ctlInputMethod: IMKInputController {
   static var areWeNerfing = false
 
   /// 目前在用的的選字窗副本。
-  static var ctlCandidateCurrent: ctlCandidateProtocol = ctlCandidateIMK.init(.horizontal)
+  static var ctlCandidateCurrent: ctlCandidateProtocol =
+    mgrPrefs.useIMKCandidateWindow ? ctlCandidateIMK.init(.horizontal) : ctlCandidateUniversal.init(.horizontal)
 
   /// 工具提示視窗的副本。
   static let tooltipController = TooltipController()
