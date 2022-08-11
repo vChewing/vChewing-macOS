@@ -387,7 +387,8 @@ extension KeyHandler {
             return true
           default:  // 包括 case 0，直接塞給組字區。
             let letter: String! = String(
-              format: "%@%c", "_letter_", charCode.isPrintableASCII ? CChar(charCode) : inputText)
+              format: "%@%c", "_letter_", charCode.isPrintableASCII ? CChar(charCode) : inputText
+            )
             if handlePunctuation(
               letter,
               state: state,

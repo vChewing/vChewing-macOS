@@ -195,8 +195,8 @@ class ctlInputMethod: IMKInputController {
             message: String(
               format: "%@%@%@", NSLocalizedString("Alphanumerical Mode", comment: ""), "\n",
               toggleASCIIMode()
-              ? NSLocalizedString("NotificationSwitchON", comment: "")
-              : NSLocalizedString("NotificationSwitchOFF", comment: "")
+                ? NSLocalizedString("NotificationSwitchON", comment: "")
+                : NSLocalizedString("NotificationSwitchOFF", comment: "")
             )
           )
         }

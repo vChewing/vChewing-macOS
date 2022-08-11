@@ -194,7 +194,7 @@ extension vChewing {
 
       // 如果有檢測到使用者自訂逐字選字語料庫內的相關資料的話，在這裡先插入。
       if mgrPrefs.useSCPCTypingMode {
-        rawAllUnigrams += lmPlainBopomofo.valuesFor(key: key).map { Megrez.Unigram.init(value: $0, score: 0) }
+        rawAllUnigrams += lmPlainBopomofo.valuesFor(key: key).map { Megrez.Unigram(value: $0, score: 0) }
       }
 
       // 用 reversed 指令讓使用者語彙檔案內的詞條優先順序隨著行數增加而逐漸增高。
