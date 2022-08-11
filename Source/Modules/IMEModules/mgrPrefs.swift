@@ -23,7 +23,7 @@ public enum UserDef: String, CaseIterable {
   case kCandidateListTextSize = "CandidateListTextSize"
   case kAppleLanguages = "AppleLanguages"
   case kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
-  case kUseRearCursorMode = "useRearCursorMode"
+  case kUseRearCursorMode = "UseRearCursorMode"
   case kUseHorizontalCandidateList = "UseHorizontalCandidateList"
   case kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
   case kCNS11643Enabled = "CNS11643Enabled"
