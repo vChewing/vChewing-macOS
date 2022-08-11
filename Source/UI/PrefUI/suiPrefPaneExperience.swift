@@ -9,9 +9,8 @@
 import Cocoa
 import SwiftUI
 
-@available(macOS 11.0, *)
+@available(macOS 10.15, *)
 struct suiPrefPaneExperience: View {
-
   @State private var selCursorPosition =
     UserDefaults.standard.bool(
       forKey: UserDef.kUseRearCursorMode.rawValue) ? 1 : 0
@@ -53,11 +52,14 @@ struct suiPrefPaneExperience: View {
   var body: some View {
     Preferences.Container(contentWidth: contentWidth) {
       Preferences.Section(label: { Text(LocalizedStringKey("Cursor Selection:")) }) {
-        Picker("", selection: $selCursorPosition) {
+        Picker(
+          "",
+          selection: $selCursorPosition.onChange {
+            mgrPrefs.useRearCursorMode = (selCursorPosition == 1) ? true : false
+          }
+        ) {
           Text(LocalizedStringKey("in front of the phrase (like macOS built-in Zhuyin IME)")).tag(0)
           Text(LocalizedStringKey("at the rear of the phrase (like Microsoft New Phonetic)")).tag(1)
-        }.onChange(of: selCursorPosition) { value in
-          mgrPrefs.useRearCursorMode = (value == 1) ? true : false
         }
         .labelsHidden()
         .pickerStyle(RadioGroupPickerStyle())
@@ -65,17 +67,20 @@ struct suiPrefPaneExperience: View {
           .preferenceDescription()
         Toggle(
           LocalizedStringKey("Push the cursor in front of the phrase after selection"),
-          isOn: $selPushCursorAfterSelection
-        ).onChange(of: selPushCursorAfterSelection) { value in
-          mgrPrefs.moveCursorAfterSelectingCandidate = value
-        }.controlSize(.small)
+          isOn: $selPushCursorAfterSelection.onChange {
+            mgrPrefs.moveCursorAfterSelectingCandidate = selPushCursorAfterSelection
+          }
+        ).controlSize(.small)
       }
       Preferences.Section(title: "(Shift+)Tab:") {
-        Picker("", selection: $selKeyBehaviorShiftTab) {
+        Picker(
+          "",
+          selection: $selKeyBehaviorShiftTab.onChange {
+            mgrPrefs.specifyShiftTabKeyBehavior = (selKeyBehaviorShiftTab == 1) ? true : false
+          }
+        ) {
           Text(LocalizedStringKey("for cycling candidates")).tag(0)
           Text(LocalizedStringKey("for cycling pages")).tag(1)
-        }.onChange(of: selKeyBehaviorShiftTab) { value in
-          mgrPrefs.specifyShiftTabKeyBehavior = (value == 1) ? true : false
         }
         .labelsHidden()
         .horizontalRadioGroupLayout()
@@ -84,11 +89,14 @@ struct suiPrefPaneExperience: View {
           .preferenceDescription()
       }
       Preferences.Section(label: { Text(LocalizedStringKey("(Shift+)Space:")) }) {
-        Picker("", selection: $selKeyBehaviorShiftSpace) {
+        Picker(
+          "",
+          selection: $selKeyBehaviorShiftSpace.onChange {
+            mgrPrefs.specifyShiftSpaceKeyBehavior = (selKeyBehaviorShiftSpace == 1) ? true : false
+          }
+        ) {
           Text(LocalizedStringKey("Space to +cycle candidates, Shift+Space to +cycle pages")).tag(0)
           Text(LocalizedStringKey("Space to +cycle pages, Shift+Space to +cycle candidates")).tag(1)
-        }.onChange(of: selKeyBehaviorShiftSpace) { value in
-          mgrPrefs.specifyShiftSpaceKeyBehavior = (value == 1) ? true : false
         }
         .labelsHidden()
         .pickerStyle(RadioGroupPickerStyle())
@@ -96,12 +104,15 @@ struct suiPrefPaneExperience: View {
           .preferenceDescription()
       }
       Preferences.Section(label: { Text(LocalizedStringKey("Shift+Letter:")) }) {
-        Picker("", selection: $selUpperCaseLetterKeyBehavior) {
+        Picker(
+          "",
+          selection: $selUpperCaseLetterKeyBehavior.onChange {
+            mgrPrefs.upperCaseLetterKeyBehavior = selUpperCaseLetterKeyBehavior
+          }
+        ) {
           Text(LocalizedStringKey("Type them into inline composition buffer")).tag(0)
           Text(LocalizedStringKey("Directly commit lowercased letters")).tag(1)
           Text(LocalizedStringKey("Directly commit uppercased letters")).tag(2)
-        }.onChange(of: selUpperCaseLetterKeyBehavior) { value in
-          mgrPrefs.upperCaseLetterKeyBehavior = value
         }
         .labelsHidden()
         .pickerStyle(RadioGroupPickerStyle())
@@ -111,39 +122,40 @@ struct suiPrefPaneExperience: View {
       Preferences.Section(label: { Text(LocalizedStringKey("Misc Settings:")) }) {
         Toggle(
           LocalizedStringKey("Enable Space key for calling candidate window"),
-          isOn: $selKeyBehaviorSpaceForCallingCandidate
-        ).onChange(of: selKeyBehaviorSpaceForCallingCandidate) { value in
-          mgrPrefs.chooseCandidateUsingSpace = value
-        }
+          isOn: $selKeyBehaviorSpaceForCallingCandidate.onChange {
+            mgrPrefs.chooseCandidateUsingSpace = selKeyBehaviorSpaceForCallingCandidate
+          }
+        )
         Toggle(
           LocalizedStringKey("Use ESC key to clear the entire input buffer"),
-          isOn: $selKeyBehaviorESCForClearingTheBuffer
-        ).onChange(of: selKeyBehaviorESCForClearingTheBuffer) { value in
-          mgrPrefs.escToCleanInputBuffer = value
-        }
+          isOn: $selKeyBehaviorESCForClearingTheBuffer.onChange {
+            mgrPrefs.escToCleanInputBuffer = selKeyBehaviorESCForClearingTheBuffer
+          }
+        )
         Toggle(
           LocalizedStringKey("Automatically correct reading combinations when typing"),
-          isOn: $selAutoCorrectReadingCombination
-        ).onChange(of: selAutoCorrectReadingCombination) { value in
-          mgrPrefs.autoCorrectReadingCombination = value
-        }
+          isOn: $selAutoCorrectReadingCombination.onChange {
+            mgrPrefs.autoCorrectReadingCombination = selAutoCorrectReadingCombination
+          }
+        )
         Toggle(
           LocalizedStringKey("Allow using Enter key to confirm associated candidate selection"),
-          isOn: $selAlsoConfirmAssociatedCandidatesByEnter
-        ).onChange(of: selAlsoConfirmAssociatedCandidatesByEnter) { value in
-          mgrPrefs.alsoConfirmAssociatedCandidatesByEnter = value
-        }
+          isOn: $selAlsoConfirmAssociatedCandidatesByEnter.onChange {
+            mgrPrefs.alsoConfirmAssociatedCandidatesByEnter = selAlsoConfirmAssociatedCandidatesByEnter
+          }
+        )
         Toggle(
           LocalizedStringKey("Also toggle alphanumerical mode with Left-Shift"),
-          isOn: $selTogglingAlphanumericalModeWithLShift
-        ).onChange(of: selTogglingAlphanumericalModeWithLShift) { value in
-          mgrPrefs.togglingAlphanumericalModeWithLShift = value
-        }
+          isOn: $selTogglingAlphanumericalModeWithLShift.onChange {
+            mgrPrefs.togglingAlphanumericalModeWithLShift = selTogglingAlphanumericalModeWithLShift
+          }
+        )
         Toggle(
-          LocalizedStringKey("Emulating select-candidate-per-character mode"), isOn: $selEnableSCPCTypingMode
-        ).onChange(of: selEnableSCPCTypingMode) { value in
-          mgrPrefs.useSCPCTypingMode = value
-        }
+          LocalizedStringKey("Emulating select-candidate-per-character mode"),
+          isOn: $selEnableSCPCTypingMode.onChange {
+            mgrPrefs.useSCPCTypingMode = selEnableSCPCTypingMode
+          }
+        )
         Text(LocalizedStringKey("An accomodation for elder computer users."))
           .preferenceDescription()
       }

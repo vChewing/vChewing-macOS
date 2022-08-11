@@ -8,7 +8,7 @@ import SwiftUI
 // MARK: - NSComboBox
 
 // Ref: https://stackoverflow.com/a/71058587/4162914
-@available(macOS 11.0, *)
+@available(macOS 10.15, *)
 struct ComboBox: NSViewRepresentable {
   // The items that will show up in the pop-up menu:
   var items: [String]
