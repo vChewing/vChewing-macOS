@@ -9,7 +9,7 @@
 import Cocoa
 import SwiftUI
 
-@available(macOS 11.0, *)
+@available(macOS 10.15, *)
 struct suiPrefPaneGeneral: View {
   @State private var selCandidateUIFontSize = UserDefaults.standard.integer(
     forKey: UserDef.kCandidateListTextSize.rawValue)
@@ -53,7 +53,12 @@ struct suiPrefPaneGeneral: View {
   var body: some View {
     Preferences.Container(contentWidth: contentWidth) {
       Preferences.Section(bottomDivider: false, label: { Text(LocalizedStringKey("Candidate Size:")) }) {
-        Picker("", selection: $selCandidateUIFontSize) {
+        Picker(
+          "",
+          selection: $selCandidateUIFontSize.onChange {
+            mgrPrefs.candidateListTextSize = CGFloat(selCandidateUIFontSize)
+          }
+        ) {
           Text("12").tag(12)
           Text("14").tag(14)
           Text("16").tag(16)
@@ -62,8 +67,6 @@ struct suiPrefPaneGeneral: View {
           Text("32").tag(32)
           Text("64").tag(64)
           Text("96").tag(96)
-        }.onChange(of: selCandidateUIFontSize) { value in
-          mgrPrefs.candidateListTextSize = CGFloat(value)
         }
         .labelsHidden()
         .frame(width: 120.0)
@@ -71,27 +74,30 @@ struct suiPrefPaneGeneral: View {
           .preferenceDescription()
       }
       Preferences.Section(bottomDivider: false, label: { Text(LocalizedStringKey("UI Language:")) }) {
-        Picker(LocalizedStringKey("Follow OS settings"), selection: $selUILanguage) {
+        Picker(
+          LocalizedStringKey("Follow OS settings"),
+          selection: $selUILanguage.onChange {
+            IME.prtDebugIntel(selUILanguage[0])
+            if selUILanguage == mgrPrefs.appleLanguages
+              || (selUILanguage[0] == "auto"
+                && UserDefaults.standard.object(forKey: UserDef.kAppleLanguages.rawValue) == nil)
+            {
+              return
+            }
+            if selUILanguage[0] != "auto" {
+              mgrPrefs.appleLanguages = selUILanguage
+            } else {
+              UserDefaults.standard.removeObject(forKey: UserDef.kAppleLanguages.rawValue)
+            }
+            NSLog("vChewing App self-terminated due to UI language change.")
+            NSApplication.shared.terminate(nil)
+          }
+        ) {
           Text(LocalizedStringKey("Follow OS settings")).tag(["auto"])
           Text(LocalizedStringKey("Simplified Chinese")).tag(["zh-Hans"])
           Text(LocalizedStringKey("Traditional Chinese")).tag(["zh-Hant"])
           Text(LocalizedStringKey("Japanese")).tag(["ja"])
           Text(LocalizedStringKey("English")).tag(["en"])
-        }.onChange(of: selUILanguage) { value in
-          IME.prtDebugIntel(value[0])
-          if selUILanguage == mgrPrefs.appleLanguages
-            || (selUILanguage[0] == "auto"
-              && UserDefaults.standard.object(forKey: UserDef.kAppleLanguages.rawValue) == nil)
-          {
-            return
-          }
-          if selUILanguage[0] != "auto" {
-            mgrPrefs.appleLanguages = value
-          } else {
-            UserDefaults.standard.removeObject(forKey: UserDef.kAppleLanguages.rawValue)
-          }
-          NSLog("vChewing App self-terminated due to UI language change.")
-          NSApplication.shared.terminate(nil)
         }
         .labelsHidden()
         .frame(width: 180.0)
@@ -100,11 +106,14 @@ struct suiPrefPaneGeneral: View {
           .preferenceDescription()
       }
       Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Candidate Layout:")) }) {
-        Picker("", selection: $selEnableHorizontalCandidateLayout) {
+        Picker(
+          "",
+          selection: $selEnableHorizontalCandidateLayout.onChange {
+            mgrPrefs.useHorizontalCandidateList = selEnableHorizontalCandidateLayout
+          }
+        ) {
           Text(LocalizedStringKey("Vertical")).tag(false)
           Text(LocalizedStringKey("Horizontal")).tag(true)
-        }.onChange(of: selEnableHorizontalCandidateLayout) { value in
-          mgrPrefs.useHorizontalCandidateList = value
         }
         .labelsHidden()
         .horizontalRadioGroupLayout()
@@ -112,11 +121,9 @@ struct suiPrefPaneGeneral: View {
         Text(LocalizedStringKey("Choose your preferred layout of the candidate window."))
           .preferenceDescription()
         Toggle(
-          LocalizedStringKey("Show page buttons in candidate window"), isOn: $selShowPageButtonsInCandidateUI
-        ).onChange(
-          of: selShowPageButtonsInCandidateUI,
-          perform: { value in
-            mgrPrefs.showPageButtonsInCandidateWindow = value
+          LocalizedStringKey("Show page buttons in candidate window"),
+          isOn: $selShowPageButtonsInCandidateUI.onChange {
+            mgrPrefs.showPageButtonsInCandidateWindow = selShowPageButtonsInCandidateUI
           }
         )
         .controlSize(.small)
@@ -124,58 +131,59 @@ struct suiPrefPaneGeneral: View {
       Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Output Settings:")) }) {
         Toggle(
           LocalizedStringKey("Auto-convert traditional Chinese glyphs to KangXi characters"),
-          isOn: $selEnableKanjiConvToKangXi
-        ).onChange(of: selEnableKanjiConvToKangXi) { value in
-          mgrPrefs.chineseConversionEnabled = value
-          selEnableKanjiConvToKangXi = value
-          if value {
-            mgrPrefs.shiftJISShinjitaiOutputEnabled = !value
-            selEnableKanjiConvToJIS = !value
+          isOn: $selEnableKanjiConvToKangXi.onChange {
+            mgrPrefs.chineseConversionEnabled = selEnableKanjiConvToKangXi
+            if selEnableKanjiConvToKangXi {
+              mgrPrefs.shiftJISShinjitaiOutputEnabled = !selEnableKanjiConvToKangXi
+              selEnableKanjiConvToJIS = !selEnableKanjiConvToKangXi
+            }
           }
-        }
+        )
         Toggle(
           LocalizedStringKey("Auto-convert traditional Chinese glyphs to JIS Shinjitai characters"),
-          isOn: $selEnableKanjiConvToJIS
-        ).onChange(of: selEnableKanjiConvToJIS) { value in
-          mgrPrefs.shiftJISShinjitaiOutputEnabled = value
-          selEnableKanjiConvToJIS = value
-          if value {
-            mgrPrefs.chineseConversionEnabled = !value
-            selEnableKanjiConvToKangXi = !value
+          isOn: $selEnableKanjiConvToJIS.onChange {
+            mgrPrefs.shiftJISShinjitaiOutputEnabled = selEnableKanjiConvToJIS
+            if selEnableKanjiConvToJIS {
+              mgrPrefs.chineseConversionEnabled = !selEnableKanjiConvToJIS
+              selEnableKanjiConvToKangXi = !selEnableKanjiConvToJIS
+            }
           }
-        }
+        )
         Toggle(
           LocalizedStringKey("Show Hanyu-Pinyin in the inline composition buffer & tooltip"),
-          isOn: $selShowHanyuPinyinInCompositionBuffer
-        ).onChange(of: selShowHanyuPinyinInCompositionBuffer) { value in
-          mgrPrefs.showHanyuPinyinInCompositionBuffer = value
-          selShowHanyuPinyinInCompositionBuffer = value
-        }
+          isOn: $selShowHanyuPinyinInCompositionBuffer.onChange {
+            mgrPrefs.showHanyuPinyinInCompositionBuffer = selShowHanyuPinyinInCompositionBuffer
+          }
+        )
         Toggle(
           LocalizedStringKey("Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter"),
-          isOn: $selInlineDumpPinyinInLieuOfZhuyin
-        ).onChange(of: selInlineDumpPinyinInLieuOfZhuyin) { value in
-          mgrPrefs.inlineDumpPinyinInLieuOfZhuyin = value
-          selInlineDumpPinyinInLieuOfZhuyin = value
-        }
+          isOn: $selInlineDumpPinyinInLieuOfZhuyin.onChange {
+            mgrPrefs.inlineDumpPinyinInLieuOfZhuyin = selInlineDumpPinyinInLieuOfZhuyin
+          }
+        )
         Toggle(
           LocalizedStringKey("Stop farting (when typed phonetic combination is invalid, etc.)"),
-          isOn: $selEnableFartSuppressor
-        ).onChange(of: selEnableFartSuppressor) { value in
-          mgrPrefs.shouldNotFartInLieuOfBeep = value
-          clsSFX.beep()
-        }
+          isOn: $selEnableFartSuppressor.onChange {
+            mgrPrefs.shouldNotFartInLieuOfBeep = selEnableFartSuppressor
+            clsSFX.beep()
+          }
+        )
       }
       Preferences.Section(label: { Text(LocalizedStringKey("Misc Settings:")).controlSize(.small) }) {
-        Toggle(LocalizedStringKey("Check for updates automatically"), isOn: $selEnableAutoUpdateCheck)
-          .onChange(of: selEnableAutoUpdateCheck) { value in
-            mgrPrefs.checkUpdateAutomatically = value
+        Toggle(
+          LocalizedStringKey("Check for updates automatically"),
+          isOn: $selEnableAutoUpdateCheck.onChange {
+            mgrPrefs.checkUpdateAutomatically = selEnableAutoUpdateCheck
           }
-          .controlSize(.small)
-        Toggle(LocalizedStringKey("Debug Mode"), isOn: $selEnableDebugMode).controlSize(.small)
-          .onChange(of: selEnableDebugMode) { value in
-            mgrPrefs.isDebugModeEnabled = value
+        )
+        .controlSize(.small)
+        Toggle(
+          LocalizedStringKey("Debug Mode"),
+          isOn: $selEnableDebugMode.onChange {
+            mgrPrefs.isDebugModeEnabled = selEnableDebugMode
           }
+        )
+        .controlSize(.small)
       }
     }
   }

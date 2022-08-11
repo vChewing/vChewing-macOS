@@ -185,7 +185,7 @@ extension ctlInputMethod {
   // MARK: - IME Menu Items
 
   @objc override func showPreferences(_: Any?) {
-    if #available(macOS 11.0, *) {
+    if #available(macOS 10.15, *) {
       NSApp.setActivationPolicy(.accessory)
       ctlPrefUI.shared.controller.show(preferencePane: Preferences.PaneIdentifier(rawValue: "General"))
       ctlPrefUI.shared.controller.window?.level = .floating

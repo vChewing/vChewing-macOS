@@ -187,20 +187,22 @@ class ctlInputMethod: IMKInputController {
   @objc(handleEvent:client:) override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
 
-    // 用 Shift 開關半形英數模式。
-    if ShiftKeyUpChecker.check(event) {
-      if !rencentKeyHandledByKeyHandler {
-        NotifierController.notify(
-          message: String(
-            format: "%@%@%@", NSLocalizedString("Alphanumerical Mode", comment: ""), "\n",
-            toggleASCIIMode()
-              ? NSLocalizedString("NotificationSwitchON", comment: "")
-              : NSLocalizedString("NotificationSwitchOFF", comment: "")
+    // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
+    if #available(macOS 10.15, *) {
+      if ShiftKeyUpChecker.check(event) {
+        if !rencentKeyHandledByKeyHandler {
+          NotifierController.notify(
+            message: String(
+              format: "%@%@%@", NSLocalizedString("Alphanumerical Mode", comment: ""), "\n",
+              toggleASCIIMode()
+                ? NSLocalizedString("NotificationSwitchON", comment: "")
+                : NSLocalizedString("NotificationSwitchOFF", comment: "")
+            )
           )
-        )
+        }
+        rencentKeyHandledByKeyHandler = false
+        return false
       }
-      rencentKeyHandledByKeyHandler = false
-      return false
     }
 
     /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。

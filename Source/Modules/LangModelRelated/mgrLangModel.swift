@@ -175,6 +175,15 @@ enum mgrLangModel {
     )
   }
 
+  public static func loadUserSCPCSequencesData() {
+    gLangModelCHT.loadUserSCPCSequencesData(
+      path: mgrLangModel.userSCPCSequencesURL(InputMode.imeModeCHT).path
+    )
+    gLangModelCHS.loadUserSCPCSequencesData(
+      path: mgrLangModel.userSCPCSequencesURL(InputMode.imeModeCHS).path
+    )
+  }
+
   public static func checkIfUserPhraseExist(
     userPhrase: String,
     mode: InputMode,
@@ -256,6 +265,14 @@ enum mgrLangModel {
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
+  /// 使用者逐字選字模式候選字詞順序資料路徑。
+  /// - Parameter mode: 簡繁體輸入模式。
+  /// - Returns: 資料路徑（URL）。
+  static func userSCPCSequencesURL(_ mode: InputMode) -> URL {
+    let fileName = (mode == InputMode.imeModeCHT) ? "data-plain-bpmf-cht.plist" : "data-plain-bpmf-chs.plist"
+    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
+  }
+
   /// 使用者波浪符號選單資料路徑。
   /// - Returns: 資料路徑（URL）。
   static func userSymbolNodeDataURL() -> URL {
@@ -311,6 +328,7 @@ enum mgrLangModel {
         userAssociatesDataURL(mode),
         populateWithTemplate: mode == .imeModeCHS ? kTemplateNameUserAssociatesCHS : kTemplateNameUserAssociatesCHT
       )
+      || !ensureFileExists(userSCPCSequencesURL(mode))
       || !ensureFileExists(userFilteredDataURL(mode), populateWithTemplate: kTemplateNameUserExclusions)
       || !ensureFileExists(userReplacementsDataURL(mode), populateWithTemplate: kTemplateNameUserReplacements)
       || !ensureFileExists(userSymbolDataURL(mode), populateWithTemplate: kTemplateNameUserSymbolPhrases)

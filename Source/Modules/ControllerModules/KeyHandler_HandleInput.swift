@@ -372,7 +372,6 @@ extension KeyHandler {
 
     // MARK: 摁住 Shift+字母鍵 的處理 (Shift+Letter Processing)
 
-    // 這裡不使用小麥注音 2.2 版的組字區處理方式，而是直接由詞庫負責。
     if input.isUpperCaseASCIILetterKey, !input.isCommandHold, !input.isControlHold {
       if input.isShiftHold {  // 這裡先不要判斷 isOptionHold。
         switch mgrPrefs.upperCaseLetterKeyBehavior {
@@ -388,7 +387,8 @@ extension KeyHandler {
             return true
           default:  // 包括 case 0，直接塞給組字區。
             let letter: String! = String(
-              format: "%@%c", "_letter_", charCode.isPrintableASCII ? CChar(charCode) : inputText)
+              format: "%@%c", "_letter_", charCode.isPrintableASCII ? CChar(charCode) : inputText
+            )
             if handlePunctuation(
               letter,
               state: state,

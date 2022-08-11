@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-@available(macOS 11.0, *)
+@available(macOS 10.15, *)
 struct suiPrefPaneDictionary: View {
   private var fdrDefault = mgrLangModel.dataFolderPath(isDefaultFolder: true)
   @State private var tbxUserDataPathSpecified: String =
@@ -43,8 +43,13 @@ struct suiPrefPaneDictionary: View {
       Preferences.Section(title: "", bottomDivider: true) {
         Text(LocalizedStringKey("Choose your desired user data folder path. Will be omitted if invalid."))
         HStack {
-          TextField(fdrDefault, text: $tbxUserDataPathSpecified).disabled(true)
-            .help(tbxUserDataPathSpecified)
+          if #available(macOS 11.0, *) {
+            TextField(fdrDefault, text: $tbxUserDataPathSpecified).disabled(true)
+              .help(tbxUserDataPathSpecified)
+          } else {
+            TextField(fdrDefault, text: $tbxUserDataPathSpecified).disabled(true)
+              .toolTip(tbxUserDataPathSpecified)
+          }
           Button {
             IME.dlgOpenPath.title = NSLocalizedString(
               "Choose your desired user data folder.", comment: ""
@@ -98,48 +103,43 @@ struct suiPrefPaneDictionary: View {
         }
         Toggle(
           LocalizedStringKey("Automatically reload user data files if changes detected"),
-          isOn: $selAutoReloadUserData
-        ).controlSize(.small).onChange(of: selAutoReloadUserData) { value in
-          mgrPrefs.shouldAutoReloadUserDataFiles = value
-        }
+          isOn: $selAutoReloadUserData.onChange {
+            mgrPrefs.shouldAutoReloadUserDataFiles = selAutoReloadUserData
+          }
+        ).controlSize(.small)
         Divider()
         Toggle(
           LocalizedStringKey("Enable CNS11643 Support (2022-07-20)"),
-          isOn: $selEnableCNS11643
+          isOn: $selEnableCNS11643.onChange {
+            mgrPrefs.cns11643Enabled = selEnableCNS11643
+            mgrLangModel.setCNSEnabled(mgrPrefs.cns11643Enabled)
+          }
         )
-        .onChange(of: selEnableCNS11643) { value in
-          mgrPrefs.cns11643Enabled = value
-          mgrLangModel.setCNSEnabled(value)
-        }
         Toggle(
           LocalizedStringKey("Enable symbol input support (incl. certain emoji symbols)"),
-          isOn: $selEnableSymbolInputSupport
+          isOn: $selEnableSymbolInputSupport.onChange {
+            mgrPrefs.symbolInputEnabled = selEnableSymbolInputSupport
+            mgrLangModel.setSymbolEnabled(mgrPrefs.symbolInputEnabled)
+          }
         )
-        .onChange(of: selEnableSymbolInputSupport) { value in
-          mgrPrefs.symbolInputEnabled = value
-          mgrLangModel.setSymbolEnabled(value)
-        }
         Toggle(
           LocalizedStringKey("Allow boosting / excluding a candidate of single kanji"),
-          isOn: $selAllowBoostingSingleKanjiAsUserPhrase
+          isOn: $selAllowBoostingSingleKanjiAsUserPhrase.onChange {
+            mgrPrefs.allowBoostingSingleKanjiAsUserPhrase = selAllowBoostingSingleKanjiAsUserPhrase
+          }
         )
-        .onChange(of: selAllowBoostingSingleKanjiAsUserPhrase) { value in
-          mgrPrefs.allowBoostingSingleKanjiAsUserPhrase = value
-        }
         Toggle(
           LocalizedStringKey("Applying typing suggestions from half-life user override model"),
-          isOn: $selFetchSuggestionsFromUserOverrideModel
+          isOn: $selFetchSuggestionsFromUserOverrideModel.onChange {
+            mgrPrefs.fetchSuggestionsFromUserOverrideModel = selFetchSuggestionsFromUserOverrideModel
+          }
         )
-        .onChange(of: selFetchSuggestionsFromUserOverrideModel) { value in
-          mgrPrefs.fetchSuggestionsFromUserOverrideModel = value
-        }
         Toggle(
           LocalizedStringKey("Always use fixed listing order in candidate window"),
-          isOn: $selUseFixecCandidateOrderOnSelection
+          isOn: $selUseFixecCandidateOrderOnSelection.onChange {
+            mgrPrefs.useFixecCandidateOrderOnSelection = selUseFixecCandidateOrderOnSelection
+          }
         )
-        .onChange(of: selUseFixecCandidateOrderOnSelection) { value in
-          mgrPrefs.useFixecCandidateOrderOnSelection = value
-        }
       }
     }
   }

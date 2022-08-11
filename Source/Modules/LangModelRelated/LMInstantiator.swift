@@ -76,6 +76,7 @@ extension vChewing {
     )
     var lmReplacements = LMReplacments()
     var lmAssociates = LMAssociates()
+    var lmPlainBopomofo = LMPlainBopomofo()
 
     // MARK: - 工具函式
 
@@ -166,6 +167,16 @@ extension vChewing {
       }
     }
 
+    public func loadUserSCPCSequencesData(path: String) {
+      if FileManager.default.isReadableFile(atPath: path) {
+        lmPlainBopomofo.close()
+        lmPlainBopomofo.open(path)
+        IME.prtDebugIntel("lmPlainBopomofo: \(lmPlainBopomofo.count) entries of data loaded from: \(path)")
+      } else {
+        IME.prtDebugIntel("lmPlainBopomofo: File access failure: \(path)")
+      }
+    }
+
     // MARK: - 核心函式（對外）
 
     /// 威注音輸入法目前尚未具備對雙元圖的處理能力，故停用該函式。
@@ -180,6 +191,11 @@ extension vChewing {
 
       /// 準備不同的語言模組容器，開始逐漸往容器陣列內塞入資料。
       var rawAllUnigrams: [Megrez.Unigram] = []
+
+      // 如果有檢測到使用者自訂逐字選字語料庫內的相關資料的話，在這裡先插入。
+      if mgrPrefs.useSCPCTypingMode {
+        rawAllUnigrams += lmPlainBopomofo.valuesFor(key: key).map { Megrez.Unigram(value: $0, score: 0) }
+      }
 
       // 用 reversed 指令讓使用者語彙檔案內的詞條優先順序隨著行數增加而逐漸增高。
       // 這樣一來就可以在就地新增語彙時徹底複寫優先權。

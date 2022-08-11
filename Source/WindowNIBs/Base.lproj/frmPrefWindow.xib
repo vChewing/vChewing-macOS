@@ -410,7 +410,7 @@
                         </column>
                     </cells>
                     <connections>
-                        <binding destination="32" name="selectedTag" keyPath="values.SelectPhraseAfterCursorAsCandidate" id="104"/>
+                        <binding destination="32" name="selectedTag" keyPath="values.UseRearCursorMode" id="8rm-vc-0Db"/>
                     </connections>
                 </matrix>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7z2-DD-c58">

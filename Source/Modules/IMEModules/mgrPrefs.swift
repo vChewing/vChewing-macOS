@@ -23,7 +23,7 @@ public enum UserDef: String, CaseIterable {
   case kCandidateListTextSize = "CandidateListTextSize"
   case kAppleLanguages = "AppleLanguages"
   case kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
-  case kUseRearCursorMode = "useRearCursorMode"
+  case kUseRearCursorMode = "UseRearCursorMode"
   case kUseHorizontalCandidateList = "UseHorizontalCandidateList"
   case kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
   case kCNS11643Enabled = "CNS11643Enabled"
@@ -388,15 +388,6 @@ public enum mgrPrefs {
     mgrPrefs.allowBoostingSingleKanjiAsUserPhrase ? 1 : 2
   }
 
-  @UserDefault(key: UserDef.kUseSCPCTypingMode.rawValue, defaultValue: false)
-  static var useSCPCTypingMode: Bool
-
-  static func toggleSCPCTypingModeEnabled() -> Bool {
-    useSCPCTypingMode = !useSCPCTypingMode
-    UserDefaults.standard.set(useSCPCTypingMode, forKey: UserDef.kUseSCPCTypingMode.rawValue)
-    return useSCPCTypingMode
-  }
-
   @UserDefault(key: UserDef.kMaxCandidateLength.rawValue, defaultValue: 10)
   static var maxCandidateLength: Int
 
@@ -564,8 +555,29 @@ public enum mgrPrefs {
     }
   }
 
+  @UserDefault(key: UserDef.kUseSCPCTypingMode.rawValue, defaultValue: false)
+  static var useSCPCTypingMode: Bool {
+    willSet {
+      DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
+        mgrLangModel.loadUserSCPCSequencesData()
+      }
+    }
+  }
+
+  static func toggleSCPCTypingModeEnabled() -> Bool {
+    useSCPCTypingMode = !useSCPCTypingMode
+    UserDefaults.standard.set(useSCPCTypingMode, forKey: UserDef.kUseSCPCTypingMode.rawValue)
+    return useSCPCTypingMode
+  }
+
   @UserDefault(key: UserDef.kPhraseReplacementEnabled.rawValue, defaultValue: false)
-  static var phraseReplacementEnabled: Bool
+  static var phraseReplacementEnabled: Bool {
+    willSet {
+      DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
+        mgrLangModel.loadUserPhraseReplacement()
+      }
+    }
+  }
 
   static func togglePhraseReplacementEnabled() -> Bool {
     phraseReplacementEnabled = !phraseReplacementEnabled
@@ -575,7 +587,13 @@ public enum mgrPrefs {
   }
 
   @UserDefault(key: UserDef.kAssociatedPhrasesEnabled.rawValue, defaultValue: false)
-  static var associatedPhrasesEnabled: Bool
+  static var associatedPhrasesEnabled: Bool {
+    willSet {
+      DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
+        mgrLangModel.loadUserAssociatesData()
+      }
+    }
+  }
 
   static func toggleAssociatedPhrasesEnabled() -> Bool {
     associatedPhrasesEnabled = !associatedPhrasesEnabled

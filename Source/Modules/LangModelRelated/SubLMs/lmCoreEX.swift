@@ -77,7 +77,7 @@ extension vChewing {
             if !neta[0].isEmpty, !neta[1].isEmpty {
               let theKey = shouldReverse ? String(neta[1]) : String(neta[0])
               let theValue = $0
-              rangeMap[Tekkon.cnvHanyuPinyinToPhona(target: theKey), default: []].append(theValue)
+              rangeMap[Tekkon.cnvHanyuPinyinToPhona(target: theKey.lowercased()), default: []].append(theValue)
             }
           }
         }

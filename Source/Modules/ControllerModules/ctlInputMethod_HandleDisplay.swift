@@ -83,8 +83,23 @@ extension ctlInputMethod {
       return NSFont.systemFont(ofSize: size)
     }
 
+    /// FB10978412: Since macOS 11 Big Sur, CTFontCreateUIFontForLanguage cannot
+    /// distinguish zh-Hans and zh-Hant with correct adoptation of proper PingFang SC/TC variants.
+    ///
+    /// Instructions for Apple Developer relations to reveal this bug:
+    ///
+    /// 1) Remove the usage of ".languageIdentifier" from ctlCandidateUniversal.swift (already done).
+    /// 2) Run "make update" in the project folder to download the latest git-submodule of dictionary file.
+    /// 3) Compile the target "vChewingInstaller", run it. It will install the input method into
+    ///    "~/Library/Input Methods/" folder. Remember to ENABLE BOTH "vChewing-CHS"
+    ///    and "vChewing-CHT" input sources in System Preferences / Settings.
+    /// 4) Type Zhuyin "ej3" (ㄍㄨˇ) (or "gu3" in Pinyin if you enabled Pinyin typing in vChewing preferences.)
+    ///    using both "vChewing-CHS" and "vChewing-CHT", and check the candidate window by pressing SPACE key.
+    /// 5) Do NOT enable either KangXi conversion mode nor JIS conversion mode. They are disabled by default.
+    /// 6) Expecting the glyph differences of the candidate "骨" between PingFang SC and PingFang TC when rendering
+    ///    the candidate window in different "vChewing-CHS" and "vChewing-CHT" input modes.
     func candidateFont(name: String?, size: CGFloat) -> NSFont {
-      var finalReturnFont: NSFont =
+      let finalReturnFont: NSFont =
         {
           switch IME.currentInputMode {
             case InputMode.imeModeCHS:
@@ -98,9 +113,6 @@ extension ctlInputMethod {
           }
         }()
         ?? NSFont.systemFont(ofSize: size)
-      // 上述方法對 macOS 10.11-10.15 有效，但對 macOS 12 Monterey 無效（懷疑是 Bug）。
-      // macOS 12 Monterey 開始就用系統內建的函式來處理，相關流程直接寫在 ctlCandidateUniversal 內。
-      if #available(macOS 12.0, *) { finalReturnFont = NSFont.systemFont(ofSize: size) }
       if let name = name {
         return NSFont(name: name, size: size) ?? finalReturnFont
       }
