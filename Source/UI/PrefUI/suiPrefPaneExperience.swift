@@ -151,6 +151,12 @@ struct suiPrefPaneExperience: View {
           }
         )
         Toggle(
+          LocalizedStringKey("Allow backspace-editing miscomposed readings"),
+          isOn: $selKeepReadingUponCompositionError.onChange {
+            mgrPrefs.keepReadingUponCompositionError = selKeepReadingUponCompositionError
+          }
+        )
+        Toggle(
           LocalizedStringKey("Emulating select-candidate-per-character mode"),
           isOn: $selEnableSCPCTypingMode.onChange {
             mgrPrefs.useSCPCTypingMode = selEnableSCPCTypingMode
