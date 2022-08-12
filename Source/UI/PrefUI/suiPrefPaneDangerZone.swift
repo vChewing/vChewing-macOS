@@ -50,8 +50,12 @@ struct suiPrefPaneDangerZone: View {
             mgrPrefs.handleDefaultCandidateFontsByLangIdentifier = selHandleDefaultCandidateFontsByLangIdentifier
           }
         )
-        Text(LocalizedStringKey("This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later."))
-          .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+        Text(
+          LocalizedStringKey(
+            "This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later."
+          )
+        )
+        .preferenceDescription().fixedSize(horizontal: false, vertical: true)
       }
     }
   }

@@ -102,3 +102,8 @@
 "XqL-rf-X6d.title" = "Space で次のページ、Shift+Space で次の候補文字を";
 "xrE-8T-WKO.label" = "詳細";
 "ZEv-Q2-mYL.title" = "アプリ表示用言語をご指定ください、そして入力アプリは自動的に再起動。";
+"lblDangerZoneTitleDescription.title" = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
+"tglDangerZoneIMKCandidate.title" = "IMK 候補陳列ウィンドウを起用（入力アプリは自動的に再起動）";
+"lblDangerZoneIMKCandidate.title" = "IMK 候補陳列ウィンドウで言選り用キーは現時点で利用不可。";
+"tglDangerZoneCandidateFont.title" = "「.langIdentifier」を使って候補陳列ウィンドウのフォントを取り扱う";
+"lblDangerZoneCandidateFont.title" = "これは Apple Bug Report #FB10978412 の臨時対策であり、macOS 12 からの macOS に効き、IMK 以外の候補陳列ウィンドウに作用する。Apple は macOS 11 からの macOS のために該当 Bug を修復すべきである。";

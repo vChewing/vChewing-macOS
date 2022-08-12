@@ -102,3 +102,8 @@
 "XqL-rf-X6d.title" = "Space to +cycle pages, Shift+Space to +cycle candidates";
 "xrE-8T-WKO.label" = "Advanced";
 "ZEv-Q2-mYL.title" = "Change user interface language (will reboot the IME).";
+"lblDangerZoneTitleDescription.title" = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
+"tglDangerZoneIMKCandidate.title" = "Use IMK Candidate Window instead (will reboot the IME)";
+"lblDangerZoneIMKCandidate.title" = "Candidate selection keys are not yet available in IMK candidate window.";
+"tglDangerZoneCandidateFont.title" = "Use .langIdentifier to handle UI font in candidate window";
+"lblDangerZoneCandidateFont.title" = "This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later.";

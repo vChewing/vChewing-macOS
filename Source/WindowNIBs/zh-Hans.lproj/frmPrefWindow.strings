@@ -102,3 +102,8 @@
 "XqL-rf-X6d.title" = "Space 换下一页，Shift+Space 换选下一个候选字。";
 "xrE-8T-WKO.label" = "进阶";
 "ZEv-Q2-mYL.title" = "变更使用者界面语言，会自动重新启动输入法。";
+"lblDangerZoneTitleDescription.title" = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";
+"tglDangerZoneIMKCandidate.title" = "启用 IMK 选字窗（会自动重启输入法）";
+"lblDangerZoneIMKCandidate.title" = "IMK 选字窗目前暂时无法正常使用选字键。";
+"tglDangerZoneCandidateFont.title" = "使用 .langIdentifier 来管理选字窗的预设介面字型";
+"lblDangerZoneCandidateFont.title" = "该方法是 Apple Bug Report #FB10978412 的保守治疗方案，用来仅针对 macOS 12 开始的系统，且仅对非 IMK 选字窗起作用。Apple 应该对 macOS 11 开始的系统修复这个 Bug。";

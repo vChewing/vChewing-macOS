@@ -14,7 +14,9 @@
                 <outlet property="fontSizePopUpButton" destination="90" id="108"/>
                 <outlet property="lblCurrentlySpecifiedUserDataFolder" destination="REC-r4-T7m" id="eEq-XN-mMq"/>
                 <outlet property="selectionKeyComboBox" destination="uHU-aL-du7" id="cEx-Ui-Phc"/>
+                <outlet property="tglControlDangerZoneIMKCandidate" destination="tglControlDangerZoneIMKCandidate" id="eyT-uP-QU6"/>
                 <outlet property="uiLanguageButton" destination="oS6-u5-7dP" id="V3u-XK-z7G"/>
+                <outlet property="vwrDangerZone" destination="Qd7-ln-nNO" id="8mw-wO-gXS"/>
                 <outlet property="vwrDictionary" destination="Rnp-LM-RIF" id="8gY-ah-RT8"/>
                 <outlet property="vwrExperience" destination="XWo-36-xGi" id="hC5-gV-NWn"/>
                 <outlet property="vwrGeneral" destination="BUt-lg-GPp" id="PC2-Sj-V4Q"/>
@@ -1053,6 +1055,93 @@
                 <constraint firstItem="Md1-t7-hU4" firstAttribute="top" secondItem="hab-1o-1kS" secondAttribute="bottom" constant="8" symbolic="YES" id="zZC-jv-TR3"/>
             </constraints>
             <point key="canvasLocation" x="-392" y="-704"/>
+        </visualEffectView>
+        <visualEffectView blendingMode="behindWindow" material="sidebar" state="followsWindowActiveState" id="Qd7-ln-nNO" userLabel="vwrDangerZone">
+            <rect key="frame" x="0.0" y="0.0" width="445" height="261"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lblControlDangerZoneTitleDescription" userLabel="lblControlDangerZoneTitleDescription">
+                    <rect key="frame" x="18" y="211" width="409" height="30"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" id="lblDangerZoneTitleDescription">
+                        <font key="font" metaFont="cellTitle"/>
+                        <string key="title">Warning: This page is for testing future features.
+Features listed here may not work as expected.</string>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="P1o-bW-Tjn">
+                    <rect key="frame" x="20" y="200" width="405" height="5"/>
+                </box>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tglControlDangerZoneIMKCandidate" userLabel="tglControlDangerZoneIMKCandidate">
+                    <rect key="frame" x="19" y="178.5" width="406" height="17"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="16" id="1fy-CP-mlB"/>
+                    </constraints>
+                    <buttonCell key="cell" type="check" title="Use IMK Candidate Window instead (will reboot the IME)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="tglDangerZoneIMKCandidate" userLabel="tglDangerZoneIMKCandidate">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="cellTitle"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="updateIMKCandidateEnableStatusAction:" target="-2" id="mkT-P8-reE"/>
+                        <binding destination="32" name="value" keyPath="values.UseIMKCandidateWindow" id="XjP-hu-rUm"/>
+                    </connections>
+                </button>
+                <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lblControlDangerZoneIMKCandidate" userLabel="lblControlDangerZoneIMKCandidate">
+                    <rect key="frame" x="18" y="156" width="409" height="14"/>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Candidate selection keys are not yet available in IMK candidate window." id="lblDangerZoneIMKCandidate">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tglControlDangerZoneCandidateFont" userLabel="tglControlDangerZoneCandidateFont">
+                    <rect key="frame" x="19" y="132.5" width="406" height="18"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="17" id="eCc-Cc-xvc"/>
+                    </constraints>
+                    <buttonCell key="cell" type="check" title="Use .langIdentifier to handle UI font in candidate window" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="tglDangerZoneCandidateFont" userLabel="tglDangerZoneCandidateFont">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="cellTitle"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="32" name="value" keyPath="values.HandleDefaultCandidateFontsByLangIdentifier" id="EEd-Z8-b5S"/>
+                    </connections>
+                </button>
+                <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lblControlDangerZoneCandidateFont" userLabel="lblControlDangerZoneCandidateFont">
+                    <rect key="frame" x="18" y="82" width="409" height="42"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="405" id="1OL-J2-FUX"/>
+                    </constraints>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="lblDangerZoneCandidateFont">
+                        <font key="font" metaFont="smallSystem"/>
+                        <string key="title">This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later.</string>
+                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="lblControlDangerZoneTitleDescription" firstAttribute="leading" secondItem="Qd7-ln-nNO" secondAttribute="leading" constant="20" symbolic="YES" id="0Ia-ut-ksj"/>
+                <constraint firstItem="tglControlDangerZoneIMKCandidate" firstAttribute="top" secondItem="P1o-bW-Tjn" secondAttribute="bottom" constant="7.5" id="3as-Db-NwQ"/>
+                <constraint firstItem="tglControlDangerZoneIMKCandidate" firstAttribute="leading" secondItem="lblControlDangerZoneIMKCandidate" secondAttribute="leading" id="59X-nd-Otf"/>
+                <constraint firstItem="lblControlDangerZoneIMKCandidate" firstAttribute="leading" secondItem="tglControlDangerZoneCandidateFont" secondAttribute="leading" id="COk-L6-3R8"/>
+                <constraint firstItem="lblControlDangerZoneCandidateFont" firstAttribute="top" secondItem="tglControlDangerZoneCandidateFont" secondAttribute="bottom" constant="8.5" id="EyK-gG-Xhd"/>
+                <constraint firstItem="P1o-bW-Tjn" firstAttribute="trailing" secondItem="tglControlDangerZoneIMKCandidate" secondAttribute="trailing" id="LM7-ov-mng"/>
+                <constraint firstItem="lblControlDangerZoneTitleDescription" firstAttribute="trailing" secondItem="P1o-bW-Tjn" secondAttribute="trailing" id="LqC-ii-aOO"/>
+                <constraint firstAttribute="bottom" relation="lessThanOrEqual" secondItem="lblControlDangerZoneCandidateFont" secondAttribute="bottom" constant="82" id="NVG-bX-Lgd"/>
+                <constraint firstItem="tglControlDangerZoneCandidateFont" firstAttribute="top" secondItem="lblControlDangerZoneIMKCandidate" secondAttribute="bottom" constant="6.5" id="UXh-8X-5wM"/>
+                <constraint firstItem="lblControlDangerZoneTitleDescription" firstAttribute="leading" secondItem="P1o-bW-Tjn" secondAttribute="leading" id="Wc3-Oe-D2E"/>
+                <constraint firstItem="P1o-bW-Tjn" firstAttribute="top" secondItem="lblControlDangerZoneTitleDescription" secondAttribute="bottom" constant="8" symbolic="YES" id="Whf-Gf-g65"/>
+                <constraint firstItem="lblControlDangerZoneIMKCandidate" firstAttribute="top" secondItem="tglControlDangerZoneIMKCandidate" secondAttribute="bottom" constant="8.5" id="awf-DD-u2k"/>
+                <constraint firstItem="P1o-bW-Tjn" firstAttribute="leading" secondItem="tglControlDangerZoneIMKCandidate" secondAttribute="leading" id="f2q-KJ-bvO"/>
+                <constraint firstItem="tglControlDangerZoneCandidateFont" firstAttribute="trailing" secondItem="lblControlDangerZoneCandidateFont" secondAttribute="trailing" id="gWx-J5-kgO"/>
+                <constraint firstItem="tglControlDangerZoneIMKCandidate" firstAttribute="trailing" secondItem="lblControlDangerZoneIMKCandidate" secondAttribute="trailing" id="lQf-A0-TPV"/>
+                <constraint firstItem="tglControlDangerZoneCandidateFont" firstAttribute="leading" secondItem="lblControlDangerZoneCandidateFont" secondAttribute="leading" id="oCd-O4-Qfg"/>
+                <constraint firstItem="lblControlDangerZoneTitleDescription" firstAttribute="top" secondItem="Qd7-ln-nNO" secondAttribute="top" constant="20" symbolic="YES" id="vYg-x4-tfo"/>
+                <constraint firstItem="lblControlDangerZoneIMKCandidate" firstAttribute="trailing" secondItem="tglControlDangerZoneCandidateFont" secondAttribute="trailing" id="z47-zE-rak"/>
+            </constraints>
+            <point key="canvasLocation" x="-393.5" y="-70.5"/>
         </visualEffectView>
     </objects>
 </document>
