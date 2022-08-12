@@ -184,6 +184,22 @@ private class vwrCandidateUniversal: NSView {
           } else {
             NSColor.controlBackgroundColor.setFill()
           }
+          if mgrPrefs.handleDefaultCandidateFontsByLangIdentifier {
+            switch IME.currentInputMode {
+              case InputMode.imeModeCHS:
+                if #available(macOS 12.0, *) {
+                  activeCandidateAttr[.languageIdentifier] = "zh-Hans" as AnyObject
+                }
+              case InputMode.imeModeCHT:
+                if #available(macOS 12.0, *) {
+                  activeCandidateAttr[.languageIdentifier] =
+                    (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
+                    ? "ja" as AnyObject : "zh-Hant" as AnyObject
+                }
+              default:
+                break
+            }
+          }
           let path: NSBezierPath = .init(roundedRect: rctCandidateArea, xRadius: 5, yRadius: 5)
           path.fill()
           (keyLabels[index] as NSString).draw(
@@ -240,6 +256,22 @@ private class vwrCandidateUniversal: NSView {
             activeCandidateAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor
           } else {
             NSColor.controlBackgroundColor.setFill()
+          }
+          if mgrPrefs.handleDefaultCandidateFontsByLangIdentifier {
+            switch IME.currentInputMode {
+              case InputMode.imeModeCHS:
+                if #available(macOS 12.0, *) {
+                  activeCandidateAttr[.languageIdentifier] = "zh-Hans" as AnyObject
+                }
+              case InputMode.imeModeCHT:
+                if #available(macOS 12.0, *) {
+                  activeCandidateAttr[.languageIdentifier] =
+                    (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
+                    ? "ja" as AnyObject : "zh-Hant" as AnyObject
+                }
+              default:
+                break
+            }
           }
           let path: NSBezierPath = .init(roundedRect: rctCandidateArea, xRadius: 5, yRadius: 5)
           path.fill()
