@@ -103,7 +103,8 @@ extension ctlInputMethod {
   /// 在處理不受 .NotEmpty() 管轄的狀態時可能要用到的函式，會清空螢幕上顯示的內文組字區。
   /// 當 setInlineDisplayWithCursor() 在錯誤的狀態下被呼叫時，也會觸發這個函式。
   private func clearInlineDisplay() {
-    client().setMarkedText(
+    guard let theClient = client() else { return }
+    theClient.setMarkedText(
       "", selectionRange: NSRange(location: 0, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
