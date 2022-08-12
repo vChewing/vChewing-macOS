@@ -34,6 +34,14 @@ struct suiPrefPaneDangerZone: View {
         )
         .fixedSize(horizontal: false, vertical: true)
         Divider()
+        Toggle(
+          LocalizedStringKey("Use IMK Candidate Window instead (will reboot the IME)"),
+          isOn: $selUseIMKCandidateWindow.onChange {
+            mgrPrefs.useIMKCandidateWindow = selUseIMKCandidateWindow
+          }
+        )
+        Text(LocalizedStringKey("Candidate selection keys are not yet available in IMK candidate window."))
+          .preferenceDescription()
       }
     }
   }

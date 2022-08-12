@@ -106,6 +106,7 @@
 "Automatically reload user data files if changes detected" = "自动检测并载入使用者语汇档案变更";
 "Basic Keyboard Layout:" = "基础键盘布局:";
 "Candidate Layout:" = "候选字窗布局:";
+"Candidate selection keys are not yet available in IMK candidate window." = "IMK 选字窗目前暂时无法正常使用选字键。";
 "Candidate Size:" = "候选字窗字号:";
 "Change user interface language (will reboot the IME)." = "变更输入法介面语言，会自动重启输入法。";
 "Check for updates automatically" = "自动检查软体更新";
@@ -175,6 +176,7 @@
 "Universal Pinyin with Numeral Intonation" = "通用拼音+数字标调";
 "Universal Pinyin with Numeral Intonation" = "通用拼音+数字标调";
 "Use ESC key to clear the entire input buffer" = "敲 ESC 键以清空整个组字缓冲区";
+"Use IMK Candidate Window instead (will reboot the IME)" = "启用 IMK 选字窗（会自动重启输入法）";
 "Vertical" = "纵向布局";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";
 "Yale Pinyin with Numeral Intonation" = "耶鲁拼音+数字标调";

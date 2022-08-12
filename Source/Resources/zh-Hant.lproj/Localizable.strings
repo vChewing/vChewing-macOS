@@ -106,6 +106,7 @@
 "Automatically reload user data files if changes detected" = "自動檢測並載入使用者語彙檔案變更";
 "Basic Keyboard Layout:" = "基礎鍵盤佈局:";
 "Candidate Layout:" = "候選字窗佈局:";
+"Candidate selection keys are not yet available in IMK candidate window." = "IMK 選字窗目前暫時無法正常使用選字鍵。";
 "Candidate Size:" = "候選字窗字號:";
 "Change user interface language (will reboot the IME)." = "變更輸入法介面語言，會自動重啟輸入法。";
 "Check for updates automatically" = "自動檢查軟體更新";
@@ -173,6 +174,7 @@
 "UI Language:" = "介面語言:";
 "Universal Pinyin with Numeral Intonation" = "通用拼音+數字標調";
 "Use ESC key to clear the entire input buffer" = "敲 ESC 鍵以清空整個組字緩衝區";
+"Use IMK Candidate Window instead (will reboot the IME)" = "啟用 IMK 選字窗（會自動重啟輸入法）";
 "Vertical" = "縱向佈局";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：該頁面僅作未來功能測試所用。\n在此列出的功能並非處於完全可用之狀態。";
 "Yale Pinyin with Numeral Intonation" = "耶魯拼音+數字標調";

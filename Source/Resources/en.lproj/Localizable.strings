@@ -106,6 +106,7 @@
 "Automatically reload user data files if changes detected" = "Automatically reload user data files if changes detected";
 "Basic Keyboard Layout:" = "Basic Keyboard Layout:";
 "Candidate Layout:" = "Candidate Layout:";
+"Candidate selection keys are not yet available in IMK candidate window." = "Candidate selection keys are not yet available in IMK candidate window.";
 "Candidate Size:" = "Candidate Size:";
 "Change user interface language (will reboot the IME)." = "Change user interface language (will reboot the IME).";
 "Check for updates automatically" = "Check for updates automatically";
@@ -173,6 +174,7 @@
 "UI Language:" = "UI Language:";
 "Universal Pinyin with Numeral Intonation" = "Universal Pinyin with Numeral Intonation";
 "Use ESC key to clear the entire input buffer" = "Use ESC key to clear the entire input buffer";
+"Use IMK Candidate Window instead (will reboot the IME)" = "Use IMK Candidate Window instead (will reboot the IME)";
 "Vertical" = "Vertical";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
 "Yale Pinyin with Numeral Intonation" = "Yale Pinyin with Numeral Intonation";

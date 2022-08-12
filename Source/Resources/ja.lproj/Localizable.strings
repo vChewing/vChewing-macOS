@@ -106,6 +106,7 @@
 "Automatically reload user data files if changes detected" = "ユーザー辞書データの変更を自動検出し、自動的に再読込";
 "Basic Keyboard Layout:" = "基礎キーボード:";
 "Candidate Layout:" = "入力候補陳列の仕様";
+"Candidate selection keys are not yet available in IMK candidate window." = "IMK 候補陳列ウィンドウで言選り用キーは現時点で利用不可。";
 "Candidate Size:" = "候補文字の字号:";
 "Change user interface language (will reboot the IME)." = "アプリ表示用言語をご指定下さい、そして入力アプリは自動的に再起動。";
 "Check for updates automatically" = "アプリの更新通知を受く";
@@ -173,6 +174,7 @@
 "UI Language:" = "表示用言語:";
 "Universal Pinyin with Numeral Intonation" = "汎用弁音 (ローマ字+数字音調)";
 "Use ESC key to clear the entire input buffer" = "ESC キーで入力緩衝列を消す";
+"Use IMK Candidate Window instead (will reboot the IME)" = "IMK 候補陳列ウィンドウを起用（入力アプリは自動的に再起動）";
 "Vertical" = "縦型陳列";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
 "Yale Pinyin with Numeral Intonation" = "イェール弁音 (ローマ字+数字音調)";
