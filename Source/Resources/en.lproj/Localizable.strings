@@ -168,11 +168,13 @@
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "Space to +cycle pages, Shift+Space to +cycle candidates";
 "Starlight" = "Starlight";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "Stop farting (when typed phonetic combination is invalid, etc.)";
+"This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later." = "This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later.";
 "Traditional Chinese" = "Traditional Chinese";
 "Type them into inline composition buffer" = "Type them into inline composition buffer";
 "Typing Style:" = "Typing Style:";
 "UI Language:" = "UI Language:";
 "Universal Pinyin with Numeral Intonation" = "Universal Pinyin with Numeral Intonation";
+"Use .langIdentifier to handle UI font in candidate window" = "Use .langIdentifier to handle UI font in candidate window";
 "Use ESC key to clear the entire input buffer" = "Use ESC key to clear the entire input buffer";
 "Use IMK Candidate Window instead (will reboot the IME)" = "Use IMK Candidate Window instead (will reboot the IME)";
 "Vertical" = "Vertical";

@@ -12,6 +12,8 @@ import SwiftUI
 struct suiPrefPaneDangerZone: View {
   @State private var selUseIMKCandidateWindow: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kUseIMKCandidateWindow.rawValue)
+  @State private var selHandleDefaultCandidateFontsByLangIdentifier: Bool = UserDefaults.standard.bool(
+    forKey: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue)
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -41,7 +43,15 @@ struct suiPrefPaneDangerZone: View {
           }
         )
         Text(LocalizedStringKey("Candidate selection keys are not yet available in IMK candidate window."))
-          .preferenceDescription()
+          .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+        Toggle(
+          LocalizedStringKey("Use .langIdentifier to handle UI font in candidate window"),
+          isOn: $selHandleDefaultCandidateFontsByLangIdentifier.onChange {
+            mgrPrefs.handleDefaultCandidateFontsByLangIdentifier = selHandleDefaultCandidateFontsByLangIdentifier
+          }
+        )
+        Text(LocalizedStringKey("This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later."))
+          .preferenceDescription().fixedSize(horizontal: false, vertical: true)
       }
     }
   }
