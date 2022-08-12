@@ -39,7 +39,7 @@
 "Please specify at least 4 candidate keys." = "请至少指定四个选字键。";
 "Maximum 15 candidate keys allowed." = "选字键最多只能指定十五个。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 语汇置换功能已启用，会波及语汇自订。";
-"⚠︎ Beware: Chars and Readings in buffer doesn't match." = "⚠︎ 注意：组字区字数与读音数不对应。";
+"⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 无法处理：组字区字数与读音数不对应。";
 "Per-Char Select Mode" = "仿真逐字选字输入";
 "CNS11643 Mode" = "全字库模式";
 "JIS Shinjitai Output" = "JIS 新字体模式";

@@ -280,9 +280,9 @@ public enum InputState {
     private var markedTargetExists = false
     var tooltip: String {
       if composingBuffer.count != readings.count {
-        ctlInputMethod.tooltipController.setColor(state: .denialOverflow)
+        ctlInputMethod.tooltipController.setColor(state: .redAlert)
         return NSLocalizedString(
-          "⚠︎ Beware: Chars and Readings in buffer doesn't match.", comment: ""
+          "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.", comment: ""
         )
       }
       if mgrPrefs.phraseReplacementEnabled {
@@ -398,11 +398,9 @@ public enum InputState {
       return state
     }
 
-    var validToFilter: Bool {
-      /// 與小麥注音不同，威注音會自動解消「游標插斷字符」的異常狀態，所以允許在字音長度不相符的情況下加詞。
-      /// 這裡的 deleteTargetExists 是防止使用者排除「詞庫內尚未存在的詞」。
-      markedTargetExists ? allowedMarkRange.contains(literalMarkedRange.count) : false
-    }
+    var validToFilter: Bool { markedTargetExists ? allowedMarkRange.contains(literalMarkedRange.count) : false }
+
+    var bufferReadingCountMisMatch: Bool { composingBuffer.count != readings.count }
 
     var chkIfUserPhraseExists: Bool {
       let text = composingBuffer.utf16SubString(with: markedRange)

@@ -26,6 +26,7 @@ extension ctlInputMethod: KeyHandlerDelegate {
     -> Bool
   {
     guard let state = state as? InputState.Marking else { return false }
+    if state.bufferReadingCountMisMatch { return false }
     let refInputModeReversed: InputMode =
       (keyHandler.inputMode == InputMode.imeModeCHT)
       ? InputMode.imeModeCHS : InputMode.imeModeCHT
