@@ -229,8 +229,6 @@ public class KeyHandler {
           )
         }
         walk()
-      } else {
-        IME.prtDebugIntel("UOM: Blank suggestion retrieved, dismissing.")
       }
     }
     arrResult = arrResult.stableSort { $0.1.score > $1.1.score }
