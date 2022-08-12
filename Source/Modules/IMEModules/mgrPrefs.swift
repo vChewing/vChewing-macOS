@@ -50,6 +50,7 @@ public enum UserDef: String, CaseIterable {
   case kTogglingAlphanumericalModeWithLShift = "TogglingAlphanumericalModeWithLShift"
   case kUpperCaseLetterKeyBehavior = "UpperCaseLetterKeyBehavior"
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
+  case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
 
   case kCandidateTextFontName = "CandidateTextFontName"
   case kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
@@ -279,6 +280,10 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.useIMKCandidateWindow, forKey: UserDef.kUseIMKCandidateWindow.rawValue
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.handleDefaultCandidateFontsByLangIdentifier,
+      forKey: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue
+    )
 
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeySCPC, forKey: UserDef.kUsingHotKeySCPC.rawValue)
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyAssociates, forKey: UserDef.kUsingHotKeyAssociates.rawValue)
@@ -390,6 +395,9 @@ public enum mgrPrefs {
       NSApplication.shared.terminate(nil)
     }
   }
+
+  @UserDefault(key: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue, defaultValue: false)
+  static var handleDefaultCandidateFontsByLangIdentifier: Bool
 
   // MARK: - Settings (Tier 2)
 
