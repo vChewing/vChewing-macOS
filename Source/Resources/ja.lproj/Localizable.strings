@@ -122,6 +122,7 @@
 "Cursor Selection:" = "カーソル候補呼出:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千配列 (Microsoft 標準・王安・零壹など)";
 "Dachen 26 (libChewing)" = "酷音大千 26 キー配列";
+"DangerZone" = "開発道場";
 "Debug Mode" = "欠陥辿着モード";
 "Dictionary" = "辞書設定";
 "Directly commit lowercased letters" = "ローマ字（小文字）を直接出力";
@@ -173,4 +174,5 @@
 "Universal Pinyin with Numeral Intonation" = "汎用弁音 (ローマ字+数字音調)";
 "Use ESC key to clear the entire input buffer" = "ESC キーで入力緩衝列を消す";
 "Vertical" = "縦型陳列";
+"Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
 "Yale Pinyin with Numeral Intonation" = "イェール弁音 (ローマ字+数字音調)";

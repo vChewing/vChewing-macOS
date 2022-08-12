@@ -122,6 +122,7 @@
 "Cursor Selection:" = "选字游标:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千排列 (微软标准/王安/零壹/仲鼎/国乔)";
 "Dachen 26 (libChewing)" = "酷音大千二十六键排列";
+"DangerZone" = "禁区";
 "Debug Mode" = "侦错模式";
 "Dictionary" = "辞典";
 "Directly commit lowercased letters" = "直接递交小写字母";
@@ -175,4 +176,5 @@
 "Universal Pinyin with Numeral Intonation" = "通用拼音+数字标调";
 "Use ESC key to clear the entire input buffer" = "敲 ESC 键以清空整个组字缓冲区";
 "Vertical" = "纵向布局";
+"Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";
 "Yale Pinyin with Numeral Intonation" = "耶鲁拼音+数字标调";
