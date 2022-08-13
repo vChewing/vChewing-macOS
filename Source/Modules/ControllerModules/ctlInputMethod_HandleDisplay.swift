@@ -15,13 +15,14 @@ import Foundation
 
 extension ctlInputMethod {
   func show(tooltip: String, composingBuffer: String, cursorIndex: Int) {
+    guard let client = client() else { return }
     var lineHeightRect = NSRect(x: 0.0, y: 0.0, width: 16.0, height: 16.0)
     var cursor = cursorIndex
     if cursor == composingBuffer.count, cursor != 0 {
       cursor -= 1
     }
     while lineHeightRect.origin.x == 0, lineHeightRect.origin.y == 0, cursor >= 0 {
-      client().attributes(
+      client.attributes(
         forCharacterIndex: cursor, lineHeightRectangle: &lineHeightRect
       )
       cursor -= 1
@@ -30,6 +31,7 @@ extension ctlInputMethod {
   }
 
   func show(candidateWindowWith state: InputStateProtocol) {
+    guard let client = client() else { return }
     var isTypingVertical: Bool {
       if let state = state as? InputState.ChoosingCandidate {
         return state.isTypingVertical
@@ -153,7 +155,7 @@ extension ctlInputMethod {
     }
 
     while lineHeightRect.origin.x == 0, lineHeightRect.origin.y == 0, cursor >= 0 {
-      client().attributes(
+      client.attributes(
         forCharacterIndex: cursor, lineHeightRectangle: &lineHeightRect
       )
       cursor -= 1

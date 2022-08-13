@@ -39,6 +39,15 @@ class ctlInputMethod: IMKInputController {
   var state: InputStateProtocol = InputState.Empty()
   /// 當前這個 ctlInputMethod 副本是否處於英數輸入模式。
   var isASCIIMode: Bool = false
+  /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
+  public var isVerticalTyping: Bool {
+    guard let client = client() else { return false }
+    var textFrame = NSRect.zero
+    let attributes: [AnyHashable: Any]? = client.attributes(
+      forCharacterIndex: 0, lineHeightRectangle: &textFrame
+    )
+    return (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
+  }
 
   /// 切換當前 ctlInputMethod 副本的英數輸入模式開關。
   func toggleASCIIMode() -> Bool {
@@ -54,7 +63,9 @@ class ctlInputMethod: IMKInputController {
 
   /// 指定鍵盤佈局。
   func setKeyLayout() {
-    client().overrideKeyboard(withKeyboardNamed: mgrPrefs.basicKeyboardLayout)
+    if let client = client() {
+      client.overrideKeyboard(withKeyboardNamed: mgrPrefs.basicKeyboardLayout)
+    }
   }
 
   /// 重設按鍵調度模組，會將當前尚未遞交的內容遞交出去。
@@ -95,7 +106,8 @@ class ctlInputMethod: IMKInputController {
     // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
     // 所以這裡添加這句、來試圖應對這種情況。
     if keyHandler.delegate == nil { keyHandler.delegate = self }
-    setValue(IME.currentInputMode.rawValue, forTag: 114_514, client: client())
+    guard let client = client() else { return }
+    setValue(IME.currentInputMode.rawValue, forTag: 114_514, client: client)
     keyHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
     keyHandler.ensureParser()
 
@@ -111,7 +123,7 @@ class ctlInputMethod: IMKInputController {
 
     /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
     /// 這是很多 macOS 副廠輸入法的常見失誤之處。
-    if client().bundleIdentifier() != Bundle.main.bundleIdentifier {
+    if client.bundleIdentifier() != Bundle.main.bundleIdentifier {
       // 強制重設當前鍵盤佈局、使其與偏好設定同步。
       setKeyLayout()
       handle(state: InputState.Empty())
@@ -152,7 +164,7 @@ class ctlInputMethod: IMKInputController {
       keyHandler.inputMode = newInputMode
       /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
       /// 這是很多 macOS 副廠輸入法的常見失誤之處。
-      if client().bundleIdentifier() != Bundle.main.bundleIdentifier {
+      if let client = client(), client.bundleIdentifier() != Bundle.main.bundleIdentifier {
         // 強制重設當前鍵盤佈局、使其與偏好設定同步。這裡的這一步也不能省略。
         setKeyLayout()
         handle(state: InputState.Empty())
@@ -221,24 +233,16 @@ class ctlInputMethod: IMKInputController {
     // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
     ctlInputMethod.areWeNerfing = event.modifierFlags.contains([.shift, .command])
 
-    var textFrame = NSRect.zero
-
-    let attributes: [AnyHashable: Any]? = client().attributes(
-      forCharacterIndex: 0, lineHeightRectangle: &textFrame
-    )
-
-    let isTypingVertical =
-      (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
-
-    if client().bundleIdentifier()
-      == "org.atelierInmu.vChewing.vChewingPhraseEditor"
+    if let client = client(),
+      client.bundleIdentifier()
+        == "org.atelierInmu.vChewing.vChewingPhraseEditor"
     {
       IME.areWeUsingOurOwnPhraseEditor = true
     } else {
       IME.areWeUsingOurOwnPhraseEditor = false
     }
 
-    var input = InputSignal(event: event, isVerticalTyping: isTypingVertical)
+    var input = InputSignal(event: event, isVerticalTyping: isVerticalTyping)
     input.isASCIIModeInput = isASCIIMode
 
     // 無法列印的訊號輸入，一概不作處理。

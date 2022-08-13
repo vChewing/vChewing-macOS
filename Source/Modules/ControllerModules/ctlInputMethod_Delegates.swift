@@ -78,24 +78,16 @@ extension ctlInputMethod: ctlCandidateDelegate {
     // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
     ctlInputMethod.areWeNerfing = event.modifierFlags.contains([.shift, .command])
 
-    var textFrame = NSRect.zero
-
-    let attributes: [AnyHashable: Any]? = client().attributes(
-      forCharacterIndex: 0, lineHeightRectangle: &textFrame
-    )
-
-    let isTypingVertical =
-      (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
-
-    if client().bundleIdentifier()
-      == "org.atelierInmu.vChewing.vChewingPhraseEditor"
+    if let client = client(),
+      client.bundleIdentifier()
+        == "org.atelierInmu.vChewing.vChewingPhraseEditor"
     {
       IME.areWeUsingOurOwnPhraseEditor = true
     } else {
       IME.areWeUsingOurOwnPhraseEditor = false
     }
 
-    var input = InputSignal(event: event, isVerticalTyping: isTypingVertical)
+    var input = InputSignal(event: event, isVerticalTyping: isVerticalTyping)
     input.isASCIIModeInput = isASCIIMode
 
     // 無法列印的訊號輸入，一概不作處理。
