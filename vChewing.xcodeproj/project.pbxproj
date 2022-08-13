@@ -544,7 +544,7 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		5B62A33927AE7C6700A19448 /* UI */ = {
+		5B62A33927AE7C6700A19448 /* UIModules */ = {
 			isa = PBXGroup;
 			children = (
 				5B62A33E27AE7CD900A19448 /* CandidateUI */,
@@ -552,7 +552,7 @@
 				5BA9FD0927FED9F3002DE248 /* PrefUI */,
 				5B62A34227AE7CD900A19448 /* TooltipUI */,
 			);
-			path = UI;
+			path = UIModules;
 			sourceTree = "<group>";
 		};
 		5B62A33A27AE7C7500A19448 /* WindowControllers */ = {
@@ -792,7 +792,6 @@
 				5B62A30127AE732800A19448 /* 3rdParty */,
 				6A0D4F1215FC0EB100ABF4B3 /* Modules */,
 				5B62A33027AE78E500A19448 /* Resources */,
-				5B62A33927AE7C6700A19448 /* UI */,
 				5B62A33A27AE7C7500A19448 /* WindowControllers */,
 				5B62A33B27AE7C7F00A19448 /* WindowNIBs */,
 			);
@@ -818,6 +817,7 @@
 				5B62A32427AE757300A19448 /* LangModelRelated */,
 				5B62A32327AE756800A19448 /* LanguageParsers */,
 				5B62A31E27AE74E400A19448 /* SFX */,
+				5B62A33927AE7C6700A19448 /* UIModules */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
