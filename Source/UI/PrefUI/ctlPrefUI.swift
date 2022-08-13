@@ -15,7 +15,7 @@ class ctlPrefUI {
   private(set) var tabImageExperiences: NSImage! = NSImage(named: "PrefToolbar-Experiences")
   private(set) var tabImageDictionary: NSImage! = NSImage(named: "PrefToolbar-Dictionary")
   private(set) var tabImageKeyboard: NSImage! = NSImage(named: "PrefToolbar-Keyboard")
-  private(set) var tabImageDangerZone: NSImage! = NSImage(named: "PrefToolbar-DangerZone")
+  private(set) var tabImageDevZone: NSImage! = NSImage(named: "PrefToolbar-DevZone")
 
   init() {
     if #available(macOS 11.0, *) {
@@ -31,8 +31,8 @@ class ctlPrefUI {
       tabImageKeyboard = NSImage(
         systemSymbolName: "keyboard.macwindow", accessibilityDescription: "Keyboard Preferences"
       )
-      tabImageDangerZone = NSImage(
-        systemSymbolName: "hand.raised.circle", accessibilityDescription: "DangerZone Preferences"
+      tabImageDevZone = NSImage(
+        systemSymbolName: "hand.raised.circle", accessibilityDescription: "DevZone Preferences"
       )
     }
   }
@@ -68,11 +68,11 @@ class ctlPrefUI {
         suiPrefPaneKeyboard()
       },
       Preferences.Pane(
-        identifier: Preferences.PaneIdentifier(rawValue: "DangerZone"),
-        title: NSLocalizedString("DangerZone", comment: ""),
-        toolbarIcon: tabImageDangerZone
+        identifier: Preferences.PaneIdentifier(rawValue: "DevZone"),
+        title: NSLocalizedString("DevZone", comment: ""),
+        toolbarIcon: tabImageDevZone
       ) {
-        suiPrefPaneDangerZone()
+        suiPrefPaneDevZone()
       },
     ],
     style: .toolbarItems

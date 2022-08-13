@@ -18,7 +18,7 @@ extension NSToolbarItem.Identifier {
   fileprivate static let ofExperience = NSToolbarItem.Identifier(rawValue: "tabExperience")
   fileprivate static let ofDictionary = NSToolbarItem.Identifier(rawValue: "tabDictionary")
   fileprivate static let ofKeyboard = NSToolbarItem.Identifier(rawValue: "tabKeyboard")
-  fileprivate static let ofDangerZone = NSToolbarItem.Identifier(rawValue: "tabDangerZone")
+  fileprivate static let ofDevZone = NSToolbarItem.Identifier(rawValue: "tabDevZone")
 }
 
 // Please note that the class should be exposed using the same class name
@@ -33,13 +33,13 @@ class ctlPrefWindow: NSWindowController {
   @IBOutlet var chkTrad2KangXi: NSButton!
   @IBOutlet var chkTrad2JISShinjitai: NSButton!
   @IBOutlet var lblCurrentlySpecifiedUserDataFolder: NSTextFieldCell!
-  @IBOutlet var tglControlDangerZoneIMKCandidate: NSButton!
+  @IBOutlet var tglControlDevZoneIMKCandidate: NSButton!
 
   @IBOutlet var vwrGeneral: NSView!
   @IBOutlet var vwrExperience: NSView!
   @IBOutlet var vwrDictionary: NSView!
   @IBOutlet var vwrKeyboard: NSView!
-  @IBOutlet var vwrDangerZone: NSView!
+  @IBOutlet var vwrDevZone: NSView!
 
   var currentLanguageSelectItem: NSMenuItem?
 
@@ -336,15 +336,15 @@ extension ctlPrefWindow: NSToolbarDelegate {
   }
 
   func toolbarDefaultItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
-    [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard, .ofDangerZone]
+    [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard, .ofDevZone]
   }
 
   func toolbarAllowedItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
-    [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard, .ofDangerZone]
+    [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard, .ofDevZone]
   }
 
   func toolbarSelectableItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
-    [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard, .ofDangerZone]
+    [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard, .ofDevZone]
   }
 
   @objc func showGeneralView(_: Any?) {
@@ -367,9 +367,9 @@ extension ctlPrefWindow: NSToolbarDelegate {
     window?.toolbar?.selectedItemIdentifier = .ofKeyboard
   }
 
-  @objc func showDangerZOneView(_: Any?) {
-    use(view: vwrDangerZone)
-    window?.toolbar?.selectedItemIdentifier = .ofDangerZone
+  @objc func showDevZoneView(_: Any?) {
+    use(view: vwrDevZone)
+    window?.toolbar?.selectedItemIdentifier = .ofDevZone
   }
 
   func toolbar(
@@ -425,17 +425,17 @@ extension ctlPrefWindow: NSToolbarDelegate {
         }
         item.action = #selector(showKeyboardView(_:))
 
-      case .ofDangerZone:
-        let title = NSLocalizedString("DangerZone", comment: "")
+      case .ofDevZone:
+        let title = NSLocalizedString("DevZone", comment: "")
         item.label = title
         if #available(macOS 11.0, *) {
           item.image = NSImage(
-            systemSymbolName: "hand.raised.circle", accessibilityDescription: "DangerZone Preferences"
+            systemSymbolName: "hand.raised.circle", accessibilityDescription: "DevZone Preferences"
           )
         } else {
-          item.image = NSImage(named: "PrefToolbar-DangerZone")
+          item.image = NSImage(named: "PrefToolbar-DevZone")
         }
-        item.action = #selector(showDangerZOneView(_:))
+        item.action = #selector(showDevZoneView(_:))
 
       default:
         return nil

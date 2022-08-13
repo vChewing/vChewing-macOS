@@ -63,6 +63,9 @@
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
+"lblDevZoneCandidateFont.title" = "該方法是 Apple Bug Report #FB10978412 的保守治療方案，用來僅針對 macOS 12 開始的系統，且僅對非 IMK 選字窗起作用。Apple 應該對 macOS 11 開始的系統修復這個 Bug。";
+"lblDevZoneIMKCandidate.title" = "IMK 選字窗目前暫時無法正常使用選字鍵。";
+"lblDevZoneTitleDescription.title" = "警告：該頁面僅作未來功能測試所用。\n在此列出的功能並非處於完全可用之狀態。";
 "lblUpperCaseLetterKeyBehavior.title" = "指定 Shift+字母鍵 的行為。";
 "Parser11.title" = "國音二式+數字標調";
 "Parser12.title" = "耶魯拼音+數字標調";
@@ -78,6 +81,8 @@
 "rVQ-Hx-cGi.title" = "和語";
 "s7u-Fm-dVg.title" = "輪替頁面";
 "shc-Nu-UsM.title" = "在選字窗內顯示翻頁按鈕";
+"tglDevZoneCandidateFont.title" = "使用 .langIdentifier 來管理選字窗的預設介面字型";
+"tglDevZoneIMKCandidate.title" = "啟用 IMK 選字窗（會自動重啟輸入法）";
 "TXr-FF-ehw.title" = "繁體中文";
 "ueU-Rz-a1C.title" = "指定 (Shift+)Tab 熱鍵在選字窗內的輪替操作對象。";
 "VdT-fw-7pQ.title" = "偵錯模式";
@@ -102,8 +107,3 @@
 "XqL-rf-X6d.title" = "Space 換下一頁，Shift+Space 換選下一個候選字";
 "xrE-8T-WKO.label" = "進階";
 "ZEv-Q2-mYL.title" = "變更使用者介面語言，會自動重新啟動輸入法。";
-"lblDangerZoneTitleDescription.title" = "警告：該頁面僅作未來功能測試所用。\n在此列出的功能並非處於完全可用之狀態。";
-"tglDangerZoneIMKCandidate.title" = "啟用 IMK 選字窗（會自動重啟輸入法）";
-"lblDangerZoneIMKCandidate.title" = "IMK 選字窗目前暫時無法正常使用選字鍵。";
-"tglDangerZoneCandidateFont.title" = "使用 .langIdentifier 來管理選字窗的預設介面字型";
-"lblDangerZoneCandidateFont.title" = "該方法是 Apple Bug Report #FB10978412 的保守治療方案，用來僅針對 macOS 12 開始的系統，且僅對非 IMK 選字窗起作用。Apple 應該對 macOS 11 開始的系統修復這個 Bug。";

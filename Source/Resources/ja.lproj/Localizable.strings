@@ -123,8 +123,8 @@
 "Cursor Selection:" = "カーソル候補呼出:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千配列 (Microsoft 標準・王安・零壹など)";
 "Dachen 26 (libChewing)" = "酷音大千 26 キー配列";
-"DangerZone" = "開発道場";
 "Debug Mode" = "欠陥辿着モード";
+"DevZone" = "開発道場";
 "Dictionary" = "辞書設定";
 "Directly commit lowercased letters" = "ローマ字（小文字）を直接出力";
 "Directly commit uppercased letters" = "ローマ字（大文字）を直接出力";

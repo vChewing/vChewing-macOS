@@ -123,8 +123,8 @@
 "Cursor Selection:" = "选字游标:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千排列 (微软标准/王安/零壹/仲鼎/国乔)";
 "Dachen 26 (libChewing)" = "酷音大千二十六键排列";
-"DangerZone" = "开发道场";
 "Debug Mode" = "侦错模式";
+"DevZone" = "开发道场";
 "Dictionary" = "辞典设定";
 "Directly commit lowercased letters" = "直接递交小写字母";
 "Directly commit uppercased letters" = "直接递交大写字母";

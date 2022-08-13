@@ -40,7 +40,7 @@
 		5B62A35327AE89C400A19448 /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33127AE792F00A19448 /* InputSourceHelper.swift */; };
 		5B73FB5E27B2BE1300E9BF49 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */; };
 		5B782EC4280C243C007276DE /* KeyHandler_HandleCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */; };
-		5B78EE0D28A562B4009456C1 /* suiPrefPaneDangerZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B78EE0C28A562B4009456C1 /* suiPrefPaneDangerZone.swift */; };
+		5B78EE0D28A562B4009456C1 /* suiPrefPaneDevZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B78EE0C28A562B4009456C1 /* suiPrefPaneDevZone.swift */; };
 		5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */; };
 		5B7F225D2808501000DDD3CB /* KeyHandler_HandleInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7F225C2808501000DDD3CB /* KeyHandler_HandleInput.swift */; };
 		5B84579E2871AD2200C93B01 /* convdict.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B84579C2871AD2200C93B01 /* convdict.plist */; };
@@ -247,7 +247,7 @@
 		5B73FB5427B2BD6900E9BF49 /* PhraseEditor-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "PhraseEditor-Info.plist"; path = "UserPhraseEditor/PhraseEditor-Info.plist"; sourceTree = SOURCE_ROOT; };
 		5B73FB5F27B2BE1300E9BF49 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_HandleCandidate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5B78EE0C28A562B4009456C1 /* suiPrefPaneDangerZone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = suiPrefPaneDangerZone.swift; sourceTree = "<group>"; };
+		5B78EE0C28A562B4009456C1 /* suiPrefPaneDevZone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = suiPrefPaneDevZone.swift; sourceTree = "<group>"; };
 		5B7BC4AF27AFFBE800F66C24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmPrefWindow.xib; sourceTree = "<group>"; };
 		5B7BC4B227AFFC0B00F66C24 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmPrefWindow.strings; sourceTree = "<group>"; };
 		5B7F225C2808501000DDD3CB /* KeyHandler_HandleInput.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_HandleInput.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -654,7 +654,7 @@
 			isa = PBXGroup;
 			children = (
 				5BA9FD0C27FEDB6B002DE248 /* ctlPrefUI.swift */,
-				5B78EE0C28A562B4009456C1 /* suiPrefPaneDangerZone.swift */,
+				5B78EE0C28A562B4009456C1 /* suiPrefPaneDevZone.swift */,
 				5BA9FD0E27FEDB6B002DE248 /* suiPrefPaneDictionary.swift */,
 				5BA9FD0D27FEDB6B002DE248 /* suiPrefPaneExperience.swift */,
 				5BA9FD0A27FEDB6B002DE248 /* suiPrefPaneGeneral.swift */,
@@ -1187,7 +1187,7 @@
 				5B3A87BC28597CDB0090E163 /* LMSymbolNode.swift in Sources */,
 				5BA9FD4327FEF3C8002DE248 /* Preferences.swift in Sources */,
 				5BA9FD4427FEF3C8002DE248 /* SegmentedControlStyleViewController.swift in Sources */,
-				5B78EE0D28A562B4009456C1 /* suiPrefPaneDangerZone.swift in Sources */,
+				5B78EE0D28A562B4009456C1 /* suiPrefPaneDevZone.swift in Sources */,
 				D47F7DCE278BFB57002F9DD7 /* ctlPrefWindow.swift in Sources */,
 				5BD0113D2818543900609769 /* KeyHandler_Core.swift in Sources */,
 				5B2170E4289FACAD00BE7304 /* 2_Walker.swift in Sources */,

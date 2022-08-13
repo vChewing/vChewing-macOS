@@ -9,7 +9,7 @@
 import SwiftUI
 
 @available(macOS 10.15, *)
-struct suiPrefPaneDangerZone: View {
+struct suiPrefPaneDevZone: View {
   @State private var selUseIMKCandidateWindow: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kUseIMKCandidateWindow.rawValue)
   @State private var selHandleDefaultCandidateFontsByLangIdentifier: Bool = UserDefaults.standard.bool(
@@ -62,8 +62,8 @@ struct suiPrefPaneDangerZone: View {
 }
 
 @available(macOS 11.0, *)
-struct suiPrefPaneDangerZone_Previews: PreviewProvider {
+struct suiPrefPaneDevZone_Previews: PreviewProvider {
   static var previews: some View {
-    suiPrefPaneDangerZone()
+    suiPrefPaneDevZone()
   }
 }

@@ -63,6 +63,9 @@
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
+"lblDevZoneCandidateFont.title" = "これは Apple Bug Report #FB10978412 の臨時対策であり、macOS 12 からの macOS に効き、IMK 以外の候補陳列ウィンドウに作用する。Apple は macOS 11 からの macOS のために該当 Bug を修復すべきである。";
+"lblDevZoneIMKCandidate.title" = "IMK 候補陳列ウィンドウで言選り用キーは現時点で利用不可。";
+"lblDevZoneTitleDescription.title" = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
 "lblUpperCaseLetterKeyBehavior.title" = "Shift+文字キーの行為をご指定ください。";
 "Parser11.title" = "国音二式 (ローマ字+数字音調)";
 "Parser12.title" = "イェール弁音 (ローマ字+数字音調)";
@@ -78,6 +81,8 @@
 "rVQ-Hx-cGi.title" = "和語";
 "s7u-Fm-dVg.title" = "ページ";
 "shc-Nu-UsM.title" = "ページボタンを表示";
+"tglDevZoneCandidateFont.title" = "「.langIdentifier」を使って候補陳列ウィンドウのフォントを取り扱う";
+"tglDevZoneIMKCandidate.title" = "IMK 候補陳列ウィンドウを起用（入力アプリは自動的に再起動）";
 "TXr-FF-ehw.title" = "繁体中国語";
 "ueU-Rz-a1C.title" = "入力候補陳列での (Shift+)Tab キーの輪番切替対象をご指定ください。";
 "VdT-fw-7pQ.title" = "欠陥辿着モード";
@@ -102,8 +107,3 @@
 "XqL-rf-X6d.title" = "Space で次のページ、Shift+Space で次の候補文字を";
 "xrE-8T-WKO.label" = "詳細";
 "ZEv-Q2-mYL.title" = "アプリ表示用言語をご指定ください、そして入力アプリは自動的に再起動。";
-"lblDangerZoneTitleDescription.title" = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
-"tglDangerZoneIMKCandidate.title" = "IMK 候補陳列ウィンドウを起用（入力アプリは自動的に再起動）";
-"lblDangerZoneIMKCandidate.title" = "IMK 候補陳列ウィンドウで言選り用キーは現時点で利用不可。";
-"tglDangerZoneCandidateFont.title" = "「.langIdentifier」を使って候補陳列ウィンドウのフォントを取り扱う";
-"lblDangerZoneCandidateFont.title" = "これは Apple Bug Report #FB10978412 の臨時対策であり、macOS 12 からの macOS に効き、IMK 以外の候補陳列ウィンドウに作用する。Apple は macOS 11 からの macOS のために該当 Bug を修復すべきである。";
