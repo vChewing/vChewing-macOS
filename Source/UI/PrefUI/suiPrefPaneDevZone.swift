@@ -42,7 +42,7 @@ struct suiPrefPaneDevZone: View {
             mgrPrefs.useIMKCandidateWindow = selUseIMKCandidateWindow
           }
         )
-        Text(LocalizedStringKey("Candidate selection keys are not yet available in IMK candidate window."))
+        Text(LocalizedStringKey("IMK candidate window is plagued with issues like failed selection keys."))
           .preferenceDescription().fixedSize(horizontal: false, vertical: true)
         Toggle(
           LocalizedStringKey("Use .langIdentifier to handle UI fonts in candidate window"),

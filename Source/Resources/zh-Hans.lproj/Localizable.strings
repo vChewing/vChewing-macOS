@@ -106,7 +106,6 @@
 "Automatically reload user data files if changes detected" = "自动检测并载入使用者语汇档案变更";
 "Basic Keyboard Layout:" = "基础键盘布局:";
 "Candidate Layout:" = "候选字窗布局:";
-"Candidate selection keys are not yet available in IMK candidate window." = "IMK 选字窗目前暂时无法正常使用选字键。";
 "Candidate Size:" = "候选字窗字号:";
 "Change user interface language (will reboot the IME)." = "变更输入法介面语言，会自动重启输入法。";
 "Check for updates automatically" = "自动检查软体更新";
@@ -147,6 +146,7 @@
 "Hualuo Pinyin with Numeral Intonation" = "华罗拼音+数字标调";
 "Hualuo Pinyin with Numeral Intonation" = "華羅拼音+数字标调";
 "IBM" = "IBM 排列";
+"IMK candidate window is plagued with issues like failed selection keys." = "IMK 选字窗目前暂时无法正常使用选字键，并具其它未知故障。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "将游标置于词语前方 // macOS 内建注音风格";
 "Japanese" = "和语";
 "Keyboard Shortcuts:" = "键盘快捷键:";

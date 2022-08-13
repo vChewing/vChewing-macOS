@@ -64,7 +64,7 @@
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
 "lblDevZoneCandidateFont.title" = "This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later.";
-"lblDevZoneIMKCandidate.title" = "Candidate selection keys are not yet available in IMK candidate window.";
+"lblDevZoneIMKCandidate.title" = "IMK candidate window is plagued with issues like failed selection keys.";
 "lblDevZoneTitleDescription.title" = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
 "lblUpperCaseLetterKeyBehavior.title" = "Choose the behavior of Shift+Letter key with letter inputs.";
 "Parser11.title" = "Secondary Pinyin with Numeral Intonation";

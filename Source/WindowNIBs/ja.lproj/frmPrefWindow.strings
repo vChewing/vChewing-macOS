@@ -64,7 +64,7 @@
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
 "lblDevZoneCandidateFont.title" = "これは Apple Bug Report #FB10978412 の臨時対策であり、macOS 12 からの macOS に効き、IMK 以外の候補陳列ウィンドウに作用する。Apple は macOS 11 からの macOS のために該当 Bug を修復すべきである。";
-"lblDevZoneIMKCandidate.title" = "IMK 候補陳列ウィンドウで言選り用キーは現時点で利用不可。";
+"lblDevZoneIMKCandidate.title" = "IMK 候補陳列ウィンドウで言選り用キーは現時点で利用不可、尚他故障あり。";
 "lblDevZoneTitleDescription.title" = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
 "lblUpperCaseLetterKeyBehavior.title" = "Shift+文字キーの行為をご指定ください。";
 "Parser11.title" = "国音二式 (ローマ字+数字音調)";

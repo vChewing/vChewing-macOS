@@ -106,7 +106,6 @@
 "Automatically reload user data files if changes detected" = "Automatically reload user data files if changes detected";
 "Basic Keyboard Layout:" = "Basic Keyboard Layout:";
 "Candidate Layout:" = "Candidate Layout:";
-"Candidate selection keys are not yet available in IMK candidate window." = "Candidate selection keys are not yet available in IMK candidate window.";
 "Candidate Size:" = "Candidate Size:";
 "Change user interface language (will reboot the IME)." = "Change user interface language (will reboot the IME).";
 "Check for updates automatically" = "Check for updates automatically";
@@ -146,6 +145,7 @@
 "Hsu" = "Hsu";
 "Hualuo Pinyin with Numeral Intonation" = "Hualuo Pinyin with Numeral Intonation";
 "IBM" = "IBM";
+"IMK candidate window is plagued with issues like failed selection keys." = "IMK candidate window is plagued with issues like failed selection keys.";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "in front of the phrase (like macOS built-in Zhuyin IME)";
 "Japanese" = "Japanese";
 "Keyboard Shortcuts:" = "Keyboard Shortcuts:";

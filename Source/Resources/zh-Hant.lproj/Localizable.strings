@@ -106,7 +106,6 @@
 "Automatically reload user data files if changes detected" = "自動檢測並載入使用者語彙檔案變更";
 "Basic Keyboard Layout:" = "基礎鍵盤佈局:";
 "Candidate Layout:" = "候選字窗佈局:";
-"Candidate selection keys are not yet available in IMK candidate window." = "IMK 選字窗目前暫時無法正常使用選字鍵。";
 "Candidate Size:" = "候選字窗字號:";
 "Change user interface language (will reboot the IME)." = "變更輸入法介面語言，會自動重啟輸入法。";
 "Check for updates automatically" = "自動檢查軟體更新";
@@ -146,6 +145,7 @@
 "Hsu" = "許氏國音自然排列";
 "Hualuo Pinyin with Numeral Intonation" = "華羅拼音+數字標調";
 "IBM" = "IBM 排列";
+"IMK candidate window is plagued with issues like failed selection keys." = "IMK 選字窗目前暫時無法正常使用選字鍵，併具其它未知故障。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "將游標置於詞語前方 // macOS 內建注音風格";
 "Japanese" = "和語";
 "Keyboard Shortcuts:" = "鍵盤快速鍵:";

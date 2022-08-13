@@ -1088,15 +1088,15 @@ Features listed here may not work as expected.</string>
                     </connections>
                 </button>
                 <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lblControlDevZoneIMKCandidate" userLabel="lblControlDevZoneIMKCandidate">
-                    <rect key="frame" x="18" y="156" width="409" height="14"/>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Candidate selection keys are not yet available in IMK candidate window." id="lblDevZoneIMKCandidate">
+                    <rect key="frame" x="18" y="142" width="409" height="28"/>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="IMK candidate window is plagued with issues like malfunctioned selection keys, etc." id="lblDevZoneIMKCandidate">
                         <font key="font" metaFont="smallSystem"/>
                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tglControlDevZoneCandidateFont" userLabel="tglControlDevZoneCandidateFont">
-                    <rect key="frame" x="19" y="132.5" width="406" height="18"/>
+                    <rect key="frame" x="19" y="118.5" width="406" height="18"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="17" id="eCc-Cc-xvc"/>
                     </constraints>
@@ -1109,7 +1109,7 @@ Features listed here may not work as expected.</string>
                     </connections>
                 </button>
                 <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lblControlDevZoneCandidateFont" userLabel="lblControlDevZoneCandidateFont">
-                    <rect key="frame" x="18" y="82" width="409" height="42"/>
+                    <rect key="frame" x="18" y="68" width="409" height="42"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="405" id="1OL-J2-FUX"/>
                     </constraints>

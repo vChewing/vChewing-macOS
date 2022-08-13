@@ -64,7 +64,7 @@
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
 "lblDevZoneCandidateFont.title" = "該方法是 Apple Bug Report #FB10978412 的保守治療方案，用來僅針對 macOS 12 開始的系統，且僅對非 IMK 選字窗起作用。Apple 應該對 macOS 11 開始的系統修復這個 Bug。";
-"lblDevZoneIMKCandidate.title" = "IMK 選字窗目前暫時無法正常使用選字鍵。";
+"lblDevZoneIMKCandidate.title" = "IMK 選字窗目前暫時無法正常使用選字鍵，併具其它未知故障。";
 "lblDevZoneTitleDescription.title" = "警告：該頁面僅作未來功能測試所用。\n在此列出的功能並非處於完全可用之狀態。";
 "lblUpperCaseLetterKeyBehavior.title" = "指定 Shift+字母鍵 的行為。";
 "Parser11.title" = "國音二式+數字標調";
