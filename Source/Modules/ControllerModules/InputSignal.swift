@@ -214,6 +214,11 @@ struct InputSignal: CustomStringConvertible {
     18: "1", 19: "2", 20: "3", 21: "4", 23: "5", 22: "6", 26: "7", 28: "8", 25: "9", 29: "0",
   ]
 
+  var isCandidateKey: Bool {
+    mgrPrefs.candidateKeys.contains(inputText)
+      || mgrPrefs.candidateKeys.contains(inputTextIgnoringModifiers ?? "114514")
+  }
+
   /// 單獨用 flags 來判定數字小鍵盤輸入的方法已經失效了，所以必須再增補用 KeyCode 判定的方法。
   var isNumericPadKey: Bool { arrNumpadKeyCodes.contains(keyCode) }
   var isMainAreaNumKey: Bool { arrMainAreaNumKey.contains(keyCode) }

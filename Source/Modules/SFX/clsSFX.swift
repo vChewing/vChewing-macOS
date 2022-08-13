@@ -18,6 +18,14 @@ public enum clsSFX {
     AudioServicesPlaySystemSound(soundID)
   }
 
+  static func fart() {
+    let filePath = Bundle.main.path(forResource: "Fart", ofType: "m4a")!
+    let fileURL = URL(fileURLWithPath: filePath)
+    var soundID: SystemSoundID = 0
+    AudioServicesCreateSystemSoundID(fileURL as CFURL, &soundID)
+    AudioServicesPlaySystemSound(soundID)
+  }
+
   static func beep(count: Int = 1) {
     if count <= 1 {
       clsSFX.beep()

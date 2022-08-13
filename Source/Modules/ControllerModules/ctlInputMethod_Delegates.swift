@@ -26,6 +26,7 @@ extension ctlInputMethod: KeyHandlerDelegate {
     -> Bool
   {
     guard let state = state as? InputState.Marking else { return false }
+    if state.bufferReadingCountMisMatch { return false }
     let refInputModeReversed: InputMode =
       (keyHandler.inputMode == InputMode.imeModeCHT)
       ? InputMode.imeModeCHS : InputMode.imeModeCHT
@@ -49,7 +50,70 @@ extension ctlInputMethod: KeyHandlerDelegate {
 // MARK: - Candidate Controller Delegate
 
 extension ctlInputMethod: ctlCandidateDelegate {
-  func handleDelegateEvent(_ event: NSEvent!) -> Bool { handle(event, client: client()) }
+  func handleDelegateEvent(_ event: NSEvent!) -> Bool {
+    // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
+    if #available(macOS 10.15, *) {
+      if ShiftKeyUpChecker.check(event) {
+        if !rencentKeyHandledByKeyHandler {
+          NotifierController.notify(
+            message: String(
+              format: "%@%@%@", NSLocalizedString("Alphanumerical Mode", comment: ""), "\n",
+              toggleASCIIMode()
+                ? NSLocalizedString("NotificationSwitchON", comment: "")
+                : NSLocalizedString("NotificationSwitchOFF", comment: "")
+            )
+          )
+        }
+        rencentKeyHandledByKeyHandler = false
+        return false
+      }
+    }
+
+    /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
+    /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
+    /// 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
+    /// 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
+    if event.type == .flagsChanged { return false }
+
+    // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
+    ctlInputMethod.areWeNerfing = event.modifierFlags.contains([.shift, .command])
+
+    var textFrame = NSRect.zero
+
+    let attributes: [AnyHashable: Any]? = client().attributes(
+      forCharacterIndex: 0, lineHeightRectangle: &textFrame
+    )
+
+    let isTypingVertical =
+      (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
+
+    if client().bundleIdentifier()
+      == "org.atelierInmu.vChewing.vChewingPhraseEditor"
+    {
+      IME.areWeUsingOurOwnPhraseEditor = true
+    } else {
+      IME.areWeUsingOurOwnPhraseEditor = false
+    }
+
+    var input = InputSignal(event: event, isVerticalTyping: isTypingVertical)
+    input.isASCIIModeInput = isASCIIMode
+
+    // 無法列印的訊號輸入，一概不作處理。
+    // 這個過程不能放在 KeyHandler 內，否則不會起作用。
+    if !input.charCode.isPrintable {
+      return false
+    }
+
+    /// 將按鍵行為與當前輸入法狀態結合起來、交給按鍵調度模組來處理。
+    /// 再根據返回的 result bool 數值來告知 IMK「這個按鍵事件是被處理了還是被放行了」。
+    let result = keyHandler.handleCandidate(state: state, input: input) { newState in
+      self.handle(state: newState)
+    } errorCallback: {
+      clsSFX.beep()
+    }
+    rencentKeyHandledByKeyHandler = result
+    return result
+  }
 
   func candidateCountForController(_ controller: ctlCandidateProtocol) -> Int {
     _ = controller  // 防止格式整理工具毀掉與此對應的參數。

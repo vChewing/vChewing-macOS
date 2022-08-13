@@ -18,8 +18,6 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     }
   }
 
-  public var selectedCandidateIndex: Int = .max
-
   public var visible: Bool = false {
     didSet {
       if visible {
@@ -30,10 +28,14 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     }
   }
 
-  public var windowTopLeftPoint: NSPoint = .init(x: 0, y: 0) {
-    didSet {
+  public var windowTopLeftPoint: NSPoint {
+    get {
+      let frameRect = candidateFrame()
+      return NSPoint(x: frameRect.minX, y: frameRect.maxY)
+    }
+    set {
       DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
-        self.set(windowTopLeftPoint: self.windowTopLeftPoint, bottomOutOfScreenAdjustmentHeight: 0)
+        self.set(windowTopLeftPoint: newValue, bottomOutOfScreenAdjustmentHeight: 0)
       }
     }
   }
@@ -60,7 +62,8 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
       case .vertical:
         setPanelType(kIMKSingleColumnScrollingCandidatePanel)
     }
-    setAttributes([IMKCandidatesSendServerKeyEventFirst: false])
+    // 設為 true 表示先交給 ctlIME 處理
+    setAttributes([IMKCandidatesSendServerKeyEventFirst: true])
   }
 
   public required init(_ layout: CandidateLayout = .horizontal) {
@@ -86,40 +89,151 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     update()
   }
 
+  /// 幹話：這裡很多函式內容亂寫也都無所謂了，因為都被 IMKCandidates 代管執行。
+  /// 對於所有 IMK 選字窗的選字判斷動作，不是在 keyHandler 中，而是在 `ctlIME_Core` 中。
+
+  private var currentPageIndex: Int = 0
+
+  private var pageCount: Int {
+    guard let delegate = delegate else {
+      return 0
+    }
+    let totalCount = delegate.candidateCountForController(self)
+    let keyLabelCount = keyLabels.count
+    return totalCount / keyLabelCount + ((totalCount % keyLabelCount) != 0 ? 1 : 0)
+  }
+
   public func showNextPage() -> Bool {
+    guard delegate != nil else { return false }
+    if pageCount == 1 { return highlightNextCandidate() }
+    if currentPageIndex + 1 >= pageCount { clsSFX.beep() }
+    currentPageIndex = (currentPageIndex + 1 >= pageCount) ? 0 : currentPageIndex + 1
     if selectedCandidateIndex == candidates(self).count - 1 { return false }
     selectedCandidateIndex = min(selectedCandidateIndex + keyCount, candidates(self).count - 1)
-    return selectCandidate(withIdentifier: selectedCandidateIndex)
+    pageDownAndModifySelection(self)
+    return true
   }
 
   public func showPreviousPage() -> Bool {
+    guard delegate != nil else { return false }
+    if pageCount == 1 { return highlightPreviousCandidate() }
+    if currentPageIndex == 0 { clsSFX.beep() }
+    currentPageIndex = (currentPageIndex == 0) ? pageCount - 1 : currentPageIndex - 1
     if selectedCandidateIndex == 0 { return true }
     selectedCandidateIndex = max(selectedCandidateIndex - keyCount, 0)
-    return selectCandidate(withIdentifier: selectedCandidateIndex)
+    pageUpAndModifySelection(self)
+    return true
   }
 
   public func highlightNextCandidate() -> Bool {
-    if selectedCandidateIndex == candidates(self).count - 1 { return false }
-    selectedCandidateIndex = min(selectedCandidateIndex + 1, candidates(self).count - 1)
-    return selectCandidate(withIdentifier: selectedCandidateIndex)
+    guard let delegate = delegate else { return false }
+    selectedCandidateIndex =
+      (selectedCandidateIndex + 1 >= delegate.candidateCountForController(self))
+      ? 0 : selectedCandidateIndex + 1
+    switch currentLayout {
+      case .horizontal:
+        moveRight(self)
+        return true
+      case .vertical:
+        moveDown(self)
+        return true
+    }
   }
 
   public func highlightPreviousCandidate() -> Bool {
-    if selectedCandidateIndex == 0 { return true }
-    selectedCandidateIndex = max(selectedCandidateIndex - 1, 0)
-    return selectCandidate(withIdentifier: selectedCandidateIndex)
-  }
-
-  public func candidateIndexAtKeyLabelIndex(_: Int) -> Int {
-    selectedCandidateIndex
-  }
-
-  public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight _: CGFloat = 0) {
-    setCandidateFrameTopLeft(windowTopLeftPoint)
-  }
-
-  override public func handle(_ event: NSEvent!, client _: Any!) -> Bool {
     guard let delegate = delegate else { return false }
-    return delegate.handleDelegateEvent(event)
+    selectedCandidateIndex =
+      (selectedCandidateIndex == 0)
+      ? delegate.candidateCountForController(self) - 1 : selectedCandidateIndex - 1
+    switch currentLayout {
+      case .horizontal:
+        moveLeft(self)
+        return true
+      case .vertical:
+        moveUp(self)
+        return true
+    }
+  }
+
+  public func candidateIndexAtKeyLabelIndex(_ index: Int) -> Int {
+    guard let delegate = delegate else {
+      return Int.max
+    }
+
+    let result = currentPageIndex * keyLabels.count + index
+    return result < delegate.candidateCountForController(self) ? result : Int.max
+  }
+
+  public var selectedCandidateIndex: Int {
+    get {
+      selectedCandidate()
+    }
+    set {
+      selectCandidate(withIdentifier: newValue)
+    }
+  }
+
+  public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
+    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
+      self.doSet(
+        windowTopLeftPoint: windowTopLeftPoint, bottomOutOfScreenAdjustmentHeight: height
+      )
+    }
+  }
+
+  func doSet(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
+    var adjustedPoint = windowTopLeftPoint
+    var adjustedHeight = height
+
+    var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.zero
+    for screen in NSScreen.screens {
+      let frame = screen.visibleFrame
+      if windowTopLeftPoint.x >= frame.minX, windowTopLeftPoint.x <= frame.maxX,
+        windowTopLeftPoint.y >= frame.minY, windowTopLeftPoint.y <= frame.maxY
+      {
+        screenFrame = frame
+        break
+      }
+    }
+
+    if adjustedHeight > screenFrame.size.height / 2.0 {
+      adjustedHeight = 0.0
+    }
+
+    let windowSize = candidateFrame().size
+
+    // bottom beneath the screen?
+    if adjustedPoint.y - windowSize.height < screenFrame.minY {
+      adjustedPoint.y = windowTopLeftPoint.y + adjustedHeight + windowSize.height
+    }
+
+    // top over the screen?
+    if adjustedPoint.y >= screenFrame.maxY {
+      adjustedPoint.y = screenFrame.maxY - 1.0
+    }
+
+    // right
+    if adjustedPoint.x + windowSize.width >= screenFrame.maxX {
+      adjustedPoint.x = screenFrame.maxX - windowSize.width
+    }
+
+    // left
+    if adjustedPoint.x < screenFrame.minX {
+      adjustedPoint.x = screenFrame.minX
+    }
+
+    setCandidateFrameTopLeft(adjustedPoint)
+  }
+
+  override public func interpretKeyEvents(_ eventArray: [NSEvent]) {
+    guard !eventArray.isEmpty else { return }
+    let event = eventArray[0]
+    let input = InputSignal(event: event)
+    guard let delegate = delegate else { return }
+    if input.isEsc || input.isBackSpace || input.isDelete || input.isShiftHold {
+      _ = delegate.handleDelegateEvent(event)
+    } else {
+      super.interpretKeyEvents(eventArray)
+    }
   }
 }

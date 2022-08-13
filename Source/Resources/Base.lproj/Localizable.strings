@@ -39,7 +39,7 @@
 "Please specify at least 4 candidate keys." = "Please specify at least 4 candidate keys.";
 "Maximum 15 candidate keys allowed." = "Maximum 15 candidate keys allowed.";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.";
-"⚠︎ Beware: Chars and Readings in buffer doesn't match." = "⚠︎ Beware: Chars and Readings in buffer doesn't match.";
+"⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.";
 "Per-Char Select Mode" = "Per-Char Select Mode";
 "CNS11643 Mode" = "CNS11643 Mode";
 "JIS Shinjitai Output" = "JIS Shinjitai Output";
@@ -123,6 +123,7 @@
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "Dachen (Microsoft Standard / Wang / 01, etc.)";
 "Dachen 26 (libChewing)" = "Dachen 26 (libChewing)";
 "Debug Mode" = "Debug Mode";
+"DevZone" = "DevZone";
 "Dictionary" = "Dictionary";
 "Directly commit lowercased letters" = "Directly commit lowercased letters";
 "Directly commit uppercased letters" = "Directly commit uppercased letters";
@@ -144,6 +145,7 @@
 "Hsu" = "Hsu";
 "Hualuo Pinyin with Numeral Intonation" = "Hualuo Pinyin with Numeral Intonation";
 "IBM" = "IBM";
+"IMK candidate window is plagued with issues like failed selection keys." = "IMK candidate window is plagued with issues like failed selection keys.";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "in front of the phrase (like macOS built-in Zhuyin IME)";
 "Japanese" = "Japanese";
 "Keyboard Shortcuts:" = "Keyboard Shortcuts:";
@@ -166,11 +168,15 @@
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "Space to +cycle pages, Shift+Space to +cycle candidates";
 "Starlight" = "Starlight";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "Stop farting (when typed phonetic combination is invalid, etc.)";
+"This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later." = "This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later.";
 "Traditional Chinese" = "Traditional Chinese";
 "Type them into inline composition buffer" = "Type them into inline composition buffer";
 "Typing Style:" = "Typing Style:";
 "UI Language:" = "UI Language:";
 "Universal Pinyin with Numeral Intonation" = "Universal Pinyin with Numeral Intonation";
+"Use .langIdentifier to handle UI fonts in candidate window" = "Use .langIdentifier to handle UI fonts in candidate window";
 "Use ESC key to clear the entire input buffer" = "Use ESC key to clear the entire input buffer";
+"Use IMK Candidate Window instead (will reboot the IME)" = "Use IMK Candidate Window instead (will reboot the IME)";
 "Vertical" = "Vertical";
+"Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
 "Yale Pinyin with Numeral Intonation" = "Yale Pinyin with Numeral Intonation";

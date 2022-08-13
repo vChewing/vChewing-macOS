@@ -25,7 +25,8 @@ class ctlInputMethod: IMKInputController {
   static var areWeNerfing = false
 
   /// 目前在用的的選字窗副本。
-  static var ctlCandidateCurrent: ctlCandidateProtocol = ctlCandidateUniversal.init(.horizontal)
+  static var ctlCandidateCurrent: ctlCandidateProtocol =
+    mgrPrefs.useIMKCandidateWindow ? ctlCandidateIMK.init(.horizontal) : ctlCandidateUniversal.init(.horizontal)
 
   /// 工具提示視窗的副本。
   static let tooltipController = TooltipController()
@@ -47,7 +48,7 @@ class ctlInputMethod: IMKInputController {
   }
 
   /// `handle(event:)` 會利用這個參數判定某次 Shift 按鍵是否用來切換中英文輸入。
-  private var rencentKeyHandledByKeyHandler = false
+  var rencentKeyHandledByKeyHandler = false
 
   // MARK: - 工具函式
 
@@ -205,6 +206,12 @@ class ctlInputMethod: IMKInputController {
       }
     }
 
+    /// IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
+    if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK, ctlCandidateCurrent.visible {
+      ctlCandidateCurrent.interpretKeyEvents([event])
+      return true
+    }
+
     /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
     /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
     /// 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
@@ -270,19 +277,66 @@ class ctlInputMethod: IMKInputController {
         let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
         return (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
       }
-    }
-    if let state = state as? InputState.ChoosingCandidate {
+    } else if let state = state as? InputState.SymbolTable {
       return state.candidates.map { theCandidate -> String in
         let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
         return (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
       }
-    }
-    if let state = state as? InputState.SymbolTable {
+    } else if let state = state as? InputState.ChoosingCandidate {
       return state.candidates.map { theCandidate -> String in
         let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
         return (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
       }
     }
     return .init()
+  }
+
+  override open func candidateSelectionChanged(_: NSAttributedString!) {
+    // 暫時不需要擴充這個函數。
+  }
+
+  override open func candidateSelected(_ candidateString: NSAttributedString!) {
+    if state is InputState.AssociatedPhrases {
+      if !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter {
+        handle(state: InputState.EmptyIgnoringPreviousState())
+        handle(state: InputState.Empty())
+        return
+      }
+    }
+
+    var indexDeducted = 0
+    if let state = state as? InputState.AssociatedPhrases {
+      for (i, neta) in state.candidates.map(\.1).enumerated() {
+        let theConverted = IME.kanjiConversionIfRequired(neta)
+        let netaShown = (neta == theConverted) ? neta : "\(theConverted)(\(neta))"
+        if candidateString.string == netaShown {
+          indexDeducted = i
+          break
+        }
+      }
+    } else if let state = state as? InputState.SymbolTable {
+      for (i, neta) in state.candidates.map(\.1).enumerated() {
+        let theConverted = IME.kanjiConversionIfRequired(neta)
+        let netaShown = (neta == theConverted) ? neta : "\(theConverted)(\(neta))"
+        if candidateString.string == netaShown {
+          indexDeducted = i
+          break
+        }
+      }
+    } else if let state = state as? InputState.ChoosingCandidate {
+      for (i, neta) in state.candidates.map(\.1).enumerated() {
+        let theConverted = IME.kanjiConversionIfRequired(neta)
+        let netaShown = (neta == theConverted) ? neta : "\(theConverted)(\(neta))"
+        if candidateString.string == netaShown {
+          indexDeducted = i
+          break
+        }
+      }
+    }
+    keyHandler(
+      keyHandler,
+      didSelectCandidateAt: indexDeducted,
+      ctlCandidate: ctlInputMethod.ctlCandidateCurrent
+    )
   }
 }

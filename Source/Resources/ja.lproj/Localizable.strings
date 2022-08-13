@@ -39,7 +39,7 @@
 "Please specify at least 4 candidate keys." = "言選り用キー陣列に少なくとも４つのキーをご登録ください。";
 "Maximum 15 candidate keys allowed." = "言選り用キー陣列には最多１５つキー登録できます。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 言葉置換機能稼働中、新添付言葉にも影響。";
-"⚠︎ Beware: Chars and Readings in buffer doesn't match." = "⚠︎ 注意：緩衝列の字数は読みの数と不同等。";
+"⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 対処不可：緩衝列の字数は読みの数と不同等。";
 "Per-Char Select Mode" = "全候補入力モード";
 "CNS11643 Mode" = "全字庫モード";
 "JIS Shinjitai Output" = "JIS 新字体モード";
@@ -123,6 +123,7 @@
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千配列 (Microsoft 標準・王安・零壹など)";
 "Dachen 26 (libChewing)" = "酷音大千 26 キー配列";
 "Debug Mode" = "欠陥辿着モード";
+"DevZone" = "開発道場";
 "Dictionary" = "辞書設定";
 "Directly commit lowercased letters" = "ローマ字（小文字）を直接出力";
 "Directly commit uppercased letters" = "ローマ字（大文字）を直接出力";
@@ -144,6 +145,7 @@
 "Hsu" = "許氏国音自然配列";
 "Hualuo Pinyin with Numeral Intonation" = "中華ローマ弁音 (ローマ字+数字音調)";
 "IBM" = "IBM 配列";
+"IMK candidate window is plagued with issues like failed selection keys." = "IMK 候補陳列ウィンドウで言選り用キーは現時点で利用不可、尚他故障あり。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "単語の前で // macOS 内蔵注音入力のやり方";
 "Japanese" = "和語";
 "Keyboard Shortcuts:" = "ショートカット:";
@@ -166,11 +168,15 @@
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "Space で次のページ、Shift+Space で次の候補文字を";
 "Starlight" = "星光配列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "マナーモード // 外すと入力間違った時に変な声が出る";
+"This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later." = "これは Apple Bug Report #FB10978412 の臨時対策であり、macOS 12 からの macOS に効き、IMK 以外の候補陳列ウィンドウに作用する。Apple は macOS 11 からの macOS のために該当 Bug を修復すべきである。";
 "Traditional Chinese" = "繁体中国語";
 "Type them into inline composition buffer" = "入力緩衝列にローマ字入力";
 "Typing Style:" = "入力習慣:";
 "UI Language:" = "表示用言語:";
 "Universal Pinyin with Numeral Intonation" = "汎用弁音 (ローマ字+数字音調)";
+"Use .langIdentifier to handle UI fonts in candidate window" = "「.langIdentifier」を使って候補陳列ウィンドウのフォントを取り扱う";
 "Use ESC key to clear the entire input buffer" = "ESC キーで入力緩衝列を消す";
+"Use IMK Candidate Window instead (will reboot the IME)" = "IMK 候補陳列ウィンドウを起用（入力アプリは自動的に再起動）";
 "Vertical" = "縦型陳列";
+"Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
 "Yale Pinyin with Numeral Intonation" = "イェール弁音 (ローマ字+数字音調)";

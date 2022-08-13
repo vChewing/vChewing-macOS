@@ -14,7 +14,9 @@
                 <outlet property="fontSizePopUpButton" destination="90" id="108"/>
                 <outlet property="lblCurrentlySpecifiedUserDataFolder" destination="REC-r4-T7m" id="eEq-XN-mMq"/>
                 <outlet property="selectionKeyComboBox" destination="uHU-aL-du7" id="cEx-Ui-Phc"/>
+                <outlet property="tglControlDevZoneIMKCandidate" destination="tglControlDevZoneIMKCandidate" id="eyT-uP-QU6"/>
                 <outlet property="uiLanguageButton" destination="oS6-u5-7dP" id="V3u-XK-z7G"/>
+                <outlet property="vwrDevZone" destination="Qd7-ln-nNO" id="8mw-wO-gXS"/>
                 <outlet property="vwrDictionary" destination="Rnp-LM-RIF" id="8gY-ah-RT8"/>
                 <outlet property="vwrExperience" destination="XWo-36-xGi" id="hC5-gV-NWn"/>
                 <outlet property="vwrGeneral" destination="BUt-lg-GPp" id="PC2-Sj-V4Q"/>
@@ -1053,6 +1055,93 @@
                 <constraint firstItem="Md1-t7-hU4" firstAttribute="top" secondItem="hab-1o-1kS" secondAttribute="bottom" constant="8" symbolic="YES" id="zZC-jv-TR3"/>
             </constraints>
             <point key="canvasLocation" x="-392" y="-704"/>
+        </visualEffectView>
+        <visualEffectView blendingMode="behindWindow" material="sidebar" state="followsWindowActiveState" id="Qd7-ln-nNO" userLabel="vwrDevZone">
+            <rect key="frame" x="0.0" y="0.0" width="445" height="261"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lblControlDevZoneTitleDescription" userLabel="lblControlDevZoneTitleDescription">
+                    <rect key="frame" x="18" y="211" width="409" height="30"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" id="lblDevZoneTitleDescription">
+                        <font key="font" metaFont="cellTitle"/>
+                        <string key="title">Warning: This page is for testing future features.
+Features listed here may not work as expected.</string>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="P1o-bW-Tjn">
+                    <rect key="frame" x="20" y="200" width="405" height="5"/>
+                </box>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tglControlDevZoneIMKCandidate" userLabel="tglControlDevZoneIMKCandidate">
+                    <rect key="frame" x="19" y="178.5" width="406" height="17"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="16" id="1fy-CP-mlB"/>
+                    </constraints>
+                    <buttonCell key="cell" type="check" title="Use IMK Candidate Window instead (will reboot the IME)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="tglDevZoneIMKCandidate" userLabel="tglDevZoneIMKCandidate">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="cellTitle"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="updateIMKCandidateEnableStatusAction:" target="-2" id="mkT-P8-reE"/>
+                        <binding destination="32" name="value" keyPath="values.UseIMKCandidateWindow" id="XjP-hu-rUm"/>
+                    </connections>
+                </button>
+                <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lblControlDevZoneIMKCandidate" userLabel="lblControlDevZoneIMKCandidate">
+                    <rect key="frame" x="18" y="142" width="409" height="28"/>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="IMK candidate window is plagued with issues like malfunctioned selection keys, etc." id="lblDevZoneIMKCandidate">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tglControlDevZoneCandidateFont" userLabel="tglControlDevZoneCandidateFont">
+                    <rect key="frame" x="19" y="118.5" width="406" height="18"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="17" id="eCc-Cc-xvc"/>
+                    </constraints>
+                    <buttonCell key="cell" type="check" title="Use .langIdentifier to handle UI fonts in candidate window" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="tglDevZoneCandidateFont" userLabel="tglDevZoneCandidateFont">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="cellTitle"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="32" name="value" keyPath="values.HandleDefaultCandidateFontsByLangIdentifier" id="EEd-Z8-b5S"/>
+                    </connections>
+                </button>
+                <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lblControlDevZoneCandidateFont" userLabel="lblControlDevZoneCandidateFont">
+                    <rect key="frame" x="18" y="68" width="409" height="42"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="405" id="1OL-J2-FUX"/>
+                    </constraints>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="lblDevZoneCandidateFont">
+                        <font key="font" metaFont="smallSystem"/>
+                        <string key="title">This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later.</string>
+                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="lblControlDevZoneTitleDescription" firstAttribute="leading" secondItem="Qd7-ln-nNO" secondAttribute="leading" constant="20" symbolic="YES" id="0Ia-ut-ksj"/>
+                <constraint firstItem="tglControlDevZoneIMKCandidate" firstAttribute="top" secondItem="P1o-bW-Tjn" secondAttribute="bottom" constant="7.5" id="3as-Db-NwQ"/>
+                <constraint firstItem="tglControlDevZoneIMKCandidate" firstAttribute="leading" secondItem="lblControlDevZoneIMKCandidate" secondAttribute="leading" id="59X-nd-Otf"/>
+                <constraint firstItem="lblControlDevZoneIMKCandidate" firstAttribute="leading" secondItem="tglControlDevZoneCandidateFont" secondAttribute="leading" id="COk-L6-3R8"/>
+                <constraint firstItem="lblControlDevZoneCandidateFont" firstAttribute="top" secondItem="tglControlDevZoneCandidateFont" secondAttribute="bottom" constant="8.5" id="EyK-gG-Xhd"/>
+                <constraint firstItem="P1o-bW-Tjn" firstAttribute="trailing" secondItem="tglControlDevZoneIMKCandidate" secondAttribute="trailing" id="LM7-ov-mng"/>
+                <constraint firstItem="lblControlDevZoneTitleDescription" firstAttribute="trailing" secondItem="P1o-bW-Tjn" secondAttribute="trailing" id="LqC-ii-aOO"/>
+                <constraint firstAttribute="bottom" relation="lessThanOrEqual" secondItem="lblControlDevZoneCandidateFont" secondAttribute="bottom" constant="82" id="NVG-bX-Lgd"/>
+                <constraint firstItem="tglControlDevZoneCandidateFont" firstAttribute="top" secondItem="lblControlDevZoneIMKCandidate" secondAttribute="bottom" constant="6.5" id="UXh-8X-5wM"/>
+                <constraint firstItem="lblControlDevZoneTitleDescription" firstAttribute="leading" secondItem="P1o-bW-Tjn" secondAttribute="leading" id="Wc3-Oe-D2E"/>
+                <constraint firstItem="P1o-bW-Tjn" firstAttribute="top" secondItem="lblControlDevZoneTitleDescription" secondAttribute="bottom" constant="8" symbolic="YES" id="Whf-Gf-g65"/>
+                <constraint firstItem="lblControlDevZoneIMKCandidate" firstAttribute="top" secondItem="tglControlDevZoneIMKCandidate" secondAttribute="bottom" constant="8.5" id="awf-DD-u2k"/>
+                <constraint firstItem="P1o-bW-Tjn" firstAttribute="leading" secondItem="tglControlDevZoneIMKCandidate" secondAttribute="leading" id="f2q-KJ-bvO"/>
+                <constraint firstItem="tglControlDevZoneCandidateFont" firstAttribute="trailing" secondItem="lblControlDevZoneCandidateFont" secondAttribute="trailing" id="gWx-J5-kgO"/>
+                <constraint firstItem="tglControlDevZoneIMKCandidate" firstAttribute="trailing" secondItem="lblControlDevZoneIMKCandidate" secondAttribute="trailing" id="lQf-A0-TPV"/>
+                <constraint firstItem="tglControlDevZoneCandidateFont" firstAttribute="leading" secondItem="lblControlDevZoneCandidateFont" secondAttribute="leading" id="oCd-O4-Qfg"/>
+                <constraint firstItem="lblControlDevZoneTitleDescription" firstAttribute="top" secondItem="Qd7-ln-nNO" secondAttribute="top" constant="20" symbolic="YES" id="vYg-x4-tfo"/>
+                <constraint firstItem="lblControlDevZoneIMKCandidate" firstAttribute="trailing" secondItem="tglControlDevZoneCandidateFont" secondAttribute="trailing" id="z47-zE-rak"/>
+            </constraints>
+            <point key="canvasLocation" x="-393.5" y="-70.5"/>
         </visualEffectView>
     </objects>
 </document>

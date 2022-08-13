@@ -278,26 +278,19 @@ extension vChewing.LMUserOverride {
       saveCallback()
       return
     }
-    // TODO: 降低磁碟寫入次數。唯有失憶的情況下才會更新觀察且記憶。
+    // 這裡還是不要做 decayCallback 判定「是否不急著更新觀察」了，不然會在嘗試覆寫掉錯誤的記憶時失敗。
     if var theNeta = mutLRUMap[key] {
-      _ = getSuggestion(
-        key: key, timestamp: timestamp, headReading: "",
-        decayCallback: {
-          theNeta.observation.update(
-            candidate: candidate, timestamp: timestamp, forceHighScoreOverride: forceHighScoreOverride
-          )
-          self.mutLRUList.insert(theNeta, at: 0)
-          self.mutLRUMap[key] = theNeta
-          IME.prtDebugIntel("UOM: Observation finished with existing observation: \(key)")
-          saveCallback()
-        }
+      theNeta.observation.update(
+        candidate: candidate, timestamp: timestamp, forceHighScoreOverride: forceHighScoreOverride
       )
+      mutLRUList.insert(theNeta, at: 0)
+      mutLRUMap[key] = theNeta
+      IME.prtDebugIntel("UOM: Observation finished with existing observation: \(key)")
+      saveCallback()
     }
   }
 
-  private func getSuggestion(
-    key: String, timestamp: Double, headReading: String, decayCallback: @escaping () -> Void = {}
-  ) -> Suggestion {
+  private func getSuggestion(key: String, timestamp: Double, headReading: String) -> Suggestion {
     guard !key.isEmpty, let kvPair = mutLRUMap[key] else { return .init() }
     let observation: Observation = kvPair.observation
     var candidates: [(String, Megrez.Unigram)] = .init()
@@ -309,11 +302,6 @@ extension vChewing.LMUserOverride {
         eventTimestamp: theObservation.timestamp, timestamp: timestamp, lambda: mutDecayExponent
       )
       if (0...currentHighScore).contains(overrideScore) { continue }
-      let overrideDetectionScore: Double = getScore(
-        eventCount: theObservation.count, totalCount: observation.count,
-        eventTimestamp: theObservation.timestamp, timestamp: timestamp, lambda: mutDecayExponent * 2
-      )
-      if (0...currentHighScore).contains(overrideDetectionScore) { decayCallback() }
 
       candidates.append((headReading, .init(value: i, score: overrideScore)))
       forceHighScoreOverride = theObservation.forceHighScoreOverride

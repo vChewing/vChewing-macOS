@@ -82,7 +82,7 @@ private class vwrCandidateUniversal: NSView {
       switch isVerticalLayout {
         case true:
           if calculatedWindowWidth < rctCandidate.size.width {
-            calculatedWindowWidth = rctCandidate.size.width + cellPadding
+            calculatedWindowWidth = rctCandidate.size.width + cellPadding * 2
           }
         case false:
           if cellWidth < cellHeight * 1.35 {
@@ -137,46 +137,40 @@ private class vwrCandidateUniversal: NSView {
     NSColor.controlBackgroundColor.setFill()  // Candidate list panel base background
     NSBezierPath.fill(bounds)
 
-    NSColor.systemGray.withAlphaComponent(0.75).setStroke()
-
-    NSBezierPath.strokeLine(
-      from: NSPoint(x: bounds.size.width, y: 0.0),
-      to: NSPoint(x: bounds.size.width, y: bounds.size.height)
-    )
-
     switch isVerticalLayout {
       case true:
         var accuHeight: CGFloat = 0
         for (index, elementHeight) in elementHeights.enumerated() {
           let currentHeight = elementHeight
           let rctCandidateArea = NSRect(
-            x: 0.0, y: accuHeight, width: windowWidth, height: candidateTextHeight + cellPadding
+            x: 3.0, y: accuHeight + 3.0, width: windowWidth - 6.0,
+            height: candidateTextHeight + cellPadding - 6.0
           )
           let rctLabel = NSRect(
-            x: cellPadding / 2 - 1, y: accuHeight + cellPadding / 2, width: keyLabelWidth,
+            x: cellPadding / 2 + 2, y: accuHeight + cellPadding / 2, width: keyLabelWidth,
             height: keyLabelHeight * 2.0
           )
           let rctCandidatePhrase = NSRect(
-            x: cellPadding / 2 - 1 + keyLabelWidth, y: accuHeight + cellPadding / 2 - 1,
+            x: cellPadding / 2 + 2 + keyLabelWidth, y: accuHeight + cellPadding / 2 - 1,
             width: windowWidth - keyLabelWidth, height: candidateTextHeight
           )
 
           var activeCandidateIndexAttr = keyLabelAttrDict
           var activeCandidateAttr = candidateAttrDict
           if index == highlightedIndex {
-            let colorBlendAmount: CGFloat = IME.isDarkMode() ? 0.25 : 0
+            let colorBlendAmount: CGFloat = IME.isDarkMode() ? 0.3 : 0
             // The background color of the highlightened candidate
             switch IME.currentInputMode {
               case InputMode.imeModeCHS:
                 NSColor.systemRed.blended(
                   withFraction: colorBlendAmount,
-                  of: NSColor.controlBackgroundColor
+                  of: NSColor.black
                 )!
                 .setFill()
               case InputMode.imeModeCHT:
                 NSColor.systemBlue.blended(
                   withFraction: colorBlendAmount,
-                  of: NSColor.controlBackgroundColor
+                  of: NSColor.black
                 )!
                 .setFill()
               default:
@@ -190,7 +184,24 @@ private class vwrCandidateUniversal: NSView {
           } else {
             NSColor.controlBackgroundColor.setFill()
           }
-          NSBezierPath.fill(rctCandidateArea)
+          if mgrPrefs.handleDefaultCandidateFontsByLangIdentifier {
+            switch IME.currentInputMode {
+              case InputMode.imeModeCHS:
+                if #available(macOS 12.0, *) {
+                  activeCandidateAttr[.languageIdentifier] = "zh-Hans" as AnyObject
+                }
+              case InputMode.imeModeCHT:
+                if #available(macOS 12.0, *) {
+                  activeCandidateAttr[.languageIdentifier] =
+                    (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
+                    ? "ja" as AnyObject : "zh-Hant" as AnyObject
+                }
+              default:
+                break
+            }
+          }
+          let path: NSBezierPath = .init(roundedRect: rctCandidateArea, xRadius: 5, yRadius: 5)
+          path.fill()
           (keyLabels[index] as NSString).draw(
             in: rctLabel, withAttributes: activeCandidateIndexAttr
           )
@@ -204,8 +215,8 @@ private class vwrCandidateUniversal: NSView {
         for (index, elementWidth) in elementWidths.enumerated() {
           let currentWidth = elementWidth
           let rctCandidateArea = NSRect(
-            x: accuWidth, y: 0.0, width: currentWidth + 1.0,
-            height: candidateTextHeight + cellPadding
+            x: accuWidth + 3.0, y: 3.0, width: currentWidth + 1.0 - 6.0,
+            height: candidateTextHeight + cellPadding - 6.0
           )
           let rctLabel = NSRect(
             x: accuWidth + cellPadding / 2 - 1, y: cellPadding / 2, width: keyLabelWidth,
@@ -220,19 +231,19 @@ private class vwrCandidateUniversal: NSView {
           var activeCandidateIndexAttr = keyLabelAttrDict
           var activeCandidateAttr = candidateAttrDict
           if index == highlightedIndex {
-            let colorBlendAmount: CGFloat = IME.isDarkMode() ? 0.25 : 0
+            let colorBlendAmount: CGFloat = IME.isDarkMode() ? 0.3 : 0
             // The background color of the highlightened candidate
             switch IME.currentInputMode {
               case InputMode.imeModeCHS:
                 NSColor.systemRed.blended(
                   withFraction: colorBlendAmount,
-                  of: NSColor.controlBackgroundColor
+                  of: NSColor.black
                 )!
                 .setFill()
               case InputMode.imeModeCHT:
                 NSColor.systemBlue.blended(
                   withFraction: colorBlendAmount,
-                  of: NSColor.controlBackgroundColor
+                  of: NSColor.black
                 )!
                 .setFill()
               default:
@@ -246,7 +257,24 @@ private class vwrCandidateUniversal: NSView {
           } else {
             NSColor.controlBackgroundColor.setFill()
           }
-          NSBezierPath.fill(rctCandidateArea)
+          if mgrPrefs.handleDefaultCandidateFontsByLangIdentifier {
+            switch IME.currentInputMode {
+              case InputMode.imeModeCHS:
+                if #available(macOS 12.0, *) {
+                  activeCandidateAttr[.languageIdentifier] = "zh-Hans" as AnyObject
+                }
+              case InputMode.imeModeCHT:
+                if #available(macOS 12.0, *) {
+                  activeCandidateAttr[.languageIdentifier] =
+                    (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
+                    ? "ja" as AnyObject : "zh-Hant" as AnyObject
+                }
+              default:
+                break
+            }
+          }
+          let path: NSBezierPath = .init(roundedRect: rctCandidateArea, xRadius: 5, yRadius: 5)
+          path.fill()
           (keyLabels[index] as NSString).draw(
             in: rctLabel, withAttributes: activeCandidateIndexAttr
           )
@@ -352,10 +380,10 @@ public class ctlCandidateUniversal: ctlCandidate {
 
     candidateView.wantsLayer = true
     candidateView.layer?.borderColor =
-      NSColor.selectedMenuItemTextColor.withAlphaComponent(0.10).cgColor
+      NSColor.selectedMenuItemTextColor.withAlphaComponent(0.20).cgColor
     candidateView.layer?.borderWidth = 1.0
     if #available(macOS 10.13, *) {
-      candidateView.layer?.cornerRadius = 6.0
+      candidateView.layer?.cornerRadius = 8.0
     }
 
     panel.contentView?.addSubview(candidateView)

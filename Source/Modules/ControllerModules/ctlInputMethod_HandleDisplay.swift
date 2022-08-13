@@ -46,6 +46,8 @@ extension ctlInputMethod {
         candidates = state.candidates
       }
       if isTypingVertical { return true }
+      // 接下來的判斷並非適用於 IMK 選字窗，所以先插入排除語句。
+      guard ctlInputMethod.ctlCandidateCurrent is ctlCandidateUniversal else { return false }
       // 以上是通用情形。接下來決定橫排輸入時是否使用縱排選字窗。
       // 因為在拿候選字陣列時已經排序過了，所以這裡不用再多排序。
       // 測量每頁顯示候選字的累計總長度。如果太長的話就強制使用縱排候選字窗。
@@ -64,13 +66,14 @@ extension ctlInputMethod {
     /// layoutCandidateView 在這裡無法起到糾正作用。
     /// 該問題徹底解決的價值並不大，直接等到 macOS 10.x 全線淘汰之後用 SwiftUI 重寫選字窗吧。
 
-    if isCandidateWindowVertical {  // 縱排輸入時強制使用縱排選字窗
-      ctlInputMethod.ctlCandidateCurrent = ctlCandidateUniversal.init(.vertical)
-    } else if mgrPrefs.useHorizontalCandidateList {
-      ctlInputMethod.ctlCandidateCurrent = ctlCandidateUniversal.init(.horizontal)
-    } else {
-      ctlInputMethod.ctlCandidateCurrent = ctlCandidateUniversal.init(.vertical)
-    }
+    let candidateLayout: CandidateLayout =
+      ((isCandidateWindowVertical || !mgrPrefs.useHorizontalCandidateList)
+        ? CandidateLayout.vertical
+        : CandidateLayout.horizontal)
+
+    ctlInputMethod.ctlCandidateCurrent =
+      mgrPrefs.useIMKCandidateWindow
+      ? ctlCandidateIMK.init(candidateLayout) : ctlCandidateUniversal.init(candidateLayout)
 
     // set the attributes for the candidate panel (which uses NSAttributedString)
     let textSize = mgrPrefs.candidateListTextSize
