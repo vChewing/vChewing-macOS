@@ -11,7 +11,9 @@ import InputMethodKit
 
 public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
   public var currentLayout: CandidateLayout = .horizontal
-
+  private let defaultIMKSelectionKey: [UInt16: String] = [
+    18: "1", 19: "2", 20: "3", 21: "4", 23: "5", 22: "6", 26: "7", 28: "8", 25: "9",
+  ]
   public weak var delegate: ctlCandidateDelegate? {
     didSet {
       reloadData()
@@ -239,6 +241,8 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
   }
 
   override public func interpretKeyEvents(_ eventArray: [NSEvent]) {
+    // 我不知道為什麼這個函數接收的參數是陣列，但經過測試卻發現這個函數收到的陣列往往內容只有一個。
+    // 這也可能是 Objective-C 當中允許接收內容為 nil 的一種方式。
     guard !eventArray.isEmpty else { return }
     let event = eventArray[0]
     let input = InputSignal(event: event)
@@ -275,6 +279,24 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
           } else {
             moveDown(self)
           }
+      }
+    } else if let newChar = defaultIMKSelectionKey[event.keyCode] {
+      /// 根據 KeyCode 重新換算一下選字鍵的 NSEvent，糾正其 Character 數值。
+      let newEvent = NSEvent.keyEvent(
+        with: event.type,
+        location: event.locationInWindow,
+        modifierFlags: event.modifierFlags,
+        timestamp: event.timestamp,
+        windowNumber: event.windowNumber,
+        context: nil,
+        characters: newChar,
+        charactersIgnoringModifiers: event.charactersIgnoringModifiers ?? event.characters ?? "",
+        isARepeat: event.isARepeat,
+        keyCode: event.keyCode
+      )
+      if let newEvent = newEvent {
+        /// 這裡不用診斷了，檢出的內容都是經過轉換之後的正確 NSEvent。
+        super.interpretKeyEvents([newEvent])
       }
     } else {
       super.interpretKeyEvents(eventArray)
