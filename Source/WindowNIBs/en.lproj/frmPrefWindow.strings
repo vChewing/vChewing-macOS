@@ -81,7 +81,7 @@
 "rVQ-Hx-cGi.title" = "Japanese";
 "s7u-Fm-dVg.title" = "Cycling Pages";
 "shc-Nu-UsM.title" = "Show page buttons in candidate list";
-"tglDevZoneCandidateFont.title" = "Use .langIdentifier to handle UI font in candidate window";
+"tglDevZoneCandidateFont.title" = "Use .langIdentifier to handle UI fonts in candidate window";
 "tglDevZoneIMKCandidate.title" = "Use IMK Candidate Window instead (will reboot the IME)";
 "TXr-FF-ehw.title" = "Traditional Chinese";
 "ueU-Rz-a1C.title" = "Choose the behavior of (Shift+)Tab key in the candidate window.";

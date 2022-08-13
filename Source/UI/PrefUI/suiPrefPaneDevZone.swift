@@ -45,7 +45,7 @@ struct suiPrefPaneDevZone: View {
         Text(LocalizedStringKey("Candidate selection keys are not yet available in IMK candidate window."))
           .preferenceDescription().fixedSize(horizontal: false, vertical: true)
         Toggle(
-          LocalizedStringKey("Use .langIdentifier to handle UI font in candidate window"),
+          LocalizedStringKey("Use .langIdentifier to handle UI fonts in candidate window"),
           isOn: $selHandleDefaultCandidateFontsByLangIdentifier.onChange {
             mgrPrefs.handleDefaultCandidateFontsByLangIdentifier = selHandleDefaultCandidateFontsByLangIdentifier
           }

@@ -174,7 +174,7 @@
 "Typing Style:" = "入力習慣:";
 "UI Language:" = "表示用言語:";
 "Universal Pinyin with Numeral Intonation" = "汎用弁音 (ローマ字+数字音調)";
-"Use .langIdentifier to handle UI font in candidate window" = "「.langIdentifier」を使って候補陳列ウィンドウのフォントを取り扱う";
+"Use .langIdentifier to handle UI fonts in candidate window" = "「.langIdentifier」を使って候補陳列ウィンドウのフォントを取り扱う";
 "Use ESC key to clear the entire input buffer" = "ESC キーで入力緩衝列を消す";
 "Use IMK Candidate Window instead (will reboot the IME)" = "IMK 候補陳列ウィンドウを起用（入力アプリは自動的に再起動）";
 "Vertical" = "縦型陳列";

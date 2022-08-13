@@ -174,7 +174,7 @@
 "Typing Style:" = "輸入風格:";
 "UI Language:" = "介面語言:";
 "Universal Pinyin with Numeral Intonation" = "通用拼音+數字標調";
-"Use .langIdentifier to handle UI font in candidate window" = "使用 .langIdentifier 來管理選字窗的預設介面字型";
+"Use .langIdentifier to handle UI fonts in candidate window" = "使用 .langIdentifier 來管理選字窗的預設介面字型";
 "Use ESC key to clear the entire input buffer" = "敲 ESC 鍵以清空整個組字緩衝區";
 "Use IMK Candidate Window instead (will reboot the IME)" = "啟用 IMK 選字窗（會自動重啟輸入法）";
 "Vertical" = "縱向佈局";
