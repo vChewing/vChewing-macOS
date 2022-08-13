@@ -241,7 +241,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
   }
 
   override public func interpretKeyEvents(_ eventArray: [NSEvent]) {
-    // 我不知道為什麼這個函數接收的參數是陣列，但經過測試卻發現這個函數收到的陣列往往內容只有一個。
+    // 鬼知道為什麼這個函式接收的參數是陣列，但經過測試卻發現這個函式收到的陣列往往內容只有一個。
     // 這也可能是 Objective-C 當中允許接收內容為 nil 的一種方式。
     guard !eventArray.isEmpty else { return }
     let event = eventArray[0]
