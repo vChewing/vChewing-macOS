@@ -70,6 +70,9 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     super.init(server: theServer, panelType: kIMKScrollingGridCandidatePanel)
     specifyLayout(layout)
     visible = false
+    // guard let currentTISInputSource = currentTISInputSource else { return }  // 下面兩句都沒用，所以註釋掉。
+    // setSelectionKeys([18, 19, 20, 21, 23, 22, 26, 28, 25])  // 這句是壞的，用了反而沒有選字鍵。
+    // setSelectionKeysKeylayout(currentTISInputSource)  // 這句也是壞的，沒有卵用。
   }
 
   @available(*, unavailable)
@@ -236,4 +239,24 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
       super.interpretKeyEvents(eventArray)
     }
   }
+}
+
+// MARK: - Generate TISInputSource Object
+
+/// 該參數只用來獲取 "com.apple.keylayout.ABC" 對應的 TISInputSource，
+/// 所以少寫了很多在這裡用不到的東西。
+/// 想參考完整版的話，請洽該專案內的 IME.swift。
+var currentTISInputSource: TISInputSource? {
+  var result: TISInputSource?
+  let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
+  let matchedTISString = "com.apple.keylayout.ABC"
+  for source in list {
+    guard let ptrCat = TISGetInputSourceProperty(source, kTISPropertyInputSourceCategory) else { continue }
+    let category = Unmanaged<CFString>.fromOpaque(ptrCat).takeUnretainedValue()
+    guard category == kTISCategoryKeyboardInputSource else { continue }
+    guard let ptrSourceID = TISGetInputSourceProperty(source, kTISPropertyInputSourceID) else { continue }
+    let sourceID = String(Unmanaged<CFString>.fromOpaque(ptrSourceID).takeUnretainedValue())
+    if sourceID == matchedTISString { result = source }
+  }
+  return result
 }
