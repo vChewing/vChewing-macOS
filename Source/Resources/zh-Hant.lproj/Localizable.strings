@@ -123,9 +123,9 @@
 "Cursor Selection:" = "選字游標:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千排列 (微軟標準/王安/零壹/仲鼎/國喬)";
 "Dachen 26 (libChewing)" = "酷音大千二十六鍵排列";
-"DangerZone" = "禁區";
+"DangerZone" = "開發道場";
 "Debug Mode" = "偵錯模式";
-"Dictionary" = "辭典";
+"Dictionary" = "辭典設定";
 "Directly commit lowercased letters" = "直接遞交小寫字母";
 "Directly commit uppercased letters" = "直接遞交大寫字母";
 "Emulating select-candidate-per-character mode" = "模擬 90 年代前期注音逐字選字輸入風格";
@@ -135,12 +135,12 @@
 "English" = "英語";
 "Eten 26" = "倚天忘形排列 (26 鍵)";
 "Eten Traditional" = "倚天傳統排列";
-"Experience" = "體驗";
+"Experience" = "體驗設定";
 "Fake Seigyou" = "偽精業排列";
 "Follow OS settings" = "依系統設定";
 "for cycling candidates" = "輪替候選字";
 "for cycling pages" = "輪替頁面";
-"General" = "通用";
+"General" = "通用設定";
 "Hanyu Pinyin with Numeral Intonation" = "漢語拼音+數字標調";
 "Horizontal" = "橫向佈局";
 "Hsu" = "許氏國音自然排列";
@@ -149,7 +149,7 @@
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "將游標置於詞語前方 // macOS 內建注音風格";
 "Japanese" = "和語";
 "Keyboard Shortcuts:" = "鍵盤快速鍵:";
-"Keyboard" = "鍵盤";
+"Keyboard" = "鍵盤設定";
 "Misc Settings:" = "雜項:";
 "MiTAC" = "神通排列";
 "Non-QWERTY alphanumerical keyboard layouts are for Hanyu Pinyin parser only." = "QWERTY 以外的英數佈局是為了漢語拼音排列使用者而準備的。";
