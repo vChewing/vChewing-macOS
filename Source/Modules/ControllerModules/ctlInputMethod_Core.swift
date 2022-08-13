@@ -267,6 +267,8 @@ class ctlInputMethod: IMKInputController {
     resetKeyHandler()
   }
 
+  // MARK: - IMKCandidates 功能擴充
+
   /// 生成 IMK 選字窗專用的候選字串陣列。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: IMK 選字窗專用的候選字串陣列。
@@ -306,7 +308,12 @@ class ctlInputMethod: IMKInputController {
   }
 
   override open func candidateSelectionChanged(_: NSAttributedString!) {
-    // 暫時不需要擴充這個函數。
+    // 暫時不需要擴充這個函數。但有些幹話還是要講的：
+    // 在這個函數當中試圖（無論是否拿著傳入的參數）從 ctlCandidateIMK 找 identifier 的話，
+    // 只會找出 NSNotFound。你想 NSLog 列印看 identifier 是多少，輸入法直接崩潰。
+    // 而且會他媽的崩得連 console 內的 ips 錯誤報告都沒有。
+    // 在下文的 candidateSelected() 試圖看每個候選字的 identifier 的話，永遠都只能拿到 NSNotFound。
+    // 衰洨 IMK 真的看上去就像是沒有做過單元測試的東西，賈伯斯有檢查過的話會被氣得從棺材裡爬出來。
   }
 
   override open func candidateSelected(_ candidateString: NSAttributedString!) {
