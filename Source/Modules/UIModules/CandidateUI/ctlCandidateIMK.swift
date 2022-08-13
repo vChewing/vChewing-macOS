@@ -113,7 +113,12 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     currentPageIndex = (currentPageIndex + 1 >= pageCount) ? 0 : currentPageIndex + 1
     if selectedCandidateIndex == candidates(self).count - 1 { return false }
     selectedCandidateIndex = min(selectedCandidateIndex + keyCount, candidates(self).count - 1)
-    pageDownAndModifySelection(self)
+    switch currentLayout {
+      case .horizontal:
+        moveDown(self)
+      case .vertical:
+        moveRight(self)
+    }
     return true
   }
 
@@ -124,7 +129,12 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     currentPageIndex = (currentPageIndex == 0) ? pageCount - 1 : currentPageIndex - 1
     if selectedCandidateIndex == 0 { return true }
     selectedCandidateIndex = max(selectedCandidateIndex - keyCount, 0)
-    pageUpAndModifySelection(self)
+    switch currentLayout {
+      case .horizontal:
+        moveUp(self)
+      case .vertical:
+        moveLeft(self)
+    }
     return true
   }
 
@@ -233,8 +243,39 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     let event = eventArray[0]
     let input = InputSignal(event: event)
     guard let delegate = delegate else { return }
-    if input.isEsc || input.isBackSpace || input.isDelete || input.isShiftHold {
+    if input.isEsc || input.isBackSpace || input.isDelete || (input.isShiftHold && !input.isSpace) {
       _ = delegate.handleDelegateEvent(event)
+    } else if input.isSymbolMenuPhysicalKey || input.isSpace {
+      if input.isShiftHold {
+        switch currentLayout {
+          case .horizontal:
+            moveUp(self)
+          case .vertical:
+            moveLeft(self)
+        }
+      } else {
+        switch currentLayout {
+          case .horizontal:
+            moveDown(self)
+          case .vertical:
+            moveRight(self)
+        }
+      }
+    } else if input.isTab {
+      switch currentLayout {
+        case .horizontal:
+          if input.isShiftHold {
+            moveLeft(self)
+          } else {
+            moveRight(self)
+          }
+        case .vertical:
+          if input.isShiftHold {
+            moveUp(self)
+          } else {
+            moveDown(self)
+          }
+      }
     } else {
       super.interpretKeyEvents(eventArray)
     }
