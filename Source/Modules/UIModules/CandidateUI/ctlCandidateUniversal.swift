@@ -13,7 +13,10 @@ import Cocoa
 // 將之前 Zonble 重寫的 Voltaire 選字窗隔的橫向版本與縱向版本合併到同一個型別實體內。
 
 private class vwrCandidateUniversal: NSView {
-  var highlightedIndex: Int = 0 { didSet { highlightedIndex = max(highlightedIndex, 0) } }
+  var highlightedIndex: Int = 0 {
+    didSet { highlightedIndex = min(max(highlightedIndex, 0), dispCandidatesWithLabels.count - 1) }
+  }
+
   var action: Selector?
   weak var target: AnyObject?
   var isVerticalLayout: Bool = false
@@ -462,7 +465,10 @@ public class ctlCandidateUniversal: ctlCandidate {
     if pageCount == 1 { return highlightNextCandidate() }
     if currentPageIndex + 1 >= pageCount { clsSFX.beep() }
     currentPageIndex = (currentPageIndex + 1 >= pageCount) ? 0 : currentPageIndex + 1
-    candidateView.highlightedIndex = 0
+    if currentPageIndex == pageCount - 1 {
+      candidateView.highlightedIndex = min(lastPageContentCount - 1, candidateView.highlightedIndex)
+    }
+    // candidateView.highlightedIndex = 0
     layoutCandidateView()
     return true
   }
@@ -472,7 +478,10 @@ public class ctlCandidateUniversal: ctlCandidate {
     if pageCount == 1 { return highlightPreviousCandidate() }
     if currentPageIndex == 0 { clsSFX.beep() }
     currentPageIndex = (currentPageIndex == 0) ? pageCount - 1 : currentPageIndex - 1
-    candidateView.highlightedIndex = 0
+    if currentPageIndex == pageCount - 1 {
+      candidateView.highlightedIndex = min(lastPageContentCount - 1, candidateView.highlightedIndex)
+    }
+    // candidateView.highlightedIndex = 0
     layoutCandidateView()
     return true
   }
@@ -528,6 +537,15 @@ extension ctlCandidateUniversal {
     let totalCount = delegate.candidateCountForController(self)
     let keyLabelCount = keyLabels.count
     return totalCount / keyLabelCount + ((totalCount % keyLabelCount) != 0 ? 1 : 0)
+  }
+
+  private var lastPageContentCount: Int {
+    guard let delegate = delegate else {
+      return 0
+    }
+    let totalCount = delegate.candidateCountForController(self)
+    let keyLabelCount = keyLabels.count
+    return totalCount % keyLabelCount
   }
 
   private func layoutCandidateView() {
