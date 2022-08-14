@@ -18,6 +18,7 @@ import Cocoa
 
 /// KeyHandler 委任協定
 protocol KeyHandlerDelegate {
+  var clientBundleIdentifier: String { get }
   func ctlCandidate() -> ctlCandidateProtocol
   func keyHandler(
     _: KeyHandler, didSelectCandidateAt index: Int,

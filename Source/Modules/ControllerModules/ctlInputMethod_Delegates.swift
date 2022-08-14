@@ -13,6 +13,8 @@ import Cocoa
 // MARK: - KeyHandler Delegate
 
 extension ctlInputMethod: KeyHandlerDelegate {
+  var clientBundleIdentifier: String { client()?.bundleIdentifier() ?? "" }
+
   func ctlCandidate() -> ctlCandidateProtocol { ctlInputMethod.ctlCandidateCurrent }
 
   func keyHandler(
@@ -83,15 +85,6 @@ extension ctlInputMethod: ctlCandidateDelegate {
 
     // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
     ctlInputMethod.areWeNerfing = event.modifierFlags.contains([.shift, .command])
-
-    if let client = client(),
-      client.bundleIdentifier()
-        == "org.atelierInmu.vChewing.vChewingPhraseEditor"
-    {
-      IME.areWeUsingOurOwnPhraseEditor = true
-    } else {
-      IME.areWeUsingOurOwnPhraseEditor = false
-    }
 
     var input = InputSignal(event: event, isVerticalTyping: isVerticalTyping)
     input.isASCIIModeInput = isASCIIMode

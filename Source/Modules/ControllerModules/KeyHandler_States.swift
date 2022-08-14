@@ -347,7 +347,7 @@ extension KeyHandler {
       composingBuffer = Tekkon.cnvPhonaToHanyuPinyin(target: composingBuffer)  // 注音轉拼音
     }
 
-    if !IME.areWeUsingOurOwnPhraseEditor {
+    if let delegate = delegate, !delegate.clientBundleIdentifier.contains("vChewingPhraseEditor") {
       composingBuffer = composingBuffer.replacingOccurrences(of: "-", with: " ")
     }
 

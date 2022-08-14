@@ -39,6 +39,7 @@ class ctlInputMethod: IMKInputController {
   var state: InputStateProtocol = InputState.Empty()
   /// 當前這個 ctlInputMethod 副本是否處於英數輸入模式。
   var isASCIIMode: Bool = false
+
   /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
   public var isVerticalTyping: Bool {
     guard let client = client() else { return false }
@@ -232,15 +233,6 @@ class ctlInputMethod: IMKInputController {
 
     // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
     ctlInputMethod.areWeNerfing = event.modifierFlags.contains([.shift, .command])
-
-    if let client = client(),
-      client.bundleIdentifier()
-        == "org.atelierInmu.vChewing.vChewingPhraseEditor"
-    {
-      IME.areWeUsingOurOwnPhraseEditor = true
-    } else {
-      IME.areWeUsingOurOwnPhraseEditor = false
-    }
 
     var input = InputSignal(event: event, isVerticalTyping: isVerticalTyping)
     input.isASCIIModeInput = isASCIIMode

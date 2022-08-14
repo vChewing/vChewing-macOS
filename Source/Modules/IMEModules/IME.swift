@@ -40,10 +40,6 @@ public enum IME {
     return text
   }
 
-  // MARK: - 開關判定當前應用究竟是？
-
-  static var areWeUsingOurOwnPhraseEditor: Bool = false
-
   // MARK: - 自 ctlInputMethod 讀取當前輸入法的簡繁體模式
 
   static func getInputMode(isReversed: Bool = false) -> InputMode {
