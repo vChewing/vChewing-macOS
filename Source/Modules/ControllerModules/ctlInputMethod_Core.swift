@@ -202,7 +202,9 @@ class ctlInputMethod: IMKInputController {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
 
     // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
-    let shouldUseHandle = IME.arrClientShiftHandlingExceptionList.contains(clientBundleIdentifier)
+    let shouldUseHandle =
+      IME.arrClientShiftHandlingExceptionList.contains(clientBundleIdentifier)
+      || mgrPrefs.shouldAlwaysUseShiftKeyAccommodation
     if #available(macOS 10.15, *) {
       if ShiftKeyUpChecker.check(event) {
         if !shouldUseHandle || (!rencentKeyHandledByKeyHandler && shouldUseHandle) {
