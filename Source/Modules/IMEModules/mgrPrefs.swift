@@ -53,6 +53,7 @@ public enum UserDef: String, CaseIterable {
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
   case kShouldAlwaysUseShiftKeyAccommodation = "ShouldAlwaysUseShiftKeyAccommodation"
+  case kDisableShiftTogglingAlphanumericalMode = "DisableShiftTogglingAlphanumericalMode"
 
   case kCandidateTextFontName = "CandidateTextFontName"
   case kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
@@ -413,6 +414,9 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kShouldAlwaysUseShiftKeyAccommodation.rawValue, defaultValue: false)
   static var shouldAlwaysUseShiftKeyAccommodation: Bool
+
+  @UserDefault(key: UserDef.kDisableShiftTogglingAlphanumericalMode.rawValue, defaultValue: false)
+  static var disableShiftTogglingAlphanumericalMode: Bool
 
   // MARK: - Settings (Tier 3)
 
