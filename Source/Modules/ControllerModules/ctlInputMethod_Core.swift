@@ -113,13 +113,17 @@ class ctlInputMethod: IMKInputController {
     keyHandler.ensureParser()
 
     if isASCIIMode {
-      NotifierController.notify(
-        message: String(
-          format: "%@%@%@", NSLocalizedString("Alphanumerical Mode", comment: ""), "\n",
-          isASCIIMode
-            ? NSLocalizedString("NotificationSwitchON", comment: "")
-            : NSLocalizedString("NotificationSwitchOFF", comment: "")
-        ))
+      if mgrPrefs.disableShiftTogglingAlphanumericalMode {
+        isASCIIMode = false
+      } else {
+        NotifierController.notify(
+          message: String(
+            format: "%@%@%@", NSLocalizedString("Alphanumerical Mode", comment: ""), "\n",
+            isASCIIMode
+              ? NSLocalizedString("NotificationSwitchON", comment: "")
+              : NSLocalizedString("NotificationSwitchOFF", comment: "")
+          ))
+      }
     }
 
     /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
@@ -203,10 +207,10 @@ class ctlInputMethod: IMKInputController {
 
     // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
     let shouldUseHandle =
-      IME.arrClientShiftHandlingExceptionList.contains(clientBundleIdentifier)
-      || mgrPrefs.shouldAlwaysUseShiftKeyAccommodation
+      (IME.arrClientShiftHandlingExceptionList.contains(clientBundleIdentifier)
+        || mgrPrefs.shouldAlwaysUseShiftKeyAccommodation)
     if #available(macOS 10.15, *) {
-      if ShiftKeyUpChecker.check(event) {
+      if ShiftKeyUpChecker.check(event), !mgrPrefs.disableShiftTogglingAlphanumericalMode {
         if !shouldUseHandle || (!rencentKeyHandledByKeyHandler && shouldUseHandle) {
           NotifierController.notify(
             message: String(
