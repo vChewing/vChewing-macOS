@@ -119,6 +119,7 @@
 "Choose the phonetic layout for Mandarin parser." = "Choose the phonetic layout for Mandarin parser.";
 "Choose your desired user data folder path. Will be omitted if invalid." = "Choose your desired user data folder path. Will be omitted if invalid.";
 "Choose your preferred layout of the candidate window." = "Choose your preferred layout of the candidate window.";
+"Completely disable using Shift key to toggling alphanumerical mode" = "Completely disable using Shift key to toggling alphanumerical mode";
 "Cursor Selection:" = "Cursor Selection:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "Dachen (Microsoft Standard / Wang / 01, etc.)";
 "Dachen 26 (libChewing)" = "Dachen 26 (libChewing)";
