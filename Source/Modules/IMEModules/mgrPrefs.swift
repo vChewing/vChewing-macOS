@@ -52,6 +52,7 @@ public enum UserDef: String, CaseIterable {
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
+  case kShouldAlwaysUseShiftKeyAccommodation = "ShouldAlwaysUseShiftKeyAccommodation"
 
   case kCandidateTextFontName = "CandidateTextFontName"
   case kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
@@ -288,6 +289,9 @@ public enum mgrPrefs {
       mgrPrefs.handleDefaultCandidateFontsByLangIdentifier,
       forKey: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.shouldAlwaysUseShiftKeyAccommodation, forKey: UserDef.kShouldAlwaysUseShiftKeyAccommodation.rawValue
+    )
 
     // -----
 
@@ -406,6 +410,9 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue, defaultValue: false)
   static var handleDefaultCandidateFontsByLangIdentifier: Bool
+
+  @UserDefault(key: UserDef.kShouldAlwaysUseShiftKeyAccommodation.rawValue, defaultValue: false)
+  static var shouldAlwaysUseShiftKeyAccommodation: Bool
 
   // MARK: - Settings (Tier 3)
 
