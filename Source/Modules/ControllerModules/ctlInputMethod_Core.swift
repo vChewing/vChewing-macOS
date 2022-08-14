@@ -202,9 +202,10 @@ class ctlInputMethod: IMKInputController {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
 
     // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
+    let shouldUseHandle = IME.arrClientShiftHandlingExceptionList.contains(clientBundleIdentifier)
     if #available(macOS 10.15, *) {
       if ShiftKeyUpChecker.check(event) {
-        if !rencentKeyHandledByKeyHandler {
+        if !shouldUseHandle || (!rencentKeyHandledByKeyHandler && shouldUseHandle) {
           NotifierController.notify(
             message: String(
               format: "%@%@%@", NSLocalizedString("Alphanumerical Mode", comment: ""), "\n",
@@ -214,7 +215,9 @@ class ctlInputMethod: IMKInputController {
             )
           )
         }
-        rencentKeyHandledByKeyHandler = false
+        if shouldUseHandle {
+          rencentKeyHandledByKeyHandler = false
+        }
         return false
       }
     }
@@ -250,7 +253,9 @@ class ctlInputMethod: IMKInputController {
     } errorCallback: {
       clsSFX.beep()
     }
-    rencentKeyHandledByKeyHandler = result
+    if shouldUseHandle {
+      rencentKeyHandledByKeyHandler = result
+    }
     return result
   }
 
