@@ -23,6 +23,18 @@ public enum IME {
   static let arrSupportedLocales = ["en", "zh-Hant", "zh-Hans", "ja"]
   static let dlgOpenPath = NSOpenPanel()
 
+  // MARK: - 瀏覽器 Bundle Identifier 關鍵詞匹配黑名單
+
+  /// 瀏覽器 Bundle Identifier 關鍵詞匹配黑名單，匹配到的瀏覽器會做出特殊的 Shift 鍵擊劍判定處理。
+  static let arrClientShiftHandlingExceptionList = [
+    "com.avast.browser", "com.brave.Browser", "com.brave.Browser.beta", "com.coccoc.Coccoc", "com.fenrir-inc.Sleipnir",
+    "com.google.Chrome", "com.google.Chrome.beta", "com.google.Chrome.canary", "com.hiddenreflex.Epic",
+    "com.maxthon.Maxthon", "com.microsoft.edgemac", "com.microsoft.edgemac.Canary", "com.microsoft.edgemac.Dev",
+    "com.naver.Whale", "com.operasoftware.Opera", "com.valvesoftware.steam", "com.vivaldi.Vivaldi",
+    "net.qihoo.360browser", "org.blisk.Blisk", "org.chromium.Chromium", "org.qt-project.Qt.QtWebEngineCore",
+    "ru.yandex.desktop.yandex-browser",
+  ]
+
   // MARK: - 輸入法的當前的簡繁體中文模式是？
 
   static var currentInputMode: InputMode = .init(rawValue: mgrPrefs.mostRecentInputMode) ?? .imeModeNULL
@@ -39,10 +51,6 @@ public enum IME {
     }
     return text
   }
-
-  // MARK: - 開關判定當前應用究竟是？
-
-  static var areWeUsingOurOwnPhraseEditor: Bool = false
 
   // MARK: - 自 ctlInputMethod 讀取當前輸入法的簡繁體模式
 

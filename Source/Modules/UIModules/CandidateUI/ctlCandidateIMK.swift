@@ -11,7 +11,9 @@ import InputMethodKit
 
 public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
   public var currentLayout: CandidateLayout = .horizontal
-
+  private let defaultIMKSelectionKey: [UInt16: String] = [
+    18: "1", 19: "2", 20: "3", 21: "4", 23: "5", 22: "6", 26: "7", 28: "8", 25: "9",
+  ]
   public weak var delegate: ctlCandidateDelegate? {
     didSet {
       reloadData()
@@ -70,6 +72,9 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     super.init(server: theServer, panelType: kIMKScrollingGridCandidatePanel)
     specifyLayout(layout)
     visible = false
+    // guard let currentTISInputSource = currentTISInputSource else { return }  // 下面兩句都沒用，所以註釋掉。
+    // setSelectionKeys([18, 19, 20, 21, 23, 22, 26, 28, 25])  // 這句是壞的，用了反而沒有選字鍵。
+    // setSelectionKeysKeylayout(currentTISInputSource)  // 這句也是壞的，沒有卵用。
   }
 
   @available(*, unavailable)
@@ -110,7 +115,12 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     currentPageIndex = (currentPageIndex + 1 >= pageCount) ? 0 : currentPageIndex + 1
     if selectedCandidateIndex == candidates(self).count - 1 { return false }
     selectedCandidateIndex = min(selectedCandidateIndex + keyCount, candidates(self).count - 1)
-    pageDownAndModifySelection(self)
+    switch currentLayout {
+      case .horizontal:
+        moveDown(self)
+      case .vertical:
+        moveRight(self)
+    }
     return true
   }
 
@@ -121,7 +131,12 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     currentPageIndex = (currentPageIndex == 0) ? pageCount - 1 : currentPageIndex - 1
     if selectedCandidateIndex == 0 { return true }
     selectedCandidateIndex = max(selectedCandidateIndex - keyCount, 0)
-    pageUpAndModifySelection(self)
+    switch currentLayout {
+      case .horizontal:
+        moveUp(self)
+      case .vertical:
+        moveLeft(self)
+    }
     return true
   }
 
@@ -226,14 +241,97 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
   }
 
   override public func interpretKeyEvents(_ eventArray: [NSEvent]) {
+    // 鬼知道為什麼這個函式接收的參數是陣列，但經過測試卻發現這個函式收到的陣列往往內容只有一個。
+    // 這也可能是 Objective-C 當中允許接收內容為 nil 的一種方式。
     guard !eventArray.isEmpty else { return }
+    var eventArray = eventArray
     let event = eventArray[0]
     let input = InputSignal(event: event)
     guard let delegate = delegate else { return }
-    if input.isEsc || input.isBackSpace || input.isDelete || input.isShiftHold {
+    if input.isEsc || input.isBackSpace || input.isDelete || (input.isShiftHold && !input.isSpace) {
       _ = delegate.handleDelegateEvent(event)
+    } else if input.isSymbolMenuPhysicalKey || input.isSpace {
+      if input.isShiftHold {
+        switch currentLayout {
+          case .horizontal:
+            moveUp(self)
+          case .vertical:
+            moveLeft(self)
+        }
+      } else {
+        switch currentLayout {
+          case .horizontal:
+            moveDown(self)
+          case .vertical:
+            moveRight(self)
+        }
+      }
+    } else if input.isTab {
+      switch currentLayout {
+        case .horizontal:
+          if input.isShiftHold {
+            moveLeft(self)
+          } else {
+            moveRight(self)
+          }
+        case .vertical:
+          if input.isShiftHold {
+            moveUp(self)
+          } else {
+            moveDown(self)
+          }
+      }
     } else {
+      if let newChar = defaultIMKSelectionKey[event.keyCode] {
+        /// 根據 KeyCode 重新換算一下選字鍵的 NSEvent，糾正其 Character 數值。
+        /// 反正 IMK 選字窗目前也沒辦法修改選字鍵。
+        let newEvent = NSEvent.keyEvent(
+          with: event.type,
+          location: event.locationInWindow,
+          modifierFlags: event.modifierFlags,
+          timestamp: event.timestamp,
+          windowNumber: event.windowNumber,
+          context: nil,
+          characters: newChar,
+          charactersIgnoringModifiers: event.charactersIgnoringModifiers ?? event.characters ?? "",
+          isARepeat: event.isARepeat,
+          keyCode: event.keyCode
+        )
+        if let newEvent = newEvent {
+          /// 這裡不用診斷了，檢出的內容都是經過轉換之後的正確 NSEvent。
+          eventArray = Array(eventArray.dropFirst(0))
+          eventArray.insert(newEvent, at: 0)
+        }
+      }
+      if delegate.isAssociatedPhrasesMode,
+        !input.isPageUp, !input.isPageDown, !input.isCursorForward, !input.isCursorBackward,
+        !input.isCursorClockLeft, !input.isCursorClockRight, !input.isSpace,
+        !input.isEnter || !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter
+      {
+        _ = delegate.handleDelegateEvent(event)
+        return
+      }
       super.interpretKeyEvents(eventArray)
     }
   }
+}
+
+// MARK: - Generate TISInputSource Object
+
+/// 該參數只用來獲取 "com.apple.keylayout.ABC" 對應的 TISInputSource，
+/// 所以少寫了很多在這裡用不到的東西。
+/// 想參考完整版的話，請洽該專案內的 IME.swift。
+var currentTISInputSource: TISInputSource? {
+  var result: TISInputSource?
+  let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
+  let matchedTISString = "com.apple.keylayout.ABC"
+  for source in list {
+    guard let ptrCat = TISGetInputSourceProperty(source, kTISPropertyInputSourceCategory) else { continue }
+    let category = Unmanaged<CFString>.fromOpaque(ptrCat).takeUnretainedValue()
+    guard category == kTISCategoryKeyboardInputSource else { continue }
+    guard let ptrSourceID = TISGetInputSourceProperty(source, kTISPropertyInputSourceID) else { continue }
+    let sourceID = String(Unmanaged<CFString>.fromOpaque(ptrSourceID).takeUnretainedValue())
+    if sourceID == matchedTISString { result = source }
+  }
+  return result
 }

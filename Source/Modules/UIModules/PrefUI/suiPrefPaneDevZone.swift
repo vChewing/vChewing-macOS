@@ -14,6 +14,10 @@ struct suiPrefPaneDevZone: View {
     forKey: UserDef.kUseIMKCandidateWindow.rawValue)
   @State private var selHandleDefaultCandidateFontsByLangIdentifier: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue)
+  @State private var selShouldAlwaysUseShiftKeyAccommodation: Bool = UserDefaults.standard.bool(
+    forKey: UserDef.kShouldAlwaysUseShiftKeyAccommodation.rawValue)
+  @State private var selDisableShiftTogglingAlphanumericalMode: Bool = UserDefaults.standard.bool(
+    forKey: UserDef.kDisableShiftTogglingAlphanumericalMode.rawValue)
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -56,6 +60,24 @@ struct suiPrefPaneDevZone: View {
           )
         )
         .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+        Toggle(
+          LocalizedStringKey("Use Shift Key Accommodation in all cases"),
+          isOn: $selShouldAlwaysUseShiftKeyAccommodation.onChange {
+            mgrPrefs.shouldAlwaysUseShiftKeyAccommodation = selShouldAlwaysUseShiftKeyAccommodation
+          }
+        )
+        Text(
+          LocalizedStringKey(
+            "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. If you want the same accommodation for other client apps, please tick this checkbox on."
+          )
+        )
+        .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+        Toggle(
+          LocalizedStringKey("Completely disable using Shift key to toggling alphanumerical mode"),
+          isOn: $selDisableShiftTogglingAlphanumericalMode.onChange {
+            mgrPrefs.disableShiftTogglingAlphanumericalMode = selDisableShiftTogglingAlphanumericalMode
+          }
+        )
       }
     }
   }

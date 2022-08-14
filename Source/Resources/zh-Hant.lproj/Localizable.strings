@@ -93,7 +93,7 @@
 "Allow using Enter key to confirm associated candidate selection" = "允許使用 Enter 確認當前選中的聯想詞";
 "Also toggle alphanumerical mode with Left-Shift" = "也允許使用左側的 Shift 鍵盤切換英數輸入模式";
 "Always use fixed listing order in candidate window" = "以固定順序來陳列選字窗內的候選字";
-"An accomodation for elder computer users." = "針對年長使用者的習慣而提供。";
+"An accommodation for elder computer users." = "針對年長使用者的習慣而提供。";
 "Apple ABC (equivalent to English US)" = "Apple ABC (與 Apple 美規鍵盤等價)";
 "Apple Chewing - Dachen" = "Apple 大千注音鍵盤佈局";
 "Apple Chewing - Eten Traditional" = "Apple 倚天傳統鍵盤佈局";
@@ -119,6 +119,7 @@
 "Choose the phonetic layout for Mandarin parser." = "請指定普通話/國音分析器所使用的注音排列。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "請在此指定您想指定的使用者語彙檔案目錄。無效值會被忽略。";
 "Choose your preferred layout of the candidate window." = "選擇您所偏好的候選字窗佈局。";
+"Completely disable using Shift key to toggling alphanumerical mode" = "徹底禁止使用 Shift 鍵切換英數模式";
 "Cursor Selection:" = "選字游標:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千排列 (微軟標準/王安/零壹/仲鼎/國喬)";
 "Dachen 26 (libChewing)" = "酷音大千二十六鍵排列";
@@ -164,8 +165,9 @@
 "Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "拼音並擊（組字區與工具提示內顯示漢語拼音）";
 "Show page buttons in candidate window" = "在選字窗內顯示翻頁按鈕";
 "Simplified Chinese" = "簡體中文";
-"Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+空格鍵 換下一頁，空格鍵 換選下一個後選字";
-"Space to +cycle pages, Shift+Space to +cycle candidates" = "空格鍵 換下一頁，Shift+空格鍵 換選下一個後選字";
+"Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. If you want the same accommodation for other client apps, please tick this checkbox on." = "某些應用（比如像是 MS Edge 或者 Chrome 這樣的 Chromium 核心的瀏覽器）可能會使輸入的 Shift 按鍵訊號被重複輸入，且其有關研發方很可能不打算修復這些產品缺陷。威注音針對這些應用預設啟用了相容措施。如果您希望在任何應用當中都啟用該措施的話，請勾選之。";
+"Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+空格鍵 換下一頁，空格鍵 換選下一個候選字";
+"Space to +cycle pages, Shift+Space to +cycle candidates" = "空格鍵 換下一頁，Shift+空格鍵 換選下一個候選字";
 "Starlight" = "星光排列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉恥模式 // 取消勾選的話，敲錯字時會有異音";
 "This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later." = "該方法是 Apple Bug Report #FB10978412 的保守治療方案，用來僅針對 macOS 12 開始的系統，且僅對非 IMK 選字窗起作用。Apple 應該對 macOS 11 開始的系統修復這個 Bug。";
@@ -177,6 +179,7 @@
 "Use .langIdentifier to handle UI fonts in candidate window" = "使用 .langIdentifier 來管理選字窗的預設介面字型";
 "Use ESC key to clear the entire input buffer" = "敲 ESC 鍵以清空整個組字緩衝區";
 "Use IMK Candidate Window instead (will reboot the IME)" = "啟用 IMK 選字窗（會自動重啟輸入法）";
+"Use Shift Key Accommodation in all cases" = "對任何客體應用均啟用 Shift 鍵相容性措施";
 "Vertical" = "縱向佈局";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：該頁面僅作未來功能測試所用。\n在此列出的功能並非處於完全可用之狀態。";
 "Yale Pinyin with Numeral Intonation" = "耶魯拼音+數字標調";

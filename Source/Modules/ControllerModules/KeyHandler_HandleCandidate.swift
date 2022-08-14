@@ -347,6 +347,18 @@ extension KeyHandler {
       }
     }
 
+    // MARK: - Flipping pages by using symbol menu keys (when they are not occupied).
+
+    if input.isSymbolMenuPhysicalKey {
+      let updated: Bool =
+        input.isShiftHold ? ctlCandidateCurrent.showPreviousPage() : ctlCandidateCurrent.showNextPage()
+      if !updated {
+        IME.prtDebugIntel("66F3477B")
+        errorCallback()
+      }
+      return true
+    }
+
     IME.prtDebugIntel("172A0F81")
     errorCallback()
     return true

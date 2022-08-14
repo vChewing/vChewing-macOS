@@ -162,7 +162,7 @@ struct suiPrefPaneExperience: View {
             mgrPrefs.useSCPCTypingMode = selEnableSCPCTypingMode
           }
         )
-        Text(LocalizedStringKey("An accomodation for elder computer users."))
+        Text(LocalizedStringKey("An accommodation for elder computer users."))
           .preferenceDescription()
       }
     }

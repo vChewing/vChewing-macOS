@@ -13,6 +13,8 @@ import Cocoa
 // MARK: - KeyHandler Delegate
 
 extension ctlInputMethod: KeyHandlerDelegate {
+  var clientBundleIdentifier: String { client()?.bundleIdentifier() ?? "" }
+
   func ctlCandidate() -> ctlCandidateProtocol { ctlInputMethod.ctlCandidateCurrent }
 
   func keyHandler(
@@ -50,11 +52,20 @@ extension ctlInputMethod: KeyHandlerDelegate {
 // MARK: - Candidate Controller Delegate
 
 extension ctlInputMethod: ctlCandidateDelegate {
+  var isAssociatedPhrasesMode: Bool { state is InputState.AssociatedPhrases }
+
+  /// 與 handle() 完全雷同，但去掉了與 IMK 選字窗有關的判斷語句。
+  /// 這兩個函數最好分開處理，不然 handle() 函數會陷入無限迴圈。
+  /// - Parameter event: 由 IMK 選字窗接收的裝置操作輸入事件。
+  /// - Returns: 回「`true`」以將該案件已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
   func handleDelegateEvent(_ event: NSEvent!) -> Bool {
     // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
+    let shouldUseHandle =
+      (IME.arrClientShiftHandlingExceptionList.contains(clientBundleIdentifier)
+        || mgrPrefs.shouldAlwaysUseShiftKeyAccommodation)
     if #available(macOS 10.15, *) {
-      if ShiftKeyUpChecker.check(event) {
-        if !rencentKeyHandledByKeyHandler {
+      if ShiftKeyUpChecker.check(event), !mgrPrefs.disableShiftTogglingAlphanumericalMode {
+        if !shouldUseHandle || (!rencentKeyHandledByKeyHandler && shouldUseHandle) {
           NotifierController.notify(
             message: String(
               format: "%@%@%@", NSLocalizedString("Alphanumerical Mode", comment: ""), "\n",
@@ -64,7 +75,9 @@ extension ctlInputMethod: ctlCandidateDelegate {
             )
           )
         }
-        rencentKeyHandledByKeyHandler = false
+        if shouldUseHandle {
+          rencentKeyHandledByKeyHandler = false
+        }
         return false
       }
     }
@@ -78,24 +91,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
     // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
     ctlInputMethod.areWeNerfing = event.modifierFlags.contains([.shift, .command])
 
-    var textFrame = NSRect.zero
-
-    let attributes: [AnyHashable: Any]? = client().attributes(
-      forCharacterIndex: 0, lineHeightRectangle: &textFrame
-    )
-
-    let isTypingVertical =
-      (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
-
-    if client().bundleIdentifier()
-      == "org.atelierInmu.vChewing.vChewingPhraseEditor"
-    {
-      IME.areWeUsingOurOwnPhraseEditor = true
-    } else {
-      IME.areWeUsingOurOwnPhraseEditor = false
-    }
-
-    var input = InputSignal(event: event, isVerticalTyping: isTypingVertical)
+    var input = InputSignal(event: event, isVerticalTyping: isVerticalTyping)
     input.isASCIIModeInput = isASCIIMode
 
     // 無法列印的訊號輸入，一概不作處理。
@@ -106,12 +102,15 @@ extension ctlInputMethod: ctlCandidateDelegate {
 
     /// 將按鍵行為與當前輸入法狀態結合起來、交給按鍵調度模組來處理。
     /// 再根據返回的 result bool 數值來告知 IMK「這個按鍵事件是被處理了還是被放行了」。
-    let result = keyHandler.handleCandidate(state: state, input: input) { newState in
+    /// 這裡不用 keyHandler.handleCandidate() 是因為需要針對聯想詞輸入狀態做額外處理。
+    let result = keyHandler.handle(input: input, state: state) { newState in
       self.handle(state: newState)
     } errorCallback: {
       clsSFX.beep()
     }
-    rencentKeyHandledByKeyHandler = result
+    if shouldUseHandle {
+      rencentKeyHandledByKeyHandler = result
+    }
     return result
   }
 

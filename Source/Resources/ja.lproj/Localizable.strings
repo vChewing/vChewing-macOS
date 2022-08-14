@@ -93,7 +93,7 @@
 "Allow using Enter key to confirm associated candidate selection" = "Enter キーを連想語彙候補の確認のために使う";
 "Also toggle alphanumerical mode with Left-Shift" = "左側の Shift キーでも英数入力モードの切り替え";
 "Always use fixed listing order in candidate window" = "候補文字を固定順番で陳列する";
-"An accomodation for elder computer users." = "年配なるユーザーのために提供した機能である。";
+"An accommodation for elder computer users." = "年配なるユーザーのために提供した機能である。";
 "Apple ABC (equivalent to English US)" = "Apple ABC (Apple U.S. キーボードと同じ)";
 "Apple Chewing - Dachen" = "Apple 大千注音キーボード";
 "Apple Chewing - Eten Traditional" = "Apple 倚天傳統キーボード";
@@ -119,6 +119,7 @@
 "Choose the phonetic layout for Mandarin parser." = "共通語分析器の注音配列をご指定ください。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "欲しがるユーザー辞書保存先をご指定ください。無効なる保存先設定は省かれる。";
 "Choose your preferred layout of the candidate window." = "入力候補陳列の仕様をご指定ください。";
+"Completely disable using Shift key to toggling alphanumerical mode" = "Shift キーの英数入力モードの切り替え機能を徹底的に禁ず";
 "Cursor Selection:" = "カーソル候補呼出:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千配列 (Microsoft 標準・王安・零壹など)";
 "Dachen 26 (libChewing)" = "酷音大千 26 キー配列";
@@ -164,6 +165,7 @@
 "Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "弁音合併入力（入力緩衝列とヒントで音読みを漢語弁音に）";
 "Show page buttons in candidate window" = "入力候補陳列の側にページボタンを表示";
 "Simplified Chinese" = "簡体中国語";
+"Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. If you want the same accommodation for other client apps, please tick this checkbox on." = "いくつかのアプリ（例えば MS Edge や Google Chrome などのような Chromium 系ブラウザー）には「Shift キーの入力イベントを複数化してしまう」という支障があり、そしてアプリそれぞれの開発元に修復される可能性はほぼゼロだと言える。威注音入力アプリは対策用の特殊措置を普段に起用している。別のアプリにも同じ特殊措置が欲しければ、これをチェックしてください。";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+Space で次のページ、Space で次の候補文字を";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "Space で次のページ、Shift+Space で次の候補文字を";
 "Starlight" = "星光配列";
@@ -177,6 +179,7 @@
 "Use .langIdentifier to handle UI fonts in candidate window" = "「.langIdentifier」を使って候補陳列ウィンドウのフォントを取り扱う";
 "Use ESC key to clear the entire input buffer" = "ESC キーで入力緩衝列を消す";
 "Use IMK Candidate Window instead (will reboot the IME)" = "IMK 候補陳列ウィンドウを起用（入力アプリは自動的に再起動）";
+"Use Shift Key Accommodation in all cases" = "いずれの客体アプリにも Shift キーの互換性措置を起用";
 "Vertical" = "縦型陳列";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
 "Yale Pinyin with Numeral Intonation" = "イェール弁音 (ローマ字+数字音調)";

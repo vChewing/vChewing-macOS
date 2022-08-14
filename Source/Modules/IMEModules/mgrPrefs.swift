@@ -49,8 +49,11 @@ public enum UserDef: String, CaseIterable {
   case kKeepReadingUponCompositionError = "KeepReadingUponCompositionError"
   case kTogglingAlphanumericalModeWithLShift = "TogglingAlphanumericalModeWithLShift"
   case kUpperCaseLetterKeyBehavior = "UpperCaseLetterKeyBehavior"
+
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
+  case kShouldAlwaysUseShiftKeyAccommodation = "ShouldAlwaysUseShiftKeyAccommodation"
+  case kDisableShiftTogglingAlphanumericalMode = "DisableShiftTogglingAlphanumericalMode"
 
   case kCandidateTextFontName = "CandidateTextFontName"
   case kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
@@ -277,6 +280,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.upperCaseLetterKeyBehavior, forKey: UserDef.kUpperCaseLetterKeyBehavior.rawValue
     )
+
+    // -----
+
     UserDefaults.standard.setDefault(
       mgrPrefs.useIMKCandidateWindow, forKey: UserDef.kUseIMKCandidateWindow.rawValue
     )
@@ -284,6 +290,11 @@ public enum mgrPrefs {
       mgrPrefs.handleDefaultCandidateFontsByLangIdentifier,
       forKey: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.shouldAlwaysUseShiftKeyAccommodation, forKey: UserDef.kShouldAlwaysUseShiftKeyAccommodation.rawValue
+    )
+
+    // -----
 
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeySCPC, forKey: UserDef.kUsingHotKeySCPC.rawValue)
     UserDefaults.standard.setDefault(mgrPrefs.usingHotKeyAssociates, forKey: UserDef.kUsingHotKeyAssociates.rawValue)
@@ -388,6 +399,8 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kUpperCaseLetterKeyBehavior.rawValue, defaultValue: 0)
   static var upperCaseLetterKeyBehavior: Int
 
+  // MARK: - Settings (Tier 2)
+
   @UserDefault(key: UserDef.kUseIMKCandidateWindow.rawValue, defaultValue: false)
   static var useIMKCandidateWindow: Bool {
     didSet {
@@ -399,7 +412,13 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue, defaultValue: false)
   static var handleDefaultCandidateFontsByLangIdentifier: Bool
 
-  // MARK: - Settings (Tier 2)
+  @UserDefault(key: UserDef.kShouldAlwaysUseShiftKeyAccommodation.rawValue, defaultValue: false)
+  static var shouldAlwaysUseShiftKeyAccommodation: Bool
+
+  @UserDefault(key: UserDef.kDisableShiftTogglingAlphanumericalMode.rawValue, defaultValue: false)
+  static var disableShiftTogglingAlphanumericalMode: Bool
+
+  // MARK: - Settings (Tier 3)
 
   @UserDefault(key: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue, defaultValue: true)
   static var togglingAlphanumericalModeWithLShift: Bool

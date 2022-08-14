@@ -47,8 +47,9 @@ extension ctlInputMethod {
 
   /// 針對受 .NotEmpty() 管轄的非空狀態，在組字區內顯示游標。
   private func setInlineDisplayWithCursor() {
+    guard let client = client() else { return }
     if let state = state as? InputState.AssociatedPhrases {
-      client().setMarkedText(
+      client.setMarkedText(
         state.attributedString, selectionRange: NSRange(location: 0, length: 0),
         replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
       )
@@ -94,7 +95,7 @@ extension ctlInputMethod {
     /// 所謂選區「selectionRange」，就是「可見游標位置」的位置，只不過長度
     /// 是 0 且取代範圍（replacementRange）為「NSNotFound」罷了。
     /// 也就是說，內文組字區該在哪裡出現，得由客體軟體來作主。
-    client().setMarkedText(
+    client.setMarkedText(
       state.attributedString, selectionRange: NSRange(location: state.cursorIndex, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
@@ -113,12 +114,12 @@ extension ctlInputMethod {
   /// 遞交組字區內容。
   /// 注意：必須在 IMK 的 commitComposition 函式當中也間接或者直接執行這個處理。
   private func commit(text: String) {
+    guard let client = client() else { return }
     let buffer = IME.kanjiConversionIfRequired(text)
     if buffer.isEmpty {
       return
     }
-
-    client().insertText(
+    client.insertText(
       buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
   }
