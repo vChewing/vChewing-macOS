@@ -144,7 +144,6 @@
 "Horizontal" = "横向布局";
 "Hsu" = "许氏国音自然排列";
 "Hualuo Pinyin with Numeral Intonation" = "华罗拼音+数字标调";
-"Hualuo Pinyin with Numeral Intonation" = "華羅拼音+数字标调";
 "IBM" = "IBM 排列";
 "IMK candidate window is plagued with issues like failed selection keys." = "IMK 选字窗目前暂时无法正常使用选字键，并具其它未知故障。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "将游标置于词语前方 // macOS 内建注音风格";
@@ -165,8 +164,9 @@
 "Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "拼音并击（组字区与工具提示内显示汉语拼音）";
 "Show page buttons in candidate window" = "在选字窗内显示翻页按钮";
 "Simplified Chinese" = "简体中文";
-"Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+空格键 换下一页，空格键 换选下一个后选字";
-"Space to +cycle pages, Shift+Space to +cycle candidates" = "空格键 换下一页，Shift+空格键 换选下一个后选字";
+"Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. If you want the same accommodation for other client apps, please tick this checkbox on." = "某些应用（比如像是 MS Edge 或者 Chrome 这样的 Chromium 核心的浏览器）可能会使输入的 Shift 按键讯号被重复输入，且其有关研发方很可能不打算修复这些产品缺陷。威注音针对这些应用预设启用了相容措施。如果您希望在任何应用当中都启用该措施的话，请勾选之。";
+"Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+空格键 换下一页，空格键 换选下一个候选字";
+"Space to +cycle pages, Shift+Space to +cycle candidates" = "空格键 换下一页，Shift+空格键 换选下一个候选字";
 "Starlight" = "星光排列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉耻模式 // 取消勾选的话，敲错字时会有异音";
 "This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later." = "该方法是 Apple Bug Report #FB10978412 的保守治疗方案，用来仅针对 macOS 12 开始的系统，且仅对非 IMK 选字窗起作用。Apple 应该对 macOS 11 开始的系统修复这个 Bug。";
@@ -175,10 +175,10 @@
 "Typing Style:" = "输入风格:";
 "UI Language:" = "介面语言:";
 "Universal Pinyin with Numeral Intonation" = "通用拼音+数字标调";
-"Universal Pinyin with Numeral Intonation" = "通用拼音+数字标调";
 "Use .langIdentifier to handle UI fonts in candidate window" = "使用 .langIdentifier 来管理选字窗的预设介面字型";
 "Use ESC key to clear the entire input buffer" = "敲 ESC 键以清空整个组字缓冲区";
 "Use IMK Candidate Window instead (will reboot the IME)" = "启用 IMK 选字窗（会自动重启输入法）";
+"Use Shift Key Accommodation in all cases" = "对任何客体应用均启用 Shift 键相容性措施";
 "Vertical" = "纵向布局";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";
 "Yale Pinyin with Numeral Intonation" = "耶鲁拼音+数字标调";

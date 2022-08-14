@@ -14,6 +14,8 @@ struct suiPrefPaneDevZone: View {
     forKey: UserDef.kUseIMKCandidateWindow.rawValue)
   @State private var selHandleDefaultCandidateFontsByLangIdentifier: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue)
+  @State private var selShouldAlwaysUseShiftKeyAccommodation: Bool = UserDefaults.standard.bool(
+    forKey: UserDef.kShouldAlwaysUseShiftKeyAccommodation.rawValue)
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -53,6 +55,18 @@ struct suiPrefPaneDevZone: View {
         Text(
           LocalizedStringKey(
             "This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later."
+          )
+        )
+        .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+        Toggle(
+          LocalizedStringKey("Use Shift Key Accommodation in all cases"),
+          isOn: $selShouldAlwaysUseShiftKeyAccommodation.onChange {
+            mgrPrefs.shouldAlwaysUseShiftKeyAccommodation = selShouldAlwaysUseShiftKeyAccommodation
+          }
+        )
+        Text(
+          LocalizedStringKey(
+            "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. If you want the same accommodation for other client apps, please tick this checkbox on."
           )
         )
         .preferenceDescription().fixedSize(horizontal: false, vertical: true)
