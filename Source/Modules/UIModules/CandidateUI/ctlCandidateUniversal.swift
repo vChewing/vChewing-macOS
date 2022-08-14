@@ -184,8 +184,8 @@ private class vwrCandidateUniversal: NSView {
               .withAlphaComponent(0.84)
             // Highlightened phrase text color
             activeCandidateAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor
-          } else {
-            NSColor.controlBackgroundColor.setFill()
+            let path: NSBezierPath = .init(roundedRect: rctCandidateArea, xRadius: 6, yRadius: 6)
+            path.fill()
           }
           if mgrPrefs.handleDefaultCandidateFontsByLangIdentifier {
             switch IME.currentInputMode {
@@ -203,8 +203,6 @@ private class vwrCandidateUniversal: NSView {
                 break
             }
           }
-          let path: NSBezierPath = .init(roundedRect: rctCandidateArea, xRadius: 5, yRadius: 5)
-          path.fill()
           (keyLabels[index] as NSString).draw(
             in: rctLabel, withAttributes: activeCandidateIndexAttr
           )
@@ -257,8 +255,8 @@ private class vwrCandidateUniversal: NSView {
               .withAlphaComponent(0.84)
             // Highlightened phrase text color
             activeCandidateAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor
-          } else {
-            NSColor.controlBackgroundColor.setFill()
+            let path: NSBezierPath = .init(roundedRect: rctCandidateArea, xRadius: 6, yRadius: 6)
+            path.fill()
           }
           if mgrPrefs.handleDefaultCandidateFontsByLangIdentifier {
             switch IME.currentInputMode {
@@ -276,8 +274,6 @@ private class vwrCandidateUniversal: NSView {
                 break
             }
           }
-          let path: NSBezierPath = .init(roundedRect: rctCandidateArea, xRadius: 5, yRadius: 5)
-          path.fill()
           (keyLabels[index] as NSString).draw(
             in: rctLabel, withAttributes: activeCandidateIndexAttr
           )
@@ -382,11 +378,10 @@ public class ctlCandidateUniversal: ctlCandidate {
     candidateView = vwrCandidateUniversal(frame: contentRect)
 
     candidateView.wantsLayer = true
-    candidateView.layer?.borderColor =
-      NSColor.selectedMenuItemTextColor.withAlphaComponent(0.20).cgColor
-    candidateView.layer?.borderWidth = 1.0
+    // candidateView.layer?.borderColor = NSColor.selectedMenuItemTextColor.withAlphaComponent(0.20).cgColor
+    // candidateView.layer?.borderWidth = 1.0
     if #available(macOS 10.13, *) {
-      candidateView.layer?.cornerRadius = 8.0
+      candidateView.layer?.cornerRadius = 9.0
     }
 
     panel.contentView?.addSubview(candidateView)
