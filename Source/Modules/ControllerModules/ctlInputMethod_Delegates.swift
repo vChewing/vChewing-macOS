@@ -50,6 +50,8 @@ extension ctlInputMethod: KeyHandlerDelegate {
 // MARK: - Candidate Controller Delegate
 
 extension ctlInputMethod: ctlCandidateDelegate {
+  var isAssociatedPhrasesMode: Bool { state is InputState.AssociatedPhrases }
+
   func handleDelegateEvent(_ event: NSEvent!) -> Bool {
     // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
     if #available(macOS 10.15, *) {
