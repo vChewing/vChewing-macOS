@@ -28,7 +28,7 @@ public class CandidateKeyLabel: NSObject {
 
 public protocol ctlCandidateDelegate: AnyObject {
   var isAssociatedPhrasesMode: Bool { get }
-  func handleDelegateEvent(_ event: NSEvent!) -> Bool
+  func sharedEventHandler(_ event: NSEvent!) -> Bool
   func candidateCountForController(_ controller: ctlCandidateProtocol) -> Int
   func candidatesForController(_ controller: ctlCandidateProtocol) -> [(String, String)]
   func ctlCandidate(_ controller: ctlCandidateProtocol, candidateAtIndex index: Int)

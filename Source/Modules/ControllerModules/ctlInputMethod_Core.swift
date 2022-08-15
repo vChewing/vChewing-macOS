@@ -107,10 +107,14 @@ class ctlInputMethod: IMKInputController {
     // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
     // 所以這裡添加這句、來試圖應對這種情況。
     if keyHandler.delegate == nil { keyHandler.delegate = self }
-    guard let client = client() else { return }
-    setValue(IME.currentInputMode.rawValue, forTag: 114_514, client: client)
+    setValue(IME.currentInputMode.rawValue, forTag: 114_514, client: client())
     keyHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
     keyHandler.ensureParser()
+
+    if #available(macOS 10.13, *) {
+    } else {
+      mgrPrefs.useIMKCandidateWindow = false  // 防呆。macOS 10.11 用 IMK 選字窗會崩潰。
+    }
 
     if isASCIIMode {
       if mgrPrefs.disableShiftTogglingAlphanumericalMode {
@@ -128,7 +132,7 @@ class ctlInputMethod: IMKInputController {
 
     /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
     /// 這是很多 macOS 副廠輸入法的常見失誤之處。
-    if client.bundleIdentifier() != Bundle.main.bundleIdentifier {
+    if let client = client(), client.bundleIdentifier() != Bundle.main.bundleIdentifier {
       // 強制重設當前鍵盤佈局、使其與偏好設定同步。
       setKeyLayout()
       handle(state: InputState.Empty())
@@ -205,64 +209,18 @@ class ctlInputMethod: IMKInputController {
   @objc(handleEvent:client:) override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
 
-    // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
-    let shouldUseHandle =
-      (IME.arrClientShiftHandlingExceptionList.contains(clientBundleIdentifier)
-        || mgrPrefs.shouldAlwaysUseShiftKeyAccommodation)
-    if #available(macOS 10.15, *) {
-      if ShiftKeyUpChecker.check(event), !mgrPrefs.disableShiftTogglingAlphanumericalMode {
-        if !shouldUseHandle || (!rencentKeyHandledByKeyHandler && shouldUseHandle) {
-          NotifierController.notify(
-            message: String(
-              format: "%@%@%@", NSLocalizedString("Alphanumerical Mode", comment: ""), "\n",
-              toggleASCIIMode()
-                ? NSLocalizedString("NotificationSwitchON", comment: "")
-                : NSLocalizedString("NotificationSwitchOFF", comment: "")
-            )
-          )
-        }
-        if shouldUseHandle {
-          rencentKeyHandledByKeyHandler = false
-        }
-        return false
-      }
-    }
-
-    /// IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
+    // IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
+    // 這樣可以讓 interpretKeyEvents() 函式自行判斷：
+    // - 是就地交給 super.interpretKeyEvents() 處理？
+    // - 還是藉由 delegate 扔回 ctlInputMethod 給 KeyHandler 處理？
     if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK, ctlCandidateCurrent.visible {
       ctlCandidateCurrent.interpretKeyEvents([event])
       return true
     }
 
-    /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
-    /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
-    /// 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
-    /// 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
-    if event.type == .flagsChanged { return false }
-
-    // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
-    ctlInputMethod.areWeNerfing = event.modifierFlags.contains([.shift, .command])
-
-    var input = InputSignal(event: event, isVerticalTyping: isVerticalTyping)
-    input.isASCIIModeInput = isASCIIMode
-
-    // 無法列印的訊號輸入，一概不作處理。
-    // 這個過程不能放在 KeyHandler 內，否則不會起作用。
-    if !input.charCode.isPrintable {
-      return false
-    }
-
-    /// 將按鍵行為與當前輸入法狀態結合起來、交給按鍵調度模組來處理。
-    /// 再根據返回的 result bool 數值來告知 IMK「這個按鍵事件是被處理了還是被放行了」。
-    let result = keyHandler.handle(input: input, state: state) { newState in
-      self.handle(state: newState)
-    } errorCallback: {
-      clsSFX.beep()
-    }
-    if shouldUseHandle {
-      rencentKeyHandledByKeyHandler = result
-    }
-    return result
+    /// 我們不在這裡處理了，直接交給 commonEventHandler 來處理。
+    /// 這樣可以與 IMK 選字窗共用按鍵處理資源，維護起來也比較方便。
+    return commonEventHandler(event)
   }
 
   /// 有時會出現某些 App 攔截輸入法的 Ctrl+Enter / Shift+Enter 熱鍵的情況。
@@ -282,34 +240,24 @@ class ctlInputMethod: IMKInputController {
   override func candidates(_ sender: Any!) -> [Any]! {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     var arrResult = [String]()
-    // 你沒看錯，三個狀態下的處理流程都是雷同的。
+
+    func handleCandidatesPrepared(_ candidates: [(String, String)]) {
+      for theCandidate in candidates {
+        let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
+        var result = (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
+        if arrResult.contains(result) {
+          result = "\(result)(\(theCandidate.0))"
+        }
+        arrResult.append(result)
+      }
+    }
+
     if let state = state as? InputState.AssociatedPhrases {
-      for theCandidate in state.candidates {
-        let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
-        var result = (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
-        if arrResult.contains(result) {
-          result = "\(result)(\(theCandidate.0))"
-        }
-        arrResult.append(result)
-      }
+      handleCandidatesPrepared(state.candidates)
     } else if let state = state as? InputState.SymbolTable {
-      for theCandidate in state.candidates {
-        let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
-        var result = (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
-        if arrResult.contains(result) {
-          result = "\(result)(\(theCandidate.0))"
-        }
-        arrResult.append(result)
-      }
+      handleCandidatesPrepared(state.candidates)
     } else if let state = state as? InputState.ChoosingCandidate {
-      for theCandidate in state.candidates {
-        let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
-        var result = (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
-        if arrResult.contains(result) {
-          result = "\(result)(\(theCandidate.0))"
-        }
-        arrResult.append(result)
-      }
+      handleCandidatesPrepared(state.candidates)
     }
     return arrResult
   }
@@ -337,49 +285,29 @@ class ctlInputMethod: IMKInputController {
     }
 
     var indexDeducted = 0
-    // 你沒看錯，三個狀態下的處理流程都是雷同的。
+
+    func handleCandidatesSelected(_ candidates: [(String, String)]) {
+      for (i, neta) in candidates.enumerated() {
+        let theConverted = IME.kanjiConversionIfRequired(neta.1)
+        let netaShown = (neta.1 == theConverted) ? neta.1 : "\(theConverted)(\(neta.1))"
+        let netaShownWithPronunciation = "\(theConverted)(\(neta.0))"
+        if candidateString.string == netaShownWithPronunciation {
+          indexDeducted = i
+          break
+        }
+        if candidateString.string == netaShown {
+          indexDeducted = i
+          break
+        }
+      }
+    }
+
     if let state = state as? InputState.AssociatedPhrases {
-      for (i, neta) in state.candidates.enumerated() {
-        let theConverted = IME.kanjiConversionIfRequired(neta.1)
-        let netaShown = (neta.1 == theConverted) ? neta.1 : "\(theConverted)(\(neta.1))"
-        let netaShownWithPronunciation = "\(theConverted)(\(neta.0))"
-        if candidateString.string == netaShownWithPronunciation {
-          indexDeducted = i
-          break
-        }
-        if candidateString.string == netaShown {
-          indexDeducted = i
-          break
-        }
-      }
+      handleCandidatesSelected(state.candidates)
     } else if let state = state as? InputState.SymbolTable {
-      for (i, neta) in state.candidates.enumerated() {
-        let theConverted = IME.kanjiConversionIfRequired(neta.1)
-        let netaShown = (neta.1 == theConverted) ? neta.1 : "\(theConverted)(\(neta.1))"
-        let netaShownWithPronunciation = "\(theConverted)(\(neta.0))"
-        if candidateString.string == netaShownWithPronunciation {
-          indexDeducted = i
-          break
-        }
-        if candidateString.string == netaShown {
-          indexDeducted = i
-          break
-        }
-      }
+      handleCandidatesSelected(state.candidates)
     } else if let state = state as? InputState.ChoosingCandidate {
-      for (i, neta) in state.candidates.enumerated() {
-        let theConverted = IME.kanjiConversionIfRequired(neta.1)
-        let netaShown = (neta.1 == theConverted) ? neta.1 : "\(theConverted)(\(neta.1))"
-        let netaShownWithPronunciation = "\(theConverted)(\(neta.0))"
-        if candidateString.string == netaShownWithPronunciation {
-          indexDeducted = i
-          break
-        }
-        if candidateString.string == netaShown {
-          indexDeducted = i
-          break
-        }
-      }
+      handleCandidatesSelected(state.candidates)
     }
     keyHandler(
       keyHandler,

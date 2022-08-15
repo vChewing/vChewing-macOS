@@ -335,16 +335,23 @@ extension ctlPrefWindow: NSToolbarDelegate {
     window.contentView?.addSubview(view)
   }
 
+  var toolbarIdentifiers: [NSToolbarItem.Identifier] {
+    if #available(macOS 10.13, *) {
+      return [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard, .ofDevZone]
+    }
+    return [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard]
+  }
+
   func toolbarDefaultItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
-    [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard, .ofDevZone]
+    toolbarIdentifiers
   }
 
   func toolbarAllowedItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
-    [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard, .ofDevZone]
+    toolbarIdentifiers
   }
 
   func toolbarSelectableItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
-    [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard, .ofDevZone]
+    toolbarIdentifiers
   }
 
   @objc func showGeneralView(_: Any?) {
