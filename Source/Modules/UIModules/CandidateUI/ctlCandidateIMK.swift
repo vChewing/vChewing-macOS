@@ -83,12 +83,9 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
   }
 
   public func reloadData() {
-    guard let delegate = delegate else { return }
-    let candidates = delegate.candidatesForController(self).map { theCandidate -> String in
-      let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
-      return (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
-    }
-    setCandidateData(candidates)
+    // guard let delegate = delegate else { return }  // 下文無效，所以這句沒用。
+    // 既然下述函式無效，那中間這段沒用的也都砍了。
+    // setCandidateData(candidates)  // 該函式無效。
     keyCount = selectionKeys().count
     selectedCandidateIndex = 0
     update()
