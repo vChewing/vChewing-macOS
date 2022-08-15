@@ -88,8 +88,8 @@ private class vwrCandidateUniversal: NSView {
             calculatedWindowWidth = rctCandidate.size.width + cellPadding * 2
           }
         case false:
-          if cellWidth < cellHeight * 1.35 {
-            cellWidth = cellHeight * 1.35
+          if cellWidth < cellHeight * 1.4 {
+            cellWidth = cellHeight * 1.4
           }
       }
       newWidths.append(round(cellWidth))
