@@ -107,10 +107,14 @@ class ctlInputMethod: IMKInputController {
     // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
     // 所以這裡添加這句、來試圖應對這種情況。
     if keyHandler.delegate == nil { keyHandler.delegate = self }
-    guard let client = client() else { return }
-    setValue(IME.currentInputMode.rawValue, forTag: 114_514, client: client)
+    setValue(IME.currentInputMode.rawValue, forTag: 114_514, client: client())
     keyHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
     keyHandler.ensureParser()
+
+    if #available(macOS 10.13, *) {
+    } else {
+      mgrPrefs.useIMKCandidateWindow = false  // 防呆。macOS 10.11 用 IMK 選字窗會崩潰。
+    }
 
     if isASCIIMode {
       if mgrPrefs.disableShiftTogglingAlphanumericalMode {
@@ -128,7 +132,7 @@ class ctlInputMethod: IMKInputController {
 
     /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
     /// 這是很多 macOS 副廠輸入法的常見失誤之處。
-    if client.bundleIdentifier() != Bundle.main.bundleIdentifier {
+    if let client = client(), client.bundleIdentifier() != Bundle.main.bundleIdentifier {
       // 強制重設當前鍵盤佈局、使其與偏好設定同步。
       setKeyLayout()
       handle(state: InputState.Empty())
