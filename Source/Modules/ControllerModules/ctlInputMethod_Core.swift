@@ -236,34 +236,24 @@ class ctlInputMethod: IMKInputController {
   override func candidates(_ sender: Any!) -> [Any]! {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     var arrResult = [String]()
-    // 你沒看錯，三個狀態下的處理流程都是雷同的。
+
+    func handleCandidatesPrepared(_ candidates: [(String, String)]) {
+      for theCandidate in candidates {
+        let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
+        var result = (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
+        if arrResult.contains(result) {
+          result = "\(result)(\(theCandidate.0))"
+        }
+        arrResult.append(result)
+      }
+    }
+
     if let state = state as? InputState.AssociatedPhrases {
-      for theCandidate in state.candidates {
-        let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
-        var result = (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
-        if arrResult.contains(result) {
-          result = "\(result)(\(theCandidate.0))"
-        }
-        arrResult.append(result)
-      }
+      handleCandidatesPrepared(state.candidates)
     } else if let state = state as? InputState.SymbolTable {
-      for theCandidate in state.candidates {
-        let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
-        var result = (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
-        if arrResult.contains(result) {
-          result = "\(result)(\(theCandidate.0))"
-        }
-        arrResult.append(result)
-      }
+      handleCandidatesPrepared(state.candidates)
     } else if let state = state as? InputState.ChoosingCandidate {
-      for theCandidate in state.candidates {
-        let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
-        var result = (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
-        if arrResult.contains(result) {
-          result = "\(result)(\(theCandidate.0))"
-        }
-        arrResult.append(result)
-      }
+      handleCandidatesPrepared(state.candidates)
     }
     return arrResult
   }
@@ -291,49 +281,29 @@ class ctlInputMethod: IMKInputController {
     }
 
     var indexDeducted = 0
-    // 你沒看錯，三個狀態下的處理流程都是雷同的。
+
+    func handleCandidatesSelected(_ candidates: [(String, String)]) {
+      for (i, neta) in candidates.enumerated() {
+        let theConverted = IME.kanjiConversionIfRequired(neta.1)
+        let netaShown = (neta.1 == theConverted) ? neta.1 : "\(theConverted)(\(neta.1))"
+        let netaShownWithPronunciation = "\(theConverted)(\(neta.0))"
+        if candidateString.string == netaShownWithPronunciation {
+          indexDeducted = i
+          break
+        }
+        if candidateString.string == netaShown {
+          indexDeducted = i
+          break
+        }
+      }
+    }
+
     if let state = state as? InputState.AssociatedPhrases {
-      for (i, neta) in state.candidates.enumerated() {
-        let theConverted = IME.kanjiConversionIfRequired(neta.1)
-        let netaShown = (neta.1 == theConverted) ? neta.1 : "\(theConverted)(\(neta.1))"
-        let netaShownWithPronunciation = "\(theConverted)(\(neta.0))"
-        if candidateString.string == netaShownWithPronunciation {
-          indexDeducted = i
-          break
-        }
-        if candidateString.string == netaShown {
-          indexDeducted = i
-          break
-        }
-      }
+      handleCandidatesSelected(state.candidates)
     } else if let state = state as? InputState.SymbolTable {
-      for (i, neta) in state.candidates.enumerated() {
-        let theConverted = IME.kanjiConversionIfRequired(neta.1)
-        let netaShown = (neta.1 == theConverted) ? neta.1 : "\(theConverted)(\(neta.1))"
-        let netaShownWithPronunciation = "\(theConverted)(\(neta.0))"
-        if candidateString.string == netaShownWithPronunciation {
-          indexDeducted = i
-          break
-        }
-        if candidateString.string == netaShown {
-          indexDeducted = i
-          break
-        }
-      }
+      handleCandidatesSelected(state.candidates)
     } else if let state = state as? InputState.ChoosingCandidate {
-      for (i, neta) in state.candidates.enumerated() {
-        let theConverted = IME.kanjiConversionIfRequired(neta.1)
-        let netaShown = (neta.1 == theConverted) ? neta.1 : "\(theConverted)(\(neta.1))"
-        let netaShownWithPronunciation = "\(theConverted)(\(neta.0))"
-        if candidateString.string == netaShownWithPronunciation {
-          indexDeducted = i
-          break
-        }
-        if candidateString.string == netaShown {
-          indexDeducted = i
-          break
-        }
-      }
+      handleCandidatesSelected(state.candidates)
     }
     keyHandler(
       keyHandler,
