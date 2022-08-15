@@ -205,64 +205,18 @@ class ctlInputMethod: IMKInputController {
   @objc(handleEvent:client:) override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
 
-    // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
-    let shouldUseHandle =
-      (IME.arrClientShiftHandlingExceptionList.contains(clientBundleIdentifier)
-        || mgrPrefs.shouldAlwaysUseShiftKeyAccommodation)
-    if #available(macOS 10.15, *) {
-      if ShiftKeyUpChecker.check(event), !mgrPrefs.disableShiftTogglingAlphanumericalMode {
-        if !shouldUseHandle || (!rencentKeyHandledByKeyHandler && shouldUseHandle) {
-          NotifierController.notify(
-            message: String(
-              format: "%@%@%@", NSLocalizedString("Alphanumerical Mode", comment: ""), "\n",
-              toggleASCIIMode()
-                ? NSLocalizedString("NotificationSwitchON", comment: "")
-                : NSLocalizedString("NotificationSwitchOFF", comment: "")
-            )
-          )
-        }
-        if shouldUseHandle {
-          rencentKeyHandledByKeyHandler = false
-        }
-        return false
-      }
-    }
-
-    /// IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
+    // IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
+    // 這樣可以讓 interpretKeyEvents() 函式自行判斷：
+    // - 是就地交給 super.interpretKeyEvents() 處理？
+    // - 還是藉由 delegate 扔回 ctlInputMethod 給 KeyHandler 處理？
     if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK, ctlCandidateCurrent.visible {
       ctlCandidateCurrent.interpretKeyEvents([event])
       return true
     }
 
-    /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
-    /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
-    /// 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
-    /// 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
-    if event.type == .flagsChanged { return false }
-
-    // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
-    ctlInputMethod.areWeNerfing = event.modifierFlags.contains([.shift, .command])
-
-    var input = InputSignal(event: event, isVerticalTyping: isVerticalTyping)
-    input.isASCIIModeInput = isASCIIMode
-
-    // 無法列印的訊號輸入，一概不作處理。
-    // 這個過程不能放在 KeyHandler 內，否則不會起作用。
-    if !input.charCode.isPrintable {
-      return false
-    }
-
-    /// 將按鍵行為與當前輸入法狀態結合起來、交給按鍵調度模組來處理。
-    /// 再根據返回的 result bool 數值來告知 IMK「這個按鍵事件是被處理了還是被放行了」。
-    let result = keyHandler.handle(input: input, state: state) { newState in
-      self.handle(state: newState)
-    } errorCallback: {
-      clsSFX.beep()
-    }
-    if shouldUseHandle {
-      rencentKeyHandledByKeyHandler = result
-    }
-    return result
+    /// 我們不在這裡處理了，直接交給 commonEventHandler 來處理。
+    /// 這樣可以與 IMK 選字窗共用按鍵處理資源，維護起來也比較方便。
+    return commonEventHandler(event)
   }
 
   /// 有時會出現某些 App 攔截輸入法的 Ctrl+Enter / Shift+Enter 熱鍵的情況。

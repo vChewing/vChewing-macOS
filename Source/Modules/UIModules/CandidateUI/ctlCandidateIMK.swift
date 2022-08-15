@@ -249,7 +249,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     let input = InputSignal(event: event)
     guard let delegate = delegate else { return }
     if input.isEsc || input.isBackSpace || input.isDelete || (input.isShiftHold && !input.isSpace) {
-      _ = delegate.handleDelegateEvent(event)
+      _ = delegate.sharedEventHandler(event)
     } else if input.isSymbolMenuPhysicalKey || input.isSpace {
       if input.isShiftHold {
         switch currentLayout {
@@ -308,7 +308,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
         !input.isCursorClockLeft, !input.isCursorClockRight, !input.isSpace,
         !input.isEnter || !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter
       {
-        _ = delegate.handleDelegateEvent(event)
+        _ = delegate.sharedEventHandler(event)
         return
       }
       super.interpretKeyEvents(eventArray)
