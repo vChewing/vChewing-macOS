@@ -280,6 +280,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.upperCaseLetterKeyBehavior, forKey: UserDef.kUpperCaseLetterKeyBehavior.rawValue
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.disableShiftTogglingAlphanumericalMode, forKey: UserDef.kDisableShiftTogglingAlphanumericalMode.rawValue
+    )
 
     // -----
 
@@ -399,6 +402,12 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kUpperCaseLetterKeyBehavior.rawValue, defaultValue: 0)
   static var upperCaseLetterKeyBehavior: Int
 
+  @UserDefault(key: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue, defaultValue: true)
+  static var togglingAlphanumericalModeWithLShift: Bool
+
+  @UserDefault(key: UserDef.kDisableShiftTogglingAlphanumericalMode.rawValue, defaultValue: false)
+  static var disableShiftTogglingAlphanumericalMode: Bool
+
   // MARK: - Settings (Tier 2)
 
   @UserDefault(key: UserDef.kUseIMKCandidateWindow.rawValue, defaultValue: false)
@@ -415,13 +424,7 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kShouldAlwaysUseShiftKeyAccommodation.rawValue, defaultValue: false)
   static var shouldAlwaysUseShiftKeyAccommodation: Bool
 
-  @UserDefault(key: UserDef.kDisableShiftTogglingAlphanumericalMode.rawValue, defaultValue: false)
-  static var disableShiftTogglingAlphanumericalMode: Bool
-
   // MARK: - Settings (Tier 3)
-
-  @UserDefault(key: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue, defaultValue: true)
-  static var togglingAlphanumericalModeWithLShift: Bool
 
   static var minCandidateLength: Int {
     mgrPrefs.allowBoostingSingleKanjiAsUserPhrase ? 1 : 2
