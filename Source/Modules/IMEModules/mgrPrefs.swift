@@ -469,34 +469,44 @@ public enum mgrPrefs {
   }
 
   @UserDefault(key: UserDef.kChineseConversionEnabled.rawValue, defaultValue: false)
-  static var chineseConversionEnabled: Bool
+  static var chineseConversionEnabled: Bool {
+    didSet {
+      // 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
+      if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
+        toggleShiftJISShinjitaiOutputEnabled()
+        UserDefaults.standard.set(
+          shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue
+        )
+      }
+      UserDefaults.standard.set(
+        chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled.rawValue
+      )
+    }
+  }
 
   @discardableResult static func toggleChineseConversionEnabled() -> Bool {
     chineseConversionEnabled = !chineseConversionEnabled
-    // 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
-    if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
-      toggleShiftJISShinjitaiOutputEnabled()
-      UserDefaults.standard.set(
-        shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue
-      )
-    }
-    UserDefaults.standard.set(chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled.rawValue)
     return chineseConversionEnabled
   }
 
   @UserDefault(key: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue, defaultValue: false)
-  static var shiftJISShinjitaiOutputEnabled: Bool
+  static var shiftJISShinjitaiOutputEnabled: Bool {
+    didSet {
+      // 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
+      if shiftJISShinjitaiOutputEnabled, chineseConversionEnabled {
+        toggleChineseConversionEnabled()
+        UserDefaults.standard.set(
+          chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled.rawValue
+        )
+      }
+      UserDefaults.standard.set(
+        shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue
+      )
+    }
+  }
 
   @discardableResult static func toggleShiftJISShinjitaiOutputEnabled() -> Bool {
     shiftJISShinjitaiOutputEnabled = !shiftJISShinjitaiOutputEnabled
-    // 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
-    if shiftJISShinjitaiOutputEnabled, chineseConversionEnabled {
-      toggleChineseConversionEnabled()
-      UserDefaults.standard.set(chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled.rawValue)
-    }
-    UserDefaults.standard.set(
-      shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue
-    )
     return shiftJISShinjitaiOutputEnabled
   }
 
