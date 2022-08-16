@@ -118,7 +118,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
 
     if let state = state as? InputState.ChoosingCandidate {
       let selectedValue = state.candidates[index]
-      keyHandler.fixNode(candidate: selectedValue, respectCursorPushing: true)
+      keyHandler.fixNode(candidate: selectedValue, respectCursorPushing: true, preConsolidate: true)
 
       let inputting = keyHandler.buildInputtingState
 

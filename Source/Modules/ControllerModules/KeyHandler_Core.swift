@@ -127,15 +127,95 @@ public class KeyHandler {
     return arrResult
   }
 
+  /// 鞏固當前組字器游標上下文，防止在當前游標位置固化節點時給作業範圍以外的內容帶來不想要的變化。
+  ///
+  /// 打比方說輸入法原廠詞庫內有「章太炎」一詞，你敲「章太炎」，然後想把「太」改成「泰」以使其變成「章泰炎」。
+  /// **macOS 內建的注音輸入法不會在這個過程對這個詞除了「太」以外的部分有任何變動**，
+  /// 但所有 OV 系輸入法都對此有 Bug：會將這些部分全部重設為各自的讀音下的最高原始權重的漢字。
+  /// 也就是說，選字之後的結果可能會變成「張泰言」。
+  ///
+  /// - Remark: 類似的可以拿來測試的詞有「蔡依林」「周杰倫」。
+  ///
+  /// 測試時請務必也測試「敲長句子、且這種詞在句子中間出現時」的情況。
+  ///
+  /// 威注音輸入法截至 v1.9.3 SP2 版為止都受到上游的這個 Bug 的影響，且在 v1.9.4 版利用該函式修正了這個缺陷。
+  /// 該修正必須搭配至少天權星組字引擎 v2.0.2 版方可生效。算法可能比較囉唆，但至少在常用情形下不會再發生該問題。
+  /// - Parameter theCandidate: 要拿來覆寫的詞音配對。
+  func consolidateCursorContext(with theCandidate: Megrez.Compositor.Candidate) {
+    let grid = compositor
+    var frontBoundaryEX = compositor.width - 1
+    var rearBoundaryEX = 0
+    if grid.overrideCandidate(theCandidate, at: actualCandidateCursor) {
+      guard let node = compositor.walkedNodes.findNode(at: actualCandidateCursor, target: &frontBoundaryEX) else {
+        return
+      }
+      rearBoundaryEX = max(0, frontBoundaryEX - node.keyArray.count)
+    }
+
+    var frontBoundary = 0
+    guard let node = compositor.walkedNodes.findNode(at: actualCandidateCursor, target: &frontBoundary) else { return }
+
+    var rearBoundary = min(max(0, frontBoundary - node.keyArray.count), rearBoundaryEX)  // 防呆
+    frontBoundary = max(min(frontBoundary, compositor.width), frontBoundaryEX)  // 防呆。
+
+    let cursorBackup = compositor.cursor
+    while compositor.cursor > rearBoundary { compositor.jumpCursorBySpan(to: .rear) }
+    rearBoundary = min(compositor.cursor, rearBoundary)
+    compositor.cursor = cursorBackup  // 游標歸位，再接著計算。
+    while compositor.cursor < frontBoundary { compositor.jumpCursorBySpan(to: .front) }
+    frontBoundary = max(compositor.cursor, frontBoundary)
+    compositor.cursor = cursorBackup  // 計算結束，游標歸位。
+
+    // 接下來獲取這個範圍內的媽的都不知道該怎麼講了。
+    var nodeIndices = [Int]()  // 僅作統計用。
+
+    var position = rearBoundary  // 臨時統計用
+    while position < frontBoundary {
+      guard let regionIndex = compositor.cursorRegionMap[position] else {
+        position += 1
+        continue
+      }
+      if !nodeIndices.contains(regionIndex) {
+        nodeIndices.append(regionIndex)  // 新增統計
+        guard compositor.walkedNodes.count > regionIndex else { break }  // 防呆
+        let currentNode = compositor.walkedNodes[regionIndex]
+        guard currentNode.keyArray.count == currentNode.value.count else {
+          compositor.overrideCandidate(currentNode.currentPair, at: position)
+          position += currentNode.keyArray.count
+          continue
+        }
+        let values = currentNode.currentPair.value.map { String($0) }
+        for (subPosition, key) in currentNode.keyArray.enumerated() {
+          guard values.count > subPosition else { break }  // 防呆，應該沒有發生的可能性
+          let thePair = Megrez.Compositor.Candidate(
+            key: key, value: values[subPosition]
+          )
+          compositor.overrideCandidate(thePair, at: position)
+          position += 1
+        }
+        continue
+      }
+      position += 1
+    }
+  }
+
   /// 在組字器內，以給定之候選字（詞音配對）、來試圖在給定游標位置所在之處指定選字處理過程。
-  /// 然後再將對應的節錨內的節點標記為「已經手動選字過」。
+  /// 然後再將對應的節錨內的節點標記為「已經手動選字過」。我們稱之為「固化節點」。
   /// - Parameters:
   ///   - value: 給定之候選字（詞音配對）。
   ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字後的節錨的前方。
-  func fixNode(candidate: (String, String), respectCursorPushing: Bool = true) {
-    let actualCursor = actualCandidateCursor
+  ///   - consolidate: 在固化節點之前，先鞏固上下文。該選項可能會破壞在內文組字區內就地輪替候選字詞時的體驗。
+  func fixNode(candidate: (String, String), respectCursorPushing: Bool = true, preConsolidate: Bool = false) {
     let theCandidate: Megrez.Compositor.Candidate = .init(key: candidate.0, value: candidate.1)
-    if !compositor.overrideCandidate(theCandidate, at: actualCursor, overrideType: .withHighScore) { return }
+
+    /// 必須先鞏固當前組字器游標上下文、以消滅意料之外的影響，但在內文組字區內就地輪替候選字詞時除外。
+    if preConsolidate {
+      consolidateCursorContext(with: theCandidate)
+    }
+
+    // 回到正常流程。
+
+    if !compositor.overrideCandidate(theCandidate, at: actualCandidateCursor) { return }
     let previousWalk = compositor.walkedNodes
     // 開始爬軌。
     walk()
