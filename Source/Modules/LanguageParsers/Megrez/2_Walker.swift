@@ -11,7 +11,7 @@ extension Megrez.Compositor {
   /// 對於 `G = (V, E)`，該算法的運行次數為 `O(|V|+|E|)`，其中 `G` 是一個有向無環圖。
   /// 這意味著，即使軌格很大，也可以用很少的算力就可以爬軌。
   /// - Returns: 爬軌結果＋該過程是否順利執行。
-  @discardableResult public func walk() -> ([Node], Bool) {
+  @discardableResult public mutating func walk() -> ([Node], Bool) {
     var result = [Node]()
     defer {
       walkedNodes = result

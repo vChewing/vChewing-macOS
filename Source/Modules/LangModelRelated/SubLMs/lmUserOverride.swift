@@ -223,34 +223,6 @@ extension Array where Element == Megrez.Compositor.Node {
     }
     return counter
   }
-
-  public func findNode(at cursor: Int, target outCursorPastNode: inout Int) -> Megrez.Compositor.Node? {
-    guard !isEmpty else { return nil }
-    let cursor = Swift.max(0, Swift.min(cursor, keys.count))
-
-    if cursor == 0, let theFirst = first {
-      outCursorPastNode = theFirst.spanLength
-      return theFirst
-    }
-
-    // 同時應對「游標在右端」與「游標離右端還差一個位置」的情形。
-    if cursor >= keys.count - 1, let theLast = last {
-      outCursorPastNode = keys.count
-      return theLast
-    }
-
-    var accumulated = 0
-    for neta in self {
-      accumulated += neta.spanLength
-      if accumulated > cursor {
-        outCursorPastNode = accumulated
-        return neta
-      }
-    }
-
-    // 下述情形本不應該出現。
-    return nil
-  }
 }
 
 // MARK: - Private Methods

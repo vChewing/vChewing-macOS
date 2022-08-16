@@ -17,8 +17,8 @@ extension Megrez.Compositor {
     ///  [("a", -114), ("b", -514), ("c", -1919)] 的話，指定該覆寫行為則會導致該節
     ///  點返回的結果為 ("c", -114)。該覆寫行為多用於諸如使用者半衰記憶模組的建議
     ///  行為。被覆寫的這個節點的狀態可能不會再被爬軌行為擅自改回。該覆寫行為無法
-    ///  防止其它節點被爬軌函式所支配。這種情況下就需要用到 kOverridingScore
-    /// - withHighScore: 將該節點權重覆寫為 kOverridingScore，使其被爬軌函式所青睞。
+    ///  防止其它節點被爬軌函式所支配。這種情況下就需要用到 overridingScore
+    /// - withHighScore: 將該節點權重覆寫為 overridingScore，使其被爬軌函式所青睞。
     public enum OverrideType: Int {
       case withNoOverrides = 0
       case withTopUnigramScore = 1
@@ -32,7 +32,7 @@ extension Megrez.Compositor {
     /// 找出「A->bc」的爬軌途徑（尤其是當 A 和 B 使用「0」作為複寫數值的情況下）。這樣
     /// 一來，「A-B」就不一定始終會是爬軌函式的青睞結果了。所以，這裡一定要用大於 0 的
     /// 數（比如野獸常數），以讓「c」更容易單獨被選中。
-    public static let kOverridingScore: Double = 114_514
+    public var overridingScore: Double = 114_514
 
     private(set) var key: String
     private(set) var keyArray: [String]
@@ -81,7 +81,7 @@ extension Megrez.Compositor {
     public var score: Double {
       guard !unigrams.isEmpty else { return 0 }
       switch overrideType {
-        case .withHighScore: return Megrez.Compositor.Node.kOverridingScore
+        case .withHighScore: return overridingScore
         case .withTopUnigramScore: return unigrams[0].score
         default: return currentUnigram.score
       }
@@ -139,4 +139,45 @@ extension Array where Element == Megrez.Compositor.Node {
 
   /// 從一個節點陣列當中取出目前的索引鍵陣列。
   public var keys: [String] { map(\.key) }
+
+  /// 在陣列內以給定游標位置找出對應的節點。
+  /// - Parameters:
+  ///   - cursor: 給定游標位置。
+  ///   - outCursorPastNode: 找出的節點的前端位置。
+  /// - Returns: 查找結果。
+  public func findNode(at cursor: Int, target outCursorPastNode: inout Int) -> Megrez.Compositor.Node? {
+    guard !isEmpty else { return nil }
+    let cursor = Swift.max(0, Swift.min(cursor, keys.count))
+
+    if cursor == 0, let theFirst = first {
+      outCursorPastNode = theFirst.spanLength
+      return theFirst
+    }
+
+    // 同時應對「游標在右端」與「游標離右端還差一個位置」的情形。
+    if cursor >= keys.count - 1, let theLast = last {
+      outCursorPastNode = keys.count
+      return theLast
+    }
+
+    var accumulated = 0
+    for neta in self {
+      accumulated += neta.spanLength
+      if accumulated > cursor {
+        outCursorPastNode = accumulated
+        return neta
+      }
+    }
+
+    // 下述情形本不應該出現。
+    return nil
+  }
+
+  /// 在陣列內以給定游標位置找出對應的節點。
+  /// - Parameter cursor: 給定游標位置。
+  /// - Returns: 查找結果。
+  public func findNode(at cursor: Int) -> Megrez.Compositor.Node? {
+    var useless = 0
+    return findNode(at: cursor, target: &useless)
+  }
 }

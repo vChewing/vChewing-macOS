@@ -13,7 +13,7 @@ extension Megrez {
   /// 簡單的貝氏推論：因為底層的語言模組只會提供單元圖資料。一旦將所有可以組字的單元圖
   /// 作為節點塞到組字器內，就可以用一個簡單的有向無環圖爬軌過程、來利用這些隱性資料值
   /// 算出最大相似估算結果。
-  public class Compositor {
+  public struct Compositor {
     /// 就文字輸入方向而言的方向。
     public enum TypingDirection { case front, rear }
     /// 軌格增減行為。
@@ -51,7 +51,7 @@ extension Megrez {
       self.separator = separator
     }
 
-    public func clear() {
+    public mutating func clear() {
       cursor = 0
       keys.removeAll()
       spans.removeAll()
@@ -62,7 +62,7 @@ extension Megrez {
     /// 在游標位置插入給定的索引鍵。
     /// - Parameter key: 要插入的索引鍵。
     /// - Returns: 該操作是否成功執行。
-    @discardableResult public func insertKey(_ key: String) -> Bool {
+    @discardableResult public mutating func insertKey(_ key: String) -> Bool {
       guard !key.isEmpty, key != separator, langModel.hasUnigramsFor(key: key) else { return false }
       keys.insert(key, at: cursor)
       resizeGrid(at: cursor, do: .expand)
@@ -77,7 +77,7 @@ extension Megrez {
     /// 如果是朝著與文字輸入方向相反的方向砍的話，游標位置會自動遞減。
     /// - Parameter direction: 指定方向（相對於文字輸入方向而言）。
     /// - Returns: 該操作是否成功執行。
-    @discardableResult public func dropKey(direction: TypingDirection) -> Bool {
+    @discardableResult public mutating func dropKey(direction: TypingDirection) -> Bool {
       let isBackSpace: Bool = direction == .rear ? true : false
       guard cursor != (isBackSpace ? 0 : keys.count) else { return false }
       keys.remove(at: cursor - (isBackSpace ? 1 : 0))
@@ -90,7 +90,7 @@ extension Megrez {
     /// 按幅位來前後移動游標。
     /// - Parameter direction: 移動方向。
     /// - Returns: 該操作是否順利完成。
-    @discardableResult public func jumpCursorBySpan(to direction: TypingDirection) -> Bool {
+    @discardableResult public mutating func jumpCursorBySpan(to direction: TypingDirection) -> Bool {
       switch direction {
         case .front:
           if cursor == width { return false }
@@ -158,7 +158,7 @@ extension Megrez.Compositor {
   /// - Parameters:
   ///   - location: 給定的幅位座標。
   ///   - action: 指定是擴張還是縮減一個幅位。
-  func resizeGrid(at location: Int, do action: ResizeBehavior) {
+  mutating func resizeGrid(at location: Int, do action: ResizeBehavior) {
     let location = max(min(location, spans.count), 0)  // 防呆
     switch action {
       case .expand:
@@ -255,7 +255,7 @@ extension Megrez.Compositor {
     }
   }
 
-  func updateCursorJumpingTables(_ walkedNodes: [Node]) {
+  mutating func updateCursorJumpingTables(_ walkedNodes: [Node]) {
     var cursorRegionMapDict = [Int: Int]()
     cursorRegionMapDict[-1] = 0  // 防呆
     var counter = 0
