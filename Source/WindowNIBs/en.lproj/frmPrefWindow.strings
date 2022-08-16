@@ -45,7 +45,6 @@
 "chkAutoCorrectReadingCombination.title" = "Automatically correct reading combinations when typing";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "Applying typing suggestions from half-life user override model";
 "chkKeepReadingUponCompositionError.title" = "Allow backspace-editing miscomposed readings";
-"chkTogglingAlphanumericalModeWithLShift.title" = "Also toggle alphanumerical mode with Left-Shift";
 "chkUseFixecCandidateOrderOnSelection.title" = "Always use fixed listing order in candidate window";
 "DbW-eq-ZdB.title" = "Starlight";
 "dIN-TZ-67g.title" = "Space to +cycle candidates, Shift+Space to +cycle pages";
@@ -63,7 +62,6 @@
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
-"lblDevZoneCandidateFont.title" = "This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later.";
 "lblDevZoneIMKCandidate.title" = "IMK candidate window is plagued with issues like failed selection keys.";
 "lblDevZoneTitleDescription.title" = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
 "lblUpperCaseLetterKeyBehavior.title" = "Choose the behavior of Shift+Letter key with letter inputs.";
@@ -81,7 +79,6 @@
 "rVQ-Hx-cGi.title" = "Japanese";
 "s7u-Fm-dVg.title" = "Cycling Pages";
 "shc-Nu-UsM.title" = "Show page buttons in candidate list";
-"tglDevZoneCandidateFont.title" = "Use .langIdentifier to handle UI fonts in candidate window";
 "tglDevZoneIMKCandidate.title" = "Use IMK Candidate Window instead (will reboot the IME)";
 "TXr-FF-ehw.title" = "Traditional Chinese";
 "ueU-Rz-a1C.title" = "Choose the behavior of (Shift+)Tab key in the candidate window.";
