@@ -492,6 +492,7 @@ public enum mgrPrefs {
     // 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
     if shiftJISShinjitaiOutputEnabled, chineseConversionEnabled {
       toggleChineseConversionEnabled()
+      UserDefaults.standard.set(chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled.rawValue)
     }
     UserDefaults.standard.set(
       shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue
