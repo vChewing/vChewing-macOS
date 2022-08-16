@@ -36,6 +36,8 @@ struct suiPrefPaneExperience: View {
     forKey: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue)
   @State private var selUpperCaseLetterKeyBehavior = UserDefaults.standard.integer(
     forKey: UserDef.kUpperCaseLetterKeyBehavior.rawValue)
+  @State private var selDisableShiftTogglingAlphanumericalMode: Bool = UserDefaults.standard.bool(
+    forKey: UserDef.kDisableShiftTogglingAlphanumericalMode.rawValue)
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -148,6 +150,12 @@ struct suiPrefPaneExperience: View {
           LocalizedStringKey("Also toggle alphanumerical mode with Left-Shift"),
           isOn: $selTogglingAlphanumericalModeWithLShift.onChange {
             mgrPrefs.togglingAlphanumericalModeWithLShift = selTogglingAlphanumericalModeWithLShift
+          }
+        ).disabled(mgrPrefs.disableShiftTogglingAlphanumericalMode == true)
+        Toggle(
+          LocalizedStringKey("Completely disable using Shift key to toggling alphanumerical mode"),
+          isOn: $selDisableShiftTogglingAlphanumericalMode.onChange {
+            mgrPrefs.disableShiftTogglingAlphanumericalMode = selDisableShiftTogglingAlphanumericalMode
           }
         )
         Toggle(
