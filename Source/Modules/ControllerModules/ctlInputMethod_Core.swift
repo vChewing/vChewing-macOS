@@ -111,10 +111,7 @@ class ctlInputMethod: IMKInputController {
     keyHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
     keyHandler.ensureParser()
 
-    if #available(macOS 10.13, *) {
-    } else {
-      mgrPrefs.useIMKCandidateWindow = false  // 防呆。macOS 10.11 用 IMK 選字窗會崩潰。
-    }
+    mgrPrefs.fixOddPreferences()
 
     if isASCIIMode {
       if mgrPrefs.disableShiftTogglingAlphanumericalMode {
