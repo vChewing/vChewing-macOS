@@ -106,17 +106,9 @@ public enum IME {
     if #available(macOS 10.15, *) {
       let appearanceDescription = NSApplication.shared.effectiveAppearance.debugDescription
         .lowercased()
-      if appearanceDescription.contains("dark") {
-        return true
-      }
-    } else if #available(macOS 10.14, *) {
-      if let appleInterfaceStyle = UserDefaults.standard.object(forKey: "AppleInterfaceStyle")
-        as? String
-      {
-        if appleInterfaceStyle.lowercased().contains("dark") {
-          return true
-        }
-      }
+      return appearanceDescription.contains("dark")
+    } else if let appleInterfaceStyle = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") {
+      return appleInterfaceStyle.lowercased().contains("dark")
     }
     return false
   }
