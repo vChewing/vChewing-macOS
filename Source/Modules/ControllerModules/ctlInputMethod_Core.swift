@@ -281,24 +281,25 @@ class ctlInputMethod: IMKInputController {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     var arrResult = [String]()
 
-    func handleCandidatesPrepared(_ candidates: [(String, String)]) {
+    func handleCandidatesPrepared(_ candidates: [(String, String)], prefix: String = "") {
       for theCandidate in candidates {
         let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
         var result = (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
         if arrResult.contains(result) {
           result = "\(result)(\(theCandidate.0))"
         }
-        arrResult.append(result)
+        arrResult.append(prefix + result)
       }
     }
 
     if let state = state as? InputState.AssociatedPhrases {
-      handleCandidatesPrepared(state.candidates)
+      handleCandidatesPrepared(state.candidates, prefix: "⇧")
     } else if let state = state as? InputState.SymbolTable {
       handleCandidatesPrepared(state.candidates)
     } else if let state = state as? InputState.ChoosingCandidate {
       handleCandidatesPrepared(state.candidates)
     }
+
     return arrResult
   }
 
@@ -326,16 +327,16 @@ class ctlInputMethod: IMKInputController {
 
     var indexDeducted = 0
 
-    func handleCandidatesSelected(_ candidates: [(String, String)]) {
+    func handleCandidatesSelected(_ candidates: [(String, String)], prefix: String = "") {
       for (i, neta) in candidates.enumerated() {
         let theConverted = IME.kanjiConversionIfRequired(neta.1)
         let netaShown = (neta.1 == theConverted) ? neta.1 : "\(theConverted)(\(neta.1))"
         let netaShownWithPronunciation = "\(theConverted)(\(neta.0))"
-        if candidateString.string == netaShownWithPronunciation {
+        if candidateString.string == prefix + netaShownWithPronunciation {
           indexDeducted = i
           break
         }
-        if candidateString.string == netaShown {
+        if candidateString.string == prefix + netaShown {
           indexDeducted = i
           break
         }
@@ -343,7 +344,7 @@ class ctlInputMethod: IMKInputController {
     }
 
     if let state = state as? InputState.AssociatedPhrases {
-      handleCandidatesSelected(state.candidates)
+      handleCandidatesSelected(state.candidates, prefix: "⇧")
     } else if let state = state as? InputState.SymbolTable {
       handleCandidatesSelected(state.candidates)
     } else if let state = state as? InputState.ChoosingCandidate {
