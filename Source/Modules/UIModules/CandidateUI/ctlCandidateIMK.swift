@@ -299,7 +299,17 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
           eventArray = Array(eventArray.dropFirst(0))
           eventArray.insert(newEvent, at: 0)
         }
+        perform(Selector(("handleKeyboardEvent:")), with: newEvent)
+        return
       }
+
+      if mgrPrefs.useSCPCTypingMode {
+        if !input.isReservedKey {
+          _ = delegate.sharedEventHandler(event)
+          return
+        }
+      }
+
       if delegate.isAssociatedPhrasesMode,
         !input.isPageUp, !input.isPageDown, !input.isCursorForward, !input.isCursorBackward,
         !input.isCursorClockLeft, !input.isCursorClockRight, !input.isSpace,
