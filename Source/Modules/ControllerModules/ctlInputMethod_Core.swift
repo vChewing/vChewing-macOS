@@ -235,6 +235,25 @@ class ctlInputMethod: IMKInputController {
         ctlCandidateCurrent.interpretKeyEvents([newEvent])
         return true
       }
+
+      if let newChar = ctlCandidateIMK.defaultIMKSelectionKey[event.keyCode], input.isShiftHold,
+        isAssociatedPhrasesState
+      {
+        let newEvent = NSEvent.keyEvent(
+          with: event.type,
+          location: event.locationInWindow,
+          modifierFlags: [],
+          timestamp: event.timestamp,
+          windowNumber: event.windowNumber,
+          context: nil,
+          characters: newChar,
+          charactersIgnoringModifiers: event.charactersIgnoringModifiers ?? event.characters ?? "",
+          isARepeat: event.isARepeat,
+          keyCode: event.keyCode
+        )
+        ctlCandidateCurrent.perform(Selector(("handleKeyboardEvent:")), with: newEvent)
+      }
+
       ctlCandidateCurrent.interpretKeyEvents([event])
       return true
     }
