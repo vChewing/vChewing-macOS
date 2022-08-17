@@ -142,6 +142,11 @@ extension ctlInputMethod {
     ctlInputMethod.ctlCandidateCurrent.delegate = self
     ctlInputMethod.ctlCandidateCurrent.reloadData()
 
+    // Spotlight 視窗會擋住 IMK 選字窗，所以需要特殊處理。
+    if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK {
+      ctlCandidateCurrent.perform(Selector(("setWindowLevel:")), with: client.windowLevel() + 1000)
+    }
+
     ctlInputMethod.ctlCandidateCurrent.visible = true
 
     var lineHeightRect = NSRect(x: 0.0, y: 0.0, width: 16.0, height: 16.0)
