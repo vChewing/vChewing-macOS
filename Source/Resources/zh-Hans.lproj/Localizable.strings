@@ -29,7 +29,7 @@
 "\"%@\" length must ≥ 2 for a user phrase." = "「%@」字数不足以自订语汇。";
 "\"%@\" length should ≤ %d for a user phrase." = "「%@」字数超过 %d、无法自订。";
 "\"%@\" selected. ENTER to add user phrase." = "「%@」敲 Enter 添入自订语汇。";
-"\"%@\" already exists: ENTER to boost, SHIFT+CMD+ENTER to nerf, \n BackSpace or Delete key to exclude." = "「%@」已存在：敲 Enter 以升权、敲 Shift+CMD+Enter 以降权；\n　敲 BackSpace 或 Delete 以排除。";
+"\"%@\" already exists: ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "「%@」已存在：敲 Enter 以升权、敲 Shift+Command+Enter 以降权；\n　敲 BackSpace 或 Delete 以排除。";
 "Edit Phrase Replacement Table…" = "编辑语汇置换表…";
 "Use Phrase Replacement" = "使用语汇置换";
 "Candidates keys cannot be empty." = "您必须指定选字键。";
@@ -154,7 +154,7 @@
 "Misc Settings:" = "杂项:";
 "MiTAC" = "神通排列";
 "Non-QWERTY alphanumerical keyboard layouts are for Hanyu Pinyin parser only." = "QWERTY 以外的英数布局是为了汉语拼音排列使用者而准备的。";
-"Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter" = "Ctrl(+Alt)+CMD+Enter 输出汉语拼音而非注音";
+"Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Ctrl(+Option)+Command+Enter 输出汉语拼音而非注音";
 "Output Settings:" = "输出设定:";
 "Phonetic Parser:" = "注音排列:";
 "Push the cursor in front of the phrase after selection" = "在选字后将游标置于该字词的前方";

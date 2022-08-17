@@ -322,7 +322,7 @@ public enum InputState {
         ctlInputMethod.tooltipController.setColor(state: .prompt)
         return String(
           format: NSLocalizedString(
-            "\"%@\" already exists: ENTER to boost, SHIFT+CMD+ENTER to nerf, \n BackSpace or Delete key to exclude.",
+            "\"%@\" already exists: ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude.",
             comment: ""
           ) + "\n//  " + literalReadingThread, text
         )

@@ -328,9 +328,9 @@ extension KeyHandler {
     return true
   }
 
-  // MARK: - CMD+Enter 鍵的處理（注音文）
+  // MARK: - Command+Enter 鍵的處理（注音文）
 
-  /// CMD+Enter 鍵的處理（注音文）。
+  /// Command+Enter 鍵的處理（注音文）。
   /// - Parameters:
   ///   - state: 當前狀態。
   ///   - stateCallback: 狀態回呼。
@@ -356,9 +356,9 @@ extension KeyHandler {
     return true
   }
 
-  // MARK: - CMD+Alt+Enter 鍵的處理（網頁 Ruby 注音文標記）
+  // MARK: - Command+Option+Enter 鍵的處理（網頁 Ruby 注音文標記）
 
-  /// CMD+Alt+Enter 鍵的處理（網頁 Ruby 注音文標記）。
+  /// Command+Option+Enter 鍵的處理（網頁 Ruby 注音文標記）。
   /// - Parameters:
   ///   - state: 當前狀態。
   ///   - stateCallback: 狀態回呼。
@@ -825,7 +825,7 @@ extension KeyHandler {
       /// 讀音組成的雙字詞的權重、導致這個雙字詞並未在爬軌時被自動
       /// 選中的話，則使用者可以直接摁下本函式對應的按鍵來輪替候選字即可。
       /// （預設情況下是 (Shift+)Tab 來做正 (反) 向切換，但也可以用
-      /// Shift(+CMD)+Space 或 Alt+↑/↓ 來切換（縱排輸入時則是 Alt+←/→）、
+      /// Shift(+Command)+Space 或 Alt+↑/↓ 來切換（縱排輸入時則是 Alt+←/→）、
       /// 以應對臉書綁架 Tab 鍵的情況。
       if candidates[0] == currentPaired {
         /// 如果第一個候選字詞是當前節點的候選字詞的值的話，

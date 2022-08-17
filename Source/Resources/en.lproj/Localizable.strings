@@ -29,7 +29,7 @@
 "\"%@\" length must ≥ 2 for a user phrase." = "\"%@\" length must ≥ 2 for a user phrase.";
 "\"%@\" length should ≤ %d for a user phrase." = "\"%@\" length should ≤ %d for a user phrase.";
 "\"%@\" selected. ENTER to add user phrase." = "\"%@\" selected. ENTER to add user phrase.";
-"\"%@\" already exists: ENTER to boost, SHIFT+CMD+ENTER to nerf, \n BackSpace or Delete key to exclude." = "\"%@\" already exists: ENTER to boost, SHIFT+CMD+ENTER to nerf, \n BackSpace or Delete key to exclude.";
+"\"%@\" already exists: ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "\"%@\" already exists: ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude.";
 "Edit Phrase Replacement Table…" = "Edit Phrase Replacement Table…";
 "Use Phrase Replacement" = "Use Phrase Replacement";
 "Candidates keys cannot be empty." = "Candidates keys cannot be empty.";
@@ -154,7 +154,7 @@
 "Misc Settings:" = "Misc Settings:";
 "MiTAC" = "MiTAC";
 "Non-QWERTY alphanumerical keyboard layouts are for Hanyu Pinyin parser only." = "Non-QWERTY alphanumerical keyboard layouts are for Hanyu Pinyin parser only.";
-"Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter" = "Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter";
+"Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter";
 "Output Settings:" = "Output Settings:";
 "Phonetic Parser:" = "Phonetic Parser:";
 "Push the cursor in front of the phrase after selection" = "Push the cursor in front of the phrase after selection";

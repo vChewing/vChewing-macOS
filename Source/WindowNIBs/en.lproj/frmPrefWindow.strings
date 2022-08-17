@@ -58,7 +58,7 @@
 "GlJ-Ns-9eE.title" = "Auto-Select";
 "hSv-LJ-Cq3.title" = "Enable symbol input support (incl. certain emoji symbols)";
 "iRg-wx-Nx2.title" = "Change UI font size of candidate window for a better visual clarity.";
-"iWy-Nw-QKB.title" = "Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter";
+"iWy-Nw-QKB.title" = "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter";
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";

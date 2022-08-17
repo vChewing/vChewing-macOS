@@ -169,7 +169,7 @@ extension KeyHandler {
             stateCallback(inputting)
           }
           return true
-        } else if input.isShiftHold {  // 臉書等網站會攔截 Tab 鍵，所以用 Shift+CMD+Space 對候選字詞做正向/反向輪替。
+        } else if input.isShiftHold {  // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
           return handleInlineCandidateRotation(
             state: state, reverseModifier: input.isCommandHold, stateCallback: stateCallback,
             errorCallback: errorCallback

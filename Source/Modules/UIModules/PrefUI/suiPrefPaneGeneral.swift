@@ -150,7 +150,7 @@ struct suiPrefPaneGeneral: View {
           }
         )
         Toggle(
-          LocalizedStringKey("Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter"),
+          LocalizedStringKey("Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter"),
           isOn: $selInlineDumpPinyinInLieuOfZhuyin.onChange {
             mgrPrefs.inlineDumpPinyinInLieuOfZhuyin = selInlineDumpPinyinInLieuOfZhuyin
           }
