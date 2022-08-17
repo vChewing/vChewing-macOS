@@ -135,6 +135,43 @@ private class vwrCandidateUniversal: NSView {
     cellPadding = ceil(biggestSize / 4.0) * 2
   }
 
+  func ensureLangIdentifier(for attr: inout [NSAttributedString.Key: AnyObject]) {
+    if mgrPrefs.handleDefaultCandidateFontsByLangIdentifier {
+      switch IME.currentInputMode {
+        case InputMode.imeModeCHS:
+          if #available(macOS 12.0, *) {
+            attr[.languageIdentifier] = "zh-Hans" as AnyObject
+          }
+        case InputMode.imeModeCHT:
+          if #available(macOS 12.0, *) {
+            attr[.languageIdentifier] =
+              (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
+              ? "ja" as AnyObject : "zh-Hant" as AnyObject
+          }
+        default:
+          break
+      }
+    }
+  }
+
+  var highlightedColor: NSColor {
+    var result = NSColor.alternateSelectedControlColor
+    var colorBlendAmount: CGFloat = IME.isDarkMode ? 0.3 : 0.0
+    if #available(macOS 10.14, *), !IME.isDarkMode, IME.currentInputMode == .imeModeCHT {
+      colorBlendAmount = 0.15
+    }
+    // The background color of the highlightened candidate
+    switch IME.currentInputMode {
+      case InputMode.imeModeCHS:
+        result = NSColor.systemRed
+      case InputMode.imeModeCHT:
+        result = NSColor.systemBlue
+      default: break
+    }
+    let blendingAgainstTarget: NSColor = IME.isDarkMode ? NSColor.black : NSColor.white
+    return result.blended(withFraction: colorBlendAmount, of: blendingAgainstTarget)!
+  }
+
   override func draw(_: NSRect) {
     let bounds = bounds
     NSColor.controlBackgroundColor.setFill()  // Candidate list panel base background
@@ -161,24 +198,7 @@ private class vwrCandidateUniversal: NSView {
           var activeCandidateIndexAttr = keyLabelAttrDict
           var activeCandidateAttr = candidateAttrDict
           if index == highlightedIndex {
-            let colorBlendAmount: CGFloat = IME.isDarkMode() ? 0.3 : 0
-            // The background color of the highlightened candidate
-            switch IME.currentInputMode {
-              case InputMode.imeModeCHS:
-                NSColor.systemRed.blended(
-                  withFraction: colorBlendAmount,
-                  of: NSColor.black
-                )!
-                .setFill()
-              case InputMode.imeModeCHT:
-                NSColor.systemBlue.blended(
-                  withFraction: colorBlendAmount,
-                  of: NSColor.black
-                )!
-                .setFill()
-              default:
-                NSColor.alternateSelectedControlColor.setFill()
-            }
+            highlightedColor.setFill()
             // Highlightened index text color
             activeCandidateIndexAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor
               .withAlphaComponent(0.84)
@@ -187,22 +207,7 @@ private class vwrCandidateUniversal: NSView {
             let path: NSBezierPath = .init(roundedRect: rctCandidateArea, xRadius: 6, yRadius: 6)
             path.fill()
           }
-          if mgrPrefs.handleDefaultCandidateFontsByLangIdentifier {
-            switch IME.currentInputMode {
-              case InputMode.imeModeCHS:
-                if #available(macOS 12.0, *) {
-                  activeCandidateAttr[.languageIdentifier] = "zh-Hans" as AnyObject
-                }
-              case InputMode.imeModeCHT:
-                if #available(macOS 12.0, *) {
-                  activeCandidateAttr[.languageIdentifier] =
-                    (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
-                    ? "ja" as AnyObject : "zh-Hant" as AnyObject
-                }
-              default:
-                break
-            }
-          }
+          ensureLangIdentifier(for: &activeCandidateAttr)
           (keyLabels[index] as NSString).draw(
             in: rctLabel, withAttributes: activeCandidateIndexAttr
           )
@@ -232,24 +237,7 @@ private class vwrCandidateUniversal: NSView {
           var activeCandidateIndexAttr = keyLabelAttrDict
           var activeCandidateAttr = candidateAttrDict
           if index == highlightedIndex {
-            let colorBlendAmount: CGFloat = IME.isDarkMode() ? 0.3 : 0
-            // The background color of the highlightened candidate
-            switch IME.currentInputMode {
-              case InputMode.imeModeCHS:
-                NSColor.systemRed.blended(
-                  withFraction: colorBlendAmount,
-                  of: NSColor.black
-                )!
-                .setFill()
-              case InputMode.imeModeCHT:
-                NSColor.systemBlue.blended(
-                  withFraction: colorBlendAmount,
-                  of: NSColor.black
-                )!
-                .setFill()
-              default:
-                NSColor.alternateSelectedControlColor.setFill()
-            }
+            highlightedColor.setFill()
             // Highlightened index text color
             activeCandidateIndexAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor
               .withAlphaComponent(0.84)
@@ -258,22 +246,7 @@ private class vwrCandidateUniversal: NSView {
             let path: NSBezierPath = .init(roundedRect: rctCandidateArea, xRadius: 6, yRadius: 6)
             path.fill()
           }
-          if mgrPrefs.handleDefaultCandidateFontsByLangIdentifier {
-            switch IME.currentInputMode {
-              case InputMode.imeModeCHS:
-                if #available(macOS 12.0, *) {
-                  activeCandidateAttr[.languageIdentifier] = "zh-Hans" as AnyObject
-                }
-              case InputMode.imeModeCHT:
-                if #available(macOS 12.0, *) {
-                  activeCandidateAttr[.languageIdentifier] =
-                    (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
-                    ? "ja" as AnyObject : "zh-Hant" as AnyObject
-                }
-              default:
-                break
-            }
-          }
+          ensureLangIdentifier(for: &activeCandidateAttr)
           (keyLabels[index] as NSString).draw(
             in: rctLabel, withAttributes: activeCandidateIndexAttr
           )

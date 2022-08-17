@@ -280,6 +280,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.upperCaseLetterKeyBehavior, forKey: UserDef.kUpperCaseLetterKeyBehavior.rawValue
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.disableShiftTogglingAlphanumericalMode, forKey: UserDef.kDisableShiftTogglingAlphanumericalMode.rawValue
+    )
 
     // -----
 
@@ -399,6 +402,12 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kUpperCaseLetterKeyBehavior.rawValue, defaultValue: 0)
   static var upperCaseLetterKeyBehavior: Int
 
+  @UserDefault(key: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue, defaultValue: true)
+  static var togglingAlphanumericalModeWithLShift: Bool
+
+  @UserDefault(key: UserDef.kDisableShiftTogglingAlphanumericalMode.rawValue, defaultValue: false)
+  static var disableShiftTogglingAlphanumericalMode: Bool
+
   // MARK: - Settings (Tier 2)
 
   @UserDefault(key: UserDef.kUseIMKCandidateWindow.rawValue, defaultValue: false)
@@ -415,13 +424,7 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kShouldAlwaysUseShiftKeyAccommodation.rawValue, defaultValue: false)
   static var shouldAlwaysUseShiftKeyAccommodation: Bool
 
-  @UserDefault(key: UserDef.kDisableShiftTogglingAlphanumericalMode.rawValue, defaultValue: false)
-  static var disableShiftTogglingAlphanumericalMode: Bool
-
   // MARK: - Settings (Tier 3)
-
-  @UserDefault(key: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue, defaultValue: true)
-  static var togglingAlphanumericalModeWithLShift: Bool
 
   static var minCandidateLength: Int {
     mgrPrefs.allowBoostingSingleKanjiAsUserPhrase ? 1 : 2
@@ -466,33 +469,44 @@ public enum mgrPrefs {
   }
 
   @UserDefault(key: UserDef.kChineseConversionEnabled.rawValue, defaultValue: false)
-  static var chineseConversionEnabled: Bool
+  static var chineseConversionEnabled: Bool {
+    didSet {
+      // 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
+      if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
+        toggleShiftJISShinjitaiOutputEnabled()
+        UserDefaults.standard.set(
+          shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue
+        )
+      }
+      UserDefaults.standard.set(
+        chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled.rawValue
+      )
+    }
+  }
 
   @discardableResult static func toggleChineseConversionEnabled() -> Bool {
     chineseConversionEnabled = !chineseConversionEnabled
-    // 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
-    if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
-      toggleShiftJISShinjitaiOutputEnabled()
-      UserDefaults.standard.set(
-        shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue
-      )
-    }
-    UserDefaults.standard.set(chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled.rawValue)
     return chineseConversionEnabled
   }
 
   @UserDefault(key: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue, defaultValue: false)
-  static var shiftJISShinjitaiOutputEnabled: Bool
+  static var shiftJISShinjitaiOutputEnabled: Bool {
+    didSet {
+      // 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
+      if shiftJISShinjitaiOutputEnabled, chineseConversionEnabled {
+        toggleChineseConversionEnabled()
+        UserDefaults.standard.set(
+          chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled.rawValue
+        )
+      }
+      UserDefaults.standard.set(
+        shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue
+      )
+    }
+  }
 
   @discardableResult static func toggleShiftJISShinjitaiOutputEnabled() -> Bool {
     shiftJISShinjitaiOutputEnabled = !shiftJISShinjitaiOutputEnabled
-    // 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
-    if shiftJISShinjitaiOutputEnabled, chineseConversionEnabled {
-      toggleChineseConversionEnabled()
-    }
-    UserDefaults.standard.set(
-      shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue
-    )
     return shiftJISShinjitaiOutputEnabled
   }
 
@@ -662,6 +676,21 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kUsingHotKeyCurrencyNumerals.rawValue, defaultValue: true)
   static var usingHotKeyCurrencyNumerals: Bool
+}
+
+// MARK: Auto parameter fix procedures, executed everytime on ctlInputMethod.activateServer().
+
+extension mgrPrefs {
+  static func fixOddPreferences() {
+    // 防呆。macOS 10.11 用 IMK 選字窗會崩潰。
+    if #unavailable(macOS 10.13) { mgrPrefs.useIMKCandidateWindow = false }
+    if #unavailable(macOS 10.15) {
+      handleDefaultCandidateFontsByLangIdentifier = false
+      shouldAlwaysUseShiftKeyAccommodation = false
+      disableShiftTogglingAlphanumericalMode = false
+      togglingAlphanumericalModeWithLShift = false
+    }
+  }
 }
 
 // MARK: Snapshot Extension

@@ -45,7 +45,6 @@
 "chkAutoCorrectReadingCombination.title" = "敲字時自動糾正讀音組合";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "在敲字時自動套用來自半衰記憶模組的建議";
 "chkKeepReadingUponCompositionError.title" = "允許對無效的讀音使用 BackSpace 編輯";
-"chkTogglingAlphanumericalModeWithLShift.title" = "也允許使用左側的 Shift 鍵盤切換英數輸入模式";
 "chkUseFixecCandidateOrderOnSelection.title" = "以固定順序來陳列選字窗內的候選字";
 "DbW-eq-ZdB.title" = "星光";
 "dIN-TZ-67g.title" = "Shift+Space 換下一頁，Space 換選下一個候選字";
@@ -63,7 +62,6 @@
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
-"lblDevZoneCandidateFont.title" = "該方法是 Apple Bug Report #FB10978412 的保守治療方案，用來僅針對 macOS 12 開始的系統，且僅對非 IMK 選字窗起作用。Apple 應該對 macOS 11 開始的系統修復這個 Bug。";
 "lblDevZoneIMKCandidate.title" = "IMK 選字窗目前暫時無法正常使用選字鍵，併具其它未知故障。";
 "lblDevZoneTitleDescription.title" = "警告：該頁面僅作未來功能測試所用。\n在此列出的功能並非處於完全可用之狀態。";
 "lblUpperCaseLetterKeyBehavior.title" = "指定 Shift+字母鍵 的行為。";
@@ -81,7 +79,6 @@
 "rVQ-Hx-cGi.title" = "和語";
 "s7u-Fm-dVg.title" = "輪替頁面";
 "shc-Nu-UsM.title" = "在選字窗內顯示翻頁按鈕";
-"tglDevZoneCandidateFont.title" = "使用 .langIdentifier 來管理選字窗的預設介面字型";
 "tglDevZoneIMKCandidate.title" = "啟用 IMK 選字窗（會自動重啟輸入法）";
 "TXr-FF-ehw.title" = "繁體中文";
 "ueU-Rz-a1C.title" = "指定 (Shift+)Tab 熱鍵在選字窗內的輪替操作對象。";

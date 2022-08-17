@@ -144,13 +144,17 @@ extension Megrez.Compositor {
     guard let overridden = overridden else { return false }  // 啥也不覆寫。
 
     for i in overridden.spanIndex..<min(spans.count, overridden.spanIndex + overridden.node.spanLength) {
-      /// 咱們還得重設所有在相同的幅位座標的節點。舉例說之前爬軌的結果是「A BC」
+      /// 咱們還得弱化所有在相同的幅位座標的節點的複寫權重。舉例說之前爬軌的結果是「A BC」
       /// 且 A 與 BC 都是被覆寫的結果，然後使用者現在在與 A 相同的幅位座標位置
       /// 選了「DEF」，那麼 BC 的覆寫狀態就有必要重設（但 A 不用重設）。
       arrOverlappedNodes = fetchOverlappingNodes(at: i)
       for anchor in arrOverlappedNodes {
         if anchor.node == overridden.node { continue }
-        anchor.node.reset()
+        if !overridden.node.key.contains(anchor.node.key) || !overridden.node.value.contains(anchor.node.value) {
+          anchor.node.reset()
+          continue
+        }
+        anchor.node.overridingScore /= 2
       }
     }
     return true

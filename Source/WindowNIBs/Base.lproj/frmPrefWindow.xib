@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21219" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21223" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21219"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21223"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -344,11 +344,11 @@
             <point key="canvasLocation" x="-895.5" y="-645.5"/>
         </visualEffectView>
         <visualEffectView blendingMode="behindWindow" material="sidebar" state="followsWindowActiveState" id="XWo-36-xGi" userLabel="vwrExperience">
-            <rect key="frame" x="0.0" y="0.0" width="445" height="552"/>
+            <rect key="frame" x="0.0" y="0.0" width="445" height="536"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <textField autoresizesSubviews="NO" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="IpX-f7-rTL">
-                    <rect key="frame" x="18" y="517" width="317" height="15"/>
+                    <rect key="frame" x="18" y="501" width="317" height="15"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Choose which keys you prefer for selecting candidates." id="2pS-nv-te4">
                         <font key="font" metaFont="cellTitle"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -356,7 +356,7 @@
                     </textFieldCell>
                 </textField>
                 <comboBox verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uHU-aL-du7">
-                    <rect key="frame" x="127" y="487" width="151" height="23"/>
+                    <rect key="frame" x="127" y="471" width="151" height="23"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="147" id="Luo-hb-kcY"/>
                     </constraints>
@@ -375,7 +375,7 @@
                     </connections>
                 </comboBox>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ETa-09-qWI">
-                    <rect key="frame" x="31" y="491" width="91" height="15"/>
+                    <rect key="frame" x="31" y="475" width="91" height="15"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Selection Keys:" id="FnD-oH-El5">
                         <font key="font" metaFont="cellTitle"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -383,7 +383,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="13">
-                    <rect key="frame" x="18" y="463" width="403" height="15"/>
+                    <rect key="frame" x="18" y="447" width="403" height="15"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the cursor position where you want to list possible candidates." id="14">
                         <font key="font" metaFont="cellTitle"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -391,7 +391,7 @@
                     </textFieldCell>
                 </textField>
                 <matrix wantsLayer="YES" verticalHuggingPriority="751" tag="1" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="15">
-                    <rect key="frame" x="33" y="417" width="402" height="38"/>
+                    <rect key="frame" x="33" y="401" width="402" height="38"/>
                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     <size key="cellSize" width="402" height="18"/>
                     <size key="intercellSpacing" width="4" height="2"/>
@@ -416,7 +416,7 @@
                     </connections>
                 </matrix>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7z2-DD-c58">
-                    <rect key="frame" x="33" y="396.5" width="318" height="16"/>
+                    <rect key="frame" x="33" y="380.5" width="318" height="16"/>
                     <buttonCell key="cell" type="check" title="Push the cursor in front of the phrase after selection" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="RUG-ls-KyA">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="cellTitle"/>
@@ -426,7 +426,7 @@
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TMn-LX-3Ub">
-                    <rect key="frame" x="18" y="373" width="369" height="15"/>
+                    <rect key="frame" x="18" y="357" width="369" height="15"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the behavior of (Shift+)Tab key in the candidate window." id="ueU-Rz-a1C">
                         <font key="font" metaFont="cellTitle"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -434,7 +434,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J0f-Aw-dxC">
-                    <rect key="frame" x="18" y="325" width="336" height="15"/>
+                    <rect key="frame" x="18" y="309" width="336" height="15"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the behavior of (Shift+)Space key with candidates." id="Pg5-G9-pY5">
                         <font key="font" metaFont="cellTitle"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -442,7 +442,7 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bE0-Lq-Pj7">
-                    <rect key="frame" x="19" y="141.5" width="266" height="16"/>
+                    <rect key="frame" x="19" y="125.5" width="266" height="16"/>
                     <buttonCell key="cell" type="check" title="Use ESC key to clear the entire input buffer" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="f2j-xD-4xK">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="cellTitle"/>
@@ -452,7 +452,7 @@
                     </connections>
                 </button>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="109">
-                    <rect key="frame" x="19" y="162.5" width="285" height="16"/>
+                    <rect key="frame" x="19" y="146.5" width="285" height="16"/>
                     <buttonCell key="cell" type="check" title="Enable Space key for calling candidate window" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="110">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="cellTitle"/>
@@ -462,7 +462,7 @@
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mzw-F2-aAQ">
-                    <rect key="frame" x="19" y="120.5" width="295" height="16"/>
+                    <rect key="frame" x="19" y="104.5" width="295" height="16"/>
                     <buttonCell key="cell" type="check" title="Emulating select-candidate-per-character mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="ArK-Vk-OoT">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="cellTitle"/>
@@ -472,7 +472,7 @@
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="j8R-Hj-3dj">
-                    <rect key="frame" x="19" y="99.5" width="340" height="16"/>
+                    <rect key="frame" x="19" y="83.5" width="340" height="16"/>
                     <buttonCell key="cell" type="check" title="Automatically correct reading combinations when typing" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkAutoCorrectReadingCombination">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="cellTitle"/>
@@ -482,7 +482,7 @@
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6MM-WC-Mpd">
-                    <rect key="frame" x="19" y="78.5" width="388" height="16"/>
+                    <rect key="frame" x="19" y="62.5" width="388" height="16"/>
                     <buttonCell key="cell" type="check" title="Allow using Enter key to confirm associated candidate selection" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkAlsoConfirmAssociatedCandidatesByEnter">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="cellTitle"/>
@@ -492,7 +492,7 @@
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HaB-rc-AcW">
-                    <rect key="frame" x="19" y="57.5" width="388" height="16"/>
+                    <rect key="frame" x="19" y="41.5" width="388" height="16"/>
                     <buttonCell key="cell" type="check" title="Allow backspace-editing miscomposed readings" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkKeepReadingUponCompositionError">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="cellTitle"/>
@@ -501,18 +501,8 @@
                         <binding destination="32" name="value" keyPath="values.KeepReadingUponCompositionError" id="ddF-qg-jes"/>
                     </connections>
                 </button>
-                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FCB-ax-ARZ">
-                    <rect key="frame" x="19" y="36.5" width="388" height="16"/>
-                    <buttonCell key="cell" type="check" title="Also toggle alphanumerical mode with Left-Shift" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkTogglingAlphanumericalModeWithLShift">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="cellTitle"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="32" name="value" keyPath="values.TogglingAlphanumericalModeWithLShift" id="XW6-un-l8B"/>
-                    </connections>
-                </button>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6q5-OP-iEb">
-                    <rect key="frame" x="18" y="255" width="332" height="15"/>
+                    <rect key="frame" x="18" y="239" width="332" height="15"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the behavior of Shift+Letter key with letter inputs." id="lblUpperCaseLetterKeyBehavior">
                         <font key="font" metaFont="cellTitle"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -520,7 +510,7 @@
                     </textFieldCell>
                 </textField>
                 <matrix wantsLayer="YES" verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n7q-ew-DYu">
-                    <rect key="frame" x="32" y="347" width="352" height="18"/>
+                    <rect key="frame" x="32" y="331" width="352" height="18"/>
                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     <size key="cellSize" width="174" height="18"/>
                     <size key="intercellSpacing" width="4" height="2"/>
@@ -547,7 +537,7 @@
                     </connections>
                 </matrix>
                 <matrix wantsLayer="YES" verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YkJ-lr-EP6">
-                    <rect key="frame" x="32" y="279" width="386" height="38"/>
+                    <rect key="frame" x="32" y="263" width="386" height="38"/>
                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     <size key="cellSize" width="386" height="18"/>
                     <size key="intercellSpacing" width="4" height="2"/>
@@ -572,7 +562,7 @@
                     </connections>
                 </matrix>
                 <matrix wantsLayer="YES" verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="veW-XM-HGs">
-                    <rect key="frame" x="32" y="187" width="386" height="61"/>
+                    <rect key="frame" x="32" y="171" width="386" height="61"/>
                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     <size key="cellSize" width="386" height="19"/>
                     <size key="intercellSpacing" width="4" height="2"/>
@@ -613,8 +603,6 @@
                 <constraint firstItem="15" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="33" id="Be1-9m-alA"/>
                 <constraint firstItem="n7q-ew-DYu" firstAttribute="top" secondItem="TMn-LX-3Ub" secondAttribute="bottom" constant="8" id="BtQ-PX-1e1"/>
                 <constraint firstItem="109" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="20" id="Cu9-uO-BZG"/>
-                <constraint firstItem="FCB-ax-ARZ" firstAttribute="top" secondItem="HaB-rc-AcW" secondAttribute="bottom" constant="6" id="EAW-lg-2pb"/>
-                <constraint firstItem="FCB-ax-ARZ" firstAttribute="leading" secondItem="HaB-rc-AcW" secondAttribute="leading" id="GjC-qu-Nxe"/>
                 <constraint firstItem="j8R-Hj-3dj" firstAttribute="top" secondItem="mzw-F2-aAQ" secondAttribute="bottom" constant="6" id="H9h-Dz-FOL"/>
                 <constraint firstItem="bE0-Lq-Pj7" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="20" id="KKo-uq-jJx"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="6q5-OP-iEb" secondAttribute="trailing" constant="20" symbolic="YES" id="L3C-R7-eDB"/>
@@ -652,9 +640,8 @@
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="mzw-F2-aAQ" secondAttribute="trailing" constant="20" symbolic="YES" id="vCa-4g-Zxq"/>
                 <constraint firstItem="uHU-aL-du7" firstAttribute="leading" secondItem="ETa-09-qWI" secondAttribute="trailing" constant="8" symbolic="YES" id="wZO-1b-2vC"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="13" secondAttribute="trailing" constant="20" symbolic="YES" id="yxg-7J-xR5"/>
-                <constraint firstItem="FCB-ax-ARZ" firstAttribute="trailing" secondItem="HaB-rc-AcW" secondAttribute="trailing" id="z0l-7W-j7D"/>
             </constraints>
-            <point key="canvasLocation" x="-896.5" y="-91"/>
+            <point key="canvasLocation" x="-896.5" y="-112"/>
         </visualEffectView>
         <visualEffectView blendingMode="behindWindow" material="sidebar" state="followsWindowActiveState" id="Rnp-LM-RIF" userLabel="vwrDictionary">
             <rect key="frame" x="0.0" y="0.0" width="445" height="250"/>
@@ -1057,11 +1044,11 @@
             <point key="canvasLocation" x="-392" y="-704"/>
         </visualEffectView>
         <visualEffectView blendingMode="behindWindow" material="sidebar" state="followsWindowActiveState" id="Qd7-ln-nNO" userLabel="vwrDevZone">
-            <rect key="frame" x="0.0" y="0.0" width="445" height="261"/>
+            <rect key="frame" x="0.0" y="0.0" width="445" height="165"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lblControlDevZoneTitleDescription" userLabel="lblControlDevZoneTitleDescription">
-                    <rect key="frame" x="18" y="211" width="409" height="30"/>
+                    <rect key="frame" x="18" y="115" width="343" height="30"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" id="lblDevZoneTitleDescription">
                         <font key="font" metaFont="cellTitle"/>
                         <string key="title">Warning: This page is for testing future features.
@@ -1071,10 +1058,10 @@ Features listed here may not work as expected.</string>
                     </textFieldCell>
                 </textField>
                 <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="P1o-bW-Tjn">
-                    <rect key="frame" x="20" y="200" width="405" height="5"/>
+                    <rect key="frame" x="20" y="104" width="339" height="5"/>
                 </box>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tglControlDevZoneIMKCandidate" userLabel="tglControlDevZoneIMKCandidate">
-                    <rect key="frame" x="19" y="178.5" width="406" height="17"/>
+                    <rect key="frame" x="19" y="82.5" width="340" height="17"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="16" id="1fy-CP-mlB"/>
                     </constraints>
@@ -1088,34 +1075,12 @@ Features listed here may not work as expected.</string>
                     </connections>
                 </button>
                 <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lblControlDevZoneIMKCandidate" userLabel="lblControlDevZoneIMKCandidate">
-                    <rect key="frame" x="18" y="142" width="409" height="28"/>
+                    <rect key="frame" x="18" y="46" width="409" height="28"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="405" id="YoB-Wx-n3h"/>
+                    </constraints>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="IMK candidate window is plagued with issues like malfunctioned selection keys, etc." id="lblDevZoneIMKCandidate">
                         <font key="font" metaFont="smallSystem"/>
-                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tglControlDevZoneCandidateFont" userLabel="tglControlDevZoneCandidateFont">
-                    <rect key="frame" x="19" y="118.5" width="406" height="18"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="17" id="eCc-Cc-xvc"/>
-                    </constraints>
-                    <buttonCell key="cell" type="check" title="Use .langIdentifier to handle UI fonts in candidate window" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="tglDevZoneCandidateFont" userLabel="tglDevZoneCandidateFont">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="cellTitle"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="32" name="value" keyPath="values.HandleDefaultCandidateFontsByLangIdentifier" id="EEd-Z8-b5S"/>
-                    </connections>
-                </button>
-                <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lblControlDevZoneCandidateFont" userLabel="lblControlDevZoneCandidateFont">
-                    <rect key="frame" x="18" y="68" width="409" height="42"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="405" id="1OL-J2-FUX"/>
-                    </constraints>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="lblDevZoneCandidateFont">
-                        <font key="font" metaFont="smallSystem"/>
-                        <string key="title">This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later.</string>
                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -1124,24 +1089,18 @@ Features listed here may not work as expected.</string>
             <constraints>
                 <constraint firstItem="lblControlDevZoneTitleDescription" firstAttribute="leading" secondItem="Qd7-ln-nNO" secondAttribute="leading" constant="20" symbolic="YES" id="0Ia-ut-ksj"/>
                 <constraint firstItem="tglControlDevZoneIMKCandidate" firstAttribute="top" secondItem="P1o-bW-Tjn" secondAttribute="bottom" constant="7.5" id="3as-Db-NwQ"/>
-                <constraint firstItem="tglControlDevZoneIMKCandidate" firstAttribute="leading" secondItem="lblControlDevZoneIMKCandidate" secondAttribute="leading" id="59X-nd-Otf"/>
-                <constraint firstItem="lblControlDevZoneIMKCandidate" firstAttribute="leading" secondItem="tglControlDevZoneCandidateFont" secondAttribute="leading" id="COk-L6-3R8"/>
-                <constraint firstItem="lblControlDevZoneCandidateFont" firstAttribute="top" secondItem="tglControlDevZoneCandidateFont" secondAttribute="bottom" constant="8.5" id="EyK-gG-Xhd"/>
                 <constraint firstItem="P1o-bW-Tjn" firstAttribute="trailing" secondItem="tglControlDevZoneIMKCandidate" secondAttribute="trailing" id="LM7-ov-mng"/>
                 <constraint firstItem="lblControlDevZoneTitleDescription" firstAttribute="trailing" secondItem="P1o-bW-Tjn" secondAttribute="trailing" id="LqC-ii-aOO"/>
-                <constraint firstAttribute="bottom" relation="lessThanOrEqual" secondItem="lblControlDevZoneCandidateFont" secondAttribute="bottom" constant="82" id="NVG-bX-Lgd"/>
-                <constraint firstItem="tglControlDevZoneCandidateFont" firstAttribute="top" secondItem="lblControlDevZoneIMKCandidate" secondAttribute="bottom" constant="6.5" id="UXh-8X-5wM"/>
+                <constraint firstAttribute="trailing" secondItem="lblControlDevZoneIMKCandidate" secondAttribute="trailing" constant="20" symbolic="YES" id="MHM-FX-JE7"/>
+                <constraint firstItem="lblControlDevZoneIMKCandidate" firstAttribute="leading" secondItem="tglControlDevZoneIMKCandidate" secondAttribute="leading" id="WDx-XS-EUF"/>
                 <constraint firstItem="lblControlDevZoneTitleDescription" firstAttribute="leading" secondItem="P1o-bW-Tjn" secondAttribute="leading" id="Wc3-Oe-D2E"/>
                 <constraint firstItem="P1o-bW-Tjn" firstAttribute="top" secondItem="lblControlDevZoneTitleDescription" secondAttribute="bottom" constant="8" symbolic="YES" id="Whf-Gf-g65"/>
-                <constraint firstItem="lblControlDevZoneIMKCandidate" firstAttribute="top" secondItem="tglControlDevZoneIMKCandidate" secondAttribute="bottom" constant="8.5" id="awf-DD-u2k"/>
+                <constraint firstAttribute="bottom" relation="lessThanOrEqual" secondItem="lblControlDevZoneIMKCandidate" secondAttribute="bottom" constant="142" id="ZcX-Vx-qyC"/>
+                <constraint firstItem="lblControlDevZoneIMKCandidate" firstAttribute="top" secondItem="tglControlDevZoneIMKCandidate" secondAttribute="bottom" constant="9" id="eqi-Pb-gfH"/>
                 <constraint firstItem="P1o-bW-Tjn" firstAttribute="leading" secondItem="tglControlDevZoneIMKCandidate" secondAttribute="leading" id="f2q-KJ-bvO"/>
-                <constraint firstItem="tglControlDevZoneCandidateFont" firstAttribute="trailing" secondItem="lblControlDevZoneCandidateFont" secondAttribute="trailing" id="gWx-J5-kgO"/>
-                <constraint firstItem="tglControlDevZoneIMKCandidate" firstAttribute="trailing" secondItem="lblControlDevZoneIMKCandidate" secondAttribute="trailing" id="lQf-A0-TPV"/>
-                <constraint firstItem="tglControlDevZoneCandidateFont" firstAttribute="leading" secondItem="lblControlDevZoneCandidateFont" secondAttribute="leading" id="oCd-O4-Qfg"/>
                 <constraint firstItem="lblControlDevZoneTitleDescription" firstAttribute="top" secondItem="Qd7-ln-nNO" secondAttribute="top" constant="20" symbolic="YES" id="vYg-x4-tfo"/>
-                <constraint firstItem="lblControlDevZoneIMKCandidate" firstAttribute="trailing" secondItem="tglControlDevZoneCandidateFont" secondAttribute="trailing" id="z47-zE-rak"/>
             </constraints>
-            <point key="canvasLocation" x="-393.5" y="-70.5"/>
+            <point key="canvasLocation" x="-393.5" y="-119.5"/>
         </visualEffectView>
     </objects>
 </document>

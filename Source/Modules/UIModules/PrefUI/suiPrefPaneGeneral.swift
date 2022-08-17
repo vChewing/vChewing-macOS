@@ -133,20 +133,14 @@ struct suiPrefPaneGeneral: View {
           LocalizedStringKey("Auto-convert traditional Chinese glyphs to KangXi characters"),
           isOn: $selEnableKanjiConvToKangXi.onChange {
             mgrPrefs.chineseConversionEnabled = selEnableKanjiConvToKangXi
-            if selEnableKanjiConvToKangXi {
-              mgrPrefs.shiftJISShinjitaiOutputEnabled = !selEnableKanjiConvToKangXi
-              selEnableKanjiConvToJIS = !selEnableKanjiConvToKangXi
-            }
+            selEnableKanjiConvToJIS = mgrPrefs.shiftJISShinjitaiOutputEnabled
           }
         )
         Toggle(
           LocalizedStringKey("Auto-convert traditional Chinese glyphs to JIS Shinjitai characters"),
           isOn: $selEnableKanjiConvToJIS.onChange {
             mgrPrefs.shiftJISShinjitaiOutputEnabled = selEnableKanjiConvToJIS
-            if selEnableKanjiConvToJIS {
-              mgrPrefs.chineseConversionEnabled = !selEnableKanjiConvToJIS
-              selEnableKanjiConvToKangXi = !selEnableKanjiConvToJIS
-            }
+            selEnableKanjiConvToKangXi = mgrPrefs.chineseConversionEnabled
           }
         )
         Toggle(

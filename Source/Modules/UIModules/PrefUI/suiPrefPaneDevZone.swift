@@ -16,8 +16,6 @@ struct suiPrefPaneDevZone: View {
     forKey: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue)
   @State private var selShouldAlwaysUseShiftKeyAccommodation: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kShouldAlwaysUseShiftKeyAccommodation.rawValue)
-  @State private var selDisableShiftTogglingAlphanumericalMode: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kDisableShiftTogglingAlphanumericalMode.rawValue)
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -72,12 +70,6 @@ struct suiPrefPaneDevZone: View {
           )
         )
         .preferenceDescription().fixedSize(horizontal: false, vertical: true)
-        Toggle(
-          LocalizedStringKey("Completely disable using Shift key to toggling alphanumerical mode"),
-          isOn: $selDisableShiftTogglingAlphanumericalMode.onChange {
-            mgrPrefs.disableShiftTogglingAlphanumericalMode = selDisableShiftTogglingAlphanumericalMode
-          }
-        )
       }
     }
   }

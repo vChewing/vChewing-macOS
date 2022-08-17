@@ -854,7 +854,7 @@ extension KeyHandler {
       currentIndex = 0
     }
 
-    fixNode(candidate: candidates[currentIndex], respectCursorPushing: false)
+    fixNode(candidate: candidates[currentIndex], respectCursorPushing: false, preConsolidate: false)
 
     stateCallback(buildInputtingState)
     return true
