@@ -310,7 +310,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
         }
       }
 
-      if delegate.isAssociatedPhrasesMode,
+      if delegate.isAssociatedPhrasesState,
         !input.isPageUp, !input.isPageDown, !input.isCursorForward, !input.isCursorBackward,
         !input.isCursorClockLeft, !input.isCursorClockRight, !input.isSpace,
         !input.isEnter || !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter
