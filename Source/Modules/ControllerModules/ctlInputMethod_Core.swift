@@ -211,6 +211,30 @@ class ctlInputMethod: IMKInputController {
     // - 是就地交給 super.interpretKeyEvents() 處理？
     // - 還是藉由 delegate 扔回 ctlInputMethod 給 KeyHandler 處理？
     if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK, ctlCandidateCurrent.visible {
+      let input = InputSignal(event: event)
+      // Shift+Enter 是個特殊情形，不提前攔截處理的話、會有垃圾參數傳給 delegate 的 keyHandler 從而崩潰。
+      // 所以這裡直接將 Shift Flags 清空。
+      if input.isShiftHold, input.isEnter {
+        guard
+          let newEvent = NSEvent.keyEvent(
+            with: event.type,
+            location: event.locationInWindow,
+            modifierFlags: [],
+            timestamp: event.timestamp,
+            windowNumber: event.windowNumber,
+            context: nil,
+            characters: event.characters ?? "",
+            charactersIgnoringModifiers: event.charactersIgnoringModifiers ?? event.characters ?? "",
+            isARepeat: event.isARepeat,
+            keyCode: event.keyCode
+          )
+        else {
+          NSSound.beep()
+          return true
+        }
+        ctlCandidateCurrent.interpretKeyEvents([newEvent])
+        return true
+      }
       ctlCandidateCurrent.interpretKeyEvents([event])
       return true
     }
