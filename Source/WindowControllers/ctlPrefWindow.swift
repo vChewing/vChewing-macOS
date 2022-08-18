@@ -336,7 +336,7 @@ extension ctlPrefWindow: NSToolbarDelegate {
   }
 
   var toolbarIdentifiers: [NSToolbarItem.Identifier] {
-    if #available(macOS 10.13, *) {
+    if #available(macOS 10.14, *) {
       return [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard, .ofDevZone]
     }
     return [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard]

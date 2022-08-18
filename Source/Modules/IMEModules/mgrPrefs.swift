@@ -683,7 +683,7 @@ public enum mgrPrefs {
 extension mgrPrefs {
   static func fixOddPreferences() {
     // 防呆。macOS 10.11 用 IMK 選字窗會崩潰。
-    if #unavailable(macOS 10.13) { mgrPrefs.useIMKCandidateWindow = false }
+    if #unavailable(macOS 10.14) { mgrPrefs.useIMKCandidateWindow = false }
     if #unavailable(macOS 10.15) {
       handleDefaultCandidateFontsByLangIdentifier = false
       shouldAlwaysUseShiftKeyAccommodation = false
