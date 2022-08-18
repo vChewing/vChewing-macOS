@@ -1075,11 +1075,11 @@ Features listed here may not work as expected.</string>
                     </connections>
                 </button>
                 <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lblControlDevZoneIMKCandidate" userLabel="lblControlDevZoneIMKCandidate">
-                    <rect key="frame" x="18" y="46" width="409" height="28"/>
+                    <rect key="frame" x="18" y="60" width="409" height="14"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="405" id="YoB-Wx-n3h"/>
                     </constraints>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="IMK candidate window is plagued with issues like malfunctioned selection keys, etc." id="lblDevZoneIMKCandidate">
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="IMK candidate window is plagued with issues and incapabilities." id="lblDevZoneIMKCandidate">
                         <font key="font" metaFont="smallSystem"/>
                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

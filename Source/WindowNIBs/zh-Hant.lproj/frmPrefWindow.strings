@@ -62,7 +62,7 @@
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
-"lblDevZoneIMKCandidate.title" = "IMK 選字窗目前暫時無法正常使用選字鍵，併具其它未知故障。";
+"lblDevZoneIMKCandidate.title" = "IMK 選字窗目前暫時無法正常自訂選字鍵，併具其它未知故障。";
 "lblDevZoneTitleDescription.title" = "警告：該頁面僅作未來功能測試所用。\n在此列出的功能並非處於完全可用之狀態。";
 "lblUpperCaseLetterKeyBehavior.title" = "指定 Shift+字母鍵 的行為。";
 "Parser11.title" = "國音二式+數字標調";

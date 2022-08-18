@@ -146,7 +146,7 @@
 "Hsu" = "許氏國音自然排列";
 "Hualuo Pinyin with Numeral Intonation" = "華羅拼音+數字標調";
 "IBM" = "IBM 排列";
-"IMK candidate window is plagued with issues like failed selection keys." = "IMK 選字窗目前暫時無法正常使用選字鍵，併具其它未知故障。";
+"IMK candidate window is plagued with issues and incapabilities." = "IMK 選字窗目前暫時無法正常自訂選字鍵，併具其它未知故障。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "將游標置於詞語前方 // macOS 內建注音風格";
 "Japanese" = "和語";
 "Keyboard Shortcuts:" = "鍵盤快速鍵:";
