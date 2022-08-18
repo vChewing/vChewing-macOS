@@ -168,7 +168,11 @@ private class vwrCandidateUniversal: NSView {
         result = NSColor.systemBlue
       default: break
     }
-    let blendingAgainstTarget: NSColor = IME.isDarkMode ? NSColor.black : NSColor.white
+    var blendingAgainstTarget: NSColor = IME.isDarkMode ? NSColor.black : NSColor.white
+    if #unavailable(macOS 10.14) {
+      colorBlendAmount = 0.3
+      blendingAgainstTarget = NSColor.white
+    }
     return result.blended(withFraction: colorBlendAmount, of: blendingAgainstTarget)!
   }
 
