@@ -88,42 +88,6 @@ extension ctlInputMethod {
       return NSFont.systemFont(ofSize: size)
     }
 
-    /// FB10978412: Since macOS 11 Big Sur, CTFontCreateUIFontForLanguage cannot
-    /// distinguish zh-Hans and zh-Hant with correct adoptation of proper PingFang SC/TC variants.
-    ///
-    /// Instructions for Apple Developer relations to reveal this bug:
-    ///
-    /// 1) Remove the usage of ".languageIdentifier" from ctlCandidateUniversal.swift (already done).
-    /// 2) Run "make update" in the project folder to download the latest git-submodule of dictionary file.
-    /// 3) Compile the target "vChewingInstaller", run it. It will install the input method into
-    ///    "~/Library/Input Methods/" folder. Remember to ENABLE BOTH "vChewing-CHS"
-    ///    and "vChewing-CHT" input sources in System Preferences / Settings.
-    /// 4) Type Zhuyin "ej3" (ㄍㄨˇ) (or "gu3" in Pinyin if you enabled Pinyin typing in vChewing preferences.)
-    ///    using both "vChewing-CHS" and "vChewing-CHT", and check the candidate window by pressing SPACE key.
-    /// 5) Do NOT enable either KangXi conversion mode nor JIS conversion mode. They are disabled by default.
-    /// 6) Expecting the glyph differences of the candidate "骨" between PingFang SC and PingFang TC when rendering
-    ///    the candidate window in different "vChewing-CHS" and "vChewing-CHT" input modes.
-    func candidateFont(name: String?, size: CGFloat) -> NSFont {
-      let finalReturnFont: NSFont =
-        {
-          switch IME.currentInputMode {
-            case InputMode.imeModeCHS:
-              return CTFontCreateUIFontForLanguage(.system, size, "zh-Hans" as CFString)
-            case InputMode.imeModeCHT:
-              return (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
-                ? CTFontCreateUIFontForLanguage(.system, size, "ja" as CFString)
-                : CTFontCreateUIFontForLanguage(.system, size, "zh-Hant" as CFString)
-            default:
-              return CTFontCreateUIFontForLanguage(.system, size, nil)
-          }
-        }()
-        ?? NSFont.systemFont(ofSize: size)
-      if let name = name {
-        return NSFont(name: name, size: size) ?? finalReturnFont
-      }
-      return finalReturnFont
-    }
-
     ctlInputMethod.ctlCandidateCurrent.keyLabelFont = labelFont(
       name: mgrPrefs.candidateKeyLabelFontName, size: keyLabelSize
     )
@@ -179,5 +143,45 @@ extension ctlInputMethod {
         bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0
       )
     }
+  }
+
+  /// FB10978412: Since macOS 11 Big Sur, CTFontCreateUIFontForLanguage cannot
+  /// distinguish zh-Hans and zh-Hant with correct adoptation of proper PingFang SC/TC variants.
+  ///
+  /// Instructions for Apple Developer relations to reveal this bug:
+  ///
+  /// 0) Disable IMK Candidate window in the vChewing preferences (disabled by default).
+  ///    **REASON**: IMKCandidates has bug that it does not respect font attributes attached to the
+  ///    results generated from `candidiates() -> [Any]!` function. IMKCandidates is plagued with
+  ///    bugs which are not dealt in the recent decade, regardless Radar complaints from input method developers.
+  /// 1) Remove the usage of ".languageIdentifier" from ctlCandidateUniversal.swift (already done).
+  /// 2) Run "make update" in the project folder to download the latest git-submodule of dictionary file.
+  /// 3) Compile the target "vChewingInstaller", run it. It will install the input method into
+  ///    "~/Library/Input Methods/" folder. Remember to ENABLE BOTH "vChewing-CHS"
+  ///    and "vChewing-CHT" input sources in System Preferences / Settings.
+  /// 4) Type Zhuyin "ej3" (ㄍㄨˇ) (or "gu3" in Pinyin if you enabled Pinyin typing in vChewing preferences.)
+  ///    using both "vChewing-CHS" and "vChewing-CHT", and check the candidate window by pressing SPACE key.
+  /// 5) Do NOT enable either KangXi conversion mode nor JIS conversion mode. They are disabled by default.
+  /// 6) Expecting the glyph differences of the candidate "骨" between PingFang SC and PingFang TC when rendering
+  ///    the candidate window in different "vChewing-CHS" and "vChewing-CHT" input modes.
+  func candidateFont(name: String?, size: CGFloat) -> NSFont {
+    let finalReturnFont: NSFont =
+      {
+        switch IME.currentInputMode {
+          case InputMode.imeModeCHS:
+            return CTFontCreateUIFontForLanguage(.system, size, "zh-Hans" as CFString)
+          case InputMode.imeModeCHT:
+            return (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
+              ? CTFontCreateUIFontForLanguage(.system, size, "ja" as CFString)
+              : CTFontCreateUIFontForLanguage(.system, size, "zh-Hant" as CFString)
+          default:
+            return CTFontCreateUIFontForLanguage(.system, size, nil)
+        }
+      }()
+      ?? NSFont.systemFont(ofSize: size)
+    if let name = name {
+      return NSFont(name: name, size: size) ?? finalReturnFont
+    }
+    return finalReturnFont
   }
 }
