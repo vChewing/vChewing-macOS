@@ -1799,7 +1799,7 @@
 				);
 				MARKETING_VERSION = 1.9.4;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.atelierInmu.vChewing.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingInstaller;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
@@ -1834,7 +1834,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.9.4;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.atelierInmu.vChewing.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingInstaller;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
