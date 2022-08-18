@@ -278,7 +278,7 @@ extension KeyHandler {
 
     // MARK: Punctuation list
 
-    if input.isSymbolMenuPhysicalKey && !input.isShiftHold {
+    if input.isSymbolMenuPhysicalKey, !input.isShiftHold, !input.isControlHold {
       if input.isOptionHold {
         if currentLM.hasUnigramsFor(key: "_punctuation_list") {
           if composer.isEmpty {
