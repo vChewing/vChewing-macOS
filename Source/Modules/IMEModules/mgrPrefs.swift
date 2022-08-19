@@ -49,11 +49,11 @@ public enum UserDef: String, CaseIterable {
   case kKeepReadingUponCompositionError = "KeepReadingUponCompositionError"
   case kTogglingAlphanumericalModeWithLShift = "TogglingAlphanumericalModeWithLShift"
   case kUpperCaseLetterKeyBehavior = "UpperCaseLetterKeyBehavior"
+  case kDisableShiftTogglingAlphanumericalMode = "DisableShiftTogglingAlphanumericalMode"
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
   case kShouldAlwaysUseShiftKeyAccommodation = "ShouldAlwaysUseShiftKeyAccommodation"
-  case kDisableShiftTogglingAlphanumericalMode = "DisableShiftTogglingAlphanumericalMode"
 
   case kCandidateTextFontName = "CandidateTextFontName"
   case kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
