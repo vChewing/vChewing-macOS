@@ -73,6 +73,7 @@ struct suiPrefPaneGeneral: View {
           }
           .labelsHidden()
           .frame(width: 120.0)
+          .disabled(mgrPrefs.useIMKCandidateWindow)
           Text(LocalizedStringKey("Choose candidate font size for better visual clarity."))
             .preferenceDescription()
         }
@@ -130,6 +131,7 @@ struct suiPrefPaneGeneral: View {
             }
           )
           .controlSize(.small)
+          .disabled(mgrPrefs.useIMKCandidateWindow)
         }
         Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Output Settings:")) }) {
           Toggle(

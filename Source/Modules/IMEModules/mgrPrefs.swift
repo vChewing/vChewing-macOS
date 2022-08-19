@@ -551,7 +551,13 @@ public enum mgrPrefs {
   static var candidateKeyLabelFontName: String?
 
   @UserDefault(key: UserDef.kCandidateKeys.rawValue, defaultValue: kDefaultKeys)
-  static var candidateKeys: String
+  static var candidateKeys: String {
+    didSet {
+      if mgrPrefs.useIMKCandidateWindow {
+        mgrPrefs.candidateKeys = kDefaultKeys
+      }
+    }
+  }
 
   static var defaultCandidateKeys: String {
     kDefaultKeys

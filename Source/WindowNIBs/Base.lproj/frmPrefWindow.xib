@@ -139,6 +139,13 @@
                             <binding destination="32" name="value" keyPath="values.ShowPageButtonsInCandidateWindow" id="6BK-hU-lqs"/>
                         </connections>
                     </buttonCell>
+                    <connections>
+                        <binding destination="32" name="enabled" keyPath="values.UseIMKCandidateWindow" id="pHT-37-Eyh">
+                            <dictionary key="options">
+                                <string key="NSValueTransformerName">NSNegateBoolean</string>
+                            </dictionary>
+                        </binding>
+                    </connections>
                 </button>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="da1-7e-els">
                     <rect key="frame" x="18" y="199" width="246" height="15"/>
@@ -255,6 +262,11 @@
                     </popUpButtonCell>
                     <connections>
                         <binding destination="32" name="selectedTag" keyPath="values.CandidateListTextSize" id="107"/>
+                        <binding destination="32" name="enabled" keyPath="values.UseIMKCandidateWindow" id="bpc-Zm-I2n">
+                            <dictionary key="options">
+                                <string key="NSValueTransformerName">NSNegateBoolean</string>
+                            </dictionary>
+                        </binding>
                     </connections>
                 </popUpButton>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0Fh-O5-BKD">
@@ -355,7 +367,7 @@
                     </textFieldCell>
                 </textField>
                 <comboBox verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uHU-aL-du7">
-                    <rect key="frame" x="127" y="471" width="151" height="23"/>
+                    <rect key="frame" x="127" y="470" width="151" height="23"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="147" id="Luo-hb-kcY"/>
                     </constraints>
@@ -371,6 +383,11 @@
                     </comboBoxCell>
                     <connections>
                         <action selector="changeSelectionKeyAction:" target="-2" id="REj-7y-bbQ"/>
+                        <binding destination="32" name="enabled" keyPath="values.UseIMKCandidateWindow" id="BDQ-gl-txA">
+                            <dictionary key="options">
+                                <string key="NSValueTransformerName">NSNegateBoolean</string>
+                            </dictionary>
+                        </binding>
                     </connections>
                 </comboBox>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ETa-09-qWI">
@@ -593,7 +610,7 @@
             <constraints>
                 <constraint firstItem="n7q-ew-DYu" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="32" id="2gT-9Z-6F4"/>
                 <constraint firstItem="YkJ-lr-EP6" firstAttribute="top" secondItem="J0f-Aw-dxC" secondAttribute="bottom" constant="8" id="5fd-qi-hJ6"/>
-                <constraint firstItem="13" firstAttribute="top" secondItem="uHU-aL-du7" secondAttribute="bottom" constant="11" id="5uq-In-4bN"/>
+                <constraint firstItem="13" firstAttribute="top" secondItem="uHU-aL-du7" secondAttribute="bottom" constant="10" id="5uq-In-4bN"/>
                 <constraint firstItem="HaB-rc-AcW" firstAttribute="leading" secondItem="6MM-WC-Mpd" secondAttribute="leading" id="7Fs-9l-g66"/>
                 <constraint firstItem="TMn-LX-3Ub" firstAttribute="top" secondItem="7z2-DD-c58" secondAttribute="bottom" constant="9" id="AXY-LV-HMX"/>
                 <constraint firstItem="6q5-OP-iEb" firstAttribute="top" secondItem="YkJ-lr-EP6" secondAttribute="bottom" constant="9" id="AvD-Ni-GL2"/>
@@ -615,7 +632,7 @@
                 <constraint firstItem="7z2-DD-c58" firstAttribute="top" secondItem="15" secondAttribute="bottom" constant="5" id="VKv-YI-AS2"/>
                 <constraint firstItem="15" firstAttribute="top" secondItem="13" secondAttribute="bottom" constant="8" symbolic="YES" id="WHr-jO-a07"/>
                 <constraint firstItem="IpX-f7-rTL" firstAttribute="top" secondItem="XWo-36-xGi" secondAttribute="top" constant="20" id="YaG-ab-LJH"/>
-                <constraint firstItem="uHU-aL-du7" firstAttribute="top" secondItem="IpX-f7-rTL" secondAttribute="bottom" constant="8" symbolic="YES" id="aet-Zq-v6x"/>
+                <constraint firstItem="uHU-aL-du7" firstAttribute="top" secondItem="IpX-f7-rTL" secondAttribute="bottom" constant="9" id="aet-Zq-v6x"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="TMn-LX-3Ub" secondAttribute="trailing" constant="20" symbolic="YES" id="atz-4L-U9s"/>
                 <constraint firstItem="veW-XM-HGs" firstAttribute="leading" secondItem="YkJ-lr-EP6" secondAttribute="leading" id="bS2-qk-WNJ"/>
                 <constraint firstItem="HaB-rc-AcW" firstAttribute="top" secondItem="6MM-WC-Mpd" secondAttribute="bottom" constant="6" symbolic="YES" id="cBa-57-gWH"/>

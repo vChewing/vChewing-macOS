@@ -67,7 +67,7 @@ struct suiPrefPaneKeyboard: View {
                 }
               }
             }
-          ).frame(width: 180)
+          ).frame(width: 180).disabled(mgrPrefs.useIMKCandidateWindow)
           Text(
             LocalizedStringKey(
               "Choose or hit Enter to confim your prefered keys for selecting candidates."
