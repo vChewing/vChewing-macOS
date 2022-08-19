@@ -119,6 +119,7 @@
 "Choose the phonetic layout for Mandarin parser." = "Choose the phonetic layout for Mandarin parser.";
 "Choose your desired user data folder path. Will be omitted if invalid." = "Choose your desired user data folder path. Will be omitted if invalid.";
 "Choose your preferred layout of the candidate window." = "Choose your preferred layout of the candidate window.";
+"Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter";
 "Completely disable using Shift key to toggling alphanumerical mode" = "Completely disable using Shift key to toggling alphanumerical mode";
 "Cursor Selection:" = "Cursor Selection:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "Dachen (Microsoft Standard / Wang / 01, etc.)";
@@ -154,7 +155,6 @@
 "Misc Settings:" = "Misc Settings:";
 "MiTAC" = "MiTAC";
 "Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only.";
-"Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter";
 "Output Settings:" = "Output Settings:";
 "Phonetic Parser:" = "Phonetic Parser:";
 "Push the cursor in front of the phrase after selection" = "Push the cursor in front of the phrase after selection";

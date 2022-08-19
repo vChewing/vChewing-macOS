@@ -79,7 +79,7 @@
 "rVQ-Hx-cGi.title" = "和語";
 "s7u-Fm-dVg.title" = "輪替頁面";
 "shc-Nu-UsM.title" = "在選字窗內顯示翻頁按鈕";
-"tglDevZoneIMKCandidate.title" = "啟用 IMK 選字窗（會自動重啟輸入法）";
+"tglDevZoneIMKCandidate.title" = "啟用與 macOS 內建輸入法相同的 IMK 選字窗（會自動重啟輸入法）";
 "TXr-FF-ehw.title" = "繁體中文";
 "ueU-Rz-a1C.title" = "指定 (Shift+)Tab 熱鍵在選字窗內的輪替操作對象。";
 "VdT-fw-7pQ.title" = "偵錯模式";

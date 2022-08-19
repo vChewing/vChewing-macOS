@@ -119,6 +119,7 @@
 "Choose the phonetic layout for Mandarin parser." = "共通語分析器の注音配列をご指定ください。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "欲しがるユーザー辞書保存先をご指定ください。無効なる保存先設定は省かれる。";
 "Choose your preferred layout of the candidate window." = "入力候補陳列の仕様をご指定ください。";
+"Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Ctrl(+Option)+Command+Enter で出すのを漢語弁音と変換";
 "Completely disable using Shift key to toggling alphanumerical mode" = "Shift キーの英数入力モードの切り替え機能を徹底的に禁ず";
 "Cursor Selection:" = "カーソル候補呼出:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千配列 (Microsoft 標準・王安・零壹など)";
@@ -154,7 +155,6 @@
 "Misc Settings:" = "他の設定:";
 "MiTAC" = "神通配列";
 "Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "QWERTY 以外の英数キーボードは弁音以外の配列に不適用。";
-"Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Ctrl(+Option)+Command+Enter で出すのを漢語弁音と変換";
 "Output Settings:" = "出力設定:";
 "Phonetic Parser:" = "注音配列:";
 "Push the cursor in front of the phrase after selection" = "候補選択の直後、すぐカーソルを単語の向こうに推し進める";

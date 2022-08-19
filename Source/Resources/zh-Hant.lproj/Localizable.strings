@@ -119,6 +119,7 @@
 "Choose the phonetic layout for Mandarin parser." = "請指定普通話/國音分析器所使用的注音排列。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "請在此指定您想指定的使用者語彙檔案目錄。無效值會被忽略。";
 "Choose your preferred layout of the candidate window." = "選擇您所偏好的候選字窗佈局。";
+"Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Ctrl(+Option)+Command+Enter 輸出漢語拼音而非注音";
 "Completely disable using Shift key to toggling alphanumerical mode" = "徹底禁止使用 Shift 鍵切換英數模式";
 "Cursor Selection:" = "選字游標:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千排列 (微軟標準/王安/零壹/仲鼎/國喬)";
@@ -154,7 +155,6 @@
 "Misc Settings:" = "雜項:";
 "MiTAC" = "神通排列";
 "Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "QWERTY 以外的英數佈局是為了拼音排列使用者而準備的。";
-"Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Ctrl(+Option)+Command+Enter 輸出漢語拼音而非注音";
 "Output Settings:" = "輸出設定:";
 "Phonetic Parser:" = "注音排列:";
 "Push the cursor in front of the phrase after selection" = "在選字後將游標置於該字詞的前方";
@@ -178,7 +178,7 @@
 "Universal Pinyin with Numeral Intonation" = "通用拼音+數字標調";
 "Use .langIdentifier to handle UI fonts in candidate window" = "使用 .langIdentifier 來管理選字窗的預設介面字型";
 "Use ESC key to clear the entire input buffer" = "敲 ESC 鍵以清空整個組字緩衝區";
-"Use IMK Candidate Window instead (will reboot the IME)" = "啟用 IMK 選字窗（會自動重啟輸入法）";
+"Use IMK Candidate Window instead (will reboot the IME)" = "啟用與 macOS 內建輸入法相同的 IMK 選字窗（會自動重啟輸入法）";
 "Use Shift Key Accommodation in all cases" = "對任何客體應用均啟用 Shift 鍵相容性措施";
 "Vertical" = "縱向佈局";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：該頁面僅作未來功能測試所用。\n在此列出的功能並非處於完全可用之狀態。";
