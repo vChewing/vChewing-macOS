@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21223" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21223"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -27,17 +27,17 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6Dx-DY-UG1">
-                        <rect key="frame" x="89" y="442" width="123" height="15"/>
+                        <rect key="frame" x="89" y="442" width="130" height="15"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="vChewing for macOS" id="lblAppTitle" userLabel="appNameLabel">
-                            <font key="font" metaFont="cellTitle"/>
+                            <font key="font" size="12" name="Tahoma-Bold"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Srh-ua-uQD">
-                        <rect key="frame" x="89" y="426" width="281" height="15"/>
+                        <rect key="frame" x="89" y="426" width="263" height="15"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Derived from OpenVanilla McBopopmofo Project." id="lblProjectDescription">
-                            <font key="font" metaFont="cellTitle"/>
+                            <font key="font" size="12" name="Tahoma"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -48,7 +48,7 @@
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="293" id="I1K-WT-jie"/>
                         </constraints>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Placeholder for showing copyright information." id="lblCopyright" userLabel="appCopyrightLabel">
-                            <font key="font" metaFont="cellTitle"/>
+                            <font key="font" size="12" name="Tahoma"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -56,7 +56,7 @@
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8M8-3C-BZO">
                         <rect key="frame" x="89" y="387" width="431" height="15"/>
                         <textFieldCell key="cell" selectable="YES" title="Placeholder for detailed credits." id="lblCredits">
-                            <font key="font" metaFont="cellTitle"/>
+                            <font key="font" size="12" name="Tahoma"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -67,7 +67,7 @@
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eYM-F7-drf">
                         <rect key="frame" x="89" y="364" width="431" height="15"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="MIT-NTL License:" id="lblLicense">
-                            <font key="font" metaFont="cellTitle"/>
+                            <font key="font" size="12" name="Tahoma"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -78,7 +78,7 @@
                             <constraint firstAttribute="width" constant="356" id="B0d-48-3we"/>
                         </constraints>
                         <textFieldCell key="cell" selectable="YES" id="lblDisclaimer">
-                            <font key="font" metaFont="cellTitle"/>
+                            <font key="font" size="12" name="Tahoma"/>
                             <string key="title">DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, are not included in vChewing official phrase database.</string>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -92,12 +92,12 @@
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="AboutBanner" id="Noc-kP-zTE"/>
                     </imageView>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9Pk-k3-0cO">
-                        <rect key="frame" x="211" y="442" width="126" height="15"/>
+                        <rect key="frame" x="218" y="442" width="126" height="15"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="122" id="0XT-cl-6S4"/>
                         </constraints>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="version_placeholder" id="lblVersionString" userLabel="appVersionLabel">
-                            <font key="font" metaFont="cellTitle"/>
+                            <font key="font" size="12" name="Tahoma"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -109,7 +109,7 @@
                         </constraints>
                         <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="btnConfirm">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
+                            <font key="font" size="13" name="Tahoma-Bold"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
 DQ
 </string>
@@ -157,7 +157,7 @@ DQ
                         <rect key="frame" x="382" y="69" width="143" height="32"/>
                         <buttonCell key="cell" type="push" title="Website" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="xCD-lx-zY7">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
+                            <font key="font" size="13" name="Tahoma"/>
                         </buttonCell>
                         <connections>
                             <action selector="btnWebsite:" target="-1" id="KjF-Ja-Vhz"/>
@@ -167,7 +167,7 @@ DQ
                         <rect key="frame" x="382" y="42" width="143" height="32"/>
                         <buttonCell key="cell" type="push" title="Bug Report" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7SW-k9-sId">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
+                            <font key="font" size="13" name="Tahoma"/>
                         </buttonCell>
                         <connections>
                             <action selector="btnBugReport:" target="-1" id="ub1-rB-AED"/>

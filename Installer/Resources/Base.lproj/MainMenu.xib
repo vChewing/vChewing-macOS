@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21223" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21223"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -125,7 +125,10 @@
                         </constraints>
                         <buttonCell key="cell" type="push" title="I Accept" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="576">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
+                            <font key="font" size="13" name="Tahoma-Bold"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
                         </buttonCell>
                         <connections>
                             <action selector="agreeAndInstallAction:" target="494" id="708"/>
@@ -167,17 +170,17 @@
                         </scroller>
                     </scrollView>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ir5-sQ-sJc">
-                        <rect key="frame" x="89" y="442" width="123" height="15"/>
+                        <rect key="frame" x="89" y="442" width="130" height="15"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="vChewing for macOS" id="GNc-8S-1VG" userLabel="appNameLabel">
-                            <font key="font" metaFont="cellTitle"/>
+                            <font key="font" size="12" name="Tahoma-Bold"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bzR-Oa-BZa">
-                        <rect key="frame" x="89" y="426" width="281" height="15"/>
+                        <rect key="frame" x="89" y="426" width="263" height="15"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Derived from OpenVanilla McBopopmofo Project." id="QYf-Nf-hoi">
-                            <font key="font" metaFont="cellTitle"/>
+                            <font key="font" size="12" name="Tahoma"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -188,7 +191,7 @@
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="293" id="v2b-OK-WGD"/>
                         </constraints>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Placeholder for showing copyright information." id="eo3-TK-0rB" userLabel="appCopyrightLabel">
-                            <font key="font" metaFont="cellTitle"/>
+                            <font key="font" size="12" name="Tahoma"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -196,7 +199,7 @@
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XLb-mv-73s">
                         <rect key="frame" x="89" y="387" width="431" height="15"/>
                         <textFieldCell key="cell" selectable="YES" title="Placeholder for detailed credits." id="VW8-s5-Wpn">
-                            <font key="font" metaFont="cellTitle"/>
+                            <font key="font" size="12" name="Tahoma"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -207,18 +210,18 @@
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="k5O-zZ-gQY">
                         <rect key="frame" x="89" y="364" width="431" height="15"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="MIT-NTL License:" id="AVS-ih-FXM">
-                            <font key="font" metaFont="cellTitle"/>
+                            <font key="font" size="12" name="Tahoma"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="miu-08-dZk">
-                        <rect key="frame" x="13" y="26" width="360" height="105"/>
+                        <rect key="frame" x="13" y="41" width="360" height="90"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="356" id="pu3-zr-hJy"/>
                         </constraints>
                         <textFieldCell key="cell" selectable="YES" id="Q9M-ni-kUM">
-                            <font key="font" metaFont="cellTitle"/>
+                            <font key="font" size="12" name="Tahoma"/>
                             <string key="title">DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, are not included in vChewing official phrase database.</string>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -232,12 +235,12 @@
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="AboutBanner" id="akk-zO-Abm"/>
                     </imageView>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="z1m-8k-Z63">
-                        <rect key="frame" x="211" y="442" width="126" height="15"/>
+                        <rect key="frame" x="218" y="442" width="126" height="15"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="122" id="yKq-Fv-W1J"/>
                         </constraints>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="version_placeholder" id="JRP-At-H9q" userLabel="appVersionLabel">
-                            <font key="font" metaFont="cellTitle"/>
+                            <font key="font" size="12" name="Tahoma"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -245,7 +248,7 @@
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nul-TQ-gOI">
                         <rect key="frame" x="89" y="148" width="431" height="15"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="By installing the software, you must accept the terms above." id="mf8-6e-z7X">
-                            <font key="font" metaFont="systemBold" size="12"/>
+                            <font key="font" size="12" name="Tahoma-Bold"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -254,7 +257,7 @@
                         <rect key="frame" x="378" y="74" width="147" height="32"/>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="593">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
+                            <font key="font" size="13" name="Tahoma"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
 Gw
 </string>
@@ -338,7 +341,7 @@ Gw
                             <constraint firstAttribute="height" constant="17" id="MLj-KG-mL8"/>
                         </constraints>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Stopping the old version. This may take up to one minute…" id="nTo-dx-qfZ">
-                            <font key="font" metaFont="system"/>
+                            <font key="font" size="13" name="Tahoma"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
