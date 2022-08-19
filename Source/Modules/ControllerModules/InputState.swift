@@ -437,6 +437,17 @@ public enum InputState {
     override public var type: StateType { .ofChoosingCandidate }
     private(set) var candidates: [(String, String)]
     private(set) var isTypingVertical: Bool
+    // 該變數改為可以隨時更改的內容，不然的話 ctlInputMethod.candidateSelectionChanged() 會上演俄羅斯套娃（崩潰）。
+    public var chosenCandidateString: String = "" {
+      didSet {
+        // 去掉讀音資訊，且最終留存「執行康熙 / JIS 轉換之前」的結果。
+        if chosenCandidateString.contains("\u{17}") {
+          chosenCandidateString = String(chosenCandidateString.split(separator: "\u{17}")[0])
+        }
+        if !chosenCandidateString.contains("\u{1A}") { return }
+        chosenCandidateString = String(chosenCandidateString.split(separator: "\u{1A}").reversed()[0])
+      }
+    }
 
     init(
       composingBuffer: String, cursorIndex: Int, candidates: [(String, String)], isTypingVertical: Bool,
@@ -445,6 +456,70 @@ public enum InputState {
       self.candidates = candidates
       self.isTypingVertical = isTypingVertical
       super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex, nodeValuesArray: nodeValuesArray)
+    }
+
+    // 這個函數尚未經過嚴格的單元測試。請在使用時確保 chosenCandidateString 為空。
+    // 不為空的話，該參數的返回值就會有對應的影響、顯示成類似 macOS 內建注音輸入法那樣子。
+    // 本來想給輸入法拓展這方面的功能的，奈何 ctlInputMethod.candidateSelectionChanged() 這函式太氣人。
+    // 想要講的幹話已經在那邊講完了，感興趣的可以去看看。
+    override var attributedString: NSMutableAttributedString {
+      guard !chosenCandidateString.isEmpty else { return super.attributedString }
+      let bufferTextRear = composingBuffer.utf16SubString(with: 0..<cursorIndex)
+      let bufferTextFront = composingBuffer.utf16SubString(with: cursorIndex..<(composingBuffer.utf16.count))
+      let cursorIndexU8 = bufferTextRear.count - 1
+      // 排除一些不應該出現的情形。
+      if (mgrPrefs.useRearCursorMode && bufferTextFront.count < chosenCandidateString.count)
+        || (!mgrPrefs.useRearCursorMode && bufferTextRear.count < chosenCandidateString.count)
+      {
+        return super.attributedString
+      }
+      // u16Range 是用來畫線的，因為 NSAttributedString 只認 NSRange。
+      let u16Range: Range<Int> = {
+        switch mgrPrefs.useRearCursorMode {
+          case false: return (max(0, cursorIndex - chosenCandidateString.utf16.count))..<cursorIndex
+          case true:
+            return
+              cursorIndex..<min(cursorIndex + chosenCandidateString.utf16.count, composingBuffer.utf16.count - 1)
+        }
+      }()
+      // u8Range 是用來計算字串的。
+      let u8Range: Range<Int> = {
+        switch mgrPrefs.useRearCursorMode {
+          case false: return (max(0, cursorIndexU8 - chosenCandidateString.count))..<cursorIndexU8
+          case true:
+            return cursorIndexU8..<min(cursorIndexU8 + chosenCandidateString.count, composingBuffer.count - 1)
+        }
+      }()
+      let strSegmentedRear = composingBuffer.map { String($0) }[0..<u8Range.lowerBound].joined()
+      let strSegmentedFront = composingBuffer.map { String($0) }[u8Range.upperBound...].joined()
+      let newBufferConverted: String = NotEmpty(
+        composingBuffer: strSegmentedRear + chosenCandidateString + strSegmentedFront, cursorIndex: 0
+      ).composingBufferConverted
+      guard newBufferConverted.count == composingBuffer.count else { return super.attributedString }
+
+      /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
+      /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
+      let attributedStringResult = NSMutableAttributedString(string: newBufferConverted)
+      attributedStringResult.setAttributes(
+        [
+          .underlineStyle: NSUnderlineStyle.single.rawValue,
+          .markedClauseSegment: 0,
+        ], range: NSRange(location: 0, length: u16Range.lowerBound)
+      )
+      attributedStringResult.setAttributes(
+        [
+          .underlineStyle: NSUnderlineStyle.thick.rawValue,
+          .markedClauseSegment: 1,
+        ], range: NSRange(location: u16Range.lowerBound, length: u16Range.count)
+      )
+      attributedStringResult.setAttributes(
+        [
+          .underlineStyle: NSUnderlineStyle.single.rawValue,
+          .markedClauseSegment: 2,
+        ], range: NSRange(location: u16Range.upperBound, length: newBufferConverted.utf16.count)
+      )
+
+      return attributedStringResult
     }
 
     override var description: String {
