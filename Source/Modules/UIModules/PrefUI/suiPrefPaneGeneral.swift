@@ -40,10 +40,10 @@ struct suiPrefPaneGeneral: View {
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
-        return 465
+        return 520
       default:
         if mgrPrefs.appleLanguages[0].contains("zh-Han") {
-          return 450
+          return 480
         } else {
           return 550
         }
