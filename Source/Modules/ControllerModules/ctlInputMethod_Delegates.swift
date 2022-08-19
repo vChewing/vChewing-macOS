@@ -13,7 +13,10 @@ import Cocoa
 // MARK: - KeyHandler Delegate
 
 extension ctlInputMethod: KeyHandlerDelegate {
-  var clientBundleIdentifier: String { client()?.bundleIdentifier() ?? "" }
+  var clientBundleIdentifier: String {
+    guard let client = client() else { return "" }
+    return client.bundleIdentifier() ?? ""
+  }
 
   func ctlCandidate() -> ctlCandidateProtocol { ctlInputMethod.ctlCandidateCurrent }
 
