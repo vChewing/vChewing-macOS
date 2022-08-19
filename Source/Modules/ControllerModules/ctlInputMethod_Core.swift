@@ -281,12 +281,17 @@ class ctlInputMethod: IMKInputController {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     var arrResult = [String]()
 
+    // 注意：下文中的不可列印字元是用來方便在 InputState 當中用來分割資料的。
     func handleCandidatesPrepared(_ candidates: [(String, String)], prefix: String = "") {
       for theCandidate in candidates {
         let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
-        var result = (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
+        var result = (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)\u{1A}(\(theCandidate.1))"
         if arrResult.contains(result) {
-          result = "\(result)(\(theCandidate.0))"
+          let reading: String =
+            mgrPrefs.showHanyuPinyinInCompositionBuffer
+            ? Tekkon.cnvPhonaToHanyuPinyin(target: Tekkon.restoreToneOneInZhuyinKey(target: theCandidate.0))
+            : theCandidate.0
+          result = "\(result)\u{17}(\(reading))"
         }
         arrResult.append(prefix + result)
       }
@@ -327,11 +332,15 @@ class ctlInputMethod: IMKInputController {
 
     var indexDeducted = 0
 
+    // 注意：下文中的不可列印字元是用來方便在 InputState 當中用來分割資料的。
     func handleCandidatesSelected(_ candidates: [(String, String)], prefix: String = "") {
       for (i, neta) in candidates.enumerated() {
         let theConverted = IME.kanjiConversionIfRequired(neta.1)
-        let netaShown = (neta.1 == theConverted) ? neta.1 : "\(theConverted)(\(neta.1))"
-        let netaShownWithPronunciation = "\(theConverted)(\(neta.0))"
+        let netaShown = (neta.1 == theConverted) ? neta.1 : "\(theConverted)\u{1A}(\(neta.1))"
+        let reading: String =
+          mgrPrefs.showHanyuPinyinInCompositionBuffer
+          ? Tekkon.cnvPhonaToHanyuPinyin(target: Tekkon.restoreToneOneInZhuyinKey(target: neta.0)) : neta.0
+        let netaShownWithPronunciation = "\(netaShown)\u{17}(\(reading))"
         if candidateString.string == prefix + netaShownWithPronunciation {
           indexDeducted = i
           break
