@@ -28,6 +28,7 @@ struct suiPrefPaneKeyboard: View {
   @State private var selUsingHotKeyCurrencyNumerals = UserDefaults.standard.bool(
     forKey: UserDef.kUsingHotKeyCurrencyNumerals.rawValue)
 
+  private let contentMaxHeight: Double = 430
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -42,192 +43,194 @@ struct suiPrefPaneKeyboard: View {
   }()
 
   var body: some View {
-    Preferences.Container(contentWidth: contentWidth) {
-      Preferences.Section(label: { Text(LocalizedStringKey("Selection Keys:")) }) {
-        ComboBox(
-          items: mgrPrefs.suggestedCandidateKeys,
-          text: $selSelectionKeys.onChange {
-            let value = selSelectionKeys
-            let keys: String = value.trimmingCharacters(in: .whitespacesAndNewlines).deduplicate
-            do {
-              try mgrPrefs.validate(candidateKeys: keys)
-              mgrPrefs.candidateKeys = keys
-              selSelectionKeys = mgrPrefs.candidateKeys
-            } catch mgrPrefs.CandidateKeyError.empty {
-              selSelectionKeys = mgrPrefs.candidateKeys
-            } catch {
-              if let window = ctlPrefUI.shared.controller.window {
-                let alert = NSAlert(error: error)
-                alert.beginSheetModal(for: window) { _ in
-                  selSelectionKeys = mgrPrefs.candidateKeys
+    ScrollView {
+      Preferences.Container(contentWidth: contentWidth) {
+        Preferences.Section(label: { Text(LocalizedStringKey("Selection Keys:")) }) {
+          ComboBox(
+            items: mgrPrefs.suggestedCandidateKeys,
+            text: $selSelectionKeys.onChange {
+              let value = selSelectionKeys
+              let keys: String = value.trimmingCharacters(in: .whitespacesAndNewlines).deduplicate
+              do {
+                try mgrPrefs.validate(candidateKeys: keys)
+                mgrPrefs.candidateKeys = keys
+                selSelectionKeys = mgrPrefs.candidateKeys
+              } catch mgrPrefs.CandidateKeyError.empty {
+                selSelectionKeys = mgrPrefs.candidateKeys
+              } catch {
+                if let window = ctlPrefUI.shared.controller.window {
+                  let alert = NSAlert(error: error)
+                  alert.beginSheetModal(for: window) { _ in
+                    selSelectionKeys = mgrPrefs.candidateKeys
+                  }
+                  clsSFX.beep()
                 }
-                clsSFX.beep()
               }
             }
-          }
-        ).frame(width: 180)
-        Text(
-          LocalizedStringKey(
-            "Choose or hit Enter to confim your prefered keys for selecting candidates."
-          )
-        )
-        .preferenceDescription()
-      }
-      Preferences.Section(label: { Text(LocalizedStringKey("Phonetic Parser:")) }) {
-        HStack {
-          Picker(
-            "",
-            selection: $selMandarinParser.onChange {
-              let value = selMandarinParser
-              mgrPrefs.mandarinParser = value
-              switch value {
-                case 0:
-                  if !AppleKeyboardConverter.arrDynamicBasicKeyLayout.contains(mgrPrefs.basicKeyboardLayout) {
-                    mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
-                    selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
-                  }
-                default:
-                  if AppleKeyboardConverter.arrDynamicBasicKeyLayout.contains(mgrPrefs.basicKeyboardLayout) {
-                    mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ABC"
-                    selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
-                  }
-              }
-            }
-          ) {
-            Group {
-              Text(LocalizedStringKey("Dachen (Microsoft Standard / Wang / 01, etc.)")).tag(0)
-              Text(LocalizedStringKey("Eten Traditional")).tag(1)
-              Text(LocalizedStringKey("IBM")).tag(4)
-              Text(LocalizedStringKey("MiTAC")).tag(5)
-              Text(LocalizedStringKey("Seigyou")).tag(8)
-              Text(LocalizedStringKey("Fake Seigyou")).tag(6)
-            }
-            Divider()
-            Group {
-              Text(LocalizedStringKey("Dachen 26 (libChewing)")).tag(7)
-              Text(LocalizedStringKey("Eten 26")).tag(3)
-              Text(LocalizedStringKey("Hsu")).tag(2)
-              Text(LocalizedStringKey("Starlight")).tag(9)
-            }
-            Divider()
-            Group {
-              Text(LocalizedStringKey("Hanyu Pinyin with Numeral Intonation")).tag(10)
-              Text(LocalizedStringKey("Secondary Pinyin with Numeral Intonation")).tag(11)
-              Text(LocalizedStringKey("Yale Pinyin with Numeral Intonation")).tag(12)
-              Text(LocalizedStringKey("Hualuo Pinyin with Numeral Intonation")).tag(13)
-              Text(LocalizedStringKey("Universal Pinyin with Numeral Intonation")).tag(14)
-            }
-          }
-          .labelsHidden()
-          Button {
-            mgrPrefs.mandarinParser = 0
-            selMandarinParser = mgrPrefs.mandarinParser
-            mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
-            selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
-          } label: {
-            Text("↻ㄅ")
-          }
-          Button {
-            mgrPrefs.mandarinParser = 10
-            selMandarinParser = mgrPrefs.mandarinParser
-            mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ABC"
-            selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
-          } label: {
-            Text("↻Ａ")
-          }
-        }
-        .frame(width: 380.0)
-        Text(LocalizedStringKey("Choose the phonetic layout for Mandarin parser."))
-          .preferenceDescription()
-      }
-      Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Basic Keyboard Layout:")) }) {
-        HStack {
-          Picker(
-            "",
-            selection: $selBasicKeyboardLayout.onChange {
-              let value = selBasicKeyboardLayout
-              mgrPrefs.basicKeyboardLayout = value
-              if AppleKeyboardConverter.arrDynamicBasicKeyLayout.contains(value) {
-                mgrPrefs.mandarinParser = 0
-                selMandarinParser = mgrPrefs.mandarinParser
-              }
-            }
-          ) {
-            ForEach(0...(IME.arrEnumerateSystemKeyboardLayouts.count - 1), id: \.self) { id in
-              Text(IME.arrEnumerateSystemKeyboardLayouts[id].strName).tag(
-                IME.arrEnumerateSystemKeyboardLayouts[id].strValue)
-            }.id(UUID())
-          }
-          .labelsHidden()
-          .frame(width: 240.0)
-        }
-        Text(LocalizedStringKey("Choose the macOS-level basic keyboard layout."))
-          .preferenceDescription()
-      }
-      Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Keyboard Shortcuts:")) }) {
-        Toggle(
-          LocalizedStringKey("Per-Char Select Mode"),
-          isOn: $selUsingHotKeySCPC.onChange {
-            mgrPrefs.usingHotKeySCPC = selUsingHotKeySCPC
-          }
-        )
-        Toggle(
-          LocalizedStringKey("Per-Char Associated Phrases"),
-          isOn: $selUsingHotKeyAssociates.onChange {
-            mgrPrefs.usingHotKeyAssociates = selUsingHotKeyAssociates
-          }
-        )
-        Toggle(
-          LocalizedStringKey("CNS11643 Mode"),
-          isOn: $selUsingHotKeyCNS.onChange {
-            mgrPrefs.usingHotKeyCNS = selUsingHotKeyCNS
-          }
-        )
-        Toggle(
-          LocalizedStringKey("Force KangXi Writing"),
-          isOn: $selUsingHotKeyKangXi.onChange {
-            mgrPrefs.usingHotKeyKangXi = selUsingHotKeyKangXi
-          }
-        )
-        Toggle(
-          LocalizedStringKey("JIS Shinjitai Output"),
-          isOn: $selUsingHotKeyJIS.onChange {
-            mgrPrefs.usingHotKeyJIS = selUsingHotKeyJIS
-          }
-        )
-        Toggle(
-          LocalizedStringKey("Half-Width Punctuation Mode"),
-          isOn: $selUsingHotKeyHalfWidthASCII.onChange {
-            mgrPrefs.usingHotKeyHalfWidthASCII = selUsingHotKeyHalfWidthASCII
-          }
-        )
-        Toggle(
-          LocalizedStringKey("Currency Numeral Output"),
-          isOn: $selUsingHotKeyCurrencyNumerals.onChange {
-            mgrPrefs.usingHotKeyCurrencyNumerals = selUsingHotKeyCurrencyNumerals
-          }
-        )
-      }
-    }
-    Divider()
-    Preferences.Container(contentWidth: contentWidth) {
-      Preferences.Section(title: "") {
-        VStack(alignment: .leading, spacing: 10) {
+          ).frame(width: 180)
           Text(
             LocalizedStringKey(
-              "Non-QWERTY alphanumerical keyboard layouts are for Hanyu Pinyin parser only."
-            )
-          )
-          .preferenceDescription()
-          Text(
-            LocalizedStringKey(
-              "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional."
+              "Choose or hit Enter to confim your prefered keys for selecting candidates."
             )
           )
           .preferenceDescription()
         }
+        Preferences.Section(label: { Text(LocalizedStringKey("Phonetic Parser:")) }) {
+          HStack {
+            Picker(
+              "",
+              selection: $selMandarinParser.onChange {
+                let value = selMandarinParser
+                mgrPrefs.mandarinParser = value
+                switch value {
+                  case 0:
+                    if !AppleKeyboardConverter.arrDynamicBasicKeyLayout.contains(mgrPrefs.basicKeyboardLayout) {
+                      mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
+                      selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
+                    }
+                  default:
+                    if AppleKeyboardConverter.arrDynamicBasicKeyLayout.contains(mgrPrefs.basicKeyboardLayout) {
+                      mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ABC"
+                      selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
+                    }
+                }
+              }
+            ) {
+              Group {
+                Text(LocalizedStringKey("Dachen (Microsoft Standard / Wang / 01, etc.)")).tag(0)
+                Text(LocalizedStringKey("Eten Traditional")).tag(1)
+                Text(LocalizedStringKey("IBM")).tag(4)
+                Text(LocalizedStringKey("MiTAC")).tag(5)
+                Text(LocalizedStringKey("Seigyou")).tag(8)
+                Text(LocalizedStringKey("Fake Seigyou")).tag(6)
+              }
+              Divider()
+              Group {
+                Text(LocalizedStringKey("Dachen 26 (libChewing)")).tag(7)
+                Text(LocalizedStringKey("Eten 26")).tag(3)
+                Text(LocalizedStringKey("Hsu")).tag(2)
+                Text(LocalizedStringKey("Starlight")).tag(9)
+              }
+              Divider()
+              Group {
+                Text(LocalizedStringKey("Hanyu Pinyin with Numeral Intonation")).tag(10)
+                Text(LocalizedStringKey("Secondary Pinyin with Numeral Intonation")).tag(11)
+                Text(LocalizedStringKey("Yale Pinyin with Numeral Intonation")).tag(12)
+                Text(LocalizedStringKey("Hualuo Pinyin with Numeral Intonation")).tag(13)
+                Text(LocalizedStringKey("Universal Pinyin with Numeral Intonation")).tag(14)
+              }
+            }
+            .labelsHidden()
+            Button {
+              mgrPrefs.mandarinParser = 0
+              selMandarinParser = mgrPrefs.mandarinParser
+              mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
+              selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
+            } label: {
+              Text("↻ㄅ")
+            }
+            Button {
+              mgrPrefs.mandarinParser = 10
+              selMandarinParser = mgrPrefs.mandarinParser
+              mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ABC"
+              selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
+            } label: {
+              Text("↻Ａ")
+            }
+          }
+          .frame(width: 380.0)
+          Text(LocalizedStringKey("Choose the phonetic layout for Mandarin parser."))
+            .preferenceDescription()
+        }
+        Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Basic Keyboard Layout:")) }) {
+          HStack {
+            Picker(
+              "",
+              selection: $selBasicKeyboardLayout.onChange {
+                let value = selBasicKeyboardLayout
+                mgrPrefs.basicKeyboardLayout = value
+                if AppleKeyboardConverter.arrDynamicBasicKeyLayout.contains(value) {
+                  mgrPrefs.mandarinParser = 0
+                  selMandarinParser = mgrPrefs.mandarinParser
+                }
+              }
+            ) {
+              ForEach(0...(IME.arrEnumerateSystemKeyboardLayouts.count - 1), id: \.self) { id in
+                Text(IME.arrEnumerateSystemKeyboardLayouts[id].strName).tag(
+                  IME.arrEnumerateSystemKeyboardLayouts[id].strValue)
+              }.id(UUID())
+            }
+            .labelsHidden()
+            .frame(width: 240.0)
+          }
+          Text(LocalizedStringKey("Choose the macOS-level basic keyboard layout."))
+            .preferenceDescription()
+        }
+        Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Keyboard Shortcuts:")) }) {
+          Toggle(
+            LocalizedStringKey("Per-Char Select Mode"),
+            isOn: $selUsingHotKeySCPC.onChange {
+              mgrPrefs.usingHotKeySCPC = selUsingHotKeySCPC
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Per-Char Associated Phrases"),
+            isOn: $selUsingHotKeyAssociates.onChange {
+              mgrPrefs.usingHotKeyAssociates = selUsingHotKeyAssociates
+            }
+          )
+          Toggle(
+            LocalizedStringKey("CNS11643 Mode"),
+            isOn: $selUsingHotKeyCNS.onChange {
+              mgrPrefs.usingHotKeyCNS = selUsingHotKeyCNS
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Force KangXi Writing"),
+            isOn: $selUsingHotKeyKangXi.onChange {
+              mgrPrefs.usingHotKeyKangXi = selUsingHotKeyKangXi
+            }
+          )
+          Toggle(
+            LocalizedStringKey("JIS Shinjitai Output"),
+            isOn: $selUsingHotKeyJIS.onChange {
+              mgrPrefs.usingHotKeyJIS = selUsingHotKeyJIS
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Half-Width Punctuation Mode"),
+            isOn: $selUsingHotKeyHalfWidthASCII.onChange {
+              mgrPrefs.usingHotKeyHalfWidthASCII = selUsingHotKeyHalfWidthASCII
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Currency Numeral Output"),
+            isOn: $selUsingHotKeyCurrencyNumerals.onChange {
+              mgrPrefs.usingHotKeyCurrencyNumerals = selUsingHotKeyCurrencyNumerals
+            }
+          )
+        }
       }
-    }
+      Divider()
+      Preferences.Container(contentWidth: contentWidth) {
+        Preferences.Section(title: "") {
+          VStack(alignment: .leading, spacing: 10) {
+            Text(
+              LocalizedStringKey(
+                "Non-QWERTY alphanumerical keyboard layouts are for Hanyu Pinyin parser only."
+              )
+            )
+            .preferenceDescription()
+            Text(
+              LocalizedStringKey(
+                "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional."
+              )
+            )
+            .preferenceDescription()
+          }
+        }
+      }
+    }.frame(maxHeight: contentMaxHeight).fixedSize(horizontal: false, vertical: true)
   }
 }
 
