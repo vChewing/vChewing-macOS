@@ -90,7 +90,9 @@ struct suiPrefPaneDevZone: View {
           .preferenceDescription().fixedSize(horizontal: false, vertical: true)
         }
       }
-    }.frame(maxHeight: contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    }
+    .frame(maxHeight: contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .background(VisualEffectView(material: .sidebar, blendingMode: .behindWindow))
   }
 }
 

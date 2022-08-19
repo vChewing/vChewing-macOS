@@ -149,3 +149,26 @@ extension View {
     overlay(Tooltip(tooltip: tooltip))
   }
 }
+
+// MARK: - Windows Aero in Swift UI
+
+// Ref: https://stackoverflow.com/questions/62461957
+
+@available(macOS 10.15, *)
+struct VisualEffectView: NSViewRepresentable {
+  let material: NSVisualEffectView.Material
+  let blendingMode: NSVisualEffectView.BlendingMode
+
+  func makeNSView(context _: Context) -> NSVisualEffectView {
+    let visualEffectView = NSVisualEffectView()
+    visualEffectView.material = material
+    visualEffectView.blendingMode = blendingMode
+    visualEffectView.state = NSVisualEffectView.State.active
+    return visualEffectView
+  }
+
+  func updateNSView(_ visualEffectView: NSVisualEffectView, context _: Context) {
+    visualEffectView.material = material
+    visualEffectView.blendingMode = blendingMode
+  }
+}
