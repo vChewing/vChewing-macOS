@@ -389,59 +389,31 @@ extension ctlPrefWindow: NSToolbarDelegate {
       case .ofGeneral:
         let title = NSLocalizedString("General", comment: "")
         item.label = title
-        if #available(macOS 11.0, *) {
-          item.image = NSImage(
-            systemSymbolName: "wrench.and.screwdriver.fill", accessibilityDescription: "General Preferences"
-          )
-        } else {
-          item.image = NSImage(named: "PrefToolbar-General")
-        }
+        item.image = .tabImageGeneral
         item.action = #selector(showGeneralView(_:))
 
       case .ofExperience:
         let title = NSLocalizedString("Experience", comment: "")
         item.label = title
-        if #available(macOS 11.0, *) {
-          item.image = NSImage(
-            systemSymbolName: "person.fill.questionmark", accessibilityDescription: "Experiences Preferences"
-          )
-        } else {
-          item.image = NSImage(named: "PrefToolbar-Experiences")
-        }
+        item.image = .tabImageExperience
         item.action = #selector(showExperienceView(_:))
 
       case .ofDictionary:
         let title = NSLocalizedString("Dictionary", comment: "")
         item.label = title
-        if #available(macOS 11.0, *) {
-          item.image = NSImage(
-            systemSymbolName: "character.book.closed.fill", accessibilityDescription: "Dictionary Preferences"
-          )
-        } else {
-          item.image = NSImage(named: "PrefToolbar-Dictionary")
-        }
+        item.image = .tabImageDictionary
         item.action = #selector(showDictionaryView(_:))
 
       case .ofKeyboard:
         let title = NSLocalizedString("Keyboard", comment: "")
         item.label = title
-        if #available(macOS 11.0, *) {
-          item.image = NSImage(systemSymbolName: "keyboard.macwindow", accessibilityDescription: "Keyboard Preferences")
-        } else {
-          item.image = NSImage(named: "PrefToolbar-Keyboard")
-        }
+        item.image = .tabImageKeyboard
         item.action = #selector(showKeyboardView(_:))
 
       case .ofDevZone:
         let title = NSLocalizedString("DevZone", comment: "")
         item.label = title
-        if #available(macOS 11.0, *) {
-          item.image = NSImage(
-            systemSymbolName: "hand.raised.circle", accessibilityDescription: "DevZone Preferences"
-          )
-        } else {
-          item.image = NSImage(named: "PrefToolbar-DevZone")
-        }
+        item.image = .tabImageDevZone
         item.action = #selector(showDevZoneView(_:))
 
       default:
