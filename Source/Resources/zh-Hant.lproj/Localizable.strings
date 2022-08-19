@@ -153,7 +153,7 @@
 "Keyboard" = "鍵盤設定";
 "Misc Settings:" = "雜項:";
 "MiTAC" = "神通排列";
-"Non-QWERTY alphanumerical keyboard layouts are for Hanyu Pinyin parser only." = "QWERTY 以外的英數佈局是為了漢語拼音排列使用者而準備的。";
+"Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "QWERTY 以外的英數佈局是為了拼音排列使用者而準備的。";
 "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Ctrl(+Option)+Command+Enter 輸出漢語拼音而非注音";
 "Output Settings:" = "輸出設定:";
 "Phonetic Parser:" = "注音排列:";

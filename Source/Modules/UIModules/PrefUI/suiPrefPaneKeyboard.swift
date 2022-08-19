@@ -139,8 +139,20 @@ struct suiPrefPaneKeyboard: View {
             }
           }
           .frame(width: 380.0)
-          Text(LocalizedStringKey("Choose the phonetic layout for Mandarin parser."))
-            .preferenceDescription()
+          HStack {
+            Text(
+              NSLocalizedString(
+                "Choose the phonetic layout for Mandarin parser.",
+                comment: ""
+              ) + (mgrPrefs.appleLanguages[0].contains("en") ? " " : "")
+                + NSLocalizedString(
+                  "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional.",
+                  comment: ""
+                )
+            )
+            .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+            Spacer().frame(width: 30)
+          }
         }
         Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Basic Keyboard Layout:")) }) {
           HStack {
@@ -163,8 +175,20 @@ struct suiPrefPaneKeyboard: View {
             .labelsHidden()
             .frame(width: 240.0)
           }
-          Text(LocalizedStringKey("Choose the macOS-level basic keyboard layout."))
-            .preferenceDescription()
+          HStack {
+            Text(
+              NSLocalizedString(
+                "Choose the macOS-level basic keyboard layout.",
+                comment: ""
+              ) + (mgrPrefs.appleLanguages[0].contains("en") ? " " : "")
+                + NSLocalizedString(
+                  "Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only.",
+                  comment: ""
+                )
+            )
+            .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+            Spacer().frame(width: 30)
+          }
         }
         Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Keyboard Shortcuts:")) }) {
           Toggle(
@@ -209,25 +233,6 @@ struct suiPrefPaneKeyboard: View {
               mgrPrefs.usingHotKeyCurrencyNumerals = selUsingHotKeyCurrencyNumerals
             }
           )
-        }
-      }
-      Divider()
-      Preferences.Container(contentWidth: contentWidth) {
-        Preferences.Section(title: "") {
-          VStack(alignment: .leading, spacing: 10) {
-            Text(
-              LocalizedStringKey(
-                "Non-QWERTY alphanumerical keyboard layouts are for Hanyu Pinyin parser only."
-              )
-            )
-            .preferenceDescription()
-            Text(
-              LocalizedStringKey(
-                "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional."
-              )
-            )
-            .preferenceDescription()
-          }
         }
       }
     }.frame(maxHeight: contentMaxHeight).fixedSize(horizontal: false, vertical: true)

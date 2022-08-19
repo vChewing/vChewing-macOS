@@ -152,7 +152,7 @@
 "Keyboard" = "Keyboard";
 "Misc Settings:" = "Misc Settings:";
 "MiTAC" = "MiTAC";
-"Non-QWERTY alphanumerical keyboard layouts are for Hanyu Pinyin parser only." = "Non-QWERTY alphanumerical keyboard layouts are for Hanyu Pinyin parser only.";
+"Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only.";
 "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter";
 "Output Settings:" = "Output Settings:";
 "Phonetic Parser:" = "Phonetic Parser:";
