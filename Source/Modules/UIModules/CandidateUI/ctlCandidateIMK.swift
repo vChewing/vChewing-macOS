@@ -346,3 +346,25 @@ var currentTISInputSource: TISInputSource? {
   }
   return result
 }
+
+// MARK: - Translating NumPad KeyCodes to Default IMK Candidate Selection KeyCodes.
+
+extension ctlCandidateIMK {
+  public static func replaceNumPadKeyCodes(target event: NSEvent) -> NSEvent? {
+    let mapNumPadKeyCodeTranslation: [UInt16: UInt16] = [
+      83: 18, 84: 19, 85: 20, 86: 21, 87: 23, 88: 22, 89: 26, 91: 28, 92: 25,
+    ]
+    return NSEvent.keyEvent(
+      with: event.type,
+      location: event.locationInWindow,
+      modifierFlags: event.modifierFlags,
+      timestamp: event.timestamp,
+      windowNumber: event.windowNumber,
+      context: nil,
+      characters: event.characters ?? "",
+      charactersIgnoringModifiers: event.charactersIgnoringModifiers ?? event.characters ?? "",
+      isARepeat: event.isARepeat,
+      keyCode: mapNumPadKeyCodeTranslation[event.keyCode] ?? event.keyCode
+    )
+  }
+}
