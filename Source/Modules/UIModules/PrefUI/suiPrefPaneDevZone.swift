@@ -81,6 +81,7 @@ struct suiPrefPaneDevZone: View {
               mgrPrefs.shouldAlwaysUseShiftKeyAccommodation = selShouldAlwaysUseShiftKeyAccommodation
             }
           )
+          .disabled(mgrPrefs.disableShiftTogglingAlphanumericalMode)
           Text(
             LocalizedStringKey(
               "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. If you want the same accommodation for other client apps, please tick this checkbox on."
