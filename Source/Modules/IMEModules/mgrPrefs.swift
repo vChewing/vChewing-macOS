@@ -49,11 +49,12 @@ public enum UserDef: String, CaseIterable {
   case kKeepReadingUponCompositionError = "KeepReadingUponCompositionError"
   case kTogglingAlphanumericalModeWithLShift = "TogglingAlphanumericalModeWithLShift"
   case kUpperCaseLetterKeyBehavior = "UpperCaseLetterKeyBehavior"
+  case kDisableShiftTogglingAlphanumericalMode = "DisableShiftTogglingAlphanumericalMode"
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
   case kShouldAlwaysUseShiftKeyAccommodation = "ShouldAlwaysUseShiftKeyAccommodation"
-  case kDisableShiftTogglingAlphanumericalMode = "DisableShiftTogglingAlphanumericalMode"
+  case kAdjustIMKCandidateWindowLevel = "AdjustIMKCandidateWindowLevel"
 
   case kCandidateTextFontName = "CandidateTextFontName"
   case kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
@@ -296,6 +297,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.shouldAlwaysUseShiftKeyAccommodation, forKey: UserDef.kShouldAlwaysUseShiftKeyAccommodation.rawValue
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.adjustIMKCandidateWindowLevel, forKey: UserDef.kAdjustIMKCandidateWindowLevel.rawValue
+    )
 
     // -----
 
@@ -424,6 +428,9 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kShouldAlwaysUseShiftKeyAccommodation.rawValue, defaultValue: false)
   static var shouldAlwaysUseShiftKeyAccommodation: Bool
 
+  @UserDefault(key: UserDef.kAdjustIMKCandidateWindowLevel.rawValue, defaultValue: false)
+  static var adjustIMKCandidateWindowLevel: Bool
+
   // MARK: - Settings (Tier 3)
 
   static var minCandidateLength: Int {
@@ -544,7 +551,13 @@ public enum mgrPrefs {
   static var candidateKeyLabelFontName: String?
 
   @UserDefault(key: UserDef.kCandidateKeys.rawValue, defaultValue: kDefaultKeys)
-  static var candidateKeys: String
+  static var candidateKeys: String {
+    didSet {
+      if mgrPrefs.useIMKCandidateWindow {
+        mgrPrefs.candidateKeys = kDefaultKeys
+      }
+    }
+  }
 
   static var defaultCandidateKeys: String {
     kDefaultKeys
@@ -682,13 +695,18 @@ public enum mgrPrefs {
 
 extension mgrPrefs {
   static func fixOddPreferences() {
-    // 防呆。macOS 10.11 用 IMK 選字窗會崩潰。
-    if #unavailable(macOS 10.13) { mgrPrefs.useIMKCandidateWindow = false }
+    // 防呆。macOS 10.11 用 IMK 選字窗會崩潰，macOS 10.13 的 IMK 選字窗仍有問題。
+    // 一般人想用的 IMK 選字窗基於 macOS 10.09 系統內建的注音輸入法的那種矩陣選字窗。
+    // 然而，該選字窗的體驗直到 macOS 10.14 開始才在 IMKCandidates 當中正式提供。
+    if #unavailable(macOS 10.14) {
+      mgrPrefs.useIMKCandidateWindow = false
+      mgrPrefs.adjustIMKCandidateWindowLevel = false
+    }
     if #unavailable(macOS 10.15) {
-      handleDefaultCandidateFontsByLangIdentifier = false
-      shouldAlwaysUseShiftKeyAccommodation = false
-      disableShiftTogglingAlphanumericalMode = false
-      togglingAlphanumericalModeWithLShift = false
+      mgrPrefs.handleDefaultCandidateFontsByLangIdentifier = false
+      mgrPrefs.shouldAlwaysUseShiftKeyAccommodation = false
+      mgrPrefs.disableShiftTogglingAlphanumericalMode = false
+      mgrPrefs.togglingAlphanumericalModeWithLShift = false
     }
   }
 }

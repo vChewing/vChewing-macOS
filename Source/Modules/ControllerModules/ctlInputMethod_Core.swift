@@ -211,6 +211,50 @@ class ctlInputMethod: IMKInputController {
     // - 是就地交給 super.interpretKeyEvents() 處理？
     // - 還是藉由 delegate 扔回 ctlInputMethod 給 KeyHandler 處理？
     if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK, ctlCandidateCurrent.visible {
+      let event: NSEvent! = ctlCandidateIMK.replaceNumPadKeyCodes(target: event) ?? event
+      let input = InputSignal(event: event)
+      // Shift+Enter 是個特殊情形，不提前攔截處理的話、會有垃圾參數傳給 delegate 的 keyHandler 從而崩潰。
+      // 所以這裡直接將 Shift Flags 清空。
+      if input.isShiftHold, input.isEnter {
+        guard
+          let newEvent = NSEvent.keyEvent(
+            with: event.type,
+            location: event.locationInWindow,
+            modifierFlags: [],
+            timestamp: event.timestamp,
+            windowNumber: event.windowNumber,
+            context: nil,
+            characters: event.characters ?? "",
+            charactersIgnoringModifiers: event.charactersIgnoringModifiers ?? event.characters ?? "",
+            isARepeat: event.isARepeat,
+            keyCode: event.keyCode
+          )
+        else {
+          NSSound.beep()
+          return true
+        }
+        ctlCandidateCurrent.interpretKeyEvents([newEvent])
+        return true
+      }
+
+      if let newChar = ctlCandidateIMK.defaultIMKSelectionKey[event.keyCode], input.isShiftHold,
+        isAssociatedPhrasesState
+      {
+        let newEvent = NSEvent.keyEvent(
+          with: event.type,
+          location: event.locationInWindow,
+          modifierFlags: [],
+          timestamp: event.timestamp,
+          windowNumber: event.windowNumber,
+          context: nil,
+          characters: newChar,
+          charactersIgnoringModifiers: event.charactersIgnoringModifiers ?? event.characters ?? "",
+          isARepeat: event.isARepeat,
+          keyCode: event.keyCode
+        )
+        ctlCandidateCurrent.perform(Selector(("handleKeyboardEvent:")), with: newEvent)
+      }
+
       ctlCandidateCurrent.interpretKeyEvents([event])
       return true
     }
@@ -238,31 +282,43 @@ class ctlInputMethod: IMKInputController {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     var arrResult = [String]()
 
-    func handleCandidatesPrepared(_ candidates: [(String, String)]) {
+    // 注意：下文中的不可列印字元是用來方便在 InputState 當中用來分割資料的。
+    func handleCandidatesPrepared(_ candidates: [(String, String)], prefix: String = "") {
       for theCandidate in candidates {
         let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
-        var result = (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)(\(theCandidate.1))"
+        var result = (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)\u{1A}(\(theCandidate.1))"
         if arrResult.contains(result) {
-          result = "\(result)(\(theCandidate.0))"
+          let reading: String =
+            mgrPrefs.showHanyuPinyinInCompositionBuffer
+            ? Tekkon.cnvPhonaToHanyuPinyin(target: Tekkon.restoreToneOneInZhuyinKey(target: theCandidate.0))
+            : theCandidate.0
+          result = "\(result)\u{17}(\(reading))"
         }
-        arrResult.append(result)
+        arrResult.append(prefix + result)
       }
     }
 
     if let state = state as? InputState.AssociatedPhrases {
-      handleCandidatesPrepared(state.candidates)
+      handleCandidatesPrepared(state.candidates, prefix: "⇧")
     } else if let state = state as? InputState.SymbolTable {
       handleCandidatesPrepared(state.candidates)
     } else if let state = state as? InputState.ChoosingCandidate {
       handleCandidatesPrepared(state.candidates)
     }
+
     return arrResult
   }
 
   /// IMK 選字窗限定函式，只要選字窗內的高亮內容選擇出現變化了、就會呼叫這個函式。
   /// - Parameter _: 已經高亮選中的候選字詞內容。
   override open func candidateSelectionChanged(_: NSAttributedString!) {
-    // 暫時不需要擴充這個函式。但有些幹話還是要講的：
+    // 警告：不要考慮用實作這個函式的方式來更新內文組字區的顯示。
+    // 因為這樣會導致 IMKServer.commitCompositionWithReply() 呼叫你本來不想呼叫的 commitComposition()，
+    // 然後 keyHandler 會被重設，屆時輸入法會在狀態處理等方面崩潰掉。
+
+    // 這個函式的實作其實很容易誘發各種崩潰，所以最好不要輕易實作。
+
+    // 有些幹話還是要講的：
     // 在這個函式當中試圖（無論是否拿著傳入的參數）從 ctlCandidateIMK 找 identifier 的話，
     // 只會找出 NSNotFound。你想 NSLog 列印看 identifier 是多少，輸入法直接崩潰。
     // 而且會他媽的崩得連 console 內的 ips 錯誤報告都沒有。
@@ -283,16 +339,20 @@ class ctlInputMethod: IMKInputController {
 
     var indexDeducted = 0
 
-    func handleCandidatesSelected(_ candidates: [(String, String)]) {
+    // 注意：下文中的不可列印字元是用來方便在 InputState 當中用來分割資料的。
+    func handleCandidatesSelected(_ candidates: [(String, String)], prefix: String = "") {
       for (i, neta) in candidates.enumerated() {
         let theConverted = IME.kanjiConversionIfRequired(neta.1)
-        let netaShown = (neta.1 == theConverted) ? neta.1 : "\(theConverted)(\(neta.1))"
-        let netaShownWithPronunciation = "\(theConverted)(\(neta.0))"
-        if candidateString.string == netaShownWithPronunciation {
+        let netaShown = (neta.1 == theConverted) ? neta.1 : "\(theConverted)\u{1A}(\(neta.1))"
+        let reading: String =
+          mgrPrefs.showHanyuPinyinInCompositionBuffer
+          ? Tekkon.cnvPhonaToHanyuPinyin(target: Tekkon.restoreToneOneInZhuyinKey(target: neta.0)) : neta.0
+        let netaShownWithPronunciation = "\(netaShown)\u{17}(\(reading))"
+        if candidateString.string == prefix + netaShownWithPronunciation {
           indexDeducted = i
           break
         }
-        if candidateString.string == netaShown {
+        if candidateString.string == prefix + netaShown {
           indexDeducted = i
           break
         }
@@ -300,7 +360,7 @@ class ctlInputMethod: IMKInputController {
     }
 
     if let state = state as? InputState.AssociatedPhrases {
-      handleCandidatesSelected(state.candidates)
+      handleCandidatesSelected(state.candidates, prefix: "⇧")
     } else if let state = state as? InputState.SymbolTable {
       handleCandidatesSelected(state.candidates)
     } else if let state = state as? InputState.ChoosingCandidate {

@@ -9,68 +9,99 @@
 import Cocoa
 import SwiftUI
 
-@available(macOS 10.15, *)
-class ctlPrefUI {
-  private(set) var tabImageGeneral: NSImage! = NSImage(named: "PrefToolbar-General")
-  private(set) var tabImageExperiences: NSImage! = NSImage(named: "PrefToolbar-Experiences")
-  private(set) var tabImageDictionary: NSImage! = NSImage(named: "PrefToolbar-Dictionary")
-  private(set) var tabImageKeyboard: NSImage! = NSImage(named: "PrefToolbar-Keyboard")
-  private(set) var tabImageDevZone: NSImage! = NSImage(named: "PrefToolbar-DevZone")
-
-  init() {
-    if #available(macOS 11.0, *) {
-      tabImageGeneral = NSImage(
+extension NSImage {
+  static var tabImageGeneral: NSImage! {
+    if #unavailable(macOS 11.0) {
+      return NSImage(named: "PrefToolbar-General")
+    } else {
+      return NSImage(
         systemSymbolName: "wrench.and.screwdriver.fill", accessibilityDescription: "General Preferences"
-      )
-      tabImageExperiences = NSImage(
-        systemSymbolName: "person.fill.questionmark", accessibilityDescription: "Experiences Preferences"
-      )
-      tabImageDictionary = NSImage(
-        systemSymbolName: "character.book.closed.fill", accessibilityDescription: "Dictionary Preferences"
-      )
-      tabImageKeyboard = NSImage(
-        systemSymbolName: "keyboard.macwindow", accessibilityDescription: "Keyboard Preferences"
-      )
-      tabImageDevZone = NSImage(
-        systemSymbolName: "hand.raised.circle", accessibilityDescription: "DevZone Preferences"
       )
     }
   }
 
+  static var tabImageExperience: NSImage! {
+    if #unavailable(macOS 11.0) {
+      return NSImage(named: "PrefToolbar-Experience")
+    } else {
+      return NSImage(
+        systemSymbolName: "person.fill.questionmark", accessibilityDescription: "Experience Preferences"
+      )
+    }
+  }
+
+  static var tabImageDictionary: NSImage! {
+    if #unavailable(macOS 11.0) {
+      return NSImage(named: "PrefToolbar-Dictionary")
+    } else {
+      return NSImage(
+        systemSymbolName: "character.book.closed.fill", accessibilityDescription: "Dictionary Preferences"
+      )
+    }
+  }
+
+  static var tabImageKeyboard: NSImage! {
+    if #unavailable(macOS 11.0) {
+      return NSImage(named: "PrefToolbar-Keyboard")
+    } else {
+      return NSImage(
+        systemSymbolName: "keyboard.macwindow", accessibilityDescription: "Keyboard Preferences"
+      )
+    }
+  }
+
+  static var tabImageDevZone: NSImage! {
+    if #available(macOS 12.0, *) {
+      return NSImage(
+        systemSymbolName: "hand.raised.circle", accessibilityDescription: "DevZone Preferences"
+      )
+    }
+    if #unavailable(macOS 11.0) {
+      return NSImage(named: "PrefToolbar-DevZone")
+    } else {
+      return NSImage(
+        systemSymbolName: "pc", accessibilityDescription: "DevZone Preferences"
+      )
+    }
+  }
+}
+
+@available(macOS 10.15, *)
+class ctlPrefUI {
   lazy var controller = PreferencesWindowController(
     panes: [
       Preferences.Pane(
         identifier: Preferences.PaneIdentifier(rawValue: "General"),
         title: NSLocalizedString("General", comment: ""),
-        toolbarIcon: tabImageGeneral
+        toolbarIcon: .tabImageGeneral
       ) {
         suiPrefPaneGeneral()
       },
       Preferences.Pane(
-        identifier: Preferences.PaneIdentifier(rawValue: "Experiences"),
+        identifier: Preferences.PaneIdentifier(rawValue: "Experience"),
         title: NSLocalizedString("Experience", comment: ""),
-        toolbarIcon: tabImageExperiences
+        toolbarIcon: .tabImageExperience
       ) {
         suiPrefPaneExperience()
       },
       Preferences.Pane(
         identifier: Preferences.PaneIdentifier(rawValue: "Dictionary"),
         title: NSLocalizedString("Dictionary", comment: ""),
-        toolbarIcon: tabImageDictionary
+        toolbarIcon: .tabImageDictionary
       ) {
         suiPrefPaneDictionary()
       },
       Preferences.Pane(
         identifier: Preferences.PaneIdentifier(rawValue: "Keyboard"),
         title: NSLocalizedString("Keyboard", comment: ""),
-        toolbarIcon: tabImageKeyboard
+        toolbarIcon: .tabImageKeyboard
       ) {
         suiPrefPaneKeyboard()
       },
       Preferences.Pane(
         identifier: Preferences.PaneIdentifier(rawValue: "DevZone"),
         title: NSLocalizedString("DevZone", comment: ""),
-        toolbarIcon: tabImageDevZone
+        toolbarIcon: .tabImageDevZone
       ) {
         suiPrefPaneDevZone()
       },
@@ -121,5 +152,28 @@ struct Tooltip: NSViewRepresentable {
 extension View {
   public func toolTip(_ tooltip: String) -> some View {
     overlay(Tooltip(tooltip: tooltip))
+  }
+}
+
+// MARK: - Windows Aero in Swift UI
+
+// Ref: https://stackoverflow.com/questions/62461957
+
+@available(macOS 10.15, *)
+struct VisualEffectView: NSViewRepresentable {
+  let material: NSVisualEffectView.Material
+  let blendingMode: NSVisualEffectView.BlendingMode
+
+  func makeNSView(context _: Context) -> NSVisualEffectView {
+    let visualEffectView = NSVisualEffectView()
+    visualEffectView.material = material
+    visualEffectView.blendingMode = blendingMode
+    visualEffectView.state = NSVisualEffectView.State.active
+    return visualEffectView
+  }
+
+  func updateNSView(_ visualEffectView: NSVisualEffectView, context _: Context) {
+    visualEffectView.material = material
+    visualEffectView.blendingMode = blendingMode
   }
 }

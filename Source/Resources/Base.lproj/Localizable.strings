@@ -29,7 +29,7 @@
 "\"%@\" length must ≥ 2 for a user phrase." = "\"%@\" length must ≥ 2 for a user phrase.";
 "\"%@\" length should ≤ %d for a user phrase." = "\"%@\" length should ≤ %d for a user phrase.";
 "\"%@\" selected. ENTER to add user phrase." = "\"%@\" selected. ENTER to add user phrase.";
-"\"%@\" already exists: ENTER to boost, SHIFT+CMD+ENTER to nerf, \n BackSpace or Delete key to exclude." = "\"%@\" already exists: ENTER to boost, SHIFT+CMD+ENTER to nerf, \n BackSpace or Delete key to exclude.";
+"\"%@\" already exists: ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "\"%@\" already exists: ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude.";
 "Edit Phrase Replacement Table…" = "Edit Phrase Replacement Table…";
 "Use Phrase Replacement" = "Use Phrase Replacement";
 "Candidates keys cannot be empty." = "Candidates keys cannot be empty.";
@@ -88,6 +88,7 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)Space:";
+"Adjust the window level of IMK Candidate Window" = "Adjust the window level of IMK Candidate Window";
 "Allow backspace-editing miscomposed readings" = "Allow backspace-editing miscomposed readings";
 "Allow boosting / excluding a candidate of single kanji" = "Allow boosting / excluding a candidate of single kanji";
 "Allow using Enter key to confirm associated candidate selection" = "Allow using Enter key to confirm associated candidate selection";
@@ -119,6 +120,8 @@
 "Choose the phonetic layout for Mandarin parser." = "Choose the phonetic layout for Mandarin parser.";
 "Choose your desired user data folder path. Will be omitted if invalid." = "Choose your desired user data folder path. Will be omitted if invalid.";
 "Choose your preferred layout of the candidate window." = "Choose your preferred layout of the candidate window.";
+"Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter";
+"Completely disable using Shift key to toggling alphanumerical mode" = "Completely disable using Shift key to toggling alphanumerical mode";
 "Cursor Selection:" = "Cursor Selection:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "Dachen (Microsoft Standard / Wang / 01, etc.)";
 "Dachen 26 (libChewing)" = "Dachen 26 (libChewing)";
@@ -145,15 +148,15 @@
 "Hsu" = "Hsu";
 "Hualuo Pinyin with Numeral Intonation" = "Hualuo Pinyin with Numeral Intonation";
 "IBM" = "IBM";
-"IMK candidate window is plagued with issues like failed selection keys." = "IMK candidate window is plagued with issues like failed selection keys.";
+"IMK Candidate Window has a bug (#FB11300759) that it is always shown below NSMenu and Spotlight window by default. By toggling this checkbox, vChewing will attempt to adjust its window level according to its current context. However, this accomodation itself has a bug (also filed in #FB11300759): as long as vChewing application restarted once, IMK Candidate Window will always be shown beneath all other windows in the current desktop." = "IMK Candidate Window has a bug (#FB11300759) that it is always shown below NSMenu and Spotlight window by default. By toggling this checkbox, vChewing will attempt to adjust its window level according to its current context. However, this accomodation itself has a bug (also filed in #FB11300759): as long as vChewing application restarted once, IMK Candidate Window will always be shown beneath all other windows in the current desktop.";
+"IMK candidate window is plagued with issues and incapabilities." = "IMK candidate window is plagued with issues and incapabilities.";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "in front of the phrase (like macOS built-in Zhuyin IME)";
 "Japanese" = "Japanese";
 "Keyboard Shortcuts:" = "Keyboard Shortcuts:";
 "Keyboard" = "Keyboard";
 "Misc Settings:" = "Misc Settings:";
 "MiTAC" = "MiTAC";
-"Non-QWERTY alphanumerical keyboard layouts are for Hanyu Pinyin parser only." = "Non-QWERTY alphanumerical keyboard layouts are for Hanyu Pinyin parser only.";
-"Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter" = "Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter";
+"Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only.";
 "Output Settings:" = "Output Settings:";
 "Phonetic Parser:" = "Phonetic Parser:";
 "Push the cursor in front of the phrase after selection" = "Push the cursor in front of the phrase after selection";

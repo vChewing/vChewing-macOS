@@ -29,7 +29,7 @@
 "\"%@\" length must ≥ 2 for a user phrase." = "「%@」字数不足以自订语汇。";
 "\"%@\" length should ≤ %d for a user phrase." = "「%@」字数超过 %d、无法自订。";
 "\"%@\" selected. ENTER to add user phrase." = "「%@」敲 Enter 添入自订语汇。";
-"\"%@\" already exists: ENTER to boost, SHIFT+CMD+ENTER to nerf, \n BackSpace or Delete key to exclude." = "「%@」已存在：敲 Enter 以升权、敲 Shift+CMD+Enter 以降权；\n　敲 BackSpace 或 Delete 以排除。";
+"\"%@\" already exists: ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "「%@」已存在：敲 Enter 以升权、敲 Shift+Command+Enter 以降权；\n　敲 BackSpace 或 Delete 以排除。";
 "Edit Phrase Replacement Table…" = "编辑语汇置换表…";
 "Use Phrase Replacement" = "使用语汇置换";
 "Candidates keys cannot be empty." = "您必须指定选字键。";
@@ -88,6 +88,7 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)空格键:";
+"Adjust the window level of IMK Candidate Window" = "调整 IMK 选字窗的显示优先级";
 "Allow backspace-editing miscomposed readings" = "允许对无效的读音使用 BackSpace 编辑";
 "Allow boosting / excluding a candidate of single kanji" = "将可以就地升权/排除的候选字词的最短词长设为单个汉字";
 "Allow using Enter key to confirm associated candidate selection" = "允许使用 Enter 确认当前选中的联想词";
@@ -119,6 +120,7 @@
 "Choose the phonetic layout for Mandarin parser." = "请指定普通话/国音分析器所使用的注音排列。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "请在此指定您想指定的使用者语汇档案目录。无效值会被忽略。";
 "Choose your preferred layout of the candidate window." = "选择您所偏好的候选字窗布局。";
+"Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Ctrl(+Option)+Command+Enter 输出汉语拼音而非注音";
 "Completely disable using Shift key to toggling alphanumerical mode" = "彻底禁止使用 Shift 键切换英数模式";
 "Cursor Selection:" = "选字游标:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千排列 (微软标准/王安/零壹/仲鼎/国乔)";
@@ -146,15 +148,15 @@
 "Hsu" = "许氏国音自然排列";
 "Hualuo Pinyin with Numeral Intonation" = "华罗拼音+数字标调";
 "IBM" = "IBM 排列";
-"IMK candidate window is plagued with issues like failed selection keys." = "IMK 选字窗目前暂时无法正常使用选字键，并具其它未知故障。";
+"IMK Candidate Window has a bug (#FB11300759) that it is always shown below NSMenu and Spotlight window by default. By toggling this checkbox, vChewing will attempt to adjust its window level according to its current context. However, this accomodation itself has a bug (also filed in #FB11300759): as long as vChewing application restarted once, IMK Candidate Window will always be shown beneath all other windows in the current desktop." = "IMK 选字窗有一处行为缺陷 (#FB11300759)：在预设情况下，会始终被 NSMenu 和 Spotlight 挡住。启用该选项的话，威注音会试图根据当前状况自动调整该选字窗的显示优先级。然而，该保守治疗方案本身也有一个缺陷 (也备案于 #FB11300759)：只要输入法本身有重新启动过，则 IMK 选字窗便会顽固地显示于当前桌面所有视窗的底部，直至重新开机为止。";
+"IMK candidate window is plagued with issues and incapabilities." = "IMK 选字窗目前暂时无法正常自订选字键，并具其它未知故障。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "将游标置于词语前方 // macOS 内建注音风格";
 "Japanese" = "和语";
 "Keyboard Shortcuts:" = "键盘快捷键:";
 "Keyboard" = "键盘设定";
 "Misc Settings:" = "杂项:";
 "MiTAC" = "神通排列";
-"Non-QWERTY alphanumerical keyboard layouts are for Hanyu Pinyin parser only." = "QWERTY 以外的英数布局是为了汉语拼音排列使用者而准备的。";
-"Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter" = "Ctrl(+Alt)+CMD+Enter 输出汉语拼音而非注音";
+"Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "QWERTY 以外的英数布局是为了拼音排列使用者而准备的。";
 "Output Settings:" = "输出设定:";
 "Phonetic Parser:" = "注音排列:";
 "Push the cursor in front of the phrase after selection" = "在选字后将游标置于该字词的前方";
@@ -178,7 +180,7 @@
 "Universal Pinyin with Numeral Intonation" = "通用拼音+数字标调";
 "Use .langIdentifier to handle UI fonts in candidate window" = "使用 .langIdentifier 来管理选字窗的预设介面字型";
 "Use ESC key to clear the entire input buffer" = "敲 ESC 键以清空整个组字缓冲区";
-"Use IMK Candidate Window instead (will reboot the IME)" = "启用 IMK 选字窗（会自动重启输入法）";
+"Use IMK Candidate Window instead (will reboot the IME)" = "启用与 macOS 内建输入法相同的 IMK 选字窗（会自动重启输入法）";
 "Use Shift Key Accommodation in all cases" = "对任何客体应用均启用 Shift 键相容性措施";
 "Vertical" = "纵向布局";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";

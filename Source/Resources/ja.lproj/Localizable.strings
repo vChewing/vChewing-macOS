@@ -29,7 +29,7 @@
 "\"%@\" length must ≥ 2 for a user phrase." = "「%@」もう１つ文字のお選びを。";
 "\"%@\" length should ≤ %d for a user phrase." = "「%@」文字数過剰で登録不可、%d 文字以内にして下さい。";
 "\"%@\" selected. ENTER to add user phrase." = "「%@」を ENTER で辞書に登録。";
-"\"%@\" already exists: ENTER to boost, SHIFT+CMD+ENTER to nerf, \n BackSpace or Delete key to exclude." = "「%@」は既存語彙：ENTER で最優先にし、SHIFT+CMD+ENTER で優先順位を下げる；\n　BackSpace 或いは Delete で排除。";
+"\"%@\" already exists: ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "「%@」は既存語彙：ENTER で最優先にし、SHIFT+COMMAND+ENTER で優先順位を下げる；\n　BackSpace 或いは Delete で排除。";
 "Edit Phrase Replacement Table…" = "言葉置換表を編集…";
 "Use Phrase Replacement" = "言葉置換機能";
 "Candidates keys cannot be empty." = "言選り用キー陣列に何かキーをご登録ください。";
@@ -88,6 +88,7 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)Space:";
+"Adjust the window level of IMK Candidate Window" = "IMK 候補陳列ウィンドウの表示の優先順位を調整する";
 "Allow backspace-editing miscomposed readings" = "効かぬ音読みを BackSpace で再編集";
 "Allow boosting / excluding a candidate of single kanji" = "即排除/即最優先にできる候補の文字数の最低限は１字とする";
 "Allow using Enter key to confirm associated candidate selection" = "Enter キーを連想語彙候補の確認のために使う";
@@ -119,6 +120,7 @@
 "Choose the phonetic layout for Mandarin parser." = "共通語分析器の注音配列をご指定ください。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "欲しがるユーザー辞書保存先をご指定ください。無効なる保存先設定は省かれる。";
 "Choose your preferred layout of the candidate window." = "入力候補陳列の仕様をご指定ください。";
+"Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Ctrl(+Option)+Command+Enter で出すのを漢語弁音と変換";
 "Completely disable using Shift key to toggling alphanumerical mode" = "Shift キーの英数入力モードの切り替え機能を徹底的に禁ず";
 "Cursor Selection:" = "カーソル候補呼出:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千配列 (Microsoft 標準・王安・零壹など)";
@@ -146,15 +148,15 @@
 "Hsu" = "許氏国音自然配列";
 "Hualuo Pinyin with Numeral Intonation" = "中華ローマ弁音 (ローマ字+数字音調)";
 "IBM" = "IBM 配列";
-"IMK candidate window is plagued with issues like failed selection keys." = "IMK 候補陳列ウィンドウで言選り用キーは現時点で利用不可、尚他故障あり。";
+"IMK Candidate Window has a bug (#FB11300759) that it is always shown below NSMenu and Spotlight window by default. By toggling this checkbox, vChewing will attempt to adjust its window level according to its current context. However, this accomodation itself has a bug (also filed in #FB11300759): as long as vChewing application restarted once, IMK Candidate Window will always be shown beneath all other windows in the current desktop." = "IMK 候補陳列ウィンドウにはこういう欠陥がある (#FB11300759)：何の特殊措置をしない限り、候補陳列ウィンドウは常に NSMenu と Spotlight に遮られている。これをチェックすれば、毎度候補陳列ウィンドウを呼ぶたびに、候補陳列ウィンドウの表示の優先順位を自動的に調整する。だが、この特殊措置こそが、完璧とは言えぬ（この欠陥も #FB11300759 に記されておる）：一旦入力アプリ自身が再起動すると、このパソコンの再起動まで、IMK 候補陳列ウィンドウは所在のデスクトップの全てのウィンドウの後ろに隠されてしまうことになる。";
+"IMK candidate window is plagued with issues and incapabilities." = "IMK 候補陳列ウィンドウで言選り用キーは現時点で調整不可、且つ他故障あり。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "単語の前で // macOS 内蔵注音入力のやり方";
 "Japanese" = "和語";
 "Keyboard Shortcuts:" = "ショートカット:";
 "Keyboard" = "配列設定";
 "Misc Settings:" = "他の設定:";
 "MiTAC" = "神通配列";
-"Non-QWERTY alphanumerical keyboard layouts are for Hanyu Pinyin parser only." = "QWERTY 以外の英数キーボードは漢語弁音以外の配列に不適用。";
-"Output Hanyu-Pinyin in lieu of Zhuyin when Ctrl(+Alt)+CMD+Enter" = "Ctrl(+Alt)+CMD+Enter で出すのを漢語弁音と変換";
+"Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "QWERTY 以外の英数キーボードは弁音以外の配列に不適用。";
 "Output Settings:" = "出力設定:";
 "Phonetic Parser:" = "注音配列:";
 "Push the cursor in front of the phrase after selection" = "候補選択の直後、すぐカーソルを単語の向こうに推し進める";

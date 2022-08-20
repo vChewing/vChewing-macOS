@@ -46,7 +46,7 @@ extension ctlInputMethod {
   }
 
   /// 針對受 .NotEmpty() 管轄的非空狀態，在組字區內顯示游標。
-  private func setInlineDisplayWithCursor() {
+  func setInlineDisplayWithCursor() {
     guard let client = client() else { return }
     if let state = state as? InputState.AssociatedPhrases {
       client.setMarkedText(

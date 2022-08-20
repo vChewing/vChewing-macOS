@@ -25,6 +25,8 @@ struct suiPrefPaneDictionary: View {
     forKey: UserDef.kFetchSuggestionsFromUserOverrideModel.rawValue)
   @State private var selUseFixecCandidateOrderOnSelection: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kUseFixecCandidateOrderOnSelection.rawValue)
+
+  private let contentMaxHeight: Double = 430
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -39,109 +41,113 @@ struct suiPrefPaneDictionary: View {
   }()
 
   var body: some View {
-    Preferences.Container(contentWidth: contentWidth) {
-      Preferences.Section(title: "", bottomDivider: true) {
-        Text(LocalizedStringKey("Choose your desired user data folder path. Will be omitted if invalid."))
-        HStack {
-          if #available(macOS 11.0, *) {
-            TextField(fdrDefault, text: $tbxUserDataPathSpecified).disabled(true)
-              .help(tbxUserDataPathSpecified)
-          } else {
-            TextField(fdrDefault, text: $tbxUserDataPathSpecified).disabled(true)
-              .toolTip(tbxUserDataPathSpecified)
-          }
-          Button {
-            IME.dlgOpenPath.title = NSLocalizedString(
-              "Choose your desired user data folder.", comment: ""
-            )
-            IME.dlgOpenPath.showsResizeIndicator = true
-            IME.dlgOpenPath.showsHiddenFiles = true
-            IME.dlgOpenPath.canChooseFiles = false
-            IME.dlgOpenPath.canChooseDirectories = true
+    ScrollView {
+      Preferences.Container(contentWidth: contentWidth) {
+        Preferences.Section(title: "", bottomDivider: true) {
+          Text(LocalizedStringKey("Choose your desired user data folder path. Will be omitted if invalid."))
+          HStack {
+            if #available(macOS 11.0, *) {
+              TextField(fdrDefault, text: $tbxUserDataPathSpecified).disabled(true)
+                .help(tbxUserDataPathSpecified)
+            } else {
+              TextField(fdrDefault, text: $tbxUserDataPathSpecified).disabled(true)
+                .toolTip(tbxUserDataPathSpecified)
+            }
+            Button {
+              IME.dlgOpenPath.title = NSLocalizedString(
+                "Choose your desired user data folder.", comment: ""
+              )
+              IME.dlgOpenPath.showsResizeIndicator = true
+              IME.dlgOpenPath.showsHiddenFiles = true
+              IME.dlgOpenPath.canChooseFiles = false
+              IME.dlgOpenPath.canChooseDirectories = true
 
-            let bolPreviousFolderValidity = mgrLangModel.checkIfSpecifiedUserDataFolderValid(
-              mgrPrefs.userDataFolderSpecified.expandingTildeInPath)
+              let bolPreviousFolderValidity = mgrLangModel.checkIfSpecifiedUserDataFolderValid(
+                mgrPrefs.userDataFolderSpecified.expandingTildeInPath)
 
-            if let window = ctlPrefUI.shared.controller.window {
-              IME.dlgOpenPath.beginSheetModal(for: window) { result in
-                if result == NSApplication.ModalResponse.OK {
-                  if IME.dlgOpenPath.url != nil {
-                    // CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
-                    // 所以要手動補回來。
-                    var newPath = IME.dlgOpenPath.url!.path
-                    newPath.ensureTrailingSlash()
-                    if mgrLangModel.checkIfSpecifiedUserDataFolderValid(newPath) {
-                      mgrPrefs.userDataFolderSpecified = newPath
-                      tbxUserDataPathSpecified = mgrPrefs.userDataFolderSpecified
-                      IME.initLangModels(userOnly: true)
-                      (NSApplication.shared.delegate as! AppDelegate).updateStreamHelperPath()
-                    } else {
-                      clsSFX.beep()
-                      if !bolPreviousFolderValidity {
-                        mgrPrefs.resetSpecifiedUserDataFolder()
+              if let window = ctlPrefUI.shared.controller.window {
+                IME.dlgOpenPath.beginSheetModal(for: window) { result in
+                  if result == NSApplication.ModalResponse.OK {
+                    if IME.dlgOpenPath.url != nil {
+                      // CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
+                      // 所以要手動補回來。
+                      var newPath = IME.dlgOpenPath.url!.path
+                      newPath.ensureTrailingSlash()
+                      if mgrLangModel.checkIfSpecifiedUserDataFolderValid(newPath) {
+                        mgrPrefs.userDataFolderSpecified = newPath
+                        tbxUserDataPathSpecified = mgrPrefs.userDataFolderSpecified
+                        IME.initLangModels(userOnly: true)
+                        (NSApplication.shared.delegate as! AppDelegate).updateStreamHelperPath()
+                      } else {
+                        clsSFX.beep()
+                        if !bolPreviousFolderValidity {
+                          mgrPrefs.resetSpecifiedUserDataFolder()
+                        }
+                        return
                       }
-                      return
                     }
+                  } else {
+                    if !bolPreviousFolderValidity {
+                      mgrPrefs.resetSpecifiedUserDataFolder()
+                    }
+                    return
                   }
-                } else {
-                  if !bolPreviousFolderValidity {
-                    mgrPrefs.resetSpecifiedUserDataFolder()
-                  }
-                  return
                 }
               }
+            } label: {
+              Text("...")
             }
-          } label: {
-            Text("...")
+            Button {
+              mgrPrefs.resetSpecifiedUserDataFolder()
+              tbxUserDataPathSpecified = ""
+            } label: {
+              Text("↻")
+            }
           }
-          Button {
-            mgrPrefs.resetSpecifiedUserDataFolder()
-            tbxUserDataPathSpecified = ""
-          } label: {
-            Text("↻")
-          }
+          Toggle(
+            LocalizedStringKey("Automatically reload user data files if changes detected"),
+            isOn: $selAutoReloadUserData.onChange {
+              mgrPrefs.shouldAutoReloadUserDataFiles = selAutoReloadUserData
+            }
+          ).controlSize(.small)
+          Divider()
+          Toggle(
+            LocalizedStringKey("Enable CNS11643 Support (2022-07-20)"),
+            isOn: $selEnableCNS11643.onChange {
+              mgrPrefs.cns11643Enabled = selEnableCNS11643
+              mgrLangModel.setCNSEnabled(mgrPrefs.cns11643Enabled)
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Enable symbol input support (incl. certain emoji symbols)"),
+            isOn: $selEnableSymbolInputSupport.onChange {
+              mgrPrefs.symbolInputEnabled = selEnableSymbolInputSupport
+              mgrLangModel.setSymbolEnabled(mgrPrefs.symbolInputEnabled)
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Allow boosting / excluding a candidate of single kanji"),
+            isOn: $selAllowBoostingSingleKanjiAsUserPhrase.onChange {
+              mgrPrefs.allowBoostingSingleKanjiAsUserPhrase = selAllowBoostingSingleKanjiAsUserPhrase
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Applying typing suggestions from half-life user override model"),
+            isOn: $selFetchSuggestionsFromUserOverrideModel.onChange {
+              mgrPrefs.fetchSuggestionsFromUserOverrideModel = selFetchSuggestionsFromUserOverrideModel
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Always use fixed listing order in candidate window"),
+            isOn: $selUseFixecCandidateOrderOnSelection.onChange {
+              mgrPrefs.useFixecCandidateOrderOnSelection = selUseFixecCandidateOrderOnSelection
+            }
+          )
         }
-        Toggle(
-          LocalizedStringKey("Automatically reload user data files if changes detected"),
-          isOn: $selAutoReloadUserData.onChange {
-            mgrPrefs.shouldAutoReloadUserDataFiles = selAutoReloadUserData
-          }
-        ).controlSize(.small)
-        Divider()
-        Toggle(
-          LocalizedStringKey("Enable CNS11643 Support (2022-07-20)"),
-          isOn: $selEnableCNS11643.onChange {
-            mgrPrefs.cns11643Enabled = selEnableCNS11643
-            mgrLangModel.setCNSEnabled(mgrPrefs.cns11643Enabled)
-          }
-        )
-        Toggle(
-          LocalizedStringKey("Enable symbol input support (incl. certain emoji symbols)"),
-          isOn: $selEnableSymbolInputSupport.onChange {
-            mgrPrefs.symbolInputEnabled = selEnableSymbolInputSupport
-            mgrLangModel.setSymbolEnabled(mgrPrefs.symbolInputEnabled)
-          }
-        )
-        Toggle(
-          LocalizedStringKey("Allow boosting / excluding a candidate of single kanji"),
-          isOn: $selAllowBoostingSingleKanjiAsUserPhrase.onChange {
-            mgrPrefs.allowBoostingSingleKanjiAsUserPhrase = selAllowBoostingSingleKanjiAsUserPhrase
-          }
-        )
-        Toggle(
-          LocalizedStringKey("Applying typing suggestions from half-life user override model"),
-          isOn: $selFetchSuggestionsFromUserOverrideModel.onChange {
-            mgrPrefs.fetchSuggestionsFromUserOverrideModel = selFetchSuggestionsFromUserOverrideModel
-          }
-        )
-        Toggle(
-          LocalizedStringKey("Always use fixed listing order in candidate window"),
-          isOn: $selUseFixecCandidateOrderOnSelection.onChange {
-            mgrPrefs.useFixecCandidateOrderOnSelection = selUseFixecCandidateOrderOnSelection
-          }
-        )
       }
     }
+    .frame(maxHeight: contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .background(VisualEffectView(material: .sidebar, blendingMode: .behindWindow))
   }
 }
 

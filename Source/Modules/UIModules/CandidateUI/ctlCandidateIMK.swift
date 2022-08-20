@@ -11,7 +11,7 @@ import InputMethodKit
 
 public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
   public var currentLayout: CandidateLayout = .horizontal
-  private let defaultIMKSelectionKey: [UInt16: String] = [
+  public static let defaultIMKSelectionKey: [UInt16: String] = [
     18: "1", 19: "2", 20: "3", 21: "4", 23: "5", 22: "6", 26: "7", 28: "8", 25: "9",
   ]
   public weak var delegate: ctlCandidateDelegate? {
@@ -241,7 +241,6 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     // 鬼知道為什麼這個函式接收的參數是陣列，但經過測試卻發現這個函式收到的陣列往往內容只有一個。
     // 這也可能是 Objective-C 當中允許接收內容為 nil 的一種方式。
     guard !eventArray.isEmpty else { return }
-    var eventArray = eventArray
     let event = eventArray[0]
     let input = InputSignal(event: event)
     guard let delegate = delegate else { return }
@@ -279,7 +278,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
           }
       }
     } else {
-      if let newChar = defaultIMKSelectionKey[event.keyCode] {
+      if let newChar = ctlCandidateIMK.defaultIMKSelectionKey[event.keyCode] {
         /// 根據 KeyCode 重新換算一下選字鍵的 NSEvent，糾正其 Character 數值。
         /// 反正 IMK 選字窗目前也沒辦法修改選字鍵。
         let newEvent = NSEvent.keyEvent(
@@ -295,12 +294,27 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
           keyCode: event.keyCode
         )
         if let newEvent = newEvent {
-          /// 這裡不用診斷了，檢出的內容都是經過轉換之後的正確 NSEvent。
-          eventArray = Array(eventArray.dropFirst(0))
-          eventArray.insert(newEvent, at: 0)
+          if mgrPrefs.useSCPCTypingMode, delegate.isAssociatedPhrasesState {
+            // 註：input.isShiftHold 已經在 ctlInputMethod.handle() 內處理，因為在那邊處理才有效。
+            if !input.isShiftHold {
+              _ = delegate.sharedEventHandler(event)
+              return
+            }
+          } else {
+            perform(Selector(("handleKeyboardEvent:")), with: newEvent)
+            return
+          }
         }
       }
-      if delegate.isAssociatedPhrasesMode,
+
+      if mgrPrefs.useSCPCTypingMode {
+        if !input.isReservedKey {
+          _ = delegate.sharedEventHandler(event)
+          return
+        }
+      }
+
+      if delegate.isAssociatedPhrasesState,
         !input.isPageUp, !input.isPageDown, !input.isCursorForward, !input.isCursorBackward,
         !input.isCursorClockLeft, !input.isCursorClockRight, !input.isSpace,
         !input.isEnter || !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter
@@ -331,4 +345,26 @@ var currentTISInputSource: TISInputSource? {
     if sourceID == matchedTISString { result = source }
   }
   return result
+}
+
+// MARK: - Translating NumPad KeyCodes to Default IMK Candidate Selection KeyCodes.
+
+extension ctlCandidateIMK {
+  public static func replaceNumPadKeyCodes(target event: NSEvent) -> NSEvent? {
+    let mapNumPadKeyCodeTranslation: [UInt16: UInt16] = [
+      83: 18, 84: 19, 85: 20, 86: 21, 87: 23, 88: 22, 89: 26, 91: 28, 92: 25,
+    ]
+    return NSEvent.keyEvent(
+      with: event.type,
+      location: event.locationInWindow,
+      modifierFlags: event.modifierFlags,
+      timestamp: event.timestamp,
+      windowNumber: event.windowNumber,
+      context: nil,
+      characters: event.characters ?? "",
+      charactersIgnoringModifiers: event.charactersIgnoringModifiers ?? event.characters ?? "",
+      isARepeat: event.isARepeat,
+      keyCode: mapNumPadKeyCodeTranslation[event.keyCode] ?? event.keyCode
+    )
+  }
 }

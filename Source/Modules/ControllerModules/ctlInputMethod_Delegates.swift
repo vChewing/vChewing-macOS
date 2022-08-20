@@ -13,7 +13,10 @@ import Cocoa
 // MARK: - KeyHandler Delegate
 
 extension ctlInputMethod: KeyHandlerDelegate {
-  var clientBundleIdentifier: String { client()?.bundleIdentifier() ?? "" }
+  var clientBundleIdentifier: String {
+    guard let client = client() else { return "" }
+    return client.bundleIdentifier() ?? ""
+  }
 
   func ctlCandidate() -> ctlCandidateProtocol { ctlInputMethod.ctlCandidateCurrent }
 
@@ -52,7 +55,7 @@ extension ctlInputMethod: KeyHandlerDelegate {
 // MARK: - Candidate Controller Delegate
 
 extension ctlInputMethod: ctlCandidateDelegate {
-  var isAssociatedPhrasesMode: Bool { state is InputState.AssociatedPhrases }
+  var isAssociatedPhrasesState: Bool { state is InputState.AssociatedPhrases }
 
   /// 完成 handle() 函式本該完成的內容，但去掉了與 IMK 選字窗有關的判斷語句。
   /// 這樣分開處理很有必要，不然 handle() 函式會陷入無限迴圈。
