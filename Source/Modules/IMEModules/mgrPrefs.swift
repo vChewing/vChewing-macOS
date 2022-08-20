@@ -415,12 +415,7 @@ public enum mgrPrefs {
   // MARK: - Settings (Tier 2)
 
   @UserDefault(key: UserDef.kUseIMKCandidateWindow.rawValue, defaultValue: false)
-  static var useIMKCandidateWindow: Bool {
-    didSet {
-      NSLog("vChewing App self-terminated due to enabling / disabling IMK candidate window.")
-      NSApplication.shared.terminate(nil)
-    }
-  }
+  static var useIMKCandidateWindow: Bool
 
   @UserDefault(key: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue, defaultValue: false)
   static var handleDefaultCandidateFontsByLangIdentifier: Bool

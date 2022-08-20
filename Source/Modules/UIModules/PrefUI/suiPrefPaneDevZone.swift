@@ -47,6 +47,8 @@ struct suiPrefPaneDevZone: View {
             LocalizedStringKey("Use IMK Candidate Window instead (will reboot the IME)"),
             isOn: $selUseIMKCandidateWindow.onChange {
               mgrPrefs.useIMKCandidateWindow = selUseIMKCandidateWindow
+              NSLog("vChewing App self-terminated due to enabling / disabling IMK candidate window.")
+              NSApplication.shared.terminate(nil)
             }
           )
           Text(LocalizedStringKey("IMK candidate window is plagued with issues and incapabilities."))
