@@ -51,11 +51,16 @@ extension NSImage {
   }
 
   static var tabImageDevZone: NSImage! {
+    if #available(macOS 12.0, *) {
+      return NSImage(
+        systemSymbolName: "hand.raised.circle", accessibilityDescription: "DevZone Preferences"
+      )
+    }
     if #unavailable(macOS 11.0) {
       return NSImage(named: "PrefToolbar-DevZone")
     } else {
       return NSImage(
-        systemSymbolName: "hand.raised.circle", accessibilityDescription: "DevZone Preferences"
+        systemSymbolName: "pc", accessibilityDescription: "DevZone Preferences"
       )
     }
   }
