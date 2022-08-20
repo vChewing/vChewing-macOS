@@ -1111,7 +1111,6 @@ Features listed here may not work as expected.</string>
                         <font key="font" metaFont="cellTitle"/>
                     </buttonCell>
                     <connections>
-                        <action selector="updateIMKCandidateEnableStatusAction:" target="-2" id="dAG-Si-cta"/>
                         <binding destination="32" name="value" keyPath="values.AdjustIMKCandidateWindowLevel" id="E6Z-Rn-IHD"/>
                         <binding destination="32" name="enabled" keyPath="values.UseIMKCandidateWindow" id="qla-KO-plC"/>
                     </connections>

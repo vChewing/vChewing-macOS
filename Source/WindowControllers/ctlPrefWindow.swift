@@ -240,6 +240,7 @@ class ctlPrefWindow: NSWindowController {
   }
 
   @IBAction func updateIMKCandidateEnableStatusAction(_: Any) {
+    NSLog("vChewing App self-terminated due to enabling / disabling IMK candidate window.")
     NSApplication.shared.terminate(nil)
   }
 
