@@ -262,11 +262,6 @@
                     </popUpButtonCell>
                     <connections>
                         <binding destination="32" name="selectedTag" keyPath="values.CandidateListTextSize" id="107"/>
-                        <binding destination="32" name="enabled" keyPath="values.UseIMKCandidateWindow" id="bpc-Zm-I2n">
-                            <dictionary key="options">
-                                <string key="NSValueTransformerName">NSNegateBoolean</string>
-                            </dictionary>
-                        </binding>
                     </connections>
                 </popUpButton>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0Fh-O5-BKD">
