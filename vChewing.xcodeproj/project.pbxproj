@@ -332,6 +332,7 @@
 		5BEDB71E283B4AEA0078EB25 /* data-symbols.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-symbols.plist"; path = "Data/data-symbols.plist"; sourceTree = "<group>"; };
 		5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-zhuyinwen.plist"; path = "Data/data-zhuyinwen.plist"; sourceTree = "<group>"; };
 		5BEDB720283B4AEA0078EB25 /* data-cht.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-cht.plist"; path = "Data/data-cht.plist"; sourceTree = "<group>"; };
+		5BF255CD28B2694E003ECB60 /* vChewing-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vChewing-Bridging-Header.h"; sourceTree = "<group>"; };
 		5BF9DA2228840E6200DBD48E /* template-usersymbolphrases.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-usersymbolphrases.txt"; sourceTree = "<group>"; usesTabs = 0; };
 		5BF9DA2328840E6200DBD48E /* template-exclusions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-exclusions.txt"; sourceTree = "<group>"; usesTabs = 0; };
 		5BF9DA2428840E6200DBD48E /* template-associatedPhrases-chs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; name = "template-associatedPhrases-chs.txt"; path = "../Data/components/chs/template-associatedPhrases-chs.txt"; sourceTree = "<group>"; usesTabs = 0; };
@@ -760,6 +761,14 @@
 			path = KeyboardExtension;
 			sourceTree = "<group>";
 		};
+		5BF255CC28B2690B003ECB60 /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				5BF255CD28B2694E003ECB60 /* vChewing-Bridging-Header.h */,
+			);
+			path = Headers;
+			sourceTree = "<group>";
+		};
 		6A0D4E9215FC0CFA00ABF4B3 = {
 			isa = PBXGroup;
 			children = (
@@ -793,6 +802,7 @@
 			children = (
 				5B62A35027AE7F6600A19448 /* Data */,
 				5B62A30127AE732800A19448 /* 3rdParty */,
+				5BF255CC28B2690B003ECB60 /* Headers */,
 				6A0D4F1215FC0EB100ABF4B3 /* Modules */,
 				5B62A33027AE78E500A19448 /* Resources */,
 				5B62A33A27AE7C7500A19448 /* WindowControllers */,
@@ -962,7 +972,7 @@
 						ProvisioningStyle = Automatic;
 					};
 					6A0D4EA115FC0D2D00ABF4B3 = {
-						LastSwiftMigration = 1240;
+						LastSwiftMigration = 1400;
 						ProvisioningStyle = Automatic;
 					};
 					6ACA41CA15FC1D7500935EF6 = {
@@ -1668,6 +1678,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
@@ -1711,6 +1722,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "Source/Headers/vChewing-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1723,6 +1735,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
@@ -1760,6 +1773,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OBJC_BRIDGING_HEADER = "Source/Headers/vChewing-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = app;
 			};

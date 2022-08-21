@@ -110,7 +110,9 @@ extension ctlInputMethod {
     if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK,
       mgrPrefs.adjustIMKCandidateWindowLevel
     {
-      ctlCandidateCurrent.perform(Selector(("setWindowLevel:")), with: client.windowLevel() + 1000)
+      while ctlCandidateCurrent.windowLevel() <= client.windowLevel() {
+        ctlCandidateCurrent.setWindowLevel(UInt64(max(0, client.windowLevel() + 1000)))
+      }
     }
 
     ctlInputMethod.ctlCandidateCurrent.visible = true

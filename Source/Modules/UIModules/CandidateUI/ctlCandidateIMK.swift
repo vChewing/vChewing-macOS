@@ -50,7 +50,17 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
   public var keyLabelFont: NSFont = NSFont.monospacedDigitSystemFont(
     ofSize: 14, weight: .medium
   )
-  public var candidateFont: NSFont = NSFont.systemFont(ofSize: 18)
+
+  public var candidateFont: NSFont = NSFont.systemFont(ofSize: 18) {
+    didSet {
+      setFontSize(candidateFont.pointSize)
+      var attributes = attributes()
+      // FB11300759: Set "NSAttributedString.Key.font" doesn't work.
+      attributes?[NSAttributedString.Key.font] = candidateFont
+      setAttributes(attributes)
+    }
+  }
+
   public var tooltip: String = ""
 
   var keyCount = 0
@@ -301,7 +311,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
               return
             }
           } else {
-            perform(Selector(("handleKeyboardEvent:")), with: newEvent)
+            handleKeyboardEvent(newEvent)
             return
           }
         }
