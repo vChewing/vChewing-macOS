@@ -91,7 +91,7 @@ extension ctlInputMethod {
     ctlInputMethod.ctlCandidateCurrent.keyLabelFont = labelFont(
       name: mgrPrefs.candidateKeyLabelFontName, size: keyLabelSize
     )
-    ctlInputMethod.ctlCandidateCurrent.candidateFont = candidateFont(
+    ctlInputMethod.ctlCandidateCurrent.candidateFont = ctlInputMethod.candidateFont(
       name: mgrPrefs.candidateTextFontName, size: textSize
     )
 
@@ -168,7 +168,7 @@ extension ctlInputMethod {
   /// 5) Do NOT enable either KangXi conversion mode nor JIS conversion mode. They are disabled by default.
   /// 6) Expecting the glyph differences of the candidate "骨" between PingFang SC and PingFang TC when rendering
   ///    the candidate window in different "vChewing-CHS" and "vChewing-CHT" input modes.
-  func candidateFont(name: String?, size: CGFloat) -> NSFont {
+  static func candidateFont(name: String? = nil, size: CGFloat) -> NSFont {
     let finalReturnFont: NSFont =
       {
         switch IME.currentInputMode {
@@ -183,7 +183,7 @@ extension ctlInputMethod {
         }
       }()
       ?? NSFont.systemFont(ofSize: size)
-    if let name = name {
+    if let name = name, !name.isEmpty {
       return NSFont(name: name, size: size) ?? finalReturnFont
     }
     return finalReturnFont
