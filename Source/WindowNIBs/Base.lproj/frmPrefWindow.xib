@@ -1055,11 +1055,11 @@
             <point key="canvasLocation" x="-392" y="-704"/>
         </visualEffectView>
         <visualEffectView blendingMode="behindWindow" material="sidebar" state="followsWindowActiveState" id="Qd7-ln-nNO" userLabel="vwrDevZone">
-            <rect key="frame" x="0.0" y="0.0" width="445" height="272"/>
+            <rect key="frame" x="0.0" y="0.0" width="445" height="190"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lblControlDevZoneTitleDescription" userLabel="lblControlDevZoneTitleDescription">
-                    <rect key="frame" x="18" y="222" width="343" height="30"/>
+                    <rect key="frame" x="18" y="140" width="343" height="30"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" id="lblDevZoneTitleDescription">
                         <font key="font" metaFont="cellTitle"/>
                         <string key="title">Warning: This page is for testing future features.
@@ -1069,10 +1069,10 @@ Features listed here may not work as expected.</string>
                     </textFieldCell>
                 </textField>
                 <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="P1o-bW-Tjn">
-                    <rect key="frame" x="20" y="211" width="339" height="5"/>
+                    <rect key="frame" x="20" y="129" width="339" height="5"/>
                 </box>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="le7-59-tFK" userLabel="tglControlDevZoneIMKCandidate">
-                    <rect key="frame" x="19" y="191.5" width="340" height="17"/>
+                    <rect key="frame" x="19" y="109.5" width="340" height="17"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="16" id="054-U2-1Xk"/>
                     </constraints>
@@ -1086,7 +1086,7 @@ Features listed here may not work as expected.</string>
                     </connections>
                 </button>
                 <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jrF-Cr-EDB" userLabel="lblControlDevZoneIMKCandidate">
-                    <rect key="frame" x="18" y="169" width="409" height="14"/>
+                    <rect key="frame" x="18" y="31" width="409" height="70"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="405" id="eHP-6y-RUV"/>
                     </constraints>
@@ -1096,54 +1096,21 @@ Features listed here may not work as expected.</string>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OJj-Hq-nF8" userLabel="tglControlDevZoneIMKCandidateLevel">
-                    <rect key="frame" x="19" y="145.5" width="406" height="17"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="16" id="pEL-6t-gbP"/>
-                    </constraints>
-                    <buttonCell key="cell" type="check" title="Adjust the window level of IMK Candidate Window" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="tglDevZoneIMKCandidateLevel" userLabel="tglDevZoneIMKCandidateLevel">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="cellTitle"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="32" name="value" keyPath="values.AdjustIMKCandidateWindowLevel" id="E6Z-Rn-IHD"/>
-                        <binding destination="32" name="enabled" keyPath="values.UseIMKCandidateWindow" id="qla-KO-plC"/>
-                    </connections>
-                </button>
-                <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4qO-ck-Pzw" userLabel="lblControlDevZoneIMKCandidateLevel">
-                    <rect key="frame" x="18" y="39" width="409" height="98"/>
-                    <constraints>
-                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="98" id="s4O-ec-pBz"/>
-                        <constraint firstAttribute="width" constant="405" id="zNy-dn-yPR"/>
-                    </constraints>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="lblDevZoneIMKCandidateLevel" userLabel="lblDevZoneIMKCandidateLevel">
-                        <font key="font" metaFont="smallSystem"/>
-                        <string key="title">IMK Candidate Window has a bug (#FB11300759) that it is always shown below NSMenu and Spotlight window by default. By toggling this checkbox, vChewing will attempt to adjust its window level according to its current context. However, this accomodation itself has a bug (also filed in #FB11300759): as long as vChewing application restarted once, IMK Candidate Window will always be shown beneath all other windows in the current desktop.</string>
-                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
             </subviews>
             <constraints>
                 <constraint firstItem="lblControlDevZoneTitleDescription" firstAttribute="leading" secondItem="Qd7-ln-nNO" secondAttribute="leading" constant="20" symbolic="YES" id="0Ia-ut-ksj"/>
-                <constraint firstItem="OJj-Hq-nF8" firstAttribute="top" secondItem="jrF-Cr-EDB" secondAttribute="bottom" constant="6.5" id="2sJ-y7-C7J"/>
                 <constraint firstItem="le7-59-tFK" firstAttribute="trailing" secondItem="P1o-bW-Tjn" secondAttribute="trailing" id="5G1-VY-skr"/>
-                <constraint firstItem="jrF-Cr-EDB" firstAttribute="trailing" secondItem="OJj-Hq-nF8" secondAttribute="trailing" id="EL1-YF-bHq"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="jrF-Cr-EDB" secondAttribute="trailing" constant="20" symbolic="YES" id="H1b-Lt-gQQ"/>
                 <constraint firstItem="jrF-Cr-EDB" firstAttribute="leading" secondItem="le7-59-tFK" secondAttribute="leading" id="HZn-ty-n6v"/>
-                <constraint firstItem="4qO-ck-Pzw" firstAttribute="top" secondItem="OJj-Hq-nF8" secondAttribute="bottom" constant="9" id="L8p-vO-Fo7"/>
                 <constraint firstItem="lblControlDevZoneTitleDescription" firstAttribute="trailing" secondItem="P1o-bW-Tjn" secondAttribute="trailing" id="LqC-ii-aOO"/>
-                <constraint firstItem="4qO-ck-Pzw" firstAttribute="leading" secondItem="OJj-Hq-nF8" secondAttribute="leading" id="UVx-eH-QjH"/>
                 <constraint firstItem="lblControlDevZoneTitleDescription" firstAttribute="leading" secondItem="P1o-bW-Tjn" secondAttribute="leading" id="Wc3-Oe-D2E"/>
                 <constraint firstItem="P1o-bW-Tjn" firstAttribute="top" secondItem="lblControlDevZoneTitleDescription" secondAttribute="bottom" constant="8" symbolic="YES" id="Whf-Gf-g65"/>
-                <constraint firstAttribute="bottom" relation="lessThanOrEqual" secondItem="4qO-ck-Pzw" secondAttribute="bottom" constant="39" id="Wrk-iz-rTZ"/>
-                <constraint firstItem="jrF-Cr-EDB" firstAttribute="leading" secondItem="OJj-Hq-nF8" secondAttribute="leading" id="Z1H-NT-vGK"/>
                 <constraint firstItem="jrF-Cr-EDB" firstAttribute="top" secondItem="le7-59-tFK" secondAttribute="bottom" constant="9" id="aj4-H1-92H"/>
-                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="4qO-ck-Pzw" secondAttribute="trailing" constant="20" symbolic="YES" id="erj-vd-tL0"/>
                 <constraint firstItem="le7-59-tFK" firstAttribute="top" secondItem="P1o-bW-Tjn" secondAttribute="bottom" constant="5.5" id="j3c-3A-4JT"/>
                 <constraint firstItem="le7-59-tFK" firstAttribute="leading" secondItem="P1o-bW-Tjn" secondAttribute="leading" id="tqq-97-fHt"/>
                 <constraint firstItem="lblControlDevZoneTitleDescription" firstAttribute="top" secondItem="Qd7-ln-nNO" secondAttribute="top" constant="20" symbolic="YES" id="vYg-x4-tfo"/>
             </constraints>
-            <point key="canvasLocation" x="-393.5" y="-66"/>
+            <point key="canvasLocation" x="-393.5" y="-107"/>
         </visualEffectView>
     </objects>
 </document>

@@ -88,7 +88,6 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)空格键:";
-"Adjust the window level of IMK Candidate Window" = "调整 IMK 选字窗的显示优先级";
 "Allow backspace-editing miscomposed readings" = "允许对无效的读音使用 BackSpace 编辑";
 "Allow boosting / excluding a candidate of single kanji" = "将可以就地升权/排除的候选字词的最短词长设为单个汉字";
 "Allow using Enter key to confirm associated candidate selection" = "允许使用 Enter 确认当前选中的联想词";
@@ -148,7 +147,6 @@
 "Hsu" = "许氏国音自然排列";
 "Hualuo Pinyin with Numeral Intonation" = "华罗拼音+数字标调";
 "IBM" = "IBM 排列";
-"IMK Candidate Window has a bug (#FB11300759) that it is always shown below NSMenu and Spotlight window by default. By toggling this checkbox, vChewing will attempt to adjust its window level according to its current context. However, this accomodation itself has a bug (also filed in #FB11300759): as long as vChewing application restarted once, IMK Candidate Window will always be shown beneath all other windows in the current desktop." = "IMK 选字窗有一处行为缺陷 (#FB11300759)：在预设情况下，会始终被 NSMenu 和 Spotlight 挡住。启用该选项的话，威注音会试图根据当前状况自动调整该选字窗的显示优先级。然而，该保守治疗方案本身也有一个缺陷 (也备案于 #FB11300759)：只要输入法本身有重新启动过，则 IMK 选字窗便会顽固地显示于当前桌面所有视窗的底部，直至重新开机为止。";
 "IMK candidate window is plagued with issues and incapabilities." = "IMK 选字窗目前暂时无法正常自订选字键，并具其它未知故障。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "将游标置于词语前方 // macOS 内建注音风格";
 "Japanese" = "和语";

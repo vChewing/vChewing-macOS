@@ -16,8 +16,6 @@ struct suiPrefPaneDevZone: View {
     forKey: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue)
   @State private var selShouldAlwaysUseShiftKeyAccommodation: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kShouldAlwaysUseShiftKeyAccommodation.rawValue)
-  @State private var selAdjustIMKCandidateWindowLevel: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kAdjustIMKCandidateWindowLevel.rawValue)
 
   private let contentMaxHeight: Double = 430
   private let contentWidth: Double = {
@@ -60,18 +58,6 @@ struct suiPrefPaneDevZone: View {
           )
           Text(LocalizedStringKey("IMK candidate window is plagued with issues and incapabilities."))
             .preferenceDescription().fixedSize(horizontal: false, vertical: true)
-          Toggle(
-            LocalizedStringKey("Adjust the window level of IMK Candidate Window"),
-            isOn: $selAdjustIMKCandidateWindowLevel.onChange {
-              mgrPrefs.adjustIMKCandidateWindowLevel = selAdjustIMKCandidateWindowLevel
-            }
-          ).disabled(mgrPrefs.useIMKCandidateWindow == false)
-          Text(
-            LocalizedStringKey(
-              "IMK Candidate Window has a bug (#FB11300759) that it is always shown below NSMenu and Spotlight window by default. By toggling this checkbox, vChewing will attempt to adjust its window level according to its current context. However, this accomodation itself has a bug (also filed in #FB11300759): as long as vChewing application restarted once, IMK Candidate Window will always be shown beneath all other windows in the current desktop."
-            )
-          )
-          .preferenceDescription().fixedSize(horizontal: false, vertical: true)
           Toggle(
             LocalizedStringKey("Use .langIdentifier to handle UI fonts in candidate window"),
             isOn: $selHandleDefaultCandidateFontsByLangIdentifier.onChange {

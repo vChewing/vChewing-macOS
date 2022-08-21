@@ -63,7 +63,6 @@
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
 "lblDevZoneIMKCandidate.title" = "IMK 选字窗目前暂时无法正常自订选字键，并具其它未知故障。";
-"lblDevZoneIMKCandidateLevel.title" = "IMK 选字窗有一处行为缺陷 (#FB11300759)：在预设情况下，会始终被 NSMenu 和 Spotlight 挡住。启用该选项的话，威注音会试图根据当前状况自动调整该选字窗的显示优先级。然而，该保守治疗方案本身也有一个缺陷 (也备案于 #FB11300759)：只要输入法本身有重新启动过，则 IMK 选字窗便会顽固地显示于当前桌面所有视窗的底部，直至重新开机为止。";
 "lblDevZoneTitleDescription.title" = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";
 "lblUpperCaseLetterKeyBehavior.title" = "指定 Shift+字母键 的行为。";
 "Parser11.title" = "国音二式+数字标调";
@@ -81,7 +80,6 @@
 "s7u-Fm-dVg.title" = "轮替页面";
 "shc-Nu-UsM.title" = "在选字窗内显示翻页按钮";
 "tglDevZoneIMKCandidate.title" = "启用与 macOS 内建输入法相同的 IMK 选字窗（会自动重启输入法）";
-"tglDevZoneIMKCandidateLevel.title" = "调整 IMK 选字窗的显示优先级";
 "TXr-FF-ehw.title" = "繁体中文";
 "ueU-Rz-a1C.title" = "指定 (Shift+)Tab 热键在选字窗内的轮替操作对象。";
 "VdT-fw-7pQ.title" = "侦错模式";

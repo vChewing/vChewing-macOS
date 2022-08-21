@@ -88,7 +88,6 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)Space:";
-"Adjust the window level of IMK Candidate Window" = "Adjust the window level of IMK Candidate Window";
 "Allow backspace-editing miscomposed readings" = "Allow backspace-editing miscomposed readings";
 "Allow boosting / excluding a candidate of single kanji" = "Allow boosting / excluding a candidate of single kanji";
 "Allow using Enter key to confirm associated candidate selection" = "Allow using Enter key to confirm associated candidate selection";
@@ -148,7 +147,6 @@
 "Hsu" = "Hsu";
 "Hualuo Pinyin with Numeral Intonation" = "Hualuo Pinyin with Numeral Intonation";
 "IBM" = "IBM";
-"IMK Candidate Window has a bug (#FB11300759) that it is always shown below NSMenu and Spotlight window by default. By toggling this checkbox, vChewing will attempt to adjust its window level according to its current context. However, this accomodation itself has a bug (also filed in #FB11300759): as long as vChewing application restarted once, IMK Candidate Window will always be shown beneath all other windows in the current desktop." = "IMK Candidate Window has a bug (#FB11300759) that it is always shown below NSMenu and Spotlight window by default. By toggling this checkbox, vChewing will attempt to adjust its window level according to its current context. However, this accomodation itself has a bug (also filed in #FB11300759): as long as vChewing application restarted once, IMK Candidate Window will always be shown beneath all other windows in the current desktop.";
 "IMK candidate window is plagued with issues and incapabilities." = "IMK candidate window is plagued with issues and incapabilities.";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "in front of the phrase (like macOS built-in Zhuyin IME)";
 "Japanese" = "Japanese";
