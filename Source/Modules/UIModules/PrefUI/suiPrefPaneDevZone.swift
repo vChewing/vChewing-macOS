@@ -33,6 +33,13 @@ struct suiPrefPaneDevZone: View {
     }
   }()
 
+  var isMontereyOrAbove: Bool = {
+    if #available(macOS 12.0, *) {
+      return true
+    }
+    return false
+  }()
+
   var body: some View {
     ScrollView {
       Preferences.Container(contentWidth: contentWidth) {
@@ -77,6 +84,7 @@ struct suiPrefPaneDevZone: View {
             )
           )
           .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+          .disabled(!isMontereyOrAbove)
           Toggle(
             LocalizedStringKey("Use Shift Key Accommodation in all cases"),
             isOn: $selShouldAlwaysUseShiftKeyAccommodation.onChange {
