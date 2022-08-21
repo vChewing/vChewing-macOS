@@ -107,9 +107,7 @@ extension ctlInputMethod {
     ctlInputMethod.ctlCandidateCurrent.reloadData()
 
     // Spotlight 視窗會擋住 IMK 選字窗，所以需要特殊處理。
-    if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK,
-      mgrPrefs.adjustIMKCandidateWindowLevel
-    {
+    if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK {
       while ctlCandidateCurrent.windowLevel() <= client.windowLevel() {
         ctlCandidateCurrent.setWindowLevel(UInt64(max(0, client.windowLevel() + 1000)))
       }
