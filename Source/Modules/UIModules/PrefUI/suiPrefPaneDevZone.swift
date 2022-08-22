@@ -16,8 +16,6 @@ struct suiPrefPaneDevZone: View {
     forKey: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue)
   @State private var selShouldAlwaysUseShiftKeyAccommodation: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kShouldAlwaysUseShiftKeyAccommodation.rawValue)
-  @State private var selAdjustIMKCandidateWindowLevel: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kAdjustIMKCandidateWindowLevel.rawValue)
 
   private let contentMaxHeight: Double = 430
   private let contentWidth: Double = {
@@ -31,6 +29,13 @@ struct suiPrefPaneDevZone: View {
           return 550
         }
     }
+  }()
+
+  var isMontereyOrAbove: Bool = {
+    if #available(macOS 12.0, *) {
+      return true
+    }
+    return false
   }()
 
   var body: some View {
@@ -51,17 +56,9 @@ struct suiPrefPaneDevZone: View {
               NSApplication.shared.terminate(nil)
             }
           )
-          Text(LocalizedStringKey("IMK candidate window is plagued with issues and incapabilities."))
-            .preferenceDescription().fixedSize(horizontal: false, vertical: true)
-          Toggle(
-            LocalizedStringKey("Adjust the window level of IMK Candidate Window"),
-            isOn: $selAdjustIMKCandidateWindowLevel.onChange {
-              mgrPrefs.adjustIMKCandidateWindowLevel = selAdjustIMKCandidateWindowLevel
-            }
-          ).disabled(mgrPrefs.useIMKCandidateWindow == false)
           Text(
             LocalizedStringKey(
-              "IMK Candidate Window has a bug (#FB11300759) that it is always shown below NSMenu and Spotlight window by default. By toggling this checkbox, vChewing will attempt to adjust its window level according to its current context. However, this accomodation itself has a bug (also filed in #FB11300759): as long as vChewing application restarted once, IMK Candidate Window will always be shown beneath all other windows in the current desktop."
+              "IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases."
             )
           )
           .preferenceDescription().fixedSize(horizontal: false, vertical: true)
@@ -77,6 +74,7 @@ struct suiPrefPaneDevZone: View {
             )
           )
           .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+          .disabled(!isMontereyOrAbove)
           Toggle(
             LocalizedStringKey("Use Shift Key Accommodation in all cases"),
             isOn: $selShouldAlwaysUseShiftKeyAccommodation.onChange {

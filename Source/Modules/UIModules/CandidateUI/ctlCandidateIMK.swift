@@ -50,7 +50,34 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
   public var keyLabelFont: NSFont = NSFont.monospacedDigitSystemFont(
     ofSize: 14, weight: .medium
   )
-  public var candidateFont: NSFont = NSFont.systemFont(ofSize: 18)
+
+  public var candidateFont: NSFont = NSFont.systemFont(ofSize: 18) {
+    didSet {
+      setFontSize(candidateFont.pointSize)
+      var attributes = attributes()
+      // FB11300759: Set "NSAttributedString.Key.font" doesn't work.
+      attributes?[NSAttributedString.Key.font] = candidateFont
+      if mgrPrefs.handleDefaultCandidateFontsByLangIdentifier {
+        switch IME.currentInputMode {
+          case InputMode.imeModeCHS:
+            if #available(macOS 12.0, *) {
+              attributes?[NSAttributedString.Key.languageIdentifier] = "zh-Hans" as AnyObject
+            }
+          case InputMode.imeModeCHT:
+            if #available(macOS 12.0, *) {
+              attributes?[NSAttributedString.Key.languageIdentifier] =
+                (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
+                ? "ja" as AnyObject : "zh-Hant" as AnyObject
+            }
+          default:
+            break
+        }
+      }
+      setAttributes(attributes)
+      update()
+    }
+  }
+
   public var tooltip: String = ""
 
   var keyCount = 0
@@ -64,13 +91,13 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
       case .vertical:
         setPanelType(kIMKSingleColumnScrollingCandidatePanel)
     }
-    // 設為 true 表示先交給 ctlIME 處理
-    setAttributes([IMKCandidatesSendServerKeyEventFirst: true])
   }
 
   public required init(_ layout: CandidateLayout = .horizontal) {
     super.init(server: theServer, panelType: kIMKScrollingGridCandidatePanel)
     specifyLayout(layout)
+    // 設為 true 表示先交給 ctlIME 處理
+    setAttributes([IMKCandidatesSendServerKeyEventFirst: true])
     visible = false
     // guard let currentTISInputSource = currentTISInputSource else { return }  // 下面兩句都沒用，所以註釋掉。
     // setSelectionKeys([18, 19, 20, 21, 23, 22, 26, 28, 25])  // 這句是壞的，用了反而沒有選字鍵。
@@ -301,7 +328,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
               return
             }
           } else {
-            perform(Selector(("handleKeyboardEvent:")), with: newEvent)
+            handleKeyboardEvent(newEvent)
             return
           }
         }

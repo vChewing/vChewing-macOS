@@ -88,7 +88,6 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)空格鍵:";
-"Adjust the window level of IMK Candidate Window" = "調整 IMK 選字窗的顯示優先級";
 "Allow backspace-editing miscomposed readings" = "允許對無效的讀音使用 BackSpace 編輯";
 "Allow boosting / excluding a candidate of single kanji" = "將可以就地升權/排除的候選字詞的最短詞長設為單個漢字";
 "Allow using Enter key to confirm associated candidate selection" = "允許使用 Enter 確認當前選中的聯想詞";
@@ -148,8 +147,7 @@
 "Hsu" = "許氏國音自然排列";
 "Hualuo Pinyin with Numeral Intonation" = "華羅拼音+數字標調";
 "IBM" = "IBM 排列";
-"IMK Candidate Window has a bug (#FB11300759) that it is always shown below NSMenu and Spotlight window by default. By toggling this checkbox, vChewing will attempt to adjust its window level according to its current context. However, this accomodation itself has a bug (also filed in #FB11300759): as long as vChewing application restarted once, IMK Candidate Window will always be shown beneath all other windows in the current desktop." = "IMK 選字窗有一處行為缺陷 (#FB11300759)：在預設情況下，會始終被 NSMenu 和 Spotlight 擋住。啟用該選項的話，威注音會試圖根據當前狀況自動調整該選字窗的顯示優先級。然而，該保守治療方案本身也有一個缺陷 (也備案於 #FB11300759)：只要輸入法本身有重新啟動過，則 IMK 選字窗便會頑固地顯示於當前桌面所有視窗的底部，直至重新開機為止。";
-"IMK candidate window is plagued with issues and incapabilities." = "IMK 選字窗目前暫時無法正常自訂選字鍵，併具其它未知故障。";
+"IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases." = "IMK 選字窗依賴於 Apple 的私有 API，而且是藉由橋接檔案頭強制曝露的方法使用的。目前，該功能僅在 macOS 10.14 Mojave 至 macOS 13 Ventura 系統內有測試過可用性。至於在未來的 macOS 發行版當中是否可用，則需要另行測試、才能下結論。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "將游標置於詞語前方 // macOS 內建注音風格";
 "Japanese" = "和語";
 "Keyboard Shortcuts:" = "鍵盤快速鍵:";

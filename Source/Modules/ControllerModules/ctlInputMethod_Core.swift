@@ -252,7 +252,7 @@ class ctlInputMethod: IMKInputController {
           isARepeat: event.isARepeat,
           keyCode: event.keyCode
         )
-        ctlCandidateCurrent.perform(Selector(("handleKeyboardEvent:")), with: newEvent)
+        ctlCandidateCurrent.handleKeyboardEvent(newEvent)
       }
 
       ctlCandidateCurrent.interpretKeyEvents([event])
