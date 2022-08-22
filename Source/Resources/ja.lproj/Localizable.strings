@@ -147,7 +147,7 @@
 "Hsu" = "許氏国音自然配列";
 "Hualuo Pinyin with Numeral Intonation" = "中華ローマ弁音 (ローマ字+数字音調)";
 "IBM" = "IBM 配列";
-"IMK candidate window is plagued with issues and incapabilities." = "IMK 候補陳列ウィンドウで言選り用キーは現時点で調整不可、且つ他故障あり。";
+"IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases." = "IMK 候補陳列ウィンドウは、Apple の未公開のAPIを「bridging-header」という強引的な手段で引き出して利用した機能である。現時点で macOS 10.14 Mojave から macOS 13 Ventura まで利用可能であるが、その後の新しい macOS との互換性の話はまだ早い。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "単語の前で // macOS 内蔵注音入力のやり方";
 "Japanese" = "和語";
 "Keyboard Shortcuts:" = "ショートカット:";

@@ -1090,8 +1090,9 @@ Features listed here may not work as expected.</string>
                     <constraints>
                         <constraint firstAttribute="width" constant="405" id="eHP-6y-RUV"/>
                     </constraints>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="IMK candidate window is plagued with issues and incapabilities." id="lblDevZoneIMKCandidate" userLabel="lblDevZoneIMKCandidate">
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="lblDevZoneIMKCandidate" userLabel="lblDevZoneIMKCandidate">
                         <font key="font" metaFont="smallSystem"/>
+                        <string key="title">IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases.</string>
                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>

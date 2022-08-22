@@ -56,8 +56,12 @@ struct suiPrefPaneDevZone: View {
               NSApplication.shared.terminate(nil)
             }
           )
-          Text(LocalizedStringKey("IMK candidate window is plagued with issues and incapabilities."))
-            .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+          Text(
+            LocalizedStringKey(
+              "IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases."
+            )
+          )
+          .preferenceDescription().fixedSize(horizontal: false, vertical: true)
           Toggle(
             LocalizedStringKey("Use .langIdentifier to handle UI fonts in candidate window"),
             isOn: $selHandleDefaultCandidateFontsByLangIdentifier.onChange {

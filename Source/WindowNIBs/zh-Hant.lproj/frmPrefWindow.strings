@@ -62,7 +62,7 @@
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
-"lblDevZoneIMKCandidate.title" = "IMK 選字窗目前暫時無法正常自訂選字鍵，併具其它未知故障。";
+"lblDevZoneIMKCandidate.title" = "IMK 選字窗依賴於 Apple 的私有 API，而且是藉由橋接檔案頭強制曝露的方法使用的。目前，該功能僅在 macOS 10.14 Mojave 至 macOS 13 Ventura 系統內有測試過可用性。至於在未來的 macOS 發行版當中是否可用，則需要另行測試、才能下結論。";
 "lblDevZoneTitleDescription.title" = "警告：該頁面僅作未來功能測試所用。\n在此列出的功能並非處於完全可用之狀態。";
 "lblUpperCaseLetterKeyBehavior.title" = "指定 Shift+字母鍵 的行為。";
 "Parser11.title" = "國音二式+數字標調";

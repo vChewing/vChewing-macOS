@@ -62,7 +62,7 @@
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
-"lblDevZoneIMKCandidate.title" = "IMK 候補陳列ウィンドウで言選り用キーは現時点で調整不可、且つ他故障あり。";
+"lblDevZoneIMKCandidate.title" = "IMK 候補陳列ウィンドウは、Apple の未公開のAPIを「bridging-header」という強引的な手段で引き出して利用した機能である。現時点で macOS 10.14 Mojave から macOS 13 Ventura まで利用可能であるが、その後の新しい macOS との互換性の話はまだ早い。";
 "lblDevZoneTitleDescription.title" = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
 "lblUpperCaseLetterKeyBehavior.title" = "Shift+文字キーの行為をご指定ください。";
 "Parser11.title" = "国音二式 (ローマ字+数字音調)";

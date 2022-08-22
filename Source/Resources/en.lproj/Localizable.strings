@@ -147,7 +147,7 @@
 "Hsu" = "Hsu";
 "Hualuo Pinyin with Numeral Intonation" = "Hualuo Pinyin with Numeral Intonation";
 "IBM" = "IBM";
-"IMK candidate window is plagued with issues and incapabilities." = "IMK candidate window is plagued with issues and incapabilities.";
+"IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases." = "IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases.";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "in front of the phrase (like macOS built-in Zhuyin IME)";
 "Japanese" = "Japanese";
 "Keyboard Shortcuts:" = "Keyboard Shortcuts:";

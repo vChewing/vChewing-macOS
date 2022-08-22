@@ -147,7 +147,7 @@
 "Hsu" = "许氏国音自然排列";
 "Hualuo Pinyin with Numeral Intonation" = "华罗拼音+数字标调";
 "IBM" = "IBM 排列";
-"IMK candidate window is plagued with issues and incapabilities." = "IMK 选字窗目前暂时无法正常自订选字键，并具其它未知故障。";
+"IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases." = "IMK 选字窗依赖于 Apple 的私有 API，而且是借由桥接档案头强制曝露的方法使用的。目前，该功能仅在 macOS 10.14 Mojave 至 macOS 13 Ventura 系统内有测试过可用性。至于在未来的 macOS 发行版当中是否可用，则需要另行测试、才能下结论。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "将游标置于词语前方 // macOS 内建注音风格";
 "Japanese" = "和语";
 "Keyboard Shortcuts:" = "键盘快捷键:";
