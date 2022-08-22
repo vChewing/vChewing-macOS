@@ -57,7 +57,24 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
       var attributes = attributes()
       // FB11300759: Set "NSAttributedString.Key.font" doesn't work.
       attributes?[NSAttributedString.Key.font] = candidateFont
+      if mgrPrefs.handleDefaultCandidateFontsByLangIdentifier {
+        switch IME.currentInputMode {
+          case InputMode.imeModeCHS:
+            if #available(macOS 12.0, *) {
+              attributes?[NSAttributedString.Key.languageIdentifier] = "zh-Hans" as AnyObject
+            }
+          case InputMode.imeModeCHT:
+            if #available(macOS 12.0, *) {
+              attributes?[NSAttributedString.Key.languageIdentifier] =
+                (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
+                ? "ja" as AnyObject : "zh-Hant" as AnyObject
+            }
+          default:
+            break
+        }
+      }
       setAttributes(attributes)
+      update()
     }
   }
 
