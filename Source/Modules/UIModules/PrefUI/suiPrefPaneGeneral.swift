@@ -52,6 +52,8 @@ struct suiPrefPaneGeneral: View {
     }
   }()
 
+  let enabledFontSizes = [12, 14, 16, 17, 18, 20, 22, 24, 32, 64, 96]
+
   var body: some View {
     ScrollView {
       Preferences.Container(contentWidth: contentWidth) {
@@ -62,14 +64,9 @@ struct suiPrefPaneGeneral: View {
               mgrPrefs.candidateListTextSize = CGFloat(selCandidateUIFontSize)
             }
           ) {
-            Text("12").tag(12)
-            Text("14").tag(14)
-            Text("16").tag(16)
-            Text("18").tag(18)
-            Text("24").tag(24)
-            Text("32").tag(32)
-            Text("64").tag(64)
-            Text("96").tag(96)
+            ForEach(0...(enabledFontSizes.count - 1), id: \.self) { id in
+              Text(String(enabledFontSizes[id])).tag(enabledFontSizes[id])
+            }.id(UUID())
           }
           .labelsHidden()
           .frame(width: 120.0)
