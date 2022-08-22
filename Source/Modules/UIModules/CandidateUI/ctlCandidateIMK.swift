@@ -91,13 +91,13 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
       case .vertical:
         setPanelType(kIMKSingleColumnScrollingCandidatePanel)
     }
-    // 設為 true 表示先交給 ctlIME 處理
-    setAttributes([IMKCandidatesSendServerKeyEventFirst: true])
   }
 
   public required init(_ layout: CandidateLayout = .horizontal) {
     super.init(server: theServer, panelType: kIMKScrollingGridCandidatePanel)
     specifyLayout(layout)
+    // 設為 true 表示先交給 ctlIME 處理
+    setAttributes([IMKCandidatesSendServerKeyEventFirst: true])
     visible = false
     // guard let currentTISInputSource = currentTISInputSource else { return }  // 下面兩句都沒用，所以註釋掉。
     // setSelectionKeys([18, 19, 20, 21, 23, 22, 26, 28, 25])  // 這句是壞的，用了反而沒有選字鍵。
