@@ -58,6 +58,22 @@ struct suiPrefPaneExperience: View {
 
   var body: some View {
     ScrollView {
+      VStack {
+        _VSpacer(minHeight: 24)
+        Text(
+          "\u{2022} "
+            + NSLocalizedString(
+              "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu.",
+              comment: ""
+            ) + "\n\u{2022} "
+            + NSLocalizedString(
+              "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead.",
+              comment: ""
+            )
+        )
+        .preferenceDescription()
+        .fixedSize(horizontal: false, vertical: true)
+      }.frame(maxWidth: contentWidth)
       Preferences.Container(contentWidth: contentWidth) {
         Preferences.Section(label: { Text(LocalizedStringKey("Cursor Selection:")) }) {
           Picker(

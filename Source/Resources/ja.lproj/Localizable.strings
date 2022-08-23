@@ -158,10 +158,12 @@
 "Misc Settings:" = "他の設定:";
 "MiTAC" = "神通配列";
 "Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "QWERTY 以外の英数キーボードは弁音以外の配列に不適用。";
+"Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead." = "ご注意：Mac キーボードの「Delete ⌫」キーはここで「BackSpace ⌫」と呼ばれ、それはパソコンの常識としての本物の「Delete ⌦」と区別するためである。もし、テンキーの付いていない Mac キーボードで本物の「Delete ⌦」を使いたければ、代わりに「Fn+⌫」をご使用ください。";
 "Only override the intonation of the previous reading if different" = "カーソルの後部の音読みの異なる音調だけを上書きする";
 "Output Settings:" = "出力設定:";
 "Override the previous reading's intonation with candidate-reset" = "カーソルの後部の音読みの音調を上書きし、候補選択状態を戻す";
 "Phonetic Parser:" = "注音配列:";
+"Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu." = "マウスホイールでこのページをご覧ください。キーに関する取扱説明のアクセスはメニューに。";
 "Push the cursor in front of the phrase after selection" = "候補選択の直後、すぐカーソルを単語の向こうに推し進める";
 "Secondary Pinyin with Numeral Intonation" = "国音二式 (ローマ字+数字音調)";
 "Seigyou" = "精業配列";
