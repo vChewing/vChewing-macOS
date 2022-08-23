@@ -381,6 +381,16 @@ public class KeyHandler {
     return (rawData, rawDataSansIntonation, hasIntonation)
   }
 
+  /// 檢測某個傳入的按鍵訊號是否為聲調鍵。
+  /// - Parameter input: 傳入的按鍵訊號。
+  /// - Returns: 判斷結果：是否為聲調鍵。
+  func isIntonationKey(_ input: InputSignal) -> Bool {
+    var theComposer = composer  // 複製一份用來做實驗。
+    theComposer.clear()  // 清空各種槽的內容。
+    theComposer.receiveKey(fromCharCode: input.charCode)
+    return theComposer.hasToneMarker(withNothingElse: true)
+  }
+
   // MARK: - Extracted methods and functions (Megrez).
 
   /// 將輸入法偏好設定同步至語言模組內。
