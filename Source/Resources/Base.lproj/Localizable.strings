@@ -58,9 +58,6 @@
 "Symbol & Emoji Input" = "Symbol & Emoji Input";
 "Edit User Symbol & Emoji Data…" = "Edit User Symbol & Emoji Data…";
 "Choose your desired user data folder." = "Choose your desired user data folder.";
-"Cursor is between \"%@\" and \"%@\"." = "Cursor is between \"%@\" and \"%@\".";
-"Cursor is to the rear of \"%@\"." = "Cursor is to the rear of \"%@\".";
-"Cursor is in front of \"%@\"." = "Cursor is in front of \"%@\".";
 "Loading CHS Core Dict..." = "Loading CHS Core Dict...";
 "Loading CHT Core Dict..." = "Loading CHT Core Dict...";
 "Core Dict loading complete." = "Core Dict loading complete.";
