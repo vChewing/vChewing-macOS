@@ -34,6 +34,8 @@ public enum UserDef: String, CaseIterable {
   case kHalfWidthPunctuationEnabled = "HalfWidthPunctuationEnable"
   case kMoveCursorAfterSelectingCandidate = "MoveCursorAfterSelectingCandidate"
   case kEscToCleanInputBuffer = "EscToCleanInputBuffer"
+  case kSpecifyIntonationKeyBehavior = "SecifyIntonationKeyBehavior"
+  case kSpecifyShiftBackSpaceKeyBehavior = "SpecifyShiftBackSpaceKeyBehavior"
   case kSpecifyShiftTabKeyBehavior = "SpecifyShiftTabKeyBehavior"
   case kSpecifyShiftSpaceKeyBehavior = "SpecifyShiftSpaceKeyBehavior"
   case kAllowBoostingSingleKanjiAsUserPhrase = "AllowBoostingSingleKanjiAsUserPhrase"
@@ -214,6 +216,12 @@ public enum mgrPrefs {
     )
     UserDefaults.standard.setDefault(
       mgrPrefs.shouldAutoReloadUserDataFiles, forKey: UserDef.kShouldAutoReloadUserDataFiles.rawValue
+    )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.specifyIntonationKeyBehavior, forKey: UserDef.kSpecifyIntonationKeyBehavior.rawValue
+    )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.specifyShiftBackSpaceKeyBehavior, forKey: UserDef.kSpecifyShiftBackSpaceKeyBehavior.rawValue
     )
     UserDefaults.standard.setDefault(
       mgrPrefs.specifyShiftTabKeyBehavior, forKey: UserDef.kSpecifyShiftTabKeyBehavior.rawValue
@@ -523,6 +531,12 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kEscToCleanInputBuffer.rawValue, defaultValue: true)
   static var escToCleanInputBuffer: Bool
+
+  @UserDefault(key: UserDef.kSpecifyIntonationKeyBehavior.rawValue, defaultValue: 0)
+  static var specifyIntonationKeyBehavior: Int
+
+  @UserDefault(key: UserDef.kSpecifyShiftBackSpaceKeyBehavior.rawValue, defaultValue: 0)
+  static var specifyShiftBackSpaceKeyBehavior: Int
 
   @UserDefault(key: UserDef.kSpecifyShiftTabKeyBehavior.rawValue, defaultValue: false)
   static var specifyShiftTabKeyBehavior: Bool
