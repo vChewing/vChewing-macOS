@@ -138,7 +138,7 @@ struct CandidateListTextSize {
 
 // MARK: -
 
-enum MandarinParser: Int {
+enum MandarinParser: Int, CaseIterable {
   case ofStandard = 0
   case ofETen = 1
   case ofHsu = 2
