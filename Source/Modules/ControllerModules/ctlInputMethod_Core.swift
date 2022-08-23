@@ -110,8 +110,6 @@ class ctlInputMethod: IMKInputController {
     keyHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
     keyHandler.ensureParser()
 
-    mgrPrefs.fixOddPreferences()
-
     if isASCIIMode {
       if mgrPrefs.disableShiftTogglingAlphanumericalMode {
         isASCIIMode = false

@@ -73,6 +73,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
     fsStreamHelper.delegate = self
     _ = fsStreamHelper.start()
 
+    mgrPrefs.fixOddPreferences()
     mgrPrefs.setMissingDefaults()
 
     // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
