@@ -37,6 +37,10 @@ struct suiPrefPaneExperience: View {
     forKey: UserDef.kUpperCaseLetterKeyBehavior.rawValue)
   @State private var selDisableShiftTogglingAlphanumericalMode: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kDisableShiftTogglingAlphanumericalMode.rawValue)
+  @State private var selSpecifyIntonationKeyBehavior = UserDefaults.standard.integer(
+    forKey: UserDef.kSpecifyIntonationKeyBehavior.rawValue)
+  @State private var selSpecifyShiftBackSpaceKeyBehavior = UserDefaults.standard.integer(
+    forKey: UserDef.kSpecifyShiftBackSpaceKeyBehavior.rawValue)
 
   private let contentMaxHeight: Double = 430
   private let contentWidth: Double = {
@@ -75,6 +79,22 @@ struct suiPrefPaneExperience: View {
               mgrPrefs.moveCursorAfterSelectingCandidate = selPushCursorAfterSelection
             }
           ).controlSize(.small)
+        }
+        Preferences.Section(label: { Text(LocalizedStringKey("Shift+BackSpace:")) }) {
+          Picker(
+            "",
+            selection: $selSpecifyShiftBackSpaceKeyBehavior.onChange {
+              mgrPrefs.specifyShiftBackSpaceKeyBehavior = selSpecifyShiftBackSpaceKeyBehavior
+            }
+          ) {
+            Text(LocalizedStringKey("Disassemble the previous reading, dropping its intonation")).tag(0)
+            Text(LocalizedStringKey("Clear the entire inline composition buffer like Shift+Delete")).tag(1)
+            Text(LocalizedStringKey("Always drop the previous reading")).tag(2)
+          }
+          .labelsHidden()
+          .pickerStyle(RadioGroupPickerStyle())
+          Text(LocalizedStringKey("Disassembling process does not work with non-phonetic reading keys."))
+            .preferenceDescription()
         }
         Preferences.Section(title: "(Shift+)Tab:") {
           Picker(
@@ -121,6 +141,22 @@ struct suiPrefPaneExperience: View {
           .labelsHidden()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Choose the behavior of Shift+Letter key with letter inputs."))
+            .preferenceDescription()
+        }
+        Preferences.Section(label: { Text(LocalizedStringKey("Intonation Key:")) }) {
+          Picker(
+            "",
+            selection: $selSpecifyIntonationKeyBehavior.onChange {
+              mgrPrefs.specifyIntonationKeyBehavior = selSpecifyIntonationKeyBehavior
+            }
+          ) {
+            Text(LocalizedStringKey("Override the previous reading's intonation with candidate-reset")).tag(0)
+            Text(LocalizedStringKey("Only override the intonation of the previous reading if different")).tag(1)
+            Text(LocalizedStringKey("Always type intonations to the inline composition buffer")).tag(2)
+          }
+          .labelsHidden()
+          .pickerStyle(RadioGroupPickerStyle())
+          Text(LocalizedStringKey("Specify the behavior of intonation key when syllable composer is empty."))
             .preferenceDescription()
         }
         Preferences.Section(title: "Shift:") {
