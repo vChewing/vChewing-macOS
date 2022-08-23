@@ -80,6 +80,8 @@ private let kMaxCandidateListTextSize: CGFloat = 196
 
 private let kDefaultKeys = "123456789"
 
+private let kDefaultBasicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
+
 // MARK: - UserDefaults extension.
 
 extension UserDefaults {
@@ -362,7 +364,7 @@ public enum mgrPrefs {
   }
 
   @UserDefault(
-    key: UserDef.kBasicKeyboardLayout.rawValue, defaultValue: "com.apple.keylayout.ZhuyinBopomofo"
+    key: UserDef.kBasicKeyboardLayout.rawValue, defaultValue: kDefaultBasicKeyboardLayout
   )
   static var basicKeyboardLayout: String
 
@@ -708,6 +710,54 @@ extension mgrPrefs {
       mgrPrefs.shouldAlwaysUseShiftKeyAccommodation = false
       mgrPrefs.disableShiftTogglingAlphanumericalMode = false
       mgrPrefs.togglingAlphanumericalModeWithLShift = false
+    }
+    // 介面語言選項糾錯。
+    var filteredAppleLanguages = Set<String>()
+    appleLanguages.forEach {
+      if IME.arrSupportedLocales.contains($0) {
+        filteredAppleLanguages.insert($0)
+      }
+    }
+    if !filteredAppleLanguages.isEmpty {
+      appleLanguages = Array(filteredAppleLanguages)
+    } else {
+      UserDefaults.standard.removeObject(forKey: UserDef.kAppleLanguages.rawValue)
+    }
+    // 注拼槽注音排列選項糾錯。
+    var isMandarinParserOptionValid = false
+    MandarinParser.allCases.forEach {
+      if $0.rawValue == mandarinParser { isMandarinParserOptionValid = true }
+    }
+    if !isMandarinParserOptionValid {
+      mandarinParser = 0
+    }
+    // 基礎鍵盤排列選項糾錯。
+    var inputSourceTIS: TISInputSource? {
+      var result: TISInputSource?
+      let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
+      let matchedTISString = mgrPrefs.basicKeyboardLayout
+      for source in list {
+        guard let ptrCat = TISGetInputSourceProperty(source, kTISPropertyInputSourceCategory) else { continue }
+        let category = Unmanaged<CFString>.fromOpaque(ptrCat).takeUnretainedValue()
+        guard category == kTISCategoryKeyboardInputSource else { continue }
+        guard let ptrSourceID = TISGetInputSourceProperty(source, kTISPropertyInputSourceID) else { continue }
+        let sourceID = String(Unmanaged<CFString>.fromOpaque(ptrSourceID).takeUnretainedValue())
+        if sourceID == matchedTISString { result = source }
+      }
+      return result
+    }
+    if inputSourceTIS == nil {
+      mgrPrefs.basicKeyboardLayout = kDefaultBasicKeyboardLayout
+    }
+    // 其它多元選項參數自動糾錯。
+    if ![0, 1, 2].contains(specifyIntonationKeyBehavior) {
+      specifyIntonationKeyBehavior = 0
+    }
+    if ![0, 1, 2].contains(specifyShiftBackSpaceKeyBehavior) {
+      specifyShiftBackSpaceKeyBehavior = 0
+    }
+    if ![0, 1, 2].contains(upperCaseLetterKeyBehavior) {
+      upperCaseLetterKeyBehavior = 0
     }
   }
 }
