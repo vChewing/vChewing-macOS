@@ -33,6 +33,32 @@ extension KeyHandler {
     // 如果是的話，就將這次傳入的這個按鍵訊號塞入注拼槽內且標記為「keyConsumedByReading」。
     // 函式 composer.receiveKey() 可以既接收 String 又接收 UniChar。
     if !skipPhoneticHandling && composer.inputValidityCheck(key: input.charCode) {
+      // 引入 macOS 內建注音輸入法的行為，允許用除了陰平以外的聲調鍵覆寫前一個漢字的讀音。
+      // 但如果要覆寫的內容會導致游標身後的字音沒有對應的辭典記錄的話，那就只蜂鳴警告一下。
+      proc: if [0, 1].contains(mgrPrefs.specifyIntonationKeyBehavior), composer.isEmpty, !input.isSpace {
+        // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
+        guard let prevReading = previousParsableReading, isIntonationKey(input) else { break proc }
+        var theComposer = composer
+        prevReading.0.charComponents.forEach { theComposer.receiveKey(fromPhonabet: $0) }
+        // 發現要覆寫的聲調與覆寫對象的聲調雷同的情況的話，直接跳過處理。
+        let oldIntonation: Tekkon.Phonabet = theComposer.intonation
+        theComposer.receiveKey(fromCharCode: input.charCode)
+        if theComposer.intonation == oldIntonation, mgrPrefs.specifyIntonationKeyBehavior == 1 { break proc }
+        theComposer.intonation.clear()
+        // 檢查新的漢字字音是否在庫。
+        let temporaryReadingKey = theComposer.getComposition()
+        if currentLM.hasUnigramsFor(key: theComposer.getComposition()) {
+          compositor.dropKey(direction: .rear)
+          walk()  // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
+          composer = theComposer
+          // 這裡不需要回呼 buildInputtingState，因為當前輸入的聲調鍵一定是合規的、會在之後回呼 buildInputtingState。
+        } else {
+          IME.prtDebugIntel("4B0DD2D4：語彙庫內無「\(temporaryReadingKey)」的匹配記錄，放棄覆寫游標身後的內容。")
+          errorCallback()
+          return true
+        }
+      }
+
       composer.receiveKey(fromCharCode: input.charCode)
       keyConsumedByReading = true
 
