@@ -69,6 +69,8 @@ public class KeyHandler {
 
   /// 初期化。
   public init() {
+    /// 同步組字器單個詞的幅位長度上限。
+    Megrez.Compositor.maxSpanLength = mgrPrefs.maxCandidateLength
     /// 組字器初期化。因為是首次初期化變數，所以這裡不能用 ensureCompositor() 代勞。
     compositor = Megrez.Compositor(with: currentLM, separator: "-")
     /// 注拼槽初期化。
