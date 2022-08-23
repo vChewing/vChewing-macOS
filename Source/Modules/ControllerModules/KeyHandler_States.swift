@@ -409,7 +409,25 @@ extension KeyHandler {
   ) -> Bool {
     guard state is InputState.Inputting else { return false }
 
-    if input.isShiftHold {
+    // 引入 macOS 內建注音輸入法的行為，允許用 Shift+BackSpace 解構前一個漢字的讀音。
+    switch mgrPrefs.specifyShiftBackSpaceKeyBehavior {
+      case 0:
+        guard input.isShiftHold, composer.isEmpty else { break }
+        guard let prevReading = previousParsableReading else { break }
+        // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
+        compositor.dropKey(direction: .rear)
+        walk()  // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
+        prevReading.1.charComponents.forEach { composer.receiveKey(fromPhonabet: $0) }
+        stateCallback(buildInputtingState)
+        return true
+      case 1:
+        stateCallback(InputState.EmptyIgnoringPreviousState())
+        stateCallback(InputState.Empty())
+        return true
+      default: break
+    }
+
+    if input.isShiftHold, input.isOptionHold {
       stateCallback(InputState.EmptyIgnoringPreviousState())
       stateCallback(InputState.Empty())
       return true
