@@ -364,6 +364,23 @@ public class KeyHandler {
     composer.phonabetCombinationCorrectionEnabled = mgrPrefs.autoCorrectReadingCombination
   }
 
+  /// 返回前一個游標位置的可解析的漢字讀音。
+  /// 返回的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
+  var previousParsableReading: (String, String, Bool)? {
+    if compositor.cursor == 0 { return nil }
+    let cursorPrevious = max(compositor.cursor - 1, 0)
+    let rawData = compositor.keys[cursorPrevious]
+    let components = rawData.charComponents
+    var hasIntonation = false
+    for neta in components {
+      if !Tekkon.allowedPhonabets.contains(neta) || neta == " " { return nil }
+      if Tekkon.allowedIntonations.contains(neta) { hasIntonation = true }
+    }
+    if hasIntonation, components.count == 1 { return nil }  // 剔除純聲調之情形
+    let rawDataSansIntonation = hasIntonation ? components.dropLast(1).joined() : rawData
+    return (rawData, rawDataSansIntonation, hasIntonation)
+  }
+
   // MARK: - Extracted methods and functions (Megrez).
 
   /// 將輸入法偏好設定同步至語言模組內。
