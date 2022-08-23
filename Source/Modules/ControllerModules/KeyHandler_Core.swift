@@ -140,20 +140,26 @@ public class KeyHandler {
   ///
   /// 威注音輸入法截至 v1.9.3 SP2 版為止都受到上游的這個 Bug 的影響，且在 v1.9.4 版利用該函式修正了這個缺陷。
   /// 該修正必須搭配至少天權星組字引擎 v2.0.2 版方可生效。算法可能比較囉唆，但至少在常用情形下不會再發生該問題。
-  /// - Parameter theCandidate: 要拿來覆寫的詞音配對。
-  func consolidateCursorContext(with theCandidate: Megrez.Compositor.Candidate) {
+  /// - Parameters:
+  ///   - theCandidate: 要拿來覆寫的詞音配對。
+  ///   - cursorSpecified: 給定作業目標游標位置（不知道怎麼用的話就不要用），不設定的話則改用 actualCandidateCursor。
+  func consolidateCursorContext(with theCandidate: Megrez.Compositor.Candidate = .init(), cursorSpecified: Int? = nil) {
+    var cursorSpecified = cursorSpecified ?? actualCandidateCursor
+    if cursorSpecified != actualCandidateCursor {
+      cursorSpecified = max(0, min(cursorSpecified, compositor.width - 1))  // 糾正傳入的數值。
+    }
     let grid = compositor
     var frontBoundaryEX = compositor.width - 1
     var rearBoundaryEX = 0
-    if grid.overrideCandidate(theCandidate, at: actualCandidateCursor) {
-      guard let node = compositor.walkedNodes.findNode(at: actualCandidateCursor, target: &frontBoundaryEX) else {
+    if grid.overrideCandidate(theCandidate, at: cursorSpecified) {
+      guard let node = compositor.walkedNodes.findNode(at: cursorSpecified, target: &frontBoundaryEX) else {
         return
       }
       rearBoundaryEX = max(0, frontBoundaryEX - node.keyArray.count)
     }
 
     var frontBoundary = 0
-    guard let node = compositor.walkedNodes.findNode(at: actualCandidateCursor, target: &frontBoundary) else { return }
+    guard let node = compositor.walkedNodes.findNode(at: cursorSpecified, target: &frontBoundary) else { return }
 
     var rearBoundary = min(max(0, frontBoundary - node.keyArray.count), rearBoundaryEX)  // 防呆
     frontBoundary = max(min(frontBoundary, compositor.width), frontBoundaryEX)  // 防呆。
