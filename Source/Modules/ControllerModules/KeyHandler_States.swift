@@ -30,7 +30,7 @@ extension KeyHandler {
     /// 這樣就可以免除不必要的類型轉換。
     for theNode in compositor.walkedNodes {
       let strNodeValue = theNode.value
-      let arrSplit: [String] = Array(strNodeValue).map { String($0) }
+      let arrSplit: [String] = Array(strNodeValue).charComponents
       let codepointCount = arrSplit.count
       /// 藉下述步驟重新將「可見游標位置」對齊至「組字器內的游標所在的讀音位置」。
       /// 每個節錨（NodeAnchor）都有自身的幅位長度（spanningLength），可以用來

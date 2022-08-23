@@ -184,7 +184,7 @@ public class KeyHandler {
           position += currentNode.keyArray.count
           continue
         }
-        let values = currentNode.currentPair.value.map { String($0) }
+        let values = currentNode.currentPair.value.charComponents
         for (subPosition, key) in currentNode.keyArray.enumerated() {
           guard values.count > subPosition else { break }  // 防呆，應該沒有發生的可能性
           let thePair = Megrez.Compositor.Candidate(

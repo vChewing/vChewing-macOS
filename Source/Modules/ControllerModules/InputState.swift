@@ -490,8 +490,8 @@ public enum InputState {
             return cursorIndexU8..<min(cursorIndexU8 + chosenCandidateString.count, composingBuffer.count - 1)
         }
       }()
-      let strSegmentedRear = composingBuffer.map { String($0) }[0..<u8Range.lowerBound].joined()
-      let strSegmentedFront = composingBuffer.map { String($0) }[u8Range.upperBound...].joined()
+      let strSegmentedRear = composingBuffer.charComponents[0..<u8Range.lowerBound].joined()
+      let strSegmentedFront = composingBuffer.charComponents[u8Range.upperBound...].joined()
       let newBufferConverted: String = NotEmpty(
         composingBuffer: strSegmentedRear + chosenCandidateString + strSegmentedFront, cursorIndex: 0
       ).composingBufferConverted
