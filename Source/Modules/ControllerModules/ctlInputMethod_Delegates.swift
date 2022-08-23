@@ -126,7 +126,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
       let inputting = keyHandler.buildInputtingState
 
       if mgrPrefs.useSCPCTypingMode {
-        handle(state: InputState.Committing(textToCommit: inputting.composingBuffer))
+        handle(state: InputState.Committing(textToCommit: inputting.composingBufferConverted))
         // 此時是逐字選字模式，所以「selectedValue.1」是單個字、不用追加處理。
         if mgrPrefs.associatedPhrasesEnabled,
           let associatePhrases = keyHandler.buildAssociatePhraseState(
