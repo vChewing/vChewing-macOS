@@ -53,4 +53,10 @@ extension String {
     let arr = Array(utf16)[r].map { $0 }
     return String(utf16CodeUnits: arr, count: arr.count)
   }
+
+  public var charComponents: [String] { map { String($0) } }
+}
+
+extension Array where Element == String.Element {
+  public var charComponents: [String] { map { String($0) } }
 }
