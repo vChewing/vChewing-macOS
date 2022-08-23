@@ -8,7 +8,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
+import Foundation
 
 // 註：所有 InputState 型別均不適合使用 Struct，因為 Struct 無法相互繼承派生。
 

@@ -8,8 +8,8 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Carbon
 import Cocoa
+import InputMethodKit
 
 public class InputSourceHelper: NSObject {
   @available(*, unavailable)

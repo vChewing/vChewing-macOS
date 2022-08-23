@@ -6,8 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
-
 enum AppleKeyboardConverter {
   static let arrDynamicBasicKeyLayout: [String] = [
     "com.apple.keylayout.ZhuyinBopomofo",

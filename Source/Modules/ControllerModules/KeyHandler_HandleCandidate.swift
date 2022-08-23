@@ -10,7 +10,7 @@
 
 /// 該檔案乃按鍵調度模組當中「用來規定在選字窗出現時的按鍵行為」的部分。
 
-import Cocoa
+import Foundation
 
 // MARK: - § 對選字狀態進行調度 (Handle Candidate State).
 

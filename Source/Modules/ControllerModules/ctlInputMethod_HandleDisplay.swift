@@ -9,7 +9,6 @@
 // requirements defined in MIT License.
 
 import Cocoa
-import Foundation
 
 // MARK: - Tooltip Display and Candidate Display Methods
 

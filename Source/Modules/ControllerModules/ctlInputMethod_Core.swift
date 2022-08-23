@@ -8,7 +8,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
 import InputMethodKit
 
 /// 輸入法控制模組，乃在輸入法端用以控制輸入行為的基礎型別。

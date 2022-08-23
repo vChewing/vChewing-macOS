@@ -8,7 +8,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
+import Foundation
 
 /// Shiki's Notes: The cursor index in the IMK inline composition buffer
 /// still uses UTF16 index measurements. This means that any attempt of

@@ -10,7 +10,7 @@
 
 /// 該檔案乃按鍵調度模組的用以承載「根據按鍵行為來調控模式」的各種成員函式的部分。
 
-import Cocoa
+import Foundation
 
 // MARK: - § 根據按鍵行為來調控模式的函式 (Functions Interact With States).
 
