@@ -124,6 +124,20 @@ struct suiPrefPaneExperience: View {
           Text(LocalizedStringKey("Choose the behavior of Shift+Letter key with letter inputs."))
             .preferenceDescription()
         }
+        Preferences.Section(title: "Shift:") {
+          Toggle(
+            LocalizedStringKey("Completely disable using Shift key to toggle alphanumerical mode"),
+            isOn: $selDisableShiftTogglingAlphanumericalMode.onChange {
+              mgrPrefs.disableShiftTogglingAlphanumericalMode = selDisableShiftTogglingAlphanumericalMode
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Also toggle alphanumerical mode with Left-Shift"),
+            isOn: $selTogglingAlphanumericalModeWithLShift.onChange {
+              mgrPrefs.togglingAlphanumericalModeWithLShift = selTogglingAlphanumericalModeWithLShift
+            }
+          ).disabled(mgrPrefs.disableShiftTogglingAlphanumericalMode == true)
+        }
         Preferences.Section(label: { Text(LocalizedStringKey("Misc Settings:")) }) {
           Toggle(
             LocalizedStringKey("Enable Space key for calling candidate window"),
@@ -147,18 +161,6 @@ struct suiPrefPaneExperience: View {
             LocalizedStringKey("Allow using Enter key to confirm associated candidate selection"),
             isOn: $selAlsoConfirmAssociatedCandidatesByEnter.onChange {
               mgrPrefs.alsoConfirmAssociatedCandidatesByEnter = selAlsoConfirmAssociatedCandidatesByEnter
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Also toggle alphanumerical mode with Left-Shift"),
-            isOn: $selTogglingAlphanumericalModeWithLShift.onChange {
-              mgrPrefs.togglingAlphanumericalModeWithLShift = selTogglingAlphanumericalModeWithLShift
-            }
-          ).disabled(mgrPrefs.disableShiftTogglingAlphanumericalMode == true)
-          Toggle(
-            LocalizedStringKey("Completely disable using Shift key to toggling alphanumerical mode"),
-            isOn: $selDisableShiftTogglingAlphanumericalMode.onChange {
-              mgrPrefs.disableShiftTogglingAlphanumericalMode = selDisableShiftTogglingAlphanumericalMode
             }
           )
           Toggle(

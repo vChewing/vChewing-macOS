@@ -120,7 +120,7 @@
 "Choose your desired user data folder path. Will be omitted if invalid." = "请在此指定您想指定的使用者语汇档案目录。无效值会被忽略。";
 "Choose your preferred layout of the candidate window." = "选择您所偏好的候选字窗布局。";
 "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Ctrl(+Option)+Command+Enter 输出汉语拼音而非注音";
-"Completely disable using Shift key to toggling alphanumerical mode" = "彻底禁止使用 Shift 键切换英数模式";
+"Completely disable using Shift key to toggle alphanumerical mode" = "彻底禁止使用 Shift 键切换英数模式";
 "Cursor Selection:" = "选字游标:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千排列 (微软标准/王安/零壹/仲鼎/国乔)";
 "Dachen 26 (libChewing)" = "酷音大千二十六键排列";
