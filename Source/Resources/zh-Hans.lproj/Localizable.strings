@@ -10,7 +10,7 @@
 "Check for Update Completed" = "新版检查完毕";
 "You are already using the latest version of vChewing." = "目前使用的已经是最新版本。";
 "Update Check Failed" = "无法检查新版";
-"There may be no internet connection or the server failed to respond.\n\nError message: %@" = "网路连线失败，或是服务器没有回应。\n\n错误说明：%@";
+"There may be no internet connection or the server failed to respond.\n\nError message: %@" = "网路连线失败，或是伺服器没有回应。\n\n错误说明：%@";
 "OK" = "确定";
 "Dismiss" = "关闭本视窗";
 "New Version Available" = "有新版可下载";
@@ -25,7 +25,7 @@
 "Unable to create the user phrase file." = "无法创建自订语汇档案。";
 "Please check the permission at \"%@\"." = "请检查此处的存取权限：\"%@\".";
 "Edit Excluded Phrases…" = "编辑要滤除的语汇…";
-"Half-Width Punctuation Mode" = "半角标点模式";
+"Half-Width Punctuation Mode" = "半形标点模式";
 "\"%@\" length must ≥ 2 for a user phrase." = "「%@」字数不足以自订语汇。";
 "\"%@\" length should ≤ %d for a user phrase." = "「%@」字数超过 %d、无法自订。";
 "\"%@\" selected. ENTER to add user phrase." = "「%@」敲 Enter 添入自订语汇。";
@@ -40,7 +40,7 @@
 "Maximum 15 candidate keys allowed." = "选字键最多只能指定十五个。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 语汇置换功能已启用，会波及语汇自订。";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 无法处理：组字区字数与读音数不对应。";
-"Per-Char Select Mode" = "仿真逐字选字输入";
+"Per-Char Select Mode" = "模拟逐字选字输入";
 "CNS11643 Mode" = "全字库模式";
 "JIS Shinjitai Output" = "JIS 新字体模式";
 "Per-Char Associated Phrases" = "逐字选字联想模式";
@@ -130,7 +130,7 @@
 "Directly commit lowercased letters" = "直接递交小写字母";
 "Directly commit uppercased letters" = "直接递交大写字母";
 "Disassemble the previous reading, dropping its intonation" = "析构游标正后方的字音，且剔除其声调";
-"Disassembling process does not work with non-phonetic reading keys." = "析构行为仅针对组字器内“身为汉字读音”的读音索引单元有效。";
+"Disassembling process does not work with non-phonetic reading keys." = "析构行为仅针对组字器内「身为汉字读音」的读音索引单元有效。";
 "Emulating select-candidate-per-character mode" = "模拟 90 年代前期注音逐字选字输入风格";
 "Enable CNS11643 Support (2022-07-20)" = "启用 CNS11643 全字库支援 (2022-07-20)";
 "Enable Space key for calling candidate window" = "敲空格键以呼出候选字窗";
@@ -153,12 +153,12 @@
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "将游标置于词语前方 // macOS 内建注音风格";
 "Intonation Key:" = "声调键:";
 "Japanese" = "和语";
-"Keyboard Shortcuts:" = "键盘快捷键:";
+"Keyboard Shortcuts:" = "键盘快速键:";
 "Keyboard" = "键盘设定";
 "Misc Settings:" = "杂项:";
 "MiTAC" = "神通排列";
 "Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "QWERTY 以外的英数布局是为了拼音排列使用者而准备的。";
-"Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead." = "注意：Mac 键盘的「Delete ⌫」键在此被称作「BackSpace 退格键 ⌫」以与 PC 键盘的真正的「Delete ⌦」键彼此区分开。若您想在没有数字小键盘的 Mac 电脑上使用真正的「Delete ⌦」按键的话，请改用「Fn+⌫」。";;
+"Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead." = "注意：Mac 键盘的「Delete ⌫」键在此被称作「BackSpace 退格键 ⌫」以与 PC 键盘的真正的「Delete ⌦」键彼此区分开。若您想在没有数字小键盘的 Mac 电脑上使用真正的「Delete ⌦」按键的话，请改用「Fn+⌫」。";
 "Only override the intonation of the previous reading if different" = "仅在键入的声调与游标正后方的字音不同时，尝试覆写";
 "Output Settings:" = "输出设定:";
 "Override the previous reading's intonation with candidate-reset" = "尝试对游标正后方的字音覆写声调，且重设其选字状态";
