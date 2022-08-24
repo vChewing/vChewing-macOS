@@ -62,7 +62,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
   /// 該函式僅由 IMK 選字窗來存取，且對接給 commonEventHandler()。
   /// - Parameter event: 由 IMK 選字窗接收的裝置操作輸入事件。
   /// - Returns: 回「`true`」以將該案件已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
-  @discardableResult func sharedEventHandler(_ event: NSEvent!) -> Bool {
+  @discardableResult func sharedEventHandler(_ event: NSEvent) -> Bool {
     commonEventHandler(event)
   }
 
