@@ -122,6 +122,7 @@
 "Clear the entire inline composition buffer like Shift+Delete" = "像 Shift+Delete 那样清空当前组字区内容";
 "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Ctrl(+Option)+Command+Enter 输出汉语拼音而非注音";
 "Completely disable using Shift key to toggle alphanumerical mode" = "彻底禁止使用 Shift 键切换英数模式";
+"Consolidate the context on confirming candidate selection" = "在使用选字窗选字时，自動巩固上下文";
 "Cursor Selection:" = "选字游标:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千排列 (微软标准/王安/零壹/仲鼎/国乔)";
 "Dachen 26 (libChewing)" = "酷音大千二十六键排列";

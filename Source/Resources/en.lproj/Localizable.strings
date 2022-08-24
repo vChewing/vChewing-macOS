@@ -122,6 +122,7 @@
 "Clear the entire inline composition buffer like Shift+Delete" = "Clear the entire inline composition buffer like Shift+Delete";
 "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter";
 "Completely disable using Shift key to toggle alphanumerical mode" = "Completely disable using Shift key to toggle alphanumerical mode";
+"Consolidate the context on confirming candidate selection" = "Consolidate the context on confirming candidate selection";
 "Cursor Selection:" = "Cursor Selection:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "Dachen (Microsoft Standard / Wang / 01, etc.)";
 "Dachen 26 (libChewing)" = "Dachen 26 (libChewing)";
