@@ -85,6 +85,7 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)空格鍵:";
+"⚠︎ This feature in IMK Candidate Window defects. Please consult Apple Developer Relations\nand tell them the related Radar ID: #FB11300759." = "⚠︎ 該功能因 IMK 選字窗自身缺陷而無法實作。\n請攜 Radar 編號 #FB11300759 找 Apple Developer Relations 投訴。";
 "Allow backspace-editing miscomposed readings" = "允許對無效的讀音使用 BackSpace 編輯";
 "Allow boosting / excluding a candidate of single kanji" = "將可以就地升權/排除的候選字詞的最短詞長設為單個漢字";
 "Allow using Enter key to confirm associated candidate selection" = "允許使用 Enter 確認當前選中的聯想詞";
