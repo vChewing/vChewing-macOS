@@ -171,6 +171,8 @@ public enum InputState {
       return converted
     }
 
+    public var committingBufferConverted: String { composingBufferConverted }
+
     init(composingBuffer: String, cursorIndex: Int, reading: String = "", nodeValuesArray: [String] = []) {
       self.composingBuffer = composingBuffer
       self.reading = reading
@@ -229,6 +231,17 @@ public enum InputState {
     override public var type: StateType { .ofInputting }
     var textToCommit: String = ""
     var tooltip: String = ""
+
+    override public var committingBufferConverted: String {
+      let committingBuffer = nodeValuesArray.joined()
+      let converted = IME.kanjiConversionIfRequired(committingBuffer)
+      if converted.utf16.count != composingBuffer.utf16.count
+        || converted.count != composingBuffer.count
+      {
+        return composingBuffer
+      }
+      return converted
+    }
 
     override init(composingBuffer: String, cursorIndex: Int, reading: String = "", nodeValuesArray: [String] = []) {
       super.init(
