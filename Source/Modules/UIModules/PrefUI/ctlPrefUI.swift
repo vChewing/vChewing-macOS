@@ -67,7 +67,7 @@ extension NSImage {
 
 @available(macOS 10.15, *)
 class ctlPrefUI {
-  lazy var controller = PreferencesWindowController(
+  var controller = PreferencesWindowController(
     panes: [
       Preferences.Pane(
         identifier: Preferences.PaneIdentifier(rawValue: "General"),
