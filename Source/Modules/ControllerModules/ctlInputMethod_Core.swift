@@ -273,6 +273,15 @@ class ctlInputMethod: IMKInputController {
     resetKeyHandler()
   }
 
+  /// 指定輸入法要遞交出去的內容（雖然威注音可能並未用到這個函式）。
+  /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
+  /// - Returns: 字串內容，或者 nil。
+  override func composedString(_ sender: Any!) -> Any! {
+    _ = sender  // 防止格式整理工具毀掉與此對應的參數。
+    guard let state = state as? InputState.NotEmpty else { return "" }
+    return state.committingBufferConverted
+  }
+
   // MARK: - IMKCandidates 功能擴充
 
   /// 生成 IMK 選字窗專用的候選字串陣列。
