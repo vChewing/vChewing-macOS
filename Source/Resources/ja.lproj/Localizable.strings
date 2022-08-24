@@ -134,7 +134,7 @@
 "Disassemble the previous reading, dropping its intonation" = "カーソルの後部の音読みを解き、その音調を除く";
 "Disassembling process does not work with non-phonetic reading keys." = "実の意味の音読みだけを解くことができる。";
 "Emulating select-candidate-per-character mode" = "漢字１つづつ全候補選択入力モード";
-"Enable CNS11643 Support (2022-07-20)" = "全字庫モード // 入力可能な漢字数を倍増す (2022-07-20)";
+"Enable CNS11643 Support (2022-08-02)" = "全字庫モード // 入力可能な漢字数を倍増す (2022-08-02)";
 "Enable Space key for calling candidate window" = "Space キーで入力候補を呼び出す";
 "Enable symbol input support (incl. certain emoji symbols)" = "僅かなる絵文字も含む符号入力サポートを起用";
 "English" = "英語";

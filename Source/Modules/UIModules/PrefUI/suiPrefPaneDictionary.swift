@@ -114,7 +114,7 @@ struct suiPrefPaneDictionary: View {
           ).controlSize(.small)
           Divider()
           Toggle(
-            LocalizedStringKey("Enable CNS11643 Support (2022-07-20)"),
+            LocalizedStringKey("Enable CNS11643 Support (2022-08-02)"),
             isOn: $selEnableCNS11643.onChange {
               mgrPrefs.cns11643Enabled = selEnableCNS11643
               mgrLangModel.setCNSEnabled(mgrPrefs.cns11643Enabled)

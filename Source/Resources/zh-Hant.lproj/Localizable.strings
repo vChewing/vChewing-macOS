@@ -134,7 +134,7 @@
 "Disassemble the previous reading, dropping its intonation" = "析構游標正後方的字音，且剔除其聲調";
 "Disassembling process does not work with non-phonetic reading keys." = "析構行為僅針對組字器內「身為漢字讀音」的讀音索引單元有效。";
 "Emulating select-candidate-per-character mode" = "模擬 90 年代前期注音逐字選字輸入風格";
-"Enable CNS11643 Support (2022-07-20)" = "啟用 CNS11643 全字庫支援 (2022-07-20)";
+"Enable CNS11643 Support (2022-08-02)" = "啟用 CNS11643 全字庫支援 (2022-08-02)";
 "Enable Space key for calling candidate window" = "敲空格鍵以呼出候選字窗";
 "Enable symbol input support (incl. certain emoji symbols)" = "啟用包括少許繪文字在內的符號輸入支援";
 "English" = "英語";
