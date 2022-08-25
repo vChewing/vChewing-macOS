@@ -188,17 +188,13 @@ extension ctlInputMethod {
     if #available(macOS 10.15, *) {
       NSApp.setActivationPolicy(.accessory)
       ctlPrefUI.shared.controller.show(preferencePane: Preferences.PaneIdentifier(rawValue: "General"))
-      ctlPrefUI.shared.controller.window?.level = .floating
+      ctlPrefUI.shared.controller.window?.level = .statusBar
     } else {
-      showPrefWindowTraditional()
+      showLegacyPreferences()
     }
   }
 
-  @objc func showLegacyPreferences(_: Any?) {
-    showPrefWindowTraditional()
-  }
-
-  private func showPrefWindowTraditional() {
+  @objc func showLegacyPreferences(_: Any? = nil) {
     (NSApp.delegate as? AppDelegate)?.showPreferences()
     NSApp.activate(ignoringOtherApps: true)
   }
