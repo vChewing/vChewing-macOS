@@ -29,7 +29,11 @@ final class PreferencesTabViewController: NSViewController, PreferencesStyleCont
   }
 
   override func loadView() {
-    view = NSView()
+    let newView = NSVisualEffectView()
+    newView.material = NSVisualEffectView.Material.sidebar
+    newView.blendingMode = NSVisualEffectView.BlendingMode.behindWindow
+    newView.state = NSVisualEffectView.State.active
+    view = newView
     view.translatesAutoresizingMaskIntoConstraints = false
   }
 
@@ -135,7 +139,7 @@ final class PreferencesTabViewController: NSViewController, PreferencesStyleCont
     // View controller animations only work on macOS 10.14 and newer.
     let options: NSViewController.TransitionOptions
     if #available(macOS 10.14, *) {
-      options = animated && isAnimated ? [.crossfade] : []
+      options = animated && isAnimated ? [.slideUp] : []
     } else {
       options = []
     }
