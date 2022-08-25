@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */ = {isa = PBXBuildFile; fileRef = 5B09307828B6FC3B0021F8C5 /* shortcuts.html */; };
 		5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0AF8B427B2C8290096FE54 /* StringExtension.swift */; };
 		5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */; };
 		5B21176C287539BB000443A9 /* ctlInputMethod_HandleStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176B287539BB000443A9 /* ctlInputMethod_HandleStates.swift */; };
@@ -203,6 +204,10 @@
 		5B05A47B27AFF7CA00437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5B05A47C27AFF7CF00437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5B05A47F27AFF84200437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmAboutWindow.strings; sourceTree = "<group>"; };
+		5B09307728B6FC3B0021F8C5 /* zh-Hant */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = "zh-Hant"; path = "zh-Hant.lproj/shortcuts.html"; sourceTree = "<group>"; };
+		5B09307928B6FC3F0021F8C5 /* zh-Hans */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = "zh-Hans"; path = "zh-Hans.lproj/shortcuts.html"; sourceTree = "<group>"; };
+		5B09307A28B6FC400021F8C5 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = en; path = en.lproj/shortcuts.html; sourceTree = "<group>"; };
+		5B09307B28B6FC410021F8C5 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = ja; path = ja.lproj/shortcuts.html; sourceTree = "<group>"; };
 		5B0AF8B427B2C8290096FE54 /* StringExtension.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = StringExtension.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B0C5EDF27C7D9870078037C /* dataCompiler.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = dataCompiler.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = AppleKeyboardConverter.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -532,6 +537,7 @@
 		5B62A33027AE78E500A19448 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				5B09307828B6FC3B0021F8C5 /* shortcuts.html */,
 				5BF9DA2428840E6200DBD48E /* template-associatedPhrases-chs.txt */,
 				5BF9DA2C2884247800DBD48E /* template-associatedPhrases-cht.txt */,
 				5BF9DA2328840E6200DBD48E /* template-exclusions.txt */,
@@ -1049,6 +1055,7 @@
 				5BF9DA2D288427E000DBD48E /* template-associatedPhrases-cht.txt in Resources */,
 				5BEDB725283B4C250078EB25 /* data-chs.plist in Resources */,
 				5BF9DA2928840E6200DBD48E /* template-associatedPhrases-chs.txt in Resources */,
+				5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */,
 				5BBBB76D27AED5DB0023B93A /* frmAboutWindow.xib in Resources */,
 				5BF9DA2B28840E6200DBD48E /* template-userphrases.txt in Resources */,
 				5BBBB77527AED70B0023B93A /* MenuIcon-SCVIM.png in Resources */,
@@ -1281,6 +1288,17 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		5B09307828B6FC3B0021F8C5 /* shortcuts.html */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5B09307728B6FC3B0021F8C5 /* zh-Hant */,
+				5B09307928B6FC3F0021F8C5 /* zh-Hans */,
+				5B09307A28B6FC400021F8C5 /* en */,
+				5B09307B28B6FC410021F8C5 /* ja */,
+			);
+			name = shortcuts.html;
+			sourceTree = "<group>";
+		};
 		5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
