@@ -338,6 +338,7 @@ class ctlInputMethod: IMKInputController {
   /// IMK 選字窗限定函式，只要選字窗確認了某個候選字詞的選擇、就會呼叫這個函式。
   /// - Parameter candidateString: 已經確認的候選字詞內容。
   override open func candidateSelected(_ candidateString: NSAttributedString!) {
+    let candidateString: NSAttributedString = candidateString ?? .init(string: "")
     if state is InputState.AssociatedPhrases {
       if !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter {
         handle(state: InputState.EmptyIgnoringPreviousState())
