@@ -123,7 +123,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
   }
 
   // 該函式會影響 IMK 選字窗。
-  public func showNextPage() -> Bool {
+  @discardableResult public func showNextPage() -> Bool {
     guard delegate != nil else { return false }
     if pageCount == 1 { return highlightNextCandidate() }
     if currentPageIndex + 1 >= pageCount { clsSFX.beep() }
@@ -135,7 +135,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
   }
 
   // 該函式會影響 IMK 選字窗。
-  public func showPreviousPage() -> Bool {
+  @discardableResult public func showPreviousPage() -> Bool {
     guard delegate != nil else { return false }
     if pageCount == 1 { return highlightPreviousCandidate() }
     if currentPageIndex == 0 { clsSFX.beep() }
@@ -147,7 +147,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
   }
 
   // 該函式會影響 IMK 選字窗。
-  public func highlightNextCandidate() -> Bool {
+  @discardableResult public func highlightNextCandidate() -> Bool {
     guard let delegate = delegate else { return false }
     selectedCandidateIndex =
       (selectedCandidateIndex + 1 >= delegate.candidateCountForController(self))
@@ -157,7 +157,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
   }
 
   // 該函式會影響 IMK 選字窗。
-  public func highlightPreviousCandidate() -> Bool {
+  @discardableResult public func highlightPreviousCandidate() -> Bool {
     guard let delegate = delegate else { return false }
     selectedCandidateIndex =
       (selectedCandidateIndex == 0)

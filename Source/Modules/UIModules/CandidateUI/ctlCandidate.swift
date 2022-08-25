@@ -116,19 +116,19 @@ public class ctlCandidate: NSWindowController, ctlCandidateProtocol {
 
   public func reloadData() {}
 
-  public func showNextPage() -> Bool {
+  @discardableResult public func showNextPage() -> Bool {
     false
   }
 
-  public func showPreviousPage() -> Bool {
+  @discardableResult public func showPreviousPage() -> Bool {
     false
   }
 
-  public func highlightNextCandidate() -> Bool {
+  @discardableResult public func highlightNextCandidate() -> Bool {
     false
   }
 
-  public func highlightPreviousCandidate() -> Bool {
+  @discardableResult public func highlightPreviousCandidate() -> Bool {
     false
   }
 

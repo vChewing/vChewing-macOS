@@ -432,7 +432,7 @@ public class ctlCandidateUniversal: ctlCandidate {
     layoutCandidateView()
   }
 
-  override public func showNextPage() -> Bool {
+  @discardableResult override public func showNextPage() -> Bool {
     guard delegate != nil else { return false }
     if pageCount == 1 { return highlightNextCandidate() }
     if currentPageIndex + 1 >= pageCount { clsSFX.beep() }
@@ -445,7 +445,7 @@ public class ctlCandidateUniversal: ctlCandidate {
     return true
   }
 
-  override public func showPreviousPage() -> Bool {
+  @discardableResult override public func showPreviousPage() -> Bool {
     guard delegate != nil else { return false }
     if pageCount == 1 { return highlightPreviousCandidate() }
     if currentPageIndex == 0 { clsSFX.beep() }
@@ -458,7 +458,7 @@ public class ctlCandidateUniversal: ctlCandidate {
     return true
   }
 
-  override public func highlightNextCandidate() -> Bool {
+  @discardableResult override public func highlightNextCandidate() -> Bool {
     guard let delegate = delegate else { return false }
     selectedCandidateIndex =
       (selectedCandidateIndex + 1 >= delegate.candidateCountForController(self))
@@ -466,7 +466,7 @@ public class ctlCandidateUniversal: ctlCandidate {
     return true
   }
 
-  override public func highlightPreviousCandidate() -> Bool {
+  @discardableResult override public func highlightPreviousCandidate() -> Bool {
     guard let delegate = delegate else { return false }
     selectedCandidateIndex =
       (selectedCandidateIndex == 0)
