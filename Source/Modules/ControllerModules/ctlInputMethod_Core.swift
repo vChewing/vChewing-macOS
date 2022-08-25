@@ -210,9 +210,11 @@ class ctlInputMethod: IMKInputController {
     // 這樣可以讓 interpretKeyEvents() 函式自行判斷：
     // - 是就地交給 super.interpretKeyEvents() 處理？
     // - 還是藉由 delegate 扔回 ctlInputMethod 給 KeyHandler 處理？
-    if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK, ctlCandidateCurrent.visible {
+    proc: if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK {
+      guard ctlCandidateCurrent.visible else { break proc }
       let event: NSEvent = ctlCandidateIMK.replaceNumPadKeyCodes(target: event) ?? event
       let input = InputSignal(event: event)
+
       // Shift+Enter 是個特殊情形，不提前攔截處理的話、會有垃圾參數傳給 delegate 的 keyHandler 從而崩潰。
       // 所以這裡直接將 Shift Flags 清空。
       if input.isShiftHold, input.isEnter {
@@ -237,6 +239,7 @@ class ctlInputMethod: IMKInputController {
         return true
       }
 
+      // 聯想詞選字。
       if let newChar = ctlCandidateIMK.defaultIMKSelectionKey[event.keyCode], input.isShiftHold,
         isAssociatedPhrasesState
       {
