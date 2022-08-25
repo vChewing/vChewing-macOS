@@ -173,6 +173,13 @@ extension KeyHandler {
       return true
     }
 
+    // 阻止用於行內注音輸出的熱鍵。
+    if input.isControlHold, input.isCommandHold, input.isEnter {
+      IME.prtDebugIntel("1198E3E5")
+      errorCallback()
+      return true
+    }
+
     // Enter
     if input.isEnter {
       if let keyHandlerDelegate = delegate {
