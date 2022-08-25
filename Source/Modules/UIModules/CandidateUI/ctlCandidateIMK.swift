@@ -124,44 +124,24 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
 
   // 該函式會影響 IMK 選字窗。
   @discardableResult public func showNextPage() -> Bool {
-    guard delegate != nil else { return false }
-    if pageCount == 1 { return highlightNextCandidate() }
-    if currentPageIndex + 1 >= pageCount { clsSFX.beep() }
-    currentPageIndex = (currentPageIndex + 1 >= pageCount) ? 0 : currentPageIndex + 1
-    if selectedCandidateIndex == candidates(self).count - 1 { return false }
-    selectedCandidateIndex = min(selectedCandidateIndex + keyCount, candidates(self).count - 1)
     do { currentLayout == .vertical ? moveRight(self) : moveDown(self) }
     return true
   }
 
   // 該函式會影響 IMK 選字窗。
   @discardableResult public func showPreviousPage() -> Bool {
-    guard delegate != nil else { return false }
-    if pageCount == 1 { return highlightPreviousCandidate() }
-    if currentPageIndex == 0 { clsSFX.beep() }
-    currentPageIndex = (currentPageIndex == 0) ? pageCount - 1 : currentPageIndex - 1
-    if selectedCandidateIndex == 0 { return true }
-    selectedCandidateIndex = max(selectedCandidateIndex - keyCount, 0)
     do { currentLayout == .vertical ? moveLeft(self) : moveUp(self) }
     return true
   }
 
   // 該函式會影響 IMK 選字窗。
   @discardableResult public func highlightNextCandidate() -> Bool {
-    guard let delegate = delegate else { return false }
-    selectedCandidateIndex =
-      (selectedCandidateIndex + 1 >= delegate.candidateCountForController(self))
-      ? 0 : selectedCandidateIndex + 1
     do { currentLayout == .vertical ? moveDown(self) : moveRight(self) }
     return true
   }
 
   // 該函式會影響 IMK 選字窗。
   @discardableResult public func highlightPreviousCandidate() -> Bool {
-    guard let delegate = delegate else { return false }
-    selectedCandidateIndex =
-      (selectedCandidateIndex == 0)
-      ? delegate.candidateCountForController(self) - 1 : selectedCandidateIndex - 1
     do { currentLayout == .vertical ? moveUp(self) : moveLeft(self) }
     return true
   }
@@ -230,15 +210,21 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     guard let delegate = delegate else { return }
     if input.isEsc || input.isBackSpace || input.isDelete || (input.isShiftHold && !input.isSpace) {
       _ = delegate.sharedEventHandler(event)
-    } else if input.isSymbolMenuPhysicalKey || input.isSpace {
+    } else if input.isSymbolMenuPhysicalKey {
+      // 符號鍵的行為是固定的，不受偏好設定影響。
       switch currentLayout {
         case .horizontal: input.isShiftHold ? moveUp(self) : moveDown(self)
         case .vertical: input.isShiftHold ? moveLeft(self) : moveRight(self)
       }
+    } else if input.isSpace {
+      switch mgrPrefs.specifyShiftSpaceKeyBehavior {
+        case true: _ = input.isShiftHold ? highlightNextCandidate() : showNextPage()
+        case false: _ = input.isShiftHold ? showNextPage() : highlightNextCandidate()
+      }
     } else if input.isTab {
-      switch currentLayout {
-        case .horizontal: input.isShiftHold ? moveLeft(self) : moveRight(self)
-        case .vertical: input.isShiftHold ? moveUp(self) : moveDown(self)
+      switch mgrPrefs.specifyShiftTabKeyBehavior {
+        case true: _ = input.isShiftHold ? showPreviousPage() : showNextPage()
+        case false: _ = input.isShiftHold ? highlightPreviousCandidate() : highlightNextCandidate()
       }
     } else {
       if let newChar = ctlCandidateIMK.defaultIMKSelectionKey[event.keyCode] {
