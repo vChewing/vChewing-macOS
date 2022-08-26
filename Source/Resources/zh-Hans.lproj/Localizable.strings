@@ -2,6 +2,7 @@
 "vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability." = "威注音输入法的使用者半衰记忆模组在观测时崩溃，相关半衰记忆资料档案内容已全部清空。";
 "About vChewing…" = "关于威注音…";
 "vChewing Preferences…" = "威注音偏好设定…";
+"CheatSheet" = "热键指南";
 "Uninstallation" = "卸除输入法";
 "Uninstall vChewing…" = "卸除威注音…";
 "This will remove vChewing Input Method from this user account, requiring your confirmation." = "此举会将威注音自当前系统使用者帐户卸除。请确认。";

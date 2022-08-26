@@ -169,6 +169,10 @@ extension ctlInputMethod {
       withTitle: NSLocalizedString("About vChewing…", comment: ""),
       action: #selector(showAbout(_:)), keyEquivalent: ""
     )
+    menu.addItem(
+      withTitle: NSLocalizedString("CheatSheet", comment: "") + "…",
+      action: #selector(showCheatSheet(_:)), keyEquivalent: ""
+    )
     if optionKeyPressed {
       menu.addItem(
         withTitle: NSLocalizedString("Uninstall vChewing…", comment: ""),
@@ -199,7 +203,12 @@ extension ctlInputMethod {
     NSApp.activate(ignoringOtherApps: true)
   }
 
-  @objc func toggleSCPCTypingMode(_: Any?) {
+  @objc func showCheatSheet(_: Any?) {
+    guard let url = Bundle.main.url(forResource: "shortcuts", withExtension: "html") else { return }
+    NSWorkspace.shared.openFile(url.path, withApplication: "Safari")
+  }
+
+  @objc func toggleSCPCTypingMode(_: Any? = nil) {
     resetKeyHandler()
     NotifierController.notify(
       message: String(
