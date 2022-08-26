@@ -34,6 +34,8 @@ public enum UserDef: String, CaseIterable {
   case kHalfWidthPunctuationEnabled = "HalfWidthPunctuationEnable"
   case kMoveCursorAfterSelectingCandidate = "MoveCursorAfterSelectingCandidate"
   case kEscToCleanInputBuffer = "EscToCleanInputBuffer"
+  case kSpecifyIntonationKeyBehavior = "SecifyIntonationKeyBehavior"
+  case kSpecifyShiftBackSpaceKeyBehavior = "SpecifyShiftBackSpaceKeyBehavior"
   case kSpecifyShiftTabKeyBehavior = "SpecifyShiftTabKeyBehavior"
   case kSpecifyShiftSpaceKeyBehavior = "SpecifyShiftSpaceKeyBehavior"
   case kAllowBoostingSingleKanjiAsUserPhrase = "AllowBoostingSingleKanjiAsUserPhrase"
@@ -50,6 +52,7 @@ public enum UserDef: String, CaseIterable {
   case kTogglingAlphanumericalModeWithLShift = "TogglingAlphanumericalModeWithLShift"
   case kUpperCaseLetterKeyBehavior = "UpperCaseLetterKeyBehavior"
   case kDisableShiftTogglingAlphanumericalMode = "DisableShiftTogglingAlphanumericalMode"
+  case kConsolidateContextOnCandidateSelection = "ConsolidateContextOnCandidateSelection"
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
@@ -77,6 +80,8 @@ private let kMinCandidateListTextSize: CGFloat = 12
 private let kMaxCandidateListTextSize: CGFloat = 196
 
 private let kDefaultKeys = "123456789"
+
+private let kDefaultBasicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
 
 // MARK: - UserDefaults extension.
 
@@ -136,7 +141,7 @@ struct CandidateListTextSize {
 
 // MARK: -
 
-enum MandarinParser: Int {
+enum MandarinParser: Int, CaseIterable {
   case ofStandard = 0
   case ofETen = 1
   case ofHsu = 2
@@ -216,6 +221,12 @@ public enum mgrPrefs {
       mgrPrefs.shouldAutoReloadUserDataFiles, forKey: UserDef.kShouldAutoReloadUserDataFiles.rawValue
     )
     UserDefaults.standard.setDefault(
+      mgrPrefs.specifyIntonationKeyBehavior, forKey: UserDef.kSpecifyIntonationKeyBehavior.rawValue
+    )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.specifyShiftBackSpaceKeyBehavior, forKey: UserDef.kSpecifyShiftBackSpaceKeyBehavior.rawValue
+    )
+    UserDefaults.standard.setDefault(
       mgrPrefs.specifyShiftTabKeyBehavior, forKey: UserDef.kSpecifyShiftTabKeyBehavior.rawValue
     )
     UserDefaults.standard.setDefault(
@@ -282,6 +293,9 @@ public enum mgrPrefs {
     )
     UserDefaults.standard.setDefault(
       mgrPrefs.disableShiftTogglingAlphanumericalMode, forKey: UserDef.kDisableShiftTogglingAlphanumericalMode.rawValue
+    )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.consolidateContextOnCandidateSelection, forKey: UserDef.kConsolidateContextOnCandidateSelection.rawValue
     )
 
     // -----
@@ -354,7 +368,7 @@ public enum mgrPrefs {
   }
 
   @UserDefault(
-    key: UserDef.kBasicKeyboardLayout.rawValue, defaultValue: "com.apple.keylayout.ZhuyinBopomofo"
+    key: UserDef.kBasicKeyboardLayout.rawValue, defaultValue: kDefaultBasicKeyboardLayout
   )
   static var basicKeyboardLayout: String
 
@@ -407,6 +421,9 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kDisableShiftTogglingAlphanumericalMode.rawValue, defaultValue: false)
   static var disableShiftTogglingAlphanumericalMode: Bool
+
+  @UserDefault(key: UserDef.kConsolidateContextOnCandidateSelection.rawValue, defaultValue: true)
+  static var consolidateContextOnCandidateSelection: Bool
 
   // MARK: - Settings (Tier 2)
 
@@ -523,6 +540,12 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kEscToCleanInputBuffer.rawValue, defaultValue: true)
   static var escToCleanInputBuffer: Bool
+
+  @UserDefault(key: UserDef.kSpecifyIntonationKeyBehavior.rawValue, defaultValue: 0)
+  static var specifyIntonationKeyBehavior: Int
+
+  @UserDefault(key: UserDef.kSpecifyShiftBackSpaceKeyBehavior.rawValue, defaultValue: 0)
+  static var specifyShiftBackSpaceKeyBehavior: Int
 
   @UserDefault(key: UserDef.kSpecifyShiftTabKeyBehavior.rawValue, defaultValue: false)
   static var specifyShiftTabKeyBehavior: Bool
@@ -694,6 +717,54 @@ extension mgrPrefs {
       mgrPrefs.shouldAlwaysUseShiftKeyAccommodation = false
       mgrPrefs.disableShiftTogglingAlphanumericalMode = false
       mgrPrefs.togglingAlphanumericalModeWithLShift = false
+    }
+    // 介面語言選項糾錯。
+    var filteredAppleLanguages = Set<String>()
+    appleLanguages.forEach {
+      if IME.arrSupportedLocales.contains($0) {
+        filteredAppleLanguages.insert($0)
+      }
+    }
+    if !filteredAppleLanguages.isEmpty {
+      appleLanguages = Array(filteredAppleLanguages)
+    } else {
+      UserDefaults.standard.removeObject(forKey: UserDef.kAppleLanguages.rawValue)
+    }
+    // 注拼槽注音排列選項糾錯。
+    var isMandarinParserOptionValid = false
+    MandarinParser.allCases.forEach {
+      if $0.rawValue == mandarinParser { isMandarinParserOptionValid = true }
+    }
+    if !isMandarinParserOptionValid {
+      mandarinParser = 0
+    }
+    // 基礎鍵盤排列選項糾錯。
+    var inputSourceTIS: TISInputSource? {
+      var result: TISInputSource?
+      let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
+      let matchedTISString = mgrPrefs.basicKeyboardLayout
+      for source in list {
+        guard let ptrCat = TISGetInputSourceProperty(source, kTISPropertyInputSourceCategory) else { continue }
+        let category = Unmanaged<CFString>.fromOpaque(ptrCat).takeUnretainedValue()
+        guard category == kTISCategoryKeyboardInputSource else { continue }
+        guard let ptrSourceID = TISGetInputSourceProperty(source, kTISPropertyInputSourceID) else { continue }
+        let sourceID = String(Unmanaged<CFString>.fromOpaque(ptrSourceID).takeUnretainedValue())
+        if sourceID == matchedTISString { result = source }
+      }
+      return result
+    }
+    if inputSourceTIS == nil {
+      mgrPrefs.basicKeyboardLayout = kDefaultBasicKeyboardLayout
+    }
+    // 其它多元選項參數自動糾錯。
+    if ![0, 1, 2].contains(specifyIntonationKeyBehavior) {
+      specifyIntonationKeyBehavior = 0
+    }
+    if ![0, 1, 2].contains(specifyShiftBackSpaceKeyBehavior) {
+      specifyShiftBackSpaceKeyBehavior = 0
+    }
+    if ![0, 1, 2].contains(upperCaseLetterKeyBehavior) {
+      upperCaseLetterKeyBehavior = 0
     }
   }
 }

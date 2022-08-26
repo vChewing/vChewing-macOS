@@ -467,9 +467,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testInvalidBpmf() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("eul4").map {
-      String($0)
-    }
+    let keys = Array("eul4").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -482,9 +480,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testInputting() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("18 m,45j/ fu. g0 xup6xu;6").map {
-      String($0)
-    }
+    let keys = Array("18 m,45j/ fu. g0 xup6xu;6").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -500,9 +496,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testInputtingNihao() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3cl3").map {
-      String($0)
-    }
+    let keys = Array("su3cl3").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -518,9 +512,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testInputtingTianKong() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("wu0 dj/ ").map {
-      String($0)
-    }
+    let keys = Array("wu0 dj/ ").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -536,9 +528,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testCommittingNihao() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3cl3").map {
-      String($0)
-    }
+    let keys = Array("su3cl3").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -580,9 +570,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testDelete() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3cl3").map {
-      String($0)
-    }
+    let keys = Array("su3cl3").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -662,9 +650,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testBackspaceToDeleteReading() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su").map {
-      String($0)
-    }
+    let keys = Array("su").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -696,9 +682,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testBackspaceAtBegin() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3cl3").map {
-      String($0)
-    }
+    let keys = Array("su3cl3").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -739,9 +723,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testBackspaceToDeleteReadingWithText() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3cl").map {
-      String($0)
-    }
+    let keys = Array("su3cl").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -777,9 +759,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testBackspace() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3cl3").map {
-      String($0)
-    }
+    let keys = Array("su3cl3").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -818,9 +798,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testCursorWithReading() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3cl").map {
-      String($0)
-    }
+    let keys = Array("su3cl").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -855,9 +833,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testCursor() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3cl3").map {
-      String($0)
-    }
+    let keys = Array("su3cl3").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -948,9 +924,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testCandidateWithDown() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3").map {
-      String($0)
-    }
+    let keys = Array("su3").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -985,9 +959,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
     let enabled = mgrPrefs.chooseCandidateUsingSpace
     mgrPrefs.chooseCandidateUsingSpace = true
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3").map {
-      String($0)
-    }
+    let keys = Array("su3").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -1023,9 +995,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
     let enabled = mgrPrefs.chooseCandidateUsingSpace
     mgrPrefs.chooseCandidateUsingSpace = false
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3").map {
-      String($0)
-    }
+    let keys = Array("su3").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: InputState.Empty()) { newState in
@@ -1079,9 +1049,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
     let enabled = mgrPrefs.chooseCandidateUsingSpace
     mgrPrefs.chooseCandidateUsingSpace = false
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3cl3").map {
-      String($0)
-    }
+    let keys = Array("su3cl3").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -1117,9 +1085,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testHomeAndEnd() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3cl3").map {
-      String($0)
-    }
+    let keys = Array("su3cl3").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -1191,9 +1157,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testHomeAndEndWithReading() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3cl").map {
-      String($0)
-    }
+    let keys = Array("su3cl").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -1245,9 +1209,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testMarkingLeftAtBegin() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3cl3").map {
-      String($0)
-    }
+    let keys = Array("su3cl3").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -1279,9 +1241,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testMarkingRightAtEnd() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3cl3").map {
-      String($0)
-    }
+    let keys = Array("su3cl3").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -1304,9 +1264,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testMarkingLeft() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3cl3").map {
-      String($0)
-    }
+    let keys = Array("su3cl3").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -1371,9 +1329,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testMarkingRight() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3cl3").map {
-      String($0)
-    }
+    let keys = Array("su3cl3").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -1455,9 +1411,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
 
   func testCancelMarking() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3cl3").map {
-      String($0)
-    }
+    let keys = Array("su3cl3").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -1503,9 +1457,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
     let enabled = mgrPrefs.escToCleanInputBuffer
     mgrPrefs.escToCleanInputBuffer = false
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su").map {
-      String($0)
-    }
+    let keys = Array("su").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -1535,9 +1487,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
     let enabled = mgrPrefs.escToCleanInputBuffer
     mgrPrefs.escToCleanInputBuffer = false
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3cl").map {
-      String($0)
-    }
+    let keys = Array("su3cl").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in
@@ -1571,9 +1521,7 @@ class KeyHandlerTestsNormalCHS: XCTestCase {
     let enabled = mgrPrefs.escToCleanInputBuffer
     mgrPrefs.escToCleanInputBuffer = true
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3cl").map {
-      String($0)
-    }
+    let keys = Array("su3cl").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalTyping: false)
       _ = handler.handle(input: input, state: state) { newState in

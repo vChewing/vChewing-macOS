@@ -2,6 +2,7 @@
 "vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability." = "威注音输入法的使用者半衰记忆模组在观测时崩溃，相关半衰记忆资料档案内容已全部清空。";
 "About vChewing…" = "关于威注音…";
 "vChewing Preferences…" = "威注音偏好设定…";
+"CheatSheet" = "热键指南";
 "Uninstallation" = "卸除输入法";
 "Uninstall vChewing…" = "卸除威注音…";
 "This will remove vChewing Input Method from this user account, requiring your confirmation." = "此举会将威注音自当前系统使用者帐户卸除。请确认。";
@@ -10,7 +11,7 @@
 "Check for Update Completed" = "新版检查完毕";
 "You are already using the latest version of vChewing." = "目前使用的已经是最新版本。";
 "Update Check Failed" = "无法检查新版";
-"There may be no internet connection or the server failed to respond.\n\nError message: %@" = "网路连线失败，或是服务器没有回应。\n\n错误说明：%@";
+"There may be no internet connection or the server failed to respond.\n\nError message: %@" = "网路连线失败，或是伺服器没有回应。\n\n错误说明：%@";
 "OK" = "确定";
 "Dismiss" = "关闭本视窗";
 "New Version Available" = "有新版可下载";
@@ -25,7 +26,7 @@
 "Unable to create the user phrase file." = "无法创建自订语汇档案。";
 "Please check the permission at \"%@\"." = "请检查此处的存取权限：\"%@\".";
 "Edit Excluded Phrases…" = "编辑要滤除的语汇…";
-"Half-Width Punctuation Mode" = "半角标点模式";
+"Half-Width Punctuation Mode" = "半形标点模式";
 "\"%@\" length must ≥ 2 for a user phrase." = "「%@」字数不足以自订语汇。";
 "\"%@\" length should ≤ %d for a user phrase." = "「%@」字数超过 %d、无法自订。";
 "\"%@\" selected. ENTER to add user phrase." = "「%@」敲 Enter 添入自订语汇。";
@@ -40,7 +41,7 @@
 "Maximum 15 candidate keys allowed." = "选字键最多只能指定十五个。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 语汇置换功能已启用，会波及语汇自订。";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 无法处理：组字区字数与读音数不对应。";
-"Per-Char Select Mode" = "仿真逐字选字输入";
+"Per-Char Select Mode" = "模拟逐字选字输入";
 "CNS11643 Mode" = "全字库模式";
 "JIS Shinjitai Output" = "JIS 新字体模式";
 "Per-Char Associated Phrases" = "逐字选字联想模式";
@@ -58,9 +59,6 @@
 "Symbol & Emoji Input" = "符号＆绘文字输入";
 "Edit User Symbol & Emoji Data…" = "编辑自订符号&绘文字资料…";
 "Choose your desired user data folder." = "请选择您想指定的使用者语汇档案目录。";
-"Cursor is between \"%@\" and \"%@\"." = "游标介于「%@」与「%@」之间。";
-"Cursor is to the rear of \"%@\"." = "游标在「%@」的后方。";
-"Cursor is in front of \"%@\"." = "游标在「%@」的前方。.";
 "Loading CHS Core Dict..." = "载入简体中文核心辞典…";
 "Loading CHT Core Dict..." = "载入繁体中文核心辞典…";
 "Core Dict loading complete." = "核心辞典载入完毕";
@@ -88,10 +86,13 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)空格键:";
+"⚠︎ This feature in IMK Candidate Window defects. Please consult Apple Developer Relations\nand tell them the related Radar ID: #FB11300759." = "⚠︎ 该功能因 IMK 选字窗自身缺陷而无法实作。\n请携 Radar 编号 #FB11300759 找 Apple Developer Relations 投诉。";
 "Allow backspace-editing miscomposed readings" = "允许对无效的读音使用 BackSpace 编辑";
 "Allow boosting / excluding a candidate of single kanji" = "将可以就地升权/排除的候选字词的最短词长设为单个汉字";
 "Allow using Enter key to confirm associated candidate selection" = "允许使用 Enter 确认当前选中的联想词";
 "Also toggle alphanumerical mode with Left-Shift" = "也允许使用左侧的 Shift 键盘切换英数输入模式";
+"Always drop the previous reading" = "始终剔除游标正后方的字音";
+"Always type intonations to the inline composition buffer" = "始终在内文组字区内键入声调符号";
 "Always use fixed listing order in candidate window" = "以固定顺序来陈列选字窗内的候选字";
 "An accommodation for elder computer users." = "针对年长使用者的习惯而提供。";
 "Apple ABC (equivalent to English US)" = "Apple ABC (与 Apple 美规键盘等价)";
@@ -119,8 +120,10 @@
 "Choose the phonetic layout for Mandarin parser." = "请指定普通话/国音分析器所使用的注音排列。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "请在此指定您想指定的使用者语汇档案目录。无效值会被忽略。";
 "Choose your preferred layout of the candidate window." = "选择您所偏好的候选字窗布局。";
+"Clear the entire inline composition buffer like Shift+Delete" = "像 Shift+Delete 那样清空当前组字区内容";
 "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Ctrl(+Option)+Command+Enter 输出汉语拼音而非注音";
-"Completely disable using Shift key to toggling alphanumerical mode" = "彻底禁止使用 Shift 键切换英数模式";
+"Completely disable using Shift key to toggle alphanumerical mode" = "彻底禁止使用 Shift 键切换英数模式";
+"Consolidate the context on confirming candidate selection" = "在使用选字窗选字时，自動巩固上下文";
 "Cursor Selection:" = "选字游标:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千排列 (微软标准/王安/零壹/仲鼎/国乔)";
 "Dachen 26 (libChewing)" = "酷音大千二十六键排列";
@@ -129,8 +132,10 @@
 "Dictionary" = "辞典设定";
 "Directly commit lowercased letters" = "直接递交小写字母";
 "Directly commit uppercased letters" = "直接递交大写字母";
+"Disassemble the previous reading, dropping its intonation" = "析构游标正后方的字音，且剔除其声调";
+"Disassembling process does not work with non-phonetic reading keys." = "析构行为仅针对组字器内「身为汉字读音」的读音索引单元有效。";
 "Emulating select-candidate-per-character mode" = "模拟 90 年代前期注音逐字选字输入风格";
-"Enable CNS11643 Support (2022-07-20)" = "启用 CNS11643 全字库支援 (2022-07-20)";
+"Enable CNS11643 Support (2022-08-02)" = "启用 CNS11643 全字库支援 (2022-08-02)";
 "Enable Space key for calling candidate window" = "敲空格键以呼出候选字窗";
 "Enable symbol input support (incl. certain emoji symbols)" = "启用包括少许绘文字在内的符号输入支援";
 "English" = "英语";
@@ -149,18 +154,24 @@
 "IBM" = "IBM 排列";
 "IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases." = "IMK 选字窗依赖于 Apple 的私有 API，而且是借由桥接档案头强制曝露的方法使用的。目前，该功能仅在 macOS 10.14 Mojave 至 macOS 13 Ventura 系统内有测试过可用性。至于在未来的 macOS 发行版当中是否可用，则需要另行测试、才能下结论。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "将游标置于词语前方 // macOS 内建注音风格";
+"Intonation Key:" = "声调键:";
 "Japanese" = "和语";
-"Keyboard Shortcuts:" = "键盘快捷键:";
+"Keyboard Shortcuts:" = "键盘快速键:";
 "Keyboard" = "键盘设定";
 "Misc Settings:" = "杂项:";
 "MiTAC" = "神通排列";
 "Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "QWERTY 以外的英数布局是为了拼音排列使用者而准备的。";
+"Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead." = "注意：Mac 键盘的「Delete ⌫」键在此被称作「BackSpace 退格键 ⌫」以与 PC 键盘的真正的「Delete ⌦」键彼此区分开。若您想在没有数字小键盘的 Mac 电脑上使用真正的「Delete ⌦」按键的话，请改用「Fn+⌫」。";
+"Only override the intonation of the previous reading if different" = "仅在键入的声调与游标正后方的字音不同时，尝试覆写";
 "Output Settings:" = "输出设定:";
+"Override the previous reading's intonation with candidate-reset" = "尝试对游标正后方的字音覆写声调，且重设其选字状态";
 "Phonetic Parser:" = "注音排列:";
+"Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu." = "请利用滑鼠滚轮检视该页面。也请洽输入法选单内的热键指南。";
 "Push the cursor in front of the phrase after selection" = "在选字后将游标置于该字词的前方";
 "Secondary Pinyin with Numeral Intonation" = "国音二式+数字标调";
 "Seigyou" = "精业排列";
 "Selection Keys:" = "选字键:";
+"Shift+BackSpace:" = "Shift+退格键:";
 "Shift+Letter:" = "Shift+字母键:";
 "Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "拼音并击（组字区与工具提示内显示汉语拼音）";
 "Show page buttons in candidate window" = "在选字窗内显示翻页按钮";
@@ -168,6 +179,7 @@
 "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. If you want the same accommodation for other client apps, please tick this checkbox on." = "某些应用（比如像是 MS Edge 或者 Chrome 这样的 Chromium 核心的浏览器）可能会使输入的 Shift 按键讯号被重复输入，且其有关研发方很可能不打算修复这些产品缺陷。威注音针对这些应用预设启用了相容措施。如果您希望在任何应用当中都启用该措施的话，请勾选之。";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+空格键 换下一页，空格键 换选下一个候选字";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "空格键 换下一页，Shift+空格键 换选下一个候选字";
+"Specify the behavior of intonation key when syllable composer is empty." = "指定声调键（在注拼槽为「空」状态时）的行为。";
 "Starlight" = "星光排列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉耻模式 // 取消勾选的话，敲错字时会有异音";
 "This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later." = "该方法是 Apple Bug Report #FB10978412 的保守治疗方案，用来仅针对 macOS 12 开始的系统，且仅对非 IMK 选字窗起作用。Apple 应该对 macOS 11 开始的系统修复这个 Bug。";

@@ -8,7 +8,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
+import Foundation
 
 // 註：所有 InputState 型別均不適合使用 Struct，因為 Struct 無法相互繼承派生。
 
@@ -171,6 +171,8 @@ public enum InputState {
       return converted
     }
 
+    public var committingBufferConverted: String { composingBufferConverted }
+
     init(composingBuffer: String, cursorIndex: Int, reading: String = "", nodeValuesArray: [String] = []) {
       self.composingBuffer = composingBuffer
       self.reading = reading
@@ -229,6 +231,17 @@ public enum InputState {
     override public var type: StateType { .ofInputting }
     var textToCommit: String = ""
     var tooltip: String = ""
+
+    override public var committingBufferConverted: String {
+      let committingBuffer = nodeValuesArray.joined()
+      let converted = IME.kanjiConversionIfRequired(committingBuffer)
+      if converted.utf16.count != composingBuffer.utf16.count
+        || converted.count != composingBuffer.count
+      {
+        return composingBuffer
+      }
+      return converted
+    }
 
     override init(composingBuffer: String, cursorIndex: Int, reading: String = "", nodeValuesArray: [String] = []) {
       super.init(
@@ -490,8 +503,8 @@ public enum InputState {
             return cursorIndexU8..<min(cursorIndexU8 + chosenCandidateString.count, composingBuffer.count - 1)
         }
       }()
-      let strSegmentedRear = composingBuffer.map { String($0) }[0..<u8Range.lowerBound].joined()
-      let strSegmentedFront = composingBuffer.map { String($0) }[u8Range.upperBound...].joined()
+      let strSegmentedRear = composingBuffer.charComponents[0..<u8Range.lowerBound].joined()
+      let strSegmentedFront = composingBuffer.charComponents[u8Range.upperBound...].joined()
       let newBufferConverted: String = NotEmpty(
         composingBuffer: strSegmentedRear + chosenCandidateString + strSegmentedFront, cursorIndex: 0
       ).composingBufferConverted

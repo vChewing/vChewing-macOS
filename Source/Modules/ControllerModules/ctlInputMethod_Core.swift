@@ -8,7 +8,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
 import InputMethodKit
 
 /// 輸入法控制模組，乃在輸入法端用以控制輸入行為的基礎型別。
@@ -111,8 +110,6 @@ class ctlInputMethod: IMKInputController {
     keyHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
     keyHandler.ensureParser()
 
-    mgrPrefs.fixOddPreferences()
-
     if isASCIIMode {
       if mgrPrefs.disableShiftTogglingAlphanumericalMode {
         isASCIIMode = false
@@ -200,19 +197,24 @@ class ctlInputMethod: IMKInputController {
 
   /// 接受所有鍵鼠事件為 NSEvent，讓輸入法判斷是否要處理、該怎樣處理。
   /// - Parameters:
-  ///   - event: 裝置操作輸入事件。
+  ///   - event: 裝置操作輸入事件，可能會是 nil。
   ///   - sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 回「`true`」以將該案件已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
   @objc(handleEvent:client:) override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
 
+    // 就這傳入的 NSEvent 都還有可能是 nil，Apple InputMethodKit 團隊到底在搞三小。
+    guard let event = event else { return false }
+
     // IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
     // 這樣可以讓 interpretKeyEvents() 函式自行判斷：
     // - 是就地交給 super.interpretKeyEvents() 處理？
     // - 還是藉由 delegate 扔回 ctlInputMethod 給 KeyHandler 處理？
-    if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK, ctlCandidateCurrent.visible {
-      let event: NSEvent! = ctlCandidateIMK.replaceNumPadKeyCodes(target: event) ?? event
+    proc: if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK {
+      guard ctlCandidateCurrent.visible else { break proc }
+      let event: NSEvent = ctlCandidateIMK.replaceNumPadKeyCodes(target: event) ?? event
       let input = InputSignal(event: event)
+
       // Shift+Enter 是個特殊情形，不提前攔截處理的話、會有垃圾參數傳給 delegate 的 keyHandler 從而崩潰。
       // 所以這裡直接將 Shift Flags 清空。
       if input.isShiftHold, input.isEnter {
@@ -237,6 +239,7 @@ class ctlInputMethod: IMKInputController {
         return true
       }
 
+      // 聯想詞選字。
       if let newChar = ctlCandidateIMK.defaultIMKSelectionKey[event.keyCode], input.isShiftHold,
         isAssociatedPhrasesState
       {
@@ -271,6 +274,15 @@ class ctlInputMethod: IMKInputController {
   override func commitComposition(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     resetKeyHandler()
+  }
+
+  /// 指定輸入法要遞交出去的內容（雖然威注音可能並未用到這個函式）。
+  /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
+  /// - Returns: 字串內容，或者 nil。
+  override func composedString(_ sender: Any!) -> Any! {
+    _ = sender  // 防止格式整理工具毀掉與此對應的參數。
+    guard let state = state as? InputState.NotEmpty else { return "" }
+    return state.committingBufferConverted
   }
 
   // MARK: - IMKCandidates 功能擴充
@@ -329,6 +341,7 @@ class ctlInputMethod: IMKInputController {
   /// IMK 選字窗限定函式，只要選字窗確認了某個候選字詞的選擇、就會呼叫這個函式。
   /// - Parameter candidateString: 已經確認的候選字詞內容。
   override open func candidateSelected(_ candidateString: NSAttributedString!) {
+    let candidateString: NSAttributedString = candidateString ?? .init(string: "")
     if state is InputState.AssociatedPhrases {
       if !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter {
         handle(state: InputState.EmptyIgnoringPreviousState())

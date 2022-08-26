@@ -20,15 +20,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     }
   }
 
-  public var visible: Bool = false {
-    didSet {
-      if visible {
-        show()
-      } else {
-        hide()
-      }
-    }
-  }
+  public var visible: Bool = false { didSet { visible ? show() : hide() } }
 
   public var windowTopLeftPoint: NSPoint {
     get {
@@ -124,99 +116,50 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
   private var currentPageIndex: Int = 0
 
   private var pageCount: Int {
-    guard let delegate = delegate else {
-      return 0
-    }
+    guard let delegate = delegate else { return 0 }
     let totalCount = delegate.candidateCountForController(self)
     let keyLabelCount = keyLabels.count
     return totalCount / keyLabelCount + ((totalCount % keyLabelCount) != 0 ? 1 : 0)
   }
 
-  public func showNextPage() -> Bool {
-    guard delegate != nil else { return false }
-    if pageCount == 1 { return highlightNextCandidate() }
-    if currentPageIndex + 1 >= pageCount { clsSFX.beep() }
-    currentPageIndex = (currentPageIndex + 1 >= pageCount) ? 0 : currentPageIndex + 1
-    if selectedCandidateIndex == candidates(self).count - 1 { return false }
-    selectedCandidateIndex = min(selectedCandidateIndex + keyCount, candidates(self).count - 1)
-    switch currentLayout {
-      case .horizontal:
-        moveDown(self)
-      case .vertical:
-        moveRight(self)
-    }
+  // 該函式會影響 IMK 選字窗。
+  @discardableResult public func showNextPage() -> Bool {
+    do { currentLayout == .vertical ? moveRight(self) : moveDown(self) }
     return true
   }
 
-  public func showPreviousPage() -> Bool {
-    guard delegate != nil else { return false }
-    if pageCount == 1 { return highlightPreviousCandidate() }
-    if currentPageIndex == 0 { clsSFX.beep() }
-    currentPageIndex = (currentPageIndex == 0) ? pageCount - 1 : currentPageIndex - 1
-    if selectedCandidateIndex == 0 { return true }
-    selectedCandidateIndex = max(selectedCandidateIndex - keyCount, 0)
-    switch currentLayout {
-      case .horizontal:
-        moveUp(self)
-      case .vertical:
-        moveLeft(self)
-    }
+  // 該函式會影響 IMK 選字窗。
+  @discardableResult public func showPreviousPage() -> Bool {
+    do { currentLayout == .vertical ? moveLeft(self) : moveUp(self) }
     return true
   }
 
-  public func highlightNextCandidate() -> Bool {
-    guard let delegate = delegate else { return false }
-    selectedCandidateIndex =
-      (selectedCandidateIndex + 1 >= delegate.candidateCountForController(self))
-      ? 0 : selectedCandidateIndex + 1
-    switch currentLayout {
-      case .horizontal:
-        moveRight(self)
-        return true
-      case .vertical:
-        moveDown(self)
-        return true
-    }
+  // 該函式會影響 IMK 選字窗。
+  @discardableResult public func highlightNextCandidate() -> Bool {
+    do { currentLayout == .vertical ? moveDown(self) : moveRight(self) }
+    return true
   }
 
-  public func highlightPreviousCandidate() -> Bool {
-    guard let delegate = delegate else { return false }
-    selectedCandidateIndex =
-      (selectedCandidateIndex == 0)
-      ? delegate.candidateCountForController(self) - 1 : selectedCandidateIndex - 1
-    switch currentLayout {
-      case .horizontal:
-        moveLeft(self)
-        return true
-      case .vertical:
-        moveUp(self)
-        return true
-    }
+  // 該函式會影響 IMK 選字窗。
+  @discardableResult public func highlightPreviousCandidate() -> Bool {
+    do { currentLayout == .vertical ? moveUp(self) : moveLeft(self) }
+    return true
   }
 
   public func candidateIndexAtKeyLabelIndex(_ index: Int) -> Int {
-    guard let delegate = delegate else {
-      return Int.max
-    }
-
+    guard let delegate = delegate else { return Int.max }
     let result = currentPageIndex * keyLabels.count + index
     return result < delegate.candidateCountForController(self) ? result : Int.max
   }
 
   public var selectedCandidateIndex: Int {
-    get {
-      selectedCandidate()
-    }
-    set {
-      selectCandidate(withIdentifier: newValue)
-    }
+    get { selectedCandidate() }
+    set { selectCandidate(withIdentifier: newValue) }
   }
 
   public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
-      self.doSet(
-        windowTopLeftPoint: windowTopLeftPoint, bottomOutOfScreenAdjustmentHeight: height
-      )
+      self.doSet(windowTopLeftPoint: windowTopLeftPoint, bottomOutOfScreenAdjustmentHeight: height)
     }
   }
 
@@ -235,9 +178,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
       }
     }
 
-    if adjustedHeight > screenFrame.size.height / 2.0 {
-      adjustedHeight = 0.0
-    }
+    if adjustedHeight > screenFrame.size.height / 2.0 { adjustedHeight = 0.0 }
 
     let windowSize = candidateFrame().size
 
@@ -247,9 +188,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     }
 
     // top over the screen?
-    if adjustedPoint.y >= screenFrame.maxY {
-      adjustedPoint.y = screenFrame.maxY - 1.0
-    }
+    if adjustedPoint.y >= screenFrame.maxY { adjustedPoint.y = screenFrame.maxY - 1.0 }
 
     // right
     if adjustedPoint.x + windowSize.width >= screenFrame.maxX {
@@ -257,9 +196,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     }
 
     // left
-    if adjustedPoint.x < screenFrame.minX {
-      adjustedPoint.x = screenFrame.minX
-    }
+    if adjustedPoint.x < screenFrame.minX { adjustedPoint.x = screenFrame.minX }
 
     setCandidateFrameTopLeft(adjustedPoint)
   }
@@ -273,36 +210,21 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     guard let delegate = delegate else { return }
     if input.isEsc || input.isBackSpace || input.isDelete || (input.isShiftHold && !input.isSpace) {
       _ = delegate.sharedEventHandler(event)
-    } else if input.isSymbolMenuPhysicalKey || input.isSpace {
-      if input.isShiftHold {
-        switch currentLayout {
-          case .horizontal:
-            moveUp(self)
-          case .vertical:
-            moveLeft(self)
-        }
-      } else {
-        switch currentLayout {
-          case .horizontal:
-            moveDown(self)
-          case .vertical:
-            moveRight(self)
-        }
+    } else if input.isSymbolMenuPhysicalKey {
+      // 符號鍵的行為是固定的，不受偏好設定影響。
+      switch currentLayout {
+        case .horizontal: input.isShiftHold ? moveUp(self) : moveDown(self)
+        case .vertical: input.isShiftHold ? moveLeft(self) : moveRight(self)
+      }
+    } else if input.isSpace {
+      switch mgrPrefs.specifyShiftSpaceKeyBehavior {
+        case true: _ = input.isShiftHold ? highlightNextCandidate() : showNextPage()
+        case false: _ = input.isShiftHold ? showNextPage() : highlightNextCandidate()
       }
     } else if input.isTab {
-      switch currentLayout {
-        case .horizontal:
-          if input.isShiftHold {
-            moveLeft(self)
-          } else {
-            moveRight(self)
-          }
-        case .vertical:
-          if input.isShiftHold {
-            moveUp(self)
-          } else {
-            moveDown(self)
-          }
+      switch mgrPrefs.specifyShiftTabKeyBehavior {
+        case true: _ = input.isShiftHold ? showPreviousPage() : showNextPage()
+        case false: _ = input.isShiftHold ? highlightPreviousCandidate() : highlightNextCandidate()
       }
     } else {
       if let newChar = ctlCandidateIMK.defaultIMKSelectionKey[event.keyCode] {
@@ -334,11 +256,9 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
         }
       }
 
-      if mgrPrefs.useSCPCTypingMode {
-        if !input.isReservedKey {
-          _ = delegate.sharedEventHandler(event)
-          return
-        }
+      if mgrPrefs.useSCPCTypingMode, !input.isReservedKey {
+        _ = delegate.sharedEventHandler(event)
+        return
       }
 
       if delegate.isAssociatedPhrasesState,

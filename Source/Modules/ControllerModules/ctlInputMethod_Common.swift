@@ -15,7 +15,7 @@ extension ctlInputMethod {
   /// 這樣分開處理很有必要，不然 handle() 函式會陷入無限迴圈。
   /// - Parameter event: 由 IMK 選字窗接收的裝置操作輸入事件。
   /// - Returns: 回「`true`」以將該案件已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
-  func commonEventHandler(_ event: NSEvent!) -> Bool {
+  func commonEventHandler(_ event: NSEvent) -> Bool {
     // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
     let shouldUseHandle =
       (IME.arrClientShiftHandlingExceptionList.contains(clientBundleIdentifier)

@@ -6,7 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
 import SwiftUI
 
 @available(macOS 10.15, *)
@@ -38,6 +37,10 @@ struct suiPrefPaneExperience: View {
     forKey: UserDef.kUpperCaseLetterKeyBehavior.rawValue)
   @State private var selDisableShiftTogglingAlphanumericalMode: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kDisableShiftTogglingAlphanumericalMode.rawValue)
+  @State private var selSpecifyIntonationKeyBehavior = UserDefaults.standard.integer(
+    forKey: UserDef.kSpecifyIntonationKeyBehavior.rawValue)
+  @State private var selSpecifyShiftBackSpaceKeyBehavior = UserDefaults.standard.integer(
+    forKey: UserDef.kSpecifyShiftBackSpaceKeyBehavior.rawValue)
 
   private let contentMaxHeight: Double = 430
   private let contentWidth: Double = {
@@ -55,6 +58,22 @@ struct suiPrefPaneExperience: View {
 
   var body: some View {
     ScrollView {
+      VStack {
+        _VSpacer(minHeight: 24)
+        Text(
+          "\u{2022} "
+            + NSLocalizedString(
+              "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu.",
+              comment: ""
+            ) + "\n\u{2022} "
+            + NSLocalizedString(
+              "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead.",
+              comment: ""
+            )
+        )
+        .preferenceDescription()
+        .fixedSize(horizontal: false, vertical: true)
+      }.frame(maxWidth: contentWidth)
       Preferences.Container(contentWidth: contentWidth) {
         Preferences.Section(label: { Text(LocalizedStringKey("Cursor Selection:")) }) {
           Picker(
@@ -76,6 +95,22 @@ struct suiPrefPaneExperience: View {
               mgrPrefs.moveCursorAfterSelectingCandidate = selPushCursorAfterSelection
             }
           ).controlSize(.small)
+        }
+        Preferences.Section(label: { Text(LocalizedStringKey("Shift+BackSpace:")) }) {
+          Picker(
+            "",
+            selection: $selSpecifyShiftBackSpaceKeyBehavior.onChange {
+              mgrPrefs.specifyShiftBackSpaceKeyBehavior = selSpecifyShiftBackSpaceKeyBehavior
+            }
+          ) {
+            Text(LocalizedStringKey("Disassemble the previous reading, dropping its intonation")).tag(0)
+            Text(LocalizedStringKey("Clear the entire inline composition buffer like Shift+Delete")).tag(1)
+            Text(LocalizedStringKey("Always drop the previous reading")).tag(2)
+          }
+          .labelsHidden()
+          .pickerStyle(RadioGroupPickerStyle())
+          Text(LocalizedStringKey("Disassembling process does not work with non-phonetic reading keys."))
+            .preferenceDescription()
         }
         Preferences.Section(title: "(Shift+)Tab:") {
           Picker(
@@ -124,6 +159,36 @@ struct suiPrefPaneExperience: View {
           Text(LocalizedStringKey("Choose the behavior of Shift+Letter key with letter inputs."))
             .preferenceDescription()
         }
+        Preferences.Section(label: { Text(LocalizedStringKey("Intonation Key:")) }) {
+          Picker(
+            "",
+            selection: $selSpecifyIntonationKeyBehavior.onChange {
+              mgrPrefs.specifyIntonationKeyBehavior = selSpecifyIntonationKeyBehavior
+            }
+          ) {
+            Text(LocalizedStringKey("Override the previous reading's intonation with candidate-reset")).tag(0)
+            Text(LocalizedStringKey("Only override the intonation of the previous reading if different")).tag(1)
+            Text(LocalizedStringKey("Always type intonations to the inline composition buffer")).tag(2)
+          }
+          .labelsHidden()
+          .pickerStyle(RadioGroupPickerStyle())
+          Text(LocalizedStringKey("Specify the behavior of intonation key when syllable composer is empty."))
+            .preferenceDescription()
+        }
+        Preferences.Section(title: "Shift:") {
+          Toggle(
+            LocalizedStringKey("Completely disable using Shift key to toggle alphanumerical mode"),
+            isOn: $selDisableShiftTogglingAlphanumericalMode.onChange {
+              mgrPrefs.disableShiftTogglingAlphanumericalMode = selDisableShiftTogglingAlphanumericalMode
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Also toggle alphanumerical mode with Left-Shift"),
+            isOn: $selTogglingAlphanumericalModeWithLShift.onChange {
+              mgrPrefs.togglingAlphanumericalModeWithLShift = selTogglingAlphanumericalModeWithLShift
+            }
+          ).disabled(mgrPrefs.disableShiftTogglingAlphanumericalMode == true)
+        }
         Preferences.Section(label: { Text(LocalizedStringKey("Misc Settings:")) }) {
           Toggle(
             LocalizedStringKey("Enable Space key for calling candidate window"),
@@ -147,18 +212,6 @@ struct suiPrefPaneExperience: View {
             LocalizedStringKey("Allow using Enter key to confirm associated candidate selection"),
             isOn: $selAlsoConfirmAssociatedCandidatesByEnter.onChange {
               mgrPrefs.alsoConfirmAssociatedCandidatesByEnter = selAlsoConfirmAssociatedCandidatesByEnter
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Also toggle alphanumerical mode with Left-Shift"),
-            isOn: $selTogglingAlphanumericalModeWithLShift.onChange {
-              mgrPrefs.togglingAlphanumericalModeWithLShift = selTogglingAlphanumericalModeWithLShift
-            }
-          ).disabled(mgrPrefs.disableShiftTogglingAlphanumericalMode == true)
-          Toggle(
-            LocalizedStringKey("Completely disable using Shift key to toggling alphanumerical mode"),
-            isOn: $selDisableShiftTogglingAlphanumericalMode.onChange {
-              mgrPrefs.disableShiftTogglingAlphanumericalMode = selDisableShiftTogglingAlphanumericalMode
             }
           )
           Toggle(

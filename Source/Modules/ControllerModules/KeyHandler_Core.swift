@@ -12,7 +12,7 @@
 /// 被封裝的「與 Megrez 組字引擎和 Tekkon 注拼引擎對接的」各種工具函式。
 /// 注意：不要把 composer 注拼槽與 compositor 組字器這兩個概念搞混。
 
-import Cocoa
+import Foundation
 
 // MARK: - 委任協定 (Delegate).
 
@@ -69,6 +69,8 @@ public class KeyHandler {
 
   /// 初期化。
   public init() {
+    /// 同步組字器單個詞的幅位長度上限。
+    Megrez.Compositor.maxSpanLength = mgrPrefs.maxCandidateLength
     /// 組字器初期化。因為是首次初期化變數，所以這裡不能用 ensureCompositor() 代勞。
     compositor = Megrez.Compositor(with: currentLM, separator: "-")
     /// 注拼槽初期化。
@@ -140,20 +142,26 @@ public class KeyHandler {
   ///
   /// 威注音輸入法截至 v1.9.3 SP2 版為止都受到上游的這個 Bug 的影響，且在 v1.9.4 版利用該函式修正了這個缺陷。
   /// 該修正必須搭配至少天權星組字引擎 v2.0.2 版方可生效。算法可能比較囉唆，但至少在常用情形下不會再發生該問題。
-  /// - Parameter theCandidate: 要拿來覆寫的詞音配對。
-  func consolidateCursorContext(with theCandidate: Megrez.Compositor.Candidate) {
+  /// - Parameters:
+  ///   - theCandidate: 要拿來覆寫的詞音配對。
+  ///   - cursorSpecified: 給定作業目標游標位置（不知道怎麼用的話就不要用），不設定的話則改用 actualCandidateCursor。
+  func consolidateCursorContext(with theCandidate: Megrez.Compositor.Candidate = .init(), cursorSpecified: Int? = nil) {
+    var cursorSpecified = cursorSpecified ?? actualCandidateCursor
+    if cursorSpecified != actualCandidateCursor {
+      cursorSpecified = max(0, min(cursorSpecified, compositor.width - 1))  // 糾正傳入的數值。
+    }
     let grid = compositor
     var frontBoundaryEX = compositor.width - 1
     var rearBoundaryEX = 0
-    if grid.overrideCandidate(theCandidate, at: actualCandidateCursor) {
-      guard let node = compositor.walkedNodes.findNode(at: actualCandidateCursor, target: &frontBoundaryEX) else {
+    if grid.overrideCandidate(theCandidate, at: cursorSpecified) {
+      guard let node = compositor.walkedNodes.findNode(at: cursorSpecified, target: &frontBoundaryEX) else {
         return
       }
       rearBoundaryEX = max(0, frontBoundaryEX - node.keyArray.count)
     }
 
     var frontBoundary = 0
-    guard let node = compositor.walkedNodes.findNode(at: actualCandidateCursor, target: &frontBoundary) else { return }
+    guard let node = compositor.walkedNodes.findNode(at: cursorSpecified, target: &frontBoundary) else { return }
 
     var rearBoundary = min(max(0, frontBoundary - node.keyArray.count), rearBoundaryEX)  // 防呆
     frontBoundary = max(min(frontBoundary, compositor.width), frontBoundaryEX)  // 防呆。
@@ -184,7 +192,7 @@ public class KeyHandler {
           position += currentNode.keyArray.count
           continue
         }
-        let values = currentNode.currentPair.value.map { String($0) }
+        let values = currentNode.currentPair.value.charComponents
         for (subPosition, key) in currentNode.keyArray.enumerated() {
           guard values.count > subPosition else { break }  // 防呆，應該沒有發生的可能性
           let thePair = Megrez.Compositor.Candidate(
@@ -362,6 +370,33 @@ public class KeyHandler {
     }
     composer.clear()
     composer.phonabetCombinationCorrectionEnabled = mgrPrefs.autoCorrectReadingCombination
+  }
+
+  /// 返回前一個游標位置的可解析的漢字讀音。
+  /// 返回的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
+  var previousParsableReading: (String, String, Bool)? {
+    if compositor.cursor == 0 { return nil }
+    let cursorPrevious = max(compositor.cursor - 1, 0)
+    let rawData = compositor.keys[cursorPrevious]
+    let components = rawData.charComponents
+    var hasIntonation = false
+    for neta in components {
+      if !Tekkon.allowedPhonabets.contains(neta) || neta == " " { return nil }
+      if Tekkon.allowedIntonations.contains(neta) { hasIntonation = true }
+    }
+    if hasIntonation, components.count == 1 { return nil }  // 剔除純聲調之情形
+    let rawDataSansIntonation = hasIntonation ? components.dropLast(1).joined() : rawData
+    return (rawData, rawDataSansIntonation, hasIntonation)
+  }
+
+  /// 檢測某個傳入的按鍵訊號是否為聲調鍵。
+  /// - Parameter input: 傳入的按鍵訊號。
+  /// - Returns: 判斷結果：是否為聲調鍵。
+  func isIntonationKey(_ input: InputSignal) -> Bool {
+    var theComposer = composer  // 複製一份用來做實驗。
+    theComposer.clear()  // 清空各種槽的內容。
+    theComposer.receiveKey(fromCharCode: input.charCode)
+    return theComposer.hasToneMarker(withNothingElse: true)
   }
 
   // MARK: - Extracted methods and functions (Megrez).

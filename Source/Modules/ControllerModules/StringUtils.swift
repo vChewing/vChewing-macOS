@@ -8,7 +8,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
+import Foundation
 
 /// Shiki's Notes: The cursor index in the IMK inline composition buffer
 /// still uses UTF16 index measurements. This means that any attempt of
@@ -53,4 +53,10 @@ extension String {
     let arr = Array(utf16)[r].map { $0 }
     return String(utf16CodeUnits: arr, count: arr.count)
   }
+
+  public var charComponents: [String] { map { String($0) } }
+}
+
+extension Array where Element == String.Element {
+  public var charComponents: [String] { map { String($0) } }
 }

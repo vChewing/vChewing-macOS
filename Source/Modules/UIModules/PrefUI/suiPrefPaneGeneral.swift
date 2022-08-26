@@ -6,7 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
 import SwiftUI
 
 @available(macOS 10.15, *)
@@ -52,8 +51,6 @@ struct suiPrefPaneGeneral: View {
     }
   }()
 
-  let enabledFontSizes = [12, 14, 16, 17, 18, 20, 22, 24, 32, 64, 96]
-
   var body: some View {
     ScrollView {
       Preferences.Container(contentWidth: contentWidth) {
@@ -64,9 +61,21 @@ struct suiPrefPaneGeneral: View {
               mgrPrefs.candidateListTextSize = CGFloat(selCandidateUIFontSize)
             }
           ) {
-            ForEach(0...(enabledFontSizes.count - 1), id: \.self) { id in
-              Text(String(enabledFontSizes[id])).tag(enabledFontSizes[id])
-            }.id(UUID())
+            Group {
+              Text("12").tag(12)
+              Text("14").tag(14)
+              Text("16").tag(16)
+              Text("17").tag(17)
+              Text("18").tag(18)
+              Text("20").tag(20)
+              Text("22").tag(22)
+              Text("24").tag(24)
+            }
+            Group {
+              Text("32").tag(32)
+              Text("64").tag(64)
+              Text("96").tag(96)
+            }
           }
           .labelsHidden()
           .frame(width: 120.0)

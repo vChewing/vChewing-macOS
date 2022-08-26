@@ -2,9 +2,7 @@
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
-import Carbon
 import Cocoa
-import Foundation
 
 extension Date {
   static func - (lhs: Date, rhs: Date) -> TimeInterval {

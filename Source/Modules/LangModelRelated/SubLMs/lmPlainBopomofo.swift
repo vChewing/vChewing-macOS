@@ -58,7 +58,7 @@ extension vChewing {
     public func valuesFor(key: String) -> [String] {
       var pairs: [String] = []
       if let arrRangeRecords: String = rangeMap[key] {
-        pairs.append(contentsOf: arrRangeRecords.map { String($0) })
+        pairs.append(contentsOf: arrRangeRecords.charComponents)
       }
       var set = Set<String>()
       return pairs.filter { set.insert($0).inserted }

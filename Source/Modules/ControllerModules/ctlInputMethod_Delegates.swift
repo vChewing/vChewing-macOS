@@ -62,7 +62,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
   /// 該函式僅由 IMK 選字窗來存取，且對接給 commonEventHandler()。
   /// - Parameter event: 由 IMK 選字窗接收的裝置操作輸入事件。
   /// - Returns: 回「`true`」以將該案件已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
-  @discardableResult func sharedEventHandler(_ event: NSEvent!) -> Bool {
+  @discardableResult func sharedEventHandler(_ event: NSEvent) -> Bool {
     commonEventHandler(event)
   }
 
@@ -121,12 +121,15 @@ extension ctlInputMethod: ctlCandidateDelegate {
 
     if let state = state as? InputState.ChoosingCandidate {
       let selectedValue = state.candidates[index]
-      keyHandler.fixNode(candidate: selectedValue, respectCursorPushing: true, preConsolidate: true)
+      keyHandler.fixNode(
+        candidate: selectedValue, respectCursorPushing: true,
+        preConsolidate: mgrPrefs.consolidateContextOnCandidateSelection
+      )
 
       let inputting = keyHandler.buildInputtingState
 
       if mgrPrefs.useSCPCTypingMode {
-        handle(state: InputState.Committing(textToCommit: inputting.composingBuffer))
+        handle(state: InputState.Committing(textToCommit: inputting.composingBufferConverted))
         // 此時是逐字選字模式，所以「selectedValue.1」是單個字、不用追加處理。
         if mgrPrefs.associatedPhrasesEnabled,
           let associatePhrases = keyHandler.buildAssociatePhraseState(

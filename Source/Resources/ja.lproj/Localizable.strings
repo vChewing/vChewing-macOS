@@ -3,6 +3,7 @@
 "About vChewing…" = "威注音について…";
 "vChewing Preferences…" = "入力機能設定…";
 "Uninstallation" = "入力アプリの卸除（おろしのぞき）";
+"CheatSheet" = "キー取扱説明";
 "Uninstall vChewing…" = "入力アプリを卸除く…";
 "This will remove vChewing Input Method from this user account, requiring your confirmation." = "これにて威注音入力アプリをこのアカウントから卸除しますが、宜しいですか。";
 "Check Later" = "後でやる";
@@ -58,9 +59,6 @@
 "Symbol & Emoji Input" = "符号＆絵文字入力";
 "Edit User Symbol & Emoji Data…" = "ユーザー符号＆絵文字辞書を編集…";
 "Choose your desired user data folder." = "欲しがるユーザー辞書フォルダをお選びください。";
-"Cursor is between \"%@\" and \"%@\"." = "カーソルは「%@」と「%@」に間れ。";
-"Cursor is to the rear of \"%@\"." = "カーソルは「%@」の後ろに。";
-"Cursor is in front of \"%@\"." = "カーソルは「%@」の前に。";
 "Loading CHS Core Dict..." = "簡体中国語核心辞書読込中…";
 "Loading CHT Core Dict..." = "繁体中国語核心辞書読込中…";
 "Core Dict loading complete." = "核心辞書読込完了";
@@ -88,10 +86,13 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)Space:";
+"⚠︎ This feature in IMK Candidate Window defects. Please consult Apple Developer Relations\nand tell them the related Radar ID: #FB11300759." = "⚠︎ この機能は IMK 候補陳列ウィンドウにサポートされておりません。\nApple Developer Relations に案件番号 #FB11300759 を教えながらクレームしてください。";
 "Allow backspace-editing miscomposed readings" = "効かぬ音読みを BackSpace で再編集";
 "Allow boosting / excluding a candidate of single kanji" = "即排除/即最優先にできる候補の文字数の最低限は１字とする";
 "Allow using Enter key to confirm associated candidate selection" = "Enter キーを連想語彙候補の確認のために使う";
 "Also toggle alphanumerical mode with Left-Shift" = "左側の Shift キーでも英数入力モードの切り替え";
+"Always drop the previous reading" = "カーソルの後部の音読みを常に削除する";
+"Always type intonations to the inline composition buffer" = "常に入力緩衝列に音調を入力する";
 "Always use fixed listing order in candidate window" = "候補文字を固定順番で陳列する";
 "An accommodation for elder computer users." = "年配なるユーザーのために提供した機能である。";
 "Apple ABC (equivalent to English US)" = "Apple ABC (Apple U.S. キーボードと同じ)";
@@ -119,8 +120,10 @@
 "Choose the phonetic layout for Mandarin parser." = "共通語分析器の注音配列をご指定ください。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "欲しがるユーザー辞書保存先をご指定ください。無効なる保存先設定は省かれる。";
 "Choose your preferred layout of the candidate window." = "入力候補陳列の仕様をご指定ください。";
+"Clear the entire inline composition buffer like Shift+Delete" = "Shift+Delete のように入力緩衝列を消す";
 "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Ctrl(+Option)+Command+Enter で出すのを漢語弁音と変換";
-"Completely disable using Shift key to toggling alphanumerical mode" = "Shift キーの英数入力モードの切り替え機能を徹底的に禁ず";
+"Completely disable using Shift key to toggle alphanumerical mode" = "Shift キーの英数入力モードの切り替え機能を徹底的に禁ず";
+"Consolidate the context on confirming candidate selection" = "候補陳列ウィンドウで候補を選ぶ時に文脈を強固する";
 "Cursor Selection:" = "カーソル候補呼出:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千配列 (Microsoft 標準・王安・零壹など)";
 "Dachen 26 (libChewing)" = "酷音大千 26 キー配列";
@@ -129,8 +132,10 @@
 "Dictionary" = "辞書設定";
 "Directly commit lowercased letters" = "ローマ字（小文字）を直接出力";
 "Directly commit uppercased letters" = "ローマ字（大文字）を直接出力";
+"Disassemble the previous reading, dropping its intonation" = "カーソルの後部の音読みを解き、その音調を除く";
+"Disassembling process does not work with non-phonetic reading keys." = "実の意味の音読みだけを解くことができる。";
 "Emulating select-candidate-per-character mode" = "漢字１つづつ全候補選択入力モード";
-"Enable CNS11643 Support (2022-07-20)" = "全字庫モード // 入力可能な漢字数を倍増す (2022-07-20)";
+"Enable CNS11643 Support (2022-08-02)" = "全字庫モード // 入力可能な漢字数を倍増す (2022-08-02)";
 "Enable Space key for calling candidate window" = "Space キーで入力候補を呼び出す";
 "Enable symbol input support (incl. certain emoji symbols)" = "僅かなる絵文字も含む符号入力サポートを起用";
 "English" = "英語";
@@ -149,18 +154,24 @@
 "IBM" = "IBM 配列";
 "IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases." = "IMK 候補陳列ウィンドウは、Apple の未公開のAPIを「bridging-header」という強引的な手段で引き出して利用した機能である。現時点で macOS 10.14 Mojave から macOS 13 Ventura まで利用可能であるが、その後の新しい macOS との互換性の話はまだ早い。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "単語の前で // macOS 内蔵注音入力のやり方";
+"Intonation Key:" = "音調キー:";
 "Japanese" = "和語";
 "Keyboard Shortcuts:" = "ショートカット:";
 "Keyboard" = "配列設定";
 "Misc Settings:" = "他の設定:";
 "MiTAC" = "神通配列";
 "Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "QWERTY 以外の英数キーボードは弁音以外の配列に不適用。";
+"Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead." = "ご注意：Mac キーボードの「Delete ⌫」キーはここで「BackSpace ⌫」と呼ばれ、それはパソコンの常識としての本物の「Delete ⌦」と区別するためである。もし、テンキーの付いていない Mac キーボードで本物の「Delete ⌦」を使いたければ、代わりに「Fn+⌫」をご使用ください。";
+"Only override the intonation of the previous reading if different" = "カーソルの後部の音読みの異なる音調だけを上書きする";
 "Output Settings:" = "出力設定:";
+"Override the previous reading's intonation with candidate-reset" = "カーソルの後部の音読みの音調を上書きし、候補選択状態を戻す";
 "Phonetic Parser:" = "注音配列:";
+"Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu." = "マウスホイールでこのページをご覧ください。キーに関する取扱説明のアクセスはメニューに。";
 "Push the cursor in front of the phrase after selection" = "候補選択の直後、すぐカーソルを単語の向こうに推し進める";
 "Secondary Pinyin with Numeral Intonation" = "国音二式 (ローマ字+数字音調)";
 "Seigyou" = "精業配列";
 "Selection Keys:" = "言選り用キー:";
+"Shift+BackSpace:" = "Shift+BackSpace:";
 "Shift+Letter:" = "Shift+文字キー:";
 "Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "弁音合併入力（入力緩衝列とヒントで音読みを漢語弁音に）";
 "Show page buttons in candidate window" = "入力候補陳列の側にページボタンを表示";
@@ -168,6 +179,7 @@
 "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. If you want the same accommodation for other client apps, please tick this checkbox on." = "いくつかのアプリ（例えば MS Edge や Google Chrome などのような Chromium 系ブラウザー）には「Shift キーの入力イベントを複数化してしまう」という支障があり、そしてアプリそれぞれの開発元に修復される可能性はほぼゼロだと言える。威注音入力アプリは対策用の特殊措置を普段に起用している。別のアプリにも同じ特殊措置が欲しければ、これをチェックしてください。";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+Space で次のページ、Space で次の候補文字を";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "Space で次のページ、Shift+Space で次の候補文字を";
+"Specify the behavior of intonation key when syllable composer is empty." = "音読組立緩衝列が空かされた時の音調キーの行為をご指定ください。";
 "Starlight" = "星光配列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "マナーモード // 外すと入力間違った時に変な声が出る";
 "This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later." = "これは Apple Bug Report #FB10978412 の臨時対策であり、macOS 12 からの macOS に効き、IMK 以外の候補陳列ウィンドウに作用する。Apple は macOS 11 からの macOS のために該当 Bug を修復すべきである。";

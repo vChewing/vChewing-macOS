@@ -190,9 +190,7 @@ class KeyHandlerTestsSCPCCHT: XCTestCase {
 
   func testInputNi() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su").map {
-      String($0)
-    }
+    let keys = Array("su").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [])
       _ = handler.handle(input: input, state: state) { newState in
@@ -209,9 +207,7 @@ class KeyHandlerTestsSCPCCHT: XCTestCase {
 
   func testInputNi3() {
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3").map {
-      String($0)
-    }
+    let keys = Array("su3").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [])
       _ = handler.handle(input: input, state: state) { newState in
@@ -230,9 +226,7 @@ class KeyHandlerTestsSCPCCHT: XCTestCase {
   func testCancelCandidateUsingDelete() {
     mgrPrefs.useSCPCTypingMode = true
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3").map {
-      String($0)
-    }
+    let keys = Array("su3").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [])
       _ = handler.handle(input: input, state: state) { newState in
@@ -257,9 +251,7 @@ class KeyHandlerTestsSCPCCHT: XCTestCase {
   func testCancelCandidateUsingEsc() {
     mgrPrefs.useSCPCTypingMode = true
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("su3").map {
-      String($0)
-    }
+    let keys = Array("su3").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [])
       _ = handler.handle(input: input, state: state) { newState in
@@ -285,9 +277,7 @@ class KeyHandlerTestsSCPCCHT: XCTestCase {
     mgrPrefs.useSCPCTypingMode = true
     handler.forceOpenStringInsteadForAssociatePhrases("二 百五")
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("-41").map {
-      String($0)
-    }
+    let keys = Array("-41").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [])
       _ = handler.handle(input: input, state: state) { newState in
@@ -308,9 +298,7 @@ class KeyHandlerTestsSCPCCHT: XCTestCase {
     let enabled = mgrPrefs.associatedPhrasesEnabled
     mgrPrefs.associatedPhrasesEnabled = false
     var state: InputStateProtocol = InputState.Empty()
-    let keys = Array("aul ").map {
-      String($0)
-    }
+    let keys = Array("aul ").charComponents
     for key in keys {
       let input = InputSignal(inputText: key, keyCode: 0, charCode: charCode(key), flags: [])
       _ = handler.handle(input: input, state: state) { newState in

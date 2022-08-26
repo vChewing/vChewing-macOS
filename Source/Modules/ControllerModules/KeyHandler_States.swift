@@ -10,7 +10,7 @@
 
 /// 該檔案乃按鍵調度模組的用以承載「根據按鍵行為來調控模式」的各種成員函式的部分。
 
-import Cocoa
+import Foundation
 
 // MARK: - § 根據按鍵行為來調控模式的函式 (Functions Interact With States).
 
@@ -30,7 +30,7 @@ extension KeyHandler {
     /// 這樣就可以免除不必要的類型轉換。
     for theNode in compositor.walkedNodes {
       let strNodeValue = theNode.value
-      let arrSplit: [String] = Array(strNodeValue).map { String($0) }
+      let arrSplit: [String] = Array(strNodeValue).charComponents
       let codepointCount = arrSplit.count
       /// 藉下述步驟重新將「可見游標位置」對齊至「組字器內的游標所在的讀音位置」。
       /// 每個節錨（NodeAnchor）都有自身的幅位長度（spanningLength），可以用來
@@ -170,6 +170,13 @@ extension KeyHandler {
   ) -> Bool {
     if input.isEsc {
       stateCallback(buildInputtingState)
+      return true
+    }
+
+    // 阻止用於行內注音輸出的熱鍵。
+    if input.isControlHold, input.isCommandHold, input.isEnter {
+      IME.prtDebugIntel("1198E3E5")
+      errorCallback()
       return true
     }
 
@@ -409,7 +416,25 @@ extension KeyHandler {
   ) -> Bool {
     guard state is InputState.Inputting else { return false }
 
-    if input.isShiftHold {
+    // 引入 macOS 內建注音輸入法的行為，允許用 Shift+BackSpace 解構前一個漢字的讀音。
+    switch mgrPrefs.specifyShiftBackSpaceKeyBehavior {
+      case 0:
+        guard input.isShiftHold, composer.isEmpty else { break }
+        guard let prevReading = previousParsableReading else { break }
+        // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
+        compositor.dropKey(direction: .rear)
+        walk()  // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
+        prevReading.1.charComponents.forEach { composer.receiveKey(fromPhonabet: $0) }
+        stateCallback(buildInputtingState)
+        return true
+      case 1:
+        stateCallback(InputState.EmptyIgnoringPreviousState())
+        stateCallback(InputState.Empty())
+        return true
+      default: break
+    }
+
+    if input.isShiftHold, input.isOptionHold {
       stateCallback(InputState.EmptyIgnoringPreviousState())
       stateCallback(InputState.Empty())
       return true

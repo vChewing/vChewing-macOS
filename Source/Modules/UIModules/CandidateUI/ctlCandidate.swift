@@ -28,7 +28,7 @@ public class CandidateKeyLabel: NSObject {
 
 public protocol ctlCandidateDelegate: AnyObject {
   var isAssociatedPhrasesState: Bool { get }
-  func sharedEventHandler(_ event: NSEvent!) -> Bool
+  func sharedEventHandler(_ event: NSEvent) -> Bool
   func candidateCountForController(_ controller: ctlCandidateProtocol) -> Int
   func candidatesForController(_ controller: ctlCandidateProtocol) -> [(String, String)]
   func ctlCandidate(_ controller: ctlCandidateProtocol, candidateAtIndex index: Int)
@@ -116,19 +116,19 @@ public class ctlCandidate: NSWindowController, ctlCandidateProtocol {
 
   public func reloadData() {}
 
-  public func showNextPage() -> Bool {
+  @discardableResult public func showNextPage() -> Bool {
     false
   }
 
-  public func showPreviousPage() -> Bool {
+  @discardableResult public func showPreviousPage() -> Bool {
     false
   }
 
-  public func highlightNextCandidate() -> Bool {
+  @discardableResult public func highlightNextCandidate() -> Bool {
     false
   }
 
-  public func highlightPreviousCandidate() -> Bool {
+  @discardableResult public func highlightPreviousCandidate() -> Bool {
     false
   }
 

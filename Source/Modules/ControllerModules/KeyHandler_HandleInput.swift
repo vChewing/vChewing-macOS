@@ -11,7 +11,7 @@
 /// 該檔案乃按鍵調度模組當中「用來規定當 IMK 接受按鍵訊號時且首次交給按鍵調度模組處理時、
 /// 按鍵調度模組要率先處理」的部分。據此判斷是否需要將按鍵處理委派給其它成員函式。
 
-import Cocoa
+import Foundation
 
 // MARK: - § 根據狀態調度按鍵輸入 (Handle Input with States)
 

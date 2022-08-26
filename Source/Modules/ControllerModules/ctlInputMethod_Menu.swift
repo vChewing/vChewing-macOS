@@ -169,6 +169,10 @@ extension ctlInputMethod {
       withTitle: NSLocalizedString("About vChewing…", comment: ""),
       action: #selector(showAbout(_:)), keyEquivalent: ""
     )
+    menu.addItem(
+      withTitle: NSLocalizedString("CheatSheet", comment: "") + "…",
+      action: #selector(showCheatSheet(_:)), keyEquivalent: ""
+    )
     if optionKeyPressed {
       menu.addItem(
         withTitle: NSLocalizedString("Uninstall vChewing…", comment: ""),
@@ -188,22 +192,23 @@ extension ctlInputMethod {
     if #available(macOS 10.15, *) {
       NSApp.setActivationPolicy(.accessory)
       ctlPrefUI.shared.controller.show(preferencePane: Preferences.PaneIdentifier(rawValue: "General"))
-      ctlPrefUI.shared.controller.window?.level = .floating
+      ctlPrefUI.shared.controller.window?.level = .statusBar
     } else {
-      showPrefWindowTraditional()
+      showLegacyPreferences()
     }
   }
 
-  @objc func showLegacyPreferences(_: Any?) {
-    showPrefWindowTraditional()
-  }
-
-  private func showPrefWindowTraditional() {
+  @objc func showLegacyPreferences(_: Any? = nil) {
     (NSApp.delegate as? AppDelegate)?.showPreferences()
     NSApp.activate(ignoringOtherApps: true)
   }
 
-  @objc func toggleSCPCTypingMode(_: Any?) {
+  @objc func showCheatSheet(_: Any?) {
+    guard let url = Bundle.main.url(forResource: "shortcuts", withExtension: "html") else { return }
+    NSWorkspace.shared.openFile(url.path, withApplication: "Safari")
+  }
+
+  @objc func toggleSCPCTypingMode(_: Any? = nil) {
     resetKeyHandler()
     NotifierController.notify(
       message: String(

@@ -68,12 +68,21 @@ struct suiPrefPaneKeyboard: View {
               }
             }
           ).frame(width: 180).disabled(mgrPrefs.useIMKCandidateWindow)
-          Text(
-            LocalizedStringKey(
-              "Choose or hit Enter to confim your prefered keys for selecting candidates."
+          if mgrPrefs.useIMKCandidateWindow {
+            Text(
+              LocalizedStringKey(
+                "⚠︎ This feature in IMK Candidate Window defects. Please consult Apple Developer Relations\nand tell them the related Radar ID: #FB11300759."
+              )
             )
-          )
-          .preferenceDescription()
+            .preferenceDescription()
+          } else {
+            Text(
+              LocalizedStringKey(
+                "Choose or hit Enter to confim your prefered keys for selecting candidates."
+              )
+            )
+            .preferenceDescription()
+          }
         }
         Preferences.Section(label: { Text(LocalizedStringKey("Phonetic Parser:")) }) {
           HStack {

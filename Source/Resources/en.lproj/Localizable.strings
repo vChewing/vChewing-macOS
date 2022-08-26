@@ -2,6 +2,7 @@
 "vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability." = "vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability.";
 "About vChewing…" = "About vChewing…";
 "vChewing Preferences…" = "vChewing Preferences…";
+"CheatSheet" = "CheatSheet";
 "Uninstallation" = "Uninstallation";
 "Uninstall vChewing…" = "Uninstall vChewing…";
 "This will remove vChewing Input Method from this user account, requiring your confirmation." = "This will remove vChewing Input Method from this user account, requiring your confirmation.";
@@ -58,9 +59,6 @@
 "Symbol & Emoji Input" = "Symbol & Emoji Input";
 "Edit User Symbol & Emoji Data…" = "Edit User Symbol & Emoji Data…";
 "Choose your desired user data folder." = "Choose your desired user data folder.";
-"Cursor is between \"%@\" and \"%@\"." = "Cursor is between \"%@\" and \"%@\".";
-"Cursor is to the rear of \"%@\"." = "Cursor is to the rear of \"%@\".";
-"Cursor is in front of \"%@\"." = "Cursor is in front of \"%@\".";
 "Loading CHS Core Dict..." = "Loading CHS Core Dict...";
 "Loading CHT Core Dict..." = "Loading CHT Core Dict...";
 "Core Dict loading complete." = "Core Dict loading complete.";
@@ -88,10 +86,13 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)Space:";
+"⚠︎ This feature in IMK Candidate Window defects. Please consult Apple Developer Relations\nand tell them the related Radar ID: #FB11300759." = "⚠︎ This feature in IMK Candidate Window defects. Please consult Apple Developer Relations\nand tell them the related Radar ID: #FB11300759.";
 "Allow backspace-editing miscomposed readings" = "Allow backspace-editing miscomposed readings";
 "Allow boosting / excluding a candidate of single kanji" = "Allow boosting / excluding a candidate of single kanji";
 "Allow using Enter key to confirm associated candidate selection" = "Allow using Enter key to confirm associated candidate selection";
 "Also toggle alphanumerical mode with Left-Shift" = "Also toggle alphanumerical mode with Left-Shift";
+"Always drop the previous reading" = "Always drop the previous reading";
+"Always type intonations to the inline composition buffer" = "Always type intonations to the inline composition buffer";
 "Always use fixed listing order in candidate window" = "Always use fixed listing order in candidate window";
 "An accommodation for elder computer users." = "An accommodation for elder computer users.";
 "Apple ABC (equivalent to English US)" = "Apple ABC (equivalent to English US)";
@@ -119,8 +120,10 @@
 "Choose the phonetic layout for Mandarin parser." = "Choose the phonetic layout for Mandarin parser.";
 "Choose your desired user data folder path. Will be omitted if invalid." = "Choose your desired user data folder path. Will be omitted if invalid.";
 "Choose your preferred layout of the candidate window." = "Choose your preferred layout of the candidate window.";
+"Clear the entire inline composition buffer like Shift+Delete" = "Clear the entire inline composition buffer like Shift+Delete";
 "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter";
-"Completely disable using Shift key to toggling alphanumerical mode" = "Completely disable using Shift key to toggling alphanumerical mode";
+"Completely disable using Shift key to toggle alphanumerical mode" = "Completely disable using Shift key to toggle alphanumerical mode";
+"Consolidate the context on confirming candidate selection" = "Consolidate the context on confirming candidate selection";
 "Cursor Selection:" = "Cursor Selection:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "Dachen (Microsoft Standard / Wang / 01, etc.)";
 "Dachen 26 (libChewing)" = "Dachen 26 (libChewing)";
@@ -129,8 +132,10 @@
 "Dictionary" = "Dictionary";
 "Directly commit lowercased letters" = "Directly commit lowercased letters";
 "Directly commit uppercased letters" = "Directly commit uppercased letters";
+"Disassemble the previous reading, dropping its intonation" = "Disassemble the previous reading, dropping its intonation";
+"Disassembling process does not work with non-phonetic reading keys." = "Disassembling process does not work with non-phonetic reading keys.";
 "Emulating select-candidate-per-character mode" = "Emulating select-candidate-per-character mode";
-"Enable CNS11643 Support (2022-07-20)" = "Enable CNS11643 Support (2022-07-20)";
+"Enable CNS11643 Support (2022-08-02)" = "Enable CNS11643 Support (2022-08-02)";
 "Enable Space key for calling candidate window" = "Enable Space key for calling candidate window";
 "Enable symbol input support (incl. certain emoji symbols)" = "Enable symbol input support (incl. certain emoji symbols)";
 "English" = "English";
@@ -149,18 +154,24 @@
 "IBM" = "IBM";
 "IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases." = "IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases.";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "in front of the phrase (like macOS built-in Zhuyin IME)";
+"Intonation Key:" = "Intonation Key:";
 "Japanese" = "Japanese";
 "Keyboard Shortcuts:" = "Keyboard Shortcuts:";
 "Keyboard" = "Keyboard";
 "Misc Settings:" = "Misc Settings:";
 "MiTAC" = "MiTAC";
 "Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only.";
+"Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead." = "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead.";
+"Only override the intonation of the previous reading if different" = "Only override the intonation of the previous reading if different";
 "Output Settings:" = "Output Settings:";
+"Override the previous reading's intonation with candidate-reset" = "Override the previous reading's intonation with candidate-reset";
 "Phonetic Parser:" = "Phonetic Parser:";
+"Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu." = "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu.";
 "Push the cursor in front of the phrase after selection" = "Push the cursor in front of the phrase after selection";
 "Secondary Pinyin with Numeral Intonation" = "Secondary Pinyin with Numeral Intonation";
 "Seigyou" = "Seigyou (JinYei)";
 "Selection Keys:" = "Selection Keys:";
+"Shift+BackSpace:" = "Shift+BackSpace:";
 "Shift+Letter:" = "Shift+Letter:";
 "Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "Show Hanyu-Pinyin in the inline composition buffer & tooltip";
 "Show page buttons in candidate window" = "Show page buttons in candidate window";
@@ -168,6 +179,7 @@
 "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. If you want the same accommodation for other client apps, please tick this checkbox on." = "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. If you want the same accommodation for other client apps, please tick this checkbox on.";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Space to +cycle candidates, Shift+Space to +cycle pages";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "Space to +cycle pages, Shift+Space to +cycle candidates";
+"Specify the behavior of intonation key when syllable composer is empty." = "Specify the behavior of intonation key when syllable composer is empty.";
 "Starlight" = "Starlight";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "Stop farting (when typed phonetic combination is invalid, etc.)";
 "This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later." = "This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later.";

@@ -6,7 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
 import SwiftUI
 
 extension NSImage {
@@ -68,7 +67,7 @@ extension NSImage {
 
 @available(macOS 10.15, *)
 class ctlPrefUI {
-  lazy var controller = PreferencesWindowController(
+  var controller = PreferencesWindowController(
     panes: [
       Preferences.Pane(
         identifier: Preferences.PaneIdentifier(rawValue: "General"),

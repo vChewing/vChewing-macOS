@@ -25,6 +25,8 @@ struct suiPrefPaneDictionary: View {
     forKey: UserDef.kFetchSuggestionsFromUserOverrideModel.rawValue)
   @State private var selUseFixecCandidateOrderOnSelection: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kUseFixecCandidateOrderOnSelection.rawValue)
+  @State private var selConsolidateContextOnCandidateSelection: Bool = UserDefaults.standard.bool(
+    forKey: UserDef.kConsolidateContextOnCandidateSelection.rawValue)
 
   private let contentMaxHeight: Double = 430
   private let contentWidth: Double = {
@@ -112,7 +114,7 @@ struct suiPrefPaneDictionary: View {
           ).controlSize(.small)
           Divider()
           Toggle(
-            LocalizedStringKey("Enable CNS11643 Support (2022-07-20)"),
+            LocalizedStringKey("Enable CNS11643 Support (2022-08-02)"),
             isOn: $selEnableCNS11643.onChange {
               mgrPrefs.cns11643Enabled = selEnableCNS11643
               mgrLangModel.setCNSEnabled(mgrPrefs.cns11643Enabled)
@@ -141,6 +143,12 @@ struct suiPrefPaneDictionary: View {
             LocalizedStringKey("Always use fixed listing order in candidate window"),
             isOn: $selUseFixecCandidateOrderOnSelection.onChange {
               mgrPrefs.useFixecCandidateOrderOnSelection = selUseFixecCandidateOrderOnSelection
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Consolidate the context on confirming candidate selection"),
+            isOn: $selConsolidateContextOnCandidateSelection.onChange {
+              mgrPrefs.consolidateContextOnCandidateSelection = selConsolidateContextOnCandidateSelection
             }
           )
         }

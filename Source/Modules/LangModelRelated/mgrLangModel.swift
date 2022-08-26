@@ -8,7 +8,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
+import Foundation
 
 /// 我們不能讓 mgrLangModel 這個靜態管理器來承載下面這些副本變數。
 /// 所以，這些副本變數只能放在 mgrLangModel 的外部。
