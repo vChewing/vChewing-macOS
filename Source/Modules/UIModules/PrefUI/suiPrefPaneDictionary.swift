@@ -154,6 +154,12 @@ struct suiPrefPaneDictionary: View {
               mgrPrefs.consolidateContextOnCandidateSelection = selConsolidateContextOnCandidateSelection
             }
           )
+          Text(
+            LocalizedStringKey(
+              "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is."
+            )
+          )
+          .preferenceDescription().fixedSize(horizontal: false, vertical: true)
           Toggle(
             LocalizedStringKey("Harden vertical punctuations during vertical typing (not recommended)"),
             isOn: $selHardenVerticalPunctuations.onChange {

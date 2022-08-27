@@ -196,4 +196,5 @@
 "Use Shift Key Accommodation in all cases" = "对任何客体应用均启用 Shift 键相容性措施";
 "Vertical" = "纵向布局";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";
+"For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is." = "打比方说，你敲了「章太炎」，你想将「太」改成「泰」。这个操作的作业索引范围是开闭区间 [1,2)，会切到「章太炎」这个节点的所在索引范围 [0,3)。如果没有事前巩固处理的话，这个词会在你选字之后变成诸如「张泰言」这种你不想要的自动选字结果。当且仅当你启用了这个巩固功能的前提下，你选字之后的结果才会是「章泰炎」这种你想要的结果。";
 "Yale Pinyin with Numeral Intonation" = "耶鲁拼音+数字标调";

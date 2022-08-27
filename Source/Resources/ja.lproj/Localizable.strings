@@ -196,4 +196,5 @@
 "Use Shift Key Accommodation in all cases" = "いずれの客体アプリにも Shift キーの互換性措置を起用";
 "Vertical" = "縦型陳列";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
+"For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is." = "例えば、入力緩衝列には「章太炎」という節点があり、その範囲は [0,3) である。もし、「太」を「泰」にしたいのなら、今回の作業範囲は [1,2) で、「章太炎」の範囲と重ねてしまう。この場合、もし、事前強固措置がなければ、今回の作業でこの単語は「張泰言」のような望ましくない変換結果になってしまう。事前強固措置があるからこそ、「章泰炎」のような正確な作業結果の保証である。";
 "Yale Pinyin with Numeral Intonation" = "イェール弁音 (ローマ字+数字音調)";
