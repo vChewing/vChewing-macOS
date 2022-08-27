@@ -53,6 +53,7 @@ public enum UserDef: String, CaseIterable {
   case kUpperCaseLetterKeyBehavior = "UpperCaseLetterKeyBehavior"
   case kDisableShiftTogglingAlphanumericalMode = "DisableShiftTogglingAlphanumericalMode"
   case kConsolidateContextOnCandidateSelection = "ConsolidateContextOnCandidateSelection"
+  case kHardenVerticalPunctuations = "HardenVerticalPunctuations"
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
@@ -297,6 +298,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.consolidateContextOnCandidateSelection, forKey: UserDef.kConsolidateContextOnCandidateSelection.rawValue
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.hardenVerticalPunctuations, forKey: UserDef.kHardenVerticalPunctuations.rawValue
+    )
 
     // -----
 
@@ -424,6 +428,9 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kConsolidateContextOnCandidateSelection.rawValue, defaultValue: true)
   static var consolidateContextOnCandidateSelection: Bool
+
+  @UserDefault(key: UserDef.kHardenVerticalPunctuations.rawValue, defaultValue: false)
+  static var hardenVerticalPunctuations: Bool
 
   // MARK: - Settings (Tier 2)
 
