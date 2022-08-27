@@ -39,16 +39,6 @@ class ctlInputMethod: IMKInputController {
   /// 當前這個 ctlInputMethod 副本是否處於英數輸入模式。
   var isASCIIMode: Bool = false
 
-  /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
-  public var isVerticalTyping: Bool {
-    guard let client = client() else { return false }
-    var textFrame = NSRect.zero
-    let attributes: [AnyHashable: Any]? = client.attributes(
-      forCharacterIndex: 0, lineHeightRectangle: &textFrame
-    )
-    return (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
-  }
-
   /// 切換當前 ctlInputMethod 副本的英數輸入模式開關。
   func toggleASCIIMode() -> Bool {
     resetKeyHandler()
