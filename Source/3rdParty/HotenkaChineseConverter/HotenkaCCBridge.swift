@@ -11,6 +11,19 @@ import Foundation
 public enum ChineseConverter {
   public static let shared = HotenkaChineseConverter(plistDir: mgrLangModel.getBundleDataPath("convdict"))
 
+  // 給 JIS 轉換模式新增疊字符號支援。
+  private static func processKanjiRepeatSymbol(target: inout String) {
+    guard !target.isEmpty else { return }
+    var arr = target.charComponents
+    for (i, char) in arr.enumerated() {
+      if i == 0 { continue }
+      if char == target.charComponents[i - 1] {
+        arr[i] = "々"
+      }
+    }
+    target = arr.joined()
+  }
+
   /// 漢字數字大寫轉換專用辭典，順序為：康熙、當代繁體中文、日文、簡體中文。
   private static let currencyNumeralDictTable: [String: (String, String, String, String)] = [
     "一": ("壹", "壹", "壹", "壹"), "二": ("貳", "貳", "弐", "贰"), "三": ("叄", "參", "参", "叁"),
@@ -75,6 +88,8 @@ public enum ChineseConverter {
   public static func cnvTradToJIS(_ strObj: String) -> String {
     // 該轉換是由康熙繁體轉換至日語當用漢字的，所以需要先跑一遍康熙轉換。
     let strObj = cnvTradToKangXi(strObj)
-    return shared.convert(strObj, to: .zhHansJP)
+    var result = shared.convert(strObj, to: .zhHansJP)
+    processKanjiRepeatSymbol(target: &result)
+    return result
   }
 }
