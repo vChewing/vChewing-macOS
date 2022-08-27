@@ -148,6 +148,8 @@
 "for cycling pages" = "for cycling pages";
 "General" = "General";
 "Hanyu Pinyin with Numeral Intonation" = "Hanyu Pinyin with Numeral Intonation";
+"Harden vertical punctuations during vertical typing (not recommended)" = "Harden vertical punctuations during vertical typing (not recommended)";
+"⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal.";
 "Horizontal" = "Horizontal";
 "Hsu" = "Hsu";
 "Hualuo Pinyin with Numeral Intonation" = "Hualuo Pinyin with Numeral Intonation";

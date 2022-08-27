@@ -148,6 +148,8 @@
 "for cycling pages" = "輪替頁面";
 "General" = "通用設定";
 "Hanyu Pinyin with Numeral Intonation" = "漢語拼音+數字標調";
+"Harden vertical punctuations during vertical typing (not recommended)" = "在縱排書寫時，強制轉換標點為縱排形式（不推薦）";
+"⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 該功能當且僅當目前的排版字型不支援縱排標點動態顯示轉義的情況下才有用。一旦使用了，所有敲出去的標點都會被永久轉換為靜態縱排標點：哪怕當前編輯器的排版模式已經改成橫排，這些已經輸入的標點也都還是縱排標點字符。";
 "Horizontal" = "橫向佈局";
 "Hsu" = "許氏國音自然排列";
 "Hualuo Pinyin with Numeral Intonation" = "華羅拼音+數字標調";

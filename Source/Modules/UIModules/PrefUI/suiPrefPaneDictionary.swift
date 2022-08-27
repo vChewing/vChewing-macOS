@@ -27,6 +27,8 @@ struct suiPrefPaneDictionary: View {
     forKey: UserDef.kUseFixecCandidateOrderOnSelection.rawValue)
   @State private var selConsolidateContextOnCandidateSelection: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kConsolidateContextOnCandidateSelection.rawValue)
+  @State private var selHardenVerticalPunctuations: Bool = UserDefaults.standard.bool(
+    forKey: UserDef.kHardenVerticalPunctuations.rawValue)
 
   private let contentMaxHeight: Double = 430
   private let contentWidth: Double = {
@@ -112,7 +114,8 @@ struct suiPrefPaneDictionary: View {
               mgrPrefs.shouldAutoReloadUserDataFiles = selAutoReloadUserData
             }
           ).controlSize(.small)
-          Divider()
+        }
+        Preferences.Section(title: "") {
           Toggle(
             LocalizedStringKey("Enable CNS11643 Support (2022-08-02)"),
             isOn: $selEnableCNS11643.onChange {
@@ -151,6 +154,18 @@ struct suiPrefPaneDictionary: View {
               mgrPrefs.consolidateContextOnCandidateSelection = selConsolidateContextOnCandidateSelection
             }
           )
+          Toggle(
+            LocalizedStringKey("Harden vertical punctuations during vertical typing (not recommended)"),
+            isOn: $selHardenVerticalPunctuations.onChange {
+              mgrPrefs.hardenVerticalPunctuations = selHardenVerticalPunctuations
+            }
+          )
+          Text(
+            LocalizedStringKey(
+              "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal."
+            )
+          )
+          .preferenceDescription().fixedSize(horizontal: false, vertical: true)
         }
       }
     }

@@ -148,6 +148,8 @@
 "for cycling pages" = "候補陳列ページ";
 "General" = "全般設定";
 "Hanyu Pinyin with Numeral Intonation" = "漢語弁音 (ローマ字+数字音調)";
+"Harden vertical punctuations during vertical typing (not recommended)" = "縦書きの時に、引用符・括弧などを強制的に縦書き文字と変換する（不推奨）";
+"⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 該当の組版用フォントには縦書き（引用符・括弧）変換機能が備えていない限り、この機能を使う甲斐がある。一旦使うと、入力した全ての引用符・括弧は永遠的に縦書きの様式になる。例え入力を受けているアプリ（例えばワープロソフとなど）の書写方向は横書きと変えたとしても、これらの入力済みの引用符・括弧は全て縦書きの見た目であり、削除してから入力し直す必要になる。";
 "Horizontal" = "横型陳列";
 "Hsu" = "許氏国音自然配列";
 "Hualuo Pinyin with Numeral Intonation" = "中華ローマ弁音 (ローマ字+数字音調)";
