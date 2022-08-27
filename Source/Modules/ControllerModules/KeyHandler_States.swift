@@ -22,7 +22,13 @@ extension KeyHandler {
     /// 「更新內文組字區 (Update the composing buffer)」是指要求客體軟體將組字緩衝區的內容
     /// 換成由此處重新生成的組字字串（NSAttributeString，否則會不顯示）。
     var tooltipParameterRef: [String] = ["", ""]
-    let nodeValuesArray: [String] = compositor.walkedNodes.values
+    let nodeValuesArray: [String] = compositor.walkedNodes.values.map {
+      guard let delegate = delegate, delegate.isVerticalTyping else { return $0 }
+      guard mgrPrefs.hardenVerticalPunctuations else { return $0 }
+      var neta = $0
+      ChineseConverter.hardenVerticalPunctuations(target: &neta, convert: delegate.isVerticalTyping)
+      return neta
+    }
     var composedStringCursorIndex = 0
     var readingCursorIndex = 0
     /// IMK 協定的內文組字區的游標長度與游標位置無法正確統計 UTF8 高萬字（比如 emoji）的長度，
