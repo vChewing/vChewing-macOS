@@ -30,7 +30,7 @@ struct suiPrefPaneDictionary: View {
   @State private var selHardenVerticalPunctuations: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kHardenVerticalPunctuations.rawValue)
 
-  private let contentMaxHeight: Double = 430
+  private let contentMaxHeight: Double = 432
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":

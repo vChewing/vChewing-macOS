@@ -42,7 +42,7 @@ struct suiPrefPaneExperience: View {
   @State private var selSpecifyShiftBackSpaceKeyBehavior = UserDefaults.standard.integer(
     forKey: UserDef.kSpecifyShiftBackSpaceKeyBehavior.rawValue)
 
-  private let contentMaxHeight: Double = 430
+  private let contentMaxHeight: Double = 432
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":

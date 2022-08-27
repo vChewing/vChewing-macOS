@@ -28,7 +28,7 @@ struct suiPrefPaneKeyboard: View {
   @State private var selUsingHotKeyCurrencyNumerals = UserDefaults.standard.bool(
     forKey: UserDef.kUsingHotKeyCurrencyNumerals.rawValue)
 
-  private let contentMaxHeight: Double = 430
+  private let contentMaxHeight: Double = 432
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
