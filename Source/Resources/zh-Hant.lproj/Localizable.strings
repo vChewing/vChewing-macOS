@@ -71,7 +71,8 @@
 "catCommonSymbols" = "常用";
 "catHoriBrackets" = "橫括";
 "catVertBrackets" = "縱括";
-"catGreekLetters" = "希臘";
+"catAlphabets" = "字母";
+"catSpecialNumbers" = "數字";
 "catMathSymbols" = "數學";
 "catCurrencyUnits" = "貨幣";
 "catSpecialSymbols" = "特殊";
@@ -83,6 +84,14 @@
 "catDoubleTableLines" = "雙線";
 "catFillingBlocks" = "填色";
 "catLineSegments" = "線段";
+"catKana" = "假名";
+"catCombinations" = "組字";
+"catPhonabets" = "注音";
+"catCircledASCII" = "圈英";
+"catBracketedASCII" = "括英";
+"catMusicSymbols" = "音樂";
+"catThai" = "泰文";
+"catYi" = "彝文";
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)空格鍵:";

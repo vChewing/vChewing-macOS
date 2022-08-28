@@ -71,7 +71,8 @@
 "catCommonSymbols" = "CommonSymbols";
 "catHoriBrackets" = "HorizontalBrackets";
 "catVertBrackets" = "VerticalBrackets";
-"catGreekLetters" = "GreekLetters";
+"catAlphabets" = "Alphabets";
+"catSpecialNumbers" = "SpecialNumbers";
 "catMathSymbols" = "MathSymbols";
 "catCurrencyUnits" = "CurrencyUnits";
 "catSpecialSymbols" = "SpecialSymbols";
@@ -83,6 +84,14 @@
 "catDoubleTableLines" = "DoubleTableLines";
 "catFillingBlocks" = "FillingBlocks";
 "catLineSegments" = "LineSegments";
+"catKana" = "Kana";
+"catCombinations" = "Combinations";
+"catPhonabets" = "Phonabets";
+"catCircledASCII" = "CircledASCII";
+"catBracketedASCII" = "BracketASCII";
+"catMusicSymbols" = "MusicSymbols";
+"catThai" = "Thaiphabets";
+"catYi" = "Yiphabets";
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)Space:";
