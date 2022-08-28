@@ -725,18 +725,6 @@ extension mgrPrefs {
       mgrPrefs.disableShiftTogglingAlphanumericalMode = false
       mgrPrefs.togglingAlphanumericalModeWithLShift = false
     }
-    // 介面語言選項糾錯。
-    var filteredAppleLanguages = Set<String>()
-    appleLanguages.forEach {
-      if IME.arrSupportedLocales.contains($0) {
-        filteredAppleLanguages.insert($0)
-      }
-    }
-    if !filteredAppleLanguages.isEmpty {
-      appleLanguages = Array(filteredAppleLanguages)
-    } else {
-      UserDefaults.standard.removeObject(forKey: UserDef.kAppleLanguages.rawValue)
-    }
     // 注拼槽注音排列選項糾錯。
     var isMandarinParserOptionValid = false
     MandarinParser.allCases.forEach {
