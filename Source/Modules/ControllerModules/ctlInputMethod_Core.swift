@@ -60,6 +60,11 @@ class ctlInputMethod: IMKInputController {
 
   /// 重設按鍵調度模組，會將當前尚未遞交的內容遞交出去。
   func resetKeyHandler() {
+    // 過濾掉尚未完成拼寫的注音。
+    if state is InputState.Inputting, mgrPrefs.trimUnfinishedReadingsOnCommit {
+      keyHandler.composer.clear()
+      handle(state: keyHandler.buildInputtingState)
+    }
     if let state = state as? InputState.NotEmpty {
       /// 將傳回的新狀態交給調度函式。
       handle(state: InputState.Committing(textToCommit: state.composingBufferConverted))
@@ -128,7 +133,7 @@ class ctlInputMethod: IMKInputController {
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   override func deactivateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-    handle(state: InputState.Empty())
+    resetKeyHandler()  // 這條會自動搞定 Empty 狀態。
     handle(state: InputState.Deactivated())
   }
 
@@ -267,6 +272,7 @@ class ctlInputMethod: IMKInputController {
   override func commitComposition(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     resetKeyHandler()
+    // super.commitComposition(sender)  // 這句不要引入，否則每次切出輸入法時都會死當。
   }
 
   /// 指定輸入法要遞交出去的內容（雖然威注音可能並未用到這個函式）。
@@ -276,6 +282,14 @@ class ctlInputMethod: IMKInputController {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     guard let state = state as? InputState.NotEmpty else { return "" }
     return state.committingBufferConverted
+  }
+
+  /// 輸入法要被換掉或關掉的時候，要做的事情。
+  /// 不過好像因為 IMK 的 Bug 而並不會被執行。
+  override func inputControllerWillClose() {
+    // 下述兩行用來防止尚未完成拼寫的注音內容貝蒂交出去。
+    resetKeyHandler()
+    super.inputControllerWillClose()
   }
 
   // MARK: - IMKCandidates 功能擴充
