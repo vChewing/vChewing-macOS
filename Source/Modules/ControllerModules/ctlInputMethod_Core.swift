@@ -39,16 +39,6 @@ class ctlInputMethod: IMKInputController {
   /// 當前這個 ctlInputMethod 副本是否處於英數輸入模式。
   var isASCIIMode: Bool = false
 
-  /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
-  public var isVerticalTyping: Bool {
-    guard let client = client() else { return false }
-    var textFrame = NSRect.zero
-    let attributes: [AnyHashable: Any]? = client.attributes(
-      forCharacterIndex: 0, lineHeightRectangle: &textFrame
-    )
-    return (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
-  }
-
   /// 切換當前 ctlInputMethod 副本的英數輸入模式開關。
   func toggleASCIIMode() -> Bool {
     resetKeyHandler()
@@ -313,9 +303,15 @@ class ctlInputMethod: IMKInputController {
     if let state = state as? InputState.AssociatedPhrases {
       handleCandidatesPrepared(state.candidates, prefix: "⇧")
     } else if let state = state as? InputState.SymbolTable {
-      handleCandidatesPrepared(state.candidates)
+      // 分類符號選單不會出現同符異音項、不需要康熙 / JIS 轉換，所以使用簡化過的處理方式。
+      arrResult = state.candidates.map(\.1)
     } else if let state = state as? InputState.ChoosingCandidate {
-      handleCandidatesPrepared(state.candidates)
+      guard !state.candidates.isEmpty else { return .init() }
+      if state.candidates[0].0.contains("_punctuation") {
+        arrResult = state.candidates.map(\.1)  // 標點符號選單處理。
+      } else {
+        handleCandidatesPrepared(state.candidates)
+      }
     }
 
     return arrResult
@@ -372,12 +368,27 @@ class ctlInputMethod: IMKInputController {
       }
     }
 
+    // 分類符號選單不會出現同符異音項、不需要康熙 / JIS 轉換，所以使用簡化過的處理方式。
+    func handleSymbolCandidatesSelected(_ candidates: [(String, String)]) {
+      for (i, neta) in candidates.enumerated() {
+        if candidateString.string == neta.1 {
+          indexDeducted = i
+          break
+        }
+      }
+    }
+
     if let state = state as? InputState.AssociatedPhrases {
       handleCandidatesSelected(state.candidates, prefix: "⇧")
     } else if let state = state as? InputState.SymbolTable {
-      handleCandidatesSelected(state.candidates)
+      handleSymbolCandidatesSelected(state.candidates)
     } else if let state = state as? InputState.ChoosingCandidate {
-      handleCandidatesSelected(state.candidates)
+      guard !state.candidates.isEmpty else { return }
+      if state.candidates[0].0.contains("_punctuation") {
+        handleSymbolCandidatesSelected(state.candidates)  // 標點符號選單處理。
+      } else {
+        handleCandidatesSelected(state.candidates)
+      }
     }
     keyHandler(
       keyHandler,

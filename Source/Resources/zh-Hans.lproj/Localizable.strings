@@ -71,7 +71,8 @@
 "catCommonSymbols" = "常用";
 "catHoriBrackets" = "横括";
 "catVertBrackets" = "纵括";
-"catGreekLetters" = "希腊";
+"catAlphabets" = "字母";
+"catSpecialNumbers" = "数字";
 "catMathSymbols" = "数学";
 "catCurrencyUnits" = "货币";
 "catSpecialSymbols" = "特殊";
@@ -83,6 +84,14 @@
 "catDoubleTableLines" = "双线";
 "catFillingBlocks" = "填色";
 "catLineSegments" = "线段";
+"catKana" = "假名";
+"catCombinations" = "组字";
+"catPhonabets" = "注音";
+"catCircledASCII" = "圈英";
+"catBracketedASCII" = "括英";
+"catMusicSymbols" = "音乐";
+"catThai" = "泰文";
+"catYi" = "彝文";
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)空格键:";
@@ -123,7 +132,7 @@
 "Clear the entire inline composition buffer like Shift+Delete" = "像 Shift+Delete 那样清空当前组字区内容";
 "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Ctrl(+Option)+Command+Enter 输出汉语拼音而非注音";
 "Completely disable using Shift key to toggle alphanumerical mode" = "彻底禁止使用 Shift 键切换英数模式";
-"Consolidate the context on confirming candidate selection" = "在使用选字窗选字时，自動巩固上下文";
+"Consolidate the context on confirming candidate selection" = "在使用选字窗选字时，自动巩固上下文";
 "Cursor Selection:" = "选字游标:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千排列 (微软标准/王安/零壹/仲鼎/国乔)";
 "Dachen 26 (libChewing)" = "酷音大千二十六键排列";
@@ -148,6 +157,8 @@
 "for cycling pages" = "轮替页面";
 "General" = "通用设定";
 "Hanyu Pinyin with Numeral Intonation" = "汉语拼音+数字标调";
+"Harden vertical punctuations during vertical typing (not recommended)" = "在纵排书写时，强制转换标点为纵排形式（不推荐）";
+"⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 该功能当且仅当目前的排版字型不支援纵排标点动态显示转义的情况下才有用。一旦使用了，所有敲出去的标点都会被永久转换为静态纵排标点：哪怕当前编辑器的排版模式已经改成横排，这些已经输入的标点也都还是纵排标点字符。";
 "Horizontal" = "横向布局";
 "Hsu" = "许氏国音自然排列";
 "Hualuo Pinyin with Numeral Intonation" = "华罗拼音+数字标调";
@@ -194,4 +205,5 @@
 "Use Shift Key Accommodation in all cases" = "对任何客体应用均启用 Shift 键相容性措施";
 "Vertical" = "纵向布局";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";
+"For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is." = "打比方说，你敲了「章太炎」，你想将「太」改成「泰」。这个操作的作业索引范围是开闭区间 [1,2)，会切到「章太炎」这个节点的所在索引范围 [0,3)。如果没有事前巩固处理的话，这个词会在你选字之后变成诸如「张泰言」这种你不想要的自动选字结果。当且仅当你启用了这个巩固功能的前提下，你选字之后的结果才会是「章泰炎」这种你想要的结果。";
 "Yale Pinyin with Numeral Intonation" = "耶鲁拼音+数字标调";

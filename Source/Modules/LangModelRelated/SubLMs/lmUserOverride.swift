@@ -32,7 +32,7 @@ extension vChewing {
     ) {
       // 參數合規性檢查。
       guard !walkedAfter.isEmpty, !walkedBefore.isEmpty else { return }
-      guard walkedBefore.totalReadingsCount == walkedAfter.totalReadingsCount else { return }
+      guard walkedBefore.totalKeyCount == walkedAfter.totalKeyCount else { return }
       // 先判斷用哪種覆寫方法。
       var actualCursor = 0
       guard let currentNode = walkedAfter.findNode(at: cursor, target: &actualCursor) else { return }
@@ -210,18 +210,6 @@ extension vChewing.LMUserOverride {
     var candidates = [(String, Megrez.Unigram)]()
     var forceHighScoreOverride = false
     var isEmpty: Bool { candidates.isEmpty }
-  }
-}
-
-// MARK: - Array Extensions.
-
-extension Array where Element == Megrez.Compositor.Node {
-  public var totalReadingsCount: Int {
-    var counter = 0
-    for node in self {
-      counter += node.keyArray.count
-    }
-    return counter
   }
 }
 

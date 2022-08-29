@@ -17,7 +17,7 @@ struct suiPrefPaneDevZone: View {
   @State private var selShouldAlwaysUseShiftKeyAccommodation: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kShouldAlwaysUseShiftKeyAccommodation.rawValue)
 
-  private let contentMaxHeight: Double = 430
+  private let contentMaxHeight: Double = 432
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":

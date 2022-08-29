@@ -471,7 +471,7 @@ public enum InputState {
       super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex, nodeValuesArray: nodeValuesArray)
     }
 
-    // 這個函數尚未經過嚴格的單元測試。請在使用時確保 chosenCandidateString 為空。
+    // 這個函式尚未經過嚴格的單元測試。請在使用時確保 chosenCandidateString 為空。
     // 不為空的話，該參數的返回值就會有對應的影響、顯示成類似 macOS 內建注音輸入法那樣子。
     // 本來想給輸入法拓展這方面的功能的，奈何 ctlInputMethod.candidateSelectionChanged() 這函式太氣人。
     // 想要講的幹話已經在那邊講完了，感興趣的可以去看看。

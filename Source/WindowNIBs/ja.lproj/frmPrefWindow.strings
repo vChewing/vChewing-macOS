@@ -43,7 +43,9 @@
 "chkAllowBoostingSingleKanjiAsUserPhrase.title" = "即排除/即最優先にできる候補の文字数の最低限は１字とする";
 "chkAlsoConfirmAssociatedCandidatesByEnter.title" = "Enter キーを連想語彙候補の確認のために使う";
 "chkAutoCorrectReadingCombination.title" = "入力中で打ち間違った発音組み合わせを自動的に訂正する";
+"chkConsolidateContextOnCandidateSelection.title" = "候補陳列ウィンドウで候補を選ぶ時に文脈を強固する";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "入力中で臨時記憶モジュールからお薦めの候補を自動的に選ぶ";
+"chkHardenVerticalPunctuations.title" = "縦書きの時に、引用符・括弧などを強制的に縦書き文字と変換する（不推奨）";
 "chkKeepReadingUponCompositionError.title" = "効かぬ音読みを BackSpace で再編集";
 "chkUseFixecCandidateOrderOnSelection.title" = "候補文字を固定順番で陳列する";
 "DbW-eq-ZdB.title" = "星光";
@@ -64,6 +66,8 @@
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
 "lblDevZoneIMKCandidate.title" = "IMK 候補陳列ウィンドウは、Apple の未公開のAPIを「bridging-header」という強引的な手段で引き出して利用した機能である。現時点で macOS 10.14 Mojave から macOS 13 Ventura まで利用可能であるが、その後の新しい macOS との互換性の話はまだ早い。";
 "lblDevZoneTitleDescription.title" = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
+"lblIntonationKeyBehavior.title" = "音調組立緩衝列が空かされた時の音調キーの行為をご指定ください。";
+"lblShiftBkspKeyBehavior.title" = "Shift+BackSpace キーの優先行為をご指定ください。";
 "lblUpperCaseLetterKeyBehavior.title" = "Shift+文字キーの行為をご指定ください。";
 "Parser11.title" = "国音二式 (ローマ字+数字音調)";
 "Parser12.title" = "イェール弁音 (ローマ字+数字音調)";
@@ -71,6 +75,12 @@
 "Parser14.title" = "汎用弁音 (ローマ字+数字音調)";
 "Pg5-G9-pY5.title" = "入力候補についての (Shift+)Space キーの輪番切替対象をご指定ください。";
 "QUQ-oY-4Hc.label" = "全般";
+"rdoIntonationKeyBehavior0.title" = "カーソルの後部の音読みの音調を上書きし、候補選択状態を戻す";
+"rdoIntonationKeyBehavior1.title" = "カーソルの後部の音読みの異なる音調だけを上書きする";
+"rdoIntonationKeyBehavior2.title" = "常に入力緩衝列に音調を入力する";
+"rdoShiftBkspKeyBehavior0.title" = "カーソルの後部の音読みを解き、その音調を除く";
+"rdoShiftBkspKeyBehavior1.title" = "Shift+Delete のように入力緩衝列を消す";
+"rdoShiftBkspKeyBehavior2.title" = "カーソルの後部の音読みを常に削除する";
 "rdoUpperCaseLetterKeyBehavior0.title" = "入力緩衝列にローマ字入力";
 "rdoUpperCaseLetterKeyBehavior1.title" = "ローマ字（小文字）を直接出力";
 "rdoUpperCaseLetterKeyBehavior2.title" = "ローマ字（大文字）を直接出力";

@@ -27,8 +27,10 @@ struct suiPrefPaneDictionary: View {
     forKey: UserDef.kUseFixecCandidateOrderOnSelection.rawValue)
   @State private var selConsolidateContextOnCandidateSelection: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kConsolidateContextOnCandidateSelection.rawValue)
+  @State private var selHardenVerticalPunctuations: Bool = UserDefaults.standard.bool(
+    forKey: UserDef.kHardenVerticalPunctuations.rawValue)
 
-  private let contentMaxHeight: Double = 430
+  private let contentMaxHeight: Double = 432
   private let contentWidth: Double = {
     switch mgrPrefs.appleLanguages[0] {
       case "ja":
@@ -112,7 +114,8 @@ struct suiPrefPaneDictionary: View {
               mgrPrefs.shouldAutoReloadUserDataFiles = selAutoReloadUserData
             }
           ).controlSize(.small)
-          Divider()
+        }
+        Preferences.Section(title: "") {
           Toggle(
             LocalizedStringKey("Enable CNS11643 Support (2022-08-02)"),
             isOn: $selEnableCNS11643.onChange {
@@ -151,6 +154,24 @@ struct suiPrefPaneDictionary: View {
               mgrPrefs.consolidateContextOnCandidateSelection = selConsolidateContextOnCandidateSelection
             }
           )
+          Text(
+            LocalizedStringKey(
+              "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is."
+            )
+          )
+          .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+          Toggle(
+            LocalizedStringKey("Harden vertical punctuations during vertical typing (not recommended)"),
+            isOn: $selHardenVerticalPunctuations.onChange {
+              mgrPrefs.hardenVerticalPunctuations = selHardenVerticalPunctuations
+            }
+          )
+          Text(
+            LocalizedStringKey(
+              "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal."
+            )
+          )
+          .preferenceDescription().fixedSize(horizontal: false, vertical: true)
         }
       }
     }

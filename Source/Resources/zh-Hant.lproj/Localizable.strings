@@ -71,7 +71,8 @@
 "catCommonSymbols" = "常用";
 "catHoriBrackets" = "橫括";
 "catVertBrackets" = "縱括";
-"catGreekLetters" = "希臘";
+"catAlphabets" = "字母";
+"catSpecialNumbers" = "數字";
 "catMathSymbols" = "數學";
 "catCurrencyUnits" = "貨幣";
 "catSpecialSymbols" = "特殊";
@@ -83,6 +84,14 @@
 "catDoubleTableLines" = "雙線";
 "catFillingBlocks" = "填色";
 "catLineSegments" = "線段";
+"catKana" = "假名";
+"catCombinations" = "組字";
+"catPhonabets" = "注音";
+"catCircledASCII" = "圈英";
+"catBracketedASCII" = "括英";
+"catMusicSymbols" = "音樂";
+"catThai" = "泰文";
+"catYi" = "彝文";
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)空格鍵:";
@@ -148,6 +157,8 @@
 "for cycling pages" = "輪替頁面";
 "General" = "通用設定";
 "Hanyu Pinyin with Numeral Intonation" = "漢語拼音+數字標調";
+"Harden vertical punctuations during vertical typing (not recommended)" = "在縱排書寫時，強制轉換標點為縱排形式（不推薦）";
+"⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 該功能當且僅當目前的排版字型不支援縱排標點動態顯示轉義的情況下才有用。一旦使用了，所有敲出去的標點都會被永久轉換為靜態縱排標點：哪怕當前編輯器的排版模式已經改成橫排，這些已經輸入的標點也都還是縱排標點字符。";
 "Horizontal" = "橫向佈局";
 "Hsu" = "許氏國音自然排列";
 "Hualuo Pinyin with Numeral Intonation" = "華羅拼音+數字標調";
@@ -194,4 +205,5 @@
 "Use Shift Key Accommodation in all cases" = "對任何客體應用均啟用 Shift 鍵相容性措施";
 "Vertical" = "縱向佈局";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：該頁面僅作未來功能測試所用。\n在此列出的功能並非處於完全可用之狀態。";
+"For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is." = "打比方說，你敲了「章太炎」，你想將「太」改成「泰」。這個操作的作業索引範圍是開閉區間 [1,2)，會切到「章太炎」這個節點的所在索引範圍 [0,3)。如果沒有事前鞏固處理的話，這個詞會在你選字之後變成諸如「張泰言」這種你不想要的自動選字結果。當且僅當你啟用了這個鞏固功能的前提下，你選字之後的結果才會是「章泰炎」這種你想要的結果。";
 "Yale Pinyin with Numeral Intonation" = "耶魯拼音+數字標調";

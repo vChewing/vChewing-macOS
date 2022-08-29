@@ -43,7 +43,9 @@
 "chkAllowBoostingSingleKanjiAsUserPhrase.title" = "Allow boosting / excluding a candidate of single kanji";
 "chkAlsoConfirmAssociatedCandidatesByEnter.title" = "Allow using Enter key to confirm associated candidate selection";
 "chkAutoCorrectReadingCombination.title" = "Automatically correct reading combinations when typing";
+"chkConsolidateContextOnCandidateSelection.title" = "Consolidate the context on confirming candidate selection";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "Applying typing suggestions from half-life user override model";
+"chkHardenVerticalPunctuations.title" = "Harden vertical punctuations during vertical typing";
 "chkKeepReadingUponCompositionError.title" = "Allow backspace-editing miscomposed readings";
 "chkUseFixecCandidateOrderOnSelection.title" = "Always use fixed listing order in candidate window";
 "DbW-eq-ZdB.title" = "Starlight";
@@ -64,6 +66,8 @@
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
 "lblDevZoneIMKCandidate.title" = "IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases.";
 "lblDevZoneTitleDescription.title" = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
+"lblIntonationKeyBehavior.title" = "Specify what intonation key does when syllable composer is empty.";
+"lblShiftBkspKeyBehavior.title" = "Choose the attempted behavior of Shift+BackSpace key.";
 "lblUpperCaseLetterKeyBehavior.title" = "Choose the behavior of Shift+Letter key with letter inputs.";
 "Parser11.title" = "Secondary Pinyin with Numeral Intonation";
 "Parser12.title" = "Yale Pinyin with Numeral Intonation";
@@ -71,6 +75,12 @@
 "Parser14.title" = "Universal Pinyin with Numeral Intonation";
 "Pg5-G9-pY5.title" = "Choose the behavior of (Shift+)Space key with candidates.";
 "QUQ-oY-4Hc.label" = "General";
+"rdoIntonationKeyBehavior0.title" = "Override the previous reading's intonation with candidate-reset";
+"rdoIntonationKeyBehavior1.title" = "Only override the intonation of the previous reading if different";
+"rdoIntonationKeyBehavior2.title" = "Always type intonations to the inline composition buffer";
+"rdoShiftBkspKeyBehavior0.title" = "Disassemble the previous reading, dropping its intonation";
+"rdoShiftBkspKeyBehavior1.title" = "Clear the entire inline composition buffer like Shift+Delete";
+"rdoShiftBkspKeyBehavior2.title" = "Always drop the previous reading";
 "rdoUpperCaseLetterKeyBehavior0.title" = "Type them into inline composition buffer";
 "rdoUpperCaseLetterKeyBehavior1.title" = "Directly commit lowercased letters";
 "rdoUpperCaseLetterKeyBehavior2.title" = "Directly commit uppercased letters";

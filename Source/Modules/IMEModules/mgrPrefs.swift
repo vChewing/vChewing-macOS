@@ -53,6 +53,7 @@ public enum UserDef: String, CaseIterable {
   case kUpperCaseLetterKeyBehavior = "UpperCaseLetterKeyBehavior"
   case kDisableShiftTogglingAlphanumericalMode = "DisableShiftTogglingAlphanumericalMode"
   case kConsolidateContextOnCandidateSelection = "ConsolidateContextOnCandidateSelection"
+  case kHardenVerticalPunctuations = "HardenVerticalPunctuations"
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
@@ -297,6 +298,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.consolidateContextOnCandidateSelection, forKey: UserDef.kConsolidateContextOnCandidateSelection.rawValue
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.hardenVerticalPunctuations, forKey: UserDef.kHardenVerticalPunctuations.rawValue
+    )
 
     // -----
 
@@ -424,6 +428,9 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kConsolidateContextOnCandidateSelection.rawValue, defaultValue: true)
   static var consolidateContextOnCandidateSelection: Bool
+
+  @UserDefault(key: UserDef.kHardenVerticalPunctuations.rawValue, defaultValue: false)
+  static var hardenVerticalPunctuations: Bool
 
   // MARK: - Settings (Tier 2)
 
@@ -717,18 +724,6 @@ extension mgrPrefs {
       mgrPrefs.shouldAlwaysUseShiftKeyAccommodation = false
       mgrPrefs.disableShiftTogglingAlphanumericalMode = false
       mgrPrefs.togglingAlphanumericalModeWithLShift = false
-    }
-    // 介面語言選項糾錯。
-    var filteredAppleLanguages = Set<String>()
-    appleLanguages.forEach {
-      if IME.arrSupportedLocales.contains($0) {
-        filteredAppleLanguages.insert($0)
-      }
-    }
-    if !filteredAppleLanguages.isEmpty {
-      appleLanguages = Array(filteredAppleLanguages)
-    } else {
-      UserDefaults.standard.removeObject(forKey: UserDef.kAppleLanguages.rawValue)
     }
     // 注拼槽注音排列選項糾錯。
     var isMandarinParserOptionValid = false
