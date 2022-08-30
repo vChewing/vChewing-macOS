@@ -193,6 +193,9 @@ class ctlInputMethod: IMKInputController {
   @objc(handleEvent:client:) override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
 
+    // 只針對特定類型的 client() 進行處理。
+    if !(sender is IMKTextInput) { return false }
+
     // 就這傳入的 NSEvent 都還有可能是 nil，Apple InputMethodKit 團隊到底在搞三小。
     guard let event = event else { return false }
 
