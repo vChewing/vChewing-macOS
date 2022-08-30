@@ -11,7 +11,7 @@
 import Cocoa
 import InputMethodKit
 
-let kConnectionName = "vChewing_1_Connection"
+let kConnectionName = "org.atelierInmu.inputmethod.vChewing_Connection"
 
 switch max(CommandLine.arguments.count - 1, 0) {
   case 0: break

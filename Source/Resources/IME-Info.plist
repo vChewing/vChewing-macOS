@@ -90,7 +90,7 @@
 		</array>
 	</dict>
 	<key>InputMethodConnectionName</key>
-	<string>vChewing_1_Connection</string>
+	<string>org.atelierInmu.inputmethod.vChewing_Connection</string>
 	<key>InputMethodServerControllerClass</key>
 	<string>ctlInputMethod</string>
 	<key>InputMethodServerDelegateClass</key>
