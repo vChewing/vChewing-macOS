@@ -195,6 +195,7 @@
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "マナーモード // 外すと入力間違った時に変な声が出る";
 "This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later." = "これは Apple Bug Report #FB10978412 の臨時対策であり、macOS 12 からの macOS に効き、IMK 以外の候補陳列ウィンドウに作用する。Apple は macOS 11 からの macOS のために該当 Bug を修復すべきである。";
 "Traditional Chinese" = "繁体中国語";
+"Trim unfinished readings on commit" = "送り出す緩衝列内容から未完成な音読みを除く";
 "Type them into inline composition buffer" = "入力緩衝列にローマ字入力";
 "Typing Style:" = "入力習慣:";
 "UI Language:" = "表示用言語:";
