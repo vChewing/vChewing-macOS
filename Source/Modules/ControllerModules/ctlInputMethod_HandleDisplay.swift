@@ -26,7 +26,16 @@ extension ctlInputMethod {
       )
       cursor -= 1
     }
-    ctlInputMethod.tooltipController.show(tooltip: tooltip, at: lineHeightRect.origin)
+    var finalOrigin: NSPoint = lineHeightRect.origin
+    if isVerticalTyping {
+      finalOrigin = NSPoint(
+        x: lineHeightRect.origin.x + lineHeightRect.size.width + 4.0, y: lineHeightRect.origin.y - 4.0
+      )
+      ctlInputMethod.tooltipController.direction = .vertical
+    } else {
+      ctlInputMethod.tooltipController.direction = .horizontal
+    }
+    ctlInputMethod.tooltipController.show(tooltip: tooltip, at: finalOrigin)
   }
 
   func show(candidateWindowWith state: InputStateProtocol) {

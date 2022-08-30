@@ -20,6 +20,11 @@ public class TooltipController: NSWindowController {
     case prompt
   }
 
+  public enum displayDirection {
+    case horizontal
+    case vertical
+  }
+
   private var backgroundColor = NSColor.windowBackgroundColor
   private var textColor = NSColor.windowBackgroundColor
   private var messageTextField: NSTextField
@@ -29,6 +34,8 @@ public class TooltipController: NSWindowController {
       adjustSize()
     }
   }
+
+  public var direction: displayDirection = .horizontal
 
   public init() {
     let contentRect = NSRect(x: 128.0, y: 128.0, width: 300.0, height: 20.0)
@@ -157,6 +164,7 @@ public class TooltipController: NSWindowController {
     var rect = attrString.boundingRect(
       with: NSSize(width: 1600.0, height: 1600.0), options: .usesLineFragmentOrigin
     )
+
     rect.size.width += 10
     messageTextField.frame = rect
     window?.setFrame(rect, display: true)
