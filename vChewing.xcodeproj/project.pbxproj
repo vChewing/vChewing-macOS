@@ -10,6 +10,7 @@
 		5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */ = {isa = PBXBuildFile; fileRef = 5B09307828B6FC3B0021F8C5 /* shortcuts.html */; };
 		5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0AF8B427B2C8290096FE54 /* StringExtension.swift */; };
 		5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */; };
+		5B20430728BEE30900BFC6FD /* BookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B20430628BEE30900BFC6FD /* BookmarkManager.swift */; };
 		5B21176C287539BB000443A9 /* ctlInputMethod_HandleStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176B287539BB000443A9 /* ctlInputMethod_HandleStates.swift */; };
 		5B21176E28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176D28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift */; };
 		5B21177028753B9D000443A9 /* ctlInputMethod_Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176F28753B9D000443A9 /* ctlInputMethod_Delegates.swift */; };
@@ -217,6 +218,7 @@
 		5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-JPN.txt"; sourceTree = "<group>"; };
 		5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHT.txt"; sourceTree = "<group>"; };
+		5B20430628BEE30900BFC6FD /* BookmarkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkManager.swift; sourceTree = "<group>"; };
 		5B21176B287539BB000443A9 /* ctlInputMethod_HandleStates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_HandleStates.swift; sourceTree = "<group>"; };
 		5B21176D28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_HandleDisplay.swift; sourceTree = "<group>"; };
 		5B21176F28753B9D000443A9 /* ctlInputMethod_Delegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_Delegates.swift; sourceTree = "<group>"; };
@@ -427,6 +429,14 @@
 			name = MiscRootFiles;
 			sourceTree = "<group>";
 		};
+		5B20430528BEE2F300BFC6FD /* Sandbox */ = {
+			isa = PBXGroup;
+			children = (
+				5B20430628BEE30900BFC6FD /* BookmarkManager.swift */,
+			);
+			path = Sandbox;
+			sourceTree = "<group>";
+		};
 		5B2F2BB4286216A500B8557B /* vChewingTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -457,6 +467,7 @@
 				5B84579B2871AD2200C93B01 /* HotenkaChineseConverter */,
 				5B949BD72816DC4400D87B5D /* LineReader */,
 				5BA58644289BCFAC0077D02F /* Qwertyyb */,
+				5B20430528BEE2F300BFC6FD /* Sandbox */,
 				5BA9FCEA27FED652002DE248 /* SindreSorhus */,
 				5BA9FD8C28006BA7002DE248 /* VDKComboBox */,
 			);
@@ -1242,6 +1253,7 @@
 				5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */,
 				5BA9FD4027FEF3C8002DE248 /* Localization.swift in Sources */,
 				5BAA8FBE282CAF380066C406 /* SyllableComposer.swift in Sources */,
+				5B20430728BEE30900BFC6FD /* BookmarkManager.swift in Sources */,
 				5BA9FD1327FEDB6B002DE248 /* suiPrefPaneDictionary.swift in Sources */,
 				5B2170E8289FACAD00BE7304 /* 5_Vertex.swift in Sources */,
 				5BBBB77A27AEDC690023B93A /* clsSFX.swift in Sources */,
