@@ -354,7 +354,7 @@ enum mgrLangModel {
       folderPath?.ensureTrailingSlash()
     }
     let isFolderWritable = FileManager.default.isWritableFile(atPath: folderPath ?? "")
-
+    // IME.prtDebugIntel("mgrLM: Exist: \(folderExist), IsFolder: \(isFolder.boolValue), isWritable: \(isFolderWritable)")
     if ((folderExist && !isFolder.boolValue) || !folderExist) || !isFolderWritable {
       return false
     }
@@ -423,6 +423,7 @@ enum mgrLangModel {
       return userDictPathDefault
     }
     if mgrPrefs.ifSpecifiedUserDataPathExistsInPlist() {
+      BookmarkManager.shared.loadBookmarks()
       if mgrLangModel.checkIfSpecifiedUserDataFolderValid(userDictPathSpecified) {
         return userDictPathSpecified
       } else {
