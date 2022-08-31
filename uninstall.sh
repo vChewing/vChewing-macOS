@@ -17,8 +17,9 @@ rm ~/Library/Receipts/org.atelierInmu.vChewing.bom
 rm ~/Library/Receipts/org.atelierInmu.vChewing.plist
 
 # Also user phrase folder:
-# 原廠預設的使用者辭典目錄：
-rm -rf ~/Library/Application\ Support/vChewing/
+# 原廠預設的使用者辭典目錄不自動刪除了，讓使用者自己刪：
+# rm -rf ~/Library/Application\ Support/vChewing/
+# rm -rf /Users/shikisuen/Library/Containers/org.atelierInmu.inputmethod.vChewing/Data/Library/Application\ Support/vChewing/
 
 # Also the IME configuration file:
 # 輸入法偏好設定檔案：
