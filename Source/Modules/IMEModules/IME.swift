@@ -22,6 +22,9 @@ public enum InputMode: String {
 public enum IME {
   static let arrSupportedLocales = ["en", "zh-Hant", "zh-Hans", "ja"]
   static let dlgOpenPath = NSOpenPanel()
+  public static let realHomeDir = URL(
+    fileURLWithFileSystemRepresentation: getpwuid(getuid()).pointee.pw_dir, isDirectory: true, relativeTo: nil
+  )
 
   // MARK: - 瀏覽器 Bundle Identifier 關鍵詞匹配黑名單
 
@@ -173,16 +176,23 @@ public enum IME {
       return -1
     }
 
-    let kTargetBin = "vChewing"
+    // 自威注音 v2.3.0 開始，沙箱限制了威注音的某些行為，所以該函式不再受理 sudo 模式下的操作。
+    if isSudo {
+      print(
+        "vChewing binary does not support sudo-uninstall since v2.3.0. Please use the bundled uninstall.sh instead.\n\nIf you want to fix the installation (i.e. removing all incorrectly installed files outside of the current user folder), please use the bundled fixinstall.sh instead.\n\nIf you don't know how to proceed, please bring either the uninstall.sh / install.sh or the instruction article https://vchewing.github.io/UNINSTALL.html to Apple Support (support.apple.com) for help. Their senior advisors can understand these uninstall instructions."
+      )
+      return -1
+    }
+
     let kTargetBundle = "/vChewing.app"
     let pathLibrary =
       isSudo
       ? "/Library"
-      : FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0].path
+      : IME.realHomeDir.appendingPathComponent("Library/").path
     let pathIMELibrary =
       isSudo
       ? "/Library/Input Methods"
-      : FileManager.default.urls(for: .inputMethodsDirectory, in: .userDomainMask)[0].path
+      : IME.realHomeDir.appendingPathComponent("Library/Input Methods/").path
     let pathUnitKeyboardLayouts = "/Keyboard Layouts"
     let arrKeyLayoutFiles = [
       "/vChewing ETen.keylayout", "/vChewingKeyLayout.bundle", "/vChewing MiTAC.keylayout",
@@ -203,15 +213,13 @@ public enum IME {
       // 目前暫時無法應對 symbol link 的情況。
       IME.trashTargetIfExists(mgrLangModel.dataFolderPath(isDefaultFolder: true))
       IME.trashTargetIfExists(pathLibrary + "/Preferences/" + bundleID + ".plist")  // 之後移除 App 偏好設定
+      IME.trashTargetIfExists(pathLibrary + "/Receipts/org.atelierInmu.vChewing.bom")  // pkg 垃圾
+      IME.trashTargetIfExists(pathLibrary + "/Receipts/org.atelierInmu.vChewing.plist")  // pkg 垃圾
     }
     if !IME.trashTargetIfExists(pathIMELibrary + kTargetBundle) { return -1 }  // 最後移除 App 自身
     // 幹掉殘留在記憶體內的執行緒。
     if selfKill {
-      let killTask = Process()
-      killTask.launchPath = "/usr/bin/killall"
-      killTask.arguments = ["-9", kTargetBin]
-      killTask.launch()
-      killTask.waitUntilExit()
+      NSApplication.shared.terminate(nil)
     }
     return 0
   }
