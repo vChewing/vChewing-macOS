@@ -13,6 +13,8 @@ rm ~/Library/Keyboard\ Layouts/vChewing\ IBM.keylayout
 rm ~/Library/Keyboard\ Layouts/vChewing\ FakeSeigyou.keylayout
 rm ~/Library/Keyboard\ Layouts/vChewing\ ETen.keylayout
 rm ~/Library/Keyboard\ Layouts/vChewing\ Dachen.keylayout
+rm ~/Library/Receipts/org.atelierInmu.vChewing.bom
+rm ~/Library/Receipts/org.atelierInmu.vChewing.plist
 
 # Also user phrase folder:
 # 原廠預設的使用者辭典目錄：
@@ -35,6 +37,8 @@ sudo rm -rf /Library/Keyboard\ Layouts/vChewing\ IBM.keylayout
 sudo rm -rf /Library/Keyboard\ Layouts/vChewing\ FakeSeigyou.keylayout
 sudo rm -rf /Library/Keyboard\ Layouts/vChewing\ ETen.keylayout
 sudo rm -rf /Library/Keyboard\ Layouts/vChewing\ Dachen.keylayout
+sudo rm -rf /Library/Receipts/org.atelierInmu.vChewing.bom
+sudo rm -rf /Library/Receipts/org.atelierInmu.vChewing.plist
 
 # P.S.: The "vChewingKeyLayout.bundle" and keylayout files are deployed by the pkg installer. They are not hard-requirements for running vChewing, but providing extended on-screen keyboard for MiTAC, IBM, FakeSeigyou phonetic layouts.
 # P.S.: 「vChewingKeyLayout.bundle」與 keylayout 檔案只會被 pkg 格式的安裝包安裝。這些檔案提供了除了大千傳統與倚天傳統以外的靜態注音排列的螢幕鍵盤支援。
