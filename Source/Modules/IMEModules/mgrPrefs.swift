@@ -54,6 +54,7 @@ public enum UserDef: String, CaseIterable {
   case kDisableShiftTogglingAlphanumericalMode = "DisableShiftTogglingAlphanumericalMode"
   case kConsolidateContextOnCandidateSelection = "ConsolidateContextOnCandidateSelection"
   case kHardenVerticalPunctuations = "HardenVerticalPunctuations"
+  case kTrimUnfinishedReadingsOnCommit = "TrimUnfinishedReadingsOnCommit"
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
@@ -301,6 +302,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.hardenVerticalPunctuations, forKey: UserDef.kHardenVerticalPunctuations.rawValue
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.trimUnfinishedReadingsOnCommit, forKey: UserDef.kTrimUnfinishedReadingsOnCommit.rawValue
+    )
 
     // -----
 
@@ -431,6 +435,9 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kHardenVerticalPunctuations.rawValue, defaultValue: false)
   static var hardenVerticalPunctuations: Bool
+
+  @UserDefault(key: UserDef.kTrimUnfinishedReadingsOnCommit.rawValue, defaultValue: true)
+  static var trimUnfinishedReadingsOnCommit: Bool
 
   // MARK: - Settings (Tier 2)
 

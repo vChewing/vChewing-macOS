@@ -195,6 +195,7 @@
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉恥模式 // 取消勾選的話，敲錯字時會有異音";
 "This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later." = "該方法是 Apple Bug Report #FB10978412 的保守治療方案，用來僅針對 macOS 12 開始的系統，且僅對非 IMK 選字窗起作用。Apple 應該對 macOS 11 開始的系統修復這個 Bug。";
 "Traditional Chinese" = "繁體中文";
+"Trim unfinished readings on commit" = "在遞交時清理未完成拼寫的讀音";
 "Type them into inline composition buffer" = "直接鍵入內文組字區";
 "Typing Style:" = "輸入風格:";
 "UI Language:" = "介面語言:";

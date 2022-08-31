@@ -285,7 +285,9 @@ enum mgrLangModel {
   /// - Parameter mode: 簡繁體輸入模式。
   /// - Returns: 資料路徑（URL）。
   static func userOverrideModelDataURL(_ mode: InputMode) -> URL {
-    let fileName = (mode == InputMode.imeModeCHT) ? "override-model-data-cht.dat" : "override-model-data-chs.dat"
+    let fileName =
+      (mode == InputMode.imeModeCHT)
+      ? "../vChewing_override-model-data-cht.dat" : "../vChewing_override-model-data-chs.dat"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: true)).appendingPathComponent(fileName)
   }
 
@@ -354,7 +356,7 @@ enum mgrLangModel {
       folderPath?.ensureTrailingSlash()
     }
     let isFolderWritable = FileManager.default.isWritableFile(atPath: folderPath ?? "")
-
+    // IME.prtDebugIntel("mgrLM: Exist: \(folderExist), IsFolder: \(isFolder.boolValue), isWritable: \(isFolderWritable)")
     if ((folderExist && !isFolder.boolValue) || !folderExist) || !isFolderWritable {
       return false
     }
@@ -423,6 +425,7 @@ enum mgrLangModel {
       return userDictPathDefault
     }
     if mgrPrefs.ifSpecifiedUserDataPathExistsInPlist() {
+      BookmarkManager.shared.loadBookmarks()
       if mgrLangModel.checkIfSpecifiedUserDataFolderValid(userDictPathSpecified) {
         return userDictPathSpecified
       } else {

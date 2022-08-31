@@ -195,6 +195,7 @@
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "Stop farting (when typed phonetic combination is invalid, etc.)";
 "This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later." = "This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later.";
 "Traditional Chinese" = "Traditional Chinese";
+"Trim unfinished readings on commit" = "Trim unfinished readings on commit";
 "Type them into inline composition buffer" = "Type them into inline composition buffer";
 "Typing Style:" = "Typing Style:";
 "UI Language:" = "UI Language:";

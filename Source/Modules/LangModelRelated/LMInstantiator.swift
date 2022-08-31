@@ -245,11 +245,11 @@ extension vChewing {
       return !unigramsFor(key: key).isEmpty
     }
 
-    public func associatedPhrasesFor(pair: Megrez.KeyValuePaired) -> [String] {
+    public func associatedPhrasesFor(pair: Megrez.Compositor.Candidate) -> [String] {
       lmAssociates.valuesFor(pair: pair)
     }
 
-    public func hasAssociatedPhrasesFor(pair: Megrez.KeyValuePaired) -> Bool {
+    public func hasAssociatedPhrasesFor(pair: Megrez.Compositor.Candidate) -> Bool {
       lmAssociates.hasValuesFor(pair: pair)
     }
 

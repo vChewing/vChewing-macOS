@@ -130,7 +130,7 @@ extension ctlInputMethod {
     ctlInputMethod.ctlCandidateCurrent.visible = false
     ctlInputMethod.tooltipController.hide()
     if let previous = previous as? InputState.NotEmpty {
-      commit(text: previous.composingBuffer)
+      commit(text: previous.committingBufferConverted)
     }
     clearInlineDisplay()
     // 最後一道保險
@@ -145,7 +145,7 @@ extension ctlInputMethod {
     if let previous = previous as? InputState.NotEmpty,
       !(state is InputState.EmptyIgnoringPreviousState)
     {
-      commit(text: previous.composingBuffer)
+      commit(text: previous.committingBufferConverted)
     }
     // 在這裡手動再取消一次選字窗與工具提示的顯示，可謂雙重保險。
     ctlInputMethod.ctlCandidateCurrent.visible = false

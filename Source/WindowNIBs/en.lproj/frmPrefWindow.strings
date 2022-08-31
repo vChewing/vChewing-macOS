@@ -90,6 +90,7 @@
 "s7u-Fm-dVg.title" = "Cycling Pages";
 "shc-Nu-UsM.title" = "Show page buttons in candidate list";
 "tglDevZoneIMKCandidate.title" = "Use IMK Candidate Window instead (will reboot the IME)";
+"tglTrimUnfinishedReadingsOnCommit.title" = "Trim unfinished readings on commit";
 "TXr-FF-ehw.title" = "Traditional Chinese";
 "ueU-Rz-a1C.title" = "Choose the behavior of (Shift+)Tab key in the candidate window.";
 "VdT-fw-7pQ.title" = "Debug Mode";

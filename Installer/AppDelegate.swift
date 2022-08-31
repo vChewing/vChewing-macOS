@@ -13,12 +13,14 @@ import Cocoa
 private let kTargetBin = "vChewing"
 private let kTargetType = "app"
 private let kTargetBundle = "vChewing.app"
+private let kTargetBundleWithComponents = "Library/Input%20Methods/vChewing.app"
 
-private let urlDestinationPartial = FileManager.default.urls(
-  for: .inputMethodsDirectory, in: .userDomainMask
-)[0]
-private let urlTargetPartial = urlDestinationPartial.appendingPathComponent(kTargetBundle)
-private let urlTargetFullBinPartial = urlTargetPartial.appendingPathComponent("Contents/MacOS/")
+private let realHomeDir = URL(
+  fileURLWithFileSystemRepresentation: getpwuid(getuid()).pointee.pw_dir, isDirectory: true, relativeTo: nil
+)
+private let urlDestinationPartial = realHomeDir.appendingPathComponent("Library/Input Methods")
+private let urlTargetPartial = realHomeDir.appendingPathComponent(kTargetBundleWithComponents)
+private let urlTargetFullBinPartial = urlTargetPartial.appendingPathComponent("Contents/MacOS")
   .appendingPathComponent(kTargetBin)
 
 private let kDestinationPartial = urlDestinationPartial.path
@@ -93,9 +95,9 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
     window?.standardWindowButton(.zoomButton)?.isHidden = true
 
     if FileManager.default.fileExists(
-      atPath: (kTargetPartialPath as NSString).expandingTildeInPath)
+      atPath: kTargetPartialPath)
     {
-      let currentBundle = Bundle(path: (kTargetPartialPath as NSString).expandingTildeInPath)
+      let currentBundle = Bundle(path: kTargetPartialPath)
       let shortVersion =
         currentBundle?.infoDictionary?["CFBundleShortVersionString"] as? String
       let currentVersion =
@@ -136,15 +138,12 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
   }
 
   func removeThenInstallInputMethod() {
-    if FileManager.default.fileExists(
-      atPath: (kTargetPartialPath as NSString).expandingTildeInPath)
-      == false
-    {
-      installInputMethod(
-        previousExists: false, previousVersionNotFullyDeactivatedWarning: false
-      )
-      return
-    }
+    // if !FileManager.default.fileExists(atPath: kTargetPartialPath) {
+    //   installInputMethod(
+    //     previousExists: false, previousVersionNotFullyDeactivatedWarning: false
+    //   )
+    //   return
+    // }
 
     let shouldWaitForTranslocationRemoval =
       isAppBundleTranslocated(atPath: kTargetPartialPath)
@@ -152,7 +151,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 
     // 將既存輸入法扔到垃圾桶內
     do {
-      let sourceDir = (kDestinationPartial as NSString).expandingTildeInPath
+      let sourceDir = kDestinationPartial
       let fileManager = FileManager.default
       let fileURLString = String(format: "%@/%@", sourceDir, kTargetBundle)
       let fileURL = URL(fileURLWithPath: fileURLString)
@@ -216,8 +215,9 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
     }
     let cpTask = Process()
     cpTask.launchPath = "/bin/cp"
+    print(kDestinationPartial)
     cpTask.arguments = [
-      "-R", targetBundle, (kDestinationPartial as NSString).expandingTildeInPath,
+      "-R", targetBundle, kDestinationPartial,
     ]
     cpTask.launch()
     cpTask.waitUntilExit()
@@ -231,7 +231,11 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
       endAppWithDelay()
     }
 
-    guard let imeBundle = Bundle(path: (kTargetPartialPath as NSString).expandingTildeInPath),
+    let imeURLInstalled = realHomeDir.appendingPathComponent("Library/Input Methods/vChewing.app")
+
+    _ = try? shell("/usr/bin/xattr -drs com.apple.quarantine \(kTargetPartialPath)")
+
+    guard let imeBundle = Bundle(url: imeURLInstalled),
       let imeIdentifier = imeBundle.bundleIdentifier
     else {
       endAppWithDelay()
@@ -343,6 +347,30 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
     NSApp.terminate(self)
   }
 
+  private func shell(_ command: String) throws -> String {
+    let task = Process()
+    let pipe = Pipe()
+
+    task.standardOutput = pipe
+    task.standardError = pipe
+    task.arguments = ["-c", command]
+    if #available(macOS 10.13, *) {
+      task.executableURL = URL(fileURLWithPath: "/bin/zsh")
+    } else {
+      task.launchPath = "/bin/zsh"
+    }
+    task.standardInput = nil
+
+    if #available(macOS 10.13, *) {
+      try task.run()
+    }
+
+    let data = pipe.fileHandleForReading.readDataToEndOfFile()
+    let output = String(data: data, encoding: .utf8)!
+
+    return output
+  }
+
   // Determines if an app is translocated by Gatekeeper to a randomized path.
   // See https://weblog.rogueamoeba.com/2016/06/29/sierra-and-gatekeeper-path-randomization/
   // Originally written by Zonble Yang in Objective-C (MIT License).
@@ -350,7 +378,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
   func isAppBundleTranslocated(atPath bundlePath: String) -> Bool {
     var entryCount = getfsstat(nil, 0, 0)
     var entries: [statfs] = .init(repeating: .init(), count: Int(entryCount))
-    let absPath = (bundlePath as NSString).expandingTildeInPath.cString(using: .utf8)
+    let absPath = bundlePath.cString(using: .utf8)
     entryCount = getfsstat(&entries, entryCount * Int32(MemoryLayout<statfs>.stride), MNT_NOWAIT)
     for entry in entries.prefix(Int(entryCount)) {
       let isMatch = withUnsafeBytes(of: entry.f_mntfromname) { mntFromName in

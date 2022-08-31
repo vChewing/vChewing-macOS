@@ -71,8 +71,8 @@ extension KeyHandler {
       // 但願能夠處理這種情況下所有可能的按鍵組合。
       stateCallback(InputState.Empty())
 
-      // 摁 Shift 的話，無須額外處理，因為直接就會敲出大寫字母。
-      if input.isShiftHold {
+      // 字母鍵摁 Shift 的話，無須額外處理，因為直接就會敲出大寫字母。
+      if input.isUpperCaseASCIILetterKey {
         return false
       }
 

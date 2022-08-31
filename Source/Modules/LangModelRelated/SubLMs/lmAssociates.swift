@@ -78,7 +78,7 @@ extension vChewing {
       // This function will be implemented only if further hard-necessity comes.
     }
 
-    public func valuesFor(pair: Megrez.KeyValuePaired) -> [String] {
+    public func valuesFor(pair: Megrez.Compositor.Candidate) -> [String] {
       var pairs: [String] = []
       if let arrRangeRecords: [(Range<String.Index>, Int)] = rangeMap[pair.toNGramKey] {
         for (netaRange, index) in arrRangeRecords {
@@ -98,7 +98,7 @@ extension vChewing {
       return pairs.filter { set.insert($0).inserted }
     }
 
-    public func hasValuesFor(pair: Megrez.KeyValuePaired) -> Bool {
+    public func hasValuesFor(pair: Megrez.Compositor.Candidate) -> Bool {
       if rangeMap[pair.toNGramKey] != nil { return true }
       return rangeMap[pair.value] != nil
     }

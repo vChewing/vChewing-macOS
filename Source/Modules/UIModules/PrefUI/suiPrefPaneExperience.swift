@@ -41,6 +41,8 @@ struct suiPrefPaneExperience: View {
     forKey: UserDef.kSpecifyIntonationKeyBehavior.rawValue)
   @State private var selSpecifyShiftBackSpaceKeyBehavior = UserDefaults.standard.integer(
     forKey: UserDef.kSpecifyShiftBackSpaceKeyBehavior.rawValue)
+  @State private var selTrimUnfinishedReadingsOnCommit = UserDefaults.standard.bool(
+    forKey: UserDef.kTrimUnfinishedReadingsOnCommit.rawValue)
 
   private let contentMaxHeight: Double = 432
   private let contentWidth: Double = {
@@ -218,6 +220,12 @@ struct suiPrefPaneExperience: View {
             LocalizedStringKey("Allow backspace-editing miscomposed readings"),
             isOn: $selKeepReadingUponCompositionError.onChange {
               mgrPrefs.keepReadingUponCompositionError = selKeepReadingUponCompositionError
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Trim unfinished readings on commit"),
+            isOn: $selTrimUnfinishedReadingsOnCommit.onChange {
+              mgrPrefs.trimUnfinishedReadingsOnCommit = selTrimUnfinishedReadingsOnCommit
             }
           )
           Toggle(

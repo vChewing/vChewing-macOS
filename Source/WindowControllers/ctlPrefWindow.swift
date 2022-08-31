@@ -293,22 +293,22 @@ class ctlPrefWindow: NSWindowController {
 
     IME.dlgOpenPath.beginSheetModal(for: window) { result in
       if result == NSApplication.ModalResponse.OK {
-        if IME.dlgOpenPath.url != nil {
-          // CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
-          // 所以要手動補回來。
-          var newPath = IME.dlgOpenPath.url!.path
-          newPath.ensureTrailingSlash()
-          if mgrLangModel.checkIfSpecifiedUserDataFolderValid(newPath) {
-            mgrPrefs.userDataFolderSpecified = newPath
-            IME.initLangModels(userOnly: true)
-            (NSApplication.shared.delegate as! AppDelegate).updateStreamHelperPath()
-          } else {
-            clsSFX.beep()
-            if !bolPreviousFolderValidity {
-              mgrPrefs.resetSpecifiedUserDataFolder()
-            }
-            return
+        guard let url = IME.dlgOpenPath.url else { return }
+        // CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
+        // 所以要手動補回來。
+        var newPath = url.path
+        newPath.ensureTrailingSlash()
+        if mgrLangModel.checkIfSpecifiedUserDataFolderValid(newPath) {
+          mgrPrefs.userDataFolderSpecified = newPath
+          BookmarkManager.shared.saveBookmark(for: url)
+          IME.initLangModels(userOnly: true)
+          (NSApplication.shared.delegate as! AppDelegate).updateStreamHelperPath()
+        } else {
+          clsSFX.beep()
+          if !bolPreviousFolderValidity {
+            mgrPrefs.resetSpecifiedUserDataFolder()
           }
+          return
         }
       } else {
         if !bolPreviousFolderValidity {
