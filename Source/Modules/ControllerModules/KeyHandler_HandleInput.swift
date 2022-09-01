@@ -1,4 +1,4 @@
-// Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // Refactored from the ObjCpp-version of this class by:
 // (c) 2011 and onwards The OpenVanilla Project (MIT License).
 // ====================
@@ -24,16 +24,15 @@ extension KeyHandler {
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handle(
-    input: InputSignal,
+    input: InputSignalProtocol,
     state: InputStateProtocol,
     stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
     // 如果按鍵訊號內的 inputTest 是空的話，則忽略該按鍵輸入，因為很可能是功能修飾鍵。
-    guard !input.inputText.isEmpty else { return false }
+    guard !input.text.isEmpty else { return false }
 
-    let charCode: UniChar = input.charCode
-    let inputText: String = input.inputText
+    let inputText: String = input.text
     var state = state  // 常數轉變數。
 
     // 提前過濾掉一些不合規的按鍵訊號輸入，免得相關按鍵訊號被送給 Megrez 引發輸入法崩潰。
@@ -78,7 +77,7 @@ extension KeyHandler {
 
       /// 如果是 ASCII 當中的不可列印的字元的話，不使用「insertText:replacementRange:」。
       /// 某些應用無法正常處理非 ASCII 字符的輸入。
-      if charCode < 0x80, !charCode.isPrintableASCII {
+      if input.isASCII, !input.charCode.isPrintableASCII {
         return false
       }
 
@@ -309,7 +308,7 @@ extension KeyHandler {
       if input.isMainAreaNumKey, input.isShiftHold, input.isOptionHold, !input.isControlHold, !input.isCommandHold {
         // NOTE: 將來棄用 macOS 10.11 El Capitan 支援的時候，把這裡由 CFStringTransform 改為 StringTransform:
         // https://developer.apple.com/documentation/foundation/stringtransform
-        guard let stringRAW = input.mapMainAreaNumKey[input.keyCode] else { return false }
+        guard let stringRAW = input.mainAreaNumKeyChar else { return false }
         let string = NSMutableString(string: stringRAW)
         CFStringTransform(string, nil, kCFStringTransformFullwidthHalfwidth, true)
         stateCallback(
@@ -328,9 +327,7 @@ extension KeyHandler {
 
     let punctuationNamePrefix: String = generatePunctuationNamePrefix(withKeyCondition: input)
     let parser = currentMandarinParser
-    let arrCustomPunctuations: [String] = [
-      punctuationNamePrefix, parser, String(format: "%c", charCode.isPrintableASCII ? CChar(charCode) : inputText),
-    ]
+    let arrCustomPunctuations: [String] = [punctuationNamePrefix, parser, input.text]
     let customPunctuation: String = arrCustomPunctuations.joined(separator: "")
     if handlePunctuation(
       customPunctuation,
@@ -344,9 +341,7 @@ extension KeyHandler {
 
     /// 如果仍無匹配結果的話，看看這個輸入是否是不需要修飾鍵的那種標點鍵輸入。
 
-    let arrPunctuations: [String] = [
-      punctuationNamePrefix, String(format: "%c", charCode.isPrintableASCII ? CChar(charCode) : inputText),
-    ]
+    let arrPunctuations: [String] = [punctuationNamePrefix, input.text]
     let punctuation: String = arrPunctuations.joined(separator: "")
 
     if handlePunctuation(
@@ -386,9 +381,7 @@ extension KeyHandler {
             stateCallback(InputState.Empty())
             return true
           default:  // 包括 case 0，直接塞給組字區。
-            let letter: String! = String(
-              format: "%@%c", "_letter_", charCode.isPrintableASCII ? CChar(charCode) : inputText
-            )
+            let letter = "_letter_\(inputText)"
             if handlePunctuation(
               letter,
               state: state,
@@ -410,7 +403,7 @@ extension KeyHandler {
     /// 暫時只能先恢復這段，且補上偵錯彙報機制，方便今後排查故障。
     if (state is InputState.NotEmpty) || !composer.isEmpty {
       IME.prtDebugIntel(
-        "Blocked data: charCode: \(charCode), keyCode: \(input.keyCode)")
+        "Blocked data: charCode: \(input.charCode), keyCode: \(input.keyCode)")
       IME.prtDebugIntel("A9BFF20E")
       errorCallback()
       stateCallback(state)

@@ -1,4 +1,4 @@
-// Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // Refactored from the ObjCpp-version of this class by:
 // (c) 2011 and onwards The OpenVanilla Project (MIT License).
 // ====================
@@ -170,7 +170,7 @@ extension KeyHandler {
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleMarkingState(
     _ state: InputState.Marking,
-    input: InputSignal,
+    input: InputSignalProtocol,
     stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
@@ -416,7 +416,7 @@ extension KeyHandler {
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleBackSpace(
     state: InputStateProtocol,
-    input: InputSignal,
+    input: InputSignalProtocol,
     stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
@@ -482,7 +482,7 @@ extension KeyHandler {
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleDelete(
     state: InputStateProtocol,
-    input: InputSignal,
+    input: InputSignalProtocol,
     stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
@@ -652,7 +652,7 @@ extension KeyHandler {
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleForward(
     state: InputStateProtocol,
-    input: InputSignal,
+    input: InputSignalProtocol,
     stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
@@ -726,7 +726,7 @@ extension KeyHandler {
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleBackward(
     state: InputStateProtocol,
-    input: InputSignal,
+    input: InputSignalProtocol,
     stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {

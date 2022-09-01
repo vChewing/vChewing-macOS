@@ -187,7 +187,7 @@
 "Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "弁音合併入力（入力緩衝列とヒントで音読みを漢語弁音に）";
 "Show page buttons in candidate window" = "入力候補陳列の側にページボタンを表示";
 "Simplified Chinese" = "簡体中国語";
-"Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. If you want the same accommodation for other client apps, please tick this checkbox on." = "いくつかのアプリ（例えば MS Edge や Google Chrome などのような Chromium 系ブラウザー）には「Shift キーの入力イベントを複数化してしまう」という支障があり、そしてアプリそれぞれの開発元に修復される可能性はほぼゼロだと言える。威注音入力アプリは対策用の特殊措置を普段に起用している。別のアプリにも同じ特殊措置が欲しければ、これをチェックしてください。";
+"Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work." = "いくつかのアプリ（例えば MS Edge や Google Chrome などのような Chromium 系ブラウザー）には「Shift キーの入力イベントを複数化してしまう」という支障があり、そしてアプリそれぞれの開発元に修復される可能性はほぼゼロだと言える。威注音入力アプリは対策用の特殊措置を普段に起用している。ご自分の必要によって設定してください。";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+Space で次のページ、Space で次の候補文字を";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "Space で次のページ、Shift+Space で次の候補文字を";
 "Specify the behavior of intonation key when syllable composer is empty." = "音読組立緩衝列が空かされた時の音調キーの行為をご指定ください。";
@@ -203,8 +203,10 @@
 "Use .langIdentifier to handle UI fonts in candidate window" = "「.langIdentifier」を使って候補陳列ウィンドウのフォントを取り扱う";
 "Use ESC key to clear the entire input buffer" = "ESC キーで入力緩衝列を消す";
 "Use IMK Candidate Window instead (will reboot the IME)" = "IMK 候補陳列ウィンドウを起用（入力アプリは自動的に再起動）";
-"Use Shift Key Accommodation in all cases" = "いずれの客体アプリにも Shift キーの互換性措置を起用";
+"Use Shift key accommodation in all cases" = "いずれの客体アプリにも Shift キーの互換性措置を起用";
 "Vertical" = "縦型陳列";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
 "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is." = "例えば、入力緩衝列には「章太炎」という節点があり、その範囲は [0,3) である。もし、「太」を「泰」にしたいのなら、今回の作業範囲は [1,2) で、「章太炎」の範囲と重ねてしまう。この場合、もし、事前強固措置がなければ、今回の作業でこの単語は「張泰言」のような望ましくない変換結果になってしまう。事前強固措置があるからこそ、「章泰炎」のような正確な作業結果の保証である。";
 "Yale Pinyin with Numeral Intonation" = "イェール弁音 (ローマ字+数字音調)";
+"Only use this with known Chromium-based browsers" = "有名なる Chromium 系ブラウザーだけに、この装置を起用";
+"Disable Shift key accomodation in all cases" = "いずれの客体アプリにも Shift キーの互換性措置を禁ず";

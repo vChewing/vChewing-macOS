@@ -1,4 +1,4 @@
-// Copyright (c) 2019 and onwards Robert Muckle-Jones (Apache 2.0 License).
+// (c) 2019 and onwards Robert Muckle-Jones (Apache 2.0 License).
 
 import Foundation
 

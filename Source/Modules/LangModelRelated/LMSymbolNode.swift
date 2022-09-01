@@ -1,4 +1,4 @@
-// Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
+// (c) 2011 and onwards The OpenVanilla Project (MIT License).
 // All possible vChewing-specific modifications are of:
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // ====================
@@ -54,54 +54,30 @@ class SymbolNode {
 
   // MARK: - Static data.
 
-  static let catCommonSymbols = String(
-    format: NSLocalizedString("catCommonSymbols", comment: ""))
-  static let catHoriBrackets = String(
-    format: NSLocalizedString("catHoriBrackets", comment: ""))
-  static let catVertBrackets = String(
-    format: NSLocalizedString("catVertBrackets", comment: ""))
-  static let catAlphabets = String(
-    format: NSLocalizedString("catAlphabets", comment: ""))
-  static let catSpecialNumbers = String(
-    format: NSLocalizedString("catSpecialNumbers", comment: ""))
-  static let catMathSymbols = String(
-    format: NSLocalizedString("catMathSymbols", comment: ""))
-  static let catCurrencyUnits = String(
-    format: NSLocalizedString("catCurrencyUnits", comment: ""))
-  static let catSpecialSymbols = String(
-    format: NSLocalizedString("catSpecialSymbols", comment: ""))
-  static let catUnicodeSymbols = String(
-    format: NSLocalizedString("catUnicodeSymbols", comment: ""))
-  static let catCircledKanjis = String(
-    format: NSLocalizedString("catCircledKanjis", comment: ""))
-  static let catCircledKataKana = String(
-    format: NSLocalizedString("catCircledKataKana", comment: ""))
-  static let catBracketKanjis = String(
-    format: NSLocalizedString("catBracketKanjis", comment: ""))
-  static let catSingleTableLines = String(
-    format: NSLocalizedString("catSingleTableLines", comment: ""))
-  static let catDoubleTableLines = String(
-    format: NSLocalizedString("catDoubleTableLines", comment: ""))
-  static let catFillingBlocks = String(
-    format: NSLocalizedString("catFillingBlocks", comment: ""))
-  static let catLineSegments = String(
-    format: NSLocalizedString("catLineSegments", comment: ""))
-  static let catKana = String(
-    format: NSLocalizedString("catKana", comment: ""))
-  static let catCombinations = String(
-    format: NSLocalizedString("catCombinations", comment: ""))
-  static let catPhonabets = String(
-    format: NSLocalizedString("catPhonabets", comment: ""))
-  static let catCircledASCII = String(
-    format: NSLocalizedString("catCircledASCII", comment: ""))
-  static let catBracketedASCII = String(
-    format: NSLocalizedString("catBracketedASCII", comment: ""))
-  static let catMusicSymbols = String(
-    format: NSLocalizedString("catMusicSymbols", comment: ""))
-  static let catThai = String(
-    format: NSLocalizedString("catThai", comment: ""))
-  static let catYi = String(
-    format: NSLocalizedString("catYi", comment: ""))
+  static let catCommonSymbols = NSLocalizedString("catCommonSymbols", comment: "")
+  static let catHoriBrackets = NSLocalizedString("catHoriBrackets", comment: "")
+  static let catVertBrackets = NSLocalizedString("catVertBrackets", comment: "")
+  static let catAlphabets = NSLocalizedString("catAlphabets", comment: "")
+  static let catSpecialNumbers = NSLocalizedString("catSpecialNumbers", comment: "")
+  static let catMathSymbols = NSLocalizedString("catMathSymbols", comment: "")
+  static let catCurrencyUnits = NSLocalizedString("catCurrencyUnits", comment: "")
+  static let catSpecialSymbols = NSLocalizedString("catSpecialSymbols", comment: "")
+  static let catUnicodeSymbols = NSLocalizedString("catUnicodeSymbols", comment: "")
+  static let catCircledKanjis = NSLocalizedString("catCircledKanjis", comment: "")
+  static let catCircledKataKana = NSLocalizedString("catCircledKataKana", comment: "")
+  static let catBracketKanjis = NSLocalizedString("catBracketKanjis", comment: "")
+  static let catSingleTableLines = NSLocalizedString("catSingleTableLines", comment: "")
+  static let catDoubleTableLines = NSLocalizedString("catDoubleTableLines", comment: "")
+  static let catFillingBlocks = NSLocalizedString("catFillingBlocks", comment: "")
+  static let catLineSegments = NSLocalizedString("catLineSegments", comment: "")
+  static let catKana = NSLocalizedString("catKana", comment: "")
+  static let catCombinations = NSLocalizedString("catCombinations", comment: "")
+  static let catPhonabets = NSLocalizedString("catPhonabets", comment: "")
+  static let catCircledASCII = NSLocalizedString("catCircledASCII", comment: "")
+  static let catBracketedASCII = NSLocalizedString("catBracketedASCII", comment: "")
+  static let catMusicSymbols = NSLocalizedString("catMusicSymbols", comment: "")
+  static let catThai = NSLocalizedString("catThai", comment: "")
+  static let catYi = NSLocalizedString("catYi", comment: "")
 
   private(set) static var root: SymbolNode = .init("/")
 

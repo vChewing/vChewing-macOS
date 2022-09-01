@@ -1,4 +1,4 @@
-// Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 // ... with NTL restriction stating that:
@@ -206,25 +206,24 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     // 這也可能是 Objective-C 當中允許接收內容為 nil 的一種方式。
     guard !eventArray.isEmpty else { return }
     let event = eventArray[0]
-    let input = InputSignal(event: event)
     guard let delegate = delegate else { return }
-    if input.isEsc || input.isBackSpace || input.isDelete || (input.isShiftHold && !input.isSpace) {
+    if event.isEsc || event.isBackSpace || event.isDelete || (event.isShiftHold && !event.isSpace) {
       _ = delegate.sharedEventHandler(event)
-    } else if input.isSymbolMenuPhysicalKey {
+    } else if event.isSymbolMenuPhysicalKey {
       // 符號鍵的行為是固定的，不受偏好設定影響。
       switch currentLayout {
-        case .horizontal: input.isShiftHold ? moveUp(self) : moveDown(self)
-        case .vertical: input.isShiftHold ? moveLeft(self) : moveRight(self)
+        case .horizontal: event.isShiftHold ? moveUp(self) : moveDown(self)
+        case .vertical: event.isShiftHold ? moveLeft(self) : moveRight(self)
       }
-    } else if input.isSpace {
+    } else if event.isSpace {
       switch mgrPrefs.specifyShiftSpaceKeyBehavior {
-        case true: _ = input.isShiftHold ? highlightNextCandidate() : showNextPage()
-        case false: _ = input.isShiftHold ? showNextPage() : highlightNextCandidate()
+        case true: _ = event.isShiftHold ? highlightNextCandidate() : showNextPage()
+        case false: _ = event.isShiftHold ? showNextPage() : highlightNextCandidate()
       }
-    } else if input.isTab {
+    } else if event.isTab {
       switch mgrPrefs.specifyShiftTabKeyBehavior {
-        case true: _ = input.isShiftHold ? showPreviousPage() : showNextPage()
-        case false: _ = input.isShiftHold ? highlightPreviousCandidate() : highlightNextCandidate()
+        case true: _ = event.isShiftHold ? showPreviousPage() : showNextPage()
+        case false: _ = event.isShiftHold ? highlightPreviousCandidate() : highlightNextCandidate()
       }
     } else {
       if let newChar = ctlCandidateIMK.defaultIMKSelectionKey[event.keyCode] {
@@ -245,7 +244,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
         if let newEvent = newEvent {
           if mgrPrefs.useSCPCTypingMode, delegate.isAssociatedPhrasesState {
             // 註：input.isShiftHold 已經在 ctlInputMethod.handle() 內處理，因為在那邊處理才有效。
-            if !input.isShiftHold {
+            if !event.isShiftHold {
               _ = delegate.sharedEventHandler(event)
               return
             }
@@ -256,15 +255,15 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
         }
       }
 
-      if mgrPrefs.useSCPCTypingMode, !input.isReservedKey {
+      if mgrPrefs.useSCPCTypingMode, !event.isReservedKey {
         _ = delegate.sharedEventHandler(event)
         return
       }
 
       if delegate.isAssociatedPhrasesState,
-        !input.isPageUp, !input.isPageDown, !input.isCursorForward, !input.isCursorBackward,
-        !input.isCursorClockLeft, !input.isCursorClockRight, !input.isSpace,
-        !input.isEnter || !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter
+        !event.isPageUp, !event.isPageDown, !event.isCursorForward, !event.isCursorBackward,
+        !event.isCursorClockLeft, !event.isCursorClockRight, !event.isSpace,
+        !event.isEnter || !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter
       {
         _ = delegate.sharedEventHandler(event)
         return

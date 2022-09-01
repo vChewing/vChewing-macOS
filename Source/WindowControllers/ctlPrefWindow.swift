@@ -1,4 +1,4 @@
-// Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
+// (c) 2011 and onwards The OpenVanilla Project (MIT License).
 // All possible vChewing-specific modifications are of:
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // ====================
@@ -100,15 +100,13 @@ class ctlPrefWindow: NSWindowController {
     basicKeyboardLayoutButton.menu?.removeAllItems()
 
     let itmAppleZhuyinBopomofo = NSMenuItem()
-    itmAppleZhuyinBopomofo.title = String(
-      format: NSLocalizedString("Apple Zhuyin Bopomofo (Dachen)", comment: ""))
+    itmAppleZhuyinBopomofo.title = NSLocalizedString("Apple Zhuyin Bopomofo (Dachen)", comment: "")
     itmAppleZhuyinBopomofo.representedObject = String(
       "com.apple.keylayout.ZhuyinBopomofo")
     basicKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinBopomofo)
 
     let itmAppleZhuyinEten = NSMenuItem()
-    itmAppleZhuyinEten.title = String(
-      format: NSLocalizedString("Apple Zhuyin Eten (Traditional)", comment: ""))
+    itmAppleZhuyinEten.title = NSLocalizedString("Apple Zhuyin Eten (Traditional)", comment: "")
     itmAppleZhuyinEten.representedObject = String("com.apple.keylayout.ZhuyinEten")
     basicKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinEten)
 

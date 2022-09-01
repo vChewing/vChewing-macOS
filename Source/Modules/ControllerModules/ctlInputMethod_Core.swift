@@ -1,4 +1,4 @@
-// Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
+// (c) 2011 and onwards The OpenVanilla Project (MIT License).
 // All possible vChewing-specific modifications are of:
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // ====================
@@ -38,6 +38,10 @@ class ctlInputMethod: IMKInputController {
   var state: InputStateProtocol = InputState.Empty()
   /// 當前這個 ctlInputMethod 副本是否處於英數輸入模式。
   var isASCIIMode: Bool = false
+  /// 當前這個 ctlInputMethod 副本是否處於英數輸入模式（滯後項）。
+  static var isASCIIModeSituation: Bool = false
+  /// 當前這個 ctlInputMethod 副本是否處於縱排輸入模式（滯後項）。
+  static var isVerticalTypingSituation: Bool = false
 
   /// 切換當前 ctlInputMethod 副本的英數輸入模式開關。
   func toggleASCIIMode() -> Bool {
@@ -110,12 +114,13 @@ class ctlInputMethod: IMKInputController {
         isASCIIMode = false
       } else {
         NotifierController.notify(
-          message: String(
-            format: "%@%@%@", NSLocalizedString("Alphanumerical Mode", comment: ""), "\n",
-            isASCIIMode
-              ? NSLocalizedString("NotificationSwitchON", comment: "")
-              : NSLocalizedString("NotificationSwitchOFF", comment: "")
-          ))
+          message: NSLocalizedString("Alphanumerical Mode", comment: "") + "\n"
+            + {
+              isASCIIMode
+                ? NSLocalizedString("NotificationSwitchON", comment: "")
+                : NSLocalizedString("NotificationSwitchOFF", comment: "")
+            }()
+        )
       }
     }
 
@@ -201,6 +206,10 @@ class ctlInputMethod: IMKInputController {
     // 只針對特定類型的 client() 進行處理。
     if !(sender is IMKTextInput) { return false }
 
+    // 更新此時的靜態狀態標記。
+    ctlInputMethod.isASCIIModeSituation = isASCIIMode
+    ctlInputMethod.isVerticalTypingSituation = isVerticalTyping
+
     // 就這傳入的 NSEvent 都還有可能是 nil，Apple InputMethodKit 團隊到底在搞三小。
     guard let event = event else { return false }
 
@@ -211,11 +220,10 @@ class ctlInputMethod: IMKInputController {
     proc: if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK {
       guard ctlCandidateCurrent.visible else { break proc }
       let event: NSEvent = ctlCandidateIMK.replaceNumPadKeyCodes(target: event) ?? event
-      let input = InputSignal(event: event)
 
       // Shift+Enter 是個特殊情形，不提前攔截處理的話、會有垃圾參數傳給 delegate 的 keyHandler 從而崩潰。
       // 所以這裡直接將 Shift Flags 清空。
-      if input.isShiftHold, input.isEnter {
+      if event.isShiftHold, event.isEnter {
         guard
           let newEvent = NSEvent.keyEvent(
             with: event.type,
@@ -238,7 +246,7 @@ class ctlInputMethod: IMKInputController {
       }
 
       // 聯想詞選字。
-      if let newChar = ctlCandidateIMK.defaultIMKSelectionKey[event.keyCode], input.isShiftHold,
+      if let newChar = ctlCandidateIMK.defaultIMKSelectionKey[event.keyCode], event.isShiftHold,
         isAssociatedPhrasesState
       {
         let newEvent = NSEvent.keyEvent(

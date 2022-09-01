@@ -1,4 +1,4 @@
-// Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 // ... with NTL restriction stating that:
@@ -14,8 +14,8 @@ struct suiPrefPaneDevZone: View {
     forKey: UserDef.kUseIMKCandidateWindow.rawValue)
   @State private var selHandleDefaultCandidateFontsByLangIdentifier: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue)
-  @State private var selShouldAlwaysUseShiftKeyAccommodation: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kShouldAlwaysUseShiftKeyAccommodation.rawValue)
+  @State private var selShiftKeyAccommodationBehavior: Int = UserDefaults.standard.integer(
+    forKey: UserDef.kShiftKeyAccommodationBehavior.rawValue)
 
   private let contentMaxHeight: Double = 432
   private let contentWidth: Double = {
@@ -68,23 +68,28 @@ struct suiPrefPaneDevZone: View {
               mgrPrefs.handleDefaultCandidateFontsByLangIdentifier = selHandleDefaultCandidateFontsByLangIdentifier
             }
           )
+          .disabled(!isMontereyOrAbove)
           Text(
             LocalizedStringKey(
               "This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later."
             )
           )
           .preferenceDescription().fixedSize(horizontal: false, vertical: true)
-          .disabled(!isMontereyOrAbove)
-          Toggle(
-            LocalizedStringKey("Use Shift Key Accommodation in all cases"),
-            isOn: $selShouldAlwaysUseShiftKeyAccommodation.onChange {
-              mgrPrefs.shouldAlwaysUseShiftKeyAccommodation = selShouldAlwaysUseShiftKeyAccommodation
+          Picker(
+            "",
+            selection: $selShiftKeyAccommodationBehavior.onChange {
+              mgrPrefs.shiftKeyAccommodationBehavior = selShiftKeyAccommodationBehavior
             }
-          )
-          .disabled(mgrPrefs.disableShiftTogglingAlphanumericalMode)
+          ) {
+            Text(LocalizedStringKey("Disable Shift key accomodation in all cases")).tag(0)
+            Text(LocalizedStringKey("Only use this with known Chromium-based browsers")).tag(1)
+            Text(LocalizedStringKey("Use Shift key accommodation in all cases")).tag(2)
+          }
+          .labelsHidden()
+          .pickerStyle(RadioGroupPickerStyle())
           Text(
             LocalizedStringKey(
-              "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. If you want the same accommodation for other client apps, please tick this checkbox on."
+              "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work."
             )
           )
           .preferenceDescription().fixedSize(horizontal: false, vertical: true)

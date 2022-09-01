@@ -17,5 +17,3 @@
 "Warning" = "お知らせ";
 "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources." = "入力アプリの自動起動はうまく出来なかったかもしれません。ご自分で「システム環境設定→キーボード→入力ソース」で起動してください。";
 "Continue" = "続行";
-
-"%@ (for version %@, r%@)" = "%@ (for version %@, r%@)";

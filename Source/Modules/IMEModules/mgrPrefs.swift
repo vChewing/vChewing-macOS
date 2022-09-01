@@ -1,4 +1,4 @@
-// Copyright (c) 2011 and onwards The OpenVanilla Project (MIT License).
+// (c) 2011 and onwards The OpenVanilla Project (MIT License).
 // All possible vChewing-specific modifications are of:
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // ====================
@@ -58,7 +58,7 @@ public enum UserDef: String, CaseIterable {
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
-  case kShouldAlwaysUseShiftKeyAccommodation = "ShouldAlwaysUseShiftKeyAccommodation"
+  case kShiftKeyAccommodationBehavior = "ShiftKeyAccommodationBehavior"
 
   case kCandidateTextFontName = "CandidateTextFontName"
   case kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
@@ -316,7 +316,7 @@ public enum mgrPrefs {
       forKey: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue
     )
     UserDefaults.standard.setDefault(
-      mgrPrefs.shouldAlwaysUseShiftKeyAccommodation, forKey: UserDef.kShouldAlwaysUseShiftKeyAccommodation.rawValue
+      mgrPrefs.shiftKeyAccommodationBehavior, forKey: UserDef.kShiftKeyAccommodationBehavior.rawValue
     )
 
     // -----
@@ -438,7 +438,6 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kTrimUnfinishedReadingsOnCommit.rawValue, defaultValue: true)
   static var trimUnfinishedReadingsOnCommit: Bool
-
   // MARK: - Settings (Tier 2)
 
   @UserDefault(key: UserDef.kUseIMKCandidateWindow.rawValue, defaultValue: false)
@@ -447,8 +446,8 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue, defaultValue: false)
   static var handleDefaultCandidateFontsByLangIdentifier: Bool
 
-  @UserDefault(key: UserDef.kShouldAlwaysUseShiftKeyAccommodation.rawValue, defaultValue: false)
-  static var shouldAlwaysUseShiftKeyAccommodation: Bool
+  @UserDefault(key: UserDef.kShiftKeyAccommodationBehavior.rawValue, defaultValue: 0)
+  static var shiftKeyAccommodationBehavior: Int
 
   // MARK: - Settings (Tier 3)
 
@@ -728,7 +727,7 @@ extension mgrPrefs {
     }
     if #unavailable(macOS 10.15) {
       mgrPrefs.handleDefaultCandidateFontsByLangIdentifier = false
-      mgrPrefs.shouldAlwaysUseShiftKeyAccommodation = false
+      mgrPrefs.shiftKeyAccommodationBehavior = 0
       mgrPrefs.disableShiftTogglingAlphanumericalMode = false
       mgrPrefs.togglingAlphanumericalModeWithLShift = false
     }
@@ -767,6 +766,9 @@ extension mgrPrefs {
     }
     if ![0, 1, 2].contains(upperCaseLetterKeyBehavior) {
       upperCaseLetterKeyBehavior = 0
+    }
+    if ![0, 1, 2].contains(shiftKeyAccommodationBehavior) {
+      shiftKeyAccommodationBehavior = 0
     }
   }
 }

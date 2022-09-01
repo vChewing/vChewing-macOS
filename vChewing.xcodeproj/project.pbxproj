@@ -116,6 +116,7 @@
 		5BEDB723283B4C250078EB25 /* data-cht.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB720283B4AEA0078EB25 /* data-cht.plist */; };
 		5BEDB724283B4C250078EB25 /* data-symbols.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71E283B4AEA0078EB25 /* data-symbols.plist */; };
 		5BEDB725283B4C250078EB25 /* data-chs.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71C283B4AEA0078EB25 /* data-chs.plist */; };
+		5BF0B84C28C070B000795FC6 /* NSEventExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF0B84B28C070B000795FC6 /* NSEventExtension.swift */; };
 		5BF9DA2728840E6200DBD48E /* template-usersymbolphrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2228840E6200DBD48E /* template-usersymbolphrases.txt */; };
 		5BF9DA2828840E6200DBD48E /* template-exclusions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2328840E6200DBD48E /* template-exclusions.txt */; };
 		5BF9DA2928840E6200DBD48E /* template-associatedPhrases-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2428840E6200DBD48E /* template-associatedPhrases-chs.txt */; };
@@ -133,7 +134,6 @@
 		6ACA41FD15FC1D9000935EF6 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41F015FC1D9000935EF6 /* MainMenu.xib */; };
 		6ACA420215FC1E5200935EF6 /* vChewing.app in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */; };
 		D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427F76B278CA1BA004A2160 /* AppDelegate.swift */; };
-		D456576E279E4F7B00DF6BC9 /* InputSignal.swift in Sources */ = {isa = PBXBuildFile; fileRef = D456576D279E4F7B00DF6BC9 /* InputSignal.swift */; };
 		D461B792279DAC010070E734 /* InputState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D461B791279DAC010070E734 /* InputState.swift */; };
 		D47B92C027972AD100458394 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47B92BF27972AC800458394 /* main.swift */; };
 		D47F7DCE278BFB57002F9DD7 /* ctlPrefWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCD278BFB57002F9DD7 /* ctlPrefWindow.swift */; };
@@ -344,6 +344,7 @@
 		5BEDB71E283B4AEA0078EB25 /* data-symbols.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-symbols.plist"; path = "Data/data-symbols.plist"; sourceTree = "<group>"; };
 		5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-zhuyinwen.plist"; path = "Data/data-zhuyinwen.plist"; sourceTree = "<group>"; };
 		5BEDB720283B4AEA0078EB25 /* data-cht.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-cht.plist"; path = "Data/data-cht.plist"; sourceTree = "<group>"; };
+		5BF0B84B28C070B000795FC6 /* NSEventExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSEventExtension.swift; sourceTree = "<group>"; };
 		5BF255CD28B2694E003ECB60 /* vChewing-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vChewing-Bridging-Header.h"; sourceTree = "<group>"; };
 		5BF9DA2228840E6200DBD48E /* template-usersymbolphrases.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-usersymbolphrases.txt"; sourceTree = "<group>"; usesTabs = 0; };
 		5BF9DA2328840E6200DBD48E /* template-exclusions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-exclusions.txt"; sourceTree = "<group>"; usesTabs = 0; };
@@ -365,7 +366,6 @@
 		6ACA41EF15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6ACA41F215FC1D9000935EF6 /* Installer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Installer-Info.plist"; path = "Installer/Installer-Info.plist"; sourceTree = SOURCE_ROOT; };
 		D427F76B278CA1BA004A2160 /* AppDelegate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		D456576D279E4F7B00DF6BC9 /* InputSignal.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputSignal.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D461B791279DAC010070E734 /* InputState.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputState.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D47B92BF27972AC800458394 /* main.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = main.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D47F7DCD278BFB57002F9DD7 /* ctlPrefWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlPrefWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -498,13 +498,13 @@
 				5B21176D28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift */,
 				5B21176B287539BB000443A9 /* ctlInputMethod_HandleStates.swift */,
 				5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */,
-				D456576D279E4F7B00DF6BC9 /* InputSignal.swift */,
 				D461B791279DAC010070E734 /* InputState.swift */,
 				5BD0113C2818543900609769 /* KeyHandler_Core.swift */,
 				5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */,
 				5BE3779F288FED8D0037365B /* KeyHandler_HandleComposition.swift */,
 				5B7F225C2808501000DDD3CB /* KeyHandler_HandleInput.swift */,
 				5B3133BE280B229700A4A505 /* KeyHandler_States.swift */,
+				5BF0B84B28C070B000795FC6 /* NSEventExtension.swift */,
 				5B62A33727AE79CD00A19448 /* StringUtils.swift */,
 				5BAA8FBD282CAF380066C406 /* SyllableComposer.swift */,
 			);
@@ -1220,7 +1220,6 @@
 				D47F7DD0278C0897002F9DD7 /* ctlNonModalAlertWindow.swift in Sources */,
 				5B2170E5289FACAD00BE7304 /* 6_Node.swift in Sources */,
 				5B949BD92816DC5400D87B5D /* LineReader.swift in Sources */,
-				D456576E279E4F7B00DF6BC9 /* InputSignal.swift in Sources */,
 				5BA9FD1027FEDB6B002DE248 /* suiPrefPaneKeyboard.swift in Sources */,
 				5B3133BF280B229700A4A505 /* KeyHandler_States.swift in Sources */,
 				5B2170E1289FACAD00BE7304 /* 0_Megrez.swift in Sources */,
@@ -1262,6 +1261,7 @@
 				5B2170E0289FACAD00BE7304 /* 7_LangModel.swift in Sources */,
 				5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */,
 				5BA9FD4027FEF3C8002DE248 /* Localization.swift in Sources */,
+				5BF0B84C28C070B000795FC6 /* NSEventExtension.swift in Sources */,
 				5BAA8FBE282CAF380066C406 /* SyllableComposer.swift in Sources */,
 				5B20430728BEE30900BFC6FD /* BookmarkManager.swift in Sources */,
 				5BA9FD1327FEDB6B002DE248 /* suiPrefPaneDictionary.swift in Sources */,
@@ -1471,7 +1471,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2300;
+				CURRENT_PROJECT_VERSION = 2310;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1481,7 +1481,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 2.3.0;
+				MARKETING_VERSION = 2.3.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewingTests;
@@ -1510,13 +1510,13 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2300;
+				CURRENT_PROJECT_VERSION = 2310;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 2.3.0;
+				MARKETING_VERSION = 2.3.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewingTests;
@@ -1548,7 +1548,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2300;
+				CURRENT_PROJECT_VERSION = 2310;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1570,7 +1570,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.0;
+				MARKETING_VERSION = 2.3.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
@@ -1600,7 +1600,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2300;
+				CURRENT_PROJECT_VERSION = 2310;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -1618,7 +1618,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.0;
+				MARKETING_VERSION = 2.3.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
@@ -1734,7 +1734,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2300;
+				CURRENT_PROJECT_VERSION = 2310;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1763,7 +1763,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.0;
+				MARKETING_VERSION = 2.3.1;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1793,7 +1793,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2300;
+				CURRENT_PROJECT_VERSION = 2310;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1816,7 +1816,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.0;
+				MARKETING_VERSION = 2.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1840,7 +1840,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2300;
+				CURRENT_PROJECT_VERSION = 2310;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1861,7 +1861,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.0;
+				MARKETING_VERSION = 2.3.1;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingInstaller;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1884,7 +1884,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2300;
+				CURRENT_PROJECT_VERSION = 2310;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1899,7 +1899,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.0;
+				MARKETING_VERSION = 2.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingInstaller;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
