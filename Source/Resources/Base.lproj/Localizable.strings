@@ -187,7 +187,7 @@
 "Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "Show Hanyu-Pinyin in the inline composition buffer & tooltip";
 "Show page buttons in candidate window" = "Show page buttons in candidate window";
 "Simplified Chinese" = "Simplified Chinese";
-"Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. If you want the same accommodation for other client apps, please tick this checkbox on." = "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. If you want the same accommodation for other client apps, please tick this checkbox on.";
+"Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work." = "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work.";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Space to +cycle candidates, Shift+Space to +cycle pages";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "Space to +cycle pages, Shift+Space to +cycle candidates";
 "Specify the behavior of intonation key when syllable composer is empty." = "Specify the behavior of intonation key when syllable composer is empty.";
@@ -203,8 +203,10 @@
 "Use .langIdentifier to handle UI fonts in candidate window" = "Use .langIdentifier to handle UI fonts in candidate window";
 "Use ESC key to clear the entire input buffer" = "Use ESC key to clear the entire input buffer";
 "Use IMK Candidate Window instead (will reboot the IME)" = "Use IMK Candidate Window instead (will reboot the IME)";
-"Use Shift Key Accommodation in all cases" = "Use Shift Key Accommodation in all cases";
+"Use Shift key accommodation in all cases" = "Use Shift key accommodation in all cases";
 "Vertical" = "Vertical";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
 "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is." = "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is.";
 "Yale Pinyin with Numeral Intonation" = "Yale Pinyin with Numeral Intonation";
+"Only use this with known Chromium-based browsers" = "Only use this with known Chromium-based browsers";
+"Disable Shift key accomodation in all cases" = "Disable Shift key accomodation in all cases";

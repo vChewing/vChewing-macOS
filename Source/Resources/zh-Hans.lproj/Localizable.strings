@@ -187,7 +187,7 @@
 "Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "拼音并击（组字区与工具提示内显示汉语拼音）";
 "Show page buttons in candidate window" = "在选字窗内显示翻页按钮";
 "Simplified Chinese" = "简体中文";
-"Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. If you want the same accommodation for other client apps, please tick this checkbox on." = "某些应用（比如像是 MS Edge 或者 Chrome 这样的 Chromium 核心的浏览器）可能会使输入的 Shift 按键讯号被重复输入，且其有关研发方很可能不打算修复这些产品缺陷。威注音针对这些应用预设启用了相容措施。如果您希望在任何应用当中都启用该措施的话，请勾选之。";
+"Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work." = "某些应用（比如像是 MS Edge 或者 Chrome 这样的 Chromium 核心的浏览器）可能会使输入的 Shift 按键讯号被重复输入，且其有关研发方很可能不打算修复这些产品缺陷。威注音针对这些应用预设启用了相容措施。请在此根据您的需求自订。";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+空格键 换下一页，空格键 换选下一个候选字";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "空格键 换下一页，Shift+空格键 换选下一个候选字";
 "Specify the behavior of intonation key when syllable composer is empty." = "指定声调键（在注拼槽为「空」状态时）的行为。";
@@ -203,8 +203,10 @@
 "Use .langIdentifier to handle UI fonts in candidate window" = "使用 .langIdentifier 来管理选字窗的预设介面字型";
 "Use ESC key to clear the entire input buffer" = "敲 ESC 键以清空整个组字缓冲区";
 "Use IMK Candidate Window instead (will reboot the IME)" = "启用与 macOS 内建输入法相同的 IMK 选字窗（会自动重启输入法）";
-"Use Shift Key Accommodation in all cases" = "对任何客体应用均启用 Shift 键相容性措施";
+"Use Shift key accommodation in all cases" = "对任何客体应用均启用 Shift 键相容性措施";
 "Vertical" = "纵向布局";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";
 "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is." = "打比方说，你敲了「章太炎」，你想将「太」改成「泰」。这个操作的作业索引范围是开闭区间 [1,2)，会切到「章太炎」这个节点的所在索引范围 [0,3)。如果没有事前巩固处理的话，这个词会在你选字之后变成诸如「张泰言」这种你不想要的自动选字结果。当且仅当你启用了这个巩固功能的前提下，你选字之后的结果才会是「章泰炎」这种你想要的结果。";
 "Yale Pinyin with Numeral Intonation" = "耶鲁拼音+数字标调";
+"Only use this with known Chromium-based browsers" = "仅针对知名的 Chromium 核心的浏览器启用该措施";
+"Disable Shift key accomodation in all cases" = "对任何客体应用均停用 Shift 键相容性措施";
