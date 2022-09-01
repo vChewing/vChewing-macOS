@@ -38,6 +38,10 @@ class ctlInputMethod: IMKInputController {
   var state: InputStateProtocol = InputState.Empty()
   /// 當前這個 ctlInputMethod 副本是否處於英數輸入模式。
   var isASCIIMode: Bool = false
+  /// 當前這個 ctlInputMethod 副本是否處於英數輸入模式（滯後項）。
+  static var isASCIIModeSituation: Bool = false
+  /// 當前這個 ctlInputMethod 副本是否處於縱排輸入模式（滯後項）。
+  static var isVerticalTypingSituation: Bool = false
 
   /// 切換當前 ctlInputMethod 副本的英數輸入模式開關。
   func toggleASCIIMode() -> Bool {
@@ -200,6 +204,10 @@ class ctlInputMethod: IMKInputController {
 
     // 只針對特定類型的 client() 進行處理。
     if !(sender is IMKTextInput) { return false }
+
+    // 更新此時的靜態狀態標記。
+    ctlInputMethod.isASCIIModeSituation = isASCIIMode
+    ctlInputMethod.isVerticalTypingSituation = isVerticalTyping
 
     // 就這傳入的 NSEvent 都還有可能是 nil，Apple InputMethodKit 團隊到底在搞三小。
     guard let event = event else { return false }
