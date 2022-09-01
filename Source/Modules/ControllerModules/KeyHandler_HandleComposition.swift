@@ -18,7 +18,7 @@ extension KeyHandler {
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleComposition(
-    input: InputSignal,
+    input: InputSignalProtocol,
     stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool? {
@@ -42,7 +42,7 @@ extension KeyHandler {
         prevReading.0.charComponents.forEach { theComposer.receiveKey(fromPhonabet: $0) }
         // 發現要覆寫的聲調與覆寫對象的聲調雷同的情況的話，直接跳過處理。
         let oldIntonation: Tekkon.Phonabet = theComposer.intonation
-        theComposer.receiveKey(fromCharCode: input.charCode)
+        theComposer.receiveKey(fromString: input.text)
         if theComposer.intonation == oldIntonation, mgrPrefs.specifyIntonationKeyBehavior == 1 { break proc }
         theComposer.intonation.clear()
         // 檢查新的漢字字音是否在庫。
@@ -59,7 +59,7 @@ extension KeyHandler {
         }
       }
 
-      composer.receiveKey(fromCharCode: input.charCode)
+      composer.receiveKey(fromString: input.text)
       keyConsumedByReading = true
 
       // 沒有調號的話，只需要 updateClientComposingBuffer() 且終止處理（return true）即可。

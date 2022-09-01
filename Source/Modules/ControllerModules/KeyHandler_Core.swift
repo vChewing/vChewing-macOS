@@ -392,10 +392,10 @@ public class KeyHandler {
   /// 檢測某個傳入的按鍵訊號是否為聲調鍵。
   /// - Parameter input: 傳入的按鍵訊號。
   /// - Returns: 判斷結果：是否為聲調鍵。
-  func isIntonationKey(_ input: InputSignal) -> Bool {
+  func isIntonationKey(_ input: InputSignalProtocol) -> Bool {
     var theComposer = composer  // 複製一份用來做實驗。
     theComposer.clear()  // 清空各種槽的內容。
-    theComposer.receiveKey(fromCharCode: input.charCode)
+    theComposer.receiveKey(fromString: input.text)
     return theComposer.hasToneMarker(withNothingElse: true)
   }
 
@@ -417,7 +417,7 @@ public class KeyHandler {
   /// 生成標點符號索引鍵。
   /// - Parameter input: 輸入的按鍵訊號。
   /// - Returns: 生成的標點符號索引鍵。
-  func generatePunctuationNamePrefix(withKeyCondition input: InputSignal) -> String {
+  func generatePunctuationNamePrefix(withKeyCondition input: InputSignalProtocol) -> String {
     if mgrPrefs.halfWidthPunctuationEnabled {
       return "_half_punctuation_"
     }

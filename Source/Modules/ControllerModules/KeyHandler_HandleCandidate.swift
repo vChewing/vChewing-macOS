@@ -24,12 +24,10 @@ extension KeyHandler {
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleCandidate(
     state: InputStateProtocol,
-    input: InputSignal,
+    input: InputSignalProtocol,
     stateCallback: @escaping (InputStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    let inputText = input.inputText
-    let charCode: UniChar = input.charCode
     guard var ctlCandidateCurrent = delegate?.ctlCandidate() else {
       IME.prtDebugIntel("06661F6E")
       errorCallback()
@@ -275,7 +273,7 @@ extension KeyHandler {
 
     var index: Int = NSNotFound
     let match: String =
-      (state is InputState.AssociatedPhrases) ? input.inputTextIgnoringModifiers ?? "" : inputText
+      (state is InputState.AssociatedPhrases) ? input.inputTextIgnoringModifiers ?? "" : input.text
 
     for j in 0..<ctlCandidateCurrent.keyLabels.count {
       let label: CandidateKeyLabel = ctlCandidateCurrent.keyLabels[j]
@@ -307,25 +305,23 @@ extension KeyHandler {
       let punctuationNamePrefix: String = generatePunctuationNamePrefix(withKeyCondition: input)
       let parser = currentMandarinParser
       let arrCustomPunctuations: [String] = [
-        punctuationNamePrefix, parser, String(format: "%c", charCode.isPrintableASCII ? CChar(charCode) : inputText),
+        punctuationNamePrefix, parser, input.text,
       ]
       let customPunctuation: String = arrCustomPunctuations.joined(separator: "")
 
       /// 看看這個輸入是否是不需要修飾鍵的那種標點鍵輸入。
 
       let arrPunctuations: [String] = [
-        punctuationNamePrefix, String(format: "%c", charCode.isPrintableASCII ? CChar(charCode) : inputText),
+        punctuationNamePrefix, input.text,
       ]
       let punctuation: String = arrPunctuations.joined(separator: "")
 
       var shouldAutoSelectCandidate: Bool =
-        composer.inputValidityCheck(key: charCode) || currentLM.hasUnigramsFor(key: customPunctuation)
+        composer.inputValidityCheck(key: input.charCode) || currentLM.hasUnigramsFor(key: customPunctuation)
         || currentLM.hasUnigramsFor(key: punctuation)
 
       if !shouldAutoSelectCandidate, input.isUpperCaseASCIILetterKey {
-        let letter: String! = String(
-          format: "%@%c", "_letter_", charCode.isPrintableASCII ? CChar(charCode) : inputText
-        )
+        let letter = "_letter_\(input.text)"
         if currentLM.hasUnigramsFor(key: letter) { shouldAutoSelectCandidate = true }
       }
 
