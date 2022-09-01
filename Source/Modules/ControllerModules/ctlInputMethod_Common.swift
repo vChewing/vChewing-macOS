@@ -24,12 +24,12 @@ extension ctlInputMethod {
       if ShiftKeyUpChecker.check(event), !mgrPrefs.disableShiftTogglingAlphanumericalMode {
         if !shouldUseHandle || (!rencentKeyHandledByKeyHandler && shouldUseHandle) {
           NotifierController.notify(
-            message: String(
-              format: "%@%@%@", NSLocalizedString("Alphanumerical Mode", comment: ""), "\n",
-              toggleASCIIMode()
-                ? NSLocalizedString("NotificationSwitchON", comment: "")
-                : NSLocalizedString("NotificationSwitchOFF", comment: "")
-            )
+            message: NSLocalizedString("Alphanumerical Mode", comment: "") + "\n"
+              + {
+                toggleASCIIMode()
+                  ? NSLocalizedString("NotificationSwitchON", comment: "")
+                  : NSLocalizedString("NotificationSwitchOFF", comment: "")
+              }()
           )
         }
         if shouldUseHandle {

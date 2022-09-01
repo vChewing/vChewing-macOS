@@ -100,15 +100,13 @@ class ctlPrefWindow: NSWindowController {
     basicKeyboardLayoutButton.menu?.removeAllItems()
 
     let itmAppleZhuyinBopomofo = NSMenuItem()
-    itmAppleZhuyinBopomofo.title = String(
-      format: NSLocalizedString("Apple Zhuyin Bopomofo (Dachen)", comment: ""))
+    itmAppleZhuyinBopomofo.title = NSLocalizedString("Apple Zhuyin Bopomofo (Dachen)", comment: "")
     itmAppleZhuyinBopomofo.representedObject = String(
       "com.apple.keylayout.ZhuyinBopomofo")
     basicKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinBopomofo)
 
     let itmAppleZhuyinEten = NSMenuItem()
-    itmAppleZhuyinEten.title = String(
-      format: NSLocalizedString("Apple Zhuyin Eten (Traditional)", comment: ""))
+    itmAppleZhuyinEten.title = NSLocalizedString("Apple Zhuyin Eten (Traditional)", comment: "")
     itmAppleZhuyinEten.representedObject = String("com.apple.keylayout.ZhuyinEten")
     basicKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinEten)
 

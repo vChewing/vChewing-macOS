@@ -63,28 +63,20 @@ enum mgrLangModel {
     }
     if !gLangModelCHT.isLanguageModelLoaded {
       NotifierController.notify(
-        message: String(
-          format: "%@", NSLocalizedString("Loading CHT Core Dict...", comment: "")
-        )
+        message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
       )
       loadCoreLanguageModelFile(filenameSansExtension: "data-cht", langModel: &gLangModelCHT)
       NotifierController.notify(
-        message: String(
-          format: "%@", NSLocalizedString("Core Dict loading complete.", comment: "")
-        )
+        message: NSLocalizedString("Core Dict loading complete.", comment: "")
       )
     }
     if !gLangModelCHS.isLanguageModelLoaded {
       NotifierController.notify(
-        message: String(
-          format: "%@", NSLocalizedString("Loading CHS Core Dict...", comment: "")
-        )
+        message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
       )
       loadCoreLanguageModelFile(filenameSansExtension: "data-chs", langModel: &gLangModelCHS)
       NotifierController.notify(
-        message: String(
-          format: "%@", NSLocalizedString("Core Dict loading complete.", comment: "")
-        )
+        message: NSLocalizedString("Core Dict loading complete.", comment: "")
       )
     }
   }
@@ -102,15 +94,11 @@ enum mgrLangModel {
       }
       if !gLangModelCHS.isLanguageModelLoaded {
         NotifierController.notify(
-          message: String(
-            format: "%@", NSLocalizedString("Loading CHS Core Dict...", comment: "")
-          )
+          message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
         )
         loadCoreLanguageModelFile(filenameSansExtension: "data-chs", langModel: &gLangModelCHS)
         NotifierController.notify(
-          message: String(
-            format: "%@", NSLocalizedString("Core Dict loading complete.", comment: "")
-          )
+          message: NSLocalizedString("Core Dict loading complete.", comment: "")
         )
       }
     } else if mode == InputMode.imeModeCHT {
@@ -125,15 +113,11 @@ enum mgrLangModel {
       }
       if !gLangModelCHT.isLanguageModelLoaded {
         NotifierController.notify(
-          message: String(
-            format: "%@", NSLocalizedString("Loading CHT Core Dict...", comment: "")
-          )
+          message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
         )
         loadCoreLanguageModelFile(filenameSansExtension: "data-cht", langModel: &gLangModelCHT)
         NotifierController.notify(
-          message: String(
-            format: "%@", NSLocalizedString("Core Dict loading complete.", comment: "")
-          )
+          message: NSLocalizedString("Core Dict loading complete.", comment: "")
         )
       }
     }

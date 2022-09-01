@@ -114,12 +114,13 @@ class ctlInputMethod: IMKInputController {
         isASCIIMode = false
       } else {
         NotifierController.notify(
-          message: String(
-            format: "%@%@%@", NSLocalizedString("Alphanumerical Mode", comment: ""), "\n",
-            isASCIIMode
-              ? NSLocalizedString("NotificationSwitchON", comment: "")
-              : NSLocalizedString("NotificationSwitchOFF", comment: "")
-          ))
+          message: NSLocalizedString("Alphanumerical Mode", comment: "") + "\n"
+            + {
+              isASCIIMode
+                ? NSLocalizedString("NotificationSwitchON", comment: "")
+                : NSLocalizedString("NotificationSwitchOFF", comment: "")
+            }()
+        )
       }
     }
 

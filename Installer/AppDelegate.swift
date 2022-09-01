@@ -60,6 +60,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
     guard
       let installingVersion = Bundle.main.infoDictionary?[kCFBundleVersionKey as String]
         as? String,
+      let window = window,
       let versionString = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     else {
       return
@@ -71,7 +72,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
     cancelButton.nextKeyView = installButton
     installButton.nextKeyView = cancelButton
     if let cell = installButton.cell as? NSButtonCell {
-      window?.defaultButtonCell = cell
+      window.defaultButtonCell = cell
     }
 
     if let copyrightLabel = Bundle.main.localizedInfoDictionary?["NSHumanReadableCopyright"]
@@ -82,17 +83,12 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
     if let eulaContent = Bundle.main.localizedInfoDictionary?["CFEULAContent"] as? String {
       appEULAContent.string = eulaContent
     }
-    appVersionLabel.stringValue = String(
-      format: "%@ Build %@", versionString, installingVersion
-    )
+    appVersionLabel.stringValue = "\(versionString) Build \(installingVersion)"
 
-    window?.title = String(
-      format: NSLocalizedString("%@ (for version %@, r%@)", comment: ""), window?.title ?? "",
-      versionString, installingVersion
-    )
-    window?.standardWindowButton(.closeButton)?.isHidden = true
-    window?.standardWindowButton(.miniaturizeButton)?.isHidden = true
-    window?.standardWindowButton(.zoomButton)?.isHidden = true
+    window.title = "\(window.title) (v\(versionString), Build \(installingVersion))"
+    window.standardWindowButton(.closeButton)?.isHidden = true
+    window.standardWindowButton(.miniaturizeButton)?.isHidden = true
+    window.standardWindowButton(.zoomButton)?.isHidden = true
 
     if FileManager.default.fileExists(
       atPath: kTargetPartialPath)
@@ -114,8 +110,8 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
       installButton.title = NSLocalizedString("Upgrade", comment: "")
     }
 
-    window?.center()
-    window?.orderFront(self)
+    window.center()
+    window.orderFront(self)
     NSApp.activate(ignoringOtherApps: true)
   }
 
@@ -126,14 +122,15 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
   }
 
   @objc func timerTick(_ timer: Timer) {
+    guard let window = window else { return }
     let elapsed = Date().timeIntervalSince(translocationRemovalStartTime ?? Date())
     if elapsed >= kTranslocationRemovalDeadline {
       timer.invalidate()
-      window?.endSheet(progressSheet, returnCode: .cancel)
+      window.endSheet(progressSheet, returnCode: .cancel)
     } else if isAppBundleTranslocated(atPath: kTargetPartialPath) == false {
       progressIndicator.doubleValue = 1.0
       timer.invalidate()
-      window?.endSheet(progressSheet, returnCode: .continue)
+      window.endSheet(progressSheet, returnCode: .continue)
     }
   }
 
@@ -145,15 +142,17 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
     //   return
     // }
 
+    guard let window = window else { return }
+
     let shouldWaitForTranslocationRemoval =
       isAppBundleTranslocated(atPath: kTargetPartialPath)
-      && (window?.responds(to: #selector(NSWindow.beginSheet(_:completionHandler:))) ?? false)
+      && window.responds(to: #selector(NSWindow.beginSheet(_:completionHandler:)))
 
     // 將既存輸入法扔到垃圾桶內
     do {
       let sourceDir = kDestinationPartial
       let fileManager = FileManager.default
-      let fileURLString = String(format: "%@/%@", sourceDir, kTargetBundle)
+      let fileURLString = sourceDir + "/" + kTargetBundle
       let fileURL = URL(fileURLWithPath: fileURLString)
 
       // 檢查檔案是否存在
@@ -176,7 +175,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 
     if shouldWaitForTranslocationRemoval {
       progressIndicator.startAnimation(self)
-      window?.beginSheet(progressSheet) { returnCode in
+      window.beginSheet(progressSheet) { returnCode in
         DispatchQueue.main.async {
           if returnCode == .continue {
             self.installInputMethod(

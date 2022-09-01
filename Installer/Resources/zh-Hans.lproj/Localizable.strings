@@ -17,5 +17,3 @@
 "Warning" = "安装不完整";
 "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources." = "输入法已经安装好，但可能没有完全启用。请从「系统偏好设定」 > 「键盘」 > 「输入方式」分页加入输入法。";
 "Continue" = "继续";
-
-"%@ (for version %@, r%@)" = "%@ (for version %@, r%@)";

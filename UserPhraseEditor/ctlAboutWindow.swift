@@ -36,9 +36,7 @@ import Cocoa
     if let eulaContent = Bundle.main.localizedInfoDictionary?["CFEULAContent"] as? String {
       appEULAContent.string = eulaContent
     }
-    appVersionLabel.stringValue = String(
-      format: "%@ Build %@", versionString, installingVersion
-    )
+    appVersionLabel.stringValue = "\(versionString) Build \(installingVersion)"
   }
 
   @IBAction func btnWebsite(_: NSButton) {

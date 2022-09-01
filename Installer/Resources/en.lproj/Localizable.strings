@@ -17,5 +17,3 @@
 "Warning" = "Warning";
 "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources." = "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources.";
 "Continue" = "Continue";
-
-"%@ (for version %@, r%@)" = "%@ (for version %@, r%@)";
