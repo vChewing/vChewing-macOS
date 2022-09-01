@@ -1,4 +1,4 @@
-// Copyright (c) 2021 and onwards Zonble Yang (MIT-NTL License).
+// (c) 2021 and onwards Zonble Yang (MIT-NTL License).
 // All possible vChewing-specific modifications are of:
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // ====================

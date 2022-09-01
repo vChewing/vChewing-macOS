@@ -1,4 +1,4 @@
-// Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // Refactored from the ObjCpp-version of this class by:
 // (c) 2011 and onwards The OpenVanilla Project (MIT License).
 // ====================

@@ -1,4 +1,4 @@
-// Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // Refactored from the Cpp version of this class by Mengjuei Hsieh (MIT License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)

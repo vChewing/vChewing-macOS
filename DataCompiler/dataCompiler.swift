@@ -1,6 +1,6 @@
 #!/usr/bin/env swift
 
-// Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 // ... with NTL restriction stating that:

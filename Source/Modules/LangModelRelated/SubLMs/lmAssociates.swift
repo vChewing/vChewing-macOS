@@ -1,4 +1,4 @@
-// Copyright (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // StringView Ranges extension by (c) 2022 and onwards Isaac Xen (MIT License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
