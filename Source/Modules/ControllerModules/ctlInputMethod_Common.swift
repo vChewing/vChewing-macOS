@@ -17,9 +17,15 @@ extension ctlInputMethod {
   /// - Returns: 回「`true`」以將該案件已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
   func commonEventHandler(_ event: NSEvent) -> Bool {
     // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
-    let shouldUseHandle =
-      (IME.arrClientShiftHandlingExceptionList.contains(clientBundleIdentifier)
-        || mgrPrefs.shouldAlwaysUseShiftKeyAccommodation)
+    let shouldUseHandle: Bool = {
+      switch mgrPrefs.shiftKeyAccommodationBehavior {
+        case 0: return false
+        case 1: return IME.arrClientShiftHandlingExceptionList.contains(clientBundleIdentifier)
+        case 2: return true
+        default: return false
+      }
+    }()
+
     if #available(macOS 10.15, *) {
       if ShiftKeyUpChecker.check(event), !mgrPrefs.disableShiftTogglingAlphanumericalMode {
         if !shouldUseHandle || (!rencentKeyHandledByKeyHandler && shouldUseHandle) {
