@@ -10,109 +10,6 @@
 
 import Cocoa
 
-// Use KeyCodes as much as possible since its recognition won't be affected by macOS Base Keyboard Layouts.
-// KeyCodes: https://eastmanreference.com/complete-list-of-applescript-key-codes
-// Also: HIToolbox.framework/Versions/A/Headers/Events.h
-enum KeyCode: UInt16 {
-  case kNone = 0
-  case kCarriageReturn = 36  // Renamed from "kReturn" to avoid nomenclatural confusions.
-  case kTab = 48
-  case kSpace = 49
-  case kSymbolMenuPhysicalKeyIntl = 50  // vChewing Specific (Non-JIS)
-  case kBackSpace = 51  // Renamed from "kDelete" to avoid nomenclatural confusions.
-  case kEscape = 53
-  case kCommand = 55
-  case kShift = 56
-  case kCapsLock = 57
-  case kOption = 58
-  case kControl = 59
-  case kRightShift = 60
-  case kRightOption = 61
-  case kRightControl = 62
-  case kFunction = 63
-  case kF17 = 64
-  case kVolumeUp = 72
-  case kVolumeDown = 73
-  case kMute = 74
-  case kLineFeed = 76  // Another keyCode to identify the Enter Key, typable by Fn+Enter.
-  case kF18 = 79
-  case kF19 = 80
-  case kF20 = 90
-  case kSymbolMenuPhysicalKeyJIS = 94  // vChewing Specific (JIS)
-  case kF5 = 96
-  case kF6 = 97
-  case kF7 = 98
-  case kF3 = 99
-  case kF8 = 100
-  case kF9 = 101
-  case kF11 = 103
-  case kF13 = 105  // PrtSc
-  case kF16 = 106
-  case kF14 = 107
-  case kF10 = 109
-  case kF12 = 111
-  case kF15 = 113
-  case kHelp = 114  // Insert
-  case kHome = 115
-  case kPageUp = 116
-  case kWindowsDelete = 117  // Renamed from "kForwardDelete" to avoid nomenclatural confusions.
-  case kF4 = 118
-  case kEnd = 119
-  case kF2 = 120
-  case kPageDown = 121
-  case kF1 = 122
-  case kLeftArrow = 123
-  case kRightArrow = 124
-  case kDownArrow = 125
-  case kUpArrow = 126
-}
-
-enum KeyCodeBlackListed: UInt16 {
-  case kF17 = 64
-  case kVolumeUp = 72
-  case kVolumeDown = 73
-  case kMute = 74
-  case kF18 = 79
-  case kF19 = 80
-  case kF20 = 90
-  case kF5 = 96
-  case kF6 = 97
-  case kF7 = 98
-  case kF3 = 99
-  case kF8 = 100
-  case kF9 = 101
-  case kF11 = 103
-  case kF13 = 105  // PrtSc
-  case kF16 = 106
-  case kF14 = 107
-  case kF10 = 109
-  case kF12 = 111
-  case kF15 = 113
-  case kHelp = 114  // Insert
-  case kF4 = 118
-  case kF2 = 120
-  case kF1 = 122
-}
-
-/// 數字小鍵盤區域的按鍵的 KeyCode。
-///
-/// 注意：第 95 號 Key Code（逗號）為 JIS 佈局特有的數字小鍵盤按鍵。
-let arrNumpadKeyCodes: [UInt16] = [65, 67, 69, 71, 75, 78, 81, 82, 83, 84, 85, 86, 87, 88, 89, 91, 92, 95]
-
-/// 主鍵盤區域的數字鍵的 KeyCode。
-let arrMainAreaNumKey: [UInt16] = [18, 19, 20, 21, 22, 23, 25, 26, 28, 29]
-
-// CharCodes: https://theasciicode.com.ar/ascii-control-characters/horizontal-tab-ascii-code-9.html
-enum CharCode: UInt16 {
-  case yajuusenpaiA = 114
-  case yajuusenpaiB = 514
-  case yajuusenpaiC = 1919
-  case yajuusenpaiD = 810
-  // CharCode is not reliable at all. KeyCode is the most appropriate choice due to its accuracy.
-  // KeyCode doesn't give a phuque about the character sent through macOS keyboard layouts ...
-  // ... but only focuses on which physical key is pressed.
-}
-
 struct InputSignal: CustomStringConvertible {
   private(set) var isTypingVertical: Bool
   private(set) var inputText: String
@@ -258,16 +155,6 @@ struct InputSignal: CustomStringConvertible {
   var isSymbolMenuPhysicalKey: Bool {
     [KeyCode.kSymbolMenuPhysicalKeyIntl, KeyCode.kSymbolMenuPhysicalKeyJIS].contains(KeyCode(rawValue: keyCode))
   }
-}
-
-enum EmacsKey: UInt16 {
-  case none = 0
-  case forward = 6  // F
-  case backward = 2  // B
-  case home = 1  // A
-  case end = 5  // E
-  case delete = 4  // D
-  case nextPage = 22  // V
 }
 
 enum EmacsKeyHelper {

@@ -116,6 +116,7 @@
 		5BEDB723283B4C250078EB25 /* data-cht.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB720283B4AEA0078EB25 /* data-cht.plist */; };
 		5BEDB724283B4C250078EB25 /* data-symbols.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71E283B4AEA0078EB25 /* data-symbols.plist */; };
 		5BEDB725283B4C250078EB25 /* data-chs.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71C283B4AEA0078EB25 /* data-chs.plist */; };
+		5BF0B84C28C070B000795FC6 /* NSEventExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF0B84B28C070B000795FC6 /* NSEventExtension.swift */; };
 		5BF9DA2728840E6200DBD48E /* template-usersymbolphrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2228840E6200DBD48E /* template-usersymbolphrases.txt */; };
 		5BF9DA2828840E6200DBD48E /* template-exclusions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2328840E6200DBD48E /* template-exclusions.txt */; };
 		5BF9DA2928840E6200DBD48E /* template-associatedPhrases-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2428840E6200DBD48E /* template-associatedPhrases-chs.txt */; };
@@ -344,6 +345,7 @@
 		5BEDB71E283B4AEA0078EB25 /* data-symbols.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-symbols.plist"; path = "Data/data-symbols.plist"; sourceTree = "<group>"; };
 		5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-zhuyinwen.plist"; path = "Data/data-zhuyinwen.plist"; sourceTree = "<group>"; };
 		5BEDB720283B4AEA0078EB25 /* data-cht.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-cht.plist"; path = "Data/data-cht.plist"; sourceTree = "<group>"; };
+		5BF0B84B28C070B000795FC6 /* NSEventExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSEventExtension.swift; sourceTree = "<group>"; };
 		5BF255CD28B2694E003ECB60 /* vChewing-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vChewing-Bridging-Header.h"; sourceTree = "<group>"; };
 		5BF9DA2228840E6200DBD48E /* template-usersymbolphrases.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-usersymbolphrases.txt"; sourceTree = "<group>"; usesTabs = 0; };
 		5BF9DA2328840E6200DBD48E /* template-exclusions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-exclusions.txt"; sourceTree = "<group>"; usesTabs = 0; };
@@ -505,6 +507,7 @@
 				5BE3779F288FED8D0037365B /* KeyHandler_HandleComposition.swift */,
 				5B7F225C2808501000DDD3CB /* KeyHandler_HandleInput.swift */,
 				5B3133BE280B229700A4A505 /* KeyHandler_States.swift */,
+				5BF0B84B28C070B000795FC6 /* NSEventExtension.swift */,
 				5B62A33727AE79CD00A19448 /* StringUtils.swift */,
 				5BAA8FBD282CAF380066C406 /* SyllableComposer.swift */,
 			);
@@ -1262,6 +1265,7 @@
 				5B2170E0289FACAD00BE7304 /* 7_LangModel.swift in Sources */,
 				5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */,
 				5BA9FD4027FEF3C8002DE248 /* Localization.swift in Sources */,
+				5BF0B84C28C070B000795FC6 /* NSEventExtension.swift in Sources */,
 				5BAA8FBE282CAF380066C406 /* SyllableComposer.swift in Sources */,
 				5B20430728BEE30900BFC6FD /* BookmarkManager.swift in Sources */,
 				5BA9FD1327FEDB6B002DE248 /* suiPrefPaneDictionary.swift in Sources */,
