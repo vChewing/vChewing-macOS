@@ -29,6 +29,8 @@ public enum StateType {
 // 所有 InputState 均遵守該協定：
 public protocol InputStateProtocol {
   var type: StateType { get }
+  var hasBuffer: Bool { get }
+  var isCandidateContainer: Bool { get }
 }
 
 /// 此型別用以呈現輸入法控制器（ctlInputMethod）的各種狀態。
@@ -66,10 +68,9 @@ public protocol InputStateProtocol {
 public enum InputState {
   /// .Deactivated: 使用者沒在使用輸入法。
   class Deactivated: InputStateProtocol {
+    let hasBuffer: Bool = false
+    let isCandidateContainer: Bool = false
     public var type: StateType { .ofDeactivated }
-    var description: String {
-      "<InputState.Deactivated>"
-    }
   }
 
   // MARK: -
@@ -77,15 +78,10 @@ public enum InputState {
   /// .Empty: 使用者剛剛切換至該輸入法、卻還沒有任何輸入行為。
   /// 抑或是剛剛敲字遞交給客體應用、準備新的輸入行為。
   class Empty: InputStateProtocol {
+    let hasBuffer: Bool = false
+    let isCandidateContainer: Bool = false
     public var type: StateType { .ofEmpty }
-
-    var composingBuffer: String {
-      ""
-    }
-
-    var description: String {
-      "<InputState.Empty>"
-    }
+    let composingBuffer: String = ""
   }
 
   // MARK: -
@@ -95,15 +91,14 @@ public enum InputState {
   /// 該狀態在處理完畢之後會被立刻切換至 .Empty()。
   class EmptyIgnoringPreviousState: Empty {
     override public var type: StateType { .ofEmptyIgnoringPreviousState }
-    override var description: String {
-      "<InputState.EmptyIgnoringPreviousState>"
-    }
   }
 
   // MARK: -
 
   /// .Committing: 該狀態會承載要遞交出去的內容，讓輸入法控制器處理時代為遞交。
   class Committing: InputStateProtocol {
+    let hasBuffer: Bool = false
+    let isCandidateContainer: Bool = false
     public var type: StateType { .ofCommitting }
     private(set) var textToCommit: String = ""
 
@@ -112,10 +107,6 @@ public enum InputState {
       self.textToCommit = textToCommit
       ChineseConverter.ensureCurrencyNumerals(target: &self.textToCommit)
     }
-
-    var description: String {
-      "<InputState.Committing textToCommit:\(textToCommit)>"
-    }
   }
 
   // MARK: -
@@ -123,6 +114,8 @@ public enum InputState {
   /// .AssociatedPhrases: 逐字選字模式內的聯想詞輸入狀態。
   /// 因為逐字選字模式不需要在組字區內存入任何東西，所以該狀態不受 .NotEmpty 的管轄。
   class AssociatedPhrases: InputStateProtocol {
+    let hasBuffer: Bool = false
+    let isCandidateContainer: Bool = true
     public var type: StateType { .ofAssociatedPhrases }
     private(set) var candidates: [(String, String)] = []
     private(set) var isTypingVertical: Bool = false
@@ -141,10 +134,6 @@ public enum InputState {
       )
       return attributedString
     }
-
-    var description: String {
-      "<InputState.AssociatedPhrases, candidates:\(candidates), isTypingVertical:\(isTypingVertical)>"
-    }
   }
 
   // MARK: -
@@ -156,6 +145,8 @@ public enum InputState {
   /// - .ChoosingCandidate: 叫出選字窗、允許使用者選字。
   /// - .SymbolTable: 波浪鍵符號選單專用的狀態，有自身的特殊處理。
   class NotEmpty: InputStateProtocol {
+    let hasBuffer: Bool = true
+    var isCandidateContainer: Bool { false }
     public var type: StateType { .ofNotEmpty }
     private(set) var composingBuffer: String
     private(set) var cursorIndex: Int = 0 { didSet { cursorIndex = max(cursorIndex, 0) } }
@@ -218,10 +209,6 @@ public enum InputState {
       }
       return attributedString
     }
-
-    var description: String {
-      "<InputState.NotEmpty, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
-    }
   }
 
   // MARK: -
@@ -247,10 +234,6 @@ public enum InputState {
       super.init(
         composingBuffer: composingBuffer, cursorIndex: cursorIndex, reading: reading, nodeValuesArray: nodeValuesArray
       )
-    }
-
-    override var description: String {
-      "<InputState.Inputting, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>, textToCommit:\(textToCommit)>"
     }
   }
 
@@ -399,10 +382,6 @@ public enum InputState {
       return attributedString
     }
 
-    override var description: String {
-      "<InputState.Marking, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), markedRange:\(markedRange)>"
-    }
-
     var convertedToInputting: Inputting {
       let state = Inputting(
         composingBuffer: composingBuffer, cursorIndex: cursorIndex, reading: reading, nodeValuesArray: nodeValuesArray
@@ -447,6 +426,7 @@ public enum InputState {
 
   /// .ChoosingCandidate: 叫出選字窗、允許使用者選字。
   class ChoosingCandidate: NotEmpty {
+    override var isCandidateContainer: Bool { true }
     override public var type: StateType { .ofChoosingCandidate }
     private(set) var candidates: [(String, String)]
     private(set) var isTypingVertical: Bool
@@ -534,10 +514,6 @@ public enum InputState {
 
       return attributedStringResult
     }
-
-    override var description: String {
-      "<InputState.ChoosingCandidate, candidates:\(candidates), isTypingVertical:\(isTypingVertical),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
-    }
   }
 
   // MARK: -
@@ -573,10 +549,6 @@ public enum InputState {
         ]
       )
       return attributedString
-    }
-
-    override var description: String {
-      "<InputState.SymbolTable, candidates:\(candidates), isTypingVertical:\(isTypingVertical)>"
     }
   }
 }
