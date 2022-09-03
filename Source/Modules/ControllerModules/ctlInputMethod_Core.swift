@@ -71,7 +71,7 @@ class ctlInputMethod: IMKInputController {
     }
     if let state = state as? InputState.NotEmpty {
       /// 將傳回的新狀態交給調度函式。
-      handle(state: InputState.Committing(textToCommit: state.composingBufferConverted))
+      handle(state: InputState.Committing(textToCommit: state.displayedTextConverted))
     }
     handle(state: InputState.Empty())
   }
@@ -115,11 +115,9 @@ class ctlInputMethod: IMKInputController {
       } else {
         NotifierController.notify(
           message: NSLocalizedString("Alphanumerical Mode", comment: "") + "\n"
-            + {
-              isASCIIMode
-                ? NSLocalizedString("NotificationSwitchON", comment: "")
-                : NSLocalizedString("NotificationSwitchOFF", comment: "")
-            }()
+            + isASCIIMode
+            ? NSLocalizedString("NotificationSwitchON", comment: "")
+            : NSLocalizedString("NotificationSwitchOFF", comment: "")
         )
       }
     }
@@ -325,7 +323,7 @@ class ctlInputMethod: IMKInputController {
       }
     }
 
-    if let state = state as? InputState.AssociatedPhrases {
+    if let state = state as? InputState.Associates {
       handleCandidatesPrepared(state.candidates, prefix: "⇧")
     } else if let state = state as? InputState.SymbolTable {
       // 分類符號選單不會出現同符異音項、不需要康熙 / JIS 轉換，所以使用簡化過的處理方式。
@@ -363,9 +361,9 @@ class ctlInputMethod: IMKInputController {
   /// - Parameter candidateString: 已經確認的候選字詞內容。
   override open func candidateSelected(_ candidateString: NSAttributedString!) {
     let candidateString: NSAttributedString = candidateString ?? .init(string: "")
-    if state is InputState.AssociatedPhrases {
+    if state is InputState.Associates {
       if !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter {
-        handle(state: InputState.EmptyIgnoringPreviousState())
+        handle(state: InputState.Abortion())
         handle(state: InputState.Empty())
         return
       }
@@ -403,7 +401,7 @@ class ctlInputMethod: IMKInputController {
       }
     }
 
-    if let state = state as? InputState.AssociatedPhrases {
+    if let state = state as? InputState.Associates {
       handleCandidatesSelected(state.candidates, prefix: "⇧")
     } else if let state = state as? InputState.SymbolTable {
       handleSymbolCandidatesSelected(state.candidates)

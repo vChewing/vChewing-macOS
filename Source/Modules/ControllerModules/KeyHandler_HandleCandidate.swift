@@ -41,7 +41,7 @@ extension KeyHandler {
       || ((input.isCursorBackward || input.isCursorForward) && input.isShiftHold)
 
     if cancelCandidateKey {
-      if state is InputState.AssociatedPhrases
+      if state is InputState.Associates
         || mgrPrefs.useSCPCTypingMode
         || compositor.isEmpty
       {
@@ -49,13 +49,13 @@ extension KeyHandler {
         // 就將當前的組字緩衝區析構處理、強制重設輸入狀態。
         // 否則，一個本不該出現的真空組字緩衝區會使前後方向鍵與 BackSpace 鍵失靈。
         // 所以這裡需要對 compositor.isEmpty 做判定。
-        stateCallback(InputState.EmptyIgnoringPreviousState())
+        stateCallback(InputState.Abortion())
         stateCallback(InputState.Empty())
       } else {
         stateCallback(buildInputtingState)
       }
       if let state = state as? InputState.SymbolTable, let nodePrevious = state.node.previous {
-        stateCallback(InputState.SymbolTable(node: nodePrevious, isTypingVertical: state.isTypingVertical))
+        stateCallback(InputState.SymbolTable(node: nodePrevious))
       }
       return true
     }
@@ -63,8 +63,8 @@ extension KeyHandler {
     // MARK: Enter
 
     if input.isEnter {
-      if state is InputState.AssociatedPhrases, !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter {
-        stateCallback(InputState.EmptyIgnoringPreviousState())
+      if state is InputState.Associates, !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter {
+        stateCallback(InputState.Abortion())
         stateCallback(InputState.Empty())
         return true
       }
@@ -247,7 +247,7 @@ extension KeyHandler {
 
     if let state = state as? InputState.ChoosingCandidate {
       candidates = state.candidates
-    } else if let state = state as? InputState.AssociatedPhrases {
+    } else if let state = state as? InputState.Associates {
       candidates = state.candidates
     }
 
@@ -267,13 +267,13 @@ extension KeyHandler {
 
     // MARK: 聯想詞處理 (Associated Phrases)
 
-    if state is InputState.AssociatedPhrases {
+    if state is InputState.Associates {
       if !input.isShiftHold { return false }
     }
 
     var index: Int = NSNotFound
     let match: String =
-      (state is InputState.AssociatedPhrases) ? input.inputTextIgnoringModifiers ?? "" : input.text
+      (state is InputState.Associates) ? input.inputTextIgnoringModifiers ?? "" : input.text
 
     for j in 0..<ctlCandidateCurrent.keyLabels.count {
       let label: CandidateKeyLabel = ctlCandidateCurrent.keyLabels[j]
@@ -293,7 +293,7 @@ extension KeyHandler {
       }
     }
 
-    if state is InputState.AssociatedPhrases { return false }
+    if state is InputState.Associates { return false }
 
     // MARK: 逐字選字模式的處理 (SCPC Mode Processing)
 
@@ -333,7 +333,7 @@ extension KeyHandler {
             didSelectCandidateAt: candidateIndex,
             ctlCandidate: ctlCandidateCurrent
           )
-          stateCallback(InputState.EmptyIgnoringPreviousState())
+          stateCallback(InputState.Abortion())
           stateCallback(InputState.Empty())
           return handle(
             input: input, state: InputState.Empty(), stateCallback: stateCallback, errorCallback: errorCallback

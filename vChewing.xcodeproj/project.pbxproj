@@ -117,6 +117,8 @@
 		5BEDB724283B4C250078EB25 /* data-symbols.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71E283B4AEA0078EB25 /* data-symbols.plist */; };
 		5BEDB725283B4C250078EB25 /* data-chs.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71C283B4AEA0078EB25 /* data-chs.plist */; };
 		5BF0B84C28C070B000795FC6 /* NSEventExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF0B84B28C070B000795FC6 /* NSEventExtension.swift */; };
+		5BF56F9828C39A2700DD6839 /* IMEState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF56F9728C39A2700DD6839 /* IMEState.swift */; };
+		5BF56F9A28C39D1800DD6839 /* IMEStateData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF56F9928C39D1800DD6839 /* IMEStateData.swift */; };
 		5BF9DA2728840E6200DBD48E /* template-usersymbolphrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2228840E6200DBD48E /* template-usersymbolphrases.txt */; };
 		5BF9DA2828840E6200DBD48E /* template-exclusions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2328840E6200DBD48E /* template-exclusions.txt */; };
 		5BF9DA2928840E6200DBD48E /* template-associatedPhrases-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2428840E6200DBD48E /* template-associatedPhrases-chs.txt */; };
@@ -346,6 +348,8 @@
 		5BEDB720283B4AEA0078EB25 /* data-cht.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-cht.plist"; path = "Data/data-cht.plist"; sourceTree = "<group>"; };
 		5BF0B84B28C070B000795FC6 /* NSEventExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSEventExtension.swift; sourceTree = "<group>"; };
 		5BF255CD28B2694E003ECB60 /* vChewing-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vChewing-Bridging-Header.h"; sourceTree = "<group>"; };
+		5BF56F9728C39A2700DD6839 /* IMEState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMEState.swift; sourceTree = "<group>"; };
+		5BF56F9928C39D1800DD6839 /* IMEStateData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMEStateData.swift; sourceTree = "<group>"; };
 		5BF9DA2228840E6200DBD48E /* template-usersymbolphrases.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-usersymbolphrases.txt"; sourceTree = "<group>"; usesTabs = 0; };
 		5BF9DA2328840E6200DBD48E /* template-exclusions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-exclusions.txt"; sourceTree = "<group>"; usesTabs = 0; };
 		5BF9DA2428840E6200DBD48E /* template-associatedPhrases-chs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; name = "template-associatedPhrases-chs.txt"; path = "../Data/components/chs/template-associatedPhrases-chs.txt"; sourceTree = "<group>"; usesTabs = 0; };
@@ -498,6 +502,8 @@
 				5B21176D28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift */,
 				5B21176B287539BB000443A9 /* ctlInputMethod_HandleStates.swift */,
 				5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */,
+				5BF56F9728C39A2700DD6839 /* IMEState.swift */,
+				5BF56F9928C39D1800DD6839 /* IMEStateData.swift */,
 				D461B791279DAC010070E734 /* InputState.swift */,
 				5BD0113C2818543900609769 /* KeyHandler_Core.swift */,
 				5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */,
@@ -1206,6 +1212,7 @@
 				5B7F225D2808501000DDD3CB /* KeyHandler_HandleInput.swift in Sources */,
 				5BA9FD1227FEDB6B002DE248 /* suiPrefPaneExperience.swift in Sources */,
 				D461B792279DAC010070E734 /* InputState.swift in Sources */,
+				5BF56F9828C39A2700DD6839 /* IMEState.swift in Sources */,
 				5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */,
 				D47B92C027972AD100458394 /* main.swift in Sources */,
 				D4A13D5A27A59F0B003BE359 /* ctlInputMethod_Core.swift in Sources */,
@@ -1232,6 +1239,7 @@
 				D47F7DCE278BFB57002F9DD7 /* ctlPrefWindow.swift in Sources */,
 				5BD0113D2818543900609769 /* KeyHandler_Core.swift in Sources */,
 				5B2170E4289FACAD00BE7304 /* 2_Walker.swift in Sources */,
+				5BF56F9A28C39D1800DD6839 /* IMEStateData.swift in Sources */,
 				5BA9FD4227FEF3C8002DE248 /* PreferencePane.swift in Sources */,
 				5BA0DF312817857D009E73BB /* lmUserOverride.swift in Sources */,
 				5BA9FD8B28006B41002DE248 /* VDKComboBox.swift in Sources */,

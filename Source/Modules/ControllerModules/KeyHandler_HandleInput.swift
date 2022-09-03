@@ -38,7 +38,7 @@ extension KeyHandler {
     // 提前過濾掉一些不合規的按鍵訊號輸入，免得相關按鍵訊號被送給 Megrez 引發輸入法崩潰。
     if input.isInvalid {
       // 在「.Empty(IgnoringPreviousState) 與 .Deactivated」狀態下的首次不合規按鍵輸入可以直接放行。
-      // 因為「.EmptyIgnoringPreviousState」會在處理之後被自動轉為「.Empty」，所以不需要單獨判斷。
+      // 因為「.Abortion」會在處理之後被自動轉為「.Empty」，所以不需要單獨判斷。
       if state is InputState.Empty || state is InputState.Deactivated {
         return false
       }
@@ -51,7 +51,7 @@ extension KeyHandler {
     // 如果當前組字器為空的話，就不再攔截某些修飾鍵，畢竟這些鍵可能會會用來觸發某些功能。
     let isFunctionKey: Bool =
       input.isControlHotKey || (input.isCommandHold || input.isOptionHotKey || input.isNonLaptopFunctionKey)
-    if !(state is InputState.NotEmpty) && !(state is InputState.AssociatedPhrases) && isFunctionKey {
+    if !(state is InputState.NotEmpty) && !(state is InputState.Associates) && isFunctionKey {
       return false
     }
 
@@ -94,7 +94,7 @@ extension KeyHandler {
     // 不然、使用 Cocoa 內建的 flags 的話，會誤傷到在主鍵盤區域的功能鍵。
     // 我們先規定允許小鍵盤區域操縱選字窗，其餘場合一律直接放行。
     if input.isNumericPadKey {
-      if !(state is InputState.ChoosingCandidate || state is InputState.AssociatedPhrases
+      if !(state is InputState.ChoosingCandidate || state is InputState.Associates
         || state is InputState.SymbolTable)
       {
         stateCallback(InputState.Empty())
@@ -114,7 +114,7 @@ extension KeyHandler {
 
     // MARK: 處理聯想詞 (Handle Associated Phrases)
 
-    if state is InputState.AssociatedPhrases {
+    if state is InputState.Associates {
       if handleCandidate(
         state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
       ) {
@@ -155,9 +155,9 @@ extension KeyHandler {
         /// 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
         if !mgrPrefs.chooseCandidateUsingSpace {
           if compositor.cursor >= compositor.length {
-            let composingBuffer = currentState.composingBuffer
-            if !composingBuffer.isEmpty {
-              stateCallback(InputState.Committing(textToCommit: composingBuffer))
+            let displayedText = currentState.displayedText
+            if !displayedText.isEmpty {
+              stateCallback(InputState.Committing(textToCommit: displayedText))
             }
             stateCallback(InputState.Committing(textToCommit: " "))
             stateCallback(InputState.Empty())

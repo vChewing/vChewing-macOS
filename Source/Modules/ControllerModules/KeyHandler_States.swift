@@ -110,7 +110,7 @@ extension KeyHandler {
 
     /// 這裡生成準備要拿來回呼的「正在輸入」狀態，但還不能立即使用，因為工具提示仍未完成。
     return InputState.Inputting(
-      composingBuffer: cleanedComposition, cursorIndex: cursorIndex, reading: reading, nodeValuesArray: nodeValuesArray
+      displayedText: cleanedComposition, cursorIndex: cursorIndex, reading: reading, nodeValuesArray: nodeValuesArray
     )
   }
 
@@ -123,13 +123,12 @@ extension KeyHandler {
   /// - Returns: 回呼一個新的選詞狀態，來就給定的候選字詞陣列資料內容顯示選字窗。
   func buildCandidate(
     state currentState: InputState.NotEmpty,
-    isTypingVertical: Bool = false
+    isTypingVertical _: Bool = false
   ) -> InputState.ChoosingCandidate {
     InputState.ChoosingCandidate(
-      composingBuffer: currentState.composingBuffer,
+      displayedText: currentState.displayedText,
       cursorIndex: currentState.cursorIndex,
       candidates: getCandidatesArray(fixOrder: mgrPrefs.useFixecCandidateOrderOnSelection),
-      isTypingVertical: isTypingVertical,
       nodeValuesArray: compositor.walkedNodes.values
     )
   }
@@ -147,16 +146,13 @@ extension KeyHandler {
   /// 是否為空：如果陣列為空的話，直接回呼一個空狀態。
   /// - Parameters:
   ///   - key: 給定的索引鍵（也就是給定的聯想詞的開頭字）。
-  ///   - isTypingVertical: 是否縱排輸入？
   /// - Returns: 回呼一個新的聯想詞狀態，來就給定的聯想詞陣列資料內容顯示選字窗。
   func buildAssociatePhraseState(
-    withPair pair: Megrez.Compositor.Candidate,
-    isTypingVertical: Bool
-  ) -> InputState.AssociatedPhrases! {
+    withPair pair: Megrez.Compositor.Candidate
+  ) -> InputState.Associates! {
     // 上一行必須要用驚嘆號，否則 Xcode 會誤導你砍掉某些實際上必需的語句。
-    InputState.AssociatedPhrases(
-      candidates: buildAssociatePhraseArray(withPair: pair), isTypingVertical: isTypingVertical
-    )
+    InputState.Associates(
+      candidates: buildAssociatePhraseArray(withPair: pair))
   }
 
   // MARK: - 用以處理就地新增自訂語彙時的行為
@@ -190,7 +186,7 @@ extension KeyHandler {
     if input.isEnter {
       if let keyHandlerDelegate = delegate {
         // 先判斷是否是在摁了降權組合鍵的時候目標不在庫。
-        if input.isShiftHold, input.isCommandHold, !state.validToFilter {
+        if input.isShiftHold, input.isCommandHold, !state.isFilterable {
           IME.prtDebugIntel("2EAC1F7A")
           errorCallback()
           return true
@@ -207,7 +203,7 @@ extension KeyHandler {
     // BackSpace & Delete
     if input.isBackSpace || input.isDelete {
       if let keyHandlerDelegate = delegate {
-        if !state.validToFilter {
+        if !state.isFilterable {
           IME.prtDebugIntel("1F88B191")
           errorCallback()
           return true
@@ -226,15 +222,15 @@ extension KeyHandler {
     if input.isCursorBackward || input.emacsKey == EmacsKey.backward, input.isShiftHold {
       var index = state.markerIndex
       if index > 0 {
-        index = state.composingBuffer.utf16PreviousPosition(for: index)
+        index = state.displayedText.utf16PreviousPosition(for: index)
         let marking = InputState.Marking(
-          composingBuffer: state.composingBuffer,
+          displayedText: state.displayedText,
           cursorIndex: state.cursorIndex,
           markerIndex: index,
           readings: state.readings,
           nodeValuesArray: compositor.walkedNodes.values
         )
-        marking.tooltipForInputting = state.tooltipForInputting
+        marking.tooltipBackupForInputting = state.tooltipBackupForInputting
         stateCallback(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
       } else {
         IME.prtDebugIntel("1149908D")
@@ -247,16 +243,16 @@ extension KeyHandler {
     // Shift + Right
     if input.isCursorForward || input.emacsKey == EmacsKey.forward, input.isShiftHold {
       var index = state.markerIndex
-      if index < (state.composingBuffer.utf16.count) {
-        index = state.composingBuffer.utf16NextPosition(for: index)
+      if index < (state.displayedText.utf16.count) {
+        index = state.displayedText.utf16NextPosition(for: index)
         let marking = InputState.Marking(
-          composingBuffer: state.composingBuffer,
+          displayedText: state.displayedText,
           cursorIndex: state.cursorIndex,
           markerIndex: index,
           readings: state.readings,
           nodeValuesArray: compositor.walkedNodes.values
         )
-        marking.tooltipForInputting = state.tooltipForInputting
+        marking.tooltipBackupForInputting = state.tooltipBackupForInputting
         stateCallback(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
       } else {
         IME.prtDebugIntel("9B51408D")
@@ -336,7 +332,7 @@ extension KeyHandler {
   ) -> Bool {
     guard let currentState = state as? InputState.Inputting else { return false }
 
-    stateCallback(InputState.Committing(textToCommit: currentState.composingBuffer))
+    stateCallback(InputState.Committing(textToCommit: currentState.displayedText))
     stateCallback(InputState.Empty())
     return true
   }
@@ -354,17 +350,17 @@ extension KeyHandler {
   ) -> Bool {
     guard state is InputState.Inputting else { return false }
 
-    var composingBuffer = compositor.keys.joined(separator: "-")
+    var displayedText = compositor.keys.joined(separator: "-")
     if mgrPrefs.inlineDumpPinyinInLieuOfZhuyin {
-      composingBuffer = Tekkon.restoreToneOneInZhuyinKey(target: composingBuffer)  // 恢復陰平標記
-      composingBuffer = Tekkon.cnvPhonaToHanyuPinyin(target: composingBuffer)  // 注音轉拼音
+      displayedText = Tekkon.restoreToneOneInZhuyinKey(target: displayedText)  // 恢復陰平標記
+      displayedText = Tekkon.cnvPhonaToHanyuPinyin(target: displayedText)  // 注音轉拼音
     }
 
     if let delegate = delegate, !delegate.clientBundleIdentifier.contains("vChewingPhraseEditor") {
-      composingBuffer = composingBuffer.replacingOccurrences(of: "-", with: " ")
+      displayedText = displayedText.replacingOccurrences(of: "-", with: " ")
     }
 
-    stateCallback(InputState.Committing(textToCommit: composingBuffer))
+    stateCallback(InputState.Committing(textToCommit: displayedText))
     stateCallback(InputState.Empty())
     return true
   }
@@ -434,14 +430,14 @@ extension KeyHandler {
         stateCallback(buildInputtingState)
         return true
       case 1:
-        stateCallback(InputState.EmptyIgnoringPreviousState())
+        stateCallback(InputState.Abortion())
         stateCallback(InputState.Empty())
         return true
       default: break
     }
 
     if input.isShiftHold, input.isOptionHold {
-      stateCallback(InputState.EmptyIgnoringPreviousState())
+      stateCallback(InputState.Abortion())
       stateCallback(InputState.Empty())
       return true
     }
@@ -465,7 +461,7 @@ extension KeyHandler {
     switch composer.isEmpty && compositor.isEmpty {
       case false: stateCallback(buildInputtingState)
       case true:
-        stateCallback(InputState.EmptyIgnoringPreviousState())
+        stateCallback(InputState.Abortion())
         stateCallback(InputState.Empty())
     }
     return true
@@ -489,7 +485,7 @@ extension KeyHandler {
     guard state is InputState.Inputting else { return false }
 
     if input.isShiftHold {
-      stateCallback(InputState.EmptyIgnoringPreviousState())
+      stateCallback(InputState.Abortion())
       stateCallback(InputState.Empty())
       return true
     }
@@ -510,10 +506,10 @@ extension KeyHandler {
 
     let inputting = buildInputtingState
     // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
-    switch inputting.composingBuffer.isEmpty {
+    switch inputting.displayedText.isEmpty {
       case false: stateCallback(inputting)
       case true:
-        stateCallback(InputState.EmptyIgnoringPreviousState())
+        stateCallback(InputState.Abortion())
         stateCallback(InputState.Empty())
     }
     return true
@@ -625,7 +621,7 @@ extension KeyHandler {
     if mgrPrefs.escToCleanInputBuffer {
       /// 若啟用了該選項，則清空組字器的內容與注拼槽的內容。
       /// 此乃 macOS 內建注音輸入法預設之行為，但不太受 Windows 使用者群體之待見。
-      stateCallback(InputState.EmptyIgnoringPreviousState())
+      stateCallback(InputState.Abortion())
       stateCallback(InputState.Empty())
     } else {
       if composer.isEmpty { return true }
@@ -634,7 +630,7 @@ extension KeyHandler {
       switch compositor.isEmpty {
         case false: stateCallback(buildInputtingState)
         case true:
-          stateCallback(InputState.EmptyIgnoringPreviousState())
+          stateCallback(InputState.Abortion())
           stateCallback(InputState.Empty())
       }
     }
@@ -667,16 +663,16 @@ extension KeyHandler {
 
     if input.isShiftHold {
       // Shift + Right
-      if currentState.cursorIndex < currentState.composingBuffer.utf16.count {
-        let nextPosition = currentState.composingBuffer.utf16NextPosition(
+      if currentState.cursorIndex < currentState.displayedText.utf16.count {
+        let nextPosition = currentState.displayedText.utf16NextPosition(
           for: currentState.cursorIndex)
         let marking: InputState.Marking! = InputState.Marking(
-          composingBuffer: currentState.composingBuffer,
+          displayedText: currentState.displayedText,
           cursorIndex: currentState.cursorIndex,
           markerIndex: nextPosition,
           readings: compositor.keys
         )
-        marking.tooltipForInputting = currentState.tooltip
+        marking.tooltipBackupForInputting = currentState.tooltip
         stateCallback(marking)
       } else {
         IME.prtDebugIntel("BB7F6DB9")
@@ -742,15 +738,15 @@ extension KeyHandler {
     if input.isShiftHold {
       // Shift + left
       if currentState.cursorIndex > 0 {
-        let previousPosition = currentState.composingBuffer.utf16PreviousPosition(
+        let previousPosition = currentState.displayedText.utf16PreviousPosition(
           for: currentState.cursorIndex)
         let marking: InputState.Marking! = InputState.Marking(
-          composingBuffer: currentState.composingBuffer,
+          displayedText: currentState.displayedText,
           cursorIndex: currentState.cursorIndex,
           markerIndex: previousPosition,
           readings: compositor.keys
         )
-        marking.tooltipForInputting = currentState.tooltip
+        marking.tooltipBackupForInputting = currentState.tooltip
         stateCallback(marking)
       } else {
         IME.prtDebugIntel("D326DEA3")

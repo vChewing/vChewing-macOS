@@ -65,7 +65,7 @@ extension ctlInputMethod: KeyHandlerDelegate {
 // MARK: - Candidate Controller Delegate
 
 extension ctlInputMethod: ctlCandidateDelegate {
-  var isAssociatedPhrasesState: Bool { state is InputState.AssociatedPhrases }
+  var isAssociatedPhrasesState: Bool { state is InputState.Associates }
 
   /// 完成 handle() 函式本該完成的內容，但去掉了與 IMK 選字窗有關的判斷語句。
   /// 這樣分開處理很有必要，不然 handle() 函式會陷入無限迴圈。
@@ -80,7 +80,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
     _ = controller  // 防止格式整理工具毀掉與此對應的參數。
     if let state = state as? InputState.ChoosingCandidate {
       return state.candidates.count
-    } else if let state = state as? InputState.AssociatedPhrases {
+    } else if let state = state as? InputState.Associates {
       return state.candidates.count
     }
     return 0
@@ -93,7 +93,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
     _ = controller  // 防止格式整理工具毀掉與此對應的參數。
     if let state = state as? InputState.ChoosingCandidate {
       return state.candidates
-    } else if let state = state as? InputState.AssociatedPhrases {
+    } else if let state = state as? InputState.Associates {
       return state.candidates
     }
     return .init()
@@ -105,7 +105,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
     _ = controller  // 防止格式整理工具毀掉與此對應的參數。
     if let state = state as? InputState.ChoosingCandidate {
       return state.candidates[index]
-    } else if let state = state as? InputState.AssociatedPhrases {
+    } else if let state = state as? InputState.Associates {
       return state.candidates[index]
     }
     return ("", "")
@@ -119,9 +119,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
     {
       if let children = node.children, !children.isEmpty {
         handle(state: InputState.Empty())  // 防止縱橫排選字窗同時出現
-        handle(
-          state: InputState.SymbolTable(node: node, previous: state.node, isTypingVertical: state.isTypingVertical)
-        )
+        handle(state: InputState.SymbolTable(node: node, previous: state.node))
       } else {
         handle(state: InputState.Committing(textToCommit: node.title))
         handle(state: InputState.Empty())
@@ -139,12 +137,11 @@ extension ctlInputMethod: ctlCandidateDelegate {
       let inputting = keyHandler.buildInputtingState
 
       if mgrPrefs.useSCPCTypingMode {
-        handle(state: InputState.Committing(textToCommit: inputting.composingBufferConverted))
+        handle(state: InputState.Committing(textToCommit: inputting.displayedTextConverted))
         // 此時是逐字選字模式，所以「selectedValue.1」是單個字、不用追加處理。
         if mgrPrefs.associatedPhrasesEnabled,
           let associatePhrases = keyHandler.buildAssociatePhraseState(
-            withPair: .init(key: selectedValue.0, value: selectedValue.1),
-            isTypingVertical: state.isTypingVertical
+            withPair: .init(key: selectedValue.0, value: selectedValue.1)
           ), !associatePhrases.candidates.isEmpty
         {
           handle(state: associatePhrases)
@@ -157,7 +154,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
       return
     }
 
-    if let state = state as? InputState.AssociatedPhrases {
+    if let state = state as? InputState.Associates {
       let selectedValue = state.candidates[index]
       handle(state: InputState.Committing(textToCommit: selectedValue.1))
       // 此時是聯想詞選字模式，所以「selectedValue.1」必須只保留最後一個字。
@@ -168,8 +165,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
       }
       if mgrPrefs.associatedPhrasesEnabled,
         let associatePhrases = keyHandler.buildAssociatePhraseState(
-          withPair: .init(key: selectedValue.0, value: String(valueKept)),
-          isTypingVertical: state.isTypingVertical
+          withPair: .init(key: selectedValue.0, value: String(valueKept))
         ), !associatePhrases.candidates.isEmpty
       {
         handle(state: associatePhrases)

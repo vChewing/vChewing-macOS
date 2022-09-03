@@ -13,11 +13,11 @@ import Cocoa
 // MARK: - Tooltip Display and Candidate Display Methods
 
 extension ctlInputMethod {
-  func show(tooltip: String, composingBuffer: String, cursorIndex: Int) {
+  func show(tooltip: String, displayedText: String, cursorIndex: Int) {
     guard let client = client() else { return }
     var lineHeightRect = NSRect(x: 0.0, y: 0.0, width: 16.0, height: 16.0)
     var cursor = cursorIndex
-    if cursor == composingBuffer.count, cursor != 0 {
+    if cursor == displayedText.count, cursor != 0 {
       cursor -= 1
     }
     while lineHeightRect.origin.x == 0, lineHeightRect.origin.y == 0, cursor >= 0 {
@@ -41,10 +41,10 @@ extension ctlInputMethod {
   func show(candidateWindowWith state: InputStateProtocol) {
     guard let client = client() else { return }
     var isTypingVertical: Bool {
-      if let state = state as? InputState.ChoosingCandidate {
-        return state.isTypingVertical
-      } else if let state = state as? InputState.AssociatedPhrases {
-        return state.isTypingVertical
+      if state.type == .ofCandidates {
+        return ctlInputMethod.isVerticalTypingSituation
+      } else if state.type == ..ofAssociates {
+        return ctlInputMethod.isVerticalTypingSituation
       }
       return false
     }
@@ -52,7 +52,7 @@ extension ctlInputMethod {
       var candidates: [(String, String)] = .init()
       if let state = state as? InputState.ChoosingCandidate {
         candidates = state.candidates
-      } else if let state = state as? InputState.AssociatedPhrases {
+      } else if let state = state as? InputState.Associates {
         candidates = state.candidates
       }
       if isTypingVertical { return true }
@@ -106,7 +106,7 @@ extension ctlInputMethod {
     let candidateKeys = mgrPrefs.candidateKeys
     let keyLabels =
       candidateKeys.count > 4 ? Array(candidateKeys) : Array(mgrPrefs.defaultCandidateKeys)
-    let keyLabelSuffix = state is InputState.AssociatedPhrases ? "^" : ""
+    let keyLabelSuffix = state is InputState.Associates ? "^" : ""
     ctlInputMethod.ctlCandidateCurrent.keyLabels = keyLabels.map {
       CandidateKeyLabel(key: String($0), displayedText: String($0) + keyLabelSuffix)
     }
@@ -128,7 +128,7 @@ extension ctlInputMethod {
 
     if let state = state as? InputState.ChoosingCandidate {
       cursor = state.cursorIndex
-      if cursor == state.composingBuffer.count, cursor != 0 {
+      if cursor == state.displayedText.count, cursor != 0 {
         cursor -= 1
       }
     }

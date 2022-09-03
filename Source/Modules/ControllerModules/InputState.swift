@@ -12,27 +12,6 @@ import Foundation
 
 // 註：所有 InputState 型別均不適合使用 Struct，因為 Struct 無法相互繼承派生。
 
-// 用以讓每個狀態自描述的 enum。
-public enum StateType {
-  case ofDeactivated
-  case ofAssociatedPhrases
-  case ofEmpty
-  case ofEmptyIgnoringPreviousState
-  case ofCommitting
-  case ofNotEmpty
-  case ofInputting
-  case ofMarking
-  case ofChoosingCandidate
-  case ofSymbolTable
-}
-
-// 所有 InputState 均遵守該協定：
-public protocol InputStateProtocol {
-  var type: StateType { get }
-  var hasBuffer: Bool { get }
-  var isCandidateContainer: Bool { get }
-}
-
 /// 此型別用以呈現輸入法控制器（ctlInputMethod）的各種狀態。
 ///
 /// 從實際角度來看，輸入法屬於有限態械（Finite State Machine）。其藉由滑鼠/鍵盤
@@ -56,7 +35,7 @@ public protocol InputStateProtocol {
 ///   組字區內存入任何東西，所以該狀態不受 .NotEmpty 的管轄。
 /// - .Empty: 使用者剛剛切換至該輸入法、卻還沒有任何輸入行為。抑或是剛剛敲字遞交給
 ///   客體應用、準備新的輸入行為。
-/// - .EmptyIgnoringPreviousState: 與 Empty 類似，但會扔掉上一個狀態的內容、不將這些
+/// - .Abortion: 與 Empty 類似，但會扔掉上一個狀態的內容、不將這些
 ///   內容遞交給客體應用。該狀態在處理完畢之後會被立刻切換至 .Empty()。
 /// - .Committing: 該狀態會承載要遞交出去的內容，讓輸入法控制器處理時代為遞交。
 /// - .NotEmpty: 非空狀態，是一種狀態大類、用以派生且代表下述諸狀態。
@@ -68,6 +47,12 @@ public protocol InputStateProtocol {
 public enum InputState {
   /// .Deactivated: 使用者沒在使用輸入法。
   class Deactivated: InputStateProtocol {
+    var node: SymbolNode = .init("")
+    var attributedString: NSAttributedString = .init()
+    var data: StateData = .init()
+    var textToCommit: String = ""
+    var tooltip: String = ""
+    let displayedText: String = ""
     let hasBuffer: Bool = false
     let isCandidateContainer: Bool = false
     public var type: StateType { .ofDeactivated }
@@ -78,32 +63,41 @@ public enum InputState {
   /// .Empty: 使用者剛剛切換至該輸入法、卻還沒有任何輸入行為。
   /// 抑或是剛剛敲字遞交給客體應用、準備新的輸入行為。
   class Empty: InputStateProtocol {
+    var node: SymbolNode = .init("")
+    var attributedString: NSAttributedString = .init()
+    var data: StateData = .init()
+    var textToCommit: String = ""
+    var tooltip: String = ""
     let hasBuffer: Bool = false
     let isCandidateContainer: Bool = false
     public var type: StateType { .ofEmpty }
-    let composingBuffer: String = ""
+    let displayedText: String = ""
   }
 
   // MARK: -
 
-  /// .EmptyIgnoringPreviousState: 與 Empty 類似，
+  /// .Abortion: 與 Empty 類似，
   /// 但會扔掉上一個狀態的內容、不將這些內容遞交給客體應用。
   /// 該狀態在處理完畢之後會被立刻切換至 .Empty()。
-  class EmptyIgnoringPreviousState: Empty {
-    override public var type: StateType { .ofEmptyIgnoringPreviousState }
+  class Abortion: Empty {
+    override public var type: StateType { .ofAbortion }
   }
 
   // MARK: -
 
   /// .Committing: 該狀態會承載要遞交出去的內容，讓輸入法控制器處理時代為遞交。
   class Committing: InputStateProtocol {
+    var node: SymbolNode = .init("")
+    var attributedString: NSAttributedString = .init()
+    var data: StateData = .init()
+    var tooltip: String = ""
+    var textToCommit: String = ""
+    let displayedText: String = ""
     let hasBuffer: Bool = false
     let isCandidateContainer: Bool = false
     public var type: StateType { .ofCommitting }
-    private(set) var textToCommit: String = ""
 
-    convenience init(textToCommit: String) {
-      self.init()
+    init(textToCommit: String) {
       self.textToCommit = textToCommit
       ChineseConverter.ensureCurrencyNumerals(target: &self.textToCommit)
     }
@@ -113,26 +107,29 @@ public enum InputState {
 
   /// .AssociatedPhrases: 逐字選字模式內的聯想詞輸入狀態。
   /// 因為逐字選字模式不需要在組字區內存入任何東西，所以該狀態不受 .NotEmpty 的管轄。
-  class AssociatedPhrases: InputStateProtocol {
+  class Associates: InputStateProtocol {
+    var node: SymbolNode = .init("")
+    var attributedString: NSAttributedString = .init()
+    var data: StateData = .init()
+    var textToCommit: String = ""
+    var tooltip: String = ""
+    let displayedText: String = ""
     let hasBuffer: Bool = false
     let isCandidateContainer: Bool = true
-    public var type: StateType { .ofAssociatedPhrases }
-    private(set) var candidates: [(String, String)] = []
-    private(set) var isTypingVertical: Bool = false
-    init(candidates: [(String, String)], isTypingVertical: Bool) {
-      self.candidates = candidates
-      self.isTypingVertical = isTypingVertical
-    }
-
-    var attributedString: NSMutableAttributedString {
-      let attributedString = NSMutableAttributedString(
-        string: " ",
-        attributes: [
-          .underlineStyle: NSUnderlineStyle.single.rawValue,
-          .markedClauseSegment: 0,
-        ]
-      )
-      return attributedString
+    public var type: StateType { .ofAssociates }
+    var candidates: [(String, String)] { data.candidates }
+    init(candidates: [(String, String)]) {
+      data.candidates = candidates
+      attributedString = {
+        let attributedString = NSMutableAttributedString(
+          string: " ",
+          attributes: [
+            .underlineStyle: NSUnderlineStyle.single.rawValue,
+            .markedClauseSegment: 0,
+          ]
+        )
+        return attributedString
+      }()
     }
   }
 
@@ -145,27 +142,32 @@ public enum InputState {
   /// - .ChoosingCandidate: 叫出選字窗、允許使用者選字。
   /// - .SymbolTable: 波浪鍵符號選單專用的狀態，有自身的特殊處理。
   class NotEmpty: InputStateProtocol {
+    var node: SymbolNode = .init("")
+    var attributedString: NSAttributedString = .init()
+    var data: StateData = .init()
+    var tooltip: String = ""
+    var textToCommit: String = ""
     let hasBuffer: Bool = true
     var isCandidateContainer: Bool { false }
     public var type: StateType { .ofNotEmpty }
-    private(set) var composingBuffer: String
+    private(set) var displayedText: String
     private(set) var cursorIndex: Int = 0 { didSet { cursorIndex = max(cursorIndex, 0) } }
     private(set) var reading: String = ""
     private(set) var nodeValuesArray = [String]()
-    public var composingBufferConverted: String {
-      let converted = IME.kanjiConversionIfRequired(composingBuffer)
-      if converted.utf16.count != composingBuffer.utf16.count
-        || converted.count != composingBuffer.count
+    public var displayedTextConverted: String {
+      let converted = IME.kanjiConversionIfRequired(displayedText)
+      if converted.utf16.count != displayedText.utf16.count
+        || converted.count != displayedText.count
       {
-        return composingBuffer
+        return displayedText
       }
       return converted
     }
 
-    public var committingBufferConverted: String { composingBufferConverted }
+    public var committingBufferConverted: String { displayedTextConverted }
 
-    init(composingBuffer: String, cursorIndex: Int, reading: String = "", nodeValuesArray: [String] = []) {
-      self.composingBuffer = composingBuffer
+    init(displayedText: String, cursorIndex: Int, reading: String = "", nodeValuesArray: [String] = []) {
+      self.displayedText = displayedText
       self.reading = reading
       // 為了簡化運算，將 reading 本身也變成一個字詞節點。
       if !reading.isEmpty {
@@ -189,25 +191,26 @@ public enum InputState {
       } else {
         self.nodeValuesArray = nodeValuesArray
       }
-      defer { self.cursorIndex = cursorIndex }
-    }
-
-    var attributedString: NSMutableAttributedString {
-      /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
-      /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
-      let attributedString = NSMutableAttributedString(string: composingBufferConverted)
-      var newBegin = 0
-      for (i, neta) in nodeValuesArray.enumerated() {
-        attributedString.setAttributes(
-          [
-            /// 不能用 .thick，否則會看不到游標。
-            .underlineStyle: NSUnderlineStyle.single.rawValue,
-            .markedClauseSegment: i,
-          ], range: NSRange(location: newBegin, length: neta.utf16.count)
-        )
-        newBegin += neta.utf16.count
+      defer {
+        self.cursorIndex = cursorIndex
+        self.attributedString = {
+          /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
+          /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
+          let attributedString = NSMutableAttributedString(string: displayedTextConverted)
+          var newBegin = 0
+          for (i, neta) in nodeValuesArray.enumerated() {
+            attributedString.setAttributes(
+              [
+                /// 不能用 .thick，否則會看不到游標。
+                .underlineStyle: NSUnderlineStyle.single.rawValue,
+                .markedClauseSegment: i,
+              ], range: NSRange(location: newBegin, length: neta.utf16.count)
+            )
+            newBegin += neta.utf16.count
+          }
+          return attributedString
+        }()
       }
-      return attributedString
     }
   }
 
@@ -216,23 +219,20 @@ public enum InputState {
   /// .Inputting: 使用者輸入了內容。此時會出現組字區（Compositor）。
   class Inputting: NotEmpty {
     override public var type: StateType { .ofInputting }
-    var textToCommit: String = ""
-    var tooltip: String = ""
-
     override public var committingBufferConverted: String {
       let committingBuffer = nodeValuesArray.joined()
       let converted = IME.kanjiConversionIfRequired(committingBuffer)
-      if converted.utf16.count != composingBuffer.utf16.count
-        || converted.count != composingBuffer.count
+      if converted.utf16.count != displayedText.utf16.count
+        || converted.count != displayedText.count
       {
-        return composingBuffer
+        return displayedText
       }
       return converted
     }
 
-    override init(composingBuffer: String, cursorIndex: Int, reading: String = "", nodeValuesArray: [String] = []) {
+    override init(displayedText: String, cursorIndex: Int, reading: String = "", nodeValuesArray: [String] = []) {
       super.init(
-        composingBuffer: composingBuffer, cursorIndex: cursorIndex, reading: reading, nodeValuesArray: nodeValuesArray
+        displayedText: displayedText, cursorIndex: cursorIndex, reading: reading, nodeValuesArray: nodeValuesArray
       )
     }
   }
@@ -247,8 +247,8 @@ public enum InputState {
     private(set) var markerIndex: Int = 0 { didSet { markerIndex = max(markerIndex, 0) } }
     private(set) var markedRange: Range<Int>
     private var literalMarkedRange: Range<Int> {
-      let lowerBoundLiteral = composingBuffer.charIndexLiteral(from: markedRange.lowerBound)
-      let upperBoundLiteral = composingBuffer.charIndexLiteral(from: markedRange.upperBound)
+      let lowerBoundLiteral = displayedText.charIndexLiteral(from: markedRange.lowerBound)
+      let upperBoundLiteral = displayedText.charIndexLiteral(from: markedRange.upperBound)
       return lowerBoundLiteral..<upperBoundLiteral
     }
 
@@ -274,8 +274,9 @@ public enum InputState {
     }
 
     private var markedTargetExists = false
-    var tooltip: String {
-      if composingBuffer.count != readings.count {
+
+    var tooltipForMarking: String {
+      if displayedText.count != readings.count {
         ctlInputMethod.tooltipController.setColor(state: .redAlert)
         return NSLocalizedString(
           "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.", comment: ""
@@ -291,7 +292,7 @@ public enum InputState {
         return ""
       }
 
-      let text = composingBuffer.utf16SubString(with: markedRange)
+      let text = displayedText.utf16SubString(with: markedRange)
       if literalMarkedRange.count < allowedMarkRange.lowerBound {
         ctlInputMethod.tooltipController.setColor(state: .denialInsufficiency)
         return String(
@@ -331,71 +332,73 @@ public enum InputState {
       )
     }
 
-    var tooltipForInputting: String = ""
+    var tooltipBackupForInputting: String = ""
     private(set) var readings: [String]
 
     init(
-      composingBuffer: String, cursorIndex: Int, markerIndex: Int, readings: [String], nodeValuesArray: [String] = []
+      displayedText: String, cursorIndex: Int, markerIndex: Int, readings: [String], nodeValuesArray: [String] = []
     ) {
       let begin = min(cursorIndex, markerIndex)
       let end = max(cursorIndex, markerIndex)
       markedRange = begin..<end
       self.readings = readings
       super.init(
-        composingBuffer: composingBuffer, cursorIndex: cursorIndex, nodeValuesArray: nodeValuesArray
+        displayedText: displayedText, cursorIndex: cursorIndex, nodeValuesArray: nodeValuesArray
       )
-      defer { self.markerIndex = markerIndex }
-    }
+      defer {
+        self.markerIndex = markerIndex
+        tooltip = tooltipForMarking
+        attributedString = {
+          /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
+          /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
+          let attributedString = NSMutableAttributedString(string: displayedTextConverted)
+          let end = markedRange.upperBound
 
-    override var attributedString: NSMutableAttributedString {
-      /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
-      /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
-      let attributedString = NSMutableAttributedString(string: composingBufferConverted)
-      let end = markedRange.upperBound
-
-      attributedString.setAttributes(
-        [
-          .underlineStyle: NSUnderlineStyle.single.rawValue,
-          .markedClauseSegment: 0,
-        ], range: NSRange(location: 0, length: markedRange.lowerBound)
-      )
-      attributedString.setAttributes(
-        [
-          .underlineStyle: NSUnderlineStyle.thick.rawValue,
-          .markedClauseSegment: 1,
-        ],
-        range: NSRange(
-          location: markedRange.lowerBound,
-          length: markedRange.upperBound - markedRange.lowerBound
-        )
-      )
-      attributedString.setAttributes(
-        [
-          .underlineStyle: NSUnderlineStyle.single.rawValue,
-          .markedClauseSegment: 2,
-        ],
-        range: NSRange(
-          location: end,
-          length: composingBuffer.utf16.count - end
-        )
-      )
-      return attributedString
+          attributedString.setAttributes(
+            [
+              .underlineStyle: NSUnderlineStyle.single.rawValue,
+              .markedClauseSegment: 0,
+            ], range: NSRange(location: 0, length: markedRange.lowerBound)
+          )
+          attributedString.setAttributes(
+            [
+              .underlineStyle: NSUnderlineStyle.thick.rawValue,
+              .markedClauseSegment: 1,
+            ],
+            range: NSRange(
+              location: markedRange.lowerBound,
+              length: markedRange.upperBound - markedRange.lowerBound
+            )
+          )
+          attributedString.setAttributes(
+            [
+              .underlineStyle: NSUnderlineStyle.single.rawValue,
+              .markedClauseSegment: 2,
+            ],
+            range: NSRange(
+              location: end,
+              length: displayedText.utf16.count - end
+            )
+          )
+          return attributedString
+        }()
+      }
     }
 
     var convertedToInputting: Inputting {
       let state = Inputting(
-        composingBuffer: composingBuffer, cursorIndex: cursorIndex, reading: reading, nodeValuesArray: nodeValuesArray
+        displayedText: displayedText, cursorIndex: cursorIndex, reading: reading, nodeValuesArray: nodeValuesArray
       )
-      state.tooltip = tooltipForInputting
+      state.tooltip = tooltipBackupForInputting
       return state
     }
 
-    var validToFilter: Bool { markedTargetExists ? allowedMarkRange.contains(literalMarkedRange.count) : false }
+    var isFilterable: Bool { markedTargetExists ? allowedMarkRange.contains(literalMarkedRange.count) : false }
 
-    var bufferReadingCountMisMatch: Bool { composingBuffer.count != readings.count }
+    var bufferReadingCountMisMatch: Bool { displayedText.count != readings.count }
 
     var chkIfUserPhraseExists: Bool {
-      let text = composingBuffer.utf16SubString(with: markedRange)
+      let text = displayedText.utf16SubString(with: markedRange)
       let selectedReadings = readings[literalMarkedRange]
       let joined = selectedReadings.joined(separator: "-")
       return mgrLangModel.checkIfUserPhraseExist(
@@ -404,7 +407,7 @@ public enum InputState {
     }
 
     var userPhrase: String {
-      let text = composingBuffer.utf16SubString(with: markedRange)
+      let text = displayedText.utf16SubString(with: markedRange)
       let selectedReadings = readings[literalMarkedRange]
       let joined = selectedReadings.joined(separator: "-")
       let nerfedScore = ctlInputMethod.areWeNerfing && markedTargetExists ? " -114.514" : ""
@@ -413,7 +416,7 @@ public enum InputState {
 
     var userPhraseConverted: String {
       let text =
-        ChineseConverter.crossConvert(composingBuffer.utf16SubString(with: markedRange)) ?? ""
+        ChineseConverter.crossConvert(displayedText.utf16SubString(with: markedRange)) ?? ""
       let selectedReadings = readings[literalMarkedRange]
       let joined = selectedReadings.joined(separator: "-")
       let nerfedScore = ctlInputMethod.areWeNerfing && markedTargetExists ? " -114.514" : ""
@@ -427,9 +430,8 @@ public enum InputState {
   /// .ChoosingCandidate: 叫出選字窗、允許使用者選字。
   class ChoosingCandidate: NotEmpty {
     override var isCandidateContainer: Bool { true }
-    override public var type: StateType { .ofChoosingCandidate }
-    private(set) var candidates: [(String, String)]
-    private(set) var isTypingVertical: Bool
+    override public var type: StateType { .ofCandidates }
+    var candidates: [(String, String)]
     // 該變數改為可以隨時更改的內容，不然的話 ctlInputMethod.candidateSelectionChanged() 會上演俄羅斯套娃（崩潰）。
     public var chosenCandidateString: String = "" {
       didSet {
@@ -443,76 +445,11 @@ public enum InputState {
     }
 
     init(
-      composingBuffer: String, cursorIndex: Int, candidates: [(String, String)], isTypingVertical: Bool,
+      displayedText: String, cursorIndex: Int, candidates: [(String, String)],
       nodeValuesArray: [String] = []
     ) {
       self.candidates = candidates
-      self.isTypingVertical = isTypingVertical
-      super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex, nodeValuesArray: nodeValuesArray)
-    }
-
-    // 這個函式尚未經過嚴格的單元測試。請在使用時確保 chosenCandidateString 為空。
-    // 不為空的話，該參數的返回值就會有對應的影響、顯示成類似 macOS 內建注音輸入法那樣子。
-    // 本來想給輸入法拓展這方面的功能的，奈何 ctlInputMethod.candidateSelectionChanged() 這函式太氣人。
-    // 想要講的幹話已經在那邊講完了，感興趣的可以去看看。
-    override var attributedString: NSMutableAttributedString {
-      guard !chosenCandidateString.isEmpty else { return super.attributedString }
-      let bufferTextRear = composingBuffer.utf16SubString(with: 0..<cursorIndex)
-      let bufferTextFront = composingBuffer.utf16SubString(with: cursorIndex..<(composingBuffer.utf16.count))
-      let cursorIndexU8 = bufferTextRear.count - 1
-      // 排除一些不應該出現的情形。
-      if (mgrPrefs.useRearCursorMode && bufferTextFront.count < chosenCandidateString.count)
-        || (!mgrPrefs.useRearCursorMode && bufferTextRear.count < chosenCandidateString.count)
-      {
-        return super.attributedString
-      }
-      // u16Range 是用來畫線的，因為 NSAttributedString 只認 NSRange。
-      let u16Range: Range<Int> = {
-        switch mgrPrefs.useRearCursorMode {
-          case false: return (max(0, cursorIndex - chosenCandidateString.utf16.count))..<cursorIndex
-          case true:
-            return
-              cursorIndex..<min(cursorIndex + chosenCandidateString.utf16.count, composingBuffer.utf16.count - 1)
-        }
-      }()
-      // u8Range 是用來計算字串的。
-      let u8Range: Range<Int> = {
-        switch mgrPrefs.useRearCursorMode {
-          case false: return (max(0, cursorIndexU8 - chosenCandidateString.count))..<cursorIndexU8
-          case true:
-            return cursorIndexU8..<min(cursorIndexU8 + chosenCandidateString.count, composingBuffer.count - 1)
-        }
-      }()
-      let strSegmentedRear = composingBuffer.charComponents[0..<u8Range.lowerBound].joined()
-      let strSegmentedFront = composingBuffer.charComponents[u8Range.upperBound...].joined()
-      let newBufferConverted: String = NotEmpty(
-        composingBuffer: strSegmentedRear + chosenCandidateString + strSegmentedFront, cursorIndex: 0
-      ).composingBufferConverted
-      guard newBufferConverted.count == composingBuffer.count else { return super.attributedString }
-
-      /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
-      /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
-      let attributedStringResult = NSMutableAttributedString(string: newBufferConverted)
-      attributedStringResult.setAttributes(
-        [
-          .underlineStyle: NSUnderlineStyle.single.rawValue,
-          .markedClauseSegment: 0,
-        ], range: NSRange(location: 0, length: u16Range.lowerBound)
-      )
-      attributedStringResult.setAttributes(
-        [
-          .underlineStyle: NSUnderlineStyle.thick.rawValue,
-          .markedClauseSegment: 1,
-        ], range: NSRange(location: u16Range.lowerBound, length: u16Range.count)
-      )
-      attributedStringResult.setAttributes(
-        [
-          .underlineStyle: NSUnderlineStyle.single.rawValue,
-          .markedClauseSegment: 2,
-        ], range: NSRange(location: u16Range.upperBound, length: newBufferConverted.utf16.count)
-      )
-
-      return attributedStringResult
+      super.init(displayedText: displayedText, cursorIndex: cursorIndex, nodeValuesArray: nodeValuesArray)
     }
   }
 
@@ -521,34 +458,31 @@ public enum InputState {
   /// .SymbolTable: 波浪鍵符號選單專用的狀態，有自身的特殊處理。
   class SymbolTable: ChoosingCandidate {
     override public var type: StateType { .ofSymbolTable }
-    var node: SymbolNode
 
-    init(node: SymbolNode, previous: SymbolNode? = nil, isTypingVertical: Bool) {
+    init(node: SymbolNode, previous: SymbolNode? = nil) {
+      super.init(displayedText: "", cursorIndex: 0, candidates: [])
       self.node = node
       if let previous = previous {
         self.node.previous = previous
       }
       let candidates = node.children?.map(\.title) ?? [String]()
-      super.init(
-        composingBuffer: "", cursorIndex: 0, candidates: candidates.map { ("", $0) },
-        isTypingVertical: isTypingVertical
-      )
-    }
+      self.candidates = candidates.map { ("", $0) }
 
-    // InputState.SymbolTable 這個狀態比較特殊，不能把真空組字區交出去。
-    // 不然的話，在絕大多數終端機類應用當中、以及在 MS Word 等軟體當中
-    // 會出現符號選字窗無法響應方向鍵的問題。
-    // 如有誰要修奇摩注音的一點通選單的話，修復原理也是一樣的。
-    // Crediting Qwertyyb: https://github.com/qwertyyb/Fire/issues/55#issuecomment-1133497700
-    override var attributedString: NSMutableAttributedString {
-      let attributedString = NSMutableAttributedString(
-        string: " ",
-        attributes: [
-          .underlineStyle: NSUnderlineStyle.single.rawValue,
-          .markedClauseSegment: 0,
-        ]
-      )
-      return attributedString
+      // InputState.SymbolTable 這個狀態比較特殊，不能把真空組字區交出去。
+      // 不然的話，在絕大多數終端機類應用當中、以及在 MS Word 等軟體當中
+      // 會出現符號選字窗無法響應方向鍵的問題。
+      // 如有誰要修奇摩注音的一點通選單的話，修復原理也是一樣的。
+      // Crediting Qwertyyb: https://github.com/qwertyyb/Fire/issues/55#issuecomment-1133497700
+      attributedString = {
+        let attributedString = NSMutableAttributedString(
+          string: " ",
+          attributes: [
+            .underlineStyle: NSUnderlineStyle.single.rawValue,
+            .markedClauseSegment: 0,
+          ]
+        )
+        return attributedString
+      }()
     }
   }
 }

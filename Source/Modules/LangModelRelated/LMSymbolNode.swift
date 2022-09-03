@@ -10,7 +10,7 @@
 
 import Foundation
 
-class SymbolNode {
+public class SymbolNode {
   var title: String
   var children: [SymbolNode]?
   var previous: SymbolNode?

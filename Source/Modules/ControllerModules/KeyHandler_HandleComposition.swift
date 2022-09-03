@@ -62,7 +62,7 @@ extension KeyHandler {
       composer.receiveKey(fromString: input.text)
       keyConsumedByReading = true
 
-      // 沒有調號的話，只需要 updateClientComposingBuffer() 且終止處理（return true）即可。
+      // 沒有調號的話，只需要 updateClientdisplayedText() 且終止處理（return true）即可。
       // 有調號的話，則不需要這樣，而是轉而繼續在此之後的處理。
       if !composer.hasToneMarker() {
         stateCallback(buildInputtingState)
@@ -100,7 +100,7 @@ extension KeyHandler {
         switch compositor.isEmpty {
           case false: stateCallback(buildInputtingState)
           case true:
-            stateCallback(InputState.EmptyIgnoringPreviousState())
+            stateCallback(InputState.Abortion())
             stateCallback(InputState.Empty())
         }
         return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了。
@@ -118,7 +118,7 @@ extension KeyHandler {
       // 之後就是更新組字區了。先清空注拼槽的內容。
       composer.clear()
 
-      // 再以回呼組字狀態的方式來執行 updateClientComposingBuffer()。
+      // 再以回呼組字狀態的方式來執行 updateClientdisplayedText()。
       let inputting = buildInputtingState
       stateCallback(inputting)
 
@@ -157,7 +157,7 @@ extension KeyHandler {
 
     /// 是說此時注拼槽並非為空、卻還沒組音。這種情況下只可能是「注拼槽內只有聲調」。
     if keyConsumedByReading {
-      // 以回呼組字狀態的方式來執行 updateClientComposingBuffer()。
+      // 以回呼組字狀態的方式來執行 updateClientdisplayedText()。
       stateCallback(buildInputtingState)
       return true
     }

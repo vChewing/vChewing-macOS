@@ -27,7 +27,7 @@ extension ctlInputMethod {
         handle(state: newState, previous: prevState)
       case let newState as InputState.Empty:
         handle(state: newState, previous: prevState)
-      case let newState as InputState.EmptyIgnoringPreviousState:
+      case let newState as InputState.Abortion:
         handle(state: newState, previous: prevState)
       case let newState as InputState.Committing:
         handle(state: newState, previous: prevState)
@@ -37,7 +37,7 @@ extension ctlInputMethod {
         handle(state: newState, previous: prevState)
       case let newState as InputState.ChoosingCandidate:
         handle(state: newState, previous: prevState)
-      case let newState as InputState.AssociatedPhrases:
+      case let newState as InputState.Associates:
         handle(state: newState, previous: prevState)
       case let newState as InputState.SymbolTable:
         handle(state: newState, previous: prevState)
@@ -48,7 +48,7 @@ extension ctlInputMethod {
   /// 針對受 .NotEmpty() 管轄的非空狀態，在組字區內顯示游標。
   func setInlineDisplayWithCursor() {
     guard let client = client() else { return }
-    if let state = state as? InputState.AssociatedPhrases {
+    if let state = state as? InputState.Associates {
       client.setMarkedText(
         state.attributedString, selectionRange: NSRange(location: 0, length: 0),
         replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
@@ -87,7 +87,7 @@ extension ctlInputMethod {
         [.languageIdentifier: identifier],
         range: NSRange(
           location: 0,
-          length: state.composingBuffer.utf16.count
+          length: state.displayedText.utf16.count
         )
       )
     }
@@ -141,9 +141,9 @@ extension ctlInputMethod {
     _ = state  // 防止格式整理工具毀掉與此對應的參數。
     ctlInputMethod.ctlCandidateCurrent.visible = false
     ctlInputMethod.tooltipController.hide()
-    // 全專案用以判斷「.EmptyIgnoringPreviousState」的地方僅此一處。
+    // 全專案用以判斷「.Abortion」的地方僅此一處。
     if let previous = previous as? InputState.NotEmpty,
-      !(state is InputState.EmptyIgnoringPreviousState)
+      !(state is InputState.Abortion)
     {
       commit(text: previous.committingBufferConverted)
     }
@@ -156,7 +156,7 @@ extension ctlInputMethod {
   }
 
   private func handle(
-    state: InputState.EmptyIgnoringPreviousState, previous: InputStateProtocol
+    state: InputState.Abortion, previous: InputStateProtocol
   ) {
     _ = state  // 防止格式整理工具毀掉與此對應的參數。
     _ = previous  // 防止格式整理工具毀掉與此對應的參數。
@@ -188,7 +188,7 @@ extension ctlInputMethod {
     setInlineDisplayWithCursor()
     if !state.tooltip.isEmpty {
       show(
-        tooltip: state.tooltip, composingBuffer: state.composingBuffer,
+        tooltip: state.tooltip, displayedText: state.displayedText,
         cursorIndex: state.cursorIndex
       )
     }
@@ -202,7 +202,7 @@ extension ctlInputMethod {
       ctlInputMethod.tooltipController.hide()
     } else {
       show(
-        tooltip: state.tooltip, composingBuffer: state.composingBuffer,
+        tooltip: state.tooltip, displayedText: state.displayedText,
         cursorIndex: state.markerIndex
       )
     }
@@ -222,7 +222,7 @@ extension ctlInputMethod {
     show(candidateWindowWith: state)
   }
 
-  private func handle(state: InputState.AssociatedPhrases, previous: InputStateProtocol) {
+  private func handle(state: InputState.Associates, previous: InputStateProtocol) {
     _ = previous  // 防止格式整理工具毀掉與此對應的參數。
     ctlInputMethod.tooltipController.hide()
     setInlineDisplayWithCursor()
