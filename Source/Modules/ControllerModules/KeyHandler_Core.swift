@@ -215,12 +215,9 @@ public class KeyHandler {
     let theCandidate: Megrez.Compositor.Candidate = .init(key: candidate.0, value: candidate.1)
 
     /// 必須先鞏固當前組字器游標上下文、以消滅意料之外的影響，但在內文組字區內就地輪替候選字詞時除外。
-    if preConsolidate {
-      consolidateCursorContext(with: theCandidate)
-    }
+    if preConsolidate { consolidateCursorContext(with: theCandidate) }
 
     // 回到正常流程。
-
     if !compositor.overrideCandidate(theCandidate, at: actualCandidateCursor) { return }
     let previousWalk = compositor.walkedNodes
     // 開始爬軌。
