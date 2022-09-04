@@ -107,11 +107,9 @@ public class KeyHandler {
     // 在偵錯模式開啟時，將 GraphViz 資料寫入至指定位置。
     if mgrPrefs.isDebugModeEnabled {
       let result = compositor.dumpDOT
+      let appSupportPath = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].path.appending("vChewing-visualization.dot")
       do {
-        try result.write(
-          toFile: "/private/var/tmp/vChewing-visualization.dot",
-          atomically: true, encoding: .utf8
-        )
+        try result.write(toFile: appSupportPath, atomically: true, encoding: .utf8)
       } catch {
         IME.prtDebugIntel("Failed from writing dumpDOT results.")
       }
