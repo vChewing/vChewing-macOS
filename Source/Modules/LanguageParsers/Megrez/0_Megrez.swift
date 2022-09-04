@@ -4,9 +4,7 @@
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
 /// The namespace for this package.
-public enum Megrez {
-  public typealias KeyValuePaired = Compositor.Candidate  // 相容性措施。
-}
+public enum Megrez {}
 
 // 著作權聲明：
 // 除了 Megrez 專有的修改與實作以外，該套件所有程式邏輯來自於 Gramambular、算法歸 Lukhnos Liu 所有。

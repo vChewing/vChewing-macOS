@@ -120,7 +120,7 @@ public class KeyHandler {
   /// - Parameter key: 給定的聯想詞的開頭字。
   /// - Returns: 抓取到的聯想詞陣列。
   /// 不會是 nil，但那些負責接收結果的函式會對空白陣列結果做出正確的處理。
-  func buildAssociatePhraseArray(withPair pair: Megrez.Compositor.Candidate) -> [(String, String)] {
+  func buildAssociatePhraseArray(withPair pair: Megrez.Compositor.KeyValuePaired) -> [(String, String)] {
     var arrResult: [(String, String)] = []
     if currentLM.hasAssociatedPhrasesFor(pair: pair) {
       arrResult = currentLM.associatedPhrasesFor(pair: pair).map { ("", $0) }
@@ -142,7 +142,7 @@ public class KeyHandler {
   /// 威注音輸入法截至 v1.9.3 SP2 版為止都受到上游的這個 Bug 的影響，且在 v1.9.4 版利用該函式修正了這個缺陷。
   /// 該修正必須搭配至少天權星組字引擎 v2.0.2 版方可生效。算法可能比較囉唆，但至少在常用情形下不會再發生該問題。
   /// - Parameter theCandidate: 要拿來覆寫的詞音配對。
-  func consolidateCursorContext(with theCandidate: Megrez.Compositor.Candidate) {
+  func consolidateCursorContext(with theCandidate: Megrez.Compositor.KeyValuePaired) {
     var grid = compositor
     var frontBoundaryEX = actualCandidateCursor + 1
     var rearBoundaryEX = actualCandidateCursor
@@ -193,7 +193,7 @@ public class KeyHandler {
         let values = currentNode.currentPair.value.charComponents
         for (subPosition, key) in currentNode.keyArray.enumerated() {
           guard values.count > subPosition else { break }  // 防呆，應該沒有發生的可能性
-          let thePair = Megrez.Compositor.Candidate(
+          let thePair = Megrez.Compositor.KeyValuePaired(
             key: key, value: values[subPosition]
           )
           compositor.overrideCandidate(thePair, at: position)
@@ -212,7 +212,7 @@ public class KeyHandler {
   ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字後的節錨的前方。
   ///   - consolidate: 在固化節點之前，先鞏固上下文。該選項可能會破壞在內文組字區內就地輪替候選字詞時的體驗。
   func fixNode(candidate: (String, String), respectCursorPushing: Bool = true, preConsolidate: Bool = false) {
-    let theCandidate: Megrez.Compositor.Candidate = .init(key: candidate.0, value: candidate.1)
+    let theCandidate: Megrez.Compositor.KeyValuePaired = .init(key: candidate.0, value: candidate.1)
 
     /// 必須先鞏固當前組字器游標上下文、以消滅意料之外的影響，但在內文組字區內就地輪替候選字詞時除外。
     if preConsolidate { consolidateCursorContext(with: theCandidate) }
@@ -256,7 +256,7 @@ public class KeyHandler {
   func getCandidatesArray(fixOrder: Bool = true) -> [(String, String)] {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
-    var arrCandidates: [Megrez.Compositor.Candidate] = {
+    var arrCandidates: [Megrez.Compositor.KeyValuePaired] = {
       switch mgrPrefs.useRearCursorMode {
         case false:
           return compositor.fetchCandidates(at: actualCandidateCursor, filter: .endAt)
@@ -276,8 +276,8 @@ public class KeyHandler {
     }
 
     let arrSuggestedUnigrams: [(String, Megrez.Unigram)] = fetchSuggestionsFromUOM(apply: false)
-    let arrSuggestedCandidates: [Megrez.Compositor.Candidate] = arrSuggestedUnigrams.map {
-      Megrez.Compositor.Candidate(key: $0.0, value: $0.1.value)
+    let arrSuggestedCandidates: [Megrez.Compositor.KeyValuePaired] = arrSuggestedUnigrams.map {
+      Megrez.Compositor.KeyValuePaired(key: $0.0, value: $0.1.value)
     }
     arrCandidates = arrSuggestedCandidates.filter { arrCandidates.contains($0) } + arrCandidates
     arrCandidates = arrCandidates.deduplicate
@@ -302,7 +302,7 @@ public class KeyHandler {
       if !suggestion.isEmpty, let newestSuggestedCandidate = suggestion.candidates.last {
         let overrideBehavior: Megrez.Compositor.Node.OverrideType =
           suggestion.forceHighScoreOverride ? .withHighScore : .withTopUnigramScore
-        let suggestedPair: Megrez.Compositor.Candidate = .init(
+        let suggestedPair: Megrez.Compositor.KeyValuePaired = .init(
           key: newestSuggestedCandidate.0, value: newestSuggestedCandidate.1.value
         )
         IME.prtDebugIntel(

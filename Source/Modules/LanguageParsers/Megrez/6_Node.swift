@@ -42,7 +42,7 @@ extension Megrez.Compositor {
       didSet { currentUnigramIndex = min(max(0, currentUnigramIndex), unigrams.count - 1) }
     }
 
-    public var currentPair: Megrez.Compositor.Candidate { .init(key: key, value: value) }
+    public var currentPair: Megrez.Compositor.KeyValuePaired { .init(key: key, value: value) }
 
     public func hash(into hasher: inout Hasher) {
       hasher.combine(key)
@@ -70,8 +70,12 @@ extension Megrez.Compositor {
       overrideType = .withNoOverrides
     }
 
+    /// 檢查當前節點是否「讀音字長與候選字字長不一致」。
+    public var isReadingMismatched: Bool {
+      keyArray.count != value.count
+    }
+
     /// 給出目前的最高權重單元圖。該結果可能會受節點覆寫狀態所影響。
-    /// - Returns: 目前的最高權重單元圖。該結果可能會受節點覆寫狀態所影響。
     public var currentUnigram: Megrez.Unigram {
       unigrams.isEmpty ? .init() : unigrams[currentUnigramIndex]
     }

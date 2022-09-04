@@ -319,8 +319,8 @@ extension vChewing.LMUserOverride {
 
     // 前置單元只記錄讀音，在其後的單元則同時記錄讀音與字詞
     let strCurrent = kvCurrent.key
-    var kvPrevious = Megrez.Compositor.Candidate()
-    var kvAnterior = Megrez.Compositor.Candidate()
+    var kvPrevious = Megrez.Compositor.KeyValuePaired()
+    var kvAnterior = Megrez.Compositor.KeyValuePaired()
     var readingStack = ""
     var trigramKey: String { "(\(kvAnterior.toNGramKey),\(kvPrevious.toNGramKey),\(strCurrent))" }
     var result: String {

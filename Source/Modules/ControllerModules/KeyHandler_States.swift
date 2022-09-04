@@ -148,7 +148,7 @@ extension KeyHandler {
   ///   - key: 給定的索引鍵（也就是給定的聯想詞的開頭字）。
   /// - Returns: 回呼一個新的聯想詞狀態，來就給定的聯想詞陣列資料內容顯示選字窗。
   func buildAssociatePhraseState(
-    withPair pair: Megrez.Compositor.Candidate
+    withPair pair: Megrez.Compositor.KeyValuePaired
   ) -> InputState.Associates! {
     // 上一行必須要用驚嘆號，否則 Xcode 會誤導你砍掉某些實際上必需的語句。
     InputState.Associates(

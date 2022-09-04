@@ -23,7 +23,15 @@ extension Megrez {
     /// 公開：多字讀音鍵當中用以分割漢字讀音的記號的預設值，是「-」。
     public static let kDefaultSeparator: String = "-"
     /// 該組字器的游標位置。
-    public var cursor: Int = 0 { didSet { cursor = max(0, min(cursor, length)) } }
+    public var cursor: Int = 0 {
+      didSet {
+        cursor = max(0, min(cursor, length))
+        marker = cursor
+      }
+    }
+
+    /// 該組字器的標記器位置。
+    public var marker: Int = 0 { didSet { marker = max(0, min(marker, length)) } }
     /// 公開：多字讀音鍵當中用以分割漢字讀音的記號，預設為「-」。
     public var separator = kDefaultSeparator
     /// 公開：組字器內已經插入的單筆索引鍵的數量。
@@ -88,36 +96,45 @@ extension Megrez {
     }
 
     /// 按幅位來前後移動游標。
-    /// - Parameter direction: 移動方向。
+    /// - Parameters:
+    ///   - direction: 移動方向。
+    ///   - isMarker: 要移動的是否為選擇標記（而非游標）。
     /// - Returns: 該操作是否順利完成。
-    @discardableResult public mutating func jumpCursorBySpan(to direction: TypingDirection) -> Bool {
+    @discardableResult public mutating func jumpCursorBySpan(to direction: TypingDirection, isMarker: Bool = false)
+      -> Bool
+    {
+      var target = isMarker ? marker : cursor
       switch direction {
         case .front:
-          if cursor == width { return false }
+          if target == width { return false }
         case .rear:
-          if cursor == 0 { return false }
+          if target == 0 { return false }
       }
-      guard let currentRegion = cursorRegionMap[cursor] else { return false }
+      guard let currentRegion = cursorRegionMap[target] else { return false }
 
       let aRegionForward = max(currentRegion - 1, 0)
       let currentRegionBorderRear: Int = walkedNodes[0..<currentRegion].map(\.spanLength).reduce(0, +)
-      switch cursor {
+      switch target {
         case currentRegionBorderRear:
           switch direction {
             case .front:
-              cursor =
+              target =
                 (currentRegion > walkedNodes.count)
                 ? keys.count : walkedNodes[0...currentRegion].map(\.spanLength).reduce(0, +)
             case .rear:
-              cursor = walkedNodes[0..<aRegionForward].map(\.spanLength).reduce(0, +)
+              target = walkedNodes[0..<aRegionForward].map(\.spanLength).reduce(0, +)
           }
         default:
           switch direction {
             case .front:
-              cursor = currentRegionBorderRear + walkedNodes[currentRegion].spanLength
+              target = currentRegionBorderRear + walkedNodes[currentRegion].spanLength
             case .rear:
-              cursor = currentRegionBorderRear
+              target = currentRegionBorderRear
           }
+      }
+      switch isMarker {
+        case false: cursor = target
+        case true: marker = target
       }
       return true
     }
