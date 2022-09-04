@@ -15,9 +15,10 @@ class SymbolNode {
   var children: [SymbolNode]?
   var previous: SymbolNode?
 
-  init(_ title: String, _ children: [SymbolNode]? = nil) {
+  init(_ title: String, _ children: [SymbolNode]? = nil, previous: SymbolNode? = nil) {
     self.title = title
     self.children = children
+    self.previous = previous
   }
 
   init(_ title: String, symbols: String) {
