@@ -19,7 +19,7 @@ extension KeyHandler {
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleComposition(
     input: InputSignalProtocol,
-    stateCallback: @escaping (InputStateProtocol) -> Void,
+    stateCallback: @escaping (IMEStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool? {
     // MARK: 注音按鍵輸入處理 (Handle BPMF Keys)
@@ -100,8 +100,7 @@ extension KeyHandler {
         switch compositor.isEmpty {
           case false: stateCallback(buildInputtingState)
           case true:
-            stateCallback(InputState.Abortion())
-            stateCallback(InputState.Empty())
+            stateCallback(IMEState.Abortion())
         }
         return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了。
       }
@@ -124,31 +123,26 @@ extension KeyHandler {
 
       /// 逐字選字模式的處理。
       if mgrPrefs.useSCPCTypingMode {
-        let choosingCandidates: InputState.ChoosingCandidate = buildCandidate(
+        let candidateState: IMEState = buildCandidate(
           state: inputting,
           isTypingVertical: input.isTypingVertical
         )
-        if choosingCandidates.candidates.count == 1, let firstCandidate = choosingCandidates.candidates.first {
+        if candidateState.candidates.count == 1, let firstCandidate = candidateState.candidates.first {
           let reading: String = firstCandidate.0
           let text: String = firstCandidate.1
-          stateCallback(InputState.Committing(textToCommit: text))
+          stateCallback(IMEState.Committing(textToCommit: text))
 
           if !mgrPrefs.associatedPhrasesEnabled {
-            stateCallback(InputState.Empty())
+            stateCallback(IMEState.Empty())
           } else {
-            if let associatedPhrases =
+            let associatedPhrases =
               buildAssociatePhraseState(
-                withPair: .init(key: reading, value: text),
-                isTypingVertical: input.isTypingVertical
-              ), !associatedPhrases.candidates.isEmpty
-            {
-              stateCallback(associatedPhrases)
-            } else {
-              stateCallback(InputState.Empty())
-            }
+                withPair: .init(key: reading, value: text)
+              )
+            stateCallback(associatedPhrases.candidates.isEmpty ? IMEState.Empty() : associatedPhrases)
           }
         } else {
-          stateCallback(choosingCandidates)
+          stateCallback(candidateState)
         }
       }
       // 將「這個按鍵訊號已經被輸入法攔截處理了」的結果藉由 ctlInputMethod 回報給 IMK。

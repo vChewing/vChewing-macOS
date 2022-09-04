@@ -17,101 +17,73 @@ import Foundation
 extension KeyHandler {
   // MARK: - 構築狀態（State Building）
 
-  /// 生成「正在輸入」狀態。
-  var buildInputtingState: InputState.Inputting {
+  /// 生成「正在輸入」狀態。相關的內容會被拿給狀態機械用來處理在電腦螢幕上顯示的內容。
+  var buildInputtingState: IMEState {
     /// 「更新內文組字區 (Update the composing buffer)」是指要求客體軟體將組字緩衝區的內容
     /// 換成由此處重新生成的組字字串（NSAttributeString，否則會不顯示）。
-    var tooltipParameterRef: [String] = ["", ""]
-    let nodeValuesArray: [String] = compositor.walkedNodes.values.map {
+    var displayTextSegments: [String] = compositor.walkedNodes.values.map {
       guard let delegate = delegate, delegate.isVerticalTyping else { return $0 }
       guard mgrPrefs.hardenVerticalPunctuations else { return $0 }
       var neta = $0
       ChineseConverter.hardenVerticalPunctuations(target: &neta, convert: delegate.isVerticalTyping)
       return neta
     }
+    var cursor = convertCursorForDisplay(compositor.cursor)
+    let reading = composer.getInlineCompositionForDisplay(isHanyuPinyin: mgrPrefs.showHanyuPinyinInCompositionBuffer)
+    if !reading.isEmpty {
+      var newDisplayTextSegments = [String]()
+      var temporaryNode = ""
+      var charCounter = 0
+      for node in displayTextSegments {
+        for char in node {
+          if charCounter == cursor {
+            newDisplayTextSegments.append(temporaryNode)
+            temporaryNode = ""
+            newDisplayTextSegments.append(reading)
+          }
+          temporaryNode += String(char)
+          charCounter += 1
+        }
+        newDisplayTextSegments.append(temporaryNode)
+        temporaryNode = ""
+      }
+      if newDisplayTextSegments == displayTextSegments { newDisplayTextSegments.append(reading) }
+      displayTextSegments = newDisplayTextSegments
+      cursor += reading.count
+    }
+    /// 這裡生成準備要拿來回呼的「正在輸入」狀態，但還不能立即使用，因為工具提示仍未完成。
+    return IMEState.Inputting(displayTextSegments: displayTextSegments, cursor: cursor)
+  }
+
+  /// 生成「正在輸入」狀態。
+  func convertCursorForDisplay(_ rawCursor: Int) -> Int {
     var composedStringCursorIndex = 0
     var readingCursorIndex = 0
-    /// IMK 協定的內文組字區的游標長度與游標位置無法正確統計 UTF8 高萬字（比如 emoji）的長度，
-    /// 所以在這裡必須做糾偏處理。因為在用 Swift，所以可以用「.utf16」取代「NSString.length()」。
-    /// 這樣就可以免除不必要的類型轉換。
     for theNode in compositor.walkedNodes {
       let strNodeValue = theNode.value
-      let arrSplit: [String] = Array(strNodeValue).charComponents
-      let codepointCount = arrSplit.count
       /// 藉下述步驟重新將「可見游標位置」對齊至「組字器內的游標所在的讀音位置」。
       /// 每個節錨（NodeAnchor）都有自身的幅位長度（spanningLength），可以用來
       /// 累加、以此為依據，來校正「可見游標位置」。
-      let spanningLength: Int = theNode.spanLength
-      if readingCursorIndex + spanningLength <= compositor.cursor {
-        composedStringCursorIndex += strNodeValue.utf16.count
+      let spanningLength: Int = theNode.keyArray.count
+      if readingCursorIndex + spanningLength <= rawCursor {
+        composedStringCursorIndex += strNodeValue.count
         readingCursorIndex += spanningLength
         continue
       }
-      if codepointCount == spanningLength {
-        for i in 0..<codepointCount {
-          guard readingCursorIndex < compositor.cursor else { continue }
-          composedStringCursorIndex += arrSplit[i].utf16.count
+      if !theNode.isReadingMismatched {
+        for _ in 0..<strNodeValue.count {
+          guard readingCursorIndex < rawCursor else { continue }
+          composedStringCursorIndex += 1
           readingCursorIndex += 1
         }
         continue
       }
-      guard readingCursorIndex < compositor.cursor else { continue }
-      composedStringCursorIndex += strNodeValue.utf16.count
+      guard readingCursorIndex < rawCursor else { continue }
+      composedStringCursorIndex += strNodeValue.count
       readingCursorIndex += spanningLength
-      readingCursorIndex = min(readingCursorIndex, compositor.cursor)
-      /// 接下來再處理這麼一種情況：
-      /// 某些錨點內的當前候選字詞長度與讀音長度不相等。
-      /// 但此時游標還是按照每個讀音單位來移動的，
-      /// 所以需要上下文工具提示來顯示游標的相對位置。
-      /// 這裡先計算一下要用在工具提示當中的顯示參數的內容。
-      switch compositor.cursor {
-        case compositor.keys.count...:
-          // 這裡的 compositor.cursor 數值不可能大於 readings.count，因為會被 Megrez 自動糾正。
-          tooltipParameterRef[0] = compositor.keys[compositor.cursor - 1]
-        case 0:
-          tooltipParameterRef[1] = compositor.keys[compositor.cursor]
-        default:
-          tooltipParameterRef[0] = compositor.keys[compositor.cursor - 1]
-          tooltipParameterRef[1] = compositor.keys[compositor.cursor]
-      }
+      readingCursorIndex = min(readingCursorIndex, rawCursor)
     }
-
-    isCursorCuttingChar = !tooltipParameterRef[0].isEmpty || !tooltipParameterRef[1].isEmpty
-
-    /// 再接下來，藉由已經計算成功的「可見游標位置」，咱們計算一下在這個游標之前與之後的
-    /// 組字區內容，以便之後在這之間插入正在輸入的漢字讀音（藉由鐵恨 composer 注拼槽取得）。
-    var arrHead = [String.UTF16View.Element]()
-    var arrTail = [String.UTF16View.Element]()
-
-    for (i, n) in nodeValuesArray.joined().utf16.enumerated() {
-      if i < composedStringCursorIndex {
-        arrHead.append(n)
-      } else {
-        arrTail.append(n)
-      }
-    }
-
-    /// 現在呢，咱們拿到了游標前後的 stringview 資料，準備著手生成要在組字區內顯示用的內容。
-    /// 在這對前後資料當中插入目前正在輸入的讀音資料即可。
-    let head = String(utf16CodeUnits: arrHead, count: arrHead.count)
-    let reading = composer.getInlineCompositionForDisplay(isHanyuPinyin: mgrPrefs.showHanyuPinyinInCompositionBuffer)
-    let tail = String(utf16CodeUnits: arrTail, count: arrTail.count)
-    let composedText = head + reading + tail
-    let cursorIndex = composedStringCursorIndex + reading.utf16.count
-
-    // 防止組字區內出現不可列印的字元。
-    var cleanedComposition = ""
-    for theChar in composedText {
-      guard let charCode = theChar.utf16.first else { continue }
-      if !(theChar.isASCII && !(charCode.isPrintable)) {
-        cleanedComposition += String(theChar)
-      }
-    }
-
-    /// 這裡生成準備要拿來回呼的「正在輸入」狀態，但還不能立即使用，因為工具提示仍未完成。
-    return InputState.Inputting(
-      displayedText: cleanedComposition, cursorIndex: cursorIndex, reading: reading, nodeValuesArray: nodeValuesArray
-    )
+    return composedStringCursorIndex
   }
 
   // MARK: - 用以生成候選詞陣列及狀態
@@ -122,14 +94,13 @@ extension KeyHandler {
   ///   - isTypingVertical: 是否縱排輸入？
   /// - Returns: 回呼一個新的選詞狀態，來就給定的候選字詞陣列資料內容顯示選字窗。
   func buildCandidate(
-    state currentState: InputState.NotEmpty,
+    state currentState: IMEStateProtocol,
     isTypingVertical _: Bool = false
-  ) -> InputState.ChoosingCandidate {
-    InputState.ChoosingCandidate(
-      displayedText: currentState.displayedText,
-      cursorIndex: currentState.cursorIndex,
+  ) -> IMEState {
+    IMEState.Candidates(
       candidates: getCandidatesArray(fixOrder: mgrPrefs.useFixecCandidateOrderOnSelection),
-      nodeValuesArray: compositor.walkedNodes.values
+      displayTextSegments: compositor.walkedNodes.values,
+      cursor: currentState.data.cursor
     )
   }
 
@@ -149,9 +120,9 @@ extension KeyHandler {
   /// - Returns: 回呼一個新的聯想詞狀態，來就給定的聯想詞陣列資料內容顯示選字窗。
   func buildAssociatePhraseState(
     withPair pair: Megrez.Compositor.KeyValuePaired
-  ) -> InputState.Associates! {
+  ) -> IMEState {
     // 上一行必須要用驚嘆號，否則 Xcode 會誤導你砍掉某些實際上必需的語句。
-    InputState.Associates(
+    IMEState.Associates(
       candidates: buildAssociatePhraseArray(withPair: pair))
   }
 
@@ -165,9 +136,9 @@ extension KeyHandler {
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleMarkingState(
-    _ state: InputState.Marking,
+    _ state: IMEStateProtocol,
     input: InputSignalProtocol,
-    stateCallback: @escaping (InputStateProtocol) -> Void,
+    stateCallback: @escaping (IMEStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
     if input.isEsc {
@@ -220,18 +191,19 @@ extension KeyHandler {
 
     // Shift + Left
     if input.isCursorBackward || input.emacsKey == EmacsKey.backward, input.isShiftHold {
-      var index = state.markerIndex
-      if index > 0 {
-        index = state.displayedText.utf16PreviousPosition(for: index)
-        let marking = InputState.Marking(
-          displayedText: state.displayedText,
-          cursorIndex: state.cursorIndex,
-          markerIndex: index,
-          readings: state.readings,
-          nodeValuesArray: compositor.walkedNodes.values
+      if compositor.marker > 0 {
+        compositor.marker -= 1
+        if isCursorCuttingChar(isMarker: true) {
+          compositor.jumpCursorBySpan(to: .rear, isMarker: true)
+        }
+        var marking = IMEState.Marking(
+          displayTextSegments: state.data.displayTextSegments,
+          markedReadings: Array(compositor.keys[currentMarkedRange()]),
+          cursor: convertCursorForDisplay(compositor.cursor),
+          marker: convertCursorForDisplay(compositor.marker)
         )
-        marking.tooltipBackupForInputting = state.tooltipBackupForInputting
-        stateCallback(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
+        marking.data.tooltipBackupForInputting = state.data.tooltipBackupForInputting
+        stateCallback(marking.data.markedRange.isEmpty ? marking.convertedToInputting : marking)
       } else {
         IME.prtDebugIntel("1149908D")
         errorCallback()
@@ -242,18 +214,19 @@ extension KeyHandler {
 
     // Shift + Right
     if input.isCursorForward || input.emacsKey == EmacsKey.forward, input.isShiftHold {
-      var index = state.markerIndex
-      if index < (state.displayedText.utf16.count) {
-        index = state.displayedText.utf16NextPosition(for: index)
-        let marking = InputState.Marking(
-          displayedText: state.displayedText,
-          cursorIndex: state.cursorIndex,
-          markerIndex: index,
-          readings: state.readings,
-          nodeValuesArray: compositor.walkedNodes.values
+      if compositor.marker < compositor.width {
+        compositor.marker += 1
+        if isCursorCuttingChar(isMarker: true) {
+          compositor.jumpCursorBySpan(to: .front, isMarker: true)
+        }
+        var marking = IMEState.Marking(
+          displayTextSegments: state.data.displayTextSegments,
+          markedReadings: Array(compositor.keys[currentMarkedRange()]),
+          cursor: convertCursorForDisplay(compositor.cursor),
+          marker: convertCursorForDisplay(compositor.marker)
         )
-        marking.tooltipBackupForInputting = state.tooltipBackupForInputting
-        stateCallback(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
+        marking.data.tooltipBackupForInputting = state.data.tooltipBackupForInputting
+        stateCallback(marking.data.markedRange.isEmpty ? marking.convertedToInputting : marking)
       } else {
         IME.prtDebugIntel("9B51408D")
         errorCallback()
@@ -276,9 +249,9 @@ extension KeyHandler {
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handlePunctuation(
     _ customPunctuation: String,
-    state: InputStateProtocol,
+    state: IMEStateProtocol,
     usingVerticalTyping isTypingVertical: Bool,
-    stateCallback: @escaping (InputStateProtocol) -> Void,
+    stateCallback: @escaping (IMEStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
     if !currentLM.hasUnigramsFor(key: customPunctuation) {
@@ -308,8 +281,8 @@ extension KeyHandler {
     if candidateState.candidates.count == 1 {
       clear()  // 這句不要砍，因為下文可能會回呼 candidateState。
       if let candidateToCommit: (String, String) = candidateState.candidates.first, !candidateToCommit.1.isEmpty {
-        stateCallback(InputState.Committing(textToCommit: candidateToCommit.1))
-        stateCallback(InputState.Empty())
+        stateCallback(IMEState.Committing(textToCommit: candidateToCommit.1))
+        stateCallback(IMEState.Empty())
       } else {
         stateCallback(candidateState)
       }
@@ -327,13 +300,13 @@ extension KeyHandler {
   ///   - stateCallback: 狀態回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleEnter(
-    state: InputStateProtocol,
-    stateCallback: @escaping (InputStateProtocol) -> Void
+    state: IMEStateProtocol,
+    stateCallback: @escaping (IMEStateProtocol) -> Void
   ) -> Bool {
-    guard let currentState = state as? InputState.Inputting else { return false }
+    guard state.type == .ofInputting else { return false }
 
-    stateCallback(InputState.Committing(textToCommit: currentState.displayedText))
-    stateCallback(InputState.Empty())
+    stateCallback(IMEState.Committing(textToCommit: state.displayedText))
+    stateCallback(IMEState.Empty())
     return true
   }
 
@@ -345,10 +318,10 @@ extension KeyHandler {
   ///   - stateCallback: 狀態回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleCtrlCommandEnter(
-    state: InputStateProtocol,
-    stateCallback: @escaping (InputStateProtocol) -> Void
+    state: IMEStateProtocol,
+    stateCallback: @escaping (IMEStateProtocol) -> Void
   ) -> Bool {
-    guard state is InputState.Inputting else { return false }
+    guard state.type == .ofInputting else { return false }
 
     var displayedText = compositor.keys.joined(separator: "-")
     if mgrPrefs.inlineDumpPinyinInLieuOfZhuyin {
@@ -360,8 +333,8 @@ extension KeyHandler {
       displayedText = displayedText.replacingOccurrences(of: "-", with: " ")
     }
 
-    stateCallback(InputState.Committing(textToCommit: displayedText))
-    stateCallback(InputState.Empty())
+    stateCallback(IMEState.Committing(textToCommit: displayedText))
+    stateCallback(IMEState.Empty())
     return true
   }
 
@@ -373,10 +346,10 @@ extension KeyHandler {
   ///   - stateCallback: 狀態回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleCtrlOptionCommandEnter(
-    state: InputStateProtocol,
-    stateCallback: @escaping (InputStateProtocol) -> Void
+    state: IMEStateProtocol,
+    stateCallback: @escaping (IMEStateProtocol) -> Void
   ) -> Bool {
-    guard state is InputState.Inputting else { return false }
+    guard state.type == .ofInputting else { return false }
 
     var composed = ""
 
@@ -396,8 +369,8 @@ extension KeyHandler {
       composed += key.contains("_") ? value : "<ruby>\(value)<rp>(</rp><rt>\(key)</rt><rp>)</rp></ruby>"
     }
 
-    stateCallback(InputState.Committing(textToCommit: composed))
-    stateCallback(InputState.Empty())
+    stateCallback(IMEState.Committing(textToCommit: composed))
+    stateCallback(IMEState.Empty())
     return true
   }
 
@@ -411,12 +384,12 @@ extension KeyHandler {
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleBackSpace(
-    state: InputStateProtocol,
+    state: IMEStateProtocol,
     input: InputSignalProtocol,
-    stateCallback: @escaping (InputStateProtocol) -> Void,
+    stateCallback: @escaping (IMEStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    guard state is InputState.Inputting else { return false }
+    guard state.type == .ofInputting else { return false }
 
     // 引入 macOS 內建注音輸入法的行為，允許用 Shift+BackSpace 解構前一個漢字的讀音。
     switch mgrPrefs.specifyShiftBackSpaceKeyBehavior {
@@ -430,15 +403,13 @@ extension KeyHandler {
         stateCallback(buildInputtingState)
         return true
       case 1:
-        stateCallback(InputState.Abortion())
-        stateCallback(InputState.Empty())
+        stateCallback(IMEState.Abortion())
         return true
       default: break
     }
 
     if input.isShiftHold, input.isOptionHold {
-      stateCallback(InputState.Abortion())
-      stateCallback(InputState.Empty())
+      stateCallback(IMEState.Abortion())
       return true
     }
 
@@ -461,8 +432,7 @@ extension KeyHandler {
     switch composer.isEmpty && compositor.isEmpty {
       case false: stateCallback(buildInputtingState)
       case true:
-        stateCallback(InputState.Abortion())
-        stateCallback(InputState.Empty())
+        stateCallback(IMEState.Abortion())
     }
     return true
   }
@@ -477,16 +447,15 @@ extension KeyHandler {
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleDelete(
-    state: InputStateProtocol,
+    state: IMEStateProtocol,
     input: InputSignalProtocol,
-    stateCallback: @escaping (InputStateProtocol) -> Void,
+    stateCallback: @escaping (IMEStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    guard state is InputState.Inputting else { return false }
+    guard state.type == .ofInputting else { return false }
 
     if input.isShiftHold {
-      stateCallback(InputState.Abortion())
-      stateCallback(InputState.Empty())
+      stateCallback(IMEState.Abortion())
       return true
     }
 
@@ -509,8 +478,7 @@ extension KeyHandler {
     switch inputting.displayedText.isEmpty {
       case false: stateCallback(inputting)
       case true:
-        stateCallback(InputState.Abortion())
-        stateCallback(InputState.Empty())
+        stateCallback(IMEState.Abortion())
     }
     return true
   }
@@ -524,11 +492,11 @@ extension KeyHandler {
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleClockKey(
-    state: InputStateProtocol,
-    stateCallback: @escaping (InputStateProtocol) -> Void,
+    state: IMEStateProtocol,
+    stateCallback: @escaping (IMEStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    guard state is InputState.Inputting else { return false }
+    guard state.type == .ofInputting else { return false }
     if !composer.isEmpty {
       IME.prtDebugIntel("9B6F908D")
       errorCallback()
@@ -546,11 +514,11 @@ extension KeyHandler {
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleHome(
-    state: InputStateProtocol,
-    stateCallback: @escaping (InputStateProtocol) -> Void,
+    state: IMEStateProtocol,
+    stateCallback: @escaping (IMEStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    guard state is InputState.Inputting else { return false }
+    guard state.type == .ofInputting else { return false }
 
     if !composer.isEmpty {
       IME.prtDebugIntel("ABC44080")
@@ -580,11 +548,11 @@ extension KeyHandler {
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleEnd(
-    state: InputStateProtocol,
-    stateCallback: @escaping (InputStateProtocol) -> Void,
+    state: IMEStateProtocol,
+    stateCallback: @escaping (IMEStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    guard state is InputState.Inputting else { return false }
+    guard state.type == .ofInputting else { return false }
 
     if !composer.isEmpty {
       IME.prtDebugIntel("9B69908D")
@@ -613,16 +581,15 @@ extension KeyHandler {
   ///   - stateCallback: 狀態回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleEsc(
-    state: InputStateProtocol,
-    stateCallback: @escaping (InputStateProtocol) -> Void
+    state: IMEStateProtocol,
+    stateCallback: @escaping (IMEStateProtocol) -> Void
   ) -> Bool {
-    guard state is InputState.Inputting else { return false }
+    guard state.type == .ofInputting else { return false }
 
     if mgrPrefs.escToCleanInputBuffer {
       /// 若啟用了該選項，則清空組字器的內容與注拼槽的內容。
       /// 此乃 macOS 內建注音輸入法預設之行為，但不太受 Windows 使用者群體之待見。
-      stateCallback(InputState.Abortion())
-      stateCallback(InputState.Empty())
+      stateCallback(IMEState.Abortion())
     } else {
       if composer.isEmpty { return true }
       /// 如果注拼槽不是空的話，則清空之。
@@ -630,8 +597,7 @@ extension KeyHandler {
       switch compositor.isEmpty {
         case false: stateCallback(buildInputtingState)
         case true:
-          stateCallback(InputState.Abortion())
-          stateCallback(InputState.Empty())
+          stateCallback(IMEState.Abortion())
       }
     }
     return true
@@ -647,12 +613,12 @@ extension KeyHandler {
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleForward(
-    state: InputStateProtocol,
+    state: IMEStateProtocol,
     input: InputSignalProtocol,
-    stateCallback: @escaping (InputStateProtocol) -> Void,
+    stateCallback: @escaping (IMEStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    guard let currentState = state as? InputState.Inputting else { return false }
+    guard state.type == .ofInputting else { return false }
 
     if !composer.isEmpty {
       IME.prtDebugIntel("B3BA5257")
@@ -663,16 +629,18 @@ extension KeyHandler {
 
     if input.isShiftHold {
       // Shift + Right
-      if currentState.cursorIndex < currentState.displayedText.utf16.count {
-        let nextPosition = currentState.displayedText.utf16NextPosition(
-          for: currentState.cursorIndex)
-        let marking: InputState.Marking! = InputState.Marking(
-          displayedText: currentState.displayedText,
-          cursorIndex: currentState.cursorIndex,
-          markerIndex: nextPosition,
-          readings: compositor.keys
+      if compositor.cursor < compositor.width {
+        compositor.marker = compositor.cursor + 1
+        if isCursorCuttingChar(isMarker: true) {
+          compositor.jumpCursorBySpan(to: .front, isMarker: true)
+        }
+        var marking = IMEState.Marking(
+          displayTextSegments: compositor.walkedNodes.values,
+          markedReadings: Array(compositor.keys[currentMarkedRange()]),
+          cursor: convertCursorForDisplay(compositor.cursor),
+          marker: convertCursorForDisplay(compositor.marker)
         )
-        marking.tooltipBackupForInputting = currentState.tooltip
+        marking.data.tooltipBackupForInputting = state.tooltip
         stateCallback(marking)
       } else {
         IME.prtDebugIntel("BB7F6DB9")
@@ -680,7 +648,6 @@ extension KeyHandler {
         stateCallback(state)
       }
     } else if input.isOptionHold {
-      isCursorCuttingChar = false
       if input.isControlHold {
         return handleEnd(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
       }
@@ -695,12 +662,10 @@ extension KeyHandler {
     } else {
       if compositor.cursor < compositor.length {
         compositor.cursor += 1
-        var inputtingState = buildInputtingState
-        if isCursorCuttingChar == true {
+        if isCursorCuttingChar() {
           compositor.jumpCursorBySpan(to: .front)
-          inputtingState = buildInputtingState
         }
-        stateCallback(inputtingState)
+        stateCallback(buildInputtingState)
       } else {
         IME.prtDebugIntel("A96AAD58")
         errorCallback()
@@ -721,12 +686,12 @@ extension KeyHandler {
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleBackward(
-    state: InputStateProtocol,
+    state: IMEStateProtocol,
     input: InputSignalProtocol,
-    stateCallback: @escaping (InputStateProtocol) -> Void,
+    stateCallback: @escaping (IMEStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
-    guard let currentState = state as? InputState.Inputting else { return false }
+    guard state.type == .ofInputting else { return false }
 
     if !composer.isEmpty {
       IME.prtDebugIntel("6ED95318")
@@ -737,16 +702,18 @@ extension KeyHandler {
 
     if input.isShiftHold {
       // Shift + left
-      if currentState.cursorIndex > 0 {
-        let previousPosition = currentState.displayedText.utf16PreviousPosition(
-          for: currentState.cursorIndex)
-        let marking: InputState.Marking! = InputState.Marking(
-          displayedText: currentState.displayedText,
-          cursorIndex: currentState.cursorIndex,
-          markerIndex: previousPosition,
-          readings: compositor.keys
+      if compositor.cursor > 0 {
+        compositor.marker = compositor.cursor - 1
+        if isCursorCuttingChar(isMarker: true) {
+          compositor.jumpCursorBySpan(to: .rear, isMarker: true)
+        }
+        var marking = IMEState.Marking(
+          displayTextSegments: compositor.walkedNodes.values,
+          markedReadings: Array(compositor.keys[currentMarkedRange()]),
+          cursor: convertCursorForDisplay(compositor.cursor),
+          marker: convertCursorForDisplay(compositor.marker)
         )
-        marking.tooltipBackupForInputting = currentState.tooltip
+        marking.data.tooltipBackupForInputting = state.tooltip
         stateCallback(marking)
       } else {
         IME.prtDebugIntel("D326DEA3")
@@ -754,7 +721,6 @@ extension KeyHandler {
         stateCallback(state)
       }
     } else if input.isOptionHold {
-      isCursorCuttingChar = false
       if input.isControlHold {
         return handleHome(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
       }
@@ -769,12 +735,10 @@ extension KeyHandler {
     } else {
       if compositor.cursor > 0 {
         compositor.cursor -= 1
-        var inputtingState = buildInputtingState
-        if isCursorCuttingChar == true {
+        if isCursorCuttingChar() {
           compositor.jumpCursorBySpan(to: .rear)
-          inputtingState = buildInputtingState
         }
-        stateCallback(inputtingState)
+        stateCallback(buildInputtingState)
       } else {
         IME.prtDebugIntel("7045E6F3")
         errorCallback()
@@ -795,14 +759,14 @@ extension KeyHandler {
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
   func handleInlineCandidateRotation(
-    state: InputStateProtocol,
+    state: IMEStateProtocol,
     reverseModifier: Bool,
-    stateCallback: @escaping (InputStateProtocol) -> Void,
+    stateCallback: @escaping (IMEStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
     if composer.isEmpty, compositor.isEmpty || compositor.walkedNodes.isEmpty { return false }
-    guard state is InputState.Inputting else {
-      guard state is InputState.Empty else {
+    guard state.type == .ofInputting else {
+      guard state.type == .ofEmpty else {
         IME.prtDebugIntel("6044F081")
         errorCallback()
         return true

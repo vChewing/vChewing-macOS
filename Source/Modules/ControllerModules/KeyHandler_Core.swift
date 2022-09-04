@@ -25,7 +25,7 @@ protocol KeyHandlerDelegate {
     _: KeyHandler, didSelectCandidateAt index: Int,
     ctlCandidate controller: ctlCandidateProtocol
   )
-  func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputStateProtocol, addToFilter: Bool)
+  func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: IMEStateProtocol, addToFilter: Bool)
     -> Bool
 }
 
@@ -35,8 +35,6 @@ protocol KeyHandlerDelegate {
 public class KeyHandler {
   /// 半衰模組的衰減指數
   let kEpsilon: Double = 0.000001
-  /// 檢測是否出現游標切斷組字圈內字符的情況
-  var isCursorCuttingChar = false
   /// 檢測是否內容為空（注拼槽與組字器都是空的）
   var isTypingContentEmpty: Bool { composer.isEmpty && compositor.isEmpty }
 
@@ -88,6 +86,21 @@ public class KeyHandler {
 
   // MARK: - Functions dealing with Megrez.
 
+  /// 獲取當前標記得範圍。這個函式只能是函式、而非只讀變數。
+  /// - Returns: 當前標記範圍。
+  func currentMarkedRange() -> Range<Int> {
+    min(compositor.cursor, compositor.marker)..<max(compositor.cursor, compositor.marker)
+  }
+
+  /// 檢測是否出現游標切斷組字圈內字符的情況
+  func isCursorCuttingChar(isMarker: Bool = false) -> Bool {
+    let index = isMarker ? compositor.marker : compositor.cursor
+    var isBound = (index == compositor.walkedNodes.contextRange(ofGivenCursor: index).lowerBound)
+    if index == compositor.width { isBound = true }
+    let rawResult = compositor.walkedNodes.findNode(at: index)?.isReadingMismatched ?? false
+    return !isBound && rawResult
+  }
+
   /// 實際上要拿給 Megrez 使用的的滑鼠游標位址，以方便在組字器最開頭或者最末尾的時候始終能抓取候選字節點陣列。
   ///
   /// 威注音對游標前置與游標後置模式採取的候選字節點陣列抓取方法是分離的，且不使用 Node Crossing。
@@ -107,7 +120,8 @@ public class KeyHandler {
     // 在偵錯模式開啟時，將 GraphViz 資料寫入至指定位置。
     if mgrPrefs.isDebugModeEnabled {
       let result = compositor.dumpDOT
-      let appSupportPath = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].path.appending("vChewing-visualization.dot")
+      let appSupportPath = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].path.appending(
+        "vChewing-visualization.dot")
       do {
         try result.write(toFile: appSupportPath, atomically: true, encoding: .utf8)
       } catch {

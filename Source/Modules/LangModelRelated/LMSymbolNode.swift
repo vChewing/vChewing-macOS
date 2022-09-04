@@ -18,17 +18,26 @@ public class SymbolNode {
   init(_ title: String, _ children: [SymbolNode]? = nil, previous: SymbolNode? = nil) {
     self.title = title
     self.children = children
+    self.children?.forEach {
+      $0.previous = self
+    }
     self.previous = previous
   }
 
   init(_ title: String, symbols: String) {
     self.title = title
     children = Array(symbols).map { SymbolNode(String($0), nil) }
+    children?.forEach {
+      $0.previous = self
+    }
   }
 
   init(_ title: String, symbols: [String]) {
     self.title = title
     children = symbols.map { SymbolNode($0, nil) }
+    children?.forEach {
+      $0.previous = self
+    }
   }
 
   static func parseUserSymbolNodeData() {

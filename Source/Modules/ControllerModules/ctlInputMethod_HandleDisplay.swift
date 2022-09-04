@@ -13,10 +13,10 @@ import Cocoa
 // MARK: - Tooltip Display and Candidate Display Methods
 
 extension ctlInputMethod {
-  func show(tooltip: String, displayedText: String, cursorIndex: Int) {
+  func show(tooltip: String, displayedText: String, u16Cursor: Int) {
     guard let client = client() else { return }
     var lineHeightRect = NSRect(x: 0.0, y: 0.0, width: 16.0, height: 16.0)
-    var cursor = cursorIndex
+    var cursor = u16Cursor
     if cursor == displayedText.count, cursor != 0 {
       cursor -= 1
     }
@@ -38,24 +38,14 @@ extension ctlInputMethod {
     ctlInputMethod.tooltipController.show(tooltip: tooltip, at: finalOrigin)
   }
 
-  func show(candidateWindowWith state: InputStateProtocol) {
+  func show(candidateWindowWith state: IMEStateProtocol) {
     guard let client = client() else { return }
-    var isTypingVertical: Bool {
-      if state.type == .ofCandidates {
-        return ctlInputMethod.isVerticalTypingSituation
-      } else if state.type == ..ofAssociates {
-        return ctlInputMethod.isVerticalTypingSituation
-      }
-      return false
-    }
     var isCandidateWindowVertical: Bool {
       var candidates: [(String, String)] = .init()
-      if let state = state as? InputState.ChoosingCandidate {
-        candidates = state.candidates
-      } else if let state = state as? InputState.Associates {
+      if state.isCandidateContainer {
         candidates = state.candidates
       }
-      if isTypingVertical { return true }
+      if isVerticalTyping { return true }
       // 接下來的判斷並非適用於 IMK 選字窗，所以先插入排除語句。
       guard ctlInputMethod.ctlCandidateCurrent is ctlCandidateUniversal else { return false }
       // 以上是通用情形。接下來決定橫排輸入時是否使用縱排選字窗。
@@ -106,7 +96,7 @@ extension ctlInputMethod {
     let candidateKeys = mgrPrefs.candidateKeys
     let keyLabels =
       candidateKeys.count > 4 ? Array(candidateKeys) : Array(mgrPrefs.defaultCandidateKeys)
-    let keyLabelSuffix = state is InputState.Associates ? "^" : ""
+    let keyLabelSuffix = state.type == .ofAssociates ? "^" : ""
     ctlInputMethod.ctlCandidateCurrent.keyLabels = keyLabels.map {
       CandidateKeyLabel(key: String($0), displayedText: String($0) + keyLabelSuffix)
     }
@@ -126,8 +116,8 @@ extension ctlInputMethod {
     var lineHeightRect = NSRect(x: 0.0, y: 0.0, width: 16.0, height: 16.0)
     var cursor = 0
 
-    if let state = state as? InputState.ChoosingCandidate {
-      cursor = state.cursorIndex
+    if [.ofCandidates, .ofSymbolTable].contains(state.type) {
+      cursor = state.data.cursor
       if cursor == state.displayedText.count, cursor != 0 {
         cursor -= 1
       }
@@ -140,7 +130,7 @@ extension ctlInputMethod {
       cursor -= 1
     }
 
-    if isTypingVertical {
+    if isVerticalTyping {
       ctlInputMethod.ctlCandidateCurrent.set(
         windowTopLeftPoint: NSPoint(
           x: lineHeightRect.origin.x + lineHeightRect.size.width + 4.0, y: lineHeightRect.origin.y - 4.0

@@ -38,6 +38,9 @@ public struct StateData {
 
   // MARK: Cursor & Marker & Range for UTF16 (Read-Only)
 
+  /// IMK 協定的內文組字區的游標長度與游標位置無法正確統計 UTF8 高萬字（比如 emoji）的長度，
+  /// 所以在這裡必須做糾偏處理。因為在用 Swift，所以可以用「.utf16」取代「NSString.length()」。
+  /// 這樣就可以免除不必要的類型轉換。
   var u16Cursor: Int {
     displayedText.charComponents[0..<cursor].joined().utf16.count
   }
@@ -53,32 +56,14 @@ public struct StateData {
   // MARK: Other data for non-empty states.
 
   var markedTargetExists: Bool = false
-  var nodeReadingsArray = [String]()
-  var nodeValuesArray = [String]()
-  var reading: String = "" {
+  var displayTextSegments = [String]() {
     didSet {
-      if !reading.isEmpty {
-        var newNodeValuesArray = [String]()
-        var temporaryNode = ""
-        var charCounter = 0
-        for node in nodeValuesArray {
-          for char in node {
-            if charCounter == cursor - reading.count {
-              newNodeValuesArray.append(temporaryNode)
-              temporaryNode = ""
-              newNodeValuesArray.append(reading)
-            }
-            temporaryNode += String(char)
-            charCounter += 1
-          }
-          newNodeValuesArray.append(temporaryNode)
-          temporaryNode = ""
-        }
-        nodeValuesArray = newNodeValuesArray.isEmpty ? [reading] : newNodeValuesArray
-      }
+      displayedText = displayTextSegments.joined()
     }
   }
 
+  var reading: String = ""
+  var markedReadings = [String]()
   var candidates = [(String, String)]()
   var textToCommit: String = ""
   var tooltip: String = ""
@@ -94,13 +79,12 @@ public struct StateData {
     markedTargetExists ? mgrPrefs.allowedMarkRange.contains(markedRange.count) : false
   }
 
-  var readingCountMismatched: Bool { displayedText.count != nodeReadingsArray.count }
   var attributedStringNormal: NSAttributedString {
     /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
     /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
     let attributedString = NSMutableAttributedString(string: displayedText)
     var newBegin = 0
-    for (i, neta) in nodeValuesArray.enumerated() {
+    for (i, neta) in displayTextSegments.enumerated() {
       attributedString.setAttributes(
         [
           /// 不能用 .thick，否則會看不到游標。
@@ -147,17 +131,14 @@ public struct StateData {
     )
     return attributedString
   }
-
-  var node: SymbolNode = .init("")
 }
 
-// MARK: - InputState 工具函式
+// MARK: - IMEState 工具函式
 
 extension StateData {
   var chkIfUserPhraseExists: Bool {
     let text = displayedText.charComponents[markedRange].joined()
-    let selectedReadings = nodeReadingsArray[markedRange]
-    let joined = selectedReadings.joined(separator: "-")
+    let joined = markedReadings.joined(separator: "-")
     return mgrLangModel.checkIfUserPhraseExist(
       userPhrase: text, mode: IME.currentInputMode, key: joined
     )
@@ -165,8 +146,7 @@ extension StateData {
 
   var userPhrase: String {
     let text = displayedText.charComponents[markedRange].joined()
-    let selectedReadings = nodeReadingsArray[markedRange]
-    let joined = selectedReadings.joined(separator: "-")
+    let joined = markedReadings.joined(separator: "-")
     let nerfedScore = ctlInputMethod.areWeNerfing && markedTargetExists ? " -114.514" : ""
     return "\(text) \(joined)\(nerfedScore)"
   }
@@ -174,8 +154,7 @@ extension StateData {
   var userPhraseConverted: String {
     let text =
       ChineseConverter.crossConvert(displayedText.charComponents[markedRange].joined()) ?? ""
-    let selectedReadings = nodeReadingsArray[markedRange]
-    let joined = selectedReadings.joined(separator: "-")
+    let joined = markedReadings.joined(separator: "-")
     let nerfedScore = ctlInputMethod.areWeNerfing && markedTargetExists ? " -114.514" : ""
     let convertedMark = "#𝙃𝙪𝙢𝙖𝙣𝘾𝙝𝙚𝙘𝙠𝙍𝙚𝙦𝙪𝙞𝙧𝙚𝙙"
     return "\(text) \(joined)\(nerfedScore)\t\(convertedMark)"
@@ -184,7 +163,7 @@ extension StateData {
   enum Marking {
     private static func generateReadingThread(_ data: StateData) -> String {
       var arrOutput = [String]()
-      for neta in data.nodeReadingsArray[data.markedRange] {
+      for neta in data.markedReadings {
         var neta = neta
         if neta.isEmpty { continue }
         if neta.contains("_") {
@@ -207,12 +186,6 @@ extension StateData {
     /// - Parameter data: 要處理的狀態資料包。
     public static func updateParameters(_ data: inout StateData) {
       var tooltipGenerated: String {
-        if data.displayedText.count != data.nodeReadingsArray.count {
-          ctlInputMethod.tooltipController.setColor(state: .redAlert)
-          return NSLocalizedString(
-            "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.", comment: ""
-          )
-        }
         if mgrPrefs.phraseReplacementEnabled {
           ctlInputMethod.tooltipController.setColor(state: .warning)
           return NSLocalizedString(
@@ -240,8 +213,7 @@ extension StateData {
           )
         }
 
-        let selectedReadings = data.nodeReadingsArray[data.markedRange]
-        let joined = selectedReadings.joined(separator: "-")
+        let joined = data.markedReadings.joined(separator: "-")
         let exist = mgrLangModel.checkIfUserPhraseExist(
           userPhrase: text, mode: IME.currentInputMode, key: joined
         )

@@ -18,29 +18,77 @@ extension ctlInputMethod {
   /// 先將舊狀態單獨記錄起來，再將新舊狀態作為參數，
   /// 根據新狀態本身的狀態種類來判斷交給哪一個專門的函式來處理。
   /// - Parameter newState: 新狀態。
-  func handle(state newState: InputStateProtocol) {
-    let prevState = state
+  func handle(state newState: IMEStateProtocol) {
+    let previous = state
     state = newState
-
-    switch newState {
-      case let newState as InputState.Deactivated:
-        handle(state: newState, previous: prevState)
-      case let newState as InputState.Empty:
-        handle(state: newState, previous: prevState)
-      case let newState as InputState.Abortion:
-        handle(state: newState, previous: prevState)
-      case let newState as InputState.Committing:
-        handle(state: newState, previous: prevState)
-      case let newState as InputState.Inputting:
-        handle(state: newState, previous: prevState)
-      case let newState as InputState.Marking:
-        handle(state: newState, previous: prevState)
-      case let newState as InputState.ChoosingCandidate:
-        handle(state: newState, previous: prevState)
-      case let newState as InputState.Associates:
-        handle(state: newState, previous: prevState)
-      case let newState as InputState.SymbolTable:
-        handle(state: newState, previous: prevState)
+    switch state.type {
+      case .ofDeactivated:
+        ctlInputMethod.ctlCandidateCurrent.delegate = nil
+        ctlInputMethod.ctlCandidateCurrent.visible = false
+        ctlInputMethod.tooltipController.hide()
+        if previous.hasComposition {
+          commit(text: previous.displayedText)
+        }
+        clearInlineDisplay()
+        // 最後一道保險
+        keyHandler.clear()
+      case .ofEmpty, .ofAbortion:
+        var previous = previous
+        if state.type == .ofAbortion {
+          state = IMEState.Empty()
+          previous = state
+        }
+        ctlInputMethod.ctlCandidateCurrent.visible = false
+        ctlInputMethod.tooltipController.hide()
+        // 全專案用以判斷「.Abortion」的地方僅此一處。
+        if previous.hasComposition, state.type != .ofAbortion {
+          commit(text: previous.displayedText)
+        }
+        // 在這裡手動再取消一次選字窗與工具提示的顯示，可謂雙重保險。
+        ctlInputMethod.ctlCandidateCurrent.visible = false
+        ctlInputMethod.tooltipController.hide()
+        clearInlineDisplay()
+        // 最後一道保險
+        keyHandler.clear()
+      case .ofCommitting:
+        ctlInputMethod.ctlCandidateCurrent.visible = false
+        ctlInputMethod.tooltipController.hide()
+        let textToCommit = state.textToCommit
+        if !textToCommit.isEmpty { commit(text: textToCommit) }
+        clearInlineDisplay()
+        // 最後一道保險
+        keyHandler.clear()
+      case .ofInputting:
+        ctlInputMethod.ctlCandidateCurrent.visible = false
+        ctlInputMethod.tooltipController.hide()
+        let textToCommit = state.textToCommit
+        if !textToCommit.isEmpty { commit(text: textToCommit) }
+        setInlineDisplayWithCursor()
+        if !state.tooltip.isEmpty {
+          show(
+            tooltip: state.tooltip, displayedText: state.displayedText,
+            u16Cursor: state.data.u16Cursor
+          )
+        }
+      case .ofMarking:
+        ctlInputMethod.ctlCandidateCurrent.visible = false
+        setInlineDisplayWithCursor()
+        if state.tooltip.isEmpty {
+          ctlInputMethod.tooltipController.hide()
+        } else {
+          let cursorReference: Int = {
+            if state.data.marker >= state.data.cursor { return state.data.u16Cursor }
+            return state.data.u16Marker  // 這樣可以讓工具提示視窗始終盡量往書寫方向的後方顯示。
+          }()
+          show(
+            tooltip: state.tooltip, displayedText: state.displayedText,
+            u16Cursor: cursorReference
+          )
+        }
+      case .ofCandidates, .ofAssociates, .ofSymbolTable:
+        ctlInputMethod.tooltipController.hide()
+        setInlineDisplayWithCursor()
+        show(candidateWindowWith: state)
       default: break
     }
   }
@@ -48,7 +96,7 @@ extension ctlInputMethod {
   /// 針對受 .NotEmpty() 管轄的非空狀態，在組字區內顯示游標。
   func setInlineDisplayWithCursor() {
     guard let client = client() else { return }
-    if let state = state as? InputState.Associates {
+    if state.type == .ofAssociates {
       client.setMarkedText(
         state.attributedString, selectionRange: NSRange(location: 0, length: 0),
         replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
@@ -56,49 +104,19 @@ extension ctlInputMethod {
       return
     }
 
-    guard let state = state as? InputState.NotEmpty else {
-      clearInlineDisplay()
+    if state.hasComposition || state.isCandidateContainer {
+      /// 所謂選區「selectionRange」，就是「可見游標位置」的位置，只不過長度
+      /// 是 0 且取代範圍（replacementRange）為「NSNotFound」罷了。
+      /// 也就是說，內文組字區該在哪裡出現，得由客體軟體來作主。
+      client.setMarkedText(
+        state.attributedString, selectionRange: NSRange(location: state.data.u16Cursor, length: 0),
+        replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
+      )
       return
     }
 
-    var identifier: AnyObject {
-      switch IME.currentInputMode {
-        case InputMode.imeModeCHS:
-          if #available(macOS 12.0, *) {
-            return "zh-Hans" as AnyObject
-          }
-        case InputMode.imeModeCHT:
-          if #available(macOS 12.0, *) {
-            return (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
-              ? "ja" as AnyObject : "zh-Hant" as AnyObject
-          }
-        default:
-          break
-      }
-      return "" as AnyObject
-    }
-
-    // [Shiki's Note] This might needs to be bug-reported to Apple:
-    // The LanguageIdentifier attribute of an NSAttributeString designated to
-    // IMK Client().SetMarkedText won't let the actual font respect your languageIdentifier
-    // settings. Still, this might behaves as Apple's current expectation, I'm afraid.
-    if #available(macOS 12.0, *) {
-      state.attributedString.setAttributes(
-        [.languageIdentifier: identifier],
-        range: NSRange(
-          location: 0,
-          length: state.displayedText.utf16.count
-        )
-      )
-    }
-
-    /// 所謂選區「selectionRange」，就是「可見游標位置」的位置，只不過長度
-    /// 是 0 且取代範圍（replacementRange）為「NSNotFound」罷了。
-    /// 也就是說，內文組字區該在哪裡出現，得由客體軟體來作主。
-    client.setMarkedText(
-      state.attributedString, selectionRange: NSRange(location: state.cursorIndex, length: 0),
-      replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
-    )
+    // 其它情形。
+    clearInlineDisplay()
   }
 
   /// 在處理不受 .NotEmpty() 管轄的狀態時可能要用到的函式，會清空螢幕上顯示的內文組字區。
@@ -122,110 +140,5 @@ extension ctlInputMethod {
     client.insertText(
       buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
-  }
-
-  private func handle(state: InputState.Deactivated, previous: InputStateProtocol) {
-    _ = state  // 防止格式整理工具毀掉與此對應的參數。
-    ctlInputMethod.ctlCandidateCurrent.delegate = nil
-    ctlInputMethod.ctlCandidateCurrent.visible = false
-    ctlInputMethod.tooltipController.hide()
-    if let previous = previous as? InputState.NotEmpty {
-      commit(text: previous.committingBufferConverted)
-    }
-    clearInlineDisplay()
-    // 最後一道保險
-    keyHandler.clear()
-  }
-
-  private func handle(state: InputState.Empty, previous: InputStateProtocol) {
-    _ = state  // 防止格式整理工具毀掉與此對應的參數。
-    ctlInputMethod.ctlCandidateCurrent.visible = false
-    ctlInputMethod.tooltipController.hide()
-    // 全專案用以判斷「.Abortion」的地方僅此一處。
-    if let previous = previous as? InputState.NotEmpty,
-      !(state is InputState.Abortion)
-    {
-      commit(text: previous.committingBufferConverted)
-    }
-    // 在這裡手動再取消一次選字窗與工具提示的顯示，可謂雙重保險。
-    ctlInputMethod.ctlCandidateCurrent.visible = false
-    ctlInputMethod.tooltipController.hide()
-    clearInlineDisplay()
-    // 最後一道保險
-    keyHandler.clear()
-  }
-
-  private func handle(
-    state: InputState.Abortion, previous: InputStateProtocol
-  ) {
-    _ = state  // 防止格式整理工具毀掉與此對應的參數。
-    _ = previous  // 防止格式整理工具毀掉與此對應的參數。
-    // 這個函式就是去掉 previous state 使得沒有任何東西可以 commit。
-    handle(state: InputState.Empty())
-  }
-
-  private func handle(state: InputState.Committing, previous: InputStateProtocol) {
-    _ = previous  // 防止格式整理工具毀掉與此對應的參數。
-    ctlInputMethod.ctlCandidateCurrent.visible = false
-    ctlInputMethod.tooltipController.hide()
-    let textToCommit = state.textToCommit
-    if !textToCommit.isEmpty {
-      commit(text: textToCommit)
-    }
-    clearInlineDisplay()
-    // 最後一道保險
-    keyHandler.clear()
-  }
-
-  private func handle(state: InputState.Inputting, previous: InputStateProtocol) {
-    _ = previous  // 防止格式整理工具毀掉與此對應的參數。
-    ctlInputMethod.ctlCandidateCurrent.visible = false
-    ctlInputMethod.tooltipController.hide()
-    let textToCommit = state.textToCommit
-    if !textToCommit.isEmpty {
-      commit(text: textToCommit)
-    }
-    setInlineDisplayWithCursor()
-    if !state.tooltip.isEmpty {
-      show(
-        tooltip: state.tooltip, displayedText: state.displayedText,
-        cursorIndex: state.cursorIndex
-      )
-    }
-  }
-
-  private func handle(state: InputState.Marking, previous: InputStateProtocol) {
-    _ = previous  // 防止格式整理工具毀掉與此對應的參數。
-    ctlInputMethod.ctlCandidateCurrent.visible = false
-    setInlineDisplayWithCursor()
-    if state.tooltip.isEmpty {
-      ctlInputMethod.tooltipController.hide()
-    } else {
-      show(
-        tooltip: state.tooltip, displayedText: state.displayedText,
-        cursorIndex: state.markerIndex
-      )
-    }
-  }
-
-  private func handle(state: InputState.ChoosingCandidate, previous: InputStateProtocol) {
-    _ = previous  // 防止格式整理工具毀掉與此對應的參數。
-    ctlInputMethod.tooltipController.hide()
-    setInlineDisplayWithCursor()
-    show(candidateWindowWith: state)
-  }
-
-  private func handle(state: InputState.SymbolTable, previous: InputStateProtocol) {
-    _ = previous  // 防止格式整理工具毀掉與此對應的參數。
-    ctlInputMethod.tooltipController.hide()
-    setInlineDisplayWithCursor()
-    show(candidateWindowWith: state)
-  }
-
-  private func handle(state: InputState.Associates, previous: InputStateProtocol) {
-    _ = previous  // 防止格式整理工具毀掉與此對應的參數。
-    ctlInputMethod.tooltipController.hide()
-    setInlineDisplayWithCursor()
-    show(candidateWindowWith: state)
   }
 }
