@@ -382,6 +382,16 @@ extension RangeReplaceableCollection where Element: Hashable {
   }
 }
 
+// MARK: - String charComponents Extension
+
+extension String {
+  public var charComponents: [String] { map { String($0) } }
+}
+
+extension Array where Element == String.Element {
+  public var charComponents: [String] { map { String($0) } }
+}
+
 // MARK: - String Tildes Expansion Extension
 
 extension String {
