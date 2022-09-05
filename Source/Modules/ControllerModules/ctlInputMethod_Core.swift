@@ -226,20 +226,7 @@ class ctlInputMethod: IMKInputController {
       // Shift+Enter 是個特殊情形，不提前攔截處理的話、會有垃圾參數傳給 delegate 的 keyHandler 從而崩潰。
       // 所以這裡直接將 Shift Flags 清空。
       if event.isShiftHold, event.isEnter {
-        guard
-          let newEvent = NSEvent.keyEvent(
-            with: event.type,
-            location: event.locationInWindow,
-            modifierFlags: [],
-            timestamp: event.timestamp,
-            windowNumber: event.windowNumber,
-            context: nil,
-            characters: event.characters ?? "",
-            charactersIgnoringModifiers: event.charactersIgnoringModifiers ?? event.characters ?? "",
-            isARepeat: event.isARepeat,
-            keyCode: event.keyCode
-          )
-        else {
+        guard let newEvent = event.reinitiate(modifierFlags: []) else {
           NSSound.beep()
           return true
         }
@@ -249,20 +236,8 @@ class ctlInputMethod: IMKInputController {
 
       // 聯想詞選字。
       if let newChar = ctlCandidateIMK.defaultIMKSelectionKey[event.keyCode], event.isShiftHold,
-        isAssociatedPhrasesState
+        isAssociatedPhrasesState, let newEvent = event.reinitiate(modifierFlags: [], characters: newChar)
       {
-        let newEvent = NSEvent.keyEvent(
-          with: event.type,
-          location: event.locationInWindow,
-          modifierFlags: [],
-          timestamp: event.timestamp,
-          windowNumber: event.windowNumber,
-          context: nil,
-          characters: newChar,
-          charactersIgnoringModifiers: event.charactersIgnoringModifiers ?? event.characters ?? "",
-          isARepeat: event.isARepeat,
-          keyCode: event.keyCode
-        )
         ctlCandidateCurrent.handleKeyboardEvent(newEvent)
       }
 
