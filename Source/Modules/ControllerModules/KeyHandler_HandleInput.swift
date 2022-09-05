@@ -25,8 +25,8 @@ extension KeyHandler {
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handle(
     input: InputSignalProtocol,
-    state: InputStateProtocol,
-    stateCallback: @escaping (InputStateProtocol) -> Void,
+    state: IMEStateProtocol,
+    stateCallback: @escaping (IMEStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
     // 如果按鍵訊號內的 inputTest 是空的話，則忽略該按鍵輸入，因為很可能是功能修飾鍵。
@@ -38,8 +38,8 @@ extension KeyHandler {
     // 提前過濾掉一些不合規的按鍵訊號輸入，免得相關按鍵訊號被送給 Megrez 引發輸入法崩潰。
     if input.isInvalid {
       // 在「.Empty(IgnoringPreviousState) 與 .Deactivated」狀態下的首次不合規按鍵輸入可以直接放行。
-      // 因為「.EmptyIgnoringPreviousState」會在處理之後被自動轉為「.Empty」，所以不需要單獨判斷。
-      if state is InputState.Empty || state is InputState.Deactivated {
+      // 因為「.Abortion」會在處理之後被自動轉為「.Empty」，所以不需要單獨判斷。
+      if state.type == .ofEmpty || state.type == .ofDeactivated {
         return false
       }
       IME.prtDebugIntel("550BCF7B: KeyHandler just refused an invalid input.")
@@ -51,7 +51,7 @@ extension KeyHandler {
     // 如果當前組字器為空的話，就不再攔截某些修飾鍵，畢竟這些鍵可能會會用來觸發某些功能。
     let isFunctionKey: Bool =
       input.isControlHotKey || (input.isCommandHold || input.isOptionHotKey || input.isNonLaptopFunctionKey)
-    if !(state is InputState.NotEmpty) && !(state is InputState.AssociatedPhrases) && isFunctionKey {
+    if state.type != .ofAssociates, !state.hasComposition, !state.isCandidateContainer, isFunctionKey {
       return false
     }
 
@@ -68,7 +68,7 @@ extension KeyHandler {
       // 略過對 BackSpace 的處理。
     } else if input.isCapsLockOn || input.isASCIIModeInput {
       // 但願能夠處理這種情況下所有可能的按鍵組合。
-      stateCallback(InputState.Empty())
+      stateCallback(IMEState.ofEmpty())
 
       // 字母鍵摁 Shift 的話，無須額外處理，因為直接就會敲出大寫字母。
       if input.isUpperCaseASCIILetterKey {
@@ -82,8 +82,8 @@ extension KeyHandler {
       }
 
       // 將整個組字區的內容遞交給客體應用。
-      stateCallback(InputState.Committing(textToCommit: inputText.lowercased()))
-      stateCallback(InputState.Empty())
+      stateCallback(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
+      stateCallback(IMEState.ofEmpty())
 
       return true
     }
@@ -94,19 +94,19 @@ extension KeyHandler {
     // 不然、使用 Cocoa 內建的 flags 的話，會誤傷到在主鍵盤區域的功能鍵。
     // 我們先規定允許小鍵盤區域操縱選字窗，其餘場合一律直接放行。
     if input.isNumericPadKey {
-      if !(state is InputState.ChoosingCandidate || state is InputState.AssociatedPhrases
-        || state is InputState.SymbolTable)
+      if !(state.type == .ofCandidates || state.type == .ofAssociates
+        || state.type == .ofSymbolTable)
       {
-        stateCallback(InputState.Empty())
-        stateCallback(InputState.Committing(textToCommit: inputText.lowercased()))
-        stateCallback(InputState.Empty())
+        stateCallback(IMEState.ofEmpty())
+        stateCallback(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
+        stateCallback(IMEState.ofEmpty())
         return true
       }
     }
 
     // MARK: 處理候選字詞 (Handle Candidates)
 
-    if state is InputState.ChoosingCandidate {
+    if [.ofCandidates, .ofSymbolTable].contains(state.type) {
       return handleCandidate(
         state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
       )
@@ -114,26 +114,26 @@ extension KeyHandler {
 
     // MARK: 處理聯想詞 (Handle Associated Phrases)
 
-    if state is InputState.AssociatedPhrases {
+    if state.type == .ofAssociates {
       if handleCandidate(
         state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
       ) {
         return true
       } else {
-        stateCallback(InputState.Empty())
+        stateCallback(IMEState.ofEmpty())
       }
     }
 
     // MARK: 處理標記範圍、以便決定要把哪個範圍拿來新增使用者(濾除)語彙 (Handle Marking)
 
-    if let marking = state as? InputState.Marking {
+    if state.type == .ofMarking {
       if handleMarkingState(
-        marking, input: input, stateCallback: stateCallback,
+        state, input: input, stateCallback: stateCallback,
         errorCallback: errorCallback
       ) {
         return true
       }
-      state = marking.convertedToInputting
+      state = state.convertedToInputting
       stateCallback(state)
     }
 
@@ -147,7 +147,7 @@ extension KeyHandler {
 
     // MARK: 用上下左右鍵呼叫選字窗 (Calling candidate window using Up / Down or PageUp / PageDn.)
 
-    if let currentState = state as? InputState.NotEmpty, composer.isEmpty, !input.isOptionHold,
+    if state.hasComposition, composer.isEmpty, !input.isOptionHold,
       input.isCursorClockLeft || input.isCursorClockRight || input.isSpace
         || input.isPageDown || input.isPageUp || (input.isTab && mgrPrefs.specifyShiftTabKeyBehavior)
     {
@@ -155,12 +155,12 @@ extension KeyHandler {
         /// 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
         if !mgrPrefs.chooseCandidateUsingSpace {
           if compositor.cursor >= compositor.length {
-            let composingBuffer = currentState.composingBuffer
-            if !composingBuffer.isEmpty {
-              stateCallback(InputState.Committing(textToCommit: composingBuffer))
+            let displayedText = state.displayedText
+            if !displayedText.isEmpty {
+              stateCallback(IMEState.ofCommitting(textToCommit: displayedText))
             }
-            stateCallback(InputState.Committing(textToCommit: " "))
-            stateCallback(InputState.Empty())
+            stateCallback(IMEState.ofCommitting(textToCommit: " "))
+            stateCallback(IMEState.ofEmpty())
           } else if currentLM.hasUnigramsFor(key: " ") {
             compositor.insertKey(" ")
             walk()
@@ -175,7 +175,7 @@ extension KeyHandler {
           )
         }
       }
-      stateCallback(buildCandidate(state: currentState, isTypingVertical: input.isTypingVertical))
+      stateCallback(buildCandidate(state: state))
       return true
     }
 
@@ -236,7 +236,7 @@ extension KeyHandler {
     // MARK: Clock-Left & Clock-Right
 
     if input.isCursorClockLeft || input.isCursorClockRight {
-      if input.isOptionHold, state is InputState.Inputting {
+      if input.isOptionHold, state.type == .ofInputting {
         if input.isCursorClockRight {
           return handleInlineCandidateRotation(
             state: state, reverseModifier: false, stateCallback: stateCallback, errorCallback: errorCallback
@@ -277,7 +277,7 @@ extension KeyHandler {
 
     // MARK: Punctuation list
 
-    if input.isSymbolMenuPhysicalKey, !input.isShiftHold, !input.isControlHold {
+    if input.isSymbolMenuPhysicalKey, !input.isShiftHold, !input.isControlHold, state.type != .ofDeactivated {
       if input.isOptionHold {
         if currentLM.hasUnigramsFor(key: "_punctuation_list") {
           if composer.isEmpty {
@@ -285,7 +285,7 @@ extension KeyHandler {
             walk()
             let inputting = buildInputtingState
             stateCallback(inputting)
-            stateCallback(buildCandidate(state: inputting, isTypingVertical: input.isTypingVertical))
+            stateCallback(buildCandidate(state: inputting))
           } else {  // 不要在注音沒敲完整的情況下叫出統合符號選單。
             IME.prtDebugIntel("17446655")
             errorCallback()
@@ -297,14 +297,14 @@ extension KeyHandler {
         // 於是這裡用「模擬一次 Enter 鍵的操作」使其代為執行這個 commit buffer 的動作。
         // 這裡不需要該函式所傳回的 bool 結果，所以用「_ =」解消掉。
         _ = handleEnter(state: state, stateCallback: stateCallback)
-        stateCallback(InputState.SymbolTable(node: SymbolNode.root, isTypingVertical: input.isTypingVertical))
+        stateCallback(IMEState.ofSymbolTable(node: SymbolNode.root))
         return true
       }
     }
 
     // MARK: 全形/半形阿拉伯數字輸入 (FW / HW Arabic Numbers Input)
 
-    if state is InputState.Empty {
+    if state.type == .ofEmpty {
       if input.isMainAreaNumKey, input.isShiftHold, input.isOptionHold, !input.isControlHold, !input.isCommandHold {
         // NOTE: 將來棄用 macOS 10.11 El Capitan 支援的時候，把這裡由 CFStringTransform 改為 StringTransform:
         // https://developer.apple.com/documentation/foundation/stringtransform
@@ -312,9 +312,9 @@ extension KeyHandler {
         let string = NSMutableString(string: stringRAW)
         CFStringTransform(string, nil, kCFStringTransformFullwidthHalfwidth, true)
         stateCallback(
-          InputState.Committing(textToCommit: mgrPrefs.halfWidthPunctuationEnabled ? stringRAW : string as String)
+          IMEState.ofCommitting(textToCommit: mgrPrefs.halfWidthPunctuationEnabled ? stringRAW : string as String)
         )
-        stateCallback(InputState.Empty())
+        stateCallback(IMEState.ofEmpty())
         return true
       }
     }
@@ -357,10 +357,10 @@ extension KeyHandler {
     // MARK: 全形/半形空白 (Full-Width / Half-Width Space)
 
     /// 該功能僅可在當前組字區沒有任何內容的時候使用。
-    if state is InputState.Empty {
+    if state.type == .ofEmpty {
       if input.isSpace, !input.isOptionHold, !input.isControlHold, !input.isCommandHold {
-        stateCallback(InputState.Committing(textToCommit: input.isShiftHold ? "　" : " "))
-        stateCallback(InputState.Empty())
+        stateCallback(IMEState.ofCommitting(textToCommit: input.isShiftHold ? "　" : " "))
+        stateCallback(IMEState.ofEmpty())
         return true
       }
     }
@@ -371,14 +371,14 @@ extension KeyHandler {
       if input.isShiftHold {  // 這裡先不要判斷 isOptionHold。
         switch mgrPrefs.upperCaseLetterKeyBehavior {
           case 1:
-            stateCallback(InputState.Empty())
-            stateCallback(InputState.Committing(textToCommit: inputText.lowercased()))
-            stateCallback(InputState.Empty())
+            stateCallback(IMEState.ofEmpty())
+            stateCallback(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
+            stateCallback(IMEState.ofEmpty())
             return true
           case 2:
-            stateCallback(InputState.Empty())
-            stateCallback(InputState.Committing(textToCommit: inputText.uppercased()))
-            stateCallback(InputState.Empty())
+            stateCallback(IMEState.ofEmpty())
+            stateCallback(IMEState.ofCommitting(textToCommit: inputText.uppercased()))
+            stateCallback(IMEState.ofEmpty())
             return true
           default:  // 包括 case 0，直接塞給組字區。
             let letter = "_letter_\(inputText)"
@@ -401,7 +401,7 @@ extension KeyHandler {
     /// 否則的話，可能會導致輸入法行為異常：部分應用會阻止輸入法完全攔截某些按鍵訊號。
     /// 砍掉這一段會導致「F1-F12 按鍵干擾組字區」的問題。
     /// 暫時只能先恢復這段，且補上偵錯彙報機制，方便今後排查故障。
-    if (state is InputState.NotEmpty) || !composer.isEmpty {
+    if state.hasComposition || !composer.isEmpty {
       IME.prtDebugIntel(
         "Blocked data: charCode: \(input.charCode), keyCode: \(input.keyCode)")
       IME.prtDebugIntel("A9BFF20E")

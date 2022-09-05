@@ -12,7 +12,7 @@ import Cocoa
 import InputMethodKit
 
 @objc(AppDelegate)
-class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelegate,
+class AppDelegate: NSObject, NSApplicationDelegate,
   FSEventStreamHelperDelegate, NSUserNotificationCenterDelegate
 {
   func helper(_: FSEventStreamHelper, didReceive _: [FSEventStreamHelper.Event]) {
@@ -30,7 +30,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
   private var ctlPrefWindowInstance: ctlPrefWindow?
   private var ctlAboutWindowInstance: ctlAboutWindow?  // New About Window
   private var checkTask: URLSessionTask?
-  private var updateNextStepURL: URL?
   public var fsStreamHelper = FSEventStreamHelper(
     path: mgrLangModel.dataFolderPath(isDefaultFolder: false),
     queue: DispatchQueue(label: "vChewing User Phrases")
@@ -42,7 +41,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
     ctlPrefWindowInstance = nil
     ctlAboutWindowInstance = nil
     checkTask = nil
-    updateNextStepURL = nil
     fsStreamHelper.stop()
     fsStreamHelper.delegate = nil
   }
@@ -137,7 +135,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
         case .success(let apiResult):
           switch apiResult {
             case .shouldUpdate(let report):
-              updateNextStepURL = report.siteUrl
               let content = String(
                 format: NSLocalizedString(
                   "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@",
@@ -150,21 +147,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
                 report.versionDescription
               )
               IME.prtDebugIntel("vChewingDebug: \(content)")
-              currentAlertType = "Update"
-              ctlNonModalAlertWindow.shared.show(
-                title: NSLocalizedString(
-                  "New Version Available", comment: ""
-                ),
-                content: content,
-                confirmButtonTitle: NSLocalizedString(
-                  "Visit Website", comment: ""
-                ),
-                cancelButtonTitle: NSLocalizedString(
-                  "Not Now", comment: ""
-                ),
-                cancelAsDefault: false,
-                delegate: self
-              )
+              let alert = NSAlert()
+              alert.messageText = NSLocalizedString("New Version Available", comment: "")
+              alert.informativeText = content
+              alert.addButton(withTitle: NSLocalizedString("Visit Website", comment: ""))
+              alert.addButton(withTitle: NSLocalizedString("Not Now", comment: ""))
+              let result = alert.runModal()
+              if result == NSApplication.ModalResponse.alertFirstButtonReturn {
+                if let siteURL = report.siteUrl {
+                  NSWorkspace.shared.open(siteURL)
+                }
+              }
               NSApp.setActivationPolicy(.accessory)
             case .noNeedToUpdate, .ignored:
               break
@@ -172,9 +165,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
         case .failure(let error):
           switch error {
             case VersionUpdateApiError.connectionError(let message):
-              let title = NSLocalizedString(
-                "Update Check Failed", comment: ""
-              )
+              let title = NSLocalizedString("Update Check Failed", comment: "")
               let content = String(
                 format: NSLocalizedString(
                   "There may be no internet connection or the server failed to respond.\n\nError message: %@",
@@ -183,13 +174,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
               )
               let buttonTitle = NSLocalizedString("Dismiss", comment: "")
               IME.prtDebugIntel("vChewingDebug: \(content)")
-              currentAlertType = "Update"
-              ctlNonModalAlertWindow.shared.show(
-                title: title, content: content,
-                confirmButtonTitle: buttonTitle,
-                cancelButtonTitle: nil,
-                cancelAsDefault: false, delegate: nil
-              )
+
+              let alert = NSAlert()
+              alert.messageText = title
+              alert.informativeText = content
+              alert.addButton(withTitle: buttonTitle)
+              alert.runModal()
               NSApp.setActivationPolicy(.accessory)
             default:
               break
@@ -205,39 +195,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, ctlNonModalAlertWindowDelega
         "This will remove vChewing Input Method from this user account, requiring your confirmation.",
         comment: ""
       ))
-    ctlNonModalAlertWindow.shared.show(
-      title: NSLocalizedString("Uninstallation", comment: ""), content: content,
-      confirmButtonTitle: NSLocalizedString("OK", comment: ""),
-      cancelButtonTitle: NSLocalizedString("Not Now", comment: ""), cancelAsDefault: false,
-      delegate: self
-    )
+    let alert = NSAlert()
+    alert.messageText = NSLocalizedString("Uninstallation", comment: "")
+    alert.informativeText = content
+    alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+    alert.addButton(withTitle: NSLocalizedString("Not Now", comment: ""))
+    let result = alert.runModal()
+    if result == NSApplication.ModalResponse.alertFirstButtonReturn {
+      NSWorkspace.shared.openFile(
+        mgrLangModel.dataFolderPath(isDefaultFolder: true), withApplication: "Finder"
+      )
+      IME.uninstall(isSudo: false, selfKill: true)
+    }
     NSApp.setActivationPolicy(.accessory)
-  }
-
-  func ctlNonModalAlertWindowDidConfirm(_: ctlNonModalAlertWindow) {
-    switch currentAlertType {
-      case "Uninstall":
-        NSWorkspace.shared.openFile(
-          mgrLangModel.dataFolderPath(isDefaultFolder: true), withApplication: "Finder"
-        )
-        IME.uninstall(isSudo: false, selfKill: true)
-      case "Update":
-        if let updateNextStepURL = updateNextStepURL {
-          NSWorkspace.shared.open(updateNextStepURL)
-        }
-        updateNextStepURL = nil
-      default:
-        break
-    }
-  }
-
-  func ctlNonModalAlertWindowDidCancel(_: ctlNonModalAlertWindow) {
-    switch currentAlertType {
-      case "Update":
-        updateNextStepURL = nil
-      default:
-        break
-    }
   }
 
   // New About Window

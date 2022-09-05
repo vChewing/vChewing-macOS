@@ -13,7 +13,7 @@ import InputMethodKit
 public enum vChewing {}
 
 // The type of input modes.
-public enum InputMode: String {
+public enum InputMode: String, CaseIterable {
   case imeModeCHS = "org.atelierInmu.inputmethod.vChewing.IMECHS"
   case imeModeCHT = "org.atelierInmu.inputmethod.vChewing.IMECHT"
   case imeModeNULL = ""
@@ -131,11 +131,11 @@ public enum IME {
           ),
           mgrLangModel.dataFolderPath(isDefaultFolder: false)
         )
-        ctlNonModalAlertWindow.shared.show(
-          title: NSLocalizedString("Unable to create the user phrase file.", comment: ""),
-          content: content, confirmButtonTitle: NSLocalizedString("OK", comment: ""),
-          cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil
-        )
+        let alert = NSAlert()
+        alert.messageText = NSLocalizedString("Unable to create the user phrase file.", comment: "")
+        alert.informativeText = content
+        alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+        alert.runModal()
         NSApp.setActivationPolicy(.accessory)
         return false
       }
@@ -223,152 +223,6 @@ public enum IME {
     }
     return 0
   }
-
-  // MARK: - Registering the input method.
-
-  @discardableResult static func registerInputMethod() -> Int32 {
-    guard let bundleID = Bundle.main.bundleIdentifier else {
-      return -1
-    }
-    let bundleUrl = Bundle.main.bundleURL
-    var maybeInputSource = InputSourceHelper.inputSource(for: bundleID)
-
-    if maybeInputSource == nil {
-      NSLog("Registering input source \(bundleID) at \(bundleUrl.absoluteString)")
-      // then register
-      let status = InputSourceHelper.registerTnputSource(at: bundleUrl)
-
-      if !status {
-        NSLog(
-          "Fatal error: Cannot register input source \(bundleID) at \(bundleUrl.absoluteString)."
-        )
-        return -1
-      }
-
-      maybeInputSource = InputSourceHelper.inputSource(for: bundleID)
-    }
-
-    guard let inputSource = maybeInputSource else {
-      NSLog("Fatal error: Cannot find input source \(bundleID) after registration.")
-      return -1
-    }
-
-    if !InputSourceHelper.inputSourceEnabled(for: inputSource) {
-      NSLog("Enabling input source \(bundleID) at \(bundleUrl.absoluteString).")
-      let status = InputSourceHelper.enable(inputSource: inputSource)
-      if !status {
-        NSLog("Fatal error: Cannot enable input source \(bundleID).")
-        return -1
-      }
-      if !InputSourceHelper.inputSourceEnabled(for: inputSource) {
-        NSLog("Fatal error: Cannot enable input source \(bundleID).")
-        return -1
-      }
-    }
-
-    if CommandLine.arguments.count > 2, CommandLine.arguments[2] == "--all" {
-      let enabled = InputSourceHelper.enableAllInputMode(for: bundleID)
-      NSLog(
-        enabled
-          ? "All input sources enabled for \(bundleID)"
-          : "Cannot enable all input sources for \(bundleID), but this is ignored")
-    }
-    return 0
-  }
-
-  // MARK: - 準備枚舉系統內所有的 ASCII 鍵盤佈局
-
-  struct CarbonKeyboardLayout {
-    var strName: String = ""
-    var strValue: String = ""
-  }
-
-  static let arrWhitelistedKeyLayoutsASCII: [String] = [
-    "com.apple.keylayout.ABC",
-    "com.apple.keylayout.ABC-AZERTY",
-    "com.apple.keylayout.ABC-QWERTZ",
-    "com.apple.keylayout.British",
-    "com.apple.keylayout.Colemak",
-    "com.apple.keylayout.Dvorak",
-    "com.apple.keylayout.Dvorak-Left",
-    "com.apple.keylayout.DVORAK-QWERTYCMD",
-    "com.apple.keylayout.Dvorak-Right",
-  ]
-  static var arrEnumerateSystemKeyboardLayouts: [IME.CarbonKeyboardLayout] {
-    // 提前塞入 macOS 內建的兩款動態鍵盤佈局
-    var arrKeyLayouts: [IME.CarbonKeyboardLayout] = []
-    arrKeyLayouts += [
-      IME.CarbonKeyboardLayout(
-        strName: NSLocalizedString("Apple Chewing - Dachen", comment: ""),
-        strValue: "com.apple.keylayout.ZhuyinBopomofo"
-      ),
-      IME.CarbonKeyboardLayout(
-        strName: NSLocalizedString("Apple Chewing - Eten Traditional", comment: ""),
-        strValue: "com.apple.keylayout.ZhuyinEten"
-      ),
-    ]
-
-    // 準備枚舉系統內所有的 ASCII 鍵盤佈局
-    var arrKeyLayoutsMACV: [IME.CarbonKeyboardLayout] = []
-    var arrKeyLayoutsASCII: [IME.CarbonKeyboardLayout] = []
-    let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
-    for source in list {
-      if let ptrCategory = TISGetInputSourceProperty(source, kTISPropertyInputSourceCategory) {
-        let category = Unmanaged<CFString>.fromOpaque(ptrCategory).takeUnretainedValue()
-        if category != kTISCategoryKeyboardInputSource {
-          continue
-        }
-      } else {
-        continue
-      }
-
-      if let ptrASCIICapable = TISGetInputSourceProperty(
-        source, kTISPropertyInputSourceIsASCIICapable
-      ) {
-        let asciiCapable = Unmanaged<CFBoolean>.fromOpaque(ptrASCIICapable)
-          .takeUnretainedValue()
-        if asciiCapable != kCFBooleanTrue {
-          continue
-        }
-      } else {
-        continue
-      }
-
-      if let ptrSourceType = TISGetInputSourceProperty(source, kTISPropertyInputSourceType) {
-        let sourceType = Unmanaged<CFString>.fromOpaque(ptrSourceType).takeUnretainedValue()
-        if sourceType != kTISTypeKeyboardLayout {
-          continue
-        }
-      } else {
-        continue
-      }
-
-      guard let ptrSourceID = TISGetInputSourceProperty(source, kTISPropertyInputSourceID),
-        let localizedNamePtr = TISGetInputSourceProperty(source, kTISPropertyLocalizedName)
-      else {
-        continue
-      }
-
-      let sourceID = String(Unmanaged<CFString>.fromOpaque(ptrSourceID).takeUnretainedValue())
-      let localizedName = String(
-        Unmanaged<CFString>.fromOpaque(localizedNamePtr).takeUnretainedValue())
-
-      if sourceID.contains("vChewing") {
-        arrKeyLayoutsMACV += [
-          IME.CarbonKeyboardLayout(strName: localizedName, strValue: sourceID)
-        ]
-      }
-
-      if IME.arrWhitelistedKeyLayoutsASCII.contains(sourceID) {
-        arrKeyLayoutsASCII += [
-          IME.CarbonKeyboardLayout(strName: localizedName, strValue: sourceID)
-        ]
-      }
-    }
-    arrKeyLayouts += arrKeyLayoutsMACV
-    arrKeyLayouts += arrKeyLayoutsASCII
-    return arrKeyLayouts
-  }
 }
 
 // MARK: - Root Extensions
@@ -380,6 +234,16 @@ extension RangeReplaceableCollection where Element: Hashable {
     var set = Set<Element>()
     return filter { set.insert($0).inserted }
   }
+}
+
+// MARK: - String charComponents Extension
+
+extension String {
+  public var charComponents: [String] { map { String($0) } }
+}
+
+extension Array where Element == String.Element {
+  public var charComponents: [String] { map { String($0) } }
 }
 
 // MARK: - String Tildes Expansion Extension

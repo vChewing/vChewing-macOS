@@ -229,18 +229,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
       if let newChar = ctlCandidateIMK.defaultIMKSelectionKey[event.keyCode] {
         /// 根據 KeyCode 重新換算一下選字鍵的 NSEvent，糾正其 Character 數值。
         /// 反正 IMK 選字窗目前也沒辦法修改選字鍵。
-        let newEvent = NSEvent.keyEvent(
-          with: event.type,
-          location: event.locationInWindow,
-          modifierFlags: event.modifierFlags,
-          timestamp: event.timestamp,
-          windowNumber: event.windowNumber,
-          context: nil,
-          characters: newChar,
-          charactersIgnoringModifiers: event.charactersIgnoringModifiers ?? event.characters ?? "",
-          isARepeat: event.isARepeat,
-          keyCode: event.keyCode
-        )
+        let newEvent = event.reinitiate(characters: newChar)
         if let newEvent = newEvent {
           if mgrPrefs.useSCPCTypingMode, delegate.isAssociatedPhrasesState {
             // 註：input.isShiftHold 已經在 ctlInputMethod.handle() 內處理，因為在那邊處理才有效。
@@ -300,17 +289,6 @@ extension ctlCandidateIMK {
     let mapNumPadKeyCodeTranslation: [UInt16: UInt16] = [
       83: 18, 84: 19, 85: 20, 86: 21, 87: 23, 88: 22, 89: 26, 91: 28, 92: 25,
     ]
-    return NSEvent.keyEvent(
-      with: event.type,
-      location: event.locationInWindow,
-      modifierFlags: event.modifierFlags,
-      timestamp: event.timestamp,
-      windowNumber: event.windowNumber,
-      context: nil,
-      characters: event.characters ?? "",
-      charactersIgnoringModifiers: event.charactersIgnoringModifiers ?? event.characters ?? "",
-      isARepeat: event.isARepeat,
-      keyCode: mapNumPadKeyCodeTranslation[event.keyCode] ?? event.keyCode
-    )
+    return event.reinitiate(keyCode: mapNumPadKeyCodeTranslation[event.keyCode] ?? event.keyCode)
   }
 }

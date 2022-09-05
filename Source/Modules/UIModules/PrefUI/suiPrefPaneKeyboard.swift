@@ -93,12 +93,12 @@ struct suiPrefPaneKeyboard: View {
                 mgrPrefs.mandarinParser = value
                 switch value {
                   case 0:
-                    if !AppleKeyboardConverter.arrDynamicBasicKeyLayout.contains(mgrPrefs.basicKeyboardLayout) {
+                    if !IMKHelper.arrDynamicBasicKeyLayouts.contains(mgrPrefs.basicKeyboardLayout) {
                       mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
                       selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
                     }
                   default:
-                    if AppleKeyboardConverter.arrDynamicBasicKeyLayout.contains(mgrPrefs.basicKeyboardLayout) {
+                    if IMKHelper.arrDynamicBasicKeyLayouts.contains(mgrPrefs.basicKeyboardLayout) {
                       mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ABC"
                       selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
                     }
@@ -170,15 +170,19 @@ struct suiPrefPaneKeyboard: View {
               selection: $selBasicKeyboardLayout.onChange {
                 let value = selBasicKeyboardLayout
                 mgrPrefs.basicKeyboardLayout = value
-                if AppleKeyboardConverter.arrDynamicBasicKeyLayout.contains(value) {
+                if IMKHelper.arrDynamicBasicKeyLayouts.contains(value) {
                   mgrPrefs.mandarinParser = 0
                   selMandarinParser = mgrPrefs.mandarinParser
                 }
               }
             ) {
-              ForEach(0...(IME.arrEnumerateSystemKeyboardLayouts.count - 1), id: \.self) { id in
-                Text(IME.arrEnumerateSystemKeyboardLayouts[id].strName).tag(
-                  IME.arrEnumerateSystemKeyboardLayouts[id].strValue)
+              ForEach(0...(IMKHelper.allowedBasicLayoutsAsTISInputSources.count - 1), id: \.self) { id in
+                let theEntry = IMKHelper.allowedBasicLayoutsAsTISInputSources[id]
+                if let theEntry = theEntry {
+                  Text(theEntry.vChewingLocalizedName).tag(theEntry.identifier)
+                } else {
+                  Divider()
+                }
               }.id(UUID())
             }
             .labelsHidden()

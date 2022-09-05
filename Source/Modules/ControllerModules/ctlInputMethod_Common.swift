@@ -31,11 +31,9 @@ extension ctlInputMethod {
         if !shouldUseHandle || (!rencentKeyHandledByKeyHandler && shouldUseHandle) {
           NotifierController.notify(
             message: NSLocalizedString("Alphanumerical Mode", comment: "") + "\n"
-              + {
-                toggleASCIIMode()
-                  ? NSLocalizedString("NotificationSwitchON", comment: "")
-                  : NSLocalizedString("NotificationSwitchOFF", comment: "")
-              }()
+              + (toggleASCIIMode()
+                ? NSLocalizedString("NotificationSwitchON", comment: "")
+                : NSLocalizedString("NotificationSwitchOFF", comment: ""))
           )
         }
         if shouldUseHandle {

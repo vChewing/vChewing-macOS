@@ -23,9 +23,9 @@ extension KeyHandler {
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleCandidate(
-    state: InputStateProtocol,
+    state: IMEStateProtocol,
     input: InputSignalProtocol,
-    stateCallback: @escaping (InputStateProtocol) -> Void,
+    stateCallback: @escaping (IMEStateProtocol) -> Void,
     errorCallback: @escaping () -> Void
   ) -> Bool {
     guard var ctlCandidateCurrent = delegate?.ctlCandidate() else {
@@ -41,7 +41,7 @@ extension KeyHandler {
       || ((input.isCursorBackward || input.isCursorForward) && input.isShiftHold)
 
     if cancelCandidateKey {
-      if state is InputState.AssociatedPhrases
+      if state.type == .ofAssociates
         || mgrPrefs.useSCPCTypingMode
         || compositor.isEmpty
       {
@@ -49,13 +49,12 @@ extension KeyHandler {
         // 就將當前的組字緩衝區析構處理、強制重設輸入狀態。
         // 否則，一個本不該出現的真空組字緩衝區會使前後方向鍵與 BackSpace 鍵失靈。
         // 所以這裡需要對 compositor.isEmpty 做判定。
-        stateCallback(InputState.EmptyIgnoringPreviousState())
-        stateCallback(InputState.Empty())
+        stateCallback(IMEState.ofAbortion())
       } else {
         stateCallback(buildInputtingState)
       }
-      if let state = state as? InputState.SymbolTable, let nodePrevious = state.node.previous {
-        stateCallback(InputState.SymbolTable(node: nodePrevious, isTypingVertical: state.isTypingVertical))
+      if state.type == .ofSymbolTable, let nodePrevious = state.node.previous, let _ = nodePrevious.children {
+        stateCallback(IMEState.ofSymbolTable(node: nodePrevious))
       }
       return true
     }
@@ -63,9 +62,8 @@ extension KeyHandler {
     // MARK: Enter
 
     if input.isEnter {
-      if state is InputState.AssociatedPhrases, !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter {
-        stateCallback(InputState.EmptyIgnoringPreviousState())
-        stateCallback(InputState.Empty())
+      if state.type == .ofAssociates, !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter {
+        stateCallback(IMEState.ofAbortion())
         return true
       }
       delegate?.keyHandler(
@@ -243,23 +241,15 @@ extension KeyHandler {
 
     // MARK: End Key
 
-    var candidates: [(String, String)]!
-
-    if let state = state as? InputState.ChoosingCandidate {
-      candidates = state.candidates
-    } else if let state = state as? InputState.AssociatedPhrases {
-      candidates = state.candidates
-    }
-
-    if candidates.isEmpty {
+    if state.candidates.isEmpty {
       return false
     } else {  // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
       if input.isEnd || input.emacsKey == EmacsKey.end {
-        if ctlCandidateCurrent.selectedCandidateIndex == candidates.count - 1 {
+        if ctlCandidateCurrent.selectedCandidateIndex == state.candidates.count - 1 {
           IME.prtDebugIntel("9B69AAAD")
           errorCallback()
         } else {
-          ctlCandidateCurrent.selectedCandidateIndex = candidates.count - 1
+          ctlCandidateCurrent.selectedCandidateIndex = state.candidates.count - 1
         }
         return true
       }
@@ -267,13 +257,13 @@ extension KeyHandler {
 
     // MARK: 聯想詞處理 (Associated Phrases)
 
-    if state is InputState.AssociatedPhrases {
+    if state.type == .ofAssociates {
       if !input.isShiftHold { return false }
     }
 
     var index: Int = NSNotFound
     let match: String =
-      (state is InputState.AssociatedPhrases) ? input.inputTextIgnoringModifiers ?? "" : input.text
+      (state.type == .ofAssociates) ? input.inputTextIgnoringModifiers ?? "" : input.text
 
     for j in 0..<ctlCandidateCurrent.keyLabels.count {
       let label: CandidateKeyLabel = ctlCandidateCurrent.keyLabels[j]
@@ -293,7 +283,7 @@ extension KeyHandler {
       }
     }
 
-    if state is InputState.AssociatedPhrases { return false }
+    if state.type == .ofAssociates { return false }
 
     // MARK: 逐字選字模式的處理 (SCPC Mode Processing)
 
@@ -333,10 +323,9 @@ extension KeyHandler {
             didSelectCandidateAt: candidateIndex,
             ctlCandidate: ctlCandidateCurrent
           )
-          stateCallback(InputState.EmptyIgnoringPreviousState())
-          stateCallback(InputState.Empty())
+          stateCallback(IMEState.ofAbortion())
           return handle(
-            input: input, state: InputState.Empty(), stateCallback: stateCallback, errorCallback: errorCallback
+            input: input, state: IMEState.ofEmpty(), stateCallback: stateCallback, errorCallback: errorCallback
           )
         }
         return true

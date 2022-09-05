@@ -212,11 +212,9 @@ extension ctlInputMethod {
     resetKeyHandler()
     NotifierController.notify(
       message: NSLocalizedString("Per-Char Select Mode", comment: "") + "\n"
-        + {
-          mgrPrefs.toggleSCPCTypingModeEnabled()
-            ? NSLocalizedString("NotificationSwitchON", comment: "")
-            : NSLocalizedString("NotificationSwitchOFF", comment: "")
-        }()
+        + (mgrPrefs.toggleSCPCTypingModeEnabled()
+          ? NSLocalizedString("NotificationSwitchON", comment: "")
+          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
   }
 
@@ -224,11 +222,9 @@ extension ctlInputMethod {
     resetKeyHandler()
     NotifierController.notify(
       message: NSLocalizedString("Force KangXi Writing", comment: "") + "\n"
-        + {
-          mgrPrefs.toggleChineseConversionEnabled()
-            ? NSLocalizedString("NotificationSwitchON", comment: "")
-            : NSLocalizedString("NotificationSwitchOFF", comment: "")
-        }()
+        + (mgrPrefs.toggleChineseConversionEnabled()
+          ? NSLocalizedString("NotificationSwitchON", comment: "")
+          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
   }
 
@@ -236,11 +232,9 @@ extension ctlInputMethod {
     resetKeyHandler()
     NotifierController.notify(
       message: NSLocalizedString("JIS Shinjitai Output", comment: "") + "\n"
-        + {
-          mgrPrefs.toggleShiftJISShinjitaiOutputEnabled()
-            ? NSLocalizedString("NotificationSwitchON", comment: "")
-            : NSLocalizedString("NotificationSwitchOFF", comment: "")
-        }()
+        + (mgrPrefs.toggleShiftJISShinjitaiOutputEnabled()
+          ? NSLocalizedString("NotificationSwitchON", comment: "")
+          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
   }
 
@@ -248,11 +242,9 @@ extension ctlInputMethod {
     resetKeyHandler()
     NotifierController.notify(
       message: NSLocalizedString("Currency Numeral Output", comment: "") + "\n"
-        + {
-          mgrPrefs.toggleCurrencyNumeralsEnabled()
-            ? NSLocalizedString("NotificationSwitchON", comment: "")
-            : NSLocalizedString("NotificationSwitchOFF", comment: "")
-        }()
+        + (mgrPrefs.toggleCurrencyNumeralsEnabled()
+          ? NSLocalizedString("NotificationSwitchON", comment: "")
+          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
   }
 
@@ -260,11 +252,9 @@ extension ctlInputMethod {
     resetKeyHandler()
     NotifierController.notify(
       message: NSLocalizedString("Half-Width Punctuation Mode", comment: "") + "\n"
-        + {
-          mgrPrefs.toggleHalfWidthPunctuationEnabled()
-            ? NSLocalizedString("NotificationSwitchON", comment: "")
-            : NSLocalizedString("NotificationSwitchOFF", comment: "")
-        }()
+        + (mgrPrefs.toggleHalfWidthPunctuationEnabled()
+          ? NSLocalizedString("NotificationSwitchON", comment: "")
+          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
   }
 
@@ -272,11 +262,9 @@ extension ctlInputMethod {
     resetKeyHandler()
     NotifierController.notify(
       message: NSLocalizedString("CNS11643 Mode", comment: "") + "\n"
-        + {
-          mgrPrefs.toggleCNS11643Enabled()
-            ? NSLocalizedString("NotificationSwitchON", comment: "")
-            : NSLocalizedString("NotificationSwitchOFF", comment: "")
-        }()
+        + (mgrPrefs.toggleCNS11643Enabled()
+          ? NSLocalizedString("NotificationSwitchON", comment: "")
+          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
   }
 
@@ -284,11 +272,9 @@ extension ctlInputMethod {
     resetKeyHandler()
     NotifierController.notify(
       message: NSLocalizedString("Symbol & Emoji Input", comment: "") + "\n"
-        + {
-          mgrPrefs.toggleSymbolInputEnabled()
-            ? NSLocalizedString("NotificationSwitchON", comment: "")
-            : NSLocalizedString("NotificationSwitchOFF", comment: "")
-        }()
+        + (mgrPrefs.toggleSymbolInputEnabled()
+          ? NSLocalizedString("NotificationSwitchON", comment: "")
+          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
   }
 
@@ -296,11 +282,9 @@ extension ctlInputMethod {
     resetKeyHandler()
     NotifierController.notify(
       message: NSLocalizedString("Per-Char Associated Phrases", comment: "") + "\n"
-        + {
-          mgrPrefs.toggleAssociatedPhrasesEnabled()
-            ? NSLocalizedString("NotificationSwitchON", comment: "")
-            : NSLocalizedString("NotificationSwitchOFF", comment: "")
-        }()
+        + (mgrPrefs.toggleAssociatedPhrasesEnabled()
+          ? NSLocalizedString("NotificationSwitchON", comment: "")
+          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
   }
 
@@ -308,11 +292,9 @@ extension ctlInputMethod {
     resetKeyHandler()
     NotifierController.notify(
       message: NSLocalizedString("Use Phrase Replacement", comment: "") + "\n"
-        + {
-          mgrPrefs.togglePhraseReplacementEnabled()
-            ? NSLocalizedString("NotificationSwitchON", comment: "")
-            : NSLocalizedString("NotificationSwitchOFF", comment: "")
-        }()
+        + (mgrPrefs.togglePhraseReplacementEnabled()
+          ? NSLocalizedString("NotificationSwitchON", comment: "")
+          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
   }
 

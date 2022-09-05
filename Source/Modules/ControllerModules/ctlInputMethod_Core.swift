@@ -32,16 +32,20 @@ class ctlInputMethod: IMKInputController {
 
   // MARK: -
 
-  /// 按鍵調度模組的副本。
-  var keyHandler: KeyHandler = .init()
-  /// 用以記錄當前輸入法狀態的變數。
-  var state: InputStateProtocol = InputState.Empty()
-  /// 當前這個 ctlInputMethod 副本是否處於英數輸入模式。
-  var isASCIIMode: Bool = false
   /// 當前這個 ctlInputMethod 副本是否處於英數輸入模式（滯後項）。
   static var isASCIIModeSituation: Bool = false
   /// 當前這個 ctlInputMethod 副本是否處於縱排輸入模式（滯後項）。
   static var isVerticalTypingSituation: Bool = false
+  /// 當前這個 ctlInputMethod 副本是否處於英數輸入模式。
+  var isASCIIMode: Bool = false
+  /// 按鍵調度模組的副本。
+  var keyHandler: KeyHandler = .init()
+  /// 用以記錄當前輸入法狀態的變數。
+  var state: IMEStateProtocol = IMEState.ofEmpty() {
+    didSet {
+      IME.prtDebugIntel("Current State: \(state.type.rawValue)")
+    }
+  }
 
   /// 切換當前 ctlInputMethod 副本的英數輸入模式開關。
   func toggleASCIIMode() -> Bool {
@@ -65,15 +69,15 @@ class ctlInputMethod: IMKInputController {
   /// 重設按鍵調度模組，會將當前尚未遞交的內容遞交出去。
   func resetKeyHandler() {
     // 過濾掉尚未完成拼寫的注音。
-    if state is InputState.Inputting, mgrPrefs.trimUnfinishedReadingsOnCommit {
+    if state.type == .ofInputting, mgrPrefs.trimUnfinishedReadingsOnCommit {
       keyHandler.composer.clear()
       handle(state: keyHandler.buildInputtingState)
     }
-    if let state = state as? InputState.NotEmpty {
+    if state.hasComposition {
       /// 將傳回的新狀態交給調度函式。
-      handle(state: InputState.Committing(textToCommit: state.composingBufferConverted))
+      handle(state: IMEState.ofCommitting(textToCommit: state.displayedText))
     }
-    handle(state: InputState.Empty())
+    handle(state: IMEState.ofEmpty())
   }
 
   // MARK: - IMKInputController 方法
@@ -115,11 +119,9 @@ class ctlInputMethod: IMKInputController {
       } else {
         NotifierController.notify(
           message: NSLocalizedString("Alphanumerical Mode", comment: "") + "\n"
-            + {
-              isASCIIMode
-                ? NSLocalizedString("NotificationSwitchON", comment: "")
-                : NSLocalizedString("NotificationSwitchOFF", comment: "")
-            }()
+            + (isASCIIMode
+              ? NSLocalizedString("NotificationSwitchON", comment: "")
+              : NSLocalizedString("NotificationSwitchOFF", comment: ""))
         )
       }
     }
@@ -129,7 +131,7 @@ class ctlInputMethod: IMKInputController {
     if let client = client(), client.bundleIdentifier() != Bundle.main.bundleIdentifier {
       // 強制重設當前鍵盤佈局、使其與偏好設定同步。
       setKeyLayout()
-      handle(state: InputState.Empty())
+      handle(state: IMEState.ofEmpty())
     }  // 除此之外就不要動了，免得在點開輸入法自身的視窗時卡死。
     (NSApp.delegate as? AppDelegate)?.checkForUpdate()
   }
@@ -139,7 +141,7 @@ class ctlInputMethod: IMKInputController {
   override func deactivateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     resetKeyHandler()  // 這條會自動搞定 Empty 狀態。
-    handle(state: InputState.Deactivated())
+    handle(state: IMEState.ofDeactivated())
   }
 
   /// 切換至某一個輸入法的某個副本時（比如威注音的簡體輸入法副本與繁體輸入法副本），會觸發該函式。
@@ -170,7 +172,7 @@ class ctlInputMethod: IMKInputController {
       if let client = client(), client.bundleIdentifier() != Bundle.main.bundleIdentifier {
         // 強制重設當前鍵盤佈局、使其與偏好設定同步。這裡的這一步也不能省略。
         setKeyLayout()
-        handle(state: InputState.Empty())
+        handle(state: IMEState.ofEmpty())
       }  // 除此之外就不要動了，免得在點開輸入法自身的視窗時卡死。
     }
 
@@ -224,20 +226,7 @@ class ctlInputMethod: IMKInputController {
       // Shift+Enter 是個特殊情形，不提前攔截處理的話、會有垃圾參數傳給 delegate 的 keyHandler 從而崩潰。
       // 所以這裡直接將 Shift Flags 清空。
       if event.isShiftHold, event.isEnter {
-        guard
-          let newEvent = NSEvent.keyEvent(
-            with: event.type,
-            location: event.locationInWindow,
-            modifierFlags: [],
-            timestamp: event.timestamp,
-            windowNumber: event.windowNumber,
-            context: nil,
-            characters: event.characters ?? "",
-            charactersIgnoringModifiers: event.charactersIgnoringModifiers ?? event.characters ?? "",
-            isARepeat: event.isARepeat,
-            keyCode: event.keyCode
-          )
-        else {
+        guard let newEvent = event.reinitiate(modifierFlags: []) else {
           NSSound.beep()
           return true
         }
@@ -247,20 +236,8 @@ class ctlInputMethod: IMKInputController {
 
       // 聯想詞選字。
       if let newChar = ctlCandidateIMK.defaultIMKSelectionKey[event.keyCode], event.isShiftHold,
-        isAssociatedPhrasesState
+        isAssociatedPhrasesState, let newEvent = event.reinitiate(modifierFlags: [], characters: newChar)
       {
-        let newEvent = NSEvent.keyEvent(
-          with: event.type,
-          location: event.locationInWindow,
-          modifierFlags: [],
-          timestamp: event.timestamp,
-          windowNumber: event.windowNumber,
-          context: nil,
-          characters: newChar,
-          charactersIgnoringModifiers: event.charactersIgnoringModifiers ?? event.characters ?? "",
-          isARepeat: event.isARepeat,
-          keyCode: event.keyCode
-        )
         ctlCandidateCurrent.handleKeyboardEvent(newEvent)
       }
 
@@ -288,8 +265,8 @@ class ctlInputMethod: IMKInputController {
   /// - Returns: 字串內容，或者 nil。
   override func composedString(_ sender: Any!) -> Any! {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-    guard let state = state as? InputState.NotEmpty else { return "" }
-    return state.committingBufferConverted
+    guard state.hasComposition else { return "" }
+    return state.displayedText
   }
 
   /// 輸入法要被換掉或關掉的時候，要做的事情。
@@ -309,7 +286,7 @@ class ctlInputMethod: IMKInputController {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     var arrResult = [String]()
 
-    // 注意：下文中的不可列印字元是用來方便在 InputState 當中用來分割資料的。
+    // 注意：下文中的不可列印字元是用來方便在 IMEState 當中用來分割資料的。
     func handleCandidatesPrepared(_ candidates: [(String, String)], prefix: String = "") {
       for theCandidate in candidates {
         let theConverted = IME.kanjiConversionIfRequired(theCandidate.1)
@@ -325,12 +302,12 @@ class ctlInputMethod: IMKInputController {
       }
     }
 
-    if let state = state as? InputState.AssociatedPhrases {
+    if state.type == .ofAssociates {
       handleCandidatesPrepared(state.candidates, prefix: "⇧")
-    } else if let state = state as? InputState.SymbolTable {
+    } else if state.type == .ofSymbolTable {
       // 分類符號選單不會出現同符異音項、不需要康熙 / JIS 轉換，所以使用簡化過的處理方式。
       arrResult = state.candidates.map(\.1)
-    } else if let state = state as? InputState.ChoosingCandidate {
+    } else if state.type == .ofCandidates {
       guard !state.candidates.isEmpty else { return .init() }
       if state.candidates[0].0.contains("_punctuation") {
         arrResult = state.candidates.map(\.1)  // 標點符號選單處理。
@@ -363,17 +340,16 @@ class ctlInputMethod: IMKInputController {
   /// - Parameter candidateString: 已經確認的候選字詞內容。
   override open func candidateSelected(_ candidateString: NSAttributedString!) {
     let candidateString: NSAttributedString = candidateString ?? .init(string: "")
-    if state is InputState.AssociatedPhrases {
+    if state.type == .ofAssociates {
       if !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter {
-        handle(state: InputState.EmptyIgnoringPreviousState())
-        handle(state: InputState.Empty())
+        handle(state: IMEState.ofAbortion())
         return
       }
     }
 
     var indexDeducted = 0
 
-    // 注意：下文中的不可列印字元是用來方便在 InputState 當中用來分割資料的。
+    // 注意：下文中的不可列印字元是用來方便在 IMEState 當中用來分割資料的。
     func handleCandidatesSelected(_ candidates: [(String, String)], prefix: String = "") {
       for (i, neta) in candidates.enumerated() {
         let theConverted = IME.kanjiConversionIfRequired(neta.1)
@@ -403,11 +379,11 @@ class ctlInputMethod: IMKInputController {
       }
     }
 
-    if let state = state as? InputState.AssociatedPhrases {
+    if state.type == .ofAssociates {
       handleCandidatesSelected(state.candidates, prefix: "⇧")
-    } else if let state = state as? InputState.SymbolTable {
+    } else if state.type == .ofSymbolTable {
       handleSymbolCandidatesSelected(state.candidates)
-    } else if let state = state as? InputState.ChoosingCandidate {
+    } else if state.type == .ofCandidates {
       guard !state.candidates.isEmpty else { return }
       if state.candidates[0].0.contains("_punctuation") {
         handleSymbolCandidatesSelected(state.candidates)  // 標點符號選單處理。

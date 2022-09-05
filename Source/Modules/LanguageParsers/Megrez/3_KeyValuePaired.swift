@@ -6,7 +6,7 @@
 import Foundation
 
 extension Megrez.Compositor {
-  public struct Candidate: Equatable, Hashable, Comparable, CustomStringConvertible {
+  public struct KeyValuePaired: Equatable, Hashable, Comparable, CustomStringConvertible {
     /// 鍵。一般情況下用來放置讀音等可以用來作為索引的內容。
     public var key: String
     /// 資料值。
@@ -32,23 +32,23 @@ extension Megrez.Compositor {
       hasher.combine(value)
     }
 
-    public static func == (lhs: Candidate, rhs: Candidate) -> Bool {
+    public static func == (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
       lhs.key == rhs.key && lhs.value == rhs.value
     }
 
-    public static func < (lhs: Candidate, rhs: Candidate) -> Bool {
+    public static func < (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
       (lhs.key.count < rhs.key.count) || (lhs.key.count == rhs.key.count && lhs.value < rhs.value)
     }
 
-    public static func > (lhs: Candidate, rhs: Candidate) -> Bool {
+    public static func > (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
       (lhs.key.count > rhs.key.count) || (lhs.key.count == rhs.key.count && lhs.value > rhs.value)
     }
 
-    public static func <= (lhs: Candidate, rhs: Candidate) -> Bool {
+    public static func <= (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
       (lhs.key.count <= rhs.key.count) || (lhs.key.count == rhs.key.count && lhs.value <= rhs.value)
     }
 
-    public static func >= (lhs: Candidate, rhs: Candidate) -> Bool {
+    public static func >= (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
       (lhs.key.count >= rhs.key.count) || (lhs.key.count == rhs.key.count && lhs.value >= rhs.value)
     }
   }
@@ -60,8 +60,8 @@ extension Megrez.Compositor {
   /// 話，那麼這裡會用到 location - 1、以免去在呼叫該函式後再處理的麻煩。
   /// - Parameter location: 游標位置。
   /// - Returns: 候選字音配對陣列。
-  public func fetchCandidates(at location: Int, filter: CandidateFetchFilter = .all) -> [Candidate] {
-    var result = [Candidate]()
+  public func fetchCandidates(at location: Int, filter: CandidateFetchFilter = .all) -> [KeyValuePaired] {
+    var result = [KeyValuePaired]()
     guard !keys.isEmpty else { return result }
     let location = max(min(location, keys.count - 1), 0)  // 防呆
     let anchors: [NodeAnchor] = fetchOverlappingNodes(at: location).stableSorted {
@@ -96,7 +96,7 @@ extension Megrez.Compositor {
   ///   - overrideType: 指定覆寫行為。
   /// - Returns: 該操作是否成功執行。
   @discardableResult public func overrideCandidate(
-    _ candidate: Candidate, at location: Int, overrideType: Node.OverrideType = .withHighScore
+    _ candidate: KeyValuePaired, at location: Int, overrideType: Node.OverrideType = .withHighScore
   )
     -> Bool
   {
@@ -154,7 +154,7 @@ extension Megrez.Compositor {
           anchor.node.reset()
           continue
         }
-        anchor.node.overridingScore /= 2
+        anchor.node.overridingScore /= 4
       }
     }
     return true

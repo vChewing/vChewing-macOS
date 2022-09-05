@@ -37,21 +37,20 @@ extension ctlInputMethod: KeyHandlerDelegate {
     ctlCandidate(controller, didSelectCandidateAtIndex: index)
   }
 
-  func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputStateProtocol, addToFilter: Bool)
+  func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: IMEStateProtocol, addToFilter: Bool)
     -> Bool
   {
-    guard let state = state as? InputState.Marking else { return false }
-    if state.bufferReadingCountMisMatch { return false }
+    guard state.type == .ofMarking else { return false }
     let refInputModeReversed: InputMode =
       (keyHandler.inputMode == InputMode.imeModeCHT)
       ? InputMode.imeModeCHS : InputMode.imeModeCHT
     if !mgrLangModel.writeUserPhrase(
-      state.userPhrase, inputMode: keyHandler.inputMode,
-      areWeDuplicating: state.chkIfUserPhraseExists,
+      state.data.userPhrase, inputMode: keyHandler.inputMode,
+      areWeDuplicating: state.data.chkIfUserPhraseExists,
       areWeDeleting: addToFilter
     )
       || !mgrLangModel.writeUserPhrase(
-        state.userPhraseConverted, inputMode: refInputModeReversed,
+        state.data.userPhraseConverted, inputMode: refInputModeReversed,
         areWeDuplicating: false,
         areWeDeleting: addToFilter
       )
@@ -65,7 +64,7 @@ extension ctlInputMethod: KeyHandlerDelegate {
 // MARK: - Candidate Controller Delegate
 
 extension ctlInputMethod: ctlCandidateDelegate {
-  var isAssociatedPhrasesState: Bool { state is InputState.AssociatedPhrases }
+  var isAssociatedPhrasesState: Bool { state.type == .ofAssociates }
 
   /// 完成 handle() 函式本該完成的內容，但去掉了與 IMK 選字窗有關的判斷語句。
   /// 這樣分開處理很有必要，不然 handle() 函式會陷入無限迴圈。
@@ -78,9 +77,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
 
   func candidateCountForController(_ controller: ctlCandidateProtocol) -> Int {
     _ = controller  // 防止格式整理工具毀掉與此對應的參數。
-    if let state = state as? InputState.ChoosingCandidate {
-      return state.candidates.count
-    } else if let state = state as? InputState.AssociatedPhrases {
+    if state.isCandidateContainer {
       return state.candidates.count
     }
     return 0
@@ -91,9 +88,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
   /// - Returns: 候選字詞陣列（字音配對）。
   func candidatesForController(_ controller: ctlCandidateProtocol) -> [(String, String)] {
     _ = controller  // 防止格式整理工具毀掉與此對應的參數。
-    if let state = state as? InputState.ChoosingCandidate {
-      return state.candidates
-    } else if let state = state as? InputState.AssociatedPhrases {
+    if state.isCandidateContainer {
       return state.candidates
     }
     return .init()
@@ -103,9 +98,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
     -> (String, String)
   {
     _ = controller  // 防止格式整理工具毀掉與此對應的參數。
-    if let state = state as? InputState.ChoosingCandidate {
-      return state.candidates[index]
-    } else if let state = state as? InputState.AssociatedPhrases {
+    if state.isCandidateContainer {
       return state.candidates[index]
     }
     return ("", "")
@@ -114,22 +107,20 @@ extension ctlInputMethod: ctlCandidateDelegate {
   func ctlCandidate(_ controller: ctlCandidateProtocol, didSelectCandidateAtIndex index: Int) {
     _ = controller  // 防止格式整理工具毀掉與此對應的參數。
 
-    if let state = state as? InputState.SymbolTable,
+    if state.type == .ofSymbolTable,
       let node = state.node.children?[index]
     {
       if let children = node.children, !children.isEmpty {
-        handle(state: InputState.Empty())  // 防止縱橫排選字窗同時出現
-        handle(
-          state: InputState.SymbolTable(node: node, previous: state.node, isTypingVertical: state.isTypingVertical)
-        )
+        handle(state: IMEState.ofEmpty())  // 防止縱橫排選字窗同時出現
+        handle(state: IMEState.ofSymbolTable(node: node))
       } else {
-        handle(state: InputState.Committing(textToCommit: node.title))
-        handle(state: InputState.Empty())
+        handle(state: IMEState.ofCommitting(textToCommit: node.title))
+        handle(state: IMEState.ofEmpty())
       }
       return
     }
 
-    if let state = state as? InputState.ChoosingCandidate {
+    if [.ofCandidates, .ofSymbolTable].contains(state.type) {
       let selectedValue = state.candidates[index]
       keyHandler.fixNode(
         candidate: selectedValue, respectCursorPushing: true,
@@ -139,17 +130,15 @@ extension ctlInputMethod: ctlCandidateDelegate {
       let inputting = keyHandler.buildInputtingState
 
       if mgrPrefs.useSCPCTypingMode {
-        handle(state: InputState.Committing(textToCommit: inputting.composingBufferConverted))
+        handle(state: IMEState.ofCommitting(textToCommit: inputting.displayedText))
         // 此時是逐字選字模式，所以「selectedValue.1」是單個字、不用追加處理。
-        if mgrPrefs.associatedPhrasesEnabled,
-          let associatePhrases = keyHandler.buildAssociatePhraseState(
-            withPair: .init(key: selectedValue.0, value: selectedValue.1),
-            isTypingVertical: state.isTypingVertical
-          ), !associatePhrases.candidates.isEmpty
-        {
-          handle(state: associatePhrases)
+        if mgrPrefs.associatedPhrasesEnabled {
+          let associates = keyHandler.buildAssociatePhraseState(
+            withPair: .init(key: selectedValue.0, value: selectedValue.1)
+          )
+          handle(state: associates.candidates.isEmpty ? IMEState.ofEmpty() : associates)
         } else {
-          handle(state: InputState.Empty())
+          handle(state: IMEState.ofEmpty())
         }
       } else {
         handle(state: inputting)
@@ -157,25 +146,25 @@ extension ctlInputMethod: ctlCandidateDelegate {
       return
     }
 
-    if let state = state as? InputState.AssociatedPhrases {
+    if state.type == .ofAssociates {
       let selectedValue = state.candidates[index]
-      handle(state: InputState.Committing(textToCommit: selectedValue.1))
+      handle(state: IMEState.ofCommitting(textToCommit: selectedValue.1))
       // 此時是聯想詞選字模式，所以「selectedValue.1」必須只保留最後一個字。
       // 不然的話，一旦你選中了由多個字組成的聯想候選詞，則連續聯想會被打斷。
       guard let valueKept = selectedValue.1.last else {
-        handle(state: InputState.Empty())
+        handle(state: IMEState.ofEmpty())
         return
       }
-      if mgrPrefs.associatedPhrasesEnabled,
-        let associatePhrases = keyHandler.buildAssociatePhraseState(
-          withPair: .init(key: selectedValue.0, value: String(valueKept)),
-          isTypingVertical: state.isTypingVertical
-        ), !associatePhrases.candidates.isEmpty
-      {
-        handle(state: associatePhrases)
-        return
+      if mgrPrefs.associatedPhrasesEnabled {
+        let associates = keyHandler.buildAssociatePhraseState(
+          withPair: .init(key: selectedValue.0, value: String(valueKept))
+        )
+        if !associates.candidates.isEmpty {
+          handle(state: associates)
+          return
+        }
       }
-      handle(state: InputState.Empty())
+      handle(state: IMEState.ofEmpty())
     }
   }
 }
