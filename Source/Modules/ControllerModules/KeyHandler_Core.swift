@@ -121,7 +121,7 @@ public class KeyHandler {
     if mgrPrefs.isDebugModeEnabled {
       let result = compositor.dumpDOT
       let appSupportPath = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].path.appending(
-        "vChewing-visualization.dot")
+        "/vChewing-visualization.dot")
       do {
         try result.write(toFile: appSupportPath, atomically: true, encoding: .utf8)
       } catch {
