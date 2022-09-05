@@ -68,7 +68,7 @@ extension KeyHandler {
       // 略過對 BackSpace 的處理。
     } else if input.isCapsLockOn || input.isASCIIModeInput {
       // 但願能夠處理這種情況下所有可能的按鍵組合。
-      stateCallback(IMEState.Empty())
+      stateCallback(IMEState.ofEmpty())
 
       // 字母鍵摁 Shift 的話，無須額外處理，因為直接就會敲出大寫字母。
       if input.isUpperCaseASCIILetterKey {
@@ -82,8 +82,8 @@ extension KeyHandler {
       }
 
       // 將整個組字區的內容遞交給客體應用。
-      stateCallback(IMEState.Committing(textToCommit: inputText.lowercased()))
-      stateCallback(IMEState.Empty())
+      stateCallback(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
+      stateCallback(IMEState.ofEmpty())
 
       return true
     }
@@ -97,9 +97,9 @@ extension KeyHandler {
       if !(state.type == .ofCandidates || state.type == .ofAssociates
         || state.type == .ofSymbolTable)
       {
-        stateCallback(IMEState.Empty())
-        stateCallback(IMEState.Committing(textToCommit: inputText.lowercased()))
-        stateCallback(IMEState.Empty())
+        stateCallback(IMEState.ofEmpty())
+        stateCallback(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
+        stateCallback(IMEState.ofEmpty())
         return true
       }
     }
@@ -120,7 +120,7 @@ extension KeyHandler {
       ) {
         return true
       } else {
-        stateCallback(IMEState.Empty())
+        stateCallback(IMEState.ofEmpty())
       }
     }
 
@@ -157,10 +157,10 @@ extension KeyHandler {
           if compositor.cursor >= compositor.length {
             let displayedText = state.displayedText
             if !displayedText.isEmpty {
-              stateCallback(IMEState.Committing(textToCommit: displayedText))
+              stateCallback(IMEState.ofCommitting(textToCommit: displayedText))
             }
-            stateCallback(IMEState.Committing(textToCommit: " "))
-            stateCallback(IMEState.Empty())
+            stateCallback(IMEState.ofCommitting(textToCommit: " "))
+            stateCallback(IMEState.ofEmpty())
           } else if currentLM.hasUnigramsFor(key: " ") {
             compositor.insertKey(" ")
             walk()
@@ -297,7 +297,7 @@ extension KeyHandler {
         // 於是這裡用「模擬一次 Enter 鍵的操作」使其代為執行這個 commit buffer 的動作。
         // 這裡不需要該函式所傳回的 bool 結果，所以用「_ =」解消掉。
         _ = handleEnter(state: state, stateCallback: stateCallback)
-        stateCallback(IMEState.SymbolTable(node: SymbolNode.root))
+        stateCallback(IMEState.ofSymbolTable(node: SymbolNode.root))
         return true
       }
     }
@@ -312,9 +312,9 @@ extension KeyHandler {
         let string = NSMutableString(string: stringRAW)
         CFStringTransform(string, nil, kCFStringTransformFullwidthHalfwidth, true)
         stateCallback(
-          IMEState.Committing(textToCommit: mgrPrefs.halfWidthPunctuationEnabled ? stringRAW : string as String)
+          IMEState.ofCommitting(textToCommit: mgrPrefs.halfWidthPunctuationEnabled ? stringRAW : string as String)
         )
-        stateCallback(IMEState.Empty())
+        stateCallback(IMEState.ofEmpty())
         return true
       }
     }
@@ -359,8 +359,8 @@ extension KeyHandler {
     /// 該功能僅可在當前組字區沒有任何內容的時候使用。
     if state.type == .ofEmpty {
       if input.isSpace, !input.isOptionHold, !input.isControlHold, !input.isCommandHold {
-        stateCallback(IMEState.Committing(textToCommit: input.isShiftHold ? "　" : " "))
-        stateCallback(IMEState.Empty())
+        stateCallback(IMEState.ofCommitting(textToCommit: input.isShiftHold ? "　" : " "))
+        stateCallback(IMEState.ofEmpty())
         return true
       }
     }
@@ -371,14 +371,14 @@ extension KeyHandler {
       if input.isShiftHold {  // 這裡先不要判斷 isOptionHold。
         switch mgrPrefs.upperCaseLetterKeyBehavior {
           case 1:
-            stateCallback(IMEState.Empty())
-            stateCallback(IMEState.Committing(textToCommit: inputText.lowercased()))
-            stateCallback(IMEState.Empty())
+            stateCallback(IMEState.ofEmpty())
+            stateCallback(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
+            stateCallback(IMEState.ofEmpty())
             return true
           case 2:
-            stateCallback(IMEState.Empty())
-            stateCallback(IMEState.Committing(textToCommit: inputText.uppercased()))
-            stateCallback(IMEState.Empty())
+            stateCallback(IMEState.ofEmpty())
+            stateCallback(IMEState.ofCommitting(textToCommit: inputText.uppercased()))
+            stateCallback(IMEState.ofEmpty())
             return true
           default:  // 包括 case 0，直接塞給組字區。
             let letter = "_letter_\(inputText)"

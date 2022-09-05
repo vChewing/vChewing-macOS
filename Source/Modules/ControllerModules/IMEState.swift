@@ -51,7 +51,7 @@ public protocol IMEStateProtocol {
 /// 不需要再在某個狀態下為了該狀態不需要的變數與常數的處置策略而煩惱。
 ///
 /// 對 IMEState 型別下的諸多狀態的切換，應以生成新副本來取代舊有副本的形式來完
-/// 成。唯一例外是 IMEState.Marking、擁有可以將自身轉變為 IMEState.Inputting
+/// 成。唯一例外是 IMEState.ofMarking、擁有可以將自身轉變為 IMEState.ofInputting
 /// 的成員函式，但也只是生成副本、來交給輸入法控制器來處理而已。每個狀態都有
 /// 各自的構造器 (Constructor)。
 ///
@@ -91,23 +91,23 @@ public struct IMEState: IMEStateProtocol {
 // MARK: - 針對不同的狀態，規定不同的構造器
 
 extension IMEState {
-  public static func Deactivated() -> IMEState { .init(type: .ofDeactivated) }
-  public static func Empty() -> IMEState { .init(type: .ofEmpty) }
-  public static func Abortion() -> IMEState { .init(type: .ofAbortion) }
-  public static func Committing(textToCommit: String) -> IMEState {
+  public static func ofDeactivated() -> IMEState { .init(type: .ofDeactivated) }
+  public static func ofEmpty() -> IMEState { .init(type: .ofEmpty) }
+  public static func ofAbortion() -> IMEState { .init(type: .ofAbortion) }
+  public static func ofCommitting(textToCommit: String) -> IMEState {
     var result = IMEState(type: .ofCommitting)
     result.data.textToCommit = textToCommit
     ChineseConverter.ensureCurrencyNumerals(target: &result.data.textToCommit)
     return result
   }
 
-  public static func Associates(candidates: [(String, String)]) -> IMEState {
+  public static func ofAssociates(candidates: [(String, String)]) -> IMEState {
     var result = IMEState(type: .ofAssociates)
     result.data.candidates = candidates
     return result
   }
 
-  public static func NotEmpty(displayTextSegments: [String], cursor: Int) -> IMEState {
+  public static func ofNotEmpty(displayTextSegments: [String], cursor: Int) -> IMEState {
     var result = IMEState(type: .ofNotEmpty)
     // 注意資料的設定順序，一定得先設定 displayTextSegments。
     result.data.displayTextSegments = displayTextSegments
@@ -115,18 +115,18 @@ extension IMEState {
     return result
   }
 
-  public static func Inputting(displayTextSegments: [String], cursor: Int) -> IMEState {
-    var result = IMEState.NotEmpty(displayTextSegments: displayTextSegments, cursor: cursor)
+  public static func ofInputting(displayTextSegments: [String], cursor: Int) -> IMEState {
+    var result = IMEState.ofNotEmpty(displayTextSegments: displayTextSegments, cursor: cursor)
     result.type = .ofInputting
     return result
   }
 
-  public static func Marking(
+  public static func ofMarking(
     displayTextSegments: [String], markedReadings: [String], cursor: Int, marker: Int
   )
     -> IMEState
   {
-    var result = IMEState.NotEmpty(displayTextSegments: displayTextSegments, cursor: cursor)
+    var result = IMEState.ofNotEmpty(displayTextSegments: displayTextSegments, cursor: cursor)
     result.type = .ofMarking
     result.data.marker = marker
     result.data.markedReadings = markedReadings
@@ -134,15 +134,15 @@ extension IMEState {
     return result
   }
 
-  public static func Candidates(candidates: [(String, String)], displayTextSegments: [String], cursor: Int) -> IMEState
+  public static func ofCandidates(candidates: [(String, String)], displayTextSegments: [String], cursor: Int) -> IMEState
   {
-    var result = IMEState.NotEmpty(displayTextSegments: displayTextSegments, cursor: cursor)
+    var result = IMEState.ofNotEmpty(displayTextSegments: displayTextSegments, cursor: cursor)
     result.type = .ofCandidates
     result.data.candidates = candidates
     return result
   }
 
-  public static func SymbolTable(node: SymbolNode) -> IMEState {
+  public static func ofSymbolTable(node: SymbolNode) -> IMEState {
     var result = IMEState(type: .ofNotEmpty, node: node)
     result.type = .ofSymbolTable
     return result
@@ -156,7 +156,7 @@ extension IMEState {
   public var candidates: [(String, String)] { data.candidates }
   public var convertedToInputting: IMEState {
     if type == .ofInputting { return self }
-    var result = IMEState.Inputting(displayTextSegments: data.displayTextSegments, cursor: data.cursor)
+    var result = IMEState.ofInputting(displayTextSegments: data.displayTextSegments, cursor: data.cursor)
     result.tooltip = data.tooltipBackupForInputting
     return result
   }

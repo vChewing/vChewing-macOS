@@ -100,7 +100,7 @@ extension KeyHandler {
         switch compositor.isEmpty {
           case false: stateCallback(buildInputtingState)
           case true:
-            stateCallback(IMEState.Abortion())
+            stateCallback(IMEState.ofAbortion())
         }
         return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了。
       }
@@ -130,16 +130,16 @@ extension KeyHandler {
         if candidateState.candidates.count == 1, let firstCandidate = candidateState.candidates.first {
           let reading: String = firstCandidate.0
           let text: String = firstCandidate.1
-          stateCallback(IMEState.Committing(textToCommit: text))
+          stateCallback(IMEState.ofCommitting(textToCommit: text))
 
           if !mgrPrefs.associatedPhrasesEnabled {
-            stateCallback(IMEState.Empty())
+            stateCallback(IMEState.ofEmpty())
           } else {
             let associatedPhrases =
               buildAssociatePhraseState(
                 withPair: .init(key: reading, value: text)
               )
-            stateCallback(associatedPhrases.candidates.isEmpty ? IMEState.Empty() : associatedPhrases)
+            stateCallback(associatedPhrases.candidates.isEmpty ? IMEState.ofEmpty() : associatedPhrases)
           }
         } else {
           stateCallback(candidateState)

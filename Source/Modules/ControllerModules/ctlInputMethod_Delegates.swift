@@ -111,11 +111,11 @@ extension ctlInputMethod: ctlCandidateDelegate {
       let node = state.node.children?[index]
     {
       if let children = node.children, !children.isEmpty {
-        handle(state: IMEState.Empty())  // 防止縱橫排選字窗同時出現
-        handle(state: IMEState.SymbolTable(node: node))
+        handle(state: IMEState.ofEmpty())  // 防止縱橫排選字窗同時出現
+        handle(state: IMEState.ofSymbolTable(node: node))
       } else {
-        handle(state: IMEState.Committing(textToCommit: node.title))
-        handle(state: IMEState.Empty())
+        handle(state: IMEState.ofCommitting(textToCommit: node.title))
+        handle(state: IMEState.ofEmpty())
       }
       return
     }
@@ -130,15 +130,15 @@ extension ctlInputMethod: ctlCandidateDelegate {
       let inputting = keyHandler.buildInputtingState
 
       if mgrPrefs.useSCPCTypingMode {
-        handle(state: IMEState.Committing(textToCommit: inputting.displayedText))
+        handle(state: IMEState.ofCommitting(textToCommit: inputting.displayedText))
         // 此時是逐字選字模式，所以「selectedValue.1」是單個字、不用追加處理。
         if mgrPrefs.associatedPhrasesEnabled {
           let associates = keyHandler.buildAssociatePhraseState(
             withPair: .init(key: selectedValue.0, value: selectedValue.1)
           )
-          handle(state: associates.candidates.isEmpty ? IMEState.Empty() : associates)
+          handle(state: associates.candidates.isEmpty ? IMEState.ofEmpty() : associates)
         } else {
-          handle(state: IMEState.Empty())
+          handle(state: IMEState.ofEmpty())
         }
       } else {
         handle(state: inputting)
@@ -148,11 +148,11 @@ extension ctlInputMethod: ctlCandidateDelegate {
 
     if state.type == .ofAssociates {
       let selectedValue = state.candidates[index]
-      handle(state: IMEState.Committing(textToCommit: selectedValue.1))
+      handle(state: IMEState.ofCommitting(textToCommit: selectedValue.1))
       // 此時是聯想詞選字模式，所以「selectedValue.1」必須只保留最後一個字。
       // 不然的話，一旦你選中了由多個字組成的聯想候選詞，則連續聯想會被打斷。
       guard let valueKept = selectedValue.1.last else {
-        handle(state: IMEState.Empty())
+        handle(state: IMEState.ofEmpty())
         return
       }
       if mgrPrefs.associatedPhrasesEnabled {
@@ -164,7 +164,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
           return
         }
       }
-      handle(state: IMEState.Empty())
+      handle(state: IMEState.ofEmpty())
     }
   }
 }

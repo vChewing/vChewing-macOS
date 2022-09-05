@@ -41,7 +41,7 @@ class ctlInputMethod: IMKInputController {
   /// 按鍵調度模組的副本。
   var keyHandler: KeyHandler = .init()
   /// 用以記錄當前輸入法狀態的變數。
-  var state: IMEStateProtocol = IMEState.Empty() {
+  var state: IMEStateProtocol = IMEState.ofEmpty() {
     didSet {
       IME.prtDebugIntel("Current State: \(state.type.rawValue)")
     }
@@ -75,9 +75,9 @@ class ctlInputMethod: IMKInputController {
     }
     if state.hasComposition {
       /// 將傳回的新狀態交給調度函式。
-      handle(state: IMEState.Committing(textToCommit: state.displayedText))
+      handle(state: IMEState.ofCommitting(textToCommit: state.displayedText))
     }
-    handle(state: IMEState.Empty())
+    handle(state: IMEState.ofEmpty())
   }
 
   // MARK: - IMKInputController 方法
@@ -131,7 +131,7 @@ class ctlInputMethod: IMKInputController {
     if let client = client(), client.bundleIdentifier() != Bundle.main.bundleIdentifier {
       // 強制重設當前鍵盤佈局、使其與偏好設定同步。
       setKeyLayout()
-      handle(state: IMEState.Empty())
+      handle(state: IMEState.ofEmpty())
     }  // 除此之外就不要動了，免得在點開輸入法自身的視窗時卡死。
     (NSApp.delegate as? AppDelegate)?.checkForUpdate()
   }
@@ -141,7 +141,7 @@ class ctlInputMethod: IMKInputController {
   override func deactivateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     resetKeyHandler()  // 這條會自動搞定 Empty 狀態。
-    handle(state: IMEState.Deactivated())
+    handle(state: IMEState.ofDeactivated())
   }
 
   /// 切換至某一個輸入法的某個副本時（比如威注音的簡體輸入法副本與繁體輸入法副本），會觸發該函式。
@@ -172,7 +172,7 @@ class ctlInputMethod: IMKInputController {
       if let client = client(), client.bundleIdentifier() != Bundle.main.bundleIdentifier {
         // 強制重設當前鍵盤佈局、使其與偏好設定同步。這裡的這一步也不能省略。
         setKeyLayout()
-        handle(state: IMEState.Empty())
+        handle(state: IMEState.ofEmpty())
       }  // 除此之外就不要動了，免得在點開輸入法自身的視窗時卡死。
     }
 
@@ -367,7 +367,7 @@ class ctlInputMethod: IMKInputController {
     let candidateString: NSAttributedString = candidateString ?? .init(string: "")
     if state.type == .ofAssociates {
       if !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter {
-        handle(state: IMEState.Abortion())
+        handle(state: IMEState.ofAbortion())
         return
       }
     }

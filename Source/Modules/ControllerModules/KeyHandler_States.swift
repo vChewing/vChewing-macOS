@@ -52,7 +52,7 @@ extension KeyHandler {
       cursor += reading.count
     }
     /// 這裡生成準備要拿來回呼的「正在輸入」狀態，但還不能立即使用，因為工具提示仍未完成。
-    return IMEState.Inputting(displayTextSegments: displayTextSegments, cursor: cursor)
+    return IMEState.ofInputting(displayTextSegments: displayTextSegments, cursor: cursor)
   }
 
   /// 生成「正在輸入」狀態。
@@ -97,7 +97,7 @@ extension KeyHandler {
     state currentState: IMEStateProtocol,
     isTypingVertical _: Bool = false
   ) -> IMEState {
-    IMEState.Candidates(
+    IMEState.ofCandidates(
       candidates: getCandidatesArray(fixOrder: mgrPrefs.useFixecCandidateOrderOnSelection),
       displayTextSegments: compositor.walkedNodes.values,
       cursor: currentState.data.cursor
@@ -122,7 +122,7 @@ extension KeyHandler {
     withPair pair: Megrez.Compositor.KeyValuePaired
   ) -> IMEState {
     // 上一行必須要用驚嘆號，否則 Xcode 會誤導你砍掉某些實際上必需的語句。
-    IMEState.Associates(
+    IMEState.ofAssociates(
       candidates: buildAssociatePhraseArray(withPair: pair))
   }
 
@@ -196,7 +196,7 @@ extension KeyHandler {
         if isCursorCuttingChar(isMarker: true) {
           compositor.jumpCursorBySpan(to: .rear, isMarker: true)
         }
-        var marking = IMEState.Marking(
+        var marking = IMEState.ofMarking(
           displayTextSegments: state.data.displayTextSegments,
           markedReadings: Array(compositor.keys[currentMarkedRange()]),
           cursor: convertCursorForDisplay(compositor.cursor),
@@ -219,7 +219,7 @@ extension KeyHandler {
         if isCursorCuttingChar(isMarker: true) {
           compositor.jumpCursorBySpan(to: .front, isMarker: true)
         }
-        var marking = IMEState.Marking(
+        var marking = IMEState.ofMarking(
           displayTextSegments: state.data.displayTextSegments,
           markedReadings: Array(compositor.keys[currentMarkedRange()]),
           cursor: convertCursorForDisplay(compositor.cursor),
@@ -281,8 +281,8 @@ extension KeyHandler {
     if candidateState.candidates.count == 1 {
       clear()  // 這句不要砍，因為下文可能會回呼 candidateState。
       if let candidateToCommit: (String, String) = candidateState.candidates.first, !candidateToCommit.1.isEmpty {
-        stateCallback(IMEState.Committing(textToCommit: candidateToCommit.1))
-        stateCallback(IMEState.Empty())
+        stateCallback(IMEState.ofCommitting(textToCommit: candidateToCommit.1))
+        stateCallback(IMEState.ofEmpty())
       } else {
         stateCallback(candidateState)
       }
@@ -305,8 +305,8 @@ extension KeyHandler {
   ) -> Bool {
     guard state.type == .ofInputting else { return false }
 
-    stateCallback(IMEState.Committing(textToCommit: state.displayedText))
-    stateCallback(IMEState.Empty())
+    stateCallback(IMEState.ofCommitting(textToCommit: state.displayedText))
+    stateCallback(IMEState.ofEmpty())
     return true
   }
 
@@ -333,8 +333,8 @@ extension KeyHandler {
       displayedText = displayedText.replacingOccurrences(of: "-", with: " ")
     }
 
-    stateCallback(IMEState.Committing(textToCommit: displayedText))
-    stateCallback(IMEState.Empty())
+    stateCallback(IMEState.ofCommitting(textToCommit: displayedText))
+    stateCallback(IMEState.ofEmpty())
     return true
   }
 
@@ -369,8 +369,8 @@ extension KeyHandler {
       composed += key.contains("_") ? value : "<ruby>\(value)<rp>(</rp><rt>\(key)</rt><rp>)</rp></ruby>"
     }
 
-    stateCallback(IMEState.Committing(textToCommit: composed))
-    stateCallback(IMEState.Empty())
+    stateCallback(IMEState.ofCommitting(textToCommit: composed))
+    stateCallback(IMEState.ofEmpty())
     return true
   }
 
@@ -403,13 +403,13 @@ extension KeyHandler {
         stateCallback(buildInputtingState)
         return true
       case 1:
-        stateCallback(IMEState.Abortion())
+        stateCallback(IMEState.ofAbortion())
         return true
       default: break
     }
 
     if input.isShiftHold, input.isOptionHold {
-      stateCallback(IMEState.Abortion())
+      stateCallback(IMEState.ofAbortion())
       return true
     }
 
@@ -432,7 +432,7 @@ extension KeyHandler {
     switch composer.isEmpty && compositor.isEmpty {
       case false: stateCallback(buildInputtingState)
       case true:
-        stateCallback(IMEState.Abortion())
+        stateCallback(IMEState.ofAbortion())
     }
     return true
   }
@@ -455,7 +455,7 @@ extension KeyHandler {
     guard state.type == .ofInputting else { return false }
 
     if input.isShiftHold {
-      stateCallback(IMEState.Abortion())
+      stateCallback(IMEState.ofAbortion())
       return true
     }
 
@@ -478,7 +478,7 @@ extension KeyHandler {
     switch inputting.displayedText.isEmpty {
       case false: stateCallback(inputting)
       case true:
-        stateCallback(IMEState.Abortion())
+        stateCallback(IMEState.ofAbortion())
     }
     return true
   }
@@ -589,7 +589,7 @@ extension KeyHandler {
     if mgrPrefs.escToCleanInputBuffer {
       /// 若啟用了該選項，則清空組字器的內容與注拼槽的內容。
       /// 此乃 macOS 內建注音輸入法預設之行為，但不太受 Windows 使用者群體之待見。
-      stateCallback(IMEState.Abortion())
+      stateCallback(IMEState.ofAbortion())
     } else {
       if composer.isEmpty { return true }
       /// 如果注拼槽不是空的話，則清空之。
@@ -597,7 +597,7 @@ extension KeyHandler {
       switch compositor.isEmpty {
         case false: stateCallback(buildInputtingState)
         case true:
-          stateCallback(IMEState.Abortion())
+          stateCallback(IMEState.ofAbortion())
       }
     }
     return true
@@ -634,7 +634,7 @@ extension KeyHandler {
         if isCursorCuttingChar(isMarker: true) {
           compositor.jumpCursorBySpan(to: .front, isMarker: true)
         }
-        var marking = IMEState.Marking(
+        var marking = IMEState.ofMarking(
           displayTextSegments: compositor.walkedNodes.values,
           markedReadings: Array(compositor.keys[currentMarkedRange()]),
           cursor: convertCursorForDisplay(compositor.cursor),
@@ -707,7 +707,7 @@ extension KeyHandler {
         if isCursorCuttingChar(isMarker: true) {
           compositor.jumpCursorBySpan(to: .rear, isMarker: true)
         }
-        var marking = IMEState.Marking(
+        var marking = IMEState.ofMarking(
           displayTextSegments: compositor.walkedNodes.values,
           markedReadings: Array(compositor.keys[currentMarkedRange()]),
           cursor: convertCursorForDisplay(compositor.cursor),

@@ -35,7 +35,7 @@ extension ctlInputMethod {
       case .ofEmpty, .ofAbortion:
         var previous = previous
         if state.type == .ofAbortion {
-          state = IMEState.Empty()
+          state = IMEState.ofEmpty()
           previous = state
         }
         ctlInputMethod.ctlCandidateCurrent.visible = false

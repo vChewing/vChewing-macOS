@@ -49,12 +49,12 @@ extension KeyHandler {
         // 就將當前的組字緩衝區析構處理、強制重設輸入狀態。
         // 否則，一個本不該出現的真空組字緩衝區會使前後方向鍵與 BackSpace 鍵失靈。
         // 所以這裡需要對 compositor.isEmpty 做判定。
-        stateCallback(IMEState.Abortion())
+        stateCallback(IMEState.ofAbortion())
       } else {
         stateCallback(buildInputtingState)
       }
       if state.type == .ofSymbolTable, let nodePrevious = state.node.previous, let _ = nodePrevious.children {
-        stateCallback(IMEState.SymbolTable(node: nodePrevious))
+        stateCallback(IMEState.ofSymbolTable(node: nodePrevious))
       }
       return true
     }
@@ -63,7 +63,7 @@ extension KeyHandler {
 
     if input.isEnter {
       if state.type == .ofAssociates, !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter {
-        stateCallback(IMEState.Abortion())
+        stateCallback(IMEState.ofAbortion())
         return true
       }
       delegate?.keyHandler(
@@ -323,9 +323,9 @@ extension KeyHandler {
             didSelectCandidateAt: candidateIndex,
             ctlCandidate: ctlCandidateCurrent
           )
-          stateCallback(IMEState.Abortion())
+          stateCallback(IMEState.ofAbortion())
           return handle(
-            input: input, state: IMEState.Empty(), stateCallback: stateCallback, errorCallback: errorCallback
+            input: input, state: IMEState.ofEmpty(), stateCallback: stateCallback, errorCallback: errorCallback
           )
         }
         return true
