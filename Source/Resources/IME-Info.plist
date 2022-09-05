@@ -52,7 +52,7 @@
 				<key>tsInputModePrimaryInScriptKey</key>
 				<true/>
 				<key>tsInputModeScriptKey</key>
-				<string>smTradChinese</string>
+				<string>smUnicode</string>
 			</dict>
 			<key>org.atelierInmu.inputmethod.vChewing.IMECHT</key>
 			<dict>
@@ -80,7 +80,7 @@
 				<key>tsInputModePrimaryInScriptKey</key>
 				<true/>
 				<key>tsInputModeScriptKey</key>
-				<string>smTradChinese</string>
+				<string>smUnicode</string>
 			</dict>
 		</dict>
 		<key>tsVisibleInputModeOrderedArrayKey</key>
