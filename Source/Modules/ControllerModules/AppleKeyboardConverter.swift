@@ -7,23 +7,8 @@
 // requirements defined in MIT License.
 
 enum AppleKeyboardConverter {
-  static let arrDynamicBasicKeyLayout: [String] = [
-    "com.apple.keylayout.ZhuyinBopomofo",
-    "com.apple.keylayout.ZhuyinEten",
-    "org.atelierInmu.vChewing.keyLayouts.vchewingdachen",
-    "org.atelierInmu.vChewing.keyLayouts.vchewingmitac",
-    "org.atelierInmu.vChewing.keyLayouts.vchewingibm",
-    "org.atelierInmu.vChewing.keyLayouts.vchewingseigyou",
-    "org.atelierInmu.vChewing.keyLayouts.vchewingeten",
-    "org.unknown.keylayout.vChewingDachen",
-    "org.unknown.keylayout.vChewingFakeSeigyou",
-    "org.unknown.keylayout.vChewingETen",
-    "org.unknown.keylayout.vChewingIBM",
-    "org.unknown.keylayout.vChewingMiTAC",
-  ]
-
   static var isDynamicBasicKeyboardLayoutEnabled: Bool {
-    AppleKeyboardConverter.arrDynamicBasicKeyLayout.contains(mgrPrefs.basicKeyboardLayout)
+    IMKHelper.arrDynamicBasicKeyLayouts.contains(mgrPrefs.basicKeyboardLayout)
   }
 
   static func cnvStringApple2ABC(_ strProcessed: String) -> String {

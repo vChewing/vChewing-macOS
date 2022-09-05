@@ -134,7 +134,8 @@ extension IMEState {
     return result
   }
 
-  public static func ofCandidates(candidates: [(String, String)], displayTextSegments: [String], cursor: Int) -> IMEState
+  public static func ofCandidates(candidates: [(String, String)], displayTextSegments: [String], cursor: Int)
+    -> IMEState
   {
     var result = IMEState.ofNotEmpty(displayTextSegments: displayTextSegments, cursor: cursor)
     result.type = .ofCandidates

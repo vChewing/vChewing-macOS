@@ -10,6 +10,7 @@
 		5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */ = {isa = PBXBuildFile; fileRef = 5B09307828B6FC3B0021F8C5 /* shortcuts.html */; };
 		5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0AF8B427B2C8290096FE54 /* StringExtension.swift */; };
 		5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */; };
+		5B175FFB28C5CDDC0078D1B4 /* IMKHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B175FFA28C5CDDC0078D1B4 /* IMKHelper.swift */; };
 		5B20430728BEE30900BFC6FD /* BookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B20430628BEE30900BFC6FD /* BookmarkManager.swift */; };
 		5B21176C287539BB000443A9 /* ctlInputMethod_HandleStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176B287539BB000443A9 /* ctlInputMethod_HandleStates.swift */; };
 		5B21176E28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176D28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift */; };
@@ -32,7 +33,6 @@
 		5B5948CE289CC04500C85824 /* LMInstantiator_DateTimeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5948CD289CC04500C85824 /* LMInstantiator_DateTimeExtension.swift */; };
 		5B5E535227EF261400C6AA1E /* IME.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E535127EF261400C6AA1E /* IME.swift */; };
 		5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */; };
-		5B62A33227AE792F00A19448 /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33127AE792F00A19448 /* InputSourceHelper.swift */; };
 		5B62A33627AE795800A19448 /* mgrPrefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33527AE795800A19448 /* mgrPrefs.swift */; };
 		5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */; };
 		5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34027AE7CD900A19448 /* ctlCandidate.swift */; };
@@ -116,6 +116,7 @@
 		5BEDB724283B4C250078EB25 /* data-symbols.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71E283B4AEA0078EB25 /* data-symbols.plist */; };
 		5BEDB725283B4C250078EB25 /* data-chs.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71C283B4AEA0078EB25 /* data-chs.plist */; };
 		5BF0B84C28C070B000795FC6 /* NSEventExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF0B84B28C070B000795FC6 /* NSEventExtension.swift */; };
+		5BF13B9428C627BB00E99EC1 /* IMKHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B175FFA28C5CDDC0078D1B4 /* IMKHelper.swift */; };
 		5BF56F9828C39A2700DD6839 /* IMEState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF56F9728C39A2700DD6839 /* IMEState.swift */; };
 		5BF56F9A28C39D1800DD6839 /* IMEStateData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF56F9928C39D1800DD6839 /* IMEStateData.swift */; };
 		5BF9DA2728840E6200DBD48E /* template-usersymbolphrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2228840E6200DBD48E /* template-usersymbolphrases.txt */; };
@@ -213,6 +214,7 @@
 		5B0AF8B427B2C8290096FE54 /* StringExtension.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = StringExtension.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B0C5EDF27C7D9870078037C /* dataCompiler.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = dataCompiler.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = AppleKeyboardConverter.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		5B175FFA28C5CDDC0078D1B4 /* IMKHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMKHelper.swift; sourceTree = "<group>"; };
 		5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHS.txt"; sourceTree = "<group>"; };
 		5B18BA7027C7BD8B0056EB19 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		5B18BA7127C7BD8B0056EB19 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -524,7 +526,7 @@
 			children = (
 				5BDC1CF927FDF1310052C2B9 /* apiUpdate.swift */,
 				5B5E535127EF261400C6AA1E /* IME.swift */,
-				5B62A33127AE792F00A19448 /* InputSourceHelper.swift */,
+				5B175FFA28C5CDDC0078D1B4 /* IMKHelper.swift */,
 				5B62A33527AE795800A19448 /* mgrPrefs.swift */,
 			);
 			path = IMEModules;
@@ -884,6 +886,7 @@
 				5BBBB77827AEDB330023B93A /* Resources */,
 				D4F0BBE0279AF8B30071253C /* AppDelegate.swift */,
 				D4F0BBDE279AF1AF0071253C /* ArchiveUtil.swift */,
+				5B62A33127AE792F00A19448 /* InputSourceHelper.swift */,
 				6ACA41F215FC1D9000935EF6 /* Installer-Info.plist */,
 				5BC0AACA27F58472002D33E9 /* pkgPostInstall.sh */,
 				5BC0AAC927F58472002D33E9 /* pkgPreInstall.sh */,
@@ -1250,13 +1253,13 @@
 				5B2170E3289FACAD00BE7304 /* 3_KeyValuePaired.swift in Sources */,
 				5BA9FD0F27FEDB6B002DE248 /* suiPrefPaneGeneral.swift in Sources */,
 				5B2170E6289FACAD00BE7304 /* 4_Span.swift in Sources */,
+				5B175FFB28C5CDDC0078D1B4 /* IMKHelper.swift in Sources */,
 				5BA9FD4927FEF3C9002DE248 /* Section.swift in Sources */,
 				5BA9FD3E27FEF3C8002DE248 /* Utilities.swift in Sources */,
 				5B242403284B0D6500520FE4 /* ctlCandidateUniversal.swift in Sources */,
 				5BA9FD1127FEDB6B002DE248 /* ctlPrefUI.swift in Sources */,
 				5B8457A12871ADBE00C93B01 /* HotenkaCCBridge.swift in Sources */,
 				5B40730D281672610023DFFF /* lmReplacements.swift in Sources */,
-				5B62A33227AE792F00A19448 /* InputSourceHelper.swift in Sources */,
 				5B5E535227EF261400C6AA1E /* IME.swift in Sources */,
 				5B2170E0289FACAD00BE7304 /* 7_LangModel.swift in Sources */,
 				5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */,
@@ -1286,6 +1289,7 @@
 				D4F0BBE1279AF8B30071253C /* AppDelegate.swift in Sources */,
 				D4F0BBDF279AF1AF0071253C /* ArchiveUtil.swift in Sources */,
 				5B62A35327AE89C400A19448 /* InputSourceHelper.swift in Sources */,
+				5BF13B9428C627BB00E99EC1 /* IMKHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

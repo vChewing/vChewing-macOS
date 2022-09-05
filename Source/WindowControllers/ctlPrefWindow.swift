@@ -93,88 +93,24 @@ class ctlPrefWindow: NSWindowController {
     currentLanguageSelectItem = chosenLanguageItem ?? autoMUISelectItem
     uiLanguageButton.select(currentLanguageSelectItem)
 
-    let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
     var usKeyboardLayoutItem: NSMenuItem?
     var chosenBaseKeyboardLayoutItem: NSMenuItem?
 
     basicKeyboardLayoutButton.menu?.removeAllItems()
 
-    let itmAppleZhuyinBopomofo = NSMenuItem()
-    itmAppleZhuyinBopomofo.title = NSLocalizedString("Apple Zhuyin Bopomofo (Dachen)", comment: "")
-    itmAppleZhuyinBopomofo.representedObject = String(
-      "com.apple.keylayout.ZhuyinBopomofo")
-    basicKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinBopomofo)
-
-    let itmAppleZhuyinEten = NSMenuItem()
-    itmAppleZhuyinEten.title = NSLocalizedString("Apple Zhuyin Eten (Traditional)", comment: "")
-    itmAppleZhuyinEten.representedObject = String("com.apple.keylayout.ZhuyinEten")
-    basicKeyboardLayoutButton.menu?.addItem(itmAppleZhuyinEten)
-
     let basicKeyboardLayoutID = mgrPrefs.basicKeyboardLayout
 
-    for source in list {
-      if let categoryPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceCategory) {
-        let category = Unmanaged<CFString>.fromOpaque(categoryPtr).takeUnretainedValue()
-        if category != kTISCategoryKeyboardInputSource {
-          continue
-        }
-      } else {
+    for source in IMKHelper.allowedBasicLayoutsAsTISInputSources {
+      guard let source = source else {
+        basicKeyboardLayoutButton.menu?.addItem(NSMenuItem.separator())
         continue
       }
-
-      if let asciiCapablePtr = TISGetInputSourceProperty(
-        source, kTISPropertyInputSourceIsASCIICapable
-      ) {
-        let asciiCapable = Unmanaged<CFBoolean>.fromOpaque(asciiCapablePtr)
-          .takeUnretainedValue()
-        if asciiCapable != kCFBooleanTrue {
-          continue
-        }
-      } else {
-        continue
-      }
-
-      if let sourceTypePtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceType) {
-        let sourceType = Unmanaged<CFString>.fromOpaque(sourceTypePtr).takeUnretainedValue()
-        if sourceType != kTISTypeKeyboardLayout {
-          continue
-        }
-      } else {
-        continue
-      }
-
-      guard let sourceIDPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceID),
-        let localizedNamePtr = TISGetInputSourceProperty(source, kTISPropertyLocalizedName)
-      else {
-        continue
-      }
-
-      let sourceID = String(Unmanaged<CFString>.fromOpaque(sourceIDPtr).takeUnretainedValue())
-      let localizedName = String(
-        Unmanaged<CFString>.fromOpaque(localizedNamePtr).takeUnretainedValue())
-
       let menuItem = NSMenuItem()
-      menuItem.title = localizedName
-      menuItem.representedObject = sourceID
-
-      if sourceID == "com.apple.keylayout.US" {
-        usKeyboardLayoutItem = menuItem
-      }
-      if basicKeyboardLayoutID == sourceID {
-        chosenBaseKeyboardLayoutItem = menuItem
-      }
-      if IME.arrWhitelistedKeyLayoutsASCII.contains(sourceID) || sourceID.contains("vChewing") {
-        basicKeyboardLayoutButton.menu?.addItem(menuItem)
-      }
-    }
-
-    switch basicKeyboardLayoutID {
-      case "com.apple.keylayout.ZhuyinBopomofo":
-        chosenBaseKeyboardLayoutItem = itmAppleZhuyinBopomofo
-      case "com.apple.keylayout.ZhuyinEten":
-        chosenBaseKeyboardLayoutItem = itmAppleZhuyinEten
-      default:
-        break  // nothing to do
+      menuItem.title = source.vChewingLocalizedName
+      menuItem.representedObject = source.identifier
+      if source.identifier == "com.apple.keylayout.US" { usKeyboardLayoutItem = menuItem }
+      if basicKeyboardLayoutID == source.identifier { chosenBaseKeyboardLayoutItem = menuItem }
+      basicKeyboardLayoutButton.menu?.addItem(menuItem)
     }
 
     basicKeyboardLayoutButton.select(chosenBaseKeyboardLayoutItem ?? usKeyboardLayoutItem)

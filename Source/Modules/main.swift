@@ -23,7 +23,7 @@ switch max(CommandLine.arguments.count - 1, 0) {
     switch CommandLine.arguments[1] {
       case "install":
         if CommandLine.arguments[1] == "install" {
-          let exitCode = IME.registerInputMethod()
+          let exitCode = IMKHelper.registerInputMethod()
           exit(exitCode)
         }
       case "uninstall":
