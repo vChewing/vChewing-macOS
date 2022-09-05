@@ -131,11 +131,11 @@ public enum IME {
           ),
           mgrLangModel.dataFolderPath(isDefaultFolder: false)
         )
-        ctlNonModalAlertWindow.shared.show(
-          title: NSLocalizedString("Unable to create the user phrase file.", comment: ""),
-          content: content, confirmButtonTitle: NSLocalizedString("OK", comment: ""),
-          cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil
-        )
+        let alert = NSAlert()
+        alert.messageText = NSLocalizedString("Unable to create the user phrase file.", comment: "")
+        alert.informativeText = content
+        alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+        alert.runModal()
         NSApp.setActivationPolicy(.accessory)
         return false
       }

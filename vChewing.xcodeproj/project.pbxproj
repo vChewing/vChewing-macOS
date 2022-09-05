@@ -78,7 +78,6 @@
 		5BB802DA27FABA8300CF1C19 /* ctlInputMethod_Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */; };
 		5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75D27AED54C0023B93A /* Beep.m4a */; };
 		5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75E27AED54C0023B93A /* Fart.m4a */; };
-		5BBBB76B27AED5DB0023B93A /* frmNonModalAlertWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB76527AED5DB0023B93A /* frmNonModalAlertWindow.xib */; };
 		5BBBB76D27AED5DB0023B93A /* frmAboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB76927AED5DB0023B93A /* frmAboutWindow.xib */; };
 		5BBBB77327AED70B0023B93A /* MenuIcon-TCVIM@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB76F27AED70B0023B93A /* MenuIcon-TCVIM@2x.png */; };
 		5BBBB77427AED70B0023B93A /* MenuIcon-SCVIM@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77027AED70B0023B93A /* MenuIcon-SCVIM@2x.png */; };
@@ -137,7 +136,6 @@
 		D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427F76B278CA1BA004A2160 /* AppDelegate.swift */; };
 		D47B92C027972AD100458394 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47B92BF27972AC800458394 /* main.swift */; };
 		D47F7DCE278BFB57002F9DD7 /* ctlPrefWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCD278BFB57002F9DD7 /* ctlPrefWindow.swift */; };
-		D47F7DD0278C0897002F9DD7 /* ctlNonModalAlertWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCF278C0897002F9DD7 /* ctlNonModalAlertWindow.swift */; };
 		D4A13D5A27A59F0B003BE359 /* ctlInputMethod_Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A13D5927A59D5C003BE359 /* ctlInputMethod_Core.swift */; };
 		D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8827A838CF006DB1CF /* Localizable.strings */; };
 		D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8D27A838F0006DB1CF /* InfoPlist.strings */; };
@@ -296,7 +294,6 @@
 		5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlInputMethod_Menu.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BBBB75D27AED54C0023B93A /* Beep.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.m4a; sourceTree = "<group>"; };
 		5BBBB75E27AED54C0023B93A /* Fart.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.m4a; sourceTree = "<group>"; };
-		5BBBB76627AED5DB0023B93A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmNonModalAlertWindow.xib; sourceTree = "<group>"; };
 		5BBBB76A27AED5DB0023B93A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmAboutWindow.xib; sourceTree = "<group>"; };
 		5BBBB76F27AED70B0023B93A /* MenuIcon-TCVIM@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-TCVIM@2x.png"; sourceTree = "<group>"; };
 		5BBBB77027AED70B0023B93A /* MenuIcon-SCVIM@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-SCVIM@2x.png"; sourceTree = "<group>"; };
@@ -369,7 +366,6 @@
 		D427F76B278CA1BA004A2160 /* AppDelegate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D47B92BF27972AC800458394 /* main.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = main.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D47F7DCD278BFB57002F9DD7 /* ctlPrefWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlPrefWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		D47F7DCF278C0897002F9DD7 /* ctlNonModalAlertWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlNonModalAlertWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D4A13D5927A59D5C003BE359 /* ctlInputMethod_Core.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlInputMethod_Core.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D4E33D8927A838CF006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D4E33D8E27A838F0006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -586,7 +582,6 @@
 			isa = PBXGroup;
 			children = (
 				5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */,
-				D47F7DCF278C0897002F9DD7 /* ctlNonModalAlertWindow.swift */,
 				D47F7DCD278BFB57002F9DD7 /* ctlPrefWindow.swift */,
 			);
 			path = WindowControllers;
@@ -596,7 +591,6 @@
 			isa = PBXGroup;
 			children = (
 				5BBBB76927AED5DB0023B93A /* frmAboutWindow.xib */,
-				5BBBB76527AED5DB0023B93A /* frmNonModalAlertWindow.xib */,
 				5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */,
 				6A187E2816004C5900466B2E /* MainMenu.xib */,
 			);
@@ -1070,7 +1064,6 @@
 				5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */,
 				6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */,
 				D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */,
-				5BBBB76B27AED5DB0023B93A /* frmNonModalAlertWindow.xib in Resources */,
 				5BEDB723283B4C250078EB25 /* data-cht.plist in Resources */,
 				5BEDB721283B4C250078EB25 /* data-cns.plist in Resources */,
 				5BF9DA2D288427E000DBD48E /* template-associatedPhrases-cht.txt in Resources */,
@@ -1217,7 +1210,6 @@
 				5B84579F2871AD2200C93B01 /* HotenkaChineseConverter.swift in Sources */,
 				5B887F302826AEA400B6651E /* lmCoreEX.swift in Sources */,
 				5BA9FD4627FEF3C9002DE248 /* Container.swift in Sources */,
-				D47F7DD0278C0897002F9DD7 /* ctlNonModalAlertWindow.swift in Sources */,
 				5B2170E5289FACAD00BE7304 /* 6_Node.swift in Sources */,
 				5B949BD92816DC5400D87B5D /* LineReader.swift in Sources */,
 				5BA9FD1027FEDB6B002DE248 /* suiPrefPaneKeyboard.swift in Sources */,
@@ -1342,14 +1334,6 @@
 				5B04306427B5312E00CB65BC /* ja */,
 			);
 			name = frmPrefWindow.xib;
-			sourceTree = "<group>";
-		};
-		5BBBB76527AED5DB0023B93A /* frmNonModalAlertWindow.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				5BBBB76627AED5DB0023B93A /* Base */,
-			);
-			name = frmNonModalAlertWindow.xib;
 			sourceTree = "<group>";
 		};
 		5BBBB76927AED5DB0023B93A /* frmAboutWindow.xib */ = {
