@@ -9,6 +9,7 @@
 // requirements defined in MIT License.
 
 import Cocoa
+import InputMethodKit
 
 private let kTargetBin = "vChewing"
 private let kTargetType = "app"
@@ -46,6 +47,17 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
   private var upgrading = false
   private var translocationRemovalStartTime: Date?
   private var currentVersionNumber: Int = 0
+
+  let imeURLInstalled = realHomeDir.appendingPathComponent("Library/Input Methods/vChewing.app")
+
+  var allRegisteredInstancesOfThisInputMethod: [TISInputSource] {
+    guard let components = Bundle(url: imeURLInstalled)?.infoDictionary?["ComponentInputModeDict"] as? [String: Any],
+      let tsInputModeListKey = components["tsInputModeListKey"] as? [String: Any]
+    else {
+      return []
+    }
+    return tsInputModeListKey.keys.compactMap { TISInputSource.generate(from: $0) }
+  }
 
   func runAlertPanel(title: String, message: String, buttonTitle: String) {
     let alert = NSAlert()
@@ -230,23 +242,20 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
       endAppWithDelay()
     }
 
-    let imeURLInstalled = realHomeDir.appendingPathComponent("Library/Input Methods/vChewing.app")
-
     _ = try? shell("/usr/bin/xattr -drs com.apple.quarantine \(kTargetPartialPath)")
 
-    guard let imeBundle = Bundle(url: imeURLInstalled),
-      let imeIdentifier = imeBundle.bundleIdentifier
+    guard let theBundle = Bundle(url: imeURLInstalled),
+      let imeIdentifier = theBundle.bundleIdentifier
     else {
       endAppWithDelay()
       return
     }
 
-    let imeBundleURL = imeBundle.bundleURL
-    var inputSource = InputSourceHelper.inputSource(for: imeIdentifier)
+    let imeBundleURL = theBundle.bundleURL
 
-    if inputSource == nil {
+    if allRegisteredInstancesOfThisInputMethod.isEmpty {
       NSLog("Registering input source \(imeIdentifier) at \(imeBundleURL.absoluteString).")
-      let status = InputSourceHelper.registerTnputSource(at: imeBundleURL)
+      let status = (TISRegisterInputSource(imeBundleURL as CFURL) == noErr)
       if !status {
         let message = String(
           format: NSLocalizedString(
@@ -262,8 +271,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
         return
       }
 
-      inputSource = InputSourceHelper.inputSource(for: imeIdentifier)
-      if inputSource == nil {
+      if allRegisteredInstancesOfThisInputMethod.isEmpty {
         let message = String(
           format: NSLocalizedString(
             "Cannot find input source %@ after registration.", comment: ""
@@ -285,19 +293,20 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
       NSLog("Installer runs with the pre-macOS 12 flow.")
     }
 
-    // If the IME is not enabled, enable it. Also, unconditionally enable it on macOS 12.0+,
+    // Unconditionally enable the IME on macOS 12.0+,
     // as the kTISPropertyInputSourceIsEnabled can still be true even if the IME is *not*
     // enabled in the user's current set of IMEs (which means the IME does not show up in
     // the user's input menu).
 
-    var mainInputSourceEnabled = InputSourceHelper.inputSourceEnabled(for: inputSource!)
-    if !mainInputSourceEnabled || isMacOS12OrAbove {
-      mainInputSourceEnabled = InputSourceHelper.enable(inputSource: inputSource!)
-      if mainInputSourceEnabled {
+    var mainInputSourceEnabled = false
+
+    allRegisteredInstancesOfThisInputMethod.forEach {
+      if $0.activate() {
         NSLog("Input method enabled: \(imeIdentifier)")
       } else {
         NSLog("Failed to enable input method: \(imeIdentifier)")
       }
+      mainInputSourceEnabled = $0.isActivated
     }
 
     // Alert Panel

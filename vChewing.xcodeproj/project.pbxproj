@@ -38,7 +38,6 @@
 		5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34027AE7CD900A19448 /* ctlCandidate.swift */; };
 		5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34327AE7CD900A19448 /* TooltipController.swift */; };
 		5B62A34A27AE7CD900A19448 /* NotifierController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34527AE7CD900A19448 /* NotifierController.swift */; };
-		5B62A35327AE89C400A19448 /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33127AE792F00A19448 /* InputSourceHelper.swift */; };
 		5B6C141228A9D4B30098ADF8 /* ctlInputMethod_Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6C141128A9D4B30098ADF8 /* ctlInputMethod_Common.swift */; };
 		5B73FB5E27B2BE1300E9BF49 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */; };
 		5B782EC4280C243C007276DE /* KeyHandler_HandleCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */; };
@@ -250,7 +249,6 @@
 		5B5948CD289CC04500C85824 /* LMInstantiator_DateTimeExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMInstantiator_DateTimeExtension.swift; sourceTree = "<group>"; };
 		5B5E535127EF261400C6AA1E /* IME.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = IME.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = FSEventStreamHelper.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5B62A33127AE792F00A19448 /* InputSourceHelper.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputSourceHelper.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A33527AE795800A19448 /* mgrPrefs.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = mgrPrefs.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A34027AE7CD900A19448 /* ctlCandidate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlCandidate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -886,7 +884,6 @@
 				5BBBB77827AEDB330023B93A /* Resources */,
 				D4F0BBE0279AF8B30071253C /* AppDelegate.swift */,
 				D4F0BBDE279AF1AF0071253C /* ArchiveUtil.swift */,
-				5B62A33127AE792F00A19448 /* InputSourceHelper.swift */,
 				6ACA41F215FC1D9000935EF6 /* Installer-Info.plist */,
 				5BC0AACA27F58472002D33E9 /* pkgPostInstall.sh */,
 				5BC0AAC927F58472002D33E9 /* pkgPreInstall.sh */,
@@ -1288,7 +1285,6 @@
 			files = (
 				D4F0BBE1279AF8B30071253C /* AppDelegate.swift in Sources */,
 				D4F0BBDF279AF1AF0071253C /* ArchiveUtil.swift in Sources */,
-				5B62A35327AE89C400A19448 /* InputSourceHelper.swift in Sources */,
 				5BF13B9428C627BB00E99EC1 /* IMKHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
