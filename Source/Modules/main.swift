@@ -11,7 +11,11 @@
 import Cocoa
 import InputMethodKit
 
-let kConnectionName = "org.atelierInmu.inputmethod.vChewing_Connection"
+guard let kConnectionName = Bundle.main.infoDictionary?["InputMethodConnectionName"] as? String
+else {
+  NSLog("Fatal error: Failed from retrieving connection name from info.plist file.")
+  exit(-1)
+}
 
 switch max(CommandLine.arguments.count - 1, 0) {
   case 0: break
