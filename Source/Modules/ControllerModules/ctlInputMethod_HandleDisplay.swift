@@ -58,6 +58,8 @@ extension ctlInputMethod {
       // 上面這句如果是 true 的話，就會是縱排；反之則為橫排。
     }
 
+    ctlInputMethod.isVerticalCandidateSituation = (isCandidateWindowVertical || !mgrPrefs.useHorizontalCandidateList)
+
     ctlInputMethod.ctlCandidateCurrent.delegate = nil
 
     /// 下面這一段本可直接指定 currentLayout，但這樣的話翻頁按鈕位置無法精準地重新繪製。

@@ -35,6 +35,38 @@ extension NSEvent {
       keyCode: keyCode ?? self.keyCode
     )
   }
+
+  /// 自 Emacs 熱鍵的 NSEvent 翻譯回標準 NSEvent。失敗的話則會返回原始 NSEvent 自身。
+  /// - Parameter isVerticalTyping: 是否按照縱排來操作。
+  /// - Returns: 翻譯結果。失敗的話則返回翻譯原文。
+  public func convertFromEmacKeyEvent(isVerticalContext: Bool) -> NSEvent {
+    guard isEmacsKey else { return self }
+    let newKeyCode: UInt16 = {
+      switch isVerticalContext {
+        case false: return IME.vChewingEmacsKey.charKeyMapHorizontal[charCode] ?? 0
+        case true: return IME.vChewingEmacsKey.charKeyMapVertical[charCode] ?? 0
+      }
+    }()
+    guard newKeyCode != 0 else { return self }
+    let newCharScalar: Unicode.Scalar = {
+      switch charCode {
+        case 6:
+          return isVerticalContext
+            ? NSEvent.SpecialKey.downArrow.unicodeScalar : NSEvent.SpecialKey.rightArrow.unicodeScalar
+        case 2:
+          return isVerticalContext
+            ? NSEvent.SpecialKey.upArrow.unicodeScalar : NSEvent.SpecialKey.leftArrow.unicodeScalar
+        case 1: return NSEvent.SpecialKey.home.unicodeScalar
+        case 5: return NSEvent.SpecialKey.end.unicodeScalar
+        case 4: return NSEvent.SpecialKey.deleteForward.unicodeScalar  // Use "deleteForward" for PC delete.
+        case 22: return NSEvent.SpecialKey.pageDown.unicodeScalar
+        default: return .init(0)
+      }
+    }()
+    let newChar = String(newCharScalar)
+    return reinitiate(modifierFlags: [], characters: newChar, charactersIgnoringModifiers: newChar, keyCode: newKeyCode)
+      ?? self
+  }
 }
 
 // MARK: - NSEvent Extension - InputSignalProtocol
@@ -58,8 +90,9 @@ extension NSEvent: InputSignalProtocol {
 
   public var isFlagChanged: Bool { type == .flagsChanged }
 
-  public var emacsKey: EmacsKey {
-    NSEvent.detectEmacsKey(charCode: charCode, flags: modifierFlags)
+  public var isEmacsKey: Bool {
+    // 這裡不能只用 isControlHold，因為這裡對修飾鍵的要求有排他性。
+    [6, 2, 1, 5, 4, 22].contains(charCode) && modifierFlags == .control
   }
 
   // 摁 Alt+Shift+主鍵盤區域數字鍵 的話，根據不同的 macOS 鍵盤佈局種類，會出現不同的符號結果。
@@ -150,13 +183,6 @@ extension NSEvent: InputSignalProtocol {
   public var isSymbolMenuPhysicalKey: Bool {
     [KeyCode.kSymbolMenuPhysicalKeyIntl, KeyCode.kSymbolMenuPhysicalKeyJIS].contains(KeyCode(rawValue: keyCode))
   }
-
-  static func detectEmacsKey(charCode: UniChar, flags: NSEvent.ModifierFlags) -> EmacsKey {
-    if flags.contains(.control) {
-      return EmacsKey(rawValue: charCode) ?? .none
-    }
-    return .none
-  }
 }
 
 // MARK: - InputSignalProtocol
@@ -169,7 +195,6 @@ public protocol InputSignalProtocol {
   var charCode: UInt16 { get }
   var keyCode: UInt16 { get }
   var isFlagChanged: Bool { get }
-  var emacsKey: EmacsKey { get }
   var mainAreaNumKeyChar: String? { get }
   var isASCII: Bool { get }
   var isInvalid: Bool { get }
@@ -318,14 +343,4 @@ enum CharCode: UInt16 {
   // CharCode is not reliable at all. KeyCode is the most appropriate choice due to its accuracy.
   // KeyCode doesn't give a phuque about the character sent through macOS keyboard layouts ...
   // ... but only focuses on which physical key is pressed.
-}
-
-public enum EmacsKey: UInt16 {
-  case none = 0
-  case forward = 6  // F
-  case backward = 2  // B
-  case home = 1  // A
-  case end = 5  // E
-  case delete = 4  // D
-  case nextPage = 22  // V
 }
