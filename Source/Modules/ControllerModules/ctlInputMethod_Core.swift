@@ -221,7 +221,11 @@ class ctlInputMethod: IMKInputController {
     // - 還是藉由 delegate 扔回 ctlInputMethod 給 KeyHandler 處理？
     proc: if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK {
       guard ctlCandidateCurrent.visible else { break proc }
-      let event: NSEvent = ctlCandidateIMK.replaceNumPadKeyCodes(target: event) ?? event
+      var event: NSEvent = ctlCandidateIMK.replaceNumPadKeyCodes(target: event) ?? event
+      // 使 NSEvent 自翻譯，這樣可以讓 Emacs NSEvent 變成標準 NSEvent。
+      if event.isEmacsKey {
+        event = event.convertFromEmacKeyEvent(isVerticalTyping: ctlInputMethod.isVerticalTypingSituation)
+      }
 
       // Shift+Enter 是個特殊情形，不提前攔截處理的話、會有垃圾參數傳給 delegate 的 keyHandler 從而崩潰。
       // 所以這裡直接將 Shift Flags 清空。
@@ -247,6 +251,7 @@ class ctlInputMethod: IMKInputController {
 
     /// 我們不在這裡處理了，直接交給 commonEventHandler 來處理。
     /// 這樣可以與 IMK 選字窗共用按鍵處理資源，維護起來也比較方便。
+    /// 警告：這裡的 event 必須是原始 event 且不能被 var，否則會影響 Shift 中英模式判定。
     return commonEventHandler(event)
   }
 

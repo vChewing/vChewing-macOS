@@ -190,7 +190,7 @@ extension KeyHandler {
     }
 
     // Shift + Left
-    if input.isCursorBackward || input.emacsKey == EmacsKey.backward, input.isShiftHold {
+    if input.isCursorBackward, input.isShiftHold {
       if compositor.marker > 0 {
         compositor.marker -= 1
         if isCursorCuttingChar(isMarker: true) {
@@ -213,7 +213,7 @@ extension KeyHandler {
     }
 
     // Shift + Right
-    if input.isCursorForward || input.emacsKey == EmacsKey.forward, input.isShiftHold {
+    if input.isCursorForward, input.isShiftHold {
       if compositor.marker < compositor.width {
         compositor.marker += 1
         if isCursorCuttingChar(isMarker: true) {

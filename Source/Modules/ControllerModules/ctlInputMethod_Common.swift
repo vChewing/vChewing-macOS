@@ -46,6 +46,12 @@ extension ctlInputMethod {
     /// 沒有文字輸入客體的話，就不要再往下處理了。
     guard client() != nil else { return false }
 
+    var event = event
+    // 使 NSEvent 自翻譯，這樣可以讓 Emacs NSEvent 變成標準 NSEvent。
+    if event.isEmacsKey {
+      event = event.convertFromEmacKeyEvent(isVerticalTyping: ctlInputMethod.isVerticalTypingSituation)
+    }
+
     /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
     /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
     /// 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
