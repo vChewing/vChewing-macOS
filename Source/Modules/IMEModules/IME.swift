@@ -26,6 +26,13 @@ public enum IME {
     fileURLWithFileSystemRepresentation: getpwuid(getuid()).pointee.pw_dir, isDirectory: true, relativeTo: nil
   )
 
+  // MARK: - vChewing Emacs CharCode-KeyCode translation tables.
+
+  public enum vChewingEmacsKey {
+    static let charKeyMapHorizontal: [UInt16: UInt16] = [6: 124, 2: 123, 1: 115, 5: 119, 4: 117, 22: 121]
+    static let charKeyMapVertical: [UInt16: UInt16] = [6: 126, 2: 125, 1: 115, 5: 119, 4: 117, 22: 121]
+  }
+
   // MARK: - 瀏覽器 Bundle Identifier 關鍵詞匹配黑名單
 
   /// 瀏覽器 Bundle Identifier 關鍵詞匹配黑名單，匹配到的瀏覽器會做出特殊的 Shift 鍵擊劍判定處理。

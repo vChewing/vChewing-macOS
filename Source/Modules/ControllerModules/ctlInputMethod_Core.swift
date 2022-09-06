@@ -213,7 +213,12 @@ class ctlInputMethod: IMKInputController {
     ctlInputMethod.isVerticalTypingSituation = isVerticalTyping
 
     // 就這傳入的 NSEvent 都還有可能是 nil，Apple InputMethodKit 團隊到底在搞三小。
-    guard let event = event else { return false }
+    guard var event = event else { return false }
+
+    // 使 NSEvent 自翻譯，這樣可以讓 Emacs NSEvent 變成標準 NSEvent。
+    if event.isEmacsKey {
+      event = event.convertFromEmacKeyEvent(isVerticalTyping: ctlInputMethod.isVerticalTypingSituation)
+    }
 
     // IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
     // 這樣可以讓 interpretKeyEvents() 函式自行判斷：

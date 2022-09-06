@@ -112,7 +112,7 @@ extension KeyHandler {
 
     // MARK: PgDn
 
-    if input.isPageDown || input.emacsKey == EmacsKey.nextPage {
+    if input.isPageDown {
       let updated: Bool = ctlCandidateCurrent.showNextPage()
       if !updated {
         IME.prtDebugIntel("9B691919")
@@ -150,17 +150,6 @@ extension KeyHandler {
       return true
     }
 
-    // MARK: EmacsKey Backward
-
-    if input.emacsKey == EmacsKey.backward {
-      let updated: Bool = ctlCandidateCurrent.highlightPreviousCandidate()
-      if !updated {
-        IME.prtDebugIntel("9B89308D")
-        errorCallback()
-      }
-      return true
-    }
-
     // MARK: Right Arrow
 
     if input.isRight {
@@ -175,17 +164,6 @@ extension KeyHandler {
             IME.prtDebugIntel("9244908D")
             errorCallback()
           }
-      }
-      return true
-    }
-
-    // MARK: EmacsKey Forward
-
-    if input.emacsKey == EmacsKey.forward {
-      let updated: Bool = ctlCandidateCurrent.highlightNextCandidate()
-      if !updated {
-        IME.prtDebugIntel("9B2428D")
-        errorCallback()
       }
       return true
     }
@@ -228,7 +206,7 @@ extension KeyHandler {
 
     // MARK: Home Key
 
-    if input.isHome || input.emacsKey == EmacsKey.home {
+    if input.isHome {
       if ctlCandidateCurrent.selectedCandidateIndex == 0 {
         IME.prtDebugIntel("9B6EDE8D")
         errorCallback()
@@ -244,7 +222,7 @@ extension KeyHandler {
     if state.candidates.isEmpty {
       return false
     } else {  // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
-      if input.isEnd || input.emacsKey == EmacsKey.end {
+      if input.isEnd {
         if ctlCandidateCurrent.selectedCandidateIndex == state.candidates.count - 1 {
           IME.prtDebugIntel("9B69AAAD")
           errorCallback()

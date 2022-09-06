@@ -197,7 +197,7 @@ extension KeyHandler {
 
     // MARK: Cursor backward
 
-    if input.isCursorBackward || input.emacsKey == EmacsKey.backward {
+    if input.isCursorBackward {
       return handleBackward(
         state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
       )
@@ -205,7 +205,7 @@ extension KeyHandler {
 
     // MARK: Cursor forward
 
-    if input.isCursorForward || input.emacsKey == EmacsKey.forward {
+    if input.isCursorForward {
       return handleForward(
         state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
       )
@@ -213,13 +213,13 @@ extension KeyHandler {
 
     // MARK: Home
 
-    if input.isHome || input.emacsKey == EmacsKey.home {
+    if input.isHome {
       return handleHome(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 
     // MARK: End
 
-    if input.isEnd || input.emacsKey == EmacsKey.end {
+    if input.isEnd {
       return handleEnd(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 
@@ -261,7 +261,7 @@ extension KeyHandler {
 
     // MARK: Delete
 
-    if input.isDelete || input.emacsKey == EmacsKey.delete {
+    if input.isDelete {
       return handleDelete(state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 
