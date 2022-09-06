@@ -71,7 +71,9 @@ extension KeyHandler {
       stateCallback(IMEState.ofEmpty())
 
       // 字母鍵摁 Shift 的話，無須額外處理，因為直接就會敲出大寫字母。
-      if input.isUpperCaseASCIILetterKey {
+      if (input.isUpperCaseASCIILetterKey && input.isASCIIModeInput)
+        || (input.isCapsLockOn && input.isShiftHold)
+      {
         return false
       }
 
