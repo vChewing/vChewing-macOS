@@ -222,7 +222,7 @@ extension StateData {
           ctlInputMethod.tooltipController.setColor(state: .prompt)
           return String(
             format: NSLocalizedString(
-              "\"%@\" already exists: ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude.",
+              "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude.",
               comment: ""
             ) + "\n//  " + generateReadingThread(data), text
           )
