@@ -88,7 +88,7 @@
   - ctlInputMethod 輸入法主控制器內則採用策略設計模式來處理各種狀態。
 - 半衰記憶模組的 C++ 原版作者是 Mengjuei Hsieh，且由 Shiki Suen 用 Swift 與 C# 分別重寫、繼續開發。
 - 僅供研發人員調試方便而使用的 App 版安裝程式 (by Zonble Yang)，不對公眾使用。
-- Voltaire MK2 選字窗、飄雲通知視窗、工具提示 (by Zonble Yang)，有大幅度修改。
+- Voltaire MK2 選字窗、飄雲通知視窗 (by Zonble Yang)，有大幅度修改。
 
 威注音輸入法 macOS 版以 MIT-NTL License 授權釋出 (與 MIT 相容)：© 2021-2022 vChewing 專案。
 

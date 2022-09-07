@@ -33,11 +33,11 @@
 		5B5948CE289CC04500C85824 /* LMInstantiator_DateTimeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5948CD289CC04500C85824 /* LMInstantiator_DateTimeExtension.swift */; };
 		5B5E535227EF261400C6AA1E /* IME.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E535127EF261400C6AA1E /* IME.swift */; };
 		5B5F8AEB28C86AAD007C11F1 /* NSAttributedTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F8AEA28C86AAD007C11F1 /* NSAttributedTextView.swift */; };
+		5B5F8AEE28C8826D007C11F1 /* ctlTooltip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F8AED28C8826D007C11F1 /* ctlTooltip.swift */; };
 		5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */; };
 		5B62A33627AE795800A19448 /* mgrPrefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33527AE795800A19448 /* mgrPrefs.swift */; };
 		5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */; };
 		5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34027AE7CD900A19448 /* ctlCandidate.swift */; };
-		5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34327AE7CD900A19448 /* TooltipController.swift */; };
 		5B62A34A27AE7CD900A19448 /* NotifierController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34527AE7CD900A19448 /* NotifierController.swift */; };
 		5B6C141228A9D4B30098ADF8 /* ctlInputMethod_Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6C141128A9D4B30098ADF8 /* ctlInputMethod_Common.swift */; };
 		5B73FB5E27B2BE1300E9BF49 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */; };
@@ -248,11 +248,11 @@
 		5B5948CD289CC04500C85824 /* LMInstantiator_DateTimeExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMInstantiator_DateTimeExtension.swift; sourceTree = "<group>"; };
 		5B5E535127EF261400C6AA1E /* IME.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = IME.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B5F8AEA28C86AAD007C11F1 /* NSAttributedTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAttributedTextView.swift; sourceTree = "<group>"; };
+		5B5F8AED28C8826D007C11F1 /* ctlTooltip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlTooltip.swift; sourceTree = "<group>"; };
 		5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = FSEventStreamHelper.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A33527AE795800A19448 /* mgrPrefs.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = mgrPrefs.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A34027AE7CD900A19448 /* ctlCandidate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlCandidate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5B62A34327AE7CD900A19448 /* TooltipController.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = TooltipController.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A34527AE7CD900A19448 /* NotifierController.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = NotifierController.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B65B919284D0185007C558B /* README-CHT.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README-CHT.md"; sourceTree = "<group>"; };
 		5B6C141128A9D4B30098ADF8 /* ctlInputMethod_Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_Common.swift; sourceTree = "<group>"; };
@@ -621,7 +621,7 @@
 		5B62A34227AE7CD900A19448 /* TooltipUI */ = {
 			isa = PBXGroup;
 			children = (
-				5B62A34327AE7CD900A19448 /* TooltipController.swift */,
+				5B5F8AED28C8826D007C11F1 /* ctlTooltip.swift */,
 			);
 			path = TooltipUI;
 			sourceTree = "<group>";
@@ -1214,6 +1214,7 @@
 				D47B92C027972AD100458394 /* main.swift in Sources */,
 				D4A13D5A27A59F0B003BE359 /* ctlInputMethod_Core.swift in Sources */,
 				5BA9FD4827FEF3C9002DE248 /* PreferencesWindowController.swift in Sources */,
+				5B5F8AEE28C8826D007C11F1 /* ctlTooltip.swift in Sources */,
 				5BD0113B28180D6100609769 /* LMInstantiator.swift in Sources */,
 				5B2170E7289FACAD00BE7304 /* 1_Compositor.swift in Sources */,
 				5B21177028753B9D000443A9 /* ctlInputMethod_Delegates.swift in Sources */,
@@ -1263,7 +1264,6 @@
 				5B40730D281672610023DFFF /* lmReplacements.swift in Sources */,
 				5B5E535227EF261400C6AA1E /* IME.swift in Sources */,
 				5B2170E0289FACAD00BE7304 /* 7_LangModel.swift in Sources */,
-				5B62A34927AE7CD900A19448 /* TooltipController.swift in Sources */,
 				5BA9FD4027FEF3C8002DE248 /* Localization.swift in Sources */,
 				5BF0B84C28C070B000795FC6 /* NSEventExtension.swift in Sources */,
 				5BAA8FBE282CAF380066C406 /* SyllableComposer.swift in Sources */,

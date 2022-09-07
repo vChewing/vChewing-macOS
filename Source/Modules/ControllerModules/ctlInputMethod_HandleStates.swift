@@ -25,7 +25,7 @@ extension ctlInputMethod {
       case .ofDeactivated:
         ctlInputMethod.ctlCandidateCurrent.delegate = nil
         ctlInputMethod.ctlCandidateCurrent.visible = false
-        ctlInputMethod.tooltipController.hide()
+        ctlInputMethod.tooltipInstance.hide()
         if previous.hasComposition {
           commit(text: previous.displayedText)
         }
@@ -39,20 +39,20 @@ extension ctlInputMethod {
           previous = state
         }
         ctlInputMethod.ctlCandidateCurrent.visible = false
-        ctlInputMethod.tooltipController.hide()
+        ctlInputMethod.tooltipInstance.hide()
         // 全專案用以判斷「.Abortion」的地方僅此一處。
         if previous.hasComposition, state.type != .ofAbortion {
           commit(text: previous.displayedText)
         }
         // 在這裡手動再取消一次選字窗與工具提示的顯示，可謂雙重保險。
         ctlInputMethod.ctlCandidateCurrent.visible = false
-        ctlInputMethod.tooltipController.hide()
+        ctlInputMethod.tooltipInstance.hide()
         clearInlineDisplay()
         // 最後一道保險
         keyHandler.clear()
       case .ofCommitting:
         ctlInputMethod.ctlCandidateCurrent.visible = false
-        ctlInputMethod.tooltipController.hide()
+        ctlInputMethod.tooltipInstance.hide()
         let textToCommit = state.textToCommit
         if !textToCommit.isEmpty { commit(text: textToCommit) }
         clearInlineDisplay()
@@ -60,7 +60,7 @@ extension ctlInputMethod {
         keyHandler.clear()
       case .ofInputting:
         ctlInputMethod.ctlCandidateCurrent.visible = false
-        ctlInputMethod.tooltipController.hide()
+        ctlInputMethod.tooltipInstance.hide()
         let textToCommit = state.textToCommit
         if !textToCommit.isEmpty { commit(text: textToCommit) }
         setInlineDisplayWithCursor()
@@ -74,7 +74,7 @@ extension ctlInputMethod {
         ctlInputMethod.ctlCandidateCurrent.visible = false
         setInlineDisplayWithCursor()
         if state.tooltip.isEmpty {
-          ctlInputMethod.tooltipController.hide()
+          ctlInputMethod.tooltipInstance.hide()
         } else {
           let cursorReference: Int = {
             if state.data.marker >= state.data.cursor { return state.data.u16Cursor }
@@ -86,7 +86,7 @@ extension ctlInputMethod {
           )
         }
       case .ofCandidates, .ofAssociates, .ofSymbolTable:
-        ctlInputMethod.tooltipController.hide()
+        ctlInputMethod.tooltipInstance.hide()
         setInlineDisplayWithCursor()
         show(candidateWindowWith: state)
       default: break

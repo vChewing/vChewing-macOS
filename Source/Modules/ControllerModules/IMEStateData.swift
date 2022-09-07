@@ -179,7 +179,7 @@ extension StateData {
         }
         arrOutput.append(neta)
       }
-      return arrOutput.joined(separator: " ")
+      return arrOutput.joined(separator: "\u{A0}")
     }
 
     /// 更新工具提示內容、以及對應配對是否在庫。
@@ -187,7 +187,7 @@ extension StateData {
     public static func updateParameters(_ data: inout StateData) {
       var tooltipGenerated: String {
         if mgrPrefs.phraseReplacementEnabled {
-          ctlInputMethod.tooltipController.setColor(state: .warning)
+          ctlInputMethod.tooltipInstance.setColor(state: .warning)
           return NSLocalizedString(
             "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.", comment: ""
           )
@@ -198,18 +198,18 @@ extension StateData {
 
         let text = data.displayedText.charComponents[data.markedRange].joined()
         if data.markedRange.count < mgrPrefs.allowedMarkRange.lowerBound {
-          ctlInputMethod.tooltipController.setColor(state: .denialInsufficiency)
+          ctlInputMethod.tooltipInstance.setColor(state: .denialInsufficiency)
           return String(
             format: NSLocalizedString(
               "\"%@\" length must ≥ 2 for a user phrase.", comment: ""
-            ) + "\n//  " + generateReadingThread(data), text
+            ) + "\n◆  " + generateReadingThread(data), text
           )
         } else if data.markedRange.count > mgrPrefs.allowedMarkRange.upperBound {
-          ctlInputMethod.tooltipController.setColor(state: .denialOverflow)
+          ctlInputMethod.tooltipInstance.setColor(state: .denialOverflow)
           return String(
             format: NSLocalizedString(
               "\"%@\" length should ≤ %d for a user phrase.", comment: ""
-            ) + "\n//  " + generateReadingThread(data), text, mgrPrefs.allowedMarkRange.upperBound
+            ) + "\n◆  " + generateReadingThread(data), text, mgrPrefs.allowedMarkRange.upperBound
           )
         }
 
@@ -219,17 +219,17 @@ extension StateData {
         )
         if exist {
           data.markedTargetExists = exist
-          ctlInputMethod.tooltipController.setColor(state: .prompt)
+          ctlInputMethod.tooltipInstance.setColor(state: .prompt)
           return String(
             format: NSLocalizedString(
               "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude.",
               comment: ""
-            ) + "\n//  " + generateReadingThread(data), text
+            ) + "\n◆  " + generateReadingThread(data), text
           )
         }
-        ctlInputMethod.tooltipController.resetColor()
+        ctlInputMethod.tooltipInstance.resetColor()
         return String(
-          format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: "") + "\n//  "
+          format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: "") + "\n◆  "
             + generateReadingThread(data),
           text
         )
