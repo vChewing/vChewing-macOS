@@ -10,6 +10,7 @@
 		5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */ = {isa = PBXBuildFile; fileRef = 5B09307828B6FC3B0021F8C5 /* shortcuts.html */; };
 		5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0AF8B427B2C8290096FE54 /* StringExtension.swift */; };
 		5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */; };
+		5B16B84C28C9A89000ABA692 /* FolderMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16B84B28C9A89000ABA692 /* FolderMonitor.swift */; };
 		5B175FFB28C5CDDC0078D1B4 /* IMKHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B175FFA28C5CDDC0078D1B4 /* IMKHelper.swift */; };
 		5B20430728BEE30900BFC6FD /* BookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B20430628BEE30900BFC6FD /* BookmarkManager.swift */; };
 		5B21176C287539BB000443A9 /* ctlInputMethod_HandleStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176B287539BB000443A9 /* ctlInputMethod_HandleStates.swift */; };
@@ -34,7 +35,6 @@
 		5B5E535227EF261400C6AA1E /* IME.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E535127EF261400C6AA1E /* IME.swift */; };
 		5B5F8AEB28C86AAD007C11F1 /* NSAttributedTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F8AEA28C86AAD007C11F1 /* NSAttributedTextView.swift */; };
 		5B5F8AEE28C8826D007C11F1 /* ctlTooltip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F8AED28C8826D007C11F1 /* ctlTooltip.swift */; };
-		5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */; };
 		5B62A33627AE795800A19448 /* mgrPrefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33527AE795800A19448 /* mgrPrefs.swift */; };
 		5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */; };
 		5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34027AE7CD900A19448 /* ctlCandidate.swift */; };
@@ -212,6 +212,7 @@
 		5B0AF8B427B2C8290096FE54 /* StringExtension.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = StringExtension.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B0C5EDF27C7D9870078037C /* dataCompiler.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = dataCompiler.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = AppleKeyboardConverter.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		5B16B84B28C9A89000ABA692 /* FolderMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderMonitor.swift; sourceTree = "<group>"; };
 		5B175FFA28C5CDDC0078D1B4 /* IMKHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMKHelper.swift; sourceTree = "<group>"; };
 		5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHS.txt"; sourceTree = "<group>"; };
 		5B18BA7027C7BD8B0056EB19 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
@@ -249,7 +250,6 @@
 		5B5E535127EF261400C6AA1E /* IME.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = IME.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B5F8AEA28C86AAD007C11F1 /* NSAttributedTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAttributedTextView.swift; sourceTree = "<group>"; };
 		5B5F8AED28C8826D007C11F1 /* ctlTooltip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlTooltip.swift; sourceTree = "<group>"; };
-		5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = FSEventStreamHelper.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A33527AE795800A19448 /* mgrPrefs.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = mgrPrefs.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A34027AE7CD900A19448 /* ctlCandidate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlCandidate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -415,6 +415,14 @@
 			path = DataCompiler;
 			sourceTree = "<group>";
 		};
+		5B16B84A28C9A88300ABA692 /* FolderMonitor */ = {
+			isa = PBXGroup;
+			children = (
+				5B16B84B28C9A89000ABA692 /* FolderMonitor.swift */,
+			);
+			path = FolderMonitor;
+			sourceTree = "<group>";
+		};
 		5B18BA7527C7BF6D0056EB19 /* MiscRootFiles */ = {
 			isa = PBXGroup;
 			children = (
@@ -476,6 +484,7 @@
 		5B62A30127AE732800A19448 /* 3rdParty */ = {
 			isa = PBXGroup;
 			children = (
+				5B16B84A28C9A88300ABA692 /* FolderMonitor */,
 				5B84579B2871AD2200C93B01 /* HotenkaChineseConverter */,
 				5B949BD72816DC4400D87B5D /* LineReader */,
 				5B5F8AEC28C86AB3007C11F1 /* NSAttributedTextView */,
@@ -516,14 +525,6 @@
 				5BAA8FBD282CAF380066C406 /* SyllableComposer.swift */,
 			);
 			path = ControllerModules;
-			sourceTree = "<group>";
-		};
-		5B62A32127AE755D00A19448 /* FileHandlers */ = {
-			isa = PBXGroup;
-			children = (
-				5B62A32827AE77D100A19448 /* FSEventStreamHelper.swift */,
-			);
-			path = FileHandlers;
 			sourceTree = "<group>";
 		};
 		5B62A32227AE756300A19448 /* IMEModules */ = {
@@ -856,7 +857,6 @@
 				D427F76B278CA1BA004A2160 /* AppDelegate.swift */,
 				D47B92BF27972AC800458394 /* main.swift */,
 				5B62A31F27AE74E900A19448 /* ControllerModules */,
-				5B62A32127AE755D00A19448 /* FileHandlers */,
 				5B62A32227AE756300A19448 /* IMEModules */,
 				5B62A32427AE757300A19448 /* LangModelRelated */,
 				5B62A32327AE756800A19448 /* LanguageParsers */,
@@ -1246,7 +1246,7 @@
 				5B62A34A27AE7CD900A19448 /* NotifierController.swift in Sources */,
 				5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */,
 				5B54E743283A7D89001ECBDC /* lmCoreNS.swift in Sources */,
-				5B62A32927AE77D100A19448 /* FSEventStreamHelper.swift in Sources */,
+				5B16B84C28C9A89000ABA692 /* FolderMonitor.swift in Sources */,
 				5B2170E2289FACAD00BE7304 /* 8_Unigram.swift in Sources */,
 				5B21176C287539BB000443A9 /* ctlInputMethod_HandleStates.swift in Sources */,
 				5B62A33627AE795800A19448 /* mgrPrefs.swift in Sources */,

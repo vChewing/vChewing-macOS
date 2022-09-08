@@ -459,11 +459,10 @@ enum mgrLangModel {
         return false
       }
 
-      // We use FSEventStream to monitor possible changes of the user phrase folder, hence the
-      // lack of the needs of manually load data here unless FSEventStream is disabled by user.
-      if !mgrPrefs.shouldAutoReloadUserDataFiles {
-        loadUserPhrasesData()
-      }
+      // The new FolderMonitor module does NOT monitor cases that files are modified
+      // by the current application itself, requiring additional manual loading process here.
+      // if !mgrPrefs.shouldAutoReloadUserDataFiles {}
+      loadUserPhrasesData()
       return true
     }
     return false

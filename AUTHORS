@@ -18,7 +18,6 @@ $ Contributors and volunteers of the upstream repo, having no responsibility in 
     - McBopomofo for macOS 2.x architect.
     - Voltaire candidate window MK2 (massively modified as MK3 in vChewing by Shiki Suen).
     - Notifier window and Tooltip UI.
-    - FSEventStreamHelper.
     - App-style installer (only preserved for developer purposes).
     - mgrPrefs (userdefaults manager).
     - apiUpdate.

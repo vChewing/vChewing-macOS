@@ -12,10 +12,8 @@ import Cocoa
 import InputMethodKit
 
 @objc(AppDelegate)
-class AppDelegate: NSObject, NSApplicationDelegate,
-  FSEventStreamHelperDelegate, NSUserNotificationCenterDelegate
-{
-  func helper(_: FSEventStreamHelper, didReceive _: [FSEventStreamHelper.Event]) {
+class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDelegate {
+  private func reloadOnFolderChangeHappens() {
     // 拖 100ms 再重載，畢竟有些有特殊需求的使用者可能會想使用巨型自訂語彙檔案。
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
       if mgrPrefs.shouldAutoReloadUserDataFiles {
@@ -30,9 +28,8 @@ class AppDelegate: NSObject, NSApplicationDelegate,
   private var ctlPrefWindowInstance: ctlPrefWindow?
   private var ctlAboutWindowInstance: ctlAboutWindow?  // New About Window
   private var checkTask: URLSessionTask?
-  public var fsStreamHelper = FSEventStreamHelper(
-    path: mgrLangModel.dataFolderPath(isDefaultFolder: false),
-    queue: DispatchQueue(label: "vChewing User Phrases")
+  public lazy var folderMonitor = FolderMonitor(
+    url: URL(fileURLWithPath: mgrLangModel.dataFolderPath(isDefaultFolder: false))
   )
   private var currentAlertType: String = ""
 
@@ -59,8 +56,10 @@ class AppDelegate: NSObject, NSApplicationDelegate,
       IME.initLangModels(userOnly: false)
     }
 
-    fsStreamHelper.delegate = self
-    _ = fsStreamHelper.start()
+    folderMonitor.folderDidChange = { [weak self] in
+      self?.reloadOnFolderChangeHappens()
+    }
+    folderMonitor.startMonitoring()
 
     mgrPrefs.fixOddPreferences()
     mgrPrefs.setMissingDefaults()
@@ -71,8 +70,15 @@ class AppDelegate: NSObject, NSApplicationDelegate,
     }
   }
 
-  func updateStreamHelperPath() {
-    fsStreamHelper.path = mgrPrefs.userDataFolderSpecified
+  func updateDirectoryMonitorPath() {
+    folderMonitor.stopMonitoring()
+    folderMonitor = FolderMonitor(
+      url: URL(fileURLWithPath: mgrLangModel.dataFolderPath(isDefaultFolder: false))
+    )
+    folderMonitor.folderDidChange = { [weak self] in
+      self?.reloadOnFolderChangeHappens()
+    }
+    folderMonitor.startMonitoring()
   }
 
   func showPreferences() {
