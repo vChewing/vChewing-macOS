@@ -36,15 +36,6 @@ class AppDelegate: NSObject, NSApplicationDelegate,
   )
   private var currentAlertType: String = ""
 
-  // 補上 dealloc
-  deinit {
-    ctlPrefWindowInstance = nil
-    ctlAboutWindowInstance = nil
-    checkTask = nil
-    fsStreamHelper.stop()
-    fsStreamHelper.delegate = nil
-  }
-
   func userNotificationCenter(_: NSUserNotificationCenter, shouldPresent _: NSUserNotification) -> Bool {
     true
   }
