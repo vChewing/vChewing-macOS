@@ -194,6 +194,7 @@ extension vChewing.LMUserOverride {
     let decoder = JSONDecoder()
     do {
       let data = try Data(contentsOf: fileURL, options: .mappedIfSafe)
+      if ["", "{}"].contains(String(data: data, encoding: .utf8)) { return }
       guard let jsonResult = try? decoder.decode([String: KeyObservationPair].self, from: data) else {
         IME.prtDebugIntel("UOM Error: Read file content type invalid, abort loading.")
         return
