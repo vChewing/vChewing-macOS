@@ -1,4 +1,8 @@
 "vChewing" = "威注音輸入法";
+"Update Check Completed" = "更新檢查完畢";
+"You are already using the latest version." = "您正在使用目前最新的發行版。";
+"Plist downloaded is nil." = "下載來的更新資訊並非 Plist 檔案。";
+"Plist downloaded cannot be parsed correctly." = "下載來的更新資訊 Plist 檔案無法正常解析。";
 "vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability." = "威注音輸入法的使用者半衰記憶模組在觀測時崩潰，相關半衰記憶資料檔案內容已全部清空。";
 "About vChewing…" = "關於威注音…";
 "vChewing Preferences…" = "威注音偏好設定…";
@@ -17,7 +21,7 @@
 "New Version Available" = "有新版可下載";
 "Not Now" = "以後再說";
 "Visit Website" = "前往網站";
-"You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@" = "目前使用的威注音官方版本是 %1$@ (%2$@)，網路上有更新版本 %3$@ (%4$@) 可供下載。是否要前往威注音網站下載新版來安裝？%5$@";
+"You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?" = "目前使用的威注音官方版本是 %1$@ (%2$@)，網路上有更新版本 %3$@ (%4$@) 可供下載。是否要前往威注音網站下載新版來安裝？";
 "Force KangXi Writing" = "康熙正體字模式";
 "NotificationSwitchON" = "✔ 已啟用";
 "NotificationSwitchOFF" = "✘ 已停用";

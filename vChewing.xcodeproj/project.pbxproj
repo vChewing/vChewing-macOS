@@ -85,6 +85,7 @@
 		5BBBB77527AED70B0023B93A /* MenuIcon-SCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77127AED70B0023B93A /* MenuIcon-SCVIM.png */; };
 		5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77227AED70B0023B93A /* MenuIcon-TCVIM.png */; };
 		5BBBB77A27AEDC690023B93A /* clsSFX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBBB77927AEDC690023B93A /* clsSFX.swift */; };
+		5BBC9EFC28CA042500041196 /* UpdateSputnik.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC9EFB28CA042500041196 /* UpdateSputnik.swift */; };
 		5BC2652227E04B7E00700291 /* uninstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 5BC2652127E04B7B00700291 /* uninstall.sh */; };
 		5BC4479D2865686500EDC323 /* data-chs.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71C283B4AEA0078EB25 /* data-chs.plist */; };
 		5BC4479E2865686500EDC323 /* data-cht.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB720283B4AEA0078EB25 /* data-cht.plist */; };
@@ -303,6 +304,7 @@
 		5BBBB77227AED70B0023B93A /* MenuIcon-TCVIM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-TCVIM.png"; sourceTree = "<group>"; };
 		5BBBB77727AEDB290023B93A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		5BBBB77927AEDC690023B93A /* clsSFX.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = clsSFX.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		5BBC9EFB28CA042500041196 /* UpdateSputnik.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateSputnik.swift; sourceTree = "<group>"; };
 		5BBD627827B6C4D900271480 /* Update-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Update-Info.plist"; sourceTree = "<group>"; };
 		5BC0AAC927F58472002D33E9 /* pkgPreInstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = pkgPreInstall.sh; sourceTree = "<group>"; };
 		5BC0AACA27F58472002D33E9 /* pkgPostInstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = pkgPostInstall.sh; sourceTree = "<group>"; };
@@ -542,6 +544,7 @@
 				5B5E535127EF261400C6AA1E /* IME.swift */,
 				5B175FFA28C5CDDC0078D1B4 /* IMKHelper.swift */,
 				5B62A33527AE795800A19448 /* mgrPrefs.swift */,
+				5BBC9EFB28CA042500041196 /* UpdateSputnik.swift */,
 			);
 			path = IMEModules;
 			sourceTree = "<group>";
@@ -1214,6 +1217,7 @@
 				5B40730C281672610023DFFF /* lmAssociates.swift in Sources */,
 				D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */,
 				5BA9FD4527FEF3C9002DE248 /* ToolbarItemStyleViewController.swift in Sources */,
+				5BBC9EFC28CA042500041196 /* UpdateSputnik.swift in Sources */,
 				5BA9FD4127FEF3C8002DE248 /* PreferencesStyle.swift in Sources */,
 				5B7F225D2808501000DDD3CB /* KeyHandler_HandleInput.swift in Sources */,
 				5BA9FD1227FEDB6B002DE248 /* suiPrefPaneExperience.swift in Sources */,

@@ -1,4 +1,8 @@
 "vChewing" = "vChewing";
+"Update Check Completed" = "Update Check Completed";
+"You are already using the latest version." = "You are already using the latest version.";
+"Plist downloaded is nil." = "Plist downloaded is nil.";
+"Plist downloaded cannot be parsed correctly." = "Plist downloaded cannot be parsed correctly.";
 "vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability." = "vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability.";
 "About vChewing…" = "About vChewing…";
 "vChewing Preferences…" = "vChewing Preferences…";
@@ -17,7 +21,7 @@
 "New Version Available" = "New Version Available";
 "Not Now" = "Not Now";
 "Visit Website" = "Visit Website";
-"You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@" = "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@";
+"You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?" = "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?";
 "Force KangXi Writing" = "Force KangXi Writing";
 "NotificationSwitchON" = "✔ ON";
 "NotificationSwitchOFF" = "✘ OFF";

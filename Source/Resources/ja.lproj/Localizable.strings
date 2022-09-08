@@ -1,4 +1,8 @@
 "vChewing" = "威注音入力アプリ";
+"Update Check Completed" = "新バージョンチェック完了";
+"You are already using the latest version." = "現在稼働中のは最新バージョンである。";
+"Plist downloaded is nil." = "受けた新バージョンお知らせ情報データは Plist ではないため、失敗とみなす。";
+"Plist downloaded cannot be parsed correctly." = "受けた新バージョンお知らせ情報 Plist データは解読できないため、失敗とみなす。";
 "vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability." = "臨時記憶モジュールの観測行為による威注音入力アプリの意外中止は発生した。威注音入力アプリの無事利用のために、既存臨時記憶データは全てお消しした。";
 "About vChewing…" = "威注音について…";
 "vChewing Preferences…" = "入力機能設定…";
@@ -17,7 +21,7 @@
 "New Version Available" = "最新版利用可能";
 "Not Now" = "後で";
 "Visit Website" = "公式サイト";
-"You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@" = "今のご使用していた威注音入力アプリのバージョンは「%1$@ (%2$@)」であり、ネットでもっと新しいバージョン「%3$@ (%4$@)」の下載せはできるらしい。公式サイトへバージョン「%5$@」を下載せますか？";
+"You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?" = "今のご使用していた威注音入力アプリのバージョンは「%1$@ (%2$@)」であり、ネットでもっと新しいバージョン「%3$@ (%4$@)」の下載せはできるらしい。お下載せしますか？";
 "Force KangXi Writing" = "康熙文字変換モード";
 "NotificationSwitchON" = "✔ 機能起動";
 "NotificationSwitchOFF" = "✘ 機能停止";
