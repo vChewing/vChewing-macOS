@@ -308,7 +308,7 @@ extension ctlInputMethod {
   }
 
   @objc func checkForUpdate(_: Any?) {
-    VersionUpdateApi.checkForUpdate(forced: true)
+    UpdateSputnik.shared.checkForUpdate(forced: true)
   }
 
   @objc func openUserDataFolder(_: Any?) {

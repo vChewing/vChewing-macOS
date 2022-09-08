@@ -20,7 +20,6 @@ $ Contributors and volunteers of the upstream repo, having no responsibility in 
     - Notifier window and Tooltip UI.
     - App-style installer (only preserved for developer purposes).
     - mgrPrefs (userdefaults manager).
-    - apiUpdate.
 - Mengjuei Hsieh:
     - McBopomofo for macOS 1.x main developer and architect.
     - The original C++ version of the User Override Module.

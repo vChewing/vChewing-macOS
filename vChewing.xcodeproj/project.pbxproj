@@ -93,7 +93,6 @@
 		5BC447A02865686500EDC323 /* data-symbols.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71E283B4AEA0078EB25 /* data-symbols.plist */; };
 		5BC447A12865686500EDC323 /* data-zhuyinwen.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.plist */; };
 		5BC447A628656A1900EDC323 /* PrefManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC447A228656A1900EDC323 /* PrefManagerTests.swift */; };
-		5BC447A928656A1900EDC323 /* UpdateAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC447A528656A1900EDC323 /* UpdateAPITests.swift */; };
 		5BC447AE2865CFC200EDC323 /* KeyHandlerTestsNormalCHS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC447A428656A1900EDC323 /* KeyHandlerTestsNormalCHS.swift */; };
 		5BC6E03C286692BE00291771 /* KeyHandlerTestsSCPCCHT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC447A328656A1900EDC323 /* KeyHandlerTestsSCPCCHT.swift */; };
 		5BD0113B28180D6100609769 /* LMInstantiator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0113A28180D6100609769 /* LMInstantiator.swift */; };
@@ -105,7 +104,6 @@
 		5BD05C6827B2BBEF004C4F1D /* Content.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD05C6327B2BBEF004C4F1D /* Content.swift */; };
 		5BD05C6927B2BBEF004C4F1D /* WindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD05C6427B2BBEF004C4F1D /* WindowController.swift */; };
 		5BD05C6A27B2BBEF004C4F1D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD05C6527B2BBEF004C4F1D /* ViewController.swift */; };
-		5BDC1CFA27FDF1310052C2B9 /* apiUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDC1CF927FDF1310052C2B9 /* apiUpdate.swift */; };
 		5BDCBB2E27B4E67A00D0CC59 /* vChewingPhraseEditor.app in Resources */ = {isa = PBXBuildFile; fileRef = 5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */; };
 		5BE377A0288FED8D0037365B /* KeyHandler_HandleComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE3779F288FED8D0037365B /* KeyHandler_HandleComposition.swift */; };
 		5BE78BD927B3775B005EA1BE /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE78BD827B37750005EA1BE /* ctlAboutWindow.swift */; };
@@ -312,7 +310,6 @@
 		5BC447A228656A1900EDC323 /* PrefManagerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrefManagerTests.swift; sourceTree = "<group>"; };
 		5BC447A328656A1900EDC323 /* KeyHandlerTestsSCPCCHT.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyHandlerTestsSCPCCHT.swift; sourceTree = "<group>"; };
 		5BC447A428656A1900EDC323 /* KeyHandlerTestsNormalCHS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyHandlerTestsNormalCHS.swift; sourceTree = "<group>"; };
-		5BC447A528656A1900EDC323 /* UpdateAPITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateAPITests.swift; sourceTree = "<group>"; };
 		5BC447AB2865BEF500EDC323 /* AUTHORS */ = {isa = PBXFileReference; lastKnownFileType = text; path = AUTHORS; sourceTree = "<group>"; };
 		5BD0113A28180D6100609769 /* LMInstantiator.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = LMInstantiator.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5BD0113C2818543900609769 /* KeyHandler_Core.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = KeyHandler_Core.swift; sourceTree = "<group>"; usesTabs = 0; };
@@ -324,7 +321,6 @@
 		5BD05C6327B2BBEF004C4F1D /* Content.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = Content.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BD05C6427B2BBEF004C4F1D /* WindowController.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = WindowController.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BD05C6527B2BBEF004C4F1D /* ViewController.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ViewController.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5BDC1CF927FDF1310052C2B9 /* apiUpdate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = apiUpdate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BDCBB4227B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/MainMenu.strings"; sourceTree = "<group>"; };
 		5BDCBB4327B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/frmAboutWindow.strings"; sourceTree = "<group>"; };
 		5BDCBB4527B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/frmPrefWindow.strings"; sourceTree = "<group>"; };
@@ -425,14 +421,6 @@
 			path = FolderMonitor;
 			sourceTree = "<group>";
 		};
-		5B16B84D28C9D6BF00ABA692 /* OVUpdateAPI */ = {
-			isa = PBXGroup;
-			children = (
-				5BDC1CF927FDF1310052C2B9 /* apiUpdate.swift */,
-			);
-			path = OVUpdateAPI;
-			sourceTree = "<group>";
-		};
 		5B18BA7527C7BF6D0056EB19 /* MiscRootFiles */ = {
 			isa = PBXGroup;
 			children = (
@@ -465,7 +453,6 @@
 				5BC447A428656A1900EDC323 /* KeyHandlerTestsNormalCHS.swift */,
 				5BC447A328656A1900EDC323 /* KeyHandlerTestsSCPCCHT.swift */,
 				5BC447A228656A1900EDC323 /* PrefManagerTests.swift */,
-				5BC447A528656A1900EDC323 /* UpdateAPITests.swift */,
 			);
 			path = vChewingTests;
 			sourceTree = "<group>";
@@ -498,7 +485,6 @@
 				5B84579B2871AD2200C93B01 /* HotenkaChineseConverter */,
 				5B949BD72816DC4400D87B5D /* LineReader */,
 				5B5F8AEC28C86AB3007C11F1 /* NSAttributedTextView */,
-				5B16B84D28C9D6BF00ABA692 /* OVUpdateAPI */,
 				5BA58644289BCFAC0077D02F /* Qwertyyb */,
 				5B20430528BEE2F300BFC6FD /* Sandbox */,
 				5BA9FCEA27FED652002DE248 /* SindreSorhus */,
@@ -1191,7 +1177,6 @@
 			files = (
 				5BC447A628656A1900EDC323 /* PrefManagerTests.swift in Sources */,
 				5BC6E03C286692BE00291771 /* KeyHandlerTestsSCPCCHT.swift in Sources */,
-				5BC447A928656A1900EDC323 /* UpdateAPITests.swift in Sources */,
 				5BC447AE2865CFC200EDC323 /* KeyHandlerTestsNormalCHS.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1291,7 +1276,6 @@
 				5BA9FD3F27FEF3C8002DE248 /* Pane.swift in Sources */,
 				5BB802DA27FABA8300CF1C19 /* ctlInputMethod_Menu.swift in Sources */,
 				5BE377A0288FED8D0037365B /* KeyHandler_HandleComposition.swift in Sources */,
-				5BDC1CFA27FDF1310052C2B9 /* apiUpdate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

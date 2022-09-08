@@ -135,7 +135,7 @@ class ctlInputMethod: IMKInputController {
       setKeyLayout()
       handle(state: IMEState.ofEmpty())
     }  // 除此之外就不要動了，免得在點開輸入法自身的視窗時卡死。
-    VersionUpdateApi.checkForUpdate()
+    UpdateSputnik.shared.checkForUpdate()
   }
 
   /// 停用輸入法時，會觸發該函式。
