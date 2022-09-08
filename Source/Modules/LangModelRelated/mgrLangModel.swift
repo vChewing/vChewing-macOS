@@ -271,8 +271,10 @@ enum mgrLangModel {
   static func userOverrideModelDataURL(_ mode: InputMode) -> URL {
     let fileName =
       (mode == InputMode.imeModeCHT)
-      ? "../vChewing_override-model-data-cht.dat" : "../vChewing_override-model-data-chs.dat"
-    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: true)).appendingPathComponent(fileName)
+      ? "vChewing_override-model-data-cht.dat" : "vChewing_override-model-data-chs.dat"
+    return URL(
+      fileURLWithPath: dataFolderPath(isDefaultFolder: true)
+    ).deletingLastPathComponent().appendingPathComponent(fileName)
   }
 
   // MARK: - 檢查具體的使用者語彙檔案是否存在
