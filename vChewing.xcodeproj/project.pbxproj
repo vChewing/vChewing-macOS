@@ -423,6 +423,14 @@
 			path = FolderMonitor;
 			sourceTree = "<group>";
 		};
+		5B16B84D28C9D6BF00ABA692 /* OVUpdateAPI */ = {
+			isa = PBXGroup;
+			children = (
+				5BDC1CF927FDF1310052C2B9 /* apiUpdate.swift */,
+			);
+			path = OVUpdateAPI;
+			sourceTree = "<group>";
+		};
 		5B18BA7527C7BF6D0056EB19 /* MiscRootFiles */ = {
 			isa = PBXGroup;
 			children = (
@@ -488,6 +496,7 @@
 				5B84579B2871AD2200C93B01 /* HotenkaChineseConverter */,
 				5B949BD72816DC4400D87B5D /* LineReader */,
 				5B5F8AEC28C86AB3007C11F1 /* NSAttributedTextView */,
+				5B16B84D28C9D6BF00ABA692 /* OVUpdateAPI */,
 				5BA58644289BCFAC0077D02F /* Qwertyyb */,
 				5B20430528BEE2F300BFC6FD /* Sandbox */,
 				5BA9FCEA27FED652002DE248 /* SindreSorhus */,
@@ -530,7 +539,6 @@
 		5B62A32227AE756300A19448 /* IMEModules */ = {
 			isa = PBXGroup;
 			children = (
-				5BDC1CF927FDF1310052C2B9 /* apiUpdate.swift */,
 				5B5E535127EF261400C6AA1E /* IME.swift */,
 				5B175FFA28C5CDDC0078D1B4 /* IMKHelper.swift */,
 				5B62A33527AE795800A19448 /* mgrPrefs.swift */,

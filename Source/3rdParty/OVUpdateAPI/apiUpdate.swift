@@ -10,39 +10,8 @@
 
 import Cocoa
 
-struct VersionUpdateReport {
-  var siteUrl: URL?
-  var currentShortVersion: String = ""
-  var currentVersion: String = ""
-  var remoteShortVersion: String = ""
-  var remoteVersion: String = ""
-  var versionDescription: String = ""
-}
-
-enum VersionUpdateApiResult {
-  case shouldUpdate(report: VersionUpdateReport)
-  case noNeedToUpdate
-  case ignored
-}
-
-enum VersionUpdateApiError: Error, LocalizedError {
-  case connectionError(message: String)
-
-  var errorDescription: String? {
-    switch self {
-      case .connectionError(let message):
-        return String(
-          format: NSLocalizedString(
-            "There may be no internet connection or the server failed to respond.\n\nError message: %@",
-            comment: ""
-          ), message
-        )
-    }
-  }
-}
-
 enum VersionUpdateApi {
-  static let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
+  static let kCheckUpdateAutomatically = UserDef.kCheckUpdateAutomatically.rawValue
   static let kNextUpdateCheckDateKey = "NextUpdateCheckDate"
   static let kUpdateInfoEndpointKey = "UpdateInfoEndpoint"
   static let kUpdateInfoSiteKey = "UpdateInfoSite"
@@ -160,5 +129,119 @@ enum VersionUpdateApi {
     }
     task.resume()
     return task
+  }
+
+  private static var checkTask: URLSessionTask?
+  static func checkForUpdate(forced: Bool = false) {
+    if checkTask != nil {
+      // busy
+      return
+    }
+
+    // time for update?
+    if !forced {
+      if !mgrPrefs.checkUpdateAutomatically {
+        return
+      }
+      let now = Date()
+      let date = UserDefaults.standard.object(forKey: VersionUpdateApi.kNextUpdateCheckDateKey) as? Date ?? now
+      if now.compare(date) == .orderedAscending {
+        return
+      }
+    }
+
+    let nextUpdateDate = Date(timeInterval: VersionUpdateApi.kNextCheckInterval, since: Date())
+    UserDefaults.standard.set(nextUpdateDate, forKey: VersionUpdateApi.kNextUpdateCheckDateKey)
+
+    checkTask = VersionUpdateApi.check(forced: forced) { [self] result in
+      defer {
+        checkTask = nil
+      }
+      switch result {
+        case .success(let apiResult):
+          switch apiResult {
+            case .shouldUpdate(let report):
+              let content = String(
+                format: NSLocalizedString(
+                  "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@",
+                  comment: ""
+                ),
+                report.currentShortVersion,
+                report.currentVersion,
+                report.remoteShortVersion,
+                report.remoteVersion,
+                report.versionDescription
+              )
+              IME.prtDebugIntel("vChewingDebug: \(content)")
+              let alert = NSAlert()
+              alert.messageText = NSLocalizedString("New Version Available", comment: "")
+              alert.informativeText = content
+              alert.addButton(withTitle: NSLocalizedString("Visit Website", comment: ""))
+              alert.addButton(withTitle: NSLocalizedString("Not Now", comment: ""))
+              NSApp.setActivationPolicy(.accessory)
+              let result = alert.runModal()
+              if result == NSApplication.ModalResponse.alertFirstButtonReturn {
+                if let siteURL = report.siteUrl {
+                  NSWorkspace.shared.open(siteURL)
+                }
+              }
+            case .noNeedToUpdate, .ignored:
+              break
+          }
+        case .failure(let error):
+          switch error {
+            case VersionUpdateApiError.connectionError(let message):
+              let title = NSLocalizedString("Update Check Failed", comment: "")
+              let content = String(
+                format: NSLocalizedString(
+                  "There may be no internet connection or the server failed to respond.\n\nError message: %@",
+                  comment: ""
+                ), message
+              )
+              let buttonTitle = NSLocalizedString("Dismiss", comment: "")
+              IME.prtDebugIntel("vChewingDebug: \(content)")
+
+              let alert = NSAlert()
+              alert.messageText = title
+              alert.informativeText = content
+              alert.addButton(withTitle: buttonTitle)
+              alert.runModal()
+              NSApp.setActivationPolicy(.accessory)
+            default:
+              break
+          }
+      }
+    }
+  }
+
+  struct VersionUpdateReport {
+    var siteUrl: URL?
+    var currentShortVersion: String = ""
+    var currentVersion: String = ""
+    var remoteShortVersion: String = ""
+    var remoteVersion: String = ""
+    var versionDescription: String = ""
+  }
+
+  enum VersionUpdateApiResult {
+    case shouldUpdate(report: VersionUpdateReport)
+    case noNeedToUpdate
+    case ignored
+  }
+
+  enum VersionUpdateApiError: Error, LocalizedError {
+    case connectionError(message: String)
+
+    var errorDescription: String? {
+      switch self {
+        case .connectionError(let message):
+          return String(
+            format: NSLocalizedString(
+              "There may be no internet connection or the server failed to respond.\n\nError message: %@",
+              comment: ""
+            ), message
+          )
+      }
+    }
   }
 }

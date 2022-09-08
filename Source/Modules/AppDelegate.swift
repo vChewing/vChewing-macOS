@@ -27,7 +27,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
   @IBOutlet var window: NSWindow?
   private var ctlPrefWindowInstance: ctlPrefWindow?
   private var ctlAboutWindowInstance: ctlAboutWindow?  // New About Window
-  private var checkTask: URLSessionTask?
   public lazy var folderMonitor = FolderMonitor(
     url: URL(fileURLWithPath: mgrLangModel.dataFolderPath(isDefaultFolder: false))
   )
@@ -66,7 +65,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
 
     // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
     if mgrPrefs.checkUpdateAutomatically {
-      checkForUpdate()
+      VersionUpdateApi.checkForUpdate()
     }
   }
 
@@ -101,88 +100,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     ctlAboutWindowInstance?.window?.orderFrontRegardless()  // 逼著關於視窗往最前方顯示
     ctlAboutWindowInstance?.window?.level = .statusBar
     NSApp.setActivationPolicy(.accessory)
-  }
-
-  func checkForUpdate(forced: Bool = false) {
-    if checkTask != nil {
-      // busy
-      return
-    }
-
-    // time for update?
-    if !forced {
-      if !mgrPrefs.checkUpdateAutomatically {
-        return
-      }
-      let now = Date()
-      let date = UserDefaults.standard.object(forKey: VersionUpdateApi.kNextUpdateCheckDateKey) as? Date ?? now
-      if now.compare(date) == .orderedAscending {
-        return
-      }
-    }
-
-    let nextUpdateDate = Date(timeInterval: VersionUpdateApi.kNextCheckInterval, since: Date())
-    UserDefaults.standard.set(nextUpdateDate, forKey: VersionUpdateApi.kNextUpdateCheckDateKey)
-
-    checkTask = VersionUpdateApi.check(forced: forced) { [self] result in
-      defer {
-        checkTask = nil
-      }
-      switch result {
-        case .success(let apiResult):
-          switch apiResult {
-            case .shouldUpdate(let report):
-              let content = String(
-                format: NSLocalizedString(
-                  "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@",
-                  comment: ""
-                ),
-                report.currentShortVersion,
-                report.currentVersion,
-                report.remoteShortVersion,
-                report.remoteVersion,
-                report.versionDescription
-              )
-              IME.prtDebugIntel("vChewingDebug: \(content)")
-              let alert = NSAlert()
-              alert.messageText = NSLocalizedString("New Version Available", comment: "")
-              alert.informativeText = content
-              alert.addButton(withTitle: NSLocalizedString("Visit Website", comment: ""))
-              alert.addButton(withTitle: NSLocalizedString("Not Now", comment: ""))
-              let result = alert.runModal()
-              if result == NSApplication.ModalResponse.alertFirstButtonReturn {
-                if let siteURL = report.siteUrl {
-                  NSWorkspace.shared.open(siteURL)
-                }
-              }
-              NSApp.setActivationPolicy(.accessory)
-            case .noNeedToUpdate, .ignored:
-              break
-          }
-        case .failure(let error):
-          switch error {
-            case VersionUpdateApiError.connectionError(let message):
-              let title = NSLocalizedString("Update Check Failed", comment: "")
-              let content = String(
-                format: NSLocalizedString(
-                  "There may be no internet connection or the server failed to respond.\n\nError message: %@",
-                  comment: ""
-                ), message
-              )
-              let buttonTitle = NSLocalizedString("Dismiss", comment: "")
-              IME.prtDebugIntel("vChewingDebug: \(content)")
-
-              let alert = NSAlert()
-              alert.messageText = title
-              alert.informativeText = content
-              alert.addButton(withTitle: buttonTitle)
-              alert.runModal()
-              NSApp.setActivationPolicy(.accessory)
-            default:
-              break
-          }
-      }
-    }
   }
 
   func selfUninstall() {

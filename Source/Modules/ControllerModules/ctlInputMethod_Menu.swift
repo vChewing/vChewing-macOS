@@ -308,7 +308,7 @@ extension ctlInputMethod {
   }
 
   @objc func checkForUpdate(_: Any?) {
-    (NSApp.delegate as? AppDelegate)?.checkForUpdate(forced: true)
+    VersionUpdateApi.checkForUpdate(forced: true)
   }
 
   @objc func openUserDataFolder(_: Any?) {
