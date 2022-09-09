@@ -76,7 +76,7 @@ public struct StateData {
     ]
   )
   var isFilterable: Bool {
-    markedTargetExists ? mgrPrefs.allowedMarkRange.contains(markedRange.count) : false
+    markedTargetExists ? mgrPrefs.allowedMarkLengthRange.contains(markedRange.count) : false
   }
 
   var attributedStringNormal: NSAttributedString {
@@ -197,19 +197,19 @@ extension StateData {
         }
 
         let text = data.displayedText.charComponents[data.markedRange].joined()
-        if data.markedRange.count < mgrPrefs.allowedMarkRange.lowerBound {
+        if data.markedRange.count < mgrPrefs.allowedMarkLengthRange.lowerBound {
           ctlInputMethod.tooltipInstance.setColor(state: .denialInsufficiency)
           return String(
             format: NSLocalizedString(
               "\"%@\" length must ≥ 2 for a user phrase.", comment: ""
             ) + "\n◆  " + generateReadingThread(data), text
           )
-        } else if data.markedRange.count > mgrPrefs.allowedMarkRange.upperBound {
+        } else if data.markedRange.count > mgrPrefs.allowedMarkLengthRange.upperBound {
           ctlInputMethod.tooltipInstance.setColor(state: .denialOverflow)
           return String(
             format: NSLocalizedString(
               "\"%@\" length should ≤ %d for a user phrase.", comment: ""
-            ) + "\n◆  " + generateReadingThread(data), text, mgrPrefs.allowedMarkRange.upperBound
+            ) + "\n◆  " + generateReadingThread(data), text, mgrPrefs.allowedMarkLengthRange.upperBound
           )
         }
 
