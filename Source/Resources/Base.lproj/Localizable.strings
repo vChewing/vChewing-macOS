@@ -174,7 +174,7 @@
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "in front of the phrase (like macOS built-in Zhuyin IME)";
 "Intonation Key:" = "Intonation Key:";
 "Japanese" = "Japanese";
-"Key names in tooltip will be shown as symbols when the typing direction of the client app is vertical." = "Key names in tooltip will be shown as symbols when the typing direction of the client app is vertical.";
+"Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English." = "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English.";
 "Keyboard Shortcuts:" = "Keyboard Shortcuts:";
 "Keyboard" = "Keyboard";
 "Misc Settings:" = "Misc Settings:";

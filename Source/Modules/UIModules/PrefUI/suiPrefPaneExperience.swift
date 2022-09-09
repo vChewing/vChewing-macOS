@@ -243,10 +243,10 @@ struct suiPrefPaneExperience: View {
             isOn: $selAlwaysShowTooltipTextsHorizontally.onChange {
               mgrPrefs.alwaysShowTooltipTextsHorizontally = selAlwaysShowTooltipTextsHorizontally
             }
-          )
+          ).disabled(Bundle.main.preferredLocalizations[0] == "en")
           Text(
             LocalizedStringKey(
-              "Key names in tooltip will be shown as symbols when the typing direction of the client app is vertical."
+              "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English."
             )
           ).preferenceDescription()
         }

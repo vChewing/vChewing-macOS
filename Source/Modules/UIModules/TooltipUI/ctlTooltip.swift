@@ -29,6 +29,7 @@ public class ctlTooltip: NSWindowController {
   public var direction: NSAttributedTextView.writingDirection = .horizontal {
     didSet {
       if #unavailable(macOS 10.13) { direction = .horizontal }
+      if Bundle.main.preferredLocalizations[0] == "en" { direction = .horizontal }
       messageText.direction = direction
     }
   }
