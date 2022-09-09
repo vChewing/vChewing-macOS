@@ -55,6 +55,7 @@ public enum UserDef: String, CaseIterable {
   case kConsolidateContextOnCandidateSelection = "ConsolidateContextOnCandidateSelection"
   case kHardenVerticalPunctuations = "HardenVerticalPunctuations"
   case kTrimUnfinishedReadingsOnCommit = "TrimUnfinishedReadingsOnCommit"
+  case kAlwaysShowTooltipTextsHorizontally = "AlwaysShowTooltipTextsHorizontally"
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
@@ -438,6 +439,9 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kTrimUnfinishedReadingsOnCommit.rawValue, defaultValue: true)
   static var trimUnfinishedReadingsOnCommit: Bool
+
+  @UserDefault(key: UserDef.kAlwaysShowTooltipTextsHorizontally.rawValue, defaultValue: false)
+  static var alwaysShowTooltipTextsHorizontally: Bool
 
   // MARK: - Settings (Tier 2)
 
