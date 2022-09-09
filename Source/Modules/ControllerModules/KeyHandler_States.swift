@@ -374,9 +374,9 @@ extension KeyHandler {
     return true
   }
 
-  // MARK: - 處理 Backspace (macOS Delete) 按鍵行為
+  // MARK: - 處理 BackSpace (macOS Delete) 按鍵行為
 
-  /// 處理 Backspace (macOS Delete) 按鍵行為。
+  /// 處理 BackSpace (macOS Delete) 按鍵行為。
   /// - Parameters:
   ///   - state: 當前狀態。
   ///   - input: 輸入按鍵訊號。

@@ -253,7 +253,7 @@ extension KeyHandler {
       return handleClockKey(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
     }
 
-    // MARK: Backspace
+    // MARK: BackSpace
 
     if input.isBackSpace {
       return handleBackSpace(state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
