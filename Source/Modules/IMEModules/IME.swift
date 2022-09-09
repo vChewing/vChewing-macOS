@@ -111,6 +111,7 @@ public enum IME {
   // MARK: - System Dark Mode Status Detector.
 
   static var isDarkMode: Bool {
+    if #unavailable(macOS 10.14) { return false }
     if #available(macOS 10.15, *) {
       let appearanceDescription = NSApplication.shared.effectiveAppearance.debugDescription
         .lowercased()
