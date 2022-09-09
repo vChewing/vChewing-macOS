@@ -191,7 +191,7 @@
 "Selection Keys:" = "Selection Keys:";
 "Shift+BackSpace:" = "Shift+BackSpace:";
 "Shift+Letter:" = "Shift+Letter:";
-"Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "Show Hanyu-Pinyin in the inline composition buffer & tooltip";
+"Show Hanyu-Pinyin in the inline composition buffer" = "Show Hanyu-Pinyin in the inline composition buffer";
 "Show page buttons in candidate window" = "Show page buttons in candidate window";
 "Simplified Chinese" = "Simplified Chinese";
 "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work." = "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work.";

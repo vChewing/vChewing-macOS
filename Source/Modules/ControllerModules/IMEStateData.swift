@@ -174,7 +174,10 @@ extension StateData {
           arrOutput.append("??")
           continue
         }
-        if mgrPrefs.showHanyuPinyinInCompositionBuffer {  // 恢復陰平標記->注音轉拼音->轉教科書式標調
+        if mgrPrefs.showHanyuPinyinInCompositionBuffer,
+          mgrPrefs.alwaysShowTooltipTextsHorizontally || !ctlInputMethod.isVerticalTypingSituation
+        {
+          // 恢復陰平標記->注音轉拼音->轉教科書式標調
           neta = Tekkon.restoreToneOneInZhuyinKey(target: neta)
           neta = Tekkon.cnvPhonaToHanyuPinyin(target: neta)
           neta = Tekkon.cnvHanyuPinyinToTextbookStyle(target: neta)

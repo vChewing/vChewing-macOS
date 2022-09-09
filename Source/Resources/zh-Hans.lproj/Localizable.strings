@@ -191,7 +191,7 @@
 "Selection Keys:" = "选字键:";
 "Shift+BackSpace:" = "Shift+退格键:";
 "Shift+Letter:" = "Shift+字母键:";
-"Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "拼音并击（组字区与工具提示内显示汉语拼音）";
+"Show Hanyu-Pinyin in the inline composition buffer" = "拼音并击（组字区内显示汉语拼音）";
 "Show page buttons in candidate window" = "在选字窗内显示翻页按钮";
 "Simplified Chinese" = "简体中文";
 "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work." = "某些应用（比如像是 MS Edge 或者 Chrome 这样的 Chromium 核心的浏览器）可能会使输入的 Shift 按键讯号被重复输入，且其有关研发方很可能不打算修复这些产品缺陷。威注音针对这些应用预设启用了相容措施。请在此根据您的需求自订。";
