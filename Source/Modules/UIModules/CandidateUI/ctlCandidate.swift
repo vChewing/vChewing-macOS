@@ -154,47 +154,26 @@ public class ctlCandidate: NSWindowController, ctlCandidateProtocol {
     }
   }
 
-  func doSet(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
+  func doSet(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight heightDelta: CGFloat) {
+    guard let window = window else { return }
+    let windowSize = window.frame.size
+
     var adjustedPoint = windowTopLeftPoint
-    var adjustedHeight = height
-
+    var delta = heightDelta
     var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.zero
-    for screen in NSScreen.screens {
-      let frame = screen.visibleFrame
-      if windowTopLeftPoint.x >= frame.minX, windowTopLeftPoint.x <= frame.maxX,
-        windowTopLeftPoint.y >= frame.minY, windowTopLeftPoint.y <= frame.maxY
-      {
-        screenFrame = frame
-        break
-      }
+    for frame in NSScreen.screens.map(\.visibleFrame).filter({ !$0.contains(windowTopLeftPoint) }) {
+      screenFrame = frame
+      break
     }
 
-    if adjustedHeight > screenFrame.size.height / 2.0 {
-      adjustedHeight = 0.0
+    if delta > screenFrame.size.height / 2.0 { delta = 0.0 }
+
+    if adjustedPoint.y < screenFrame.minY + windowSize.height {
+      adjustedPoint.y = windowTopLeftPoint.y + windowSize.height + delta
     }
+    adjustedPoint.y = min(adjustedPoint.y, screenFrame.maxY - 1.0)
+    adjustedPoint.x = min(max(adjustedPoint.x, screenFrame.minX), screenFrame.maxX - windowSize.width - 1.0)
 
-    let windowSize = window?.frame.size ?? NSSize.zero
-
-    // bottom beneath the screen?
-    if adjustedPoint.y - windowSize.height < screenFrame.minY {
-      adjustedPoint.y = windowTopLeftPoint.y + adjustedHeight + windowSize.height
-    }
-
-    // top over the screen?
-    if adjustedPoint.y >= screenFrame.maxY {
-      adjustedPoint.y = screenFrame.maxY - 1.0
-    }
-
-    // right
-    if adjustedPoint.x + windowSize.width >= screenFrame.maxX {
-      adjustedPoint.x = screenFrame.maxX - windowSize.width
-    }
-
-    // left
-    if adjustedPoint.x < screenFrame.minX {
-      adjustedPoint.x = screenFrame.minX
-    }
-
-    window?.setFrameTopLeftPoint(adjustedPoint)
+    window.setFrameTopLeftPoint(adjustedPoint)
   }
 }
