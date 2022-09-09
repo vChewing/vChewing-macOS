@@ -64,12 +64,30 @@ public class NSAttributedTextView: NSView {
     var newAttributes = attributes
     let isVertical: Bool = !(direction == .horizontal)
     newAttributes[.verticalGlyphForm] = isVertical
-    let lineHeight: CGFloat = isVertical ? fontSize * 0.8 : fontSize * 1.3
     let newStyle: NSMutableParagraphStyle = newAttributes[.paragraphStyle] as! NSMutableParagraphStyle
-    newStyle.maximumLineHeight = lineHeight
-    newStyle.minimumLineHeight = lineHeight
+    newStyle.lineSpacing = isVertical ? (fontSize / -2) : fontSize * 0.1
+    newStyle.maximumLineHeight = fontSize
+    newStyle.minimumLineHeight = fontSize
     newAttributes[.paragraphStyle] = newStyle
-    let attributedText = NSMutableAttributedString(string: text ?? "", attributes: newAttributes)
+    var text: String = text ?? ""
+    if !(direction == .horizontal) {
+      text = text.replacingOccurrences(of: "˙", with: "･")
+      text = text.replacingOccurrences(of: "\u{A0}", with: "　")
+      text = text.replacingOccurrences(of: "+", with: "")
+      text = text.replacingOccurrences(of: "Shift", with: "⇧")
+      text = text.replacingOccurrences(of: "Control", with: "⌃")
+      text = text.replacingOccurrences(of: "Enter", with: "⏎")
+      text = text.replacingOccurrences(of: "Command", with: "⌘")
+      text = text.replacingOccurrences(of: "Delete", with: "⌦")
+      text = text.replacingOccurrences(of: "BackSpace", with: "⌫")
+      text = text.replacingOccurrences(of: "SHIFT", with: "⇧")
+      text = text.replacingOccurrences(of: "CONTROL", with: "⌃")
+      text = text.replacingOccurrences(of: "ENTER", with: "⏎")
+      text = text.replacingOccurrences(of: "COMMAND", with: "⌘")
+      text = text.replacingOccurrences(of: "DELETE", with: "⌦")
+      text = text.replacingOccurrences(of: "BACKSPACE", with: "⌫")
+    }
+    let attributedText = NSMutableAttributedString(string: text, attributes: newAttributes)
     return attributedText
   }
 
