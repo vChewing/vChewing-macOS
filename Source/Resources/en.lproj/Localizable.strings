@@ -106,6 +106,7 @@
 "Allow using Enter key to confirm associated candidate selection" = "Allow using Enter key to confirm associated candidate selection";
 "Also toggle alphanumerical mode with Left-Shift" = "Also toggle alphanumerical mode with Left-Shift";
 "Always drop the previous reading" = "Always drop the previous reading";
+"Always show tooltip texts horizontally" = "Always show tooltip texts horizontally";
 "Always type intonations to the inline composition buffer" = "Always type intonations to the inline composition buffer";
 "Always use fixed listing order in candidate window" = "Always use fixed listing order in candidate window";
 "An accommodation for elder computer users." = "An accommodation for elder computer users.";
@@ -173,6 +174,7 @@
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "in front of the phrase (like macOS built-in Zhuyin IME)";
 "Intonation Key:" = "Intonation Key:";
 "Japanese" = "Japanese";
+"Key names in tooltip will be shown as symbols when the typing direction of the client app is vertical." = "Key names in tooltip will be shown as symbols when the typing direction of the client app is vertical.";
 "Keyboard Shortcuts:" = "Keyboard Shortcuts:";
 "Keyboard" = "Keyboard";
 "Misc Settings:" = "Misc Settings:";

@@ -106,6 +106,7 @@
 "Allow using Enter key to confirm associated candidate selection" = "Enter キーを連想語彙候補の確認のために使う";
 "Also toggle alphanumerical mode with Left-Shift" = "左側の Shift キーでも英数入力モードの切り替え";
 "Always drop the previous reading" = "カーソルの後部の音読みを常に削除する";
+"Always show tooltip texts horizontally" = "ヒントを常に横書きにする";
 "Always type intonations to the inline composition buffer" = "常に入力緩衝列に音調を入力する";
 "Always use fixed listing order in candidate window" = "候補文字を固定順番で陳列する";
 "An accommodation for elder computer users." = "年配なるユーザーのために提供した機能である。";
@@ -173,6 +174,7 @@
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "単語の前で // macOS 内蔵注音入力のやり方";
 "Intonation Key:" = "音調キー:";
 "Japanese" = "和語";
+"Key names in tooltip will be shown as symbols when the typing direction of the client app is vertical." = "縦書き入力の場合、ヒントにはキーの名前は常に符号で表示する。";
 "Keyboard Shortcuts:" = "ショートカット:";
 "Keyboard" = "配列設定";
 "Misc Settings:" = "他の設定:";
