@@ -32,16 +32,15 @@ extension ctlInputMethod {
       finalOrigin = NSPoint(
         x: lineHeightRect.origin.x + lineHeightRect.size.width + 5, y: lineHeightRect.origin.y
       )
-      ctlInputMethod.tooltipInstance.show(
-        tooltip: tooltip, at: finalOrigin,
-        bottomOutOfScreenAdjustmentHeight: delta, direction: .vertical
-      )
-    } else {
-      ctlInputMethod.tooltipInstance.show(
-        tooltip: tooltip, at: finalOrigin,
-        bottomOutOfScreenAdjustmentHeight: delta, direction: .horizontal
-      )
     }
+    var tooltipContentDirection: NSAttributedTextView.writingDirection = {
+      if mgrPrefs.alwaysShowTooltipTextsHorizontally { return .horizontal }
+      return isVerticalTyping ? .vertical : .horizontal
+    }()
+    ctlInputMethod.tooltipInstance.show(
+      tooltip: tooltip, at: finalOrigin,
+      bottomOutOfScreenAdjustmentHeight: delta, direction: tooltipContentDirection
+    )
   }
 
   func show(candidateWindowWith state: IMEStateProtocol) {
