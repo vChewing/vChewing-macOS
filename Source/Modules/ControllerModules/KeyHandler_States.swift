@@ -161,7 +161,13 @@ extension KeyHandler {
           IME.prtDebugIntel("2EAC1F7A")
           errorCallback()
           return true
-        } else if !keyHandlerDelegate.keyHandler(self, didRequestWriteUserPhraseWith: state, addToFilter: false) {
+        }
+        if !state.isMarkedLengthValid {
+          IME.prtDebugIntel("9AAFAC00")
+          errorCallback()
+          return true
+        }
+        if !keyHandlerDelegate.keyHandler(self, didRequestWriteUserPhraseWith: state, addToFilter: false) {
           IME.prtDebugIntel("5B69CC8D")
           errorCallback()
           return true

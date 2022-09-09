@@ -76,7 +76,11 @@ public struct StateData {
     ]
   )
   var isFilterable: Bool {
-    markedTargetExists ? mgrPrefs.allowedMarkLengthRange.contains(markedRange.count) : false
+    markedTargetExists ? isMarkedLengthValid : false
+  }
+
+  var isMarkedLengthValid: Bool {
+    mgrPrefs.allowedMarkLengthRange.contains(markedRange.count)
   }
 
   var attributedStringNormal: NSAttributedString {

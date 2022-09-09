@@ -35,6 +35,7 @@ public protocol IMEStateProtocol {
   var attributedString: NSAttributedString { get }
   var convertedToInputting: IMEState { get }
   var isFilterable: Bool { get }
+  var isMarkedLengthValid: Bool { get }
   var node: SymbolNode { get set }
 }
 
@@ -154,6 +155,7 @@ extension IMEState {
 
 extension IMEState {
   public var isFilterable: Bool { data.isFilterable }
+  public var isMarkedLengthValid: Bool { data.isMarkedLengthValid }
   public var candidates: [(String, String)] { data.candidates }
   public var convertedToInputting: IMEState {
     if type == .ofInputting { return self }
