@@ -28,6 +28,7 @@ public class ctlTooltip: NSWindowController {
 
   public var direction: NSAttributedTextView.writingDirection = .horizontal {
     didSet {
+      if #unavailable(macOS 10.13) { direction = .horizontal }
       messageText.direction = direction
     }
   }
@@ -59,7 +60,6 @@ public class ctlTooltip: NSWindowController {
     direction: NSAttributedTextView.writingDirection = .horizontal
   ) {
     self.direction = direction
-    messageText.direction = self.direction
     self.tooltip = tooltip
     window?.orderFront(nil)
     set(windowTopLeftPoint: point, bottomOutOfScreenAdjustmentHeight: heightDelta)

@@ -33,7 +33,7 @@ extension ctlInputMethod {
         x: lineHeightRect.origin.x + lineHeightRect.size.width + 5, y: lineHeightRect.origin.y
       )
     }
-    var tooltipContentDirection: NSAttributedTextView.writingDirection = {
+    let tooltipContentDirection: NSAttributedTextView.writingDirection = {
       if mgrPrefs.alwaysShowTooltipTextsHorizontally { return .horizontal }
       return isVerticalTyping ? .vertical : .horizontal
     }()
