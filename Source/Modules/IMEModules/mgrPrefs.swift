@@ -55,6 +55,7 @@ public enum UserDef: String, CaseIterable {
   case kConsolidateContextOnCandidateSelection = "ConsolidateContextOnCandidateSelection"
   case kHardenVerticalPunctuations = "HardenVerticalPunctuations"
   case kTrimUnfinishedReadingsOnCommit = "TrimUnfinishedReadingsOnCommit"
+  case kAlwaysShowTooltipTextsHorizontally = "AlwaysShowTooltipTextsHorizontally"
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
@@ -439,6 +440,9 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kTrimUnfinishedReadingsOnCommit.rawValue, defaultValue: true)
   static var trimUnfinishedReadingsOnCommit: Bool
 
+  @UserDefault(key: UserDef.kAlwaysShowTooltipTextsHorizontally.rawValue, defaultValue: false)
+  static var alwaysShowTooltipTextsHorizontally: Bool
+
   // MARK: - Settings (Tier 2)
 
   @UserDefault(key: UserDef.kUseIMKCandidateWindow.rawValue, defaultValue: false)
@@ -459,7 +463,7 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kMaxCandidateLength.rawValue, defaultValue: 10)
   static var maxCandidateLength: Int
 
-  static var allowedMarkRange: ClosedRange<Int> = mgrPrefs.minCandidateLength...mgrPrefs.maxCandidateLength
+  static var allowedMarkLengthRange: ClosedRange<Int> = mgrPrefs.minCandidateLength...mgrPrefs.maxCandidateLength
 
   @UserDefault(key: UserDef.kShouldNotFartInLieuOfBeep.rawValue, defaultValue: true)
   static var shouldNotFartInLieuOfBeep: Bool

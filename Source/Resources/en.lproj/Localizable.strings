@@ -1,4 +1,8 @@
 "vChewing" = "vChewing";
+"Update Check Completed" = "Update Check Completed";
+"You are already using the latest version." = "You are already using the latest version.";
+"Plist downloaded is nil." = "Plist downloaded is nil.";
+"Plist downloaded cannot be parsed correctly." = "Plist downloaded cannot be parsed correctly.";
 "vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability." = "vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability.";
 "About vChewing…" = "About vChewing…";
 "vChewing Preferences…" = "vChewing Preferences…";
@@ -17,7 +21,7 @@
 "New Version Available" = "New Version Available";
 "Not Now" = "Not Now";
 "Visit Website" = "Visit Website";
-"You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@" = "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@";
+"You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?" = "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?";
 "Force KangXi Writing" = "Force KangXi Writing";
 "NotificationSwitchON" = "✔ ON";
 "NotificationSwitchOFF" = "✘ OFF";
@@ -30,7 +34,7 @@
 "\"%@\" length must ≥ 2 for a user phrase." = "\"%@\" length must ≥ 2 for a user phrase.";
 "\"%@\" length should ≤ %d for a user phrase." = "\"%@\" length should ≤ %d for a user phrase.";
 "\"%@\" selected. ENTER to add user phrase." = "\"%@\" selected. ENTER to add user phrase.";
-"\"%@\" already exists: ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "\"%@\" already exists: ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude.";
+"\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude.";
 "Edit Phrase Replacement Table…" = "Edit Phrase Replacement Table…";
 "Use Phrase Replacement" = "Use Phrase Replacement";
 "Candidates keys cannot be empty." = "Candidates keys cannot be empty.";
@@ -96,11 +100,13 @@
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)Space:";
 "⚠︎ This feature in IMK Candidate Window defects. Please consult Apple Developer Relations\nand tell them the related Radar ID: #FB11300759." = "⚠︎ This feature in IMK Candidate Window defects. Please consult Apple Developer Relations\nand tell them the related Radar ID: #FB11300759.";
+"⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal.";
 "Allow backspace-editing miscomposed readings" = "Allow backspace-editing miscomposed readings";
 "Allow boosting / excluding a candidate of single kanji" = "Allow boosting / excluding a candidate of single kanji";
 "Allow using Enter key to confirm associated candidate selection" = "Allow using Enter key to confirm associated candidate selection";
 "Also toggle alphanumerical mode with Left-Shift" = "Also toggle alphanumerical mode with Left-Shift";
 "Always drop the previous reading" = "Always drop the previous reading";
+"Always show tooltip texts horizontally" = "Always show tooltip texts horizontally";
 "Always type intonations to the inline composition buffer" = "Always type intonations to the inline composition buffer";
 "Always use fixed listing order in candidate window" = "Always use fixed listing order in candidate window";
 "An accommodation for elder computer users." = "An accommodation for elder computer users.";
@@ -141,6 +147,7 @@
 "Dictionary" = "Dictionary";
 "Directly commit lowercased letters" = "Directly commit lowercased letters";
 "Directly commit uppercased letters" = "Directly commit uppercased letters";
+"Disable Shift key accomodation in all cases" = "Disable Shift key accomodation in all cases";
 "Disassemble the previous reading, dropping its intonation" = "Disassemble the previous reading, dropping its intonation";
 "Disassembling process does not work with non-phonetic reading keys." = "Disassembling process does not work with non-phonetic reading keys.";
 "Emulating select-candidate-per-character mode" = "Emulating select-candidate-per-character mode";
@@ -155,10 +162,10 @@
 "Follow OS settings" = "Follow OS settings";
 "for cycling candidates" = "for cycling candidates";
 "for cycling pages" = "for cycling pages";
+"For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is." = "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is.";
 "General" = "General";
 "Hanyu Pinyin with Numeral Intonation" = "Hanyu Pinyin with Numeral Intonation";
 "Harden vertical punctuations during vertical typing (not recommended)" = "Harden vertical punctuations during vertical typing (not recommended)";
-"⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal.";
 "Horizontal" = "Horizontal";
 "Hsu" = "Hsu";
 "Hualuo Pinyin with Numeral Intonation" = "Hualuo Pinyin with Numeral Intonation";
@@ -167,6 +174,7 @@
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "in front of the phrase (like macOS built-in Zhuyin IME)";
 "Intonation Key:" = "Intonation Key:";
 "Japanese" = "Japanese";
+"Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English." = "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English.";
 "Keyboard Shortcuts:" = "Keyboard Shortcuts:";
 "Keyboard" = "Keyboard";
 "Misc Settings:" = "Misc Settings:";
@@ -174,6 +182,7 @@
 "Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only.";
 "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead." = "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead.";
 "Only override the intonation of the previous reading if different" = "Only override the intonation of the previous reading if different";
+"Only use this with known Chromium-based browsers" = "Only use this with known Chromium-based browsers";
 "Output Settings:" = "Output Settings:";
 "Override the previous reading's intonation with candidate-reset" = "Override the previous reading's intonation with candidate-reset";
 "Phonetic Parser:" = "Phonetic Parser:";
@@ -184,7 +193,7 @@
 "Selection Keys:" = "Selection Keys:";
 "Shift+BackSpace:" = "Shift+BackSpace:";
 "Shift+Letter:" = "Shift+Letter:";
-"Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "Show Hanyu-Pinyin in the inline composition buffer & tooltip";
+"Show Hanyu-Pinyin in the inline composition buffer" = "Show Hanyu-Pinyin in the inline composition buffer";
 "Show page buttons in candidate window" = "Show page buttons in candidate window";
 "Simplified Chinese" = "Simplified Chinese";
 "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work." = "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work.";
@@ -206,7 +215,4 @@
 "Use Shift key accommodation in all cases" = "Use Shift key accommodation in all cases";
 "Vertical" = "Vertical";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
-"For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is." = "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is.";
 "Yale Pinyin with Numeral Intonation" = "Yale Pinyin with Numeral Intonation";
-"Only use this with known Chromium-based browsers" = "Only use this with known Chromium-based browsers";
-"Disable Shift key accomodation in all cases" = "Disable Shift key accomodation in all cases";

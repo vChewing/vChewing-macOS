@@ -43,6 +43,8 @@ struct suiPrefPaneExperience: View {
     forKey: UserDef.kSpecifyShiftBackSpaceKeyBehavior.rawValue)
   @State private var selTrimUnfinishedReadingsOnCommit = UserDefaults.standard.bool(
     forKey: UserDef.kTrimUnfinishedReadingsOnCommit.rawValue)
+  @State private var selAlwaysShowTooltipTextsHorizontally = UserDefaults.standard.bool(
+    forKey: UserDef.kAlwaysShowTooltipTextsHorizontally.rawValue)
 
   private let contentMaxHeight: Double = 432
   private let contentWidth: Double = {
@@ -236,6 +238,17 @@ struct suiPrefPaneExperience: View {
           )
           Text(LocalizedStringKey("An accommodation for elder computer users."))
             .preferenceDescription()
+          Toggle(
+            LocalizedStringKey("Always show tooltip texts horizontally"),
+            isOn: $selAlwaysShowTooltipTextsHorizontally.onChange {
+              mgrPrefs.alwaysShowTooltipTextsHorizontally = selAlwaysShowTooltipTextsHorizontally
+            }
+          ).disabled(Bundle.main.preferredLocalizations[0] == "en")
+          Text(
+            LocalizedStringKey(
+              "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English."
+            )
+          ).preferenceDescription()
         }
       }
     }

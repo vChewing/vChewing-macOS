@@ -27,15 +27,20 @@ extension ctlInputMethod {
       cursor -= 1
     }
     var finalOrigin: NSPoint = lineHeightRect.origin
+    let delta: CGFloat = lineHeightRect.size.height + 4.0  // bottomOutOfScreenAdjustmentHeight
     if isVerticalTyping {
       finalOrigin = NSPoint(
-        x: lineHeightRect.origin.x + lineHeightRect.size.width + 4.0, y: lineHeightRect.origin.y - 4.0
+        x: lineHeightRect.origin.x + lineHeightRect.size.width + 5, y: lineHeightRect.origin.y
       )
-      ctlInputMethod.tooltipController.direction = .vertical
-    } else {
-      ctlInputMethod.tooltipController.direction = .horizontal
     }
-    ctlInputMethod.tooltipController.show(tooltip: tooltip, at: finalOrigin)
+    let tooltipContentDirection: NSAttributedTextView.writingDirection = {
+      if mgrPrefs.alwaysShowTooltipTextsHorizontally { return .horizontal }
+      return isVerticalTyping ? .vertical : .horizontal
+    }()
+    ctlInputMethod.tooltipInstance.show(
+      tooltip: tooltip, at: finalOrigin,
+      bottomOutOfScreenAdjustmentHeight: delta, direction: tooltipContentDirection
+    )
   }
 
   func show(candidateWindowWith state: IMEStateProtocol) {

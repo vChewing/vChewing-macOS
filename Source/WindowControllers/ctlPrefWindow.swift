@@ -236,7 +236,7 @@ class ctlPrefWindow: NSWindowController {
           mgrPrefs.userDataFolderSpecified = newPath
           BookmarkManager.shared.saveBookmark(for: url)
           IME.initLangModels(userOnly: true)
-          (NSApplication.shared.delegate as! AppDelegate).updateStreamHelperPath()
+          (NSApplication.shared.delegate as! AppDelegate).updateDirectoryMonitorPath()
         } else {
           clsSFX.beep()
           if !bolPreviousFolderValidity {

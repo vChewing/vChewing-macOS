@@ -271,8 +271,10 @@ enum mgrLangModel {
   static func userOverrideModelDataURL(_ mode: InputMode) -> URL {
     let fileName =
       (mode == InputMode.imeModeCHT)
-      ? "../vChewing_override-model-data-cht.dat" : "../vChewing_override-model-data-chs.dat"
-    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: true)).appendingPathComponent(fileName)
+      ? "vChewing_override-model-data-cht.dat" : "vChewing_override-model-data-chs.dat"
+    return URL(
+      fileURLWithPath: dataFolderPath(isDefaultFolder: true)
+    ).deletingLastPathComponent().appendingPathComponent(fileName)
   }
 
   // MARK: - 檢查具體的使用者語彙檔案是否存在
@@ -459,11 +461,10 @@ enum mgrLangModel {
         return false
       }
 
-      // We use FSEventStream to monitor possible changes of the user phrase folder, hence the
-      // lack of the needs of manually load data here unless FSEventStream is disabled by user.
-      if !mgrPrefs.shouldAutoReloadUserDataFiles {
-        loadUserPhrasesData()
-      }
+      // The new FolderMonitor module does NOT monitor cases that files are modified
+      // by the current application itself, requiring additional manual loading process here.
+      // if !mgrPrefs.shouldAutoReloadUserDataFiles {}
+      loadUserPhrasesData()
       return true
     }
     return false

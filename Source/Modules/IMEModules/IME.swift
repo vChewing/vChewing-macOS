@@ -111,6 +111,7 @@ public enum IME {
   // MARK: - System Dark Mode Status Detector.
 
   static var isDarkMode: Bool {
+    if #unavailable(macOS 10.14) { return false }
     if #available(macOS 10.15, *) {
       let appearanceDescription = NSApplication.shared.effectiveAppearance.debugDescription
         .lowercased()
@@ -138,12 +139,14 @@ public enum IME {
           ),
           mgrLangModel.dataFolderPath(isDefaultFolder: false)
         )
-        let alert = NSAlert()
-        alert.messageText = NSLocalizedString("Unable to create the user phrase file.", comment: "")
-        alert.informativeText = content
-        alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
-        alert.runModal()
-        NSApp.setActivationPolicy(.accessory)
+        DispatchQueue.main.async {
+          let alert = NSAlert()
+          alert.messageText = NSLocalizedString("Unable to create the user phrase file.", comment: "")
+          alert.informativeText = content
+          alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+          alert.runModal()
+          NSApp.setActivationPolicy(.accessory)
+        }
         return false
       }
       return true

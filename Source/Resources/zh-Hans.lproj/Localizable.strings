@@ -1,4 +1,8 @@
 "vChewing" = "威注音输入法";
+"Update Check Completed" = "更新检查完毕";
+"You are already using the latest version." = "您正在使用目前最新的发行版。";
+"Plist downloaded is nil." = "下载来的更新资讯并非 Plist 档案。";
+"Plist downloaded cannot be parsed correctly." = "下载来的更新资讯 Plist 档案无法正常解析。";
 "vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability." = "威注音输入法的使用者半衰记忆模组在观测时崩溃，相关半衰记忆资料档案内容已全部清空。";
 "About vChewing…" = "关于威注音…";
 "vChewing Preferences…" = "威注音偏好设定…";
@@ -17,7 +21,7 @@
 "New Version Available" = "有新版可下载";
 "Not Now" = "以后再说";
 "Visit Website" = "前往网站";
-"You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@" = "目前使用的威注音官方版本是 %1$@ (%2$@)，网路上有更新版本 %3$@ (%4$@) 可供下载。是否要前往威注音网站下载新版来安装？%5$@";
+"You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?" = "目前使用的威注音官方版本是 %1$@ (%2$@)，网路上有更新版本 %3$@ (%4$@) 可供下载。是否要前往威注音网站下载新版来安装？";
 "Force KangXi Writing" = "康熙正体字模式";
 "NotificationSwitchON" = "✔ 已启用";
 "NotificationSwitchOFF" = "✘ 已停用";
@@ -30,7 +34,7 @@
 "\"%@\" length must ≥ 2 for a user phrase." = "「%@」字数不足以自订语汇。";
 "\"%@\" length should ≤ %d for a user phrase." = "「%@」字数超过 %d、无法自订。";
 "\"%@\" selected. ENTER to add user phrase." = "「%@」敲 Enter 添入自订语汇。";
-"\"%@\" already exists: ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "「%@」已存在：敲 Enter 以升权、敲 Shift+Command+Enter 以降权；\n　敲 BackSpace 或 Delete 以排除。";
+"\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "「%@」已存在：\n　敲 Enter 以升权、敲 Shift+Command+Enter 以降权；\n　敲 BackSpace 或 Delete 以排除。";
 "Edit Phrase Replacement Table…" = "编辑语汇置换表…";
 "Use Phrase Replacement" = "使用语汇置换";
 "Candidates keys cannot be empty." = "您必须指定选字键。";
@@ -96,11 +100,13 @@
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)空格键:";
 "⚠︎ This feature in IMK Candidate Window defects. Please consult Apple Developer Relations\nand tell them the related Radar ID: #FB11300759." = "⚠︎ 该功能因 IMK 选字窗自身缺陷而无法实作。\n请携 Radar 编号 #FB11300759 找 Apple Developer Relations 投诉。";
+"⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 该功能当且仅当目前的排版字型不支援纵排标点动态显示转义的情况下才有用。一旦使用了，所有敲出去的标点都会被永久转换为静态纵排标点：哪怕当前编辑器的排版模式已经改成横排，这些已经输入的标点也都还是纵排标点字符。";
 "Allow backspace-editing miscomposed readings" = "允许对无效的读音使用 BackSpace 编辑";
 "Allow boosting / excluding a candidate of single kanji" = "将可以就地升权/排除的候选字词的最短词长设为单个汉字";
 "Allow using Enter key to confirm associated candidate selection" = "允许使用 Enter 确认当前选中的联想词";
 "Also toggle alphanumerical mode with Left-Shift" = "也允许使用左侧的 Shift 键盘切换英数输入模式";
 "Always drop the previous reading" = "始终剔除游标正后方的字音";
+"Always show tooltip texts horizontally" = "始终使用横排来显示工具提示视窗";
 "Always type intonations to the inline composition buffer" = "始终在内文组字区内键入声调符号";
 "Always use fixed listing order in candidate window" = "以固定顺序来陈列选字窗内的候选字";
 "An accommodation for elder computer users." = "针对年长使用者的习惯而提供。";
@@ -141,6 +147,7 @@
 "Dictionary" = "辞典设定";
 "Directly commit lowercased letters" = "直接递交小写字母";
 "Directly commit uppercased letters" = "直接递交大写字母";
+"Disable Shift key accomodation in all cases" = "对任何客体应用均停用 Shift 键相容性措施";
 "Disassemble the previous reading, dropping its intonation" = "析构游标正后方的字音，且剔除其声调";
 "Disassembling process does not work with non-phonetic reading keys." = "析构行为仅针对组字器内「身为汉字读音」的读音索引单元有效。";
 "Emulating select-candidate-per-character mode" = "模拟 90 年代前期注音逐字选字输入风格";
@@ -155,10 +162,10 @@
 "Follow OS settings" = "依系统设定";
 "for cycling candidates" = "轮替候选字";
 "for cycling pages" = "轮替页面";
+"For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is." = "打比方说，你敲了「章太炎」，你想将「太」改成「泰」。这个操作的作业索引范围是开闭区间 [1,2)，会切到「章太炎」这个节点的所在索引范围 [0,3)。如果没有事前巩固处理的话，这个词会在你选字之后变成诸如「张泰言」这种你不想要的自动选字结果。当且仅当你启用了这个巩固功能的前提下，你选字之后的结果才会是「章泰炎」这种你想要的结果。";
 "General" = "通用设定";
 "Hanyu Pinyin with Numeral Intonation" = "汉语拼音+数字标调";
 "Harden vertical punctuations during vertical typing (not recommended)" = "在纵排书写时，强制转换标点为纵排形式（不推荐）";
-"⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 该功能当且仅当目前的排版字型不支援纵排标点动态显示转义的情况下才有用。一旦使用了，所有敲出去的标点都会被永久转换为静态纵排标点：哪怕当前编辑器的排版模式已经改成横排，这些已经输入的标点也都还是纵排标点字符。";
 "Horizontal" = "横向布局";
 "Hsu" = "许氏国音自然排列";
 "Hualuo Pinyin with Numeral Intonation" = "华罗拼音+数字标调";
@@ -167,6 +174,7 @@
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "将游标置于词语前方 // macOS 内建注音风格";
 "Intonation Key:" = "声调键:";
 "Japanese" = "和语";
+"Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English." = "纵排输入的情况下，工具提示内的按键名称会以符号显示。";
 "Keyboard Shortcuts:" = "键盘快速键:";
 "Keyboard" = "键盘设定";
 "Misc Settings:" = "杂项:";
@@ -174,6 +182,7 @@
 "Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "QWERTY 以外的英数布局是为了拼音排列使用者而准备的。";
 "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead." = "注意：Mac 键盘的「Delete ⌫」键在此被称作「BackSpace 退格键 ⌫」以与 PC 键盘的真正的「Delete ⌦」键彼此区分开。若您想在没有数字小键盘的 Mac 电脑上使用真正的「Delete ⌦」按键的话，请改用「Fn+⌫」。";
 "Only override the intonation of the previous reading if different" = "仅在键入的声调与游标正后方的字音不同时，尝试覆写";
+"Only use this with known Chromium-based browsers" = "仅针对知名的 Chromium 核心的浏览器启用该措施";
 "Output Settings:" = "输出设定:";
 "Override the previous reading's intonation with candidate-reset" = "尝试对游标正后方的字音覆写声调，且重设其选字状态";
 "Phonetic Parser:" = "注音排列:";
@@ -184,7 +193,7 @@
 "Selection Keys:" = "选字键:";
 "Shift+BackSpace:" = "Shift+退格键:";
 "Shift+Letter:" = "Shift+字母键:";
-"Show Hanyu-Pinyin in the inline composition buffer & tooltip" = "拼音并击（组字区与工具提示内显示汉语拼音）";
+"Show Hanyu-Pinyin in the inline composition buffer" = "拼音并击（组字区内显示汉语拼音）";
 "Show page buttons in candidate window" = "在选字窗内显示翻页按钮";
 "Simplified Chinese" = "简体中文";
 "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work." = "某些应用（比如像是 MS Edge 或者 Chrome 这样的 Chromium 核心的浏览器）可能会使输入的 Shift 按键讯号被重复输入，且其有关研发方很可能不打算修复这些产品缺陷。威注音针对这些应用预设启用了相容措施。请在此根据您的需求自订。";
@@ -206,7 +215,4 @@
 "Use Shift key accommodation in all cases" = "对任何客体应用均启用 Shift 键相容性措施";
 "Vertical" = "纵向布局";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";
-"For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is." = "打比方说，你敲了「章太炎」，你想将「太」改成「泰」。这个操作的作业索引范围是开闭区间 [1,2)，会切到「章太炎」这个节点的所在索引范围 [0,3)。如果没有事前巩固处理的话，这个词会在你选字之后变成诸如「张泰言」这种你不想要的自动选字结果。当且仅当你启用了这个巩固功能的前提下，你选字之后的结果才会是「章泰炎」这种你想要的结果。";
 "Yale Pinyin with Numeral Intonation" = "耶鲁拼音+数字标调";
-"Only use this with known Chromium-based browsers" = "仅针对知名的 Chromium 核心的浏览器启用该措施";
-"Disable Shift key accomodation in all cases" = "对任何客体应用均停用 Shift 键相容性措施";

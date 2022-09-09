@@ -12,10 +12,8 @@ import Cocoa
 import InputMethodKit
 
 @objc(AppDelegate)
-class AppDelegate: NSObject, NSApplicationDelegate,
-  FSEventStreamHelperDelegate, NSUserNotificationCenterDelegate
-{
-  func helper(_: FSEventStreamHelper, didReceive _: [FSEventStreamHelper.Event]) {
+class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDelegate {
+  private func reloadOnFolderChangeHappens() {
     // 拖 100ms 再重載，畢竟有些有特殊需求的使用者可能會想使用巨型自訂語彙檔案。
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
       if mgrPrefs.shouldAutoReloadUserDataFiles {
@@ -29,21 +27,10 @@ class AppDelegate: NSObject, NSApplicationDelegate,
   @IBOutlet var window: NSWindow?
   private var ctlPrefWindowInstance: ctlPrefWindow?
   private var ctlAboutWindowInstance: ctlAboutWindow?  // New About Window
-  private var checkTask: URLSessionTask?
-  public var fsStreamHelper = FSEventStreamHelper(
-    path: mgrLangModel.dataFolderPath(isDefaultFolder: false),
-    queue: DispatchQueue(label: "vChewing User Phrases")
+  public lazy var folderMonitor = FolderMonitor(
+    url: URL(fileURLWithPath: mgrLangModel.dataFolderPath(isDefaultFolder: false))
   )
   private var currentAlertType: String = ""
-
-  // 補上 dealloc
-  deinit {
-    ctlPrefWindowInstance = nil
-    ctlAboutWindowInstance = nil
-    checkTask = nil
-    fsStreamHelper.stop()
-    fsStreamHelper.delegate = nil
-  }
 
   func userNotificationCenter(_: NSUserNotificationCenter, shouldPresent _: NSUserNotification) -> Bool {
     true
@@ -68,20 +55,29 @@ class AppDelegate: NSObject, NSApplicationDelegate,
       IME.initLangModels(userOnly: false)
     }
 
-    fsStreamHelper.delegate = self
-    _ = fsStreamHelper.start()
+    folderMonitor.folderDidChange = { [weak self] in
+      self?.reloadOnFolderChangeHappens()
+    }
+    folderMonitor.startMonitoring()
 
     mgrPrefs.fixOddPreferences()
     mgrPrefs.setMissingDefaults()
 
     // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
     if mgrPrefs.checkUpdateAutomatically {
-      checkForUpdate()
+      UpdateSputnik.shared.checkForUpdate()
     }
   }
 
-  func updateStreamHelperPath() {
-    fsStreamHelper.path = mgrPrefs.userDataFolderSpecified
+  func updateDirectoryMonitorPath() {
+    folderMonitor.stopMonitoring()
+    folderMonitor = FolderMonitor(
+      url: URL(fileURLWithPath: mgrLangModel.dataFolderPath(isDefaultFolder: false))
+    )
+    folderMonitor.folderDidChange = { [weak self] in
+      self?.reloadOnFolderChangeHappens()
+    }
+    folderMonitor.startMonitoring()
   }
 
   func showPreferences() {
@@ -104,88 +100,6 @@ class AppDelegate: NSObject, NSApplicationDelegate,
     ctlAboutWindowInstance?.window?.orderFrontRegardless()  // 逼著關於視窗往最前方顯示
     ctlAboutWindowInstance?.window?.level = .statusBar
     NSApp.setActivationPolicy(.accessory)
-  }
-
-  func checkForUpdate(forced: Bool = false) {
-    if checkTask != nil {
-      // busy
-      return
-    }
-
-    // time for update?
-    if !forced {
-      if !mgrPrefs.checkUpdateAutomatically {
-        return
-      }
-      let now = Date()
-      let date = UserDefaults.standard.object(forKey: VersionUpdateApi.kNextUpdateCheckDateKey) as? Date ?? now
-      if now.compare(date) == .orderedAscending {
-        return
-      }
-    }
-
-    let nextUpdateDate = Date(timeInterval: VersionUpdateApi.kNextCheckInterval, since: Date())
-    UserDefaults.standard.set(nextUpdateDate, forKey: VersionUpdateApi.kNextUpdateCheckDateKey)
-
-    checkTask = VersionUpdateApi.check(forced: forced) { [self] result in
-      defer {
-        checkTask = nil
-      }
-      switch result {
-        case .success(let apiResult):
-          switch apiResult {
-            case .shouldUpdate(let report):
-              let content = String(
-                format: NSLocalizedString(
-                  "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?%@",
-                  comment: ""
-                ),
-                report.currentShortVersion,
-                report.currentVersion,
-                report.remoteShortVersion,
-                report.remoteVersion,
-                report.versionDescription
-              )
-              IME.prtDebugIntel("vChewingDebug: \(content)")
-              let alert = NSAlert()
-              alert.messageText = NSLocalizedString("New Version Available", comment: "")
-              alert.informativeText = content
-              alert.addButton(withTitle: NSLocalizedString("Visit Website", comment: ""))
-              alert.addButton(withTitle: NSLocalizedString("Not Now", comment: ""))
-              let result = alert.runModal()
-              if result == NSApplication.ModalResponse.alertFirstButtonReturn {
-                if let siteURL = report.siteUrl {
-                  NSWorkspace.shared.open(siteURL)
-                }
-              }
-              NSApp.setActivationPolicy(.accessory)
-            case .noNeedToUpdate, .ignored:
-              break
-          }
-        case .failure(let error):
-          switch error {
-            case VersionUpdateApiError.connectionError(let message):
-              let title = NSLocalizedString("Update Check Failed", comment: "")
-              let content = String(
-                format: NSLocalizedString(
-                  "There may be no internet connection or the server failed to respond.\n\nError message: %@",
-                  comment: ""
-                ), message
-              )
-              let buttonTitle = NSLocalizedString("Dismiss", comment: "")
-              IME.prtDebugIntel("vChewingDebug: \(content)")
-
-              let alert = NSAlert()
-              alert.messageText = title
-              alert.informativeText = content
-              alert.addButton(withTitle: buttonTitle)
-              alert.runModal()
-              NSApp.setActivationPolicy(.accessory)
-            default:
-              break
-          }
-      }
-    }
   }
 
   func selfUninstall() {

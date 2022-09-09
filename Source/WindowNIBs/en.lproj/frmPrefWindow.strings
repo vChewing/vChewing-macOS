@@ -64,6 +64,7 @@
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
+"lblAlwaysShowTooltipTextsHorizontally.title" = "Always show tooltip texts horizontally";
 "lblDevZoneIMKCandidate.title" = "IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases.";
 "lblDevZoneTitleDescription.title" = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
 "lblIntonationKeyBehavior.title" = "Specify what intonation key does when syllable composer is empty.";
@@ -96,7 +97,7 @@
 "VdT-fw-7pQ.title" = "Debug Mode";
 "vpd-zx-GIk.title" = "Seigyou (JinYei)";
 "W24-T4-cg0.title" = "Enable CNS11643 Support (2022-08-02)";
-"wFR-zX-M8H.title" = "Show Hanyu-Pinyin in the inline composition buffer & tooltip";
+"wFR-zX-M8H.title" = "Show Hanyu-Pinyin in the inline composition buffer";
 "wN3-k3-b2a.title" = "Choose your desired user data folder path. Will be omitted if invalid.";
 "wQ9-px-b07.title" = "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional.";
 "Wvt-HE-LOv.title" = "Keyboard Layout";

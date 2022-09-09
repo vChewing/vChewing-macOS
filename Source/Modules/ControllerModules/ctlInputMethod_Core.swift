@@ -27,8 +27,8 @@ class ctlInputMethod: IMKInputController {
   static var ctlCandidateCurrent: ctlCandidateProtocol =
     mgrPrefs.useIMKCandidateWindow ? ctlCandidateIMK.init(.horizontal) : ctlCandidateUniversal.init(.horizontal)
 
-  /// 工具提示視窗的副本。
-  static let tooltipController = TooltipController()
+  /// 工具提示視窗的副本，每次都重新初始化。
+  static var tooltipInstance = ctlTooltip()
 
   // MARK: -
 
@@ -135,7 +135,7 @@ class ctlInputMethod: IMKInputController {
       setKeyLayout()
       handle(state: IMEState.ofEmpty())
     }  // 除此之外就不要動了，免得在點開輸入法自身的視窗時卡死。
-    (NSApp.delegate as? AppDelegate)?.checkForUpdate()
+    UpdateSputnik.shared.checkForUpdate()
   }
 
   /// 停用輸入法時，會觸發該函式。
@@ -207,15 +207,16 @@ class ctlInputMethod: IMKInputController {
   @objc(handleEvent:client:) override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
 
-    // 只針對特定類型的 client() 進行處理。
-    if !(sender is IMKTextInput) { return false }
-
     // 更新此時的靜態狀態標記。
     ctlInputMethod.isASCIIModeSituation = isASCIIMode
     ctlInputMethod.isVerticalTypingSituation = isVerticalTyping
 
     // 就這傳入的 NSEvent 都還有可能是 nil，Apple InputMethodKit 團隊到底在搞三小。
-    guard let event = event else { return false }
+    // 只針對特定類型的 client() 進行處理。
+    guard let event = event, sender is IMKTextInput else {
+      resetKeyHandler()
+      return false
+    }
 
     // IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
     // 這樣可以讓 interpretKeyEvents() 函式自行判斷：

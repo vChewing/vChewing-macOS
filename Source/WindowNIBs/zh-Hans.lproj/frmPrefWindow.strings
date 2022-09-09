@@ -64,6 +64,7 @@
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
+"lblAlwaysShowTooltipTextsHorizontally.title" = "始终使用横排来显示工具提示视窗";
 "lblDevZoneIMKCandidate.title" = "IMK 选字窗依赖于 Apple 的私有 API，而且是借由桥接档案头强制曝露的方法使用的。目前，该功能仅在 macOS 10.14 Mojave 至 macOS 13 Ventura 系统内有测试过可用性。至于在未来的 macOS 发行版当中是否可用，则需要另行测试、才能下结论。";
 "lblDevZoneTitleDescription.title" = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";
 "lblIntonationKeyBehavior.title" = "指定声调键（在注拼槽为「空」状态时）的行为。";
@@ -96,7 +97,7 @@
 "VdT-fw-7pQ.title" = "侦错模式";
 "vpd-zx-GIk.title" = "精业";
 "W24-T4-cg0.title" = "启用 CNS11643 全字库支援 (2022-08-02)";
-"wFR-zX-M8H.title" = "拼音并击（组字区与工具提示内显示汉语拼音）";
+"wFR-zX-M8H.title" = "拼音并击（组字区内显示汉语拼音）";
 "wN3-k3-b2a.title" = "请在此指定您想指定的使用者语汇档案目录。无效值会被忽略。";
 "wQ9-px-b07.title" = "Apple 动态注音键盘布局（大千与倚天）要求普通话/国音分析器的注音排列得配置为大千排列。";
 "Wvt-HE-LOv.title" = "键盘布局";

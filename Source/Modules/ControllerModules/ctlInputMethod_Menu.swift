@@ -308,7 +308,7 @@ extension ctlInputMethod {
   }
 
   @objc func checkForUpdate(_: Any?) {
-    (NSApp.delegate as? AppDelegate)?.checkForUpdate(forced: true)
+    UpdateSputnik.shared.checkForUpdate(forced: true)
   }
 
   @objc func openUserDataFolder(_: Any?) {

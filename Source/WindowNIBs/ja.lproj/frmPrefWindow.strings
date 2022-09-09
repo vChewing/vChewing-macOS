@@ -64,6 +64,7 @@
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
+"lblAlwaysShowTooltipTextsHorizontally.title" = "ヒントを常に横書きにする";
 "lblDevZoneIMKCandidate.title" = "IMK 候補陳列ウィンドウは、Apple の未公開のAPIを「bridging-header」という強引的な手段で引き出して利用した機能である。現時点で macOS 10.14 Mojave から macOS 13 Ventura まで利用可能であるが、その後の新しい macOS との互換性の話はまだ早い。";
 "lblDevZoneTitleDescription.title" = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
 "lblIntonationKeyBehavior.title" = "音調組立緩衝列が空かされた時の音調キーの行為をご指定ください。";
@@ -96,7 +97,7 @@
 "VdT-fw-7pQ.title" = "欠陥辿着モード";
 "vpd-zx-GIk.title" = "精業配列";
 "W24-T4-cg0.title" = "全字庫モード // 入力可能の漢字数倍増 (2022-08-02)";
-"wFR-zX-M8H.title" = "弁音合併入力（入力緩衝列とヒントで音読みを漢語弁音に）";
+"wFR-zX-M8H.title" = "弁音合併入力（入力緩衝列で音読みを漢語弁音に）";
 "wN3-k3-b2a.title" = "欲しがるユーザー辞書保存先をご指定ください。無効の保存先設定は効かぬ。";
 "wQ9-px-b07.title" = "Apple 動態注音キーボード (大千と倚天伝統) を使うには、共通語分析器の注音配列を大千と設定すべきである。";
 "Wvt-HE-LOv.title" = "キーボード";
