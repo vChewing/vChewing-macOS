@@ -39,6 +39,7 @@
 		5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */; };
 		5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34027AE7CD900A19448 /* ctlCandidate.swift */; };
 		5B62A34A27AE7CD900A19448 /* NotifierController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34527AE7CD900A19448 /* NotifierController.swift */; };
+		5B630A3C28CC97020010D076 /* ctlPopupCompositionBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B630A3B28CC97020010D076 /* ctlPopupCompositionBuffer.swift */; };
 		5B6C141228A9D4B30098ADF8 /* ctlInputMethod_Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6C141128A9D4B30098ADF8 /* ctlInputMethod_Common.swift */; };
 		5B73FB5E27B2BE1300E9BF49 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */; };
 		5B782EC4280C243C007276DE /* KeyHandler_HandleCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */; };
@@ -253,6 +254,7 @@
 		5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A34027AE7CD900A19448 /* ctlCandidate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlCandidate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A34527AE7CD900A19448 /* NotifierController.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = NotifierController.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		5B630A3B28CC97020010D076 /* ctlPopupCompositionBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlPopupCompositionBuffer.swift; sourceTree = "<group>"; };
 		5B65B919284D0185007C558B /* README-CHT.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README-CHT.md"; sourceTree = "<group>"; };
 		5B6C141128A9D4B30098ADF8 /* ctlInputMethod_Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_Common.swift; sourceTree = "<group>"; };
 		5B73FB5427B2BD6900E9BF49 /* PhraseEditor-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "PhraseEditor-Info.plist"; path = "UserPhraseEditor/PhraseEditor-Info.plist"; sourceTree = SOURCE_ROOT; };
@@ -581,6 +583,7 @@
 			children = (
 				5B62A33E27AE7CD900A19448 /* CandidateUI */,
 				5B62A34427AE7CD900A19448 /* NotifierUI */,
+				5B630A3A28CC96D80010D076 /* PopupCompositionBufferUI */,
 				5BA9FD0927FED9F3002DE248 /* PrefUI */,
 				5B62A34227AE7CD900A19448 /* TooltipUI */,
 			);
@@ -643,6 +646,14 @@
 				5B2DB17127AF8771006D874E /* Makefile */,
 			);
 			name = Data;
+			sourceTree = "<group>";
+		};
+		5B630A3A28CC96D80010D076 /* PopupCompositionBufferUI */ = {
+			isa = PBXGroup;
+			children = (
+				5B630A3B28CC97020010D076 /* ctlPopupCompositionBuffer.swift */,
+			);
+			path = PopupCompositionBufferUI;
 			sourceTree = "<group>";
 		};
 		5B84579B2871AD2200C93B01 /* HotenkaChineseConverter */ = {
@@ -1268,6 +1279,7 @@
 				5BA9FD1327FEDB6B002DE248 /* suiPrefPaneDictionary.swift in Sources */,
 				5B2170E8289FACAD00BE7304 /* 5_Vertex.swift in Sources */,
 				5BBBB77A27AEDC690023B93A /* clsSFX.swift in Sources */,
+				5B630A3C28CC97020010D076 /* ctlPopupCompositionBuffer.swift in Sources */,
 				5BA9FD4727FEF3C9002DE248 /* PreferencesStyleController.swift in Sources */,
 				5B949BDB2816DDBC00D87B5D /* LMConsolidator.swift in Sources */,
 				5BFDF011289635C100417BBC /* ctlCandidateIMK.swift in Sources */,

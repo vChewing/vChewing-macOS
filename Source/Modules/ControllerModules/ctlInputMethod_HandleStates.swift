@@ -67,7 +67,6 @@ extension ctlInputMethod {
         if !state.tooltip.isEmpty {
           show(tooltip: state.tooltip)
         }
-        }
       case .ofMarking:
         ctlInputMethod.ctlCandidateCurrent.visible = false
         setInlineDisplayWithCursor()
@@ -81,6 +80,14 @@ extension ctlInputMethod {
         setInlineDisplayWithCursor()
         show(candidateWindowWith: state)
       default: break
+    }
+    // 浮動組字窗的顯示判定
+    if state.hasComposition, mgrPrefs.clientsIMKTextInputIncapable.contains(clientBundleIdentifier) {
+      ctlInputMethod.popupCompositionBuffer.show(
+        state: state, at: lineHeightRect(zeroCursor: true).origin
+      )
+    } else {
+      ctlInputMethod.popupCompositionBuffer.hide()
     }
   }
 

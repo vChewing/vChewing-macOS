@@ -27,8 +27,11 @@ class ctlInputMethod: IMKInputController {
   static var ctlCandidateCurrent: ctlCandidateProtocol =
     mgrPrefs.useIMKCandidateWindow ? ctlCandidateIMK.init(.horizontal) : ctlCandidateUniversal.init(.horizontal)
 
-  /// 工具提示視窗的副本，每次都重新初始化。
+  /// 工具提示視窗的共用副本。
   static var tooltipInstance = ctlTooltip()
+
+  /// 浮動組字窗的共用副本。
+  static var popupCompositionBuffer = ctlPopupCompositionBuffer()
 
   // MARK: -
 

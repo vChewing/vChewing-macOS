@@ -40,7 +40,7 @@ public class ctlTooltip: NSWindowController {
     let panel = NSPanel(
       contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false
     )
-    panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel) + 1)
+    panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel) + 2)
     panel.hasShadow = true
     panel.backgroundColor = NSColor.controlBackgroundColor
     messageText = NSAttributedTextView()
