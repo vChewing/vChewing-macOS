@@ -438,3 +438,52 @@ public class KeyHandler {
     }
   }
 }
+
+// MARK: - Components for Popup Composition Buffer (PCB) Window.
+
+/// 組字區文字上限。
+/// - Remark: 該選項僅對不支援 IMKTextInput 協定的應用有用，就不交給 mgrPrefs 了。
+private let compositorWidthLimit = 20
+
+extension KeyHandler {
+  /// 在爬取組字結果之前，先將即將從組字區溢出的內容遞交出去。
+  ///
+  /// 在理想狀況之下，組字區多長都無所謂。但是，螢幕浮動組字窗的尺寸是有限的。
+  /// 於是，有必要限定組字區的長度。超過該長度的內容會在爬軌之前先遞交出去，
+  /// 使其不再記入最大相似度估算的估算對象範圍。
+  /// 用比較形象且生動卻有點噁心的解釋的話，蒼蠅一邊吃一邊屙。
+  var commitOverflownComposition: String {
+    guard !compositor.walkedNodes.isEmpty,
+      compositor.width > compositorWidthLimit,
+      let identifier = delegate?.clientBundleIdentifier,
+      mgrPrefs.clientsIMKTextInputIncapable.contains(identifier)
+    else {
+      return ""
+    }
+    // 回頭在這裡插上對 Steam 的 Client Identifier 的要求。
+    var textToCommit = ""
+    while compositor.width > compositorWidthLimit {
+      var delta = compositor.width - compositorWidthLimit
+      let node = compositor.walkedNodes[0]
+      if node.isReadingMismatched {
+        delta = node.keyArray.count
+        textToCommit += node.currentPair.value
+      } else {
+        delta = min(delta, node.keyArray.count)
+        textToCommit += node.currentPair.value.charComponents[0..<delta].joined()
+      }
+      let newCursor = max(compositor.cursor - delta, 0)
+      compositor.cursor = 0
+      if !node.isReadingMismatched {
+        consolidateCursorContext(with: node.currentPair)
+      }
+      // 威注音不支援 Bigram，所以無須考慮前後節點「是否需要鞏固」。
+      for _ in 0..<delta {
+        compositor.dropKey(direction: .front)
+      }
+      compositor.cursor = newCursor
+      walk()
+    }
+    return textToCommit
+  }
+}

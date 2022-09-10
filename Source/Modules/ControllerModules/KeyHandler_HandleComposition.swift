@@ -111,6 +111,9 @@ extension KeyHandler {
       // 讓組字器反爬軌格。
       walk()
 
+      // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
+      let textToCommit = commitOverflownComposition
+
       // 看看半衰記憶模組是否會對目前的狀態給出自動選字建議。
       fetchSuggestionsFromUOM(apply: true)
 
@@ -118,7 +121,8 @@ extension KeyHandler {
       composer.clear()
 
       // 再以回呼組字狀態的方式來執行 updateClientdisplayedText()。
-      let inputting = buildInputtingState
+      var inputting = buildInputtingState
+      inputting.textToCommit = textToCommit
       stateCallback(inputting)
 
       /// 逐字選字模式的處理。
