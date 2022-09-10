@@ -9,13 +9,16 @@
 import Foundation
 
 public struct StateData {
-  var displayedText: String = "" {
-    didSet {
-      let result = IME.kanjiConversionIfRequired(displayedText)
-      if result.utf16.count == displayedText.utf16.count, result.count == displayedText.count {
-        displayedText = result
-      }
+  var displayedText: String = ""
+  var displayedTextConverted: String {
+    /// 先做繁簡轉換
+    var result = IME.kanjiConversionIfRequired(displayedText)
+    if result.utf16.count != displayedText.utf16.count
+      || result.count != displayedText.count
+    {
+      result = displayedText
     }
+    return result
   }
 
   // MARK: Cursor & Marker & Range for UTF8
@@ -86,7 +89,7 @@ public struct StateData {
   var attributedStringNormal: NSAttributedString {
     /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
     /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
-    let attributedString = NSMutableAttributedString(string: displayedText)
+    let attributedString = NSMutableAttributedString(string: displayedTextConverted)
     var newBegin = 0
     for (i, neta) in displayTextSegments.enumerated() {
       attributedString.setAttributes(
@@ -104,7 +107,7 @@ public struct StateData {
   var attributedStringMarking: NSAttributedString {
     /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
     /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
-    let attributedString = NSMutableAttributedString(string: displayedText)
+    let attributedString = NSMutableAttributedString(string: displayedTextConverted)
     let end = u16MarkedRange.upperBound
 
     attributedString.setAttributes(
@@ -130,7 +133,7 @@ public struct StateData {
       ],
       range: NSRange(
         location: end,
-        length: displayedText.utf16.count - end
+        length: displayedTextConverted.utf16.count - end
       )
     )
     return attributedString
