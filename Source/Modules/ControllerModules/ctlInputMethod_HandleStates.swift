@@ -65,10 +65,8 @@ extension ctlInputMethod {
         if !textToCommit.isEmpty { commit(text: textToCommit) }
         setInlineDisplayWithCursor()
         if !state.tooltip.isEmpty {
-          show(
-            tooltip: state.tooltip, displayedText: state.displayedText,
-            u16Cursor: state.data.u16Cursor
-          )
+          show(tooltip: state.tooltip)
+        }
         }
       case .ofMarking:
         ctlInputMethod.ctlCandidateCurrent.visible = false
@@ -76,14 +74,7 @@ extension ctlInputMethod {
         if state.tooltip.isEmpty {
           ctlInputMethod.tooltipInstance.hide()
         } else {
-          let cursorReference: Int = {
-            if state.data.marker >= state.data.cursor { return state.data.u16Cursor }
-            return state.data.u16Marker  // 這樣可以讓工具提示視窗始終盡量往書寫方向的後方顯示。
-          }()
-          show(
-            tooltip: state.tooltip, displayedText: state.displayedText,
-            u16Cursor: cursorReference
-          )
+          show(tooltip: state.tooltip)
         }
       case .ofCandidates, .ofAssociates, .ofSymbolTable:
         ctlInputMethod.tooltipInstance.hide()
