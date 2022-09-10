@@ -17,7 +17,7 @@ extension ctlInputMethod {
     guard let client = client() else { return }
     var lineHeightRect = NSRect(x: 0.0, y: 0.0, width: 16.0, height: 16.0)
     var cursor = u16Cursor
-    if cursor == displayedText.count, cursor != 0 {
+    if cursor == displayedText.utf16.count, cursor != 0 {
       cursor -= 1
     }
     while lineHeightRect.origin.x == 0, lineHeightRect.origin.y == 0, cursor >= 0 {
@@ -124,8 +124,8 @@ extension ctlInputMethod {
     var cursor = 0
 
     if [.ofCandidates, .ofSymbolTable].contains(state.type) {
-      cursor = state.data.cursor
-      if cursor == state.displayedText.count, cursor != 0 {
+      cursor = state.data.u16Cursor
+      if cursor == state.displayedText.utf16.count, cursor != 0 {
         cursor -= 1
       }
     }
