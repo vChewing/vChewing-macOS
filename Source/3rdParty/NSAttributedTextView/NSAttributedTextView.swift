@@ -65,9 +65,11 @@ public class NSAttributedTextView: NSView {
     let isVertical: Bool = !(direction == .horizontal)
     newAttributes[.verticalGlyphForm] = isVertical
     let newStyle: NSMutableParagraphStyle = newAttributes[.paragraphStyle] as! NSMutableParagraphStyle
-    newStyle.lineSpacing = isVertical ? (fontSize / -2) : fontSize * 0.1
-    newStyle.maximumLineHeight = fontSize
-    newStyle.minimumLineHeight = fontSize
+    if #available(macOS 10.13, *) {
+      newStyle.lineSpacing = isVertical ? (fontSize / -2) : fontSize * 0.1
+      newStyle.maximumLineHeight = fontSize * 1.1
+      newStyle.minimumLineHeight = fontSize * 1.1
+    }
     newAttributes[.paragraphStyle] = newStyle
     var text: String = text ?? ""
     if !(direction == .horizontal) {
