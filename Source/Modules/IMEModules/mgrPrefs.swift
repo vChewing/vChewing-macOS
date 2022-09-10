@@ -56,6 +56,7 @@ public enum UserDef: String, CaseIterable {
   case kHardenVerticalPunctuations = "HardenVerticalPunctuations"
   case kTrimUnfinishedReadingsOnCommit = "TrimUnfinishedReadingsOnCommit"
   case kAlwaysShowTooltipTextsHorizontally = "AlwaysShowTooltipTextsHorizontally"
+  case kClientsIMKTextInputIncapable = "ClientsIMKTextInputIncapable"
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
@@ -306,6 +307,9 @@ public enum mgrPrefs {
     UserDefaults.standard.setDefault(
       mgrPrefs.trimUnfinishedReadingsOnCommit, forKey: UserDef.kTrimUnfinishedReadingsOnCommit.rawValue
     )
+    UserDefaults.standard.setDefault(
+      mgrPrefs.clientsIMKTextInputIncapable, forKey: UserDef.kClientsIMKTextInputIncapable.rawValue
+    )
 
     // -----
 
@@ -442,6 +446,9 @@ public enum mgrPrefs {
 
   @UserDefault(key: UserDef.kAlwaysShowTooltipTextsHorizontally.rawValue, defaultValue: false)
   static var alwaysShowTooltipTextsHorizontally: Bool
+
+  @UserDefault(key: UserDef.kClientsIMKTextInputIncapable.rawValue, defaultValue: ["com.valvesoftware.steam"])
+  static var clientsIMKTextInputIncapable: [String]
 
   // MARK: - Settings (Tier 2)
 
@@ -738,6 +745,8 @@ extension mgrPrefs {
       mgrPrefs.disableShiftTogglingAlphanumericalMode = false
       mgrPrefs.togglingAlphanumericalModeWithLShift = false
     }
+    // 客體黑名單自動排序去重複。
+    clientsIMKTextInputIncapable = Array(Set(clientsIMKTextInputIncapable)).sorted()
     // 注拼槽注音排列選項糾錯。
     var isMandarinParserOptionValid = false
     MandarinParser.allCases.forEach {
