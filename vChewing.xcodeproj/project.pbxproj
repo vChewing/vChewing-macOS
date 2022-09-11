@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */ = {isa = PBXBuildFile; fileRef = 5B09307828B6FC3B0021F8C5 /* shortcuts.html */; };
 		5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0AF8B427B2C8290096FE54 /* StringExtension.swift */; };
+		5B0EF55D28CDBF7100F8F7CE /* frmClientListMgr.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */; };
+		5B0EF55F28CDBF8E00F8F7CE /* ctlClientListMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0EF55E28CDBF8E00F8F7CE /* ctlClientListMgr.swift */; };
 		5B11328927B94CFB00E58451 /* AppleKeyboardConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */; };
 		5B16B84C28C9A89000ABA692 /* FolderMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16B84B28C9A89000ABA692 /* FolderMonitor.swift */; };
 		5B175FFB28C5CDDC0078D1B4 /* IMKHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B175FFA28C5CDDC0078D1B4 /* IMKHelper.swift */; };
@@ -211,6 +213,8 @@
 		5B09307B28B6FC410021F8C5 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = ja; path = ja.lproj/shortcuts.html; sourceTree = "<group>"; };
 		5B0AF8B427B2C8290096FE54 /* StringExtension.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = StringExtension.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B0C5EDF27C7D9870078037C /* dataCompiler.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = dataCompiler.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = frmClientListMgr.xib; sourceTree = "<group>"; };
+		5B0EF55E28CDBF8E00F8F7CE /* ctlClientListMgr.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ctlClientListMgr.swift; sourceTree = "<group>"; };
 		5B11328827B94CFB00E58451 /* AppleKeyboardConverter.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = AppleKeyboardConverter.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B16B84B28C9A89000ABA692 /* FolderMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderMonitor.swift; sourceTree = "<group>"; };
 		5B175FFA28C5CDDC0078D1B4 /* IMKHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMKHelper.swift; sourceTree = "<group>"; };
@@ -594,6 +598,7 @@
 			isa = PBXGroup;
 			children = (
 				5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */,
+				5B0EF55E28CDBF8E00F8F7CE /* ctlClientListMgr.swift */,
 				D47F7DCD278BFB57002F9DD7 /* ctlPrefWindow.swift */,
 			);
 			path = WindowControllers;
@@ -602,6 +607,7 @@
 		5B62A33B27AE7C7F00A19448 /* WindowNIBs */ = {
 			isa = PBXGroup;
 			children = (
+				5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */,
 				5BBBB76927AED5DB0023B93A /* frmAboutWindow.xib */,
 				5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */,
 				6A187E2816004C5900466B2E /* MainMenu.xib */,
@@ -1079,6 +1085,7 @@
 				D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */,
 				5BF9DA2828840E6200DBD48E /* template-exclusions.txt in Resources */,
 				5B7DA80328BF6BC600D7B2AD /* fixinstall.sh in Resources */,
+				5B0EF55D28CDBF7100F8F7CE /* frmClientListMgr.xib in Resources */,
 				5BDCBB2E27B4E67A00D0CC59 /* vChewingPhraseEditor.app in Resources */,
 				5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */,
 				6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */,
@@ -1225,6 +1232,7 @@
 				5B5F8AEE28C8826D007C11F1 /* ctlTooltip.swift in Sources */,
 				5BD0113B28180D6100609769 /* LMInstantiator.swift in Sources */,
 				5B2170E7289FACAD00BE7304 /* 1_Compositor.swift in Sources */,
+				5B0EF55F28CDBF8E00F8F7CE /* ctlClientListMgr.swift in Sources */,
 				5B21177028753B9D000443A9 /* ctlInputMethod_Delegates.swift in Sources */,
 				5B21176E28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift in Sources */,
 				5B84579F2871AD2200C93B01 /* HotenkaChineseConverter.swift in Sources */,

@@ -1,4 +1,15 @@
 "vChewing" = "威注音输入法";
+"Please enter the client app bundle identifier(s) you want to register." = "请键入您要登记的客体应用的唯一标帜（Bundle Identifier）。";
+"One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed." = "每行一笔记录，用 Option+Enter 换行。\n空白值会被无视。";
+"Just Select" = "直接选取";
+"Client Manager" = "管理客体应用";
+"Please manage the list of IMKTextInput-incompatible clients here. Clients listed here will trigger vChewing's built-in popup composition buffer window with maximum 20 reading counts holdable." = "请在此管理那些不遵守 IMKTextInput 协定的客体应用。威注音输入法对于任何位列在此的客体应用均启用浮动组字窗、且对组字区内容设定容量上限（最多二十个读音）。";
+"Add Client" = "登记新客体";
+"Remove Selected" = "移除所选条目";
+"Choose the target application bundle." = "请选择要登记的应用程式的封包。";
+"The selected item is not a valid macOS application bundle." = "当前所选之物并非 macOS 应用程式封包。";
+"Please try again." = "请重试。";
+"The selected item's identifier is already in the list." = "当前所选之封包的唯一标帜（Bundle Identifier）已被登记。";
 "Update Check Completed" = "更新检查完毕";
 "You are already using the latest version." = "您正在使用目前最新的发行版。";
 "Plist downloaded is nil." = "下载来的更新资讯并非 Plist 档案。";
