@@ -1,4 +1,15 @@
 "vChewing" = "vChewing";
+"Please enter the client app bundle identifier(s) you want to register." = "Please enter the client app bundle identifier(s) you want to register.";
+"One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed." = "One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed.";
+"Just Select" = "Just Select";
+"Client Manager" = "Client Manager";
+"Please manage the list of IMKTextInput-incompatible clients here. Clients listed here will trigger vChewing's built-in popup composition buffer window with maximum 20 reading counts holdable." = "Please manage the list of IMKTextInput-incompatible clients here. Clients listed here will trigger vChewing's built-in popup composition buffer window with maximum 20 reading counts holdable.";
+"Add Client" = "Add Client";
+"Remove Selected" = "Remove Selected";
+"Choose the target application bundle." = "Choose the target application bundle.";
+"The selected item is not a valid macOS application bundle." = "The selected item is not a valid macOS application bundle.";
+"Please try again." = "Please try again.";
+"The selected item's identifier is already in the list." = "The selected item's identifier is already in the list.";
 "Update Check Completed" = "Update Check Completed";
 "You are already using the latest version." = "You are already using the latest version.";
 "Plist downloaded is nil." = "Plist downloaded is nil.";
@@ -17,7 +28,7 @@
 "Update Check Failed" = "Update Check Failed";
 "There may be no internet connection or the server failed to respond.\n\nError message: %@" = "There may be no internet connection or the server failed to respond.\n\nError message: %@";
 "OK" = "OK";
-"Dismiss" = "Dismiss";
+"Cancel" = "Cancel";
 "New Version Available" = "New Version Available";
 "Not Now" = "Not Now";
 "Visit Website" = "Visit Website";

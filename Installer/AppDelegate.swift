@@ -101,6 +101,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
     window.standardWindowButton(.closeButton)?.isHidden = true
     window.standardWindowButton(.miniaturizeButton)?.isHidden = true
     window.standardWindowButton(.zoomButton)?.isHidden = true
+    window.titlebarAppearsTransparent = true
 
     if FileManager.default.fileExists(
       atPath: kTargetPartialPath)

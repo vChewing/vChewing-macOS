@@ -65,10 +65,7 @@ extension ctlInputMethod {
         if !textToCommit.isEmpty { commit(text: textToCommit) }
         setInlineDisplayWithCursor()
         if !state.tooltip.isEmpty {
-          show(
-            tooltip: state.tooltip, displayedText: state.displayedText,
-            u16Cursor: state.data.u16Cursor
-          )
+          show(tooltip: state.tooltip)
         }
       case .ofMarking:
         ctlInputMethod.ctlCandidateCurrent.visible = false
@@ -76,20 +73,21 @@ extension ctlInputMethod {
         if state.tooltip.isEmpty {
           ctlInputMethod.tooltipInstance.hide()
         } else {
-          let cursorReference: Int = {
-            if state.data.marker >= state.data.cursor { return state.data.u16Cursor }
-            return state.data.u16Marker  // 這樣可以讓工具提示視窗始終盡量往書寫方向的後方顯示。
-          }()
-          show(
-            tooltip: state.tooltip, displayedText: state.displayedText,
-            u16Cursor: cursorReference
-          )
+          show(tooltip: state.tooltip)
         }
       case .ofCandidates, .ofAssociates, .ofSymbolTable:
         ctlInputMethod.tooltipInstance.hide()
         setInlineDisplayWithCursor()
         show(candidateWindowWith: state)
       default: break
+    }
+    // 浮動組字窗的顯示判定
+    if state.hasComposition, mgrPrefs.clientsIMKTextInputIncapable.contains(clientBundleIdentifier) {
+      ctlInputMethod.popupCompositionBuffer.show(
+        state: state, at: lineHeightRect(zeroCursor: true).origin
+      )
+    } else {
+      ctlInputMethod.popupCompositionBuffer.hide()
     }
   }
 
@@ -109,7 +107,7 @@ extension ctlInputMethod {
       /// 是 0 且取代範圍（replacementRange）為「NSNotFound」罷了。
       /// 也就是說，內文組字區該在哪裡出現，得由客體軟體來作主。
       client.setMarkedText(
-        state.attributedString, selectionRange: NSRange(location: state.data.u16Cursor, length: 0),
+        state.attributedString, selectionRange: NSRange(state.data.u16MarkedRange),
         replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
       )
       return

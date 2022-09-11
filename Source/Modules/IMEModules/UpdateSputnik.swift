@@ -152,7 +152,7 @@ class UpdateSputnik: NSObject, URLSessionDataDelegate {
     let content = NSLocalizedString(message, comment: "")
     alert.messageText = NSLocalizedString("Update Check Failed", comment: "")
     alert.informativeText = content
-    alert.addButton(withTitle: NSLocalizedString("Dismiss", comment: ""))
+    alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
     alert.runModal()
     NSApp.setActivationPolicy(.accessory)
   }

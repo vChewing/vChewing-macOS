@@ -13,19 +13,31 @@ import Cocoa
 // MARK: - Tooltip Display and Candidate Display Methods
 
 extension ctlInputMethod {
-  func show(tooltip: String, displayedText: String, u16Cursor: Int) {
-    guard let client = client() else { return }
-    var lineHeightRect = NSRect(x: 0.0, y: 0.0, width: 16.0, height: 16.0)
-    var cursor = u16Cursor
-    if cursor == displayedText.count, cursor != 0 {
-      cursor -= 1
+  func lineHeightRect(zeroCursor: Bool = false) -> NSRect {
+    var lineHeightRect = NSRect.seniorTheBeast
+    guard let client = client() else {
+      return lineHeightRect
     }
-    while lineHeightRect.origin.x == 0, lineHeightRect.origin.y == 0, cursor >= 0 {
+    var u16Cursor: Int = {
+      // iMessage 在 cursor == 0 時的計算會有一些偏差，所以例外處理。
+      if clientBundleIdentifier == "com.apple.MobileSMS" { return state.data.u16Cursor }
+      if state.data.marker >= state.data.cursor { return state.data.u16Cursor }
+      return state.data.u16Marker  // 這樣可以讓工具提示視窗始終盡量往書寫方向的後方顯示。
+    }()
+    u16Cursor = max(min(state.data.displayedTextConverted.utf16.count, u16Cursor), 0)
+    if zeroCursor { u16Cursor = 0 }
+    while lineHeightRect.origin.x == 0, lineHeightRect.origin.y == 0, u16Cursor >= 0 {
       client.attributes(
-        forCharacterIndex: cursor, lineHeightRectangle: &lineHeightRect
+        forCharacterIndex: u16Cursor, lineHeightRectangle: &lineHeightRect
       )
-      cursor -= 1
+      u16Cursor -= 1
     }
+    return lineHeightRect
+  }
+
+  func show(tooltip: String) {
+    guard client() != nil else { return }
+    let lineHeightRect = lineHeightRect()
     var finalOrigin: NSPoint = lineHeightRect.origin
     let delta: CGFloat = lineHeightRect.size.height + 4.0  // bottomOutOfScreenAdjustmentHeight
     if isVerticalTyping {
@@ -120,34 +132,17 @@ extension ctlInputMethod {
 
     ctlInputMethod.ctlCandidateCurrent.visible = true
 
-    var lineHeightRect = NSRect(x: 0.0, y: 0.0, width: 16.0, height: 16.0)
-    var cursor = 0
-
-    if [.ofCandidates, .ofSymbolTable].contains(state.type) {
-      cursor = state.data.cursor
-      if cursor == state.displayedText.count, cursor != 0 {
-        cursor -= 1
-      }
-    }
-
-    while lineHeightRect.origin.x == 0, lineHeightRect.origin.y == 0, cursor >= 0 {
-      client.attributes(
-        forCharacterIndex: cursor, lineHeightRectangle: &lineHeightRect
-      )
-      cursor -= 1
-    }
-
     if isVerticalTyping {
       ctlInputMethod.ctlCandidateCurrent.set(
         windowTopLeftPoint: NSPoint(
-          x: lineHeightRect.origin.x + lineHeightRect.size.width + 4.0, y: lineHeightRect.origin.y - 4.0
+          x: lineHeightRect().origin.x + lineHeightRect().size.width + 4.0, y: lineHeightRect().origin.y - 4.0
         ),
-        bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0
+        bottomOutOfScreenAdjustmentHeight: lineHeightRect().size.height + 4.0
       )
     } else {
       ctlInputMethod.ctlCandidateCurrent.set(
-        windowTopLeftPoint: NSPoint(x: lineHeightRect.origin.x, y: lineHeightRect.origin.y - 4.0),
-        bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0
+        windowTopLeftPoint: NSPoint(x: lineHeightRect().origin.x, y: lineHeightRect().origin.y - 4.0),
+        bottomOutOfScreenAdjustmentHeight: lineHeightRect().size.height + 4.0
       )
     }
   }

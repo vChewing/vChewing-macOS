@@ -1,4 +1,15 @@
 "vChewing" = "威注音入力アプリ";
+"Please enter the client app bundle identifier(s) you want to register." = "登録したい客体アプリの唯一識別子（Bundle Identifier）をご入力ください。";
+"One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed." = "毎行は１つ記録とみなす。Option+Enter キーで改行。\n空白の記録値は無視される。";
+"Just Select" = "直接に選ぶ";
+"Client Manager" = "客体アプリの管理";
+"Please manage the list of IMKTextInput-incompatible clients here. Clients listed here will trigger vChewing's built-in popup composition buffer window with maximum 20 reading counts holdable." = "IMKTextInput 議定規約に従っていない客体アプリはここでご登録ください。登録済みのアプリは客体アプリ（文字入力を受くアプリ）とされた時に、威注音入力アプリは「吹き出し入力緩衝列ウィンドウ」と「緩衝列容量制限」を起用し、その容量制限は最大限音読み２０箇とする。";
+"Add Client" = "入れる";
+"Remove Selected" = "外す";
+"Choose the target application bundle." = "登録したいアプリのバンドルのお選びを。";
+"The selected item is not a valid macOS application bundle." = "今選んだんのは正しい macOS アプリバンドルではないと考えられる。";
+"Please try again." = "お選び直しください。";
+"The selected item's identifier is already in the list." = "今選んだバンドルの唯一識別子（Bundle Identifier）は既に登録済みである。";
 "Update Check Completed" = "新バージョンチェック完了";
 "You are already using the latest version." = "現在稼働中のは最新バージョンである。";
 "Plist downloaded is nil." = "受けた新バージョンお知らせ情報データは Plist ではないため、失敗とみなす。";
@@ -17,7 +28,7 @@
 "Update Check Failed" = "更新通知受信失敗";
 "There may be no internet connection or the server failed to respond.\n\nError message: %@" = "ネットの接続の有無の問題か、サーバー側の反応の問題か。\n\nいずれにせよ、エラーメッセージ：「%@」";
 "OK" = "うむ";
-"Dismiss" = "却下";
+"Cancel" = "取り消す";
 "New Version Available" = "最新版利用可能";
 "Not Now" = "後で";
 "Visit Website" = "公式サイト";

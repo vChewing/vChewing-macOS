@@ -40,7 +40,7 @@ public class ctlTooltip: NSWindowController {
     let panel = NSPanel(
       contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false
     )
-    panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel) + 1)
+    panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel) + 2)
     panel.hasShadow = true
     panel.backgroundColor = NSColor.controlBackgroundColor
     messageText = NSAttributedTextView()
@@ -129,7 +129,7 @@ public class ctlTooltip: NSWindowController {
 
     var adjustedPoint = windowTopLeftPoint
     var delta = heightDelta
-    var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.zero
+    var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.seniorTheBeast
     for frame in NSScreen.screens.map(\.visibleFrame).filter({ !$0.contains(windowTopLeftPoint) }) {
       screenFrame = frame
       break

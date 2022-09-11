@@ -22,15 +22,19 @@ extension NSEvent {
     isARepeat: Bool? = nil,
     keyCode: UInt16? = nil
   ) -> NSEvent? {
-    NSEvent.keyEvent(
+    let oldChars: String = {
+      if self.type == .flagsChanged { return "" }
+      return self.characters ?? ""
+    }()
+    return NSEvent.keyEvent(
       with: type ?? self.type,
       location: location ?? locationInWindow,
       modifierFlags: modifierFlags ?? self.modifierFlags,
       timestamp: timestamp ?? self.timestamp,
       windowNumber: windowNumber ?? self.windowNumber,
       context: nil,
-      characters: characters ?? self.characters ?? "",
-      charactersIgnoringModifiers: charactersIgnoringModifiers ?? self.characters ?? "",
+      characters: characters ?? oldChars,
+      charactersIgnoringModifiers: charactersIgnoringModifiers ?? characters ?? oldChars,
       isARepeat: isARepeat ?? self.isARepeat,
       keyCode: keyCode ?? self.keyCode
     )
@@ -81,6 +85,8 @@ extension NSEvent: InputSignalProtocol {
   }
 
   public var charCode: UInt16 {
+    guard type != .flagsChanged else { return 0 }
+    guard characters != nil else { return 0 }
     // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
     guard !text.isEmpty else { return 0 }
     let scalars = text.unicodeScalars

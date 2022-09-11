@@ -113,6 +113,7 @@ extension IMEState {
     // 注意資料的設定順序，一定得先設定 displayTextSegments。
     result.data.displayTextSegments = displayTextSegments
     result.data.cursor = cursor
+    result.data.marker = cursor
     return result
   }
 

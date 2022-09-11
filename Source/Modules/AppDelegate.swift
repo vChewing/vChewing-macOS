@@ -25,6 +25,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
   // let vChewingKeyLayoutBundle = Bundle.init(path: URL(fileURLWithPath: Bundle.main.resourcePath ?? "").appendingPathComponent("vChewingKeyLayout.bundle").path)
 
   @IBOutlet var window: NSWindow?
+  private var ctlClientListMgrInstance: ctlClientListMgr?
   private var ctlPrefWindowInstance: ctlPrefWindow?
   private var ctlAboutWindowInstance: ctlAboutWindow?  // New About Window
   public lazy var folderMonitor = FolderMonitor(
@@ -80,6 +81,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     folderMonitor.startMonitoring()
   }
 
+  func showClientListMgr() {
+    if ctlClientListMgrInstance == nil {
+      ctlClientListMgrInstance = ctlClientListMgr.init(windowNibName: "frmClientListMgr")
+    }
+    ctlClientListMgrInstance?.window?.center()
+    ctlClientListMgrInstance?.window?.orderFrontRegardless()  // 逼著屬性視窗往最前方顯示
+    ctlClientListMgrInstance?.window?.level = .statusBar
+    ctlClientListMgrInstance?.window?.titlebarAppearsTransparent = true
+    NSApp.setActivationPolicy(.accessory)
+  }
+
   func showPreferences() {
     if ctlPrefWindowInstance == nil {
       ctlPrefWindowInstance = ctlPrefWindow.init(windowNibName: "frmPrefWindow")
@@ -99,6 +111,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     ctlAboutWindowInstance?.window?.center()
     ctlAboutWindowInstance?.window?.orderFrontRegardless()  // 逼著關於視窗往最前方顯示
     ctlAboutWindowInstance?.window?.level = .statusBar
+    ctlAboutWindowInstance?.window?.titlebarAppearsTransparent = true
     NSApp.setActivationPolicy(.accessory)
   }
 
