@@ -79,11 +79,11 @@ extension ctlClientListMgr {
     alert.accessoryView = scrollview
     alert.beginSheetModal(for: window) { result in
       switch result {
-        case .alertFirstButtonReturn:
+        case .alertFirstButtonReturn, .alertSecondButtonReturn:
           theTextView.textContainer?.textView?.string.components(separatedBy: "\n").filter { !$0.isEmpty }.forEach {
             self.applyNewValue($0)
           }
-        case .alertSecondButtonReturn:
+          if result == .alertFirstButtonReturn { break }
           IME.dlgOpenPath.title = NSLocalizedString(
             "Choose the target application bundle.", comment: ""
           )
