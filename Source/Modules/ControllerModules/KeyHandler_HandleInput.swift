@@ -83,8 +83,16 @@ extension KeyHandler {
         return false
       }
 
+      // 糾正 macOS 內建的的動態注音鍵盤佈局的一個 bug。
+      var charToCommit = inputText.lowercased()
+      if "-·".contains(charToCommit), input.isSymbolMenuPhysicalKey,
+        AppleKeyboardConverter.isDynamicBasicKeyboardLayoutEnabled
+      {
+        charToCommit = "`"
+      }
+
       // 將整個組字區的內容遞交給客體應用。
-      stateCallback(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
+      stateCallback(IMEState.ofCommitting(textToCommit: charToCommit))
       stateCallback(IMEState.ofEmpty())
 
       return true
