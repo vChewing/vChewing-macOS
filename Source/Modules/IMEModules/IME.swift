@@ -348,3 +348,11 @@ extension NSApplication {
     return output
   }
 }
+
+// MARK: NSRect Extension
+
+extension NSRect {
+  public static var seniorTheBeast: NSRect {
+    NSRect(x: 0.0, y: 0.0, width: 0.114, height: 0.514)
+  }
+}
