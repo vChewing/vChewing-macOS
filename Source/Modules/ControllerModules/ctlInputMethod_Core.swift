@@ -118,18 +118,7 @@ class ctlInputMethod: IMKInputController {
     keyHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
     keyHandler.ensureParser()
 
-    if isASCIIMode {
-      if mgrPrefs.disableShiftTogglingAlphanumericalMode {
-        isASCIIMode = false
-      } else {
-        NotifierController.notify(
-          message: NSLocalizedString("Alphanumerical Mode", comment: "") + "\n"
-            + (isASCIIMode
-              ? NSLocalizedString("NotificationSwitchON", comment: "")
-              : NSLocalizedString("NotificationSwitchOFF", comment: ""))
-        )
-      }
-    }
+    if isASCIIMode, mgrPrefs.disableShiftTogglingAlphanumericalMode { isASCIIMode = false }
 
     /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
     /// 這是很多 macOS 副廠輸入法的常見失誤之處。
