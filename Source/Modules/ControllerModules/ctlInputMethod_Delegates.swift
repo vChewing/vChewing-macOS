@@ -16,7 +16,7 @@ extension ctlInputMethod: KeyHandlerDelegate {
   /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
   public var isVerticalTyping: Bool {
     guard let client = client() else { return false }
-    var textFrame = NSRect.zero
+    var textFrame = NSRect.seniorTheBeast
     let attributes: [AnyHashable: Any]? = client.attributes(
       forCharacterIndex: 0, lineHeightRectangle: &textFrame
     )

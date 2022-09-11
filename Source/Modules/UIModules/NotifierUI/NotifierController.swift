@@ -90,7 +90,7 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
   }
 
   private init() {
-    let screenRect = NSScreen.main?.visibleFrame ?? NSRect.zero
+    let screenRect = NSScreen.main?.visibleFrame ?? NSRect.seniorTheBeast
     let contentRect = NSRect(x: 0, y: 0, width: kWindowWidth, height: kWindowHeight)
     var windowRect = contentRect
     windowRect.origin.x = screenRect.maxX - windowRect.width - 10
@@ -144,8 +144,8 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
         return
       }
       let lastLocation = NotifierController.lastLocation
-      let screenRect = NSScreen.main?.visibleFrame ?? NSRect.zero
-      var windowRect = window?.frame ?? NSRect.zero
+      let screenRect = NSScreen.main?.visibleFrame ?? NSRect.seniorTheBeast
+      var windowRect = window?.frame ?? NSRect.seniorTheBeast
       windowRect.origin.x = lastLocation.x
       windowRect.origin.y = lastLocation.y - 10 - windowRect.height
 
@@ -157,7 +157,7 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
     }
 
     func moveIn() {
-      let afterRect = window?.frame ?? NSRect.zero
+      let afterRect = window?.frame ?? NSRect.seniorTheBeast
       NotifierController.lastLocation = afterRect.origin
       var beforeRect = afterRect
       beforeRect.origin.y += 10

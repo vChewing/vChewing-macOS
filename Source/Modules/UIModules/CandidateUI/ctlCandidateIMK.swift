@@ -167,7 +167,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     var adjustedPoint = windowTopLeftPoint
     var adjustedHeight = height
 
-    var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.zero
+    var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.seniorTheBeast
     for screen in NSScreen.screens {
       let frame = screen.visibleFrame
       if windowTopLeftPoint.x >= frame.minX, windowTopLeftPoint.x <= frame.maxX,

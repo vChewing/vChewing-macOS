@@ -600,7 +600,7 @@ extension ctlCandidateUniversal {
       pageCounterLabel.isHidden = true
     }
 
-    frameRect = window?.frame ?? NSRect.zero
+    frameRect = window?.frame ?? NSRect.seniorTheBeast
 
     let topLeftPoint = NSPoint(x: frameRect.origin.x, y: frameRect.origin.y + frameRect.size.height)
     frameRect.size = newSize

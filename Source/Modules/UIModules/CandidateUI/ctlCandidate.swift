@@ -160,7 +160,7 @@ public class ctlCandidate: NSWindowController, ctlCandidateProtocol {
 
     var adjustedPoint = windowTopLeftPoint
     var delta = heightDelta
-    var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.zero
+    var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.seniorTheBeast
     for frame in NSScreen.screens.map(\.visibleFrame).filter({ !$0.contains(windowTopLeftPoint) }) {
       screenFrame = frame
       break
