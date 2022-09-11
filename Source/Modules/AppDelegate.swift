@@ -99,6 +99,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     ctlAboutWindowInstance?.window?.center()
     ctlAboutWindowInstance?.window?.orderFrontRegardless()  // 逼著關於視窗往最前方顯示
     ctlAboutWindowInstance?.window?.level = .statusBar
+    ctlAboutWindowInstance?.window?.titlebarAppearsTransparent = true
     NSApp.setActivationPolicy(.accessory)
   }
 

@@ -32,6 +32,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     ctlAboutWindowInstance?.window?.center()
     ctlAboutWindowInstance?.window?.orderFrontRegardless()  // 逼著關於視窗往最前方顯示
     ctlAboutWindowInstance?.window?.level = .statusBar
+    ctlAboutWindowInstance?.window?.titlebarAppearsTransparent = true
   }
 
   // Call the New About Window

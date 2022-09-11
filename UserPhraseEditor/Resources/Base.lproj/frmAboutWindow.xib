@@ -55,7 +55,7 @@
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8M8-3C-BZO">
                         <rect key="frame" x="89" y="372" width="431" height="30"/>
-                        <textFieldCell key="cell" selectable="YES" id="lblCredits">
+                        <textFieldCell key="cell" id="lblCredits">
                             <font key="font" size="12" name="Tahoma"/>
                             <string key="title">vChewing Phrase Editor developed by Shiki Suen.
 vChewing Phrase Database Maintained by Shiki Suen.</string>
@@ -79,7 +79,7 @@ vChewing Phrase Database Maintained by Shiki Suen.</string>
                         <constraints>
                             <constraint firstAttribute="width" constant="356" id="B0d-48-3we"/>
                         </constraints>
-                        <textFieldCell key="cell" selectable="YES" id="lblDisclaimer">
+                        <textFieldCell key="cell" id="lblDisclaimer">
                             <font key="font" size="12" name="Tahoma"/>
                             <string key="title">DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, are not included in vChewing official phrase database.</string>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
