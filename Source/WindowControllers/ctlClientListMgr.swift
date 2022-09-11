@@ -17,6 +17,7 @@ class ctlClientListMgr: NSWindowController, NSTableViewDelegate, NSTableViewData
     super.windowDidLoad()
     localize()
     tblClients.delegate = self
+    tblClients.allowsMultipleSelection = true
     tblClients.dataSource = self
     tblClients.reloadData()
   }
@@ -132,18 +133,24 @@ extension ctlClientListMgr {
   }
 
   @IBAction func btnRemoveClientClicked(_: Any) {
-    if tblClients.selectedRow >= mgrPrefs.clientsIMKTextInputIncapable.count { return }
-    if tblClients.selectedRow < 0 { return }
-    let isLastRow: Bool = {
-      if mgrPrefs.clientsIMKTextInputIncapable.count < 2 { return false }
-      return tblClients.selectedRow == mgrPrefs.clientsIMKTextInputIncapable.count - 1
-    }()
-    mgrPrefs.clientsIMKTextInputIncapable.remove(at: tblClients.selectedRow)
+    guard let minIndexSelected = tblClients.selectedRowIndexes.min() else { return }
+    if minIndexSelected >= mgrPrefs.clientsIMKTextInputIncapable.count { return }
+    if minIndexSelected < 0 { return }
+    var isLastRow = false
+    tblClients.selectedRowIndexes.sorted().reversed().forEach { index in
+      isLastRow = {
+        if mgrPrefs.clientsIMKTextInputIncapable.count < 2 { return false }
+        return minIndexSelected == mgrPrefs.clientsIMKTextInputIncapable.count - 1
+      }()
+      if index < mgrPrefs.clientsIMKTextInputIncapable.count {
+        mgrPrefs.clientsIMKTextInputIncapable.remove(at: index)
+      }
+    }
     if isLastRow {
-      tblClients.selectRowIndexes(.init(arrayLiteral: tblClients.selectedRow - 1), byExtendingSelection: false)
+      tblClients.selectRowIndexes(.init(arrayLiteral: minIndexSelected - 1), byExtendingSelection: false)
     }
     tblClients.reloadData()
-    btnRemoveClient.isEnabled = (0..<mgrPrefs.clientsIMKTextInputIncapable.count).contains(tblClients.selectedRow)
+    btnRemoveClient.isEnabled = (0..<mgrPrefs.clientsIMKTextInputIncapable.count).contains(minIndexSelected)
   }
 
   func tableView(_: NSTableView, objectValueFor _: NSTableColumn?, row: Int) -> Any? {
