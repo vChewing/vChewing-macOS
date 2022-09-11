@@ -60,7 +60,7 @@
 "CNS11643 Mode" = "全字庫モード";
 "JIS Shinjitai Output" = "JIS 新字体モード";
 "Per-Char Associated Phrases" = "全候補入力で連想語彙";
-"Open User Data Folder" = "ユーザー資料フォルダを開く";
+"Open User Dictionary Folder" = "ユーザー辞書フォルダを開く";
 "Edit Associated Phrases…" = "連想語彙を編集…";
 "Reboot vChewing…" = "入力アプリ再起動…";
 "auto" = "システム設定に準ず";

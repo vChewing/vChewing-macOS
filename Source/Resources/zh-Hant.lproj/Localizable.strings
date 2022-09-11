@@ -60,7 +60,7 @@
 "CNS11643 Mode" = "全字庫模式";
 "JIS Shinjitai Output" = "JIS 新字體模式";
 "Per-Char Associated Phrases" = "逐字選字聯想模式";
-"Open User Data Folder" = "開啟使用者資料夾";
+"Open User Dictionary Folder" = "開啟使用者辭典資料夾";
 "Edit Associated Phrases…" = "編輯聯想詞…";
 "Reboot vChewing…" = "重新啟動輸入法…";
 "auto" = "與系統設定一致";

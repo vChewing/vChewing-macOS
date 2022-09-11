@@ -119,8 +119,8 @@ public class ctlPopupCompositionBuffer: NSWindowController {
     var bigRect = rect
     bigRect.size.width += NSFont.systemFontSize
     bigRect.size.height += NSFont.systemFontSize
-    rect.origin.x += NSFont.systemFontSize / 2
-    rect.origin.y += NSFont.systemFontSize / 2
+    rect.origin.x += ceil(NSFont.systemFontSize / 2)
+    rect.origin.y += ceil(NSFont.systemFontSize / 2)
     messageTextField.frame = rect
     window?.setFrame(bigRect, display: true)
   }
