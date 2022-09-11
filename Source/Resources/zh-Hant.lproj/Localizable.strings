@@ -17,7 +17,7 @@
 "Update Check Failed" = "無法檢查新版";
 "There may be no internet connection or the server failed to respond.\n\nError message: %@" = "網路連線失敗，或是伺服器沒有回應。\n\n錯誤說明：%@";
 "OK" = "確定";
-"Dismiss" = "關閉本視窗";
+"Cancel" = "取消";
 "New Version Available" = "有新版可下載";
 "Not Now" = "以後再說";
 "Visit Website" = "前往網站";

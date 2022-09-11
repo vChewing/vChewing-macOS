@@ -17,7 +17,7 @@
 "Update Check Failed" = "无法检查新版";
 "There may be no internet connection or the server failed to respond.\n\nError message: %@" = "网路连线失败，或是伺服器没有回应。\n\n错误说明：%@";
 "OK" = "确定";
-"Dismiss" = "关闭本视窗";
+"Cancel" = "取消";
 "New Version Available" = "有新版可下载";
 "Not Now" = "以后再说";
 "Visit Website" = "前往网站";

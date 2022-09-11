@@ -17,7 +17,7 @@
 "Update Check Failed" = "Update Check Failed";
 "There may be no internet connection or the server failed to respond.\n\nError message: %@" = "There may be no internet connection or the server failed to respond.\n\nError message: %@";
 "OK" = "OK";
-"Dismiss" = "Dismiss";
+"Cancel" = "Cancel";
 "New Version Available" = "New Version Available";
 "Not Now" = "Not Now";
 "Visit Website" = "Visit Website";

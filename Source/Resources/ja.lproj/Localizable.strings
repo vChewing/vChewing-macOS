@@ -17,7 +17,7 @@
 "Update Check Failed" = "更新通知受信失敗";
 "There may be no internet connection or the server failed to respond.\n\nError message: %@" = "ネットの接続の有無の問題か、サーバー側の反応の問題か。\n\nいずれにせよ、エラーメッセージ：「%@」";
 "OK" = "うむ";
-"Dismiss" = "却下";
+"Cancel" = "取り消す";
 "New Version Available" = "最新版利用可能";
 "Not Now" = "後で";
 "Visit Website" = "公式サイト";
