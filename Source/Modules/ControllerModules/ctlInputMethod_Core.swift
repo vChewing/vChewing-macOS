@@ -57,7 +57,7 @@ class ctlInputMethod: IMKInputController {
   }
 
   /// `handle(event:)` 會利用這個參數判定某次 Shift 按鍵是否用來切換中英文輸入。
-  var rencentKeyHandledByKeyHandler = false
+  var rencentKeyHandledByKeyHandlerEtc = false
 
   // MARK: - 工具函式
 
@@ -207,6 +207,8 @@ class ctlInputMethod: IMKInputController {
   @objc(handleEvent:client:) override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
 
+    // MARK: 前置處理
+
     // 更新此時的靜態狀態標記。
     ctlInputMethod.isASCIIModeSituation = isASCIIMode
     ctlInputMethod.isVerticalTypingSituation = isVerticalTyping
@@ -218,17 +220,63 @@ class ctlInputMethod: IMKInputController {
       return false
     }
 
+    // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
+    let shouldUseShiftToggleHandle: Bool = {
+      switch mgrPrefs.shiftKeyAccommodationBehavior {
+        case 0: return false
+        case 1: return IME.arrClientShiftHandlingExceptionList.contains(clientBundleIdentifier)
+        case 2: return true
+        default: return false
+      }
+    }()
+
+    if #available(macOS 10.15, *) {
+      if ShiftKeyUpChecker.check(event), !mgrPrefs.disableShiftTogglingAlphanumericalMode {
+        if !shouldUseShiftToggleHandle || (!rencentKeyHandledByKeyHandlerEtc && shouldUseShiftToggleHandle) {
+          NotifierController.notify(
+            message: NSLocalizedString("Alphanumerical Mode", comment: "") + "\n"
+              + (toggleASCIIMode()
+                ? NSLocalizedString("NotificationSwitchON", comment: "")
+                : NSLocalizedString("NotificationSwitchOFF", comment: ""))
+          )
+        }
+        if shouldUseShiftToggleHandle {
+          rencentKeyHandledByKeyHandlerEtc = false
+        }
+        return false
+      }
+    }
+
+    // MARK: 針對客體的具體處理
+
+    /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
+    /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
+    /// 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
+    /// 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
+    if event.type == .flagsChanged { return false }
+
+    /// 沒有文字輸入客體的話，就不要再往下處理了。
+    guard client() != nil else { return false }
+
+    var eventToDeal = event
+    // 使 NSEvent 自翻譯，這樣可以讓 Emacs NSEvent 變成標準 NSEvent。
+    if eventToDeal.isEmacsKey {
+      let verticalProcessing =
+        (state.isCandidateContainer)
+        ? ctlInputMethod.isVerticalCandidateSituation : ctlInputMethod.isVerticalTypingSituation
+      eventToDeal = eventToDeal.convertFromEmacKeyEvent(isVerticalContext: verticalProcessing)
+    }
+
+    // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
+    ctlInputMethod.areWeNerfing = eventToDeal.modifierFlags.contains([.shift, .command])
+
     // IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
     // 這樣可以讓 interpretKeyEvents() 函式自行判斷：
     // - 是就地交給 super.interpretKeyEvents() 處理？
     // - 還是藉由 delegate 扔回 ctlInputMethod 給 KeyHandler 處理？
     proc: if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK {
       guard ctlCandidateCurrent.visible else { break proc }
-      var event: NSEvent = ctlCandidateIMK.replaceNumPadKeyCodes(target: event) ?? event
-      // 使 NSEvent 自翻譯，這樣可以讓 Emacs NSEvent 變成標準 NSEvent。
-      if event.isEmacsKey {
-        event = event.convertFromEmacKeyEvent(isVerticalContext: ctlInputMethod.isVerticalCandidateSituation)
-      }
+      var event: NSEvent = ctlCandidateIMK.replaceNumPadKeyCodes(target: eventToDeal) ?? eventToDeal
 
       // Shift+Enter 是個特殊情形，不提前攔截處理的話、會有垃圾參數傳給 delegate 的 keyHandler 從而崩潰。
       // 所以這裡直接將 Shift Flags 清空。
@@ -255,7 +303,11 @@ class ctlInputMethod: IMKInputController {
     /// 我們不在這裡處理了，直接交給 commonEventHandler 來處理。
     /// 這樣可以與 IMK 選字窗共用按鍵處理資源，維護起來也比較方便。
     /// 警告：這裡的 event 必須是原始 event 且不能被 var，否則會影響 Shift 中英模式判定。
-    return commonEventHandler(event)
+    let result = commonEventHandler(eventToDeal)
+    if shouldUseShiftToggleHandle {
+      rencentKeyHandledByKeyHandlerEtc = result
+    }
+    return result
   }
 
   /// 有時會出現某些 App 攔截輸入法的 Ctrl+Enter / Shift+Enter 熱鍵的情況。
