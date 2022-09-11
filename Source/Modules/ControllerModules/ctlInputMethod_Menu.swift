@@ -96,7 +96,7 @@ extension ctlInputMethod {
     menu.addItem(NSMenuItem.separator())  // ---------------------
 
     menu.addItem(
-      withTitle: NSLocalizedString("Open User Data Folder", comment: ""),
+      withTitle: NSLocalizedString("Open User Dictionary Folder", comment: ""),
       action: #selector(openUserDataFolder(_:)), keyEquivalent: ""
     )
     menu.addItem(
