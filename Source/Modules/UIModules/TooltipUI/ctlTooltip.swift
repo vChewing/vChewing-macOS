@@ -168,8 +168,8 @@ public class ctlTooltip: NSWindowController {
     var bigRect = rect
     bigRect.size.width += NSFont.systemFontSize
     bigRect.size.height += NSFont.systemFontSize
-    rect.origin.x += NSFont.systemFontSize / 2
-    rect.origin.y += NSFont.systemFontSize / 2
+    rect.origin.x += ceil(NSFont.systemFontSize / 2)
+    rect.origin.y += ceil(NSFont.systemFontSize / 2)
     messageText.frame = rect
     window?.setFrame(bigRect, display: true)
     messageText.draw(messageText.frame)
