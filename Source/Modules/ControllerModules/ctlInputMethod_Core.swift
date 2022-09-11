@@ -230,6 +230,7 @@ class ctlInputMethod: IMKInputController {
       }
     }()
 
+    /// 警告：這裡的 event 必須是原始 event 且不能被 var，否則會影響 Shift 中英模式判定。
     if #available(macOS 10.15, *) {
       if ShiftKeyUpChecker.check(event), !mgrPrefs.disableShiftTogglingAlphanumericalMode {
         if !shouldUseShiftToggleHandle || (!rencentKeyHandledByKeyHandlerEtc && shouldUseShiftToggleHandle) {
@@ -271,38 +272,15 @@ class ctlInputMethod: IMKInputController {
     ctlInputMethod.areWeNerfing = eventToDeal.modifierFlags.contains([.shift, .command])
 
     // IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
-    // 這樣可以讓 interpretKeyEvents() 函式自行判斷：
-    // - 是就地交給 super.interpretKeyEvents() 處理？
-    // - 還是藉由 delegate 扔回 ctlInputMethod 給 KeyHandler 處理？
-    proc: if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK {
-      guard ctlCandidateCurrent.visible else { break proc }
-      var event: NSEvent = ctlCandidateIMK.replaceNumPadKeyCodes(target: eventToDeal) ?? eventToDeal
-
-      // Shift+Enter 是個特殊情形，不提前攔截處理的話、會有垃圾參數傳給 delegate 的 keyHandler 從而崩潰。
-      // 所以這裡直接將 Shift Flags 清空。
-      if event.isShiftHold, event.isEnter {
-        guard let newEvent = event.reinitiate(modifierFlags: []) else {
-          NSSound.beep()
-          return true
-        }
-        ctlCandidateCurrent.interpretKeyEvents([newEvent])
-        return true
+    if let result = imkCandidatesEventHandler(event: eventToDeal) {
+      if shouldUseShiftToggleHandle {
+        rencentKeyHandledByKeyHandlerEtc = result
       }
-
-      // 聯想詞選字。
-      if let newChar = ctlCandidateIMK.defaultIMKSelectionKey[event.keyCode], event.isShiftHold,
-        isAssociatedPhrasesState, let newEvent = event.reinitiate(modifierFlags: [], characters: newChar)
-      {
-        ctlCandidateCurrent.handleKeyboardEvent(newEvent)
-      }
-
-      ctlCandidateCurrent.interpretKeyEvents([event])
-      return true
+      return result
     }
 
-    /// 我們不在這裡處理了，直接交給 commonEventHandler 來處理。
+    /// 剩下的 NSEvent 直接交給 commonEventHandler 來處理。
     /// 這樣可以與 IMK 選字窗共用按鍵處理資源，維護起來也比較方便。
-    /// 警告：這裡的 event 必須是原始 event 且不能被 var，否則會影響 Shift 中英模式判定。
     let result = commonEventHandler(eventToDeal)
     if shouldUseShiftToggleHandle {
       rencentKeyHandledByKeyHandlerEtc = result
