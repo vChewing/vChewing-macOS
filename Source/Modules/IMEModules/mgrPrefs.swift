@@ -19,6 +19,7 @@ public enum UserDef: String, CaseIterable {
   case kCheckUpdateAutomatically = "CheckUpdateAutomatically"
   case kMandarinParser = "MandarinParser"
   case kBasicKeyboardLayout = "BasicKeyboardLayout"
+  case kAlphanumericalKeyboardLayout = "AlphanumericalKeyboardLayout"
   case kShowPageButtonsInCandidateWindow = "ShowPageButtonsInCandidateWindow"
   case kCandidateListTextSize = "CandidateListTextSize"
   case kAppleLanguages = "AppleLanguages"
@@ -86,6 +87,7 @@ private let kMaxCandidateListTextSize: CGFloat = 196
 private let kDefaultKeys = "123456789"
 
 private let kDefaultBasicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
+private let kDefaultAlphanumericalKeyboardLayout = "com.apple.keylayout.ABC"
 
 // MARK: - UserDefaults extension.
 
@@ -384,6 +386,11 @@ public enum mgrPrefs {
     key: UserDef.kBasicKeyboardLayout.rawValue, defaultValue: kDefaultBasicKeyboardLayout
   )
   static var basicKeyboardLayout: String
+
+  @UserDefault(
+    key: UserDef.kAlphanumericalKeyboardLayout.rawValue, defaultValue: kDefaultAlphanumericalKeyboardLayout
+  )
+  static var alphanumericalKeyboardLayout: String
 
   @UserDefault(key: UserDef.kShowPageButtonsInCandidateWindow.rawValue, defaultValue: true)
   static var showPageButtonsInCandidateWindow: Bool
@@ -756,22 +763,11 @@ extension mgrPrefs {
       mandarinParser = 0
     }
     // 基礎鍵盤排列選項糾錯。
-    var inputSourceTIS: TISInputSource? {
-      var result: TISInputSource?
-      let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
-      let matchedTISString = mgrPrefs.basicKeyboardLayout
-      for source in list {
-        guard let ptrCat = TISGetInputSourceProperty(source, kTISPropertyInputSourceCategory) else { continue }
-        let category = Unmanaged<CFString>.fromOpaque(ptrCat).takeUnretainedValue()
-        guard category == kTISCategoryKeyboardInputSource else { continue }
-        guard let ptrSourceID = TISGetInputSourceProperty(source, kTISPropertyInputSourceID) else { continue }
-        let sourceID = String(Unmanaged<CFString>.fromOpaque(ptrSourceID).takeUnretainedValue())
-        if sourceID == matchedTISString { result = source }
-      }
-      return result
-    }
-    if inputSourceTIS == nil {
+    if TISInputSource.generate(from: mgrPrefs.basicKeyboardLayout) == nil {
       mgrPrefs.basicKeyboardLayout = kDefaultBasicKeyboardLayout
+    }
+    if TISInputSource.generate(from: mgrPrefs.alphanumericalKeyboardLayout) == nil {
+      mgrPrefs.alphanumericalKeyboardLayout = kDefaultAlphanumericalKeyboardLayout
     }
     // 其它多元選項參數自動糾錯。
     if ![0, 1, 2].contains(specifyIntonationKeyBehavior) {
