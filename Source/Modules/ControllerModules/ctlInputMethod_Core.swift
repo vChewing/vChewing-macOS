@@ -42,7 +42,7 @@ class ctlInputMethod: IMKInputController {
   /// 當前這個 ctlInputMethod 副本是否處於縱排選字窗模式（滯後項）。
   static var isVerticalCandidateSituation: Bool = false
   /// 當前這個 ctlInputMethod 副本是否處於英數輸入模式。
-  var isASCIIMode: Bool = false
+  var isASCIIMode: Bool = false { didSet { setKeyLayout() } }
   /// 按鍵調度模組的副本。
   var keyHandler: KeyHandler = .init()
   /// 用以記錄當前輸入法狀態的變數。
@@ -66,9 +66,12 @@ class ctlInputMethod: IMKInputController {
 
   /// 指定鍵盤佈局。
   func setKeyLayout() {
-    if let client = client() {
-      client.overrideKeyboard(withKeyboardNamed: mgrPrefs.basicKeyboardLayout)
+    guard let client = client() else { return }
+    if isASCIIMode, AppleKeyboardConverter.isDynamicBasicKeyboardLayoutEnabled {
+      client.overrideKeyboard(withKeyboardNamed: mgrPrefs.alphanumericalKeyboardLayout)
+      return
     }
+    client.overrideKeyboard(withKeyboardNamed: mgrPrefs.basicKeyboardLayout)
   }
 
   /// 重設按鍵調度模組，會將當前尚未遞交的內容遞交出去。

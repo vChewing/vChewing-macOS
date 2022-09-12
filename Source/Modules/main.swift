@@ -59,7 +59,7 @@ guard let mainBundleInfoDict = Bundle.main.infoDictionary,
   let strUpdateInfoSource = mainBundleInfoDict["UpdateInfoEndpoint"] as? String,
   let urlUpdateInfoSource = URL(string: strUpdateInfoSource)
 else {
-  NSLog("Fatal error: Info.plist wrecked It needs to have correct 'UpdateInfoEndpoint' value.")
+  NSLog("Fatal error: Info.plist wrecked. It needs to have correct 'UpdateInfoEndpoint' value.")
   exit(-1)
 }
 

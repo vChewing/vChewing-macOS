@@ -46,7 +46,7 @@ struct suiPrefPaneGeneral: View {
         if mgrPrefs.appleLanguages[0].contains("zh-Han") {
           return 480
         } else {
-          return 550
+          return 580
         }
     }
   }()
@@ -54,7 +54,7 @@ struct suiPrefPaneGeneral: View {
   var body: some View {
     ScrollView {
       Preferences.Container(contentWidth: contentWidth) {
-        Preferences.Section(bottomDivider: false, label: { Text(LocalizedStringKey("Candidate Size:")) }) {
+        Preferences.Section(label: { Text(LocalizedStringKey("Candidate Size:")) }) {
           Picker(
             "",
             selection: $selCandidateUIFontSize.onChange {
@@ -82,7 +82,7 @@ struct suiPrefPaneGeneral: View {
           Text(LocalizedStringKey("Choose candidate font size for better visual clarity."))
             .preferenceDescription()
         }
-        Preferences.Section(bottomDivider: false, label: { Text(LocalizedStringKey("UI Language:")) }) {
+        Preferences.Section(label: { Text(LocalizedStringKey("UI Language:")) }) {
           Picker(
             LocalizedStringKey("Follow OS settings"),
             selection: $selUILanguage.onChange {
@@ -114,7 +114,7 @@ struct suiPrefPaneGeneral: View {
           Text(LocalizedStringKey("Change user interface language (will reboot the IME)."))
             .preferenceDescription()
         }
-        Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Candidate Layout:")) }) {
+        Preferences.Section(label: { Text(LocalizedStringKey("Candidate Layout:")) }) {
           Picker(
             "",
             selection: $selEnableHorizontalCandidateLayout.onChange {
@@ -138,7 +138,7 @@ struct suiPrefPaneGeneral: View {
           .controlSize(.small)
           .disabled(mgrPrefs.useIMKCandidateWindow)
         }
-        Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Output Settings:")) }) {
+        Preferences.Section(label: { Text(LocalizedStringKey("Output Settings:")) }) {
           Toggle(
             LocalizedStringKey("Auto-convert traditional Chinese glyphs to KangXi characters"),
             isOn: $selEnableKanjiConvToKangXi.onChange {

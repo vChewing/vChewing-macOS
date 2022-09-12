@@ -115,6 +115,7 @@
 "Allow backspace-editing miscomposed readings" = "Allow backspace-editing miscomposed readings";
 "Allow boosting / excluding a candidate of single kanji" = "Allow boosting / excluding a candidate of single kanji";
 "Allow using Enter key to confirm associated candidate selection" = "Allow using Enter key to confirm associated candidate selection";
+"Alphanumerical Layout:" = "Alphanumerical Layout:";
 "Also toggle alphanumerical mode with Left-Shift" = "Also toggle alphanumerical mode with Left-Shift";
 "Always drop the previous reading" = "Always drop the previous reading";
 "Always show tooltip texts horizontally" = "Always show tooltip texts horizontally";
@@ -142,7 +143,8 @@
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "Choose the behavior of (Shift+)Tab key in the candidate window.";
 "Choose the behavior of Shift+Letter key with letter inputs." = "Choose the behavior of Shift+Letter key with letter inputs.";
 "Choose the cursor position where you want to list possible candidates." = "Choose the cursor position where you want to list possible candidates.";
-"Choose the macOS-level basic keyboard layout." = "Choose the macOS-level basic keyboard layout.";
+"Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode toggled by Shift key." = "Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode toggled by Shift key.";
+"Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only.";
 "Choose the phonetic layout for Mandarin parser." = "Choose the phonetic layout for Mandarin parser.";
 "Choose your desired user data folder path. Will be omitted if invalid." = "Choose your desired user data folder path. Will be omitted if invalid.";
 "Choose your preferred layout of the candidate window." = "Choose your preferred layout of the candidate window.";
@@ -190,7 +192,6 @@
 "Keyboard" = "Keyboard";
 "Misc Settings:" = "Misc Settings:";
 "MiTAC" = "MiTAC";
-"Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only.";
 "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead." = "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead.";
 "Only override the intonation of the previous reading if different" = "Only override the intonation of the previous reading if different";
 "Only use this with known Chromium-based browsers" = "Only use this with known Chromium-based browsers";

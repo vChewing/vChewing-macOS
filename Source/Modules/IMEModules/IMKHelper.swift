@@ -41,6 +41,10 @@ enum IMKHelper {
     "org.unknown.keylayout.vChewingMiTAC",
   ]
 
+  static var allowedAlphanumericalTISInputSources: [TISInputSource] {
+    arrWhitelistedKeyLayoutsASCII.compactMap { TISInputSource.generate(from: $0) }
+  }
+
   static var allowedBasicLayoutsAsTISInputSources: [TISInputSource?] {
     // 為了保證清單順序，先弄兩個容器。
     var containerA: [TISInputSource?] = []

@@ -39,7 +39,7 @@ struct suiPrefPaneDictionary: View {
         if mgrPrefs.appleLanguages[0].contains("zh-Han") {
           return 480
         } else {
-          return 550
+          return 580
         }
     }
   }()

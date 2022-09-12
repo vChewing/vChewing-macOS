@@ -146,17 +146,10 @@ extension ctlInputMethod {
 
     menu.addItem(NSMenuItem.separator())  // ---------------------
 
-    if optionKeyPressed {
-      menu.addItem(
-        withTitle: NSLocalizedString("vChewing Preferences…", comment: ""),
-        action: #selector(showLegacyPreferences(_:)), keyEquivalent: ""
-      )
-    } else {
-      menu.addItem(
-        withTitle: NSLocalizedString("vChewing Preferences…", comment: ""),
-        action: #selector(showPreferences(_:)), keyEquivalent: ""
-      )
-    }
+    menu.addItem(
+      withTitle: NSLocalizedString("vChewing Preferences…", comment: ""),
+      action: #selector(showPreferences(_:)), keyEquivalent: ""
+    )
     menu.addItem(
       withTitle: NSLocalizedString("Client Manager", comment: "") + "…",
       action: #selector(showClientListMgr(_:)), keyEquivalent: ""
@@ -191,20 +184,24 @@ extension ctlInputMethod {
 
     return menu
   }
+}
 
-  // MARK: - IME Menu Items
+// MARK: - IME Menu Items
 
+extension ctlInputMethod {
   @objc override func showPreferences(_: Any?) {
-    if #available(macOS 10.15, *) {
+    if #unavailable(macOS 10.15) {
+      showLegacyPreferences()
+    } else if NSEvent.modifierFlags.contains(.option) {
+      showLegacyPreferences()
+    } else {
       NSApp.setActivationPolicy(.accessory)
       ctlPrefUI.shared.controller.show(preferencePane: Preferences.PaneIdentifier(rawValue: "General"))
       ctlPrefUI.shared.controller.window?.level = .statusBar
-    } else {
-      showLegacyPreferences()
     }
   }
 
-  @objc func showLegacyPreferences(_: Any? = nil) {
+  func showLegacyPreferences() {
     (NSApp.delegate as? AppDelegate)?.showPreferences()
     NSApp.activate(ignoringOtherApps: true)
   }
