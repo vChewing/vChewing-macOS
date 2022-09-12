@@ -202,7 +202,7 @@ struct suiPrefPaneKeyboard: View {
             Spacer().frame(width: 30)
           }
         }
-        Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Alphanumerical Layout:")) }) {
+        Preferences.Section(label: { Text(LocalizedStringKey("Alphanumerical Layout:")) }) {
           HStack {
             Picker(
               "",
@@ -230,7 +230,7 @@ struct suiPrefPaneKeyboard: View {
             Spacer().frame(width: 30)
           }
         }
-        Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Keyboard Shortcuts:")) }) {
+        Preferences.Section(label: { Text(LocalizedStringKey("Keyboard Shortcuts:")) }) {
           HStack(alignment: .top, spacing: NSFont.systemFontSize) {
             VStack(alignment: .leading) {
               Toggle(
