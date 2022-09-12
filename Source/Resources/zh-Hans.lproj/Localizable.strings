@@ -115,6 +115,7 @@
 "Allow backspace-editing miscomposed readings" = "允许对无效的读音使用 BackSpace 编辑";
 "Allow boosting / excluding a candidate of single kanji" = "将可以就地升权/排除的候选字词的最短词长设为单个汉字";
 "Allow using Enter key to confirm associated candidate selection" = "允许使用 Enter 确认当前选中的联想词";
+"Alphanumerical Layout:" = "英数键盘布局:";
 "Also toggle alphanumerical mode with Left-Shift" = "也允许使用左侧的 Shift 键盘切换英数输入模式";
 "Always drop the previous reading" = "始终剔除游标正后方的字音";
 "Always show tooltip texts horizontally" = "始终使用横排来显示工具提示视窗";
@@ -142,7 +143,8 @@
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "指定 (Shift+)Tab 在选字窗内的轮替操作对象。";
 "Choose the behavior of Shift+Letter key with letter inputs." = "指定 Shift+字母键 的行为。";
 "Choose the cursor position where you want to list possible candidates." = "请选择用以触发选字的游标相对位置。";
-"Choose the macOS-level basic keyboard layout." = "请选择 macOS 基础键盘布局。";
+"Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode toggled by Shift key." = "请选择 macOS 英数键盘布局。该布局用于以 Shift 切换至的英数输入模式。";
+"Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "请选择 macOS 基础键盘布局。QWERTY 以外的英数布局是为了拼音排列使用者而准备的。";
 "Choose the phonetic layout for Mandarin parser." = "请指定普通话/国音分析器所使用的注音排列。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "请在此指定您想指定的使用者语汇档案目录。无效值会被忽略。";
 "Choose your preferred layout of the candidate window." = "选择您所偏好的候选字窗布局。";
@@ -190,7 +192,6 @@
 "Keyboard" = "键盘设定";
 "Misc Settings:" = "杂项:";
 "MiTAC" = "神通排列";
-"Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "QWERTY 以外的英数布局是为了拼音排列使用者而准备的。";
 "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead." = "注意：Mac 键盘的「Delete ⌫」键在此被称作「BackSpace 退格键 ⌫」以与 PC 键盘的真正的「Delete ⌦」键彼此区分开。若您想在没有数字小键盘的 Mac 电脑上使用真正的「Delete ⌦」按键的话，请改用「Fn+⌫」。";
 "Only override the intonation of the previous reading if different" = "仅在键入的声调与游标正后方的字音不同时，尝试覆写";
 "Only use this with known Chromium-based browsers" = "仅针对知名的 Chromium 核心的浏览器启用该措施";

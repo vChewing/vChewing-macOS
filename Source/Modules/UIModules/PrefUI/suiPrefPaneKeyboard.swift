@@ -16,6 +16,9 @@ struct suiPrefPaneKeyboard: View {
   @State private var selMandarinParser = UserDefaults.standard.integer(forKey: UserDef.kMandarinParser.rawValue)
   @State private var selBasicKeyboardLayout: String =
     UserDefaults.standard.string(forKey: UserDef.kBasicKeyboardLayout.rawValue) ?? mgrPrefs.basicKeyboardLayout
+  @State private var selAlphanumericalKeyboardLayout: String =
+    UserDefaults.standard.string(forKey: UserDef.kAlphanumericalKeyboardLayout.rawValue)
+    ?? mgrPrefs.alphanumericalKeyboardLayout
 
   @State private var selUsingHotKeySCPC = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeySCPC.rawValue)
   @State private var selUsingHotKeyAssociates = UserDefaults.standard.bool(
@@ -163,7 +166,7 @@ struct suiPrefPaneKeyboard: View {
             Spacer().frame(width: 30)
           }
         }
-        Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Basic Keyboard Layout:")) }) {
+        Preferences.Section(label: { Text(LocalizedStringKey("Basic Keyboard Layout:")) }) {
           HStack {
             Picker(
               "",
@@ -191,13 +194,37 @@ struct suiPrefPaneKeyboard: View {
           HStack {
             Text(
               NSLocalizedString(
-                "Choose the macOS-level basic keyboard layout.",
+                "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only.",
                 comment: ""
-              ) + (mgrPrefs.appleLanguages[0].contains("en") ? " " : "")
-                + NSLocalizedString(
-                  "Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only.",
-                  comment: ""
-                )
+              )
+            )
+            .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+            Spacer().frame(width: 30)
+          }
+        }
+        Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Alphanumerical Layout:")) }) {
+          HStack {
+            Picker(
+              "",
+              selection: $selAlphanumericalKeyboardLayout.onChange {
+                mgrPrefs.alphanumericalKeyboardLayout = selAlphanumericalKeyboardLayout
+              }
+            ) {
+              ForEach(0...(IMKHelper.allowedAlphanumericalTISInputSources.count - 1), id: \.self) { id in
+                if let theEntry = IMKHelper.allowedAlphanumericalTISInputSources[id] {
+                  Text(theEntry.vChewingLocalizedName).tag(theEntry.identifier)
+                }
+              }.id(UUID())
+            }
+            .labelsHidden()
+            .frame(width: 240.0)
+          }
+          HStack {
+            Text(
+              NSLocalizedString(
+                "Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode toggled by Shift key.",
+                comment: ""
+              )
             )
             .preferenceDescription().fixedSize(horizontal: false, vertical: true)
             Spacer().frame(width: 30)

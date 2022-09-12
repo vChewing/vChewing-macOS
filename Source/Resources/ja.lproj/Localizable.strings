@@ -115,6 +115,7 @@
 "Allow backspace-editing miscomposed readings" = "効かぬ音読みを BackSpace で再編集";
 "Allow boosting / excluding a candidate of single kanji" = "即排除/即最優先にできる候補の文字数の最低限は１字とする";
 "Allow using Enter key to confirm associated candidate selection" = "Enter キーを連想語彙候補の確認のために使う";
+"Alphanumerical Layout:" = "英数キーボード:";
 "Also toggle alphanumerical mode with Left-Shift" = "左側の Shift キーでも英数入力モードの切り替え";
 "Always drop the previous reading" = "カーソルの後部の音読みを常に削除する";
 "Always show tooltip texts horizontally" = "ヒントを常に横書きにする";
@@ -142,7 +143,8 @@
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "入力候補陳列での (Shift+)Tab キーの輪番切替対象をご指定ください。";
 "Choose the behavior of Shift+Letter key with letter inputs." = "Shift+文字キーの行為をご指定ください。";
 "Choose the cursor position where you want to list possible candidates." = "カーソルはどこで入力候補を呼び出すかとご指定ださい。";
-"Choose the macOS-level basic keyboard layout." = "macOS 基礎キーボード配置をご指定ください。";
+"Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode toggled by Shift key." = "macOS 英数キーボード配置をご指定ください。「Shift キーで切り替える英数入力モード」に使われる配置である。";
+"Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "macOS 基礎キーボード配置をご指定ください。QWERTY 以外の英数キーボードは弁音以外の配列に不適用。";
 "Choose the phonetic layout for Mandarin parser." = "共通語分析器の注音配列をご指定ください。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "欲しがるユーザー辞書保存先をご指定ください。無効なる保存先設定は省かれる。";
 "Choose your preferred layout of the candidate window." = "入力候補陳列の仕様をご指定ください。";
@@ -190,7 +192,6 @@
 "Keyboard" = "配列設定";
 "Misc Settings:" = "他の設定:";
 "MiTAC" = "神通配列";
-"Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "QWERTY 以外の英数キーボードは弁音以外の配列に不適用。";
 "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead." = "ご注意：Mac キーボードの「Delete ⌫」キーはここで「BackSpace ⌫」と呼ばれ、それはパソコンの常識としての本物の「Delete ⌦」と区別するためである。もし、テンキーの付いていない Mac キーボードで本物の「Delete ⌦」を使いたければ、代わりに「Fn+⌫」をご使用ください。";
 "Only override the intonation of the previous reading if different" = "カーソルの後部の音読みの異なる音調だけを上書きする";
 "Only use this with known Chromium-based browsers" = "有名なる Chromium 系ブラウザーだけに、この装置を起用";
