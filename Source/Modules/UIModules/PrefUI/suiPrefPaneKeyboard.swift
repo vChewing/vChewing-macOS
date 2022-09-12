@@ -40,7 +40,7 @@ struct suiPrefPaneKeyboard: View {
         if mgrPrefs.appleLanguages[0].contains("zh-Han") {
           return 480
         } else {
-          return 550
+          return 580
         }
     }
   }()
@@ -231,48 +231,54 @@ struct suiPrefPaneKeyboard: View {
           }
         }
         Preferences.Section(bottomDivider: true, label: { Text(LocalizedStringKey("Keyboard Shortcuts:")) }) {
-          Toggle(
-            LocalizedStringKey("Per-Char Select Mode"),
-            isOn: $selUsingHotKeySCPC.onChange {
-              mgrPrefs.usingHotKeySCPC = selUsingHotKeySCPC
+          HStack(alignment: .top, spacing: NSFont.systemFontSize) {
+            VStack(alignment: .leading) {
+              Toggle(
+                LocalizedStringKey("Per-Char Select Mode"),
+                isOn: $selUsingHotKeySCPC.onChange {
+                  mgrPrefs.usingHotKeySCPC = selUsingHotKeySCPC
+                }
+              )
+              Toggle(
+                LocalizedStringKey("Per-Char Associated Phrases"),
+                isOn: $selUsingHotKeyAssociates.onChange {
+                  mgrPrefs.usingHotKeyAssociates = selUsingHotKeyAssociates
+                }
+              )
+              Toggle(
+                LocalizedStringKey("CNS11643 Mode"),
+                isOn: $selUsingHotKeyCNS.onChange {
+                  mgrPrefs.usingHotKeyCNS = selUsingHotKeyCNS
+                }
+              )
+              Toggle(
+                LocalizedStringKey("Force KangXi Writing"),
+                isOn: $selUsingHotKeyKangXi.onChange {
+                  mgrPrefs.usingHotKeyKangXi = selUsingHotKeyKangXi
+                }
+              )
             }
-          )
-          Toggle(
-            LocalizedStringKey("Per-Char Associated Phrases"),
-            isOn: $selUsingHotKeyAssociates.onChange {
-              mgrPrefs.usingHotKeyAssociates = selUsingHotKeyAssociates
+            VStack(alignment: .leading) {
+              Toggle(
+                LocalizedStringKey("JIS Shinjitai Output"),
+                isOn: $selUsingHotKeyJIS.onChange {
+                  mgrPrefs.usingHotKeyJIS = selUsingHotKeyJIS
+                }
+              )
+              Toggle(
+                LocalizedStringKey("Half-Width Punctuation Mode"),
+                isOn: $selUsingHotKeyHalfWidthASCII.onChange {
+                  mgrPrefs.usingHotKeyHalfWidthASCII = selUsingHotKeyHalfWidthASCII
+                }
+              )
+              Toggle(
+                LocalizedStringKey("Currency Numeral Output"),
+                isOn: $selUsingHotKeyCurrencyNumerals.onChange {
+                  mgrPrefs.usingHotKeyCurrencyNumerals = selUsingHotKeyCurrencyNumerals
+                }
+              )
             }
-          )
-          Toggle(
-            LocalizedStringKey("CNS11643 Mode"),
-            isOn: $selUsingHotKeyCNS.onChange {
-              mgrPrefs.usingHotKeyCNS = selUsingHotKeyCNS
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Force KangXi Writing"),
-            isOn: $selUsingHotKeyKangXi.onChange {
-              mgrPrefs.usingHotKeyKangXi = selUsingHotKeyKangXi
-            }
-          )
-          Toggle(
-            LocalizedStringKey("JIS Shinjitai Output"),
-            isOn: $selUsingHotKeyJIS.onChange {
-              mgrPrefs.usingHotKeyJIS = selUsingHotKeyJIS
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Half-Width Punctuation Mode"),
-            isOn: $selUsingHotKeyHalfWidthASCII.onChange {
-              mgrPrefs.usingHotKeyHalfWidthASCII = selUsingHotKeyHalfWidthASCII
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Currency Numeral Output"),
-            isOn: $selUsingHotKeyCurrencyNumerals.onChange {
-              mgrPrefs.usingHotKeyCurrencyNumerals = selUsingHotKeyCurrencyNumerals
-            }
-          )
+          }
         }
       }
     }
