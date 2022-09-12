@@ -220,7 +220,7 @@
 		5B175FFA28C5CDDC0078D1B4 /* IMKHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMKHelper.swift; sourceTree = "<group>"; };
 		5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHS.txt"; sourceTree = "<group>"; };
 		5B18BA7027C7BD8B0056EB19 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
-		5B18BA7127C7BD8B0056EB19 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		5B18BA7127C7BD8B0056EB19 /* README-CHS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README-CHS.md"; sourceTree = "<group>"; };
 		5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-JPN.txt"; sourceTree = "<group>"; };
 		5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHT.txt"; sourceTree = "<group>"; };
@@ -259,7 +259,7 @@
 		5B62A34027AE7CD900A19448 /* ctlCandidate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlCandidate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A34527AE7CD900A19448 /* NotifierController.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = NotifierController.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B630A3B28CC97020010D076 /* ctlPopupCompositionBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlPopupCompositionBuffer.swift; sourceTree = "<group>"; };
-		5B65B919284D0185007C558B /* README-CHT.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README-CHT.md"; sourceTree = "<group>"; };
+		5B65B919284D0185007C558B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		5B6C141128A9D4B30098ADF8 /* ctlInputMethod_Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_Common.swift; sourceTree = "<group>"; };
 		5B73FB5427B2BD6900E9BF49 /* PhraseEditor-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "PhraseEditor-Info.plist"; path = "UserPhraseEditor/PhraseEditor-Info.plist"; sourceTree = SOURCE_ROOT; };
 		5B73FB5F27B2BE1300E9BF49 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -439,8 +439,8 @@
 				5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */,
 				5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */,
 				5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */,
-				5B18BA7127C7BD8B0056EB19 /* README.md */,
-				5B65B919284D0185007C558B /* README-CHT.md */,
+				5B18BA7127C7BD8B0056EB19 /* README-CHS.md */,
+				5B65B919284D0185007C558B /* README.md */,
 			);
 			name = MiscRootFiles;
 			sourceTree = "<group>";
