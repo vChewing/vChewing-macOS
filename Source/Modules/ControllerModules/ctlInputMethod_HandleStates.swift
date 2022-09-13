@@ -96,7 +96,7 @@ extension ctlInputMethod {
     guard let client = client() else { return }
     if state.type == .ofAssociates {
       client.setMarkedText(
-        state.attributedString, selectionRange: NSRange(location: 0, length: 0),
+        state.data.attributedStringPlaceholder, selectionRange: NSRange(location: 0, length: 0),
         replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
       )
       return
@@ -107,7 +107,7 @@ extension ctlInputMethod {
       /// 是 0 且取代範圍（replacementRange）為「NSNotFound」罷了。
       /// 也就是說，內文組字區該在哪裡出現，得由客體軟體來作主。
       client.setMarkedText(
-        state.attributedString, selectionRange: NSRange(state.data.u16MarkedRange),
+        attributedStringSecured.0, selectionRange: attributedStringSecured.1,
         replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
       )
       return

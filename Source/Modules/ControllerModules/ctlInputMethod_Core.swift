@@ -81,11 +81,12 @@ class ctlInputMethod: IMKInputController {
       keyHandler.composer.clear()
       handle(state: keyHandler.buildInputtingState)
     }
-    if state.hasComposition {
+    let isSecureMode = mgrPrefs.clientsIMKTextInputIncapable.contains(clientBundleIdentifier)
+    if state.hasComposition, !isSecureMode {
       /// 將傳回的新狀態交給調度函式。
       handle(state: IMEState.ofCommitting(textToCommit: state.displayedText))
     }
-    handle(state: IMEState.ofEmpty())
+    handle(state: isSecureMode ? IMEState.ofAbortion() : IMEState.ofEmpty())
   }
 
   // MARK: - IMKInputController 方法

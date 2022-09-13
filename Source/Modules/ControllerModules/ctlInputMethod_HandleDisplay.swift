@@ -13,6 +13,15 @@ import Cocoa
 // MARK: - Tooltip Display and Candidate Display Methods
 
 extension ctlInputMethod {
+  // 有些 App 會濫用內文組字區的內容來預測使用者的輸入行為。
+  // 對此類 App 有疑慮者，可以將這類 App 登記到客體管理員當中。
+  // 這樣，不但強制使用（限制讀音 20 個的）浮動組字窗，而且內文組字區只會顯示一個空格。
+  var attributedStringSecured: (NSAttributedString, NSRange) {
+    mgrPrefs.clientsIMKTextInputIncapable.contains(clientBundleIdentifier)
+      ? (state.data.attributedStringPlaceholder, NSRange(location: 0, length: 0))
+      : (state.attributedString, NSRange(state.data.u16MarkedRange))
+  }
+
   func lineHeightRect(zeroCursor: Bool = false) -> NSRect {
     var lineHeightRect = NSRect.seniorTheBeast
     guard let client = client() else {
