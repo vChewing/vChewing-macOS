@@ -165,7 +165,7 @@ extension ctlClientListMgr {
     guard let window = window else { return }
     window.title = NSLocalizedString("Client Manager", comment: "")
     lblClientMgrWindow.stringValue = NSLocalizedString(
-      "Please manage the list of IMKTextInput-incompatible clients here. Clients listed here will trigger vChewing's built-in popup composition buffer window with maximum 20 reading counts holdable.",
+      "Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. Clients listed here will only use popup composition buffer with maximum 20 reading counts holdable.",
       comment: ""
     )
     btnAddClient.title = NSLocalizedString("Add Client", comment: "")

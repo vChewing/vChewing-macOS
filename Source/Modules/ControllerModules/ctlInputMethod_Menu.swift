@@ -208,7 +208,9 @@ extension ctlInputMethod {
 
   @objc func showCheatSheet(_: Any?) {
     guard let url = Bundle.main.url(forResource: "shortcuts", withExtension: "html") else { return }
-    NSWorkspace.shared.openFile(url.path, withApplication: "Safari")
+    DispatchQueue.main.async {
+      NSWorkspace.shared.openFile(url.path, withApplication: "Safari")
+    }
   }
 
   @objc func showClientListMgr(_: Any?) {

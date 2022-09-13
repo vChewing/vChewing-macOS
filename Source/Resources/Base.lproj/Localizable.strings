@@ -3,7 +3,7 @@
 "One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed." = "One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed.";
 "Just Select" = "Just Select";
 "Client Manager" = "Client Manager";
-"Please manage the list of IMKTextInput-incompatible clients here. Clients listed here will trigger vChewing's built-in popup composition buffer window with maximum 20 reading counts holdable." = "Please manage the list of IMKTextInput-incompatible clients here. Clients listed here will trigger vChewing's built-in popup composition buffer window with maximum 20 reading counts holdable.";
+"Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. Clients listed here will only use popup composition buffer with maximum 20 reading counts holdable." = "Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. Clients listed here will only use popup composition buffer with maximum 20 reading counts holdable.";
 "Add Client" = "Add Client";
 "Remove Selected" = "Remove Selected";
 "Choose the target application bundle." = "Choose the target application bundle.";

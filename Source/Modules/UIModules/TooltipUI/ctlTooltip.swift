@@ -18,7 +18,7 @@ public class ctlTooltip: NSWindowController {
     case prompt
   }
 
-  private var messageText: NSAttributedTextView
+  private var messageText: NSAttributedTooltipTextView
   private var tooltip: String = "" {
     didSet {
       messageText.text = tooltip.isEmpty ? nil : tooltip
@@ -26,7 +26,7 @@ public class ctlTooltip: NSWindowController {
     }
   }
 
-  public var direction: NSAttributedTextView.writingDirection = .horizontal {
+  public var direction: NSAttributedTooltipTextView.writingDirection = .horizontal {
     didSet {
       if #unavailable(macOS 10.13) { direction = .horizontal }
       if Bundle.main.preferredLocalizations[0] == "en" { direction = .horizontal }
@@ -43,7 +43,7 @@ public class ctlTooltip: NSWindowController {
     panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel) + 2)
     panel.hasShadow = true
     panel.backgroundColor = NSColor.controlBackgroundColor
-    messageText = NSAttributedTextView()
+    messageText = NSAttributedTooltipTextView()
     messageText.backgroundColor = NSColor.controlBackgroundColor
     messageText.textColor = NSColor.textColor
     panel.contentView?.addSubview(messageText)
@@ -58,7 +58,7 @@ public class ctlTooltip: NSWindowController {
   public func show(
     tooltip: String = "", at point: NSPoint,
     bottomOutOfScreenAdjustmentHeight heightDelta: CGFloat,
-    direction: NSAttributedTextView.writingDirection = .horizontal
+    direction: NSAttributedTooltipTextView.writingDirection = .horizontal
   ) {
     self.direction = direction
     self.tooltip = tooltip
@@ -147,24 +147,7 @@ public class ctlTooltip: NSWindowController {
   }
 
   private func adjustSize() {
-    let attrString = messageText.attributedStringValue
-    var rect = attrString.boundingRect(
-      with: NSSize(width: 1600.0, height: 1600.0),
-      options: [.usesLineFragmentOrigin, .usesFontLeading, .usesDeviceMetrics]
-    )
-    if direction != .horizontal {
-      rect = .init(x: rect.minX, y: rect.minY, width: rect.height, height: rect.width)
-      rect.size.height += NSFont.systemFontSize
-      rect.size.width *= 1.03
-      rect.size.width = max(rect.size.width, NSFont.systemFontSize * 1.05)
-      rect.size.width = ceil(rect.size.width)
-    } else {
-      rect = .init(x: rect.minX, y: rect.minY, width: rect.width, height: rect.height)
-      rect.size.width += NSFont.systemFontSize
-      rect.size.height *= 1.03
-      rect.size.height = max(rect.size.height, NSFont.systemFontSize * 1.05)
-      rect.size.height = ceil(rect.size.height)
-    }
+    var rect = messageText.shrinkFrame()
     var bigRect = rect
     bigRect.size.width += NSFont.systemFontSize
     bigRect.size.height += NSFont.systemFontSize
