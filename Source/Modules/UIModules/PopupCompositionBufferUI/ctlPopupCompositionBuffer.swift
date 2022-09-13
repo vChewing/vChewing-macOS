@@ -9,6 +9,14 @@
 import Cocoa
 
 public class ctlPopupCompositionBuffer: NSWindowController {
+  public var isTypingDirectionVertical: Bool = false {
+    didSet {
+      if #unavailable(macOS 10.14) {
+        isTypingDirectionVertical = false
+      }
+    }
+  }
+
   private var messageTextField: NSTextField
   private var textShown: NSAttributedString = .init(string: "") {
     didSet {
@@ -18,18 +26,15 @@ public class ctlPopupCompositionBuffer: NSWindowController {
   }
 
   public init() {
-    let transparentVisualEffect = NSVisualEffectView()
-    transparentVisualEffect.blendingMode = .behindWindow
-    transparentVisualEffect.state = .active
     let contentRect = NSRect(x: 128.0, y: 128.0, width: 300.0, height: 20.0)
     let styleMask: NSWindow.StyleMask = [.borderless, .nonactivatingPanel]
     let panel = NSPanel(
       contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false
     )
-    panel.contentView = transparentVisualEffect
     panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel) + 1)
     panel.hasShadow = true
-    panel.backgroundColor = NSColor.clear
+    panel.backgroundColor = NSColor.controlBackgroundColor
+    panel.styleMask = .fullSizeContentView
 
     messageTextField = NSTextField()
     messageTextField.isEditable = false
@@ -40,6 +45,7 @@ public class ctlPopupCompositionBuffer: NSWindowController {
     messageTextField.backgroundColor = NSColor.clear
     messageTextField.font = .systemFont(ofSize: 18)
     panel.contentView?.addSubview(messageTextField)
+    panel.contentView?.wantsLayer = true
     super.init(window: panel)
   }
 
@@ -53,31 +59,74 @@ public class ctlPopupCompositionBuffer: NSWindowController {
       hide()
       return
     }
-    // 在這個視窗內的下畫線繪製方法就得單獨設計了。
+
     let attrString: NSMutableAttributedString = .init(string: state.data.displayedTextConverted)
-    attrString.setAttributes(
-      [
-        .backgroundColor: NSColor.alternateSelectedControlColor,
-        .foregroundColor: NSColor.alternateSelectedControlTextColor,
+    let verticalAttributes: [NSAttributedString.Key: Any] = [
+      .verticalGlyphForm: true,
+      .paragraphStyle: {
+        let newStyle = NSMutableParagraphStyle()
+        if #available(macOS 10.13, *) {
+          let fontSize = messageTextField.font?.pointSize ?? 18
+          newStyle.lineSpacing = fontSize / -3
+          newStyle.maximumLineHeight = fontSize
+          newStyle.minimumLineHeight = fontSize
+        }
+        return newStyle
+      }(),
+    ]
+
+    if isTypingDirectionVertical {
+      attrString.setAttributes(
+        verticalAttributes, range: NSRange(location: 0, length: attrString.string.utf16.count)
+      )
+    }
+
+    let markerAttributes: [NSAttributedString.Key: Any] = {
+      var result: [NSAttributedString.Key: Any] = [
+        .backgroundColor: IME.isDarkMode ? NSColor.systemRed : NSColor.systemYellow,
         .markedClauseSegment: 0,
-      ],
+      ]
+      if isTypingDirectionVertical {
+        result[.paragraphStyle] = verticalAttributes[.paragraphStyle]
+        result[.verticalGlyphForm] = true
+      }
+      return result
+    }()
+
+    // 在這個視窗內的下畫線繪製方法就得單獨設計了。
+    attrString.setAttributes(
+      markerAttributes,
       range: NSRange(
         location: state.data.u16MarkedRange.lowerBound,
         length: state.data.u16MarkedRange.upperBound - state.data.u16MarkedRange.lowerBound
       )
     )
-    let attrCursor = NSMutableAttributedString(string: "_")
-    if #available(macOS 10.13, *) {
-      attrCursor.setAttributes(
-        [
-          .kern: -18,
-          .baselineOffset: -2,
-          .markedClauseSegment: 1,
-        ],
-        range: NSRange(location: 0, length: attrCursor.string.utf16.count)
-      )
-    }
+
+    let cursorAttributes: [NSAttributedString.Key: Any] = {
+      var result: [NSAttributedString.Key: Any] = [
+        .kern: -18,
+        .foregroundColor: NSColor.textColor,
+      ]
+      if isTypingDirectionVertical {
+        result[.paragraphStyle] = verticalAttributes[.paragraphStyle]
+        result[.verticalGlyphForm] = true
+        result[.baselineOffset] = 3
+      } else {
+        result[.baselineOffset] = -2
+      }
+      if #unavailable(macOS 10.13) {
+        result[.kern] = 0
+        result[.baselineOffset] = 0
+      }
+      return result
+    }()
+
+    let attrCursor: NSAttributedString =
+      isTypingDirectionVertical
+      ? NSMutableAttributedString(string: "▔", attributes: cursorAttributes)
+      : NSMutableAttributedString(string: "_", attributes: cursorAttributes)
     attrString.insert(attrCursor, at: state.data.u16Cursor)
+
     textShown = attrString
     messageTextField.maximumNumberOfLines = 1
     if let editor = messageTextField.currentEditor() {
@@ -105,7 +154,11 @@ public class ctlPopupCompositionBuffer: NSWindowController {
     adjustedPoint.y = min(max(adjustedPoint.y, screenFrame.minY + windowSize.height), screenFrame.maxY)
     adjustedPoint.x = min(max(adjustedPoint.x, screenFrame.minX), screenFrame.maxX - windowSize.width)
 
-    window.setFrameOrigin(adjustedPoint)
+    if isTypingDirectionVertical {
+      window.setFrameTopLeftPoint(adjustedPoint)
+    } else {
+      window.setFrameOrigin(adjustedPoint)
+    }
   }
 
   private func adjustSize() {
@@ -115,12 +168,21 @@ public class ctlPopupCompositionBuffer: NSWindowController {
       options: [.usesLineFragmentOrigin, .usesFontLeading]
     )
     rect.size.width = max(rect.size.width, 20 * CGFloat(attrString.string.count)) + 2
-    rect.size.height = 22
+    rect.size.height *= 1.2
+    rect.size.height = max(22, rect.size.height)
+    if isTypingDirectionVertical {
+      rect = .init(x: rect.minX, y: rect.minY, width: rect.height, height: rect.width)
+    }
     var bigRect = rect
     bigRect.size.width += NSFont.systemFontSize
     bigRect.size.height += NSFont.systemFontSize
     rect.origin.x += ceil(NSFont.systemFontSize / 2)
     rect.origin.y += ceil(NSFont.systemFontSize / 2)
+    if isTypingDirectionVertical {
+      messageTextField.boundsRotation = 90
+    } else {
+      messageTextField.boundsRotation = 0
+    }
     messageTextField.frame = rect
     window?.setFrame(bigRect, display: true)
   }
