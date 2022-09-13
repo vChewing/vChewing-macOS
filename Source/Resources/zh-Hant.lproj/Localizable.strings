@@ -3,7 +3,7 @@
 "One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed." = "每行一筆記錄，用 Option+Enter 換行。\n空白值會被無視。";
 "Just Select" = "直接選取";
 "Client Manager" = "管理客體應用";
-"Please manage the list of IMKTextInput-incompatible clients here. Clients listed here will trigger vChewing's built-in popup composition buffer window with maximum 20 reading counts holdable." = "請在此管理那些不遵守 IMKTextInput 協定的客體應用。威注音輸入法對於任何位列在此的客體應用均啟用浮動組字窗、且對組字區內容設定容量上限（最多二十個讀音）。";
+"Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. Clients listed here will only use popup composition buffer with maximum 20 reading counts holdable." = "請在此管理這兩類客體應用：1) 不遵守 IMKTextInput 協定；2）有濫用內文組字區的嫌疑。威注音輸入法對於任何位列在此的客體應用均啟用浮動組字窗、且對組字區內容設定容量上限（最多二十個讀音）。";
 "Add Client" = "登記新客體";
 "Remove Selected" = "移除所選條目";
 "Choose the target application bundle." = "請選擇要登記的應用程式的封包。";
