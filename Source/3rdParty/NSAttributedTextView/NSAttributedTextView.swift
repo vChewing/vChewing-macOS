@@ -60,7 +60,7 @@ public class NSAttributedTextView: NSView {
     }
   }
 
-  public var attributedStringValue: NSAttributedString {
+  public func attributedStringValue(areaCalculation: Bool = false) -> NSAttributedString {
     var newAttributes = attributes
     let isVertical: Bool = !(direction == .horizontal)
     newAttributes[.verticalGlyphForm] = isVertical
@@ -71,23 +71,14 @@ public class NSAttributedTextView: NSView {
       newStyle.minimumLineHeight = fontSize * 1.1
     }
     newAttributes[.paragraphStyle] = newStyle
-    var text: String = text ?? ""
-    if !(direction == .horizontal) {
-      text = text.replacingOccurrences(of: "˙", with: "･")
-      text = text.replacingOccurrences(of: "\u{A0}", with: "　")
-      text = text.replacingOccurrences(of: "+", with: "")
-      text = text.replacingOccurrences(of: "Shift", with: "⇧")
-      text = text.replacingOccurrences(of: "Control", with: "⌃")
-      text = text.replacingOccurrences(of: "Enter", with: "⏎")
-      text = text.replacingOccurrences(of: "Command", with: "⌘")
-      text = text.replacingOccurrences(of: "Delete", with: "⌦")
-      text = text.replacingOccurrences(of: "BackSpace", with: "⌫")
-      text = text.replacingOccurrences(of: "SHIFT", with: "⇧")
-      text = text.replacingOccurrences(of: "CONTROL", with: "⌃")
-      text = text.replacingOccurrences(of: "ENTER", with: "⏎")
-      text = text.replacingOccurrences(of: "COMMAND", with: "⌘")
-      text = text.replacingOccurrences(of: "DELETE", with: "⌦")
-      text = text.replacingOccurrences(of: "BACKSPACE", with: "⌫")
+    var text: String = text ?? text ?? ""
+    if areaCalculation {
+      text = text.replacingOccurrences(
+        of: "[^\n]",
+        with: "國",
+        options: .regularExpression,
+        range: text.range(of: text)
+      )
     }
     let attributedText = NSMutableAttributedString(string: text, attributes: newAttributes)
     return attributedText
@@ -109,10 +100,33 @@ public class NSAttributedTextView: NSView {
   private var ctFrame: CTFrame?
   private(set) var currentRect: NSRect?
 
+  @discardableResult public func shrinkFrame() -> NSRect {
+    let attrString: NSAttributedString = {
+      switch direction {
+        case .horizontal: return attributedStringValue()
+        default: return attributedStringValue(areaCalculation: true)
+      }
+    }()
+    var rect = attrString.boundingRect(
+      with: NSSize(width: 1600.0, height: 1600.0),
+      options: [.usesLineFragmentOrigin, .usesFontLeading, .usesDeviceMetrics]
+    )
+    rect.size.height *= 1.03
+    rect.size.height = max(rect.size.height, NSFont.systemFontSize * 1.1)
+    rect.size.height = ceil(rect.size.height)
+    rect.size.width *= 1.03
+    rect.size.width = max(rect.size.width, NSFont.systemFontSize * 1.05)
+    rect.size.width = ceil(rect.size.width)
+    if direction != .horizontal {
+      rect = .init(x: rect.minX, y: rect.minY, width: rect.height, height: rect.width)
+    }
+    return rect
+  }
+
   override public func draw(_ rect: CGRect) {
     let context = NSGraphicsContext.current?.cgContext
     guard let context = context else { return }
-    let setter = CTFramesetterCreateWithAttributedString(attributedStringValue)
+    let setter = CTFramesetterCreateWithAttributedString(attributedStringValue())
     let path = CGPath(rect: rect, transform: nil)
     let theCTFrameProgression: CTFrameProgression = {
       switch direction {
@@ -132,5 +146,48 @@ public class NSAttributedTextView: NSView {
     bgPath.fill()
     currentRect = rect
     CTFrameDraw(newFrame, context)
+  }
+}
+
+public class NSAttributedTooltipTextView: NSAttributedTextView {
+  override public func attributedStringValue(areaCalculation: Bool = false) -> NSAttributedString {
+    var newAttributes = attributes
+    let isVertical: Bool = !(direction == .horizontal)
+    newAttributes[.verticalGlyphForm] = isVertical
+    let newStyle: NSMutableParagraphStyle = newAttributes[.paragraphStyle] as! NSMutableParagraphStyle
+    if #available(macOS 10.13, *) {
+      newStyle.lineSpacing = isVertical ? (fontSize / -2) : fontSize * 0.1
+      newStyle.maximumLineHeight = fontSize * 1.1
+      newStyle.minimumLineHeight = fontSize * 1.1
+    }
+    newAttributes[.paragraphStyle] = newStyle
+    var text: String = text ?? text ?? ""
+    if !(direction == .horizontal) {
+      text = text.replacingOccurrences(of: "˙", with: "･")
+      text = text.replacingOccurrences(of: "\u{A0}", with: "　")
+      text = text.replacingOccurrences(of: "+", with: "")
+      text = text.replacingOccurrences(of: "Shift", with: "⇧")
+      text = text.replacingOccurrences(of: "Control", with: "⌃")
+      text = text.replacingOccurrences(of: "Enter", with: "⏎")
+      text = text.replacingOccurrences(of: "Command", with: "⌘")
+      text = text.replacingOccurrences(of: "Delete", with: "⌦")
+      text = text.replacingOccurrences(of: "BackSpace", with: "⌫")
+      text = text.replacingOccurrences(of: "SHIFT", with: "⇧")
+      text = text.replacingOccurrences(of: "CONTROL", with: "⌃")
+      text = text.replacingOccurrences(of: "ENTER", with: "⏎")
+      text = text.replacingOccurrences(of: "COMMAND", with: "⌘")
+      text = text.replacingOccurrences(of: "DELETE", with: "⌦")
+      text = text.replacingOccurrences(of: "BACKSPACE", with: "⌫")
+    }
+    if areaCalculation {
+      text = text.replacingOccurrences(
+        of: "[^\n]",
+        with: "國",
+        options: .regularExpression,
+        range: text.range(of: text)
+      )
+    }
+    let attributedText = NSMutableAttributedString(string: text, attributes: newAttributes)
+    return attributedText
   }
 }
