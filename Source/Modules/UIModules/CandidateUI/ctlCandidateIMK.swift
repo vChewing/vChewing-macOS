@@ -163,40 +163,23 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     }
   }
 
-  func doSet(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
+  func doSet(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight heightDelta: CGFloat) {
     var adjustedPoint = windowTopLeftPoint
-    var adjustedHeight = height
-
-    var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.seniorTheBeast
-    for screen in NSScreen.screens {
-      let frame = screen.visibleFrame
-      if windowTopLeftPoint.x >= frame.minX, windowTopLeftPoint.x <= frame.maxX,
-        windowTopLeftPoint.y >= frame.minY, windowTopLeftPoint.y <= frame.maxY
-      {
-        screenFrame = frame
-        break
-      }
-    }
-
-    if adjustedHeight > screenFrame.size.height / 2.0 { adjustedHeight = 0.0 }
-
     let windowSize = candidateFrame().size
-
-    // bottom beneath the screen?
-    if adjustedPoint.y - windowSize.height < screenFrame.minY {
-      adjustedPoint.y = windowTopLeftPoint.y + adjustedHeight + windowSize.height
+    var delta = heightDelta
+    var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.seniorTheBeast
+    for frame in NSScreen.screens.map(\.visibleFrame).filter({ $0.contains(windowTopLeftPoint) }) {
+      screenFrame = frame
+      break
     }
 
-    // top over the screen?
-    if adjustedPoint.y >= screenFrame.maxY { adjustedPoint.y = screenFrame.maxY - 1.0 }
+    if delta > screenFrame.size.height / 2.0 { delta = 0.0 }
 
-    // right
-    if adjustedPoint.x + windowSize.width >= screenFrame.maxX {
-      adjustedPoint.x = screenFrame.maxX - windowSize.width
+    if adjustedPoint.y < screenFrame.minY + windowSize.height {
+      adjustedPoint.y = windowTopLeftPoint.y + windowSize.height + delta
     }
-
-    // left
-    if adjustedPoint.x < screenFrame.minX { adjustedPoint.x = screenFrame.minX }
+    adjustedPoint.y = min(adjustedPoint.y, screenFrame.maxY - 1.0)
+    adjustedPoint.x = min(max(adjustedPoint.x, screenFrame.minX), screenFrame.maxX - windowSize.width - 1.0)
 
     setCandidateFrameTopLeft(adjustedPoint)
   }

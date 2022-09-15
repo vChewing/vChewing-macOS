@@ -175,6 +175,7 @@ FakesAssemblies/
 Generated\ Files/
 Generated_Code/
 Icon
+Installer/PKGRoot/
 install-sh
 ipch/
 Makefile.in

@@ -1,4 +1,6 @@
 "vChewing" = "威注音輸入法";
+"Alphanumerical Input Mode" = "英數輸入模式";
+"Chinese Input Mode" = "中文輸入模式";
 "Please enter the client app bundle identifier(s) you want to register." = "請鍵入您要登記的客體應用的唯一標幟（Bundle Identifier）。";
 "One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed." = "每行一筆記錄，用 Option+Enter 換行。\n空白值會被無視。";
 "Just Select" = "直接選取";
@@ -68,7 +70,6 @@
 "zh-Hans" = "簡體中文";
 "zh-Hant" = "繁體中文";
 "ja" = "和文";
-"Alphanumerical Input Mode" = "原生英數輸入模式";
 "Apple Zhuyin Bopomofo (Dachen)" = "Apple 標準注音鍵盤佈局 (大千)";
 "Apple Zhuyin Eten (Traditional)" = "Apple 倚天注音鍵盤佈局 (傳統)";
 "Symbol & Emoji Input" = "符號＆繪文字輸入";

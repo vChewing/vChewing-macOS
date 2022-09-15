@@ -1,4 +1,6 @@
 "vChewing" = "vChewing";
+"Alphanumerical Input Mode" = "Alphanumerical Input Mode";
+"Chinese Input Mode" = "Chinese Input Mode";
 "Please enter the client app bundle identifier(s) you want to register." = "Please enter the client app bundle identifier(s) you want to register.";
 "One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed." = "One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed.";
 "Just Select" = "Just Select";
@@ -68,7 +70,6 @@
 "zh-Hans" = "Simplified Chinese";
 "zh-Hant" = "Traditional Chinese";
 "ja" = "Japanese";
-"Alphanumerical Input Mode" = "Alphanumerical Input Mode";
 "Apple Zhuyin Bopomofo (Dachen)" = "Apple Zhuyin Bopomofo (Standard)";
 "Apple Zhuyin Eten (Traditional)" = "Apple Zhuyin Eten (Traditional)";
 "Symbol & Emoji Input" = "Symbol & Emoji Input";

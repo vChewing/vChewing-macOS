@@ -90,13 +90,15 @@
 		</array>
 	</dict>
 	<key>InputMethodConnectionName</key>
-	<string>org.atelierInmu.inputmethod.vChewing_Connection</string>
+	<string>org_atelierInmu_inputmethod_vChewing_Connection</string>
 	<key>InputMethodServerControllerClass</key>
 	<string>ctlInputMethod</string>
 	<key>InputMethodServerDelegateClass</key>
 	<string>ctlInputMethod</string>
 	<key>InputMethodServerPreferencesWindowControllerClass</key>
 	<string>ctlPrefWindow</string>
+	<key>InputMethodSessionController</key>
+	<string>ctlInputMethod</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSHasLocalizedDisplayName</key>
@@ -131,9 +133,10 @@
 	<array>
 		<string>Hans</string>
 		<string>Hant</string>
-		<string>Han</string>
+		<string>Hani</string>
+		<string>Hanb</string>
 	</array>
 	<key>tsInputMethodIconFileKey</key>
-	<string>Bopomofo.tiff</string>
+	<string>MenuIcon-TCVIM.png</string>
 </dict>
 </plist>

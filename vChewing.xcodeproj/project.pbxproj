@@ -227,7 +227,6 @@
 		5B20430628BEE30900BFC6FD /* BookmarkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkManager.swift; sourceTree = "<group>"; };
 		5B20430B28BEFC0C00BFC6FD /* vChewing.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewing.entitlements; sourceTree = "<group>"; };
 		5B20430C28BEFC1200BFC6FD /* vChewingPhraseEditor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewingPhraseEditor.entitlements; sourceTree = "<group>"; };
-		5B20430D28BF279900BFC6FD /* vChewingInstaller.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewingInstaller.entitlements; sourceTree = "<group>"; };
 		5B21176B287539BB000443A9 /* ctlInputMethod_HandleStates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_HandleStates.swift; sourceTree = "<group>"; };
 		5B21176D28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_HandleDisplay.swift; sourceTree = "<group>"; };
 		5B21176F28753B9D000443A9 /* ctlInputMethod_Delegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_Delegates.swift; sourceTree = "<group>"; };
@@ -474,6 +473,13 @@
 				5BA0DF2E2817857D009E73BB /* lmUserOverride.swift */,
 			);
 			path = SubLMs;
+			sourceTree = "<group>";
+		};
+		5B44B97C28D2F283004508BF /* PKGRoot */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = PKGRoot;
 			sourceTree = "<group>";
 		};
 		5B5F8AEC28C86AB3007C11F1 /* NSAttributedTextView */ = {
@@ -815,7 +821,6 @@
 		6A0D4E9215FC0CFA00ABF4B3 = {
 			isa = PBXGroup;
 			children = (
-				5B20430D28BF279900BFC6FD /* vChewingInstaller.entitlements */,
 				5B20430C28BEFC1200BFC6FD /* vChewingPhraseEditor.entitlements */,
 				5B20430B28BEFC0C00BFC6FD /* vChewing.entitlements */,
 				5BBD627827B6C4D900271480 /* Update-Info.plist */,
@@ -899,6 +904,7 @@
 		6ACA41E715FC1D9000935EF6 /* Installer */ = {
 			isa = PBXGroup;
 			children = (
+				5B44B97C28D2F283004508BF /* PKGRoot */,
 				6A225A1E23679F2600F685C6 /* NotarizedArchives */,
 				5BBBB77827AEDB330023B93A /* Resources */,
 				D4F0BBE0279AF8B30071253C /* AppDelegate.swift */,
@@ -961,9 +967,10 @@
 			buildPhases = (
 				6A0D4E9E15FC0D2D00ABF4B3 /* Sources */,
 				6A0D4E9F15FC0D2D00ABF4B3 /* Frameworks */,
-				5B9A5A00285184BB001FFCAF /* ShellScript */,
+				5B9A5A00285184BB001FFCAF /* Run Script (Build Dictionary Data) */,
 				6A0D4EA015FC0D2D00ABF4B3 /* Resources */,
 				5BDC5CBE27C28E8B00E1CCE2 /* Embed Foundation Extensions */,
+				5B6F882E28D2F49F004EF52F /* Run Script (Build PKG Installer) */,
 			);
 			buildRules = (
 			);
@@ -1129,7 +1136,26 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		5B9A5A00285184BB001FFCAF /* ShellScript */ = {
+		5B6F882E28D2F49F004EF52F /* Run Script (Build PKG Installer) */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script (Build PKG Installer)";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/zsh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n# cd \"${SRCROOT}/\"\n# mkdir -p \"${SRCROOT}/Installer/PKGRoot/Library/Input Methods/\"\n# mkdir -p \"${SRCROOT}/Installer/PKGRoot/Library/Keyboard Layouts/\"\n# cp -a \"${BUILD_DIR}/Release/vChewing.app\" \"${SRCROOT}/Installer/PKGRoot/Library/Input Methods/\"\n# cp -a ${SRCROOT}/KeyboardExtension/vChewingKeyLayout.bundle \"${SRCROOT}/Installer/PKGRoot/Library/Keyboard Layouts/\"\n# cp -a ${SRCROOT}/KeyboardExtension/vChewingKeyLayout.bundle/Contents/Resources/vChewing*.keylayout \"${SRCROOT}/Installer/PKGRoot/Library/Keyboard Layouts/\"\n";
+		};
+		5B9A5A00285184BB001FFCAF /* Run Script (Build Dictionary Data) */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1155,6 +1181,7 @@
 				"$(SRCROOT)/Source/Data/components/common/data-zhuyinwen.txt",
 				"$(SRCROOT)/Source/Data/components/common/phone-header.txt",
 			);
+			name = "Run Script (Build Dictionary Data)";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -1483,7 +1510,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2610;
+				CURRENT_PROJECT_VERSION = 2620;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1493,7 +1520,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 2.6.1;
+				MARKETING_VERSION = 2.6.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewingTests;
@@ -1522,13 +1549,13 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2610;
+				CURRENT_PROJECT_VERSION = 2620;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 2.6.1;
+				MARKETING_VERSION = 2.6.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewingTests;
@@ -1560,7 +1587,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2610;
+				CURRENT_PROJECT_VERSION = 2620;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1582,7 +1609,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.6.1;
+				MARKETING_VERSION = 2.6.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
@@ -1612,7 +1639,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2610;
+				CURRENT_PROJECT_VERSION = 2620;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -1630,7 +1657,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.6.1;
+				MARKETING_VERSION = 2.6.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
@@ -1746,7 +1773,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2610;
+				CURRENT_PROJECT_VERSION = 2620;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1775,7 +1802,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.6.1;
+				MARKETING_VERSION = 2.6.2;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1805,7 +1832,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2610;
+				CURRENT_PROJECT_VERSION = 2620;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1828,7 +1855,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.6.1;
+				MARKETING_VERSION = 2.6.2;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1848,14 +1875,13 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = vChewingInstaller.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2610;
+				CURRENT_PROJECT_VERSION = 2620;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
-				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -1873,7 +1899,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.6.1;
+				MARKETING_VERSION = 2.6.2;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingInstaller;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1892,14 +1918,13 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = vChewingInstaller.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2610;
+				CURRENT_PROJECT_VERSION = 2620;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
-				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
@@ -1911,7 +1936,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.6.1;
+				MARKETING_VERSION = 2.6.2;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingInstaller;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

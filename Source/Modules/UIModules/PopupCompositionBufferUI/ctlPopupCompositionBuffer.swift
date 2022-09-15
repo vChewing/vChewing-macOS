@@ -146,7 +146,7 @@ public class ctlPopupCompositionBuffer: NSWindowController {
 
     var adjustedPoint = windowOrigin
     var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.seniorTheBeast
-    for frame in NSScreen.screens.map(\.visibleFrame).filter({ !$0.contains(windowOrigin) }) {
+    for frame in NSScreen.screens.map(\.visibleFrame).filter({ $0.contains(windowOrigin) }) {
       screenFrame = frame
       break
     }
