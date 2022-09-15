@@ -168,7 +168,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     let windowSize = candidateFrame().size
     var delta = heightDelta
     var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.seniorTheBeast
-    for frame in NSScreen.screens.map(\.visibleFrame).filter({ !$0.contains(windowTopLeftPoint) }) {
+    for frame in NSScreen.screens.map(\.visibleFrame).filter({ $0.contains(windowTopLeftPoint) }) {
       screenFrame = frame
       break
     }
