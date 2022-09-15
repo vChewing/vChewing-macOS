@@ -3,10 +3,8 @@
 TARGET='vChewing'
 login_user=$(/usr/bin/stat -f%Su /dev/console)
 
-base_ver=12.0
-ver=$(sw_vers | grep ProductVersion | cut -d':' -f2 | tr -d ' ')
-if [ $(echo -e $base_ver"\n"$ver | sort -V | tail -1) == "$base_ver" ]
-then
+OS_Version=$(sw_vers -productVersion)
+if [[ ${OS_Version} < 12.0.0 ]]; then
   # Copy the wrongfully installed contents to the right location:
   cp -r /Library/Input\ Methods/"${TARGET}".app /Users/"${login_user}"/Library/Input\ Methods/ || true
   cp -r /Library/Keyboard\ Layouts/"${TARGET}"* /Users/"${login_user}"/Library/Keyboard\ Layouts/ || true
