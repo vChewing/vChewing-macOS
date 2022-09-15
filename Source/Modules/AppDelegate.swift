@@ -28,7 +28,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
   private var ctlClientListMgrInstance: ctlClientListMgr?
   private var ctlPrefWindowInstance: ctlPrefWindow?
   private var ctlAboutWindowInstance: ctlAboutWindow?  // New About Window
-  public lazy var folderMonitor = FolderMonitor(
+  public var folderMonitor = FolderMonitor(
     url: URL(fileURLWithPath: mgrLangModel.dataFolderPath(isDefaultFolder: false))
   )
   private var currentAlertType: String = ""
@@ -54,12 +54,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
 
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
       IME.initLangModels(userOnly: false)
+      self.folderMonitor.folderDidChange = { [weak self] in
+        self?.reloadOnFolderChangeHappens()
+      }
+      if mgrLangModel.userDataFolderExists {
+        self.folderMonitor.startMonitoring()
+      }
     }
-
-    folderMonitor.folderDidChange = { [weak self] in
-      self?.reloadOnFolderChangeHappens()
-    }
-    folderMonitor.startMonitoring()
 
     mgrPrefs.fixOddPreferences()
     mgrPrefs.setMissingDefaults()
@@ -78,7 +79,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     folderMonitor.folderDidChange = { [weak self] in
       self?.reloadOnFolderChangeHappens()
     }
-    folderMonitor.startMonitoring()
+    if mgrLangModel.userDataFolderExists {
+      folderMonitor.startMonitoring()
+    }
   }
 
   func showClientListMgr() {
