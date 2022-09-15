@@ -475,6 +475,13 @@
 			path = SubLMs;
 			sourceTree = "<group>";
 		};
+		5B44B97C28D2F283004508BF /* PKGRoot */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = PKGRoot;
+			sourceTree = "<group>";
+		};
 		5B5F8AEC28C86AB3007C11F1 /* NSAttributedTextView */ = {
 			isa = PBXGroup;
 			children = (
@@ -897,6 +904,7 @@
 		6ACA41E715FC1D9000935EF6 /* Installer */ = {
 			isa = PBXGroup;
 			children = (
+				5B44B97C28D2F283004508BF /* PKGRoot */,
 				6A225A1E23679F2600F685C6 /* NotarizedArchives */,
 				5BBBB77827AEDB330023B93A /* Resources */,
 				D4F0BBE0279AF8B30071253C /* AppDelegate.swift */,
@@ -959,9 +967,10 @@
 			buildPhases = (
 				6A0D4E9E15FC0D2D00ABF4B3 /* Sources */,
 				6A0D4E9F15FC0D2D00ABF4B3 /* Frameworks */,
-				5B9A5A00285184BB001FFCAF /* ShellScript */,
+				5B9A5A00285184BB001FFCAF /* Run Script (Build Dictionary Data) */,
 				6A0D4EA015FC0D2D00ABF4B3 /* Resources */,
 				5BDC5CBE27C28E8B00E1CCE2 /* Embed Foundation Extensions */,
+				5B6F882E28D2F49F004EF52F /* Run Script (Build PKG Installer) */,
 			);
 			buildRules = (
 			);
@@ -1127,7 +1136,26 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		5B9A5A00285184BB001FFCAF /* ShellScript */ = {
+		5B6F882E28D2F49F004EF52F /* Run Script (Build PKG Installer) */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script (Build PKG Installer)";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/zsh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n# cd \"${SRCROOT}/\"\n# mkdir -p \"${SRCROOT}/Installer/PKGRoot/Library/Input Methods/\"\n# mkdir -p \"${SRCROOT}/Installer/PKGRoot/Library/Keyboard Layouts/\"\n# cp -a \"${BUILD_DIR}/Release/vChewing.app\" \"${SRCROOT}/Installer/PKGRoot/Library/Input Methods/\"\n# cp -a ${SRCROOT}/KeyboardExtension/vChewingKeyLayout.bundle \"${SRCROOT}/Installer/PKGRoot/Library/Keyboard Layouts/\"\n# cp -a ${SRCROOT}/KeyboardExtension/vChewingKeyLayout.bundle/Contents/Resources/vChewing*.keylayout \"${SRCROOT}/Installer/PKGRoot/Library/Keyboard Layouts/\"\n";
+		};
+		5B9A5A00285184BB001FFCAF /* Run Script (Build Dictionary Data) */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1153,6 +1181,7 @@
 				"$(SRCROOT)/Source/Data/components/common/data-zhuyinwen.txt",
 				"$(SRCROOT)/Source/Data/components/common/phone-header.txt",
 			);
+			name = "Run Script (Build Dictionary Data)";
 			outputFileListPaths = (
 			);
 			outputPaths = (
