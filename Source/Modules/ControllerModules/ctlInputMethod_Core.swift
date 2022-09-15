@@ -231,10 +231,9 @@ class ctlInputMethod: IMKInputController {
       if ShiftKeyUpChecker.check(event), !mgrPrefs.disableShiftTogglingAlphanumericalMode {
         if !shouldUseShiftToggleHandle || (!rencentKeyHandledByKeyHandlerEtc && shouldUseShiftToggleHandle) {
           NotifierController.notify(
-            message: NSLocalizedString("Alphanumerical Mode", comment: "") + "\n"
-              + (toggleASCIIMode()
-                ? NSLocalizedString("NotificationSwitchON", comment: "")
-                : NSLocalizedString("NotificationSwitchOFF", comment: ""))
+            message: toggleASCIIMode()
+              ? NSLocalizedString("Alphanumerical Input Mode", comment: "")
+              : NSLocalizedString("Chinese Input Mode", comment: "")
           )
         }
         if shouldUseShiftToggleHandle {
