@@ -1081,7 +1081,7 @@
 						<key>IC_REQUIREMENT_OS_DISTRIBUTION_TYPE</key>
 						<integer>0</integer>
 						<key>IC_REQUIREMENT_OS_MINIMUM_VERSION</key>
-						<integer>101105</integer>
+						<integer>101304</integer>
 					</dict>
 					<key>IC_REQUIREMENT_CHECK_TYPE</key>
 					<integer>0</integer>
@@ -1093,7 +1093,7 @@
 							<key>LANGUAGE</key>
 							<string>English</string>
 							<key>SECONDARY_VALUE</key>
-							<string>Requiring at least macOS 10.11.5 for Unicode Support.</string>
+							<string>Requiring at least macOS 10.13.</string>
 							<key>VALUE</key>
 							<string>Minimum OS Version Not Met.</string>
 						</dict>
@@ -1101,7 +1101,7 @@
 							<key>LANGUAGE</key>
 							<string>Simplified Chinese</string>
 							<key>SECONDARY_VALUE</key>
-							<string>至少 macOS 10.11.5 方可满足威注音对系统内的万国码版本支援的需要。</string>
+							<string>当前系统版本低于 macOS 10.13。</string>
 							<key>VALUE</key>
 							<string>作业系统版本太旧</string>
 						</dict>
@@ -1109,7 +1109,7 @@
 							<key>LANGUAGE</key>
 							<string>Japanese</string>
 							<key>SECONDARY_VALUE</key>
-							<string>Unicode バージョン依頼のため、macOS 10.11.5 以降が必要。</string>
+							<string>macOS 10.13 以降が必要。</string>
 							<key>VALUE</key>
 							<string>OSのバージョンは古すぎ</string>
 						</dict>
@@ -1117,7 +1117,7 @@
 							<key>LANGUAGE</key>
 							<string>Traditional Chinese</string>
 							<key>SECONDARY_VALUE</key>
-							<string>至少 macOS 10.11.5 方可滿足威注音對系統內的萬國碼版本支援的需要。</string>
+							<string>當前系統版本低於 macOS 10.13。</string>
 							<key>VALUE</key>
 							<string>作業系統版本太舊</string>
 						</dict>
