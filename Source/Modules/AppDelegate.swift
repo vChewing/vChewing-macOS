@@ -8,8 +8,9 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
-import InputMethodKit
+import FolderMonitor
+import Uninstaller
+import UpdateSputnik
 
 @objc(AppDelegate)
 class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDelegate {
@@ -17,19 +18,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     // 拖 100ms 再重載，畢竟有些有特殊需求的使用者可能會想使用巨型自訂語彙檔案。
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
       if mgrPrefs.shouldAutoReloadUserDataFiles {
-        IME.initLangModels(userOnly: true)
+        LMMgr.initUserLangModels()
       }
     }
   }
 
-  // let vChewingKeyLayoutBundle = Bundle.init(path: URL(fileURLWithPath: Bundle.main.resourcePath ?? "").appendingPathComponent("vChewingKeyLayout.bundle").path)
-
-  @IBOutlet var window: NSWindow?
+  public let updateSputnik = UpdateSputnik()
   private var ctlClientListMgrInstance: ctlClientListMgr?
   private var ctlPrefWindowInstance: ctlPrefWindow?
   private var ctlAboutWindowInstance: ctlAboutWindow?  // New About Window
   public var folderMonitor = FolderMonitor(
-    url: URL(fileURLWithPath: mgrLangModel.dataFolderPath(isDefaultFolder: false))
+    url: URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
   )
   private var currentAlertType: String = ""
 
@@ -41,8 +40,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     NSUserNotificationCenter.default.delegate = self
     // 一旦發現與使用者半衰模組的觀察行為有關的崩潰標記被開啟，就清空既有的半衰記憶資料檔案。
     if mgrPrefs.failureFlagForUOMObservation {
-      mgrLangModel.clearUserOverrideModelData(.imeModeCHS)
-      mgrLangModel.clearUserOverrideModelData(.imeModeCHT)
+      LMMgr.clearUserOverrideModelData(.imeModeCHS)
+      LMMgr.clearUserOverrideModelData(.imeModeCHT)
       mgrPrefs.failureFlagForUOMObservation = false
       let userNotification = NSUserNotification()
       userNotification.title = NSLocalizedString("vChewing", comment: "")
@@ -52,34 +51,40 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
       NSUserNotificationCenter.default.deliver(userNotification)
     }
 
-    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
-      IME.initLangModels(userOnly: false)
+    DispatchQueue.main.async {
+      LMMgr.initUserLangModels()
       self.folderMonitor.folderDidChange = { [weak self] in
         self?.reloadOnFolderChangeHappens()
       }
-      if mgrLangModel.userDataFolderExists {
+      if LMMgr.userDataFolderExists {
         self.folderMonitor.startMonitoring()
       }
     }
 
     mgrPrefs.fixOddPreferences()
-    mgrPrefs.setMissingDefaults()
+
+    // 配置更新小助手
+    updateSputnik.varkUpdateInfoPageURLKey = "UpdateInfoSite"
+    updateSputnik.varkUpdateCheckDateKeyPrevious = "PreviousUpdateCheckDate"
+    updateSputnik.varkUpdateCheckDateKeyNext = "NextUpdateCheckDate"
+    updateSputnik.varkUpdateCheckInterval = 114_514
+    updateSputnik.varCheckUpdateAutomatically = "ChecvarkUpdateAutomatically"
 
     // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
     if mgrPrefs.checkUpdateAutomatically {
-      UpdateSputnik.shared.checkForUpdate()
+      updateSputnik.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
     }
   }
 
   func updateDirectoryMonitorPath() {
     folderMonitor.stopMonitoring()
     folderMonitor = FolderMonitor(
-      url: URL(fileURLWithPath: mgrLangModel.dataFolderPath(isDefaultFolder: false))
+      url: URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
     )
     folderMonitor.folderDidChange = { [weak self] in
       self?.reloadOnFolderChangeHappens()
     }
-    if mgrLangModel.userDataFolderExists {
+    if LMMgr.userDataFolderExists {
       folderMonitor.startMonitoring()
     }
   }
@@ -133,9 +138,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     let result = alert.runModal()
     if result == NSApplication.ModalResponse.alertFirstButtonReturn {
       NSWorkspace.shared.openFile(
-        mgrLangModel.dataFolderPath(isDefaultFolder: true), withApplication: "Finder"
+        LMMgr.dataFolderPath(isDefaultFolder: true), withApplication: "Finder"
       )
-      IME.uninstall(isSudo: false, selfKill: true)
+      Uninstaller.uninstall(
+        isSudo: false, selfKill: true, defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true)
+      )
     }
     NSApp.setActivationPolicy(.accessory)
   }

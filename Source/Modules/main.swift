@@ -1,5 +1,3 @@
-// (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are of:
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
@@ -9,7 +7,11 @@
 // requirements defined in MIT License.
 
 import Cocoa
+import CocoaExtension
+import IMKUtils
 import InputMethodKit
+import Shared
+import Uninstaller
 
 guard let kConnectionName = Bundle.main.infoDictionary?["InputMethodConnectionName"] as? String
 else {
@@ -28,7 +30,9 @@ switch max(CommandLine.arguments.count - 1, 0) {
         }
       case "uninstall":
         if CommandLine.arguments[1] == "uninstall" {
-          let exitCode = IME.uninstall(isSudo: IME.isSudoMode)
+          let exitCode = Uninstaller.uninstall(
+            isSudo: NSApplication.isSudoMode, defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true)
+          )
           exit(exitCode)
         }
       default: break
@@ -67,3 +71,33 @@ public let theServer = server
 public let kUpdateInfoSourceURL = urlUpdateInfoSource
 
 NSApp.run()
+
+// MARK: - Top-level Enums relating to Input Mode and Language Supports.
+
+// The type of input modes.
+public enum InputMode: String, CaseIterable {
+  case imeModeCHS = "org.atelierInmu.inputmethod.vChewing.IMECHS"
+  case imeModeCHT = "org.atelierInmu.inputmethod.vChewing.IMECHT"
+  case imeModeNULL = ""
+  var reversed: InputMode {
+    switch self {
+      case .imeModeCHS:
+        return .imeModeCHT
+      case .imeModeCHT:
+        return .imeModeCHS
+      case .imeModeNULL:
+        return .imeModeNULL
+    }
+  }
+}
+
+public enum IMEApp {
+  // MARK: - 輸入法的當前的簡繁體中文模式
+
+  public static var currentInputMode: InputMode = .init(rawValue: mgrPrefs.mostRecentInputMode) ?? .imeModeNULL
+
+  /// Fart or Beep?
+  static func buzz() {
+    NSSound.buzz(fart: !mgrPrefs.shouldNotFartInLieuOfBeep)
+  }
+}
