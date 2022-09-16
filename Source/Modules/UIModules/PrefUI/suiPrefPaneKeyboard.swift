@@ -6,14 +6,17 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import IMKUtils
+import Preferences
+import Shared
 import SwiftUI
 
 @available(macOS 10.15, *)
 struct suiPrefPaneKeyboard: View {
-  @State private var selSelectionKeysList = mgrPrefs.suggestedCandidateKeys
+  @State private var selSelectionKeysList = CandidateKey.suggestions
   @State private var selSelectionKeys =
-    UserDefaults.standard.string(forKey: UserDef.kCandidateKeys.rawValue) ?? mgrPrefs.defaultCandidateKeys
-  @State private var selMandarinParser = UserDefaults.standard.integer(forKey: UserDef.kMandarinParser.rawValue)
+    UserDefaults.standard.string(forKey: UserDef.kCandidateKeys.rawValue) ?? CandidateKey.defaultKeys
+  @State private var selKeyboardParser = UserDefaults.standard.integer(forKey: UserDef.kKeyboardParser.rawValue)
   @State private var selBasicKeyboardLayout: String =
     UserDefaults.standard.string(forKey: UserDef.kBasicKeyboardLayout.rawValue) ?? mgrPrefs.basicKeyboardLayout
   @State private var selAlphanumericalKeyboardLayout: String =
@@ -50,15 +53,15 @@ struct suiPrefPaneKeyboard: View {
       Preferences.Container(contentWidth: contentWidth) {
         Preferences.Section(label: { Text(LocalizedStringKey("Selection Keys:")) }) {
           ComboBox(
-            items: mgrPrefs.suggestedCandidateKeys,
+            items: CandidateKey.suggestions,
             text: $selSelectionKeys.onChange {
               let value = selSelectionKeys
               let keys: String = value.trimmingCharacters(in: .whitespacesAndNewlines).deduplicate
               do {
-                try mgrPrefs.validate(candidateKeys: keys)
+                try CandidateKey.validate(keys: keys)
                 mgrPrefs.candidateKeys = keys
                 selSelectionKeys = mgrPrefs.candidateKeys
-              } catch mgrPrefs.CandidateKeyError.empty {
+              } catch CandidateKey.ErrorType.empty {
                 selSelectionKeys = mgrPrefs.candidateKeys
               } catch {
                 if let window = ctlPrefUI.shared.controller.window {
@@ -66,7 +69,7 @@ struct suiPrefPaneKeyboard: View {
                   alert.beginSheetModal(for: window) { _ in
                     selSelectionKeys = mgrPrefs.candidateKeys
                   }
-                  clsSFX.beep()
+                  IMEApp.buzz()
                 }
               }
             }
@@ -91,9 +94,9 @@ struct suiPrefPaneKeyboard: View {
           HStack {
             Picker(
               "",
-              selection: $selMandarinParser.onChange {
-                let value = selMandarinParser
-                mgrPrefs.mandarinParser = value
+              selection: $selKeyboardParser.onChange {
+                let value = selKeyboardParser
+                mgrPrefs.keyboardParser = value
                 switch value {
                   case 0:
                     if !IMKHelper.arrDynamicBasicKeyLayouts.contains(mgrPrefs.basicKeyboardLayout) {
@@ -134,16 +137,16 @@ struct suiPrefPaneKeyboard: View {
             }
             .labelsHidden()
             Button {
-              mgrPrefs.mandarinParser = 0
-              selMandarinParser = mgrPrefs.mandarinParser
+              mgrPrefs.keyboardParser = 0
+              selKeyboardParser = mgrPrefs.keyboardParser
               mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
               selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
             } label: {
               Text("↻ㄅ")
             }
             Button {
-              mgrPrefs.mandarinParser = 10
-              selMandarinParser = mgrPrefs.mandarinParser
+              mgrPrefs.keyboardParser = 10
+              selKeyboardParser = mgrPrefs.keyboardParser
               mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ABC"
               selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
             } label: {
@@ -174,8 +177,8 @@ struct suiPrefPaneKeyboard: View {
                 let value = selBasicKeyboardLayout
                 mgrPrefs.basicKeyboardLayout = value
                 if IMKHelper.arrDynamicBasicKeyLayouts.contains(value) {
-                  mgrPrefs.mandarinParser = 0
-                  selMandarinParser = mgrPrefs.mandarinParser
+                  mgrPrefs.keyboardParser = 0
+                  selKeyboardParser = mgrPrefs.keyboardParser
                 }
               }
             ) {
@@ -291,5 +294,73 @@ struct suiPrefPaneKeyboard: View {
 struct suiPrefPaneKeyboard_Previews: PreviewProvider {
   static var previews: some View {
     suiPrefPaneKeyboard()
+  }
+}
+
+// MARK: - NSComboBox
+
+//  Ref: https://stackoverflow.com/a/71058587/4162914
+//  License: https://creativecommons.org/licenses/by-sa/4.0/
+
+// Ref: https://stackoverflow.com/a/71058587/4162914
+@available(macOS 10.15, *)
+public struct ComboBox: NSViewRepresentable {
+  // The items that will show up in the pop-up menu:
+  public var items: [String] = []
+
+  // The property on our parent view that gets synced to the current
+  // stringValue of the NSComboBox, whether the user typed it in or
+  // selected it from the list:
+  @Binding public var text: String
+
+  public func makeCoordinator() -> Coordinator {
+    Coordinator(self)
+  }
+
+  public func makeNSView(context: Context) -> NSComboBox {
+    let comboBox = NSComboBox()
+    comboBox.usesDataSource = false
+    comboBox.completes = false
+    comboBox.delegate = context.coordinator
+    comboBox.intercellSpacing = NSSize(width: 0.0, height: 10.0)
+    return comboBox
+  }
+
+  public func updateNSView(_ nsView: NSComboBox, context: Context) {
+    nsView.removeAllItems()
+    nsView.addItems(withObjectValues: items)
+
+    // ComboBox doesn't automatically select the item matching its text;
+    // we must do that manually. But we need the delegate to ignore that
+    // selection-change or we'll get a "state modified during view update;
+    // will cause undefined behavior" warning.
+    context.coordinator.ignoreSelectionChanges = true
+    nsView.stringValue = text
+    nsView.selectItem(withObjectValue: text)
+    context.coordinator.ignoreSelectionChanges = false
+  }
+
+  public class Coordinator: NSObject, NSComboBoxDelegate {
+    public var parent: ComboBox
+    public var ignoreSelectionChanges = false
+
+    public init(_ parent: ComboBox) {
+      self.parent = parent
+    }
+
+    public func comboBoxSelectionDidChange(_ notification: Notification) {
+      if !ignoreSelectionChanges,
+        let box: NSComboBox = notification.object as? NSComboBox,
+        let newStringValue: String = box.objectValueOfSelectedItem as? String
+      {
+        parent.text = newStringValue
+      }
+    }
+
+    public func controlTextDidEndEditing(_ obj: Notification) {
+      if let textField = obj.object as? NSTextField {
+        parent.text = textField.stringValue
+      }
+    }
   }
 }
