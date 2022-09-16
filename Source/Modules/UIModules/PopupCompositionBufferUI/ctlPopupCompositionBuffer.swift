@@ -6,10 +6,8 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
-
 public class ctlPopupCompositionBuffer: NSWindowController {
-  public var isTypingDirectionVertical: Bool = false {
+  public var isTypingDirectionVertical = false {
     didSet {
       if #unavailable(macOS 10.14) {
         isTypingDirectionVertical = false
@@ -83,7 +81,7 @@ public class ctlPopupCompositionBuffer: NSWindowController {
 
     let markerAttributes: [NSAttributedString.Key: Any] = {
       var result: [NSAttributedString.Key: Any] = [
-        .backgroundColor: IME.isDarkMode ? NSColor.systemRed : NSColor.systemYellow,
+        .backgroundColor: NSApplication.isDarkMode ? NSColor.systemRed : NSColor.systemYellow,
         .markedClauseSegment: 0,
       ]
       if isTypingDirectionVertical {
