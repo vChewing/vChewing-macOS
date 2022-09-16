@@ -8,8 +8,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
-
 // 將之前 Zonble 重寫的 Voltaire 選字窗隔的橫向版本與縱向版本合併到同一個型別實體內。
 
 private class vwrCandidateUniversal: NSView {
@@ -19,7 +17,7 @@ private class vwrCandidateUniversal: NSView {
 
   var action: Selector?
   weak var target: AnyObject?
-  var isVerticalLayout: Bool = false
+  var isVerticalLayout = false
   var fractionFontSize: CGFloat = 12.0
 
   private var keyLabels: [String] = []
@@ -62,7 +60,7 @@ private class vwrCandidateUniversal: NSView {
   @objc(setKeyLabels:displayedCandidates:)
   func set(keyLabels labels: [String], displayedCandidates candidates: [String]) {
     let candidates = candidates.map { theCandidate -> String in
-      let theConverted = IME.kanjiConversionIfRequired(theCandidate)
+      let theConverted = ChineseConverter.kanjiConversionIfRequired(theCandidate)
       return (theCandidate == theConverted) ? theCandidate : "\(theConverted)(\(theCandidate))"
     }
 
@@ -137,7 +135,7 @@ private class vwrCandidateUniversal: NSView {
 
   func ensureLangIdentifier(for attr: inout [NSAttributedString.Key: AnyObject]) {
     if mgrPrefs.handleDefaultCandidateFontsByLangIdentifier {
-      switch IME.currentInputMode {
+      switch IMEApp.currentInputMode {
         case InputMode.imeModeCHS:
           if #available(macOS 12.0, *) {
             attr[.languageIdentifier] = "zh-Hans" as AnyObject
@@ -156,19 +154,19 @@ private class vwrCandidateUniversal: NSView {
 
   var highlightedColor: NSColor {
     var result = NSColor.alternateSelectedControlColor
-    var colorBlendAmount: CGFloat = IME.isDarkMode ? 0.3 : 0.0
-    if #available(macOS 10.14, *), !IME.isDarkMode, IME.currentInputMode == .imeModeCHT {
+    var colorBlendAmount: CGFloat = NSApplication.isDarkMode ? 0.3 : 0.0
+    if #available(macOS 10.14, *), !NSApplication.isDarkMode, IMEApp.currentInputMode == .imeModeCHT {
       colorBlendAmount = 0.15
     }
     // The background color of the highlightened candidate
-    switch IME.currentInputMode {
+    switch IMEApp.currentInputMode {
       case InputMode.imeModeCHS:
         result = NSColor.systemRed
       case InputMode.imeModeCHT:
         result = NSColor.systemBlue
       default: break
     }
-    var blendingAgainstTarget: NSColor = IME.isDarkMode ? NSColor.black : NSColor.white
+    var blendingAgainstTarget: NSColor = NSApplication.isDarkMode ? NSColor.black : NSColor.white
     if #unavailable(macOS 10.14) {
       colorBlendAmount = 0.3
       blendingAgainstTarget = NSColor.white
@@ -435,7 +433,7 @@ public class ctlCandidateUniversal: ctlCandidate {
   @discardableResult override public func showNextPage() -> Bool {
     guard delegate != nil else { return false }
     if pageCount == 1 { return highlightNextCandidate() }
-    if currentPageIndex + 1 >= pageCount { clsSFX.beep() }
+    if currentPageIndex + 1 >= pageCount { IMEApp.buzz() }
     currentPageIndex = (currentPageIndex + 1 >= pageCount) ? 0 : currentPageIndex + 1
     if currentPageIndex == pageCount - 1 {
       candidateView.highlightedIndex = min(lastPageContentCount - 1, candidateView.highlightedIndex)
@@ -448,7 +446,7 @@ public class ctlCandidateUniversal: ctlCandidate {
   @discardableResult override public func showPreviousPage() -> Bool {
     guard delegate != nil else { return false }
     if pageCount == 1 { return highlightPreviousCandidate() }
-    if currentPageIndex == 0 { clsSFX.beep() }
+    if currentPageIndex == 0 { IMEApp.buzz() }
     currentPageIndex = (currentPageIndex == 0) ? pageCount - 1 : currentPageIndex - 1
     if currentPageIndex == pageCount - 1 {
       candidateView.highlightedIndex = min(lastPageContentCount - 1, candidateView.highlightedIndex)
@@ -621,6 +619,6 @@ extension ctlCandidateUniversal {
   }
 
   @objc private func candidateViewMouseDidClick(_: Any) {
-    delegate?.ctlCandidate(self, didSelectCandidateAtIndex: selectedCandidateIndex)
+    delegate?.candidateSelected(at: selectedCandidateIndex)
   }
 }

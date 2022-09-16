@@ -6,6 +6,8 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Preferences
+import Shared
 import SwiftUI
 
 @available(macOS 10.15, *)
@@ -13,7 +15,7 @@ struct suiPrefPaneGeneral: View {
   @State private var selCandidateUIFontSize = UserDefaults.standard.integer(
     forKey: UserDef.kCandidateListTextSize.rawValue)
   @State private var selUILanguage: [String] =
-    IME.arrSupportedLocales.contains(
+    Shared.arrSupportedLocales.contains(
       ((UserDefaults.standard.object(forKey: UserDef.kAppleLanguages.rawValue) == nil)
         ? ["auto"] : UserDefaults.standard.array(forKey: UserDef.kAppleLanguages.rawValue) as? [String] ?? ["auto"])[0])
     ? ((UserDefaults.standard.object(forKey: UserDef.kAppleLanguages.rawValue) == nil)
@@ -86,7 +88,7 @@ struct suiPrefPaneGeneral: View {
           Picker(
             LocalizedStringKey("Follow OS settings"),
             selection: $selUILanguage.onChange {
-              IME.prtDebugIntel(selUILanguage[0])
+              vCLog(selUILanguage[0])
               if selUILanguage == mgrPrefs.appleLanguages
                 || (selUILanguage[0] == "auto"
                   && UserDefaults.standard.object(forKey: UserDef.kAppleLanguages.rawValue) == nil)
@@ -169,7 +171,7 @@ struct suiPrefPaneGeneral: View {
             LocalizedStringKey("Stop farting (when typed phonetic combination is invalid, etc.)"),
             isOn: $selEnableFartSuppressor.onChange {
               mgrPrefs.shouldNotFartInLieuOfBeep = selEnableFartSuppressor
-              clsSFX.beep()
+              IMEApp.buzz()
             }
           )
         }

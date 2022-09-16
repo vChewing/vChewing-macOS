@@ -6,14 +6,17 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import BookmarkManager
+import Preferences
+import Shared
 import SwiftUI
 
 @available(macOS 10.15, *)
 struct suiPrefPaneDictionary: View {
-  private var fdrDefault = mgrLangModel.dataFolderPath(isDefaultFolder: true)
+  private var fdrDefault = LMMgr.dataFolderPath(isDefaultFolder: true)
   @State private var tbxUserDataPathSpecified: String =
     UserDefaults.standard.string(forKey: UserDef.kUserDataFolderSpecified.rawValue)
-    ?? mgrLangModel.dataFolderPath(isDefaultFolder: true)
+    ?? LMMgr.dataFolderPath(isDefaultFolder: true)
   @State private var selAutoReloadUserData: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kShouldAutoReloadUserDataFiles.rawValue)
   @State private var selEnableCNS11643: Bool = UserDefaults.standard.bool(forKey: UserDef.kCNS11643Enabled.rawValue)
@@ -29,6 +32,8 @@ struct suiPrefPaneDictionary: View {
     forKey: UserDef.kConsolidateContextOnCandidateSelection.rawValue)
   @State private var selHardenVerticalPunctuations: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kHardenVerticalPunctuations.rawValue)
+
+  private static let dlgOpenPath = NSOpenPanel()
 
   private let contentMaxHeight: Double = 432
   private let contentWidth: Double = {
@@ -58,41 +63,40 @@ struct suiPrefPaneDictionary: View {
                 .toolTip(tbxUserDataPathSpecified)
             }
             Button {
-              IME.dlgOpenPath.title = NSLocalizedString(
+              Self.dlgOpenPath.title = NSLocalizedString(
                 "Choose your desired user data folder.", comment: ""
               )
-              IME.dlgOpenPath.showsResizeIndicator = true
-              IME.dlgOpenPath.showsHiddenFiles = true
-              IME.dlgOpenPath.canChooseFiles = false
-              IME.dlgOpenPath.canChooseDirectories = true
+              Self.dlgOpenPath.showsResizeIndicator = true
+              Self.dlgOpenPath.showsHiddenFiles = true
+              Self.dlgOpenPath.canChooseFiles = false
+              Self.dlgOpenPath.canChooseDirectories = true
 
-              let bolPreviousFolderValidity = mgrLangModel.checkIfSpecifiedUserDataFolderValid(
+              let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
                 mgrPrefs.userDataFolderSpecified.expandingTildeInPath)
 
               if let window = ctlPrefUI.shared.controller.window {
-                IME.dlgOpenPath.beginSheetModal(for: window) { result in
+                Self.dlgOpenPath.beginSheetModal(for: window) { result in
                   if result == NSApplication.ModalResponse.OK {
-                    guard let url = IME.dlgOpenPath.url else { return }
+                    guard let url = Self.dlgOpenPath.url else { return }
                     // CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
                     // 所以要手動補回來。
                     var newPath = url.path
                     newPath.ensureTrailingSlash()
-                    if mgrLangModel.checkIfSpecifiedUserDataFolderValid(newPath) {
+                    if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
                       mgrPrefs.userDataFolderSpecified = newPath
                       tbxUserDataPathSpecified = mgrPrefs.userDataFolderSpecified
                       BookmarkManager.shared.saveBookmark(for: url)
-                      IME.initLangModels(userOnly: true)
                       (NSApplication.shared.delegate as! AppDelegate).updateDirectoryMonitorPath()
                     } else {
-                      clsSFX.beep()
+                      IMEApp.buzz()
                       if !bolPreviousFolderValidity {
-                        mgrPrefs.resetSpecifiedUserDataFolder()
+                        LMMgr.resetSpecifiedUserDataFolder()
                       }
                       return
                     }
                   } else {
                     if !bolPreviousFolderValidity {
-                      mgrPrefs.resetSpecifiedUserDataFolder()
+                      LMMgr.resetSpecifiedUserDataFolder()
                     }
                     return
                   }
@@ -102,7 +106,7 @@ struct suiPrefPaneDictionary: View {
               Text("...")
             }
             Button {
-              mgrPrefs.resetSpecifiedUserDataFolder()
+              LMMgr.resetSpecifiedUserDataFolder()
               tbxUserDataPathSpecified = ""
             } label: {
               Text("↻")
@@ -120,14 +124,14 @@ struct suiPrefPaneDictionary: View {
             LocalizedStringKey("Enable CNS11643 Support (2022-08-02)"),
             isOn: $selEnableCNS11643.onChange {
               mgrPrefs.cns11643Enabled = selEnableCNS11643
-              mgrLangModel.setCNSEnabled(mgrPrefs.cns11643Enabled)
+              LMMgr.setCNSEnabled(mgrPrefs.cns11643Enabled)
             }
           )
           Toggle(
             LocalizedStringKey("Enable symbol input support (incl. certain emoji symbols)"),
             isOn: $selEnableSymbolInputSupport.onChange {
               mgrPrefs.symbolInputEnabled = selEnableSymbolInputSupport
-              mgrLangModel.setSymbolEnabled(mgrPrefs.symbolInputEnabled)
+              LMMgr.setSymbolEnabled(mgrPrefs.symbolInputEnabled)
             }
           )
           Toggle(
