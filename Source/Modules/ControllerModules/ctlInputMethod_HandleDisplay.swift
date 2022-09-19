@@ -62,6 +62,9 @@ extension ctlInputMethod {
     do {
       ctlInputMethod.tooltipInstance.hide()
       ctlInputMethod.tooltipInstance = .init()
+      if state.type == .ofMarking {
+        ctlInputMethod.tooltipInstance.setColor(state: state.data.tooltipColorState)
+      }
     }
     // 再設定其文字顯示內容並顯示。
     ctlInputMethod.tooltipInstance.show(
