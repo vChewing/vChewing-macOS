@@ -477,7 +477,7 @@ public enum mgrPrefs {
   @UserDefault(key: UserDef.kMaxCandidateLength.rawValue, defaultValue: 10)
   static var maxCandidateLength: Int
 
-  static var allowedMarkLengthRange: ClosedRange<Int> = mgrPrefs.minCandidateLength...mgrPrefs.maxCandidateLength
+  static var allowedMarkLengthRange: ClosedRange<Int> { mgrPrefs.minCandidateLength...mgrPrefs.maxCandidateLength }
 
   @UserDefault(key: UserDef.kShouldNotFartInLieuOfBeep.rawValue, defaultValue: true)
   static var shouldNotFartInLieuOfBeep: Bool
