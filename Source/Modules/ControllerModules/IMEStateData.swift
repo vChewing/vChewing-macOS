@@ -86,6 +86,8 @@ public struct StateData {
     mgrPrefs.allowedMarkLengthRange.contains(markedRange.count)
   }
 
+  var tooltipColorState: ctlTooltip.ColorStates = .normal
+
   var attributedStringNormal: NSAttributedString {
     /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
     /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
@@ -197,7 +199,7 @@ extension StateData {
     public static func updateParameters(_ data: inout StateData) {
       var tooltipGenerated: String {
         if mgrPrefs.phraseReplacementEnabled {
-          ctlInputMethod.tooltipInstance.setColor(state: .warning)
+          data.tooltipColorState = .warning
           return NSLocalizedString(
             "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.", comment: ""
           )
@@ -208,14 +210,14 @@ extension StateData {
 
         let text = data.displayedText.charComponents[data.markedRange].joined()
         if data.markedRange.count < mgrPrefs.allowedMarkLengthRange.lowerBound {
-          ctlInputMethod.tooltipInstance.setColor(state: .denialInsufficiency)
+          data.tooltipColorState = .denialInsufficiency
           return String(
             format: NSLocalizedString(
               "\"%@\" length must ≥ 2 for a user phrase.", comment: ""
             ) + "\n◆  " + generateReadingThread(data), text
           )
         } else if data.markedRange.count > mgrPrefs.allowedMarkLengthRange.upperBound {
-          ctlInputMethod.tooltipInstance.setColor(state: .denialOverflow)
+          data.tooltipColorState = .denialOverflow
           return String(
             format: NSLocalizedString(
               "\"%@\" length should ≤ %d for a user phrase.", comment: ""
@@ -229,7 +231,7 @@ extension StateData {
         )
         if exist {
           data.markedTargetExists = exist
-          ctlInputMethod.tooltipInstance.setColor(state: .prompt)
+          data.tooltipColorState = .prompt
           return String(
             format: NSLocalizedString(
               "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude.",
@@ -237,7 +239,7 @@ extension StateData {
             ) + "\n◆  " + generateReadingThread(data), text
           )
         }
-        ctlInputMethod.tooltipInstance.resetColor()
+        data.tooltipColorState = .normal
         return String(
           format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: "") + "\n◆  "
             + generateReadingThread(data),
