@@ -58,6 +58,12 @@ extension ctlInputMethod {
       if mgrPrefs.alwaysShowTooltipTextsHorizontally { return .horizontal }
       return isVerticalTyping ? .vertical : .horizontal
     }()
+    // 強制重新初期化，因為 NSAttributedTextView 有顯示滯後性。
+    do {
+      ctlInputMethod.tooltipInstance.hide()
+      ctlInputMethod.tooltipInstance = .init()
+    }
+    // 再設定其文字顯示內容並顯示。
     ctlInputMethod.tooltipInstance.show(
       tooltip: tooltip, at: finalOrigin,
       bottomOutOfScreenAdjustmentHeight: delta, direction: tooltipContentDirection
