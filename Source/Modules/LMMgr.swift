@@ -558,12 +558,20 @@ public enum LMMgr {
   // MARK: UOM
 
   public static func saveUserOverrideModelData() {
-    DispatchQueue.main.async {
+    let globalQuene = DispatchQueue.global(qos: .default)
+    let group = DispatchGroup()
+    group.enter()
+    globalQuene.async {
       Self.uomCHT.saveData(toURL: userOverrideModelDataURL(InputMode.imeModeCHT))
+      group.leave()
     }
-    DispatchQueue.main.async {
+    group.enter()
+    globalQuene.async {
       Self.uomCHS.saveData(toURL: userOverrideModelDataURL(InputMode.imeModeCHS))
+      group.leave()
     }
+    _ = group.wait(timeout: .distantFuture)
+    group.notify(queue: DispatchQueue.main) {}
   }
 
   public static func removeUnigramsFromUserOverrideModel(_ mode: InputMode) {
