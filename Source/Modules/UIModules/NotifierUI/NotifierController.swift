@@ -24,6 +24,15 @@ private let kWindowWidth: CGFloat = 213.0
 private let kWindowHeight: CGFloat = 60.0
 
 public class NotifierController: NSWindowController, NotifierWindowDelegate {
+  static var message: String = "" {
+    didSet {
+      if !Self.message.isEmpty {
+        NotifierController.initiateWithNoStay(message: message)
+        Self.message = ""
+      }
+    }
+  }
+
   private var messageTextField: NSTextField
 
   private var message: String = "" {
@@ -69,7 +78,17 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
   private static var instanceCount = 0
   private static var lastLocation = NSPoint.zero
 
-  public static func notify(message: String, stay: Bool = false) {
+  private static func initiateWithNoStay(message: String) {
+    let controller = NotifierController()
+    controller.message = message
+    controller.show()
+  }
+
+  public static func notify(message: String) {
+    Self.message = message
+  }
+
+  public static func notify(message: String, stay: Bool) {
     let controller = NotifierController()
     controller.message = message
     controller.shouldStay = stay
