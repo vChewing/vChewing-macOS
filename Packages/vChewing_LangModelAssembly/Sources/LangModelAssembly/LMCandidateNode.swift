@@ -33,23 +33,25 @@ public class CandidateNode {
   }
 
   public static func load(url: URL) {
-    // 這兩個變數單獨拿出來，省得每次都重建還要浪費算力。
-    var arrLines = [String.SubSequence]()
-    var fieldSlice = [Substring.SubSequence]()
-    var arrMembers = [CandidateNode]()
-    do {
-      arrLines = try String(contentsOfFile: url.path, encoding: .utf8).split(separator: "\n")
-      for strLine in arrLines.lazy.filter({ !$0.isEmpty }) {
-        fieldSlice = strLine.split(separator: "=")
-        switch fieldSlice.count {
-          case 1: arrMembers.append(.init(name: String(fieldSlice[0])))
-          case 2: arrMembers.append(.init(name: String(fieldSlice[0]), symbols: .init(fieldSlice[1])))
-          default: break
+    DispatchQueue.main.async {
+      // 這兩個變數單獨拿出來，省得每次都重建還要浪費算力。
+      var arrLines = [String.SubSequence]()
+      var fieldSlice = [Substring.SubSequence]()
+      var arrMembers = [CandidateNode]()
+      do {
+        arrLines = try String(contentsOfFile: url.path, encoding: .utf8).split(separator: "\n")
+        for strLine in arrLines.lazy.filter({ !$0.isEmpty }) {
+          fieldSlice = strLine.split(separator: "=")
+          switch fieldSlice.count {
+            case 1: arrMembers.append(.init(name: String(fieldSlice[0])))
+            case 2: arrMembers.append(.init(name: String(fieldSlice[0]), symbols: .init(fieldSlice[1])))
+            default: break
+          }
         }
+        root = arrMembers.isEmpty ? defaultSymbolRoot : .init(name: "/", members: arrMembers)
+      } catch {
+        root = defaultSymbolRoot
       }
-      root = arrMembers.isEmpty ? defaultSymbolRoot : .init(name: "/", members: arrMembers)
-    } catch {
-      root = defaultSymbolRoot
     }
   }
 
