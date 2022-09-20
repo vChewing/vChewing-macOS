@@ -129,60 +129,74 @@ extension vChewingLM {
       }
     }
 
+    // 上述幾個函式不要加 Async，因為這些內容都被 LMMgr 負責用別的方法 Async 了、用 GCD 的多任務並行共結來完成。
+
     public func loadUserPhrasesData(path: String, filterPath: String) {
-      if FileManager.default.isReadableFile(atPath: path) {
-        lmUserPhrases.close()
-        lmUserPhrases.open(path)
-        vCLog("lmUserPhrases: \(lmUserPhrases.count) entries of data loaded from: \(path)")
-      } else {
-        vCLog("lmUserPhrases: File access failure: \(path)")
+      DispatchQueue.main.async {
+        if FileManager.default.isReadableFile(atPath: path) {
+          self.lmUserPhrases.close()
+          self.lmUserPhrases.open(path)
+          vCLog("lmUserPhrases: \(self.lmUserPhrases.count) entries of data loaded from: \(path)")
+        } else {
+          vCLog("lmUserPhrases: File access failure: \(path)")
+        }
       }
-      if FileManager.default.isReadableFile(atPath: filterPath) {
-        lmFiltered.close()
-        lmFiltered.open(filterPath)
-        vCLog("lmFiltered: \(lmFiltered.count) entries of data loaded from: \(path)")
-      } else {
-        vCLog("lmFiltered: File access failure: \(path)")
+      DispatchQueue.main.async {
+        if FileManager.default.isReadableFile(atPath: filterPath) {
+          self.lmFiltered.close()
+          self.lmFiltered.open(filterPath)
+          vCLog("lmFiltered: \(self.lmFiltered.count) entries of data loaded from: \(path)")
+        } else {
+          vCLog("lmFiltered: File access failure: \(path)")
+        }
       }
     }
 
     public func loadUserSymbolData(path: String) {
-      if FileManager.default.isReadableFile(atPath: path) {
-        lmUserSymbols.close()
-        lmUserSymbols.open(path)
-        vCLog("lmUserSymbol: \(lmUserSymbols.count) entries of data loaded from: \(path)")
-      } else {
-        vCLog("lmUserSymbol: File access failure: \(path)")
+      DispatchQueue.main.async {
+        if FileManager.default.isReadableFile(atPath: path) {
+          self.lmUserSymbols.close()
+          self.lmUserSymbols.open(path)
+          vCLog("lmUserSymbol: \(self.lmUserSymbols.count) entries of data loaded from: \(path)")
+        } else {
+          vCLog("lmUserSymbol: File access failure: \(path)")
+        }
       }
     }
 
     public func loadUserAssociatesData(path: String) {
-      if FileManager.default.isReadableFile(atPath: path) {
-        lmAssociates.close()
-        lmAssociates.open(path)
-        vCLog("lmAssociates: \(lmAssociates.count) entries of data loaded from: \(path)")
-      } else {
-        vCLog("lmAssociates: File access failure: \(path)")
+      DispatchQueue.main.async {
+        if FileManager.default.isReadableFile(atPath: path) {
+          self.lmAssociates.close()
+          self.lmAssociates.open(path)
+          vCLog("lmAssociates: \(self.lmAssociates.count) entries of data loaded from: \(path)")
+        } else {
+          vCLog("lmAssociates: File access failure: \(path)")
+        }
       }
     }
 
     public func loadReplacementsData(path: String) {
-      if FileManager.default.isReadableFile(atPath: path) {
-        lmReplacements.close()
-        lmReplacements.open(path)
-        vCLog("lmReplacements: \(lmReplacements.count) entries of data loaded from: \(path)")
-      } else {
-        vCLog("lmReplacements: File access failure: \(path)")
+      DispatchQueue.main.async {
+        if FileManager.default.isReadableFile(atPath: path) {
+          self.lmReplacements.close()
+          self.lmReplacements.open(path)
+          vCLog("lmReplacements: \(self.lmReplacements.count) entries of data loaded from: \(path)")
+        } else {
+          vCLog("lmReplacements: File access failure: \(path)")
+        }
       }
     }
 
     public func loadUserSCPCSequencesData(path: String) {
-      if FileManager.default.isReadableFile(atPath: path) {
-        lmPlainBopomofo.close()
-        lmPlainBopomofo.open(path)
-        vCLog("lmPlainBopomofo: \(lmPlainBopomofo.count) entries of data loaded from: \(path)")
-      } else {
-        vCLog("lmPlainBopomofo: File access failure: \(path)")
+      DispatchQueue.main.async {
+        if FileManager.default.isReadableFile(atPath: path) {
+          self.lmPlainBopomofo.close()
+          self.lmPlainBopomofo.open(path)
+          vCLog("lmPlainBopomofo: \(self.lmPlainBopomofo.count) entries of data loaded from: \(path)")
+        } else {
+          vCLog("lmPlainBopomofo: File access failure: \(path)")
+        }
       }
     }
 
