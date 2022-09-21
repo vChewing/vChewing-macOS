@@ -19,6 +19,8 @@ struct suiPrefPaneDictionary: View {
     ?? LMMgr.dataFolderPath(isDefaultFolder: true)
   @State private var selAutoReloadUserData: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kShouldAutoReloadUserDataFiles.rawValue)
+  @State private var selOnlyLoadFactoryLangModelsIfNeeded: Bool = UserDefaults.standard.bool(
+    forKey: UserDef.kOnlyLoadFactoryLangModelsIfNeeded.rawValue)
   @State private var selEnableCNS11643: Bool = UserDefaults.standard.bool(forKey: UserDef.kCNS11643Enabled.rawValue)
   @State private var selEnableSymbolInputSupport: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kSymbolInputEnabled.rawValue)
@@ -120,6 +122,12 @@ struct suiPrefPaneDictionary: View {
           ).controlSize(.small)
         }
         Preferences.Section(title: "") {
+          Toggle(
+            LocalizedStringKey("Only load factory language models if needed"),
+            isOn: $selOnlyLoadFactoryLangModelsIfNeeded.onChange {
+              PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded = selOnlyLoadFactoryLangModelsIfNeeded
+            }
+          )
           Toggle(
             LocalizedStringKey("Enable CNS11643 Support (2022-08-02)"),
             isOn: $selEnableCNS11643.onChange {
