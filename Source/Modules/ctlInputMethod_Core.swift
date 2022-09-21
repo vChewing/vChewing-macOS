@@ -168,14 +168,14 @@ class ctlInputMethod: IMKInputController {
   override func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
     _ = tag  // 防止格式整理工具毀掉與此對應的參數。
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-    var newInputMode = InputMode(rawValue: value as? String ?? "") ?? InputMode.imeModeNULL
+    var newInputMode = Shared.InputMode(rawValue: value as? String ?? "") ?? Shared.InputMode.imeModeNULL
     switch newInputMode {
-      case InputMode.imeModeCHS:
-        newInputMode = InputMode.imeModeCHS
-      case InputMode.imeModeCHT:
-        newInputMode = InputMode.imeModeCHT
+      case .imeModeCHS:
+        newInputMode = .imeModeCHS
+      case .imeModeCHT:
+        newInputMode = .imeModeCHT
       default:
-        newInputMode = InputMode.imeModeNULL
+        newInputMode = .imeModeNULL
     }
     LMMgr.loadDataModel(newInputMode)
 
@@ -195,7 +195,7 @@ class ctlInputMethod: IMKInputController {
 
   /// InputMode 需要在每次出現內容變更的時候都連帶重設組字器與各項語言模組，
   /// 順帶更新 IME 模組及 UserPrefs 當中對於當前語言模式的記載。
-  var inputMode: InputMode = IMEApp.currentInputMode {
+  var inputMode: Shared.InputMode = IMEApp.currentInputMode {
     willSet {
       /// 將新的簡繁輸入模式提報給 Prefs 與 IME 模組。
       IMEApp.currentInputMode = newValue
