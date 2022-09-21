@@ -194,6 +194,7 @@
 "Misc Settings:" = "Misc Settings:";
 "MiTAC" = "MiTAC";
 "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead." = "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead.";
+"Only load factory language models if needed" = "Only load factory language models if needed";
 "Only override the intonation of the previous reading if different" = "Only override the intonation of the previous reading if different";
 "Only use this with known Chromium-based browsers" = "Only use this with known Chromium-based browsers";
 "Output Settings:" = "Output Settings:";

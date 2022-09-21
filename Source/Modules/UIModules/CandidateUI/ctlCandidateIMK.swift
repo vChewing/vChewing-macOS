@@ -6,9 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Foundation
-import InputMethodKit
-
 public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
   public var currentLayout: CandidateLayout = .horizontal
   public static let defaultIMKSelectionKey: [UInt16: String] = [
@@ -20,7 +17,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     }
   }
 
-  public var visible: Bool = false { didSet { visible ? show() : hide() } }
+  public var visible = false { didSet { visible ? show() : hide() } }
 
   public var windowTopLeftPoint: NSPoint {
     get {
@@ -28,7 +25,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
       return NSPoint(x: frameRect.minX, y: frameRect.maxY)
     }
     set {
-      DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
+      DispatchQueue.main.async {
         self.set(windowTopLeftPoint: newValue, bottomOutOfScreenAdjustmentHeight: 0)
       }
     }
@@ -39,26 +36,26 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
       CandidateKeyLabel(key: $0, displayedText: $0)
     }
 
-  public var keyLabelFont: NSFont = NSFont.monospacedDigitSystemFont(
+  public var keyLabelFont = NSFont.monospacedDigitSystemFont(
     ofSize: 14, weight: .medium
   )
 
-  public var candidateFont: NSFont = NSFont.systemFont(ofSize: 18) {
+  public var candidateFont = NSFont.systemFont(ofSize: PrefMgr.shared.candidateListTextSize) {
     didSet {
-      setFontSize(candidateFont.pointSize)
+      if #available(macOS 10.14, *) { setFontSize(candidateFont.pointSize) }
       var attributes = attributes()
       // FB11300759: Set "NSAttributedString.Key.font" doesn't work.
       attributes?[NSAttributedString.Key.font] = candidateFont
-      if mgrPrefs.handleDefaultCandidateFontsByLangIdentifier {
-        switch IME.currentInputMode {
-          case InputMode.imeModeCHS:
+      if PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier {
+        switch IMEApp.currentInputMode {
+          case .imeModeCHS:
             if #available(macOS 12.0, *) {
               attributes?[NSAttributedString.Key.languageIdentifier] = "zh-Hans" as AnyObject
             }
-          case InputMode.imeModeCHT:
+          case .imeModeCHT:
             if #available(macOS 12.0, *) {
               attributes?[NSAttributedString.Key.languageIdentifier] =
-                (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
+                (PrefMgr.shared.shiftJISShinjitaiOutputEnabled || PrefMgr.shared.chineseConversionEnabled)
                 ? "ja" as AnyObject : "zh-Hant" as AnyObject
             }
           default:
@@ -79,7 +76,12 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     currentLayout = layout
     switch currentLayout {
       case .horizontal:
-        setPanelType(kIMKScrollingGridCandidatePanel)
+        if #available(macOS 10.14, *) {
+          setPanelType(kIMKScrollingGridCandidatePanel)
+        } else {
+          // macOS 10.13 High Sierra 的矩陣選字窗不支援選字鍵，所以只能弄成橫版單行。
+          setPanelType(kIMKSingleRowSteppingCandidatePanel)
+        }
       case .vertical:
         setPanelType(kIMKSingleColumnScrollingCandidatePanel)
     }
@@ -158,7 +160,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
   }
 
   public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
-    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
+    DispatchQueue.main.async {
       self.doSet(windowTopLeftPoint: windowTopLeftPoint, bottomOutOfScreenAdjustmentHeight: height)
     }
   }
@@ -199,35 +201,39 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
         case .vertical: event.isShiftHold ? moveLeft(self) : moveRight(self)
       }
     } else if event.isSpace {
-      switch mgrPrefs.specifyShiftSpaceKeyBehavior {
+      switch PrefMgr.shared.specifyShiftSpaceKeyBehavior {
         case true: _ = event.isShiftHold ? highlightNextCandidate() : showNextPage()
         case false: _ = event.isShiftHold ? showNextPage() : highlightNextCandidate()
       }
     } else if event.isTab {
-      switch mgrPrefs.specifyShiftTabKeyBehavior {
+      switch PrefMgr.shared.specifyShiftTabKeyBehavior {
         case true: _ = event.isShiftHold ? showPreviousPage() : showNextPage()
         case false: _ = event.isShiftHold ? highlightPreviousCandidate() : highlightNextCandidate()
       }
     } else {
-      if let newChar = ctlCandidateIMK.defaultIMKSelectionKey[event.keyCode] {
+      if let newChar = Self.defaultIMKSelectionKey[event.keyCode] {
         /// 根據 KeyCode 重新換算一下選字鍵的 NSEvent，糾正其 Character 數值。
         /// 反正 IMK 選字窗目前也沒辦法修改選字鍵。
         let newEvent = event.reinitiate(characters: newChar)
         if let newEvent = newEvent {
-          if mgrPrefs.useSCPCTypingMode, delegate.isAssociatedPhrasesState {
+          if PrefMgr.shared.useSCPCTypingMode, delegate.isAssociatedPhrasesState {
             // 註：input.isShiftHold 已經在 ctlInputMethod.handle() 內處理，因為在那邊處理才有效。
             if !event.isShiftHold {
               _ = delegate.sharedEventHandler(event)
               return
             }
           } else {
-            handleKeyboardEvent(newEvent)
+            if #available(macOS 10.14, *) {
+              handleKeyboardEvent(newEvent)
+            } else {
+              super.interpretKeyEvents([newEvent])
+            }
             return
           }
         }
       }
 
-      if mgrPrefs.useSCPCTypingMode, !event.isReservedKey {
+      if PrefMgr.shared.useSCPCTypingMode, !event.isReservedKey {
         _ = delegate.sharedEventHandler(event)
         return
       }
@@ -235,13 +241,17 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
       if delegate.isAssociatedPhrasesState,
         !event.isPageUp, !event.isPageDown, !event.isCursorForward, !event.isCursorBackward,
         !event.isCursorClockLeft, !event.isCursorClockRight, !event.isSpace,
-        !event.isEnter || !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter
+        !event.isEnter || !PrefMgr.shared.alsoConfirmAssociatedCandidatesByEnter
       {
         _ = delegate.sharedEventHandler(event)
         return
       }
       super.interpretKeyEvents(eventArray)
     }
+  }
+
+  public func superInterpretKeyEvents(_ eventArray: [NSEvent]) {
+    super.interpretKeyEvents(eventArray)
   }
 }
 

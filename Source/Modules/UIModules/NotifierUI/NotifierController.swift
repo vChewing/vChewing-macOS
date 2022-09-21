@@ -8,8 +8,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
-
 private protocol NotifierWindowDelegate: AnyObject {
   func windowDidBecomeClicked(_ window: NotifierWindow)
 }
@@ -26,6 +24,15 @@ private let kWindowWidth: CGFloat = 213.0
 private let kWindowHeight: CGFloat = 60.0
 
 public class NotifierController: NSWindowController, NotifierWindowDelegate {
+  static var message: String = "" {
+    didSet {
+      if !Self.message.isEmpty {
+        NotifierController.initiateWithNoStay(message: message)
+        Self.message = ""
+      }
+    }
+  }
+
   private var messageTextField: NSTextField
 
   private var message: String = "" {
@@ -52,7 +59,7 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
     }
   }
 
-  private var shouldStay: Bool = false
+  private var shouldStay = false
   private var backgroundColor: NSColor = .textBackgroundColor {
     didSet {
       window?.backgroundColor = backgroundColor
@@ -71,7 +78,17 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
   private static var instanceCount = 0
   private static var lastLocation = NSPoint.zero
 
-  public static func notify(message: String, stay: Bool = false) {
+  private static func initiateWithNoStay(message: String) {
+    let controller = NotifierController()
+    controller.message = message
+    controller.show()
+  }
+
+  public static func notify(message: String) {
+    Self.message = message
+  }
+
+  public static func notify(message: String, stay: Bool) {
     let controller = NotifierController()
     controller.message = message
     controller.shouldStay = stay
@@ -140,10 +157,10 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
 
   private func show() {
     func setStartLocation() {
-      if NotifierController.instanceCount == 0 {
+      if Self.instanceCount == 0 {
         return
       }
-      let lastLocation = NotifierController.lastLocation
+      let lastLocation = Self.lastLocation
       let screenRect = NSScreen.main?.visibleFrame ?? NSRect.seniorTheBeast
       var windowRect = window?.frame ?? NSRect.seniorTheBeast
       windowRect.origin.x = lastLocation.x
@@ -158,7 +175,7 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
 
     func moveIn() {
       let afterRect = window?.frame ?? NSRect.seniorTheBeast
-      NotifierController.lastLocation = afterRect.origin
+      Self.lastLocation = afterRect.origin
       var beforeRect = afterRect
       beforeRect.origin.y += 10
       window?.setFrame(beforeRect, display: true)
@@ -168,7 +185,7 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
 
     setStartLocation()
     moveIn()
-    NotifierController.increaseInstanceCount()
+    Self.increaseInstanceCount()
     waitTimer = Timer.scheduledTimer(
       timeInterval: shouldStay ? 5 : 1, target: self, selector: #selector(fadeOut),
       userInfo: nil,
@@ -188,7 +205,7 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
   @objc private func fadeOut() {
     waitTimer?.invalidate()
     waitTimer = nil
-    NotifierController.decreaseInstanceCount()
+    Self.decreaseInstanceCount()
     fadeTimer = Timer.scheduledTimer(
       timeInterval: 0.01, target: self, selector: #selector(doFadeOut(_:)), userInfo: nil,
       repeats: true

@@ -19,7 +19,7 @@ $ Contributors and volunteers of the upstream repo, having no responsibility in 
     - Voltaire candidate window MK2 (massively modified as MK3 in vChewing by Shiki Suen).
     - Notifier window.
     - App-style installer (only preserved for developer purposes).
-    - mgrPrefs (userdefaults manager).
+    - PrefMgr (userdefaults manager).
 - Mengjuei Hsieh:
     - McBopomofo for macOS 1.x main developer and architect.
     - The original C++ version of the User Override Module.

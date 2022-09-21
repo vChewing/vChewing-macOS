@@ -8,8 +8,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
-
 public enum CandidateLayout {
   case horizontal
   case vertical
@@ -33,9 +31,7 @@ public protocol ctlCandidateDelegate: AnyObject {
   func candidatesForController(_ controller: ctlCandidateProtocol) -> [(String, String)]
   func ctlCandidate(_ controller: ctlCandidateProtocol, candidateAtIndex index: Int)
     -> (String, String)
-  func ctlCandidate(
-    _ controller: ctlCandidateProtocol, didSelectCandidateAtIndex index: Int
-  )
+  func candidateSelected(at index: Int)
 }
 
 public protocol ctlCandidateProtocol {
@@ -68,7 +64,7 @@ public class ctlCandidate: NSWindowController, ctlCandidateProtocol {
   }
 
   public var selectedCandidateIndex: Int = .max
-  public var visible: Bool = false {
+  public var visible = false {
     didSet {
       NSObject.cancelPreviousPerformRequests(withTarget: self)
       if visible {
@@ -87,7 +83,7 @@ public class ctlCandidate: NSWindowController, ctlCandidateProtocol {
       return NSPoint(x: frameRect.minX, y: frameRect.maxY)
     }
     set {
-      DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
+      DispatchQueue.main.async {
         self.set(windowTopLeftPoint: newValue, bottomOutOfScreenAdjustmentHeight: 0)
       }
     }
@@ -108,10 +104,10 @@ public class ctlCandidate: NSWindowController, ctlCandidateProtocol {
       CandidateKeyLabel(key: $0, displayedText: $0)
     }
 
-  public var keyLabelFont: NSFont = NSFont.monospacedDigitSystemFont(
+  public var keyLabelFont = NSFont.monospacedDigitSystemFont(
     ofSize: 14, weight: .medium
   )
-  public var candidateFont: NSFont = NSFont.systemFont(ofSize: 18)
+  public var candidateFont = NSFont.systemFont(ofSize: 18)
   public var tooltip: String = ""
 
   public func reloadData() {}
@@ -147,7 +143,7 @@ public class ctlCandidate: NSWindowController, ctlCandidateProtocol {
   ///   - height: The height that helps the window not to be out of the bottom
   ///     of a screen.
   public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
-    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
+    DispatchQueue.main.async {
       self.doSet(
         windowTopLeftPoint: windowTopLeftPoint, bottomOutOfScreenAdjustmentHeight: height
       )

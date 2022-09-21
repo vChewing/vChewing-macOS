@@ -1,5 +1,3 @@
-// (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are of:
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
@@ -9,13 +7,11 @@
 // requirements defined in MIT License.
 
 import Cocoa
+import CocoaExtension
+import IMKUtils
 import InputMethodKit
-
-guard let kConnectionName = Bundle.main.infoDictionary?["InputMethodConnectionName"] as? String
-else {
-  NSLog("Fatal error: Failed from retrieving connection name from info.plist file.")
-  exit(-1)
-}
+import Shared
+import Uninstaller
 
 switch max(CommandLine.arguments.count - 1, 0) {
   case 0: break
@@ -28,7 +24,9 @@ switch max(CommandLine.arguments.count - 1, 0) {
         }
       case "uninstall":
         if CommandLine.arguments[1] == "uninstall" {
-          let exitCode = IME.uninstall(isSudo: IME.isSudoMode)
+          let exitCode = Uninstaller.uninstall(
+            isSudo: NSApplication.isSudoMode, defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true)
+          )
           exit(exitCode)
         }
       default: break
@@ -49,9 +47,12 @@ if !loaded {
 }
 
 guard let bundleID = Bundle.main.bundleIdentifier,
+  let kConnectionName = Bundle.main.infoDictionary?["InputMethodConnectionName"] as? String,
   let server = IMKServer(name: kConnectionName, bundleIdentifier: bundleID)
 else {
-  NSLog("Fatal error: Cannot initialize input method server with connection \(kConnectionName).")
+  NSLog(
+    "Fatal error: Cannot initialize input method server with connection name retrieved from the plist, nor there's no connection name in the plist."
+  )
   exit(-1)
 }
 
@@ -67,3 +68,17 @@ public let theServer = server
 public let kUpdateInfoSourceURL = urlUpdateInfoSource
 
 NSApp.run()
+
+// MARK: - Top-level Enums relating to Input Mode and Language Supports.
+
+public enum IMEApp {
+  // MARK: - 輸入法的當前的簡繁體中文模式
+
+  public static var currentInputMode: Shared.InputMode =
+    .init(rawValue: PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
+
+  /// Fart or Beep?
+  static func buzz() {
+    NSSound.buzz(fart: !PrefMgr.shared.shouldNotFartInLieuOfBeep)
+  }
+}

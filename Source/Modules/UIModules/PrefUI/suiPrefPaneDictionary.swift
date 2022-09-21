@@ -6,16 +6,21 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import BookmarkManager
+import Preferences
+import Shared
 import SwiftUI
 
 @available(macOS 10.15, *)
 struct suiPrefPaneDictionary: View {
-  private var fdrDefault = mgrLangModel.dataFolderPath(isDefaultFolder: true)
+  private var fdrDefault = LMMgr.dataFolderPath(isDefaultFolder: true)
   @State private var tbxUserDataPathSpecified: String =
     UserDefaults.standard.string(forKey: UserDef.kUserDataFolderSpecified.rawValue)
-    ?? mgrLangModel.dataFolderPath(isDefaultFolder: true)
+    ?? LMMgr.dataFolderPath(isDefaultFolder: true)
   @State private var selAutoReloadUserData: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kShouldAutoReloadUserDataFiles.rawValue)
+  @State private var selOnlyLoadFactoryLangModelsIfNeeded: Bool = UserDefaults.standard.bool(
+    forKey: UserDef.kOnlyLoadFactoryLangModelsIfNeeded.rawValue)
   @State private var selEnableCNS11643: Bool = UserDefaults.standard.bool(forKey: UserDef.kCNS11643Enabled.rawValue)
   @State private var selEnableSymbolInputSupport: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kSymbolInputEnabled.rawValue)
@@ -30,13 +35,15 @@ struct suiPrefPaneDictionary: View {
   @State private var selHardenVerticalPunctuations: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kHardenVerticalPunctuations.rawValue)
 
+  private static let dlgOpenPath = NSOpenPanel()
+
   private let contentMaxHeight: Double = 432
   private let contentWidth: Double = {
-    switch mgrPrefs.appleLanguages[0] {
+    switch PrefMgr.shared.appleLanguages[0] {
       case "ja":
         return 520
       default:
-        if mgrPrefs.appleLanguages[0].contains("zh-Han") {
+        if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
           return 480
         } else {
           return 580
@@ -58,41 +65,40 @@ struct suiPrefPaneDictionary: View {
                 .toolTip(tbxUserDataPathSpecified)
             }
             Button {
-              IME.dlgOpenPath.title = NSLocalizedString(
+              Self.dlgOpenPath.title = NSLocalizedString(
                 "Choose your desired user data folder.", comment: ""
               )
-              IME.dlgOpenPath.showsResizeIndicator = true
-              IME.dlgOpenPath.showsHiddenFiles = true
-              IME.dlgOpenPath.canChooseFiles = false
-              IME.dlgOpenPath.canChooseDirectories = true
+              Self.dlgOpenPath.showsResizeIndicator = true
+              Self.dlgOpenPath.showsHiddenFiles = true
+              Self.dlgOpenPath.canChooseFiles = false
+              Self.dlgOpenPath.canChooseDirectories = true
 
-              let bolPreviousFolderValidity = mgrLangModel.checkIfSpecifiedUserDataFolderValid(
-                mgrPrefs.userDataFolderSpecified.expandingTildeInPath)
+              let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
+                PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath)
 
               if let window = ctlPrefUI.shared.controller.window {
-                IME.dlgOpenPath.beginSheetModal(for: window) { result in
+                Self.dlgOpenPath.beginSheetModal(for: window) { result in
                   if result == NSApplication.ModalResponse.OK {
-                    guard let url = IME.dlgOpenPath.url else { return }
+                    guard let url = Self.dlgOpenPath.url else { return }
                     // CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
                     // 所以要手動補回來。
                     var newPath = url.path
                     newPath.ensureTrailingSlash()
-                    if mgrLangModel.checkIfSpecifiedUserDataFolderValid(newPath) {
-                      mgrPrefs.userDataFolderSpecified = newPath
-                      tbxUserDataPathSpecified = mgrPrefs.userDataFolderSpecified
+                    if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
+                      PrefMgr.shared.userDataFolderSpecified = newPath
+                      tbxUserDataPathSpecified = PrefMgr.shared.userDataFolderSpecified
                       BookmarkManager.shared.saveBookmark(for: url)
-                      IME.initLangModels(userOnly: true)
                       (NSApplication.shared.delegate as! AppDelegate).updateDirectoryMonitorPath()
                     } else {
-                      clsSFX.beep()
+                      IMEApp.buzz()
                       if !bolPreviousFolderValidity {
-                        mgrPrefs.resetSpecifiedUserDataFolder()
+                        LMMgr.resetSpecifiedUserDataFolder()
                       }
                       return
                     }
                   } else {
                     if !bolPreviousFolderValidity {
-                      mgrPrefs.resetSpecifiedUserDataFolder()
+                      LMMgr.resetSpecifiedUserDataFolder()
                     }
                     return
                   }
@@ -102,7 +108,7 @@ struct suiPrefPaneDictionary: View {
               Text("...")
             }
             Button {
-              mgrPrefs.resetSpecifiedUserDataFolder()
+              LMMgr.resetSpecifiedUserDataFolder()
               tbxUserDataPathSpecified = ""
             } label: {
               Text("↻")
@@ -111,47 +117,53 @@ struct suiPrefPaneDictionary: View {
           Toggle(
             LocalizedStringKey("Automatically reload user data files if changes detected"),
             isOn: $selAutoReloadUserData.onChange {
-              mgrPrefs.shouldAutoReloadUserDataFiles = selAutoReloadUserData
+              PrefMgr.shared.shouldAutoReloadUserDataFiles = selAutoReloadUserData
             }
           ).controlSize(.small)
         }
         Preferences.Section(title: "") {
           Toggle(
+            LocalizedStringKey("Only load factory language models if needed"),
+            isOn: $selOnlyLoadFactoryLangModelsIfNeeded.onChange {
+              PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded = selOnlyLoadFactoryLangModelsIfNeeded
+            }
+          )
+          Toggle(
             LocalizedStringKey("Enable CNS11643 Support (2022-08-02)"),
             isOn: $selEnableCNS11643.onChange {
-              mgrPrefs.cns11643Enabled = selEnableCNS11643
-              mgrLangModel.setCNSEnabled(mgrPrefs.cns11643Enabled)
+              PrefMgr.shared.cns11643Enabled = selEnableCNS11643
+              LMMgr.setCNSEnabled(PrefMgr.shared.cns11643Enabled)
             }
           )
           Toggle(
             LocalizedStringKey("Enable symbol input support (incl. certain emoji symbols)"),
             isOn: $selEnableSymbolInputSupport.onChange {
-              mgrPrefs.symbolInputEnabled = selEnableSymbolInputSupport
-              mgrLangModel.setSymbolEnabled(mgrPrefs.symbolInputEnabled)
+              PrefMgr.shared.symbolInputEnabled = selEnableSymbolInputSupport
+              LMMgr.setSymbolEnabled(PrefMgr.shared.symbolInputEnabled)
             }
           )
           Toggle(
             LocalizedStringKey("Allow boosting / excluding a candidate of single kanji"),
             isOn: $selAllowBoostingSingleKanjiAsUserPhrase.onChange {
-              mgrPrefs.allowBoostingSingleKanjiAsUserPhrase = selAllowBoostingSingleKanjiAsUserPhrase
+              PrefMgr.shared.allowBoostingSingleKanjiAsUserPhrase = selAllowBoostingSingleKanjiAsUserPhrase
             }
           )
           Toggle(
             LocalizedStringKey("Applying typing suggestions from half-life user override model"),
             isOn: $selFetchSuggestionsFromUserOverrideModel.onChange {
-              mgrPrefs.fetchSuggestionsFromUserOverrideModel = selFetchSuggestionsFromUserOverrideModel
+              PrefMgr.shared.fetchSuggestionsFromUserOverrideModel = selFetchSuggestionsFromUserOverrideModel
             }
           )
           Toggle(
             LocalizedStringKey("Always use fixed listing order in candidate window"),
             isOn: $selUseFixecCandidateOrderOnSelection.onChange {
-              mgrPrefs.useFixecCandidateOrderOnSelection = selUseFixecCandidateOrderOnSelection
+              PrefMgr.shared.useFixecCandidateOrderOnSelection = selUseFixecCandidateOrderOnSelection
             }
           )
           Toggle(
             LocalizedStringKey("Consolidate the context on confirming candidate selection"),
             isOn: $selConsolidateContextOnCandidateSelection.onChange {
-              mgrPrefs.consolidateContextOnCandidateSelection = selConsolidateContextOnCandidateSelection
+              PrefMgr.shared.consolidateContextOnCandidateSelection = selConsolidateContextOnCandidateSelection
             }
           )
           Text(
@@ -163,7 +175,7 @@ struct suiPrefPaneDictionary: View {
           Toggle(
             LocalizedStringKey("Harden vertical punctuations during vertical typing (not recommended)"),
             isOn: $selHardenVerticalPunctuations.onChange {
-              mgrPrefs.hardenVerticalPunctuations = selHardenVerticalPunctuations
+              PrefMgr.shared.hardenVerticalPunctuations = selHardenVerticalPunctuations
             }
           )
           Text(
