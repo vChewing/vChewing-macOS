@@ -126,6 +126,13 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kClientsIMKTextInputIncapable.rawValue, defaultValue: ["com.valvesoftware.steam"])
   public var clientsIMKTextInputIncapable: [String]
 
+  @AppProperty(key: UserDef.kOnlyLoadFactoryLangModelsIfNeeded.rawValue, defaultValue: true)
+  public var onlyLoadFactoryLangModelsIfNeeded: Bool {
+    didSet {
+      if onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModelsOnAppDelegate() }
+    }
+  }
+
   // MARK: - Settings (Tier 2)
 
   @AppProperty(key: UserDef.kUseIMKCandidateWindow.rawValue, defaultValue: false)
