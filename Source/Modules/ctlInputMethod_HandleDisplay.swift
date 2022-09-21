@@ -192,9 +192,9 @@ extension ctlInputMethod {
     let finalReturnFont: NSFont =
       {
         switch IMEApp.currentInputMode {
-          case InputMode.imeModeCHS:
+          case .imeModeCHS:
             return CTFontCreateUIFontForLanguage(.system, size, "zh-Hans" as CFString)
-          case InputMode.imeModeCHT:
+          case .imeModeCHT:
             return (PrefMgr.shared.shiftJISShinjitaiOutputEnabled || PrefMgr.shared.chineseConversionEnabled)
               ? CTFontCreateUIFontForLanguage(.system, size, "ja" as CFString)
               : CTFontCreateUIFontForLanguage(.system, size, "zh-Hant" as CFString)

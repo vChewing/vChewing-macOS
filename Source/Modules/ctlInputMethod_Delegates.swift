@@ -8,6 +8,8 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Shared
+
 // MARK: - KeyHandler Delegate
 
 extension ctlInputMethod: KeyHandlerDelegate {
@@ -26,9 +28,8 @@ extension ctlInputMethod: KeyHandlerDelegate {
     -> Bool
   {
     guard state.type == .ofMarking else { return false }
-    let refInputModeReversed: InputMode =
-      (inputMode == InputMode.imeModeCHT)
-      ? InputMode.imeModeCHS : InputMode.imeModeCHT
+    let refInputModeReversed: Shared.InputMode =
+      (inputMode == .imeModeCHT) ? .imeModeCHS : .imeModeCHT
     if !LMMgr.writeUserPhrase(
       state.data.userPhraseDumped, inputMode: inputMode,
       areWeDuplicating: state.data.chkIfUserPhraseExists,
