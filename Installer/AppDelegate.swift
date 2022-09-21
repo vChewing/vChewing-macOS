@@ -9,6 +9,7 @@
 // requirements defined in MIT License.
 
 import Cocoa
+import IMKUtils
 import InputMethodKit
 
 private let kTargetBin = "vChewing"
