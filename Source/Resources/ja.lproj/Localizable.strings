@@ -194,6 +194,7 @@
 "Misc Settings:" = "他の設定:";
 "MiTAC" = "神通配列";
 "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead." = "ご注意：Mac キーボードの「Delete ⌫」キーはここで「BackSpace ⌫」と呼ばれ、それはパソコンの常識としての本物の「Delete ⌦」と区別するためである。もし、テンキーの付いていない Mac キーボードで本物の「Delete ⌦」を使いたければ、代わりに「Fn+⌫」をご使用ください。";
+"Only load factory language models if needed" = "必要性を判断してから内蔵辞書を読み込む";
 "Only override the intonation of the previous reading if different" = "カーソルの後部の音読みの異なる音調だけを上書きする";
 "Only use this with known Chromium-based browsers" = "有名なる Chromium 系ブラウザーだけに、この装置を起用";
 "Output Settings:" = "出力設定:";
