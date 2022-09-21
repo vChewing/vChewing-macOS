@@ -47,6 +47,7 @@
 "chkFetchSuggestionsFromUserOverrideModel.title" = "Applying typing suggestions from half-life user override model";
 "chkHardenVerticalPunctuations.title" = "Harden vertical punctuations during vertical typing";
 "chkKeepReadingUponCompositionError.title" = "Allow backspace-editing miscomposed readings";
+"chkOnlyLoadFactoryLangModelsIfNeeded.title" = "Only load factory language models if needed";
 "chkUseFixecCandidateOrderOnSelection.title" = "Always use fixed listing order in candidate window";
 "DbW-eq-ZdB.title" = "Starlight";
 "dIN-TZ-67g.title" = "Space to +cycle candidates, Shift+Space to +cycle pages";

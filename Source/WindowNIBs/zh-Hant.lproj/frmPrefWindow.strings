@@ -47,6 +47,7 @@
 "chkFetchSuggestionsFromUserOverrideModel.title" = "在敲字時自動套用來自半衰記憶模組的建議";
 "chkHardenVerticalPunctuations.title" = "在縱排書寫時，強制轉換標點為縱排形式（不推薦）";
 "chkKeepReadingUponCompositionError.title" = "允許對無效的讀音使用 BackSpace 編輯";
+"chkOnlyLoadFactoryLangModelsIfNeeded.title" = "按需載入簡繁體模式的原廠辭典資料";
 "chkUseFixecCandidateOrderOnSelection.title" = "以固定順序來陳列選字窗內的候選字";
 "DbW-eq-ZdB.title" = "星光";
 "dIN-TZ-67g.title" = "Shift+Space 換下一頁，Space 換選下一個候選字";
