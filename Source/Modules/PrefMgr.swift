@@ -239,9 +239,7 @@ public class PrefMgr: PrefMgrProtocol {
   public var useSCPCTypingMode: Bool {
     willSet {
       if newValue {
-        DispatchQueue.main.async {
-          LMMgr.loadUserSCPCSequencesData()
-        }
+        LMMgr.loadUserSCPCSequencesData()
       }
     }
   }
@@ -251,9 +249,7 @@ public class PrefMgr: PrefMgrProtocol {
     willSet {
       LMMgr.setPhraseReplacementEnabled(newValue)
       if newValue {
-        DispatchQueue.main.async {
-          LMMgr.loadUserPhraseReplacement()
-        }
+        LMMgr.loadUserPhraseReplacement()
       }
     }
   }
@@ -262,9 +258,7 @@ public class PrefMgr: PrefMgrProtocol {
   public var associatedPhrasesEnabled: Bool {
     willSet {
       if newValue {
-        DispatchQueue.main.async {
-          LMMgr.loadUserAssociatesData()
-        }
+        LMMgr.loadUserAssociatesData()
       }
     }
   }
