@@ -27,7 +27,7 @@ class ctlClientListMgr: NSWindowController, NSTableViewDelegate, NSTableViewData
 
 extension ctlClientListMgr {
   func numberOfRows(in _: NSTableView) -> Int {
-    mgrPrefs.clientsIMKTextInputIncapable.count
+    PrefMgr.shared.clientsIMKTextInputIncapable.count
   }
 
   func callAlert(_ window: NSWindow, title: String, text: String? = nil) {
@@ -107,7 +107,7 @@ extension ctlClientListMgr {
                   self.callAlert(window, title: title, text: text)
                   return
                 }
-                if mgrPrefs.clientsIMKTextInputIncapable.contains(identifier) {
+                if PrefMgr.shared.clientsIMKTextInputIncapable.contains(identifier) {
                   title = NSLocalizedString(
                     "The selected item's identifier is already in the list.", comment: ""
                   )
@@ -125,41 +125,41 @@ extension ctlClientListMgr {
 
   private func applyNewValue(_ newValue: String) {
     guard !newValue.isEmpty else { return }
-    var arrResult = mgrPrefs.clientsIMKTextInputIncapable
+    var arrResult = PrefMgr.shared.clientsIMKTextInputIncapable
     arrResult.append(newValue)
-    mgrPrefs.clientsIMKTextInputIncapable = arrResult.sorted()
+    PrefMgr.shared.clientsIMKTextInputIncapable = arrResult.sorted()
     tblClients.reloadData()
-    btnRemoveClient.isEnabled = (0..<mgrPrefs.clientsIMKTextInputIncapable.count).contains(
+    btnRemoveClient.isEnabled = (0..<PrefMgr.shared.clientsIMKTextInputIncapable.count).contains(
       tblClients.selectedRow)
   }
 
   @IBAction func btnRemoveClientClicked(_: Any) {
     guard let minIndexSelected = tblClients.selectedRowIndexes.min() else { return }
-    if minIndexSelected >= mgrPrefs.clientsIMKTextInputIncapable.count { return }
+    if minIndexSelected >= PrefMgr.shared.clientsIMKTextInputIncapable.count { return }
     if minIndexSelected < 0 { return }
     var isLastRow = false
     tblClients.selectedRowIndexes.sorted().reversed().forEach { index in
       isLastRow = {
-        if mgrPrefs.clientsIMKTextInputIncapable.count < 2 { return false }
-        return minIndexSelected == mgrPrefs.clientsIMKTextInputIncapable.count - 1
+        if PrefMgr.shared.clientsIMKTextInputIncapable.count < 2 { return false }
+        return minIndexSelected == PrefMgr.shared.clientsIMKTextInputIncapable.count - 1
       }()
-      if index < mgrPrefs.clientsIMKTextInputIncapable.count {
-        mgrPrefs.clientsIMKTextInputIncapable.remove(at: index)
+      if index < PrefMgr.shared.clientsIMKTextInputIncapable.count {
+        PrefMgr.shared.clientsIMKTextInputIncapable.remove(at: index)
       }
     }
     if isLastRow {
       tblClients.selectRowIndexes(.init(arrayLiteral: minIndexSelected - 1), byExtendingSelection: false)
     }
     tblClients.reloadData()
-    btnRemoveClient.isEnabled = (0..<mgrPrefs.clientsIMKTextInputIncapable.count).contains(minIndexSelected)
+    btnRemoveClient.isEnabled = (0..<PrefMgr.shared.clientsIMKTextInputIncapable.count).contains(minIndexSelected)
   }
 
   func tableView(_: NSTableView, objectValueFor _: NSTableColumn?, row: Int) -> Any? {
     defer {
-      self.btnRemoveClient.isEnabled = (0..<mgrPrefs.clientsIMKTextInputIncapable.count).contains(
+      self.btnRemoveClient.isEnabled = (0..<PrefMgr.shared.clientsIMKTextInputIncapable.count).contains(
         self.tblClients.selectedRow)
     }
-    return mgrPrefs.clientsIMKTextInputIncapable[row]
+    return PrefMgr.shared.clientsIMKTextInputIncapable[row]
   }
 
   private func localize() {

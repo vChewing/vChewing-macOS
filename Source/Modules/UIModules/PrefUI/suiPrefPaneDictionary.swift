@@ -37,11 +37,11 @@ struct suiPrefPaneDictionary: View {
 
   private let contentMaxHeight: Double = 432
   private let contentWidth: Double = {
-    switch mgrPrefs.appleLanguages[0] {
+    switch PrefMgr.shared.appleLanguages[0] {
       case "ja":
         return 520
       default:
-        if mgrPrefs.appleLanguages[0].contains("zh-Han") {
+        if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
           return 480
         } else {
           return 580
@@ -72,7 +72,7 @@ struct suiPrefPaneDictionary: View {
               Self.dlgOpenPath.canChooseDirectories = true
 
               let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
-                mgrPrefs.userDataFolderSpecified.expandingTildeInPath)
+                PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath)
 
               if let window = ctlPrefUI.shared.controller.window {
                 Self.dlgOpenPath.beginSheetModal(for: window) { result in
@@ -83,8 +83,8 @@ struct suiPrefPaneDictionary: View {
                     var newPath = url.path
                     newPath.ensureTrailingSlash()
                     if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
-                      mgrPrefs.userDataFolderSpecified = newPath
-                      tbxUserDataPathSpecified = mgrPrefs.userDataFolderSpecified
+                      PrefMgr.shared.userDataFolderSpecified = newPath
+                      tbxUserDataPathSpecified = PrefMgr.shared.userDataFolderSpecified
                       BookmarkManager.shared.saveBookmark(for: url)
                       (NSApplication.shared.delegate as! AppDelegate).updateDirectoryMonitorPath()
                     } else {
@@ -115,7 +115,7 @@ struct suiPrefPaneDictionary: View {
           Toggle(
             LocalizedStringKey("Automatically reload user data files if changes detected"),
             isOn: $selAutoReloadUserData.onChange {
-              mgrPrefs.shouldAutoReloadUserDataFiles = selAutoReloadUserData
+              PrefMgr.shared.shouldAutoReloadUserDataFiles = selAutoReloadUserData
             }
           ).controlSize(.small)
         }
@@ -123,39 +123,39 @@ struct suiPrefPaneDictionary: View {
           Toggle(
             LocalizedStringKey("Enable CNS11643 Support (2022-08-02)"),
             isOn: $selEnableCNS11643.onChange {
-              mgrPrefs.cns11643Enabled = selEnableCNS11643
-              LMMgr.setCNSEnabled(mgrPrefs.cns11643Enabled)
+              PrefMgr.shared.cns11643Enabled = selEnableCNS11643
+              LMMgr.setCNSEnabled(PrefMgr.shared.cns11643Enabled)
             }
           )
           Toggle(
             LocalizedStringKey("Enable symbol input support (incl. certain emoji symbols)"),
             isOn: $selEnableSymbolInputSupport.onChange {
-              mgrPrefs.symbolInputEnabled = selEnableSymbolInputSupport
-              LMMgr.setSymbolEnabled(mgrPrefs.symbolInputEnabled)
+              PrefMgr.shared.symbolInputEnabled = selEnableSymbolInputSupport
+              LMMgr.setSymbolEnabled(PrefMgr.shared.symbolInputEnabled)
             }
           )
           Toggle(
             LocalizedStringKey("Allow boosting / excluding a candidate of single kanji"),
             isOn: $selAllowBoostingSingleKanjiAsUserPhrase.onChange {
-              mgrPrefs.allowBoostingSingleKanjiAsUserPhrase = selAllowBoostingSingleKanjiAsUserPhrase
+              PrefMgr.shared.allowBoostingSingleKanjiAsUserPhrase = selAllowBoostingSingleKanjiAsUserPhrase
             }
           )
           Toggle(
             LocalizedStringKey("Applying typing suggestions from half-life user override model"),
             isOn: $selFetchSuggestionsFromUserOverrideModel.onChange {
-              mgrPrefs.fetchSuggestionsFromUserOverrideModel = selFetchSuggestionsFromUserOverrideModel
+              PrefMgr.shared.fetchSuggestionsFromUserOverrideModel = selFetchSuggestionsFromUserOverrideModel
             }
           )
           Toggle(
             LocalizedStringKey("Always use fixed listing order in candidate window"),
             isOn: $selUseFixecCandidateOrderOnSelection.onChange {
-              mgrPrefs.useFixecCandidateOrderOnSelection = selUseFixecCandidateOrderOnSelection
+              PrefMgr.shared.useFixecCandidateOrderOnSelection = selUseFixecCandidateOrderOnSelection
             }
           )
           Toggle(
             LocalizedStringKey("Consolidate the context on confirming candidate selection"),
             isOn: $selConsolidateContextOnCandidateSelection.onChange {
-              mgrPrefs.consolidateContextOnCandidateSelection = selConsolidateContextOnCandidateSelection
+              PrefMgr.shared.consolidateContextOnCandidateSelection = selConsolidateContextOnCandidateSelection
             }
           )
           Text(
@@ -167,7 +167,7 @@ struct suiPrefPaneDictionary: View {
           Toggle(
             LocalizedStringKey("Harden vertical punctuations during vertical typing (not recommended)"),
             isOn: $selHardenVerticalPunctuations.onChange {
-              mgrPrefs.hardenVerticalPunctuations = selHardenVerticalPunctuations
+              PrefMgr.shared.hardenVerticalPunctuations = selHardenVerticalPunctuations
             }
           )
           Text(

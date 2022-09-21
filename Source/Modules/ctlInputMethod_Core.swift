@@ -28,7 +28,7 @@ class ctlInputMethod: IMKInputController {
 
   /// 目前在用的的選字窗副本。
   static var ctlCandidateCurrent: ctlCandidateProtocol =
-    mgrPrefs.useIMKCandidateWindow ? ctlCandidateIMK.init(.horizontal) : ctlCandidateUniversal.init(.horizontal)
+    PrefMgr.shared.useIMKCandidateWindow ? ctlCandidateIMK.init(.horizontal) : ctlCandidateUniversal.init(.horizontal)
 
   /// 工具提示視窗的共用副本。
   static var tooltipInstance = ctlTooltip()
@@ -41,7 +41,7 @@ class ctlInputMethod: IMKInputController {
   /// 當前這個 ctlInputMethod 副本是否處於英數輸入模式。
   var isASCIIMode = false { didSet { setKeyLayout() } }
   /// 按鍵調度模組的副本。
-  var keyHandler: KeyHandler = .init(lm: LMMgr.currentLM(), uom: LMMgr.currentUOM())
+  var keyHandler = KeyHandler(lm: LMMgr.currentLM(), uom: LMMgr.currentUOM(), pref: PrefMgr.shared)
   /// 用以記錄當前輸入法狀態的變數。
   var state: IMEStateProtocol = IMEState.ofEmpty() {
     didSet {
@@ -51,7 +51,7 @@ class ctlInputMethod: IMKInputController {
 
   /// Shift 按鍵事件分析器的副本。
   /// - Remark: 警告：該工具必須為 Struct 且全專案只能有一個唯一初期化副本。否則會在動 CapsLock 的時候誤以為是在摁 Shift。
-  static var theShiftKeyDetector = ShiftKeyUpChecker(useLShift: mgrPrefs.togglingAlphanumericalModeWithLShift)
+  static var theShiftKeyDetector = ShiftKeyUpChecker(useLShift: PrefMgr.shared.togglingAlphanumericalModeWithLShift)
 
   /// 切換當前 ctlInputMethod 副本的英數輸入模式開關。
   func toggleASCIIMode() -> Bool {
@@ -82,20 +82,20 @@ class ctlInputMethod: IMKInputController {
   func setKeyLayout() {
     guard let client = client() else { return }
     if isASCIIMode, IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
-      client.overrideKeyboard(withKeyboardNamed: mgrPrefs.alphanumericalKeyboardLayout)
+      client.overrideKeyboard(withKeyboardNamed: PrefMgr.shared.alphanumericalKeyboardLayout)
       return
     }
-    client.overrideKeyboard(withKeyboardNamed: mgrPrefs.basicKeyboardLayout)
+    client.overrideKeyboard(withKeyboardNamed: PrefMgr.shared.basicKeyboardLayout)
   }
 
   /// 重設按鍵調度模組，會將當前尚未遞交的內容遞交出去。
   func resetKeyHandler() {
     // 過濾掉尚未完成拼寫的注音。
-    if state.type == .ofInputting, mgrPrefs.trimUnfinishedReadingsOnCommit {
+    if state.type == .ofInputting, PrefMgr.shared.trimUnfinishedReadingsOnCommit {
       keyHandler.composer.clear()
       handle(state: keyHandler.buildInputtingState)
     }
-    let isSecureMode = mgrPrefs.clientsIMKTextInputIncapable.contains(clientBundleIdentifier)
+    let isSecureMode = PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier)
     if state.hasComposition, !isSecureMode {
       /// 將傳回的新狀態交給調度函式。
       handle(state: IMEState.ofCommitting(textToCommit: state.displayedText))
@@ -137,7 +137,7 @@ class ctlInputMethod: IMKInputController {
     keyHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
     keyHandler.ensureKeyboardParser()
 
-    if isASCIIMode, mgrPrefs.disableShiftTogglingAlphanumericalMode { isASCIIMode = false }
+    if isASCIIMode, PrefMgr.shared.disableShiftTogglingAlphanumericalMode { isASCIIMode = false }
 
     /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
     /// 這是很多 macOS 副廠輸入法的常見失誤之處。
@@ -199,7 +199,7 @@ class ctlInputMethod: IMKInputController {
     willSet {
       /// 將新的簡繁輸入模式提報給 Prefs 與 IME 模組。
       IMEApp.currentInputMode = newValue
-      mgrPrefs.mostRecentInputMode = IMEApp.currentInputMode.rawValue
+      PrefMgr.shared.mostRecentInputMode = IMEApp.currentInputMode.rawValue
     }
     didSet {
       /// 重設所有語言模組。這裡不需要做按需重設，因為對運算量沒有影響。
@@ -214,11 +214,11 @@ class ctlInputMethod: IMKInputController {
 
   /// 將輸入法偏好設定同步至語言模組內。
   func syncBaseLMPrefs() {
-    LMMgr.currentLM().isPhraseReplacementEnabled = mgrPrefs.phraseReplacementEnabled
-    LMMgr.currentLM().isCNSEnabled = mgrPrefs.cns11643Enabled
-    LMMgr.currentLM().isSymbolEnabled = mgrPrefs.symbolInputEnabled
-    LMMgr.currentLM().isSCPCEnabled = mgrPrefs.useSCPCTypingMode
-    LMMgr.currentLM().deltaOfCalendarYears = mgrPrefs.deltaOfCalendarYears
+    LMMgr.currentLM().isPhraseReplacementEnabled = PrefMgr.shared.phraseReplacementEnabled
+    LMMgr.currentLM().isCNSEnabled = PrefMgr.shared.cns11643Enabled
+    LMMgr.currentLM().isSymbolEnabled = PrefMgr.shared.symbolInputEnabled
+    LMMgr.currentLM().isSCPCEnabled = PrefMgr.shared.useSCPCTypingMode
+    LMMgr.currentLM().deltaOfCalendarYears = PrefMgr.shared.deltaOfCalendarYears
   }
 
   // MARK: - IMKServerInput 協定規定的方法
@@ -261,7 +261,7 @@ class ctlInputMethod: IMKInputController {
 
     // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
     let shouldUseShiftToggleHandle: Bool = {
-      switch mgrPrefs.shiftKeyAccommodationBehavior {
+      switch PrefMgr.shared.shiftKeyAccommodationBehavior {
         case 0: return false
         case 1: return Shared.arrClientShiftHandlingExceptionList.contains(clientBundleIdentifier)
         case 2: return true
@@ -271,7 +271,7 @@ class ctlInputMethod: IMKInputController {
 
     /// 警告：這裡的 event 必須是原始 event 且不能被 var，否則會影響 Shift 中英模式判定。
     if #available(macOS 10.15, *) {
-      if Self.theShiftKeyDetector.check(event), !mgrPrefs.disableShiftTogglingAlphanumericalMode {
+      if Self.theShiftKeyDetector.check(event), !PrefMgr.shared.disableShiftTogglingAlphanumericalMode {
         if !shouldUseShiftToggleHandle || (!rencentKeyHandledByKeyHandlerEtc && shouldUseShiftToggleHandle) {
           NotifierController.notify(
             message: toggleASCIIMode()
@@ -375,7 +375,7 @@ class ctlInputMethod: IMKInputController {
         var result = (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)\u{1A}(\(theCandidate.1))"
         if arrResult.contains(result) {
           let reading: String =
-            mgrPrefs.showHanyuPinyinInCompositionBuffer
+            PrefMgr.shared.showHanyuPinyinInCompositionBuffer
             ? Tekkon.cnvPhonaToHanyuPinyin(target: Tekkon.restoreToneOneInZhuyinKey(target: theCandidate.0))
             : theCandidate.0
           result = "\(result)\u{17}(\(reading))"
@@ -423,7 +423,7 @@ class ctlInputMethod: IMKInputController {
   override open func candidateSelected(_ candidateString: NSAttributedString!) {
     let candidateString: String = candidateString?.string ?? ""
     if state.type == .ofAssociates {
-      if !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter {
+      if !PrefMgr.shared.alsoConfirmAssociatedCandidatesByEnter {
         handle(state: IMEState.ofAbortion())
         return
       }
@@ -437,7 +437,7 @@ class ctlInputMethod: IMKInputController {
         let theConverted = ChineseConverter.kanjiConversionIfRequired(neta.1)
         let netaShown = (neta.1 == theConverted) ? neta.1 : "\(theConverted)\u{1A}(\(neta.1))"
         let reading: String =
-          mgrPrefs.showHanyuPinyinInCompositionBuffer
+          PrefMgr.shared.showHanyuPinyinInCompositionBuffer
           ? Tekkon.cnvPhonaToHanyuPinyin(target: Tekkon.restoreToneOneInZhuyinKey(target: neta.0)) : neta.0
         let netaShownWithPronunciation = "\(netaShown)\u{17}(\(reading))"
         if candidateString == prefix + netaShownWithPronunciation {

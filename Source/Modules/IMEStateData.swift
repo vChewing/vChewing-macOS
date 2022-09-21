@@ -10,11 +10,11 @@ import Tekkon
 
 public struct StateData {
   private static var minCandidateLength: Int {
-    mgrPrefs.allowBoostingSingleKanjiAsUserPhrase ? 1 : 2
+    PrefMgr.shared.allowBoostingSingleKanjiAsUserPhrase ? 1 : 2
   }
 
   static var allowedMarkLengthRange: ClosedRange<Int> {
-    Self.minCandidateLength...mgrPrefs.maxCandidateLength
+    Self.minCandidateLength...PrefMgr.shared.maxCandidateLength
   }
 
   var displayedText: String = ""
@@ -177,8 +177,8 @@ extension StateData {
         arrOutput.append("??")
         continue
       }
-      if mgrPrefs.showHanyuPinyinInCompositionBuffer,
-        mgrPrefs.alwaysShowTooltipTextsHorizontally || !isVerticalTyping
+      if PrefMgr.shared.showHanyuPinyinInCompositionBuffer,
+        PrefMgr.shared.alwaysShowTooltipTextsHorizontally || !isVerticalTyping
       {
         // 恢復陰平標記->注音轉拼音->轉教科書式標調
         neta = Tekkon.restoreToneOneInZhuyinKey(target: neta)
@@ -215,7 +215,7 @@ extension StateData {
   mutating func updateTooltipForMarking() {
     var tooltipForMarking: String {
       let pair = userPhraseKVPair
-      if mgrPrefs.phraseReplacementEnabled {
+      if PrefMgr.shared.phraseReplacementEnabled {
         tooltipColorState = .warning
         return NSLocalizedString(
           "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.", comment: ""

@@ -39,7 +39,7 @@ extension KeyHandler {
 
     if cancelCandidateKey {
       if state.type == .ofAssociates
-        || mgrPrefs.useSCPCTypingMode
+        || prefs.useSCPCTypingMode
         || compositor.isEmpty
       {
         // 如果此時發現當前組字緩衝區為真空的情況的話，
@@ -59,7 +59,7 @@ extension KeyHandler {
     // MARK: Enter
 
     if input.isEnter {
-      if state.type == .ofAssociates, !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter {
+      if state.type == .ofAssociates, !prefs.alsoConfirmAssociatedCandidatesByEnter {
         stateCallback(IMEState.ofAbortion())
         return true
       }
@@ -71,7 +71,7 @@ extension KeyHandler {
 
     if input.isTab {
       let updated: Bool =
-        mgrPrefs.specifyShiftTabKeyBehavior
+        prefs.specifyShiftTabKeyBehavior
         ? (input.isShiftHold
           ? ctlCandidate.showPreviousPage()
           : ctlCandidate.showNextPage())
@@ -88,7 +88,7 @@ extension KeyHandler {
 
     if input.isSpace {
       let updated: Bool =
-        mgrPrefs.specifyShiftSpaceKeyBehavior
+        prefs.specifyShiftSpaceKeyBehavior
         ? (input.isShiftHold
           ? ctlCandidate.highlightNextCandidate()
           : ctlCandidate.showNextPage())
@@ -242,7 +242,7 @@ extension KeyHandler {
 
     // MARK: 逐字選字模式的處理 (SCPC Mode Processing)
 
-    if mgrPrefs.useSCPCTypingMode {
+    if prefs.useSCPCTypingMode {
       /// 檢查：
       /// - 是否是針對當前注音排列/拼音輸入種類專門提供的標點符號。
       /// - 是否是需要摁修飾鍵才可以輸入的那種標點符號。
