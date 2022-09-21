@@ -288,6 +288,9 @@ class ctlInputMethod: IMKInputController {
 
     // MARK: 針對客體的具體處理
 
+    // 不再讓威注音處理由 Shift 切換到的英文模式的按鍵輸入。
+    if isASCIIMode { return false }
+
     /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
     /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
     /// 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
