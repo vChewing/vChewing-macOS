@@ -34,7 +34,7 @@
 		5B8457A12871ADBE00C93B01 /* ChineseConverterBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8457A02871ADBE00C93B01 /* ChineseConverterBridge.swift */; };
 		5B963C9D28D5BFB800DCEE88 /* CocoaExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 5B963C9C28D5BFB800DCEE88 /* CocoaExtension */; };
 		5B963CA328D5C23600DCEE88 /* SwiftExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 5B963CA228D5C23600DCEE88 /* SwiftExtension */; };
-		5B963CA828D5DB1400DCEE88 /* PrefMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B963CA728D5DB1400DCEE88 /* PrefMgr.swift */; };
+		5B963CA828D5DB1400DCEE88 /* PrefMgr_Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B963CA728D5DB1400DCEE88 /* PrefMgr_Core.swift */; };
 		5B98114828D6198700CBC605 /* PinyinPhonaConverter in Frameworks */ = {isa = PBXBuildFile; productRef = 5B98114728D6198700CBC605 /* PinyinPhonaConverter */; };
 		5BA9FD0F27FEDB6B002DE248 /* suiPrefPaneGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0A27FEDB6B002DE248 /* suiPrefPaneGeneral.swift */; };
 		5BA9FD1027FEDB6B002DE248 /* suiPrefPaneKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0B27FEDB6B002DE248 /* suiPrefPaneKeyboard.swift */; };
@@ -58,6 +58,7 @@
 		5BC447A02865686500EDC323 /* data-symbols.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71E283B4AEA0078EB25 /* data-symbols.plist */; };
 		5BC447A12865686500EDC323 /* data-zhuyinwen.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.plist */; };
 		5BC447A628656A1900EDC323 /* Placeholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC447A228656A1900EDC323 /* Placeholder.swift */; };
+		5BCCAFF828DB19A300AB1B27 /* PrefMgr_Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCCAFF728DB19A300AB1B27 /* PrefMgr_Extension.swift */; };
 		5BD0113D2818543900609769 /* KeyHandler_Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0113C2818543900609769 /* KeyHandler_Core.swift */; };
 		5BD05BCA27B2A43D004C4F1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
 		5BD05C5D27B2BBA9004C4F1D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5BD05C5B27B2BBA9004C4F1D /* Main.storyboard */; };
@@ -222,7 +223,7 @@
 		5B963C9B28D5BE4100DCEE88 /* vChewing_CocoaExtension */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_CocoaExtension; path = Packages/vChewing_CocoaExtension; sourceTree = "<group>"; };
 		5B963C9E28D5C14600DCEE88 /* vChewing_Shared */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Shared; path = Packages/vChewing_Shared; sourceTree = "<group>"; };
 		5B963CA128D5C22D00DCEE88 /* vChewing_SwiftExtension */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_SwiftExtension; path = Packages/vChewing_SwiftExtension; sourceTree = "<group>"; };
-		5B963CA728D5DB1400DCEE88 /* PrefMgr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefMgr.swift; sourceTree = "<group>"; };
+		5B963CA728D5DB1400DCEE88 /* PrefMgr_Core.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefMgr_Core.swift; sourceTree = "<group>"; };
 		5B98114628D6198000CBC605 /* vChewing_PinyinPhonaConverter */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_PinyinPhonaConverter; path = Packages/vChewing_PinyinPhonaConverter; sourceTree = "<group>"; };
 		5BA9FD0A27FEDB6B002DE248 /* suiPrefPaneGeneral.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = suiPrefPaneGeneral.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BA9FD0B27FEDB6B002DE248 /* suiPrefPaneKeyboard.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = suiPrefPaneKeyboard.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -245,6 +246,7 @@
 		5BC2652127E04B7B00700291 /* uninstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; lineEnding = 0; path = uninstall.sh; sourceTree = "<group>"; };
 		5BC447A228656A1900EDC323 /* Placeholder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Placeholder.swift; sourceTree = "<group>"; };
 		5BC447AB2865BEF500EDC323 /* AUTHORS */ = {isa = PBXFileReference; lastKnownFileType = text; path = AUTHORS; sourceTree = "<group>"; };
+		5BCCAFF728DB19A300AB1B27 /* PrefMgr_Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefMgr_Extension.swift; sourceTree = "<group>"; };
 		5BD0113C2818543900609769 /* KeyHandler_Core.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = KeyHandler_Core.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingPhraseEditor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5BD05BC627B2A42A004C4F1D /* vChewingPhraseEditor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewingPhraseEditor.entitlements; sourceTree = "<group>"; };
@@ -692,7 +694,8 @@
 				5B3133BE280B229700A4A505 /* KeyHandler_States.swift */,
 				5BAEFACF28012565001F42C9 /* LMMgr.swift */,
 				D47B92BF27972AC800458394 /* main.swift */,
-				5B963CA728D5DB1400DCEE88 /* PrefMgr.swift */,
+				5B963CA728D5DB1400DCEE88 /* PrefMgr_Core.swift */,
+				5BCCAFF728DB19A300AB1B27 /* PrefMgr_Extension.swift */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -1057,7 +1060,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B963CA828D5DB1400DCEE88 /* PrefMgr.swift in Sources */,
+				5B963CA828D5DB1400DCEE88 /* PrefMgr_Core.swift in Sources */,
 				D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */,
 				5B7F225D2808501000DDD3CB /* KeyHandler_HandleInput.swift in Sources */,
 				5BA9FD1227FEDB6B002DE248 /* suiPrefPaneExperience.swift in Sources */,
@@ -1082,6 +1085,7 @@
 				5B782EC4280C243C007276DE /* KeyHandler_HandleCandidate.swift in Sources */,
 				5BA9FD0F27FEDB6B002DE248 /* suiPrefPaneGeneral.swift in Sources */,
 				5B242403284B0D6500520FE4 /* ctlCandidateUniversal.swift in Sources */,
+				5BCCAFF828DB19A300AB1B27 /* PrefMgr_Extension.swift in Sources */,
 				5BA9FD1127FEDB6B002DE248 /* ctlPrefUI.swift in Sources */,
 				5B8457A12871ADBE00C93B01 /* ChineseConverterBridge.swift in Sources */,
 				5BA9FD1327FEDB6B002DE248 /* suiPrefPaneDictionary.swift in Sources */,
