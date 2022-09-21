@@ -13,12 +13,6 @@ import InputMethodKit
 import Shared
 import Uninstaller
 
-guard let kConnectionName = Bundle.main.infoDictionary?["InputMethodConnectionName"] as? String
-else {
-  NSLog("Fatal error: Failed from retrieving connection name from info.plist file.")
-  exit(-1)
-}
-
 switch max(CommandLine.arguments.count - 1, 0) {
   case 0: break
   case 1, 2:
@@ -53,9 +47,12 @@ if !loaded {
 }
 
 guard let bundleID = Bundle.main.bundleIdentifier,
+  let kConnectionName = Bundle.main.infoDictionary?["InputMethodConnectionName"] as? String,
   let server = IMKServer(name: kConnectionName, bundleIdentifier: bundleID)
 else {
-  NSLog("Fatal error: Cannot initialize input method server with connection \(kConnectionName).")
+  NSLog(
+    "Fatal error: Cannot initialize input method server with connection name retrieved from the plist, nor there's no connection name in the plist."
+  )
   exit(-1)
 }
 
