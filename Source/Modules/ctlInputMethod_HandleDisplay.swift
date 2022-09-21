@@ -18,7 +18,7 @@ extension ctlInputMethod {
   // 對此類 App 有疑慮者，可以將這類 App 登記到客體管理員當中。
   // 這樣，不但強制使用（限制讀音 20 個的）浮動組字窗，而且內文組字區只會顯示一個空格。
   var attributedStringSecured: (NSAttributedString, NSRange) {
-    mgrPrefs.clientsIMKTextInputIncapable.contains(clientBundleIdentifier)
+    PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier)
       ? (state.data.attributedStringPlaceholder, NSRange(location: 0, length: 0))
       : (state.attributedString, NSRange(state.data.u16MarkedRange))
   }
@@ -56,7 +56,7 @@ extension ctlInputMethod {
       )
     }
     let tooltipContentDirection: NSAttributedTextView.writingDirection = {
-      if mgrPrefs.alwaysShowTooltipTextsHorizontally { return .horizontal }
+      if PrefMgr.shared.alwaysShowTooltipTextsHorizontally { return .horizontal }
       return isVerticalTyping ? .vertical : .horizontal
     }()
     // 強制重新初期化，因為 NSAttributedTextView 有顯示滯後性。
@@ -88,13 +88,13 @@ extension ctlInputMethod {
       // 因為在拿候選字陣列時已經排序過了，所以這裡不用再多排序。
       // 測量每頁顯示候選字的累計總長度。如果太長的話就強制使用縱排候選字窗。
       // 範例：「屬實牛逼」（會有一大串各種各樣的「鼠食牛Beer」的 emoji）。
-      let maxCandidatesPerPage = mgrPrefs.candidateKeys.count
+      let maxCandidatesPerPage = PrefMgr.shared.candidateKeys.count
       let firstPageCandidates = candidates[0..<min(maxCandidatesPerPage, candidates.count)].map(\.1)
       return firstPageCandidates.joined().count > Int(round(Double(maxCandidatesPerPage) * 1.8))
       // 上面這句如果是 true 的話，就會是縱排；反之則為橫排。
     }
 
-    state.isVerticalCandidateWindow = (isCandidateWindowVertical || !mgrPrefs.useHorizontalCandidateList)
+    state.isVerticalCandidateWindow = (isCandidateWindowVertical || !PrefMgr.shared.useHorizontalCandidateList)
 
     ctlInputMethod.ctlCandidateCurrent.delegate = nil
 
@@ -105,16 +105,16 @@ extension ctlInputMethod {
     /// 該問題徹底解決的價值並不大，直接等到 macOS 10.x 全線淘汰之後用 SwiftUI 重寫選字窗吧。
 
     let candidateLayout: CandidateLayout =
-      ((isCandidateWindowVertical || !mgrPrefs.useHorizontalCandidateList)
+      ((isCandidateWindowVertical || !PrefMgr.shared.useHorizontalCandidateList)
         ? CandidateLayout.vertical
         : CandidateLayout.horizontal)
 
     ctlInputMethod.ctlCandidateCurrent =
-      mgrPrefs.useIMKCandidateWindow
+      PrefMgr.shared.useIMKCandidateWindow
       ? ctlCandidateIMK.init(candidateLayout) : ctlCandidateUniversal.init(candidateLayout)
 
     // set the attributes for the candidate panel (which uses NSAttributedString)
-    let textSize = mgrPrefs.candidateListTextSize
+    let textSize = PrefMgr.shared.candidateListTextSize
     let minimumKeyLabelSize: Double = 10
     let keyLabelSize = max(textSize / 2, minimumKeyLabelSize)
 
@@ -126,13 +126,13 @@ extension ctlInputMethod {
     }
 
     ctlInputMethod.ctlCandidateCurrent.keyLabelFont = labelFont(
-      name: mgrPrefs.candidateKeyLabelFontName, size: keyLabelSize
+      name: PrefMgr.shared.candidateKeyLabelFontName, size: keyLabelSize
     )
     ctlInputMethod.ctlCandidateCurrent.candidateFont = ctlInputMethod.candidateFont(
-      name: mgrPrefs.candidateTextFontName, size: textSize
+      name: PrefMgr.shared.candidateTextFontName, size: textSize
     )
 
-    let candidateKeys = mgrPrefs.candidateKeys
+    let candidateKeys = PrefMgr.shared.candidateKeys
     let keyLabels =
       candidateKeys.count > 4 ? Array(candidateKeys) : Array(CandidateKey.defaultKeys)
     let keyLabelSuffix = state.type == .ofAssociates ? "^" : ""
@@ -195,7 +195,7 @@ extension ctlInputMethod {
           case InputMode.imeModeCHS:
             return CTFontCreateUIFontForLanguage(.system, size, "zh-Hans" as CFString)
           case InputMode.imeModeCHT:
-            return (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
+            return (PrefMgr.shared.shiftJISShinjitaiOutputEnabled || PrefMgr.shared.chineseConversionEnabled)
               ? CTFontCreateUIFontForLanguage(.system, size, "ja" as CFString)
               : CTFontCreateUIFontForLanguage(.system, size, "zh-Hant" as CFString)
           default:

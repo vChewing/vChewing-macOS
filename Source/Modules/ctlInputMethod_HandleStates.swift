@@ -80,7 +80,7 @@ extension ctlInputMethod {
       default: break
     }
     // 浮動組字窗的顯示判定
-    if state.hasComposition, mgrPrefs.clientsIMKTextInputIncapable.contains(clientBundleIdentifier) {
+    if state.hasComposition, PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier) {
       ctlInputMethod.popupCompositionBuffer.isTypingDirectionVertical = isVerticalTyping
       ctlInputMethod.popupCompositionBuffer.show(
         state: state, at: lineHeightRect(zeroCursor: true).origin

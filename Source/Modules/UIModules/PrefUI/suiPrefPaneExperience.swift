@@ -50,11 +50,11 @@ struct suiPrefPaneExperience: View {
 
   private let contentMaxHeight: Double = 432
   private let contentWidth: Double = {
-    switch mgrPrefs.appleLanguages[0] {
+    switch PrefMgr.shared.appleLanguages[0] {
       case "ja":
         return 520
       default:
-        if mgrPrefs.appleLanguages[0].contains("zh-Han") {
+        if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
           return 480
         } else {
           return 580
@@ -85,7 +85,7 @@ struct suiPrefPaneExperience: View {
           Picker(
             "",
             selection: $selCursorPosition.onChange {
-              mgrPrefs.useRearCursorMode = (selCursorPosition == 1) ? true : false
+              PrefMgr.shared.useRearCursorMode = (selCursorPosition == 1) ? true : false
             }
           ) {
             Text(LocalizedStringKey("in front of the phrase (like macOS built-in Zhuyin IME)")).tag(0)
@@ -98,7 +98,7 @@ struct suiPrefPaneExperience: View {
           Toggle(
             LocalizedStringKey("Push the cursor in front of the phrase after selection"),
             isOn: $selPushCursorAfterSelection.onChange {
-              mgrPrefs.moveCursorAfterSelectingCandidate = selPushCursorAfterSelection
+              PrefMgr.shared.moveCursorAfterSelectingCandidate = selPushCursorAfterSelection
             }
           ).controlSize(.small)
         }
@@ -106,7 +106,7 @@ struct suiPrefPaneExperience: View {
           Picker(
             "",
             selection: $selSpecifyShiftBackSpaceKeyBehavior.onChange {
-              mgrPrefs.specifyShiftBackSpaceKeyBehavior = selSpecifyShiftBackSpaceKeyBehavior
+              PrefMgr.shared.specifyShiftBackSpaceKeyBehavior = selSpecifyShiftBackSpaceKeyBehavior
             }
           ) {
             Text(LocalizedStringKey("Disassemble the previous reading, dropping its intonation")).tag(0)
@@ -122,7 +122,7 @@ struct suiPrefPaneExperience: View {
           Picker(
             "",
             selection: $selKeyBehaviorShiftTab.onChange {
-              mgrPrefs.specifyShiftTabKeyBehavior = (selKeyBehaviorShiftTab == 1) ? true : false
+              PrefMgr.shared.specifyShiftTabKeyBehavior = (selKeyBehaviorShiftTab == 1) ? true : false
             }
           ) {
             Text(LocalizedStringKey("for cycling candidates")).tag(0)
@@ -138,7 +138,7 @@ struct suiPrefPaneExperience: View {
           Picker(
             "",
             selection: $selKeyBehaviorShiftSpace.onChange {
-              mgrPrefs.specifyShiftSpaceKeyBehavior = (selKeyBehaviorShiftSpace == 1) ? true : false
+              PrefMgr.shared.specifyShiftSpaceKeyBehavior = (selKeyBehaviorShiftSpace == 1) ? true : false
             }
           ) {
             Text(LocalizedStringKey("Space to +cycle candidates, Shift+Space to +cycle pages")).tag(0)
@@ -153,7 +153,7 @@ struct suiPrefPaneExperience: View {
           Picker(
             "",
             selection: $selUpperCaseLetterKeyBehavior.onChange {
-              mgrPrefs.upperCaseLetterKeyBehavior = selUpperCaseLetterKeyBehavior
+              PrefMgr.shared.upperCaseLetterKeyBehavior = selUpperCaseLetterKeyBehavior
             }
           ) {
             Text(LocalizedStringKey("Type them into inline composition buffer")).tag(0)
@@ -169,7 +169,7 @@ struct suiPrefPaneExperience: View {
           Picker(
             "",
             selection: $selSpecifyIntonationKeyBehavior.onChange {
-              mgrPrefs.specifyIntonationKeyBehavior = selSpecifyIntonationKeyBehavior
+              PrefMgr.shared.specifyIntonationKeyBehavior = selSpecifyIntonationKeyBehavior
             }
           ) {
             Text(LocalizedStringKey("Override the previous reading's intonation with candidate-reset")).tag(0)
@@ -185,57 +185,57 @@ struct suiPrefPaneExperience: View {
           Toggle(
             LocalizedStringKey("Completely disable using Shift key to toggle alphanumerical mode"),
             isOn: $selDisableShiftTogglingAlphanumericalMode.onChange {
-              mgrPrefs.disableShiftTogglingAlphanumericalMode = selDisableShiftTogglingAlphanumericalMode
+              PrefMgr.shared.disableShiftTogglingAlphanumericalMode = selDisableShiftTogglingAlphanumericalMode
             }
           )
           Toggle(
             LocalizedStringKey("Also toggle alphanumerical mode with Left-Shift"),
             isOn: $selTogglingAlphanumericalModeWithLShift.onChange {
-              mgrPrefs.togglingAlphanumericalModeWithLShift = selTogglingAlphanumericalModeWithLShift
+              PrefMgr.shared.togglingAlphanumericalModeWithLShift = selTogglingAlphanumericalModeWithLShift
             }
-          ).disabled(mgrPrefs.disableShiftTogglingAlphanumericalMode == true)
+          ).disabled(PrefMgr.shared.disableShiftTogglingAlphanumericalMode == true)
         }
         Preferences.Section(label: { Text(LocalizedStringKey("Misc Settings:")) }) {
           Toggle(
             LocalizedStringKey("Enable Space key for calling candidate window"),
             isOn: $selKeyBehaviorSpaceForCallingCandidate.onChange {
-              mgrPrefs.chooseCandidateUsingSpace = selKeyBehaviorSpaceForCallingCandidate
+              PrefMgr.shared.chooseCandidateUsingSpace = selKeyBehaviorSpaceForCallingCandidate
             }
           )
           Toggle(
             LocalizedStringKey("Use ESC key to clear the entire input buffer"),
             isOn: $selKeyBehaviorESCForClearingTheBuffer.onChange {
-              mgrPrefs.escToCleanInputBuffer = selKeyBehaviorESCForClearingTheBuffer
+              PrefMgr.shared.escToCleanInputBuffer = selKeyBehaviorESCForClearingTheBuffer
             }
           )
           Toggle(
             LocalizedStringKey("Automatically correct reading combinations when typing"),
             isOn: $selAutoCorrectReadingCombination.onChange {
-              mgrPrefs.autoCorrectReadingCombination = selAutoCorrectReadingCombination
+              PrefMgr.shared.autoCorrectReadingCombination = selAutoCorrectReadingCombination
             }
           )
           Toggle(
             LocalizedStringKey("Allow using Enter key to confirm associated candidate selection"),
             isOn: $selAlsoConfirmAssociatedCandidatesByEnter.onChange {
-              mgrPrefs.alsoConfirmAssociatedCandidatesByEnter = selAlsoConfirmAssociatedCandidatesByEnter
+              PrefMgr.shared.alsoConfirmAssociatedCandidatesByEnter = selAlsoConfirmAssociatedCandidatesByEnter
             }
           )
           Toggle(
             LocalizedStringKey("Allow backspace-editing miscomposed readings"),
             isOn: $selKeepReadingUponCompositionError.onChange {
-              mgrPrefs.keepReadingUponCompositionError = selKeepReadingUponCompositionError
+              PrefMgr.shared.keepReadingUponCompositionError = selKeepReadingUponCompositionError
             }
           )
           Toggle(
             LocalizedStringKey("Trim unfinished readings on commit"),
             isOn: $selTrimUnfinishedReadingsOnCommit.onChange {
-              mgrPrefs.trimUnfinishedReadingsOnCommit = selTrimUnfinishedReadingsOnCommit
+              PrefMgr.shared.trimUnfinishedReadingsOnCommit = selTrimUnfinishedReadingsOnCommit
             }
           )
           Toggle(
             LocalizedStringKey("Emulating select-candidate-per-character mode"),
             isOn: $selEnableSCPCTypingMode.onChange {
-              mgrPrefs.useSCPCTypingMode = selEnableSCPCTypingMode
+              PrefMgr.shared.useSCPCTypingMode = selEnableSCPCTypingMode
             }
           )
           Text(LocalizedStringKey("An accommodation for elder computer users."))
@@ -243,7 +243,7 @@ struct suiPrefPaneExperience: View {
           Toggle(
             LocalizedStringKey("Always show tooltip texts horizontally"),
             isOn: $selAlwaysShowTooltipTextsHorizontally.onChange {
-              mgrPrefs.alwaysShowTooltipTextsHorizontally = selAlwaysShowTooltipTextsHorizontally
+              PrefMgr.shared.alwaysShowTooltipTextsHorizontally = selAlwaysShowTooltipTextsHorizontally
             }
           ).disabled(Bundle.main.preferredLocalizations[0] == "en")
           Text(

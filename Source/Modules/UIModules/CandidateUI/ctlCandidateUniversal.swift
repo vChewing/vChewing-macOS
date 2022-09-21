@@ -134,7 +134,7 @@ private class vwrCandidateUniversal: NSView {
   }
 
   func ensureLangIdentifier(for attr: inout [NSAttributedString.Key: AnyObject]) {
-    if mgrPrefs.handleDefaultCandidateFontsByLangIdentifier {
+    if PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier {
       switch IMEApp.currentInputMode {
         case InputMode.imeModeCHS:
           if #available(macOS 12.0, *) {
@@ -143,7 +143,7 @@ private class vwrCandidateUniversal: NSView {
         case InputMode.imeModeCHT:
           if #available(macOS 12.0, *) {
             attr[.languageIdentifier] =
-              (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
+              (PrefMgr.shared.shiftJISShinjitaiOutputEnabled || PrefMgr.shared.chineseConversionEnabled)
               ? "ja" as AnyObject : "zh-Hant" as AnyObject
           }
         default:
@@ -542,7 +542,7 @@ extension ctlCandidateUniversal {
     candidateView.frame = frameRect
     let counterHeight: CGFloat = newSize.height - 24
 
-    if pageCount > 1, mgrPrefs.showPageButtonsInCandidateWindow {
+    if pageCount > 1, PrefMgr.shared.showPageButtonsInCandidateWindow {
       var buttonRect = nextPageButton.frame
       let spacing: CGFloat = 0.0
 
@@ -587,7 +587,7 @@ extension ctlCandidateUniversal {
         ? (newSize.height - rect.height) / 2
         : counterHeight
       let rectOriginX: CGFloat =
-        mgrPrefs.showPageButtonsInCandidateWindow
+        PrefMgr.shared.showPageButtonsInCandidateWindow
         ? newSize.width
         : newSize.width + 4
       rect.origin = NSPoint(x: rectOriginX, y: rectOriginY)

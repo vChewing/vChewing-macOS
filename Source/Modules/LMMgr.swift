@@ -57,9 +57,9 @@ public enum LMMgr {
     // LMMgr 的 loadUserPhrases 等函式在自動讀取 dataFolderPath 時，
     // 如果發現自訂目錄不可用，則會自動抹去自訂目錄設定、改採預設目錄。
     // 所以這裡不需要特別處理。
-    if mgrPrefs.associatedPhrasesEnabled { Self.loadUserAssociatesData() }
-    if mgrPrefs.phraseReplacementEnabled { Self.loadUserPhraseReplacement() }
-    if mgrPrefs.useSCPCTypingMode { Self.loadUserSCPCSequencesData() }
+    if PrefMgr.shared.associatedPhrasesEnabled { Self.loadUserAssociatesData() }
+    if PrefMgr.shared.phraseReplacementEnabled { Self.loadUserPhraseReplacement() }
+    if PrefMgr.shared.useSCPCTypingMode { Self.loadUserSCPCSequencesData() }
     Self.loadUserPhrasesData()
   }
 
@@ -445,7 +445,7 @@ public enum LMMgr {
   public static let appSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
 
   public static func dataFolderPath(isDefaultFolder: Bool) -> String {
-    var userDictPathSpecified = mgrPrefs.userDataFolderSpecified.expandingTildeInPath
+    var userDictPathSpecified = PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath
     var userDictPathDefault =
       Self.appSupportURL.appendingPathComponent("vChewing").path.expandingTildeInPath
 
@@ -516,7 +516,7 @@ public enum LMMgr {
 
       // The new FolderMonitor module does NOT monitor cases that files are modified
       // by the current application itself, requiring additional manual loading process here.
-      // if !mgrPrefs.shouldAutoReloadUserDataFiles {}
+      // if !PrefMgr.shared.shouldAutoReloadUserDataFiles {}
       loadUserPhrasesData()
       return true
     }
