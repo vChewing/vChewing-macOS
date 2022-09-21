@@ -58,6 +58,7 @@ public enum UserDef: String, CaseIterable {
   case kTrimUnfinishedReadingsOnCommit = "TrimUnfinishedReadingsOnCommit"
   case kAlwaysShowTooltipTextsHorizontally = "AlwaysShowTooltipTextsHorizontally"
   case kClientsIMKTextInputIncapable = "ClientsIMKTextInputIncapable"
+  case kOnlyLoadFactoryLangModelsIfNeeded = "OnlyLoadFactoryLangModelsIfNeeded"
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"

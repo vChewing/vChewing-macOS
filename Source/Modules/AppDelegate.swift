@@ -51,7 +51,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
       NSUserNotificationCenter.default.deliver(userNotification)
     }
 
-    LMMgr.loadDataModelsOnAppDelegate()
+    if !PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModelsOnAppDelegate() }
     DispatchQueue.main.async {
       LMMgr.initUserLangModels()
       self.folderMonitor.folderDidChange = { [weak self] in
