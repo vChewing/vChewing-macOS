@@ -177,7 +177,7 @@ class ctlInputMethod: IMKInputController {
       default:
         newInputMode = .imeModeNULL
     }
-    LMMgr.loadDataModel(newInputMode)
+    // LMMgr.loadDataModel(newInputMode)
 
     if inputMode != newInputMode {
       UserDefaults.standard.synchronize()
