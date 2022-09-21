@@ -39,7 +39,13 @@ class ctlInputMethod: IMKInputController {
   // MARK: -
 
   /// 當前這個 ctlInputMethod 副本是否處於英數輸入模式。
-  var isASCIIMode = false { didSet { setKeyLayout() } }
+  var isASCIIMode = false {
+    didSet {
+      resetKeyHandler()
+      setKeyLayout()
+    }
+  }
+
   /// 按鍵調度模組的副本。
   var keyHandler = KeyHandler(lm: LMMgr.currentLM(), uom: LMMgr.currentUOM(), pref: PrefMgr.shared)
   /// 用以記錄當前輸入法狀態的變數。
@@ -52,13 +58,6 @@ class ctlInputMethod: IMKInputController {
   /// Shift 按鍵事件分析器的副本。
   /// - Remark: 警告：該工具必須為 Struct 且全專案只能有一個唯一初期化副本。否則會在動 CapsLock 的時候誤以為是在摁 Shift。
   static var theShiftKeyDetector = ShiftKeyUpChecker(useLShift: PrefMgr.shared.togglingAlphanumericalModeWithLShift)
-
-  /// 切換當前 ctlInputMethod 副本的英數輸入模式開關。
-  func toggleASCIIMode() -> Bool {
-    resetKeyHandler()
-    isASCIIMode.toggle()
-    return isASCIIMode
-  }
 
   /// `handle(event:)` 會利用這個參數判定某次 Shift 按鍵是否用來切換中英文輸入。
   var rencentKeyHandledByKeyHandlerEtc = false
@@ -274,7 +273,7 @@ class ctlInputMethod: IMKInputController {
       if Self.theShiftKeyDetector.check(event), !PrefMgr.shared.disableShiftTogglingAlphanumericalMode {
         if !shouldUseShiftToggleHandle || (!rencentKeyHandledByKeyHandlerEtc && shouldUseShiftToggleHandle) {
           NotifierController.notify(
-            message: toggleASCIIMode()
+            message: isASCIIMode.toggled()
               ? NSLocalizedString("Alphanumerical Input Mode", comment: "")
               : NSLocalizedString("Chinese Input Mode", comment: "")
           )
