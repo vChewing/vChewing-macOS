@@ -70,42 +70,60 @@ public enum LMMgr {
     lm.loadLanguageModel(path: dataPath)
   }
 
-  public static func loadDataModels() {
-    if !Self.lmCHT.isCNSDataLoaded {
-      Self.lmCHT.loadCNSData(path: getBundleDataPath("data-cns"))
-    }
-    if !Self.lmCHT.isMiscDataLoaded {
-      Self.lmCHT.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
-    }
-    if !Self.lmCHT.isSymbolDataLoaded {
-      Self.lmCHT.loadSymbolData(path: getBundleDataPath("data-symbols"))
-    }
-    if !Self.lmCHS.isCNSDataLoaded {
-      Self.lmCHS.loadCNSData(path: getBundleDataPath("data-cns"))
-    }
-    if !Self.lmCHS.isMiscDataLoaded {
-      Self.lmCHS.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
-    }
-    if !Self.lmCHS.isSymbolDataLoaded {
-      Self.lmCHS.loadSymbolData(path: getBundleDataPath("data-symbols"))
+  public static func loadDataModelsOnAppDelegate() {
+    let globalQuene = DispatchQueue.global(qos: .default)
+    var showFinishNotification = false
+    let group = DispatchGroup()
+    group.enter()
+    DispatchQueue.main.async {
+      if !Self.lmCHT.isCNSDataLoaded {
+        Self.lmCHT.loadCNSData(path: getBundleDataPath("data-cns"))
+      }
+      if !Self.lmCHT.isMiscDataLoaded {
+        Self.lmCHT.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
+      }
+      if !Self.lmCHT.isSymbolDataLoaded {
+        Self.lmCHT.loadSymbolData(path: getBundleDataPath("data-symbols"))
+      }
+      if !Self.lmCHS.isCNSDataLoaded {
+        Self.lmCHS.loadCNSData(path: getBundleDataPath("data-cns"))
+      }
+      if !Self.lmCHS.isMiscDataLoaded {
+        Self.lmCHS.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
+      }
+      if !Self.lmCHS.isSymbolDataLoaded {
+        Self.lmCHS.loadSymbolData(path: getBundleDataPath("data-symbols"))
+      }
+      group.leave()
     }
     if !Self.lmCHT.isLanguageModelLoaded {
+      showFinishNotification = true
       NotifierController.notify(
         message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
       )
-      loadCoreLanguageModelFile(filenameSansExtension: "data-cht", langModel: &Self.lmCHT)
-      NotifierController.notify(
-        message: NSLocalizedString("Core Dict loading complete.", comment: "")
-      )
+      group.enter()
+      globalQuene.async {
+        loadCoreLanguageModelFile(filenameSansExtension: "data-cht", langModel: &Self.lmCHT)
+        group.leave()
+      }
     }
     if !Self.lmCHS.isLanguageModelLoaded {
+      showFinishNotification = true
       NotifierController.notify(
         message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
       )
-      loadCoreLanguageModelFile(filenameSansExtension: "data-chs", langModel: &Self.lmCHS)
-      NotifierController.notify(
-        message: NSLocalizedString("Core Dict loading complete.", comment: "")
-      )
+      group.enter()
+      globalQuene.async {
+        loadCoreLanguageModelFile(filenameSansExtension: "data-chs", langModel: &Self.lmCHS)
+        group.leave()
+      }
+    }
+    group.notify(queue: DispatchQueue.main) {
+      if showFinishNotification {
+        NotifierController.notify(
+          message: NSLocalizedString("Core Dict loading complete.", comment: "")
+        )
+      }
     }
   }
 
