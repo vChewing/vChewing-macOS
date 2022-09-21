@@ -48,11 +48,11 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
       attributes?[NSAttributedString.Key.font] = candidateFont
       if PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier {
         switch IMEApp.currentInputMode {
-          case InputMode.imeModeCHS:
+          case .imeModeCHS:
             if #available(macOS 12.0, *) {
               attributes?[NSAttributedString.Key.languageIdentifier] = "zh-Hans" as AnyObject
             }
-          case InputMode.imeModeCHT:
+          case .imeModeCHT:
             if #available(macOS 12.0, *) {
               attributes?[NSAttributedString.Key.languageIdentifier] =
                 (PrefMgr.shared.shiftJISShinjitaiOutputEnabled || PrefMgr.shared.chineseConversionEnabled)

@@ -109,7 +109,7 @@ public enum LMMgr {
     }
   }
 
-  public static func loadDataModel(_ mode: InputMode) {
+  public static func loadDataModel(_ mode: Shared.InputMode) {
     switch mode {
       case .imeModeCHS:
         if !Self.lmCHS.isMiscDataLoaded {
@@ -156,56 +156,56 @@ public enum LMMgr {
 
   public static func loadUserPhrasesData() {
     Self.lmCHT.loadUserPhrasesData(
-      path: userPhrasesDataURL(InputMode.imeModeCHT).path,
-      filterPath: userFilteredDataURL(InputMode.imeModeCHT).path
+      path: userPhrasesDataURL(.imeModeCHT).path,
+      filterPath: userFilteredDataURL(.imeModeCHT).path
     )
     Self.lmCHS.loadUserPhrasesData(
-      path: userPhrasesDataURL(InputMode.imeModeCHS).path,
-      filterPath: userFilteredDataURL(InputMode.imeModeCHS).path
+      path: userPhrasesDataURL(.imeModeCHS).path,
+      filterPath: userFilteredDataURL(.imeModeCHS).path
     )
-    Self.lmCHT.loadUserSymbolData(path: userSymbolDataURL(InputMode.imeModeCHT).path)
-    Self.lmCHS.loadUserSymbolData(path: userSymbolDataURL(InputMode.imeModeCHS).path)
+    Self.lmCHT.loadUserSymbolData(path: userSymbolDataURL(.imeModeCHT).path)
+    Self.lmCHS.loadUserSymbolData(path: userSymbolDataURL(.imeModeCHS).path)
 
-    Self.uomCHT.loadData(fromURL: userOverrideModelDataURL(InputMode.imeModeCHT))
-    Self.uomCHS.loadData(fromURL: userOverrideModelDataURL(InputMode.imeModeCHS))
+    Self.uomCHT.loadData(fromURL: userOverrideModelDataURL(.imeModeCHT))
+    Self.uomCHS.loadData(fromURL: userOverrideModelDataURL(.imeModeCHS))
 
     CandidateNode.load(url: Self.userSymbolMenuDataURL())
   }
 
   public static func loadUserAssociatesData() {
     Self.lmCHT.loadUserAssociatesData(
-      path: Self.userAssociatesDataURL(InputMode.imeModeCHT).path
+      path: Self.userAssociatesDataURL(.imeModeCHT).path
     )
     Self.lmCHS.loadUserAssociatesData(
-      path: Self.userAssociatesDataURL(InputMode.imeModeCHS).path
+      path: Self.userAssociatesDataURL(.imeModeCHS).path
     )
   }
 
   public static func loadUserPhraseReplacement() {
     Self.lmCHT.loadReplacementsData(
-      path: Self.userReplacementsDataURL(InputMode.imeModeCHT).path
+      path: Self.userReplacementsDataURL(.imeModeCHT).path
     )
     Self.lmCHS.loadReplacementsData(
-      path: Self.userReplacementsDataURL(InputMode.imeModeCHS).path
+      path: Self.userReplacementsDataURL(.imeModeCHS).path
     )
   }
 
   public static func loadUserSCPCSequencesData() {
     Self.lmCHT.loadUserSCPCSequencesData(
-      path: Self.userSCPCSequencesURL(InputMode.imeModeCHT).path
+      path: Self.userSCPCSequencesURL(.imeModeCHT).path
     )
     Self.lmCHS.loadUserSCPCSequencesData(
-      path: Self.userSCPCSequencesURL(InputMode.imeModeCHS).path
+      path: Self.userSCPCSequencesURL(.imeModeCHS).path
     )
   }
 
   public static func checkIfUserPhraseExist(
     userPhrase: String,
-    mode: InputMode,
+    mode: Shared.InputMode,
     key unigramKey: String
   ) -> Bool {
     let unigrams: [Megrez.Unigram] =
-      (mode == InputMode.imeModeCHT)
+      (mode == .imeModeCHT)
       ? Self.lmCHT.unigramsFor(key: unigramKey) : Self.lmCHS.unigramsFor(key: unigramKey)
     for unigram in unigrams {
       if unigram.value == userPhrase {
@@ -253,48 +253,48 @@ public enum LMMgr {
   /// 使用者語彙辭典資料路徑。
   /// - Parameter mode: 簡繁體輸入模式。
   /// - Returns: 資料路徑（URL）。
-  public static func userPhrasesDataURL(_ mode: InputMode) -> URL {
-    let fileName = (mode == InputMode.imeModeCHT) ? "userdata-cht.txt" : "userdata-chs.txt"
+  public static func userPhrasesDataURL(_ mode: Shared.InputMode) -> URL {
+    let fileName = (mode == .imeModeCHT) ? "userdata-cht.txt" : "userdata-chs.txt"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
   /// 使用者繪文字符號辭典資料路徑。
   /// - Parameter mode: 簡繁體輸入模式。
   /// - Returns: 資料路徑（URL）。
-  public static func userSymbolDataURL(_ mode: InputMode) -> URL {
-    let fileName = (mode == InputMode.imeModeCHT) ? "usersymbolphrases-cht.txt" : "usersymbolphrases-chs.txt"
+  public static func userSymbolDataURL(_ mode: Shared.InputMode) -> URL {
+    let fileName = (mode == .imeModeCHT) ? "usersymbolphrases-cht.txt" : "usersymbolphrases-chs.txt"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
   /// 使用者聯想詞資料路徑。
   /// - Parameter mode: 簡繁體輸入模式。
   /// - Returns: 資料路徑（URL）。
-  public static func userAssociatesDataURL(_ mode: InputMode) -> URL {
-    let fileName = (mode == InputMode.imeModeCHT) ? "associatedPhrases-cht.txt" : "associatedPhrases-chs.txt"
+  public static func userAssociatesDataURL(_ mode: Shared.InputMode) -> URL {
+    let fileName = (mode == .imeModeCHT) ? "associatedPhrases-cht.txt" : "associatedPhrases-chs.txt"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
   /// 使用者語彙濾除表資料路徑。
   /// - Parameter mode: 簡繁體輸入模式。
   /// - Returns: 資料路徑（URL）。
-  public static func userFilteredDataURL(_ mode: InputMode) -> URL {
-    let fileName = (mode == InputMode.imeModeCHT) ? "exclude-phrases-cht.txt" : "exclude-phrases-chs.txt"
+  public static func userFilteredDataURL(_ mode: Shared.InputMode) -> URL {
+    let fileName = (mode == .imeModeCHT) ? "exclude-phrases-cht.txt" : "exclude-phrases-chs.txt"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
   /// 使用者語彙置換表資料路徑。
   /// - Parameter mode: 簡繁體輸入模式。
   /// - Returns: 資料路徑（URL）。
-  public static func userReplacementsDataURL(_ mode: InputMode) -> URL {
-    let fileName = (mode == InputMode.imeModeCHT) ? "phrases-replacement-cht.txt" : "phrases-replacement-chs.txt"
+  public static func userReplacementsDataURL(_ mode: Shared.InputMode) -> URL {
+    let fileName = (mode == .imeModeCHT) ? "phrases-replacement-cht.txt" : "phrases-replacement-chs.txt"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
   /// 使用者逐字選字模式候選字詞順序資料路徑。
   /// - Parameter mode: 簡繁體輸入模式。
   /// - Returns: 資料路徑（URL）。
-  public static func userSCPCSequencesURL(_ mode: InputMode) -> URL {
-    let fileName = (mode == InputMode.imeModeCHT) ? "data-plain-bpmf-cht.plist" : "data-plain-bpmf-chs.plist"
+  public static func userSCPCSequencesURL(_ mode: Shared.InputMode) -> URL {
+    let fileName = (mode == .imeModeCHT) ? "data-plain-bpmf-cht.plist" : "data-plain-bpmf-chs.plist"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
@@ -309,7 +309,7 @@ public enum LMMgr {
   /// 也就是「~/Library/Application Support/vChewing/」目錄下，且不會隨著使用者辭典目錄的改變而改變。
   /// - Parameter mode: 簡繁體輸入模式。
   /// - Returns: 資料路徑（URL）。
-  public static func userOverrideModelDataURL(_ mode: InputMode) -> URL {
+  public static func userOverrideModelDataURL(_ mode: Shared.InputMode) -> URL {
     let fileName: String = {
       switch mode {
         case .imeModeCHS: return "vChewing_override-model-data-chs.dat"
@@ -350,7 +350,7 @@ public enum LMMgr {
     return true
   }
 
-  @discardableResult public static func chkUserLMFilesExist(_ mode: InputMode) -> Bool {
+  @discardableResult public static func chkUserLMFilesExist(_ mode: Shared.InputMode) -> Bool {
     if !userDataFolderExists {
       return false
     }
@@ -477,11 +477,11 @@ public enum LMMgr {
   // MARK: - 寫入使用者檔案
 
   public static func writeUserPhrase(
-    _ userPhrase: String?, inputMode mode: InputMode, areWeDuplicating: Bool, areWeDeleting: Bool
+    _ userPhrase: String?, inputMode mode: Shared.InputMode, areWeDuplicating: Bool, areWeDeleting: Bool
   ) -> Bool {
     if var currentMarkedPhrase: String = userPhrase {
-      if !chkUserLMFilesExist(InputMode.imeModeCHS)
-        || !chkUserLMFilesExist(InputMode.imeModeCHT)
+      if !chkUserLMFilesExist(.imeModeCHS)
+        || !chkUserLMFilesExist(.imeModeCHT)
       {
         return false
       }
@@ -526,8 +526,8 @@ public enum LMMgr {
   // MARK: - 藉由語彙編輯器開啟使用者檔案
 
   public static func checkIfUserFilesExistBeforeOpening() -> Bool {
-    if !Self.chkUserLMFilesExist(InputMode.imeModeCHS)
-      || !Self.chkUserLMFilesExist(InputMode.imeModeCHT)
+    if !Self.chkUserLMFilesExist(.imeModeCHS)
+      || !Self.chkUserLMFilesExist(.imeModeCHT)
     {
       let content = String(
         format: NSLocalizedString(
@@ -562,19 +562,19 @@ public enum LMMgr {
     let group = DispatchGroup()
     group.enter()
     globalQuene.async {
-      Self.uomCHT.saveData(toURL: userOverrideModelDataURL(InputMode.imeModeCHT))
+      Self.uomCHT.saveData(toURL: userOverrideModelDataURL(.imeModeCHT))
       group.leave()
     }
     group.enter()
     globalQuene.async {
-      Self.uomCHS.saveData(toURL: userOverrideModelDataURL(InputMode.imeModeCHS))
+      Self.uomCHS.saveData(toURL: userOverrideModelDataURL(.imeModeCHS))
       group.leave()
     }
     _ = group.wait(timeout: .distantFuture)
     group.notify(queue: DispatchQueue.main) {}
   }
 
-  public static func removeUnigramsFromUserOverrideModel(_ mode: InputMode) {
+  public static func removeUnigramsFromUserOverrideModel(_ mode: Shared.InputMode) {
     switch mode {
       case .imeModeCHS:
         Self.uomCHT.bleachUnigrams(saveCallback: { Self.uomCHT.saveData() })
@@ -585,12 +585,12 @@ public enum LMMgr {
     }
   }
 
-  public static func clearUserOverrideModelData(_ mode: InputMode = .imeModeNULL) {
+  public static func clearUserOverrideModelData(_ mode: Shared.InputMode = .imeModeNULL) {
     switch mode {
       case .imeModeCHS:
-        Self.uomCHS.clearData(withURL: userOverrideModelDataURL(InputMode.imeModeCHS))
+        Self.uomCHS.clearData(withURL: userOverrideModelDataURL(.imeModeCHS))
       case .imeModeCHT:
-        Self.uomCHT.clearData(withURL: userOverrideModelDataURL(InputMode.imeModeCHT))
+        Self.uomCHT.clearData(withURL: userOverrideModelDataURL(.imeModeCHT))
       case .imeModeNULL:
         break
     }
