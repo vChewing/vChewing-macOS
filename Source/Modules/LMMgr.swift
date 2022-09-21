@@ -71,11 +71,11 @@ public enum LMMgr {
   }
 
   public static func loadDataModelsOnAppDelegate() {
-    let globalQuene = DispatchQueue.global(qos: .default)
+    let globalQueue = DispatchQueue.global(qos: .default)
     var showFinishNotification = false
     let group = DispatchGroup()
     group.enter()
-    DispatchQueue.main.async {
+    globalQueue.async {
       if !Self.lmCHT.isCNSDataLoaded {
         Self.lmCHT.loadCNSData(path: getBundleDataPath("data-cns"))
       }
@@ -102,7 +102,7 @@ public enum LMMgr {
         message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
       )
       group.enter()
-      globalQuene.async {
+      globalQueue.async {
         loadCoreLanguageModelFile(filenameSansExtension: "data-cht", langModel: &Self.lmCHT)
         group.leave()
       }
@@ -113,7 +113,7 @@ public enum LMMgr {
         message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
       )
       group.enter()
-      globalQuene.async {
+      globalQueue.async {
         loadCoreLanguageModelFile(filenameSansExtension: "data-chs", langModel: &Self.lmCHS)
         group.leave()
       }
@@ -128,47 +128,69 @@ public enum LMMgr {
   }
 
   public static func loadDataModel(_ mode: Shared.InputMode) {
+    let globalQueue = DispatchQueue.global(qos: .default)
+    var showFinishNotification = false
+    let group = DispatchGroup()
+    group.enter()
+    globalQueue.async {
+      switch mode {
+        case .imeModeCHS:
+          if !Self.lmCHS.isCNSDataLoaded {
+            Self.lmCHS.loadCNSData(path: getBundleDataPath("data-cns"))
+          }
+          if !Self.lmCHS.isMiscDataLoaded {
+            Self.lmCHS.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
+          }
+          if !Self.lmCHS.isSymbolDataLoaded {
+            Self.lmCHS.loadSymbolData(path: getBundleDataPath("data-symbols"))
+          }
+        case .imeModeCHT:
+          if !Self.lmCHT.isCNSDataLoaded {
+            Self.lmCHT.loadCNSData(path: getBundleDataPath("data-cns"))
+          }
+          if !Self.lmCHT.isMiscDataLoaded {
+            Self.lmCHT.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
+          }
+          if !Self.lmCHT.isSymbolDataLoaded {
+            Self.lmCHT.loadSymbolData(path: getBundleDataPath("data-symbols"))
+          }
+        default: break
+      }
+      group.leave()
+    }
     switch mode {
       case .imeModeCHS:
-        if !Self.lmCHS.isMiscDataLoaded {
-          Self.lmCHS.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
-        }
-        if !Self.lmCHS.isSymbolDataLoaded {
-          Self.lmCHS.loadSymbolData(path: getBundleDataPath("data-symbols"))
-        }
-        if !Self.lmCHS.isCNSDataLoaded {
-          Self.lmCHS.loadCNSData(path: getBundleDataPath("data-cns"))
-        }
         if !Self.lmCHS.isLanguageModelLoaded {
+          showFinishNotification = true
           NotifierController.notify(
             message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
           )
-          loadCoreLanguageModelFile(filenameSansExtension: "data-chs", langModel: &Self.lmCHS)
-          NotifierController.notify(
-            message: NSLocalizedString("Core Dict loading complete.", comment: "")
-          )
+          group.enter()
+          globalQueue.async {
+            loadCoreLanguageModelFile(filenameSansExtension: "data-chs", langModel: &Self.lmCHS)
+            group.leave()
+          }
         }
       case .imeModeCHT:
-        if !Self.lmCHT.isMiscDataLoaded {
-          Self.lmCHT.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
-        }
-        if !Self.lmCHT.isSymbolDataLoaded {
-          Self.lmCHT.loadSymbolData(path: getBundleDataPath("data-symbols"))
-        }
-        if !Self.lmCHT.isCNSDataLoaded {
-          Self.lmCHT.loadCNSData(path: getBundleDataPath("data-cns"))
-        }
         if !Self.lmCHT.isLanguageModelLoaded {
+          showFinishNotification = true
           NotifierController.notify(
             message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
           )
-          loadCoreLanguageModelFile(filenameSansExtension: "data-cht", langModel: &Self.lmCHT)
-          NotifierController.notify(
-            message: NSLocalizedString("Core Dict loading complete.", comment: "")
-          )
+          group.enter()
+          globalQueue.async {
+            loadCoreLanguageModelFile(filenameSansExtension: "data-cht", langModel: &Self.lmCHT)
+            group.leave()
+          }
         }
-      case .imeModeNULL:
-        break
+      default: break
+    }
+    group.notify(queue: DispatchQueue.main) {
+      if showFinishNotification {
+        NotifierController.notify(
+          message: NSLocalizedString("Core Dict loading complete.", comment: "")
+        )
+      }
     }
   }
 
@@ -576,15 +598,15 @@ public enum LMMgr {
   // MARK: UOM
 
   public static func saveUserOverrideModelData() {
-    let globalQuene = DispatchQueue.global(qos: .default)
+    let globalQueue = DispatchQueue.global(qos: .default)
     let group = DispatchGroup()
     group.enter()
-    globalQuene.async {
+    globalQueue.async {
       Self.uomCHT.saveData(toURL: userOverrideModelDataURL(.imeModeCHT))
       group.leave()
     }
     group.enter()
-    globalQuene.async {
+    globalQueue.async {
       Self.uomCHS.saveData(toURL: userOverrideModelDataURL(.imeModeCHS))
       group.leave()
     }
