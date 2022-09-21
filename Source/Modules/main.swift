@@ -94,10 +94,10 @@ public enum InputMode: String, CaseIterable {
 public enum IMEApp {
   // MARK: - 輸入法的當前的簡繁體中文模式
 
-  public static var currentInputMode: InputMode = .init(rawValue: mgrPrefs.mostRecentInputMode) ?? .imeModeNULL
+  public static var currentInputMode: InputMode = .init(rawValue: PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
 
   /// Fart or Beep?
   static func buzz() {
-    NSSound.buzz(fart: !mgrPrefs.shouldNotFartInLieuOfBeep)
+    NSSound.buzz(fart: !PrefMgr.shared.shouldNotFartInLieuOfBeep)
   }
 }

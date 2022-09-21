@@ -121,7 +121,7 @@ extension IMEState {
     // 注意資料的設定順序，一定得先設定 displayTextSegments。
     result.data.displayTextSegments = displayTextSegments.map {
       if !ctlInputMethod.isVerticalTyping { return $0 }
-      guard mgrPrefs.hardenVerticalPunctuations else { return $0 }
+      guard PrefMgr.shared.hardenVerticalPunctuations else { return $0 }
       var neta = $0
       ChineseConverter.hardenVerticalPunctuations(target: &neta, convert: ctlInputMethod.isVerticalTyping)
       return neta

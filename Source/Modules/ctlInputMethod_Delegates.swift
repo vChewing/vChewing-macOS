@@ -106,15 +106,15 @@ extension ctlInputMethod: ctlCandidateDelegate {
       let selectedValue = state.candidates[index]
       keyHandler.fixNode(
         candidate: selectedValue, respectCursorPushing: true,
-        preConsolidate: mgrPrefs.consolidateContextOnCandidateSelection
+        preConsolidate: PrefMgr.shared.consolidateContextOnCandidateSelection
       )
 
       let inputting = keyHandler.buildInputtingState
 
-      if mgrPrefs.useSCPCTypingMode {
+      if PrefMgr.shared.useSCPCTypingMode {
         handle(state: IMEState.ofCommitting(textToCommit: inputting.displayedText))
         // 此時是逐字選字模式，所以「selectedValue.1」是單個字、不用追加處理。
-        if mgrPrefs.associatedPhrasesEnabled {
+        if PrefMgr.shared.associatedPhrasesEnabled {
           let associates = keyHandler.buildAssociatePhraseState(
             withPair: .init(key: selectedValue.0, value: selectedValue.1)
           )
@@ -137,7 +137,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
         handle(state: IMEState.ofEmpty())
         return
       }
-      if mgrPrefs.associatedPhrasesEnabled {
+      if PrefMgr.shared.associatedPhrasesEnabled {
         let associates = keyHandler.buildAssociatePhraseState(
           withPair: .init(key: selectedValue.0, value: String(valueKept))
         )

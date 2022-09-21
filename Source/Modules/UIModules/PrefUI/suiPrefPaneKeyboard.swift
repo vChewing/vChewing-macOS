@@ -18,10 +18,10 @@ struct suiPrefPaneKeyboard: View {
     UserDefaults.standard.string(forKey: UserDef.kCandidateKeys.rawValue) ?? CandidateKey.defaultKeys
   @State private var selKeyboardParser = UserDefaults.standard.integer(forKey: UserDef.kKeyboardParser.rawValue)
   @State private var selBasicKeyboardLayout: String =
-    UserDefaults.standard.string(forKey: UserDef.kBasicKeyboardLayout.rawValue) ?? mgrPrefs.basicKeyboardLayout
+    UserDefaults.standard.string(forKey: UserDef.kBasicKeyboardLayout.rawValue) ?? PrefMgr.shared.basicKeyboardLayout
   @State private var selAlphanumericalKeyboardLayout: String =
     UserDefaults.standard.string(forKey: UserDef.kAlphanumericalKeyboardLayout.rawValue)
-    ?? mgrPrefs.alphanumericalKeyboardLayout
+    ?? PrefMgr.shared.alphanumericalKeyboardLayout
 
   @State private var selUsingHotKeySCPC = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeySCPC.rawValue)
   @State private var selUsingHotKeyAssociates = UserDefaults.standard.bool(
@@ -36,11 +36,11 @@ struct suiPrefPaneKeyboard: View {
 
   private let contentMaxHeight: Double = 432
   private let contentWidth: Double = {
-    switch mgrPrefs.appleLanguages[0] {
+    switch PrefMgr.shared.appleLanguages[0] {
       case "ja":
         return 520
       default:
-        if mgrPrefs.appleLanguages[0].contains("zh-Han") {
+        if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
           return 480
         } else {
           return 580
@@ -59,22 +59,22 @@ struct suiPrefPaneKeyboard: View {
               let keys: String = value.trimmingCharacters(in: .whitespacesAndNewlines).deduplicate
               do {
                 try CandidateKey.validate(keys: keys)
-                mgrPrefs.candidateKeys = keys
-                selSelectionKeys = mgrPrefs.candidateKeys
+                PrefMgr.shared.candidateKeys = keys
+                selSelectionKeys = PrefMgr.shared.candidateKeys
               } catch CandidateKey.ErrorType.empty {
-                selSelectionKeys = mgrPrefs.candidateKeys
+                selSelectionKeys = PrefMgr.shared.candidateKeys
               } catch {
                 if let window = ctlPrefUI.shared.controller.window {
                   let alert = NSAlert(error: error)
                   alert.beginSheetModal(for: window) { _ in
-                    selSelectionKeys = mgrPrefs.candidateKeys
+                    selSelectionKeys = PrefMgr.shared.candidateKeys
                   }
                   IMEApp.buzz()
                 }
               }
             }
-          ).frame(width: 180).disabled(mgrPrefs.useIMKCandidateWindow)
-          if mgrPrefs.useIMKCandidateWindow {
+          ).frame(width: 180).disabled(PrefMgr.shared.useIMKCandidateWindow)
+          if PrefMgr.shared.useIMKCandidateWindow {
             Text(
               LocalizedStringKey(
                 "⚠︎ This feature in IMK Candidate Window defects. Please consult Apple Developer Relations\nand tell them the related Radar ID: #FB11300759."
@@ -96,17 +96,17 @@ struct suiPrefPaneKeyboard: View {
               "",
               selection: $selKeyboardParser.onChange {
                 let value = selKeyboardParser
-                mgrPrefs.keyboardParser = value
+                PrefMgr.shared.keyboardParser = value
                 switch value {
                   case 0:
-                    if !IMKHelper.arrDynamicBasicKeyLayouts.contains(mgrPrefs.basicKeyboardLayout) {
-                      mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
-                      selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
+                    if !IMKHelper.arrDynamicBasicKeyLayouts.contains(PrefMgr.shared.basicKeyboardLayout) {
+                      PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
+                      selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
                     }
                   default:
-                    if IMKHelper.arrDynamicBasicKeyLayouts.contains(mgrPrefs.basicKeyboardLayout) {
-                      mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ABC"
-                      selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
+                    if IMKHelper.arrDynamicBasicKeyLayouts.contains(PrefMgr.shared.basicKeyboardLayout) {
+                      PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ABC"
+                      selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
                     }
                 }
               }
@@ -137,18 +137,18 @@ struct suiPrefPaneKeyboard: View {
             }
             .labelsHidden()
             Button {
-              mgrPrefs.keyboardParser = 0
-              selKeyboardParser = mgrPrefs.keyboardParser
-              mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
-              selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
+              PrefMgr.shared.keyboardParser = 0
+              selKeyboardParser = PrefMgr.shared.keyboardParser
+              PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
+              selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
             } label: {
               Text("↻ㄅ")
             }
             Button {
-              mgrPrefs.keyboardParser = 10
-              selKeyboardParser = mgrPrefs.keyboardParser
-              mgrPrefs.basicKeyboardLayout = "com.apple.keylayout.ABC"
-              selBasicKeyboardLayout = mgrPrefs.basicKeyboardLayout
+              PrefMgr.shared.keyboardParser = 10
+              selKeyboardParser = PrefMgr.shared.keyboardParser
+              PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ABC"
+              selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
             } label: {
               Text("↻Ａ")
             }
@@ -159,7 +159,7 @@ struct suiPrefPaneKeyboard: View {
               NSLocalizedString(
                 "Choose the phonetic layout for Mandarin parser.",
                 comment: ""
-              ) + (mgrPrefs.appleLanguages[0].contains("en") ? " " : "")
+              ) + (PrefMgr.shared.appleLanguages[0].contains("en") ? " " : "")
                 + NSLocalizedString(
                   "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional.",
                   comment: ""
@@ -175,10 +175,10 @@ struct suiPrefPaneKeyboard: View {
               "",
               selection: $selBasicKeyboardLayout.onChange {
                 let value = selBasicKeyboardLayout
-                mgrPrefs.basicKeyboardLayout = value
+                PrefMgr.shared.basicKeyboardLayout = value
                 if IMKHelper.arrDynamicBasicKeyLayouts.contains(value) {
-                  mgrPrefs.keyboardParser = 0
-                  selKeyboardParser = mgrPrefs.keyboardParser
+                  PrefMgr.shared.keyboardParser = 0
+                  selKeyboardParser = PrefMgr.shared.keyboardParser
                 }
               }
             ) {
@@ -210,7 +210,7 @@ struct suiPrefPaneKeyboard: View {
             Picker(
               "",
               selection: $selAlphanumericalKeyboardLayout.onChange {
-                mgrPrefs.alphanumericalKeyboardLayout = selAlphanumericalKeyboardLayout
+                PrefMgr.shared.alphanumericalKeyboardLayout = selAlphanumericalKeyboardLayout
               }
             ) {
               ForEach(0...(IMKHelper.allowedAlphanumericalTISInputSources.count - 1), id: \.self) { id in
@@ -239,25 +239,25 @@ struct suiPrefPaneKeyboard: View {
               Toggle(
                 LocalizedStringKey("Per-Char Select Mode"),
                 isOn: $selUsingHotKeySCPC.onChange {
-                  mgrPrefs.usingHotKeySCPC = selUsingHotKeySCPC
+                  PrefMgr.shared.usingHotKeySCPC = selUsingHotKeySCPC
                 }
               )
               Toggle(
                 LocalizedStringKey("Per-Char Associated Phrases"),
                 isOn: $selUsingHotKeyAssociates.onChange {
-                  mgrPrefs.usingHotKeyAssociates = selUsingHotKeyAssociates
+                  PrefMgr.shared.usingHotKeyAssociates = selUsingHotKeyAssociates
                 }
               )
               Toggle(
                 LocalizedStringKey("CNS11643 Mode"),
                 isOn: $selUsingHotKeyCNS.onChange {
-                  mgrPrefs.usingHotKeyCNS = selUsingHotKeyCNS
+                  PrefMgr.shared.usingHotKeyCNS = selUsingHotKeyCNS
                 }
               )
               Toggle(
                 LocalizedStringKey("Force KangXi Writing"),
                 isOn: $selUsingHotKeyKangXi.onChange {
-                  mgrPrefs.usingHotKeyKangXi = selUsingHotKeyKangXi
+                  PrefMgr.shared.usingHotKeyKangXi = selUsingHotKeyKangXi
                 }
               )
             }
@@ -265,19 +265,19 @@ struct suiPrefPaneKeyboard: View {
               Toggle(
                 LocalizedStringKey("JIS Shinjitai Output"),
                 isOn: $selUsingHotKeyJIS.onChange {
-                  mgrPrefs.usingHotKeyJIS = selUsingHotKeyJIS
+                  PrefMgr.shared.usingHotKeyJIS = selUsingHotKeyJIS
                 }
               )
               Toggle(
                 LocalizedStringKey("Half-Width Punctuation Mode"),
                 isOn: $selUsingHotKeyHalfWidthASCII.onChange {
-                  mgrPrefs.usingHotKeyHalfWidthASCII = selUsingHotKeyHalfWidthASCII
+                  PrefMgr.shared.usingHotKeyHalfWidthASCII = selUsingHotKeyHalfWidthASCII
                 }
               )
               Toggle(
                 LocalizedStringKey("Currency Numeral Output"),
                 isOn: $selUsingHotKeyCurrencyNumerals.onChange {
-                  mgrPrefs.usingHotKeyCurrencyNumerals = selUsingHotKeyCurrencyNumerals
+                  PrefMgr.shared.usingHotKeyCurrencyNumerals = selUsingHotKeyCurrencyNumerals
                 }
               )
             }

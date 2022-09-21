@@ -21,11 +21,11 @@ struct suiPrefPaneDevZone: View {
 
   private let contentMaxHeight: Double = 432
   private let contentWidth: Double = {
-    switch mgrPrefs.appleLanguages[0] {
+    switch PrefMgr.shared.appleLanguages[0] {
       case "ja":
         return 520
       default:
-        if mgrPrefs.appleLanguages[0].contains("zh-Han") {
+        if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
           return 480
         } else {
           return 580
@@ -53,7 +53,7 @@ struct suiPrefPaneDevZone: View {
           Toggle(
             LocalizedStringKey("Use IMK Candidate Window instead (will reboot the IME)"),
             isOn: $selUseIMKCandidateWindow.onChange {
-              mgrPrefs.useIMKCandidateWindow = selUseIMKCandidateWindow
+              PrefMgr.shared.useIMKCandidateWindow = selUseIMKCandidateWindow
               NSLog("vChewing App self-terminated due to enabling / disabling IMK candidate window.")
               NSApplication.shared.terminate(nil)
             }
@@ -67,7 +67,8 @@ struct suiPrefPaneDevZone: View {
           Toggle(
             LocalizedStringKey("Use .langIdentifier to handle UI fonts in candidate window"),
             isOn: $selHandleDefaultCandidateFontsByLangIdentifier.onChange {
-              mgrPrefs.handleDefaultCandidateFontsByLangIdentifier = selHandleDefaultCandidateFontsByLangIdentifier
+              PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier =
+                selHandleDefaultCandidateFontsByLangIdentifier
             }
           )
           .disabled(!isMontereyOrAbove)
@@ -80,7 +81,7 @@ struct suiPrefPaneDevZone: View {
           Picker(
             "",
             selection: $selShiftKeyAccommodationBehavior.onChange {
-              mgrPrefs.shiftKeyAccommodationBehavior = selShiftKeyAccommodationBehavior
+              PrefMgr.shared.shiftKeyAccommodationBehavior = selShiftKeyAccommodationBehavior
             }
           ) {
             Text(LocalizedStringKey("Disable Shift key accomodation in all cases")).tag(0)

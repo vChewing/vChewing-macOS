@@ -55,7 +55,7 @@ class ctlInputMethod: IMKInputController {
   // MARK: - Extracted methods and functions (Tekkon).
 
   func ensureParser() {
-    switch mgrPrefs.mandarinParser {
+    switch PrefMgr.shared.mandarinParser {
       case MandarinParser.ofStandard.rawValue:
         _composer.ensureParser(arrange: .ofDachen)  // 大千
       case MandarinParser.ofETen.rawValue:
@@ -82,7 +82,7 @@ class ctlInputMethod: IMKInputController {
         _composer.ensureParser(arrange: .ofUniversalPinyin)  // 通用拼音
       default:
         _composer.ensureParser(arrange: .ofDachen)  // 預設情況下按照 PrefMgr 內定義預設值來處理
-        mgrPrefs.mandarinParser = MandarinParser.ofStandard.rawValue
+        PrefMgr.shared.mandarinParser = MandarinParser.ofStandard.rawValue
     }
     _composer.clear()
   }
