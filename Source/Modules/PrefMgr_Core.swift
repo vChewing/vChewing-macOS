@@ -11,14 +11,13 @@
 import Shared
 import SwiftExtension
 
-private let kDefaultKeys = "123456789"
-private let kDefaultBasicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
-private let kDefaultAlphanumericalKeyboardLayout = "com.apple.keylayout.ABC"
-
 // MARK: -
 
 public class PrefMgr: PrefMgrProtocol {
   public static let shared = PrefMgr()
+  public static let kDefaultCandidateKeys = "123456789"
+  public static let kDefaultBasicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
+  public static let kDefaultAlphanumericalKeyboardLayout = "com.apple.keylayout.ABC"
 
   // MARK: - Settings (Tier 1)
 
@@ -233,11 +232,11 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kCandidateKeyLabelFontName.rawValue, defaultValue: "")
   public var candidateKeyLabelFontName: String
 
-  @AppProperty(key: UserDef.kCandidateKeys.rawValue, defaultValue: kDefaultKeys)
+  @AppProperty(key: UserDef.kCandidateKeys.rawValue, defaultValue: kDefaultCandidateKeys)
   public var candidateKeys: String {
     didSet {
       if useIMKCandidateWindow {
-        candidateKeys = kDefaultKeys
+        candidateKeys = Self.kDefaultCandidateKeys
       }
     }
   }
@@ -292,51 +291,4 @@ public class PrefMgr: PrefMgrProtocol {
 
   @AppProperty(key: UserDef.kUsingHotKeyCurrencyNumerals.rawValue, defaultValue: true)
   public var usingHotKeyCurrencyNumerals: Bool
-}
-
-// MARK: Auto parameter fix procedures, executed everytime on ctlInputMethod.activateServer().
-
-extension PrefMgr {
-  public func fixOddPreferences() {
-    // 防呆。macOS 10.11 用 IMK 選字窗會崩潰，macOS 10.13 的 IMK 選字窗仍有問題。
-    // 一般人想用的 IMK 選字窗基於 macOS 10.09 系統內建的注音輸入法的那種矩陣選字窗。
-    // 然而，該選字窗的體驗直到 macOS 10.14 開始才在 IMKCandidates 當中正式提供。
-    if #unavailable(macOS 10.13) { useIMKCandidateWindow = false }
-    if #unavailable(macOS 10.15) {
-      handleDefaultCandidateFontsByLangIdentifier = false
-      shiftKeyAccommodationBehavior = 0
-      disableShiftTogglingAlphanumericalMode = false
-      togglingAlphanumericalModeWithLShift = false
-    }
-    // 客體黑名單自動排序去重複。
-    clientsIMKTextInputIncapable = Array(Set(clientsIMKTextInputIncapable)).sorted()
-    // 注拼槽注音排列選項糾錯。
-    var isKeyboardParserOptionValid = false
-    KeyboardParser.allCases.forEach {
-      if $0.rawValue == keyboardParser { isKeyboardParserOptionValid = true }
-    }
-    if !isKeyboardParserOptionValid {
-      keyboardParser = 0
-    }
-    // 基礎鍵盤排列選項糾錯。
-    if TISInputSource.generate(from: basicKeyboardLayout) == nil {
-      basicKeyboardLayout = kDefaultBasicKeyboardLayout
-    }
-    if TISInputSource.generate(from: alphanumericalKeyboardLayout) == nil {
-      alphanumericalKeyboardLayout = kDefaultAlphanumericalKeyboardLayout
-    }
-    // 其它多元選項參數自動糾錯。
-    if ![0, 1, 2].contains(specifyIntonationKeyBehavior) {
-      specifyIntonationKeyBehavior = 0
-    }
-    if ![0, 1, 2].contains(specifyShiftBackSpaceKeyBehavior) {
-      specifyShiftBackSpaceKeyBehavior = 0
-    }
-    if ![0, 1, 2].contains(upperCaseLetterKeyBehavior) {
-      upperCaseLetterKeyBehavior = 0
-    }
-    if ![0, 1, 2].contains(shiftKeyAccommodationBehavior) {
-      shiftKeyAccommodationBehavior = 0
-    }
-  }
 }
