@@ -40,13 +40,13 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     ofSize: 14, weight: .medium
   )
 
-  public var candidateFont = NSFont.systemFont(ofSize: mgrPrefs.candidateListTextSize) {
+  public var candidateFont = NSFont.systemFont(ofSize: PrefMgr.shared.candidateListTextSize) {
     didSet {
       if #available(macOS 10.14, *) { setFontSize(candidateFont.pointSize) }
       var attributes = attributes()
       // FB11300759: Set "NSAttributedString.Key.font" doesn't work.
       attributes?[NSAttributedString.Key.font] = candidateFont
-      if mgrPrefs.handleDefaultCandidateFontsByLangIdentifier {
+      if PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier {
         switch IMEApp.currentInputMode {
           case InputMode.imeModeCHS:
             if #available(macOS 12.0, *) {
@@ -55,7 +55,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
           case InputMode.imeModeCHT:
             if #available(macOS 12.0, *) {
               attributes?[NSAttributedString.Key.languageIdentifier] =
-                (mgrPrefs.shiftJISShinjitaiOutputEnabled || mgrPrefs.chineseConversionEnabled)
+                (PrefMgr.shared.shiftJISShinjitaiOutputEnabled || PrefMgr.shared.chineseConversionEnabled)
                 ? "ja" as AnyObject : "zh-Hant" as AnyObject
             }
           default:
@@ -201,12 +201,12 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
         case .vertical: event.isShiftHold ? moveLeft(self) : moveRight(self)
       }
     } else if event.isSpace {
-      switch mgrPrefs.specifyShiftSpaceKeyBehavior {
+      switch PrefMgr.shared.specifyShiftSpaceKeyBehavior {
         case true: _ = event.isShiftHold ? highlightNextCandidate() : showNextPage()
         case false: _ = event.isShiftHold ? showNextPage() : highlightNextCandidate()
       }
     } else if event.isTab {
-      switch mgrPrefs.specifyShiftTabKeyBehavior {
+      switch PrefMgr.shared.specifyShiftTabKeyBehavior {
         case true: _ = event.isShiftHold ? showPreviousPage() : showNextPage()
         case false: _ = event.isShiftHold ? highlightPreviousCandidate() : highlightNextCandidate()
       }
@@ -216,7 +216,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
         /// 反正 IMK 選字窗目前也沒辦法修改選字鍵。
         let newEvent = event.reinitiate(characters: newChar)
         if let newEvent = newEvent {
-          if mgrPrefs.useSCPCTypingMode, delegate.isAssociatedPhrasesState {
+          if PrefMgr.shared.useSCPCTypingMode, delegate.isAssociatedPhrasesState {
             // 註：input.isShiftHold 已經在 ctlInputMethod.handle() 內處理，因為在那邊處理才有效。
             if !event.isShiftHold {
               _ = delegate.sharedEventHandler(event)
@@ -233,7 +233,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
         }
       }
 
-      if mgrPrefs.useSCPCTypingMode, !event.isReservedKey {
+      if PrefMgr.shared.useSCPCTypingMode, !event.isReservedKey {
         _ = delegate.sharedEventHandler(event)
         return
       }
@@ -241,7 +241,7 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
       if delegate.isAssociatedPhrasesState,
         !event.isPageUp, !event.isPageDown, !event.isCursorForward, !event.isCursorBackward,
         !event.isCursorClockLeft, !event.isCursorClockRight, !event.isSpace,
-        !event.isEnter || !mgrPrefs.alsoConfirmAssociatedCandidatesByEnter
+        !event.isEnter || !PrefMgr.shared.alsoConfirmAssociatedCandidatesByEnter
       {
         _ = delegate.sharedEventHandler(event)
         return

@@ -28,61 +28,64 @@ extension ctlInputMethod {
 
     let useSCPCTypingModeItem = menu.addItem(
       withTitle: NSLocalizedString("Per-Char Select Mode", comment: ""),
-      action: #selector(toggleSCPCTypingMode(_:)), keyEquivalent: mgrPrefs.usingHotKeySCPC ? "P" : ""
+      action: #selector(toggleSCPCTypingMode(_:)), keyEquivalent: PrefMgr.shared.usingHotKeySCPC ? "P" : ""
     )
     useSCPCTypingModeItem.keyEquivalentModifierMask = [.command, .control]
-    useSCPCTypingModeItem.state = mgrPrefs.useSCPCTypingMode.state
+    useSCPCTypingModeItem.state = PrefMgr.shared.useSCPCTypingMode.state
 
     let userAssociatedPhrasesItem = menu.addItem(
       withTitle: NSLocalizedString("Per-Char Associated Phrases", comment: ""),
-      action: #selector(toggleAssociatedPhrasesEnabled(_:)), keyEquivalent: mgrPrefs.usingHotKeyAssociates ? "O" : ""
+      action: #selector(toggleAssociatedPhrasesEnabled(_:)),
+      keyEquivalent: PrefMgr.shared.usingHotKeyAssociates ? "O" : ""
     )
     userAssociatedPhrasesItem.keyEquivalentModifierMask = [.command, .control]
-    userAssociatedPhrasesItem.state = mgrPrefs.associatedPhrasesEnabled.state
+    userAssociatedPhrasesItem.state = PrefMgr.shared.associatedPhrasesEnabled.state
 
     let useCNS11643SupportItem = menu.addItem(
       withTitle: NSLocalizedString("CNS11643 Mode", comment: ""),
-      action: #selector(toggleCNS11643Enabled(_:)), keyEquivalent: mgrPrefs.usingHotKeyCNS ? "L" : ""
+      action: #selector(toggleCNS11643Enabled(_:)), keyEquivalent: PrefMgr.shared.usingHotKeyCNS ? "L" : ""
     )
     useCNS11643SupportItem.keyEquivalentModifierMask = [.command, .control]
-    useCNS11643SupportItem.state = mgrPrefs.cns11643Enabled.state
+    useCNS11643SupportItem.state = PrefMgr.shared.cns11643Enabled.state
 
     if IMEApp.currentInputMode == InputMode.imeModeCHT {
       let chineseConversionItem = menu.addItem(
         withTitle: NSLocalizedString("Force KangXi Writing", comment: ""),
-        action: #selector(toggleChineseConverter(_:)), keyEquivalent: mgrPrefs.usingHotKeyKangXi ? "K" : ""
+        action: #selector(toggleChineseConverter(_:)), keyEquivalent: PrefMgr.shared.usingHotKeyKangXi ? "K" : ""
       )
       chineseConversionItem.keyEquivalentModifierMask = [.command, .control]
-      chineseConversionItem.state = mgrPrefs.chineseConversionEnabled.state
+      chineseConversionItem.state = PrefMgr.shared.chineseConversionEnabled.state
 
       let shiftJISConversionItem = menu.addItem(
         withTitle: NSLocalizedString("JIS Shinjitai Output", comment: ""),
-        action: #selector(toggleShiftJISShinjitaiOutput(_:)), keyEquivalent: mgrPrefs.usingHotKeyJIS ? "J" : ""
+        action: #selector(toggleShiftJISShinjitaiOutput(_:)), keyEquivalent: PrefMgr.shared.usingHotKeyJIS ? "J" : ""
       )
       shiftJISConversionItem.keyEquivalentModifierMask = [.command, .control]
-      shiftJISConversionItem.state = mgrPrefs.shiftJISShinjitaiOutputEnabled.state
+      shiftJISConversionItem.state = PrefMgr.shared.shiftJISShinjitaiOutputEnabled.state
     }
 
     let currencyNumeralsItem = menu.addItem(
       withTitle: NSLocalizedString("Currency Numeral Output", comment: ""),
-      action: #selector(toggleCurrencyNumerals(_:)), keyEquivalent: mgrPrefs.usingHotKeyCurrencyNumerals ? "M" : ""
+      action: #selector(toggleCurrencyNumerals(_:)),
+      keyEquivalent: PrefMgr.shared.usingHotKeyCurrencyNumerals ? "M" : ""
     )
     currencyNumeralsItem.keyEquivalentModifierMask = [.command, .control]
-    currencyNumeralsItem.state = mgrPrefs.currencyNumeralsEnabled.state
+    currencyNumeralsItem.state = PrefMgr.shared.currencyNumeralsEnabled.state
 
     let halfWidthPunctuationItem = menu.addItem(
       withTitle: NSLocalizedString("Half-Width Punctuation Mode", comment: ""),
-      action: #selector(toggleHalfWidthPunctuation(_:)), keyEquivalent: mgrPrefs.usingHotKeyHalfWidthASCII ? "H" : ""
+      action: #selector(toggleHalfWidthPunctuation(_:)),
+      keyEquivalent: PrefMgr.shared.usingHotKeyHalfWidthASCII ? "H" : ""
     )
     halfWidthPunctuationItem.keyEquivalentModifierMask = [.command, .control]
-    halfWidthPunctuationItem.state = mgrPrefs.halfWidthPunctuationEnabled.state
+    halfWidthPunctuationItem.state = PrefMgr.shared.halfWidthPunctuationEnabled.state
 
-    if optionKeyPressed || mgrPrefs.phraseReplacementEnabled {
+    if optionKeyPressed || PrefMgr.shared.phraseReplacementEnabled {
       let phaseReplacementItem = menu.addItem(
         withTitle: NSLocalizedString("Use Phrase Replacement", comment: ""),
         action: #selector(togglePhraseReplacement(_:)), keyEquivalent: ""
       )
-      phaseReplacementItem.state = mgrPrefs.phraseReplacementEnabled.state
+      phaseReplacementItem.state = PrefMgr.shared.phraseReplacementEnabled.state
     }
 
     if optionKeyPressed {
@@ -90,7 +93,7 @@ extension ctlInputMethod {
         withTitle: NSLocalizedString("Symbol & Emoji Input", comment: ""),
         action: #selector(toggleSymbolEnabled(_:)), keyEquivalent: ""
       )
-      toggleSymbolInputItem.state = mgrPrefs.symbolInputEnabled.state
+      toggleSymbolInputItem.state = PrefMgr.shared.symbolInputEnabled.state
     }
 
     menu.addItem(NSMenuItem.separator())  // ---------------------
@@ -108,7 +111,7 @@ extension ctlInputMethod {
       action: #selector(openExcludedPhrases(_:)), keyEquivalent: ""
     )
 
-    if optionKeyPressed || mgrPrefs.associatedPhrasesEnabled {
+    if optionKeyPressed || PrefMgr.shared.associatedPhrasesEnabled {
       menu.addItem(
         withTitle: NSLocalizedString("Edit Associated Phrases…", comment: ""),
         action: #selector(openAssociatedPhrases(_:)), keyEquivalent: ""
@@ -126,7 +129,7 @@ extension ctlInputMethod {
       )
     }
 
-    if optionKeyPressed || !mgrPrefs.shouldAutoReloadUserDataFiles {
+    if optionKeyPressed || !PrefMgr.shared.shouldAutoReloadUserDataFiles {
       menu.addItem(
         withTitle: NSLocalizedString("Reload User Phrases", comment: ""),
         action: #selector(reloadUserPhrasesData(_:)), keyEquivalent: ""
@@ -222,7 +225,7 @@ extension ctlInputMethod {
     resetKeyHandler()
     NotifierController.notify(
       message: NSLocalizedString("Per-Char Select Mode", comment: "") + "\n"
-        + (mgrPrefs.useSCPCTypingMode.toggled()
+        + (PrefMgr.shared.useSCPCTypingMode.toggled()
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
@@ -232,7 +235,7 @@ extension ctlInputMethod {
     resetKeyHandler()
     NotifierController.notify(
       message: NSLocalizedString("Force KangXi Writing", comment: "") + "\n"
-        + (mgrPrefs.chineseConversionEnabled.toggled()
+        + (PrefMgr.shared.chineseConversionEnabled.toggled()
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
@@ -242,7 +245,7 @@ extension ctlInputMethod {
     resetKeyHandler()
     NotifierController.notify(
       message: NSLocalizedString("JIS Shinjitai Output", comment: "") + "\n"
-        + (mgrPrefs.shiftJISShinjitaiOutputEnabled.toggled()
+        + (PrefMgr.shared.shiftJISShinjitaiOutputEnabled.toggled()
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
@@ -252,7 +255,7 @@ extension ctlInputMethod {
     resetKeyHandler()
     NotifierController.notify(
       message: NSLocalizedString("Currency Numeral Output", comment: "") + "\n"
-        + (mgrPrefs.currencyNumeralsEnabled.toggled()
+        + (PrefMgr.shared.currencyNumeralsEnabled.toggled()
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
@@ -262,7 +265,7 @@ extension ctlInputMethod {
     resetKeyHandler()
     NotifierController.notify(
       message: NSLocalizedString("Half-Width Punctuation Mode", comment: "") + "\n"
-        + (mgrPrefs.halfWidthPunctuationEnabled.toggled()
+        + (PrefMgr.shared.halfWidthPunctuationEnabled.toggled()
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
@@ -272,7 +275,7 @@ extension ctlInputMethod {
     resetKeyHandler()
     NotifierController.notify(
       message: NSLocalizedString("CNS11643 Mode", comment: "") + "\n"
-        + (mgrPrefs.cns11643Enabled.toggled()
+        + (PrefMgr.shared.cns11643Enabled.toggled()
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
@@ -282,7 +285,7 @@ extension ctlInputMethod {
     resetKeyHandler()
     NotifierController.notify(
       message: NSLocalizedString("Symbol & Emoji Input", comment: "") + "\n"
-        + (mgrPrefs.symbolInputEnabled.toggled()
+        + (PrefMgr.shared.symbolInputEnabled.toggled()
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
@@ -292,7 +295,7 @@ extension ctlInputMethod {
     resetKeyHandler()
     NotifierController.notify(
       message: NSLocalizedString("Per-Char Associated Phrases", comment: "") + "\n"
-        + (mgrPrefs.associatedPhrasesEnabled.toggled()
+        + (PrefMgr.shared.associatedPhrasesEnabled.toggled()
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
@@ -302,7 +305,7 @@ extension ctlInputMethod {
     resetKeyHandler()
     NotifierController.notify(
       message: NSLocalizedString("Use Phrase Replacement", comment: "") + "\n"
-        + (mgrPrefs.phraseReplacementEnabled.toggled()
+        + (PrefMgr.shared.phraseReplacementEnabled.toggled()
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )

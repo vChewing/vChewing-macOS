@@ -149,11 +149,11 @@ extension KeyHandler {
 
     if state.hasComposition, composer.isEmpty, !input.isOptionHold,
       input.isCursorClockLeft || input.isCursorClockRight || input.isSpace
-        || input.isPageDown || input.isPageUp || (input.isTab && mgrPrefs.specifyShiftTabKeyBehavior)
+        || input.isPageDown || input.isPageUp || (input.isTab && prefs.specifyShiftTabKeyBehavior)
     {
       if input.isSpace {
         /// 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
-        if !mgrPrefs.chooseCandidateUsingSpace {
+        if !prefs.chooseCandidateUsingSpace {
           if compositor.cursor >= compositor.length {
             let displayedText = state.displayedText
             if !displayedText.isEmpty {
@@ -317,7 +317,7 @@ extension KeyHandler {
         let string = NSMutableString(string: stringRAW)
         CFStringTransform(string, nil, kCFStringTransformFullwidthHalfwidth, true)
         stateCallback(
-          IMEState.ofCommitting(textToCommit: mgrPrefs.halfWidthPunctuationEnabled ? stringRAW : string as String)
+          IMEState.ofCommitting(textToCommit: prefs.halfWidthPunctuationEnabled ? stringRAW : string as String)
         )
         stateCallback(IMEState.ofEmpty())
         return true
@@ -372,7 +372,7 @@ extension KeyHandler {
 
     if input.isUpperCaseASCIILetterKey, !input.isCommandHold, !input.isControlHold {
       if input.isShiftHold {  // 這裡先不要判斷 isOptionHold。
-        switch mgrPrefs.upperCaseLetterKeyBehavior {
+        switch prefs.upperCaseLetterKeyBehavior {
           case 1:
             stateCallback(IMEState.ofEmpty())
             stateCallback(IMEState.ofCommitting(textToCommit: inputText.lowercased()))

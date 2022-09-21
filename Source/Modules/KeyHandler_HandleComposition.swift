@@ -36,7 +36,7 @@ extension KeyHandler {
     if !skipPhoneticHandling && composer.inputValidityCheck(key: input.charCode) {
       // 引入 macOS 內建注音輸入法的行為，允許用除了陰平以外的聲調鍵覆寫前一個漢字的讀音。
       // 但如果要覆寫的內容會導致游標身後的字音沒有對應的辭典記錄的話，那就只蜂鳴警告一下。
-      proc: if [0, 1].contains(mgrPrefs.specifyIntonationKeyBehavior), composer.isEmpty, !input.isSpace {
+      proc: if [0, 1].contains(prefs.specifyIntonationKeyBehavior), composer.isEmpty, !input.isSpace {
         // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
         guard let prevReading = previousParsableReading, isIntonationKey(input) else { break proc }
         var theComposer = composer
@@ -44,7 +44,7 @@ extension KeyHandler {
         // 發現要覆寫的聲調與覆寫對象的聲調雷同的情況的話，直接跳過處理。
         let oldIntonation: Tekkon.Phonabet = theComposer.intonation
         theComposer.receiveKey(fromString: input.text)
-        if theComposer.intonation == oldIntonation, mgrPrefs.specifyIntonationKeyBehavior == 1 { break proc }
+        if theComposer.intonation == oldIntonation, prefs.specifyIntonationKeyBehavior == 1 { break proc }
         theComposer.intonation.clear()
         // 檢查新的漢字字音是否在庫。
         let temporaryReadingKey = theComposer.getComposition()
@@ -88,7 +88,7 @@ extension KeyHandler {
       if !currentLM.hasUnigramsFor(key: readingKey) {
         errorCallback("B49C0979：語彙庫內無「\(readingKey)」的匹配記錄。")
 
-        if mgrPrefs.keepReadingUponCompositionError {
+        if prefs.keepReadingUponCompositionError {
           composer.intonation.clear()  // 砍掉聲調。
           stateCallback(buildInputtingState)
           return true
@@ -125,14 +125,14 @@ extension KeyHandler {
       stateCallback(inputting)
 
       /// 逐字選字模式的處理。
-      if mgrPrefs.useSCPCTypingMode {
+      if prefs.useSCPCTypingMode {
         let candidateState: IMEState = buildCandidate(state: inputting)
         if candidateState.candidates.count == 1, let firstCandidate = candidateState.candidates.first {
           let reading: String = firstCandidate.0
           let text: String = firstCandidate.1
           stateCallback(IMEState.ofCommitting(textToCommit: text))
 
-          if !mgrPrefs.associatedPhrasesEnabled {
+          if !prefs.associatedPhrasesEnabled {
             stateCallback(IMEState.ofEmpty())
           } else {
             let associatedPhrases =

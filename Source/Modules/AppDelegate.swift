@@ -17,7 +17,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
   private func reloadOnFolderChangeHappens() {
     // 拖 100ms 再重載，畢竟有些有特殊需求的使用者可能會想使用巨型自訂語彙檔案。
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
-      if mgrPrefs.shouldAutoReloadUserDataFiles {
+      if PrefMgr.shared.shouldAutoReloadUserDataFiles {
         LMMgr.initUserLangModels()
       }
     }
@@ -39,10 +39,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
   func applicationDidFinishLaunching(_: Notification) {
     NSUserNotificationCenter.default.delegate = self
     // 一旦發現與使用者半衰模組的觀察行為有關的崩潰標記被開啟，就清空既有的半衰記憶資料檔案。
-    if mgrPrefs.failureFlagForUOMObservation {
+    if PrefMgr.shared.failureFlagForUOMObservation {
       LMMgr.clearUserOverrideModelData(.imeModeCHS)
       LMMgr.clearUserOverrideModelData(.imeModeCHT)
-      mgrPrefs.failureFlagForUOMObservation = false
+      PrefMgr.shared.failureFlagForUOMObservation = false
       let userNotification = NSUserNotification()
       userNotification.title = NSLocalizedString("vChewing", comment: "")
       userNotification.informativeText =
@@ -61,7 +61,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
       }
     }
 
-    mgrPrefs.fixOddPreferences()
+    PrefMgr.shared.fixOddPreferences()
 
     // 配置更新小助手
     updateSputnik.varkUpdateInfoPageURLKey = "UpdateInfoSite"
@@ -71,7 +71,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     updateSputnik.varCheckUpdateAutomatically = "ChecvarkUpdateAutomatically"
 
     // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
-    if mgrPrefs.checkUpdateAutomatically {
+    if PrefMgr.shared.checkUpdateAutomatically {
       updateSputnik.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
     }
   }

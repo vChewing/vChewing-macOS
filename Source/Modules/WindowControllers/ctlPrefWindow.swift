@@ -51,7 +51,7 @@ class ctlPrefWindow: NSWindowController {
     cmbCandidateFontSize.isEnabled = true
 
     if #unavailable(macOS 10.14) {
-      if mgrPrefs.useIMKCandidateWindow {
+      if PrefMgr.shared.useIMKCandidateWindow {
         cmbCandidateFontSize.isEnabled = false
       }
     }
@@ -82,7 +82,7 @@ class ctlPrefWindow: NSWindowController {
     var chosenLanguageItem: NSMenuItem?
     uiLanguageButton.menu?.removeAllItems()
 
-    let appleLanguages = mgrPrefs.appleLanguages
+    let appleLanguages = PrefMgr.shared.appleLanguages
     for language in languages {
       let menuItem = NSMenuItem()
       menuItem.title = NSLocalizedString(language, comment: language)
@@ -108,7 +108,7 @@ class ctlPrefWindow: NSWindowController {
 
     basicKeyboardLayoutButton.menu?.removeAllItems()
 
-    let basicKeyboardLayoutID = mgrPrefs.basicKeyboardLayout
+    let basicKeyboardLayoutID = PrefMgr.shared.basicKeyboardLayout
 
     for source in IMKHelper.allowedBasicLayoutsAsTISInputSources {
       guard let source = source else {
@@ -129,7 +129,7 @@ class ctlPrefWindow: NSWindowController {
     selectionKeyComboBox.removeAllItems()
     selectionKeyComboBox.addItems(withObjectValues: CandidateKey.suggestions)
 
-    var candidateSelectionKeys = mgrPrefs.candidateKeys
+    var candidateSelectionKeys = PrefMgr.shared.candidateKeys
     if candidateSelectionKeys.isEmpty {
       candidateSelectionKeys = CandidateKey.defaultKeys
     }
@@ -140,28 +140,28 @@ class ctlPrefWindow: NSWindowController {
   // 這裡有必要加上這段處理，用來確保藉由偏好設定介面動過的 CNS 開關能夠立刻生效。
   // 所有涉及到語言模型開關的內容均需要這樣處理。
   @IBAction func toggleCNSSupport(_: Any) {
-    LMMgr.setCNSEnabled(mgrPrefs.cns11643Enabled)
+    LMMgr.setCNSEnabled(PrefMgr.shared.cns11643Enabled)
   }
 
   @IBAction func toggleSymbolInputEnabled(_: Any) {
-    LMMgr.setSymbolEnabled(mgrPrefs.symbolInputEnabled)
+    LMMgr.setSymbolEnabled(PrefMgr.shared.symbolInputEnabled)
   }
 
   @IBAction func toggleTrad2KangXiAction(_: Any) {
     if chkTrad2KangXi.state == .on, chkTrad2JISShinjitai.state == .on {
-      mgrPrefs.shiftJISShinjitaiOutputEnabled.toggle()
+      PrefMgr.shared.shiftJISShinjitaiOutputEnabled.toggle()
     }
   }
 
   @IBAction func toggleTrad2JISShinjitaiAction(_: Any) {
     if chkTrad2KangXi.state == .on, chkTrad2JISShinjitai.state == .on {
-      mgrPrefs.chineseConversionEnabled.toggle()
+      PrefMgr.shared.chineseConversionEnabled.toggle()
     }
   }
 
   @IBAction func updateBasicKeyboardLayoutAction(_: Any) {
     if let sourceID = basicKeyboardLayoutButton.selectedItem?.representedObject as? String {
-      mgrPrefs.basicKeyboardLayout = sourceID
+      PrefMgr.shared.basicKeyboardLayout = sourceID
     }
   }
 
@@ -173,7 +173,7 @@ class ctlPrefWindow: NSWindowController {
     }
     if let language = uiLanguageButton.selectedItem?.representedObject as? String {
       if language != "auto" {
-        mgrPrefs.appleLanguages = [language]
+        PrefMgr.shared.appleLanguages = [language]
       } else {
         UserDefaults.standard.removeObject(forKey: "AppleLanguages")
       }
@@ -203,15 +203,15 @@ class ctlPrefWindow: NSWindowController {
     }
     do {
       try CandidateKey.validate(keys: keys)
-      mgrPrefs.candidateKeys = keys
-      selectionKeyComboBox.stringValue = mgrPrefs.candidateKeys
+      PrefMgr.shared.candidateKeys = keys
+      selectionKeyComboBox.stringValue = PrefMgr.shared.candidateKeys
     } catch CandidateKey.ErrorType.empty {
-      selectionKeyComboBox.stringValue = mgrPrefs.candidateKeys
+      selectionKeyComboBox.stringValue = PrefMgr.shared.candidateKeys
     } catch {
       if let window = window {
         let alert = NSAlert(error: error)
         alert.beginSheetModal(for: window) { _ in
-          self.selectionKeyComboBox.stringValue = mgrPrefs.candidateKeys
+          self.selectionKeyComboBox.stringValue = PrefMgr.shared.candidateKeys
         }
         IMEApp.buzz()
       }
@@ -234,7 +234,7 @@ class ctlPrefWindow: NSWindowController {
     dlgOpenPath.canChooseDirectories = true
 
     let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
-      mgrPrefs.userDataFolderSpecified.expandingTildeInPath)
+      PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath)
 
     dlgOpenPath.beginSheetModal(for: window) { result in
       if result == NSApplication.ModalResponse.OK {
@@ -244,7 +244,7 @@ class ctlPrefWindow: NSWindowController {
         var newPath = url.path
         newPath.ensureTrailingSlash()
         if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
-          mgrPrefs.userDataFolderSpecified = newPath
+          PrefMgr.shared.userDataFolderSpecified = newPath
           BookmarkManager.shared.saveBookmark(for: url)
           (NSApplication.shared.delegate as! AppDelegate).updateDirectoryMonitorPath()
         } else {

@@ -32,6 +32,7 @@ public protocol KeyHandlerDelegate {
 public class KeyHandler {
   /// 委任物件 (ctlInputMethod)，以便呼叫其中的函式。
   public var delegate: KeyHandlerDelegate?
+  public var prefs: PrefMgrProtocol
 
   /// 半衰模組的衰減指數
   let kEpsilon: Double = 0.000_001
@@ -47,11 +48,12 @@ public class KeyHandler {
   }
 
   /// 初期化。
-  public init(lm: vChewingLM.LMInstantiator, uom: vChewingLM.LMUserOverride) {
+  public init(lm: vChewingLM.LMInstantiator, uom: vChewingLM.LMUserOverride, pref: PrefMgrProtocol) {
+    prefs = pref
     currentLM = lm
     currentUOM = uom
     /// 同步組字器單個詞的幅位長度上限。
-    Megrez.Compositor.maxSpanLength = mgrPrefs.maxCandidateLength
+    Megrez.Compositor.maxSpanLength = prefs.maxCandidateLength
     /// 組字器初期化。因為是首次初期化變數，所以這裡不能用 ensureCompositor() 代勞。
     compositor = Megrez.Compositor(with: currentLM, separator: "-")
     /// 注拼槽初期化。
@@ -85,7 +87,7 @@ public class KeyHandler {
   /// 威注音對游標前置與游標後置模式採取的候選字節點陣列抓取方法是分離的，且不使用 Node Crossing。
   var actualCandidateCursor: Int {
     compositor.cursor
-      - ((compositor.cursor == compositor.width || !mgrPrefs.useRearCursorMode) && compositor.cursor > 0 ? 1 : 0)
+      - ((compositor.cursor == compositor.width || !prefs.useRearCursorMode) && compositor.cursor > 0 ? 1 : 0)
   }
 
   /// 利用給定的讀音鏈來試圖爬取最接近的組字結果（最大相似度估算）。
@@ -97,7 +99,7 @@ public class KeyHandler {
     compositor.walk()
 
     // 在偵錯模式開啟時，將 GraphViz 資料寫入至指定位置。
-    if mgrPrefs.isDebugModeEnabled {
+    if prefs.isDebugModeEnabled {
       let result = compositor.dumpDOT
       let thePath = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].path.appending(
         "/vChewing-visualization.dot")
@@ -222,12 +224,12 @@ public class KeyHandler {
     let currentNode = currentWalk.findNode(at: actualCandidateCursor, target: &accumulatedCursor)
     guard let currentNode = currentNode else { return }
 
-    if currentNode.currentUnigram.score > -12, mgrPrefs.fetchSuggestionsFromUserOverrideModel {
+    if currentNode.currentUnigram.score > -12, prefs.fetchSuggestionsFromUserOverrideModel {
       vCLog("UOM: Start Observation.")
       // 這個過程可能會因為使用者半衰記憶模組內部資料錯亂、而導致輸入法在選字時崩潰。
       // 於是在這裡引入災後狀況察覺專用變數，且先開啟該開關。順利執行完觀察後會關閉。
       // 一旦輸入法崩潰，會在重啟時發現這個開關是開著的，屆時 AppDelegate 會做出應對。
-      mgrPrefs.failureFlagForUOMObservation = true
+      prefs.failureFlagForUOMObservation = true
       // 令半衰記憶模組觀測給定的三元圖。
       // 這個過程會讓半衰引擎根據當前上下文生成三元圖索引鍵。
       currentUOM.performObservation(
@@ -235,11 +237,11 @@ public class KeyHandler {
         timestamp: Date().timeIntervalSince1970, saveCallback: { self.currentUOM.saveData() }
       )
       // 如果沒有出現崩框的話，那就將這個開關復位。
-      mgrPrefs.failureFlagForUOMObservation = false
+      prefs.failureFlagForUOMObservation = false
     }
 
     /// 若偏好設定內啟用了相關選項，則會在選字之後始終將游標推送至選字後的節錨的前方。
-    if mgrPrefs.moveCursorAfterSelectingCandidate, respectCursorPushing {
+    if prefs.moveCursorAfterSelectingCandidate, respectCursorPushing {
       // compositor.cursor = accumulatedCursor
       compositor.jumpCursorBySpan(to: .front)
     }
@@ -250,7 +252,7 @@ public class KeyHandler {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
     var arrCandidates: [Megrez.Compositor.KeyValuePaired] = {
-      switch mgrPrefs.useRearCursorMode {
+      switch prefs.useRearCursorMode {
         case false:
           return compositor.fetchCandidates(at: actualCandidateCursor, filter: .endAt)
         case true:
@@ -264,7 +266,7 @@ public class KeyHandler {
     if arrCandidates.isEmpty { return .init() }
 
     // 決定是否根據半衰記憶模組的建議來調整候選字詞的順序。
-    if !mgrPrefs.fetchSuggestionsFromUserOverrideModel || mgrPrefs.useSCPCTypingMode || fixOrder {
+    if !prefs.fetchSuggestionsFromUserOverrideModel || prefs.useSCPCTypingMode || fixOrder {
       return arrCandidates.map { ($0.key, $0.value) }
     }
 
@@ -282,9 +284,9 @@ public class KeyHandler {
   @discardableResult func fetchSuggestionsFromUOM(apply: Bool) -> [(String, Megrez.Unigram)] {
     var arrResult = [(String, Megrez.Unigram)]()
     /// 如果逐字選字模式有啟用的話，直接放棄執行這個函式。
-    if mgrPrefs.useSCPCTypingMode { return arrResult }
+    if prefs.useSCPCTypingMode { return arrResult }
     /// 如果這個開關沒打開的話，直接放棄執行這個函式。
-    if !mgrPrefs.fetchSuggestionsFromUserOverrideModel { return arrResult }
+    if !prefs.fetchSuggestionsFromUserOverrideModel { return arrResult }
     /// 獲取來自半衰記憶模組的建議結果
     let suggestion = currentUOM.fetchSuggestion(
       currentWalk: compositor.walkedNodes, cursor: actualCandidateCursor, timestamp: Date().timeIntervalSince1970
@@ -320,7 +322,7 @@ public class KeyHandler {
   }
 
   var currentKeyboardParserType: KeyboardParser {
-    .init(rawValue: mgrPrefs.keyboardParser) ?? .ofStandard
+    .init(rawValue: prefs.keyboardParser) ?? .ofStandard
   }
 
   /// 給注拼槽指定注音排列或拼音輸入種類之後，將注拼槽內容清空。
@@ -358,7 +360,7 @@ public class KeyHandler {
         composer.ensureParser(arrange: .ofUniversalPinyin)
     }
     composer.clear()
-    composer.phonabetCombinationCorrectionEnabled = mgrPrefs.autoCorrectReadingCombination
+    composer.phonabetCombinationCorrectionEnabled = prefs.autoCorrectReadingCombination
   }
 
   /// 返回前一個游標位置的可解析的漢字讀音。
@@ -394,7 +396,7 @@ public class KeyHandler {
   /// - Parameter input: 輸入的按鍵訊號。
   /// - Returns: 生成的標點符號索引鍵。
   func generatePunctuationNamePrefix(withKeyCondition input: InputSignalProtocol) -> String {
-    if mgrPrefs.halfWidthPunctuationEnabled {
+    if prefs.halfWidthPunctuationEnabled {
       return "_half_punctuation_"
     }
     switch (input.isControlHold, input.isOptionHold) {
@@ -423,7 +425,7 @@ extension KeyHandler {
     guard !compositor.walkedNodes.isEmpty,
       compositor.width > compositorWidthLimit,
       let identifier = delegate?.clientBundleIdentifier,
-      mgrPrefs.clientsIMKTextInputIncapable.contains(identifier)
+      prefs.clientsIMKTextInputIncapable.contains(identifier)
     else {
       return ""
     }

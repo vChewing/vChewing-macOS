@@ -23,7 +23,7 @@ extension KeyHandler {
     /// 換成由此處重新生成的組字字串（NSAttributeString，否則會不顯示）。
     var displayTextSegments: [String] = compositor.walkedNodes.values
     var cursor = convertCursorForDisplay(compositor.cursor)
-    let reading = composer.getInlineCompositionForDisplay(isHanyuPinyin: mgrPrefs.showHanyuPinyinInCompositionBuffer)
+    let reading = composer.getInlineCompositionForDisplay(isHanyuPinyin: prefs.showHanyuPinyinInCompositionBuffer)
     if !reading.isEmpty {
       var newDisplayTextSegments = [String]()
       var temporaryNode = ""
@@ -91,7 +91,7 @@ extension KeyHandler {
     state currentState: IMEStateProtocol
   ) -> IMEState {
     IMEState.ofCandidates(
-      candidates: getCandidatesArray(fixOrder: mgrPrefs.useFixecCandidateOrderOnSelection),
+      candidates: getCandidatesArray(fixOrder: prefs.useFixecCandidateOrderOnSelection),
       displayTextSegments: compositor.walkedNodes.values,
       cursor: currentState.cursor
     )
@@ -263,7 +263,7 @@ extension KeyHandler {
     stateCallback(inputting)
 
     // 從這一行之後開始，就是針對逐字選字模式的單獨處理。
-    guard mgrPrefs.useSCPCTypingMode, composer.isEmpty else { return true }
+    guard prefs.useSCPCTypingMode, composer.isEmpty else { return true }
 
     let candidateState = buildCandidate(state: inputting)
     if candidateState.candidates.count == 1 {
@@ -312,7 +312,7 @@ extension KeyHandler {
     guard state.type == .ofInputting else { return false }
 
     var displayedText = compositor.keys.joined(separator: "-")
-    if mgrPrefs.inlineDumpPinyinInLieuOfZhuyin {
+    if prefs.inlineDumpPinyinInLieuOfZhuyin {
       displayedText = Tekkon.restoreToneOneInZhuyinKey(target: displayedText)  // 恢復陰平標記
       displayedText = Tekkon.cnvPhonaToHanyuPinyin(target: displayedText)  // 注音轉拼音
     }
@@ -343,7 +343,7 @@ extension KeyHandler {
 
     for node in compositor.walkedNodes {
       var key = node.key
-      if mgrPrefs.inlineDumpPinyinInLieuOfZhuyin {
+      if prefs.inlineDumpPinyinInLieuOfZhuyin {
         key = Tekkon.restoreToneOneInZhuyinKey(target: key)  // 恢復陰平標記
         key = Tekkon.cnvPhonaToHanyuPinyin(target: key)  // 注音轉拼音
         key = Tekkon.cnvHanyuPinyinToTextbookStyle(target: key)  // 轉教科書式標調
@@ -380,7 +380,7 @@ extension KeyHandler {
     guard state.type == .ofInputting else { return false }
 
     // 引入 macOS 內建注音輸入法的行為，允許用 Shift+BackSpace 解構前一個漢字的讀音。
-    switch mgrPrefs.specifyShiftBackSpaceKeyBehavior {
+    switch prefs.specifyShiftBackSpaceKeyBehavior {
       case 0:
         guard input.isShiftHold, composer.isEmpty else { break }
         guard let prevReading = previousParsableReading else { break }
@@ -567,7 +567,7 @@ extension KeyHandler {
   ) -> Bool {
     guard state.type == .ofInputting else { return false }
 
-    if mgrPrefs.escToCleanInputBuffer {
+    if prefs.escToCleanInputBuffer {
       /// 若啟用了該選項，則清空組字器的內容與注拼槽的內容。
       /// 此乃 macOS 內建注音輸入法預設之行為，但不太受 Windows 使用者群體之待見。
       stateCallback(IMEState.ofAbortion())

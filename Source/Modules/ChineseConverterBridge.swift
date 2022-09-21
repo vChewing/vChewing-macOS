@@ -54,14 +54,14 @@ public enum ChineseConverter {
   /// 將指定字串內的小寫漢字數字轉換為大寫，會對轉換對象進行直接修改操作。
   /// - Parameter target: 轉換對象。
   public static func ensureCurrencyNumerals(target: inout String) {
-    if !mgrPrefs.currencyNumeralsEnabled { return }
+    if !PrefMgr.shared.currencyNumeralsEnabled { return }
     for key in currencyNumeralDictTable.keys {
       guard let result = currencyNumeralDictTable[key] else { continue }
       if IMEApp.currentInputMode == InputMode.imeModeCHS {
         target = target.replacingOccurrences(of: key, with: result.3)  // Simplified Chinese
         continue
       }
-      switch (mgrPrefs.chineseConversionEnabled, mgrPrefs.shiftJISShinjitaiOutputEnabled) {
+      switch (PrefMgr.shared.chineseConversionEnabled, PrefMgr.shared.shiftJISShinjitaiOutputEnabled) {
         case (false, true), (true, true): target = target.replacingOccurrences(of: key, with: result.2)  // JIS
         case (true, false): target = target.replacingOccurrences(of: key, with: result.0)  // KangXi
         default: target = target.replacingOccurrences(of: key, with: result.1)  // Contemporary
@@ -98,7 +98,7 @@ public enum ChineseConverter {
 
   static func kanjiConversionIfRequired(_ text: String) -> String {
     guard IMEApp.currentInputMode == InputMode.imeModeCHT else { return text }
-    switch (mgrPrefs.chineseConversionEnabled, mgrPrefs.shiftJISShinjitaiOutputEnabled) {
+    switch (PrefMgr.shared.chineseConversionEnabled, PrefMgr.shared.shiftJISShinjitaiOutputEnabled) {
       case (false, true): return ChineseConverter.cnvTradToJIS(text)
       case (true, false): return ChineseConverter.cnvTradToKangXi(text)
       // 本來這兩個開關不該同時開啟的，但萬一被同時開啟了的話就這樣處理：

@@ -15,11 +15,11 @@ private let kDefaultKeys = "123456789"
 private let kDefaultBasicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
 private let kDefaultAlphanumericalKeyboardLayout = "com.apple.keylayout.ABC"
 
-public let mgrPrefs = PrefMgr()
-
 // MARK: -
 
 public class PrefMgr: PrefMgrProtocol {
+  public static let shared = PrefMgr()
+
   // MARK: - Settings (Tier 1)
 
   @AppProperty(key: UserDef.kIsDebugModeEnabled.rawValue, defaultValue: false)
