@@ -74,27 +74,11 @@ NSApp.run()
 
 // MARK: - Top-level Enums relating to Input Mode and Language Supports.
 
-// The type of input modes.
-public enum InputMode: String, CaseIterable {
-  case imeModeCHS = "org.atelierInmu.inputmethod.vChewing.IMECHS"
-  case imeModeCHT = "org.atelierInmu.inputmethod.vChewing.IMECHT"
-  case imeModeNULL = ""
-  var reversed: InputMode {
-    switch self {
-      case .imeModeCHS:
-        return .imeModeCHT
-      case .imeModeCHT:
-        return .imeModeCHS
-      case .imeModeNULL:
-        return .imeModeNULL
-    }
-  }
-}
-
 public enum IMEApp {
   // MARK: - 輸入法的當前的簡繁體中文模式
 
-  public static var currentInputMode: InputMode = .init(rawValue: PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
+  public static var currentInputMode: Shared.InputMode =
+    .init(rawValue: PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
 
   /// Fart or Beep?
   static func buzz() {

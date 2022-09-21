@@ -136,11 +136,11 @@ private class vwrCandidateUniversal: NSView {
   func ensureLangIdentifier(for attr: inout [NSAttributedString.Key: AnyObject]) {
     if PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier {
       switch IMEApp.currentInputMode {
-        case InputMode.imeModeCHS:
+        case .imeModeCHS:
           if #available(macOS 12.0, *) {
             attr[.languageIdentifier] = "zh-Hans" as AnyObject
           }
-        case InputMode.imeModeCHT:
+        case .imeModeCHT:
           if #available(macOS 12.0, *) {
             attr[.languageIdentifier] =
               (PrefMgr.shared.shiftJISShinjitaiOutputEnabled || PrefMgr.shared.chineseConversionEnabled)
@@ -160,9 +160,9 @@ private class vwrCandidateUniversal: NSView {
     }
     // The background color of the highlightened candidate
     switch IMEApp.currentInputMode {
-      case InputMode.imeModeCHS:
+      case .imeModeCHS:
         result = NSColor.systemRed
-      case InputMode.imeModeCHT:
+      case .imeModeCHT:
         result = NSColor.systemBlue
       default: break
     }

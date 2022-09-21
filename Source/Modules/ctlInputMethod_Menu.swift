@@ -48,7 +48,7 @@ extension ctlInputMethod {
     useCNS11643SupportItem.keyEquivalentModifierMask = [.command, .control]
     useCNS11643SupportItem.state = PrefMgr.shared.cns11643Enabled.state
 
-    if IMEApp.currentInputMode == InputMode.imeModeCHT {
+    if IMEApp.currentInputMode == .imeModeCHT {
       let chineseConversionItem = menu.addItem(
         withTitle: NSLocalizedString("Force KangXi Writing", comment: ""),
         action: #selector(toggleChineseConverter(_:)), keyEquivalent: PrefMgr.shared.usingHotKeyKangXi ? "K" : ""

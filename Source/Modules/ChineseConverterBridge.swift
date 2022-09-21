@@ -57,7 +57,7 @@ public enum ChineseConverter {
     if !PrefMgr.shared.currencyNumeralsEnabled { return }
     for key in currencyNumeralDictTable.keys {
       guard let result = currencyNumeralDictTable[key] else { continue }
-      if IMEApp.currentInputMode == InputMode.imeModeCHS {
+      if IMEApp.currentInputMode == .imeModeCHS {
         target = target.replacingOccurrences(of: key, with: result.3)  // Simplified Chinese
         continue
       }
@@ -75,9 +75,9 @@ public enum ChineseConverter {
   /// - Returns: Text converted to Different Script.
   public static func crossConvert(_ string: String) -> String? {
     switch IMEApp.currentInputMode {
-      case InputMode.imeModeCHS:
+      case .imeModeCHS:
         return shared.convert(string, to: .zhHantTW)
-      case InputMode.imeModeCHT:
+      case .imeModeCHT:
         return shared.convert(string, to: .zhHansCN)
       default:
         return string
@@ -97,7 +97,7 @@ public enum ChineseConverter {
   }
 
   static func kanjiConversionIfRequired(_ text: String) -> String {
-    guard IMEApp.currentInputMode == InputMode.imeModeCHT else { return text }
+    guard IMEApp.currentInputMode == .imeModeCHT else { return text }
     switch (PrefMgr.shared.chineseConversionEnabled, PrefMgr.shared.shiftJISShinjitaiOutputEnabled) {
       case (false, true): return ChineseConverter.cnvTradToJIS(text)
       case (true, false): return ChineseConverter.cnvTradToKangXi(text)
