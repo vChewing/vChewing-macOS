@@ -552,12 +552,31 @@ func commonFileOutput() {
 // MARK: - 主執行緒
 
 func main() {
-  NSLog("// 準備編譯符號表情ㄅ文語料檔案。")
-  commonFileOutput()
-  NSLog("// 準備編譯繁體中文核心語料檔案。")
-  fileOutput(isCHS: false)
-  NSLog("// 準備編譯簡體中文核心語料檔案。")
-  fileOutput(isCHS: true)
+  let globalQueue = DispatchQueue.global(qos: .default)
+  let group = DispatchGroup()
+  group.enter()
+  globalQueue.async {
+    NSLog("// 準備編譯符號表情ㄅ文語料檔案。")
+    commonFileOutput()
+    group.leave()
+  }
+  group.enter()
+  globalQueue.async {
+    NSLog("// 準備編譯繁體中文核心語料檔案。")
+    fileOutput(isCHS: false)
+    group.leave()
+  }
+  group.enter()
+  globalQueue.async {
+    NSLog("// 準備編譯簡體中文核心語料檔案。")
+    fileOutput(isCHS: true)
+    group.leave()
+  }
+  // 一直等待完成
+  _ = group.wait(timeout: .distantFuture)
+  group.notify(queue: DispatchQueue.main) {
+    NSLog("// 全部辭典檔案建置完畢。")
+  }
 }
 
 main()

@@ -8,7 +8,6 @@ $tf/
 **/*.HTMLClient/GeneratedArtifacts
 **/*.Server/GeneratedArtifacts
 **/*.Server/ModelManifest.xml
-**/[Pp]ackages/*
 *.app
 *.appx
 *.aps

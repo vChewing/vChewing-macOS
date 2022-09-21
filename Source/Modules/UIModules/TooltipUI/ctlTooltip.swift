@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
+import NSAttributedTextView
 
 public class ctlTooltip: NSWindowController {
   public enum ColorStates {
@@ -101,7 +101,7 @@ public class ctlTooltip: NSWindowController {
           red: 0.91, green: 0.95, blue: 0.92, alpha: 1.00
         )
     }
-    if !IME.isDarkMode {
+    if !NSApplication.isDarkMode {
       switch state {
         case .denialInsufficiency: break
         default:
