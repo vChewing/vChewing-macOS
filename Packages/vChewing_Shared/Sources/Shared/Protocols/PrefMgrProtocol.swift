@@ -40,6 +40,7 @@ public protocol PrefMgrProtocol {
   var trimUnfinishedReadingsOnCommit: Bool { get set }
   var alwaysShowTooltipTextsHorizontally: Bool { get set }
   var clientsIMKTextInputIncapable: [String] { get set }
+  var onlyLoadFactoryLangModelsIfNeeded: Bool { get set }
   var useIMKCandidateWindow: Bool { get set }
   var handleDefaultCandidateFontsByLangIdentifier: Bool { get set }
   var shiftKeyAccommodationBehavior: Int { get set }
