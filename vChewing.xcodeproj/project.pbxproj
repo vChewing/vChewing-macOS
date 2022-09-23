@@ -18,7 +18,6 @@
 		5B3133BF280B229700A4A505 /* KeyHandler_States.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3133BE280B229700A4A505 /* KeyHandler_States.swift */; };
 		5B40113928D7050D00A9D4CB /* Shared in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113828D7050D00A9D4CB /* Shared */; };
 		5B40113C28D71C0100A9D4CB /* Uninstaller in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113B28D71C0100A9D4CB /* Uninstaller */; };
-		5B5F8AEE28C8826D007C11F1 /* ctlTooltip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5F8AED28C8826D007C11F1 /* ctlTooltip.swift */; };
 		5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */; };
 		5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34027AE7CD900A19448 /* ctlCandidate.swift */; };
 		5B630A3C28CC97020010D076 /* ctlPopupCompositionBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B630A3B28CC97020010D076 /* ctlPopupCompositionBuffer.swift */; };
@@ -58,6 +57,7 @@
 		5BC447A12865686500EDC323 /* data-zhuyinwen.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.plist */; };
 		5BC447A628656A1900EDC323 /* Placeholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC447A228656A1900EDC323 /* Placeholder.swift */; };
 		5BC5E01E28DDE4770094E427 /* NotifierUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E01D28DDE4770094E427 /* NotifierUI */; };
+		5BC5E02128DDEFE00094E427 /* TooltipUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E02028DDEFE00094E427 /* TooltipUI */; };
 		5BCCAFF828DB19A300AB1B27 /* PrefMgr_Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCCAFF728DB19A300AB1B27 /* PrefMgr_Extension.swift */; };
 		5BD0113D2818543900609769 /* KeyHandler_Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0113C2818543900609769 /* KeyHandler_Core.swift */; };
 		5BD05BCA27B2A43D004C4F1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
@@ -203,7 +203,6 @@
 		5B312684287800DE001AA720 /* FAQ.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = FAQ.md; sourceTree = "<group>"; };
 		5B3133BE280B229700A4A505 /* KeyHandler_States.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_States.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Uninstaller; path = Packages/vChewing_Uninstaller; sourceTree = "<group>"; };
-		5B5F8AED28C8826D007C11F1 /* ctlTooltip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlTooltip.swift; sourceTree = "<group>"; };
 		5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A34027AE7CD900A19448 /* ctlCandidate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlCandidate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B630A3B28CC97020010D076 /* ctlPopupCompositionBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlPopupCompositionBuffer.swift; sourceTree = "<group>"; };
@@ -246,6 +245,7 @@
 		5BC447A228656A1900EDC323 /* Placeholder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Placeholder.swift; sourceTree = "<group>"; };
 		5BC447AB2865BEF500EDC323 /* AUTHORS */ = {isa = PBXFileReference; lastKnownFileType = text; path = AUTHORS; sourceTree = "<group>"; };
 		5BC5E01C28DDE4270094E427 /* vChewing_NotifierUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_NotifierUI; path = Packages/vChewing_NotifierUI; sourceTree = "<group>"; };
+		5BC5E01F28DDEFD80094E427 /* vChewing_TooltipUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_TooltipUI; path = Packages/vChewing_TooltipUI; sourceTree = "<group>"; };
 		5BCCAFF728DB19A300AB1B27 /* PrefMgr_Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefMgr_Extension.swift; sourceTree = "<group>"; };
 		5BD0113C2818543900609769 /* KeyHandler_Core.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = KeyHandler_Core.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingPhraseEditor.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -348,6 +348,7 @@
 				5B963C9D28D5BFB800DCEE88 /* CocoaExtension in Frameworks */,
 				5B98114828D6198700CBC605 /* PinyinPhonaConverter in Frameworks */,
 				5BFC63CF28D4ACA3004A77B7 /* LangModelAssembly in Frameworks */,
+				5BC5E02128DDEFE00094E427 /* TooltipUI in Frameworks */,
 				5BDB7A3928D4824A001AC277 /* BookmarkManager in Frameworks */,
 				5B963CA328D5C23600DCEE88 /* SwiftExtension in Frameworks */,
 				5B40113928D7050D00A9D4CB /* Shared in Frameworks */,
@@ -437,7 +438,6 @@
 				5B62A33E27AE7CD900A19448 /* CandidateUI */,
 				5B630A3A28CC96D80010D076 /* PopupCompositionBufferUI */,
 				5BA9FD0927FED9F3002DE248 /* PrefUI */,
-				5B62A34227AE7CD900A19448 /* TooltipUI */,
 			);
 			path = UIModules;
 			sourceTree = "<group>";
@@ -471,14 +471,6 @@
 				5BFDF010289635C100417BBC /* ctlCandidateIMK.swift */,
 			);
 			path = CandidateUI;
-			sourceTree = "<group>";
-		};
-		5B62A34227AE7CD900A19448 /* TooltipUI */ = {
-			isa = PBXGroup;
-			children = (
-				5B5F8AED28C8826D007C11F1 /* ctlTooltip.swift */,
-			);
-			path = TooltipUI;
 			sourceTree = "<group>";
 		};
 		5B62A35027AE7F6600A19448 /* Data */ = {
@@ -592,6 +584,7 @@
 				5B963C9E28D5C14600DCEE88 /* vChewing_Shared */,
 				5B963CA128D5C22D00DCEE88 /* vChewing_SwiftExtension */,
 				5BDB7A3628D47587001AC277 /* vChewing_Tekkon */,
+				5BC5E01F28DDEFD80094E427 /* vChewing_TooltipUI */,
 				5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */,
 				5BFC63CA28D49B2B004A77B7 /* vChewing_UpdateSputnik */,
 			);
@@ -789,6 +782,7 @@
 				5B40113828D7050D00A9D4CB /* Shared */,
 				5B40113B28D71C0100A9D4CB /* Uninstaller */,
 				5BC5E01D28DDE4770094E427 /* NotifierUI */,
+				5BC5E02028DDEFE00094E427 /* TooltipUI */,
 			);
 			productName = vChewing;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */;
@@ -1062,7 +1056,6 @@
 				5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */,
 				D47B92C027972AD100458394 /* main.swift in Sources */,
 				D4A13D5A27A59F0B003BE359 /* ctlInputMethod_Core.swift in Sources */,
-				5B5F8AEE28C8826D007C11F1 /* ctlTooltip.swift in Sources */,
 				5B0EF55F28CDBF8E00F8F7CE /* ctlClientListMgr.swift in Sources */,
 				5B21177028753B9D000443A9 /* ctlInputMethod_Delegates.swift in Sources */,
 				5B21176E28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift in Sources */,
@@ -1787,6 +1780,10 @@
 		5BC5E01D28DDE4770094E427 /* NotifierUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = NotifierUI;
+		};
+		5BC5E02028DDEFE00094E427 /* TooltipUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TooltipUI;
 		};
 		5BDB7A3828D4824A001AC277 /* BookmarkManager */ = {
 			isa = XCSwiftPackageProductDependency;
