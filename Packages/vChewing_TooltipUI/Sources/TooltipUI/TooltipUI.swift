@@ -37,6 +37,7 @@ public class TooltipUI: NSWindowController {
     panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel) + 2)
     panel.hasShadow = true
     panel.backgroundColor = NSColor.controlBackgroundColor
+    panel.isMovable = false
     messageText = NSAttributedTooltipTextView()
     messageText.backgroundColor = NSColor.controlBackgroundColor
     messageText.textColor = NSColor.textColor
