@@ -9,6 +9,7 @@
 // requirements defined in MIT License.
 
 import IMKUtils
+import NotifierUI
 import Shared
 import ShiftKeyUpChecker
 import Tekkon
@@ -272,7 +273,7 @@ class ctlInputMethod: IMKInputController {
     if #available(macOS 10.15, *) {
       if Self.theShiftKeyDetector.check(event), !PrefMgr.shared.disableShiftTogglingAlphanumericalMode {
         if !shouldUseShiftToggleHandle || (!rencentKeyHandledByKeyHandlerEtc && shouldUseShiftToggleHandle) {
-          NotifierController.notify(
+          Notifier.notify(
             message: isASCIIMode.toggled()
               ? NSLocalizedString("Alphanumerical Input Mode", comment: "")
               : NSLocalizedString("Chinese Input Mode", comment: "")
