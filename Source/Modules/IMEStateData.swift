@@ -6,10 +6,11 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Shared
 import Tekkon
 import TooltipUI
 
-public struct StateData {
+public struct StateData: StateDataProtocol {
   private static var minCandidateLength: Int {
     PrefMgr.shared.allowBoostingSingleKanjiAsUserPhrase ? 1 : 2
   }
@@ -18,8 +19,8 @@ public struct StateData {
     Self.minCandidateLength...PrefMgr.shared.maxCandidateLength
   }
 
-  var displayedText: String = ""
-  var displayedTextConverted: String {
+  public var displayedText: String = ""
+  public var displayedTextConverted: String {
     /// 先做繁簡轉換
     var result = ChineseConverter.kanjiConversionIfRequired(displayedText)
     if result.utf16.count != displayedText.utf16.count
@@ -32,19 +33,19 @@ public struct StateData {
 
   // MARK: Cursor & Marker & Range for UTF8
 
-  var cursor: Int = 0 {
+  public var cursor: Int = 0 {
     didSet {
       cursor = min(max(cursor, 0), displayedText.count)
     }
   }
 
-  var marker: Int = 0 {
+  public var marker: Int = 0 {
     didSet {
       marker = min(max(marker, 0), displayedText.count)
     }
   }
 
-  var markedRange: Range<Int> {
+  public var markedRange: Range<Int> {
     min(cursor, marker)..<max(cursor, marker)
   }
 
@@ -53,58 +54,58 @@ public struct StateData {
   /// IMK 協定的內文組字區的游標長度與游標位置無法正確統計 UTF8 高萬字（比如 emoji）的長度，
   /// 所以在這裡必須做糾偏處理。因為在用 Swift，所以可以用「.utf16」取代「NSString.length()」。
   /// 這樣就可以免除不必要的類型轉換。
-  var u16Cursor: Int {
+  public var u16Cursor: Int {
     displayedText.charComponents[0..<cursor].joined().utf16.count
   }
 
-  var u16Marker: Int {
+  public var u16Marker: Int {
     displayedText.charComponents[0..<marker].joined().utf16.count
   }
 
-  var u16MarkedRange: Range<Int> {
+  public var u16MarkedRange: Range<Int> {
     min(u16Cursor, u16Marker)..<max(u16Cursor, u16Marker)
   }
 
   // MARK: Other data for non-empty states.
 
-  var isVerticalTyping = false
-  var markedTargetExists: Bool {
+  public var isVerticalTyping = false
+  public var markedTargetExists: Bool {
     let pair = userPhraseKVPair
     return LMMgr.checkIfUserPhraseExist(
       userPhrase: pair.1, mode: IMEApp.currentInputMode, key: pair.0
     )
   }
 
-  var displayTextSegments = [String]() {
+  public var displayTextSegments = [String]() {
     didSet {
       displayedText = displayTextSegments.joined()
     }
   }
 
-  var reading: String = ""
-  var markedReadings = [String]()
-  var candidates = [(String, String)]()
-  var textToCommit: String = ""
-  var tooltip: String = ""
-  var tooltipBackupForInputting: String = ""
-  var attributedStringPlaceholder: NSAttributedString = .init(
+  public var reading: String = ""
+  public var markedReadings = [String]()
+  public var candidates = [(String, String)]()
+  public var textToCommit: String = ""
+  public var tooltip: String = ""
+  public var tooltipBackupForInputting: String = ""
+  public var attributedStringPlaceholder: NSAttributedString = .init(
     string: " ",
     attributes: [
       .underlineStyle: NSUnderlineStyle.single.rawValue,
       .markedClauseSegment: 0,
     ]
   )
-  var isFilterable: Bool {
+  public var isFilterable: Bool {
     markedTargetExists ? isMarkedLengthValid : false
   }
 
-  var isMarkedLengthValid: Bool {
+  public var isMarkedLengthValid: Bool {
     Self.allowedMarkLengthRange.contains(markedRange.count)
   }
 
-  var tooltipColorState: TooltipUI.ColorStates = .normal
+  public var tooltipColorState: TooltipColorState = .normal
 
-  var attributedStringNormal: NSAttributedString {
+  public var attributedStringNormal: NSAttributedString {
     /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
     /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
     let attributedString = NSMutableAttributedString(string: displayedTextConverted)
@@ -122,7 +123,7 @@ public struct StateData {
     return attributedString
   }
 
-  var attributedStringMarking: NSAttributedString {
+  public var attributedStringMarking: NSAttributedString {
     /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
     /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
     let attributedString = NSMutableAttributedString(string: displayedTextConverted)
@@ -161,7 +162,7 @@ public struct StateData {
 // MARK: - IMEState 工具函式
 
 extension StateData {
-  var chkIfUserPhraseExists: Bool {
+  public var doesUserPhraseExist: Bool {
     let text = displayedText.charComponents[markedRange].joined()
     let joined = markedReadings.joined(separator: "-")
     return LMMgr.checkIfUserPhraseExist(
@@ -169,7 +170,7 @@ extension StateData {
     )
   }
 
-  var readingThreadForDisplay: String {
+  public var readingThreadForDisplay: String {
     var arrOutput = [String]()
     for neta in markedReadings {
       var neta = neta
@@ -193,19 +194,19 @@ extension StateData {
     return arrOutput.joined(separator: "\u{A0}")
   }
 
-  var userPhraseKVPair: (String, String) {
+  public var userPhraseKVPair: (String, String) {
     let key = markedReadings.joined(separator: "-")
     let value = displayedText.charComponents[markedRange].joined()
     return (key, value)
   }
 
-  var userPhraseDumped: String {
+  public var userPhraseDumped: String {
     let pair = userPhraseKVPair
     let nerfedScore = ctlInputMethod.areWeNerfing && markedTargetExists ? " -114.514" : ""
     return "\(pair.1) \(pair.0)\(nerfedScore)"
   }
 
-  var userPhraseDumpedConverted: String {
+  public var userPhraseDumpedConverted: String {
     let pair = userPhraseKVPair
     let text = ChineseConverter.crossConvert(pair.1) ?? ""
     let nerfedScore = ctlInputMethod.areWeNerfing && markedTargetExists ? " -114.514" : ""
@@ -213,7 +214,7 @@ extension StateData {
     return "\(text) \(pair.0)\(nerfedScore)\t\(convertedMark)"
   }
 
-  mutating func updateTooltipForMarking() {
+  public mutating func updateTooltipForMarking() {
     var tooltipForMarking: String {
       let pair = userPhraseKVPair
       if PrefMgr.shared.phraseReplacementEnabled {
