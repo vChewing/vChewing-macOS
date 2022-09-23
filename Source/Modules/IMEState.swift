@@ -7,47 +7,7 @@
 // requirements defined in MIT License.
 
 import LangModelAssembly
-
-// 用以讓每個狀態自描述的 enum。
-public enum StateType: String {
-  case ofDeactivated = "Deactivated"
-  case ofEmpty = "Empty"
-  case ofAbortion = "Abortion"  // 該狀態會自動轉為 Empty
-  case ofCommitting = "Committing"
-  case ofAssociates = "Associates"
-  case ofNotEmpty = "NotEmpty"
-  case ofInputting = "Inputting"
-  case ofMarking = "Marking"
-  case ofCandidates = "Candidates"
-  case ofSymbolTable = "SymbolTable"
-}
-
-// 所有 IMEState 均遵守該協定：
-public protocol IMEStateProtocol {
-  var type: StateType { get }
-  var data: StateData { get }
-  var isASCIIMode: Bool { get set }
-  var isVerticalTyping: Bool { get set }
-  var isVerticalCandidateWindow: Bool { get set }
-  var candidates: [(String, String)] { get }
-  var hasComposition: Bool { get }
-  var isCandidateContainer: Bool { get }
-  var displayedText: String { get }
-  var displayedTextConverted: String { get }
-  var textToCommit: String { get set }
-  var tooltip: String { get set }
-  var attributedString: NSAttributedString { get }
-  var convertedToInputting: IMEState { get }
-  var isFilterable: Bool { get }
-  var isMarkedLengthValid: Bool { get }
-  var node: CandidateNode { get set }
-  var displayTextSegments: [String] { get }
-  var tooltipBackupForInputting: String { get set }
-  var markedRange: Range<Int> { get }
-  var cursor: Int { get }
-  var u16MarkedRange: Range<Int> { get }
-  var u16Cursor: Int { get }
-}
+import Shared
 
 /// 用以呈現輸入法控制器（ctlInputMethod）的各種狀態。
 ///
@@ -82,17 +42,17 @@ public protocol IMEStateProtocol {
 /// - .SymbolTable: 波浪鍵符號選單專用的狀態，有自身的特殊處理。
 public struct IMEState: IMEStateProtocol {
   public var type: StateType = .ofEmpty
-  public var data: StateData = .init()
+  public var data: StateDataProtocol = StateData() as StateDataProtocol
   public var node: CandidateNode = .init(name: "")
   public var isASCIIMode = false
   public var isVerticalCandidateWindow = false
-  init(_ data: StateData = .init(), type: StateType = .ofEmpty) {
+  init(_ data: StateDataProtocol = StateData() as StateDataProtocol, type: StateType = .ofEmpty) {
     self.data = data
     self.type = type
     isVerticalTyping = ctlInputMethod.isVerticalTyping
   }
 
-  init(_ data: StateData = .init(), type: StateType = .ofEmpty, node: CandidateNode) {
+  init(_ data: StateDataProtocol = StateData() as StateDataProtocol, type: StateType = .ofEmpty, node: CandidateNode) {
     self.data = data
     self.type = type
     self.node = node
@@ -108,14 +68,14 @@ extension IMEState {
   public static func ofAbortion() -> IMEState { .init(type: .ofAbortion) }
   public static func ofCommitting(textToCommit: String) -> IMEState {
     var result = IMEState(type: .ofCommitting)
-    result.data.textToCommit = textToCommit
+    result.textToCommit = textToCommit
     ChineseConverter.ensureCurrencyNumerals(target: &result.data.textToCommit)
     return result
   }
 
   public static func ofAssociates(candidates: [(String, String)]) -> IMEState {
     var result = IMEState(type: .ofAssociates)
-    result.data.candidates = candidates
+    result.candidates = candidates
     return result
   }
 
@@ -175,15 +135,24 @@ extension IMEState {
 extension IMEState {
   public var isFilterable: Bool { data.isFilterable }
   public var isMarkedLengthValid: Bool { data.isMarkedLengthValid }
-  public var candidates: [(String, String)] { data.candidates }
   public var displayedText: String { data.displayedText }
   public var displayedTextConverted: String { data.displayedTextConverted }
-  public var cursor: Int { data.cursor }
   public var displayTextSegments: [String] { data.displayTextSegments }
   public var markedRange: Range<Int> { data.markedRange }
   public var u16MarkedRange: Range<Int> { data.u16MarkedRange }
   public var u16Cursor: Int { data.u16Cursor }
-  public var convertedToInputting: IMEState {
+
+  public var cursor: Int {
+    get { data.cursor }
+    set { data.cursor = newValue }
+  }
+
+  public var marker: Int {
+    get { data.marker }
+    set { data.marker = newValue }
+  }
+
+  public var convertedToInputting: IMEStateProtocol {
     if type == .ofInputting { return self }
     var result = IMEState.ofInputting(displayTextSegments: data.displayTextSegments, cursor: data.cursor)
     result.tooltip = data.tooltipBackupForInputting
@@ -191,22 +160,19 @@ extension IMEState {
     return result
   }
 
+  public var candidates: [(String, String)] {
+    get { data.candidates }
+    set { data.candidates = newValue }
+  }
+
   public var textToCommit: String {
-    get {
-      data.textToCommit
-    }
-    set {
-      data.textToCommit = newValue
-    }
+    get { data.textToCommit }
+    set { data.textToCommit = newValue }
   }
 
   public var tooltip: String {
-    get {
-      data.tooltip
-    }
-    set {
-      data.tooltip = newValue
-    }
+    get { data.tooltip }
+    set { data.tooltip = newValue }
   }
 
   public var attributedString: NSAttributedString {
@@ -237,11 +203,7 @@ extension IMEState {
   }
 
   public var tooltipBackupForInputting: String {
-    get {
-      data.tooltipBackupForInputting
-    }
-    set {
-      data.tooltipBackupForInputting = newValue
-    }
+    get { data.tooltipBackupForInputting }
+    set { data.tooltipBackupForInputting = newValue }
   }
 }

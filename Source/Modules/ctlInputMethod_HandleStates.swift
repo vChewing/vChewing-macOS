@@ -8,6 +8,8 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Shared
+
 // MARK: - 狀態調度 (State Handling)
 
 extension ctlInputMethod {
