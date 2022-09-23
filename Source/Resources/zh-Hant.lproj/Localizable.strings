@@ -38,6 +38,7 @@
 "Force KangXi Writing" = "康熙正體字模式";
 "NotificationSwitchON" = "✔ 已啟用";
 "NotificationSwitchOFF" = "✘ 已停用";
+"NotificationSwitchShift" = "↺ 切換完畢";
 "Edit User Phrases…" = "編輯自訂語彙…";
 "Reload User Phrases" = "重載自訂語彙";
 "Unable to create the user phrase file." = "無法創建自訂語彙檔案。";

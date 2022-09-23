@@ -38,6 +38,7 @@
 "Force KangXi Writing" = "康熙文字変換モード";
 "NotificationSwitchON" = "✔ 機能起動";
 "NotificationSwitchOFF" = "✘ 機能停止";
+"NotificationSwitchShift" = "↺ 切替完了";
 "Edit User Phrases…" = "ユーザー辞書を編集…";
 "Reload User Phrases" = "ユーザー辞書を再び読込む";
 "Unable to create the user phrase file." = "ユーザー辞書ファイルの作成は失敗しました。";
