@@ -10,6 +10,7 @@
 
 import IMKUtils
 import NotifierUI
+import PopupCompositionBuffer
 import Shared
 import ShiftKeyUpChecker
 import Tekkon
@@ -36,7 +37,7 @@ class ctlInputMethod: IMKInputController {
   static var tooltipInstance = TooltipUI()
 
   /// 浮動組字窗的共用副本。
-  static var popupCompositionBuffer = ctlPopupCompositionBuffer()
+  static var popupCompositionBuffer = PopupCompositionBuffer()
 
   // MARK: -
 
