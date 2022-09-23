@@ -33,6 +33,7 @@ public protocol IMEStateProtocol {
   var hasComposition: Bool { get }
   var isCandidateContainer: Bool { get }
   var displayedText: String { get }
+  var displayedTextConverted: String { get }
   var textToCommit: String { get set }
   var tooltip: String { get set }
   var attributedString: NSAttributedString { get }
@@ -40,10 +41,12 @@ public protocol IMEStateProtocol {
   var isFilterable: Bool { get }
   var isMarkedLengthValid: Bool { get }
   var node: CandidateNode { get set }
-  var cursor: Int { get }
   var displayTextSegments: [String] { get }
   var tooltipBackupForInputting: String { get set }
   var markedRange: Range<Int> { get }
+  var cursor: Int { get }
+  var u16MarkedRange: Range<Int> { get }
+  var u16Cursor: Int { get }
 }
 
 /// 用以呈現輸入法控制器（ctlInputMethod）的各種狀態。
@@ -174,9 +177,12 @@ extension IMEState {
   public var isMarkedLengthValid: Bool { data.isMarkedLengthValid }
   public var candidates: [(String, String)] { data.candidates }
   public var displayedText: String { data.displayedText }
+  public var displayedTextConverted: String { data.displayedTextConverted }
   public var cursor: Int { data.cursor }
   public var displayTextSegments: [String] { data.displayTextSegments }
   public var markedRange: Range<Int> { data.markedRange }
+  public var u16MarkedRange: Range<Int> { data.u16MarkedRange }
+  public var u16Cursor: Int { data.u16Cursor }
   public var convertedToInputting: IMEState {
     if type == .ofInputting { return self }
     var result = IMEState.ofInputting(displayTextSegments: data.displayTextSegments, cursor: data.cursor)
