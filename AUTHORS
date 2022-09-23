@@ -17,13 +17,9 @@ $ Contributors and volunteers of the upstream repo, having no responsibility in 
 - Zonble Yang:
     - McBopomofo for macOS 2.x architect.
     - Voltaire candidate window MK2 (massively modified as MK3 in vChewing by Shiki Suen).
-    - Notifier window.
     - App-style installer (only preserved for developer purposes).
-    - PrefMgr (userdefaults manager).
 - Mengjuei Hsieh:
     - McBopomofo for macOS 1.x main developer and architect.
-    - The original C++ version of the User Override Module.
-        - Shiki Suen is trying to rewrite this module in Swift (and CSharp) with further development.
 
 Although there is no Lukhnos's codes left in the current repository, we still credit him for his previous work:
 
@@ -32,6 +28,8 @@ Although there is no Lukhnos's codes left in the current repository, we still cr
         - Shiki Suen's Megrez engine (MIT License) is basically a Swift-rewritten version of Gramambular 2 with further development.
     - Developer of Mandarin syllable composer (removed since vChewing 1.5.7).
         - Shiki Suen's Tekkon engine is made from scratch and has no relationship to Mandarin syllable composer.
+    - Developer of the original C++ version of the User Override Module MK2.
+        - Shiki Suen is trying to rewrite this module in Swift (and CSharp) with further development.
 
 $ Special thanks to:
 
