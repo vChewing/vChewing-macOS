@@ -36,7 +36,7 @@ public class PopupCompositionBuffer: NSWindowController {
     panel.hasShadow = true
     panel.backgroundColor = NSColor.controlBackgroundColor
     panel.styleMask = .fullSizeContentView
-
+    panel.isMovable = false
     messageTextField = NSTextField()
     messageTextField.isEditable = false
     messageTextField.isSelectable = false
