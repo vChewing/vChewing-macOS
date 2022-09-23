@@ -6,9 +6,10 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Cocoa
 import Shared
 
-public class ctlPopupCompositionBuffer: NSWindowController {
+public class PopupCompositionBuffer: NSWindowController {
   public var isTypingDirectionVertical = false {
     didSet {
       if #unavailable(macOS 10.14) {
