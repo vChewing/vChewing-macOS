@@ -13,6 +13,7 @@ import NotifierUI
 import Shared
 import ShiftKeyUpChecker
 import Tekkon
+import TooltipUI
 
 /// 輸入法控制模組，乃在輸入法端用以控制輸入行為的基礎型別。
 ///
@@ -32,7 +33,7 @@ class ctlInputMethod: IMKInputController {
     PrefMgr.shared.useIMKCandidateWindow ? ctlCandidateIMK.init(.horizontal) : ctlCandidateUniversal.init(.horizontal)
 
   /// 工具提示視窗的共用副本。
-  static var tooltipInstance = ctlTooltip()
+  static var tooltipInstance = TooltipUI()
 
   /// 浮動組字窗的共用副本。
   static var popupCompositionBuffer = ctlPopupCompositionBuffer()

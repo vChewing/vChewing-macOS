@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import Tekkon
+import TooltipUI
 
 public struct StateData {
   private static var minCandidateLength: Int {
@@ -101,7 +102,7 @@ public struct StateData {
     Self.allowedMarkLengthRange.contains(markedRange.count)
   }
 
-  var tooltipColorState: ctlTooltip.ColorStates = .normal
+  var tooltipColorState: TooltipUI.ColorStates = .normal
 
   var attributedStringNormal: NSAttributedString {
     /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
