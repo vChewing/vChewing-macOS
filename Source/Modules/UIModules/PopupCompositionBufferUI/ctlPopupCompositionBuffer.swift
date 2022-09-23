@@ -6,6 +6,8 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Shared
+
 public class ctlPopupCompositionBuffer: NSWindowController {
   public var isTypingDirectionVertical = false {
     didSet {

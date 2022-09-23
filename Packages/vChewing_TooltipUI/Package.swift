@@ -15,6 +15,7 @@ let package = Package(
   dependencies: [
     .package(path: "../Fuziki_NSAttributedTextView"),
     .package(path: "../vChewing_CocoaExtension"),
+    .package(path: "../vChewing_Shared"),
   ],
   targets: [
     .target(
@@ -22,6 +23,7 @@ let package = Package(
       dependencies: [
         .product(name: "NSAttributedTextView", package: "Fuziki_NSAttributedTextView"),
         .product(name: "CocoaExtension", package: "vChewing_CocoaExtension"),
+        .product(name: "Shared", package: "vChewing_Shared"),
       ]
     )
   ]

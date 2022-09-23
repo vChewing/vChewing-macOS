@@ -32,7 +32,7 @@ extension ctlInputMethod: KeyHandlerDelegate {
       (inputMode == .imeModeCHT) ? .imeModeCHS : .imeModeCHT
     if !LMMgr.writeUserPhrase(
       state.data.userPhraseDumped, inputMode: inputMode,
-      areWeDuplicating: state.data.chkIfUserPhraseExists,
+      areWeDuplicating: state.data.doesUserPhraseExist,
       areWeDeleting: addToFilter
     )
       || !LMMgr.writeUserPhrase(

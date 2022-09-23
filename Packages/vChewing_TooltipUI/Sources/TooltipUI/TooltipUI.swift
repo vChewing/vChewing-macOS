@@ -9,17 +9,9 @@
 import Cocoa
 import CocoaExtension
 import NSAttributedTextView
+import Shared
 
 public class TooltipUI: NSWindowController {
-  public enum ColorStates {
-    case normal
-    case redAlert
-    case warning
-    case denialOverflow
-    case denialInsufficiency
-    case prompt
-  }
-
   private var messageText: NSAttributedTooltipTextView
   private var tooltip: String = "" {
     didSet {
@@ -68,7 +60,7 @@ public class TooltipUI: NSWindowController {
     set(windowTopLeftPoint: point, bottomOutOfScreenAdjustmentHeight: heightDelta)
   }
 
-  public func setColor(state: ColorStates) {
+  public func setColor(state: TooltipColorState) {
     var backgroundColor = NSColor.controlBackgroundColor
     var textColor = NSColor.textColor
     switch state {

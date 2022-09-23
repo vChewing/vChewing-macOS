@@ -103,6 +103,33 @@ public enum UserDef: String, CaseIterable {
   }
 }
 
+// MARK: - Tooltip Color States
+
+public enum TooltipColorState {
+  case normal
+  case redAlert
+  case warning
+  case denialOverflow
+  case denialInsufficiency
+  case prompt
+}
+
+// MARK: - IMEState types.
+
+// 用以讓每個狀態自描述的 enum。
+public enum StateType: String {
+  case ofDeactivated = "Deactivated"
+  case ofEmpty = "Empty"
+  case ofAbortion = "Abortion"  // 該狀態會自動轉為 Empty
+  case ofCommitting = "Committing"
+  case ofAssociates = "Associates"
+  case ofNotEmpty = "NotEmpty"
+  case ofInputting = "Inputting"
+  case ofMarking = "Marking"
+  case ofCandidates = "Candidates"
+  case ofSymbolTable = "SymbolTable"
+}
+
 // MARK: - Parser for Syllable composer
 
 public enum KeyboardParser: Int, CaseIterable {
