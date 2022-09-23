@@ -75,7 +75,7 @@ public class ctlPopupCompositionBuffer: NSWindowController {
 
     if isTypingDirectionVertical {
       attrString.setAttributes(
-        verticalAttributes, range: NSRange(location: 0, length: attrString.string.utf16.count)
+        verticalAttributes, range: NSRange(location: 0, length: attrString.length)
       )
     }
 
