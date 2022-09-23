@@ -9,6 +9,7 @@
 import BookmarkManager
 import LangModelAssembly
 import Megrez
+import NotifierUI
 import Shared
 
 /// 使用者辭典資料預設範例檔案名稱。
@@ -98,7 +99,7 @@ public enum LMMgr {
     }
     if !Self.lmCHT.isLanguageModelLoaded {
       showFinishNotification = true
-      NotifierController.notify(
+      Notifier.notify(
         message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
       )
       group.enter()
@@ -109,7 +110,7 @@ public enum LMMgr {
     }
     if !Self.lmCHS.isLanguageModelLoaded {
       showFinishNotification = true
-      NotifierController.notify(
+      Notifier.notify(
         message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
       )
       group.enter()
@@ -120,7 +121,7 @@ public enum LMMgr {
     }
     group.notify(queue: DispatchQueue.main) {
       if showFinishNotification {
-        NotifierController.notify(
+        Notifier.notify(
           message: NSLocalizedString("Core Dict loading complete.", comment: "")
         )
       }
@@ -162,7 +163,7 @@ public enum LMMgr {
       case .imeModeCHS:
         if !Self.lmCHS.isLanguageModelLoaded {
           showFinishNotification = true
-          NotifierController.notify(
+          Notifier.notify(
             message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
           )
           group.enter()
@@ -174,7 +175,7 @@ public enum LMMgr {
       case .imeModeCHT:
         if !Self.lmCHT.isLanguageModelLoaded {
           showFinishNotification = true
-          NotifierController.notify(
+          Notifier.notify(
             message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
           )
           group.enter()
@@ -187,7 +188,7 @@ public enum LMMgr {
     }
     group.notify(queue: DispatchQueue.main) {
       if showFinishNotification {
-        NotifierController.notify(
+        Notifier.notify(
           message: NSLocalizedString("Core Dict loading complete.", comment: "")
         )
       }
