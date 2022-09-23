@@ -273,10 +273,11 @@ class ctlInputMethod: IMKInputController {
     if #available(macOS 10.15, *) {
       if Self.theShiftKeyDetector.check(event), !PrefMgr.shared.disableShiftTogglingAlphanumericalMode {
         if !shouldUseShiftToggleHandle || (!rencentKeyHandledByKeyHandlerEtc && shouldUseShiftToggleHandle) {
+          let status = NSLocalizedString("NotificationSwitchShift", comment: "")
           Notifier.notify(
             message: isASCIIMode.toggled()
-              ? NSLocalizedString("Alphanumerical Input Mode", comment: "")
-              : NSLocalizedString("Chinese Input Mode", comment: "")
+              ? NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
+              : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
           )
         }
         if shouldUseShiftToggleHandle {
