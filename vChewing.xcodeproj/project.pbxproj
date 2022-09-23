@@ -20,7 +20,6 @@
 		5B40113C28D71C0100A9D4CB /* Uninstaller in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113B28D71C0100A9D4CB /* Uninstaller */; };
 		5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */; };
 		5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34027AE7CD900A19448 /* ctlCandidate.swift */; };
-		5B630A3C28CC97020010D076 /* ctlPopupCompositionBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B630A3B28CC97020010D076 /* ctlPopupCompositionBuffer.swift */; };
 		5B6C141228A9D4B30098ADF8 /* ctlInputMethod_HandleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6C141128A9D4B30098ADF8 /* ctlInputMethod_HandleEvent.swift */; };
 		5B73FB5E27B2BE1300E9BF49 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */; };
 		5B782EC4280C243C007276DE /* KeyHandler_HandleCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */; };
@@ -58,6 +57,7 @@
 		5BC447A628656A1900EDC323 /* Placeholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC447A228656A1900EDC323 /* Placeholder.swift */; };
 		5BC5E01E28DDE4770094E427 /* NotifierUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E01D28DDE4770094E427 /* NotifierUI */; };
 		5BC5E02128DDEFE00094E427 /* TooltipUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E02028DDEFE00094E427 /* TooltipUI */; };
+		5BC5E02428DE07860094E427 /* PopupCompositionBuffer in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E02328DE07860094E427 /* PopupCompositionBuffer */; };
 		5BCCAFF828DB19A300AB1B27 /* PrefMgr_Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCCAFF728DB19A300AB1B27 /* PrefMgr_Extension.swift */; };
 		5BD0113D2818543900609769 /* KeyHandler_Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0113C2818543900609769 /* KeyHandler_Core.swift */; };
 		5BD05BCA27B2A43D004C4F1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
@@ -205,7 +205,6 @@
 		5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Uninstaller; path = Packages/vChewing_Uninstaller; sourceTree = "<group>"; };
 		5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B62A34027AE7CD900A19448 /* ctlCandidate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlCandidate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5B630A3B28CC97020010D076 /* ctlPopupCompositionBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlPopupCompositionBuffer.swift; sourceTree = "<group>"; };
 		5B65B919284D0185007C558B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		5B6C141128A9D4B30098ADF8 /* ctlInputMethod_HandleEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_HandleEvent.swift; sourceTree = "<group>"; };
 		5B73FB5427B2BD6900E9BF49 /* PhraseEditor-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "PhraseEditor-Info.plist"; path = "UserPhraseEditor/PhraseEditor-Info.plist"; sourceTree = SOURCE_ROOT; };
@@ -246,6 +245,7 @@
 		5BC447AB2865BEF500EDC323 /* AUTHORS */ = {isa = PBXFileReference; lastKnownFileType = text; path = AUTHORS; sourceTree = "<group>"; };
 		5BC5E01C28DDE4270094E427 /* vChewing_NotifierUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_NotifierUI; path = Packages/vChewing_NotifierUI; sourceTree = "<group>"; };
 		5BC5E01F28DDEFD80094E427 /* vChewing_TooltipUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_TooltipUI; path = Packages/vChewing_TooltipUI; sourceTree = "<group>"; };
+		5BC5E02228DE07250094E427 /* vChewing_PopupCompositionBuffer */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_PopupCompositionBuffer; path = Packages/vChewing_PopupCompositionBuffer; sourceTree = "<group>"; };
 		5BCCAFF728DB19A300AB1B27 /* PrefMgr_Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefMgr_Extension.swift; sourceTree = "<group>"; };
 		5BD0113C2818543900609769 /* KeyHandler_Core.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = KeyHandler_Core.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingPhraseEditor.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -337,6 +337,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5BC5E02428DE07860094E427 /* PopupCompositionBuffer in Frameworks */,
 				5BDB7A4528D4824A001AC277 /* ShiftKeyUpChecker in Frameworks */,
 				5BFC63CC28D49BBC004A77B7 /* UpdateSputnik in Frameworks */,
 				5BDB7A4128D4824A001AC277 /* Megrez in Frameworks */,
@@ -436,7 +437,6 @@
 			isa = PBXGroup;
 			children = (
 				5B62A33E27AE7CD900A19448 /* CandidateUI */,
-				5B630A3A28CC96D80010D076 /* PopupCompositionBufferUI */,
 				5BA9FD0927FED9F3002DE248 /* PrefUI */,
 			);
 			path = UIModules;
@@ -484,14 +484,6 @@
 				5B2DB17127AF8771006D874E /* Makefile */,
 			);
 			name = Data;
-			sourceTree = "<group>";
-		};
-		5B630A3A28CC96D80010D076 /* PopupCompositionBufferUI */ = {
-			isa = PBXGroup;
-			children = (
-				5B630A3B28CC97020010D076 /* ctlPopupCompositionBuffer.swift */,
-			);
-			path = PopupCompositionBufferUI;
 			sourceTree = "<group>";
 		};
 		5BA9FD0927FED9F3002DE248 /* PrefUI */ = {
@@ -581,6 +573,7 @@
 				5BDB7A3328D47587001AC277 /* vChewing_Megrez */,
 				5BC5E01C28DDE4270094E427 /* vChewing_NotifierUI */,
 				5B98114628D6198000CBC605 /* vChewing_PinyinPhonaConverter */,
+				5BC5E02228DE07250094E427 /* vChewing_PopupCompositionBuffer */,
 				5B963C9E28D5C14600DCEE88 /* vChewing_Shared */,
 				5B963CA128D5C22D00DCEE88 /* vChewing_SwiftExtension */,
 				5BDB7A3628D47587001AC277 /* vChewing_Tekkon */,
@@ -783,6 +776,7 @@
 				5B40113B28D71C0100A9D4CB /* Uninstaller */,
 				5BC5E01D28DDE4770094E427 /* NotifierUI */,
 				5BC5E02028DDEFE00094E427 /* TooltipUI */,
+				5BC5E02328DE07860094E427 /* PopupCompositionBuffer */,
 			);
 			productName = vChewing;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */;
@@ -1075,7 +1069,6 @@
 				5BA9FD1127FEDB6B002DE248 /* ctlPrefUI.swift in Sources */,
 				5B8457A12871ADBE00C93B01 /* ChineseConverterBridge.swift in Sources */,
 				5BA9FD1327FEDB6B002DE248 /* suiPrefPaneDictionary.swift in Sources */,
-				5B630A3C28CC97020010D076 /* ctlPopupCompositionBuffer.swift in Sources */,
 				5BFDF011289635C100417BBC /* ctlCandidateIMK.swift in Sources */,
 				5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */,
 				5BB802DA27FABA8300CF1C19 /* ctlInputMethod_Menu.swift in Sources */,
@@ -1784,6 +1777,10 @@
 		5BC5E02028DDEFE00094E427 /* TooltipUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = TooltipUI;
+		};
+		5BC5E02328DE07860094E427 /* PopupCompositionBuffer */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PopupCompositionBuffer;
 		};
 		5BDB7A3828D4824A001AC277 /* BookmarkManager */ = {
 			isa = XCSwiftPackageProductDependency;
