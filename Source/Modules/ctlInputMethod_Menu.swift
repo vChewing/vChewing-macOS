@@ -8,6 +8,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import NotifierUI
 import Preferences
 
 extension Bool {
@@ -223,7 +224,7 @@ extension ctlInputMethod {
 
   @objc func toggleSCPCTypingMode(_: Any? = nil) {
     resetKeyHandler()
-    NotifierController.notify(
+    Notifier.notify(
       message: NSLocalizedString("Per-Char Select Mode", comment: "") + "\n"
         + (PrefMgr.shared.useSCPCTypingMode.toggled()
           ? NSLocalizedString("NotificationSwitchON", comment: "")
@@ -233,7 +234,7 @@ extension ctlInputMethod {
 
   @objc func toggleChineseConverter(_: Any?) {
     resetKeyHandler()
-    NotifierController.notify(
+    Notifier.notify(
       message: NSLocalizedString("Force KangXi Writing", comment: "") + "\n"
         + (PrefMgr.shared.chineseConversionEnabled.toggled()
           ? NSLocalizedString("NotificationSwitchON", comment: "")
@@ -243,7 +244,7 @@ extension ctlInputMethod {
 
   @objc func toggleShiftJISShinjitaiOutput(_: Any?) {
     resetKeyHandler()
-    NotifierController.notify(
+    Notifier.notify(
       message: NSLocalizedString("JIS Shinjitai Output", comment: "") + "\n"
         + (PrefMgr.shared.shiftJISShinjitaiOutputEnabled.toggled()
           ? NSLocalizedString("NotificationSwitchON", comment: "")
@@ -253,7 +254,7 @@ extension ctlInputMethod {
 
   @objc func toggleCurrencyNumerals(_: Any?) {
     resetKeyHandler()
-    NotifierController.notify(
+    Notifier.notify(
       message: NSLocalizedString("Currency Numeral Output", comment: "") + "\n"
         + (PrefMgr.shared.currencyNumeralsEnabled.toggled()
           ? NSLocalizedString("NotificationSwitchON", comment: "")
@@ -263,7 +264,7 @@ extension ctlInputMethod {
 
   @objc func toggleHalfWidthPunctuation(_: Any?) {
     resetKeyHandler()
-    NotifierController.notify(
+    Notifier.notify(
       message: NSLocalizedString("Half-Width Punctuation Mode", comment: "") + "\n"
         + (PrefMgr.shared.halfWidthPunctuationEnabled.toggled()
           ? NSLocalizedString("NotificationSwitchON", comment: "")
@@ -273,7 +274,7 @@ extension ctlInputMethod {
 
   @objc func toggleCNS11643Enabled(_: Any?) {
     resetKeyHandler()
-    NotifierController.notify(
+    Notifier.notify(
       message: NSLocalizedString("CNS11643 Mode", comment: "") + "\n"
         + (PrefMgr.shared.cns11643Enabled.toggled()
           ? NSLocalizedString("NotificationSwitchON", comment: "")
@@ -283,7 +284,7 @@ extension ctlInputMethod {
 
   @objc func toggleSymbolEnabled(_: Any?) {
     resetKeyHandler()
-    NotifierController.notify(
+    Notifier.notify(
       message: NSLocalizedString("Symbol & Emoji Input", comment: "") + "\n"
         + (PrefMgr.shared.symbolInputEnabled.toggled()
           ? NSLocalizedString("NotificationSwitchON", comment: "")
@@ -293,7 +294,7 @@ extension ctlInputMethod {
 
   @objc func toggleAssociatedPhrasesEnabled(_: Any?) {
     resetKeyHandler()
-    NotifierController.notify(
+    Notifier.notify(
       message: NSLocalizedString("Per-Char Associated Phrases", comment: "") + "\n"
         + (PrefMgr.shared.associatedPhrasesEnabled.toggled()
           ? NSLocalizedString("NotificationSwitchON", comment: "")
@@ -303,7 +304,7 @@ extension ctlInputMethod {
 
   @objc func togglePhraseReplacement(_: Any?) {
     resetKeyHandler()
-    NotifierController.notify(
+    Notifier.notify(
       message: NSLocalizedString("Use Phrase Replacement", comment: "") + "\n"
         + (PrefMgr.shared.phraseReplacementEnabled.toggled()
           ? NSLocalizedString("NotificationSwitchON", comment: "")
