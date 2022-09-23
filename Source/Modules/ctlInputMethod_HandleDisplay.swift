@@ -20,7 +20,7 @@ extension ctlInputMethod {
   var attributedStringSecured: (NSAttributedString, NSRange) {
     PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier)
       ? (state.data.attributedStringPlaceholder, NSRange(location: 0, length: 0))
-      : (state.attributedString, NSRange(state.data.u16MarkedRange))
+      : (state.attributedString, NSRange(state.u16MarkedRange))
   }
 
   func lineHeightRect(zeroCursor: Bool = false) -> NSRect {
@@ -28,14 +28,10 @@ extension ctlInputMethod {
     guard let client = client() else {
       return lineHeightRect
     }
-    var u16Cursor: Int = {
-      // iMessage 在 cursor == 0 時的計算會有一些偏差，所以例外處理。
-      if clientBundleIdentifier == "com.apple.MobileSMS" { return state.data.u16Cursor }
-      if state.data.marker >= state.data.cursor { return state.data.u16Cursor }
-      return state.data.u16Marker  // 這樣可以讓工具提示視窗始終盡量往書寫方向的後方顯示。
-    }()
-    u16Cursor = max(min(state.data.displayedTextConverted.utf16.count, u16Cursor), 0)
+    var u16Cursor: Int = state.u16MarkedRange.lowerBound
+    u16Cursor = max(min(state.displayedTextConverted.utf16.count, u16Cursor), 0)
     if zeroCursor { u16Cursor = 0 }
+    // iMessage 的話，據此算出來的 lineHeightRect 結果的橫向座標起始點不準確。目前無解。
     while lineHeightRect.origin.x == 0, lineHeightRect.origin.y == 0, u16Cursor >= 0 {
       client.attributes(
         forCharacterIndex: u16Cursor, lineHeightRectangle: &lineHeightRect

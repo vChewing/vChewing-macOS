@@ -58,7 +58,7 @@ public class ctlPopupCompositionBuffer: NSWindowController {
       return
     }
 
-    let attrString: NSMutableAttributedString = .init(string: state.data.displayedTextConverted)
+    let attrString: NSMutableAttributedString = .init(string: state.displayedTextConverted)
     let verticalAttributes: [NSAttributedString.Key: Any] = [
       .verticalGlyphForm: true,
       .paragraphStyle: {
@@ -95,8 +95,8 @@ public class ctlPopupCompositionBuffer: NSWindowController {
     attrString.setAttributes(
       markerAttributes,
       range: NSRange(
-        location: state.data.u16MarkedRange.lowerBound,
-        length: state.data.u16MarkedRange.upperBound - state.data.u16MarkedRange.lowerBound
+        location: state.u16MarkedRange.lowerBound,
+        length: state.u16MarkedRange.upperBound - state.u16MarkedRange.lowerBound
       )
     )
 
@@ -123,12 +123,12 @@ public class ctlPopupCompositionBuffer: NSWindowController {
       isTypingDirectionVertical
       ? NSMutableAttributedString(string: "▔", attributes: cursorAttributes)
       : NSMutableAttributedString(string: "_", attributes: cursorAttributes)
-    attrString.insert(attrCursor, at: state.data.u16Cursor)
+    attrString.insert(attrCursor, at: state.u16Cursor)
 
     textShown = attrString
     messageTextField.maximumNumberOfLines = 1
     if let editor = messageTextField.currentEditor() {
-      editor.selectedRange = NSRange(state.data.u16MarkedRange)
+      editor.selectedRange = NSRange(state.u16MarkedRange)
     }
     window?.orderFront(nil)
     set(windowOrigin: point)
