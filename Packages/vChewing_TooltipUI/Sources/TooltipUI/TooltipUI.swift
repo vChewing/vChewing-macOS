@@ -6,9 +6,11 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Cocoa
+import CocoaExtension
 import NSAttributedTextView
 
-public class ctlTooltip: NSWindowController {
+public class TooltipUI: NSWindowController {
   public enum ColorStates {
     case normal
     case redAlert
