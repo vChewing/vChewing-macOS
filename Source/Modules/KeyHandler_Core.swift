@@ -30,7 +30,7 @@ public protocol KeyHandlerDelegate {
 
 /// KeyHandler 按鍵調度模組。
 public class KeyHandler {
-  /// 委任物件 (ctlInputMethod)，以便呼叫其中的函式。
+  /// 委任物件 (SessionCtl)，以便呼叫其中的函式。
   public var delegate: KeyHandlerDelegate?
   public var prefs: PrefMgrProtocol
 
