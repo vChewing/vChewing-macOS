@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5B00FA0C28DEC17200F6D436 /* ctlInputMethod_IMKCandidatesData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B00FA0B28DEC17200F6D436 /* ctlInputMethod_IMKCandidatesData.swift */; };
 		5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */ = {isa = PBXBuildFile; fileRef = 5B09307828B6FC3B0021F8C5 /* shortcuts.html */; };
 		5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0AF8B427B2C8290096FE54 /* StringExtension.swift */; };
 		5B0EF55D28CDBF7100F8F7CE /* frmClientListMgr.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */; };
@@ -154,6 +155,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5B00FA0B28DEC17200F6D436 /* ctlInputMethod_IMKCandidatesData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_IMKCandidatesData.swift; sourceTree = "<group>"; };
 		5B04305327B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5B04305427B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5B04305527B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
@@ -663,6 +665,7 @@
 				5B21176D28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift */,
 				5B6C141128A9D4B30098ADF8 /* ctlInputMethod_HandleEvent.swift */,
 				5B21176B287539BB000443A9 /* ctlInputMethod_HandleStates.swift */,
+				5B00FA0B28DEC17200F6D436 /* ctlInputMethod_IMKCandidatesData.swift */,
 				5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */,
 				5BF56F9728C39A2700DD6839 /* IMEState.swift */,
 				5BF56F9928C39D1800DD6839 /* IMEStateData.swift */,
@@ -1073,6 +1076,7 @@
 				5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */,
 				5BB802DA27FABA8300CF1C19 /* ctlInputMethod_Menu.swift in Sources */,
 				5BE377A0288FED8D0037365B /* KeyHandler_HandleComposition.swift in Sources */,
+				5B00FA0C28DEC17200F6D436 /* ctlInputMethod_IMKCandidatesData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
