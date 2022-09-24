@@ -208,7 +208,7 @@ extension StateData {
 
   public var userPhraseDumpedConverted: String {
     let pair = userPhraseKVPair
-    let text = ChineseConverter.crossConvert(pair.1) ?? ""
+    let text = ChineseConverter.crossConvert(pair.1)
     let nerfedScore = ctlInputMethod.areWeNerfing && markedTargetExists ? " -114.514" : ""
     let convertedMark = "#𝙃𝙪𝙢𝙖𝙣𝘾𝙝𝙚𝙘𝙠𝙍𝙚𝙦𝙪𝙞𝙧𝙚𝙙"
     return "\(text) \(pair.0)\(nerfedScore)\t\(convertedMark)"

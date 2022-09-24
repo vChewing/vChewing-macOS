@@ -53,7 +53,7 @@ extension ctlClientListMgr {
     alert.addButton(withTitle: NSLocalizedString("Just Select", comment: "") + "…")
     alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
 
-    let maxFloat = CGFloat(Float.greatestFiniteMagnitude)
+    let maxFloat = Double(Float.greatestFiniteMagnitude)
     let scrollview = NSScrollView(frame: NSRect(x: 0, y: 0, width: 370, height: 380))
     let contentSize = scrollview.contentSize
     scrollview.borderType = .noBorder

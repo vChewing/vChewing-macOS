@@ -18,7 +18,7 @@ extension ctlInputMethod: KeyHandlerDelegate {
     return client.bundleIdentifier() ?? ""
   }
 
-  func ctlCandidate() -> ctlCandidateProtocol { ctlInputMethod.ctlCandidateCurrent }
+  func ctlCandidate() -> CtlCandidateProtocol { ctlInputMethod.ctlCandidateCurrent }
 
   func candidateSelectionCalledByKeyHandler(at index: Int) {
     candidateSelected(at: index)
@@ -49,8 +49,16 @@ extension ctlInputMethod: KeyHandlerDelegate {
 
 // MARK: - Candidate Controller Delegate
 
-extension ctlInputMethod: ctlCandidateDelegate {
-  func candidateCountForController(_ controller: ctlCandidateProtocol) -> Int {
+extension ctlInputMethod: CtlCandidateDelegate {
+  func buzz() {
+    IMEApp.buzz()
+  }
+
+  func kanjiConversionIfRequired(_ target: String) -> String {
+    ChineseConverter.kanjiConversionIfRequired(target)
+  }
+
+  func candidateCountForController(_ controller: CtlCandidateProtocol) -> Int {
     _ = controller  // 防止格式整理工具毀掉與此對應的參數。
     if state.isCandidateContainer {
       return state.candidates.count
@@ -61,7 +69,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
   /// 直接給出全部的候選字詞的字音配對陣列
   /// - Parameter controller: 對應的控制器。因為有唯一解，所以填錯了也不會有影響。
   /// - Returns: 候選字詞陣列（字音配對）。
-  func candidatesForController(_ controller: ctlCandidateProtocol) -> [(String, String)] {
+  func candidatesForController(_ controller: CtlCandidateProtocol) -> [(String, String)] {
     _ = controller  // 防止格式整理工具毀掉與此對應的參數。
     if state.isCandidateContainer {
       return state.candidates
@@ -69,7 +77,7 @@ extension ctlInputMethod: ctlCandidateDelegate {
     return .init()
   }
 
-  func ctlCandidate(_ controller: ctlCandidateProtocol, candidateAtIndex index: Int)
+  func ctlCandidate(_ controller: CtlCandidateProtocol, candidateAtIndex index: Int)
     -> (String, String)
   {
     _ = controller  // 防止格式整理工具毀掉與此對應的參數。

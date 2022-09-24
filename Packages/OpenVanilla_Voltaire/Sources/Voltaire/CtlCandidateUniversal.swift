@@ -10,6 +10,10 @@
 
 // 將之前 Zonble 重寫的 Voltaire 選字窗隔的橫向版本與縱向版本合併到同一個型別實體內。
 
+import CandidateWindow
+import Cocoa
+import Shared
+
 private class vwrCandidateUniversal: NSView {
   var highlightedIndex: Int = 0 {
     didSet { highlightedIndex = min(max(highlightedIndex, 0), dispCandidatesWithLabels.count - 1) }
@@ -17,22 +21,23 @@ private class vwrCandidateUniversal: NSView {
 
   var action: Selector?
   weak var target: AnyObject?
+  weak var controller: AnyObject?
   var isVerticalLayout = false
-  var fractionFontSize: CGFloat = 12.0
+  var fractionFontSize: Double = 12.0
 
   private var keyLabels: [String] = []
   private var displayedCandidates: [String] = []
   private var dispCandidatesWithLabels: [String] = []
-  private var keyLabelHeight: CGFloat = 0
-  private var keyLabelWidth: CGFloat = 0
-  private var candidateTextHeight: CGFloat = 0
-  private var cellPadding: CGFloat = 0
+  private var keyLabelHeight: Double = 0
+  private var keyLabelWidth: Double = 0
+  private var candidateTextHeight: Double = 0
+  private var cellPadding: Double = 0
   private var keyLabelAttrDict: [NSAttributedString.Key: AnyObject] = [:]
   private var candidateAttrDict: [NSAttributedString.Key: AnyObject] = [:]
   private var candidateWithLabelAttrDict: [NSAttributedString.Key: AnyObject] = [:]
-  private var windowWidth: CGFloat = 0  // 縱排專用
-  private var elementWidths: [CGFloat] = []
-  private var elementHeights: [CGFloat] = []  // 縱排專用
+  private var windowWidth: Double = 0  // 縱排專用
+  private var elementWidths: [Double] = []
+  private var elementHeights: [Double] = []  // 縱排專用
   private var trackingHighlightedIndex: Int = .max {
     didSet { trackingHighlightedIndex = max(trackingHighlightedIndex, 0) }
   }
@@ -50,17 +55,17 @@ private class vwrCandidateUniversal: NSView {
           result.width = windowWidth
           result.height = elementHeights.reduce(0, +)
         case false:
-          result.width = elementWidths.reduce(0, +) + CGFloat(elementWidths.count)
+          result.width = elementWidths.reduce(0, +) + Double(elementWidths.count)
           result.height = candidateTextHeight + cellPadding
       }
     }
     return result
   }
 
-  @objc(setKeyLabels:displayedCandidates:)
   func set(keyLabels labels: [String], displayedCandidates candidates: [String]) {
+    guard let delegate = (controller as? CtlCandidateUniversal)?.delegate else { return }
     let candidates = candidates.map { theCandidate -> String in
-      let theConverted = ChineseConverter.kanjiConversionIfRequired(theCandidate)
+      let theConverted = delegate.kanjiConversionIfRequired(theCandidate)
       return (theCandidate == theConverted) ? theCandidate : "\(theConverted)(\(theCandidate))"
     }
 
@@ -69,9 +74,9 @@ private class vwrCandidateUniversal: NSView {
     displayedCandidates = Array(candidates[0..<count])
     dispCandidatesWithLabels = zip(keyLabels, displayedCandidates).map { $0 + $1 }
 
-    var newWidths = [CGFloat]()
-    var calculatedWindowWidth = CGFloat()
-    var newHeights = [CGFloat]()
+    var newWidths = [Double]()
+    var calculatedWindowWidth = Double()
+    var newHeights = [Double]()
     let baseSize = NSSize(width: 10240.0, height: 10240.0)
     for index in 0..<count {
       let rctCandidate = (dispCandidatesWithLabels[index] as NSString).boundingRect(
@@ -133,55 +138,15 @@ private class vwrCandidateUniversal: NSView {
     cellPadding = ceil(biggestSize / 4.0) * 2
   }
 
-  func ensureLangIdentifier(for attr: inout [NSAttributedString.Key: AnyObject]) {
-    if PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier {
-      switch IMEApp.currentInputMode {
-        case .imeModeCHS:
-          if #available(macOS 12.0, *) {
-            attr[.languageIdentifier] = "zh-Hans" as AnyObject
-          }
-        case .imeModeCHT:
-          if #available(macOS 12.0, *) {
-            attr[.languageIdentifier] =
-              (PrefMgr.shared.shiftJISShinjitaiOutputEnabled || PrefMgr.shared.chineseConversionEnabled)
-              ? "ja" as AnyObject : "zh-Hant" as AnyObject
-          }
-        default:
-          break
-      }
-    }
-  }
-
-  var highlightedColor: NSColor {
-    var result = NSColor.alternateSelectedControlColor
-    var colorBlendAmount: CGFloat = NSApplication.isDarkMode ? 0.3 : 0.0
-    if #available(macOS 10.14, *), !NSApplication.isDarkMode, IMEApp.currentInputMode == .imeModeCHT {
-      colorBlendAmount = 0.15
-    }
-    // The background color of the highlightened candidate
-    switch IMEApp.currentInputMode {
-      case .imeModeCHS:
-        result = NSColor.systemRed
-      case .imeModeCHT:
-        result = NSColor.systemBlue
-      default: break
-    }
-    var blendingAgainstTarget: NSColor = NSApplication.isDarkMode ? NSColor.black : NSColor.white
-    if #unavailable(macOS 10.14) {
-      colorBlendAmount = 0.3
-      blendingAgainstTarget = NSColor.white
-    }
-    return result.blended(withFraction: colorBlendAmount, of: blendingAgainstTarget)!
-  }
-
   override func draw(_: NSRect) {
+    guard let controller = controller as? CtlCandidateUniversal else { return }
     let bounds = bounds
     NSColor.controlBackgroundColor.setFill()  // Candidate list panel base background
     NSBezierPath.fill(bounds)
 
     switch isVerticalLayout {
       case true:
-        var accuHeight: CGFloat = 0
+        var accuHeight: Double = 0
         for (index, elementHeight) in elementHeights.enumerated() {
           let currentHeight = elementHeight
           let rctCandidateArea = NSRect(
@@ -200,7 +165,7 @@ private class vwrCandidateUniversal: NSView {
           var activeCandidateIndexAttr = keyLabelAttrDict
           var activeCandidateAttr = candidateAttrDict
           if index == highlightedIndex {
-            highlightedColor.setFill()
+            controller.highlightedColor().setFill()
             // Highlightened index text color
             activeCandidateIndexAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor
               .withAlphaComponent(0.84)
@@ -209,7 +174,11 @@ private class vwrCandidateUniversal: NSView {
             let path: NSBezierPath = .init(roundedRect: rctCandidateArea, xRadius: 6, yRadius: 6)
             path.fill()
           }
-          ensureLangIdentifier(for: &activeCandidateAttr)
+          if #available(macOS 12, *) {
+            if controller.useLangIdentifier {
+              activeCandidateAttr[.languageIdentifier] = controller.locale as AnyObject
+            }
+          }
           (keyLabels[index] as NSString).draw(
             in: rctLabel, withAttributes: activeCandidateIndexAttr
           )
@@ -219,7 +188,7 @@ private class vwrCandidateUniversal: NSView {
           accuHeight += currentHeight
         }
       case false:
-        var accuWidth: CGFloat = 0
+        var accuWidth: Double = 0
         for (index, elementWidth) in elementWidths.enumerated() {
           let currentWidth = elementWidth
           let rctCandidateArea = NSRect(
@@ -239,7 +208,7 @@ private class vwrCandidateUniversal: NSView {
           var activeCandidateIndexAttr = keyLabelAttrDict
           var activeCandidateAttr = candidateAttrDict
           if index == highlightedIndex {
-            highlightedColor.setFill()
+            controller.highlightedColor().setFill()
             // Highlightened index text color
             activeCandidateIndexAttr[.foregroundColor] = NSColor.selectedMenuItemTextColor
               .withAlphaComponent(0.84)
@@ -248,7 +217,11 @@ private class vwrCandidateUniversal: NSView {
             let path: NSBezierPath = .init(roundedRect: rctCandidateArea, xRadius: 6, yRadius: 6)
             path.fill()
           }
-          ensureLangIdentifier(for: &activeCandidateAttr)
+          if #available(macOS 12, *) {
+            if controller.useLangIdentifier {
+              activeCandidateAttr[.languageIdentifier] = controller.locale as AnyObject
+            }
+          }
           (keyLabels[index] as NSString).draw(
             in: rctLabel, withAttributes: activeCandidateIndexAttr
           )
@@ -267,7 +240,7 @@ private class vwrCandidateUniversal: NSView {
     }
     switch isVerticalLayout {
       case true:
-        var accuHeight: CGFloat = 0.0
+        var accuHeight = 0.0
         for (index, elementHeight) in elementHeights.enumerated() {
           let currentHeight = elementHeight
 
@@ -277,7 +250,7 @@ private class vwrCandidateUniversal: NSView {
           accuHeight += currentHeight
         }
       case false:
-        var accuWidth: CGFloat = 0.0
+        var accuWidth = 0.0
         for (index, elementWidth) in elementWidths.enumerated() {
           let currentWidth = elementWidth
 
@@ -322,7 +295,7 @@ private class vwrCandidateUniversal: NSView {
   }
 }
 
-public class ctlCandidateUniversal: ctlCandidate {
+public class CtlCandidateUniversal: CtlCandidate {
   private var candidateView: vwrCandidateUniversal
   private var prevPageButton: NSButton
   private var nextPageButton: NSButton
@@ -408,6 +381,7 @@ public class ctlCandidateUniversal: ctlCandidate {
     super.init(layout)
     window = panel
     currentLayout = layout
+    candidateView.controller = self
 
     candidateView.target = self
     candidateView.action = #selector(candidateViewMouseDidClick(_:))
@@ -431,9 +405,9 @@ public class ctlCandidateUniversal: ctlCandidate {
   }
 
   @discardableResult override public func showNextPage() -> Bool {
-    guard delegate != nil else { return false }
+    guard let delegate = delegate else { return false }
     if pageCount == 1 { return highlightNextCandidate() }
-    if currentPageIndex + 1 >= pageCount { IMEApp.buzz() }
+    if currentPageIndex + 1 >= pageCount { delegate.buzz() }
     currentPageIndex = (currentPageIndex + 1 >= pageCount) ? 0 : currentPageIndex + 1
     if currentPageIndex == pageCount - 1 {
       candidateView.highlightedIndex = min(lastPageContentCount - 1, candidateView.highlightedIndex)
@@ -444,9 +418,9 @@ public class ctlCandidateUniversal: ctlCandidate {
   }
 
   @discardableResult override public func showPreviousPage() -> Bool {
-    guard delegate != nil else { return false }
+    guard let delegate = delegate else { return false }
     if pageCount == 1 { return highlightPreviousCandidate() }
-    if currentPageIndex == 0 { IMEApp.buzz() }
+    if currentPageIndex == 0 { delegate.buzz() }
     currentPageIndex = (currentPageIndex == 0) ? pageCount - 1 : currentPageIndex - 1
     if currentPageIndex == pageCount - 1 {
       candidateView.highlightedIndex = min(lastPageContentCount - 1, candidateView.highlightedIndex)
@@ -499,7 +473,7 @@ public class ctlCandidateUniversal: ctlCandidate {
   }
 }
 
-extension ctlCandidateUniversal {
+extension CtlCandidateUniversal {
   private var pageCount: Int {
     guard let delegate = delegate else {
       return 0
@@ -519,9 +493,7 @@ extension ctlCandidateUniversal {
   }
 
   private func layoutCandidateView() {
-    guard let delegate = delegate else {
-      return
-    }
+    guard let delegate = delegate, let window = window else { return }
 
     candidateView.set(keyLabelFont: keyLabelFont, candidateFont: candidateFont)
     var candidates = [(String, String)]()
@@ -540,14 +512,14 @@ extension ctlCandidateUniversal {
     var frameRect = candidateView.frame
     frameRect.size = newSize
     candidateView.frame = frameRect
-    let counterHeight: CGFloat = newSize.height - 24
+    let counterHeight: Double = newSize.height - 24.0
 
-    if pageCount > 1, PrefMgr.shared.showPageButtonsInCandidateWindow {
+    if pageCount > 1, showPageButtons {
       var buttonRect = nextPageButton.frame
-      let spacing: CGFloat = 0.0
+      let spacing = 0.0
 
       if currentLayout == .horizontal { buttonRect.size.height = floor(newSize.height / 2) }
-      let buttonOriginY: CGFloat = {
+      let buttonOriginY: Double = {
         if currentLayout == .vertical {
           return counterHeight
         }
@@ -582,12 +554,12 @@ extension ctlCandidateUniversal {
 
       rect.size.height += 3
       rect.size.width += 4
-      let rectOriginY: CGFloat =
+      let rectOriginY: Double =
         (currentLayout == .horizontal)
         ? (newSize.height - rect.height) / 2
         : counterHeight
-      let rectOriginX: CGFloat =
-        PrefMgr.shared.showPageButtonsInCandidateWindow
+      let rectOriginX: Double =
+        showPageButtons
         ? newSize.width
         : newSize.width + 4
       rect.origin = NSPoint(x: rectOriginX, y: rectOriginY)
@@ -598,12 +570,12 @@ extension ctlCandidateUniversal {
       pageCounterLabel.isHidden = true
     }
 
-    frameRect = window?.frame ?? NSRect.seniorTheBeast
+    frameRect = window.frame
 
     let topLeftPoint = NSPoint(x: frameRect.origin.x, y: frameRect.origin.y + frameRect.size.height)
     frameRect.size = newSize
     frameRect.origin = NSPoint(x: topLeftPoint.x, y: topLeftPoint.y - frameRect.size.height)
-    window?.setFrame(frameRect, display: false)
+    window.setFrame(frameRect, display: false)
     candidateView.setNeedsDisplay(candidateView.bounds)
   }
 
