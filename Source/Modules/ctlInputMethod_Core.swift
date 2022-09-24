@@ -9,11 +9,9 @@
 // requirements defined in MIT License.
 
 import IMKUtils
-import NotifierUI
 import PopupCompositionBuffer
 import Shared
 import ShiftKeyUpChecker
-import Tekkon
 import TooltipUI
 
 /// 輸入法控制模組，乃在輸入法端用以控制輸入行為的基礎型別。
@@ -78,8 +76,46 @@ class ctlInputMethod: IMKInputController {
     return result
   }
 
-  // MARK: - 工具函式
+  /// InputMode 需要在每次出現內容變更的時候都連帶重設組字器與各項語言模組，
+  /// 順帶更新 IME 模組及 UserPrefs 當中對於當前語言模式的記載。
+  var inputMode: Shared.InputMode = IMEApp.currentInputMode {
+    willSet {
+      /// 將新的簡繁輸入模式提報給 Prefs 與 IME 模組。
+      IMEApp.currentInputMode = newValue
+      PrefMgr.shared.mostRecentInputMode = IMEApp.currentInputMode.rawValue
+    }
+    didSet {
+      /// 重設所有語言模組。這裡不需要做按需重設，因為對運算量沒有影響。
+      keyHandler.currentLM = LMMgr.currentLM()  // 會自動更新組字引擎內的模組。
+      keyHandler.currentUOM = LMMgr.currentUOM()
+      /// 清空注拼槽＋同步最新的注拼槽排列設定。
+      keyHandler.ensureKeyboardParser()
+      /// 將輸入法偏好設定同步至語言模組內。
+      syncBaseLMPrefs()
+    }
+  }
 
+  /// 對用以設定委任物件的控制器型別進行初期化處理。
+  ///
+  /// inputClient 參數是客體應用側存在的用以藉由 IMKServer 伺服器向輸入法傳訊的物件。該物件始終遵守 IMKTextInput 協定。
+  /// - Remark: 所有由委任物件實裝的「被協定要求實裝的方法」都會有一個用來接受客體物件的參數。在 IMKInputController 內部的型別不需要接受這個參數，因為已經有「client()」這個參數存在了。
+  /// - Parameters:
+  ///   - server: IMKServer
+  ///   - delegate: 客體物件
+  ///   - inputClient: 用以接受輸入的客體應用物件
+  override init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
+    super.init(server: server, delegate: delegate, client: inputClient)
+    keyHandler.delegate = self
+    syncBaseLMPrefs()
+    // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
+    resetKeyHandler()
+    activateServer(inputClient)
+  }
+}
+
+// MARK: - 工具函式
+
+extension ctlInputMethod {
   /// 指定鍵盤佈局。
   func setKeyLayout() {
     guard let client = client() else { return }
@@ -104,28 +140,11 @@ class ctlInputMethod: IMKInputController {
     }
     handle(state: isSecureMode ? IMEState.ofAbortion() : IMEState.ofEmpty())
   }
+}
 
-  // MARK: - IMKInputController 方法
+// MARK: - IMKStateSetting 協定規定的方法
 
-  /// 對用以設定委任物件的控制器型別進行初期化處理。
-  ///
-  /// inputClient 參數是客體應用側存在的用以藉由 IMKServer 伺服器向輸入法傳訊的物件。該物件始終遵守 IMKTextInput 協定。
-  /// - Remark: 所有由委任物件實裝的「被協定要求實裝的方法」都會有一個用來接受客體物件的參數。在 IMKInputController 內部的型別不需要接受這個參數，因為已經有「client()」這個參數存在了。
-  /// - Parameters:
-  ///   - server: IMKServer
-  ///   - delegate: 客體物件
-  ///   - inputClient: 用以接受輸入的客體應用物件
-  override init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
-    super.init(server: server, delegate: delegate, client: inputClient)
-    keyHandler.delegate = self
-    syncBaseLMPrefs()
-    // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
-    resetKeyHandler()
-    activateServer(inputClient)
-  }
-
-  // MARK: - IMKStateSetting 協定規定的方法
-
+extension ctlInputMethod {
   /// 啟用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   override func activateServer(_ sender: Any!) {
@@ -195,25 +214,6 @@ class ctlInputMethod: IMKInputController {
     }
   }
 
-  /// InputMode 需要在每次出現內容變更的時候都連帶重設組字器與各項語言模組，
-  /// 順帶更新 IME 模組及 UserPrefs 當中對於當前語言模式的記載。
-  var inputMode: Shared.InputMode = IMEApp.currentInputMode {
-    willSet {
-      /// 將新的簡繁輸入模式提報給 Prefs 與 IME 模組。
-      IMEApp.currentInputMode = newValue
-      PrefMgr.shared.mostRecentInputMode = IMEApp.currentInputMode.rawValue
-    }
-    didSet {
-      /// 重設所有語言模組。這裡不需要做按需重設，因為對運算量沒有影響。
-      keyHandler.currentLM = LMMgr.currentLM()  // 會自動更新組字引擎內的模組。
-      keyHandler.currentUOM = LMMgr.currentUOM()
-      /// 清空注拼槽＋同步最新的注拼槽排列設定。
-      keyHandler.ensureKeyboardParser()
-      /// 將輸入法偏好設定同步至語言模組內。
-      syncBaseLMPrefs()
-    }
-  }
-
   /// 將輸入法偏好設定同步至語言模組內。
   func syncBaseLMPrefs() {
     LMMgr.currentLM().isPhraseReplacementEnabled = PrefMgr.shared.phraseReplacementEnabled
@@ -222,9 +222,13 @@ class ctlInputMethod: IMKInputController {
     LMMgr.currentLM().isSCPCEnabled = PrefMgr.shared.useSCPCTypingMode
     LMMgr.currentLM().deltaOfCalendarYears = PrefMgr.shared.deltaOfCalendarYears
   }
+}
 
-  // MARK: - IMKServerInput 協定規定的方法
+// MARK: - IMKServerInput 協定規定的方法（僅部分）
 
+// 註：handle(_ event:) 位於 ctlInputMethod_HandleEvent.swift。
+
+extension ctlInputMethod {
   /// 該函式的回饋結果決定了輸入法會攔截且捕捉哪些類型的輸入裝置操作事件。
   ///
   /// 一個客體應用會與輸入法共同確認某個輸入裝置操作事件是否可以觸發輸入法內的某個方法。預設情況下，
@@ -240,104 +244,6 @@ class ctlInputMethod: IMKInputController {
     return Int(events.rawValue)
   }
 
-  /// 接受所有鍵鼠事件為 NSEvent，讓輸入法判斷是否要處理、該怎樣處理。
-  /// - Parameters:
-  ///   - event: 裝置操作輸入事件，可能會是 nil。
-  ///   - sender: 呼叫了該函式的客體（無須使用）。
-  /// - Returns: 回「`true`」以將該案件已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
-  @objc(handleEvent:client:) override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
-    _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-
-    // MARK: 前置處理
-
-    // 更新此時的靜態狀態標記。
-    state.isASCIIMode = isASCIIMode
-    state.isVerticalTyping = isVerticalTyping
-
-    // 就這傳入的 NSEvent 都還有可能是 nil，Apple InputMethodKit 團隊到底在搞三小。
-    // 只針對特定類型的 client() 進行處理。
-    guard let event = event, sender is IMKTextInput else {
-      resetKeyHandler()
-      return false
-    }
-
-    // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
-    let shouldUseShiftToggleHandle: Bool = {
-      switch PrefMgr.shared.shiftKeyAccommodationBehavior {
-        case 0: return false
-        case 1: return Shared.arrClientShiftHandlingExceptionList.contains(clientBundleIdentifier)
-        case 2: return true
-        default: return false
-      }
-    }()
-
-    /// 警告：這裡的 event 必須是原始 event 且不能被 var，否則會影響 Shift 中英模式判定。
-    if #available(macOS 10.15, *) {
-      if Self.theShiftKeyDetector.check(event), !PrefMgr.shared.disableShiftTogglingAlphanumericalMode {
-        if !shouldUseShiftToggleHandle || (!rencentKeyHandledByKeyHandlerEtc && shouldUseShiftToggleHandle) {
-          let status = NSLocalizedString("NotificationSwitchShift", comment: "")
-          Notifier.notify(
-            message: isASCIIMode.toggled()
-              ? NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
-              : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
-          )
-        }
-        if shouldUseShiftToggleHandle {
-          rencentKeyHandledByKeyHandlerEtc = false
-        }
-        return false
-      }
-    }
-
-    // MARK: 針對客體的具體處理
-
-    // 不再讓威注音處理由 Shift 切換到的英文模式的按鍵輸入。
-    if isASCIIMode { return false }
-
-    /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
-    /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
-    /// 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
-    /// 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
-    if event.type == .flagsChanged { return false }
-
-    /// 沒有文字輸入客體的話，就不要再往下處理了。
-    guard client() != nil else { return false }
-
-    var eventToDeal = event
-
-    // 如果是方向鍵輸入的話，就想辦法帶上標記資訊、來說明當前是縱排還是橫排。
-    if event.isUp || event.isDown || event.isLeft || event.isRight {
-      eventToDeal = event.reinitiate(charactersIgnoringModifiers: isVerticalTyping ? "Vertical" : "Horizontal") ?? event
-    }
-
-    // 使 NSEvent 自翻譯，這樣可以讓 Emacs NSEvent 變成標準 NSEvent。
-    if eventToDeal.isEmacsKey {
-      let verticalProcessing =
-        (state.isCandidateContainer)
-        ? state.isVerticalCandidateWindow : state.isVerticalTyping
-      eventToDeal = eventToDeal.convertFromEmacKeyEvent(isVerticalContext: verticalProcessing)
-    }
-
-    // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
-    Self.areWeNerfing = eventToDeal.modifierFlags.contains([.shift, .command])
-
-    // IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
-    if let result = imkCandidatesEventPreHandler(event: eventToDeal) {
-      if shouldUseShiftToggleHandle {
-        rencentKeyHandledByKeyHandlerEtc = result
-      }
-      return result
-    }
-
-    /// 剩下的 NSEvent 直接交給 commonEventHandler 來處理。
-    /// 這樣可以與 IMK 選字窗共用按鍵處理資源，維護起來也比較方便。
-    let result = commonEventHandler(eventToDeal)
-    if shouldUseShiftToggleHandle {
-      rencentKeyHandledByKeyHandlerEtc = result
-    }
-    return result
-  }
-
   /// 有時會出現某些 App 攔截輸入法的 Ctrl+Enter / Shift+Enter 熱鍵的情況。
   /// 也就是說 handle(event:) 完全抓不到這個 Event。
   /// 這時需要在 commitComposition 這一關做一些收尾處理。
@@ -348,13 +254,13 @@ class ctlInputMethod: IMKInputController {
     // super.commitComposition(sender)  // 這句不要引入，否則每次切出輸入法時都會死當。
   }
 
-  /// 指定輸入法要遞交出去的內容（雖然威注音可能並未用到這個函式）。
+  /// 指定輸入法要遞交出去的內容（雖然 InputMethodKit 可能並不會真的用到這個函式）。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 字串內容，或者 nil。
   override func composedString(_ sender: Any!) -> Any! {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     guard state.hasComposition else { return "" }
-    return state.displayedText
+    return state.displayedTextConverted
   }
 
   /// 輸入法要被換掉或關掉的時候，要做的事情。
@@ -363,122 +269,5 @@ class ctlInputMethod: IMKInputController {
     // 下述兩行用來防止尚未完成拼寫的注音內容貝蒂交出去。
     resetKeyHandler()
     super.inputControllerWillClose()
-  }
-
-  // MARK: - IMKCandidates 功能擴充
-
-  /// 生成 IMK 選字窗專用的候選字串陣列。
-  /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
-  /// - Returns: IMK 選字窗專用的候選字串陣列。
-  override func candidates(_ sender: Any!) -> [Any]! {
-    _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-    var arrResult = [String]()
-
-    // 注意：下文中的不可列印字元是用來方便在 IMEState 當中用來分割資料的。
-    func handleIMKCandidatesPrepared(_ candidates: [(String, String)], prefix: String = "") {
-      for theCandidate in candidates {
-        let theConverted = ChineseConverter.kanjiConversionIfRequired(theCandidate.1)
-        var result = (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)\u{1A}(\(theCandidate.1))"
-        if arrResult.contains(result) {
-          let reading: String =
-            PrefMgr.shared.showHanyuPinyinInCompositionBuffer
-            ? Tekkon.cnvPhonaToHanyuPinyin(target: Tekkon.restoreToneOneInZhuyinKey(target: theCandidate.0))
-            : theCandidate.0
-          result = "\(result)\u{17}(\(reading))"
-        }
-        arrResult.append(prefix + result)
-      }
-    }
-
-    if state.type == .ofAssociates {
-      handleIMKCandidatesPrepared(state.candidates, prefix: "⇧")
-    } else if state.type == .ofSymbolTable {
-      // 分類符號選單不會出現同符異音項、不需要康熙 / JIS 轉換，所以使用簡化過的處理方式。
-      arrResult = state.candidates.map(\.1)
-    } else if state.type == .ofCandidates {
-      guard !state.candidates.isEmpty else { return .init() }
-      if state.candidates[0].0.contains("_punctuation") {
-        arrResult = state.candidates.map(\.1)  // 標點符號選單處理。
-      } else {
-        handleIMKCandidatesPrepared(state.candidates)
-      }
-    }
-
-    return arrResult
-  }
-
-  /// IMK 選字窗限定函式，只要選字窗內的高亮內容選擇出現變化了、就會呼叫這個函式。
-  /// - Parameter _: 已經高亮選中的候選字詞內容。
-  override open func candidateSelectionChanged(_: NSAttributedString!) {
-    // 警告：不要考慮用實作這個函式的方式來更新內文組字區的顯示。
-    // 因為這樣會導致 IMKServer.commitCompositionWithReply() 呼叫你本來不想呼叫的 commitComposition()，
-    // 然後 keyHandler 會被重設，屆時輸入法會在狀態處理等方面崩潰掉。
-
-    // 這個函式的實作其實很容易誘發各種崩潰，所以最好不要輕易實作。
-
-    // 有些幹話還是要講的：
-    // 在這個函式當中試圖（無論是否拿著傳入的參數）從 ctlCandidateIMK 找 identifier 的話，
-    // 只會找出 NSNotFound。你想 NSLog 列印看 identifier 是多少，輸入法直接崩潰。
-    // 而且會他媽的崩得連 console 內的 ips 錯誤報告都沒有。
-    // 在下文的 candidateSelected() 試圖看每個候選字的 identifier 的話，永遠都只能拿到 NSNotFound。
-    // 衰洨 IMK 真的看上去就像是沒有做過單元測試的東西，賈伯斯有檢查過的話會被氣得從棺材裡爬出來。
-  }
-
-  /// IMK 選字窗限定函式，只要選字窗確認了某個候選字詞的選擇、就會呼叫這個函式。
-  /// - Parameter candidateString: 已經確認的候選字詞內容。
-  override open func candidateSelected(_ candidateString: NSAttributedString!) {
-    let candidateString: String = candidateString?.string ?? ""
-    if state.type == .ofAssociates {
-      if !PrefMgr.shared.alsoConfirmAssociatedCandidatesByEnter {
-        handle(state: IMEState.ofAbortion())
-        return
-      }
-    }
-
-    var indexDeducted = 0
-
-    // 注意：下文中的不可列印字元是用來方便在 IMEState 當中用來分割資料的。
-    func handleIMKCandidatesSelected(_ candidates: [(String, String)], prefix: String = "") {
-      for (i, neta) in candidates.enumerated() {
-        let theConverted = ChineseConverter.kanjiConversionIfRequired(neta.1)
-        let netaShown = (neta.1 == theConverted) ? neta.1 : "\(theConverted)\u{1A}(\(neta.1))"
-        let reading: String =
-          PrefMgr.shared.showHanyuPinyinInCompositionBuffer
-          ? Tekkon.cnvPhonaToHanyuPinyin(target: Tekkon.restoreToneOneInZhuyinKey(target: neta.0)) : neta.0
-        let netaShownWithPronunciation = "\(netaShown)\u{17}(\(reading))"
-        if candidateString == prefix + netaShownWithPronunciation {
-          indexDeducted = i
-          break
-        }
-        if candidateString == prefix + netaShown {
-          indexDeducted = i
-          break
-        }
-      }
-    }
-
-    // 分類符號選單不會出現同符異音項、不需要康熙 / JIS 轉換，所以使用簡化過的處理方式。
-    func handleSymbolCandidatesSelected(_ candidates: [(String, String)]) {
-      for (i, neta) in candidates.enumerated() {
-        if candidateString == neta.1 {
-          indexDeducted = i
-          break
-        }
-      }
-    }
-
-    if state.type == .ofAssociates {
-      handleIMKCandidatesSelected(state.candidates, prefix: "⇧")
-    } else if state.type == .ofSymbolTable {
-      handleSymbolCandidatesSelected(state.candidates)
-    } else if state.type == .ofCandidates {
-      guard !state.candidates.isEmpty else { return }
-      if state.candidates[0].0.contains("_punctuation") {
-        handleSymbolCandidatesSelected(state.candidates)  // 標點符號選單處理。
-      } else {
-        handleIMKCandidatesSelected(state.candidates)
-      }
-    }
-    candidateSelected(at: indexDeducted)
   }
 }
