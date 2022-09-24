@@ -37,7 +37,7 @@ struct suiPrefPaneDictionary: View {
 
   private static let dlgOpenPath = NSOpenPanel()
 
-  private let contentMaxHeight: Double = 432
+  private let contentMaxHeight: Double = 440
   private let contentWidth: Double = {
     switch PrefMgr.shared.appleLanguages[0] {
       case "ja":

@@ -19,7 +19,7 @@ struct suiPrefPaneDevZone: View {
   @State private var selShiftKeyAccommodationBehavior: Int = UserDefaults.standard.integer(
     forKey: UserDef.kShiftKeyAccommodationBehavior.rawValue)
 
-  private let contentMaxHeight: Double = 432
+  private let contentMaxHeight: Double = 440
   private let contentWidth: Double = {
     switch PrefMgr.shared.appleLanguages[0] {
       case "ja":

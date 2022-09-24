@@ -39,7 +39,7 @@ struct suiPrefPaneGeneral: View {
     forKey: UserDef.kCheckUpdateAutomatically.rawValue)
   @State private var selEnableDebugMode = UserDefaults.standard.bool(forKey: UserDef.kIsDebugModeEnabled.rawValue)
 
-  private let contentMaxHeight: Double = 432
+  private let contentMaxHeight: Double = 440
   private let contentWidth: Double = {
     switch PrefMgr.shared.appleLanguages[0] {
       case "ja":
