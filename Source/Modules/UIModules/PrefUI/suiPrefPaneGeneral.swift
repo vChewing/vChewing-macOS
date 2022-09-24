@@ -60,7 +60,7 @@ struct suiPrefPaneGeneral: View {
           Picker(
             "",
             selection: $selCandidateUIFontSize.onChange {
-              PrefMgr.shared.candidateListTextSize = CGFloat(selCandidateUIFontSize)
+              PrefMgr.shared.candidateListTextSize = Double(selCandidateUIFontSize)
             }
           ) {
             Group {

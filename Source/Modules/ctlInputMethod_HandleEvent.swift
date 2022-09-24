@@ -143,8 +143,8 @@ extension ctlInputMethod {
     // 這樣可以讓 interpretKeyEvents() 函式自行判斷：
     // - 是就地交給 imkCandidates.interpretKeyEvents() 處理？
     // - 還是藉由 delegate 扔回 ctlInputMethod 給 KeyHandler 處理？
-    if let imkCandidates = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK, imkCandidates.visible {
-      let event: NSEvent = ctlCandidateIMK.replaceNumPadKeyCodes(target: eventToDeal) ?? eventToDeal
+    if let imkCandidates = ctlInputMethod.ctlCandidateCurrent as? CtlCandidateIMK, imkCandidates.visible {
+      let event: NSEvent = CtlCandidateIMK.replaceNumPadKeyCodes(target: eventToDeal) ?? eventToDeal
 
       // Shift+Enter 是個特殊情形，不提前攔截處理的話、會有垃圾參數傳給 delegate 的 keyHandler 從而崩潰。
       // 所以這裡直接將 Shift Flags 清空。
@@ -158,7 +158,7 @@ extension ctlInputMethod {
       }
 
       // 聯想詞選字。
-      if let newChar = ctlCandidateIMK.defaultIMKSelectionKey[event.keyCode],
+      if let newChar = CtlCandidateIMK.defaultIMKSelectionKey[event.keyCode],
         event.isShiftHold, state.type == .ofAssociates,
         let newEvent = event.reinitiate(modifierFlags: [], characters: newChar)
       {
@@ -177,7 +177,7 @@ extension ctlInputMethod {
 
   private func imkCandidatesEventSubHandler(event: NSEvent) -> Bool {
     let eventArray = [event]
-    guard let imkC = Self.ctlCandidateCurrent as? ctlCandidateIMK else { return false }
+    guard let imkC = Self.ctlCandidateCurrent as? CtlCandidateIMK else { return false }
     if event.isEsc || event.isBackSpace || event.isDelete || (event.isShiftHold && !event.isSpace) {
       return commonEventHandler(event)
     } else if event.isSymbolMenuPhysicalKey {
@@ -200,7 +200,7 @@ extension ctlInputMethod {
       }
       return true
     } else {
-      if let newChar = ctlCandidateIMK.defaultIMKSelectionKey[event.keyCode] {
+      if let newChar = CtlCandidateIMK.defaultIMKSelectionKey[event.keyCode] {
         /// 根據 KeyCode 重新換算一下選字鍵的 NSEvent，糾正其 Character 數值。
         /// 反正 IMK 選字窗目前也沒辦法修改選字鍵。
         let newEvent = event.reinitiate(characters: newChar)

@@ -6,12 +6,19 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
+import CandidateWindow
+import Shared
+
+/// 威注音自用的 IMKCandidates 型別。因為有用到 bridging header，所以無法弄成 Swift Package。
+public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
+  public var showPageButtons: Bool = false
+  public var locale: String = ""
+  public var useLangIdentifier: Bool = false
   public var currentLayout: CandidateLayout = .horizontal
   public static let defaultIMKSelectionKey: [UInt16: String] = [
     18: "1", 19: "2", 20: "3", 21: "4", 23: "5", 22: "6", 26: "7", 28: "8", 25: "9",
   ]
-  public weak var delegate: ctlCandidateDelegate? {
+  public weak var delegate: CtlCandidateDelegate? {
     didSet {
       reloadData()
     }
@@ -40,26 +47,15 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     ofSize: 14, weight: .medium
   )
 
-  public var candidateFont = NSFont.systemFont(ofSize: PrefMgr.shared.candidateListTextSize) {
+  public var candidateFont = NSFont.systemFont(ofSize: 16) {
     didSet {
       if #available(macOS 10.14, *) { setFontSize(candidateFont.pointSize) }
       var attributes = attributes()
       // FB11300759: Set "NSAttributedString.Key.font" doesn't work.
       attributes?[NSAttributedString.Key.font] = candidateFont
-      if PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier {
-        switch IMEApp.currentInputMode {
-          case .imeModeCHS:
-            if #available(macOS 12.0, *) {
-              attributes?[NSAttributedString.Key.languageIdentifier] = "zh-Hans" as AnyObject
-            }
-          case .imeModeCHT:
-            if #available(macOS 12.0, *) {
-              attributes?[NSAttributedString.Key.languageIdentifier] =
-                (PrefMgr.shared.shiftJISShinjitaiOutputEnabled || PrefMgr.shared.chineseConversionEnabled)
-                ? "ja" as AnyObject : "zh-Hant" as AnyObject
-            }
-          default:
-            break
+      if #available(macOS 12.0, *) {
+        if useLangIdentifier {
+          attributes?[NSAttributedString.Key.languageIdentifier] = locale as AnyObject
         }
       }
       setAttributes(attributes)
@@ -159,17 +155,17 @@ public class ctlCandidateIMK: IMKCandidates, ctlCandidateProtocol {
     set { selectCandidate(withIdentifier: newValue) }
   }
 
-  public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
+  public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: Double) {
     DispatchQueue.main.async {
       self.doSet(windowTopLeftPoint: windowTopLeftPoint, bottomOutOfScreenAdjustmentHeight: height)
     }
   }
 
-  func doSet(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight heightDelta: CGFloat) {
+  func doSet(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight heightDelta: Double) {
+    guard var screenFrame = NSScreen.main?.visibleFrame else { return }
     var adjustedPoint = windowTopLeftPoint
     let windowSize = candidateFrame().size
     var delta = heightDelta
-    var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.seniorTheBeast
     for frame in NSScreen.screens.map(\.visibleFrame).filter({ $0.contains(windowTopLeftPoint) }) {
       screenFrame = frame
       break
@@ -209,7 +205,7 @@ var currentTISInputSource: TISInputSource? {
 
 // MARK: - Translating NumPad KeyCodes to Default IMK Candidate Selection KeyCodes.
 
-extension ctlCandidateIMK {
+extension CtlCandidateIMK {
   public static func replaceNumPadKeyCodes(target event: NSEvent) -> NSEvent? {
     let mapNumPadKeyCodeTranslation: [UInt16: UInt16] = [
       83: 18, 84: 19, 85: 20, 86: 21, 87: 23, 88: 22, 89: 26, 91: 28, 92: 25,

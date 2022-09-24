@@ -10,6 +10,7 @@
 
 import NSAttributedTextView
 import Shared
+import Voltaire
 
 // MARK: - Tooltip Display and Candidate Display Methods
 
@@ -45,7 +46,7 @@ extension ctlInputMethod {
     guard client() != nil else { return }
     let lineHeightRect = lineHeightRect()
     var finalOrigin: NSPoint = lineHeightRect.origin
-    let delta: CGFloat = lineHeightRect.size.height + 4.0  // bottomOutOfScreenAdjustmentHeight
+    let delta: Double = lineHeightRect.size.height + 4.0  // bottomOutOfScreenAdjustmentHeight
     if isVerticalTyping {
       finalOrigin = NSPoint(
         x: lineHeightRect.origin.x + lineHeightRect.size.width + 5, y: lineHeightRect.origin.y
@@ -79,7 +80,7 @@ extension ctlInputMethod {
       }
       if isVerticalTyping { return true }
       // 接下來的判斷並非適用於 IMK 選字窗，所以先插入排除語句。
-      guard ctlInputMethod.ctlCandidateCurrent is ctlCandidateUniversal else { return false }
+      guard ctlInputMethod.ctlCandidateCurrent is CtlCandidateUniversal else { return false }
       // 以上是通用情形。接下來決定橫排輸入時是否使用縱排選字窗。
       // 因為在拿候選字陣列時已經排序過了，所以這裡不用再多排序。
       // 測量每頁顯示候選字的累計總長度。如果太長的話就強制使用縱排候選字窗。
@@ -107,14 +108,14 @@ extension ctlInputMethod {
 
     ctlInputMethod.ctlCandidateCurrent =
       PrefMgr.shared.useIMKCandidateWindow
-      ? ctlCandidateIMK.init(candidateLayout) : ctlCandidateUniversal.init(candidateLayout)
+      ? CtlCandidateIMK(candidateLayout) : CtlCandidateUniversal(candidateLayout)
 
     // set the attributes for the candidate panel (which uses NSAttributedString)
     let textSize = PrefMgr.shared.candidateListTextSize
     let minimumKeyLabelSize: Double = 10
     let keyLabelSize = max(textSize / 2, minimumKeyLabelSize)
 
-    func labelFont(name: String?, size: CGFloat) -> NSFont {
+    func labelFont(name: String?, size: Double) -> NSFont {
       if let name = name {
         return NSFont(name: name, size: size) ?? NSFont.systemFont(ofSize: size)
       }
@@ -137,11 +138,24 @@ extension ctlInputMethod {
     }
 
     ctlInputMethod.ctlCandidateCurrent.delegate = self
+    ctlInputMethod.ctlCandidateCurrent.showPageButtons = PrefMgr.shared.showPageButtonsInCandidateWindow
+    ctlInputMethod.ctlCandidateCurrent.useLangIdentifier = PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier
+    ctlInputMethod.ctlCandidateCurrent.locale = {
+      switch inputMode {
+        case .imeModeCHS: return "zh-Hans"
+        case .imeModeCHT:
+          if !PrefMgr.shared.shiftJISShinjitaiOutputEnabled, !PrefMgr.shared.chineseConversionEnabled {
+            return "zh-Hant"
+          }
+          return "ja"
+        default: return ""
+      }
+    }()
     ctlInputMethod.ctlCandidateCurrent.reloadData()
 
     if #available(macOS 10.14, *) {
       // Spotlight 視窗會擋住 IMK 選字窗，所以需要特殊處理。
-      if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK {
+      if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? CtlCandidateIMK {
         while ctlCandidateCurrent.windowLevel() <= client.windowLevel() {
           ctlCandidateCurrent.setWindowLevel(UInt64(max(0, client.windowLevel() + 1000)))
         }
@@ -174,7 +188,7 @@ extension ctlInputMethod {
   ///    **REASON**: IMKCandidates has bug that it does not respect font attributes attached to the
   ///    results generated from `candidiates() -> [Any]!` function. IMKCandidates is plagued with
   ///    bugs which are not dealt in the recent decade, regardless Radar complaints from input method developers.
-  /// 1) Remove the usage of ".languageIdentifier" from ctlCandidateUniversal.swift (already done).
+  /// 1) Make sure the usage of ".languageIdentifier" is disabled in the Dev Zone of the vChewing Preferences.
   /// 2) Run "make update" in the project folder to download the latest git-submodule of dictionary file.
   /// 3) Compile the target "vChewingInstaller", run it. It will install the input method into
   ///    "~/Library/Input Methods/" folder. Remember to ENABLE BOTH "vChewing-CHS"
@@ -184,7 +198,7 @@ extension ctlInputMethod {
   /// 5) Do NOT enable either KangXi conversion mode nor JIS conversion mode. They are disabled by default.
   /// 6) Expecting the glyph differences of the candidate "骨" between PingFang SC and PingFang TC when rendering
   ///    the candidate window in different "vChewing-CHS" and "vChewing-CHT" input modes.
-  static func candidateFont(name: String? = nil, size: CGFloat) -> NSFont {
+  static func candidateFont(name: String? = nil, size: Double) -> NSFont {
     let finalReturnFont: NSFont =
       {
         switch IMEApp.currentInputMode {
