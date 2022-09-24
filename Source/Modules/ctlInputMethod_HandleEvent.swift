@@ -143,7 +143,7 @@ extension ctlInputMethod {
     // 這樣可以讓 interpretKeyEvents() 函式自行判斷：
     // - 是就地交給 imkCandidates.interpretKeyEvents() 處理？
     // - 還是藉由 delegate 扔回 ctlInputMethod 給 KeyHandler 處理？
-    if let imkCandidates = ctlInputMethod.ctlCandidateCurrent as? CtlCandidateIMK, imkCandidates.visible {
+    if let imkCandidates = Self.ctlCandidateCurrent as? CtlCandidateIMK, imkCandidates.visible {
       let event: NSEvent = CtlCandidateIMK.replaceNumPadKeyCodes(target: eventToDeal) ?? eventToDeal
 
       // Shift+Enter 是個特殊情形，不提前攔截處理的話、會有垃圾參數傳給 delegate 的 keyHandler 從而崩潰。
@@ -206,7 +206,7 @@ extension ctlInputMethod {
         let newEvent = event.reinitiate(characters: newChar)
         if let newEvent = newEvent {
           if PrefMgr.shared.useSCPCTypingMode, state.type == .ofAssociates {
-            // 註：input.isShiftHold 已經在 ctlInputMethod.handle() 內處理，因為在那邊處理才有效。
+            // 註：input.isShiftHold 已經在 Self.handle() 內處理，因為在那邊處理才有效。
             return event.isShiftHold ? true : commonEventHandler(event)
           } else {
             if #available(macOS 10.14, *) {

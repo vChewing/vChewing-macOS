@@ -24,9 +24,9 @@ extension ctlInputMethod {
     state = newState
     switch state.type {
       case .ofDeactivated:
-        ctlInputMethod.ctlCandidateCurrent.delegate = nil
-        ctlInputMethod.ctlCandidateCurrent.visible = false
-        ctlInputMethod.tooltipInstance.hide()
+        Self.ctlCandidateCurrent.delegate = nil
+        Self.ctlCandidateCurrent.visible = false
+        Self.tooltipInstance.hide()
         if previous.hasComposition {
           commit(text: previous.displayedText)
         }
@@ -39,29 +39,29 @@ extension ctlInputMethod {
           state = IMEState.ofEmpty()
           previous = state
         }
-        ctlInputMethod.ctlCandidateCurrent.visible = false
-        ctlInputMethod.tooltipInstance.hide()
+        Self.ctlCandidateCurrent.visible = false
+        Self.tooltipInstance.hide()
         // 全專案用以判斷「.Abortion」的地方僅此一處。
         if previous.hasComposition, state.type != .ofAbortion {
           commit(text: previous.displayedText)
         }
         // 在這裡手動再取消一次選字窗與工具提示的顯示，可謂雙重保險。
-        ctlInputMethod.ctlCandidateCurrent.visible = false
-        ctlInputMethod.tooltipInstance.hide()
+        Self.ctlCandidateCurrent.visible = false
+        Self.tooltipInstance.hide()
         clearInlineDisplay()
         // 最後一道保險
         keyHandler.clear()
       case .ofCommitting:
-        ctlInputMethod.ctlCandidateCurrent.visible = false
-        ctlInputMethod.tooltipInstance.hide()
+        Self.ctlCandidateCurrent.visible = false
+        Self.tooltipInstance.hide()
         let textToCommit = state.textToCommit
         if !textToCommit.isEmpty { commit(text: textToCommit) }
         clearInlineDisplay()
         // 最後一道保險
         keyHandler.clear()
       case .ofInputting:
-        ctlInputMethod.ctlCandidateCurrent.visible = false
-        ctlInputMethod.tooltipInstance.hide()
+        Self.ctlCandidateCurrent.visible = false
+        Self.tooltipInstance.hide()
         let textToCommit = state.textToCommit
         if !textToCommit.isEmpty { commit(text: textToCommit) }
         setInlineDisplayWithCursor()
@@ -69,27 +69,27 @@ extension ctlInputMethod {
           show(tooltip: state.tooltip)
         }
       case .ofMarking:
-        ctlInputMethod.ctlCandidateCurrent.visible = false
+        Self.ctlCandidateCurrent.visible = false
         setInlineDisplayWithCursor()
         if state.tooltip.isEmpty {
-          ctlInputMethod.tooltipInstance.hide()
+          Self.tooltipInstance.hide()
         } else {
           show(tooltip: state.tooltip)
         }
       case .ofCandidates, .ofAssociates, .ofSymbolTable:
-        ctlInputMethod.tooltipInstance.hide()
+        Self.tooltipInstance.hide()
         setInlineDisplayWithCursor()
         showCandidates()
       default: break
     }
     // 浮動組字窗的顯示判定
     if state.hasComposition, PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier) {
-      ctlInputMethod.popupCompositionBuffer.isTypingDirectionVertical = isVerticalTyping
-      ctlInputMethod.popupCompositionBuffer.show(
+      Self.popupCompositionBuffer.isTypingDirectionVertical = isVerticalTyping
+      Self.popupCompositionBuffer.show(
         state: state, at: lineHeightRect(zeroCursor: true).origin
       )
     } else {
-      ctlInputMethod.popupCompositionBuffer.hide()
+      Self.popupCompositionBuffer.hide()
     }
   }
 

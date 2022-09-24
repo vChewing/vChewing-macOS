@@ -58,14 +58,14 @@ extension ctlInputMethod {
     }()
     // 強制重新初期化，因為 NSAttributedTextView 有顯示滯後性。
     do {
-      ctlInputMethod.tooltipInstance.hide()
-      ctlInputMethod.tooltipInstance = .init()
+      Self.tooltipInstance.hide()
+      Self.tooltipInstance = .init()
       if state.type == .ofMarking {
-        ctlInputMethod.tooltipInstance.setColor(state: state.data.tooltipColorState)
+        Self.tooltipInstance.setColor(state: state.data.tooltipColorState)
       }
     }
     // 再設定其文字顯示內容並顯示。
-    ctlInputMethod.tooltipInstance.show(
+    Self.tooltipInstance.show(
       tooltip: tooltip, at: finalOrigin,
       bottomOutOfScreenAdjustmentHeight: delta, direction: tooltipContentDirection
     )
@@ -80,7 +80,7 @@ extension ctlInputMethod {
       }
       if isVerticalTyping { return true }
       // 接下來的判斷並非適用於 IMK 選字窗，所以先插入排除語句。
-      guard ctlInputMethod.ctlCandidateCurrent is CtlCandidateUniversal else { return false }
+      guard Self.ctlCandidateCurrent is CtlCandidateUniversal else { return false }
       // 以上是通用情形。接下來決定橫排輸入時是否使用縱排選字窗。
       // 因為在拿候選字陣列時已經排序過了，所以這裡不用再多排序。
       // 測量每頁顯示候選字的累計總長度。如果太長的話就強制使用縱排候選字窗。
@@ -93,7 +93,7 @@ extension ctlInputMethod {
 
     state.isVerticalCandidateWindow = (isCandidateWindowVertical || !PrefMgr.shared.useHorizontalCandidateList)
 
-    ctlInputMethod.ctlCandidateCurrent.delegate = nil
+    Self.ctlCandidateCurrent.delegate = nil
 
     /// 下面這一段本可直接指定 currentLayout，但這樣的話翻頁按鈕位置無法精準地重新繪製。
     /// 所以只能重新初期化。壞處就是得在 ctlCandidate() 當中與 SymbolTable 控制有關的地方
@@ -106,7 +106,7 @@ extension ctlInputMethod {
         ? CandidateLayout.vertical
         : CandidateLayout.horizontal)
 
-    ctlInputMethod.ctlCandidateCurrent =
+    Self.ctlCandidateCurrent =
       PrefMgr.shared.useIMKCandidateWindow
       ? CtlCandidateIMK(candidateLayout) : CtlCandidateUniversal(candidateLayout)
 
@@ -122,10 +122,10 @@ extension ctlInputMethod {
       return NSFont.systemFont(ofSize: size)
     }
 
-    ctlInputMethod.ctlCandidateCurrent.keyLabelFont = labelFont(
+    Self.ctlCandidateCurrent.keyLabelFont = labelFont(
       name: PrefMgr.shared.candidateKeyLabelFontName, size: keyLabelSize
     )
-    ctlInputMethod.ctlCandidateCurrent.candidateFont = ctlInputMethod.candidateFont(
+    Self.ctlCandidateCurrent.candidateFont = Self.candidateFont(
       name: PrefMgr.shared.candidateTextFontName, size: textSize
     )
 
@@ -133,14 +133,14 @@ extension ctlInputMethod {
     let keyLabels =
       candidateKeys.count > 4 ? Array(candidateKeys) : Array(CandidateKey.defaultKeys)
     let keyLabelSuffix = state.type == .ofAssociates ? "^" : ""
-    ctlInputMethod.ctlCandidateCurrent.keyLabels = keyLabels.map {
+    Self.ctlCandidateCurrent.keyLabels = keyLabels.map {
       CandidateKeyLabel(key: String($0), displayedText: String($0) + keyLabelSuffix)
     }
 
-    ctlInputMethod.ctlCandidateCurrent.delegate = self
-    ctlInputMethod.ctlCandidateCurrent.showPageButtons = PrefMgr.shared.showPageButtonsInCandidateWindow
-    ctlInputMethod.ctlCandidateCurrent.useLangIdentifier = PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier
-    ctlInputMethod.ctlCandidateCurrent.locale = {
+    Self.ctlCandidateCurrent.delegate = self
+    Self.ctlCandidateCurrent.showPageButtons = PrefMgr.shared.showPageButtonsInCandidateWindow
+    Self.ctlCandidateCurrent.useLangIdentifier = PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier
+    Self.ctlCandidateCurrent.locale = {
       switch inputMode {
         case .imeModeCHS: return "zh-Hans"
         case .imeModeCHT:
@@ -151,28 +151,28 @@ extension ctlInputMethod {
         default: return ""
       }
     }()
-    ctlInputMethod.ctlCandidateCurrent.reloadData()
+    Self.ctlCandidateCurrent.reloadData()
 
     if #available(macOS 10.14, *) {
       // Spotlight 視窗會擋住 IMK 選字窗，所以需要特殊處理。
-      if let ctlCandidateCurrent = ctlInputMethod.ctlCandidateCurrent as? CtlCandidateIMK {
+      if let ctlCandidateCurrent = Self.ctlCandidateCurrent as? CtlCandidateIMK {
         while ctlCandidateCurrent.windowLevel() <= client.windowLevel() {
           ctlCandidateCurrent.setWindowLevel(UInt64(max(0, client.windowLevel() + 1000)))
         }
       }
     }
 
-    ctlInputMethod.ctlCandidateCurrent.visible = true
+    Self.ctlCandidateCurrent.visible = true
 
     if isVerticalTyping {
-      ctlInputMethod.ctlCandidateCurrent.set(
+      Self.ctlCandidateCurrent.set(
         windowTopLeftPoint: NSPoint(
           x: lineHeightRect().origin.x + lineHeightRect().size.width + 4.0, y: lineHeightRect().origin.y - 4.0
         ),
         bottomOutOfScreenAdjustmentHeight: lineHeightRect().size.height + 4.0
       )
     } else {
-      ctlInputMethod.ctlCandidateCurrent.set(
+      Self.ctlCandidateCurrent.set(
         windowTopLeftPoint: NSPoint(x: lineHeightRect().origin.x, y: lineHeightRect().origin.y - 4.0),
         bottomOutOfScreenAdjustmentHeight: lineHeightRect().size.height + 4.0
       )
