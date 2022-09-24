@@ -18,25 +18,23 @@ extension SessionCtl: KeyHandlerDelegate {
     return client.bundleIdentifier() ?? ""
   }
 
-  func ctlCandidate() -> CtlCandidateProtocol { Self.ctlCandidateCurrent }
+  func candidateController() -> CtlCandidateProtocol { Self.ctlCandidateCurrent }
 
   func candidateSelectionCalledByKeyHandler(at index: Int) {
-    candidateSelected(at: index)
+    candidatePairSelected(at: index)
   }
 
   func performUserPhraseOperation(with state: IMEStateProtocol, addToFilter: Bool)
     -> Bool
   {
     guard state.type == .ofMarking else { return false }
-    let refInputModeReversed: Shared.InputMode =
-      (inputMode == .imeModeCHT) ? .imeModeCHS : .imeModeCHT
     if !LMMgr.writeUserPhrase(
       state.data.userPhraseDumped, inputMode: inputMode,
       areWeDuplicating: state.data.doesUserPhraseExist,
       areWeDeleting: addToFilter
     )
       || !LMMgr.writeUserPhrase(
-        state.data.userPhraseDumpedConverted, inputMode: refInputModeReversed,
+        state.data.userPhraseDumpedConverted, inputMode: inputMode.reversed,
         areWeDuplicating: false,
         areWeDeleting: addToFilter
       )
@@ -58,36 +56,18 @@ extension SessionCtl: CtlCandidateDelegate {
     ChineseConverter.kanjiConversionIfRequired(target)
   }
 
-  func candidateCountForController(_ controller: CtlCandidateProtocol) -> Int {
-    _ = controller  // 防止格式整理工具毀掉與此對應的參數。
-    if state.isCandidateContainer {
-      return state.candidates.count
-    }
-    return 0
+  func candidatePairs() -> [(String, String)] {
+    state.isCandidateContainer ? state.candidates : []
   }
 
-  /// 直接給出全部的候選字詞的字音配對陣列
-  /// - Parameter controller: 對應的控制器。因為有唯一解，所以填錯了也不會有影響。
-  /// - Returns: 候選字詞陣列（字音配對）。
-  func candidatesForController(_ controller: CtlCandidateProtocol) -> [(String, String)] {
-    _ = controller  // 防止格式整理工具毀掉與此對應的參數。
-    if state.isCandidateContainer {
-      return state.candidates
-    }
-    return .init()
-  }
-
-  func ctlCandidate(_ controller: CtlCandidateProtocol, candidateAtIndex index: Int)
-    -> (String, String)
-  {
-    _ = controller  // 防止格式整理工具毀掉與此對應的參數。
-    if state.isCandidateContainer {
+  func candidatePairAt(_ index: Int) -> (String, String) {
+    if state.isCandidateContainer, state.candidates.count > index {
       return state.candidates[index]
     }
     return ("", "")
   }
 
-  func candidateSelected(at index: Int) {
+  func candidatePairSelected(at index: Int) {
     if state.type == .ofSymbolTable, (0..<state.node.members.count).contains(index) {
       let node = state.node.members[index]
       if !node.members.isEmpty {

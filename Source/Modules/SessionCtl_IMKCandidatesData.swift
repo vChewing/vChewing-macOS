@@ -124,6 +124,6 @@ extension SessionCtl {
         handleIMKCandidatesSelected(state.candidates)
       }
     }
-    candidateSelected(at: indexDeducted)
+    candidatePairSelected(at: indexDeducted)
   }
 }
