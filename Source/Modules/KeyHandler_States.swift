@@ -114,7 +114,6 @@ extension KeyHandler {
   func buildAssociatePhraseState(
     withPair pair: Megrez.Compositor.KeyValuePaired
   ) -> IMEState {
-    // 上一行必須要用驚嘆號，否則 Xcode 會誤導你砍掉某些實際上必需的語句。
     IMEState.ofAssociates(
       candidates: buildAssociatePhraseArray(withPair: pair))
   }
