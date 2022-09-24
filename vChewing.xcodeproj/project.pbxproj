@@ -7,19 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5B00FA0C28DEC17200F6D436 /* ctlInputMethod_IMKCandidatesData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B00FA0B28DEC17200F6D436 /* ctlInputMethod_IMKCandidatesData.swift */; };
+		5B00FA0C28DEC17200F6D436 /* SessionCtl_IMKCandidatesData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B00FA0B28DEC17200F6D436 /* SessionCtl_IMKCandidatesData.swift */; };
 		5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */ = {isa = PBXBuildFile; fileRef = 5B09307828B6FC3B0021F8C5 /* shortcuts.html */; };
 		5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0AF8B427B2C8290096FE54 /* StringExtension.swift */; };
 		5B0EF55D28CDBF7100F8F7CE /* frmClientListMgr.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */; };
 		5B0EF55F28CDBF8E00F8F7CE /* ctlClientListMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0EF55E28CDBF8E00F8F7CE /* ctlClientListMgr.swift */; };
-		5B21176C287539BB000443A9 /* ctlInputMethod_HandleStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176B287539BB000443A9 /* ctlInputMethod_HandleStates.swift */; };
-		5B21176E28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176D28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift */; };
-		5B21177028753B9D000443A9 /* ctlInputMethod_Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176F28753B9D000443A9 /* ctlInputMethod_Delegates.swift */; };
+		5B21176C287539BB000443A9 /* SessionCtl_HandleStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176B287539BB000443A9 /* SessionCtl_HandleStates.swift */; };
+		5B21176E28753B35000443A9 /* SessionCtl_HandleDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176D28753B35000443A9 /* SessionCtl_HandleDisplay.swift */; };
+		5B21177028753B9D000443A9 /* SessionCtl_Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176F28753B9D000443A9 /* SessionCtl_Delegates.swift */; };
 		5B3133BF280B229700A4A505 /* KeyHandler_States.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3133BE280B229700A4A505 /* KeyHandler_States.swift */; };
 		5B40113928D7050D00A9D4CB /* Shared in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113828D7050D00A9D4CB /* Shared */; };
 		5B40113C28D71C0100A9D4CB /* Uninstaller in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113B28D71C0100A9D4CB /* Uninstaller */; };
 		5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */; };
-		5B6C141228A9D4B30098ADF8 /* ctlInputMethod_HandleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6C141128A9D4B30098ADF8 /* ctlInputMethod_HandleEvent.swift */; };
+		5B6C141228A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6C141128A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift */; };
 		5B73FB5E27B2BE1300E9BF49 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */; };
 		5B782EC4280C243C007276DE /* KeyHandler_HandleCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */; };
 		5B78EE0D28A562B4009456C1 /* suiPrefPaneDevZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B78EE0C28A562B4009456C1 /* suiPrefPaneDevZone.swift */; };
@@ -41,7 +41,7 @@
 		5BA9FD1327FEDB6B002DE248 /* suiPrefPaneDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0E27FEDB6B002DE248 /* suiPrefPaneDictionary.swift */; };
 		5BAD0CD527D701F6003D127F /* vChewingKeyLayout.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */; };
 		5BAEFAD028012565001F42C9 /* LMMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BAEFACF28012565001F42C9 /* LMMgr.swift */; };
-		5BB802DA27FABA8300CF1C19 /* ctlInputMethod_Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */; };
+		5BB802DA27FABA8300CF1C19 /* SessionCtl_Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB802D927FABA8300CF1C19 /* SessionCtl_Menu.swift */; };
 		5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75D27AED54C0023B93A /* Beep.m4a */; };
 		5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75E27AED54C0023B93A /* Fart.m4a */; };
 		5BBBB76D27AED5DB0023B93A /* frmAboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB76927AED5DB0023B93A /* frmAboutWindow.xib */; };
@@ -110,7 +110,7 @@
 		D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427F76B278CA1BA004A2160 /* AppDelegate.swift */; };
 		D47B92C027972AD100458394 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47B92BF27972AC800458394 /* main.swift */; };
 		D47F7DCE278BFB57002F9DD7 /* ctlPrefWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCD278BFB57002F9DD7 /* ctlPrefWindow.swift */; };
-		D4A13D5A27A59F0B003BE359 /* ctlInputMethod_Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A13D5927A59D5C003BE359 /* ctlInputMethod_Core.swift */; };
+		D4A13D5A27A59F0B003BE359 /* SessionCtl_Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A13D5927A59D5C003BE359 /* SessionCtl_Core.swift */; };
 		D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8827A838CF006DB1CF /* Localizable.strings */; };
 		D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8D27A838F0006DB1CF /* InfoPlist.strings */; };
 		D4F0BBDF279AF1AF0071253C /* ArchiveUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F0BBDE279AF1AF0071253C /* ArchiveUtil.swift */; };
@@ -155,7 +155,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		5B00FA0B28DEC17200F6D436 /* ctlInputMethod_IMKCandidatesData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_IMKCandidatesData.swift; sourceTree = "<group>"; };
+		5B00FA0B28DEC17200F6D436 /* SessionCtl_IMKCandidatesData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCtl_IMKCandidatesData.swift; sourceTree = "<group>"; };
 		5B04305327B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5B04305427B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5B04305527B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
@@ -195,9 +195,9 @@
 		5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHT.txt"; sourceTree = "<group>"; };
 		5B20430B28BEFC0C00BFC6FD /* vChewing.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewing.entitlements; sourceTree = "<group>"; };
 		5B20430C28BEFC1200BFC6FD /* vChewingPhraseEditor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewingPhraseEditor.entitlements; sourceTree = "<group>"; };
-		5B21176B287539BB000443A9 /* ctlInputMethod_HandleStates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_HandleStates.swift; sourceTree = "<group>"; };
-		5B21176D28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_HandleDisplay.swift; sourceTree = "<group>"; };
-		5B21176F28753B9D000443A9 /* ctlInputMethod_Delegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_Delegates.swift; sourceTree = "<group>"; };
+		5B21176B287539BB000443A9 /* SessionCtl_HandleStates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCtl_HandleStates.swift; sourceTree = "<group>"; };
+		5B21176D28753B35000443A9 /* SessionCtl_HandleDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCtl_HandleDisplay.swift; sourceTree = "<group>"; };
+		5B21176F28753B9D000443A9 /* SessionCtl_Delegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCtl_Delegates.swift; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
 		5B2F2BB3286216A500B8557B /* vChewingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vChewingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
@@ -206,7 +206,7 @@
 		5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Uninstaller; path = Packages/vChewing_Uninstaller; sourceTree = "<group>"; };
 		5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B65B919284D0185007C558B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		5B6C141128A9D4B30098ADF8 /* ctlInputMethod_HandleEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_HandleEvent.swift; sourceTree = "<group>"; };
+		5B6C141128A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCtl_HandleEvent.swift; sourceTree = "<group>"; };
 		5B73FB5427B2BD6900E9BF49 /* PhraseEditor-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "PhraseEditor-Info.plist"; path = "UserPhraseEditor/PhraseEditor-Info.plist"; sourceTree = SOURCE_ROOT; };
 		5B73FB5F27B2BE1300E9BF49 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_HandleCandidate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -230,7 +230,7 @@
 		5BA9FD0D27FEDB6B002DE248 /* suiPrefPaneExperience.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = suiPrefPaneExperience.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BA9FD0E27FEDB6B002DE248 /* suiPrefPaneDictionary.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = suiPrefPaneDictionary.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BAEFACF28012565001F42C9 /* LMMgr.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = LMMgr.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlInputMethod_Menu.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		5BB802D927FABA8300CF1C19 /* SessionCtl_Menu.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = SessionCtl_Menu.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BBBB75D27AED54C0023B93A /* Beep.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.m4a; sourceTree = "<group>"; };
 		5BBBB75E27AED54C0023B93A /* Fart.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.m4a; sourceTree = "<group>"; };
 		5BBBB76A27AED5DB0023B93A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmAboutWindow.xib; sourceTree = "<group>"; };
@@ -313,7 +313,7 @@
 		D427F76B278CA1BA004A2160 /* AppDelegate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D47B92BF27972AC800458394 /* main.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = main.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D47F7DCD278BFB57002F9DD7 /* ctlPrefWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlPrefWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		D4A13D5927A59D5C003BE359 /* ctlInputMethod_Core.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlInputMethod_Core.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		D4A13D5927A59D5C003BE359 /* SessionCtl_Core.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = SessionCtl_Core.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D4E33D8927A838CF006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D4E33D8E27A838F0006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D4F0BBDE279AF1AF0071253C /* ArchiveUtil.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ArchiveUtil.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -662,13 +662,6 @@
 				5B62A33A27AE7C7500A19448 /* WindowControllers */,
 				D427F76B278CA1BA004A2160 /* AppDelegate.swift */,
 				5B8457A02871ADBE00C93B01 /* ChineseConverterBridge.swift */,
-				D4A13D5927A59D5C003BE359 /* ctlInputMethod_Core.swift */,
-				5B21176F28753B9D000443A9 /* ctlInputMethod_Delegates.swift */,
-				5B21176D28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift */,
-				5B6C141128A9D4B30098ADF8 /* ctlInputMethod_HandleEvent.swift */,
-				5B21176B287539BB000443A9 /* ctlInputMethod_HandleStates.swift */,
-				5B00FA0B28DEC17200F6D436 /* ctlInputMethod_IMKCandidatesData.swift */,
-				5BB802D927FABA8300CF1C19 /* ctlInputMethod_Menu.swift */,
 				5BF56F9728C39A2700DD6839 /* IMEState.swift */,
 				5BF56F9928C39D1800DD6839 /* IMEStateData.swift */,
 				5BD0113C2818543900609769 /* KeyHandler_Core.swift */,
@@ -680,6 +673,13 @@
 				D47B92BF27972AC800458394 /* main.swift */,
 				5B963CA728D5DB1400DCEE88 /* PrefMgr_Core.swift */,
 				5BCCAFF728DB19A300AB1B27 /* PrefMgr_Extension.swift */,
+				D4A13D5927A59D5C003BE359 /* SessionCtl_Core.swift */,
+				5B21176F28753B9D000443A9 /* SessionCtl_Delegates.swift */,
+				5B21176D28753B35000443A9 /* SessionCtl_HandleDisplay.swift */,
+				5B6C141128A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift */,
+				5B21176B287539BB000443A9 /* SessionCtl_HandleStates.swift */,
+				5B00FA0B28DEC17200F6D436 /* SessionCtl_IMKCandidatesData.swift */,
+				5BB802D927FABA8300CF1C19 /* SessionCtl_Menu.swift */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -1056,18 +1056,18 @@
 				5BF56F9828C39A2700DD6839 /* IMEState.swift in Sources */,
 				5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */,
 				D47B92C027972AD100458394 /* main.swift in Sources */,
-				D4A13D5A27A59F0B003BE359 /* ctlInputMethod_Core.swift in Sources */,
+				D4A13D5A27A59F0B003BE359 /* SessionCtl_Core.swift in Sources */,
 				5B0EF55F28CDBF8E00F8F7CE /* ctlClientListMgr.swift in Sources */,
-				5B21177028753B9D000443A9 /* ctlInputMethod_Delegates.swift in Sources */,
-				5B21176E28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift in Sources */,
+				5B21177028753B9D000443A9 /* SessionCtl_Delegates.swift in Sources */,
+				5B21176E28753B35000443A9 /* SessionCtl_HandleDisplay.swift in Sources */,
 				5BA9FD1027FEDB6B002DE248 /* suiPrefPaneKeyboard.swift in Sources */,
 				5B3133BF280B229700A4A505 /* KeyHandler_States.swift in Sources */,
 				5B78EE0D28A562B4009456C1 /* suiPrefPaneDevZone.swift in Sources */,
-				5B6C141228A9D4B30098ADF8 /* ctlInputMethod_HandleEvent.swift in Sources */,
+				5B6C141228A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift in Sources */,
 				D47F7DCE278BFB57002F9DD7 /* ctlPrefWindow.swift in Sources */,
 				5BD0113D2818543900609769 /* KeyHandler_Core.swift in Sources */,
 				5BF56F9A28C39D1800DD6839 /* IMEStateData.swift in Sources */,
-				5B21176C287539BB000443A9 /* ctlInputMethod_HandleStates.swift in Sources */,
+				5B21176C287539BB000443A9 /* SessionCtl_HandleStates.swift in Sources */,
 				5BAEFAD028012565001F42C9 /* LMMgr.swift in Sources */,
 				5B782EC4280C243C007276DE /* KeyHandler_HandleCandidate.swift in Sources */,
 				5BA9FD0F27FEDB6B002DE248 /* suiPrefPaneGeneral.swift in Sources */,
@@ -1076,9 +1076,9 @@
 				5B8457A12871ADBE00C93B01 /* ChineseConverterBridge.swift in Sources */,
 				5BA9FD1327FEDB6B002DE248 /* suiPrefPaneDictionary.swift in Sources */,
 				5BFDF011289635C100417BBC /* IMKCandidatesImpl.swift in Sources */,
-				5BB802DA27FABA8300CF1C19 /* ctlInputMethod_Menu.swift in Sources */,
+				5BB802DA27FABA8300CF1C19 /* SessionCtl_Menu.swift in Sources */,
 				5BE377A0288FED8D0037365B /* KeyHandler_HandleComposition.swift in Sources */,
-				5B00FA0C28DEC17200F6D436 /* ctlInputMethod_IMKCandidatesData.swift in Sources */,
+				5B00FA0C28DEC17200F6D436 /* SessionCtl_IMKCandidatesData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

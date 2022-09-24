@@ -23,8 +23,8 @@ import Voltaire
 /// 檢查委任物件是否實現了方法：若存在的話，就調用委任物件內的版本。
 /// - Remark: 在輸入法的主函式中分配的 IMKServer 型別為客體應用程式創建的每個
 /// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
-@objc(ctlInputMethod)  // 必須加上 ObjC，因為 IMK 是用 ObjC 寫的。
-class ctlInputMethod: IMKInputController {
+@objc(SessionCtl)  // 必須加上 ObjC，因為 IMK 是用 ObjC 寫的。
+class SessionCtl: IMKInputController {
   /// 標記狀態來聲明目前新增的詞彙是否需要賦以非常低的權重。
   static var areWeNerfing = false
 
@@ -40,7 +40,7 @@ class ctlInputMethod: IMKInputController {
 
   // MARK: -
 
-  /// 當前這個 ctlInputMethod 副本是否處於英數輸入模式。
+  /// 當前這個 SessionCtl 副本是否處於英數輸入模式。
   var isASCIIMode = false {
     didSet {
       resetKeyHandler()
@@ -116,7 +116,7 @@ class ctlInputMethod: IMKInputController {
 
 // MARK: - 工具函式
 
-extension ctlInputMethod {
+extension SessionCtl {
   /// 指定鍵盤佈局。
   func setKeyLayout() {
     guard let client = client() else { return }
@@ -145,7 +145,7 @@ extension ctlInputMethod {
 
 // MARK: - IMKStateSetting 協定規定的方法
 
-extension ctlInputMethod {
+extension SessionCtl {
   /// 啟用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   override func activateServer(_ sender: Any!) {
@@ -227,9 +227,9 @@ extension ctlInputMethod {
 
 // MARK: - IMKServerInput 協定規定的方法（僅部分）
 
-// 註：handle(_ event:) 位於 ctlInputMethod_HandleEvent.swift。
+// 註：handle(_ event:) 位於 SessionCtl_HandleEvent.swift。
 
-extension ctlInputMethod {
+extension SessionCtl {
   /// 該函式的回饋結果決定了輸入法會攔截且捕捉哪些類型的輸入裝置操作事件。
   ///
   /// 一個客體應用會與輸入法共同確認某個輸入裝置操作事件是否可以觸發輸入法內的某個方法。預設情況下，
