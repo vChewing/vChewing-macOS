@@ -9,11 +9,9 @@
 import Cocoa
 
 public protocol CtlCandidateDelegate: AnyObject {
-  func candidateCountForController(_ controller: CtlCandidateProtocol) -> Int
-  func candidatesForController(_ controller: CtlCandidateProtocol) -> [(String, String)]
-  func ctlCandidate(_ controller: CtlCandidateProtocol, candidateAtIndex index: Int)
-    -> (String, String)
-  func candidateSelected(at index: Int)
+  func candidatePairs() -> [(String, String)]
+  func candidatePairAt(_ index: Int) -> (String, String)
+  func candidatePairSelected(at index: Int)
   func buzz()
   func kanjiConversionIfRequired(_ target: String) -> String
 }
