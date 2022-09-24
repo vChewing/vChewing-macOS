@@ -221,6 +221,15 @@ extension vChewingLM {
       return !unigramsFor(key: key).isEmpty
     }
 
+    /// 根據給定的索引鍵和資料值，確認是否有該具體的資料值在庫。
+    /// - Parameters:
+    ///   - key: 索引鍵。
+    ///   - value: 資料值。
+    /// - Returns: 是否在庫。
+    public func hasKeyValuePairFor(key: String, value: String) -> Bool {
+      unigramsFor(key: key).map(\.value).contains(value)
+    }
+
     /// 給定讀音字串，讓 LMI 給出對應的經過處理的單元圖陣列。
     /// - Parameter key: 給定的讀音字串。
     /// - Returns: 對應的經過處理的單元圖陣列。
