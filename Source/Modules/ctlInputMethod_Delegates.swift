@@ -50,17 +50,6 @@ extension ctlInputMethod: KeyHandlerDelegate {
 // MARK: - Candidate Controller Delegate
 
 extension ctlInputMethod: ctlCandidateDelegate {
-  var isAssociatedPhrasesState: Bool { state.type == .ofAssociates }
-
-  /// 完成 handle() 函式本該完成的內容，但去掉了與 IMK 選字窗有關的判斷語句。
-  /// 這樣分開處理很有必要，不然 handle() 函式會陷入無限迴圈。
-  /// 該函式僅由 IMK 選字窗來存取，且對接給 commonEventHandler()。
-  /// - Parameter event: 由 IMK 選字窗接收的裝置操作輸入事件。
-  /// - Returns: 回「`true`」以將該案件已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
-  @discardableResult func sharedEventHandler(_ event: NSEvent) -> Bool {
-    commonEventHandler(event)
-  }
-
   func candidateCountForController(_ controller: ctlCandidateProtocol) -> Int {
     _ = controller  // 防止格式整理工具毀掉與此對應的參數。
     if state.isCandidateContainer {
