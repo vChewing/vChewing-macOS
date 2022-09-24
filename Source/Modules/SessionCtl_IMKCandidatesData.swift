@@ -11,7 +11,7 @@ import Tekkon
 
 // MARK: - IMKCandidates 功能擴充
 
-extension ctlInputMethod {
+extension SessionCtl {
   /// 生成 IMK 選字窗專用的候選字串陣列。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: IMK 選字窗專用的候選字串陣列。

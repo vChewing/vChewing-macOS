@@ -9,7 +9,7 @@
 import LangModelAssembly
 import Shared
 
-/// 用以呈現輸入法控制器（ctlInputMethod）的各種狀態。
+/// 用以呈現輸入法控制器（SessionCtl）的各種狀態。
 ///
 /// 從實際角度來看，輸入法屬於有限態械（Finite State Machine）。其藉由滑鼠/鍵盤
 /// 等輸入裝置接收輸入訊號，據此切換至對應的狀態，再根據狀態更新使用者介面內容，
@@ -49,7 +49,7 @@ public struct IMEState: IMEStateProtocol {
   init(_ data: StateDataProtocol = StateData() as StateDataProtocol, type: StateType = .ofEmpty) {
     self.data = data
     self.type = type
-    isVerticalTyping = ctlInputMethod.isVerticalTyping
+    isVerticalTyping = SessionCtl.isVerticalTyping
   }
 
   init(_ data: StateDataProtocol = StateData() as StateDataProtocol, type: StateType = .ofEmpty, node: CandidateNode) {
@@ -83,10 +83,10 @@ extension IMEState {
     var result = IMEState(type: .ofNotEmpty)
     // 注意資料的設定順序，一定得先設定 displayTextSegments。
     result.data.displayTextSegments = displayTextSegments.map {
-      if !ctlInputMethod.isVerticalTyping { return $0 }
+      if !SessionCtl.isVerticalTyping { return $0 }
       guard PrefMgr.shared.hardenVerticalPunctuations else { return $0 }
       var neta = $0
-      ChineseConverter.hardenVerticalPunctuations(target: &neta, convert: ctlInputMethod.isVerticalTyping)
+      ChineseConverter.hardenVerticalPunctuations(target: &neta, convert: SessionCtl.isVerticalTyping)
       return neta
     }
 

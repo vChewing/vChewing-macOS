@@ -23,7 +23,7 @@ Regarding pinyin input support, we only support: Hanyu Pinyin, Secondary Pinyin,
 
 ### §1. 初期化
 
-在你的 ctlInputMethod (InputMethodController) 或者 KeyHandler 內初期化一份 Tekkon.Composer 注拼槽副本（這裡將該副本命名為「`_composer`」）。由於 Tekkon.Composer 的型別是 Struct 型別，所以其副本必須為變數（var），否則無法自我 mutate。
+在你的 IMKInputController (InputMethodController) 或者 KeyHandler 內初期化一份 Tekkon.Composer 注拼槽副本（這裡將該副本命名為「`_composer`」）。由於 Tekkon.Composer 的型別是 Struct 型別，所以其副本必須為變數（var），否則無法自我 mutate。
 
 以 KeyHandler 為例：
 ```swift
@@ -34,10 +34,10 @@ class KeyHandler: NSObject {
 }
 ```
 
-以 ctlInputMethod 為例：
+以 IMKInputController 為例：
 ```swift
-@objc(ctlInputMethod)  // 根據 info.plist 內的情況來確定型別的命名
-class ctlInputMethod: IMKInputController {
+@objc(IMKMyInputController)  // 根據 info.plist 內的情況來確定型別的命名
+class IMKMyInputController: IMKInputController {
   // 先設定好變數
   var _composer: Tekkon.Composer = .init()
   ...
@@ -45,7 +45,7 @@ class ctlInputMethod: IMKInputController {
 ```
 
 
-由於 Swift 會在某個大副本（KeyHandler 或者 ctlInputMethod 副本）被銷毀的時候自動銷毀其中的全部副本，所以 Tekkon.Composer 的副本初期化沒必要寫在 init() 當中。但你很可能會想在 init() 時指定 Tekkon.Composer 所使用的注音排列（是大千？還是倚天傳統？還是神通？等）。
+由於 Swift 會在某個大副本（KeyHandler 或者 IMKInputController 副本）被銷毀的時候自動銷毀其中的全部副本，所以 Tekkon.Composer 的副本初期化沒必要寫在 init() 當中。但你很可能會想在 init() 時指定 Tekkon.Composer 所使用的注音排列（是大千？還是倚天傳統？還是神通？等）。
 
 這裡就需要在 _composer 這個副本所在的型別當中額外寫一個過程函式。
 
@@ -159,9 +159,9 @@ final class TekkonTests: XCTestCase {
 
 #### // 2. 訊號處理
 
-無論是 KeyHandler 還是 ctlInputMethod 都得要處理被傳入的 NSEvent 當中的 charCode 訊號。
+無論是 KeyHandler 還是 IMKInputController 都得要處理被傳入的 NSEvent 當中的 charCode 訊號。
 
-比如 ctlInputMethod 內：
+比如 IMKInputController 內：
 ```swift
 func handleInputText(_ inputText: String?, key keyCode: Int, modifiers flags: Int, client: Any?) -> Bool {
 ...

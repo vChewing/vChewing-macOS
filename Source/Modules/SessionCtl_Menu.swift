@@ -21,7 +21,7 @@ extension Bool {
 
 // 因為選單部分的內容又臭又長，所以就單獨拉到一個檔案內管理了。
 
-extension ctlInputMethod {
+extension SessionCtl {
   override func menu() -> NSMenu! {
     let optionKeyPressed = NSEvent.modifierFlags.contains(.option)
 
@@ -192,7 +192,7 @@ extension ctlInputMethod {
 
 // MARK: - IME Menu Items
 
-extension ctlInputMethod {
+extension SessionCtl {
   @objc override func showPreferences(_: Any?) {
     if #unavailable(macOS 10.15) {
       showLegacyPreferences()

@@ -8,7 +8,7 @@
 
 import Shared
 
-// MARK: Auto parameter fix procedures, executed everytime on ctlInputMethod.activateServer().
+// MARK: Auto parameter fix procedures, executed everytime on SessionCtl.activateServer().
 
 extension PrefMgr {
   public func fixOddPreferences() {

@@ -14,7 +14,7 @@ import Shared
 
 // MARK: - Facade
 
-extension ctlInputMethod {
+extension SessionCtl {
   /// 接受所有鍵鼠事件為 NSEvent，讓輸入法判斷是否要處理、該怎樣處理。
   /// - Parameters:
   ///   - event: 裝置操作輸入事件，可能會是 nil。
@@ -112,7 +112,7 @@ extension ctlInputMethod {
 
 // MARK: - Private functions
 
-extension ctlInputMethod {
+extension SessionCtl {
   /// 完成 handle() 函式本該完成的內容，但去掉了與 IMK 選字窗有關的判斷語句。
   /// 這樣分開處理很有必要，不然 handle() 函式會陷入無限迴圈。
   /// - Parameter event: 由 IMK 選字窗接收的裝置操作輸入事件。
@@ -142,7 +142,7 @@ extension ctlInputMethod {
     // IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
     // 這樣可以讓 interpretKeyEvents() 函式自行判斷：
     // - 是就地交給 imkCandidates.interpretKeyEvents() 處理？
-    // - 還是藉由 delegate 扔回 ctlInputMethod 給 KeyHandler 處理？
+    // - 還是藉由 delegate 扔回 SessionCtl 給 KeyHandler 處理？
     if let imkCandidates = Self.ctlCandidateCurrent as? CtlCandidateIMK, imkCandidates.visible {
       let event: NSEvent = CtlCandidateIMK.replaceNumPadKeyCodes(target: eventToDeal) ?? eventToDeal
 

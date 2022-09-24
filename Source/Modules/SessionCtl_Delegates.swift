@@ -12,7 +12,7 @@ import Shared
 
 // MARK: - KeyHandler Delegate
 
-extension ctlInputMethod: KeyHandlerDelegate {
+extension SessionCtl: KeyHandlerDelegate {
   var clientBundleIdentifier: String {
     guard let client = client() else { return "" }
     return client.bundleIdentifier() ?? ""
@@ -49,7 +49,7 @@ extension ctlInputMethod: KeyHandlerDelegate {
 
 // MARK: - Candidate Controller Delegate
 
-extension ctlInputMethod: CtlCandidateDelegate {
+extension SessionCtl: CtlCandidateDelegate {
   func buzz() {
     IMEApp.buzz()
   }

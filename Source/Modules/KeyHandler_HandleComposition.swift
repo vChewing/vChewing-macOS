@@ -145,7 +145,7 @@ extension KeyHandler {
           stateCallback(candidateState)
         }
       }
-      // 將「這個按鍵訊號已經被輸入法攔截處理了」的結果藉由 ctlInputMethod 回報給 IMK。
+      // 將「這個按鍵訊號已經被輸入法攔截處理了」的結果藉由 SessionCtl 回報給 IMK。
       return true
     }
 
