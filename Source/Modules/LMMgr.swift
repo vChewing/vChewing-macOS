@@ -8,7 +8,6 @@
 
 import BookmarkManager
 import LangModelAssembly
-import Megrez
 import NotifierUI
 import Shared
 
@@ -245,15 +244,11 @@ public enum LMMgr {
     mode: Shared.InputMode,
     key unigramKey: String
   ) -> Bool {
-    let unigrams: [Megrez.Unigram] =
-      (mode == .imeModeCHT)
-      ? Self.lmCHT.unigramsFor(key: unigramKey) : Self.lmCHS.unigramsFor(key: unigramKey)
-    for unigram in unigrams {
-      if unigram.value == userPhrase {
-        return true
-      }
+    switch mode {
+      case .imeModeCHS: return lmCHS.hasKeyValuePairFor(key: unigramKey, value: userPhrase)
+      case .imeModeCHT: return lmCHT.hasKeyValuePairFor(key: unigramKey, value: userPhrase)
+      case .imeModeNULL: return false
     }
-    return false
   }
 
   public static func setPhraseReplacementEnabled(_ state: Bool) {
