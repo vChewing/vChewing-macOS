@@ -13,6 +13,7 @@ import PopupCompositionBuffer
 import Shared
 import ShiftKeyUpChecker
 import TooltipUI
+import Voltaire
 
 /// 輸入法控制模組，乃在輸入法端用以控制輸入行為的基礎型別。
 ///
@@ -28,8 +29,8 @@ class ctlInputMethod: IMKInputController {
   static var areWeNerfing = false
 
   /// 目前在用的的選字窗副本。
-  static var ctlCandidateCurrent: ctlCandidateProtocol =
-    PrefMgr.shared.useIMKCandidateWindow ? ctlCandidateIMK.init(.horizontal) : ctlCandidateUniversal.init(.horizontal)
+  static var ctlCandidateCurrent: CtlCandidateProtocol =
+    PrefMgr.shared.useIMKCandidateWindow ? CtlCandidateIMK(.horizontal) : CtlCandidateUniversal(.horizontal)
 
   /// 工具提示視窗的共用副本。
   static var tooltipInstance = TooltipUI()

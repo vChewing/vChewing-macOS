@@ -48,7 +48,7 @@ public class NSAttributedTextView: NSView {
   }
 
   public var direction: writingDirection = .horizontal
-  public var fontSize: CGFloat = NSFont.systemFontSize {
+  public var fontSize: Double = NSFont.systemFontSize {
     didSet {
       attributes[.font] = NSFont.systemFont(ofSize: fontSize)
     }

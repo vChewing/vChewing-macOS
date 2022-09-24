@@ -168,7 +168,7 @@ public class PopupCompositionBuffer: NSWindowController {
       with: NSSize(width: 1600.0, height: 1600.0),
       options: [.usesLineFragmentOrigin, .usesFontLeading]
     )
-    rect.size.width = max(rect.size.width, 20 * CGFloat(attrString.string.count)) + 2
+    rect.size.width = max(rect.size.width, 20 * Double(attrString.string.count)) + 2
     rect.size.height *= 1.2
     rect.size.height = max(22, rect.size.height)
     if isTypingDirectionVertical {

@@ -73,7 +73,7 @@ public enum ChineseConverter {
   ///
   /// - Parameter string: Text in Original Script.
   /// - Returns: Text converted to Different Script.
-  public static func crossConvert(_ string: String) -> String? {
+  public static func crossConvert(_ string: String) -> String {
     switch IMEApp.currentInputMode {
       case .imeModeCHS:
         return shared.convert(string, to: .zhHantTW)

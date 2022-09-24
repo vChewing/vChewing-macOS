@@ -52,7 +52,7 @@ public class TooltipUI: NSWindowController {
 
   public func show(
     tooltip: String = "", at point: NSPoint,
-    bottomOutOfScreenAdjustmentHeight heightDelta: CGFloat,
+    bottomOutOfScreenAdjustmentHeight heightDelta: Double,
     direction: NSAttributedTooltipTextView.writingDirection = .horizontal
   ) {
     self.direction = direction
@@ -118,7 +118,7 @@ public class TooltipUI: NSWindowController {
     window?.orderOut(nil)
   }
 
-  private func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight heightDelta: CGFloat) {
+  private func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight heightDelta: Double) {
     guard let window = window else { return }
     let windowSize = window.frame.size
 

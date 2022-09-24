@@ -54,7 +54,7 @@ extension Preferences {
         }
       }
       .modifier(Section.LabelWidthModifier(maximumWidth: $maximumLabelWidth))
-      .frame(width: CGFloat(contentWidth), alignment: .leading)
+      .frame(width: Double(contentWidth), alignment: .leading)
       .padding(.vertical, 20)
       .padding(.horizontal, 30)
     }
@@ -65,9 +65,9 @@ extension Preferences {
       if index != sections.count - 1, sections[index].bottomDivider {
         Divider()
           // Strangely doesn't work without width being specified. Probably because of custom alignment.
-          .frame(width: CGFloat(contentWidth), height: 20)
+          .frame(width: Double(contentWidth), height: 20)
           .alignmentGuide(.preferenceSectionLabel) {
-            $0[.leading] + CGFloat(max(minimumLabelWidth, maximumLabelWidth))
+            $0[.leading] + Double(max(minimumLabelWidth, maximumLabelWidth))
           }
       }
     }

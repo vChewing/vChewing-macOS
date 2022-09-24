@@ -77,8 +77,8 @@ final class SegmentedControlStyleViewController: NSViewController, PreferencesSt
       )
     }()
 
-    let segmentBorderWidth = CGFloat(preferencePanes.count) + 1
-    let segmentWidth = segmentSize.width * CGFloat(preferencePanes.count) + segmentBorderWidth
+    let segmentBorderWidth = Double(preferencePanes.count) + 1
+    let segmentWidth = segmentSize.width * Double(preferencePanes.count) + segmentBorderWidth
     let segmentHeight = segmentSize.height
     segmentedControl.frame = CGRect(x: 0, y: 0, width: segmentWidth, height: segmentHeight)
 

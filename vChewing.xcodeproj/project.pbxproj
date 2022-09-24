@@ -15,12 +15,10 @@
 		5B21176C287539BB000443A9 /* ctlInputMethod_HandleStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176B287539BB000443A9 /* ctlInputMethod_HandleStates.swift */; };
 		5B21176E28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176D28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift */; };
 		5B21177028753B9D000443A9 /* ctlInputMethod_Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176F28753B9D000443A9 /* ctlInputMethod_Delegates.swift */; };
-		5B242403284B0D6500520FE4 /* ctlCandidateUniversal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B242402284B0D6500520FE4 /* ctlCandidateUniversal.swift */; };
 		5B3133BF280B229700A4A505 /* KeyHandler_States.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3133BE280B229700A4A505 /* KeyHandler_States.swift */; };
 		5B40113928D7050D00A9D4CB /* Shared in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113828D7050D00A9D4CB /* Shared */; };
 		5B40113C28D71C0100A9D4CB /* Uninstaller in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113B28D71C0100A9D4CB /* Uninstaller */; };
 		5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */; };
-		5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A34027AE7CD900A19448 /* ctlCandidate.swift */; };
 		5B6C141228A9D4B30098ADF8 /* ctlInputMethod_HandleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6C141128A9D4B30098ADF8 /* ctlInputMethod_HandleEvent.swift */; };
 		5B73FB5E27B2BE1300E9BF49 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */; };
 		5B782EC4280C243C007276DE /* KeyHandler_HandleCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B782EC3280C243C007276DE /* KeyHandler_HandleCandidate.swift */; };
@@ -34,6 +32,8 @@
 		5B963CA328D5C23600DCEE88 /* SwiftExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 5B963CA228D5C23600DCEE88 /* SwiftExtension */; };
 		5B963CA828D5DB1400DCEE88 /* PrefMgr_Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B963CA728D5DB1400DCEE88 /* PrefMgr_Core.swift */; };
 		5B98114828D6198700CBC605 /* PinyinPhonaConverter in Frameworks */ = {isa = PBXBuildFile; productRef = 5B98114728D6198700CBC605 /* PinyinPhonaConverter */; };
+		5BA8C30328DF0360004C5CC4 /* CandidateWindow in Frameworks */ = {isa = PBXBuildFile; productRef = 5BA8C30228DF0360004C5CC4 /* CandidateWindow */; };
+		5BA8C30528DF0364004C5CC4 /* Voltaire in Frameworks */ = {isa = PBXBuildFile; productRef = 5BA8C30428DF0364004C5CC4 /* Voltaire */; };
 		5BA9FD0F27FEDB6B002DE248 /* suiPrefPaneGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0A27FEDB6B002DE248 /* suiPrefPaneGeneral.swift */; };
 		5BA9FD1027FEDB6B002DE248 /* suiPrefPaneKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0B27FEDB6B002DE248 /* suiPrefPaneKeyboard.swift */; };
 		5BA9FD1127FEDB6B002DE248 /* ctlPrefUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0C27FEDB6B002DE248 /* ctlPrefUI.swift */; };
@@ -98,7 +98,7 @@
 		5BFC63CC28D49BBC004A77B7 /* UpdateSputnik in Frameworks */ = {isa = PBXBuildFile; productRef = 5BFC63CB28D49BBC004A77B7 /* UpdateSputnik */; };
 		5BFC63CF28D4ACA3004A77B7 /* LangModelAssembly in Frameworks */ = {isa = PBXBuildFile; productRef = 5BFC63CE28D4ACA3004A77B7 /* LangModelAssembly */; };
 		5BFC63D128D4B9F7004A77B7 /* IMKUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 5BFC63D028D4B9F7004A77B7 /* IMKUtils */; };
-		5BFDF011289635C100417BBC /* ctlCandidateIMK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFDF010289635C100417BBC /* ctlCandidateIMK.swift */; };
+		5BFDF011289635C100417BBC /* IMKCandidatesImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFDF010289635C100417BBC /* IMKCandidatesImpl.swift */; };
 		6A187E2616004C5900466B2E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A187E2816004C5900466B2E /* MainMenu.xib */; };
 		6A225A1F23679F2600F685C6 /* NotarizedArchives in Resources */ = {isa = PBXBuildFile; fileRef = 6A225A1E23679F2600F685C6 /* NotarizedArchives */; };
 		6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
@@ -198,7 +198,6 @@
 		5B21176B287539BB000443A9 /* ctlInputMethod_HandleStates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_HandleStates.swift; sourceTree = "<group>"; };
 		5B21176D28753B35000443A9 /* ctlInputMethod_HandleDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_HandleDisplay.swift; sourceTree = "<group>"; };
 		5B21176F28753B9D000443A9 /* ctlInputMethod_Delegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_Delegates.swift; sourceTree = "<group>"; };
-		5B242402284B0D6500520FE4 /* ctlCandidateUniversal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlCandidateUniversal.swift; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
 		5B2F2BB3286216A500B8557B /* vChewingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vChewingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
@@ -206,7 +205,6 @@
 		5B3133BE280B229700A4A505 /* KeyHandler_States.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_States.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Uninstaller; path = Packages/vChewing_Uninstaller; sourceTree = "<group>"; };
 		5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5B62A34027AE7CD900A19448 /* ctlCandidate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlCandidate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B65B919284D0185007C558B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		5B6C141128A9D4B30098ADF8 /* ctlInputMethod_HandleEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlInputMethod_HandleEvent.swift; sourceTree = "<group>"; };
 		5B73FB5427B2BD6900E9BF49 /* PhraseEditor-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "PhraseEditor-Info.plist"; path = "UserPhraseEditor/PhraseEditor-Info.plist"; sourceTree = SOURCE_ROOT; };
@@ -224,6 +222,8 @@
 		5B963CA128D5C22D00DCEE88 /* vChewing_SwiftExtension */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_SwiftExtension; path = Packages/vChewing_SwiftExtension; sourceTree = "<group>"; };
 		5B963CA728D5DB1400DCEE88 /* PrefMgr_Core.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefMgr_Core.swift; sourceTree = "<group>"; };
 		5B98114628D6198000CBC605 /* vChewing_PinyinPhonaConverter */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_PinyinPhonaConverter; path = Packages/vChewing_PinyinPhonaConverter; sourceTree = "<group>"; };
+		5BA8C30028DEFE4F004C5CC4 /* OpenVanilla_Voltaire */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = OpenVanilla_Voltaire; path = Packages/OpenVanilla_Voltaire; sourceTree = "<group>"; };
+		5BA8C30128DEFE4F004C5CC4 /* vChewing_CandidateWindow */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_CandidateWindow; path = Packages/vChewing_CandidateWindow; sourceTree = "<group>"; };
 		5BA9FD0A27FEDB6B002DE248 /* suiPrefPaneGeneral.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = suiPrefPaneGeneral.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BA9FD0B27FEDB6B002DE248 /* suiPrefPaneKeyboard.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = suiPrefPaneKeyboard.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BA9FD0C27FEDB6B002DE248 /* ctlPrefUI.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlPrefUI.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -298,7 +298,7 @@
 		5BFC63C728D49511004A77B7 /* vChewing_IMKUtils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_IMKUtils; path = Packages/vChewing_IMKUtils; sourceTree = "<group>"; };
 		5BFC63CA28D49B2B004A77B7 /* vChewing_UpdateSputnik */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_UpdateSputnik; path = Packages/vChewing_UpdateSputnik; sourceTree = "<group>"; };
 		5BFC63CD28D4AC98004A77B7 /* vChewing_LangModelAssembly */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_LangModelAssembly; path = Packages/vChewing_LangModelAssembly; sourceTree = "<group>"; };
-		5BFDF010289635C100417BBC /* ctlCandidateIMK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ctlCandidateIMK.swift; sourceTree = "<group>"; };
+		5BFDF010289635C100417BBC /* IMKCandidatesImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMKCandidatesImpl.swift; sourceTree = "<group>"; };
 		5BFDF48C27B51867009523B6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Main.strings"; sourceTree = "<group>"; };
 		6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A0D4EF515FC0DA600ABF4B3 /* IME-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IME-Info.plist"; sourceTree = "<group>"; };
@@ -357,7 +357,9 @@
 				5B40113928D7050D00A9D4CB /* Shared in Frameworks */,
 				5BFC63C628D48806004A77B7 /* NSAttributedTextView in Frameworks */,
 				5BDB7A3B28D4824A001AC277 /* FolderMonitor in Frameworks */,
+				5BA8C30328DF0360004C5CC4 /* CandidateWindow in Frameworks */,
 				5BC5E01E28DDE4770094E427 /* NotifierUI in Frameworks */,
+				5BA8C30528DF0364004C5CC4 /* Voltaire in Frameworks */,
 				5B40113C28D71C0100A9D4CB /* Uninstaller in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -468,9 +470,7 @@
 		5B62A33E27AE7CD900A19448 /* CandidateUI */ = {
 			isa = PBXGroup;
 			children = (
-				5B62A34027AE7CD900A19448 /* ctlCandidate.swift */,
-				5B242402284B0D6500520FE4 /* ctlCandidateUniversal.swift */,
-				5BFDF010289635C100417BBC /* ctlCandidateIMK.swift */,
+				5BFDF010289635C100417BBC /* IMKCandidatesImpl.swift */,
 			);
 			path = CandidateUI;
 			sourceTree = "<group>";
@@ -565,9 +565,11 @@
 				5BDB7A3128D47587001AC277 /* DanielGalasko_FolderMonitor */,
 				5BFC63C428D487AE004A77B7 /* Fuziki_NSAttributedTextView */,
 				5BDB7A3028D47587001AC277 /* Jad_BookmarkManager */,
+				5BA8C30028DEFE4F004C5CC4 /* OpenVanilla_Voltaire */,
 				5BDB7A3428D47587001AC277 /* Qwertyyb_ShiftKeyUpChecker */,
 				5BDB7A3528D47587001AC277 /* RMJay_LineReader */,
 				5BDB7A2F28D47587001AC277 /* Sindresorhus_Preferences */,
+				5BA8C30128DEFE4F004C5CC4 /* vChewing_CandidateWindow */,
 				5B963C9B28D5BE4100DCEE88 /* vChewing_CocoaExtension */,
 				5BDB7A3228D47587001AC277 /* vChewing_Hotenka */,
 				5BFC63C728D49511004A77B7 /* vChewing_IMKUtils */,
@@ -780,6 +782,8 @@
 				5BC5E01D28DDE4770094E427 /* NotifierUI */,
 				5BC5E02028DDEFE00094E427 /* TooltipUI */,
 				5BC5E02328DE07860094E427 /* PopupCompositionBuffer */,
+				5BA8C30228DF0360004C5CC4 /* CandidateWindow */,
+				5BA8C30428DF0364004C5CC4 /* Voltaire */,
 			);
 			productName = vChewing;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */;
@@ -1067,13 +1071,11 @@
 				5BAEFAD028012565001F42C9 /* LMMgr.swift in Sources */,
 				5B782EC4280C243C007276DE /* KeyHandler_HandleCandidate.swift in Sources */,
 				5BA9FD0F27FEDB6B002DE248 /* suiPrefPaneGeneral.swift in Sources */,
-				5B242403284B0D6500520FE4 /* ctlCandidateUniversal.swift in Sources */,
 				5BCCAFF828DB19A300AB1B27 /* PrefMgr_Extension.swift in Sources */,
 				5BA9FD1127FEDB6B002DE248 /* ctlPrefUI.swift in Sources */,
 				5B8457A12871ADBE00C93B01 /* ChineseConverterBridge.swift in Sources */,
 				5BA9FD1327FEDB6B002DE248 /* suiPrefPaneDictionary.swift in Sources */,
-				5BFDF011289635C100417BBC /* ctlCandidateIMK.swift in Sources */,
-				5B62A34727AE7CD900A19448 /* ctlCandidate.swift in Sources */,
+				5BFDF011289635C100417BBC /* IMKCandidatesImpl.swift in Sources */,
 				5BB802DA27FABA8300CF1C19 /* ctlInputMethod_Menu.swift in Sources */,
 				5BE377A0288FED8D0037365B /* KeyHandler_HandleComposition.swift in Sources */,
 				5B00FA0C28DEC17200F6D436 /* ctlInputMethod_IMKCandidatesData.swift in Sources */,
@@ -1773,6 +1775,14 @@
 		5B98114728D6198700CBC605 /* PinyinPhonaConverter */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PinyinPhonaConverter;
+		};
+		5BA8C30228DF0360004C5CC4 /* CandidateWindow */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CandidateWindow;
+		};
+		5BA8C30428DF0364004C5CC4 /* Voltaire */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Voltaire;
 		};
 		5BC5E01D28DDE4770094E427 /* NotifierUI */ = {
 			isa = XCSwiftPackageProductDependency;
