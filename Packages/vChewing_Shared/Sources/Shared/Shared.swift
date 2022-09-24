@@ -103,6 +103,23 @@ public enum UserDef: String, CaseIterable {
   }
 }
 
+// MARK: - Enums and Structs used by Candidate Window
+
+public enum CandidateLayout {
+  case horizontal
+  case vertical
+}
+
+public struct CandidateKeyLabel {
+  public private(set) var key: String
+  public private(set) var displayedText: String
+
+  public init(key: String, displayedText: String) {
+    self.key = key
+    self.displayedText = displayedText
+  }
+}
+
 // MARK: - Tooltip Color States
 
 public enum TooltipColorState {
