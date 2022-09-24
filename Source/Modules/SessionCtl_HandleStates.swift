@@ -13,7 +13,7 @@ import Shared
 
 // MARK: - 狀態調度 (State Handling)
 
-extension ctlInputMethod {
+extension SessionCtl {
   /// 針對傳入的新狀態進行調度。
   ///
   /// 先將舊狀態單獨記錄起來，再將新舊狀態作為參數，
