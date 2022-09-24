@@ -9,14 +9,115 @@
 // requirements defined in MIT License.
 
 import InputMethodKit
+import NotifierUI
 import Shared
+
+// MARK: - Facade
+
+extension ctlInputMethod {
+  /// 接受所有鍵鼠事件為 NSEvent，讓輸入法判斷是否要處理、該怎樣處理。
+  /// - Parameters:
+  ///   - event: 裝置操作輸入事件，可能會是 nil。
+  ///   - sender: 呼叫了該函式的客體（無須使用）。
+  /// - Returns: 回「`true`」以將該案件已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
+  @objc(handleEvent:client:) override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
+    _ = sender  // 防止格式整理工具毀掉與此對應的參數。
+
+    // MARK: 前置處理
+
+    // 更新此時的靜態狀態標記。
+    state.isASCIIMode = isASCIIMode
+    state.isVerticalTyping = isVerticalTyping
+
+    // 就這傳入的 NSEvent 都還有可能是 nil，Apple InputMethodKit 團隊到底在搞三小。
+    // 只針對特定類型的 client() 進行處理。
+    guard let event = event, sender is IMKTextInput else {
+      resetKeyHandler()
+      return false
+    }
+
+    // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
+    let shouldUseShiftToggleHandle: Bool = {
+      switch PrefMgr.shared.shiftKeyAccommodationBehavior {
+        case 0: return false
+        case 1: return Shared.arrClientShiftHandlingExceptionList.contains(clientBundleIdentifier)
+        case 2: return true
+        default: return false
+      }
+    }()
+
+    /// 警告：這裡的 event 必須是原始 event 且不能被 var，否則會影響 Shift 中英模式判定。
+    if #available(macOS 10.15, *) {
+      if Self.theShiftKeyDetector.check(event), !PrefMgr.shared.disableShiftTogglingAlphanumericalMode {
+        if !shouldUseShiftToggleHandle || (!rencentKeyHandledByKeyHandlerEtc && shouldUseShiftToggleHandle) {
+          let status = NSLocalizedString("NotificationSwitchShift", comment: "")
+          Notifier.notify(
+            message: isASCIIMode.toggled()
+              ? NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
+              : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
+          )
+        }
+        if shouldUseShiftToggleHandle {
+          rencentKeyHandledByKeyHandlerEtc = false
+        }
+        return false
+      }
+    }
+
+    // MARK: 針對客體的具體處理
+
+    // 不再讓威注音處理由 Shift 切換到的英文模式的按鍵輸入。
+    if isASCIIMode { return false }
+
+    /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
+    /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
+    /// 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
+    /// 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
+    if event.type == .flagsChanged { return false }
+
+    /// 沒有文字輸入客體的話，就不要再往下處理了。
+    guard client() != nil else { return false }
+
+    var eventToDeal = event
+
+    // 如果是方向鍵輸入的話，就想辦法帶上標記資訊、來說明當前是縱排還是橫排。
+    if event.isUp || event.isDown || event.isLeft || event.isRight {
+      eventToDeal = event.reinitiate(charactersIgnoringModifiers: isVerticalTyping ? "Vertical" : "Horizontal") ?? event
+    }
+
+    // 使 NSEvent 自翻譯，這樣可以讓 Emacs NSEvent 變成標準 NSEvent。
+    if eventToDeal.isEmacsKey {
+      let verticalProcessing = (state.isCandidateContainer) ? state.isVerticalCandidateWindow : state.isVerticalTyping
+      eventToDeal = eventToDeal.convertFromEmacKeyEvent(isVerticalContext: verticalProcessing)
+    }
+
+    // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
+    Self.areWeNerfing = eventToDeal.modifierFlags.contains([.shift, .command])
+
+    // IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
+    if let result = imkCandidatesEventPreHandler(event: eventToDeal) {
+      if shouldUseShiftToggleHandle { rencentKeyHandledByKeyHandlerEtc = result }
+      return result
+    }
+
+    /// 剩下的 NSEvent 直接交給 commonEventHandler 來處理。
+    /// 這樣可以與 IMK 選字窗共用按鍵處理資源，維護起來也比較方便。
+    let result = commonEventHandler(eventToDeal)
+    if shouldUseShiftToggleHandle {
+      rencentKeyHandledByKeyHandlerEtc = result
+    }
+    return result
+  }
+}
+
+// MARK: - Private functions
 
 extension ctlInputMethod {
   /// 完成 handle() 函式本該完成的內容，但去掉了與 IMK 選字窗有關的判斷語句。
   /// 這樣分開處理很有必要，不然 handle() 函式會陷入無限迴圈。
   /// - Parameter event: 由 IMK 選字窗接收的裝置操作輸入事件。
   /// - Returns: 回「`true`」以將該案件已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
-  func commonEventHandler(_ event: NSEvent) -> Bool {
+  private func commonEventHandler(_ event: NSEvent) -> Bool {
     // 無法列印的訊號輸入，一概不作處理。
     // 這個過程不能放在 KeyHandler 內，否則不會起作用。
     if !event.charCode.isPrintable { return false }
@@ -37,7 +138,7 @@ extension ctlInputMethod {
   /// 這樣分開處理很有必要，不然 handle() 函式會陷入無限迴圈。
   /// - Parameter event: 由 IMK 選字窗接收的裝置操作輸入事件。
   /// - Returns: 回「`true`」以將該案件已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
-  func imkCandidatesEventPreHandler(event eventToDeal: NSEvent) -> Bool? {
+  private func imkCandidatesEventPreHandler(event eventToDeal: NSEvent) -> Bool? {
     // IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
     // 這樣可以讓 interpretKeyEvents() 函式自行判斷：
     // - 是就地交給 imkCandidates.interpretKeyEvents() 處理？
@@ -74,7 +175,7 @@ extension ctlInputMethod {
     return nil
   }
 
-  func imkCandidatesEventSubHandler(event: NSEvent) -> Bool {
+  private func imkCandidatesEventSubHandler(event: NSEvent) -> Bool {
     let eventArray = [event]
     guard let imkC = Self.ctlCandidateCurrent as? ctlCandidateIMK else { return false }
     if event.isEsc || event.isBackSpace || event.isDelete || (event.isShiftHold && !event.isSpace) {
