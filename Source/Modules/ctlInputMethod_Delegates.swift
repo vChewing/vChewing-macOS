@@ -18,7 +18,7 @@ extension ctlInputMethod: KeyHandlerDelegate {
     return client.bundleIdentifier() ?? ""
   }
 
-  func ctlCandidate() -> CtlCandidateProtocol { ctlInputMethod.ctlCandidateCurrent }
+  func ctlCandidate() -> CtlCandidateProtocol { Self.ctlCandidateCurrent }
 
   func candidateSelectionCalledByKeyHandler(at index: Int) {
     candidateSelected(at: index)
