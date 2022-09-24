@@ -96,7 +96,7 @@ extension IMEState {
   }
 
   public static func ofInputting(displayTextSegments: [String], cursor: Int) -> IMEState {
-    var result = IMEState.ofNotEmpty(displayTextSegments: displayTextSegments, cursor: cursor)
+    var result = Self.ofNotEmpty(displayTextSegments: displayTextSegments, cursor: cursor)
     result.type = .ofInputting
     return result
   }
@@ -106,7 +106,7 @@ extension IMEState {
   )
     -> IMEState
   {
-    var result = IMEState.ofNotEmpty(displayTextSegments: displayTextSegments, cursor: cursor)
+    var result = Self.ofNotEmpty(displayTextSegments: displayTextSegments, cursor: cursor)
     result.type = .ofMarking
     result.data.marker = marker
     result.data.markedReadings = markedReadings
@@ -117,7 +117,7 @@ extension IMEState {
   public static func ofCandidates(candidates: [(String, String)], displayTextSegments: [String], cursor: Int)
     -> IMEState
   {
-    var result = IMEState.ofNotEmpty(displayTextSegments: displayTextSegments, cursor: cursor)
+    var result = Self.ofNotEmpty(displayTextSegments: displayTextSegments, cursor: cursor)
     result.type = .ofCandidates
     result.data.candidates = candidates
     return result
@@ -154,7 +154,7 @@ extension IMEState {
 
   public var convertedToInputting: IMEStateProtocol {
     if type == .ofInputting { return self }
-    var result = IMEState.ofInputting(displayTextSegments: data.displayTextSegments, cursor: data.cursor)
+    var result = Self.ofInputting(displayTextSegments: data.displayTextSegments, cursor: data.cursor)
     result.tooltip = data.tooltipBackupForInputting
     result.isVerticalTyping = isVerticalTyping
     return result
