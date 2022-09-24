@@ -26,7 +26,7 @@ extension KeyHandler {
     stateCallback: @escaping (IMEStateProtocol) -> Void,
     errorCallback: @escaping (String) -> Void
   ) -> Bool {
-    guard var ctlCandidate = delegate?.ctlCandidate() else {
+    guard var ctlCandidate = delegate?.candidateController() else {
       errorCallback("06661F6E")
       return true
     }

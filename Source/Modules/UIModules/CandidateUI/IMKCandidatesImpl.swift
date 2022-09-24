@@ -115,7 +115,7 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
 
   private var pageCount: Int {
     guard let delegate = delegate else { return 0 }
-    let totalCount = delegate.candidateCountForController(self)
+    let totalCount = delegate.candidatePairs().count
     let keyLabelCount = keyLabels.count
     return totalCount / keyLabelCount + ((totalCount % keyLabelCount) != 0 ? 1 : 0)
   }
@@ -147,7 +147,7 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
   public func candidateIndexAtKeyLabelIndex(_ index: Int) -> Int {
     guard let delegate = delegate else { return Int.max }
     let result = currentPageIndex * keyLabels.count + index
-    return result < delegate.candidateCountForController(self) ? result : Int.max
+    return result < delegate.candidatePairs().count ? result : Int.max
   }
 
   public var selectedCandidateIndex: Int {

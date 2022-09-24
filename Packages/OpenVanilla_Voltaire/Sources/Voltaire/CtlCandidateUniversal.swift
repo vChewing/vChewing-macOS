@@ -433,7 +433,7 @@ public class CtlCandidateUniversal: CtlCandidate {
   @discardableResult override public func highlightNextCandidate() -> Bool {
     guard let delegate = delegate else { return false }
     selectedCandidateIndex =
-      (selectedCandidateIndex + 1 >= delegate.candidateCountForController(self))
+      (selectedCandidateIndex + 1 >= delegate.candidatePairs().count)
       ? 0 : selectedCandidateIndex + 1
     return true
   }
@@ -442,7 +442,7 @@ public class CtlCandidateUniversal: CtlCandidate {
     guard let delegate = delegate else { return false }
     selectedCandidateIndex =
       (selectedCandidateIndex == 0)
-      ? delegate.candidateCountForController(self) - 1 : selectedCandidateIndex - 1
+      ? delegate.candidatePairs().count - 1 : selectedCandidateIndex - 1
     return true
   }
 
@@ -452,7 +452,7 @@ public class CtlCandidateUniversal: CtlCandidate {
     }
 
     let result = currentPageIndex * keyLabels.count + index
-    return result < delegate.candidateCountForController(self) ? result : Int.max
+    return result < delegate.candidatePairs().count ? result : Int.max
   }
 
   override public var selectedCandidateIndex: Int {
@@ -464,7 +464,7 @@ public class CtlCandidateUniversal: CtlCandidate {
         return
       }
       let keyLabelCount = keyLabels.count
-      if newValue < delegate.candidateCountForController(self) {
+      if newValue < delegate.candidatePairs().count {
         currentPageIndex = newValue / keyLabelCount
         candidateView.highlightedIndex = newValue % keyLabelCount
         layoutCandidateView()
@@ -478,7 +478,7 @@ extension CtlCandidateUniversal {
     guard let delegate = delegate else {
       return 0
     }
-    let totalCount = delegate.candidateCountForController(self)
+    let totalCount = delegate.candidatePairs().count
     let keyLabelCount = keyLabels.count
     return totalCount / keyLabelCount + ((totalCount % keyLabelCount) != 0 ? 1 : 0)
   }
@@ -487,7 +487,7 @@ extension CtlCandidateUniversal {
     guard let delegate = delegate else {
       return 0
     }
-    let totalCount = delegate.candidateCountForController(self)
+    let totalCount = delegate.candidatePairs().count
     let keyLabelCount = keyLabels.count
     return totalCount % keyLabelCount
   }
@@ -497,12 +497,12 @@ extension CtlCandidateUniversal {
 
     candidateView.set(keyLabelFont: keyLabelFont, candidateFont: candidateFont)
     var candidates = [(String, String)]()
-    let count = delegate.candidateCountForController(self)
+    let count = delegate.candidatePairs().count
     let keyLabelCount = keyLabels.count
 
     let begin = currentPageIndex * keyLabelCount
     for index in begin..<min(begin + keyLabelCount, count) {
-      let candidate = delegate.ctlCandidate(self, candidateAtIndex: index)
+      let candidate = delegate.candidatePairAt(index)
       candidates.append(candidate)
     }
     candidateView.set(
@@ -591,6 +591,6 @@ extension CtlCandidateUniversal {
   }
 
   @objc private func candidateViewMouseDidClick(_: Any) {
-    delegate?.candidateSelected(at: selectedCandidateIndex)
+    delegate?.candidatePairSelected(at: selectedCandidateIndex)
   }
 }
