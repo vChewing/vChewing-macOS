@@ -37,10 +37,10 @@ extension ctlInputMethod {
   /// 這樣分開處理很有必要，不然 handle() 函式會陷入無限迴圈。
   /// - Parameter event: 由 IMK 選字窗接收的裝置操作輸入事件。
   /// - Returns: 回「`true`」以將該案件已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
-  func imkCandidatesEventHandler(event eventToDeal: NSEvent) -> Bool? {
+  func imkCandidatesEventPreHandler(event eventToDeal: NSEvent) -> Bool? {
     // IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
     // 這樣可以讓 interpretKeyEvents() 函式自行判斷：
-    // - 是就地交給 super.interpretKeyEvents() 處理？
+    // - 是就地交給 imkCandidates.interpretKeyEvents() 處理？
     // - 還是藉由 delegate 扔回 ctlInputMethod 給 KeyHandler 處理？
     if let imkCandidates = ctlInputMethod.ctlCandidateCurrent as? ctlCandidateIMK, imkCandidates.visible {
       let event: NSEvent = ctlCandidateIMK.replaceNumPadKeyCodes(target: eventToDeal) ?? eventToDeal
@@ -52,25 +52,85 @@ extension ctlInputMethod {
           NSSound.beep()
           return true
         }
-        imkCandidates.interpretKeyEvents([newEvent])
-        return true
+
+        return imkCandidatesEventSubHandler(event: newEvent)
       }
 
       // 聯想詞選字。
       if let newChar = ctlCandidateIMK.defaultIMKSelectionKey[event.keyCode],
-        event.isShiftHold, isAssociatedPhrasesState,
+        event.isShiftHold, state.type == .ofAssociates,
         let newEvent = event.reinitiate(modifierFlags: [], characters: newChar)
       {
         if #available(macOS 10.14, *) {
           imkCandidates.handleKeyboardEvent(newEvent)
         } else {
-          imkCandidates.superInterpretKeyEvents([newEvent])
+          imkCandidates.interpretKeyEvents([newEvent])
+        }
+        return true
+      }
+
+      return imkCandidatesEventSubHandler(event: event)
+    }
+    return nil
+  }
+
+  func imkCandidatesEventSubHandler(event: NSEvent) -> Bool {
+    let eventArray = [event]
+    guard let imkC = Self.ctlCandidateCurrent as? ctlCandidateIMK else { return false }
+    if event.isEsc || event.isBackSpace || event.isDelete || (event.isShiftHold && !event.isSpace) {
+      return commonEventHandler(event)
+    } else if event.isSymbolMenuPhysicalKey {
+      // 符號鍵的行為是固定的，不受偏好設定影響。
+      switch imkC.currentLayout {
+        case .horizontal: _ = event.isShiftHold ? imkC.moveUp(self) : imkC.moveDown(self)
+        case .vertical: _ = event.isShiftHold ? imkC.moveLeft(self) : imkC.moveRight(self)
+      }
+      return true
+    } else if event.isSpace {
+      switch PrefMgr.shared.specifyShiftSpaceKeyBehavior {
+        case true: _ = event.isShiftHold ? imkC.highlightNextCandidate() : imkC.showNextPage()
+        case false: _ = event.isShiftHold ? imkC.showNextPage() : imkC.highlightNextCandidate()
+      }
+      return true
+    } else if event.isTab {
+      switch PrefMgr.shared.specifyShiftTabKeyBehavior {
+        case true: _ = event.isShiftHold ? imkC.showPreviousPage() : imkC.showNextPage()
+        case false: _ = event.isShiftHold ? imkC.highlightPreviousCandidate() : imkC.highlightNextCandidate()
+      }
+      return true
+    } else {
+      if let newChar = ctlCandidateIMK.defaultIMKSelectionKey[event.keyCode] {
+        /// 根據 KeyCode 重新換算一下選字鍵的 NSEvent，糾正其 Character 數值。
+        /// 反正 IMK 選字窗目前也沒辦法修改選字鍵。
+        let newEvent = event.reinitiate(characters: newChar)
+        if let newEvent = newEvent {
+          if PrefMgr.shared.useSCPCTypingMode, state.type == .ofAssociates {
+            // 註：input.isShiftHold 已經在 ctlInputMethod.handle() 內處理，因為在那邊處理才有效。
+            return event.isShiftHold ? true : commonEventHandler(event)
+          } else {
+            if #available(macOS 10.14, *) {
+              imkC.handleKeyboardEvent(newEvent)
+            } else {
+              imkC.interpretKeyEvents([newEvent])
+            }
+            return true
+          }
         }
       }
 
-      imkCandidates.interpretKeyEvents([event])
+      if PrefMgr.shared.useSCPCTypingMode, !event.isReservedKey {
+        return commonEventHandler(event)
+      }
+
+      if state.type == .ofAssociates,
+        !event.isPageUp, !event.isPageDown, !event.isCursorForward, !event.isCursorBackward,
+        !event.isCursorClockLeft, !event.isCursorClockRight, !event.isSpace,
+        !event.isEnter || !PrefMgr.shared.alsoConfirmAssociatedCandidatesByEnter
+      {
+        return commonEventHandler(event)
+      }
+      imkC.interpretKeyEvents(eventArray)
       return true
     }
-    return nil
   }
 }
