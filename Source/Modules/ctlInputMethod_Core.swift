@@ -322,7 +322,7 @@ class ctlInputMethod: IMKInputController {
     Self.areWeNerfing = eventToDeal.modifierFlags.contains([.shift, .command])
 
     // IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
-    if let result = imkCandidatesEventHandler(event: eventToDeal) {
+    if let result = imkCandidatesEventPreHandler(event: eventToDeal) {
       if shouldUseShiftToggleHandle {
         rencentKeyHandledByKeyHandlerEtc = result
       }
