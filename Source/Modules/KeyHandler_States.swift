@@ -114,7 +114,6 @@ extension KeyHandler {
   func buildAssociatePhraseState(
     withPair pair: Megrez.Compositor.KeyValuePaired
   ) -> IMEState {
-    // 上一行必須要用驚嘆號，否則 Xcode 會誤導你砍掉某些實際上必需的語句。
     IMEState.ofAssociates(
       candidates: buildAssociatePhraseArray(withPair: pair))
   }
@@ -127,7 +126,7 @@ extension KeyHandler {
   ///   - input: 輸入按鍵訊號。
   ///   - stateCallback: 狀態回呼。
   ///   - errorCallback: 錯誤回呼。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleMarkingState(
     _ state: IMEStateProtocol,
     input: InputSignalProtocol,
@@ -236,7 +235,7 @@ extension KeyHandler {
   ///   - isTypingVertical: 是否縱排輸入？
   ///   - stateCallback: 狀態回呼。
   ///   - errorCallback: 錯誤回呼。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handlePunctuation(
     _ customPunctuation: String,
     state: IMEStateProtocol,
@@ -286,7 +285,7 @@ extension KeyHandler {
   /// - Parameters:
   ///   - state: 當前狀態。
   ///   - stateCallback: 狀態回呼。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleEnter(
     state: IMEStateProtocol,
     stateCallback: @escaping (IMEStateProtocol) -> Void
@@ -304,7 +303,7 @@ extension KeyHandler {
   /// - Parameters:
   ///   - state: 當前狀態。
   ///   - stateCallback: 狀態回呼。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleCtrlCommandEnter(
     state: IMEStateProtocol,
     stateCallback: @escaping (IMEStateProtocol) -> Void
@@ -332,7 +331,7 @@ extension KeyHandler {
   /// - Parameters:
   ///   - state: 當前狀態。
   ///   - stateCallback: 狀態回呼。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleCtrlOptionCommandEnter(
     state: IMEStateProtocol,
     stateCallback: @escaping (IMEStateProtocol) -> Void
@@ -370,7 +369,7 @@ extension KeyHandler {
   ///   - input: 輸入按鍵訊號。
   ///   - stateCallback: 狀態回呼。
   ///   - errorCallback: 錯誤回呼。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleBackSpace(
     state: IMEStateProtocol,
     input: InputSignalProtocol,
@@ -432,7 +431,7 @@ extension KeyHandler {
   ///   - input: 輸入按鍵訊號。
   ///   - stateCallback: 狀態回呼。
   ///   - errorCallback: 錯誤回呼。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleDelete(
     state: IMEStateProtocol,
     input: InputSignalProtocol,
@@ -476,7 +475,7 @@ extension KeyHandler {
   ///   - state: 當前狀態。
   ///   - stateCallback: 狀態回呼。
   ///   - errorCallback: 錯誤回呼。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleClockKey(
     state: IMEStateProtocol,
     stateCallback: @escaping (IMEStateProtocol) -> Void,
@@ -497,7 +496,7 @@ extension KeyHandler {
   ///   - state: 當前狀態。
   ///   - stateCallback: 狀態回呼。
   ///   - errorCallback: 錯誤回呼。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleHome(
     state: IMEStateProtocol,
     stateCallback: @escaping (IMEStateProtocol) -> Void,
@@ -529,7 +528,7 @@ extension KeyHandler {
   ///   - state: 當前狀態。
   ///   - stateCallback: 狀態回呼。
   ///   - errorCallback: 錯誤回呼。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleEnd(
     state: IMEStateProtocol,
     stateCallback: @escaping (IMEStateProtocol) -> Void,
@@ -560,7 +559,7 @@ extension KeyHandler {
   /// - Parameters:
   ///   - state: 當前狀態。
   ///   - stateCallback: 狀態回呼。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleEsc(
     state: IMEStateProtocol,
     stateCallback: @escaping (IMEStateProtocol) -> Void
@@ -592,7 +591,7 @@ extension KeyHandler {
   ///   - input: 輸入按鍵訊號。
   ///   - stateCallback: 狀態回呼。
   ///   - errorCallback: 錯誤回呼。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleForward(
     state: IMEStateProtocol,
     input: InputSignalProtocol,
@@ -661,7 +660,7 @@ extension KeyHandler {
   ///   - input: 輸入按鍵訊號。
   ///   - stateCallback: 狀態回呼。
   ///   - errorCallback: 錯誤回呼。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleBackward(
     state: IMEStateProtocol,
     input: InputSignalProtocol,
@@ -730,7 +729,7 @@ extension KeyHandler {
   ///   - reverseModifier: 是否有控制輪替方向的修飾鍵輸入。
   ///   - stateCallback: 狀態回呼。
   ///   - errorCallback: 錯誤回呼。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 ctlInputMethod 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleInlineCandidateRotation(
     state: IMEStateProtocol,
     reverseModifier: Bool,

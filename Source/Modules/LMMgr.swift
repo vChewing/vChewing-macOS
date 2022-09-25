@@ -8,7 +8,7 @@
 
 import BookmarkManager
 import LangModelAssembly
-import Megrez
+import NotifierUI
 import Shared
 
 /// 使用者辭典資料預設範例檔案名稱。
@@ -98,7 +98,7 @@ public enum LMMgr {
     }
     if !Self.lmCHT.isLanguageModelLoaded {
       showFinishNotification = true
-      NotifierController.notify(
+      Notifier.notify(
         message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
       )
       group.enter()
@@ -109,7 +109,7 @@ public enum LMMgr {
     }
     if !Self.lmCHS.isLanguageModelLoaded {
       showFinishNotification = true
-      NotifierController.notify(
+      Notifier.notify(
         message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
       )
       group.enter()
@@ -120,7 +120,7 @@ public enum LMMgr {
     }
     group.notify(queue: DispatchQueue.main) {
       if showFinishNotification {
-        NotifierController.notify(
+        Notifier.notify(
           message: NSLocalizedString("Core Dict loading complete.", comment: "")
         )
       }
@@ -162,7 +162,7 @@ public enum LMMgr {
       case .imeModeCHS:
         if !Self.lmCHS.isLanguageModelLoaded {
           showFinishNotification = true
-          NotifierController.notify(
+          Notifier.notify(
             message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
           )
           group.enter()
@@ -174,7 +174,7 @@ public enum LMMgr {
       case .imeModeCHT:
         if !Self.lmCHT.isLanguageModelLoaded {
           showFinishNotification = true
-          NotifierController.notify(
+          Notifier.notify(
             message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
           )
           group.enter()
@@ -187,7 +187,7 @@ public enum LMMgr {
     }
     group.notify(queue: DispatchQueue.main) {
       if showFinishNotification {
-        NotifierController.notify(
+        Notifier.notify(
           message: NSLocalizedString("Core Dict loading complete.", comment: "")
         )
       }
@@ -244,15 +244,11 @@ public enum LMMgr {
     mode: Shared.InputMode,
     key unigramKey: String
   ) -> Bool {
-    let unigrams: [Megrez.Unigram] =
-      (mode == .imeModeCHT)
-      ? Self.lmCHT.unigramsFor(key: unigramKey) : Self.lmCHS.unigramsFor(key: unigramKey)
-    for unigram in unigrams {
-      if unigram.value == userPhrase {
-        return true
-      }
+    switch mode {
+      case .imeModeCHS: return lmCHS.hasKeyValuePairFor(key: unigramKey, value: userPhrase)
+      case .imeModeCHT: return lmCHT.hasKeyValuePairFor(key: unigramKey, value: userPhrase)
+      case .imeModeNULL: return false
     }
-    return false
   }
 
   public static func setPhraseReplacementEnabled(_ state: Bool) {

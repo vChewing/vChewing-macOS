@@ -92,13 +92,13 @@
 	<key>InputMethodConnectionName</key>
 	<string>org_atelierInmu_inputmethod_vChewing_Connection</string>
 	<key>InputMethodServerControllerClass</key>
-	<string>ctlInputMethod</string>
+	<string>SessionCtl</string>
 	<key>InputMethodServerDelegateClass</key>
-	<string>ctlInputMethod</string>
+	<string>SessionCtl</string>
 	<key>InputMethodServerPreferencesWindowControllerClass</key>
 	<string>ctlPrefWindow</string>
 	<key>InputMethodSessionController</key>
-	<string>ctlInputMethod</string>
+	<string>SessionCtl</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSHasLocalizedDisplayName</key>

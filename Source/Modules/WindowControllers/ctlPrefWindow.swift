@@ -12,7 +12,7 @@ import BookmarkManager
 import IMKUtils
 import Shared
 
-private let kWindowTitleHeight: CGFloat = 78
+private let kWindowTitleHeight: Double = 78
 
 extension NSToolbarItem.Identifier {
   fileprivate static let ofGeneral = NSToolbarItem.Identifier(rawValue: "tabGeneral")
