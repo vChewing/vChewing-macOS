@@ -56,9 +56,7 @@ extension KeyHandler {
     // MARK: Caps Lock processing.
 
     /// 若 Caps Lock 被啟用的話，則暫停對注音輸入的處理。
-    /// 這裡的處理原先是給威注音曾經有過的 Shift 切換英數模式來用的，但因為採 Chromium 核
-    /// 心的瀏覽器會讓 IMK 無法徹底攔截對 Shift 鍵的單擊行為、導致這個模式的使用體驗非常糟
-    /// 糕，故僅保留以 Caps Lock 驅動的英數模式。
+    /// 這裡的處理仍舊有用，不然 Caps Lock 英文模式無法直接鍵入小寫字母。
     if input.isBackSpace || input.isEnter
       || input.isCursorClockLeft || input.isCursorClockRight
       || input.isCursorForward || input.isCursorBackward
