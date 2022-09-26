@@ -38,7 +38,7 @@
 "Force KangXi Writing" = "Force KangXi Writing";
 "NotificationSwitchON" = "✔ ON";
 "NotificationSwitchOFF" = "✘ OFF";
-"NotificationSwitchShift" = "↺ Switched";
+"NotificationSwitchASCII" = "↺ Switched";
 "Edit User Phrases…" = "Edit User Phrases…";
 "Reload User Phrases" = "Reload User Phrases";
 "Unable to create the user phrase file." = "Unable to create the user phrase file.";
