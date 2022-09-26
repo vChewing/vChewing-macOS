@@ -142,7 +142,10 @@ extension Notifier {
   private func display() {
     let existingInstanceArray = Self.instanceStack.compactMap(\.window)
     if !existingInstanceArray.isEmpty {
-      existingInstanceArray.forEach { $0.alphaValue *= 0.5 }
+      existingInstanceArray.forEach {
+        $0.alphaValue -= 0.1
+        $0.contentView?.subviews.forEach { $0.alphaValue *= 0.5 }
+      }
     }
     shiftExistingWindowPositions()
     fadeIn()
