@@ -145,7 +145,7 @@
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "Choose the behavior of (Shift+)Tab key in the candidate window.";
 "Choose the behavior of Shift+Letter key with letter inputs." = "Choose the behavior of Shift+Letter key with letter inputs.";
 "Choose the cursor position where you want to list possible candidates." = "Choose the cursor position where you want to list possible candidates.";
-"Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode toggled by Shift key." = "Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode toggled by Shift key.";
+"Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode only." = "Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode only.";
 "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only.";
 "Choose the phonetic layout for Mandarin parser." = "Choose the phonetic layout for Mandarin parser.";
 "Choose your desired user data folder path. Will be omitted if invalid." = "Choose your desired user data folder path. Will be omitted if invalid.";

@@ -225,7 +225,7 @@ struct suiPrefPaneKeyboard: View {
           HStack {
             Text(
               NSLocalizedString(
-                "Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode toggled by Shift key.",
+                "Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode only.",
                 comment: ""
               )
             )
