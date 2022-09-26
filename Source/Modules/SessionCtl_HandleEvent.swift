@@ -38,7 +38,7 @@ extension SessionCtl {
     // Caps Lock 通知與切換處理。
     if event.type == .flagsChanged, event.keyCode == KeyCode.kCapsLock.rawValue {
       let isCapsLockTurnedOn = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
-      let status = NSLocalizedString("NotificationSwitchShift", comment: "")
+      let status = NSLocalizedString("NotificationSwitchASCII", comment: "")
       Notifier.notify(
         message: isCapsLockTurnedOn
           ? "Caps Lock" + NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
@@ -61,7 +61,7 @@ extension SessionCtl {
     if #available(macOS 10.15, *) {
       if Self.theShiftKeyDetector.check(event), !PrefMgr.shared.disableShiftTogglingAlphanumericalMode {
         if !shouldUseShiftToggleHandle || (!rencentKeyHandledByKeyHandlerEtc && shouldUseShiftToggleHandle) {
-          let status = NSLocalizedString("NotificationSwitchShift", comment: "")
+          let status = NSLocalizedString("NotificationSwitchASCII", comment: "")
           Notifier.notify(
             message: isASCIIMode.toggled()
               ? NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
