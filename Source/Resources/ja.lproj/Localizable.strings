@@ -82,6 +82,7 @@
 "Optimize Memorized Phrases" = "臨時記憶資料を整う";
 "Clear Memorized Phrases" = "臨時記憶資料を削除";
 "Currency Numeral Output" = "数字大字変換";
+"Hold ⇧ to choose associates." = "⇧を押しながら連想候補をご選択ください。";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";
