@@ -133,6 +133,8 @@ extension KeyHandler {
           if !ctlCandidate.showPreviousPage() {
             errorCallback("1919810D")
           }
+        @unknown default:
+          break
       }
       return true
     }
@@ -149,6 +151,8 @@ extension KeyHandler {
           if !ctlCandidate.showNextPage() {
             errorCallback("9244908D")
           }
+        @unknown default:
+          break
       }
       return true
     }
@@ -165,6 +169,8 @@ extension KeyHandler {
           if !ctlCandidate.highlightPreviousCandidate() {
             errorCallback("ASD9908D")
           }
+        @unknown default:
+          break
       }
       return true
     }
@@ -181,6 +187,8 @@ extension KeyHandler {
           if !ctlCandidate.highlightNextCandidate() {
             errorCallback("6B99908D")
           }
+        @unknown default:
+          break
       }
       return true
     }
@@ -223,7 +231,7 @@ extension KeyHandler {
       (state.type == .ofAssociates) ? input.inputTextIgnoringModifiers ?? "" : input.text
 
     for j in 0..<ctlCandidate.keyLabels.count {
-      let label: CandidateKeyLabel = ctlCandidate.keyLabels[j]
+      let label: CandidateCellData = ctlCandidate.keyLabels[j]
       if match.compare(label.key, options: .caseInsensitive, range: nil, locale: .current) == .orderedSame {
         index = j
         break

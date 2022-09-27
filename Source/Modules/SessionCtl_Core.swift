@@ -6,13 +6,13 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import CandidateWindow
 import CocoaExtension
 import IMKUtils
 import PopupCompositionBuffer
 import Shared
 import ShiftKeyUpChecker
 import TooltipUI
-import Voltaire
 
 /// 輸入法控制模組，乃在輸入法端用以控制輸入行為的基礎型別。
 ///
@@ -28,8 +28,16 @@ class SessionCtl: IMKInputController {
   static var areWeNerfing = false
 
   /// 目前在用的的選字窗副本。
-  static var ctlCandidateCurrent: CtlCandidateProtocol =
-    PrefMgr.shared.useIMKCandidateWindow ? CtlCandidateIMK(.horizontal) : CtlCandidateUniversal(.horizontal)
+  static var ctlCandidateCurrent: CtlCandidateProtocol = {
+    let direction: NSUserInterfaceLayoutOrientation =
+      PrefMgr.shared.useHorizontalCandidateList ? .horizontal : .vertical
+    if #available(macOS 12, *) {
+      return PrefMgr.shared.useIMKCandidateWindow
+        ? CtlCandidateIMK(direction) : CtlCandidateTDK(direction)
+    } else {
+      return CtlCandidateIMK(direction)
+    }
+  }()
 
   /// 工具提示視窗的共用副本。
   static var tooltipInstance = TooltipUI()

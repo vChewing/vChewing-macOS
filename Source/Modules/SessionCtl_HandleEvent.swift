@@ -196,6 +196,7 @@ extension SessionCtl {
       switch imkC.currentLayout {
         case .horizontal: _ = event.isShiftHold ? imkC.moveUp(self) : imkC.moveDown(self)
         case .vertical: _ = event.isShiftHold ? imkC.moveLeft(self) : imkC.moveRight(self)
+        @unknown default: break
       }
       return true
     } else if event.isSpace {
