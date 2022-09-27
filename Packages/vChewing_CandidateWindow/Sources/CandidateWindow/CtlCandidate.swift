@@ -21,7 +21,7 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
     if #available(macOS 10.14, *), !NSApplication.isDarkMode, locale == "zh-Hant" {
       colorBlendAmount = 0.15
     }
-    // The background color of the highlightened candidate
+    // 設定當前高亮候選字的背景顏色。
     switch locale {
       case "zh-Hans":
         result = NSColor.systemRed
@@ -72,16 +72,13 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
     visible = false
   }
 
-  /// Sets the location of the candidate window.
+  /// 設定選字窗的顯示位置。
   ///
-  /// Please note that the method has side effects that modifies
-  /// `windowTopLeftPoint` to make the candidate window to stay in at least
-  /// in a screen.
+  /// 需注意：該函數會藉由設定選字窗左上角頂點的方式、使選字窗始終位於某個螢幕之內。
   ///
   /// - Parameters:
-  ///   - windowTopLeftPoint: The given location.
-  ///   - height: The height that helps the window not to be out of the bottom
-  ///     of a screen.
+  ///   - windowTopLeftPoint: 給定的視窗顯示位置。
+  ///   - heightDelta: 為了「防止選字窗抻出螢幕下方」而給定的預留高度。
   public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight heightDelta: Double) {
     DispatchQueue.main.async { [self] in
       guard let window = window, var screenFrame = NSScreen.main?.visibleFrame else { return }
@@ -106,7 +103,7 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
     }
   }
 
-  // MARK: - Contents that are not needed to be implemented here.
+  // MARK: - 不需要在這裡仔細實作的內容。
 
   @available(*, unavailable)
   public required init?(coder _: NSCoder) {
