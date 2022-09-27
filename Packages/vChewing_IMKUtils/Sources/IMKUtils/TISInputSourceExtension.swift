@@ -9,7 +9,7 @@
 import Foundation
 import InputMethodKit
 
-// MARK: - TISInputSource Extension by The vChewing Project (MIT License).
+// MARK: - TISInputSource Extension by The vChewing Project (MIT-NTL License).
 
 extension TISInputSource {
   public static var allRegisteredInstancesOfThisInputMethod: [TISInputSource] {
