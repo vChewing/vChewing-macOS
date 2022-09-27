@@ -301,17 +301,18 @@ public class CtlCandidateUniversal: CtlCandidate {
   private var nextPageButton: NSButton
   private var pageCounterLabel: NSTextField
   private var currentPageIndex: Int = 0
-  override public var currentLayout: CandidateLayout {
+  override public var currentLayout: NSUserInterfaceLayoutOrientation {
     get { candidateView.isVerticalLayout ? .vertical : .horizontal }
     set {
       switch newValue {
         case .vertical: candidateView.isVerticalLayout = true
         case .horizontal: candidateView.isVerticalLayout = false
+        @unknown default: candidateView.isVerticalLayout = false
       }
     }
   }
 
-  public required init(_ layout: CandidateLayout = .horizontal) {
+  public required init(_ layout: NSUserInterfaceLayoutOrientation = .horizontal) {
     var contentRect = NSRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
     let styleMask: NSWindow.StyleMask = [.nonactivatingPanel]
     let panel = NSPanel(
@@ -433,7 +434,7 @@ public class CtlCandidateUniversal: CtlCandidate {
   @discardableResult override public func highlightNextCandidate() -> Bool {
     guard let delegate = delegate else { return false }
     selectedCandidateIndex =
-      (selectedCandidateIndex + 1 >= delegate.candidatePairs().count)
+      (selectedCandidateIndex + 1 >= delegate.candidatePairs(conv: false).count)
       ? 0 : selectedCandidateIndex + 1
     return true
   }
@@ -442,7 +443,7 @@ public class CtlCandidateUniversal: CtlCandidate {
     guard let delegate = delegate else { return false }
     selectedCandidateIndex =
       (selectedCandidateIndex == 0)
-      ? delegate.candidatePairs().count - 1 : selectedCandidateIndex - 1
+      ? delegate.candidatePairs(conv: false).count - 1 : selectedCandidateIndex - 1
     return true
   }
 
@@ -452,7 +453,7 @@ public class CtlCandidateUniversal: CtlCandidate {
     }
 
     let result = currentPageIndex * keyLabels.count + index
-    return result < delegate.candidatePairs().count ? result : Int.max
+    return result < delegate.candidatePairs(conv: false).count ? result : Int.max
   }
 
   override public var selectedCandidateIndex: Int {
@@ -464,7 +465,7 @@ public class CtlCandidateUniversal: CtlCandidate {
         return
       }
       let keyLabelCount = keyLabels.count
-      if newValue < delegate.candidatePairs().count {
+      if newValue < delegate.candidatePairs(conv: false).count {
         currentPageIndex = newValue / keyLabelCount
         candidateView.highlightedIndex = newValue % keyLabelCount
         layoutCandidateView()
@@ -478,7 +479,7 @@ extension CtlCandidateUniversal {
     guard let delegate = delegate else {
       return 0
     }
-    let totalCount = delegate.candidatePairs().count
+    let totalCount = delegate.candidatePairs(conv: false).count
     let keyLabelCount = keyLabels.count
     return totalCount / keyLabelCount + ((totalCount % keyLabelCount) != 0 ? 1 : 0)
   }
@@ -487,7 +488,7 @@ extension CtlCandidateUniversal {
     guard let delegate = delegate else {
       return 0
     }
-    let totalCount = delegate.candidatePairs().count
+    let totalCount = delegate.candidatePairs(conv: false).count
     let keyLabelCount = keyLabels.count
     return totalCount % keyLabelCount
   }
@@ -497,7 +498,7 @@ extension CtlCandidateUniversal {
 
     candidateView.set(keyLabelFont: keyLabelFont, candidateFont: candidateFont)
     var candidates = [(String, String)]()
-    let count = delegate.candidatePairs().count
+    let count = delegate.candidatePairs(conv: false).count
     let keyLabelCount = keyLabels.count
 
     let begin = currentPageIndex * keyLabelCount

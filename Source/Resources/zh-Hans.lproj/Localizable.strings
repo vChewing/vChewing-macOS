@@ -82,6 +82,7 @@
 "Optimize Memorized Phrases" = "精简临时记忆语汇资料";
 "Clear Memorized Phrases" = "清除临时记忆语汇资料";
 "Currency Numeral Output" = "大写汉字数字输出";
+"Hold ⇧ to choose associates." = "摁住⇧以选取联想词。";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";

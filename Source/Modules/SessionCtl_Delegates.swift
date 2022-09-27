@@ -54,8 +54,16 @@ extension SessionCtl: CtlCandidateDelegate {
     ChineseConverter.kanjiConversionIfRequired(target)
   }
 
-  func candidatePairs() -> [(String, String)] {
-    state.isCandidateContainer ? state.candidates : []
+  func candidatePairs(conv: Bool = false) -> [(String, String)] {
+    if !state.isCandidateContainer { return [] }
+    if !conv { return state.candidates }
+    let convertedCandidates: [(String, String)] = state.candidates.map { theCandidatePair -> (String, String) in
+      let theCandidate = theCandidatePair.1
+      let theConverted = ChineseConverter.kanjiConversionIfRequired(theCandidate)
+      let result = (theCandidate == theConverted) ? theCandidate : "\(theConverted)(\(theCandidate))"
+      return (theCandidatePair.0, result)
+    }
+    return convertedCandidates
   }
 
   func candidatePairAt(_ index: Int) -> (String, String) {

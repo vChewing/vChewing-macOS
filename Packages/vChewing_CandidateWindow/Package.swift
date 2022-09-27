@@ -21,6 +21,10 @@ let package = Package(
       dependencies: [
         .product(name: "Shared", package: "vChewing_Shared")
       ]
-    )
+    ),
+    .testTarget(
+      name: "CandidateWindowTests",
+      dependencies: ["CandidateWindow"]
+    ),
   ]
 )
