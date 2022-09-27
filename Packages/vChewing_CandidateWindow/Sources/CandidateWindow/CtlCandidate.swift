@@ -10,8 +10,9 @@ import Cocoa
 import Shared
 
 open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
+  open var hint: String = ""
   open var showPageButtons: Bool = false
-  open var currentLayout: CandidateLayout = .horizontal
+  open var currentLayout: NSUserInterfaceLayoutOrientation = .horizontal
   open var locale: String = ""
   open var useLangIdentifier: Bool = false
 
@@ -67,7 +68,7 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
     }
   }
 
-  public required init(_: CandidateLayout = .horizontal) {
+  public required init(_: NSUserInterfaceLayoutOrientation = .horizontal) {
     super.init(window: .init())
     visible = false
   }
@@ -110,9 +111,9 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
     fatalError("init(coder:) has not been implemented")
   }
 
-  open var keyLabels: [CandidateKeyLabel] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+  open var keyLabels: [CandidateCellData] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
     .map {
-      CandidateKeyLabel(key: $0, displayedText: $0)
+      CandidateCellData(key: $0, displayedText: $0)
     }
 
   open var candidateFont = NSFont.systemFont(ofSize: 18)
@@ -141,4 +142,6 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
   }
 
   open func reloadData() {}
+
+  open func updateDisplay() {}
 }

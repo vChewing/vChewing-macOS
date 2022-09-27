@@ -6,9 +6,9 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import CandidateWindow
 import NSAttributedTextView
 import Shared
-import Voltaire
 
 // MARK: - Tooltip Display and Candidate Display Methods
 
@@ -72,21 +72,20 @@ extension SessionCtl {
   func showCandidates() {
     guard let client = client() else { return }
     var isCandidateWindowVertical: Bool {
-      var candidates: [(String, String)] = .init()
-      if state.isCandidateContainer {
-        candidates = state.candidates
-      }
+      // var candidates: [(String, String)] = .init()
+      // if state.isCandidateContainer { candidates = state.candidates }
       if isVerticalTyping { return true }
       // 接下來的判斷並非適用於 IMK 選字窗，所以先插入排除語句。
-      guard Self.ctlCandidateCurrent is CtlCandidateUniversal else { return false }
+      // guard Self.ctlCandidateCurrent is CtlCandidateUniversal else { return false }
       // 以上是通用情形。接下來決定橫排輸入時是否使用縱排選字窗。
       // 因為在拿候選字陣列時已經排序過了，所以這裡不用再多排序。
       // 測量每頁顯示候選字的累計總長度。如果太長的話就強制使用縱排候選字窗。
       // 範例：「屬實牛逼」（會有一大串各種各樣的「鼠食牛Beer」的 emoji）。
-      let maxCandidatesPerPage = PrefMgr.shared.candidateKeys.count
-      let firstPageCandidates = candidates[0..<min(maxCandidatesPerPage, candidates.count)].map(\.1)
-      return firstPageCandidates.joined().count > Int(round(Double(maxCandidatesPerPage) * 1.8))
+      // let maxCandidatesPerPage = PrefMgr.shared.candidateKeys.count
+      // let firstPageCandidates = candidates[0..<min(maxCandidatesPerPage, candidates.count)].map(\.1)
+      // return firstPageCandidates.joined().count > Int(round(Double(maxCandidatesPerPage) * 1.8))
       // 上面這句如果是 true 的話，就會是縱排；反之則為橫排。
+      return false
     }
 
     state.isVerticalCandidateWindow = (isCandidateWindowVertical || !PrefMgr.shared.useHorizontalCandidateList)
@@ -99,14 +98,18 @@ extension SessionCtl {
     /// layoutCandidateView 在這裡無法起到糾正作用。
     /// 該問題徹底解決的價值並不大，直接等到 macOS 10.x 全線淘汰之後用 SwiftUI 重寫選字窗吧。
 
-    let candidateLayout: CandidateLayout =
+    let candidateLayout: NSUserInterfaceLayoutOrientation =
       ((isCandidateWindowVertical || !PrefMgr.shared.useHorizontalCandidateList)
-        ? CandidateLayout.vertical
-        : CandidateLayout.horizontal)
+        ? .vertical
+        : .horizontal)
 
-    Self.ctlCandidateCurrent =
-      PrefMgr.shared.useIMKCandidateWindow
-      ? CtlCandidateIMK(candidateLayout) : CtlCandidateUniversal(candidateLayout)
+    if #available(macOS 12, *) {
+      Self.ctlCandidateCurrent =
+        PrefMgr.shared.useIMKCandidateWindow
+        ? CtlCandidateIMK(candidateLayout) : CtlCandidateTDK(candidateLayout)
+    } else {
+      Self.ctlCandidateCurrent = CtlCandidateIMK(candidateLayout)
+    }
 
     // set the attributes for the candidate panel (which uses NSAttributedString)
     let textSize = PrefMgr.shared.candidateListTextSize
@@ -132,7 +135,11 @@ extension SessionCtl {
       candidateKeys.count > 4 ? Array(candidateKeys) : Array(CandidateKey.defaultKeys)
     let keyLabelSuffix = state.type == .ofAssociates ? "^" : ""
     Self.ctlCandidateCurrent.keyLabels = keyLabels.map {
-      CandidateKeyLabel(key: String($0), displayedText: String($0) + keyLabelSuffix)
+      CandidateCellData(key: String($0), displayedText: String($0) + keyLabelSuffix)
+    }
+
+    if state.type == .ofAssociates {
+      Self.ctlCandidateCurrent.hint = NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
     }
 
     Self.ctlCandidateCurrent.delegate = self
