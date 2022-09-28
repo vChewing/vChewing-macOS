@@ -33,7 +33,6 @@
 		5B963CA828D5DB1400DCEE88 /* PrefMgr_Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B963CA728D5DB1400DCEE88 /* PrefMgr_Core.swift */; };
 		5B98114828D6198700CBC605 /* PinyinPhonaConverter in Frameworks */ = {isa = PBXBuildFile; productRef = 5B98114728D6198700CBC605 /* PinyinPhonaConverter */; };
 		5BA8C30328DF0360004C5CC4 /* CandidateWindow in Frameworks */ = {isa = PBXBuildFile; productRef = 5BA8C30228DF0360004C5CC4 /* CandidateWindow */; };
-		5BA8C30528DF0364004C5CC4 /* Voltaire in Frameworks */ = {isa = PBXBuildFile; productRef = 5BA8C30428DF0364004C5CC4 /* Voltaire */; };
 		5BA9FD0F27FEDB6B002DE248 /* suiPrefPaneGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0A27FEDB6B002DE248 /* suiPrefPaneGeneral.swift */; };
 		5BA9FD1027FEDB6B002DE248 /* suiPrefPaneKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0B27FEDB6B002DE248 /* suiPrefPaneKeyboard.swift */; };
 		5BA9FD1127FEDB6B002DE248 /* ctlPrefUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0C27FEDB6B002DE248 /* ctlPrefUI.swift */; };
@@ -222,7 +221,6 @@
 		5B963CA128D5C22D00DCEE88 /* vChewing_SwiftExtension */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_SwiftExtension; path = Packages/vChewing_SwiftExtension; sourceTree = "<group>"; };
 		5B963CA728D5DB1400DCEE88 /* PrefMgr_Core.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefMgr_Core.swift; sourceTree = "<group>"; };
 		5B98114628D6198000CBC605 /* vChewing_PinyinPhonaConverter */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_PinyinPhonaConverter; path = Packages/vChewing_PinyinPhonaConverter; sourceTree = "<group>"; };
-		5BA8C30028DEFE4F004C5CC4 /* OpenVanilla_Voltaire */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = OpenVanilla_Voltaire; path = Packages/OpenVanilla_Voltaire; sourceTree = "<group>"; };
 		5BA8C30128DEFE4F004C5CC4 /* vChewing_CandidateWindow */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_CandidateWindow; path = Packages/vChewing_CandidateWindow; sourceTree = "<group>"; };
 		5BA9FD0A27FEDB6B002DE248 /* suiPrefPaneGeneral.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = suiPrefPaneGeneral.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BA9FD0B27FEDB6B002DE248 /* suiPrefPaneKeyboard.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = suiPrefPaneKeyboard.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -359,7 +357,6 @@
 				5BDB7A3B28D4824A001AC277 /* FolderMonitor in Frameworks */,
 				5BA8C30328DF0360004C5CC4 /* CandidateWindow in Frameworks */,
 				5BC5E01E28DDE4770094E427 /* NotifierUI in Frameworks */,
-				5BA8C30528DF0364004C5CC4 /* Voltaire in Frameworks */,
 				5B40113C28D71C0100A9D4CB /* Uninstaller in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -565,7 +562,6 @@
 				5BDB7A3128D47587001AC277 /* DanielGalasko_FolderMonitor */,
 				5BFC63C428D487AE004A77B7 /* Fuziki_NSAttributedTextView */,
 				5BDB7A3028D47587001AC277 /* Jad_BookmarkManager */,
-				5BA8C30028DEFE4F004C5CC4 /* OpenVanilla_Voltaire */,
 				5BDB7A3428D47587001AC277 /* Qwertyyb_ShiftKeyUpChecker */,
 				5BDB7A3528D47587001AC277 /* RMJay_LineReader */,
 				5BDB7A2F28D47587001AC277 /* Sindresorhus_Preferences */,
@@ -783,7 +779,6 @@
 				5BC5E02028DDEFE00094E427 /* TooltipUI */,
 				5BC5E02328DE07860094E427 /* PopupCompositionBuffer */,
 				5BA8C30228DF0360004C5CC4 /* CandidateWindow */,
-				5BA8C30428DF0364004C5CC4 /* Voltaire */,
 			);
 			productName = vChewing;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */;
@@ -1779,10 +1774,6 @@
 		5BA8C30228DF0360004C5CC4 /* CandidateWindow */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CandidateWindow;
-		};
-		5BA8C30428DF0364004C5CC4 /* Voltaire */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Voltaire;
 		};
 		5BC5E01D28DDE4770094E427 /* NotifierUI */ = {
 			isa = XCSwiftPackageProductDependency;
