@@ -66,7 +66,7 @@
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
 "lblAlwaysShowTooltipTextsHorizontally.title" = "Always show tooltip texts horizontally";
-"lblDevZoneIMKCandidate.title" = "IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases.";
+"lblDevZoneIMKCandidate.title" = "IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases. However, this mode is recommended at this moment since Tadokoro candidate window still needs possible improvements.";
 "lblDevZoneTitleDescription.title" = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
 "lblIntonationKeyBehavior.title" = "Specify what intonation key does when syllable composer is empty.";
 "lblShiftBkspKeyBehavior.title" = "Choose the attempted behavior of Shift+BackSpace key.";
@@ -91,7 +91,7 @@
 "rVQ-Hx-cGi.title" = "Japanese";
 "s7u-Fm-dVg.title" = "Cycling Pages";
 "shc-Nu-UsM.title" = "Show page buttons in candidate list";
-"tglDevZoneIMKCandidate.title" = "Use IMK Candidate Window instead (will reboot the IME)";
+"tglDevZoneIMKCandidate.title" = "Use IMK Candidate Window instead of Tadokoro (will reboot the IME)";
 "tglTrimUnfinishedReadingsOnCommit.title" = "Trim unfinished readings on commit";
 "TXr-FF-ehw.title" = "Traditional Chinese";
 "ueU-Rz-a1C.title" = "Choose the behavior of (Shift+)Tab key in the candidate window.";

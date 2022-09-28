@@ -15,7 +15,7 @@ extension PrefMgr {
     // 防呆。macOS 10.11 用 IMK 選字窗會崩潰，macOS 10.13 的 IMK 選字窗仍有問題。
     // 一般人想用的 IMK 選字窗基於 macOS 10.09 系統內建的注音輸入法的那種矩陣選字窗。
     // 然而，該選字窗的體驗直到 macOS 10.14 開始才在 IMKCandidates 當中正式提供。
-    if #unavailable(macOS 10.13) { useIMKCandidateWindow = false }
+    if #unavailable(macOS 12) { useIMKCandidateWindow = true }
     if #unavailable(macOS 10.15) {
       handleDefaultCandidateFontsByLangIdentifier = false
       shiftKeyAccommodationBehavior = 0

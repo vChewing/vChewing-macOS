@@ -185,7 +185,7 @@
 "Hsu" = "許氏国音自然配列";
 "Hualuo Pinyin with Numeral Intonation" = "中華ローマ弁音 (ローマ字+数字音調)";
 "IBM" = "IBM 配列";
-"IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases." = "IMK 候補陳列ウィンドウは、Apple の未公開のAPIを「bridging-header」という強引的な手段で引き出して利用した機能である。現時点で macOS 10.14 Mojave から macOS 13 Ventura まで利用可能であるが、その後の新しい macOS との互換性の話はまだ早い。";
+"IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases. However, this mode is recommended at this moment since Tadokoro candidate window still needs possible improvements." = "IMK 候補陳列ウィンドウは、Apple の未公開のAPIを「bridging-header」という強引的な手段で引き出して利用した機能である。現時点で macOS 10.14 Mojave から macOS 13 Ventura まで利用可能であるが、その後の新しい macOS との互換性の話はまだ早い。とはいえ、田所候補陳列ウィンドウにはまだ改善できるところがあるため、IMK 候補陳列ウィンドウは現時点で推奨選択とする。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "単語の前で // macOS 内蔵注音入力のやり方";
 "Intonation Key:" = "音調キー:";
 "Japanese" = "和語";
@@ -217,7 +217,8 @@
 "Specify the behavior of intonation key when syllable composer is empty." = "音読組立緩衝列が空かされた時の音調キーの行為をご指定ください。";
 "Starlight" = "星光配列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "マナーモード // 外すと入力間違った時に変な声が出る";
-"This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later." = "これは Apple Bug Report #FB10978412 の臨時対策であり、macOS 12 からの macOS に効き、IMK 以外の候補陳列ウィンドウに作用する。Apple は macOS 11 からの macOS のために該当 Bug を修復すべきである。";
+"Tadokoro candidate window only supports horizontal grid view. Enable IMK candidate window in DevZone page first if you want to choose vertical candidate window." = "田所候補陳列ウィンドウは格子状横型陳列しかできません。開発道場のページで IMK 候補陳列ウィンドウを起用してから、今のこのページで縦型・横型陳列の選択はできます。";
+"This only works with Tadokoro candidate window." = "これは田所候補陳列ウィンドウだけに効ける機能である。";
 "Traditional Chinese" = "繁体中国語";
 "Trim unfinished readings on commit" = "送り出す緩衝列内容から未完成な音読みを除く";
 "Type them into inline composition buffer" = "入力緩衝列にローマ字入力";
@@ -226,7 +227,7 @@
 "Universal Pinyin with Numeral Intonation" = "汎用弁音 (ローマ字+数字音調)";
 "Use .langIdentifier to handle UI fonts in candidate window" = "「.langIdentifier」を使って候補陳列ウィンドウのフォントを取り扱う";
 "Use ESC key to clear the entire input buffer" = "ESC キーで入力緩衝列を消す";
-"Use IMK Candidate Window instead (will reboot the IME)" = "IMK 候補陳列ウィンドウを起用（入力アプリは自動的に再起動）";
+"Use IMK Candidate Window instead of Tadokoro (will reboot the IME)" = "IMK 候補陳列ウィンドウを起用（入力アプリは自動的に再起動）";
 "Use Shift key accommodation in all cases" = "いずれの客体アプリにも Shift キーの互換性措置を起用";
 "Vertical" = "縦型陳列";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";

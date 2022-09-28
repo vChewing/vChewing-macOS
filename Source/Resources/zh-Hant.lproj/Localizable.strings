@@ -185,7 +185,7 @@
 "Hsu" = "許氏國音自然排列";
 "Hualuo Pinyin with Numeral Intonation" = "華羅拼音+數字標調";
 "IBM" = "IBM 排列";
-"IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases." = "IMK 選字窗依賴於 Apple 的私有 API，而且是藉由橋接檔案頭強制曝露的方法使用的。目前，該功能僅在 macOS 10.14 Mojave 至 macOS 13 Ventura 系統內有測試過可用性。至於在未來的 macOS 發行版當中是否可用，則需要另行測試、才能下結論。";
+"IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases. However, this mode is recommended at this moment since Tadokoro candidate window still needs possible improvements." = "IMK 選字窗依賴於 Apple 的私有 API，而且是藉由橋接檔案頭強制曝露的方法使用的。目前，該功能僅在 macOS 10.14 Mojave 至 macOS 13 Ventura 系統內有測試過可用性。至於在未來的 macOS 發行版當中是否可用，則需要另行測試、才能下結論。然而，目前 IMK 選字窗屬於建議啟用的功能，因為田所選字窗仍需改善。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "將游標置於詞語前方 // macOS 內建注音風格";
 "Intonation Key:" = "聲調鍵:";
 "Japanese" = "和語";
@@ -217,7 +217,8 @@
 "Specify the behavior of intonation key when syllable composer is empty." = "指定聲調鍵（在注拼槽為「空」狀態時）的行為。";
 "Starlight" = "星光排列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉恥模式 // 取消勾選的話，敲錯字時會有異音";
-"This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later." = "該方法是 Apple Bug Report #FB10978412 的保守治療方案，用來僅針對 macOS 12 開始的系統，且僅對非 IMK 選字窗起作用。Apple 應該對 macOS 11 開始的系統修復這個 Bug。";
+"Tadokoro candidate window only supports horizontal grid view. Enable IMK candidate window in DevZone page first if you want to choose vertical candidate window." = "田所選字窗僅支援橫排矩陣佈局模式。如欲使用縱排佈局模式者，請在開發道場內先啟用 IMK 選字窗。";
+"This only works with Tadokoro candidate window." = "該方法僅對田所選字窗起作用。";
 "Traditional Chinese" = "繁體中文";
 "Trim unfinished readings on commit" = "在遞交時清理未完成拼寫的讀音";
 "Type them into inline composition buffer" = "直接鍵入內文組字區";
@@ -226,7 +227,7 @@
 "Universal Pinyin with Numeral Intonation" = "通用拼音+數字標調";
 "Use .langIdentifier to handle UI fonts in candidate window" = "使用 .langIdentifier 來管理選字窗的預設介面字型";
 "Use ESC key to clear the entire input buffer" = "敲 ESC 鍵以清空整個組字緩衝區";
-"Use IMK Candidate Window instead (will reboot the IME)" = "啟用與 macOS 內建輸入法相同的 IMK 選字窗（會自動重啟輸入法）";
+"Use IMK Candidate Window instead of Tadokoro (will reboot the IME)" = "啟用與 macOS 內建輸入法相同的 IMK 選字窗（會自動重啟輸入法）";
 "Use Shift key accommodation in all cases" = "對任何客體應用均啟用 Shift 鍵相容性措施";
 "Vertical" = "縱向佈局";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：該頁面僅作未來功能測試所用。\n在此列出的功能並非處於完全可用之狀態。";
