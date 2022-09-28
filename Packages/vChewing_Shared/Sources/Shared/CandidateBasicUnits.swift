@@ -44,9 +44,9 @@ public class CandidateCellData: Hashable {
   }
 
   public var cellLength: Int {
-    let rect = attributedString.boundingRect(
-      with: NSSize(width: 1600.0, height: 1600.0),
-      options: [.usesLineFragmentOrigin]
+    if displayedText.count <= 2 { return Int(ceil(size * 3)) }
+    let rect = attributedStringForLengthCalculation.boundingRect(
+      with: NSSize(width: 1600.0, height: 1600.0), options: [.usesLineFragmentOrigin]
     )
     let rawResult = ceil(rect.width + size / size)
     return Int(rawResult)
@@ -70,6 +70,14 @@ public class CandidateCellData: Hashable {
     }
     let attrStrKey = NSMutableAttributedString(string: key, attributes: attrKey)
     return attrStrKey
+  }
+
+  public var attributedStringForLengthCalculation: NSAttributedString {
+    let attrCandidate: [NSAttributedString.Key: AnyObject] = [
+      .font: NSFont.monospacedDigitSystemFont(ofSize: size, weight: .regular)
+    ]
+    let attrStrCandidate = NSMutableAttributedString(string: displayedText + "　", attributes: attrCandidate)
+    return attrStrCandidate
   }
 
   public var attributedString: NSAttributedString {

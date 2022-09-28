@@ -142,7 +142,6 @@ extension SessionCtl {
       Self.ctlCandidateCurrent.hint = NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
     }
 
-    Self.ctlCandidateCurrent.delegate = self
     Self.ctlCandidateCurrent.showPageButtons = PrefMgr.shared.showPageButtonsInCandidateWindow
     Self.ctlCandidateCurrent.useLangIdentifier = PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier
     Self.ctlCandidateCurrent.locale = {
@@ -156,7 +155,6 @@ extension SessionCtl {
         default: return ""
       }
     }()
-    Self.ctlCandidateCurrent.reloadData()
 
     if #available(macOS 10.14, *) {
       // Spotlight 視窗會擋住 IMK 選字窗，所以需要特殊處理。
@@ -167,6 +165,7 @@ extension SessionCtl {
       }
     }
 
+    Self.ctlCandidateCurrent.delegate = self
     Self.ctlCandidateCurrent.visible = true
 
     if isVerticalTyping {

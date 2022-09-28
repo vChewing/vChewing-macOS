@@ -46,17 +46,17 @@ extension SessionCtl: KeyHandlerDelegate {
 // MARK: - Candidate Controller Delegate
 
 extension SessionCtl: CtlCandidateDelegate {
+  var selectionKeys: String { PrefMgr.shared.candidateKeys }
+
   func buzz() {
     IMEApp.buzz()
   }
 
-  func kanjiConversionIfRequired(_ target: String) -> String {
-    ChineseConverter.kanjiConversionIfRequired(target)
-  }
-
   func candidatePairs(conv: Bool = false) -> [(String, String)] {
-    if !state.isCandidateContainer { return [] }
-    if !conv { return state.candidates }
+    if !state.isCandidateContainer || state.candidates.isEmpty { return [] }
+    if !conv || PrefMgr.shared.cns11643Enabled || state.candidates[0].0.contains("_punctuation") {
+      return state.candidates
+    }
     let convertedCandidates: [(String, String)] = state.candidates.map { theCandidatePair -> (String, String) in
       let theCandidate = theCandidatePair.1
       let theConverted = ChineseConverter.kanjiConversionIfRequired(theCandidate)
