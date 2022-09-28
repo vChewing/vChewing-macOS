@@ -8,6 +8,7 @@
 
 /// 該檔案乃按鍵調度模組當中「用來規定在選字窗出現時的按鍵行為」的部分。
 
+import CandidateWindow
 import Shared
 
 // MARK: - § 對選字狀態進行調度 (Handle Candidate State).
@@ -162,8 +163,21 @@ extension KeyHandler {
     if input.isUp {
       switch ctlCandidate.currentLayout {
         case .horizontal:
-          if !ctlCandidate.showPreviousPage() {
-            errorCallback("9B614524")
+          if #available(macOS 12, *) {
+            if let ctlCandidate = ctlCandidate as? CtlCandidateTDK {
+              ctlCandidate.showPreviousLine()
+              break
+            } else {
+              if !ctlCandidate.showPreviousPage() {
+                errorCallback("9B614524")
+                break
+              }
+            }
+          } else {
+            if !ctlCandidate.showPreviousPage() {
+              errorCallback("9B614524")
+              break
+            }
           }
         case .vertical:
           if !ctlCandidate.highlightPreviousCandidate() {
@@ -180,8 +194,21 @@ extension KeyHandler {
     if input.isDown {
       switch ctlCandidate.currentLayout {
         case .horizontal:
-          if !ctlCandidate.showNextPage() {
-            errorCallback("92B990DD")
+          if #available(macOS 12, *) {
+            if let ctlCandidate = ctlCandidate as? CtlCandidateTDK {
+              ctlCandidate.showNextLine()
+              break
+            } else {
+              if !ctlCandidate.showNextPage() {
+                errorCallback("92B990DD")
+                break
+              }
+            }
+          } else {
+            if !ctlCandidate.showNextPage() {
+              errorCallback("92B990DD")
+              break
+            }
           }
         case .vertical:
           if !ctlCandidate.highlightNextCandidate() {
@@ -294,8 +321,16 @@ extension KeyHandler {
     // MARK: - Flipping pages by using symbol menu keys (when they are not occupied).
 
     if input.isSymbolMenuPhysicalKey {
-      let updated: Bool =
-        input.isShiftHold ? ctlCandidate.showPreviousPage() : ctlCandidate.showNextPage()
+      var updated = true
+      if #available(macOS 12, *) {
+        if let ctlCandidate = ctlCandidate as? CtlCandidateTDK {
+          updated = input.isShiftHold ? ctlCandidate.showPreviousLine() : ctlCandidate.showNextLine()
+        } else {
+          updated = input.isShiftHold ? ctlCandidate.showPreviousPage() : ctlCandidate.showNextPage()
+        }
+      } else {
+        updated = input.isShiftHold ? ctlCandidate.showPreviousPage() : ctlCandidate.showNextPage()
+      }
       if !updated {
         errorCallback("66F3477B")
       }

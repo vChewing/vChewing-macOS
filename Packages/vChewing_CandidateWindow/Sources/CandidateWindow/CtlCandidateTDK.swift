@@ -65,12 +65,28 @@ public class CtlCandidateTDK: CtlCandidate {
   }
 
   @discardableResult override public func showNextPage() -> Bool {
-    thePool.selectNewNeighborRow(direction: .down)
+    for _ in 0..<6 {
+      thePool.selectNewNeighborRow(direction: .down)
+    }
     updateDisplay()
     return true
   }
 
   @discardableResult override public func showPreviousPage() -> Bool {
+    for _ in 0..<6 {
+      thePool.selectNewNeighborRow(direction: .up)
+    }
+    updateDisplay()
+    return true
+  }
+
+  @discardableResult public func showNextLine() -> Bool {
+    thePool.selectNewNeighborRow(direction: .down)
+    updateDisplay()
+    return true
+  }
+
+  @discardableResult public func showPreviousLine() -> Bool {
     thePool.selectNewNeighborRow(direction: .up)
     updateDisplay()
     return true
