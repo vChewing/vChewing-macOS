@@ -21,7 +21,7 @@ struct CandidatePoolViewUI_Previews: PreviewProvider {
     "吹", "大", "地", "草", "枝", "擺",
   ]
   static var thePool: CandidatePool {
-    let result = CandidatePool(candidates: testCandidates, columnCapacity: 6)
+    var result = CandidatePool(candidates: testCandidates, columnCapacity: 6)
     // 下一行待解決：無論這裡怎麼指定高亮選中項是哪一筆，其所在行都得被卷動到使用者眼前。
     result.highlight(at: 14)
     return result
@@ -50,28 +50,24 @@ public struct VwrCandidateTDK: View {
 
   public var body: some View {
     VStack(alignment: .leading, spacing: 0) {
-      ScrollViewReader { proxy in
-        ScrollView(.vertical, showsIndicators: true) {
-          VStack(alignment: .leading, spacing: 1.6) {
-            ForEach(thePool.candidateRows.indices, id: \.self) { columnIndex in
-              HStack(spacing: 10) {
-                ForEach(Array(thePool.candidateRows[columnIndex]), id: \.self) { currentCandidate in
-                  currentCandidate.attributedStringForSwiftUI.fixedSize()
-                    .frame(maxWidth: .infinity, alignment: .topLeading)
-                    .contentShape(Rectangle())
-                    .onTapGesture { didSelectCandidateAt(currentCandidate.index) }
-                }
-                Spacer()
-              }.frame(
-                minWidth: 0,
-                maxWidth: .infinity,
-                alignment: .topLeading
-              ).id(columnIndex)
-              Divider()
-            }
+      ScrollView(.vertical, showsIndicators: true) {
+        VStack(alignment: .leading, spacing: 1.6) {
+          ForEach(thePool.rangeForCurrentPage, id: \.self) { columnIndex in
+            HStack(spacing: 10) {
+              ForEach(Array(thePool.candidateRows[columnIndex]), id: \.self) { currentCandidate in
+                currentCandidate.attributedStringForSwiftUI.fixedSize()
+                  .frame(maxWidth: .infinity, alignment: .topLeading)
+                  .contentShape(Rectangle())
+                  .onTapGesture { didSelectCandidateAt(currentCandidate.index) }
+              }
+              Spacer()
+            }.frame(
+              minWidth: 0,
+              maxWidth: .infinity,
+              alignment: .topLeading
+            ).id(columnIndex)
+            Divider()
           }
-        }.onAppear {
-          proxy.scrollTo(thePool.currentRowNumber)
         }
       }
       .frame(minHeight: thePool.maxWindowHeight, maxHeight: thePool.maxWindowHeight).padding(5)
