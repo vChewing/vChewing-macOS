@@ -91,7 +91,6 @@ P.S.: 威注音输入法的 Shift 按键监测功能仅借由对 NSEvent 讯号�
 威注音专案目前仅用到小麦注音的下述程式组件（MIT License）：
 
 - 仅供研发人员调试方便而使用的 App 版安装程式 (by Zonble Yang)，不对公众使用。
-- Voltaire MK2 选字窗 (by Zonble Yang)，有大幅度修改。
 
 威注音专案目前还用到如下的来自 Lukhnos Liu 的算法：
 
