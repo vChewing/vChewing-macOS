@@ -43,25 +43,25 @@ public class CtlCandidateTDK: CtlCandidate {
     CandidateCellData.highlightBackground = highlightedColor()
     CandidateCellData.unifiedSize = candidateFont.pointSize
     guard let delegate = delegate else { return }
-    let selectionKeys = keyLabels.map(\.key).joined()
     thePool = .init(
-      candidates: delegate.candidatePairs(conv: true).map(\.1), selectionKeys: selectionKeys, locale: locale
+      candidates: delegate.candidatePairs(conv: true).map(\.1),
+      selectionKeys: delegate.selectionKeys, locale: locale
     )
     thePool.highlight(at: 0)
     updateDisplay()
   }
 
   override open func updateDisplay() {
-    let newView = NSHostingView(rootView: theView.fixedSize())
-    let newSize = newView.fittingSize
-    var newFrame = NSRect.zero
-    if let window = window {
-      newFrame = window.frame
+    DispatchQueue.main.async { [self] in
+      let newView = NSHostingView(rootView: theView.fixedSize())
+      let newSize = newView.fittingSize
+      var newFrame = NSRect.zero
+      if let window = window { newFrame = window.frame }
+      newFrame.size = newSize
+      window?.setFrame(newFrame, display: false)
+      window?.contentView = NSHostingView(rootView: theView.fixedSize())
+      window?.setContentSize(newSize)
     }
-    newFrame.size = newSize
-    window?.setFrame(newFrame, display: false)
-    window?.contentView = NSHostingView(rootView: theView.fixedSize())
-    window?.setContentSize(newSize)
   }
 
   @discardableResult override public func showNextPage() -> Bool {
