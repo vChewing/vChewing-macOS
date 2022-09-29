@@ -81,7 +81,7 @@
 "Optimize Memorized Phrases" = "臨時記憶資料を整う";
 "Clear Memorized Phrases" = "臨時記憶資料を削除";
 "Currency Numeral Output" = "数字大字変換";
-"Hold ⇧ to choose associates." = "⇧を押しながら連想候補をご選択ください。";
+"Hold ⇧ to choose associates." = "⇧を押しながら連想候補を選択。";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";
@@ -216,7 +216,6 @@
 "Specify the behavior of intonation key when syllable composer is empty." = "音読組立緩衝列が空かされた時の音調キーの行為をご指定ください。";
 "Starlight" = "星光配列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "マナーモード // 外すと入力間違った時に変な声が出る";
-"Tadokoro candidate window only supports horizontal grid view. Enable IMK candidate window in DevZone page first if you want to choose vertical candidate window." = "田所候補陳列ウィンドウは格子状横型陳列しかできません。開発道場のページで IMK 候補陳列ウィンドウを起用してから、今のこのページで縦型・横型陳列の選択はできます。";
 "This only works with Tadokoro candidate window." = "これは田所候補陳列ウィンドウだけに効ける機能である。";
 "Traditional Chinese" = "繁体中国語";
 "Trim unfinished readings on commit" = "送り出す緩衝列内容から未完成な音読みを除く";
