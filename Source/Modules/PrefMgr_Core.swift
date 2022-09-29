@@ -53,8 +53,8 @@ public class PrefMgr: PrefMgrProtocol {
   )
   public var alphanumericalKeyboardLayout: String
 
-  @AppProperty(key: UserDef.kShowPageButtonsInCandidateWindow.rawValue, defaultValue: true)
-  public var showPageButtonsInCandidateWindow: Bool
+  @AppProperty(key: UserDef.kShowNotificationsWhenTogglingCapsLock.rawValue, defaultValue: true)
+  public var showNotificationsWhenTogglingCapsLock: Bool
 
   @AppProperty(key: UserDef.kCandidateListTextSize.rawValue, defaultValue: 18)
   public var candidateListTextSize: Double {

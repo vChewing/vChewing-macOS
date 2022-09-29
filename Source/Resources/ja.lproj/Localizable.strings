@@ -208,7 +208,7 @@
 "Shift+BackSpace:" = "Shift+BackSpace:";
 "Shift+Letter:" = "Shift+文字キー:";
 "Show Hanyu-Pinyin in the inline composition buffer" = "弁音合併入力（入力緩衝列で音読みを漢語弁音に）";
-"Show page buttons in candidate window" = "入力候補陳列の側にページボタンを表示";
+"Show notifications when toggling Caps Lock" = "Caps Lock で切り替えの時に吹出通知メッセージを";
 "Simplified Chinese" = "簡体中国語";
 "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work." = "いくつかのアプリ（例えば MS Edge や Google Chrome などのような Chromium 系ブラウザー）には「Shift キーの入力イベントを複数化してしまう」という支障があり、そしてアプリそれぞれの開発元に修復される可能性はほぼゼロだと言える。威注音入力アプリは対策用の特殊措置を普段に起用している。ご自分の必要によって設定してください。";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+Space で次のページ、Space で次の候補文字を";
