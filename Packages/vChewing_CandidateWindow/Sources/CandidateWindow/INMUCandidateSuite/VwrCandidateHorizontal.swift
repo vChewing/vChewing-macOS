@@ -13,27 +13,28 @@ import SwiftUI
 // MARK: - Some useless tests
 
 @available(macOS 12, *)
-struct CandidatePoolViewUI_Previews: PreviewProvider {
+struct CandidatePoolViewUIHorizontal_Previews: PreviewProvider {
   @State static var testCandidates: [String] = [
     "八月中秋山林涼", "八月中秋", "風吹大地", "山林涼", "草枝擺", "八月", "中秋",
+    "🐂🍺🐂🍺", "🐃🍺", "🐂🍺", "🐃🐂🍺🍺", "🐂🍺", "🐃🍺", "🐂🍺", "🐃🍺", "🐂🍺", "🐃🍺",
     "山林", "風吹", "大地", "草枝", "八", "月", "中", "秋", "山", "林", "涼", "風",
     "吹", "大", "地", "草", "枝", "擺", "八", "月", "中", "秋", "山", "林", "涼", "風",
     "吹", "大", "地", "草", "枝", "擺",
   ]
   static var thePool: CandidatePool {
-    let result = CandidatePool(candidates: testCandidates, columnCapacity: 6)
+    let result = CandidatePool(candidates: testCandidates, rowCapacity: 6)
     // 下一行待解決：無論這裡怎麼指定高亮選中項是哪一筆，其所在行都得被卷動到使用者眼前。
-    result.highlight(at: 14)
+    result.highlightHorizontal(at: 5)
     return result
   }
 
   static var previews: some View {
-    VwrCandidateTDK(controller: .init(.horizontal), thePool: thePool).fixedSize()
+    VwrCandidateHorizontal(controller: .init(.horizontal), thePool: thePool).fixedSize()
   }
 }
 
 @available(macOS 12, *)
-public struct VwrCandidateTDK: View {
+public struct VwrCandidateHorizontal: View {
   public var controller: CtlCandidateTDK
   @State public var thePool: CandidatePool
   @State public var hint: String = ""
@@ -52,26 +53,28 @@ public struct VwrCandidateTDK: View {
     VStack(alignment: .leading, spacing: 0) {
       ScrollView(.vertical, showsIndicators: true) {
         VStack(alignment: .leading, spacing: 1.6) {
-          ForEach(thePool.rangeForCurrentPage, id: \.self) { columnIndex in
+          ForEach(thePool.rangeForCurrentHorizontalPage, id: \.self) { rowIndex in
             HStack(spacing: 10) {
-              ForEach(Array(thePool.candidateRows[columnIndex]), id: \.self) { currentCandidate in
+              ForEach(Array(thePool.candidateRows[rowIndex]), id: \.self) { currentCandidate in
                 currentCandidate.attributedStringForSwiftUI.fixedSize()
-                  .frame(maxWidth: .infinity, alignment: .topLeading)
+                  .frame(
+                    maxWidth: .infinity,
+                    alignment: .topLeading
+                  )
                   .contentShape(Rectangle())
                   .onTapGesture { didSelectCandidateAt(currentCandidate.index) }
               }
-              Spacer()
             }.frame(
               minWidth: 0,
               maxWidth: .infinity,
               alignment: .topLeading
-            ).id(columnIndex)
+            ).id(rowIndex)
             Divider()
           }
-          if thePool.maximumLinesPerPage - thePool.rangeForCurrentPage.count > 0 {
-            ForEach(thePool.rangeForLastPageBlanked, id: \.self) { _ in
+          if thePool.maximumRowsPerPage - thePool.rangeForCurrentHorizontalPage.count > 0 {
+            ForEach(thePool.rangeForLastHorizontalPageBlanked, id: \.self) { _ in
               HStack(spacing: 0) {
-                thePool.blankCell.attributedStringForSwiftUI.fixedSize()
+                thePool.blankCell.attributedStringForSwiftUI
                   .frame(maxWidth: .infinity, alignment: .topLeading)
                   .contentShape(Rectangle())
                 Spacer()
@@ -87,41 +90,18 @@ public struct VwrCandidateTDK: View {
       }
       .fixedSize(horizontal: false, vertical: true).padding(5)
       .background(Color(nsColor: NSColor.controlBackgroundColor).ignoresSafeArea())
-      HStack(alignment: .bottom) {
-        Text(hint).font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold)).lineLimit(1)
-        Spacer()
-        Text(positionLabel).font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold)).lineLimit(
-          1)
-      }.padding(6).foregroundColor(.init(nsColor: .controlTextColor))
-        .shadow(color: .init(nsColor: .textBackgroundColor), radius: 1)
+      ZStack(alignment: .leading) {
+        Color(nsColor: hint.isEmpty ? .windowBackgroundColor : CandidateCellData.highlightBackground).ignoresSafeArea()
+        HStack(alignment: .bottom) {
+          Text(hint).font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold)).lineLimit(1)
+          Spacer()
+          Text(positionLabel).font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold))
+            .lineLimit(
+              1)
+        }
+        .padding(6).foregroundColor(.init(nsColor: .controlTextColor))
+      }
     }
     .frame(minWidth: thePool.maxWindowWidth, maxWidth: thePool.maxWindowWidth)
-  }
-}
-
-@available(macOS 12, *)
-extension CandidateCellData {
-  public var attributedStringForSwiftUI: some View {
-    var result: some View {
-      ZStack(alignment: .leading) {
-        if isSelected {
-          Color(nsColor: CandidateCellData.highlightBackground).ignoresSafeArea().cornerRadius(6)
-        }
-        VStack(spacing: 0) {
-          HStack(spacing: 4) {
-            if UserDefaults.standard.bool(forKey: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue) {
-              Text(AttributedString(attributedStringHeader)).frame(width: CandidateCellData.unifiedSize / 2)
-              Text(AttributedString(attributedString))
-            } else {
-              Text(key).font(.system(size: fontSizeKey).monospaced())
-                .foregroundColor(.init(nsColor: fontColorKey)).lineLimit(1)
-              Text(displayedText).font(.system(size: fontSizeCandidate))
-                .foregroundColor(.init(nsColor: fontColorCandidate)).lineLimit(1)
-            }
-          }.padding(4)
-        }
-      }.fixedSize(horizontal: false, vertical: true)
-    }
-    return result
   }
 }
