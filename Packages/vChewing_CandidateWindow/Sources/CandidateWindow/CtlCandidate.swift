@@ -11,7 +11,6 @@ import Shared
 
 open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
   open var hint: String = ""
-  open var showPageButtons: Bool = false
   open var currentLayout: NSUserInterfaceLayoutOrientation = .horizontal
   open var locale: String = ""
   open var useLangIdentifier: Bool = false
