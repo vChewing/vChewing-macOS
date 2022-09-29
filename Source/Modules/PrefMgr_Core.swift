@@ -233,7 +233,10 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kCandidateKeys.rawValue, defaultValue: kDefaultCandidateKeys)
   public var candidateKeys: String {
     didSet {
-      if useIMKCandidateWindow {
+      if candidateKeys != candidateKeys.deduplicated {
+        candidateKeys = candidateKeys.deduplicated
+      }
+      if !(6...9).contains(candidateKeys.count) {
         candidateKeys = Self.kDefaultCandidateKeys
       }
     }

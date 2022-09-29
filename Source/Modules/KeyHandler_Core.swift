@@ -275,7 +275,7 @@ public class KeyHandler {
       Megrez.Compositor.KeyValuePaired(key: $0.0, value: $0.1.value)
     }
     arrCandidates = arrSuggestedCandidates.filter { arrCandidates.contains($0) } + arrCandidates
-    arrCandidates = arrCandidates.deduplicate
+    arrCandidates = arrCandidates.deduplicated
     arrCandidates = arrCandidates.stableSort { $0.key.split(separator: "-").count > $1.key.split(separator: "-").count }
     return arrCandidates.map { ($0.key, $0.value) }
   }
