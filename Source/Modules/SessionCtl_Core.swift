@@ -47,7 +47,7 @@ class SessionCtl: IMKInputController {
 
   // MARK: -
 
-  /// 當前 CapsLock 按鍵是否被摁下。
+  /// 當前 Caps Lock 按鍵是否被摁下。
   var isCapsLocked: Bool { NSEvent.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock) }
 
   /// 當前這個 SessionCtl 副本是否處於英數輸入模式。
@@ -68,7 +68,7 @@ class SessionCtl: IMKInputController {
   }
 
   /// Shift 按鍵事件分析器的副本。
-  /// - Remark: 警告：該工具必須為 Struct 且全專案只能有一個唯一初期化副本。否則會在動 CapsLock 的時候誤以為是在摁 Shift。
+  /// - Remark: 警告：該工具必須為 Struct 且全專案只能有一個唯一初期化副本。否則會在動 Caps Lock 的時候誤以為是在摁 Shift。
   static var theShiftKeyDetector = ShiftKeyUpChecker(useLShift: PrefMgr.shared.togglingAlphanumericalModeWithLShift)
 
   /// `handle(event:)` 會利用這個參數判定某次 Shift 按鍵是否用來切換中英文輸入。
@@ -170,7 +170,7 @@ extension SessionCtl {
     keyHandler.ensureKeyboardParser()
 
     if isASCIIMode, !isCapsLocked, PrefMgr.shared.disableShiftTogglingAlphanumericalMode { isASCIIMode = false }
-    if isCapsLocked { isASCIIMode = isCapsLocked }  // 同步 CapsLock 狀態。
+    if isCapsLocked { isASCIIMode = isCapsLocked }  // 同步 Caps Lock 狀態。
 
     /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
     /// 這是很多 macOS 副廠輸入法的常見失誤之處。
