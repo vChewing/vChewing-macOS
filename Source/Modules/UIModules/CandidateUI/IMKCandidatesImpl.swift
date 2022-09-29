@@ -148,6 +148,18 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
     return true
   }
 
+  // 該函式會影響 IMK 選字窗。
+  public func showNextLine() -> Bool {
+    do { currentLayout == .vertical ? moveRight(self) : moveDown(self) }
+    return true
+  }
+
+  // 該函式會影響 IMK 選字窗。
+  public func showPreviousLine() -> Bool {
+    do { currentLayout == .vertical ? moveLeft(self) : moveUp(self) }
+    return true
+  }
+
   public func candidateIndexAtKeyLabelIndex(_ index: Int) -> Int {
     guard let delegate = delegate else { return Int.max }
     let result = currentPageIndex * keyLabels.count + index

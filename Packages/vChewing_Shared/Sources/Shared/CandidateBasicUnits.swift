@@ -25,7 +25,8 @@ public class CandidateCellData: Hashable {
   public var displayedText: String
   public var size: Double { Self.unifiedSize }
   public var isSelected: Bool = false
-  public var whichRow: Int = 0
+  public var whichRow: Int = 0  // 橫排選字窗專用
+  public var whichColumn: Int = 0  // 縱排選字窗專用
   public var index: Int = 0
   public var subIndex: Int = 0
 
@@ -48,7 +49,7 @@ public class CandidateCellData: Hashable {
     let rect = attributedStringForLengthCalculation.boundingRect(
       with: NSSize(width: 1600.0, height: 1600.0), options: [.usesLineFragmentOrigin]
     )
-    let rawResult = ceil(rect.width + size / size)
+    let rawResult = ceil(rect.width)
     return Int(rawResult)
   }
 
@@ -73,8 +74,16 @@ public class CandidateCellData: Hashable {
   }
 
   public var attributedStringForLengthCalculation: NSAttributedString {
+    let paraStyleKey = NSMutableParagraphStyle()
+    paraStyleKey.setParagraphStyle(NSParagraphStyle.default)
+    paraStyleKey.alignment = .natural
+    let paraStyle = NSMutableParagraphStyle()
+    paraStyle.setParagraphStyle(NSParagraphStyle.default)
+    paraStyle.alignment = .natural
+    paraStyle.lineBreakMode = .byWordWrapping
     let attrCandidate: [NSAttributedString.Key: AnyObject] = [
-      .font: NSFont.monospacedDigitSystemFont(ofSize: size, weight: .regular)
+      .font: NSFont.monospacedDigitSystemFont(ofSize: size, weight: .regular),
+      .paragraphStyle: paraStyle,
     ]
     let attrStrCandidate = NSMutableAttributedString(string: displayedText + "　", attributes: attrCandidate)
     return attrStrCandidate
@@ -87,6 +96,7 @@ public class CandidateCellData: Hashable {
     let paraStyle = NSMutableParagraphStyle()
     paraStyle.setParagraphStyle(NSParagraphStyle.default)
     paraStyle.alignment = .natural
+    paraStyle.lineBreakMode = .byWordWrapping
     var attrCandidate: [NSAttributedString.Key: AnyObject] = [
       .font: NSFont.monospacedDigitSystemFont(ofSize: size, weight: .regular),
       .paragraphStyle: paraStyle,
