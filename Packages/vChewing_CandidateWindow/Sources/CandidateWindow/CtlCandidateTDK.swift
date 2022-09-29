@@ -65,7 +65,7 @@ public class CtlCandidateTDK: CtlCandidate {
   }
 
   @discardableResult override public func showNextPage() -> Bool {
-    for _ in 0..<6 {
+    for _ in 0..<thePool.maximumLinesPerPage {
       thePool.selectNewNeighborRow(direction: .down)
     }
     updateDisplay()
@@ -73,7 +73,7 @@ public class CtlCandidateTDK: CtlCandidate {
   }
 
   @discardableResult override public func showPreviousPage() -> Bool {
-    for _ in 0..<6 {
+    for _ in 0..<thePool.maximumLinesPerPage {
       thePool.selectNewNeighborRow(direction: .up)
     }
     updateDisplay()
