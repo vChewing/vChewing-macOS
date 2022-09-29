@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -36,14 +37,14 @@
         </window>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <visualEffectView blendingMode="behindWindow" material="sidebar" state="followsWindowActiveState" id="XWo-36-xGi" userLabel="vwrExperience">
-            <rect key="frame" x="0.0" y="0.0" width="836" height="396"/>
+            <rect key="frame" x="0.0" y="0.0" width="836" height="418"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qDj-B9-mZf">
-                    <rect key="frame" x="20" y="32" width="796" height="344"/>
+                    <rect key="frame" x="20" y="31" width="796" height="367"/>
                     <subviews>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j9R-fB-ttM">
-                            <rect key="frame" x="0.0" y="26" width="402" height="318"/>
+                            <rect key="frame" x="0.0" y="49" width="402" height="318"/>
                             <subviews>
                                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fO5-4y-X0y">
                                     <rect key="frame" x="0.0" y="277" width="365" height="41"/>
@@ -266,10 +267,10 @@
                             </customSpacing>
                         </stackView>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VOm-nN-5IB">
-                            <rect key="frame" x="410" y="0.0" width="386" height="344"/>
+                            <rect key="frame" x="410" y="0.0" width="386" height="367"/>
                             <subviews>
                                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="7" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s47-wG-vKA">
-                                    <rect key="frame" x="0.0" y="261" width="386" height="83"/>
+                                    <rect key="frame" x="0.0" y="284" width="386" height="83"/>
                                     <subviews>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iCL-n8-VTP">
                                             <rect key="frame" x="-2" y="68" width="323" height="15"/>
@@ -319,7 +320,7 @@
                                     </customSpacing>
                                 </stackView>
                                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NOW-jd-XBh">
-                                    <rect key="frame" x="0.0" y="188" width="386" height="61"/>
+                                    <rect key="frame" x="0.0" y="211" width="386" height="61"/>
                                     <subviews>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J0f-Aw-dxC">
                                             <rect key="frame" x="-2" y="46" width="336" height="15"/>
@@ -365,10 +366,10 @@
                                     </customSpacing>
                                 </stackView>
                                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jxD-fv-UYx">
-                                    <rect key="frame" x="0.0" y="0.0" width="380" height="176"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="380" height="199"/>
                                     <subviews>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="109">
-                                            <rect key="frame" x="-1" y="160.5" width="285" height="16"/>
+                                            <rect key="frame" x="-1" y="183.5" width="285" height="16"/>
                                             <buttonCell key="cell" type="check" title="Enable Space key for calling candidate window" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="110">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
@@ -378,7 +379,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bE0-Lq-Pj7">
-                                            <rect key="frame" x="-1" y="137.5" width="266" height="16"/>
+                                            <rect key="frame" x="-1" y="160.5" width="266" height="16"/>
                                             <buttonCell key="cell" type="check" title="Use ESC key to clear the entire input buffer" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="f2j-xD-4xK">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
@@ -388,7 +389,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mzw-F2-aAQ">
-                                            <rect key="frame" x="-1" y="114.5" width="295" height="16"/>
+                                            <rect key="frame" x="-1" y="137.5" width="295" height="16"/>
                                             <buttonCell key="cell" type="check" title="Emulating select-candidate-per-character mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="ArK-Vk-OoT">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
@@ -398,7 +399,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="j8R-Hj-3dj">
-                                            <rect key="frame" x="-1" y="91.5" width="340" height="16"/>
+                                            <rect key="frame" x="-1" y="114.5" width="340" height="16"/>
                                             <buttonCell key="cell" type="check" title="Automatically correct reading combinations when typing" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkAutoCorrectReadingCombination">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
@@ -408,7 +409,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6MM-WC-Mpd">
-                                            <rect key="frame" x="-1" y="68.5" width="381" height="16"/>
+                                            <rect key="frame" x="-1" y="91.5" width="381" height="16"/>
                                             <buttonCell key="cell" type="check" title="Allow using Enter key to confirm associated candidate selection" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkAlsoConfirmAssociatedCandidatesByEnter">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
@@ -418,7 +419,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HaB-rc-AcW">
-                                            <rect key="frame" x="-1" y="45.5" width="295" height="16"/>
+                                            <rect key="frame" x="-1" y="68.5" width="295" height="16"/>
                                             <buttonCell key="cell" type="check" title="Allow backspace-editing miscomposed readings" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkKeepReadingUponCompositionError">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
@@ -428,7 +429,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xe6-Pu-3Fa">
-                                            <rect key="frame" x="-1" y="22.5" width="223" height="16"/>
+                                            <rect key="frame" x="-1" y="45.5" width="223" height="16"/>
                                             <buttonCell key="cell" type="check" title="Trim unfinished readings on commit" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="tglTrimUnfinishedReadingsOnCommit">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
@@ -438,13 +439,30 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7QM-7z-tpq">
-                                            <rect key="frame" x="-1" y="-0.5" width="233" height="16"/>
+                                            <rect key="frame" x="-1" y="22.5" width="233" height="16"/>
                                             <buttonCell key="cell" type="check" title="Always show tooltip texts horizontally" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="lblAlwaysShowTooltipTextsHorizontally">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
                                             </buttonCell>
                                             <connections>
                                                 <binding destination="32" name="value" keyPath="values.AlwaysShowTooltipTextsHorizontally" id="szi-4g-EIC"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="233">
+                                            <rect key="frame" x="-1" y="-0.5" width="271" height="16"/>
+                                            <buttonCell key="cell" type="check" title="Show notifications when toggling Caps Lock" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="shc-Nu-UsM">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="cellTitle"/>
+                                                <connections>
+                                                    <binding destination="32" name="value" keyPath="values.ShowNotificationsWhenTogglingCapsLock" id="0e1-3G-eIc"/>
+                                                </connections>
+                                            </buttonCell>
+                                            <connections>
+                                                <binding destination="32" name="enabled" keyPath="values.UseIMKCandidateWindow" id="pHT-37-Eyh">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                    </dictionary>
+                                                </binding>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -457,8 +475,10 @@
                                         <integer value="1000"/>
                                         <integer value="1000"/>
                                         <integer value="1000"/>
+                                        <integer value="1000"/>
                                     </visibilityPriorities>
                                     <customSpacing>
+                                        <real value="3.4028234663852886e+38"/>
                                         <real value="3.4028234663852886e+38"/>
                                         <real value="3.4028234663852886e+38"/>
                                         <real value="3.4028234663852886e+38"/>
@@ -496,7 +516,7 @@
                 <constraint firstItem="qDj-B9-mZf" firstAttribute="top" secondItem="XWo-36-xGi" secondAttribute="top" constant="20" symbolic="YES" id="EmH-pX-s2C"/>
                 <constraint firstItem="qDj-B9-mZf" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="20" symbolic="YES" id="cs3-Kh-czM"/>
             </constraints>
-            <point key="canvasLocation" x="-1091" y="-192"/>
+            <point key="canvasLocation" x="-1091" y="-181"/>
         </visualEffectView>
         <visualEffectView blendingMode="behindWindow" material="sidebar" state="followsWindowActiveState" id="BUt-lg-GPp" userLabel="vwrGeneral">
             <rect key="frame" x="0.0" y="0.0" width="445" height="431"/>
@@ -511,7 +531,6 @@
                         <constraint firstItem="Agg-8d-6bO" firstAttribute="top" secondItem="gZ0-OK-r7a" secondAttribute="bottom" constant="9.5" id="bzP-jz-kHQ"/>
                         <constraint firstItem="5Rz-c8-hp9" firstAttribute="top" secondItem="90" secondAttribute="bottom" constant="9" id="d7i-nb-E1l"/>
                         <constraint firstItem="28" firstAttribute="top" secondItem="Ldp-U1-36g" secondAttribute="bottom" constant="12" id="mas-hn-K8C"/>
-                        <constraint firstItem="da1-7e-els" firstAttribute="top" secondItem="233" secondAttribute="bottom" constant="9.5" id="rca-Fa-YX4"/>
                         <constraint firstItem="da1-7e-els" firstAttribute="top" secondItem="Tax-1R-BrU" secondAttribute="top" constant="177" id="vTm-gq-EBY"/>
                     </constraints>
                     <rows>
@@ -635,7 +654,7 @@
                         </gridCell>
                         <gridCell row="oKH-BK-XYd" column="X1u-rr-FFP" headOfMergedCell="ytZ-JE-JBZ" id="ytZ-JE-JBZ">
                             <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="749" translatesAutoresizingMaskIntoConstraints="NO" id="Yl4-Ar-L6r">
-                                <rect key="frame" x="-2" y="252" width="314" height="15"/>
+                                <rect key="frame" x="-2" y="244" width="314" height="15"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="15" id="Bgf-Qu-fAR"/>
                                 </constraints>
@@ -649,7 +668,7 @@
                         <gridCell row="oKH-BK-XYd" column="s2d-Vu-rHv" headOfMergedCell="ytZ-JE-JBZ" id="R5f-hg-7u0"/>
                         <gridCell row="KfK-kF-hJJ" column="X1u-rr-FFP" xPlacement="trailing" yPlacement="top" rowAlignment="none" id="K38-CT-HsS">
                             <textField key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="23">
-                                <rect key="frame" x="9" y="228" width="131" height="15"/>
+                                <rect key="frame" x="9" y="212" width="131" height="15"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Candidate List Layout:" id="24">
                                     <font key="font" metaFont="cellTitle"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -659,7 +678,7 @@
                         </gridCell>
                         <gridCell row="KfK-kF-hJJ" column="s2d-Vu-rHv" yPlacement="top" rowAlignment="none" id="ie1-hW-RKb">
                             <matrix key="contentView" wantsLayer="YES" verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="19">
-                                <rect key="frame" x="144" y="228" width="240" height="15"/>
+                                <rect key="frame" x="144" y="212" width="240" height="15"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="240" id="gpb-Gt-QDY"/>
                                     <constraint firstAttribute="height" constant="15" id="wB2-bw-gqA"/>
@@ -692,25 +711,7 @@
                             </matrix>
                         </gridCell>
                         <gridCell row="f3d-br-SXh" column="X1u-rr-FFP" id="HUa-vb-9P8"/>
-                        <gridCell row="f3d-br-SXh" column="s2d-Vu-rHv" yPlacement="center" id="vxY-vh-tw7">
-                            <button key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="233">
-                                <rect key="frame" x="143" y="203.5" width="223" height="16"/>
-                                <buttonCell key="cell" type="check" title="Show page buttons in candidate list" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="shc-Nu-UsM">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="cellTitle"/>
-                                    <connections>
-                                        <binding destination="32" name="value" keyPath="values.ShowPageButtonsInCandidateWindow" id="6BK-hU-lqs"/>
-                                    </connections>
-                                </buttonCell>
-                                <connections>
-                                    <binding destination="32" name="enabled" keyPath="values.UseIMKCandidateWindow" id="pHT-37-Eyh">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                </connections>
-                            </button>
-                        </gridCell>
+                        <gridCell row="f3d-br-SXh" column="s2d-Vu-rHv" yPlacement="center" id="vxY-vh-tw7"/>
                         <gridCell row="VsE-7i-d0I" column="X1u-rr-FFP" headOfMergedCell="1LR-8q-4K4" rowAlignment="none" id="1LR-8q-4K4">
                             <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="da1-7e-els">
                                 <rect key="frame" x="-2" y="179" width="404" height="15"/>
