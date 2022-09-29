@@ -56,7 +56,7 @@ struct suiPrefPaneKeyboard: View {
             items: CandidateKey.suggestions,
             text: $selSelectionKeys.onChange {
               let value = selSelectionKeys
-              let keys: String = value.trimmingCharacters(in: .whitespacesAndNewlines).deduplicate
+              let keys: String = value.trimmingCharacters(in: .whitespacesAndNewlines).deduplicated
               do {
                 try CandidateKey.validate(keys: keys)
                 PrefMgr.shared.candidateKeys = keys
@@ -64,8 +64,8 @@ struct suiPrefPaneKeyboard: View {
               } catch CandidateKey.ErrorType.empty {
                 selSelectionKeys = PrefMgr.shared.candidateKeys
               } catch {
-                if let window = ctlPrefUI.shared.controller.window {
-                  let alert = NSAlert(error: error)
+                if let window = ctlPrefUI.shared.controller.window, let error = error as? CandidateKey.ErrorType {
+                  let alert = NSAlert(error: error.errorDescription)
                   alert.beginSheetModal(for: window) { _ in
                     selSelectionKeys = PrefMgr.shared.candidateKeys
                   }
