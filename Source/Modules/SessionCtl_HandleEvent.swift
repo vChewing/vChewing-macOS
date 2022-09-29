@@ -39,11 +39,13 @@ extension SessionCtl {
     if event.type == .flagsChanged, event.keyCode == KeyCode.kCapsLock.rawValue {
       let isCapsLockTurnedOn = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
       let status = NSLocalizedString("NotificationSwitchASCII", comment: "")
-      Notifier.notify(
-        message: isCapsLockTurnedOn
-          ? "Caps Lock" + NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
-          : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
-      )
+      if PrefMgr.shared.showNotificationsWhenTogglingCapsLock {
+        Notifier.notify(
+          message: isCapsLockTurnedOn
+            ? "Caps Lock" + NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
+            : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
+        )
+      }
       isASCIIMode = isCapsLockTurnedOn
     }
 

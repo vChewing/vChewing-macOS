@@ -47,6 +47,8 @@ struct suiPrefPaneExperience: View {
     forKey: UserDef.kTrimUnfinishedReadingsOnCommit.rawValue)
   @State private var selAlwaysShowTooltipTextsHorizontally = UserDefaults.standard.bool(
     forKey: UserDef.kAlwaysShowTooltipTextsHorizontally.rawValue)
+  @State private var selShowNotificationsWhenTogglingCapsLock = UserDefaults.standard.bool(
+    forKey: UserDef.kShowNotificationsWhenTogglingCapsLock.rawValue)
 
   private let contentMaxHeight: Double = 440
   private let contentWidth: Double = {
@@ -194,6 +196,14 @@ struct suiPrefPaneExperience: View {
               PrefMgr.shared.togglingAlphanumericalModeWithLShift = selTogglingAlphanumericalModeWithLShift
             }
           ).disabled(PrefMgr.shared.disableShiftTogglingAlphanumericalMode == true)
+        }
+        Preferences.Section(title: "Caps Lock:") {
+          Toggle(
+            LocalizedStringKey("Show notifications when toggling Caps Lock"),
+            isOn: $selShowNotificationsWhenTogglingCapsLock.onChange {
+              PrefMgr.shared.showNotificationsWhenTogglingCapsLock = selShowNotificationsWhenTogglingCapsLock
+            }
+          )
         }
         Preferences.Section(label: { Text(LocalizedStringKey("Misc Settings:")) }) {
           Toggle(

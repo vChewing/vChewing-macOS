@@ -90,7 +90,7 @@
 "RUG-ls-KyA.title" = "候補選択の直後、すぐカーソルを単語の向こうに推す";
 "rVQ-Hx-cGi.title" = "和語";
 "s7u-Fm-dVg.title" = "ページ";
-"shc-Nu-UsM.title" = "ページボタンを表示";
+"shc-Nu-UsM.title" = "Caps Lock で切り替えの時に吹出通知メッセージを";
 "tglDevZoneIMKCandidate.title" = "IMK 候補陳列ウィンドウを起用（入力アプリは自動的に再起動）";
 "tglTrimUnfinishedReadingsOnCommit.title" = "送り出す緩衝列内容から未完成な音読みを除く";
 "TXr-FF-ehw.title" = "繁体中国語";
