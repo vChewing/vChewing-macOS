@@ -1,5 +1,3 @@
-// (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are of:
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
@@ -48,16 +46,24 @@ extension SessionCtl: KeyHandlerDelegate {
 // MARK: - Candidate Controller Delegate
 
 extension SessionCtl: CtlCandidateDelegate {
+  var selectionKeys: String { PrefMgr.shared.candidateKeys }
+
   func buzz() {
     IMEApp.buzz()
   }
 
-  func kanjiConversionIfRequired(_ target: String) -> String {
-    ChineseConverter.kanjiConversionIfRequired(target)
-  }
-
-  func candidatePairs() -> [(String, String)] {
-    state.isCandidateContainer ? state.candidates : []
+  func candidatePairs(conv: Bool = false) -> [(String, String)] {
+    if !state.isCandidateContainer || state.candidates.isEmpty { return [] }
+    if !conv || PrefMgr.shared.cns11643Enabled || state.candidates[0].0.contains("_punctuation") {
+      return state.candidates
+    }
+    let convertedCandidates: [(String, String)] = state.candidates.map { theCandidatePair -> (String, String) in
+      let theCandidate = theCandidatePair.1
+      let theConverted = ChineseConverter.kanjiConversionIfRequired(theCandidate)
+      let result = (theCandidate == theConverted) ? theCandidate : "\(theConverted)(\(theCandidate))"
+      return (theCandidatePair.0, result)
+    }
+    return convertedCandidates
   }
 
   func candidatePairAt(_ index: Int) -> (String, String) {

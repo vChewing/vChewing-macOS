@@ -21,16 +21,32 @@ public class Notifier: NSWindowController {
     }
   }
 
+  private var currentMessage: String  // 承載該副本在初期化時被傳入的訊息內容。
+  private var isNew = true  // 新通知標記。
+
   // MARK: - Private Declarations
 
   private static var instanceStack: [Notifier] = []
   private let blankValue = ""
 
   @discardableResult private init(_ message: String) {
+    currentMessage = message
     let rawMessage = message.replacingOccurrences(of: "\n", with: "")
-    guard let screenRect = NSScreen.main?.visibleFrame, !rawMessage.isEmpty else {
+    let isDuplicated: Bool = {
+      if let firstInstanceExisted = Self.instanceStack.first {
+        return message == firstInstanceExisted.currentMessage && firstInstanceExisted.isNew
+      }
+      return false
+    }()
+    guard let screenRect = NSScreen.main?.visibleFrame, !rawMessage.isEmpty, !isDuplicated else {
       super.init(window: nil)
       return
+    }
+    // 正式進入處理環節。
+    defer {  // 先讓新通知標記自此開始過 0.3 秒自動變為 false。
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        self.isNew = false
+      }
     }
     let kLargeFontSize: Double = 17
     let kSmallFontSize: Double = 15
@@ -142,7 +158,10 @@ extension Notifier {
   private func display() {
     let existingInstanceArray = Self.instanceStack.compactMap(\.window)
     if !existingInstanceArray.isEmpty {
-      existingInstanceArray.forEach { $0.alphaValue *= 0.5 }
+      existingInstanceArray.forEach {
+        $0.alphaValue -= 0.1
+        $0.contentView?.subviews.forEach { $0.alphaValue *= 0.5 }
+      }
     }
     shiftExistingWindowPositions()
     fadeIn()

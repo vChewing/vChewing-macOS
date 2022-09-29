@@ -11,10 +11,11 @@ import Shared
 
 /// 威注音自用的 IMKCandidates 型別。因為有用到 bridging header，所以無法弄成 Swift Package。
 public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
+  public var hint: String = ""
   public var showPageButtons: Bool = false
   public var locale: String = ""
   public var useLangIdentifier: Bool = false
-  public var currentLayout: CandidateLayout = .horizontal
+  public var currentLayout: NSUserInterfaceLayoutOrientation = .horizontal
   public static let defaultIMKSelectionKey: [UInt16: String] = [
     18: "1", 19: "2", 20: "3", 21: "4", 23: "5", 22: "6", 26: "7", 28: "8", 25: "9",
   ]
@@ -38,9 +39,9 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
     }
   }
 
-  public var keyLabels: [CandidateKeyLabel] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+  public var keyLabels: [CandidateCellData] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
     .map {
-      CandidateKeyLabel(key: $0, displayedText: $0)
+      CandidateCellData(key: $0, displayedText: $0)
     }
 
   public var keyLabelFont = NSFont.monospacedDigitSystemFont(
@@ -68,7 +69,7 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
   var keyCount = 0
   var displayedCandidates = [String]()
 
-  public func specifyLayout(_ layout: CandidateLayout = .horizontal) {
+  public func specifyLayout(_ layout: NSUserInterfaceLayoutOrientation = .horizontal) {
     currentLayout = layout
     switch currentLayout {
       case .horizontal:
@@ -80,10 +81,14 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
         }
       case .vertical:
         setPanelType(kIMKSingleColumnScrollingCandidatePanel)
+      @unknown default:
+        setPanelType(kIMKSingleRowSteppingCandidatePanel)
     }
   }
 
-  public required init(_ layout: CandidateLayout = .horizontal) {
+  public func updateDisplay() {}
+
+  public required init(_ layout: NSUserInterfaceLayoutOrientation = .horizontal) {
     super.init(server: theServer, panelType: kIMKScrollingGridCandidatePanel)
     specifyLayout(layout)
     // 設為 true 表示先交給 ctlIME 處理
@@ -115,7 +120,7 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
 
   private var pageCount: Int {
     guard let delegate = delegate else { return 0 }
-    let totalCount = delegate.candidatePairs().count
+    let totalCount = delegate.candidatePairs(conv: false).count
     let keyLabelCount = keyLabels.count
     return totalCount / keyLabelCount + ((totalCount % keyLabelCount) != 0 ? 1 : 0)
   }
@@ -147,7 +152,7 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
   public func candidateIndexAtKeyLabelIndex(_ index: Int) -> Int {
     guard let delegate = delegate else { return Int.max }
     let result = currentPageIndex * keyLabels.count + index
-    return result < delegate.candidatePairs().count ? result : Int.max
+    return result < delegate.candidatePairs(conv: false).count ? result : Int.max
   }
 
   public var selectedCandidateIndex: Int {

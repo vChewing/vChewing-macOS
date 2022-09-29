@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -688,6 +687,7 @@
                                 </cells>
                                 <connections>
                                     <binding destination="32" name="selectedTag" keyPath="values.UseHorizontalCandidateList" id="105"/>
+                                    <binding destination="32" name="enabled" keyPath="values.UseIMKCandidateWindow" id="TVK-89-xXv"/>
                                 </connections>
                             </matrix>
                         </gridCell>
@@ -959,11 +959,11 @@
                             </connections>
                         </button>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Yaj-QY-7xV" userLabel="chkCNSSupport">
-                            <rect key="frame" x="-1" y="109.5" width="254" height="17"/>
+                            <rect key="frame" x="-1" y="109.5" width="252" height="17"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="16" id="lGu-fQ-Nvc"/>
                             </constraints>
-                            <buttonCell key="cell" type="check" title="Enable CNS11643 Support (2022-08-02)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="W24-T4-cg0">
+                            <buttonCell key="cell" type="check" title="Enable CNS11643 Support (2022-09-12)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="W24-T4-cg0">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="cellTitle"/>
                             </buttonCell>
@@ -1375,7 +1375,7 @@
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="7" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yH2-IC-kI1">
-                    <rect key="frame" x="20" y="32" width="405" height="138"/>
+                    <rect key="frame" x="20" y="32" width="409" height="138"/>
                     <subviews>
                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lblControlDevZoneTitleDescription" userLabel="lblControlDevZoneTitleDescription">
                             <rect key="frame" x="-2" y="108" width="278" height="30"/>
@@ -1394,11 +1394,11 @@ Features listed here may not work as expected.</string>
                             </constraints>
                         </box>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="le7-59-tFK" userLabel="tglControlDevZoneIMKCandidate">
-                            <rect key="frame" x="-1" y="76.5" width="340" height="17"/>
+                            <rect key="frame" x="-1" y="76.5" width="410" height="17"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="16" id="054-U2-1Xk"/>
                             </constraints>
-                            <buttonCell key="cell" type="check" title="Use IMK Candidate Window instead (will reboot the IME)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="tglDevZoneIMKCandidate" userLabel="tglDevZoneIMKCandidate">
+                            <buttonCell key="cell" type="check" title="Use IMK Candidate Window instead of Tadokoro (will reboot the IME)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="tglDevZoneIMKCandidate" userLabel="tglDevZoneIMKCandidate">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="cellTitle"/>
                             </buttonCell>

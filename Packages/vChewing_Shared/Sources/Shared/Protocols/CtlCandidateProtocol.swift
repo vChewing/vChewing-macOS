@@ -9,29 +9,32 @@
 import Cocoa
 
 public protocol CtlCandidateDelegate: AnyObject {
-  func candidatePairs() -> [(String, String)]
+  func candidatePairs(conv: Bool) -> [(String, String)]
   func candidatePairAt(_ index: Int) -> (String, String)
   func candidatePairSelected(at index: Int)
+  func candidates(_ sender: Any!) -> [Any]!
   func buzz()
-  func kanjiConversionIfRequired(_ target: String) -> String
+  var selectionKeys: String { get }
 }
 
 public protocol CtlCandidateProtocol {
+  var hint: String { get set }
   var locale: String { get set }
-  var currentLayout: CandidateLayout { get set }
+  var currentLayout: NSUserInterfaceLayoutOrientation { get set }
   var delegate: CtlCandidateDelegate? { get set }
   var selectedCandidateIndex: Int { get set }
   var visible: Bool { get set }
   var windowTopLeftPoint: NSPoint { get set }
-  var keyLabels: [CandidateKeyLabel] { get set }
+  var keyLabels: [CandidateCellData] { get set }
   var keyLabelFont: NSFont { get set }
   var candidateFont: NSFont { get set }
   var tooltip: String { get set }
   var useLangIdentifier: Bool { get set }
   var showPageButtons: Bool { get set }
 
-  init(_ layout: CandidateLayout)
+  init(_ layout: NSUserInterfaceLayoutOrientation)
   func reloadData()
+  func updateDisplay()
   func showNextPage() -> Bool
   func showPreviousPage() -> Bool
   func highlightNextCandidate() -> Bool

@@ -135,6 +135,7 @@ class ctlPrefWindow: NSWindowController {
     }
 
     selectionKeyComboBox.stringValue = candidateSelectionKeys
+    selectionKeyComboBox.isEnabled = false  // 無法與 IMKCandidates 協作，故禁用。
   }
 
   // 這裡有必要加上這段處理，用來確保藉由偏好設定介面動過的 CNS 開關能夠立刻生效。
@@ -281,8 +282,9 @@ extension ctlPrefWindow: NSToolbarDelegate {
   }
 
   var toolbarIdentifiers: [NSToolbarItem.Identifier] {
-    if #unavailable(macOS 10.13) { return [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard] }
-    return [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard, .ofDevZone]
+    // if #unavailable(macOS 10.13) { return [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard] }
+    // return [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard, .ofDevZone]
+    [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard]
   }
 
   func toolbarDefaultItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {

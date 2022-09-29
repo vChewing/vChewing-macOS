@@ -38,7 +38,7 @@
 "Force KangXi Writing" = "康熙正体字模式";
 "NotificationSwitchON" = "✔ 已启用";
 "NotificationSwitchOFF" = "✘ 已停用";
-"NotificationSwitchShift" = "↺ 切换完毕";
+"NotificationSwitchASCII" = "↺ 切换完毕";
 "Edit User Phrases…" = "编辑自订语汇…";
 "Reload User Phrases" = "重载自订语汇";
 "Unable to create the user phrase file." = "无法创建自订语汇档案。";
@@ -82,7 +82,7 @@
 "Optimize Memorized Phrases" = "精简临时记忆语汇资料";
 "Clear Memorized Phrases" = "清除临时记忆语汇资料";
 "Currency Numeral Output" = "大写汉字数字输出";
-"Alphanumerical Mode" = "英数输入模式";
+"Hold ⇧ to choose associates." = "摁住⇧以选取联想词。";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";
@@ -145,7 +145,7 @@
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "指定 (Shift+)Tab 在选字窗内的轮替操作对象。";
 "Choose the behavior of Shift+Letter key with letter inputs." = "指定 Shift+字母键 的行为。";
 "Choose the cursor position where you want to list possible candidates." = "请选择用以触发选字的游标相对位置。";
-"Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode toggled by Shift key." = "请选择 macOS 英数键盘布局。该布局用于以 Shift 切换至的英数输入模式。";
+"Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode only." = "请选择 macOS 英数键盘布局。该布局仅用于英数输入模式。";
 "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "请选择 macOS 基础键盘布局。QWERTY 以外的英数布局是为了拼音排列使用者而准备的。";
 "Choose the phonetic layout for Mandarin parser." = "请指定普通话/国音分析器所使用的注音排列。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "请在此指定您想指定的使用者语汇档案目录。无效值会被忽略。";
@@ -166,7 +166,7 @@
 "Disassemble the previous reading, dropping its intonation" = "析构游标正后方的字音，且剔除其声调";
 "Disassembling process does not work with non-phonetic reading keys." = "析构行为仅针对组字器内「身为汉字读音」的读音索引单元有效。";
 "Emulating select-candidate-per-character mode" = "模拟 90 年代前期注音逐字选字输入风格";
-"Enable CNS11643 Support (2022-08-02)" = "启用 CNS11643 全字库支援 (2022-08-02)";
+"Enable CNS11643 Support (2022-09-12)" = "启用 CNS11643 全字库支援 (2022-09-12)";
 "Enable Space key for calling candidate window" = "敲空格键以呼出候选字窗";
 "Enable symbol input support (incl. certain emoji symbols)" = "启用包括少许绘文字在内的符号输入支援";
 "English" = "英语";
@@ -185,7 +185,7 @@
 "Hsu" = "许氏国音自然排列";
 "Hualuo Pinyin with Numeral Intonation" = "华罗拼音+数字标调";
 "IBM" = "IBM 排列";
-"IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases." = "IMK 选字窗依赖于 Apple 的私有 API，而且是借由桥接档案头强制曝露的方法使用的。目前，该功能仅在 macOS 10.14 Mojave 至 macOS 13 Ventura 系统内有测试过可用性。至于在未来的 macOS 发行版当中是否可用，则需要另行测试、才能下结论。";
+"IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases. However, this mode is recommended at this moment since Tadokoro candidate window still needs possible improvements." = "IMK 选字窗依赖于 Apple 的私有 API，而且是借由桥接档案头强制曝露的方法使用的。目前，该功能仅在 macOS 10.14 Mojave 至 macOS 13 Ventura 系统内有测试过可用性。至于在未来的 macOS 发行版当中是否可用，则需要另行测试、才能下结论。然而，目前 IMK 选字窗属于建议启用的功能，因为田所选字窗仍需改善。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "将游标置于词语前方 // macOS 内建注音风格";
 "Intonation Key:" = "声调键:";
 "Japanese" = "和语";
@@ -217,7 +217,8 @@
 "Specify the behavior of intonation key when syllable composer is empty." = "指定声调键（在注拼槽为「空」状态时）的行为。";
 "Starlight" = "星光排列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉耻模式 // 取消勾选的话，敲错字时会有异音";
-"This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later." = "该方法是 Apple Bug Report #FB10978412 的保守治疗方案，用来仅针对 macOS 12 开始的系统，且仅对非 IMK 选字窗起作用。Apple 应该对 macOS 11 开始的系统修复这个 Bug。";
+"Tadokoro candidate window only supports horizontal grid view. Enable IMK candidate window in DevZone page first if you want to choose vertical candidate window." = "田所选字窗仅支援横排矩阵布局模式。如欲使用纵排布局模式者，请在开发道场内先启用 IMK 选字窗。";
+"This only works with Tadokoro candidate window." = "该方法仅对田所选字窗起作用。";
 "Traditional Chinese" = "繁体中文";
 "Trim unfinished readings on commit" = "在递交时清理未完成拼写的读音";
 "Type them into inline composition buffer" = "直接键入内文组字区";
@@ -226,7 +227,7 @@
 "Universal Pinyin with Numeral Intonation" = "通用拼音+数字标调";
 "Use .langIdentifier to handle UI fonts in candidate window" = "使用 .langIdentifier 来管理选字窗的预设介面字型";
 "Use ESC key to clear the entire input buffer" = "敲 ESC 键以清空整个组字缓冲区";
-"Use IMK Candidate Window instead (will reboot the IME)" = "启用与 macOS 内建输入法相同的 IMK 选字窗（会自动重启输入法）";
+"Use IMK Candidate Window instead of Tadokoro (will reboot the IME)" = "启用与 macOS 内建输入法相同的 IMK 选字窗（会自动重启输入法）";
 "Use Shift key accommodation in all cases" = "对任何客体应用均启用 Shift 键相容性措施";
 "Vertical" = "纵向布局";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";

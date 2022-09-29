@@ -1,5 +1,3 @@
-// (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are of:
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
@@ -8,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import CocoaExtension
 import InputMethodKit
 import NotifierUI
 import Shared
@@ -36,6 +35,18 @@ extension SessionCtl {
       return false
     }
 
+    // Caps Lock 通知與切換處理。
+    if event.type == .flagsChanged, event.keyCode == KeyCode.kCapsLock.rawValue {
+      let isCapsLockTurnedOn = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
+      let status = NSLocalizedString("NotificationSwitchASCII", comment: "")
+      Notifier.notify(
+        message: isCapsLockTurnedOn
+          ? "Caps Lock" + NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
+          : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
+      )
+      isASCIIMode = isCapsLockTurnedOn
+    }
+
     // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
     let shouldUseShiftToggleHandle: Bool = {
       switch PrefMgr.shared.shiftKeyAccommodationBehavior {
@@ -50,7 +61,7 @@ extension SessionCtl {
     if #available(macOS 10.15, *) {
       if Self.theShiftKeyDetector.check(event), !PrefMgr.shared.disableShiftTogglingAlphanumericalMode {
         if !shouldUseShiftToggleHandle || (!rencentKeyHandledByKeyHandlerEtc && shouldUseShiftToggleHandle) {
-          let status = NSLocalizedString("NotificationSwitchShift", comment: "")
+          let status = NSLocalizedString("NotificationSwitchASCII", comment: "")
           Notifier.notify(
             message: isASCIIMode.toggled()
               ? NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
@@ -67,7 +78,7 @@ extension SessionCtl {
     // MARK: 針對客體的具體處理
 
     // 不再讓威注音處理由 Shift 切換到的英文模式的按鍵輸入。
-    if isASCIIMode { return false }
+    if isASCIIMode, !isCapsLocked { return false }
 
     /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
     /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
@@ -185,6 +196,7 @@ extension SessionCtl {
       switch imkC.currentLayout {
         case .horizontal: _ = event.isShiftHold ? imkC.moveUp(self) : imkC.moveDown(self)
         case .vertical: _ = event.isShiftHold ? imkC.moveLeft(self) : imkC.moveRight(self)
+        @unknown default: break
       }
       return true
     } else if event.isSpace {

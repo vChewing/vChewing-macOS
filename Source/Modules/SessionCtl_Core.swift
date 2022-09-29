@@ -1,5 +1,3 @@
-// (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are of:
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
@@ -8,12 +6,13 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import CandidateWindow
+import CocoaExtension
 import IMKUtils
 import PopupCompositionBuffer
 import Shared
 import ShiftKeyUpChecker
 import TooltipUI
-import Voltaire
 
 /// 輸入法控制模組，乃在輸入法端用以控制輸入行為的基礎型別。
 ///
@@ -29,8 +28,16 @@ class SessionCtl: IMKInputController {
   static var areWeNerfing = false
 
   /// 目前在用的的選字窗副本。
-  static var ctlCandidateCurrent: CtlCandidateProtocol =
-    PrefMgr.shared.useIMKCandidateWindow ? CtlCandidateIMK(.horizontal) : CtlCandidateUniversal(.horizontal)
+  static var ctlCandidateCurrent: CtlCandidateProtocol = {
+    let direction: NSUserInterfaceLayoutOrientation =
+      PrefMgr.shared.useHorizontalCandidateList ? .horizontal : .vertical
+    if #available(macOS 12, *) {
+      return PrefMgr.shared.useIMKCandidateWindow
+        ? CtlCandidateIMK(direction) : CtlCandidateTDK(direction)
+    } else {
+      return CtlCandidateIMK(direction)
+    }
+  }()
 
   /// 工具提示視窗的共用副本。
   static var tooltipInstance = TooltipUI()
@@ -39,6 +46,9 @@ class SessionCtl: IMKInputController {
   static var popupCompositionBuffer = PopupCompositionBuffer()
 
   // MARK: -
+
+  /// 當前 CapsLock 按鍵是否被摁下。
+  var isCapsLocked: Bool { NSEvent.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock) }
 
   /// 當前這個 SessionCtl 副本是否處於英數輸入模式。
   var isASCIIMode = false {
@@ -159,7 +169,8 @@ extension SessionCtl {
     keyHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
     keyHandler.ensureKeyboardParser()
 
-    if isASCIIMode, PrefMgr.shared.disableShiftTogglingAlphanumericalMode { isASCIIMode = false }
+    if isASCIIMode, !isCapsLocked, PrefMgr.shared.disableShiftTogglingAlphanumericalMode { isASCIIMode = false }
+    if isCapsLocked { isASCIIMode = isCapsLocked }  // 同步 CapsLock 狀態。
 
     /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
     /// 這是很多 macOS 副廠輸入法的常見失誤之處。

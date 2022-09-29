@@ -38,7 +38,7 @@
 "Force KangXi Writing" = "康熙文字変換モード";
 "NotificationSwitchON" = "✔ 機能起動";
 "NotificationSwitchOFF" = "✘ 機能停止";
-"NotificationSwitchShift" = "↺ 切替完了";
+"NotificationSwitchASCII" = "↺ 切替完了";
 "Edit User Phrases…" = "ユーザー辞書を編集…";
 "Reload User Phrases" = "ユーザー辞書を再び読込む";
 "Unable to create the user phrase file." = "ユーザー辞書ファイルの作成は失敗しました。";
@@ -82,7 +82,7 @@
 "Optimize Memorized Phrases" = "臨時記憶資料を整う";
 "Clear Memorized Phrases" = "臨時記憶資料を削除";
 "Currency Numeral Output" = "数字大字変換";
-"Alphanumerical Mode" = "英数入力モード";
+"Hold ⇧ to choose associates." = "⇧を押しながら連想候補をご選択ください。";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";
@@ -145,7 +145,7 @@
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "入力候補陳列での (Shift+)Tab キーの輪番切替対象をご指定ください。";
 "Choose the behavior of Shift+Letter key with letter inputs." = "Shift+文字キーの行為をご指定ください。";
 "Choose the cursor position where you want to list possible candidates." = "カーソルはどこで入力候補を呼び出すかとご指定ださい。";
-"Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode toggled by Shift key." = "macOS 英数キーボード配置をご指定ください。「Shift キーで切り替える英数入力モード」に使われる配置である。";
+"Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode only." = "macOS 英数キーボード配置をご指定ください。英数入力モードだけに使われる配置である。";
 "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "macOS 基礎キーボード配置をご指定ください。QWERTY 以外の英数キーボードは弁音以外の配列に不適用。";
 "Choose the phonetic layout for Mandarin parser." = "共通語分析器の注音配列をご指定ください。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "欲しがるユーザー辞書保存先をご指定ください。無効なる保存先設定は省かれる。";
@@ -166,7 +166,7 @@
 "Disassemble the previous reading, dropping its intonation" = "カーソルの後部の音読みを解き、その音調を除く";
 "Disassembling process does not work with non-phonetic reading keys." = "実の意味の音読みだけを解くことができる。";
 "Emulating select-candidate-per-character mode" = "漢字１つづつ全候補選択入力モード";
-"Enable CNS11643 Support (2022-08-02)" = "全字庫モード // 入力可能な漢字数を倍増す (2022-08-02)";
+"Enable CNS11643 Support (2022-09-12)" = "全字庫モード // 入力可能な漢字数を倍増す (2022-09-12)";
 "Enable Space key for calling candidate window" = "Space キーで入力候補を呼び出す";
 "Enable symbol input support (incl. certain emoji symbols)" = "僅かなる絵文字も含む符号入力サポートを起用";
 "English" = "英語";
@@ -185,7 +185,7 @@
 "Hsu" = "許氏国音自然配列";
 "Hualuo Pinyin with Numeral Intonation" = "中華ローマ弁音 (ローマ字+数字音調)";
 "IBM" = "IBM 配列";
-"IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases." = "IMK 候補陳列ウィンドウは、Apple の未公開のAPIを「bridging-header」という強引的な手段で引き出して利用した機能である。現時点で macOS 10.14 Mojave から macOS 13 Ventura まで利用可能であるが、その後の新しい macOS との互換性の話はまだ早い。";
+"IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases. However, this mode is recommended at this moment since Tadokoro candidate window still needs possible improvements." = "IMK 候補陳列ウィンドウは、Apple の未公開のAPIを「bridging-header」という強引的な手段で引き出して利用した機能である。現時点で macOS 10.14 Mojave から macOS 13 Ventura まで利用可能であるが、その後の新しい macOS との互換性の話はまだ早い。とはいえ、田所候補陳列ウィンドウにはまだ改善できるところがあるため、IMK 候補陳列ウィンドウは現時点で推奨選択とする。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "単語の前で // macOS 内蔵注音入力のやり方";
 "Intonation Key:" = "音調キー:";
 "Japanese" = "和語";
@@ -217,7 +217,8 @@
 "Specify the behavior of intonation key when syllable composer is empty." = "音読組立緩衝列が空かされた時の音調キーの行為をご指定ください。";
 "Starlight" = "星光配列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "マナーモード // 外すと入力間違った時に変な声が出る";
-"This only works since macOS 12 with non-IMK candidate window as an alternative wordaround of Apple Bug Report #FB10978412. Apple should patch that for macOS 11 and later." = "これは Apple Bug Report #FB10978412 の臨時対策であり、macOS 12 からの macOS に効き、IMK 以外の候補陳列ウィンドウに作用する。Apple は macOS 11 からの macOS のために該当 Bug を修復すべきである。";
+"Tadokoro candidate window only supports horizontal grid view. Enable IMK candidate window in DevZone page first if you want to choose vertical candidate window." = "田所候補陳列ウィンドウは格子状横型陳列しかできません。開発道場のページで IMK 候補陳列ウィンドウを起用してから、今のこのページで縦型・横型陳列の選択はできます。";
+"This only works with Tadokoro candidate window." = "これは田所候補陳列ウィンドウだけに効ける機能である。";
 "Traditional Chinese" = "繁体中国語";
 "Trim unfinished readings on commit" = "送り出す緩衝列内容から未完成な音読みを除く";
 "Type them into inline composition buffer" = "入力緩衝列にローマ字入力";
@@ -226,7 +227,7 @@
 "Universal Pinyin with Numeral Intonation" = "汎用弁音 (ローマ字+数字音調)";
 "Use .langIdentifier to handle UI fonts in candidate window" = "「.langIdentifier」を使って候補陳列ウィンドウのフォントを取り扱う";
 "Use ESC key to clear the entire input buffer" = "ESC キーで入力緩衝列を消す";
-"Use IMK Candidate Window instead (will reboot the IME)" = "IMK 候補陳列ウィンドウを起用（入力アプリは自動的に再起動）";
+"Use IMK Candidate Window instead of Tadokoro (will reboot the IME)" = "IMK 候補陳列ウィンドウを起用（入力アプリは自動的に再起動）";
 "Use Shift key accommodation in all cases" = "いずれの客体アプリにも Shift キーの互換性措置を起用";
 "Vertical" = "縦型陳列";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
