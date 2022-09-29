@@ -19,7 +19,7 @@ public protocol PrefMgrProtocol {
   var keyboardParser: Int { get set }
   var basicKeyboardLayout: String { get set }
   var alphanumericalKeyboardLayout: String { get set }
-  var showPageButtonsInCandidateWindow: Bool { get set }
+  var showNotificationsWhenTogglingCapsLock: Bool { get set }
   var candidateListTextSize: Double { get set }
   var shouldAutoReloadUserDataFiles: Bool { get set }
   var useRearCursorMode: Bool { get set }
