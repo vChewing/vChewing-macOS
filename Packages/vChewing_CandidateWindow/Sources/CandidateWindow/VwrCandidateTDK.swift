@@ -68,9 +68,24 @@ public struct VwrCandidateTDK: View {
             ).id(columnIndex)
             Divider()
           }
+          if thePool.maximumLinesPerPage - thePool.rangeForCurrentPage.count > 0 {
+            ForEach(thePool.rangeForLastPageBlanked, id: \.self) { _ in
+              HStack(spacing: 0) {
+                thePool.blankCell.attributedStringForSwiftUI.fixedSize()
+                  .frame(maxWidth: .infinity, alignment: .topLeading)
+                  .contentShape(Rectangle())
+                Spacer()
+              }.frame(
+                minWidth: 0,
+                maxWidth: .infinity,
+                alignment: .topLeading
+              )
+              Divider()
+            }
+          }
         }
       }
-      .frame(minHeight: thePool.maxWindowHeight, maxHeight: thePool.maxWindowHeight).padding(5)
+      .fixedSize(horizontal: false, vertical: true).padding(5)
       .background(Color(nsColor: NSColor.controlBackgroundColor).ignoresSafeArea())
       HStack(alignment: .bottom) {
         Text(hint).font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold)).lineLimit(1)
