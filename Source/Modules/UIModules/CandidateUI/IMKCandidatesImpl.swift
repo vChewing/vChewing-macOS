@@ -12,7 +12,6 @@ import Shared
 /// 威注音自用的 IMKCandidates 型別。因為有用到 bridging header，所以無法弄成 Swift Package。
 public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
   public var hint: String = ""
-  public var showPageButtons: Bool = false
   public var locale: String = ""
   public var useLangIdentifier: Bool = false
   public var currentLayout: NSUserInterfaceLayoutOrientation = .horizontal

@@ -23,8 +23,6 @@ struct suiPrefPaneGeneral: View {
     : ["auto"]
   @State private var selEnableHorizontalCandidateLayout = UserDefaults.standard.bool(
     forKey: UserDef.kUseHorizontalCandidateList.rawValue)
-  @State private var selShowPageButtonsInCandidateUI = UserDefaults.standard.bool(
-    forKey: UserDef.kShowPageButtonsInCandidateWindow.rawValue)
   @State private var selEnableKanjiConvToKangXi = UserDefaults.standard.bool(
     forKey: UserDef.kChineseConversionEnabled.rawValue)
   @State private var selEnableKanjiConvToJIS = UserDefaults.standard.bool(
