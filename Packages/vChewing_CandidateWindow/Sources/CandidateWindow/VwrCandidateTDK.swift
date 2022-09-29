@@ -21,7 +21,7 @@ struct CandidatePoolViewUI_Previews: PreviewProvider {
     "吹", "大", "地", "草", "枝", "擺",
   ]
   static var thePool: CandidatePool {
-    var result = CandidatePool(candidates: testCandidates, columnCapacity: 6)
+    let result = CandidatePool(candidates: testCandidates, columnCapacity: 6)
     // 下一行待解決：無論這裡怎麼指定高亮選中項是哪一筆，其所在行都得被卷動到使用者眼前。
     result.highlight(at: 14)
     return result
