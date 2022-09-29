@@ -127,18 +127,8 @@ struct suiPrefPaneGeneral: View {
           .labelsHidden()
           .horizontalRadioGroupLayout()
           .pickerStyle(RadioGroupPickerStyle())
-          .disabled(!PrefMgr.shared.useIMKCandidateWindow)
-          if PrefMgr.shared.useIMKCandidateWindow {
-            Text(LocalizedStringKey("Choose your preferred layout of the candidate window."))
-              .preferenceDescription()
-          } else {
-            Text(
-              LocalizedStringKey(
-                "Tadokoro candidate window only supports horizontal grid view. Enable IMK candidate window in DevZone page first if you want to choose vertical candidate window."
-              )
-            )
+          Text(LocalizedStringKey("Choose your preferred layout of the candidate window."))
             .preferenceDescription()
-          }
         }
         Preferences.Section(label: { Text(LocalizedStringKey("Output Settings:")) }) {
           Toggle(
