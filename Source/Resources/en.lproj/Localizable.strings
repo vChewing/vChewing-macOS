@@ -51,12 +51,11 @@
 "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude.";
 "Edit Phrase Replacement Table…" = "Edit Phrase Replacement Table…";
 "Use Phrase Replacement" = "Use Phrase Replacement";
-"Candidates keys cannot be empty." = "Candidates keys cannot be empty.";
 "Candidate keys can only contain ASCII characters like alphanumericals." = "Candidate keys can only contain ASCII characters like alphanumericals.";
 "Candidate keys cannot contain space." = "Candidate keys cannot contain space.";
 "There should not be duplicated keys." = "There should not be duplicated keys.";
-"Please specify at least 4 candidate keys." = "Please specify at least 4 candidate keys.";
-"Maximum 15 candidate keys allowed." = "Maximum 15 candidate keys allowed.";
+"Please specify at least 6 candidate keys." = "Please specify at least 6 candidate keys.";
+"Maximum 9 candidate keys allowed." = "Maximum 9 candidate keys allowed.";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.";
 "Per-Char Select Mode" = "Per-Char Select Mode";
