@@ -51,12 +51,11 @@
 "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "「%@」已存在：\n　敲 Enter 以升權、敲 Shift+Command+Enter 以降權；\n　敲 BackSpace 或 Delete 以排除。";
 "Edit Phrase Replacement Table…" = "編輯語彙置換表…";
 "Use Phrase Replacement" = "使用語彙置換";
-"Candidates keys cannot be empty." = "您必須指定選字鍵。";
 "Candidate keys can only contain ASCII characters like alphanumericals." = "選字鍵只能是英數等 ASCII 字符。";
 "Candidate keys cannot contain space." = "選字鍵不得包含空格。";
 "There should not be duplicated keys." = "選字鍵不得重複。";
-"Please specify at least 4 candidate keys." = "請至少指定四個選字鍵。";
-"Maximum 15 candidate keys allowed." = "選字鍵最多只能指定十五個。";
+"Please specify at least 6 candidate keys." = "請至少指定 6 個選字鍵。";
+"Maximum 9 candidate keys allowed." = "選字鍵最多只能指定 9 個。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 語彙置換功能已啟用，會波及語彙自訂。";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 無法處理：組字區字數與讀音數不對應。";
 "Per-Char Select Mode" = "模擬逐字選字輸入";

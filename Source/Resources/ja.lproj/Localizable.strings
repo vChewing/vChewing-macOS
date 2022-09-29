@@ -51,12 +51,11 @@
 "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "「%@」は既存語彙：\n　ENTER で最優先にし、SHIFT+COMMAND+ENTER で優先順位を下げる；\n　BackSpace 或いは Delete で排除。";
 "Edit Phrase Replacement Table…" = "言葉置換表を編集…";
 "Use Phrase Replacement" = "言葉置換機能";
-"Candidates keys cannot be empty." = "言選り用キー陣列に何かキーをご登録ください。";
 "Candidate keys can only contain ASCII characters like alphanumericals." = "言選り用キー陣列にはASCII文字だけをご登録ください（英数など）。";
 "Candidate keys cannot contain space." = "言選り用キー陣列にスペースキーは登録できません。";
 "There should not be duplicated keys." = "言選り用キー陣列に同じキーの重複登録はできません。";
-"Please specify at least 4 candidate keys." = "言選り用キー陣列に少なくとも４つのキーをご登録ください。";
-"Maximum 15 candidate keys allowed." = "言選り用キー陣列には最多１５つキー登録できます。";
+"Please specify at least 6 candidate keys." = "言選り用キー陣列に少なくとも６つのキーをご登録ください。";
+"Maximum 9 candidate keys allowed." = "言選り用キー陣列には最多９つキー登録できます。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 言葉置換機能稼働中、新添付言葉にも影響。";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 対処不可：緩衝列の字数は読みの数と不同等。";
 "Per-Char Select Mode" = "全候補入力モード";

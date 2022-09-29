@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import Foundation
+import SwiftExtension
 
 // MARK: - UserDef Snapshot Manager
 
@@ -214,10 +215,10 @@ public enum CandidateKey {
           return NSLocalizedString("There should not be duplicated keys.", comment: "")
         case .tooShort:
           return NSLocalizedString(
-            "Please specify at least 4 candidate keys.", comment: ""
+            "Please specify at least 6 candidate keys.", comment: ""
           )
         case .tooLong:
-          return NSLocalizedString("Maximum 15 candidate keys allowed.", comment: "")
+          return NSLocalizedString("Maximum 9 candidate keys allowed.", comment: "")
       }
     }
   }
@@ -233,10 +234,10 @@ public enum CandidateKey {
     if trimmed.contains(" ") {
       throw CandidateKey.ErrorType.containSpace
     }
-    if trimmed.count < 4 {
+    if trimmed.count < 6 {
       throw CandidateKey.ErrorType.tooShort
     }
-    if trimmed.count > 15 {
+    if trimmed.count > 9 {
       throw CandidateKey.ErrorType.tooLong
     }
     let set = Set(Array(trimmed))
