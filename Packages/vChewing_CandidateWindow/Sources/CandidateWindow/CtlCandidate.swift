@@ -120,6 +120,14 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
 
   open var tooltip: String = ""
 
+  @discardableResult open func showNextLine() -> Bool {
+    false
+  }
+
+  @discardableResult open func showPreviousLine() -> Bool {
+    false
+  }
+
   @discardableResult open func highlightNextCandidate() -> Bool {
     false
   }

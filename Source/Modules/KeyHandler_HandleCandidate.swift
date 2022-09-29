@@ -131,7 +131,7 @@ extension KeyHandler {
             errorCallback("1145148D")
           }
         case .vertical:
-          if !ctlCandidate.showPreviousPage() {
+          if !ctlCandidate.showPreviousLine() {
             errorCallback("1919810D")
           }
         @unknown default:
@@ -149,7 +149,7 @@ extension KeyHandler {
             errorCallback("9B65138D")
           }
         case .vertical:
-          if !ctlCandidate.showNextPage() {
+          if !ctlCandidate.showNextLine() {
             errorCallback("9244908D")
           }
         @unknown default:
@@ -163,21 +163,8 @@ extension KeyHandler {
     if input.isUp {
       switch ctlCandidate.currentLayout {
         case .horizontal:
-          if #available(macOS 12, *) {
-            if let ctlCandidate = ctlCandidate as? CtlCandidateTDK {
-              ctlCandidate.showPreviousLine()
-              break
-            } else {
-              if !ctlCandidate.showPreviousPage() {
-                errorCallback("9B614524")
-                break
-              }
-            }
-          } else {
-            if !ctlCandidate.showPreviousPage() {
-              errorCallback("9B614524")
-              break
-            }
+          if !ctlCandidate.showPreviousLine() {
+            errorCallback("9B614524")
           }
         case .vertical:
           if !ctlCandidate.highlightPreviousCandidate() {
@@ -194,21 +181,9 @@ extension KeyHandler {
     if input.isDown {
       switch ctlCandidate.currentLayout {
         case .horizontal:
-          if #available(macOS 12, *) {
-            if let ctlCandidate = ctlCandidate as? CtlCandidateTDK {
-              ctlCandidate.showNextLine()
-              break
-            } else {
-              if !ctlCandidate.showNextPage() {
-                errorCallback("92B990DD")
-                break
-              }
-            }
-          } else {
-            if !ctlCandidate.showNextPage() {
-              errorCallback("92B990DD")
-              break
-            }
+          if !ctlCandidate.showNextLine() {
+            errorCallback("92B990DD")
+            break
           }
         case .vertical:
           if !ctlCandidate.highlightNextCandidate() {
@@ -322,15 +297,7 @@ extension KeyHandler {
 
     if input.isSymbolMenuPhysicalKey {
       var updated = true
-      if #available(macOS 12, *) {
-        if let ctlCandidate = ctlCandidate as? CtlCandidateTDK {
-          updated = input.isShiftHold ? ctlCandidate.showPreviousLine() : ctlCandidate.showNextLine()
-        } else {
-          updated = input.isShiftHold ? ctlCandidate.showPreviousPage() : ctlCandidate.showNextPage()
-        }
-      } else {
-        updated = input.isShiftHold ? ctlCandidate.showPreviousPage() : ctlCandidate.showNextPage()
-      }
+      updated = input.isShiftHold ? ctlCandidate.showPreviousLine() : ctlCandidate.showNextLine()
       if !updated {
         errorCallback("66F3477B")
       }

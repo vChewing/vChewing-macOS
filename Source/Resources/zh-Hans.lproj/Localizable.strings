@@ -216,7 +216,6 @@
 "Specify the behavior of intonation key when syllable composer is empty." = "指定声调键（在注拼槽为「空」状态时）的行为。";
 "Starlight" = "星光排列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉耻模式 // 取消勾选的话，敲错字时会有异音";
-"Tadokoro candidate window only supports horizontal grid view. Enable IMK candidate window in DevZone page first if you want to choose vertical candidate window." = "田所选字窗仅支援横排矩阵布局模式。如欲使用纵排布局模式者，请在开发道场内先启用 IMK 选字窗。";
 "This only works with Tadokoro candidate window." = "该方法仅对田所选字窗起作用。";
 "Traditional Chinese" = "繁体中文";
 "Trim unfinished readings on commit" = "在递交时清理未完成拼写的读音";

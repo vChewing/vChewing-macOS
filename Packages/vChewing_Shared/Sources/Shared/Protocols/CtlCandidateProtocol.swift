@@ -36,6 +36,8 @@ public protocol CtlCandidateProtocol {
   func updateDisplay()
   func showNextPage() -> Bool
   func showPreviousPage() -> Bool
+  func showNextLine() -> Bool
+  func showPreviousLine() -> Bool
   func highlightNextCandidate() -> Bool
   func highlightPreviousCandidate() -> Bool
   func candidateIndexAtKeyLabelIndex(_: Int) -> Int

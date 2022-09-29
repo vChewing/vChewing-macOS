@@ -216,7 +216,6 @@
 "Specify the behavior of intonation key when syllable composer is empty." = "Specify the behavior of intonation key when syllable composer is empty.";
 "Starlight" = "Starlight";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "Stop farting (when typed phonetic combination is invalid, etc.)";
-"Tadokoro candidate window only supports horizontal grid view. Enable IMK candidate window in DevZone page first if you want to choose vertical candidate window." = "Tadokoro candidate window only supports horizontal grid view. Enable IMK candidate window in DevZone page first if you want to choose vertical candidate window.";
 "This only works with Tadokoro candidate window." = "This only works with Tadokoro candidate window.";
 "Traditional Chinese" = "Traditional Chinese";
 "Trim unfinished readings on commit" = "Trim unfinished readings on commit";
