@@ -10,21 +10,24 @@ import Cocoa
 import Shared
 
 /// 候選字窗會用到的資料池單位。
-public struct CandidatePool {
+public class CandidatePool {
   public var currentRowNumber = 0
+  public var maximumLinesPerPage = 3
   public private(set) var selectionKeys: String
   public private(set) var highlightedIndex: Int = 0
   public private(set) var maxColumnCapacity: Int = 6
   public private(set) var candidateDataAll: [CandidateCellData] = []
   public private(set) var candidateRows: [[CandidateCellData]] = []
-  public var maxWindowHeight: Double { ceil(maxWindowWidth * 0.4) }
   public var isVerticalLayout: Bool { maxColumnCapacity == 1 }
   public var maxColumnWidth: Int { Int(Double(maxColumnCapacity + 3) * 2) * Int(ceil(CandidateCellData.unifiedSize)) }
+  public var maxWindowHeight: Double { ceil(maxWindowWidth * 0.4 / 2) }
   public var maxWindowWidth: Double {
     ceil(Double(maxColumnCapacity + 3) * 2.7 * ceil(CandidateCellData.unifiedSize) * 1.2)
   }
 
-  public var rangeForCurrentPage: Range<Int> { currentRowNumber..<min(candidateRows.count, currentRowNumber + 6) }
+  public var rangeForCurrentPage: Range<Int> {
+    currentRowNumber..<min(candidateRows.count, currentRowNumber + maximumLinesPerPage)
+  }
 
   public enum VerticalDirection {
     case up
@@ -56,7 +59,7 @@ public struct CandidatePool {
     candidateRows.append(currentColumn)
   }
 
-  public mutating func selectNewNeighborRow(direction: VerticalDirection) {
+  public func selectNewNeighborRow(direction: VerticalDirection) {
     let currentSubIndex = candidateDataAll[highlightedIndex].subIndex
     var result = currentSubIndex
     switch direction {
@@ -94,7 +97,7 @@ public struct CandidatePool {
     }
   }
 
-  public mutating func highlight(at indexSpecified: Int) {
+  public func highlight(at indexSpecified: Int) {
     var indexSpecified = indexSpecified
     highlightedIndex = indexSpecified
     if !(0..<candidateDataAll.count).contains(highlightedIndex) {
