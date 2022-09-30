@@ -74,8 +74,8 @@ extension KeyHandler {
       let updated: Bool =
         prefs.specifyShiftTabKeyBehavior
         ? (input.isShiftHold
-          ? ctlCandidate.showPreviousPage()
-          : ctlCandidate.showNextPage())
+          ? ctlCandidate.showPreviousLine()
+          : ctlCandidate.showNextLine())
         : (input.isShiftHold
           ? ctlCandidate.highlightPreviousCandidate()
           : ctlCandidate.highlightNextCandidate())
@@ -92,9 +92,9 @@ extension KeyHandler {
         prefs.specifyShiftSpaceKeyBehavior
         ? (input.isShiftHold
           ? ctlCandidate.highlightNextCandidate()
-          : ctlCandidate.showNextPage())
+          : ctlCandidate.showNextLine())
         : (input.isShiftHold
-          ? ctlCandidate.showNextPage()
+          ? ctlCandidate.showNextLine()
           : ctlCandidate.highlightNextCandidate())
       if !updated {
         errorCallback("A11C781F")
