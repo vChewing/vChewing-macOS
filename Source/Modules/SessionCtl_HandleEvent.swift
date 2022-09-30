@@ -37,16 +37,18 @@ extension SessionCtl {
 
     // Caps Lock 通知與切換處理。
     if event.type == .flagsChanged, event.keyCode == KeyCode.kCapsLock.rawValue {
-      let isCapsLockTurnedOn = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
-      let status = NSLocalizedString("NotificationSwitchASCII", comment: "")
-      if PrefMgr.shared.showNotificationsWhenTogglingCapsLock {
-        Notifier.notify(
-          message: isCapsLockTurnedOn
+      DispatchQueue.main.async {
+        let isCapsLockTurnedOn = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
+        let status = NSLocalizedString("NotificationSwitchASCII", comment: "")
+        if PrefMgr.shared.showNotificationsWhenTogglingCapsLock {
+          Notifier.notify(
+            message: isCapsLockTurnedOn
             ? "Caps Lock" + NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
             : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
-        )
+          )
+        }
+        self.isASCIIMode = isCapsLockTurnedOn
       }
-      isASCIIMode = isCapsLockTurnedOn
     }
 
     // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
