@@ -11,7 +11,6 @@ import Shared
 
 open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
   open var hint: String = ""
-  open var showPageButtons: Bool = false
   open var currentLayout: NSUserInterfaceLayoutOrientation = .horizontal
   open var locale: String = ""
   open var useLangIdentifier: Bool = false
@@ -120,6 +119,14 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
   open var keyLabelFont = NSFont.monospacedDigitSystemFont(ofSize: 14, weight: .medium)
 
   open var tooltip: String = ""
+
+  @discardableResult open func showNextLine() -> Bool {
+    false
+  }
+
+  @discardableResult open func showPreviousLine() -> Bool {
+    false
+  }
 
   @discardableResult open func highlightNextCandidate() -> Bool {
     false

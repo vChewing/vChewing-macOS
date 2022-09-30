@@ -51,12 +51,11 @@
 "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "「%@」は既存語彙：\n　ENTER で最優先にし、SHIFT+COMMAND+ENTER で優先順位を下げる；\n　BackSpace 或いは Delete で排除。";
 "Edit Phrase Replacement Table…" = "言葉置換表を編集…";
 "Use Phrase Replacement" = "言葉置換機能";
-"Candidates keys cannot be empty." = "言選り用キー陣列に何かキーをご登録ください。";
 "Candidate keys can only contain ASCII characters like alphanumericals." = "言選り用キー陣列にはASCII文字だけをご登録ください（英数など）。";
 "Candidate keys cannot contain space." = "言選り用キー陣列にスペースキーは登録できません。";
 "There should not be duplicated keys." = "言選り用キー陣列に同じキーの重複登録はできません。";
-"Please specify at least 4 candidate keys." = "言選り用キー陣列に少なくとも４つのキーをご登録ください。";
-"Maximum 15 candidate keys allowed." = "言選り用キー陣列には最多１５つキー登録できます。";
+"Please specify at least 6 candidate keys." = "言選り用キー陣列に少なくとも６つのキーをご登録ください。";
+"Maximum 9 candidate keys allowed." = "言選り用キー陣列には最多９つキー登録できます。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 言葉置換機能稼働中、新添付言葉にも影響。";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 対処不可：緩衝列の字数は読みの数と不同等。";
 "Per-Char Select Mode" = "全候補入力モード";
@@ -82,7 +81,7 @@
 "Optimize Memorized Phrases" = "臨時記憶資料を整う";
 "Clear Memorized Phrases" = "臨時記憶資料を削除";
 "Currency Numeral Output" = "数字大字変換";
-"Hold ⇧ to choose associates." = "⇧を押しながら連想候補をご選択ください。";
+"Hold ⇧ to choose associates." = "⇧を押しながら連想候補を選択。";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";
@@ -209,7 +208,7 @@
 "Shift+BackSpace:" = "Shift+BackSpace:";
 "Shift+Letter:" = "Shift+文字キー:";
 "Show Hanyu-Pinyin in the inline composition buffer" = "弁音合併入力（入力緩衝列で音読みを漢語弁音に）";
-"Show page buttons in candidate window" = "入力候補陳列の側にページボタンを表示";
+"Show notifications when toggling Caps Lock" = "Caps Lock で切り替えの時に吹出通知メッセージを";
 "Simplified Chinese" = "簡体中国語";
 "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work." = "いくつかのアプリ（例えば MS Edge や Google Chrome などのような Chromium 系ブラウザー）には「Shift キーの入力イベントを複数化してしまう」という支障があり、そしてアプリそれぞれの開発元に修復される可能性はほぼゼロだと言える。威注音入力アプリは対策用の特殊措置を普段に起用している。ご自分の必要によって設定してください。";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+Space で次のページ、Space で次の候補文字を";
@@ -217,7 +216,6 @@
 "Specify the behavior of intonation key when syllable composer is empty." = "音読組立緩衝列が空かされた時の音調キーの行為をご指定ください。";
 "Starlight" = "星光配列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "マナーモード // 外すと入力間違った時に変な声が出る";
-"Tadokoro candidate window only supports horizontal grid view. Enable IMK candidate window in DevZone page first if you want to choose vertical candidate window." = "田所候補陳列ウィンドウは格子状横型陳列しかできません。開発道場のページで IMK 候補陳列ウィンドウを起用してから、今のこのページで縦型・横型陳列の選択はできます。";
 "This only works with Tadokoro candidate window." = "これは田所候補陳列ウィンドウだけに効ける機能である。";
 "Traditional Chinese" = "繁体中国語";
 "Trim unfinished readings on commit" = "送り出す緩衝列内容から未完成な音読みを除く";

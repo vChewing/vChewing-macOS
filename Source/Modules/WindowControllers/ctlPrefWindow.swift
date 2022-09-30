@@ -135,7 +135,9 @@ class ctlPrefWindow: NSWindowController {
     }
 
     selectionKeyComboBox.stringValue = candidateSelectionKeys
-    selectionKeyComboBox.isEnabled = false  // 無法與 IMKCandidates 協作，故禁用。
+    if PrefMgr.shared.useIMKCandidateWindow {
+      selectionKeyComboBox.isEnabled = false  // 無法與 IMKCandidates 協作，故禁用。
+    }
   }
 
   // 這裡有必要加上這段處理，用來確保藉由偏好設定介面動過的 CNS 開關能夠立刻生效。
@@ -198,7 +200,7 @@ class ctlPrefWindow: NSWindowController {
       let keys = (sender as AnyObject).stringValue?.trimmingCharacters(
         in: .whitespacesAndNewlines
       )
-      .deduplicate
+      .deduplicated
     else {
       return
     }
@@ -209,8 +211,8 @@ class ctlPrefWindow: NSWindowController {
     } catch CandidateKey.ErrorType.empty {
       selectionKeyComboBox.stringValue = PrefMgr.shared.candidateKeys
     } catch {
-      if let window = window {
-        let alert = NSAlert(error: error)
+      if let window = window, let error = error as? CandidateKey.ErrorType {
+        let alert = NSAlert(error: error.errorDescription)
         alert.beginSheetModal(for: window) { _ in
           self.selectionKeyComboBox.stringValue = PrefMgr.shared.candidateKeys
         }

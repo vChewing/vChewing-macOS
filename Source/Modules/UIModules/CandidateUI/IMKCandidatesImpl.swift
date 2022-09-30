@@ -12,7 +12,6 @@ import Shared
 /// 威注音自用的 IMKCandidates 型別。因為有用到 bridging header，所以無法弄成 Swift Package。
 public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
   public var hint: String = ""
-  public var showPageButtons: Bool = false
   public var locale: String = ""
   public var useLangIdentifier: Bool = false
   public var currentLayout: NSUserInterfaceLayoutOrientation = .horizontal
@@ -146,6 +145,18 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
   // 該函式會影響 IMK 選字窗。
   @discardableResult public func highlightPreviousCandidate() -> Bool {
     do { currentLayout == .vertical ? moveUp(self) : moveLeft(self) }
+    return true
+  }
+
+  // 該函式會影響 IMK 選字窗。
+  public func showNextLine() -> Bool {
+    do { currentLayout == .vertical ? moveRight(self) : moveDown(self) }
+    return true
+  }
+
+  // 該函式會影響 IMK 選字窗。
+  public func showPreviousLine() -> Bool {
+    do { currentLayout == .vertical ? moveLeft(self) : moveUp(self) }
     return true
   }
 

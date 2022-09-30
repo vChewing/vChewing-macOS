@@ -90,7 +90,7 @@
 "RUG-ls-KyA.title" = "在選字後將游標置於該字詞的前方";
 "rVQ-Hx-cGi.title" = "和語";
 "s7u-Fm-dVg.title" = "輪替頁面";
-"shc-Nu-UsM.title" = "在選字窗內顯示翻頁按鈕";
+"shc-Nu-UsM.title" = "以 Caps Lock 切換輸入法/中英模式時顯示通知";
 "tglDevZoneIMKCandidate.title" = "啟用與 macOS 內建輸入法相同的 IMK 選字窗（會自動重啟輸入法）";
 "tglTrimUnfinishedReadingsOnCommit.title" = "在遞交時清理未完成拼寫的讀音";
 "TXr-FF-ehw.title" = "繁體中文";

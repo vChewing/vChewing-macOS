@@ -13,13 +13,15 @@ let package = Package(
     )
   ],
   dependencies: [
-    .package(path: "../vChewing_CocoaExtension")
+    .package(path: "../vChewing_CocoaExtension"),
+    .package(path: "../vChewing_SwiftExtension")
   ],
   targets: [
     .target(
       name: "Shared",
       dependencies: [
-        .product(name: "CocoaExtension", package: "vChewing_CocoaExtension")
+        .product(name: "CocoaExtension", package: "vChewing_CocoaExtension"),
+        .product(name: "SwiftExtension", package: "vChewing_SwiftExtension")
       ]
     )
   ]

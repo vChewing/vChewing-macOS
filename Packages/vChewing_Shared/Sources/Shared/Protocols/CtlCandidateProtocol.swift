@@ -30,13 +30,14 @@ public protocol CtlCandidateProtocol {
   var candidateFont: NSFont { get set }
   var tooltip: String { get set }
   var useLangIdentifier: Bool { get set }
-  var showPageButtons: Bool { get set }
 
   init(_ layout: NSUserInterfaceLayoutOrientation)
   func reloadData()
   func updateDisplay()
   func showNextPage() -> Bool
   func showPreviousPage() -> Bool
+  func showNextLine() -> Bool
+  func showPreviousLine() -> Bool
   func highlightNextCandidate() -> Bool
   func highlightPreviousCandidate() -> Bool
   func candidateIndexAtKeyLabelIndex(_: Int) -> Int

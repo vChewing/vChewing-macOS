@@ -51,12 +51,11 @@
 "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude.";
 "Edit Phrase Replacement Table…" = "Edit Phrase Replacement Table…";
 "Use Phrase Replacement" = "Use Phrase Replacement";
-"Candidates keys cannot be empty." = "Candidates keys cannot be empty.";
 "Candidate keys can only contain ASCII characters like alphanumericals." = "Candidate keys can only contain ASCII characters like alphanumericals.";
 "Candidate keys cannot contain space." = "Candidate keys cannot contain space.";
 "There should not be duplicated keys." = "There should not be duplicated keys.";
-"Please specify at least 4 candidate keys." = "Please specify at least 4 candidate keys.";
-"Maximum 15 candidate keys allowed." = "Maximum 15 candidate keys allowed.";
+"Please specify at least 6 candidate keys." = "Please specify at least 6 candidate keys.";
+"Maximum 9 candidate keys allowed." = "Maximum 9 candidate keys allowed.";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.";
 "Per-Char Select Mode" = "Per-Char Select Mode";
@@ -209,7 +208,7 @@
 "Shift+BackSpace:" = "Shift+BackSpace:";
 "Shift+Letter:" = "Shift+Letter:";
 "Show Hanyu-Pinyin in the inline composition buffer" = "Show Hanyu-Pinyin in the inline composition buffer";
-"Show page buttons in candidate window" = "Show page buttons in candidate window";
+"Show notifications when toggling Caps Lock" = "Show notifications when toggling Caps Lock";
 "Simplified Chinese" = "Simplified Chinese";
 "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work." = "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work.";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Space to +cycle candidates, Shift+Space to +cycle pages";
@@ -217,7 +216,6 @@
 "Specify the behavior of intonation key when syllable composer is empty." = "Specify the behavior of intonation key when syllable composer is empty.";
 "Starlight" = "Starlight";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "Stop farting (when typed phonetic combination is invalid, etc.)";
-"Tadokoro candidate window only supports horizontal grid view. Enable IMK candidate window in DevZone page first if you want to choose vertical candidate window." = "Tadokoro candidate window only supports horizontal grid view. Enable IMK candidate window in DevZone page first if you want to choose vertical candidate window.";
 "This only works with Tadokoro candidate window." = "This only works with Tadokoro candidate window.";
 "Traditional Chinese" = "Traditional Chinese";
 "Trim unfinished readings on commit" = "Trim unfinished readings on commit";

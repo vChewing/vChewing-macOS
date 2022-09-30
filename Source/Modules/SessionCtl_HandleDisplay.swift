@@ -142,7 +142,6 @@ extension SessionCtl {
       Self.ctlCandidateCurrent.hint = NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
     }
 
-    Self.ctlCandidateCurrent.showPageButtons = PrefMgr.shared.showPageButtonsInCandidateWindow
     Self.ctlCandidateCurrent.useLangIdentifier = PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier
     Self.ctlCandidateCurrent.locale = {
       switch inputMode {

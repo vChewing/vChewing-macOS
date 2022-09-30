@@ -51,12 +51,11 @@
 "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "「%@」已存在：\n　敲 Enter 以升權、敲 Shift+Command+Enter 以降權；\n　敲 BackSpace 或 Delete 以排除。";
 "Edit Phrase Replacement Table…" = "編輯語彙置換表…";
 "Use Phrase Replacement" = "使用語彙置換";
-"Candidates keys cannot be empty." = "您必須指定選字鍵。";
 "Candidate keys can only contain ASCII characters like alphanumericals." = "選字鍵只能是英數等 ASCII 字符。";
 "Candidate keys cannot contain space." = "選字鍵不得包含空格。";
 "There should not be duplicated keys." = "選字鍵不得重複。";
-"Please specify at least 4 candidate keys." = "請至少指定四個選字鍵。";
-"Maximum 15 candidate keys allowed." = "選字鍵最多只能指定十五個。";
+"Please specify at least 6 candidate keys." = "請至少指定 6 個選字鍵。";
+"Maximum 9 candidate keys allowed." = "選字鍵最多只能指定 9 個。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 語彙置換功能已啟用，會波及語彙自訂。";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 無法處理：組字區字數與讀音數不對應。";
 "Per-Char Select Mode" = "模擬逐字選字輸入";
@@ -209,7 +208,7 @@
 "Shift+BackSpace:" = "Shift+退格鍵:";
 "Shift+Letter:" = "Shift+字母鍵:";
 "Show Hanyu-Pinyin in the inline composition buffer" = "拼音並擊（組字區內顯示漢語拼音）";
-"Show page buttons in candidate window" = "在選字窗內顯示翻頁按鈕";
+"Show notifications when toggling Caps Lock" = "以 Caps Lock 切換輸入法/中英模式時顯示通知";
 "Simplified Chinese" = "簡體中文";
 "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work." = "某些應用（比如像是 MS Edge 或者 Chrome 這樣的 Chromium 核心的瀏覽器）可能會使輸入的 Shift 按鍵訊號被重複輸入，且其有關研發方很可能不打算修復這些產品缺陷。威注音針對這些應用預設啟用了相容措施。請在此根據您的需求自訂。";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+空格鍵 換下一頁，空格鍵 換選下一個候選字";
@@ -217,7 +216,6 @@
 "Specify the behavior of intonation key when syllable composer is empty." = "指定聲調鍵（在注拼槽為「空」狀態時）的行為。";
 "Starlight" = "星光排列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉恥模式 // 取消勾選的話，敲錯字時會有異音";
-"Tadokoro candidate window only supports horizontal grid view. Enable IMK candidate window in DevZone page first if you want to choose vertical candidate window." = "田所選字窗僅支援橫排矩陣佈局模式。如欲使用縱排佈局模式者，請在開發道場內先啟用 IMK 選字窗。";
 "This only works with Tadokoro candidate window." = "該方法僅對田所選字窗起作用。";
 "Traditional Chinese" = "繁體中文";
 "Trim unfinished readings on commit" = "在遞交時清理未完成拼寫的讀音";
