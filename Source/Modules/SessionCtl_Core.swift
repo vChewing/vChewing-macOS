@@ -12,6 +12,7 @@ import IMKUtils
 import PopupCompositionBuffer
 import Shared
 import ShiftKeyUpChecker
+import TDKCandidateBackports
 import TooltipUI
 
 /// 輸入法控制模組，乃在輸入法端用以控制輸入行為的基礎型別。
@@ -34,6 +35,9 @@ class SessionCtl: IMKInputController {
     if #available(macOS 12, *) {
       return PrefMgr.shared.useIMKCandidateWindow
         ? CtlCandidateIMK(direction) : CtlCandidateTDK(direction)
+    } else if #available(macOS 10.15, *) {
+      return PrefMgr.shared.useIMKCandidateWindow
+        ? CtlCandidateIMK(direction) : CtlCandidateTDKBackports(direction)
     } else {
       return CtlCandidateIMK(direction)
     }
