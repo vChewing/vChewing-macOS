@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 extension Backport where Wrapped: View {
   /// Sets the Dynamic Type size within the view to the given value.
   ///
@@ -34,6 +35,7 @@ extension Backport where Wrapped: View {
     content.environment(\.backportDynamicTypeSize, size)
   }
 
+  @available(macOS 10.15, *)
   /// Limits the Dynamic Type size within the view to the given range.
   ///
   /// As an example, you can constrain the maximum Dynamic Type size in
@@ -93,10 +95,12 @@ extension Backport where Wrapped: View {
   }
 }
 
+@available(macOS 10.15, *)
 private struct DynamicTypeRangeModifier: ViewModifier {
   @Environment(\.dynamicTypeRange) private var range
   @Environment(\.backportDynamicTypeSize) private var size
 
+  @available(macOS 10.15, *)
   private var resolvedSize: Backport<Any>.DynamicTypeSize {
     print(range)
     return range.contains(size)
@@ -104,6 +108,7 @@ private struct DynamicTypeRangeModifier: ViewModifier {
       : max(range.lowerBound, min(range.upperBound, size))
   }
 
+  @available(macOS 10.15, *)
   func body(content: Content) -> some View {
     content.environment(\.backportDynamicTypeSize, resolvedSize)
   }

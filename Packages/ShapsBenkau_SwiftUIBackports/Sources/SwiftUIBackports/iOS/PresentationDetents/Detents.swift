@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(tvOS, deprecated: 16)
 @available(macOS, deprecated: 13)
 @available(watchOS, deprecated: 9)
@@ -39,6 +40,7 @@ extension Backport where Wrapped: View {
     #endif
   }
 
+  @available(macOS 10.15, *)
   /// Sets the available detents for the enclosing sheet, giving you
   /// programmatic control of the currently selected detent.
   ///
@@ -81,6 +83,7 @@ extension Backport where Wrapped: View {
     #endif
   }
 
+  @available(macOS 10.15, *)
   /// Sets the available detents for the enclosing sheet, giving you
   /// programmatic control of the currently selected detent.
   ///
@@ -126,6 +129,7 @@ extension Backport where Wrapped: View {
   }
 }
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 16)
 @available(tvOS, deprecated: 16)
 @available(macOS, deprecated: 13)
@@ -139,32 +143,39 @@ extension Backport where Wrapped == Any {
         self.rawValue = rawValue
       }
 
+      @available(macOS 10.15, *)
       public static var medium: Identifier {
         .init(rawValue: "com.apple.UIKit.medium")
       }
 
+      @available(macOS 10.15, *)
       public static var large: Identifier {
         .init(rawValue: "com.apple.UIKit.large")
       }
     }
 
+    @available(macOS 10.15, *)
     public let id: Identifier
 
+    @available(macOS 10.15, *)
     /// The system detent for a sheet that's approximately half the height of
     /// the screen, and is inactive in compact height.
     public static var medium: PresentationDetent {
       .init(id: .medium)
     }
 
+    @available(macOS 10.15, *)
     /// The system detent for a sheet at full height.
     public static var large: PresentationDetent {
       .init(id: .large)
     }
 
+    @available(macOS 10.15, *)
     fileprivate static var none: PresentationDetent {
       .init(id: .init(rawValue: ""))
     }
 
+    @available(macOS 10.15, *)
     public static func < (lhs: PresentationDetent, rhs: PresentationDetent) -> Bool {
       switch (lhs, rhs) {
         case (.large, .medium):
@@ -194,6 +205,7 @@ extension Backport where Wrapped == Any {
     }
   }
 
+  @available(macOS 10.15, *)
   @available(iOS 15, *)
   extension Backport.Representable {
     fileprivate final class Controller: UIViewController, UISheetPresentationControllerDelegate {
@@ -202,6 +214,7 @@ extension Backport where Wrapped == Any {
       var largestUndimmed: Backport<Any>.PresentationDetent?
       weak var _delegate: UISheetPresentationControllerDelegate?
 
+      @available(macOS 10.15, *)
       init(
         detents: Set<Backport<Any>.PresentationDetent>, selection: Binding<Backport<Any>.PresentationDetent>?,
         largestUndimmed: Backport<Any>.PresentationDetent?
@@ -212,11 +225,13 @@ extension Backport where Wrapped == Any {
         super.init(nibName: nil, bundle: nil)
       }
 
+      @available(macOS 10.15, *)
       @available(*, unavailable)
       required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
       }
 
+      @available(macOS 10.15, *)
       override func willMove(toParent parent: UIViewController?) {
         super.willMove(toParent: parent)
         if let controller = parent?.sheetPresentationController {
@@ -228,6 +243,7 @@ extension Backport where Wrapped == Any {
         update(detents: detents, selection: selection, largestUndimmed: largestUndimmed)
       }
 
+      @available(macOS 10.15, *)
       func update(
         detents: Set<Backport<Any>.PresentationDetent>, selection: Binding<Backport<Any>.PresentationDetent>?,
         largestUndimmed: Backport<Any>.PresentationDetent?
@@ -269,6 +285,7 @@ extension Backport where Wrapped == Any {
         }
       }
 
+      @available(macOS 10.15, *)
       func sheetPresentationControllerDidChangeSelectedDetentIdentifier(
         _ sheetPresentationController: UISheetPresentationController
       ) {
@@ -281,12 +298,14 @@ extension Backport where Wrapped == Any {
         selection.wrappedValue = .init(id: .init(rawValue: id))
       }
 
+      @available(macOS 10.15, *)
       override func responds(to aSelector: Selector!) -> Bool {
         if super.responds(to: aSelector) { return true }
         if _delegate?.responds(to: aSelector) ?? false { return true }
         return false
       }
 
+      @available(macOS 10.15, *)
       override func forwardingTarget(for aSelector: Selector!) -> Any? {
         if super.responds(to: aSelector) { return self }
         return _delegate

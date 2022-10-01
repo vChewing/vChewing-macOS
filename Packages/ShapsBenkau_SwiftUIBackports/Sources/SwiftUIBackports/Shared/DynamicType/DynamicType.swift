@@ -8,6 +8,7 @@ import SwiftUI
 @available(tvOS, deprecated: 15)
 @available(macOS, deprecated: 12)
 @available(watchOS, deprecated: 8)
+@available(macOS 10.15, *)
 extension Backport where Wrapped == Any {
   /// A Dynamic Type size, which specifies how large scalable content should be.
   ///

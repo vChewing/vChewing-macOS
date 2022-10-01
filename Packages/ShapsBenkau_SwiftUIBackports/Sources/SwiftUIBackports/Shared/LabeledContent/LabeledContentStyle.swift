@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 16)
 @available(tvOS, deprecated: 16)
 @available(macOS, deprecated: 13)
@@ -15,6 +16,7 @@ extension Backport where Wrapped: View {
   }
 }
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 16)
 @available(tvOS, deprecated: 16)
 @available(macOS, deprecated: 13)
@@ -25,25 +27,30 @@ public protocol BackportLabeledContentStyle {
   @ViewBuilder func makeBody(configuration: Configuration) -> Body
 }
 
+@available(macOS 10.15, *)
 internal struct AnyLabeledContentStyle: BackportLabeledContentStyle {
   typealias Configuration = Backport<Any>.LabeledContentStyleConfiguration
   let _makeBody: (Configuration) -> AnyView
 
+  @available(macOS 10.15, *)
   init<S: BackportLabeledContentStyle>(_ style: S) {
     _makeBody = { config in
       AnyView(style.makeBody(configuration: config))
     }
   }
 
+  @available(macOS 10.15, *)
   func makeBody(configuration: Configuration) -> some View {
     _makeBody(configuration)
   }
 }
 
+@available(macOS 10.15, *)
 private struct BackportLabeledContentStyleEnvironmentKey: EnvironmentKey {
   static var defaultValue: AnyLabeledContentStyle = .init(.automatic)
 }
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 16)
 @available(tvOS, deprecated: 16)
 @available(macOS, deprecated: 13)

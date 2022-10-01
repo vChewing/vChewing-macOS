@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 14)
 @available(macOS, deprecated: 11)
 @available(tvOS, deprecated: 14.0)
@@ -17,6 +18,7 @@ extension Backport where Wrapped == Any {
     /// Creates a default progress view style.
     public init() {}
 
+    @available(macOS 10.15, *)
     /// Creates a view representing the body of a progress view.
     ///
     /// - Parameter configuration: The properties of the progress view being
@@ -46,6 +48,7 @@ extension Backport where Wrapped == Any {
   }
 }
 
+@available(macOS 10.15, *)
 extension BackportProgressViewStyle where Self == Backport<Any>.DefaultProgressViewStyle {
   public static var automatic: Self { .init() }
 }

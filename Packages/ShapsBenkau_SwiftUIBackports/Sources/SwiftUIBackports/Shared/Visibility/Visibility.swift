@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 15)
 @available(macOS, deprecated: 12)
 @available(tvOS, deprecated: 15)

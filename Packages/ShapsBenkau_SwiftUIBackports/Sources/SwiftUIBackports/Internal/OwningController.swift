@@ -23,6 +23,7 @@
 #if os(macOS)
   import AppKit
 
+  @available(macOS 10.15, *)
   extension NSView {
     public var parentController: NSViewController? {
       var responder: NSResponder? = self

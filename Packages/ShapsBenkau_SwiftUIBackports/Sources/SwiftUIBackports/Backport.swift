@@ -1,6 +1,7 @@
 import ObjectiveC
 import SwiftUI
 
+@available(macOS 10.15, *)
 /// Provides a convenient method for backporting API,
 /// including types, functions, properties, property wrappers and more.
 ///
@@ -32,6 +33,7 @@ public struct Backport<Wrapped> {
   /// The underlying content this backport represents.
   public let content: Wrapped
 
+  @available(macOS 10.15, *)
   /// Initializes a new Backport for the specified content.
   /// - Parameter content: The content (type) that's being backported
   public init(_ content: Wrapped) {
@@ -39,16 +41,19 @@ public struct Backport<Wrapped> {
   }
 }
 
+@available(macOS 10.15, *)
 extension View {
   /// Wraps a SwiftUI `View` that can be extended to provide backport functionality.
   public var backport: Backport<Self> { .init(self) }
 }
 
+@available(macOS 10.15, *)
 extension NSObjectProtocol {
   /// Wraps an `NSObject` that can be extended to provide backport functionality.
   public var backport: Backport<Self> { .init(self) }
 }
 
+@available(macOS 10.15, *)
 extension AnyTransition {
   /// Wraps an `AnyTransition` that can be extended to provide backport functionality.
   public static var backport: Backport<AnyTransition> {

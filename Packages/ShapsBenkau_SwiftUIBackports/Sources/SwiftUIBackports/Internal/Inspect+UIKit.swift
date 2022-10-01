@@ -82,6 +82,7 @@ import SwiftUI
     }
   }
 
+  @available(macOS 10.15, *)
   extension View {
     private func inject<Wrapped>(_ content: Wrapped) -> some View where Wrapped: View {
       overlay(content.frame(width: 0, height: 0))
@@ -94,6 +95,7 @@ import SwiftUI
     }
   }
 
+  @available(macOS 10.15, *)
   private struct InspectionView<ViewType: PlatformView>: View {
     let selector: (Inspector) -> ViewType?
     let customize: (ViewType) -> Void
@@ -145,6 +147,7 @@ import SwiftUI
   }
 
 #elseif os(macOS)
+  @available(macOS 10.15, *)
   extension InspectionView {
     fileprivate struct Representable: NSViewRepresentable {
       let parent: InspectionView

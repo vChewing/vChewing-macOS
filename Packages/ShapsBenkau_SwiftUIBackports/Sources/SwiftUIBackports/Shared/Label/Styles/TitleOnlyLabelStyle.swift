@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 14)
 @available(macOS, deprecated: 11)
 @available(tvOS, deprecated: 14)
@@ -16,6 +17,7 @@ extension Backport where Wrapped == Any {
     /// Creates a title-only label style.
     public init() {}
 
+    @available(macOS 10.15, *)
     /// Creates a view that represents the body of a label.
     ///
     /// The system calls this method for each ``Label`` instance in a view
@@ -28,6 +30,7 @@ extension Backport where Wrapped == Any {
   }
 }
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 14)
 @available(macOS, deprecated: 11)
 @available(tvOS, deprecated: 14)
