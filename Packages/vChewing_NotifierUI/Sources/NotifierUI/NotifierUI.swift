@@ -42,8 +42,11 @@ public class Notifier: NSWindowController {
       super.init(window: nil)
       return
     }
+    // 剔除溢出的副本，讓 Swift 自動回收之。
+    while Self.instanceStack.count > 3 { Self.instanceStack.removeLast().close() }
     // 正式進入處理環節。
-    defer {  // 先讓新通知標記自此開始過 0.3 秒自動變為 false。
+    defer {
+      // 先讓新通知標記自此開始過 0.3 秒自動變為 false。
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
         self.isNew = false
       }
@@ -137,8 +140,8 @@ public class Notifier: NSWindowController {
 
 extension Notifier {
   private func shiftExistingWindowPositions() {
-    guard let window = window, !Self.instanceStack.isEmpty else { return }
-    for theInstanceWindow in Self.instanceStack.compactMap(\.window) {
+    guard let window = window else { return }
+    Self.instanceStack.compactMap(\.window).forEach { theInstanceWindow in
       var theOrigin = theInstanceWindow.frame
       theOrigin.origin.y -= (10 + window.frame.height)
       theInstanceWindow.setFrame(theOrigin, display: true)
@@ -156,19 +159,18 @@ extension Notifier {
   }
 
   private func display() {
-    let existingInstanceArray = Self.instanceStack.compactMap(\.window)
-    if !existingInstanceArray.isEmpty {
-      existingInstanceArray.forEach {
-        $0.alphaValue -= 0.1
-        $0.contentView?.subviews.forEach { $0.alphaValue *= 0.5 }
-      }
+    Self.instanceStack.compactMap(\.window).forEach {
+      $0.alphaValue -= 0.1
+      $0.contentView?.subviews.forEach { $0.alphaValue *= 0.5 }
     }
     shiftExistingWindowPositions()
     fadeIn()
     Self.instanceStack.insert(self, at: 0)
-    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
       self.close()
-      Self.instanceStack.removeAll(where: { $0.window == nil })
+      if let idx = Self.instanceStack.firstIndex(where: { $0 === self }) {
+        Self.instanceStack.remove(at: idx)
+      }
     }
   }
 }
