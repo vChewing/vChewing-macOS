@@ -50,7 +50,7 @@ public struct VwrCandidateVertical: View {
 
   public var body: some View {
     VStack(alignment: .leading, spacing: 0) {
-      ScrollView(.horizontal, showsIndicators: true) {
+      ScrollView(.horizontal, showsIndicators: false) {
         HStack(alignment: .top, spacing: 10) {
           ForEach(thePool.rangeForCurrentVerticalPage, id: \.self) { columnIndex in
             VStack(alignment: .leading, spacing: 0) {

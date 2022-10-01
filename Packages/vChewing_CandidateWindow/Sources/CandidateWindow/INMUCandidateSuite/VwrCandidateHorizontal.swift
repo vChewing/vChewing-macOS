@@ -51,7 +51,7 @@ public struct VwrCandidateHorizontal: View {
 
   public var body: some View {
     VStack(alignment: .leading, spacing: 0) {
-      ScrollView(.vertical, showsIndicators: true) {
+      ScrollView(.vertical, showsIndicators: false) {
         VStack(alignment: .leading, spacing: 1.6) {
           ForEach(thePool.rangeForCurrentHorizontalPage, id: \.self) { rowIndex in
             HStack(spacing: 10) {
