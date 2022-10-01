@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 16)
 @available(tvOS, deprecated: 16)
 @available(watchOS, deprecated: 9)
@@ -52,6 +53,7 @@ extension Backport where Wrapped: View {
   }
 }
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 16)
 @available(tvOS, deprecated: 16)
 @available(watchOS, deprecated: 9)
@@ -60,11 +62,13 @@ extension Backport where Wrapped == Any {
   public struct NavigationLink<Label, Destination>: View where Label: View, Destination: View {
     @Environment(\.navigationDestinations) private var destinations
 
+    @available(macOS 10.15, *)
     private let valueType: AnyMetaType
     private let value: Any?
     private let label: Label
     private let destination: () -> Destination
 
+    @available(macOS 10.15, *)
     public init<P>(value: P?, @ViewBuilder label: () -> Label) where Destination == Never {
       self.value = value
       valueType = .init(type: P.self)
@@ -72,6 +76,7 @@ extension Backport where Wrapped == Any {
       self.label = label()
     }
 
+    @available(macOS 10.15, *)
     public var body: some View {
       SwiftUI.NavigationLink {
         if let value = value {
@@ -85,10 +90,12 @@ extension Backport where Wrapped == Any {
   }
 }
 
+@available(macOS 10.15, *)
 private struct NavigationDestinationsEnvironmentKey: EnvironmentKey {
   static var defaultValue: [AnyMetaType: DestinationView] = [:]
 }
 
+@available(macOS 10.15, *)
 extension EnvironmentValues {
   fileprivate var navigationDestinations: [AnyMetaType: DestinationView] {
     get { self[NavigationDestinationsEnvironmentKey.self] }
@@ -100,22 +107,26 @@ extension EnvironmentValues {
   }
 }
 
+@available(macOS 10.15, *)
 private struct AnyMetaType {
   let type: Any.Type
 }
 
+@available(macOS 10.15, *)
 extension AnyMetaType: Equatable {
   static func == (lhs: Self, rhs: Self) -> Bool {
     lhs.type == rhs.type
   }
 }
 
+@available(macOS 10.15, *)
 extension AnyMetaType: Hashable {
   func hash(into hasher: inout Hasher) {
     hasher.combine(ObjectIdentifier(type))
   }
 }
 
+@available(macOS 10.15, *)
 extension Dictionary {
   fileprivate subscript(_ key: Any.Type) -> Value? where Key == AnyMetaType {
     get { self[.init(type: key)] }
@@ -123,6 +134,7 @@ extension Dictionary {
   }
 }
 
+@available(macOS 10.15, *)
 private struct DestinationView: View {
   let content: (Any) -> AnyView
   var body: Never { fatalError() }

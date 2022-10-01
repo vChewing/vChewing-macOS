@@ -8,10 +8,12 @@ import SwiftUI
   import WatchKit
 #endif
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 14)
 @available(tvOS, deprecated: 14)
 @available(macOS, deprecated: 11)
 @available(watchOS, deprecated: 7)
+@available(macOS 10.15, *)
 extension Backport where Wrapped == Any {
   /// An action that opens a URL.
   ///
@@ -83,6 +85,7 @@ extension Backport where Wrapped == Any {
         case discarded
         case systemAction(_ url: URL?)
 
+        @available(macOS 10.15, *)
         var accepted: Bool {
           if case .discarded = self {
             return false
@@ -92,31 +95,38 @@ extension Backport where Wrapped == Any {
         }
       }
 
+      @available(macOS 10.15, *)
       let value: Value
 
+      @available(macOS 10.15, *)
       public static var handled: Result { .init(value: .handled) }
       public static var discarded: Result { .init(value: .discarded) }
       public static var systemAction: Result { .init(value: .systemAction(nil)) }
       public static func systemAction(_ url: URL) -> Result { .init(value: .systemAction(url)) }
     }
 
+    @available(macOS 10.15, *)
     let handler: (URL) -> Result
 
+    @available(macOS 10.15, *)
     public init(handler: @escaping (URL) -> Result) {
       self.handler = handler
     }
 
+    @available(macOS 10.15, *)
     @available(watchOS, unavailable)
     public func callAsFunction(_ url: URL) {
       handleUrl(url)
     }
 
+    @available(macOS 10.15, *)
     @available(watchOS, unavailable)
     public func callAsFunction(_ url: URL, completion: @escaping (_ accepted: Bool) -> Void) {
       let result = handleUrl(url)
       completion(result.accepted)
     }
 
+    @available(macOS 10.15, *)
     @discardableResult
     private func handleUrl(_ url: URL) -> Result.Value {
       let result = handler(url).value
@@ -139,6 +149,7 @@ extension Backport where Wrapped == Any {
   }
 }
 
+@available(macOS 10.15, *)
 private struct BackportOpenURLKey: EnvironmentKey {
   static var defaultValue: Backport<Any>.OpenURLAction {
     .init { url in
@@ -157,6 +168,7 @@ private struct BackportOpenURLKey: EnvironmentKey {
   }
 }
 
+@available(macOS 10.15, *)
 extension EnvironmentValues {
   public var backportOpenURL: Backport<Any>.OpenURLAction {
     get { self[BackportOpenURLKey.self] }

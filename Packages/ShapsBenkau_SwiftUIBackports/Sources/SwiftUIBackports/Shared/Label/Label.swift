@@ -8,6 +8,7 @@ import SwiftUI
 @available(macOS, deprecated: 11)
 @available(tvOS, deprecated: 14)
 @available(watchOS, deprecated: 7)
+@available(macOS 10.15, *)
 extension Backport where Wrapped == Any {
   /// A standard label for user interface items, consisting of an icon with a
   /// title.
@@ -109,6 +110,7 @@ extension Backport where Wrapped == Any {
   }
 }
 
+@available(macOS 10.15, *)
 extension Backport.Label where Wrapped == Any, Title == Text, Icon == Image {
   /// Creates a label with an icon image and a title generated from a
   /// localized string.
@@ -153,6 +155,7 @@ extension Backport.Label where Wrapped == Any, Title == Text, Icon == Image {
   }
 }
 
+@available(macOS 10.15, *)
 extension Backport.Label
 where Wrapped == Any, Title == Backport.LabelStyleConfiguration.Title, Icon == Backport.LabelStyleConfiguration.Icon {
   /// Creates a label representing the configuration of a style.

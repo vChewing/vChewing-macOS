@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 14)
 @available(macOS, deprecated: 11)
 @available(tvOS, deprecated: 14.0)
@@ -26,6 +27,7 @@ extension Backport where Wrapped == Any {
     ///
     /// - Parameter configuration: The properties of the progress view, such as
     ///  its preferred progress type.
+    @available(macOS 10.15, *)
     public func makeBody(configuration: Configuration) -> some View {
       #if os(macOS)
         VStack(alignment: .leading, spacing: 0) {
@@ -60,18 +62,22 @@ extension Backport where Wrapped == Any {
   }
 }
 
+@available(macOS 10.15, *)
 extension BackportProgressViewStyle where Self == Backport<Any>.LinearProgressViewStyle {
   public static var linear: Self { .init() }
 }
 
 #if os(macOS)
+  @available(macOS 10.15, *)
   private struct LinearRepresentable: NSViewRepresentable {
     let configuration: Backport<Any>.ProgressViewStyleConfiguration
 
+    @available(macOS 10.15, *)
     func makeNSView(context _: Context) -> NSProgressIndicator {
       .init()
     }
 
+    @available(macOS 10.15, *)
     func updateNSView(_ view: NSProgressIndicator, context _: Context) {
       if let value = configuration.fractionCompleted {
         view.doubleValue = value
@@ -88,13 +94,16 @@ extension BackportProgressViewStyle where Self == Backport<Any>.LinearProgressVi
   }
 
 #elseif !os(watchOS)
+  @available(macOS 10.15, *)
   private struct LinearRepresentable: UIViewRepresentable {
     let configuration: Backport<Any>.ProgressViewStyleConfiguration
 
+    @available(macOS 10.15, *)
     func makeUIView(context _: Context) -> UIProgressView {
       .init(progressViewStyle: .default)
     }
 
+    @available(macOS 10.15, *)
     func updateUIView(_ view: UIProgressView, context _: Context) {
       view.progress = Float(configuration.fractionCompleted ?? 0)
     }

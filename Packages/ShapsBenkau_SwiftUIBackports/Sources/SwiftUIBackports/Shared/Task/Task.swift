@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 15.0)
 @available(macOS, deprecated: 12.0)
 @available(tvOS, deprecated: 15.0)
@@ -64,6 +65,7 @@ extension Backport where Wrapped: View {
     )
   }
 
+  @available(macOS 10.15, *)
   /// Adds a task to perform when this view appears or when a specified
   /// value changes.
   ///
@@ -137,19 +139,23 @@ extension Backport where Wrapped: View {
   }
 }
 
+@available(macOS 10.15, *)
 private struct TaskModifier<ID: Equatable>: ViewModifier {
   var id: ID
   var priority: TaskPriority
   var action: () async -> Void
 
+  @available(macOS 10.15, *)
   @State private var task: Task<Void, Never>?
 
+  @available(macOS 10.15, *)
   init(id: ID, priority: TaskPriority, action: @MainActor @escaping () async -> Void) {
     self.id = id
     self.priority = priority
     self.action = action
   }
 
+  @available(macOS 10.15, *)
   func body(content: Content) -> some View {
     content
       .backport.onChange(of: id) { _ in

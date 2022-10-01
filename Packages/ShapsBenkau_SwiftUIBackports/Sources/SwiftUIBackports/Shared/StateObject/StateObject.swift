@@ -1,6 +1,7 @@
 import Combine
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 14.0)
 @available(macOS, deprecated: 11.0)
 @available(tvOS, deprecated: 14.0)
@@ -48,6 +49,7 @@ extension Backport where Wrapped: ObservableObject {
     private final class Wrapper: ObservableObject {
       private var subject = PassthroughSubject<Void, Never>()
 
+      @available(macOS 10.15, *)
       var value: Wrapped? {
         didSet {
           cancellable = nil
@@ -56,19 +58,25 @@ extension Backport where Wrapped: ObservableObject {
         }
       }
 
+      @available(macOS 10.15, *)
       private var cancellable: AnyCancellable?
 
+      @available(macOS 10.15, *)
       var objectWillChange: AnyPublisher<Void, Never> {
         subject.eraseToAnyPublisher()
       }
     }
 
+    @available(macOS 10.15, *)
     @State private var state = Wrapper()
 
+    @available(macOS 10.15, *)
     @ObservedObject private var observedObject = Wrapper()
 
+    @available(macOS 10.15, *)
     private var thunk: () -> Wrapped
 
+    @available(macOS 10.15, *)
     /// The underlying value referenced by the state object.
     ///
     /// The wrapped value property provides primary access to the value's data.
@@ -94,6 +102,7 @@ extension Backport where Wrapped: ObservableObject {
       }
     }
 
+    @available(macOS 10.15, *)
     /// A projection of the state object that creates bindings to its
     /// properties.
     ///
@@ -113,6 +122,7 @@ extension Backport where Wrapped: ObservableObject {
       ObservedObject(wrappedValue: wrappedValue).projectedValue
     }
 
+    @available(macOS 10.15, *)
     /// Creates a new state object with an initial wrapped value.
     ///
     /// You don’t call this initializer directly. Instead, declare a property
@@ -136,6 +146,7 @@ extension Backport where Wrapped: ObservableObject {
       self.thunk = thunk
     }
 
+    @available(macOS 10.15, *)
     public mutating func update() {
       if state.value == nil {
         state.value = thunk()
