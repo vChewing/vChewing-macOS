@@ -31,7 +31,7 @@ public class CandidateCellData: Hashable {
   public var subIndex: Int = 0
 
   public var fontSizeCandidate: Double { CandidateCellData.unifiedSize }
-  public var fontSizeKey: Double { ceil(CandidateCellData.unifiedSize * 0.8) }
+  public var fontSizeKey: Double { max(ceil(CandidateCellData.unifiedSize * 0.6), 11) }
   public var fontColorKey: NSColor {
     isSelected ? .selectedMenuItemTextColor.withAlphaComponent(0.8) : .secondaryLabelColor
   }
@@ -62,9 +62,9 @@ public class CandidateCellData: Hashable {
     paraStyle.alignment = .natural
     let theFontForCandidateKey: NSFont = {
       if #available(macOS 10.15, *) {
-        return NSFont.monospacedSystemFont(ofSize: size * 0.7, weight: .regular)
+        return NSFont.monospacedSystemFont(ofSize: fontSizeKey, weight: .regular)
       }
-      return NSFont.monospacedDigitSystemFont(ofSize: size * 0.7, weight: .regular)
+      return NSFont.monospacedDigitSystemFont(ofSize: fontSizeKey, weight: .regular)
     }()
     var attrKey: [NSAttributedString.Key: AnyObject] = [
       .font: theFontForCandidateKey,
