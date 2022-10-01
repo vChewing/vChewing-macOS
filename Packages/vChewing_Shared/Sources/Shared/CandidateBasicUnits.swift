@@ -60,8 +60,14 @@ public class CandidateCellData: Hashable {
     let paraStyle = NSMutableParagraphStyle()
     paraStyle.setParagraphStyle(NSParagraphStyle.default)
     paraStyle.alignment = .natural
+    let theFontForCandidateKey = {
+      if #available(macOS 10.15, *) {
+        return NSFont.monospacedSystemFont(ofSize: size * 0.7, weight: .regular)
+      }
+      return NSFont.monospacedDigitSystemFont(ofSize: size * 0.7, weight: .regular)
+    }()
     var attrKey: [NSAttributedString.Key: AnyObject] = [
-      .font: NSFont.monospacedDigitSystemFont(ofSize: size * 0.7, weight: .regular),
+      .font: theFontForCandidateKey,
       .paragraphStyle: paraStyleKey,
     ]
     if isSelected {
