@@ -26,14 +26,14 @@ public class Notifier: NSWindowController {
 
   // MARK: - Private Declarations
 
-  private static var instanceStack: [Notifier] = []
+  private static var instanceSet: NSMutableOrderedSet = .init()
   private let blankValue = ""
 
   @discardableResult private init(_ message: String) {
     currentMessage = message
     let rawMessage = message.replacingOccurrences(of: "\n", with: "")
     let isDuplicated: Bool = {
-      if let firstInstanceExisted = Self.instanceStack.first {
+      if let firstInstanceExisted = Self.instanceSet.firstNotifier {
         return message == firstInstanceExisted.currentMessage && firstInstanceExisted.isNew
       }
       return false
@@ -42,8 +42,16 @@ public class Notifier: NSWindowController {
       super.init(window: nil)
       return
     }
+    // 剔除溢出的副本，讓 Swift 自動回收之。
+    while Self.instanceSet.count > 3 {
+      if let instanceToRemove = Self.instanceSet.lastNotifier {
+        instanceToRemove.close()
+        Self.instanceSet.remove(instanceToRemove)
+      }
+    }
     // 正式進入處理環節。
-    defer {  // 先讓新通知標記自此開始過 0.3 秒自動變為 false。
+    defer {
+      // 先讓新通知標記自此開始過 0.3 秒自動變為 false。
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
         self.isNew = false
       }
@@ -137,8 +145,8 @@ public class Notifier: NSWindowController {
 
 extension Notifier {
   private func shiftExistingWindowPositions() {
-    guard let window = window, !Self.instanceStack.isEmpty else { return }
-    for theInstanceWindow in Self.instanceStack.compactMap(\.window) {
+    guard let window = window else { return }
+    Self.instanceSet.arrayOfWindows.forEach { theInstanceWindow in
       var theOrigin = theInstanceWindow.frame
       theOrigin.origin.y -= (10 + window.frame.height)
       theInstanceWindow.setFrame(theOrigin, display: true)
@@ -156,19 +164,30 @@ extension Notifier {
   }
 
   private func display() {
-    let existingInstanceArray = Self.instanceStack.compactMap(\.window)
-    if !existingInstanceArray.isEmpty {
-      existingInstanceArray.forEach {
-        $0.alphaValue -= 0.1
-        $0.contentView?.subviews.forEach { $0.alphaValue *= 0.5 }
-      }
+    Self.instanceSet.arrayOfWindows.forEach {
+      $0.alphaValue -= 0.1
+      $0.contentView?.subviews.forEach { $0.alphaValue *= 0.5 }
     }
     shiftExistingWindowPositions()
     fadeIn()
-    Self.instanceStack.insert(self, at: 0)
-    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+    Self.instanceSet.insert(self, at: 0)
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
       self.close()
-      Self.instanceStack.removeAll(where: { $0.window == nil })
+      Self.instanceSet.remove(self)
     }
+  }
+}
+
+extension NSMutableOrderedSet {
+  fileprivate var arrayOfWindows: [NSWindow] { compactMap { ($0 as? Notifier)?.window } }
+
+  fileprivate var firstNotifier: Notifier? {
+    for neta in self { if let result = neta as? Notifier { return result } }
+    return nil
+  }
+
+  fileprivate var lastNotifier: Notifier? {
+    for neta in reversed { if let result = neta as? Notifier { return result } }
+    return nil
   }
 }
