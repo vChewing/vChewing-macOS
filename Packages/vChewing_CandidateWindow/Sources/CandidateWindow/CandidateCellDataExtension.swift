@@ -20,7 +20,7 @@ extension CandidateCellData {
         VStack(spacing: 0) {
           HStack(spacing: 4) {
             if UserDefaults.standard.bool(forKey: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue) {
-              Text(AttributedString(attributedStringHeader)).frame(width: CandidateCellData.unifiedSize * 2 / 3)
+              Text(AttributedString(attributedStringHeader))
               Text(AttributedString(attributedString))
             } else {
               Text(key).font(.system(size: fontSizeKey).monospaced())
