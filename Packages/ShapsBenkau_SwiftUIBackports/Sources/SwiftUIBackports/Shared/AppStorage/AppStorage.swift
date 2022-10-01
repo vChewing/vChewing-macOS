@@ -8,6 +8,7 @@ import SwiftUI
 @available(macOS, deprecated: 11)
 @available(tvOS, deprecated: 14)
 @available(watchOS, deprecated: 7)
+@available(macOS 10.15, *)
 extension Backport where Wrapped == Any {
   /// A property wrapper type that reflects a value from `Store` and
   /// invalidates a view on a change in value in that store.
@@ -41,6 +42,7 @@ extension Backport where Wrapped == Any {
   }
 }
 
+@available(macOS 10.15, *)
 extension Backport.AppStorage {
   /// Creates a property that can read and write to a boolean user default.
   ///
@@ -154,6 +156,7 @@ extension Backport.AppStorage {
   }
 }
 
+@available(macOS 10.15, *)
 extension Backport.AppStorage where Wrapped == Any, Value: ExpressibleByNilLiteral {
   /// Creates a property that can read and write an Optional boolean user
   /// default.
@@ -270,6 +273,7 @@ extension Backport.AppStorage where Wrapped == Any, Value: ExpressibleByNilLiter
   }
 }
 
+@available(macOS 10.15, *)
 extension Backport.AppStorage where Wrapped == Any, Value: RawRepresentable {
   /// Creates a property that can read and write to a string user default,
   /// transforming that to `RawRepresentable` data type.
@@ -332,6 +336,7 @@ extension Backport.AppStorage where Wrapped == Any, Value: RawRepresentable {
   }
 }
 
+@available(macOS 10.15, *)
 private final class RefStorage<Value>: NSObject, ObservableObject {
   @Published
   fileprivate var value: Value

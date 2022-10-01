@@ -1,6 +1,7 @@
 import Combine
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 14.0)
 @available(macOS, deprecated: 11.0)
 @available(tvOS, deprecated: 14.0)
@@ -27,18 +28,22 @@ extension Backport where Wrapped: View {
   }
 }
 
+@available(macOS 10.15, *)
 private struct ChangeModifier<Value: Equatable>: ViewModifier {
   let value: Value
   let action: (Value) -> Void
 
+  @available(macOS 10.15, *)
   @State var oldValue: Value?
 
+  @available(macOS 10.15, *)
   init(value: Value, action: @escaping (Value) -> Void) {
     self.value = value
     self.action = action
     _oldValue = .init(initialValue: value)
   }
 
+  @available(macOS 10.15, *)
   func body(content: Content) -> some View {
     content
       .onReceive(Just(value)) { newValue in

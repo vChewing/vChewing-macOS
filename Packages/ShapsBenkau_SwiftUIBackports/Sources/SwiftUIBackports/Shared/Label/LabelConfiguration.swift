@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 14)
 @available(macOS, deprecated: 11)
 @available(tvOS, deprecated: 14)
@@ -20,6 +21,7 @@ extension Backport where Wrapped == Any {
       }
     }
 
+    @available(macOS 10.15, *)
     /// A type-erased icon view of a label.
     public struct Icon: View {
       let content: AnyView
@@ -29,14 +31,18 @@ extension Backport where Wrapped == Any {
       }
     }
 
+    @available(macOS 10.15, *)
     /// A description of the labeled item.
     public internal(set) var title: LabelStyleConfiguration.Title
 
+    @available(macOS 10.15, *)
     /// A symbolic representation of the labeled item.
     public internal(set) var icon: LabelStyleConfiguration.Icon
 
+    @available(macOS 10.15, *)
     internal var environment: EnvironmentValues = .init()
 
+    @available(macOS 10.15, *)
     func environment(_ values: EnvironmentValues) -> Self {
       var config = self
       config.environment = values

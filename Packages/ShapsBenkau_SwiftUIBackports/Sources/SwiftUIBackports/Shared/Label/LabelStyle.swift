@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 14)
 @available(macOS, deprecated: 11)
 @available(tvOS, deprecated: 14)
@@ -19,6 +20,7 @@ public protocol BackportLabelStyle {
   /// A view that represents the body of a label.
   associatedtype Body: View
 
+  @available(macOS 10.15, *)
   /// Creates a view that represents the body of a label.
   ///
   /// The system calls this method for each ``Label`` instance in a view
@@ -28,6 +30,7 @@ public protocol BackportLabelStyle {
   @ViewBuilder func makeBody(configuration: Configuration) -> Body
 }
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 14)
 @available(macOS, deprecated: 11)
 @available(tvOS, deprecated: 14.0)
@@ -38,24 +41,29 @@ extension Backport where Wrapped: View {
   }
 }
 
+@available(macOS 10.15, *)
 internal struct AnyLabelStyle: BackportLabelStyle {
   let _makeBody: (Backport<Any>.LabelStyleConfiguration) -> AnyView
 
+  @available(macOS 10.15, *)
   init<S: BackportLabelStyle>(_ style: S) {
     _makeBody = { config in
       AnyView(style.makeBody(configuration: config))
     }
   }
 
+  @available(macOS 10.15, *)
   func makeBody(configuration: Configuration) -> some View {
     _makeBody(configuration)
   }
 }
 
+@available(macOS 10.15, *)
 private struct BackportLabelStyleEnvironmentKey: EnvironmentKey {
   static var defaultValue: AnyLabelStyle?
 }
 
+@available(macOS 10.15, *)
 extension EnvironmentValues {
   var backportLabelStyle: AnyLabelStyle? {
     get { self[BackportLabelStyleEnvironmentKey.self] }

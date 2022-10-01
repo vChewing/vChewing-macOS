@@ -13,6 +13,7 @@ import SwiftUI
  */
 
 #if DEBUG
+  @available(macOS 10.15, *)
   extension EnvironmentValues: CustomDebugStringConvertible {
     public var debugDescription: String {
       "\(self)"
@@ -22,6 +23,7 @@ import SwiftUI
     }
   }
 
+  @available(macOS 10.15, *)
   struct EnvironmentOutputModifier: ViewModifier {
     @Environment(\.self) private var environment
 
@@ -33,6 +35,7 @@ import SwiftUI
     }
   }
 
+  @available(macOS 10.15, *)
   extension View {
     func printEnvironment() -> some View {
       modifier(EnvironmentOutputModifier())

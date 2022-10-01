@@ -4,11 +4,13 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 /// A scrollview that behaves more similarly to a `VStack` when its content size is small enough.
 public struct FittingScrollView<Content: View>: View {
   private let content: Content
   private let showsIndicators: Bool
 
+  @available(macOS 10.15, *)
   /// A new scrollview
   /// - Parameters:
   ///   - showsIndicators: If true, the scroll view will show indicators when necessary
@@ -18,6 +20,7 @@ public struct FittingScrollView<Content: View>: View {
     self.content = content()
   }
 
+  @available(macOS 10.15, *)
   public var body: some View {
     GeometryReader { geo in
       SwiftUI.ScrollView(showsIndicators: showsIndicators) {

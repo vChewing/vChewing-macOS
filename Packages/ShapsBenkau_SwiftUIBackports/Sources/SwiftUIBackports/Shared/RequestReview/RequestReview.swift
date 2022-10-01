@@ -2,6 +2,7 @@ import StoreKit
 import SwiftUI
 
 #if os(iOS) || os(macOS)
+  @available(macOS 10.15, *)
   extension EnvironmentValues {
     /// An instance that tells StoreKit to request an App Store rating or review from the user, if appropriate.
     /// Read the requestReview environment value to get an instance of this structure for a given Environment. Call the instance to tell StoreKit to ask the user to rate or review your app, if appropriate. You call the instance directly because it defines a callAsFunction() method that Swift calls when you call the instance.
@@ -19,6 +20,7 @@ import SwiftUI
   ///
   /// > When you call this instance while your app is in development mode, the system always displays a rating and review request view so you can test the user interface and experience. This instance has no effect when you call it in an app that you distribute using TestFlight.
   ///
+  @available(macOS 10.15, *)
   @available(iOS, deprecated: 16)
   @available(macOS, deprecated: 13)
   extension Backport where Wrapped == Any {

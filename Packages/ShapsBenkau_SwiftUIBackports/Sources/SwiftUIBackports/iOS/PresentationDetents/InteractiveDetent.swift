@@ -8,6 +8,7 @@ import SwiftUI
 @available(tvOS, deprecated: 16)
 @available(macOS, deprecated: 13)
 @available(watchOS, deprecated: 9)
+@available(macOS 10.15, *)
 extension Backport where Wrapped: View {
   /// Removes dimming from detents higher (and including) the provided identifier
   ///

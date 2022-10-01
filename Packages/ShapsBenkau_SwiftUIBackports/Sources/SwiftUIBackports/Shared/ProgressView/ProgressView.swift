@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 14)
 @available(macOS, deprecated: 11)
 @available(tvOS, deprecated: 14.0)
@@ -13,6 +14,7 @@ extension Backport where Wrapped == Any {
     @Environment(\.backportProgressViewStyle) private var style
     let config: Backport<Any>.ProgressViewStyleConfiguration
 
+    @available(macOS 10.15, *)
     public var body: some View {
       Group {
         if let style = style {
@@ -25,6 +27,7 @@ extension Backport where Wrapped == Any {
   }
 }
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 14)
 @available(macOS, deprecated: 11)
 @available(tvOS, deprecated: 14.0)
@@ -36,6 +39,7 @@ extension Backport.ProgressView where Wrapped == Any, CurrentValueLabel == Empty
     self.init(config: .init(fractionCompleted: nil, preferredKind: .circular))
   }
 
+  @available(macOS 10.15, *)
   /// Creates a progress view for showing indeterminate progress that displays
   /// a custom label.
   ///
@@ -46,6 +50,7 @@ extension Backport.ProgressView where Wrapped == Any, CurrentValueLabel == Empty
     config = .init(fractionCompleted: nil, label: .init(content: label()), preferredKind: .circular)
   }
 
+  @available(macOS 10.15, *)
   /// Creates a progress view for showing indeterminate progress that
   /// generates its label from a localized string.
   ///
@@ -62,6 +67,7 @@ extension Backport.ProgressView where Wrapped == Any, CurrentValueLabel == Empty
     config = .init(fractionCompleted: nil, label: .init(content: Text(titleKey)), preferredKind: .circular)
   }
 
+  @available(macOS 10.15, *)
   /// Creates a progress view for showing indeterminate progress that
   /// generates its label from a string.
   ///
@@ -78,6 +84,7 @@ extension Backport.ProgressView where Wrapped == Any, CurrentValueLabel == Empty
   }
 }
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 14)
 @available(macOS, deprecated: 11)
 @available(tvOS, deprecated: 14.0)
@@ -105,6 +112,7 @@ extension Backport.ProgressView where Wrapped == Any {
     }
   }
 
+  @available(macOS 10.15, *)
   /// Creates a progress view for showing determinate progress, with a
   /// custom label.
   ///
@@ -132,6 +140,7 @@ extension Backport.ProgressView where Wrapped == Any {
     }
   }
 
+  @available(macOS 10.15, *)
   /// Creates a progress view for showing determinate progress, with a
   /// custom label.
   ///
@@ -166,6 +175,7 @@ extension Backport.ProgressView where Wrapped == Any {
     }
   }
 
+  @available(macOS 10.15, *)
   /// Creates a progress view for showing determinate progress that generates
   /// its label from a localized string.
   ///
@@ -203,6 +213,7 @@ extension Backport.ProgressView where Wrapped == Any {
     }
   }
 
+  @available(macOS 10.15, *)
   /// Creates a progress view for showing determinate progress that generates
   /// its label from a string.
   ///

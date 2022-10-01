@@ -4,10 +4,12 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 private struct BackportDynamicTypeKey: EnvironmentKey {
   static var defaultValue: Backport.DynamicTypeSize = .large
 }
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 15)
 @available(tvOS, deprecated: 15)
 @available(macOS, deprecated: 12)
@@ -43,12 +45,14 @@ extension EnvironmentValues {
   }
 }
 
+@available(macOS 10.15, *)
 private struct DynamicTypeRangeKey: EnvironmentKey {
   static var defaultValue: Range<Backport<Any>.DynamicTypeSize> {
     .init(uncheckedBounds: (lower: .xSmall, upper: .accessibility5))
   }
 }
 
+@available(macOS 10.15, *)
 extension EnvironmentValues {
   var dynamicTypeRange: Range<Backport<Any>.DynamicTypeSize> {
     get { self[DynamicTypeRangeKey.self] }

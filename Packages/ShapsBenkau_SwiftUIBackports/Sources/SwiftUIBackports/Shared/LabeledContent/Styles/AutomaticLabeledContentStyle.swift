@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 extension Backport where Wrapped == Any {
   public struct AutomaticLabeledContentStyle: BackportLabeledContentStyle {
     public func makeBody(configuration: Configuration) -> some View {
@@ -17,6 +18,7 @@ extension Backport where Wrapped == Any {
   }
 }
 
+@available(macOS 10.15, *)
 extension BackportLabeledContentStyle where Self == Backport<Any>.AutomaticLabeledContentStyle {
   static var automatic: Self { .init() }
 }

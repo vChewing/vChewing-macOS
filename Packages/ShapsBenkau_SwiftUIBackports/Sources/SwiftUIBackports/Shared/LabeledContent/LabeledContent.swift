@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 16)
 @available(tvOS, deprecated: 16)
 @available(macOS, deprecated: 13)
@@ -135,6 +136,7 @@ extension Backport where Wrapped == Any {
   }
 }
 
+@available(macOS 10.15, *)
 extension Backport.LabeledContent
 where
   Wrapped == Any, Label == Backport<Any>.LabeledContentStyleConfiguration.Label,
@@ -164,6 +166,7 @@ where
   }
 }
 
+@available(macOS 10.15, *)
 extension Backport.LabeledContent where Wrapped == Any, Label == Text, Content: View {
   /// Creates a labeled view that generates its label from a localized string
   /// key.
@@ -183,6 +186,7 @@ extension Backport.LabeledContent where Wrapped == Any, Label == Text, Content: 
     )
   }
 
+  @available(macOS 10.15, *)
   /// Creates a labeled view that generates its label from a string.
   ///
   /// This initializer creates a ``Text`` label on your behalf, and treats the
@@ -200,6 +204,7 @@ extension Backport.LabeledContent where Wrapped == Any, Label == Text, Content: 
   }
 }
 
+@available(macOS 10.15, *)
 extension Backport.LabeledContent: View where Wrapped == Any, Label: View, Content: View {
   /// Creates a labeled view that generates its label from a localized string
   /// key.
@@ -220,6 +225,7 @@ extension Backport.LabeledContent: View where Wrapped == Any, Label: View, Conte
   }
 }
 
+@available(macOS 10.15, *)
 extension Backport.LabeledContent where Wrapped == Any, Label == Text, Content == Text {
   /// Creates a labeled informational view.
   ///
@@ -244,6 +250,7 @@ extension Backport.LabeledContent where Wrapped == Any, Label == Text, Content =
     )
   }
 
+  @available(macOS 10.15, *)
   /// Creates a labeled informational view.
   ///
   /// This initializer creates a ``Text`` label on your behalf, and treats the

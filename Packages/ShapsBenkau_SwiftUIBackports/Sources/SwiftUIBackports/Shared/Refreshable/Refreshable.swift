@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 15)
 @available(macOS, deprecated: 12)
 @available(tvOS, deprecated: 15)
@@ -81,6 +82,7 @@ extension Backport where Wrapped: View {
 @available(macOS, deprecated: 12)
 @available(tvOS, deprecated: 15)
 @available(watchOS, deprecated: 8)
+@available(macOS 10.15, *)
 extension Backport where Wrapped == Any {
   /// An action that initiates a refresh operation.
   ///
@@ -134,6 +136,7 @@ extension Backport where Wrapped == Any {
   }
 }
 
+@available(macOS 10.15, *)
 private struct RefreshEnvironmentKey: EnvironmentKey {
   static let defaultValue: Backport<Any>.RefreshAction? = nil
 }
@@ -142,6 +145,7 @@ private struct RefreshEnvironmentKey: EnvironmentKey {
 @available(macOS, deprecated: 12)
 @available(tvOS, deprecated: 15)
 @available(watchOS, deprecated: 8)
+@available(macOS 10.15, *)
 extension EnvironmentValues {
   /// An action that initiates a refresh operation.
   ///

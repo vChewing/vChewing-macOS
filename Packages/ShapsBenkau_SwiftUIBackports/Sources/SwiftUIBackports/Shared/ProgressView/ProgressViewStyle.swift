@@ -8,6 +8,7 @@ import SwiftUI
 @available(macOS, deprecated: 11)
 @available(tvOS, deprecated: 14.0)
 @available(watchOS, deprecated: 7.0)
+@available(macOS 10.15, *)
 /// A type that applies standard interaction behavior to all progress views
 /// within a view hierarchy.
 ///
@@ -37,12 +38,14 @@ public protocol BackportProgressViewStyle {
 @available(macOS, deprecated: 11)
 @available(tvOS, deprecated: 14.0)
 @available(watchOS, deprecated: 7.0)
+@available(macOS 10.15, *)
 extension Backport where Wrapped: View {
   public func progressViewStyle<S: BackportProgressViewStyle>(_ style: S) -> some View {
     content.environment(\.backportProgressViewStyle, .init(style))
   }
 }
 
+@available(macOS 10.15, *)
 internal struct AnyProgressViewStyle: BackportProgressViewStyle {
   let _makeBody: (Backport<Any>.ProgressViewStyleConfiguration) -> AnyView
 
@@ -57,10 +60,12 @@ internal struct AnyProgressViewStyle: BackportProgressViewStyle {
   }
 }
 
+@available(macOS 10.15, *)
 private struct BackportProgressViewStyleEnvironmentKey: EnvironmentKey {
   static var defaultValue: AnyProgressViewStyle?
 }
 
+@available(macOS 10.15, *)
 extension EnvironmentValues {
   var backportProgressViewStyle: AnyProgressViewStyle? {
     get { self[BackportProgressViewStyleEnvironmentKey.self] }

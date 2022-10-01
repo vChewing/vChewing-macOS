@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 14)
 @available(macOS, deprecated: 11)
 @available(tvOS, deprecated: 14.0)
@@ -16,6 +17,7 @@ extension Backport where Wrapped == Any {
       case linear
     }
 
+    @available(macOS 10.15, *)
     /// A type-erased label describing the task represented by the progress
     /// view.
     public struct Label: View {
@@ -26,6 +28,7 @@ extension Backport where Wrapped == Any {
       }
     }
 
+    @available(macOS 10.15, *)
     /// A type-erased label that describes the current value of a progress view.
     public struct CurrentValueLabel: View {
       let content: AnyView
@@ -35,11 +38,13 @@ extension Backport where Wrapped == Any {
       }
     }
 
+    @available(macOS 10.15, *)
     /// The completed fraction of the task represented by the progress view,
     /// from `0.0` (not yet started) to `1.0` (fully complete), or `nil` if the
     /// progress is indeterminate or relative to a date interval.
     public let fractionCompleted: Double?
 
+    @available(macOS 10.15, *)
     /// A view that describes the task represented by the progress view.
     ///
     /// If `nil`, then the task is self-evident from the surrounding context,
@@ -49,6 +54,7 @@ extension Backport where Wrapped == Any {
     /// label is equivalent to its `localizedDescription`.
     public var label: Label?
 
+    @available(macOS 10.15, *)
     /// A view that describes the current value of a progress view.
     ///
     /// If `nil`, then the value of the progress view is either self-evident
@@ -59,6 +65,7 @@ extension Backport where Wrapped == Any {
     /// label is equivalent to its `localizedAdditionalDescription`.
     public var currentValueLabel: CurrentValueLabel?
 
+    @available(macOS 10.15, *)
     internal let preferredKind: Kind
     internal var min: Double = 0
     internal var max: Double = 1
