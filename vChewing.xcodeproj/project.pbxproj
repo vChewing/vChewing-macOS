@@ -19,6 +19,7 @@
 		5B40113928D7050D00A9D4CB /* Shared in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113828D7050D00A9D4CB /* Shared */; };
 		5B40113C28D71C0100A9D4CB /* Uninstaller in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113B28D71C0100A9D4CB /* Uninstaller */; };
 		5B5A603028E81CC50001AE8D /* SwiftUIBackports in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5A602F28E81CC50001AE8D /* SwiftUIBackports */; };
+		5B5A603428E81FDF0001AE8D /* TDKCandidateBackports in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5A603328E81FDF0001AE8D /* TDKCandidateBackports */; };
 		5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */; };
 		5B6C141228A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6C141128A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift */; };
 		5B73FB5E27B2BE1300E9BF49 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */; };
@@ -205,6 +206,7 @@
 		5B3133BE280B229700A4A505 /* KeyHandler_States.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = KeyHandler_States.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Uninstaller; path = Packages/vChewing_Uninstaller; sourceTree = "<group>"; };
 		5B5A602E28E81CB00001AE8D /* ShapsBenkau_SwiftUIBackports */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = ShapsBenkau_SwiftUIBackports; path = Packages/ShapsBenkau_SwiftUIBackports; sourceTree = "<group>"; };
+		5B5A603228E81F670001AE8D /* vChewing_TDKCandidateBackports */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_TDKCandidateBackports; path = Packages/vChewing_TDKCandidateBackports; sourceTree = "<group>"; };
 		5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B65B919284D0185007C558B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		5B6C141128A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCtl_HandleEvent.swift; sourceTree = "<group>"; };
@@ -345,6 +347,7 @@
 				5BFC63CC28D49BBC004A77B7 /* UpdateSputnik in Frameworks */,
 				5BDB7A4128D4824A001AC277 /* Megrez in Frameworks */,
 				5BFC63C928D49754004A77B7 /* IMKUtils in Frameworks */,
+				5B5A603428E81FDF0001AE8D /* TDKCandidateBackports in Frameworks */,
 				5BDB7A4728D4824A001AC277 /* Tekkon in Frameworks */,
 				5BDB7A4328D4824A001AC277 /* Preferences in Frameworks */,
 				5BDB7A3D28D4824A001AC277 /* Hotenka in Frameworks */,
@@ -581,6 +584,7 @@
 				5BC5E02228DE07250094E427 /* vChewing_PopupCompositionBuffer */,
 				5B963C9E28D5C14600DCEE88 /* vChewing_Shared */,
 				5B963CA128D5C22D00DCEE88 /* vChewing_SwiftExtension */,
+				5B5A603228E81F670001AE8D /* vChewing_TDKCandidateBackports */,
 				5BDB7A3628D47587001AC277 /* vChewing_Tekkon */,
 				5BC5E01F28DDEFD80094E427 /* vChewing_TooltipUI */,
 				5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */,
@@ -786,6 +790,7 @@
 				5BC5E02328DE07860094E427 /* PopupCompositionBuffer */,
 				5BA8C30228DF0360004C5CC4 /* CandidateWindow */,
 				5B5A602F28E81CC50001AE8D /* SwiftUIBackports */,
+				5B5A603328E81FDF0001AE8D /* TDKCandidateBackports */,
 			);
 			productName = vChewing;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */;
@@ -1777,6 +1782,10 @@
 		5B5A602F28E81CC50001AE8D /* SwiftUIBackports */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SwiftUIBackports;
+		};
+		5B5A603328E81FDF0001AE8D /* TDKCandidateBackports */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TDKCandidateBackports;
 		};
 		5B963C9C28D5BFB800DCEE88 /* CocoaExtension */ = {
 			isa = XCSwiftPackageProductDependency;
