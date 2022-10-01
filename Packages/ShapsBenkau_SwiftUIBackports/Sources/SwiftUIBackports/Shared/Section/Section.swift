@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 15)
 @available(tvOS, deprecated: 15)
 @available(macOS, deprecated: 12)
@@ -20,6 +21,7 @@ extension Backport where Wrapped == Any {
     @ViewBuilder let header: () -> Parent
     @ViewBuilder let footer: () -> Footer
 
+    @available(macOS 10.15, *)
     public var body: some View {
       SwiftUI.Section(
         content: content,
@@ -30,6 +32,7 @@ extension Backport where Wrapped == Any {
   }
 }
 
+@available(macOS 10.15, *)
 extension Backport.Section where Wrapped == Any, Parent == Text, Footer == EmptyView {
   /// Creates a section with the provided section content.
   /// - Parameters:
@@ -42,6 +45,7 @@ extension Backport.Section where Wrapped == Any, Parent == Text, Footer == Empty
     footer = { EmptyView() }
   }
 
+  @available(macOS 10.15, *)
   /// Creates a section with the provided section content.
   /// - Parameters:
   ///   - title: A string that describes the contents of the section.

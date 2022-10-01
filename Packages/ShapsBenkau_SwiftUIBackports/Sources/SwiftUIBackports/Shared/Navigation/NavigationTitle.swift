@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 14)
 @available(watchOS, deprecated: 7)
 @available(tvOS, deprecated: 14)
@@ -21,6 +22,7 @@ extension Backport where Wrapped: View {
     #endif
   }
 
+  @available(macOS 10.15, *)
   @ViewBuilder
   public func navigationTitle(_ titleKey: LocalizedStringKey) -> some View {
     #if os(macOS)

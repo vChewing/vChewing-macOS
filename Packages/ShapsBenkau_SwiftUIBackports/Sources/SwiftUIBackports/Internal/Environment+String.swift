@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 extension EnvironmentValues {
   fileprivate func containsValue(forKey key: String) -> Bool {
     value(forKey: key) != nil
@@ -95,6 +96,7 @@ extension EnvironmentValues {
   }
 }
 
+@available(macOS 10.15, *)
 @propertyWrapper
 internal struct StringlyTypedEnvironment<Value> {
   final class Store<Value>: ObservableObject {
@@ -116,12 +118,14 @@ internal struct StringlyTypedEnvironment<Value> {
   }
 }
 
+@available(macOS 10.15, *)
 extension StringlyTypedEnvironment: DynamicProperty {
   func update() {
     wrappedValue = env.value(forKey: key, as: Value.self)
   }
 }
 
+@available(macOS 10.15, *)
 @propertyWrapper
 internal struct EnvironmentContains: DynamicProperty {
   final class Store: ObservableObject {

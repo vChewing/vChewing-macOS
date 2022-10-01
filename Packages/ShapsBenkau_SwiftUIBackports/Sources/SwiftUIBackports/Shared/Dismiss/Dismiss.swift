@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 extension EnvironmentValues {
   /// An action that dismisses the current presentation.
   ///
@@ -76,6 +77,7 @@ extension EnvironmentValues {
     .init(presentation: presentationMode)
   }
 
+  @available(macOS 10.15, *)
   /// A Boolean value that indicates whether the view associated with this
   /// environment is currently presented.
   ///
@@ -107,6 +109,7 @@ extension EnvironmentValues {
   }
 }
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 15)
 @available(macOS, deprecated: 12)
 @available(tvOS, deprecated: 15)

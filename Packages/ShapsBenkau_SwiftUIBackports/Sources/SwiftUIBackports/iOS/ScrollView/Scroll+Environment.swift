@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 16)
 @available(tvOS, deprecated: 16)
 @available(macOS, deprecated: 13)
@@ -16,6 +17,7 @@ extension EnvironmentValues {
     set { self[BackportVerticalIndicatorKey.self] = newValue }
   }
 
+  @available(macOS 10.15, *)
   /// The visibility to apply to scroll indicators of any
   /// horizontally scrollable content.
   public var backportHorizontalScrollIndicatorVisibility: Backport<Any>.ScrollIndicatorVisibility {
@@ -23,6 +25,7 @@ extension EnvironmentValues {
     set { self[BackportHorizontalIndicatorKey.self] = newValue }
   }
 
+  @available(macOS 10.15, *)
   /// The way that scrollable content interacts with the software keyboard.
   ///
   /// The default value is ``Backport.ScrollDismissesKeyboardMode.automatic``. Use the
@@ -33,6 +36,7 @@ extension EnvironmentValues {
     set { self[BackportKeyboardDismissKey.self] = newValue }
   }
 
+  @available(macOS 10.15, *)
   /// A Boolean value that indicates whether any scroll views associated
   /// with this environment allow scrolling to occur.
   ///
@@ -44,18 +48,22 @@ extension EnvironmentValues {
   }
 }
 
+@available(macOS 10.15, *)
 private struct BackportVerticalIndicatorKey: EnvironmentKey {
   static var defaultValue: Backport<Any>.ScrollIndicatorVisibility = .automatic
 }
 
+@available(macOS 10.15, *)
 private struct BackportHorizontalIndicatorKey: EnvironmentKey {
   static var defaultValue: Backport<Any>.ScrollIndicatorVisibility = .automatic
 }
 
+@available(macOS 10.15, *)
 private struct BackportKeyboardDismissKey: EnvironmentKey {
   static var defaultValue: Backport<Any>.ScrollDismissesKeyboardMode = .automatic
 }
 
+@available(macOS 10.15, *)
 private struct BackportScrollEnabledKey: EnvironmentKey {
   static var defaultValue: Bool = true
 }

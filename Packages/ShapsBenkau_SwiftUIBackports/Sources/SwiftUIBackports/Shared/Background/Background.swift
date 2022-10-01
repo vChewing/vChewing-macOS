@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 extension Backport where Wrapped: View {
   /// Layers the views that you specify behind this view.
   ///

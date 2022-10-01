@@ -12,6 +12,7 @@ import SwiftUI
 @available(macOS, deprecated: 11)
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
+@available(macOS 10.15, *)
 extension Backport where Wrapped: View {
   /// Presents a Quick Look preview of the URLs you provide.
   ///
@@ -61,6 +62,7 @@ extension Backport where Wrapped: View {
 #if os(macOS)
   import QuickLookUI
 
+  @available(macOS 10.15, *)
   private struct QuicklookSheet<Items>: NSViewControllerRepresentable
   where Items: RandomAccessCollection, Items.Element == URL {
     let selection: Binding<Items.Element?>

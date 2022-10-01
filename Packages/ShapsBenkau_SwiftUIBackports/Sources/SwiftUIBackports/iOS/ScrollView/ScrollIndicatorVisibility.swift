@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 16)
 @available(tvOS, deprecated: 16)
 @available(macOS, deprecated: 13)
@@ -20,22 +21,27 @@ extension Backport where Wrapped == Any {
       case hidden
     }
 
+    @available(macOS 10.15, *)
     let visibility: Backport.Visibility
 
+    @available(macOS 10.15, *)
     var scrollViewVisible: Bool {
       visibility != .hidden
     }
 
+    @available(macOS 10.15, *)
     public var description: String {
       String(describing: visibility)
     }
 
+    @available(macOS 10.15, *)
     /// Scroll indicator visibility depends on the
     /// policies of the component accepting the visibility configuration.
     public static var automatic: ScrollIndicatorVisibility {
       .init(visibility: .automatic)
     }
 
+    @available(macOS 10.15, *)
     /// Show the scroll indicators.
     ///
     /// The actual visibility of the indicators depends on platform
@@ -45,6 +51,7 @@ extension Backport where Wrapped == Any {
       .init(visibility: .visible)
     }
 
+    @available(macOS 10.15, *)
     /// Hide the scroll indicators.
     ///
     /// By default, scroll views in macOS show indicators when a

@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 14)
 @available(macOS, deprecated: 11)
 @available(tvOS, deprecated: 14.0)
@@ -16,6 +17,7 @@ extension Backport where Wrapped == Any {
     /// Creates a circular progress view style.
     public init() {}
 
+    @available(macOS 10.15, *)
     /// Creates a view representing the body of a progress view.
     ///
     /// - Parameter configuration: The properties of the progress view being
@@ -39,18 +41,22 @@ extension Backport where Wrapped == Any {
   }
 }
 
+@available(macOS 10.15, *)
 extension BackportProgressViewStyle where Self == Backport<Any>.CircularProgressViewStyle {
   public static var circular: Self { .init() }
 }
 
 #if os(macOS)
+  @available(macOS 10.15, *)
   private struct CircularRepresentable: NSViewRepresentable {
     let configuration: Backport<Any>.ProgressViewStyleConfiguration
 
+    @available(macOS 10.15, *)
     func makeNSView(context _: Context) -> NSProgressIndicator {
       .init()
     }
 
+    @available(macOS 10.15, *)
     func updateNSView(_ view: NSProgressIndicator, context _: Context) {
       if let value = configuration.fractionCompleted {
         view.doubleValue = value
@@ -65,13 +71,16 @@ extension BackportProgressViewStyle where Self == Backport<Any>.CircularProgress
   }
 
 #elseif !os(watchOS)
+  @available(macOS 10.15, *)
   private struct CircularRepresentable: UIViewRepresentable {
     let configuration: Backport<Any>.ProgressViewStyleConfiguration
 
+    @available(macOS 10.15, *)
     func makeUIView(context _: Context) -> UIActivityIndicatorView {
       .init(style: .medium)
     }
 
+    @available(macOS 10.15, *)
     func updateUIView(_ view: UIActivityIndicatorView, context _: Context) {
       view.hidesWhenStopped = false
       view.startAnimating()

@@ -8,6 +8,7 @@ import SwiftUI
 @available(macOS, deprecated: 11)
 @available(tvOS, deprecated: 14)
 @available(watchOS, deprecated: 7)
+@available(macOS 10.15, *)
 extension Backport where Wrapped == Any {
   /// A dynamic property that scales a numeric value.
   @propertyWrapper

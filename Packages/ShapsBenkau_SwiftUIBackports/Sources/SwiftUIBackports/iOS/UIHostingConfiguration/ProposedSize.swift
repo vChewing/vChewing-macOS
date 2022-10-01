@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 /// A proposal for the size
 ///
 /// * The ``zero`` proposal; the size responds with its minimum size.
@@ -15,24 +16,29 @@ internal struct ProposedSize: Equatable, Sendable {
   /// A value of `nil` represents an unspecified width proposal.
   public var width: CGFloat?
 
+  @available(macOS 10.15, *)
   /// The proposed vertical size measured in points.
   ///
   /// A value of `nil` represents an unspecified height proposal.
   public var height: CGFloat?
 
+  @available(macOS 10.15, *)
   /// A size proposal that contains zero in both dimensions.
   public static var zero: ProposedSize { .init(width: 0, height: 0) }
 
+  @available(macOS 10.15, *)
   /// The proposed size with both dimensions left unspecified.
   ///
   /// Both dimensions contain `nil` in this size proposal.
   public static var unspecified: ProposedSize { .init(width: nil, height: nil) }
 
+  @available(macOS 10.15, *)
   /// A size proposal that contains infinity in both dimensions.
   ///
   /// Both dimensions contain .infinity in this size proposal.
   public static var infinity: ProposedSize { .init(width: .infinity, height: .infinity) }
 
+  @available(macOS 10.15, *)
   /// Creates a new proposed size using the specified width and height.
   ///
   /// - Parameters:
@@ -45,6 +51,7 @@ internal struct ProposedSize: Equatable, Sendable {
     self.height = height
   }
 
+  @available(macOS 10.15, *)
   /// Creates a new proposed size from a specified size.
   ///
   /// - Parameter size: A proposed size with dimensions measured in points.

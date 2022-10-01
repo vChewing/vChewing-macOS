@@ -4,6 +4,7 @@
 
 import Foundation
 
+@available(macOS 10.15, *)
 @available(iOS, deprecated: 15.0)
 @available(macOS, deprecated: 12.0)
 @available(tvOS, deprecated: 15.0)
@@ -152,6 +153,7 @@ extension Backport where Wrapped: URLSession {
   }
 }
 
+@available(macOS 10.15, *)
 private actor URLSessionTaskActor {
   weak var task: URLSessionTask?
 
