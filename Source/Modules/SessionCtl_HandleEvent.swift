@@ -43,8 +43,8 @@ extension SessionCtl {
         if PrefMgr.shared.showNotificationsWhenTogglingCapsLock {
           Notifier.notify(
             message: isCapsLockTurnedOn
-            ? "Caps Lock" + NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
-            : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
+              ? "Caps Lock" + NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
+              : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
           )
         }
         self.isASCIIMode = isCapsLockTurnedOn
