@@ -56,6 +56,7 @@ public protocol StateDataProtocol {
   var attributedStringNormal: NSAttributedString { get }
   var attributedStringMarking: NSAttributedString { get }
   var attributedStringPlaceholder: NSAttributedString { get }
+  var userPhraseKVPair: (String, String) { get }
   var userPhraseDumped: String { get }
   var userPhraseDumpedConverted: String { get }
   var doesUserPhraseExist: Bool { get }
