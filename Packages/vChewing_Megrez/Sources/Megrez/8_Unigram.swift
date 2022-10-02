@@ -43,12 +43,11 @@ extension Megrez {
 
 extension Array where Element == Megrez.Unigram {
   /// 給定過濾清單，讓單元圖陣列自我過濾。
-  /// 在此基礎之上，對於相同詞值的多個單元圖，僅保留權重最大者。
   public mutating func consolidate(filter theFilter: Set<String> = .init()) {
     var inserted: [String: Double] = [:]
     var insertedArray: [Megrez.Unigram] = []
     for neta in filter({ !theFilter.contains($0.value) }) {
-      if let existed = inserted[neta.value], existed >= neta.score { continue }
+      if inserted.keys.contains(neta.value) { continue }
       inserted[neta.value] = neta.score
       insertedArray.append(neta)
     }
