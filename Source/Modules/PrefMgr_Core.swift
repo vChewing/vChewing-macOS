@@ -103,7 +103,11 @@ public class PrefMgr: PrefMgrProtocol {
   public var upperCaseLetterKeyBehavior: Int
 
   @AppProperty(key: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue, defaultValue: true)
-  public var togglingAlphanumericalModeWithLShift: Bool
+  public var togglingAlphanumericalModeWithLShift: Bool {
+    didSet {
+      SessionCtl.theShiftKeyDetector.alsoToggleWithLShift = togglingAlphanumericalModeWithLShift
+    }
+  }
 
   @AppProperty(key: UserDef.kDisableShiftTogglingAlphanumericalMode.rawValue, defaultValue: false)
   public var disableShiftTogglingAlphanumericalMode: Bool
