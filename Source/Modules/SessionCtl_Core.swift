@@ -173,6 +173,7 @@ extension SessionCtl {
     keyHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
     keyHandler.ensureKeyboardParser()
 
+    Self.theShiftKeyDetector.alsoToggleWithLShift = PrefMgr.shared.togglingAlphanumericalModeWithLShift
     if isASCIIMode, !isCapsLocked, PrefMgr.shared.disableShiftTogglingAlphanumericalMode { isASCIIMode = false }
     if isCapsLocked { isASCIIMode = isCapsLocked }  // 同步 Caps Lock 狀態。
 
