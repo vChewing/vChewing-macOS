@@ -610,6 +610,17 @@ public enum LMMgr {
     group.notify(queue: DispatchQueue.main) {}
   }
 
+  public static func bleachSpecifiedSuggestions(target: String, mode: Shared.InputMode) {
+    switch mode {
+      case .imeModeCHS:
+        Self.uomCHT.bleachSpecifiedSuggestions(target: target, saveCallback: { Self.uomCHT.saveData() })
+      case .imeModeCHT:
+        Self.uomCHS.bleachSpecifiedSuggestions(target: target, saveCallback: { Self.uomCHS.saveData() })
+      case .imeModeNULL:
+        break
+    }
+  }
+
   public static func removeUnigramsFromUserOverrideModel(_ mode: Shared.InputMode) {
     switch mode {
       case .imeModeCHS:

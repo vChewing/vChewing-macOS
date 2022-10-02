@@ -39,6 +39,13 @@ extension SessionCtl: KeyHandlerDelegate {
     {
       return false
     }
+    // 開始針對使用者半衰模組的清詞處理
+    let rawPair = state.data.userPhraseKVPair
+    let valueCurrent = rawPair.1
+    let valueReversed = ChineseConverter.crossConvert(rawPair.1)
+    LMMgr.bleachSpecifiedSuggestions(target: valueCurrent, mode: IMEApp.currentInputMode)
+    LMMgr.bleachSpecifiedSuggestions(target: valueReversed, mode: IMEApp.currentInputMode.reversed)
+    // 清詞完畢
     return true
   }
 }
