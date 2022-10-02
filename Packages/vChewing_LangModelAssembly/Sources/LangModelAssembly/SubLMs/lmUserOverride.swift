@@ -151,9 +151,19 @@ extension vChewingLM.LMUserOverride {
   }
 }
 
-// MARK: - Hash and Dehash the entire UOM data
+// MARK: - Hash and Dehash the entire UOM data, etc.
 
 extension vChewingLM.LMUserOverride {
+  public func bleachSpecifiedSuggestions(target: String, saveCallback: @escaping () -> Void) {
+    for neta in mutLRUMap {
+      if neta.value.observation.overrides.keys.contains(target) {
+        mutLRUMap.removeValue(forKey: neta.key)
+      }
+    }
+    resetMRUList()
+    saveCallback()
+  }
+
   /// 自 LRU 辭典內移除所有的單元圖。
   public func bleachUnigrams(saveCallback: @escaping () -> Void) {
     for key in mutLRUMap.keys {
