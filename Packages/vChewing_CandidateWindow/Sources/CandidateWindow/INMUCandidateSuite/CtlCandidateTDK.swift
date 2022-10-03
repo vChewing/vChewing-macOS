@@ -89,6 +89,12 @@ public class CtlCandidateTDK: CtlCandidate {
   }
 
   @discardableResult override public func showNextPage() -> Bool {
+    if (currentLayout == .horizontal && thePoolHorizontal.currentRowNumber == thePoolHorizontal.candidateRows.count - 1)
+      || (currentLayout == .vertical
+        && thePoolVertical.currentColumnNumber == thePoolVertical.candidateColumns.count - 1)
+    {
+      return highlightNextCandidate()
+    }
     switch currentLayout {
       case .horizontal:
         for _ in 0..<thePoolHorizontal.maximumRowsPerPage {
@@ -105,7 +111,31 @@ public class CtlCandidateTDK: CtlCandidate {
     return true
   }
 
+  @discardableResult override public func showNextLine() -> Bool {
+    if (currentLayout == .horizontal && thePoolHorizontal.currentRowNumber == thePoolHorizontal.candidateRows.count - 1)
+      || (currentLayout == .vertical
+        && thePoolVertical.currentColumnNumber == thePoolVertical.candidateColumns.count - 1)
+    {
+      return highlightNextCandidate()
+    }
+    switch currentLayout {
+      case .horizontal:
+        thePoolHorizontal.selectNewNeighborRow(direction: .down)
+      case .vertical:
+        thePoolVertical.selectNewNeighborColumn(direction: .right)
+      @unknown default:
+        return false
+    }
+    updateDisplay()
+    return true
+  }
+
   @discardableResult override public func showPreviousPage() -> Bool {
+    if (currentLayout == .horizontal && thePoolHorizontal.currentRowNumber == 0)
+      || (currentLayout == .vertical && thePoolVertical.currentColumnNumber == 0)
+    {
+      return highlightPreviousCandidate()
+    }
     switch currentLayout {
       case .horizontal:
         for _ in 0..<thePoolHorizontal.maximumRowsPerPage {
@@ -122,20 +152,12 @@ public class CtlCandidateTDK: CtlCandidate {
     return true
   }
 
-  @discardableResult override public func showNextLine() -> Bool {
-    switch currentLayout {
-      case .horizontal:
-        thePoolHorizontal.selectNewNeighborRow(direction: .down)
-      case .vertical:
-        thePoolVertical.selectNewNeighborColumn(direction: .right)
-      @unknown default:
-        return false
-    }
-    updateDisplay()
-    return true
-  }
-
   @discardableResult override public func showPreviousLine() -> Bool {
+    if (currentLayout == .horizontal && thePoolHorizontal.currentRowNumber == 0)
+      || (currentLayout == .vertical && thePoolVertical.currentColumnNumber == 0)
+    {
+      return highlightPreviousCandidate()
+    }
     switch currentLayout {
       case .horizontal:
         thePoolHorizontal.selectNewNeighborRow(direction: .up)
@@ -151,8 +173,18 @@ public class CtlCandidateTDK: CtlCandidate {
   @discardableResult override public func highlightNextCandidate() -> Bool {
     switch currentLayout {
       case .horizontal:
+        if thePoolHorizontal.highlightedIndex == thePoolHorizontal.candidateDataAll.count - 1 {
+          thePoolHorizontal.highlightHorizontal(at: 0)
+          delegate?.buzz()
+          break
+        }
         thePoolHorizontal.highlightHorizontal(at: thePoolHorizontal.highlightedIndex + 1)
       case .vertical:
+        if thePoolVertical.highlightedIndex == thePoolVertical.candidateDataAll.count - 1 {
+          thePoolVertical.highlightVertical(at: 0)
+          delegate?.buzz()
+          break
+        }
         thePoolVertical.highlightVertical(at: thePoolVertical.highlightedIndex + 1)
       @unknown default:
         return false
@@ -164,8 +196,18 @@ public class CtlCandidateTDK: CtlCandidate {
   @discardableResult override public func highlightPreviousCandidate() -> Bool {
     switch currentLayout {
       case .horizontal:
+        if thePoolHorizontal.highlightedIndex == 0 {
+          thePoolHorizontal.highlightHorizontal(at: thePoolHorizontal.candidateDataAll.count - 1)
+          delegate?.buzz()
+          break
+        }
         thePoolHorizontal.highlightHorizontal(at: thePoolHorizontal.highlightedIndex - 1)
       case .vertical:
+        if thePoolVertical.highlightedIndex == 0 {
+          thePoolVertical.highlightVertical(at: thePoolVertical.candidateDataAll.count - 1)
+          delegate?.buzz()
+          break
+        }
         thePoolVertical.highlightVertical(at: thePoolVertical.highlightedIndex - 1)
       @unknown default:
         return false
@@ -179,11 +221,11 @@ public class CtlCandidateTDK: CtlCandidate {
       case .horizontal:
         let currentRow = thePoolHorizontal.candidateRows[thePoolHorizontal.currentRowNumber]
         let actualID = max(0, min(id, currentRow.count - 1))
-        return thePoolHorizontal.candidateRows[thePoolHorizontal.currentRowNumber][actualID].index
+        return currentRow[actualID].index
       case .vertical:
         let currentColumn = thePoolVertical.candidateColumns[thePoolVertical.currentColumnNumber]
         let actualID = max(0, min(id, currentColumn.count - 1))
-        return thePoolVertical.candidateColumns[thePoolVertical.currentColumnNumber][actualID].index
+        return currentColumn[actualID].index
       @unknown default:
         return 0
     }
