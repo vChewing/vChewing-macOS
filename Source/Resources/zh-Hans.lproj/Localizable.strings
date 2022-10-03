@@ -144,7 +144,7 @@
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "指定 (Shift+)Tab 在选字窗内的轮替操作对象。";
 "Choose the behavior of Shift+Letter key with letter inputs." = "指定 Shift+字母键 的行为。";
 "Choose the cursor position where you want to list possible candidates." = "请选择用以触发选字的游标相对位置。";
-"Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode only." = "请选择 macOS 英数键盘布局。该布局仅用于英数输入模式。";
+"Choose the macOS-level alphanumerical keyboard layout. This setting is for candidate window and the alphanumerical mode only." = "请选择 macOS 英数键盘布局。该布局仅用于选字窗和英数输入模式。";
 "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "请选择 macOS 基础键盘布局。QWERTY 以外的英数布局是为了拼音排列使用者而准备的。";
 "Choose the phonetic layout for Mandarin parser." = "请指定普通话/国音分析器所使用的注音排列。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "请在此指定您想指定的使用者语汇档案目录。无效值会被忽略。";
