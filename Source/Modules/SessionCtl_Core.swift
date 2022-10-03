@@ -67,7 +67,11 @@ class SessionCtl: IMKInputController {
   /// 用以記錄當前輸入法狀態的變數。
   var state: IMEStateProtocol = IMEState.ofEmpty() {
     didSet {
+      guard oldValue.type != state.type else { return }
       vCLog("Current State: \(state.type.rawValue)")
+      if state.isCandidateContainer || oldValue.isCandidateContainer {
+        setKeyLayout()
+      }
     }
   }
 
@@ -134,7 +138,7 @@ extension SessionCtl {
   /// 指定鍵盤佈局。
   func setKeyLayout() {
     guard let client = client() else { return }
-    if isASCIIMode, IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
+    if (isASCIIMode && IMKHelper.isDynamicBasicKeyboardLayoutEnabled) || state.isCandidateContainer {
       client.overrideKeyboard(withKeyboardNamed: PrefMgr.shared.alphanumericalKeyboardLayout)
       return
     }
