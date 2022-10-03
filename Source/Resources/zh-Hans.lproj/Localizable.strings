@@ -39,7 +39,7 @@
 "NotificationSwitchON" = "✔ 已启用";
 "NotificationSwitchOFF" = "✘ 已停用";
 "NotificationSwitchASCII" = "↺ 切换完毕";
-"Edit User Phrases…" = "编辑自订语汇…";
+"Edit vChewing User Phrases…" = "编辑威注音自订语汇…";
 "Reload User Phrases" = "重载自订语汇";
 "Unable to create the user phrase file." = "无法创建自订语汇档案。";
 "Please check the permission at \"%@\"." = "请检查此处的存取权限：\"%@\".";

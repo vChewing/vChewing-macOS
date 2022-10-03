@@ -39,7 +39,7 @@
 "NotificationSwitchON" = "✔ 機能起動";
 "NotificationSwitchOFF" = "✘ 機能停止";
 "NotificationSwitchASCII" = "↺ 切替完了";
-"Edit User Phrases…" = "ユーザー辞書を編集…";
+"Edit vChewing User Phrases…" = "威注音ユーザー辞書を編集…";
 "Reload User Phrases" = "ユーザー辞書を再び読込む";
 "Unable to create the user phrase file." = "ユーザー辞書ファイルの作成は失敗しました。";
 "Please check the permission at \"%@\"." = "「%@」に書き出す権限は不足らしい。";
