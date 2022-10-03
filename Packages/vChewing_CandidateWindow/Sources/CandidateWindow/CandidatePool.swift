@@ -184,7 +184,6 @@ public class CandidatePool {
     var indexSpecified = indexSpecified
     highlightedIndex = indexSpecified
     if !(0..<candidateDataAll.count).contains(highlightedIndex) {
-      NSSound.beep()
       switch highlightedIndex {
         case candidateDataAll.count...:
           currentRowNumber = candidateRows.count - 1
@@ -218,7 +217,6 @@ public class CandidatePool {
     var indexSpecified = indexSpecified
     highlightedIndex = indexSpecified
     if !(0..<candidateDataAll.count).contains(highlightedIndex) {
-      NSSound.beep()
       switch highlightedIndex {
         case candidateDataAll.count...:
           currentColumnNumber = candidateColumns.count - 1
