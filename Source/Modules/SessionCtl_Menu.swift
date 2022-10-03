@@ -102,7 +102,7 @@ extension SessionCtl {
       action: #selector(openUserDataFolder(_:)), keyEquivalent: ""
     )
     menu.addItem(
-      withTitle: NSLocalizedString("Edit User Phrases…", comment: ""),
+      withTitle: NSLocalizedString("Edit vChewing User Phrases…", comment: ""),
       action: #selector(openUserPhrases(_:)), keyEquivalent: ""
     )
     menu.addItem(

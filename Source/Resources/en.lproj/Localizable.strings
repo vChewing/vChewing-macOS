@@ -39,7 +39,7 @@
 "NotificationSwitchON" = "✔ ON";
 "NotificationSwitchOFF" = "✘ OFF";
 "NotificationSwitchASCII" = "↺ Switched";
-"Edit User Phrases…" = "Edit User Phrases…";
+"Edit vChewing User Phrases…" = "Edit vChewing User Phrases…";
 "Reload User Phrases" = "Reload User Phrases";
 "Unable to create the user phrase file." = "Unable to create the user phrase file.";
 "Please check the permission at \"%@\"." = "Please check the permission at \"%@\".";
