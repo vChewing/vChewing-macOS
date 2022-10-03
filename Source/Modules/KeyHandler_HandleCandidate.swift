@@ -222,7 +222,7 @@ extension KeyHandler {
       }
     }
 
-    // MARK: 聯想詞處理 (Associated Phrases)
+    // MARK: 聯想詞處理 (Associated Phrases) 以及標準選字處理
 
     if state.type == .ofAssociates {
       if !input.isShiftHold { return false }
