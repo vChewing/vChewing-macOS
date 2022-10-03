@@ -610,12 +610,12 @@ public enum LMMgr {
     group.notify(queue: DispatchQueue.main) {}
   }
 
-  public static func bleachSpecifiedSuggestions(target: String, mode: Shared.InputMode) {
+  public static func bleachSpecifiedSuggestions(targets: [String], mode: Shared.InputMode) {
     switch mode {
       case .imeModeCHS:
-        Self.uomCHT.bleachSpecifiedSuggestions(target: target, saveCallback: { Self.uomCHT.saveData() })
+        Self.uomCHT.bleachSpecifiedSuggestions(targets: targets, saveCallback: { Self.uomCHT.saveData() })
       case .imeModeCHT:
-        Self.uomCHS.bleachSpecifiedSuggestions(target: target, saveCallback: { Self.uomCHS.saveData() })
+        Self.uomCHS.bleachSpecifiedSuggestions(targets: targets, saveCallback: { Self.uomCHS.saveData() })
       case .imeModeNULL:
         break
     }

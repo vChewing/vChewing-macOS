@@ -154,10 +154,13 @@ extension vChewingLM.LMUserOverride {
 // MARK: - Hash and Dehash the entire UOM data, etc.
 
 extension vChewingLM.LMUserOverride {
-  public func bleachSpecifiedSuggestions(target: String, saveCallback: @escaping () -> Void) {
+  public func bleachSpecifiedSuggestions(targets: [String], saveCallback: @escaping () -> Void) {
+    if targets.isEmpty { return }
     for neta in mutLRUMap {
-      if neta.value.observation.overrides.keys.contains(target) {
-        mutLRUMap.removeValue(forKey: neta.key)
+      for target in targets {
+        if neta.value.observation.overrides.keys.contains(target) {
+          mutLRUMap.removeValue(forKey: neta.key)
+        }
       }
     }
     resetMRUList()

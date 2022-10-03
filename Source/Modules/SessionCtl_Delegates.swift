@@ -43,8 +43,8 @@ extension SessionCtl: KeyHandlerDelegate {
     let rawPair = state.data.userPhraseKVPair
     let valueCurrent = rawPair.1
     let valueReversed = ChineseConverter.crossConvert(rawPair.1)
-    LMMgr.bleachSpecifiedSuggestions(target: valueCurrent, mode: IMEApp.currentInputMode)
-    LMMgr.bleachSpecifiedSuggestions(target: valueReversed, mode: IMEApp.currentInputMode.reversed)
+    LMMgr.bleachSpecifiedSuggestions(targets: [valueCurrent], mode: IMEApp.currentInputMode)
+    LMMgr.bleachSpecifiedSuggestions(targets: [valueReversed], mode: IMEApp.currentInputMode.reversed)
     // 清詞完畢
     return true
   }
