@@ -39,7 +39,7 @@
 "NotificationSwitchON" = "✔ ON";
 "NotificationSwitchOFF" = "✘ OFF";
 "NotificationSwitchASCII" = "↺ Switched";
-"Edit User Phrases…" = "Edit User Phrases…";
+"Edit vChewing User Phrases…" = "Edit vChewing User Phrases…";
 "Reload User Phrases" = "Reload User Phrases";
 "Unable to create the user phrase file." = "Unable to create the user phrase file.";
 "Please check the permission at \"%@\"." = "Please check the permission at \"%@\".";
@@ -144,7 +144,7 @@
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "Choose the behavior of (Shift+)Tab key in the candidate window.";
 "Choose the behavior of Shift+Letter key with letter inputs." = "Choose the behavior of Shift+Letter key with letter inputs.";
 "Choose the cursor position where you want to list possible candidates." = "Choose the cursor position where you want to list possible candidates.";
-"Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode only." = "Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode only.";
+"Choose the macOS-level alphanumerical keyboard layout. This setting is for candidate window and the alphanumerical mode only." = "Choose the macOS-level alphanumerical keyboard layout. This setting is for candidate window and the alphanumerical mode only.";
 "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only.";
 "Choose the phonetic layout for Mandarin parser." = "Choose the phonetic layout for Mandarin parser.";
 "Choose your desired user data folder path. Will be omitted if invalid." = "Choose your desired user data folder path. Will be omitted if invalid.";

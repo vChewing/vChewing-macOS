@@ -39,7 +39,7 @@
 "NotificationSwitchON" = "✔ 機能起動";
 "NotificationSwitchOFF" = "✘ 機能停止";
 "NotificationSwitchASCII" = "↺ 切替完了";
-"Edit User Phrases…" = "ユーザー辞書を編集…";
+"Edit vChewing User Phrases…" = "威注音ユーザー辞書を編集…";
 "Reload User Phrases" = "ユーザー辞書を再び読込む";
 "Unable to create the user phrase file." = "ユーザー辞書ファイルの作成は失敗しました。";
 "Please check the permission at \"%@\"." = "「%@」に書き出す権限は不足らしい。";
@@ -144,7 +144,7 @@
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "入力候補陳列での (Shift+)Tab キーの輪番切替対象をご指定ください。";
 "Choose the behavior of Shift+Letter key with letter inputs." = "Shift+文字キーの行為をご指定ください。";
 "Choose the cursor position where you want to list possible candidates." = "カーソルはどこで入力候補を呼び出すかとご指定ださい。";
-"Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode only." = "macOS 英数キーボード配置をご指定ください。英数入力モードだけに使われる配置である。";
+"Choose the macOS-level alphanumerical keyboard layout. This setting is for candidate window and the alphanumerical mode only." = "macOS 英数キーボード配置をご指定ください。文字候補の選択と英数入力モードだけに使われる配置である。";
 "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "macOS 基礎キーボード配置をご指定ください。QWERTY 以外の英数キーボードは弁音以外の配列に不適用。";
 "Choose the phonetic layout for Mandarin parser." = "共通語分析器の注音配列をご指定ください。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "欲しがるユーザー辞書保存先をご指定ください。無効なる保存先設定は省かれる。";

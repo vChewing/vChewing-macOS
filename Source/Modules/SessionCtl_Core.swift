@@ -68,6 +68,7 @@ class SessionCtl: IMKInputController {
   var state: IMEStateProtocol = IMEState.ofEmpty() {
     didSet {
       vCLog("Current State: \(state.type.rawValue)")
+      setKeyLayout()
     }
   }
 
@@ -134,7 +135,7 @@ extension SessionCtl {
   /// 指定鍵盤佈局。
   func setKeyLayout() {
     guard let client = client() else { return }
-    if isASCIIMode, IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
+    if (isASCIIMode && IMKHelper.isDynamicBasicKeyboardLayoutEnabled) || state.isCandidateContainer {
       client.overrideKeyboard(withKeyboardNamed: PrefMgr.shared.alphanumericalKeyboardLayout)
       return
     }
