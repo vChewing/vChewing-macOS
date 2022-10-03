@@ -13,11 +13,11 @@ import Shared
 extension PrefMgr {
   public func fixOddPreferences() {
     // macOS 10.15 開始才能使用 SwiftUI 構建的田所選字窗。
-    if #unavailable(macOS 10.15) { useIMKCandidateWindow = true }
     if #unavailable(macOS 10.15) {
+      useIMKCandidateWindow = true
       handleDefaultCandidateFontsByLangIdentifier = false
       shiftKeyAccommodationBehavior = 0
-      disableShiftTogglingAlphanumericalMode = false
+      disableShiftTogglingAlphanumericalMode = true
       togglingAlphanumericalModeWithLShift = false
     }
     // 自動糾正選字鍵 (利用其 didSet 特性)
