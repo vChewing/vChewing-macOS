@@ -6,7 +6,7 @@
 "Install Failed" = "実装失敗。";
 "Installation Successful" = "実装完了";
 "OK" = "うむ";
-"vChewing is ready to use." = "威注音入力、利用準備完了。";
+"vChewing is ready to use. \n\nPlease relogin if this is the first time you install it in this user account." = "威注音入力、利用準備完了。\n\nこのシステムユーザーアカウントで初めて実装した場合、再ログインしてください。";
 "Stopping the old version. This may take up to one minute…" = "古いバージョンを強制停止中。１分かかると恐れ入りますが……";
 "Attention" = "ご注意";
 "vChewing is upgraded, but please log out or reboot for the new version to be fully functional." = "威注音入力の更新は実装完了しましたが、うまく作動できるために、このパソコンの再起動および再ログインが必要だと恐れ入ります。";
