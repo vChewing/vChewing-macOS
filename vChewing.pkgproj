@@ -941,11 +941,11 @@
 					</dict>
 					<dict>
 						<key>LANGUAGE</key>
-						<string>Traditional Chinese</string>
+						<string>Simplified Chinese</string>
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>Installer/pkgTextWarning-CHT.txt</string>
+							<string>Installer/pkgTextWarning-CHS.txt</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>
@@ -963,11 +963,11 @@
 					</dict>
 					<dict>
 						<key>LANGUAGE</key>
-						<string>Simplified Chinese</string>
+						<string>Traditional Chinese</string>
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>Installer/pkgTextWarning-CHS.txt</string>
+							<string>Installer/pkgTextWarning-CHT.txt</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>
@@ -991,11 +991,11 @@
 					</dict>
 					<dict>
 						<key>LANGUAGE</key>
-						<string>Traditional Chinese</string>
+						<string>Simplified Chinese</string>
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>LICENSE-CHT.txt</string>
+							<string>LICENSE-CHS.txt</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>
@@ -1013,11 +1013,11 @@
 					</dict>
 					<dict>
 						<key>LANGUAGE</key>
-						<string>Simplified Chinese</string>
+						<string>Traditional Chinese</string>
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>LICENSE-CHS.txt</string>
+							<string>LICENSE-CHT.txt</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>
@@ -1034,7 +1034,52 @@
 			<key>SUMMARY</key>
 			<dict>
 				<key>LOCALIZATIONS</key>
-				<array/>
+				<array>
+					<dict>
+						<key>LANGUAGE</key>
+						<string>English</string>
+						<key>VALUE</key>
+						<dict>
+							<key>PATH</key>
+							<string>Installer/pkgTextSuccessful-ENU.rtf</string>
+							<key>PATH_TYPE</key>
+							<integer>1</integer>
+						</dict>
+					</dict>
+					<dict>
+						<key>LANGUAGE</key>
+						<string>Simplified Chinese</string>
+						<key>VALUE</key>
+						<dict>
+							<key>PATH</key>
+							<string>Installer/pkgTextSuccessful-CHS.rtf</string>
+							<key>PATH_TYPE</key>
+							<integer>1</integer>
+						</dict>
+					</dict>
+					<dict>
+						<key>LANGUAGE</key>
+						<string>Japanese</string>
+						<key>VALUE</key>
+						<dict>
+							<key>PATH</key>
+							<string>Installer/pkgTextSuccessful-JPN.rtf</string>
+							<key>PATH_TYPE</key>
+							<integer>1</integer>
+						</dict>
+					</dict>
+					<dict>
+						<key>LANGUAGE</key>
+						<string>Traditional Chinese</string>
+						<key>VALUE</key>
+						<dict>
+							<key>PATH</key>
+							<string>Installer/pkgTextSuccessful-CHT.rtf</string>
+							<key>PATH_TYPE</key>
+							<integer>1</integer>
+						</dict>
+					</dict>
+				</array>
 			</dict>
 			<key>TITLE</key>
 			<dict>
@@ -1048,9 +1093,9 @@
 					</dict>
 					<dict>
 						<key>LANGUAGE</key>
-						<string>Simplified Chinese</string>
+						<string>Traditional Chinese</string>
 						<key>VALUE</key>
-						<string>威注音输入法</string>
+						<string>威注音輸入法</string>
 					</dict>
 					<dict>
 						<key>LANGUAGE</key>
@@ -1060,9 +1105,9 @@
 					</dict>
 					<dict>
 						<key>LANGUAGE</key>
-						<string>Traditional Chinese</string>
+						<string>Simplified Chinese</string>
 						<key>VALUE</key>
-						<string>威注音輸入法</string>
+						<string>威注音输入法</string>
 					</dict>
 				</array>
 			</dict>
@@ -1099,11 +1144,11 @@
 						</dict>
 						<dict>
 							<key>LANGUAGE</key>
-							<string>Simplified Chinese</string>
+							<string>Traditional Chinese</string>
 							<key>SECONDARY_VALUE</key>
-							<string>当前系统版本低于 macOS 10.13。</string>
+							<string>當前系統版本低於 macOS 10.13。</string>
 							<key>VALUE</key>
-							<string>作业系统版本太旧</string>
+							<string>作業系統版本太舊</string>
 						</dict>
 						<dict>
 							<key>LANGUAGE</key>
@@ -1115,11 +1160,11 @@
 						</dict>
 						<dict>
 							<key>LANGUAGE</key>
-							<string>Traditional Chinese</string>
+							<string>Simplified Chinese</string>
 							<key>SECONDARY_VALUE</key>
-							<string>當前系統版本低於 macOS 10.13。</string>
+							<string>当前系统版本低于 macOS 10.13。</string>
 							<key>VALUE</key>
-							<string>作業系統版本太舊</string>
+							<string>作业系统版本太旧</string>
 						</dict>
 					</array>
 					<key>NAME</key>
