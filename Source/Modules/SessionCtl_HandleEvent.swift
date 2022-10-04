@@ -35,19 +35,21 @@ extension SessionCtl {
       return false
     }
 
-    // Caps Lock 通知與切換處理。
-    if event.type == .flagsChanged, event.keyCode == KeyCode.kCapsLock.rawValue {
-      DispatchQueue.main.async {
-        let isCapsLockTurnedOn = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
-        let status = NSLocalizedString("NotificationSwitchASCII", comment: "")
-        if PrefMgr.shared.showNotificationsWhenTogglingCapsLock {
-          Notifier.notify(
-            message: isCapsLockTurnedOn
-              ? "Caps Lock" + NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
-              : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
-          )
+    // Caps Lock 通知與切換處理，要求至少 macOS 12 Monterey。
+    if #available(macOS 12, *) {
+      if event.type == .flagsChanged, event.keyCode == KeyCode.kCapsLock.rawValue {
+        DispatchQueue.main.async {
+          let isCapsLockTurnedOn = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
+          let status = NSLocalizedString("NotificationSwitchASCII", comment: "")
+          if PrefMgr.shared.showNotificationsWhenTogglingCapsLock {
+            Notifier.notify(
+              message: isCapsLockTurnedOn
+                ? "Caps Lock" + NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
+                : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
+            )
+          }
+          self.isASCIIMode = isCapsLockTurnedOn
         }
-        self.isASCIIMode = isCapsLockTurnedOn
       }
     }
 

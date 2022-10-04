@@ -175,8 +175,20 @@ extension SessionCtl {
     keyHandler.ensureKeyboardParser()
 
     Self.theShiftKeyDetector.alsoToggleWithLShift = PrefMgr.shared.togglingAlphanumericalModeWithLShift
-    if isASCIIMode, !isCapsLocked, PrefMgr.shared.disableShiftTogglingAlphanumericalMode { isASCIIMode = false }
-    if isCapsLocked || PrefMgr.shared.disableShiftTogglingAlphanumericalMode { isASCIIMode = isCapsLocked }  // 同步 Caps Lock 狀態。
+
+    if #unavailable(macOS 12) {
+      if #available(macOS 10.15, *) {
+        if isASCIIMode, PrefMgr.shared.disableShiftTogglingAlphanumericalMode { isASCIIMode = false }
+      }
+    } else {
+      if isASCIIMode, !isCapsLocked, PrefMgr.shared.disableShiftTogglingAlphanumericalMode {
+        isASCIIMode = false
+      }
+      // 同步 Caps Lock 狀態。
+      else if isCapsLocked || PrefMgr.shared.disableShiftTogglingAlphanumericalMode {
+        isASCIIMode = isCapsLocked
+      }
+    }
 
     /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
     /// 這是很多 macOS 副廠輸入法的常見失誤之處。
