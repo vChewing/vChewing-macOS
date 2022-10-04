@@ -333,7 +333,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
           "Installation Successful", comment: ""
         )
         ntfPostInstall.informativeText = NSLocalizedString(
-          "vChewing is ready to use.", comment: ""
+          "vChewing is ready to use. \n\nPlease relogin if this is the first time you install it in this user account.", comment: ""
         )
         ntfPostInstall.addButton(withTitle: NSLocalizedString("OK", comment: ""))
       }
