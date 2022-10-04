@@ -458,11 +458,7 @@
                                                 </connections>
                                             </buttonCell>
                                             <connections>
-                                                <binding destination="32" name="enabled" keyPath="values.UseIMKCandidateWindow" id="pHT-37-Eyh">
-                                                    <dictionary key="options">
-                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                    </dictionary>
-                                                </binding>
+                                                <binding destination="32" name="value" keyPath="values.ShowNotificationsWhenTogglingCapsLock" id="AJj-wK-AYK"/>
                                             </connections>
                                         </button>
                                     </subviews>
