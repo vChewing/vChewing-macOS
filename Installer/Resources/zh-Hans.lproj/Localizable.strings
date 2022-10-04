@@ -6,7 +6,7 @@
 "Install Failed" = "安装失败";
 "Installation Successful" = "安装成功";
 "OK" = "确定";
-"vChewing is ready to use." = "威注音输入法安装成功";
+"vChewing is ready to use. \n\nPlease relogin if this is the first time you install it in this user account." = "威注音输入法安装成功。\n\n若是在當前使用者帳戶內首次安裝的話，請重新登入。";
 "Stopping the old version. This may take up to one minute…" = "正在试图结束正在运行的旧版输入法，大概需要一分钟…";
 "Attention" = "请注意";
 "vChewing is upgraded, but please log out or reboot for the new version to be fully functional." = "vChewing 安装完成，但建议您登出或重新开机，以便顺利使用新版。";
