@@ -64,6 +64,13 @@ struct suiPrefPaneExperience: View {
     }
   }()
 
+  var macOSMontereyOrLaterDetected: Bool {
+    if #available(macOS 12, *) {
+      return true
+    }
+    return false
+  }
+
   var body: some View {
     ScrollView {
       VStack {
@@ -203,7 +210,7 @@ struct suiPrefPaneExperience: View {
             isOn: $selShowNotificationsWhenTogglingCapsLock.onChange {
               PrefMgr.shared.showNotificationsWhenTogglingCapsLock = selShowNotificationsWhenTogglingCapsLock
             }
-          )
+          ).disabled(!macOSMontereyOrLaterDetected)
         }
         Preferences.Section(label: { Text(LocalizedStringKey("Misc Settings:")) }) {
           Toggle(
