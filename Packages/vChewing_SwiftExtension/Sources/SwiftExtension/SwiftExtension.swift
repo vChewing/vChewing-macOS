@@ -105,6 +105,8 @@ extension Bool {
 
 // MARK: - Property wrapper
 
+// Ref: https://www.avanderlee.com/swift/property-wrappers/
+
 @propertyWrapper
 public struct AppProperty<Value> {
   public let key: String
