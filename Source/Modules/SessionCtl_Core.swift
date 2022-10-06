@@ -95,18 +95,26 @@ class SessionCtl: IMKInputController {
   /// 順帶更新 IME 模組及 UserPrefs 當中對於當前語言模式的記載。
   var inputMode: Shared.InputMode = IMEApp.currentInputMode {
     willSet {
-      /// 將新的簡繁輸入模式提報給 Prefs 與 IME 模組。
-      IMEApp.currentInputMode = newValue
-      PrefMgr.shared.mostRecentInputMode = IMEApp.currentInputMode.rawValue
+      /// 將新的簡繁輸入模式提報給 Prefs 模組。IMEApp 模組會據此計算正確的資料值。
+      PrefMgr.shared.mostRecentInputMode = newValue.rawValue
     }
     didSet {
-      /// 重設所有語言模組。這裡不需要做按需重設，因為對運算量沒有影響。
-      keyHandler.currentLM = LMMgr.currentLM()  // 會自動更新組字引擎內的模組。
-      keyHandler.currentUOM = LMMgr.currentUOM()
-      /// 清空注拼槽＋同步最新的注拼槽排列設定。
-      keyHandler.ensureKeyboardParser()
-      /// 將輸入法偏好設定同步至語言模組內。
-      syncBaseLMPrefs()
+      if oldValue != inputMode, inputMode != .imeModeNULL {
+        UserDefaults.standard.synchronize()
+        keyHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
+        // ----------------------------
+        /// 重設所有語言模組。這裡不需要做按需重設，因為對運算量沒有影響。
+        keyHandler.currentLM = LMMgr.currentLM()  // 會自動更新組字引擎內的模組。
+        keyHandler.currentUOM = LMMgr.currentUOM()
+        /// 清空注拼槽＋同步最新的注拼槽排列設定。
+        keyHandler.ensureKeyboardParser()
+        /// 將輸入法偏好設定同步至語言模組內。
+        syncBaseLMPrefs()
+        // ----------------------------
+        Self.isVerticalTyping = isVerticalTyping
+        // 強制重設當前鍵盤佈局、使其與偏好設定同步。這裡的這一步也不能省略。
+        handle(state: IMEState.ofEmpty())
+      }
     }
   }
 
@@ -122,9 +130,6 @@ class SessionCtl: IMKInputController {
     super.init(server: server, delegate: delegate, client: inputClient)
     keyHandler.delegate = self
     syncBaseLMPrefs()
-    // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
-    resetKeyHandler()
-    activateServer(inputClient)
   }
 }
 
@@ -134,11 +139,18 @@ extension SessionCtl {
   /// 指定鍵盤佈局。
   func setKeyLayout() {
     guard let client = client() else { return }
-    if (isASCIIMode && IMKHelper.isDynamicBasicKeyboardLayoutEnabled) || state.isCandidateContainer {
-      client.overrideKeyboard(withKeyboardNamed: PrefMgr.shared.alphanumericalKeyboardLayout)
-      return
+
+    func doSetKeyLayout() {
+      if (isASCIIMode && IMKHelper.isDynamicBasicKeyboardLayoutEnabled) || state.isCandidateContainer {
+        client.overrideKeyboard(withKeyboardNamed: PrefMgr.shared.alphanumericalKeyboardLayout)
+        return
+      }
+      client.overrideKeyboard(withKeyboardNamed: PrefMgr.shared.basicKeyboardLayout)
     }
-    client.overrideKeyboard(withKeyboardNamed: PrefMgr.shared.basicKeyboardLayout)
+
+    DispatchQueue.main.async {
+      doSetKeyLayout()
+    }
   }
 
   /// 重設按鍵調度模組，會將當前尚未遞交的內容遞交出去。
@@ -189,17 +201,9 @@ extension SessionCtl {
       }
     }
 
-    /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
-    /// 這是很多 macOS 副廠輸入法的常見失誤之處。
-    if let client = client() {
-      Self.isVerticalTyping = isVerticalTyping
-      if client.bundleIdentifier() != Bundle.main.bundleIdentifier {
-        // 強制重設當前鍵盤佈局、使其與偏好設定同步。
-        setKeyLayout()
-        handle(state: IMEState.ofEmpty())
-      }
-    }  // 除此之外就不要動了，免得在點開輸入法自身的視窗時卡死。
-    (NSApp.delegate as? AppDelegate)?.updateSputnik.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
+    DispatchQueue.main.async {
+      (NSApp.delegate as? AppDelegate)?.updateSputnik.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
+    }
   }
 
   /// 停用輸入法時，會觸發該函式。
@@ -218,28 +222,13 @@ extension SessionCtl {
   override func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
     _ = tag  // 防止格式整理工具毀掉與此對應的參數。
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-    var newInputMode = Shared.InputMode(rawValue: value as? String ?? "") ?? Shared.InputMode.imeModeNULL
-    switch newInputMode {
-      case .imeModeCHS:
-        newInputMode = .imeModeCHS
-      case .imeModeCHT:
-        newInputMode = .imeModeCHT
-      default:
-        newInputMode = .imeModeNULL
-    }
+    let newInputMode = Shared.InputMode(rawValue: value as? String ?? "") ?? Shared.InputMode.imeModeNULL
     if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(newInputMode) }
-
-    if inputMode != newInputMode {
-      UserDefaults.standard.synchronize()
-      keyHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
-      inputMode = newInputMode
-      /// 必須加上下述條件，否則會在每次切換至輸入法本體的視窗（比如偏好設定視窗）時會卡死。
-      /// 這是很多 macOS 副廠輸入法的常見失誤之處。
-      if let client = client(), client.bundleIdentifier() != Bundle.main.bundleIdentifier {
-        // 強制重設當前鍵盤佈局、使其與偏好設定同步。這裡的這一步也不能省略。
-        setKeyLayout()
-        handle(state: IMEState.ofEmpty())
-      }  // 除此之外就不要動了，免得在點開輸入法自身的視窗時卡死。
+    inputMode = newInputMode
+    if let rawValString = value as? String, let bundleID = Bundle.main.bundleIdentifier,
+      !bundleID.isEmpty, !rawValString.contains(bundleID)
+    {
+      setKeyLayout()
     }
   }
 

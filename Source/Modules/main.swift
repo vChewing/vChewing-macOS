@@ -74,8 +74,9 @@ NSApp.run()
 public enum IMEApp {
   // MARK: - 輸入法的當前的簡繁體中文模式
 
-  public static var currentInputMode: Shared.InputMode =
+  public static var currentInputMode: Shared.InputMode {
     .init(rawValue: PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
+  }
 
   /// Fart or Beep?
   static func buzz() {
