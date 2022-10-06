@@ -6,14 +6,13 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import CandidateWindow
 import Shared
 import SwiftUI
 import SwiftUIBackports
 
 @available(macOS 10.15, *)
 extension CandidateCellData {
-  public var themeColor: some View {
+  public var themeColorBackports: some View {
     // 設定當前高亮候選字的背景顏色。
     let result: Color = {
       switch locale {
@@ -30,7 +29,7 @@ extension CandidateCellData {
     var result: some View {
       ZStack(alignment: .leading) {
         if isSelected {
-          themeColor.cornerRadius(6)
+          themeColorBackports.cornerRadius(6)
           VStack(spacing: 0) {
             HStack(spacing: 4) {
               Text(key).font(.custom("Menlo", size: fontSizeKey))

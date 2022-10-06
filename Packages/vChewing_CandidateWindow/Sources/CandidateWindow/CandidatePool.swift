@@ -12,53 +12,91 @@ import Shared
 /// 候選字窗會用到的資料池單位。
 public class CandidatePool {
   public let blankCell = CandidateCellData(key: " ", displayedText: "　", isSelected: false)
+  public var currentLayout: NSUserInterfaceLayoutOrientation = .horizontal
   public private(set) var candidateDataAll: [CandidateCellData] = []
   public private(set) var selectionKeys: String
   public private(set) var highlightedIndex: Int = 0
 
   // 下述變數只有橫排選字窗才會用到
-  public var currentRowNumber = 0
-  public var maximumRowsPerPage = 3
-  public private(set) var maxRowCapacity: Int = 6
-  public private(set) var candidateRows: [[CandidateCellData]] = []
+  private var currentRowNumber = 0
+  private var maxRowsPerPage = 3
+  private var maxRowCapacity: Int = 6
+  private var candidateRows: [[CandidateCellData]] = []
 
   // 下述變數只有縱排選字窗才會用到
-  public var currentColumnNumber = 0
-  public var maximumColumnsPerPage = 3
-  public private(set) var maxColumnCapacity: Int = 6
-  public private(set) var candidateColumns: [[CandidateCellData]] = []
+  private var currentColumnNumber = 0
+  private var maxColumnsPerPage = 3
+  private var maxColumnCapacity: Int = 6
+  private var candidateColumns: [[CandidateCellData]] = []
 
-  // 動態變數
+  // MARK: - 動態變數
+
   public var maxRowWidth: Int { Int(Double(maxRowCapacity + 3) * 2) * Int(ceil(CandidateCellData.unifiedSize)) }
   public var maxWindowWidth: Double {
     ceil(Double(maxRowCapacity + 3) * 2.7 * ceil(CandidateCellData.unifiedSize) * 1.2)
   }
 
-  public var rangeForCurrentHorizontalPage: Range<Int> {
-    currentRowNumber..<min(candidateRows.count, currentRowNumber + maximumRowsPerPage)
+  public var currentLineNumber: Int {
+    switch currentLayout {
+      case .horizontal:
+        return currentRowNumber
+      case .vertical:
+        return currentColumnNumber
+      @unknown default:
+        return 0
+    }
   }
 
-  public var rangeForCurrentVerticalPage: Range<Int> {
-    currentColumnNumber..<min(candidateColumns.count, currentColumnNumber + maximumColumnsPerPage)
+  public var candidateLines: [[CandidateCellData]] {
+    switch currentLayout {
+      case .horizontal:
+        return candidateRows
+      case .vertical:
+        return candidateColumns
+      @unknown default:
+        return []
+    }
   }
 
-  public var rangeForLastHorizontalPageBlanked: Range<Int> {
-    0..<(maximumRowsPerPage - rangeForCurrentHorizontalPage.count)
+  public var maxLineCapacity: Int {
+    switch currentLayout {
+      case .horizontal:
+        return maxRowCapacity
+      case .vertical:
+        return maxColumnCapacity
+      @unknown default:
+        return 0
+    }
   }
 
-  public var rangeForLastVerticalPageBlanked: Range<Int> {
-    0..<(maximumColumnsPerPage - rangeForCurrentVerticalPage.count)
+  public var maxLinesPerPage: Int {
+    switch currentLayout {
+      case .horizontal:
+        return maxRowsPerPage
+      case .vertical:
+        return maxColumnsPerPage
+      @unknown default:
+        return 0
+    }
   }
 
-  public enum VerticalDirection {
-    case up
-    case down
+  public var rangeForLastPageBlanked: Range<Int> {
+    switch currentLayout {
+      case .horizontal: return rangeForLastHorizontalPageBlanked
+      case .vertical: return rangeForLastVerticalPageBlanked
+      @unknown default: return 0..<0
+    }
   }
 
-  public enum HorizontalDirection {
-    case left
-    case right
+  public var rangeForCurrentPage: Range<Int> {
+    switch currentLayout {
+      case .horizontal: return rangeForCurrentHorizontalPage
+      case .vertical: return rangeForCurrentVerticalPage
+      @unknown default: return 0..<0
+    }
   }
+
+  // MARK: - Constructors
 
   /// 初期化一個縱排候選字窗專用資料池。
   /// - Parameters:
@@ -84,6 +122,7 @@ public class CandidatePool {
       currentColumn.append(candidate)
     }
     candidateColumns.append(currentColumn)
+    currentLayout = .vertical
   }
 
   /// 初期化一個橫排候選字窗專用資料池。
@@ -111,9 +150,58 @@ public class CandidatePool {
       currentRow.append(candidate)
     }
     candidateRows.append(currentRow)
+    currentLayout = .horizontal
   }
 
-  public func selectNewNeighborRow(direction: VerticalDirection) {
+  // MARK: Public Functions
+
+  public func selectNewNeighborLine(isForward: Bool) {
+    switch currentLayout {
+      case .horizontal: selectNewNeighborRow(direction: isForward ? .down : .up)
+      case .vertical: selectNewNeighborColumn(direction: isForward ? .right : .left)
+      @unknown default: break
+    }
+  }
+
+  public func highlight(at indexSpecified: Int) {
+    switch currentLayout {
+      case .horizontal: highlightHorizontal(at: indexSpecified)
+      case .vertical: highlightVertical(at: indexSpecified)
+      @unknown default: break
+    }
+  }
+}
+
+// MARK: - Private Functions
+
+extension CandidatePool {
+  private enum VerticalDirection {
+    case up
+    case down
+  }
+
+  private enum HorizontalDirection {
+    case left
+    case right
+  }
+
+  private var rangeForLastHorizontalPageBlanked: Range<Int> {
+    0..<(maxRowsPerPage - rangeForCurrentHorizontalPage.count)
+  }
+
+  private var rangeForLastVerticalPageBlanked: Range<Int> {
+    0..<(maxColumnsPerPage - rangeForCurrentVerticalPage.count)
+  }
+
+  private var rangeForCurrentHorizontalPage: Range<Int> {
+    currentRowNumber..<min(candidateRows.count, currentRowNumber + maxRowsPerPage)
+  }
+
+  private var rangeForCurrentVerticalPage: Range<Int> {
+    currentColumnNumber..<min(candidateColumns.count, currentColumnNumber + maxColumnsPerPage)
+  }
+
+  private func selectNewNeighborRow(direction: VerticalDirection) {
     let currentSubIndex = candidateDataAll[highlightedIndex].subIndex
     var result = currentSubIndex
     switch direction {
@@ -151,7 +239,7 @@ public class CandidatePool {
     }
   }
 
-  public func selectNewNeighborColumn(direction: HorizontalDirection) {
+  private func selectNewNeighborColumn(direction: HorizontalDirection) {
     let currentSubIndex = candidateDataAll[highlightedIndex].subIndex
     switch direction {
       case .left:
@@ -180,7 +268,7 @@ public class CandidatePool {
     }
   }
 
-  public func highlightHorizontal(at indexSpecified: Int) {
+  private func highlightHorizontal(at indexSpecified: Int) {
     var indexSpecified = indexSpecified
     highlightedIndex = indexSpecified
     if !(0..<candidateDataAll.count).contains(highlightedIndex) {
@@ -213,7 +301,7 @@ public class CandidatePool {
     }
   }
 
-  public func highlightVertical(at indexSpecified: Int) {
+  private func highlightVertical(at indexSpecified: Int) {
     var indexSpecified = indexSpecified
     highlightedIndex = indexSpecified
     if !(0..<candidateDataAll.count).contains(highlightedIndex) {
