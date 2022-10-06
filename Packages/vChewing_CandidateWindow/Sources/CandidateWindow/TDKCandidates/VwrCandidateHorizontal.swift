@@ -24,7 +24,7 @@ struct CandidatePoolViewUIHorizontal_Previews: PreviewProvider {
   static var thePool: CandidatePool {
     let result = CandidatePool(candidates: testCandidates, rowCapacity: 6)
     // 下一行待解決：無論這裡怎麼指定高亮選中項是哪一筆，其所在行都得被卷動到使用者眼前。
-    result.highlightHorizontal(at: 5)
+    result.highlight(at: 5)
     return result
   }
 
@@ -53,9 +53,9 @@ public struct VwrCandidateHorizontal: View {
     VStack(alignment: .leading, spacing: 0) {
       ScrollView(.vertical, showsIndicators: false) {
         VStack(alignment: .leading, spacing: 1.6) {
-          ForEach(thePool.rangeForCurrentHorizontalPage, id: \.self) { rowIndex in
+          ForEach(thePool.rangeForCurrentPage, id: \.self) { rowIndex in
             HStack(spacing: 10) {
-              ForEach(Array(thePool.candidateRows[rowIndex]), id: \.self) { currentCandidate in
+              ForEach(Array(thePool.candidateLines[rowIndex]), id: \.self) { currentCandidate in
                 currentCandidate.attributedStringForSwiftUI.fixedSize()
                   .frame(
                     maxWidth: .infinity,
@@ -71,8 +71,8 @@ public struct VwrCandidateHorizontal: View {
             ).id(rowIndex)
             Divider()
           }
-          if thePool.maximumRowsPerPage - thePool.rangeForCurrentHorizontalPage.count > 0 {
-            ForEach(thePool.rangeForLastHorizontalPageBlanked, id: \.self) { _ in
+          if thePool.maxLinesPerPage - thePool.rangeForCurrentPage.count > 0 {
+            ForEach(thePool.rangeForLastPageBlanked, id: \.self) { _ in
               HStack(spacing: 0) {
                 thePool.blankCell.attributedStringForSwiftUI
                   .frame(maxWidth: .infinity, alignment: .topLeading)
