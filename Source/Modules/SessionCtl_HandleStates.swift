@@ -93,9 +93,8 @@ extension SessionCtl {
 
   /// 針對受 .NotEmpty() 管轄的非空狀態，在組字區內顯示游標。
   func setInlineDisplayWithCursor() {
-    guard let client = client() else { return }
     if state.type == .ofAssociates {
-      client.setMarkedText(
+      doSetMarkedText(
         state.data.attributedStringPlaceholder, selectionRange: NSRange(location: 0, length: 0),
         replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
       )
@@ -106,7 +105,7 @@ extension SessionCtl {
       /// 所謂選區「selectionRange」，就是「可見游標位置」的位置，只不過長度
       /// 是 0 且取代範圍（replacementRange）為「NSNotFound」罷了。
       /// 也就是說，內文組字區該在哪裡出現，得由客體軟體來作主。
-      client.setMarkedText(
+      doSetMarkedText(
         attributedStringSecured.0, selectionRange: attributedStringSecured.1,
         replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
       )
@@ -120,8 +119,7 @@ extension SessionCtl {
   /// 在處理不受 .NotEmpty() 管轄的狀態時可能要用到的函式，會清空螢幕上顯示的內文組字區。
   /// 當 setInlineDisplayWithCursor() 在錯誤的狀態下被呼叫時，也會觸發這個函式。
   private func clearInlineDisplay() {
-    guard let theClient = client() else { return }
-    theClient.setMarkedText(
+    doSetMarkedText(
       "", selectionRange: NSRange(location: 0, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
     )
@@ -135,8 +133,28 @@ extension SessionCtl {
     if buffer.isEmpty {
       return
     }
-    client.insertText(
-      buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
-    )
+    if let myID = Bundle.main.bundleIdentifier, let clientID = client.bundleIdentifier(), myID == clientID {
+      DispatchQueue.main.async {
+        client.insertText(
+          buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
+        )
+      }
+    } else {
+      client.insertText(
+        buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
+      )
+    }
+  }
+
+  /// 把 setMarkedText 包裝一下，按需啟用 GCD。
+  func doSetMarkedText(_ string: Any!, selectionRange: NSRange, replacementRange: NSRange) {
+    guard let client = client() else { return }
+    if let myID = Bundle.main.bundleIdentifier, let clientID = client.bundleIdentifier(), myID == clientID {
+      DispatchQueue.main.async {
+        client.setMarkedText(string, selectionRange: selectionRange, replacementRange: replacementRange)
+      }
+    } else {
+      client.setMarkedText(string, selectionRange: selectionRange, replacementRange: replacementRange)
+    }
   }
 }
