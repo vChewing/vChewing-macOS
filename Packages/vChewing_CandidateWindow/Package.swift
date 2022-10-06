@@ -13,13 +13,15 @@ let package = Package(
     )
   ],
   dependencies: [
-    .package(path: "../vChewing_Shared")
+    .package(path: "../vChewing_Shared"),
+    .package(path: "../ShapsBenkau_SwiftUIBackports"),
   ],
   targets: [
     .target(
       name: "CandidateWindow",
       dependencies: [
-        .product(name: "Shared", package: "vChewing_Shared")
+        .product(name: "Shared", package: "vChewing_Shared"),
+        .product(name: "SwiftUIBackports", package: "ShapsBenkau_SwiftUIBackports"),
       ]
     ),
     .testTarget(
