@@ -105,7 +105,7 @@ extension SessionCtl {
     // 使 NSEvent 自翻譯，這樣可以讓 Emacs NSEvent 變成標準 NSEvent。
     if eventToDeal.isEmacsKey {
       let verticalProcessing = (state.isCandidateContainer) ? state.isVerticalCandidateWindow : state.isVerticalTyping
-      eventToDeal = eventToDeal.convertFromEmacKeyEvent(isVerticalContext: verticalProcessing)
+      eventToDeal = eventToDeal.convertFromEmacsKeyEvent(isVerticalContext: verticalProcessing)
     }
 
     // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
