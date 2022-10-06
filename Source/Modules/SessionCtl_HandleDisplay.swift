@@ -9,7 +9,6 @@
 import CandidateWindow
 import NSAttributedTextView
 import Shared
-import TDKCandidateBackports
 
 // MARK: - Tooltip Display and Candidate Display Methods
 
@@ -104,14 +103,10 @@ extension SessionCtl {
         ? .vertical
         : .horizontal)
 
-    if #available(macOS 12, *) {
+    if #available(macOS 10.15, *) {
       Self.ctlCandidateCurrent =
         PrefMgr.shared.useIMKCandidateWindow
         ? CtlCandidateIMK(candidateLayout) : CtlCandidateTDK(candidateLayout)
-    } else if #available(macOS 10.15, *) {
-      Self.ctlCandidateCurrent =
-        PrefMgr.shared.useIMKCandidateWindow
-        ? CtlCandidateIMK(candidateLayout) : CtlCandidateTDKBackports(candidateLayout)
     } else {
       Self.ctlCandidateCurrent = CtlCandidateIMK(candidateLayout)
     }
