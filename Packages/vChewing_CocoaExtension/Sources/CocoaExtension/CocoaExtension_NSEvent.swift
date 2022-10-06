@@ -44,7 +44,7 @@ extension NSEvent {
   /// 自 Emacs 熱鍵的 NSEvent 翻譯回標準 NSEvent。失敗的話則會返回原始 NSEvent 自身。
   /// - Parameter isVerticalTyping: 是否按照縱排來操作。
   /// - Returns: 翻譯結果。失敗的話則返回翻譯原文。
-  public func convertFromEmacKeyEvent(isVerticalContext: Bool) -> NSEvent {
+  public func convertFromEmacsKeyEvent(isVerticalContext: Bool) -> NSEvent {
     guard isEmacsKey else { return self }
     let newKeyCode: UInt16 = {
       switch isVerticalContext {
