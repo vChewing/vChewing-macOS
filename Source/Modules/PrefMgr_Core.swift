@@ -16,6 +16,9 @@ public class PrefMgr: PrefMgrProtocol {
   public static let kDefaultCandidateKeys = "123456789"
   public static let kDefaultBasicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
   public static let kDefaultAlphanumericalKeyboardLayout = "com.apple.keylayout.ABC"
+  public static let kDefaultClientsIMKTextInputIncapable: [String] = [
+    "com.valvesoftware.steam", "jp.naver.line.mac",
+  ]
 
   // MARK: - Settings (Tier 1)
 
@@ -124,7 +127,7 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kAlwaysShowTooltipTextsHorizontally.rawValue, defaultValue: false)
   public var alwaysShowTooltipTextsHorizontally: Bool
 
-  @AppProperty(key: UserDef.kClientsIMKTextInputIncapable.rawValue, defaultValue: ["com.valvesoftware.steam"])
+  @AppProperty(key: UserDef.kClientsIMKTextInputIncapable.rawValue, defaultValue: kDefaultClientsIMKTextInputIncapable)
   public var clientsIMKTextInputIncapable: [String]
 
   @AppProperty(key: UserDef.kOnlyLoadFactoryLangModelsIfNeeded.rawValue, defaultValue: true)
