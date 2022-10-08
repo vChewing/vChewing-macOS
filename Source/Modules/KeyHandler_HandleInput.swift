@@ -176,7 +176,12 @@ extension KeyHandler {
           )
         }
       }
-      stateCallback(buildCandidate(state: state))
+      let candidateState: IMEStateProtocol = buildCandidate(state: state)
+      if candidateState.candidates.isEmpty {
+        errorCallback("3572F238")
+      } else {
+        stateCallback(candidateState)
+      }
       return true
     }
 
@@ -289,7 +294,12 @@ extension KeyHandler {
             var inputting = buildInputtingState
             inputting.textToCommit = textToCommit
             stateCallback(inputting)
-            stateCallback(buildCandidate(state: inputting))
+            let candidateState = buildCandidate(state: inputting)
+            if candidateState.candidates.isEmpty {
+              errorCallback("B5127D8A")
+            } else {
+              stateCallback(candidateState)
+            }
           } else {  // 不要在注音沒敲完整的情況下叫出統合符號選單。
             errorCallback("17446655")
           }

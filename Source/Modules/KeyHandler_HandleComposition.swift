@@ -126,23 +126,25 @@ extension KeyHandler {
 
       /// 逐字選字模式的處理。
       if prefs.useSCPCTypingMode {
-        let candidateState: IMEState = buildCandidate(state: inputting)
-        if candidateState.candidates.count == 1, let firstCandidate = candidateState.candidates.first {
-          let reading: String = firstCandidate.0
-          let text: String = firstCandidate.1
-          stateCallback(IMEState.ofCommitting(textToCommit: text))
+        let candidateState: IMEStateProtocol = buildCandidate(state: inputting)
+        switch candidateState.candidates.count {
+          case 2...: stateCallback(candidateState)
+          case 1:
+            let firstCandidate = candidateState.candidates.first!  // 一定會有，所以強制拆包也無妨。
+            let reading: String = firstCandidate.0
+            let text: String = firstCandidate.1
+            stateCallback(IMEState.ofCommitting(textToCommit: text))
 
-          if !prefs.associatedPhrasesEnabled {
-            stateCallback(IMEState.ofEmpty())
-          } else {
-            let associatedPhrases =
-              buildAssociatePhraseState(
-                withPair: .init(key: reading, value: text)
-              )
-            stateCallback(associatedPhrases.candidates.isEmpty ? IMEState.ofEmpty() : associatedPhrases)
-          }
-        } else {
-          stateCallback(candidateState)
+            if !prefs.associatedPhrasesEnabled {
+              stateCallback(IMEState.ofEmpty())
+            } else {
+              let associatedPhrases =
+                buildAssociatePhraseState(
+                  withPair: .init(key: reading, value: text)
+                )
+              stateCallback(associatedPhrases.candidates.isEmpty ? IMEState.ofEmpty() : associatedPhrases)
+            }
+          default: break
         }
       }
       // 將「這個按鍵訊號已經被輸入法攔截處理了」的結果藉由 SessionCtl 回報給 IMK。

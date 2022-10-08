@@ -18,7 +18,7 @@ extension KeyHandler {
   // MARK: - 構築狀態（State Building）
 
   /// 生成「正在輸入」狀態。相關的內容會被拿給狀態機械用來處理在電腦螢幕上顯示的內容。
-  public var buildInputtingState: IMEState {
+  public var buildInputtingState: IMEStateProtocol {
     /// 「更新內文組字區 (Update the composing buffer)」是指要求客體軟體將組字緩衝區的內容
     /// 換成由此處重新生成的組字字串（NSAttributeString，否則會不顯示）。
     var displayTextSegments: [String] = compositor.walkedNodes.values
@@ -85,11 +85,10 @@ extension KeyHandler {
   /// 拿著給定的候選字詞陣列資料內容，切換至選字狀態。
   /// - Parameters:
   ///   - currentState: 當前狀態。
-  ///   - isTypingVertical: 是否縱排輸入？
   /// - Returns: 回呼一個新的選詞狀態，來就給定的候選字詞陣列資料內容顯示選字窗。
   func buildCandidate(
     state currentState: IMEStateProtocol
-  ) -> IMEState {
+  ) -> IMEStateProtocol {
     IMEState.ofCandidates(
       candidates: getCandidatesArray(fixOrder: prefs.useFixecCandidateOrderOnSelection),
       displayTextSegments: compositor.walkedNodes.values,
@@ -113,7 +112,7 @@ extension KeyHandler {
   /// - Returns: 回呼一個新的聯想詞狀態，來就給定的聯想詞陣列資料內容顯示選字窗。
   func buildAssociatePhraseState(
     withPair pair: Megrez.Compositor.KeyValuePaired
-  ) -> IMEState {
+  ) -> IMEStateProtocol {
     IMEState.ofAssociates(
       candidates: buildAssociatePhraseArray(withPair: pair))
   }
@@ -232,7 +231,6 @@ extension KeyHandler {
   /// 標點輸入的處理。
   /// - Parameters:
   ///   - customPunctuation: 自訂標點索引鍵頭。
-  ///   - isTypingVertical: 是否縱排輸入？
   ///   - stateCallback: 狀態回呼。
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
@@ -265,16 +263,17 @@ extension KeyHandler {
     guard prefs.useSCPCTypingMode, composer.isEmpty else { return true }
 
     let candidateState = buildCandidate(state: inputting)
-    if candidateState.candidates.count == 1 {
-      clear()  // 這句不要砍，因為下文可能會回呼 candidateState。
-      if let candidateToCommit: (String, String) = candidateState.candidates.first, !candidateToCommit.1.isEmpty {
-        stateCallback(IMEState.ofCommitting(textToCommit: candidateToCommit.1))
-        stateCallback(IMEState.ofEmpty())
-      } else {
-        stateCallback(candidateState)
-      }
-    } else {
-      stateCallback(candidateState)
+    switch candidateState.candidates.count {
+      case 2...: stateCallback(candidateState)
+      case 1:
+        clear()  // 這句不要砍，因為下文可能會回呼 candidateState。
+        if let candidateToCommit: (String, String) = candidateState.candidates.first, !candidateToCommit.1.isEmpty {
+          stateCallback(IMEState.ofCommitting(textToCommit: candidateToCommit.1))
+          stateCallback(IMEState.ofEmpty())
+        } else {
+          stateCallback(candidateState)
+        }
+      default: errorCallback("8DA4096E")
     }
     return true
   }
