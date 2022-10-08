@@ -116,7 +116,11 @@ public class CandidatePool {
   ///   - columnCapacity: (第一縱列的最大候選字詞數量, 陣列畫面展開之後的每一縱列的最大候選字詞數量)。
   ///   - selectionKeys: 選字鍵。
   ///   - locale: 區域編碼。例：「zh-Hans」或「zh-Hant」。
-  public init(candidates: [String], columnCapacity: Int, selectionKeys: String = "123456789", locale: String = "") {
+  public init(
+    candidates: [String], columnCapacity: Int, columns: Int = 3, selectionKeys: String = "123456789",
+    locale: String = ""
+  ) {
+    maxColumnsPerPage = max(1, columns)
     maxColumnCapacity = max(1, columnCapacity)
     self.selectionKeys = selectionKeys
     candidateDataAll = candidates.map { .init(key: "0", displayedText: $0) }
@@ -143,7 +147,10 @@ public class CandidatePool {
   ///   - rowCapacity: (第一橫行的最大候選字詞數量, 陣列畫面展開之後的每一橫行的最大候選字詞數量)。
   ///   - selectionKeys: 選字鍵。
   ///   - locale: 區域編碼。例：「zh-Hans」或「zh-Hant」。
-  public init(candidates: [String], rowCapacity: Int, selectionKeys: String = "123456789", locale: String = "") {
+  public init(
+    candidates: [String], rowCapacity: Int, rows: Int = 3, selectionKeys: String = "123456789", locale: String = ""
+  ) {
+    maxRowsPerPage = max(1, rows)
     maxRowCapacity = max(1, rowCapacity)
     self.selectionKeys = selectionKeys
     candidateDataAll = candidates.map { .init(key: "0", displayedText: $0) }
