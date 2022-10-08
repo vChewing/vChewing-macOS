@@ -105,11 +105,13 @@ public struct VwrCandidateHorizontalBackports: View {
             .lineLimit(
               1)
         }
-        .padding(6).foregroundColor(
+        .padding(7).foregroundColor(
           tooltip.isEmpty && colorScheme == .light ? Color(white: 0.1) : Color(white: 0.9)
         )
       }
+      .fixedSize(horizontal: false, vertical: true)
     }
     .frame(minWidth: thePool.maxWindowWidth, maxWidth: thePool.maxWindowWidth)
+    .cornerRadius(10)
   }
 }
