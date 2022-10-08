@@ -105,10 +105,11 @@ public struct VwrCandidateVertical: View {
             .lineLimit(
               1)
         }
-        .padding(6).foregroundColor(
+        .padding(7).foregroundColor(
           .init(nsColor: tooltip.isEmpty ? .controlTextColor : .selectedMenuItemTextColor.withAlphaComponent(0.9))
         )
       }
     }
+    .cornerRadius(10)
   }
 }

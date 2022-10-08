@@ -100,11 +100,13 @@ public struct VwrCandidateHorizontal: View {
             .lineLimit(
               1)
         }
-        .padding(6).foregroundColor(
+        .padding(7).foregroundColor(
           .init(nsColor: tooltip.isEmpty ? .controlTextColor : .selectedMenuItemTextColor.withAlphaComponent(0.9))
         )
       }
+      .fixedSize(horizontal: false, vertical: true)
     }
     .frame(minWidth: thePool.maxWindowWidth, maxWidth: thePool.maxWindowWidth)
+    .cornerRadius(10)
   }
 }
