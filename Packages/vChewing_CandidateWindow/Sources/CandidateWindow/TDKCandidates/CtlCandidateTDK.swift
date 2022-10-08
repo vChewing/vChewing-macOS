@@ -18,20 +18,20 @@ public class CtlCandidateTDK: CtlCandidate {
 
   @available(macOS 12, *)
   public var theViewHorizontal: VwrCandidateHorizontal {
-    .init(controller: self, thePool: thePoolHorizontal, hint: hint)
+    .init(controller: self, thePool: thePoolHorizontal, tooltip: tooltip)
   }
 
   @available(macOS 12, *)
   public var theViewVertical: VwrCandidateVertical {
-    .init(controller: self, thePool: thePoolVertical, hint: hint)
+    .init(controller: self, thePool: thePoolVertical, tooltip: tooltip)
   }
 
   public var theViewHorizontalBackports: VwrCandidateHorizontalBackports {
-    .init(controller: self, thePool: thePoolHorizontal, hint: hint)
+    .init(controller: self, thePool: thePoolHorizontal, tooltip: tooltip)
   }
 
   public var theViewVerticalBackports: VwrCandidateVerticalBackports {
-    .init(controller: self, thePool: thePoolVertical, hint: hint)
+    .init(controller: self, thePool: thePoolVertical, tooltip: tooltip)
   }
 
   public var thePool: CandidatePool {
