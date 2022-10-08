@@ -66,7 +66,6 @@ public enum UserDef: String, CaseIterable {
   case kShiftKeyAccommodationBehavior = "ShiftKeyAccommodationBehavior"
 
   case kCandidateTextFontName = "CandidateTextFontName"
-  case kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
   case kCandidateKeys = "CandidateKeys"
 
   case kAssociatedPhrasesEnabled = "AssociatedPhrasesEnabled"
