@@ -10,10 +10,8 @@ import Cocoa
 
 public protocol CtlCandidateDelegate: AnyObject {
   func candidatePairs(conv: Bool) -> [(String, String)]
-  func candidatePairAt(_ index: Int) -> (String, String)
   func candidatePairSelected(at index: Int)
   func candidates(_ sender: Any!) -> [Any]!
-  func buzz()
   var selectionKeys: String { get }
 }
 

@@ -57,10 +57,6 @@ extension SessionCtl: CtlCandidateDelegate {
     PrefMgr.shared.useIMKCandidateWindow ? "123456789" : PrefMgr.shared.candidateKeys
   }
 
-  func buzz() {
-    IMEApp.buzz()
-  }
-
   func candidatePairs(conv: Bool = false) -> [(String, String)] {
     if !state.isCandidateContainer || state.candidates.isEmpty { return [] }
     if !conv || PrefMgr.shared.cns11643Enabled || state.candidates[0].0.contains("_punctuation") {
@@ -73,13 +69,6 @@ extension SessionCtl: CtlCandidateDelegate {
       return (theCandidatePair.0, result)
     }
     return convertedCandidates
-  }
-
-  func candidatePairAt(_ index: Int) -> (String, String) {
-    if state.isCandidateContainer, state.candidates.count > index {
-      return state.candidates[index]
-    }
-    return ("", "")
   }
 
   func candidatePairSelected(at index: Int) {
