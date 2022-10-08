@@ -19,6 +19,7 @@ import Tekkon
 
 /// KeyHandler 委任協定
 public protocol KeyHandlerDelegate {
+  var selectionKeys: String { get }
   var clientBundleIdentifier: String { get }
   func candidateController() -> CtlCandidateProtocol
   func candidateSelectionCalledByKeyHandler(at index: Int)
