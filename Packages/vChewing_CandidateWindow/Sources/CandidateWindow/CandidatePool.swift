@@ -70,13 +70,25 @@ public class CandidatePool {
   }
 
   public var maxLinesPerPage: Int {
-    switch currentLayout {
-      case .horizontal:
-        return maxRowsPerPage
-      case .vertical:
-        return maxColumnsPerPage
-      @unknown default:
-        return 0
+    get {
+      switch currentLayout {
+        case .horizontal:
+          return maxRowsPerPage
+        case .vertical:
+          return maxColumnsPerPage
+        @unknown default:
+          return 0
+      }
+    }
+    set {
+      switch currentLayout {
+        case .horizontal:
+          maxRowsPerPage = newValue
+        case .vertical:
+          maxColumnsPerPage = newValue
+        @unknown default:
+          return
+      }
     }
   }
 
