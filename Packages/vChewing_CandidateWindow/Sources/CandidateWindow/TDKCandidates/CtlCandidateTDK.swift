@@ -63,7 +63,6 @@ public class CtlCandidateTDK: CtlCandidate {
     panel.hasShadow = true
     panel.isOpaque = false
     panel.backgroundColor = NSColor.clear
-
     contentRect.origin = NSPoint.zero
 
     super.init(layout)
@@ -104,33 +103,34 @@ public class CtlCandidateTDK: CtlCandidate {
   }
 
   override open func updateDisplay() {
+    guard let window = window else { return }
     switch currentLayout {
       case .horizontal:
         DispatchQueue.main.async { [self] in
           if #available(macOS 12, *) {
-            let newView = NSHostingView(rootView: theViewHorizontal)
+            let newView = NSHostingView(rootView: theViewHorizontal.edgesIgnoringSafeArea(.top))
             let newSize = newView.fittingSize
-            window?.contentView = newView
-            window?.setContentSize(newSize)
+            window.contentView = newView
+            window.setContentSize(newSize)
           } else {
-            let newView = NSHostingView(rootView: theViewHorizontalBackports)
+            let newView = NSHostingView(rootView: theViewHorizontalBackports.edgesIgnoringSafeArea(.top))
             let newSize = newView.fittingSize
-            window?.contentView = newView
-            window?.setContentSize(newSize)
+            window.contentView = newView
+            window.setContentSize(newSize)
           }
         }
       case .vertical:
         DispatchQueue.main.async { [self] in
           if #available(macOS 12, *) {
-            let newView = NSHostingView(rootView: theViewVertical)
+            let newView = NSHostingView(rootView: theViewVertical.edgesIgnoringSafeArea(.top))
             let newSize = newView.fittingSize
-            window?.contentView = newView
-            window?.setContentSize(newSize)
+            window.contentView = newView
+            window.setContentSize(newSize)
           } else {
-            let newView = NSHostingView(rootView: theViewVerticalBackports)
+            let newView = NSHostingView(rootView: theViewVerticalBackports.edgesIgnoringSafeArea(.top))
             let newSize = newView.fittingSize
-            window?.contentView = newView
-            window?.setContentSize(newSize)
+            window.contentView = newView
+            window.setContentSize(newSize)
           }
         }
       @unknown default:

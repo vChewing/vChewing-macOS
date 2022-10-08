@@ -110,10 +110,11 @@ public struct VwrCandidateVerticalBackports: View {
             .lineLimit(
               1)
         }
-        .padding(6).foregroundColor(
+        .padding(7).foregroundColor(
           tooltip.isEmpty && colorScheme == .light ? Color(white: 0.1) : Color(white: 0.9)
         )
       }
     }
+    .cornerRadius(10)
   }
 }
