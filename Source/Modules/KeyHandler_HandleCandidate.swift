@@ -232,8 +232,10 @@ extension KeyHandler {
     let match: String =
       (state.type == .ofAssociates) ? input.inputTextIgnoringModifiers ?? "" : input.text
 
-    for j in 0..<PrefMgr.shared.candidateKeys.count {
-      let label = PrefMgr.shared.candidateKeys.charComponents[j]
+    let selectionKeys = delegate?.selectionKeys ?? PrefMgr.shared.candidateKeys
+
+    for j in 0..<selectionKeys.count {
+      let label = selectionKeys.charComponents[j]
       if match.compare(label, options: .caseInsensitive, range: nil, locale: .current) == .orderedSame {
         index = j
         break

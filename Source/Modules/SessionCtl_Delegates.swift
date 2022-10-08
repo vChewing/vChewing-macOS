@@ -53,7 +53,9 @@ extension SessionCtl: KeyHandlerDelegate {
 // MARK: - Candidate Controller Delegate
 
 extension SessionCtl: CtlCandidateDelegate {
-  var selectionKeys: String { PrefMgr.shared.candidateKeys }
+  var selectionKeys: String {
+    PrefMgr.shared.useIMKCandidateWindow ? "123456789" : PrefMgr.shared.candidateKeys
+  }
 
   func buzz() {
     IMEApp.buzz()
