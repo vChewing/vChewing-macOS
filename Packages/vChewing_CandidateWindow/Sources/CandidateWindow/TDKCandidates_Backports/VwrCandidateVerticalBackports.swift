@@ -54,7 +54,7 @@ public struct VwrCandidateVerticalBackports: View {
     VStack(alignment: .leading, spacing: 0) {
       ScrollView(.horizontal, showsIndicators: false) {
         HStack(alignment: .top, spacing: 10) {
-          ForEach(thePool.rangeForCurrentPage, id: \.self) { columnIndex in
+          ForEach(Array(thePool.rangeForCurrentPage.enumerated()), id: \.offset) { loopIndex, columnIndex in
             VStack(alignment: .leading, spacing: 0) {
               ForEach(Array(thePool.candidateLines[columnIndex]), id: \.self) { currentCandidate in
                 HStack(spacing: 0) {
@@ -71,10 +71,12 @@ public struct VwrCandidateVerticalBackports: View {
               minWidth: Double(CandidateCellData.unifiedSize * 5),
               alignment: .topLeading
             ).id(columnIndex)
-            Divider()
+            if loopIndex < thePool.maxLinesPerPage - 1 {
+              Divider()
+            }
           }
           if thePool.maxLinesPerPage - thePool.rangeForCurrentPage.count > 0 {
-            ForEach(thePool.rangeForLastPageBlanked, id: \.self) { _ in
+            ForEach(Array(thePool.rangeForLastPageBlanked.enumerated()), id: \.offset) { loopIndex, _ in
               VStack(alignment: .leading, spacing: 0) {
                 ForEach(0..<thePool.maxLineCapacity, id: \.self) { _ in
                   thePool.blankCell.attributedStringForSwiftUIBackports.fixedSize()
@@ -86,7 +88,9 @@ public struct VwrCandidateVerticalBackports: View {
                 maxWidth: .infinity,
                 alignment: .topLeading
               )
-              Divider()
+              if loopIndex < thePool.maxLinesPerPage - thePool.rangeForCurrentPage.count - 1 {
+                Divider()
+              }
             }
           }
         }
