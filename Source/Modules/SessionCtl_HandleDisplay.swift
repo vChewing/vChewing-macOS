@@ -111,35 +111,12 @@ extension SessionCtl {
       Self.ctlCandidateCurrent = CtlCandidateIMK(candidateLayout)
     }
 
-    // set the attributes for the candidate panel (which uses NSAttributedString)
-    let textSize = PrefMgr.shared.candidateListTextSize
-    let minimumKeyLabelSize: Double = 10
-    let keyLabelSize = max(textSize / 2, minimumKeyLabelSize)
-
-    func labelFont(name: String?, size: Double) -> NSFont {
-      if let name = name {
-        return NSFont(name: name, size: size) ?? NSFont.systemFont(ofSize: size)
-      }
-      return NSFont.systemFont(ofSize: size)
-    }
-
-    Self.ctlCandidateCurrent.keyLabelFont = labelFont(
-      name: PrefMgr.shared.candidateKeyLabelFontName, size: keyLabelSize
-    )
     Self.ctlCandidateCurrent.candidateFont = Self.candidateFont(
-      name: PrefMgr.shared.candidateTextFontName, size: textSize
+      name: PrefMgr.shared.candidateTextFontName, size: PrefMgr.shared.candidateListTextSize
     )
-
-    let candidateKeys = PrefMgr.shared.candidateKeys
-    let keyLabels =
-      candidateKeys.count > 4 ? Array(candidateKeys) : Array(CandidateKey.defaultKeys)
-    let keyLabelSuffix = state.type == .ofAssociates ? "^" : ""
-    Self.ctlCandidateCurrent.keyLabels = keyLabels.map {
-      CandidateCellData(key: String($0), displayedText: String($0) + keyLabelSuffix)
-    }
 
     if state.type == .ofAssociates {
-      Self.ctlCandidateCurrent.hint = NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
+      Self.ctlCandidateCurrent.tooltip = NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
     }
 
     Self.ctlCandidateCurrent.useLangIdentifier = PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier
