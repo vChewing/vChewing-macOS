@@ -1,4 +1,5 @@
 "vChewing" = "威注音输入法";
+"Invalid Selection Keys." = "选字键参数资料值不规范。";
 "Alphanumerical Input Mode" = "英数输入模式";
 "Chinese Input Mode" = "中文输入模式";
 "Please enter the client app bundle identifier(s) you want to register." = "请键入您要登记的客体应用的唯一标帜（Bundle Identifier）。";
@@ -51,10 +52,9 @@
 "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "「%@」已存在：\n　敲 Enter 以升权、敲 Shift+Command+Enter 以降权；\n　敲 BackSpace 或 Delete 以排除。";
 "Edit Phrase Replacement Table…" = "编辑语汇置换表…";
 "Use Phrase Replacement" = "使用语汇置换";
-"Candidate keys can only contain ASCII characters like alphanumericals." = "选字键只能是英数等 ASCII 字符。";
+"Candidate keys can only contain printable ASCII characters like alphanumericals." = "选字键只能是英数等 ASCII 可列印字符。";
 "Candidate keys cannot contain space." = "选字键不得包含空格。";
-"There should not be duplicated keys." = "选字键不得重复。";
-"Please specify at least 6 candidate keys." = "请至少指定 6 个选字键。";
+"Minimum 6 candidate keys allowed." = "请至少指定 6 个选字键。";
 "Maximum 9 candidate keys allowed." = "选字键最多只能指定 9 个。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 语汇置换功能已启用，会波及语汇自订。";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 无法处理：组字区字数与读音数不对应。";

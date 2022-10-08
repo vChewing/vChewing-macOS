@@ -192,58 +192,56 @@ public enum CandidateKey {
     "123456789", "234567890", "QWERTYUIO", "QWERTASDF", "ASDFGHJKL", "ASDFZXCVB",
   ]
 
-  public enum ErrorType: Error, LocalizedError {
-    case empty
+  /// 僅列舉那些需要專門檢查才能發現的那種無法自動排除的錯誤。
+  public enum ValidationError {
+    case noError
     case invalidCharacters
-    case containSpace
-    case duplicatedCharacters
-    case tooShort
-    case tooLong
+    case countMismatch
 
-    public var errorDescription: String {
+    public var description: String {
       switch self {
-        case .empty:
-          return NSLocalizedString("Candidates keys cannot be empty.", comment: "")
         case .invalidCharacters:
-          return NSLocalizedString(
-            "Candidate keys can only contain ASCII characters like alphanumericals.",
-            comment: ""
-          )
-        case .containSpace:
-          return NSLocalizedString("Candidate keys cannot contain space.", comment: "")
-        case .duplicatedCharacters:
-          return NSLocalizedString("There should not be duplicated keys.", comment: "")
-        case .tooShort:
-          return NSLocalizedString(
-            "Please specify at least 6 candidate keys.", comment: ""
-          )
-        case .tooLong:
-          return NSLocalizedString("Maximum 9 candidate keys allowed.", comment: "")
+          return "- "
+            + NSLocalizedString(
+              "Candidate keys can only contain printable ASCII characters like alphanumericals.",
+              comment: ""
+            ) + "\n" + "- " + NSLocalizedString("Candidate keys cannot contain space.", comment: "")
+        case .countMismatch:
+          return "- "
+            + NSLocalizedString(
+              "Minimum 6 candidate keys allowed.", comment: ""
+            ) + "\n" + "- " + NSLocalizedString("Maximum 9 candidate keys allowed.", comment: "")
+        case .noError:
+          return ""
       }
     }
   }
 
-  public static func validate(keys candidateKeys: String) throws {
-    let trimmed = candidateKeys.trimmingCharacters(in: .whitespacesAndNewlines)
-    if trimmed.isEmpty {
-      throw CandidateKey.ErrorType.empty
+  /// 校驗選字鍵參數資料值的合法性。
+  /// - Remark: 傳入的參數值得事先做過下述處理：
+  /// ```
+  /// .trimmingCharacters(in: .whitespacesAndNewlines).deduplicated
+  /// ```
+  /// - Parameter candidateKeys: 傳入的參數值
+  /// - Returns: 返回 nil 的話，證明沒有錯誤；否則會返回錯誤描述訊息。
+  public static func validate(keys candidateKeys: String) -> String? {
+    var result = ValidationError.noError
+    charValidityCheck: for neta in candidateKeys {
+      if String(neta) == " " {
+        result = CandidateKey.ValidationError.invalidCharacters
+        break charValidityCheck
+      }
+      for subNeta in neta.unicodeScalars {
+        if !subNeta.isPrintableASCII {
+          result = CandidateKey.ValidationError.invalidCharacters
+          break charValidityCheck
+        }
+      }
     }
-    if !trimmed.canBeConverted(to: .ascii) {
-      throw CandidateKey.ErrorType.invalidCharacters
+    if !(6...9).contains(candidateKeys.count) {
+      result = CandidateKey.ValidationError.countMismatch
     }
-    if trimmed.contains(" ") {
-      throw CandidateKey.ErrorType.containSpace
-    }
-    if trimmed.count < 6 {
-      throw CandidateKey.ErrorType.tooShort
-    }
-    if trimmed.count > 9 {
-      throw CandidateKey.ErrorType.tooLong
-    }
-    let set = Set(Array(trimmed))
-    if set.count != trimmed.count {
-      throw CandidateKey.ErrorType.duplicatedCharacters
-    }
+    return result == ValidationError.noError ? nil : result.description
   }
 }
 
