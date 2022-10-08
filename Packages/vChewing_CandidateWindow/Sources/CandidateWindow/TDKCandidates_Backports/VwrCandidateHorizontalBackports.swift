@@ -39,7 +39,7 @@ public struct VwrCandidateHorizontalBackports: View {
   @Environment(\.colorScheme) var colorScheme
   public var controller: CtlCandidateTDK
   @State public var thePool: CandidatePool
-  @State public var hint: String = ""
+  @State public var tooltip: String = ""
 
   private var positionLabel: String {
     (thePool.highlightedIndex + 1).description + "/" + thePool.candidateDataAll.count.description
@@ -93,20 +93,20 @@ public struct VwrCandidateHorizontalBackports: View {
       .fixedSize(horizontal: false, vertical: true).padding(5)
       .background(Color(white: colorScheme == .dark ? 0.1 : 1))
       ZStack(alignment: .leading) {
-        if hint.isEmpty {
+        if tooltip.isEmpty {
           Color(white: colorScheme == .dark ? 0.2 : 0.9)
         } else {
           controller.highlightedColorUIBackports
         }
         HStack(alignment: .bottom) {
-          Text(hint).font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold)).lineLimit(1)
+          Text(tooltip).font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold)).lineLimit(1)
           Spacer()
           Text(positionLabel).font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold))
             .lineLimit(
               1)
         }
         .padding(6).foregroundColor(
-          hint.isEmpty && colorScheme == .light ? Color(white: 0.1) : Color(white: 0.9)
+          tooltip.isEmpty && colorScheme == .light ? Color(white: 0.1) : Color(white: 0.9)
         )
       }
     }

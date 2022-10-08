@@ -232,9 +232,9 @@ extension KeyHandler {
     let match: String =
       (state.type == .ofAssociates) ? input.inputTextIgnoringModifiers ?? "" : input.text
 
-    for j in 0..<ctlCandidate.keyLabels.count {
-      let label: CandidateCellData = ctlCandidate.keyLabels[j]
-      if match.compare(label.key, options: .caseInsensitive, range: nil, locale: .current) == .orderedSame {
+    for j in 0..<PrefMgr.shared.candidateKeys.count {
+      let label = PrefMgr.shared.candidateKeys.charComponents[j]
+      if match.compare(label, options: .caseInsensitive, range: nil, locale: .current) == .orderedSame {
         index = j
         break
       }

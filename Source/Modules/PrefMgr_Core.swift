@@ -234,9 +234,6 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kCandidateTextFontName.rawValue, defaultValue: "")
   public var candidateTextFontName: String
 
-  @AppProperty(key: UserDef.kCandidateKeyLabelFontName.rawValue, defaultValue: "")
-  public var candidateKeyLabelFontName: String
-
   @AppProperty(key: UserDef.kCandidateKeys.rawValue, defaultValue: kDefaultCandidateKeys)
   public var candidateKeys: String {
     didSet {

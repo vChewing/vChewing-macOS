@@ -11,7 +11,7 @@ import Shared
 
 /// 威注音自用的 IMKCandidates 型別。因為有用到 bridging header，所以無法弄成 Swift Package。
 public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
-  public var hint: String = ""
+  public var tooltip: String = ""
   public var locale: String = ""
   public var useLangIdentifier: Bool = false
   public var currentLayout: NSUserInterfaceLayoutOrientation = .horizontal
@@ -38,15 +38,6 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
     }
   }
 
-  public var keyLabels: [CandidateCellData] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-    .map {
-      CandidateCellData(key: $0, displayedText: $0)
-    }
-
-  public var keyLabelFont = NSFont.monospacedDigitSystemFont(
-    ofSize: 14, weight: .medium
-  )
-
   public var candidateFont = NSFont.systemFont(ofSize: 16) {
     didSet {
       if #available(macOS 10.14, *) { setFontSize(candidateFont.pointSize) }
@@ -62,11 +53,6 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
       update()
     }
   }
-
-  public var tooltip: String = ""
-
-  var keyCount = 0
-  var displayedCandidates = [String]()
 
   public func specifyLayout(_ layout: NSUserInterfaceLayoutOrientation = .horizontal) {
     currentLayout = layout
@@ -107,22 +93,12 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
     // guard let delegate = delegate else { return }  // 下文無效，所以這句沒用。
     // 既然下述函式無效，那中間這段沒用的也都砍了。
     // setCandidateData(candidates)  // 該函式無效。
-    keyCount = selectionKeys().count
     selectedCandidateIndex = 0
     update()
   }
 
   /// 幹話：這裡很多函式內容亂寫也都無所謂了，因為都被 IMKCandidates 代管執行。
   /// 對於所有 IMK 選字窗的選字判斷動作，不是在 keyHandler 中，而是在 `ctlIME_Core` 中。
-
-  private var currentPageIndex: Int = 0
-
-  private var pageCount: Int {
-    guard let delegate = delegate else { return 0 }
-    let totalCount = delegate.candidatePairs(conv: false).count
-    let keyLabelCount = keyLabels.count
-    return totalCount / keyLabelCount + ((totalCount % keyLabelCount) != 0 ? 1 : 0)
-  }
 
   // 該函式會影響 IMK 選字窗。
   @discardableResult public func showNextPage() -> Bool {
@@ -160,11 +136,8 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
     return true
   }
 
-  public func candidateIndexAtKeyLabelIndex(_ index: Int) -> Int {
-    guard let delegate = delegate else { return Int.max }
-    let result = currentPageIndex * keyLabels.count + index
-    return result < delegate.candidatePairs(conv: false).count ? result : Int.max
-  }
+  // IMK 選字窗目前無法實作該函式。威注音 IMK 選字窗目前也不需要使用該函式。
+  public func candidateIndexAtKeyLabelIndex(_: Int) -> Int { 0 }
 
   public var selectedCandidateIndex: Int {
     get { selectedCandidate() }
