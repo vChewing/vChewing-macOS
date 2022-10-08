@@ -242,7 +242,7 @@ extension KeyHandler {
 
     if index != NSNotFound {
       let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(index)
-      if candidateIndex != Int.max {
+      if candidateIndex != -114_514 {
         delegate?.candidateSelectionCalledByKeyHandler(at: candidateIndex)
         return true
       }
@@ -282,7 +282,7 @@ extension KeyHandler {
 
       if shouldAutoSelectCandidate {
         let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(0)
-        if candidateIndex != Int.max {
+        if candidateIndex != -114_514 {
           delegate?.candidateSelectionCalledByKeyHandler(at: candidateIndex)
           stateCallback(IMEState.ofAbortion())
           return handle(

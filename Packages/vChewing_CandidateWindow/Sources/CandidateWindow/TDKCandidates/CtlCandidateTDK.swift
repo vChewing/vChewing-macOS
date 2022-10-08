@@ -202,6 +202,7 @@ public class CtlCandidateTDK: CtlCandidate {
 
   override public func candidateIndexAtKeyLabelIndex(_ id: Int) -> Int {
     let arrCurrentLine = thePool.candidateLines[thePool.currentLineNumber]
+    if !(0..<arrCurrentLine.count).contains(id) { return -114_514 }
     let actualID = max(0, min(id, arrCurrentLine.count - 1))
     return arrCurrentLine[actualID].index
   }
