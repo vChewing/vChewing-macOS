@@ -57,20 +57,24 @@ struct suiPrefPaneKeyboard: View {
             text: $selSelectionKeys.onChange {
               let value = selSelectionKeys
               let keys: String = value.trimmingCharacters(in: .whitespacesAndNewlines).deduplicated
-              do {
-                try CandidateKey.validate(keys: keys)
-                PrefMgr.shared.candidateKeys = keys
+              if keys.isEmpty {
                 selSelectionKeys = PrefMgr.shared.candidateKeys
-              } catch CandidateKey.ErrorType.empty {
-                selSelectionKeys = PrefMgr.shared.candidateKeys
-              } catch {
-                if let window = ctlPrefUI.shared.controller.window, let error = error as? CandidateKey.ErrorType {
-                  let alert = NSAlert(error: error.errorDescription)
+                return
+              }
+              // Start Error Handling.
+              if let errorResult = CandidateKey.validate(keys: keys) {
+                if let window = ctlPrefUI.shared.controller.window {
+                  let alert = NSAlert(error: NSLocalizedString("Invalid Selection Keys.", comment: ""))
+                  alert.informativeText = errorResult
                   alert.beginSheetModal(for: window) { _ in
                     selSelectionKeys = PrefMgr.shared.candidateKeys
                   }
                   IMEApp.buzz()
                 }
+              } else {
+                PrefMgr.shared.candidateKeys = keys
+                selSelectionKeys = PrefMgr.shared.candidateKeys
+                return
               }
             }
           ).frame(width: 180).disabled(PrefMgr.shared.useIMKCandidateWindow)
