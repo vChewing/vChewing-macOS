@@ -15,6 +15,7 @@ import SwiftUI
 public class CtlCandidateTDK: CtlCandidate {
   public var thePoolHorizontal: CandidatePool = .init(candidates: [], rowCapacity: 6)
   public var thePoolVertical: CandidatePool = .init(candidates: [], columnCapacity: 6)
+  public var maxLinesPerPage: Int = 0
 
   @available(macOS 12, *)
   public var theViewHorizontal: VwrCandidateHorizontal {
@@ -87,13 +88,13 @@ public class CtlCandidateTDK: CtlCandidate {
       case .horizontal:
         thePoolHorizontal = .init(
           candidates: delegate.candidatePairs(conv: true).map(\.1), rowCapacity: 6,
-          selectionKeys: delegate.selectionKeys, locale: locale
+          rows: maxLinesPerPage, selectionKeys: delegate.selectionKeys, locale: locale
         )
         thePoolHorizontal.highlight(at: 0)
       case .vertical:
         thePoolVertical = .init(
           candidates: delegate.candidatePairs(conv: true).map(\.1), columnCapacity: 6,
-          selectionKeys: delegate.selectionKeys, locale: locale
+          columns: maxLinesPerPage, selectionKeys: delegate.selectionKeys, locale: locale
         )
         thePoolVertical.highlight(at: 0)
       @unknown default:
