@@ -187,18 +187,8 @@ extension SessionCtl {
 
     Self.theShiftKeyDetector.alsoToggleWithLShift = PrefMgr.shared.togglingAlphanumericalModeWithLShift
 
-    if #unavailable(macOS 12) {
-      if #available(macOS 10.15, *) {
-        if isASCIIMode, PrefMgr.shared.disableShiftTogglingAlphanumericalMode { isASCIIMode = false }
-      }
-    } else {
-      if isASCIIMode, !isCapsLocked, PrefMgr.shared.disableShiftTogglingAlphanumericalMode {
-        isASCIIMode = false
-      }
-      // 同步 Caps Lock 狀態。
-      else if isCapsLocked || PrefMgr.shared.disableShiftTogglingAlphanumericalMode {
-        isASCIIMode = isCapsLocked
-      }
+    if #available(macOS 10.15, *) {
+      if isASCIIMode, PrefMgr.shared.disableShiftTogglingAlphanumericalMode { isASCIIMode = false }
     }
 
     DispatchQueue.main.async {
