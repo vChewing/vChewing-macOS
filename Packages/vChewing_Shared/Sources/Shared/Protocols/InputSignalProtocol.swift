@@ -14,6 +14,7 @@ extension NSEvent: InputSignalProtocol {}
 // MARK: - InputSignalProtocol
 
 public protocol InputSignalProtocol {
+  var modifierFlags: NSEvent.ModifierFlags { get }
   var isTypingVertical: Bool { get }
   var text: String { get }
   var inputTextIgnoringModifiers: String? { get }
