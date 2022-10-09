@@ -146,8 +146,8 @@
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "指定 (Shift+)Tab 在選字窗內的輪替操作對象。";
 "Choose the behavior of Shift+Letter key with letter inputs." = "指定 Shift+字母鍵 的行為。";
 "Choose the cursor position where you want to list possible candidates." = "請選擇用以觸發選字的游標相對位置。";
-"Choose the macOS-level alphanumerical keyboard layout. This setting is for candidate window and the alphanumerical mode only." = "請選擇 macOS 英數鍵盤佈局。該佈局僅用於選字窗和英數輸入模式。";
-"Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "請選擇 macOS 基礎鍵盤佈局。QWERTY 以外的英數佈局是為了拼音排列使用者而準備的。";
+"Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only." = "請選擇 macOS 英數鍵盤佈局。該佈局僅用於 Shift 英數輸入模式。";
+"Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is not (any) pinyin." = "請選擇 macOS 基礎鍵盤佈局。QWERTY 以外的英數佈局是為了拼音排列的使用者而準備的。如果當前的普通話/國音分析器並未設為拼音的話，則鍵盤佈局選項僅會影響到螢幕鍵盤。";
 "Choose the phonetic layout for Mandarin parser." = "請指定普通話/國音分析器所使用的注音排列。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "請在此指定您想指定的使用者語彙檔案目錄。無效值會被忽略。";
 "Choose your preferred layout of the candidate window." = "選擇您所偏好的候選字窗佈局。";
