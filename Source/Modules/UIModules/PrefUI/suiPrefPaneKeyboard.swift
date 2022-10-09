@@ -94,6 +94,34 @@ struct suiPrefPaneKeyboard: View {
             .preferenceDescription()
           }
         }
+        Preferences.Section(label: { Text(LocalizedStringKey("Quick Setup:")) }) {
+          HStack {
+            Button {
+              PrefMgr.shared.keyboardParser = 0
+              selKeyboardParser = PrefMgr.shared.keyboardParser
+              PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
+              selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
+            } label: {
+              Text("↻ㄅ" + " " + NSLocalizedString("Dachen Trad.", comment: ""))
+            }
+            Button {
+              PrefMgr.shared.keyboardParser = 1
+              selKeyboardParser = PrefMgr.shared.keyboardParser
+              PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ZhuyinEten"
+              selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
+            } label: {
+              Text("↻ㄅ" + " " + NSLocalizedString("Eten Trad.", comment: ""))
+            }
+            Button {
+              PrefMgr.shared.keyboardParser = 10
+              selKeyboardParser = PrefMgr.shared.keyboardParser
+              PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ABC"
+              selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
+            } label: {
+              Text("↻Ａ")
+            }
+          }
+        }
         Preferences.Section(label: { Text(LocalizedStringKey("Phonetic Parser:")) }) {
           HStack {
             Picker(
@@ -127,23 +155,9 @@ struct suiPrefPaneKeyboard: View {
                 Text(LocalizedStringKey("Universal Pinyin with Numeral Intonation")).tag(14)
               }
             }
+            .fixedSize()
             .labelsHidden()
-            Button {
-              PrefMgr.shared.keyboardParser = 0
-              selKeyboardParser = PrefMgr.shared.keyboardParser
-              PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
-              selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
-            } label: {
-              Text("↻ㄅ")
-            }
-            Button {
-              PrefMgr.shared.keyboardParser = 10
-              selKeyboardParser = PrefMgr.shared.keyboardParser
-              PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ABC"
-              selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
-            } label: {
-              Text("↻Ａ")
-            }
+            Spacer()
           }
           .frame(width: 380.0)
           HStack {

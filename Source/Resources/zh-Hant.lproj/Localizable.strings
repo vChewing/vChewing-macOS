@@ -82,6 +82,8 @@
 "Clear Memorized Phrases" = "清除臨時記憶語彙資料";
 "Currency Numeral Output" = "大寫漢字數字輸出";
 "Hold ⇧ to choose associates." = "摁住⇧以選取聯想詞。";
+"Dachen Trad." = "大千傳統";
+"Eten Trad." = "倚天傳統";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";
@@ -202,6 +204,7 @@
 "Phonetic Parser:" = "注音排列:";
 "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu." = "請利用滑鼠滾輪檢視該頁面。也請洽輸入法選單內的熱鍵指南。";
 "Push the cursor in front of the phrase after selection" = "在選字後將游標置於該字詞的前方";
+"Quick Setup:" = "直接設定:";
 "Secondary Pinyin with Numeral Intonation" = "國音二式+數字標調";
 "Seigyou" = "精業排列";
 "Selection Keys:" = "選字鍵:";
