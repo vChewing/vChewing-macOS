@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import CocoaExtension
+import IMKUtils
 import InputMethodKit
 import NotifierUI
 import Shared
@@ -106,6 +107,11 @@ extension SessionCtl {
     if eventToDeal.isEmacsKey {
       let verticalProcessing = (state.isCandidateContainer) ? state.isVerticalCandidateWindow : state.isVerticalTyping
       eventToDeal = eventToDeal.convertFromEmacsKeyEvent(isVerticalContext: verticalProcessing)
+    }
+
+    // 翻譯 Apple 動態鍵盤佈局
+    if IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
+      eventToDeal = eventToDeal.inAppleABCStaticForm
     }
 
     // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
