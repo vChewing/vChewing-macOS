@@ -114,6 +114,13 @@ extension SessionCtl {
       eventToDeal = eventToDeal.inAppleABCStaticForm
     }
 
+    // Apple 數字小鍵盤處理
+    if eventToDeal.isNumericPadKey,
+      let eventCharConverted = eventToDeal.characters?.applyingTransform(.fullwidthToHalfwidth, reverse: false)
+    {
+      eventToDeal = eventToDeal.reinitiate(characters: eventCharConverted) ?? eventToDeal
+    }
+
     // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
     Self.areWeNerfing = eventToDeal.modifierFlags.contains([.shift, .command])
 
