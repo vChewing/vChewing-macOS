@@ -101,18 +101,6 @@ struct suiPrefPaneKeyboard: View {
               selection: $selKeyboardParser.onChange {
                 let value = selKeyboardParser
                 PrefMgr.shared.keyboardParser = value
-                switch value {
-                  case 0:
-                    if !IMKHelper.arrDynamicBasicKeyLayouts.contains(PrefMgr.shared.basicKeyboardLayout) {
-                      PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
-                      selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
-                    }
-                  default:
-                    if IMKHelper.arrDynamicBasicKeyLayouts.contains(PrefMgr.shared.basicKeyboardLayout) {
-                      PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ABC"
-                      selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
-                    }
-                }
               }
             ) {
               Group {
@@ -180,10 +168,6 @@ struct suiPrefPaneKeyboard: View {
               selection: $selBasicKeyboardLayout.onChange {
                 let value = selBasicKeyboardLayout
                 PrefMgr.shared.basicKeyboardLayout = value
-                if IMKHelper.arrDynamicBasicKeyLayouts.contains(value) {
-                  PrefMgr.shared.keyboardParser = 0
-                  selKeyboardParser = PrefMgr.shared.keyboardParser
-                }
               }
             ) {
               ForEach(0...(IMKHelper.allowedBasicLayoutsAsTISInputSources.count - 1), id: \.self) { id in
