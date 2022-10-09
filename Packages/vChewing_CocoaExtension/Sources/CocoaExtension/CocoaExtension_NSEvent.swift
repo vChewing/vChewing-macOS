@@ -78,10 +78,10 @@ extension NSEvent {
 
 extension NSEvent {
   public var isTypingVertical: Bool { charactersIgnoringModifiers == "Vertical" }
-  public var text: String { convertedFromPhonabets() }
+  public var text: String { characters ?? "" }
   public var inputTextIgnoringModifiers: String? {
     guard charactersIgnoringModifiers != nil else { return nil }
-    return convertedFromPhonabets(ignoringModifiers: true)
+    return charactersIgnoringModifiers ?? characters ?? ""
   }
 
   public var charCode: UInt16 {
