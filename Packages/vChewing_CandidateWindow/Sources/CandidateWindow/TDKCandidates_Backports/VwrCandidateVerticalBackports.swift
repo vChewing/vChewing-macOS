@@ -115,6 +115,9 @@ public struct VwrCandidateVerticalBackports: View {
         )
       }
     }
+    .overlay(
+      RoundedRectangle(cornerRadius: 10).stroke(.white.opacity(0.2), lineWidth: 1)
+    )
     .cornerRadius(10)
   }
 }
