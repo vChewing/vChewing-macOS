@@ -165,11 +165,7 @@ struct suiPrefPaneKeyboard: View {
               NSLocalizedString(
                 "Choose the phonetic layout for Mandarin parser.",
                 comment: ""
-              ) + (PrefMgr.shared.appleLanguages[0].contains("en") ? " " : "")
-                + NSLocalizedString(
-                  "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional.",
-                  comment: ""
-                )
+              )
             )
             .preferenceDescription().fixedSize(horizontal: false, vertical: true)
             Spacer().frame(width: 30)
@@ -199,7 +195,7 @@ struct suiPrefPaneKeyboard: View {
           HStack {
             Text(
               NSLocalizedString(
-                "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only.",
+                "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is not (any) pinyin.",
                 comment: ""
               )
             )
@@ -227,7 +223,7 @@ struct suiPrefPaneKeyboard: View {
           HStack {
             Text(
               NSLocalizedString(
-                "Choose the macOS-level alphanumerical keyboard layout. This setting is for candidate window and the alphanumerical mode only.",
+                "Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only.",
                 comment: ""
               )
             )
