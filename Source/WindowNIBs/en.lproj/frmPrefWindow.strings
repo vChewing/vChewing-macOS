@@ -100,7 +100,7 @@
 "W24-T4-cg0.title" = "Enable CNS11643 Support (2022-09-12)";
 "wFR-zX-M8H.title" = "Show Hanyu-Pinyin in the inline composition buffer";
 "wN3-k3-b2a.title" = "Choose your desired user data folder path. Will be omitted if invalid.";
-"wQ9-px-b07.title" = "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional.";
+"wQ9-px-b07.title" = "Basic keyboard layout option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is not (any) pinyin.";
 "Wvt-HE-LOv.title" = "Keyboard Layout";
 "xC5-yV-1W1.title" = "Choose your preferred layout of the candidate window.";
 "xibGeneralSettings.title" = "General Settings";

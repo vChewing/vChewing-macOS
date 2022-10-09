@@ -1222,7 +1222,7 @@
                             </constraints>
                             <textFieldCell key="cell" selectable="YES" id="wQ9-px-b07">
                                 <font key="font" metaFont="cellTitle"/>
-                                <string key="title">Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen &amp; Eten Traditional) must match the Dachen parser in order to be functional.</string>
+                                <string key="title">Basic keyboard layout option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is not (any) pinyin.</string>
                                 <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
