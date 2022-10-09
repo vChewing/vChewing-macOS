@@ -194,6 +194,8 @@ extension SessionCtl {
     DispatchQueue.main.async {
       (NSApp.delegate as? AppDelegate)?.updateSputnik.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
     }
+
+    handle(state: IMEState.ofEmpty())
   }
 
   /// 停用輸入法時，會觸發該函式。
