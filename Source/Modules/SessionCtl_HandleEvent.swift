@@ -109,8 +109,8 @@ extension SessionCtl {
       eventToDeal = eventToDeal.convertFromEmacsKeyEvent(isVerticalContext: verticalProcessing)
     }
 
-    // 翻譯 Apple 動態鍵盤佈局
-    if IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
+    // 在啟用注音排列而非拼音輸入的情況下，強制將當前鍵盤佈局翻譯為美規鍵盤。
+    if keyHandler.composer.parser.rawValue < 100 {
       eventToDeal = eventToDeal.inAppleABCStaticForm
     }
 
