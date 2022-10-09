@@ -9,11 +9,12 @@
 import Cocoa
 import Shared
 import SwiftUI
+import SwiftUIBackports
 
 // MARK: - Some useless tests
 
-@available(macOS 12, *)
-struct CandidatePoolViewUIHorizontal_Previews: PreviewProvider {
+@available(macOS 10.15, *)
+struct CandidatePoolViewUIHorizontalBackports_Previews: PreviewProvider {
   @State static var testCandidates: [String] = [
     "八月中秋山林涼", "八月中秋", "風吹大地", "山林涼", "草枝擺", "八月", "中秋",
     "🐂🍺🐂🍺", "🐃🍺", "🐂🍺", "🐃🐂🍺🍺", "🐂🍺", "🐃🍺", "🐂🍺", "🐃🍺", "🐂🍺", "🐃🍺",
@@ -24,20 +25,21 @@ struct CandidatePoolViewUIHorizontal_Previews: PreviewProvider {
   static var thePool: CandidatePool {
     let result = CandidatePool(candidates: testCandidates, rowCapacity: 6)
     // 下一行待解決：無論這裡怎麼指定高亮選中項是哪一筆，其所在行都得被卷動到使用者眼前。
-    result.highlightHorizontal(at: 5)
+    result.highlight(at: 5)
     return result
   }
 
   static var previews: some View {
-    VwrCandidateHorizontal(controller: .init(.horizontal), thePool: thePool).fixedSize()
+    VwrCandidateHorizontalBackports(controller: .init(.horizontal), thePool: thePool).fixedSize()
   }
 }
 
-@available(macOS 12, *)
-public struct VwrCandidateHorizontal: View {
+@available(macOS 10.15, *)
+public struct VwrCandidateHorizontalBackports: View {
+  @Environment(\.colorScheme) var colorScheme
   public var controller: CtlCandidateTDK
   @State public var thePool: CandidatePool
-  @State public var hint: String = ""
+  @State public var tooltip: String = ""
 
   private var positionLabel: String {
     (thePool.highlightedIndex + 1).description + "/" + thePool.candidateDataAll.count.description
@@ -53,10 +55,10 @@ public struct VwrCandidateHorizontal: View {
     VStack(alignment: .leading, spacing: 0) {
       ScrollView(.vertical, showsIndicators: false) {
         VStack(alignment: .leading, spacing: 1.6) {
-          ForEach(thePool.rangeForCurrentHorizontalPage, id: \.self) { rowIndex in
+          ForEach(thePool.rangeForCurrentPage, id: \.self) { rowIndex in
             HStack(spacing: 10) {
-              ForEach(Array(thePool.candidateRows[rowIndex]), id: \.self) { currentCandidate in
-                currentCandidate.attributedStringForSwiftUI.fixedSize()
+              ForEach(Array(thePool.candidateLines[rowIndex]), id: \.self) { currentCandidate in
+                currentCandidate.attributedStringForSwiftUIBackports.fixedSize()
                   .frame(
                     maxWidth: .infinity,
                     alignment: .topLeading
@@ -71,10 +73,10 @@ public struct VwrCandidateHorizontal: View {
             ).id(rowIndex)
             Divider()
           }
-          if thePool.maximumRowsPerPage - thePool.rangeForCurrentHorizontalPage.count > 0 {
-            ForEach(thePool.rangeForLastHorizontalPageBlanked, id: \.self) { _ in
+          if thePool.maxLinesPerPage - thePool.rangeForCurrentPage.count > 0 {
+            ForEach(thePool.rangeForLastPageBlanked, id: \.self) { _ in
               HStack(spacing: 0) {
-                thePool.blankCell.attributedStringForSwiftUI
+                thePool.blankCell.attributedStringForSwiftUIBackports
                   .frame(maxWidth: .infinity, alignment: .topLeading)
                   .contentShape(Rectangle())
                 Spacer()
@@ -89,21 +91,30 @@ public struct VwrCandidateHorizontal: View {
         }
       }
       .fixedSize(horizontal: false, vertical: true).padding(5)
-      .background(Color(nsColor: NSColor.controlBackgroundColor).ignoresSafeArea())
+      .background(Color(white: colorScheme == .dark ? 0.1 : 1))
       ZStack(alignment: .leading) {
-        Color(nsColor: hint.isEmpty ? .windowBackgroundColor : CandidateCellData.highlightBackground).ignoresSafeArea()
+        if tooltip.isEmpty {
+          Color(white: colorScheme == .dark ? 0.2 : 0.9)
+        } else {
+          controller.highlightedColorUIBackports
+        }
         HStack(alignment: .bottom) {
-          Text(hint).font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold)).lineLimit(1)
+          Text(tooltip).font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold)).lineLimit(1)
           Spacer()
           Text(positionLabel).font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold))
             .lineLimit(
               1)
         }
-        .padding(6).foregroundColor(
-          .init(nsColor: hint.isEmpty ? .controlTextColor : .selectedMenuItemTextColor.withAlphaComponent(0.9))
+        .padding(7).foregroundColor(
+          tooltip.isEmpty && colorScheme == .light ? Color(white: 0.1) : Color(white: 0.9)
         )
       }
+      .fixedSize(horizontal: false, vertical: true)
     }
     .frame(minWidth: thePool.maxWindowWidth, maxWidth: thePool.maxWindowWidth)
+    .overlay(
+      RoundedRectangle(cornerRadius: 10).stroke(.white.opacity(0.2), lineWidth: 1)
+    )
+    .cornerRadius(10)
   }
 }

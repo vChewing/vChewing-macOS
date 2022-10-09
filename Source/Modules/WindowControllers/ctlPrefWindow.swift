@@ -202,22 +202,21 @@ class ctlPrefWindow: NSWindowController {
       )
       .deduplicated
     else {
+      selectionKeyComboBox.stringValue = PrefMgr.shared.candidateKeys
       return
     }
-    do {
-      try CandidateKey.validate(keys: keys)
+    guard let errorResult = CandidateKey.validate(keys: keys) else {
       PrefMgr.shared.candidateKeys = keys
       selectionKeyComboBox.stringValue = PrefMgr.shared.candidateKeys
-    } catch CandidateKey.ErrorType.empty {
-      selectionKeyComboBox.stringValue = PrefMgr.shared.candidateKeys
-    } catch {
-      if let window = window, let error = error as? CandidateKey.ErrorType {
-        let alert = NSAlert(error: error.errorDescription)
-        alert.beginSheetModal(for: window) { _ in
-          self.selectionKeyComboBox.stringValue = PrefMgr.shared.candidateKeys
-        }
-        IMEApp.buzz()
+      return
+    }
+    if let window = window {
+      let alert = NSAlert(error: NSLocalizedString("Invalid Selection Keys.", comment: ""))
+      alert.informativeText = errorResult
+      alert.beginSheetModal(for: window) { _ in
+        self.selectionKeyComboBox.stringValue = PrefMgr.shared.candidateKeys
       }
+      IMEApp.buzz()
     }
   }
 

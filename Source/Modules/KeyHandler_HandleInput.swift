@@ -176,7 +176,12 @@ extension KeyHandler {
           )
         }
       }
-      stateCallback(buildCandidate(state: state))
+      let candidateState: IMEStateProtocol = buildCandidate(state: state)
+      if candidateState.candidates.isEmpty {
+        errorCallback("3572F238")
+      } else {
+        stateCallback(candidateState)
+      }
       return true
     }
 
@@ -289,7 +294,12 @@ extension KeyHandler {
             var inputting = buildInputtingState
             inputting.textToCommit = textToCommit
             stateCallback(inputting)
-            stateCallback(buildCandidate(state: inputting))
+            let candidateState = buildCandidate(state: inputting)
+            if candidateState.candidates.isEmpty {
+              errorCallback("B5127D8A")
+            } else {
+              stateCallback(candidateState)
+            }
           } else {  // 不要在注音沒敲完整的情況下叫出統合符號選單。
             errorCallback("17446655")
           }
@@ -308,14 +318,12 @@ extension KeyHandler {
     // MARK: 全形/半形阿拉伯數字輸入 (FW / HW Arabic Numbers Input)
 
     if state.type == .ofEmpty {
-      if input.isMainAreaNumKey, input.isShiftHold, input.isOptionHold, !input.isControlHold, !input.isCommandHold {
-        // NOTE: 將來棄用 macOS 10.11 El Capitan 支援的時候，把這裡由 CFStringTransform 改為 StringTransform:
-        // https://developer.apple.com/documentation/foundation/stringtransform
+      if input.isMainAreaNumKey, input.modifierFlags == [.shift, .option] {
         guard let stringRAW = input.mainAreaNumKeyChar else { return false }
-        let string = NSMutableString(string: stringRAW)
-        CFStringTransform(string, nil, kCFStringTransformFullwidthHalfwidth, true)
+        let newStringFW = stringRAW.applyingTransform(.fullwidthToHalfwidth, reverse: true) ?? stringRAW
+        let newStringHW = stringRAW.applyingTransform(.fullwidthToHalfwidth, reverse: false) ?? stringRAW
         stateCallback(
-          IMEState.ofCommitting(textToCommit: prefs.halfWidthPunctuationEnabled ? stringRAW : string as String)
+          IMEState.ofCommitting(textToCommit: prefs.halfWidthPunctuationEnabled ? newStringHW : newStringFW)
         )
         stateCallback(IMEState.ofEmpty())
         return true

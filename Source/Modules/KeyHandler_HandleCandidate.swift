@@ -222,7 +222,7 @@ extension KeyHandler {
       }
     }
 
-    // MARK: 聯想詞處理 (Associated Phrases)
+    // MARK: 聯想詞處理 (Associated Phrases) 以及標準選字處理
 
     if state.type == .ofAssociates {
       if !input.isShiftHold { return false }
@@ -232,9 +232,11 @@ extension KeyHandler {
     let match: String =
       (state.type == .ofAssociates) ? input.inputTextIgnoringModifiers ?? "" : input.text
 
-    for j in 0..<ctlCandidate.keyLabels.count {
-      let label: CandidateCellData = ctlCandidate.keyLabels[j]
-      if match.compare(label.key, options: .caseInsensitive, range: nil, locale: .current) == .orderedSame {
+    let selectionKeys = delegate?.selectionKeys ?? PrefMgr.shared.candidateKeys
+
+    for j in 0..<selectionKeys.count {
+      let label = selectionKeys.charComponents[j]
+      if match.compare(label, options: .caseInsensitive, range: nil, locale: .current) == .orderedSame {
         index = j
         break
       }
@@ -242,7 +244,7 @@ extension KeyHandler {
 
     if index != NSNotFound {
       let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(index)
-      if candidateIndex != Int.max {
+      if candidateIndex != -114_514 {
         delegate?.candidateSelectionCalledByKeyHandler(at: candidateIndex)
         return true
       }
@@ -282,7 +284,7 @@ extension KeyHandler {
 
       if shouldAutoSelectCandidate {
         let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(0)
-        if candidateIndex != Int.max {
+        if candidateIndex != -114_514 {
           delegate?.candidateSelectionCalledByKeyHandler(at: candidateIndex)
           stateCallback(IMEState.ofAbortion())
           return handle(

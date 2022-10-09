@@ -72,6 +72,12 @@ extension UniChar {
   }
 }
 
+extension Unicode.Scalar {
+  public var isPrintableASCII: Bool {
+    (32...126).contains(value)
+  }
+}
+
 // MARK: - Stable Sort Extension
 
 // Ref: https://stackoverflow.com/a/50545761/4162914
@@ -104,6 +110,8 @@ extension Bool {
 }
 
 // MARK: - Property wrapper
+
+// Ref: https://www.avanderlee.com/swift/property-wrappers/
 
 @propertyWrapper
 public struct AppProperty<Value> {

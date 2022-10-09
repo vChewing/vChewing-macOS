@@ -43,8 +43,8 @@ extension SessionCtl: KeyHandlerDelegate {
     let rawPair = state.data.userPhraseKVPair
     let valueCurrent = rawPair.1
     let valueReversed = ChineseConverter.crossConvert(rawPair.1)
-    LMMgr.bleachSpecifiedSuggestions(target: valueCurrent, mode: IMEApp.currentInputMode)
-    LMMgr.bleachSpecifiedSuggestions(target: valueReversed, mode: IMEApp.currentInputMode.reversed)
+    LMMgr.bleachSpecifiedSuggestions(targets: [valueCurrent], mode: IMEApp.currentInputMode)
+    LMMgr.bleachSpecifiedSuggestions(targets: [valueReversed], mode: IMEApp.currentInputMode.reversed)
     // 清詞完畢
     return true
   }
@@ -53,10 +53,8 @@ extension SessionCtl: KeyHandlerDelegate {
 // MARK: - Candidate Controller Delegate
 
 extension SessionCtl: CtlCandidateDelegate {
-  var selectionKeys: String { PrefMgr.shared.candidateKeys }
-
-  func buzz() {
-    IMEApp.buzz()
+  var selectionKeys: String {
+    PrefMgr.shared.useIMKCandidateWindow ? "123456789" : PrefMgr.shared.candidateKeys
   }
 
   func candidatePairs(conv: Bool = false) -> [(String, String)] {
@@ -71,13 +69,6 @@ extension SessionCtl: CtlCandidateDelegate {
       return (theCandidatePair.0, result)
     }
     return convertedCandidates
-  }
-
-  func candidatePairAt(_ index: Int) -> (String, String) {
-    if state.isCandidateContainer, state.candidates.count > index {
-      return state.candidates[index]
-    }
-    return ("", "")
   }
 
   func candidatePairSelected(at index: Int) {

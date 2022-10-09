@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import CocoaExtension
+import IMKUtils
 import InputMethodKit
 import NotifierUI
 import Shared
@@ -35,19 +36,21 @@ extension SessionCtl {
       return false
     }
 
-    // Caps Lock 通知與切換處理。
-    if event.type == .flagsChanged, event.keyCode == KeyCode.kCapsLock.rawValue {
-      DispatchQueue.main.async {
-        let isCapsLockTurnedOn = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
-        let status = NSLocalizedString("NotificationSwitchASCII", comment: "")
-        if PrefMgr.shared.showNotificationsWhenTogglingCapsLock {
-          Notifier.notify(
-            message: isCapsLockTurnedOn
-              ? "Caps Lock" + NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
-              : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
-          )
+    // Caps Lock 通知與切換處理，要求至少 macOS 12 Monterey。
+    if #available(macOS 12, *) {
+      if event.type == .flagsChanged, event.keyCode == KeyCode.kCapsLock.rawValue {
+        DispatchQueue.main.async {
+          let isCapsLockTurnedOn = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
+          let status = NSLocalizedString("NotificationSwitchASCII", comment: "")
+          if PrefMgr.shared.showNotificationsWhenTogglingCapsLock {
+            Notifier.notify(
+              message: isCapsLockTurnedOn
+                ? "Caps Lock" + NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
+                : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
+            )
+          }
+          self.isASCIIMode = isCapsLockTurnedOn
         }
-        self.isASCIIMode = isCapsLockTurnedOn
       }
     }
 
@@ -103,7 +106,19 @@ extension SessionCtl {
     // 使 NSEvent 自翻譯，這樣可以讓 Emacs NSEvent 變成標準 NSEvent。
     if eventToDeal.isEmacsKey {
       let verticalProcessing = (state.isCandidateContainer) ? state.isVerticalCandidateWindow : state.isVerticalTyping
-      eventToDeal = eventToDeal.convertFromEmacKeyEvent(isVerticalContext: verticalProcessing)
+      eventToDeal = eventToDeal.convertFromEmacsKeyEvent(isVerticalContext: verticalProcessing)
+    }
+
+    // 在啟用注音排列而非拼音輸入的情況下，強制將當前鍵盤佈局翻譯為美規鍵盤。
+    if keyHandler.composer.parser.rawValue < 100 {
+      eventToDeal = eventToDeal.inAppleABCStaticForm
+    }
+
+    // Apple 數字小鍵盤處理
+    if eventToDeal.isNumericPadKey,
+      let eventCharConverted = eventToDeal.characters?.applyingTransform(.fullwidthToHalfwidth, reverse: false)
+    {
+      eventToDeal = eventToDeal.reinitiate(characters: eventCharConverted) ?? eventToDeal
     }
 
     // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。

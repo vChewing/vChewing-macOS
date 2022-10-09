@@ -9,11 +9,12 @@
 import Cocoa
 import Shared
 import SwiftUI
+import SwiftUIBackports
 
 // MARK: - Some useless tests
 
-@available(macOS 12, *)
-struct CandidatePoolViewUIVertical_Previews: PreviewProvider {
+@available(macOS 10.15, *)
+struct CandidatePoolViewUIVerticalBackports_Previews: PreviewProvider {
   @State static var testCandidates: [String] = [
     "八月中秋山林涼", "八月中秋", "風吹大地", "山林涼", "草枝擺", "🐂🍺", "🐃🍺", "八月", "中秋",
     "山林", "風吹", "大地", "草枝", "八", "月", "中", "秋", "山", "林", "涼", "風",
@@ -23,20 +24,21 @@ struct CandidatePoolViewUIVertical_Previews: PreviewProvider {
   static var thePool: CandidatePool {
     let result = CandidatePool(candidates: testCandidates, columnCapacity: 6, selectionKeys: "123456789")
     // 下一行待解決：無論這裡怎麼指定高亮選中項是哪一筆，其所在行都得被卷動到使用者眼前。
-    result.highlightVertical(at: 5)
+    result.highlight(at: 5)
     return result
   }
 
   static var previews: some View {
-    VwrCandidateVertical(controller: .init(.horizontal), thePool: thePool).fixedSize()
+    VwrCandidateVerticalBackports(controller: .init(.horizontal), thePool: thePool).fixedSize()
   }
 }
 
-@available(macOS 12, *)
-public struct VwrCandidateVertical: View {
+@available(macOS 10.15, *)
+public struct VwrCandidateVerticalBackports: View {
+  @Environment(\.colorScheme) var colorScheme
   public var controller: CtlCandidateTDK
   @State public var thePool: CandidatePool
-  @State public var hint: String = ""
+  @State public var tooltip: String = ""
 
   private var positionLabel: String {
     (thePool.highlightedIndex + 1).description + "/" + thePool.candidateDataAll.count.description
@@ -52,11 +54,11 @@ public struct VwrCandidateVertical: View {
     VStack(alignment: .leading, spacing: 0) {
       ScrollView(.horizontal, showsIndicators: false) {
         HStack(alignment: .top, spacing: 10) {
-          ForEach(thePool.rangeForCurrentVerticalPage, id: \.self) { columnIndex in
+          ForEach(Array(thePool.rangeForCurrentPage.enumerated()), id: \.offset) { loopIndex, columnIndex in
             VStack(alignment: .leading, spacing: 0) {
-              ForEach(Array(thePool.candidateColumns[columnIndex]), id: \.self) { currentCandidate in
+              ForEach(Array(thePool.candidateLines[columnIndex]), id: \.self) { currentCandidate in
                 HStack(spacing: 0) {
-                  currentCandidate.attributedStringForSwiftUI.fixedSize(horizontal: false, vertical: true)
+                  currentCandidate.attributedStringForSwiftUIBackports.fixedSize(horizontal: false, vertical: true)
                     .frame(
                       maxWidth: .infinity,
                       alignment: .topLeading
@@ -69,13 +71,15 @@ public struct VwrCandidateVertical: View {
               minWidth: Double(CandidateCellData.unifiedSize * 5),
               alignment: .topLeading
             ).id(columnIndex)
-            Divider()
+            if loopIndex < thePool.maxLinesPerPage - 1 {
+              Divider()
+            }
           }
-          if thePool.maximumColumnsPerPage - thePool.rangeForCurrentVerticalPage.count > 0 {
-            ForEach(thePool.rangeForLastVerticalPageBlanked, id: \.self) { _ in
+          if thePool.maxLinesPerPage - thePool.rangeForCurrentPage.count > 0 {
+            ForEach(Array(thePool.rangeForLastPageBlanked.enumerated()), id: \.offset) { loopIndex, _ in
               VStack(alignment: .leading, spacing: 0) {
-                ForEach(0..<thePool.maxColumnCapacity, id: \.self) { _ in
-                  thePool.blankCell.attributedStringForSwiftUI.fixedSize()
+                ForEach(0..<thePool.maxLineCapacity, id: \.self) { _ in
+                  thePool.blankCell.attributedStringForSwiftUIBackports.fixedSize()
                     .frame(width: Double(CandidateCellData.unifiedSize * 5), alignment: .topLeading)
                     .contentShape(Rectangle())
                 }
@@ -84,26 +88,36 @@ public struct VwrCandidateVertical: View {
                 maxWidth: .infinity,
                 alignment: .topLeading
               )
-              Divider()
+              if loopIndex < thePool.maxLinesPerPage - thePool.rangeForCurrentPage.count - 1 {
+                Divider()
+              }
             }
           }
         }
       }
       .fixedSize(horizontal: true, vertical: false).padding(5)
-      .background(Color(nsColor: NSColor.controlBackgroundColor).ignoresSafeArea())
+      .background(Color(white: colorScheme == .dark ? 0.1 : 1))
       ZStack(alignment: .leading) {
-        Color(nsColor: hint.isEmpty ? .windowBackgroundColor : CandidateCellData.highlightBackground).ignoresSafeArea()
+        if tooltip.isEmpty {
+          Color(white: colorScheme == .dark ? 0.2 : 0.9)
+        } else {
+          controller.highlightedColorUIBackports
+        }
         HStack(alignment: .bottom) {
-          Text(hint).font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold)).lineLimit(1)
+          Text(tooltip).font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold)).lineLimit(1)
           Spacer()
           Text(positionLabel).font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold))
             .lineLimit(
               1)
         }
-        .padding(6).foregroundColor(
-          .init(nsColor: hint.isEmpty ? .controlTextColor : .selectedMenuItemTextColor.withAlphaComponent(0.9))
+        .padding(7).foregroundColor(
+          tooltip.isEmpty && colorScheme == .light ? Color(white: 0.1) : Color(white: 0.9)
         )
       }
     }
+    .overlay(
+      RoundedRectangle(cornerRadius: 10).stroke(.white.opacity(0.2), lineWidth: 1)
+    )
+    .cornerRadius(10)
   }
 }

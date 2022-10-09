@@ -7,6 +7,9 @@
 // requirements defined in MIT License.
 
 import Cocoa
+import Shared
+import SwiftUI
+import SwiftUIBackports
 
 // MARK: - Classes used by Candidate Window
 
@@ -42,6 +45,15 @@ public class CandidateCellData: Hashable {
     self.key = key
     self.displayedText = displayedText
     self.isSelected = isSelected
+  }
+
+  public static func == (lhs: CandidateCellData, rhs: CandidateCellData) -> Bool {
+    lhs.key == rhs.key && lhs.displayedText == rhs.displayedText
+  }
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(key)
+    hasher.combine(displayedText)
   }
 
   public var cellLength: Int {
@@ -120,13 +132,79 @@ public class CandidateCellData: Hashable {
     let attrStrCandidate = NSMutableAttributedString(string: displayedText, attributes: attrCandidate)
     return attrStrCandidate
   }
+}
 
-  public static func == (lhs: CandidateCellData, rhs: CandidateCellData) -> Bool {
-    lhs.key == rhs.key && lhs.displayedText == rhs.displayedText
+// MARK: - Contents specifically made for macOS 12 and newer.
+
+@available(macOS 12, *)
+extension CandidateCellData {
+  public var attributedStringForSwiftUI: some View {
+    var result: some View {
+      ZStack(alignment: .leading) {
+        if isSelected {
+          Color(nsColor: CandidateCellData.highlightBackground).ignoresSafeArea().cornerRadius(6)
+        }
+        VStack(spacing: 0) {
+          HStack(spacing: 4) {
+            if UserDefaults.standard.bool(forKey: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue) {
+              Text(AttributedString(attributedStringHeader))
+              Text(AttributedString(attributedString))
+            } else {
+              Text(key).font(.system(size: fontSizeKey).monospaced())
+                .foregroundColor(.init(nsColor: fontColorKey)).lineLimit(1)
+              Text(displayedText).font(.system(size: fontSizeCandidate))
+                .foregroundColor(.init(nsColor: fontColorCandidate)).lineLimit(1)
+            }
+          }.padding(4)
+        }
+      }.fixedSize(horizontal: false, vertical: true)
+    }
+    return result
+  }
+}
+
+// MARK: - Contents specifically made for macOS 10.15 and macOS 11.
+
+@available(macOS 10.15, *)
+extension CandidateCellData {
+  public var themeColorBackports: some View {
+    // 設定當前高亮候選字的背景顏色。
+    let result: Color = {
+      switch locale {
+        case "zh-Hans": return Color.red
+        case "zh-Hant": return Color.blue
+        case "ja": return Color.pink
+        default: return Color.accentColor
+      }
+    }()
+    return result.opacity(0.85)
   }
 
-  public func hash(into hasher: inout Hasher) {
-    hasher.combine(key)
-    hasher.combine(displayedText)
+  public var attributedStringForSwiftUIBackports: some View {
+    var result: some View {
+      ZStack(alignment: .leading) {
+        if isSelected {
+          themeColorBackports.cornerRadius(6)
+          VStack(spacing: 0) {
+            HStack(spacing: 4) {
+              Text(key).font(.custom("Menlo", size: fontSizeKey))
+                .foregroundColor(Color.white.opacity(0.8)).lineLimit(1)
+              Text(displayedText).font(.system(size: fontSizeCandidate))
+                .foregroundColor(Color(white: 1)).lineLimit(1)
+            }.padding(4).foregroundColor(Color(white: 0.9))
+          }
+        } else {
+          VStack(spacing: 0) {
+            HStack(spacing: 4) {
+              Text(key).font(.custom("Menlo", size: fontSizeKey))
+                .foregroundColor(Color.secondary).lineLimit(1)
+              Text(displayedText).font(.system(size: fontSizeCandidate))
+                .foregroundColor(Color.primary).lineLimit(1)
+            }.padding(4).foregroundColor(Color(white: 0.9))
+          }
+        }
+      }.fixedSize(horizontal: false, vertical: true)
+    }
+    return result
   }
 }

@@ -10,7 +10,7 @@ import Cocoa
 import Shared
 
 open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
-  open var hint: String = ""
+  open var tooltip: String = ""
   open var currentLayout: NSUserInterfaceLayoutOrientation = .horizontal
   open var locale: String = ""
   open var useLangIdentifier: Bool = false
@@ -110,15 +110,7 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
     fatalError("init(coder:) has not been implemented")
   }
 
-  open var keyLabels: [CandidateCellData] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-    .map {
-      CandidateCellData(key: $0, displayedText: $0)
-    }
-
   open var candidateFont = NSFont.systemFont(ofSize: 18)
-  open var keyLabelFont = NSFont.monospacedDigitSystemFont(ofSize: 14, weight: .medium)
-
-  open var tooltip: String = ""
 
   @discardableResult open func showNextLine() -> Bool {
     false

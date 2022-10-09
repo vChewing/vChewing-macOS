@@ -57,20 +57,24 @@ struct suiPrefPaneKeyboard: View {
             text: $selSelectionKeys.onChange {
               let value = selSelectionKeys
               let keys: String = value.trimmingCharacters(in: .whitespacesAndNewlines).deduplicated
-              do {
-                try CandidateKey.validate(keys: keys)
-                PrefMgr.shared.candidateKeys = keys
+              if keys.isEmpty {
                 selSelectionKeys = PrefMgr.shared.candidateKeys
-              } catch CandidateKey.ErrorType.empty {
-                selSelectionKeys = PrefMgr.shared.candidateKeys
-              } catch {
-                if let window = ctlPrefUI.shared.controller.window, let error = error as? CandidateKey.ErrorType {
-                  let alert = NSAlert(error: error.errorDescription)
+                return
+              }
+              // Start Error Handling.
+              if let errorResult = CandidateKey.validate(keys: keys) {
+                if let window = ctlPrefUI.shared.controller.window {
+                  let alert = NSAlert(error: NSLocalizedString("Invalid Selection Keys.", comment: ""))
+                  alert.informativeText = errorResult
                   alert.beginSheetModal(for: window) { _ in
                     selSelectionKeys = PrefMgr.shared.candidateKeys
                   }
                   IMEApp.buzz()
                 }
+              } else {
+                PrefMgr.shared.candidateKeys = keys
+                selSelectionKeys = PrefMgr.shared.candidateKeys
+                return
               }
             }
           ).frame(width: 180).disabled(PrefMgr.shared.useIMKCandidateWindow)
@@ -90,6 +94,34 @@ struct suiPrefPaneKeyboard: View {
             .preferenceDescription()
           }
         }
+        Preferences.Section(label: { Text(LocalizedStringKey("Quick Setup:")) }) {
+          HStack {
+            Button {
+              PrefMgr.shared.keyboardParser = 0
+              selKeyboardParser = PrefMgr.shared.keyboardParser
+              PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
+              selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
+            } label: {
+              Text("↻ㄅ" + " " + NSLocalizedString("Dachen Trad.", comment: ""))
+            }
+            Button {
+              PrefMgr.shared.keyboardParser = 1
+              selKeyboardParser = PrefMgr.shared.keyboardParser
+              PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ZhuyinEten"
+              selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
+            } label: {
+              Text("↻ㄅ" + " " + NSLocalizedString("Eten Trad.", comment: ""))
+            }
+            Button {
+              PrefMgr.shared.keyboardParser = 10
+              selKeyboardParser = PrefMgr.shared.keyboardParser
+              PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ABC"
+              selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
+            } label: {
+              Text("↻Ａ")
+            }
+          }
+        }
         Preferences.Section(label: { Text(LocalizedStringKey("Phonetic Parser:")) }) {
           HStack {
             Picker(
@@ -97,18 +129,6 @@ struct suiPrefPaneKeyboard: View {
               selection: $selKeyboardParser.onChange {
                 let value = selKeyboardParser
                 PrefMgr.shared.keyboardParser = value
-                switch value {
-                  case 0:
-                    if !IMKHelper.arrDynamicBasicKeyLayouts.contains(PrefMgr.shared.basicKeyboardLayout) {
-                      PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
-                      selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
-                    }
-                  default:
-                    if IMKHelper.arrDynamicBasicKeyLayouts.contains(PrefMgr.shared.basicKeyboardLayout) {
-                      PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ABC"
-                      selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
-                    }
-                }
               }
             ) {
               Group {
@@ -135,39 +155,18 @@ struct suiPrefPaneKeyboard: View {
                 Text(LocalizedStringKey("Universal Pinyin with Numeral Intonation")).tag(14)
               }
             }
+            .fixedSize()
             .labelsHidden()
-            Button {
-              PrefMgr.shared.keyboardParser = 0
-              selKeyboardParser = PrefMgr.shared.keyboardParser
-              PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
-              selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
-            } label: {
-              Text("↻ㄅ")
-            }
-            Button {
-              PrefMgr.shared.keyboardParser = 10
-              selKeyboardParser = PrefMgr.shared.keyboardParser
-              PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ABC"
-              selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
-            } label: {
-              Text("↻Ａ")
-            }
+            Spacer()
           }
           .frame(width: 380.0)
-          HStack {
-            Text(
-              NSLocalizedString(
-                "Choose the phonetic layout for Mandarin parser.",
-                comment: ""
-              ) + (PrefMgr.shared.appleLanguages[0].contains("en") ? " " : "")
-                + NSLocalizedString(
-                  "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional.",
-                  comment: ""
-                )
+          Text(
+            NSLocalizedString(
+              "Choose the phonetic layout for Mandarin parser.",
+              comment: ""
             )
-            .preferenceDescription().fixedSize(horizontal: false, vertical: true)
-            Spacer().frame(width: 30)
-          }
+          )
+          .preferenceDescription()
         }
         Preferences.Section(label: { Text(LocalizedStringKey("Basic Keyboard Layout:")) }) {
           HStack {
@@ -176,10 +175,6 @@ struct suiPrefPaneKeyboard: View {
               selection: $selBasicKeyboardLayout.onChange {
                 let value = selBasicKeyboardLayout
                 PrefMgr.shared.basicKeyboardLayout = value
-                if IMKHelper.arrDynamicBasicKeyLayouts.contains(value) {
-                  PrefMgr.shared.keyboardParser = 0
-                  selKeyboardParser = PrefMgr.shared.keyboardParser
-                }
               }
             ) {
               ForEach(0...(IMKHelper.allowedBasicLayoutsAsTISInputSources.count - 1), id: \.self) { id in
@@ -194,16 +189,13 @@ struct suiPrefPaneKeyboard: View {
             .labelsHidden()
             .frame(width: 240.0)
           }
-          HStack {
-            Text(
-              NSLocalizedString(
-                "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only.",
-                comment: ""
-              )
+          Text(
+            NSLocalizedString(
+              "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is not (any) pinyin.",
+              comment: ""
             )
-            .preferenceDescription().fixedSize(horizontal: false, vertical: true)
-            Spacer().frame(width: 30)
-          }
+          )
+          .preferenceDescription()
         }
         Preferences.Section(label: { Text(LocalizedStringKey("Alphanumerical Layout:")) }) {
           HStack {
@@ -225,7 +217,7 @@ struct suiPrefPaneKeyboard: View {
           HStack {
             Text(
               NSLocalizedString(
-                "Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode only.",
+                "Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only.",
                 comment: ""
               )
             )

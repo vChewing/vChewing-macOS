@@ -9,7 +9,6 @@
 import CandidateWindow
 import NSAttributedTextView
 import Shared
-import TDKCandidateBackports
 
 // MARK: - Tooltip Display and Candidate Display Methods
 
@@ -72,79 +71,33 @@ extension SessionCtl {
 
   func showCandidates() {
     guard let client = client() else { return }
-    var isCandidateWindowVertical: Bool {
-      // var candidates: [(String, String)] = .init()
-      // if state.isCandidateContainer { candidates = state.candidates }
-      if isVerticalTyping { return true }
-      // 接下來的判斷並非適用於 IMK 選字窗，所以先插入排除語句。
-      // guard Self.ctlCandidateCurrent is CtlCandidateUniversal else { return false }
-      // 以上是通用情形。接下來決定橫排輸入時是否使用縱排選字窗。
-      // 因為在拿候選字陣列時已經排序過了，所以這裡不用再多排序。
-      // 測量每頁顯示候選字的累計總長度。如果太長的話就強制使用縱排候選字窗。
-      // 範例：「屬實牛逼」（會有一大串各種各樣的「鼠食牛Beer」的 emoji）。
-      // let maxCandidatesPerPage = PrefMgr.shared.candidateKeys.count
-      // let firstPageCandidates = candidates[0..<min(maxCandidatesPerPage, candidates.count)].map(\.1)
-      // return firstPageCandidates.joined().count > Int(round(Double(maxCandidatesPerPage) * 1.8))
-      // 上面這句如果是 true 的話，就會是縱排；反之則為橫排。
-      return false
-    }
+    state.isVerticalCandidateWindow = (isVerticalTyping || !PrefMgr.shared.useHorizontalCandidateList)
 
-    state.isVerticalCandidateWindow = (isCandidateWindowVertical || !PrefMgr.shared.useHorizontalCandidateList)
-
+    /// 無論是田所選字窗還是 IMK 選字窗，在這裡都有必要重新初期化。
     Self.ctlCandidateCurrent.delegate = nil
-
-    /// 下面這一段本可直接指定 currentLayout，但這樣的話翻頁按鈕位置無法精準地重新繪製。
-    /// 所以只能重新初期化。壞處就是得在 ctlCandidate() 當中與 SymbolTable 控制有關的地方
-    /// 新增一個空狀態請求、防止縱排與橫排選字窗同時出現。
-    /// layoutCandidateView 在這裡無法起到糾正作用。
-    /// 該問題徹底解決的價值並不大，直接等到 macOS 10.x 全線淘汰之後用 SwiftUI 重寫選字窗吧。
-
     let candidateLayout: NSUserInterfaceLayoutOrientation =
-      ((isCandidateWindowVertical || !PrefMgr.shared.useHorizontalCandidateList)
+      ((isVerticalTyping || !PrefMgr.shared.useHorizontalCandidateList)
         ? .vertical
         : .horizontal)
 
-    if #available(macOS 12, *) {
+    if #available(macOS 10.15, *) {
       Self.ctlCandidateCurrent =
         PrefMgr.shared.useIMKCandidateWindow
         ? CtlCandidateIMK(candidateLayout) : CtlCandidateTDK(candidateLayout)
-    } else if #available(macOS 10.15, *) {
-      Self.ctlCandidateCurrent =
-        PrefMgr.shared.useIMKCandidateWindow
-        ? CtlCandidateIMK(candidateLayout) : CtlCandidateTDKBackports(candidateLayout)
+      if let candidateTDK = Self.ctlCandidateCurrent as? CtlCandidateTDK {
+        candidateTDK.maxLinesPerPage = isVerticalTyping ? 1 : 3
+      }
     } else {
       Self.ctlCandidateCurrent = CtlCandidateIMK(candidateLayout)
     }
 
-    // set the attributes for the candidate panel (which uses NSAttributedString)
-    let textSize = PrefMgr.shared.candidateListTextSize
-    let minimumKeyLabelSize: Double = 10
-    let keyLabelSize = max(textSize / 2, minimumKeyLabelSize)
-
-    func labelFont(name: String?, size: Double) -> NSFont {
-      if let name = name {
-        return NSFont(name: name, size: size) ?? NSFont.systemFont(ofSize: size)
-      }
-      return NSFont.systemFont(ofSize: size)
-    }
-
-    Self.ctlCandidateCurrent.keyLabelFont = labelFont(
-      name: PrefMgr.shared.candidateKeyLabelFontName, size: keyLabelSize
-    )
     Self.ctlCandidateCurrent.candidateFont = Self.candidateFont(
-      name: PrefMgr.shared.candidateTextFontName, size: textSize
+      name: PrefMgr.shared.candidateTextFontName, size: PrefMgr.shared.candidateListTextSize
     )
-
-    let candidateKeys = PrefMgr.shared.candidateKeys
-    let keyLabels =
-      candidateKeys.count > 4 ? Array(candidateKeys) : Array(CandidateKey.defaultKeys)
-    let keyLabelSuffix = state.type == .ofAssociates ? "^" : ""
-    Self.ctlCandidateCurrent.keyLabels = keyLabels.map {
-      CandidateCellData(key: String($0), displayedText: String($0) + keyLabelSuffix)
-    }
 
     if state.type == .ofAssociates {
-      Self.ctlCandidateCurrent.hint = NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
+      Self.ctlCandidateCurrent.tooltip =
+        isVerticalTyping ? "⇧" : NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
     }
 
     Self.ctlCandidateCurrent.useLangIdentifier = PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier
@@ -169,7 +122,7 @@ extension SessionCtl {
       }
     }
 
-    Self.ctlCandidateCurrent.delegate = self
+    Self.ctlCandidateCurrent.delegate = self  // 會自動觸發田所選字窗的資料重載。
     Self.ctlCandidateCurrent.visible = true
 
     if isVerticalTyping {

@@ -60,7 +60,6 @@ public protocol PrefMgrProtocol {
   var specifyShiftTabKeyBehavior: Bool { get set }
   var specifyShiftSpaceKeyBehavior: Bool { get set }
   var candidateTextFontName: String { get set }
-  var candidateKeyLabelFontName: String { get set }
   var candidateKeys: String { get set }
   var useSCPCTypingMode: Bool { get set }
   var phraseReplacementEnabled: Bool { get set }

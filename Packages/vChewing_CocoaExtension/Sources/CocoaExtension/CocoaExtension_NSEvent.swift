@@ -44,7 +44,7 @@ extension NSEvent {
   /// 自 Emacs 熱鍵的 NSEvent 翻譯回標準 NSEvent。失敗的話則會返回原始 NSEvent 自身。
   /// - Parameter isVerticalTyping: 是否按照縱排來操作。
   /// - Returns: 翻譯結果。失敗的話則返回翻譯原文。
-  public func convertFromEmacKeyEvent(isVerticalContext: Bool) -> NSEvent {
+  public func convertFromEmacsKeyEvent(isVerticalContext: Bool) -> NSEvent {
     guard isEmacsKey else { return self }
     let newKeyCode: UInt16 = {
       switch isVerticalContext {
@@ -78,10 +78,10 @@ extension NSEvent {
 
 extension NSEvent {
   public var isTypingVertical: Bool { charactersIgnoringModifiers == "Vertical" }
-  public var text: String { convertedFromPhonabets() }
+  public var text: String { characters ?? "" }
   public var inputTextIgnoringModifiers: String? {
     guard charactersIgnoringModifiers != nil else { return nil }
-    return convertedFromPhonabets(ignoringModifiers: true)
+    return charactersIgnoringModifiers ?? characters ?? ""
   }
 
   public var charCode: UInt16 {
@@ -302,4 +302,30 @@ enum CharCode: UInt16 {
 public enum EmacsKey {
   static let charKeyMapHorizontal: [UInt16: UInt16] = [6: 124, 2: 123, 1: 115, 5: 119, 4: 117, 22: 121]
   static let charKeyMapVertical: [UInt16: UInt16] = [6: 125, 2: 126, 1: 115, 5: 119, 4: 117, 22: 121]
+}
+
+// MARK: - Apple ABC Keyboard Mapping
+
+let arrAppleABCKeyboardMap: [UInt16: (String, String)] = [
+  50: ("`", "~"), 18: ("1", "!"), 19: ("2", "@"), 20: ("3", "#"), 21: ("4", "$"), 23: ("5", "%"), 22: ("6", "^"),
+  26: ("7", "&"), 28: ("8", "*"), 25: ("9", "("), 29: ("0", ")"), 27: ("-", "_"), 24: ("=", "+"), 12: ("q", "Q"),
+  13: ("w", "W"), 14: ("e", "E"), 15: ("r", "R"), 17: ("t", "T"), 16: ("y", "Y"), 32: ("u", "U"), 34: ("i", "I"),
+  31: ("o", "O"), 35: ("p", "P"), 33: ("[", "{"), 30: ("]", "}"), 42: ("\\", "|"), 0: ("a", "A"), 1: ("s", "S"),
+  2: ("d", "D"), 3: ("f", "F"), 5: ("g", "G"), 4: ("h", "H"), 38: ("j", "J"), 40: ("k", "K"), 37: ("l", "L"),
+  41: (";", ":"), 39: ("'", "\""), 6: ("z", "Z"), 7: ("x", "X"), 8: ("c", "C"), 9: ("v", "V"), 11: ("b", "B"),
+  45: ("n", "N"), 46: ("m", "M"), 43: (",", "<"), 47: (".", ">"), 44: ("/", "?"),
+]
+
+extension NSEvent {
+  public var inAppleABCStaticForm: NSEvent {
+    if type == .flagsChanged { return self }
+    guard modifierFlags == .shift || modifierFlags == [] else { return self }
+    if !arrAppleABCKeyboardMap.keys.contains(keyCode) { return self }
+    guard let dataTuplet = arrAppleABCKeyboardMap[keyCode] else { return self }
+    let result: NSEvent? = reinitiate(
+      characters: isShiftHold ? dataTuplet.1 : dataTuplet.0,
+      charactersIgnoringModifiers: dataTuplet.0
+    )
+    return result ?? self
+  }
 }

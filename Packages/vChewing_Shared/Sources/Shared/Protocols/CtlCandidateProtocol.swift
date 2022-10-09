@@ -10,25 +10,20 @@ import Cocoa
 
 public protocol CtlCandidateDelegate: AnyObject {
   func candidatePairs(conv: Bool) -> [(String, String)]
-  func candidatePairAt(_ index: Int) -> (String, String)
   func candidatePairSelected(at index: Int)
   func candidates(_ sender: Any!) -> [Any]!
-  func buzz()
   var selectionKeys: String { get }
 }
 
 public protocol CtlCandidateProtocol {
-  var hint: String { get set }
+  var tooltip: String { get set }
   var locale: String { get set }
   var currentLayout: NSUserInterfaceLayoutOrientation { get set }
   var delegate: CtlCandidateDelegate? { get set }
   var selectedCandidateIndex: Int { get set }
   var visible: Bool { get set }
   var windowTopLeftPoint: NSPoint { get set }
-  var keyLabels: [CandidateCellData] { get set }
-  var keyLabelFont: NSFont { get set }
   var candidateFont: NSFont { get set }
-  var tooltip: String { get set }
   var useLangIdentifier: Bool { get set }
 
   init(_ layout: NSUserInterfaceLayoutOrientation)

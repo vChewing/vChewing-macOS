@@ -41,10 +41,10 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qDj-B9-mZf">
-                    <rect key="frame" x="20" y="31" width="796" height="367"/>
+                    <rect key="frame" x="20" y="54" width="796" height="344"/>
                     <subviews>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j9R-fB-ttM">
-                            <rect key="frame" x="0.0" y="49" width="402" height="318"/>
+                            <rect key="frame" x="0.0" y="26" width="402" height="318"/>
                             <subviews>
                                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fO5-4y-X0y">
                                     <rect key="frame" x="0.0" y="277" width="365" height="41"/>
@@ -267,10 +267,10 @@
                             </customSpacing>
                         </stackView>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VOm-nN-5IB">
-                            <rect key="frame" x="410" y="0.0" width="386" height="367"/>
+                            <rect key="frame" x="410" y="0.0" width="386" height="344"/>
                             <subviews>
                                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="7" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s47-wG-vKA">
-                                    <rect key="frame" x="0.0" y="284" width="386" height="83"/>
+                                    <rect key="frame" x="0.0" y="261" width="386" height="83"/>
                                     <subviews>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iCL-n8-VTP">
                                             <rect key="frame" x="-2" y="68" width="323" height="15"/>
@@ -320,7 +320,7 @@
                                     </customSpacing>
                                 </stackView>
                                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NOW-jd-XBh">
-                                    <rect key="frame" x="0.0" y="211" width="386" height="61"/>
+                                    <rect key="frame" x="0.0" y="188" width="386" height="61"/>
                                     <subviews>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J0f-Aw-dxC">
                                             <rect key="frame" x="-2" y="46" width="336" height="15"/>
@@ -366,10 +366,10 @@
                                     </customSpacing>
                                 </stackView>
                                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jxD-fv-UYx">
-                                    <rect key="frame" x="0.0" y="0.0" width="380" height="199"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="380" height="176"/>
                                     <subviews>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="109">
-                                            <rect key="frame" x="-1" y="183.5" width="285" height="16"/>
+                                            <rect key="frame" x="-1" y="160.5" width="285" height="16"/>
                                             <buttonCell key="cell" type="check" title="Enable Space key for calling candidate window" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="110">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
@@ -379,7 +379,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bE0-Lq-Pj7">
-                                            <rect key="frame" x="-1" y="160.5" width="266" height="16"/>
+                                            <rect key="frame" x="-1" y="137.5" width="266" height="16"/>
                                             <buttonCell key="cell" type="check" title="Use ESC key to clear the entire input buffer" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="f2j-xD-4xK">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
@@ -389,7 +389,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mzw-F2-aAQ">
-                                            <rect key="frame" x="-1" y="137.5" width="295" height="16"/>
+                                            <rect key="frame" x="-1" y="114.5" width="295" height="16"/>
                                             <buttonCell key="cell" type="check" title="Emulating select-candidate-per-character mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="ArK-Vk-OoT">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
@@ -399,7 +399,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="j8R-Hj-3dj">
-                                            <rect key="frame" x="-1" y="114.5" width="340" height="16"/>
+                                            <rect key="frame" x="-1" y="91.5" width="340" height="16"/>
                                             <buttonCell key="cell" type="check" title="Automatically correct reading combinations when typing" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkAutoCorrectReadingCombination">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
@@ -409,7 +409,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6MM-WC-Mpd">
-                                            <rect key="frame" x="-1" y="91.5" width="381" height="16"/>
+                                            <rect key="frame" x="-1" y="68.5" width="381" height="16"/>
                                             <buttonCell key="cell" type="check" title="Allow using Enter key to confirm associated candidate selection" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkAlsoConfirmAssociatedCandidatesByEnter">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
@@ -419,7 +419,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HaB-rc-AcW">
-                                            <rect key="frame" x="-1" y="68.5" width="295" height="16"/>
+                                            <rect key="frame" x="-1" y="45.5" width="295" height="16"/>
                                             <buttonCell key="cell" type="check" title="Allow backspace-editing miscomposed readings" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkKeepReadingUponCompositionError">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
@@ -429,7 +429,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xe6-Pu-3Fa">
-                                            <rect key="frame" x="-1" y="45.5" width="223" height="16"/>
+                                            <rect key="frame" x="-1" y="22.5" width="223" height="16"/>
                                             <buttonCell key="cell" type="check" title="Trim unfinished readings on commit" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="tglTrimUnfinishedReadingsOnCommit">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
@@ -439,30 +439,13 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7QM-7z-tpq">
-                                            <rect key="frame" x="-1" y="22.5" width="233" height="16"/>
+                                            <rect key="frame" x="-1" y="-0.5" width="233" height="16"/>
                                             <buttonCell key="cell" type="check" title="Always show tooltip texts horizontally" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="lblAlwaysShowTooltipTextsHorizontally">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
                                             </buttonCell>
                                             <connections>
                                                 <binding destination="32" name="value" keyPath="values.AlwaysShowTooltipTextsHorizontally" id="szi-4g-EIC"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="233">
-                                            <rect key="frame" x="-1" y="-0.5" width="271" height="16"/>
-                                            <buttonCell key="cell" type="check" title="Show notifications when toggling Caps Lock" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="shc-Nu-UsM">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="cellTitle"/>
-                                                <connections>
-                                                    <binding destination="32" name="value" keyPath="values.ShowNotificationsWhenTogglingCapsLock" id="0e1-3G-eIc"/>
-                                                </connections>
-                                            </buttonCell>
-                                            <connections>
-                                                <binding destination="32" name="enabled" keyPath="values.UseIMKCandidateWindow" id="pHT-37-Eyh">
-                                                    <dictionary key="options">
-                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                    </dictionary>
-                                                </binding>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -475,10 +458,8 @@
                                         <integer value="1000"/>
                                         <integer value="1000"/>
                                         <integer value="1000"/>
-                                        <integer value="1000"/>
                                     </visibilityPriorities>
                                     <customSpacing>
-                                        <real value="3.4028234663852886e+38"/>
                                         <real value="3.4028234663852886e+38"/>
                                         <real value="3.4028234663852886e+38"/>
                                         <real value="3.4028234663852886e+38"/>
@@ -1241,7 +1222,7 @@
                             </constraints>
                             <textFieldCell key="cell" selectable="YES" id="wQ9-px-b07">
                                 <font key="font" metaFont="cellTitle"/>
-                                <string key="title">Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen &amp; Eten Traditional) must match the Dachen parser in order to be functional.</string>
+                                <string key="title">Basic keyboard layout option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is not (any) pinyin.</string>
                                 <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>

@@ -1,4 +1,5 @@
 "vChewing" = "威注音输入法";
+"Invalid Selection Keys." = "选字键参数资料值不规范。";
 "Alphanumerical Input Mode" = "英数输入模式";
 "Chinese Input Mode" = "中文输入模式";
 "Please enter the client app bundle identifier(s) you want to register." = "请键入您要登记的客体应用的唯一标帜（Bundle Identifier）。";
@@ -39,7 +40,7 @@
 "NotificationSwitchON" = "✔ 已启用";
 "NotificationSwitchOFF" = "✘ 已停用";
 "NotificationSwitchASCII" = "↺ 切换完毕";
-"Edit User Phrases…" = "编辑自订语汇…";
+"Edit vChewing User Phrases…" = "编辑威注音自订语汇…";
 "Reload User Phrases" = "重载自订语汇";
 "Unable to create the user phrase file." = "无法创建自订语汇档案。";
 "Please check the permission at \"%@\"." = "请检查此处的存取权限：\"%@\".";
@@ -51,10 +52,9 @@
 "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "「%@」已存在：\n　敲 Enter 以升权、敲 Shift+Command+Enter 以降权；\n　敲 BackSpace 或 Delete 以排除。";
 "Edit Phrase Replacement Table…" = "编辑语汇置换表…";
 "Use Phrase Replacement" = "使用语汇置换";
-"Candidate keys can only contain ASCII characters like alphanumericals." = "选字键只能是英数等 ASCII 字符。";
+"Candidate keys can only contain printable ASCII characters like alphanumericals." = "选字键只能是英数等 ASCII 可列印字符。";
 "Candidate keys cannot contain space." = "选字键不得包含空格。";
-"There should not be duplicated keys." = "选字键不得重复。";
-"Please specify at least 6 candidate keys." = "请至少指定 6 个选字键。";
+"Minimum 6 candidate keys allowed." = "请至少指定 6 个选字键。";
 "Maximum 9 candidate keys allowed." = "选字键最多只能指定 9 个。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 语汇置换功能已启用，会波及语汇自订。";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 无法处理：组字区字数与读音数不对应。";
@@ -82,6 +82,8 @@
 "Clear Memorized Phrases" = "清除临时记忆语汇资料";
 "Currency Numeral Output" = "大写汉字数字输出";
 "Hold ⇧ to choose associates." = "摁住⇧以选取联想词。";
+"Dachen Trad." = "大千传统";
+"Eten Trad." = "倚天传统";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";
@@ -126,7 +128,6 @@
 "Apple ABC (equivalent to English US)" = "Apple ABC (与 Apple 美规键盘等价)";
 "Apple Chewing - Dachen" = "Apple 大千注音键盘排列";
 "Apple Chewing - Eten Traditional" = "Apple 倚天传统键盘排列";
-"Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional." = "Apple 动态注音键盘布局（大千与倚天）要求普通话/国音分析器得配置为大千排列。";
 "Applying typing suggestions from half-life user override model" = "在敲字时自动套用来自半衰记忆模组的建议";
 "at the rear of the phrase (like Microsoft New Phonetic)" = "将游标置于词语后方 // Windows 微软新注音风格";
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "自动将繁体中文字转为日文 JIS 新字体";
@@ -144,8 +145,8 @@
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "指定 (Shift+)Tab 在选字窗内的轮替操作对象。";
 "Choose the behavior of Shift+Letter key with letter inputs." = "指定 Shift+字母键 的行为。";
 "Choose the cursor position where you want to list possible candidates." = "请选择用以触发选字的游标相对位置。";
-"Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode only." = "请选择 macOS 英数键盘布局。该布局仅用于英数输入模式。";
-"Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "请选择 macOS 基础键盘布局。QWERTY 以外的英数布局是为了拼音排列使用者而准备的。";
+"Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only." = "请选择 macOS 英数键盘布局。该布局仅用于 Shift 英数输入模式。";
+"Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is not (any) pinyin." = "请选择 macOS 基础键盘布局。QWERTY 以外的英数布局是为了拼音排列的使用者而准备的。如果当前的普通话/国音分析器并未设为拼音的话，则键盘布局选项仅会影响到荧幕键盘。";
 "Choose the phonetic layout for Mandarin parser." = "请指定普通话/国音分析器所使用的注音排列。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "请在此指定您想指定的使用者语汇档案目录。无效值会被忽略。";
 "Choose your preferred layout of the candidate window." = "选择您所偏好的候选字窗布局。";
@@ -202,6 +203,7 @@
 "Phonetic Parser:" = "注音排列:";
 "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu." = "请利用滑鼠滚轮检视该页面。也请洽输入法选单内的热键指南。";
 "Push the cursor in front of the phrase after selection" = "在选字后将游标置于该字词的前方";
+"Quick Setup:" = "直接设定:";
 "Secondary Pinyin with Numeral Intonation" = "国音二式+数字标调";
 "Seigyou" = "精业排列";
 "Selection Keys:" = "选字键:";

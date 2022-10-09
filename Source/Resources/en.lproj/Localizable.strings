@@ -1,4 +1,5 @@
 "vChewing" = "vChewing";
+"Invalid Selection Keys." = "Invalid Selection Keys.";
 "Alphanumerical Input Mode" = "Alphanumerical Input Mode";
 "Chinese Input Mode" = "Chinese Input Mode";
 "Please enter the client app bundle identifier(s) you want to register." = "Please enter the client app bundle identifier(s) you want to register.";
@@ -39,7 +40,7 @@
 "NotificationSwitchON" = "✔ ON";
 "NotificationSwitchOFF" = "✘ OFF";
 "NotificationSwitchASCII" = "↺ Switched";
-"Edit User Phrases…" = "Edit User Phrases…";
+"Edit vChewing User Phrases…" = "Edit vChewing User Phrases…";
 "Reload User Phrases" = "Reload User Phrases";
 "Unable to create the user phrase file." = "Unable to create the user phrase file.";
 "Please check the permission at \"%@\"." = "Please check the permission at \"%@\".";
@@ -51,10 +52,9 @@
 "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude.";
 "Edit Phrase Replacement Table…" = "Edit Phrase Replacement Table…";
 "Use Phrase Replacement" = "Use Phrase Replacement";
-"Candidate keys can only contain ASCII characters like alphanumericals." = "Candidate keys can only contain ASCII characters like alphanumericals.";
+"Candidate keys can only contain printable ASCII characters like alphanumericals." = "Candidate keys can only contain printable ASCII characters like alphanumericals.";
 "Candidate keys cannot contain space." = "Candidate keys cannot contain space.";
-"There should not be duplicated keys." = "There should not be duplicated keys.";
-"Please specify at least 6 candidate keys." = "Please specify at least 6 candidate keys.";
+"Minimum 6 candidate keys allowed." = "Minimum 6 candidate keys allowed.";
 "Maximum 9 candidate keys allowed." = "Maximum 9 candidate keys allowed.";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.";
@@ -82,6 +82,8 @@
 "Clear Memorized Phrases" = "Clear Memorized Phrases";
 "Currency Numeral Output" = "Currency Numeral Output";
 "Hold ⇧ to choose associates." = "Hold ⇧ to choose associates.";
+"Dachen Trad." = "Dachen Trad.";
+"Eten Trad." = "Eten Trad.";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "CommonSymbols";
@@ -126,7 +128,6 @@
 "Apple ABC (equivalent to English US)" = "Apple ABC (equivalent to English US)";
 "Apple Chewing - Dachen" = "Apple Chewing - Dachen";
 "Apple Chewing - Eten Traditional" = "Apple Chewing - Eten Traditional";
-"Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional." = "Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional.";
 "Applying typing suggestions from half-life user override model" = "Applying typing suggestions from half-life user override model";
 "at the rear of the phrase (like Microsoft New Phonetic)" = "at the rear of the phrase (like Microsoft New Phonetic)";
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters";
@@ -144,8 +145,8 @@
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "Choose the behavior of (Shift+)Tab key in the candidate window.";
 "Choose the behavior of Shift+Letter key with letter inputs." = "Choose the behavior of Shift+Letter key with letter inputs.";
 "Choose the cursor position where you want to list possible candidates." = "Choose the cursor position where you want to list possible candidates.";
-"Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode only." = "Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode only.";
-"Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only.";
+"Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only." = "Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only.";
+"Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is not (any) pinyin." = "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is not (any) pinyin.";
 "Choose the phonetic layout for Mandarin parser." = "Choose the phonetic layout for Mandarin parser.";
 "Choose your desired user data folder path. Will be omitted if invalid." = "Choose your desired user data folder path. Will be omitted if invalid.";
 "Choose your preferred layout of the candidate window." = "Choose your preferred layout of the candidate window.";
@@ -202,6 +203,7 @@
 "Phonetic Parser:" = "Phonetic Parser:";
 "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu." = "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu.";
 "Push the cursor in front of the phrase after selection" = "Push the cursor in front of the phrase after selection";
+"Quick Setup:" = "Quick Setup:";
 "Secondary Pinyin with Numeral Intonation" = "Secondary Pinyin with Numeral Intonation";
 "Seigyou" = "Seigyou (JinYei)";
 "Selection Keys:" = "Selection Keys:";
