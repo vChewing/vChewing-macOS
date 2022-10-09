@@ -65,9 +65,9 @@ class SessionCtl: IMKInputController {
     didSet {
       guard oldValue.type != state.type else { return }
       vCLog("Current State: \(state.type.rawValue)")
-      if state.isCandidateContainer || oldValue.isCandidateContainer {
-        setKeyLayout()
-      }
+      // 因鍵盤訊號翻譯機制存在，故禁用下文。
+      // guard state.isCandidateContainer != oldValue.isCandidateContainer else { return }
+      // if state.isCandidateContainer || oldValue.isCandidateContainer { setKeyLayout() }
     }
   }
 
@@ -141,7 +141,7 @@ extension SessionCtl {
     guard let client = client() else { return }
 
     func doSetKeyLayout() {
-      if (isASCIIMode && IMKHelper.isDynamicBasicKeyboardLayoutEnabled) || state.isCandidateContainer {
+      if isASCIIMode, IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
         client.overrideKeyboard(withKeyboardNamed: PrefMgr.shared.alphanumericalKeyboardLayout)
         return
       }
