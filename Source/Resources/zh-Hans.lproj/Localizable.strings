@@ -128,7 +128,6 @@
 "Apple ABC (equivalent to English US)" = "Apple ABC (与 Apple 美规键盘等价)";
 "Apple Chewing - Dachen" = "Apple 大千注音键盘排列";
 "Apple Chewing - Eten Traditional" = "Apple 倚天传统键盘排列";
-"Apple Dynamic Bopomofo Basic Keyboard Layouts (Dachen & Eten Traditional) must match the Dachen parser in order to be functional." = "Apple 动态注音键盘布局（大千与倚天）要求普通话/国音分析器得配置为大千排列。";
 "Applying typing suggestions from half-life user override model" = "在敲字时自动套用来自半衰记忆模组的建议";
 "at the rear of the phrase (like Microsoft New Phonetic)" = "将游标置于词语后方 // Windows 微软新注音风格";
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "自动将繁体中文字转为日文 JIS 新字体";
@@ -146,8 +145,8 @@
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "指定 (Shift+)Tab 在选字窗内的轮替操作对象。";
 "Choose the behavior of Shift+Letter key with letter inputs." = "指定 Shift+字母键 的行为。";
 "Choose the cursor position where you want to list possible candidates." = "请选择用以触发选字的游标相对位置。";
-"Choose the macOS-level alphanumerical keyboard layout. This setting is for candidate window and the alphanumerical mode only." = "请选择 macOS 英数键盘布局。该布局仅用于选字窗和英数输入模式。";
-"Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "请选择 macOS 基础键盘布局。QWERTY 以外的英数布局是为了拼音排列使用者而准备的。";
+"Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only." = "请选择 macOS 英数键盘布局。该布局仅用于 Shift 英数输入模式。";
+"Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is not (any) pinyin." = "请选择 macOS 基础键盘布局。QWERTY 以外的英数布局是为了拼音排列的使用者而准备的。如果当前的普通话/国音分析器并未设为拼音的话，则键盘布局选项仅会影响到荧幕键盘。";
 "Choose the phonetic layout for Mandarin parser." = "请指定普通话/国音分析器所使用的注音排列。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "请在此指定您想指定的使用者语汇档案目录。无效值会被忽略。";
 "Choose your preferred layout of the candidate window." = "选择您所偏好的候选字窗布局。";
