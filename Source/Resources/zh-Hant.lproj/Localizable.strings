@@ -39,7 +39,7 @@
 "NotificationSwitchON" = "✔ 已啟用";
 "NotificationSwitchOFF" = "✘ 已停用";
 "NotificationSwitchASCII" = "↺ 切換完畢";
-"Edit User Phrases…" = "編輯自訂語彙…";
+"Edit vChewing User Phrases…" = "編輯威注音自訂語彙…";
 "Reload User Phrases" = "重載自訂語彙";
 "Unable to create the user phrase file." = "無法創建自訂語彙檔案。";
 "Please check the permission at \"%@\"." = "請檢查此處的存取權限：\"%@\".";
@@ -144,7 +144,7 @@
 "Choose the behavior of (Shift+)Tab key in the candidate window." = "指定 (Shift+)Tab 在選字窗內的輪替操作對象。";
 "Choose the behavior of Shift+Letter key with letter inputs." = "指定 Shift+字母鍵 的行為。";
 "Choose the cursor position where you want to list possible candidates." = "請選擇用以觸發選字的游標相對位置。";
-"Choose the macOS-level alphanumerical keyboard layout. This setting is for the alphanumerical mode only." = "請選擇 macOS 英數鍵盤佈局。該佈局僅用於英數輸入模式。";
+"Choose the macOS-level alphanumerical keyboard layout. This setting is for candidate window and the alphanumerical mode only." = "請選擇 macOS 英數鍵盤佈局。該佈局僅用於選字窗和英數輸入模式。";
 "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only." = "請選擇 macOS 基礎鍵盤佈局。QWERTY 以外的英數佈局是為了拼音排列使用者而準備的。";
 "Choose the phonetic layout for Mandarin parser." = "請指定普通話/國音分析器所使用的注音排列。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "請在此指定您想指定的使用者語彙檔案目錄。無效值會被忽略。";

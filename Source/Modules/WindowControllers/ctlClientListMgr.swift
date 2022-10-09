@@ -54,7 +54,7 @@ extension ctlClientListMgr {
     alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
 
     let maxFloat = Double(Float.greatestFiniteMagnitude)
-    let scrollview = NSScrollView(frame: NSRect(x: 0, y: 0, width: 370, height: 380))
+    let scrollview = NSScrollView(frame: NSRect(x: 0, y: 0, width: 370, height: 200))
     let contentSize = scrollview.contentSize
     scrollview.borderType = .noBorder
     scrollview.hasVerticalScroller = true
