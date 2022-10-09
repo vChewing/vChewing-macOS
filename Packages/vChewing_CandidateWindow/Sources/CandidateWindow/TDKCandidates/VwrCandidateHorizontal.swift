@@ -107,6 +107,9 @@ public struct VwrCandidateHorizontal: View {
       .fixedSize(horizontal: false, vertical: true)
     }
     .frame(minWidth: thePool.maxWindowWidth, maxWidth: thePool.maxWindowWidth)
+    .overlay(
+      RoundedRectangle(cornerRadius: 10).stroke(.white.opacity(0.2), lineWidth: 1)
+    )
     .cornerRadius(10)
   }
 }
