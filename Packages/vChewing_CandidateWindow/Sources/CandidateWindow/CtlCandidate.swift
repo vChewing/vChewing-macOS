@@ -39,7 +39,7 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
     return result.blended(withFraction: colorBlendAmount, of: blendingAgainstTarget)!
   }
 
-  open weak var delegate: CtlCandidateDelegate? {
+  open var delegate: CtlCandidateDelegate? {
     didSet {
       reloadData()
     }
