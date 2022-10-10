@@ -16,6 +16,10 @@ extension SessionCtl {
   ///
   /// 先將舊狀態單獨記錄起來，再將新舊狀態作為參數，
   /// 根據新狀態本身的狀態種類來判斷交給哪一個專門的函式來處理。
+  /// - Remark: ⚠️ 任何在這個函式當中被改變的變數均不得是靜態 (Static) 變數。
+  /// 針對某一個客體的 deactivateServer() 可能會在使用者切換到另一個客體應用
+  /// 且開始敲字之後才會執行。這個過程會使得不同的 SessionCtl 副本之間出現
+  /// 不必要的互相干涉、打斷彼此的工作。
   /// - Parameter newState: 新狀態。
   func handle(state newState: IMEStateProtocol) {
     let previous = state
