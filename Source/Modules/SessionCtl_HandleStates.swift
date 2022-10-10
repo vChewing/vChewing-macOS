@@ -21,10 +21,10 @@ extension SessionCtl {
   /// 且開始敲字之後才會執行。這個過程會使得不同的 SessionCtl 副本之間出現
   /// 不必要的互相干涉、打斷彼此的工作。
   /// - Parameter newState: 新狀態。
-  public func handle(state newState: IMEStateProtocol) {
-    let previous = state
-    state = newState
-    switch state.type {
+  public func handle(state newState: IMEStateProtocol, replaceCurrent: Bool = true) {
+    var previous = state
+    if replaceCurrent { state = newState }
+    switch newState.type {
       case .ofDeactivated:
         ctlCandidateCurrent.visible = false
         popupCompositionBuffer.hide()
@@ -43,20 +43,19 @@ extension SessionCtl {
           for instance in Self.allInstances {
             guard let imkC = instance.ctlCandidateCurrent as? CtlCandidateIMK else { continue }
             if instance.state.isCandidateContainer, !imkC.visible {
-              instance.handle(state: instance.state)
+              instance.handle(state: instance.state, replaceCurrent: false)
             }
           }
         }
       case .ofEmpty, .ofAbortion:
-        var previous = previous
-        if state.type == .ofAbortion {
-          state = IMEState.ofEmpty()
-          previous = state
+        if newState.type == .ofAbortion {
+          previous = IMEState.ofEmpty()
+          if replaceCurrent { state = previous }
         }
         ctlCandidateCurrent.visible = false
         tooltipInstance.hide()
         // 全專案用以判斷「.Abortion」的地方僅此一處。
-        if previous.hasComposition, state.type != .ofAbortion {
+        if previous.hasComposition, newState.type != .ofAbortion {
           commit(text: previous.displayedText)
         }
         // 在這裡手動再取消一次選字窗與工具提示的顯示，可謂雙重保險。
@@ -67,7 +66,7 @@ extension SessionCtl {
       case .ofCommitting:
         ctlCandidateCurrent.visible = false
         tooltipInstance.hide()
-        let textToCommit = state.textToCommit
+        let textToCommit = newState.textToCommit
         if !textToCommit.isEmpty { commit(text: textToCommit) }
         clearInlineDisplay()
         // 最後一道保險
@@ -75,19 +74,19 @@ extension SessionCtl {
       case .ofInputting:
         ctlCandidateCurrent.visible = false
         tooltipInstance.hide()
-        let textToCommit = state.textToCommit
+        let textToCommit = newState.textToCommit
         if !textToCommit.isEmpty { commit(text: textToCommit) }
         setInlineDisplayWithCursor()
-        if !state.tooltip.isEmpty {
-          show(tooltip: state.tooltip)
+        if !newState.tooltip.isEmpty {
+          show(tooltip: newState.tooltip)
         }
       case .ofMarking:
         ctlCandidateCurrent.visible = false
         setInlineDisplayWithCursor()
-        if state.tooltip.isEmpty {
+        if newState.tooltip.isEmpty {
           tooltipInstance.hide()
         } else {
-          show(tooltip: state.tooltip)
+          show(tooltip: newState.tooltip)
         }
       case .ofCandidates, .ofAssociates, .ofSymbolTable:
         tooltipInstance.hide()
@@ -96,10 +95,10 @@ extension SessionCtl {
       default: break
     }
     // 浮動組字窗的顯示判定
-    if state.hasComposition, PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier) {
+    if newState.hasComposition, PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier) {
       popupCompositionBuffer.isTypingDirectionVertical = isVerticalTyping
       popupCompositionBuffer.show(
-        state: state, at: lineHeightRect(zeroCursor: true).origin
+        state: newState, at: lineHeightRect(zeroCursor: true).origin
       )
     } else {
       popupCompositionBuffer.hide()
