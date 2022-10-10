@@ -15,7 +15,7 @@ extension SessionCtl {
   /// 生成 IMK 選字窗專用的候選字串陣列。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: IMK 選字窗專用的候選字串陣列。
-  override func candidates(_ sender: Any!) -> [Any]! {
+  public override func candidates(_ sender: Any!) -> [Any]! {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     var arrResult = [String]()
 
@@ -54,7 +54,7 @@ extension SessionCtl {
 
   /// IMK 選字窗限定函式，只要選字窗內的高亮內容選擇出現變化了、就會呼叫這個函式。
   /// - Parameter _: 已經高亮選中的候選字詞內容。
-  override open func candidateSelectionChanged(_: NSAttributedString!) {
+  public override func candidateSelectionChanged(_: NSAttributedString!) {
     // 警告：不要考慮用實作這個函式的方式來更新內文組字區的顯示。
     // 因為這樣會導致 IMKServer.commitCompositionWithReply() 呼叫你本來不想呼叫的 commitComposition()，
     // 然後 keyHandler 會被重設，屆時輸入法會在狀態處理等方面崩潰掉。
@@ -71,7 +71,7 @@ extension SessionCtl {
 
   /// IMK 選字窗限定函式，只要選字窗確認了某個候選字詞的選擇、就會呼叫這個函式。
   /// - Parameter candidateString: 已經確認的候選字詞內容。
-  override open func candidateSelected(_ candidateString: NSAttributedString!) {
+  public override func candidateSelected(_ candidateString: NSAttributedString!) {
     let candidateString: String = candidateString?.string ?? ""
     if state.type == .ofAssociates {
       if !PrefMgr.shared.alsoConfirmAssociatedCandidatesByEnter {
