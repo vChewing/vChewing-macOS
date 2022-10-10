@@ -26,7 +26,6 @@ extension SessionCtl {
     state = newState
     switch state.type {
       case .ofDeactivated:
-        ctlCandidateCurrent.delegate = nil
         ctlCandidateCurrent.visible = false
         popupCompositionBuffer.hide()
         tooltipInstance.hide()
