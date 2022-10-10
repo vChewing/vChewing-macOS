@@ -64,7 +64,7 @@ class SessionCtl: IMKInputController {
   var state: IMEStateProtocol = IMEState.ofEmpty() {
     didSet {
       guard oldValue.type != state.type else { return }
-      vCLog("Current State: \(state.type.rawValue)")
+      vCLog("Current State: \(state.type.rawValue), client: \(clientBundleIdentifier)")
       // 因鍵盤訊號翻譯機制存在，故禁用下文。
       // guard state.isCandidateContainer != oldValue.isCandidateContainer else { return }
       // if state.isCandidateContainer || oldValue.isCandidateContainer { setKeyLayout() }
