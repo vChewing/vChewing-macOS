@@ -18,7 +18,7 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
   public static let defaultIMKSelectionKey: [UInt16: String] = [
     18: "1", 19: "2", 20: "3", 21: "4", 23: "5", 22: "6", 26: "7", 28: "8", 25: "9",
   ]
-  public weak var delegate: CtlCandidateDelegate? {
+  public var delegate: CtlCandidateDelegate? {
     didSet {
       reloadData()
     }

@@ -8,7 +8,7 @@
 
 import Cocoa
 
-public protocol CtlCandidateDelegate: AnyObject {
+public protocol CtlCandidateDelegate {
   func candidatePairs(conv: Bool) -> [(String, String)]
   func candidatePairSelected(at index: Int)
   func candidates(_ sender: Any!) -> [Any]!
