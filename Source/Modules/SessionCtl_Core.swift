@@ -24,6 +24,8 @@ import TooltipUI
 /// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
 @objc(SessionCtl)  // 必須加上 ObjC，因為 IMK 是用 ObjC 寫的。
 public class SessionCtl: IMKInputController {
+  public static var allInstances: Set<SessionCtl> = .init()
+
   /// 標記狀態來聲明目前新增的詞彙是否需要賦以非常低的權重。
   public static var areWeNerfing = false
 
@@ -197,6 +199,7 @@ extension SessionCtl {
     }
 
     handle(state: IMEState.ofEmpty())
+    Self.allInstances.insert(self)
   }
 
   /// 停用輸入法時，會觸發該函式。
@@ -205,6 +208,7 @@ extension SessionCtl {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     resetKeyHandler()  // 這條會自動搞定 Empty 狀態。
     handle(state: IMEState.ofDeactivated())
+    Self.allInstances.remove(self)
   }
 
   /// 切換至某一個輸入法的某個副本時（比如威注音的簡體輸入法副本與繁體輸入法副本），會觸發該函式。
