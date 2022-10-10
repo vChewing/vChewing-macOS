@@ -35,6 +35,18 @@ extension SessionCtl {
         clearInlineDisplay()
         // 最後一道保險
         keyHandler.clear()
+        // 特殊處理：deactivateServer() 可能會遲於另一個客體會話的 activateServer() 執行。
+        // 雖然所有在這個函式內影響到的變數都改為動態變數了（不會出現跨副本波及的情況），
+        // 但 IMKCandidates 是有內部共用副本的、會被波及。
+        // 所以在這裡糾偏一下、讓所有開啟了選字窗的會話重新顯示選字窗。
+        if PrefMgr.shared.useIMKCandidateWindow {
+          for instance in Self.allInstances {
+            guard let imkC = instance.ctlCandidateCurrent as? CtlCandidateIMK else { continue }
+            if instance.state.isCandidateContainer, !imkC.visible {
+              instance.handle(state: instance.state)
+            }
+          }
+        }
       case .ofEmpty, .ofAbortion:
         var previous = previous
         if state.type == .ofAbortion {
@@ -48,7 +60,6 @@ extension SessionCtl {
           commit(text: previous.displayedText)
         }
         // 在這裡手動再取消一次選字窗與工具提示的顯示，可謂雙重保險。
-        ctlCandidateCurrent.visible = false
         tooltipInstance.hide()
         clearInlineDisplay()
         // 最後一道保險
