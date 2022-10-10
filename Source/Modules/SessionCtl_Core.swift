@@ -23,12 +23,12 @@ import TooltipUI
 /// - Remark: 在輸入法的主函式中分配的 IMKServer 型別為客體應用程式創建的每個
 /// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
 @objc(SessionCtl)  // 必須加上 ObjC，因為 IMK 是用 ObjC 寫的。
-class SessionCtl: IMKInputController {
+public class SessionCtl: IMKInputController {
   /// 標記狀態來聲明目前新增的詞彙是否需要賦以非常低的權重。
-  static var areWeNerfing = false
+  public static var areWeNerfing = false
 
   /// 目前在用的的選字窗副本。
-  var ctlCandidateCurrent: CtlCandidateProtocol = {
+  public var ctlCandidateCurrent: CtlCandidateProtocol = {
     let direction: NSUserInterfaceLayoutOrientation =
       PrefMgr.shared.useHorizontalCandidateList ? .horizontal : .vertical
     if #available(macOS 10.15, *) {
@@ -40,18 +40,18 @@ class SessionCtl: IMKInputController {
   }()
 
   /// 工具提示視窗的副本。
-  var tooltipInstance = TooltipUI()
+  public var tooltipInstance = TooltipUI()
 
   /// 浮動組字窗的副本。
-  var popupCompositionBuffer = PopupCompositionBuffer()
+  public var popupCompositionBuffer = PopupCompositionBuffer()
 
   // MARK: -
 
   /// 當前 Caps Lock 按鍵是否被摁下。
-  var isCapsLocked: Bool { NSEvent.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock) }
+  public var isCapsLocked: Bool { NSEvent.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock) }
 
   /// 當前這個 SessionCtl 副本是否處於英數輸入模式。
-  var isASCIIMode = false {
+  public var isASCIIMode = false {
     didSet {
       resetKeyHandler()
       setKeyLayout()
@@ -61,7 +61,7 @@ class SessionCtl: IMKInputController {
   /// 按鍵調度模組的副本。
   var keyHandler = KeyHandler(lm: LMMgr.currentLM(), uom: LMMgr.currentUOM(), pref: PrefMgr.shared)
   /// 用以記錄當前輸入法狀態的變數。
-  var state: IMEStateProtocol = IMEState.ofEmpty() {
+  public var state: IMEStateProtocol = IMEState.ofEmpty() {
     didSet {
       guard oldValue.type != state.type else { return }
       vCLog("Current State: \(state.type.rawValue), client: \(clientBundleIdentifier)")
@@ -73,10 +73,11 @@ class SessionCtl: IMKInputController {
 
   /// Shift 按鍵事件分析器的副本。
   /// - Remark: 警告：該工具必須為 Struct 且全專案只能有一個唯一初期化副本。否則會在動 Caps Lock 的時候誤以為是在摁 Shift。
-  static var theShiftKeyDetector = ShiftKeyUpChecker(useLShift: PrefMgr.shared.togglingAlphanumericalModeWithLShift)
+  public static var theShiftKeyDetector = ShiftKeyUpChecker(
+    useLShift: PrefMgr.shared.togglingAlphanumericalModeWithLShift)
 
   /// `handle(event:)` 會利用這個參數判定某次 Shift 按鍵是否用來切換中英文輸入。
-  var rencentKeyHandledByKeyHandlerEtc = false
+  public var rencentKeyHandledByKeyHandlerEtc = false
 
   /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
   public static var isVerticalTyping: Bool = false
@@ -93,7 +94,7 @@ class SessionCtl: IMKInputController {
 
   /// InputMode 需要在每次出現內容變更的時候都連帶重設組字器與各項語言模組，
   /// 順帶更新 IME 模組及 UserPrefs 當中對於當前語言模式的記載。
-  var inputMode: Shared.InputMode = IMEApp.currentInputMode {
+  public var inputMode: Shared.InputMode = IMEApp.currentInputMode {
     willSet {
       /// 將新的簡繁輸入模式提報給 Prefs 模組。IMEApp 模組會據此計算正確的資料值。
       PrefMgr.shared.mostRecentInputMode = newValue.rawValue
@@ -126,7 +127,7 @@ class SessionCtl: IMKInputController {
   ///   - server: IMKServer
   ///   - delegate: 客體物件
   ///   - inputClient: 用以接受輸入的客體應用物件
-  override init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
+  override public init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
     super.init(server: server, delegate: delegate, client: inputClient)
     keyHandler.delegate = self
     syncBaseLMPrefs()
@@ -137,7 +138,7 @@ class SessionCtl: IMKInputController {
 
 extension SessionCtl {
   /// 指定鍵盤佈局。
-  func setKeyLayout() {
+  public func setKeyLayout() {
     guard let client = client() else { return }
 
     func doSetKeyLayout() {
@@ -154,7 +155,7 @@ extension SessionCtl {
   }
 
   /// 重設按鍵調度模組，會將當前尚未遞交的內容遞交出去。
-  func resetKeyHandler() {
+  public func resetKeyHandler() {
     // 過濾掉尚未完成拼寫的注音。
     if state.type == .ofInputting, PrefMgr.shared.trimUnfinishedReadingsOnCommit {
       keyHandler.composer.clear()
@@ -174,7 +175,7 @@ extension SessionCtl {
 extension SessionCtl {
   /// 啟用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
-  override func activateServer(_ sender: Any!) {
+  public override func activateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     UserDefaults.standard.synchronize()
 
@@ -200,7 +201,7 @@ extension SessionCtl {
 
   /// 停用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
-  override func deactivateServer(_ sender: Any!) {
+  public override func deactivateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     resetKeyHandler()  // 這條會自動搞定 Empty 狀態。
     handle(state: IMEState.ofDeactivated())
@@ -211,7 +212,7 @@ extension SessionCtl {
   ///   - value: 輸入法在系統偏好設定當中的副本的 identifier，與 bundle identifier 類似。在輸入法的 info.plist 內定義。
   ///   - tag: 標記（無須使用）。
   ///   - sender: 呼叫了該函式的客體（無須使用）。
-  override func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
+  public override func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
     _ = tag  // 防止格式整理工具毀掉與此對應的參數。
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     let newInputMode = Shared.InputMode(rawValue: value as? String ?? "") ?? Shared.InputMode.imeModeNULL
@@ -225,7 +226,7 @@ extension SessionCtl {
   }
 
   /// 將輸入法偏好設定同步至語言模組內。
-  func syncBaseLMPrefs() {
+  public func syncBaseLMPrefs() {
     LMMgr.currentLM().isPhraseReplacementEnabled = PrefMgr.shared.phraseReplacementEnabled
     LMMgr.currentLM().isCNSEnabled = PrefMgr.shared.cns11643Enabled
     LMMgr.currentLM().isSymbolEnabled = PrefMgr.shared.symbolInputEnabled
@@ -248,7 +249,7 @@ extension SessionCtl {
   /// 「`commitComposition(_ message)`」遞交給客體。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 返回一個 uint，其中承載了與系統 NSEvent 操作事件有關的掩碼集合（詳見 NSEvent.h）。
-  override func recognizedEvents(_ sender: Any!) -> Int {
+  public override func recognizedEvents(_ sender: Any!) -> Int {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     let events: NSEvent.EventTypeMask = [.keyDown, .flagsChanged]
     return Int(events.rawValue)
@@ -258,7 +259,7 @@ extension SessionCtl {
   /// 也就是說 handle(event:) 完全抓不到這個 Event。
   /// 這時需要在 commitComposition 這一關做一些收尾處理。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
-  override func commitComposition(_ sender: Any!) {
+  public override func commitComposition(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     resetKeyHandler()
     // super.commitComposition(sender)  // 這句不要引入，否則每次切出輸入法時都會死當。
@@ -267,7 +268,7 @@ extension SessionCtl {
   /// 指定輸入法要遞交出去的內容（雖然 InputMethodKit 可能並不會真的用到這個函式）。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 字串內容，或者 nil。
-  override func composedString(_ sender: Any!) -> Any! {
+  public override func composedString(_ sender: Any!) -> Any! {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     guard state.hasComposition else { return "" }
     return state.displayedTextConverted
@@ -275,7 +276,7 @@ extension SessionCtl {
 
   /// 輸入法要被換掉或關掉的時候，要做的事情。
   /// 不過好像因為 IMK 的 Bug 而並不會被執行。
-  override func inputControllerWillClose() {
+  public override func inputControllerWillClose() {
     // 下述兩行用來防止尚未完成拼寫的注音內容貝蒂交出去。
     resetKeyHandler()
     super.inputControllerWillClose()

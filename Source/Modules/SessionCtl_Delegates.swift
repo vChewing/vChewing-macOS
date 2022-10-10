@@ -11,18 +11,18 @@ import Shared
 // MARK: - KeyHandler Delegate
 
 extension SessionCtl: KeyHandlerDelegate {
-  var clientBundleIdentifier: String {
+  public var clientBundleIdentifier: String {
     guard let client = client() else { return "" }
     return client.bundleIdentifier() ?? ""
   }
 
-  func candidateController() -> CtlCandidateProtocol { ctlCandidateCurrent }
+  public func candidateController() -> CtlCandidateProtocol { ctlCandidateCurrent }
 
-  func candidateSelectionCalledByKeyHandler(at index: Int) {
+  public func candidateSelectionCalledByKeyHandler(at index: Int) {
     candidatePairSelected(at: index)
   }
 
-  func performUserPhraseOperation(with state: IMEStateProtocol, addToFilter: Bool)
+  public func performUserPhraseOperation(with state: IMEStateProtocol, addToFilter: Bool)
     -> Bool
   {
     guard state.type == .ofMarking else { return false }
@@ -53,11 +53,11 @@ extension SessionCtl: KeyHandlerDelegate {
 // MARK: - Candidate Controller Delegate
 
 extension SessionCtl: CtlCandidateDelegate {
-  var selectionKeys: String {
+  public var selectionKeys: String {
     PrefMgr.shared.useIMKCandidateWindow ? "123456789" : PrefMgr.shared.candidateKeys
   }
 
-  func candidatePairs(conv: Bool = false) -> [(String, String)] {
+  public func candidatePairs(conv: Bool = false) -> [(String, String)] {
     if !state.isCandidateContainer || state.candidates.isEmpty { return [] }
     if !conv || PrefMgr.shared.cns11643Enabled || state.candidates[0].0.contains("_punctuation") {
       return state.candidates
@@ -71,7 +71,7 @@ extension SessionCtl: CtlCandidateDelegate {
     return convertedCandidates
   }
 
-  func candidatePairSelected(at index: Int) {
+  public func candidatePairSelected(at index: Int) {
     if state.type == .ofSymbolTable, (0..<state.node.members.count).contains(index) {
       let node = state.node.members[index]
       if !node.members.isEmpty {

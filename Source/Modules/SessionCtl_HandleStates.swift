@@ -21,7 +21,7 @@ extension SessionCtl {
   /// 且開始敲字之後才會執行。這個過程會使得不同的 SessionCtl 副本之間出現
   /// 不必要的互相干涉、打斷彼此的工作。
   /// - Parameter newState: 新狀態。
-  func handle(state newState: IMEStateProtocol) {
+  public func handle(state newState: IMEStateProtocol) {
     let previous = state
     state = newState
     switch state.type {
@@ -97,7 +97,7 @@ extension SessionCtl {
   }
 
   /// 針對受 .NotEmpty() 管轄的非空狀態，在組字區內顯示游標。
-  func setInlineDisplayWithCursor() {
+  public func setInlineDisplayWithCursor() {
     if state.type == .ofAssociates {
       doSetMarkedText(
         state.data.attributedStringPlaceholder, selectionRange: NSRange(location: 0, length: 0),
@@ -152,7 +152,7 @@ extension SessionCtl {
   }
 
   /// 把 setMarkedText 包裝一下，按需啟用 GCD。
-  func doSetMarkedText(_ string: Any!, selectionRange: NSRange, replacementRange: NSRange) {
+  public func doSetMarkedText(_ string: Any!, selectionRange: NSRange, replacementRange: NSRange) {
     guard let client = client() else { return }
     if let myID = Bundle.main.bundleIdentifier, let clientID = client.bundleIdentifier(), myID == clientID {
       DispatchQueue.main.async {

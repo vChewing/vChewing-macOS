@@ -16,13 +16,13 @@ extension SessionCtl {
   // 有些 App 會濫用內文組字區的內容來預測使用者的輸入行為。
   // 對此類 App 有疑慮者，可以將這類 App 登記到客體管理員當中。
   // 這樣，不但強制使用（限制讀音 20 個的）浮動組字窗，而且內文組字區只會顯示一個空格。
-  var attributedStringSecured: (NSAttributedString, NSRange) {
+  public var attributedStringSecured: (NSAttributedString, NSRange) {
     PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier)
       ? (state.data.attributedStringPlaceholder, NSRange(location: 0, length: 0))
       : (state.attributedString, NSRange(state.u16MarkedRange))
   }
 
-  func lineHeightRect(zeroCursor: Bool = false) -> NSRect {
+  public func lineHeightRect(zeroCursor: Bool = false) -> NSRect {
     var lineHeightRect = NSRect.seniorTheBeast
     guard let client = client() else {
       return lineHeightRect
@@ -40,7 +40,7 @@ extension SessionCtl {
     return lineHeightRect
   }
 
-  func show(tooltip: String) {
+  public func show(tooltip: String) {
     guard client() != nil else { return }
     let lineHeightRect = lineHeightRect()
     var finalOrigin: NSPoint = lineHeightRect.origin
@@ -69,7 +69,7 @@ extension SessionCtl {
     )
   }
 
-  func showCandidates() {
+  public func showCandidates() {
     guard let client = client() else { return }
     state.isVerticalCandidateWindow = (isVerticalTyping || !PrefMgr.shared.useHorizontalCandidateList)
 
@@ -159,7 +159,7 @@ extension SessionCtl {
   /// 5) Do NOT enable either KangXi conversion mode nor JIS conversion mode. They are disabled by default.
   /// 6) Expecting the glyph differences of the candidate "骨" between PingFang SC and PingFang TC when rendering
   ///    the candidate window in different "vChewing-CHS" and "vChewing-CHT" input modes.
-  static func candidateFont(name: String? = nil, size: Double) -> NSFont {
+  public static func candidateFont(name: String? = nil, size: Double) -> NSFont {
     let finalReturnFont: NSFont =
       {
         switch IMEApp.currentInputMode {
