@@ -133,6 +133,12 @@ public class SessionCtl: IMKInputController {
     super.init(server: server, delegate: delegate, client: inputClient)
     keyHandler.delegate = self
     syncBaseLMPrefs()
+    // 下述部分很有必要，否則輸入法會在手動重啟之後無法立刻生效。
+    activateServer(inputClient)
+    if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(IMEApp.currentInputMode) }
+    if let myID = Bundle.main.bundleIdentifier, !myID.isEmpty, !clientBundleIdentifier.contains(myID) {
+      setKeyLayout()
+    }
   }
 }
 
@@ -180,6 +186,7 @@ extension SessionCtl {
   public override func activateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     UserDefaults.standard.synchronize()
+    if Self.allInstances.contains(self) { return }
 
     // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
     // 所以這裡添加這句、來試圖應對這種情況。
@@ -219,7 +226,7 @@ extension SessionCtl {
   public override func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
     _ = tag  // 防止格式整理工具毀掉與此對應的參數。
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-    let newInputMode = Shared.InputMode(rawValue: value as? String ?? "") ?? Shared.InputMode.imeModeNULL
+    let newInputMode: Shared.InputMode = .init(rawValue: value as? String ?? "") ?? .imeModeNULL
     if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(newInputMode) }
     inputMode = newInputMode
     if let rawValString = value as? String, let bundleID = Bundle.main.bundleIdentifier,
