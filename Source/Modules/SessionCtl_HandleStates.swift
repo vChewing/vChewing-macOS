@@ -22,9 +22,10 @@ extension SessionCtl {
     state = newState
     switch state.type {
       case .ofDeactivated:
-        Self.ctlCandidateCurrent.delegate = nil
-        Self.ctlCandidateCurrent.visible = false
-        Self.tooltipInstance.hide()
+        ctlCandidateCurrent.delegate = nil
+        ctlCandidateCurrent.visible = false
+        popupCompositionBuffer.hide()
+        tooltipInstance.hide()
         if previous.hasComposition {
           commit(text: previous.displayedText)
         }
@@ -37,29 +38,29 @@ extension SessionCtl {
           state = IMEState.ofEmpty()
           previous = state
         }
-        Self.ctlCandidateCurrent.visible = false
-        Self.tooltipInstance.hide()
+        ctlCandidateCurrent.visible = false
+        tooltipInstance.hide()
         // 全專案用以判斷「.Abortion」的地方僅此一處。
         if previous.hasComposition, state.type != .ofAbortion {
           commit(text: previous.displayedText)
         }
         // 在這裡手動再取消一次選字窗與工具提示的顯示，可謂雙重保險。
-        Self.ctlCandidateCurrent.visible = false
-        Self.tooltipInstance.hide()
+        ctlCandidateCurrent.visible = false
+        tooltipInstance.hide()
         clearInlineDisplay()
         // 最後一道保險
         keyHandler.clear()
       case .ofCommitting:
-        Self.ctlCandidateCurrent.visible = false
-        Self.tooltipInstance.hide()
+        ctlCandidateCurrent.visible = false
+        tooltipInstance.hide()
         let textToCommit = state.textToCommit
         if !textToCommit.isEmpty { commit(text: textToCommit) }
         clearInlineDisplay()
         // 最後一道保險
         keyHandler.clear()
       case .ofInputting:
-        Self.ctlCandidateCurrent.visible = false
-        Self.tooltipInstance.hide()
+        ctlCandidateCurrent.visible = false
+        tooltipInstance.hide()
         let textToCommit = state.textToCommit
         if !textToCommit.isEmpty { commit(text: textToCommit) }
         setInlineDisplayWithCursor()
@@ -67,27 +68,27 @@ extension SessionCtl {
           show(tooltip: state.tooltip)
         }
       case .ofMarking:
-        Self.ctlCandidateCurrent.visible = false
+        ctlCandidateCurrent.visible = false
         setInlineDisplayWithCursor()
         if state.tooltip.isEmpty {
-          Self.tooltipInstance.hide()
+          tooltipInstance.hide()
         } else {
           show(tooltip: state.tooltip)
         }
       case .ofCandidates, .ofAssociates, .ofSymbolTable:
-        Self.tooltipInstance.hide()
+        tooltipInstance.hide()
         setInlineDisplayWithCursor()
         showCandidates()
       default: break
     }
     // 浮動組字窗的顯示判定
     if state.hasComposition, PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier) {
-      Self.popupCompositionBuffer.isTypingDirectionVertical = isVerticalTyping
-      Self.popupCompositionBuffer.show(
+      popupCompositionBuffer.isTypingDirectionVertical = isVerticalTyping
+      popupCompositionBuffer.show(
         state: state, at: lineHeightRect(zeroCursor: true).origin
       )
     } else {
-      Self.popupCompositionBuffer.hide()
+      popupCompositionBuffer.hide()
     }
   }
 
