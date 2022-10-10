@@ -25,6 +25,12 @@ extension SessionCtl {
 
     // MARK: 前置處理
 
+    // 如果是 deactivated 狀態的話，強制糾正其為 empty()。
+    if let client = client(), state.type == .ofDeactivated {
+      handle(state: IMEState.ofEmpty())
+      return handle(event, client: client)
+    }
+
     // 更新此時的靜態狀態標記。
     state.isASCIIMode = isASCIIMode
     state.isVerticalTyping = isVerticalTyping
