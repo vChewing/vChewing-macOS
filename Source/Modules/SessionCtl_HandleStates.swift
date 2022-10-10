@@ -66,28 +66,20 @@ extension SessionCtl {
       case .ofCommitting:
         ctlCandidateCurrent.visible = false
         tooltipInstance.hide()
-        let textToCommit = newState.textToCommit
-        if !textToCommit.isEmpty { commit(text: textToCommit) }
+        commit(text: newState.textToCommit)
         clearInlineDisplay()
         // 最後一道保險
         keyHandler.clear()
       case .ofInputting:
         ctlCandidateCurrent.visible = false
         tooltipInstance.hide()
-        let textToCommit = newState.textToCommit
-        if !textToCommit.isEmpty { commit(text: textToCommit) }
+        commit(text: newState.textToCommit)
         setInlineDisplayWithCursor()
-        if !newState.tooltip.isEmpty {
-          show(tooltip: newState.tooltip)
-        }
+        showTooltip(newState.tooltip)
       case .ofMarking:
         ctlCandidateCurrent.visible = false
         setInlineDisplayWithCursor()
-        if newState.tooltip.isEmpty {
-          tooltipInstance.hide()
-        } else {
-          show(tooltip: newState.tooltip)
-        }
+        showTooltip(newState.tooltip)
       case .ofCandidates, .ofAssociates, .ofSymbolTable:
         tooltipInstance.hide()
         setInlineDisplayWithCursor()
@@ -142,7 +134,7 @@ extension SessionCtl {
   /// 遞交組字區內容。
   /// 注意：必須在 IMK 的 commitComposition 函式當中也間接或者直接執行這個處理。
   private func commit(text: String) {
-    guard let client = client() else { return }
+    guard let client = client(), !text.isEmpty else { return }
     let buffer = ChineseConverter.kanjiConversionIfRequired(text)
     if buffer.isEmpty {
       return
