@@ -40,8 +40,12 @@ extension SessionCtl {
     return lineHeightRect
   }
 
-  public func show(tooltip: String) {
+  public func showTooltip(_ tooltip: String) {
     guard client() != nil else { return }
+    if tooltip.isEmpty {
+      tooltipInstance.hide()
+      return
+    }
     let lineHeightRect = lineHeightRect()
     var finalOrigin: NSPoint = lineHeightRect.origin
     let delta: Double = lineHeightRect.size.height + 4.0  // bottomOutOfScreenAdjustmentHeight
