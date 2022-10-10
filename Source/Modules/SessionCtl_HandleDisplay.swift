@@ -74,7 +74,6 @@ extension SessionCtl {
     state.isVerticalCandidateWindow = (isVerticalTyping || !PrefMgr.shared.useHorizontalCandidateList)
 
     /// 無論是田所選字窗還是 IMK 選字窗，在這裡都有必要重新初期化。
-    ctlCandidateCurrent.delegate = nil
     let candidateLayout: NSUserInterfaceLayoutOrientation =
       ((isVerticalTyping || !PrefMgr.shared.useHorizontalCandidateList)
         ? .vertical
