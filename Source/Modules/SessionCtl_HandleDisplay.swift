@@ -56,14 +56,14 @@ extension SessionCtl {
     }()
     // 強制重新初期化，因為 NSAttributedTextView 有顯示滯後性。
     do {
-      Self.tooltipInstance.hide()
-      Self.tooltipInstance = .init()
+      tooltipInstance.hide()
+      tooltipInstance = .init()
       if state.type == .ofMarking {
-        Self.tooltipInstance.setColor(state: state.data.tooltipColorState)
+        tooltipInstance.setColor(state: state.data.tooltipColorState)
       }
     }
     // 再設定其文字顯示內容並顯示。
-    Self.tooltipInstance.show(
+    tooltipInstance.show(
       tooltip: tooltip, at: finalOrigin,
       bottomOutOfScreenAdjustmentHeight: delta, direction: tooltipContentDirection
     )
@@ -74,34 +74,34 @@ extension SessionCtl {
     state.isVerticalCandidateWindow = (isVerticalTyping || !PrefMgr.shared.useHorizontalCandidateList)
 
     /// 無論是田所選字窗還是 IMK 選字窗，在這裡都有必要重新初期化。
-    Self.ctlCandidateCurrent.delegate = nil
+    ctlCandidateCurrent.delegate = nil
     let candidateLayout: NSUserInterfaceLayoutOrientation =
       ((isVerticalTyping || !PrefMgr.shared.useHorizontalCandidateList)
         ? .vertical
         : .horizontal)
 
     if #available(macOS 10.15, *) {
-      Self.ctlCandidateCurrent =
+      ctlCandidateCurrent =
         PrefMgr.shared.useIMKCandidateWindow
         ? CtlCandidateIMK(candidateLayout) : CtlCandidateTDK(candidateLayout)
-      if let candidateTDK = Self.ctlCandidateCurrent as? CtlCandidateTDK {
+      if let candidateTDK = ctlCandidateCurrent as? CtlCandidateTDK {
         candidateTDK.maxLinesPerPage = isVerticalTyping ? 1 : 3
       }
     } else {
-      Self.ctlCandidateCurrent = CtlCandidateIMK(candidateLayout)
+      ctlCandidateCurrent = CtlCandidateIMK(candidateLayout)
     }
 
-    Self.ctlCandidateCurrent.candidateFont = Self.candidateFont(
+    ctlCandidateCurrent.candidateFont = Self.candidateFont(
       name: PrefMgr.shared.candidateTextFontName, size: PrefMgr.shared.candidateListTextSize
     )
 
     if state.type == .ofAssociates {
-      Self.ctlCandidateCurrent.tooltip =
+      ctlCandidateCurrent.tooltip =
         isVerticalTyping ? "⇧" : NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
     }
 
-    Self.ctlCandidateCurrent.useLangIdentifier = PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier
-    Self.ctlCandidateCurrent.locale = {
+    ctlCandidateCurrent.useLangIdentifier = PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier
+    ctlCandidateCurrent.locale = {
       switch inputMode {
         case .imeModeCHS: return "zh-Hans"
         case .imeModeCHT:
@@ -115,25 +115,25 @@ extension SessionCtl {
 
     if #available(macOS 10.14, *) {
       // Spotlight 視窗會擋住 IMK 選字窗，所以需要特殊處理。
-      if let ctlCandidateCurrent = Self.ctlCandidateCurrent as? CtlCandidateIMK {
+      if let ctlCandidateCurrent = ctlCandidateCurrent as? CtlCandidateIMK {
         while ctlCandidateCurrent.windowLevel() <= client.windowLevel() {
           ctlCandidateCurrent.setWindowLevel(UInt64(max(0, client.windowLevel() + 1000)))
         }
       }
     }
 
-    Self.ctlCandidateCurrent.delegate = self  // 會自動觸發田所選字窗的資料重載。
-    Self.ctlCandidateCurrent.visible = true
+    ctlCandidateCurrent.delegate = self  // 會自動觸發田所選字窗的資料重載。
+    ctlCandidateCurrent.visible = true
 
     if isVerticalTyping {
-      Self.ctlCandidateCurrent.set(
+      ctlCandidateCurrent.set(
         windowTopLeftPoint: NSPoint(
           x: lineHeightRect().origin.x + lineHeightRect().size.width + 4.0, y: lineHeightRect().origin.y - 4.0
         ),
         bottomOutOfScreenAdjustmentHeight: lineHeightRect().size.height + 4.0
       )
     } else {
-      Self.ctlCandidateCurrent.set(
+      ctlCandidateCurrent.set(
         windowTopLeftPoint: NSPoint(x: lineHeightRect().origin.x, y: lineHeightRect().origin.y - 4.0),
         bottomOutOfScreenAdjustmentHeight: lineHeightRect().size.height + 4.0
       )

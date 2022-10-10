@@ -28,7 +28,7 @@ class SessionCtl: IMKInputController {
   static var areWeNerfing = false
 
   /// 目前在用的的選字窗副本。
-  static var ctlCandidateCurrent: CtlCandidateProtocol = {
+  var ctlCandidateCurrent: CtlCandidateProtocol = {
     let direction: NSUserInterfaceLayoutOrientation =
       PrefMgr.shared.useHorizontalCandidateList ? .horizontal : .vertical
     if #available(macOS 10.15, *) {
@@ -39,11 +39,11 @@ class SessionCtl: IMKInputController {
     }
   }()
 
-  /// 工具提示視窗的共用副本。
-  static var tooltipInstance = TooltipUI()
+  /// 工具提示視窗的副本。
+  var tooltipInstance = TooltipUI()
 
-  /// 浮動組字窗的共用副本。
-  static var popupCompositionBuffer = PopupCompositionBuffer()
+  /// 浮動組字窗的副本。
+  var popupCompositionBuffer = PopupCompositionBuffer()
 
   // MARK: -
 
