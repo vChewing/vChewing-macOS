@@ -16,7 +16,7 @@ extension SessionCtl: KeyHandlerDelegate {
     return client.bundleIdentifier() ?? ""
   }
 
-  func candidateController() -> CtlCandidateProtocol { Self.ctlCandidateCurrent }
+  func candidateController() -> CtlCandidateProtocol { ctlCandidateCurrent }
 
   func candidateSelectionCalledByKeyHandler(at index: Int) {
     candidatePairSelected(at: index)
