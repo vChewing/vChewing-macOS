@@ -24,7 +24,10 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
     }
   }
 
-  public var visible = false { didSet { visible ? show() : hide() } }
+  public var visible: Bool {
+    get { isVisible() }
+    set { newValue ? show() : hide() }
+  }
 
   public var windowTopLeftPoint: NSPoint {
     get {
