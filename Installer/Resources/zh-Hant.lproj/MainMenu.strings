@@ -53,11 +53,11 @@
 /* Class = "NSTextFieldCell"; title = "DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, are not included in vChewing official phrase database."; ObjectID = "Q9M-ni-kUM"; */
 "Q9M-ni-kUM.title" = "免責聲明：威注音專案對小麥注音官方專案內贈的小麥注音原版詞庫內容不負任何責任。威注音輸入法專用的威注音官方詞庫不包含任何「會在法理上妨礙威注音在全球傳播」的「與地緣政治及政治意識形態有關的」內容。威註音專案與 OpenVanilla 專案之間無合作關係、無隸屬關係。";
 
-/* Class = "NSTextFieldCell"; title = "Derived from OpenVanilla McBopopmofo Project."; ObjectID = "QYf-Nf-hoi"; */
-"QYf-Nf-hoi.title" = "該專案由 OpenVanilla 小麥注音專案衍生而來。";
+/* Class = "NSTextFieldCell"; title = "Was derived from OpenVanilla McBopopmofo Project (MIT-License)."; ObjectID = "QYf-Nf-hoi"; */
+"QYf-Nf-hoi.title" = "該專案曾由 OpenVanilla 小麥注音專案 (MIT-License) 衍生而來。";
 
-/* Class = "NSTextFieldCell"; title = "vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "VW8-s5-Wpn"; */
-"VW8-s5-Wpn.title" = "威注音 macOS 程式研發：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n威注音詞庫維護：Shiki Suen。";
+/* Class = "NSTextFieldCell"; title = "vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen.\nWalking algorithm by Lukhnos Liu (from Gramambular 2, MIT-License)."; ObjectID = "VW8-s5-Wpn"; */
+"VW8-s5-Wpn.title" = "威注音 macOS 程式研發：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n威注音詞庫維護：Shiki Suen。\n爬軌算法：Lukhnos Liu (Gramambular 2, MIT-License)。\nApp 格式的安裝程式繼承自 OpenVanilla (MIT-License)。";
 
 /* Class = "NSTextFieldCell"; title = "Placeholder for showing copyright information."; ObjectID = "eo3-TK-0rB"; */
 // "eo3-TK-0rB.title" = "Placeholder for showing copyright information.";
