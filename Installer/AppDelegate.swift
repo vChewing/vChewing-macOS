@@ -90,8 +90,10 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
     {
       appCopyrightLabel.stringValue = copyrightLabel
     }
-    if let eulaContent = Bundle.main.localizedInfoDictionary?["CFEULAContent"] as? String {
-      appEULAContent.string = eulaContent
+    if let eulaContent = Bundle.main.localizedInfoDictionary?["CFEULAContent"] as? String,
+      let eulaContentUpstream = Bundle.main.infoDictionary?["CFUpstreamEULAContent"] as? String
+    {
+      appEULAContent.string = eulaContent + "\n" + eulaContentUpstream
     }
     appVersionLabel.stringValue = "\(versionString) Build \(installingVersion)"
 
