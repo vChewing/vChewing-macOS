@@ -50,6 +50,10 @@
 		5BBBB77427AED70B0023B93A /* MenuIcon-SCVIM@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77027AED70B0023B93A /* MenuIcon-SCVIM@2x.png */; };
 		5BBBB77527AED70B0023B93A /* MenuIcon-SCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77127AED70B0023B93A /* MenuIcon-SCVIM.png */; };
 		5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77227AED70B0023B93A /* MenuIcon-TCVIM.png */; };
+		5BBC2D9E28F51C0400C986F6 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */; };
+		5BBC2D9F28F51C0400C986F6 /* LICENSE-CHT.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */; };
+		5BBC2DA028F51C0400C986F6 /* LICENSE-JPN.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */; };
+		5BBC2DA128F51C0400C986F6 /* LICENSE-CHS.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */; };
 		5BC2652227E04B7E00700291 /* uninstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 5BC2652127E04B7B00700291 /* uninstall.sh */; };
 		5BC4479D2865686500EDC323 /* data-chs.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71C283B4AEA0078EB25 /* data-chs.plist */; };
 		5BC4479E2865686500EDC323 /* data-cht.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB720283B4AEA0078EB25 /* data-cht.plist */; };
@@ -904,7 +908,9 @@
 				D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */,
 				5BEDB723283B4C250078EB25 /* data-cht.plist in Resources */,
 				5BEDB721283B4C250078EB25 /* data-cns.plist in Resources */,
+				5BBC2D9F28F51C0400C986F6 /* LICENSE-CHT.txt in Resources */,
 				5BF9DA2D288427E000DBD48E /* template-associatedPhrases-cht.txt in Resources */,
+				5BBC2D9E28F51C0400C986F6 /* LICENSE.txt in Resources */,
 				5BEDB725283B4C250078EB25 /* data-chs.plist in Resources */,
 				5BF9DA2928840E6200DBD48E /* template-associatedPhrases-chs.txt in Resources */,
 				5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */,
@@ -913,6 +919,7 @@
 				5BBBB77527AED70B0023B93A /* MenuIcon-SCVIM.png in Resources */,
 				5BEDB722283B4C250078EB25 /* data-zhuyinwen.plist in Resources */,
 				5BF9DA2728840E6200DBD48E /* template-usersymbolphrases.txt in Resources */,
+				5BBC2DA128F51C0400C986F6 /* LICENSE-CHS.txt in Resources */,
 				5BEDB724283B4C250078EB25 /* data-symbols.plist in Resources */,
 				5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */,
 				5BF9DA2A28840E6200DBD48E /* template-replacements.txt in Resources */,
@@ -922,6 +929,7 @@
 				5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */,
 				5BC2652227E04B7E00700291 /* uninstall.sh in Resources */,
 				5BAD0CD527D701F6003D127F /* vChewingKeyLayout.bundle in Resources */,
+				5BBC2DA028F51C0400C986F6 /* LICENSE-JPN.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
