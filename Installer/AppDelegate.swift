@@ -43,7 +43,6 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
   @IBOutlet private var appCopyrightLabel: NSTextField!
   @IBOutlet private var appEULAContent: NSTextView!
 
-  private var archiveUtil: ArchiveUtil?
   private var installingVersion = ""
   private var upgrading = false
   private var translocationRemovalStartTime: Date?
@@ -79,8 +78,6 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
       return
     }
     self.installingVersion = installingVersion
-    archiveUtil = ArchiveUtil(appName: kTargetBin, targetAppBundleName: kTargetBundle)
-    _ = archiveUtil?.validateIfNotarizedArchiveExists()
 
     cancelButton.nextKeyView = installButton
     installButton.nextKeyView = cancelButton
@@ -221,8 +218,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
     previousExists _: Bool, previousVersionNotFullyDeactivatedWarning warning: Bool
   ) {
     guard
-      let targetBundle = archiveUtil?.unzipNotarizedArchive()
-        ?? Bundle.main.path(forResource: kTargetBin, ofType: kTargetType)
+      let targetBundle = Bundle.main.path(forResource: kTargetBin, ofType: kTargetType)
     else {
       return
     }
