@@ -14,7 +14,7 @@ import Shared
 
 // MARK: - § 根據狀態調度按鍵輸入 (Handle Input with States)
 
-extension KeyHandler {
+extension InputHandler {
   /// 對於輸入訊號的第一關處理均藉由此函式來進行。
   /// - Parameters:
   ///   - input: 輸入訊號。
@@ -22,8 +22,8 @@ extension KeyHandler {
   ///   - stateCallback: 狀態回呼，交給對應的型別內的專有函式來處理。
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
-  func handle(
-    input: InputSignalProtocol,
+  func handleInput(
+    event input: InputSignalProtocol,
     state: IMEStateProtocol,
     stateCallback: @escaping (IMEStateProtocol) -> Void,
     errorCallback: @escaping (String) -> Void
@@ -41,7 +41,7 @@ extension KeyHandler {
       if state.type == .ofEmpty || state.type == .ofDeactivated {
         return false
       }
-      errorCallback("550BCF7B: KeyHandler just refused an invalid input.")
+      errorCallback("550BCF7B: InputHandler just refused an invalid input.")
       stateCallback(state)
       return true
     }
@@ -164,7 +164,7 @@ extension KeyHandler {
             walk()
             // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
             let textToCommit = commitOverflownComposition
-            var inputting = buildInputtingState
+            var inputting = generateStateOfInputting()
             inputting.textToCommit = textToCommit
             stateCallback(inputting)
           }
@@ -176,7 +176,7 @@ extension KeyHandler {
           )
         }
       }
-      let candidateState: IMEStateProtocol = buildCandidate(state: state)
+      let candidateState: IMEStateProtocol = generateStateOfCandidates(state: state)
       if candidateState.candidates.isEmpty {
         errorCallback("3572F238")
       } else {
@@ -291,10 +291,10 @@ extension KeyHandler {
             walk()
             // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
             let textToCommit = commitOverflownComposition
-            var inputting = buildInputtingState
+            var inputting = generateStateOfInputting()
             inputting.textToCommit = textToCommit
             stateCallback(inputting)
-            let candidateState = buildCandidate(state: inputting)
+            let candidateState = generateStateOfCandidates(state: inputting)
             if candidateState.candidates.isEmpty {
               errorCallback("B5127D8A")
             } else {

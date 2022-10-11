@@ -6,13 +6,13 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-/// 該檔案用來處理 KeyHandler.HandleInput() 當中的與組字有關的行為。
+/// 該檔案用來處理 InputHandler.HandleInput() 當中的與組字有關的行為。
 
 import Shared
 import Tekkon
 
-extension KeyHandler {
-  /// 用來處理 KeyHandler.HandleInput() 當中的與組字有關的行為。
+extension InputHandler {
+  /// 用來處理 InputHandler.HandleInput() 當中的與組字有關的行為。
   /// - Parameters:
   ///   - input: 輸入訊號。
   ///   - stateCallback: 狀態回呼，交給對應的型別內的專有函式來處理。
@@ -52,7 +52,7 @@ extension KeyHandler {
           compositor.dropKey(direction: .rear)
           walk()  // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
           composer = theComposer
-          // 這裡不需要回呼 buildInputtingState，因為當前輸入的聲調鍵一定是合規的、會在之後回呼 buildInputtingState。
+          // 這裡不需要回呼 generateStateOfInputting()，因為當前輸入的聲調鍵一定是合規的、會在之後回呼 generateStateOfInputting()。
         } else {
           errorCallback("4B0DD2D4：語彙庫內無「\(temporaryReadingKey)」的匹配記錄，放棄覆寫游標身後的內容。")
           return true
@@ -65,7 +65,7 @@ extension KeyHandler {
       // 沒有調號的話，只需要 setInlineDisplayWithCursor() 且終止處理（return true）即可。
       // 有調號的話，則不需要這樣，而是轉而繼續在此之後的處理。
       if !composer.hasToneMarker() {
-        stateCallback(buildInputtingState)
+        stateCallback(generateStateOfInputting())
         return true
       }
     }
@@ -90,14 +90,14 @@ extension KeyHandler {
 
         if prefs.keepReadingUponCompositionError {
           composer.intonation.clear()  // 砍掉聲調。
-          stateCallback(buildInputtingState)
+          stateCallback(generateStateOfInputting())
           return true
         }
 
         composer.clear()
         // 根據「組字器是否為空」來判定回呼哪一種狀態。
         switch compositor.isEmpty {
-          case false: stateCallback(buildInputtingState)
+          case false: stateCallback(generateStateOfInputting())
           case true:
             stateCallback(IMEState.ofAbortion())
         }
@@ -114,19 +114,19 @@ extension KeyHandler {
       let textToCommit = commitOverflownComposition
 
       // 看看半衰記憶模組是否會對目前的狀態給出自動選字建議。
-      fetchSuggestionsFromUOM(apply: true)
+      retrieveUOMSuggestions(apply: true)
 
       // 之後就是更新組字區了。先清空注拼槽的內容。
       composer.clear()
 
       // 再以回呼組字狀態的方式來執行 setInlineDisplayWithCursor()。
-      var inputting = buildInputtingState
+      var inputting = generateStateOfInputting()
       inputting.textToCommit = textToCommit
       stateCallback(inputting)
 
       /// 逐字選字模式的處理。
       if prefs.useSCPCTypingMode {
-        let candidateState: IMEStateProtocol = buildCandidate(state: inputting)
+        let candidateState: IMEStateProtocol = generateStateOfCandidates(state: inputting)
         switch candidateState.candidates.count {
           case 2...: stateCallback(candidateState)
           case 1:
@@ -139,7 +139,7 @@ extension KeyHandler {
               stateCallback(IMEState.ofEmpty())
             } else {
               let associatedPhrases =
-                buildAssociatePhraseState(
+                generateStateOfAssociates(
                   withPair: .init(key: reading, value: text)
                 )
               stateCallback(associatedPhrases.candidates.isEmpty ? IMEState.ofEmpty() : associatedPhrases)
@@ -154,7 +154,7 @@ extension KeyHandler {
     /// 是說此時注拼槽並非為空、卻還沒組音。這種情況下只可能是「注拼槽內只有聲調」。
     if keyConsumedByReading {
       // 以回呼組字狀態的方式來執行 setInlineDisplayWithCursor()。
-      stateCallback(buildInputtingState)
+      stateCallback(generateStateOfInputting())
       return true
     }
     return nil

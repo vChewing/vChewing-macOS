@@ -57,7 +57,7 @@ extension SessionCtl {
   public override func candidateSelectionChanged(_: NSAttributedString!) {
     // 警告：不要考慮用實作這個函式的方式來更新內文組字區的顯示。
     // 因為這樣會導致 IMKServer.commitCompositionWithReply() 呼叫你本來不想呼叫的 commitComposition()，
-    // 然後 keyHandler 會被重設，屆時輸入法會在狀態處理等方面崩潰掉。
+    // 然後 inputHandler 會被重設，屆時輸入法會在狀態處理等方面崩潰掉。
 
     // 這個函式的實作其實很容易誘發各種崩潰，所以最好不要輕易實作。
 

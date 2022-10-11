@@ -55,13 +55,13 @@ public class SessionCtl: IMKInputController {
   /// 當前這個 SessionCtl 副本是否處於英數輸入模式。
   public var isASCIIMode = false {
     didSet {
-      resetKeyHandler()
+      resetInputHandler()
       setKeyLayout()
     }
   }
 
   /// 按鍵調度模組的副本。
-  var keyHandler = KeyHandler(lm: LMMgr.currentLM(), uom: LMMgr.currentUOM(), pref: PrefMgr.shared)
+  var inputHandler = InputHandler(lm: LMMgr.currentLM(), uom: LMMgr.currentUOM(), pref: PrefMgr.shared)
   /// 用以記錄當前輸入法狀態的變數。
   public var state: IMEStateProtocol = IMEState.ofEmpty() {
     didSet {
@@ -79,7 +79,7 @@ public class SessionCtl: IMKInputController {
     useLShift: PrefMgr.shared.togglingAlphanumericalModeWithLShift)
 
   /// `handle(event:)` 會利用這個參數判定某次 Shift 按鍵是否用來切換中英文輸入。
-  public var rencentKeyHandledByKeyHandlerEtc = false
+  public var rencentKeyHandledByInputHandlerEtc = false
 
   /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
   public static var isVerticalTyping: Bool = false
@@ -104,13 +104,13 @@ public class SessionCtl: IMKInputController {
     didSet {
       if oldValue != inputMode, inputMode != .imeModeNULL {
         UserDefaults.standard.synchronize()
-        keyHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
+        inputHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
         // ----------------------------
         /// 重設所有語言模組。這裡不需要做按需重設，因為對運算量沒有影響。
-        keyHandler.currentLM = LMMgr.currentLM()  // 會自動更新組字引擎內的模組。
-        keyHandler.currentUOM = LMMgr.currentUOM()
+        inputHandler.currentLM = LMMgr.currentLM()  // 會自動更新組字引擎內的模組。
+        inputHandler.currentUOM = LMMgr.currentUOM()
         /// 清空注拼槽＋同步最新的注拼槽排列設定。
-        keyHandler.ensureKeyboardParser()
+        inputHandler.ensureKeyboardParser()
         /// 將輸入法偏好設定同步至語言模組內。
         syncBaseLMPrefs()
         // ----------------------------
@@ -131,7 +131,7 @@ public class SessionCtl: IMKInputController {
   ///   - inputClient: 用以接受輸入的客體應用物件
   override public init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
     super.init(server: server, delegate: delegate, client: inputClient)
-    keyHandler.delegate = self
+    inputHandler.delegate = self
     syncBaseLMPrefs()
     // 下述部分很有必要，否則輸入法會在手動重啟之後無法立刻生效。
     activateServer(inputClient)
@@ -163,11 +163,11 @@ extension SessionCtl {
   }
 
   /// 重設按鍵調度模組，會將當前尚未遞交的內容遞交出去。
-  public func resetKeyHandler() {
+  public func resetInputHandler() {
     // 過濾掉尚未完成拼寫的注音。
     if state.type == .ofInputting, PrefMgr.shared.trimUnfinishedReadingsOnCommit {
-      keyHandler.composer.clear()
-      handle(state: keyHandler.buildInputtingState)
+      inputHandler.composer.clear()
+      handle(state: inputHandler.generateStateOfInputting())
     }
     let isSecureMode = PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier)
     if state.hasComposition, !isSecureMode {
@@ -190,10 +190,10 @@ extension SessionCtl {
 
     // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
     // 所以這裡添加這句、來試圖應對這種情況。
-    if keyHandler.delegate == nil { keyHandler.delegate = self }
+    if inputHandler.delegate == nil { inputHandler.delegate = self }
     // 這裡不需要 setValue()，因為 IMK 會在 activateServer() 之後自動執行 setValue()。
-    keyHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
-    keyHandler.ensureKeyboardParser()
+    inputHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
+    inputHandler.ensureKeyboardParser()
 
     Self.theShiftKeyDetector.alsoToggleWithLShift = PrefMgr.shared.togglingAlphanumericalModeWithLShift
 
@@ -213,7 +213,7 @@ extension SessionCtl {
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   public override func deactivateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-    resetKeyHandler()  // 這條會自動搞定 Empty 狀態。
+    resetInputHandler()  // 這條會自動搞定 Empty 狀態。
     handle(state: IMEState.ofDeactivated())
     Self.allInstances.remove(self)
   }
@@ -272,7 +272,7 @@ extension SessionCtl {
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   public override func commitComposition(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-    resetKeyHandler()
+    resetInputHandler()
     // super.commitComposition(sender)  // 這句不要引入，否則每次切出輸入法時都會死當。
   }
 
@@ -289,7 +289,7 @@ extension SessionCtl {
   /// 不過好像因為 IMK 的 Bug 而並不會被執行。
   public override func inputControllerWillClose() {
     // 下述兩行用來防止尚未完成拼寫的注音內容貝蒂交出去。
-    resetKeyHandler()
+    resetInputHandler()
     super.inputControllerWillClose()
   }
 }

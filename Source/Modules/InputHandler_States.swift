@@ -14,11 +14,11 @@ import Tekkon
 
 // MARK: - § 根據按鍵行為來調控模式的函式 (Functions Interact With States).
 
-extension KeyHandler {
+extension InputHandler {
   // MARK: - 構築狀態（State Building）
 
   /// 生成「正在輸入」狀態。相關的內容會被拿給狀態機械用來處理在電腦螢幕上顯示的內容。
-  public var buildInputtingState: IMEStateProtocol {
+  public func generateStateOfInputting() -> IMEStateProtocol {
     /// 「更新內文組字區 (Update the composing buffer)」是指要求客體軟體將組字緩衝區的內容
     /// 換成由此處重新生成的組字字串（NSAttributeString，否則會不顯示）。
     var displayTextSegments: [String] = compositor.walkedNodes.values
@@ -86,11 +86,11 @@ extension KeyHandler {
   /// - Parameters:
   ///   - currentState: 當前狀態。
   /// - Returns: 回呼一個新的選詞狀態，來就給定的候選字詞陣列資料內容顯示選字窗。
-  func buildCandidate(
+  func generateStateOfCandidates(
     state currentState: IMEStateProtocol
   ) -> IMEStateProtocol {
     IMEState.ofCandidates(
-      candidates: getCandidatesArray(fixOrder: prefs.useFixecCandidateOrderOnSelection),
+      candidates: generateArrayOfCandidates(fixOrder: prefs.useFixecCandidateOrderOnSelection),
       displayTextSegments: compositor.walkedNodes.values,
       cursor: currentState.cursor
     )
@@ -100,9 +100,9 @@ extension KeyHandler {
 
   /// 拿著給定的聯想詞陣列資料內容，切換至聯想詞狀態。
   ///
-  /// 這次重寫時，針對「buildAssociatePhraseStateWithKey」這個（用以生成帶有
+  /// 這次重寫時，針對「generateStateOfAssociates」這個（用以生成帶有
   /// 聯想詞候選清單的結果的狀態回呼的）函式進行了小幅度的重構處理，使其始終
-  /// 可以從 Core 部分的「buildAssociatePhraseArray」函式獲取到一個內容類型
+  /// 可以從 Core 部分的「generateArrayOfAssociates」函式獲取到一個內容類型
   /// 為「String」的標準 Swift 陣列。這樣一來，該聯想詞狀態回呼函式將始終能
   /// 夠傳回正確的結果形態、永遠也無法傳回 nil。於是，所有在用到該函式時以
   /// 回傳結果類型判斷作為合法性判斷依據的函式，全都將依據改為檢查傳回的陣列
@@ -110,11 +110,11 @@ extension KeyHandler {
   /// - Parameters:
   ///   - key: 給定的索引鍵（也就是給定的聯想詞的開頭字）。
   /// - Returns: 回呼一個新的聯想詞狀態，來就給定的聯想詞陣列資料內容顯示選字窗。
-  func buildAssociatePhraseState(
+  func generateStateOfAssociates(
     withPair pair: Megrez.Compositor.KeyValuePaired
   ) -> IMEStateProtocol {
     IMEState.ofAssociates(
-      candidates: buildAssociatePhraseArray(withPair: pair))
+      candidates: generateArrayOfAssociates(withPair: pair))
   }
 
   // MARK: - 用以處理就地新增自訂語彙時的行為
@@ -133,7 +133,7 @@ extension KeyHandler {
     errorCallback: @escaping (String) -> Void
   ) -> Bool {
     if input.isEsc {
-      stateCallback(buildInputtingState)
+      stateCallback(generateStateOfInputting())
       return true
     }
 
@@ -145,7 +145,7 @@ extension KeyHandler {
 
     // Enter
     if input.isEnter {
-      if let ctlIME = delegate {
+      if let sessionCtl = delegate {
         // 先判斷是否是在摁了降權組合鍵的時候目標不在庫。
         if input.isShiftHold, input.isCommandHold, !state.isFilterable {
           errorCallback("2EAC1F7A")
@@ -155,28 +155,28 @@ extension KeyHandler {
           errorCallback("9AAFAC00")
           return true
         }
-        if !ctlIME.performUserPhraseOperation(with: state, addToFilter: false) {
+        if !sessionCtl.performUserPhraseOperation(with: state, addToFilter: false) {
           errorCallback("5B69CC8D")
           return true
         }
       }
-      stateCallback(buildInputtingState)
+      stateCallback(generateStateOfInputting())
       return true
     }
 
     // BackSpace & Delete
     if input.isBackSpace || input.isDelete {
-      if let keyHandlerDelegate = delegate {
+      if let inputHandlerDelegate = delegate {
         if !state.isFilterable {
           errorCallback("1F88B191")
           return true
         }
-        if !keyHandlerDelegate.performUserPhraseOperation(with: state, addToFilter: true) {
+        if !inputHandlerDelegate.performUserPhraseOperation(with: state, addToFilter: true) {
           errorCallback("68D3C6C8")
           return true
         }
       }
-      stateCallback(buildInputtingState)
+      stateCallback(generateStateOfInputting())
       return true
     }
 
@@ -255,14 +255,14 @@ extension KeyHandler {
     walk()
     // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
     let textToCommit = commitOverflownComposition
-    var inputting = buildInputtingState
+    var inputting = generateStateOfInputting()
     inputting.textToCommit = textToCommit
     stateCallback(inputting)
 
     // 從這一行之後開始，就是針對逐字選字模式的單獨處理。
     guard prefs.useSCPCTypingMode, composer.isEmpty else { return true }
 
-    let candidateState = buildCandidate(state: inputting)
+    let candidateState = generateStateOfCandidates(state: inputting)
     switch candidateState.candidates.count {
       case 2...: stateCallback(candidateState)
       case 1:
@@ -386,7 +386,7 @@ extension KeyHandler {
         compositor.dropKey(direction: .rear)
         walk()  // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
         prevReading.1.charComponents.forEach { composer.receiveKey(fromPhonabet: $0) }
-        stateCallback(buildInputtingState)
+        stateCallback(generateStateOfInputting())
         return true
       case 1:
         stateCallback(IMEState.ofAbortion())
@@ -415,7 +415,7 @@ extension KeyHandler {
     }
 
     switch composer.isEmpty && compositor.isEmpty {
-      case false: stateCallback(buildInputtingState)
+      case false: stateCallback(generateStateOfInputting())
       case true:
         stateCallback(IMEState.ofAbortion())
     }
@@ -457,7 +457,7 @@ extension KeyHandler {
       composer.clear()
     }
 
-    let inputting = buildInputtingState
+    let inputting = generateStateOfInputting()
     // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
     switch inputting.displayedText.isEmpty {
       case false: stateCallback(inputting)
@@ -511,7 +511,7 @@ extension KeyHandler {
 
     if compositor.cursor != 0 {
       compositor.cursor = 0
-      stateCallback(buildInputtingState)
+      stateCallback(generateStateOfInputting())
     } else {
       errorCallback("66D97F90")
       stateCallback(state)
@@ -543,7 +543,7 @@ extension KeyHandler {
 
     if compositor.cursor != compositor.length {
       compositor.cursor = compositor.length
-      stateCallback(buildInputtingState)
+      stateCallback(generateStateOfInputting())
     } else {
       errorCallback("9B69908E")
       stateCallback(state)
@@ -574,7 +574,7 @@ extension KeyHandler {
       /// 如果注拼槽不是空的話，則清空之。
       composer.clear()
       switch compositor.isEmpty {
-        case false: stateCallback(buildInputtingState)
+        case false: stateCallback(generateStateOfInputting())
         case true:
           stateCallback(IMEState.ofAbortion())
       }
@@ -634,14 +634,14 @@ extension KeyHandler {
         stateCallback(state)
         return true
       }
-      stateCallback(buildInputtingState)
+      stateCallback(generateStateOfInputting())
     } else {
       if compositor.cursor < compositor.length {
         compositor.cursor += 1
         if isCursorCuttingChar() {
           compositor.jumpCursorBySpan(to: .front)
         }
-        stateCallback(buildInputtingState)
+        stateCallback(generateStateOfInputting())
       } else {
         errorCallback("A96AAD58")
         stateCallback(state)
@@ -703,14 +703,14 @@ extension KeyHandler {
         stateCallback(state)
         return true
       }
-      stateCallback(buildInputtingState)
+      stateCallback(generateStateOfInputting())
     } else {
       if compositor.cursor > 0 {
         compositor.cursor -= 1
         if isCursorCuttingChar() {
           compositor.jumpCursorBySpan(to: .rear)
         }
-        stateCallback(buildInputtingState)
+        stateCallback(generateStateOfInputting())
       } else {
         errorCallback("7045E6F3")
         stateCallback(state)
@@ -750,7 +750,7 @@ extension KeyHandler {
       return true
     }
 
-    let candidates = getCandidatesArray(fixOrder: true)
+    let candidates = generateArrayOfCandidates(fixOrder: true)
     guard !candidates.isEmpty else {
       errorCallback("3378A6DF")
       return true
@@ -758,7 +758,7 @@ extension KeyHandler {
 
     var length = 0
     var currentNode: Megrez.Compositor.Node?
-    let cursorIndex = actualCandidateCursor
+    let cursorIndex = cursorForCandidate
     for node in compositor.walkedNodes {
       length += node.spanLength
       if length > cursorIndex {
@@ -812,9 +812,9 @@ extension KeyHandler {
       currentIndex = 0
     }
 
-    fixNode(candidate: candidates[currentIndex], respectCursorPushing: false, preConsolidate: false)
+    consolidateNode(candidate: candidates[currentIndex], respectCursorPushing: false, preConsolidate: false)
 
-    stateCallback(buildInputtingState)
+    stateCallback(generateStateOfInputting())
     return true
   }
 }

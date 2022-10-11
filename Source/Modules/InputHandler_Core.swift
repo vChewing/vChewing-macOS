@@ -17,22 +17,22 @@ import Tekkon
 
 // MARK: - 委任協定 (Delegate).
 
-/// KeyHandler 委任協定
-public protocol KeyHandlerDelegate {
+/// InputHandler 委任協定
+public protocol InputHandlerDelegate {
   var selectionKeys: String { get }
   var clientBundleIdentifier: String { get }
   func candidateController() -> CtlCandidateProtocol
-  func candidateSelectionCalledByKeyHandler(at index: Int)
+  func candidateSelectionCalledByInputHandler(at index: Int)
   func performUserPhraseOperation(with state: IMEStateProtocol, addToFilter: Bool)
     -> Bool
 }
 
 // MARK: - 核心 (Kernel).
 
-/// KeyHandler 按鍵調度模組。
-public class KeyHandler {
+/// InputHandler 按鍵調度模組。
+public class InputHandler {
   /// 委任物件 (SessionCtl)，以便呼叫其中的函式。
-  public var delegate: KeyHandlerDelegate?
+  public var delegate: InputHandlerDelegate?
   public var prefs: PrefMgrProtocol
 
   /// 半衰模組的衰減指數
@@ -74,7 +74,7 @@ public class KeyHandler {
     min(compositor.cursor, compositor.marker)..<max(compositor.cursor, compositor.marker)
   }
 
-  /// 檢測是否出現游標切斷組字圈內字符的情況
+  /// 檢測是否出現游標切斷組字區內字符的情況
   func isCursorCuttingChar(isMarker: Bool = false) -> Bool {
     let index = isMarker ? compositor.marker : compositor.cursor
     var isBound = (index == compositor.walkedNodes.contextRange(ofGivenCursor: index).lowerBound)
@@ -86,7 +86,7 @@ public class KeyHandler {
   /// 實際上要拿給 Megrez 使用的的游標位址，以方便在組字器最開頭或者最末尾的時候始終能抓取候選字節點陣列。
   ///
   /// 威注音對游標前置與游標後置模式採取的候選字節點陣列抓取方法是分離的，且不使用 Node Crossing。
-  var actualCandidateCursor: Int {
+  var cursorForCandidate: Int {
     compositor.cursor
       - ((compositor.cursor == compositor.width || !prefs.useRearCursorMode) && compositor.cursor > 0 ? 1 : 0)
   }
@@ -116,7 +116,7 @@ public class KeyHandler {
   /// - Parameter key: 給定的聯想詞的開頭字。
   /// - Returns: 抓取到的聯想詞陣列。
   /// 不會是 nil，但那些負責接收結果的函式會對空白陣列結果做出正確的處理。
-  func buildAssociatePhraseArray(withPair pair: Megrez.Compositor.KeyValuePaired) -> [(String, String)] {
+  func generateArrayOfAssociates(withPair pair: Megrez.Compositor.KeyValuePaired) -> [(String, String)] {
     var arrResult: [(String, String)] = []
     if currentLM.hasAssociatedPhrasesFor(pair: pair) {
       arrResult = currentLM.associatedPhrasesFor(pair: pair).map { ("", $0) }
@@ -140,18 +140,18 @@ public class KeyHandler {
   /// - Parameter theCandidate: 要拿來覆寫的詞音配對。
   func consolidateCursorContext(with theCandidate: Megrez.Compositor.KeyValuePaired) {
     var grid = compositor
-    var frontBoundaryEX = actualCandidateCursor + 1
-    var rearBoundaryEX = actualCandidateCursor
+    var frontBoundaryEX = cursorForCandidate + 1
+    var rearBoundaryEX = cursorForCandidate
     var debugIntelToPrint = ""
-    if grid.overrideCandidate(theCandidate, at: actualCandidateCursor) {
+    if grid.overrideCandidate(theCandidate, at: cursorForCandidate) {
       grid.walk()
-      let range = grid.walkedNodes.contextRange(ofGivenCursor: actualCandidateCursor)
+      let range = grid.walkedNodes.contextRange(ofGivenCursor: cursorForCandidate)
       rearBoundaryEX = range.lowerBound
       frontBoundaryEX = range.upperBound
       debugIntelToPrint.append("EX: \(rearBoundaryEX)..<\(frontBoundaryEX), ")
     }
 
-    let range = compositor.walkedNodes.contextRange(ofGivenCursor: actualCandidateCursor)
+    let range = compositor.walkedNodes.contextRange(ofGivenCursor: cursorForCandidate)
     var rearBoundary = min(range.lowerBound, rearBoundaryEX)
     var frontBoundary = max(range.upperBound, frontBoundaryEX)
 
@@ -207,14 +207,14 @@ public class KeyHandler {
   ///   - value: 給定之候選字（詞音配對）。
   ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字後的節錨的前方。
   ///   - consolidate: 在固化節點之前，先鞏固上下文。該選項可能會破壞在內文組字區內就地輪替候選字詞時的體驗。
-  func fixNode(candidate: (String, String), respectCursorPushing: Bool = true, preConsolidate: Bool = false) {
+  func consolidateNode(candidate: (String, String), respectCursorPushing: Bool = true, preConsolidate: Bool = false) {
     let theCandidate: Megrez.Compositor.KeyValuePaired = .init(key: candidate.0, value: candidate.1)
 
     /// 必須先鞏固當前組字器游標上下文、以消滅意料之外的影響，但在內文組字區內就地輪替候選字詞時除外。
     if preConsolidate { consolidateCursorContext(with: theCandidate) }
 
     // 回到正常流程。
-    if !compositor.overrideCandidate(theCandidate, at: actualCandidateCursor) { return }
+    if !compositor.overrideCandidate(theCandidate, at: cursorForCandidate) { return }
     let previousWalk = compositor.walkedNodes
     // 開始爬軌。
     walk()
@@ -222,7 +222,7 @@ public class KeyHandler {
 
     // 在可行的情況下更新使用者半衰記憶模組。
     var accumulatedCursor = 0
-    let currentNode = currentWalk.findNode(at: actualCandidateCursor, target: &accumulatedCursor)
+    let currentNode = currentWalk.findNode(at: cursorForCandidate, target: &accumulatedCursor)
     guard let currentNode = currentNode else { return }
 
     if currentNode.currentUnigram.score > -12, prefs.fetchSuggestionsFromUserOverrideModel {
@@ -234,7 +234,7 @@ public class KeyHandler {
       // 令半衰記憶模組觀測給定的三元圖。
       // 這個過程會讓半衰引擎根據當前上下文生成三元圖索引鍵。
       currentUOM.performObservation(
-        walkedBefore: previousWalk, walkedAfter: currentWalk, cursor: actualCandidateCursor,
+        walkedBefore: previousWalk, walkedAfter: currentWalk, cursor: cursorForCandidate,
         timestamp: Date().timeIntervalSince1970, saveCallback: { self.currentUOM.saveData() }
       )
       // 如果沒有出現崩框的話，那就將這個開關復位。
@@ -249,15 +249,15 @@ public class KeyHandler {
   }
 
   /// 獲取候選字詞（包含讀音）陣列資料內容。
-  func getCandidatesArray(fixOrder: Bool = true) -> [(String, String)] {
+  func generateArrayOfCandidates(fixOrder: Bool = true) -> [(String, String)] {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
     var arrCandidates: [Megrez.Compositor.KeyValuePaired] = {
       switch prefs.useRearCursorMode {
         case false:
-          return compositor.fetchCandidates(at: actualCandidateCursor, filter: .endAt)
+          return compositor.fetchCandidates(at: cursorForCandidate, filter: .endAt)
         case true:
-          return compositor.fetchCandidates(at: actualCandidateCursor, filter: .beginAt)
+          return compositor.fetchCandidates(at: cursorForCandidate, filter: .beginAt)
       }
     }()
 
@@ -271,7 +271,7 @@ public class KeyHandler {
       return arrCandidates.map { ($0.key, $0.value) }
     }
 
-    let arrSuggestedUnigrams: [(String, Megrez.Unigram)] = fetchSuggestionsFromUOM(apply: false)
+    let arrSuggestedUnigrams: [(String, Megrez.Unigram)] = retrieveUOMSuggestions(apply: false)
     let arrSuggestedCandidates: [Megrez.Compositor.KeyValuePaired] = arrSuggestedUnigrams.map {
       Megrez.Compositor.KeyValuePaired(key: $0.0, value: $0.1.value)
     }
@@ -282,7 +282,7 @@ public class KeyHandler {
   }
 
   /// 向半衰引擎詢問可能的選字建議、且套用給組字器內的當前游標位置。
-  @discardableResult func fetchSuggestionsFromUOM(apply: Bool) -> [(String, Megrez.Unigram)] {
+  @discardableResult func retrieveUOMSuggestions(apply: Bool) -> [(String, Megrez.Unigram)] {
     var arrResult = [(String, Megrez.Unigram)]()
     /// 如果逐字選字模式有啟用的話，直接放棄執行這個函式。
     if prefs.useSCPCTypingMode { return arrResult }
@@ -290,7 +290,7 @@ public class KeyHandler {
     if !prefs.fetchSuggestionsFromUserOverrideModel { return arrResult }
     /// 獲取來自半衰記憶模組的建議結果
     let suggestion = currentUOM.fetchSuggestion(
-      currentWalk: compositor.walkedNodes, cursor: actualCandidateCursor, timestamp: Date().timeIntervalSince1970
+      currentWalk: compositor.walkedNodes, cursor: cursorForCandidate, timestamp: Date().timeIntervalSince1970
     )
     arrResult.append(contentsOf: suggestion.candidates)
     if apply {
@@ -303,9 +303,9 @@ public class KeyHandler {
         )
         vCLog(
           "UOM: Suggestion retrieved, overriding the node score of the selected candidate: \(suggestedPair.toNGramKey)")
-        if !compositor.overrideCandidate(suggestedPair, at: actualCandidateCursor, overrideType: overrideBehavior) {
+        if !compositor.overrideCandidate(suggestedPair, at: cursorForCandidate, overrideType: overrideBehavior) {
           compositor.overrideCandidateLiteral(
-            newestSuggestedCandidate.1.value, at: actualCandidateCursor, overrideType: overrideBehavior
+            newestSuggestedCandidate.1.value, at: cursorForCandidate, overrideType: overrideBehavior
           )
         }
         walk()
@@ -415,7 +415,7 @@ public class KeyHandler {
 /// - Remark: 該選項僅對不支援 IMKTextInput 協定的應用有用，就不交給 PrefMgr 了。
 private let compositorWidthLimit = 20
 
-extension KeyHandler {
+extension InputHandler {
   /// 在爬取組字結果之前，先將即將從組字區溢出的內容遞交出去。
   ///
   /// 在理想狀況之下，組字區多長都無所謂。但是，螢幕浮動組字窗的尺寸是有限的。
