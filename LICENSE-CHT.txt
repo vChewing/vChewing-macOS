@@ -2,7 +2,7 @@
 
 vChewing macOS: MIT-NTL License 麻理（去商標）授權合約
 
-© 2021-2022 vChewing Project.
+© 2021 and onwards The vChewing Project.
 威注音 macOS 程式研發：Shiki Suen, Isaac Xen, Hiraku Wang, 等。
 威注音詞庫維護：Shiki Suen。
 

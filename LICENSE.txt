@@ -2,7 +2,7 @@ DISCLAIMER: The vChewing project, having no relationship of cooperation or affil
 
 vChewing macOS: MIT-NTL License
 
-© 2021-2022 vChewing Project.
+© 2021 and onwards The vChewing Project.
 vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.
 vChewing Phrase Database Maintained by Shiki Suen.
 
