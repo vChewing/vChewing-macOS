@@ -8,8 +8,8 @@
 /* Class = "NSWindow"; title = "About vChewing for macOS"; ObjectID = "ttlAboutWindow"; */
 "ttlAboutWindow.title" = "關於 macOS 版「威注音輸入法」";
 
-/* Class = "NSTextFieldCell"; title = "Derived from OpenVanilla McBopopmofo Project."; ObjectID = "lblProjectDescription"; */
-"lblProjectDescription.title" = "該專案由 OpenVanilla 小麥注音專案衍生而來。";
+/* Class = "NSTextFieldCell"; title = "Was derived from OpenVanilla McBopopmofo Project (MIT-License)."; ObjectID = "lblProjectDescription"; */
+"lblProjectDescription.title" = "該專案曾由 OpenVanilla 小麥注音專案 (MIT-License) 衍生而來。";
 
 /* Class = "NSButtonCell"; title = "OK"; ObjectID = "btnConfirm"; */
 "btnConfirm.title" = "確定";
@@ -23,8 +23,8 @@
 /* Class = "NSTextFieldCell"; title = "© 2021 and onwards The vChewing Project."; ObjectID = "lblCopyright"; */
 // "lblCopyright.title" = "© 2021 and onwards The vChewing Project.";
 
-/* Class = "NSTextFieldCell"; title = "vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "lblCredits"; */
-"lblCredits.title" = "威注音 macOS 程式研發：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n威注音詞庫維護：Shiki Suen。";
+/* Class = "NSTextFieldCell"; title = "vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen.\nWalking algorithm by Lukhnos Liu (from Gramambular 2, MIT-License)."; ObjectID = "lblCredits"; */
+"lblCredits.title" = "威注音 macOS 程式研發：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n威注音詞庫維護：Shiki Suen。\n爬軌算法：Lukhnos Liu (Gramambular 2, MIT-License)。";
 
 "xCD-lx-zY7.title" = "網站";
 
