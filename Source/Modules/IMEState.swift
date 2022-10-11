@@ -42,17 +42,20 @@ import Shared
 /// - .SymbolTable: 波浪鍵符號選單專用的狀態，有自身的特殊處理。
 public struct IMEState: IMEStateProtocol {
   public var type: StateType = .ofEmpty
-  public var data: StateDataProtocol = StateData() as StateDataProtocol
+  public var data: IMEStateDataProtocol = IMEStateData() as IMEStateDataProtocol
   public var node: CandidateNode = .init(name: "")
   public var isASCIIMode = false
   public var isVerticalCandidateWindow = false
-  init(_ data: StateDataProtocol = StateData() as StateDataProtocol, type: StateType = .ofEmpty) {
+  init(_ data: IMEStateDataProtocol = IMEStateData() as IMEStateDataProtocol, type: StateType = .ofEmpty) {
     self.data = data
     self.type = type
     isVerticalTyping = SessionCtl.isVerticalTyping
   }
 
-  init(_ data: StateDataProtocol = StateData() as StateDataProtocol, type: StateType = .ofEmpty, node: CandidateNode) {
+  init(
+    _ data: IMEStateDataProtocol = IMEStateData() as IMEStateDataProtocol, type: StateType = .ofEmpty,
+    node: CandidateNode
+  ) {
     self.data = data
     self.type = type
     self.node = node

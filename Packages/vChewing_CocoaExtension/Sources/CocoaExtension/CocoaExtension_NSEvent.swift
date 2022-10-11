@@ -106,7 +106,7 @@ extension NSEvent {
   // 這句用來返回換算結果。
   public var mainAreaNumKeyChar: String? { mapMainAreaNumKey[keyCode] }
 
-  // 除了 ANSI charCode 以外，其餘一律過濾掉，免得純 Swift 版 KeyHandler 被餵屎。
+  // 除了 ANSI charCode 以外，其餘一律過濾掉，免得 InputHandler 被餵屎。
   public var isInvalid: Bool {
     (0x20...0xFF).contains(charCode) ? false : !(isReservedKey && !isKeyCodeBlacklisted)
   }

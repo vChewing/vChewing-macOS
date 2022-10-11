@@ -14,7 +14,7 @@ import Shared
 /// 使用者辭典資料預設範例檔案名稱。
 private let kTemplateNameUserPhrases = "template-userphrases"
 private let kTemplateNameUserReplacements = "template-replacements"
-private let kTemplateNameUserExclusions = "template-exclusions"
+private let kTemplateNameUserFilterList = "template-exclusions"
 private let kTemplateNameUserSymbolPhrases = "template-usersymbolphrases"
 private let kTemplateNameUserAssociatesCHS = "template-associatedPhrases-chs"
 private let kTemplateNameUserAssociatesCHT = "template-associatedPhrases-cht"
@@ -362,7 +362,7 @@ public enum LMMgr {
   // MARK: - 檢查具體的使用者語彙檔案是否存在
 
   public static func ensureFileExists(
-    _ fileURL: URL, populateWithTemplate templateBasename: String = "1145141919810",
+    _ fileURL: URL, deployTemplate templateBasename: String = "1145141919810",
     extension ext: String = "txt"
   ) -> Bool {
     let filePath = fileURL.path
@@ -393,15 +393,15 @@ public enum LMMgr {
     /// CandidateNode 資料與 UserOverrideModel 半衰模組資料檔案不需要強行確保存在。
     /// 前者的話，需要該檔案存在的人自己會建立。
     /// 後者的話，你在敲字時自己就會建立。
-    if !ensureFileExists(userPhrasesDataURL(mode), populateWithTemplate: kTemplateNameUserPhrases)
+    if !ensureFileExists(userPhrasesDataURL(mode), deployTemplate: kTemplateNameUserPhrases)
       || !ensureFileExists(
         userAssociatesDataURL(mode),
-        populateWithTemplate: mode == .imeModeCHS ? kTemplateNameUserAssociatesCHS : kTemplateNameUserAssociatesCHT
+        deployTemplate: mode == .imeModeCHS ? kTemplateNameUserAssociatesCHS : kTemplateNameUserAssociatesCHT
       )
       || !ensureFileExists(userSCPCSequencesURL(mode))
-      || !ensureFileExists(userFilteredDataURL(mode), populateWithTemplate: kTemplateNameUserExclusions)
-      || !ensureFileExists(userReplacementsDataURL(mode), populateWithTemplate: kTemplateNameUserReplacements)
-      || !ensureFileExists(userSymbolDataURL(mode), populateWithTemplate: kTemplateNameUserSymbolPhrases)
+      || !ensureFileExists(userFilteredDataURL(mode), deployTemplate: kTemplateNameUserFilterList)
+      || !ensureFileExists(userReplacementsDataURL(mode), deployTemplate: kTemplateNameUserReplacements)
+      || !ensureFileExists(userSymbolDataURL(mode), deployTemplate: kTemplateNameUserSymbolPhrases)
     {
       return false
     }
