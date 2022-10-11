@@ -101,7 +101,6 @@
 		5BFC63D128D4B9F7004A77B7 /* IMKUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 5BFC63D028D4B9F7004A77B7 /* IMKUtils */; };
 		5BFDF011289635C100417BBC /* IMKCandidatesImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFDF010289635C100417BBC /* IMKCandidatesImpl.swift */; };
 		6A187E2616004C5900466B2E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A187E2816004C5900466B2E /* MainMenu.xib */; };
-		6A225A1F23679F2600F685C6 /* NotarizedArchives in Resources */ = {isa = PBXBuildFile; fileRef = 6A225A1E23679F2600F685C6 /* NotarizedArchives */; };
 		6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
 		6A2E40F9253A6AA000D1AE1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
 		6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */; };
@@ -114,7 +113,6 @@
 		D4A13D5A27A59F0B003BE359 /* SessionCtl_Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A13D5927A59D5C003BE359 /* SessionCtl_Core.swift */; };
 		D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8827A838CF006DB1CF /* Localizable.strings */; };
 		D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8D27A838F0006DB1CF /* InfoPlist.strings */; };
-		D4F0BBDF279AF1AF0071253C /* ArchiveUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F0BBDE279AF1AF0071253C /* ArchiveUtil.swift */; };
 		D4F0BBE1279AF8B30071253C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F0BBE0279AF8B30071253C /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
@@ -307,7 +305,6 @@
 		6A0D4EF515FC0DA600ABF4B3 /* IME-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IME-Info.plist"; sourceTree = "<group>"; };
 		6A15B32421A51F2300B92CD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		6A15B32521A51F2300B92CD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		6A225A1E23679F2600F685C6 /* NotarizedArchives */ = {isa = PBXFileReference; lastKnownFileType = folder; path = NotarizedArchives; sourceTree = "<group>"; };
 		6A2E40F5253A69DA00D1AE1D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		6ACA41CB15FC1D7500935EF6 /* vChewingInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ACA41EB15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -319,7 +316,6 @@
 		D4A13D5927A59D5C003BE359 /* SessionCtl_Core.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = SessionCtl_Core.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D4E33D8927A838CF006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D4E33D8E27A838F0006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		D4F0BBDE279AF1AF0071253C /* ArchiveUtil.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ArchiveUtil.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D4F0BBE0279AF8B30071253C /* AppDelegate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 /* End PBXFileReference section */
 
@@ -693,10 +689,8 @@
 			isa = PBXGroup;
 			children = (
 				5B44B97C28D2F283004508BF /* PKGRoot */,
-				6A225A1E23679F2600F685C6 /* NotarizedArchives */,
 				5BBBB77827AEDB330023B93A /* Resources */,
 				D4F0BBE0279AF8B30071253C /* AppDelegate.swift */,
-				D4F0BBDE279AF1AF0071253C /* ArchiveUtil.swift */,
 				6ACA41F215FC1D9000935EF6 /* Installer-Info.plist */,
 				5BC0AACA27F58472002D33E9 /* pkgPostInstall.sh */,
 				5BC0AAC927F58472002D33E9 /* pkgPreInstall.sh */,
@@ -938,7 +932,6 @@
 				6ACA420215FC1E5200935EF6 /* vChewing.app in Resources */,
 				6A2E40F9253A6AA000D1AE1D /* Images.xcassets in Resources */,
 				6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */,
-				6A225A1F23679F2600F685C6 /* NotarizedArchives in Resources */,
 				6ACA41FC15FC1D9000935EF6 /* Localizable.strings in Resources */,
 				6ACA41FD15FC1D9000935EF6 /* MainMenu.xib in Resources */,
 			);
@@ -1093,7 +1086,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D4F0BBE1279AF8B30071253C /* AppDelegate.swift in Sources */,
-				D4F0BBDF279AF1AF0071253C /* ArchiveUtil.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
