@@ -8,9 +8,9 @@
 
 import Shared
 
-// MARK: - KeyHandler Delegate
+// MARK: - InputHandler Delegate
 
-extension SessionCtl: KeyHandlerDelegate {
+extension SessionCtl: InputHandlerDelegate {
   public var clientBundleIdentifier: String {
     guard let client = client() else { return "" }
     return client.bundleIdentifier() ?? ""
@@ -18,7 +18,7 @@ extension SessionCtl: KeyHandlerDelegate {
 
   public func candidateController() -> CtlCandidateProtocol { ctlCandidateCurrent }
 
-  public func candidateSelectionCalledByKeyHandler(at index: Int) {
+  public func candidateSelectionCalledByInputHandler(at index: Int) {
     candidatePairSelected(at: index)
   }
 
@@ -86,18 +86,18 @@ extension SessionCtl: CtlCandidateDelegate {
 
     if [.ofCandidates, .ofSymbolTable].contains(state.type) {
       let selectedValue = state.candidates[index]
-      keyHandler.fixNode(
+      inputHandler.consolidateNode(
         candidate: selectedValue, respectCursorPushing: true,
         preConsolidate: PrefMgr.shared.consolidateContextOnCandidateSelection
       )
 
-      let inputting = keyHandler.buildInputtingState
+      let inputting = inputHandler.generateStateOfInputting()
 
       if PrefMgr.shared.useSCPCTypingMode {
         handle(state: IMEState.ofCommitting(textToCommit: inputting.displayedText))
         // 此時是逐字選字模式，所以「selectedValue.1」是單個字、不用追加處理。
         if PrefMgr.shared.associatedPhrasesEnabled {
-          let associates = keyHandler.buildAssociatePhraseState(
+          let associates = inputHandler.generateStateOfAssociates(
             withPair: .init(key: selectedValue.0, value: selectedValue.1)
           )
           handle(state: associates.candidates.isEmpty ? IMEState.ofEmpty() : associates)
@@ -120,7 +120,7 @@ extension SessionCtl: CtlCandidateDelegate {
         return
       }
       if PrefMgr.shared.associatedPhrasesEnabled {
-        let associates = keyHandler.buildAssociatePhraseState(
+        let associates = inputHandler.generateStateOfAssociates(
           withPair: .init(key: selectedValue.0, value: String(valueKept))
         )
         if !associates.candidates.isEmpty {

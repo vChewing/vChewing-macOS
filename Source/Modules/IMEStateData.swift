@@ -10,7 +10,7 @@ import Shared
 import Tekkon
 import TooltipUI
 
-public struct StateData: StateDataProtocol {
+public struct IMEStateData: IMEStateDataProtocol {
   private static var minCandidateLength: Int {
     PrefMgr.shared.allowBoostingSingleKanjiAsUserPhrase ? 1 : 2
   }
@@ -161,7 +161,7 @@ public struct StateData: StateDataProtocol {
 
 // MARK: - IMEState 工具函式
 
-extension StateData {
+extension IMEStateData {
   public var doesUserPhraseExist: Bool {
     let text = displayedText.charComponents[markedRange].joined()
     let joined = markedReadings.joined(separator: "-")
@@ -229,19 +229,19 @@ extension StateData {
 
       let text = pair.1
       let readingDisplay = readingThreadForDisplay
-      if markedRange.count < StateData.allowedMarkLengthRange.lowerBound {
+      if markedRange.count < IMEStateData.allowedMarkLengthRange.lowerBound {
         tooltipColorState = .denialInsufficiency
         return String(
           format: NSLocalizedString(
             "\"%@\" length must ≥ 2 for a user phrase.", comment: ""
           ) + "\n◆  " + readingDisplay, text
         )
-      } else if markedRange.count > StateData.allowedMarkLengthRange.upperBound {
+      } else if markedRange.count > IMEStateData.allowedMarkLengthRange.upperBound {
         tooltipColorState = .denialOverflow
         return String(
           format: NSLocalizedString(
             "\"%@\" length should ≤ %d for a user phrase.", comment: ""
-          ) + "\n◆  " + readingDisplay, text, StateData.allowedMarkLengthRange.upperBound
+          ) + "\n◆  " + readingDisplay, text, IMEStateData.allowedMarkLengthRange.upperBound
         )
       }
 

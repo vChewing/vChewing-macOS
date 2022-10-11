@@ -13,11 +13,11 @@ Megrez Engine is a module made for processing lingual data of an input method. T
 
 ### §1. 初期化
 
-在你的 IMKInputController 或者 KeyHandler 內初期化一份 Megrez.Compositor 組字器副本（這裡將該副本命名為「`compositor`」）。由於 Megrez.Compositor 的型別是 Struct 型別（為了讓 Compositor 可以 deep copy），所以其副本可以用 var 來宣告。
+在你的 IMKInputController 或者 InputHandler 內初期化一份 Megrez.Compositor 組字器副本（這裡將該副本命名為「`compositor`」）。由於 Megrez.Compositor 的型別是 Struct 型別（為了讓 Compositor 可以 deep copy），所以其副本可以用 var 來宣告。
 
-以 KeyHandler 為例：
+以 InputHandler 為例：
 ```swift
-class KeyHandler {
+class InputHandler {
   // 先設定好變數
   var compositor: Megrez.Compositor = .init()
   ...
@@ -34,7 +34,7 @@ class IMKMyInputController: IMKInputController {
 }
 ```
 
-由於 Swift 會在某個大副本（KeyHandler 或者 IMKInputController 副本）被銷毀的時候自動銷毀其中的全部副本，所以 Megrez.Compositor 的副本初期化沒必要寫在 init() 當中。但你很可能會想在 init() 時指定 Tekkon.Composer 所對接的語言模組型別、以及其可以允許的最大詞長。
+由於 Swift 會在某個大副本（InputHandler 或者 IMKInputController 副本）被銷毀的時候自動銷毀其中的全部副本，所以 Megrez.Compositor 的副本初期化沒必要寫在 init() 當中。但你很可能會想在 init() 時指定 Tekkon.Composer 所對接的語言模組型別、以及其可以允許的最大詞長。
 
 這裡就需要在 init() 時使用參數：
 ```swift

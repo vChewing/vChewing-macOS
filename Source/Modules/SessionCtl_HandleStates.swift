@@ -34,7 +34,7 @@ extension SessionCtl {
         }
         clearInlineDisplay()
         // 最後一道保險
-        keyHandler.clear()
+        inputHandler.clear()
         // 特殊處理：deactivateServer() 可能會遲於另一個客體會話的 activateServer() 執行。
         // 雖然所有在這個函式內影響到的變數都改為動態變數了（不會出現跨副本波及的情況），
         // 但 IMKCandidates 是有內部共用副本的、會被波及。
@@ -62,14 +62,14 @@ extension SessionCtl {
         tooltipInstance.hide()
         clearInlineDisplay()
         // 最後一道保險
-        keyHandler.clear()
+        inputHandler.clear()
       case .ofCommitting:
         ctlCandidateCurrent.visible = false
         tooltipInstance.hide()
         commit(text: newState.textToCommit)
         clearInlineDisplay()
         // 最後一道保險
-        keyHandler.clear()
+        inputHandler.clear()
       case .ofInputting:
         ctlCandidateCurrent.visible = false
         tooltipInstance.hide()
