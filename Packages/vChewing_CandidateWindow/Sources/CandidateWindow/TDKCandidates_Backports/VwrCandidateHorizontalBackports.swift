@@ -96,6 +96,7 @@ public struct VwrCandidateHorizontalBackports: View {
         if tooltip.isEmpty {
           Color(white: colorScheme == .dark ? 0.2 : 0.9)
         } else {
+          Color(white: colorScheme == .dark ? 0.0 : 1)
           controller.highlightedColorUIBackports
         }
         HStack(alignment: .bottom) {
