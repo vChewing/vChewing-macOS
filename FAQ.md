@@ -90,6 +90,6 @@ xattr -dr com.apple.quarantine ~/Downloads/vChewingInstaller.app
 
 ### 威注音 2.7.0 版好像改很兇，但又幾乎沒有新功能。究竟改了哪些內容？
 
-威注音 2.7.0 是威注音的 Dezonblization 行動的一部分，旨在讓在此之後的研發流程更能順利進行。藉由將整個專案大卸八塊、拆成各個以 Swift Package 為單位的各種組件，以及對大中心派發技術（Grand Central Dispatch）的合理運用，威注音得以做到更快的專案建置速度、更快的辭典載入速度、更清晰且更易於維護的專案結構框架。至於放棄 macOS 10.11-10.12 的支援，則是因為 NSGridView 以及 Xcode 14 的雙雙限制使然。藉由這些改動，威注音今後在理論上就可以引入對 KeyHandler 等元件的更有效的單元測試。
+威注音 2.7.0 是威注音的 Dezonblization 行動的一部分，旨在讓在此之後的研發流程更能順利進行。藉由將整個專案大卸八塊、拆成各個以 Swift Package 為單位的各種組件，以及對大中心派發技術（Grand Central Dispatch）的合理運用，威注音得以做到更快的專案建置速度、更快的辭典載入速度、更清晰且更易於維護的專案結構框架。至於放棄 macOS 10.11-10.12 的支援，則是因為 NSGridView 以及 Xcode 14 的雙雙限制使然。藉由這些改動，威注音今後在理論上就可以引入對 InputHandler 等元件的更有效的單元測試。
 
 $ EOF.

@@ -13,7 +13,7 @@ import Shared
 
 // MARK: - § 對選字狀態進行調度 (Handle Candidate State).
 
-extension KeyHandler {
+extension InputHandler {
   /// 當且僅當選字窗出現時，對於經過初次篩選處理的輸入訊號的處理均藉由此函式來進行。
   /// - Parameters:
   ///   - input: 輸入訊號。
@@ -49,7 +49,7 @@ extension KeyHandler {
         // 所以這裡需要對 compositor.isEmpty 做判定。
         stateCallback(IMEState.ofAbortion())
       } else {
-        stateCallback(buildInputtingState)
+        stateCallback(generateStateOfInputting())
       }
       if state.type == .ofSymbolTable, let nodePrevious = state.node.previous, !nodePrevious.members.isEmpty {
         stateCallback(IMEState.ofSymbolTable(node: nodePrevious))
@@ -64,7 +64,7 @@ extension KeyHandler {
         stateCallback(IMEState.ofAbortion())
         return true
       }
-      delegate?.candidateSelectionCalledByKeyHandler(at: ctlCandidate.selectedCandidateIndex)
+      delegate?.candidateSelectionCalledByInputHandler(at: ctlCandidate.selectedCandidateIndex)
       return true
     }
 
@@ -245,7 +245,7 @@ extension KeyHandler {
     if index != NSNotFound {
       let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(index)
       if candidateIndex != -114_514 {
-        delegate?.candidateSelectionCalledByKeyHandler(at: candidateIndex)
+        delegate?.candidateSelectionCalledByInputHandler(at: candidateIndex)
         return true
       }
     }
@@ -285,10 +285,10 @@ extension KeyHandler {
       if shouldAutoSelectCandidate {
         let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(0)
         if candidateIndex != -114_514 {
-          delegate?.candidateSelectionCalledByKeyHandler(at: candidateIndex)
+          delegate?.candidateSelectionCalledByInputHandler(at: candidateIndex)
           stateCallback(IMEState.ofAbortion())
-          return handle(
-            input: input, state: IMEState.ofEmpty(), stateCallback: stateCallback, errorCallback: errorCallback
+          return handleInput(
+            event: input, state: IMEState.ofEmpty(), stateCallback: stateCallback, errorCallback: errorCallback
           )
         }
         return true
