@@ -55,7 +55,7 @@ struct VwrPrefPaneDevZone: View {
             isOn: $selUseIMKCandidateWindow.onChange {
               PrefMgr.shared.useIMKCandidateWindow = selUseIMKCandidateWindow
               NSLog("vChewing App self-terminated due to enabling / disabling IMK candidate window.")
-              NSApplication.shared.terminate(nil)
+              NSApp.terminate(nil)
             }
           )
           Text(
