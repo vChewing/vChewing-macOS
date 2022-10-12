@@ -1,19 +1,14 @@
-// (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are of:
-// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// (c) 2011 and onwards Lukhnos Liu and MJHsieh.
+// Swiftified by Rob Mayoff.
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
-// ... with NTL restriction stating that:
-// No trademark license is granted to use the trade names, trademarks, service
-// marks, or product names of Contributor, except as required to fulfill notice
-// requirements defined in MIT License.
 
 import Foundation
 
 public enum Reloc {
   // Determines if an app is translocated by Gatekeeper to a randomized path.
   // See https://weblog.rogueamoeba.com/2016/06/29/sierra-and-gatekeeper-path-randomization/
-  // Originally written by Zonble Yang in Objective-C (MIT License).
+  // Originally written by MJHsieh and Lukhnos Liu in Objective-C (MIT License).
   // Swiftified by: Rob Mayoff. Ref: https://forums.swift.org/t/58719/5
   public static func isAppBundleTranslocated(atPath bundlePath: String) -> Bool {
     var entryCount = getfsstat(nil, 0, 0)
