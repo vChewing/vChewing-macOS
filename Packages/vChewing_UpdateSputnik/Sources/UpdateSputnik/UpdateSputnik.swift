@@ -9,11 +9,12 @@
 import Cocoa
 
 public class UpdateSputnik {
+  public static var shared: UpdateSputnik = .init()
   public var varkUpdateInfoPageURLKey: String = "UpdateInfoSite"
   public var varkUpdateCheckDateKeyPrevious: String = "PreviousUpdateCheckDate"
   public var varkUpdateCheckDateKeyNext: String = "NextUpdateCheckDate"
   public var varkUpdateCheckInterval: TimeInterval = 114_514
-  public var varCheckUpdateAutomatically = "ChecvarkUpdateAutomatically"
+  public var varCheckUpdateAutomatically = "CheckUpdateAutomatically"
 
   public init() {}
 
