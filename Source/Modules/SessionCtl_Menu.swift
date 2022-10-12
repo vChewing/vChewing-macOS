@@ -198,8 +198,8 @@ extension SessionCtl {
       CtlPrefWindow.show()
     } else {
       NSApp.setActivationPolicy(.accessory)
-      ctlPrefUI.shared.controller.show(preferencePane: Preferences.PaneIdentifier(rawValue: "General"))
-      ctlPrefUI.shared.controller.window?.level = .statusBar
+      CtlPrefUI.shared.controller.show(preferencePane: Preferences.PaneIdentifier(rawValue: "General"))
+      CtlPrefUI.shared.controller.window?.level = .statusBar
       NSApp.activate(ignoringOtherApps: true)
     }
   }

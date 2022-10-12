@@ -67,7 +67,7 @@ extension NSImage {
 }
 
 @available(macOS 10.15, *)
-class ctlPrefUI {
+class CtlPrefUI {
   var controller = PreferencesWindowController(
     panes: [
       Preferences.Pane(
@@ -75,40 +75,40 @@ class ctlPrefUI {
         title: NSLocalizedString("General", comment: ""),
         toolbarIcon: .tabImageGeneral
       ) {
-        suiPrefPaneGeneral()
+        VwrPrefPaneGeneral()
       },
       Preferences.Pane(
         identifier: Preferences.PaneIdentifier(rawValue: "Experience"),
         title: NSLocalizedString("Experience", comment: ""),
         toolbarIcon: .tabImageExperience
       ) {
-        suiPrefPaneExperience()
+        VwrPrefPaneExperience()
       },
       Preferences.Pane(
         identifier: Preferences.PaneIdentifier(rawValue: "Dictionary"),
         title: NSLocalizedString("Dictionary", comment: ""),
         toolbarIcon: .tabImageDictionary
       ) {
-        suiPrefPaneDictionary()
+        VwrPrefPaneDictionary()
       },
       Preferences.Pane(
         identifier: Preferences.PaneIdentifier(rawValue: "Keyboard"),
         title: NSLocalizedString("Keyboard", comment: ""),
         toolbarIcon: .tabImageKeyboard
       ) {
-        suiPrefPaneKeyboard()
+        VwrPrefPaneKeyboard()
       },
       Preferences.Pane(
         identifier: Preferences.PaneIdentifier(rawValue: "DevZone"),
         title: NSLocalizedString("DevZone", comment: ""),
         toolbarIcon: .tabImageDevZone
       ) {
-        suiPrefPaneDevZone()
+        VwrPrefPaneDevZone()
       },
     ],
     style: .toolbarItems
   )
-  static let shared = ctlPrefUI()
+  static let shared = CtlPrefUI()
 }
 
 // MARK: - Add "onChange" support.
