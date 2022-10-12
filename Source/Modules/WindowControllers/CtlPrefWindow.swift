@@ -25,8 +25,8 @@ extension NSToolbarItem.Identifier {
 // Please note that the class should be exposed using the same class name
 // in Objective-C in order to let IMK to see the same class name as
 // the "InputMethodServerPreferencesWindowControllerClass" in Info.plist.
-@objc(ctlPrefWindow)
-class ctlPrefWindow: NSWindowController {
+@objc(CtlPrefWindow)
+class CtlPrefWindow: NSWindowController {
   @IBOutlet var fontSizePopUpButton: NSPopUpButton!
   @IBOutlet var uiLanguageButton: NSPopUpButton!
   @IBOutlet var basicKeyboardLayoutButton: NSPopUpButton!
@@ -43,7 +43,19 @@ class ctlPrefWindow: NSWindowController {
   @IBOutlet var vwrKeyboard: NSView!
   @IBOutlet var vwrDevZone: NSView!
 
-  var currentLanguageSelectItem: NSMenuItem?
+  public static var shared: CtlPrefWindow?
+
+  static func show() {
+    if shared == nil { shared = CtlPrefWindow(windowNibName: "frmPrefWindow") }
+    guard let sharedWindow = shared?.window else { return }
+    sharedWindow.center()
+    sharedWindow.orderFrontRegardless()  // 逼著視窗往最前方顯示
+    sharedWindow.level = .statusBar
+    sharedWindow.titlebarAppearsTransparent = true
+    NSApp.setActivationPolicy(.accessory)
+  }
+
+  private var currentLanguageSelectItem: NSMenuItem?
 
   override func windowDidLoad() {
     super.windowDidLoad()
@@ -266,7 +278,7 @@ class ctlPrefWindow: NSWindowController {
   }  // End IBAction
 }
 
-extension ctlPrefWindow: NSToolbarDelegate {
+extension CtlPrefWindow: NSToolbarDelegate {
   func use(view: NSView) {
     guard let window = window else {
       return

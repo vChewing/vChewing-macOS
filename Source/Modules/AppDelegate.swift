@@ -24,9 +24,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
   }
 
   public let updateSputnik = UpdateSputnik()
-  private var ctlClientListMgrInstance: ctlClientListMgr?
-  private var ctlPrefWindowInstance: ctlPrefWindow?
-  private var ctlAboutWindowInstance: ctlAboutWindow?  // New About Window
   public var folderMonitor = FolderMonitor(
     url: URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
   )
@@ -90,40 +87,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     }
   }
 
-  func showClientListMgr() {
-    if ctlClientListMgrInstance == nil {
-      ctlClientListMgrInstance = ctlClientListMgr.init(windowNibName: "frmClientListMgr")
-    }
-    ctlClientListMgrInstance?.window?.center()
-    ctlClientListMgrInstance?.window?.orderFrontRegardless()  // 逼著屬性視窗往最前方顯示
-    ctlClientListMgrInstance?.window?.level = .statusBar
-    ctlClientListMgrInstance?.window?.titlebarAppearsTransparent = true
-    NSApp.setActivationPolicy(.accessory)
-  }
-
-  func showPreferences() {
-    if ctlPrefWindowInstance == nil {
-      ctlPrefWindowInstance = ctlPrefWindow.init(windowNibName: "frmPrefWindow")
-    }
-    ctlPrefWindowInstance?.window?.center()
-    ctlPrefWindowInstance?.window?.orderFrontRegardless()  // 逼著屬性視窗往最前方顯示
-    ctlPrefWindowInstance?.window?.level = .statusBar
-    ctlPrefWindowInstance?.window?.titlebarAppearsTransparent = true
-    NSApp.setActivationPolicy(.accessory)
-  }
-
-  // New About Window
-  func showAbout() {
-    if ctlAboutWindowInstance == nil {
-      ctlAboutWindowInstance = ctlAboutWindow.init(windowNibName: "frmAboutWindow")
-    }
-    ctlAboutWindowInstance?.window?.center()
-    ctlAboutWindowInstance?.window?.orderFrontRegardless()  // 逼著關於視窗往最前方顯示
-    ctlAboutWindowInstance?.window?.level = .statusBar
-    ctlAboutWindowInstance?.window?.titlebarAppearsTransparent = true
-    NSApp.setActivationPolicy(.accessory)
-  }
-
   func selfUninstall() {
     currentAlertType = "Uninstall"
     let content = String(
@@ -150,7 +113,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
 
   // New About Window
   @IBAction func about(_: Any) {
-    (NSApp.delegate as? AppDelegate)?.showAbout()
+    CtlAboutWindow.show()
     NSApplication.shared.activate(ignoringOtherApps: true)
   }
 }

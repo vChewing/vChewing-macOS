@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="ctlClientListMgr" customModule="vChewing" customModuleProvider="target">
+        <customObject id="-2" userLabel="File's Owner" customClass="CtlClientListMgr" customModule="vChewing" customModuleProvider="target">
             <connections>
                 <outlet property="btnAddClient" destination="JcI-Ff-tDM" id="XbA-OK-zl8"/>
                 <outlet property="btnRemoveClient" destination="UNR-wG-8n1" id="vkb-81-1hA"/>
@@ -43,7 +42,7 @@
                         <rect key="frame" x="20" y="76" width="624" height="232"/>
                         <clipView key="contentView" drawsBackground="NO" id="wKQ-IV-k62">
                             <rect key="frame" x="1" y="1" width="622" height="230"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" tableStyle="inset" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" id="vIw-vc-WKJ" userLabel="tblClients">
                                     <rect key="frame" x="0.0" y="0.0" width="622" height="230"/>
