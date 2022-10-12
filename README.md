@@ -88,9 +88,9 @@ P.S.: 威注音輸入法的 Shift 按鍵監測功能僅藉由對 NSEvent 訊號�
 
 ## 應用授權
 
-威注音專案目前僅用到小麥注音的下述程式組件（MIT License）：
+威注音專案目前僅用到 OpenVanilla for Mac 的下述程式組件（MIT License）：
 
-- 僅供研發人員調試方便而使用的 App 版安裝程式 (by Zonble Yang)，不對公眾使用。
+- 僅供研發人員調試方便而使用的 App 版安裝程式 (by Lukhnos Liu & MJHsieh)，不對公眾使用。
 
 威注音專案目前還用到如下的來自 Lukhnos Liu 的算法：
 
