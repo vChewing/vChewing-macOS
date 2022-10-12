@@ -11,7 +11,7 @@ import Shared
 import SwiftUI
 
 @available(macOS 10.15, *)
-struct suiPrefPaneGeneral: View {
+struct VwrPrefPaneGeneral: View {
   @State private var selCandidateUIFontSize = UserDefaults.standard.integer(
     forKey: UserDef.kCandidateListTextSize.rawValue)
   @State private var selUILanguage: [String] =
@@ -99,7 +99,7 @@ struct suiPrefPaneGeneral: View {
                 UserDefaults.standard.removeObject(forKey: UserDef.kAppleLanguages.rawValue)
               }
               NSLog("vChewing App self-terminated due to UI language change.")
-              NSApplication.shared.terminate(nil)
+              NSApp.terminate(nil)
             }
           ) {
             Text(LocalizedStringKey("Follow OS settings")).tag(["auto"])
@@ -189,8 +189,8 @@ struct suiPrefPaneGeneral: View {
 }
 
 @available(macOS 11.0, *)
-struct suiPrefPaneGeneral_Previews: PreviewProvider {
+struct VwrPrefPaneGeneral_Previews: PreviewProvider {
   static var previews: some View {
-    suiPrefPaneGeneral()
+    VwrPrefPaneGeneral()
   }
 }

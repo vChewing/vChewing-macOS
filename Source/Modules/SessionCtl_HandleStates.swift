@@ -16,83 +16,89 @@ extension SessionCtl {
   ///
   /// 先將舊狀態單獨記錄起來，再將新舊狀態作為參數，
   /// 根據新狀態本身的狀態種類來判斷交給哪一個專門的函式來處理。
+  /// - Remark: ⚠️ 任何在這個函式當中被改變的變數均不得是靜態 (Static) 變數。
+  /// 針對某一個客體的 deactivateServer() 可能會在使用者切換到另一個客體應用
+  /// 且開始敲字之後才會執行。這個過程會使得不同的 SessionCtl 副本之間出現
+  /// 不必要的互相干涉、打斷彼此的工作。
   /// - Parameter newState: 新狀態。
-  func handle(state newState: IMEStateProtocol) {
-    let previous = state
-    state = newState
-    switch state.type {
+  public func handle(state newState: IMEStateProtocol, replaceCurrent: Bool = true) {
+    var previous = state
+    if replaceCurrent { state = newState }
+    switch newState.type {
       case .ofDeactivated:
-        Self.ctlCandidateCurrent.delegate = nil
-        Self.ctlCandidateCurrent.visible = false
-        Self.tooltipInstance.hide()
+        ctlCandidateCurrent.visible = false
+        popupCompositionBuffer.hide()
+        tooltipInstance.hide()
         if previous.hasComposition {
           commit(text: previous.displayedText)
         }
         clearInlineDisplay()
         // 最後一道保險
-        keyHandler.clear()
-      case .ofEmpty, .ofAbortion:
-        var previous = previous
-        if state.type == .ofAbortion {
-          state = IMEState.ofEmpty()
-          previous = state
+        inputHandler.clear()
+        // 特殊處理：deactivateServer() 可能會遲於另一個客體會話的 activateServer() 執行。
+        // 雖然所有在這個函式內影響到的變數都改為動態變數了（不會出現跨副本波及的情況），
+        // 但 IMKCandidates 是有內部共用副本的、會被波及。
+        // 所以在這裡糾偏一下、讓所有開啟了選字窗的會話重新顯示選字窗。
+        if PrefMgr.shared.useIMKCandidateWindow {
+          for instance in Self.allInstances {
+            guard let imkC = instance.ctlCandidateCurrent as? CtlCandidateIMK else { continue }
+            if instance.state.isCandidateContainer, !imkC.visible {
+              instance.handle(state: instance.state, replaceCurrent: false)
+            }
+          }
         }
-        Self.ctlCandidateCurrent.visible = false
-        Self.tooltipInstance.hide()
+      case .ofEmpty, .ofAbortion:
+        if newState.type == .ofAbortion {
+          previous = IMEState.ofEmpty()
+          if replaceCurrent { state = previous }
+        }
+        ctlCandidateCurrent.visible = false
+        tooltipInstance.hide()
         // 全專案用以判斷「.Abortion」的地方僅此一處。
-        if previous.hasComposition, state.type != .ofAbortion {
+        if previous.hasComposition, newState.type != .ofAbortion {
           commit(text: previous.displayedText)
         }
         // 在這裡手動再取消一次選字窗與工具提示的顯示，可謂雙重保險。
-        Self.ctlCandidateCurrent.visible = false
-        Self.tooltipInstance.hide()
+        tooltipInstance.hide()
         clearInlineDisplay()
         // 最後一道保險
-        keyHandler.clear()
+        inputHandler.clear()
       case .ofCommitting:
-        Self.ctlCandidateCurrent.visible = false
-        Self.tooltipInstance.hide()
-        let textToCommit = state.textToCommit
-        if !textToCommit.isEmpty { commit(text: textToCommit) }
+        ctlCandidateCurrent.visible = false
+        tooltipInstance.hide()
+        commit(text: newState.textToCommit)
         clearInlineDisplay()
         // 最後一道保險
-        keyHandler.clear()
+        inputHandler.clear()
       case .ofInputting:
-        Self.ctlCandidateCurrent.visible = false
-        Self.tooltipInstance.hide()
-        let textToCommit = state.textToCommit
-        if !textToCommit.isEmpty { commit(text: textToCommit) }
+        ctlCandidateCurrent.visible = false
+        tooltipInstance.hide()
+        commit(text: newState.textToCommit)
         setInlineDisplayWithCursor()
-        if !state.tooltip.isEmpty {
-          show(tooltip: state.tooltip)
-        }
+        showTooltip(newState.tooltip)
       case .ofMarking:
-        Self.ctlCandidateCurrent.visible = false
+        ctlCandidateCurrent.visible = false
         setInlineDisplayWithCursor()
-        if state.tooltip.isEmpty {
-          Self.tooltipInstance.hide()
-        } else {
-          show(tooltip: state.tooltip)
-        }
+        showTooltip(newState.tooltip)
       case .ofCandidates, .ofAssociates, .ofSymbolTable:
-        Self.tooltipInstance.hide()
+        tooltipInstance.hide()
         setInlineDisplayWithCursor()
         showCandidates()
       default: break
     }
     // 浮動組字窗的顯示判定
-    if state.hasComposition, PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier) {
-      Self.popupCompositionBuffer.isTypingDirectionVertical = isVerticalTyping
-      Self.popupCompositionBuffer.show(
-        state: state, at: lineHeightRect(zeroCursor: true).origin
+    if newState.hasComposition, PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier) {
+      popupCompositionBuffer.isTypingDirectionVertical = isVerticalTyping
+      popupCompositionBuffer.show(
+        state: newState, at: lineHeightRect(zeroCursor: true).origin
       )
     } else {
-      Self.popupCompositionBuffer.hide()
+      popupCompositionBuffer.hide()
     }
   }
 
   /// 針對受 .NotEmpty() 管轄的非空狀態，在組字區內顯示游標。
-  func setInlineDisplayWithCursor() {
+  public func setInlineDisplayWithCursor() {
     if state.type == .ofAssociates {
       doSetMarkedText(
         state.data.attributedStringPlaceholder, selectionRange: NSRange(location: 0, length: 0),
@@ -128,7 +134,7 @@ extension SessionCtl {
   /// 遞交組字區內容。
   /// 注意：必須在 IMK 的 commitComposition 函式當中也間接或者直接執行這個處理。
   private func commit(text: String) {
-    guard let client = client() else { return }
+    guard let client = client(), !text.isEmpty else { return }
     let buffer = ChineseConverter.kanjiConversionIfRequired(text)
     if buffer.isEmpty {
       return
@@ -147,7 +153,7 @@ extension SessionCtl {
   }
 
   /// 把 setMarkedText 包裝一下，按需啟用 GCD。
-  func doSetMarkedText(_ string: Any!, selectionRange: NSRange, replacementRange: NSRange) {
+  public func doSetMarkedText(_ string: Any!, selectionRange: NSRange, replacementRange: NSRange) {
     guard let client = client() else { return }
     if let myID = Bundle.main.bundleIdentifier, let clientID = client.bundleIdentifier(), myID == clientID {
       DispatchQueue.main.async {

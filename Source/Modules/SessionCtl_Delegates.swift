@@ -8,21 +8,21 @@
 
 import Shared
 
-// MARK: - KeyHandler Delegate
+// MARK: - InputHandler Delegate
 
-extension SessionCtl: KeyHandlerDelegate {
-  var clientBundleIdentifier: String {
+extension SessionCtl: InputHandlerDelegate {
+  public var clientBundleIdentifier: String {
     guard let client = client() else { return "" }
     return client.bundleIdentifier() ?? ""
   }
 
-  func candidateController() -> CtlCandidateProtocol { Self.ctlCandidateCurrent }
+  public func candidateController() -> CtlCandidateProtocol { ctlCandidateCurrent }
 
-  func candidateSelectionCalledByKeyHandler(at index: Int) {
+  public func candidateSelectionCalledByInputHandler(at index: Int) {
     candidatePairSelected(at: index)
   }
 
-  func performUserPhraseOperation(with state: IMEStateProtocol, addToFilter: Bool)
+  public func performUserPhraseOperation(with state: IMEStateProtocol, addToFilter: Bool)
     -> Bool
   {
     guard state.type == .ofMarking else { return false }
@@ -53,11 +53,11 @@ extension SessionCtl: KeyHandlerDelegate {
 // MARK: - Candidate Controller Delegate
 
 extension SessionCtl: CtlCandidateDelegate {
-  var selectionKeys: String {
+  public var selectionKeys: String {
     PrefMgr.shared.useIMKCandidateWindow ? "123456789" : PrefMgr.shared.candidateKeys
   }
 
-  func candidatePairs(conv: Bool = false) -> [(String, String)] {
+  public func candidatePairs(conv: Bool = false) -> [(String, String)] {
     if !state.isCandidateContainer || state.candidates.isEmpty { return [] }
     if !conv || PrefMgr.shared.cns11643Enabled || state.candidates[0].0.contains("_punctuation") {
       return state.candidates
@@ -71,7 +71,7 @@ extension SessionCtl: CtlCandidateDelegate {
     return convertedCandidates
   }
 
-  func candidatePairSelected(at index: Int) {
+  public func candidatePairSelected(at index: Int) {
     if state.type == .ofSymbolTable, (0..<state.node.members.count).contains(index) {
       let node = state.node.members[index]
       if !node.members.isEmpty {
@@ -86,18 +86,18 @@ extension SessionCtl: CtlCandidateDelegate {
 
     if [.ofCandidates, .ofSymbolTable].contains(state.type) {
       let selectedValue = state.candidates[index]
-      keyHandler.fixNode(
+      inputHandler.consolidateNode(
         candidate: selectedValue, respectCursorPushing: true,
         preConsolidate: PrefMgr.shared.consolidateContextOnCandidateSelection
       )
 
-      let inputting = keyHandler.buildInputtingState
+      let inputting = inputHandler.generateStateOfInputting()
 
       if PrefMgr.shared.useSCPCTypingMode {
         handle(state: IMEState.ofCommitting(textToCommit: inputting.displayedText))
         // 此時是逐字選字模式，所以「selectedValue.1」是單個字、不用追加處理。
         if PrefMgr.shared.associatedPhrasesEnabled {
-          let associates = keyHandler.buildAssociatePhraseState(
+          let associates = inputHandler.generateStateOfAssociates(
             withPair: .init(key: selectedValue.0, value: selectedValue.1)
           )
           handle(state: associates.candidates.isEmpty ? IMEState.ofEmpty() : associates)
@@ -120,7 +120,7 @@ extension SessionCtl: CtlCandidateDelegate {
         return
       }
       if PrefMgr.shared.associatedPhrasesEnabled {
-        let associates = keyHandler.buildAssociatePhraseState(
+        let associates = inputHandler.generateStateOfAssociates(
           withPair: .init(key: selectedValue.0, value: String(valueKept))
         )
         if !associates.candidates.isEmpty {

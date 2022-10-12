@@ -39,7 +39,7 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
     return result.blended(withFraction: colorBlendAmount, of: blendingAgainstTarget)!
   }
 
-  open weak var delegate: CtlCandidateDelegate? {
+  open var delegate: CtlCandidateDelegate? {
     didSet {
       reloadData()
     }
@@ -110,7 +110,9 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
     fatalError("init(coder:) has not been implemented")
   }
 
-  open var candidateFont = NSFont.systemFont(ofSize: 18)
+  open var candidateFont = NSFont.systemFont(
+    ofSize: min(196, max(12, Double(UserDefaults.standard.integer(forKey: "CandidateListTextSize"))))
+  )
 
   @discardableResult open func showNextLine() -> Bool {
     false

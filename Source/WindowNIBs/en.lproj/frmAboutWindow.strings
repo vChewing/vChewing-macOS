@@ -8,8 +8,8 @@
 /* Class = "NSWindow"; title = "About vChewing for macOS"; ObjectID = "ttlAboutWindow"; */
 "ttlAboutWindow.title" = "About vChewing for macOS";
 
-/* Class = "NSTextFieldCell"; title = "Derived from OpenVanilla McBopopmofo Project."; ObjectID = "lblProjectDescription"; */
-"lblProjectDescription.title" = "Derived from OpenVanilla McBopopmofo Project.";
+/* Class = "NSTextFieldCell"; title = "Was derived from OpenVanilla McBopopmofo Project (MIT-License)."; ObjectID = "lblProjectDescription"; */
+"lblProjectDescription.title" = "Was derived from OpenVanilla McBopopmofo Project (MIT-License).";
 
 /* Class = "NSButtonCell"; title = "OK"; ObjectID = "btnConfirm"; */
 "btnConfirm.title" = "OK";
@@ -20,11 +20,11 @@
 /* Class = "NSTextFieldCell"; title = "DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, are not included in vChewing official phrase database."; ObjectID = "lblDisclaimer"; */
 "lblDisclaimer.title" = "DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, are not included in vChewing official phrase database.";
 
-/* Class = "NSTextFieldCell"; title = "© 2021-2022 vChewing Project."; ObjectID = "lblCopyright"; */
-// "lblCopyright.title" = "© 2021-2022 vChewing Project.";
+/* Class = "NSTextFieldCell"; title = "© 2021 and onwards The vChewing Project."; ObjectID = "lblCopyright"; */
+// "lblCopyright.title" = "© 2021 and onwards The vChewing Project.";
 
-/* Class = "NSTextFieldCell"; title = "vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "lblCredits"; */
-"lblCredits.title" = "vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen.";
+/* Class = "NSTextFieldCell"; title = "vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen.\nWalking algorithm by Lukhnos Liu (from Gramambular 2, MIT-License)."; ObjectID = "lblCredits"; */
+"lblCredits.title" = "vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen.\nWalking algorithm by Lukhnos Liu (from Gramambular 2, MIT-License).";
 
 "xCD-lx-zY7.title" = "Website";
 

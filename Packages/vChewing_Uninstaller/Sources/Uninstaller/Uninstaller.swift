@@ -67,7 +67,7 @@ public enum Uninstaller {
     if !FileManager.trashTargetIfExists(pathIMELibrary + kTargetBundle) { return -1 }  // 最後移除 App 自身
     // 幹掉殘留在記憶體內的執行緒。
     if selfKill {
-      NSApplication.shared.terminate(nil)
+      NSApp.terminate(nil)
     }
     return 0
   }

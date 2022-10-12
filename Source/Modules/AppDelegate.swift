@@ -17,20 +17,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
   private func reloadOnFolderChangeHappens() {
     // 拖 100ms 再重載，畢竟有些有特殊需求的使用者可能會想使用巨型自訂語彙檔案。
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
-      if PrefMgr.shared.shouldAutoReloadUserDataFiles {
-        LMMgr.initUserLangModels()
-      }
+      if PrefMgr.shared.shouldAutoReloadUserDataFiles { LMMgr.initUserLangModels() }
     }
   }
 
-  public let updateSputnik = UpdateSputnik()
-  private var ctlClientListMgrInstance: ctlClientListMgr?
-  private var ctlPrefWindowInstance: ctlPrefWindow?
-  private var ctlAboutWindowInstance: ctlAboutWindow?  // New About Window
   public var folderMonitor = FolderMonitor(
     url: URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
   )
-  private var currentAlertType: String = ""
 
   func userNotificationCenter(_: NSUserNotificationCenter, shouldPresent _: NSUserNotification) -> Bool {
     true
@@ -57,23 +50,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
       self.folderMonitor.folderDidChange = { [weak self] in
         self?.reloadOnFolderChangeHappens()
       }
-      if LMMgr.userDataFolderExists {
-        self.folderMonitor.startMonitoring()
-      }
+      if LMMgr.userDataFolderExists { self.folderMonitor.startMonitoring() }
     }
 
     PrefMgr.shared.fixOddPreferences()
 
-    // 配置更新小助手
-    updateSputnik.varkUpdateInfoPageURLKey = "UpdateInfoSite"
-    updateSputnik.varkUpdateCheckDateKeyPrevious = "PreviousUpdateCheckDate"
-    updateSputnik.varkUpdateCheckDateKeyNext = "NextUpdateCheckDate"
-    updateSputnik.varkUpdateCheckInterval = 114_514
-    updateSputnik.varCheckUpdateAutomatically = "ChecvarkUpdateAutomatically"
-
     // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
     if PrefMgr.shared.checkUpdateAutomatically {
-      updateSputnik.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
+      UpdateSputnik.shared.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
     }
   }
 
@@ -85,47 +69,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     folderMonitor.folderDidChange = { [weak self] in
       self?.reloadOnFolderChangeHappens()
     }
-    if LMMgr.userDataFolderExists {
-      folderMonitor.startMonitoring()
-    }
-  }
-
-  func showClientListMgr() {
-    if ctlClientListMgrInstance == nil {
-      ctlClientListMgrInstance = ctlClientListMgr.init(windowNibName: "frmClientListMgr")
-    }
-    ctlClientListMgrInstance?.window?.center()
-    ctlClientListMgrInstance?.window?.orderFrontRegardless()  // 逼著屬性視窗往最前方顯示
-    ctlClientListMgrInstance?.window?.level = .statusBar
-    ctlClientListMgrInstance?.window?.titlebarAppearsTransparent = true
-    NSApp.setActivationPolicy(.accessory)
-  }
-
-  func showPreferences() {
-    if ctlPrefWindowInstance == nil {
-      ctlPrefWindowInstance = ctlPrefWindow.init(windowNibName: "frmPrefWindow")
-    }
-    ctlPrefWindowInstance?.window?.center()
-    ctlPrefWindowInstance?.window?.orderFrontRegardless()  // 逼著屬性視窗往最前方顯示
-    ctlPrefWindowInstance?.window?.level = .statusBar
-    ctlPrefWindowInstance?.window?.titlebarAppearsTransparent = true
-    NSApp.setActivationPolicy(.accessory)
-  }
-
-  // New About Window
-  func showAbout() {
-    if ctlAboutWindowInstance == nil {
-      ctlAboutWindowInstance = ctlAboutWindow.init(windowNibName: "frmAboutWindow")
-    }
-    ctlAboutWindowInstance?.window?.center()
-    ctlAboutWindowInstance?.window?.orderFrontRegardless()  // 逼著關於視窗往最前方顯示
-    ctlAboutWindowInstance?.window?.level = .statusBar
-    ctlAboutWindowInstance?.window?.titlebarAppearsTransparent = true
-    NSApp.setActivationPolicy(.accessory)
+    if LMMgr.userDataFolderExists { folderMonitor.startMonitoring() }
   }
 
   func selfUninstall() {
-    currentAlertType = "Uninstall"
     let content = String(
       format: NSLocalizedString(
         "This will remove vChewing Input Method from this user account, requiring your confirmation.",
@@ -150,7 +97,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
 
   // New About Window
   @IBAction func about(_: Any) {
-    (NSApp.delegate as? AppDelegate)?.showAbout()
-    NSApplication.shared.activate(ignoringOtherApps: true)
+    CtlAboutWindow.show()
+    NSApp.activate(ignoringOtherApps: true)
   }
 }

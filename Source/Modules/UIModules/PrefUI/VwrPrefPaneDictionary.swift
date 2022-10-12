@@ -12,7 +12,7 @@ import Shared
 import SwiftUI
 
 @available(macOS 10.15, *)
-struct suiPrefPaneDictionary: View {
+struct VwrPrefPaneDictionary: View {
   private var fdrDefault = LMMgr.dataFolderPath(isDefaultFolder: true)
   @State private var tbxUserDataPathSpecified: String =
     UserDefaults.standard.string(forKey: UserDef.kUserDataFolderSpecified.rawValue)
@@ -76,7 +76,7 @@ struct suiPrefPaneDictionary: View {
               let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
                 PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath)
 
-              if let window = ctlPrefUI.shared.controller.window {
+              if let window = CtlPrefUI.shared.controller.window {
                 Self.dlgOpenPath.beginSheetModal(for: window) { result in
                   if result == NSApplication.ModalResponse.OK {
                     guard let url = Self.dlgOpenPath.url else { return }
@@ -88,7 +88,7 @@ struct suiPrefPaneDictionary: View {
                       PrefMgr.shared.userDataFolderSpecified = newPath
                       tbxUserDataPathSpecified = PrefMgr.shared.userDataFolderSpecified
                       BookmarkManager.shared.saveBookmark(for: url)
-                      (NSApplication.shared.delegate as! AppDelegate).updateDirectoryMonitorPath()
+                      (NSApp.delegate as! AppDelegate).updateDirectoryMonitorPath()
                     } else {
                       IMEApp.buzz()
                       if !bolPreviousFolderValidity {
@@ -193,8 +193,8 @@ struct suiPrefPaneDictionary: View {
 }
 
 @available(macOS 11.0, *)
-struct suiPrefPaneDictionary_Previews: PreviewProvider {
+struct VwrPrefPaneDictionary_Previews: PreviewProvider {
   static var previews: some View {
-    suiPrefPaneDictionary()
+    VwrPrefPaneDictionary()
   }
 }

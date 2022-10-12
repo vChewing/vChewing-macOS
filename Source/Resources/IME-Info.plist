@@ -22,6 +22,34 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>CFEULAContent</key>
 	<string>License texts used in the customized about window.</string>
+	<key>CFUpstreamEULAContent</key>
+	<string>########################################################
+## UPSTREAM LICENSE PROVIDED BELOW INTACT FOR REFERENCE
+## https://github.com/openvanilla/McBopomofo/blob/5b319f491142c1170a3607e28ab4e91c22861998/LICENSE.txt
+########################################################
+
+MIT License
+
+Copyright (c) 2011-2022 Mengjuei Hsieh et al.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the “Software”), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</string>
 	<key>ComponentInputModeDict</key>
 	<dict>
 		<key>tsInputModeListKey</key>
@@ -96,7 +124,7 @@
 	<key>InputMethodServerDelegateClass</key>
 	<string>SessionCtl</string>
 	<key>InputMethodServerPreferencesWindowControllerClass</key>
-	<string>ctlPrefWindow</string>
+	<string>CtlPrefWindow</string>
 	<key>InputMethodSessionController</key>
 	<string>SessionCtl</string>
 	<key>LSApplicationCategoryType</key>
@@ -108,7 +136,7 @@
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
-	<string>© 2021-2022 vChewing Project.</string>
+	<string>© 2021 and onwards The vChewing Project.</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

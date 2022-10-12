@@ -20,10 +20,16 @@ extension SessionCtl {
   ///   - event: 裝置操作輸入事件，可能會是 nil。
   ///   - sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 回「`true`」以將該案件已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
-  @objc(handleEvent:client:) override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
+  @objc(handleEvent:client:) public override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
 
     // MARK: 前置處理
+
+    // 如果是 deactivated 狀態的話，強制糾正其為 empty()。
+    if let client = client(), state.type == .ofDeactivated {
+      handle(state: IMEState.ofEmpty())
+      return handle(event, client: client)
+    }
 
     // 更新此時的靜態狀態標記。
     state.isASCIIMode = isASCIIMode
@@ -32,7 +38,7 @@ extension SessionCtl {
     // 就這傳入的 NSEvent 都還有可能是 nil，Apple InputMethodKit 團隊到底在搞三小。
     // 只針對特定類型的 client() 進行處理。
     guard let event = event, sender is IMKTextInput else {
-      resetKeyHandler()
+      resetInputHandler()
       return false
     }
 
@@ -67,7 +73,7 @@ extension SessionCtl {
     /// 警告：這裡的 event 必須是原始 event 且不能被 var，否則會影響 Shift 中英模式判定。
     if #available(macOS 10.15, *) {
       if Self.theShiftKeyDetector.check(event), !PrefMgr.shared.disableShiftTogglingAlphanumericalMode {
-        if !shouldUseShiftToggleHandle || (!rencentKeyHandledByKeyHandlerEtc && shouldUseShiftToggleHandle) {
+        if !shouldUseShiftToggleHandle || (!rencentKeyHandledByInputHandlerEtc && shouldUseShiftToggleHandle) {
           let status = NSLocalizedString("NotificationSwitchASCII", comment: "")
           Notifier.notify(
             message: isASCIIMode.toggled()
@@ -76,7 +82,7 @@ extension SessionCtl {
           )
         }
         if shouldUseShiftToggleHandle {
-          rencentKeyHandledByKeyHandlerEtc = false
+          rencentKeyHandledByInputHandlerEtc = false
         }
         return false
       }
@@ -87,7 +93,7 @@ extension SessionCtl {
     // 不再讓威注音處理由 Shift 切換到的英文模式的按鍵輸入。
     if isASCIIMode, !isCapsLocked { return false }
 
-    /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 KeyHandler 內修復。
+    /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 InputHandler 內修復。
     /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
     /// 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
     /// 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
@@ -110,7 +116,7 @@ extension SessionCtl {
     }
 
     // 在啟用注音排列而非拼音輸入的情況下，強制將當前鍵盤佈局翻譯為美規鍵盤。
-    if keyHandler.composer.parser.rawValue < 100 {
+    if inputHandler.composer.parser.rawValue < 100 {
       eventToDeal = eventToDeal.inAppleABCStaticForm
     }
 
@@ -126,7 +132,7 @@ extension SessionCtl {
 
     // IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
     if let result = imkCandidatesEventPreHandler(event: eventToDeal) {
-      if shouldUseShiftToggleHandle { rencentKeyHandledByKeyHandlerEtc = result }
+      if shouldUseShiftToggleHandle { rencentKeyHandledByInputHandlerEtc = result }
       return result
     }
 
@@ -134,7 +140,7 @@ extension SessionCtl {
     /// 這樣可以與 IMK 選字窗共用按鍵處理資源，維護起來也比較方便。
     let result = commonEventHandler(eventToDeal)
     if shouldUseShiftToggleHandle {
-      rencentKeyHandledByKeyHandlerEtc = result
+      rencentKeyHandledByInputHandlerEtc = result
     }
     return result
   }
@@ -149,13 +155,13 @@ extension SessionCtl {
   /// - Returns: 回「`true`」以將該案件已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
   private func commonEventHandler(_ event: NSEvent) -> Bool {
     // 無法列印的訊號輸入，一概不作處理。
-    // 這個過程不能放在 KeyHandler 內，否則不會起作用。
+    // 這個過程不能放在 InputHandler 內，否則不會起作用。
     if !event.charCode.isPrintable { return false }
 
     /// 將按鍵行為與當前輸入法狀態結合起來、交給按鍵調度模組來處理。
     /// 再根據返回的 result bool 數值來告知 IMK「這個按鍵事件是被處理了還是被放行了」。
-    /// 這裡不用 keyHandler.handleCandidate() 是因為需要針對聯想詞輸入狀態做額外處理。
-    let result = keyHandler.handle(input: event, state: state) { newState in
+    /// 這裡不用 inputHandler.handleCandidate() 是因為需要針對聯想詞輸入狀態做額外處理。
+    let result = inputHandler.handleInput(event: event, state: state) { newState in
       self.handle(state: newState)
     } errorCallback: { errorString in
       vCLog(errorString)
@@ -172,11 +178,11 @@ extension SessionCtl {
     // IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
     // 這樣可以讓 interpretKeyEvents() 函式自行判斷：
     // - 是就地交給 imkCandidates.interpretKeyEvents() 處理？
-    // - 還是藉由 delegate 扔回 SessionCtl 給 KeyHandler 處理？
-    if let imkCandidates = Self.ctlCandidateCurrent as? CtlCandidateIMK, imkCandidates.visible {
+    // - 還是藉由 delegate 扔回 SessionCtl 給 InputHandler 處理？
+    if let imkCandidates = ctlCandidateCurrent as? CtlCandidateIMK, imkCandidates.visible {
       let event: NSEvent = CtlCandidateIMK.replaceNumPadKeyCodes(target: eventToDeal) ?? eventToDeal
 
-      // Shift+Enter 是個特殊情形，不提前攔截處理的話、會有垃圾參數傳給 delegate 的 keyHandler 從而崩潰。
+      // Shift+Enter 是個特殊情形，不提前攔截處理的話、會有垃圾參數傳給 delegate 的 inputHandler 從而崩潰。
       // 所以這裡直接將 Shift Flags 清空。
       if event.isShiftHold, event.isEnter {
         guard let newEvent = event.reinitiate(modifierFlags: []) else {
@@ -207,7 +213,7 @@ extension SessionCtl {
 
   private func imkCandidatesEventSubHandler(event: NSEvent) -> Bool {
     let eventArray = [event]
-    guard let imkC = Self.ctlCandidateCurrent as? CtlCandidateIMK else { return false }
+    guard let imkC = ctlCandidateCurrent as? CtlCandidateIMK else { return false }
     if event.isEsc || event.isBackSpace || event.isDelete || (event.isShiftHold && !event.isSpace) {
       return commonEventHandler(event)
     } else if event.isSymbolMenuPhysicalKey {

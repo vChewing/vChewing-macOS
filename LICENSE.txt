@@ -2,7 +2,7 @@ DISCLAIMER: The vChewing project, having no relationship of cooperation or affil
 
 vChewing macOS: MIT-NTL License
 
-© 2021-2022 vChewing Project.
+© 2021 and onwards The vChewing Project.
 vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.
 vChewing Phrase Database Maintained by Shiki Suen.
 
@@ -14,7 +14,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-$ 3rd-Party Modules Used:
+$ Some 3rd-Party Modules Used:
 
 - ShiftKeyUpChecker: (c) 2019 and onwards Qwertyyb (March Yang) (MIT License).
 - LineReader: (c) 2019 and onwards Robert Muckle-Jones (Apache 2.0 License).

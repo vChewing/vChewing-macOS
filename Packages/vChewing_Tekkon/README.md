@@ -23,11 +23,11 @@ Regarding pinyin input support, we only support: Hanyu Pinyin, Secondary Pinyin,
 
 ### §1. 初期化
 
-在你的 IMKInputController (InputMethodController) 或者 KeyHandler 內初期化一份 Tekkon.Composer 注拼槽副本（這裡將該副本命名為「`_composer`」）。由於 Tekkon.Composer 的型別是 Struct 型別，所以其副本必須為變數（var），否則無法自我 mutate。
+在你的 IMKInputController (InputMethodController) 或者 InputHandler 內初期化一份 Tekkon.Composer 注拼槽副本（這裡將該副本命名為「`_composer`」）。由於 Tekkon.Composer 的型別是 Struct 型別，所以其副本必須為變數（var），否則無法自我 mutate。
 
-以 KeyHandler 為例：
+以 InputHandler 為例：
 ```swift
-class KeyHandler: NSObject {
+class InputHandler: NSObject {
   // 先設定好變數
   var _composer: Tekkon.Composer = .init()
   ...
@@ -45,7 +45,7 @@ class IMKMyInputController: IMKInputController {
 ```
 
 
-由於 Swift 會在某個大副本（KeyHandler 或者 IMKInputController 副本）被銷毀的時候自動銷毀其中的全部副本，所以 Tekkon.Composer 的副本初期化沒必要寫在 init() 當中。但你很可能會想在 init() 時指定 Tekkon.Composer 所使用的注音排列（是大千？還是倚天傳統？還是神通？等）。
+由於 Swift 會在某個大副本（InputHandler 或者 IMKInputController 副本）被銷毀的時候自動銷毀其中的全部副本，所以 Tekkon.Composer 的副本初期化沒必要寫在 init() 當中。但你很可能會想在 init() 時指定 Tekkon.Composer 所使用的注音排列（是大千？還是倚天傳統？還是神通？等）。
 
 這裡就需要在 _composer 這個副本所在的型別當中額外寫一個過程函式。
 
@@ -159,7 +159,7 @@ final class TekkonTests: XCTestCase {
 
 #### // 2. 訊號處理
 
-無論是 KeyHandler 還是 IMKInputController 都得要處理被傳入的 NSEvent 當中的 charCode 訊號。
+無論是 InputHandler 還是 IMKInputController 都得要處理被傳入的 NSEvent 當中的 charCode 訊號。
 
 比如 IMKInputController 內：
 ```swift
@@ -168,9 +168,9 @@ func handleInputText(_ inputText: String?, key keyCode: Int, modifiers flags: In
 }
 ```
 
-或者 KeyHandler 內：
+或者 InputHandler 內：
 ```swift
-extension KeyHandler {
+extension InputHandler {
   func handle(
     input: InputHandler,
     state: InputState,
@@ -184,7 +184,7 @@ extension KeyHandler {
 
 但對注拼槽的處理都是一樣的。
 
-這裡分享一下小麥注音輸入法與威注音輸入法在 KeyHandler 內對 _composer 的用法。
+這裡分享一下威注音輸入法在 InputHandler 內對 _composer 的用法。
 
 如果收到的按鍵訊號是 BackSpace 的話，可以用 _composer.doBackSpace() 來移除注拼槽內最前方的元素。
 
@@ -193,8 +193,6 @@ extension KeyHandler {
 
 
 > (這裡的範例取自威注音，只用作演示用途。威注音實際的 codebase 可能會有出入。請留意這一段內的漢語註解。)
-> 
-> (小麥注音 2.2 沒在用鐵恨引擎，而是在用 OVMandarin 引擎與 Objective-Cpp，所以語法會有一些出入。)
 > 
 > (不是所有輸入法都有狀態管理引擎，請根據各自專案的實際情況來結合理解這段程式碼。)
 
@@ -219,7 +217,7 @@ if !skipPhoneticHandling && _composer.inputValidityCheck(key: charCode) {
   // 有調號的話，則不需要這樣處理，轉而繼續在此之後的處理。
   let composeReading = _composer.hasToneMarker()
   if !composeReading {
-    stateCallback(buildInputtingState())
+    stateCallback(generateStateOfInputting())
     return true
   }
 }
@@ -236,7 +234,7 @@ composeReading = composeReading || (!_composer.isEmpty && (input.isSpace || inpu
 if composeReading {  // 符合按鍵組合條件
   if input.isSpace && !_composer.hasToneMarker() {
     _composer.receiveKey(fromString: " ")  // 補上空格，否則倚天忘形與許氏排列某些音無法響應不了陰平聲調。
-    // 小麥注音因為使用 OVMandarin 而不是鐵恨引擎，所以不需要這樣補。但鐵恨引擎對所有聲調一視同仁。
+    // 某些輸入法使用 OVMandarin 而不是鐵恨引擎，所以不需要這樣補。但鐵恨引擎對所有聲調一視同仁。
   }
   let reading = _composer.getComposition()  // 拿取用來進行索引檢索用的注音
   // 如果輸入法的辭典索引是漢語拼音的話，要注意上一行拿到的內容得是漢語拼音。
@@ -249,7 +247,7 @@ if composeReading {  // 符合按鍵組合條件
     _composer.clear()  // 清空注拼槽的內容
     // 根據「天權星引擎 (威注音) 或 Gramambular (小麥) 的組字器是否為空」來判定回呼哪一種狀態
     stateCallback(
-      (getCompositorLength() == 0) ? InputState.EmptyIgnoringPreviousState() : buildInputtingState())
+      (getCompositorLength() == 0) ? InputState.EmptyIgnoringPreviousState() : generateStateOfInputting())
     return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了
   }
 
@@ -269,7 +267,7 @@ if composeReading {  // 符合按鍵組合條件
   // 之後就是更新組字區了。先清空注拼槽的內容。
   _composer.clear()
   // 再以回呼組字狀態的方式來執行updateClientComposingBuffer()
-  let inputting = buildInputtingState()
+  let inputting = generateStateOfInputting()
   inputting.poppedText = poppedText
   stateCallback(inputting)
 

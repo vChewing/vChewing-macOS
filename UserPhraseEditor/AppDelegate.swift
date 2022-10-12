@@ -10,8 +10,6 @@ import Cocoa
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-  private var ctlAboutWindowInstance: ctlAboutWindow?  // New About Window
-
   func applicationDidFinishLaunching(_: Notification) {
     // Insert code here to initialize your application
   }
@@ -24,20 +22,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     .terminateNow
   }
 
-  // New About Window
-  @objc func showAbout() {
-    if ctlAboutWindowInstance == nil {
-      ctlAboutWindowInstance = ctlAboutWindow.init(windowNibName: "frmAboutWindow")
-    }
-    ctlAboutWindowInstance?.window?.center()
-    ctlAboutWindowInstance?.window?.orderFrontRegardless()  // 逼著關於視窗往最前方顯示
-    ctlAboutWindowInstance?.window?.level = .statusBar
-    ctlAboutWindowInstance?.window?.titlebarAppearsTransparent = true
-  }
-
   // Call the New About Window
   @IBAction func about(_: Any) {
-    (NSApp.delegate as? AppDelegate)?.showAbout()
-    NSApplication.shared.activate(ignoringOtherApps: true)
+    CtlAboutWindow.show()
+    NSApp.activate(ignoringOtherApps: true)
   }
 }

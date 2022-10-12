@@ -11,7 +11,7 @@ import Shared
 import SwiftUI
 
 @available(macOS 10.15, *)
-struct suiPrefPaneDevZone: View {
+struct VwrPrefPaneDevZone: View {
   @State private var selUseIMKCandidateWindow: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kUseIMKCandidateWindow.rawValue)
   @State private var selHandleDefaultCandidateFontsByLangIdentifier: Bool = UserDefaults.standard.bool(
@@ -55,7 +55,7 @@ struct suiPrefPaneDevZone: View {
             isOn: $selUseIMKCandidateWindow.onChange {
               PrefMgr.shared.useIMKCandidateWindow = selUseIMKCandidateWindow
               NSLog("vChewing App self-terminated due to enabling / disabling IMK candidate window.")
-              NSApplication.shared.terminate(nil)
+              NSApp.terminate(nil)
             }
           )
           Text(
@@ -105,8 +105,8 @@ struct suiPrefPaneDevZone: View {
 }
 
 @available(macOS 11.0, *)
-struct suiPrefPaneDevZone_Previews: PreviewProvider {
+struct VwrPrefPaneDevZone_Previews: PreviewProvider {
   static var previews: some View {
-    suiPrefPaneDevZone()
+    VwrPrefPaneDevZone()
   }
 }

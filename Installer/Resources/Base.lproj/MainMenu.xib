@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21223" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21223"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -111,7 +111,7 @@
         <window title="vChewing Installer" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" animationBehavior="default" titlebarAppearsTransparent="YES" id="371">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <rect key="contentRect" x="335" y="390" width="533" height="457"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
             <value key="minSize" type="size" width="533" height="457"/>
             <value key="maxSize" type="size" width="533" height="457"/>
             <view key="contentView" id="372">
@@ -135,17 +135,17 @@ DQ
                         </connections>
                     </button>
                     <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" findBarPosition="belowContent" translatesAutoresizingMaskIntoConstraints="NO" id="YCR-wo-M5a">
-                        <rect key="frame" x="91" y="166" width="427" height="190"/>
+                        <rect key="frame" x="91" y="165" width="427" height="196"/>
                         <clipView key="contentView" drawsBackground="NO" id="NrY-FL-PVu" userLabel="appEULAContentClip">
-                            <rect key="frame" x="1" y="1" width="425" height="188"/>
+                            <rect key="frame" x="1" y="1" width="425" height="194"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="bar" smartInsertDelete="YES" id="47J-tO-8TZ" userLabel="appEULAContent">
-                                    <rect key="frame" x="0.0" y="-2" width="425" height="188"/>
+                                    <rect key="frame" x="0.0" y="-2" width="425" height="194"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="minSize" width="425" height="188"/>
+                                    <size key="minSize" width="425" height="194"/>
                                     <size key="maxSize" width="427" height="10000000"/>
                                     <attributedString key="textStorage">
                                         <fragment content="Placeholder for EULA Texts.">
@@ -165,12 +165,12 @@ DQ
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" controlSize="mini" horizontal="NO" id="E5B-3B-faV">
-                            <rect key="frame" x="412" y="1" width="14" height="188"/>
+                            <rect key="frame" x="412" y="1" width="14" height="194"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ir5-sQ-sJc">
-                        <rect key="frame" x="89" y="442" width="130" height="15"/>
+                        <rect key="frame" x="89" y="443" width="130" height="14"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="vChewing for macOS" id="GNc-8S-1VG" userLabel="appNameLabel">
                             <font key="font" size="12" name="Tahoma-Bold"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -178,15 +178,15 @@ DQ
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bzR-Oa-BZa">
-                        <rect key="frame" x="89" y="426" width="263" height="15"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" title="Derived from OpenVanilla McBopopmofo Project." id="QYf-Nf-hoi">
+                        <rect key="frame" x="89" y="428" width="362" height="14"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="Was derived from OpenVanilla McBopopmofo Project (MIT-License)." id="QYf-Nf-hoi">
                             <font key="font" size="12" name="Tahoma"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="03l-rN-zf9">
-                        <rect key="frame" x="89" y="410" width="297" height="15"/>
+                        <rect key="frame" x="89" y="413" width="297" height="14"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="293" id="v2b-OK-WGD"/>
                         </constraints>
@@ -197,7 +197,7 @@ DQ
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XLb-mv-73s">
-                        <rect key="frame" x="89" y="387" width="431" height="15"/>
+                        <rect key="frame" x="89" y="391" width="431" height="14"/>
                         <textFieldCell key="cell" title="Placeholder for detailed credits." id="VW8-s5-Wpn">
                             <font key="font" size="12" name="Tahoma"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -208,7 +208,7 @@ DQ
                         <rect key="frame" x="15" y="137" width="503" height="5"/>
                     </box>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="k5O-zZ-gQY">
-                        <rect key="frame" x="89" y="364" width="431" height="15"/>
+                        <rect key="frame" x="89" y="369" width="431" height="14"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="MIT-NTL License:" id="AVS-ih-FXM">
                             <font key="font" size="12" name="Tahoma"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -216,7 +216,7 @@ DQ
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="miu-08-dZk">
-                        <rect key="frame" x="13" y="41" width="360" height="90"/>
+                        <rect key="frame" x="13" y="47" width="360" height="84"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="356" id="pu3-zr-hJy"/>
                         </constraints>
@@ -235,7 +235,7 @@ DQ
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="AboutBanner" id="akk-zO-Abm"/>
                     </imageView>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="z1m-8k-Z63">
-                        <rect key="frame" x="218" y="442" width="126" height="15"/>
+                        <rect key="frame" x="218" y="443" width="126" height="14"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="122" id="yKq-Fv-W1J"/>
                         </constraints>
@@ -246,7 +246,7 @@ DQ
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nul-TQ-gOI">
-                        <rect key="frame" x="89" y="148" width="431" height="15"/>
+                        <rect key="frame" x="89" y="148" width="431" height="14"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="By installing the software, you must accept the terms above." id="mf8-6e-z7X">
                             <font key="font" size="12" name="Tahoma-Bold"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -327,7 +327,7 @@ Gw
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="gHl-Hx-eQn">
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="283" y="305" width="480" height="180"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
             <view key="contentView" id="wAe-c8-Vh9">
                 <rect key="frame" x="0.0" y="0.0" width="480" height="180"/>
                 <autoresizingMask key="autoresizingMask"/>

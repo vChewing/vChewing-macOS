@@ -18,13 +18,16 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
   public static let defaultIMKSelectionKey: [UInt16: String] = [
     18: "1", 19: "2", 20: "3", 21: "4", 23: "5", 22: "6", 26: "7", 28: "8", 25: "9",
   ]
-  public weak var delegate: CtlCandidateDelegate? {
+  public var delegate: CtlCandidateDelegate? {
     didSet {
       reloadData()
     }
   }
 
-  public var visible = false { didSet { visible ? show() : hide() } }
+  public var visible: Bool {
+    get { isVisible() }
+    set { newValue ? show() : hide() }
+  }
 
   public var windowTopLeftPoint: NSPoint {
     get {
@@ -76,7 +79,7 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
   public required init(_ layout: NSUserInterfaceLayoutOrientation = .horizontal) {
     super.init(server: theServer, panelType: kIMKScrollingGridCandidatePanel)
     specifyLayout(layout)
-    // 設為 true 表示先交給 ctlIME 處理
+    // 設為 true 表示先交給 SessionCtl 處理
     setAttributes([IMKCandidatesSendServerKeyEventFirst: true])
     visible = false
     // guard let currentTISInputSource = currentTISInputSource else { return }  // 下面兩句都沒用，所以註釋掉。
@@ -98,7 +101,7 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
   }
 
   /// 幹話：這裡很多函式內容亂寫也都無所謂了，因為都被 IMKCandidates 代管執行。
-  /// 對於所有 IMK 選字窗的選字判斷動作，不是在 keyHandler 中，而是在 `ctlIME_Core` 中。
+  /// 對於所有 IMK 選字窗的選字判斷動作，不是在 inputHandler 中，而是在 `SessionCtl_HandleEvent` 中。
 
   // 該函式會影響 IMK 選字窗。
   @discardableResult public func showNextPage() -> Bool {

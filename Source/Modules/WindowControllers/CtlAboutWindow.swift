@@ -8,10 +8,22 @@
 
 import Cocoa
 
-class ctlAboutWindow: NSWindowController {
+class CtlAboutWindow: NSWindowController {
   @IBOutlet var appVersionLabel: NSTextField!
   @IBOutlet var appCopyrightLabel: NSTextField!
   @IBOutlet var appEULAContent: NSTextView!
+
+  public static var shared: CtlAboutWindow?
+
+  static func show() {
+    if shared == nil { shared = CtlAboutWindow(windowNibName: "frmAboutWindow") }
+    guard let sharedWindow = shared?.window else { return }
+    sharedWindow.center()
+    sharedWindow.orderFrontRegardless()  // 逼著視窗往最前方顯示
+    sharedWindow.level = .statusBar
+    sharedWindow.titlebarAppearsTransparent = true
+    NSApp.setActivationPolicy(.accessory)
+  }
 
   override func windowDidLoad() {
     super.windowDidLoad()
@@ -31,8 +43,10 @@ class ctlAboutWindow: NSWindowController {
     {
       appCopyrightLabel.stringValue = copyrightLabel
     }
-    if let eulaContent = Bundle.main.localizedInfoDictionary?["CFEULAContent"] as? String {
-      appEULAContent.string = eulaContent
+    if let eulaContent = Bundle.main.localizedInfoDictionary?["CFEULAContent"] as? String,
+      let eulaContentUpstream = Bundle.main.infoDictionary?["CFUpstreamEULAContent"] as? String
+    {
+      appEULAContent.string = eulaContent + "\n" + eulaContentUpstream
     }
     appVersionLabel.stringValue = "\(versionString) Build \(installingVersion)"
   }

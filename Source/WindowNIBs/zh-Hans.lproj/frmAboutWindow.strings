@@ -8,8 +8,8 @@
 /* Class = "NSWindow"; title = "About vChewing for macOS"; ObjectID = "ttlAboutWindow"; */
 "ttlAboutWindow.title" = "关于 macOS 版「威注音输入法」";
 
-/* Class = "NSTextFieldCell"; title = "Derived from OpenVanilla McBopopmofo Project."; ObjectID = "lblProjectDescription"; */
-"lblProjectDescription.title" = "该专案由 OpenVanilla 小麦注音专案衍生而来。";
+/* Class = "NSTextFieldCell"; title = "Was derived from OpenVanilla McBopopmofo Project (MIT-License)."; ObjectID = "lblProjectDescription"; */
+"lblProjectDescription.title" = "该专案曾由 OpenVanilla 小麦注音专案 (MIT-License) 衍生而来。";
 
 /* Class = "NSButtonCell"; title = "OK"; ObjectID = "btnConfirm"; */
 "btnConfirm.title" = "确定";
@@ -20,11 +20,11 @@
 /* Class = "NSTextFieldCell"; title = "DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, are not included in vChewing official phrase database."; ObjectID = "lblDisclaimer"; */
 "lblDisclaimer.title" = "免责声明：威注音专案对小麦注音官方专案内赠的小麦注音原版词库内容不负任何责任。威注音输入法专用的威注音官方词库不包含任何「会在法理上妨碍威注音在全球传播」的「与地缘政治及政治意识形态有关的」内容。威注音专案与 OpenVanilla 专案之间无合作关系、无隶属关系。";
 
-/* Class = "NSTextFieldCell"; title = "© 2021-2022 vChewing Project."; ObjectID = "lblCopyright"; */
-// "lblCopyright.title" = "© 2021-2022 vChewing Project.";
+/* Class = "NSTextFieldCell"; title = "© 2021 and onwards The vChewing Project."; ObjectID = "lblCopyright"; */
+// "lblCopyright.title" = "© 2021 and onwards The vChewing Project.";
 
-/* Class = "NSTextFieldCell"; title = "vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "lblCredits"; */
-"lblCredits.title" = "威注音 macOS 程式研发：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n威注音词库维护：Shiki Suen。";
+/* Class = "NSTextFieldCell"; title = "vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen.\nWalking algorithm by Lukhnos Liu (from Gramambular 2, MIT-License)."; ObjectID = "lblCredits"; */
+"lblCredits.title" = "威注音 macOS 程式研发：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n威注音词库维护：Shiki Suen。\n爬轨算法：Lukhnos Liu (Gramambular 2, MIT-License)。";
 
 "xCD-lx-zY7.title" = "网站";
 
