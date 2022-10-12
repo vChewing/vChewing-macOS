@@ -13,6 +13,7 @@ import PopupCompositionBuffer
 import Shared
 import ShiftKeyUpChecker
 import TooltipUI
+import UpdateSputnik
 
 /// 輸入法控制模組，乃在輸入法端用以控制輸入行為的基礎型別。
 ///
@@ -202,7 +203,7 @@ extension SessionCtl {
     }
 
     DispatchQueue.main.async {
-      (NSApp.delegate as? AppDelegate)?.updateSputnik.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
+      UpdateSputnik.shared.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
     }
 
     handle(state: IMEState.ofEmpty())

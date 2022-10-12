@@ -21,7 +21,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     }
   }
 
-  public let updateSputnik = UpdateSputnik()
   public var folderMonitor = FolderMonitor(
     url: URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
   )
@@ -56,16 +55,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
 
     PrefMgr.shared.fixOddPreferences()
 
-    // 配置更新小助手
-    updateSputnik.varkUpdateInfoPageURLKey = "UpdateInfoSite"
-    updateSputnik.varkUpdateCheckDateKeyPrevious = "PreviousUpdateCheckDate"
-    updateSputnik.varkUpdateCheckDateKeyNext = "NextUpdateCheckDate"
-    updateSputnik.varkUpdateCheckInterval = 114_514
-    updateSputnik.varCheckUpdateAutomatically = "ChecvarkUpdateAutomatically"
-
     // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
     if PrefMgr.shared.checkUpdateAutomatically {
-      updateSputnik.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
+      UpdateSputnik.shared.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
     }
   }
 
