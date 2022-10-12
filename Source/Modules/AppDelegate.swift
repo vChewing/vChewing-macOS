@@ -17,9 +17,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
   private func reloadOnFolderChangeHappens() {
     // 拖 100ms 再重載，畢竟有些有特殊需求的使用者可能會想使用巨型自訂語彙檔案。
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
-      if PrefMgr.shared.shouldAutoReloadUserDataFiles {
-        LMMgr.initUserLangModels()
-      }
+      if PrefMgr.shared.shouldAutoReloadUserDataFiles { LMMgr.initUserLangModels() }
     }
   }
 
@@ -27,7 +25,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
   public var folderMonitor = FolderMonitor(
     url: URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
   )
-  private var currentAlertType: String = ""
 
   func userNotificationCenter(_: NSUserNotificationCenter, shouldPresent _: NSUserNotification) -> Bool {
     true
@@ -54,9 +51,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
       self.folderMonitor.folderDidChange = { [weak self] in
         self?.reloadOnFolderChangeHappens()
       }
-      if LMMgr.userDataFolderExists {
-        self.folderMonitor.startMonitoring()
-      }
+      if LMMgr.userDataFolderExists { self.folderMonitor.startMonitoring() }
     }
 
     PrefMgr.shared.fixOddPreferences()
@@ -82,13 +77,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     folderMonitor.folderDidChange = { [weak self] in
       self?.reloadOnFolderChangeHappens()
     }
-    if LMMgr.userDataFolderExists {
-      folderMonitor.startMonitoring()
-    }
+    if LMMgr.userDataFolderExists { folderMonitor.startMonitoring() }
   }
 
   func selfUninstall() {
-    currentAlertType = "Uninstall"
     let content = String(
       format: NSLocalizedString(
         "This will remove vChewing Input Method from this user account, requiring your confirmation.",
