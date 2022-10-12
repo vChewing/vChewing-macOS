@@ -193,19 +193,15 @@ extension SessionCtl {
 extension SessionCtl {
   @objc public override func showPreferences(_: Any?) {
     if #unavailable(macOS 10.15) {
-      showLegacyPreferences()
+      CtlPrefWindow.show()
     } else if NSEvent.modifierFlags.contains(.option) {
-      showLegacyPreferences()
+      CtlPrefWindow.show()
     } else {
       NSApp.setActivationPolicy(.accessory)
       ctlPrefUI.shared.controller.show(preferencePane: Preferences.PaneIdentifier(rawValue: "General"))
       ctlPrefUI.shared.controller.window?.level = .statusBar
+      NSApp.activate(ignoringOtherApps: true)
     }
-  }
-
-  public func showLegacyPreferences() {
-    (NSApp.delegate as? AppDelegate)?.showPreferences()
-    NSApp.activate(ignoringOtherApps: true)
   }
 
   @objc public func showCheatSheet(_: Any?) {
@@ -216,7 +212,7 @@ extension SessionCtl {
   }
 
   @objc public func showClientListMgr(_: Any?) {
-    (NSApp.delegate as? AppDelegate)?.showClientListMgr()
+    CtlClientListMgr.show()
     NSApp.activate(ignoringOtherApps: true)
   }
 
@@ -387,7 +383,7 @@ extension SessionCtl {
   }
 
   @objc public func showAbout(_: Any?) {
-    (NSApp.delegate as? AppDelegate)?.showAbout()
+    CtlAboutWindow.show()
     NSApp.activate(ignoringOtherApps: true)
   }
 }
