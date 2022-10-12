@@ -20,6 +20,7 @@
 		5B40113C28D71C0100A9D4CB /* Uninstaller in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113B28D71C0100A9D4CB /* Uninstaller */; };
 		5B5A603028E81CC50001AE8D /* SwiftUIBackports in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5A602F28E81CC50001AE8D /* SwiftUIBackports */; };
 		5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */; };
+		5B660A8628F64A8800E5E4F6 /* SymbolMenuDefaultData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B660A8528F64A8800E5E4F6 /* SymbolMenuDefaultData.swift */; };
 		5B6C141228A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6C141128A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift */; };
 		5B73FB5E27B2BE1300E9BF49 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */; };
 		5B782EC4280C243C007276DE /* InputHandler_HandleCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B782EC3280C243C007276DE /* InputHandler_HandleCandidate.swift */; };
@@ -207,6 +208,7 @@
 		5B5A602E28E81CB00001AE8D /* ShapsBenkau_SwiftUIBackports */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = ShapsBenkau_SwiftUIBackports; path = Packages/ShapsBenkau_SwiftUIBackports; sourceTree = "<group>"; };
 		5B62A33C27AE7CC100A19448 /* ctlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ctlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B65B919284D0185007C558B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		5B660A8528F64A8800E5E4F6 /* SymbolMenuDefaultData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolMenuDefaultData.swift; sourceTree = "<group>"; };
 		5B6C141128A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCtl_HandleEvent.swift; sourceTree = "<group>"; };
 		5B73FB5427B2BD6900E9BF49 /* PhraseEditor-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "PhraseEditor-Info.plist"; path = "UserPhraseEditor/PhraseEditor-Info.plist"; sourceTree = SOURCE_ROOT; };
 		5B73FB5F27B2BE1300E9BF49 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -682,6 +684,7 @@
 				5B21176B287539BB000443A9 /* SessionCtl_HandleStates.swift */,
 				5B00FA0B28DEC17200F6D436 /* SessionCtl_IMKCandidatesData.swift */,
 				5BB802D927FABA8300CF1C19 /* SessionCtl_Menu.swift */,
+				5B660A8528F64A8800E5E4F6 /* SymbolMenuDefaultData.swift */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -1054,6 +1057,7 @@
 				5B963CA828D5DB1400DCEE88 /* PrefMgr_Core.swift in Sources */,
 				D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */,
 				5B7F225D2808501000DDD3CB /* InputHandler_HandleInput.swift in Sources */,
+				5B660A8628F64A8800E5E4F6 /* SymbolMenuDefaultData.swift in Sources */,
 				5BA9FD1227FEDB6B002DE248 /* suiPrefPaneExperience.swift in Sources */,
 				5BF56F9828C39A2700DD6839 /* IMEState.swift in Sources */,
 				5B62A33D27AE7CC100A19448 /* ctlAboutWindow.swift in Sources */,
