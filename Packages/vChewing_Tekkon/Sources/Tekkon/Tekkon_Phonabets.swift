@@ -41,7 +41,7 @@ extension Tekkon {
     var name: String {
       switch self {
         case .ofDachen:
-          return "Dachen Trad."
+          return "Dachen"
         case .ofDachen26:
           return "Dachen26"
         case .ofETen:
