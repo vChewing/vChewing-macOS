@@ -25,6 +25,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   // Call the New About Window
   @IBAction func about(_: Any) {
     CtlAboutWindow.show()
-    NSApplication.shared.activate(ignoringOtherApps: true)
+    NSApp.activate(ignoringOtherApps: true)
   }
 }

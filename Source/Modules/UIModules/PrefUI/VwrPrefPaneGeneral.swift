@@ -99,7 +99,7 @@ struct VwrPrefPaneGeneral: View {
                 UserDefaults.standard.removeObject(forKey: UserDef.kAppleLanguages.rawValue)
               }
               NSLog("vChewing App self-terminated due to UI language change.")
-              NSApplication.shared.terminate(nil)
+              NSApp.terminate(nil)
             }
           ) {
             Text(LocalizedStringKey("Follow OS settings")).tag(["auto"])

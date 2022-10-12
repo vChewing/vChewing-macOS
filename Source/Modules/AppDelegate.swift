@@ -114,6 +114,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
   // New About Window
   @IBAction func about(_: Any) {
     CtlAboutWindow.show()
-    NSApplication.shared.activate(ignoringOtherApps: true)
+    NSApp.activate(ignoringOtherApps: true)
   }
 }
