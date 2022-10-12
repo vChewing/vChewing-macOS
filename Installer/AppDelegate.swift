@@ -44,7 +44,6 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
   @IBOutlet var appEULAContent: NSTextView!
 
   var installingVersion = ""
-  var upgrading = false
   var translocationRemovalStartTime: Date?
   var currentVersionNumber: Int = 0
 
@@ -70,57 +69,42 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 
   func applicationDidFinishLaunching(_: Notification) {
     guard
-      let installingVersion = Bundle.main.infoDictionary?[kCFBundleVersionKey as String]
-        as? String,
       let window = window,
-      let versionString = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+      let cell = installButton.cell as? NSButtonCell,
+      let installingVersion = Bundle.main.infoDictionary?[kCFBundleVersionKey as String] as? String,
+      let versionString = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String,
+      let copyrightLabel = Bundle.main.localizedInfoDictionary?["NSHumanReadableCopyright"] as? String,
+      let eulaContent = Bundle.main.localizedInfoDictionary?["CFEULAContent"] as? String,
+      let eulaContentUpstream = Bundle.main.infoDictionary?["CFUpstreamEULAContent"] as? String
     else {
+      NSSound.beep()
+      NSLog("The vChewing App Installer failed its initial guard-let process on appDidFinishLaunching().")
       return
     }
     self.installingVersion = installingVersion
-
     cancelButton.nextKeyView = installButton
     installButton.nextKeyView = cancelButton
-    if let cell = installButton.cell as? NSButtonCell {
-      window.defaultButtonCell = cell
-    }
-
-    if let copyrightLabel = Bundle.main.localizedInfoDictionary?["NSHumanReadableCopyright"]
-      as? String
-    {
-      appCopyrightLabel.stringValue = copyrightLabel
-    }
-    if let eulaContent = Bundle.main.localizedInfoDictionary?["CFEULAContent"] as? String,
-      let eulaContentUpstream = Bundle.main.infoDictionary?["CFUpstreamEULAContent"] as? String
-    {
-      appEULAContent.string = eulaContent + "\n" + eulaContentUpstream
-    }
+    window.defaultButtonCell = cell
+    appCopyrightLabel.stringValue = copyrightLabel
+    appEULAContent.string = eulaContent + "\n" + eulaContentUpstream
     appVersionLabel.stringValue = "\(versionString) Build \(installingVersion)"
-
     window.title = "\(window.title) (v\(versionString), Build \(installingVersion))"
     window.standardWindowButton(.closeButton)?.isHidden = true
     window.standardWindowButton(.miniaturizeButton)?.isHidden = true
     window.standardWindowButton(.zoomButton)?.isHidden = true
     window.titlebarAppearsTransparent = true
 
-    if FileManager.default.fileExists(
-      atPath: kTargetPartialPath)
-    {
+    if FileManager.default.fileExists(atPath: kTargetPartialPath) {
       let currentBundle = Bundle(path: kTargetPartialPath)
-      let shortVersion =
-        currentBundle?.infoDictionary?["CFBundleShortVersionString"] as? String
-      let currentVersion =
-        currentBundle?.infoDictionary?[kCFBundleVersionKey as String] as? String
+      let shortVersion = currentBundle?.infoDictionary?["CFBundleShortVersionString"] as? String
+      let currentVersion = currentBundle?.infoDictionary?[kCFBundleVersionKey as String] as? String
       currentVersionNumber = (currentVersion as NSString?)?.integerValue ?? 0
       if shortVersion != nil, let currentVersion = currentVersion,
         currentVersion.compare(installingVersion, options: .numeric) == .orderedAscending
       {
-        upgrading = true
+        // Upgrading confirmed.
+        installButton.title = NSLocalizedString("Upgrade", comment: "")
       }
-    }
-
-    if upgrading {
-      installButton.title = NSLocalizedString("Upgrade", comment: "")
     }
 
     window.center()
