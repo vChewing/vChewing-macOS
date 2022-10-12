@@ -11,7 +11,7 @@ import Shared
 import SwiftUI
 
 @available(macOS 10.15, *)
-struct suiPrefPaneExperience: View {
+struct VwrPrefPaneExperience: View {
   @State private var selCursorPosition =
     UserDefaults.standard.bool(
       forKey: UserDef.kUseRearCursorMode.rawValue) ? 1 : 0
@@ -277,8 +277,8 @@ struct suiPrefPaneExperience: View {
 }
 
 @available(macOS 11.0, *)
-struct suiPrefPaneExperience_Previews: PreviewProvider {
+struct VwrPrefPaneExperience_Previews: PreviewProvider {
   static var previews: some View {
-    suiPrefPaneExperience()
+    VwrPrefPaneExperience()
   }
 }

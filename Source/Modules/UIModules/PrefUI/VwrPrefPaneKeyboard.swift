@@ -12,7 +12,7 @@ import Shared
 import SwiftUI
 
 @available(macOS 10.15, *)
-struct suiPrefPaneKeyboard: View {
+struct VwrPrefPaneKeyboard: View {
   @State private var selSelectionKeysList = CandidateKey.suggestions
   @State private var selSelectionKeys =
     UserDefaults.standard.string(forKey: UserDef.kCandidateKeys.rawValue) ?? CandidateKey.defaultKeys
@@ -63,7 +63,7 @@ struct suiPrefPaneKeyboard: View {
               }
               // Start Error Handling.
               if let errorResult = CandidateKey.validate(keys: keys) {
-                if let window = ctlPrefUI.shared.controller.window {
+                if let window = CtlPrefUI.shared.controller.window {
                   let alert = NSAlert(error: NSLocalizedString("Invalid Selection Keys.", comment: ""))
                   alert.informativeText = errorResult
                   alert.beginSheetModal(for: window) { _ in
@@ -283,9 +283,9 @@ struct suiPrefPaneKeyboard: View {
 }
 
 @available(macOS 11.0, *)
-struct suiPrefPaneKeyboard_Previews: PreviewProvider {
+struct VwrPrefPaneKeyboard_Previews: PreviewProvider {
   static var previews: some View {
-    suiPrefPaneKeyboard()
+    VwrPrefPaneKeyboard()
   }
 }
 
