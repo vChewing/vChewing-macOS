@@ -14,15 +14,14 @@ $ 3rd-Party Modules Used:
 
 $ Contributors and volunteers of the upstream repo, having no responsibility in discussing anything in the current repo:
 
-- Zonble Yang:
-    - McBopomofo for macOS 2.x architect.
-    - App-style installer (only preserved for developer purposes).
 - Mengjuei Hsieh:
     - McBopomofo for macOS 1.x main developer and architect.
+    - App-style installer (only preserved for developer purposes) // Only the part of the Objective-C version of the isAppBundleTranslocated().
 
-Although there is no Lukhnos's codes left in the current repository, we still credit him for his previous work:
+Although there is no Lukhnos's Objective-C / C++ codes left in the current repository, we still credit him for his previous work:
 
 - Lukhnos Liu:
+    - App-style installer (only preserved for developer purposes).
     - Developer of Gramambular 2 language engine (removed since vChewing 1.5.4).
         - Shiki Suen's Megrez engine (MIT License) is basically a Swift-rewritten version of Gramambular 2 with further development.
     - Developer of Mandarin syllable composer (removed since vChewing 1.5.7).
