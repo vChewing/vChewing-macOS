@@ -8,6 +8,7 @@
 
 import NotifierUI
 import Preferences
+import UpdateSputnik
 
 extension Bool {
   fileprivate var state: NSControl.StateValue {
@@ -316,7 +317,7 @@ extension SessionCtl {
   }
 
   @objc public func checkForUpdate(_: Any?) {
-    (NSApp.delegate as? AppDelegate)?.updateSputnik.checkForUpdate(forced: true, url: kUpdateInfoSourceURL)
+    UpdateSputnik.shared.checkForUpdate(forced: true, url: kUpdateInfoSourceURL)
   }
 
   @objc public func openUserDataFolder(_: Any?) {
