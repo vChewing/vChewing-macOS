@@ -8,11 +8,24 @@
 
 import Cocoa
 
-class ctlClientListMgr: NSWindowController, NSTableViewDelegate, NSTableViewDataSource {
+class CtlClientListMgr: NSWindowController, NSTableViewDelegate, NSTableViewDataSource {
   @IBOutlet var tblClients: NSTableView!
   @IBOutlet var btnRemoveClient: NSButton!
   @IBOutlet var btnAddClient: NSButton!
   @IBOutlet var lblClientMgrWindow: NSTextField!
+
+  public static var shared: CtlClientListMgr?
+
+  static func show() {
+    if shared == nil { shared = CtlClientListMgr(windowNibName: "frmClientListMgr") }
+    guard let sharedWindow = shared?.window else { return }
+    sharedWindow.center()
+    sharedWindow.orderFrontRegardless()  // 逼著視窗往最前方顯示
+    sharedWindow.level = .statusBar
+    sharedWindow.titlebarAppearsTransparent = true
+    NSApp.setActivationPolicy(.accessory)
+  }
+
   override func windowDidLoad() {
     super.windowDidLoad()
     localize()
@@ -25,7 +38,7 @@ class ctlClientListMgr: NSWindowController, NSTableViewDelegate, NSTableViewData
 
 // MARK: - Implementations
 
-extension ctlClientListMgr {
+extension CtlClientListMgr {
   func numberOfRows(in _: NSTableView) -> Int {
     PrefMgr.shared.clientsIMKTextInputIncapable.count
   }

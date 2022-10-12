@@ -124,7 +124,7 @@ SOFTWARE.
 	<key>InputMethodServerDelegateClass</key>
 	<string>SessionCtl</string>
 	<key>InputMethodServerPreferencesWindowControllerClass</key>
-	<string>ctlPrefWindow</string>
+	<string>CtlPrefWindow</string>
 	<key>InputMethodSessionController</key>
 	<string>SessionCtl</string>
 	<key>LSApplicationCategoryType</key>
