@@ -50,7 +50,7 @@ extension NSApplication {
   public static var isDarkMode: Bool {
     if #unavailable(macOS 10.14) { return false }
     if #available(macOS 10.15, *) {
-      let appearanceDescription = NSApplication.shared.effectiveAppearance.debugDescription
+      let appearanceDescription = NSApp.effectiveAppearance.debugDescription
         .lowercased()
       return appearanceDescription.contains("dark")
     } else if let appleInterfaceStyle = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") {

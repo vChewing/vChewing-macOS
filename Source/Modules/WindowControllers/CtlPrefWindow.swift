@@ -194,13 +194,13 @@ class CtlPrefWindow: NSWindowController {
       }
 
       NSLog("vChewing App self-terminated due to UI language change.")
-      NSApplication.shared.terminate(nil)
+      NSApp.terminate(nil)
     }
   }
 
   @IBAction func updateIMKCandidateEnableStatusAction(_: Any) {
     NSLog("vChewing App self-terminated due to enabling / disabling IMK candidate window.")
-    NSApplication.shared.terminate(nil)
+    NSApp.terminate(nil)
   }
 
   @IBAction func clickedWhetherIMEShouldNotFartToggleAction(_: Any) {
@@ -260,7 +260,7 @@ class CtlPrefWindow: NSWindowController {
         if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
           PrefMgr.shared.userDataFolderSpecified = newPath
           BookmarkManager.shared.saveBookmark(for: url)
-          (NSApplication.shared.delegate as! AppDelegate).updateDirectoryMonitorPath()
+          (NSApp.delegate as! AppDelegate).updateDirectoryMonitorPath()
         } else {
           IMEApp.buzz()
           if !bolPreviousFolderValidity {
