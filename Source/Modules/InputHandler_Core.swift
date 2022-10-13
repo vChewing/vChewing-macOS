@@ -15,6 +15,21 @@ import Tekkon
 /// 被封裝的「與 Megrez 組字引擎和 Tekkon 注拼引擎對接的」各種工具函式。
 /// 注意：不要把 composer 注拼槽與 compositor 組字器這兩個概念搞混。
 
+// MARK: - InputHandler 自身協定 (Protocol).
+
+public protocol InputHandlerProtocol {
+  var currentLM: vChewingLM.LMInstantiator { get set }
+  var currentUOM: vChewingLM.LMUserOverride { get set }
+  var delegate: InputHandlerDelegate? { get set }
+  var composer: Tekkon.Composer { get set }
+  func clear()
+  func ensureKeyboardParser()
+  func handleEvent(_ event: NSEvent) -> Bool
+  func generateStateOfInputting() -> IMEStateProtocol
+  func generateStateOfAssociates(withPair pair: Megrez.Compositor.KeyValuePaired) -> IMEStateProtocol
+  func consolidateNode(candidate: (String, String), respectCursorPushing: Bool, preConsolidate: Bool)
+}
+
 // MARK: - 委任協定 (Delegate).
 
 /// InputHandler 委任協定
@@ -32,7 +47,7 @@ public protocol InputHandlerDelegate {
 // MARK: - 核心 (Kernel).
 
 /// InputHandler 按鍵調度模組。
-public class InputHandler {
+public class InputHandler: InputHandlerProtocol {
   /// 委任物件 (SessionCtl)，以便呼叫其中的函式。
   public var delegate: InputHandlerDelegate?
   public var prefs: PrefMgrProtocol
@@ -63,7 +78,7 @@ public class InputHandler {
     ensureKeyboardParser()
   }
 
-  func clear() {
+  public func clear() {
     composer.clear()
     compositor.clear()
   }
@@ -209,7 +224,9 @@ public class InputHandler {
   ///   - value: 給定之候選字（詞音配對）。
   ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字後的節錨的前方。
   ///   - consolidate: 在固化節點之前，先鞏固上下文。該選項可能會破壞在內文組字區內就地輪替候選字詞時的體驗。
-  func consolidateNode(candidate: (String, String), respectCursorPushing: Bool = true, preConsolidate: Bool = false) {
+  public func consolidateNode(
+    candidate: (String, String), respectCursorPushing: Bool = true, preConsolidate: Bool = false
+  ) {
     let theCandidate: Megrez.Compositor.KeyValuePaired = .init(key: candidate.0, value: candidate.1)
 
     /// 必須先鞏固當前組字器游標上下文、以消滅意料之外的影響，但在內文組字區內就地輪替候選字詞時除外。
@@ -329,7 +346,7 @@ public class InputHandler {
   }
 
   /// 給注拼槽指定注音排列或拼音輸入種類之後，將注拼槽內容清空。
-  func ensureKeyboardParser() {
+  public func ensureKeyboardParser() {
     switch currentKeyboardParserType {
       case KeyboardParser.ofStandard:
         composer.ensureParser(arrange: .ofDachen)
