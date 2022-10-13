@@ -16,6 +16,7 @@ import Shared
 
 extension InputHandler {
   /// 對於輸入訊號的第一關處理均藉由此函式來進行。
+  /// - Remark: 送入該函式處理之前，先用 inputHandler.handleEvent() 分診、來判斷是否需要交給 IMKCandidates 處理。
   /// - Parameters:
   ///   - input: 輸入訊號。
   ///   - state: 給定狀態（通常為當前狀態）。
@@ -29,7 +30,7 @@ extension InputHandler {
     errorCallback: @escaping (String) -> Void
   ) -> Bool {
     // 如果按鍵訊號內的 inputTest 是空的話，則忽略該按鍵輸入，因為很可能是功能修飾鍵。
-    guard !input.text.isEmpty else { return false }
+    guard !input.text.isEmpty, input.charCode.isPrintable else { return false }
 
     let inputText: String = input.text
     var state = state  // 常數轉變數。
