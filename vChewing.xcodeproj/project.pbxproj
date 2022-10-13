@@ -84,6 +84,7 @@
 		5BDB7A4528D4824A001AC277 /* ShiftKeyUpChecker in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4428D4824A001AC277 /* ShiftKeyUpChecker */; };
 		5BDB7A4728D4824A001AC277 /* Tekkon in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4628D4824A001AC277 /* Tekkon */; };
 		5BDCBB2E27B4E67A00D0CC59 /* vChewingPhraseEditor.app in Resources */ = {isa = PBXBuildFile; fileRef = 5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */; };
+		5BE1F8A928F86AB5006C7FF5 /* InputHandler_HandleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE1F8A828F86AB5006C7FF5 /* InputHandler_HandleEvent.swift */; };
 		5BE377A0288FED8D0037365B /* InputHandler_HandleComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE3779F288FED8D0037365B /* InputHandler_HandleComposition.swift */; };
 		5BE78BD927B3775B005EA1BE /* CtlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE78BD827B37750005EA1BE /* CtlAboutWindow.swift */; };
 		5BE78BDD27B3776D005EA1BE /* frmAboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BE78BDA27B37764005EA1BE /* frmAboutWindow.xib */; };
@@ -283,6 +284,7 @@
 		5BDCBB4A27B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5BDCBB4B27B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/frmAboutWindow.strings"; sourceTree = "<group>"; };
 		5BDCBB4D27B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		5BE1F8A828F86AB5006C7FF5 /* InputHandler_HandleEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputHandler_HandleEvent.swift; sourceTree = "<group>"; };
 		5BE3779F288FED8D0037365B /* InputHandler_HandleComposition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputHandler_HandleComposition.swift; sourceTree = "<group>"; };
 		5BE78BD827B37750005EA1BE /* CtlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = CtlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BE78BDB27B37764005EA1BE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmAboutWindow.xib; sourceTree = "<group>"; };
@@ -675,6 +677,7 @@
 				5BD0113C2818543900609769 /* InputHandler_Core.swift */,
 				5B782EC3280C243C007276DE /* InputHandler_HandleCandidate.swift */,
 				5BE3779F288FED8D0037365B /* InputHandler_HandleComposition.swift */,
+				5BE1F8A828F86AB5006C7FF5 /* InputHandler_HandleEvent.swift */,
 				5B7F225C2808501000DDD3CB /* InputHandler_HandleInput.swift */,
 				5B3133BE280B229700A4A505 /* InputHandler_States.swift */,
 				5BAEFACF28012565001F42C9 /* LMMgr.swift */,
@@ -1081,6 +1084,7 @@
 				5BD0113D2818543900609769 /* InputHandler_Core.swift in Sources */,
 				5BF56F9A28C39D1800DD6839 /* IMEStateData.swift in Sources */,
 				5B21176C287539BB000443A9 /* SessionCtl_HandleStates.swift in Sources */,
+				5BE1F8A928F86AB5006C7FF5 /* InputHandler_HandleEvent.swift in Sources */,
 				5BAEFAD028012565001F42C9 /* LMMgr.swift in Sources */,
 				5B782EC4280C243C007276DE /* InputHandler_HandleCandidate.swift in Sources */,
 				5BA9FD0F27FEDB6B002DE248 /* VwrPrefPaneGeneral.swift in Sources */,

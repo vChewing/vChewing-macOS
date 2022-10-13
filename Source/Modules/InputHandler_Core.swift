@@ -20,7 +20,9 @@ import Tekkon
 /// InputHandler 委任協定
 public protocol InputHandlerDelegate {
   var selectionKeys: String { get }
+  var state: IMEStateProtocol { get set }
   var clientBundleIdentifier: String { get }
+  func handle(state newState: IMEStateProtocol, replaceCurrent: Bool)
   func candidateController() -> CtlCandidateProtocol
   func candidateSelectionCalledByInputHandler(at index: Int)
   func performUserPhraseOperation(with state: IMEStateProtocol, addToFilter: Bool)
