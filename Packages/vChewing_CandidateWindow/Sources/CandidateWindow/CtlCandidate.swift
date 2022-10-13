@@ -52,7 +52,7 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
     }
     set {
       DispatchQueue.main.async {
-        self.set(windowTopLeftPoint: newValue, bottomOutOfScreenAdjustmentHeight: 0)
+        self.set(windowTopLeftPoint: newValue, bottomOutOfScreenAdjustmentHeight: 0, useGCD: true)
       }
     }
   }
@@ -70,37 +70,6 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
   public required init(_: NSUserInterfaceLayoutOrientation = .horizontal) {
     super.init(window: .init())
     visible = false
-  }
-
-  /// 設定選字窗的顯示位置。
-  ///
-  /// 需注意：該函數會藉由設定選字窗左上角頂點的方式、使選字窗始終位於某個螢幕之內。
-  ///
-  /// - Parameters:
-  ///   - windowTopLeftPoint: 給定的視窗顯示位置。
-  ///   - heightDelta: 為了「防止選字窗抻出螢幕下方」而給定的預留高度。
-  public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight heightDelta: Double) {
-    DispatchQueue.main.async { [self] in
-      guard let window = window, var screenFrame = NSScreen.main?.visibleFrame else { return }
-      let windowSize = window.frame.size
-
-      var adjustedPoint = windowTopLeftPoint
-      var delta = heightDelta
-      for frame in NSScreen.screens.map(\.visibleFrame).filter({ $0.contains(windowTopLeftPoint) }) {
-        screenFrame = frame
-        break
-      }
-
-      if delta > screenFrame.size.height / 2.0 { delta = 0.0 }
-
-      if adjustedPoint.y < screenFrame.minY + windowSize.height {
-        adjustedPoint.y = windowTopLeftPoint.y + windowSize.height + delta
-      }
-      adjustedPoint.y = min(adjustedPoint.y, screenFrame.maxY - 1.0)
-      adjustedPoint.x = min(max(adjustedPoint.x, screenFrame.minX), screenFrame.maxX - windowSize.width - 1.0)
-
-      window.setFrameTopLeftPoint(adjustedPoint)
-    }
   }
 
   // MARK: - 不需要在這裡仔細實作的內容。
