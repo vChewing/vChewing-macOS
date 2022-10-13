@@ -36,5 +36,5 @@ public protocol CtlCandidateProtocol {
   func highlightNextCandidate() -> Bool
   func highlightPreviousCandidate() -> Bool
   func candidateIndexAtKeyLabelIndex(_: Int) -> Int
-  func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: Double)
+  func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: Double, useGCD: Bool)
 }
