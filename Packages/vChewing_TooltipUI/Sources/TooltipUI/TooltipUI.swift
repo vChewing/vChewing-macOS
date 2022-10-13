@@ -57,8 +57,10 @@ public class TooltipUI: NSWindowController {
   ) {
     self.direction = direction
     self.tooltip = tooltip
+    window?.setIsVisible(false)
     window?.orderFront(nil)
-    set(windowTopLeftPoint: point, bottomOutOfScreenAdjustmentHeight: heightDelta)
+    set(windowTopLeftPoint: point, bottomOutOfScreenAdjustmentHeight: heightDelta, useGCD: false)
+    window?.setIsVisible(true)
   }
 
   public func setColor(state: TooltipColorState) {
@@ -116,29 +118,6 @@ public class TooltipUI: NSWindowController {
 
   public func hide() {
     window?.orderOut(nil)
-  }
-
-  private func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight heightDelta: Double) {
-    guard let window = window else { return }
-    let windowSize = window.frame.size
-
-    var adjustedPoint = windowTopLeftPoint
-    var delta = heightDelta
-    var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.seniorTheBeast
-    for frame in NSScreen.screens.map(\.visibleFrame).filter({ $0.contains(windowTopLeftPoint) }) {
-      screenFrame = frame
-      break
-    }
-
-    if delta > screenFrame.size.height / 2.0 { delta = 0.0 }
-
-    if adjustedPoint.y < screenFrame.minY + windowSize.height {
-      adjustedPoint.y = windowTopLeftPoint.y + windowSize.height + delta
-    }
-    adjustedPoint.y = min(adjustedPoint.y, screenFrame.maxY - 1.0)
-    adjustedPoint.x = min(max(adjustedPoint.x, screenFrame.minX), screenFrame.maxX - windowSize.width - 1.0)
-
-    window.setFrameTopLeftPoint(adjustedPoint)
   }
 
   private func adjustSize() {
