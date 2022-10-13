@@ -36,7 +36,7 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
     }
     set {
       DispatchQueue.main.async {
-        self.set(windowTopLeftPoint: newValue, bottomOutOfScreenAdjustmentHeight: 0)
+        self.set(windowTopLeftPoint: newValue, bottomOutOfScreenAdjustmentHeight: 0, useGCD: true)
       }
     }
   }
@@ -145,33 +145,6 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
   public var selectedCandidateIndex: Int {
     get { selectedCandidate() }
     set { selectCandidate(withIdentifier: newValue) }
-  }
-
-  public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: Double) {
-    DispatchQueue.main.async {
-      self.doSet(windowTopLeftPoint: windowTopLeftPoint, bottomOutOfScreenAdjustmentHeight: height)
-    }
-  }
-
-  func doSet(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight heightDelta: Double) {
-    guard var screenFrame = NSScreen.main?.visibleFrame else { return }
-    var adjustedPoint = windowTopLeftPoint
-    let windowSize = candidateFrame().size
-    var delta = heightDelta
-    for frame in NSScreen.screens.map(\.visibleFrame).filter({ $0.contains(windowTopLeftPoint) }) {
-      screenFrame = frame
-      break
-    }
-
-    if delta > screenFrame.size.height / 2.0 { delta = 0.0 }
-
-    if adjustedPoint.y < screenFrame.minY + windowSize.height {
-      adjustedPoint.y = windowTopLeftPoint.y + windowSize.height + delta
-    }
-    adjustedPoint.y = min(adjustedPoint.y, screenFrame.maxY - 1.0)
-    adjustedPoint.x = min(max(adjustedPoint.x, screenFrame.minX), screenFrame.maxX - windowSize.width - 1.0)
-
-    setCandidateFrameTopLeft(adjustedPoint)
   }
 }
 

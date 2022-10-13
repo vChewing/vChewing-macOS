@@ -133,12 +133,14 @@ extension SessionCtl {
         windowTopLeftPoint: NSPoint(
           x: lineHeightRect().origin.x + lineHeightRect().size.width + 4.0, y: lineHeightRect().origin.y - 4.0
         ),
-        bottomOutOfScreenAdjustmentHeight: lineHeightRect().size.height + 4.0
+        bottomOutOfScreenAdjustmentHeight: lineHeightRect().size.height + 4.0,
+        useGCD: true
       )
     } else {
       ctlCandidateCurrent.set(
         windowTopLeftPoint: NSPoint(x: lineHeightRect().origin.x, y: lineHeightRect().origin.y - 4.0),
-        bottomOutOfScreenAdjustmentHeight: lineHeightRect().size.height + 4.0
+        bottomOutOfScreenAdjustmentHeight: lineHeightRect().size.height + 4.0,
+        useGCD: true
       )
     }
   }
