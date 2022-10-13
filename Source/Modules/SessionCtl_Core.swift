@@ -62,7 +62,9 @@ public class SessionCtl: IMKInputController {
   }
 
   /// 按鍵調度模組的副本。
-  var inputHandler = InputHandler(lm: LMMgr.currentLM(), uom: LMMgr.currentUOM(), pref: PrefMgr.shared)
+  var inputHandler: InputHandlerProtocol = InputHandler(
+    lm: LMMgr.currentLM(), uom: LMMgr.currentUOM(), pref: PrefMgr.shared
+  )
   /// 用以記錄當前輸入法狀態的變數。
   public var state: IMEStateProtocol = IMEState.ofEmpty() {
     didSet {

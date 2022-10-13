@@ -110,7 +110,7 @@ extension InputHandler {
   /// - Parameters:
   ///   - key: 給定的索引鍵（也就是給定的聯想詞的開頭字）。
   /// - Returns: 回呼一個新的聯想詞狀態，來就給定的聯想詞陣列資料內容顯示選字窗。
-  func generateStateOfAssociates(
+  public func generateStateOfAssociates(
     withPair pair: Megrez.Compositor.KeyValuePaired
   ) -> IMEStateProtocol {
     IMEState.ofAssociates(
