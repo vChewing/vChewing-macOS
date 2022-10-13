@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import AVFoundation
-import AppKit
+import Cocoa
 
 extension NSSound {
   public static func buzz(fart: Bool = false) {
