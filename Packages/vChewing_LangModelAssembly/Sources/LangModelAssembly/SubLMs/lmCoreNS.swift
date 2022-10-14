@@ -29,9 +29,7 @@ extension vChewingLM {
     var shouldForceDefaultScore = false
 
     /// 資料陣列內承載的資料筆數。
-    public var count: Int {
-      rangeMap.count
-    }
+    public var count: Int { rangeMap.count }
 
     /// 初期化該語言模型。
     ///
@@ -54,17 +52,13 @@ extension vChewingLM {
     }
 
     /// 檢測資料庫辭典內是否已經有載入的資料。
-    public var isLoaded: Bool {
-      !rangeMap.isEmpty
-    }
+    public var isLoaded: Bool { !rangeMap.isEmpty }
 
     /// 將資料從檔案讀入至資料庫辭典內。
     /// - parameters:
     ///   - path: 給定路徑。
     @discardableResult public mutating func open(_ path: String) -> Bool {
-      if isLoaded {
-        return false
-      }
+      if isLoaded { return false }
 
       do {
         let rawData = try Data(contentsOf: URL(fileURLWithPath: path))
@@ -81,9 +75,7 @@ extension vChewingLM {
 
     /// 將當前語言模組的資料庫辭典自記憶體內卸除。
     public mutating func close() {
-      if isLoaded {
-        rangeMap.removeAll()
-      }
+      rangeMap.removeAll()
     }
 
     // MARK: - Advanced features
