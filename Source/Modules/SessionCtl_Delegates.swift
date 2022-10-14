@@ -22,6 +22,11 @@ extension SessionCtl: InputHandlerDelegate {
     candidatePairSelected(at: index)
   }
 
+  public func callError(_ logMessage: String) {
+    vCLog(logMessage)
+    IMEApp.buzz()
+  }
+
   public func performUserPhraseOperation(addToFilter: Bool) -> Bool {
     guard state.type == .ofMarking else { return false }
     if !LMMgr.writeUserPhrase(

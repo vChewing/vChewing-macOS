@@ -17,17 +17,9 @@ extension InputHandler {
   /// 當且僅當選字窗出現時，對於經過初次篩選處理的輸入訊號的處理均藉由此函式來進行。
   /// - Parameters:
   ///   - input: 輸入訊號。
-  ///   - errorCallback: 錯誤回呼。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
-  func handleCandidate(
-    input: InputSignalProtocol,
-    errorCallback: @escaping (String) -> Void
-  ) -> Bool {
-    guard let delegate = delegate else {
-      errorCallback("06661F6E")
-      return true
-    }
-
+  func handleCandidate(input: InputSignalProtocol) -> Bool {
+    guard let delegate = delegate else { return false }
     var ctlCandidate = delegate.candidateController()
     let state = delegate.state
 
@@ -79,7 +71,7 @@ extension InputHandler {
           ? ctlCandidate.highlightPreviousCandidate()
           : ctlCandidate.highlightNextCandidate())
       if !updated {
-        errorCallback("9B691919")
+        delegate.callError("9B691919")
       }
       return true
     }
@@ -96,7 +88,7 @@ extension InputHandler {
           ? ctlCandidate.showNextLine()
           : ctlCandidate.highlightNextCandidate())
       if !updated {
-        errorCallback("A11C781F")
+        delegate.callError("A11C781F")
       }
       return true
     }
@@ -106,7 +98,7 @@ extension InputHandler {
     if input.isPageDown {
       let updated: Bool = ctlCandidate.showNextPage()
       if !updated {
-        errorCallback("9B691919")
+        delegate.callError("9B691919")
       }
       return true
     }
@@ -116,7 +108,7 @@ extension InputHandler {
     if input.isPageUp {
       let updated: Bool = ctlCandidate.showPreviousPage()
       if !updated {
-        errorCallback("9569955D")
+        delegate.callError("9569955D")
       }
       return true
     }
@@ -127,11 +119,11 @@ extension InputHandler {
       switch ctlCandidate.currentLayout {
         case .horizontal:
           if !ctlCandidate.highlightPreviousCandidate() {
-            errorCallback("1145148D")
+            delegate.callError("1145148D")
           }
         case .vertical:
           if !ctlCandidate.showPreviousLine() {
-            errorCallback("1919810D")
+            delegate.callError("1919810D")
           }
         @unknown default:
           break
@@ -145,11 +137,11 @@ extension InputHandler {
       switch ctlCandidate.currentLayout {
         case .horizontal:
           if !ctlCandidate.highlightNextCandidate() {
-            errorCallback("9B65138D")
+            delegate.callError("9B65138D")
           }
         case .vertical:
           if !ctlCandidate.showNextLine() {
-            errorCallback("9244908D")
+            delegate.callError("9244908D")
           }
         @unknown default:
           break
@@ -163,11 +155,11 @@ extension InputHandler {
       switch ctlCandidate.currentLayout {
         case .horizontal:
           if !ctlCandidate.showPreviousLine() {
-            errorCallback("9B614524")
+            delegate.callError("9B614524")
           }
         case .vertical:
           if !ctlCandidate.highlightPreviousCandidate() {
-            errorCallback("ASD9908D")
+            delegate.callError("ASD9908D")
           }
         @unknown default:
           break
@@ -181,12 +173,12 @@ extension InputHandler {
       switch ctlCandidate.currentLayout {
         case .horizontal:
           if !ctlCandidate.showNextLine() {
-            errorCallback("92B990DD")
+            delegate.callError("92B990DD")
             break
           }
         case .vertical:
           if !ctlCandidate.highlightNextCandidate() {
-            errorCallback("6B99908D")
+            delegate.callError("6B99908D")
           }
         @unknown default:
           break
@@ -198,7 +190,7 @@ extension InputHandler {
 
     if input.isHome {
       if ctlCandidate.selectedCandidateIndex == 0 {
-        errorCallback("9B6EDE8D")
+        delegate.callError("9B6EDE8D")
       } else {
         ctlCandidate.selectedCandidateIndex = 0
       }
@@ -213,7 +205,7 @@ extension InputHandler {
     } else {  // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
       if input.isEnd {
         if ctlCandidate.selectedCandidateIndex == state.candidates.count - 1 {
-          errorCallback("9B69AAAD")
+          delegate.callError("9B69AAAD")
         } else {
           ctlCandidate.selectedCandidateIndex = state.candidates.count - 1
         }
@@ -286,7 +278,7 @@ extension InputHandler {
         if candidateIndex != -114_514 {
           delegate.candidateSelectionCalledByInputHandler(at: candidateIndex)
           delegate.switchState(IMEState.ofAbortion())
-          return handleInput(event: input, errorCallback: errorCallback)
+          return handleInput(event: input)
         }
         return true
       }
@@ -298,12 +290,12 @@ extension InputHandler {
       var updated = true
       updated = input.isShiftHold ? ctlCandidate.showPreviousLine() : ctlCandidate.showNextLine()
       if !updated {
-        errorCallback("66F3477B")
+        delegate.callError("66F3477B")
       }
       return true
     }
 
-    errorCallback("172A0F81")
+    delegate.callError("172A0F81")
     return true
   }
 }
