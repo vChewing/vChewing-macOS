@@ -17,11 +17,9 @@ extension InputHandler {
   /// 當且僅當選字窗出現時，對於經過初次篩選處理的輸入訊號的處理均藉由此函式來進行。
   /// - Parameters:
   ///   - input: 輸入訊號。
-  ///   - state: 給定狀態（通常為當前狀態）。
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleCandidate(
-    state: IMEStateProtocol,
     input: InputSignalProtocol,
     errorCallback: @escaping (String) -> Void
   ) -> Bool {
@@ -31,6 +29,7 @@ extension InputHandler {
     }
 
     var ctlCandidate = delegate.candidateController()
+    let state = delegate.state
 
     // MARK: 取消選字 (Cancel Candidate)
 
@@ -287,9 +286,7 @@ extension InputHandler {
         if candidateIndex != -114_514 {
           delegate.candidateSelectionCalledByInputHandler(at: candidateIndex)
           delegate.switchState(IMEState.ofAbortion())
-          return handleInput(
-            event: input, state: IMEState.ofEmpty(), errorCallback: errorCallback
-          )
+          return handleInput(event: input, errorCallback: errorCallback)
         }
         return true
       }

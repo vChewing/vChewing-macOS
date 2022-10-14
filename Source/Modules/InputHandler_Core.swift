@@ -40,7 +40,7 @@ public protocol InputHandlerDelegate {
   func switchState(_ newState: IMEStateProtocol)
   func candidateController() -> CtlCandidateProtocol
   func candidateSelectionCalledByInputHandler(at index: Int)
-  func performUserPhraseOperation(with state: IMEStateProtocol, addToFilter: Bool)
+  func performUserPhraseOperation(addToFilter: Bool)
     -> Bool
 }
 
