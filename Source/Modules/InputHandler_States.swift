@@ -83,7 +83,6 @@ extension InputHandler {
   // MARK: - 用以生成候選詞陣列及狀態
 
   /// 拿著給定的候選字詞陣列資料內容，切換至選字狀態。
-  /// - Parameters:
   /// - Returns: 回呼一個新的選詞狀態，來就給定的候選字詞陣列資料內容顯示選字窗。
   func generateStateOfCandidates() -> IMEStateProtocol {
     IMEState.ofCandidates(
@@ -117,12 +116,8 @@ extension InputHandler {
   /// 用以處理就地新增自訂語彙時的行為。
   /// - Parameters:
   ///   - input: 輸入按鍵訊號。
-  ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func handleMarkingState(
-    input: InputSignalProtocol,
-    errorCallback: @escaping (String) -> Void
-  ) -> Bool {
+  func handleMarkingState(input: InputSignalProtocol) -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
 
@@ -133,7 +128,7 @@ extension InputHandler {
 
     // 阻止用於行內注音輸出的熱鍵。
     if input.isControlHold, input.isCommandHold, input.isEnter {
-      errorCallback("1198E3E5")
+      delegate.callError("1198E3E5")
       return true
     }
 
@@ -141,15 +136,15 @@ extension InputHandler {
     if input.isEnter {
       // 先判斷是否是在摁了降權組合鍵的時候目標不在庫。
       if input.isShiftHold, input.isCommandHold, !state.isFilterable {
-        errorCallback("2EAC1F7A")
+        delegate.callError("2EAC1F7A")
         return true
       }
       if !state.isMarkedLengthValid {
-        errorCallback("9AAFAC00")
+        delegate.callError("9AAFAC00")
         return true
       }
       if !delegate.performUserPhraseOperation(addToFilter: false) {
-        errorCallback("5B69CC8D")
+        delegate.callError("5B69CC8D")
         return true
       }
       delegate.switchState(generateStateOfInputting())
@@ -159,11 +154,11 @@ extension InputHandler {
     // BackSpace & Delete
     if input.isBackSpace || input.isDelete {
       if !state.isFilterable {
-        errorCallback("1F88B191")
+        delegate.callError("1F88B191")
         return true
       }
       if !delegate.performUserPhraseOperation(addToFilter: true) {
-        errorCallback("68D3C6C8")
+        delegate.callError("68D3C6C8")
         return true
       }
       delegate.switchState(generateStateOfInputting())
@@ -186,7 +181,7 @@ extension InputHandler {
         marking.tooltipBackupForInputting = state.tooltipBackupForInputting
         delegate.switchState(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
       } else {
-        errorCallback("1149908D")
+        delegate.callError("1149908D")
         delegate.switchState(state)
       }
       return true
@@ -208,7 +203,7 @@ extension InputHandler {
         marking.tooltipBackupForInputting = state.tooltipBackupForInputting
         delegate.switchState(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
       } else {
-        errorCallback("9B51408D")
+        delegate.callError("9B51408D")
         delegate.switchState(state)
       }
       return true
@@ -221,12 +216,8 @@ extension InputHandler {
   /// 標點輸入的處理。
   /// - Parameters:
   ///   - customPunctuation: 自訂標點索引鍵頭。
-  ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func handlePunctuation(
-    _ customPunctuation: String,
-    errorCallback: @escaping (String) -> Void
-  ) -> Bool {
+  func handlePunctuation(_ customPunctuation: String) -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
 
@@ -236,7 +227,7 @@ extension InputHandler {
 
     guard composer.isEmpty else {
       // 注音沒敲完的情況下，無視標點輸入。
-      errorCallback("A9B69908D")
+      delegate.callError("A9B69908D")
       delegate.switchState(state)
       return true
     }
@@ -263,7 +254,7 @@ extension InputHandler {
         } else {
           delegate.switchState(candidateState)
         }
-      default: errorCallback("8DA4096E")
+      default: delegate.callError("8DA4096E")
     }
     return true
   }
@@ -271,7 +262,6 @@ extension InputHandler {
   // MARK: - Enter 鍵的處理
 
   /// Enter 鍵的處理。
-  /// - Parameters:
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleEnter() -> Bool {
     guard let delegate = delegate else { return false }
@@ -286,7 +276,6 @@ extension InputHandler {
   // MARK: - Command+Enter 鍵的處理（注音文）
 
   /// Command+Enter 鍵的處理（注音文）。
-  /// - Parameters:
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleCtrlCommandEnter() -> Bool {
     guard let delegate = delegate else { return false }
@@ -311,7 +300,6 @@ extension InputHandler {
   // MARK: - Command+Option+Enter 鍵的處理（網頁 Ruby 注音文標記）
 
   /// Command+Option+Enter 鍵的處理（網頁 Ruby 注音文標記）。
-  /// - Parameters:
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleCtrlOptionCommandEnter() -> Bool {
     guard let delegate = delegate else { return false }
@@ -346,12 +334,8 @@ extension InputHandler {
   /// 處理 BackSpace (macOS Delete) 按鍵行為。
   /// - Parameters:
   ///   - input: 輸入按鍵訊號。
-  ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func handleBackSpace(
-    input: InputSignalProtocol,
-    errorCallback: @escaping (String) -> Void
-  ) -> Bool {
+  func handleBackSpace(input: InputSignalProtocol) -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
@@ -385,7 +369,7 @@ extension InputHandler {
         compositor.dropKey(direction: .rear)
         walk()
       } else {
-        errorCallback("9D69908D")
+        delegate.callError("9D69908D")
         delegate.switchState(state)
         return true
       }
@@ -406,12 +390,8 @@ extension InputHandler {
   /// 處理 PC Delete (macOS Fn+BackSpace) 按鍵行為。
   /// - Parameters:
   ///   - input: 輸入按鍵訊號。
-  ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func handleDelete(
-    input: InputSignalProtocol,
-    errorCallback: @escaping (String) -> Void
-  ) -> Bool {
+  func handleDelete(input: InputSignalProtocol) -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
@@ -422,7 +402,7 @@ extension InputHandler {
     }
 
     if compositor.cursor == compositor.length, composer.isEmpty {
-      errorCallback("9B69938D")
+      delegate.callError("9B69938D")
       delegate.switchState(state)
       return true
     }
@@ -447,17 +427,13 @@ extension InputHandler {
   // MARK: - 處理與當前文字輸入排版前後方向呈 90 度的那兩個方向鍵的按鍵行為
 
   /// 處理與當前文字輸入排版前後方向呈 90 度的那兩個方向鍵的按鍵行為。
-  /// - Parameters:
-  ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func handleClockKey(
-    errorCallback: @escaping (String) -> Void
-  ) -> Bool {
+  func handleClockKey() -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
     if !composer.isEmpty {
-      errorCallback("9B6F908D")
+      delegate.callError("9B6F908D")
     }
     delegate.switchState(state)
     return true
@@ -466,18 +442,14 @@ extension InputHandler {
   // MARK: - 處理 Home 鍵的行為
 
   /// 處理 Home 鍵的行為。
-  /// - Parameters:
-  ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func handleHome(
-    errorCallback: @escaping (String) -> Void
-  ) -> Bool {
+  func handleHome() -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
 
     if !composer.isEmpty {
-      errorCallback("ABC44080")
+      delegate.callError("ABC44080")
       delegate.switchState(state)
       return true
     }
@@ -486,7 +458,7 @@ extension InputHandler {
       compositor.cursor = 0
       delegate.switchState(generateStateOfInputting())
     } else {
-      errorCallback("66D97F90")
+      delegate.callError("66D97F90")
       delegate.switchState(state)
     }
 
@@ -496,18 +468,14 @@ extension InputHandler {
   // MARK: - 處理 End 鍵的行為
 
   /// 處理 End 鍵的行為。
-  /// - Parameters:
-  ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func handleEnd(
-    errorCallback: @escaping (String) -> Void
-  ) -> Bool {
+  func handleEnd() -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
 
     if !composer.isEmpty {
-      errorCallback("9B69908D")
+      delegate.callError("9B69908D")
       delegate.switchState(state)
       return true
     }
@@ -516,7 +484,7 @@ extension InputHandler {
       compositor.cursor = compositor.length
       delegate.switchState(generateStateOfInputting())
     } else {
-      errorCallback("9B69908E")
+      delegate.callError("9B69908E")
       delegate.switchState(state)
     }
 
@@ -526,7 +494,6 @@ extension InputHandler {
   // MARK: - 處理 Esc 鍵的行為
 
   /// 處理 Esc 鍵的行為。
-  /// - Parameters:
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleEsc() -> Bool {
     guard let delegate = delegate else { return false }
@@ -555,18 +522,14 @@ extension InputHandler {
   /// 處理向前方向鍵的行為。
   /// - Parameters:
   ///   - input: 輸入按鍵訊號。
-  ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func handleForward(
-    input: InputSignalProtocol,
-    errorCallback: @escaping (String) -> Void
-  ) -> Bool {
+  func handleForward(input: InputSignalProtocol) -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
 
     if !composer.isEmpty {
-      errorCallback("B3BA5257")
+      delegate.callError("B3BA5257")
       delegate.switchState(state)
       return true
     }
@@ -587,16 +550,16 @@ extension InputHandler {
         marking.tooltipBackupForInputting = state.tooltip
         delegate.switchState(marking)
       } else {
-        errorCallback("BB7F6DB9")
+        delegate.callError("BB7F6DB9")
         delegate.switchState(state)
       }
     } else if input.isOptionHold {
       if input.isControlHold {
-        return handleEnd(errorCallback: errorCallback)
+        return handleEnd()
       }
       // 游標跳轉動作無論怎樣都會執行，但如果出了執行失敗的結果的話則觸發報錯流程。
       if !compositor.jumpCursorBySpan(to: .front) {
-        errorCallback("33C3B580")
+        delegate.callError("33C3B580")
         delegate.switchState(state)
         return true
       }
@@ -609,7 +572,7 @@ extension InputHandler {
         }
         delegate.switchState(generateStateOfInputting())
       } else {
-        errorCallback("A96AAD58")
+        delegate.callError("A96AAD58")
         delegate.switchState(state)
       }
     }
@@ -622,18 +585,14 @@ extension InputHandler {
   /// 處理向後方向鍵的行為。
   /// - Parameters:
   ///   - input: 輸入按鍵訊號。
-  ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func handleBackward(
-    input: InputSignalProtocol,
-    errorCallback: @escaping (String) -> Void
-  ) -> Bool {
+  func handleBackward(input: InputSignalProtocol) -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
 
     if !composer.isEmpty {
-      errorCallback("6ED95318")
+      delegate.callError("6ED95318")
       delegate.switchState(state)
       return true
     }
@@ -654,16 +613,16 @@ extension InputHandler {
         marking.tooltipBackupForInputting = state.tooltip
         delegate.switchState(marking)
       } else {
-        errorCallback("D326DEA3")
+        delegate.callError("D326DEA3")
         delegate.switchState(state)
       }
     } else if input.isOptionHold {
       if input.isControlHold {
-        return handleHome(errorCallback: errorCallback)
+        return handleHome()
       }
       // 游標跳轉動作無論怎樣都會執行，但如果出了執行失敗的結果的話則觸發報錯流程。
       if !compositor.jumpCursorBySpan(to: .rear) {
-        errorCallback("8D50DD9E")
+        delegate.callError("8D50DD9E")
         delegate.switchState(state)
         return true
       }
@@ -676,7 +635,7 @@ extension InputHandler {
         }
         delegate.switchState(generateStateOfInputting())
       } else {
-        errorCallback("7045E6F3")
+        delegate.callError("7045E6F3")
         delegate.switchState(state)
       }
     }
@@ -689,18 +648,14 @@ extension InputHandler {
   /// 以給定之參數來處理上下文候選字詞之輪替。
   /// - Parameters:
   ///   - reverseOrder: 是否有控制輪替方向的修飾鍵輸入。
-  ///   - errorCallback: 錯誤回呼。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func handleInlineCandidateRotation(
-    reverseOrder: Bool,
-    errorCallback: @escaping (String) -> Void
-  ) -> Bool {
+  func handleInlineCandidateRotation(reverseOrder: Bool) -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
     if composer.isEmpty, compositor.isEmpty || compositor.walkedNodes.isEmpty { return false }
     guard state.type == .ofInputting else {
       guard state.type == .ofEmpty else {
-        errorCallback("6044F081")
+        delegate.callError("6044F081")
         return true
       }
       // 不妨礙使用者平時輸入 Tab 的需求。
@@ -708,13 +663,13 @@ extension InputHandler {
     }
 
     guard composer.isEmpty else {
-      errorCallback("A2DAF7BC")
+      delegate.callError("A2DAF7BC")
       return true
     }
 
     let candidates = generateArrayOfCandidates(fixOrder: true)
     guard !candidates.isEmpty else {
-      errorCallback("3378A6DF")
+      delegate.callError("3378A6DF")
       return true
     }
 
@@ -730,7 +685,7 @@ extension InputHandler {
     }
 
     guard let currentNode = currentNode else {
-      errorCallback("F58DEA95")
+      delegate.callError("F58DEA95")
       return true
     }
 

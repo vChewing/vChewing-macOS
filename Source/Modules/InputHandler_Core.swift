@@ -37,6 +37,7 @@ public protocol InputHandlerDelegate {
   var selectionKeys: String { get }
   var state: IMEStateProtocol { get set }
   var clientBundleIdentifier: String { get }
+  func callError(_ logMessage: String)
   func switchState(_ newState: IMEStateProtocol)
   func candidateController() -> CtlCandidateProtocol
   func candidateSelectionCalledByInputHandler(at index: Int)

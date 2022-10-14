@@ -15,12 +15,8 @@ extension InputHandler {
   /// 用來處理 InputHandler.HandleInput() 當中的與組字有關的行為。
   /// - Parameters:
   ///   - input: 輸入訊號。
-  ///   - errorCallback: 錯誤回呼。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
-  func handleComposition(
-    input: InputSignalProtocol,
-    errorCallback: @escaping (String) -> Void
-  ) -> Bool? {
+  func handleComposition(input: InputSignalProtocol) -> Bool? {
     guard let delegate = delegate else { return nil }
 
     // MARK: 注音按鍵輸入處理 (Handle BPMF Keys)
@@ -54,7 +50,7 @@ extension InputHandler {
           composer = theComposer
           // 這裡不需要回呼 generateStateOfInputting()，因為當前輸入的聲調鍵一定是合規的、會在之後回呼 generateStateOfInputting()。
         } else {
-          errorCallback("4B0DD2D4：語彙庫內無「\(temporaryReadingKey)」的匹配記錄，放棄覆寫游標身後的內容。")
+          delegate.callError("4B0DD2D4：語彙庫內無「\(temporaryReadingKey)」的匹配記錄，放棄覆寫游標身後的內容。")
           return true
         }
       }
@@ -86,7 +82,7 @@ extension InputHandler {
 
       // 向語言模型詢問是否有對應的記錄。
       if !currentLM.hasUnigramsFor(key: readingKey) {
-        errorCallback("B49C0979：語彙庫內無「\(readingKey)」的匹配記錄。")
+        delegate.callError("B49C0979：語彙庫內無「\(readingKey)」的匹配記錄。")
 
         if prefs.keepReadingUponCompositionError {
           composer.intonation.clear()  // 砍掉聲調。
