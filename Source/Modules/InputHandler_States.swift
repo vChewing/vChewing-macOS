@@ -50,6 +50,8 @@ extension InputHandler {
   }
 
   /// 生成「正在輸入」狀態。
+  /// - Parameter rawCursor: 原始游標。
+  /// - Returns: 用以顯示的游標。
   func convertCursorForDisplay(_ rawCursor: Int) -> Int {
     var composedStringCursorIndex = 0
     var readingCursorIndex = 0
@@ -379,8 +381,7 @@ extension InputHandler {
 
     switch composer.isEmpty && compositor.isEmpty {
       case false: delegate.switchState(generateStateOfInputting())
-      case true:
-        delegate.switchState(IMEState.ofAbortion())
+      case true: delegate.switchState(IMEState.ofAbortion())
     }
     return true
   }
@@ -418,8 +419,7 @@ extension InputHandler {
     // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
     switch inputting.displayedText.isEmpty {
       case false: delegate.switchState(inputting)
-      case true:
-        delegate.switchState(IMEState.ofAbortion())
+      case true: delegate.switchState(IMEState.ofAbortion())
     }
     return true
   }
@@ -510,8 +510,7 @@ extension InputHandler {
       composer.clear()
       switch compositor.isEmpty {
         case false: delegate.switchState(generateStateOfInputting())
-        case true:
-          delegate.switchState(IMEState.ofAbortion())
+        case true: delegate.switchState(IMEState.ofAbortion())
       }
     }
     return true

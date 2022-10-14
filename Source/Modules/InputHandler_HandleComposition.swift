@@ -94,8 +94,7 @@ extension InputHandler {
         // 根據「組字器是否為空」來判定回呼哪一種狀態。
         switch compositor.isEmpty {
           case false: delegate.switchState(generateStateOfInputting())
-          case true:
-            delegate.switchState(IMEState.ofAbortion())
+          case true: delegate.switchState(IMEState.ofAbortion())
         }
         return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了。
       }
@@ -134,10 +133,7 @@ extension InputHandler {
             if !prefs.associatedPhrasesEnabled {
               delegate.switchState(IMEState.ofEmpty())
             } else {
-              let associatedPhrases =
-                generateStateOfAssociates(
-                  withPair: .init(key: reading, value: text)
-                )
+              let associatedPhrases = generateStateOfAssociates(withPair: .init(key: reading, value: text))
               delegate.switchState(associatedPhrases.candidates.isEmpty ? IMEState.ofEmpty() : associatedPhrases)
             }
           default: break
