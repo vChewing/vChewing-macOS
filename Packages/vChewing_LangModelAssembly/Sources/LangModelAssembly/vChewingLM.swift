@@ -8,4 +8,8 @@
 
 import Foundation
 
-public enum vChewingLM {}
+public enum vChewingLM {
+  enum FileErrors: Error {
+    case fileHandleError(String)
+  }
+}
