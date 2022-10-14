@@ -27,6 +27,10 @@ let package = Package(
         .product(name: "Shared", package: "vChewing_Shared"),
         .product(name: "PinyinPhonaConverter", package: "vChewing_PinyinPhonaConverter"),
       ]
-    )
+    ),
+    .testTarget(
+      name: "LangModelAssemblyTests",
+      dependencies: ["LangModelAssembly"]
+    ),
   ]
 )
