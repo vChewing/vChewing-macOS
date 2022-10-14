@@ -89,10 +89,12 @@ extension SessionCtl: CtlCandidateDelegate {
 
     if [.ofCandidates, .ofSymbolTable].contains(state.type) {
       let selectedValue = state.candidates[index]
-      inputHandler.consolidateNode(
-        candidate: selectedValue, respectCursorPushing: true,
-        preConsolidate: PrefMgr.shared.consolidateContextOnCandidateSelection
-      )
+      if state.type == .ofCandidates {
+        inputHandler.consolidateNode(
+          candidate: selectedValue, respectCursorPushing: true,
+          preConsolidate: PrefMgr.shared.consolidateContextOnCandidateSelection
+        )
+      }
 
       let inputting = inputHandler.generateStateOfInputting()
 
