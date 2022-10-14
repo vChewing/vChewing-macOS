@@ -21,7 +21,7 @@ final class CandidatePoolTests: XCTestCase {
   func testPoolHorizontal() throws {
     let pool = CandidatePool(candidates: testCandidates, rowCapacity: 6)
     var strOutput = ""
-    pool.candidateRows.forEach {
+    pool.candidateLines.forEach {
       $0.forEach {
         strOutput += $0.displayedText + ", "
       }
@@ -34,7 +34,7 @@ final class CandidatePoolTests: XCTestCase {
   func testPoolVertical() throws {
     let pool = CandidatePool(candidates: testCandidates, columnCapacity: 6)
     var strOutput = ""
-    pool.candidateColumns.forEach {
+    pool.candidateLines.forEach {
       $0.forEach {
         strOutput += $0.displayedText + ", "
       }
