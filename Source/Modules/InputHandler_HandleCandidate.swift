@@ -59,7 +59,7 @@ extension InputHandler {
             delegate.switchState(IMEState.ofAbortion())
             return true
           }
-          delegate.candidateSelectionCalledByInputHandler(at: ctlCandidate.selectedCandidateIndex)
+          delegate.candidateSelectionCalledByInputHandler(at: ctlCandidate.highlightedIndex)
           return true
         case .kTab:
           let updated: Bool =
@@ -104,14 +104,14 @@ extension InputHandler {
           return true
         case .kHome:
           _ =
-            (ctlCandidate.selectedCandidateIndex == 0)
-            ? delegate.callError("9B6EDE8D") : (ctlCandidate.selectedCandidateIndex = 0)
+            (ctlCandidate.highlightedIndex == 0)
+            ? delegate.callError("9B6EDE8D") : (ctlCandidate.highlightedIndex = 0)
           return true
         case .kEnd:
           let maxIndex = state.candidates.count - 1
           _ =
-            (ctlCandidate.selectedCandidateIndex == maxIndex)
-            ? delegate.callError("9B69AAAD") : (ctlCandidate.selectedCandidateIndex = maxIndex)
+            (ctlCandidate.highlightedIndex == maxIndex)
+            ? delegate.callError("9B69AAAD") : (ctlCandidate.highlightedIndex = maxIndex)
           return true
         default: break
       }

@@ -208,7 +208,7 @@ public class CtlCandidateTDK: CtlCandidate {
     return arrCurrentLine[actualID].index
   }
 
-  override public var selectedCandidateIndex: Int {
+  override public var highlightedIndex: Int {
     get { thePool.highlightedIndex }
     set {
       thePool.highlight(at: newValue)

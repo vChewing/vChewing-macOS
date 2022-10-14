@@ -57,7 +57,7 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
     }
   }
 
-  open var selectedCandidateIndex: Int = .max
+  open var highlightedIndex: Int = .max
   open var visible = false {
     didSet {
       NSObject.cancelPreviousPerformRequests(withTarget: self)

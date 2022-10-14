@@ -20,7 +20,7 @@ public protocol CtlCandidateProtocol {
   var locale: String { get set }
   var currentLayout: NSUserInterfaceLayoutOrientation { get set }
   var delegate: CtlCandidateDelegate? { get set }
-  var selectedCandidateIndex: Int { get set }
+  var highlightedIndex: Int { get set }
   var visible: Bool { get set }
   var windowTopLeftPoint: NSPoint { get set }
   var candidateFont: NSFont { get set }
