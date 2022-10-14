@@ -172,13 +172,6 @@ extension InputHandler {
         case .kEscape: return handleEsc()
         case .kTab: return handleInlineCandidateRotation(reverseOrder: input.isShiftHold)
         case .kUpArrow, .kDownArrow, .kLeftArrow, .kRightArrow:
-          if (input.isControlHold || input.isShiftHold) && (input.isOptionHold) {
-            if input.isLeft {  // Ctrl+PgLf / Shift+PgLf
-              return handleHome()
-            } else if input.isRight {  // Ctrl+PgRt or Shift+PgRt
-              return handleEnd()
-            }
-          }
           if input.isCursorBackward { return handleBackward(input: input) }  // Forward
           if input.isCursorForward { return handleForward(input: input) }  // Backward
           if input.isCursorClockLeft || input.isCursorClockRight {  // Clock keys
