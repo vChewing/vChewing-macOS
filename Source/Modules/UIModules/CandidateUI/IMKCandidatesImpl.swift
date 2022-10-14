@@ -96,7 +96,7 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
     // guard let delegate = delegate else { return }  // 下文無效，所以這句沒用。
     // 既然下述函式無效，那中間這段沒用的也都砍了。
     // setCandidateData(candidates)  // 該函式無效。
-    selectedCandidateIndex = 0
+    highlightedIndex = 0
     update()
   }
 
@@ -142,7 +142,7 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
   // IMK 選字窗目前無法實作該函式。威注音 IMK 選字窗目前也不需要使用該函式。
   public func candidateIndexAtKeyLabelIndex(_: Int) -> Int { 0 }
 
-  public var selectedCandidateIndex: Int {
+  public var highlightedIndex: Int {
     get { selectedCandidate() }
     set { selectCandidate(withIdentifier: newValue) }
   }
