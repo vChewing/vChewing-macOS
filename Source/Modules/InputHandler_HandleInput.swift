@@ -34,9 +34,7 @@ extension InputHandler {
     if input.isInvalid {
       // 在「.Empty(IgnoringPreviousState) 與 .Deactivated」狀態下的首次不合規按鍵輸入可以直接放行。
       // 因為「.Abortion」會在處理之後被自動轉為「.Empty」，所以不需要單獨判斷。
-      if state.type == .ofEmpty || state.type == .ofDeactivated {
-        return false
-      }
+      if state.type == .ofEmpty || state.type == .ofDeactivated { return false }
       delegate.callError("550BCF7B: InputHandler just refused an invalid input.")
       delegate.switchState(state)
       return true
@@ -53,13 +51,8 @@ extension InputHandler {
 
     /// 若 Caps Lock 被啟用的話，則暫停對注音輸入的處理。
     /// 這裡的處理仍舊有用，不然 Caps Lock 英文模式無法直接鍵入小寫字母。
-    if input.isBackSpace || input.isEnter
-      || input.isCursorClockLeft || input.isCursorClockRight
-      || input.isCursorForward || input.isCursorBackward
-    {
-      // 略過對 BackSpace 的處理。
-    } else if input.isCapsLockOn || state.isASCIIMode {
-      // 但願能夠處理這種情況下所有可能的按鍵組合。
+    if input.isCapsLockOn || state.isASCIIMode {
+      // 低於 macOS 12 的系統無法偵測 CapsLock 的啟用狀態，所以這裡一律強制重置狀態為 .ofEmpty()。
       delegate.switchState(IMEState.ofEmpty())
 
       // 字母鍵摁 Shift 的話，無須額外處理，因為直接就會敲出大寫字母。
@@ -71,9 +64,7 @@ extension InputHandler {
 
       /// 如果是 ASCII 當中的不可列印的字元的話，不使用「insertText:replacementRange:」。
       /// 某些應用無法正常處理非 ASCII 字符的輸入。
-      if input.isASCII, !input.charCode.isPrintableASCII {
-        return false
-      }
+      if input.isASCII, !input.charCode.isPrintableASCII { return false }
 
       // 將整個組字區的內容遞交給客體應用。
       delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
