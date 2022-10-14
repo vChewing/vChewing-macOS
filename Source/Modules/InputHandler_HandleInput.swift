@@ -68,7 +68,6 @@ extension InputHandler {
 
       // 將整個組字區的內容遞交給客體應用。
       delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
-      delegate.switchState(IMEState.ofEmpty())
 
       return true
     }
@@ -79,21 +78,15 @@ extension InputHandler {
     // 不然、使用 Cocoa 內建的 flags 的話，會誤傷到在主鍵盤區域的功能鍵。
     // 我們先規定允許小鍵盤區域操縱選字窗，其餘場合一律直接放行。
     if input.isNumericPadKey {
-      if !(state.type == .ofCandidates || state.type == .ofAssociates
-        || state.type == .ofSymbolTable)
-      {
-        delegate.switchState(IMEState.ofEmpty())
+      if ![.ofCandidates, .ofAssociates, .ofSymbolTable].contains(state.type) {
         delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
-        delegate.switchState(IMEState.ofEmpty())
         return true
       }
     }
 
     // MARK: 處理候選字詞 (Handle Candidates)
 
-    if [.ofCandidates, .ofSymbolTable].contains(state.type) {
-      return handleCandidate(input: input)
-    }
+    if [.ofCandidates, .ofSymbolTable].contains(state.type) { return handleCandidate(input: input) }
 
     // MARK: 處理聯想詞 (Handle Associated Phrases)
 
@@ -132,7 +125,6 @@ extension InputHandler {
               delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
             }
             delegate.switchState(IMEState.ofCommitting(textToCommit: " "))
-            delegate.switchState(IMEState.ofEmpty())
           } else if currentLM.hasUnigramsFor(key: " ") {
             compositor.insertKey(" ")
             walk()
@@ -147,12 +139,9 @@ extension InputHandler {
           return handleInlineCandidateRotation(reverseOrder: input.isCommandHold)
         }
       }
+      // 開始決定是否切換至選字狀態。
       let candidateState: IMEStateProtocol = generateStateOfCandidates()
-      if candidateState.candidates.isEmpty {
-        delegate.callError("3572F238")
-      } else {
-        delegate.switchState(candidateState)
-      }
+      _ = candidateState.candidates.isEmpty ? delegate.callError("3572F238") : delegate.switchState(candidateState)
       return true
     }
 
@@ -199,12 +188,9 @@ extension InputHandler {
             var inputting = generateStateOfInputting()
             inputting.textToCommit = textToCommit
             delegate.switchState(inputting)
-            let candidateState = generateStateOfCandidates()
-            if candidateState.candidates.isEmpty {
-              delegate.callError("B5127D8A")
-            } else {
-              delegate.switchState(candidateState)
-            }
+            // 開始決定是否切換至選字狀態。
+            let newState = generateStateOfCandidates()
+            _ = newState.candidates.isEmpty ? delegate.callError("B5127D8A") : delegate.switchState(newState)
           } else {  // 不要在注音沒敲完整的情況下叫出統合符號選單。
             delegate.callError("17446655")
           }
@@ -212,9 +198,7 @@ extension InputHandler {
         }
       } else {
         // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
-        // 於是這裡用「模擬一次 Enter 鍵的操作」使其代為執行這個 commit buffer 的動作。
-        // 這裡不需要該函式所傳回的 bool 結果，所以用「_ =」解消掉。
-        _ = handleEnter()
+        delegate.switchState(IMEState.ofCommitting(textToCommit: state.displayedText))
         delegate.switchState(IMEState.ofSymbolTable(node: CandidateNode.root))
         return true
       }
@@ -224,13 +208,10 @@ extension InputHandler {
 
     if state.type == .ofEmpty {
       if input.isMainAreaNumKey, input.modifierFlags == [.shift, .option] {
-        guard let stringRAW = input.mainAreaNumKeyChar else { return false }
-        let newStringFW = stringRAW.applyingTransform(.fullwidthToHalfwidth, reverse: true) ?? stringRAW
-        let newStringHW = stringRAW.applyingTransform(.fullwidthToHalfwidth, reverse: false) ?? stringRAW
-        delegate.switchState(
-          IMEState.ofCommitting(textToCommit: prefs.halfWidthPunctuationEnabled ? newStringHW : newStringFW)
-        )
-        delegate.switchState(IMEState.ofEmpty())
+        guard let strRAW = input.mainAreaNumKeyChar else { return false }
+        let newString =
+          strRAW.applyingTransform(.fullwidthToHalfwidth, reverse: !prefs.halfWidthPunctuationEnabled) ?? strRAW
+        delegate.switchState(IMEState.ofCommitting(textToCommit: newString))
         return true
       }
     }
@@ -240,23 +221,15 @@ extension InputHandler {
     /// 如果仍無匹配結果的話，先看一下：
     /// - 是否是針對當前注音排列/拼音輸入種類專門提供的標點符號。
     /// - 是否是需要摁修飾鍵才可以輸入的那種標點符號。
-
     let punctuationNamePrefix: String = generatePunctuationNamePrefix(withKeyCondition: input)
     let parser = currentKeyboardParser
     let arrCustomPunctuations: [String] = [punctuationNamePrefix, parser, input.text]
     let customPunctuation: String = arrCustomPunctuations.joined()
-    if handlePunctuation(customPunctuation) {
-      return true
-    }
-
+    if handlePunctuation(customPunctuation) { return true }
     /// 如果仍無匹配結果的話，看看這個輸入是否是不需要修飾鍵的那種標點鍵輸入。
-
     let arrPunctuations: [String] = [punctuationNamePrefix, input.text]
     let punctuation: String = arrPunctuations.joined()
-
-    if handlePunctuation(punctuation) {
-      return true
-    }
+    if handlePunctuation(punctuation) { return true }
 
     // MARK: 全形/半形空白 (Full-Width / Half-Width Space)
 
@@ -264,7 +237,6 @@ extension InputHandler {
     if state.type == .ofEmpty {
       if input.isSpace, !input.isOptionHold, !input.isControlHold, !input.isCommandHold {
         delegate.switchState(IMEState.ofCommitting(textToCommit: input.isShiftHold ? "　" : " "))
-        delegate.switchState(IMEState.ofEmpty())
         return true
       }
     }
@@ -275,15 +247,10 @@ extension InputHandler {
       if input.isShiftHold {  // 這裡先不要判斷 isOptionHold。
         switch prefs.upperCaseLetterKeyBehavior {
           case 1:
-            delegate.switchState(IMEState.ofEmpty())
             delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
-            delegate.switchState(IMEState.ofEmpty())
             return true
-
           case 2:
-            delegate.switchState(IMEState.ofEmpty())
             delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.uppercased()))
-            delegate.switchState(IMEState.ofEmpty())
             return true
           default:  // 包括 case 0，直接塞給組字區。
             let letter = "_letter_\(inputText)"
@@ -301,8 +268,7 @@ extension InputHandler {
     /// 砍掉這一段會導致「F1-F12 按鍵干擾組字區」的問題。
     /// 暫時只能先恢復這段，且補上偵錯彙報機制，方便今後排查故障。
     if state.hasComposition || !composer.isEmpty {
-      delegate.callError(
-        "Blocked data: charCode: \(input.charCode), keyCode: \(input.keyCode)")
+      delegate.callError("Blocked data: charCode: \(input.charCode), keyCode: \(input.keyCode)")
       delegate.callError("A9BFF20E")
       delegate.switchState(state)
       return true
