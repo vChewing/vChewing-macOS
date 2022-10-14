@@ -193,9 +193,7 @@ extension InputHandler {
     if input.isSymbolMenuPhysicalKey {
       var updated = true
       updated = input.isShiftHold ? ctlCandidate.showPreviousLine() : ctlCandidate.showNextLine()
-      if !updated {
-        delegate.callError("66F3477B")
-      }
+      if !updated { delegate.callError("66F3477B") }
       return true
     }
 
