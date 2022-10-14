@@ -53,7 +53,7 @@ extension vChewingLM {
     }
 
     /// 檢測資料庫辭典內是否已經有載入的資料。
-    public func isLoaded() -> Bool {
+    public var isLoaded: Bool {
       !rangeMap.isEmpty
     }
 
@@ -61,7 +61,7 @@ extension vChewingLM {
     /// - parameters:
     ///   - path: 給定路徑。
     @discardableResult public mutating func open(_ path: String) -> Bool {
-      if isLoaded() {
+      if isLoaded {
         return false
       }
 
@@ -95,7 +95,7 @@ extension vChewingLM {
 
     /// 將當前語言模組的資料庫辭典自記憶體內卸除。
     public mutating func close() {
-      if isLoaded() {
+      if isLoaded {
         rangeMap.removeAll()
       }
     }
