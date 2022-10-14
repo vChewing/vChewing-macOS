@@ -170,8 +170,7 @@ extension InputHandler {
     if let keyCodeType = KeyCode(rawValue: input.keyCode) {
       switch keyCodeType {
         case .kEscape: return handleEsc()
-        case .kTab:
-          return handleInlineCandidateRotation(reverseOrder: input.isShiftHold)
+        case .kTab: return handleInlineCandidateRotation(reverseOrder: input.isShiftHold)
         case .kUpArrow, .kDownArrow, .kLeftArrow, .kRightArrow:
           if (input.isControlHold || input.isShiftHold) && (input.isOptionHold) {
             if input.isLeft {  // Ctrl+PgLf / Shift+PgLf
@@ -180,30 +179,20 @@ extension InputHandler {
               return handleEnd()
             }
           }
-          if input.isCursorBackward {  // Forward
-            return handleBackward(input: input)
-          }
-          if input.isCursorForward {  // Backward
-            return handleForward(input: input)
-          }
+          if input.isCursorBackward { return handleBackward(input: input) }  // Forward
+          if input.isCursorForward { return handleForward(input: input) }  // Backward
           if input.isCursorClockLeft || input.isCursorClockRight {  // Clock keys
             if input.isOptionHold, state.type == .ofInputting {
-              if input.isCursorClockRight {
-                return handleInlineCandidateRotation(reverseOrder: false)
-              }
-              if input.isCursorClockLeft {
-                return handleInlineCandidateRotation(reverseOrder: true)
-              }
+              if input.isCursorClockRight { return handleInlineCandidateRotation(reverseOrder: false) }
+              if input.isCursorClockLeft { return handleInlineCandidateRotation(reverseOrder: true) }
             }
             return handleClockKey()
           }
         case .kHome: return handleHome()
         case .kEnd: return handleEnd()
-        case .kBackSpace:
-          return handleBackSpace(input: input)
-        case .kWindowsDelete:
-          return handleDelete(input: input)
-        case .kCarriageReturn, .kLineFeed:
+        case .kBackSpace: return handleBackSpace(input: input)
+        case .kWindowsDelete: return handleDelete(input: input)
+        case .kCarriageReturn, .kLineFeed:  // Enter
           return (input.isCommandHold && input.isControlHold)
             ? (input.isOptionHold
               ? handleCtrlOptionCommandEnter()
