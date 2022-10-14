@@ -22,9 +22,7 @@ extension SessionCtl: InputHandlerDelegate {
     candidatePairSelected(at: index)
   }
 
-  public func performUserPhraseOperation(with state: IMEStateProtocol, addToFilter: Bool)
-    -> Bool
-  {
+  public func performUserPhraseOperation(addToFilter: Bool) -> Bool {
     guard state.type == .ofMarking else { return false }
     if !LMMgr.writeUserPhrase(
       state.data.userPhraseDumped, inputMode: inputMode,

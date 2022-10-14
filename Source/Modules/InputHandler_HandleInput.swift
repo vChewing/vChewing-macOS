@@ -20,12 +20,10 @@ extension InputHandler {
   /// - Remark: 送入該函式處理之前，先用 inputHandler.handleEvent() 分診、來判斷是否需要交給 IMKCandidates 處理。
   /// - Parameters:
   ///   - input: 輸入訊號。
-  ///   - state: 給定狀態（通常為當前狀態）。
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleInput(
     event input: InputSignalProtocol,
-    state: IMEStateProtocol,
     errorCallback: @escaping (String) -> Void
   ) -> Bool {
     // 如果按鍵訊號內的 inputTest 是空的話，則忽略該按鍵輸入，因為很可能是功能修飾鍵。
@@ -34,7 +32,7 @@ extension InputHandler {
     guard !input.text.isEmpty, input.charCode.isPrintable, let delegate = delegate else { return false }
 
     let inputText: String = input.text
-    var state = state  // 常數轉變數。
+    var state = delegate.state  // 常數轉變數。
 
     // 提前過濾掉一些不合規的按鍵訊號輸入，免得相關按鍵訊號被送給 Megrez 引發輸入法崩潰。
     if input.isInvalid {
@@ -107,17 +105,13 @@ extension InputHandler {
     // MARK: 處理候選字詞 (Handle Candidates)
 
     if [.ofCandidates, .ofSymbolTable].contains(state.type) {
-      return handleCandidate(
-        state: state, input: input, errorCallback: errorCallback
-      )
+      return handleCandidate(input: input, errorCallback: errorCallback)
     }
 
     // MARK: 處理聯想詞 (Handle Associated Phrases)
 
     if state.type == .ofAssociates {
-      if handleCandidate(
-        state: state, input: input, errorCallback: errorCallback
-      ) {
+      if handleCandidate(input: input, errorCallback: errorCallback) {
         return true
       } else {
         delegate.switchState(IMEState.ofEmpty())
@@ -127,12 +121,7 @@ extension InputHandler {
     // MARK: 處理標記範圍、以便決定要把哪個範圍拿來新增使用者(濾除)語彙 (Handle Marking)
 
     if state.type == .ofMarking {
-      if handleMarkingState(
-        state, input: input,
-        errorCallback: errorCallback
-      ) {
-        return true
-      }
+      if handleMarkingState(input: input, errorCallback: errorCallback) { return true }
       state = state.convertedToInputting
       delegate.switchState(state)
     }
@@ -172,13 +161,10 @@ extension InputHandler {
           }
           return true
         } else if input.isShiftHold {  // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
-          return handleInlineCandidateRotation(
-            state: state, reverseModifier: input.isCommandHold,
-            errorCallback: errorCallback
-          )
+          return handleInlineCandidateRotation(reverseOrder: input.isCommandHold, errorCallback: errorCallback)
         }
       }
-      let candidateState: IMEStateProtocol = generateStateOfCandidates(state: state)
+      let candidateState: IMEStateProtocol = generateStateOfCandidates()
       if candidateState.candidates.isEmpty {
         errorCallback("3572F238")
       } else {
@@ -191,56 +177,46 @@ extension InputHandler {
 
     if let keyCodeType = KeyCode(rawValue: input.keyCode) {
       switch keyCodeType {
-        case .kEscape: return handleEsc(state: state)
+        case .kEscape: return handleEsc()
         case .kTab:
-          return handleInlineCandidateRotation(
-            state: state, reverseModifier: input.isShiftHold, errorCallback: errorCallback
-          )
+          return handleInlineCandidateRotation(reverseOrder: input.isShiftHold, errorCallback: errorCallback)
         case .kUpArrow, .kDownArrow, .kLeftArrow, .kRightArrow:
           if (input.isControlHold || input.isShiftHold) && (input.isOptionHold) {
             if input.isLeft {  // Ctrl+PgLf / Shift+PgLf
-              return handleHome(state: state, errorCallback: errorCallback)
+              return handleHome(errorCallback: errorCallback)
             } else if input.isRight {  // Ctrl+PgRt or Shift+PgRt
-              return handleEnd(state: state, errorCallback: errorCallback)
+              return handleEnd(errorCallback: errorCallback)
             }
           }
           if input.isCursorBackward {  // Forward
-            return handleBackward(
-              state: state, input: input, errorCallback: errorCallback
-            )
+            return handleBackward(input: input, errorCallback: errorCallback)
           }
           if input.isCursorForward {  // Backward
-            return handleForward(
-              state: state, input: input, errorCallback: errorCallback
-            )
+            return handleForward(input: input, errorCallback: errorCallback)
           }
           if input.isCursorClockLeft || input.isCursorClockRight {  // Clock keys
             if input.isOptionHold, state.type == .ofInputting {
               if input.isCursorClockRight {
-                return handleInlineCandidateRotation(
-                  state: state, reverseModifier: false, errorCallback: errorCallback
-                )
+                return handleInlineCandidateRotation(reverseOrder: false, errorCallback: errorCallback)
               }
               if input.isCursorClockLeft {
-                return handleInlineCandidateRotation(
-                  state: state, reverseModifier: true, errorCallback: errorCallback
-                )
+                return handleInlineCandidateRotation(reverseOrder: true, errorCallback: errorCallback)
               }
             }
-            return handleClockKey(state: state, errorCallback: errorCallback)
+            return handleClockKey(errorCallback: errorCallback)
           }
-        case .kHome: return handleHome(state: state, errorCallback: errorCallback)
-        case .kEnd: return handleEnd(state: state, errorCallback: errorCallback)
+        case .kHome: return handleHome(errorCallback: errorCallback)
+        case .kEnd: return handleEnd(errorCallback: errorCallback)
         case .kBackSpace:
-          return handleBackSpace(state: state, input: input, errorCallback: errorCallback)
+          return handleBackSpace(input: input, errorCallback: errorCallback)
         case .kWindowsDelete:
-          return handleDelete(state: state, input: input, errorCallback: errorCallback)
+          return handleDelete(input: input, errorCallback: errorCallback)
         case .kCarriageReturn, .kLineFeed:
           return (input.isCommandHold && input.isControlHold)
             ? (input.isOptionHold
-              ? handleCtrlOptionCommandEnter(state: state)
-              : handleCtrlCommandEnter(state: state))
-            : handleEnter(state: state)
+              ? handleCtrlOptionCommandEnter()
+              : handleCtrlCommandEnter())
+            : handleEnter()
         default: break
       }
     }
@@ -258,7 +234,7 @@ extension InputHandler {
             var inputting = generateStateOfInputting()
             inputting.textToCommit = textToCommit
             delegate.switchState(inputting)
-            let candidateState = generateStateOfCandidates(state: inputting)
+            let candidateState = generateStateOfCandidates()
             if candidateState.candidates.isEmpty {
               errorCallback("B5127D8A")
             } else {
@@ -273,7 +249,7 @@ extension InputHandler {
         // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
         // 於是這裡用「模擬一次 Enter 鍵的操作」使其代為執行這個 commit buffer 的動作。
         // 這裡不需要該函式所傳回的 bool 結果，所以用「_ =」解消掉。
-        _ = handleEnter(state: state)
+        _ = handleEnter()
         delegate.switchState(IMEState.ofSymbolTable(node: CandidateNode.root))
         return true
       }
@@ -304,11 +280,7 @@ extension InputHandler {
     let parser = currentKeyboardParser
     let arrCustomPunctuations: [String] = [punctuationNamePrefix, parser, input.text]
     let customPunctuation: String = arrCustomPunctuations.joined()
-    if handlePunctuation(
-      customPunctuation,
-      state: state,
-      errorCallback: errorCallback
-    ) {
+    if handlePunctuation(customPunctuation, errorCallback: errorCallback) {
       return true
     }
 
@@ -317,11 +289,7 @@ extension InputHandler {
     let arrPunctuations: [String] = [punctuationNamePrefix, input.text]
     let punctuation: String = arrPunctuations.joined()
 
-    if handlePunctuation(
-      punctuation,
-      state: state,
-      errorCallback: errorCallback
-    ) {
+    if handlePunctuation(punctuation, errorCallback: errorCallback) {
       return true
     }
 
@@ -354,11 +322,7 @@ extension InputHandler {
             return true
           default:  // 包括 case 0，直接塞給組字區。
             let letter = "_letter_\(inputText)"
-            if handlePunctuation(
-              letter,
-              state: state,
-              errorCallback: errorCallback
-            ) {
+            if handlePunctuation(letter, errorCallback: errorCallback) {
               return true
             }
         }

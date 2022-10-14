@@ -126,7 +126,7 @@ extension InputHandler {
 
       /// 逐字選字模式的處理。
       if prefs.useSCPCTypingMode {
-        let candidateState: IMEStateProtocol = generateStateOfCandidates(state: inputting)
+        let candidateState: IMEStateProtocol = generateStateOfCandidates()
         switch candidateState.candidates.count {
           case 2...: delegate.switchState(candidateState)
           case 1:
