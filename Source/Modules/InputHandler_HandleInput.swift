@@ -9,6 +9,7 @@
 /// 該檔案乃按鍵調度模組當中「用來規定當 IMK 接受按鍵訊號時且首次交給按鍵調度模組處理時、
 /// 按鍵調度模組要率先處理」的部分。據此判斷是否需要將按鍵處理委派給其它成員函式。
 
+import CocoaExtension
 import LangModelAssembly
 import Shared
 
@@ -54,7 +55,7 @@ extension InputHandler {
       return false
     }
 
-    // MARK: Caps Lock processing.
+    // MARK: Caps Lock 處理
 
     /// 若 Caps Lock 被啟用的話，則暫停對注音輸入的處理。
     /// 這裡的處理仍舊有用，不然 Caps Lock 英文模式無法直接鍵入小寫字母。
@@ -186,101 +187,63 @@ extension InputHandler {
       return true
     }
 
-    // MARK: -
+    // MARK: 批次集中處理某些常用功能鍵
 
-    // MARK: Esc
-
-    if input.isEsc { return handleEsc(state: state, stateCallback: stateCallback) }
-
-    // MARK: Tab
-
-    if input.isTab {
-      return handleInlineCandidateRotation(
-        state: state, reverseModifier: input.isShiftHold, stateCallback: stateCallback, errorCallback: errorCallback
-      )
-    }
-
-    // MARK: Cursor backward
-
-    if input.isCursorBackward {
-      return handleBackward(
-        state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
-      )
-    }
-
-    // MARK: Cursor forward
-
-    if input.isCursorForward {
-      return handleForward(
-        state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
-      )
-    }
-
-    // MARK: Home
-
-    if input.isHome {
-      return handleHome(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
-    }
-
-    // MARK: End
-
-    if input.isEnd {
-      return handleEnd(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
-    }
-
-    // MARK: Ctrl+PgLf or Shift+PgLf
-
-    if (input.isControlHold || input.isShiftHold) && (input.isOptionHold && input.isLeft) {
-      return handleHome(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
-    }
-
-    // MARK: Ctrl+PgRt or Shift+PgRt
-
-    if (input.isControlHold || input.isShiftHold) && (input.isOptionHold && input.isRight) {
-      return handleEnd(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
-    }
-
-    // MARK: Clock-Left & Clock-Right
-
-    if input.isCursorClockLeft || input.isCursorClockRight {
-      if input.isOptionHold, state.type == .ofInputting {
-        if input.isCursorClockRight {
+    if let keyCodeType = KeyCode(rawValue: input.keyCode) {
+      switch keyCodeType {
+        case .kEscape: return handleEsc(state: state, stateCallback: stateCallback)
+        case .kTab:
           return handleInlineCandidateRotation(
-            state: state, reverseModifier: false, stateCallback: stateCallback, errorCallback: errorCallback
+            state: state, reverseModifier: input.isShiftHold, stateCallback: stateCallback, errorCallback: errorCallback
           )
-        }
-        if input.isCursorClockLeft {
-          return handleInlineCandidateRotation(
-            state: state, reverseModifier: true, stateCallback: stateCallback, errorCallback: errorCallback
-          )
-        }
+        case .kUpArrow, .kDownArrow, .kLeftArrow, .kRightArrow:
+          if (input.isControlHold || input.isShiftHold) && (input.isOptionHold) {
+            if input.isLeft {  // Ctrl+PgLf / Shift+PgLf
+              return handleHome(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+            } else if input.isRight {  // Ctrl+PgRt or Shift+PgRt
+              return handleEnd(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+            }
+          }
+          if input.isCursorBackward {  // Forward
+            return handleBackward(
+              state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
+            )
+          }
+          if input.isCursorForward {  // Backward
+            return handleForward(
+              state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
+            )
+          }
+          if input.isCursorClockLeft || input.isCursorClockRight {  // Clock keys
+            if input.isOptionHold, state.type == .ofInputting {
+              if input.isCursorClockRight {
+                return handleInlineCandidateRotation(
+                  state: state, reverseModifier: false, stateCallback: stateCallback, errorCallback: errorCallback
+                )
+              }
+              if input.isCursorClockLeft {
+                return handleInlineCandidateRotation(
+                  state: state, reverseModifier: true, stateCallback: stateCallback, errorCallback: errorCallback
+                )
+              }
+            }
+            return handleClockKey(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+          }
+        case .kHome: return handleHome(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+        case .kEnd: return handleEnd(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+        case .kBackSpace:
+          return handleBackSpace(state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
+        case .kWindowsDelete:
+          return handleDelete(state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
+        case .kCarriageReturn, .kLineFeed:
+          return (input.isCommandHold && input.isControlHold)
+            ? (input.isOptionHold
+              ? handleCtrlOptionCommandEnter(state: state, stateCallback: stateCallback)
+              : handleCtrlCommandEnter(state: state, stateCallback: stateCallback))
+            : handleEnter(state: state, stateCallback: stateCallback)
+        default: break
       }
-      return handleClockKey(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
     }
-
-    // MARK: BackSpace
-
-    if input.isBackSpace {
-      return handleBackSpace(state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
-    }
-
-    // MARK: Delete
-
-    if input.isDelete {
-      return handleDelete(state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
-    }
-
-    // MARK: Enter
-
-    if input.isEnter {
-      return (input.isCommandHold && input.isControlHold)
-        ? (input.isOptionHold
-          ? handleCtrlOptionCommandEnter(state: state, stateCallback: stateCallback)
-          : handleCtrlCommandEnter(state: state, stateCallback: stateCallback))
-        : handleEnter(state: state, stateCallback: stateCallback)
-    }
-
-    // MARK: -
 
     // MARK: Punctuation list
 
