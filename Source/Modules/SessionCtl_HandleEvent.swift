@@ -27,7 +27,7 @@ extension SessionCtl {
 
     // 如果是 deactivated 狀態的話，強制糾正其為 empty()。
     if let client = client(), state.type == .ofDeactivated {
-      handle(state: IMEState.ofEmpty())
+      switchState(IMEState.ofEmpty())
       return handle(event, client: client)
     }
 

@@ -18,19 +18,19 @@ extension InputHandler {
   /// - Parameters:
   ///   - input: 輸入訊號。
   ///   - state: 給定狀態（通常為當前狀態）。
-  ///   - stateCallback: 狀態回呼，交給對應的型別內的專有函式來處理。
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleCandidate(
     state: IMEStateProtocol,
     input: InputSignalProtocol,
-    stateCallback: @escaping (IMEStateProtocol) -> Void,
     errorCallback: @escaping (String) -> Void
   ) -> Bool {
-    guard var ctlCandidate = delegate?.candidateController() else {
+    guard let delegate = delegate else {
       errorCallback("06661F6E")
       return true
     }
+
+    var ctlCandidate = delegate.candidateController()
 
     // MARK: 取消選字 (Cancel Candidate)
 
@@ -47,12 +47,12 @@ extension InputHandler {
         // 就將當前的組字緩衝區析構處理、強制重設輸入狀態。
         // 否則，一個本不該出現的真空組字緩衝區會使前後方向鍵與 BackSpace 鍵失靈。
         // 所以這裡需要對 compositor.isEmpty 做判定。
-        stateCallback(IMEState.ofAbortion())
+        delegate.switchState(IMEState.ofAbortion())
       } else {
-        stateCallback(generateStateOfInputting())
+        delegate.switchState(generateStateOfInputting())
       }
       if state.type == .ofSymbolTable, let nodePrevious = state.node.previous, !nodePrevious.members.isEmpty {
-        stateCallback(IMEState.ofSymbolTable(node: nodePrevious))
+        delegate.switchState(IMEState.ofSymbolTable(node: nodePrevious))
       }
       return true
     }
@@ -61,10 +61,10 @@ extension InputHandler {
 
     if input.isEnter {
       if state.type == .ofAssociates, !prefs.alsoConfirmAssociatedCandidatesByEnter {
-        stateCallback(IMEState.ofAbortion())
+        delegate.switchState(IMEState.ofAbortion())
         return true
       }
-      delegate?.candidateSelectionCalledByInputHandler(at: ctlCandidate.selectedCandidateIndex)
+      delegate.candidateSelectionCalledByInputHandler(at: ctlCandidate.selectedCandidateIndex)
       return true
     }
 
@@ -232,7 +232,7 @@ extension InputHandler {
     let match: String =
       (state.type == .ofAssociates) ? input.inputTextIgnoringModifiers ?? "" : input.text
 
-    let selectionKeys = delegate?.selectionKeys ?? PrefMgr.shared.candidateKeys
+    let selectionKeys = delegate.selectionKeys
 
     for j in 0..<selectionKeys.count {
       let label = selectionKeys.charComponents[j]
@@ -245,7 +245,7 @@ extension InputHandler {
     if index != NSNotFound {
       let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(index)
       if candidateIndex != -114_514 {
-        delegate?.candidateSelectionCalledByInputHandler(at: candidateIndex)
+        delegate.candidateSelectionCalledByInputHandler(at: candidateIndex)
         return true
       }
     }
@@ -285,10 +285,10 @@ extension InputHandler {
       if shouldAutoSelectCandidate {
         let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(0)
         if candidateIndex != -114_514 {
-          delegate?.candidateSelectionCalledByInputHandler(at: candidateIndex)
-          stateCallback(IMEState.ofAbortion())
+          delegate.candidateSelectionCalledByInputHandler(at: candidateIndex)
+          delegate.switchState(IMEState.ofAbortion())
           return handleInput(
-            event: input, state: IMEState.ofEmpty(), stateCallback: stateCallback, errorCallback: errorCallback
+            event: input, state: IMEState.ofEmpty(), errorCallback: errorCallback
           )
         }
         return true

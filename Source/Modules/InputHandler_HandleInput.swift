@@ -21,17 +21,17 @@ extension InputHandler {
   /// - Parameters:
   ///   - input: 輸入訊號。
   ///   - state: 給定狀態（通常為當前狀態）。
-  ///   - stateCallback: 狀態回呼，交給對應的型別內的專有函式來處理。
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleInput(
     event input: InputSignalProtocol,
     state: IMEStateProtocol,
-    stateCallback: @escaping (IMEStateProtocol) -> Void,
     errorCallback: @escaping (String) -> Void
   ) -> Bool {
     // 如果按鍵訊號內的 inputTest 是空的話，則忽略該按鍵輸入，因為很可能是功能修飾鍵。
-    guard !input.text.isEmpty, input.charCode.isPrintable else { return false }
+    // 不處理任何包含不可列印字元的訊號。
+    // delegate 必須存在，否則不處理。
+    guard !input.text.isEmpty, input.charCode.isPrintable, let delegate = delegate else { return false }
 
     let inputText: String = input.text
     var state = state  // 常數轉變數。
@@ -44,7 +44,7 @@ extension InputHandler {
         return false
       }
       errorCallback("550BCF7B: InputHandler just refused an invalid input.")
-      stateCallback(state)
+      delegate.switchState(state)
       return true
     }
 
@@ -66,7 +66,7 @@ extension InputHandler {
       // 略過對 BackSpace 的處理。
     } else if input.isCapsLockOn || state.isASCIIMode {
       // 但願能夠處理這種情況下所有可能的按鍵組合。
-      stateCallback(IMEState.ofEmpty())
+      delegate.switchState(IMEState.ofEmpty())
 
       // 字母鍵摁 Shift 的話，無須額外處理，因為直接就會敲出大寫字母。
       if (input.isUpperCaseASCIILetterKey && state.isASCIIMode)
@@ -82,8 +82,8 @@ extension InputHandler {
       }
 
       // 將整個組字區的內容遞交給客體應用。
-      stateCallback(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
-      stateCallback(IMEState.ofEmpty())
+      delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
+      delegate.switchState(IMEState.ofEmpty())
 
       return true
     }
@@ -97,9 +97,9 @@ extension InputHandler {
       if !(state.type == .ofCandidates || state.type == .ofAssociates
         || state.type == .ofSymbolTable)
       {
-        stateCallback(IMEState.ofEmpty())
-        stateCallback(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
-        stateCallback(IMEState.ofEmpty())
+        delegate.switchState(IMEState.ofEmpty())
+        delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
+        delegate.switchState(IMEState.ofEmpty())
         return true
       }
     }
@@ -108,7 +108,7 @@ extension InputHandler {
 
     if [.ofCandidates, .ofSymbolTable].contains(state.type) {
       return handleCandidate(
-        state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
+        state: state, input: input, errorCallback: errorCallback
       )
     }
 
@@ -116,11 +116,11 @@ extension InputHandler {
 
     if state.type == .ofAssociates {
       if handleCandidate(
-        state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
+        state: state, input: input, errorCallback: errorCallback
       ) {
         return true
       } else {
-        stateCallback(IMEState.ofEmpty())
+        delegate.switchState(IMEState.ofEmpty())
       }
     }
 
@@ -128,19 +128,19 @@ extension InputHandler {
 
     if state.type == .ofMarking {
       if handleMarkingState(
-        state, input: input, stateCallback: stateCallback,
+        state, input: input,
         errorCallback: errorCallback
       ) {
         return true
       }
       state = state.convertedToInputting
-      stateCallback(state)
+      delegate.switchState(state)
     }
 
     // MARK: 注音按鍵輸入處理 (Handle BPMF Keys)
 
     if let compositionHandled = handleComposition(
-      input: input, stateCallback: stateCallback, errorCallback: errorCallback
+      input: input, errorCallback: errorCallback
     ) {
       return compositionHandled
     }
@@ -157,10 +157,10 @@ extension InputHandler {
           if compositor.cursor >= compositor.length {
             let displayedText = state.displayedText
             if !displayedText.isEmpty {
-              stateCallback(IMEState.ofCommitting(textToCommit: displayedText))
+              delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
             }
-            stateCallback(IMEState.ofCommitting(textToCommit: " "))
-            stateCallback(IMEState.ofEmpty())
+            delegate.switchState(IMEState.ofCommitting(textToCommit: " "))
+            delegate.switchState(IMEState.ofEmpty())
           } else if currentLM.hasUnigramsFor(key: " ") {
             compositor.insertKey(" ")
             walk()
@@ -168,12 +168,12 @@ extension InputHandler {
             let textToCommit = commitOverflownComposition
             var inputting = generateStateOfInputting()
             inputting.textToCommit = textToCommit
-            stateCallback(inputting)
+            delegate.switchState(inputting)
           }
           return true
         } else if input.isShiftHold {  // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
           return handleInlineCandidateRotation(
-            state: state, reverseModifier: input.isCommandHold, stateCallback: stateCallback,
+            state: state, reverseModifier: input.isCommandHold,
             errorCallback: errorCallback
           )
         }
@@ -182,7 +182,7 @@ extension InputHandler {
       if candidateState.candidates.isEmpty {
         errorCallback("3572F238")
       } else {
-        stateCallback(candidateState)
+        delegate.switchState(candidateState)
       }
       return true
     }
@@ -191,56 +191,56 @@ extension InputHandler {
 
     if let keyCodeType = KeyCode(rawValue: input.keyCode) {
       switch keyCodeType {
-        case .kEscape: return handleEsc(state: state, stateCallback: stateCallback)
+        case .kEscape: return handleEsc(state: state)
         case .kTab:
           return handleInlineCandidateRotation(
-            state: state, reverseModifier: input.isShiftHold, stateCallback: stateCallback, errorCallback: errorCallback
+            state: state, reverseModifier: input.isShiftHold, errorCallback: errorCallback
           )
         case .kUpArrow, .kDownArrow, .kLeftArrow, .kRightArrow:
           if (input.isControlHold || input.isShiftHold) && (input.isOptionHold) {
             if input.isLeft {  // Ctrl+PgLf / Shift+PgLf
-              return handleHome(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+              return handleHome(state: state, errorCallback: errorCallback)
             } else if input.isRight {  // Ctrl+PgRt or Shift+PgRt
-              return handleEnd(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+              return handleEnd(state: state, errorCallback: errorCallback)
             }
           }
           if input.isCursorBackward {  // Forward
             return handleBackward(
-              state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
+              state: state, input: input, errorCallback: errorCallback
             )
           }
           if input.isCursorForward {  // Backward
             return handleForward(
-              state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback
+              state: state, input: input, errorCallback: errorCallback
             )
           }
           if input.isCursorClockLeft || input.isCursorClockRight {  // Clock keys
             if input.isOptionHold, state.type == .ofInputting {
               if input.isCursorClockRight {
                 return handleInlineCandidateRotation(
-                  state: state, reverseModifier: false, stateCallback: stateCallback, errorCallback: errorCallback
+                  state: state, reverseModifier: false, errorCallback: errorCallback
                 )
               }
               if input.isCursorClockLeft {
                 return handleInlineCandidateRotation(
-                  state: state, reverseModifier: true, stateCallback: stateCallback, errorCallback: errorCallback
+                  state: state, reverseModifier: true, errorCallback: errorCallback
                 )
               }
             }
-            return handleClockKey(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+            return handleClockKey(state: state, errorCallback: errorCallback)
           }
-        case .kHome: return handleHome(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
-        case .kEnd: return handleEnd(state: state, stateCallback: stateCallback, errorCallback: errorCallback)
+        case .kHome: return handleHome(state: state, errorCallback: errorCallback)
+        case .kEnd: return handleEnd(state: state, errorCallback: errorCallback)
         case .kBackSpace:
-          return handleBackSpace(state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
+          return handleBackSpace(state: state, input: input, errorCallback: errorCallback)
         case .kWindowsDelete:
-          return handleDelete(state: state, input: input, stateCallback: stateCallback, errorCallback: errorCallback)
+          return handleDelete(state: state, input: input, errorCallback: errorCallback)
         case .kCarriageReturn, .kLineFeed:
           return (input.isCommandHold && input.isControlHold)
             ? (input.isOptionHold
-              ? handleCtrlOptionCommandEnter(state: state, stateCallback: stateCallback)
-              : handleCtrlCommandEnter(state: state, stateCallback: stateCallback))
-            : handleEnter(state: state, stateCallback: stateCallback)
+              ? handleCtrlOptionCommandEnter(state: state)
+              : handleCtrlCommandEnter(state: state))
+            : handleEnter(state: state)
         default: break
       }
     }
@@ -257,12 +257,12 @@ extension InputHandler {
             let textToCommit = commitOverflownComposition
             var inputting = generateStateOfInputting()
             inputting.textToCommit = textToCommit
-            stateCallback(inputting)
+            delegate.switchState(inputting)
             let candidateState = generateStateOfCandidates(state: inputting)
             if candidateState.candidates.isEmpty {
               errorCallback("B5127D8A")
             } else {
-              stateCallback(candidateState)
+              delegate.switchState(candidateState)
             }
           } else {  // 不要在注音沒敲完整的情況下叫出統合符號選單。
             errorCallback("17446655")
@@ -273,8 +273,8 @@ extension InputHandler {
         // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
         // 於是這裡用「模擬一次 Enter 鍵的操作」使其代為執行這個 commit buffer 的動作。
         // 這裡不需要該函式所傳回的 bool 結果，所以用「_ =」解消掉。
-        _ = handleEnter(state: state, stateCallback: stateCallback)
-        stateCallback(IMEState.ofSymbolTable(node: CandidateNode.root))
+        _ = handleEnter(state: state)
+        delegate.switchState(IMEState.ofSymbolTable(node: CandidateNode.root))
         return true
       }
     }
@@ -286,10 +286,10 @@ extension InputHandler {
         guard let stringRAW = input.mainAreaNumKeyChar else { return false }
         let newStringFW = stringRAW.applyingTransform(.fullwidthToHalfwidth, reverse: true) ?? stringRAW
         let newStringHW = stringRAW.applyingTransform(.fullwidthToHalfwidth, reverse: false) ?? stringRAW
-        stateCallback(
+        delegate.switchState(
           IMEState.ofCommitting(textToCommit: prefs.halfWidthPunctuationEnabled ? newStringHW : newStringFW)
         )
-        stateCallback(IMEState.ofEmpty())
+        delegate.switchState(IMEState.ofEmpty())
         return true
       }
     }
@@ -307,7 +307,6 @@ extension InputHandler {
     if handlePunctuation(
       customPunctuation,
       state: state,
-      stateCallback: stateCallback,
       errorCallback: errorCallback
     ) {
       return true
@@ -321,7 +320,6 @@ extension InputHandler {
     if handlePunctuation(
       punctuation,
       state: state,
-      stateCallback: stateCallback,
       errorCallback: errorCallback
     ) {
       return true
@@ -332,8 +330,8 @@ extension InputHandler {
     /// 該功能僅可在當前組字區沒有任何內容的時候使用。
     if state.type == .ofEmpty {
       if input.isSpace, !input.isOptionHold, !input.isControlHold, !input.isCommandHold {
-        stateCallback(IMEState.ofCommitting(textToCommit: input.isShiftHold ? "　" : " "))
-        stateCallback(IMEState.ofEmpty())
+        delegate.switchState(IMEState.ofCommitting(textToCommit: input.isShiftHold ? "　" : " "))
+        delegate.switchState(IMEState.ofEmpty())
         return true
       }
     }
@@ -344,22 +342,21 @@ extension InputHandler {
       if input.isShiftHold {  // 這裡先不要判斷 isOptionHold。
         switch prefs.upperCaseLetterKeyBehavior {
           case 1:
-            stateCallback(IMEState.ofEmpty())
-            stateCallback(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
-            stateCallback(IMEState.ofEmpty())
+            delegate.switchState(IMEState.ofEmpty())
+            delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
+            delegate.switchState(IMEState.ofEmpty())
             return true
 
           case 2:
-            stateCallback(IMEState.ofEmpty())
-            stateCallback(IMEState.ofCommitting(textToCommit: inputText.uppercased()))
-            stateCallback(IMEState.ofEmpty())
+            delegate.switchState(IMEState.ofEmpty())
+            delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.uppercased()))
+            delegate.switchState(IMEState.ofEmpty())
             return true
           default:  // 包括 case 0，直接塞給組字區。
             let letter = "_letter_\(inputText)"
             if handlePunctuation(
               letter,
               state: state,
-              stateCallback: stateCallback,
               errorCallback: errorCallback
             ) {
               return true
@@ -378,7 +375,7 @@ extension InputHandler {
       errorCallback(
         "Blocked data: charCode: \(input.charCode), keyCode: \(input.keyCode)")
       errorCallback("A9BFF20E")
-      stateCallback(state)
+      delegate.switchState(state)
       return true
     }
 

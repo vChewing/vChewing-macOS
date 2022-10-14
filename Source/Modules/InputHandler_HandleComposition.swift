@@ -15,14 +15,14 @@ extension InputHandler {
   /// 用來處理 InputHandler.HandleInput() 當中的與組字有關的行為。
   /// - Parameters:
   ///   - input: 輸入訊號。
-  ///   - stateCallback: 狀態回呼，交給對應的型別內的專有函式來處理。
   ///   - errorCallback: 錯誤回呼。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleComposition(
     input: InputSignalProtocol,
-    stateCallback: @escaping (IMEStateProtocol) -> Void,
     errorCallback: @escaping (String) -> Void
   ) -> Bool? {
+    guard let delegate = delegate else { return nil }
+
     // MARK: 注音按鍵輸入處理 (Handle BPMF Keys)
 
     var keyConsumedByReading = false
@@ -65,7 +65,7 @@ extension InputHandler {
       // 沒有調號的話，只需要 setInlineDisplayWithCursor() 且終止處理（return true）即可。
       // 有調號的話，則不需要這樣，而是轉而繼續在此之後的處理。
       if !composer.hasToneMarker() {
-        stateCallback(generateStateOfInputting())
+        delegate.switchState(generateStateOfInputting())
         return true
       }
     }
@@ -90,16 +90,16 @@ extension InputHandler {
 
         if prefs.keepReadingUponCompositionError {
           composer.intonation.clear()  // 砍掉聲調。
-          stateCallback(generateStateOfInputting())
+          delegate.switchState(generateStateOfInputting())
           return true
         }
 
         composer.clear()
         // 根據「組字器是否為空」來判定回呼哪一種狀態。
         switch compositor.isEmpty {
-          case false: stateCallback(generateStateOfInputting())
+          case false: delegate.switchState(generateStateOfInputting())
           case true:
-            stateCallback(IMEState.ofAbortion())
+            delegate.switchState(IMEState.ofAbortion())
         }
         return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了。
       }
@@ -122,27 +122,27 @@ extension InputHandler {
       // 再以回呼組字狀態的方式來執行 setInlineDisplayWithCursor()。
       var inputting = generateStateOfInputting()
       inputting.textToCommit = textToCommit
-      stateCallback(inputting)
+      delegate.switchState(inputting)
 
       /// 逐字選字模式的處理。
       if prefs.useSCPCTypingMode {
         let candidateState: IMEStateProtocol = generateStateOfCandidates(state: inputting)
         switch candidateState.candidates.count {
-          case 2...: stateCallback(candidateState)
+          case 2...: delegate.switchState(candidateState)
           case 1:
             let firstCandidate = candidateState.candidates.first!  // 一定會有，所以強制拆包也無妨。
             let reading: String = firstCandidate.0
             let text: String = firstCandidate.1
-            stateCallback(IMEState.ofCommitting(textToCommit: text))
+            delegate.switchState(IMEState.ofCommitting(textToCommit: text))
 
             if !prefs.associatedPhrasesEnabled {
-              stateCallback(IMEState.ofEmpty())
+              delegate.switchState(IMEState.ofEmpty())
             } else {
               let associatedPhrases =
                 generateStateOfAssociates(
                   withPair: .init(key: reading, value: text)
                 )
-              stateCallback(associatedPhrases.candidates.isEmpty ? IMEState.ofEmpty() : associatedPhrases)
+              delegate.switchState(associatedPhrases.candidates.isEmpty ? IMEState.ofEmpty() : associatedPhrases)
             }
           default: break
         }
@@ -154,7 +154,7 @@ extension InputHandler {
     /// 是說此時注拼槽並非為空、卻還沒組音。這種情況下只可能是「注拼槽內只有聲調」。
     if keyConsumedByReading {
       // 以回呼組字狀態的方式來執行 setInlineDisplayWithCursor()。
-      stateCallback(generateStateOfInputting())
+      delegate.switchState(generateStateOfInputting())
       return true
     }
     return nil
