@@ -22,12 +22,12 @@ extension vChewingLM {
       rangeMap = [:]
     }
 
-    public func isLoaded() -> Bool {
+    public var isLoaded: Bool {
       !rangeMap.isEmpty
     }
 
     @discardableResult public mutating func open(_ path: String) -> Bool {
-      if isLoaded() {
+      if isLoaded {
         return false
       }
 
@@ -57,7 +57,7 @@ extension vChewingLM {
     }
 
     public mutating func close() {
-      if isLoaded() {
+      if isLoaded {
         rangeMap.removeAll()
       }
     }
