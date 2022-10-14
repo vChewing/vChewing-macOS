@@ -61,26 +61,24 @@ extension SessionCtl {
             }
           }
         }
-      case .ofEmpty, .ofAbortion:
-        if newState.type == .ofAbortion {
-          previous = IMEState.ofEmpty()
-          if replace { state = previous }
+      case .ofEmpty, .ofAbortion, .ofCommitting:
+        innerCircle: switch newState.type {
+          case .ofAbortion:
+            previous = IMEState.ofEmpty()
+            if replace { state = previous }
+          case .ofCommitting:
+            commit(text: newState.textToCommit)
+            state = IMEState.ofEmpty()
+          default: break innerCircle
         }
         ctlCandidateCurrent.visible = false
         tooltipInstance.hide()
         // 全專案用以判斷「.Abortion」的地方僅此一處。
-        if previous.hasComposition, newState.type != .ofAbortion {
+        if previous.hasComposition, ![.ofAbortion, .ofCommitting].contains(newState.type) {
           commit(text: previous.displayedText)
         }
         // 在這裡手動再取消一次選字窗與工具提示的顯示，可謂雙重保險。
         tooltipInstance.hide()
-        clearInlineDisplay()
-        // 最後一道保險
-        inputHandler.clear()
-      case .ofCommitting:
-        ctlCandidateCurrent.visible = false
-        tooltipInstance.hide()
-        commit(text: newState.textToCommit)
         clearInlineDisplay()
         // 最後一道保險
         inputHandler.clear()
