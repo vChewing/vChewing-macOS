@@ -75,7 +75,7 @@ extension SessionCtl {
     let candidateString: String = candidateString?.string ?? ""
     if state.type == .ofAssociates {
       if !PrefMgr.shared.alsoConfirmAssociatedCandidatesByEnter {
-        handle(state: IMEState.ofAbortion())
+        switchState(IMEState.ofAbortion())
         return
       }
     }
