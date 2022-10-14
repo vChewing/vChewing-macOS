@@ -20,12 +20,8 @@ extension InputHandler {
   /// - Remark: 送入該函式處理之前，先用 inputHandler.handleEvent() 分診、來判斷是否需要交給 IMKCandidates 處理。
   /// - Parameters:
   ///   - input: 輸入訊號。
-  ///   - errorCallback: 錯誤回呼。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
-  func handleInput(
-    event input: InputSignalProtocol,
-    errorCallback: @escaping (String) -> Void
-  ) -> Bool {
+  func handleInput(event input: InputSignalProtocol) -> Bool {
     // 如果按鍵訊號內的 inputTest 是空的話，則忽略該按鍵輸入，因為很可能是功能修飾鍵。
     // 不處理任何包含不可列印字元的訊號。
     // delegate 必須存在，否則不處理。
@@ -41,7 +37,7 @@ extension InputHandler {
       if state.type == .ofEmpty || state.type == .ofDeactivated {
         return false
       }
-      errorCallback("550BCF7B: InputHandler just refused an invalid input.")
+      delegate.callError("550BCF7B: InputHandler just refused an invalid input.")
       delegate.switchState(state)
       return true
     }
@@ -105,13 +101,13 @@ extension InputHandler {
     // MARK: 處理候選字詞 (Handle Candidates)
 
     if [.ofCandidates, .ofSymbolTable].contains(state.type) {
-      return handleCandidate(input: input, errorCallback: errorCallback)
+      return handleCandidate(input: input)
     }
 
     // MARK: 處理聯想詞 (Handle Associated Phrases)
 
     if state.type == .ofAssociates {
-      if handleCandidate(input: input, errorCallback: errorCallback) {
+      if handleCandidate(input: input) {
         return true
       } else {
         delegate.switchState(IMEState.ofEmpty())
@@ -121,18 +117,14 @@ extension InputHandler {
     // MARK: 處理標記範圍、以便決定要把哪個範圍拿來新增使用者(濾除)語彙 (Handle Marking)
 
     if state.type == .ofMarking {
-      if handleMarkingState(input: input, errorCallback: errorCallback) { return true }
+      if handleMarkingState(input: input) { return true }
       state = state.convertedToInputting
       delegate.switchState(state)
     }
 
     // MARK: 注音按鍵輸入處理 (Handle BPMF Keys)
 
-    if let compositionHandled = handleComposition(
-      input: input, errorCallback: errorCallback
-    ) {
-      return compositionHandled
-    }
+    if let compositionHandled = handleComposition(input: input) { return compositionHandled }
 
     // MARK: 用上下左右鍵呼叫選字窗 (Calling candidate window using Up / Down or PageUp / PageDn.)
 
@@ -161,12 +153,12 @@ extension InputHandler {
           }
           return true
         } else if input.isShiftHold {  // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
-          return handleInlineCandidateRotation(reverseOrder: input.isCommandHold, errorCallback: errorCallback)
+          return handleInlineCandidateRotation(reverseOrder: input.isCommandHold)
         }
       }
       let candidateState: IMEStateProtocol = generateStateOfCandidates()
       if candidateState.candidates.isEmpty {
-        errorCallback("3572F238")
+        delegate.callError("3572F238")
       } else {
         delegate.switchState(candidateState)
       }
@@ -179,38 +171,38 @@ extension InputHandler {
       switch keyCodeType {
         case .kEscape: return handleEsc()
         case .kTab:
-          return handleInlineCandidateRotation(reverseOrder: input.isShiftHold, errorCallback: errorCallback)
+          return handleInlineCandidateRotation(reverseOrder: input.isShiftHold)
         case .kUpArrow, .kDownArrow, .kLeftArrow, .kRightArrow:
           if (input.isControlHold || input.isShiftHold) && (input.isOptionHold) {
             if input.isLeft {  // Ctrl+PgLf / Shift+PgLf
-              return handleHome(errorCallback: errorCallback)
+              return handleHome()
             } else if input.isRight {  // Ctrl+PgRt or Shift+PgRt
-              return handleEnd(errorCallback: errorCallback)
+              return handleEnd()
             }
           }
           if input.isCursorBackward {  // Forward
-            return handleBackward(input: input, errorCallback: errorCallback)
+            return handleBackward(input: input)
           }
           if input.isCursorForward {  // Backward
-            return handleForward(input: input, errorCallback: errorCallback)
+            return handleForward(input: input)
           }
           if input.isCursorClockLeft || input.isCursorClockRight {  // Clock keys
             if input.isOptionHold, state.type == .ofInputting {
               if input.isCursorClockRight {
-                return handleInlineCandidateRotation(reverseOrder: false, errorCallback: errorCallback)
+                return handleInlineCandidateRotation(reverseOrder: false)
               }
               if input.isCursorClockLeft {
-                return handleInlineCandidateRotation(reverseOrder: true, errorCallback: errorCallback)
+                return handleInlineCandidateRotation(reverseOrder: true)
               }
             }
-            return handleClockKey(errorCallback: errorCallback)
+            return handleClockKey()
           }
-        case .kHome: return handleHome(errorCallback: errorCallback)
-        case .kEnd: return handleEnd(errorCallback: errorCallback)
+        case .kHome: return handleHome()
+        case .kEnd: return handleEnd()
         case .kBackSpace:
-          return handleBackSpace(input: input, errorCallback: errorCallback)
+          return handleBackSpace(input: input)
         case .kWindowsDelete:
-          return handleDelete(input: input, errorCallback: errorCallback)
+          return handleDelete(input: input)
         case .kCarriageReturn, .kLineFeed:
           return (input.isCommandHold && input.isControlHold)
             ? (input.isOptionHold
@@ -236,12 +228,12 @@ extension InputHandler {
             delegate.switchState(inputting)
             let candidateState = generateStateOfCandidates()
             if candidateState.candidates.isEmpty {
-              errorCallback("B5127D8A")
+              delegate.callError("B5127D8A")
             } else {
               delegate.switchState(candidateState)
             }
           } else {  // 不要在注音沒敲完整的情況下叫出統合符號選單。
-            errorCallback("17446655")
+            delegate.callError("17446655")
           }
           return true
         }
@@ -280,7 +272,7 @@ extension InputHandler {
     let parser = currentKeyboardParser
     let arrCustomPunctuations: [String] = [punctuationNamePrefix, parser, input.text]
     let customPunctuation: String = arrCustomPunctuations.joined()
-    if handlePunctuation(customPunctuation, errorCallback: errorCallback) {
+    if handlePunctuation(customPunctuation) {
       return true
     }
 
@@ -289,7 +281,7 @@ extension InputHandler {
     let arrPunctuations: [String] = [punctuationNamePrefix, input.text]
     let punctuation: String = arrPunctuations.joined()
 
-    if handlePunctuation(punctuation, errorCallback: errorCallback) {
+    if handlePunctuation(punctuation) {
       return true
     }
 
@@ -322,7 +314,7 @@ extension InputHandler {
             return true
           default:  // 包括 case 0，直接塞給組字區。
             let letter = "_letter_\(inputText)"
-            if handlePunctuation(letter, errorCallback: errorCallback) {
+            if handlePunctuation(letter) {
               return true
             }
         }
@@ -336,9 +328,9 @@ extension InputHandler {
     /// 砍掉這一段會導致「F1-F12 按鍵干擾組字區」的問題。
     /// 暫時只能先恢復這段，且補上偵錯彙報機制，方便今後排查故障。
     if state.hasComposition || !composer.isEmpty {
-      errorCallback(
+      delegate.callError(
         "Blocked data: charCode: \(input.charCode), keyCode: \(input.keyCode)")
-      errorCallback("A9BFF20E")
+      delegate.callError("A9BFF20E")
       delegate.switchState(state)
       return true
     }
