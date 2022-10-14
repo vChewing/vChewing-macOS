@@ -14,22 +14,16 @@ extension vChewingLM {
   @frozen public struct LMPlainBopomofo {
     var rangeMap: [String: String] = [:]
 
-    public var count: Int {
-      rangeMap.count
-    }
+    public var count: Int { rangeMap.count }
 
     public init() {
       rangeMap = [:]
     }
 
-    public var isLoaded: Bool {
-      !rangeMap.isEmpty
-    }
+    public var isLoaded: Bool { !rangeMap.isEmpty }
 
     @discardableResult public mutating func open(_ path: String) -> Bool {
-      if isLoaded {
-        return false
-      }
+      if isLoaded { return false }
 
       do {
         let rawData = try Data(contentsOf: URL(fileURLWithPath: path))
@@ -46,9 +40,7 @@ extension vChewingLM {
     }
 
     public mutating func close() {
-      if isLoaded {
-        rangeMap.removeAll()
-      }
+      rangeMap.removeAll()
     }
 
     public func valuesFor(key: String) -> [String] {
