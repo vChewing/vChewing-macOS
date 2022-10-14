@@ -9,6 +9,7 @@
 /// 該檔案乃按鍵調度模組當中「用來規定在選字窗出現時的按鍵行為」的部分。
 
 import CandidateWindow
+import CocoaExtension
 import Shared
 
 // MARK: - § 對選字狀態進行調度 (Handle Candidate State).
@@ -22,6 +23,7 @@ extension InputHandler {
     guard let delegate = delegate else { return false }
     var ctlCandidate = delegate.candidateController()
     let state = delegate.state
+    guard !state.candidates.isEmpty else { return false }
 
     // MARK: 取消選字 (Cancel Candidate)
 
@@ -48,168 +50,70 @@ extension InputHandler {
       return true
     }
 
-    // MARK: Enter
+    // MARK: 批次集中處理某些常用功能鍵
 
-    if input.isEnter {
-      if state.type == .ofAssociates, !prefs.alsoConfirmAssociatedCandidatesByEnter {
-        delegate.switchState(IMEState.ofAbortion())
-        return true
-      }
-      delegate.candidateSelectionCalledByInputHandler(at: ctlCandidate.selectedCandidateIndex)
-      return true
-    }
-
-    // MARK: Tab
-
-    if input.isTab {
-      let updated: Bool =
-        prefs.specifyShiftTabKeyBehavior
-        ? (input.isShiftHold
-          ? ctlCandidate.showPreviousLine()
-          : ctlCandidate.showNextLine())
-        : (input.isShiftHold
-          ? ctlCandidate.highlightPreviousCandidate()
-          : ctlCandidate.highlightNextCandidate())
-      if !updated {
-        delegate.callError("9B691919")
-      }
-      return true
-    }
-
-    // MARK: Space
-
-    if input.isSpace {
-      let updated: Bool =
-        prefs.specifyShiftSpaceKeyBehavior
-        ? (input.isShiftHold
-          ? ctlCandidate.highlightNextCandidate()
-          : ctlCandidate.showNextLine())
-        : (input.isShiftHold
-          ? ctlCandidate.showNextLine()
-          : ctlCandidate.highlightNextCandidate())
-      if !updated {
-        delegate.callError("A11C781F")
-      }
-      return true
-    }
-
-    // MARK: PgDn
-
-    if input.isPageDown {
-      let updated: Bool = ctlCandidate.showNextPage()
-      if !updated {
-        delegate.callError("9B691919")
-      }
-      return true
-    }
-
-    // MARK: PgUp
-
-    if input.isPageUp {
-      let updated: Bool = ctlCandidate.showPreviousPage()
-      if !updated {
-        delegate.callError("9569955D")
-      }
-      return true
-    }
-
-    // MARK: Left Arrow
-
-    if input.isLeft {
-      switch ctlCandidate.currentLayout {
-        case .horizontal:
-          if !ctlCandidate.highlightPreviousCandidate() {
-            delegate.callError("1145148D")
+    if let keyCodeType = KeyCode(rawValue: input.keyCode) {
+      switch keyCodeType {
+        case .kLineFeed, .kCarriageReturn:
+          if state.type == .ofAssociates, !prefs.alsoConfirmAssociatedCandidatesByEnter {
+            delegate.switchState(IMEState.ofAbortion())
+            return true
           }
-        case .vertical:
-          if !ctlCandidate.showPreviousLine() {
-            delegate.callError("1919810D")
+          delegate.candidateSelectionCalledByInputHandler(at: ctlCandidate.selectedCandidateIndex)
+          return true
+        case .kTab:
+          let updated: Bool =
+            prefs.specifyShiftTabKeyBehavior
+            ? (input.isShiftHold
+              ? ctlCandidate.showPreviousLine()
+              : ctlCandidate.showNextLine())
+            : (input.isShiftHold
+              ? ctlCandidate.highlightPreviousCandidate()
+              : ctlCandidate.highlightNextCandidate())
+          _ = updated ? {}() : delegate.callError("9B691919")
+          return true
+        case .kSpace:
+          let updated: Bool =
+            prefs.specifyShiftSpaceKeyBehavior
+            ? (input.isShiftHold
+              ? ctlCandidate.highlightNextCandidate()
+              : ctlCandidate.showNextLine())
+            : (input.isShiftHold
+              ? ctlCandidate.showNextLine()
+              : ctlCandidate.highlightNextCandidate())
+          _ = updated ? {}() : delegate.callError("A11C781F")
+          return true
+        case .kPageDown:
+          _ = ctlCandidate.showNextPage() ? {}() : delegate.callError("9B691919")
+          return true
+        case .kPageUp:
+          _ = ctlCandidate.showPreviousPage() ? {}() : delegate.callError("9569955D")
+          return true
+        case .kUpArrow, .kDownArrow, .kLeftArrow, .kRightArrow:
+          handleArrowKey: switch (keyCodeType, ctlCandidate.currentLayout) {
+            case (.kLeftArrow, .horizontal), (.kUpArrow, .vertical):  // Previous Candidate
+              _ = ctlCandidate.highlightPreviousCandidate() ? {}() : delegate.callError("5548FD14")
+            case (.kRightArrow, .horizontal), (.kDownArrow, .vertical):  // Next Candidate
+              _ = ctlCandidate.highlightNextCandidate() ? {}() : delegate.callError("3CEFB82E")
+            case (.kUpArrow, .horizontal), (.kLeftArrow, .vertical):  // Previous Line
+              _ = ctlCandidate.showPreviousLine() ? {}() : delegate.callError("827BBD79")
+            case (.kDownArrow, .horizontal), (.kRightArrow, .vertical):  // Next Line
+              _ = ctlCandidate.showNextLine() ? {}() : delegate.callError("7A0C7FBD")
+            default: break handleArrowKey
           }
-        @unknown default:
-          break
-      }
-      return true
-    }
-
-    // MARK: Right Arrow
-
-    if input.isRight {
-      switch ctlCandidate.currentLayout {
-        case .horizontal:
-          if !ctlCandidate.highlightNextCandidate() {
-            delegate.callError("9B65138D")
-          }
-        case .vertical:
-          if !ctlCandidate.showNextLine() {
-            delegate.callError("9244908D")
-          }
-        @unknown default:
-          break
-      }
-      return true
-    }
-
-    // MARK: Up Arrow
-
-    if input.isUp {
-      switch ctlCandidate.currentLayout {
-        case .horizontal:
-          if !ctlCandidate.showPreviousLine() {
-            delegate.callError("9B614524")
-          }
-        case .vertical:
-          if !ctlCandidate.highlightPreviousCandidate() {
-            delegate.callError("ASD9908D")
-          }
-        @unknown default:
-          break
-      }
-      return true
-    }
-
-    // MARK: Down Arrow
-
-    if input.isDown {
-      switch ctlCandidate.currentLayout {
-        case .horizontal:
-          if !ctlCandidate.showNextLine() {
-            delegate.callError("92B990DD")
-            break
-          }
-        case .vertical:
-          if !ctlCandidate.highlightNextCandidate() {
-            delegate.callError("6B99908D")
-          }
-        @unknown default:
-          break
-      }
-      return true
-    }
-
-    // MARK: Home Key
-
-    if input.isHome {
-      if ctlCandidate.selectedCandidateIndex == 0 {
-        delegate.callError("9B6EDE8D")
-      } else {
-        ctlCandidate.selectedCandidateIndex = 0
-      }
-
-      return true
-    }
-
-    // MARK: End Key
-
-    if state.candidates.isEmpty {
-      return false
-    } else {  // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
-      if input.isEnd {
-        if ctlCandidate.selectedCandidateIndex == state.candidates.count - 1 {
-          delegate.callError("9B69AAAD")
-        } else {
-          ctlCandidate.selectedCandidateIndex = state.candidates.count - 1
-        }
-        return true
+          return true
+        case .kHome:
+          _ =
+            (ctlCandidate.selectedCandidateIndex == 0)
+            ? delegate.callError("9B6EDE8D") : (ctlCandidate.selectedCandidateIndex = 0)
+          return true
+        case .kEnd:
+          let maxIndex = state.candidates.count - 1
+          _ =
+            (ctlCandidate.selectedCandidateIndex == maxIndex)
+            ? delegate.callError("9B69AAAD") : (ctlCandidate.selectedCandidateIndex = maxIndex)
+          return true
+        default: break
       }
     }
 
