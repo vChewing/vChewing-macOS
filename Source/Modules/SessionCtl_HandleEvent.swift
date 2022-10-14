@@ -16,6 +16,7 @@ import Shared
 
 extension SessionCtl {
   /// 接受所有鍵鼠事件為 NSEvent，讓輸入法判斷是否要處理、該怎樣處理。
+  /// 然後再交給 InputHandler.handleEvent() 分診。
   /// - Parameters:
   ///   - event: 裝置操作輸入事件，可能會是 nil。
   ///   - sender: 呼叫了該函式的客體（無須使用）。

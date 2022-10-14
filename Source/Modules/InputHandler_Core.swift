@@ -274,10 +274,8 @@ public class InputHandler: InputHandlerProtocol {
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
     var arrCandidates: [Megrez.Compositor.KeyValuePaired] = {
       switch prefs.useRearCursorMode {
-        case false:
-          return compositor.fetchCandidates(at: cursorForCandidate, filter: .endAt)
-        case true:
-          return compositor.fetchCandidates(at: cursorForCandidate, filter: .beginAt)
+        case false: return compositor.fetchCandidates(at: cursorForCandidate, filter: .endAt)
+        case true: return compositor.fetchCandidates(at: cursorForCandidate, filter: .beginAt)
       }
     }()
 
@@ -349,36 +347,21 @@ public class InputHandler: InputHandlerProtocol {
   /// 給注拼槽指定注音排列或拼音輸入種類之後，將注拼槽內容清空。
   public func ensureKeyboardParser() {
     switch currentKeyboardParserType {
-      case KeyboardParser.ofStandard:
-        composer.ensureParser(arrange: .ofDachen)
-      case KeyboardParser.ofDachen26:
-        composer.ensureParser(arrange: .ofDachen26)
-      case KeyboardParser.ofETen:
-        composer.ensureParser(arrange: .ofETen)
-      case KeyboardParser.ofHsu:
-        composer.ensureParser(arrange: .ofHsu)
-      case KeyboardParser.ofETen26:
-        composer.ensureParser(arrange: .ofETen26)
-      case KeyboardParser.ofIBM:
-        composer.ensureParser(arrange: .ofIBM)
-      case KeyboardParser.ofMiTAC:
-        composer.ensureParser(arrange: .ofMiTAC)
-      case KeyboardParser.ofFakeSeigyou:
-        composer.ensureParser(arrange: .ofFakeSeigyou)
-      case KeyboardParser.ofSeigyou:
-        composer.ensureParser(arrange: .ofSeigyou)
-      case KeyboardParser.ofStarlight:
-        composer.ensureParser(arrange: .ofStarlight)
-      case KeyboardParser.ofHanyuPinyin:
-        composer.ensureParser(arrange: .ofHanyuPinyin)
-      case KeyboardParser.ofSecondaryPinyin:
-        composer.ensureParser(arrange: .ofSecondaryPinyin)
-      case KeyboardParser.ofYalePinyin:
-        composer.ensureParser(arrange: .ofYalePinyin)
-      case KeyboardParser.ofHualuoPinyin:
-        composer.ensureParser(arrange: .ofHualuoPinyin)
-      case KeyboardParser.ofUniversalPinyin:
-        composer.ensureParser(arrange: .ofUniversalPinyin)
+      case KeyboardParser.ofStandard: composer.ensureParser(arrange: .ofDachen)
+      case KeyboardParser.ofDachen26: composer.ensureParser(arrange: .ofDachen26)
+      case KeyboardParser.ofETen: composer.ensureParser(arrange: .ofETen)
+      case KeyboardParser.ofHsu: composer.ensureParser(arrange: .ofHsu)
+      case KeyboardParser.ofETen26: composer.ensureParser(arrange: .ofETen26)
+      case KeyboardParser.ofIBM: composer.ensureParser(arrange: .ofIBM)
+      case KeyboardParser.ofMiTAC: composer.ensureParser(arrange: .ofMiTAC)
+      case KeyboardParser.ofFakeSeigyou: composer.ensureParser(arrange: .ofFakeSeigyou)
+      case KeyboardParser.ofSeigyou: composer.ensureParser(arrange: .ofSeigyou)
+      case KeyboardParser.ofStarlight: composer.ensureParser(arrange: .ofStarlight)
+      case KeyboardParser.ofHanyuPinyin: composer.ensureParser(arrange: .ofHanyuPinyin)
+      case KeyboardParser.ofSecondaryPinyin: composer.ensureParser(arrange: .ofSecondaryPinyin)
+      case KeyboardParser.ofYalePinyin: composer.ensureParser(arrange: .ofYalePinyin)
+      case KeyboardParser.ofHualuoPinyin: composer.ensureParser(arrange: .ofHualuoPinyin)
+      case KeyboardParser.ofUniversalPinyin: composer.ensureParser(arrange: .ofUniversalPinyin)
     }
     composer.clear()
     composer.phonabetCombinationCorrectionEnabled = prefs.autoCorrectReadingCombination
