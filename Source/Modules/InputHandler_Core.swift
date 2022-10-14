@@ -320,7 +320,7 @@ public class InputHandler: InputHandlerProtocol {
           key: newestSuggestedCandidate.0, value: newestSuggestedCandidate.1.value
         )
         vCLog(
-          "UOM: Suggestion retrieved, overriding the node score of the selected candidate: \(suggestedPair.toNGramKey)")
+          "UOM: Suggestion received, overriding the node score of the selected candidate: \(suggestedPair.toNGramKey)")
         if !compositor.overrideCandidate(suggestedPair, at: cursorForCandidate, overrideType: overrideBehavior) {
           compositor.overrideCandidateLiteral(
             newestSuggestedCandidate.1.value, at: cursorForCandidate, overrideType: overrideBehavior
@@ -336,13 +336,8 @@ public class InputHandler: InputHandlerProtocol {
   // MARK: - Extracted methods and functions (Tekkon).
 
   /// 獲取與當前注音排列或拼音輸入種類有關的標點索引鍵，以英數下畫線「_」結尾。
-  var currentKeyboardParser: String {
-    currentKeyboardParserType.name + "_"
-  }
-
-  var currentKeyboardParserType: KeyboardParser {
-    .init(rawValue: prefs.keyboardParser) ?? .ofStandard
-  }
+  var currentKeyboardParser: String { currentKeyboardParserType.name + "_" }
+  var currentKeyboardParserType: KeyboardParser { .init(rawValue: prefs.keyboardParser) ?? .ofStandard }
 
   /// 給注拼槽指定注音排列或拼音輸入種類之後，將注拼槽內容清空。
   public func ensureKeyboardParser() {
@@ -400,9 +395,7 @@ public class InputHandler: InputHandlerProtocol {
   /// - Parameter input: 輸入的按鍵訊號。
   /// - Returns: 生成的標點符號索引鍵。
   func generatePunctuationNamePrefix(withKeyCondition input: InputSignalProtocol) -> String {
-    if prefs.halfWidthPunctuationEnabled {
-      return "_half_punctuation_"
-    }
+    if prefs.halfWidthPunctuationEnabled { return "_half_punctuation_" }
     switch (input.isControlHold, input.isOptionHold) {
       case (true, true): return "_alt_ctrl_punctuation_"
       case (true, false): return "_ctrl_punctuation_"
@@ -430,9 +423,7 @@ extension InputHandler {
       compositor.width > compositorWidthLimit,
       let identifier = delegate?.clientBundleIdentifier,
       prefs.clientsIMKTextInputIncapable.contains(identifier)
-    else {
-      return ""
-    }
+    else { return "" }
     // 回頭在這裡插上對 Steam 的 Client Identifier 的要求。
     var textToCommit = ""
     while compositor.width > compositorWidthLimit {
@@ -447,13 +438,9 @@ extension InputHandler {
       }
       let newCursor = max(compositor.cursor - delta, 0)
       compositor.cursor = 0
-      if !node.isReadingMismatched {
-        consolidateCursorContext(with: node.currentPair)
-      }
+      if !node.isReadingMismatched { consolidateCursorContext(with: node.currentPair) }
       // 威注音不支援 Bigram，所以無須考慮前後節點「是否需要鞏固」。
-      for _ in 0..<delta {
-        compositor.dropKey(direction: .front)
-      }
+      for _ in 0..<delta { compositor.dropKey(direction: .front) }
       compositor.cursor = newCursor
       walk()
     }

@@ -252,7 +252,6 @@ extension InputHandler {
         clear()  // 這句不要砍，因為下文可能會回呼 candidateState。
         if let candidateToCommit: (String, String) = candidateState.candidates.first, !candidateToCommit.1.isEmpty {
           delegate.switchState(IMEState.ofCommitting(textToCommit: candidateToCommit.1))
-          delegate.switchState(IMEState.ofEmpty())
         } else {
           delegate.switchState(candidateState)
         }
@@ -265,13 +264,12 @@ extension InputHandler {
 
   /// Enter 鍵的處理。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func handleEnter() -> Bool {
+  @discardableResult func handleEnter() -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
 
     delegate.switchState(IMEState.ofCommitting(textToCommit: state.displayedText))
-    delegate.switchState(IMEState.ofEmpty())
     return true
   }
 
@@ -295,7 +293,6 @@ extension InputHandler {
     }
 
     delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
-    delegate.switchState(IMEState.ofEmpty())
     return true
   }
 
@@ -327,7 +324,6 @@ extension InputHandler {
     }
 
     delegate.switchState(IMEState.ofCommitting(textToCommit: composed))
-    delegate.switchState(IMEState.ofEmpty())
     return true
   }
 
@@ -432,9 +428,7 @@ extension InputHandler {
     guard let delegate = delegate else { return false }
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
-    if !composer.isEmpty {
-      delegate.callError("9B6F908D")
-    }
+    if !composer.isEmpty { delegate.callError("9B6F908D") }
     delegate.switchState(state)
     return true
   }
@@ -616,9 +610,7 @@ extension InputHandler {
         delegate.switchState(state)
       }
     } else if input.isOptionHold {
-      if input.isControlHold {
-        return handleHome()
-      }
+      if input.isControlHold { return handleHome() }
       // 游標跳轉動作無論怎樣都會執行，但如果出了執行失敗的結果的話則觸發報錯流程。
       if !compositor.jumpCursorBySpan(to: .rear) {
         delegate.callError("8D50DD9E")
