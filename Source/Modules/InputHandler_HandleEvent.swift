@@ -25,8 +25,7 @@ extension InputHandler {
   /// 再根據返回的 result bool 數值來告知 IMK「這個按鍵事件是被處理了還是被放行了」。
   /// 這裡不用 handleCandidate() 是因為需要針對聯想詞輸入狀態做額外處理。
   private func doHandleInput(_ event: NSEvent) -> Bool {
-    guard let delegate = delegate else { return false }
-    return handleInput(event: event, state: delegate.state) { errorString in
+    handleInput(event: event) { errorString in
       vCLog(errorString)
       IMEApp.buzz()
     }
