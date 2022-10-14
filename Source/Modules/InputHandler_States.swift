@@ -708,28 +708,15 @@ extension InputHandler {
       }
     } else {
       for candidate in candidates {
-        if candidate == currentPaired {
-          if reverseOrder {
-            if currentIndex == 0 {
-              currentIndex = candidates.count - 1
-            } else {
-              currentIndex -= 1
-            }
-          } else {
-            currentIndex += 1
-          }
-          break
-        }
-        currentIndex += 1
+        currentIndex =
+          (candidate == currentPaired && reverseOrder)
+          ? ((currentIndex == 0) ? candidates.count - 1 : currentIndex - 1) : currentIndex + 1
+        if candidate == currentPaired { break }
       }
     }
 
-    if currentIndex >= candidates.count {
-      currentIndex = 0
-    }
-
+    if currentIndex >= candidates.count { currentIndex = 0 }
     consolidateNode(candidate: candidates[currentIndex], respectCursorPushing: false, preConsolidate: false)
-
     delegate.switchState(generateStateOfInputting())
     return true
   }
