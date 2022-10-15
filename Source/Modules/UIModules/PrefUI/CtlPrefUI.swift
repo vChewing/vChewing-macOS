@@ -40,6 +40,16 @@ extension NSImage {
     }
   }
 
+  static var tabImageCassette: NSImage! {
+    if #unavailable(macOS 11.0) {
+      return NSImage(named: "PrefToolbar-Cassette")
+    } else {
+      return NSImage(
+        systemSymbolName: "externaldrive.fill.badge.plus", accessibilityDescription: "Cassette Preferences"
+      )
+    }
+  }
+
   static var tabImageKeyboard: NSImage! {
     if #unavailable(macOS 11.0) {
       return NSImage(named: "PrefToolbar-Keyboard")
@@ -90,6 +100,13 @@ class CtlPrefUI {
         toolbarIcon: .tabImageDictionary
       ) {
         VwrPrefPaneDictionary()
+      },
+      SSPreferences.Pane(
+        identifier: SSPreferences.PaneIdentifier(rawValue: "Cassette"),
+        title: NSLocalizedString("Cassette", comment: ""),
+        toolbarIcon: .tabImageCassette
+      ) {
+        VwrPrefPaneCassette()
       },
       SSPreferences.Pane(
         identifier: SSPreferences.PaneIdentifier(rawValue: "Keyboard"),

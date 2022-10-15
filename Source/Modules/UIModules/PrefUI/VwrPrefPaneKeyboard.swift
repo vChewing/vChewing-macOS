@@ -33,6 +33,8 @@ struct VwrPrefPaneKeyboard: View {
     forKey: UserDef.kUsingHotKeyHalfWidthASCII.rawValue)
   @State private var selUsingHotKeyCurrencyNumerals = UserDefaults.standard.bool(
     forKey: UserDef.kUsingHotKeyCurrencyNumerals.rawValue)
+  @State private var selUsingHotKeyCassette = UserDefaults.standard.bool(
+    forKey: UserDef.kUsingHotKeyCassette.rawValue)
 
   private let contentMaxHeight: Double = 440
   private let contentWidth: Double = {
@@ -270,6 +272,12 @@ struct VwrPrefPaneKeyboard: View {
                 LocalizedStringKey("Currency Numeral Output"),
                 isOn: $selUsingHotKeyCurrencyNumerals.onChange {
                   PrefMgr.shared.usingHotKeyCurrencyNumerals = selUsingHotKeyCurrencyNumerals
+                }
+              )
+              Toggle(
+                LocalizedStringKey("CIN Cassette Mode"),
+                isOn: $selUsingHotKeyCassette.onChange {
+                  PrefMgr.shared.usingHotKeyCassette = selUsingHotKeyCassette
                 }
               )
             }

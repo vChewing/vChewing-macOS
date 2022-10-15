@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -15,6 +16,7 @@
                 <outlet property="lblCurrentlySpecifiedUserDataFolder" destination="REC-r4-T7m" id="eEq-XN-mMq"/>
                 <outlet property="selectionKeyComboBox" destination="uHU-aL-du7" id="cEx-Ui-Phc"/>
                 <outlet property="uiLanguageButton" destination="oS6-u5-7dP" id="V3u-XK-z7G"/>
+                <outlet property="vwrCassette" destination="ZEr-3U-K9a" id="GrP-4e-JbJ"/>
                 <outlet property="vwrDevZone" destination="Qd7-ln-nNO" id="8mw-wO-gXS"/>
                 <outlet property="vwrDictionary" destination="Rnp-LM-RIF" id="8gY-ah-RT8"/>
                 <outlet property="vwrExperience" destination="XWo-36-xGi" id="pXF-Uv-Zs0"/>
@@ -1055,6 +1057,231 @@
             </constraints>
             <point key="canvasLocation" x="-400.5" y="-349.5"/>
         </visualEffectView>
+        <visualEffectView blendingMode="behindWindow" material="sidebar" state="followsWindowActiveState" id="ZEr-3U-K9a" userLabel="vwrCassette">
+            <rect key="frame" x="0.0" y="0.0" width="445" height="481"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+                <textField autoresizesSubviews="NO" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vgR-3O-aTP">
+                    <rect key="frame" x="18" y="445" width="409" height="16"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="16" id="0d5-PL-rme"/>
+                    </constraints>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Choose your desired cassette file path. Will be omitted if invalid." id="Iai-0X-nxi">
+                        <font key="font" metaFont="cellTitle"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="ZcE-jK-2vl">
+                    <rect key="frame" x="20" y="413" width="405" height="20"/>
+                    <subviews>
+                        <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8LP-EF-YwT" userLabel="btnOpenFolderToSpecifyForUserData">
+                            <rect key="frame" x="346" y="-1" width="30" height="21"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="30" id="dF8-pw-EM9"/>
+                                <constraint firstAttribute="height" constant="19" id="gBc-0g-Yjb"/>
+                            </constraints>
+                            <buttonCell key="cell" type="smallSquare" title="…" bezelStyle="smallSquare" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="V4e-Bu-wom">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <connections>
+                                <action selector="chooseCassettePath:" target="-2" id="Q7N-Im-hZd"/>
+                            </connections>
+                        </button>
+                        <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8fG-OI-45A" userLabel="btnOpenFolderToSpecifyForUserData">
+                            <rect key="frame" x="375" y="-1" width="30" height="21"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="19" id="uRx-hv-Oms"/>
+                                <constraint firstAttribute="width" constant="30" id="vN1-0q-FS0"/>
+                            </constraints>
+                            <buttonCell key="cell" type="smallSquare" title="×" bezelStyle="smallSquare" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="62c-wp-9mF">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <connections>
+                                <action selector="resetSpecifiedCassettePath:" target="-2" id="lFN-a2-ADt"/>
+                            </connections>
+                        </button>
+                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tXb-Gb-689">
+                            <rect key="frame" x="0.0" y="0.0" width="347" height="20"/>
+                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" allowsUndo="NO" borderStyle="border" baseWritingDirection="leftToRight" alignment="left" drawsBackground="YES" usesSingleLineMode="YES" id="upL-ba-fhJ">
+                                <font key="font" metaFont="cellTitle"/>
+                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                            <connections>
+                                <binding destination="32" name="displayPatternValue1" keyPath="values.CassettePath" id="DxA-Ba-LGE">
+                                    <dictionary key="options">
+                                        <string key="NSDisplayPattern">%{value1}@</string>
+                                    </dictionary>
+                                </binding>
+                            </connections>
+                        </textField>
+                    </subviews>
+                    <constraints>
+                        <constraint firstItem="tXb-Gb-689" firstAttribute="bottom" secondItem="8LP-EF-YwT" secondAttribute="bottom" id="5Gm-A1-naq"/>
+                        <constraint firstItem="8fG-OI-45A" firstAttribute="leading" secondItem="8LP-EF-YwT" secondAttribute="trailing" constant="-1" id="AMF-M3-5EL"/>
+                        <constraint firstItem="tXb-Gb-689" firstAttribute="top" secondItem="ZcE-jK-2vl" secondAttribute="top" id="CFA-Iq-Fxr"/>
+                        <constraint firstItem="tXb-Gb-689" firstAttribute="leading" secondItem="8LP-EF-YwT" secondAttribute="trailing" constant="-376" id="GJP-36-DlJ"/>
+                        <constraint firstItem="8fG-OI-45A" firstAttribute="leading" secondItem="tXb-Gb-689" secondAttribute="trailing" constant="28" id="de6-OI-qUZ"/>
+                        <constraint firstItem="8fG-OI-45A" firstAttribute="baseline" secondItem="8LP-EF-YwT" secondAttribute="baseline" id="hQG-rw-jO3"/>
+                        <constraint firstItem="tXb-Gb-689" firstAttribute="leading" secondItem="ZcE-jK-2vl" secondAttribute="leading" id="knW-na-MpT"/>
+                        <constraint firstItem="tXb-Gb-689" firstAttribute="firstBaseline" secondItem="8LP-EF-YwT" secondAttribute="baseline" id="pLQ-VZ-wue"/>
+                        <constraint firstItem="tXb-Gb-689" firstAttribute="centerY" secondItem="ZcE-jK-2vl" secondAttribute="centerY" id="pug-YN-KFi"/>
+                    </constraints>
+                </customView>
+                <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="11" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sgB-kZ-rJg">
+                    <rect key="frame" x="20" y="41" width="405" height="355"/>
+                    <subviews>
+                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="6" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6T7-2y-9JA">
+                            <rect key="frame" x="0.0" y="165" width="405" height="190"/>
+                            <subviews>
+                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="y75-fJ-x9L">
+                                    <rect key="frame" x="-1" y="173.5" width="311" height="17"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="Q0q-bq-qs4"/>
+                                    </constraints>
+                                    <buttonCell key="cell" type="check" title="Enable cassette mode, suppressing phonabet input" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="Grn-MZ-wTg">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="cellTitle"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="onToggleCassetteMode:" target="-2" id="0OS-EB-07O"/>
+                                        <binding destination="32" name="value" keyPath="values.CassetteEnabled" id="zBA-Is-Ejs"/>
+                                    </connections>
+                                </button>
+                                <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XN3-ki-c3E" userLabel="lblCassetteModeDescription">
+                                    <rect key="frame" x="-2" y="70" width="409" height="98"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="405" id="PvQ-jY-ScE"/>
+                                    </constraints>
+                                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="rXc-Ji-ery" userLabel="lblCassetteModeDescription">
+                                        <font key="font" metaFont="smallSystem"/>
+                                        <string key="title">Cassette mode is similar to the CIN support of the Yahoo Kimo IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated).</string>
+                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3eW-vq-tFr">
+                                    <rect key="frame" x="-1" y="47.5" width="281" height="17"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="AqD-B5-5qk"/>
+                                    </constraints>
+                                    <buttonCell key="cell" type="check" title="Show translated strokes in composition buffer" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="SzF-FL-sVO">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="cellTitle"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <binding destination="32" name="value" keyPath="values.ShowTranslatedStrokesInCompositionBuffer" id="wZl-Ll-NQE"/>
+                                    </connections>
+                                </button>
+                                <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="E3c-R8-OEL" userLabel="lblCassetteStrokeTranslation">
+                                    <rect key="frame" x="-2" y="0.0" width="409" height="42"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="405" id="Odf-Pf-V8x"/>
+                                    </constraints>
+                                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="BDG-qU-aj6" userLabel="lblCassetteStrokeTranslation">
+                                        <font key="font" metaFont="smallSystem"/>
+                                        <string key="title">All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file.</string>
+                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                            </subviews>
+                            <visibilityPriorities>
+                                <integer value="1000"/>
+                                <integer value="1000"/>
+                                <integer value="1000"/>
+                                <integer value="1000"/>
+                            </visibilityPriorities>
+                            <customSpacing>
+                                <real value="3.4028234663852886e+38"/>
+                                <real value="3.4028234663852886e+38"/>
+                                <real value="3.4028234663852886e+38"/>
+                                <real value="3.4028234663852886e+38"/>
+                            </customSpacing>
+                        </stackView>
+                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yaq-5S-KLW">
+                            <rect key="frame" x="-2" y="139" width="339" height="15"/>
+                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the Chinese conversion behavior in cassette mode." id="ego-1f-8cO">
+                                <font key="font" metaFont="cellTitle"/>
+                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
+                        <matrix wantsLayer="YES" verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="arI-0D-NxZ">
+                            <rect key="frame" x="0.0" y="53" width="319" height="75"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                            <size key="cellSize" width="319" height="15"/>
+                            <size key="intercellSpacing" width="4" height="5"/>
+                            <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="small" inset="2" id="AN5-Dl-pfG">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="cellTitle"/>
+                            </buttonCell>
+                            <cells>
+                                <column>
+                                    <buttonCell type="radio" title="Disable forced conversion for cassette outputs" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="Cp2-hn-bOq">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="cellTitle"/>
+                                    </buttonCell>
+                                    <buttonCell type="radio" title="Enforce conversion in both input modes" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="fQ0-Yu-pJF">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="cellTitle"/>
+                                    </buttonCell>
+                                    <buttonCell type="radio" title="Only enforce conversion in Simplified Chinese mode" imagePosition="left" alignment="left" controlSize="small" tag="2" inset="2" id="o3r-NZ-gsU">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="cellTitle"/>
+                                    </buttonCell>
+                                    <buttonCell type="radio" title="Only enforce conversion in Traditional Chinese mode" imagePosition="left" alignment="left" controlSize="small" tag="3" inset="2" id="cBw-gz-TXe">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="cellTitle"/>
+                                    </buttonCell>
+                                </column>
+                            </cells>
+                            <connections>
+                                <binding destination="32" name="selectedTag" keyPath="values.ForceCassetteChineseConversion" id="ZU7-OV-xvR"/>
+                            </connections>
+                        </matrix>
+                        <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="v8K-1M-luy" userLabel="lblCassetteChineseConversionDescription">
+                            <rect key="frame" x="-2" y="0.0" width="409" height="42"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="405" id="xko-lX-Yzn"/>
+                            </constraints>
+                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="j8q-IY-UF1" userLabel="lblCassetteChineseConversionDescription">
+                                <font key="font" metaFont="smallSystem"/>
+                                <string key="title">This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode.</string>
+                                <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
+                    </subviews>
+                    <visibilityPriorities>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                    </visibilityPriorities>
+                    <customSpacing>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                    </customSpacing>
+                </stackView>
+            </subviews>
+            <constraints>
+                <constraint firstItem="vgR-3O-aTP" firstAttribute="leading" secondItem="ZEr-3U-K9a" secondAttribute="leading" constant="20" id="2ZL-Nf-3gF"/>
+                <constraint firstItem="ZcE-jK-2vl" firstAttribute="leading" secondItem="vgR-3O-aTP" secondAttribute="leading" id="ETb-H9-QKi"/>
+                <constraint firstItem="sgB-kZ-rJg" firstAttribute="top" secondItem="ZcE-jK-2vl" secondAttribute="bottom" constant="17" id="J07-ha-M1S"/>
+                <constraint firstItem="vgR-3O-aTP" firstAttribute="top" secondItem="ZEr-3U-K9a" secondAttribute="top" constant="20" id="bmK-UB-TL6"/>
+                <constraint firstItem="ZcE-jK-2vl" firstAttribute="top" secondItem="vgR-3O-aTP" secondAttribute="bottom" constant="12" id="lgk-Qr-Zw7"/>
+                <constraint firstItem="ZcE-jK-2vl" firstAttribute="leading" secondItem="sgB-kZ-rJg" secondAttribute="leading" id="nRC-ks-Pxj"/>
+                <constraint firstItem="ZcE-jK-2vl" firstAttribute="trailing" secondItem="vgR-3O-aTP" secondAttribute="trailing" id="nkS-Us-Mz7"/>
+                <constraint firstAttribute="trailing" secondItem="vgR-3O-aTP" secondAttribute="trailing" constant="20" id="wkh-Jj-wt0"/>
+            </constraints>
+            <point key="canvasLocation" x="101.5" y="-258.5"/>
+        </visualEffectView>
         <visualEffectView blendingMode="behindWindow" material="sidebar" state="followsWindowActiveState" id="U4q-xw-mc0" userLabel="vwrKeyboard">
             <rect key="frame" x="0.0" y="0.0" width="445" height="337"/>
             <autoresizingMask key="autoresizingMask"/>
@@ -1345,7 +1572,18 @@
                                 </connections>
                             </button>
                         </gridCell>
-                        <gridCell row="G9W-5h-yOs" column="O5B-2n-sum" id="sbB-Nr-6uh"/>
+                        <gridCell row="G9W-5h-yOs" column="O5B-2n-sum" id="sbB-Nr-6uh">
+                            <button key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zZA-X1-GCy" userLabel="UsingHotKeyCassette">
+                                <rect key="frame" x="199" y="-0.5" width="131" height="16"/>
+                                <buttonCell key="cell" type="check" title="CIN Cassette Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="1ll-Jn-OD5">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="cellTitle"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="32" name="value" keyPath="values.UsingHotKeyCassette" id="mDe-q0-XYa"/>
+                                </connections>
+                            </button>
+                        </gridCell>
                     </gridCells>
                 </gridView>
             </subviews>

@@ -19,6 +19,7 @@
 		5B21176C287539BB000443A9 /* SessionCtl_HandleStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176B287539BB000443A9 /* SessionCtl_HandleStates.swift */; };
 		5B21176E28753B35000443A9 /* SessionCtl_HandleDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176D28753B35000443A9 /* SessionCtl_HandleDisplay.swift */; };
 		5B21177028753B9D000443A9 /* SessionCtl_Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176F28753B9D000443A9 /* SessionCtl_Delegates.swift */; };
+		5B2E009428FD1E8100E78D6E /* VwrPrefPaneCassette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2E009328FD1E8100E78D6E /* VwrPrefPaneCassette.swift */; };
 		5B3133BF280B229700A4A505 /* InputHandler_States.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3133BE280B229700A4A505 /* InputHandler_States.swift */; };
 		5B40113928D7050D00A9D4CB /* Shared in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113828D7050D00A9D4CB /* Shared */; };
 		5B40113C28D71C0100A9D4CB /* Uninstaller in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113B28D71C0100A9D4CB /* Uninstaller */; };
@@ -221,6 +222,7 @@
 		5B21176D28753B35000443A9 /* SessionCtl_HandleDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCtl_HandleDisplay.swift; sourceTree = "<group>"; };
 		5B21176F28753B9D000443A9 /* SessionCtl_Delegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCtl_Delegates.swift; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
+		5B2E009328FD1E8100E78D6E /* VwrPrefPaneCassette.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VwrPrefPaneCassette.swift; sourceTree = "<group>"; };
 		5B2F2BB3286216A500B8557B /* vChewingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vChewingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
 		5B312684287800DE001AA720 /* FAQ.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = FAQ.md; sourceTree = "<group>"; };
@@ -535,6 +537,7 @@
 			isa = PBXGroup;
 			children = (
 				5BA9FD0C27FEDB6B002DE248 /* CtlPrefUI.swift */,
+				5B2E009328FD1E8100E78D6E /* VwrPrefPaneCassette.swift */,
 				5B78EE0C28A562B4009456C1 /* VwrPrefPaneDevZone.swift */,
 				5BA9FD0E27FEDB6B002DE248 /* VwrPrefPaneDictionary.swift */,
 				5BA9FD0D27FEDB6B002DE248 /* VwrPrefPaneExperience.swift */,
@@ -1182,6 +1185,7 @@
 				5BA9FD1327FEDB6B002DE248 /* VwrPrefPaneDictionary.swift in Sources */,
 				5BFDF011289635C100417BBC /* IMKCandidatesImpl.swift in Sources */,
 				5BB802DA27FABA8300CF1C19 /* SessionCtl_Menu.swift in Sources */,
+				5B2E009428FD1E8100E78D6E /* VwrPrefPaneCassette.swift in Sources */,
 				5BE377A0288FED8D0037365B /* InputHandler_HandleComposition.swift in Sources */,
 				5B00FA0C28DEC17200F6D436 /* SessionCtl_IMKCandidatesData.swift in Sources */,
 			);
