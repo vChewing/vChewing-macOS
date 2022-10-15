@@ -68,7 +68,7 @@ extension SessionCtl {
             if replace { state = previous }
           case .ofCommitting:
             commit(text: newState.textToCommit)
-            state = IMEState.ofEmpty()
+            if replace { state = IMEState.ofEmpty() }
           default: break innerCircle
         }
         ctlCandidateCurrent.visible = false
