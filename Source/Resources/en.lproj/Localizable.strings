@@ -10,7 +10,7 @@
 "Add Client" = "Add Client";
 "Remove Selected" = "Remove Selected";
 "Choose the target application bundle." = "Choose the target application bundle.";
-"The selected item is not a valid macOS application bundle." = "The selected item is not a valid macOS application bundle.";
+"The selected item is not a valid macOS application bundle, nor not having a valid app bundle identifier." = "The selected item is not a valid macOS application bundle, nor not having a valid app bundle identifier.";
 "Please try again." = "Please try again.";
 "The selected item's identifier is already in the list." = "The selected item's identifier is already in the list.";
 "Update Check Completed" = "Update Check Completed";
