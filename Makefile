@@ -55,6 +55,10 @@ clean:
 	xcodebuild -scheme vChewingInstaller -configuration Release $(BUILD_SETTINGS) clean
 	make clean --file=./Source/Data/Makefile || true
 
+clean-spm:
+	find . -name ".build" -exec rm -rf {} \;
+	rm -rf ./Packages/Build
+
 .PHONY: gc
 
 gc:
