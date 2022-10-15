@@ -37,6 +37,9 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kCheckUpdateAutomatically.rawValue, defaultValue: false)
   public var checkUpdateAutomatically: Bool
 
+  @AppProperty(key: UserDef.kCassettePath.rawValue, defaultValue: "")
+  public var cassettePath: String
+
   @AppProperty(key: UserDef.kUserDataFolderSpecified.rawValue, defaultValue: "")
   public var userDataFolderSpecified: String
 
@@ -137,6 +140,12 @@ public class PrefMgr: PrefMgrProtocol {
     }
   }
 
+  @AppProperty(key: UserDef.kShowTranslatedStrokesInCompositionBuffer.rawValue, defaultValue: true)
+  public var showTranslatedStrokesInCompositionBuffer: Bool
+
+  @AppProperty(key: UserDef.kForceCassetteChineseConversion.rawValue, defaultValue: 0)
+  public var forceCassetteChineseConversion: Int
+
   // MARK: - Settings (Tier 2)
 
   @AppProperty(key: UserDef.kUseIMKCandidateWindow.rawValue, defaultValue: false)
@@ -173,6 +182,13 @@ public class PrefMgr: PrefMgrProtocol {
   public var symbolInputEnabled: Bool {
     didSet {
       LMMgr.setSymbolEnabled(symbolInputEnabled)  // 很重要
+    }
+  }
+
+  @AppProperty(key: UserDef.kCassetteEnabled.rawValue, defaultValue: false)
+  public var cassetteEnabled: Bool {
+    didSet {
+      LMMgr.setCassetteEnabled(cassetteEnabled)  // 很重要
     }
   }
 
@@ -296,4 +312,7 @@ public class PrefMgr: PrefMgrProtocol {
 
   @AppProperty(key: UserDef.kUsingHotKeyCurrencyNumerals.rawValue, defaultValue: true)
   public var usingHotKeyCurrencyNumerals: Bool
+
+  @AppProperty(key: UserDef.kUsingHotKeyCassette.rawValue, defaultValue: true)
+  public var usingHotKeyCassette: Bool
 }
