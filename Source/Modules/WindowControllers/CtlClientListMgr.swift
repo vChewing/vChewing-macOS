@@ -103,31 +103,38 @@ extension CtlClientListMgr {
             "Choose the target application bundle.", comment: ""
           )
           dlgOpenPath.showsResizeIndicator = true
+          dlgOpenPath.allowsMultipleSelection = true
+          dlgOpenPath.allowedFileTypes = ["app"]
+          dlgOpenPath.allowsOtherFileTypes = false
           dlgOpenPath.showsHiddenFiles = true
           dlgOpenPath.canChooseFiles = true
           dlgOpenPath.canChooseDirectories = false
           dlgOpenPath.beginSheetModal(for: window) { result in
             switch result {
               case .OK:
-                guard let url = dlgOpenPath.url else { return }
-                var title = NSLocalizedString("The selected item is not a valid macOS application bundle.", comment: "")
-                let text = NSLocalizedString("Please try again.", comment: "")
-                guard let bundle = Bundle(url: url) else {
-                  self.callAlert(window, title: title, text: text)
-                  return
-                }
-                guard let identifier = bundle.bundleIdentifier else {
-                  self.callAlert(window, title: title, text: text)
-                  return
-                }
-                if PrefMgr.shared.clientsIMKTextInputIncapable.contains(identifier) {
-                  title = NSLocalizedString(
-                    "The selected item's identifier is already in the list.", comment: ""
+                for url in dlgOpenPath.urls {
+                  var title = NSLocalizedString(
+                    "The selected item is not a valid macOS application bundle, nor not having a valid app bundle identifier.",
+                    comment: ""
                   )
-                  self.callAlert(window, title: title)
-                  return
+                  let text = url.path + "\n\n" + NSLocalizedString("Please try again.", comment: "")
+                  guard let bundle = Bundle(url: url) else {
+                    self.callAlert(window, title: title, text: text)
+                    return
+                  }
+                  guard let identifier = bundle.bundleIdentifier else {
+                    self.callAlert(window, title: title, text: text)
+                    return
+                  }
+                  if PrefMgr.shared.clientsIMKTextInputIncapable.contains(identifier) {
+                    title = NSLocalizedString(
+                      "The selected item's identifier is already in the list.", comment: ""
+                    )
+                    self.callAlert(window, title: title, text: identifier + "\n\n" + url.path)
+                    return
+                  }
+                  self.applyNewValue(identifier)
                 }
-                self.applyNewValue(identifier)
               default: return
             }
           }
