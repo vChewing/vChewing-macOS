@@ -30,6 +30,7 @@ extension vChewingLM {
   /// 語言模組的相關資料的存放位置，僅藉由參數來讀取相關訊息。
   public class LMInstantiator: LangModelProtocol {
     // 在函式內部用以記錄狀態的開關。
+    public var isCassetteEnabled = false
     public var isPhraseReplacementEnabled = false
     public var isCNSEnabled = false
     public var isSymbolEnabled = false
@@ -71,6 +72,10 @@ extension vChewingLM {
       reverse: true, consolidate: false, defaultScore: -13.0, forceDefaultScore: false
     )
 
+    // 磁帶資料模組。「currentCassette」對外唯讀，僅用來讀取磁帶本身的中繼資料（Metadata）。
+    static var lmCassette = LMCassette()
+    public var currentCassette: LMCassette { Self.lmCassette }
+
     // 聲明使用者語言模組。
     // 使用者語言模組使用多執行緒的話，可能會導致一些問題。有時間再仔細排查看看。
     var lmUserPhrases = LMCoreEX(
@@ -98,11 +103,11 @@ extension vChewingLM {
       }
     }
 
-    public var isCNSDataLoaded: Bool { vChewingLM.LMInstantiator.lmCNS.isLoaded }
+    public var isCNSDataLoaded: Bool { Self.lmCNS.isLoaded }
     public func loadCNSData(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
-        vChewingLM.LMInstantiator.lmCNS.open(path)
-        vCLog("lmCNS: \(vChewingLM.LMInstantiator.lmCNS.count) entries of data loaded from: \(path)")
+        Self.lmCNS.open(path)
+        vCLog("lmCNS: \(Self.lmCNS.count) entries of data loaded from: \(path)")
       } else {
         vCLog("lmCNS: File access failure: \(path)")
       }
@@ -118,12 +123,12 @@ extension vChewingLM {
       }
     }
 
-    public var isSymbolDataLoaded: Bool { vChewingLM.LMInstantiator.lmSymbols.isLoaded }
+    public var isSymbolDataLoaded: Bool { Self.lmSymbols.isLoaded }
     public func loadSymbolData(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
-        vChewingLM.LMInstantiator.lmSymbols.open(path)
+        Self.lmSymbols.open(path)
         vCLog(
-          "lmSymbol: \(vChewingLM.LMInstantiator.lmSymbols.count) entries of data loaded from: \(path)")
+          "lmSymbol: \(Self.lmSymbols.count) entries of data loaded from: \(path)")
       } else {
         vCLog("lmSymbols: File access failure: \(path)")
       }
@@ -200,6 +205,18 @@ extension vChewingLM {
       }
     }
 
+    public func loadCassetteData(path: String) {
+      DispatchQueue.main.async {
+        if FileManager.default.isReadableFile(atPath: path) {
+          Self.lmCassette.close()
+          Self.lmCassette.open(path)
+          vCLog("lmCassette: \(Self.lmCassette.count) entries of data loaded from: \(path)")
+        } else {
+          vCLog("lmCassette: File access failure: \(path)")
+        }
+      }
+    }
+
     // MARK: - 核心函式（對外）
 
     public func hasAssociatedPhrasesFor(pair: Megrez.Compositor.KeyValuePaired) -> Bool {
@@ -217,6 +234,7 @@ extension vChewingLM {
       if key == " " { return true }
       if !lmFiltered.hasUnigramsFor(key: key) {
         return lmUserPhrases.hasUnigramsFor(key: key) || lmCore.hasUnigramsFor(key: key)
+          || Self.lmCassette.hasUnigramsFor(key: key) || (Self.lmCNS.hasUnigramsFor(key: key) && isCNSEnabled)
       }
       return !unigramsFor(key: key).isEmpty
     }
@@ -240,6 +258,8 @@ extension vChewingLM {
       /// 準備不同的語言模組容器，開始逐漸往容器陣列內塞入資料。
       var rawAllUnigrams: [Megrez.Unigram] = []
 
+      if isCassetteEnabled { rawAllUnigrams += Self.lmCassette.unigramsFor(key: key) }
+
       // 如果有檢測到使用者自訂逐字選字語料庫內的相關資料的話，在這裡先插入。
       if isSCPCEnabled {
         rawAllUnigrams += lmPlainBopomofo.valuesFor(key: key).map { Megrez.Unigram(value: $0, score: 0) }
@@ -255,12 +275,12 @@ extension vChewingLM {
       rawAllUnigrams += lmCore.unigramsFor(key: key)
 
       if isCNSEnabled {
-        rawAllUnigrams += vChewingLM.LMInstantiator.lmCNS.unigramsFor(key: key)
+        rawAllUnigrams += Self.lmCNS.unigramsFor(key: key)
       }
 
       if isSymbolEnabled {
         rawAllUnigrams += lmUserSymbols.unigramsFor(key: key)
-        rawAllUnigrams += vChewingLM.LMInstantiator.lmSymbols.unigramsFor(key: key)
+        rawAllUnigrams += Self.lmSymbols.unigramsFor(key: key)
       }
 
       // 新增與日期、時間、星期有關的單元圖資料
