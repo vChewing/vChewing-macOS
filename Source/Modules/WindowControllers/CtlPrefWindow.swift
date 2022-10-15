@@ -18,14 +18,15 @@ extension NSToolbarItem.Identifier {
   fileprivate static let ofGeneral = NSToolbarItem.Identifier(rawValue: "tabGeneral")
   fileprivate static let ofExperience = NSToolbarItem.Identifier(rawValue: "tabExperience")
   fileprivate static let ofDictionary = NSToolbarItem.Identifier(rawValue: "tabDictionary")
+  fileprivate static let ofCassette = NSToolbarItem.Identifier(rawValue: "tabCassette")
   fileprivate static let ofKeyboard = NSToolbarItem.Identifier(rawValue: "tabKeyboard")
   fileprivate static let ofDevZone = NSToolbarItem.Identifier(rawValue: "tabDevZone")
 }
 
-// Please note that the class should be exposed using the same class name
-// in Objective-C in order to let IMK to see the same class name as
-// the "InputMethodServerPreferencesWindowControllerClass" in Info.plist.
-@objc(CtlPrefWindow)
+// Note: The "InputMethodServerPreferencesWindowControllerClass" in Info.plist
+// only works with macOS System Preference pane (like macOS built-in input methods).
+// It should be set as "Preferences" which correspondes to the "Preference" pref pane
+// of this build target.
 class CtlPrefWindow: NSWindowController {
   @IBOutlet var fontSizePopUpButton: NSPopUpButton!
   @IBOutlet var uiLanguageButton: NSPopUpButton!
@@ -40,6 +41,7 @@ class CtlPrefWindow: NSWindowController {
   @IBOutlet var vwrGeneral: NSView!
   @IBOutlet var vwrExperience: NSView!
   @IBOutlet var vwrDictionary: NSView!
+  @IBOutlet var vwrCassette: NSView!
   @IBOutlet var vwrKeyboard: NSView!
   @IBOutlet var vwrDevZone: NSView!
 
@@ -276,7 +278,68 @@ class CtlPrefWindow: NSWindowController {
         return
       }
     }
-  }  // End IBAction
+  }
+
+  @IBAction func onToggleCassetteMode(_: Any) {
+    if PrefMgr.shared.cassetteEnabled, !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
+      if let window = window {
+        let alert = NSAlert(error: NSLocalizedString("Path invalid or file access error.", comment: ""))
+        alert.informativeText =
+          "Please reconfigure the cassette path to a valid one before enabling this mode."
+        alert.beginSheetModal(for: window) { _ in
+          LMMgr.resetCassettePath()
+          PrefMgr.shared.cassetteEnabled = false
+        }
+        IMEApp.buzz()
+      }
+    } else {
+      LMMgr.loadCassetteData()
+    }
+  }
+
+  @IBAction func resetSpecifiedCassettePath(_: Any) {
+    LMMgr.resetCassettePath()
+  }
+
+  @IBAction func chooseCassettePath(_: Any) {
+    guard let window = window else { return }
+    let dlgOpenFile = NSOpenPanel()
+    dlgOpenFile.title = NSLocalizedString(
+      "Choose your desired cassette file path.", comment: ""
+    )
+    dlgOpenFile.showsResizeIndicator = true
+    dlgOpenFile.showsHiddenFiles = true
+    dlgOpenFile.canChooseFiles = true
+    dlgOpenFile.canChooseDirectories = false
+    dlgOpenFile.allowsMultipleSelection = false
+    dlgOpenFile.allowedFileTypes = ["cin"]
+    dlgOpenFile.allowsOtherFileTypes = true
+
+    let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(
+      PrefMgr.shared.cassettePath.expandingTildeInPath)
+
+    dlgOpenFile.beginSheetModal(for: window) { result in
+      if result == NSApplication.ModalResponse.OK {
+        guard let url = dlgOpenFile.url else { return }
+        if LMMgr.checkCassettePathValidity(url.path) {
+          PrefMgr.shared.cassettePath = url.path
+          BookmarkManager.shared.saveBookmark(for: url)
+          LMMgr.loadCassetteData()
+        } else {
+          IMEApp.buzz()
+          if !bolPreviousPathValidity {
+            LMMgr.resetCassettePath()
+          }
+          return
+        }
+      } else {
+        if !bolPreviousPathValidity {
+          LMMgr.resetCassettePath()
+        }
+        return
+      }
+    }
+  }
 }
 
 extension CtlPrefWindow: NSToolbarDelegate {
@@ -296,9 +359,7 @@ extension CtlPrefWindow: NSToolbarDelegate {
   }
 
   var toolbarIdentifiers: [NSToolbarItem.Identifier] {
-    // if #unavailable(macOS 10.13) { return [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard] }
-    // return [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard, .ofDevZone]
-    [.ofGeneral, .ofExperience, .ofDictionary, .ofKeyboard]
+    [.ofGeneral, .ofExperience, .ofDictionary, .ofCassette, .ofKeyboard]
   }
 
   func toolbarDefaultItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
@@ -326,6 +387,11 @@ extension CtlPrefWindow: NSToolbarDelegate {
   @objc func showDictionaryView(_: Any?) {
     use(view: vwrDictionary)
     window?.toolbar?.selectedItemIdentifier = .ofDictionary
+  }
+
+  @objc func showCassetteView(_: Any?) {
+    use(view: vwrCassette)
+    window?.toolbar?.selectedItemIdentifier = .ofCassette
   }
 
   @objc func showKeyboardView(_: Any?) {
@@ -362,6 +428,12 @@ extension CtlPrefWindow: NSToolbarDelegate {
         item.label = title
         item.image = .tabImageDictionary
         item.action = #selector(showDictionaryView(_:))
+
+      case .ofCassette:
+        let title = NSLocalizedString("Cassette", comment: "")
+        item.label = title
+        item.image = .tabImageCassette
+        item.action = #selector(showCassetteView(_:))
 
       case .ofKeyboard:
         let title = NSLocalizedString("Keyboard", comment: "")

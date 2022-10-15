@@ -13,7 +13,7 @@ import SwiftUI
 
 @available(macOS 10.15, *)
 struct VwrPrefPaneDictionary: View {
-  private var fdrDefault = LMMgr.dataFolderPath(isDefaultFolder: true)
+  private var fdrUserDataDefault: String { LMMgr.dataFolderPath(isDefaultFolder: true) }
   @State private var tbxUserDataPathSpecified: String =
     UserDefaults.standard.string(forKey: UserDef.kUserDataFolderSpecified.rawValue)
     ?? LMMgr.dataFolderPath(isDefaultFolder: true)
@@ -36,6 +36,7 @@ struct VwrPrefPaneDictionary: View {
     forKey: UserDef.kHardenVerticalPunctuations.rawValue)
 
   private static let dlgOpenPath = NSOpenPanel()
+  private static let dlgOpenFile = NSOpenPanel()
 
   private let contentMaxHeight: Double = 440
   private let contentWidth: Double = {
@@ -53,15 +54,17 @@ struct VwrPrefPaneDictionary: View {
 
   var body: some View {
     ScrollView {
-      Preferences.Container(contentWidth: contentWidth) {
-        Preferences.Section(title: "", bottomDivider: true) {
+      SSPreferences.Container(contentWidth: contentWidth) {
+        // MARK: - User Data Folder Path Management
+
+        SSPreferences.Section(title: "", bottomDivider: true) {
           Text(LocalizedStringKey("Choose your desired user data folder path. Will be omitted if invalid."))
           HStack {
             if #available(macOS 11.0, *) {
-              TextField(fdrDefault, text: $tbxUserDataPathSpecified).disabled(true)
+              TextField(fdrUserDataDefault, text: $tbxUserDataPathSpecified).disabled(true)
                 .help(tbxUserDataPathSpecified)
             } else {
-              TextField(fdrDefault, text: $tbxUserDataPathSpecified).disabled(true)
+              TextField(fdrUserDataDefault, text: $tbxUserDataPathSpecified).disabled(true)
                 .toolTip(tbxUserDataPathSpecified)
             }
             Button {
@@ -125,7 +128,10 @@ struct VwrPrefPaneDictionary: View {
             }
           ).controlSize(.small)
         }
-        Preferences.Section(title: "") {
+
+        // MARK: - Something Else
+
+        SSPreferences.Section(title: "") {
           Toggle(
             LocalizedStringKey("Only load factory language models if needed"),
             isOn: $selOnlyLoadFactoryLangModelsIfNeeded.onChange {
