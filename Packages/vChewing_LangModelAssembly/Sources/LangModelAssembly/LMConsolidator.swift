@@ -19,8 +19,10 @@ extension vChewingLM {
     /// - Returns: 結果正常則為真，其餘為假。
     public static func checkPragma(path: String) -> Bool {
       if FileManager.default.fileExists(atPath: path) {
-        let fileHandle = FileHandle(forReadingAtPath: path)!
         do {
+          guard let fileHandle = FileHandle(forReadingAtPath: path) else {
+            throw FileErrors.fileHandleError("")
+          }
           let lineReader = try LineReader(file: fileHandle)
           for strLine in lineReader {  // 不需要 i=0，因為第一遍迴圈就出結果。
             if strLine != kPragmaHeader {

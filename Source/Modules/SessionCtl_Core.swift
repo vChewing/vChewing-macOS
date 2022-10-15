@@ -62,7 +62,9 @@ public class SessionCtl: IMKInputController {
   }
 
   /// 按鍵調度模組的副本。
-  var inputHandler = InputHandler(lm: LMMgr.currentLM(), uom: LMMgr.currentUOM(), pref: PrefMgr.shared)
+  var inputHandler: InputHandlerProtocol = InputHandler(
+    lm: LMMgr.currentLM(), uom: LMMgr.currentUOM(), pref: PrefMgr.shared
+  )
   /// 用以記錄當前輸入法狀態的變數。
   public var state: IMEStateProtocol = IMEState.ofEmpty() {
     didSet {
@@ -117,7 +119,7 @@ public class SessionCtl: IMKInputController {
         // ----------------------------
         Self.isVerticalTyping = isVerticalTyping
         // 強制重設當前鍵盤佈局、使其與偏好設定同步。這裡的這一步也不能省略。
-        handle(state: IMEState.ofEmpty())
+        switchState(IMEState.ofEmpty())
       }
     }
   }
@@ -168,14 +170,14 @@ extension SessionCtl {
     // 過濾掉尚未完成拼寫的注音。
     if state.type == .ofInputting, PrefMgr.shared.trimUnfinishedReadingsOnCommit {
       inputHandler.composer.clear()
-      handle(state: inputHandler.generateStateOfInputting())
+      switchState(inputHandler.generateStateOfInputting())
     }
     let isSecureMode = PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier)
     if state.hasComposition, !isSecureMode {
       /// 將傳回的新狀態交給調度函式。
-      handle(state: IMEState.ofCommitting(textToCommit: state.displayedText))
+      switchState(IMEState.ofCommitting(textToCommit: state.displayedText))
     }
-    handle(state: isSecureMode ? IMEState.ofAbortion() : IMEState.ofEmpty())
+    switchState(isSecureMode ? IMEState.ofAbortion() : IMEState.ofEmpty())
   }
 }
 
@@ -206,7 +208,7 @@ extension SessionCtl {
       UpdateSputnik.shared.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
     }
 
-    handle(state: IMEState.ofEmpty())
+    switchState(IMEState.ofEmpty())
     Self.allInstances.insert(self)
   }
 
@@ -215,7 +217,7 @@ extension SessionCtl {
   public override func deactivateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     resetInputHandler()  // 這條會自動搞定 Empty 狀態。
-    handle(state: IMEState.ofDeactivated())
+    switchState(IMEState.ofDeactivated())
     Self.allInstances.remove(self)
   }
 

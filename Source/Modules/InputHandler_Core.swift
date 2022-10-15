@@ -15,22 +15,41 @@ import Tekkon
 /// 被封裝的「與 Megrez 組字引擎和 Tekkon 注拼引擎對接的」各種工具函式。
 /// 注意：不要把 composer 注拼槽與 compositor 組字器這兩個概念搞混。
 
+// MARK: - InputHandler 自身協定 (Protocol).
+
+public protocol InputHandlerProtocol {
+  var currentLM: vChewingLM.LMInstantiator { get set }
+  var currentUOM: vChewingLM.LMUserOverride { get set }
+  var delegate: InputHandlerDelegate? { get set }
+  var composer: Tekkon.Composer { get set }
+  func clear()
+  func ensureKeyboardParser()
+  func handleEvent(_ event: NSEvent) -> Bool
+  func generateStateOfInputting() -> IMEStateProtocol
+  func generateStateOfAssociates(withPair pair: Megrez.Compositor.KeyValuePaired) -> IMEStateProtocol
+  func consolidateNode(candidate: (String, String), respectCursorPushing: Bool, preConsolidate: Bool)
+}
+
 // MARK: - 委任協定 (Delegate).
 
 /// InputHandler 委任協定
 public protocol InputHandlerDelegate {
+  var isVerticalTyping: Bool { get }
   var selectionKeys: String { get }
+  var state: IMEStateProtocol { get set }
   var clientBundleIdentifier: String { get }
+  func callError(_ logMessage: String)
+  func switchState(_ newState: IMEStateProtocol)
   func candidateController() -> CtlCandidateProtocol
   func candidateSelectionCalledByInputHandler(at index: Int)
-  func performUserPhraseOperation(with state: IMEStateProtocol, addToFilter: Bool)
+  func performUserPhraseOperation(addToFilter: Bool)
     -> Bool
 }
 
 // MARK: - 核心 (Kernel).
 
 /// InputHandler 按鍵調度模組。
-public class InputHandler {
+public class InputHandler: InputHandlerProtocol {
   /// 委任物件 (SessionCtl)，以便呼叫其中的函式。
   public var delegate: InputHandlerDelegate?
   public var prefs: PrefMgrProtocol
@@ -61,7 +80,7 @@ public class InputHandler {
     ensureKeyboardParser()
   }
 
-  func clear() {
+  public func clear() {
     composer.clear()
     compositor.clear()
   }
@@ -207,7 +226,9 @@ public class InputHandler {
   ///   - value: 給定之候選字（詞音配對）。
   ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字後的節錨的前方。
   ///   - consolidate: 在固化節點之前，先鞏固上下文。該選項可能會破壞在內文組字區內就地輪替候選字詞時的體驗。
-  func consolidateNode(candidate: (String, String), respectCursorPushing: Bool = true, preConsolidate: Bool = false) {
+  public func consolidateNode(
+    candidate: (String, String), respectCursorPushing: Bool = true, preConsolidate: Bool = false
+  ) {
     let theCandidate: Megrez.Compositor.KeyValuePaired = .init(key: candidate.0, value: candidate.1)
 
     /// 必須先鞏固當前組字器游標上下文、以消滅意料之外的影響，但在內文組字區內就地輪替候選字詞時除外。
@@ -254,10 +275,8 @@ public class InputHandler {
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
     var arrCandidates: [Megrez.Compositor.KeyValuePaired] = {
       switch prefs.useRearCursorMode {
-        case false:
-          return compositor.fetchCandidates(at: cursorForCandidate, filter: .endAt)
-        case true:
-          return compositor.fetchCandidates(at: cursorForCandidate, filter: .beginAt)
+        case false: return compositor.fetchCandidates(at: cursorForCandidate, filter: .endAt)
+        case true: return compositor.fetchCandidates(at: cursorForCandidate, filter: .beginAt)
       }
     }()
 
@@ -302,7 +321,7 @@ public class InputHandler {
           key: newestSuggestedCandidate.0, value: newestSuggestedCandidate.1.value
         )
         vCLog(
-          "UOM: Suggestion retrieved, overriding the node score of the selected candidate: \(suggestedPair.toNGramKey)")
+          "UOM: Suggestion received, overriding the node score of the selected candidate: \(suggestedPair.toNGramKey)")
         if !compositor.overrideCandidate(suggestedPair, at: cursorForCandidate, overrideType: overrideBehavior) {
           compositor.overrideCandidateLiteral(
             newestSuggestedCandidate.1.value, at: cursorForCandidate, overrideType: overrideBehavior
@@ -318,47 +337,27 @@ public class InputHandler {
   // MARK: - Extracted methods and functions (Tekkon).
 
   /// 獲取與當前注音排列或拼音輸入種類有關的標點索引鍵，以英數下畫線「_」結尾。
-  var currentKeyboardParser: String {
-    currentKeyboardParserType.name + "_"
-  }
-
-  var currentKeyboardParserType: KeyboardParser {
-    .init(rawValue: prefs.keyboardParser) ?? .ofStandard
-  }
+  var currentKeyboardParser: String { currentKeyboardParserType.name + "_" }
+  var currentKeyboardParserType: KeyboardParser { .init(rawValue: prefs.keyboardParser) ?? .ofStandard }
 
   /// 給注拼槽指定注音排列或拼音輸入種類之後，將注拼槽內容清空。
-  func ensureKeyboardParser() {
+  public func ensureKeyboardParser() {
     switch currentKeyboardParserType {
-      case KeyboardParser.ofStandard:
-        composer.ensureParser(arrange: .ofDachen)
-      case KeyboardParser.ofDachen26:
-        composer.ensureParser(arrange: .ofDachen26)
-      case KeyboardParser.ofETen:
-        composer.ensureParser(arrange: .ofETen)
-      case KeyboardParser.ofHsu:
-        composer.ensureParser(arrange: .ofHsu)
-      case KeyboardParser.ofETen26:
-        composer.ensureParser(arrange: .ofETen26)
-      case KeyboardParser.ofIBM:
-        composer.ensureParser(arrange: .ofIBM)
-      case KeyboardParser.ofMiTAC:
-        composer.ensureParser(arrange: .ofMiTAC)
-      case KeyboardParser.ofFakeSeigyou:
-        composer.ensureParser(arrange: .ofFakeSeigyou)
-      case KeyboardParser.ofSeigyou:
-        composer.ensureParser(arrange: .ofSeigyou)
-      case KeyboardParser.ofStarlight:
-        composer.ensureParser(arrange: .ofStarlight)
-      case KeyboardParser.ofHanyuPinyin:
-        composer.ensureParser(arrange: .ofHanyuPinyin)
-      case KeyboardParser.ofSecondaryPinyin:
-        composer.ensureParser(arrange: .ofSecondaryPinyin)
-      case KeyboardParser.ofYalePinyin:
-        composer.ensureParser(arrange: .ofYalePinyin)
-      case KeyboardParser.ofHualuoPinyin:
-        composer.ensureParser(arrange: .ofHualuoPinyin)
-      case KeyboardParser.ofUniversalPinyin:
-        composer.ensureParser(arrange: .ofUniversalPinyin)
+      case KeyboardParser.ofStandard: composer.ensureParser(arrange: .ofDachen)
+      case KeyboardParser.ofDachen26: composer.ensureParser(arrange: .ofDachen26)
+      case KeyboardParser.ofETen: composer.ensureParser(arrange: .ofETen)
+      case KeyboardParser.ofHsu: composer.ensureParser(arrange: .ofHsu)
+      case KeyboardParser.ofETen26: composer.ensureParser(arrange: .ofETen26)
+      case KeyboardParser.ofIBM: composer.ensureParser(arrange: .ofIBM)
+      case KeyboardParser.ofMiTAC: composer.ensureParser(arrange: .ofMiTAC)
+      case KeyboardParser.ofFakeSeigyou: composer.ensureParser(arrange: .ofFakeSeigyou)
+      case KeyboardParser.ofSeigyou: composer.ensureParser(arrange: .ofSeigyou)
+      case KeyboardParser.ofStarlight: composer.ensureParser(arrange: .ofStarlight)
+      case KeyboardParser.ofHanyuPinyin: composer.ensureParser(arrange: .ofHanyuPinyin)
+      case KeyboardParser.ofSecondaryPinyin: composer.ensureParser(arrange: .ofSecondaryPinyin)
+      case KeyboardParser.ofYalePinyin: composer.ensureParser(arrange: .ofYalePinyin)
+      case KeyboardParser.ofHualuoPinyin: composer.ensureParser(arrange: .ofHualuoPinyin)
+      case KeyboardParser.ofUniversalPinyin: composer.ensureParser(arrange: .ofUniversalPinyin)
     }
     composer.clear()
     composer.phonabetCombinationCorrectionEnabled = prefs.autoCorrectReadingCombination
@@ -397,9 +396,7 @@ public class InputHandler {
   /// - Parameter input: 輸入的按鍵訊號。
   /// - Returns: 生成的標點符號索引鍵。
   func generatePunctuationNamePrefix(withKeyCondition input: InputSignalProtocol) -> String {
-    if prefs.halfWidthPunctuationEnabled {
-      return "_half_punctuation_"
-    }
+    if prefs.halfWidthPunctuationEnabled { return "_half_punctuation_" }
     switch (input.isControlHold, input.isOptionHold) {
       case (true, true): return "_alt_ctrl_punctuation_"
       case (true, false): return "_ctrl_punctuation_"
@@ -427,9 +424,7 @@ extension InputHandler {
       compositor.width > compositorWidthLimit,
       let identifier = delegate?.clientBundleIdentifier,
       prefs.clientsIMKTextInputIncapable.contains(identifier)
-    else {
-      return ""
-    }
+    else { return "" }
     // 回頭在這裡插上對 Steam 的 Client Identifier 的要求。
     var textToCommit = ""
     while compositor.width > compositorWidthLimit {
@@ -444,13 +439,9 @@ extension InputHandler {
       }
       let newCursor = max(compositor.cursor - delta, 0)
       compositor.cursor = 0
-      if !node.isReadingMismatched {
-        consolidateCursorContext(with: node.currentPair)
-      }
+      if !node.isReadingMismatched { consolidateCursorContext(with: node.currentPair) }
       // 威注音不支援 Bigram，所以無須考慮前後節點「是否需要鞏固」。
-      for _ in 0..<delta {
-        compositor.dropKey(direction: .front)
-      }
+      for _ in 0..<delta { compositor.dropKey(direction: .front) }
       compositor.cursor = newCursor
       walk()
     }

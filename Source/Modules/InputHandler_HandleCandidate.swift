@@ -9,6 +9,7 @@
 /// 該檔案乃按鍵調度模組當中「用來規定在選字窗出現時的按鍵行為」的部分。
 
 import CandidateWindow
+import CocoaExtension
 import Shared
 
 // MARK: - § 對選字狀態進行調度 (Handle Candidate State).
@@ -17,20 +18,12 @@ extension InputHandler {
   /// 當且僅當選字窗出現時，對於經過初次篩選處理的輸入訊號的處理均藉由此函式來進行。
   /// - Parameters:
   ///   - input: 輸入訊號。
-  ///   - state: 給定狀態（通常為當前狀態）。
-  ///   - stateCallback: 狀態回呼，交給對應的型別內的專有函式來處理。
-  ///   - errorCallback: 錯誤回呼。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
-  func handleCandidate(
-    state: IMEStateProtocol,
-    input: InputSignalProtocol,
-    stateCallback: @escaping (IMEStateProtocol) -> Void,
-    errorCallback: @escaping (String) -> Void
-  ) -> Bool {
-    guard var ctlCandidate = delegate?.candidateController() else {
-      errorCallback("06661F6E")
-      return true
-    }
+  func handleCandidate(input: InputSignalProtocol) -> Bool {
+    guard let delegate = delegate else { return false }
+    var ctlCandidate = delegate.candidateController()
+    let state = delegate.state
+    guard !state.candidates.isEmpty else { return false }
 
     // MARK: 取消選字 (Cancel Candidate)
 
@@ -47,178 +40,80 @@ extension InputHandler {
         // 就將當前的組字緩衝區析構處理、強制重設輸入狀態。
         // 否則，一個本不該出現的真空組字緩衝區會使前後方向鍵與 BackSpace 鍵失靈。
         // 所以這裡需要對 compositor.isEmpty 做判定。
-        stateCallback(IMEState.ofAbortion())
+        delegate.switchState(IMEState.ofAbortion())
       } else {
-        stateCallback(generateStateOfInputting())
+        delegate.switchState(generateStateOfInputting())
       }
       if state.type == .ofSymbolTable, let nodePrevious = state.node.previous, !nodePrevious.members.isEmpty {
-        stateCallback(IMEState.ofSymbolTable(node: nodePrevious))
+        delegate.switchState(IMEState.ofSymbolTable(node: nodePrevious))
       }
       return true
     }
 
-    // MARK: Enter
+    // MARK: 批次集中處理某些常用功能鍵
 
-    if input.isEnter {
-      if state.type == .ofAssociates, !prefs.alsoConfirmAssociatedCandidatesByEnter {
-        stateCallback(IMEState.ofAbortion())
-        return true
-      }
-      delegate?.candidateSelectionCalledByInputHandler(at: ctlCandidate.selectedCandidateIndex)
-      return true
-    }
-
-    // MARK: Tab
-
-    if input.isTab {
-      let updated: Bool =
-        prefs.specifyShiftTabKeyBehavior
-        ? (input.isShiftHold
-          ? ctlCandidate.showPreviousLine()
-          : ctlCandidate.showNextLine())
-        : (input.isShiftHold
-          ? ctlCandidate.highlightPreviousCandidate()
-          : ctlCandidate.highlightNextCandidate())
-      if !updated {
-        errorCallback("9B691919")
-      }
-      return true
-    }
-
-    // MARK: Space
-
-    if input.isSpace {
-      let updated: Bool =
-        prefs.specifyShiftSpaceKeyBehavior
-        ? (input.isShiftHold
-          ? ctlCandidate.highlightNextCandidate()
-          : ctlCandidate.showNextLine())
-        : (input.isShiftHold
-          ? ctlCandidate.showNextLine()
-          : ctlCandidate.highlightNextCandidate())
-      if !updated {
-        errorCallback("A11C781F")
-      }
-      return true
-    }
-
-    // MARK: PgDn
-
-    if input.isPageDown {
-      let updated: Bool = ctlCandidate.showNextPage()
-      if !updated {
-        errorCallback("9B691919")
-      }
-      return true
-    }
-
-    // MARK: PgUp
-
-    if input.isPageUp {
-      let updated: Bool = ctlCandidate.showPreviousPage()
-      if !updated {
-        errorCallback("9569955D")
-      }
-      return true
-    }
-
-    // MARK: Left Arrow
-
-    if input.isLeft {
-      switch ctlCandidate.currentLayout {
-        case .horizontal:
-          if !ctlCandidate.highlightPreviousCandidate() {
-            errorCallback("1145148D")
+    if let keyCodeType = KeyCode(rawValue: input.keyCode) {
+      switch keyCodeType {
+        case .kLineFeed, .kCarriageReturn:
+          if state.type == .ofAssociates, !prefs.alsoConfirmAssociatedCandidatesByEnter {
+            delegate.switchState(IMEState.ofAbortion())
+            return true
           }
-        case .vertical:
-          if !ctlCandidate.showPreviousLine() {
-            errorCallback("1919810D")
+          delegate.candidateSelectionCalledByInputHandler(at: ctlCandidate.highlightedIndex)
+          return true
+        case .kTab:
+          let updated: Bool =
+            prefs.specifyShiftTabKeyBehavior
+            ? (input.isShiftHold
+              ? ctlCandidate.showPreviousLine()
+              : ctlCandidate.showNextLine())
+            : (input.isShiftHold
+              ? ctlCandidate.highlightPreviousCandidate()
+              : ctlCandidate.highlightNextCandidate())
+          _ = updated ? {}() : delegate.callError("9B691919")
+          return true
+        case .kSpace:
+          let updated: Bool =
+            prefs.specifyShiftSpaceKeyBehavior
+            ? (input.isShiftHold
+              ? ctlCandidate.highlightNextCandidate()
+              : ctlCandidate.showNextLine())
+            : (input.isShiftHold
+              ? ctlCandidate.showNextLine()
+              : ctlCandidate.highlightNextCandidate())
+          _ = updated ? {}() : delegate.callError("A11C781F")
+          return true
+        case .kPageDown:
+          _ = ctlCandidate.showNextPage() ? {}() : delegate.callError("9B691919")
+          return true
+        case .kPageUp:
+          _ = ctlCandidate.showPreviousPage() ? {}() : delegate.callError("9569955D")
+          return true
+        case .kUpArrow, .kDownArrow, .kLeftArrow, .kRightArrow:
+          handleArrowKey: switch (keyCodeType, ctlCandidate.currentLayout) {
+            case (.kLeftArrow, .horizontal), (.kUpArrow, .vertical):  // Previous Candidate
+              _ = ctlCandidate.highlightPreviousCandidate() ? {}() : delegate.callError("5548FD14")
+            case (.kRightArrow, .horizontal), (.kDownArrow, .vertical):  // Next Candidate
+              _ = ctlCandidate.highlightNextCandidate() ? {}() : delegate.callError("3CEFB82E")
+            case (.kUpArrow, .horizontal), (.kLeftArrow, .vertical):  // Previous Line
+              _ = ctlCandidate.showPreviousLine() ? {}() : delegate.callError("827BBD79")
+            case (.kDownArrow, .horizontal), (.kRightArrow, .vertical):  // Next Line
+              _ = ctlCandidate.showNextLine() ? {}() : delegate.callError("7A0C7FBD")
+            default: break handleArrowKey
           }
-        @unknown default:
-          break
-      }
-      return true
-    }
-
-    // MARK: Right Arrow
-
-    if input.isRight {
-      switch ctlCandidate.currentLayout {
-        case .horizontal:
-          if !ctlCandidate.highlightNextCandidate() {
-            errorCallback("9B65138D")
-          }
-        case .vertical:
-          if !ctlCandidate.showNextLine() {
-            errorCallback("9244908D")
-          }
-        @unknown default:
-          break
-      }
-      return true
-    }
-
-    // MARK: Up Arrow
-
-    if input.isUp {
-      switch ctlCandidate.currentLayout {
-        case .horizontal:
-          if !ctlCandidate.showPreviousLine() {
-            errorCallback("9B614524")
-          }
-        case .vertical:
-          if !ctlCandidate.highlightPreviousCandidate() {
-            errorCallback("ASD9908D")
-          }
-        @unknown default:
-          break
-      }
-      return true
-    }
-
-    // MARK: Down Arrow
-
-    if input.isDown {
-      switch ctlCandidate.currentLayout {
-        case .horizontal:
-          if !ctlCandidate.showNextLine() {
-            errorCallback("92B990DD")
-            break
-          }
-        case .vertical:
-          if !ctlCandidate.highlightNextCandidate() {
-            errorCallback("6B99908D")
-          }
-        @unknown default:
-          break
-      }
-      return true
-    }
-
-    // MARK: Home Key
-
-    if input.isHome {
-      if ctlCandidate.selectedCandidateIndex == 0 {
-        errorCallback("9B6EDE8D")
-      } else {
-        ctlCandidate.selectedCandidateIndex = 0
-      }
-
-      return true
-    }
-
-    // MARK: End Key
-
-    if state.candidates.isEmpty {
-      return false
-    } else {  // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
-      if input.isEnd {
-        if ctlCandidate.selectedCandidateIndex == state.candidates.count - 1 {
-          errorCallback("9B69AAAD")
-        } else {
-          ctlCandidate.selectedCandidateIndex = state.candidates.count - 1
-        }
-        return true
+          return true
+        case .kHome:
+          _ =
+            (ctlCandidate.highlightedIndex == 0)
+            ? delegate.callError("9B6EDE8D") : (ctlCandidate.highlightedIndex = 0)
+          return true
+        case .kEnd:
+          let maxIndex = state.candidates.count - 1
+          _ =
+            (ctlCandidate.highlightedIndex == maxIndex)
+            ? delegate.callError("9B69AAAD") : (ctlCandidate.highlightedIndex = maxIndex)
+          return true
+        default: break
       }
     }
 
@@ -232,7 +127,7 @@ extension InputHandler {
     let match: String =
       (state.type == .ofAssociates) ? input.inputTextIgnoringModifiers ?? "" : input.text
 
-    let selectionKeys = delegate?.selectionKeys ?? PrefMgr.shared.candidateKeys
+    let selectionKeys = delegate.selectionKeys
 
     for j in 0..<selectionKeys.count {
       let label = selectionKeys.charComponents[j]
@@ -245,7 +140,7 @@ extension InputHandler {
     if index != NSNotFound {
       let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(index)
       if candidateIndex != -114_514 {
-        delegate?.candidateSelectionCalledByInputHandler(at: candidateIndex)
+        delegate.candidateSelectionCalledByInputHandler(at: candidateIndex)
         return true
       }
     }
@@ -285,11 +180,9 @@ extension InputHandler {
       if shouldAutoSelectCandidate {
         let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(0)
         if candidateIndex != -114_514 {
-          delegate?.candidateSelectionCalledByInputHandler(at: candidateIndex)
-          stateCallback(IMEState.ofAbortion())
-          return handleInput(
-            event: input, state: IMEState.ofEmpty(), stateCallback: stateCallback, errorCallback: errorCallback
-          )
+          delegate.candidateSelectionCalledByInputHandler(at: candidateIndex)
+          delegate.switchState(IMEState.ofAbortion())
+          return handleInput(event: input)
         }
         return true
       }
@@ -300,13 +193,11 @@ extension InputHandler {
     if input.isSymbolMenuPhysicalKey {
       var updated = true
       updated = input.isShiftHold ? ctlCandidate.showPreviousLine() : ctlCandidate.showNextLine()
-      if !updated {
-        errorCallback("66F3477B")
-      }
+      if !updated { delegate.callError("66F3477B") }
       return true
     }
 
-    errorCallback("172A0F81")
+    delegate.callError("172A0F81")
     return true
   }
 }

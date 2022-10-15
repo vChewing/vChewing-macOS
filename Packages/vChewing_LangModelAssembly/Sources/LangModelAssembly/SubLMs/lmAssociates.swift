@@ -16,17 +16,13 @@ extension vChewingLM {
     var rangeMap: [String: [(Range<String.Index>, Int)]] = [:]
     var strData: String = ""
 
-    public var count: Int {
-      rangeMap.count
-    }
+    public var count: Int { rangeMap.count }
 
     public init() {
       rangeMap = [:]
     }
 
-    public func isLoaded() -> Bool {
-      !rangeMap.isEmpty
-    }
+    public var isLoaded: Bool { !rangeMap.isEmpty }
 
     internal func cnvNGramKeyFromPinyinToPhona(target: String) -> String {
       guard target.contains("("), target.contains(","), target.contains(")") else {
@@ -40,9 +36,7 @@ extension vChewingLM {
     }
 
     @discardableResult public mutating func open(_ path: String) -> Bool {
-      if isLoaded() {
-        return false
-      }
+      if isLoaded { return false }
 
       LMConsolidator.fixEOF(path: path)
       LMConsolidator.consolidate(path: path, pragma: true)
@@ -72,9 +66,7 @@ extension vChewingLM {
     }
 
     public mutating func close() {
-      if isLoaded() {
-        rangeMap.removeAll()
-      }
+      rangeMap.removeAll()
     }
 
     public func valuesFor(pair: Megrez.Compositor.KeyValuePaired) -> [String] {

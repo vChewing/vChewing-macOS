@@ -23,9 +23,9 @@ public enum LMMgr {
   public private(set) static var lmCHS = vChewingLM.LMInstantiator(isCHS: true)
   public private(set) static var lmCHT = vChewingLM.LMInstantiator(isCHS: false)
   public private(set) static var uomCHS = vChewingLM.LMUserOverride(
-    dataURL: LMMgr.userOverrideModelDataURL(.imeModeCHS))
+    dataURL: Self.userOverrideModelDataURL(.imeModeCHS))
   public private(set) static var uomCHT = vChewingLM.LMUserOverride(
-    dataURL: LMMgr.userOverrideModelDataURL(.imeModeCHT))
+    dataURL: Self.userOverrideModelDataURL(.imeModeCHT))
 
   public static func currentLM() -> vChewingLM.LMInstantiator {
     switch IMEApp.currentInputMode {
@@ -267,13 +267,13 @@ public enum LMMgr {
   }
 
   public static func setSCPCEnabled(_ state: Bool) {
-    Self.lmCHS.isSCPCEnabled = state
     Self.lmCHT.isSCPCEnabled = state
+    Self.lmCHS.isSCPCEnabled = state
   }
 
   public static func setDeltaOfCalendarYears(_ delta: Int) {
-    Self.lmCHS.deltaOfCalendarYears = delta
     Self.lmCHT.deltaOfCalendarYears = delta
+    Self.lmCHS.deltaOfCalendarYears = delta
   }
 
   // MARK: - 獲取當前輸入法封包內的原廠核心語彙檔案所在路徑
@@ -507,7 +507,7 @@ public enum LMMgr {
 
   public static func resetSpecifiedUserDataFolder() {
     UserDefaults.standard.removeObject(forKey: UserDef.kUserDataFolderSpecified.rawValue)
-    LMMgr.initUserLangModels()
+    Self.initUserLangModels()
   }
 
   // MARK: - 寫入使用者檔案

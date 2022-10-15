@@ -171,12 +171,7 @@ func handleInputText(_ inputText: String?, key keyCode: Int, modifiers flags: In
 或者 InputHandler 內：
 ```swift
 extension InputHandler {
-  func handle(
-    input: InputHandler,
-    state: InputState,
-    stateCallback: @escaping (InputState) -> Void,
-    errorCallback: @escaping (String) -> Void
-  ) -> Bool {
+  func handle(input: InputSignalProtocol) -> Bool {
     let charCode: UniChar = input.charCode
 ...
 }
@@ -217,7 +212,7 @@ if !skipPhoneticHandling && _composer.inputValidityCheck(key: charCode) {
   // 有調號的話，則不需要這樣處理，轉而繼續在此之後的處理。
   let composeReading = _composer.hasToneMarker()
   if !composeReading {
-    stateCallback(generateStateOfInputting())
+    delegate.switchState(generateStateOfInputting())
     return true
   }
 }
@@ -243,10 +238,10 @@ if composeReading {  // 符合按鍵組合條件
   // 向語言模型詢問是否有對應的記錄
   if !ifLangModelHasUnigrams(forKey: reading) {  // 如果沒有的話
     vCLog("B49C0979：語彙庫內無「\(reading)」的匹配記錄。")
-    errorCallback("114514")  // 向狀態管理引擎回呼一個錯誤狀態
+    delegate.callError("114514")  // 向狀態管理引擎回呼一個錯誤狀態
     _composer.clear()  // 清空注拼槽的內容
     // 根據「天權星引擎 (威注音) 或 Gramambular (小麥) 的組字器是否為空」來判定回呼哪一種狀態
-    stateCallback(
+    delegate.switchState(
       (getCompositorLength() == 0) ? InputState.EmptyIgnoringPreviousState() : generateStateOfInputting())
     return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了
   }
@@ -269,7 +264,7 @@ if composeReading {  // 符合按鍵組合條件
   // 再以回呼組字狀態的方式來執行updateClientComposingBuffer()
   let inputting = generateStateOfInputting()
   inputting.poppedText = poppedText
-  stateCallback(inputting)
+  delegate.switchState(inputting)
 
   return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了
 }

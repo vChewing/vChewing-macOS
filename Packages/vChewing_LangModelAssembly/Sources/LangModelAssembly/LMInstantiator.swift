@@ -88,7 +88,7 @@ extension vChewingLM {
 
     // MARK: - 工具函式
 
-    public var isLanguageModelLoaded: Bool { lmCore.isLoaded() }
+    public var isLanguageModelLoaded: Bool { lmCore.isLoaded }
     public func loadLanguageModel(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
         lmCore.open(path)
@@ -98,7 +98,7 @@ extension vChewingLM {
       }
     }
 
-    public var isCNSDataLoaded: Bool { vChewingLM.LMInstantiator.lmCNS.isLoaded() }
+    public var isCNSDataLoaded: Bool { vChewingLM.LMInstantiator.lmCNS.isLoaded }
     public func loadCNSData(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
         vChewingLM.LMInstantiator.lmCNS.open(path)
@@ -108,7 +108,7 @@ extension vChewingLM {
       }
     }
 
-    public var isMiscDataLoaded: Bool { lmMisc.isLoaded() }
+    public var isMiscDataLoaded: Bool { lmMisc.isLoaded }
     public func loadMiscData(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
         lmMisc.open(path)
@@ -118,7 +118,7 @@ extension vChewingLM {
       }
     }
 
-    public var isSymbolDataLoaded: Bool { vChewingLM.LMInstantiator.lmSymbols.isLoaded() }
+    public var isSymbolDataLoaded: Bool { vChewingLM.LMInstantiator.lmSymbols.isLoaded }
     public func loadSymbolData(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
         vChewingLM.LMInstantiator.lmSymbols.open(path)

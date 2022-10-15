@@ -22,9 +22,12 @@ extension SessionCtl: InputHandlerDelegate {
     candidatePairSelected(at: index)
   }
 
-  public func performUserPhraseOperation(with state: IMEStateProtocol, addToFilter: Bool)
-    -> Bool
-  {
+  public func callError(_ logMessage: String) {
+    vCLog(logMessage)
+    IMEApp.buzz()
+  }
+
+  public func performUserPhraseOperation(addToFilter: Bool) -> Bool {
     guard state.type == .ofMarking else { return false }
     if !LMMgr.writeUserPhrase(
       state.data.userPhraseDumped, inputMode: inputMode,
@@ -75,48 +78,50 @@ extension SessionCtl: CtlCandidateDelegate {
     if state.type == .ofSymbolTable, (0..<state.node.members.count).contains(index) {
       let node = state.node.members[index]
       if !node.members.isEmpty {
-        handle(state: IMEState.ofEmpty())  // 防止縱橫排選字窗同時出現
-        handle(state: IMEState.ofSymbolTable(node: node))
+        switchState(IMEState.ofEmpty())  // 防止縱橫排選字窗同時出現
+        switchState(IMEState.ofSymbolTable(node: node))
       } else {
-        handle(state: IMEState.ofCommitting(textToCommit: node.name))
-        handle(state: IMEState.ofEmpty())
+        switchState(IMEState.ofCommitting(textToCommit: node.name))
+        switchState(IMEState.ofEmpty())
       }
       return
     }
 
     if [.ofCandidates, .ofSymbolTable].contains(state.type) {
       let selectedValue = state.candidates[index]
-      inputHandler.consolidateNode(
-        candidate: selectedValue, respectCursorPushing: true,
-        preConsolidate: PrefMgr.shared.consolidateContextOnCandidateSelection
-      )
+      if state.type == .ofCandidates {
+        inputHandler.consolidateNode(
+          candidate: selectedValue, respectCursorPushing: true,
+          preConsolidate: PrefMgr.shared.consolidateContextOnCandidateSelection
+        )
+      }
 
       let inputting = inputHandler.generateStateOfInputting()
 
       if PrefMgr.shared.useSCPCTypingMode {
-        handle(state: IMEState.ofCommitting(textToCommit: inputting.displayedText))
+        switchState(IMEState.ofCommitting(textToCommit: inputting.displayedText))
         // 此時是逐字選字模式，所以「selectedValue.1」是單個字、不用追加處理。
         if PrefMgr.shared.associatedPhrasesEnabled {
           let associates = inputHandler.generateStateOfAssociates(
             withPair: .init(key: selectedValue.0, value: selectedValue.1)
           )
-          handle(state: associates.candidates.isEmpty ? IMEState.ofEmpty() : associates)
+          switchState(associates.candidates.isEmpty ? IMEState.ofEmpty() : associates)
         } else {
-          handle(state: IMEState.ofEmpty())
+          switchState(IMEState.ofEmpty())
         }
       } else {
-        handle(state: inputting)
+        switchState(inputting)
       }
       return
     }
 
     if state.type == .ofAssociates {
       let selectedValue = state.candidates[index]
-      handle(state: IMEState.ofCommitting(textToCommit: selectedValue.1))
+      switchState(IMEState.ofCommitting(textToCommit: selectedValue.1))
       // 此時是聯想詞選字模式，所以「selectedValue.1」必須只保留最後一個字。
       // 不然的話，一旦你選中了由多個字組成的聯想候選詞，則連續聯想會被打斷。
       guard let valueKept = selectedValue.1.last else {
-        handle(state: IMEState.ofEmpty())
+        switchState(IMEState.ofEmpty())
         return
       }
       if PrefMgr.shared.associatedPhrasesEnabled {
@@ -124,11 +129,11 @@ extension SessionCtl: CtlCandidateDelegate {
           withPair: .init(key: selectedValue.0, value: String(valueKept))
         )
         if !associates.candidates.isEmpty {
-          handle(state: associates)
+          switchState(associates)
           return
         }
       }
-      handle(state: IMEState.ofEmpty())
+      switchState(IMEState.ofEmpty())
     }
   }
 }

@@ -12,6 +12,20 @@ import Shared
 // MARK: - 狀態調度 (State Handling)
 
 extension SessionCtl {
+  /// 針對傳入的新狀態進行調度、且將當前會話控制器的狀態切換至新狀態。
+  ///
+  /// 先將舊狀態單獨記錄起來，再將新舊狀態作為參數，
+  /// 根據新狀態本身的狀態種類來判斷交給哪一個專門的函式來處理。
+  /// - Remark: ⚠️ 任何在這個函式當中被改變的變數均不得是靜態 (Static) 變數。
+  /// 針對某一個客體的 deactivateServer() 可能會在使用者切換到另一個客體應用
+  /// 且開始敲字之後才會執行。這個過程會使得不同的 SessionCtl 副本之間出現
+  /// 不必要的互相干涉、打斷彼此的工作。
+  /// - Note: 本來不用這麼複雜的，奈何 Swift Protocol 不允許給參數指定預設值。
+  /// - Parameter newState: 新狀態。
+  public func switchState(_ newState: IMEStateProtocol) {
+    handle(state: newState, replace: true)
+  }
+
   /// 針對傳入的新狀態進行調度。
   ///
   /// 先將舊狀態單獨記錄起來，再將新舊狀態作為參數，
@@ -21,9 +35,9 @@ extension SessionCtl {
   /// 且開始敲字之後才會執行。這個過程會使得不同的 SessionCtl 副本之間出現
   /// 不必要的互相干涉、打斷彼此的工作。
   /// - Parameter newState: 新狀態。
-  public func handle(state newState: IMEStateProtocol, replaceCurrent: Bool = true) {
+  public func handle(state newState: IMEStateProtocol, replace: Bool) {
     var previous = state
-    if replaceCurrent { state = newState }
+    if replace { state = newState }
     switch newState.type {
       case .ofDeactivated:
         ctlCandidateCurrent.visible = false
@@ -43,30 +57,28 @@ extension SessionCtl {
           for instance in Self.allInstances {
             guard let imkC = instance.ctlCandidateCurrent as? CtlCandidateIMK else { continue }
             if instance.state.isCandidateContainer, !imkC.visible {
-              instance.handle(state: instance.state, replaceCurrent: false)
+              instance.handle(state: instance.state, replace: false)
             }
           }
         }
-      case .ofEmpty, .ofAbortion:
-        if newState.type == .ofAbortion {
-          previous = IMEState.ofEmpty()
-          if replaceCurrent { state = previous }
+      case .ofEmpty, .ofAbortion, .ofCommitting:
+        innerCircle: switch newState.type {
+          case .ofAbortion:
+            previous = IMEState.ofEmpty()
+            if replace { state = previous }
+          case .ofCommitting:
+            commit(text: newState.textToCommit)
+            state = IMEState.ofEmpty()
+          default: break innerCircle
         }
         ctlCandidateCurrent.visible = false
         tooltipInstance.hide()
         // 全專案用以判斷「.Abortion」的地方僅此一處。
-        if previous.hasComposition, newState.type != .ofAbortion {
+        if previous.hasComposition, ![.ofAbortion, .ofCommitting].contains(newState.type) {
           commit(text: previous.displayedText)
         }
         // 在這裡手動再取消一次選字窗與工具提示的顯示，可謂雙重保險。
         tooltipInstance.hide()
-        clearInlineDisplay()
-        // 最後一道保險
-        inputHandler.clear()
-      case .ofCommitting:
-        ctlCandidateCurrent.visible = false
-        tooltipInstance.hide()
-        commit(text: newState.textToCommit)
         clearInlineDisplay()
         // 最後一道保險
         inputHandler.clear()

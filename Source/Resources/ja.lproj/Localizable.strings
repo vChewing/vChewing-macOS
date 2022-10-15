@@ -10,7 +10,7 @@
 "Add Client" = "入れる";
 "Remove Selected" = "外す";
 "Choose the target application bundle." = "登録したいアプリのバンドルのお選びを。";
-"The selected item is not a valid macOS application bundle." = "今選んだんのは正しい macOS アプリバンドルではないと考えられる。";
+"The selected item is not a valid macOS application bundle, nor not having a valid app bundle identifier." = "今選んだんのは正しい macOS アプリバンドルではないと考えられる。少なくとも、唯一識別子は検出できぬ。";
 "Please try again." = "お選び直しください。";
 "The selected item's identifier is already in the list." = "今選んだバンドルの唯一識別子（Bundle Identifier）は既に登録済みである。";
 "Update Check Completed" = "新バージョンチェック完了";

@@ -36,7 +36,7 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
     }
     set {
       DispatchQueue.main.async {
-        self.set(windowTopLeftPoint: newValue, bottomOutOfScreenAdjustmentHeight: 0)
+        self.set(windowTopLeftPoint: newValue, bottomOutOfScreenAdjustmentHeight: 0, useGCD: true)
       }
     }
   }
@@ -96,7 +96,7 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
     // guard let delegate = delegate else { return }  // 下文無效，所以這句沒用。
     // 既然下述函式無效，那中間這段沒用的也都砍了。
     // setCandidateData(candidates)  // 該函式無效。
-    selectedCandidateIndex = 0
+    highlightedIndex = 0
     update()
   }
 
@@ -142,36 +142,9 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
   // IMK 選字窗目前無法實作該函式。威注音 IMK 選字窗目前也不需要使用該函式。
   public func candidateIndexAtKeyLabelIndex(_: Int) -> Int { 0 }
 
-  public var selectedCandidateIndex: Int {
+  public var highlightedIndex: Int {
     get { selectedCandidate() }
     set { selectCandidate(withIdentifier: newValue) }
-  }
-
-  public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: Double) {
-    DispatchQueue.main.async {
-      self.doSet(windowTopLeftPoint: windowTopLeftPoint, bottomOutOfScreenAdjustmentHeight: height)
-    }
-  }
-
-  func doSet(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight heightDelta: Double) {
-    guard var screenFrame = NSScreen.main?.visibleFrame else { return }
-    var adjustedPoint = windowTopLeftPoint
-    let windowSize = candidateFrame().size
-    var delta = heightDelta
-    for frame in NSScreen.screens.map(\.visibleFrame).filter({ $0.contains(windowTopLeftPoint) }) {
-      screenFrame = frame
-      break
-    }
-
-    if delta > screenFrame.size.height / 2.0 { delta = 0.0 }
-
-    if adjustedPoint.y < screenFrame.minY + windowSize.height {
-      adjustedPoint.y = windowTopLeftPoint.y + windowSize.height + delta
-    }
-    adjustedPoint.y = min(adjustedPoint.y, screenFrame.maxY - 1.0)
-    adjustedPoint.x = min(max(adjustedPoint.x, screenFrame.minX), screenFrame.maxX - windowSize.width - 1.0)
-
-    setCandidateFrameTopLeft(adjustedPoint)
   }
 }
 
