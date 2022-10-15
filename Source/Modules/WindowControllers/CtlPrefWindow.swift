@@ -246,6 +246,7 @@ class CtlPrefWindow: NSWindowController {
     dlgOpenPath.showsHiddenFiles = true
     dlgOpenPath.canChooseFiles = false
     dlgOpenPath.canChooseDirectories = true
+    dlgOpenPath.allowsMultipleSelection = false
 
     let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
       PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath)
