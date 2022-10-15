@@ -71,6 +71,7 @@ struct VwrPrefPaneDictionary: View {
               Self.dlgOpenPath.showsResizeIndicator = true
               Self.dlgOpenPath.showsHiddenFiles = true
               Self.dlgOpenPath.canChooseFiles = false
+              Self.dlgOpenPath.allowsMultipleSelection = false
               Self.dlgOpenPath.canChooseDirectories = true
 
               let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
