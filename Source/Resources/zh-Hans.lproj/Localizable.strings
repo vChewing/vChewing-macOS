@@ -10,7 +10,7 @@
 "Add Client" = "登记新客体";
 "Remove Selected" = "移除所选条目";
 "Choose the target application bundle." = "请选择要登记的应用程式的封包。";
-"The selected item is not a valid macOS application bundle." = "当前所选之物并非 macOS 应用程式封包。";
+"The selected item is not a valid macOS application bundle, nor not having a valid app bundle identifier." = "当前所选之物并非 macOS 应用程式封包，至少无法发现其唯一标帜（Bundle Identifier）。";
 "Please try again." = "请重试。";
 "The selected item's identifier is already in the list." = "当前所选之封包的唯一标帜（Bundle Identifier）已被登记。";
 "Update Check Completed" = "更新检查完毕";
