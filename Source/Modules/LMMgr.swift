@@ -194,6 +194,18 @@ public enum LMMgr {
     }
   }
 
+  /// 載入磁帶資料。
+  /// - Remark: cassettePath() 會在輸入法停用磁帶時直接返回
+  public static func loadCassetteData() {
+    let pathForCassette = cassettePath()
+    if !Self.lmCHT.isCassetteEnabled {
+      Self.lmCHT.loadCassetteData(path: pathForCassette)
+    }
+    if !Self.lmCHS.isCassetteEnabled {
+      Self.lmCHT.loadCassetteData(path: pathForCassette)
+    }
+  }
+
   public static func loadUserPhrasesData() {
     Self.lmCHT.loadUserPhrasesData(
       path: userPhrasesDataURL(.imeModeCHT).path,
@@ -269,6 +281,11 @@ public enum LMMgr {
   public static func setSCPCEnabled(_ state: Bool) {
     Self.lmCHT.isSCPCEnabled = state
     Self.lmCHS.isSCPCEnabled = state
+  }
+
+  public static func setCassetteEnabled(_ state: Bool) {
+    Self.lmCHT.isCassetteEnabled = state
+    Self.lmCHS.isCassetteEnabled = state
   }
 
   public static func setDeltaOfCalendarYears(_ delta: Int) {
@@ -428,8 +445,16 @@ public enum LMMgr {
     if ((folderExist && !isFolder.boolValue) || !folderExist) || !isFolderWritable {
       return false
     }
-
     return true
+  }
+
+  // 檢查給定的磁帶目錄是否存在讀入合規性、且是否為指定格式。
+  public static func checkCassettePathValidity(_ cassettePath: String?) -> Bool {
+    var isFolder = ObjCBool(true)
+    let isExist = FileManager.default.fileExists(atPath: cassettePath ?? "", isDirectory: &isFolder)
+    // The above "&" mutates the "isFolder" value to the real one received by the "isExist".
+    let isReadable = FileManager.default.isReadableFile(atPath: cassettePath ?? "")
+    return !isFolder.boolValue && isExist && isReadable
   }
 
   // 檢查給定的目錄是否存在寫入合規性、且糾偏，不接受任何傳入變數。
@@ -503,11 +528,26 @@ public enum LMMgr {
     return userDictPathDefault
   }
 
+  public static func cassettePath() -> String {
+    let rawCassettePath = PrefMgr.shared.cassettePath
+    if UserDefaults.standard.object(forKey: UserDef.kCassettePath.rawValue) != nil {
+      BookmarkManager.shared.loadBookmarks()
+      if Self.checkCassettePathValidity(rawCassettePath) { return rawCassettePath }
+      UserDefaults.standard.removeObject(forKey: UserDef.kCassettePath.rawValue)
+    }
+    return ""
+  }
+
   // MARK: - 重設使用者語彙檔案目錄
 
   public static func resetSpecifiedUserDataFolder() {
     UserDefaults.standard.removeObject(forKey: UserDef.kUserDataFolderSpecified.rawValue)
     Self.initUserLangModels()
+  }
+
+  public static func resetCassettePath() {
+    UserDefaults.standard.removeObject(forKey: UserDef.kCassettePath.rawValue)
+    Self.loadCassetteData()
   }
 
   // MARK: - 寫入使用者檔案
