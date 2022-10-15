@@ -16,6 +16,7 @@ public enum UserDef: String, CaseIterable {
   case kFailureFlagForUOMObservation = "_FailureFlag_UOMObservation"
   case kDeltaOfCalendarYears = "DeltaOfCalendarYears"
   case kMostRecentInputMode = "MostRecentInputMode"
+  case kCassettePath = "CassettePath"
   case kUserDataFolderSpecified = "UserDataFolderSpecified"
   case kCheckUpdateAutomatically = "CheckUpdateAutomatically"
   case kKeyboardParser = "KeyboardParser"
@@ -28,6 +29,7 @@ public enum UserDef: String, CaseIterable {
   case kUseRearCursorMode = "UseRearCursorMode"
   case kUseHorizontalCandidateList = "UseHorizontalCandidateList"
   case kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
+  case kCassetteEnabled = "CassetteEnabled"
   case kCNS11643Enabled = "CNS11643Enabled"
   case kSymbolInputEnabled = "SymbolInputEnabled"
   case kChineseConversionEnabled = "ChineseConversionEnabled"
@@ -60,6 +62,8 @@ public enum UserDef: String, CaseIterable {
   case kAlwaysShowTooltipTextsHorizontally = "AlwaysShowTooltipTextsHorizontally"
   case kClientsIMKTextInputIncapable = "ClientsIMKTextInputIncapable"
   case kOnlyLoadFactoryLangModelsIfNeeded = "OnlyLoadFactoryLangModelsIfNeeded"
+  case kShowTranslatedStrokesInCompositionBuffer = "ShowTranslatedStrokesInCompositionBuffer"
+  case kForceCassetteChineseConversion = "ForceCassetteChineseConversion"
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
@@ -78,6 +82,7 @@ public enum UserDef: String, CaseIterable {
   case kUsingHotKeyJIS = "UsingHotKeyJIS"
   case kUsingHotKeyHalfWidthASCII = "UsingHotKeyHalfWidthASCII"
   case kUsingHotKeyCurrencyNumerals = "UsingHotKeyCurrencyNumerals"
+  case kUsingHotKeyCassette = "UsingHotKeyCassette"
 
   public static func resetAll() {
     UserDef.allCases.forEach {
