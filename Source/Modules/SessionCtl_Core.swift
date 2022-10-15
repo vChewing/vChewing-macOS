@@ -245,6 +245,7 @@ extension SessionCtl {
     LMMgr.currentLM().isCNSEnabled = PrefMgr.shared.cns11643Enabled
     LMMgr.currentLM().isSymbolEnabled = PrefMgr.shared.symbolInputEnabled
     LMMgr.currentLM().isSCPCEnabled = PrefMgr.shared.useSCPCTypingMode
+    LMMgr.currentLM().isCassetteEnabled = PrefMgr.shared.cassetteEnabled
     LMMgr.currentLM().deltaOfCalendarYears = PrefMgr.shared.deltaOfCalendarYears
   }
 }
