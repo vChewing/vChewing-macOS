@@ -1383,6 +1383,8 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
 				MARKETING_VERSION = 2.8.9;
@@ -1432,6 +1434,8 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
 				MARKETING_VERSION = 2.8.9;
@@ -1578,6 +1582,7 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
+					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
 				MARKETING_VERSION = 2.8.9;
@@ -1633,6 +1638,7 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
+					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
 				MARKETING_VERSION = 2.8.9;
@@ -1679,6 +1685,7 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
+					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
 				MARKETING_VERSION = 2.8.9;
@@ -1719,6 +1726,7 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
+					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
 				MARKETING_VERSION = 2.8.9;
