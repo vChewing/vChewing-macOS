@@ -5,7 +5,7 @@
 import SwiftUI
 
 @available(macOS 10.15, *)
-extension Preferences {
+extension SSPreferences {
   /**
    Represents a section with right-aligned title and optional bottom divider.
    */

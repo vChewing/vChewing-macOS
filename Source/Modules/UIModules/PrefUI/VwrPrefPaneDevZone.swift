@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Preferences
+import SSPreferences
 import Shared
 import SwiftUI
 
@@ -42,8 +42,8 @@ struct VwrPrefPaneDevZone: View {
 
   var body: some View {
     ScrollView {
-      Preferences.Container(contentWidth: contentWidth) {
-        Preferences.Section(title: "", bottomDivider: true) {
+      SSPreferences.Container(contentWidth: contentWidth) {
+        SSPreferences.Section(title: "", bottomDivider: true) {
           Text(
             LocalizedStringKey(
               "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.")
