@@ -112,7 +112,7 @@ extension InputHandler {
 
     // MARK: 用上下左右鍵呼叫選字窗 (Calling candidate window using Up / Down or PageUp / PageDn.)
 
-    if state.hasComposition, composer.isEmpty, !input.isOptionHold,
+    if state.hasComposition, isComposerOrCalligrapherEmpty, !input.isOptionHold,
       input.isCursorClockLeft || input.isCursorClockRight || input.isSpace
         || input.isPageDown || input.isPageUp || (input.isTab && prefs.specifyShiftTabKeyBehavior)
     {
@@ -181,7 +181,7 @@ extension InputHandler {
     if input.isSymbolMenuPhysicalKey, !input.isShiftHold, !input.isControlHold, state.type != .ofDeactivated {
       if input.isOptionHold {
         if currentLM.hasUnigramsFor(key: "_punctuation_list") {
-          if composer.isEmpty {
+          if isComposerOrCalligrapherEmpty {
             compositor.insertKey("_punctuation_list")
             walk()
             // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
@@ -268,7 +268,7 @@ extension InputHandler {
     /// 否則的話，可能會導致輸入法行為異常：部分應用會阻止輸入法完全攔截某些按鍵訊號。
     /// 砍掉這一段會導致「F1-F12 按鍵干擾組字區」的問題。
     /// 暫時只能先恢復這段，且補上偵錯彙報機制，方便今後排查故障。
-    if state.hasComposition || !composer.isEmpty {
+    if state.hasComposition || !isComposerOrCalligrapherEmpty {
       delegate.callError("Blocked data: charCode: \(input.charCode), keyCode: \(input.keyCode)")
       delegate.callError("A9BFF20E")
       delegate.switchState(state)
