@@ -23,7 +23,7 @@ extension InputHandler {
     /// 換成由此處重新生成的原始資料在 IMEStateData 當中生成的 NSAttributeString。
     var displayTextSegments: [String] = compositor.walkedNodes.values
     var cursor = convertCursorForDisplay(compositor.cursor)
-    let reading = composer.getInlineCompositionForDisplay(isHanyuPinyin: prefs.showHanyuPinyinInCompositionBuffer)
+    let reading: String = readingForDisplay  // 先提出來，減輕運算負擔。
     if !reading.isEmpty {
       var newDisplayTextSegments = [String]()
       var temporaryNode = ""
@@ -67,10 +67,11 @@ extension InputHandler {
         continue
       }
       if !theNode.isReadingMismatched {
-        for _ in 0..<strNodeValue.count {
-          guard readingCursorIndex < rawCursor else { continue }
-          composedStringCursorIndex += 1
-          readingCursorIndex += 1
+        strNodeValue.forEach { _ in
+          if readingCursorIndex < rawCursor {
+            composedStringCursorIndex += 1
+            readingCursorIndex += 1
+          }
         }
         continue
       }
@@ -227,7 +228,7 @@ extension InputHandler {
       return false
     }
 
-    guard composer.isEmpty else {
+    guard isComposerOrCalligrapherEmpty else {
       // 注音沒敲完的情況下，無視標點輸入。
       delegate.callError("A9B69908D")
       delegate.switchState(state)
@@ -243,7 +244,7 @@ extension InputHandler {
     delegate.switchState(inputting)
 
     // 從這一行之後開始，就是針對逐字選字模式的單獨處理。
-    guard prefs.useSCPCTypingMode, composer.isEmpty else { return true }
+    guard prefs.useSCPCTypingMode, isComposerOrCalligrapherEmpty else { return true }
 
     let candidateState = generateStateOfCandidates()
     switch candidateState.candidates.count {
@@ -339,14 +340,22 @@ extension InputHandler {
     guard state.type == .ofInputting else { return false }
 
     // 引入 macOS 內建注音輸入法的行為，允許用 Shift+BackSpace 解構前一個漢字的讀音。
-    switch prefs.specifyShiftBackSpaceKeyBehavior {
+    shiftBksp: switch prefs.specifyShiftBackSpaceKeyBehavior {
       case 0:
-        guard input.isShiftHold, composer.isEmpty else { break }
-        guard let prevReading = previousParsableReading else { break }
-        // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
-        compositor.dropKey(direction: .rear)
-        walk()  // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
-        prevReading.1.charComponents.forEach { composer.receiveKey(fromPhonabet: $0) }
+        if prefs.cassetteEnabled {
+          guard input.isShiftHold, calligrapher.isEmpty else { break shiftBksp }
+          guard let prevReading = previousParsableCalligraph else { break shiftBksp }
+          compositor.dropKey(direction: .rear)
+          walk()  // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
+          calligrapher = prevReading
+        } else {
+          guard input.isShiftHold, isComposerOrCalligrapherEmpty else { break shiftBksp }
+          guard let prevReading = previousParsableReading else { break shiftBksp }
+          // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
+          compositor.dropKey(direction: .rear)
+          walk()  // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
+          prevReading.1.charComponents.forEach { composer.receiveKey(fromPhonabet: $0) }
+        }
         delegate.switchState(generateStateOfInputting())
         return true
       case 1:
@@ -360,9 +369,11 @@ extension InputHandler {
       return true
     }
 
-    if composer.hasIntonation(withNothingElse: true) {
-      composer.clear()
-    } else if composer.isEmpty {
+    let isConfirm: Bool = prefs.cassetteEnabled ? input.isSpace : composer.hasIntonation(withNothingElse: true)
+
+    if isConfirm {
+      clearComposerAndCalligrapher()
+    } else if isComposerOrCalligrapherEmpty {
       if compositor.cursor > 0 {
         compositor.dropKey(direction: .rear)
         walk()
@@ -372,10 +383,10 @@ extension InputHandler {
         return true
       }
     } else {
-      composer.doBackSpace()
+      letComposerAndCalligrapherDoBackSpace()
     }
 
-    switch composer.isEmpty && compositor.isEmpty {
+    switch isComposerOrCalligrapherEmpty && compositor.isEmpty {
       case false: delegate.switchState(generateStateOfInputting())
       case true: delegate.switchState(IMEState.ofAbortion())
     }
@@ -398,17 +409,17 @@ extension InputHandler {
       return true
     }
 
-    if compositor.cursor == compositor.length, composer.isEmpty {
+    if compositor.cursor == compositor.length, isComposerOrCalligrapherEmpty {
       delegate.callError("9B69938D")
       delegate.switchState(state)
       return true
     }
 
-    if composer.isEmpty {
+    if isComposerOrCalligrapherEmpty {
       compositor.dropKey(direction: .front)
       walk()
     } else {
-      composer.clear()
+      clearComposerAndCalligrapher()
     }
 
     let inputting = generateStateOfInputting()
@@ -428,7 +439,7 @@ extension InputHandler {
     guard let delegate = delegate else { return false }
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
-    if !composer.isEmpty { delegate.callError("9B6F908D") }
+    if !isComposerOrCalligrapherEmpty { delegate.callError("9B6F908D") }
     delegate.switchState(state)
     return true
   }
@@ -442,7 +453,7 @@ extension InputHandler {
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
 
-    if !composer.isEmpty {
+    if !isComposerOrCalligrapherEmpty {
       delegate.callError("ABC44080")
       delegate.switchState(state)
       return true
@@ -468,7 +479,7 @@ extension InputHandler {
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
 
-    if !composer.isEmpty {
+    if !isComposerOrCalligrapherEmpty {
       delegate.callError("9B69908D")
       delegate.switchState(state)
       return true
@@ -499,9 +510,9 @@ extension InputHandler {
       /// 此乃 macOS 內建注音輸入法預設之行為，但不太受 Windows 使用者群體之待見。
       delegate.switchState(IMEState.ofAbortion())
     } else {
-      if composer.isEmpty { return true }
-      /// 如果注拼槽不是空的話，則清空之。
-      composer.clear()
+      if isComposerOrCalligrapherEmpty { return true }
+      /// 如果注拼槽或組筆區不是空的話，則清空之。
+      clearComposerAndCalligrapher()
       switch compositor.isEmpty {
         case false: delegate.switchState(generateStateOfInputting())
         case true: delegate.switchState(IMEState.ofAbortion())
@@ -521,7 +532,7 @@ extension InputHandler {
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
 
-    if !composer.isEmpty {
+    if !isComposerOrCalligrapherEmpty {
       delegate.callError("B3BA5257")
       delegate.switchState(state)
       return true
@@ -584,7 +595,7 @@ extension InputHandler {
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
 
-    if !composer.isEmpty {
+    if !isComposerOrCalligrapherEmpty {
       delegate.callError("6ED95318")
       delegate.switchState(state)
       return true
@@ -643,7 +654,7 @@ extension InputHandler {
   func rotateCandidate(reverseOrder: Bool) -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
-    if composer.isEmpty, compositor.isEmpty || compositor.walkedNodes.isEmpty { return false }
+    if isComposerOrCalligrapherEmpty, compositor.isEmpty || compositor.walkedNodes.isEmpty { return false }
     guard state.type == .ofInputting else {
       guard state.type == .ofEmpty else {
         delegate.callError("6044F081")
@@ -653,7 +664,7 @@ extension InputHandler {
       return false
     }
 
-    guard composer.isEmpty else {
+    guard isComposerOrCalligrapherEmpty else {
       delegate.callError("A2DAF7BC")
       return true
     }

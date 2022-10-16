@@ -168,8 +168,12 @@ extension InputHandler {
       ]
       let punctuation: String = arrPunctuations.joined()
 
+      let isInputValid: Bool =
+        prefs.cassetteEnabled
+        ? currentLM.currentCassette.allowedKeys.contains(input.text) : composer.inputValidityCheck(key: input.charCode)
+
       var shouldAutoSelectCandidate: Bool =
-        composer.inputValidityCheck(key: input.charCode) || currentLM.hasUnigramsFor(key: customPunctuation)
+        isInputValid || currentLM.hasUnigramsFor(key: customPunctuation)
         || currentLM.hasUnigramsFor(key: punctuation)
 
       if !shouldAutoSelectCandidate, input.isUpperCaseASCIILetterKey {
