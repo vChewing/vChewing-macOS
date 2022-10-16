@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Preferences
+import SSPreferences
 import Shared
 import SwiftUI
 
@@ -53,8 +53,8 @@ struct VwrPrefPaneGeneral: View {
 
   var body: some View {
     ScrollView {
-      Preferences.Container(contentWidth: contentWidth) {
-        Preferences.Section(label: { Text(LocalizedStringKey("Candidate Size:")) }) {
+      SSPreferences.Container(contentWidth: contentWidth) {
+        SSPreferences.Section(label: { Text(LocalizedStringKey("Candidate Size:")) }) {
           Picker(
             "",
             selection: $selCandidateUIFontSize.onChange {
@@ -82,7 +82,7 @@ struct VwrPrefPaneGeneral: View {
           Text(LocalizedStringKey("Choose candidate font size for better visual clarity."))
             .preferenceDescription()
         }
-        Preferences.Section(label: { Text(LocalizedStringKey("UI Language:")) }) {
+        SSPreferences.Section(label: { Text(LocalizedStringKey("UI Language:")) }) {
           Picker(
             LocalizedStringKey("Follow OS settings"),
             selection: $selUILanguage.onChange {
@@ -114,7 +114,7 @@ struct VwrPrefPaneGeneral: View {
           Text(LocalizedStringKey("Change user interface language (will reboot the IME)."))
             .preferenceDescription()
         }
-        Preferences.Section(label: { Text(LocalizedStringKey("Candidate Layout:")) }) {
+        SSPreferences.Section(label: { Text(LocalizedStringKey("Candidate Layout:")) }) {
           Picker(
             "",
             selection: $selEnableHorizontalCandidateLayout.onChange {
@@ -130,7 +130,7 @@ struct VwrPrefPaneGeneral: View {
           Text(LocalizedStringKey("Choose your preferred layout of the candidate window."))
             .preferenceDescription()
         }
-        Preferences.Section(label: { Text(LocalizedStringKey("Output Settings:")) }) {
+        SSPreferences.Section(label: { Text(LocalizedStringKey("Output Settings:")) }) {
           Toggle(
             LocalizedStringKey("Auto-convert traditional Chinese glyphs to KangXi characters"),
             isOn: $selEnableKanjiConvToKangXi.onChange {
@@ -165,7 +165,7 @@ struct VwrPrefPaneGeneral: View {
             }
           )
         }
-        Preferences.Section(label: { Text(LocalizedStringKey("Misc Settings:")).controlSize(.small) }) {
+        SSPreferences.Section(label: { Text(LocalizedStringKey("Misc Settings:")).controlSize(.small) }) {
           Toggle(
             LocalizedStringKey("Check for updates automatically"),
             isOn: $selEnableAutoUpdateCheck.onChange {

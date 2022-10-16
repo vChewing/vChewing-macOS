@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Preferences
+import SSPreferences
 import Shared
 import SwiftUI
 
@@ -89,8 +89,8 @@ struct VwrPrefPaneExperience: View {
         .preferenceDescription()
         .fixedSize(horizontal: false, vertical: true)
       }.frame(maxWidth: contentWidth)
-      Preferences.Container(contentWidth: contentWidth) {
-        Preferences.Section(label: { Text(LocalizedStringKey("Cursor Selection:")) }) {
+      SSPreferences.Container(contentWidth: contentWidth) {
+        SSPreferences.Section(label: { Text(LocalizedStringKey("Cursor Selection:")) }) {
           Picker(
             "",
             selection: $selCursorPosition.onChange {
@@ -111,7 +111,7 @@ struct VwrPrefPaneExperience: View {
             }
           ).controlSize(.small)
         }
-        Preferences.Section(label: { Text(LocalizedStringKey("Shift+BackSpace:")) }) {
+        SSPreferences.Section(label: { Text(LocalizedStringKey("Shift+BackSpace:")) }) {
           Picker(
             "",
             selection: $selSpecifyShiftBackSpaceKeyBehavior.onChange {
@@ -127,7 +127,7 @@ struct VwrPrefPaneExperience: View {
           Text(LocalizedStringKey("Disassembling process does not work with non-phonetic reading keys."))
             .preferenceDescription()
         }
-        Preferences.Section(title: "(Shift+)Tab:") {
+        SSPreferences.Section(title: "(Shift+)Tab:") {
           Picker(
             "",
             selection: $selKeyBehaviorShiftTab.onChange {
@@ -143,7 +143,7 @@ struct VwrPrefPaneExperience: View {
           Text(LocalizedStringKey("Choose the behavior of (Shift+)Tab key in the candidate window."))
             .preferenceDescription()
         }
-        Preferences.Section(label: { Text(LocalizedStringKey("(Shift+)Space:")) }) {
+        SSPreferences.Section(label: { Text(LocalizedStringKey("(Shift+)Space:")) }) {
           Picker(
             "",
             selection: $selKeyBehaviorShiftSpace.onChange {
@@ -158,7 +158,7 @@ struct VwrPrefPaneExperience: View {
           Text(LocalizedStringKey("Choose the behavior of (Shift+)Space key with candidates."))
             .preferenceDescription()
         }
-        Preferences.Section(label: { Text(LocalizedStringKey("Shift+Letter:")) }) {
+        SSPreferences.Section(label: { Text(LocalizedStringKey("Shift+Letter:")) }) {
           Picker(
             "",
             selection: $selUpperCaseLetterKeyBehavior.onChange {
@@ -174,7 +174,7 @@ struct VwrPrefPaneExperience: View {
           Text(LocalizedStringKey("Choose the behavior of Shift+Letter key with letter inputs."))
             .preferenceDescription()
         }
-        Preferences.Section(label: { Text(LocalizedStringKey("Intonation Key:")) }) {
+        SSPreferences.Section(label: { Text(LocalizedStringKey("Intonation Key:")) }) {
           Picker(
             "",
             selection: $selSpecifyIntonationKeyBehavior.onChange {
@@ -190,7 +190,7 @@ struct VwrPrefPaneExperience: View {
           Text(LocalizedStringKey("Specify the behavior of intonation key when syllable composer is empty."))
             .preferenceDescription()
         }
-        Preferences.Section(title: "Shift:") {
+        SSPreferences.Section(title: "Shift:") {
           Toggle(
             LocalizedStringKey("Completely disable using Shift key to toggle alphanumerical mode"),
             isOn: $selDisableShiftTogglingAlphanumericalMode.onChange {
@@ -204,7 +204,7 @@ struct VwrPrefPaneExperience: View {
             }
           ).disabled(PrefMgr.shared.disableShiftTogglingAlphanumericalMode == true)
         }
-        Preferences.Section(title: "Caps Lock:") {
+        SSPreferences.Section(title: "Caps Lock:") {
           Toggle(
             LocalizedStringKey("Show notifications when toggling Caps Lock"),
             isOn: $selShowNotificationsWhenTogglingCapsLock.onChange {
@@ -212,7 +212,7 @@ struct VwrPrefPaneExperience: View {
             }
           ).disabled(!macOSMontereyOrLaterDetected)
         }
-        Preferences.Section(label: { Text(LocalizedStringKey("Misc Settings:")) }) {
+        SSPreferences.Section(label: { Text(LocalizedStringKey("Misc Settings:")) }) {
           Toggle(
             LocalizedStringKey("Enable Space key for calling candidate window"),
             isOn: $selKeyBehaviorSpaceForCallingCandidate.onChange {

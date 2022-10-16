@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import NotifierUI
-import Preferences
+import SSPreferences
 import UpdateSputnik
 
 extension Bool {
@@ -199,7 +199,7 @@ extension SessionCtl {
       CtlPrefWindow.show()
     } else {
       NSApp.setActivationPolicy(.accessory)
-      CtlPrefUI.shared.controller.show(preferencePane: Preferences.PaneIdentifier(rawValue: "General"))
+      CtlPrefUI.shared.controller.show(preferencePane: SSPreferences.PaneIdentifier(rawValue: "General"))
       CtlPrefUI.shared.controller.window?.level = .statusBar
       NSApp.activate(ignoringOtherApps: true)
     }

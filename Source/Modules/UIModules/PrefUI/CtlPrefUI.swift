@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Preferences
+import SSPreferences
 import SwiftUI
 
 extension NSImage {
@@ -70,36 +70,36 @@ extension NSImage {
 class CtlPrefUI {
   var controller = PreferencesWindowController(
     panes: [
-      Preferences.Pane(
-        identifier: Preferences.PaneIdentifier(rawValue: "General"),
+      SSPreferences.Pane(
+        identifier: SSPreferences.PaneIdentifier(rawValue: "General"),
         title: NSLocalizedString("General", comment: ""),
         toolbarIcon: .tabImageGeneral
       ) {
         VwrPrefPaneGeneral()
       },
-      Preferences.Pane(
-        identifier: Preferences.PaneIdentifier(rawValue: "Experience"),
+      SSPreferences.Pane(
+        identifier: SSPreferences.PaneIdentifier(rawValue: "Experience"),
         title: NSLocalizedString("Experience", comment: ""),
         toolbarIcon: .tabImageExperience
       ) {
         VwrPrefPaneExperience()
       },
-      Preferences.Pane(
-        identifier: Preferences.PaneIdentifier(rawValue: "Dictionary"),
+      SSPreferences.Pane(
+        identifier: SSPreferences.PaneIdentifier(rawValue: "Dictionary"),
         title: NSLocalizedString("Dictionary", comment: ""),
         toolbarIcon: .tabImageDictionary
       ) {
         VwrPrefPaneDictionary()
       },
-      Preferences.Pane(
-        identifier: Preferences.PaneIdentifier(rawValue: "Keyboard"),
+      SSPreferences.Pane(
+        identifier: SSPreferences.PaneIdentifier(rawValue: "Keyboard"),
         title: NSLocalizedString("Keyboard", comment: ""),
         toolbarIcon: .tabImageKeyboard
       ) {
         VwrPrefPaneKeyboard()
       },
-      Preferences.Pane(
-        identifier: Preferences.PaneIdentifier(rawValue: "DevZone"),
+      SSPreferences.Pane(
+        identifier: SSPreferences.PaneIdentifier(rawValue: "DevZone"),
         title: NSLocalizedString("DevZone", comment: ""),
         toolbarIcon: .tabImageDevZone
       ) {
