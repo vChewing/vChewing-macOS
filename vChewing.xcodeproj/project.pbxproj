@@ -10,6 +10,10 @@
 		5B00FA0C28DEC17200F6D436 /* SessionCtl_IMKCandidatesData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B00FA0B28DEC17200F6D436 /* SessionCtl_IMKCandidatesData.swift */; };
 		5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */ = {isa = PBXBuildFile; fileRef = 5B09307828B6FC3B0021F8C5 /* shortcuts.html */; };
 		5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0AF8B427B2C8290096FE54 /* StringExtension.swift */; };
+		5B0E22A628FC11B900EB7ACA /* Preferences.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 5B0E22A528FC11B900EB7ACA /* Preferences.tiff */; };
+		5B0E22A928FC11B900EB7ACA /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B0E22A728FC11B900EB7ACA /* Preferences.xib */; };
+		5B0E22B028FC17CB00EB7ACA /* Preferences.prefPane in Resources */ = {isa = PBXBuildFile; fileRef = 5B0E229F28FC11B900EB7ACA /* Preferences.prefPane */; };
+		5B0E22B228FC318C00EB7ACA /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0E22B128FC318C00EB7ACA /* Preferences.swift */; };
 		5B0EF55D28CDBF7100F8F7CE /* frmClientListMgr.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */; };
 		5B0EF55F28CDBF8E00F8F7CE /* CtlClientListMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */; };
 		5B21176C287539BB000443A9 /* SessionCtl_HandleStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176B287539BB000443A9 /* SessionCtl_HandleStates.swift */; };
@@ -131,6 +135,13 @@
 			remoteGlobalIDString = 5BD05BB727B2A429004C4F1D;
 			remoteInfo = vChewingPhraseEditor;
 		};
+		5B0E22AE28FC16AA00EB7ACA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6A0D4E9415FC0CFA00ABF4B3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5B0E229E28FC11B900EB7ACA;
+			remoteInfo = Preferences;
+		};
 		5B2F2BB7286216A500B8557B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6A0D4E9415FC0CFA00ABF4B3 /* Project object */;
@@ -191,6 +202,11 @@
 		5B09307B28B6FC410021F8C5 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = ja; path = ja.lproj/shortcuts.html; sourceTree = "<group>"; };
 		5B0AF8B427B2C8290096FE54 /* StringExtension.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = StringExtension.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B0C5EDF27C7D9870078037C /* dataCompiler.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = dataCompiler.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		5B0E229F28FC11B900EB7ACA /* Preferences.prefPane */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Preferences.prefPane; sourceTree = BUILT_PRODUCTS_DIR; };
+		5B0E22A528FC11B900EB7ACA /* Preferences.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Preferences.tiff; sourceTree = "<group>"; };
+		5B0E22A828FC11B900EB7ACA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Preferences.xib; sourceTree = "<group>"; };
+		5B0E22AA28FC11B900EB7ACA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5B0E22B128FC318C00EB7ACA /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = frmClientListMgr.xib; sourceTree = "<group>"; };
 		5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CtlClientListMgr.swift; sourceTree = "<group>"; };
 		5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHS.txt"; sourceTree = "<group>"; };
@@ -330,6 +346,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		5B0E229C28FC11B900EB7ACA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5B2F2BB0286216A500B8557B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -390,6 +413,17 @@
 				5B0C5EDF27C7D9870078037C /* dataCompiler.swift */,
 			);
 			path = DataCompiler;
+			sourceTree = "<group>";
+		};
+		5B0E22A028FC11B900EB7ACA /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				5B0E22B128FC318C00EB7ACA /* Preferences.swift */,
+				5B0E22A528FC11B900EB7ACA /* Preferences.tiff */,
+				5B0E22A728FC11B900EB7ACA /* Preferences.xib */,
+				5B0E22AA28FC11B900EB7ACA /* Info.plist */,
+			);
+			path = Preferences;
 			sourceTree = "<group>";
 		};
 		5B18BA7527C7BF6D0056EB19 /* MiscRootFiles */ = {
@@ -627,6 +661,7 @@
 				6A0D4EC215FC0D3C00ABF4B3 /* Source */,
 				5BD05BB927B2A429004C4F1D /* UserPhraseEditor */,
 				5B2F2BB4286216A500B8557B /* vChewingTests */,
+				5B0E22A028FC11B900EB7ACA /* Preferences */,
 				6A0D4EA315FC0D2D00ABF4B3 /* Products */,
 				D47D73C127A7200500255A50 /* Frameworks */,
 				5BDC5CB127C28E8B00E1CCE2 /* KeyboardExtension */,
@@ -641,6 +676,7 @@
 				6ACA41CB15FC1D7500935EF6 /* vChewingInstaller.app */,
 				5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */,
 				5B2F2BB3286216A500B8557B /* vChewingTests.xctest */,
+				5B0E229F28FC11B900EB7ACA /* Preferences.prefPane */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -720,7 +756,35 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		5B0E229A28FC11B900EB7ACA /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
+		5B0E229E28FC11B900EB7ACA /* Preferences */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5B0E22AD28FC11B900EB7ACA /* Build configuration list for PBXNativeTarget "Preferences" */;
+			buildPhases = (
+				5B0E229A28FC11B900EB7ACA /* Headers */,
+				5B0E229B28FC11B900EB7ACA /* Sources */,
+				5B0E229C28FC11B900EB7ACA /* Frameworks */,
+				5B0E229D28FC11B900EB7ACA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Preferences;
+			productName = Preferences;
+			productReference = 5B0E229F28FC11B900EB7ACA /* Preferences.prefPane */;
+			productType = "com.apple.product-type.bundle";
+		};
 		5B2F2BB2286216A500B8557B /* vChewingTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5B2F2BBB286216A500B8557B /* Build configuration list for PBXNativeTarget "vChewingTests" */;
@@ -770,6 +834,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				5B0E22AF28FC16AA00EB7ACA /* PBXTargetDependency */,
 				5B0AF8B327B2C4E20096FE54 /* PBXTargetDependency */,
 			);
 			name = vChewing;
@@ -832,6 +897,10 @@
 				LastSwiftUpdateCheck = 1340;
 				LastUpgradeCheck = 1400;
 				TargetAttributes = {
+					5B0E229E28FC11B900EB7ACA = {
+						CreatedOnToolsVersion = 14.0;
+						LastSwiftMigration = 1400;
+					};
 					5B2F2BB2286216A500B8557B = {
 						CreatedOnToolsVersion = 13.4.1;
 						TestTargetID = 6A0D4EA115FC0D2D00ABF4B3;
@@ -873,11 +942,21 @@
 				6ACA41CA15FC1D7500935EF6 /* vChewingInstaller */,
 				5BD05BB727B2A429004C4F1D /* vChewingPhraseEditor */,
 				5B2F2BB2286216A500B8557B /* vChewingTests */,
+				5B0E229E28FC11B900EB7ACA /* Preferences */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		5B0E229D28FC11B900EB7ACA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5B0E22A928FC11B900EB7ACA /* Preferences.xib in Resources */,
+				5B0E22A628FC11B900EB7ACA /* Preferences.tiff in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5B2F2BB1286216A500B8557B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -911,6 +990,7 @@
 				5BF9DA2828840E6200DBD48E /* template-exclusions.txt in Resources */,
 				5B7DA80328BF6BC600D7B2AD /* fixinstall.sh in Resources */,
 				5B0EF55D28CDBF7100F8F7CE /* frmClientListMgr.xib in Resources */,
+				5B0E22B028FC17CB00EB7ACA /* Preferences.prefPane in Resources */,
 				5BDCBB2E27B4E67A00D0CC59 /* vChewingPhraseEditor.app in Resources */,
 				5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */,
 				6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */,
@@ -1038,6 +1118,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		5B0E229B28FC11B900EB7ACA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5B0E22B228FC318C00EB7ACA /* Preferences.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5B2F2BAF286216A500B8557B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1117,6 +1205,11 @@
 			target = 5BD05BB727B2A429004C4F1D /* vChewingPhraseEditor */;
 			targetProxy = 5B0AF8B227B2C4E20096FE54 /* PBXContainerItemProxy */;
 		};
+		5B0E22AF28FC16AA00EB7ACA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5B0E229E28FC11B900EB7ACA /* Preferences */;
+			targetProxy = 5B0E22AE28FC16AA00EB7ACA /* PBXContainerItemProxy */;
+		};
 		5B2F2BB8286216A500B8557B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 6A0D4EA115FC0D2D00ABF4B3 /* vChewing */;
@@ -1139,6 +1232,14 @@
 				5B09307B28B6FC410021F8C5 /* ja */,
 			);
 			name = shortcuts.html;
+			sourceTree = "<group>";
+		};
+		5B0E22A728FC11B900EB7ACA /* Preferences.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5B0E22A828FC11B900EB7ACA /* Base */,
+			);
+			name = Preferences.xib;
 			sourceTree = "<group>";
 		};
 		5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */ = {
@@ -1268,6 +1369,110 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		5B0E22AB28FC11B900EB7ACA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Preferences/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMainNibFile = Preferences;
+				INFOPLIST_KEY_NSPrincipalClass = Preferences;
+				INSTALL_PATH = "$(HOME)/Library/PreferencePanes";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LD_RUNPATH_SEARCH_PATHS_SHALLOW_BUNDLE_$(SHALLOW_BUNDLE))",
+					"@loader_path/../Frameworks",
+					"@loader_path/../../../../Frameworks",
+					/usr/lib/swift,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.Preferences;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				WRAPPER_EXTENSION = prefPane;
+			};
+			name = Debug;
+		};
+		5B0E22AC28FC11B900EB7ACA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Preferences/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMainNibFile = Preferences;
+				INFOPLIST_KEY_NSPrincipalClass = Preferences;
+				INSTALL_PATH = "$(HOME)/Library/PreferencePanes";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LD_RUNPATH_SEARCH_PATHS_SHALLOW_BUNDLE_$(SHALLOW_BUNDLE))",
+					"@loader_path/../Frameworks",
+					"@loader_path/../../../../Frameworks",
+					/usr/lib/swift,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.Preferences;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				WRAPPER_EXTENSION = prefPane;
+			};
+			name = Release;
+		};
 		5B2F2BB9286216A500B8557B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1293,6 +1498,11 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LD_RUNPATH_SEARCH_PATHS_SHALLOW_BUNDLE_$(SHALLOW_BUNDLE))",
+					/usr/lib/swift,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
 				MARKETING_VERSION = 2.8.9;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -1329,6 +1539,11 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LD_RUNPATH_SEARCH_PATHS_SHALLOW_BUNDLE_$(SHALLOW_BUNDLE))",
+					/usr/lib/swift,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
 				MARKETING_VERSION = 2.8.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -1742,6 +1957,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		5B0E22AD28FC11B900EB7ACA /* Build configuration list for PBXNativeTarget "Preferences" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5B0E22AB28FC11B900EB7ACA /* Debug */,
+				5B0E22AC28FC11B900EB7ACA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		5B2F2BBB286216A500B8557B /* Build configuration list for PBXNativeTarget "vChewingTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
