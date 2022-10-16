@@ -19,6 +19,7 @@
 		5B40113928D7050D00A9D4CB /* Shared in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113828D7050D00A9D4CB /* Shared */; };
 		5B40113C28D71C0100A9D4CB /* Uninstaller in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113B28D71C0100A9D4CB /* Uninstaller */; };
 		5B5A603028E81CC50001AE8D /* SwiftUIBackports in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5A602F28E81CC50001AE8D /* SwiftUIBackports */; };
+		5B5C8ED828FC0EA9002C93A5 /* SSPreferences in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5C8ED728FC0EA9002C93A5 /* SSPreferences */; };
 		5B62A33D27AE7CC100A19448 /* CtlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33C27AE7CC100A19448 /* CtlAboutWindow.swift */; };
 		5B660A8628F64A8800E5E4F6 /* SymbolMenuDefaultData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B660A8528F64A8800E5E4F6 /* SymbolMenuDefaultData.swift */; };
 		5B6C141228A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6C141128A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift */; };
@@ -80,7 +81,6 @@
 		5BDB7A3D28D4824A001AC277 /* Hotenka in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A3C28D4824A001AC277 /* Hotenka */; };
 		5BDB7A3F28D4824A001AC277 /* LineReader in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A3E28D4824A001AC277 /* LineReader */; };
 		5BDB7A4128D4824A001AC277 /* Megrez in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4028D4824A001AC277 /* Megrez */; };
-		5BDB7A4328D4824A001AC277 /* Preferences in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4228D4824A001AC277 /* Preferences */; };
 		5BDB7A4528D4824A001AC277 /* ShiftKeyUpChecker in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4428D4824A001AC277 /* ShiftKeyUpChecker */; };
 		5BDB7A4728D4824A001AC277 /* Tekkon in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4628D4824A001AC277 /* Tekkon */; };
 		5BDCBB2E27B4E67A00D0CC59 /* vChewingPhraseEditor.app in Resources */ = {isa = PBXBuildFile; fileRef = 5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */; };
@@ -211,6 +211,7 @@
 		5B3133BE280B229700A4A505 /* InputHandler_States.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputHandler_States.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Uninstaller; path = Packages/vChewing_Uninstaller; sourceTree = "<group>"; };
 		5B5A602E28E81CB00001AE8D /* ShapsBenkau_SwiftUIBackports */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = ShapsBenkau_SwiftUIBackports; path = Packages/ShapsBenkau_SwiftUIBackports; sourceTree = "<group>"; };
+		5B5C8ED628FC0E8E002C93A5 /* Sindresorhus_SSPreferences */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Sindresorhus_SSPreferences; path = Packages/Sindresorhus_SSPreferences; sourceTree = "<group>"; };
 		5B62A33C27AE7CC100A19448 /* CtlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = CtlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B65B919284D0185007C558B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		5B660A8528F64A8800E5E4F6 /* SymbolMenuDefaultData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolMenuDefaultData.swift; sourceTree = "<group>"; };
@@ -267,7 +268,6 @@
 		5BD05C6327B2BBEF004C4F1D /* Content.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = Content.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BD05C6427B2BBEF004C4F1D /* WindowController.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = WindowController.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BD05C6527B2BBEF004C4F1D /* ViewController.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ViewController.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5BDB7A2F28D47587001AC277 /* Sindresorhus_Preferences */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Sindresorhus_Preferences; path = Packages/Sindresorhus_Preferences; sourceTree = "<group>"; };
 		5BDB7A3028D47587001AC277 /* Jad_BookmarkManager */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Jad_BookmarkManager; path = Packages/Jad_BookmarkManager; sourceTree = "<group>"; };
 		5BDB7A3128D47587001AC277 /* DanielGalasko_FolderMonitor */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = DanielGalasko_FolderMonitor; path = Packages/DanielGalasko_FolderMonitor; sourceTree = "<group>"; };
 		5BDB7A3228D47587001AC277 /* vChewing_Hotenka */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Hotenka; path = Packages/vChewing_Hotenka; sourceTree = "<group>"; };
@@ -354,7 +354,6 @@
 				5BDB7A4128D4824A001AC277 /* Megrez in Frameworks */,
 				5BFC63C928D49754004A77B7 /* IMKUtils in Frameworks */,
 				5BDB7A4728D4824A001AC277 /* Tekkon in Frameworks */,
-				5BDB7A4328D4824A001AC277 /* Preferences in Frameworks */,
 				5BDB7A3D28D4824A001AC277 /* Hotenka in Frameworks */,
 				5BDB7A3F28D4824A001AC277 /* LineReader in Frameworks */,
 				5B963C9D28D5BFB800DCEE88 /* CocoaExtension in Frameworks */,
@@ -362,6 +361,7 @@
 				5BFC63CF28D4ACA3004A77B7 /* LangModelAssembly in Frameworks */,
 				5BC5E02128DDEFE00094E427 /* TooltipUI in Frameworks */,
 				5BDB7A3928D4824A001AC277 /* BookmarkManager in Frameworks */,
+				5B5C8ED828FC0EA9002C93A5 /* SSPreferences in Frameworks */,
 				5B5A603028E81CC50001AE8D /* SwiftUIBackports in Frameworks */,
 				5B963CA328D5C23600DCEE88 /* SwiftExtension in Frameworks */,
 				5B40113928D7050D00A9D4CB /* Shared in Frameworks */,
@@ -577,7 +577,7 @@
 				5BDB7A3428D47587001AC277 /* Qwertyyb_ShiftKeyUpChecker */,
 				5BDB7A3528D47587001AC277 /* RMJay_LineReader */,
 				5B5A602E28E81CB00001AE8D /* ShapsBenkau_SwiftUIBackports */,
-				5BDB7A2F28D47587001AC277 /* Sindresorhus_Preferences */,
+				5B5C8ED628FC0E8E002C93A5 /* Sindresorhus_SSPreferences */,
 				5BA8C30128DEFE4F004C5CC4 /* vChewing_CandidateWindow */,
 				5B963C9B28D5BE4100DCEE88 /* vChewing_CocoaExtension */,
 				5BDB7A3228D47587001AC277 /* vChewing_Hotenka */,
@@ -779,7 +779,6 @@
 				5BDB7A3C28D4824A001AC277 /* Hotenka */,
 				5BDB7A3E28D4824A001AC277 /* LineReader */,
 				5BDB7A4028D4824A001AC277 /* Megrez */,
-				5BDB7A4228D4824A001AC277 /* Preferences */,
 				5BDB7A4428D4824A001AC277 /* ShiftKeyUpChecker */,
 				5BDB7A4628D4824A001AC277 /* Tekkon */,
 				5BFC63C528D48806004A77B7 /* NSAttributedTextView */,
@@ -796,6 +795,7 @@
 				5BC5E02328DE07860094E427 /* PopupCompositionBuffer */,
 				5BA8C30228DF0360004C5CC4 /* CandidateWindow */,
 				5B5A602F28E81CC50001AE8D /* SwiftUIBackports */,
+				5B5C8ED728FC0EA9002C93A5 /* SSPreferences */,
 			);
 			productName = vChewing;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */;
@@ -1794,6 +1794,10 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = SwiftUIBackports;
 		};
+		5B5C8ED728FC0EA9002C93A5 /* SSPreferences */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SSPreferences;
+		};
 		5B963C9C28D5BFB800DCEE88 /* CocoaExtension */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CocoaExtension;
@@ -1841,10 +1845,6 @@
 		5BDB7A4028D4824A001AC277 /* Megrez */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Megrez;
-		};
-		5BDB7A4228D4824A001AC277 /* Preferences */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Preferences;
 		};
 		5BDB7A4428D4824A001AC277 /* ShiftKeyUpChecker */ = {
 			isa = XCSwiftPackageProductDependency;

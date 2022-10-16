@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import BookmarkManager
-import Preferences
+import SSPreferences
 import Shared
 import SwiftUI
 

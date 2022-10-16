@@ -154,12 +154,12 @@ extension SessionCtl {
   ///    **REASON**: IMKCandidates has bug that it does not respect font attributes attached to the
   ///    results generated from `candidiates() -> [Any]!` function. IMKCandidates is plagued with
   ///    bugs which are not dealt in the recent decade, regardless Radar complaints from input method developers.
-  /// 1) Make sure the usage of ".languageIdentifier" is disabled in the Dev Zone of the vChewing Preferences.
+  /// 1) Make sure the usage of ".languageIdentifier" is disabled in the Dev Zone of the vChewing SSPreferences.
   /// 2) Run "make update" in the project folder to download the latest git-submodule of dictionary file.
   /// 3) Compile the target "vChewingInstaller", run it. It will install the input method into
   ///    "~/Library/Input Methods/" folder. Remember to ENABLE BOTH "vChewing-CHS"
   ///    and "vChewing-CHT" input sources in System Preferences / Settings.
-  /// 4) Type Zhuyin "ej3" (ㄍㄨˇ) (or "gu3" in Pinyin if you enabled Pinyin typing in vChewing preferences.)
+  /// 4) Type Zhuyin "ej3" (ㄍㄨˇ) (or "gu3" in Pinyin if you enabled Pinyin typing in vChewing SSPreferences.)
   ///    using both "vChewing-CHS" and "vChewing-CHT", and check the candidate window by pressing SPACE key.
   /// 5) Do NOT enable either KangXi conversion mode nor JIS conversion mode. They are disabled by default.
   /// 6) Expecting the glyph differences of the candidate "骨" between PingFang SC and PingFang TC when rendering

@@ -15,7 +15,7 @@ public protocol PreferencePaneConvertible {
 }
 
 @available(macOS 10.15, *)
-extension Preferences {
+extension SSPreferences {
   /**
    Create a SwiftUI-based preference pane.
 
