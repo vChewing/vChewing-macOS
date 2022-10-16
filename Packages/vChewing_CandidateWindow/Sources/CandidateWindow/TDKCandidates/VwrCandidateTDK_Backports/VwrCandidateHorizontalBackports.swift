@@ -66,6 +66,7 @@ public struct VwrCandidateHorizontalBackports: View {
                   .contentShape(Rectangle())
                   .onTapGesture { didSelectCandidateAt(currentCandidate.index) }
               }
+              Spacer()
             }.frame(
               minWidth: 0,
               maxWidth: .infinity,
