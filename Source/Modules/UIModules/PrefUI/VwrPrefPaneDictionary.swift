@@ -119,6 +119,9 @@ struct VwrPrefPaneDictionary: View {
             LocalizedStringKey("Automatically reload user data files if changes detected"),
             isOn: $selAutoReloadUserData.onChange {
               PrefMgr.shared.shouldAutoReloadUserDataFiles = selAutoReloadUserData
+              if selAutoReloadUserData {
+                LMMgr.initUserLangModels()
+              }
             }
           ).controlSize(.small)
         }
