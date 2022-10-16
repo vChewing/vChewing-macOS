@@ -114,6 +114,8 @@ extension TISInputSource {
   }
 
   public var scriptCode: Int {
+    // Shiki's note: There is no "kTISPropertyScriptCode" in TextInputSources.h file.
+    // Using Mzp's latest solution in his blog: https://mzp.hatenablog.com/entry/2018/07/16/212026
     let r = TISGetInputSourceProperty(self, "TSMInputSourcePropertyScriptCode" as CFString)
     return unsafeBitCast(r, to: NSString.self).integerValue
   }
