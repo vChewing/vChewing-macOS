@@ -210,7 +210,7 @@ if !skipPhoneticHandling && _composer.inputValidityCheck(key: charCode) {
   // update the composing buffer.
   // 沒有調號的話，只需要 updateClientComposingBuffer() 且終止處理（return true）即可。
   // 有調號的話，則不需要這樣處理，轉而繼續在此之後的處理。
-  let composeReading = _composer.hasToneMarker()
+  let composeReading = _composer.hasIntonation()
   if !composeReading {
     delegate.switchState(generateStateOfInputting())
     return true
@@ -218,7 +218,7 @@ if !skipPhoneticHandling && _composer.inputValidityCheck(key: charCode) {
 }
 
 // 這裡不需要做排他性判斷。
-var composeReading = _composer.hasToneMarker()
+var composeReading = _composer.hasIntonation()
 
 // See if we have composition if Enter/Space is hit and buffer is not empty.
 // We use "|=" conditioning so that the tone marker key is also taken into account.
@@ -227,7 +227,7 @@ var composeReading = _composer.hasToneMarker()
 // 來看看詞庫內到底有沒有對應的讀音索引。這裡用了類似「|=」的判斷處理方式。
 composeReading = composeReading || (!_composer.isEmpty && (input.isSpace || input.isEnter))
 if composeReading {  // 符合按鍵組合條件
-  if input.isSpace && !_composer.hasToneMarker() {
+  if input.isSpace && !_composer.hasIntonation() {
     _composer.receiveKey(fromString: " ")  // 補上空格，否則倚天忘形與許氏排列某些音無法響應不了陰平聲調。
     // 某些輸入法使用 OVMandarin 而不是鐵恨引擎，所以不需要這樣補。但鐵恨引擎對所有聲調一視同仁。
   }
