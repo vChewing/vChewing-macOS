@@ -61,7 +61,7 @@ final class TekkonTestsBasic: XCTestCase {
     composer.receiveKey(fromString: "l")  // ㄠ
 
     // Testing missing tone markers
-    toneMarkerIndicator = composer.hasToneMarker()
+    toneMarkerIndicator = composer.hasIntonation()
     XCTAssert(!toneMarkerIndicator)
 
     composer.receiveKey(fromString: "3")  // 上聲
@@ -82,17 +82,17 @@ final class TekkonTestsBasic: XCTestCase {
     XCTAssertEqual(composer.getComposition(isTextBookStyle: true), "˙ㄉㄧㄠ")
 
     // Testing having tone markers
-    toneMarkerIndicator = composer.hasToneMarker()
+    toneMarkerIndicator = composer.hasIntonation()
     XCTAssert(toneMarkerIndicator)
 
     // Testing having not-only tone markers
-    toneMarkerIndicator = composer.hasToneMarker(withNothingElse: true)
+    toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     XCTAssert(!toneMarkerIndicator)
 
     // Testing having only tone markers
     composer.clear()
     composer.receiveKey(fromString: "3")  // 上聲
-    toneMarkerIndicator = composer.hasToneMarker(withNothingElse: true)
+    toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     XCTAssert(toneMarkerIndicator)
 
     // Testing auto phonabet combination fixing process.
@@ -189,7 +189,7 @@ final class TekkonTestsPinyin: XCTestCase {
     composer.receiveKey(fromString: "o")
 
     // Testing missing tone markers
-    toneMarkerIndicator = composer.hasToneMarker()
+    toneMarkerIndicator = composer.hasIntonation()
     XCTAssert(!toneMarkerIndicator)
 
     composer.receiveKey(fromString: "3")  // 上聲
@@ -210,17 +210,17 @@ final class TekkonTestsPinyin: XCTestCase {
     XCTAssertEqual(composer.getComposition(isTextBookStyle: true), "˙ㄉㄧㄠ")
 
     // Testing having tone markers
-    toneMarkerIndicator = composer.hasToneMarker()
+    toneMarkerIndicator = composer.hasIntonation()
     XCTAssert(toneMarkerIndicator)
 
     // Testing having not-only tone markers
-    toneMarkerIndicator = composer.hasToneMarker(withNothingElse: true)
+    toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     XCTAssert(!toneMarkerIndicator)
 
     // Testing having only tone markers
     composer.clear()
     composer.receiveKey(fromString: "3")  // 上聲
-    toneMarkerIndicator = composer.hasToneMarker(withNothingElse: true)
+    toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     XCTAssert(toneMarkerIndicator)
   }
 
@@ -237,7 +237,7 @@ final class TekkonTestsPinyin: XCTestCase {
     composer.receiveKey(fromString: "g")
 
     // Testing missing tone markers
-    toneMarkerIndicator = composer.hasToneMarker()
+    toneMarkerIndicator = composer.hasIntonation()
     XCTAssert(!toneMarkerIndicator)
 
     composer.receiveKey(fromString: "2")  // 陽平
@@ -258,17 +258,17 @@ final class TekkonTestsPinyin: XCTestCase {
     XCTAssertEqual(composer.getComposition(isTextBookStyle: true), "˙ㄑㄩㄥ")
 
     // Testing having tone markers
-    toneMarkerIndicator = composer.hasToneMarker()
+    toneMarkerIndicator = composer.hasIntonation()
     XCTAssert(toneMarkerIndicator)
 
     // Testing having not-only tone markers
-    toneMarkerIndicator = composer.hasToneMarker(withNothingElse: true)
+    toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     XCTAssert(!toneMarkerIndicator)
 
     // Testing having only tone markers
     composer.clear()
     composer.receiveKey(fromString: "3")  // 上聲
-    toneMarkerIndicator = composer.hasToneMarker(withNothingElse: true)
+    toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     XCTAssert(toneMarkerIndicator)
   }
 
@@ -285,7 +285,7 @@ final class TekkonTestsPinyin: XCTestCase {
     composer.receiveKey(fromString: "g")
 
     // Testing missing tone markers
-    toneMarkerIndicator = composer.hasToneMarker()
+    toneMarkerIndicator = composer.hasIntonation()
     XCTAssert(!toneMarkerIndicator)
 
     composer.receiveKey(fromString: "2")  // 陽平
@@ -306,17 +306,17 @@ final class TekkonTestsPinyin: XCTestCase {
     XCTAssertEqual(composer.getComposition(isTextBookStyle: true), "˙ㄑㄩㄥ")
 
     // Testing having tone markers
-    toneMarkerIndicator = composer.hasToneMarker()
+    toneMarkerIndicator = composer.hasIntonation()
     XCTAssert(toneMarkerIndicator)
 
     // Testing having not-only tone markers
-    toneMarkerIndicator = composer.hasToneMarker(withNothingElse: true)
+    toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     XCTAssert(!toneMarkerIndicator)
 
     // Testing having only tone markers
     composer.clear()
     composer.receiveKey(fromString: "3")  // 上聲
-    toneMarkerIndicator = composer.hasToneMarker(withNothingElse: true)
+    toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     XCTAssert(toneMarkerIndicator)
   }
 
@@ -333,7 +333,7 @@ final class TekkonTestsPinyin: XCTestCase {
     composer.receiveKey(fromString: "g")
 
     // Testing missing tone markers
-    toneMarkerIndicator = composer.hasToneMarker()
+    toneMarkerIndicator = composer.hasIntonation()
     XCTAssert(!toneMarkerIndicator)
 
     composer.receiveKey(fromString: "2")  // 陽平
@@ -354,17 +354,17 @@ final class TekkonTestsPinyin: XCTestCase {
     XCTAssertEqual(composer.getComposition(isTextBookStyle: true), "˙ㄑㄩㄥ")
 
     // Testing having tone markers
-    toneMarkerIndicator = composer.hasToneMarker()
+    toneMarkerIndicator = composer.hasIntonation()
     XCTAssert(toneMarkerIndicator)
 
     // Testing having not-only tone markers
-    toneMarkerIndicator = composer.hasToneMarker(withNothingElse: true)
+    toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     XCTAssert(!toneMarkerIndicator)
 
     // Testing having only tone markers
     composer.clear()
     composer.receiveKey(fromString: "3")  // 上聲
-    toneMarkerIndicator = composer.hasToneMarker(withNothingElse: true)
+    toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     XCTAssert(toneMarkerIndicator)
   }
 
@@ -380,7 +380,7 @@ final class TekkonTestsPinyin: XCTestCase {
     composer.receiveKey(fromString: "g")
 
     // Testing missing tone markers
-    toneMarkerIndicator = composer.hasToneMarker()
+    toneMarkerIndicator = composer.hasIntonation()
     XCTAssert(!toneMarkerIndicator)
 
     composer.receiveKey(fromString: "2")  // 陽平
@@ -401,17 +401,17 @@ final class TekkonTestsPinyin: XCTestCase {
     XCTAssertEqual(composer.getComposition(isTextBookStyle: true), "˙ㄑㄩㄥ")
 
     // Testing having tone markers
-    toneMarkerIndicator = composer.hasToneMarker()
+    toneMarkerIndicator = composer.hasIntonation()
     XCTAssert(toneMarkerIndicator)
 
     // Testing having not-only tone markers
-    toneMarkerIndicator = composer.hasToneMarker(withNothingElse: true)
+    toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     XCTAssert(!toneMarkerIndicator)
 
     // Testing having only tone markers
     composer.clear()
     composer.receiveKey(fromString: "3")  // 上聲
-    toneMarkerIndicator = composer.hasToneMarker(withNothingElse: true)
+    toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     XCTAssert(toneMarkerIndicator)
   }
 }

@@ -68,19 +68,19 @@ extension InputHandler {
 
       // 沒有調號的話，只需要 setInlineDisplayWithCursor() 且終止處理（return true）即可。
       // 有調號的話，則不需要這樣，而是轉而繼續在此之後的處理。
-      if !composer.hasToneMarker() {
+      if !composer.hasIntonation() {
         delegate.switchState(generateStateOfInputting())
         return true
       }
     }
 
-    var composeReading = composer.hasToneMarker() && composer.inputValidityCheck(key: input.charCode)  // 這裡不需要做排他性判斷。
+    var composeReading = composer.hasIntonation() && composer.inputValidityCheck(key: input.charCode)  // 這裡不需要做排他性判斷。
 
     // 如果當前的按鍵是 Enter 或 Space 的話，這時就可以取出 _composer 內的注音來做檢查了。
     // 來看看詞庫內到底有沒有對應的讀音索引。這裡用了類似「|=」的判斷處理方式。
     composeReading = composeReading || (!composer.isEmpty && (input.isSpace || input.isEnter))
     if composeReading {
-      if input.isSpace, !composer.hasToneMarker() {
+      if input.isSpace, !composer.hasIntonation() {
         // 補上空格，否則倚天忘形與許氏排列某些音無法響應不了陰平聲調。
         // 小麥注音因為使用 OVMandarin，所以不需要這樣補。但鐵恨引擎對所有聲調一視同仁。
         composer.receiveKey(fromString: " ")
