@@ -28,7 +28,7 @@ extension vChewingLM {
     public var count: Int { charDefMap.count }
     /// 是否已有資料載入。
     public var isLoaded: Bool { !charDefMap.isEmpty }
-    /// 返回「允許使用的敲字鍵」的
+    /// 返回「允許使用的敲字鍵」的陣列。
     public var allowedKeys: [String] { Array(keyNameMap.keys + [" "]).deduplicated }
     /// 將給定的按鍵字母轉換成要顯示的形態。
     public func convertKeyToDisplay(char: String) -> String {
