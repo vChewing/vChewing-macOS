@@ -360,7 +360,7 @@ extension InputHandler {
       return true
     }
 
-    if composer.hasToneMarker(withNothingElse: true) {
+    if composer.hasIntonation(withNothingElse: true) {
       composer.clear()
     } else if composer.isEmpty {
       if compositor.cursor > 0 {

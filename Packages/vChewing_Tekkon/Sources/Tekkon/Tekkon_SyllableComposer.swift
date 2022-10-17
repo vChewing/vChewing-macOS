@@ -317,7 +317,7 @@ extension Tekkon {
     /// 用來檢測是否有調號的函式，預設情況下不判定聲調以外的內容的存無。
     /// - Parameters:
     ///   - withNothingElse: 追加判定「槽內是否僅有調號」。
-    public func hasToneMarker(withNothingElse: Bool = false) -> Bool {
+    public func hasIntonation(withNothingElse: Bool = false) -> Bool {
       if !withNothingElse {
         return !intonation.isEmpty
       }

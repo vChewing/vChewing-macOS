@@ -387,7 +387,7 @@ public class InputHandler: InputHandlerProtocol {
     var theComposer = composer  // 複製一份用來做實驗。
     theComposer.clear()  // 清空各種槽的內容。
     theComposer.receiveKey(fromString: input.text)
-    return theComposer.hasToneMarker(withNothingElse: true)
+    return theComposer.hasIntonation(withNothingElse: true)
   }
 
   // MARK: - Extracted methods and functions (Megrez).
