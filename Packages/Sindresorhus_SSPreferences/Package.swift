@@ -2,21 +2,21 @@
 import PackageDescription
 
 let package = Package(
-  name: "Preferences",
+  name: "SSPreferences",
   platforms: [
     .macOS(.v10_11)
   ],
   products: [
     .library(
-      name: "Preferences",
+      name: "SSPreferences",
       targets: [
-        "Preferences"
+        "SSPreferences"
       ]
     )
   ],
   targets: [
     .target(
-      name: "Preferences"
+      name: "SSPreferences"
     )
   ]
 )

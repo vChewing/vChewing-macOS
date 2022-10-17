@@ -14,6 +14,7 @@ public protocol PrefMgrProtocol {
   var deltaOfCalendarYears: Int { get set }
   var mostRecentInputMode: String { get set }
   var checkUpdateAutomatically: Bool { get set }
+  var cassettePath: String { get set }
   var userDataFolderSpecified: String { get set }
   var appleLanguages: [String] { get set }
   var keyboardParser: Int { get set }
@@ -48,7 +49,10 @@ public protocol PrefMgrProtocol {
   var shouldNotFartInLieuOfBeep: Bool { get set }
   var showHanyuPinyinInCompositionBuffer: Bool { get set }
   var inlineDumpPinyinInLieuOfZhuyin: Bool { get set }
+  var showTranslatedStrokesInCompositionBuffer: Bool { get set }
+  var forceCassetteChineseConversion: Int { get set }
   var cns11643Enabled: Bool { get set }
+  var cassetteEnabled: Bool { get set }
   var symbolInputEnabled: Bool { get set }
   var chineseConversionEnabled: Bool { get set }
   var shiftJISShinjitaiOutputEnabled: Bool { get set }
@@ -71,4 +75,5 @@ public protocol PrefMgrProtocol {
   var usingHotKeyJIS: Bool { get set }
   var usingHotKeyHalfWidthASCII: Bool { get set }
   var usingHotKeyCurrencyNumerals: Bool { get set }
+  var usingHotKeyCassette: Bool { get set }
 }

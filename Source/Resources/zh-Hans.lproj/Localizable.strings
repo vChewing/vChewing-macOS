@@ -1,4 +1,5 @@
 "vChewing" = "威注音输入法";
+"CIN Cassette Mode" = "CIN 磁带模式";
 "Invalid Selection Keys." = "选字键参数资料值不规范。";
 "Alphanumerical Input Mode" = "英数输入模式";
 "Chinese Input Mode" = "中文输入模式";
@@ -115,6 +116,7 @@
 "(Shift+)Space:" = "(Shift+)空格键:";
 "⚠︎ This feature in IMK Candidate Window defects. Please consult Apple Developer Relations\nand tell them the related Radar ID: #FB11300759." = "⚠︎ 该功能因 IMK 选字窗自身缺陷而无法实作。\n请携 Radar 编号 #FB11300759 找 Apple Developer Relations 投诉。";
 "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 该功能当且仅当目前的排版字型不支援纵排标点动态显示转义的情况下才有用。一旦使用了，所有敲出去的标点都会被永久转换为静态纵排标点：哪怕当前编辑器的排版模式已经改成横排，这些已经输入的标点也都还是纵排标点字符。";
+"All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "不启用该选项的话，在组字区内的字根将会以原始键盘按键名称来显示。所有关于字根的定义，均请洽 CIN 磁带档案内的「%keyname」章节。";
 "Allow backspace-editing miscomposed readings" = "允许对无效的读音使用 BackSpace 编辑";
 "Allow boosting / excluding a candidate of single kanji" = "将可以就地升权/排除的候选字词的最短词长设为单个汉字";
 "Allow using Enter key to confirm associated candidate selection" = "允许使用 Enter 确认当前选中的联想词";
@@ -137,6 +139,8 @@
 "Basic Keyboard Layout:" = "基础键盘布局:";
 "Candidate Layout:" = "候选字窗布局:";
 "Candidate Size:" = "候选字窗字号:";
+"Cassette mode is similar to the CIN support of the Yahoo Kimo IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)." = "磁带模式类似于雅虎奇摩输入法的 CIN 支援模式，允许使用者借由 CIN 表格档案扩充自己想要的笔画输入法（比如五笔、仓颉、呒虾米，等）。然而，因为威注音不打算为了这个功能而牺牲注音输入的体验，所以这个磁带模式的体验对于已经习惯 RIME 或者 OpenVanilla 的人群而言可能会稍微麻烦一些。";
+"Cassette" = "磁带设定";
 "Change user interface language (will reboot the IME)." = "变更输入法介面语言，会自动重启输入法。";
 "Check for updates automatically" = "自动检查软体更新";
 "Choose candidate font size for better visual clarity." = "变更候选字窗的字型大小。";
@@ -148,6 +152,8 @@
 "Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only." = "请选择 macOS 英数键盘布局。该布局仅用于 Shift 英数输入模式。";
 "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is not (any) pinyin." = "请选择 macOS 基础键盘布局。QWERTY 以外的英数布局是为了拼音排列的使用者而准备的。如果当前的普通话/国音分析器并未设为拼音的话，则键盘布局选项仅会影响到荧幕键盘。";
 "Choose the phonetic layout for Mandarin parser." = "请指定普通话/国音分析器所使用的注音排列。";
+"Choose your desired cassette file path. Will be omitted if invalid." = "请在此指定您想指定的 CIN 磁带档案。无效值会被忽略。";
+"Choose your desired cassette file path." = "请在此指定您想指定的 CIN 磁带档案。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "请在此指定您想指定的使用者语汇档案目录。无效值会被忽略。";
 "Choose your preferred layout of the candidate window." = "选择您所偏好的候选字窗布局。";
 "Clear the entire inline composition buffer like Shift+Delete" = "像 Shift+Delete 那样清空当前组字区内容";
@@ -162,13 +168,16 @@
 "Dictionary" = "辞典设定";
 "Directly commit lowercased letters" = "直接递交小写字母";
 "Directly commit uppercased letters" = "直接递交大写字母";
+"Disable forced conversion for cassette outputs" = "对磁带模式禁用繁简转换";
 "Disable Shift key accomodation in all cases" = "对任何客体应用均停用 Shift 键相容性措施";
 "Disassemble the previous reading, dropping its intonation" = "析构游标正后方的字音，且剔除其声调";
 "Disassembling process does not work with non-phonetic reading keys." = "析构行为仅针对组字器内「身为汉字读音」的读音索引单元有效。";
 "Emulating select-candidate-per-character mode" = "模拟 90 年代前期注音逐字选字输入风格";
+"Enable cassette mode, suppressing phonabet input" = "启用磁带模式，会停用注音输入";
 "Enable CNS11643 Support (2022-09-12)" = "启用 CNS11643 全字库支援 (2022-09-12)";
 "Enable Space key for calling candidate window" = "敲空格键以呼出候选字窗";
 "Enable symbol input support (incl. certain emoji symbols)" = "启用包括少许绘文字在内的符号输入支援";
+"Enforce conversion in both input modes" = "依当前简繁模式强制转换";
 "English" = "英语";
 "Eten 26" = "倚天忘形排列 (26 键)";
 "Eten Traditional" = "倚天传统排列";
@@ -195,12 +204,16 @@
 "Misc Settings:" = "杂项:";
 "MiTAC" = "神通排列";
 "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead." = "注意：Mac 键盘的「Delete ⌫」键在此被称作「BackSpace 退格键 ⌫」以与 PC 键盘的真正的「Delete ⌦」键彼此区分开。若您想在没有数字小键盘的 Mac 电脑上使用真正的「Delete ⌦」按键的话，请改用「Fn+⌫」。";
+"Only enforce conversion in Simplified Chinese mode" = "仅在简体模式转换至简体";
+"Only enforce conversion in Traditional Chinese mode" = "仅在繁体模式转换至繁体";
 "Only load factory language models if needed" = "按需载入简繁体模式的原厂辞典资料";
 "Only override the intonation of the previous reading if different" = "仅在键入的声调与游标正后方的字音不同时，尝试覆写";
 "Only use this with known Chromium-based browsers" = "仅针对知名的 Chromium 核心的浏览器启用该措施";
 "Output Settings:" = "输出设定:";
 "Override the previous reading's intonation with candidate-reset" = "尝试对游标正后方的字音覆写声调，且重设其选字状态";
+"Path invalid or file access error." = "档案存取失败，或者路径不合规。";
 "Phonetic Parser:" = "注音排列:";
+"Please reconfigure the cassette path to a valid one before enabling this mode." = "在启用该模式之前，请事先正确设定磁带档案路径。";
 "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu." = "请利用滑鼠滚轮检视该页面。也请洽输入法选单内的热键指南。";
 "Push the cursor in front of the phrase after selection" = "在选字后将游标置于该字词的前方";
 "Quick Setup:" = "直接设定:";
@@ -211,6 +224,7 @@
 "Shift+Letter:" = "Shift+字母键:";
 "Show Hanyu-Pinyin in the inline composition buffer" = "拼音并击（组字区内显示汉语拼音）";
 "Show notifications when toggling Caps Lock" = "以 Caps Lock 切换输入法/中英模式时显示通知";
+"Show translated strokes in composition buffer" = "在组字区内显示字根、而非原始键盘码";
 "Simplified Chinese" = "简体中文";
 "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work." = "某些应用（比如像是 MS Edge 或者 Chrome 这样的 Chromium 核心的浏览器）可能会使输入的 Shift 按键讯号被重复输入，且其有关研发方很可能不打算修复这些产品缺陷。威注音针对这些应用预设启用了相容措施。请在此根据您的需求自订。";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+空格键 换下一页，空格键 换选下一个候选字";
@@ -218,6 +232,7 @@
 "Specify the behavior of intonation key when syllable composer is empty." = "指定声调键（在注拼槽为「空」状态时）的行为。";
 "Starlight" = "星光排列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉耻模式 // 取消勾选的话，敲错字时会有异音";
+"This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode." = "该转换仅对磁带模式有影响，会将键入的内容根据该选项与当前的简繁体模式来转换。";
 "This only works with Tadokoro candidate window." = "该方法仅对田所选字窗起作用。";
 "Traditional Chinese" = "繁体中文";
 "Trim unfinished readings on commit" = "在递交时清理未完成拼写的读音";

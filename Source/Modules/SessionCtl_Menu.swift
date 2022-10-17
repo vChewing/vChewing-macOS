@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import NotifierUI
-import Preferences
+import SSPreferences
 import UpdateSputnik
 
 extension Bool {
@@ -40,6 +40,14 @@ extension SessionCtl {
     )
     userAssociatedPhrasesItem.keyEquivalentModifierMask = [.command, .control]
     userAssociatedPhrasesItem.state = PrefMgr.shared.associatedPhrasesEnabled.state
+
+    let cassetteModeItem = menu.addItem(
+      withTitle: NSLocalizedString("CIN Cassette Mode", comment: ""),
+      action: #selector(toggleCassetteMode(_:)),
+      keyEquivalent: PrefMgr.shared.usingHotKeyCassette ? "I" : ""
+    )
+    cassetteModeItem.keyEquivalentModifierMask = [.command, .control]
+    cassetteModeItem.state = PrefMgr.shared.cassetteEnabled.state
 
     let useCNS11643SupportItem = menu.addItem(
       withTitle: NSLocalizedString("CNS11643 Mode", comment: ""),
@@ -192,29 +200,55 @@ extension SessionCtl {
 // MARK: - IME Menu Items
 
 extension SessionCtl {
-  @objc public override func showPreferences(_: Any?) {
+  @objc public override func showPreferences(_: Any? = nil) {
     if #unavailable(macOS 10.15) {
       CtlPrefWindow.show()
     } else if NSEvent.modifierFlags.contains(.option) {
       CtlPrefWindow.show()
     } else {
       NSApp.setActivationPolicy(.accessory)
-      CtlPrefUI.shared.controller.show(preferencePane: Preferences.PaneIdentifier(rawValue: "General"))
+      CtlPrefUI.shared.controller.show(preferencePane: SSPreferences.PaneIdentifier(rawValue: "General"))
       CtlPrefUI.shared.controller.window?.level = .statusBar
       NSApp.activate(ignoringOtherApps: true)
     }
   }
 
-  @objc public func showCheatSheet(_: Any?) {
+  @objc public func showCheatSheet(_: Any? = nil) {
     guard let url = Bundle.main.url(forResource: "shortcuts", withExtension: "html") else { return }
     DispatchQueue.main.async {
       NSWorkspace.shared.openFile(url.path, withApplication: "Safari")
     }
   }
 
-  @objc public func showClientListMgr(_: Any?) {
+  @objc public func showClientListMgr(_: Any? = nil) {
     CtlClientListMgr.show()
     NSApp.activate(ignoringOtherApps: true)
+  }
+
+  @objc public func toggleCassetteMode(_: Any? = nil) {
+    resetInputHandler()
+    if !PrefMgr.shared.cassetteEnabled, !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
+      DispatchQueue.main.async {
+        let alert = NSAlert(error: NSLocalizedString("Path invalid or file access error.", comment: ""))
+        alert.informativeText =
+          "Please reconfigure the cassette path to a valid one before enabling this mode."
+        let result = alert.runModal()
+        if result == NSApplication.ModalResponse.alertFirstButtonReturn {
+          LMMgr.resetCassettePath()
+          PrefMgr.shared.cassetteEnabled = false
+        }
+        NSApp.setActivationPolicy(.accessory)
+        IMEApp.buzz()
+      }
+      return
+    }
+    Notifier.notify(
+      message: NSLocalizedString("CIN Cassette Mode", comment: "") + "\n"
+        + (PrefMgr.shared.cassetteEnabled.toggled()
+          ? NSLocalizedString("NotificationSwitchON", comment: "")
+          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
+    )
+    LMMgr.loadCassetteData()
   }
 
   @objc public func toggleSCPCTypingMode(_: Any? = nil) {
@@ -227,7 +261,7 @@ extension SessionCtl {
     )
   }
 
-  @objc public func toggleChineseConverter(_: Any?) {
+  @objc public func toggleChineseConverter(_: Any? = nil) {
     resetInputHandler()
     Notifier.notify(
       message: NSLocalizedString("Force KangXi Writing", comment: "") + "\n"
@@ -237,7 +271,7 @@ extension SessionCtl {
     )
   }
 
-  @objc public func toggleShiftJISShinjitaiOutput(_: Any?) {
+  @objc public func toggleShiftJISShinjitaiOutput(_: Any? = nil) {
     resetInputHandler()
     Notifier.notify(
       message: NSLocalizedString("JIS Shinjitai Output", comment: "") + "\n"
@@ -247,7 +281,7 @@ extension SessionCtl {
     )
   }
 
-  @objc public func toggleCurrencyNumerals(_: Any?) {
+  @objc public func toggleCurrencyNumerals(_: Any? = nil) {
     resetInputHandler()
     Notifier.notify(
       message: NSLocalizedString("Currency Numeral Output", comment: "") + "\n"
@@ -257,7 +291,7 @@ extension SessionCtl {
     )
   }
 
-  @objc public func toggleHalfWidthPunctuation(_: Any?) {
+  @objc public func toggleHalfWidthPunctuation(_: Any? = nil) {
     resetInputHandler()
     Notifier.notify(
       message: NSLocalizedString("Half-Width Punctuation Mode", comment: "") + "\n"
@@ -267,7 +301,7 @@ extension SessionCtl {
     )
   }
 
-  @objc public func toggleCNS11643Enabled(_: Any?) {
+  @objc public func toggleCNS11643Enabled(_: Any? = nil) {
     resetInputHandler()
     Notifier.notify(
       message: NSLocalizedString("CNS11643 Mode", comment: "") + "\n"
@@ -277,7 +311,7 @@ extension SessionCtl {
     )
   }
 
-  @objc public func toggleSymbolEnabled(_: Any?) {
+  @objc public func toggleSymbolEnabled(_: Any? = nil) {
     resetInputHandler()
     Notifier.notify(
       message: NSLocalizedString("Symbol & Emoji Input", comment: "") + "\n"
@@ -287,7 +321,7 @@ extension SessionCtl {
     )
   }
 
-  @objc public func toggleAssociatedPhrasesEnabled(_: Any?) {
+  @objc public func toggleAssociatedPhrasesEnabled(_: Any? = nil) {
     resetInputHandler()
     Notifier.notify(
       message: NSLocalizedString("Per-Char Associated Phrases", comment: "") + "\n"
@@ -297,7 +331,7 @@ extension SessionCtl {
     )
   }
 
-  @objc public func togglePhraseReplacement(_: Any?) {
+  @objc public func togglePhraseReplacement(_: Any? = nil) {
     resetInputHandler()
     Notifier.notify(
       message: NSLocalizedString("Use Phrase Replacement", comment: "") + "\n"
@@ -307,20 +341,20 @@ extension SessionCtl {
     )
   }
 
-  @objc public func selfUninstall(_: Any?) {
+  @objc public func selfUninstall(_: Any? = nil) {
     (NSApp.delegate as? AppDelegate)?.selfUninstall()
   }
 
-  @objc public func selfTerminate(_: Any?) {
+  @objc public func selfTerminate(_: Any? = nil) {
     NSApp.activate(ignoringOtherApps: true)
     NSApp.terminate(nil)
   }
 
-  @objc public func checkForUpdate(_: Any?) {
+  @objc public func checkForUpdate(_: Any? = nil) {
     UpdateSputnik.shared.checkForUpdate(forced: true, url: kUpdateInfoSourceURL)
   }
 
-  @objc public func openUserDataFolder(_: Any?) {
+  @objc public func openUserDataFolder(_: Any? = nil) {
     if !LMMgr.userDataFolderExists {
       return
     }
@@ -329,35 +363,35 @@ extension SessionCtl {
     )
   }
 
-  @objc public func openUserPhrases(_: Any?) {
+  @objc public func openUserPhrases(_: Any? = nil) {
     LMMgr.openPhraseFile(fromURL: LMMgr.userPhrasesDataURL(IMEApp.currentInputMode))
     if NSEvent.modifierFlags.contains(.option) {
       LMMgr.openPhraseFile(fromURL: LMMgr.userPhrasesDataURL(IMEApp.currentInputMode.reversed))
     }
   }
 
-  @objc public func openExcludedPhrases(_: Any?) {
+  @objc public func openExcludedPhrases(_: Any? = nil) {
     LMMgr.openPhraseFile(fromURL: LMMgr.userFilteredDataURL(IMEApp.currentInputMode))
     if NSEvent.modifierFlags.contains(.option) {
       LMMgr.openPhraseFile(fromURL: LMMgr.userFilteredDataURL(IMEApp.currentInputMode.reversed))
     }
   }
 
-  @objc public func openUserSymbols(_: Any?) {
+  @objc public func openUserSymbols(_: Any? = nil) {
     LMMgr.openPhraseFile(fromURL: LMMgr.userSymbolDataURL(IMEApp.currentInputMode))
     if NSEvent.modifierFlags.contains(.option) {
       LMMgr.openPhraseFile(fromURL: LMMgr.userSymbolDataURL(IMEApp.currentInputMode.reversed))
     }
   }
 
-  @objc public func openPhraseReplacement(_: Any?) {
+  @objc public func openPhraseReplacement(_: Any? = nil) {
     LMMgr.openPhraseFile(fromURL: LMMgr.userReplacementsDataURL(IMEApp.currentInputMode))
     if NSEvent.modifierFlags.contains(.option) {
       LMMgr.openPhraseFile(fromURL: LMMgr.userReplacementsDataURL(IMEApp.currentInputMode.reversed))
     }
   }
 
-  @objc public func openAssociatedPhrases(_: Any?) {
+  @objc public func openAssociatedPhrases(_: Any? = nil) {
     LMMgr.openPhraseFile(fromURL: LMMgr.userAssociatesDataURL(IMEApp.currentInputMode))
     if NSEvent.modifierFlags.contains(.option) {
       LMMgr.openPhraseFile(
@@ -365,25 +399,25 @@ extension SessionCtl {
     }
   }
 
-  @objc public func reloadUserPhrasesData(_: Any?) {
+  @objc public func reloadUserPhrasesData(_: Any? = nil) {
     LMMgr.initUserLangModels()
   }
 
-  @objc public func removeUnigramsFromUOM(_: Any?) {
+  @objc public func removeUnigramsFromUOM(_: Any? = nil) {
     LMMgr.removeUnigramsFromUserOverrideModel(IMEApp.currentInputMode)
     if NSEvent.modifierFlags.contains(.option) {
       LMMgr.removeUnigramsFromUserOverrideModel(IMEApp.currentInputMode.reversed)
     }
   }
 
-  @objc public func clearUOM(_: Any?) {
+  @objc public func clearUOM(_: Any? = nil) {
     LMMgr.clearUserOverrideModelData(IMEApp.currentInputMode)
     if NSEvent.modifierFlags.contains(.option) {
       LMMgr.clearUserOverrideModelData(IMEApp.currentInputMode.reversed)
     }
   }
 
-  @objc public func showAbout(_: Any?) {
+  @objc public func showAbout(_: Any? = nil) {
     CtlAboutWindow.show()
     NSApp.activate(ignoringOtherApps: true)
   }

@@ -4,7 +4,7 @@
 
 import Cocoa
 
-extension Preferences {
+extension SSPreferences {
   public enum Style {
     case toolbarItems
     case segmentedControl

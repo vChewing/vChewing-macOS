@@ -85,7 +85,7 @@ extension TISInputSource {
   }
 
   public var inputModeID: String {
-    unsafeBitCast(TISGetInputSourceProperty(self, kTISPropertyInputModeID), to: NSString.self) as String
+    unsafeBitCast(TISGetInputSourceProperty(self, kTISPropertyInputModeID), to: NSString.self) as String? ?? ""
   }
 
   public var vChewingLocalizedName: String {
@@ -106,16 +106,18 @@ extension TISInputSource {
 
 extension TISInputSource {
   public var localizedName: String {
-    unsafeBitCast(TISGetInputSourceProperty(self, kTISPropertyLocalizedName), to: NSString.self) as String
+    unsafeBitCast(TISGetInputSourceProperty(self, kTISPropertyLocalizedName), to: NSString.self) as String? ?? ""
   }
 
   public var identifier: String {
-    unsafeBitCast(TISGetInputSourceProperty(self, kTISPropertyInputSourceID), to: NSString.self) as String
+    unsafeBitCast(TISGetInputSourceProperty(self, kTISPropertyInputSourceID), to: NSString.self) as String? ?? ""
   }
 
   public var scriptCode: Int {
+    // Shiki's note: There is no "kTISPropertyScriptCode" in TextInputSources.h file.
+    // Using Mzp's latest solution in his blog: https://mzp.hatenablog.com/entry/2018/07/16/212026
     let r = TISGetInputSourceProperty(self, "TSMInputSourcePropertyScriptCode" as CFString)
-    return unsafeBitCast(r, to: NSString.self).integerValue
+    return unsafeBitCast(r, to: NSString.self).integerValue as Int? ?? 0
   }
 
   public static func rawTISInputSources(onlyASCII: Bool = false) -> [String: TISInputSource] {

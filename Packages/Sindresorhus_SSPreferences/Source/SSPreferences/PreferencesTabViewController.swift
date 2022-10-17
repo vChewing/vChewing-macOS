@@ -7,7 +7,7 @@ import Cocoa
 final class PreferencesTabViewController: NSViewController, PreferencesStyleControllerDelegate {
   private var activeTab: Int?
   private var preferencePanes = [PreferencePane]()
-  private var style: Preferences.Style?
+  private var style: SSPreferences.Style?
   internal var preferencePanesCount: Int { preferencePanes.count }
   private var preferencesStyleController: PreferencesStyleController!
   private var isKeepingWindowCentered: Bool { preferencesStyleController.isKeepingWindowCentered }
@@ -37,7 +37,7 @@ final class PreferencesTabViewController: NSViewController, PreferencesStyleCont
     view.translatesAutoresizingMaskIntoConstraints = false
   }
 
-  func configure(preferencePanes: [PreferencePane], style: Preferences.Style) {
+  func configure(preferencePanes: [PreferencePane], style: SSPreferences.Style) {
     self.preferencePanes = preferencePanes
     self.style = style
     children = preferencePanes
@@ -68,7 +68,7 @@ final class PreferencesTabViewController: NSViewController, PreferencesStyleCont
     activateTab(preferenceIdentifier: preferencePane.preferencePaneIdentifier, animated: animated)
   }
 
-  func activateTab(preferenceIdentifier: Preferences.PaneIdentifier, animated: Bool) {
+  func activateTab(preferenceIdentifier: SSPreferences.PaneIdentifier, animated: Bool) {
     guard let index = (preferencePanes.firstIndex { $0.preferencePaneIdentifier == preferenceIdentifier }) else {
       return activateTab(index: 0, animated: animated)
     }
@@ -245,6 +245,6 @@ extension PreferencesTabViewController: NSToolbarDelegate {
     }
 
     return preferencesStyleController.toolbarItem(
-      preferenceIdentifier: Preferences.PaneIdentifier(fromToolbarItemIdentifier: itemIdentifier))
+      preferenceIdentifier: SSPreferences.PaneIdentifier(fromToolbarItemIdentifier: itemIdentifier))
   }
 }

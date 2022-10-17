@@ -57,6 +57,7 @@ public class InputHandler: InputHandlerProtocol {
   /// 半衰模組的衰減指數
   let kEpsilon: Double = 0.000_001
 
+  public var calligrapher = ""  // 磁帶專用組筆區
   public var composer: Tekkon.Composer = .init()  // 注拼槽
   public var compositor: Megrez.Compositor  // 組字器
   public var currentUOM: vChewingLM.LMUserOverride
@@ -83,6 +84,7 @@ public class InputHandler: InputHandlerProtocol {
   public func clear() {
     composer.clear()
     compositor.clear()
+    calligrapher.removeAll()
   }
 
   // MARK: - Functions dealing with Megrez.
@@ -336,6 +338,8 @@ public class InputHandler: InputHandlerProtocol {
 
   // MARK: - Extracted methods and functions (Tekkon).
 
+  var isComposerOrCalligrapherEmpty: Bool { prefs.cassetteEnabled ? calligrapher.isEmpty : composer.isEmpty }
+
   /// 獲取與當前注音排列或拼音輸入種類有關的標點索引鍵，以英數下畫線「_」結尾。
   var currentKeyboardParser: String { currentKeyboardParserType.name + "_" }
   var currentKeyboardParserType: KeyboardParser { .init(rawValue: prefs.keyboardParser) ?? .ofStandard }
@@ -363,6 +367,22 @@ public class InputHandler: InputHandlerProtocol {
     composer.phonabetCombinationCorrectionEnabled = prefs.autoCorrectReadingCombination
   }
 
+  func clearComposerAndCalligrapher() {
+    _ = prefs.cassetteEnabled ? calligrapher.removeAll() : composer.clear()
+  }
+
+  func letComposerAndCalligrapherDoBackSpace() {
+    _ = prefs.cassetteEnabled ? calligrapher = String(calligrapher.dropLast(1)) : composer.doBackSpace()
+  }
+
+  /// 返回前一個游標位置的可解析的漢字筆畫。
+  /// 返回的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
+  var previousParsableCalligraph: String? {
+    if compositor.cursor == 0 { return nil }
+    let cursorPrevious = max(compositor.cursor - 1, 0)
+    return compositor.keys[cursorPrevious]
+  }
+
   /// 返回前一個游標位置的可解析的漢字讀音。
   /// 返回的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
   var previousParsableReading: (String, String, Bool)? {
@@ -387,7 +407,19 @@ public class InputHandler: InputHandlerProtocol {
     var theComposer = composer  // 複製一份用來做實驗。
     theComposer.clear()  // 清空各種槽的內容。
     theComposer.receiveKey(fromString: input.text)
-    return theComposer.hasToneMarker(withNothingElse: true)
+    return theComposer.hasIntonation(withNothingElse: true)
+  }
+
+  var readingForDisplay: String {
+    if !prefs.cassetteEnabled {
+      return composer.getInlineCompositionForDisplay(isHanyuPinyin: prefs.showHanyuPinyinInCompositionBuffer)
+    }
+    if !prefs.showTranslatedStrokesInCompositionBuffer { return calligrapher }
+    var result = calligrapher.charComponents
+    for idx in 0..<result.count {
+      result[idx] = currentLM.currentCassette.convertKeyToDisplay(char: result[idx])
+    }
+    return result.joined()
   }
 
   // MARK: - Extracted methods and functions (Megrez).

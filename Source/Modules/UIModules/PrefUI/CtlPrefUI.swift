@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Preferences
+import SSPreferences
 import SwiftUI
 
 extension NSImage {
@@ -36,6 +36,16 @@ extension NSImage {
     } else {
       return NSImage(
         systemSymbolName: "character.book.closed.fill", accessibilityDescription: "Dictionary Preferences"
+      )
+    }
+  }
+
+  static var tabImageCassette: NSImage! {
+    if #unavailable(macOS 11.0) {
+      return NSImage(named: "PrefToolbar-Cassette")
+    } else {
+      return NSImage(
+        systemSymbolName: "externaldrive.fill.badge.plus", accessibilityDescription: "Cassette Preferences"
       )
     }
   }
@@ -70,36 +80,43 @@ extension NSImage {
 class CtlPrefUI {
   var controller = PreferencesWindowController(
     panes: [
-      Preferences.Pane(
-        identifier: Preferences.PaneIdentifier(rawValue: "General"),
+      SSPreferences.Pane(
+        identifier: SSPreferences.PaneIdentifier(rawValue: "General"),
         title: NSLocalizedString("General", comment: ""),
         toolbarIcon: .tabImageGeneral
       ) {
         VwrPrefPaneGeneral()
       },
-      Preferences.Pane(
-        identifier: Preferences.PaneIdentifier(rawValue: "Experience"),
+      SSPreferences.Pane(
+        identifier: SSPreferences.PaneIdentifier(rawValue: "Experience"),
         title: NSLocalizedString("Experience", comment: ""),
         toolbarIcon: .tabImageExperience
       ) {
         VwrPrefPaneExperience()
       },
-      Preferences.Pane(
-        identifier: Preferences.PaneIdentifier(rawValue: "Dictionary"),
+      SSPreferences.Pane(
+        identifier: SSPreferences.PaneIdentifier(rawValue: "Dictionary"),
         title: NSLocalizedString("Dictionary", comment: ""),
         toolbarIcon: .tabImageDictionary
       ) {
         VwrPrefPaneDictionary()
       },
-      Preferences.Pane(
-        identifier: Preferences.PaneIdentifier(rawValue: "Keyboard"),
+      SSPreferences.Pane(
+        identifier: SSPreferences.PaneIdentifier(rawValue: "Cassette"),
+        title: NSLocalizedString("Cassette", comment: ""),
+        toolbarIcon: .tabImageCassette
+      ) {
+        VwrPrefPaneCassette()
+      },
+      SSPreferences.Pane(
+        identifier: SSPreferences.PaneIdentifier(rawValue: "Keyboard"),
         title: NSLocalizedString("Keyboard", comment: ""),
         toolbarIcon: .tabImageKeyboard
       ) {
         VwrPrefPaneKeyboard()
       },
-      Preferences.Pane(
-        identifier: Preferences.PaneIdentifier(rawValue: "DevZone"),
+      SSPreferences.Pane(
+        identifier: SSPreferences.PaneIdentifier(rawValue: "DevZone"),
         title: NSLocalizedString("DevZone", comment: ""),
         toolbarIcon: .tabImageDevZone
       ) {

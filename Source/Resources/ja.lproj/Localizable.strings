@@ -1,4 +1,5 @@
 "vChewing" = "威注音入力アプリ";
+"CIN Cassette Mode" = "CIN カセットモード";
 "Invalid Selection Keys." = "候補用キーによる不具合。";
 "Alphanumerical Input Mode" = "英數入力モード";
 "Chinese Input Mode" = "漢語入力モード";
@@ -115,6 +116,7 @@
 "(Shift+)Space:" = "(Shift+)Space:";
 "⚠︎ This feature in IMK Candidate Window defects. Please consult Apple Developer Relations\nand tell them the related Radar ID: #FB11300759." = "⚠︎ この機能は IMK 候補陳列ウィンドウにサポートされておりません。\nApple Developer Relations に案件番号 #FB11300759 を教えながらクレームしてください。";
 "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 該当の組版用フォントには縦書き（引用符・括弧）変換機能が備えていない限り、この機能を使う甲斐がある。一旦使うと、入力した全ての引用符・括弧は永遠的に縦書きの様式になる。例え入力を受けているアプリ（例えばワープロソフとなど）の書写方向は横書きと変えたとしても、これらの入力済みの引用符・括弧は全て縦書きの見た目であり、削除してから入力し直す必要になる。";
+"All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "これをチェックしないと、全ての筆画は ASCII キーネームで入力緩衝列で表示してしまうことになる。CIN ファイルの「%keyname」というところで筆画の定義はできる。";
 "Allow backspace-editing miscomposed readings" = "効かぬ音読みを BackSpace で再編集";
 "Allow boosting / excluding a candidate of single kanji" = "即排除/即最優先にできる候補の文字数の最低限は１字とする";
 "Allow using Enter key to confirm associated candidate selection" = "Enter キーを連想語彙候補の確認のために使う";
@@ -137,6 +139,8 @@
 "Basic Keyboard Layout:" = "基礎キーボード:";
 "Candidate Layout:" = "入力候補陳列の仕様";
 "Candidate Size:" = "候補文字の字号:";
+"Cassette mode is similar to the CIN support of the Yahoo Kimo IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)." = "カセットモードは、CIN ファイルを用いて、（五筆や倉頡や嘸蝦米などのような）筆画入力を機能拡張できるモードである。ですが、単なる予備機能として提供したもののため、使いやすいかどうか、RIME や OpenVanilla などに比べられないかもしれん。";
+"Cassette" = "カセ設定";
 "Change user interface language (will reboot the IME)." = "アプリ表示用言語をご指定下さい、そして入力アプリは自動的に再起動。";
 "Check for updates automatically" = "アプリの更新通知を受く";
 "Choose candidate font size for better visual clarity." = "入力候補陳列の候補文字の字号をご指定ください。";
@@ -148,6 +152,8 @@
 "Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only." = "macOS 英数キーボード配置をご指定ください。Shift 英数入力モードだけに使われる配置である。";
 "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is not (any) pinyin." = "macOS 基礎キーボード配置をご指定ください。QWERTY 以外の英数キーボードは弁音以外の配列に不適用。弁音配列を起用していない限り、キーボード配置の設定はキーボードビューアの有りようだけに影響を及ぼす。";
 "Choose the phonetic layout for Mandarin parser." = "共通語分析器の注音配列をご指定ください。";
+"Choose your desired cassette file path. Will be omitted if invalid." = "欲しがる CIN カセットファイルをご指定ください。無効なる保存先設定は省かれる。";
+"Choose your desired cassette file path." = "欲しがる CIN カセットファイルをご指定ください。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "欲しがるユーザー辞書保存先をご指定ください。無効なる保存先設定は省かれる。";
 "Choose your preferred layout of the candidate window." = "入力候補陳列の仕様をご指定ください。";
 "Clear the entire inline composition buffer like Shift+Delete" = "Shift+Delete のように入力緩衝列を消す";
@@ -162,13 +168,16 @@
 "Dictionary" = "辞書設定";
 "Directly commit lowercased letters" = "ローマ字（小文字）を直接出力";
 "Directly commit uppercased letters" = "ローマ字（大文字）を直接出力";
+"Disable forced conversion for cassette outputs" = "カセットモードによる漢字出力の簡繁転換を行わずにする";
 "Disable Shift key accomodation in all cases" = "いずれの客体アプリにも Shift キーの互換性措置を禁ず";
 "Disassemble the previous reading, dropping its intonation" = "カーソルの後部の音読みを解き、その音調を除く";
 "Disassembling process does not work with non-phonetic reading keys." = "実の意味の音読みだけを解くことができる。";
 "Emulating select-candidate-per-character mode" = "漢字１つづつ全候補選択入力モード";
+"Enable cassette mode, suppressing phonabet input" = "カセットモードを起用（注音入力はこのモードで使えぬ）";
 "Enable CNS11643 Support (2022-09-12)" = "全字庫モード // 入力可能な漢字数を倍増す (2022-09-12)";
 "Enable Space key for calling candidate window" = "Space キーで入力候補を呼び出す";
 "Enable symbol input support (incl. certain emoji symbols)" = "僅かなる絵文字も含む符号入力サポートを起用";
+"Enforce conversion in both input modes" = "カセットモードによる漢字出力の簡体繁体転換を常に行う";
 "English" = "英語";
 "Eten 26" = "倚天形忘れ配列 (26 キー)";
 "Eten Traditional" = "倚天伝統配列";
@@ -195,12 +204,16 @@
 "Misc Settings:" = "他の設定:";
 "MiTAC" = "神通配列";
 "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead." = "ご注意：Mac キーボードの「Delete ⌫」キーはここで「BackSpace ⌫」と呼ばれ、それはパソコンの常識としての本物の「Delete ⌦」と区別するためである。もし、テンキーの付いていない Mac キーボードで本物の「Delete ⌦」を使いたければ、代わりに「Fn+⌫」をご使用ください。";
+"Only enforce conversion in Simplified Chinese mode" = "簡体モードだけの場合、カセットモードの漢字出力転換を";
+"Only enforce conversion in Traditional Chinese mode" = "繁体モードだけの場合、カセットモードの漢字出力転換を";
 "Only load factory language models if needed" = "必要性を判断してから内蔵辞書を読み込む";
 "Only override the intonation of the previous reading if different" = "カーソルの後部の音読みの異なる音調だけを上書きする";
 "Only use this with known Chromium-based browsers" = "有名なる Chromium 系ブラウザーだけに、この装置を起用";
 "Output Settings:" = "出力設定:";
 "Override the previous reading's intonation with candidate-reset" = "カーソルの後部の音読みの音調を上書きし、候補選択状態を戻す";
+"Path invalid or file access error." = "ファイルアクセス失敗、或いはご指定したファイル位置情報は使えぬ。";
 "Phonetic Parser:" = "注音配列:";
+"Please reconfigure the cassette path to a valid one before enabling this mode." = "カセットファイルを正しくご指定してから、このモードのご使用を。";
 "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu." = "マウスホイールでこのページをご覧ください。キーに関する取扱説明のアクセスはメニューに。";
 "Push the cursor in front of the phrase after selection" = "候補選択の直後、すぐカーソルを単語の向こうに推し進める";
 "Quick Setup:" = "直接設定:";
@@ -211,6 +224,7 @@
 "Shift+Letter:" = "Shift+文字キー:";
 "Show Hanyu-Pinyin in the inline composition buffer" = "弁音合併入力（入力緩衝列で音読みを漢語弁音に）";
 "Show notifications when toggling Caps Lock" = "Caps Lock で切り替えの時に吹出通知メッセージを";
+"Show translated strokes in composition buffer" = "原始キーネームでなく、筆画を入力緩衝列で表示する";
 "Simplified Chinese" = "簡体中国語";
 "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work." = "いくつかのアプリ（例えば MS Edge や Google Chrome などのような Chromium 系ブラウザー）には「Shift キーの入力イベントを複数化してしまう」という支障があり、そしてアプリそれぞれの開発元に修復される可能性はほぼゼロだと言える。威注音入力アプリは対策用の特殊措置を普段に起用している。ご自分の必要によって設定してください。";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+Space で次のページ、Space で次の候補文字を";
@@ -218,6 +232,7 @@
 "Specify the behavior of intonation key when syllable composer is empty." = "音読組立緩衝列が空かされた時の音調キーの行為をご指定ください。";
 "Starlight" = "星光配列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "マナーモード // 外すと入力間違った時に変な声が出る";
+"This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode." = "この転換はカセットモードだけに使える転換であり、転換結果はこの設定と入力モード次第である。";
 "This only works with Tadokoro candidate window." = "これは田所候補陳列ウィンドウだけに効ける機能である。";
 "Traditional Chinese" = "繁体中国語";
 "Trim unfinished readings on commit" = "送り出す緩衝列内容から未完成な音読みを除く";

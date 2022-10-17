@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import IMKUtils
-import Preferences
+import SSPreferences
 import Shared
 import SwiftUI
 
@@ -33,6 +33,8 @@ struct VwrPrefPaneKeyboard: View {
     forKey: UserDef.kUsingHotKeyHalfWidthASCII.rawValue)
   @State private var selUsingHotKeyCurrencyNumerals = UserDefaults.standard.bool(
     forKey: UserDef.kUsingHotKeyCurrencyNumerals.rawValue)
+  @State private var selUsingHotKeyCassette = UserDefaults.standard.bool(
+    forKey: UserDef.kUsingHotKeyCassette.rawValue)
 
   private let contentMaxHeight: Double = 440
   private let contentWidth: Double = {
@@ -50,8 +52,8 @@ struct VwrPrefPaneKeyboard: View {
 
   var body: some View {
     ScrollView {
-      Preferences.Container(contentWidth: contentWidth) {
-        Preferences.Section(label: { Text(LocalizedStringKey("Selection Keys:")) }) {
+      SSPreferences.Container(contentWidth: contentWidth) {
+        SSPreferences.Section(label: { Text(LocalizedStringKey("Selection Keys:")) }) {
           ComboBox(
             items: CandidateKey.suggestions,
             text: $selSelectionKeys.onChange {
@@ -94,7 +96,7 @@ struct VwrPrefPaneKeyboard: View {
             .preferenceDescription()
           }
         }
-        Preferences.Section(label: { Text(LocalizedStringKey("Quick Setup:")) }) {
+        SSPreferences.Section(label: { Text(LocalizedStringKey("Quick Setup:")) }) {
           HStack {
             Button {
               PrefMgr.shared.keyboardParser = 0
@@ -122,7 +124,7 @@ struct VwrPrefPaneKeyboard: View {
             }
           }
         }
-        Preferences.Section(label: { Text(LocalizedStringKey("Phonetic Parser:")) }) {
+        SSPreferences.Section(label: { Text(LocalizedStringKey("Phonetic Parser:")) }) {
           HStack {
             Picker(
               "",
@@ -168,7 +170,7 @@ struct VwrPrefPaneKeyboard: View {
           )
           .preferenceDescription()
         }
-        Preferences.Section(label: { Text(LocalizedStringKey("Basic Keyboard Layout:")) }) {
+        SSPreferences.Section(label: { Text(LocalizedStringKey("Basic Keyboard Layout:")) }) {
           HStack {
             Picker(
               "",
@@ -197,7 +199,7 @@ struct VwrPrefPaneKeyboard: View {
           )
           .preferenceDescription()
         }
-        Preferences.Section(label: { Text(LocalizedStringKey("Alphanumerical Layout:")) }) {
+        SSPreferences.Section(label: { Text(LocalizedStringKey("Alphanumerical Layout:")) }) {
           HStack {
             Picker(
               "",
@@ -225,7 +227,7 @@ struct VwrPrefPaneKeyboard: View {
             Spacer().frame(width: 30)
           }
         }
-        Preferences.Section(label: { Text(LocalizedStringKey("Keyboard Shortcuts:")) }) {
+        SSPreferences.Section(label: { Text(LocalizedStringKey("Keyboard Shortcuts:")) }) {
           HStack(alignment: .top, spacing: NSFont.systemFontSize) {
             VStack(alignment: .leading) {
               Toggle(
@@ -270,6 +272,12 @@ struct VwrPrefPaneKeyboard: View {
                 LocalizedStringKey("Currency Numeral Output"),
                 isOn: $selUsingHotKeyCurrencyNumerals.onChange {
                   PrefMgr.shared.usingHotKeyCurrencyNumerals = selUsingHotKeyCurrencyNumerals
+                }
+              )
+              Toggle(
+                LocalizedStringKey("CIN Cassette Mode"),
+                isOn: $selUsingHotKeyCassette.onChange {
+                  PrefMgr.shared.usingHotKeyCassette = selUsingHotKeyCassette
                 }
               )
             }

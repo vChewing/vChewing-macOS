@@ -71,6 +71,8 @@ public struct VwrCandidateVertical: View {
             ).id(columnIndex)
             if loopIndex < thePool.maxLinesPerPage - 1 {
               Divider()
+            } else {
+              Spacer(minLength: 0)
             }
           }
           if thePool.maxLinesPerPage - thePool.rangeForCurrentPage.count > 0 {
@@ -88,6 +90,8 @@ public struct VwrCandidateVertical: View {
               )
               if loopIndex < thePool.maxLinesPerPage - thePool.rangeForCurrentPage.count - 1 {
                 Divider()
+              } else {
+                Spacer(minLength: 0)
               }
             }
           }

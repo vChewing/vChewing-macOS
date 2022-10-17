@@ -4,7 +4,7 @@
 
 import Cocoa
 
-extension Preferences {
+extension SSPreferences {
   public struct PaneIdentifier: Hashable, RawRepresentable, Codable {
     public let rawValue: String
 
@@ -15,7 +15,7 @@ extension Preferences {
 }
 
 public protocol PreferencePane: NSViewController {
-  var preferencePaneIdentifier: Preferences.PaneIdentifier { get }
+  var preferencePaneIdentifier: SSPreferences.PaneIdentifier { get }
   var preferencePaneTitle: String { get }
   var toolbarItemIcon: NSImage { get }
 }
@@ -28,7 +28,7 @@ extension PreferencePane {
   public var toolbarItemIcon: NSImage { .empty }
 }
 
-extension Preferences.PaneIdentifier {
+extension SSPreferences.PaneIdentifier {
   public init(_ rawValue: String) {
     self.init(rawValue: rawValue)
   }

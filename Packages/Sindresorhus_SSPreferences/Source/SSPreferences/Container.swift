@@ -5,7 +5,7 @@
 import SwiftUI
 
 @available(macOS 10.15, *)
-extension Preferences {
+extension SSPreferences {
   /**
    Function builder for `Preferences` components used in order to restrict types of child views to be of type `Section`.
    */

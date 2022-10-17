@@ -1,4 +1,5 @@
 "vChewing" = "vChewing";
+"CIN Cassette Mode" = "CIN Cassette Mode";
 "Invalid Selection Keys." = "Invalid Selection Keys.";
 "Alphanumerical Input Mode" = "Alphanumerical Input Mode";
 "Chinese Input Mode" = "Chinese Input Mode";
@@ -115,6 +116,7 @@
 "(Shift+)Space:" = "(Shift+)Space:";
 "⚠︎ This feature in IMK Candidate Window defects. Please consult Apple Developer Relations\nand tell them the related Radar ID: #FB11300759." = "⚠︎ This feature in IMK Candidate Window defects. Please consult Apple Developer Relations\nand tell them the related Radar ID: #FB11300759.";
 "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal.";
+"All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file.";
 "Allow backspace-editing miscomposed readings" = "Allow backspace-editing miscomposed readings";
 "Allow boosting / excluding a candidate of single kanji" = "Allow boosting / excluding a candidate of single kanji";
 "Allow using Enter key to confirm associated candidate selection" = "Allow using Enter key to confirm associated candidate selection";
@@ -137,6 +139,8 @@
 "Basic Keyboard Layout:" = "Basic Keyboard Layout:";
 "Candidate Layout:" = "Candidate Layout:";
 "Candidate Size:" = "Candidate Size:";
+"Cassette mode is similar to the CIN support of the Yahoo Kimo IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)." = "Cassette mode is similar to the CIN support of the Yahoo Kimo IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated).";
+"Cassette" = "Cassette";
 "Change user interface language (will reboot the IME)." = "Change user interface language (will reboot the IME).";
 "Check for updates automatically" = "Check for updates automatically";
 "Choose candidate font size for better visual clarity." = "Choose candidate font size for better visual clarity.";
@@ -148,6 +152,8 @@
 "Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only." = "Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only.";
 "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is not (any) pinyin." = "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is not (any) pinyin.";
 "Choose the phonetic layout for Mandarin parser." = "Choose the phonetic layout for Mandarin parser.";
+"Choose your desired cassette file path. Will be omitted if invalid." = "Choose your desired cassette file path. Will be omitted if invalid.";
+"Choose your desired cassette file path." = "Choose your desired cassette file path.";
 "Choose your desired user data folder path. Will be omitted if invalid." = "Choose your desired user data folder path. Will be omitted if invalid.";
 "Choose your preferred layout of the candidate window." = "Choose your preferred layout of the candidate window.";
 "Clear the entire inline composition buffer like Shift+Delete" = "Clear the entire inline composition buffer like Shift+Delete";
@@ -162,13 +168,16 @@
 "Dictionary" = "Dictionary";
 "Directly commit lowercased letters" = "Directly commit lowercased letters";
 "Directly commit uppercased letters" = "Directly commit uppercased letters";
+"Disable forced conversion for cassette outputs" = "Disable forced conversion for cassette outputs";
 "Disable Shift key accomodation in all cases" = "Disable Shift key accomodation in all cases";
 "Disassemble the previous reading, dropping its intonation" = "Disassemble the previous reading, dropping its intonation";
 "Disassembling process does not work with non-phonetic reading keys." = "Disassembling process does not work with non-phonetic reading keys.";
 "Emulating select-candidate-per-character mode" = "Emulating select-candidate-per-character mode";
+"Enable cassette mode, suppressing phonabet input" = "Enable cassette mode, suppressing phonabet input";
 "Enable CNS11643 Support (2022-09-12)" = "Enable CNS11643 Support (2022-09-12)";
 "Enable Space key for calling candidate window" = "Enable Space key for calling candidate window";
 "Enable symbol input support (incl. certain emoji symbols)" = "Enable symbol input support (incl. certain emoji symbols)";
+"Enforce conversion in both input modes" = "Enforce conversion in both input modes";
 "English" = "English";
 "Eten 26" = "Eten 26";
 "Eten Traditional" = "Eten Traditional";
@@ -195,12 +204,16 @@
 "Misc Settings:" = "Misc Settings:";
 "MiTAC" = "MiTAC";
 "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead." = "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead.";
+"Only enforce conversion in Simplified Chinese mode" = "Only enforce conversion in Simplified Chinese mode";
+"Only enforce conversion in Traditional Chinese mode" = "Only enforce conversion in Traditional Chinese mode";
 "Only load factory language models if needed" = "Only load factory language models if needed";
 "Only override the intonation of the previous reading if different" = "Only override the intonation of the previous reading if different";
 "Only use this with known Chromium-based browsers" = "Only use this with known Chromium-based browsers";
 "Output Settings:" = "Output Settings:";
 "Override the previous reading's intonation with candidate-reset" = "Override the previous reading's intonation with candidate-reset";
+"Path invalid or file access error." = "Path invalid or file access error.";
 "Phonetic Parser:" = "Phonetic Parser:";
+"Please reconfigure the cassette path to a valid one before enabling this mode." = "Please reconfigure the cassette path to a valid one before enabling this mode.";
 "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu." = "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu.";
 "Push the cursor in front of the phrase after selection" = "Push the cursor in front of the phrase after selection";
 "Quick Setup:" = "Quick Setup:";
@@ -211,6 +224,7 @@
 "Shift+Letter:" = "Shift+Letter:";
 "Show Hanyu-Pinyin in the inline composition buffer" = "Show Hanyu-Pinyin in the inline composition buffer";
 "Show notifications when toggling Caps Lock" = "Show notifications when toggling Caps Lock";
+"Show translated strokes in composition buffer" = "Show translated strokes in composition buffer";
 "Simplified Chinese" = "Simplified Chinese";
 "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work." = "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work.";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Space to +cycle candidates, Shift+Space to +cycle pages";
@@ -218,6 +232,7 @@
 "Specify the behavior of intonation key when syllable composer is empty." = "Specify the behavior of intonation key when syllable composer is empty.";
 "Starlight" = "Starlight";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "Stop farting (when typed phonetic combination is invalid, etc.)";
+"This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode." = "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode.";
 "This only works with Tadokoro candidate window." = "This only works with Tadokoro candidate window.";
 "Traditional Chinese" = "Traditional Chinese";
 "Trim unfinished readings on commit" = "Trim unfinished readings on commit";
