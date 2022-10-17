@@ -98,6 +98,11 @@ extension SessionCtl {
       name: PrefMgr.shared.candidateTextFontName, size: PrefMgr.shared.candidateListTextSize
     )
 
+    if PrefMgr.shared.cassetteEnabled {
+      ctlCandidateCurrent.tooltip =
+        isVerticalTyping ? "📼" : "📼 " + NSLocalizedString("CIN Cassette Mode", comment: "")
+    }
+
     if state.type == .ofAssociates {
       ctlCandidateCurrent.tooltip =
         isVerticalTyping ? "⇧" : NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
