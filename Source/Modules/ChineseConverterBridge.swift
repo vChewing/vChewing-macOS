@@ -84,6 +84,23 @@ public enum ChineseConverter {
     }
   }
 
+  /// 針對磁帶模式的敲字內容做繁簡轉換操作。具體轉換結果受輸入法偏好設定所影響。
+  /// - Parameter string: 轉換對象，會被直接修改。
+  public static func cassetteConvert(_ string: inout String) {
+    // 0 為不轉換，1 為全轉換，2 為僅轉簡，3 為僅轉繁。
+    switch PrefMgr.shared.forceCassetteChineseConversion {
+      case 1:
+        switch IMEApp.currentInputMode {
+          case .imeModeCHS: string = shared.convert(string, to: .zhHansCN)
+          case .imeModeCHT: string = shared.convert(string, to: .zhHantTW)
+          case .imeModeNULL: break
+        }
+      case 2: if IMEApp.currentInputMode == .imeModeCHS { string = shared.convert(string, to: .zhHansCN) }
+      case 3: if IMEApp.currentInputMode == .imeModeCHT { string = shared.convert(string, to: .zhHantTW) }
+      default: return
+    }
+  }
+
   public static func cnvTradToKangXi(_ strObj: String) -> String {
     shared.convert(strObj, to: .zhHantKX)
   }
@@ -97,6 +114,8 @@ public enum ChineseConverter {
   }
 
   static func kanjiConversionIfRequired(_ text: String) -> String {
+    var text = text
+    if PrefMgr.shared.cassetteEnabled { cassetteConvert(&text) }
     guard IMEApp.currentInputMode == .imeModeCHT else { return text }
     switch (PrefMgr.shared.chineseConversionEnabled, PrefMgr.shared.shiftJISShinjitaiOutputEnabled) {
       case (false, true): return ChineseConverter.cnvTradToJIS(text)
