@@ -152,7 +152,7 @@
 "Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only." = "macOS 英数キーボード配置をご指定ください。Shift 英数入力モードだけに使われる配置である。";
 "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is not (any) pinyin." = "macOS 基礎キーボード配置をご指定ください。QWERTY 以外の英数キーボードは弁音以外の配列に不適用。弁音配列を起用していない限り、キーボード配置の設定はキーボードビューアの有りようだけに影響を及ぼす。";
 "Choose the phonetic layout for Mandarin parser." = "共通語分析器の注音配列をご指定ください。";
-"Choose your desired cassette file path. Will be omitted if invalid." = "欲しがる CIN カセットファイルをご指定ください。無効なる保存先設定は省かれる。";
+"Choose your desired cassette file path. Will be omitted if invalid." = "欲しがる CIN カセットファイルをご指定ください。無効なる設定は省かれる。";
 "Choose your desired cassette file path." = "欲しがる CIN カセットファイルをご指定ください。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "欲しがるユーザー辞書保存先をご指定ください。無効なる保存先設定は省かれる。";
 "Choose your preferred layout of the candidate window." = "入力候補陳列の仕様をご指定ください。";
