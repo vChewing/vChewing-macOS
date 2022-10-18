@@ -56,40 +56,40 @@ extension vChewingLM {
     // 聲明原廠語言模組：
     // Reverse 的話，第一欄是注音，第二欄是對應的漢字，第三欄是可能的權重。
     // 不 Reverse 的話，第一欄是漢字，第二欄是對應的注音，第三欄是可能的權重。
-    var lmCore = LMCoreNS(
+    let lmCore = LMCoreNS(
       reverse: false, consolidate: false, defaultScore: -9.9, forceDefaultScore: false
     )
-    var lmMisc = LMCoreNS(
+    let lmMisc = LMCoreNS(
       reverse: true, consolidate: false, defaultScore: -1.0, forceDefaultScore: false
     )
 
     // 簡體中文模式與繁體中文模式共用全字庫擴展模組，故靜態處理。
     // 不然，每個模式都會讀入一份全字庫，會多佔用 100MB 記憶體。
-    static var lmCNS = vChewingLM.LMCoreNS(
+    static let lmCNS = vChewingLM.LMCoreNS(
       reverse: true, consolidate: false, defaultScore: -11.0, forceDefaultScore: false
     )
-    static var lmSymbols = vChewingLM.LMCoreNS(
+    static let lmSymbols = vChewingLM.LMCoreNS(
       reverse: true, consolidate: false, defaultScore: -13.0, forceDefaultScore: false
     )
 
     // 磁帶資料模組。「currentCassette」對外唯讀，僅用來讀取磁帶本身的中繼資料（Metadata）。
-    static var lmCassette = LMCassette()
+    static let lmCassette = LMCassette()
     public var currentCassette: LMCassette { Self.lmCassette }
 
     // 聲明使用者語言模組。
     // 使用者語言模組使用多執行緒的話，可能會導致一些問題。有時間再仔細排查看看。
-    var lmUserPhrases = LMCoreEX(
+    let lmUserPhrases = LMCoreEX(
       reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: false
     )
-    var lmFiltered = LMCoreEX(
+    let lmFiltered = LMCoreEX(
       reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: true
     )
-    var lmUserSymbols = LMCoreEX(
+    let lmUserSymbols = LMCoreEX(
       reverse: true, consolidate: true, defaultScore: -12.0, forceDefaultScore: true
     )
-    var lmReplacements = LMReplacements()
-    var lmAssociates = LMAssociates()
-    var lmPlainBopomofo = LMPlainBopomofo()
+    let lmReplacements = LMReplacements()
+    let lmAssociates = LMAssociates()
+    let lmPlainBopomofo = LMPlainBopomofo()
 
     // MARK: - 工具函式
 
@@ -139,7 +139,7 @@ extension vChewingLM {
     public func loadUserPhrasesData(path: String, filterPath: String) {
       DispatchQueue.main.async {
         if FileManager.default.isReadableFile(atPath: path) {
-          self.lmUserPhrases.close()
+          self.lmUserPhrases.clear()
           self.lmUserPhrases.open(path)
           vCLog("lmUserPhrases: \(self.lmUserPhrases.count) entries of data loaded from: \(path)")
         } else {
@@ -148,7 +148,7 @@ extension vChewingLM {
       }
       DispatchQueue.main.async {
         if FileManager.default.isReadableFile(atPath: filterPath) {
-          self.lmFiltered.close()
+          self.lmFiltered.clear()
           self.lmFiltered.open(filterPath)
           vCLog("lmFiltered: \(self.lmFiltered.count) entries of data loaded from: \(path)")
         } else {
@@ -160,7 +160,7 @@ extension vChewingLM {
     public func loadUserSymbolData(path: String) {
       DispatchQueue.main.async {
         if FileManager.default.isReadableFile(atPath: path) {
-          self.lmUserSymbols.close()
+          self.lmUserSymbols.clear()
           self.lmUserSymbols.open(path)
           vCLog("lmUserSymbol: \(self.lmUserSymbols.count) entries of data loaded from: \(path)")
         } else {
@@ -172,7 +172,7 @@ extension vChewingLM {
     public func loadUserAssociatesData(path: String) {
       DispatchQueue.main.async {
         if FileManager.default.isReadableFile(atPath: path) {
-          self.lmAssociates.close()
+          self.lmAssociates.clear()
           self.lmAssociates.open(path)
           vCLog("lmAssociates: \(self.lmAssociates.count) entries of data loaded from: \(path)")
         } else {
@@ -184,7 +184,7 @@ extension vChewingLM {
     public func loadReplacementsData(path: String) {
       DispatchQueue.main.async {
         if FileManager.default.isReadableFile(atPath: path) {
-          self.lmReplacements.close()
+          self.lmReplacements.clear()
           self.lmReplacements.open(path)
           vCLog("lmReplacements: \(self.lmReplacements.count) entries of data loaded from: \(path)")
         } else {
@@ -196,7 +196,7 @@ extension vChewingLM {
     public func loadUserSCPCSequencesData(path: String) {
       DispatchQueue.main.async {
         if FileManager.default.isReadableFile(atPath: path) {
-          self.lmPlainBopomofo.close()
+          self.lmPlainBopomofo.clear()
           self.lmPlainBopomofo.open(path)
           vCLog("lmPlainBopomofo: \(self.lmPlainBopomofo.count) entries of data loaded from: \(path)")
         } else {
@@ -208,7 +208,7 @@ extension vChewingLM {
     public static func loadCassetteData(path: String) {
       DispatchQueue.main.async {
         if FileManager.default.isReadableFile(atPath: path) {
-          Self.lmCassette.close()
+          Self.lmCassette.clear()
           Self.lmCassette.open(path)
           vCLog("lmCassette: \(Self.lmCassette.count) entries of data loaded from: \(path)")
         } else {
