@@ -12,7 +12,7 @@ import PinyinPhonaConverter
 import Shared
 
 extension vChewingLM {
-  @frozen public struct LMAssociates {
+  public class LMAssociates {
     var rangeMap: [String: [(Range<String.Index>, Int)]] = [:]
     var strData: String = ""
 
@@ -35,7 +35,7 @@ extension vChewingLM {
       return "(\(arrTarget0),\(arrTarget[1]))"
     }
 
-    @discardableResult public mutating func open(_ path: String) -> Bool {
+    @discardableResult public func open(_ path: String) -> Bool {
       if isLoaded { return false }
 
       LMConsolidator.fixEOF(path: path)
@@ -65,7 +65,7 @@ extension vChewingLM {
       return true
     }
 
-    public mutating func close() {
+    public func clear() {
       rangeMap.removeAll()
     }
 
