@@ -62,9 +62,7 @@ extension SessionCtl {
     do {
       tooltipInstance.hide()
       tooltipInstance = .init()
-      if state.type == .ofMarking {
-        tooltipInstance.setColor(state: state.data.tooltipColorState)
-      }
+      tooltipInstance.setColor(state: state.data.tooltipColorState)
     }
     // 再設定其文字顯示內容並顯示。
     tooltipInstance.show(
