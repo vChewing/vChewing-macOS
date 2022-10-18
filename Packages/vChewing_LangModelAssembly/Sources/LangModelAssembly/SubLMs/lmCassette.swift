@@ -69,7 +69,8 @@ extension vChewingLM {
             if loadingKeys, strLine.contains("%keyname end") { loadingKeys = false }
             if !loadingCharDefinitions, strLine.contains("%chardef begin") { loadingCharDefinitions = true }
             if loadingCharDefinitions, strLine.contains("%chardef end") { loadingCharDefinitions = false }
-            let cells = strLine.split(separator: " ")
+            let cells: [String.SubSequence] =
+              strLine.contains("\t") ? strLine.split(separator: "\t") : strLine.split(separator: " ")
             guard cells.count == 2 else { continue }
             if loadingKeys, !cells[0].contains("%keyname") {
               keyNameMap[String(cells[0])] = String(cells[1])
