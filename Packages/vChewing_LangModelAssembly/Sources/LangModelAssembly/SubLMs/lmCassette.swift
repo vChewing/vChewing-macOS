@@ -71,10 +71,10 @@ extension vChewingLM {
             if loadingCharDefinitions, strLine.contains("%chardef end") { loadingCharDefinitions = false }
             let cells = strLine.split(separator: " ")
             guard cells.count == 2 else { continue }
-            if loadingKeys {
+            if loadingKeys, !cells[0].contains("%keyname") {
               keyNameMap[String(cells[0])] = String(cells[1])
-            } else if loadingCharDefinitions {
-              if !strLine.contains("%chardef") { theMaxKeyLength = max(theMaxKeyLength, cells[0].count) }
+            } else if loadingCharDefinitions, !strLine.contains("%chardef") {
+              theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
               charDefMap[String(cells[0]), default: []].append(String(cells[1]))
             }
             guard !loadingKeys, !loadingCharDefinitions else { continue }
