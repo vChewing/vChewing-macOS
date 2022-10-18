@@ -21,8 +21,10 @@ extension vChewingLM {
     public private(set) var maxKeyLength: Int = 1
     public private(set) var selectionKeys: [String] = []
     public private(set) var endKeys: [String] = []
+    public private(set) var wildcardKey: String = ""
     public private(set) var keyNameMap: [String: String] = [:]
     public private(set) var charDefMap: [String: [String]] = [:]
+    public private(set) var charDefWildcardMap: [String: [String]] = [:]
     /// 字根輸入法專用八股文：[字詞:頻次]。
     public private(set) var octagramMap: [String: Int] = [:]
     /// 音韻輸入法專用八股文：[字詞:(頻次, 讀音)]。
@@ -50,6 +52,7 @@ extension vChewingLM {
     /// - `%encoding` 不處理，因為 Swift 只認 UTF-8。
     /// - `%selkey`  不處理，因為威注音輸入法有自己的選字鍵體系。
     /// - `%endkey` 是會觸發組字事件的按鍵。
+    /// - `%wildcardkey` 決定磁帶的萬能鍵名稱，只有第一個字元會生效。
     /// - `%keyname begin` 至 `%keyname end` 之間是字根翻譯表，先讀取為 Swift 辭典以備用。
     /// - `%chardef begin` 至 `%chardef end` 之間則是詞庫資料。
     /// - `%octagram begin` 至 `%octagram end` 之間則是詞語頻次資料。
@@ -72,22 +75,33 @@ extension vChewingLM {
             if !loadingKeys, strLine.contains("%keyname begin") { loadingKeys = true }
             if loadingKeys, strLine.contains("%keyname end") { loadingKeys = false }
             if !loadingCharDefinitions, strLine.contains("%chardef begin") { loadingCharDefinitions = true }
-            if loadingCharDefinitions, strLine.contains("%chardef end") { loadingCharDefinitions = false }
+            if loadingCharDefinitions, strLine.contains("%chardef end") {
+              loadingCharDefinitions = false
+              if charDefMap.keys.contains(wildcardKey) { wildcardKey = "" }
+            }
             if !loadingOctagramData, strLine.contains("%octagram begin") { loadingOctagramData = true }
             if loadingOctagramData, strLine.contains("%octagram end") { loadingOctagramData = false }
             let cells: [String.SubSequence] =
               strLine.contains("\t") ? strLine.split(separator: "\t") : strLine.split(separator: " ")
             guard cells.count >= 2 else { continue }
+            let strFirstCell = String(cells[0])
             if loadingKeys, !cells[0].contains("%keyname") {
-              keyNameMap[String(cells[0])] = String(cells[1])
+              keyNameMap[strFirstCell] = String(cells[1])
             } else if loadingCharDefinitions, !strLine.contains("%chardef") {
               theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
-              charDefMap[String(cells[0]), default: []].append(String(cells[1]))
+              charDefMap[strFirstCell, default: []].append(String(cells[1]))
+              var keyComps = strFirstCell.charComponents
+              while !keyComps.isEmpty, !wildcardKey.isEmpty {
+                keyComps.removeLast()
+                if !wildcardKey.isEmpty {
+                  charDefWildcardMap[keyComps.joined() + wildcardKey, default: []].append(String(cells[1]))
+                }
+              }
             } else if loadingOctagramData, !strLine.contains("%octagram") {
               guard let countValue = Int(cells[1]) else { continue }
               switch cells.count {
-                case 2: octagramMap[String(cells[0])] = countValue
-                case 3: octagramDividedMap[String(cells[0])] = (countValue, String(cells[2]))
+                case 2: octagramMap[strFirstCell] = countValue
+                case 3: octagramDividedMap[strFirstCell] = (countValue, String(cells[2]))
                 default: break
               }
               norm += Self.fscale ** (Double(cells[0].count) / 3.0 - 1.0) * Double(countValue)
@@ -110,8 +124,12 @@ extension vChewingLM {
             if endKeys.isEmpty, strLine.contains("%endkey ") {
               endKeys = cells[1].map { String($0) }.deduplicated
             }
+            if wildcardKey.isEmpty, strLine.contains("%wildcardkey ") {
+              wildcardKey = cells[1].first?.description ?? ""
+            }
           }
           maxKeyLength = theMaxKeyLength
+          keyNameMap[wildcardKey] = keyNameMap[wildcardKey] ?? "？"
           return true
         } catch {
           vCLog("CIN Loading Failed: File Access Error.")
@@ -125,12 +143,14 @@ extension vChewingLM {
     public func clear() {
       keyNameMap.removeAll()
       charDefMap.removeAll()
+      charDefWildcardMap.removeAll()
       nameENG.removeAll()
       nameCJK.removeAll()
       selectionKeys.removeAll()
       endKeys.removeAll()
       octagramMap.removeAll()
       octagramDividedMap.removeAll()
+      wildcardKey.removeAll()
       maxKeyLength = 1
       norm = 0
     }
@@ -139,18 +159,41 @@ extension vChewingLM {
     /// - parameters:
     ///   - key: 讀音索引鍵。
     public func unigramsFor(key: String) -> [Megrez.Unigram] {
-      guard let arrRaw = charDefMap[key]?.deduplicated, !arrRaw.isEmpty else { return [] }
+      let arrRaw = charDefMap[key]?.deduplicated ?? []
+      var arrRawWildcard: [String] = []
+      if let arrRawWildcardValues = charDefWildcardMap[key]?.deduplicated,
+        key.contains(wildcardKey), key.first?.description != wildcardKey
+      {
+        arrRawWildcard.append(contentsOf: arrRawWildcardValues)
+      }
       var arrResults = [Megrez.Unigram]()
-      for (i, neta) in arrRaw.enumerated() {
+      var lowestScore: Double = 0
+      for neta in arrRaw {
         let theScore: Double = {
           if let freqDataPair = octagramDividedMap[neta], key == freqDataPair.1 {
             return calculateWeight(count: freqDataPair.0, phraseLength: neta.count)
           } else if let freqData = octagramMap[neta] {
             return calculateWeight(count: freqData, phraseLength: neta.count)
           }
-          return Double(i) * -0.001
+          return Double(arrResults.count) * -0.001 - 9.5
         }()
+        lowestScore = min(theScore, lowestScore)
         arrResults.append(.init(value: neta, score: theScore))
+      }
+      lowestScore = min(-9.5, lowestScore)
+      if !arrRawWildcard.isEmpty {
+        for neta in arrRawWildcard {
+          var theScore: Double = {
+            if let freqDataPair = octagramDividedMap[neta], key == freqDataPair.1 {
+              return calculateWeight(count: freqDataPair.0, phraseLength: neta.count)
+            } else if let freqData = octagramMap[neta] {
+              return calculateWeight(count: freqData, phraseLength: neta.count)
+            }
+            return Double(arrResults.count) * -0.001 - 9.7
+          }()
+          theScore += lowestScore
+          arrResults.append(.init(value: neta, score: theScore))
+        }
       }
       return arrResults
     }
@@ -160,6 +203,7 @@ extension vChewingLM {
     ///   - key: 讀音索引鍵。
     public func hasUnigramsFor(key: String) -> Bool {
       charDefMap[key] != nil
+        || (charDefWildcardMap[key] != nil && key.contains(wildcardKey) && key.first?.description != wildcardKey)
     }
 
     // MARK: - Private Functions.

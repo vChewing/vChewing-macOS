@@ -4,6 +4,7 @@
 %cname 五笔
 #sname WUBI
 %selkey 1234567890
+%wildcardkey z
 %keyname begin
 a 工
 b 子
@@ -30,7 +31,6 @@ v 女
 w 人
 x 幺
 y 言
-z ？
 %keyname end
 %chardef begin
 aa 式
