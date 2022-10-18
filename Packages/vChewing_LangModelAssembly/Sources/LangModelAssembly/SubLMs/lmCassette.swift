@@ -23,6 +23,14 @@ extension vChewingLM {
     public private(set) var endKeys: [String] = []
     public private(set) var keyNameMap: [String: String] = [:]
     public private(set) var charDefMap: [String: [String]] = [:]
+    /// 字根輸入法專用八股文：[字詞:頻次]。
+    public private(set) var octagramMap: [String: Int] = [:]
+    /// 音韻輸入法專用八股文：[字詞:(頻次, 讀音)]。
+    public private(set) var octagramDividedMap: [String: (Int, String)] = [:]
+
+    /// 計算頻率時要用到的東西
+    private static let fscale = 2.7
+    private var norm = 0.0
 
     /// 資料陣列內承載的資料筆數。
     public var count: Int { charDefMap.count }
@@ -44,6 +52,8 @@ extension vChewingLM {
     /// - `%endkey` 是會觸發組字事件的按鍵。
     /// - `%keyname begin` 至 `%keyname end` 之間是字根翻譯表，先讀取為 Swift 辭典以備用。
     /// - `%chardef begin` 至 `%chardef end` 之間則是詞庫資料。
+    /// - `%octagram begin` 至 `%octagram end` 之間則是詞語頻次資料。
+    /// 第三欄資料為對應字根、可有可無。第一欄與第二欄分別為「字詞」與「統計頻次」。
     /// - Parameter path: 檔案路徑。
     /// - Returns: 是否載入成功。
     @discardableResult public func open(_ path: String) -> Bool {
@@ -57,21 +67,32 @@ extension vChewingLM {
           var theMaxKeyLength = 1
           var loadingKeys = false
           var loadingCharDefinitions = false
+          var loadingOctagramData = false
           for (_, strLine) in lineReader.enumerated() {
             if !loadingKeys, strLine.contains("%keyname begin") { loadingKeys = true }
             if loadingKeys, strLine.contains("%keyname end") { loadingKeys = false }
             if !loadingCharDefinitions, strLine.contains("%chardef begin") { loadingCharDefinitions = true }
             if loadingCharDefinitions, strLine.contains("%chardef end") { loadingCharDefinitions = false }
+            if !loadingOctagramData, strLine.contains("%octagram begin") { loadingOctagramData = true }
+            if loadingOctagramData, strLine.contains("%octagram end") { loadingOctagramData = false }
             let cells: [String.SubSequence] =
               strLine.contains("\t") ? strLine.split(separator: "\t") : strLine.split(separator: " ")
-            guard cells.count == 2 else { continue }
+            guard cells.count >= 2 else { continue }
             if loadingKeys, !cells[0].contains("%keyname") {
               keyNameMap[String(cells[0])] = String(cells[1])
             } else if loadingCharDefinitions, !strLine.contains("%chardef") {
               theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
               charDefMap[String(cells[0]), default: []].append(String(cells[1]))
+            } else if loadingOctagramData, !strLine.contains("%octagram") {
+              guard let countValue = Int(cells[1]) else { continue }
+              switch cells.count {
+                case 2: octagramMap[String(cells[0])] = countValue
+                case 3: octagramDividedMap[String(cells[0])] = (countValue, String(cells[2]))
+                default: break
+              }
+              norm += Self.fscale ** (Double(cells[0].count) / 3.0 - 1.0) * Double(countValue)
             }
-            guard !loadingKeys, !loadingCharDefinitions else { continue }
+            guard !loadingKeys, !loadingCharDefinitions, !loadingOctagramData else { continue }
             if nameENG.isEmpty, strLine.contains("%ename ") {
               for neta in cells[1].components(separatedBy: ";") {
                 let subNetaGroup = neta.components(separatedBy: ":")
@@ -108,17 +129,28 @@ extension vChewingLM {
       nameCJK.removeAll()
       selectionKeys.removeAll()
       endKeys.removeAll()
+      octagramMap.removeAll()
+      octagramDividedMap.removeAll()
       maxKeyLength = 1
+      norm = 0
     }
 
-    /// 根據給定的讀音索引鍵，來獲取資料庫辭典內的對應結果。
+    /// 根據給定的字根索引鍵，來獲取資料庫辭典內的對應結果。
     /// - parameters:
     ///   - key: 讀音索引鍵。
     public func unigramsFor(key: String) -> [Megrez.Unigram] {
       guard let arrRaw = charDefMap[key]?.deduplicated, !arrRaw.isEmpty else { return [] }
       var arrResults = [Megrez.Unigram]()
       for (i, neta) in arrRaw.enumerated() {
-        arrResults.append(.init(value: neta, score: Double(i) * -0.001))
+        let theScore: Double = {
+          if let freqDataPair = octagramDividedMap[neta], key == freqDataPair.1 {
+            return calculateWeight(count: freqDataPair.0, phraseLength: neta.count)
+          } else if let freqData = octagramMap[neta] {
+            return calculateWeight(count: freqData, phraseLength: neta.count)
+          }
+          return Double(i) * -0.001
+        }()
+        arrResults.append(.init(value: neta, score: theScore))
       }
       return arrResults
     }
@@ -129,5 +161,40 @@ extension vChewingLM {
     public func hasUnigramsFor(key: String) -> Bool {
       charDefMap[key] != nil
     }
+
+    // MARK: - Private Functions.
+
+    private func calculateWeight(count theCount: Int, phraseLength: Int) -> Double {
+      var weight: Double = 0
+      switch theCount {
+        case -2:  // 拗音假名
+          weight = -13
+        case -1:  // 單個假名
+          weight = -13
+        case 0:  // 墊底低頻漢字與詞語
+          weight = log10(
+            Self.fscale ** (Double(phraseLength) / 3.0 - 1.0) * 0.25 / norm)
+        default:
+          weight = log10(
+            Self.fscale ** (Double(phraseLength) / 3.0 - 1.0)
+              * Double(theCount) / norm
+          )
+      }
+      return weight
+    }
   }
+}
+
+// MARK: - 引入冪乘函式
+
+// Ref: https://stackoverflow.com/a/41581695/4162914
+precedencegroup ExponentiationPrecedence {
+  associativity: right
+  higherThan: MultiplicationPrecedence
+}
+
+infix operator **: ExponentiationPrecedence
+
+private func ** (_ base: Double, _ exp: Double) -> Double {
+  pow(base, exp)
 }
