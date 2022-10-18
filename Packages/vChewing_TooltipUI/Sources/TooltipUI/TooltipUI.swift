@@ -117,6 +117,7 @@ public class TooltipUI: NSWindowController {
   }
 
   public func hide() {
+    setColor(state: .normal)
     window?.orderOut(nil)
   }
 
