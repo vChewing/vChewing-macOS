@@ -170,6 +170,7 @@ extension InputHandler {
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   private func handleCassetteComposition(input: InputSignalProtocol) -> Bool? {
     guard let delegate = delegate else { return nil }
+    var wildcardKey: String { currentLM.currentCassette.wildcardKey }  // 花牌鍵。
 
     var keyConsumedByStrokes = false
     let skipStrokeHandling =
@@ -178,11 +179,22 @@ extension InputHandler {
 
     var isStrokesFull: Bool { calligrapher.count >= currentLM.currentCassette.maxKeyLength }
 
-    if !skipStrokeHandling && currentLM.currentCassette.allowedKeys.contains(input.text) {
+    prehandling: if !skipStrokeHandling && currentLM.currentCassette.allowedKeys.contains(input.text) {
+      if calligrapher.isEmpty, input.text == wildcardKey {
+        delegate.callError("3606B9C0")
+        var newEmptyState = IMEState.ofEmpty()
+        newEmptyState.tooltip = NSLocalizedString("Wildcard key cannot be the initial key.", comment: "") + "　　"
+        newEmptyState.data.tooltipColorState = .redAlert
+        delegate.switchState(newEmptyState)
+        return true
+      }
       if isStrokesFull {
         calligrapher = String(calligrapher.dropLast(1))
       }
       calligrapher.append(input.text)
+      if input.text == wildcardKey {
+        break prehandling
+      }
       keyConsumedByStrokes = true
 
       if !isStrokesFull {
@@ -191,7 +203,7 @@ extension InputHandler {
       }
     }
 
-    var compoundStrokes = isStrokesFull  // 這裡不需要做排他性判斷。
+    var compoundStrokes = isStrokesFull || (input.text == wildcardKey && !calligrapher.isEmpty)
 
     // 如果當前的按鍵是 Enter 或 Space 的話，這時就可以取出 calligrapher 內的筆畫來做檢查了。
     // 來看看詞庫內到底有沒有對應的讀音索引。這裡用了類似「|=」的判斷處理方式。
