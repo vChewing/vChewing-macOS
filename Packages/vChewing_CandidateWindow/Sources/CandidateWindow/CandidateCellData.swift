@@ -155,7 +155,7 @@ extension CandidateCellData {
               Text(displayedText).font(.system(size: fontSizeCandidate))
                 .foregroundColor(.init(nsColor: fontColorCandidate)).lineLimit(1)
             }
-          }.padding(4)
+          }.padding(3)
         }
       }.fixedSize(horizontal: false, vertical: true)
     }
@@ -191,7 +191,7 @@ extension CandidateCellData {
                 .foregroundColor(Color.white.opacity(0.8)).lineLimit(1)
               Text(displayedText).font(.system(size: fontSizeCandidate))
                 .foregroundColor(Color(white: 1)).lineLimit(1)
-            }.padding(4).foregroundColor(Color(white: 0.9))
+            }.padding(3).foregroundColor(Color(white: 0.9))
           }
         } else {
           VStack(spacing: 0) {
@@ -200,7 +200,7 @@ extension CandidateCellData {
                 .foregroundColor(Color.secondary).lineLimit(1)
               Text(displayedText).font(.system(size: fontSizeCandidate))
                 .foregroundColor(Color.primary).lineLimit(1)
-            }.padding(4).foregroundColor(Color(white: 0.9))
+            }.padding(3).foregroundColor(Color(white: 0.9))
           }
         }
       }.fixedSize(horizontal: false, vertical: true)
