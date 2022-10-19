@@ -40,7 +40,7 @@ extension SessionCtl {
     return lineHeightRect
   }
 
-  public func showTooltip(_ tooltip: String) {
+  public func showTooltip(_ tooltip: String, duration: Double = 0) {
     guard client() != nil else { return }
     if tooltip.isEmpty {
       tooltipInstance.hide()
@@ -66,8 +66,8 @@ extension SessionCtl {
     }
     // 再設定其文字顯示內容並顯示。
     tooltipInstance.show(
-      tooltip: tooltip, at: finalOrigin,
-      bottomOutOfScreenAdjustmentHeight: delta, direction: tooltipContentDirection
+      tooltip: tooltip, at: finalOrigin, bottomOutOfScreenAdjustmentHeight: delta,
+      direction: tooltipContentDirection, duration: duration
     )
   }
 
