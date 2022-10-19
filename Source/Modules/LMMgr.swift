@@ -197,13 +197,7 @@ public enum LMMgr {
   /// 載入磁帶資料。
   /// - Remark: cassettePath() 會在輸入法停用磁帶時直接返回
   public static func loadCassetteData() {
-    let pathForCassette = cassettePath()
-    if !Self.lmCHT.isCassetteEnabled {
-      Self.lmCHT.loadCassetteData(path: pathForCassette)
-    }
-    if !Self.lmCHS.isCassetteEnabled {
-      Self.lmCHT.loadCassetteData(path: pathForCassette)
-    }
+    vChewingLM.LMInstantiator.loadCassetteData(path: cassettePath())
   }
 
   public static func loadUserPhrasesData() {
