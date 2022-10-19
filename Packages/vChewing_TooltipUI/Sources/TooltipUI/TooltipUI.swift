@@ -53,7 +53,7 @@ public class TooltipUI: NSWindowController {
   public func show(
     tooltip: String = "", at point: NSPoint,
     bottomOutOfScreenAdjustmentHeight heightDelta: Double,
-    direction: NSAttributedTooltipTextView.writingDirection = .horizontal
+    direction: NSAttributedTooltipTextView.writingDirection = .horizontal, duration: Double = 0
   ) {
     self.direction = direction
     self.tooltip = tooltip
@@ -61,6 +61,11 @@ public class TooltipUI: NSWindowController {
     window?.orderFront(nil)
     set(windowTopLeftPoint: point, bottomOutOfScreenAdjustmentHeight: heightDelta, useGCD: false)
     window?.setIsVisible(true)
+    if duration > 0 {
+      DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+        self.window?.orderOut(nil)
+      }
+    }
   }
 
   public func setColor(state: TooltipColorState) {
@@ -117,6 +122,7 @@ public class TooltipUI: NSWindowController {
   }
 
   public func hide() {
+    setColor(state: .normal)
     window?.orderOut(nil)
   }
 

@@ -72,22 +72,19 @@ extension SessionCtl {
           default: break innerCircle
         }
         ctlCandidateCurrent.visible = false
-        tooltipInstance.hide()
         // 全專案用以判斷「.Abortion」的地方僅此一處。
         if previous.hasComposition, ![.ofAbortion, .ofCommitting].contains(newState.type) {
           commit(text: previous.displayedText)
         }
-        // 在這裡手動再取消一次選字窗與工具提示的顯示，可謂雙重保險。
-        tooltipInstance.hide()
+        showTooltip(newState.tooltip, duration: 1)  // 會在工具提示為空的時候自動消除顯示。
         clearInlineDisplay()
         // 最後一道保險
         inputHandler.clear()
       case .ofInputting:
         ctlCandidateCurrent.visible = false
-        tooltipInstance.hide()
         commit(text: newState.textToCommit)
         setInlineDisplayWithCursor()
-        showTooltip(newState.tooltip)
+        showTooltip(newState.tooltip, duration: 1)  // 會在工具提示為空的時候自動消除顯示。
       case .ofMarking:
         ctlCandidateCurrent.visible = false
         setInlineDisplayWithCursor()

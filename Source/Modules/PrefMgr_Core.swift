@@ -66,7 +66,7 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kShowNotificationsWhenTogglingCapsLock.rawValue, defaultValue: true)
   public var showNotificationsWhenTogglingCapsLock: Bool
 
-  @AppProperty(key: UserDef.kCandidateListTextSize.rawValue, defaultValue: 18)
+  @AppProperty(key: UserDef.kCandidateListTextSize.rawValue, defaultValue: 16)
   public var candidateListTextSize: Double {
     didSet {
       // 必須確立條件，否則就會是無限迴圈。
