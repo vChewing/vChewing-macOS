@@ -55,16 +55,9 @@ extension vChewingLM {
           }
           let lineReader = try LineReader(file: fileHandle)
           var theMaxKeyLength = 1
-          var isOV = false
-          var shouldStartReading = false
           var loadingKeys = false
           var loadingCharDefinitions = false
           for (_, strLine) in lineReader.enumerated() {
-            if !shouldStartReading, strLine.contains("%gen_inp") || strLine.contains("%ename ") {
-              isOV = strLine.contains("%gen_inp")
-              shouldStartReading = true
-            }
-            guard shouldStartReading else { continue }
             if !loadingKeys, strLine.contains("%keyname begin") { loadingKeys = true }
             if loadingKeys, strLine.contains("%keyname end") { loadingKeys = false }
             if !loadingCharDefinitions, strLine.contains("%chardef begin") { loadingCharDefinitions = true }
@@ -80,18 +73,14 @@ extension vChewingLM {
             }
             guard !loadingKeys, !loadingCharDefinitions else { continue }
             if nameENG.isEmpty, strLine.contains("%ename ") {
-              if isOV {
-                nameENG = String(cells[1])
-              } else {
-                for neta in cells[1].components(separatedBy: ";") {
-                  let subNetaGroup = neta.components(separatedBy: ":")
-                  if subNetaGroup.count == 2, subNetaGroup[1].contains("en") {
-                    nameENG = String(subNetaGroup[0])
-                    break
-                  }
+              for neta in cells[1].components(separatedBy: ";") {
+                let subNetaGroup = neta.components(separatedBy: ":")
+                if subNetaGroup.count == 2, subNetaGroup[1].contains("en") {
+                  nameENG = String(subNetaGroup[0])
+                  break
                 }
-                if nameENG.isEmpty { nameENG = String(cells[1]) }
               }
+              if nameENG.isEmpty { nameENG = String(cells[1]) }
             }
             if nameCJK.isEmpty, strLine.contains("%cname ") { nameCJK = String(cells[1]) }
             if selectionKeys.isEmpty, strLine.contains("%selkey ") {
