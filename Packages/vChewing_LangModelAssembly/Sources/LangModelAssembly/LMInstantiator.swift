@@ -205,7 +205,7 @@ extension vChewingLM {
       }
     }
 
-    public func loadCassetteData(path: String) {
+    public static func loadCassetteData(path: String) {
       DispatchQueue.main.async {
         if FileManager.default.isReadableFile(atPath: path) {
           Self.lmCassette.close()
