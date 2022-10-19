@@ -15,8 +15,10 @@ import Shared
 extension vChewingLM {
   /// 磁帶模組，用來方便使用者自行擴充字根輸入法。
   public class LMCassette {
+    public private(set) var nameShort: String = ""
     public private(set) var nameENG: String = ""
     public private(set) var nameCJK: String = ""
+    public private(set) var nameIntl: String = ""
     /// 一個漢字可能最多要用到多少碼。
     public private(set) var maxKeyLength: Int = 1
     public private(set) var selectionKeys: [String] = []
@@ -48,7 +50,8 @@ extension vChewingLM {
     /// 載入給定的 CIN 檔案內容。
     /// - Note:
     /// - 檢查是否以 `%gen_inp` 或者 `%ename` 開頭、以確認其是否為 cin 檔案。在讀到這些資訊之前的行都會被忽略。
-    /// - `%ename` 決定磁帶的英文名、`%cname` 決定磁帶的 CJK 名稱。
+    /// - `%ename` 決定磁帶的英文名、`%cname` 決定磁帶的 CJK 名稱、
+    /// `%sname` 決定磁帶的最短英文縮寫名稱、`%intlname` 決定磁帶的本地化名稱綜合字串。
     /// - `%encoding` 不處理，因為 Swift 只認 UTF-8。
     /// - `%selkey`  不處理，因為威注音輸入法有自己的選字鍵體系。
     /// - `%endkey` 是會觸發組字事件的按鍵。
@@ -117,7 +120,11 @@ extension vChewingLM {
               }
               if nameENG.isEmpty { nameENG = String(cells[1]) }
             }
+            if nameIntl.isEmpty, strLine.contains("%intlname ") {
+              nameIntl = String(cells[1]).replacingOccurrences(of: "_", with: " ")
+            }
             if nameCJK.isEmpty, strLine.contains("%cname ") { nameCJK = String(cells[1]) }
+            if nameShort.isEmpty, strLine.contains("%sname ") { nameShort = String(cells[1]) }
             if selectionKeys.isEmpty, strLine.contains("%selkey ") {
               selectionKeys = cells[1].map { String($0) }.deduplicated
             }
@@ -144,6 +151,7 @@ extension vChewingLM {
       keyNameMap.removeAll()
       charDefMap.removeAll()
       charDefWildcardMap.removeAll()
+      nameShort.removeAll()
       nameENG.removeAll()
       nameCJK.removeAll()
       selectionKeys.removeAll()
@@ -151,6 +159,7 @@ extension vChewingLM {
       octagramMap.removeAll()
       octagramDividedMap.removeAll()
       wildcardKey.removeAll()
+      nameIntl.removeAll()
       maxKeyLength = 1
       norm = 0
     }
