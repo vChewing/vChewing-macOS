@@ -231,12 +231,20 @@ extension vChewingLM {
     /// - Parameter key: 索引鍵。
     /// - Returns: 是否在庫。
     public func hasUnigramsFor(key: String) -> Bool {
-      if key == " " { return true }
-      if !lmFiltered.hasUnigramsFor(key: key) {
-        return lmUserPhrases.hasUnigramsFor(key: key) || lmCore.hasUnigramsFor(key: key)
-          || Self.lmCassette.hasUnigramsFor(key: key) || (Self.lmCNS.hasUnigramsFor(key: key) && isCNSEnabled)
+      if key == " " || key.isEmpty { return true }
+      let isPeripheralKey: Bool = key.charComponents[0] == "_"
+      if !isCassetteEnabled || isPeripheralKey {
+        if !lmFiltered.hasUnigramsFor(key: key) {
+          return lmUserPhrases.hasUnigramsFor(key: key) || lmCore.hasUnigramsFor(key: key)
+            || Self.lmCassette.hasUnigramsFor(key: key) || (Self.lmCNS.hasUnigramsFor(key: key) && isCNSEnabled)
+        }
+        return !unigramsFor(key: key).isEmpty
+      } else {
+        if !lmFiltered.hasUnigramsFor(key: key) {
+          return lmUserPhrases.hasUnigramsFor(key: key) || Self.lmCassette.hasUnigramsFor(key: key)
+        }
+        return !unigramsFor(key: key).isEmpty
       }
-      return !unigramsFor(key: key).isEmpty
     }
 
     /// 根據給定的索引鍵和資料值，確認是否有該具體的資料值在庫。
@@ -252,6 +260,7 @@ extension vChewingLM {
     /// - Parameter key: 給定的讀音字串。
     /// - Returns: 對應的經過處理的單元圖陣列。
     public func unigramsFor(key: String) -> [Megrez.Unigram] {
+      guard !key.isEmpty else { return [] }
       /// 給空格鍵指定輸出值。
       if key == " " { return [.init(value: " ")] }
 
@@ -270,17 +279,18 @@ extension vChewingLM {
       // 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
       rawAllUnigrams += lmUserPhrases.unigramsFor(key: key).reversed()
 
-      // LMMisc 與 LMCore 的 score 在 (-10.0, 0.0) 這個區間內。
-      rawAllUnigrams += lmMisc.unigramsFor(key: key)
-      rawAllUnigrams += lmCore.unigramsFor(key: key)
-
-      if isCNSEnabled {
-        rawAllUnigrams += Self.lmCNS.unigramsFor(key: key)
+      if !isCassetteEnabled || isCassetteEnabled && key.charComponents[0] == "_" {
+        // LMMisc 與 LMCore 的 score 在 (-10.0, 0.0) 這個區間內。
+        rawAllUnigrams += lmMisc.unigramsFor(key: key)
+        rawAllUnigrams += lmCore.unigramsFor(key: key)
+        if isCNSEnabled { rawAllUnigrams += Self.lmCNS.unigramsFor(key: key) }
       }
 
       if isSymbolEnabled {
         rawAllUnigrams += lmUserSymbols.unigramsFor(key: key)
-        rawAllUnigrams += Self.lmSymbols.unigramsFor(key: key)
+        if !isCassetteEnabled {
+          rawAllUnigrams += Self.lmSymbols.unigramsFor(key: key)
+        }
       }
 
       // 新增與日期、時間、星期有關的單元圖資料
