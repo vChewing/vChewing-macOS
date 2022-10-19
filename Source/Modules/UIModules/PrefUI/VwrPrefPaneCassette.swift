@@ -64,7 +64,7 @@ struct VwrPrefPaneCassette: View {
               Self.dlgOpenFile.canChooseFiles = true
               Self.dlgOpenFile.canChooseDirectories = false
               Self.dlgOpenFile.allowsMultipleSelection = false
-              Self.dlgOpenFile.allowedFileTypes = ["cin"]
+              Self.dlgOpenFile.allowedFileTypes = ["cin2", "vcin", "cin"]
               Self.dlgOpenFile.allowsOtherFileTypes = true
 
               let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(

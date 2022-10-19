@@ -312,7 +312,7 @@ class CtlPrefWindow: NSWindowController {
     dlgOpenFile.canChooseFiles = true
     dlgOpenFile.canChooseDirectories = false
     dlgOpenFile.allowsMultipleSelection = false
-    dlgOpenFile.allowedFileTypes = ["cin"]
+    dlgOpenFile.allowedFileTypes = ["cin2", "vcin", "cin"]
     dlgOpenFile.allowsOtherFileTypes = true
 
     let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(
