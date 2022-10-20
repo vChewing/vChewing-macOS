@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import LangModelAssembly
 import NotifierUI
 import SSPreferences
 import UpdateSputnik
@@ -249,7 +250,9 @@ extension SessionCtl {
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
-    LMMgr.loadCassetteData()
+    if !LMMgr.currentLM().currentCassette.isLoaded {
+      LMMgr.loadCassetteData()
+    }
   }
 
   @objc public func toggleSCPCTypingMode(_: Any? = nil) {
