@@ -27,7 +27,7 @@ public enum LMMgr {
   public private(set) static var uomCHT = vChewingLM.LMUserOverride(
     dataURL: Self.userOverrideModelDataURL(.imeModeCHT))
 
-  public static func currentLM() -> vChewingLM.LMInstantiator {
+  public static var currentLM: vChewingLM.LMInstantiator {
     switch IMEApp.currentInputMode {
       case .imeModeCHS:
         return Self.lmCHS
@@ -38,7 +38,7 @@ public enum LMMgr {
     }
   }
 
-  public static func currentUOM() -> vChewingLM.LMUserOverride {
+  public static var currentUOM: vChewingLM.LMUserOverride {
     switch IMEApp.currentInputMode {
       case .imeModeCHS:
         return Self.uomCHS
