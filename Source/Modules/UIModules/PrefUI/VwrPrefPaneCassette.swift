@@ -78,7 +78,6 @@ struct VwrPrefPaneCassette: View {
                       PrefMgr.shared.cassettePath = url.path
                       tbxCassettePath = PrefMgr.shared.cassettePath
                       BookmarkManager.shared.saveBookmark(for: url)
-                      LMMgr.loadCassetteData()
                     } else {
                       IMEApp.buzz()
                       if !bolPreviousPathValidity {
