@@ -193,7 +193,6 @@ public class PrefMgr: PrefMgrProtocol {
   public var cassetteEnabled: Bool {
     didSet {
       LMMgr.setCassetteEnabled(cassetteEnabled)  // 很重要
-      LMMgr.loadCassetteData()
     }
   }
 
