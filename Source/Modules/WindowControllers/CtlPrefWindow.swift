@@ -325,7 +325,6 @@ class CtlPrefWindow: NSWindowController {
         if LMMgr.checkCassettePathValidity(url.path) {
           PrefMgr.shared.cassettePath = url.path
           BookmarkManager.shared.saveBookmark(for: url)
-          LMMgr.loadCassetteData()
         } else {
           IMEApp.buzz()
           if !bolPreviousPathValidity {
