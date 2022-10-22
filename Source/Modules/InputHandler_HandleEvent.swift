@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-/// 該檔案乃按鍵調度模組當中用來預處理 NSEvent 的模組。
+/// 該檔案乃輸入調度模組當中用來預處理 NSEvent 的模組。
 
 import InputMethodKit
 import Shared
