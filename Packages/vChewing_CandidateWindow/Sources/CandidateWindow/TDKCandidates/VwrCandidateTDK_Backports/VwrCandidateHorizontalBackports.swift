@@ -40,6 +40,7 @@ public struct VwrCandidateHorizontalBackports: View {
   public var controller: CtlCandidateTDK
   @State public var thePool: CandidatePool
   @State public var tooltip: String = ""
+  @State public var reverseLookupResult: String = ""
 
   private var positionLabel: String {
     (thePool.highlightedIndex + 1).description + "/" + thePool.candidateDataAll.count.description
@@ -93,7 +94,7 @@ public struct VwrCandidateHorizontalBackports: View {
       }
       .fixedSize(horizontal: false, vertical: true).padding(5)
       .background(Color(white: colorScheme == .dark ? 0.1 : 1))
-      ZStack(alignment: .leading) {
+      ZStack(alignment: .trailing) {
         if tooltip.isEmpty {
           Color(white: colorScheme == .dark ? 0.2 : 0.9)
         } else {
@@ -101,12 +102,17 @@ public struct VwrCandidateHorizontalBackports: View {
           controller.highlightedColorUIBackports
         }
         HStack(alignment: .bottom) {
-          Text(tooltip).font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold)).lineLimit(1)
-          Spacer()
-          Text(positionLabel).font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold))
-            .lineLimit(
-              1)
+          if !tooltip.isEmpty {
+            Text(tooltip).lineLimit(1)
+            Spacer()
+          }
+          if !reverseLookupResult.isEmpty, !(controller.delegate?.isVerticalTyping ?? true) {
+            Text(reverseLookupResult).lineLimit(1)
+            Spacer()
+          }
+          Text(positionLabel).lineLimit(1)
         }
+        .font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold))
         .padding(7).foregroundColor(
           tooltip.isEmpty && colorScheme == .light ? Color(white: 0.1) : Color(white: 0.9)
         )

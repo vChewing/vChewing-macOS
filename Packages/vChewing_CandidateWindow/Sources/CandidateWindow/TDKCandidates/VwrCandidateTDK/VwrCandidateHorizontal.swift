@@ -38,6 +38,7 @@ public struct VwrCandidateHorizontal: View {
   public var controller: CtlCandidateTDK
   @State public var thePool: CandidatePool
   @State public var tooltip: String = ""
+  @State public var reverseLookupResult: String = ""
 
   private var positionLabel: String {
     (thePool.highlightedIndex + 1).description + "/" + thePool.candidateDataAll.count.description
@@ -91,16 +92,21 @@ public struct VwrCandidateHorizontal: View {
       }
       .fixedSize(horizontal: false, vertical: true).padding(5)
       .background(Color(nsColor: NSColor.controlBackgroundColor).ignoresSafeArea())
-      ZStack(alignment: .leading) {
+      ZStack(alignment: .trailing) {
         Color(nsColor: tooltip.isEmpty ? .windowBackgroundColor : CandidateCellData.highlightBackground)
           .ignoresSafeArea()
         HStack(alignment: .bottom) {
-          Text(tooltip).font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold)).lineLimit(1)
-          Spacer()
-          Text(positionLabel).font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold))
-            .lineLimit(
-              1)
+          if !tooltip.isEmpty {
+            Text(tooltip).lineLimit(1)
+            Spacer()
+          }
+          if !reverseLookupResult.isEmpty, !(controller.delegate?.isVerticalTyping ?? true) {
+            Text(reverseLookupResult).lineLimit(1)
+            Spacer()
+          }
+          Text(positionLabel).lineLimit(1)
         }
+        .font(.system(size: max(CandidateCellData.unifiedSize * 0.7, 11), weight: .bold))
         .padding(7).foregroundColor(
           .init(nsColor: tooltip.isEmpty ? .controlTextColor : .selectedMenuItemTextColor.withAlphaComponent(0.9))
         )

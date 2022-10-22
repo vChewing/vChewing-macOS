@@ -19,20 +19,32 @@ public class CtlCandidateTDK: CtlCandidate {
 
   @available(macOS 12, *)
   public var theViewHorizontal: VwrCandidateHorizontal {
-    .init(controller: self, thePool: thePoolHorizontal, tooltip: tooltip)
+    .init(
+      controller: self, thePool: thePoolHorizontal,
+      tooltip: tooltip, reverseLookupResult: reverseLookupResult
+    )
   }
 
   @available(macOS 12, *)
   public var theViewVertical: VwrCandidateVertical {
-    .init(controller: self, thePool: thePoolVertical, tooltip: tooltip)
+    .init(
+      controller: self, thePool: thePoolVertical,
+      tooltip: tooltip, reverseLookupResult: reverseLookupResult
+    )
   }
 
   public var theViewHorizontalBackports: VwrCandidateHorizontalBackports {
-    .init(controller: self, thePool: thePoolHorizontal, tooltip: tooltip)
+    .init(
+      controller: self, thePool: thePoolHorizontal,
+      tooltip: tooltip, reverseLookupResult: reverseLookupResult
+    )
   }
 
   public var theViewVerticalBackports: VwrCandidateVerticalBackports {
-    .init(controller: self, thePool: thePoolVertical, tooltip: tooltip)
+    .init(
+      controller: self, thePool: thePoolVertical,
+      tooltip: tooltip, reverseLookupResult: reverseLookupResult
+    )
   }
 
   public var thePool: CandidatePool {
@@ -105,6 +117,7 @@ public class CtlCandidateTDK: CtlCandidate {
 
   override open func updateDisplay() {
     guard let window = window else { return }
+    reverseLookupResult = delegate?.annotate(for: currentSelectedCandidateText) ?? ""
     switch currentLayout {
       case .horizontal:
         DispatchQueue.main.async { [self] in
@@ -222,6 +235,13 @@ extension CtlCandidateTDK {
   private var isMontereyAvailable: Bool {
     if #unavailable(macOS 12) { return false }
     return true
+  }
+
+  private var currentSelectedCandidateText: String {
+    if thePool.candidateDataAll.count > highlightedIndex {
+      return thePool.candidateDataAll[highlightedIndex].displayedText
+    }
+    return ""
   }
 }
 

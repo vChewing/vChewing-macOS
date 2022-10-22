@@ -223,6 +223,7 @@
 "Selection Keys:" = "言選り用キー:";
 "Shift+BackSpace:" = "Shift+BackSpace:";
 "Shift+Letter:" = "Shift+文字キー:";
+"Show available reverse-lookup results in candidate window" = "候補陳列ウィンドウで可能な逆引参照結果を示す";
 "Show Hanyu-Pinyin in the inline composition buffer" = "弁音合併入力（入力緩衝列で音読みを漢語弁音に）";
 "Show notifications when toggling Caps Lock" = "Caps Lock で切り替えの時に吹出通知メッセージを";
 "Show translated strokes in composition buffer" = "原始キーネームでなく、筆画を入力緩衝列で表示する";

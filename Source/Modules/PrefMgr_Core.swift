@@ -150,6 +150,9 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kForceCassetteChineseConversion.rawValue, defaultValue: 0)
   public var forceCassetteChineseConversion: Int
 
+  @AppProperty(key: UserDef.kShowReverseLookupInCandidateUI.rawValue, defaultValue: true)
+  public var showReverseLookupInCandidateUI: Bool
+
   // MARK: - Settings (Tier 2)
 
   @AppProperty(key: UserDef.kUseIMKCandidateWindow.rawValue, defaultValue: false)

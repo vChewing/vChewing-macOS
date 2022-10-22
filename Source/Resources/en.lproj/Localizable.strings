@@ -223,6 +223,7 @@
 "Selection Keys:" = "Selection Keys:";
 "Shift+BackSpace:" = "Shift+BackSpace:";
 "Shift+Letter:" = "Shift+Letter:";
+"Show available reverse-lookup results in candidate window" = "Show available reverse-lookup results in candidate window";
 "Show Hanyu-Pinyin in the inline composition buffer" = "Show Hanyu-Pinyin in the inline composition buffer";
 "Show notifications when toggling Caps Lock" = "Show notifications when toggling Caps Lock";
 "Show translated strokes in composition buffer" = "Show translated strokes in composition buffer";

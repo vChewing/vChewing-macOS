@@ -27,6 +27,7 @@ extension vChewingLM {
     public private(set) var keyNameMap: [String: String] = [:]
     public private(set) var charDefMap: [String: [String]] = [:]
     public private(set) var charDefWildcardMap: [String: [String]] = [:]
+    public private(set) var reverseLookupMap: [String: [String]] = [:]
     /// 字根輸入法專用八股文：[字詞:頻次]。
     public private(set) var octagramMap: [String: Int] = [:]
     /// 音韻輸入法專用八股文：[字詞:(頻次, 讀音)]。
@@ -91,13 +92,15 @@ extension vChewingLM {
             if loadingKeys, !cells[0].contains("%keyname") {
               keyNameMap[strFirstCell] = String(cells[1])
             } else if loadingCharDefinitions, !strLine.contains("%chardef") {
+              let strSecondCell = String(cells[1])
               theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
-              charDefMap[strFirstCell, default: []].append(String(cells[1]))
+              charDefMap[strFirstCell, default: []].append(strSecondCell)
+              reverseLookupMap[strSecondCell, default: []].append(strFirstCell)
               var keyComps = strFirstCell.charComponents
               while !keyComps.isEmpty, !wildcardKey.isEmpty {
                 keyComps.removeLast()
                 if !wildcardKey.isEmpty {
-                  charDefWildcardMap[keyComps.joined() + wildcardKey, default: []].append(String(cells[1]))
+                  charDefWildcardMap[keyComps.joined() + wildcardKey, default: []].append(strSecondCell)
                 }
               }
             } else if loadingOctagramData, !strLine.contains("%octagram") {

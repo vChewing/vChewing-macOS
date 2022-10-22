@@ -223,6 +223,7 @@
 "Selection Keys:" = "选字键:";
 "Shift+BackSpace:" = "Shift+退格键:";
 "Shift+Letter:" = "Shift+字母键:";
+"Show available reverse-lookup results in candidate window" = "在选字窗内显示可用的字根反查结果";
 "Show Hanyu-Pinyin in the inline composition buffer" = "拼音并击（组字区内显示汉语拼音）";
 "Show notifications when toggling Caps Lock" = "以 Caps Lock 切换输入法/中英模式时显示通知";
 "Show translated strokes in composition buffer" = "在组字区内显示字根、而非原始键盘码";
