@@ -51,6 +51,7 @@ public protocol PrefMgrProtocol {
   var inlineDumpPinyinInLieuOfZhuyin: Bool { get set }
   var showTranslatedStrokesInCompositionBuffer: Bool { get set }
   var forceCassetteChineseConversion: Int { get set }
+  var showReverseLookupInCandidateUI: Bool { get set }
   var cns11643Enabled: Bool { get set }
   var cassetteEnabled: Bool { get set }
   var symbolInputEnabled: Bool { get set }
