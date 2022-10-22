@@ -77,23 +77,6 @@ extension vChewingLM.LMInstantiator {
   }
 }
 
-// MARK: - String Extension
-
-extension String {
-  fileprivate mutating func regReplace(pattern: String, replaceWith: String = "") {
-    // Ref: https://stackoverflow.com/a/40993403/4162914 && https://stackoverflow.com/a/71291137/4162914
-    do {
-      let regex = try NSRegularExpression(
-        pattern: pattern, options: [.caseInsensitive, .anchorsMatchLines]
-      )
-      let range = NSRange(startIndex..., in: self)
-      self = regex.stringByReplacingMatches(
-        in: self, options: [], range: range, withTemplate: replaceWith
-      )
-    } catch { return }
-  }
-}
-
 // MARK: - Date Time Language Conversion Extension
 
 private let tableMappingArabicNumeralsToChinese: [String: String] = [
