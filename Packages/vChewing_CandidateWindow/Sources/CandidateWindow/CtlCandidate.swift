@@ -14,6 +14,7 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
   open var currentLayout: NSUserInterfaceLayoutOrientation = .horizontal
   open var locale: String = ""
   open var useLangIdentifier: Bool = false
+  open var reverseLookupResult: String = ""
 
   open func highlightedColor() -> NSColor {
     var result = NSColor.alternateSelectedControlColor
