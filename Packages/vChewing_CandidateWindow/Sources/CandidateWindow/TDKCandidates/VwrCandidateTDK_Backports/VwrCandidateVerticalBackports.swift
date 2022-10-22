@@ -74,7 +74,7 @@ public struct VwrCandidateVerticalBackports: View {
             ).id(columnIndex)
             if loopIndex < thePool.maxLinesPerPage - 1 {
               Divider()
-            } else {
+            } else if thePool.maxLinesPerPage > 1 {
               Spacer(minLength: 0)
             }
           }
@@ -93,7 +93,7 @@ public struct VwrCandidateVerticalBackports: View {
               )
               if loopIndex < thePool.maxLinesPerPage - thePool.rangeForCurrentPage.count - 1 {
                 Divider()
-              } else {
+              } else if thePool.maxLinesPerPage > 1 {
                 Spacer(minLength: 0)
               }
             }
