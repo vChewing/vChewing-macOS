@@ -61,7 +61,7 @@ public class SessionCtl: IMKInputController {
     }
   }
 
-  /// 按鍵調度模組的副本。
+  /// 輸入調度模組的副本。
   var inputHandler: InputHandlerProtocol = InputHandler(
     lm: LMMgr.currentLM(), uom: LMMgr.currentUOM(), pref: PrefMgr.shared
   )
@@ -165,7 +165,7 @@ extension SessionCtl {
     }
   }
 
-  /// 重設按鍵調度模組，會將當前尚未遞交的內容遞交出去。
+  /// 重設輸入調度模組，會將當前尚未遞交的內容遞交出去。
   public func resetInputHandler() {
     // 過濾掉尚未完成拼寫的注音。
     if state.type == .ofInputting, PrefMgr.shared.trimUnfinishedReadingsOnCommit {

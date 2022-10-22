@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-/// 該檔案乃按鍵調度模組當中「用來規定在選字窗出現時的按鍵行為」的部分。
+/// 該檔案乃輸入調度模組當中「用來規定在選字窗出現時的按鍵行為」的部分。
 
 import CandidateWindow
 import CocoaExtension
