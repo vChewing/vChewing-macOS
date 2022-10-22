@@ -75,16 +75,22 @@ extension vChewingLM {
           var loadingKeys = false
           var loadingCharDefinitions = false
           var loadingOctagramData = false
-          for (_, strLine) in lineReader.enumerated() {
-            if !loadingKeys, strLine.contains("%keyname begin") { loadingKeys = true }
-            if loadingKeys, strLine.contains("%keyname end") { loadingKeys = false }
-            if !loadingCharDefinitions, strLine.contains("%chardef begin") { loadingCharDefinitions = true }
-            if loadingCharDefinitions, strLine.contains("%chardef end") {
+          for strLine in lineReader {
+            if !loadingKeys, strLine.contains("%keyname"), strLine.contains("begin") { loadingKeys = true }
+            if loadingKeys, strLine.contains("%keyname"), strLine.contains("end") { loadingKeys = false }
+            if !loadingCharDefinitions, strLine.contains("%chardef"), strLine.contains("begin") {
+              loadingCharDefinitions = true
+            }
+            if loadingCharDefinitions, strLine.contains("%chardef"), strLine.contains("end") {
               loadingCharDefinitions = false
               if charDefMap.keys.contains(wildcardKey) { wildcardKey = "" }
             }
-            if !loadingOctagramData, strLine.contains("%octagram begin") { loadingOctagramData = true }
-            if loadingOctagramData, strLine.contains("%octagram end") { loadingOctagramData = false }
+            if !loadingOctagramData, strLine.contains("%octagram"), strLine.contains("begin") {
+              loadingOctagramData = true
+            }
+            if loadingOctagramData, strLine.contains("%octagram"), strLine.contains("end") {
+              loadingOctagramData = false
+            }
             let cells: [String.SubSequence] =
               strLine.contains("\t") ? strLine.split(separator: "\t") : strLine.split(separator: " ")
             guard cells.count >= 2 else { continue }
