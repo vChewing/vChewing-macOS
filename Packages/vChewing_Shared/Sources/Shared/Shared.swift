@@ -64,6 +64,7 @@ public enum UserDef: String, CaseIterable {
   case kOnlyLoadFactoryLangModelsIfNeeded = "OnlyLoadFactoryLangModelsIfNeeded"
   case kShowTranslatedStrokesInCompositionBuffer = "ShowTranslatedStrokesInCompositionBuffer"
   case kForceCassetteChineseConversion = "ForceCassetteChineseConversion"
+  case kShowReverseLookupInCandidateUI = "ShowReverseLookupInCandidateUI"
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"

@@ -56,6 +56,16 @@ extension SessionCtl: InputHandlerDelegate {
 // MARK: - Candidate Controller Delegate
 
 extension SessionCtl: CtlCandidateDelegate {
+  @discardableResult public func annotate(for value: String) -> String {
+    // 這一段專門處理「反查」。
+    if !PrefMgr.shared.showReverseLookupInCandidateUI { return "" }
+    if isVerticalTyping { return "" }  // 縱排輸入的場合，選字窗沒那個空間顯示反查結果。
+    if value.isEmpty { return "" }  // 空字串沒有需要反查的東西。
+    if value.contains("_") { return "" }
+    guard let lookupResult = LMMgr.currentLM.currentCassette.reverseLookupMap[value] else { return "" }
+    return lookupResult.joined(separator: " ")
+  }
+
   public var selectionKeys: String {
     PrefMgr.shared.useIMKCandidateWindow ? "123456789" : PrefMgr.shared.candidateKeys
   }

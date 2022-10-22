@@ -19,6 +19,7 @@ extension PrefMgr {
       shiftKeyAccommodationBehavior = 0
       disableShiftTogglingAlphanumericalMode = true
       togglingAlphanumericalModeWithLShift = false
+      showReverseLookupInCandidateUI = false
     }
     // 自動糾正選字鍵 (利用其 didSet 特性)
     candidateKeys = candidateKeys
