@@ -48,7 +48,7 @@ extension SessionCtl {
         if previous.hasComposition {
           commit(text: previous.displayedText)
         }
-        clearInlineDisplay()
+        clearInlineDisplay()  // 該函式有對 client 做 guard-let 保護，不會出現上游 #346 的問題。
         // 最後一道保險
         inputHandler.clear()
         // 特殊處理：deactivateServer() 可能會遲於另一個客體會話的 activateServer() 執行。
