@@ -66,7 +66,7 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kShowNotificationsWhenTogglingCapsLock.rawValue, defaultValue: true)
   public var showNotificationsWhenTogglingCapsLock: Bool
 
-  @AppProperty(key: UserDef.kCandidateListTextSize.rawValue, defaultValue: 18)
+  @AppProperty(key: UserDef.kCandidateListTextSize.rawValue, defaultValue: 16)
   public var candidateListTextSize: Double {
     didSet {
       // 必須確立條件，否則就會是無限迴圈。
@@ -150,6 +150,9 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kForceCassetteChineseConversion.rawValue, defaultValue: 0)
   public var forceCassetteChineseConversion: Int
 
+  @AppProperty(key: UserDef.kShowReverseLookupInCandidateUI.rawValue, defaultValue: true)
+  public var showReverseLookupInCandidateUI: Bool
+
   // MARK: - Settings (Tier 2)
 
   @AppProperty(key: UserDef.kUseIMKCandidateWindow.rawValue, defaultValue: false)
@@ -193,7 +196,6 @@ public class PrefMgr: PrefMgrProtocol {
   public var cassetteEnabled: Bool {
     didSet {
       LMMgr.setCassetteEnabled(cassetteEnabled)  // 很重要
-      LMMgr.loadCassetteData()
     }
   }
 

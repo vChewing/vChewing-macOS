@@ -10,7 +10,7 @@
 import Shared
 
 extension vChewingLM {
-  @frozen public struct LMReplacements {
+  public class LMReplacements {
     var rangeMap: [String: Range<String.Index>] = [:]
     var strData: String = ""
 
@@ -22,7 +22,7 @@ extension vChewingLM {
 
     public var isLoaded: Bool { !rangeMap.isEmpty }
 
-    @discardableResult public mutating func open(_ path: String) -> Bool {
+    @discardableResult public func open(_ path: String) -> Bool {
       if isLoaded { return false }
 
       LMConsolidator.fixEOF(path: path)
@@ -50,7 +50,7 @@ extension vChewingLM {
       return true
     }
 
-    public mutating func close() {
+    public func clear() {
       rangeMap.removeAll()
     }
 

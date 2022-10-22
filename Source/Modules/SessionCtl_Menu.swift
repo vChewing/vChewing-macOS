@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import LangModelAssembly
 import NotifierUI
 import SSPreferences
 import UpdateSputnik
@@ -230,8 +231,9 @@ extension SessionCtl {
     if !PrefMgr.shared.cassetteEnabled, !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
       DispatchQueue.main.async {
         let alert = NSAlert(error: NSLocalizedString("Path invalid or file access error.", comment: ""))
-        alert.informativeText =
-          "Please reconfigure the cassette path to a valid one before enabling this mode."
+        alert.informativeText = NSLocalizedString(
+          "Please reconfigure the cassette path to a valid one before enabling this mode.", comment: ""
+        )
         let result = alert.runModal()
         if result == NSApplication.ModalResponse.alertFirstButtonReturn {
           LMMgr.resetCassettePath()
@@ -248,7 +250,9 @@ extension SessionCtl {
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
-    LMMgr.loadCassetteData()
+    if !LMMgr.currentLM.currentCassette.isLoaded {
+      LMMgr.loadCassetteData()
+    }
   }
 
   @objc public func toggleSCPCTypingMode(_: Any? = nil) {

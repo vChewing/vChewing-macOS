@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-/// 該檔案乃按鍵調度模組的用以承載「根據按鍵行為來調控模式」的各種成員函式的部分。
+/// 該檔案乃輸入調度模組的用以承載「根據按鍵行為來調控模式」的各種成員函式的部分。
 
 import Megrez
 import Shared

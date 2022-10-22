@@ -36,6 +36,8 @@ struct VwrPrefPaneGeneral: View {
   @State private var selEnableAutoUpdateCheck = UserDefaults.standard.bool(
     forKey: UserDef.kCheckUpdateAutomatically.rawValue)
   @State private var selEnableDebugMode = UserDefaults.standard.bool(forKey: UserDef.kIsDebugModeEnabled.rawValue)
+  @State private var selShowReverseLookupInCandidateUI = UserDefaults.standard.bool(
+    forKey: UserDef.kShowReverseLookupInCandidateUI.rawValue)
 
   private let contentMaxHeight: Double = 440
   private let contentWidth: Double = {
@@ -129,6 +131,14 @@ struct VwrPrefPaneGeneral: View {
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Choose your preferred layout of the candidate window."))
             .preferenceDescription()
+          Toggle(
+            LocalizedStringKey("Show available reverse-lookup results in candidate window"),
+            isOn: $selShowReverseLookupInCandidateUI.onChange {
+              PrefMgr.shared.showReverseLookupInCandidateUI = selShowReverseLookupInCandidateUI
+            }
+          )
+          .controlSize(.small)
+          .disabled(PrefMgr.shared.useIMKCandidateWindow)
         }
         SSPreferences.Section(label: { Text(LocalizedStringKey("Output Settings:")) }) {
           Toggle(

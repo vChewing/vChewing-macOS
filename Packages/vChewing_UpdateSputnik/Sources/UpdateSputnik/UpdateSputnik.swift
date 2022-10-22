@@ -46,7 +46,7 @@ public class UpdateSputnik {
     currentTask = task
   }
 
-  // MARK: - Private properties
+  // MARK: - Private Properties
 
   private var isCurrentCheckForced = false
   var sessionConfiguration = URLSessionConfiguration.background(withIdentifier: Bundle.main.bundleIdentifier!)
@@ -73,7 +73,7 @@ public class UpdateSputnik {
     }
   }
 
-  // MARK: - Private functions.
+  // MARK: - Private Functions.
 
   internal func dataDidSet(data: Data) {
     var plist: [AnyHashable: Any]?

@@ -27,7 +27,7 @@ public enum LMMgr {
   public private(set) static var uomCHT = vChewingLM.LMUserOverride(
     dataURL: Self.userOverrideModelDataURL(.imeModeCHT))
 
-  public static func currentLM() -> vChewingLM.LMInstantiator {
+  public static var currentLM: vChewingLM.LMInstantiator {
     switch IMEApp.currentInputMode {
       case .imeModeCHS:
         return Self.lmCHS
@@ -38,7 +38,7 @@ public enum LMMgr {
     }
   }
 
-  public static func currentUOM() -> vChewingLM.LMUserOverride {
+  public static var currentUOM: vChewingLM.LMUserOverride {
     switch IMEApp.currentInputMode {
       case .imeModeCHS:
         return Self.uomCHS
@@ -197,13 +197,7 @@ public enum LMMgr {
   /// 載入磁帶資料。
   /// - Remark: cassettePath() 會在輸入法停用磁帶時直接返回
   public static func loadCassetteData() {
-    let pathForCassette = cassettePath()
-    if !Self.lmCHT.isCassetteEnabled {
-      Self.lmCHT.loadCassetteData(path: pathForCassette)
-    }
-    if !Self.lmCHS.isCassetteEnabled {
-      Self.lmCHT.loadCassetteData(path: pathForCassette)
-    }
+    vChewingLM.LMInstantiator.loadCassetteData(path: cassettePath())
   }
 
   public static func loadUserPhrasesData() {

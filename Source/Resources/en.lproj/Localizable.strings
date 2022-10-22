@@ -1,4 +1,5 @@
 "vChewing" = "vChewing";
+"Wildcard key cannot be the initial key." = "Wildcard key cannot be the initial key.";
 "CIN Cassette Mode" = "CIN Cassette Mode";
 "Invalid Selection Keys." = "Invalid Selection Keys.";
 "Alphanumerical Input Mode" = "Alphanumerical Input Mode";
@@ -222,6 +223,7 @@
 "Selection Keys:" = "Selection Keys:";
 "Shift+BackSpace:" = "Shift+BackSpace:";
 "Shift+Letter:" = "Shift+Letter:";
+"Show available reverse-lookup results in candidate window" = "Show available reverse-lookup results in candidate window";
 "Show Hanyu-Pinyin in the inline composition buffer" = "Show Hanyu-Pinyin in the inline composition buffer";
 "Show notifications when toggling Caps Lock" = "Show notifications when toggling Caps Lock";
 "Show translated strokes in composition buffer" = "Show translated strokes in composition buffer";

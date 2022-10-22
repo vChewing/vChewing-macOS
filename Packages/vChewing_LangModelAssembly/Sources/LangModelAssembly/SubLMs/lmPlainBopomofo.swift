@@ -11,7 +11,7 @@ import Foundation
 import Shared
 
 extension vChewingLM {
-  @frozen public struct LMPlainBopomofo {
+  public class LMPlainBopomofo {
     var rangeMap: [String: String] = [:]
 
     public var count: Int { rangeMap.count }
@@ -22,7 +22,7 @@ extension vChewingLM {
 
     public var isLoaded: Bool { !rangeMap.isEmpty }
 
-    @discardableResult public mutating func open(_ path: String) -> Bool {
+    @discardableResult public func open(_ path: String) -> Bool {
       if isLoaded { return false }
 
       do {
@@ -39,7 +39,7 @@ extension vChewingLM {
       return true
     }
 
-    public mutating func close() {
+    public func clear() {
       rangeMap.removeAll()
     }
 

@@ -19,31 +19,22 @@ private let packageRootPath = URL(fileURLWithPath: #file).pathComponents.prefix(
 private let testDataPath: String = packageRootPath + "/Tests/TestCINData/"
 
 final class LMCassetteTests: XCTestCase {
-  func testCassetteLoadWubi98() throws {
-    let pathCINFile = testDataPath + "wubi98.cin"
-    var lmCassette = vChewingLM.LMCassette()
-    NSLog("LMCassette: Start loading CIN.")
-    lmCassette.open(pathCINFile)
-    NSLog("LMCassette: Finished loading CIN. Entries: \(lmCassette.count)")
-    XCTAssertEqual(lmCassette.charDefMap.count, 21492)
-    XCTAssertEqual(lmCassette.keyNameMap.count, 26)
-    XCTAssertEqual(lmCassette.nameENG, "Wubi98")
-    XCTAssertEqual(lmCassette.nameCJK, "五笔98")
-    XCTAssertEqual(lmCassette.maxKeyLength, 4)
-    XCTAssertEqual(lmCassette.endKeys.count, 0)
-    XCTAssertEqual(lmCassette.selectionKeys.count, 10)
-  }
-
   func testCassetteLoadWubi86() throws {
-    let pathCINFile = testDataPath + "wubi86.cin"
-    var lmCassette = vChewingLM.LMCassette()
+    let pathCINFile = testDataPath + "wubi.cin"
+    let lmCassette = vChewingLM.LMCassette()
     NSLog("LMCassette: Start loading CIN.")
     lmCassette.open(pathCINFile)
     NSLog("LMCassette: Finished loading CIN. Entries: \(lmCassette.count)")
-    XCTAssertEqual(lmCassette.charDefMap.count, 10691)
+    print(lmCassette.unigramsFor(key: "aaaz"))
     XCTAssertEqual(lmCassette.keyNameMap.count, 26)
-    XCTAssertEqual(lmCassette.nameENG, "Wubi86")
-    XCTAssertEqual(lmCassette.nameCJK, "五笔86")
+    XCTAssertEqual(lmCassette.charDefMap.count, 23494)
+    XCTAssertEqual(lmCassette.charDefWildcardMap.count, 8390)
+    XCTAssertEqual(lmCassette.octagramMap.count, 14616)
+    XCTAssertEqual(lmCassette.octagramDividedMap.count, 0)
+    XCTAssertEqual(lmCassette.nameShort, "WUBI")
+    XCTAssertEqual(lmCassette.nameENG, "Wubi")
+    XCTAssertEqual(lmCassette.nameCJK, "五笔")
+    XCTAssertEqual(lmCassette.nameIntl, "Haifeng Wubi:en;海峰五笔:zh-Hans;海峰五筆:zh-Hant")
     XCTAssertEqual(lmCassette.maxKeyLength, 4)
     XCTAssertEqual(lmCassette.endKeys.count, 0)
     XCTAssertEqual(lmCassette.selectionKeys.count, 10)

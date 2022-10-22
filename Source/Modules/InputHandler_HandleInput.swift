@@ -6,10 +6,11 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-/// 該檔案乃按鍵調度模組當中「用來規定當 IMK 接受按鍵訊號時且首次交給按鍵調度模組處理時、
-/// 按鍵調度模組要率先處理」的部分。據此判斷是否需要將按鍵處理委派給其它成員函式。
+/// 該檔案乃輸入調度模組當中「用來規定當 IMK 接受按鍵訊號時且首次交給輸入調度模組處理時、
+/// 輸入調度模組要率先處理」的部分。據此判斷是否需要將按鍵處理委派給其它成員函式。
 
 import CocoaExtension
+import IMKUtils
 import LangModelAssembly
 import Shared
 
@@ -272,6 +273,14 @@ extension InputHandler {
       delegate.callError("Blocked data: charCode: \(input.charCode), keyCode: \(input.keyCode)")
       delegate.callError("A9BFF20E")
       delegate.switchState(state)
+      return true
+    }
+
+    // 將 Apple 動態鍵盤佈局的 RAW 輸出轉為 ABC 輸出。僅對磁帶模式啟用此步驟。
+    if IMKHelper.isDynamicBasicKeyboardLayoutEnabled, let event = input as? NSEvent,
+      prefs.cassetteEnabled, let txtABC = event.inAppleABCStaticForm.characters, !txtABC.isEmpty
+    {
+      delegate.switchState(IMEState.ofCommitting(textToCommit: txtABC))
       return true
     }
 

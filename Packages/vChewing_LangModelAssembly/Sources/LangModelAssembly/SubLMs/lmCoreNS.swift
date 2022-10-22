@@ -14,7 +14,7 @@ extension vChewingLM {
   /// 與之前的 LMCore 不同，LMCoreNS 直接讀取 plist。
   /// 這樣一來可以節省在舊 mac 機種內的資料讀入速度。
   /// 目前僅針對輸入法原廠語彙資料檔案使用 plist 格式。
-  @frozen public struct LMCoreNS {
+  public class LMCoreNS {
     /// 資料庫辭典。索引內容為經過加密的注音字串，資料內容則為 UTF8 資料陣列。
     var rangeMap: [String: [Data]] = [:]
     /// 【已作廢】資料庫字串陣列。在 LMCoreNS 內沒有作用。
@@ -57,7 +57,7 @@ extension vChewingLM {
     /// 將資料從檔案讀入至資料庫辭典內。
     /// - parameters:
     ///   - path: 給定路徑。
-    @discardableResult public mutating func open(_ path: String) -> Bool {
+    @discardableResult public func open(_ path: String) -> Bool {
       if isLoaded { return false }
 
       do {
@@ -74,7 +74,7 @@ extension vChewingLM {
     }
 
     /// 將當前語言模組的資料庫辭典自記憶體內卸除。
-    public mutating func close() {
+    public func clear() {
       rangeMap.removeAll()
     }
 

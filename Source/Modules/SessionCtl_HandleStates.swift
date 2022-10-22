@@ -34,7 +34,9 @@ extension SessionCtl {
   /// 針對某一個客體的 deactivateServer() 可能會在使用者切換到另一個客體應用
   /// 且開始敲字之後才會執行。這個過程會使得不同的 SessionCtl 副本之間出現
   /// 不必要的互相干涉、打斷彼此的工作。
-  /// - Parameter newState: 新狀態。
+  /// - Parameters:
+  ///   - newState: 新狀態。
+  ///   - replace: 是否取代現有狀態。
   public func handle(state newState: IMEStateProtocol, replace: Bool) {
     var previous = state
     if replace { state = newState }
@@ -46,7 +48,7 @@ extension SessionCtl {
         if previous.hasComposition {
           commit(text: previous.displayedText)
         }
-        clearInlineDisplay()
+        clearInlineDisplay()  // 該函式有對 client 做 guard-let 保護，不會出現上游 #346 的問題。
         // 最後一道保險
         inputHandler.clear()
         // 特殊處理：deactivateServer() 可能會遲於另一個客體會話的 activateServer() 執行。
@@ -72,22 +74,19 @@ extension SessionCtl {
           default: break innerCircle
         }
         ctlCandidateCurrent.visible = false
-        tooltipInstance.hide()
         // 全專案用以判斷「.Abortion」的地方僅此一處。
         if previous.hasComposition, ![.ofAbortion, .ofCommitting].contains(newState.type) {
           commit(text: previous.displayedText)
         }
-        // 在這裡手動再取消一次選字窗與工具提示的顯示，可謂雙重保險。
-        tooltipInstance.hide()
+        showTooltip(newState.tooltip, duration: 1)  // 會在工具提示為空的時候自動消除顯示。
         clearInlineDisplay()
         // 最後一道保險
         inputHandler.clear()
       case .ofInputting:
         ctlCandidateCurrent.visible = false
-        tooltipInstance.hide()
         commit(text: newState.textToCommit)
         setInlineDisplayWithCursor()
-        showTooltip(newState.tooltip)
+        showTooltip(newState.tooltip, duration: 1)  // 會在工具提示為空的時候自動消除顯示。
       case .ofMarking:
         ctlCandidateCurrent.visible = false
         setInlineDisplayWithCursor()

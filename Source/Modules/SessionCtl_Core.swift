@@ -61,9 +61,9 @@ public class SessionCtl: IMKInputController {
     }
   }
 
-  /// 按鍵調度模組的副本。
+  /// 輸入調度模組的副本。
   var inputHandler: InputHandlerProtocol = InputHandler(
-    lm: LMMgr.currentLM(), uom: LMMgr.currentUOM(), pref: PrefMgr.shared
+    lm: LMMgr.currentLM, uom: LMMgr.currentUOM, pref: PrefMgr.shared
   )
   /// 用以記錄當前輸入法狀態的變數。
   public var state: IMEStateProtocol = IMEState.ofEmpty() {
@@ -110,8 +110,8 @@ public class SessionCtl: IMKInputController {
         inputHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
         // ----------------------------
         /// 重設所有語言模組。這裡不需要做按需重設，因為對運算量沒有影響。
-        inputHandler.currentLM = LMMgr.currentLM()  // 會自動更新組字引擎內的模組。
-        inputHandler.currentUOM = LMMgr.currentUOM()
+        inputHandler.currentLM = LMMgr.currentLM  // 會自動更新組字引擎內的模組。
+        inputHandler.currentUOM = LMMgr.currentUOM
         /// 清空注拼槽＋同步最新的注拼槽排列設定。
         inputHandler.ensureKeyboardParser()
         /// 將輸入法偏好設定同步至語言模組內。
@@ -165,7 +165,7 @@ extension SessionCtl {
     }
   }
 
-  /// 重設按鍵調度模組，會將當前尚未遞交的內容遞交出去。
+  /// 重設輸入調度模組，會將當前尚未遞交的內容遞交出去。
   public func resetInputHandler() {
     // 過濾掉尚未完成拼寫的注音。
     if state.type == .ofInputting, PrefMgr.shared.trimUnfinishedReadingsOnCommit {
@@ -241,12 +241,12 @@ extension SessionCtl {
 
   /// 將輸入法偏好設定同步至語言模組內。
   public func syncBaseLMPrefs() {
-    LMMgr.currentLM().isPhraseReplacementEnabled = PrefMgr.shared.phraseReplacementEnabled
-    LMMgr.currentLM().isCNSEnabled = PrefMgr.shared.cns11643Enabled
-    LMMgr.currentLM().isSymbolEnabled = PrefMgr.shared.symbolInputEnabled
-    LMMgr.currentLM().isSCPCEnabled = PrefMgr.shared.useSCPCTypingMode
-    LMMgr.currentLM().isCassetteEnabled = PrefMgr.shared.cassetteEnabled
-    LMMgr.currentLM().deltaOfCalendarYears = PrefMgr.shared.deltaOfCalendarYears
+    LMMgr.currentLM.isPhraseReplacementEnabled = PrefMgr.shared.phraseReplacementEnabled
+    LMMgr.currentLM.isCNSEnabled = PrefMgr.shared.cns11643Enabled
+    LMMgr.currentLM.isSymbolEnabled = PrefMgr.shared.symbolInputEnabled
+    LMMgr.currentLM.isSCPCEnabled = PrefMgr.shared.useSCPCTypingMode
+    LMMgr.currentLM.isCassetteEnabled = PrefMgr.shared.cassetteEnabled
+    LMMgr.currentLM.deltaOfCalendarYears = PrefMgr.shared.deltaOfCalendarYears
   }
 }
 
