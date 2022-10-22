@@ -34,7 +34,9 @@ extension SessionCtl {
   /// 針對某一個客體的 deactivateServer() 可能會在使用者切換到另一個客體應用
   /// 且開始敲字之後才會執行。這個過程會使得不同的 SessionCtl 副本之間出現
   /// 不必要的互相干涉、打斷彼此的工作。
-  /// - Parameter newState: 新狀態。
+  /// - Parameters:
+  ///   - newState: 新狀態。
+  ///   - replace: 是否取代現有狀態。
   public func handle(state newState: IMEStateProtocol, replace: Bool) {
     var previous = state
     if replace { state = newState }

@@ -11,7 +11,7 @@ import Megrez
 import Shared
 import Tekkon
 
-/// 該檔案乃按鍵調度模組的核心部分，主要承接型別初期化內容、協定內容、以及
+/// 該檔案乃輸入調度模組的核心部分，主要承接型別初期化內容、協定內容、以及
 /// 被封裝的「與 Megrez 組字引擎和 Tekkon 注拼引擎對接的」各種工具函式。
 /// 注意：不要把 composer 注拼槽與 compositor 組字器這兩個概念搞混。
 
@@ -48,7 +48,7 @@ public protocol InputHandlerDelegate {
 
 // MARK: - 核心 (Kernel).
 
-/// InputHandler 按鍵調度模組。
+/// InputHandler 輸入調度模組。
 public class InputHandler: InputHandlerProtocol {
   /// 委任物件 (SessionCtl)，以便呼叫其中的函式。
   public var delegate: InputHandlerDelegate?
