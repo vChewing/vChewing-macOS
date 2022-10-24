@@ -117,7 +117,7 @@ public class CtlCandidateTDK: CtlCandidate {
 
   override open func updateDisplay() {
     guard let window = window else { return }
-    reverseLookupResult = delegate?.annotate(for: currentSelectedCandidateText) ?? ""
+    reverseLookupResult = delegate?.reverseLookup(for: currentSelectedCandidateText) ?? []
     switch currentLayout {
       case .horizontal:
         DispatchQueue.main.async { [self] in

@@ -12,14 +12,15 @@ public protocol CtlCandidateDelegate {
   func candidatePairs(conv: Bool) -> [(String, String)]
   func candidatePairSelected(at index: Int)
   func candidates(_ sender: Any!) -> [Any]!
-  @discardableResult func annotate(for value: String) -> String
+  @discardableResult func reverseLookup(for value: String) -> [String]
   var selectionKeys: String { get }
   var isVerticalTyping: Bool { get }
+  var showReverseLookupResult: Bool { get }
 }
 
 public protocol CtlCandidateProtocol {
   var tooltip: String { get set }
-  var reverseLookupResult: String { get set }
+  var reverseLookupResult: [String] { get set }
   var locale: String { get set }
   var currentLayout: NSUserInterfaceLayoutOrientation { get set }
   var delegate: CtlCandidateDelegate? { get set }
