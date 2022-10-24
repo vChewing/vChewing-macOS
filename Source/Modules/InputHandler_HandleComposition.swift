@@ -108,7 +108,10 @@ extension InputHandler {
       }
 
       // 將該讀音插入至組字器內的軌格當中。
-      compositor.insertKey(readingKey)
+      if !compositor.insertKey(readingKey) {
+        delegate.callError("3CF278C9: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。")
+        return true
+      }
 
       // 讓組字器反爬軌格。
       walk()
@@ -223,7 +226,10 @@ extension InputHandler {
       }
 
       // 將該讀音插入至組字器內的軌格當中。
-      compositor.insertKey(calligrapher)
+      if !compositor.insertKey(calligrapher) {
+        delegate.callError("61F6B11F: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。")
+        return true
+      }
 
       // 讓組字器反爬軌格。
       walk()
