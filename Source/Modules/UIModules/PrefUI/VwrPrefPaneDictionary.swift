@@ -60,13 +60,8 @@ struct VwrPrefPaneDictionary: View {
         SSPreferences.Section(title: "", bottomDivider: true) {
           Text(LocalizedStringKey("Choose your desired user data folder path. Will be omitted if invalid."))
           HStack {
-            if #available(macOS 11.0, *) {
-              TextField(fdrUserDataDefault, text: $tbxUserDataPathSpecified).disabled(true)
-                .help(tbxUserDataPathSpecified)
-            } else {
-              TextField(fdrUserDataDefault, text: $tbxUserDataPathSpecified).disabled(true)
-                .toolTip(tbxUserDataPathSpecified)
-            }
+            TextField(fdrUserDataDefault, text: $tbxUserDataPathSpecified).disabled(true)
+              .help(tbxUserDataPathSpecified)
             Button {
               Self.dlgOpenPath.title = NSLocalizedString(
                 "Choose your desired user data folder.", comment: ""
