@@ -63,7 +63,7 @@ extension SessionCtl: CtlCandidateDelegate {
     if value.isEmpty { return "" }  // 空字串沒有需要反查的東西。
     if value.contains("_") { return "" }
     guard let lookupResult = LMMgr.currentLM.currentCassette.reverseLookupMap[value] else { return "" }
-    return lookupResult.joined(separator: " ")
+    return lookupResult.stableSort(by: { $0.count < $1.count }).joined(separator: " ")
   }
 
   public var selectionKeys: String {
