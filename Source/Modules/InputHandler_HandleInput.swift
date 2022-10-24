@@ -120,20 +120,19 @@ extension InputHandler {
       if input.isSpace {
         /// 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
         if !prefs.chooseCandidateUsingSpace {
-          if compositor.cursor >= compositor.length {
-            let displayedText = state.displayedText
-            if !displayedText.isEmpty {
-              delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
-            }
-            delegate.switchState(IMEState.ofCommitting(textToCommit: " "))
-          } else if currentLM.hasUnigramsFor(key: " ") {
-            compositor.insertKey(" ")
+          if compositor.cursor < compositor.length, compositor.insertKey(" ") {
             walk()
             // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
             let textToCommit = commitOverflownComposition
             var inputting = generateStateOfInputting()
             inputting.textToCommit = textToCommit
             delegate.switchState(inputting)
+          } else {
+            let displayedText = state.displayedText
+            if !displayedText.isEmpty {
+              delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
+            }
+            delegate.switchState(IMEState.ofCommitting(textToCommit: " "))
           }
           return true
         } else if input.isShiftHold {  // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
@@ -182,8 +181,7 @@ extension InputHandler {
     if input.isSymbolMenuPhysicalKey, !input.isShiftHold, !input.isControlHold, state.type != .ofDeactivated {
       if input.isOptionHold {
         if currentLM.hasUnigramsFor(key: "_punctuation_list") {
-          if isComposerOrCalligrapherEmpty {
-            compositor.insertKey("_punctuation_list")
+          if isComposerOrCalligrapherEmpty, compositor.insertKey("_punctuation_list") {
             walk()
             // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
             let textToCommit = commitOverflownComposition

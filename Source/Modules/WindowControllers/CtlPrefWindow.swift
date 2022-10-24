@@ -283,6 +283,7 @@ class CtlPrefWindow: NSWindowController {
   @IBAction func onToggleCassetteMode(_: Any) {
     if PrefMgr.shared.cassetteEnabled, !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
       if let window = window {
+        IMEApp.buzz()
         let alert = NSAlert(error: NSLocalizedString("Path invalid or file access error.", comment: ""))
         alert.informativeText = NSLocalizedString(
           "Please reconfigure the cassette path to a valid one before enabling this mode.", comment: ""
@@ -291,7 +292,6 @@ class CtlPrefWindow: NSWindowController {
           LMMgr.resetCassettePath()
           PrefMgr.shared.cassetteEnabled = false
         }
-        IMEApp.buzz()
       }
     } else {
       LMMgr.loadCassetteData()
@@ -324,6 +324,7 @@ class CtlPrefWindow: NSWindowController {
         guard let url = dlgOpenFile.url else { return }
         if LMMgr.checkCassettePathValidity(url.path) {
           PrefMgr.shared.cassettePath = url.path
+          LMMgr.loadCassetteData()
           BookmarkManager.shared.saveBookmark(for: url)
         } else {
           IMEApp.buzz()

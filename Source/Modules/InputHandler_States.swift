@@ -235,7 +235,12 @@ extension InputHandler {
       return true
     }
 
-    compositor.insertKey(customPunctuation)
+    guard compositor.insertKey(customPunctuation) else {
+      delegate.callError("C0793A6D: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。")
+      delegate.switchState(state)
+      return true
+    }
+
     walk()
     // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
     let textToCommit = commitOverflownComposition

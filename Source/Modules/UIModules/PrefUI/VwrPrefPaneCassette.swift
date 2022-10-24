@@ -48,13 +48,8 @@ struct VwrPrefPaneCassette: View {
         SSPreferences.Section(title: "", bottomDivider: true) {
           Text(LocalizedStringKey("Choose your desired cassette file path. Will be omitted if invalid."))
           HStack {
-            if #available(macOS 11.0, *) {
-              TextField(fdrCassetteDataDefault, text: $tbxCassettePath).disabled(true)
-                .help(tbxCassettePath)
-            } else {
-              TextField(fdrCassetteDataDefault, text: $tbxCassettePath).disabled(true)
-                .toolTip(tbxCassettePath)
-            }
+            TextField(fdrCassetteDataDefault, text: $tbxCassettePath).disabled(true)
+              .help(tbxCassettePath)
             Button {
               Self.dlgOpenFile.title = NSLocalizedString(
                 "Choose your desired cassette file path.", comment: ""
@@ -76,6 +71,7 @@ struct VwrPrefPaneCassette: View {
                     guard let url = Self.dlgOpenFile.url else { return }
                     if LMMgr.checkCassettePathValidity(url.path) {
                       PrefMgr.shared.cassettePath = url.path
+                      LMMgr.loadCassetteData()
                       tbxCassettePath = PrefMgr.shared.cassettePath
                       BookmarkManager.shared.saveBookmark(for: url)
                     } else {
@@ -108,6 +104,7 @@ struct VwrPrefPaneCassette: View {
             isOn: $selCassetteEnabled.onChange {
               if selCassetteEnabled, !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
                 if let window = CtlPrefUI.shared.controller.window {
+                  IMEApp.buzz()
                   let alert = NSAlert(error: NSLocalizedString("Path invalid or file access error.", comment: ""))
                   alert.informativeText = NSLocalizedString(
                     "Please reconfigure the cassette path to a valid one before enabling this mode.", comment: ""
@@ -117,7 +114,6 @@ struct VwrPrefPaneCassette: View {
                     PrefMgr.shared.cassetteEnabled = false
                     selCassetteEnabled = false
                   }
-                  IMEApp.buzz()
                 }
               } else {
                 PrefMgr.shared.cassetteEnabled = selCassetteEnabled

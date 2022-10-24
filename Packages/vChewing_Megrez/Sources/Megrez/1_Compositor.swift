@@ -73,8 +73,14 @@ extension Megrez {
     @discardableResult public mutating func insertKey(_ key: String) -> Bool {
       guard !key.isEmpty, key != separator, langModel.hasUnigramsFor(key: key) else { return false }
       keys.insert(key, at: cursor)
+      let gridBackup = spans
       resizeGrid(at: cursor, do: .expand)
-      update()
+      let nodesInserted = update()
+      // 用來在 langModel.hasUnigramsFor() 結果不準確的時候防呆、恢復被搞壞的 spans。
+      if nodesInserted == 0 {
+        spans = gridBackup
+        return false
+      }
       cursor += 1  // 游標必須得在執行 update() 之後才可以變動。
       return true
     }
@@ -219,7 +225,7 @@ extension Megrez.Compositor {
   ///            (XXXXXXX? <-被砍爛的節點
   /// ```
   /// - Parameter location: 給定的幅位座標。
-  func dropWreckedNodes(at location: Int) {
+  mutating func dropWreckedNodes(at location: Int) {
     let location = max(min(location, spans.count), 0)  // 防呆
     guard !spans.isEmpty else { return }
     let affectedLength = Megrez.Compositor.maxSpanLength - 1
@@ -230,7 +236,7 @@ extension Megrez.Compositor {
     }
   }
 
-  @discardableResult func insertNode(_ node: Node, at location: Int) -> Bool {
+  @discardableResult mutating func insertNode(_ node: Node, at location: Int) -> Bool {
     let location = max(min(location, spans.count - 1), 0)  // 防呆
     spans[location].append(node: node)
     return true
@@ -254,9 +260,12 @@ extension Megrez.Compositor {
     return key == node.key
   }
 
-  func update() {
+  /// 根據當前狀況更新整個組字器的節點文脈。
+  /// - Returns: 新增了多少節點。
+  @discardableResult mutating func update() -> Int {
     let maxSpanLength = Megrez.Compositor.maxSpanLength
     let range = max(0, cursor - maxSpanLength)..<min(cursor + maxSpanLength, keys.count)
+    var nodesInserted = 0
     for position in range {
       for theLength in 1...min(maxSpanLength, range.upperBound - position) {
         let jointKeyArray = getJointKeyArray(range: position..<(position + theLength))
@@ -268,8 +277,10 @@ extension Megrez.Compositor {
           .init(keyArray: jointKeyArray, spanLength: theLength, unigrams: unigrams, keySeparator: separator),
           at: position
         )
+        nodesInserted += 1
       }
     }
+    return nodesInserted
   }
 
   mutating func updateCursorJumpingTables(_ walkedNodes: [Node]) {
