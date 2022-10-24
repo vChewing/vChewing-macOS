@@ -230,6 +230,7 @@ extension SessionCtl {
     resetInputHandler()
     if !PrefMgr.shared.cassetteEnabled, !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
       DispatchQueue.main.async {
+        IMEApp.buzz()
         let alert = NSAlert(error: NSLocalizedString("Path invalid or file access error.", comment: ""))
         alert.informativeText = NSLocalizedString(
           "Please reconfigure the cassette path to a valid one before enabling this mode.", comment: ""
@@ -240,7 +241,6 @@ extension SessionCtl {
           PrefMgr.shared.cassetteEnabled = false
         }
         NSApp.setActivationPolicy(.accessory)
-        IMEApp.buzz()
       }
       return
     }
