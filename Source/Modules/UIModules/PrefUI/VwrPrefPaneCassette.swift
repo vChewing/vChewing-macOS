@@ -109,6 +109,7 @@ struct VwrPrefPaneCassette: View {
             isOn: $selCassetteEnabled.onChange {
               if selCassetteEnabled, !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
                 if let window = CtlPrefUI.shared.controller.window {
+                  IMEApp.buzz()
                   let alert = NSAlert(error: NSLocalizedString("Path invalid or file access error.", comment: ""))
                   alert.informativeText = NSLocalizedString(
                     "Please reconfigure the cassette path to a valid one before enabling this mode.", comment: ""
@@ -118,7 +119,6 @@ struct VwrPrefPaneCassette: View {
                     PrefMgr.shared.cassetteEnabled = false
                     selCassetteEnabled = false
                   }
-                  IMEApp.buzz()
                 }
               } else {
                 PrefMgr.shared.cassetteEnabled = selCassetteEnabled
