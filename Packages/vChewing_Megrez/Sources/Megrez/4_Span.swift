@@ -5,7 +5,7 @@
 
 extension Megrez.Compositor {
   /// 幅位乃指一組共享起點的節點。
-  public class Span {
+  public struct Span {
     private var nodes: [Node?] = []
     public private(set) var maxLength = 0
     private var maxSpanLength: Int { Megrez.Compositor.maxSpanLength }
@@ -13,7 +13,7 @@ extension Megrez.Compositor {
       clear()
     }
 
-    public func clear() {
+    public mutating func clear() {
       nodes.removeAll()
       for _ in 0..<maxSpanLength {
         nodes.append(nil)
@@ -24,7 +24,7 @@ extension Megrez.Compositor {
     /// 往該幅位塞入一個節點。
     /// - Parameter node: 要塞入的節點。
     /// - Returns: 該操作是否成功執行。
-    @discardableResult public func append(node: Node) -> Bool {
+    @discardableResult public mutating func append(node: Node) -> Bool {
       guard (1...maxSpanLength).contains(node.spanLength) else {
         return false
       }
@@ -36,7 +36,7 @@ extension Megrez.Compositor {
     /// 丟掉任何不小於給定幅位長度的節點。
     /// - Parameter length: 給定的幅位長度。
     /// - Returns: 該操作是否成功執行。
-    @discardableResult public func dropNodesOfOrBeyond(length: Int) -> Bool {
+    @discardableResult public mutating func dropNodesOfOrBeyond(length: Int) -> Bool {
       guard (1...maxSpanLength).contains(length) else {
         return false
       }

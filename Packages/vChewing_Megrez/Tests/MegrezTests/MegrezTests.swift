@@ -11,7 +11,7 @@ import XCTest
 final class MegrezTests: XCTestCase {
   func testSpan() throws {
     let langModel = SimpleLM(input: strSampleData)
-    let span = Megrez.Compositor.Span()
+    var span = Megrez.Compositor.Span()
     let n1 = Megrez.Compositor.Node(keyArray: ["gao1"], spanLength: 1, unigrams: langModel.unigramsFor(key: "gao1"))
     let n3 = Megrez.Compositor.Node(
       keyArray: ["gao1ke1ji4"], spanLength: 3, unigrams: langModel.unigramsFor(key: "gao1ke1ji4")
