@@ -231,20 +231,7 @@ extension vChewingLM {
     /// - Parameter key: 索引鍵。
     /// - Returns: 是否在庫。
     public func hasUnigramsFor(key: String) -> Bool {
-      if key == " " || key.isEmpty { return true }
-      let isPeripheralKey: Bool = key.charComponents[0] == "_"
-      if !isCassetteEnabled || isPeripheralKey {
-        if !lmFiltered.hasUnigramsFor(key: key) {
-          return lmUserPhrases.hasUnigramsFor(key: key) || lmCore.hasUnigramsFor(key: key)
-            || Self.lmCassette.hasUnigramsFor(key: key) || (Self.lmCNS.hasUnigramsFor(key: key) && isCNSEnabled)
-        }
-        return !unigramsFor(key: key).isEmpty
-      } else {
-        if !lmFiltered.hasUnigramsFor(key: key) {
-          return lmUserPhrases.hasUnigramsFor(key: key) || Self.lmCassette.hasUnigramsFor(key: key)
-        }
-        return !unigramsFor(key: key).isEmpty
-      }
+      key == " " || (!unigramsFor(key: key).isEmpty && !key.isEmpty)
     }
 
     /// 根據給定的索引鍵和資料值，確認是否有該具體的資料值在庫。
