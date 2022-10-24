@@ -76,6 +76,7 @@ struct VwrPrefPaneCassette: View {
                     guard let url = Self.dlgOpenFile.url else { return }
                     if LMMgr.checkCassettePathValidity(url.path) {
                       PrefMgr.shared.cassettePath = url.path
+                      LMMgr.loadCassetteData()
                       tbxCassettePath = PrefMgr.shared.cassettePath
                       BookmarkManager.shared.saveBookmark(for: url)
                     } else {
