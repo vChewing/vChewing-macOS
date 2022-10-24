@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import Foundation
+import Shared
 import Tekkon
 
 // MARK: - IMKCandidates 功能擴充
@@ -53,20 +54,16 @@ extension SessionCtl {
   }
 
   /// IMK 選字窗限定函式，只要選字窗內的高亮內容選擇出現變化了、就會呼叫這個函式。
-  /// - Parameter _: 已經高亮選中的候選字詞內容。
-  public override func candidateSelectionChanged(_: NSAttributedString!) {
-    // 警告：不要考慮用實作這個函式的方式來更新內文組字區的顯示。
-    // 因為這樣會導致 IMKServer.commitCompositionWithReply() 呼叫你本來不想呼叫的 commitComposition()，
-    // 然後 inputHandler 會被重設，屆時輸入法會在狀態處理等方面崩潰掉。
-
-    // 這個函式的實作其實很容易誘發各種崩潰，所以最好不要輕易實作。
-
-    // 有些幹話還是要講的：
-    // 在這個函式當中試圖（無論是否拿著傳入的參數）從 ctlCandidateIMK 找 identifier 的話，
-    // 只會找出 NSNotFound。你想 NSLog 列印看 identifier 是多少，輸入法直接崩潰。
-    // 而且會他媽的崩得連 console 內的 ips 錯誤報告都沒有。
-    // 在下文的 candidateSelected() 試圖看每個候選字的 identifier 的話，永遠都只能拿到 NSNotFound。
-    // 衰洨 IMK 真的看上去就像是沒有做過單元測試的東西，賈伯斯有檢查過的話會被氣得從棺材裡爬出來。
+  /// - Parameter currentSelection: 已經高亮選中的候選字詞內容。
+  public override func candidateSelectionChanged(_ currentSelection: NSAttributedString!) {
+    guard let currentCandidate = currentSelection?.string, !currentCandidate.isEmpty else { return }
+    let annotation = reverseLookup(for: currentCandidate).joined(separator: "\n")
+    guard !annotation.isEmpty else { return }
+    vCLog("Current Annotation: \(annotation)")
+    DispatchQueue.main.async {
+      guard let imkCandidates = self.ctlCandidateCurrent as? CtlCandidateIMK else { return }
+      imkCandidates.showAnnotation(.init(string: annotation))
+    }
   }
 
   /// IMK 選字窗限定函式，只要選字窗確認了某個候選字詞的選擇、就會呼叫這個函式。
