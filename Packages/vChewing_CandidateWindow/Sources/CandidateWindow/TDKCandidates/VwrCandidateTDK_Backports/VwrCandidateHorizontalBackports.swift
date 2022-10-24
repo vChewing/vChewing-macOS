@@ -36,11 +36,11 @@ struct CandidatePoolViewUIHorizontalBackports_Previews: PreviewProvider {
 
 @available(macOS 10.15, *)
 public struct VwrCandidateHorizontalBackports: View {
-  @Environment(\.colorScheme) var colorScheme
   public var controller: CtlCandidateTDK
+  @Environment(\.colorScheme) var colorScheme
   @State public var thePool: CandidatePool
   @State public var tooltip: String = ""
-  @State public var reverseLookupResult: String = ""
+  @State public var reverseLookupResult: [String] = ["MLGB"]
 
   private var positionLabel: String {
     (thePool.highlightedIndex + 1).description + "/" + thePool.candidateDataAll.count.description
@@ -92,8 +92,25 @@ public struct VwrCandidateHorizontalBackports: View {
           }
         }
       }
-      .fixedSize(horizontal: false, vertical: true).padding(5)
-      .background(Color(white: colorScheme == .dark ? 0.1 : 1))
+      .fixedSize(horizontal: false, vertical: true)
+      .padding([.horizontal], 5).padding([.top], 5).padding([.bottom], -1)
+      if controller.delegate?.showReverseLookupResult ?? true {
+        ZStack(alignment: .leading) {
+          Color(white: colorScheme == .dark ? 0.15 : 0.97)
+          HStack(alignment: .center, spacing: 4) {
+            Text("→")
+            ForEach(reverseLookupResult, id: \.self) { currentResult in
+              ZStack(alignment: .center) {
+                Color(white: colorScheme == .dark ? 0.3 : 0.9).cornerRadius(3)
+                Text(" \(currentResult) ").lineLimit(1)
+              }.fixedSize()
+            }
+          }
+          .font(.system(size: max(CandidateCellData.unifiedSize * 0.6, 9)))
+          .padding([.horizontal], 4).padding([.vertical], 4)
+          .foregroundColor(colorScheme == .light ? Color(white: 0.1) : Color(white: 0.9))
+        }
+      }
       ZStack(alignment: .trailing) {
         if tooltip.isEmpty {
           Color(white: colorScheme == .dark ? 0.2 : 0.9)
@@ -101,13 +118,9 @@ public struct VwrCandidateHorizontalBackports: View {
           Color(white: colorScheme == .dark ? 0.0 : 1)
           controller.highlightedColorUIBackports
         }
-        HStack(alignment: .bottom) {
+        HStack(alignment: .center) {
           if !tooltip.isEmpty {
             Text(tooltip).lineLimit(1)
-            Spacer()
-          }
-          if !reverseLookupResult.isEmpty, !(controller.delegate?.isVerticalTyping ?? true) {
-            Text(reverseLookupResult).lineLimit(1)
             Spacer()
           }
           Text(positionLabel).lineLimit(1)
@@ -120,6 +133,7 @@ public struct VwrCandidateHorizontalBackports: View {
       .fixedSize(horizontal: false, vertical: true)
     }
     .frame(minWidth: thePool.maxWindowWidth, maxWidth: thePool.maxWindowWidth)
+    .background(Color(white: colorScheme == .dark ? 0.1 : 1))
     .overlay(
       RoundedRectangle(cornerRadius: 10).stroke(.white.opacity(0.2), lineWidth: 1)
     )
