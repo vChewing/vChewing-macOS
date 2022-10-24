@@ -38,11 +38,7 @@ public class PrefMgr: PrefMgrProtocol {
   public var checkUpdateAutomatically: Bool
 
   @AppProperty(key: UserDef.kCassettePath.rawValue, defaultValue: "")
-  public var cassettePath: String {
-    didSet {
-      LMMgr.loadCassetteData()
-    }
-  }
+  public var cassettePath: String
 
   @AppProperty(key: UserDef.kUserDataFolderSpecified.rawValue, defaultValue: "")
   public var userDataFolderSpecified: String
