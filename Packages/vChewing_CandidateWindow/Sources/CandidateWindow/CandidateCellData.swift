@@ -150,9 +150,10 @@ extension CandidateCellData {
               Text(AttributedString(attributedStringHeader))
               Text(AttributedString(attributedString))
             } else {
-              Text(key).font(.system(size: fontSizeKey).monospaced())
+              Text(verbatim: key).font(.system(size: fontSizeKey).monospaced())
                 .foregroundColor(.init(nsColor: fontColorKey)).lineLimit(1)
-              Text(displayedText).font(.system(size: fontSizeCandidate))
+              Text(verbatim: displayedText)
+                .font(.init(CTFontCreateUIFontForLanguage(.system, fontSizeCandidate, locale as CFString)!))
                 .foregroundColor(.init(nsColor: fontColorCandidate)).lineLimit(1)
             }
           }.padding(3)
@@ -187,18 +188,20 @@ extension CandidateCellData {
           themeColorBackports.cornerRadius(6)
           VStack(spacing: 0) {
             HStack(spacing: 4) {
-              Text(key).font(.custom("Menlo", size: fontSizeKey))
+              Text(verbatim: key).font(.custom("Menlo", size: fontSizeKey))
                 .foregroundColor(Color.white.opacity(0.8)).lineLimit(1)
-              Text(displayedText).font(.system(size: fontSizeCandidate))
+              Text(verbatim: displayedText)
+                .font(.init(CTFontCreateUIFontForLanguage(.system, fontSizeCandidate, locale as CFString)!))
                 .foregroundColor(Color(white: 1)).lineLimit(1)
             }.padding(3).foregroundColor(Color(white: 0.9))
           }
         } else {
           VStack(spacing: 0) {
             HStack(spacing: 4) {
-              Text(key).font(.custom("Menlo", size: fontSizeKey))
+              Text(verbatim: key).font(.custom("Menlo", size: fontSizeKey))
                 .foregroundColor(Color.secondary).lineLimit(1)
-              Text(displayedText).font(.system(size: fontSizeCandidate))
+              Text(verbatim: displayedText)
+                .font(.init(CTFontCreateUIFontForLanguage(.system, fontSizeCandidate, locale as CFString)!))
                 .foregroundColor(Color.primary).lineLimit(1)
             }.padding(3).foregroundColor(Color(white: 0.9))
           }
