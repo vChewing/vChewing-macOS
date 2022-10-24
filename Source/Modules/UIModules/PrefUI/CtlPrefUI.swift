@@ -152,6 +152,7 @@ extension Binding {
 // Ref: https://stackoverflow.com/a/63217861
 
 @available(macOS 10.15, *)
+@available(macOS, obsoleted: 11)
 struct Tooltip: NSViewRepresentable {
   let tooltip: String
 
@@ -166,8 +167,9 @@ struct Tooltip: NSViewRepresentable {
 }
 
 @available(macOS 10.15, *)
+@available(macOS, obsoleted: 11)
 extension View {
-  public func toolTip(_ tooltip: String) -> some View {
+  public func help(_ tooltip: String) -> some View {
     overlay(Tooltip(tooltip: tooltip))
   }
 }

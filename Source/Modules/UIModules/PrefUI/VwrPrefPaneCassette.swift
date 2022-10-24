@@ -48,13 +48,8 @@ struct VwrPrefPaneCassette: View {
         SSPreferences.Section(title: "", bottomDivider: true) {
           Text(LocalizedStringKey("Choose your desired cassette file path. Will be omitted if invalid."))
           HStack {
-            if #available(macOS 11.0, *) {
-              TextField(fdrCassetteDataDefault, text: $tbxCassettePath).disabled(true)
-                .help(tbxCassettePath)
-            } else {
-              TextField(fdrCassetteDataDefault, text: $tbxCassettePath).disabled(true)
-                .toolTip(tbxCassettePath)
-            }
+            TextField(fdrCassetteDataDefault, text: $tbxCassettePath).disabled(true)
+              .help(tbxCassettePath)
             Button {
               Self.dlgOpenFile.title = NSLocalizedString(
                 "Choose your desired cassette file path.", comment: ""
