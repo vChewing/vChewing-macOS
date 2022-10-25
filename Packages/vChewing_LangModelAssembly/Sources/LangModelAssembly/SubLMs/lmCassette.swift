@@ -165,6 +165,7 @@ extension vChewingLM {
       nameCJK.removeAll()
       selectionKeys.removeAll()
       endKeys.removeAll()
+      reverseLookupMap.removeAll()
       octagramMap.removeAll()
       octagramDividedMap.removeAll()
       wildcardKey.removeAll()
