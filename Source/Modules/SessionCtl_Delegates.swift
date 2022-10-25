@@ -68,7 +68,10 @@ extension SessionCtl: CtlCandidateDelegate {
     if value.isEmpty { return blankResult }  // 空字串沒有需要反查的東西。
     if value.contains("_") { return blankResult }
     guard let lookupResult = LMMgr.currentLM.currentCassette.reverseLookupMap[value] else { return blankResult }
-    return lookupResult.stableSort(by: { $0.count < $1.count })
+    return lookupResult.stableSort(by: { $0.count < $1.count }).stableSort {
+      LMMgr.currentLM.currentCassette.unigramsFor(key: $0).count
+        < LMMgr.currentLM.currentCassette.unigramsFor(key: $1).count
+    }
   }
 
   public var selectionKeys: String {
