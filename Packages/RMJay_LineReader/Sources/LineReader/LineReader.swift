@@ -33,7 +33,7 @@ public class LineReader {
         let line = String(data: buffer.subdata(in: 0..<range.lowerBound), encoding: encoding)!
         // remove that data from the buffer
         buffer.removeSubrange(0..<range.upperBound)
-        return line
+        return line.trimmingCharacters(in: .newlines)
       }
 
       let nextData = fileHandle.readData(ofLength: chunkSize)
@@ -45,7 +45,7 @@ public class LineReader {
         if !buffer.isEmpty {
           // Buffer contains last line in file (not terminated by delimiter).
           let line = String(data: buffer as Data, encoding: encoding)!
-          return line
+          return line.trimmingCharacters(in: .newlines)
         }
       }
     }
