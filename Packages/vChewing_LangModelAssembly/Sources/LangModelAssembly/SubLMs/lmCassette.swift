@@ -37,6 +37,8 @@ extension vChewingLM {
     private static let fscale = 2.7
     private var norm = 0.0
 
+    /// 萬用花牌字符，哪怕花牌鍵仍不可用。
+    public var wildcard: String { wildcardKey.isEmpty ? "†" : wildcardKey }
     /// 資料陣列內承載的資料筆數。
     public var count: Int { charDefMap.count }
     /// 是否已有資料載入。
@@ -103,11 +105,9 @@ extension vChewingLM {
               charDefMap[strFirstCell, default: []].append(strSecondCell)
               reverseLookupMap[strSecondCell, default: []].append(strFirstCell)
               var keyComps = strFirstCell.charComponents
-              while !keyComps.isEmpty, !wildcardKey.isEmpty {
+              while !keyComps.isEmpty {
                 keyComps.removeLast()
-                if !wildcardKey.isEmpty {
-                  charDefWildcardMap[keyComps.joined() + wildcardKey, default: []].append(strSecondCell)
-                }
+                charDefWildcardMap[keyComps.joined() + wildcard, default: []].append(strSecondCell)
               }
             } else if loadingOctagramData, !strLine.contains("%octagram") {
               guard let countValue = Int(cells[1]) else { continue }
@@ -180,7 +180,7 @@ extension vChewingLM {
       let arrRaw = charDefMap[key]?.deduplicated ?? []
       var arrRawWildcard: [String] = []
       if let arrRawWildcardValues = charDefWildcardMap[key]?.deduplicated,
-        key.contains(wildcardKey), key.first?.description != wildcardKey
+        key.contains(wildcard), key.first?.description != wildcard
       {
         arrRawWildcard.append(contentsOf: arrRawWildcardValues)
       }
@@ -221,7 +221,7 @@ extension vChewingLM {
     ///   - key: 讀音索引鍵。
     public func hasUnigramsFor(key: String) -> Bool {
       charDefMap[key] != nil
-        || (charDefWildcardMap[key] != nil && key.contains(wildcardKey) && key.first?.description != wildcardKey)
+        || (charDefWildcardMap[key] != nil && key.contains(wildcard) && key.first?.description != wildcard)
     }
 
     // MARK: - Private Functions.

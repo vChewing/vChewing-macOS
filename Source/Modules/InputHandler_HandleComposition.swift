@@ -174,6 +174,7 @@ extension InputHandler {
   private func handleCassetteComposition(input: InputSignalProtocol) -> Bool? {
     guard let delegate = delegate else { return nil }
     var wildcardKey: String { currentLM.currentCassette.wildcardKey }  // 花牌鍵。
+    var wildcard: String { currentLM.currentCassette.wildcard }  // 花牌鍵。
     let isWildcardKeyInput: Bool = (input.text == wildcardKey && !wildcardKey.isEmpty)
 
     var keyConsumedByStrokes = false
@@ -182,8 +183,8 @@ extension InputHandler {
       || input.isControlHold || input.isOptionHold || input.isShiftHold || input.isCommandHold
 
     var isLongestPossibleKeyFormed: Bool {
-      guard !isWildcardKeyInput, !wildcardKey.isEmpty else { return false }
-      return !currentLM.currentCassette.hasUnigramsFor(key: calligrapher + wildcardKey) && !calligrapher.isEmpty
+      guard !isWildcardKeyInput else { return false }
+      return !currentLM.currentCassette.hasUnigramsFor(key: calligrapher + wildcard) && !calligrapher.isEmpty
     }
 
     var isStrokesFull: Bool {
@@ -199,7 +200,7 @@ extension InputHandler {
         delegate.switchState(newEmptyState)
         return true
       }
-      if isStrokesFull {
+      while isStrokesFull {
         calligrapher = String(calligrapher.dropLast(1))
       }
       calligrapher.append(input.text)
