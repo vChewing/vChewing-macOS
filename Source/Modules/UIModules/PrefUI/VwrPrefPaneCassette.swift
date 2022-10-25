@@ -23,6 +23,8 @@ struct VwrPrefPaneCassette: View {
     forKey: UserDef.kForceCassetteChineseConversion.rawValue)
   @State private var selShowTranslatedStrokesInCompositionBuffer: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kShowTranslatedStrokesInCompositionBuffer.rawValue)
+  @State private var selAutoCompositeWithLongestPossibleCassetteKey = UserDefaults.standard.bool(
+    forKey: UserDef.kAutoCompositeWithLongestPossibleCassetteKey.rawValue)
 
   private static let dlgOpenFile = NSOpenPanel()
 
@@ -132,6 +134,13 @@ struct VwrPrefPaneCassette: View {
         // MARK: - Something Else
 
         SSPreferences.Section(title: "") {
+          Toggle(
+            LocalizedStringKey("Auto-composite when the longest possible key is formed"),
+            isOn: $selAutoCompositeWithLongestPossibleCassetteKey.onChange {
+              PrefMgr.shared.autoCompositeWithLongestPossibleCassetteKey =
+                selAutoCompositeWithLongestPossibleCassetteKey
+            }
+          )
           Toggle(
             LocalizedStringKey("Show translated strokes in composition buffer"),
             isOn: $selShowTranslatedStrokesInCompositionBuffer.onChange {

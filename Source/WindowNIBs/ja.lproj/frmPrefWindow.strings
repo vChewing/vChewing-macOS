@@ -80,6 +80,7 @@
 "lblIntonationKeyBehavior.title" = "音調組立緩衝列が空かされた時の音調キーの行為をご指定ください。";
 "lblShiftBkspKeyBehavior.title" = "Shift+BackSpace キーの優先行為をご指定ください。";
 "lblUpperCaseLetterKeyBehavior.title" = "Shift+文字キーの行為をご指定ください。";
+"neb-Pz-n1h.title" = "最長可能キーができた場合、文字を組み立つ";
 "o3r-NZ-gsU.title" = "簡体モードだけの場合、カセットモードの漢字出力転換を";
 "Parser11.title" = "国音二式 (ローマ字+数字音調)";
 "Parser12.title" = "イェール弁音 (ローマ字+数字音調)";
