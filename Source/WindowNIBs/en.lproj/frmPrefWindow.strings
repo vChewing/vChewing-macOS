@@ -80,6 +80,7 @@
 "lblIntonationKeyBehavior.title" = "Specify what intonation key does when syllable composer is empty.";
 "lblShiftBkspKeyBehavior.title" = "Choose the attempted behavior of Shift+BackSpace key.";
 "lblUpperCaseLetterKeyBehavior.title" = "Choose the behavior of Shift+Letter key with letter inputs.";
+"neb-Pz-n1h.title" = "Auto-composite when the longest possible key is formed";
 "o3r-NZ-gsU.title" = "Only enforce conversion in Simplified Chinese mode";
 "Parser11.title" = "Secondary Pinyin with Numeral Intonation";
 "Parser12.title" = "Yale Pinyin with Numeral Intonation";

@@ -149,6 +149,9 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kShowReverseLookupInCandidateUI.rawValue, defaultValue: true)
   public var showReverseLookupInCandidateUI: Bool
 
+  @AppProperty(key: UserDef.kAutoCompositeWithLongestPossibleCassetteKey.rawValue, defaultValue: true)
+  public var autoCompositeWithLongestPossibleCassetteKey: Bool
+
   // MARK: - Settings (Tier 2)
 
   @AppProperty(key: UserDef.kUseIMKCandidateWindow.rawValue, defaultValue: false)

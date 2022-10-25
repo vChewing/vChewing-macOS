@@ -1058,11 +1058,11 @@
             <point key="canvasLocation" x="-400.5" y="-349.5"/>
         </visualEffectView>
         <visualEffectView blendingMode="behindWindow" material="sidebar" state="followsWindowActiveState" id="ZEr-3U-K9a" userLabel="vwrCassette">
-            <rect key="frame" x="0.0" y="0.0" width="445" height="481"/>
+            <rect key="frame" x="0.0" y="0.0" width="445" height="488"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <textField autoresizesSubviews="NO" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vgR-3O-aTP">
-                    <rect key="frame" x="18" y="445" width="409" height="16"/>
+                    <rect key="frame" x="18" y="452" width="409" height="16"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="16" id="0d5-PL-rme"/>
                     </constraints>
@@ -1073,7 +1073,7 @@
                     </textFieldCell>
                 </textField>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="ZcE-jK-2vl">
-                    <rect key="frame" x="20" y="413" width="405" height="20"/>
+                    <rect key="frame" x="20" y="420" width="405" height="20"/>
                     <subviews>
                         <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8LP-EF-YwT" userLabel="btnOpenFolderToSpecifyForUserData">
                             <rect key="frame" x="346" y="-1" width="30" height="21"/>
@@ -1132,13 +1132,13 @@
                     </constraints>
                 </customView>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="11" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sgB-kZ-rJg">
-                    <rect key="frame" x="20" y="41" width="405" height="355"/>
+                    <rect key="frame" x="20" y="26" width="405" height="377"/>
                     <subviews>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="6" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6T7-2y-9JA">
-                            <rect key="frame" x="0.0" y="165" width="405" height="190"/>
+                            <rect key="frame" x="0.0" y="165" width="405" height="212"/>
                             <subviews>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="y75-fJ-x9L">
-                                    <rect key="frame" x="-1" y="173.5" width="311" height="17"/>
+                                    <rect key="frame" x="-1" y="195.5" width="311" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="Q0q-bq-qs4"/>
                                     </constraints>
@@ -1152,7 +1152,7 @@
                                     </connections>
                                 </button>
                                 <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XN3-ki-c3E" userLabel="lblCassetteModeDescription">
-                                    <rect key="frame" x="-2" y="70" width="409" height="98"/>
+                                    <rect key="frame" x="-2" y="92" width="409" height="98"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="405" id="PvQ-jY-ScE"/>
                                     </constraints>
@@ -1163,6 +1163,19 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
+                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="T4J-vm-GL6">
+                                    <rect key="frame" x="-1" y="69.5" width="343" height="17"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="Xqh-Qs-b73"/>
+                                    </constraints>
+                                    <buttonCell key="cell" type="check" title="Auto-composite when the longest possible key is formed" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="neb-Pz-n1h">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="cellTitle"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <binding destination="32" name="value" keyPath="values.AutoCombineLongestPossibleCassetteKey" id="VUF-y7-K67"/>
+                                    </connections>
+                                </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3eW-vq-tFr">
                                     <rect key="frame" x="-1" y="47.5" width="281" height="17"/>
                                     <constraints>
@@ -1194,8 +1207,10 @@
                                 <integer value="1000"/>
                                 <integer value="1000"/>
                                 <integer value="1000"/>
+                                <integer value="1000"/>
                             </visibilityPriorities>
                             <customSpacing>
+                                <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
@@ -1280,7 +1295,7 @@
                 <constraint firstItem="ZcE-jK-2vl" firstAttribute="trailing" secondItem="vgR-3O-aTP" secondAttribute="trailing" id="nkS-Us-Mz7"/>
                 <constraint firstAttribute="trailing" secondItem="vgR-3O-aTP" secondAttribute="trailing" constant="20" id="wkh-Jj-wt0"/>
             </constraints>
-            <point key="canvasLocation" x="101.5" y="-258.5"/>
+            <point key="canvasLocation" x="101.5" y="-255"/>
         </visualEffectView>
         <visualEffectView blendingMode="behindWindow" material="sidebar" state="followsWindowActiveState" id="U4q-xw-mc0" userLabel="vwrKeyboard">
             <rect key="frame" x="0.0" y="0.0" width="445" height="337"/>
