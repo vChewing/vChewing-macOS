@@ -183,7 +183,7 @@ extension InputHandler {
       || input.isControlHold || input.isOptionHold || input.isShiftHold || input.isCommandHold
 
     var isLongestPossibleKeyFormed: Bool {
-      guard !isWildcardKeyInput else { return false }
+      guard !isWildcardKeyInput, prefs.autoCompositeWithLongestPossibleCassetteKey else { return false }
       return !currentLM.currentCassette.hasUnigramsFor(key: calligrapher + wildcard) && !calligrapher.isEmpty
     }
 
@@ -217,7 +217,9 @@ extension InputHandler {
       }
     }
 
-    var combineStrokes = isStrokesFull || (isWildcardKeyInput && !calligrapher.isEmpty)
+    var combineStrokes =
+      (isStrokesFull && prefs.autoCompositeWithLongestPossibleCassetteKey)
+      || (isWildcardKeyInput && !calligrapher.isEmpty)
 
     // 如果當前的按鍵是 Enter 或 Space 的話，這時就可以取出 calligrapher 內的筆畫來做檢查了。
     // 來看看詞庫內到底有沒有對應的讀音索引。這裡用了類似「|=」的判斷處理方式。

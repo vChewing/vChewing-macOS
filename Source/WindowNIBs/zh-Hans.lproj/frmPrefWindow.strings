@@ -80,6 +80,7 @@
 "lblIntonationKeyBehavior.title" = "指定声调键（在注拼槽为「空」状态时）的行为。";
 "lblShiftBkspKeyBehavior.title" = "指定 Shift+BackSpace 组合键率先尝试的行为。";
 "lblUpperCaseLetterKeyBehavior.title" = "指定 Shift+字母键 的行为。";
+"neb-Pz-n1h.title" = "在已经敲出最长可能码的时候自动组字";
 "o3r-NZ-gsU.title" = "仅在简体模式转换至简体";
 "Parser11.title" = "国音二式+数字标调";
 "Parser12.title" = "耶鲁拼音+数字标调";

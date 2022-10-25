@@ -133,6 +133,7 @@
 "Apple Chewing - Eten Traditional" = "Apple 倚天传统键盘排列";
 "Applying typing suggestions from half-life user override model" = "在敲字时自动套用来自半衰记忆模组的建议";
 "at the rear of the phrase (like Microsoft New Phonetic)" = "将游标置于词语后方 // Windows 微软新注音风格";
+"Auto-composite when the longest possible key is formed" = "在已经敲出最长可能码的时候自动组字";
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "自动将繁体中文字转为日文 JIS 新字体";
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "自动将繁体中文字转为康熙正体字";
 "Automatically correct reading combinations when typing" = "敲字时自动纠正读音组合";

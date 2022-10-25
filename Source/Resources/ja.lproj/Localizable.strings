@@ -133,6 +133,7 @@
 "Apple Chewing - Eten Traditional" = "Apple 倚天傳統キーボード";
 "Applying typing suggestions from half-life user override model" = "入力中で臨時記憶モジュールからお薦めの候補を自動的に選ぶ";
 "at the rear of the phrase (like Microsoft New Phonetic)" = "単語の後で // Microsoft 新注音入力のやり方";
+"Auto-composite when the longest possible key is formed" = "最長可能キーができた場合、文字を組み立つ";
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "入力した繁体字を日文 JIS 新字体と自動変換";
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "入力した繁体字を康熙字体と自動変換";
 "Automatically correct reading combinations when typing" = "入力中で打ち間違った発音組み合わせを自動的に訂正する";
