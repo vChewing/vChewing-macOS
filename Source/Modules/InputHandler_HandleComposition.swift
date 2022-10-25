@@ -200,10 +200,12 @@ extension InputHandler {
         delegate.switchState(newEmptyState)
         return true
       }
-      while isStrokesFull {
-        calligrapher = String(calligrapher.dropLast(1))
+      if isStrokesFull {
+        delegate.callError("2268DD51: calligrapher is full, clearing calligrapher.")
+        calligrapher.removeAll()
+      } else {
+        calligrapher.append(input.text)
       }
-      calligrapher.append(input.text)
       if isWildcardKeyInput {
         break prehandling
       }
