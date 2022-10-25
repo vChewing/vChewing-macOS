@@ -174,16 +174,24 @@ extension InputHandler {
   private func handleCassetteComposition(input: InputSignalProtocol) -> Bool? {
     guard let delegate = delegate else { return nil }
     var wildcardKey: String { currentLM.currentCassette.wildcardKey }  // 花牌鍵。
+    let isWildcardKeyInput: Bool = (input.text == wildcardKey && !wildcardKey.isEmpty)
 
     var keyConsumedByStrokes = false
     let skipStrokeHandling =
       input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
       || input.isControlHold || input.isOptionHold || input.isShiftHold || input.isCommandHold
 
-    var isStrokesFull: Bool { calligrapher.count >= currentLM.currentCassette.maxKeyLength }
+    var isLongestPossibleKeyFormed: Bool {
+      guard !isWildcardKeyInput, !wildcardKey.isEmpty else { return false }
+      return !currentLM.currentCassette.hasUnigramsFor(key: calligrapher + wildcardKey) && !calligrapher.isEmpty
+    }
+
+    var isStrokesFull: Bool {
+      calligrapher.count >= currentLM.currentCassette.maxKeyLength || isLongestPossibleKeyFormed
+    }
 
     prehandling: if !skipStrokeHandling && currentLM.currentCassette.allowedKeys.contains(input.text) {
-      if calligrapher.isEmpty, input.text == wildcardKey {
+      if calligrapher.isEmpty, isWildcardKeyInput {
         delegate.callError("3606B9C0")
         var newEmptyState = IMEState.ofEmpty()
         newEmptyState.tooltip = NSLocalizedString("Wildcard key cannot be the initial key.", comment: "") + "　　"
@@ -195,7 +203,7 @@ extension InputHandler {
         calligrapher = String(calligrapher.dropLast(1))
       }
       calligrapher.append(input.text)
-      if input.text == wildcardKey {
+      if isWildcardKeyInput {
         break prehandling
       }
       keyConsumedByStrokes = true
@@ -206,12 +214,12 @@ extension InputHandler {
       }
     }
 
-    var compoundStrokes = isStrokesFull || (input.text == wildcardKey && !calligrapher.isEmpty)
+    var combineStrokes = isStrokesFull || (isWildcardKeyInput && !calligrapher.isEmpty)
 
     // 如果當前的按鍵是 Enter 或 Space 的話，這時就可以取出 calligrapher 內的筆畫來做檢查了。
     // 來看看詞庫內到底有沒有對應的讀音索引。這裡用了類似「|=」的判斷處理方式。
-    compoundStrokes = compoundStrokes || (!calligrapher.isEmpty && (input.isSpace || input.isEnter))
-    if compoundStrokes {
+    combineStrokes = combineStrokes || (!calligrapher.isEmpty && (input.isSpace || input.isEnter))
+    if combineStrokes {
       // 向語言模型詢問是否有對應的記錄。
       if !currentLM.hasUnigramsFor(key: calligrapher) {
         delegate.callError("B49C0979_Cassette：語彙庫內無「\(calligrapher)」的匹配記錄。")
