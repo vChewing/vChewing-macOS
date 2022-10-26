@@ -90,7 +90,7 @@ extension vChewingLM {
         let theKey = entry.key
         for netaSet in netaSets {
           let strNetaSet = String(decoding: netaSet, as: UTF8.self)
-          let neta = Array(strNetaSet.components(separatedBy: " ").reversed())
+          let neta = Array(strNetaSet.trimmingCharacters(in: .newlines).components(separatedBy: " ").reversed())
           let theValue = neta[0]
           var theScore = defaultScore
           if neta.count >= 2, !shouldForceDefaultScore {
@@ -110,7 +110,7 @@ extension vChewingLM {
       if let arrRangeRecords: [Data] = rangeMap[cnvPhonabetToASCII(key)] {
         for netaSet in arrRangeRecords {
           let strNetaSet = String(decoding: netaSet, as: UTF8.self)
-          let neta = Array(strNetaSet.split(separator: " ").reversed())
+          let neta = Array(strNetaSet.trimmingCharacters(in: .newlines).split(separator: " ").reversed())
           let theValue: String = .init(neta[0])
           var theScore = defaultScore
           if neta.count >= 2, !shouldForceDefaultScore {

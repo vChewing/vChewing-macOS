@@ -96,11 +96,11 @@ extension vChewingLM {
             let cells: [String.SubSequence] =
               strLine.contains("\t") ? strLine.split(separator: "\t") : strLine.split(separator: " ")
             guard cells.count >= 2 else { continue }
-            let strFirstCell = String(cells[0])
+            let strFirstCell = cells[0].trimmingCharacters(in: .newlines)
+            let strSecondCell = cells[1].trimmingCharacters(in: .newlines)
             if loadingKeys, !cells[0].contains("%keyname") {
-              keyNameMap[strFirstCell] = String(cells[1])
+              keyNameMap[strFirstCell] = cells[1].trimmingCharacters(in: .newlines)
             } else if loadingCharDefinitions, !strLine.contains("%chardef") {
-              let strSecondCell = String(cells[1])
               theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
               charDefMap[strFirstCell, default: []].append(strSecondCell)
               reverseLookupMap[strSecondCell, default: []].append(strFirstCell)
@@ -113,7 +113,7 @@ extension vChewingLM {
               guard let countValue = Int(cells[1]) else { continue }
               switch cells.count {
                 case 2: octagramMap[strFirstCell] = countValue
-                case 3: octagramDividedMap[strFirstCell] = (countValue, String(cells[2]))
+                case 3: octagramDividedMap[strFirstCell] = (countValue, cells[2].trimmingCharacters(in: .newlines))
                 default: break
               }
               norm += Self.fscale ** (Double(cells[0].count) / 3.0 - 1.0) * Double(countValue)
@@ -127,13 +127,13 @@ extension vChewingLM {
                   break
                 }
               }
-              if nameENG.isEmpty { nameENG = String(cells[1]) }
+              if nameENG.isEmpty { nameENG = strSecondCell }
             }
             if nameIntl.isEmpty, strLine.contains("%intlname ") {
-              nameIntl = String(cells[1]).replacingOccurrences(of: "_", with: " ")
+              nameIntl = strSecondCell.replacingOccurrences(of: "_", with: " ")
             }
-            if nameCJK.isEmpty, strLine.contains("%cname ") { nameCJK = String(cells[1]) }
-            if nameShort.isEmpty, strLine.contains("%sname ") { nameShort = String(cells[1]) }
+            if nameCJK.isEmpty, strLine.contains("%cname ") { nameCJK = strSecondCell }
+            if nameShort.isEmpty, strLine.contains("%sname ") { nameShort = strSecondCell }
             if selectionKeys.isEmpty, strLine.contains("%selkey ") {
               selectionKeys = cells[1].map { String($0) }.deduplicated
             }
