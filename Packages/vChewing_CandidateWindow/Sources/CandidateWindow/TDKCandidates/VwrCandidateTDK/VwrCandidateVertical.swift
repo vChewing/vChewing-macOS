@@ -108,7 +108,7 @@ public struct VwrCandidateVertical: View {
             ForEach(reverseLookupResult, id: \.self) { currentResult in
               ZStack(alignment: .center) {
                 Color(white: colorScheme == .dark ? 0.3 : 0.9).cornerRadius(3)
-                Text(" \(currentResult) ").lineLimit(1)
+                Text(" \(currentResult.trimmingCharacters(in: .newlines)) ").lineLimit(1)
               }.fixedSize()
             }
           }
