@@ -45,11 +45,10 @@ extension vChewingLM {
 
     public func valuesFor(key: String) -> [String] {
       var pairs: [String] = []
-      if let arrRangeRecords: String = rangeMap[key] {
+      if let arrRangeRecords: String = rangeMap[key]?.trimmingCharacters(in: .newlines) {
         pairs.append(contentsOf: arrRangeRecords.map { String($0) })
       }
-      var set = Set<String>()
-      return pairs.filter { set.insert($0).inserted }
+      return pairs.deduplicated
     }
 
     public func hasValuesFor(key: String) -> Bool { rangeMap.keys.contains(key) }
