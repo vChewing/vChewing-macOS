@@ -45,6 +45,9 @@ extension InputHandler {
       displayTextSegments = newDisplayTextSegments
       cursor += reading.count
     }
+    for i in 0..<displayTextSegments.count {
+      displayTextSegments[i] = displayTextSegments[i].trimmingCharacters(in: .newlines)
+    }
     /// 這裡生成準備要拿來回呼的「正在輸入」狀態。
     return IMEState.ofInputting(displayTextSegments: displayTextSegments, cursor: cursor)
   }
