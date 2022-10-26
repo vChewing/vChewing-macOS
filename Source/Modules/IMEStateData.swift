@@ -19,7 +19,14 @@ public struct IMEStateData: IMEStateDataProtocol {
     Self.minCandidateLength...PrefMgr.shared.maxCandidateLength
   }
 
-  public var displayedText: String = ""
+  public var displayedText: String = "" {
+    didSet {
+      if displayedText.rangeOfCharacter(from: .newlines) != nil {
+        displayedText = displayedText.trimmingCharacters(in: .newlines)
+      }
+    }
+  }
+
   public var displayedTextConverted: String {
     /// 先做繁簡轉換
     var result = ChineseConverter.kanjiConversionIfRequired(displayedText)
