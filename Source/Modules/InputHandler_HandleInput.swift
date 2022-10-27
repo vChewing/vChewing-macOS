@@ -80,6 +80,7 @@ extension InputHandler {
     // 我們先規定允許小鍵盤區域操縱選字窗，其餘場合一律直接放行。
     if input.isNumericPadKey {
       if ![.ofCandidates, .ofAssociates, .ofSymbolTable].contains(state.type) {
+        delegate.switchState(IMEState.ofEmpty())
         delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
         return true
       }
@@ -247,9 +248,11 @@ extension InputHandler {
       if input.isShiftHold {  // 這裡先不要判斷 isOptionHold。
         switch prefs.upperCaseLetterKeyBehavior {
           case 1:
+            delegate.switchState(IMEState.ofEmpty())
             delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
             return true
           case 2:
+            delegate.switchState(IMEState.ofEmpty())
             delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.uppercased()))
             return true
           default:  // 包括 case 0，直接塞給組字區。
