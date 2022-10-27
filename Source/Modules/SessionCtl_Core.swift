@@ -169,7 +169,7 @@ extension SessionCtl {
   public func resetInputHandler() {
     // 過濾掉尚未完成拼寫的注音。
     if state.type == .ofInputting, PrefMgr.shared.trimUnfinishedReadingsOnCommit {
-      inputHandler.composer.clear()
+      inputHandler.clearComposerAndCalligrapher()
       switchState(inputHandler.generateStateOfInputting())
     }
     // 威注音不再在這裡對 IMKTextInput 客體黑名單當中的應用做資安措施。
