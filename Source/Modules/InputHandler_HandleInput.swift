@@ -271,7 +271,7 @@ extension InputHandler {
     /// 砍掉這一段會導致「F1-F12 按鍵干擾組字區」的問題。
     /// 暫時只能先恢復這段，且補上偵錯彙報機制，方便今後排查故障。
     if state.hasComposition || !isComposerOrCalligrapherEmpty {
-      delegate.callError("Blocked data: charCode: \(input.charCode), keyCode: \(input.keyCode)")
+      delegate.callError("Blocked data: charCode: \(input.charCode), keyCode: \(input.keyCode), text: \(input.text)")
       delegate.callError("A9BFF20E")
       delegate.switchState(state)
       return true
