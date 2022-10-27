@@ -105,7 +105,7 @@
 "shc-Nu-UsM.title" = "以 Caps Lock 切换输入法/中英模式时显示通知";
 "SzF-FL-sVO.title" = "在组字区内显示字根、而非原始键盘码";
 "tglDevZoneIMKCandidate.title" = "启用与 macOS 内建输入法相同的 IMK 选字窗（会自动重启输入法）";
-"tglTrimUnfinishedReadingsOnCommit.title" = "在递交时清理未完成拼写的读音";
+"tglTrimUnfinishedReadingsOnCommit.title" = "在递交时清理未完成拼写的读音或字根";
 "TXr-FF-ehw.title" = "繁体中文";
 "ueU-Rz-a1C.title" = "指定 (Shift+)Tab 热键在选字窗内的轮替操作对象。";
 "VdT-fw-7pQ.title" = "侦错模式";

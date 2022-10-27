@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -430,8 +429,8 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xe6-Pu-3Fa">
-                                            <rect key="frame" x="-1" y="22.5" width="223" height="16"/>
-                                            <buttonCell key="cell" type="check" title="Trim unfinished readings on commit" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="tglTrimUnfinishedReadingsOnCommit">
+                                            <rect key="frame" x="-1" y="22.5" width="275" height="16"/>
+                                            <buttonCell key="cell" type="check" title="Trim unfinished readings / strokes on commit" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="tglTrimUnfinishedReadingsOnCommit">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
                                             </buttonCell>
