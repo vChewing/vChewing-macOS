@@ -192,6 +192,7 @@ extension IMEState {
     }
   }
 
+  /// 該參數僅用作輔助判斷。在 InputHandler 內使用的話，必須再檢查 !compositor.isEmpty。
   public var hasComposition: Bool {
     switch type {
       case .ofNotEmpty, .ofInputting, .ofMarking, .ofCandidates: return true
