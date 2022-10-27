@@ -80,6 +80,7 @@ extension InputHandler {
     // 我們先規定允許小鍵盤區域操縱選字窗，其餘場合一律直接放行。
     if input.isNumericPadKey {
       if ![.ofCandidates, .ofAssociates, .ofSymbolTable].contains(state.type) {
+        delegate.switchState(IMEState.ofEmpty())
         delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
         return true
       }
@@ -113,32 +114,13 @@ extension InputHandler {
 
     // MARK: 用上下左右鍵呼叫選字窗 (Calling candidate window using Up / Down or PageUp / PageDn.)
 
-    if state.hasComposition, isComposerOrCalligrapherEmpty, !input.isOptionHold,
-      input.isCursorClockLeft || input.isCursorClockRight || input.isSpace
+    // 僅憑藉 state.hasComposition 的話，並不能真實把握組字器的狀況。
+    // 另外，這裡不要用「!input.isFunctionKeyHold」，否則會導致對上下左右鍵與翻頁鍵的判斷失效。
+    if state.hasComposition, !compositor.isEmpty, isComposerOrCalligrapherEmpty,
+      !input.isOptionHold, !input.isShiftHold, !input.isCommandHold, !input.isControlHold,
+      input.isCursorClockLeft || input.isCursorClockRight || (input.isSpace && prefs.chooseCandidateUsingSpace)
         || input.isPageDown || input.isPageUp || (input.isTab && prefs.specifyShiftTabKeyBehavior)
     {
-      if input.isSpace {
-        /// 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
-        if !prefs.chooseCandidateUsingSpace {
-          if compositor.cursor < compositor.length, compositor.insertKey(" ") {
-            walk()
-            // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
-            let textToCommit = commitOverflownComposition
-            var inputting = generateStateOfInputting()
-            inputting.textToCommit = textToCommit
-            delegate.switchState(inputting)
-          } else {
-            let displayedText = state.displayedText
-            if !displayedText.isEmpty {
-              delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
-            }
-            delegate.switchState(IMEState.ofCommitting(textToCommit: " "))
-          }
-          return true
-        } else if input.isShiftHold {  // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
-          return rotateCandidate(reverseOrder: input.isCommandHold)
-        }
-      }
       // 開始決定是否切換至選字狀態。
       let candidateState: IMEStateProtocol = generateStateOfCandidates()
       _ = candidateState.candidates.isEmpty ? delegate.callError("3572F238") : delegate.switchState(candidateState)
@@ -172,6 +154,27 @@ extension InputHandler {
               ? handleCtrlOptionCommandEnter()
               : handleCtrlCommandEnter())
             : handleEnter()
+        case .kSpace:  // 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
+          // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
+          if input.isShiftHold { return rotateCandidate(reverseOrder: input.isCommandHold) }
+          // 空格字符輸入行為處理。
+          do {
+            if compositor.cursor < compositor.length, compositor.insertKey(" ") {
+              walk()
+              // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
+              let textToCommit = commitOverflownComposition
+              var inputting = generateStateOfInputting()
+              inputting.textToCommit = textToCommit
+              delegate.switchState(inputting)
+            } else {
+              let displayedText = state.displayedText
+              if !displayedText.isEmpty {
+                delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
+              }
+              delegate.switchState(IMEState.ofCommitting(textToCommit: " "))
+            }
+            return true
+          }
         default: break
       }
     }
@@ -247,9 +250,11 @@ extension InputHandler {
       if input.isShiftHold {  // 這裡先不要判斷 isOptionHold。
         switch prefs.upperCaseLetterKeyBehavior {
           case 1:
+            delegate.switchState(IMEState.ofEmpty())
             delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
             return true
           case 2:
+            delegate.switchState(IMEState.ofEmpty())
             delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.uppercased()))
             return true
           default:  // 包括 case 0，直接塞給組字區。
@@ -268,17 +273,9 @@ extension InputHandler {
     /// 砍掉這一段會導致「F1-F12 按鍵干擾組字區」的問題。
     /// 暫時只能先恢復這段，且補上偵錯彙報機制，方便今後排查故障。
     if state.hasComposition || !isComposerOrCalligrapherEmpty {
-      delegate.callError("Blocked data: charCode: \(input.charCode), keyCode: \(input.keyCode)")
+      delegate.callError("Blocked data: charCode: \(input.charCode), keyCode: \(input.keyCode), text: \(input.text)")
       delegate.callError("A9BFF20E")
       delegate.switchState(state)
-      return true
-    }
-
-    // 將 Apple 動態鍵盤佈局的 RAW 輸出轉為 ABC 輸出。僅對磁帶模式啟用此步驟。
-    if IMKHelper.isDynamicBasicKeyboardLayoutEnabled, let event = input as? NSEvent,
-      prefs.cassetteEnabled, let txtABC = event.inAppleABCStaticForm.characters, !txtABC.isEmpty
-    {
-      delegate.switchState(IMEState.ofCommitting(textToCommit: txtABC))
       return true
     }
 

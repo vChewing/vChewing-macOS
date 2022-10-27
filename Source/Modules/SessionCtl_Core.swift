@@ -169,15 +169,13 @@ extension SessionCtl {
   public func resetInputHandler() {
     // 過濾掉尚未完成拼寫的注音。
     if state.type == .ofInputting, PrefMgr.shared.trimUnfinishedReadingsOnCommit {
-      inputHandler.composer.clear()
+      inputHandler.clearComposerAndCalligrapher()
       switchState(inputHandler.generateStateOfInputting())
     }
-    let isSecureMode = PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier)
-    if state.hasComposition, !isSecureMode {
-      /// 將傳回的新狀態交給調度函式。
-      switchState(IMEState.ofCommitting(textToCommit: state.displayedText))
-    }
-    switchState(isSecureMode ? IMEState.ofAbortion() : IMEState.ofEmpty())
+    // 威注音不再在這裡對 IMKTextInput 客體黑名單當中的應用做資安措施。
+    // 有相關需求者，請在切換掉輸入法或者切換至新的客體應用之前敲一下 Shift+Delete。
+    switchState(IMEState.ofEmpty())
+    // switchState(isSecureMode ? IMEState.ofAbortion() : IMEState.ofEmpty())
   }
 }
 

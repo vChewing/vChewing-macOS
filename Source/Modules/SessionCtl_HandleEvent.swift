@@ -117,7 +117,7 @@ extension SessionCtl {
     }
 
     // 在啟用注音排列而非拼音輸入的情況下，強制將當前鍵盤佈局翻譯為美規鍵盤。
-    if inputHandler.composer.parser.rawValue < 100 || IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
+    if !inputHandler.isComposerUsingPinyin || IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
       eventToDeal = eventToDeal.inAppleABCStaticForm
     }
 
@@ -136,10 +136,15 @@ extension SessionCtl {
     if shouldUseShiftToggleHandle { rencentKeyHandledByInputHandlerEtc = result }
     if !result {
       // 除非是 .ofMarking 狀態，否則讓某些不用去抓的按鍵起到「取消工具提示」的作用。
-      if [.ofEmpty].contains(state.type) {
-        tooltipInstance.hide()
+      if [.ofEmpty].contains(state.type) { tooltipInstance.hide() }
+
+      // 將 Apple 動態鍵盤佈局的 RAW 輸出轉為 ABC 輸出，除非轉換結果與轉換前的內容一致。
+      if IMKHelper.isDynamicBasicKeyboardLayoutEnabled, event.text != eventToDeal.text {
+        switchState(IMEState.ofCommitting(textToCommit: eventToDeal.text))
+        return true
       }
     }
+
     return result
   }
 }
