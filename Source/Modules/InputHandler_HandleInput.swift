@@ -114,7 +114,7 @@ extension InputHandler {
 
     // MARK: 用上下左右鍵呼叫選字窗 (Calling candidate window using Up / Down or PageUp / PageDn.)
 
-    if state.hasComposition, isComposerOrCalligrapherEmpty, !input.isOptionHold,
+    candidateWindowProcessing: if state.hasComposition, isComposerOrCalligrapherEmpty, !input.isOptionHold,
       input.isCursorClockLeft || input.isCursorClockRight || input.isSpace
         || input.isPageDown || input.isPageUp || (input.isTab && prefs.specifyShiftTabKeyBehavior)
     {
@@ -140,6 +140,7 @@ extension InputHandler {
           return rotateCandidate(reverseOrder: input.isCommandHold)
         }
       }
+      if compositor.isEmpty { break candidateWindowProcessing }
       // 開始決定是否切換至選字狀態。
       let candidateState: IMEStateProtocol = generateStateOfCandidates()
       _ = candidateState.candidates.isEmpty ? delegate.callError("3572F238") : delegate.switchState(candidateState)

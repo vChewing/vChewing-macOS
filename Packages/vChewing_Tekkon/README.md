@@ -179,96 +179,11 @@ extension InputHandler {
 
 但對注拼槽的處理都是一樣的。
 
-這裡分享一下威注音輸入法在 InputHandler 內對 _composer 的用法。
+有關於威注音輸入法在 InputHandler 內對 _composer 的用法，請洽其倉庫內的 InputHandler_HandleComposition.swift 檔案。
 
 如果收到的按鍵訊號是 BackSpace 的話，可以用 _composer.doBackSpace() 來移除注拼槽內最前方的元素。
 
 鐵恨引擎的注拼槽 Composer 型別內的函式都有對應的詳細註解說明。這裡不再贅述。
-
-
-
-> (這裡的範例取自威注音，只用作演示用途。威注音實際的 codebase 可能會有出入。請留意這一段內的漢語註解。)
-> 
-> (不是所有輸入法都有狀態管理引擎，請根據各自專案的實際情況來結合理解這段程式碼。)
-
-```swift
-// MARK: Handle BPMF Keys.
-
-var keyConsumedByReading = false
-let skipPhoneticHandling = input.isReservedKey || input.isControlHold || input.isOptionHold
-
-// See if Phonetic reading is valid.
-// 這裡 inputValidityCheck() 是讓 _composer 檢查 charCode 這個 UniChar 是否是合法的注音輸入。
-// 如果是的話，就將這次傳入的這個按鍵訊號塞入 _composer 內且標記為「keyConsumedByReading」。
-// 函式 _composer.receiveKey() 可以既接收 String 又接收 UniChar。
-if !skipPhoneticHandling && _composer.inputValidityCheck(key: charCode) {
-  _composer.receiveKey(fromCharCode: charCode)
-  keyConsumedByReading = true
-
-  // If we have a tone marker, we have to insert the reading to the
-  // compositor in other words, if we don't have a tone marker, we just
-  // update the composing buffer.
-  // 沒有調號的話，只需要 updateClientComposingBuffer() 且終止處理（return true）即可。
-  // 有調號的話，則不需要這樣處理，轉而繼續在此之後的處理。
-  let composeReading = _composer.hasIntonation()
-  if !composeReading {
-    delegate.switchState(generateStateOfInputting())
-    return true
-  }
-}
-
-// 這裡不需要做排他性判斷。
-var composeReading = _composer.hasIntonation()
-
-// See if we have composition if Enter/Space is hit and buffer is not empty.
-// We use "|=" conditioning so that the tone marker key is also taken into account.
-// However, Swift does not support "|=".
-// 如果當前的按鍵是 Enter 或 Space 的話，這時就可以取出 _composer 內的注音來做檢查了。
-// 來看看詞庫內到底有沒有對應的讀音索引。這裡用了類似「|=」的判斷處理方式。
-composeReading = composeReading || (!_composer.isEmpty && (input.isSpace || input.isEnter))
-if composeReading {  // 符合按鍵組合條件
-  if input.isSpace && !_composer.hasIntonation() {
-    _composer.receiveKey(fromString: " ")  // 補上空格，否則倚天忘形與許氏排列某些音無法響應不了陰平聲調。
-    // 某些輸入法使用 OVMandarin 而不是鐵恨引擎，所以不需要這樣補。但鐵恨引擎對所有聲調一視同仁。
-  }
-  let reading = _composer.getComposition()  // 拿取用來進行索引檢索用的注音
-  // 如果輸入法的辭典索引是漢語拼音的話，要注意上一行拿到的內容得是漢語拼音。
-
-  // See whether we have a unigram for this...
-  // 向語言模型詢問是否有對應的記錄
-  if !ifLangModelHasUnigrams(forKey: reading) {  // 如果沒有的話
-    vCLog("B49C0979：語彙庫內無「\(reading)」的匹配記錄。")
-    delegate.callError("114514")  // 向狀態管理引擎回呼一個錯誤狀態
-    _composer.clear()  // 清空注拼槽的內容
-    // 根據「天權星引擎 (威注音) 或 Gramambular (小麥) 的組字器是否為空」來判定回呼哪一種狀態
-    delegate.switchState(
-      (getCompositorLength() == 0) ? InputState.EmptyIgnoringPreviousState() : generateStateOfInputting())
-    return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了
-  }
-
-  // ... and insert it into the grid...
-  // 將該讀音插入至天權星（或 Gramambular）組字器內的軌格當中
-  insertReadingToCompositorAtCursor(reading: reading)
-
-  // ... then walk the grid...
-  // 讓組字器反爬軌格
-  let poppedText = popOverflowComposingTextAndWalk()
-
-  // ... get and tweak override model suggestion if possible...
-  // 看看半衰記憶模組是否會對目前的狀態給出自動選字建議
-  dealWithOverrideModelSuggestions()
-
-  // ... then update the text.
-  // 之後就是更新組字區了。先清空注拼槽的內容。
-  _composer.clear()
-  // 再以回呼組字狀態的方式來執行updateClientComposingBuffer()
-  let inputting = generateStateOfInputting()
-  inputting.poppedText = poppedText
-  delegate.switchState(inputting)
-
-  return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了
-}
-```
 
 ## 著作權 (Credits)
 
