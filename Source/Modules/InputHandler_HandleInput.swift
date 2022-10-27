@@ -114,33 +114,13 @@ extension InputHandler {
 
     // MARK: 用上下左右鍵呼叫選字窗 (Calling candidate window using Up / Down or PageUp / PageDn.)
 
-    candidateWindowProcessing: if state.hasComposition, isComposerOrCalligrapherEmpty, !input.isOptionHold,
-      input.isCursorClockLeft || input.isCursorClockRight || input.isSpace
+    // 僅憑藉 state.hasComposition 的話，並不能真實把握組字器的狀況。
+    // 另外，這裡不要用「!input.isFunctionKeyHold」，否則會導致對上下左右鍵與翻頁鍵的判斷失效。
+    if state.hasComposition, !compositor.isEmpty, isComposerOrCalligrapherEmpty,
+      !input.isOptionHold, !input.isShiftHold, !input.isCommandHold, !input.isControlHold,
+      input.isCursorClockLeft || input.isCursorClockRight || (input.isSpace && prefs.chooseCandidateUsingSpace)
         || input.isPageDown || input.isPageUp || (input.isTab && prefs.specifyShiftTabKeyBehavior)
     {
-      if input.isSpace {
-        /// 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
-        if !prefs.chooseCandidateUsingSpace {
-          if compositor.cursor < compositor.length, compositor.insertKey(" ") {
-            walk()
-            // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
-            let textToCommit = commitOverflownComposition
-            var inputting = generateStateOfInputting()
-            inputting.textToCommit = textToCommit
-            delegate.switchState(inputting)
-          } else {
-            let displayedText = state.displayedText
-            if !displayedText.isEmpty {
-              delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
-            }
-            delegate.switchState(IMEState.ofCommitting(textToCommit: " "))
-          }
-          return true
-        } else if input.isShiftHold {  // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
-          return rotateCandidate(reverseOrder: input.isCommandHold)
-        }
-      }
-      if compositor.isEmpty { break candidateWindowProcessing }
       // 開始決定是否切換至選字狀態。
       let candidateState: IMEStateProtocol = generateStateOfCandidates()
       _ = candidateState.candidates.isEmpty ? delegate.callError("3572F238") : delegate.switchState(candidateState)
@@ -174,6 +154,27 @@ extension InputHandler {
               ? handleCtrlOptionCommandEnter()
               : handleCtrlCommandEnter())
             : handleEnter()
+        case .kSpace:  // 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
+          // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
+          if input.isShiftHold { return rotateCandidate(reverseOrder: input.isCommandHold) }
+          // 空格字符輸入行為處理。
+          do {
+            if compositor.cursor < compositor.length, compositor.insertKey(" ") {
+              walk()
+              // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
+              let textToCommit = commitOverflownComposition
+              var inputting = generateStateOfInputting()
+              inputting.textToCommit = textToCommit
+              delegate.switchState(inputting)
+            } else {
+              let displayedText = state.displayedText
+              if !displayedText.isEmpty {
+                delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
+              }
+              delegate.switchState(IMEState.ofCommitting(textToCommit: " "))
+            }
+            return true
+          }
         default: break
       }
     }
