@@ -69,6 +69,12 @@ extension IMEState {
   public static func ofDeactivated() -> IMEState { .init(type: .ofDeactivated) }
   public static func ofEmpty() -> IMEState { .init(type: .ofEmpty) }
   public static func ofAbortion() -> IMEState { .init(type: .ofAbortion) }
+
+  /// 用以手動遞交指定內容的狀態。
+  /// - Remark: 直接切換至該狀態的話，會丟失上一個狀態的內容。
+  /// 如不想丟失的話，請先切換至 `.ofEmpty()` 再切換至 `.ofCommitting()`。
+  /// - Parameter textToCommit: 要遞交的文本。
+  /// - Returns: 要切換到的狀態。
   public static func ofCommitting(textToCommit: String) -> IMEState {
     var result = IMEState(type: .ofCommitting)
     result.textToCommit = textToCommit
