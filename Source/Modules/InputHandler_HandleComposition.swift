@@ -52,7 +52,7 @@ extension InputHandler {
         theComposer.intonation.clear()
         // 檢查新的漢字字音是否在庫。
         let temporaryReadingKey = theComposer.getComposition()
-        if currentLM.hasUnigramsFor(key: theComposer.getComposition()) {
+        if currentLM.hasUnigramsFor(key: temporaryReadingKey) {
           compositor.dropKey(direction: .rear)
           walk()  // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
           composer = theComposer
@@ -63,7 +63,8 @@ extension InputHandler {
         }
       }
 
-      composer.receiveKey(fromString: input.text)
+      // 鐵恨引擎並不具備對 Enter (CR / LF) 鍵的具體判斷能力，所以在這裡單獨處理。
+      composer.receiveKey(fromString: input.isEnter ? " " : input.text)
       keyConsumedByReading = true
 
       // 沒有調號的話，只需要 setInlineDisplayWithCursor() 且終止處理（return true）即可。
@@ -74,20 +75,16 @@ extension InputHandler {
       }
     }
 
+    let readingKey = composer.getComposition()  // 拿取用來進行索引檢索用的注音。
+    // 如果輸入法的辭典索引是漢語拼音的話，要注意上一行拿到的內容得是漢語拼音。
     var composeReading = composer.hasIntonation() && composer.inputValidityCheck(key: input.charCode)  // 這裡不需要做排他性判斷。
-
     // 如果當前的按鍵是 Enter 或 Space 的話，這時就可以取出 composer 內的注音來做檢查了。
     // 來看看詞庫內到底有沒有對應的讀音索引。這裡用了類似「|=」的判斷處理方式。
+    // 這裡必須使用 composer.value.isEmpty，因為只有這樣才能真正檢測 composer 是否已經有陰平聲調了。
     composeReading = composeReading || (!composer.isEmpty && (input.isSpace || input.isEnter))
+    // readingKey 不能為空。
+    composeReading = composeReading && !readingKey.isEmpty
     if composeReading {
-      if input.isSpace, !composer.hasIntonation() {
-        // 補上空格，否則倚天忘形與許氏排列某些音無法響應不了陰平聲調。
-        // 小麥注音因為使用 OVMandarin，所以不需要這樣補。但鐵恨引擎對所有聲調一視同仁。
-        composer.receiveKey(fromString: " ")
-      }
-      let readingKey = composer.getComposition()  // 拿取用來進行索引檢索用的注音。
-      // 如果輸入法的辭典索引是漢語拼音的話，要注意上一行拿到的內容得是漢語拼音。
-
       // 向語言模型詢問是否有對應的記錄。
       if !currentLM.hasUnigramsFor(key: readingKey) {
         delegate.callError("B49C0979：語彙庫內無「\(readingKey)」的匹配記錄。")
@@ -155,7 +152,12 @@ extension InputHandler {
     }
 
     /// 是說此時注拼槽並非為空、卻還沒組音。這種情況下只可能是「注拼槽內只有聲調」。
+    /// 但這裡不處理陰平聲調。
     if keyConsumedByReading {
+      if readingKey.isEmpty {
+        composer.clear()
+        return nil
+      }
       // 以回呼組字狀態的方式來執行 setInlineDisplayWithCursor()。
       delegate.switchState(generateStateOfInputting())
       return true
