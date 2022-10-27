@@ -105,7 +105,7 @@
 "shc-Nu-UsM.title" = "Show notifications when toggling Caps Lock";
 "SzF-FL-sVO.title" = "Show translated strokes in composition buffer";
 "tglDevZoneIMKCandidate.title" = "Use IMK Candidate Window instead of Tadokoro (will reboot the IME)";
-"tglTrimUnfinishedReadingsOnCommit.title" = "Trim unfinished readings on commit";
+"tglTrimUnfinishedReadingsOnCommit.title" = "Trim unfinished readings / strokes on commit";
 "TXr-FF-ehw.title" = "Traditional Chinese";
 "ueU-Rz-a1C.title" = "Choose the behavior of (Shift+)Tab key in the candidate window.";
 "VdT-fw-7pQ.title" = "Debug Mode";

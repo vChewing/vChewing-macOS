@@ -238,7 +238,7 @@
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode." = "該轉換僅對磁帶模式有影響，會將鍵入的內容根據該選項與當前的簡繁體模式來轉換。";
 "This only works with Tadokoro candidate window." = "該方法僅對田所選字窗起作用。";
 "Traditional Chinese" = "繁體中文";
-"Trim unfinished readings on commit" = "在遞交時清理未完成拼寫的讀音";
+"Trim unfinished readings / strokes on commit" = "在遞交時清理未完成拼寫的讀音或字根";
 "Type them into inline composition buffer" = "直接鍵入內文組字區";
 "Typing Style:" = "輸入風格:";
 "UI Language:" = "介面語言:";

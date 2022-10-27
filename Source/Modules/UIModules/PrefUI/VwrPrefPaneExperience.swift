@@ -244,7 +244,7 @@ struct VwrPrefPaneExperience: View {
             }
           )
           Toggle(
-            LocalizedStringKey("Trim unfinished readings on commit"),
+            LocalizedStringKey("Trim unfinished readings / strokes on commit"),
             isOn: $selTrimUnfinishedReadingsOnCommit.onChange {
               PrefMgr.shared.trimUnfinishedReadingsOnCommit = selTrimUnfinishedReadingsOnCommit
             }

@@ -238,7 +238,7 @@
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode." = "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode.";
 "This only works with Tadokoro candidate window." = "This only works with Tadokoro candidate window.";
 "Traditional Chinese" = "Traditional Chinese";
-"Trim unfinished readings on commit" = "Trim unfinished readings on commit";
+"Trim unfinished readings / strokes on commit" = "Trim unfinished readings / strokes on commit";
 "Type them into inline composition buffer" = "Type them into inline composition buffer";
 "Typing Style:" = "Typing Style:";
 "UI Language:" = "UI Language:";
