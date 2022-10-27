@@ -277,14 +277,6 @@ extension InputHandler {
       return true
     }
 
-    // 將 Apple 動態鍵盤佈局的 RAW 輸出轉為 ABC 輸出。僅對磁帶模式啟用此步驟。
-    if IMKHelper.isDynamicBasicKeyboardLayoutEnabled, let event = input as? NSEvent,
-      prefs.cassetteEnabled, let txtABC = event.inAppleABCStaticForm.characters, !txtABC.isEmpty
-    {
-      delegate.switchState(IMEState.ofCommitting(textToCommit: txtABC))
-      return true
-    }
-
     return false
   }
 }
