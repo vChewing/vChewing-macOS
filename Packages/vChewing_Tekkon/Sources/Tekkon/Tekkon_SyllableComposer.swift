@@ -30,7 +30,7 @@ extension Tekkon {
     /// 聲調。
     public var intonation: Phonabet = ""
 
-    /// 為拉丁字母專用的組音區。
+    /// 拼音組音區。
     public var romajiBuffer: String = ""
 
     /// 注音排列種類。預設情況下是大千排列（Windows / macOS 預設注音排列）。
@@ -158,6 +158,11 @@ extension Tekkon {
       return false
     }
 
+    /// 按需更新拼音組音區的內容顯示。
+    mutating func updateRomajiBuffer() {
+      romajiBuffer = Tekkon.cnvPhonaToHanyuPinyin(target: consonant.value + semivowel.value + vowel.value)
+    }
+
     /// 接受傳入的按鍵訊號時的處理，處理對象為 String。
     /// 另有同名函式可處理 UniChar 訊號。
     ///
@@ -232,6 +237,7 @@ extension Tekkon {
         case .intonation: intonation = thePhone
         default: break
       }
+      updateRomajiBuffer()
     }
 
     /// 處理一連串的按鍵輸入。
