@@ -22,7 +22,9 @@ public protocol InputHandlerProtocol {
   var currentUOM: vChewingLM.LMUserOverride { get set }
   var delegate: InputHandlerDelegate? { get set }
   var composer: Tekkon.Composer { get set }
+  var isComposerUsingPinyin: Bool { get }
   func clear()
+  func clearComposerAndCalligrapher()
   func ensureKeyboardParser()
   func handleEvent(_ event: NSEvent) -> Bool
   func generateStateOfInputting() -> IMEStateProtocol
@@ -82,9 +84,8 @@ public class InputHandler: InputHandlerProtocol {
   }
 
   public func clear() {
-    composer.clear()
+    clearComposerAndCalligrapher()
     compositor.clear()
-    calligrapher.removeAll()
   }
 
   // MARK: - Functions dealing with Megrez.
@@ -367,8 +368,11 @@ public class InputHandler: InputHandlerProtocol {
     composer.phonabetCombinationCorrectionEnabled = prefs.autoCorrectReadingCombination
   }
 
-  func clearComposerAndCalligrapher() {
-    _ = prefs.cassetteEnabled ? calligrapher.removeAll() : composer.clear()
+  public var isComposerUsingPinyin: Bool { composer.parser.rawValue >= 100 }
+
+  public func clearComposerAndCalligrapher() {
+    calligrapher.removeAll()
+    composer.clear()
   }
 
   func letComposerAndCalligrapherDoBackSpace() {
