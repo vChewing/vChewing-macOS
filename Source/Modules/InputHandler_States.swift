@@ -291,14 +291,14 @@ extension InputHandler {
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
 
-    var displayedText = compositor.keys.joined(separator: "-")
-    if prefs.inlineDumpPinyinInLieuOfZhuyin {
+    var displayedText = compositor.keys.joined(separator: " ")
+    if prefs.inlineDumpPinyinInLieuOfZhuyin, !prefs.cassetteEnabled {
       displayedText = Tekkon.restoreToneOneInZhuyinKey(target: displayedText)  // 恢復陰平標記
       displayedText = Tekkon.cnvPhonaToHanyuPinyin(target: displayedText)  // 注音轉拼音
     }
 
-    if !delegate.clientBundleIdentifier.contains("vChewingPhraseEditor") {
-      displayedText = displayedText.replacingOccurrences(of: "-", with: " ")
+    if delegate.clientBundleIdentifier.contains("vChewingPhraseEditor") {
+      displayedText = displayedText.replacingOccurrences(of: " ", with: "-")
     }
 
     delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
@@ -318,13 +318,15 @@ extension InputHandler {
 
     for node in compositor.walkedNodes {
       var key = node.key
-      if prefs.inlineDumpPinyinInLieuOfZhuyin {
-        key = Tekkon.restoreToneOneInZhuyinKey(target: key)  // 恢復陰平標記
-        key = Tekkon.cnvPhonaToHanyuPinyin(target: key)  // 注音轉拼音
-        key = Tekkon.cnvHanyuPinyinToTextbookStyle(target: key)  // 轉教科書式標調
-        key = key.replacingOccurrences(of: "-", with: " ")
-      } else {
-        key = Tekkon.cnvZhuyinChainToTextbookReading(target: key, newSeparator: " ")
+      if !prefs.cassetteEnabled {
+        if prefs.inlineDumpPinyinInLieuOfZhuyin {
+          key = Tekkon.restoreToneOneInZhuyinKey(target: key)  // 恢復陰平標記
+          key = Tekkon.cnvPhonaToHanyuPinyin(target: key)  // 注音轉拼音
+          key = Tekkon.cnvHanyuPinyinToTextbookStyle(target: key)  // 轉教科書式標調
+          key = key.replacingOccurrences(of: "-", with: " ")
+        } else {
+          key = Tekkon.cnvZhuyinChainToTextbookReading(target: key, newSeparator: " ")
+        }
       }
 
       let value = node.value
