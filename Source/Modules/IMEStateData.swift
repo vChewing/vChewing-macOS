@@ -186,15 +186,17 @@ extension IMEStateData {
         arrOutput.append("??")
         continue
       }
-      if PrefMgr.shared.showHanyuPinyinInCompositionBuffer,
-        PrefMgr.shared.alwaysShowTooltipTextsHorizontally || !isVerticalTyping
-      {
-        // 恢復陰平標記->注音轉拼音->轉教科書式標調
-        neta = Tekkon.restoreToneOneInZhuyinKey(target: neta)
-        neta = Tekkon.cnvPhonaToHanyuPinyin(target: neta)
-        neta = Tekkon.cnvHanyuPinyinToTextbookStyle(target: neta)
-      } else {
-        neta = Tekkon.cnvZhuyinChainToTextbookReading(target: neta)
+      if !PrefMgr.shared.cassetteEnabled {
+        if PrefMgr.shared.showHanyuPinyinInCompositionBuffer,
+          PrefMgr.shared.alwaysShowTooltipTextsHorizontally || !isVerticalTyping
+        {
+          // 恢復陰平標記->注音轉拼音->轉教科書式標調
+          neta = Tekkon.restoreToneOneInZhuyinKey(target: neta)
+          neta = Tekkon.cnvPhonaToHanyuPinyin(target: neta)
+          neta = Tekkon.cnvHanyuPinyinToTextbookStyle(target: neta)
+        } else {
+          neta = Tekkon.cnvZhuyinChainToTextbookReading(target: neta)
+        }
       }
       arrOutput.append(neta)
     }

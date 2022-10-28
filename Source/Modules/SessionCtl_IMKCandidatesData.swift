@@ -27,9 +27,11 @@ extension SessionCtl {
         var result = (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)\u{1A}(\(theCandidate.1))"
         if arrResult.contains(result) {
           let reading: String =
-            PrefMgr.shared.showHanyuPinyinInCompositionBuffer
-            ? Tekkon.cnvPhonaToHanyuPinyin(target: Tekkon.restoreToneOneInZhuyinKey(target: theCandidate.0))
-            : theCandidate.0
+            PrefMgr.shared.cassetteEnabled
+            ? theCandidate.0
+            : (PrefMgr.shared.showHanyuPinyinInCompositionBuffer
+              ? Tekkon.cnvPhonaToHanyuPinyin(target: Tekkon.restoreToneOneInZhuyinKey(target: theCandidate.0))
+              : theCandidate.0)
           result = "\(result)\u{17}(\(reading))"
         }
         arrResult.append(prefix + result)
@@ -85,8 +87,10 @@ extension SessionCtl {
         let theConverted = ChineseConverter.kanjiConversionIfRequired(neta.1)
         let netaShown = (neta.1 == theConverted) ? neta.1 : "\(theConverted)\u{1A}(\(neta.1))"
         let reading: String =
-          PrefMgr.shared.showHanyuPinyinInCompositionBuffer
-          ? Tekkon.cnvPhonaToHanyuPinyin(target: Tekkon.restoreToneOneInZhuyinKey(target: neta.0)) : neta.0
+          PrefMgr.shared.cassetteEnabled
+          ? neta.0
+          : (PrefMgr.shared.showHanyuPinyinInCompositionBuffer
+            ? Tekkon.cnvPhonaToHanyuPinyin(target: Tekkon.restoreToneOneInZhuyinKey(target: neta.0)) : neta.0)
         let netaShownWithPronunciation = "\(netaShown)\u{17}(\(reading))"
         if candidateString == prefix + netaShownWithPronunciation {
           indexDeducted = i
