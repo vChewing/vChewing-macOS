@@ -33,11 +33,12 @@ extension InputHandler {
     let skipPhoneticHandling =
       input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
       || input.isControlHold || input.isOptionHold || input.isShiftHold || input.isCommandHold
+    let confirmCombination = input.isSpace || input.isEnter
 
     // 這裡 inputValidityCheck() 是讓注拼槽檢查 charCode 這個 UniChar 是否是合法的注音輸入。
     // 如果是的話，就將這次傳入的這個按鍵訊號塞入注拼槽內且標記為「keyConsumedByReading」。
     // 函式 composer.receiveKey() 可以既接收 String 又接收 UniChar。
-    if !skipPhoneticHandling && composer.inputValidityCheck(key: input.charCode) {
+    if (!skipPhoneticHandling && composer.inputValidityCheck(key: input.charCode)) || confirmCombination {
       // 引入 macOS 內建注音輸入法的行為，允許用除了陰平以外的聲調鍵覆寫前一個漢字的讀音。
       // 但如果要覆寫的內容會導致游標身後的字音沒有對應的辭典記錄的話，那就只蜂鳴警告一下。
       proc: if [0, 1].contains(prefs.specifyIntonationKeyBehavior), composer.isEmpty, !input.isSpace {
@@ -64,7 +65,7 @@ extension InputHandler {
       }
 
       // 鐵恨引擎並不具備對 Enter (CR / LF) 鍵的具體判斷能力，所以在這裡單獨處理。
-      composer.receiveKey(fromString: input.isEnter ? " " : input.text)
+      composer.receiveKey(fromString: confirmCombination ? " " : input.text)
       keyConsumedByReading = true
 
       // 沒有調號的話，只需要 setInlineDisplayWithCursor() 且終止處理（return true）即可。
@@ -81,7 +82,7 @@ extension InputHandler {
     // 如果當前的按鍵是 Enter 或 Space 的話，這時就可以取出 composer 內的注音來做檢查了。
     // 來看看詞庫內到底有沒有對應的讀音索引。這裡用了類似「|=」的判斷處理方式。
     // 這裡必須使用 composer.value.isEmpty，因為只有這樣才能真正檢測 composer 是否已經有陰平聲調了。
-    composeReading = composeReading || (!composer.isEmpty && (input.isSpace || input.isEnter))
+    composeReading = composeReading || (!composer.isEmpty && confirmCombination)
     // readingKey 不能為空。
     composeReading = composeReading && !readingKey.isEmpty
     if composeReading {
@@ -183,6 +184,7 @@ extension InputHandler {
     let skipStrokeHandling =
       input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
       || input.isControlHold || input.isOptionHold || input.isShiftHold || input.isCommandHold
+    let confirmCombination = input.isSpace || input.isEnter
 
     var isLongestPossibleKeyFormed: Bool {
       guard !isWildcardKeyInput, prefs.autoCompositeWithLongestPossibleCassetteKey else { return false }
@@ -225,7 +227,7 @@ extension InputHandler {
 
     // 如果當前的按鍵是 Enter 或 Space 的話，這時就可以取出 calligrapher 內的筆畫來做檢查了。
     // 來看看詞庫內到底有沒有對應的讀音索引。這裡用了類似「|=」的判斷處理方式。
-    combineStrokes = combineStrokes || (!calligrapher.isEmpty && (input.isSpace || input.isEnter))
+    combineStrokes = combineStrokes || (!calligrapher.isEmpty && confirmCombination)
     if combineStrokes {
       // 向語言模型詢問是否有對應的記錄。
       if !currentLM.hasUnigramsFor(key: calligrapher) {
