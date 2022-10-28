@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -1422,7 +1423,7 @@
                                                 </items>
                                             </menu>
                                             <connections>
-                                                <binding destination="32" name="selectedTag" keyPath="values.MandarinParser" id="n3r-9x-E3p"/>
+                                                <binding destination="32" name="selectedTag" keyPath="values.KeyboardParser" id="8MX-rF-6Lp"/>
                                             </connections>
                                         </popUpButtonCell>
                                     </popUpButton>
