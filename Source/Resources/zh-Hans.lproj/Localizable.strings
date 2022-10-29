@@ -201,7 +201,7 @@
 "Intonation Key:" = "声调键:";
 "Japanese" = "和语";
 "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English." = "纵排输入的情况下，工具提示内的按键名称会以符号显示。";
-"Keyboard Shortcuts:" = "键盘快速键:";
+"Keyboard Shortcuts:" = "键盘热键:";
 "Keyboard" = "键盘设定";
 "Misc Settings:" = "杂项:";
 "MiTAC" = "神通排列";
