@@ -207,6 +207,17 @@ extension InputHandler {
             delegate.callError("17446655")
           }
           return true
+        } else {
+          let errorMessage =
+            NSLocalizedString(
+              "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key.",
+              comment: ""
+            )
+          vCLog("8EB3FB1A: " + errorMessage)
+          delegate.switchState(IMEState.ofEmpty())
+          let isJIS: Bool = input.keyCode == KeyCode.kSymbolMenuPhysicalKeyJIS.rawValue
+          delegate.switchState(IMEState.ofCommitting(textToCommit: isJIS ? "_" : "`"))
+          return true
         }
       } else {
         // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
