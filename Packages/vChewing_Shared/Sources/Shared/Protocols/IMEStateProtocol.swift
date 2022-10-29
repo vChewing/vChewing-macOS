@@ -11,7 +11,7 @@ import Cocoa
 // 所有 IMEState 均遵守該協定：
 public protocol IMEStateProtocol {
   var type: StateType { get }
-  var data: IMEStateDataProtocol { get }
+  var data: IMEStateDataProtocol { get set }
   var isASCIIMode: Bool { get set }
   var isVerticalTyping: Bool { get set }
   var isVerticalCandidateWindow: Bool { get set }

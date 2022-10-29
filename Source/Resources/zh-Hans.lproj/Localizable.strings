@@ -1,4 +1,5 @@
 "vChewing" = "威注音输入法";
+"Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key." = "请自行以「_punctuation_list」索引键\n在使用者自订语汇档案内扩充该符号选单的内容。";"Wildcard key cannot be the initial key." = "花牌键不得作为起始码。";
 "Wildcard key cannot be the initial key." = "花牌键不得作为起始码。";
 "CIN Cassette Mode" = "CIN 磁带模式";
 "Invalid Selection Keys." = "选字键参数资料值不规范。";

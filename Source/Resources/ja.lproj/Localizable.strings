@@ -1,4 +1,5 @@
 "vChewing" = "威注音入力アプリ";
+"Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key." = "このメニューのお用いには、ご自分でユーザー辞書で\n「_punctuation_list」キーの符号記録のご補充が必要でござる。";
 "Wildcard key cannot be the initial key." = "骨牌キーは最初のキーとしてはならぬ。";
 "CIN Cassette Mode" = "CIN カセットモード";
 "Invalid Selection Keys." = "候補用キーによる不具合。";
