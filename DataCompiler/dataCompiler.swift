@@ -433,7 +433,7 @@ func fileOutput(isCHS: Bool) {
     if neta.count >= 2 {
       let theKey = String(neta[0])
       let theValue = String(neta[1])
-      if !neta[0].isEmpty, !neta[1].isEmpty, line.first != "#" {
+      if !neta[0].isEmpty, !neta[1].isEmpty, line.first != "#", !theKey.contains("_punctuation_list") {
         rangeMap[cnvPhonabetToASCII(theKey), default: []].append(theValue.data(using: .utf8)!)
       }
     }
@@ -462,7 +462,9 @@ func fileOutput(isCHS: Bool) {
 
     let theKey = unigram.key
     let theValue = (String(unigram.score) + " " + unigram.value)
-    rangeMap[cnvPhonabetToASCII(theKey), default: []].append(theValue.data(using: .utf8)!)
+    if !theKey.contains("_punctuation_list") {
+      rangeMap[cnvPhonabetToASCII(theKey), default: []].append(theValue.data(using: .utf8)!)
+    }
     strPrintLine +=
       unigram.key + " " + unigram.value + " " + String(unigram.score)
       + "\n"
