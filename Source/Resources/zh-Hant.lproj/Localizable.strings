@@ -1,4 +1,5 @@
 "vChewing" = "威注音輸入法";
+"Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key." = "請自行以「_punctuation_list」索引鍵\n在使用者自訂語彙檔案內擴充該符號選單的內容。";
 "Wildcard key cannot be the initial key." = "花牌鍵不得作為起始碼。";
 "CIN Cassette Mode" = "CIN 磁帶模式";
 "Invalid Selection Keys." = "選字鍵參數資料值不規範。";
@@ -201,7 +202,7 @@
 "Intonation Key:" = "聲調鍵:";
 "Japanese" = "和語";
 "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English." = "縱排輸入的情況下，工具提示內的按鍵名稱會以符號顯示。";
-"Keyboard Shortcuts:" = "鍵盤快速鍵:";
+"Keyboard Shortcuts:" = "鍵盤熱鍵:";
 "Keyboard" = "鍵盤設定";
 "Misc Settings:" = "雜項:";
 "MiTAC" = "神通排列";

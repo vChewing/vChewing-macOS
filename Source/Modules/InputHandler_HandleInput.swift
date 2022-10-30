@@ -155,25 +155,34 @@ extension InputHandler {
               : handleCtrlCommandEnter())
             : handleEnter()
         case .kSpace:  // 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
-          // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
-          if input.isShiftHold { return rotateCandidate(reverseOrder: input.isCommandHold) }
           // 空格字符輸入行為處理。
-          do {
-            if compositor.cursor < compositor.length, compositor.insertKey(" ") {
-              walk()
-              // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
-              let textToCommit = commitOverflownComposition
-              var inputting = generateStateOfInputting()
-              inputting.textToCommit = textToCommit
-              delegate.switchState(inputting)
-            } else {
-              let displayedText = state.displayedText
-              if !displayedText.isEmpty {
-                delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
+          switch state.type {
+            case .ofEmpty:
+              if !input.isOptionHold, !input.isControlHold, !input.isCommandHold {
+                delegate.switchState(IMEState.ofCommitting(textToCommit: input.isShiftHold ? "　" : " "))
+                return true
               }
-              delegate.switchState(IMEState.ofCommitting(textToCommit: " "))
-            }
-            return true
+            case .ofInputting:
+              // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
+              if input.isShiftHold, !input.isControlHold, !input.isOptionHold {
+                return rotateCandidate(reverseOrder: input.isCommandHold)
+              }
+              if compositor.cursor < compositor.length, compositor.insertKey(" ") {
+                walk()
+                // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
+                let textToCommit = commitOverflownComposition
+                var inputting = generateStateOfInputting()
+                inputting.textToCommit = textToCommit
+                delegate.switchState(inputting)
+              } else {
+                let displayedText = state.displayedText
+                if !displayedText.isEmpty {
+                  delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
+                }
+                delegate.switchState(IMEState.ofCommitting(textToCommit: " "))
+              }
+              return true
+            default: break
           }
         default: break
       }
@@ -197,6 +206,17 @@ extension InputHandler {
           } else {  // 不要在注音沒敲完整的情況下叫出統合符號選單。
             delegate.callError("17446655")
           }
+          return true
+        } else {
+          let errorMessage =
+            NSLocalizedString(
+              "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key.",
+              comment: ""
+            )
+          vCLog("8EB3FB1A: " + errorMessage)
+          delegate.switchState(IMEState.ofEmpty())
+          let isJIS: Bool = input.keyCode == KeyCode.kSymbolMenuPhysicalKeyJIS.rawValue
+          delegate.switchState(IMEState.ofCommitting(textToCommit: isJIS ? "_" : "`"))
           return true
         }
       } else {
@@ -233,16 +253,6 @@ extension InputHandler {
     let arrPunctuations: [String] = [punctuationNamePrefix, input.text]
     let punctuation: String = arrPunctuations.joined()
     if handlePunctuation(punctuation) { return true }
-
-    // MARK: 全形/半形空白 (Full-Width / Half-Width Space)
-
-    /// 該功能僅可在當前組字區沒有任何內容的時候使用。
-    if state.type == .ofEmpty {
-      if input.isSpace, !input.isOptionHold, !input.isControlHold, !input.isCommandHold {
-        delegate.switchState(IMEState.ofCommitting(textToCommit: input.isShiftHold ? "　" : " "))
-        return true
-      }
-    }
 
     // MARK: 摁住 Shift+字母鍵 的處理 (Shift+Letter Processing)
 
