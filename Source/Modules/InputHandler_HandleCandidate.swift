@@ -196,7 +196,8 @@ extension InputHandler {
 
     if input.isSymbolMenuPhysicalKey {
       var updated = true
-      updated = input.isShiftHold ? ctlCandidate.showPreviousLine() : ctlCandidate.showNextLine()
+      let reverseTrigger = input.isShiftHold || input.isOptionHold
+      updated = reverseTrigger ? ctlCandidate.showPreviousLine() : ctlCandidate.showNextLine()
       if !updated { delegate.callError("66F3477B") }
       return true
     }
