@@ -95,7 +95,6 @@ extension SessionCtl {
         tooltipInstance.hide()
         setInlineDisplayWithCursor()
         showCandidates()
-      default: break
     }
     // 浮動組字窗的顯示判定
     if newState.hasComposition, PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier) {
@@ -108,33 +107,18 @@ extension SessionCtl {
     }
   }
 
-  /// 針對受 .NotEmpty() 管轄的非空狀態，在組字區內顯示游標。
+  /// 如果當前狀態含有「組字結果內容」、或者有選字窗內容、或者存在正在輸入的字根/讀音，則在組字區內顯示游標。
   public func setInlineDisplayWithCursor() {
-    if state.type == .ofAssociates {
-      doSetMarkedText(
-        state.data.attributedStringPlaceholder, selectionRange: NSRange(location: 0, length: 0),
-        replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
-      )
-      return
-    }
-
-    if state.hasComposition || state.isCandidateContainer {
-      /// 所謂選區「selectionRange」，就是「可見游標位置」的位置，只不過長度
-      /// 是 0 且取代範圍（replacementRange）為「NSNotFound」罷了。
-      /// 也就是說，內文組字區該在哪裡出現，得由客體軟體來作主。
-      doSetMarkedText(
-        attributedStringSecured.0, selectionRange: attributedStringSecured.1,
-        replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
-      )
-      return
-    }
-
-    // 其它情形。
-    clearInlineDisplay()
+    /// 所謂選區「selectionRange」，就是「可見游標位置」的位置，只不過長度
+    /// 是 0 且取代範圍（replacementRange）為「NSNotFound」罷了。
+    /// 也就是說，內文組字區該在哪裡出現，得由客體軟體來作主。
+    doSetMarkedText(
+      attributedStringSecured.0, selectionRange: attributedStringSecured.1,
+      replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
+    )
   }
 
-  /// 在處理不受 .NotEmpty() 管轄的狀態時可能要用到的函式，會清空螢幕上顯示的內文組字區。
-  /// 當 setInlineDisplayWithCursor() 在錯誤的狀態下被呼叫時，也會觸發這個函式。
+  /// 在處理某些「沒有組字區內容顯示」且「不需要攔截某些按鍵處理」的狀態時使用的函式，會清空螢幕上顯示的組字區。
   private func clearInlineDisplay() {
     doSetMarkedText(
       "", selectionRange: NSRange(location: 0, length: 0),
