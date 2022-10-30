@@ -123,17 +123,33 @@ public enum TooltipColorState {
 
 // MARK: - IMEState types.
 
-// 用以讓每個狀態自描述的 enum。
+/// 用以讓每個狀態自描述的 enum。
 public enum StateType: String {
+  /// **失活狀態 .ofDeactivated**: 使用者沒在使用輸入法、或者使用者已經切換到另一個客體應用來敲字。
   case ofDeactivated = "Deactivated"
+  /// **空狀態 .ofEmpty**: 使用者剛剛切換至該輸入法、卻還沒有任何輸入行為。
+  /// 抑或是剛剛敲字遞交給客體應用、準備新的輸入行為。
+  /// 威注音輸入法在「組字區與組音區/組筆區同時為空」、
+  /// 且客體軟體正在準備接收使用者文字輸入行為的時候，會處於空狀態。
+  /// 有時，威注音會利用呼叫空狀態的方式，讓組字區內已經顯示出來的內容遞交出去。
   case ofEmpty = "Empty"
-  case ofAbortion = "Abortion"  // 該狀態會自動轉為 Empty
+  /// **中絕狀態 .ofAbortion**: 與 .ofEmpty() 類似，但會扔掉上一個狀態的內容、
+  /// 不將這些內容遞交給客體應用。該狀態在處理完畢之後會被立刻切換至 .ofEmpty()。
+  case ofAbortion = "Abortion"
+  /// **遞交狀態 .ofCommitting**: 該狀態會承載要遞交出去的內容，讓輸入法控制器處理時代為遞交。
+  /// 該狀態在處理完畢之後會被立刻切換至 .ofEmpty()。如果直接呼叫處理該狀態的話，
+  /// 在呼叫處理之前的組字區的內容會消失，除非你事先呼叫處理過 .ofEmpty()。
   case ofCommitting = "Committing"
+  /// **聯想詞狀態 .ofAssociates**: 逐字選字模式內的聯想詞輸入狀態。
   case ofAssociates = "Associates"
-  case ofNotEmpty = "NotEmpty"
+  /// **輸入狀態 .ofInputting**: 使用者輸入了內容。此時會出現組字區（Compositor）。
   case ofInputting = "Inputting"
+  /// **標記狀態 .ofMarking**: 使用者在組字區內標記某段範圍，
+  /// 可以決定是添入新詞、還是將這個範圍的詞音組合放入語彙濾除清單。
   case ofMarking = "Marking"
+  /// **選字狀態 .ofCandidates**: 叫出選字窗、允許使用者選字。
   case ofCandidates = "Candidates"
+  /// **分類分層符號表狀態 .ofSymbolTable**: 分類分層符號表選單專用的狀態，有自身的特殊處理。
   case ofSymbolTable = "SymbolTable"
 }
 
