@@ -26,20 +26,23 @@ import Shared
 ///
 /// 輸入法控制器持下述狀態：
 ///
-/// - .Deactivated: 使用者沒在使用輸入法。
-/// - .AssociatedPhrases: 逐字選字模式內的聯想詞輸入狀態。因為逐字選字模式不需要在
-///   組字區內存入任何東西，所以該狀態不受 .NotEmpty 的管轄。
-/// - .Empty: 使用者剛剛切換至該輸入法、卻還沒有任何輸入行為。抑或是剛剛敲字遞交給
-///   客體應用、準備新的輸入行為。
-/// - .Abortion: 與 Empty 類似，但會扔掉上一個狀態的內容、不將這些
-///   內容遞交給客體應用。該狀態在處理完畢之後會被立刻切換至 .Empty()。
-/// - .Committing: 該狀態會承載要遞交出去的內容，讓輸入法控制器處理時代為遞交。
-/// - .NotEmpty: 非空狀態，是一種狀態大類、用以派生且代表下述諸狀態。
-/// - .Inputting: 使用者輸入了內容。此時會出現組字區（Compositor）。
-/// - .Marking: 使用者在組字區內標記某段範圍，可以決定是添入新詞、還是將這個範圍的
-///   詞音組合放入語彙濾除清單。
-/// - .ChoosingCandidate: 叫出選字窗、允許使用者選字。
-/// - .SymbolTable: 波浪鍵符號選單專用的狀態，有自身的特殊處理。
+/// - **失活狀態 .ofDeactivated**: 使用者沒在使用輸入法、或者使用者已經切換到另一個客體應用來敲字。
+/// - **空狀態 .ofEmpty**: 使用者剛剛切換至該輸入法、卻還沒有任何輸入行為。
+/// 抑或是剛剛敲字遞交給客體應用、準備新的輸入行為。
+/// 威注音輸入法在「組字區與組音區/組筆區同時為空」、
+/// 且客體軟體正在準備接收使用者文字輸入行為的時候，會處於空狀態。
+/// 有時，威注音會利用呼叫空狀態的方式，讓組字區內已經顯示出來的內容遞交出去。
+/// - **聯想詞狀態 .ofAssociates**: 逐字選字模式內的聯想詞輸入狀態。
+/// - **中絕狀態 .ofAbortion**: 與 .ofEmpty() 類似，但會扔掉上一個狀態的內容、
+/// 不將這些內容遞交給客體應用。該狀態在處理完畢之後會被立刻切換至 .ofEmpty()。
+/// - **遞交狀態 .ofCommitting**: 該狀態會承載要遞交出去的內容，讓輸入法控制器處理時代為遞交。
+/// 該狀態在處理完畢之後會被立刻切換至 .ofEmpty()。如果直接呼叫處理該狀態的話，
+/// 在呼叫處理之前的組字區的內容會消失，除非你事先呼叫處理過 .ofEmpty()。
+/// - **輸入狀態 .ofInputting**: 使用者輸入了內容。此時會出現組字區（Compositor）。
+/// - **標記狀態 .ofMarking**: 使用者在組字區內標記某段範圍，
+/// 可以決定是添入新詞、還是將這個範圍的詞音組合放入語彙濾除清單。
+/// - **選字狀態 .ofCandidates**: 叫出選字窗、允許使用者選字。
+/// - **分類分層符號表狀態 .ofSymbolTable**: 分類分層符號表選單專用的狀態，有自身的特殊處理。
 public struct IMEState: IMEStateProtocol {
   public var type: StateType = .ofEmpty
   public var data: IMEStateDataProtocol = IMEStateData() as IMEStateDataProtocol
@@ -52,6 +55,28 @@ public struct IMEState: IMEStateProtocol {
     isVerticalTyping = SessionCtl.isVerticalTyping
   }
 
+  /// 內部專用初期化函式，僅用於生成「有輸入內容」的狀態。
+  /// - Parameters:
+  ///   - displayTextSegments: 用以顯示的文本的字詞字串陣列，其中包含正在輸入的讀音或字根。
+  ///   - cursor: 要顯示的游標（UTF8）。
+  fileprivate init(displayTextSegments: [String], cursor: Int) {
+    // 注意資料的設定順序，一定得先設定 displayTextSegments。
+    data.displayTextSegments = displayTextSegments.map {
+      if !SessionCtl.isVerticalTyping { return $0 }
+      guard PrefMgr.shared.hardenVerticalPunctuations else { return $0 }
+      var neta = $0
+      ChineseConverter.hardenVerticalPunctuations(target: &neta, convert: SessionCtl.isVerticalTyping)
+      return neta
+    }
+    data.cursor = cursor
+    data.marker = cursor
+  }
+
+  /// 泛用初期化函式。
+  /// - Parameters:
+  ///   - data: 資料載體。
+  ///   - type: 狀態類型。
+  ///   - node: 節點。
   init(
     _ data: IMEStateDataProtocol = IMEStateData() as IMEStateDataProtocol, type: StateType = .ofEmpty,
     node: CandidateNode
@@ -88,24 +113,8 @@ extension IMEState {
     return result
   }
 
-  public static func ofNotEmpty(displayTextSegments: [String], cursor: Int) -> IMEState {
-    var result = IMEState(type: .ofNotEmpty)
-    // 注意資料的設定順序，一定得先設定 displayTextSegments。
-    result.data.displayTextSegments = displayTextSegments.map {
-      if !SessionCtl.isVerticalTyping { return $0 }
-      guard PrefMgr.shared.hardenVerticalPunctuations else { return $0 }
-      var neta = $0
-      ChineseConverter.hardenVerticalPunctuations(target: &neta, convert: SessionCtl.isVerticalTyping)
-      return neta
-    }
-
-    result.data.cursor = cursor
-    result.data.marker = cursor
-    return result
-  }
-
   public static func ofInputting(displayTextSegments: [String], cursor: Int) -> IMEState {
-    var result = Self.ofNotEmpty(displayTextSegments: displayTextSegments, cursor: cursor)
+    var result = IMEState(displayTextSegments: displayTextSegments, cursor: cursor)
     result.type = .ofInputting
     return result
   }
@@ -115,7 +124,7 @@ extension IMEState {
   )
     -> IMEState
   {
-    var result = Self.ofNotEmpty(displayTextSegments: displayTextSegments, cursor: cursor)
+    var result = IMEState(displayTextSegments: displayTextSegments, cursor: cursor)
     result.type = .ofMarking
     result.data.marker = marker
     result.data.markedReadings = markedReadings
@@ -126,14 +135,14 @@ extension IMEState {
   public static func ofCandidates(candidates: [(String, String)], displayTextSegments: [String], cursor: Int)
     -> IMEState
   {
-    var result = Self.ofNotEmpty(displayTextSegments: displayTextSegments, cursor: cursor)
+    var result = IMEState(displayTextSegments: displayTextSegments, cursor: cursor)
     result.type = .ofCandidates
     result.data.candidates = candidates
     return result
   }
 
   public static func ofSymbolTable(node: CandidateNode) -> IMEState {
-    var result = IMEState(type: .ofNotEmpty, node: node)
+    var result = IMEState(node: node)
     result.type = .ofSymbolTable
     return result
   }
@@ -195,7 +204,7 @@ extension IMEState {
   /// 該參數僅用作輔助判斷。在 InputHandler 內使用的話，必須再檢查 !compositor.isEmpty。
   public var hasComposition: Bool {
     switch type {
-      case .ofNotEmpty, .ofInputting, .ofMarking, .ofCandidates: return true
+      case .ofInputting, .ofMarking, .ofCandidates: return true
       default: return false
     }
   }
