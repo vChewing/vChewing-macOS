@@ -291,15 +291,14 @@ extension InputHandler {
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
 
-    var displayedText = compositor.keys.joined(separator: " ")
+    var displayedText = compositor.keys.joined(separator: "\t")
     if prefs.inlineDumpPinyinInLieuOfZhuyin, !prefs.cassetteEnabled {
       displayedText = Tekkon.restoreToneOneInZhuyinKey(target: displayedText)  // 恢復陰平標記
       displayedText = Tekkon.cnvPhonaToHanyuPinyin(target: displayedText)  // 注音轉拼音
     }
 
-    if delegate.clientBundleIdentifier.contains("vChewingPhraseEditor") {
-      displayedText = displayedText.replacingOccurrences(of: " ", with: "-")
-    }
+    let isVCED = delegate.clientBundleIdentifier.contains("vChewingPhraseEditor")
+    displayedText = displayedText.replacingOccurrences(of: "\t", with: isVCED ? "-" : " ")
 
     delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
     return true
