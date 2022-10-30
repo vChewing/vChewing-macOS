@@ -283,14 +283,6 @@ extension vChewingLM {
       // 新增與日期、時間、星期有關的單元圖資料
       rawAllUnigrams.append(contentsOf: queryDateTimeUnigrams(with: key))
 
-      // 準備過濾清單。因為我們在 Swift 使用 NSOrderedSet，所以就不需要統計清單了。
-      var filteredList: Set<String> = []
-
-      // 載入要過濾的 KeyValuePair 清單。
-      for unigram in lmFiltered.unigramsFor(key: key) {
-        filteredList.insert(unigram.value)
-      }
-
       // 提前處理語彙置換
       if isPhraseReplacementEnabled {
         for i in 0..<rawAllUnigrams.count {
@@ -300,9 +292,8 @@ extension vChewingLM {
         }
       }
 
-      // 給定過濾清單，讓單元圖陣列自我過濾。
-      // 在此基礎之上，對於相同詞值的多個單元圖，僅保留權重最大者。
-      rawAllUnigrams.consolidate(filter: filteredList)
+      // 讓單元圖陣列自我過濾。在此基礎之上，對於相同詞值的多個單元圖，僅保留權重最大者。
+      rawAllUnigrams.consolidate(filter: .init(lmFiltered.unigramsFor(key: key).map(\.value)))
       return rawAllUnigrams
     }
   }
