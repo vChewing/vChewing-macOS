@@ -139,8 +139,12 @@ public class SessionCtl: IMKInputController {
     super.init(server: server, delegate: delegate, client: inputClient)
     inputHandler.delegate = self
     syncBaseLMPrefs()
-    // 下述部分很有必要，否則輸入法會在手動重啟之後無法立刻生效。
-    activateServer(inputClient)
+    // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
+    // 這裡使用輸入法重新啟動之前的舊值（簡繁模式）手動 setValue()。
+    do {
+      activateServer(inputClient)  // 這個步驟不會自動呼叫到 setValue()。
+      setValue(PrefMgr.shared.mostRecentInputMode, forTag: 114_514, client: client())
+    }
     if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(IMEApp.currentInputMode) }
     if let myID = Bundle.main.bundleIdentifier, !myID.isEmpty, !clientBundleIdentifier.contains(myID) {
       setKeyLayout()
@@ -232,6 +236,8 @@ extension SessionCtl {
   }
 
   /// 切換至某一個輸入法的某個副本時（比如威注音的簡體輸入法副本與繁體輸入法副本），會觸發該函式。
+  /// - Remark: 當系統呼叫 activateServer() 的時候，setValue() 會被自動呼叫。
+  /// 但是，手動呼叫 activateServer() 的時候，setValue() 不會被自動呼叫。
   /// - Parameters:
   ///   - value: 輸入法在系統偏好設定當中的副本的 identifier，與 bundle identifier 類似。在輸入法的 info.plist 內定義。
   ///   - tag: 標記（無須使用）。
@@ -242,8 +248,9 @@ extension SessionCtl {
     let newInputMode: Shared.InputMode = .init(rawValue: value as? String ?? "") ?? .imeModeNULL
     if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(newInputMode) }
     inputMode = newInputMode
-    if let rawValString = value as? String, let bundleID = Bundle.main.bundleIdentifier,
-      !bundleID.isEmpty, !rawValString.contains(bundleID)
+    if let rawClient = sender as? (IMKTextInput & NSObjectProtocol),
+      let bundleID = Bundle.main.bundleIdentifier,
+      !bundleID.isEmpty, !rawClient.bundleIdentifier().contains(bundleID)
     {
       setKeyLayout()
     }
