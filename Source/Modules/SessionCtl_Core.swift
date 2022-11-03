@@ -190,6 +190,11 @@ extension SessionCtl {
   public override func activateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     UserDefaults.standard.synchronize()
+    Self.allInstances.forEach { currentInstance in
+      if currentInstance !== self {
+        currentInstance.deactivateServer(currentInstance.client())
+      }
+    }
     if Self.allInstances.contains(self) { return }
 
     isActivated = true  // 登記啟用狀態。
@@ -219,6 +224,7 @@ extension SessionCtl {
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   public override func deactivateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
+    if !isActivated { return }
     isActivated = false
     resetInputHandler()  // 這條會自動搞定 Empty 狀態。
     switchState(IMEState.ofDeactivated())

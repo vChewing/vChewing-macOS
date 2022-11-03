@@ -57,6 +57,7 @@ extension SessionCtl {
         // 所以在這裡糾偏一下、讓所有開啟了選字窗的會話重新顯示選字窗。
         if PrefMgr.shared.useIMKCandidateWindow {
           for instance in Self.allInstances {
+            guard instance.isActivated else { continue }
             guard let imkC = instance.ctlCandidateCurrent as? CtlCandidateIMK else { continue }
             if instance.state.isCandidateContainer, !imkC.visible {
               instance.handle(state: instance.state, replace: false)
