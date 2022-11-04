@@ -233,7 +233,8 @@ extension SessionCtl {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     let mostRecentInputMode = PrefMgr.shared.mostRecentInputMode
     inputMode = .init(rawValue: value as? String ?? mostRecentInputMode) ?? .imeModeNULL
-    switchState(IMEState.ofEmpty())
+    handle(state: IMEState.ofDeactivated(), replace: false)
+    state = IMEState.ofEmpty()
     Self.isVerticalTyping = isVerticalTyping
   }
 
