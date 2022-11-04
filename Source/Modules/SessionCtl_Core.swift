@@ -48,6 +48,9 @@ public class SessionCtl: IMKInputController {
   /// 浮動組字窗的副本。
   public var popupCompositionBuffer = PopupCompositionBuffer()
 
+  /// 用來標記當前副本是否已處於活動狀態。
+  public var isActivated = false
+
   // MARK: -
 
   /// 當前 Caps Lock 按鍵是否被摁下。
@@ -207,6 +210,7 @@ extension SessionCtl {
     }
 
     switchState(IMEState.ofEmpty())
+    isActivated = true  // 登記啟用狀態。
     Self.allInstances.insert(self)
   }
 
@@ -214,6 +218,7 @@ extension SessionCtl {
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   public override func deactivateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
+    isActivated = false
     resetInputHandler()  // 這條會自動搞定 Empty 狀態。
     switchState(IMEState.ofDeactivated())
     Self.allInstances.remove(self)
