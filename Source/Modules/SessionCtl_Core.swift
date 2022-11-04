@@ -148,6 +148,7 @@ public class SessionCtl: IMKInputController {
 
 extension SessionCtl {
   /// 強制重設當前鍵盤佈局、使其與偏好設定同步。
+  /// - Remark: 該函式需要顯著的執行時間。
   public func setKeyLayout() {
     guard let client = client(), let myID = Bundle.main.bundleIdentifier, !myID.isEmpty,
       clientBundleIdentifier != myID
