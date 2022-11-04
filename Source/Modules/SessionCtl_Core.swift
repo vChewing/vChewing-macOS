@@ -121,7 +121,6 @@ public class SessionCtl: IMKInputController {
         syncBaseLMPrefs()
         // ----------------------------
         Self.isVerticalTyping = isVerticalTyping
-        // 強制重設當前鍵盤佈局、使其與偏好設定同步。這裡的這一步也不能省略。
         switchState(IMEState.ofEmpty())
       }
     }
@@ -142,18 +141,18 @@ public class SessionCtl: IMKInputController {
     // 下述部分很有必要，否則輸入法會在手動重啟之後無法立刻生效。
     activateServer(inputClient)
     if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(IMEApp.currentInputMode) }
-    if let myID = Bundle.main.bundleIdentifier, !myID.isEmpty, !clientBundleIdentifier.contains(myID) {
-      setKeyLayout()
-    }
+    setKeyLayout()
   }
 }
 
 // MARK: - 工具函式
 
 extension SessionCtl {
-  /// 指定鍵盤佈局。
+  /// 強制重設當前鍵盤佈局、使其與偏好設定同步。
   public func setKeyLayout() {
-    guard let client = client() else { return }
+    guard let client = client(), let myID = Bundle.main.bundleIdentifier, !myID.isEmpty,
+      clientBundleIdentifier != myID
+    else { return }
 
     func doSetKeyLayout() {
       if isASCIIMode, IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
@@ -235,11 +234,7 @@ extension SessionCtl {
     let newInputMode: Shared.InputMode = .init(rawValue: value as? String ?? "") ?? .imeModeNULL
     if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(newInputMode) }
     inputMode = newInputMode
-    if let rawValString = value as? String, let bundleID = Bundle.main.bundleIdentifier,
-      !bundleID.isEmpty, !rawValString.contains(bundleID)
-    {
-      setKeyLayout()
-    }
+    setKeyLayout()
   }
 
   /// 將輸入法偏好設定同步至語言模組內。
