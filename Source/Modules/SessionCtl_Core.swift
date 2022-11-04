@@ -108,6 +108,7 @@ public class SessionCtl: IMKInputController {
       PrefMgr.shared.mostRecentInputMode = newValue.rawValue
     }
     didSet {
+      if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(inputMode) }
       if oldValue != inputMode, inputMode != .imeModeNULL {
         UserDefaults.standard.synchronize()
         inputHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
@@ -119,9 +120,8 @@ public class SessionCtl: IMKInputController {
         inputHandler.ensureKeyboardParser()
         /// 將輸入法偏好設定同步至語言模組內。
         syncBaseLMPrefs()
-        // ----------------------------
-        Self.isVerticalTyping = isVerticalTyping
-        switchState(IMEState.ofEmpty())
+        /// 重置輸入調度模組。
+        resetInputHandler()
       }
     }
   }
@@ -138,9 +138,9 @@ public class SessionCtl: IMKInputController {
     super.init(server: server, delegate: delegate, client: inputClient)
     inputHandler.delegate = self
     syncBaseLMPrefs()
-    // 下述部分很有必要，否則輸入法會在手動重啟之後無法立刻生效。
+    // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
     activateServer(inputClient)
-    if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(IMEApp.currentInputMode) }
+    inputMode = .init(rawValue: PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
   }
 }
 
@@ -189,7 +189,7 @@ extension SessionCtl {
     // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
     // 所以這裡添加這句、來試圖應對這種情況。
     if inputHandler.delegate == nil { inputHandler.delegate = self }
-    // 這裡不需要 setValue()，因為 IMK 會在 activateServer() 之後自動執行 setValue()。
+    // 這裡不需要 setValue()，因為 IMK 會在自動呼叫 activateServer() 之後自動執行 setValue()。
     inputHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
     inputHandler.ensureKeyboardParser()
 
@@ -220,6 +220,8 @@ extension SessionCtl {
   }
 
   /// 切換至某一個輸入法的某個副本時（比如威注音的簡體輸入法副本與繁體輸入法副本），會觸發該函式。
+  /// - Remark: 當系統呼叫 activateServer() 的時候，setValue() 會被自動呼叫。
+  /// 但是，手動呼叫 activateServer() 的時候，setValue() 不會被自動呼叫。
   /// - Parameters:
   ///   - value: 輸入法在系統偏好設定當中的副本的 identifier，與 bundle identifier 類似。在輸入法的 info.plist 內定義。
   ///   - tag: 標記（無須使用）。
@@ -227,9 +229,9 @@ extension SessionCtl {
   public override func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
     _ = tag  // 防止格式整理工具毀掉與此對應的參數。
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-    let newInputMode: Shared.InputMode = .init(rawValue: value as? String ?? "") ?? .imeModeNULL
-    if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(newInputMode) }
-    inputMode = newInputMode
+    let mostRecentInputMode = PrefMgr.shared.mostRecentInputMode
+    inputMode = .init(rawValue: value as? String ?? mostRecentInputMode) ?? .imeModeNULL
+    Self.isVerticalTyping = isVerticalTyping
   }
 
   /// 將輸入法偏好設定同步至語言模組內。
