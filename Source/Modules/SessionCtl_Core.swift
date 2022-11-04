@@ -203,7 +203,7 @@ extension SessionCtl {
       UpdateSputnik.shared.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
     }
 
-    switchState(IMEState.ofEmpty())
+    state = IMEState.ofEmpty()
     isActivated = true  // 登記啟用狀態。
     Self.allInstances.insert(self)
     setKeyLayout()
