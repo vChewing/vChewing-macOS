@@ -121,7 +121,6 @@ public class SessionCtl: IMKInputController {
         syncBaseLMPrefs()
         // ----------------------------
         Self.isVerticalTyping = isVerticalTyping
-        // 強制重設當前鍵盤佈局、使其與偏好設定同步。這裡的這一步也不能省略。
         switchState(IMEState.ofEmpty())
       }
     }
@@ -142,29 +141,24 @@ public class SessionCtl: IMKInputController {
     // 下述部分很有必要，否則輸入法會在手動重啟之後無法立刻生效。
     activateServer(inputClient)
     if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(IMEApp.currentInputMode) }
-    if let myID = Bundle.main.bundleIdentifier, !myID.isEmpty, !clientBundleIdentifier.contains(myID) {
-      setKeyLayout()
-    }
   }
 }
 
 // MARK: - 工具函式
 
 extension SessionCtl {
-  /// 指定鍵盤佈局。
+  /// 強制重設當前鍵盤佈局、使其與偏好設定同步。
   public func setKeyLayout() {
-    guard let client = client() else { return }
+    guard let client = client(), let myID = Bundle.main.bundleIdentifier, !myID.isEmpty,
+      clientBundleIdentifier != myID
+    else { return }
 
-    func doSetKeyLayout() {
+    DispatchQueue.main.async { [self] in
       if isASCIIMode, IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
         client.overrideKeyboard(withKeyboardNamed: PrefMgr.shared.alphanumericalKeyboardLayout)
         return
       }
       client.overrideKeyboard(withKeyboardNamed: PrefMgr.shared.basicKeyboardLayout)
-    }
-
-    DispatchQueue.main.async {
-      doSetKeyLayout()
     }
   }
 
@@ -212,6 +206,7 @@ extension SessionCtl {
     switchState(IMEState.ofEmpty())
     isActivated = true  // 登記啟用狀態。
     Self.allInstances.insert(self)
+    setKeyLayout()
   }
 
   /// 停用輸入法時，會觸發該函式。
@@ -235,11 +230,6 @@ extension SessionCtl {
     let newInputMode: Shared.InputMode = .init(rawValue: value as? String ?? "") ?? .imeModeNULL
     if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(newInputMode) }
     inputMode = newInputMode
-    if let rawValString = value as? String, let bundleID = Bundle.main.bundleIdentifier,
-      !bundleID.isEmpty, !rawValString.contains(bundleID)
-    {
-      setKeyLayout()
-    }
   }
 
   /// 將輸入法偏好設定同步至語言模組內。
