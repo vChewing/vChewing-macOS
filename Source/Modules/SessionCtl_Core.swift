@@ -201,8 +201,6 @@ extension SessionCtl {
     }
     if Self.allInstances.contains(self) { return }
 
-    isActivated = true  // 登記啟用狀態。
-
     // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
     // 所以這裡添加這句、來試圖應對這種情況。
     if inputHandler.delegate == nil { inputHandler.delegate = self }
@@ -221,6 +219,7 @@ extension SessionCtl {
     }
 
     switchState(IMEState.ofEmpty())
+    isActivated = true  // 登記啟用狀態。
     Self.allInstances.insert(self)
   }
 
