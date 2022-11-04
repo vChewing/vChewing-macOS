@@ -121,8 +121,6 @@ public class SessionCtl: IMKInputController {
         syncBaseLMPrefs()
         // ----------------------------
         Self.isVerticalTyping = isVerticalTyping
-        // 強制重設當前鍵盤佈局、使其與偏好設定同步。這裡的這一步也不能省略。
-        switchState(IMEState.ofEmpty())
       }
     }
   }
@@ -141,14 +139,8 @@ public class SessionCtl: IMKInputController {
     syncBaseLMPrefs()
     // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
     // 這裡使用輸入法重新啟動之前的舊值（簡繁模式）手動 setValue()。
-    do {
-      activateServer(inputClient)  // 這個步驟不會自動呼叫到 setValue()。
-      setValue(PrefMgr.shared.mostRecentInputMode, forTag: 114_514, client: client())
-    }
-    if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(IMEApp.currentInputMode) }
-    if let myID = Bundle.main.bundleIdentifier, !myID.isEmpty, !clientBundleIdentifier.contains(myID) {
-      setKeyLayout()
-    }
+    activateServer(inputClient)  // 這個步驟不會自動呼叫到 setValue()。
+    setValue(PrefMgr.shared.mostRecentInputMode, forTag: 114_514, client: client())
   }
 }
 
@@ -157,7 +149,9 @@ public class SessionCtl: IMKInputController {
 extension SessionCtl {
   /// 指定鍵盤佈局。
   public func setKeyLayout() {
-    guard let client = client() else { return }
+    guard let client = client(), let myID = Bundle.main.bundleIdentifier, !myID.isEmpty,
+      !clientBundleIdentifier.contains(myID)
+    else { return }
 
     func doSetKeyLayout() {
       if isASCIIMode, IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
@@ -194,6 +188,10 @@ extension SessionCtl {
   public override func activateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     UserDefaults.standard.synchronize()
+
+    // 強制重設當前鍵盤佈局、使其與偏好設定同步。這裡的這一步也不能省略。
+    setKeyLayout()
+
     if Self.allInstances.contains(self) { return }
 
     // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
@@ -213,7 +211,7 @@ extension SessionCtl {
       UpdateSputnik.shared.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
     }
 
-    switchState(IMEState.ofEmpty())
+    // switchState(IMEState.ofEmpty()) // setValue() 會代為執行。
     isActivated = true  // 登記啟用狀態。
     Self.allInstances.insert(self)
   }
@@ -239,15 +237,12 @@ extension SessionCtl {
   public override func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
     _ = tag  // 防止格式整理工具毀掉與此對應的參數。
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-    let newInputMode: Shared.InputMode = .init(rawValue: value as? String ?? "") ?? .imeModeNULL
+    let newInputMode: Shared.InputMode =
+      .init(rawValue: value as? String ?? PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
     if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(newInputMode) }
     inputMode = newInputMode
-    if let rawClient = sender as? (IMKTextInput & NSObjectProtocol),
-      let bundleID = Bundle.main.bundleIdentifier,
-      !bundleID.isEmpty, !rawClient.bundleIdentifier().contains(bundleID)
-    {
-      setKeyLayout()
-    }
+
+    switchState(IMEState.ofEmpty())
   }
 
   /// 將輸入法偏好設定同步至語言模組內。
