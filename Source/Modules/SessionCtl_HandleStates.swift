@@ -151,7 +151,7 @@ extension SessionCtl {
 
   /// 把 setMarkedText 包裝一下，按需啟用 GCD。
   public func doSetMarkedText(_ string: Any!, selectionRange: NSRange, replacementRange: NSRange) {
-    guard let client = client() else { return }
+    guard let client = client(), isActivated else { return }
     if let myID = Bundle.main.bundleIdentifier, let clientID = client.bundleIdentifier(), myID == clientID {
       DispatchQueue.main.async {
         client.setMarkedText(string, selectionRange: selectionRange, replacementRange: replacementRange)

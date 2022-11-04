@@ -256,11 +256,6 @@ extension SessionCtl {
     }
   }
 
-  /// 給 client() 套一個安全殼層：如果當前副本沒有處於活動狀態的話，則令其為 nil。
-  public override func client() -> (IMKTextInput & NSObjectProtocol)? {
-    isActivated ? super.client() ?? nil : nil
-  }
-
   /// 將輸入法偏好設定同步至語言模組內。
   public func syncBaseLMPrefs() {
     LMMgr.currentLM.isPhraseReplacementEnabled = PrefMgr.shared.phraseReplacementEnabled
