@@ -194,11 +194,6 @@ extension SessionCtl {
   public override func activateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     UserDefaults.standard.synchronize()
-    Self.allInstances.forEach { currentInstance in
-      if currentInstance !== self {
-        currentInstance.deactivateServer(currentInstance.client())
-      }
-    }
     if Self.allInstances.contains(self) { return }
 
     // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
