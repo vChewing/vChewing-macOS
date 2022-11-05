@@ -136,11 +136,14 @@ public class SessionCtl: IMKInputController {
   ///   - inputClient: 用以接受輸入的客體應用物件
   override public init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
     super.init(server: server, delegate: delegate, client: inputClient)
-    inputHandler.delegate = self
-    syncBaseLMPrefs()
-    // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
-    activateServer(inputClient)
-    inputMode = .init(rawValue: PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
+    DispatchQueue.main.async { [self] in
+      inputHandler.delegate = self
+      syncBaseLMPrefs()
+      // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
+      activateServer(inputClient)
+      // GCD 會觸發 didSet，所以不用擔心。
+      inputMode = .init(rawValue: PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
+    }
   }
 }
 
@@ -148,7 +151,6 @@ public class SessionCtl: IMKInputController {
 
 extension SessionCtl {
   /// 強制重設當前鍵盤佈局、使其與偏好設定同步。
-  /// - Remark: 該函式需要顯著的執行時間。
   public func setKeyLayout() {
     guard let client = client(), let myID = Bundle.main.bundleIdentifier, !myID.isEmpty,
       clientBundleIdentifier != myID
@@ -184,40 +186,44 @@ extension SessionCtl {
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   public override func activateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-    UserDefaults.standard.synchronize()
-    if Self.allInstances.contains(self) { return }
+    DispatchQueue.main.async { [self] in
+      UserDefaults.standard.synchronize()
+      if Self.allInstances.contains(self) { return }
 
-    // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
-    // 所以這裡添加這句、來試圖應對這種情況。
-    if inputHandler.delegate == nil { inputHandler.delegate = self }
-    // 這裡不需要 setValue()，因為 IMK 會在自動呼叫 activateServer() 之後自動執行 setValue()。
-    inputHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
-    inputHandler.ensureKeyboardParser()
+      // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
+      // 所以這裡添加這句、來試圖應對這種情況。
+      if inputHandler.delegate == nil { inputHandler.delegate = self }
+      // 這裡不需要 setValue()，因為 IMK 會在自動呼叫 activateServer() 之後自動執行 setValue()。
+      inputHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
+      inputHandler.ensureKeyboardParser()
 
-    Self.theShiftKeyDetector.alsoToggleWithLShift = PrefMgr.shared.togglingAlphanumericalModeWithLShift
+      Self.theShiftKeyDetector.alsoToggleWithLShift = PrefMgr.shared.togglingAlphanumericalModeWithLShift
 
-    if #available(macOS 10.15, *) {
-      if isASCIIMode, PrefMgr.shared.disableShiftTogglingAlphanumericalMode { isASCIIMode = false }
+      if #available(macOS 10.15, *) {
+        if isASCIIMode, PrefMgr.shared.disableShiftTogglingAlphanumericalMode { isASCIIMode = false }
+      }
+
+      DispatchQueue.main.async {
+        UpdateSputnik.shared.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
+      }
+
+      state = IMEState.ofEmpty()
+      isActivated = true  // 登記啟用狀態。
+      Self.allInstances.insert(self)
+      setKeyLayout()
     }
-
-    DispatchQueue.main.async {
-      UpdateSputnik.shared.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
-    }
-
-    state = IMEState.ofEmpty()
-    isActivated = true  // 登記啟用狀態。
-    Self.allInstances.insert(self)
-    setKeyLayout()
   }
 
   /// 停用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   public override func deactivateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-    isActivated = false
-    resetInputHandler()  // 這條會自動搞定 Empty 狀態。
-    switchState(IMEState.ofDeactivated())
-    Self.allInstances.remove(self)
+    DispatchQueue.main.async { [self] in
+      isActivated = false
+      resetInputHandler()  // 這條會自動搞定 Empty 狀態。
+      switchState(IMEState.ofDeactivated())
+      Self.allInstances.remove(self)
+    }
   }
 
   /// 切換至某一個輸入法的某個副本時（比如威注音的簡體輸入法副本與繁體輸入法副本），會觸發該函式。
@@ -230,9 +236,11 @@ extension SessionCtl {
   public override func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
     _ = tag  // 防止格式整理工具毀掉與此對應的參數。
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-    let mostRecentInputMode = PrefMgr.shared.mostRecentInputMode
-    inputMode = .init(rawValue: value as? String ?? mostRecentInputMode) ?? .imeModeNULL
-    Self.isVerticalTyping = isVerticalTyping
+    DispatchQueue.main.async { [self] in
+      let mostRecentInputMode = PrefMgr.shared.mostRecentInputMode
+      inputMode = .init(rawValue: value as? String ?? mostRecentInputMode) ?? .imeModeNULL
+      Self.isVerticalTyping = isVerticalTyping
+    }
   }
 
   /// 將輸入法偏好設定同步至語言模組內。
