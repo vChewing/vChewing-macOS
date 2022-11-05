@@ -217,6 +217,7 @@ extension Tekkon {
           case "ㄝ":
             if "ㄨ".contains(semivowel.value) { semivowel = "ㄩ" }
           case "ㄛ", "ㄥ":
+            if phonabet == "ㄛ", semivowel.value == "ㄩ" { semivowel = "ㄨ" }
             if "ㄅㄆㄇㄈ".contains(consonant.value), semivowel.value == "ㄨ" { semivowel.clear() }
           case "ㄟ":
             if "ㄋㄌ".contains(consonant.value), semivowel.value == "ㄨ" { semivowel.clear() }

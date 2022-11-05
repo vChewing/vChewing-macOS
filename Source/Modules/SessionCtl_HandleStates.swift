@@ -48,7 +48,7 @@ extension SessionCtl {
         if previous.hasComposition {
           commit(text: previous.displayedText)
         }
-        clearInlineDisplay()  // 該函式有對 client 做 guard-let 保護，不會出現上游 #346 的問題。
+        // clearInlineDisplay()  // 不需要，否則會觸發無限迴圈。
         // 最後一道保險
         inputHandler.clear()
         // 特殊處理：deactivateServer() 可能會遲於另一個客體會話的 activateServer() 執行。
@@ -150,7 +150,7 @@ extension SessionCtl {
 
   /// 把 setMarkedText 包裝一下，按需啟用 GCD。
   public func doSetMarkedText(_ string: Any!, selectionRange: NSRange, replacementRange: NSRange) {
-    guard let client = client() else { return }
+    guard isActivated, let client = client() else { return }
     if let myID = Bundle.main.bundleIdentifier, let clientID = client.bundleIdentifier(), myID == clientID {
       DispatchQueue.main.async {
         client.setMarkedText(string, selectionRange: selectionRange, replacementRange: replacementRange)
