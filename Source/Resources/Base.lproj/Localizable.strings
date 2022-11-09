@@ -177,7 +177,7 @@
 "Disassembling process does not work with non-phonetic reading keys." = "Disassembling process does not work with non-phonetic reading keys.";
 "Emulating select-candidate-per-character mode" = "Emulating select-candidate-per-character mode";
 "Enable cassette mode, suppressing phonabet input" = "Enable cassette mode, suppressing phonabet input";
-"Enable CNS11643 Support (2022-09-12)" = "Enable CNS11643 Support (2022-09-12)";
+"Enable CNS11643 Support (2022-10-04)" = "Enable CNS11643 Support (2022-10-04)";
 "Enable Space key for calling candidate window" = "Enable Space key for calling candidate window";
 "Enable symbol input support (incl. certain emoji symbols)" = "Enable symbol input support (incl. certain emoji symbols)";
 "Enforce conversion in both input modes" = "Enforce conversion in both input modes";
