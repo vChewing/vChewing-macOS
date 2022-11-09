@@ -105,7 +105,8 @@ public class UpdateSputnik {
       let intCurrentVersion = Int(dicMainBundle[kCFBundleVersionKey as String] as? String ?? ""),
       let strCurrentVersionShortened = dicMainBundle["CFBundleShortVersionString"] as? String
     else { return }  // Shouldn't happen.
-    if intRemoteVersion <= intCurrentVersion, isCurrentCheckForced {
+    if intRemoteVersion <= intCurrentVersion {
+      guard isCurrentCheckForced else { return }
       let alert = NSAlert()
       alert.messageText = NSLocalizedString("Update Check Completed", comment: "")
       alert.informativeText = NSLocalizedString("You are already using the latest version.", comment: "")
