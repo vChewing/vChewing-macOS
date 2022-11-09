@@ -136,11 +136,11 @@ public struct AppProperty<Value> {
   }
 }
 
-// MARK: - String Extension
+// MARK: - String RegReplace Extension
 
+// Ref: https://stackoverflow.com/a/40993403/4162914 && https://stackoverflow.com/a/71291137/4162914
 extension String {
   public mutating func regReplace(pattern: String, replaceWith: String = "") {
-    // Ref: https://stackoverflow.com/a/40993403/4162914 && https://stackoverflow.com/a/71291137/4162914
     do {
       let regex = try NSRegularExpression(
         pattern: pattern, options: [.caseInsensitive, .anchorsMatchLines]
@@ -150,5 +150,16 @@ extension String {
         in: self, options: [], range: range, withTemplate: replaceWith
       )
     } catch { return }
+  }
+}
+
+// MARK: - String CharName Extension
+
+extension String {
+  public var charDescriptions: [String] {
+    flatMap(\.unicodeScalars).compactMap {
+      let theName: String = $0.properties.name ?? ""
+      return String(format: "U+%02X %@", $0.value, theName)
+    }
   }
 }

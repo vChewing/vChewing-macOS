@@ -8,6 +8,7 @@
 
 import SSPreferences
 import Shared
+import SwiftExtension
 import SwiftUI
 
 @available(macOS 10.15, *)
