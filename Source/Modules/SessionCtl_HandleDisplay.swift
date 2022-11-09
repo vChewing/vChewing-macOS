@@ -81,6 +81,9 @@ extension SessionCtl {
         ? .vertical
         : .horizontal)
 
+    /// 先取消既有的選字窗的內容顯示。否則可能會重複生成選字窗的 NSWindow()。
+    ctlCandidateCurrent.visible = false
+    /// 然後再重新初期化。
     if #available(macOS 10.15, *) {
       ctlCandidateCurrent =
         PrefMgr.shared.useIMKCandidateWindow
