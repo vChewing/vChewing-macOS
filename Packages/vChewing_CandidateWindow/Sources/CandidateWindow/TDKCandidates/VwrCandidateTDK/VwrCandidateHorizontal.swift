@@ -39,7 +39,7 @@ public struct VwrCandidateHorizontal: View {
   @Environment(\.colorScheme) var colorScheme
   @State public var thePool: CandidatePool
   @State public var tooltip: String = ""
-  @State public var reverseLookupResult: [String] = ["MLGB"]
+  @State public var reverseLookupResult: [String] = []
 
   private var positionLabel: String {
     (thePool.highlightedIndex + 1).description + "/" + thePool.candidateDataAll.count.description
