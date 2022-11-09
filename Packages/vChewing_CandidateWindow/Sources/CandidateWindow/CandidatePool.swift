@@ -188,6 +188,7 @@ public class CandidatePool {
       case .vertical: highlightVertical(at: indexSpecified)
       @unknown default: break
     }
+    vCLog("\n" + candidateDataAll[highlightedIndex].charDescriptions)
   }
 }
 
