@@ -188,7 +188,6 @@ extension InputHandler {
         delegate.switchState(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
       } else {
         delegate.callError("1149908D")
-        delegate.switchState(state)
       }
       return true
     }
@@ -210,7 +209,6 @@ extension InputHandler {
         delegate.switchState(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
       } else {
         delegate.callError("9B51408D")
-        delegate.switchState(state)
       }
       return true
     }
@@ -225,7 +223,6 @@ extension InputHandler {
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handlePunctuation(_ customPunctuation: String) -> Bool {
     guard let delegate = delegate else { return false }
-    let state = delegate.state
 
     if !currentLM.hasUnigramsFor(key: customPunctuation) {
       return false
@@ -234,13 +231,11 @@ extension InputHandler {
     guard isComposerOrCalligrapherEmpty else {
       // 注音沒敲完的情況下，無視標點輸入。
       delegate.callError("A9B69908D")
-      delegate.switchState(state)
       return true
     }
 
     guard compositor.insertKey(customPunctuation) else {
       delegate.callError("C0793A6D: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。")
-      delegate.switchState(state)
       return true
     }
 
@@ -388,7 +383,6 @@ extension InputHandler {
         walk()
       } else {
         delegate.callError("9D69908D")
-        delegate.switchState(state)
         return true
       }
     } else {
@@ -420,7 +414,6 @@ extension InputHandler {
 
     if compositor.cursor == compositor.length, isComposerOrCalligrapherEmpty {
       delegate.callError("9B69938D")
-      delegate.switchState(state)
       return true
     }
 
@@ -449,7 +442,6 @@ extension InputHandler {
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
     if !isComposerOrCalligrapherEmpty { delegate.callError("9B6F908D") }
-    delegate.switchState(state)
     return true
   }
 
@@ -464,7 +456,6 @@ extension InputHandler {
 
     if !isComposerOrCalligrapherEmpty {
       delegate.callError("ABC44080")
-      delegate.switchState(state)
       return true
     }
 
@@ -473,7 +464,6 @@ extension InputHandler {
       delegate.switchState(generateStateOfInputting())
     } else {
       delegate.callError("66D97F90")
-      delegate.switchState(state)
     }
 
     return true
@@ -490,7 +480,6 @@ extension InputHandler {
 
     if !isComposerOrCalligrapherEmpty {
       delegate.callError("9B69908D")
-      delegate.switchState(state)
       return true
     }
 
@@ -499,7 +488,6 @@ extension InputHandler {
       delegate.switchState(generateStateOfInputting())
     } else {
       delegate.callError("9B69908E")
-      delegate.switchState(state)
     }
 
     return true
@@ -543,7 +531,6 @@ extension InputHandler {
 
     if !isComposerOrCalligrapherEmpty {
       delegate.callError("B3BA5257")
-      delegate.switchState(state)
       return true
     }
 
@@ -564,7 +551,6 @@ extension InputHandler {
         delegate.switchState(marking)
       } else {
         delegate.callError("BB7F6DB9")
-        delegate.switchState(state)
       }
     } else if input.isOptionHold {
       if input.isControlHold {
@@ -573,7 +559,6 @@ extension InputHandler {
       // 游標跳轉動作無論怎樣都會執行，但如果出了執行失敗的結果的話則觸發報錯流程。
       if !compositor.jumpCursorBySpan(to: .front) {
         delegate.callError("33C3B580")
-        delegate.switchState(state)
         return true
       }
       delegate.switchState(generateStateOfInputting())
@@ -586,7 +571,6 @@ extension InputHandler {
         delegate.switchState(generateStateOfInputting())
       } else {
         delegate.callError("A96AAD58")
-        delegate.switchState(state)
       }
     }
 
@@ -606,7 +590,6 @@ extension InputHandler {
 
     if !isComposerOrCalligrapherEmpty {
       delegate.callError("6ED95318")
-      delegate.switchState(state)
       return true
     }
 
@@ -627,14 +610,12 @@ extension InputHandler {
         delegate.switchState(marking)
       } else {
         delegate.callError("D326DEA3")
-        delegate.switchState(state)
       }
     } else if input.isOptionHold {
       if input.isControlHold { return handleHome() }
       // 游標跳轉動作無論怎樣都會執行，但如果出了執行失敗的結果的話則觸發報錯流程。
       if !compositor.jumpCursorBySpan(to: .rear) {
         delegate.callError("8D50DD9E")
-        delegate.switchState(state)
         return true
       }
       delegate.switchState(generateStateOfInputting())
@@ -647,7 +628,6 @@ extension InputHandler {
         delegate.switchState(generateStateOfInputting())
       } else {
         delegate.callError("7045E6F3")
-        delegate.switchState(state)
       }
     }
 

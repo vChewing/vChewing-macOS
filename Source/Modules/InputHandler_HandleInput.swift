@@ -29,7 +29,7 @@ extension InputHandler {
     guard !input.text.isEmpty, input.charCode.isPrintable, let delegate = delegate else { return false }
 
     let inputText: String = input.text
-    var state = delegate.state  // 常數轉變數。
+    var state: IMEStateProtocol { delegate.state }  // 常數轉變數。
 
     // 提前過濾掉一些不合規的按鍵訊號輸入，免得相關按鍵訊號被送給 Megrez 引發輸入法崩潰。
     if input.isInvalid {
@@ -37,7 +37,6 @@ extension InputHandler {
       // 因為「.Abortion」會在處理之後被自動轉為「.Empty」，所以不需要單獨判斷。
       if state.type == .ofEmpty || state.type == .ofDeactivated { return false }
       delegate.callError("550BCF7B: InputHandler just refused an invalid input.")
-      delegate.switchState(state)
       return true
     }
 
@@ -104,8 +103,7 @@ extension InputHandler {
 
     if state.type == .ofMarking {
       if handleMarkingState(input: input) { return true }
-      state = state.convertedToInputting
-      delegate.switchState(state)
+      delegate.switchState(state.convertedToInputting)
     }
 
     // MARK: 注音按鍵輸入處理 (Handle BPMF Keys)
@@ -285,7 +283,6 @@ extension InputHandler {
     if state.hasComposition || !isComposerOrCalligrapherEmpty {
       delegate.callError("Blocked data: charCode: \(input.charCode), keyCode: \(input.keyCode), text: \(input.text)")
       delegate.callError("A9BFF20E")
-      delegate.switchState(state)
       return true
     }
 
