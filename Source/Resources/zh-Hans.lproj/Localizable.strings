@@ -177,7 +177,7 @@
 "Disassembling process does not work with non-phonetic reading keys." = "析构行为仅针对组字器内「身为汉字读音」的读音索引单元有效。";
 "Emulating select-candidate-per-character mode" = "模拟 90 年代前期注音逐字选字输入风格";
 "Enable cassette mode, suppressing phonabet input" = "启用磁带模式，会停用注音输入";
-"Enable CNS11643 Support (2022-09-12)" = "启用 CNS11643 全字库支援 (2022-09-12)";
+"Enable CNS11643 Support (2022-10-04)" = "启用 CNS11643 全字库支援 (2022-10-04)";
 "Enable Space key for calling candidate window" = "敲空格键以呼出候选字窗";
 "Enable symbol input support (incl. certain emoji symbols)" = "启用包括少许绘文字在内的符号输入支援";
 "Enforce conversion in both input modes" = "依当前简繁模式强制转换";
