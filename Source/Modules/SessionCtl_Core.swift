@@ -166,9 +166,9 @@ extension SessionCtl {
   }
 
   /// 重設輸入調度模組，會將當前尚未遞交的內容遞交出去。
-  public func resetInputHandler() {
+  public func resetInputHandler(forceComposerCleanup forceCleanup: Bool = false) {
     // 過濾掉尚未完成拼寫的注音。
-    if state.type == .ofInputting, PrefMgr.shared.trimUnfinishedReadingsOnCommit {
+    if state.type == .ofInputting, PrefMgr.shared.trimUnfinishedReadingsOnCommit || forceCleanup {
       inputHandler.clearComposerAndCalligrapher()
       switchState(inputHandler.generateStateOfInputting())
     }
