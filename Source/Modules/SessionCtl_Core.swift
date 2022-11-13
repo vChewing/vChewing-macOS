@@ -110,7 +110,6 @@ public class SessionCtl: IMKInputController {
     didSet {
       if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(inputMode) }
       if oldValue != inputMode, inputMode != .imeModeNULL {
-        UserDefaults.standard.synchronize()
         inputHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
         // ----------------------------
         /// 重設所有語言模組。這裡不需要做按需重設，因為對運算量沒有影響。
@@ -186,7 +185,6 @@ extension SessionCtl {
   public override func activateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     DispatchQueue.main.async { [self] in
-      UserDefaults.standard.synchronize()
       if Self.allInstances.contains(self) { return }
 
       // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
