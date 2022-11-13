@@ -110,7 +110,6 @@ public class SessionCtl: IMKInputController {
     didSet {
       if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(inputMode) }
       if oldValue != inputMode, inputMode != .imeModeNULL {
-        inputHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
         // ----------------------------
         /// 重設所有語言模組。這裡不需要做按需重設，因為對運算量沒有影響。
         inputHandler.currentLM = LMMgr.currentLM  // 會自動更新組字引擎內的模組。
@@ -120,7 +119,7 @@ public class SessionCtl: IMKInputController {
         /// 將輸入法偏好設定同步至語言模組內。
         syncBaseLMPrefs()
         /// 重置輸入調度模組。
-        resetInputHandler()
+        resetInputHandler(forceComposerCleanup: true)
       }
     }
   }
