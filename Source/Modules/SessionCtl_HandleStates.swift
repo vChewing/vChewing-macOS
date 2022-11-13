@@ -45,12 +45,8 @@ extension SessionCtl {
         ctlCandidateCurrent.visible = false
         popupCompositionBuffer.hide()
         tooltipInstance.hide()
-        if previous.hasComposition {
-          commit(text: previous.displayedText)
-        }
-        // clearInlineDisplay()  // 不需要，否則會觸發無限迴圈。
-        // 最後一道保險
-        inputHandler.clear()
+        // 這裡移除一些處理，轉而交給 commitComposition() 代為執行。
+        // 這裡不需要 clearInlineDisplay() ，否則會觸發無限迴圈。
         // 特殊處理：deactivateServer() 可能會遲於另一個客體會話的 activateServer() 執行。
         // 雖然所有在這個函式內影響到的變數都改為動態變數了（不會出現跨副本波及的情況），
         // 但 IMKCandidates 是有內部共用副本的、會被波及。
