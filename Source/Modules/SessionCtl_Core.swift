@@ -277,6 +277,7 @@ extension SessionCtl {
   public override func commitComposition(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     resetInputHandler()
+    clearInlineDisplay()
     // super.commitComposition(sender)  // 這句不要引入，否則每次切出輸入法時都會死當。
   }
 

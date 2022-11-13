@@ -115,7 +115,7 @@ extension SessionCtl {
   }
 
   /// 在處理某些「沒有組字區內容顯示」且「不需要攔截某些按鍵處理」的狀態時使用的函式，會清空螢幕上顯示的組字區。
-  private func clearInlineDisplay() {
+  public func clearInlineDisplay() {
     doSetMarkedText(
       "", selectionRange: NSRange(location: 0, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
