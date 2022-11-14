@@ -45,12 +45,8 @@ extension SessionCtl {
         ctlCandidateCurrent.visible = false
         popupCompositionBuffer.hide()
         tooltipInstance.hide()
-        if previous.hasComposition {
-          commit(text: previous.displayedText)
-        }
-        clearInlineDisplay()  // 該函式有對 client 做 guard-let 保護，不會出現上游 #346 的問題。
-        // 最後一道保險
-        inputHandler.clear()
+        // 這裡移除一些處理，轉而交給 commitComposition() 代為執行。
+        // 這裡不需要 clearInlineDisplay() ，否則會觸發無限迴圈。
         // 特殊處理：deactivateServer() 可能會遲於另一個客體會話的 activateServer() 執行。
         // 雖然所有在這個函式內影響到的變數都改為動態變數了（不會出現跨副本波及的情況），
         // 但 IMKCandidates 是有內部共用副本的、會被波及。
@@ -119,7 +115,7 @@ extension SessionCtl {
   }
 
   /// 在處理某些「沒有組字區內容顯示」且「不需要攔截某些按鍵處理」的狀態時使用的函式，會清空螢幕上顯示的組字區。
-  private func clearInlineDisplay() {
+  public func clearInlineDisplay() {
     doSetMarkedText(
       "", selectionRange: NSRange(location: 0, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
@@ -150,7 +146,7 @@ extension SessionCtl {
 
   /// 把 setMarkedText 包裝一下，按需啟用 GCD。
   public func doSetMarkedText(_ string: Any!, selectionRange: NSRange, replacementRange: NSRange) {
-    guard let client = client() else { return }
+    guard isActivated, let client = client() else { return }
     if let myID = Bundle.main.bundleIdentifier, let clientID = client.bundleIdentifier(), myID == clientID {
       DispatchQueue.main.async {
         client.setMarkedText(string, selectionRange: selectionRange, replacementRange: replacementRange)

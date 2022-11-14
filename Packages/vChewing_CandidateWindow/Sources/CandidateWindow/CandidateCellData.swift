@@ -132,6 +132,14 @@ public class CandidateCellData: Hashable {
     let attrStrCandidate = NSMutableAttributedString(string: displayedText, attributes: attrCandidate)
     return attrStrCandidate
   }
+
+  public var charDescriptions: String {
+    var result = displayedText
+    if displayedText.contains("("), displayedText.count > 2 {
+      result = displayedText.replacingOccurrences(of: "(", with: "").replacingOccurrences(of: ")", with: "")
+    }
+    return result.charDescriptions.joined(separator: "\n")
+  }
 }
 
 // MARK: - Contents specifically made for macOS 12 and newer.
