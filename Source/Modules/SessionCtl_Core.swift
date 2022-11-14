@@ -194,6 +194,7 @@ extension SessionCtl {
       inputHandler.ensureKeyboardParser()
 
       Self.theShiftKeyDetector.alsoToggleWithLShift = PrefMgr.shared.togglingAlphanumericalModeWithLShift
+      Self.isVerticalTyping = isVerticalTyping
 
       if #available(macOS 10.15, *) {
         if isASCIIMode, PrefMgr.shared.disableShiftTogglingAlphanumericalMode { isASCIIMode = false }
@@ -233,9 +234,7 @@ extension SessionCtl {
     _ = tag  // 防止格式整理工具毀掉與此對應的參數。
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     DispatchQueue.main.async { [self] in
-      let mostRecentInputMode = PrefMgr.shared.mostRecentInputMode
-      inputMode = .init(rawValue: value as? String ?? mostRecentInputMode) ?? .imeModeNULL
-      Self.isVerticalTyping = isVerticalTyping
+      inputMode = .init(rawValue: value as? String ?? PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
     }
   }
 
