@@ -136,6 +136,16 @@ public struct AppProperty<Value> {
   }
 }
 
+// MARK: - 引入小數點位數控制函式
+
+// Ref: https://stackoverflow.com/a/32581409/4162914
+extension Double {
+  public func rounded(toPlaces places: Int) -> Double {
+    let divisor = pow(10.0, Double(places))
+    return (self * divisor).rounded() / divisor
+  }
+}
+
 // MARK: - String RegReplace Extension
 
 // Ref: https://stackoverflow.com/a/40993403/4162914 && https://stackoverflow.com/a/71291137/4162914
