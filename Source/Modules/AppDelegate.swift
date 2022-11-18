@@ -13,23 +13,31 @@ import Uninstaller
 import UpdateSputnik
 
 @objc(AppDelegate)
-class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDelegate {
+public class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDelegate {
+  private var folderMonitor = FolderMonitor(
+    url: URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
+  )
+}
+
+// MARK: - Private Functions
+
+extension AppDelegate {
   private func reloadOnFolderChangeHappens() {
     // 拖 100ms 再重載，畢竟有些有特殊需求的使用者可能會想使用巨型自訂語彙檔案。
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
       if PrefMgr.shared.shouldAutoReloadUserDataFiles { LMMgr.initUserLangModels() }
     }
   }
+}
 
-  public var folderMonitor = FolderMonitor(
-    url: URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
-  )
+// MARK: - Public Functions
 
-  func userNotificationCenter(_: NSUserNotificationCenter, shouldPresent _: NSUserNotification) -> Bool {
+extension AppDelegate {
+  public func userNotificationCenter(_: NSUserNotificationCenter, shouldPresent _: NSUserNotification) -> Bool {
     true
   }
 
-  func applicationDidFinishLaunching(_: Notification) {
+  public func applicationDidFinishLaunching(_: Notification) {
     NSUserNotificationCenter.default.delegate = self
     // 一旦發現與使用者半衰模組的觀察行為有關的崩潰標記被開啟，就清空既有的半衰記憶資料檔案。
     if PrefMgr.shared.failureFlagForUOMObservation {
@@ -38,8 +46,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
       PrefMgr.shared.failureFlagForUOMObservation = false
       let userNotification = NSUserNotification()
       userNotification.title = NSLocalizedString("vChewing", comment: "")
-      userNotification.informativeText =
-        "\(NSLocalizedString("vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability.", comment: ""))"
+      userNotification.informativeText = NSLocalizedString(
+        "vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability.",
+        comment: "")
       userNotification.soundName = NSUserNotificationDefaultSoundName
       NSUserNotificationCenter.default.deliver(userNotification)
     }
@@ -62,7 +71,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     }
   }
 
-  func updateDirectoryMonitorPath() {
+  public func updateDirectoryMonitorPath() {
     folderMonitor.stopMonitoring()
     folderMonitor = FolderMonitor(
       url: URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
@@ -73,7 +82,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     if LMMgr.userDataFolderExists { folderMonitor.startMonitoring() }
   }
 
-  func selfUninstall() {
+  public func selfUninstall() {
     let content = String(
       format: NSLocalizedString(
         "This will remove vChewing Input Method from this user account, requiring your confirmation.",
@@ -97,7 +106,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
   }
 
   // New About Window
-  @IBAction func about(_: Any) {
+  @IBAction public func about(_: Any) {
     CtlAboutWindow.show()
     NSApp.activate(ignoringOtherApps: true)
   }
