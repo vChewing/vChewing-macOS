@@ -25,7 +25,7 @@ import UpdateSputnik
 /// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
 @objc(SessionCtl)  // 必須加上 ObjC，因為 IMK 是用 ObjC 寫的。
 public class SessionCtl: IMKInputController {
-  public static var allInstances: Set<SessionCtl> = .init()
+  public static var allInstances: NSMutableOrderedSet = .init()
 
   /// 標記狀態來聲明目前新增的詞彙是否需要賦以非常低的權重。
   public static var areWeNerfing = false
@@ -207,7 +207,7 @@ extension SessionCtl {
 
       state = IMEState.ofEmpty()
       isActivated = true  // 登記啟用狀態。
-      Self.allInstances.insert(self)
+      Self.allInstances.insert(self, at: 0)
       setKeyLayout()
     }
   }
