@@ -97,7 +97,7 @@ extension InputHandler {
         let newEvent = event.reinitiate(characters: newChar)
         if let newEvent = newEvent {
           if prefs.useSCPCTypingMode, delegate.state.type == .ofAssociates {
-            // 註：input.isShiftHold 已經在 Self.handle() 內處理，因為在那邊處理才有效。
+            // 註：input.isShiftHold 已經在 delegate.handle() 內處理，因為在那邊處理才有效。
             return event.isShiftHold ? true : handleInput(event: event)
           } else {
             if #available(macOS 10.14, *) {
