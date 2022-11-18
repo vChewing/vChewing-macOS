@@ -9,6 +9,7 @@
 // requirements defined in MIT License.
 
 import FolderMonitor
+import Shared
 import Uninstaller
 import UpdateSputnik
 
@@ -48,7 +49,8 @@ extension AppDelegate {
       userNotification.title = NSLocalizedString("vChewing", comment: "")
       userNotification.informativeText = NSLocalizedString(
         "vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability.",
-        comment: "")
+        comment: ""
+      )
       userNotification.soundName = NSUserNotificationDefaultSoundName
       NSUserNotificationCenter.default.deliver(userNotification)
     }
@@ -103,6 +105,29 @@ extension AppDelegate {
       )
     }
     NSApp.setActivationPolicy(.accessory)
+  }
+
+  /// 檢查該程式本身的記憶體佔用量。
+  /// - Returns: 記憶體佔用量（MiB）。
+  @discardableResult public func checkMemoryUsage() -> Double {
+    guard let currentMemorySizeInBytes = NSApplication.memoryFootprint else { return 0 }
+    let currentMemorySize: Double = (Double(currentMemorySizeInBytes) / 1024 / 1024).rounded(toPlaces: 1)
+    switch currentMemorySize {
+      case 300...:
+        vCLog("WARNING: EXCESSIVE MEMORY FOOTPRINT (\(currentMemorySize)MB).")
+        let userNotification = NSUserNotification()
+        userNotification.title = NSLocalizedString("vChewing", comment: "")
+        userNotification.informativeText = NSLocalizedString(
+          "vChewing is rebooted due to a memory-excessive-usage problem. If convenient, please inform the developer that you are having this issue, stating whether you are using an Intel Mac or Apple Silicon Mac. An NSLog is generated with the current memory footprint size.",
+          comment: ""
+        )
+        NSUserNotificationCenter.default.deliver(userNotification)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+          NSApp.terminate(self)
+        }
+      default: break
+    }
+    return currentMemorySize
   }
 
   // New About Window
