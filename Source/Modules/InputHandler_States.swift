@@ -140,10 +140,14 @@ extension InputHandler {
 
     // Enter
     if input.isEnter {
+      var tooltipMessage = "+ Successful in adding / boosting a user phrase."
       // 先判斷是否是在摁了降權組合鍵的時候目標不在庫。
-      if input.isShiftHold, input.isCommandHold, !state.isFilterable {
-        delegate.callError("2EAC1F7A")
-        return true
+      if input.isShiftHold, input.isCommandHold {
+        tooltipMessage = "- Successful in nerfing a user phrase."
+        if !state.isFilterable {
+          delegate.callError("2EAC1F7A")
+          return true
+        }
       }
       if !state.isMarkedLengthValid {
         delegate.callError("9AAFAC00")
@@ -153,12 +157,16 @@ extension InputHandler {
         delegate.callError("5B69CC8D")
         return true
       }
-      delegate.switchState(generateStateOfInputting())
+      var newState = generateStateOfInputting()
+      newState.tooltip = NSLocalizedString(tooltipMessage, comment: "") + "　　"
+      newState.data.tooltipColorState = .normal
+      delegate.switchState(newState)
       return true
     }
 
     // BackSpace & Delete
     if input.isBackSpace || input.isDelete {
+      let tooltipMessage = "! Successful in filtering a user phrase."
       if !state.isFilterable {
         delegate.callError("1F88B191")
         return true
@@ -167,7 +175,10 @@ extension InputHandler {
         delegate.callError("68D3C6C8")
         return true
       }
-      delegate.switchState(generateStateOfInputting())
+      var newState = generateStateOfInputting()
+      newState.tooltip = NSLocalizedString(tooltipMessage, comment: "") + "　　"
+      newState.data.tooltipColorState = .normal
+      delegate.switchState(newState)
       return true
     }
 
