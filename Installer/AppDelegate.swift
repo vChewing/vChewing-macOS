@@ -13,6 +13,7 @@ import IMKUtils
 import InputMethodKit
 
 public let kTargetBin = "vChewing"
+public let kTargetBinPhraseEditor = "vChewingPhraseEditor"
 public let kTargetType = "app"
 public let kTargetBundle = "vChewing.app"
 public let kTargetBundleWithComponents = "Library/Input%20Methods/vChewing.app"
