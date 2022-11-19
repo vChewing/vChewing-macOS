@@ -25,8 +25,6 @@ import UpdateSputnik
 /// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
 @objc(SessionCtl)  // 必須加上 ObjC，因為 IMK 是用 ObjC 寫的。
 public class SessionCtl: IMKInputController {
-  public static var allInstances: Set<SessionCtl> = .init()
-
   /// 標記狀態來聲明目前新增的詞彙是否需要賦以非常低的權重。
   public static var areWeNerfing = false
 
@@ -121,6 +119,15 @@ public class SessionCtl: IMKInputController {
         /// 重置輸入調度模組。
         resetInputHandler(forceComposerCleanup: true)
       }
+      // 特殊處理：deactivateServer() 可能會遲於另一個客體會話的 activateServer() 執行。
+      // 雖然所有在這個函式內影響到的變數都改為動態變數了（不會出現跨副本波及的情況），
+      // 但 IMKCandidates 是有內部共用副本的、會被波及。所以在這裡糾偏一下。
+      if PrefMgr.shared.useIMKCandidateWindow {
+        guard let imkC = ctlCandidateCurrent as? CtlCandidateIMK else { return }
+        if state.isCandidateContainer, !imkC.visible {
+          handle(state: state, replace: false)
+        }
+      }
     }
   }
 
@@ -184,7 +191,7 @@ extension SessionCtl {
   public override func activateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     DispatchQueue.main.async { [self] in
-      if Self.allInstances.contains(self) { return }
+      if isActivated { return }
 
       // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
       // 所以這裡添加這句、來試圖應對這種情況。
@@ -202,11 +209,11 @@ extension SessionCtl {
 
       DispatchQueue.main.async {
         UpdateSputnik.shared.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
+        (NSApp.delegate as? AppDelegate)?.checkMemoryUsage()
       }
 
       state = IMEState.ofEmpty()
       isActivated = true  // 登記啟用狀態。
-      Self.allInstances.insert(self)
       setKeyLayout()
     }
   }
@@ -219,7 +226,6 @@ extension SessionCtl {
       isActivated = false
       resetInputHandler()  // 這條會自動搞定 Empty 狀態。
       switchState(IMEState.ofDeactivated())
-      Self.allInstances.remove(self)
     }
   }
 

@@ -94,3 +94,27 @@ extension FileManager {
     return true
   }
 }
+
+// MARK: - Memory Footprint Calculator
+
+// Ref: https://developer.apple.com/forums/thread/105088?answerId=357415022#357415022
+extension NSApplication {
+  /// The memory footprint of the current application in bytes.
+  public static var memoryFootprint: UInt64? {
+    // The `TASK_VM_INFO_COUNT` and `TASK_VM_INFO_REV1_COUNT` macros are too
+    // complex for the Swift C importer, so we have to define them ourselves.
+    let tskVMInfoCount = mach_msg_type_number_t(
+      MemoryLayout<task_vm_info_data_t>.size / MemoryLayout<integer_t>.size)
+    let tskVMInfoRev1Count = mach_msg_type_number_t(
+      MemoryLayout.offset(of: \task_vm_info_data_t.min_address)! / MemoryLayout<integer_t>.size)
+    var info = task_vm_info_data_t()
+    var count = tskVMInfoCount
+    let kr = withUnsafeMutablePointer(to: &info) { infoPtr in
+      infoPtr.withMemoryRebound(to: integer_t.self, capacity: Int(count)) { intPtr in
+        task_info(mach_task_self_, task_flavor_t(TASK_VM_INFO), intPtr, &count)
+      }
+    }
+    guard kr == KERN_SUCCESS, count >= tskVMInfoRev1Count else { return nil }
+    return info.phys_footprint as UInt64
+  }
+}

@@ -88,7 +88,7 @@ struct VwrPrefPaneDictionary: View {
                       PrefMgr.shared.userDataFolderSpecified = newPath
                       tbxUserDataPathSpecified = PrefMgr.shared.userDataFolderSpecified
                       BookmarkManager.shared.saveBookmark(for: url)
-                      (NSApp.delegate as! AppDelegate).updateDirectoryMonitorPath()
+                      (NSApp.delegate as? AppDelegate)?.updateDirectoryMonitorPath()
                     } else {
                       IMEApp.buzz()
                       if !bolPreviousFolderValidity {

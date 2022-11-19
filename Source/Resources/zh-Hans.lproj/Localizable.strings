@@ -1,4 +1,8 @@
 "vChewing" = "威注音输入法";
+"! Successful in filtering a user phrase." = "! 成功滤除该词音配对。";
+"- Successful in nerfing a user phrase." = "- 成功将该词音配对降权处理。";
+"+ Successful in adding / boosting a user phrase." = "+ 成功添入使用者语汇（或使其升权）。";
+"vChewing is rebooted due to a memory-excessive-usage problem. If convenient, please inform the developer that you are having this issue, stating whether you are using an Intel Mac or Apple Silicon Mac. An NSLog is generated with the current memory footprint size." = "威注音输入法因记忆体用量过大的问题而重新启动。如果您方便的话，请就这个问题知会该输入法的主程式师、且请务必说明自己在用的是 Intel 机种还是 Apple Silicon 机种。当前输入法记忆体用量已借由 NSLog 记录输出。";
 "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key." = "请自行以「_punctuation_list」索引键\n在使用者自订语汇档案内扩充该符号选单的内容。";"Wildcard key cannot be the initial key." = "花牌键不得作为起始码。";
 "Wildcard key cannot be the initial key." = "花牌键不得作为起始码。";
 "CIN Cassette Mode" = "CIN 磁带模式";

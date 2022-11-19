@@ -1,6 +1,7 @@
 #!/bin/sh
 
 killall vChewing || true
+killall vChewingPhraseEditor || true
 
 if [ "${login_user}" = root ]; then
     rm -rf /Library/Input\ Methods/vChewing.app || true

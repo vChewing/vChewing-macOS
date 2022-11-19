@@ -42,23 +42,12 @@ extension SessionCtl {
     if replace { state = newState }
     switch newState.type {
       case .ofDeactivated:
+        // 這裡移除一些處理，轉而交給 commitComposition() 代為執行。
+        // 這裡不需要 clearInlineDisplay() ，否則會觸發無限迴圈。
+        // 對於 IMK 選字窗的顯示狀態糾正的行為交給 inputMode.didSet() 來處理。
         ctlCandidateCurrent.visible = false
         popupCompositionBuffer.hide()
         tooltipInstance.hide()
-        // 這裡移除一些處理，轉而交給 commitComposition() 代為執行。
-        // 這裡不需要 clearInlineDisplay() ，否則會觸發無限迴圈。
-        // 特殊處理：deactivateServer() 可能會遲於另一個客體會話的 activateServer() 執行。
-        // 雖然所有在這個函式內影響到的變數都改為動態變數了（不會出現跨副本波及的情況），
-        // 但 IMKCandidates 是有內部共用副本的、會被波及。
-        // 所以在這裡糾偏一下、讓所有開啟了選字窗的會話重新顯示選字窗。
-        if PrefMgr.shared.useIMKCandidateWindow {
-          for instance in Self.allInstances {
-            guard let imkC = instance.ctlCandidateCurrent as? CtlCandidateIMK else { continue }
-            if instance.state.isCandidateContainer, !imkC.visible {
-              instance.handle(state: instance.state, replace: false)
-            }
-          }
-        }
       case .ofEmpty, .ofAbortion, .ofCommitting:
         innerCircle: switch newState.type {
           case .ofAbortion:

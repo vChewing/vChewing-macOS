@@ -1,4 +1,8 @@
 "vChewing" = "威注音入力アプリ";
+"! Successful in filtering a user phrase." = "! この語彙は排除表に登録完了。";
+"- Successful in nerfing a user phrase." = "- この語彙の（候補としての）優先順位を下げました。";
+"+ Successful in adding / boosting a user phrase." = "+ 新しいユーザー候補を登録完了、\n或いはその既存候補の順位を最優先にしました。";
+"vChewing is rebooted due to a memory-excessive-usage problem. If convenient, please inform the developer that you are having this issue, stating whether you are using an Intel Mac or Apple Silicon Mac. An NSLog is generated with the current memory footprint size." = "威注音入力アプリはメモリー使用量多すぎたため、再起動しました。もし、よろしければ、この問題について、開発元にご連絡をし、そしてこのパソコンの CPU 種類情報（Intel か、Apple Silicon か）も一緒に教えてください。今のメモリー使用量は NSLog にて記録済みである。";
 "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key." = "このメニューのお用いには、ご自分でユーザー辞書で\n「_punctuation_list」キーの符号記録のご補充が必要でござる。";
 "Wildcard key cannot be the initial key." = "骨牌キーは最初のキーとしてはならぬ。";
 "CIN Cassette Mode" = "CIN カセットモード";
