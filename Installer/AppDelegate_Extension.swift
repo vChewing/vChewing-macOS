@@ -51,6 +51,12 @@ extension AppDelegate {
     killTask.launch()
     killTask.waitUntilExit()
 
+    let killTask2 = Process()
+    killTask2.launchPath = "/usr/bin/killall"
+    killTask2.arguments = ["-9", kTargetBinPhraseEditor]
+    killTask2.launch()
+    killTask2.waitUntilExit()
+
     if shouldWaitForTranslocationRemoval {
       progressIndicator.startAnimation(self)
       window.beginSheet(progressSheet) { returnCode in
