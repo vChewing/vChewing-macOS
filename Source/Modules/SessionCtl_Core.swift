@@ -55,12 +55,24 @@ public class SessionCtl: IMKInputController {
   public var isCapsLocked: Bool { NSEvent.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock) }
 
   /// 當前這個 SessionCtl 副本是否處於英數輸入模式。
-  public var isASCIIMode = false {
-    didSet {
+  public var isASCIIMode: Bool {
+    get {
+      PrefMgr.shared.shareAlphanumericalModeStatusAcrossClients
+        ? Self.isASCIIModeForAllClients : isASCIIModeForThisClient
+    }
+    set {
+      if PrefMgr.shared.shareAlphanumericalModeStatusAcrossClients {
+        Self.isASCIIModeForAllClients = newValue
+      } else {
+        isASCIIModeForThisClient = newValue
+      }
       resetInputHandler()
       setKeyLayout()
     }
   }
+
+  private var isASCIIModeForThisClient = false  // 給每個副本用的。
+  private static var isASCIIModeForAllClients = false  // 給所有副本共用的。
 
   /// 輸入調度模組的副本。
   var inputHandler: InputHandlerProtocol = InputHandler(
