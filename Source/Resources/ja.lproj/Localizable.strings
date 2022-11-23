@@ -227,6 +227,7 @@
 "Secondary Pinyin with Numeral Intonation" = "国音二式 (ローマ字+数字音調)";
 "Seigyou" = "精業配列";
 "Selection Keys:" = "言選り用キー:";
+"Share alphanumerical mode status across all clients" = "全ての客体アプリに英数入力モードの状態を共有";
 "Shift+BackSpace:" = "Shift+BackSpace:";
 "Shift+Letter:" = "Shift+文字キー:";
 "Show available reverse-lookup results in candidate window" = "候補陳列ウィンドウで可能な逆引参照結果を示す";
