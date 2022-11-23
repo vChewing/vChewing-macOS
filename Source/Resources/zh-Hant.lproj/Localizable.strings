@@ -227,6 +227,7 @@
 "Secondary Pinyin with Numeral Intonation" = "國音二式+數字標調";
 "Seigyou" = "精業排列";
 "Selection Keys:" = "選字鍵:";
+"Share alphanumerical mode status across all clients" = "對所有客體應用共用 Shift 中英文輸入切換狀態";
 "Shift+BackSpace:" = "Shift+退格鍵:";
 "Shift+Letter:" = "Shift+字母鍵:";
 "Show available reverse-lookup results in candidate window" = "在選字窗內顯示可用的字根反查結果";
