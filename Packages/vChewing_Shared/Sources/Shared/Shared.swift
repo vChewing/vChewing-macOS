@@ -66,6 +66,7 @@ public enum UserDef: String, CaseIterable {
   case kForceCassetteChineseConversion = "ForceCassetteChineseConversion"
   case kShowReverseLookupInCandidateUI = "ShowReverseLookupInCandidateUI"
   case kAutoCompositeWithLongestPossibleCassetteKey = "AutoCompositeWithLongestPossibleCassetteKey"
+  case kShareAlphanumericalModeStatusAcrossClients = "ShareAlphanumericalModeStatusAcrossClients"
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
