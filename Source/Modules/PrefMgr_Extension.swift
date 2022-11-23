@@ -20,6 +20,7 @@ extension PrefMgr {
       disableShiftTogglingAlphanumericalMode = true
       togglingAlphanumericalModeWithLShift = false
       showReverseLookupInCandidateUI = false
+      shareAlphanumericalModeStatusAcrossClients = false
     }
     // 自動糾正選字鍵 (利用其 didSet 特性)
     candidateKeys = candidateKeys
