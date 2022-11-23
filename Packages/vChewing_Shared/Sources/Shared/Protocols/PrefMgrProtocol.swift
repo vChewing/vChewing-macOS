@@ -53,6 +53,7 @@ public protocol PrefMgrProtocol {
   var forceCassetteChineseConversion: Int { get set }
   var showReverseLookupInCandidateUI: Bool { get set }
   var autoCompositeWithLongestPossibleCassetteKey: Bool { get set }
+  var shareAlphanumericalModeStatusAcrossClients: Bool { get set }
   var cns11643Enabled: Bool { get set }
   var cassetteEnabled: Bool { get set }
   var symbolInputEnabled: Bool { get set }
