@@ -50,6 +50,8 @@ struct VwrPrefPaneExperience: View {
     forKey: UserDef.kAlwaysShowTooltipTextsHorizontally.rawValue)
   @State private var selShowNotificationsWhenTogglingCapsLock = UserDefaults.standard.bool(
     forKey: UserDef.kShowNotificationsWhenTogglingCapsLock.rawValue)
+  @State private var selShareAlphanumericalModeStatusAcrossClients = UserDefaults.standard.bool(
+    forKey: UserDef.kShareAlphanumericalModeStatusAcrossClients.rawValue)
 
   private let contentMaxHeight: Double = 440
   private let contentWidth: Double = {
@@ -202,6 +204,12 @@ struct VwrPrefPaneExperience: View {
             LocalizedStringKey("Also toggle alphanumerical mode with Left-Shift"),
             isOn: $selTogglingAlphanumericalModeWithLShift.onChange {
               PrefMgr.shared.togglingAlphanumericalModeWithLShift = selTogglingAlphanumericalModeWithLShift
+            }
+          ).disabled(PrefMgr.shared.disableShiftTogglingAlphanumericalMode == true)
+          Toggle(
+            LocalizedStringKey("Share alphanumerical mode status across all clients"),
+            isOn: $selShareAlphanumericalModeStatusAcrossClients.onChange {
+              PrefMgr.shared.shareAlphanumericalModeStatusAcrossClients = selShareAlphanumericalModeStatusAcrossClients
             }
           ).disabled(PrefMgr.shared.disableShiftTogglingAlphanumericalMode == true)
         }
