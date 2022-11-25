@@ -29,7 +29,7 @@ public class SessionCtl: IMKInputController {
   public static var areWeNerfing = false
 
   /// 目前在用的的選字窗副本。
-  public var ctlCandidateCurrent: CtlCandidateProtocol = {
+  public var candidateUI: CtlCandidateProtocol = {
     let direction: NSUserInterfaceLayoutOrientation =
       PrefMgr.shared.useHorizontalCandidateList ? .horizontal : .vertical
     if #available(macOS 10.15, *) {
@@ -135,7 +135,7 @@ public class SessionCtl: IMKInputController {
       // 雖然所有在這個函式內影響到的變數都改為動態變數了（不會出現跨副本波及的情況），
       // 但 IMKCandidates 是有內部共用副本的、會被波及。所以在這裡糾偏一下。
       if PrefMgr.shared.useIMKCandidateWindow {
-        guard let imkC = ctlCandidateCurrent as? CtlCandidateIMK else { return }
+        guard let imkC = candidateUI as? CtlCandidateIMK else { return }
         if state.isCandidateContainer, !imkC.visible {
           handle(state: state, replace: false)
         }
@@ -209,7 +209,8 @@ extension SessionCtl {
 
       // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
       // 所以這裡添加這句、來試圖應對這種情況。
-      if inputHandler.delegate == nil { inputHandler.delegate = self }
+      inputHandler.delegate = self
+      candidateUI.delegate = self
       // 這裡不需要 setValue()，因為 IMK 會在自動呼叫 activateServer() 之後自動執行 setValue()。
       inputHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
       inputHandler.ensureKeyboardParser()
