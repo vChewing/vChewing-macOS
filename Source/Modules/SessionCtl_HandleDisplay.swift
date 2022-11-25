@@ -82,35 +82,35 @@ extension SessionCtl {
         : .horizontal)
 
     /// 先取消既有的選字窗的內容顯示。否則可能會重複生成選字窗的 NSWindow()。
-    ctlCandidateCurrent.visible = false
+    candidateUI.visible = false
     /// 然後再重新初期化。
     if #available(macOS 10.15, *) {
-      ctlCandidateCurrent =
+      candidateUI =
         PrefMgr.shared.useIMKCandidateWindow
         ? CtlCandidateIMK(candidateLayout) : CtlCandidateTDK(candidateLayout)
-      if let candidateTDK = ctlCandidateCurrent as? CtlCandidateTDK {
+      if let candidateTDK = candidateUI as? CtlCandidateTDK {
         candidateTDK.maxLinesPerPage = isVerticalTyping ? 1 : 3
       }
     } else {
-      ctlCandidateCurrent = CtlCandidateIMK(candidateLayout)
+      candidateUI = CtlCandidateIMK(candidateLayout)
     }
 
-    ctlCandidateCurrent.candidateFont = Self.candidateFont(
+    candidateUI.candidateFont = Self.candidateFont(
       name: PrefMgr.shared.candidateTextFontName, size: PrefMgr.shared.candidateListTextSize
     )
 
     if PrefMgr.shared.cassetteEnabled {
-      ctlCandidateCurrent.tooltip =
+      candidateUI.tooltip =
         isVerticalTyping ? "📼" : "📼 " + NSLocalizedString("CIN Cassette Mode", comment: "")
     }
 
     if state.type == .ofAssociates {
-      ctlCandidateCurrent.tooltip =
+      candidateUI.tooltip =
         isVerticalTyping ? "⇧" : NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
     }
 
-    ctlCandidateCurrent.useLangIdentifier = PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier
-    ctlCandidateCurrent.locale = {
+    candidateUI.useLangIdentifier = PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier
+    candidateUI.locale = {
       switch inputMode {
         case .imeModeCHS: return "zh-Hans"
         case .imeModeCHT:
@@ -124,18 +124,18 @@ extension SessionCtl {
 
     if #available(macOS 10.14, *) {
       // Spotlight 視窗會擋住 IMK 選字窗，所以需要特殊處理。
-      if let ctlCandidateCurrent = ctlCandidateCurrent as? CtlCandidateIMK {
+      if let ctlCandidateCurrent = candidateUI as? CtlCandidateIMK {
         while ctlCandidateCurrent.windowLevel() <= client.windowLevel() {
           ctlCandidateCurrent.setWindowLevel(UInt64(max(0, client.windowLevel() + 1000)))
         }
       }
     }
 
-    ctlCandidateCurrent.delegate = self  // 會自動觸發田所選字窗的資料重載。
-    ctlCandidateCurrent.visible = true
+    candidateUI.delegate = self  // 會自動觸發田所選字窗的資料重載。
+    candidateUI.visible = true
 
     if isVerticalTyping {
-      ctlCandidateCurrent.set(
+      candidateUI.set(
         windowTopLeftPoint: NSPoint(
           x: lineHeightRect().origin.x + lineHeightRect().size.width + 4.0, y: lineHeightRect().origin.y - 4.0
         ),
@@ -143,7 +143,7 @@ extension SessionCtl {
         useGCD: true
       )
     } else {
-      ctlCandidateCurrent.set(
+      candidateUI.set(
         windowTopLeftPoint: NSPoint(x: lineHeightRect().origin.x, y: lineHeightRect().origin.y - 4.0),
         bottomOutOfScreenAdjustmentHeight: lineHeightRect().size.height + 4.0,
         useGCD: true

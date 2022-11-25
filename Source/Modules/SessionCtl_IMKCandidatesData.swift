@@ -62,8 +62,8 @@ extension SessionCtl {
     let annotation = reverseLookup(for: currentCandidate).joined(separator: "\n")
     guard !annotation.isEmpty else { return }
     vCLog("Current Annotation: \(annotation)")
-    DispatchQueue.main.async {
-      guard let imkCandidates = self.ctlCandidateCurrent as? CtlCandidateIMK else { return }
+    DispatchQueue.main.async { [self] in
+      guard let imkCandidates = candidateUI as? CtlCandidateIMK else { return }
       imkCandidates.showAnnotation(.init(string: annotation))
     }
   }
