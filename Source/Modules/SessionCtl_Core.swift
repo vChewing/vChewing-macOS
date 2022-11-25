@@ -189,14 +189,16 @@ extension SessionCtl {
 
   /// 重設輸入調度模組，會將當前尚未遞交的內容遞交出去。
   public func resetInputHandler(forceComposerCleanup forceCleanup: Bool = false) {
+    var textToCommit = ""
     // 過濾掉尚未完成拼寫的注音。
-    if state.type == .ofInputting, PrefMgr.shared.trimUnfinishedReadingsOnCommit || forceCleanup {
-      Self.inputHandler.clearComposerAndCalligrapher()
-    }
+    let sansReading: Bool =
+      (state.type == .ofInputting) && (PrefMgr.shared.trimUnfinishedReadingsOnCommit || forceCleanup)
+    textToCommit = Self.inputHandler.generateStateOfInputting(sansReading: sansReading).displayedText
     // 威注音不再在這裡對 IMKTextInput 客體黑名單當中的應用做資安措施。
     // 有相關需求者，請在切換掉輸入法或者切換至新的客體應用之前敲一下 Shift+Delete。
-    switchState(IMEState.ofCommitting(textToCommit: Self.inputHandler.generateStateOfInputting().displayedText))
-    // switchState(isSecureMode ? IMEState.ofAbortion() : IMEState.ofEmpty())
+    if !Self.inputHandler.isCompositorEmpty {
+      switchState(IMEState.ofCommitting(textToCommit: textToCommit))
+    }
   }
 }
 
