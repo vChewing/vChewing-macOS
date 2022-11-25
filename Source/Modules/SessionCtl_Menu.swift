@@ -224,7 +224,7 @@ extension SessionCtl {
   }
 
   @objc public func toggleCassetteMode(_: Any? = nil) {
-    resetInputHandler()
+    resetInputHandler(forceComposerCleanup: true)
     if !PrefMgr.shared.cassetteEnabled, !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
       DispatchQueue.main.async {
         IMEApp.buzz()
@@ -253,7 +253,7 @@ extension SessionCtl {
   }
 
   @objc public func toggleSCPCTypingMode(_: Any? = nil) {
-    resetInputHandler()
+    resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: NSLocalizedString("Per-Char Select Mode", comment: "") + "\n"
         + (PrefMgr.shared.useSCPCTypingMode.toggled()
@@ -263,7 +263,7 @@ extension SessionCtl {
   }
 
   @objc public func toggleChineseConverter(_: Any? = nil) {
-    resetInputHandler()
+    resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: NSLocalizedString("Force KangXi Writing", comment: "") + "\n"
         + (PrefMgr.shared.chineseConversionEnabled.toggled()
@@ -273,7 +273,7 @@ extension SessionCtl {
   }
 
   @objc public func toggleShiftJISShinjitaiOutput(_: Any? = nil) {
-    resetInputHandler()
+    resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: NSLocalizedString("JIS Shinjitai Output", comment: "") + "\n"
         + (PrefMgr.shared.shiftJISShinjitaiOutputEnabled.toggled()
@@ -283,7 +283,7 @@ extension SessionCtl {
   }
 
   @objc public func toggleCurrencyNumerals(_: Any? = nil) {
-    resetInputHandler()
+    resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: NSLocalizedString("Currency Numeral Output", comment: "") + "\n"
         + (PrefMgr.shared.currencyNumeralsEnabled.toggled()
@@ -293,7 +293,7 @@ extension SessionCtl {
   }
 
   @objc public func toggleHalfWidthPunctuation(_: Any? = nil) {
-    resetInputHandler()
+    resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: NSLocalizedString("Half-Width Punctuation Mode", comment: "") + "\n"
         + (PrefMgr.shared.halfWidthPunctuationEnabled.toggled()
@@ -303,7 +303,7 @@ extension SessionCtl {
   }
 
   @objc public func toggleCNS11643Enabled(_: Any? = nil) {
-    resetInputHandler()
+    resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: NSLocalizedString("CNS11643 Mode", comment: "") + "\n"
         + (PrefMgr.shared.cns11643Enabled.toggled()
@@ -313,7 +313,7 @@ extension SessionCtl {
   }
 
   @objc public func toggleSymbolEnabled(_: Any? = nil) {
-    resetInputHandler()
+    resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: NSLocalizedString("Symbol & Emoji Input", comment: "") + "\n"
         + (PrefMgr.shared.symbolInputEnabled.toggled()
@@ -323,7 +323,7 @@ extension SessionCtl {
   }
 
   @objc public func toggleAssociatedPhrasesEnabled(_: Any? = nil) {
-    resetInputHandler()
+    resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: NSLocalizedString("Per-Char Associated Phrases", comment: "") + "\n"
         + (PrefMgr.shared.associatedPhrasesEnabled.toggled()
@@ -333,7 +333,7 @@ extension SessionCtl {
   }
 
   @objc public func togglePhraseReplacement(_: Any? = nil) {
-    resetInputHandler()
+    resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: NSLocalizedString("Use Phrase Replacement", comment: "") + "\n"
         + (PrefMgr.shared.phraseReplacementEnabled.toggled()
