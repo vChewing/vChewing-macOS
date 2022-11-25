@@ -86,6 +86,11 @@ extension InputHandler {
     // readingKey 不能為空。
     composeReading = composeReading && !readingKey.isEmpty
     if composeReading {
+      if input.isControlHold, input.isCommandHold, input.isEnter,
+        !input.isOptionHold, !input.isShiftHold, compositor.isEmpty
+      {
+        return handleCtrlCommandEnter()
+      }
       // 向語言模型詢問是否有對應的記錄。
       if !currentLM.hasUnigramsFor(key: readingKey) {
         delegate.callError("B49C0979：語彙庫內無「\(readingKey)」的匹配記錄。")
@@ -229,6 +234,11 @@ extension InputHandler {
     // 來看看詞庫內到底有沒有對應的讀音索引。這裡用了類似「|=」的判斷處理方式。
     combineStrokes = combineStrokes || (!calligrapher.isEmpty && confirmCombination)
     if combineStrokes {
+      if input.isControlHold, input.isCommandHold, input.isEnter,
+        !input.isOptionHold, !input.isShiftHold, composer.isEmpty
+      {
+        return handleCtrlCommandEnter()
+      }
       // 向語言模型詢問是否有對應的記錄。
       if !currentLM.hasUnigramsFor(key: calligrapher) {
         delegate.callError("B49C0979_Cassette：語彙庫內無「\(calligrapher)」的匹配記錄。")
