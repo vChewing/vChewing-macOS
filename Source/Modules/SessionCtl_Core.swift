@@ -203,6 +203,7 @@ extension SessionCtl {
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   public override func activateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
+    hidePalettes()
     DispatchQueue.main.async { [self] in
       if isActivated { return }
 
@@ -227,12 +228,14 @@ extension SessionCtl {
       }
 
       state = IMEState.ofEmpty()
+
       isActivated = true  // 登記啟用狀態。
       setKeyLayout()
     }
   }
 
   /// 停用輸入法時，會觸發該函式。
+  /// - Remark: 該函式的執行時機會明顯晚於另一個 Session 的 activateServer()。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   public override func deactivateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
@@ -241,6 +244,15 @@ extension SessionCtl {
       resetInputHandler()  // 這條會自動搞定 Empty 狀態。
       switchState(IMEState.ofDeactivated())
     }
+  }
+
+  /// 關掉所有浮窗顯示。該函式的執行時機由 IMK 自行調度。
+  public override func hidePalettes() {
+    super.hidePalettes()
+    // 下述三行是從 deactivatedServer() 遷移來的命令。
+    Self.ctlCandidateCurrent.visible = false
+    Self.popupCompositionBuffer.hide()
+    Self.tooltipInstance.hide()
   }
 
   /// 切換至某一個輸入法的某個副本時（比如威注音的簡體輸入法副本與繁體輸入法副本），會觸發該函式。
