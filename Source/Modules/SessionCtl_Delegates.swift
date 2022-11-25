@@ -56,6 +56,8 @@ extension SessionCtl: InputHandlerDelegate {
 // MARK: - Candidate Controller Delegate
 
 extension SessionCtl: CtlCandidateDelegate {
+  public var isCandidateState: Bool { state.isCandidateContainer }
+
   public var showReverseLookupResult: Bool {
     !isVerticalTyping && PrefMgr.shared.showReverseLookupInCandidateUI
   }

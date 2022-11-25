@@ -15,6 +15,7 @@ public protocol CtlCandidateDelegate {
   @discardableResult func reverseLookup(for value: String) -> [String]
   var selectionKeys: String { get }
   var isVerticalTyping: Bool { get }
+  var isCandidateState: Bool { get }
   var showReverseLookupResult: Bool { get }
 }
 
