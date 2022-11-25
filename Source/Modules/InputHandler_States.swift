@@ -298,9 +298,21 @@ extension InputHandler {
     guard state.type == .ofInputting else { return false }
 
     var displayedText = compositor.keys.joined(separator: "\t")
-    if prefs.inlineDumpPinyinInLieuOfZhuyin, !prefs.cassetteEnabled {
-      displayedText = Tekkon.restoreToneOneInZhuyinKey(target: displayedText)  // 恢復陰平標記
-      displayedText = Tekkon.cnvPhonaToHanyuPinyin(target: displayedText)  // 注音轉拼音
+    if compositor.isEmpty {
+      displayedText = readingForDisplay
+    }
+    if !prefs.cassetteEnabled {
+      if prefs.inlineDumpPinyinInLieuOfZhuyin {
+        if !compositor.isEmpty {
+          displayedText = Tekkon.restoreToneOneInZhuyinKey(target: displayedText)  // 恢復陰平標記
+        }
+        displayedText = Tekkon.cnvPhonaToHanyuPinyin(target: displayedText)  // 注音轉拼音
+      }
+      if prefs.showHanyuPinyinInCompositionBuffer {
+        if compositor.isEmpty {
+          displayedText = displayedText.replacingOccurrences(of: "1", with: "")
+        }
+      }
     }
 
     let isVCED = delegate.clientBundleIdentifier.contains("vChewingPhraseEditor")
