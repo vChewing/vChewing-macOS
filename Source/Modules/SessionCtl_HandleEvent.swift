@@ -39,7 +39,7 @@ extension SessionCtl {
     // 就這傳入的 NSEvent 都還有可能是 nil，Apple InputMethodKit 團隊到底在搞三小。
     // 只針對特定類型的 client() 進行處理。
     guard let event = event, sender is IMKTextInput else {
-      resetInputHandler()
+      resetInputHandler(forceComposerCleanup: true)
       return false
     }
 
