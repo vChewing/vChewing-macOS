@@ -63,7 +63,7 @@ extension SessionCtl {
     guard !annotation.isEmpty else { return }
     vCLog("Current Annotation: \(annotation)")
     DispatchQueue.main.async {
-      guard let imkCandidates = self.ctlCandidateCurrent as? CtlCandidateIMK else { return }
+      guard let imkCandidates = Self.ctlCandidateCurrent as? CtlCandidateIMK else { return }
       imkCandidates.showAnnotation(.init(string: annotation))
     }
   }

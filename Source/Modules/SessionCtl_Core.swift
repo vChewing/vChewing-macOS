@@ -29,7 +29,7 @@ public class SessionCtl: IMKInputController {
   public static var areWeNerfing = false
 
   /// 目前在用的的選字窗副本。
-  public var ctlCandidateCurrent: CtlCandidateProtocol = {
+  public static var ctlCandidateCurrent: CtlCandidateProtocol = {
     let direction: NSUserInterfaceLayoutOrientation =
       PrefMgr.shared.useHorizontalCandidateList ? .horizontal : .vertical
     if #available(macOS 10.15, *) {
@@ -41,10 +41,10 @@ public class SessionCtl: IMKInputController {
   }()
 
   /// 工具提示視窗的副本。
-  public var tooltipInstance = TooltipUI()
+  public static var tooltipInstance = TooltipUI()
 
   /// 浮動組字窗的副本。
-  public var popupCompositionBuffer = PopupCompositionBuffer()
+  public static var popupCompositionBuffer = PopupCompositionBuffer()
 
   /// 用來標記當前副本是否已處於活動狀態。
   public var isActivated = false
@@ -75,7 +75,7 @@ public class SessionCtl: IMKInputController {
   private static var isASCIIModeForAllClients = false  // 給所有副本共用的。
 
   /// 輸入調度模組的副本。
-  var inputHandler: InputHandlerProtocol = InputHandler(
+  public static var inputHandler: InputHandlerProtocol = InputHandler(
     lm: LMMgr.currentLM, uom: LMMgr.currentUOM, pref: PrefMgr.shared
   )
   /// 用以記錄當前輸入法狀態的變數。
@@ -122,10 +122,10 @@ public class SessionCtl: IMKInputController {
       if oldValue != inputMode, inputMode != .imeModeNULL {
         // ----------------------------
         /// 重設所有語言模組。這裡不需要做按需重設，因為對運算量沒有影響。
-        inputHandler.currentLM = LMMgr.currentLM  // 會自動更新組字引擎內的模組。
-        inputHandler.currentUOM = LMMgr.currentUOM
+        Self.inputHandler.currentLM = LMMgr.currentLM  // 會自動更新組字引擎內的模組。
+        Self.inputHandler.currentUOM = LMMgr.currentUOM
         /// 清空注拼槽＋同步最新的注拼槽排列設定。
-        inputHandler.ensureKeyboardParser()
+        Self.inputHandler.ensureKeyboardParser()
         /// 將輸入法偏好設定同步至語言模組內。
         syncBaseLMPrefs()
         /// 重置輸入調度模組。
@@ -134,8 +134,9 @@ public class SessionCtl: IMKInputController {
       // 特殊處理：deactivateServer() 可能會遲於另一個客體會話的 activateServer() 執行。
       // 雖然所有在這個函式內影響到的變數都改為動態變數了（不會出現跨副本波及的情況），
       // 但 IMKCandidates 是有內部共用副本的、會被波及。所以在這裡糾偏一下。
+      // 另：哪怕所有會話控制副本都使用共用的選字窗副本，這一段也不能省略。
       if PrefMgr.shared.useIMKCandidateWindow {
-        guard let imkC = ctlCandidateCurrent as? CtlCandidateIMK else { return }
+        guard let imkC = Self.ctlCandidateCurrent as? CtlCandidateIMK else { return }
         if state.isCandidateContainer, !imkC.visible {
           handle(state: state, replace: false)
         }
@@ -154,7 +155,7 @@ public class SessionCtl: IMKInputController {
   override public init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
     super.init(server: server, delegate: delegate, client: inputClient)
     DispatchQueue.main.async { [self] in
-      inputHandler.delegate = self
+      Self.inputHandler.delegate = self
       syncBaseLMPrefs()
       // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
       activateServer(inputClient)
@@ -186,11 +187,11 @@ extension SessionCtl {
   public func resetInputHandler(forceComposerCleanup forceCleanup: Bool = false) {
     // 過濾掉尚未完成拼寫的注音。
     if state.type == .ofInputting, PrefMgr.shared.trimUnfinishedReadingsOnCommit || forceCleanup {
-      inputHandler.clearComposerAndCalligrapher()
+      Self.inputHandler.clearComposerAndCalligrapher()
     }
     // 威注音不再在這裡對 IMKTextInput 客體黑名單當中的應用做資安措施。
     // 有相關需求者，請在切換掉輸入法或者切換至新的客體應用之前敲一下 Shift+Delete。
-    switchState(IMEState.ofCommitting(textToCommit: inputHandler.generateStateOfInputting().displayedText))
+    switchState(IMEState.ofCommitting(textToCommit: Self.inputHandler.generateStateOfInputting().displayedText))
     // switchState(isSecureMode ? IMEState.ofAbortion() : IMEState.ofEmpty())
   }
 }
@@ -207,10 +208,11 @@ extension SessionCtl {
 
       // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
       // 所以這裡添加這句、來試圖應對這種情況。
-      if inputHandler.delegate == nil { inputHandler.delegate = self }
+      Self.inputHandler.delegate = self
+      Self.ctlCandidateCurrent.delegate = self
       // 這裡不需要 setValue()，因為 IMK 會在自動呼叫 activateServer() 之後自動執行 setValue()。
-      inputHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
-      inputHandler.ensureKeyboardParser()
+      Self.inputHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
+      Self.inputHandler.ensureKeyboardParser()
 
       Self.theShiftKeyDetector.alsoToggleWithLShift = PrefMgr.shared.togglingAlphanumericalModeWithLShift
       Self.isVerticalTyping = isVerticalTyping

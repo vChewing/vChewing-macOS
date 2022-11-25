@@ -43,7 +43,7 @@ extension SessionCtl {
   public func showTooltip(_ tooltip: String, duration: Double = 0) {
     guard client() != nil else { return }
     if tooltip.isEmpty {
-      tooltipInstance.hide()
+      Self.tooltipInstance.hide()
       return
     }
     let lineHeightRect = lineHeightRect()
@@ -60,12 +60,12 @@ extension SessionCtl {
     }()
     // 強制重新初期化，因為 NSAttributedTextView 有顯示滯後性。
     do {
-      tooltipInstance.hide()
-      tooltipInstance = .init()
-      tooltipInstance.setColor(state: state.data.tooltipColorState)
+      Self.tooltipInstance.hide()
+      Self.tooltipInstance = .init()
+      Self.tooltipInstance.setColor(state: state.data.tooltipColorState)
     }
     // 再設定其文字顯示內容並顯示。
-    tooltipInstance.show(
+    Self.tooltipInstance.show(
       tooltip: tooltip, at: finalOrigin, bottomOutOfScreenAdjustmentHeight: delta,
       direction: tooltipContentDirection, duration: duration
     )
@@ -82,35 +82,35 @@ extension SessionCtl {
         : .horizontal)
 
     /// 先取消既有的選字窗的內容顯示。否則可能會重複生成選字窗的 NSWindow()。
-    ctlCandidateCurrent.visible = false
+    Self.ctlCandidateCurrent.visible = false
     /// 然後再重新初期化。
     if #available(macOS 10.15, *) {
-      ctlCandidateCurrent =
+      Self.ctlCandidateCurrent =
         PrefMgr.shared.useIMKCandidateWindow
         ? CtlCandidateIMK(candidateLayout) : CtlCandidateTDK(candidateLayout)
-      if let candidateTDK = ctlCandidateCurrent as? CtlCandidateTDK {
+      if let candidateTDK = Self.ctlCandidateCurrent as? CtlCandidateTDK {
         candidateTDK.maxLinesPerPage = isVerticalTyping ? 1 : 3
       }
     } else {
-      ctlCandidateCurrent = CtlCandidateIMK(candidateLayout)
+      Self.ctlCandidateCurrent = CtlCandidateIMK(candidateLayout)
     }
 
-    ctlCandidateCurrent.candidateFont = Self.candidateFont(
+    Self.ctlCandidateCurrent.candidateFont = Self.candidateFont(
       name: PrefMgr.shared.candidateTextFontName, size: PrefMgr.shared.candidateListTextSize
     )
 
     if PrefMgr.shared.cassetteEnabled {
-      ctlCandidateCurrent.tooltip =
+      Self.ctlCandidateCurrent.tooltip =
         isVerticalTyping ? "📼" : "📼 " + NSLocalizedString("CIN Cassette Mode", comment: "")
     }
 
     if state.type == .ofAssociates {
-      ctlCandidateCurrent.tooltip =
+      Self.ctlCandidateCurrent.tooltip =
         isVerticalTyping ? "⇧" : NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
     }
 
-    ctlCandidateCurrent.useLangIdentifier = PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier
-    ctlCandidateCurrent.locale = {
+    Self.ctlCandidateCurrent.useLangIdentifier = PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier
+    Self.ctlCandidateCurrent.locale = {
       switch inputMode {
         case .imeModeCHS: return "zh-Hans"
         case .imeModeCHT:
@@ -124,18 +124,18 @@ extension SessionCtl {
 
     if #available(macOS 10.14, *) {
       // Spotlight 視窗會擋住 IMK 選字窗，所以需要特殊處理。
-      if let ctlCandidateCurrent = ctlCandidateCurrent as? CtlCandidateIMK {
+      if let ctlCandidateCurrent = Self.ctlCandidateCurrent as? CtlCandidateIMK {
         while ctlCandidateCurrent.windowLevel() <= client.windowLevel() {
           ctlCandidateCurrent.setWindowLevel(UInt64(max(0, client.windowLevel() + 1000)))
         }
       }
     }
 
-    ctlCandidateCurrent.delegate = self  // 會自動觸發田所選字窗的資料重載。
-    ctlCandidateCurrent.visible = true
+    Self.ctlCandidateCurrent.delegate = self  // 會自動觸發田所選字窗的資料重載。
+    Self.ctlCandidateCurrent.visible = true
 
     if isVerticalTyping {
-      ctlCandidateCurrent.set(
+      Self.ctlCandidateCurrent.set(
         windowTopLeftPoint: NSPoint(
           x: lineHeightRect().origin.x + lineHeightRect().size.width + 4.0, y: lineHeightRect().origin.y - 4.0
         ),
@@ -143,7 +143,7 @@ extension SessionCtl {
         useGCD: true
       )
     } else {
-      ctlCandidateCurrent.set(
+      Self.ctlCandidateCurrent.set(
         windowTopLeftPoint: NSPoint(x: lineHeightRect().origin.x, y: lineHeightRect().origin.y - 4.0),
         bottomOutOfScreenAdjustmentHeight: lineHeightRect().size.height + 4.0,
         useGCD: true

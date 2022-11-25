@@ -16,7 +16,7 @@ extension SessionCtl: InputHandlerDelegate {
     return client.bundleIdentifier() ?? ""
   }
 
-  public func candidateController() -> CtlCandidateProtocol { ctlCandidateCurrent }
+  public func candidateController() -> CtlCandidateProtocol { Self.ctlCandidateCurrent }
 
   public func candidateSelectionCalledByInputHandler(at index: Int) {
     candidatePairSelected(at: index)
@@ -111,19 +111,19 @@ extension SessionCtl: CtlCandidateDelegate {
     if [.ofCandidates, .ofSymbolTable].contains(state.type) {
       let selectedValue = state.candidates[index]
       if state.type == .ofCandidates {
-        inputHandler.consolidateNode(
+        Self.inputHandler.consolidateNode(
           candidate: selectedValue, respectCursorPushing: true,
           preConsolidate: PrefMgr.shared.consolidateContextOnCandidateSelection
         )
       }
 
-      let inputting = inputHandler.generateStateOfInputting()
+      let inputting = Self.inputHandler.generateStateOfInputting()
 
       if PrefMgr.shared.useSCPCTypingMode {
         switchState(IMEState.ofCommitting(textToCommit: inputting.displayedText))
         // 此時是逐字選字模式，所以「selectedValue.1」是單個字、不用追加處理。
         if PrefMgr.shared.associatedPhrasesEnabled {
-          let associates = inputHandler.generateStateOfAssociates(
+          let associates = Self.inputHandler.generateStateOfAssociates(
             withPair: .init(key: selectedValue.0, value: selectedValue.1)
           )
           switchState(associates.candidates.isEmpty ? IMEState.ofEmpty() : associates)
@@ -146,7 +146,7 @@ extension SessionCtl: CtlCandidateDelegate {
         return
       }
       if PrefMgr.shared.associatedPhrasesEnabled {
-        let associates = inputHandler.generateStateOfAssociates(
+        let associates = Self.inputHandler.generateStateOfAssociates(
           withPair: .init(key: selectedValue.0, value: String(valueKept))
         )
         if !associates.candidates.isEmpty {

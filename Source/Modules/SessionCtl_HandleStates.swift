@@ -42,12 +42,7 @@ extension SessionCtl {
     if replace { state = newState }
     switch newState.type {
       case .ofDeactivated:
-        // 這裡移除一些處理，轉而交給 commitComposition() 代為執行。
-        // 這裡不需要 clearInlineDisplay() ，否則會觸發無限迴圈。
-        // 對於 IMK 選字窗的顯示狀態糾正的行為交給 inputMode.didSet() 來處理。
-        ctlCandidateCurrent.visible = false
-        popupCompositionBuffer.hide()
-        tooltipInstance.hide()
+        state = IMEState.ofEmpty()
       case .ofEmpty, .ofAbortion, .ofCommitting:
         innerCircle: switch newState.type {
           case .ofAbortion:
@@ -58,7 +53,7 @@ extension SessionCtl {
             if replace { state = IMEState.ofEmpty() }
           default: break innerCircle
         }
-        ctlCandidateCurrent.visible = false
+        Self.ctlCandidateCurrent.visible = false
         // 全專案用以判斷「.Abortion」的地方僅此一處。
         if previous.hasComposition, ![.ofAbortion, .ofCommitting].contains(newState.type) {
           commit(text: previous.displayedText)
@@ -66,29 +61,30 @@ extension SessionCtl {
         showTooltip(newState.tooltip, duration: 1)  // 會在工具提示為空的時候自動消除顯示。
         clearInlineDisplay()
         // 最後一道保險
-        inputHandler.clear()
+        Self.inputHandler.clear()
       case .ofInputting:
-        ctlCandidateCurrent.visible = false
+        Self.ctlCandidateCurrent.visible = false
         commit(text: newState.textToCommit)
         setInlineDisplayWithCursor()
         showTooltip(newState.tooltip, duration: 1)  // 會在工具提示為空的時候自動消除顯示。
       case .ofMarking:
-        ctlCandidateCurrent.visible = false
+        Self.ctlCandidateCurrent.visible = false
         setInlineDisplayWithCursor()
         showTooltip(newState.tooltip)
       case .ofCandidates, .ofAssociates, .ofSymbolTable:
-        tooltipInstance.hide()
+        Self.tooltipInstance.hide()
         setInlineDisplayWithCursor()
         showCandidates()
     }
+    guard newState.type != .ofDeactivated else { return }
     // 浮動組字窗的顯示判定
     if newState.hasComposition, PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier) {
-      popupCompositionBuffer.isTypingDirectionVertical = isVerticalTyping
-      popupCompositionBuffer.show(
+      Self.popupCompositionBuffer.isTypingDirectionVertical = isVerticalTyping
+      Self.popupCompositionBuffer.show(
         state: newState, at: lineHeightRect(zeroCursor: true).origin
       )
     } else {
-      popupCompositionBuffer.hide()
+      Self.popupCompositionBuffer.hide()
     }
   }
 
