@@ -47,7 +47,11 @@ public class SessionCtl: IMKInputController {
   public static var popupCompositionBuffer = PopupCompositionBuffer()
 
   /// 用來標記當前副本是否已處於活動狀態。
-  public var isActivated = false
+  public var isActivated: Bool { theUUID == Self.currentUUID }
+
+  /// 當前副本的唯一標幟。
+  private let theUUID = UUID().uuidString
+  private static var currentUUID = ""
 
   // MARK: -
 
@@ -203,9 +207,10 @@ extension SessionCtl {
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   public override func activateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-    hidePalettes()
     DispatchQueue.main.async { [self] in
       if isActivated { return }
+      Self.currentUUID = theUUID  // 登記啟用狀態。
+      hidePalettes()
 
       // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
       // 所以這裡添加這句、來試圖應對這種情況。
@@ -228,8 +233,6 @@ extension SessionCtl {
       }
 
       state = IMEState.ofEmpty()
-
-      isActivated = true  // 登記啟用狀態。
       setKeyLayout()
     }
   }
@@ -240,7 +243,6 @@ extension SessionCtl {
   public override func deactivateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     DispatchQueue.main.async { [self] in
-      isActivated = false
       resetInputHandler()  // 這條會自動搞定 Empty 狀態。
       switchState(IMEState.ofDeactivated())
     }
