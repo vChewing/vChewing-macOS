@@ -61,18 +61,18 @@ extension SessionCtl {
         clearInlineDisplay()
         // 僅對當前客體採取下述操作。
         if isActivated {
-          Self.ctlCandidateCurrent.visible = false
+          Self.candidateUI.visible = false
         }
         Self.inputHandler.clear()
       case .ofInputting:
         commit(text: newState.textToCommit)
         setInlineDisplayWithCursor()
         if isActivated {
-          Self.ctlCandidateCurrent.visible = false
+          Self.candidateUI.visible = false
           showTooltip(newState.tooltip, duration: 1)  // 會在工具提示為空的時候自動消除顯示。
         }
       case .ofMarking:
-        Self.ctlCandidateCurrent.visible = false
+        Self.candidateUI.visible = false
         setInlineDisplayWithCursor()
         showTooltip(newState.tooltip)
       case .ofCandidates, .ofAssociates, .ofSymbolTable:

@@ -29,7 +29,7 @@ public class SessionCtl: IMKInputController {
   public static var areWeNerfing = false
 
   /// 目前在用的的選字窗副本。
-  public static var ctlCandidateCurrent: CtlCandidateProtocol = {
+  public static var candidateUI: CtlCandidateProtocol = {
     let direction: NSUserInterfaceLayoutOrientation =
       PrefMgr.shared.useHorizontalCandidateList ? .horizontal : .vertical
     if #available(macOS 10.15, *) {
@@ -140,7 +140,7 @@ public class SessionCtl: IMKInputController {
       // 但 IMKCandidates 是有內部共用副本的、會被波及。所以在這裡糾偏一下。
       // 另：哪怕所有會話控制副本都使用共用的選字窗副本，這一段也不能省略。
       if PrefMgr.shared.useIMKCandidateWindow {
-        guard let imkC = Self.ctlCandidateCurrent as? CtlCandidateIMK else { return }
+        guard let imkC = Self.candidateUI as? CtlCandidateIMK else { return }
         if state.isCandidateContainer, !imkC.visible {
           handle(state: state, replace: false)
         }
@@ -217,7 +217,7 @@ extension SessionCtl {
       // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
       // 所以這裡添加這句、來試圖應對這種情況。
       Self.inputHandler.delegate = self
-      Self.ctlCandidateCurrent.delegate = self
+      Self.candidateUI.delegate = self
       // 這裡不需要 setValue()，因為 IMK 會在自動呼叫 activateServer() 之後自動執行 setValue()。
       Self.inputHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
       Self.inputHandler.ensureKeyboardParser()
@@ -254,7 +254,7 @@ extension SessionCtl {
   public override func hidePalettes() {
     super.hidePalettes()
     // 下述三行是從 deactivatedServer() 遷移來的命令。
-    Self.ctlCandidateCurrent.visible = false
+    Self.candidateUI.visible = false
     Self.popupCompositionBuffer.hide()
     Self.tooltipInstance.hide()
   }
