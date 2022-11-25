@@ -23,20 +23,20 @@ struct CandidatePoolViewUIHorizontalBackports_Previews: PreviewProvider {
     "吹", "大", "地", "草", "枝", "擺",
   ]
   static var thePool: CandidatePool {
-    let result = CandidatePool(candidates: testCandidates, rowCapacity: 6)
+    var result = CandidatePool(candidates: testCandidates, rowCapacity: 6)
     // 下一行待解決：無論這裡怎麼指定高亮選中項是哪一筆，其所在行都得被卷動到使用者眼前。
     result.highlight(at: 5)
     return result
   }
 
   static var previews: some View {
-    VwrCandidateHorizontalBackports(controller: .init(.horizontal), thePool: thePool).fixedSize()
+    VwrCandidateHorizontalBackports(controller: nil, thePool: thePool).fixedSize()
   }
 }
 
 @available(macOS 10.15, *)
 public struct VwrCandidateHorizontalBackports: View {
-  public var controller: CtlCandidateTDK
+  public weak var controller: CtlCandidateTDK?
   @Environment(\.colorScheme) var colorScheme
   @State public var thePool: CandidatePool
   @State public var tooltip: String = ""
@@ -47,7 +47,7 @@ public struct VwrCandidateHorizontalBackports: View {
   }
 
   private func didSelectCandidateAt(_ pos: Int) {
-    if let delegate = controller.delegate {
+    if let delegate = controller?.delegate {
       delegate.candidatePairSelected(at: pos)
     }
   }
@@ -94,7 +94,7 @@ public struct VwrCandidateHorizontalBackports: View {
       }
       .fixedSize(horizontal: false, vertical: true)
       .padding([.horizontal], 5).padding([.top], 5).padding([.bottom], -1)
-      if controller.delegate?.showReverseLookupResult ?? true {
+      if controller?.delegate?.showReverseLookupResult ?? true {
         ZStack(alignment: .leading) {
           Color(white: colorScheme == .dark ? 0.15 : 0.97)
           HStack(alignment: .center, spacing: 4) {
@@ -116,7 +116,7 @@ public struct VwrCandidateHorizontalBackports: View {
           Color(white: colorScheme == .dark ? 0.2 : 0.9)
         } else {
           Color(white: colorScheme == .dark ? 0.0 : 1)
-          controller.highlightedColorUIBackports
+          controller?.highlightedColorUIBackports
         }
         HStack(alignment: .center) {
           if !tooltip.isEmpty {
