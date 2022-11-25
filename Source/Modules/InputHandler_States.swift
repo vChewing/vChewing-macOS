@@ -18,12 +18,12 @@ extension InputHandler {
   // MARK: - 構築狀態（State Building）
 
   /// 生成「正在輸入」狀態。相關的內容會被拿給狀態機械用來處理在電腦螢幕上顯示的內容。
-  public func generateStateOfInputting() -> IMEStateProtocol {
+  public func generateStateOfInputting(sansReading: Bool = false) -> IMEStateProtocol {
     /// 「更新內文組字區 (Update the composing buffer)」是指要求客體軟體將組字緩衝區的內容
     /// 換成由此處重新生成的原始資料在 IMEStateData 當中生成的 NSAttributeString。
     var displayTextSegments: [String] = compositor.walkedNodes.values
     var cursor = convertCursorForDisplay(compositor.cursor)
-    let reading: String = readingForDisplay  // 先提出來，減輕運算負擔。
+    let reading: String = sansReading ? "" : readingForDisplay  // 先提出來，減輕運算負擔。
     if !reading.isEmpty {
       var newDisplayTextSegments = [String]()
       var temporaryNode = ""
