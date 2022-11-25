@@ -13,52 +13,54 @@ import SwiftUI
 
 @available(macOS 10.15, *)
 public class CtlCandidateTDK: CtlCandidate {
-  public var thePoolHorizontal: CandidatePool = .init(candidates: [], rowCapacity: 6)
-  public var thePoolVertical: CandidatePool = .init(candidates: [], columnCapacity: 6)
   public var maxLinesPerPage: Int = 0
 
-  @available(macOS 12, *)
-  public var theViewHorizontal: VwrCandidateHorizontal {
-    .init(
-      controller: self, thePool: thePoolHorizontal,
-      tooltip: tooltip, reverseLookupResult: reverseLookupResult
-    )
-  }
+  private static var thePoolHorizontal: CandidatePool = .init(candidates: [], rowCapacity: 6)
+  private static var thePoolVertical: CandidatePool = .init(candidates: [], columnCapacity: 6)
+  private static var currentView: NSView = .init()
 
   @available(macOS 12, *)
-  public var theViewVertical: VwrCandidateVertical {
-    .init(
-      controller: self, thePool: thePoolVertical,
+  private var theViewHorizontal: some View {
+    VwrCandidateHorizontal(
+      controller: self, thePool: Self.thePoolHorizontal,
       tooltip: tooltip, reverseLookupResult: reverseLookupResult
-    )
+    ).edgesIgnoringSafeArea(.top)
   }
 
-  public var theViewHorizontalBackports: VwrCandidateHorizontalBackports {
-    .init(
-      controller: self, thePool: thePoolHorizontal,
+  @available(macOS 12, *)
+  private var theViewVertical: some View {
+    VwrCandidateVertical(
+      controller: self, thePool: Self.thePoolVertical,
       tooltip: tooltip, reverseLookupResult: reverseLookupResult
-    )
+    ).edgesIgnoringSafeArea(.top)
   }
 
-  public var theViewVerticalBackports: VwrCandidateVerticalBackports {
-    .init(
-      controller: self, thePool: thePoolVertical,
+  private var theViewHorizontalBackports: some View {
+    VwrCandidateHorizontalBackports(
+      controller: self, thePool: Self.thePoolHorizontal,
       tooltip: tooltip, reverseLookupResult: reverseLookupResult
-    )
+    ).edgesIgnoringSafeArea(.top)
   }
 
-  public var thePool: CandidatePool {
+  private var theViewVerticalBackports: some View {
+    VwrCandidateVerticalBackports(
+      controller: self, thePool: Self.thePoolVertical,
+      tooltip: tooltip, reverseLookupResult: reverseLookupResult
+    ).edgesIgnoringSafeArea(.top)
+  }
+
+  private var thePool: CandidatePool {
     get {
       switch currentLayout {
-        case .horizontal: return thePoolHorizontal
-        case .vertical: return thePoolVertical
+        case .horizontal: return Self.thePoolHorizontal
+        case .vertical: return Self.thePoolVertical
         @unknown default: return .init(candidates: [], rowCapacity: 0)
       }
     }
     set {
       switch currentLayout {
-        case .horizontal: thePoolHorizontal = newValue
-        case .vertical: thePoolVertical = newValue
+        case .horizontal: Self.thePoolHorizontal = newValue
+        case .vertical: Self.thePoolVertical = newValue
         @unknown default: break
       }
     }
@@ -81,7 +83,6 @@ public class CtlCandidateTDK: CtlCandidate {
     super.init(layout)
     window = panel
     currentLayout = layout
-    reloadData()
   }
 
   @available(*, unavailable)
@@ -98,17 +99,17 @@ public class CtlCandidateTDK: CtlCandidate {
 
     switch currentLayout {
       case .horizontal:
-        thePoolHorizontal = .init(
+        Self.thePoolHorizontal = .init(
           candidates: delegate.candidatePairs(conv: true).map(\.1), rowCapacity: 6,
           rows: maxLinesPerPage, selectionKeys: delegate.selectionKeys, locale: locale
         )
-        thePoolHorizontal.highlight(at: 0)
+        Self.thePoolHorizontal.highlight(at: 0)
       case .vertical:
-        thePoolVertical = .init(
+        Self.thePoolVertical = .init(
           candidates: delegate.candidatePairs(conv: true).map(\.1), columnCapacity: 6,
           columns: maxLinesPerPage, selectionKeys: delegate.selectionKeys, locale: locale
         )
-        thePoolVertical.highlight(at: 0)
+        Self.thePoolVertical.highlight(at: 0)
       @unknown default:
         return
     }
@@ -122,30 +123,24 @@ public class CtlCandidateTDK: CtlCandidate {
       case .horizontal:
         DispatchQueue.main.async { [self] in
           if #available(macOS 12, *) {
-            let newView = NSHostingView(rootView: theViewHorizontal.edgesIgnoringSafeArea(.top))
-            let newSize = newView.fittingSize
-            window.contentView = newView
-            window.setContentSize(newSize)
+            Self.currentView = NSHostingView(rootView: theViewHorizontal)
           } else {
-            let newView = NSHostingView(rootView: theViewHorizontalBackports.edgesIgnoringSafeArea(.top))
-            let newSize = newView.fittingSize
-            window.contentView = newView
-            window.setContentSize(newSize)
+            Self.currentView = NSHostingView(rootView: theViewHorizontalBackports)
           }
+          let newSize = Self.currentView.fittingSize
+          window.contentView = Self.currentView
+          window.setContentSize(newSize)
         }
       case .vertical:
         DispatchQueue.main.async { [self] in
           if #available(macOS 12, *) {
-            let newView = NSHostingView(rootView: theViewVertical.edgesIgnoringSafeArea(.top))
-            let newSize = newView.fittingSize
-            window.contentView = newView
-            window.setContentSize(newSize)
+            Self.currentView = NSHostingView(rootView: theViewVertical)
           } else {
-            let newView = NSHostingView(rootView: theViewVerticalBackports.edgesIgnoringSafeArea(.top))
-            let newSize = newView.fittingSize
-            window.contentView = newView
-            window.setContentSize(newSize)
+            Self.currentView = NSHostingView(rootView: theViewVerticalBackports)
           }
+          let newSize = Self.currentView.fittingSize
+          window.contentView = Self.currentView
+          window.setContentSize(newSize)
         }
       @unknown default:
         return
