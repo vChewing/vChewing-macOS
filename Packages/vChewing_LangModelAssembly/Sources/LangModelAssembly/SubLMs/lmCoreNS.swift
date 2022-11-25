@@ -107,21 +107,28 @@ extension vChewingLM {
     ///   - key: 讀音索引鍵。
     public func unigramsFor(key: String) -> [Megrez.Unigram] {
       var grams: [Megrez.Unigram] = []
-      if let arrRangeRecords: [Data] = rangeMap[cnvPhonabetToASCII(key)] {
-        for netaSet in arrRangeRecords {
-          let strNetaSet = String(decoding: netaSet, as: UTF8.self)
-          let neta = Array(strNetaSet.trimmingCharacters(in: .newlines).split(separator: " ").reversed())
-          let theValue: String = .init(neta[0])
-          var theScore = defaultScore
-          if neta.count >= 2, !shouldForceDefaultScore {
-            theScore = .init(String(neta[1])) ?? defaultScore
+      var gramsHW: [Megrez.Unigram] = []
+      guard let arrRangeRecords: [Data] = rangeMap[cnvPhonabetToASCII(key)] else { return grams }
+      for netaSet in arrRangeRecords {
+        let strNetaSet = String(decoding: netaSet, as: UTF8.self)
+        let neta = Array(strNetaSet.trimmingCharacters(in: .newlines).split(separator: " ").reversed())
+        let theValue: String = .init(neta[0])
+        var theScore = defaultScore
+        if neta.count >= 2, !shouldForceDefaultScore {
+          theScore = .init(String(neta[1])) ?? defaultScore
+        }
+        if theScore > 0 {
+          theScore *= -1  // 應對可能忘記寫負號的情形
+        }
+        grams.append(Megrez.Unigram(value: theValue, score: theScore))
+        if !key.contains("_punctuation") { continue }
+        if let halfValue = theValue.applyingTransform(.fullwidthToHalfwidth, reverse: false) {
+          if halfValue != theValue {
+            gramsHW.append(Megrez.Unigram(value: halfValue, score: theScore))
           }
-          if theScore > 0 {
-            theScore *= -1  // 應對可能忘記寫負號的情形
-          }
-          grams.append(Megrez.Unigram(value: theValue, score: theScore))
         }
       }
+      grams.append(contentsOf: gramsHW)
       return grams
     }
 
