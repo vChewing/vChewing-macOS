@@ -22,6 +22,7 @@ public protocol InputHandlerProtocol {
   var currentUOM: vChewingLM.LMUserOverride { get set }
   var delegate: InputHandlerDelegate? { get set }
   var composer: Tekkon.Composer { get set }
+  var isCompositorEmpty: Bool { get }
   var isComposerUsingPinyin: Bool { get }
   func clear()
   func clearComposerAndCalligrapher()
@@ -89,6 +90,8 @@ public class InputHandler: InputHandlerProtocol {
   }
 
   // MARK: - Functions dealing with Megrez.
+
+  public var isCompositorEmpty: Bool { compositor.isEmpty }
 
   /// 獲取當前標記得範圍。這個函式只能是函式、而非只讀變數。
   /// - Returns: 當前標記範圍。
