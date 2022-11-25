@@ -28,9 +28,15 @@ public protocol InputHandlerProtocol {
   func clearComposerAndCalligrapher()
   func ensureKeyboardParser()
   func handleEvent(_ event: NSEvent) -> Bool
-  func generateStateOfInputting() -> IMEStateProtocol
+  func generateStateOfInputting(sansReading: Bool) -> IMEStateProtocol
   func generateStateOfAssociates(withPair pair: Megrez.Compositor.KeyValuePaired) -> IMEStateProtocol
   func consolidateNode(candidate: (String, String), respectCursorPushing: Bool, preConsolidate: Bool)
+}
+
+extension InputHandlerProtocol {
+  func generateStateOfInputting(sansReading: Bool = false) -> IMEStateProtocol {
+    generateStateOfInputting(sansReading: sansReading)
+  }
 }
 
 // MARK: - 委任協定 (Delegate).
