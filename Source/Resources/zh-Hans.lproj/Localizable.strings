@@ -179,9 +179,11 @@
 "Disable Shift key accomodation in all cases" = "对任何客体应用均停用 Shift 键相容性措施";
 "Disassemble the previous reading, dropping its intonation" = "析构游标正后方的字音，且剔除其声调";
 "Disassembling process does not work with non-phonetic reading keys." = "析构行为仅针对组字器内「身为汉字读音」的读音索引单元有效。";
+"Edit…" = "编辑…";
 "Emulating select-candidate-per-character mode" = "模拟 90 年代前期注音逐字选字输入风格";
 "Enable cassette mode, suppressing phonabet input" = "启用磁带模式，会停用注音输入";
 "Enable CNS11643 Support (2022-10-04)" = "启用 CNS11643 全字库支援 (2022-10-04)";
+"Enable phrase replacement table" = "启用语汇置换表";
 "Enable Space key for calling candidate window" = "敲空格键以呼出候选字窗";
 "Enable symbol input support (incl. certain emoji symbols)" = "启用包括少许绘文字在内的符号输入支援";
 "Enforce conversion in both input modes" = "依当前简繁模式强制转换";
@@ -243,6 +245,7 @@
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉耻模式 // 取消勾选的话，敲错字时会有异音";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode." = "该转换仅对磁带模式有影响，会将键入的内容根据该选项与当前的简繁体模式来转换。";
 "This only works with Tadokoro candidate window." = "该方法仅对田所选字窗起作用。";
+"This will batch-replace specified candidates." = "这将会对指定的候选字词进行整词取代。";
 "Traditional Chinese" = "繁体中文";
 "Trim unfinished readings / strokes on commit" = "在递交时清理未完成拼写的读音或字根";
 "Type them into inline composition buffer" = "直接键入内文组字区";
