@@ -19,6 +19,9 @@ struct VwrPrefPaneDevZone: View {
     forKey: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue)
   @State private var selShiftKeyAccommodationBehavior: Int = UserDefaults.standard.integer(
     forKey: UserDef.kShiftKeyAccommodationBehavior.rawValue)
+  @State private var selPhraseReplacementEnabled: Bool = UserDefaults.standard.bool(
+    forKey: UserDef.kPhraseReplacementEnabled.rawValue
+  )
 
   private let contentMaxHeight: Double = 440
   private let contentWidth: Double = {
@@ -94,6 +97,25 @@ struct VwrPrefPaneDevZone: View {
           Text(
             LocalizedStringKey(
               "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work."
+            )
+          )
+          .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+          HStack {
+            Toggle(
+              LocalizedStringKey("Enable phrase replacement table"),
+              isOn: $selPhraseReplacementEnabled.onChange {
+                PrefMgr.shared.phraseReplacementEnabled = selPhraseReplacementEnabled
+              }
+            )
+            Spacer()
+            Button(LocalizedStringKey("Edit…")) {
+              LMMgr.openPhraseFile(fromURL: LMMgr.userReplacementsDataURL(IMEApp.currentInputMode))
+              LMMgr.openPhraseFile(fromURL: LMMgr.userReplacementsDataURL(IMEApp.currentInputMode.reversed))
+            }
+          }
+          Text(
+            LocalizedStringKey(
+              "This will batch-replace specified candidates."
             )
           )
           .preferenceDescription().fixedSize(horizontal: false, vertical: true)
