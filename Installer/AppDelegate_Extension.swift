@@ -47,13 +47,13 @@ extension AppDelegate {
 
     let killTask = Process()
     killTask.launchPath = "/usr/bin/killall"
-    killTask.arguments = ["-9", kTargetBin]
+    killTask.arguments = [kTargetBin]
     killTask.launch()
     killTask.waitUntilExit()
 
     let killTask2 = Process()
     killTask2.launchPath = "/usr/bin/killall"
-    killTask2.arguments = ["-9", kTargetBinPhraseEditor]
+    killTask2.arguments = [kTargetBinPhraseEditor]
     killTask2.launch()
     killTask2.waitUntilExit()
 
