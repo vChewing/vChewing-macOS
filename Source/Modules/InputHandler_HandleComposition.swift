@@ -181,8 +181,7 @@ extension InputHandler {
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   private func handleCassetteComposition(input: InputSignalProtocol) -> Bool? {
     guard let delegate = delegate else { return nil }
-    var wildcardKey: String { currentLM.currentCassette.wildcardKey }  // 花牌鍵。
-    var wildcard: String { currentLM.currentCassette.wildcard }  // 花牌鍵。
+    var wildcardKey: String { currentLM.cassetteWildcardKey }  // 花牌鍵。
     let isWildcardKeyInput: Bool = (input.text == wildcardKey && !wildcardKey.isEmpty)
 
     var keyConsumedByStrokes = false
@@ -193,14 +192,14 @@ extension InputHandler {
 
     var isLongestPossibleKeyFormed: Bool {
       guard !isWildcardKeyInput, prefs.autoCompositeWithLongestPossibleCassetteKey else { return false }
-      return !currentLM.currentCassette.hasUnigramsFor(key: calligrapher + wildcard) && !calligrapher.isEmpty
+      return !currentLM.hasCassetteWildcardResultsFor(key: calligrapher) && !calligrapher.isEmpty
     }
 
     var isStrokesFull: Bool {
-      calligrapher.count >= currentLM.currentCassette.maxKeyLength || isLongestPossibleKeyFormed
+      calligrapher.count >= currentLM.maxCassetteKeyLength || isLongestPossibleKeyFormed
     }
 
-    prehandling: if !skipStrokeHandling && currentLM.currentCassette.allowedKeys.contains(input.text) {
+    prehandling: if !skipStrokeHandling && currentLM.isThisCassetteKeyAllowed(key: input.text) {
       if calligrapher.isEmpty, isWildcardKeyInput {
         delegate.callError("3606B9C0")
         var newEmptyState = compositor.isEmpty ? IMEState.ofEmpty() : generateStateOfInputting()

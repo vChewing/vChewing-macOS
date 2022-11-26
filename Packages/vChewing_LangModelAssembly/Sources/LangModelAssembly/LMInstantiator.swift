@@ -74,10 +74,6 @@ extension vChewingLM {
 
     // 磁帶資料模組。「currentCassette」對外唯讀，僅用來讀取磁帶本身的中繼資料（Metadata）。
     static var lmCassette = LMCassette()
-    public var currentCassette: LMCassette {
-      get { Self.lmCassette }
-      set { Self.lmCassette = newValue }
-    }
 
     // 聲明使用者語言模組。
     // 使用者語言模組使用多執行緒的話，可能會導致一些問題。有時間再仔細排查看看。
@@ -208,6 +204,7 @@ extension vChewingLM {
       }
     }
 
+    public var isCassetteDataLoaded: Bool { Self.lmCassette.isLoaded }
     public static func loadCassetteData(path: String) {
       DispatchQueue.main.async {
         if FileManager.default.isReadableFile(atPath: path) {
