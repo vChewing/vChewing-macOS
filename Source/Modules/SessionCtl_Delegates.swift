@@ -69,14 +69,8 @@ extension SessionCtl: CtlCandidateDelegate {
     if isVerticalTyping { return blankResult }  // 縱排輸入的場合，選字窗沒有足夠的空間顯示反查結果。
     if value.isEmpty { return blankResult }  // 空字串沒有需要反查的東西。
     if value.contains("_") { return blankResult }
-    guard var lookupResult = LMMgr.currentLM.currentCassette.reverseLookupMap[value] else { return blankResult }
-    for i in 0..<lookupResult.count {
-      lookupResult[i] = lookupResult[i].trimmingCharacters(in: .newlines)
-    }
-    return lookupResult.stableSort(by: { $0.count < $1.count }).stableSort {
-      LMMgr.currentLM.currentCassette.unigramsFor(key: $0).count
-        < LMMgr.currentLM.currentCassette.unigramsFor(key: $1).count
-    }
+    // 因為威注音輸入法的反查結果僅由磁帶模組負責，所以相關運算挪至 LMInstantiator 內處理。
+    return LMMgr.currentLM.cassetteReverseLookup(for: value)
   }
 
   public var selectionKeys: String {

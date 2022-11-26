@@ -247,7 +247,7 @@ extension SessionCtl {
           ? NSLocalizedString("NotificationSwitchON", comment: "")
           : NSLocalizedString("NotificationSwitchOFF", comment: ""))
     )
-    if !LMMgr.currentLM.currentCassette.isLoaded {
+    if !LMMgr.currentLM.isCassetteDataLoaded {
       LMMgr.loadCassetteData()
     }
   }
