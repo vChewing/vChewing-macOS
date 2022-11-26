@@ -179,9 +179,11 @@
 "Disable Shift key accomodation in all cases" = "Disable Shift key accomodation in all cases";
 "Disassemble the previous reading, dropping its intonation" = "Disassemble the previous reading, dropping its intonation";
 "Disassembling process does not work with non-phonetic reading keys." = "Disassembling process does not work with non-phonetic reading keys.";
+"Edit…" = "Edit…";
 "Emulating select-candidate-per-character mode" = "Emulating select-candidate-per-character mode";
 "Enable cassette mode, suppressing phonabet input" = "Enable cassette mode, suppressing phonabet input";
 "Enable CNS11643 Support (2022-10-04)" = "Enable CNS11643 Support (2022-10-04)";
+"Enable phrase replacement table" = "Enable phrase replacement table";
 "Enable Space key for calling candidate window" = "Enable Space key for calling candidate window";
 "Enable symbol input support (incl. certain emoji symbols)" = "Enable symbol input support (incl. certain emoji symbols)";
 "Enforce conversion in both input modes" = "Enforce conversion in both input modes";
@@ -243,6 +245,7 @@
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "Stop farting (when typed phonetic combination is invalid, etc.)";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode." = "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode.";
 "This only works with Tadokoro candidate window." = "This only works with Tadokoro candidate window.";
+"This will batch-replace specified candidates." = "This will batch-replace specified candidates.";
 "Traditional Chinese" = "Traditional Chinese";
 "Trim unfinished readings / strokes on commit" = "Trim unfinished readings / strokes on commit";
 "Type them into inline composition buffer" = "Type them into inline composition buffer";

@@ -179,9 +179,11 @@
 "Disable Shift key accomodation in all cases" = "いずれの客体アプリにも Shift キーの互換性措置を禁ず";
 "Disassemble the previous reading, dropping its intonation" = "カーソルの後部の音読みを解き、その音調を除く";
 "Disassembling process does not work with non-phonetic reading keys." = "実の意味の音読みだけを解くことができる。";
+"Edit…" = "編集…";
 "Emulating select-candidate-per-character mode" = "漢字１つづつ全候補選択入力モード";
 "Enable cassette mode, suppressing phonabet input" = "カセットモードを起用（注音入力はこのモードで使えぬ）";
 "Enable CNS11643 Support (2022-10-04)" = "全字庫モード // 入力可能な漢字数を倍増す (2022-10-04)";
+"Enable phrase replacement table" = "言葉置換表を起用";
 "Enable Space key for calling candidate window" = "Space キーで入力候補を呼び出す";
 "Enable symbol input support (incl. certain emoji symbols)" = "僅かなる絵文字も含む符号入力サポートを起用";
 "Enforce conversion in both input modes" = "カセットモードによる漢字出力の簡体繁体転換を常に行う";
@@ -243,6 +245,7 @@
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "マナーモード // 外すと入力間違った時に変な声が出る";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode." = "この転換はカセットモードだけに使える転換であり、転換結果はこの設定と入力モード次第である。";
 "This only works with Tadokoro candidate window." = "これは田所候補陳列ウィンドウだけに効ける機能である。";
+"This will batch-replace specified candidates." = "指定された候補そのものを置き換える";
 "Traditional Chinese" = "繁体中国語";
 "Trim unfinished readings / strokes on commit" = "送り出す緩衝列内容から未完成な音読み/筆組みを除く";
 "Type them into inline composition buffer" = "入力緩衝列にローマ字入力";
