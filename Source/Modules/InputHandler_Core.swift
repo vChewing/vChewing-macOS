@@ -428,11 +428,9 @@ public class InputHandler: InputHandlerProtocol {
       return composer.getInlineCompositionForDisplay(isHanyuPinyin: prefs.showHanyuPinyinInCompositionBuffer)
     }
     if !prefs.showTranslatedStrokesInCompositionBuffer { return calligrapher }
-    var result = calligrapher.charComponents
-    for idx in 0..<result.count {
-      result[idx] = currentLM.currentCassette.convertKeyToDisplay(char: result[idx])
-    }
-    return result.joined()
+    return calligrapher.charComponents.map {
+      currentLM.convertCassetteKeyToDisplay(char: $0)
+    }.joined()
   }
 
   // MARK: - Extracted methods and functions (Megrez).

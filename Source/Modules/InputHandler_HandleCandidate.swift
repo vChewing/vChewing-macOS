@@ -170,7 +170,7 @@ extension InputHandler {
 
       let isInputValid: Bool =
         prefs.cassetteEnabled
-        ? currentLM.currentCassette.allowedKeys.contains(input.text) : composer.inputValidityCheck(key: input.charCode)
+        ? currentLM.isThisCassetteKeyAllowed(key: input.text) : composer.inputValidityCheck(key: input.charCode)
 
       var shouldAutoSelectCandidate: Bool =
         isInputValid || currentLM.hasUnigramsFor(key: customPunctuation)
