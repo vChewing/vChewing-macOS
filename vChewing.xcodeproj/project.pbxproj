@@ -20,7 +20,7 @@
 		5B21176E28753B35000443A9 /* SessionCtl_HandleDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176D28753B35000443A9 /* SessionCtl_HandleDisplay.swift */; };
 		5B21177028753B9D000443A9 /* SessionCtl_Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176F28753B9D000443A9 /* SessionCtl_Delegates.swift */; };
 		5B2E009428FD1E8100E78D6E /* VwrPrefPaneCassette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2E009328FD1E8100E78D6E /* VwrPrefPaneCassette.swift */; };
-		5B3133BF280B229700A4A505 /* InputHandler_States.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3133BE280B229700A4A505 /* InputHandler_States.swift */; };
+		5B3133BF280B229700A4A505 /* InputHandler_HandleStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3133BE280B229700A4A505 /* InputHandler_HandleStates.swift */; };
 		5B40113928D7050D00A9D4CB /* Shared in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113828D7050D00A9D4CB /* Shared */; };
 		5B40113C28D71C0100A9D4CB /* Uninstaller in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113B28D71C0100A9D4CB /* Uninstaller */; };
 		5B5A603028E81CC50001AE8D /* SwiftUIBackports in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5A602F28E81CC50001AE8D /* SwiftUIBackports */; };
@@ -226,7 +226,7 @@
 		5B2F2BB3286216A500B8557B /* vChewingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vChewingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
 		5B312684287800DE001AA720 /* FAQ.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = FAQ.md; sourceTree = "<group>"; };
-		5B3133BE280B229700A4A505 /* InputHandler_States.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputHandler_States.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		5B3133BE280B229700A4A505 /* InputHandler_HandleStates.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputHandler_HandleStates.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Uninstaller; path = Packages/vChewing_Uninstaller; sourceTree = "<group>"; };
 		5B5A602E28E81CB00001AE8D /* ShapsBenkau_SwiftUIBackports */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = ShapsBenkau_SwiftUIBackports; path = Packages/ShapsBenkau_SwiftUIBackports; sourceTree = "<group>"; };
 		5B5C8ED628FC0E8E002C93A5 /* Sindresorhus_SSPreferences */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Sindresorhus_SSPreferences; path = Packages/Sindresorhus_SSPreferences; sourceTree = "<group>"; };
@@ -718,7 +718,7 @@
 				5BE3779F288FED8D0037365B /* InputHandler_HandleComposition.swift */,
 				5BE1F8A828F86AB5006C7FF5 /* InputHandler_HandleEvent.swift */,
 				5B7F225C2808501000DDD3CB /* InputHandler_HandleInput.swift */,
-				5B3133BE280B229700A4A505 /* InputHandler_States.swift */,
+				5B3133BE280B229700A4A505 /* InputHandler_HandleStates.swift */,
 				5BAEFACF28012565001F42C9 /* LMMgr.swift */,
 				D47B92BF27972AC800458394 /* main.swift */,
 				5B963CA728D5DB1400DCEE88 /* PrefMgr_Core.swift */,
@@ -1168,7 +1168,7 @@
 				5B21177028753B9D000443A9 /* SessionCtl_Delegates.swift in Sources */,
 				5B21176E28753B35000443A9 /* SessionCtl_HandleDisplay.swift in Sources */,
 				5BA9FD1027FEDB6B002DE248 /* VwrPrefPaneKeyboard.swift in Sources */,
-				5B3133BF280B229700A4A505 /* InputHandler_States.swift in Sources */,
+				5B3133BF280B229700A4A505 /* InputHandler_HandleStates.swift in Sources */,
 				5B78EE0D28A562B4009456C1 /* VwrPrefPaneDevZone.swift in Sources */,
 				5B6C141228A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift in Sources */,
 				D47F7DCE278BFB57002F9DD7 /* CtlPrefWindow.swift in Sources */,
