@@ -11,6 +11,7 @@ import Cocoa
 public protocol CtlCandidateDelegate {
   func candidatePairs(conv: Bool) -> [(String, String)]
   func candidatePairSelected(at index: Int)
+  func candidatePairRightClicked(at index: Int, action: CandidateContextMenuAction)
   func candidates(_ sender: Any!) -> [Any]!
   @discardableResult func reverseLookup(for value: String) -> [String]
   var selectionKeys: String { get }
@@ -43,4 +44,10 @@ public protocol CtlCandidateProtocol {
   func highlightPreviousCandidate() -> Bool
   func candidateIndexAtKeyLabelIndex(_: Int) -> Int
   func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: Double, useGCD: Bool)
+}
+
+public enum CandidateContextMenuAction {
+  case toBoost
+  case toNerf
+  case toFilter
 }
