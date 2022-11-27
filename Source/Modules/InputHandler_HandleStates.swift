@@ -160,6 +160,7 @@ extension InputHandler {
       var newState = generateStateOfInputting()
       newState.tooltip = NSLocalizedString(tooltipMessage, comment: "") + "　　"
       newState.data.tooltipColorState = .normal
+      newState.tooltipDuration = 1.85
       delegate.switchState(newState)
       return true
     }
@@ -178,6 +179,7 @@ extension InputHandler {
       var newState = generateStateOfInputting()
       newState.tooltip = NSLocalizedString(tooltipMessage, comment: "") + "　　"
       newState.data.tooltipColorState = .normal
+      newState.tooltipDuration = 1.85
       delegate.switchState(newState)
       return true
     }

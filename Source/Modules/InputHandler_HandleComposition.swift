@@ -206,6 +206,7 @@ extension InputHandler {
         var newEmptyState = compositor.isEmpty ? IMEState.ofEmpty() : generateStateOfInputting()
         newEmptyState.tooltip = NSLocalizedString("Wildcard key cannot be the initial key.", comment: "") + "　　"
         newEmptyState.data.tooltipColorState = .redAlert
+        newEmptyState.tooltipDuration = 1.0
         delegate.switchState(newEmptyState)
         return true
       }
