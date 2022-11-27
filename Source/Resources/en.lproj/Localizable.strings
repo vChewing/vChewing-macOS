@@ -1,7 +1,7 @@
 "vChewing" = "vChewing";
-"! Successful in filtering a user phrase." = "! Successful in filtering a user phrase.";
-"- Successful in nerfing a user phrase." = "- Successful in nerfing a user phrase.";
-"+ Successful in adding / boosting a user phrase." = "+ Successful in adding / boosting a user phrase.";
+"! Succeeded in filtering a user phrase." = "! Succeeded in filtering a user phrase.";
+"- Succeeded in nerfing a user phrase." = "- Succeeded in nerfing a user phrase.";
+"+ Succeeded in adding / boosting a user phrase." = "+ Succeeded in adding / boosting a user phrase.";
 "vChewing is rebooted due to a memory-excessive-usage problem. If convenient, please inform the developer that you are having this issue, stating whether you are using an Intel Mac or Apple Silicon Mac. An NSLog is generated with the current memory footprint size." = "vChewing is rebooted due to a memory-excessive-usage problem. If convenient, please inform the developer that you are having this issue, stating whether you are using an Intel Mac or Apple Silicon Mac. An NSLog is generated with the current memory footprint size.";
 "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key." = "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key.";
 "Wildcard key cannot be the initial key." = "Wildcard key cannot be the initial key.";

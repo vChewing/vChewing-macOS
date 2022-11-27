@@ -140,11 +140,11 @@ extension InputHandler {
 
     // Enter
     if input.isEnter {
-      var tooltipMessage = "+ Successful in adding / boosting a user phrase."
+      var tooltipMessage = "+ Succeeded in adding / boosting a user phrase."
       var tooltipColorState: TooltipColorState = .normal
       // 先判斷是否是在摁了降權組合鍵的時候目標不在庫。
       if input.isShiftHold, input.isCommandHold {
-        tooltipMessage = "- Successful in nerfing a user phrase."
+        tooltipMessage = "- Succeeded in nerfing a user phrase."
         tooltipColorState = .succeeded
         if !state.isFilterable {
           delegate.callError("2EAC1F7A")
@@ -169,7 +169,7 @@ extension InputHandler {
 
     // BackSpace & Delete
     if input.isBackSpace || input.isDelete {
-      let tooltipMessage = "! Successful in filtering a user phrase."
+      let tooltipMessage = "! Succeeded in filtering a user phrase."
       if !state.isFilterable {
         delegate.callError("1F88B191")
         return true
