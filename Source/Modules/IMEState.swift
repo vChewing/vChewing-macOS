@@ -225,4 +225,9 @@ extension IMEState {
     get { data.tooltipBackupForInputting }
     set { data.tooltipBackupForInputting = newValue }
   }
+
+  public var tooltipDuration: Double {
+    get { type == .ofMarking ? 0 : data.tooltipDuration }
+    set { data.tooltipDuration = newValue }
+  }
 }
