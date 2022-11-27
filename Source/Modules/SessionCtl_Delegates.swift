@@ -154,4 +154,55 @@ extension SessionCtl: CtlCandidateDelegate {
       switchState(IMEState.ofEmpty())
     }
   }
+
+  public func candidatePairRightClicked(at index: Int, action: CandidateContextMenuAction) {
+    guard isCandidateContextMenuEnabled else { return }
+    var succeeded = true
+
+    let rawPair = state.candidates[index]
+    let valueCurrent = rawPair.1
+    let valueReversed = ChineseConverter.crossConvert(rawPair.1)
+    let nerfedScore = (action == .toNerf) ? " -114.514" : ""
+    let convertedMark = "#𝙃𝙪𝙢𝙖𝙣𝘾𝙝𝙚𝙘𝙠𝙍𝙚𝙦𝙪𝙞𝙧𝙚𝙙"
+
+    let userPhraseDumped = "\(valueCurrent) \(rawPair.0)\(nerfedScore)"
+    let userPhraseDumpedConverted = "\(valueReversed) \(rawPair.0)\(nerfedScore)\t\(convertedMark)"
+
+    if !LMMgr.writeUserPhrase(
+      userPhraseDumped, inputMode: inputMode,
+      areWeDuplicating: action != .toFilter,
+      areWeDeleting: action == .toFilter
+    )
+      || !LMMgr.writeUserPhrase(
+        userPhraseDumpedConverted, inputMode: inputMode.reversed,
+        areWeDuplicating: action != .toFilter,
+        areWeDeleting: action == .toFilter
+      )
+    {
+      succeeded = false
+    }
+
+    // 開始針對使用者半衰模組的清詞處理
+    LMMgr.bleachSpecifiedSuggestions(targets: [valueCurrent], mode: IMEApp.currentInputMode)
+    LMMgr.bleachSpecifiedSuggestions(targets: [valueReversed], mode: IMEApp.currentInputMode.reversed)
+    // 清詞完畢
+
+    var newState = IMEState.ofCommitting(textToCommit: state.displayedText)
+    newState.tooltipDuration = 1.85
+    var tooltipMessage = ""
+    switch action {
+      case .toBoost:
+        newState.data.tooltipColorState = .normal
+        tooltipMessage = succeeded ? "+ Succeeded in boosting a candidate." : "⚠︎ Failed from boosting a candidate."
+      case .toNerf:
+        newState.data.tooltipColorState = .succeeded
+        tooltipMessage = succeeded ? "- Succeeded in nerfing a candidate." : "⚠︎ Failed from nerfing a candidate."
+      case .toFilter:
+        newState.data.tooltipColorState = .warning
+        tooltipMessage = succeeded ? "! Succeeded in filtering a candidate." : "⚠︎ Failed from filtering a candidate."
+    }
+    if !succeeded { newState.data.tooltipColorState = .redAlert }
+    newState.tooltip = NSLocalizedString(tooltipMessage, comment: "") + "　　"
+    switchState(newState)
+  }
 }

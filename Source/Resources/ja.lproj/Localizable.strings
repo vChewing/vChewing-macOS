@@ -1,4 +1,10 @@
 "vChewing" = "威注音入力アプリ";
+"⚠︎ Failed from boosting a candidate." = "⚠︎ 指定された文字候補の順位は最優先にできませんでした。";
+"⚠︎ Failed from nerfing a candidate." = "⚠︎ 指定された文字候補の優先順位を下げることに失敗ししました。";
+"⚠︎ Failed from filtering a candidate." = "⚠︎ 指定された文字候補は排除表に登録できませんでした。";
+"+ Succeeded in boosting a candidate." = "+ 指定された文字候補の順位は最優先にしました。";
+"- Succeeded in nerfing a candidate." = "- 指定された文字候補の優先順位を下げました。";
+"! Succeeded in filtering a candidate." = "! 指定された文字候補は排除表に登録しました。";
 "! Succeeded in filtering a user phrase." = "! この語彙は排除表に登録完了。";
 "- Succeeded in nerfing a user phrase." = "- この語彙の（候補としての）優先順位を下げました。";
 "+ Succeeded in adding / boosting a user phrase." = "+ 新しいユーザー候補を登録完了、\n或いはその既存候補の順位を最優先にしました。";
