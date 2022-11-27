@@ -63,14 +63,16 @@ extension SessionCtl {
         if previous.hasComposition, ![.ofAbortion, .ofCommitting].contains(newState.type) {
           commit(text: previous.displayedText)
         }
-        showTooltip(newState.tooltip, duration: 1)  // 會在工具提示為空的時候自動消除顯示。
+        // 會在工具提示為空的時候自動消除顯示。
+        showTooltip(newState.tooltip, duration: newState.tooltipDuration)
         clearInlineDisplay()
         inputHandler?.clear()
       case .ofInputting:
         candidateUI?.visible = false
         commit(text: newState.textToCommit)
         setInlineDisplayWithCursor()
-        showTooltip(newState.tooltip, duration: 1)  // 會在工具提示為空的時候自動消除顯示。
+        // 會在工具提示為空的時候自動消除顯示。
+        showTooltip(newState.tooltip, duration: newState.tooltipDuration)
       case .ofMarking:
         candidateUI?.visible = false
         setInlineDisplayWithCursor()
