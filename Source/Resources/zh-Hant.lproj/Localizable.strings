@@ -1,4 +1,10 @@
 "vChewing" = "威注音輸入法";
+"⚠︎ Failed from boosting a candidate." = "⚠︎ 候選字詞提權失敗。";
+"⚠︎ Failed from nerfing a candidate." = "⚠︎ 候選字詞降權失敗。";
+"⚠︎ Failed from filtering a candidate." = "⚠︎ 候選字詞濾除失敗。";
+"+ Succeeded in boosting a candidate." = "+ 候選字詞提權成功。";
+"- Succeeded in nerfing a candidate." = "- 候選字詞降權成功。";
+"! Succeeded in filtering a candidate." = "! 候選字詞濾除成功。";
 "! Succeeded in filtering a user phrase." = "! 成功濾除該詞音配對。";
 "- Succeeded in nerfing a user phrase." = "- 成功將該詞音配對降權處理。";
 "+ Succeeded in adding / boosting a user phrase." = "+ 成功添入使用者語彙（或使其升權）。";

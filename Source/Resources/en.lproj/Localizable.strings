@@ -1,4 +1,10 @@
 "vChewing" = "vChewing";
+"⚠︎ Failed from boosting a candidate." = "⚠︎ Failed from boosting a candidate.";
+"⚠︎ Failed from nerfing a candidate." = "⚠︎ Failed from nerfing a candidate.";
+"⚠︎ Failed from filtering a candidate." = "⚠︎ Failed from filtering a candidate.";
+"+ Succeeded in boosting a candidate." = "+ Succeeded in boosting a candidate.";
+"- Succeeded in nerfing a candidate." = "- Succeeded in nerfing a candidate.";
+"! Succeeded in filtering a candidate." = "! Succeeded in filtering a candidate.";
 "! Succeeded in filtering a user phrase." = "! Succeeded in filtering a user phrase.";
 "- Succeeded in nerfing a user phrase." = "- Succeeded in nerfing a user phrase.";
 "+ Succeeded in adding / boosting a user phrase." = "+ Succeeded in adding / boosting a user phrase.";
