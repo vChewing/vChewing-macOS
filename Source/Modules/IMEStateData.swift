@@ -94,6 +94,7 @@ public struct IMEStateData: IMEStateDataProtocol {
   public var candidates = [(String, String)]()
   public var textToCommit: String = ""
   public var tooltip: String = ""
+  public var tooltipDuration: Double = 1.0
   public var tooltipBackupForInputting: String = ""
   public var attributedStringPlaceholder: NSAttributedString = .init(
     string: " ",
