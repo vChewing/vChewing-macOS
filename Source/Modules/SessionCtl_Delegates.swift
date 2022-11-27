@@ -57,7 +57,7 @@ extension SessionCtl: InputHandlerDelegate {
 
 extension SessionCtl: CtlCandidateDelegate {
   public var isCandidateState: Bool { state.isCandidateContainer }
-
+  public var isCandidateContextMenuEnabled: Bool { state.type == .ofCandidates }
   public var showReverseLookupResult: Bool {
     !isVerticalTyping && PrefMgr.shared.showReverseLookupInCandidateUI
   }

@@ -16,6 +16,7 @@ public protocol CtlCandidateDelegate {
   var selectionKeys: String { get }
   var isVerticalTyping: Bool { get }
   var isCandidateState: Bool { get }
+  var isCandidateContextMenuEnabled: Bool { get }
   var showReverseLookupResult: Bool { get }
 }
 
