@@ -51,6 +51,12 @@ public struct VwrCandidateHorizontal: View {
     }
   }
 
+  private func didRightClickCandidateAt(_ pos: Int, action: CandidateContextMenuAction) {
+    if let delegate = controller?.delegate {
+      delegate.candidatePairRightClicked(at: pos, action: action)
+    }
+  }
+
   public var body: some View {
     VStack(alignment: .leading, spacing: 0) {
       ScrollView(.vertical, showsIndicators: false) {
@@ -65,6 +71,25 @@ public struct VwrCandidateHorizontal: View {
                   )
                   .contentShape(Rectangle())
                   .onTapGesture { didSelectCandidateAt(currentCandidate.index) }
+                  .contextMenu {
+                    if controller?.delegate?.isCandidateContextMenuEnabled ?? false {
+                      Button {
+                        didRightClickCandidateAt(currentCandidate.index, action: .toBoost)
+                      } label: {
+                        Text("↑ " + currentCandidate.displayedText)
+                      }
+                      Button {
+                        didRightClickCandidateAt(currentCandidate.index, action: .toNerf)
+                      } label: {
+                        Text("↓ " + currentCandidate.displayedText)
+                      }
+                      Button {
+                        didRightClickCandidateAt(currentCandidate.index, action: .toFilter)
+                      } label: {
+                        Text("✖︎ " + currentCandidate.displayedText)
+                      }
+                    }
+                  }
               }
               Spacer()
             }.frame(
