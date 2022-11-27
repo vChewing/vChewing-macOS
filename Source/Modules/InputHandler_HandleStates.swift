@@ -141,9 +141,11 @@ extension InputHandler {
     // Enter
     if input.isEnter {
       var tooltipMessage = "+ Successful in adding / boosting a user phrase."
+      var tooltipColorState: TooltipColorState = .normal
       // 先判斷是否是在摁了降權組合鍵的時候目標不在庫。
       if input.isShiftHold, input.isCommandHold {
         tooltipMessage = "- Successful in nerfing a user phrase."
+        tooltipColorState = .succeeded
         if !state.isFilterable {
           delegate.callError("2EAC1F7A")
           return true
@@ -159,7 +161,7 @@ extension InputHandler {
       }
       var newState = generateStateOfInputting()
       newState.tooltip = NSLocalizedString(tooltipMessage, comment: "") + "　　"
-      newState.data.tooltipColorState = .normal
+      newState.data.tooltipColorState = tooltipColorState
       newState.tooltipDuration = 1.85
       delegate.switchState(newState)
       return true
@@ -178,7 +180,7 @@ extension InputHandler {
       }
       var newState = generateStateOfInputting()
       newState.tooltip = NSLocalizedString(tooltipMessage, comment: "") + "　　"
-      newState.data.tooltipColorState = .normal
+      newState.data.tooltipColorState = .warning
       newState.tooltipDuration = 1.85
       delegate.switchState(newState)
       return true

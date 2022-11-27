@@ -120,6 +120,7 @@ public enum TooltipColorState {
   case denialOverflow
   case denialInsufficiency
   case prompt
+  case succeeded
 }
 
 // MARK: - IMEState types.

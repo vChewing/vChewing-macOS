@@ -85,6 +85,11 @@ public class TooltipUI: NSWindowController {
       case .warning:
         backgroundColor = NSColor.purple
         textColor = NSColor.white
+      case .succeeded:
+        backgroundColor = NSColor(
+          red: 0.21, green: 0.15, blue: 0.02, alpha: 1.00
+        )
+        textColor = NSColor.white
       case .denialOverflow:
         backgroundColor = NSColor(
           red: 0.13, green: 0.08, blue: 0.00, alpha: 1.00
