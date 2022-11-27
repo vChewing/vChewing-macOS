@@ -22,6 +22,7 @@ public protocol IMEStateProtocol {
   var displayedTextConverted: String { get }
   var textToCommit: String { get set }
   var tooltip: String { get set }
+  var tooltipDuration: Double { get set }
   var attributedString: NSAttributedString { get }
   var convertedToInputting: IMEStateProtocol { get }
   var isFilterable: Bool { get }
@@ -53,6 +54,7 @@ public protocol IMEStateDataProtocol {
   var displayedTextConverted: String { get }
   var tooltipBackupForInputting: String { get set }
   var tooltip: String { get set }
+  var tooltipDuration: Double { get set }
   var attributedStringNormal: NSAttributedString { get }
   var attributedStringMarking: NSAttributedString { get }
   var attributedStringPlaceholder: NSAttributedString { get }
