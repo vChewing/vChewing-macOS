@@ -109,6 +109,8 @@ public class SessionCtl: IMKInputController {
     didSet {
       if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(inputMode) }
       if oldValue != inputMode, inputMode != .imeModeNULL {
+        /// 先重置輸入調度模組，不然會因為之後的命令而導致該命令無法正常執行。
+        resetInputHandler(forceComposerCleanup: true)
         // ----------------------------
         /// 重設所有語言模組。這裡不需要做按需重設，因為對運算量沒有影響。
         inputHandler?.currentLM = LMMgr.currentLM  // 會自動更新組字引擎內的模組。
@@ -117,8 +119,6 @@ public class SessionCtl: IMKInputController {
         inputHandler?.ensureKeyboardParser()
         /// 將輸入法偏好設定同步至語言模組內。
         syncBaseLMPrefs()
-        /// 重置輸入調度模組。
-        resetInputHandler(forceComposerCleanup: true)
       }
       // 特殊處理：deactivateServer() 可能會遲於另一個客體會話的 activateServer() 執行。
       // 雖然所有在這個函式內影響到的變數都改為動態變數了（不會出現跨副本波及的情況），
