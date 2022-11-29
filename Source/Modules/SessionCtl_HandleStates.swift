@@ -121,7 +121,7 @@ extension SessionCtl {
     if buffer.isEmpty {
       return
     }
-    if let myID = Bundle.main.bundleIdentifier, let clientID = client.bundleIdentifier(), myID == clientID {
+    if isServingIMEItself {
       DispatchQueue.main.async {
         client.insertText(
           buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
@@ -137,7 +137,7 @@ extension SessionCtl {
   /// 把 setMarkedText 包裝一下，按需啟用 GCD。
   public func doSetMarkedText(_ string: Any!, selectionRange: NSRange, replacementRange: NSRange) {
     guard isActivated, let client = client() else { return }
-    if let myID = Bundle.main.bundleIdentifier, let clientID = client.bundleIdentifier(), myID == clientID {
+    if isServingIMEItself {
       DispatchQueue.main.async {
         client.setMarkedText(string, selectionRange: selectionRange, replacementRange: replacementRange)
       }
