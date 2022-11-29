@@ -45,7 +45,7 @@ extension SessionCtl {
         // 這裡移除一些處理，轉而交給 commitComposition() 代為執行。
         // 這裡不需要 clearInlineDisplay() ，否則會觸發無限迴圈。
         // 對於 IMK 選字窗的顯示狀態糾正的行為交給 inputMode.didSet() 來處理。
-        candidateUI.visible = false
+        candidateUI?.visible = false
         popupCompositionBuffer.hide()
         tooltipInstance.hide()
       case .ofEmpty, .ofAbortion, .ofCommitting:
@@ -58,7 +58,7 @@ extension SessionCtl {
             if replace { state = IMEState.ofEmpty() }
           default: break innerCircle
         }
-        candidateUI.visible = false
+        candidateUI?.visible = false
         // 全專案用以判斷「.Abortion」的地方僅此一處。
         if previous.hasComposition, ![.ofAbortion, .ofCommitting].contains(newState.type) {
           commit(text: previous.displayedText)
@@ -67,12 +67,12 @@ extension SessionCtl {
         clearInlineDisplay()
         inputHandler.clear()
       case .ofInputting:
-        candidateUI.visible = false
+        candidateUI?.visible = false
         commit(text: newState.textToCommit)
         setInlineDisplayWithCursor()
         showTooltip(newState.tooltip, duration: 1)  // 會在工具提示為空的時候自動消除顯示。
       case .ofMarking:
-        candidateUI.visible = false
+        candidateUI?.visible = false
         setInlineDisplayWithCursor()
         showTooltip(newState.tooltip)
       case .ofCandidates, .ofAssociates, .ofSymbolTable:
