@@ -82,7 +82,7 @@ extension SessionCtl {
         : .horizontal)
 
     /// 先取消既有的選字窗的內容顯示。否則可能會重複生成選字窗的 NSWindow()。
-    candidateUI.visible = false
+    candidateUI?.visible = false
     /// 然後再重新初期化。
     if #available(macOS 10.15, *) {
       candidateUI =
@@ -95,22 +95,22 @@ extension SessionCtl {
       candidateUI = CtlCandidateIMK(candidateLayout)
     }
 
-    candidateUI.candidateFont = Self.candidateFont(
+    candidateUI?.candidateFont = Self.candidateFont(
       name: PrefMgr.shared.candidateTextFontName, size: PrefMgr.shared.candidateListTextSize
     )
 
     if PrefMgr.shared.cassetteEnabled {
-      candidateUI.tooltip =
+      candidateUI?.tooltip =
         isVerticalTyping ? "📼" : "📼 " + NSLocalizedString("CIN Cassette Mode", comment: "")
     }
 
     if state.type == .ofAssociates {
-      candidateUI.tooltip =
+      candidateUI?.tooltip =
         isVerticalTyping ? "⇧" : NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
     }
 
-    candidateUI.useLangIdentifier = PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier
-    candidateUI.locale = {
+    candidateUI?.useLangIdentifier = PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier
+    candidateUI?.locale = {
       switch inputMode {
         case .imeModeCHS: return "zh-Hans"
         case .imeModeCHT:
@@ -131,11 +131,11 @@ extension SessionCtl {
       }
     }
 
-    candidateUI.delegate = self  // 會自動觸發田所選字窗的資料重載。
-    candidateUI.visible = true
+    candidateUI?.delegate = self  // 會自動觸發田所選字窗的資料重載。
+    candidateUI?.visible = true
 
     if isVerticalTyping {
-      candidateUI.set(
+      candidateUI?.set(
         windowTopLeftPoint: NSPoint(
           x: lineHeightRect().origin.x + lineHeightRect().size.width + 4.0, y: lineHeightRect().origin.y - 4.0
         ),
@@ -143,7 +143,7 @@ extension SessionCtl {
         useGCD: true
       )
     } else {
-      candidateUI.set(
+      candidateUI?.set(
         windowTopLeftPoint: NSPoint(x: lineHeightRect().origin.x, y: lineHeightRect().origin.y - 4.0),
         bottomOutOfScreenAdjustmentHeight: lineHeightRect().size.height + 4.0,
         useGCD: true

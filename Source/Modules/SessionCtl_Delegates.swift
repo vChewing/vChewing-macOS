@@ -16,7 +16,7 @@ extension SessionCtl: InputHandlerDelegate {
     return client.bundleIdentifier() ?? ""
   }
 
-  public func candidateController() -> CtlCandidateProtocol { candidateUI }
+  public func candidateController() -> CtlCandidateProtocol? { candidateUI }
 
   public func candidateSelectionCalledByInputHandler(at index: Int) {
     candidatePairSelected(at: index)
