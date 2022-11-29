@@ -40,6 +40,9 @@ public class SessionCtl: IMKInputController {
   /// 用來標記當前副本是否已處於活動狀態。
   public var isActivated = false
 
+  /// 當前副本的客體是否是輸入法本體？
+  public var isServingIMEItself: Bool = false
+
   // MARK: -
 
   /// 當前 Caps Lock 按鍵是否被摁下。
@@ -165,9 +168,7 @@ public class SessionCtl: IMKInputController {
 extension SessionCtl {
   /// 強制重設當前鍵盤佈局、使其與偏好設定同步。
   public func setKeyLayout() {
-    guard let client = client(), let myID = Bundle.main.bundleIdentifier, !myID.isEmpty,
-      clientBundleIdentifier != myID
-    else { return }
+    guard let client = client(), !isServingIMEItself else { return }
 
     DispatchQueue.main.async { [self] in
       if isASCIIMode, IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
@@ -198,12 +199,13 @@ extension SessionCtl {
 
 extension SessionCtl {
   /// 啟用輸入法時，會觸發該函式。
-  /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
+  /// - Parameter sender: 呼叫了該函式的客體。
   public override func activateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
-    DispatchQueue.main.async {
+    DispatchQueue.main.async { [self] in
       if let senderBundleID: String = (sender as? IMKTextInput)?.bundleIdentifier() {
         vCLog("activateServer(\(senderBundleID))")
+        isServingIMEItself = Bundle.main.bundleIdentifier == senderBundleID
       }
     }
     DispatchQueue.main.async { [self] in
