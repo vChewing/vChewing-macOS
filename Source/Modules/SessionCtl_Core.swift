@@ -29,16 +29,7 @@ public class SessionCtl: IMKInputController {
   public static var areWeNerfing = false
 
   /// 目前在用的的選字窗副本。
-  public var candidateUI: CtlCandidateProtocol = {
-    let direction: NSUserInterfaceLayoutOrientation =
-      PrefMgr.shared.useHorizontalCandidateList ? .horizontal : .vertical
-    if #available(macOS 10.15, *) {
-      return PrefMgr.shared.useIMKCandidateWindow
-        ? CtlCandidateIMK(direction) : CtlCandidateTDK(direction)
-    } else {
-      return CtlCandidateIMK(direction)
-    }
-  }()
+  public var candidateUI: CtlCandidateProtocol?
 
   /// 工具提示視窗的副本。
   public var tooltipInstance = TooltipUI()
@@ -210,7 +201,6 @@ extension SessionCtl {
       // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
       // 所以這裡添加這句、來試圖應對這種情況。
       inputHandler.delegate = self
-      candidateUI.delegate = self
       // 這裡不需要 setValue()，因為 IMK 會在自動呼叫 activateServer() 之後自動執行 setValue()。
       inputHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
       inputHandler.ensureKeyboardParser()
@@ -241,6 +231,10 @@ extension SessionCtl {
       isActivated = false
       resetInputHandler()  // 這條會自動搞定 Empty 狀態。
       switchState(IMEState.ofDeactivated())
+      // IMK 選字窗可以不用 nil，不然反而會出問題。反正 IMK 選字窗記憶體開銷可以不計。
+      if candidateUI is CtlCandidateTDK {
+        candidateUI = nil
+      }
     }
   }
 
