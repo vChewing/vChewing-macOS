@@ -101,7 +101,7 @@ extension SessionCtl {
     if event.type == .flagsChanged { return false }
 
     /// 沒有文字輸入客體的話，就不要再往下處理了。
-    guard client() != nil else { return false }
+    guard let inputHandler = inputHandler, client() != nil else { return false }
 
     var eventToDeal = event
 
