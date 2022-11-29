@@ -71,7 +71,11 @@ public class SessionCtl: IMKInputController {
   public var state: IMEStateProtocol = IMEState.ofEmpty() {
     didSet {
       guard oldValue.type != state.type else { return }
-      vCLog("Current State: \(state.type.rawValue), client: \(clientBundleIdentifier)")
+      if PrefMgr.shared.isDebugModeEnabled {
+        var stateDescription = state.type.rawValue
+        if state.type == .ofCommitting { stateDescription += "(\(state.textToCommit))" }
+        vCLog("Current State: \(stateDescription), client: \(clientBundleIdentifier)")
+      }
       // 因鍵盤訊號翻譯機制存在，故禁用下文。
       // guard state.isCandidateContainer != oldValue.isCandidateContainer else { return }
       // if state.isCandidateContainer || oldValue.isCandidateContainer { setKeyLayout() }
@@ -197,6 +201,11 @@ extension SessionCtl {
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   public override func activateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
+    DispatchQueue.main.async {
+      if let senderBundleID: String = (sender as? IMKTextInput)?.bundleIdentifier() {
+        vCLog("activateServer(\(senderBundleID))")
+      }
+    }
     DispatchQueue.main.async { [self] in
       if isActivated { return }
 
