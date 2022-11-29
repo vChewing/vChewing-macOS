@@ -18,7 +18,7 @@ import Shared
 
 extension InputHandler {
   /// 對於輸入訊號的第一關處理均藉由此函式來進行。
-  /// - Remark: 送入該函式處理之前，先用 inputHandler.handleEvent() 分診、來判斷是否需要交給 IMKCandidates 處理。
+  /// - Remark: 送入該函式處理之前，先用 inputHandler?.handleEvent() 分診、來判斷是否需要交給 IMKCandidates 處理。
   /// - Parameters:
   ///   - input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。

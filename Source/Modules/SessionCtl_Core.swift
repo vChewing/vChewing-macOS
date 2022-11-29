@@ -66,9 +66,7 @@ public class SessionCtl: IMKInputController {
   private static var isASCIIModeForAllClients = false  // 給所有副本共用的。
 
   /// 輸入調度模組的副本。
-  var inputHandler: InputHandlerProtocol = InputHandler(
-    lm: LMMgr.currentLM, uom: LMMgr.currentUOM, pref: PrefMgr.shared
-  )
+  var inputHandler: InputHandlerProtocol?
   /// 用以記錄當前輸入法狀態的變數。
   public var state: IMEStateProtocol = IMEState.ofEmpty() {
     didSet {
@@ -113,10 +111,10 @@ public class SessionCtl: IMKInputController {
       if oldValue != inputMode, inputMode != .imeModeNULL {
         // ----------------------------
         /// 重設所有語言模組。這裡不需要做按需重設，因為對運算量沒有影響。
-        inputHandler.currentLM = LMMgr.currentLM  // 會自動更新組字引擎內的模組。
-        inputHandler.currentUOM = LMMgr.currentUOM
+        inputHandler?.currentLM = LMMgr.currentLM  // 會自動更新組字引擎內的模組。
+        inputHandler?.currentUOM = LMMgr.currentUOM
         /// 清空注拼槽＋同步最新的注拼槽排列設定。
-        inputHandler.ensureKeyboardParser()
+        inputHandler?.ensureKeyboardParser()
         /// 將輸入法偏好設定同步至語言模組內。
         syncBaseLMPrefs()
         /// 重置輸入調度模組。
@@ -145,7 +143,10 @@ public class SessionCtl: IMKInputController {
   override public init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
     super.init(server: server, delegate: delegate, client: inputClient)
     DispatchQueue.main.async { [self] in
-      inputHandler.delegate = self
+      inputHandler = InputHandler(
+        lm: LMMgr.currentLM, uom: LMMgr.currentUOM, pref: PrefMgr.shared
+      )
+      inputHandler?.delegate = self
       syncBaseLMPrefs()
       // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
       activateServer(inputClient)
@@ -175,6 +176,7 @@ extension SessionCtl {
 
   /// 重設輸入調度模組，會將當前尚未遞交的內容遞交出去。
   public func resetInputHandler(forceComposerCleanup forceCleanup: Bool = false) {
+    guard let inputHandler = inputHandler else { return }
     var textToCommit = ""
     // 過濾掉尚未完成拼寫的注音。
     let sansReading: Bool =
@@ -198,12 +200,12 @@ extension SessionCtl {
     DispatchQueue.main.async { [self] in
       if isActivated { return }
 
-      // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
-      // 所以這裡添加這句、來試圖應對這種情況。
-      inputHandler.delegate = self
       // 這裡不需要 setValue()，因為 IMK 會在自動呼叫 activateServer() 之後自動執行 setValue()。
-      inputHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
-      inputHandler.ensureKeyboardParser()
+      inputHandler = InputHandler(
+        lm: LMMgr.currentLM, uom: LMMgr.currentUOM, pref: PrefMgr.shared
+      )
+      inputHandler?.delegate = self
+      syncBaseLMPrefs()
 
       Self.theShiftKeyDetector.alsoToggleWithLShift = PrefMgr.shared.togglingAlphanumericalModeWithLShift
       Self.isVerticalTyping = isVerticalTyping
@@ -231,6 +233,7 @@ extension SessionCtl {
       isActivated = false
       resetInputHandler()  // 這條會自動搞定 Empty 狀態。
       switchState(IMEState.ofDeactivated())
+      inputHandler = nil
       // IMK 選字窗可以不用 nil，不然反而會出問題。反正 IMK 選字窗記憶體開銷可以不計。
       if candidateUI is CtlCandidateTDK {
         candidateUI = nil
