@@ -95,15 +95,25 @@ public class SessionCtl: IMKInputController {
 
   /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
   public static var isVerticalTyping: Bool = false
-  public var isVerticalTyping: Bool {
-    guard let client = client() else { return false }
-    var textFrame = NSRect.seniorTheBeast
-    let attributes: [AnyHashable: Any]? = client.attributes(
-      forCharacterIndex: 0, lineHeightRectangle: &textFrame
-    )
-    let result = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
-    Self.isVerticalTyping = result
-    return result
+  public var isVerticalTyping: Bool = false {
+    didSet {
+      Self.isVerticalTyping = isVerticalTyping
+    }
+  }
+
+  public func updateVerticalTypingStatus() {
+    guard let client = client() else {
+      isVerticalTyping = false
+      return
+    }
+    DispatchQueue.main.async {
+      var textFrame = NSRect.seniorTheBeast
+      let attributes: [AnyHashable: Any]? = client.attributes(
+        forCharacterIndex: 0, lineHeightRectangle: &textFrame
+      )
+      let result = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
+      self.isVerticalTyping = result
+    }
   }
 
   /// InputMode 需要在每次出現內容變更的時候都連帶重設組字器與各項語言模組，
@@ -203,6 +213,7 @@ extension SessionCtl {
   public override func activateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     DispatchQueue.main.async { [self] in
+      defer { updateVerticalTypingStatus() }
       if let senderBundleID: String = (sender as? IMKTextInput)?.bundleIdentifier() {
         vCLog("activateServer(\(senderBundleID))")
         isServingIMEItself = Bundle.main.bundleIdentifier == senderBundleID
@@ -219,7 +230,6 @@ extension SessionCtl {
       syncBaseLMPrefs()
 
       Self.theShiftKeyDetector.alsoToggleWithLShift = PrefMgr.shared.togglingAlphanumericalModeWithLShift
-      Self.isVerticalTyping = isVerticalTyping
 
       if #available(macOS 10.15, *) {
         if isASCIIMode, PrefMgr.shared.disableShiftTogglingAlphanumericalMode { isASCIIMode = false }
