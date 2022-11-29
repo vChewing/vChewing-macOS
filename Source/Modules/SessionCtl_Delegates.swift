@@ -98,6 +98,7 @@ extension SessionCtl: CtlCandidateDelegate {
   }
 
   public func candidatePairSelected(at index: Int) {
+    guard let inputHandler = inputHandler else { return }
     if state.type == .ofSymbolTable, (0..<state.node.members.count).contains(index) {
       let node = state.node.members[index]
       if !node.members.isEmpty {
