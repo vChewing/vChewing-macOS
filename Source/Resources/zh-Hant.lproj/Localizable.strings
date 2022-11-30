@@ -1,7 +1,13 @@
 "vChewing" = "威注音輸入法";
-"! Successful in filtering a user phrase." = "! 成功濾除該詞音配對。";
-"- Successful in nerfing a user phrase." = "- 成功將該詞音配對降權處理。";
-"+ Successful in adding / boosting a user phrase." = "+ 成功添入使用者語彙（或使其升權）。";
+"⚠︎ Failed from boosting a candidate." = "⚠︎ 候選字詞提權失敗。";
+"⚠︎ Failed from nerfing a candidate." = "⚠︎ 候選字詞降權失敗。";
+"⚠︎ Failed from filtering a candidate." = "⚠︎ 候選字詞濾除失敗。";
+"+ Succeeded in boosting a candidate." = "+ 候選字詞提權成功。";
+"- Succeeded in nerfing a candidate." = "- 候選字詞降權成功。";
+"! Succeeded in filtering a candidate." = "! 候選字詞濾除成功。";
+"! Succeeded in filtering a user phrase." = "! 成功濾除該詞音配對。";
+"- Succeeded in nerfing a user phrase." = "- 成功將該詞音配對降權處理。";
+"+ Succeeded in adding / boosting a user phrase." = "+ 成功添入使用者語彙（或使其升權）。";
 "vChewing is rebooted due to a memory-excessive-usage problem. If convenient, please inform the developer that you are having this issue, stating whether you are using an Intel Mac or Apple Silicon Mac. An NSLog is generated with the current memory footprint size." = "威注音輸入法因記憶體用量過大的問題而重新啟動。如果您方便的話，請就這個問題知會該輸入法的主程式師、且請務必說明自己在用的是 Intel 機種還是 Apple Silicon 機種。當前輸入法記憶體用量已藉由 NSLog 記錄輸出。";
 "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key." = "請自行以「_punctuation_list」索引鍵\n在使用者自訂語彙檔案內擴充該符號選單的內容。";
 "Wildcard key cannot be the initial key." = "花牌鍵不得作為起始碼。";
@@ -179,9 +185,11 @@
 "Disable Shift key accomodation in all cases" = "對任何客體應用均停用 Shift 鍵相容性措施";
 "Disassemble the previous reading, dropping its intonation" = "析構游標正後方的字音，且剔除其聲調";
 "Disassembling process does not work with non-phonetic reading keys." = "析構行為僅針對組字器內「身為漢字讀音」的讀音索引單元有效。";
+"Edit…" = "編輯…";
 "Emulating select-candidate-per-character mode" = "模擬 90 年代前期注音逐字選字輸入風格";
 "Enable cassette mode, suppressing phonabet input" = "啟用磁帶模式，會停用注音輸入";
 "Enable CNS11643 Support (2022-10-04)" = "啟用 CNS11643 全字庫支援 (2022-10-04)";
+"Enable phrase replacement table" = "啟用語彙置換表";
 "Enable Space key for calling candidate window" = "敲空格鍵以呼出候選字窗";
 "Enable symbol input support (incl. certain emoji symbols)" = "啟用包括少許繪文字在內的符號輸入支援";
 "Enforce conversion in both input modes" = "依當前簡繁模式強制轉換";
@@ -227,6 +235,7 @@
 "Secondary Pinyin with Numeral Intonation" = "國音二式+數字標調";
 "Seigyou" = "精業排列";
 "Selection Keys:" = "選字鍵:";
+"Share alphanumerical mode status across all clients" = "對所有客體應用共用 Shift 中英文輸入切換狀態";
 "Shift+BackSpace:" = "Shift+退格鍵:";
 "Shift+Letter:" = "Shift+字母鍵:";
 "Show available reverse-lookup results in candidate window" = "在選字窗內顯示可用的字根反查結果";
@@ -242,6 +251,7 @@
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉恥模式 // 取消勾選的話，敲錯字時會有異音";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode." = "該轉換僅對磁帶模式有影響，會將鍵入的內容根據該選項與當前的簡繁體模式來轉換。";
 "This only works with Tadokoro candidate window." = "該方法僅對田所選字窗起作用。";
+"This will batch-replace specified candidates." = "這將會對指定的候選字詞進行整詞取代。";
 "Traditional Chinese" = "繁體中文";
 "Trim unfinished readings / strokes on commit" = "在遞交時清理未完成拼寫的讀音或字根";
 "Type them into inline composition buffer" = "直接鍵入內文組字區";

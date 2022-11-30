@@ -29,16 +29,7 @@ public class SessionCtl: IMKInputController {
   public static var areWeNerfing = false
 
   /// 目前在用的的選字窗副本。
-  public var ctlCandidateCurrent: CtlCandidateProtocol = {
-    let direction: NSUserInterfaceLayoutOrientation =
-      PrefMgr.shared.useHorizontalCandidateList ? .horizontal : .vertical
-    if #available(macOS 10.15, *) {
-      return PrefMgr.shared.useIMKCandidateWindow
-        ? CtlCandidateIMK(direction) : CtlCandidateTDK(direction)
-    } else {
-      return CtlCandidateIMK(direction)
-    }
-  }()
+  public var candidateUI: CtlCandidateProtocol?
 
   /// 工具提示視窗的副本。
   public var tooltipInstance = TooltipUI()
@@ -49,28 +40,45 @@ public class SessionCtl: IMKInputController {
   /// 用來標記當前副本是否已處於活動狀態。
   public var isActivated = false
 
+  /// 當前副本的客體是否是輸入法本體？
+  public var isServingIMEItself: Bool = false
+
   // MARK: -
 
   /// 當前 Caps Lock 按鍵是否被摁下。
   public var isCapsLocked: Bool { NSEvent.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock) }
 
   /// 當前這個 SessionCtl 副本是否處於英數輸入模式。
-  public var isASCIIMode = false {
-    didSet {
+  public var isASCIIMode: Bool {
+    get {
+      PrefMgr.shared.shareAlphanumericalModeStatusAcrossClients
+        ? Self.isASCIIModeForAllClients : isASCIIModeForThisClient
+    }
+    set {
+      if PrefMgr.shared.shareAlphanumericalModeStatusAcrossClients {
+        Self.isASCIIModeForAllClients = newValue
+      } else {
+        isASCIIModeForThisClient = newValue
+      }
       resetInputHandler()
       setKeyLayout()
     }
   }
 
+  private var isASCIIModeForThisClient = false  // 給每個副本用的。
+  private static var isASCIIModeForAllClients = false  // 給所有副本共用的。
+
   /// 輸入調度模組的副本。
-  var inputHandler: InputHandlerProtocol = InputHandler(
-    lm: LMMgr.currentLM, uom: LMMgr.currentUOM, pref: PrefMgr.shared
-  )
+  var inputHandler: InputHandlerProtocol?
   /// 用以記錄當前輸入法狀態的變數。
   public var state: IMEStateProtocol = IMEState.ofEmpty() {
     didSet {
       guard oldValue.type != state.type else { return }
-      vCLog("Current State: \(state.type.rawValue), client: \(clientBundleIdentifier)")
+      if PrefMgr.shared.isDebugModeEnabled {
+        var stateDescription = state.type.rawValue
+        if state.type == .ofCommitting { stateDescription += "(\(state.textToCommit))" }
+        vCLog("Current State: \(stateDescription), client: \(clientBundleIdentifier)")
+      }
       // 因鍵盤訊號翻譯機制存在，故禁用下文。
       // guard state.isCandidateContainer != oldValue.isCandidateContainer else { return }
       // if state.isCandidateContainer || oldValue.isCandidateContainer { setKeyLayout() }
@@ -87,15 +95,25 @@ public class SessionCtl: IMKInputController {
 
   /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
   public static var isVerticalTyping: Bool = false
-  public var isVerticalTyping: Bool {
-    guard let client = client() else { return false }
-    var textFrame = NSRect.seniorTheBeast
-    let attributes: [AnyHashable: Any]? = client.attributes(
-      forCharacterIndex: 0, lineHeightRectangle: &textFrame
-    )
-    let result = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
-    Self.isVerticalTyping = result
-    return result
+  public var isVerticalTyping: Bool = false {
+    didSet {
+      Self.isVerticalTyping = isVerticalTyping
+    }
+  }
+
+  public func updateVerticalTypingStatus() {
+    guard let client = client() else {
+      isVerticalTyping = false
+      return
+    }
+    DispatchQueue.main.async {
+      var textFrame = NSRect.seniorTheBeast
+      let attributes: [AnyHashable: Any]? = client.attributes(
+        forCharacterIndex: 0, lineHeightRectangle: &textFrame
+      )
+      let result = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
+      self.isVerticalTyping = result
+    }
   }
 
   /// InputMode 需要在每次出現內容變更的時候都連帶重設組字器與各項語言模組，
@@ -108,22 +126,22 @@ public class SessionCtl: IMKInputController {
     didSet {
       if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(inputMode) }
       if oldValue != inputMode, inputMode != .imeModeNULL {
+        /// 先重置輸入調度模組，不然會因為之後的命令而導致該命令無法正常執行。
+        resetInputHandler(forceComposerCleanup: true)
         // ----------------------------
         /// 重設所有語言模組。這裡不需要做按需重設，因為對運算量沒有影響。
-        inputHandler.currentLM = LMMgr.currentLM  // 會自動更新組字引擎內的模組。
-        inputHandler.currentUOM = LMMgr.currentUOM
+        inputHandler?.currentLM = LMMgr.currentLM  // 會自動更新組字引擎內的模組。
+        inputHandler?.currentUOM = LMMgr.currentUOM
         /// 清空注拼槽＋同步最新的注拼槽排列設定。
-        inputHandler.ensureKeyboardParser()
+        inputHandler?.ensureKeyboardParser()
         /// 將輸入法偏好設定同步至語言模組內。
         syncBaseLMPrefs()
-        /// 重置輸入調度模組。
-        resetInputHandler(forceComposerCleanup: true)
       }
       // 特殊處理：deactivateServer() 可能會遲於另一個客體會話的 activateServer() 執行。
       // 雖然所有在這個函式內影響到的變數都改為動態變數了（不會出現跨副本波及的情況），
       // 但 IMKCandidates 是有內部共用副本的、會被波及。所以在這裡糾偏一下。
       if PrefMgr.shared.useIMKCandidateWindow {
-        guard let imkC = ctlCandidateCurrent as? CtlCandidateIMK else { return }
+        guard let imkC = candidateUI as? CtlCandidateIMK else { return }
         if state.isCandidateContainer, !imkC.visible {
           handle(state: state, replace: false)
         }
@@ -142,7 +160,10 @@ public class SessionCtl: IMKInputController {
   override public init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
     super.init(server: server, delegate: delegate, client: inputClient)
     DispatchQueue.main.async { [self] in
-      inputHandler.delegate = self
+      inputHandler = InputHandler(
+        lm: LMMgr.currentLM, uom: LMMgr.currentUOM, pref: PrefMgr.shared
+      )
+      inputHandler?.delegate = self
       syncBaseLMPrefs()
       // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
       activateServer(inputClient)
@@ -157,9 +178,7 @@ public class SessionCtl: IMKInputController {
 extension SessionCtl {
   /// 強制重設當前鍵盤佈局、使其與偏好設定同步。
   public func setKeyLayout() {
-    guard let client = client(), let myID = Bundle.main.bundleIdentifier, !myID.isEmpty,
-      clientBundleIdentifier != myID
-    else { return }
+    guard let client = client(), !isServingIMEItself else { return }
 
     DispatchQueue.main.async { [self] in
       if isASCIIMode, IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
@@ -172,14 +191,17 @@ extension SessionCtl {
 
   /// 重設輸入調度模組，會將當前尚未遞交的內容遞交出去。
   public func resetInputHandler(forceComposerCleanup forceCleanup: Bool = false) {
+    guard let inputHandler = inputHandler else { return }
+    var textToCommit = ""
     // 過濾掉尚未完成拼寫的注音。
-    if state.type == .ofInputting, PrefMgr.shared.trimUnfinishedReadingsOnCommit || forceCleanup {
-      inputHandler.clearComposerAndCalligrapher()
-    }
+    let sansReading: Bool =
+      (state.type == .ofInputting) && (PrefMgr.shared.trimUnfinishedReadingsOnCommit || forceCleanup)
+    textToCommit = inputHandler.generateStateOfInputting(sansReading: sansReading).displayedText
     // 威注音不再在這裡對 IMKTextInput 客體黑名單當中的應用做資安措施。
     // 有相關需求者，請在切換掉輸入法或者切換至新的客體應用之前敲一下 Shift+Delete。
-    switchState(IMEState.ofCommitting(textToCommit: inputHandler.generateStateOfInputting().displayedText))
-    // switchState(isSecureMode ? IMEState.ofAbortion() : IMEState.ofEmpty())
+    if !inputHandler.isCompositorEmpty {
+      switchState(IMEState.ofCommitting(textToCommit: textToCommit))
+    }
   }
 }
 
@@ -187,21 +209,27 @@ extension SessionCtl {
 
 extension SessionCtl {
   /// 啟用輸入法時，會觸發該函式。
-  /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
+  /// - Parameter sender: 呼叫了該函式的客體。
   public override func activateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     DispatchQueue.main.async { [self] in
+      defer { updateVerticalTypingStatus() }
+      if let senderBundleID: String = (sender as? IMKTextInput)?.bundleIdentifier() {
+        vCLog("activateServer(\(senderBundleID))")
+        isServingIMEItself = Bundle.main.bundleIdentifier == senderBundleID
+      }
+    }
+    DispatchQueue.main.async { [self] in
       if isActivated { return }
 
-      // 因為偶爾會收到與 activateServer 有關的以「強制拆 nil」為理由的報錯，
-      // 所以這裡添加這句、來試圖應對這種情況。
-      if inputHandler.delegate == nil { inputHandler.delegate = self }
       // 這裡不需要 setValue()，因為 IMK 會在自動呼叫 activateServer() 之後自動執行 setValue()。
-      inputHandler.clear()  // 這句不要砍，因為後面 handle State.Empty() 不一定執行。
-      inputHandler.ensureKeyboardParser()
+      inputHandler = InputHandler(
+        lm: LMMgr.currentLM, uom: LMMgr.currentUOM, pref: PrefMgr.shared
+      )
+      inputHandler?.delegate = self
+      syncBaseLMPrefs()
 
       Self.theShiftKeyDetector.alsoToggleWithLShift = PrefMgr.shared.togglingAlphanumericalModeWithLShift
-      Self.isVerticalTyping = isVerticalTyping
 
       if #available(macOS 10.15, *) {
         if isASCIIMode, PrefMgr.shared.disableShiftTogglingAlphanumericalMode { isASCIIMode = false }
@@ -226,6 +254,11 @@ extension SessionCtl {
       isActivated = false
       resetInputHandler()  // 這條會自動搞定 Empty 狀態。
       switchState(IMEState.ofDeactivated())
+      inputHandler = nil
+      // IMK 選字窗可以不用 nil，不然反而會出問題。反正 IMK 選字窗記憶體開銷可以不計。
+      if candidateUI is CtlCandidateTDK {
+        candidateUI = nil
+      }
     }
   }
 

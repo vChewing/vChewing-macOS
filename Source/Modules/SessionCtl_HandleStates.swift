@@ -45,7 +45,7 @@ extension SessionCtl {
         // 這裡移除一些處理，轉而交給 commitComposition() 代為執行。
         // 這裡不需要 clearInlineDisplay() ，否則會觸發無限迴圈。
         // 對於 IMK 選字窗的顯示狀態糾正的行為交給 inputMode.didSet() 來處理。
-        ctlCandidateCurrent.visible = false
+        candidateUI?.visible = false
         popupCompositionBuffer.hide()
         tooltipInstance.hide()
       case .ofEmpty, .ofAbortion, .ofCommitting:
@@ -58,22 +58,23 @@ extension SessionCtl {
             if replace { state = IMEState.ofEmpty() }
           default: break innerCircle
         }
-        ctlCandidateCurrent.visible = false
+        candidateUI?.visible = false
         // 全專案用以判斷「.Abortion」的地方僅此一處。
         if previous.hasComposition, ![.ofAbortion, .ofCommitting].contains(newState.type) {
           commit(text: previous.displayedText)
         }
-        showTooltip(newState.tooltip, duration: 1)  // 會在工具提示為空的時候自動消除顯示。
+        // 會在工具提示為空的時候自動消除顯示。
+        showTooltip(newState.tooltip, duration: newState.tooltipDuration)
         clearInlineDisplay()
-        // 最後一道保險
-        inputHandler.clear()
+        inputHandler?.clear()
       case .ofInputting:
-        ctlCandidateCurrent.visible = false
+        candidateUI?.visible = false
         commit(text: newState.textToCommit)
         setInlineDisplayWithCursor()
-        showTooltip(newState.tooltip, duration: 1)  // 會在工具提示為空的時候自動消除顯示。
+        // 會在工具提示為空的時候自動消除顯示。
+        showTooltip(newState.tooltip, duration: newState.tooltipDuration)
       case .ofMarking:
-        ctlCandidateCurrent.visible = false
+        candidateUI?.visible = false
         setInlineDisplayWithCursor()
         showTooltip(newState.tooltip)
       case .ofCandidates, .ofAssociates, .ofSymbolTable:
@@ -120,7 +121,7 @@ extension SessionCtl {
     if buffer.isEmpty {
       return
     }
-    if let myID = Bundle.main.bundleIdentifier, let clientID = client.bundleIdentifier(), myID == clientID {
+    if isServingIMEItself {
       DispatchQueue.main.async {
         client.insertText(
           buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
@@ -136,7 +137,7 @@ extension SessionCtl {
   /// 把 setMarkedText 包裝一下，按需啟用 GCD。
   public func doSetMarkedText(_ string: Any!, selectionRange: NSRange, replacementRange: NSRange) {
     guard isActivated, let client = client() else { return }
-    if let myID = Bundle.main.bundleIdentifier, let clientID = client.bundleIdentifier(), myID == clientID {
+    if isServingIMEItself {
       DispatchQueue.main.async {
         client.setMarkedText(string, selectionRange: selectionRange, replacementRange: replacementRange)
       }

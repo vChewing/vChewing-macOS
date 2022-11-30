@@ -1,7 +1,13 @@
 "vChewing" = "vChewing";
-"! Successful in filtering a user phrase." = "! Successful in filtering a user phrase.";
-"- Successful in nerfing a user phrase." = "- Successful in nerfing a user phrase.";
-"+ Successful in adding / boosting a user phrase." = "+ Successful in adding / boosting a user phrase.";
+"⚠︎ Failed from boosting a candidate." = "⚠︎ Failed from boosting a candidate.";
+"⚠︎ Failed from nerfing a candidate." = "⚠︎ Failed from nerfing a candidate.";
+"⚠︎ Failed from filtering a candidate." = "⚠︎ Failed from filtering a candidate.";
+"+ Succeeded in boosting a candidate." = "+ Succeeded in boosting a candidate.";
+"- Succeeded in nerfing a candidate." = "- Succeeded in nerfing a candidate.";
+"! Succeeded in filtering a candidate." = "! Succeeded in filtering a candidate.";
+"! Succeeded in filtering a user phrase." = "! Succeeded in filtering a user phrase.";
+"- Succeeded in nerfing a user phrase." = "- Succeeded in nerfing a user phrase.";
+"+ Succeeded in adding / boosting a user phrase." = "+ Succeeded in adding / boosting a user phrase.";
 "vChewing is rebooted due to a memory-excessive-usage problem. If convenient, please inform the developer that you are having this issue, stating whether you are using an Intel Mac or Apple Silicon Mac. An NSLog is generated with the current memory footprint size." = "vChewing is rebooted due to a memory-excessive-usage problem. If convenient, please inform the developer that you are having this issue, stating whether you are using an Intel Mac or Apple Silicon Mac. An NSLog is generated with the current memory footprint size.";
 "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key." = "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key.";
 "Wildcard key cannot be the initial key." = "Wildcard key cannot be the initial key.";
@@ -179,9 +185,11 @@
 "Disable Shift key accomodation in all cases" = "Disable Shift key accomodation in all cases";
 "Disassemble the previous reading, dropping its intonation" = "Disassemble the previous reading, dropping its intonation";
 "Disassembling process does not work with non-phonetic reading keys." = "Disassembling process does not work with non-phonetic reading keys.";
+"Edit…" = "Edit…";
 "Emulating select-candidate-per-character mode" = "Emulating select-candidate-per-character mode";
 "Enable cassette mode, suppressing phonabet input" = "Enable cassette mode, suppressing phonabet input";
 "Enable CNS11643 Support (2022-10-04)" = "Enable CNS11643 Support (2022-10-04)";
+"Enable phrase replacement table" = "Enable phrase replacement table";
 "Enable Space key for calling candidate window" = "Enable Space key for calling candidate window";
 "Enable symbol input support (incl. certain emoji symbols)" = "Enable symbol input support (incl. certain emoji symbols)";
 "Enforce conversion in both input modes" = "Enforce conversion in both input modes";
@@ -227,6 +235,7 @@
 "Secondary Pinyin with Numeral Intonation" = "Secondary Pinyin with Numeral Intonation";
 "Seigyou" = "Seigyou (JinYei)";
 "Selection Keys:" = "Selection Keys:";
+"Share alphanumerical mode status across all clients" = "Share alphanumerical mode status across all clients";
 "Shift+BackSpace:" = "Shift+BackSpace:";
 "Shift+Letter:" = "Shift+Letter:";
 "Show available reverse-lookup results in candidate window" = "Show available reverse-lookup results in candidate window";
@@ -242,6 +251,7 @@
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "Stop farting (when typed phonetic combination is invalid, etc.)";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode." = "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode.";
 "This only works with Tadokoro candidate window." = "This only works with Tadokoro candidate window.";
+"This will batch-replace specified candidates." = "This will batch-replace specified candidates.";
 "Traditional Chinese" = "Traditional Chinese";
 "Trim unfinished readings / strokes on commit" = "Trim unfinished readings / strokes on commit";
 "Type them into inline composition buffer" = "Type them into inline composition buffer";

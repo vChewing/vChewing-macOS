@@ -10,7 +10,7 @@ import Cocoa
 import Shared
 
 /// 候選字窗會用到的資料池單位。
-public class CandidatePool {
+public struct CandidatePool {
   public let blankCell = CandidateCellData(key: " ", displayedText: "　", isSelected: false)
   public var currentLayout: NSUserInterfaceLayoutOrientation = .horizontal
   public private(set) var candidateDataAll: [CandidateCellData] = []
@@ -174,7 +174,7 @@ public class CandidatePool {
 
   // MARK: Public Functions
 
-  public func selectNewNeighborLine(isForward: Bool) {
+  public mutating func selectNewNeighborLine(isForward: Bool) {
     switch currentLayout {
       case .horizontal: selectNewNeighborRow(direction: isForward ? .down : .up)
       case .vertical: selectNewNeighborColumn(direction: isForward ? .right : .left)
@@ -182,7 +182,7 @@ public class CandidatePool {
     }
   }
 
-  public func highlight(at indexSpecified: Int) {
+  public mutating func highlight(at indexSpecified: Int) {
     switch currentLayout {
       case .horizontal: highlightHorizontal(at: indexSpecified)
       case .vertical: highlightVertical(at: indexSpecified)
@@ -221,7 +221,7 @@ extension CandidatePool {
     currentColumnNumber..<min(candidateColumns.count, currentColumnNumber + maxColumnsPerPage)
   }
 
-  private func selectNewNeighborRow(direction: VerticalDirection) {
+  private mutating func selectNewNeighborRow(direction: VerticalDirection) {
     let currentSubIndex = candidateDataAll[highlightedIndex].subIndex
     var result = currentSubIndex
     switch direction {
@@ -259,7 +259,7 @@ extension CandidatePool {
     }
   }
 
-  private func selectNewNeighborColumn(direction: HorizontalDirection) {
+  private mutating func selectNewNeighborColumn(direction: HorizontalDirection) {
     let currentSubIndex = candidateDataAll[highlightedIndex].subIndex
     switch direction {
       case .left:
@@ -288,7 +288,7 @@ extension CandidatePool {
     }
   }
 
-  private func highlightHorizontal(at indexSpecified: Int) {
+  private mutating func highlightHorizontal(at indexSpecified: Int) {
     var indexSpecified = indexSpecified
     highlightedIndex = indexSpecified
     if !(0..<candidateDataAll.count).contains(highlightedIndex) {
@@ -321,7 +321,7 @@ extension CandidatePool {
     }
   }
 
-  private func highlightVertical(at indexSpecified: Int) {
+  private mutating func highlightVertical(at indexSpecified: Int) {
     var indexSpecified = indexSpecified
     highlightedIndex = indexSpecified
     if !(0..<candidateDataAll.count).contains(highlightedIndex) {

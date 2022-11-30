@@ -42,7 +42,8 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
 
   open var delegate: CtlCandidateDelegate? {
     didSet {
-      reloadData()
+      guard let delegate = delegate else { return }
+      if delegate.isCandidateState { reloadData() }
     }
   }
 

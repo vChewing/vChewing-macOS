@@ -16,7 +16,7 @@ extension SessionCtl: InputHandlerDelegate {
     return client.bundleIdentifier() ?? ""
   }
 
-  public func candidateController() -> CtlCandidateProtocol { ctlCandidateCurrent }
+  public func candidateController() -> CtlCandidateProtocol? { candidateUI }
 
   public func candidateSelectionCalledByInputHandler(at index: Int) {
     candidatePairSelected(at: index)
@@ -56,6 +56,8 @@ extension SessionCtl: InputHandlerDelegate {
 // MARK: - Candidate Controller Delegate
 
 extension SessionCtl: CtlCandidateDelegate {
+  public var isCandidateState: Bool { state.isCandidateContainer }
+  public var isCandidateContextMenuEnabled: Bool { state.type == .ofCandidates }
   public var showReverseLookupResult: Bool {
     !isVerticalTyping && PrefMgr.shared.showReverseLookupInCandidateUI
   }
@@ -67,14 +69,8 @@ extension SessionCtl: CtlCandidateDelegate {
     if isVerticalTyping { return blankResult }  // 縱排輸入的場合，選字窗沒有足夠的空間顯示反查結果。
     if value.isEmpty { return blankResult }  // 空字串沒有需要反查的東西。
     if value.contains("_") { return blankResult }
-    guard var lookupResult = LMMgr.currentLM.currentCassette.reverseLookupMap[value] else { return blankResult }
-    for i in 0..<lookupResult.count {
-      lookupResult[i] = lookupResult[i].trimmingCharacters(in: .newlines)
-    }
-    return lookupResult.stableSort(by: { $0.count < $1.count }).stableSort {
-      LMMgr.currentLM.currentCassette.unigramsFor(key: $0).count
-        < LMMgr.currentLM.currentCassette.unigramsFor(key: $1).count
-    }
+    // 因為威注音輸入法的反查結果僅由磁帶模組負責，所以相關運算挪至 LMInstantiator 內處理。
+    return LMMgr.currentLM.cassetteReverseLookup(for: value)
   }
 
   public var selectionKeys: String {
@@ -96,6 +92,7 @@ extension SessionCtl: CtlCandidateDelegate {
   }
 
   public func candidatePairSelected(at index: Int) {
+    guard let inputHandler = inputHandler else { return }
     if state.type == .ofSymbolTable, (0..<state.node.members.count).contains(index) {
       let node = state.node.members[index]
       if !node.members.isEmpty {
@@ -156,5 +153,56 @@ extension SessionCtl: CtlCandidateDelegate {
       }
       switchState(IMEState.ofEmpty())
     }
+  }
+
+  public func candidatePairRightClicked(at index: Int, action: CandidateContextMenuAction) {
+    guard isCandidateContextMenuEnabled else { return }
+    var succeeded = true
+
+    let rawPair = state.candidates[index]
+    let valueCurrent = rawPair.1
+    let valueReversed = ChineseConverter.crossConvert(rawPair.1)
+    let nerfedScore = (action == .toNerf) ? " -114.514" : ""
+    let convertedMark = "#𝙃𝙪𝙢𝙖𝙣𝘾𝙝𝙚𝙘𝙠𝙍𝙚𝙦𝙪𝙞𝙧𝙚𝙙"
+
+    let userPhraseDumped = "\(valueCurrent) \(rawPair.0)\(nerfedScore)"
+    let userPhraseDumpedConverted = "\(valueReversed) \(rawPair.0)\(nerfedScore)\t\(convertedMark)"
+
+    if !LMMgr.writeUserPhrase(
+      userPhraseDumped, inputMode: inputMode,
+      areWeDuplicating: action != .toFilter,
+      areWeDeleting: action == .toFilter
+    )
+      || !LMMgr.writeUserPhrase(
+        userPhraseDumpedConverted, inputMode: inputMode.reversed,
+        areWeDuplicating: action != .toFilter,
+        areWeDeleting: action == .toFilter
+      )
+    {
+      succeeded = false
+    }
+
+    // 開始針對使用者半衰模組的清詞處理
+    LMMgr.bleachSpecifiedSuggestions(targets: [valueCurrent], mode: IMEApp.currentInputMode)
+    LMMgr.bleachSpecifiedSuggestions(targets: [valueReversed], mode: IMEApp.currentInputMode.reversed)
+    // 清詞完畢
+
+    var newState = IMEState.ofCommitting(textToCommit: state.displayedText)
+    newState.tooltipDuration = 1.85
+    var tooltipMessage = ""
+    switch action {
+      case .toBoost:
+        newState.data.tooltipColorState = .normal
+        tooltipMessage = succeeded ? "+ Succeeded in boosting a candidate." : "⚠︎ Failed from boosting a candidate."
+      case .toNerf:
+        newState.data.tooltipColorState = .succeeded
+        tooltipMessage = succeeded ? "- Succeeded in nerfing a candidate." : "⚠︎ Failed from nerfing a candidate."
+      case .toFilter:
+        newState.data.tooltipColorState = .warning
+        tooltipMessage = succeeded ? "! Succeeded in filtering a candidate." : "⚠︎ Failed from filtering a candidate."
+    }
+    if !succeeded { newState.data.tooltipColorState = .redAlert }
+    newState.tooltip = NSLocalizedString(tooltipMessage, comment: "") + "　　"
+    switchState(newState)
   }
 }

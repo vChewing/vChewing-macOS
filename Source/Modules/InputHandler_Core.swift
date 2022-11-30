@@ -22,14 +22,21 @@ public protocol InputHandlerProtocol {
   var currentUOM: vChewingLM.LMUserOverride { get set }
   var delegate: InputHandlerDelegate? { get set }
   var composer: Tekkon.Composer { get set }
+  var isCompositorEmpty: Bool { get }
   var isComposerUsingPinyin: Bool { get }
   func clear()
   func clearComposerAndCalligrapher()
   func ensureKeyboardParser()
   func handleEvent(_ event: NSEvent) -> Bool
-  func generateStateOfInputting() -> IMEStateProtocol
+  func generateStateOfInputting(sansReading: Bool) -> IMEStateProtocol
   func generateStateOfAssociates(withPair pair: Megrez.Compositor.KeyValuePaired) -> IMEStateProtocol
   func consolidateNode(candidate: (String, String), respectCursorPushing: Bool, preConsolidate: Bool)
+}
+
+extension InputHandlerProtocol {
+  func generateStateOfInputting(sansReading: Bool = false) -> IMEStateProtocol {
+    generateStateOfInputting(sansReading: sansReading)
+  }
 }
 
 // MARK: - 委任協定 (Delegate).
@@ -42,7 +49,7 @@ public protocol InputHandlerDelegate {
   var clientBundleIdentifier: String { get }
   func callError(_ logMessage: String)
   func switchState(_ newState: IMEStateProtocol)
-  func candidateController() -> CtlCandidateProtocol
+  func candidateController() -> CtlCandidateProtocol?
   func candidateSelectionCalledByInputHandler(at index: Int)
   func performUserPhraseOperation(addToFilter: Bool)
     -> Bool
@@ -89,6 +96,8 @@ public class InputHandler: InputHandlerProtocol {
   }
 
   // MARK: - Functions dealing with Megrez.
+
+  public var isCompositorEmpty: Bool { compositor.isEmpty }
 
   /// 獲取當前標記得範圍。這個函式只能是函式、而非只讀變數。
   /// - Returns: 當前標記範圍。
@@ -419,11 +428,9 @@ public class InputHandler: InputHandlerProtocol {
       return composer.getInlineCompositionForDisplay(isHanyuPinyin: prefs.showHanyuPinyinInCompositionBuffer)
     }
     if !prefs.showTranslatedStrokesInCompositionBuffer { return calligrapher }
-    var result = calligrapher.charComponents
-    for idx in 0..<result.count {
-      result[idx] = currentLM.currentCassette.convertKeyToDisplay(char: result[idx])
-    }
-    return result.joined()
+    return calligrapher.charComponents.map {
+      currentLM.convertCassetteKeyToDisplay(char: $0)
+    }.joined()
   }
 
   // MARK: - Extracted methods and functions (Megrez).

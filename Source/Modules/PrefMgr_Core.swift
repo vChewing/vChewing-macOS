@@ -152,6 +152,9 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kAutoCompositeWithLongestPossibleCassetteKey.rawValue, defaultValue: true)
   public var autoCompositeWithLongestPossibleCassetteKey: Bool
 
+  @AppProperty(key: UserDef.kShareAlphanumericalModeStatusAcrossClients.rawValue, defaultValue: false)
+  public var shareAlphanumericalModeStatusAcrossClients: Bool
+
   // MARK: - Settings (Tier 2)
 
   @AppProperty(key: UserDef.kUseIMKCandidateWindow.rawValue, defaultValue: false)

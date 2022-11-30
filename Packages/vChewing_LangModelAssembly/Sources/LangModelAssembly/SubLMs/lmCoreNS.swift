@@ -14,7 +14,7 @@ extension vChewingLM {
   /// 與之前的 LMCore 不同，LMCoreNS 直接讀取 plist。
   /// 這樣一來可以節省在舊 mac 機種內的資料讀入速度。
   /// 目前僅針對輸入法原廠語彙資料檔案使用 plist 格式。
-  public class LMCoreNS {
+  @frozen public struct LMCoreNS {
     /// 資料庫辭典。索引內容為經過加密的注音字串，資料內容則為 UTF8 資料陣列。
     var rangeMap: [String: [Data]] = [:]
     /// 【已作廢】資料庫字串陣列。在 LMCoreNS 內沒有作用。
@@ -57,7 +57,7 @@ extension vChewingLM {
     /// 將資料從檔案讀入至資料庫辭典內。
     /// - parameters:
     ///   - path: 給定路徑。
-    @discardableResult public func open(_ path: String) -> Bool {
+    @discardableResult public mutating func open(_ path: String) -> Bool {
       if isLoaded { return false }
 
       do {
@@ -74,7 +74,7 @@ extension vChewingLM {
     }
 
     /// 將當前語言模組的資料庫辭典自記憶體內卸除。
-    public func clear() {
+    public mutating func clear() {
       rangeMap.removeAll()
     }
 
@@ -107,21 +107,28 @@ extension vChewingLM {
     ///   - key: 讀音索引鍵。
     public func unigramsFor(key: String) -> [Megrez.Unigram] {
       var grams: [Megrez.Unigram] = []
-      if let arrRangeRecords: [Data] = rangeMap[cnvPhonabetToASCII(key)] {
-        for netaSet in arrRangeRecords {
-          let strNetaSet = String(decoding: netaSet, as: UTF8.self)
-          let neta = Array(strNetaSet.trimmingCharacters(in: .newlines).split(separator: " ").reversed())
-          let theValue: String = .init(neta[0])
-          var theScore = defaultScore
-          if neta.count >= 2, !shouldForceDefaultScore {
-            theScore = .init(String(neta[1])) ?? defaultScore
+      var gramsHW: [Megrez.Unigram] = []
+      guard let arrRangeRecords: [Data] = rangeMap[cnvPhonabetToASCII(key)] else { return grams }
+      for netaSet in arrRangeRecords {
+        let strNetaSet = String(decoding: netaSet, as: UTF8.self)
+        let neta = Array(strNetaSet.trimmingCharacters(in: .newlines).split(separator: " ").reversed())
+        let theValue: String = .init(neta[0])
+        var theScore = defaultScore
+        if neta.count >= 2, !shouldForceDefaultScore {
+          theScore = .init(String(neta[1])) ?? defaultScore
+        }
+        if theScore > 0 {
+          theScore *= -1  // 應對可能忘記寫負號的情形
+        }
+        grams.append(Megrez.Unigram(value: theValue, score: theScore))
+        if !key.contains("_punctuation") { continue }
+        if let halfValue = theValue.applyingTransform(.fullwidthToHalfwidth, reverse: false) {
+          if halfValue != theValue {
+            gramsHW.append(Megrez.Unigram(value: halfValue, score: theScore))
           }
-          if theScore > 0 {
-            theScore *= -1  // 應對可能忘記寫負號的情形
-          }
-          grams.append(Megrez.Unigram(value: theValue, score: theScore))
         }
       }
+      grams.append(contentsOf: gramsHW)
       return grams
     }
 

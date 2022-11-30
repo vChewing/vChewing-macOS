@@ -22,20 +22,20 @@ struct CandidatePoolViewUIVerticalBackports_Previews: PreviewProvider {
     "吹", "大", "地", "草", "枝", "擺",
   ]
   static var thePool: CandidatePool {
-    let result = CandidatePool(candidates: testCandidates, columnCapacity: 6, selectionKeys: "123456789")
+    var result = CandidatePool(candidates: testCandidates, columnCapacity: 6, selectionKeys: "123456789")
     // 下一行待解決：無論這裡怎麼指定高亮選中項是哪一筆，其所在行都得被卷動到使用者眼前。
     result.highlight(at: 5)
     return result
   }
 
   static var previews: some View {
-    VwrCandidateVerticalBackports(controller: .init(.horizontal), thePool: thePool).fixedSize()
+    VwrCandidateVerticalBackports(controller: nil, thePool: thePool).fixedSize()
   }
 }
 
 @available(macOS 10.15, *)
 public struct VwrCandidateVerticalBackports: View {
-  public var controller: CtlCandidateTDK
+  public weak var controller: CtlCandidateTDK?
   @Environment(\.colorScheme) var colorScheme
   @State public var thePool: CandidatePool
   @State public var tooltip: String = ""
@@ -46,8 +46,14 @@ public struct VwrCandidateVerticalBackports: View {
   }
 
   private func didSelectCandidateAt(_ pos: Int) {
-    if let delegate = controller.delegate {
+    if let delegate = controller?.delegate {
       delegate.candidatePairSelected(at: pos)
+    }
+  }
+
+  private func didRightClickCandidateAt(_ pos: Int, action: CandidateContextMenuAction) {
+    if let delegate = controller?.delegate {
+      delegate.candidatePairRightClicked(at: pos, action: action)
     }
   }
 
@@ -66,6 +72,25 @@ public struct VwrCandidateVerticalBackports: View {
                     )
                     .contentShape(Rectangle())
                     .onTapGesture { didSelectCandidateAt(currentCandidate.index) }
+                    .contextMenu {
+                      if controller?.delegate?.isCandidateContextMenuEnabled ?? false {
+                        Button {
+                          didRightClickCandidateAt(currentCandidate.index, action: .toBoost)
+                        } label: {
+                          Text("↑ " + currentCandidate.displayedText)
+                        }
+                        Button {
+                          didRightClickCandidateAt(currentCandidate.index, action: .toNerf)
+                        } label: {
+                          Text("↓ " + currentCandidate.displayedText)
+                        }
+                        Button {
+                          didRightClickCandidateAt(currentCandidate.index, action: .toFilter)
+                        } label: {
+                          Text("✖︎ " + currentCandidate.displayedText)
+                        }
+                      }
+                    }
                 }
               }
             }.frame(
@@ -101,7 +126,7 @@ public struct VwrCandidateVerticalBackports: View {
         }
       }
       .fixedSize(horizontal: true, vertical: false).padding(5)
-      if controller.delegate?.showReverseLookupResult ?? true {
+      if controller?.delegate?.showReverseLookupResult ?? true {
         ZStack(alignment: .leading) {
           Color(white: colorScheme == .dark ? 0.15 : 0.97)
           HStack(alignment: .center, spacing: 4) {
@@ -123,7 +148,7 @@ public struct VwrCandidateVerticalBackports: View {
           Color(white: colorScheme == .dark ? 0.2 : 0.9)
         } else {
           Color(white: colorScheme == .dark ? 0.0 : 1)
-          controller.highlightedColorUIBackports
+          controller?.highlightedColorUIBackports
         }
         HStack(alignment: .center) {
           if !tooltip.isEmpty {

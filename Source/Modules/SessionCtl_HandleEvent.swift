@@ -39,7 +39,7 @@ extension SessionCtl {
     // 就這傳入的 NSEvent 都還有可能是 nil，Apple InputMethodKit 團隊到底在搞三小。
     // 只針對特定類型的 client() 進行處理。
     guard let event = event, sender is IMKTextInput else {
-      resetInputHandler()
+      resetInputHandler(forceComposerCleanup: true)
       return false
     }
 
@@ -101,7 +101,7 @@ extension SessionCtl {
     if event.type == .flagsChanged { return false }
 
     /// 沒有文字輸入客體的話，就不要再往下處理了。
-    guard client() != nil else { return false }
+    guard let inputHandler = inputHandler, client() != nil else { return false }
 
     var eventToDeal = event
 

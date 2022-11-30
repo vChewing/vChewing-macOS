@@ -18,12 +18,12 @@ extension InputHandler {
   // MARK: - 構築狀態（State Building）
 
   /// 生成「正在輸入」狀態。相關的內容會被拿給狀態機械用來處理在電腦螢幕上顯示的內容。
-  public func generateStateOfInputting() -> IMEStateProtocol {
+  public func generateStateOfInputting(sansReading: Bool = false) -> IMEStateProtocol {
     /// 「更新內文組字區 (Update the composing buffer)」是指要求客體軟體將組字緩衝區的內容
     /// 換成由此處重新生成的原始資料在 IMEStateData 當中生成的 NSAttributeString。
     var displayTextSegments: [String] = compositor.walkedNodes.values
     var cursor = convertCursorForDisplay(compositor.cursor)
-    let reading: String = readingForDisplay  // 先提出來，減輕運算負擔。
+    let reading: String = sansReading ? "" : readingForDisplay  // 先提出來，減輕運算負擔。
     if !reading.isEmpty {
       var newDisplayTextSegments = [String]()
       var temporaryNode = ""
@@ -140,10 +140,12 @@ extension InputHandler {
 
     // Enter
     if input.isEnter {
-      var tooltipMessage = "+ Successful in adding / boosting a user phrase."
+      var tooltipMessage = "+ Succeeded in adding / boosting a user phrase."
+      var tooltipColorState: TooltipColorState = .normal
       // 先判斷是否是在摁了降權組合鍵的時候目標不在庫。
       if input.isShiftHold, input.isCommandHold {
-        tooltipMessage = "- Successful in nerfing a user phrase."
+        tooltipMessage = "- Succeeded in nerfing a user phrase."
+        tooltipColorState = .succeeded
         if !state.isFilterable {
           delegate.callError("2EAC1F7A")
           return true
@@ -159,14 +161,15 @@ extension InputHandler {
       }
       var newState = generateStateOfInputting()
       newState.tooltip = NSLocalizedString(tooltipMessage, comment: "") + "　　"
-      newState.data.tooltipColorState = .normal
+      newState.data.tooltipColorState = tooltipColorState
+      newState.tooltipDuration = 1.85
       delegate.switchState(newState)
       return true
     }
 
     // BackSpace & Delete
     if input.isBackSpace || input.isDelete {
-      let tooltipMessage = "! Successful in filtering a user phrase."
+      let tooltipMessage = "! Succeeded in filtering a user phrase."
       if !state.isFilterable {
         delegate.callError("1F88B191")
         return true
@@ -177,7 +180,8 @@ extension InputHandler {
       }
       var newState = generateStateOfInputting()
       newState.tooltip = NSLocalizedString(tooltipMessage, comment: "") + "　　"
-      newState.data.tooltipColorState = .normal
+      newState.data.tooltipColorState = .warning
+      newState.tooltipDuration = 1.85
       delegate.switchState(newState)
       return true
     }
@@ -298,9 +302,21 @@ extension InputHandler {
     guard state.type == .ofInputting else { return false }
 
     var displayedText = compositor.keys.joined(separator: "\t")
-    if prefs.inlineDumpPinyinInLieuOfZhuyin, !prefs.cassetteEnabled {
-      displayedText = Tekkon.restoreToneOneInZhuyinKey(target: displayedText)  // 恢復陰平標記
-      displayedText = Tekkon.cnvPhonaToHanyuPinyin(target: displayedText)  // 注音轉拼音
+    if compositor.isEmpty {
+      displayedText = readingForDisplay
+    }
+    if !prefs.cassetteEnabled {
+      if prefs.inlineDumpPinyinInLieuOfZhuyin {
+        if !compositor.isEmpty {
+          displayedText = Tekkon.restoreToneOneInZhuyinKey(target: displayedText)  // 恢復陰平標記
+        }
+        displayedText = Tekkon.cnvPhonaToHanyuPinyin(target: displayedText)  // 注音轉拼音
+      }
+      if prefs.showHanyuPinyinInCompositionBuffer {
+        if compositor.isEmpty {
+          displayedText = displayedText.replacingOccurrences(of: "1", with: "")
+        }
+      }
     }
 
     let isVCED = delegate.clientBundleIdentifier.contains("vChewingPhraseEditor")

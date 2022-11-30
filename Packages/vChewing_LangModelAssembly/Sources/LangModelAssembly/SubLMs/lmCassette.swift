@@ -14,7 +14,7 @@ import Shared
 
 extension vChewingLM {
   /// 磁帶模組，用來方便使用者自行擴充字根輸入法。
-  public class LMCassette {
+  @frozen public struct LMCassette {
     public private(set) var nameShort: String = ""
     public private(set) var nameENG: String = ""
     public private(set) var nameCJK: String = ""
@@ -65,7 +65,7 @@ extension vChewingLM {
     /// 第三欄資料為對應字根、可有可無。第一欄與第二欄分別為「字詞」與「統計頻次」。
     /// - Parameter path: 檔案路徑。
     /// - Returns: 是否載入成功。
-    @discardableResult public func open(_ path: String) -> Bool {
+    @discardableResult public mutating func open(_ path: String) -> Bool {
       if isLoaded { return false }
       if FileManager.default.fileExists(atPath: path) {
         do {
@@ -156,7 +156,7 @@ extension vChewingLM {
       return false
     }
 
-    public func clear() {
+    public mutating func clear() {
       keyNameMap.removeAll()
       charDefMap.removeAll()
       charDefWildcardMap.removeAll()

@@ -56,40 +56,39 @@ extension vChewingLM {
     // 聲明原廠語言模組：
     // Reverse 的話，第一欄是注音，第二欄是對應的漢字，第三欄是可能的權重。
     // 不 Reverse 的話，第一欄是漢字，第二欄是對應的注音，第三欄是可能的權重。
-    let lmCore = LMCoreNS(
+    var lmCore = LMCoreNS(
       reverse: false, consolidate: false, defaultScore: -9.9, forceDefaultScore: false
     )
-    let lmMisc = LMCoreNS(
+    var lmMisc = LMCoreNS(
       reverse: true, consolidate: false, defaultScore: -1.0, forceDefaultScore: false
     )
 
     // 簡體中文模式與繁體中文模式共用全字庫擴展模組，故靜態處理。
     // 不然，每個模式都會讀入一份全字庫，會多佔用 100MB 記憶體。
-    static let lmCNS = vChewingLM.LMCoreNS(
+    static var lmCNS = vChewingLM.LMCoreNS(
       reverse: true, consolidate: false, defaultScore: -11.0, forceDefaultScore: false
     )
-    static let lmSymbols = vChewingLM.LMCoreNS(
+    static var lmSymbols = vChewingLM.LMCoreNS(
       reverse: true, consolidate: false, defaultScore: -13.0, forceDefaultScore: false
     )
 
     // 磁帶資料模組。「currentCassette」對外唯讀，僅用來讀取磁帶本身的中繼資料（Metadata）。
-    static let lmCassette = LMCassette()
-    public var currentCassette: LMCassette { Self.lmCassette }
+    static var lmCassette = LMCassette()
 
     // 聲明使用者語言模組。
     // 使用者語言模組使用多執行緒的話，可能會導致一些問題。有時間再仔細排查看看。
-    let lmUserPhrases = LMCoreEX(
+    var lmUserPhrases = LMCoreEX(
       reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: false
     )
-    let lmFiltered = LMCoreEX(
+    var lmFiltered = LMCoreEX(
       reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: true
     )
-    let lmUserSymbols = LMCoreEX(
+    var lmUserSymbols = LMCoreEX(
       reverse: true, consolidate: true, defaultScore: -12.0, forceDefaultScore: true
     )
-    let lmReplacements = LMReplacements()
-    let lmAssociates = LMAssociates()
-    let lmPlainBopomofo = LMPlainBopomofo()
+    var lmReplacements = LMReplacements()
+    var lmAssociates = LMAssociates()
+    var lmPlainBopomofo = LMPlainBopomofo()
 
     // MARK: - 工具函式
 
@@ -205,6 +204,7 @@ extension vChewingLM {
       }
     }
 
+    public var isCassetteDataLoaded: Bool { Self.lmCassette.isLoaded }
     public static func loadCassetteData(path: String) {
       DispatchQueue.main.async {
         if FileManager.default.isReadableFile(atPath: path) {

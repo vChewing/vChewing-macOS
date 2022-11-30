@@ -21,7 +21,7 @@ extension InputHandler {
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleCandidate(input: InputSignalProtocol) -> Bool {
     guard let delegate = delegate else { return false }
-    var ctlCandidate = delegate.candidateController()
+    guard var ctlCandidate = delegate.candidateController() else { return false }
     let state = delegate.state
     guard !state.candidates.isEmpty else { return false }
 
@@ -170,7 +170,7 @@ extension InputHandler {
 
       let isInputValid: Bool =
         prefs.cassetteEnabled
-        ? currentLM.currentCassette.allowedKeys.contains(input.text) : composer.inputValidityCheck(key: input.charCode)
+        ? currentLM.isThisCassetteKeyAllowed(key: input.text) : composer.inputValidityCheck(key: input.charCode)
 
       var shouldAutoSelectCandidate: Bool =
         isInputValid || currentLM.hasUnigramsFor(key: customPunctuation)
