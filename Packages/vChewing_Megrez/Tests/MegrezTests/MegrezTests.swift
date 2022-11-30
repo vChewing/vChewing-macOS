@@ -11,7 +11,7 @@ import XCTest
 final class MegrezTests: XCTestCase {
   func testSpan() throws {
     let langModel = SimpleLM(input: strSampleData)
-    var span = Megrez.Compositor.Span()
+    let span = Megrez.Compositor.Span()
     let n1 = Megrez.Compositor.Node(keyArray: ["gao1"], spanLength: 1, unigrams: langModel.unigramsFor(key: "gao1"))
     let n3 = Megrez.Compositor.Node(
       keyArray: ["gao1ke1ji4"], spanLength: 3, unigrams: langModel.unigramsFor(key: "gao1ke1ji4")
@@ -517,5 +517,22 @@ final class MegrezTests: XCTestCase {
     XCTAssertTrue(compositor.overrideCandidate(.init(key: "huo3yan4", value: "🔥"), at: location))
     result = compositor.walk().0
     XCTAssertEqual(result.values, ["高熱", "🔥", "危險"])
+  }
+
+  func testCompositor_updateUnigramData() throws {
+    let theLM = SimpleLM(input: strSampleData)
+    var compositor = Megrez.Compositor(with: theLM)
+    compositor.separator = ""
+    compositor.insertKey("nian2")
+    compositor.insertKey("zhong1")
+    compositor.insertKey("jiang3")
+    compositor.insertKey("jin1")
+    let oldResult = compositor.walk().0.values.joined()
+    print(oldResult)
+    theLM.trim(key: "nian2zhong1", value: "年中")
+    compositor.update(updateExisting: true)
+    let newResult = compositor.walk().0.values.joined()
+    print(newResult)
+    XCTAssertEqual([oldResult, newResult], ["年中獎金", "年終獎金"])
   }
 }
