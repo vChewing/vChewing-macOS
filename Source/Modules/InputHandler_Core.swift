@@ -28,6 +28,7 @@ public protocol InputHandlerProtocol {
   func clearComposerAndCalligrapher()
   func ensureKeyboardParser()
   func handleEvent(_ event: NSEvent) -> Bool
+  func generateStateOfCandidates() -> IMEStateProtocol
   func generateStateOfInputting(sansReading: Bool) -> IMEStateProtocol
   func generateStateOfAssociates(withPair pair: Megrez.Compositor.KeyValuePaired) -> IMEStateProtocol
   func consolidateNode(candidate: (String, String), respectCursorPushing: Bool, preConsolidate: Bool)
