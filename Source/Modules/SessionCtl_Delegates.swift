@@ -28,7 +28,7 @@ extension SessionCtl: InputHandlerDelegate {
   }
 
   public func performUserPhraseOperation(addToFilter: Bool) -> Bool {
-    guard state.type == .ofMarking else { return false }
+    guard let inputHandler = inputHandler, state.type == .ofMarking else { return false }
     if !LMMgr.writeUserPhrase(
       state.data.userPhraseDumped, inputMode: inputMode,
       areWeDuplicating: state.data.doesUserPhraseExist,
@@ -42,10 +42,17 @@ extension SessionCtl: InputHandlerDelegate {
     {
       return false
     }
-    // 開始針對使用者半衰模組的清詞處理
+
+    // 後續操作。
     let rawPair = state.data.userPhraseKVPair
     let valueCurrent = rawPair.1
     let valueReversed = ChineseConverter.crossConvert(rawPair.1)
+
+    // 更新組字器內的單元圖資料。
+    // 註：如果已經排除的內容是該讀音下唯一的記錄的話，
+    // 則該內容的節點會繼續殘留在組字區內，只是無法再重新輸入了。
+    _ = inputHandler.updateUnigramData()
+    // 開始針對使用者半衰模組的清詞處理
     LMMgr.bleachSpecifiedSuggestions(targets: [valueCurrent], mode: IMEApp.currentInputMode)
     LMMgr.bleachSpecifiedSuggestions(targets: [valueReversed], mode: IMEApp.currentInputMode.reversed)
     // 清詞完畢
@@ -186,10 +193,11 @@ extension SessionCtl: CtlCandidateDelegate {
     LMMgr.bleachSpecifiedSuggestions(targets: [valueCurrent], mode: IMEApp.currentInputMode)
     LMMgr.bleachSpecifiedSuggestions(targets: [valueReversed], mode: IMEApp.currentInputMode.reversed)
     // 更新組字器內的單元圖資料。
-    let updateResult = inputHandler.updateUnigramData(key: rawPair.0)
+    let updateResult = inputHandler.updateUnigramData()
     // 清詞完畢
 
-    var newState = inputHandler.generateStateOfInputting()
+    var newState: IMEStateProtocol =
+      updateResult ? inputHandler.generateStateOfCandidates() : IMEState.ofCommitting(textToCommit: state.displayedText)
     newState.tooltipDuration = 1.85
     var tooltipMessage = ""
     switch action {
