@@ -36,6 +36,13 @@ class SimpleLM: LangModelProtocol {
   func hasUnigramsFor(key: String) -> Bool {
     mutDatabase.keys.contains(key)
   }
+
+  func trim(key: String, value: String) {
+    guard var arr = mutDatabase[key] else { return }
+    arr = arr.compactMap { $0.value == value ? nil : $0 }
+    guard !arr.isEmpty else { return }
+    mutDatabase[key] = arr
+  }
 }
 
 class MockLM: LangModelProtocol {
