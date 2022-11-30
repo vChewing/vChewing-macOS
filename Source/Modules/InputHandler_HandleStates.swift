@@ -90,7 +90,7 @@ extension InputHandler {
 
   /// 拿著給定的候選字詞陣列資料內容，切換至選字狀態。
   /// - Returns: 回呼一個新的選詞狀態，來就給定的候選字詞陣列資料內容顯示選字窗。
-  func generateStateOfCandidates() -> IMEStateProtocol {
+  public func generateStateOfCandidates() -> IMEStateProtocol {
     IMEState.ofCandidates(
       candidates: generateArrayOfCandidates(fixOrder: prefs.useFixecCandidateOrderOnSelection),
       displayTextSegments: compositor.walkedNodes.values,
