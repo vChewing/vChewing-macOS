@@ -32,6 +32,7 @@ public protocol InputHandlerProtocol {
   func generateStateOfInputting(sansReading: Bool) -> IMEStateProtocol
   func generateStateOfAssociates(withPair pair: Megrez.Compositor.KeyValuePaired) -> IMEStateProtocol
   func consolidateNode(candidate: (String, String), respectCursorPushing: Bool, preConsolidate: Bool)
+  func updateUnigramData() -> Bool
 }
 
 extension InputHandlerProtocol {
@@ -435,6 +436,13 @@ public class InputHandler: InputHandlerProtocol {
   }
 
   // MARK: - Extracted methods and functions (Megrez).
+
+  /// 就地增刪詞之後，需要就地更新游標上下文單元圖資料。
+  public func updateUnigramData() -> Bool {
+    let result = compositor.update(updateExisting: true)
+    defer { walk() }
+    return result > 0
+  }
 
   /// 生成標點符號索引鍵。
   /// - Parameter input: 輸入的按鍵訊號。

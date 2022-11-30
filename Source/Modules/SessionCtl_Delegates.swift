@@ -156,7 +156,7 @@ extension SessionCtl: CtlCandidateDelegate {
   }
 
   public func candidatePairRightClicked(at index: Int, action: CandidateContextMenuAction) {
-    guard isCandidateContextMenuEnabled else { return }
+    guard let inputHandler = inputHandler, isCandidateContextMenuEnabled else { return }
     var succeeded = true
 
     let rawPair = state.candidates[index]
@@ -185,9 +185,11 @@ extension SessionCtl: CtlCandidateDelegate {
     // 開始針對使用者半衰模組的清詞處理
     LMMgr.bleachSpecifiedSuggestions(targets: [valueCurrent], mode: IMEApp.currentInputMode)
     LMMgr.bleachSpecifiedSuggestions(targets: [valueReversed], mode: IMEApp.currentInputMode.reversed)
+    // 更新組字器內的單元圖資料。
+    let updateResult = inputHandler.updateUnigramData(key: rawPair.0)
     // 清詞完畢
 
-    var newState = IMEState.ofCommitting(textToCommit: state.displayedText)
+    var newState = inputHandler.generateStateOfInputting()
     newState.tooltipDuration = 1.85
     var tooltipMessage = ""
     switch action {
