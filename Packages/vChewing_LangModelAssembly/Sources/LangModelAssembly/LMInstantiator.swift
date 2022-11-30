@@ -227,6 +227,13 @@ extension vChewingLM {
       lmAssociates.valuesFor(pair: pair)
     }
 
+    public func insertTemporaryData(key: String, unigram: Megrez.Unigram, isFiltering: Bool) {
+      _ =
+        isFiltering
+        ? lmFiltered.temporaryMap[key, default: []].append(unigram)
+        : lmUserPhrases.temporaryMap[key, default: []].append(unigram)
+    }
+
     /// 根據給定的索引鍵來確認各個資料庫陣列內是否存在對應的資料。
     /// - Parameter key: 索引鍵。
     /// - Returns: 是否在庫。
