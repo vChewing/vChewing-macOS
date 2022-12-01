@@ -188,7 +188,7 @@
 "Edit…" = "編輯…";
 "Emulating select-candidate-per-character mode" = "模擬 90 年代前期注音逐字選字輸入風格";
 "Enable cassette mode, suppressing phonabet input" = "啟用磁帶模式，會停用注音輸入";
-"Enable CNS11643 Support (2022-10-04)" = "啟用 CNS11643 全字庫支援 (2022-10-04)";
+"Enable CNS11643 Support (2022-12-01)" = "啟用 CNS11643 全字庫支援 (2022-12-01)";
 "Enable phrase replacement table" = "啟用語彙置換表";
 "Enable Space key for calling candidate window" = "敲空格鍵以呼出候選字窗";
 "Enable symbol input support (incl. certain emoji symbols)" = "啟用包括少許繪文字在內的符號輸入支援";
