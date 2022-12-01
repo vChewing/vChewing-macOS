@@ -19,6 +19,8 @@ extension vChewingLM {
   @frozen public struct LMCoreEX {
     /// 資料庫辭典。索引內容為注音字串，資料內容則為字串首尾範圍、方便自 strData 取資料。
     var rangeMap: [String: [Range<String.Index>]] = [:]
+    /// 資料庫追加辭典。
+    var temporaryMap: [String: [Megrez.Unigram]] = [:]
     /// 資料庫字串陣列。
     var strData: String = ""
     /// 聲明原始檔案內第一、二縱列的內容是否彼此顛倒。
@@ -78,6 +80,7 @@ extension vChewingLM {
             }
           }
         }
+        temporaryMap.removeAll()
       } catch {
         vCLog("\(error)")
         vCLog("↑ Exception happened when reading data at: \(path).")
@@ -128,6 +131,9 @@ extension vChewingLM {
           }
           grams.append(Megrez.Unigram(value: theValue, score: theScore))
         }
+      }
+      if let arrOtherRecords: [Megrez.Unigram] = temporaryMap[key] {
+        grams.append(contentsOf: arrOtherRecords)
       }
       return grams
     }

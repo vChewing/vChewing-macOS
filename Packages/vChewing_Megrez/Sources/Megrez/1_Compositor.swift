@@ -172,7 +172,7 @@ extension Megrez {
   }
 }
 
-// MARK: - Internal Methods
+// MARK: - Internal Methods (Maybe Public)
 
 extension Megrez.Compositor {
   // MARK: Internal methods for maintaining the grid.
@@ -242,45 +242,51 @@ extension Megrez.Compositor {
     return true
   }
 
-  func getJointKey(range: Range<Int>) -> String {
-    // 下面這句不能用 contains，不然會要求至少 macOS 13 Ventura。
-    guard range.upperBound <= keys.count, range.lowerBound >= 0 else { return "" }
-    return keys[range].joined(separator: separator)
-  }
-
   func getJointKeyArray(range: Range<Int>) -> [String] {
     // 下面這句不能用 contains，不然會要求至少 macOS 13 Ventura。
     guard range.upperBound <= keys.count, range.lowerBound >= 0 else { return [] }
     return keys[range].map { String($0) }
   }
 
-  func hasNode(at location: Int, length: Int, key: String) -> Bool {
+  func getNode(at location: Int, length: Int, keyArray: [String]) -> Node? {
     let location = max(min(location, spans.count), 0)  // 防呆
-    guard let node = spans[location].nodeOf(length: length) else { return false }
-    return key == node.key
+    guard let node = spans[location].nodeOf(length: length) else { return nil }
+    return keyArray == node.keyArray ? node : nil
   }
 
   /// 根據當前狀況更新整個組字器的節點文脈。
-  /// - Returns: 新增了多少節點。
-  @discardableResult mutating func update() -> Int {
+  /// - Returns: 新增了多少節點。如果返回「0」則表示可能發生了錯誤。
+  @discardableResult public mutating func update(updateExisting: Bool = false) -> Int {
     let maxSpanLength = Megrez.Compositor.maxSpanLength
     let range = max(0, cursor - maxSpanLength)..<min(cursor + maxSpanLength, keys.count)
-    var nodesInserted = 0
+    var nodesChanged = 0
     for position in range {
       for theLength in 1...min(maxSpanLength, range.upperBound - position) {
         let jointKeyArray = getJointKeyArray(range: position..<(position + theLength))
-        let jointKey = getJointKey(range: position..<(position + theLength))
-        if hasNode(at: position, length: theLength, key: jointKey) { continue }
+        let jointKey = jointKeyArray.joined(separator: separator)
+        if let theNode = getNode(at: position, length: theLength, keyArray: jointKeyArray) {
+          if !updateExisting { continue }
+          let unigrams = langModel.unigramsFor(key: jointKey)
+          // 自動銷毀無效的節點。
+          if unigrams.isEmpty {
+            if theNode.keyArray.count == 1 { continue }
+            spans[position].nodes.removeAll { $0 == theNode }
+          } else {
+            theNode.resetUnigrams(using: unigrams)
+          }
+          nodesChanged += 1
+          continue
+        }
         let unigrams = langModel.unigramsFor(key: jointKey)
         guard !unigrams.isEmpty else { continue }
         insertNode(
           .init(keyArray: jointKeyArray, spanLength: theLength, unigrams: unigrams, keySeparator: separator),
           at: position
         )
-        nodesInserted += 1
+        nodesChanged += 1
       }
     }
-    return nodesInserted
+    return nodesChanged
   }
 
   mutating func updateCursorJumpingTables(_ walkedNodes: [Node]) {

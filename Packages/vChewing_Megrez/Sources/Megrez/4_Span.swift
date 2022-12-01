@@ -5,15 +5,15 @@
 
 extension Megrez.Compositor {
   /// 幅位乃指一組共享起點的節點。
-  public struct Span {
-    private var nodes: [Node?] = []
+  public class Span {
+    public var nodes: [Node?] = []
     public private(set) var maxLength = 0
     private var maxSpanLength: Int { Megrez.Compositor.maxSpanLength }
     public init() {
       clear()
     }
 
-    public mutating func clear() {
+    public func clear() {
       nodes.removeAll()
       for _ in 0..<maxSpanLength {
         nodes.append(nil)
@@ -24,7 +24,7 @@ extension Megrez.Compositor {
     /// 往該幅位塞入一個節點。
     /// - Parameter node: 要塞入的節點。
     /// - Returns: 該操作是否成功執行。
-    @discardableResult public mutating func append(node: Node) -> Bool {
+    @discardableResult public func append(node: Node) -> Bool {
       guard (1...maxSpanLength).contains(node.spanLength) else {
         return false
       }
@@ -36,7 +36,7 @@ extension Megrez.Compositor {
     /// 丟掉任何不小於給定幅位長度的節點。
     /// - Parameter length: 給定的幅位長度。
     /// - Returns: 該操作是否成功執行。
-    @discardableResult public mutating func dropNodesOfOrBeyond(length: Int) -> Bool {
+    @discardableResult public func dropNodesOfOrBeyond(length: Int) -> Bool {
       guard (1...maxSpanLength).contains(length) else {
         return false
       }
@@ -66,7 +66,7 @@ extension Megrez.Compositor {
   /// 找出所有與該位置重疊的節點。其返回值為一個節錨陣列（包含節點、以及其起始位置）。
   /// - Parameter location: 游標位置。
   /// - Returns: 一個包含所有與該位置重疊的節點的陣列。
-  func fetchOverlappingNodes(at location: Int) -> [NodeAnchor] {
+  internal func fetchOverlappingNodes(at location: Int) -> [NodeAnchor] {
     var results = [NodeAnchor]()
     guard !spans.isEmpty, location < spans.count else { return results }
 
