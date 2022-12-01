@@ -941,11 +941,11 @@
                             </connections>
                         </button>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Yaj-QY-7xV" userLabel="chkCNSSupport">
-                            <rect key="frame" x="-1" y="109.5" width="252" height="17"/>
+                            <rect key="frame" x="-1" y="109.5" width="250" height="17"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="16" id="lGu-fQ-Nvc"/>
                             </constraints>
-                            <buttonCell key="cell" type="check" title="Enable CNS11643 Support (2022-10-04)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="W24-T4-cg0">
+                            <buttonCell key="cell" type="check" title="Enable CNS11643 Support (2022-12-01)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="W24-T4-cg0">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="cellTitle"/>
                             </buttonCell>
