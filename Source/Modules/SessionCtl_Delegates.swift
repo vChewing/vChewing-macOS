@@ -52,6 +52,13 @@ extension SessionCtl: InputHandlerDelegate {
     // 註：如果已經排除的內容是該讀音下唯一的記錄的話，
     // 則該內容的節點會繼續殘留在組字區內，只是無法再重新輸入了。
     _ = inputHandler.updateUnigramData()
+
+    // 因為上述操作不會立即生效（除非遞交組字區），所以暫時塞入臨時資料記錄。
+    // 該臨時資料記錄會在接下來的語言模組資料重載過程中被自動清除。
+    let temporaryScore: Double = SessionCtl.areWeNerfing ? -114.514 : 0
+    LMMgr.currentLM.insertTemporaryData(
+      key: rawPair.0, unigram: .init(value: rawPair.1, score: temporaryScore), isFiltering: SessionCtl.areWeNerfing
+    )
     // 開始針對使用者半衰模組的清詞處理
     LMMgr.bleachSpecifiedSuggestions(targets: [valueCurrent], mode: IMEApp.currentInputMode)
     LMMgr.bleachSpecifiedSuggestions(targets: [valueReversed], mode: IMEApp.currentInputMode.reversed)
@@ -188,6 +195,13 @@ extension SessionCtl: CtlCandidateDelegate {
     {
       succeeded = false
     }
+
+    // 因為上述操作不會立即生效（除非遞交組字區），所以暫時塞入臨時資料記錄。
+    // 該臨時資料記錄會在接下來的語言模組資料重載過程中被自動清除。
+    let temporaryScore: Double = (action == .toNerf) ? -114.514 : 0
+    LMMgr.currentLM.insertTemporaryData(
+      key: rawPair.0, unigram: .init(value: rawPair.1, score: temporaryScore), isFiltering: action == .toFilter
+    )
 
     // 開始針對使用者半衰模組的清詞處理
     LMMgr.bleachSpecifiedSuggestions(targets: [valueCurrent], mode: IMEApp.currentInputMode)
