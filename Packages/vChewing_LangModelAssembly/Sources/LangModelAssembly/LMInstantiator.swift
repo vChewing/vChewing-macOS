@@ -239,6 +239,45 @@ extension vChewingLM {
         : lmUserPhrases.temporaryMap[key, default: []].append(unigram)
     }
 
+    /// 自當前記憶體取得指定使用者子語言模組內的原始資料體。
+    /// - Parameters:
+    ///   - targetType: 操作對象。
+    public func retrieveData(from targetType: ReplacableUserDataType) -> String {
+      switch targetType {
+        case .thePhrases: return lmUserPhrases.strData
+        case .theFilter: return lmFiltered.strData
+        case .theReplacements: return lmReplacements.strData
+        case .theAssociates: return lmAssociates.strData
+        case .theSymbols: return lmUserSymbols.strData
+      }
+    }
+
+    /// 熱置換指定使用者子語言模組內的資料，且會在熱置換之後存檔。
+    /// - Parameters:
+    ///   - rawStrData: 新的資料。
+    ///   - targetType: 操作對象。
+    public func replaceData(textData rawStrData: String, for targetType: ReplacableUserDataType, save: Bool = true) {
+      var rawText = rawStrData
+      LMConsolidator.consolidate(text: &rawText, pragma: true)
+      switch targetType {
+        case .theAssociates:
+          lmAssociates.replaceData(textData: rawText)
+          if save { lmAssociates.saveData() }
+        case .theFilter:
+          lmFiltered.replaceData(textData: rawText)
+          if save { lmAssociates.saveData() }
+        case .theReplacements:
+          lmReplacements.replaceData(textData: rawText)
+          if save { lmAssociates.saveData() }
+        case .thePhrases:
+          lmUserPhrases.replaceData(textData: rawText)
+          if save { lmAssociates.saveData() }
+        case .theSymbols:
+          lmUserSymbols.replaceData(textData: rawText)
+          if save { lmAssociates.saveData() }
+      }
+    }
+
     /// 根據給定的索引鍵來確認各個資料庫陣列內是否存在對應的資料。
     /// - Parameter key: 索引鍵。
     /// - Returns: 是否在庫。
