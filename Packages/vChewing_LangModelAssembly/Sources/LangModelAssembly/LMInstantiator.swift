@@ -227,6 +227,11 @@ extension vChewingLM {
       lmAssociates.valuesFor(pair: pair)
     }
 
+    /// 插入臨時資料。
+    /// - Parameters:
+    ///   - key: 索引鍵。
+    ///   - unigram: 要插入的單元圖。
+    ///   - isFiltering: 是否有在過濾內容。
     public func insertTemporaryData(key: String, unigram: Megrez.Unigram, isFiltering: Bool) {
       _ =
         isFiltering
