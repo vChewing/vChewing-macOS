@@ -68,6 +68,15 @@ extension vChewingLM {
       rangeMap.removeAll()
     }
 
+    public func saveData() {
+      guard let filePath = filePath else { return }
+      do {
+        try strData.write(toFile: filePath, atomically: true, encoding: .utf8)
+      } catch {
+        vCLog("Failed to save current database to: \(filePath)")
+      }
+    }
+
     public func dump() {
       var strDump = ""
       for entry in rangeMap {
