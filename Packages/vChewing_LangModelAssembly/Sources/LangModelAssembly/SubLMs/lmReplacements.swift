@@ -11,6 +11,7 @@ import Shared
 
 extension vChewingLM {
   @frozen public struct LMReplacements {
+    public private(set) var filePath: String?
     var rangeMap: [String: Range<String.Index>] = [:]
     var strData: String = ""
 
@@ -24,6 +25,8 @@ extension vChewingLM {
 
     @discardableResult public mutating func open(_ path: String) -> Bool {
       if isLoaded { return false }
+      let oldPath = filePath
+      filePath = nil
 
       LMConsolidator.fixEOF(path: path)
       LMConsolidator.consolidate(path: path, pragma: true)
@@ -32,11 +35,13 @@ extension vChewingLM {
         let rawStrData = try String(contentsOfFile: path, encoding: .utf8)
         replaceData(textData: rawStrData)
       } catch {
+        filePath = oldPath
         vCLog("\(error)")
         vCLog("↑ Exception happened when reading data at: \(path).")
         return false
       }
 
+      filePath = path
       return true
     }
 
@@ -59,6 +64,7 @@ extension vChewingLM {
     }
 
     public mutating func clear() {
+      filePath = nil
       rangeMap.removeAll()
     }
 
