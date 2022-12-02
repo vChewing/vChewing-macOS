@@ -15,6 +15,7 @@ extension vChewingLM {
   /// 這樣一來可以節省在舊 mac 機種內的資料讀入速度。
   /// 目前僅針對輸入法原廠語彙資料檔案使用 plist 格式。
   @frozen public struct LMCoreNS {
+    public private(set) var filePath: String?
     /// 資料庫辭典。索引內容為經過加密的注音字串，資料內容則為 UTF8 資料陣列。
     var rangeMap: [String: [Data]] = [:]
     /// 【已作廢】資料庫字串陣列。在 LMCoreNS 內沒有作用。
@@ -59,6 +60,8 @@ extension vChewingLM {
     ///   - path: 給定路徑。
     @discardableResult public mutating func open(_ path: String) -> Bool {
       if isLoaded { return false }
+      let oldPath = filePath
+      filePath = nil
 
       do {
         let rawData = try Data(contentsOf: URL(fileURLWithPath: path))
@@ -66,15 +69,18 @@ extension vChewingLM {
           try PropertyListSerialization.propertyList(from: rawData, format: nil) as? [String: [Data]] ?? .init()
         rangeMap = rawPlist
       } catch {
+        filePath = oldPath
         vCLog("↑ Exception happened when reading plist file at: \(path).")
         return false
       }
 
+      filePath = path
       return true
     }
 
     /// 將當前語言模組的資料庫辭典自記憶體內卸除。
     public mutating func clear() {
+      filePath = nil
       rangeMap.removeAll()
     }
 

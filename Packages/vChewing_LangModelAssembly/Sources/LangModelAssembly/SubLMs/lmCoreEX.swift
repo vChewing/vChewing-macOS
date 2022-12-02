@@ -17,6 +17,7 @@ extension vChewingLM {
   /// 資料記錄原理與上游 C++ 的 ParselessLM 差不多，但用的是 Swift 原生手段。
   /// 主要時間消耗仍在 For 迴圈，但這個算法可以顯著減少記憶體佔用。
   @frozen public struct LMCoreEX {
+    public private(set) var filePath: String?
     /// 資料庫辭典。索引內容為注音字串，資料內容則為字串首尾範圍、方便自 strData 取資料。
     var rangeMap: [String: [Range<String.Index>]] = [:]
     /// 資料庫追加辭典。
@@ -60,6 +61,10 @@ extension vChewingLM {
     ///   - path: 給定路徑。
     @discardableResult public mutating func open(_ path: String) -> Bool {
       if isLoaded { return false }
+
+      let oldPath = filePath
+      filePath = nil
+
       var consolidated = false
 
       if allowConsolidation {
@@ -76,11 +81,13 @@ extension vChewingLM {
         }
         replaceData(textData: rawStrData)
       } catch {
+        filePath = oldPath
         vCLog("\(error)")
         vCLog("↑ Exception happened when reading data at: \(path).")
         return false
       }
 
+      filePath = path
       return true
     }
 
@@ -106,6 +113,7 @@ extension vChewingLM {
 
     /// 將當前語言模組的資料庫辭典自記憶體內卸除。
     public mutating func clear() {
+      filePath = nil
       rangeMap.removeAll()
     }
 
