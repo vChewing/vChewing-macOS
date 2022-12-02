@@ -83,6 +83,15 @@ extension vChewingLM {
       rangeMap.removeAll()
     }
 
+    public func saveData() {
+      guard let filePath = filePath else { return }
+      do {
+        try strData.write(toFile: filePath, atomically: true, encoding: .utf8)
+      } catch {
+        vCLog("Failed to save current database to: \(filePath)")
+      }
+    }
+
     public func valuesFor(pair: Megrez.Compositor.KeyValuePaired) -> [String] {
       var pairs: [String] = []
       if let arrRangeRecords: [(Range<String.Index>, Int)] = rangeMap[pair.toNGramKey] {
