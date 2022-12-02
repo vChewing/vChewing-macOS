@@ -42,20 +42,8 @@ extension vChewingLM {
       LMConsolidator.consolidate(path: path, pragma: true)
 
       do {
-        strData = try String(contentsOfFile: path, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
-        strData = strData.replacingOccurrences(of: "\r", with: "\n")
-        strData.ranges(splitBy: "\n").filter { !$0.isEmpty }.forEach {
-          let neta = strData[$0].split(separator: " ")
-          if neta.count >= 2 {
-            let theKey = String(neta[0])
-            if !theKey.isEmpty, theKey.first != "#" {
-              for (i, _) in neta.filter({ $0.first != "#" && !$0.isEmpty }).enumerated() {
-                if i == 0 { continue }
-                rangeMap[cnvNGramKeyFromPinyinToPhona(target: theKey), default: []].append(($0, i))
-              }
-            }
-          }
-        }
+        let rawStrData = try String(contentsOfFile: path, encoding: .utf8)
+        replaceData(textData: rawStrData)
       } catch {
         vCLog("\(error)")
         vCLog("↑ Exception happened when reading data at: \(path).")
@@ -63,6 +51,26 @@ extension vChewingLM {
       }
 
       return true
+    }
+
+    /// 將資料從檔案讀入至資料庫辭典內。
+    /// - parameters:
+    ///   - path: 給定路徑。
+    public mutating func replaceData(textData rawStrData: String) {
+      if strData == rawStrData { return }
+      strData = rawStrData
+      strData.ranges(splitBy: "\n").filter { !$0.isEmpty }.forEach {
+        let neta = strData[$0].split(separator: " ")
+        if neta.count >= 2 {
+          let theKey = String(neta[0])
+          if !theKey.isEmpty, theKey.first != "#" {
+            for (i, _) in neta.filter({ $0.first != "#" && !$0.isEmpty }).enumerated() {
+              if i == 0 { continue }
+              rangeMap[cnvNGramKeyFromPinyinToPhona(target: theKey), default: []].append(($0, i))
+            }
+          }
+        }
+      }
     }
 
     public mutating func clear() {
