@@ -60,27 +60,21 @@ extension vChewingLM {
     ///   - path: 給定路徑。
     @discardableResult public mutating func open(_ path: String) -> Bool {
       if isLoaded { return false }
+      var consolidated = false
 
       if allowConsolidation {
         LMConsolidator.fixEOF(path: path)
         LMConsolidator.consolidate(path: path, pragma: true)
+        consolidated = true
       }
 
       do {
-        strData = try String(contentsOfFile: path, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
-        strData = strData.replacingOccurrences(of: "\r", with: "\n")
-        strData.ranges(splitBy: "\n").filter { !$0.isEmpty }.forEach {
-          let neta = strData[$0].split(separator: " ")
-          if neta.count >= 2, String(neta[0]).first != "#" {
-            if !neta[0].isEmpty, !neta[1].isEmpty {
-              var theKey = shouldReverse ? String(neta[1]) : String(neta[0])
-              let theValue = $0
-              theKey.converToPhonabets()
-              rangeMap[theKey, default: []].append(theValue)
-            }
-          }
+        var rawStrData = try String(contentsOfFile: path, encoding: .utf8)
+        if !consolidated {
+          rawStrData = rawStrData.replacingOccurrences(of: "\t", with: " ")
+          rawStrData = rawStrData.replacingOccurrences(of: "\r", with: "\n")
         }
-        temporaryMap.removeAll()
+        replaceData(textData: rawStrData)
       } catch {
         vCLog("\(error)")
         vCLog("↑ Exception happened when reading data at: \(path).")
@@ -88,6 +82,26 @@ extension vChewingLM {
       }
 
       return true
+    }
+
+    /// 將資料從檔案讀入至資料庫辭典內。
+    /// - parameters:
+    ///   - path: 給定路徑。
+    public mutating func replaceData(textData rawStrData: String) {
+      if strData == rawStrData { return }
+      strData = rawStrData
+      strData.ranges(splitBy: "\n").filter { !$0.isEmpty }.forEach {
+        let neta = strData[$0].split(separator: " ")
+        if neta.count >= 2, String(neta[0]).first != "#" {
+          if !neta[0].isEmpty, !neta[1].isEmpty {
+            var theKey = shouldReverse ? String(neta[1]) : String(neta[0])
+            let theValue = $0
+            theKey.converToPhonabets()
+            rangeMap[theKey, default: []].append(theValue)
+          }
+        }
+      }
+      temporaryMap.removeAll()
     }
 
     /// 將當前語言模組的資料庫辭典自記憶體內卸除。
