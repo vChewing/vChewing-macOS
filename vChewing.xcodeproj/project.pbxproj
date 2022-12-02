@@ -29,6 +29,7 @@
 		5B660A8628F64A8800E5E4F6 /* SymbolMenuDefaultData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B660A8528F64A8800E5E4F6 /* SymbolMenuDefaultData.swift */; };
 		5B6C141228A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6C141128A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift */; };
 		5B73FB5E27B2BE1300E9BF49 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */; };
+		5B765F09293A253C00122315 /* PhraseEditorUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5B765F08293A253C00122315 /* PhraseEditorUI */; };
 		5B782EC4280C243C007276DE /* InputHandler_HandleCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B782EC3280C243C007276DE /* InputHandler_HandleCandidate.swift */; };
 		5B78EE0D28A562B4009456C1 /* VwrPrefPaneDevZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B78EE0C28A562B4009456C1 /* VwrPrefPaneDevZone.swift */; };
 		5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */; };
@@ -236,6 +237,7 @@
 		5B6C141128A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCtl_HandleEvent.swift; sourceTree = "<group>"; };
 		5B73FB5427B2BD6900E9BF49 /* PhraseEditor-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "PhraseEditor-Info.plist"; path = "UserPhraseEditor/PhraseEditor-Info.plist"; sourceTree = SOURCE_ROOT; };
 		5B73FB5F27B2BE1300E9BF49 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		5B765F07293A250000122315 /* vChewing_PhraseEditorUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_PhraseEditorUI; path = Packages/vChewing_PhraseEditorUI; sourceTree = "<group>"; };
 		5B782EC3280C243C007276DE /* InputHandler_HandleCandidate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputHandler_HandleCandidate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B78EE0C28A562B4009456C1 /* VwrPrefPaneDevZone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VwrPrefPaneDevZone.swift; sourceTree = "<group>"; };
 		5B7BC4AF27AFFBE800F66C24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmPrefWindow.xib; sourceTree = "<group>"; };
@@ -385,6 +387,7 @@
 				5B98114828D6198700CBC605 /* PinyinPhonaConverter in Frameworks */,
 				5BFC63CF28D4ACA3004A77B7 /* LangModelAssembly in Frameworks */,
 				5BC5E02128DDEFE00094E427 /* TooltipUI in Frameworks */,
+				5B765F09293A253C00122315 /* PhraseEditorUI in Frameworks */,
 				5BDB7A3928D4824A001AC277 /* BookmarkManager in Frameworks */,
 				5B5C8ED828FC0EA9002C93A5 /* SSPreferences in Frameworks */,
 				5B5A603028E81CC50001AE8D /* SwiftUIBackports in Frameworks */,
@@ -622,6 +625,7 @@
 				5BFC63CD28D4AC98004A77B7 /* vChewing_LangModelAssembly */,
 				5BDB7A3328D47587001AC277 /* vChewing_Megrez */,
 				5BC5E01C28DDE4270094E427 /* vChewing_NotifierUI */,
+				5B765F07293A250000122315 /* vChewing_PhraseEditorUI */,
 				5B98114628D6198000CBC605 /* vChewing_PinyinPhonaConverter */,
 				5BC5E02228DE07250094E427 /* vChewing_PopupCompositionBuffer */,
 				5B963C9E28D5C14600DCEE88 /* vChewing_Shared */,
@@ -864,6 +868,7 @@
 				5BA8C30228DF0360004C5CC4 /* CandidateWindow */,
 				5B5A602F28E81CC50001AE8D /* SwiftUIBackports */,
 				5B5C8ED728FC0EA9002C93A5 /* SSPreferences */,
+				5B765F08293A253C00122315 /* PhraseEditorUI */,
 			);
 			productName = vChewing;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */;
@@ -2033,6 +2038,10 @@
 		5B5C8ED728FC0EA9002C93A5 /* SSPreferences */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SSPreferences;
+		};
+		5B765F08293A253C00122315 /* PhraseEditorUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PhraseEditorUI;
 		};
 		5B963C9C28D5BFB800DCEE88 /* CocoaExtension */ = {
 			isa = XCSwiftPackageProductDependency;
