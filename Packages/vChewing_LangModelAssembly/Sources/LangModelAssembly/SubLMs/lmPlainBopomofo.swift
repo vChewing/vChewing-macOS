@@ -49,6 +49,16 @@ extension vChewingLM {
       dataMap.removeAll()
     }
 
+    public func saveData() {
+      guard let filePath = filePath, let plistURL = URL(string: filePath) else { return }
+      do {
+        let plistData = try PropertyListSerialization.data(fromPropertyList: dataMap, format: .binary, options: 0)
+        try plistData.write(to: plistURL)
+      } catch {
+        vCLog("Failed to save current database to: \(filePath)")
+      }
+    }
+
     public func valuesFor(key: String) -> [String] {
       var pairs: [String] = []
       if let arrRangeRecords: String = dataMap[key]?.trimmingCharacters(in: .newlines) {

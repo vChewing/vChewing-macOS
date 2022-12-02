@@ -17,7 +17,7 @@ extension vChewingLM {
   @frozen public struct LMCoreNS {
     public private(set) var filePath: String?
     /// 資料庫辭典。索引內容為經過加密的注音字串，資料內容則為 UTF8 資料陣列。
-    var rangeMap: [String: [Data]] = [:]
+    var dataMap: [String: [Data]] = [:]
     /// 【已作廢】資料庫字串陣列。在 LMCoreNS 內沒有作用。
     var strData: String = ""
     /// 【已作廢】聲明原始檔案內第一、二縱列的內容是否彼此顛倒。
@@ -30,7 +30,7 @@ extension vChewingLM {
     var shouldForceDefaultScore = false
 
     /// 資料陣列內承載的資料筆數。
-    public var count: Int { rangeMap.count }
+    public var count: Int { dataMap.count }
 
     /// 初期化該語言模型。
     ///
@@ -45,7 +45,7 @@ extension vChewingLM {
       reverse: Bool = false, consolidate: Bool = false, defaultScore scoreDefault: Double = 0,
       forceDefaultScore: Bool = false
     ) {
-      rangeMap = [:]
+      dataMap = [:]
       allowConsolidation = consolidate
       shouldReverse = reverse
       defaultScore = scoreDefault
@@ -53,7 +53,7 @@ extension vChewingLM {
     }
 
     /// 檢測資料庫辭典內是否已經有載入的資料。
-    public var isLoaded: Bool { !rangeMap.isEmpty }
+    public var isLoaded: Bool { !dataMap.isEmpty }
 
     /// 將資料從檔案讀入至資料庫辭典內。
     /// - parameters:
@@ -67,7 +67,7 @@ extension vChewingLM {
         let rawData = try Data(contentsOf: URL(fileURLWithPath: path))
         let rawPlist: [String: [Data]] =
           try PropertyListSerialization.propertyList(from: rawData, format: nil) as? [String: [Data]] ?? .init()
-        rangeMap = rawPlist
+        dataMap = rawPlist
       } catch {
         filePath = oldPath
         vCLog("↑ Exception happened when reading plist file at: \(path).")
@@ -81,17 +81,27 @@ extension vChewingLM {
     /// 將當前語言模組的資料庫辭典自記憶體內卸除。
     public mutating func clear() {
       filePath = nil
-      rangeMap.removeAll()
+      dataMap.removeAll()
     }
 
     // MARK: - Advanced features
+
+    public func saveData() {
+      guard let filePath = filePath, let plistURL = URL(string: filePath) else { return }
+      do {
+        let plistData = try PropertyListSerialization.data(fromPropertyList: dataMap, format: .binary, options: 0)
+        try plistData.write(to: plistURL)
+      } catch {
+        vCLog("Failed to save current database to: \(filePath)")
+      }
+    }
 
     /// 將當前資料庫辭典的內容以文本的形式輸出至 macOS 內建的 Console.app。
     ///
     /// 該功能僅作偵錯之用途。
     public func dump() {
       var strDump = ""
-      for entry in rangeMap {
+      for entry in dataMap {
         let netaSets: [Data] = entry.value
         let theKey = entry.key
         for netaSet in netaSets {
@@ -114,7 +124,7 @@ extension vChewingLM {
     public func unigramsFor(key: String) -> [Megrez.Unigram] {
       var grams: [Megrez.Unigram] = []
       var gramsHW: [Megrez.Unigram] = []
-      guard let arrRangeRecords: [Data] = rangeMap[cnvPhonabetToASCII(key)] else { return grams }
+      guard let arrRangeRecords: [Data] = dataMap[cnvPhonabetToASCII(key)] else { return grams }
       for netaSet in arrRangeRecords {
         let strNetaSet = String(decoding: netaSet, as: UTF8.self)
         let neta = Array(strNetaSet.trimmingCharacters(in: .newlines).split(separator: " ").reversed())
@@ -142,7 +152,7 @@ extension vChewingLM {
     /// - parameters:
     ///   - key: 讀音索引鍵。
     public func hasUnigramsFor(key: String) -> Bool {
-      rangeMap[cnvPhonabetToASCII(key)] != nil
+      dataMap[cnvPhonabetToASCII(key)] != nil
     }
 
     /// 內部函式，用以將注音讀音索引鍵進行加密。

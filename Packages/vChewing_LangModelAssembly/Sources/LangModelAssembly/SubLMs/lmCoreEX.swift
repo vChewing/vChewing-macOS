@@ -119,6 +119,23 @@ extension vChewingLM {
 
     // MARK: - Advanced features
 
+    public func saveData() {
+      guard let filePath = filePath else { return }
+      var dataToWrite = strData
+      do {
+        if !temporaryMap.isEmpty {
+          temporaryMap.forEach { neta in
+            neta.value.forEach { unigram in
+              dataToWrite.append("\(unigram.value) \(neta.key) \(unigram.score.description)\n")
+            }
+          }
+        }
+        try dataToWrite.write(toFile: filePath, atomically: true, encoding: .utf8)
+      } catch {
+        vCLog("Failed to save current database to: \(filePath)")
+      }
+    }
+
     /// 將當前資料庫辭典的內容以文本的形式輸出至 macOS 內建的 Console.app。
     ///
     /// 該功能僅作偵錯之用途。
