@@ -57,9 +57,6 @@ public enum LMMgr {
     // LMMgr 的 loadUserPhrases 等函式在自動讀取 dataFolderPath 時，
     // 如果發現自訂目錄不可用，則會自動抹去自訂目錄設定、改採預設目錄。
     // 所以這裡不需要特別處理。
-    if PrefMgr.shared.associatedPhrasesEnabled { Self.loadUserAssociatesData() }
-    if PrefMgr.shared.phraseReplacementEnabled { Self.loadUserPhraseReplacement() }
-    if PrefMgr.shared.useSCPCTypingMode { Self.loadUserSCPCSequencesData() }
     Self.loadUserPhrasesData()
   }
 
@@ -200,22 +197,47 @@ public enum LMMgr {
     vChewingLM.LMInstantiator.loadCassetteData(path: cassettePath())
   }
 
-  public static func loadUserPhrasesData() {
-    Self.lmCHT.loadUserPhrasesData(
-      path: userPhrasesDataURL(.imeModeCHT).path,
-      filterPath: userFilteredDataURL(.imeModeCHT).path
-    )
-    Self.lmCHS.loadUserPhrasesData(
-      path: userPhrasesDataURL(.imeModeCHS).path,
-      filterPath: userFilteredDataURL(.imeModeCHS).path
-    )
-    Self.lmCHT.loadUserSymbolData(path: userSymbolDataURL(.imeModeCHT).path)
-    Self.lmCHS.loadUserSymbolData(path: userSymbolDataURL(.imeModeCHS).path)
+  public static func loadUserPhrasesData(type: vChewingLM.ReplacableUserDataType? = nil) {
+    guard let type = type else {
+      Self.lmCHT.loadUserPhrasesData(
+        path: userPhrasesDataURL(.imeModeCHT).path,
+        filterPath: userFilteredDataURL(.imeModeCHT).path
+      )
+      Self.lmCHS.loadUserPhrasesData(
+        path: userPhrasesDataURL(.imeModeCHS).path,
+        filterPath: userFilteredDataURL(.imeModeCHS).path
+      )
+      Self.lmCHT.loadUserSymbolData(path: userSymbolDataURL(.imeModeCHT).path)
+      Self.lmCHS.loadUserSymbolData(path: userSymbolDataURL(.imeModeCHS).path)
+      
+      if PrefMgr.shared.associatedPhrasesEnabled { Self.loadUserAssociatesData() }
+      if PrefMgr.shared.phraseReplacementEnabled { Self.loadUserPhraseReplacement() }
+      if PrefMgr.shared.useSCPCTypingMode { Self.loadUserSCPCSequencesData() }
 
-    Self.uomCHT.loadData(fromURL: userOverrideModelDataURL(.imeModeCHT))
-    Self.uomCHS.loadData(fromURL: userOverrideModelDataURL(.imeModeCHS))
+      Self.uomCHT.loadData(fromURL: userOverrideModelDataURL(.imeModeCHT))
+      Self.uomCHS.loadData(fromURL: userOverrideModelDataURL(.imeModeCHS))
 
-    CandidateNode.load(url: Self.userSymbolMenuDataURL())
+      CandidateNode.load(url: Self.userSymbolMenuDataURL())
+      return
+    }
+    switch type {
+      case .thePhrases, .theFilter:
+        Self.lmCHT.loadUserPhrasesData(
+          path: userPhrasesDataURL(.imeModeCHT).path,
+          filterPath: userFilteredDataURL(.imeModeCHT).path
+        )
+        Self.lmCHS.loadUserPhrasesData(
+          path: userPhrasesDataURL(.imeModeCHS).path,
+          filterPath: userFilteredDataURL(.imeModeCHS).path
+        )
+      case .theReplacements:
+        if PrefMgr.shared.phraseReplacementEnabled { Self.loadUserPhraseReplacement() }
+      case .theAssociates:
+        if PrefMgr.shared.associatedPhrasesEnabled { Self.loadUserAssociatesData() }
+      case .theSymbols:
+        Self.lmCHT.loadUserSymbolData(path: userSymbolDataURL(.imeModeCHT).path)
+        Self.lmCHS.loadUserSymbolData(path: userSymbolDataURL(.imeModeCHS).path)
+    }
   }
 
   public static func loadUserAssociatesData() {
@@ -587,7 +609,7 @@ public enum LMMgr {
       // The new FolderMonitor module does NOT monitor cases that files are modified
       // by the current application itself, requiring additional manual loading process here.
       // if !PrefMgr.shared.shouldAutoReloadUserDataFiles {}
-      loadUserPhrasesData()
+      loadUserPhrasesData(type: .thePhrases)
       return true
     }
     return false
