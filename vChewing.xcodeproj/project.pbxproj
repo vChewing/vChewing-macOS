@@ -27,6 +27,7 @@
 		5B5C8ED828FC0EA9002C93A5 /* SSPreferences in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5C8ED728FC0EA9002C93A5 /* SSPreferences */; };
 		5B62A33D27AE7CC100A19448 /* CtlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33C27AE7CC100A19448 /* CtlAboutWindow.swift */; };
 		5B660A8628F64A8800E5E4F6 /* SymbolMenuDefaultData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B660A8528F64A8800E5E4F6 /* SymbolMenuDefaultData.swift */; };
+		5B69938C293B811F0057CB8E /* VwrPrefPanePhrases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B69938B293B811F0057CB8E /* VwrPrefPanePhrases.swift */; };
 		5B6C141228A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6C141128A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift */; };
 		5B73FB5E27B2BE1300E9BF49 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */; };
 		5B765F09293A253C00122315 /* PhraseEditorUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5B765F08293A253C00122315 /* PhraseEditorUI */; };
@@ -234,6 +235,7 @@
 		5B62A33C27AE7CC100A19448 /* CtlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = CtlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B65B919284D0185007C558B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		5B660A8528F64A8800E5E4F6 /* SymbolMenuDefaultData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolMenuDefaultData.swift; sourceTree = "<group>"; };
+		5B69938B293B811F0057CB8E /* VwrPrefPanePhrases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VwrPrefPanePhrases.swift; sourceTree = "<group>"; };
 		5B6C141128A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCtl_HandleEvent.swift; sourceTree = "<group>"; };
 		5B73FB5427B2BD6900E9BF49 /* PhraseEditor-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "PhraseEditor-Info.plist"; path = "UserPhraseEditor/PhraseEditor-Info.plist"; sourceTree = SOURCE_ROOT; };
 		5B73FB5F27B2BE1300E9BF49 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -546,6 +548,7 @@
 				5BA9FD0D27FEDB6B002DE248 /* VwrPrefPaneExperience.swift */,
 				5BA9FD0A27FEDB6B002DE248 /* VwrPrefPaneGeneral.swift */,
 				5BA9FD0B27FEDB6B002DE248 /* VwrPrefPaneKeyboard.swift */,
+				5B69938B293B811F0057CB8E /* VwrPrefPanePhrases.swift */,
 			);
 			path = PrefUI;
 			sourceTree = "<group>";
@@ -1181,6 +1184,7 @@
 				5BF56F9A28C39D1800DD6839 /* IMEStateData.swift in Sources */,
 				5B21176C287539BB000443A9 /* SessionCtl_HandleStates.swift in Sources */,
 				5BE1F8A928F86AB5006C7FF5 /* InputHandler_HandleEvent.swift in Sources */,
+				5B69938C293B811F0057CB8E /* VwrPrefPanePhrases.swift in Sources */,
 				5BAEFAD028012565001F42C9 /* LMMgr.swift in Sources */,
 				5B782EC4280C243C007276DE /* InputHandler_HandleCandidate.swift in Sources */,
 				5BA9FD0F27FEDB6B002DE248 /* VwrPrefPaneGeneral.swift in Sources */,
