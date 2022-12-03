@@ -48,6 +48,16 @@ extension NSWindowController {
   }
 }
 
+extension NSWindow {
+  public func callAlert(title: String, text: String? = nil) {
+    let alert = NSAlert()
+    alert.messageText = title
+    if let text = text { alert.informativeText = text }
+    alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+    alert.beginSheetModal(for: self)
+  }
+}
+
 extension IMKCandidates {
   /// 設定選字窗的顯示位置。
   ///
