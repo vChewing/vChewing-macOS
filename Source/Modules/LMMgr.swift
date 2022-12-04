@@ -9,6 +9,7 @@
 import BookmarkManager
 import LangModelAssembly
 import NotifierUI
+import PhraseEditorUI
 import Shared
 
 /// 使用者辭典資料預設範例檔案名稱。
@@ -19,13 +20,14 @@ private let kTemplateNameUserSymbolPhrases = "template-usersymbolphrases"
 private let kTemplateNameUserAssociatesCHS = "template-associatedPhrases-chs"
 private let kTemplateNameUserAssociatesCHT = "template-associatedPhrases-cht"
 
-public enum LMMgr {
+public class LMMgr {
+  public static var shared = LMMgr()
   public private(set) static var lmCHS = vChewingLM.LMInstantiator(isCHS: true)
   public private(set) static var lmCHT = vChewingLM.LMInstantiator(isCHS: false)
   public private(set) static var uomCHS = vChewingLM.LMUserOverride(
-    dataURL: Self.userOverrideModelDataURL(.imeModeCHS))
+    dataURL: LMMgr.userOverrideModelDataURL(.imeModeCHS))
   public private(set) static var uomCHT = vChewingLM.LMUserOverride(
-    dataURL: Self.userOverrideModelDataURL(.imeModeCHT))
+    dataURL: LMMgr.userOverrideModelDataURL(.imeModeCHT))
 
   public static var currentLM: vChewingLM.LMInstantiator {
     switch IMEApp.currentInputMode {
@@ -599,6 +601,7 @@ public enum LMMgr {
 
       // The new FolderMonitor module does NOT monitor cases that files are modified
       // by the current application itself, requiring additional manual loading process here.
+      if #available(macOS 10.15, *) { FileObserveProject.shared.touch() }
       loadUserPhrasesData(type: .thePhrases)
       return true
     }
@@ -725,5 +728,55 @@ public enum LMMgr {
       case .imeModeNULL:
         break
     }
+  }
+}
+
+extension LMMgr: PhraseEditorDelegate {
+  public var currentInputMode: Shared.InputMode { IMEApp.currentInputMode }
+
+  public func openPhraseFile(mode: Shared.InputMode, type: vChewingLM.ReplacableUserDataType, app: String) {
+    Self.openPhraseFile(fromURL: Self.userDictDataURL(mode: mode, type: type), app: app)
+  }
+
+  public func consolidate(text strProcessed: inout String, pragma shouldCheckPragma: Bool) {
+    vChewingLM.LMConsolidator.consolidate(text: &strProcessed, pragma: shouldCheckPragma)
+  }
+
+  public func checkIfUserPhraseExist(userPhrase: String, mode: Shared.InputMode, key unigramKey: String) -> Bool {
+    Self.checkIfUserPhraseExist(userPhrase: userPhrase, mode: mode, key: unigramKey)
+  }
+
+  public func retrieveData(mode: Shared.InputMode, type: vChewingLM.ReplacableUserDataType) -> String {
+    Self.retrieveData(mode: mode, type: type)
+  }
+
+  public static func retrieveData(mode: Shared.InputMode, type: vChewingLM.ReplacableUserDataType) -> String {
+    vCLog("Retrieving data. Mode: \(mode.localizedDescription), type: \(type.localizedDescription)")
+    let theURL = Self.userDictDataURL(mode: mode, type: type)
+    do {
+      return try .init(contentsOf: theURL, encoding: .utf8)
+    } catch {
+      vCLog("Error reading: \(theURL.absoluteString)")
+      return ""
+    }
+  }
+
+  public func saveData(mode: Shared.InputMode, type: vChewingLM.ReplacableUserDataType, data: String) -> String {
+    Self.saveData(mode: mode, type: type, data: data)
+  }
+
+  @discardableResult public static func saveData(
+    mode: Shared.InputMode, type: vChewingLM.ReplacableUserDataType, data: String
+  ) -> String {
+    DispatchQueue.main.async {
+      let theURL = Self.userDictDataURL(mode: mode, type: type)
+      do {
+        try data.write(to: theURL, atomically: true, encoding: .utf8)
+        Self.loadUserPhrasesData(type: type)
+      } catch {
+        vCLog("Failed to save current database to: \(theURL.absoluteString)")
+      }
+    }
+    return data
   }
 }
