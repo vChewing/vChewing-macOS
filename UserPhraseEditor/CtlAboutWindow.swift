@@ -22,7 +22,7 @@ import Cocoa
     sharedWindow.orderFrontRegardless()  // 逼著視窗往最前方顯示
     sharedWindow.level = .statusBar
     sharedWindow.titlebarAppearsTransparent = true
-    NSApp.setActivationPolicy(.accessory)
+    NSApp.activate(ignoringOtherApps: true)
   }
 
   override func windowDidLoad() {
