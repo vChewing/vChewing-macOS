@@ -112,7 +112,7 @@ public class UpdateSputnik {
       alert.informativeText = NSLocalizedString("You are already using the latest version.", comment: "")
       alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
       alert.runModal()
-      NSApp.setActivationPolicy(.accessory)
+      NSApp.activate(ignoringOtherApps: true)
       return
     }
 
@@ -131,8 +131,8 @@ public class UpdateSputnik {
     alert.informativeText = content
     alert.addButton(withTitle: NSLocalizedString("Visit Website", comment: ""))
     alert.addButton(withTitle: NSLocalizedString("Not Now", comment: ""))
-    NSApp.setActivationPolicy(.accessory)
     let result = alert.runModal()
+    NSApp.activate(ignoringOtherApps: true)
     if result == NSApplication.ModalResponse.alertFirstButtonReturn {
       if let siteInfoURLString = plist[varkUpdateInfoPageURLKey] as? String,
         let siteURL = URL(string: siteInfoURLString)
@@ -158,6 +158,6 @@ public class UpdateSputnik {
     alert.informativeText = content
     alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
     alert.runModal()
-    NSApp.setActivationPolicy(.accessory)
+    NSApp.activate(ignoringOtherApps: true)
   }
 }
