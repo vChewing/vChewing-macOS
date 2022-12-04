@@ -26,6 +26,7 @@ extension AppDelegate {
   private func reloadOnFolderChangeHappens() {
     // 拖 100ms 再重載，畢竟有些有特殊需求的使用者可能會想使用巨型自訂語彙檔案。
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
+      if #available(macOS 10.15, *) { FileObserveProject.shared.touch() }
       if PrefMgr.shared.shouldAutoReloadUserDataFiles { LMMgr.initUserLangModels() }
     }
   }
