@@ -320,3 +320,17 @@ public enum Shared {
     }
   }
 }
+
+// MARK: - Observable Object
+
+@available(macOS 10.15, *)
+public class FileObserveProject: ObservableObject, Equatable {
+  public static let shared = FileObserveProject()
+  @Published public var id = UUID().uuidString
+
+  public static func == (lhs: FileObserveProject, rhs: FileObserveProject) -> Bool { lhs.id == rhs.id }
+
+  public func touch() {
+    id = UUID().uuidString
+  }
+}
