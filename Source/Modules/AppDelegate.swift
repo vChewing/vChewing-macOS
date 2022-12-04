@@ -96,6 +96,7 @@ extension AppDelegate {
     alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
     alert.addButton(withTitle: NSLocalizedString("Not Now", comment: ""))
     let result = alert.runModal()
+    NSApp.activate(ignoringOtherApps: true)
     if result == NSApplication.ModalResponse.alertFirstButtonReturn {
       NSWorkspace.shared.openFile(
         LMMgr.dataFolderPath(isDefaultFolder: true), withApplication: "Finder"
@@ -104,7 +105,6 @@ extension AppDelegate {
         isSudo: false, selfKill: true, defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true)
       )
     }
-    NSApp.setActivationPolicy(.accessory)
   }
 
   /// 檢查該程式本身的記憶體佔用量。

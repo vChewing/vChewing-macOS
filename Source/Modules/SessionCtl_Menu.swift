@@ -204,11 +204,10 @@ extension SessionCtl {
     } else if NSEvent.modifierFlags.contains(.option) {
       CtlPrefWindow.show()
     } else {
-      NSApp.setActivationPolicy(.accessory)
       CtlPrefUI.shared.controller.show(preferencePane: SSPreferences.PaneIdentifier(rawValue: "General"))
       CtlPrefUI.shared.controller.window?.level = .statusBar
-      NSApp.activate(ignoringOtherApps: true)
     }
+    NSApp.activate(ignoringOtherApps: true)
   }
 
   @objc public func showCheatSheet(_: Any? = nil) {
@@ -233,11 +232,11 @@ extension SessionCtl {
           "Please reconfigure the cassette path to a valid one before enabling this mode.", comment: ""
         )
         let result = alert.runModal()
+        NSApp.activate(ignoringOtherApps: true)
         if result == NSApplication.ModalResponse.alertFirstButtonReturn {
           LMMgr.resetCassettePath()
           PrefMgr.shared.cassetteEnabled = false
         }
-        NSApp.setActivationPolicy(.accessory)
       }
       return
     }
