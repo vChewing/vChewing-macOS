@@ -107,11 +107,6 @@ struct VwrPrefPaneDevZone: View {
                 PrefMgr.shared.phraseReplacementEnabled = selPhraseReplacementEnabled
               }
             )
-            Spacer()
-            Button(LocalizedStringKey("Edit…")) {
-              LMMgr.openPhraseFile(fromURL: LMMgr.userReplacementsDataURL(IMEApp.currentInputMode))
-              LMMgr.openPhraseFile(fromURL: LMMgr.userReplacementsDataURL(IMEApp.currentInputMode.reversed))
-            }
           }
           Text(
             LocalizedStringKey(
