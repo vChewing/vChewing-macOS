@@ -611,7 +611,7 @@ public enum LMMgr {
         alert.informativeText = content
         alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
         alert.runModal()
-        NSApp.setActivationPolicy(.accessory)
+        NSApp.activate(ignoringOtherApps: true)
       }
       return false
     }
