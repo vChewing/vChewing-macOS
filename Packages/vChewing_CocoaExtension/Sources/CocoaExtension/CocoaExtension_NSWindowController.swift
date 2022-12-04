@@ -10,6 +10,10 @@ import Cocoa
 import InputMethodKit
 
 extension NSWindowController {
+  public func orderFront() {
+    window?.orderFront(self)
+  }
+
   /// 設定選字窗的顯示位置。
   ///
   /// 需注意：該函式會藉由設定選字窗左上角頂點的方式、使選字窗始終位於某個螢幕之內。
