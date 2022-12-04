@@ -296,7 +296,7 @@ extension InputHandler {
 
   /// Command+Enter 鍵的處理（注音文）。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func handleCtrlCommandEnter() -> Bool {
+  func handleCtrlCommandEnter(isShiftPressed: Bool = false) -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
@@ -319,8 +319,7 @@ extension InputHandler {
       }
     }
 
-    let isVCED = delegate.clientBundleIdentifier.contains("vChewingPhraseEditor")
-    displayedText = displayedText.replacingOccurrences(of: "\t", with: isVCED ? "-" : " ")
+    displayedText = displayedText.replacingOccurrences(of: "\t", with: isShiftPressed ? "-" : " ")
 
     delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
     return true
