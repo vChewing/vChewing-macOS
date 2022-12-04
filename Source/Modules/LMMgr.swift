@@ -200,16 +200,16 @@ public enum LMMgr {
   public static func loadUserPhrasesData(type: vChewingLM.ReplacableUserDataType? = nil) {
     guard let type = type else {
       Self.lmCHT.loadUserPhrasesData(
-        path: userPhrasesDataURL(.imeModeCHT).path,
-        filterPath: userFilteredDataURL(.imeModeCHT).path
+        path: userDictDataURL(mode: .imeModeCHT, type: .thePhrases).path,
+        filterPath: userDictDataURL(mode: .imeModeCHT, type: .theFilter).path
       )
       Self.lmCHS.loadUserPhrasesData(
-        path: userPhrasesDataURL(.imeModeCHS).path,
-        filterPath: userFilteredDataURL(.imeModeCHS).path
+        path: userDictDataURL(mode: .imeModeCHS, type: .thePhrases).path,
+        filterPath: userDictDataURL(mode: .imeModeCHS, type: .theFilter).path
       )
-      Self.lmCHT.loadUserSymbolData(path: userSymbolDataURL(.imeModeCHT).path)
-      Self.lmCHS.loadUserSymbolData(path: userSymbolDataURL(.imeModeCHS).path)
-      
+      Self.lmCHT.loadUserSymbolData(path: userDictDataURL(mode: .imeModeCHT, type: .theSymbols).path)
+      Self.lmCHS.loadUserSymbolData(path: userDictDataURL(mode: .imeModeCHS, type: .theSymbols).path)
+
       if PrefMgr.shared.associatedPhrasesEnabled { Self.loadUserAssociatesData() }
       if PrefMgr.shared.phraseReplacementEnabled { Self.loadUserPhraseReplacement() }
       if PrefMgr.shared.useSCPCTypingMode { Self.loadUserSCPCSequencesData() }
@@ -223,38 +223,42 @@ public enum LMMgr {
     switch type {
       case .thePhrases, .theFilter:
         Self.lmCHT.loadUserPhrasesData(
-          path: userPhrasesDataURL(.imeModeCHT).path,
-          filterPath: userFilteredDataURL(.imeModeCHT).path
+          path: userDictDataURL(mode: .imeModeCHT, type: .thePhrases).path,
+          filterPath: userDictDataURL(mode: .imeModeCHT, type: .theFilter).path
         )
         Self.lmCHS.loadUserPhrasesData(
-          path: userPhrasesDataURL(.imeModeCHS).path,
-          filterPath: userFilteredDataURL(.imeModeCHS).path
+          path: userDictDataURL(mode: .imeModeCHS, type: .thePhrases).path,
+          filterPath: userDictDataURL(mode: .imeModeCHS, type: .theFilter).path
         )
       case .theReplacements:
         if PrefMgr.shared.phraseReplacementEnabled { Self.loadUserPhraseReplacement() }
       case .theAssociates:
         if PrefMgr.shared.associatedPhrasesEnabled { Self.loadUserAssociatesData() }
       case .theSymbols:
-        Self.lmCHT.loadUserSymbolData(path: userSymbolDataURL(.imeModeCHT).path)
-        Self.lmCHS.loadUserSymbolData(path: userSymbolDataURL(.imeModeCHS).path)
+        Self.lmCHT.loadUserSymbolData(
+          path: Self.userDictDataURL(mode: .imeModeCHT, type: .theSymbols).path
+        )
+        Self.lmCHS.loadUserSymbolData(
+          path: Self.userDictDataURL(mode: .imeModeCHS, type: .theSymbols).path
+        )
     }
   }
 
   public static func loadUserAssociatesData() {
     Self.lmCHT.loadUserAssociatesData(
-      path: Self.userAssociatesDataURL(.imeModeCHT).path
+      path: Self.userDictDataURL(mode: .imeModeCHT, type: .theAssociates).path
     )
     Self.lmCHS.loadUserAssociatesData(
-      path: Self.userAssociatesDataURL(.imeModeCHS).path
+      path: Self.userDictDataURL(mode: .imeModeCHS, type: .theAssociates).path
     )
   }
 
   public static func loadUserPhraseReplacement() {
     Self.lmCHT.loadReplacementsData(
-      path: Self.userReplacementsDataURL(.imeModeCHT).path
+      path: Self.userDictDataURL(mode: .imeModeCHT, type: .theReplacements).path
     )
     Self.lmCHS.loadReplacementsData(
-      path: Self.userReplacementsDataURL(.imeModeCHS).path
+      path: Self.userDictDataURL(mode: .imeModeCHS, type: .theReplacements).path
     )
   }
 
@@ -317,45 +321,24 @@ public enum LMMgr {
 
   // MARK: - 使用者語彙檔案的具體檔案名稱路徑定義
 
-  // Swift 的 appendingPathComponent 需要藉由 URL 完成，最後再用 .path 轉為路徑。
+  // Swift 的 appendingPathComponent 需要藉由 URL 完成。
 
-  /// 使用者語彙辭典資料路徑。
-  /// - Parameter mode: 簡繁體輸入模式。
+  /// 指定的使用者辭典資料路徑。
+  /// - Parameters:
+  ///   - mode: 繁簡模式。
+  ///   - type: 辭典資料類型
   /// - Returns: 資料路徑（URL）。
-  public static func userPhrasesDataURL(_ mode: Shared.InputMode) -> URL {
-    let fileName = (mode == .imeModeCHT) ? "userdata-cht.txt" : "userdata-chs.txt"
-    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
-  }
-
-  /// 使用者繪文字符號辭典資料路徑。
-  /// - Parameter mode: 簡繁體輸入模式。
-  /// - Returns: 資料路徑（URL）。
-  public static func userSymbolDataURL(_ mode: Shared.InputMode) -> URL {
-    let fileName = (mode == .imeModeCHT) ? "usersymbolphrases-cht.txt" : "usersymbolphrases-chs.txt"
-    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
-  }
-
-  /// 使用者聯想詞資料路徑。
-  /// - Parameter mode: 簡繁體輸入模式。
-  /// - Returns: 資料路徑（URL）。
-  public static func userAssociatesDataURL(_ mode: Shared.InputMode) -> URL {
-    let fileName = (mode == .imeModeCHT) ? "associatedPhrases-cht.txt" : "associatedPhrases-chs.txt"
-    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
-  }
-
-  /// 使用者語彙濾除表資料路徑。
-  /// - Parameter mode: 簡繁體輸入模式。
-  /// - Returns: 資料路徑（URL）。
-  public static func userFilteredDataURL(_ mode: Shared.InputMode) -> URL {
-    let fileName = (mode == .imeModeCHT) ? "exclude-phrases-cht.txt" : "exclude-phrases-chs.txt"
-    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
-  }
-
-  /// 使用者語彙置換表資料路徑。
-  /// - Parameter mode: 簡繁體輸入模式。
-  /// - Returns: 資料路徑（URL）。
-  public static func userReplacementsDataURL(_ mode: Shared.InputMode) -> URL {
-    let fileName = (mode == .imeModeCHT) ? "phrases-replacement-cht.txt" : "phrases-replacement-chs.txt"
+  public static func userDictDataURL(mode: Shared.InputMode, type: vChewingLM.ReplacableUserDataType) -> URL {
+    var fileName: String = {
+      switch type {
+        case .thePhrases: return "userdata"
+        case .theFilter: return "exclude-phrases"
+        case .theReplacements: return "phrases-replacement"
+        case .theAssociates: return "associatedPhrases"
+        case .theSymbols: return "usersymbolphrases"
+      }
+    }()
+    fileName.append((mode == .imeModeCHT) ? "-cht.txt" : "-chs.txt")
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
@@ -426,20 +409,27 @@ public enum LMMgr {
     /// CandidateNode 資料與 UserOverrideModel 半衰模組資料檔案不需要強行確保存在。
     /// 前者的話，需要該檔案存在的人自己會建立。
     /// 後者的話，你在敲字時自己就會建立。
-    if !ensureFileExists(userPhrasesDataURL(mode), deployTemplate: kTemplateNameUserPhrases)
-      || !ensureFileExists(
-        userAssociatesDataURL(mode),
-        deployTemplate: mode == .imeModeCHS ? kTemplateNameUserAssociatesCHS : kTemplateNameUserAssociatesCHT
-      )
-      || !ensureFileExists(userSCPCSequencesURL(mode))
-      || !ensureFileExists(userFilteredDataURL(mode), deployTemplate: kTemplateNameUserFilterList)
-      || !ensureFileExists(userReplacementsDataURL(mode), deployTemplate: kTemplateNameUserReplacements)
-      || !ensureFileExists(userSymbolDataURL(mode), deployTemplate: kTemplateNameUserSymbolPhrases)
-    {
-      return false
+    var failed = false
+    caseCheck: for type in vChewingLM.ReplacableUserDataType.allCases {
+      let templateName = Self.templateName(for: type, mode: mode)
+      if !ensureFileExists(userDictDataURL(mode: mode, type: type), deployTemplate: templateName) {
+        failed = true
+        break caseCheck
+      }
     }
+    failed = failed || !ensureFileExists(userSCPCSequencesURL(mode))
+    return !failed
+  }
 
-    return true
+  private static func templateName(for type: vChewingLM.ReplacableUserDataType, mode: Shared.InputMode) -> String {
+    switch type {
+      case .thePhrases: return kTemplateNameUserPhrases
+      case .theFilter: return kTemplateNameUserFilterList
+      case .theReplacements: return kTemplateNameUserReplacements
+      case .theSymbols: return kTemplateNameUserSymbolPhrases
+      case .theAssociates:
+        return mode == .imeModeCHS ? kTemplateNameUserAssociatesCHS : kTemplateNameUserAssociatesCHT
+    }
   }
 
   // MARK: - 使用者語彙檔案專用目錄的合規性檢查
@@ -578,7 +568,8 @@ public enum LMMgr {
         return false
       }
 
-      let theURL = areWeDeleting ? userFilteredDataURL(mode) : userPhrasesDataURL(mode)
+      let theType: vChewingLM.ReplacableUserDataType = areWeDeleting ? .theFilter : .thePhrases
+      let theURL = userDictDataURL(mode: mode, type: theType)
 
       if areWeDuplicating, !areWeDeleting {
         // Do not use ASCII characters to comment here.
@@ -638,6 +629,13 @@ public enum LMMgr {
       return false
     }
     return true
+  }
+
+  public static func openUserDictFile(type: vChewingLM.ReplacableUserDataType, dual: Bool = false, alt: Bool) {
+    let app: String = alt ? "" : "Finder"
+    openPhraseFile(fromURL: userDictDataURL(mode: IMEApp.currentInputMode, type: type), app: app)
+    guard dual else { return }
+    openPhraseFile(fromURL: userDictDataURL(mode: IMEApp.currentInputMode.reversed, type: type), app: app)
   }
 
   /// 用指定應用開啟指定檔案。

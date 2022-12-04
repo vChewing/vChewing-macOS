@@ -22,9 +22,9 @@ extension Bool {
 // 因為選單部分的內容又臭又長，所以就單獨拉到一個檔案內管理了。
 
 extension SessionCtl {
-  public override func menu() -> NSMenu! {
-    let optionKeyPressed = NSEvent.modifierFlags.contains(.option)
+  var optionKeyPressed: Bool { NSEvent.modifierFlags.contains(.option) }
 
+  override public func menu() -> NSMenu! {
     let menu = NSMenu(title: "Input Method Menu")
 
     let useSCPCTypingModeItem = menu.addItem(
@@ -364,39 +364,23 @@ extension SessionCtl {
   }
 
   @objc public func openUserPhrases(_: Any? = nil) {
-    LMMgr.openPhraseFile(fromURL: LMMgr.userPhrasesDataURL(IMEApp.currentInputMode))
-    if NSEvent.modifierFlags.contains(.option) {
-      LMMgr.openPhraseFile(fromURL: LMMgr.userPhrasesDataURL(IMEApp.currentInputMode.reversed))
-    }
+    LMMgr.openUserDictFile(type: .thePhrases, dual: optionKeyPressed, alt: optionKeyPressed)
   }
 
   @objc public func openExcludedPhrases(_: Any? = nil) {
-    LMMgr.openPhraseFile(fromURL: LMMgr.userFilteredDataURL(IMEApp.currentInputMode))
-    if NSEvent.modifierFlags.contains(.option) {
-      LMMgr.openPhraseFile(fromURL: LMMgr.userFilteredDataURL(IMEApp.currentInputMode.reversed))
-    }
+    LMMgr.openUserDictFile(type: .theFilter, dual: optionKeyPressed, alt: optionKeyPressed)
   }
 
   @objc public func openUserSymbols(_: Any? = nil) {
-    LMMgr.openPhraseFile(fromURL: LMMgr.userSymbolDataURL(IMEApp.currentInputMode))
-    if NSEvent.modifierFlags.contains(.option) {
-      LMMgr.openPhraseFile(fromURL: LMMgr.userSymbolDataURL(IMEApp.currentInputMode.reversed))
-    }
+    LMMgr.openUserDictFile(type: .theSymbols, dual: optionKeyPressed, alt: optionKeyPressed)
   }
 
   @objc public func openPhraseReplacement(_: Any? = nil) {
-    LMMgr.openPhraseFile(fromURL: LMMgr.userReplacementsDataURL(IMEApp.currentInputMode))
-    if NSEvent.modifierFlags.contains(.option) {
-      LMMgr.openPhraseFile(fromURL: LMMgr.userReplacementsDataURL(IMEApp.currentInputMode.reversed))
-    }
+    LMMgr.openUserDictFile(type: .theReplacements, dual: optionKeyPressed, alt: optionKeyPressed)
   }
 
   @objc public func openAssociatedPhrases(_: Any? = nil) {
-    LMMgr.openPhraseFile(fromURL: LMMgr.userAssociatesDataURL(IMEApp.currentInputMode))
-    if NSEvent.modifierFlags.contains(.option) {
-      LMMgr.openPhraseFile(
-        fromURL: LMMgr.userAssociatesDataURL(IMEApp.currentInputMode.reversed))
-    }
+    LMMgr.openUserDictFile(type: .theAssociates, dual: optionKeyPressed, alt: optionKeyPressed)
   }
 
   @objc public func reloadUserPhrasesData(_: Any? = nil) {
