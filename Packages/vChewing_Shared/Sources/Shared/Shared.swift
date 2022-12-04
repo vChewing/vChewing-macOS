@@ -306,5 +306,17 @@ public enum Shared {
           return .imeModeNULL
       }
     }
+
+    public var localizedDescription: String { NSLocalizedString(description, comment: "") }
+    public var description: String {
+      switch self {
+        case .imeModeCHS:
+          return "Simplified Chinese"
+        case .imeModeCHT:
+          return "Traditional Chinese"
+        case .imeModeNULL:
+          return "Please select…"
+      }
+    }
   }
 }
