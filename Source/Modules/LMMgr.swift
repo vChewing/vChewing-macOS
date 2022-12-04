@@ -599,7 +599,6 @@ public enum LMMgr {
 
       // The new FolderMonitor module does NOT monitor cases that files are modified
       // by the current application itself, requiring additional manual loading process here.
-      // if !PrefMgr.shared.shouldAutoReloadUserDataFiles {}
       loadUserPhrasesData(type: .thePhrases)
       return true
     }
