@@ -640,10 +640,41 @@ public enum LMMgr {
     return true
   }
 
-  public static func openPhraseFile(fromURL url: URL) {
+  /// 用指定應用開啟指定檔案。
+  /// - Remark: 如果你的 App 有 Sandbox 處理過的話，請勿給 app 傳入 "vim" 參數，因為 Sandbox 會阻止之。
+  /// - Parameters:
+  ///   - url: 檔案 URL。
+  ///   - app: 指定 App 應用的 binary 檔案名稱。
+  public static func openPhraseFile(fromURL url: URL, app: String = "") {
     if !Self.checkIfUserFilesExistBeforeOpening() { return }
     DispatchQueue.main.async {
-      NSWorkspace.shared.openFile(url.path, withApplication: "vChewingPhraseEditor")
+      switch app {
+        case "vim":
+          let process = Process()
+          let pipe = Pipe()
+          process.executableURL = URL(fileURLWithPath: "/bin/sh/")
+          process.arguments = ["-c", "open '/usr/bin/vim'", "'\(url.path)'"]
+          process.standardOutput = pipe
+          process.standardError = pipe
+          process.terminationHandler = { process in
+            vCLog("\ndidFinish: \(!process.isRunning)")
+          }
+          let fileHandle = pipe.fileHandleForReading
+          do {
+            try process.run()
+          } catch {
+            NSWorkspace.shared.openFile(url.path, withApplication: "TextEdit")
+          }
+          if let outStr = String(data: fileHandle.readDataToEndOfFile(), encoding: .utf8) {
+            vCLog(outStr)
+          }
+        case "Finder":
+          NSWorkspace.shared.activateFileViewerSelecting([url])
+        default:
+          if !NSWorkspace.shared.openFile(url.path, withApplication: app) {
+            NSWorkspace.shared.openFile(url.path, withApplication: "TextEdit")
+          }
+      }
     }
   }
 
