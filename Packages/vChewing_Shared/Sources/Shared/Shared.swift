@@ -291,7 +291,8 @@ public enum Shared {
   public static let arrSupportedLocales: [String] = ["en", "zh-Hant", "zh-Hans", "ja"]
 
   // The type of input modes.
-  public enum InputMode: String, CaseIterable {
+  public enum InputMode: String, CaseIterable, Identifiable {
+    public var id: ObjectIdentifier { .init(rawValue as AnyObject) }
     case imeModeCHS = "org.atelierInmu.inputmethod.vChewing.IMECHS"
     case imeModeCHT = "org.atelierInmu.inputmethod.vChewing.IMECHT"
     case imeModeNULL = ""
