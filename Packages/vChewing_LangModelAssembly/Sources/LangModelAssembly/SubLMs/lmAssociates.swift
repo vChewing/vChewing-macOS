@@ -80,6 +80,7 @@ extension vChewingLM {
 
     public mutating func clear() {
       filePath = nil
+      strData.removeAll()
       rangeMap.removeAll()
     }
 
