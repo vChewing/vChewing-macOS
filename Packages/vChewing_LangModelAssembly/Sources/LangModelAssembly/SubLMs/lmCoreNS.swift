@@ -81,6 +81,7 @@ extension vChewingLM {
     /// 將當前語言模組的資料庫辭典自記憶體內卸除。
     public mutating func clear() {
       filePath = nil
+      strData.removeAll()
       dataMap.removeAll()
     }
 
