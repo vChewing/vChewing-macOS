@@ -21,7 +21,7 @@ extension Megrez {
     /// 該軌格內可以允許的最大幅位長度。
     public static var maxSpanLength: Int = 10 { didSet { maxSpanLength = max(6, maxSpanLength) } }
     /// 公開：多字讀音鍵當中用以分割漢字讀音的記號的預設值，是「-」。
-    public static let kDefaultSeparator: String = "-"
+    public static var theSeparator: String = "-"
     /// 該組字器的游標位置。
     public var cursor: Int = 0 {
       didSet {
@@ -33,7 +33,12 @@ extension Megrez {
     /// 該組字器的標記器位置。
     public var marker: Int = 0 { didSet { marker = max(0, min(marker, length)) } }
     /// 公開：多字讀音鍵當中用以分割漢字讀音的記號，預設為「-」。
-    public var separator = kDefaultSeparator
+    public var separator = theSeparator {
+      didSet {
+        Self.theSeparator = separator
+      }
+    }
+
     /// 公開：組字器內已經插入的單筆索引鍵的數量。
     public var width: Int { keys.count }
     /// 公開：最近一次爬軌結果。
@@ -71,7 +76,7 @@ extension Megrez {
     /// - Parameter key: 要插入的索引鍵。
     /// - Returns: 該操作是否成功執行。
     @discardableResult public mutating func insertKey(_ key: String) -> Bool {
-      guard !key.isEmpty, key != separator, langModel.hasUnigramsFor(key: key) else { return false }
+      guard !key.isEmpty, key != separator, langModel.hasUnigramsFor(keyArray: [key]) else { return false }
       keys.insert(key, at: cursor)
       let gridBackup = spans
       resizeGrid(at: cursor, do: .expand)
@@ -242,7 +247,7 @@ extension Megrez.Compositor {
     return true
   }
 
-  func getJointKeyArray(range: Range<Int>) -> [String] {
+  func getJoinedKeyArray(range: Range<Int>) -> [String] {
     // 下面這句不能用 contains，不然會要求至少 macOS 13 Ventura。
     guard range.upperBound <= keys.count, range.lowerBound >= 0 else { return [] }
     return keys[range].map { String($0) }
@@ -262,11 +267,10 @@ extension Megrez.Compositor {
     var nodesChanged = 0
     for position in range {
       for theLength in 1...min(maxSpanLength, range.upperBound - position) {
-        let jointKeyArray = getJointKeyArray(range: position..<(position + theLength))
-        let jointKey = jointKeyArray.joined(separator: separator)
-        if let theNode = getNode(at: position, length: theLength, keyArray: jointKeyArray) {
+        let joinedKeyArray = getJoinedKeyArray(range: position..<(position + theLength))
+        if let theNode = getNode(at: position, length: theLength, keyArray: joinedKeyArray) {
           if !updateExisting { continue }
-          let unigrams = langModel.unigramsFor(key: jointKey)
+          let unigrams = langModel.unigramsFor(keyArray: joinedKeyArray)
           // 自動銷毀無效的節點。
           if unigrams.isEmpty {
             if theNode.keyArray.count == 1 { continue }
@@ -277,10 +281,10 @@ extension Megrez.Compositor {
           nodesChanged += 1
           continue
         }
-        let unigrams = langModel.unigramsFor(key: jointKey)
+        let unigrams = langModel.unigramsFor(keyArray: joinedKeyArray)
         guard !unigrams.isEmpty else { continue }
         insertNode(
-          .init(keyArray: jointKeyArray, spanLength: theLength, unigrams: unigrams, keySeparator: separator),
+          .init(keyArray: joinedKeyArray, spanLength: theLength, unigrams: unigrams),
           at: position
         )
         nodesChanged += 1
