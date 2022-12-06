@@ -190,7 +190,7 @@ extension InputHandler {
 
     if input.isSymbolMenuPhysicalKey, !input.isShiftHold, !input.isControlHold, state.type != .ofDeactivated {
       if input.isOptionHold {
-        if currentLM.hasUnigramsFor(key: "_punctuation_list") {
+        if currentLM.hasUnigramsFor(keyArray: ["_punctuation_list"]) {
           if isComposerOrCalligrapherEmpty, compositor.insertKey("_punctuation_list") {
             walk()
             // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
