@@ -7,49 +7,66 @@ import Foundation
 
 extension Megrez.Compositor {
   public struct KeyValuePaired: Equatable, Hashable, Comparable, CustomStringConvertible {
-    /// 鍵。一般情況下用來放置讀音等可以用來作為索引的內容。
-    public var key: String
+    /// 鍵陣列。一般情況下用來放置讀音等可以用來作為索引的內容。
+    public var keyArray: [String]
     /// 資料值。
     public var value: String
     /// 將當前鍵值列印成一個字串。
-    public var description: String { "(" + key + "," + value + ")" }
+    public var description: String { "(" + keyArray.description + "," + value + ")" }
     /// 判斷當前鍵值配對是否合規。如果鍵與值有任一為空，則結果為 false。
-    public var isValid: Bool { !key.isEmpty && !value.isEmpty }
+    public var isValid: Bool { !keyArray.joined().isEmpty && !value.isEmpty }
     /// 將當前鍵值列印成一個字串，但如果該鍵值配對為空的話則僅列印「()」。
-    public var toNGramKey: String { !isValid ? "()" : "(" + key + "," + value + ")" }
+    public var toNGramKey: String { !isValid ? "()" : "(" + joinedKey() + "," + value + ")" }
+
+    /// 初期化一組鍵值配對。
+    /// - Parameters:
+    ///   - key: 鍵陣列。一般情況下用來放置讀音等可以用來作為索引的內容。
+    ///   - value: 資料值。
+    public init(keyArray: [String], value: String = "N/A") {
+      self.keyArray = keyArray.isEmpty ? ["N/A"] : keyArray
+      self.value = value.isEmpty ? "N/A" : value
+    }
 
     /// 初期化一組鍵值配對。
     /// - Parameters:
     ///   - key: 鍵。一般情況下用來放置讀音等可以用來作為索引的內容。
     ///   - value: 資料值。
-    public init(key: String = "", value: String = "") {
-      self.key = key
-      self.value = value
+    public init(key: String = "N/A", value: String = "N/A") {
+      keyArray = key.isEmpty ? ["N/A"] : key.components(separatedBy: Megrez.Compositor.theSeparator)
+      self.value = value.isEmpty ? "N/A" : value
     }
 
     public func hash(into hasher: inout Hasher) {
-      hasher.combine(key)
+      hasher.combine(keyArray)
       hasher.combine(value)
     }
 
+    public func joinedKey(by separator: String = Megrez.Compositor.theSeparator) -> String {
+      keyArray.joined(separator: separator)
+    }
+
     public static func == (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
-      lhs.key == rhs.key && lhs.value == rhs.value
+      lhs.keyArray == rhs.keyArray && lhs.value == rhs.value
     }
 
     public static func < (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
-      (lhs.key.count < rhs.key.count) || (lhs.key.count == rhs.key.count && lhs.value < rhs.value)
+      (lhs.keyArray.joined().count < rhs.keyArray.joined().count)
+        || (lhs.keyArray.joined().count == rhs.keyArray.joined().count && lhs.value < rhs.value)
     }
 
     public static func > (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
-      (lhs.key.count > rhs.key.count) || (lhs.key.count == rhs.key.count && lhs.value > rhs.value)
+      (lhs.keyArray.joined().count > rhs.keyArray.joined().count)
+        || (lhs.keyArray.joined().count == rhs.keyArray.joined().count && lhs.value > rhs.value)
     }
 
     public static func <= (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
-      (lhs.key.count <= rhs.key.count) || (lhs.key.count == rhs.key.count && lhs.value <= rhs.value)
+      (lhs.keyArray.joined().count <= rhs.keyArray.joined().count)
+        || (lhs.keyArray.joined().count == rhs.keyArray.joined().count && lhs.value <= rhs.value)
     }
 
     public static func >= (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
-      (lhs.key.count >= rhs.key.count) || (lhs.key.count == rhs.key.count && lhs.value >= rhs.value)
+      (lhs.keyArray.joined().count >= rhs.keyArray.joined().count)
+        || (lhs.keyArray.joined().count == rhs.keyArray.joined().count && lhs.value >= rhs.value)
     }
   }
 
@@ -70,7 +87,7 @@ extension Megrez.Compositor {
     }
     let keyAtCursor = keys[location]
     for theNode in anchors.map(\.node) {
-      if theNode.key.isEmpty { continue }
+      if theNode.keyArray.joined(separator: separator).isEmpty { continue }
       for gram in theNode.unigrams {
         switch filter {
           case .all:
@@ -81,7 +98,7 @@ extension Megrez.Compositor {
           case .endAt:
             if theNode.keyArray.reversed()[0] != keyAtCursor { continue }
         }
-        result.append(.init(key: theNode.key, value: gram.value))
+        result.append(.init(keyArray: theNode.keyArray, value: gram.value))
       }
     }
     return result
@@ -100,7 +117,7 @@ extension Megrez.Compositor {
   )
     -> Bool
   {
-    overrideCandidateAgainst(key: candidate.key, at: location, value: candidate.value, type: overrideType)
+    overrideCandidateAgainst(keyArray: candidate.keyArray, at: location, value: candidate.value, type: overrideType)
   }
 
   /// 使用給定的候選字詞字串，將給定位置的節點的候選字詞改為與之一致的候選字詞。
@@ -115,7 +132,7 @@ extension Megrez.Compositor {
     _ candidate: String,
     at location: Int, overrideType: Node.OverrideType = .withHighScore
   ) -> Bool {
-    overrideCandidateAgainst(key: nil, at: location, value: candidate, type: overrideType)
+    overrideCandidateAgainst(keyArray: nil, at: location, value: candidate, type: overrideType)
   }
 
   // MARK: Internal implementations.
@@ -127,14 +144,18 @@ extension Megrez.Compositor {
   ///   - value: 資料值。
   ///   - type: 指定覆寫行為。
   /// - Returns: 該操作是否成功執行。
-  internal func overrideCandidateAgainst(key: String?, at location: Int, value: String, type: Node.OverrideType)
+  internal func overrideCandidateAgainst(keyArray: [String]?, at location: Int, value: String, type: Node.OverrideType)
     -> Bool
   {
     let location = max(min(location, keys.count), 0)  // 防呆
     var arrOverlappedNodes: [NodeAnchor] = fetchOverlappingNodes(at: min(keys.count - 1, location))
     var overridden: NodeAnchor?
     for anchor in arrOverlappedNodes {
-      if let key = key, anchor.node.key != key { continue }
+      if let keyArray = keyArray,
+        anchor.node.keyArray.joined(separator: separator) != keyArray.joined(separator: separator)
+      {
+        continue
+      }
       if anchor.node.selectOverrideUnigram(value: value, type: type) {
         overridden = anchor
         break
@@ -150,7 +171,9 @@ extension Megrez.Compositor {
       arrOverlappedNodes = fetchOverlappingNodes(at: i)
       for anchor in arrOverlappedNodes {
         if anchor.node == overridden.node { continue }
-        if !overridden.node.key.contains(anchor.node.key) || !overridden.node.value.contains(anchor.node.value) {
+        if !overridden.node.keyArray.joined(separator: separator).contains(
+          anchor.node.keyArray.joined(separator: separator)) || !overridden.node.value.contains(anchor.node.value)
+        {
           anchor.node.reset()
           continue
         }
