@@ -91,7 +91,7 @@ public struct IMEStateData: IMEStateDataProtocol {
 
   public var reading: String = ""
   public var markedReadings = [String]()
-  public var candidates = [(String, String)]()
+  public var candidates = [([String], String)]()
   public var textToCommit: String = ""
   public var tooltip: String = ""
   public var tooltipDuration: Double = 1.0
@@ -172,7 +172,7 @@ public struct IMEStateData: IMEStateDataProtocol {
 extension IMEStateData {
   public var doesUserPhraseExist: Bool {
     let text = displayedText.charComponents[markedRange].joined()
-    let joined = markedReadings.joined(separator: "-")
+    let joined = markedReadings.joined(separator: InputHandler.keySeparator)
     return LMMgr.checkIfUserPhraseExist(
       userPhrase: text, mode: IMEApp.currentInputMode, key: joined
     )
@@ -205,7 +205,7 @@ extension IMEStateData {
   }
 
   public var userPhraseKVPair: (String, String) {
-    let key = markedReadings.joined(separator: "-")
+    let key = markedReadings.joined(separator: InputHandler.keySeparator)
     let value = displayedText.charComponents[markedRange].joined()
     return (key, value)
   }

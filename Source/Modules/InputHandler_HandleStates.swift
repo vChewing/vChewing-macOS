@@ -239,7 +239,7 @@ extension InputHandler {
   func handlePunctuation(_ customPunctuation: String) -> Bool {
     guard let delegate = delegate else { return false }
 
-    if !currentLM.hasUnigramsFor(key: customPunctuation) {
+    if !currentLM.hasUnigramsFor(keyArray: [customPunctuation]) {
       return false
     }
 
@@ -269,7 +269,7 @@ extension InputHandler {
       case 2...: delegate.switchState(candidateState)
       case 1:
         clear()  // 這句不要砍，因為下文可能會回呼 candidateState。
-        if let candidateToCommit: (String, String) = candidateState.candidates.first, !candidateToCommit.1.isEmpty {
+        if let candidateToCommit: ([String], String) = candidateState.candidates.first, !candidateToCommit.1.isEmpty {
           delegate.switchState(IMEState.ofCommitting(textToCommit: candidateToCommit.1))
         } else {
           delegate.switchState(candidateState)
@@ -337,13 +337,13 @@ extension InputHandler {
     var composed = ""
 
     for node in compositor.walkedNodes {
-      var key = node.key
+      var key = node.keyArray.joined(separator: "\t")
       if !prefs.cassetteEnabled {
         if prefs.inlineDumpPinyinInLieuOfZhuyin {
           key = Tekkon.restoreToneOneInZhuyinKey(target: key)  // 恢復陰平標記
           key = Tekkon.cnvPhonaToHanyuPinyin(target: key)  // 注音轉拼音
           key = Tekkon.cnvHanyuPinyinToTextbookStyle(target: key)  // 轉教科書式標調
-          key = key.replacingOccurrences(of: "-", with: " ")
+          key = key.replacingOccurrences(of: "\t", with: " ")
         } else {
           key = Tekkon.cnvZhuyinChainToTextbookReading(target: key, newSeparator: " ")
         }
@@ -706,7 +706,7 @@ extension InputHandler {
       return true
     }
 
-    let currentPaired = (currentNode.key, currentNode.value)
+    let currentPaired = (currentNode.keyArray, currentNode.value)
 
     var currentIndex = 0
     if !currentNode.isOverriden {

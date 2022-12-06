@@ -53,7 +53,7 @@ extension InputHandler {
         theComposer.intonation.clear()
         // 檢查新的漢字字音是否在庫。
         let temporaryReadingKey = theComposer.getComposition()
-        if currentLM.hasUnigramsFor(key: temporaryReadingKey) {
+        if currentLM.hasUnigramsFor(keyArray: [temporaryReadingKey]) {
           compositor.dropKey(direction: .rear)
           walk()  // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
           composer = theComposer
@@ -92,7 +92,7 @@ extension InputHandler {
         return handleCtrlCommandEnter()
       }
       // 向語言模型詢問是否有對應的記錄。
-      if !currentLM.hasUnigramsFor(key: readingKey) {
+      if !currentLM.hasUnigramsFor(keyArray: [readingKey]) {
         delegate.callError("B49C0979：語彙庫內無「\(readingKey)」的匹配記錄。")
 
         if prefs.keepReadingUponCompositionError {
@@ -140,14 +140,14 @@ extension InputHandler {
           case 2...: delegate.switchState(candidateState)
           case 1:
             let firstCandidate = candidateState.candidates.first!  // 一定會有，所以強制拆包也無妨。
-            let reading: String = firstCandidate.0
+            let reading: String = firstCandidate.0.joined(separator: compositor.separator)
             let text: String = firstCandidate.1
             delegate.switchState(IMEState.ofCommitting(textToCommit: text))
 
             if !prefs.associatedPhrasesEnabled {
               delegate.switchState(IMEState.ofEmpty())
             } else {
-              let associatedPhrases = generateStateOfAssociates(withPair: .init(key: reading, value: text))
+              let associatedPhrases = generateStateOfAssociates(withPair: .init(keyArray: [reading], value: text))
               delegate.switchState(associatedPhrases.candidates.isEmpty ? IMEState.ofEmpty() : associatedPhrases)
             }
           default: break
@@ -240,7 +240,7 @@ extension InputHandler {
         return handleCtrlCommandEnter()
       }
       // 向語言模型詢問是否有對應的記錄。
-      if !currentLM.hasUnigramsFor(key: calligrapher) {
+      if !currentLM.hasUnigramsFor(keyArray: [calligrapher]) {
         delegate.callError("B49C0979_Cassette：語彙庫內無「\(calligrapher)」的匹配記錄。")
 
         calligrapher.removeAll()
@@ -282,14 +282,14 @@ extension InputHandler {
           case 2...: delegate.switchState(candidateState)
           case 1:
             let firstCandidate = candidateState.candidates.first!  // 一定會有，所以強制拆包也無妨。
-            let reading: String = firstCandidate.0
+            let reading: String = firstCandidate.0.joined(separator: compositor.separator)
             let text: String = firstCandidate.1
             delegate.switchState(IMEState.ofCommitting(textToCommit: text))
 
             if !prefs.associatedPhrasesEnabled {
               delegate.switchState(IMEState.ofEmpty())
             } else {
-              let associatedPhrases = generateStateOfAssociates(withPair: .init(key: reading, value: text))
+              let associatedPhrases = generateStateOfAssociates(withPair: .init(keyArray: [reading], value: text))
               delegate.switchState(associatedPhrases.candidates.isEmpty ? IMEState.ofEmpty() : associatedPhrases)
             }
           default: break

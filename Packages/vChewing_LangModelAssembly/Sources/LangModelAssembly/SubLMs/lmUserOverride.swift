@@ -69,7 +69,7 @@ extension vChewingLM {
       var headIndex = 0
       guard let nodeIter = currentWalk.findNode(at: cursor, target: &headIndex) else { return .init() }
       let key = vChewingLM.LMUserOverride.formObservationKey(walkedNodes: currentWalk, headIndex: headIndex)
-      return getSuggestion(key: key, timestamp: timestamp, headReading: nodeIter.key)
+      return getSuggestion(key: key, timestamp: timestamp, headReading: nodeIter.joinedKey())
     }
   }
 }
@@ -329,15 +329,15 @@ extension vChewingLM.LMUserOverride {
     arrNodes = Array(arrNodes.reversed())
 
     let kvCurrent = arrNodes[0].currentPair
-    guard !kvCurrent.key.contains("_") else {
+    guard !kvCurrent.joinedKey().contains("_") else {
       return ""
     }
 
     // 字音數與字數不一致的內容會被拋棄。
-    if kvCurrent.key.split(separator: "-").count != kvCurrent.value.count { return "" }
+    if kvCurrent.keyArray.count != kvCurrent.value.count { return "" }
 
     // 前置單元只記錄讀音，在其後的單元則同時記錄讀音與字詞
-    let strCurrent = kvCurrent.key
+    let strCurrent = kvCurrent.joinedKey()
     var kvPrevious = Megrez.Compositor.KeyValuePaired()
     var kvAnterior = Megrez.Compositor.KeyValuePaired()
     var readingStack = ""
@@ -354,19 +354,19 @@ extension vChewingLM.LMUserOverride {
     }
 
     if arrNodes.count >= 2,
-      !kvPrevious.key.contains("_"),
-      kvPrevious.key.split(separator: "-").count == kvPrevious.value.count
+      !kvPrevious.joinedKey().contains("_"),
+      kvPrevious.joinedKey().split(separator: "-").count == kvPrevious.value.count
     {
       kvPrevious = arrNodes[1].currentPair
-      readingStack = kvPrevious.key + readingStack
+      readingStack = kvPrevious.joinedKey() + readingStack
     }
 
     if arrNodes.count >= 3,
-      !kvAnterior.key.contains("_"),
-      kvAnterior.key.split(separator: "-").count == kvAnterior.value.count
+      !kvAnterior.joinedKey().contains("_"),
+      kvAnterior.joinedKey().split(separator: "-").count == kvAnterior.value.count
     {
       kvAnterior = arrNodes[2].currentPair
-      readingStack = kvAnterior.key + readingStack
+      readingStack = kvAnterior.joinedKey() + readingStack
     }
 
     return result

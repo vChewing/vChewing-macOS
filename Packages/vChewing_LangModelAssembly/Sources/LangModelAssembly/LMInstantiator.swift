@@ -229,14 +229,15 @@ extension vChewingLM {
 
     /// 插入臨時資料。
     /// - Parameters:
-    ///   - key: 索引鍵。
+    ///   - key: 索引鍵陣列。
     ///   - unigram: 要插入的單元圖。
     ///   - isFiltering: 是否有在過濾內容。
-    public func insertTemporaryData(key: String, unigram: Megrez.Unigram, isFiltering: Bool) {
+    public func insertTemporaryData(keyArray: [String], unigram: Megrez.Unigram, isFiltering: Bool) {
+      let keyChain = keyArray.joined(separator: "-")
       _ =
         isFiltering
-        ? lmFiltered.temporaryMap[key, default: []].append(unigram)
-        : lmUserPhrases.temporaryMap[key, default: []].append(unigram)
+        ? lmFiltered.temporaryMap[keyChain, default: []].append(unigram)
+        : lmUserPhrases.temporaryMap[keyChain, default: []].append(unigram)
     }
 
     /// 自當前記憶體取得指定使用者子語言模組內的原始資料體。
@@ -279,60 +280,62 @@ extension vChewingLM {
     }
 
     /// 根據給定的索引鍵來確認各個資料庫陣列內是否存在對應的資料。
-    /// - Parameter key: 索引鍵。
+    /// - Parameter key: 索引鍵陣列。
     /// - Returns: 是否在庫。
-    public func hasUnigramsFor(key: String) -> Bool {
-      key == " " || (!unigramsFor(key: key).isEmpty && !key.isEmpty)
+    public func hasUnigramsFor(keyArray: [String]) -> Bool {
+      let keyChain = keyArray.joined(separator: "-")
+      return keyChain == " " || (!unigramsFor(keyArray: keyArray).isEmpty && !keyChain.isEmpty)
     }
 
     /// 根據給定的索引鍵和資料值，確認是否有該具體的資料值在庫。
     /// - Parameters:
-    ///   - key: 索引鍵。
+    ///   - key: 索引鍵陣列。
     ///   - value: 資料值。
     /// - Returns: 是否在庫。
-    public func hasKeyValuePairFor(key: String, value: String) -> Bool {
-      unigramsFor(key: key).map(\.value).contains(value)
+    public func hasKeyValuePairFor(key: [String], value: String) -> Bool {
+      unigramsFor(keyArray: key).map(\.value).contains(value)
     }
 
     /// 給定讀音字串，讓 LMI 給出對應的經過處理的單元圖陣列。
     /// - Parameter key: 給定的讀音字串。
     /// - Returns: 對應的經過處理的單元圖陣列。
-    public func unigramsFor(key: String) -> [Megrez.Unigram] {
-      guard !key.isEmpty else { return [] }
+    public func unigramsFor(keyArray: [String]) -> [Megrez.Unigram] {
+      let keyChain = keyArray.joined(separator: "-")
+      guard !keyChain.isEmpty else { return [] }
       /// 給空格鍵指定輸出值。
-      if key == " " { return [.init(value: " ")] }
+      if keyChain == " " { return [.init(value: " ")] }
 
       /// 準備不同的語言模組容器，開始逐漸往容器陣列內塞入資料。
       var rawAllUnigrams: [Megrez.Unigram] = []
 
-      if isCassetteEnabled { rawAllUnigrams += Self.lmCassette.unigramsFor(key: key) }
+      if isCassetteEnabled { rawAllUnigrams += Self.lmCassette.unigramsFor(key: keyChain) }
 
       // 如果有檢測到使用者自訂逐字選字語料庫內的相關資料的話，在這裡先插入。
       if isSCPCEnabled {
-        rawAllUnigrams += lmPlainBopomofo.valuesFor(key: key).map { Megrez.Unigram(value: $0, score: 0) }
+        rawAllUnigrams += lmPlainBopomofo.valuesFor(key: keyChain).map { Megrez.Unigram(value: $0, score: 0) }
       }
 
       // 用 reversed 指令讓使用者語彙檔案內的詞條優先順序隨著行數增加而逐漸增高。
       // 這樣一來就可以在就地新增語彙時徹底複寫優先權。
       // 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
-      rawAllUnigrams += lmUserPhrases.unigramsFor(key: key).reversed()
+      rawAllUnigrams += lmUserPhrases.unigramsFor(key: keyChain).reversed()
 
-      if !isCassetteEnabled || isCassetteEnabled && key.charComponents[0] == "_" {
+      if !isCassetteEnabled || isCassetteEnabled && keyChain.charComponents[0] == "_" {
         // LMMisc 與 LMCore 的 score 在 (-10.0, 0.0) 這個區間內。
-        rawAllUnigrams += lmMisc.unigramsFor(key: key)
-        rawAllUnigrams += lmCore.unigramsFor(key: key)
-        if isCNSEnabled { rawAllUnigrams += Self.lmCNS.unigramsFor(key: key) }
+        rawAllUnigrams += lmMisc.unigramsFor(key: keyChain)
+        rawAllUnigrams += lmCore.unigramsFor(key: keyChain)
+        if isCNSEnabled { rawAllUnigrams += Self.lmCNS.unigramsFor(key: keyChain) }
       }
 
       if isSymbolEnabled {
-        rawAllUnigrams += lmUserSymbols.unigramsFor(key: key)
+        rawAllUnigrams += lmUserSymbols.unigramsFor(key: keyChain)
         if !isCassetteEnabled {
-          rawAllUnigrams += Self.lmSymbols.unigramsFor(key: key)
+          rawAllUnigrams += Self.lmSymbols.unigramsFor(key: keyChain)
         }
       }
 
       // 新增與日期、時間、星期有關的單元圖資料
-      rawAllUnigrams.append(contentsOf: queryDateTimeUnigrams(with: key))
+      rawAllUnigrams.append(contentsOf: queryDateTimeUnigrams(with: keyChain))
 
       // 提前處理語彙置換
       if isPhraseReplacementEnabled {
@@ -344,7 +347,7 @@ extension vChewingLM {
       }
 
       // 讓單元圖陣列自我過濾。在此基礎之上，對於相同詞值的多個單元圖，僅保留權重最大者。
-      rawAllUnigrams.consolidate(filter: .init(lmFiltered.unigramsFor(key: key).map(\.value)))
+      rawAllUnigrams.consolidate(filter: .init(lmFiltered.unigramsFor(key: keyChain).map(\.value)))
       return rawAllUnigrams
     }
   }
