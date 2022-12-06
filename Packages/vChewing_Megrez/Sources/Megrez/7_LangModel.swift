@@ -5,10 +5,10 @@
 
 /// 語言模組協定。
 public protocol LangModelProtocol {
-  /// 給定鍵，讓語言模型找給一組單元圖陣列。
-  func unigramsFor(key: String) -> [Megrez.Unigram]
-  /// 給定鍵，確認是否有單元圖記錄在庫。
-  func hasUnigramsFor(key: String) -> Bool
+  /// 給定鍵陣列，讓語言模型找給一組單元圖陣列。
+  func unigramsFor(keyArray: [String]) -> [Megrez.Unigram]
+  /// 給定鍵陣列，確認是否有單元圖記錄在庫。
+  func hasUnigramsFor(keyArray: [String]) -> Bool
 }
 
 extension Megrez.Compositor {
@@ -24,15 +24,15 @@ extension Megrez.Compositor {
     /// 給定索引鍵，讓語言模型找給一組經過穩定排序的單元圖陣列。
     /// - Parameter key: 給定的索引鍵字串。
     /// - Returns: 對應的經過穩定排序的單元圖陣列。
-    public func unigramsFor(key: String) -> [Megrez.Unigram] {
-      langModel.unigramsFor(key: key).stableSorted { $0.score > $1.score }
+    public func unigramsFor(keyArray: [String]) -> [Megrez.Unigram] {
+      langModel.unigramsFor(keyArray: keyArray).stableSorted { $0.score > $1.score }
     }
 
     /// 根據給定的索引鍵來確認各個資料庫陣列內是否存在對應的資料。
     /// - Parameter key: 索引鍵。
     /// - Returns: 是否在庫。
-    public func hasUnigramsFor(key: String) -> Bool {
-      langModel.hasUnigramsFor(key: key)
+    public func hasUnigramsFor(keyArray: [String]) -> Bool {
+      langModel.hasUnigramsFor(keyArray: keyArray)
     }
   }
 }
