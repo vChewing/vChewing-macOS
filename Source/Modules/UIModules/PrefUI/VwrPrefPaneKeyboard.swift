@@ -14,28 +14,12 @@ import SwiftUI
 
 @available(macOS 10.15, *)
 struct VwrPrefPaneKeyboard: View {
-  @State private var selSelectionKeysList = CandidateKey.suggestions
-  @State private var selSelectionKeys =
-    UserDefaults.standard.string(forKey: UserDef.kCandidateKeys.rawValue) ?? CandidateKey.defaultKeys
   @State private var selKeyboardParser = UserDefaults.standard.integer(forKey: UserDef.kKeyboardParser.rawValue)
   @State private var selBasicKeyboardLayout: String =
     UserDefaults.standard.string(forKey: UserDef.kBasicKeyboardLayout.rawValue) ?? PrefMgr.shared.basicKeyboardLayout
   @State private var selAlphanumericalKeyboardLayout: String =
     UserDefaults.standard.string(forKey: UserDef.kAlphanumericalKeyboardLayout.rawValue)
     ?? PrefMgr.shared.alphanumericalKeyboardLayout
-
-  @State private var selUsingHotKeySCPC = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeySCPC.rawValue)
-  @State private var selUsingHotKeyAssociates = UserDefaults.standard.bool(
-    forKey: UserDef.kUsingHotKeyAssociates.rawValue)
-  @State private var selUsingHotKeyCNS = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyCNS.rawValue)
-  @State private var selUsingHotKeyKangXi = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyKangXi.rawValue)
-  @State private var selUsingHotKeyJIS = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyJIS.rawValue)
-  @State private var selUsingHotKeyHalfWidthASCII = UserDefaults.standard.bool(
-    forKey: UserDef.kUsingHotKeyHalfWidthASCII.rawValue)
-  @State private var selUsingHotKeyCurrencyNumerals = UserDefaults.standard.bool(
-    forKey: UserDef.kUsingHotKeyCurrencyNumerals.rawValue)
-  @State private var selUsingHotKeyCassette = UserDefaults.standard.bool(
-    forKey: UserDef.kUsingHotKeyCassette.rawValue)
 
   private let contentMaxHeight: Double = 440
   private let contentWidth: Double = {
@@ -55,47 +39,7 @@ struct VwrPrefPaneKeyboard: View {
     ScrollView {
       SSPreferences.Container(contentWidth: contentWidth) {
         SSPreferences.Section(label: { Text(LocalizedStringKey("Selection Keys:")) }) {
-          ComboBox(
-            items: CandidateKey.suggestions,
-            text: $selSelectionKeys.onChange {
-              let value = selSelectionKeys
-              let keys: String = value.trimmingCharacters(in: .whitespacesAndNewlines).deduplicated
-              if keys.isEmpty {
-                selSelectionKeys = PrefMgr.shared.candidateKeys
-                return
-              }
-              // Start Error Handling.
-              if let errorResult = CandidateKey.validate(keys: keys) {
-                if let window = CtlPrefUI.shared.controller.window {
-                  let alert = NSAlert(error: NSLocalizedString("Invalid Selection Keys.", comment: ""))
-                  alert.informativeText = errorResult
-                  alert.beginSheetModal(for: window) { _ in
-                    selSelectionKeys = PrefMgr.shared.candidateKeys
-                  }
-                  IMEApp.buzz()
-                }
-              } else {
-                PrefMgr.shared.candidateKeys = keys
-                selSelectionKeys = PrefMgr.shared.candidateKeys
-                return
-              }
-            }
-          ).frame(width: 180).disabled(PrefMgr.shared.useIMKCandidateWindow)
-          if PrefMgr.shared.useIMKCandidateWindow {
-            Text(
-              LocalizedStringKey(
-                "⚠︎ This feature in IMK Candidate Window defects. Please consult Apple Developer Relations\nand tell them the related Radar ID: #FB11300759."
-              )
-            )
-            .preferenceDescription()
-          } else {
-            Text(
-              LocalizedStringKey(
-                "Choose or hit Enter to confim your prefered keys for selecting candidates."
-              )
-            )
-            .preferenceDescription()
-          }
+          VwrPrefPaneKeyboard_SelectionKeys()
         }
         SSPreferences.Section(label: { Text(LocalizedStringKey("Quick Setup:")) }) {
           HStack {
@@ -134,42 +78,18 @@ struct VwrPrefPaneKeyboard: View {
                 PrefMgr.shared.keyboardParser = value
               }
             ) {
-              Group {
-                Text(LocalizedStringKey("Dachen (Microsoft Standard / Wang / 01, etc.)")).tag(0)
-                Text(LocalizedStringKey("Eten Traditional")).tag(1)
-                Text(LocalizedStringKey("IBM")).tag(4)
-                Text(LocalizedStringKey("MiTAC")).tag(5)
-                Text(LocalizedStringKey("Seigyou")).tag(8)
-                Text(LocalizedStringKey("Fake Seigyou")).tag(6)
-              }
-              Divider()
-              Group {
-                Text(LocalizedStringKey("Dachen 26 (libChewing)")).tag(7)
-                Text(LocalizedStringKey("Eten 26")).tag(3)
-                Text(LocalizedStringKey("Hsu")).tag(2)
-                Text(LocalizedStringKey("Starlight")).tag(9)
-              }
-              Divider()
-              Group {
-                Text(LocalizedStringKey("Hanyu Pinyin with Numeral Intonation")).tag(10)
-                Text(LocalizedStringKey("Secondary Pinyin with Numeral Intonation")).tag(11)
-                Text(LocalizedStringKey("Yale Pinyin with Numeral Intonation")).tag(12)
-                Text(LocalizedStringKey("Hualuo Pinyin with Numeral Intonation")).tag(13)
-                Text(LocalizedStringKey("Universal Pinyin with Numeral Intonation")).tag(14)
-              }
+              ForEach(KeyboardParser.allCases, id: \.self) { item in
+                if [7, 10].contains(item.rawValue) { Divider() }
+                Text(item.localizedMenuName).tag(item.rawValue)
+              }.id(UUID())
             }
             .fixedSize()
             .labelsHidden()
             Spacer()
           }
           .frame(width: 380.0)
-          Text(
-            NSLocalizedString(
-              "Choose the phonetic layout for Mandarin parser.",
-              comment: ""
-            )
-          )
-          .preferenceDescription()
+          Text(NSLocalizedString("Choose the phonetic layout for Mandarin parser.", comment: ""))
+            .preferenceDescription()
         }
         SSPreferences.Section(label: { Text(LocalizedStringKey("Basic Keyboard Layout:")) }) {
           HStack {
@@ -229,65 +149,138 @@ struct VwrPrefPaneKeyboard: View {
           }
         }
         SSPreferences.Section(label: { Text(LocalizedStringKey("Keyboard Shortcuts:")) }) {
-          HStack(alignment: .top, spacing: NSFont.systemFontSize) {
-            VStack(alignment: .leading) {
-              Toggle(
-                LocalizedStringKey("Per-Char Select Mode"),
-                isOn: $selUsingHotKeySCPC.onChange {
-                  PrefMgr.shared.usingHotKeySCPC = selUsingHotKeySCPC
-                }
-              )
-              Toggle(
-                LocalizedStringKey("Per-Char Associated Phrases"),
-                isOn: $selUsingHotKeyAssociates.onChange {
-                  PrefMgr.shared.usingHotKeyAssociates = selUsingHotKeyAssociates
-                }
-              )
-              Toggle(
-                LocalizedStringKey("CNS11643 Mode"),
-                isOn: $selUsingHotKeyCNS.onChange {
-                  PrefMgr.shared.usingHotKeyCNS = selUsingHotKeyCNS
-                }
-              )
-              Toggle(
-                LocalizedStringKey("Force KangXi Writing"),
-                isOn: $selUsingHotKeyKangXi.onChange {
-                  PrefMgr.shared.usingHotKeyKangXi = selUsingHotKeyKangXi
-                }
-              )
-            }
-            VStack(alignment: .leading) {
-              Toggle(
-                LocalizedStringKey("JIS Shinjitai Output"),
-                isOn: $selUsingHotKeyJIS.onChange {
-                  PrefMgr.shared.usingHotKeyJIS = selUsingHotKeyJIS
-                }
-              )
-              Toggle(
-                LocalizedStringKey("Half-Width Punctuation Mode"),
-                isOn: $selUsingHotKeyHalfWidthASCII.onChange {
-                  PrefMgr.shared.usingHotKeyHalfWidthASCII = selUsingHotKeyHalfWidthASCII
-                }
-              )
-              Toggle(
-                LocalizedStringKey("Currency Numeral Output"),
-                isOn: $selUsingHotKeyCurrencyNumerals.onChange {
-                  PrefMgr.shared.usingHotKeyCurrencyNumerals = selUsingHotKeyCurrencyNumerals
-                }
-              )
-              Toggle(
-                LocalizedStringKey("CIN Cassette Mode"),
-                isOn: $selUsingHotKeyCassette.onChange {
-                  PrefMgr.shared.usingHotKeyCassette = selUsingHotKeyCassette
-                }
-              )
-            }
-          }
+          VwrPrefPaneKeyboard_KeyboardShortcuts()
         }
       }
     }
     .frame(maxHeight: contentMaxHeight).fixedSize(horizontal: false, vertical: true)
     .background(VisualEffectView(material: .sidebar, blendingMode: .behindWindow))
+  }
+}
+
+@available(macOS 10.15, *)
+private struct VwrPrefPaneKeyboard_SelectionKeys: View {
+  @State private var selSelectionKeysList = CandidateKey.suggestions
+  @State private var selSelectionKeys =
+    UserDefaults.standard.string(forKey: UserDef.kCandidateKeys.rawValue) ?? CandidateKey.defaultKeys
+
+  var body: some View {
+    ComboBox(
+      items: CandidateKey.suggestions,
+      text: $selSelectionKeys.onChange {
+        let value = selSelectionKeys
+        let keys: String = value.trimmingCharacters(in: .whitespacesAndNewlines).deduplicated
+        if keys.isEmpty {
+          selSelectionKeys = PrefMgr.shared.candidateKeys
+          return
+        }
+        // Start Error Handling.
+        if let errorResult = CandidateKey.validate(keys: keys) {
+          IMEApp.buzz()
+          if let window = CtlPrefUI.shared.controller.window {
+            let alert = NSAlert(error: NSLocalizedString("Invalid Selection Keys.", comment: ""))
+            alert.informativeText = errorResult
+            alert.beginSheetModal(for: window) { _ in
+              selSelectionKeys = PrefMgr.shared.candidateKeys
+            }
+          } else {
+            selSelectionKeys = PrefMgr.shared.candidateKeys
+          }
+        } else {
+          PrefMgr.shared.candidateKeys = keys
+          selSelectionKeys = PrefMgr.shared.candidateKeys
+          return
+        }
+      }
+    ).frame(width: 180).disabled(PrefMgr.shared.useIMKCandidateWindow)
+    if PrefMgr.shared.useIMKCandidateWindow {
+      Text(
+        LocalizedStringKey(
+          "⚠︎ This feature in IMK Candidate Window defects. Please consult Apple Developer Relations\nand tell them the related Radar ID: #FB11300759."
+        )
+      )
+      .preferenceDescription()
+    } else {
+      Text(
+        LocalizedStringKey(
+          "Choose or hit Enter to confim your prefered keys for selecting candidates."
+        )
+      )
+      .preferenceDescription()
+    }
+  }
+}
+
+@available(macOS 10.15, *)
+private struct VwrPrefPaneKeyboard_KeyboardShortcuts: View {
+  @State private var selUsingHotKeySCPC = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeySCPC.rawValue)
+  @State private var selUsingHotKeyAssociates = UserDefaults.standard.bool(
+    forKey: UserDef.kUsingHotKeyAssociates.rawValue)
+  @State private var selUsingHotKeyCNS = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyCNS.rawValue)
+  @State private var selUsingHotKeyKangXi = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyKangXi.rawValue)
+  @State private var selUsingHotKeyJIS = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyJIS.rawValue)
+  @State private var selUsingHotKeyHalfWidthASCII = UserDefaults.standard.bool(
+    forKey: UserDef.kUsingHotKeyHalfWidthASCII.rawValue)
+  @State private var selUsingHotKeyCurrencyNumerals = UserDefaults.standard.bool(
+    forKey: UserDef.kUsingHotKeyCurrencyNumerals.rawValue)
+  @State private var selUsingHotKeyCassette = UserDefaults.standard.bool(
+    forKey: UserDef.kUsingHotKeyCassette.rawValue)
+
+  var body: some View {
+    HStack(alignment: .top, spacing: NSFont.systemFontSize) {
+      VStack(alignment: .leading) {
+        Toggle(
+          LocalizedStringKey("Per-Char Select Mode"),
+          isOn: $selUsingHotKeySCPC.onChange {
+            PrefMgr.shared.usingHotKeySCPC = selUsingHotKeySCPC
+          }
+        )
+        Toggle(
+          LocalizedStringKey("Per-Char Associated Phrases"),
+          isOn: $selUsingHotKeyAssociates.onChange {
+            PrefMgr.shared.usingHotKeyAssociates = selUsingHotKeyAssociates
+          }
+        )
+        Toggle(
+          LocalizedStringKey("CNS11643 Mode"),
+          isOn: $selUsingHotKeyCNS.onChange {
+            PrefMgr.shared.usingHotKeyCNS = selUsingHotKeyCNS
+          }
+        )
+        Toggle(
+          LocalizedStringKey("Force KangXi Writing"),
+          isOn: $selUsingHotKeyKangXi.onChange {
+            PrefMgr.shared.usingHotKeyKangXi = selUsingHotKeyKangXi
+          }
+        )
+      }
+      VStack(alignment: .leading) {
+        Toggle(
+          LocalizedStringKey("JIS Shinjitai Output"),
+          isOn: $selUsingHotKeyJIS.onChange {
+            PrefMgr.shared.usingHotKeyJIS = selUsingHotKeyJIS
+          }
+        )
+        Toggle(
+          LocalizedStringKey("Half-Width Punctuation Mode"),
+          isOn: $selUsingHotKeyHalfWidthASCII.onChange {
+            PrefMgr.shared.usingHotKeyHalfWidthASCII = selUsingHotKeyHalfWidthASCII
+          }
+        )
+        Toggle(
+          LocalizedStringKey("Currency Numeral Output"),
+          isOn: $selUsingHotKeyCurrencyNumerals.onChange {
+            PrefMgr.shared.usingHotKeyCurrencyNumerals = selUsingHotKeyCurrencyNumerals
+          }
+        )
+        Toggle(
+          LocalizedStringKey("CIN Cassette Mode"),
+          isOn: $selUsingHotKeyCassette.onChange {
+            PrefMgr.shared.usingHotKeyCassette = selUsingHotKeyCassette
+          }
+        )
+      }
+    }
   }
 }
 
@@ -300,10 +293,9 @@ struct VwrPrefPaneKeyboard_Previews: PreviewProvider {
 
 // MARK: - NSComboBox
 
-//  Ref: https://stackoverflow.com/a/71058587/4162914
-//  License: https://creativecommons.org/licenses/by-sa/4.0/
-
 // Ref: https://stackoverflow.com/a/71058587/4162914
+// License: https://creativecommons.org/licenses/by-sa/4.0/
+
 @available(macOS 10.15, *)
 public struct ComboBox: NSViewRepresentable {
   // The items that will show up in the pop-up menu:
