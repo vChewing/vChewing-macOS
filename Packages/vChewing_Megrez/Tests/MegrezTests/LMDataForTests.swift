@@ -25,16 +25,16 @@ class SimpleLM: LangModelProtocol {
     }
   }
 
-  func unigramsFor(key: String) -> [Megrez.Unigram] {
-    if let f = mutDatabase[key] {
+  func unigramsFor(keyArray: [String]) -> [Megrez.Unigram] {
+    if let f = mutDatabase[keyArray.joined()] {
       return f
     } else {
       return [Megrez.Unigram]().sorted { $0.score > $1.score }
     }
   }
 
-  func hasUnigramsFor(key: String) -> Bool {
-    mutDatabase.keys.contains(key)
+  func hasUnigramsFor(keyArray: [String]) -> Bool {
+    mutDatabase.keys.contains(keyArray.joined())
   }
 
   func trim(key: String, value: String) {
@@ -46,12 +46,12 @@ class SimpleLM: LangModelProtocol {
 }
 
 class MockLM: LangModelProtocol {
-  func unigramsFor(key: String) -> [Megrez.Unigram] {
-    [Megrez.Unigram(value: key, score: -1)]
+  func unigramsFor(keyArray: [String]) -> [Megrez.Unigram] {
+    [Megrez.Unigram(value: keyArray.joined(), score: -1)]
   }
 
-  func hasUnigramsFor(key: String) -> Bool {
-    !key.isEmpty
+  func hasUnigramsFor(keyArray: [String]) -> Bool {
+    !keyArray.isEmpty
   }
 }
 
