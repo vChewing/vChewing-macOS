@@ -84,7 +84,7 @@ public struct IMEState: IMEStateProtocol {
     self.data = data
     self.type = type
     self.node = node
-    self.data.candidates = node.members.map { ("", $0.name) }
+    self.data.candidates = node.members.map { ([""], $0.name) }
   }
 }
 
@@ -107,7 +107,7 @@ extension IMEState {
     return result
   }
 
-  public static func ofAssociates(candidates: [(String, String)]) -> IMEState {
+  public static func ofAssociates(candidates: [([String], String)]) -> IMEState {
     var result = IMEState(type: .ofAssociates)
     result.candidates = candidates
     return result
@@ -132,7 +132,7 @@ extension IMEState {
     return result
   }
 
-  public static func ofCandidates(candidates: [(String, String)], displayTextSegments: [String], cursor: Int)
+  public static func ofCandidates(candidates: [([String], String)], displayTextSegments: [String], cursor: Int)
     -> IMEState
   {
     var result = IMEState(displayTextSegments: displayTextSegments, cursor: cursor)
@@ -178,7 +178,7 @@ extension IMEState {
     return result
   }
 
-  public var candidates: [(String, String)] {
+  public var candidates: [([String], String)] {
     get { data.candidates }
     set { data.candidates = newValue }
   }
