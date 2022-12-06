@@ -21,17 +21,19 @@ extension SessionCtl {
     var arrResult = [String]()
 
     // 注意：下文中的不可列印字元是用來方便在 IMEState 當中用來分割資料的。
-    func handleIMKCandidatesPrepared(_ candidates: [(String, String)], prefix: String = "") {
+    func handleIMKCandidatesPrepared(_ candidates: [([String], String)], prefix: String = "") {
+      guard let separator = inputHandler?.keySeparator else { return }
       for theCandidate in candidates {
         let theConverted = ChineseConverter.kanjiConversionIfRequired(theCandidate.1)
         var result = (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)\u{1A}(\(theCandidate.1))"
         if arrResult.contains(result) {
           let reading: String =
             PrefMgr.shared.cassetteEnabled
-            ? theCandidate.0
+            ? theCandidate.0.joined(separator: separator)
             : (PrefMgr.shared.showHanyuPinyinInCompositionBuffer
-              ? Tekkon.cnvPhonaToHanyuPinyin(target: Tekkon.restoreToneOneInZhuyinKey(target: theCandidate.0))
-              : theCandidate.0)
+              ? Tekkon.cnvPhonaToHanyuPinyin(
+                target: Tekkon.restoreToneOneInZhuyinKey(target: theCandidate.0.joined(separator: separator)))
+              : theCandidate.0.joined(separator: separator))
           result = "\(result)\u{17}(\(reading))"
         }
         arrResult.append(prefix + result)
@@ -82,15 +84,18 @@ extension SessionCtl {
     var indexDeducted = 0
 
     // 注意：下文中的不可列印字元是用來方便在 IMEState 當中用來分割資料的。
-    func handleIMKCandidatesSelected(_ candidates: [(String, String)], prefix: String = "") {
+    func handleIMKCandidatesSelected(_ candidates: [([String], String)], prefix: String = "") {
+      guard let separator = inputHandler?.keySeparator else { return }
       for (i, neta) in candidates.enumerated() {
         let theConverted = ChineseConverter.kanjiConversionIfRequired(neta.1)
         let netaShown = (neta.1 == theConverted) ? neta.1 : "\(theConverted)\u{1A}(\(neta.1))"
         let reading: String =
           PrefMgr.shared.cassetteEnabled
-          ? neta.0
+          ? neta.0.joined(separator: separator)
           : (PrefMgr.shared.showHanyuPinyinInCompositionBuffer
-            ? Tekkon.cnvPhonaToHanyuPinyin(target: Tekkon.restoreToneOneInZhuyinKey(target: neta.0)) : neta.0)
+            ? Tekkon.cnvPhonaToHanyuPinyin(
+              target: Tekkon.restoreToneOneInZhuyinKey(target: neta.0.joined(separator: separator)))
+            : neta.0.joined(separator: separator))
         let netaShownWithPronunciation = "\(netaShown)\u{17}(\(reading))"
         if candidateString == prefix + netaShownWithPronunciation {
           indexDeducted = i
@@ -104,7 +109,7 @@ extension SessionCtl {
     }
 
     // 分類符號選單不會出現同符異音項、不需要康熙 / JIS 轉換，所以使用簡化過的處理方式。
-    func handleSymbolCandidatesSelected(_ candidates: [(String, String)]) {
+    func handleSymbolCandidatesSelected(_ candidates: [([String], String)]) {
       for (i, neta) in candidates.enumerated() {
         if candidateString == neta.1 {
           indexDeducted = i

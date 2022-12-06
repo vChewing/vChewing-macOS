@@ -22,6 +22,8 @@ public protocol InputHandlerProtocol {
   var currentUOM: vChewingLM.LMUserOverride { get set }
   var delegate: InputHandlerDelegate? { get set }
   var composer: Tekkon.Composer { get set }
+  var keySeparator: String { get }
+  static var keySeparator: String { get }
   var isCompositorEmpty: Bool { get }
   var isComposerUsingPinyin: Bool { get }
   func clear()
@@ -31,7 +33,7 @@ public protocol InputHandlerProtocol {
   func generateStateOfCandidates() -> IMEStateProtocol
   func generateStateOfInputting(sansReading: Bool) -> IMEStateProtocol
   func generateStateOfAssociates(withPair pair: Megrez.Compositor.KeyValuePaired) -> IMEStateProtocol
-  func consolidateNode(candidate: (String, String), respectCursorPushing: Bool, preConsolidate: Bool)
+  func consolidateNode(candidate: ([String], String), respectCursorPushing: Bool, preConsolidate: Bool)
   func updateUnigramData() -> Bool
 }
 
@@ -149,10 +151,10 @@ public class InputHandler: InputHandlerProtocol {
   /// - Parameter key: 給定的聯想詞的開頭字。
   /// - Returns: 抓取到的聯想詞陣列。
   /// 不會是 nil，但那些負責接收結果的函式會對空白陣列結果做出正確的處理。
-  func generateArrayOfAssociates(withPair pair: Megrez.Compositor.KeyValuePaired) -> [(String, String)] {
-    var arrResult: [(String, String)] = []
+  func generateArrayOfAssociates(withPair pair: Megrez.Compositor.KeyValuePaired) -> [([String], String)] {
+    var arrResult: [([String], String)] = []
     if currentLM.hasAssociatedPhrasesFor(pair: pair) {
-      arrResult = currentLM.associatedPhrasesFor(pair: pair).map { ("", $0) }
+      arrResult = currentLM.associatedPhrasesFor(pair: pair).map { ([""], $0) }
     }
     return arrResult
   }
@@ -223,7 +225,7 @@ public class InputHandler: InputHandlerProtocol {
         for (subPosition, key) in currentNode.keyArray.enumerated() {
           guard values.count > subPosition else { break }  // 防呆，應該沒有發生的可能性
           let thePair = Megrez.Compositor.KeyValuePaired(
-            key: key, value: values[subPosition]
+            keyArray: [key], value: values[subPosition]
           )
           compositor.overrideCandidate(thePair, at: position)
           position += 1
@@ -241,9 +243,9 @@ public class InputHandler: InputHandlerProtocol {
   ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字後的節錨的前方。
   ///   - consolidate: 在固化節點之前，先鞏固上下文。該選項可能會破壞在內文組字區內就地輪替候選字詞時的體驗。
   public func consolidateNode(
-    candidate: (String, String), respectCursorPushing: Bool = true, preConsolidate: Bool = false
+    candidate: ([String], String), respectCursorPushing: Bool = true, preConsolidate: Bool = false
   ) {
-    let theCandidate: Megrez.Compositor.KeyValuePaired = .init(key: candidate.0, value: candidate.1)
+    let theCandidate: Megrez.Compositor.KeyValuePaired = .init(keyArray: candidate.0, value: candidate.1)
 
     /// 必須先鞏固當前組字器游標上下文、以消滅意料之外的影響，但在內文組字區內就地輪替候選字詞時除外。
     if preConsolidate { consolidateCursorContext(with: theCandidate) }
@@ -284,7 +286,7 @@ public class InputHandler: InputHandlerProtocol {
   }
 
   /// 獲取候選字詞（包含讀音）陣列資料內容。
-  func generateArrayOfCandidates(fixOrder: Bool = true) -> [(String, String)] {
+  func generateArrayOfCandidates(fixOrder: Bool = true) -> [([String], String)] {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
     var arrCandidates: [Megrez.Compositor.KeyValuePaired] = {
@@ -301,7 +303,7 @@ public class InputHandler: InputHandlerProtocol {
 
     // 決定是否根據半衰記憶模組的建議來調整候選字詞的順序。
     if !prefs.fetchSuggestionsFromUserOverrideModel || prefs.useSCPCTypingMode || fixOrder {
-      return arrCandidates.map { ($0.key, $0.value) }
+      return arrCandidates.map { ($0.keyArray, $0.value) }
     }
 
     let arrSuggestedUnigrams: [(String, Megrez.Unigram)] = retrieveUOMSuggestions(apply: false)
@@ -310,8 +312,8 @@ public class InputHandler: InputHandlerProtocol {
     }
     arrCandidates = arrSuggestedCandidates.filter { arrCandidates.contains($0) } + arrCandidates
     arrCandidates = arrCandidates.deduplicated
-    arrCandidates = arrCandidates.stableSort { $0.key.split(separator: "-").count > $1.key.split(separator: "-").count }
-    return arrCandidates.map { ($0.key, $0.value) }
+    arrCandidates = arrCandidates.stableSort { $0.keyArray.count > $1.keyArray.count }
+    return arrCandidates.map { ($0.keyArray, $0.value) }
   }
 
   /// 向半衰引擎詢問可能的選字建議、且套用給組字器內的當前游標位置。
@@ -436,6 +438,10 @@ public class InputHandler: InputHandlerProtocol {
   }
 
   // MARK: - Extracted methods and functions (Megrez).
+
+  public var keySeparator: String { compositor.separator }
+
+  public static var keySeparator: String { Megrez.Compositor.theSeparator }
 
   /// 就地增刪詞之後，需要就地更新游標上下文單元圖資料。
   public func updateUnigramData() -> Bool {
