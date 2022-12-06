@@ -15,7 +15,7 @@ public protocol IMEStateProtocol {
   var isASCIIMode: Bool { get set }
   var isVerticalTyping: Bool { get set }
   var isVerticalCandidateWindow: Bool { get set }
-  var candidates: [(String, String)] { get set }
+  var candidates: [([String], String)] { get set }
   var hasComposition: Bool { get }
   var isCandidateContainer: Bool { get }
   var displayedText: String { get }
@@ -49,7 +49,7 @@ public protocol IMEStateDataProtocol {
   var isFilterable: Bool { get }
   var isVerticalTyping: Bool { get set }
   var isMarkedLengthValid: Bool { get }
-  var candidates: [(String, String)] { get set }
+  var candidates: [([String], String)] { get set }
   var displayedText: String { get set }
   var displayedTextConverted: String { get }
   var tooltipBackupForInputting: String { get set }

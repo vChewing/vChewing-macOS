@@ -173,12 +173,12 @@ extension InputHandler {
         ? currentLM.isThisCassetteKeyAllowed(key: input.text) : composer.inputValidityCheck(key: input.charCode)
 
       var shouldAutoSelectCandidate: Bool =
-        isInputValid || currentLM.hasUnigramsFor(key: customPunctuation)
-        || currentLM.hasUnigramsFor(key: punctuation)
+        isInputValid || currentLM.hasUnigramsFor(keyArray: [customPunctuation])
+        || currentLM.hasUnigramsFor(keyArray: [punctuation])
 
       if !shouldAutoSelectCandidate, input.isUpperCaseASCIILetterKey {
         let letter = "_letter_\(input.text)"
-        if currentLM.hasUnigramsFor(key: letter) { shouldAutoSelectCandidate = true }
+        if currentLM.hasUnigramsFor(keyArray: [letter]) { shouldAutoSelectCandidate = true }
       }
 
       if shouldAutoSelectCandidate {
