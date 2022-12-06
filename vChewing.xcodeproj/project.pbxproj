@@ -13,6 +13,7 @@
 		5B0E22A928FC11B900EB7ACA /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B0E22A728FC11B900EB7ACA /* Preferences.xib */; };
 		5B0E22B028FC17CB00EB7ACA /* Preferences.prefPane in Resources */ = {isa = PBXBuildFile; fileRef = 5B0E229F28FC11B900EB7ACA /* Preferences.prefPane */; };
 		5B0E22B228FC318C00EB7ACA /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0E22B128FC318C00EB7ACA /* Preferences.swift */; };
+		5B0E22DA293F4864004DF98A /* MenuBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = 5B0E22D9293F4864004DF98A /* MenuBuilder */; };
 		5B0EF55D28CDBF7100F8F7CE /* frmClientListMgr.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */; };
 		5B0EF55F28CDBF8E00F8F7CE /* CtlClientListMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */; };
 		5B21176C287539BB000443A9 /* SessionCtl_HandleStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176B287539BB000443A9 /* SessionCtl_HandleStates.swift */; };
@@ -185,6 +186,7 @@
 		5B0E22A828FC11B900EB7ACA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Preferences.xib; sourceTree = "<group>"; };
 		5B0E22AA28FC11B900EB7ACA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5B0E22B128FC318C00EB7ACA /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
+		5B0E22D8293F47D0004DF98A /* JedFox_MenuBuilder */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = JedFox_MenuBuilder; path = Packages/JedFox_MenuBuilder; sourceTree = "<group>"; };
 		5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = frmClientListMgr.xib; sourceTree = "<group>"; };
 		5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CtlClientListMgr.swift; sourceTree = "<group>"; };
 		5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHS.txt"; sourceTree = "<group>"; };
@@ -337,6 +339,7 @@
 				5BFC63C928D49754004A77B7 /* IMKUtils in Frameworks */,
 				5BDB7A4728D4824A001AC277 /* Tekkon in Frameworks */,
 				5BDB7A3D28D4824A001AC277 /* Hotenka in Frameworks */,
+				5B0E22DA293F4864004DF98A /* MenuBuilder in Frameworks */,
 				5BDB7A3F28D4824A001AC277 /* LineReader in Frameworks */,
 				5B963C9D28D5BFB800DCEE88 /* CocoaExtension in Frameworks */,
 				5B98114828D6198700CBC605 /* PinyinPhonaConverter in Frameworks */,
@@ -544,6 +547,7 @@
 				5BDB7A3128D47587001AC277 /* DanielGalasko_FolderMonitor */,
 				5BFC63C428D487AE004A77B7 /* Fuziki_NSAttributedTextView */,
 				5BDB7A3028D47587001AC277 /* Jad_BookmarkManager */,
+				5B0E22D8293F47D0004DF98A /* JedFox_MenuBuilder */,
 				5BDB7A3428D47587001AC277 /* Qwertyyb_ShiftKeyUpChecker */,
 				5BDB7A3528D47587001AC277 /* RMJay_LineReader */,
 				5B5A602E28E81CB00001AE8D /* ShapsBenkau_SwiftUIBackports */,
@@ -779,6 +783,7 @@
 				5B5A602F28E81CC50001AE8D /* SwiftUIBackports */,
 				5B5C8ED728FC0EA9002C93A5 /* SSPreferences */,
 				5B765F08293A253C00122315 /* PhraseEditorUI */,
+				5B0E22D9293F4864004DF98A /* MenuBuilder */,
 			);
 			productName = vChewing;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */;
@@ -1750,6 +1755,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		5B0E22D9293F4864004DF98A /* MenuBuilder */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MenuBuilder;
+		};
 		5B40113828D7050D00A9D4CB /* Shared */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Shared;
