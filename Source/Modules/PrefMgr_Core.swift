@@ -155,6 +155,9 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kShareAlphanumericalModeStatusAcrossClients.rawValue, defaultValue: false)
   public var shareAlphanumericalModeStatusAcrossClients: Bool
 
+  @AppProperty(key: UserDef.kPhraseEditorAutoReloadExternalModifications.rawValue, defaultValue: true)
+  public var phraseEditorAutoReloadExternalModifications: Bool
+
   // MARK: - Settings (Tier 2)
 
   @AppProperty(key: UserDef.kUseIMKCandidateWindow.rawValue, defaultValue: false)
