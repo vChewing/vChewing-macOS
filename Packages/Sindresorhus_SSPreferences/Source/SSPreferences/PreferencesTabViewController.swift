@@ -29,11 +29,7 @@ final class PreferencesTabViewController: NSViewController, PreferencesStyleCont
   }
 
   override func loadView() {
-    let newView = NSVisualEffectView()
-    newView.material = NSVisualEffectView.Material.sidebar
-    newView.blendingMode = NSVisualEffectView.BlendingMode.behindWindow
-    newView.state = NSVisualEffectView.State.active
-    view = newView
+    view = NSView()
     view.translatesAutoresizingMaskIntoConstraints = false
   }
 
