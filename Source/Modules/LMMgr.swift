@@ -602,6 +602,9 @@ public class LMMgr {
       // The new FolderMonitor module does NOT monitor cases that files are modified
       // by the current application itself, requiring additional manual loading process here.
       if #available(macOS 10.15, *) { FileObserveProject.shared.touch() }
+      if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
+        CtlPrefWindow.shared?.updatePhraseEditor()
+      }
       loadUserPhrasesData(type: .thePhrases)
       return true
     }
