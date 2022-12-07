@@ -32,7 +32,7 @@ extension vChewingLM {
       let arrTarget = target.dropLast().dropFirst().split(separator: ",")
       guard arrTarget.count == 2 else { return target }
       var arrTarget0 = String(arrTarget[0]).lowercased()
-      arrTarget0.converToPhonabets()
+      arrTarget0.convertToPhonabets()
       return "(\(arrTarget0),\(arrTarget[1]))"
     }
 

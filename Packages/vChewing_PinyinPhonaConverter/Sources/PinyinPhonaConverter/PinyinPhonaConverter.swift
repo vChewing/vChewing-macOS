@@ -9,7 +9,7 @@
 import Cocoa
 
 extension String {
-  public mutating func converToPhonabets(newToneOne: String = "") {
+  public mutating func convertToPhonabets(newToneOne: String = "") {
     if isEmpty || contains("_") || !isNotPureAlphanumerical { return }
     for key in arrHanyuPinyinToPhonabets {
       self = replacingOccurrences(of: key.0, with: key.1)
