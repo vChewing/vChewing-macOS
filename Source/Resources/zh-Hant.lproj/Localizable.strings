@@ -16,6 +16,7 @@
 "Loading…" = "正在載入…";
 "Consolidate" = "整理";
 "Reload" = "重新載入";
+"Factory dictionary not loaded yet." = "原廠辭典尚未完成載入。";
 "Some features are unavailable for macOS 10.15 and macOS 11 due to API limitations." = "因系統 API 限制，個別功能無法對 macOS 10.15 和 macOS 11 提供。";
 "This editor only: Auto-reload modifications happened outside of this editor" = "僅限該編輯器：自動讀入來自該編輯器外部的檔案內容修改";
 "Please select Simplified / Traditional Chinese mode above." = "請先藉由上方選單選擇繁簡模式。";
