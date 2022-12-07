@@ -74,6 +74,7 @@
 		5BC5E01E28DDE4770094E427 /* NotifierUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E01D28DDE4770094E427 /* NotifierUI */; };
 		5BC5E02128DDEFE00094E427 /* TooltipUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E02028DDEFE00094E427 /* TooltipUI */; };
 		5BC5E02428DE07860094E427 /* PopupCompositionBuffer in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E02328DE07860094E427 /* PopupCompositionBuffer */; };
+		5BCC631629407BBB00A2D84F /* CtlPrefWindow_PhraseEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCC631529407BBB00A2D84F /* CtlPrefWindow_PhraseEditor.swift */; };
 		5BCCAFF828DB19A300AB1B27 /* PrefMgr_Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCCAFF728DB19A300AB1B27 /* PrefMgr_Extension.swift */; };
 		5BD0113D2818543900609769 /* InputHandler_Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0113C2818543900609769 /* InputHandler_Core.swift */; };
 		5BD05BCA27B2A43D004C4F1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
@@ -280,6 +281,7 @@
 		5BC5E01C28DDE4270094E427 /* vChewing_NotifierUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_NotifierUI; path = Packages/vChewing_NotifierUI; sourceTree = "<group>"; };
 		5BC5E01F28DDEFD80094E427 /* vChewing_TooltipUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_TooltipUI; path = Packages/vChewing_TooltipUI; sourceTree = "<group>"; };
 		5BC5E02228DE07250094E427 /* vChewing_PopupCompositionBuffer */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_PopupCompositionBuffer; path = Packages/vChewing_PopupCompositionBuffer; sourceTree = "<group>"; };
+		5BCC631529407BBB00A2D84F /* CtlPrefWindow_PhraseEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CtlPrefWindow_PhraseEditor.swift; sourceTree = "<group>"; };
 		5BCCAFF728DB19A300AB1B27 /* PrefMgr_Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefMgr_Extension.swift; sourceTree = "<group>"; };
 		5BD0113C2818543900609769 /* InputHandler_Core.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = InputHandler_Core.swift; sourceTree = "<group>"; usesTabs = 0; };
 		5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingPhraseEditor.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -502,6 +504,7 @@
 				5B62A33C27AE7CC100A19448 /* CtlAboutWindow.swift */,
 				5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */,
 				D47F7DCD278BFB57002F9DD7 /* CtlPrefWindow.swift */,
+				5BCC631529407BBB00A2D84F /* CtlPrefWindow_PhraseEditor.swift */,
 			);
 			path = WindowControllers;
 			sourceTree = "<group>";
@@ -1186,6 +1189,7 @@
 				5BE1F8A928F86AB5006C7FF5 /* InputHandler_HandleEvent.swift in Sources */,
 				5B69938C293B811F0057CB8E /* VwrPrefPanePhrases.swift in Sources */,
 				5BAEFAD028012565001F42C9 /* LMMgr.swift in Sources */,
+				5BCC631629407BBB00A2D84F /* CtlPrefWindow_PhraseEditor.swift in Sources */,
 				5B782EC4280C243C007276DE /* InputHandler_HandleCandidate.swift in Sources */,
 				5BA9FD0F27FEDB6B002DE248 /* VwrPrefPaneGeneral.swift in Sources */,
 				5BCCAFF828DB19A300AB1B27 /* PrefMgr_Extension.swift in Sources */,
