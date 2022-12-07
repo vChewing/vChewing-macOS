@@ -23,7 +23,7 @@ class CtlClientListMgr: NSWindowController, NSTableViewDelegate, NSTableViewData
     sharedWindow.orderFrontRegardless()  // 逼著視窗往最前方顯示
     sharedWindow.level = .statusBar
     sharedWindow.titlebarAppearsTransparent = true
-    NSApp.setActivationPolicy(.accessory)
+    NSApp.activate(ignoringOtherApps: true)
   }
 
   override func windowDidLoad() {
@@ -41,16 +41,6 @@ class CtlClientListMgr: NSWindowController, NSTableViewDelegate, NSTableViewData
 extension CtlClientListMgr {
   func numberOfRows(in _: NSTableView) -> Int {
     PrefMgr.shared.clientsIMKTextInputIncapable.count
-  }
-
-  func callAlert(_ window: NSWindow, title: String, text: String? = nil) {
-    let alert = NSAlert()
-    alert.messageText = title
-    if let text = text {
-      alert.informativeText = text
-    }
-    alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
-    alert.beginSheetModal(for: window)
   }
 
   @IBAction func btnAddClientClicked(_: Any) {
@@ -119,18 +109,18 @@ extension CtlClientListMgr {
                   )
                   let text = url.path + "\n\n" + NSLocalizedString("Please try again.", comment: "")
                   guard let bundle = Bundle(url: url) else {
-                    self.callAlert(window, title: title, text: text)
+                    self.window?.callAlert(title: title, text: text)
                     return
                   }
                   guard let identifier = bundle.bundleIdentifier else {
-                    self.callAlert(window, title: title, text: text)
+                    self.window?.callAlert(title: title, text: text)
                     return
                   }
                   if PrefMgr.shared.clientsIMKTextInputIncapable.contains(identifier) {
                     title = NSLocalizedString(
                       "The selected item's identifier is already in the list.", comment: ""
                     )
-                    self.callAlert(window, title: title, text: identifier + "\n\n" + url.path)
+                    self.window?.callAlert(title: title, text: identifier + "\n\n" + url.path)
                     return
                   }
                   self.applyNewValue(identifier)

@@ -14,8 +14,8 @@ extension Tekkon {
   /// 注音轉拼音，要求陰平必須是空格。
   /// - Parameters:
   ///   - target: 傳入的 String 對象物件。
-  public static func cnvPhonaToHanyuPinyin(target: String) -> String {
-    var targetConverted = target
+  public static func cnvPhonaToHanyuPinyin(targetJoined: String) -> String {
+    var targetConverted = targetJoined
     for pair in arrPhonaToHanyuPinyin {
       targetConverted = targetConverted.replacingOccurrences(of: pair[0], with: pair[1])
     }
@@ -25,8 +25,8 @@ extension Tekkon {
   /// 漢語拼音數字標調式轉漢語拼音教科書格式，要求陰平必須是數字 1。
   /// - Parameters:
   ///   - target: 傳入的 String 對象物件。
-  public static func cnvHanyuPinyinToTextbookStyle(target: String) -> String {
-    var targetConverted = target
+  public static func cnvHanyuPinyinToTextbookStyle(targetJoined: String) -> String {
+    var targetConverted = targetJoined
     for pair in arrHanyuPinyinTextbookStyleConversionTable {
       targetConverted = targetConverted.replacingOccurrences(of: pair[0], with: pair[1])
     }
@@ -38,9 +38,9 @@ extension Tekkon {
   ///   - target: 要拿來做轉換處理的讀音鏈，以英文減號來分隔每個讀音。
   ///   - newSeparator: 新的讀音分隔符。
   /// - Returns: 經過轉換處理的讀音鏈。
-  public static func cnvZhuyinChainToTextbookReading(target: String, newSeparator: String = "-") -> String {
+  public static func cnvZhuyinChainToTextbookReading(targetJoined: String, newSeparator: String = "-") -> String {
     var arrReturn: [String] = []
-    for neta in target.split(separator: "-") {
+    for neta in targetJoined.split(separator: "-") {
       var newString = String(neta)
       if String(neta.reversed()[0]) == "˙" {
         newString = String(neta.dropLast())
@@ -56,9 +56,9 @@ extension Tekkon {
   ///   - target: 要拿來做轉換處理的讀音鏈，以英文減號來分隔每個讀音。
   ///   - newSeparator: 新的讀音分隔符。
   /// - Returns: 經過轉換處理的讀音鏈。
-  public static func restoreToneOneInZhuyinKey(target: String, newSeparator: String = "-") -> String {
+  public static func restoreToneOneInZhuyinKey(targetJoined: String, newSeparator: String = "-") -> String {
     var arrReturn: [String] = []
-    for neta in target.split(separator: "-") {
+    for neta in targetJoined.split(separator: "-") {
       var newNeta = String(neta)
       if !"ˊˇˋ˙".contains(String(neta.reversed()[0])), !neta.contains("_") {
         newNeta += "1"
@@ -73,10 +73,10 @@ extension Tekkon {
   ///   - target: 要轉換的漢語拼音內容，要求必須帶有 12345 數字標調。
   ///   - newToneOne: 對陰平指定新的標記。預設情況下該標記為空字串。
   /// - Returns: 轉換結果。
-  public static func cnvHanyuPinyinToPhona(target: String, newToneOne: String = "") -> String {
+  public static func cnvHanyuPinyinToPhona(targetJoined: String, newToneOne: String = "") -> String {
     /// 如果當前內容有任何除了半形英數內容以外的內容的話，就直接放棄轉換。
-    if target.contains("_") || !target.isNotPureAlphanumerical { return target }
-    var result = target
+    if targetJoined.contains("_") || !targetJoined.isNotPureAlphanumerical { return targetJoined }
+    var result = targetJoined
     for key in Tekkon.mapHanyuPinyin.keys.sorted(by: { $0.count > $1.count }) {
       guard let value = Tekkon.mapHanyuPinyin[key] else { continue }
       result = result.replacingOccurrences(of: key, with: value)

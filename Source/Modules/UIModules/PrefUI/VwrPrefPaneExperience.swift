@@ -281,7 +281,6 @@ struct VwrPrefPaneExperience: View {
       }
     }
     .frame(maxHeight: contentMaxHeight).fixedSize(horizontal: false, vertical: true)
-    .background(VisualEffectView(material: .sidebar, blendingMode: .behindWindow))
   }
 }
 

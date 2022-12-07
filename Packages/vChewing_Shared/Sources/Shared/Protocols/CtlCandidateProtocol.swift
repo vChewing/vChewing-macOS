@@ -9,7 +9,7 @@
 import Cocoa
 
 public protocol CtlCandidateDelegate {
-  func candidatePairs(conv: Bool) -> [(String, String)]
+  func candidatePairs(conv: Bool) -> [([String], String)]
   func candidatePairSelected(at index: Int)
   func candidatePairRightClicked(at index: Int, action: CandidateContextMenuAction)
   func candidates(_ sender: Any!) -> [Any]!

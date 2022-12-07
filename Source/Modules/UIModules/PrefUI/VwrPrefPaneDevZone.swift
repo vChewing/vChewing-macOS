@@ -107,11 +107,6 @@ struct VwrPrefPaneDevZone: View {
                 PrefMgr.shared.phraseReplacementEnabled = selPhraseReplacementEnabled
               }
             )
-            Spacer()
-            Button(LocalizedStringKey("Edit…")) {
-              LMMgr.openPhraseFile(fromURL: LMMgr.userReplacementsDataURL(IMEApp.currentInputMode))
-              LMMgr.openPhraseFile(fromURL: LMMgr.userReplacementsDataURL(IMEApp.currentInputMode.reversed))
-            }
           }
           Text(
             LocalizedStringKey(
@@ -123,7 +118,6 @@ struct VwrPrefPaneDevZone: View {
       }
     }
     .frame(maxHeight: contentMaxHeight).fixedSize(horizontal: false, vertical: true)
-    .background(VisualEffectView(material: .sidebar, blendingMode: .behindWindow))
   }
 }
 

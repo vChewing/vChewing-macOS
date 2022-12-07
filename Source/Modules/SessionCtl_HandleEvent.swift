@@ -103,6 +103,17 @@ extension SessionCtl {
     /// 沒有文字輸入客體的話，就不要再往下處理了。
     guard let inputHandler = inputHandler, client() != nil else { return false }
 
+    /// 除非核心辭典有載入，否則一律蜂鳴。
+    if !LMMgr.currentLM.isCoreLoaded {
+      var newState: IMEStateProtocol = IMEState.ofEmpty()
+      newState.tooltip = NSLocalizedString("Factory dictionary not loaded yet.", comment: "") + "　　"
+      newState.tooltipDuration = 1.85
+      newState.data.tooltipColorState = .redAlert
+      switchState(newState)
+      callError("CoreLM not loaded yet.")
+      return true
+    }
+
     var eventToDeal = event
 
     // 如果是方向鍵輸入的話，就想辦法帶上標記資訊、來說明當前是縱排還是橫排。

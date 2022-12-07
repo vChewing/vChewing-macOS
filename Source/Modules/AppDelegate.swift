@@ -26,6 +26,10 @@ extension AppDelegate {
   private func reloadOnFolderChangeHappens() {
     // 拖 100ms 再重載，畢竟有些有特殊需求的使用者可能會想使用巨型自訂語彙檔案。
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
+      if #available(macOS 10.15, *) { FileObserveProject.shared.touch() }
+      if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
+        CtlPrefWindow.shared?.updatePhraseEditor()
+      }
       if PrefMgr.shared.shouldAutoReloadUserDataFiles { LMMgr.initUserLangModels() }
     }
   }
@@ -96,6 +100,7 @@ extension AppDelegate {
     alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
     alert.addButton(withTitle: NSLocalizedString("Not Now", comment: ""))
     let result = alert.runModal()
+    NSApp.activate(ignoringOtherApps: true)
     if result == NSApplication.ModalResponse.alertFirstButtonReturn {
       NSWorkspace.shared.openFile(
         LMMgr.dataFolderPath(isDefaultFolder: true), withApplication: "Finder"
@@ -104,7 +109,6 @@ extension AppDelegate {
         isSudo: false, selfKill: true, defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true)
       )
     }
-    NSApp.setActivationPolicy(.accessory)
   }
 
   /// 檢查該程式本身的記憶體佔用量。

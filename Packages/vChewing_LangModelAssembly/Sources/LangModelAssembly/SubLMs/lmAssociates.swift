@@ -13,6 +13,7 @@ import Shared
 
 extension vChewingLM {
   @frozen public struct LMAssociates {
+    public private(set) var filePath: String?
     var rangeMap: [String: [(Range<String.Index>, Int)]] = [:]
     var strData: String = ""
 
@@ -31,42 +32,65 @@ extension vChewingLM {
       let arrTarget = target.dropLast().dropFirst().split(separator: ",")
       guard arrTarget.count == 2 else { return target }
       var arrTarget0 = String(arrTarget[0]).lowercased()
-      arrTarget0.converToPhonabets()
+      arrTarget0.convertToPhonabets()
       return "(\(arrTarget0),\(arrTarget[1]))"
     }
 
     @discardableResult public mutating func open(_ path: String) -> Bool {
       if isLoaded { return false }
+      let oldPath = filePath
+      filePath = nil
 
       LMConsolidator.fixEOF(path: path)
       LMConsolidator.consolidate(path: path, pragma: true)
 
       do {
-        strData = try String(contentsOfFile: path, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
-        strData = strData.replacingOccurrences(of: "\r", with: "\n")
-        strData.ranges(splitBy: "\n").filter { !$0.isEmpty }.forEach {
-          let neta = strData[$0].split(separator: " ")
-          if neta.count >= 2 {
-            let theKey = String(neta[0])
-            if !theKey.isEmpty, theKey.first != "#" {
-              for (i, _) in neta.filter({ $0.first != "#" && !$0.isEmpty }).enumerated() {
-                if i == 0 { continue }
-                rangeMap[cnvNGramKeyFromPinyinToPhona(target: theKey), default: []].append(($0, i))
-              }
-            }
-          }
-        }
+        let rawStrData = try String(contentsOfFile: path, encoding: .utf8)
+        replaceData(textData: rawStrData)
       } catch {
+        filePath = oldPath
         vCLog("\(error)")
         vCLog("↑ Exception happened when reading data at: \(path).")
         return false
       }
 
+      filePath = path
       return true
     }
 
+    /// 將資料從檔案讀入至資料庫辭典內。
+    /// - parameters:
+    ///   - path: 給定路徑。
+    public mutating func replaceData(textData rawStrData: String) {
+      if strData == rawStrData { return }
+      strData = rawStrData
+      strData.ranges(splitBy: "\n").filter { !$0.isEmpty }.forEach {
+        let neta = strData[$0].split(separator: " ")
+        if neta.count >= 2 {
+          let theKey = String(neta[0])
+          if !theKey.isEmpty, theKey.first != "#" {
+            for (i, _) in neta.filter({ $0.first != "#" && !$0.isEmpty }).enumerated() {
+              if i == 0 { continue }
+              rangeMap[cnvNGramKeyFromPinyinToPhona(target: theKey), default: []].append(($0, i))
+            }
+          }
+        }
+      }
+    }
+
     public mutating func clear() {
+      filePath = nil
+      strData.removeAll()
       rangeMap.removeAll()
+    }
+
+    public func saveData() {
+      guard let filePath = filePath else { return }
+      do {
+        try strData.write(toFile: filePath, atomically: true, encoding: .utf8)
+      } catch {
+        vCLog("Failed to save current database to: \(filePath)")
+      }
     }
 
     public func valuesFor(pair: Megrez.Compositor.KeyValuePaired) -> [String] {

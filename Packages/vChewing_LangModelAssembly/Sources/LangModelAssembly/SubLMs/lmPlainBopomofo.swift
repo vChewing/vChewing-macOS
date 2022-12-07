@@ -12,46 +12,62 @@ import Shared
 
 extension vChewingLM {
   @frozen public struct LMPlainBopomofo {
-    var rangeMap: [String: String] = [:]
+    public private(set) var filePath: String?
+    var dataMap: [String: String] = [:]
 
-    public var count: Int { rangeMap.count }
+    public var count: Int { dataMap.count }
 
     public init() {
-      rangeMap = [:]
+      dataMap = [:]
     }
 
-    public var isLoaded: Bool { !rangeMap.isEmpty }
+    public var isLoaded: Bool { !dataMap.isEmpty }
 
     @discardableResult public mutating func open(_ path: String) -> Bool {
       if isLoaded { return false }
+      let oldPath = filePath
+      filePath = nil
 
       do {
         let rawData = try Data(contentsOf: URL(fileURLWithPath: path))
         let rawPlist: [String: String] =
           try PropertyListSerialization.propertyList(from: rawData, format: nil) as? [String: String] ?? .init()
-        rangeMap = rawPlist
+        dataMap = rawPlist
       } catch {
+        filePath = oldPath
         vCLog("\(error)")
         vCLog("↑ Exception happened when reading data at: \(path).")
         return false
       }
 
+      filePath = path
       return true
     }
 
     public mutating func clear() {
-      rangeMap.removeAll()
+      filePath = nil
+      dataMap.removeAll()
+    }
+
+    public func saveData() {
+      guard let filePath = filePath, let plistURL = URL(string: filePath) else { return }
+      do {
+        let plistData = try PropertyListSerialization.data(fromPropertyList: dataMap, format: .binary, options: 0)
+        try plistData.write(to: plistURL)
+      } catch {
+        vCLog("Failed to save current database to: \(filePath)")
+      }
     }
 
     public func valuesFor(key: String) -> [String] {
       var pairs: [String] = []
-      if let arrRangeRecords: String = rangeMap[key]?.trimmingCharacters(in: .newlines) {
+      if let arrRangeRecords: String = dataMap[key]?.trimmingCharacters(in: .newlines) {
         pairs.append(contentsOf: arrRangeRecords.map { String($0) })
       }
       return pairs.deduplicated
     }
 
-    public func hasValuesFor(key: String) -> Bool { rangeMap.keys.contains(key) }
+    public func hasValuesFor(key: String) -> Bool { dataMap.keys.contains(key) }
   }
 }
 

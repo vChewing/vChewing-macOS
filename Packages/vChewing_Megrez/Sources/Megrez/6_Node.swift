@@ -34,7 +34,8 @@ extension Megrez.Compositor {
     /// 數（比如野獸常數），以讓「c」更容易單獨被選中。
     public var overridingScore: Double = 114_514
 
-    public private(set) var key: String
+    // public var key: String { keyArray.joined(separator: Megrez.Compositor.theSeparator) }
+
     public private(set) var keyArray: [String]
     public private(set) var spanLength: Int
     public private(set) var unigrams: [Megrez.Unigram]
@@ -42,10 +43,10 @@ extension Megrez.Compositor {
       didSet { currentUnigramIndex = max(min(unigrams.count - 1, currentUnigramIndex), 0) }
     }
 
-    public var currentPair: Megrez.Compositor.KeyValuePaired { .init(key: key, value: value) }
+    public var currentPair: Megrez.Compositor.KeyValuePaired { .init(keyArray: keyArray, value: value) }
 
     public func hash(into hasher: inout Hasher) {
-      hasher.combine(key)
+      hasher.combine(keyArray)
       hasher.combine(spanLength)
       hasher.combine(unigrams)
       hasher.combine(currentUnigramIndex)
@@ -68,14 +69,11 @@ extension Megrez.Compositor {
     public private(set) var overrideType: Node.OverrideType
 
     public static func == (lhs: Node, rhs: Node) -> Bool {
-      lhs.key == rhs.key && lhs.spanLength == rhs.spanLength
+      lhs.keyArray == rhs.keyArray && lhs.spanLength == rhs.spanLength
         && lhs.unigrams == rhs.unigrams && lhs.overrideType == rhs.overrideType
     }
 
-    public init(
-      keyArray: [String] = [], spanLength: Int = 0, unigrams: [Megrez.Unigram] = [], keySeparator: String = ""
-    ) {
-      key = keyArray.joined(separator: keySeparator)
+    public init(keyArray: [String] = [], spanLength: Int = 0, unigrams: [Megrez.Unigram] = []) {
       self.keyArray = keyArray
       self.spanLength = spanLength
       self.unigrams = unigrams
@@ -112,6 +110,10 @@ extension Megrez.Compositor {
       overrideType = .withNoOverrides
     }
 
+    public func joinedKey(by separator: String = Megrez.Compositor.theSeparator) -> String {
+      keyArray.joined(separator: separator)
+    }
+
     public func selectOverrideUnigram(value: String, type: Node.OverrideType) -> Bool {
       guard type != .withNoOverrides else {
         return false
@@ -136,7 +138,7 @@ extension Megrez.Compositor {
     let spanIndex: Int  // 幅位座標
     var spanLength: Int { node.spanLength }
     var unigrams: [Megrez.Unigram] { node.unigrams }
-    var key: String { node.key }
+    var keyArray: [String] { node.keyArray }
     var value: String { node.value }
 
     /// 將該節錨雜湊化。
@@ -154,7 +156,12 @@ extension Array where Element == Megrez.Compositor.Node {
   public var values: [String] { map(\.value) }
 
   /// 從一個節點陣列當中取出目前的索引鍵陣列。
-  public var keys: [String] { map(\.key) }
+  public func joinedKeys(by separator: String = Megrez.Compositor.theSeparator) -> [String] {
+    map { $0.keyArray.lazy.joined(separator: separator) }
+  }
+
+  /// 從一個節點陣列當中取出目前的索引鍵陣列。
+  public var keyArrays: [[String]] { map(\.keyArray) }
 
   /// 返回一連串的節點起點。結果為 (Result A, Result B) 辭典陣列
   /// Result A 以索引查座標，Result B 以座標查索引。

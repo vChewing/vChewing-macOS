@@ -15,6 +15,7 @@ import Shared
 extension vChewingLM {
   /// 磁帶模組，用來方便使用者自行擴充字根輸入法。
   @frozen public struct LMCassette {
+    public private(set) var filePath: String?
     public private(set) var nameShort: String = ""
     public private(set) var nameENG: String = ""
     public private(set) var nameCJK: String = ""
@@ -67,6 +68,8 @@ extension vChewingLM {
     /// - Returns: 是否載入成功。
     @discardableResult public mutating func open(_ path: String) -> Bool {
       if isLoaded { return false }
+      let oldPath = filePath
+      filePath = nil
       if FileManager.default.fileExists(atPath: path) {
         do {
           guard let fileHandle = FileHandle(forReadingAtPath: path) else {
@@ -146,17 +149,20 @@ extension vChewingLM {
           }
           maxKeyLength = theMaxKeyLength
           keyNameMap[wildcardKey] = keyNameMap[wildcardKey] ?? "？"
+          filePath = path
           return true
         } catch {
           vCLog("CIN Loading Failed: File Access Error.")
-          return false
         }
+      } else {
+        vCLog("CIN Loading Failed: File Missing.")
       }
-      vCLog("CIN Loading Failed: File Missing.")
+      filePath = oldPath
       return false
     }
 
     public mutating func clear() {
+      filePath = nil
       keyNameMap.removeAll()
       charDefMap.removeAll()
       charDefWildcardMap.removeAll()

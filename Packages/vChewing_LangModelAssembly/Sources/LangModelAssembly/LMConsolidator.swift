@@ -77,6 +77,52 @@ extension vChewingLM {
       return false
     }
 
+    /// 統整給定的字串。
+    /// - Parameters:
+    ///   - text: 操作對象。
+    ///   - shouldCheckPragma: 是否在檔案標頭完好無損的情況下略過對格式的整理。
+    public static func consolidate(text strProcessed: inout String, pragma shouldCheckPragma: Bool) {
+      var pragmaResult: Bool {
+        let realPragmaHeader = kPragmaHeader + "\n"
+        if strProcessed.count <= kPragmaHeader.count { return false }
+        let range = 0..<(realPragmaHeader.count)
+        let fetchedPragma = ContiguousArray(strProcessed.utf8CString[range])
+        return fetchedPragma == realPragmaHeader.utf8CString
+      }
+
+      if shouldCheckPragma, pragmaResult { return }
+
+      // Step 1: Consolidating formats per line.
+      // -------
+      // CJKWhiteSpace (\x{3000}) to ASCII Space
+      // NonBreakWhiteSpace (\x{A0}) to ASCII Space
+      // Tab to ASCII Space
+      // 統整連續空格為一個 ASCII 空格
+      strProcessed.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: " ")
+      // 去除行尾行首空格
+      strProcessed.regReplace(pattern: #"(^ | $)"#, replaceWith: "")
+      strProcessed.regReplace(pattern: #"(\n | \n)"#, replaceWith: "\n")
+      // CR & FF to LF, 且去除重複行
+      strProcessed.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n")
+      if strProcessed.prefix(1) == " " {  // 去除檔案開頭空格
+        strProcessed.removeFirst()
+      }
+      if strProcessed.suffix(1) == " " {  // 去除檔案結尾空格
+        strProcessed.removeLast()
+      }
+
+      strProcessed = kPragmaHeader + "\n" + strProcessed  // Add Pragma Header
+
+      // Step 3: Deduplication.
+      let arrData = strProcessed.split(separator: "\n")
+      // 下面兩行的 reversed 是首尾顛倒，免得破壞最新的 override 資訊。
+      let arrDataDeduplicated = Array(NSOrderedSet(array: arrData.reversed()).array as! [String])
+      strProcessed = arrDataDeduplicated.reversed().joined(separator: "\n") + "\n"
+
+      // Step 4: Remove duplicated newlines at the end of the file.
+      strProcessed.regReplace(pattern: #"\n+"#, replaceWith: "\n")
+    }
+
     /// 統整給定的檔案的格式。
     /// - Parameters:
     ///   - path: 給定檔案路徑。
@@ -92,49 +138,13 @@ extension vChewingLM {
 
       let urlPath = URL(fileURLWithPath: path)
       if FileManager.default.fileExists(atPath: path) {
-        var strProcessed = ""
         do {
-          strProcessed += try String(contentsOf: urlPath, encoding: .utf8)
-
-          // Step 1: Consolidating formats per line.
-          // -------
-          // CJKWhiteSpace (\x{3000}) to ASCII Space
-          // NonBreakWhiteSpace (\x{A0}) to ASCII Space
-          // Tab to ASCII Space
-          // 統整連續空格為一個 ASCII 空格
-          strProcessed.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: " ")
-          // 去除行尾行首空格
-          strProcessed.regReplace(pattern: #"(^ | $)"#, replaceWith: "")
-          strProcessed.regReplace(pattern: #"(\n | \n)"#, replaceWith: "\n")
-          // CR & FF to LF, 且去除重複行
-          strProcessed.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n")
-          if strProcessed.prefix(1) == " " {  // 去除檔案開頭空格
-            strProcessed.removeFirst()
-          }
-          if strProcessed.suffix(1) == " " {  // 去除檔案結尾空格
-            strProcessed.removeLast()
-          }
-
-          // Step 2: Add Formatted Pragma, the Sorted Header:
-          if !pragmaResult {
-            strProcessed = kPragmaHeader + "\n" + strProcessed  // Add Sorted Header
-          }
-
-          // Step 3: Deduplication.
-          let arrData = strProcessed.split(separator: "\n")
-          // 下面兩行的 reversed 是首尾顛倒，免得破壞最新的 override 資訊。
-          let arrDataDeduplicated = Array(NSOrderedSet(array: arrData.reversed()).array as! [String])
-          strProcessed = arrDataDeduplicated.reversed().joined(separator: "\n") + "\n"
-
-          // Step 4: Remove duplicated newlines at the end of the file.
-          strProcessed.regReplace(pattern: #"\n+"#, replaceWith: "\n")
-
-          // Step 5: Write consolidated file contents.
+          var strProcessed = try String(contentsOf: urlPath, encoding: .utf8)
+          consolidate(text: &strProcessed, pragma: shouldCheckPragma)
+          // Write consolidated file contents.
           try strProcessed.write(to: urlPath, atomically: false, encoding: .utf8)
-
         } catch {
-          vCLog("Consolidation Failed w/ File: \(path)")
-          vCLog("Consolidation Failed w/ Error: \(error).")
+          vCLog("Consolidation Failed w/ File: \(path), error: \(error)")
           return false
         }
         vCLog("Either Consolidation Successful Or No-Need-To-Consolidate.")

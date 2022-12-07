@@ -11,6 +11,7 @@ import Shared
 
 extension vChewingLM {
   @frozen public struct LMReplacements {
+    public private(set) var filePath: String?
     var rangeMap: [String: Range<String.Index>] = [:]
     var strData: String = ""
 
@@ -24,34 +25,57 @@ extension vChewingLM {
 
     @discardableResult public mutating func open(_ path: String) -> Bool {
       if isLoaded { return false }
+      let oldPath = filePath
+      filePath = nil
 
       LMConsolidator.fixEOF(path: path)
       LMConsolidator.consolidate(path: path, pragma: true)
 
       do {
-        strData = try String(contentsOfFile: path, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
-        strData = strData.replacingOccurrences(of: "\r", with: "\n")
-        strData.ranges(splitBy: "\n").filter { !$0.isEmpty }.forEach {
-          let neta = strData[$0].split(separator: " ")
-          if neta.count >= 2 {
-            let theKey = String(neta[0])
-            if !neta[0].isEmpty, !neta[1].isEmpty, theKey.first != "#" {
-              let theValue = $0
-              rangeMap[theKey] = theValue
-            }
-          }
-        }
+        let rawStrData = try String(contentsOfFile: path, encoding: .utf8)
+        replaceData(textData: rawStrData)
       } catch {
+        filePath = oldPath
         vCLog("\(error)")
         vCLog("↑ Exception happened when reading data at: \(path).")
         return false
       }
 
+      filePath = path
       return true
     }
 
+    /// 將資料從檔案讀入至資料庫辭典內。
+    /// - parameters:
+    ///   - path: 給定路徑。
+    public mutating func replaceData(textData rawStrData: String) {
+      if strData == rawStrData { return }
+      strData = rawStrData
+      strData.ranges(splitBy: "\n").filter { !$0.isEmpty }.forEach {
+        let neta = strData[$0].split(separator: " ")
+        if neta.count >= 2 {
+          let theKey = String(neta[0])
+          if !neta[0].isEmpty, !neta[1].isEmpty, theKey.first != "#" {
+            let theValue = $0
+            rangeMap[theKey] = theValue
+          }
+        }
+      }
+    }
+
     public mutating func clear() {
+      filePath = nil
+      strData.removeAll()
       rangeMap.removeAll()
+    }
+
+    public func saveData() {
+      guard let filePath = filePath else { return }
+      do {
+        try strData.write(toFile: filePath, atomically: true, encoding: .utf8)
+      } catch {
+        vCLog("Failed to save current database to: \(filePath)")
+      }
     }
 
     public func dump() {

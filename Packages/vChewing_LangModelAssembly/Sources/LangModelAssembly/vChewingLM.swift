@@ -12,4 +12,14 @@ public enum vChewingLM {
   enum FileErrors: Error {
     case fileHandleError(String)
   }
+
+  public enum ReplacableUserDataType: String, CaseIterable, Identifiable {
+    public var id: ObjectIdentifier { .init(rawValue as AnyObject) }
+
+    case thePhrases
+    case theFilter
+    case theReplacements
+    case theAssociates
+    case theSymbols
+  }
 }

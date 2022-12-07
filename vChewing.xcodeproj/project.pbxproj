@@ -9,11 +9,11 @@
 /* Begin PBXBuildFile section */
 		5B00FA0C28DEC17200F6D436 /* SessionCtl_IMKCandidatesData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B00FA0B28DEC17200F6D436 /* SessionCtl_IMKCandidatesData.swift */; };
 		5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */ = {isa = PBXBuildFile; fileRef = 5B09307828B6FC3B0021F8C5 /* shortcuts.html */; };
-		5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0AF8B427B2C8290096FE54 /* StringExtension.swift */; };
 		5B0E22A628FC11B900EB7ACA /* Preferences.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 5B0E22A528FC11B900EB7ACA /* Preferences.tiff */; };
 		5B0E22A928FC11B900EB7ACA /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B0E22A728FC11B900EB7ACA /* Preferences.xib */; };
 		5B0E22B028FC17CB00EB7ACA /* Preferences.prefPane in Resources */ = {isa = PBXBuildFile; fileRef = 5B0E229F28FC11B900EB7ACA /* Preferences.prefPane */; };
 		5B0E22B228FC318C00EB7ACA /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0E22B128FC318C00EB7ACA /* Preferences.swift */; };
+		5B0E22DA293F4864004DF98A /* MenuBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = 5B0E22D9293F4864004DF98A /* MenuBuilder */; };
 		5B0EF55D28CDBF7100F8F7CE /* frmClientListMgr.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */; };
 		5B0EF55F28CDBF8E00F8F7CE /* CtlClientListMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */; };
 		5B21176C287539BB000443A9 /* SessionCtl_HandleStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176B287539BB000443A9 /* SessionCtl_HandleStates.swift */; };
@@ -27,8 +27,9 @@
 		5B5C8ED828FC0EA9002C93A5 /* SSPreferences in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5C8ED728FC0EA9002C93A5 /* SSPreferences */; };
 		5B62A33D27AE7CC100A19448 /* CtlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33C27AE7CC100A19448 /* CtlAboutWindow.swift */; };
 		5B660A8628F64A8800E5E4F6 /* SymbolMenuDefaultData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B660A8528F64A8800E5E4F6 /* SymbolMenuDefaultData.swift */; };
+		5B69938C293B811F0057CB8E /* VwrPrefPanePhrases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B69938B293B811F0057CB8E /* VwrPrefPanePhrases.swift */; };
 		5B6C141228A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6C141128A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift */; };
-		5B73FB5E27B2BE1300E9BF49 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */; };
+		5B765F09293A253C00122315 /* PhraseEditorUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5B765F08293A253C00122315 /* PhraseEditorUI */; };
 		5B782EC4280C243C007276DE /* InputHandler_HandleCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B782EC3280C243C007276DE /* InputHandler_HandleCandidate.swift */; };
 		5B78EE0D28A562B4009456C1 /* VwrPrefPaneDevZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B78EE0C28A562B4009456C1 /* VwrPrefPaneDevZone.swift */; };
 		5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */; };
@@ -72,15 +73,9 @@
 		5BC5E01E28DDE4770094E427 /* NotifierUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E01D28DDE4770094E427 /* NotifierUI */; };
 		5BC5E02128DDEFE00094E427 /* TooltipUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E02028DDEFE00094E427 /* TooltipUI */; };
 		5BC5E02428DE07860094E427 /* PopupCompositionBuffer in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E02328DE07860094E427 /* PopupCompositionBuffer */; };
+		5BCC631629407BBB00A2D84F /* CtlPrefWindow_PhraseEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCC631529407BBB00A2D84F /* CtlPrefWindow_PhraseEditor.swift */; };
 		5BCCAFF828DB19A300AB1B27 /* PrefMgr_Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCCAFF728DB19A300AB1B27 /* PrefMgr_Extension.swift */; };
 		5BD0113D2818543900609769 /* InputHandler_Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0113C2818543900609769 /* InputHandler_Core.swift */; };
-		5BD05BCA27B2A43D004C4F1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
-		5BD05C5D27B2BBA9004C4F1D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5BD05C5B27B2BBA9004C4F1D /* Main.storyboard */; };
-		5BD05C6627B2BBEF004C4F1D /* Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD05C6127B2BBEF004C4F1D /* Document.swift */; };
-		5BD05C6727B2BBEF004C4F1D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD05C6227B2BBEF004C4F1D /* AppDelegate.swift */; };
-		5BD05C6827B2BBEF004C4F1D /* Content.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD05C6327B2BBEF004C4F1D /* Content.swift */; };
-		5BD05C6927B2BBEF004C4F1D /* WindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD05C6427B2BBEF004C4F1D /* WindowController.swift */; };
-		5BD05C6A27B2BBEF004C4F1D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD05C6527B2BBEF004C4F1D /* ViewController.swift */; };
 		5BDB7A3928D4824A001AC277 /* BookmarkManager in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A3828D4824A001AC277 /* BookmarkManager */; };
 		5BDB7A3B28D4824A001AC277 /* FolderMonitor in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A3A28D4824A001AC277 /* FolderMonitor */; };
 		5BDB7A3D28D4824A001AC277 /* Hotenka in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A3C28D4824A001AC277 /* Hotenka */; };
@@ -88,11 +83,8 @@
 		5BDB7A4128D4824A001AC277 /* Megrez in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4028D4824A001AC277 /* Megrez */; };
 		5BDB7A4528D4824A001AC277 /* ShiftKeyUpChecker in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4428D4824A001AC277 /* ShiftKeyUpChecker */; };
 		5BDB7A4728D4824A001AC277 /* Tekkon in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4628D4824A001AC277 /* Tekkon */; };
-		5BDCBB2E27B4E67A00D0CC59 /* vChewingPhraseEditor.app in Resources */ = {isa = PBXBuildFile; fileRef = 5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */; };
 		5BE1F8A928F86AB5006C7FF5 /* InputHandler_HandleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE1F8A828F86AB5006C7FF5 /* InputHandler_HandleEvent.swift */; };
 		5BE377A0288FED8D0037365B /* InputHandler_HandleComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE3779F288FED8D0037365B /* InputHandler_HandleComposition.swift */; };
-		5BE78BD927B3775B005EA1BE /* CtlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE78BD827B37750005EA1BE /* CtlAboutWindow.swift */; };
-		5BE78BDD27B3776D005EA1BE /* frmAboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BE78BDA27B37764005EA1BE /* frmAboutWindow.xib */; };
 		5BEDB721283B4C250078EB25 /* data-cns.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71D283B4AEA0078EB25 /* data-cns.plist */; };
 		5BEDB722283B4C250078EB25 /* data-zhuyinwen.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.plist */; };
 		5BEDB723283B4C250078EB25 /* data-cht.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB720283B4AEA0078EB25 /* data-cht.plist */; };
@@ -129,13 +121,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		5B0AF8B227B2C4E20096FE54 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 6A0D4E9415FC0CFA00ABF4B3 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 5BD05BB727B2A429004C4F1D;
-			remoteInfo = vChewingPhraseEditor;
-		};
 		5B0E22AE28FC16AA00EB7ACA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6A0D4E9415FC0CFA00ABF4B3 /* Project object */;
@@ -181,9 +166,6 @@
 		5B04305727B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5B04305827B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/frmAboutWindow.strings"; sourceTree = "<group>"; };
 		5B04305927B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = ja.lproj/frmPrefWindow.strings; sourceTree = "<group>"; };
-		5B04305B27B529D900CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/frmAboutWindow.strings"; sourceTree = "<group>"; };
-		5B04305C27B529D900CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
-		5B04305D27B529D900CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		5B04305E27B5312E00CB65BC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5B04305F27B5312E00CB65BC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5B04306027B5312E00CB65BC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/MainMenu.strings; sourceTree = "<group>"; };
@@ -191,9 +173,6 @@
 		5B04306227B5312E00CB65BC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5B04306327B5312E00CB65BC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/frmAboutWindow.strings; sourceTree = "<group>"; };
 		5B04306427B5312E00CB65BC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = "zh-Hans.lproj/frmPrefWindow.strings"; sourceTree = "<group>"; };
-		5B04306527B5312E00CB65BC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/frmAboutWindow.strings; sourceTree = "<group>"; };
-		5B04306627B5312E00CB65BC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		5B04306727B5312E00CB65BC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Main.strings; sourceTree = "<group>"; };
 		5B05A47B27AFF7CA00437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5B05A47C27AFF7CF00437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5B05A47F27AFF84200437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmAboutWindow.strings; sourceTree = "<group>"; };
@@ -201,13 +180,13 @@
 		5B09307928B6FC3F0021F8C5 /* zh-Hans */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = "zh-Hans"; path = "zh-Hans.lproj/shortcuts.html"; sourceTree = "<group>"; };
 		5B09307A28B6FC400021F8C5 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = en; path = en.lproj/shortcuts.html; sourceTree = "<group>"; };
 		5B09307B28B6FC410021F8C5 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = ja; path = ja.lproj/shortcuts.html; sourceTree = "<group>"; };
-		5B0AF8B427B2C8290096FE54 /* StringExtension.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = StringExtension.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B0C5EDF27C7D9870078037C /* dataCompiler.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = dataCompiler.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B0E229F28FC11B900EB7ACA /* Preferences.prefPane */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Preferences.prefPane; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B0E22A528FC11B900EB7ACA /* Preferences.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Preferences.tiff; sourceTree = "<group>"; };
 		5B0E22A828FC11B900EB7ACA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Preferences.xib; sourceTree = "<group>"; };
 		5B0E22AA28FC11B900EB7ACA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5B0E22B128FC318C00EB7ACA /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
+		5B0E22D8293F47D0004DF98A /* JedFox_MenuBuilder */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = JedFox_MenuBuilder; path = Packages/JedFox_MenuBuilder; sourceTree = "<group>"; };
 		5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = frmClientListMgr.xib; sourceTree = "<group>"; };
 		5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CtlClientListMgr.swift; sourceTree = "<group>"; };
 		5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHS.txt"; sourceTree = "<group>"; };
@@ -233,9 +212,9 @@
 		5B62A33C27AE7CC100A19448 /* CtlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = CtlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B65B919284D0185007C558B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		5B660A8528F64A8800E5E4F6 /* SymbolMenuDefaultData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolMenuDefaultData.swift; sourceTree = "<group>"; };
+		5B69938B293B811F0057CB8E /* VwrPrefPanePhrases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VwrPrefPanePhrases.swift; sourceTree = "<group>"; };
 		5B6C141128A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCtl_HandleEvent.swift; sourceTree = "<group>"; };
-		5B73FB5427B2BD6900E9BF49 /* PhraseEditor-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "PhraseEditor-Info.plist"; path = "UserPhraseEditor/PhraseEditor-Info.plist"; sourceTree = SOURCE_ROOT; };
-		5B73FB5F27B2BE1300E9BF49 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		5B765F07293A250000122315 /* vChewing_PhraseEditorUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_PhraseEditorUI; path = Packages/vChewing_PhraseEditorUI; sourceTree = "<group>"; };
 		5B782EC3280C243C007276DE /* InputHandler_HandleCandidate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputHandler_HandleCandidate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B78EE0C28A562B4009456C1 /* VwrPrefPaneDevZone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VwrPrefPaneDevZone.swift; sourceTree = "<group>"; };
 		5B7BC4AF27AFFBE800F66C24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmPrefWindow.xib; sourceTree = "<group>"; };
@@ -276,16 +255,9 @@
 		5BC5E01C28DDE4270094E427 /* vChewing_NotifierUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_NotifierUI; path = Packages/vChewing_NotifierUI; sourceTree = "<group>"; };
 		5BC5E01F28DDEFD80094E427 /* vChewing_TooltipUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_TooltipUI; path = Packages/vChewing_TooltipUI; sourceTree = "<group>"; };
 		5BC5E02228DE07250094E427 /* vChewing_PopupCompositionBuffer */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_PopupCompositionBuffer; path = Packages/vChewing_PopupCompositionBuffer; sourceTree = "<group>"; };
+		5BCC631529407BBB00A2D84F /* CtlPrefWindow_PhraseEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CtlPrefWindow_PhraseEditor.swift; sourceTree = "<group>"; };
 		5BCCAFF728DB19A300AB1B27 /* PrefMgr_Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefMgr_Extension.swift; sourceTree = "<group>"; };
 		5BD0113C2818543900609769 /* InputHandler_Core.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = InputHandler_Core.swift; sourceTree = "<group>"; usesTabs = 0; };
-		5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingPhraseEditor.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		5BD05BC627B2A42A004C4F1D /* vChewingPhraseEditor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewingPhraseEditor.entitlements; sourceTree = "<group>"; };
-		5BD05C5C27B2BBA9004C4F1D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		5BD05C6127B2BBEF004C4F1D /* Document.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = Document.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5BD05C6227B2BBEF004C4F1D /* AppDelegate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5BD05C6327B2BBEF004C4F1D /* Content.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = Content.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5BD05C6427B2BBEF004C4F1D /* WindowController.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = WindowController.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5BD05C6527B2BBEF004C4F1D /* ViewController.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = ViewController.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BDB7A3028D47587001AC277 /* Jad_BookmarkManager */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Jad_BookmarkManager; path = Packages/Jad_BookmarkManager; sourceTree = "<group>"; };
 		5BDB7A3128D47587001AC277 /* DanielGalasko_FolderMonitor */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = DanielGalasko_FolderMonitor; path = Packages/DanielGalasko_FolderMonitor; sourceTree = "<group>"; };
 		5BDB7A3228D47587001AC277 /* vChewing_Hotenka */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Hotenka; path = Packages/vChewing_Hotenka; sourceTree = "<group>"; };
@@ -300,13 +272,8 @@
 		5BDCBB4827B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5BDCBB4927B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5BDCBB4A27B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		5BDCBB4B27B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/frmAboutWindow.strings"; sourceTree = "<group>"; };
-		5BDCBB4D27B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5BE1F8A828F86AB5006C7FF5 /* InputHandler_HandleEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputHandler_HandleEvent.swift; sourceTree = "<group>"; };
 		5BE3779F288FED8D0037365B /* InputHandler_HandleComposition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputHandler_HandleComposition.swift; sourceTree = "<group>"; };
-		5BE78BD827B37750005EA1BE /* CtlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = CtlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5BE78BDB27B37764005EA1BE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmAboutWindow.xib; sourceTree = "<group>"; };
-		5BE78BDF27B37968005EA1BE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmAboutWindow.strings; sourceTree = "<group>"; };
 		5BE8A8C4281EE65300197741 /* CONTRIBUTING.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
 		5BEDB71C283B4AEA0078EB25 /* data-chs.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-chs.plist"; path = "Data/data-chs.plist"; sourceTree = "<group>"; };
 		5BEDB71D283B4AEA0078EB25 /* data-cns.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-cns.plist"; path = "Data/data-cns.plist"; sourceTree = "<group>"; };
@@ -328,7 +295,6 @@
 		5BFC63CA28D49B2B004A77B7 /* vChewing_UpdateSputnik */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_UpdateSputnik; path = Packages/vChewing_UpdateSputnik; sourceTree = "<group>"; };
 		5BFC63CD28D4AC98004A77B7 /* vChewing_LangModelAssembly */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_LangModelAssembly; path = Packages/vChewing_LangModelAssembly; sourceTree = "<group>"; };
 		5BFDF010289635C100417BBC /* IMKCandidatesImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMKCandidatesImpl.swift; sourceTree = "<group>"; };
-		5BFDF48C27B51867009523B6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Main.strings"; sourceTree = "<group>"; };
 		6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A0D4EF515FC0DA600ABF4B3 /* IME-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IME-Info.plist"; sourceTree = "<group>"; };
 		6A15B32421A51F2300B92CD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -362,13 +328,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5BD05BB527B2A429004C4F1D /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		6A0D4E9F15FC0D2D00ABF4B3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -380,11 +339,13 @@
 				5BFC63C928D49754004A77B7 /* IMKUtils in Frameworks */,
 				5BDB7A4728D4824A001AC277 /* Tekkon in Frameworks */,
 				5BDB7A3D28D4824A001AC277 /* Hotenka in Frameworks */,
+				5B0E22DA293F4864004DF98A /* MenuBuilder in Frameworks */,
 				5BDB7A3F28D4824A001AC277 /* LineReader in Frameworks */,
 				5B963C9D28D5BFB800DCEE88 /* CocoaExtension in Frameworks */,
 				5B98114828D6198700CBC605 /* PinyinPhonaConverter in Frameworks */,
 				5BFC63CF28D4ACA3004A77B7 /* LangModelAssembly in Frameworks */,
 				5BC5E02128DDEFE00094E427 /* TooltipUI in Frameworks */,
+				5B765F09293A253C00122315 /* PhraseEditorUI in Frameworks */,
 				5BDB7A3928D4824A001AC277 /* BookmarkManager in Frameworks */,
 				5B5C8ED828FC0EA9002C93A5 /* SSPreferences in Frameworks */,
 				5B5A603028E81CC50001AE8D /* SwiftUIBackports in Frameworks */,
@@ -497,6 +458,7 @@
 				5B62A33C27AE7CC100A19448 /* CtlAboutWindow.swift */,
 				5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */,
 				D47F7DCD278BFB57002F9DD7 /* CtlPrefWindow.swift */,
+				5BCC631529407BBB00A2D84F /* CtlPrefWindow_PhraseEditor.swift */,
 			);
 			path = WindowControllers;
 			sourceTree = "<group>";
@@ -543,6 +505,7 @@
 				5BA9FD0D27FEDB6B002DE248 /* VwrPrefPaneExperience.swift */,
 				5BA9FD0A27FEDB6B002DE248 /* VwrPrefPaneGeneral.swift */,
 				5BA9FD0B27FEDB6B002DE248 /* VwrPrefPaneKeyboard.swift */,
+				5B69938B293B811F0057CB8E /* VwrPrefPanePhrases.swift */,
 			);
 			path = PrefUI;
 			sourceTree = "<group>";
@@ -578,39 +541,13 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		5BD05BB927B2A429004C4F1D /* UserPhraseEditor */ = {
-			isa = PBXGroup;
-			children = (
-				5BE78BD827B37750005EA1BE /* CtlAboutWindow.swift */,
-				5BD05C5A27B2BB6E004C4F1D /* Resources */,
-				5BD05BC627B2A42A004C4F1D /* vChewingPhraseEditor.entitlements */,
-				5BD05C6227B2BBEF004C4F1D /* AppDelegate.swift */,
-				5BD05C6327B2BBEF004C4F1D /* Content.swift */,
-				5BD05C6127B2BBEF004C4F1D /* Document.swift */,
-				5B0AF8B427B2C8290096FE54 /* StringExtension.swift */,
-				5BD05C6527B2BBEF004C4F1D /* ViewController.swift */,
-				5BD05C6427B2BBEF004C4F1D /* WindowController.swift */,
-				5B73FB5427B2BD6900E9BF49 /* PhraseEditor-Info.plist */,
-			);
-			path = UserPhraseEditor;
-			sourceTree = "<group>";
-		};
-		5BD05C5A27B2BB6E004C4F1D /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				5BE78BDA27B37764005EA1BE /* frmAboutWindow.xib */,
-				5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */,
-				5BD05C5B27B2BBA9004C4F1D /* Main.storyboard */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
 		5BDB7A2D28D47570001AC277 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
 				5BDB7A3128D47587001AC277 /* DanielGalasko_FolderMonitor */,
 				5BFC63C428D487AE004A77B7 /* Fuziki_NSAttributedTextView */,
 				5BDB7A3028D47587001AC277 /* Jad_BookmarkManager */,
+				5B0E22D8293F47D0004DF98A /* JedFox_MenuBuilder */,
 				5BDB7A3428D47587001AC277 /* Qwertyyb_ShiftKeyUpChecker */,
 				5BDB7A3528D47587001AC277 /* RMJay_LineReader */,
 				5B5A602E28E81CB00001AE8D /* ShapsBenkau_SwiftUIBackports */,
@@ -622,6 +559,7 @@
 				5BFC63CD28D4AC98004A77B7 /* vChewing_LangModelAssembly */,
 				5BDB7A3328D47587001AC277 /* vChewing_Megrez */,
 				5BC5E01C28DDE4270094E427 /* vChewing_NotifierUI */,
+				5B765F07293A250000122315 /* vChewing_PhraseEditorUI */,
 				5B98114628D6198000CBC605 /* vChewing_PinyinPhonaConverter */,
 				5BC5E02228DE07250094E427 /* vChewing_PopupCompositionBuffer */,
 				5B963C9E28D5C14600DCEE88 /* vChewing_Shared */,
@@ -662,7 +600,6 @@
 				5B0C5EDE27C7D94C0078037C /* DataCompiler */,
 				6ACA41E715FC1D9000935EF6 /* Installer */,
 				6A0D4EC215FC0D3C00ABF4B3 /* Source */,
-				5BD05BB927B2A429004C4F1D /* UserPhraseEditor */,
 				5B2F2BB4286216A500B8557B /* vChewingTests */,
 				5B0E22A028FC11B900EB7ACA /* Preferences */,
 				6A0D4EA315FC0D2D00ABF4B3 /* Products */,
@@ -677,7 +614,6 @@
 			children = (
 				6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */,
 				6ACA41CB15FC1D7500935EF6 /* vChewingInstaller.app */,
-				5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */,
 				5B2F2BB3286216A500B8557B /* vChewingTests.xctest */,
 				5B0E229F28FC11B900EB7ACA /* Preferences.prefPane */,
 			);
@@ -806,23 +742,6 @@
 			productReference = 5B2F2BB3286216A500B8557B /* vChewingTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		5BD05BB727B2A429004C4F1D /* vChewingPhraseEditor */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 5BD05BC927B2A42A004C4F1D /* Build configuration list for PBXNativeTarget "vChewingPhraseEditor" */;
-			buildPhases = (
-				5BD05BB427B2A429004C4F1D /* Sources */,
-				5BD05BB527B2A429004C4F1D /* Frameworks */,
-				5BD05BB627B2A429004C4F1D /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = vChewingPhraseEditor;
-			productName = vChewingPhraseEditor;
-			productReference = 5BD05BB827B2A429004C4F1D /* vChewingPhraseEditor.app */;
-			productType = "com.apple.product-type.application";
-		};
 		6A0D4EA115FC0D2D00ABF4B3 /* vChewing */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6A0D4EC015FC0D2E00ABF4B3 /* Build configuration list for PBXNativeTarget "vChewing" */;
@@ -838,7 +757,6 @@
 			);
 			dependencies = (
 				5B0E22AF28FC16AA00EB7ACA /* PBXTargetDependency */,
-				5B0AF8B327B2C4E20096FE54 /* PBXTargetDependency */,
 			);
 			name = vChewing;
 			packageProductDependencies = (
@@ -864,6 +782,8 @@
 				5BA8C30228DF0360004C5CC4 /* CandidateWindow */,
 				5B5A602F28E81CC50001AE8D /* SwiftUIBackports */,
 				5B5C8ED728FC0EA9002C93A5 /* SSPreferences */,
+				5B765F08293A253C00122315 /* PhraseEditorUI */,
+				5B0E22D9293F4864004DF98A /* MenuBuilder */,
 			);
 			productName = vChewing;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */;
@@ -908,11 +828,6 @@
 						CreatedOnToolsVersion = 13.4.1;
 						TestTargetID = 6A0D4EA115FC0D2D00ABF4B3;
 					};
-					5BD05BB727B2A429004C4F1D = {
-						CreatedOnToolsVersion = 13.2;
-						LastSwiftMigration = 1320;
-						ProvisioningStyle = Automatic;
-					};
 					6A0D4EA115FC0D2D00ABF4B3 = {
 						LastSwiftMigration = 1400;
 						ProvisioningStyle = Automatic;
@@ -943,7 +858,6 @@
 			targets = (
 				6A0D4EA115FC0D2D00ABF4B3 /* vChewing */,
 				6ACA41CA15FC1D7500935EF6 /* vChewingInstaller */,
-				5BD05BB727B2A429004C4F1D /* vChewingPhraseEditor */,
 				5B2F2BB2286216A500B8557B /* vChewingTests */,
 				5B0E229E28FC11B900EB7ACA /* Preferences */,
 			);
@@ -972,17 +886,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5BD05BB627B2A429004C4F1D /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5BD05BCA27B2A43D004C4F1D /* Images.xcassets in Resources */,
-				5B73FB5E27B2BE1300E9BF49 /* InfoPlist.strings in Resources */,
-				5BD05C5D27B2BBA9004C4F1D /* Main.storyboard in Resources */,
-				5BE78BDD27B3776D005EA1BE /* frmAboutWindow.xib in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		6A0D4EA015FC0D2D00ABF4B3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -994,7 +897,6 @@
 				5B7DA80328BF6BC600D7B2AD /* fixinstall.sh in Resources */,
 				5B0EF55D28CDBF7100F8F7CE /* frmClientListMgr.xib in Resources */,
 				5B0E22B028FC17CB00EB7ACA /* Preferences.prefPane in Resources */,
-				5BDCBB2E27B4E67A00D0CC59 /* vChewingPhraseEditor.app in Resources */,
 				5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */,
 				6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */,
 				D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */,
@@ -1137,20 +1039,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5BD05BB427B2A429004C4F1D /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5BD05C6A27B2BBEF004C4F1D /* ViewController.swift in Sources */,
-				5BD05C6727B2BBEF004C4F1D /* AppDelegate.swift in Sources */,
-				5B0AF8B527B2C8290096FE54 /* StringExtension.swift in Sources */,
-				5BD05C6927B2BBEF004C4F1D /* WindowController.swift in Sources */,
-				5BD05C6627B2BBEF004C4F1D /* Document.swift in Sources */,
-				5BD05C6827B2BBEF004C4F1D /* Content.swift in Sources */,
-				5BE78BD927B3775B005EA1BE /* CtlAboutWindow.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		6A0D4E9E15FC0D2D00ABF4B3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1176,7 +1064,9 @@
 				5BF56F9A28C39D1800DD6839 /* IMEStateData.swift in Sources */,
 				5B21176C287539BB000443A9 /* SessionCtl_HandleStates.swift in Sources */,
 				5BE1F8A928F86AB5006C7FF5 /* InputHandler_HandleEvent.swift in Sources */,
+				5B69938C293B811F0057CB8E /* VwrPrefPanePhrases.swift in Sources */,
 				5BAEFAD028012565001F42C9 /* LMMgr.swift in Sources */,
+				5BCC631629407BBB00A2D84F /* CtlPrefWindow_PhraseEditor.swift in Sources */,
 				5B782EC4280C243C007276DE /* InputHandler_HandleCandidate.swift in Sources */,
 				5BA9FD0F27FEDB6B002DE248 /* VwrPrefPaneGeneral.swift in Sources */,
 				5BCCAFF828DB19A300AB1B27 /* PrefMgr_Extension.swift in Sources */,
@@ -1204,11 +1094,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		5B0AF8B327B2C4E20096FE54 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 5BD05BB727B2A429004C4F1D /* vChewingPhraseEditor */;
-			targetProxy = 5B0AF8B227B2C4E20096FE54 /* PBXContainerItemProxy */;
-		};
 		5B0E22AF28FC16AA00EB7ACA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 5B0E229E28FC11B900EB7ACA /* Preferences */;
@@ -1246,17 +1131,6 @@
 			name = Preferences.xib;
 			sourceTree = "<group>";
 		};
-		5B73FB6027B2BE1300E9BF49 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				5B73FB5F27B2BE1300E9BF49 /* en */,
-				5BDCBB4D27B4F6C700D0CC59 /* zh-Hant */,
-				5B04305C27B529D900CB65BC /* zh-Hans */,
-				5B04306627B5312E00CB65BC /* ja */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
 		5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -1277,29 +1151,6 @@
 				5BDCBB4327B4F6C600D0CC59 /* zh-Hant */,
 				5B04305827B529D800CB65BC /* zh-Hans */,
 				5B04306327B5312E00CB65BC /* ja */,
-			);
-			name = frmAboutWindow.xib;
-			sourceTree = "<group>";
-		};
-		5BD05C5B27B2BBA9004C4F1D /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				5BD05C5C27B2BBA9004C4F1D /* Base */,
-				5BFDF48C27B51867009523B6 /* zh-Hant */,
-				5B04305D27B529D900CB65BC /* zh-Hans */,
-				5B04306727B5312E00CB65BC /* ja */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		5BE78BDA27B37764005EA1BE /* frmAboutWindow.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				5BE78BDB27B37764005EA1BE /* Base */,
-				5BE78BDF27B37968005EA1BE /* en */,
-				5BDCBB4B27B4F6C700D0CC59 /* zh-Hant */,
-				5B04305B27B529D900CB65BC /* zh-Hans */,
-				5B04306527B5312E00CB65BC /* ja */,
 			);
 			name = frmAboutWindow.xib;
 			sourceTree = "<group>";
@@ -1389,7 +1240,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2980;
+				CURRENT_PROJECT_VERSION = 3000;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1414,7 +1265,7 @@
 					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 2.9.8;
+				MARKETING_VERSION = 3.0.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.Preferences;
@@ -1444,7 +1295,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2980;
+				CURRENT_PROJECT_VERSION = 3000;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1464,7 +1315,7 @@
 					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 2.9.8;
+				MARKETING_VERSION = 3.0.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.Preferences;
@@ -1492,7 +1343,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2980;
+				CURRENT_PROJECT_VERSION = 3000;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1508,7 +1359,7 @@
 					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 2.9.8;
+				MARKETING_VERSION = 3.0.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewingTests;
@@ -1537,7 +1388,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2980;
+				CURRENT_PROJECT_VERSION = 3000;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -1549,7 +1400,7 @@
 					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 2.9.8;
+				MARKETING_VERSION = 3.0.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewingTests;
@@ -1560,111 +1411,6 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vChewing.app/Contents/MacOS/vChewing";
-			};
-			name = Release;
-		};
-		5BD05BC727B2A42A004C4F1D /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-PhraseEditor";
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = vChewingPhraseEditor.entitlements;
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2980;
-				DEAD_CODE_STRIPPING = YES;
-				ENABLE_HARDENED_RUNTIME = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "UserPhraseEditor/PhraseEditor-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = vChewingPhraseEditor;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2021-2022 vChewing Project.";
-				INFOPLIST_KEY_NSMainStoryboardFile = Main;
-				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@executable_path/../../../../Frameworks",
-					/usr/lib/swift,
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 2.9.8;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Debug;
-		};
-		5BD05BC827B2A42A004C4F1D /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-PhraseEditor";
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = vChewingPhraseEditor.entitlements;
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2980;
-				DEAD_CODE_STRIPPING = YES;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_NS_ASSERTIONS = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "UserPhraseEditor/PhraseEditor-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = vChewingPhraseEditor;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2021-2022 vChewing Project.";
-				INFOPLIST_KEY_NSMainStoryboardFile = Main;
-				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@executable_path/../../../../Frameworks",
-					/usr/lib/swift,
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 2.9.8;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingPhraseEditor;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -1773,7 +1519,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2980;
+				CURRENT_PROJECT_VERSION = 3000;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1804,7 +1550,7 @@
 					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 2.9.8;
+				MARKETING_VERSION = 3.0.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1835,7 +1581,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2980;
+				CURRENT_PROJECT_VERSION = 3000;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1860,7 +1606,7 @@
 					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 2.9.8;
+				MARKETING_VERSION = 3.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1884,7 +1630,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2980;
+				CURRENT_PROJECT_VERSION = 3000;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1907,7 +1653,7 @@
 					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 2.9.8;
+				MARKETING_VERSION = 3.0.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingInstaller;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1931,7 +1677,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2980;
+				CURRENT_PROJECT_VERSION = 3000;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1948,7 +1694,7 @@
 					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 2.9.8;
+				MARKETING_VERSION = 3.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingInstaller;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1975,15 +1721,6 @@
 			buildConfigurations = (
 				5B2F2BB9286216A500B8557B /* Debug */,
 				5B2F2BBA286216A500B8557B /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		5BD05BC927B2A42A004C4F1D /* Build configuration list for PBXNativeTarget "vChewingPhraseEditor" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				5BD05BC727B2A42A004C4F1D /* Debug */,
-				5BD05BC827B2A42A004C4F1D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2018,6 +1755,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		5B0E22D9293F4864004DF98A /* MenuBuilder */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MenuBuilder;
+		};
 		5B40113828D7050D00A9D4CB /* Shared */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Shared;
@@ -2033,6 +1774,10 @@
 		5B5C8ED728FC0EA9002C93A5 /* SSPreferences */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SSPreferences;
+		};
+		5B765F08293A253C00122315 /* PhraseEditorUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PhraseEditorUI;
 		};
 		5B963C9C28D5BFB800DCEE88 /* CocoaExtension */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -239,7 +239,7 @@ extension InputHandler {
   func handlePunctuation(_ customPunctuation: String) -> Bool {
     guard let delegate = delegate else { return false }
 
-    if !currentLM.hasUnigramsFor(key: customPunctuation) {
+    if !currentLM.hasUnigramsFor(keyArray: [customPunctuation]) {
       return false
     }
 
@@ -269,7 +269,7 @@ extension InputHandler {
       case 2...: delegate.switchState(candidateState)
       case 1:
         clear()  // 這句不要砍，因為下文可能會回呼 candidateState。
-        if let candidateToCommit: (String, String) = candidateState.candidates.first, !candidateToCommit.1.isEmpty {
+        if let candidateToCommit: ([String], String) = candidateState.candidates.first, !candidateToCommit.1.isEmpty {
           delegate.switchState(IMEState.ofCommitting(textToCommit: candidateToCommit.1))
         } else {
           delegate.switchState(candidateState)
@@ -296,7 +296,7 @@ extension InputHandler {
 
   /// Command+Enter 鍵的處理（注音文）。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func handleCtrlCommandEnter() -> Bool {
+  func handleCtrlCommandEnter(isShiftPressed: Bool = false) -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
@@ -308,9 +308,9 @@ extension InputHandler {
     if !prefs.cassetteEnabled {
       if prefs.inlineDumpPinyinInLieuOfZhuyin {
         if !compositor.isEmpty {
-          displayedText = Tekkon.restoreToneOneInZhuyinKey(target: displayedText)  // 恢復陰平標記
+          displayedText = Tekkon.restoreToneOneInZhuyinKey(targetJoined: displayedText)  // 恢復陰平標記
         }
-        displayedText = Tekkon.cnvPhonaToHanyuPinyin(target: displayedText)  // 注音轉拼音
+        displayedText = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: displayedText)  // 注音轉拼音
       }
       if prefs.showHanyuPinyinInCompositionBuffer {
         if compositor.isEmpty {
@@ -319,8 +319,7 @@ extension InputHandler {
       }
     }
 
-    let isVCED = delegate.clientBundleIdentifier.contains("vChewingPhraseEditor")
-    displayedText = displayedText.replacingOccurrences(of: "\t", with: isVCED ? "-" : " ")
+    displayedText = displayedText.replacingOccurrences(of: "\t", with: isShiftPressed ? "-" : " ")
 
     delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
     return true
@@ -338,15 +337,15 @@ extension InputHandler {
     var composed = ""
 
     for node in compositor.walkedNodes {
-      var key = node.key
+      var key = node.keyArray.joined(separator: "\t")
       if !prefs.cassetteEnabled {
         if prefs.inlineDumpPinyinInLieuOfZhuyin {
-          key = Tekkon.restoreToneOneInZhuyinKey(target: key)  // 恢復陰平標記
-          key = Tekkon.cnvPhonaToHanyuPinyin(target: key)  // 注音轉拼音
-          key = Tekkon.cnvHanyuPinyinToTextbookStyle(target: key)  // 轉教科書式標調
-          key = key.replacingOccurrences(of: "-", with: " ")
+          key = Tekkon.restoreToneOneInZhuyinKey(targetJoined: key)  // 恢復陰平標記
+          key = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: key)  // 注音轉拼音
+          key = Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: key)  // 轉教科書式標調
+          key = key.replacingOccurrences(of: "\t", with: " ")
         } else {
-          key = Tekkon.cnvZhuyinChainToTextbookReading(target: key, newSeparator: " ")
+          key = Tekkon.cnvZhuyinChainToTextbookReading(targetJoined: key, newSeparator: " ")
         }
       }
 
@@ -707,7 +706,7 @@ extension InputHandler {
       return true
     }
 
-    let currentPaired = (currentNode.key, currentNode.value)
+    let currentPaired = (currentNode.keyArray, currentNode.value)
 
     var currentIndex = 0
     if !currentNode.isOverriden {

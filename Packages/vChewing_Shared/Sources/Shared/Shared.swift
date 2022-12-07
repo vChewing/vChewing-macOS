@@ -67,6 +67,7 @@ public enum UserDef: String, CaseIterable {
   case kShowReverseLookupInCandidateUI = "ShowReverseLookupInCandidateUI"
   case kAutoCompositeWithLongestPossibleCassetteKey = "AutoCompositeWithLongestPossibleCassetteKey"
   case kShareAlphanumericalModeStatusAcrossClients = "ShareAlphanumericalModeStatusAcrossClients"
+  case kPhraseEditorAutoReloadExternalModifications = "PhraseEditorAutoReloadExternalModifications"
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
@@ -160,19 +161,42 @@ public enum StateType: String {
 public enum KeyboardParser: Int, CaseIterable {
   case ofStandard = 0
   case ofETen = 1
-  case ofHsu = 2
-  case ofETen26 = 3
   case ofIBM = 4
   case ofMiTAC = 5
+  case ofSeigyou = 8
   case ofFakeSeigyou = 6
   case ofDachen26 = 7
-  case ofSeigyou = 8
+  case ofETen26 = 3
+  case ofHsu = 2
   case ofStarlight = 9
   case ofHanyuPinyin = 10
   case ofSecondaryPinyin = 11
   case ofYalePinyin = 12
   case ofHualuoPinyin = 13
   case ofUniversalPinyin = 14
+
+  public var localizedMenuName: String {
+    let rawString: String = {
+      switch self {
+        case .ofStandard: return "Dachen (Microsoft Standard / Wang / 01, etc.)"
+        case .ofETen: return "Eten Traditional"
+        case .ofIBM: return "IBM"
+        case .ofMiTAC: return "MiTAC"
+        case .ofSeigyou: return "Seigyou"
+        case .ofFakeSeigyou: return "Fake Seigyou"
+        case .ofDachen26: return "Dachen 26 (libChewing)"
+        case .ofETen26: return "Eten 26"
+        case .ofHsu: return "Hsu"
+        case .ofStarlight: return "Starlight"
+        case .ofHanyuPinyin: return "Hanyu Pinyin with Numeral Intonation"
+        case .ofSecondaryPinyin: return "Secondary Pinyin with Numeral Intonation"
+        case .ofYalePinyin: return "Yale Pinyin with Numeral Intonation"
+        case .ofHualuoPinyin: return "Hualuo Pinyin with Numeral Intonation"
+        case .ofUniversalPinyin: return "Universal Pinyin with Numeral Intonation"
+      }
+    }()
+    return NSLocalizedString(rawString, comment: "")
+  }
 
   public var name: String {
     switch self {
@@ -291,7 +315,8 @@ public enum Shared {
   public static let arrSupportedLocales: [String] = ["en", "zh-Hant", "zh-Hans", "ja"]
 
   // The type of input modes.
-  public enum InputMode: String, CaseIterable {
+  public enum InputMode: String, CaseIterable, Identifiable {
+    public var id: ObjectIdentifier { .init(rawValue as AnyObject) }
     case imeModeCHS = "org.atelierInmu.inputmethod.vChewing.IMECHS"
     case imeModeCHT = "org.atelierInmu.inputmethod.vChewing.IMECHT"
     case imeModeNULL = ""
@@ -305,5 +330,31 @@ public enum Shared {
           return .imeModeNULL
       }
     }
+
+    public var localizedDescription: String { NSLocalizedString(description, comment: "") }
+    public var description: String {
+      switch self {
+        case .imeModeCHS:
+          return "Simplified Chinese"
+        case .imeModeCHT:
+          return "Traditional Chinese"
+        case .imeModeNULL:
+          return "Please select…"
+      }
+    }
+  }
+}
+
+// MARK: - Observable Object
+
+@available(macOS 10.15, *)
+public class FileObserveProject: ObservableObject, Equatable {
+  public static let shared = FileObserveProject()
+  @Published public var id = UUID().uuidString
+
+  public static func == (lhs: FileObserveProject, rhs: FileObserveProject) -> Bool { lhs.id == rhs.id }
+
+  public func touch() {
+    id = UUID().uuidString
   }
 }

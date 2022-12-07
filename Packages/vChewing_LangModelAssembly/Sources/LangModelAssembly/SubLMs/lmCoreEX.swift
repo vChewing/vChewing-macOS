@@ -17,6 +17,7 @@ extension vChewingLM {
   /// 資料記錄原理與上游 C++ 的 ParselessLM 差不多，但用的是 Swift 原生手段。
   /// 主要時間消耗仍在 For 迴圈，但這個算法可以顯著減少記憶體佔用。
   @frozen public struct LMCoreEX {
+    public private(set) var filePath: String?
     /// 資料庫辭典。索引內容為注音字串，資料內容則為字串首尾範圍、方便自 strData 取資料。
     var rangeMap: [String: [Range<String.Index>]] = [:]
     /// 資料庫追加辭典。
@@ -61,41 +62,80 @@ extension vChewingLM {
     @discardableResult public mutating func open(_ path: String) -> Bool {
       if isLoaded { return false }
 
+      let oldPath = filePath
+      filePath = nil
+
+      var consolidated = false
+
       if allowConsolidation {
         LMConsolidator.fixEOF(path: path)
         LMConsolidator.consolidate(path: path, pragma: true)
+        consolidated = true
       }
 
       do {
-        strData = try String(contentsOfFile: path, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
-        strData = strData.replacingOccurrences(of: "\r", with: "\n")
-        strData.ranges(splitBy: "\n").filter { !$0.isEmpty }.forEach {
-          let neta = strData[$0].split(separator: " ")
-          if neta.count >= 2, String(neta[0]).first != "#" {
-            if !neta[0].isEmpty, !neta[1].isEmpty {
-              var theKey = shouldReverse ? String(neta[1]) : String(neta[0])
-              let theValue = $0
-              theKey.converToPhonabets()
-              rangeMap[theKey, default: []].append(theValue)
-            }
-          }
+        var rawStrData = try String(contentsOfFile: path, encoding: .utf8)
+        if !consolidated {
+          rawStrData = rawStrData.replacingOccurrences(of: "\t", with: " ")
+          rawStrData = rawStrData.replacingOccurrences(of: "\r", with: "\n")
         }
-        temporaryMap.removeAll()
+        replaceData(textData: rawStrData)
       } catch {
+        filePath = oldPath
         vCLog("\(error)")
         vCLog("↑ Exception happened when reading data at: \(path).")
         return false
       }
 
+      filePath = path
       return true
+    }
+
+    /// 將資料從檔案讀入至資料庫辭典內。
+    /// - parameters:
+    ///   - path: 給定路徑。
+    public mutating func replaceData(textData rawStrData: String) {
+      if strData == rawStrData { return }
+      strData = rawStrData
+      strData.ranges(splitBy: "\n").filter { !$0.isEmpty }.forEach {
+        let neta = strData[$0].split(separator: " ")
+        if neta.count >= 2, String(neta[0]).first != "#" {
+          if !neta[0].isEmpty, !neta[1].isEmpty {
+            var theKey = shouldReverse ? String(neta[1]) : String(neta[0])
+            let theValue = $0
+            theKey.convertToPhonabets()
+            rangeMap[theKey, default: []].append(theValue)
+          }
+        }
+      }
+      temporaryMap.removeAll()
     }
 
     /// 將當前語言模組的資料庫辭典自記憶體內卸除。
     public mutating func clear() {
+      filePath = nil
+      strData.removeAll()
       rangeMap.removeAll()
     }
 
     // MARK: - Advanced features
+
+    public func saveData() {
+      guard let filePath = filePath else { return }
+      var dataToWrite = strData
+      do {
+        if !temporaryMap.isEmpty {
+          temporaryMap.forEach { neta in
+            neta.value.forEach { unigram in
+              dataToWrite.append("\(unigram.value) \(neta.key) \(unigram.score.description)\n")
+            }
+          }
+        }
+        try dataToWrite.write(toFile: filePath, atomically: true, encoding: .utf8)
+      } catch {
+        vCLog("Failed to save current database to: \(filePath)")
+      }
+    }
 
     /// 將當前資料庫辭典的內容以文本的形式輸出至 macOS 內建的 Console.app。
     ///

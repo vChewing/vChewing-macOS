@@ -10,6 +10,10 @@ import Cocoa
 import InputMethodKit
 
 extension NSWindowController {
+  public func orderFront() {
+    window?.orderFront(self)
+  }
+
   /// 設定選字窗的顯示位置。
   ///
   /// 需注意：該函式會藉由設定選字窗左上角頂點的方式、使選字窗始終位於某個螢幕之內。
@@ -41,6 +45,16 @@ extension NSWindowController {
     }
 
     if !useGCD { doSet() } else { DispatchQueue.main.async { doSet() } }
+  }
+}
+
+extension NSWindow {
+  public func callAlert(title: String, text: String? = nil) {
+    let alert = NSAlert()
+    alert.messageText = title
+    if let text = text { alert.informativeText = text }
+    alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+    alert.beginSheetModal(for: self)
   }
 }
 

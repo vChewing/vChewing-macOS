@@ -41,6 +41,16 @@ extension NSImage {
     }
   }
 
+  static var tabImagePhrases: NSImage! {
+    if #unavailable(macOS 11.0) {
+      return NSImage(named: "PrefToolbar-Phrases")
+    } else {
+      return NSImage(
+        systemSymbolName: "tablecells.badge.ellipsis", accessibilityDescription: "Phrases Preferences"
+      )
+    }
+  }
+
   static var tabImageCassette: NSImage! {
     if #unavailable(macOS 11.0) {
       return NSImage(named: "PrefToolbar-Cassette")
@@ -103,6 +113,13 @@ class CtlPrefUI {
         VwrPrefPaneDictionary()
       },
       SSPreferences.Pane(
+        identifier: SSPreferences.PaneIdentifier(rawValue: "Phrases"),
+        title: CtlPrefWindow.locPhrasesTabTitle,
+        toolbarIcon: .tabImagePhrases
+      ) {
+        VwrPrefPanePhrases()
+      },
+      SSPreferences.Pane(
         identifier: SSPreferences.PaneIdentifier(rawValue: "Cassette"),
         title: NSLocalizedString("Cassette", comment: ""),
         toolbarIcon: .tabImageCassette
@@ -127,4 +144,23 @@ class CtlPrefUI {
     style: .toolbarItems
   )
   static let shared = CtlPrefUI()
+}
+
+// MARK: - Localization-Related Contents.
+
+extension CtlPrefWindow {
+  /// 由於用於頁籤標題的某些用語放在 localizable 資源內管理的話容易混亂，所以這裡單獨處理。
+  static var locPhrasesTabTitle: String {
+    switch PrefMgr.shared.appleLanguages[0] {
+      case "ja":
+        return "辞書編集"
+      default:
+        if PrefMgr.shared.appleLanguages[0].contains("zh-Hans") {
+          return "语汇编辑"
+        } else if PrefMgr.shared.appleLanguages[0].contains("zh-Hant") {
+          return "語彙編輯"
+        }
+        return "Phrases"
+    }
+  }
 }

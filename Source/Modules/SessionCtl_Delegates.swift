@@ -57,7 +57,8 @@ extension SessionCtl: InputHandlerDelegate {
     // 該臨時資料記錄會在接下來的語言模組資料重載過程中被自動清除。
     let temporaryScore: Double = SessionCtl.areWeNerfing ? -114.514 : 0
     LMMgr.currentLM.insertTemporaryData(
-      key: rawPair.0, unigram: .init(value: rawPair.1, score: temporaryScore), isFiltering: SessionCtl.areWeNerfing
+      keyArray: [rawPair.0], unigram: .init(value: rawPair.1, score: temporaryScore),
+      isFiltering: SessionCtl.areWeNerfing
     )
     // 開始針對使用者半衰模組的清詞處理
     LMMgr.bleachSpecifiedSuggestions(targets: [valueCurrent], mode: IMEApp.currentInputMode)
@@ -71,7 +72,11 @@ extension SessionCtl: InputHandlerDelegate {
 
 extension SessionCtl: CtlCandidateDelegate {
   public var isCandidateState: Bool { state.isCandidateContainer }
-  public var isCandidateContextMenuEnabled: Bool { state.type == .ofCandidates }
+  public var isCandidateContextMenuEnabled: Bool {
+    state.type == .ofCandidates || !clientBundleIdentifier.contains("com.apple.Spotlight")
+      || !clientBundleIdentifier.contains("com.raycast.macos")
+  }
+
   public var showReverseLookupResult: Bool {
     !isVerticalTyping && PrefMgr.shared.showReverseLookupInCandidateUI
   }
@@ -91,12 +96,12 @@ extension SessionCtl: CtlCandidateDelegate {
     PrefMgr.shared.useIMKCandidateWindow ? "123456789" : PrefMgr.shared.candidateKeys
   }
 
-  public func candidatePairs(conv: Bool = false) -> [(String, String)] {
+  public func candidatePairs(conv: Bool = false) -> [([String], String)] {
     if !state.isCandidateContainer || state.candidates.isEmpty { return [] }
-    if !conv || PrefMgr.shared.cns11643Enabled || state.candidates[0].0.contains("_punctuation") {
+    if !conv || PrefMgr.shared.cns11643Enabled || state.candidates[0].0.joined().contains("_punctuation") {
       return state.candidates
     }
-    let convertedCandidates: [(String, String)] = state.candidates.map { theCandidatePair -> (String, String) in
+    let convertedCandidates: [([String], String)] = state.candidates.map { theCandidatePair -> ([String], String) in
       let theCandidate = theCandidatePair.1
       let theConverted = ChineseConverter.kanjiConversionIfRequired(theCandidate)
       let result = (theCandidate == theConverted) ? theCandidate : "\(theConverted)(\(theCandidate))"
@@ -135,7 +140,7 @@ extension SessionCtl: CtlCandidateDelegate {
         // 此時是逐字選字模式，所以「selectedValue.1」是單個字、不用追加處理。
         if PrefMgr.shared.associatedPhrasesEnabled {
           let associates = inputHandler.generateStateOfAssociates(
-            withPair: .init(key: selectedValue.0, value: selectedValue.1)
+            withPair: .init(keyArray: selectedValue.0, value: selectedValue.1)
           )
           switchState(associates.candidates.isEmpty ? IMEState.ofEmpty() : associates)
         } else {
@@ -158,7 +163,7 @@ extension SessionCtl: CtlCandidateDelegate {
       }
       if PrefMgr.shared.associatedPhrasesEnabled {
         let associates = inputHandler.generateStateOfAssociates(
-          withPair: .init(key: selectedValue.0, value: String(valueKept))
+          withPair: .init(keyArray: selectedValue.0, value: String(valueKept))
         )
         if !associates.candidates.isEmpty {
           switchState(associates)
@@ -200,7 +205,7 @@ extension SessionCtl: CtlCandidateDelegate {
     // 該臨時資料記錄會在接下來的語言模組資料重載過程中被自動清除。
     let temporaryScore: Double = (action == .toNerf) ? -114.514 : 0
     LMMgr.currentLM.insertTemporaryData(
-      key: rawPair.0, unigram: .init(value: rawPair.1, score: temporaryScore), isFiltering: action == .toFilter
+      keyArray: rawPair.0, unigram: .init(value: rawPair.1, score: temporaryScore), isFiltering: action == .toFilter
     )
 
     // 開始針對使用者半衰模組的清詞處理
