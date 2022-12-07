@@ -219,6 +219,8 @@ extension vChewingLM {
 
     // MARK: - 核心函式（對外）
 
+    public var isCoreLoaded: Bool { lmCore.isLoaded }
+
     public func hasAssociatedPhrasesFor(pair: Megrez.Compositor.KeyValuePaired) -> Bool {
       lmAssociates.hasValuesFor(pair: pair)
     }
