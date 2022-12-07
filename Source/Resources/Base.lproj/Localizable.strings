@@ -92,6 +92,7 @@
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.";
 "Per-Char Select Mode" = "Per-Char Select Mode";
+"Inline comments are not supported in associated phrases." = "Inline comments are not supported in associated phrases.";
 "CNS11643 Mode" = "CNS11643 Mode";
 "JIS Shinjitai Output" = "JIS Shinjitai Output";
 "Per-Char Associated Phrases" = "Per-Char Associated Phrases";

@@ -92,6 +92,7 @@
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 語彙置換功能已啟用，會波及語彙自訂。";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 無法處理：組字區字數與讀音數不對應。";
 "Per-Char Select Mode" = "模擬逐字選字輸入";
+"Inline comments are not supported in associated phrases." = "聯想詞不支援行內註解。";
 "CNS11643 Mode" = "全字庫模式";
 "JIS Shinjitai Output" = "JIS 新字體模式";
 "Per-Char Associated Phrases" = "逐字選字聯想模式";
