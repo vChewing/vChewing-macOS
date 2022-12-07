@@ -167,11 +167,11 @@ final class TekkonTestsBasic: XCTestCase {
     XCTAssertEqual(composer.getComposition(), "ㄩㄝ")
 
     // Testing tool functions
-    XCTAssertEqual(Tekkon.restoreToneOneInZhuyinKey(target: "ㄉㄧㄠ"), "ㄉㄧㄠ1")
-    XCTAssertEqual(Tekkon.cnvZhuyinChainToTextbookReading(target: "ㄊㄧㄥ-ㄓㄜ˙"), "ㄊㄧㄥ-˙ㄓㄜ")
-    XCTAssertEqual(Tekkon.cnvHanyuPinyinToPhona(target: "bian4-le5-tian1"), "ㄅㄧㄢˋ-ㄌㄜ˙-ㄊㄧㄢ")
+    XCTAssertEqual(Tekkon.restoreToneOneInZhuyinKey(targetJoined: "ㄉㄧㄠ"), "ㄉㄧㄠ1")
+    XCTAssertEqual(Tekkon.cnvZhuyinChainToTextbookReading(targetJoined: "ㄊㄧㄥ-ㄓㄜ˙"), "ㄊㄧㄥ-˙ㄓㄜ")
+    XCTAssertEqual(Tekkon.cnvHanyuPinyinToPhona(targetJoined: "bian4-le5-tian1"), "ㄅㄧㄢˋ-ㄌㄜ˙-ㄊㄧㄢ")
     // 測試這種情形：「如果傳入的字串不包含任何半形英數內容的話，那麼應該直接將傳入的字串原樣返回」。
-    XCTAssertEqual(Tekkon.cnvHanyuPinyinToPhona(target: "ㄅㄧㄢˋ-˙ㄌㄜ-ㄊㄧㄢ"), "ㄅㄧㄢˋ-˙ㄌㄜ-ㄊㄧㄢ")
+    XCTAssertEqual(Tekkon.cnvHanyuPinyinToPhona(targetJoined: "ㄅㄧㄢˋ-˙ㄌㄜ-ㄊㄧㄢ"), "ㄅㄧㄢˋ-˙ㄌㄜ-ㄊㄧㄢ")
   }
 }
 
