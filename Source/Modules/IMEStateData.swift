@@ -192,11 +192,11 @@ extension IMEStateData {
           PrefMgr.shared.alwaysShowTooltipTextsHorizontally || !isVerticalTyping
         {
           // 恢復陰平標記->注音轉拼音->轉教科書式標調
-          neta = Tekkon.restoreToneOneInZhuyinKey(target: neta)
-          neta = Tekkon.cnvPhonaToHanyuPinyin(target: neta)
-          neta = Tekkon.cnvHanyuPinyinToTextbookStyle(target: neta)
+          neta = Tekkon.restoreToneOneInZhuyinKey(targetJoined: neta)
+          neta = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: neta)
+          neta = Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: neta)
         } else {
-          neta = Tekkon.cnvZhuyinChainToTextbookReading(target: neta)
+          neta = Tekkon.cnvZhuyinChainToTextbookReading(targetJoined: neta)
         }
       }
       arrOutput.append(neta)

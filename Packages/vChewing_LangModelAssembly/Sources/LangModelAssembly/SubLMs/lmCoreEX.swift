@@ -103,7 +103,7 @@ extension vChewingLM {
           if !neta[0].isEmpty, !neta[1].isEmpty {
             var theKey = shouldReverse ? String(neta[1]) : String(neta[0])
             let theValue = $0
-            theKey.converToPhonabets()
+            theKey.convertToPhonabets()
             rangeMap[theKey, default: []].append(theValue)
           }
         }
