@@ -308,9 +308,9 @@ extension InputHandler {
     if !prefs.cassetteEnabled {
       if prefs.inlineDumpPinyinInLieuOfZhuyin {
         if !compositor.isEmpty {
-          displayedText = Tekkon.restoreToneOneInZhuyinKey(target: displayedText)  // 恢復陰平標記
+          displayedText = Tekkon.restoreToneOneInZhuyinKey(targetJoined: displayedText)  // 恢復陰平標記
         }
-        displayedText = Tekkon.cnvPhonaToHanyuPinyin(target: displayedText)  // 注音轉拼音
+        displayedText = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: displayedText)  // 注音轉拼音
       }
       if prefs.showHanyuPinyinInCompositionBuffer {
         if compositor.isEmpty {
@@ -340,12 +340,12 @@ extension InputHandler {
       var key = node.keyArray.joined(separator: "\t")
       if !prefs.cassetteEnabled {
         if prefs.inlineDumpPinyinInLieuOfZhuyin {
-          key = Tekkon.restoreToneOneInZhuyinKey(target: key)  // 恢復陰平標記
-          key = Tekkon.cnvPhonaToHanyuPinyin(target: key)  // 注音轉拼音
-          key = Tekkon.cnvHanyuPinyinToTextbookStyle(target: key)  // 轉教科書式標調
+          key = Tekkon.restoreToneOneInZhuyinKey(targetJoined: key)  // 恢復陰平標記
+          key = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: key)  // 注音轉拼音
+          key = Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: key)  // 轉教科書式標調
           key = key.replacingOccurrences(of: "\t", with: " ")
         } else {
-          key = Tekkon.cnvZhuyinChainToTextbookReading(target: key, newSeparator: " ")
+          key = Tekkon.cnvZhuyinChainToTextbookReading(targetJoined: key, newSeparator: " ")
         }
       }
 
