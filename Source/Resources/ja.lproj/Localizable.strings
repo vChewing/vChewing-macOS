@@ -92,6 +92,7 @@
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 言葉置換機能稼働中、新添付言葉にも影響。";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 対処不可：緩衝列の字数は読みの数と不同等。";
 "Per-Char Select Mode" = "全候補入力モード";
+"Inline comments are not supported in associated phrases." = "インラインメモは連想語彙辞書で使えません。";
 "CNS11643 Mode" = "全字庫モード";
 "JIS Shinjitai Output" = "JIS 新字体モード";
 "Per-Char Associated Phrases" = "全候補入力で連想語彙";

@@ -18,6 +18,7 @@ extension NSToolbarItem.Identifier {
   fileprivate static let ofGeneral = NSToolbarItem.Identifier(rawValue: "tabGeneral")
   fileprivate static let ofExperience = NSToolbarItem.Identifier(rawValue: "tabExperience")
   fileprivate static let ofDictionary = NSToolbarItem.Identifier(rawValue: "tabDictionary")
+  fileprivate static let ofPhrases = NSToolbarItem.Identifier(rawValue: "tabPhrases")
   fileprivate static let ofCassette = NSToolbarItem.Identifier(rawValue: "tabCassette")
   fileprivate static let ofKeyboard = NSToolbarItem.Identifier(rawValue: "tabKeyboard")
   fileprivate static let ofDevZone = NSToolbarItem.Identifier(rawValue: "tabDevZone")
@@ -38,9 +39,30 @@ class CtlPrefWindow: NSWindowController {
   @IBOutlet var tglControlDevZoneIMKCandidate: NSButton!
   @IBOutlet var cmbCandidateFontSize: NSPopUpButton!
 
+  @IBOutlet var cmbPEInputModeMenu: NSPopUpButton!
+  @IBOutlet var cmbPEDataTypeMenu: NSPopUpButton!
+  @IBOutlet var btnPEReload: NSButton!
+  @IBOutlet var btnPEConsolidate: NSButton!
+  @IBOutlet var btnPESave: NSButton!
+  @IBOutlet var btnPEAdd: NSButton!
+  @IBOutlet var btnPEOpenExternally: NSButton!
+  @IBOutlet var tfdPETextEditor: NSTextView!
+  @IBOutlet var txtPECommentField: NSTextField!
+  @IBOutlet var txtPEField1: NSTextField!
+  @IBOutlet var txtPEField2: NSTextField!
+  @IBOutlet var txtPEField3: NSTextField!
+  var isLoading = false {
+    didSet { setPEUIControlAvailability() }
+  }
+
+  var isSaved = false {
+    didSet { setPEUIControlAvailability() }
+  }
+
   @IBOutlet var vwrGeneral: NSView!
   @IBOutlet var vwrExperience: NSView!
   @IBOutlet var vwrDictionary: NSView!
+  @IBOutlet var vwrPhrases: NSView!
   @IBOutlet var vwrCassette: NSView!
   @IBOutlet var vwrKeyboard: NSView!
   @IBOutlet var vwrDevZone: NSView!
@@ -152,6 +174,8 @@ class CtlPrefWindow: NSWindowController {
     if PrefMgr.shared.useIMKCandidateWindow {
       selectionKeyComboBox.isEnabled = false  // 無法與 IMKCandidates 協作，故禁用。
     }
+
+    initPhraseEditor()
   }
 
   // 這裡有必要加上這段處理，用來確保藉由偏好設定介面動過的 CNS 開關能夠立刻生效。
@@ -343,6 +367,8 @@ class CtlPrefWindow: NSWindowController {
   }
 }
 
+// MARK: - NSToolbarDelegate Methods
+
 extension CtlPrefWindow: NSToolbarDelegate {
   func use(view: NSView) {
     guard let window = window else {
@@ -360,7 +386,7 @@ extension CtlPrefWindow: NSToolbarDelegate {
   }
 
   var toolbarIdentifiers: [NSToolbarItem.Identifier] {
-    [.ofGeneral, .ofExperience, .ofDictionary, .ofCassette, .ofKeyboard]
+    [.ofGeneral, .ofExperience, .ofDictionary, .ofPhrases, .ofCassette, .ofKeyboard]
   }
 
   func toolbarDefaultItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
@@ -388,6 +414,11 @@ extension CtlPrefWindow: NSToolbarDelegate {
   @objc func showDictionaryView(_: Any?) {
     use(view: vwrDictionary)
     window?.toolbar?.selectedItemIdentifier = .ofDictionary
+  }
+
+  @objc func showPhrasesView(_: Any?) {
+    use(view: vwrPhrases)
+    window?.toolbar?.selectedItemIdentifier = .ofPhrases
   }
 
   @objc func showCassetteView(_: Any?) {
@@ -429,6 +460,11 @@ extension CtlPrefWindow: NSToolbarDelegate {
         item.label = title
         item.image = .tabImageDictionary
         item.action = #selector(showDictionaryView(_:))
+
+      case .ofPhrases:
+        item.label = CtlPrefWindow.locPhrasesTabTitle
+        item.image = .tabImagePhrases
+        item.action = #selector(showPhrasesView(_:))
 
       case .ofCassette:
         let title = NSLocalizedString("Cassette", comment: "")
