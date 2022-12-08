@@ -40,7 +40,6 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
     tfdPETextEditor.string = NSLocalizedString("Loading…", comment: "")
     DispatchQueue.main.async { [self] in
       tfdPETextEditor.string = LMMgr.retrieveData(mode: selInputMode, type: selUserDataType)
-      isSaved = true
       isLoading = false
     }
   }
@@ -176,19 +175,16 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
         LMMgr.shared.tagOverrides(in: &tfdPETextEditor.string, mode: selInputMode)
       }
       isLoading = false
-      isSaved = false
     }
   }
 
   @IBAction func savePEButtonClicked(_: NSButton) {
-    // guard !isSaved else { return }
     let toSave = tfdPETextEditor.string
     isLoading = true
     tfdPETextEditor.string = NSLocalizedString("Loading…", comment: "")
     let newResult = LMMgr.saveData(mode: selInputMode, type: selUserDataType, data: toSave)
     tfdPETextEditor.string = newResult
     isLoading = false
-    isSaved = true
   }
 
   @IBAction func openExternallyPEButtonClicked(_: NSButton) {
@@ -224,7 +220,6 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
         arrResult.insert("\n", at: 0)
       }
       tfdPETextEditor.string.append(arrResult.joined(separator: " ") + "\n")
-      isSaved = false
       clearAllFields()
     }
   }
