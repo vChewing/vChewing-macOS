@@ -23,14 +23,18 @@ public class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCen
 // MARK: - Private Functions
 
 extension AppDelegate {
-  private func reloadOnFolderChangeHappens() {
+  private func reloadOnFolderChangeHappens(forced: Bool = true) {
     // 拖 100ms 再重載，畢竟有些有特殊需求的使用者可能會想使用巨型自訂語彙檔案。
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
-      if #available(macOS 10.15, *) { FileObserveProject.shared.touch() }
-      if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
-        CtlPrefWindow.shared?.updatePhraseEditor()
+      // forced 用於剛剛切換了辭典檔案目錄的場合。
+      // 先執行 initUserLangModels() 可以在目標辭典檔案不存在的情況下先行生成空白範本檔案。
+      if PrefMgr.shared.shouldAutoReloadUserDataFiles || forced { LMMgr.initUserLangModels() }
+      DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
+        if #available(macOS 10.15, *) { FileObserveProject.shared.touch() }
+        if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
+          CtlPrefWindow.shared?.updatePhraseEditor()
+        }
       }
-      if PrefMgr.shared.shouldAutoReloadUserDataFiles { LMMgr.initUserLangModels() }
     }
   }
 }
@@ -85,7 +89,10 @@ extension AppDelegate {
     folderMonitor.folderDidChange = { [weak self] in
       self?.reloadOnFolderChangeHappens()
     }
-    if LMMgr.userDataFolderExists { folderMonitor.startMonitoring() }
+    if LMMgr.userDataFolderExists {  // 沒有資料夾的話，FolderMonitor 會崩潰。
+      folderMonitor.startMonitoring()
+      reloadOnFolderChangeHappens(forced: true)
+    }
   }
 
   public func selfUninstall() {
