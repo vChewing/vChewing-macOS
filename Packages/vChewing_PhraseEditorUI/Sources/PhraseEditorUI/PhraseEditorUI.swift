@@ -44,7 +44,6 @@ public struct VwrPhraseEditorUI: View {
   @State public var selUserDataType: vChewingLM.ReplacableUserDataType = .thePhrases
   @State private var isLoading = false
   @State private var isSaved = false
-  @State private var redrawTrigger = false
 
   public var currentIMEInputMode: Shared.InputMode {
     delegate?.currentInputMode ?? selInputMode
@@ -76,12 +75,10 @@ public struct VwrPhraseEditorUI: View {
     guard let delegate = delegate else { return }
     updateLabels()
     clearAllFields()
-    isLoading = true
     txtContent = NSLocalizedString("Loading…", comment: "")
-    redrawTrigger.toggle()
+    isLoading = true
     DispatchQueue.main.async {
       txtContent = delegate.retrieveData(mode: selInputMode, type: selUserDataType)
-      redrawTrigger.toggle()
       isSaved = true
       isLoading = false
     }
@@ -166,12 +163,10 @@ public struct VwrPhraseEditorUI: View {
   private func saveAndReload() {
     guard let delegate = delegate, selInputMode != .imeModeNULL, !isSaved else { return }
     let toSave = txtContent
-    isLoading = true
     txtContent = NSLocalizedString("Loading…", comment: "")
-    redrawTrigger.toggle()
+    isLoading = true
     let newResult = delegate.saveData(mode: selInputMode, type: selUserDataType, data: toSave)
     txtContent = newResult
-    redrawTrigger.toggle()
     isLoading = false
     isSaved = true
   }
@@ -302,7 +297,6 @@ public struct VwrPhraseEditorUI: View {
       selInputMode = .imeModeNULL
       selUserDataType = .thePhrases
       txtContent = NSLocalizedString("Please select Simplified / Traditional Chinese mode above.", comment: "")
-      redrawTrigger.toggle()
     }.onAppear {
       guard let delegate = delegate else { return }
       selInputMode = delegate.currentInputMode
