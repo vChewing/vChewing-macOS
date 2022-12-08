@@ -55,10 +55,6 @@ class CtlPrefWindow: NSWindowController {
     didSet { setPEUIControlAvailability() }
   }
 
-  var isSaved = false {
-    didSet { setPEUIControlAvailability() }
-  }
-
   @IBOutlet var vwrGeneral: NSView!
   @IBOutlet var vwrExperience: NSView!
   @IBOutlet var vwrDictionary: NSView!
