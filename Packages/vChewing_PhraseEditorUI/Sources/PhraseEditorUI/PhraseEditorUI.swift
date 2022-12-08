@@ -142,7 +142,7 @@ public struct VwrPhraseEditorUI: View {
         userPhrase: txtAddPhraseField1, mode: selInputMode, key: txtAddPhraseField2
       )
     {
-      arrResult.append("\t#𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎")
+      arrResult.append(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎")
     }
     if let lastChar = txtContent.last, !"\n".contains(lastChar) {
       arrResult.insert("\n", at: 0)
