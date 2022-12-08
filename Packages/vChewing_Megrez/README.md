@@ -57,7 +57,7 @@ class IMKMyInputController: IMKInputController {
 ```swift
 class ExampleLM: Megrez.LangModel {
 ...
-  override func unigramsFor(key: String) -> [Megrez.Unigram] {
+  override func unigramsFor(keyArray: [String]) -> [Megrez.Unigram] {
     ...
   }
 ...
@@ -65,8 +65,8 @@ class ExampleLM: Megrez.LangModel {
 ```
 
 這個型別需要下述兩個函式能夠針對給定的鍵回饋對應的資料值、或其存無狀態：
-- unigramsFor(key: String) -> [Megrez.Unigram]
-- hasUnigramsFor(key: String) -> Bool
+- unigramsFor(keyArray: [String]) -> [Megrez.Unigram]
+- hasUnigramsFor(keyArray: [String]) -> Bool
 
 MegrezTests.swift 檔案內的 SimpleLM 可以作為範例。
 
@@ -82,7 +82,7 @@ MegrezTests.swift 檔案內的 SimpleLM 可以作為範例。
 - `compositor.insertKey("gao1")` 可以在當前的游標位置插入讀音「gao1」。
 - `compositor.dropKey(direction: .front)` 的作用是：朝著往文字輸入方向、砍掉一個與游標相鄰的讀音。反之，`dropKey(direction: .rear)` 則朝著與文字輸入方向相反的方向、砍掉一個與游標相鄰的讀音。
   - 在威注音的術語體系當中，「文字輸入方向」為向前（Front）、與此相反的方向為向後（Rear）。
-- `compositor.overrideCandidate(.init(key: "讀音", value: "候選字"), at: 游標位置, overrideType: 覆寫模式)` 用來根據輸入法選中的候選字詞、據此更新當前游標位置選中的候選字詞節點當中的候選字詞。
+- `compositor.overrideCandidate(.init(keyArray: ["讀音"], value: "候選字"), at: 游標位置, overrideType: 覆寫模式)` 用來根據輸入法選中的候選字詞、據此更新當前游標位置選中的候選字詞節點當中的候選字詞。
 
 輸入完內容之後，可以聲明一個用來接收結果的變數：
 
