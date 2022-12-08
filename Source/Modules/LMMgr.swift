@@ -577,7 +577,7 @@ public class LMMgr {
         // Do not use ASCII characters to comment here.
         // Otherwise, it will be scrambled by cnvHYPYtoBPMF
         // module shipped in the vChewing Phrase Editor.
-        currentMarkedPhrase += "\t#𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎"
+        currentMarkedPhrase += " #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎"
       }
 
       if let writeFile = FileHandle(forUpdatingAtPath: theURL.path),

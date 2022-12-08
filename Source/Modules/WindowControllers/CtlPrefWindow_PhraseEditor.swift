@@ -214,7 +214,7 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
       if LMMgr.checkIfUserPhraseExist(
         userPhrase: txtPEField1.stringValue, mode: selInputMode, key: txtPEField2.stringValue
       ) {
-        arrResult.append("\t#𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎")
+        arrResult.append(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎")
       }
       if let lastChar = tfdPETextEditor.string.last, !"\n".contains(lastChar) {
         arrResult.insert("\n", at: 0)
