@@ -279,8 +279,8 @@ public class LMMgr {
     key unigramKey: String
   ) -> Bool {
     switch mode {
-      case .imeModeCHS: return lmCHS.hasKeyValuePairFor(key: [unigramKey], value: userPhrase)
-      case .imeModeCHT: return lmCHT.hasKeyValuePairFor(key: [unigramKey], value: userPhrase)
+      case .imeModeCHS: return lmCHS.hasKeyValuePairFor(keyArray: [unigramKey], value: userPhrase)
+      case .imeModeCHT: return lmCHT.hasKeyValuePairFor(keyArray: [unigramKey], value: userPhrase)
       case .imeModeNULL: return false
     }
   }
