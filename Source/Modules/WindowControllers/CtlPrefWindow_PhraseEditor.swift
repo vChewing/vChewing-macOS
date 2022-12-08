@@ -40,7 +40,6 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
     tfdPETextEditor.string = NSLocalizedString("Loading…", comment: "")
     DispatchQueue.main.async { [self] in
       tfdPETextEditor.string = LMMgr.retrieveData(mode: selInputMode, type: selUserDataType)
-      isSaved = true
       isLoading = false
     }
   }
@@ -172,25 +171,26 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
     DispatchQueue.main.async { [self] in
       isLoading = true
       vChewingLM.LMConsolidator.consolidate(text: &tfdPETextEditor.string, pragma: false)
+      if selUserDataType == .thePhrases {
+        LMMgr.shared.tagOverrides(in: &tfdPETextEditor.string, mode: selInputMode)
+      }
       isLoading = false
-      isSaved = false
     }
   }
 
   @IBAction func savePEButtonClicked(_: NSButton) {
-    // guard !isSaved else { return }
     let toSave = tfdPETextEditor.string
     isLoading = true
     tfdPETextEditor.string = NSLocalizedString("Loading…", comment: "")
     let newResult = LMMgr.saveData(mode: selInputMode, type: selUserDataType, data: toSave)
     tfdPETextEditor.string = newResult
     isLoading = false
-    isSaved = true
   }
 
   @IBAction func openExternallyPEButtonClicked(_: NSButton) {
     DispatchQueue.main.async { [self] in
-      LMMgr.shared.openPhraseFile(mode: selInputMode, type: selUserDataType, app: "Finder")
+      let app: String = NSEvent.modifierFlags.contains(.option) ? "TextEdit" : "Finder"
+      LMMgr.shared.openPhraseFile(mode: selInputMode, type: selUserDataType, app: app)
     }
   }
 
@@ -214,13 +214,12 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
       if LMMgr.checkIfUserPhraseExist(
         userPhrase: txtPEField1.stringValue, mode: selInputMode, key: txtPEField2.stringValue
       ) {
-        arrResult.append("\t#𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎")
+        arrResult.append(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎")
       }
       if let lastChar = tfdPETextEditor.string.last, !"\n".contains(lastChar) {
         arrResult.insert("\n", at: 0)
       }
       tfdPETextEditor.string.append(arrResult.joined(separator: " ") + "\n")
-      isSaved = false
       clearAllFields()
     }
   }

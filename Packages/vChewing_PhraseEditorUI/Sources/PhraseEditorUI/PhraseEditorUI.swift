@@ -43,8 +43,6 @@ public struct VwrPhraseEditorUI: View {
   @State public var selInputMode: Shared.InputMode = .imeModeNULL
   @State public var selUserDataType: vChewingLM.ReplacableUserDataType = .thePhrases
   @State private var isLoading = false
-  @State private var isSaved = false
-  @State private var redrawTrigger = false
 
   public var currentIMEInputMode: Shared.InputMode {
     delegate?.currentInputMode ?? selInputMode
@@ -76,13 +74,10 @@ public struct VwrPhraseEditorUI: View {
     guard let delegate = delegate else { return }
     updateLabels()
     clearAllFields()
-    isLoading = true
     txtContent = NSLocalizedString("Loading…", comment: "")
-    redrawTrigger.toggle()
+    isLoading = true
     DispatchQueue.main.async {
       txtContent = delegate.retrieveData(mode: selInputMode, type: selUserDataType)
-      redrawTrigger.toggle()
-      isSaved = true
       isLoading = false
     }
   }
@@ -142,13 +137,12 @@ public struct VwrPhraseEditorUI: View {
         userPhrase: txtAddPhraseField1, mode: selInputMode, key: txtAddPhraseField2
       )
     {
-      arrResult.append("\t#𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎")
+      arrResult.append(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎")
     }
     if let lastChar = txtContent.last, !"\n".contains(lastChar) {
       arrResult.insert("\n", at: 0)
     }
     txtContent.append(arrResult.joined(separator: " ") + "\n")
-    isSaved = false
     clearAllFields()
   }
 
@@ -164,16 +158,13 @@ public struct VwrPhraseEditorUI: View {
   }
 
   private func saveAndReload() {
-    guard let delegate = delegate, selInputMode != .imeModeNULL, !isSaved else { return }
+    guard let delegate = delegate, selInputMode != .imeModeNULL else { return }
     let toSave = txtContent
-    isLoading = true
     txtContent = NSLocalizedString("Loading…", comment: "")
-    redrawTrigger.toggle()
+    isLoading = true
     let newResult = delegate.saveData(mode: selInputMode, type: selUserDataType, data: toSave)
     txtContent = newResult
-    redrawTrigger.toggle()
     isLoading = false
-    isSaved = true
   }
 
   private func consolidate() {
@@ -181,13 +172,16 @@ public struct VwrPhraseEditorUI: View {
     DispatchQueue.main.async {
       isLoading = true
       delegate.consolidate(text: &txtContent, pragma: false)  // 強制整理
+      if selUserDataType == .thePhrases {
+        delegate.tagOverrides(in: &txtContent, mode: selInputMode)
+      }
       isLoading = false
-      isSaved = false
     }
   }
 
   private func callExternalAppToOpenPhraseFile() {
-    delegate?.openPhraseFile(mode: selInputMode, type: selUserDataType, app: "Finder")
+    let app: String = NSEvent.modifierFlags.contains(.option) ? "TextEdit" : "Finder"
+    delegate?.openPhraseFile(mode: selInputMode, type: selUserDataType, app: app)
   }
 
   // MARK: - Main View.
@@ -238,11 +232,11 @@ public struct VwrPhraseEditorUI: View {
           Button("Save") {
             DispatchQueue.main.async { saveAndReload() }
           }.keyboardShortcut("s", modifiers: [.command])
-            .disabled(isSaved || delegate == nil)
+            .disabled(delegate == nil)
         } else {
           Button("Save") {
             DispatchQueue.main.async { saveAndReload() }
-          }.disabled(isSaved || delegate == nil)
+          }
         }
         Button("...") {
           DispatchQueue.main.async {
@@ -252,7 +246,7 @@ public struct VwrPhraseEditorUI: View {
         }
       }
 
-      TextEditorEX(text: $txtContent.onChange { isSaved = false })
+      TextEditorEX(text: $txtContent)
         .disabled(selInputMode == .imeModeNULL || isLoading)
         .frame(minWidth: 320, minHeight: 240)
         .backport.onChange(of: fileChangeIndicator.id) { _ in
@@ -301,7 +295,6 @@ public struct VwrPhraseEditorUI: View {
       selInputMode = .imeModeNULL
       selUserDataType = .thePhrases
       txtContent = NSLocalizedString("Please select Simplified / Traditional Chinese mode above.", comment: "")
-      redrawTrigger.toggle()
     }.onAppear {
       guard let delegate = delegate else { return }
       selInputMode = delegate.currentInputMode

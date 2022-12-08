@@ -291,11 +291,14 @@ extension vChewingLM {
 
     /// 根據給定的索引鍵和資料值，確認是否有該具體的資料值在庫。
     /// - Parameters:
-    ///   - key: 索引鍵陣列。
+    ///   - keyArray: 索引鍵陣列。
     ///   - value: 資料值。
+    ///   - factoryDictionaryOnly: 是否僅自原廠辭典確認在庫。
     /// - Returns: 是否在庫。
-    public func hasKeyValuePairFor(key: [String], value: String) -> Bool {
-      unigramsFor(keyArray: key).map(\.value).contains(value)
+    public func hasKeyValuePairFor(keyArray: [String], value: String, factoryDictionaryOnly: Bool = false) -> Bool {
+      factoryDictionaryOnly
+        ? lmCore.unigramsFor(key: keyArray.joined(separator: "-")).map(\.value).contains(value)
+        : unigramsFor(keyArray: keyArray).map(\.value).contains(value)
     }
 
     /// 給定讀音字串，讓 LMI 給出對應的經過處理的單元圖陣列。
