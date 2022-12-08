@@ -276,11 +276,18 @@ public class LMMgr {
   public static func checkIfUserPhraseExist(
     userPhrase: String,
     mode: Shared.InputMode,
-    key unigramKey: String
+    key unigramKey: String,
+    factoryDictionaryOnly: Bool = false
   ) -> Bool {
     switch mode {
-      case .imeModeCHS: return lmCHS.hasKeyValuePairFor(keyArray: [unigramKey], value: userPhrase)
-      case .imeModeCHT: return lmCHT.hasKeyValuePairFor(keyArray: [unigramKey], value: userPhrase)
+      case .imeModeCHS:
+        return lmCHS.hasKeyValuePairFor(
+          keyArray: [unigramKey], value: userPhrase, factoryDictionaryOnly: factoryDictionaryOnly
+        )
+      case .imeModeCHT:
+        return lmCHT.hasKeyValuePairFor(
+          keyArray: [unigramKey], value: userPhrase, factoryDictionaryOnly: factoryDictionaryOnly
+        )
       case .imeModeNULL: return false
     }
   }
@@ -781,5 +788,21 @@ extension LMMgr: PhraseEditorDelegate {
       }
     }
     return data
+  }
+
+  public func tagOverrides(in strProcessed: inout String, mode: Shared.InputMode) {
+    let outputStack: NSMutableString = .init()
+    for currentLine in strProcessed.split(separator: "\n") {
+      let arr = currentLine.split(separator: " ")
+      guard arr.count >= 2 else { continue }
+      let exists = Self.checkIfUserPhraseExist(
+        userPhrase: arr[0].description, mode: mode, key: arr[1].description, factoryDictionaryOnly: true
+      )
+      outputStack.append(currentLine.description)
+      let replace = !currentLine.contains(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎") && exists
+      if replace { outputStack.append(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎") }
+      outputStack.append("\n")
+    }
+    strProcessed = outputStack.description
   }
 }
