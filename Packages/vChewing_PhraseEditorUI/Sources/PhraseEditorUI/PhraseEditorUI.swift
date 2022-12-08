@@ -43,7 +43,6 @@ public struct VwrPhraseEditorUI: View {
   @State public var selInputMode: Shared.InputMode = .imeModeNULL
   @State public var selUserDataType: vChewingLM.ReplacableUserDataType = .thePhrases
   @State private var isLoading = false
-  @State private var isSaved = false
 
   public var currentIMEInputMode: Shared.InputMode {
     delegate?.currentInputMode ?? selInputMode
@@ -79,7 +78,6 @@ public struct VwrPhraseEditorUI: View {
     isLoading = true
     DispatchQueue.main.async {
       txtContent = delegate.retrieveData(mode: selInputMode, type: selUserDataType)
-      isSaved = true
       isLoading = false
     }
   }
@@ -145,7 +143,6 @@ public struct VwrPhraseEditorUI: View {
       arrResult.insert("\n", at: 0)
     }
     txtContent.append(arrResult.joined(separator: " ") + "\n")
-    isSaved = false
     clearAllFields()
   }
 
@@ -161,14 +158,13 @@ public struct VwrPhraseEditorUI: View {
   }
 
   private func saveAndReload() {
-    guard let delegate = delegate, selInputMode != .imeModeNULL, !isSaved else { return }
+    guard let delegate = delegate, selInputMode != .imeModeNULL else { return }
     let toSave = txtContent
     txtContent = NSLocalizedString("Loading…", comment: "")
     isLoading = true
     let newResult = delegate.saveData(mode: selInputMode, type: selUserDataType, data: toSave)
     txtContent = newResult
     isLoading = false
-    isSaved = true
   }
 
   private func consolidate() {
@@ -180,7 +176,6 @@ public struct VwrPhraseEditorUI: View {
         delegate.tagOverrides(in: &txtContent, mode: selInputMode)
       }
       isLoading = false
-      isSaved = false
     }
   }
 
@@ -237,11 +232,11 @@ public struct VwrPhraseEditorUI: View {
           Button("Save") {
             DispatchQueue.main.async { saveAndReload() }
           }.keyboardShortcut("s", modifiers: [.command])
-            .disabled(isSaved || delegate == nil)
+            .disabled(delegate == nil)
         } else {
           Button("Save") {
             DispatchQueue.main.async { saveAndReload() }
-          }.disabled(isSaved || delegate == nil)
+          }
         }
         Button("...") {
           DispatchQueue.main.async {
@@ -251,7 +246,7 @@ public struct VwrPhraseEditorUI: View {
         }
       }
 
-      TextEditorEX(text: $txtContent.onChange { isSaved = false })
+      TextEditorEX(text: $txtContent)
         .disabled(selInputMode == .imeModeNULL || isLoading)
         .frame(minWidth: 320, minHeight: 240)
         .backport.onChange(of: fileChangeIndicator.id) { _ in
