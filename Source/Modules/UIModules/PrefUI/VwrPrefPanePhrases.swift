@@ -37,11 +37,11 @@ struct VwrPrefPanePhrases: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Container(contentWidth: contentWidth) {
-        SSPreferences.Section(title: "", bottomDivider: true) {
-          VwrPhraseEditorUI(delegate: LMMgr.shared).frame(height: 395)
-        }
+      VStack() {
+        VwrPhraseEditorUI(delegate: LMMgr.shared).frame(width: contentWidth + 28, height: 395)
+        Spacer()
       }
+      .padding()
     }
     .frame(maxHeight: contentMaxHeight).fixedSize(horizontal: false, vertical: true)
   }
