@@ -172,6 +172,9 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
     DispatchQueue.main.async { [self] in
       isLoading = true
       vChewingLM.LMConsolidator.consolidate(text: &tfdPETextEditor.string, pragma: false)
+      if selUserDataType == .thePhrases {
+        LMMgr.shared.tagOverrides(in: &tfdPETextEditor.string, mode: selInputMode)
+      }
       isLoading = false
       isSaved = false
     }

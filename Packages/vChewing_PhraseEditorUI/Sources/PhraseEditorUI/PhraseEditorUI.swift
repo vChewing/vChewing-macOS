@@ -176,6 +176,9 @@ public struct VwrPhraseEditorUI: View {
     DispatchQueue.main.async {
       isLoading = true
       delegate.consolidate(text: &txtContent, pragma: false)  // 強制整理
+      if selUserDataType == .thePhrases {
+        delegate.tagOverrides(in: &txtContent, mode: selInputMode)
+      }
       isLoading = false
       isSaved = false
     }
