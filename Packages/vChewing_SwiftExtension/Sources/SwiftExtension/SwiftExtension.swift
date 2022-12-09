@@ -8,6 +8,12 @@
 
 import Foundation
 
+// MARK: - String.localized extension
+
+extension StringLiteralType {
+  public var localized: String { NSLocalizedString(description, comment: "") }
+}
+
 // MARK: - Root Extensions
 
 // Extend the RangeReplaceableCollection to allow it clean duplicated characters.
