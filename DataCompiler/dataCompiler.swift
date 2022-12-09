@@ -126,6 +126,15 @@ private let urlOutputCHS: String = "./data-chs.txt"
 private let urlPlistCHS: String = "./data-chs.plist"
 private let urlOutputCHT: String = "./data-cht.txt"
 private let urlPlistCHT: String = "./data-cht.plist"
+private let urlPlistBPMFReverseLookup: String = "./data-bpmf-reverse-lookup.plist"
+private let urlPlistBPMFReverseLookupCNS1: String = "./data-bpmf-reverse-lookup-CNS1.plist"
+private let urlPlistBPMFReverseLookupCNS2: String = "./data-bpmf-reverse-lookup-CNS2.plist"
+private let urlPlistBPMFReverseLookupCNS3: String = "./data-bpmf-reverse-lookup-CNS3.plist"
+private let urlPlistBPMFReverseLookupCNS4: String = "./data-bpmf-reverse-lookup-CNS4.plist"
+private let urlPlistBPMFReverseLookupCNS5: String = "./data-bpmf-reverse-lookup-CNS5.plist"
+private let urlPlistBPMFReverseLookupCNS6: String = "./data-bpmf-reverse-lookup-CNS6.plist"
+
+private var isReverseLookupDictionaryProcessed: Bool = false
 
 // MARK: - 載入詞組檔案且輸出陣列
 
@@ -233,6 +242,7 @@ func rawDictForKanjis(isCHS: Bool) -> [Unigram] {
   let arrData = Array(
     NSOrderedSet(array: strRAW.components(separatedBy: "\n")).array as! [String])
   var varLineData = ""
+  var mapReverseLookup: [String: [Data]] = [:]
   for lineData in arrData {
     // 簡體中文的話，提取 1,2,4；繁體中文的話，提取 1,3,4。
     let varLineDataPre = lineData.components(separatedBy: " ").prefix(isCHS ? 2 : 1)
@@ -271,12 +281,24 @@ func rawDictForKanjis(isCHS: Bool) -> [Unigram] {
       }
     }
     if phrase != "" {  // 廢掉空數據；之後無須再這樣處理。
+      if !isReverseLookupDictionaryProcessed {
+        mapReverseLookup[phrase, default: []].append(cnvPhonabetToASCII(phone).data(using: .utf8)!)
+      }
       arrUnigramRAW += [
         Unigram(
           key: phone, value: phrase, score: 0.0,
           count: occurrence
         )
       ]
+    }
+  }
+  if !isReverseLookupDictionaryProcessed {
+    do {
+      isReverseLookupDictionaryProcessed = true
+      try PropertyListSerialization.data(fromPropertyList: mapReverseLookup, format: .binary, options: 0).write(
+        to: URL(fileURLWithPath: urlPlistBPMFReverseLookup))
+    } catch {
+      NSLog(" - Core Reverse Lookup Data Generation Failed.")
     }
   }
   NSLog(" - \(i18n): 成功生成單字語料辭典（權重待計算）。")
@@ -369,6 +391,7 @@ func weightAndSort(_ arrStructUncalculated: [Unigram], isCHS: Bool) -> [Unigram]
         * Double(unigram.count)
     }
   }
+  NSLog(" - \(i18n): NORM 計算值為 \(norm)。")
   // norm 計算完畢，開始將 norm 作為新的固定常數來為每個詞條記錄計算權重。
   // 將新酷音的詞語出現次數數據轉換成小麥引擎可讀的數據形式。
   // 對出現次數小於 1 的詞條，將 0 當成 0.5 來處理、以防止除零。
@@ -398,10 +421,11 @@ func weightAndSort(_ arrStructUncalculated: [Unigram], isCHS: Bool) -> [Unigram]
   NSLog(" - \(i18n): 成功計算權重。")
   // ==========================================
   // 接下來是排序，先按照注音遞減排序一遍、再按照權重遞減排序一遍。
-  let arrStructSorted: [Unigram] = arrStructCalculated.sorted(by: { lhs, rhs -> Bool in
+  var arrStructSorted: [Unigram] = arrStructCalculated.sorted(by: { lhs, rhs -> Bool in
     (lhs.key, rhs.count) < (rhs.key, lhs.count)
   })
   NSLog(" - \(i18n): 排序整理完畢，準備編譯要寫入的檔案內容。")
+  arrStructSorted.append(Unigram(key: "__NORM__", value: norm.description, score: 0, count: 0))
   return arrStructSorted
 }
 
@@ -419,9 +443,15 @@ func fileOutput(isCHS: Bool) {
     strPunctuation = try String(contentsOfFile: urlPunctuation, encoding: .utf8).replacingOccurrences(
       of: "\t", with: " "
     )
+    if let charLast = strPunctuation.last, !"\n".contains(charLast) {
+      strPunctuation += "\n"
+    }
     strPrintLine += try String(contentsOfFile: urlPunctuation, encoding: .utf8).replacingOccurrences(
       of: "\t", with: " "
     )
+    if let charLast = strPunctuation.last, !"\n".contains(charLast) {
+      strPunctuation += "\n"
+    }
   } catch {
     NSLog(" - \(i18n): Exception happened when reading raw punctuation data.")
   }
@@ -438,6 +468,7 @@ func fileOutput(isCHS: Bool) {
       }
     }
   }
+
   var arrStructUnified: [Unigram] = []
   arrStructUnified += rawDictForKanjis(isCHS: isCHS)
   arrStructUnified += rawDictForNonKanjis(isCHS: isCHS)
@@ -465,13 +496,16 @@ func fileOutput(isCHS: Bool) {
     if !theKey.contains("_punctuation_list") {
       rangeMap[cnvPhonabetToASCII(theKey), default: []].append(theValue.data(using: .utf8)!)
     }
-    strPrintLine +=
-      unigram.key + " " + unigram.value + " " + String(unigram.score)
-      + "\n"
+    strPrintLine += unigram.key + " " + unigram.value
+    strPrintLine += " " + String(unigram.score)
+    if unigram.count != 0 {
+      strPrintLine += " " + String(unigram.count)
+    }
+    strPrintLine += "\n"
   }
   NSLog(" - \(i18n): 要寫入檔案的 txt 內容編譯完畢。")
   do {
-    try strPrintLine.write(to: pathOutput, atomically: false, encoding: .utf8)
+    try strPrintLine.write(to: pathOutput, atomically: true, encoding: .utf8)
     let plistData = try PropertyListSerialization.data(fromPropertyList: rangeMap, format: .binary, options: 0)
     try plistData.write(to: plistURL)
   } catch {
@@ -494,6 +528,12 @@ func commonFileOutput() {
   var mapSymbols: [String: [Data]] = [:]
   var mapZhuyinwen: [String: [Data]] = [:]
   var mapCNS: [String: [Data]] = [:]
+  var mapReverseLookupCNS1: [String: [Data]] = [:]
+  var mapReverseLookupCNS2: [String: [Data]] = [:]
+  var mapReverseLookupCNS3: [String: [Data]] = [:]
+  var mapReverseLookupCNS4: [String: [Data]] = [:]
+  var mapReverseLookupCNS5: [String: [Data]] = [:]
+  var mapReverseLookupCNS6: [String: [Data]] = [:]
   // 讀取標點內容
   do {
     strSymbols = try String(contentsOfFile: urlSymbols, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
@@ -534,6 +574,32 @@ func commonFileOutput() {
       let theValue = String(neta[0])
       if !neta[0].isEmpty, !neta[1].isEmpty, line.first != "#" {
         mapCNS[cnvPhonabetToASCII(theKey), default: []].append(theValue.data(using: .utf8)!)
+        plist: if !theKey.contains("_"), !theKey.contains("-") {
+          if mapReverseLookupCNS1.keys.count <= 16500 {
+            mapReverseLookupCNS1[theValue, default: []].append(cnvPhonabetToASCII(theKey).data(using: .utf8)!)
+            break plist
+          }
+          if mapReverseLookupCNS2.keys.count <= 16500 {
+            mapReverseLookupCNS2[theValue, default: []].append(cnvPhonabetToASCII(theKey).data(using: .utf8)!)
+            break plist
+          }
+          if mapReverseLookupCNS3.keys.count <= 16500 {
+            mapReverseLookupCNS3[theValue, default: []].append(cnvPhonabetToASCII(theKey).data(using: .utf8)!)
+            break plist
+          }
+          if mapReverseLookupCNS4.keys.count <= 16500 {
+            mapReverseLookupCNS4[theValue, default: []].append(cnvPhonabetToASCII(theKey).data(using: .utf8)!)
+            break plist
+          }
+          if mapReverseLookupCNS5.keys.count <= 16500 {
+            mapReverseLookupCNS5[theValue, default: []].append(cnvPhonabetToASCII(theKey).data(using: .utf8)!)
+            break plist
+          }
+          if mapReverseLookupCNS6.keys.count <= 16500 {
+            mapReverseLookupCNS6[theValue, default: []].append(cnvPhonabetToASCII(theKey).data(using: .utf8)!)
+            break plist
+          }
+        }
       }
     }
   }
@@ -545,6 +611,18 @@ func commonFileOutput() {
       to: URL(fileURLWithPath: urlPlistZhuyinwen))
     try PropertyListSerialization.data(fromPropertyList: mapCNS, format: .binary, options: 0).write(
       to: URL(fileURLWithPath: urlPlistCNS))
+    try PropertyListSerialization.data(fromPropertyList: mapReverseLookupCNS1, format: .binary, options: 0).write(
+      to: URL(fileURLWithPath: urlPlistBPMFReverseLookupCNS1))
+    try PropertyListSerialization.data(fromPropertyList: mapReverseLookupCNS2, format: .binary, options: 0).write(
+      to: URL(fileURLWithPath: urlPlistBPMFReverseLookupCNS2))
+    try PropertyListSerialization.data(fromPropertyList: mapReverseLookupCNS3, format: .binary, options: 0).write(
+      to: URL(fileURLWithPath: urlPlistBPMFReverseLookupCNS3))
+    try PropertyListSerialization.data(fromPropertyList: mapReverseLookupCNS4, format: .binary, options: 0).write(
+      to: URL(fileURLWithPath: urlPlistBPMFReverseLookupCNS4))
+    try PropertyListSerialization.data(fromPropertyList: mapReverseLookupCNS5, format: .binary, options: 0).write(
+      to: URL(fileURLWithPath: urlPlistBPMFReverseLookupCNS5))
+    try PropertyListSerialization.data(fromPropertyList: mapReverseLookupCNS6, format: .binary, options: 0).write(
+      to: URL(fileURLWithPath: urlPlistBPMFReverseLookupCNS6))
   } catch {
     NSLog(" - \(i18n): Error on writing strings to file: \(error)")
   }
