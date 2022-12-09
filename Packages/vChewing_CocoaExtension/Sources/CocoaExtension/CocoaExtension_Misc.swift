@@ -8,7 +8,13 @@
 
 import Cocoa
 
-// MARK: NSRect Extension
+// MARK: - NSMutableString extension
+
+extension NSMutableString {
+  public var localized: String { NSLocalizedString(description, comment: "") }
+}
+
+// MARK: - NSRect Extension
 
 extension NSRect {
   public static var seniorTheBeast: NSRect {

@@ -16,6 +16,11 @@
 "Loading…" = "正在載入…";
 "Consolidate" = "整理";
 "Reload" = "重新載入";
+"Example:\nCandidate Reading-Reading #Comment" = "【範例】\n候選字詞 讀音-讀音 #註解";
+"Example:\nCandidate Reading-Reading Weight #Comment\nCandidate Reading-Reading #Comment" = "【範例】\n候選字詞 讀音-讀音 權重 #註解\n候選字詞 讀音-讀音 #註解";
+"Example:\nInitial RestPhrase\nInitial RestPhrase1 RestPhrase2 RestPhrase3..." = "【範例】\n首字 候選\n首字 候選1 候選2 候選3...";
+"Example:\nOldPhrase NewPhrase #Comment" =  "【範例】\n要替換的詞 替換成的詞 #註解";
+"If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result." = "不填寫權重的話，預設權重為最高值「0」。理想的權重範圍在 [-9.5, 0] 這個閉區間內，可以被爬軌算法自動抓到。例外就是懲戒權重「-114.514」，屬於極端降權。這種情況下，除非是唯一結果，否則會被爬軌算法忽略掉。";
 "Factory dictionary not loaded yet." = "原廠辭典尚未完成載入。";
 "Some features are unavailable for macOS 10.15 and macOS 11 due to API limitations." = "因系統 API 限制，個別功能無法對 macOS 10.15 和 macOS 11 提供。";
 "This editor only: Auto-reload modifications happened outside of this editor" = "僅限該編輯器：自動讀入來自該編輯器外部的檔案內容修改";

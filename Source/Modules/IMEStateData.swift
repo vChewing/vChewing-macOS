@@ -221,7 +221,7 @@ extension IMEStateData {
     let text = ChineseConverter.crossConvert(pair.1)
     let nerfedScore = SessionCtl.areWeNerfing && markedTargetExists ? " -114.514" : ""
     let convertedMark = "#𝙃𝙪𝙢𝙖𝙣𝘾𝙝𝙚𝙘𝙠𝙍𝙚𝙦𝙪𝙞𝙧𝙚𝙙"
-    return "\(text) \(pair.0)\(nerfedScore)\t\(convertedMark)"
+    return "\(text) \(pair.0)\(nerfedScore) \(convertedMark)"
   }
 
   public mutating func updateTooltipForMarking() {

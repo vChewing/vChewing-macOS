@@ -37,7 +37,7 @@ struct VwrPrefPanePhrases: View {
 
   var body: some View {
     ScrollView {
-      VStack() {
+      VStack {
         VwrPhraseEditorUI(delegate: LMMgr.shared).frame(width: contentWidth + 28, height: 395)
         Spacer()
       }
