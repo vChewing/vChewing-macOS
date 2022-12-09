@@ -62,24 +62,24 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
     clearAllFields()
     switch selUserDataType {
       case .thePhrases:
-        txtPEField1.placeholderString = UITerms.AddPhrases.locPhrase.localized.0
-        txtPEField2.placeholderString = UITerms.AddPhrases.locReadingOrStroke.localized.0
-        txtPEField3.placeholderString = UITerms.AddPhrases.locWeight.localized.0
-        txtPECommentField.placeholderString = UITerms.AddPhrases.locComment.localized.0
+        txtPEField1.placeholderString = PETerms.AddPhrases.locPhrase.localized.0
+        txtPEField2.placeholderString = PETerms.AddPhrases.locReadingOrStroke.localized.0
+        txtPEField3.placeholderString = PETerms.AddPhrases.locWeight.localized.0
+        txtPECommentField.placeholderString = PETerms.AddPhrases.locComment.localized.0
       case .theFilter:
-        txtPEField1.placeholderString = UITerms.AddPhrases.locPhrase.localized.0
-        txtPEField2.placeholderString = UITerms.AddPhrases.locReadingOrStroke.localized.0
+        txtPEField1.placeholderString = PETerms.AddPhrases.locPhrase.localized.0
+        txtPEField2.placeholderString = PETerms.AddPhrases.locReadingOrStroke.localized.0
         txtPEField3.placeholderString = ""
-        txtPECommentField.placeholderString = UITerms.AddPhrases.locComment.localized.0
+        txtPECommentField.placeholderString = PETerms.AddPhrases.locComment.localized.0
       case .theReplacements:
-        txtPEField1.placeholderString = UITerms.AddPhrases.locReplaceTo.localized.0
-        txtPEField2.placeholderString = UITerms.AddPhrases.locReplaceTo.localized.1
+        txtPEField1.placeholderString = PETerms.AddPhrases.locReplaceTo.localized.0
+        txtPEField2.placeholderString = PETerms.AddPhrases.locReplaceTo.localized.1
         txtPEField3.placeholderString = ""
-        txtPECommentField.placeholderString = UITerms.AddPhrases.locComment.localized.0
+        txtPECommentField.placeholderString = PETerms.AddPhrases.locComment.localized.0
       case .theAssociates:
-        txtPEField1.placeholderString = UITerms.AddPhrases.locInitial.localized.0
+        txtPEField1.placeholderString = PETerms.AddPhrases.locInitial.localized.0
         txtPEField2.placeholderString = {
-          let result = UITerms.AddPhrases.locPhrase.localized.0
+          let result = PETerms.AddPhrases.locPhrase.localized.0
           return (result == "Phrase") ? "Phrases" : result
         }()
         txtPEField3.placeholderString = ""
@@ -87,10 +87,10 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
           "Inline comments are not supported in associated phrases.", comment: ""
         )
       case .theSymbols:
-        txtPEField1.placeholderString = UITerms.AddPhrases.locPhrase.localized.0
-        txtPEField2.placeholderString = UITerms.AddPhrases.locReadingOrStroke.localized.0
+        txtPEField1.placeholderString = PETerms.AddPhrases.locPhrase.localized.0
+        txtPEField2.placeholderString = PETerms.AddPhrases.locReadingOrStroke.localized.0
         txtPEField3.placeholderString = ""
-        txtPECommentField.placeholderString = UITerms.AddPhrases.locComment.localized.0
+        txtPECommentField.placeholderString = PETerms.AddPhrases.locComment.localized.0
     }
   }
 
@@ -135,7 +135,7 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
     btnPEReload.title = NSLocalizedString("Reload", comment: "")
     btnPEConsolidate.title = NSLocalizedString("Consolidate", comment: "")
     btnPESave.title = NSLocalizedString("Save", comment: "")
-    btnPEAdd.title = UITerms.AddPhrases.locAdd.localized.0
+    btnPEAdd.title = PETerms.AddPhrases.locAdd.localized.0
     btnPEOpenExternally.title = NSLocalizedString("...", comment: "")
 
     // Text Editor View
@@ -154,6 +154,9 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
     txtPEField1.delegate = self
     txtPEField2.delegate = self
     txtPEField3.delegate = self
+
+    // Tooltip.
+    txtPEField3.toolTip = PETerms.TooltipTexts.weightInputBox.localized
 
     // Finally, update the entire editor UI.
     updatePhraseEditor()
@@ -221,30 +224,6 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
       }
       tfdPETextEditor.string.append(arrResult.joined(separator: " ") + "\n")
       clearAllFields()
-    }
-  }
-}
-
-private enum UITerms {
-  fileprivate enum AddPhrases: String {
-    case locPhrase = "Phrase"
-    case locReadingOrStroke = "Reading/Stroke"
-    case locWeight = "Weight"
-    case locComment = "Comment"
-    case locReplaceTo = "Replace to"
-    case locAdd = "Add"
-    case locInitial = "Initial"
-
-    var localized: (String, String) {
-      if self == .locAdd {
-        let loc = PrefMgr.shared.appleLanguages[0]
-        return loc.contains("zh") ? ("添入", "") : loc.contains("ja") ? ("記入", "") : ("Add", "")
-      }
-      let rawArray = NSLocalizedString(self.rawValue, comment: "").components(separatedBy: " ")
-      if rawArray.isEmpty { return ("N/A", "N/A") }
-      let val1: String = rawArray[0]
-      let val2: String = (rawArray.count >= 2) ? rawArray[1] : ""
-      return (val1, val2)
     }
   }
 }
