@@ -185,7 +185,7 @@ extension SessionCtl: CtlCandidateDelegate {
     let convertedMark = "#𝙃𝙪𝙢𝙖𝙣𝘾𝙝𝙚𝙘𝙠𝙍𝙚𝙦𝙪𝙞𝙧𝙚𝙙"
 
     let userPhraseDumped = "\(valueCurrent) \(rawPair.0)\(nerfedScore)"
-    let userPhraseDumpedConverted = "\(valueReversed) \(rawPair.0)\(nerfedScore)\t\(convertedMark)"
+    let userPhraseDumpedConverted = "\(valueReversed) \(rawPair.0)\(nerfedScore) \(convertedMark)"
 
     if !LMMgr.writeUserPhrase(
       userPhraseDumped, inputMode: inputMode,
