@@ -16,6 +16,10 @@
 "Loading…" = "読み込む中…";
 "Consolidate" = "整理";
 "Reload" = "再読込";
+"Example:\nCandidate Reading-Reading #Comment" = "【模範例】\n候補 音読-音読 #メモ";
+"Example:\nCandidate Reading-Reading Weight #Comment\nCandidate Reading-Reading #Comment" = "【模範例】\n候補 音読-音読 優先度 #メモ\n候補 音読-音読 #メモ";
+"Example:\nInitial RestPhrase\nInitial RestPhrase1 RestPhrase2 RestPhrase3..." = "【模範例】\n頭文字 残候補\n頭文字 残候補１ 残候補２ 残候補３...";
+"Example:\nOldPhrase NewPhrase #Comment" =  "【模範例】\n置換対象 新候補 #メモ";
 "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result." = "優先度を記入しなかった場合、最高値「0」はデフォルト値です。理想な優先度の範囲は [-9.5, 0] 以内で、ウォーキング算法に捕まれられます。例外は懲戒値「-114.514」で、優先度を最低に極めた値であり、唯一結果のない場合、ウォーキング算法に無視されます。";
 "Factory dictionary not loaded yet." = "内蔵辞書はまだ読込中。";
 "Some features are unavailable for macOS 10.15 and macOS 11 due to API limitations." = "システム API 制限のため、一部の機能は macOS 10.15 と macOS 11 で提供できません。";
