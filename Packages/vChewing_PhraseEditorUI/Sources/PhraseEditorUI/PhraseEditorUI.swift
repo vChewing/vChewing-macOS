@@ -32,10 +32,10 @@ public struct VwrPhraseEditorUI: View {
   @ObservedObject public var fileChangeIndicator = FileObserveProject.shared
   @State private var selAutoReloadExternalModifications: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kPhraseEditorAutoReloadExternalModifications.rawValue)
-  @State var lblAddPhraseTag1 = UITerms.AddPhrases.locPhrase.localized.0
-  @State var lblAddPhraseTag2 = UITerms.AddPhrases.locReadingOrStroke.localized.0
-  @State var lblAddPhraseTag3 = UITerms.AddPhrases.locWeight.localized.0
-  @State var lblAddPhraseTag4 = UITerms.AddPhrases.locComment.localized.0
+  @State var lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
+  @State var lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
+  @State var lblAddPhraseTag3 = PETerms.AddPhrases.locWeight.localized.0
+  @State var lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
   @State var txtAddPhraseField1 = ""
   @State var txtAddPhraseField2 = ""
   @State var txtAddPhraseField3 = ""
@@ -86,33 +86,33 @@ public struct VwrPhraseEditorUI: View {
     clearAllFields()
     switch selUserDataType {
       case .thePhrases:
-        lblAddPhraseTag1 = UITerms.AddPhrases.locPhrase.localized.0
-        lblAddPhraseTag2 = UITerms.AddPhrases.locReadingOrStroke.localized.0
-        lblAddPhraseTag3 = UITerms.AddPhrases.locWeight.localized.0
-        lblAddPhraseTag4 = UITerms.AddPhrases.locComment.localized.0
+        lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
+        lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
+        lblAddPhraseTag3 = PETerms.AddPhrases.locWeight.localized.0
+        lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
       case .theFilter:
-        lblAddPhraseTag1 = UITerms.AddPhrases.locPhrase.localized.0
-        lblAddPhraseTag2 = UITerms.AddPhrases.locReadingOrStroke.localized.0
+        lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
+        lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
         lblAddPhraseTag3 = ""
-        lblAddPhraseTag4 = UITerms.AddPhrases.locComment.localized.0
+        lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
       case .theReplacements:
-        lblAddPhraseTag1 = UITerms.AddPhrases.locReplaceTo.localized.0
-        lblAddPhraseTag2 = UITerms.AddPhrases.locReplaceTo.localized.1
+        lblAddPhraseTag1 = PETerms.AddPhrases.locReplaceTo.localized.0
+        lblAddPhraseTag2 = PETerms.AddPhrases.locReplaceTo.localized.1
         lblAddPhraseTag3 = ""
-        lblAddPhraseTag4 = UITerms.AddPhrases.locComment.localized.0
+        lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
       case .theAssociates:
-        lblAddPhraseTag1 = UITerms.AddPhrases.locInitial.localized.0
+        lblAddPhraseTag1 = PETerms.AddPhrases.locInitial.localized.0
         lblAddPhraseTag2 = {
-          let result = UITerms.AddPhrases.locPhrase.localized.0
+          let result = PETerms.AddPhrases.locPhrase.localized.0
           return (result == "Phrase") ? "Phrases" : result
         }()
         lblAddPhraseTag3 = ""
         lblAddPhraseTag4 = ""
       case .theSymbols:
-        lblAddPhraseTag1 = UITerms.AddPhrases.locPhrase.localized.0
-        lblAddPhraseTag2 = UITerms.AddPhrases.locReadingOrStroke.localized.0
+        lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
+        lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
         lblAddPhraseTag3 = ""
-        lblAddPhraseTag4 = UITerms.AddPhrases.locComment.localized.0
+        lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
     }
   }
 
@@ -269,9 +269,9 @@ public struct VwrPhraseEditorUI: View {
                 guard let weightVal = Double(txtAddPhraseField3) else { return }
                 if weightVal > 0 { txtAddPhraseField3 = "" }
               }
-            )
+            ).help(PETerms.TooltipTexts.weightInputBox.localized)
           }
-          Button(UITerms.AddPhrases.locAdd.localized.0) {
+          Button(PETerms.AddPhrases.locAdd.localized.0) {
             DispatchQueue.main.async { insertEntry() }
           }.disabled(txtAddPhraseField1.isEmpty || txtAddPhraseField2.isEmpty)
         }
@@ -314,8 +314,8 @@ extension vChewingLM.ReplacableUserDataType {
   public var localizedDescription: String { NSLocalizedString(rawValue, comment: "") }
 }
 
-private enum UITerms {
-  fileprivate enum AddPhrases: String {
+public enum PETerms {
+  public enum AddPhrases: String {
     case locPhrase = "Phrase"
     case locReadingOrStroke = "Reading/Stroke"
     case locWeight = "Weight"
@@ -324,7 +324,7 @@ private enum UITerms {
     case locAdd = "Add"
     case locInitial = "Initial"
 
-    var localized: (String, String) {
+    public var localized: (String, String) {
       if self == .locAdd {
         return loc.contains("zh") ? ("添入", "") : loc.contains("ja") ? ("記入", "") : ("Add", "")
       }
@@ -334,5 +334,12 @@ private enum UITerms {
       let val2: String = (rawArray.count >= 2) ? rawArray[1] : ""
       return (val1, val2)
     }
+  }
+
+  public enum TooltipTexts: String {
+    case weightInputBox =
+      "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result."
+
+    public var localized: String { rawValue.localized }
   }
 }

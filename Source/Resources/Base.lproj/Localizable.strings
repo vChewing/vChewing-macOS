@@ -16,6 +16,7 @@
 "Loading…" = "Loading…";
 "Consolidate" = "Consolidate";
 "Reload" = "Reload";
+"If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result." = "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result.";
 "Factory dictionary not loaded yet." = "Factory dictionary not loaded yet.";
 "Some features are unavailable for macOS 10.15 and macOS 11 due to API limitations." = "Some features are unavailable for macOS 10.15 and macOS 11 due to API limitations.";
 "This editor only: Auto-reload modifications happened outside of this editor" = "This editor only: Auto-reload modifications happened outside of this editor";
