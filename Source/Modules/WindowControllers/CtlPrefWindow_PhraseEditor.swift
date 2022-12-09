@@ -40,6 +40,7 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
     tfdPETextEditor.string = NSLocalizedString("Loading…", comment: "")
     DispatchQueue.main.async { [self] in
       tfdPETextEditor.string = LMMgr.retrieveData(mode: selInputMode, type: selUserDataType)
+      tfdPETextEditor.toolTip = PETerms.TooltipTexts.sampleDictionaryContent(for: selUserDataType)
       isLoading = false
     }
   }
@@ -157,6 +158,7 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
 
     // Tooltip.
     txtPEField3.toolTip = PETerms.TooltipTexts.weightInputBox.localized
+    tfdPETextEditor.toolTip = PETerms.TooltipTexts.sampleDictionaryContent(for: selUserDataType)
 
     // Finally, update the entire editor UI.
     updatePhraseEditor()
