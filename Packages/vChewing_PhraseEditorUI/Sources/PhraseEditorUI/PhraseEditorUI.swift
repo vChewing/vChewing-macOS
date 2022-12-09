@@ -297,6 +297,8 @@ public struct VwrPhraseEditorUI: View {
       selInputMode = .imeModeNULL
       selUserDataType = .thePhrases
       txtContent = NSLocalizedString("Please select Simplified / Traditional Chinese mode above.", comment: "")
+      isLoading = true
+      Self.txtContentStorage = ""
     }.onAppear {
       guard let delegate = delegate else { return }
       selInputMode = delegate.currentInputMode
