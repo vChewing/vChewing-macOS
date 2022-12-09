@@ -43,6 +43,7 @@ public struct VwrPhraseEditorUI: View {
   @State public var selInputMode: Shared.InputMode = .imeModeNULL
   @State public var selUserDataType: vChewingLM.ReplacableUserDataType = .thePhrases
   @State private var isLoading = false
+  @State private var textEditorTooltip = PETerms.TooltipTexts.sampleDictionaryContent(for: .thePhrases)
 
   public var currentIMEInputMode: Shared.InputMode {
     delegate?.currentInputMode ?? selInputMode
@@ -78,6 +79,7 @@ public struct VwrPhraseEditorUI: View {
     isLoading = true
     DispatchQueue.main.async {
       txtContent = delegate.retrieveData(mode: selInputMode, type: selUserDataType)
+      textEditorTooltip = PETerms.TooltipTexts.sampleDictionaryContent(for: selUserDataType)
       isLoading = false
     }
   }
@@ -246,7 +248,7 @@ public struct VwrPhraseEditorUI: View {
         }
       }
 
-      TextEditorEX(text: $txtContent)
+      TextEditorEX(text: $txtContent, tooltip: $textEditorTooltip)
         .disabled(selInputMode == .imeModeNULL || isLoading)
         .frame(minWidth: 320, minHeight: 240)
         .backport.onChange(of: fileChangeIndicator.id) { _ in
@@ -339,6 +341,22 @@ public enum PETerms {
   public enum TooltipTexts: String {
     case weightInputBox =
       "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result."
+
+    public static func sampleDictionaryContent(for type: vChewingLM.ReplacableUserDataType) -> String {
+      var result = ""
+      switch type {
+        case .thePhrases:
+          result =
+            "Example:\nCandidate Reading-Reading Weight #Comment\nCandidate Reading-Reading #Comment".localized + "\n\n"
+            + weightInputBox.localized
+        case .theFilter: result = "Example:\nCandidate Reading-Reading #Comment".localized
+        case .theReplacements: result = "Example:\nOldPhrase NewPhrase #Comment".localized
+        case .theAssociates:
+          result = "Example:\nInitial RestPhrase\nInitial RestPhrase1 RestPhrase2 RestPhrase3...".localized
+        case .theSymbols: result = "Example:\nCandidate Reading-Reading #Comment".localized
+      }
+      return result
+    }
 
     public var localized: String { rawValue.localized }
   }

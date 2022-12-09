@@ -16,7 +16,11 @@
 "Loading…" = "正在载入…";
 "Consolidate" = "整理";
 "Reload" = "重新载入";
-"If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result." = "不填写权重的话，预设权重为最高值「0」。理想的权重范围在 [-9.5, 0] 这个闭区间内，可以被爬轨引擎自动抓到。例外就是惩戒权重「-114.514」，属于极端降权。这种情况下，除非是唯一结果，否则会被爬轨引擎无视。";
+"Example:\nCandidate Reading-Reading #Comment" = "【范例】\n候选字词 读音-读音 #注解";
+"Example:\nCandidate Reading-Reading Weight #Comment\nCandidate Reading-Reading #Comment" = "【范例】\n候选字词 读音-读音 权重 #注解\n候选字词 读音-读音 #注解";
+"Example:\nInitial RestPhrase\nInitial RestPhrase1 RestPhrase2 RestPhrase3..." = "【范例】\n首字 候选\n首字 候选1 候选2 候选3...";
+"Example:\nOldPhrase NewPhrase #Comment" =  "【范例】\n要替换的词 替换成的词 #注解";
+"If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result." = "不填写权重的话，预设权重为最高值「0」。理想的权重范围在 [-9.5, 0] 这个闭区间内，可以被爬轨算法自动抓到。例外就是惩戒权重「-114.514」，属于极端降权。这种情况下，除非是唯一结果，否则会被爬轨算法忽略掉。";
 "Factory dictionary not loaded yet." = "原厂辞典尚未完成载入。";
 "Some features are unavailable for macOS 10.15 and macOS 11 due to API limitations." = "因系统 API 限制，个别功能无法对 macOS 10.15 和 macOS 11 提供。";
 "This editor only: Auto-reload modifications happened outside of this editor" = "仅限该编辑器：自动读入来自该编辑器外部的档案内容修改";
