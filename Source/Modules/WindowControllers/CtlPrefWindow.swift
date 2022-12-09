@@ -28,7 +28,7 @@ extension NSToolbarItem.Identifier {
 // only works with macOS System Preference pane (like macOS built-in input methods).
 // It should be set as "Preferences" which correspondes to the "Preference" pref pane
 // of this build target.
-class CtlPrefWindow: NSWindowController {
+class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   @IBOutlet var fontSizePopUpButton: NSPopUpButton!
   @IBOutlet var uiLanguageButton: NSPopUpButton!
   @IBOutlet var basicKeyboardLayoutButton: NSPopUpButton!
@@ -66,8 +66,9 @@ class CtlPrefWindow: NSWindowController {
   public static var shared: CtlPrefWindow?
 
   static func show() {
-    if shared == nil { shared = CtlPrefWindow(windowNibName: "frmPrefWindow") }
+    shared = CtlPrefWindow(windowNibName: "frmPrefWindow")
     guard let sharedWindow = shared?.window else { return }
+    sharedWindow.delegate = shared
     sharedWindow.center()
     sharedWindow.orderFrontRegardless()  // 逼著視窗往最前方顯示
     sharedWindow.level = .statusBar
@@ -172,6 +173,10 @@ class CtlPrefWindow: NSWindowController {
     }
 
     initPhraseEditor()
+  }
+
+  func windowWillClose(_: Notification) {
+    tfdPETextEditor.string = ""
   }
 
   // 這裡有必要加上這段處理，用來確保藉由偏好設定介面動過的 CNS 開關能夠立刻生效。
