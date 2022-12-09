@@ -16,6 +16,10 @@
 "Loading…" = "Loading…";
 "Consolidate" = "Consolidate";
 "Reload" = "Reload";
+"Example:\nCandidate Reading-Reading #Comment" = "Example:\nCandidate Reading-Reading #Comment";
+"Example:\nCandidate Reading-Reading Weight #Comment\nCandidate Reading-Reading #Comment" = "Example:\nCandidate Reading-Reading Weight #Comment\nCandidate Reading-Reading #Comment";
+"Example:\nInitial RestPhrase\nInitial RestPhrase1 RestPhrase2 RestPhrase3..." = "Example:\nInitial RestPhrase\nInitial RestPhrase1 RestPhrase2 RestPhrase3...";
+"Example:\nOldPhrase NewPhrase #Comment" =  "Example:\nOldPhrase NewPhrase #Comment";
 "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result." = "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result.";
 "Factory dictionary not loaded yet." = "Factory dictionary not loaded yet.";
 "Some features are unavailable for macOS 10.15 and macOS 11 due to API limitations." = "Some features are unavailable for macOS 10.15 and macOS 11 due to API limitations.";
