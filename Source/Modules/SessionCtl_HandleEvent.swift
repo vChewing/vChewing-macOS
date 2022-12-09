@@ -97,7 +97,7 @@ extension SessionCtl {
     /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 InputHandler 內修復。
     /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
     /// 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
-    /// 否則，每次處理這種判斷時都會觸發 NSInternalInconsistencyException。
+    /// 否則，每次處理這種判斷時都會因為讀取 event.characters? 而觸發 NSInternalInconsistencyException。
     if event.type == .flagsChanged { return false }
 
     /// 沒有文字輸入客體的話，就不要再往下處理了。
@@ -105,6 +105,7 @@ extension SessionCtl {
 
     /// 除非核心辭典有載入，否則一律蜂鳴。
     if !LMMgr.currentLM.isCoreLoaded {
+      if (event as InputSignalProtocol).isReservedKey { return false }
       var newState: IMEStateProtocol = IMEState.ofEmpty()
       newState.tooltip = NSLocalizedString("Factory dictionary not loaded yet.", comment: "") + "　　"
       newState.tooltipDuration = 1.85
