@@ -28,14 +28,14 @@ extension SessionCtl {
     let menu = NSMenu(title: "Input Method Menu")
 
     let useSCPCTypingModeItem = menu.addItem(
-      withTitle: NSLocalizedString("Per-Char Select Mode", comment: ""),
+      withTitle: "Per-Char Select Mode".localized,
       action: #selector(toggleSCPCTypingMode(_:)), keyEquivalent: PrefMgr.shared.usingHotKeySCPC ? "P" : ""
     )
     useSCPCTypingModeItem.keyEquivalentModifierMask = [.command, .control]
     useSCPCTypingModeItem.state = PrefMgr.shared.useSCPCTypingMode.state
 
     let userAssociatedPhrasesItem = menu.addItem(
-      withTitle: NSLocalizedString("Per-Char Associated Phrases", comment: ""),
+      withTitle: "Per-Char Associated Phrases".localized,
       action: #selector(toggleAssociatedPhrasesEnabled(_:)),
       keyEquivalent: PrefMgr.shared.usingHotKeyAssociates ? "O" : ""
     )
@@ -43,7 +43,7 @@ extension SessionCtl {
     userAssociatedPhrasesItem.state = PrefMgr.shared.associatedPhrasesEnabled.state
 
     let cassetteModeItem = menu.addItem(
-      withTitle: NSLocalizedString("CIN Cassette Mode", comment: ""),
+      withTitle: "CIN Cassette Mode".localized,
       action: #selector(toggleCassetteMode(_:)),
       keyEquivalent: PrefMgr.shared.usingHotKeyCassette ? "I" : ""
     )
@@ -51,7 +51,7 @@ extension SessionCtl {
     cassetteModeItem.state = PrefMgr.shared.cassetteEnabled.state
 
     let useCNS11643SupportItem = menu.addItem(
-      withTitle: NSLocalizedString("CNS11643 Mode", comment: ""),
+      withTitle: "CNS11643 Mode".localized,
       action: #selector(toggleCNS11643Enabled(_:)), keyEquivalent: PrefMgr.shared.usingHotKeyCNS ? "L" : ""
     )
     useCNS11643SupportItem.keyEquivalentModifierMask = [.command, .control]
@@ -59,14 +59,13 @@ extension SessionCtl {
 
     if IMEApp.currentInputMode == .imeModeCHT {
       let chineseConversionItem = menu.addItem(
-        withTitle: NSLocalizedString("Force KangXi Writing", comment: ""),
+        withTitle: "Force KangXi Writing".localized,
         action: #selector(toggleChineseConverter(_:)), keyEquivalent: PrefMgr.shared.usingHotKeyKangXi ? "K" : ""
       )
       chineseConversionItem.keyEquivalentModifierMask = [.command, .control]
       chineseConversionItem.state = PrefMgr.shared.chineseConversionEnabled.state
-
       let shiftJISConversionItem = menu.addItem(
-        withTitle: NSLocalizedString("JIS Shinjitai Output", comment: ""),
+        withTitle: "JIS Shinjitai Output".localized,
         action: #selector(toggleShiftJISShinjitaiOutput(_:)), keyEquivalent: PrefMgr.shared.usingHotKeyJIS ? "J" : ""
       )
       shiftJISConversionItem.keyEquivalentModifierMask = [.command, .control]
@@ -74,7 +73,7 @@ extension SessionCtl {
     }
 
     let currencyNumeralsItem = menu.addItem(
-      withTitle: NSLocalizedString("Currency Numeral Output", comment: ""),
+      withTitle: "Currency Numeral Output".localized,
       action: #selector(toggleCurrencyNumerals(_:)),
       keyEquivalent: PrefMgr.shared.usingHotKeyCurrencyNumerals ? "M" : ""
     )
@@ -82,7 +81,7 @@ extension SessionCtl {
     currencyNumeralsItem.state = PrefMgr.shared.currencyNumeralsEnabled.state
 
     let halfWidthPunctuationItem = menu.addItem(
-      withTitle: NSLocalizedString("Half-Width Punctuation Mode", comment: ""),
+      withTitle: "Half-Width Punctuation Mode".localized,
       action: #selector(toggleHalfWidthPunctuation(_:)),
       keyEquivalent: PrefMgr.shared.usingHotKeyHalfWidthASCII ? "H" : ""
     )
@@ -91,7 +90,7 @@ extension SessionCtl {
 
     if optionKeyPressed || PrefMgr.shared.phraseReplacementEnabled {
       let phaseReplacementItem = menu.addItem(
-        withTitle: NSLocalizedString("Use Phrase Replacement", comment: ""),
+        withTitle: "Use Phrase Replacement".localized,
         action: #selector(togglePhraseReplacement(_:)), keyEquivalent: ""
       )
       phaseReplacementItem.state = PrefMgr.shared.phraseReplacementEnabled.state
@@ -99,7 +98,7 @@ extension SessionCtl {
 
     if optionKeyPressed {
       let toggleSymbolInputItem = menu.addItem(
-        withTitle: NSLocalizedString("Symbol & Emoji Input", comment: ""),
+        withTitle: "Symbol & Emoji Input".localized,
         action: #selector(toggleSymbolEnabled(_:)), keyEquivalent: ""
       )
       toggleSymbolInputItem.state = PrefMgr.shared.symbolInputEnabled.state
@@ -108,39 +107,39 @@ extension SessionCtl {
     menu.addItem(NSMenuItem.separator())  // ---------------------
 
     menu.addItem(
-      withTitle: NSLocalizedString("Open User Dictionary Folder", comment: ""),
+      withTitle: "Open User Dictionary Folder".localized,
       action: #selector(openUserDataFolder(_:)), keyEquivalent: ""
     )
     menu.addItem(
-      withTitle: NSLocalizedString("Edit vChewing User Phrases…", comment: ""),
+      withTitle: "Edit vChewing User Phrases…".localized,
       action: #selector(openUserPhrases(_:)), keyEquivalent: ""
     )
     menu.addItem(
-      withTitle: NSLocalizedString("Edit Excluded Phrases…", comment: ""),
+      withTitle: "Edit Excluded Phrases…".localized,
       action: #selector(openExcludedPhrases(_:)), keyEquivalent: ""
     )
 
     if optionKeyPressed || PrefMgr.shared.associatedPhrasesEnabled {
       menu.addItem(
-        withTitle: NSLocalizedString("Edit Associated Phrases…", comment: ""),
+        withTitle: "Edit Associated Phrases…".localized,
         action: #selector(openAssociatedPhrases(_:)), keyEquivalent: ""
       )
     }
 
     if optionKeyPressed {
       menu.addItem(
-        withTitle: NSLocalizedString("Edit Phrase Replacement Table…", comment: ""),
+        withTitle: "Edit Phrase Replacement Table…".localized,
         action: #selector(openPhraseReplacement(_:)), keyEquivalent: ""
       )
       menu.addItem(
-        withTitle: NSLocalizedString("Edit User Symbol & Emoji Data…", comment: ""),
+        withTitle: "Edit User Symbol & Emoji Data…".localized,
         action: #selector(openUserSymbols(_:)), keyEquivalent: ""
       )
     }
 
     if optionKeyPressed || !PrefMgr.shared.shouldAutoReloadUserDataFiles {
       menu.addItem(
-        withTitle: NSLocalizedString("Reload User Phrases", comment: ""),
+        withTitle: "Reload User Phrases".localized,
         action: #selector(reloadUserPhrasesData(_:)), keyEquivalent: ""
       )
     }
@@ -148,45 +147,45 @@ extension SessionCtl {
     menu.addItem(NSMenuItem.separator())  // ---------------------
 
     menu.addItem(
-      withTitle: NSLocalizedString("Optimize Memorized Phrases", comment: ""),
+      withTitle: "Optimize Memorized Phrases".localized,
       action: #selector(removeUnigramsFromUOM(_:)), keyEquivalent: ""
     )
     menu.addItem(
-      withTitle: NSLocalizedString("Clear Memorized Phrases", comment: ""),
+      withTitle: "Clear Memorized Phrases".localized,
       action: #selector(clearUOM(_:)), keyEquivalent: ""
     )
 
     menu.addItem(NSMenuItem.separator())  // ---------------------
 
     menu.addItem(
-      withTitle: NSLocalizedString("vChewing Preferences…", comment: ""),
+      withTitle: "vChewing Preferences…".localized,
       action: #selector(showPreferences(_:)), keyEquivalent: ""
     )
     menu.addItem(
-      withTitle: NSLocalizedString("Client Manager", comment: "") + "…",
+      withTitle: "Client Manager".localized.withEllipsis,
       action: #selector(showClientListMgr(_:)), keyEquivalent: ""
     )
     if !optionKeyPressed {
       menu.addItem(
-        withTitle: NSLocalizedString("Check for Updates…", comment: ""),
+        withTitle: "Check for Updates…".localized,
         action: #selector(checkForUpdate(_:)), keyEquivalent: ""
       )
     }
     menu.addItem(
-      withTitle: NSLocalizedString("Reboot vChewing…", comment: ""),
+      withTitle: "Reboot vChewing…".localized,
       action: #selector(selfTerminate(_:)), keyEquivalent: ""
     )
     menu.addItem(
-      withTitle: NSLocalizedString("About vChewing…", comment: ""),
+      withTitle: "About vChewing…".localized,
       action: #selector(showAbout(_:)), keyEquivalent: ""
     )
     menu.addItem(
-      withTitle: NSLocalizedString("CheatSheet", comment: "") + "…",
+      withTitle: "CheatSheet".localized.withEllipsis,
       action: #selector(showCheatSheet(_:)), keyEquivalent: ""
     )
     if optionKeyPressed {
       menu.addItem(
-        withTitle: NSLocalizedString("Uninstall vChewing…", comment: ""),
+        withTitle: "Uninstall vChewing…".localized,
         action: #selector(selfUninstall(_:)), keyEquivalent: ""
       )
     }
@@ -227,10 +226,9 @@ extension SessionCtl {
     if !PrefMgr.shared.cassetteEnabled, !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
       DispatchQueue.main.async {
         IMEApp.buzz()
-        let alert = NSAlert(error: NSLocalizedString("Path invalid or file access error.", comment: ""))
-        alert.informativeText = NSLocalizedString(
-          "Please reconfigure the cassette path to a valid one before enabling this mode.", comment: ""
-        )
+        let alert = NSAlert(error: "Path invalid or file access error.".localized)
+        let informativeText = "Please reconfigure the cassette path to a valid one before enabling this mode."
+        alert.informativeText = informativeText.localized
         let result = alert.runModal()
         NSApp.activate(ignoringOtherApps: true)
         if result == NSApplication.ModalResponse.alertFirstButtonReturn {
@@ -241,10 +239,10 @@ extension SessionCtl {
       return
     }
     Notifier.notify(
-      message: NSLocalizedString("CIN Cassette Mode", comment: "") + "\n"
+      message: "CIN Cassette Mode".localized + "\n"
         + (PrefMgr.shared.cassetteEnabled.toggled()
-          ? NSLocalizedString("NotificationSwitchON", comment: "")
-          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
+          ? "NotificationSwitchON".localized
+          : "NotificationSwitchOFF".localized)
     )
     if !LMMgr.currentLM.isCassetteDataLoaded {
       LMMgr.loadCassetteData()
@@ -254,90 +252,90 @@ extension SessionCtl {
   @objc public func toggleSCPCTypingMode(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: NSLocalizedString("Per-Char Select Mode", comment: "") + "\n"
+      message: "Per-Char Select Mode".localized + "\n"
         + (PrefMgr.shared.useSCPCTypingMode.toggled()
-          ? NSLocalizedString("NotificationSwitchON", comment: "")
-          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
+          ? "NotificationSwitchON".localized
+          : "NotificationSwitchOFF".localized)
     )
   }
 
   @objc public func toggleChineseConverter(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: NSLocalizedString("Force KangXi Writing", comment: "") + "\n"
+      message: "Force KangXi Writing".localized + "\n"
         + (PrefMgr.shared.chineseConversionEnabled.toggled()
-          ? NSLocalizedString("NotificationSwitchON", comment: "")
-          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
+          ? "NotificationSwitchON".localized
+          : "NotificationSwitchOFF".localized)
     )
   }
 
   @objc public func toggleShiftJISShinjitaiOutput(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: NSLocalizedString("JIS Shinjitai Output", comment: "") + "\n"
+      message: "JIS Shinjitai Output".localized + "\n"
         + (PrefMgr.shared.shiftJISShinjitaiOutputEnabled.toggled()
-          ? NSLocalizedString("NotificationSwitchON", comment: "")
-          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
+          ? "NotificationSwitchON".localized
+          : "NotificationSwitchOFF".localized)
     )
   }
 
   @objc public func toggleCurrencyNumerals(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: NSLocalizedString("Currency Numeral Output", comment: "") + "\n"
+      message: "Currency Numeral Output".localized + "\n"
         + (PrefMgr.shared.currencyNumeralsEnabled.toggled()
-          ? NSLocalizedString("NotificationSwitchON", comment: "")
-          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
+          ? "NotificationSwitchON".localized
+          : "NotificationSwitchOFF".localized)
     )
   }
 
   @objc public func toggleHalfWidthPunctuation(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: NSLocalizedString("Half-Width Punctuation Mode", comment: "") + "\n"
+      message: "Half-Width Punctuation Mode".localized + "\n"
         + (PrefMgr.shared.halfWidthPunctuationEnabled.toggled()
-          ? NSLocalizedString("NotificationSwitchON", comment: "")
-          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
+          ? "NotificationSwitchON".localized
+          : "NotificationSwitchOFF".localized)
     )
   }
 
   @objc public func toggleCNS11643Enabled(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: NSLocalizedString("CNS11643 Mode", comment: "") + "\n"
+      message: "CNS11643 Mode".localized + "\n"
         + (PrefMgr.shared.cns11643Enabled.toggled()
-          ? NSLocalizedString("NotificationSwitchON", comment: "")
-          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
+          ? "NotificationSwitchON".localized
+          : "NotificationSwitchOFF".localized)
     )
   }
 
   @objc public func toggleSymbolEnabled(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: NSLocalizedString("Symbol & Emoji Input", comment: "") + "\n"
+      message: "Symbol & Emoji Input".localized + "\n"
         + (PrefMgr.shared.symbolInputEnabled.toggled()
-          ? NSLocalizedString("NotificationSwitchON", comment: "")
-          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
+          ? "NotificationSwitchON".localized
+          : "NotificationSwitchOFF".localized)
     )
   }
 
   @objc public func toggleAssociatedPhrasesEnabled(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: NSLocalizedString("Per-Char Associated Phrases", comment: "") + "\n"
+      message: "Per-Char Associated Phrases".localized + "\n"
         + (PrefMgr.shared.associatedPhrasesEnabled.toggled()
-          ? NSLocalizedString("NotificationSwitchON", comment: "")
-          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
+          ? "NotificationSwitchON".localized
+          : "NotificationSwitchOFF".localized)
     )
   }
 
   @objc public func togglePhraseReplacement(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: NSLocalizedString("Use Phrase Replacement", comment: "") + "\n"
+      message: "Use Phrase Replacement".localized + "\n"
         + (PrefMgr.shared.phraseReplacementEnabled.toggled()
-          ? NSLocalizedString("NotificationSwitchON", comment: "")
-          : NSLocalizedString("NotificationSwitchOFF", comment: ""))
+          ? "NotificationSwitchON".localized
+          : "NotificationSwitchOFF".localized)
     )
   }
 
