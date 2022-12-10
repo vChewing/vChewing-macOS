@@ -144,6 +144,11 @@ extension SessionCtl {
       )
     }
 
+    menu.addItem(
+      withTitle: "Reverse Lookup (Phonabets)".localized.withEllipsis,
+      action: #selector(callReverseLookupWindow(_:))
+    )
+
     menu.addItem(NSMenuItem.separator())  // ---------------------
 
     menu.addItem(
@@ -384,6 +389,10 @@ extension SessionCtl {
 
   @objc public func reloadUserPhrasesData(_: Any? = nil) {
     LMMgr.initUserLangModels()
+  }
+
+  @objc public func callReverseLookupWindow(_: Any? = nil) {
+    CtlRevLookupWindow.show()
   }
 
   @objc public func removeUnigramsFromUOM(_: Any? = nil) {
