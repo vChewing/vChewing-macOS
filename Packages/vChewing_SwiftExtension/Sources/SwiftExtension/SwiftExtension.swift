@@ -179,3 +179,9 @@ extension String {
     }
   }
 }
+
+// MARK: - String Ellipsis Extension
+
+extension String {
+  public var withEllipsis: String { self + "…" }
+}
