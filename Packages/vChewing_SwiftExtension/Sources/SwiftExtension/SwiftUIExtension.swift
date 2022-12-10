@@ -130,11 +130,8 @@ public struct TextEditorEX: NSViewRepresentable {
       return true
     }
 
-    fileprivate lazy var textStorage = NSTextStorage()
-    fileprivate lazy var layoutManager = NSLayoutManager()
-    fileprivate lazy var textContainer = NSTextContainer()
     fileprivate lazy var textView: NSTextView = {
-      let result = NSTextView(frame: CGRect(), textContainer: textContainer)
+      let result = NSTextView(frame: CGRect())
       result.font = NSFont.systemFont(ofSize: 13, weight: .regular)
       result.allowsUndo = true
       return result
@@ -145,8 +142,10 @@ public struct TextEditorEX: NSViewRepresentable {
     public func createTextViewStack() -> NSScrollView {
       let contentSize = scrollview.contentSize
 
-      textContainer.containerSize = CGSize(width: contentSize.width, height: CGFloat.greatestFiniteMagnitude)
-      textContainer.widthTracksTextView = true
+      if let n = textView.textContainer {
+        n.containerSize = CGSize(width: contentSize.width, height: CGFloat.greatestFiniteMagnitude)
+        n.widthTracksTextView = true
+      }
 
       textView.minSize = CGSize(width: 0, height: 0)
       textView.maxSize = CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
@@ -158,9 +157,6 @@ public struct TextEditorEX: NSViewRepresentable {
       scrollview.borderType = .noBorder
       scrollview.hasVerticalScroller = true
       scrollview.documentView = textView
-
-      textStorage.addLayoutManager(layoutManager)
-      layoutManager.addTextContainer(textContainer)
 
       return scrollview
     }
