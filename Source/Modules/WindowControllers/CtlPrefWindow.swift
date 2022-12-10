@@ -69,7 +69,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
     shared = CtlPrefWindow(windowNibName: "frmPrefWindow")
     guard let sharedWindow = shared?.window else { return }
     sharedWindow.delegate = shared
-    sharedWindow.center()
+    sharedWindow.setPosition(vertical: .top, horizontal: .right, padding: 20)
     sharedWindow.orderFrontRegardless()  // 逼著視窗往最前方顯示
     sharedWindow.level = .statusBar
     sharedWindow.titlebarAppearsTransparent = true
