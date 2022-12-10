@@ -77,6 +77,8 @@ extension SessionCtl {
       if optionKeyPressed || !PrefMgr.shared.shouldAutoReloadUserDataFiles {
         MenuItem("Reload User Phrases").action(#selector(self.reloadUserPhrasesData(_:)))
       }
+      MenuItem(verbatim: "Reverse Lookup (Phonabets)".localized.withEllipsis).action(
+        #selector(self.callReverseLookupWindow(_:)))
 
       SeparatorItem()  // ------------------
 
@@ -291,6 +293,10 @@ extension SessionCtl {
 
   @objc public func reloadUserPhrasesData(_: Any? = nil) {
     LMMgr.initUserLangModels()
+  }
+
+  @objc public func callReverseLookupWindow(_: Any? = nil) {
+    CtlRevLookupWindow.show()
   }
 
   @objc public func removeUnigramsFromUOM(_: Any? = nil) {
