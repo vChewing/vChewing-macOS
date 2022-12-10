@@ -248,7 +248,7 @@ public struct VwrPhraseEditorUI: View {
         }
       }
 
-      TextEditorEX(text: $txtContent, tooltip: $textEditorTooltip)
+      TextEditorEX(text: $txtContent)
         .disabled(selInputMode == .imeModeNULL || isLoading)
         .frame(minWidth: 320, minHeight: 240)
         .backport.onChange(of: fileChangeIndicator.id) { _ in
@@ -297,6 +297,8 @@ public struct VwrPhraseEditorUI: View {
       selInputMode = .imeModeNULL
       selUserDataType = .thePhrases
       txtContent = NSLocalizedString("Please select Simplified / Traditional Chinese mode above.", comment: "")
+      isLoading = true
+      Self.txtContentStorage = ""
     }.onAppear {
       guard let delegate = delegate else { return }
       selInputMode = delegate.currentInputMode

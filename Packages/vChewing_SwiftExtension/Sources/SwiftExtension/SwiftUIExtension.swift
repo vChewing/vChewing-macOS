@@ -89,11 +89,9 @@ public struct VisualEffectView: NSViewRepresentable {
 /// A much faster alternative than Apple official TextEditor.
 public struct TextEditorEX: NSViewRepresentable {
   @Binding var text: String
-  @Binding var tooltip: String
 
-  public init(text: Binding<String>, tooltip: Binding<String>) {
+  public init(text: Binding<String>) {
     _text = text
-    _tooltip = tooltip
   }
 
   public func makeNSView(context: Context) -> NSScrollView {
@@ -101,23 +99,20 @@ public struct TextEditorEX: NSViewRepresentable {
   }
 
   public func updateNSView(_ nsView: NSScrollView, context _: Context) {
-    if let textArea = nsView.documentView as? NSTextView {
-      if textArea.string != text { textArea.string = text }
-      if textArea.toolTip != tooltip { textArea.toolTip = tooltip }
+    if let textArea = nsView.documentView as? NSTextView, textArea.string != self.text {
+      textArea.string = text
     }
   }
 
   public func makeCoordinator() -> Coordinator {
-    Coordinator(text: $text, tooltip: $tooltip)
+    Coordinator(text: $text)
   }
 
   public class Coordinator: NSObject, NSTextViewDelegate {
     public var text: Binding<String>
-    public var tooltip: Binding<String>
 
-    public init(text: Binding<String>, tooltip: Binding<String>) {
+    public init(text: Binding<String>) {
       self.text = text
-      self.tooltip = tooltip
     }
 
     public func textView(_ textView: NSTextView, shouldChangeTextIn range: NSRange, replacementString text: String?)
@@ -125,16 +120,12 @@ public struct TextEditorEX: NSViewRepresentable {
     {
       defer {
         self.text.wrappedValue = (textView.string as NSString).replacingCharacters(in: range, with: text!)
-        self.tooltip.wrappedValue = (textView.toolTip as? NSString ?? "").replacingCharacters(in: range, with: text!)
       }
       return true
     }
 
-    fileprivate lazy var textStorage = NSTextStorage()
-    fileprivate lazy var layoutManager = NSLayoutManager()
-    fileprivate lazy var textContainer = NSTextContainer()
     fileprivate lazy var textView: NSTextView = {
-      let result = NSTextView(frame: CGRect(), textContainer: textContainer)
+      let result = NSTextView(frame: CGRect())
       result.font = NSFont.systemFont(ofSize: 13, weight: .regular)
       result.allowsUndo = true
       return result
@@ -145,8 +136,10 @@ public struct TextEditorEX: NSViewRepresentable {
     public func createTextViewStack() -> NSScrollView {
       let contentSize = scrollview.contentSize
 
-      textContainer.containerSize = CGSize(width: contentSize.width, height: CGFloat.greatestFiniteMagnitude)
-      textContainer.widthTracksTextView = true
+      if let n = textView.textContainer {
+        n.containerSize = CGSize(width: contentSize.width, height: CGFloat.greatestFiniteMagnitude)
+        n.widthTracksTextView = true
+      }
 
       textView.minSize = CGSize(width: 0, height: 0)
       textView.maxSize = CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
@@ -158,9 +151,6 @@ public struct TextEditorEX: NSViewRepresentable {
       scrollview.borderType = .noBorder
       scrollview.hasVerticalScroller = true
       scrollview.documentView = textView
-
-      textStorage.addLayoutManager(layoutManager)
-      layoutManager.addTextContainer(textContainer)
 
       return scrollview
     }
