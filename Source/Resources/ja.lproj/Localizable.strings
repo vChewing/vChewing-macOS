@@ -16,6 +16,10 @@
 "Loading…" = "読み込む中…";
 "Consolidate" = "整理";
 "Reload" = "再読込";
+"Loading complete." = "読込完了。";
+"Char\tReading(s)\n" = "漢字\t音読\n";
+"Reverse Lookup (Phonabets)" = "注音音読逆引参照";
+"Maximum 15 results returnable." = "参照結果は最初の15件のみ表示可能。";
 "Example:\nCandidate Reading-Reading #Comment" = "【模範例】\n候補 音読-音読 #メモ";
 "Example:\nCandidate Reading-Reading Weight #Comment\nCandidate Reading-Reading #Comment" = "【模範例】\n候補 音読-音読 優先度 #メモ\n候補 音読-音読 #メモ";
 "Example:\nInitial RestPhrase\nInitial RestPhrase1 RestPhrase2 RestPhrase3..." = "【模範例】\n頭文字 残候補\n頭文字 残候補１ 残候補２ 残候補３...";
