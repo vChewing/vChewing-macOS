@@ -111,6 +111,7 @@ extension SessionCtl {
     } else {
       CtlPrefUI.shared.controller.show(preferencePane: SSPreferences.PaneIdentifier(rawValue: "General"))
       CtlPrefUI.shared.controller.window?.level = .statusBar
+      CtlPrefUI.shared.controller.window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
     }
     NSApp.activate(ignoringOtherApps: true)
   }
