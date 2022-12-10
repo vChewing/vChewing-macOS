@@ -248,7 +248,7 @@ public struct VwrPhraseEditorUI: View {
         }
       }
 
-      TextEditorEX(text: $txtContent, tooltip: $textEditorTooltip)
+      TextEditorEX(text: $txtContent)
         .disabled(selInputMode == .imeModeNULL || isLoading)
         .frame(minWidth: 320, minHeight: 240)
         .backport.onChange(of: fileChangeIndicator.id) { _ in
