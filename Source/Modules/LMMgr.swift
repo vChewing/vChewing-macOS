@@ -95,7 +95,7 @@ public class LMMgr {
       }
       group.leave()
     }
-    if !Self.lmCHT.isLanguageModelLoaded {
+    if !Self.lmCHT.isCoreLMLoaded {
       showFinishNotification = true
       Notifier.notify(
         message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
@@ -106,7 +106,7 @@ public class LMMgr {
         group.leave()
       }
     }
-    if !Self.lmCHS.isLanguageModelLoaded {
+    if !Self.lmCHS.isCoreLMLoaded {
       showFinishNotification = true
       Notifier.notify(
         message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
@@ -159,7 +159,7 @@ public class LMMgr {
     }
     switch mode {
       case .imeModeCHS:
-        if !Self.lmCHS.isLanguageModelLoaded {
+        if !Self.lmCHS.isCoreLMLoaded {
           showFinishNotification = true
           Notifier.notify(
             message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
@@ -171,7 +171,7 @@ public class LMMgr {
           }
         }
       case .imeModeCHT:
-        if !Self.lmCHT.isLanguageModelLoaded {
+        if !Self.lmCHT.isCoreLMLoaded {
           showFinishNotification = true
           Notifier.notify(
             message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
