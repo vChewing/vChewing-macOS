@@ -17,11 +17,12 @@ class CtlAboutWindow: NSWindowController {
 
   static func show() {
     if shared == nil { shared = CtlAboutWindow(windowNibName: "frmAboutWindow") }
-    guard let sharedWindow = shared?.window else { return }
-    sharedWindow.center()
+    guard let shared = shared, let sharedWindow = shared.window else { return }
+    sharedWindow.setPosition(vertical: .top, horizontal: .left, padding: 20)
     sharedWindow.orderFrontRegardless()  // 逼著視窗往最前方顯示
     sharedWindow.level = .statusBar
     sharedWindow.titlebarAppearsTransparent = true
+    shared.showWindow(shared)
     NSApp.activate(ignoringOtherApps: true)
   }
 

@@ -16,6 +16,10 @@
 "Loading…" = "正在載入…";
 "Consolidate" = "整理";
 "Reload" = "重新載入";
+"Loading complete." = "載入完畢。";
+"Char\tReading(s)\n" = "漢字\t讀音\n";
+"Reverse Lookup (Phonabets)" = "注音反查";
+"Maximum 15 results returnable." = "僅能給出前 15 筆結果。";
 "Example:\nCandidate Reading-Reading #Comment" = "【範例】\n候選字詞 讀音-讀音 #註解";
 "Example:\nCandidate Reading-Reading Weight #Comment\nCandidate Reading-Reading #Comment" = "【範例】\n候選字詞 讀音-讀音 權重 #註解\n候選字詞 讀音-讀音 #註解";
 "Example:\nInitial RestPhrase\nInitial RestPhrase1 RestPhrase2 RestPhrase3..." = "【範例】\n首字 候選\n首字 候選1 候選2 候選3...";

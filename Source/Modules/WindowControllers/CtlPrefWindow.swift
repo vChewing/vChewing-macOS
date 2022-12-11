@@ -66,13 +66,14 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   public static var shared: CtlPrefWindow?
 
   static func show() {
-    shared = CtlPrefWindow(windowNibName: "frmPrefWindow")
-    guard let sharedWindow = shared?.window else { return }
+    if shared == nil { shared = CtlPrefWindow(windowNibName: "frmPrefWindow") }
+    guard let shared = shared, let sharedWindow = shared.window else { return }
     sharedWindow.delegate = shared
-    sharedWindow.center()
+    sharedWindow.setPosition(vertical: .top, horizontal: .right, padding: 20)
     sharedWindow.orderFrontRegardless()  // 逼著視窗往最前方顯示
     sharedWindow.level = .statusBar
     sharedWindow.titlebarAppearsTransparent = true
+    shared.showWindow(shared)
     NSApp.activate(ignoringOtherApps: true)
   }
 

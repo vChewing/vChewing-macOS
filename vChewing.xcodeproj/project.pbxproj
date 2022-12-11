@@ -16,10 +16,19 @@
 		5B0E22DA293F4864004DF98A /* MenuBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = 5B0E22D9293F4864004DF98A /* MenuBuilder */; };
 		5B0EF55D28CDBF7100F8F7CE /* frmClientListMgr.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */; };
 		5B0EF55F28CDBF8E00F8F7CE /* CtlClientListMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */; };
+		5B1C98B929436CEE0019B807 /* data-bpmf-reverse-lookup.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B1C98B729436CED0019B807 /* data-bpmf-reverse-lookup.plist */; };
+		5B1C98BB29436CF60019B807 /* data-bpmf-reverse-lookup.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B1C98B729436CED0019B807 /* data-bpmf-reverse-lookup.plist */; };
 		5B21176C287539BB000443A9 /* SessionCtl_HandleStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176B287539BB000443A9 /* SessionCtl_HandleStates.swift */; };
 		5B21176E28753B35000443A9 /* SessionCtl_HandleDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176D28753B35000443A9 /* SessionCtl_HandleDisplay.swift */; };
 		5B21177028753B9D000443A9 /* SessionCtl_Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176F28753B9D000443A9 /* SessionCtl_Delegates.swift */; };
+		5B253E7E2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E782945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.plist */; };
+		5B253E7F2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E792945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.plist */; };
+		5B253E802945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7A2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.plist */; };
+		5B253E812945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7B2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.plist */; };
+		5B253E822945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7C2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.plist */; };
+		5B253E832945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7D2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.plist */; };
 		5B2E009428FD1E8100E78D6E /* VwrPrefPaneCassette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2E009328FD1E8100E78D6E /* VwrPrefPaneCassette.swift */; };
+		5B30BF282944867800BD87A9 /* CtlRevLookupWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B30BF272944867800BD87A9 /* CtlRevLookupWindow.swift */; };
 		5B3133BF280B229700A4A505 /* InputHandler_HandleStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3133BE280B229700A4A505 /* InputHandler_HandleStates.swift */; };
 		5B40113928D7050D00A9D4CB /* Shared in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113828D7050D00A9D4CB /* Shared */; };
 		5B40113C28D71C0100A9D4CB /* Uninstaller in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113B28D71C0100A9D4CB /* Uninstaller */; };
@@ -195,14 +204,22 @@
 		5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-JPN.txt"; sourceTree = "<group>"; };
 		5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHT.txt"; sourceTree = "<group>"; };
+		5B1C98B729436CED0019B807 /* data-bpmf-reverse-lookup.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-bpmf-reverse-lookup.plist"; path = "Data/data-bpmf-reverse-lookup.plist"; sourceTree = "<group>"; };
 		5B20430B28BEFC0C00BFC6FD /* vChewing.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewing.entitlements; sourceTree = "<group>"; };
 		5B20430C28BEFC1200BFC6FD /* vChewingPhraseEditor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewingPhraseEditor.entitlements; sourceTree = "<group>"; };
 		5B21176B287539BB000443A9 /* SessionCtl_HandleStates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCtl_HandleStates.swift; sourceTree = "<group>"; };
 		5B21176D28753B35000443A9 /* SessionCtl_HandleDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCtl_HandleDisplay.swift; sourceTree = "<group>"; };
 		5B21176F28753B9D000443A9 /* SessionCtl_Delegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCtl_Delegates.swift; sourceTree = "<group>"; };
+		5B253E782945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-bpmf-reverse-lookup-CNS1.plist"; path = "Data/data-bpmf-reverse-lookup-CNS1.plist"; sourceTree = "<group>"; };
+		5B253E792945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-bpmf-reverse-lookup-CNS3.plist"; path = "Data/data-bpmf-reverse-lookup-CNS3.plist"; sourceTree = "<group>"; };
+		5B253E7A2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-bpmf-reverse-lookup-CNS2.plist"; path = "Data/data-bpmf-reverse-lookup-CNS2.plist"; sourceTree = "<group>"; };
+		5B253E7B2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-bpmf-reverse-lookup-CNS6.plist"; path = "Data/data-bpmf-reverse-lookup-CNS6.plist"; sourceTree = "<group>"; };
+		5B253E7C2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-bpmf-reverse-lookup-CNS4.plist"; path = "Data/data-bpmf-reverse-lookup-CNS4.plist"; sourceTree = "<group>"; };
+		5B253E7D2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-bpmf-reverse-lookup-CNS5.plist"; path = "Data/data-bpmf-reverse-lookup-CNS5.plist"; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
 		5B2E009328FD1E8100E78D6E /* VwrPrefPaneCassette.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VwrPrefPaneCassette.swift; sourceTree = "<group>"; };
 		5B2F2BB3286216A500B8557B /* vChewingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vChewingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5B30BF272944867800BD87A9 /* CtlRevLookupWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CtlRevLookupWindow.swift; sourceTree = "<group>"; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
 		5B312684287800DE001AA720 /* FAQ.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = FAQ.md; sourceTree = "<group>"; };
 		5B3133BE280B229700A4A505 /* InputHandler_HandleStates.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputHandler_HandleStates.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
@@ -459,6 +476,7 @@
 				5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */,
 				D47F7DCD278BFB57002F9DD7 /* CtlPrefWindow.swift */,
 				5BCC631529407BBB00A2D84F /* CtlPrefWindow_PhraseEditor.swift */,
+				5B30BF272944867800BD87A9 /* CtlRevLookupWindow.swift */,
 			);
 			path = WindowControllers;
 			sourceTree = "<group>";
@@ -485,6 +503,13 @@
 		5B62A35027AE7F6600A19448 /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				5B253E782945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.plist */,
+				5B253E7A2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.plist */,
+				5B253E792945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.plist */,
+				5B253E7C2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.plist */,
+				5B253E7D2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.plist */,
+				5B253E7B2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.plist */,
+				5B1C98B729436CED0019B807 /* data-bpmf-reverse-lookup.plist */,
 				5BEDB71C283B4AEA0078EB25 /* data-chs.plist */,
 				5BEDB720283B4AEA0078EB25 /* data-cht.plist */,
 				5BEDB71D283B4AEA0078EB25 /* data-cns.plist */,
@@ -880,6 +905,7 @@
 			files = (
 				5BC4479D2865686500EDC323 /* data-chs.plist in Resources */,
 				5BC4479E2865686500EDC323 /* data-cht.plist in Resources */,
+				5B1C98BB29436CF60019B807 /* data-bpmf-reverse-lookup.plist in Resources */,
 				5BC4479F2865686500EDC323 /* data-cns.plist in Resources */,
 				5BC447A02865686500EDC323 /* data-symbols.plist in Resources */,
 				5BC447A12865686500EDC323 /* data-zhuyinwen.plist in Resources */,
@@ -913,6 +939,7 @@
 				5BBBB77527AED70B0023B93A /* MenuIcon-SCVIM.png in Resources */,
 				5BEDB722283B4C250078EB25 /* data-zhuyinwen.plist in Resources */,
 				5BF9DA2728840E6200DBD48E /* template-usersymbolphrases.txt in Resources */,
+				5B1C98B929436CEE0019B807 /* data-bpmf-reverse-lookup.plist in Resources */,
 				5BBC2DA128F51C0400C986F6 /* LICENSE-CHS.txt in Resources */,
 				5BEDB724283B4C250078EB25 /* data-symbols.plist in Resources */,
 				5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */,
@@ -924,6 +951,12 @@
 				5BC2652227E04B7E00700291 /* uninstall.sh in Resources */,
 				5BAD0CD527D701F6003D127F /* vChewingKeyLayout.bundle in Resources */,
 				5BBC2DA028F51C0400C986F6 /* LICENSE-JPN.txt in Resources */,
+				5B253E7E2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.plist in Resources */,
+				5B253E802945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.plist in Resources */,
+				5B253E7F2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.plist in Resources */,
+				5B253E822945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.plist in Resources */,
+				5B253E832945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.plist in Resources */,
+				5B253E812945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -997,6 +1030,13 @@
 				"$(SRCROOT)/Source/Data/data-cns.plist",
 				"$(SRCROOT)/Source/Data/data-zhuyinwen.plist",
 				"$(SRCROOT)/Source/Data/data-symbols.plist",
+				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup.plist",
+				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS1.plist",
+				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS2.plist",
+				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS3.plist",
+				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS4.plist",
+				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS5.plist",
+				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS6.plist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1060,6 +1100,7 @@
 				5B78EE0D28A562B4009456C1 /* VwrPrefPaneDevZone.swift in Sources */,
 				5B6C141228A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift in Sources */,
 				D47F7DCE278BFB57002F9DD7 /* CtlPrefWindow.swift in Sources */,
+				5B30BF282944867800BD87A9 /* CtlRevLookupWindow.swift in Sources */,
 				5BD0113D2818543900609769 /* InputHandler_Core.swift in Sources */,
 				5BF56F9A28C39D1800DD6839 /* IMEStateData.swift in Sources */,
 				5B21176C287539BB000443A9 /* SessionCtl_HandleStates.swift in Sources */,
@@ -1240,7 +1281,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3003;
+				CURRENT_PROJECT_VERSION = 3100;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1265,7 +1306,7 @@
 					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.Preferences;
@@ -1295,7 +1336,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3003;
+				CURRENT_PROJECT_VERSION = 3100;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1315,7 +1356,7 @@
 					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.Preferences;
@@ -1343,7 +1384,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3003;
+				CURRENT_PROJECT_VERSION = 3100;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1359,7 +1400,7 @@
 					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewingTests;
@@ -1388,7 +1429,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3003;
+				CURRENT_PROJECT_VERSION = 3100;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -1400,7 +1441,7 @@
 					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewingTests;
@@ -1519,7 +1560,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3003;
+				CURRENT_PROJECT_VERSION = 3100;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1550,7 +1591,7 @@
 					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.1.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1581,7 +1622,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3003;
+				CURRENT_PROJECT_VERSION = 3100;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1606,7 +1647,7 @@
 					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1630,7 +1671,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3003;
+				CURRENT_PROJECT_VERSION = 3100;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1653,7 +1694,7 @@
 					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.1.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingInstaller;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1677,7 +1718,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3003;
+				CURRENT_PROJECT_VERSION = 3100;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1694,7 +1735,7 @@
 					/usr/lib/swift,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingInstaller;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

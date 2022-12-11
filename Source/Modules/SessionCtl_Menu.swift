@@ -77,6 +77,8 @@ extension SessionCtl {
       if optionKeyPressed || !PrefMgr.shared.shouldAutoReloadUserDataFiles {
         MenuItem("Reload User Phrases").action(#selector(self.reloadUserPhrasesData(_:)))
       }
+      MenuItem(verbatim: "Reverse Lookup (Phonabets)".localized.withEllipsis).action(
+        #selector(self.callReverseLookupWindow(_:)))
 
       SeparatorItem()  // ------------------
 
@@ -86,14 +88,13 @@ extension SessionCtl {
       SeparatorItem()  // ------------------
 
       MenuItem("vChewing Preferences…").action(#selector(self.showPreferences(_:)))
-      MenuItem(verbatim: NSLocalizedString("Client Manager", comment: "") + "…")
-        .action(#selector(self.showClientListMgr(_:)))
+      MenuItem(verbatim: "Client Manager".localized.withEllipsis).action(#selector(self.showClientListMgr(_:)))
       if !optionKeyPressed {
         MenuItem("Check for Updates…").action(#selector(self.checkForUpdate(_:)))
       }
       MenuItem("Reboot vChewing…").action(#selector(self.selfTerminate(_:)))
       MenuItem("About vChewing…").action(#selector(self.showAbout(_:)))
-      MenuItem("CheatSheet").action(#selector(self.showCheatSheet(_:)))
+      MenuItem(verbatim: "CheatSheet".localized.withEllipsis).action(#selector(self.showCheatSheet(_:)))
       if optionKeyPressed {
         MenuItem("Uninstall vChewing…").action(#selector(self.selfUninstall(_:)))
       }
@@ -112,6 +113,7 @@ extension SessionCtl {
     } else {
       CtlPrefUI.shared.controller.show(preferencePane: SSPreferences.PaneIdentifier(rawValue: "General"))
       CtlPrefUI.shared.controller.window?.level = .statusBar
+      CtlPrefUI.shared.controller.window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
     }
     NSApp.activate(ignoringOtherApps: true)
   }
@@ -291,6 +293,10 @@ extension SessionCtl {
 
   @objc public func reloadUserPhrasesData(_: Any? = nil) {
     LMMgr.initUserLangModels()
+  }
+
+  @objc public func callReverseLookupWindow(_: Any? = nil) {
+    CtlRevLookupWindow.show()
   }
 
   @objc public func removeUnigramsFromUOM(_: Any? = nil) {
