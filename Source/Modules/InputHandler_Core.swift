@@ -241,7 +241,7 @@ public class InputHandler: InputHandlerProtocol {
   /// - Parameters:
   ///   - value: 給定之候選字（詞音配對）。
   ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字後的節錨的前方。
-  ///   - consolidate: 在固化節點之前，先鞏固上下文。該選項可能會破壞在內文組字區內就地輪替候選字詞時的體驗。
+  ///   - preConsolidate: 在固化節點之前，先鞏固上下文。該選項可能會破壞在內文組字區內就地輪替候選字詞時的體驗。
   public func consolidateNode(
     candidate: ([String], String), respectCursorPushing: Bool = true, preConsolidate: Bool = false
   ) {
