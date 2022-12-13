@@ -1,7 +1,9 @@
-// Swiftified by (c) 2022 and onwards The vChewing Project (MIT License).
-// Rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
+// Swiftified and further development by (c) 2022 and onwards The vChewing Project (MIT License).
+// Was initially rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
+
+import Foundation
 
 extension Megrez {
   /// 一個組字器用來在給定一系列的索引鍵的情況下（藉由一系列的觀測行為）返回一套資料值。
@@ -20,9 +22,9 @@ extension Megrez {
     public enum ResizeBehavior { case expand, shrink }
     /// 該軌格內可以允許的最大幅位長度。
     public static var maxSpanLength: Int = 10 { didSet { maxSpanLength = max(6, maxSpanLength) } }
-    /// 公開：多字讀音鍵當中用以分割漢字讀音的記號的預設值，是「-」。
+    /// 多字讀音鍵當中用以分割漢字讀音的記號的預設值，是「-」。
     public static var theSeparator: String = "-"
-    /// 該組字器的游標位置。
+    /// 該組字器的敲字游標位置。
     public var cursor: Int = 0 {
       didSet {
         cursor = max(0, min(cursor, length))
@@ -30,30 +32,33 @@ extension Megrez {
       }
     }
 
-    /// 該組字器的標記器位置。
+    /// 該組字器的標記器（副游標）位置。
     public var marker: Int = 0 { didSet { marker = max(0, min(marker, length)) } }
-    /// 公開：多字讀音鍵當中用以分割漢字讀音的記號，預設為「-」。
+    /// 多字讀音鍵當中用以分割漢字讀音的記號，預設為「-」。
     public var separator = theSeparator {
       didSet {
         Self.theSeparator = separator
       }
     }
 
-    /// 公開：組字器內已經插入的單筆索引鍵的數量。
-    public var width: Int { keys.count }
-    /// 公開：最近一次爬軌結果。
+    /// 最近一次爬軌結果。
     public var walkedNodes: [Node] = []
-    /// 公開：該組字器的長度，也就是內建漢字讀音的數量（唯讀）。
+    /// 該組字器的長度，組字器內已經插入的單筆索引鍵的數量，也就是內建漢字讀音的數量（唯讀）。
+    /// - Remark: 理論上而言，spans.count 也是這個數。
+    /// 但是，為了防止萬一，就用了目前的方法來計算。
     public var length: Int { keys.count }
-    /// 公開：組字器是否為空。
+    /// 組字器是否為空。
     public var isEmpty: Bool { spans.isEmpty && keys.isEmpty }
 
-    /// 該組字器的索引鍵陣列。
+    /// 該組字器已經插入的的索引鍵，以陣列的形式存放。
     public private(set) var keys = [String]()
-    /// 該組字器的幅位陣列。
-    public private(set) var spans = [Span]()
+    /// 該組字器的幅位單元陣列。
+    public private(set) var spans = [SpanUnit]()
     /// 該組字器所使用的語言模型（被 LangModelRanked 所封裝）。
-    public var langModel: LangModelRanked
+    public var langModel: LangModelRanked {
+      didSet { clear() }
+    }
+
     /// 允許查詢當前游標位置屬於第幾個幅位座標（從 0 開始算）。
     public private(set) var cursorRegionMap: [Int: Int] = .init()
 
@@ -64,8 +69,13 @@ extension Megrez {
       self.separator = separator
     }
 
+    /// 重置包括游標在內的各項參數，且清空各種由組字器生成的內部資料。
+    ///
+    /// 將已經被插入的索引鍵陣列與幅位單元陣列（包括其內的節點）全部清空。
+    /// 最近一次的爬軌結果陣列也會被清空。游標跳轉換算表也會被清空。
     public mutating func clear() {
       cursor = 0
+      marker = 0
       keys.removeAll()
       spans.removeAll()
       walkedNodes.removeAll()
@@ -107,9 +117,16 @@ extension Megrez {
     }
 
     /// 按幅位來前後移動游標。
+    ///
+    /// 在威注音的術語體系當中，「與文字輸入方向相反的方向」為向後（Rear），反之則為向前（Front）。
     /// - Parameters:
-    ///   - direction: 移動方向。
-    ///   - isMarker: 要移動的是否為選擇標記（而非游標）。
+    ///   - direction: 指定移動方向（相對於文字輸入方向而言）。
+    ///   - isMarker: 要移動的是否為作為選擇標記的副游標（而非打字用的主游標）。
+    /// 具體用法可以是這樣：你在標記模式下，
+    /// 如果出現了「副游標切了某個字音數量不相等的節點」的情況的話，
+    /// 則直接用這個函式將副游標往前推到接下來的正常的位置上。
+    /// // 該特性不適用於小麥注音，除非小麥注音重新設計 InputState 且修改 KeyHandler、
+    /// 將標記游標交給敝引擎來管理。屆時，NSStringUtils 將徹底卸任。
     /// - Returns: 該操作是否順利完成。
     @discardableResult public mutating func jumpCursorBySpan(to direction: TypingDirection, isMarker: Bool = false)
       -> Bool
@@ -117,7 +134,7 @@ extension Megrez {
       var target = isMarker ? marker : cursor
       switch direction {
         case .front:
-          if target == width { return false }
+          if target == length { return false }
         case .rear:
           if target == 0 { return false }
       }
@@ -152,27 +169,28 @@ extension Megrez {
 
     /// 生成用以交給 GraphViz 診斷的資料檔案內容，純文字。
     public var dumpDOT: String {
-      var strOutput = "digraph {\ngraph [ rankdir=LR ];\nBOS;\n"
+      // C# StringBuilder 與 Swift NSMutableString 能提供爆發性的效能。
+      let strOutput: NSMutableString = .init(string: "digraph {\ngraph [ rankdir=LR ];\nBOS;\n")
       for (p, span) in spans.enumerated() {
         for ni in 0...(span.maxLength) {
           guard let np = span.nodeOf(length: ni) else { continue }
           if p == 0 {
-            strOutput += "BOS -> \(np.value);\n"
+            strOutput.append("BOS -> \(np.value);\n")
           }
-          strOutput += "\(np.value);\n"
+          strOutput.append("\(np.value);\n")
           if (p + ni) < spans.count {
             let destinationSpan = spans[p + ni]
             for q in 0...(destinationSpan.maxLength) {
               guard let dn = destinationSpan.nodeOf(length: q) else { continue }
-              strOutput += np.value + " -> " + dn.value + ";\n"
+              strOutput.append(np.value + " -> " + dn.value + ";\n")
             }
           }
           guard (p + ni) == spans.count else { continue }
-          strOutput += np.value + " -> EOS;\n"
+          strOutput.append(np.value + " -> EOS;\n")
         }
       }
-      strOutput += "EOS;\n}\n"
-      return strOutput
+      strOutput.append("EOS;\n}\n")
+      return strOutput.description
     }
   }
 }
@@ -180,9 +198,7 @@ extension Megrez {
 // MARK: - Internal Methods (Maybe Public)
 
 extension Megrez.Compositor {
-  // MARK: Internal methods for maintaining the grid.
-
-  /// 在該軌格的指定幅位座標擴增或減少一個幅位。
+  /// 在該軌格的指定幅位座標擴增或減少一個幅位單元。
   /// - Parameters:
   ///   - location: 給定的幅位座標。
   ///   - action: 指定是擴張還是縮減一個幅位。
@@ -190,7 +206,7 @@ extension Megrez.Compositor {
     let location = max(min(location, spans.count), 0)  // 防呆
     switch action {
       case .expand:
-        spans.insert(Span(), at: location)
+        spans.insert(SpanUnit(), at: location)
         if [0, spans.count].contains(location) { return }
       case .shrink:
         if spans.count == location { return }
@@ -241,26 +257,31 @@ extension Megrez.Compositor {
     }
   }
 
-  @discardableResult mutating func insertNode(_ node: Node, at location: Int) -> Bool {
-    let location = max(min(location, spans.count - 1), 0)  // 防呆
-    spans[location].append(node: node)
-    return true
-  }
-
+  /// 自索引鍵陣列獲取指定範圍的資料。
+  /// - Parameter range: 指定範圍。
+  /// - Returns: 拿到的資料。
   func getJoinedKeyArray(range: Range<Int>) -> [String] {
     // 下面這句不能用 contains，不然會要求至少 macOS 13 Ventura。
     guard range.upperBound <= keys.count, range.lowerBound >= 0 else { return [] }
     return keys[range].map { String($0) }
   }
 
+  /// 在指定位置（以指定索引鍵陣列和指定幅位長度）拿取節點。
+  /// - Parameters:
+  ///   - location: 指定游標位置。
+  ///   - length: 指定幅位長度。
+  ///   - keyArray: 指定索引鍵陣列。
+  /// - Returns: 拿取的節點。拿不到的話就會是 nil。
   func getNode(at location: Int, length: Int, keyArray: [String]) -> Node? {
-    let location = max(min(location, spans.count), 0)  // 防呆
+    let location = max(min(location, spans.count - 1), 0)  // 防呆
     guard let node = spans[location].nodeOf(length: length) else { return nil }
     return keyArray == node.keyArray ? node : nil
   }
 
   /// 根據當前狀況更新整個組字器的節點文脈。
-  /// - Returns: 新增了多少節點。如果返回「0」則表示可能發生了錯誤。
+  /// - Parameter updateExisting: 是否根據目前的語言模型的資料狀態來對既有節點更新其內部的單元圖陣列資料。
+  /// 該特性可以用於「在選字窗內屏蔽了某個詞之後，立刻生效」這樣的軟體功能需求的實現。
+  /// - Returns: 新增或影響了多少個節點。如果返回「0」則表示可能發生了錯誤。
   @discardableResult public mutating func update(updateExisting: Bool = false) -> Int {
     let maxSpanLength = Megrez.Compositor.maxSpanLength
     let range = max(0, cursor - maxSpanLength)..<min(cursor + maxSpanLength, keys.count)
@@ -276,16 +297,15 @@ extension Megrez.Compositor {
             if theNode.keyArray.count == 1 { continue }
             spans[position].nodes.removeAll { $0 == theNode }
           } else {
-            theNode.resetUnigrams(using: unigrams)
+            theNode.syncingUnigrams(from: unigrams)
           }
           nodesChanged += 1
           continue
         }
         let unigrams = langModel.unigramsFor(keyArray: joinedKeyArray)
         guard !unigrams.isEmpty else { continue }
-        insertNode(
-          .init(keyArray: joinedKeyArray, spanLength: theLength, unigrams: unigrams),
-          at: position
+        spans[position].append(
+          node: .init(keyArray: joinedKeyArray, spanLength: theLength, unigrams: unigrams)
         )
         nodesChanged += 1
       }
@@ -293,12 +313,13 @@ extension Megrez.Compositor {
     return nodesChanged
   }
 
-  mutating func updateCursorJumpingTables(_ walkedNodes: [Node]) {
+  /// 更新游標跳轉換算表。
+  mutating func updateCursorJumpingTables() {
     var cursorRegionMapDict = [Int: Int]()
     cursorRegionMapDict[-1] = 0  // 防呆
     var counter = 0
-    for (i, anchor) in walkedNodes.enumerated() {
-      for _ in 0..<anchor.spanLength {
+    for (i, theNode) in walkedNodes.enumerated() {
+      for _ in 0..<theNode.spanLength {
         cursorRegionMapDict[counter] = i
         counter += 1
       }
