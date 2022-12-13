@@ -1,5 +1,5 @@
-// Swiftified by (c) 2022 and onwards The vChewing Project (MIT License).
-// Rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
+// Swiftified and further development by (c) 2022 and onwards The vChewing Project (MIT License).
+// Was initially rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
@@ -19,7 +19,13 @@ extension Megrez.Compositor {
     public var distance = -(Double.infinity)
     /// 在進行進行位相幾何排序時會用到的狀態標記。
     public var topologicallySorted = false
+    /// 字詞節點。
     public var node: Node
+
+    /// 初期化一個「有向無環圖的」的頂點單位。
+    ///
+    /// 這是一個可變的數據結構，用於有向無環圖的構建和單源最短路徑的計算。
+    /// - Parameter node: 字詞節點。
     public init(node: Node) {
       self.node = node
     }
@@ -32,18 +38,15 @@ extension Megrez.Compositor {
   ///   - u: 參照頂點，會在必要時成為 v 的前述頂點。
   ///   - v: 要影響的頂點。
   func relax(u: Vertex, v: inout Vertex) {
-    /// 從 u 到 w 的距離，也就是 v 的權重。
+    // 從 u 到 w 的距離，也就是 v 的權重。
     let w: Double = v.node.score
-    /// 這裡計算最大權重：
-    /// 如果 v 目前的距離值小於「u 的距離值＋w（w 是 u 到 w 的距離，也就是 v 的權重）」，
-    /// 我們就更新 v 的距離及其前述頂點。
-    if v.distance < u.distance + w {
-      v.distance = u.distance + w
-      v.prev = u
-    }
+    // 這裡計算最大權重：
+    // 如果 v 目前的距離值小於「u 的距離值＋w（w 是 u 到 w 的距離，也就是 v 的權重）」，
+    // 我們就更新 v 的距離及其前述頂點。
+    if v.distance >= u.distance + w { return }
+    v.distance = u.distance + w
+    v.prev = u
   }
-
-  typealias VertexSpan = [Vertex]
 
   /// 對持有單個根頂點的有向無環圖進行位相幾何排序（topological
   /// sort）、且將排序結果以頂點陣列的形式給出。
@@ -61,13 +64,13 @@ extension Megrez.Compositor {
   ///    }
   ///  }
   /// ```
-  /// 至於遞迴版本則類似於 Cormen 在 2001 年的著作「Introduction to Algorithms」當中的樣子。
+  /// 至於其遞迴版本，則類似於 Cormen 在 2001 年的著作「Introduction to Algorithms」當中的樣子。
   /// - Parameter root: 根頂點。
   /// - Returns: 排序結果（頂點陣列）。
   func topologicalSort(root: Vertex) -> [Vertex] {
     class State {
       var iterIndex: Int
-      var vertex: Vertex
+      let vertex: Vertex
       init(vertex: Vertex, iterIndex: Int = 0) {
         self.vertex = vertex
         self.iterIndex = iterIndex
