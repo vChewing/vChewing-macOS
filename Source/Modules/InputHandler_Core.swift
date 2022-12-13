@@ -113,7 +113,7 @@ public class InputHandler: InputHandlerProtocol {
   func isCursorCuttingChar(isMarker: Bool = false) -> Bool {
     let index = isMarker ? compositor.marker : compositor.cursor
     var isBound = (index == compositor.walkedNodes.contextRange(ofGivenCursor: index).lowerBound)
-    if index == compositor.width { isBound = true }
+    if index == compositor.length { isBound = true }
     let rawResult = compositor.walkedNodes.findNode(at: index)?.isReadingMismatched ?? false
     return !isBound && rawResult
   }
@@ -123,7 +123,7 @@ public class InputHandler: InputHandlerProtocol {
   /// 威注音對游標前置與游標後置模式採取的候選字節點陣列抓取方法是分離的，且不使用 Node Crossing。
   var cursorForCandidate: Int {
     compositor.cursor
-      - ((compositor.cursor == compositor.width || !prefs.useRearCursorMode) && compositor.cursor > 0 ? 1 : 0)
+      - ((compositor.cursor == compositor.length || !prefs.useRearCursorMode) && compositor.cursor > 0 ? 1 : 0)
   }
 
   /// 利用給定的讀音鏈來試圖爬取最接近的組字結果（最大相似度估算）。
@@ -197,7 +197,7 @@ public class InputHandler: InputHandlerProtocol {
     rearBoundary = min(compositor.cursor, rearBoundary)
     compositor.cursor = cursorBackup  // 游標歸位，再接著計算。
     while compositor.cursor < frontBoundary { compositor.jumpCursorBySpan(to: .front) }
-    frontBoundary = min(max(compositor.cursor, frontBoundary), compositor.width)
+    frontBoundary = min(max(compositor.cursor, frontBoundary), compositor.length)
     compositor.cursor = cursorBackup  // 計算結束，游標歸位。
 
     debugIntelToPrint.append("FIN: \(rearBoundary)..<\(frontBoundary)")
@@ -479,14 +479,14 @@ extension InputHandler {
   /// 用比較形象且生動卻有點噁心的解釋的話，蒼蠅一邊吃一邊屙。
   var commitOverflownComposition: String {
     guard !compositor.walkedNodes.isEmpty,
-      compositor.width > compositorWidthLimit,
+      compositor.length > compositorWidthLimit,
       let identifier = delegate?.clientBundleIdentifier,
       prefs.clientsIMKTextInputIncapable.contains(identifier)
     else { return "" }
     // 回頭在這裡插上對 Steam 的 Client Identifier 的要求。
     var textToCommit = ""
-    while compositor.width > compositorWidthLimit {
-      var delta = compositor.width - compositorWidthLimit
+    while compositor.length > compositorWidthLimit {
+      var delta = compositor.length - compositorWidthLimit
       let node = compositor.walkedNodes[0]
       if node.isReadingMismatched {
         delta = node.keyArray.count
