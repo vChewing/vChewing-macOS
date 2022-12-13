@@ -1,12 +1,12 @@
-// Swiftified by (c) 2022 and onwards The vChewing Project (MIT License).
-// Rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
+// Swiftified and further development by (c) 2022 and onwards The vChewing Project (MIT License).
+// Was initially rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
 extension Megrez {
   /// 單元圖。
   @frozen public struct Unigram: Equatable, CustomStringConvertible, Hashable {
-    /// 鍵值。
+    /// 資料值，通常是詞語或單個字。
     public var value: String
     /// 權重。
     public var score: Double
@@ -15,15 +15,17 @@ extension Megrez {
       "(" + value.description + "," + String(score) + ")"
     }
 
-    /// 初期化一筆「單元圖」。一筆單元圖由一組鍵值配對與一筆權重數值組成。
+    /// 初期化一筆「單元圖」。一筆單元圖由一筆資料值與一筆權重數值組成。
     /// - Parameters:
-    ///   - value: 鍵值。
+    ///   - value: 資料值。
     ///   - score: 權重（雙精度小數）。
     public init(value: String = "", score: Double = 0) {
       self.value = value
       self.score = score
     }
 
+    /// 做為預設雜湊函式。
+    /// - Parameter hasher: 目前物件的雜湊碼。
     public func hash(into hasher: inout Hasher) {
       hasher.combine(value)
       hasher.combine(score)
