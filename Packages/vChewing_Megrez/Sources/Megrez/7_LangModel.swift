@@ -1,13 +1,13 @@
-// Swiftified by (c) 2022 and onwards The vChewing Project (MIT License).
-// Rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
+// Swiftified and further development by (c) 2022 and onwards The vChewing Project (MIT License).
+// Was initially rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
 /// 語言模組協定。
 public protocol LangModelProtocol {
-  /// 給定鍵陣列，讓語言模型找給一組單元圖陣列。
+  /// 給定索引鍵陣列，讓語言模型找給一組單元圖陣列。
   func unigramsFor(keyArray: [String]) -> [Megrez.Unigram]
-  /// 給定鍵陣列，確認是否有單元圖記錄在庫。
+  /// 根據給定的索引鍵來確認各個資料庫陣列內是否存在對應的資料。
   func hasUnigramsFor(keyArray: [String]) -> Bool
 }
 
