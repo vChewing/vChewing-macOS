@@ -209,7 +209,7 @@ extension InputHandler {
 
     // Shift + Right
     if input.isCursorForward, input.isShiftHold {
-      if compositor.marker < compositor.width {
+      if compositor.marker < compositor.length {
         compositor.marker += 1
         if isCursorCuttingChar(isMarker: true) {
           compositor.jumpCursorBySpan(to: .front, isMarker: true)
@@ -562,7 +562,7 @@ extension InputHandler {
 
     if input.isShiftHold {
       // Shift + Right
-      if compositor.cursor < compositor.width {
+      if compositor.cursor < compositor.length {
         compositor.marker = compositor.cursor + 1
         if isCursorCuttingChar(isMarker: true) {
           compositor.jumpCursorBySpan(to: .front, isMarker: true)
@@ -709,7 +709,7 @@ extension InputHandler {
     let currentPaired = (currentNode.keyArray, currentNode.value)
 
     var currentIndex = 0
-    if !currentNode.isOverriden {
+    if !currentNode.isOverridden {
       /// 如果是沒有被使用者手動選字過的（節錨下的）節點，
       /// 就從第一個候選字詞開始，這樣使用者在敲字時就會優先匹配
       /// 那些字詞長度不小於 2 的單元圖。換言之，如果使用者敲了兩個
