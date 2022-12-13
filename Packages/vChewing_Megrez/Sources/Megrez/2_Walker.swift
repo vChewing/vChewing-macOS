@@ -1,9 +1,11 @@
-// Swiftified by (c) 2022 and onwards The vChewing Project (MIT License).
-// Rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
+// Swiftified and further development by (c) 2022 and onwards The vChewing Project (MIT License).
+// Was initially rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
 extension Megrez.Compositor {
+  /// 爬軌函式，會更新當前組字器的 walkedNodes。
+  ///
   /// 找到軌格陣圖內權重最大的路徑。該路徑代表了可被觀測到的最可能的隱藏事件鏈。
   /// 這裡使用 Cormen 在 2001 年出版的教材當中提出的「有向無環圖的最短路徑」的
   /// 算法來計算這種路徑。不過，這裡不是要計算距離最短的路徑，而是計算距離最長
@@ -11,23 +13,23 @@ extension Megrez.Compositor {
   /// 對於 `G = (V, E)`，該算法的運行次數為 `O(|V|+|E|)`，其中 `G` 是一個有向無環圖。
   /// 這意味著，即使軌格很大，也可以用很少的算力就可以爬軌。
   /// - Returns: 爬軌結果＋該過程是否順利執行。
-  @discardableResult public mutating func walk() -> ([Node], Bool) {
+  @discardableResult public mutating func walk() -> (walkedNode: [Node], succeeded: Bool) {
     var result = [Node]()
     defer {
       walkedNodes = result
-      updateCursorJumpingTables(walkedNodes)
+      updateCursorJumpingTables()
     }
     guard !spans.isEmpty else { return (result, true) }
 
-    var vertexSpans = [VertexSpan]()
+    var vertexSpans = [[Vertex]]()
     for _ in spans {
       vertexSpans.append(.init())
     }
 
     for (i, span) in spans.enumerated() {
       for j in 1...span.maxLength {
-        if let p = span.nodeOf(length: j) {
-          vertexSpans[i].append(.init(node: p))
+        if let theNode = span.nodeOf(length: j) {
+          vertexSpans[i].append(.init(node: theNode))
         }
       }
     }
@@ -60,15 +62,15 @@ extension Megrez.Compositor {
     }
 
     var walked = [Node]()
-    var totalKeyLength = 0
-    var it = terminal
-    while let itPrev = it.prev {
+    var totalLengthOfKeys = 0
+    var iterated = terminal
+    while let itPrev = iterated.prev {
       walked.append(itPrev.node)
-      it = itPrev
-      totalKeyLength += it.node.spanLength
+      iterated = itPrev
+      totalLengthOfKeys += iterated.node.spanLength
     }
 
-    guard totalKeyLength == keys.count else {
+    guard totalLengthOfKeys == keys.count else {
       print("!!! ERROR A")
       return (result, false)
     }
@@ -80,28 +82,5 @@ extension Megrez.Compositor {
     walked.removeFirst()
     result = walked
     return (result, true)
-  }
-}
-
-// MARK: - Stable Sort Extension
-
-// Reference: https://stackoverflow.com/a/50545761/4162914
-
-extension Sequence {
-  /// Return a stable-sorted collection.
-  ///
-  /// - Parameter areInIncreasingOrder: Return nil when two element are equal.
-  /// - Returns: The sorted collection.
-  fileprivate func stableSorted(
-    by areInIncreasingOrder: (Element, Element) throws -> Bool
-  )
-    rethrows -> [Element]
-  {
-    try enumerated()
-      .sorted { a, b -> Bool in
-        try areInIncreasingOrder(a.element, b.element)
-          || (a.offset < b.offset && !areInIncreasingOrder(b.element, a.element))
-      }
-      .map(\.element)
   }
 }
