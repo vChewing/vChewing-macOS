@@ -106,14 +106,12 @@ public class SessionCtl: IMKInputController {
       isVerticalTyping = false
       return
     }
-    DispatchQueue.main.async {
-      var textFrame = NSRect.seniorTheBeast
-      let attributes: [AnyHashable: Any]? = client.attributes(
-        forCharacterIndex: 0, lineHeightRectangle: &textFrame
-      )
-      let result = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
-      self.isVerticalTyping = result
-    }
+    var textFrame = NSRect.seniorTheBeast
+    let attributes: [AnyHashable: Any]? = client.attributes(
+      forCharacterIndex: 0, lineHeightRectangle: &textFrame
+    )
+    let result = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
+    self.isVerticalTyping = result
   }
 
   /// InputMode 需要在每次出現內容變更的時候都連帶重設組字器與各項語言模組，
@@ -213,7 +211,6 @@ extension SessionCtl {
   public override func activateServer(_ sender: Any!) {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
     DispatchQueue.main.async { [self] in
-      defer { updateVerticalTypingStatus() }
       if let senderBundleID: String = (sender as? IMKTextInput)?.bundleIdentifier() {
         vCLog("activateServer(\(senderBundleID))")
         isServingIMEItself = Bundle.main.bundleIdentifier == senderBundleID

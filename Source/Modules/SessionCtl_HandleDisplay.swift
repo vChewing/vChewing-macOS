@@ -73,6 +73,7 @@ extension SessionCtl {
 
   public func showCandidates() {
     guard let client = client() else { return }
+    updateVerticalTypingStatus()
     state.isVerticalCandidateWindow = (isVerticalTyping || !PrefMgr.shared.useHorizontalCandidateList)
 
     /// 無論是田所選字窗還是 IMK 選字窗，在這裡都有必要重新初期化。
