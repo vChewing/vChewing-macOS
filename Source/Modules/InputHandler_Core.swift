@@ -217,7 +217,7 @@ public class InputHandler: InputHandlerProtocol {
 
     var position = rearBoundary  // 臨時統計用
     while position < frontBoundary {
-      guard let regionIndex = compositor.cursorRegionMap[position] else {
+      guard let regionIndex = compositor.walkedNodes.cursorRegionMap[position] else {
         position += 1
         continue
       }

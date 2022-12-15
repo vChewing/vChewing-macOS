@@ -342,32 +342,26 @@ extension InputHandler {
 
     var composed = ""
 
-    for node in compositor.walkedNodes {
-      var key = node.keyArray.joined(separator: " ")
+    compositor.walkedNodes.smashedPairs.forEach { key, value in
+      var key = key
       if !prefs.cassetteEnabled {
-        var keyArray = node.keyArray
-        for (i, neta) in keyArray.enumerated() {
-          keyArray[i] =
-            prefs.inlineDumpPinyinInLieuOfZhuyin
-            ? Tekkon.restoreToneOneInPhona(target: neta)  // 恢復陰平標記
-            : Tekkon.cnvPhonaToTextbookReading(target: neta)  // 恢復陰平標記
-        }
-
-        key = keyArray.joined(separator: "\t")
+        key =
+          prefs.inlineDumpPinyinInLieuOfZhuyin
+          ? Tekkon.restoreToneOneInPhona(target: key)  // 恢復陰平標記
+          : Tekkon.cnvPhonaToTextbookReading(target: key)  // 恢復陰平標記
 
         if prefs.inlineDumpPinyinInLieuOfZhuyin {
           key = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: key)  // 注音轉拼音
           key = Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: key)  // 轉教科書式標調
         }
-        key = key.replacingOccurrences(of: "\t", with: " ")
       }
 
-      let value = node.value
+      key = key.replacingOccurrences(of: "\t", with: " ")
 
       if isShiftPressed {
         if !composed.isEmpty { composed += " " }
-        composed += key
-        continue
+        composed += key.contains("_") ? "??" : key
+        return
       }
 
       // 不要給標點符號等特殊元素加注音
@@ -710,50 +704,32 @@ extension InputHandler {
       return true
     }
 
-    var length = 0
-    var currentNode: Megrez.Compositor.Node?
-    let cursorIndex = cursorForCandidate
-    for node in compositor.walkedNodes {
-      length += node.spanLength
-      if length > cursorIndex {
-        currentNode = node
-        break
-      }
-    }
-
-    guard let currentNode = currentNode else {
-      delegate.callError("F58DEA95")
+    guard let region = compositor.walkedNodes.cursorRegionMap[cursorForCandidate],
+      compositor.walkedNodes.count > region
+    else {
+      delegate.callError("1CE6FFBD")
       return true
     }
 
+    let currentNode = compositor.walkedNodes[region]
+
     let currentPaired = (currentNode.keyArray, currentNode.value)
 
-    var currentIndex = 0
-    if !currentNode.isOverridden {
-      /// 如果是沒有被使用者手動選字過的（節錨下的）節點，
-      /// 就從第一個候選字詞開始，這樣使用者在敲字時就會優先匹配
-      /// 那些字詞長度不小於 2 的單元圖。換言之，如果使用者敲了兩個
-      /// 注音讀音、卻發現這兩個注音讀音各自的單字權重遠高於由這兩個
-      /// 讀音組成的雙字詞的權重、導致這個雙字詞並未在爬軌時被自動
-      /// 選中的話，則使用者可以直接摁下本函式對應的按鍵來輪替候選字即可。
-      /// （預設情況下是 (Shift+)Tab 來做正 (反) 向切換，但也可以用
-      /// Shift(+Command)+Space 或 Alt+↑/↓ 來切換（縱排輸入時則是 Alt+←/→）、
-      /// 以應對臉書綁架 Tab 鍵的情況。
-      if candidates[0] == currentPaired {
-        /// 如果第一個候選字詞是當前節點的候選字詞的值的話，
-        /// 那就切到下一個（或上一個，也就是最後一個）候選字詞。
-        currentIndex = reverseOrder ? candidates.count - 1 : 1
-      }
-    } else {
+    var currentIndex: Int {
+      var result = 0
       for candidate in candidates {
-        currentIndex =
+        if !currentNode.isOverridden {
+          if candidates[0] == currentPaired { result = reverseOrder ? candidates.count - 1 : 1 }
+          break
+        }
+        result =
           (candidate == currentPaired && reverseOrder)
-          ? ((currentIndex == 0) ? candidates.count - 1 : currentIndex - 1) : currentIndex + 1
+          ? ((result == 0) ? candidates.count - 1 : result - 1) : result + 1
         if candidate == currentPaired { break }
       }
+      return (0..<candidates.count).contains(result) ? result : 0
     }
 
-    if currentIndex >= candidates.count { currentIndex = 0 }
     consolidateNode(
       candidate: candidates[currentIndex], respectCursorPushing: false,
       preConsolidate: false, skipObservation: true
