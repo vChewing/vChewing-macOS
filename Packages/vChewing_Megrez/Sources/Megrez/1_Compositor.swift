@@ -59,9 +59,6 @@ extension Megrez {
       didSet { clear() }
     }
 
-    /// 允許查詢當前游標位置屬於第幾個幅位座標（從 0 開始算）。
-    public private(set) var cursorRegionMap: [Int: Int] = .init()
-
     /// 初期化一個組字器。
     /// - Parameter langModel: 要對接的語言模組。
     public init(with langModel: LangModelProtocol, separator: String = "-") {
@@ -79,7 +76,6 @@ extension Megrez {
       keys.removeAll()
       spans.removeAll()
       walkedNodes.removeAll()
-      cursorRegionMap.removeAll()
     }
 
     /// 在游標位置插入給定的索引鍵。
@@ -138,7 +134,7 @@ extension Megrez {
         case .rear:
           if target == 0 { return false }
       }
-      guard let currentRegion = cursorRegionMap[target] else { return false }
+      guard let currentRegion = walkedNodes.cursorRegionMap[target] else { return false }
 
       let aRegionForward = max(currentRegion - 1, 0)
       let currentRegionBorderRear: Int = walkedNodes[0..<currentRegion].map(\.spanLength).reduce(0, +)
@@ -311,20 +307,5 @@ extension Megrez.Compositor {
       }
     }
     return nodesChanged
-  }
-
-  /// 更新游標跳轉換算表。
-  mutating func updateCursorJumpingTables() {
-    var cursorRegionMapDict = [Int: Int]()
-    cursorRegionMapDict[-1] = 0  // 防呆
-    var counter = 0
-    for (i, theNode) in walkedNodes.enumerated() {
-      for _ in 0..<theNode.spanLength {
-        cursorRegionMapDict[counter] = i
-        counter += 1
-      }
-    }
-    cursorRegionMapDict[counter] = walkedNodes.count
-    cursorRegionMap = cursorRegionMapDict
   }
 }
