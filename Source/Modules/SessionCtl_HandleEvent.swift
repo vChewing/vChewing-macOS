@@ -104,7 +104,7 @@ extension SessionCtl {
     guard let inputHandler = inputHandler, client() != nil else { return false }
 
     /// 除非核心辭典有載入，否則一律蜂鳴。
-    if !LMMgr.currentLM.isCoreLoaded {
+    if !LMMgr.currentLM.isCoreLMLoaded {
       if (event as InputSignalProtocol).isReservedKey { return false }
       var newState: IMEStateProtocol = IMEState.ofEmpty()
       newState.tooltip = NSLocalizedString("Factory dictionary not loaded yet.", comment: "") + "　　"
@@ -119,6 +119,7 @@ extension SessionCtl {
 
     // 如果是方向鍵輸入的話，就想辦法帶上標記資訊、來說明當前是縱排還是橫排。
     if event.isUp || event.isDown || event.isLeft || event.isRight {
+      updateVerticalTypingStatus()  // 檢查當前環境是否是縱排輸入。
       eventToDeal = event.reinitiate(charactersIgnoringModifiers: isVerticalTyping ? "Vertical" : "Horizontal") ?? event
     }
 

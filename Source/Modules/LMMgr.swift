@@ -95,7 +95,7 @@ public class LMMgr {
       }
       group.leave()
     }
-    if !Self.lmCHT.isLanguageModelLoaded {
+    if !Self.lmCHT.isCoreLMLoaded {
       showFinishNotification = true
       Notifier.notify(
         message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
@@ -106,7 +106,7 @@ public class LMMgr {
         group.leave()
       }
     }
-    if !Self.lmCHS.isLanguageModelLoaded {
+    if !Self.lmCHS.isCoreLMLoaded {
       showFinishNotification = true
       Notifier.notify(
         message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
@@ -159,7 +159,7 @@ public class LMMgr {
     }
     switch mode {
       case .imeModeCHS:
-        if !Self.lmCHS.isLanguageModelLoaded {
+        if !Self.lmCHS.isCoreLMLoaded {
           showFinishNotification = true
           Notifier.notify(
             message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
@@ -171,7 +171,7 @@ public class LMMgr {
           }
         }
       case .imeModeCHT:
-        if !Self.lmCHT.isLanguageModelLoaded {
+        if !Self.lmCHT.isCoreLMLoaded {
           showFinishNotification = true
           Notifier.notify(
             message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
@@ -792,6 +792,33 @@ extension LMMgr: PhraseEditorDelegate {
 
   public func tagOverrides(in strProcessed: inout String, mode: Shared.InputMode) {
     let outputStack: NSMutableString = .init()
+    switch mode {
+      case .imeModeCHT:
+        if !Self.lmCHT.isCoreLMLoaded {
+          Notifier.notify(
+            message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
+          )
+          Self.loadCoreLanguageModelFile(
+            filenameSansExtension: "data-cht", langModel: &Self.lmCHT
+          )
+          Notifier.notify(
+            message: NSLocalizedString("Core Dict loading complete.", comment: "")
+          )
+        }
+      case .imeModeCHS:
+        if !Self.lmCHS.isCoreLMLoaded {
+          Notifier.notify(
+            message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
+          )
+          Self.loadCoreLanguageModelFile(
+            filenameSansExtension: "data-chs", langModel: &Self.lmCHS
+          )
+          Notifier.notify(
+            message: NSLocalizedString("Core Dict loading complete.", comment: "")
+          )
+        }
+      case .imeModeNULL: return
+    }
     for currentLine in strProcessed.split(separator: "\n") {
       let arr = currentLine.split(separator: " ")
       guard arr.count >= 2 else { continue }

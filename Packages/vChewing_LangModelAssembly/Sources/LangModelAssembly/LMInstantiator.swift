@@ -92,7 +92,7 @@ extension vChewingLM {
 
     // MARK: - 工具函式
 
-    public var isLanguageModelLoaded: Bool { lmCore.isLoaded }
+    public var isCoreLMLoaded: Bool { lmCore.isLoaded }
     public func loadLanguageModel(path: String) {
       if FileManager.default.isReadableFile(atPath: path) {
         lmCore.open(path)
@@ -218,8 +218,6 @@ extension vChewingLM {
     }
 
     // MARK: - 核心函式（對外）
-
-    public var isCoreLoaded: Bool { lmCore.isLoaded }
 
     public func hasAssociatedPhrasesFor(pair: Megrez.Compositor.KeyValuePaired) -> Bool {
       lmAssociates.hasValuesFor(pair: pair)
