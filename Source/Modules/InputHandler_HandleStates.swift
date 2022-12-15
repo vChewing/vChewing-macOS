@@ -734,7 +734,10 @@ extension InputHandler {
     }
 
     if currentIndex >= candidates.count { currentIndex = 0 }
-    consolidateNode(candidate: candidates[currentIndex], respectCursorPushing: false, preConsolidate: false)
+    consolidateNode(
+      candidate: candidates[currentIndex], respectCursorPushing: false,
+      preConsolidate: false, skipObservation: true
+    )
     delegate.switchState(generateStateOfInputting())
     return true
   }

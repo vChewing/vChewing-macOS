@@ -33,13 +33,22 @@ public protocol InputHandlerProtocol {
   func generateStateOfCandidates() -> IMEStateProtocol
   func generateStateOfInputting(sansReading: Bool) -> IMEStateProtocol
   func generateStateOfAssociates(withPair pair: Megrez.Compositor.KeyValuePaired) -> IMEStateProtocol
-  func consolidateNode(candidate: ([String], String), respectCursorPushing: Bool, preConsolidate: Bool)
+  func consolidateNode(
+    candidate: ([String], String), respectCursorPushing: Bool, preConsolidate: Bool, skipObservation: Bool
+  )
   func updateUnigramData() -> Bool
 }
 
 extension InputHandlerProtocol {
   func generateStateOfInputting(sansReading: Bool = false) -> IMEStateProtocol {
     generateStateOfInputting(sansReading: sansReading)
+  }
+
+  func consolidateNode(candidate: ([String], String), respectCursorPushing: Bool, preConsolidate: Bool) {
+    consolidateNode(
+      candidate: candidate, respectCursorPushing: respectCursorPushing,
+      preConsolidate: preConsolidate, skipObservation: false
+    )
   }
 }
 
@@ -242,8 +251,10 @@ public class InputHandler: InputHandlerProtocol {
   ///   - value: 給定之候選字（詞音配對）。
   ///   - respectCursorPushing: 若該選項為 true，則會在選字之後始終將游標推送至選字後的節錨的前方。
   ///   - preConsolidate: 在固化節點之前，先鞏固上下文。該選項可能會破壞在內文組字區內就地輪替候選字詞時的體驗。
+  ///   - skipObservation: 不要讓半衰記憶模組對此做出觀察。
   public func consolidateNode(
-    candidate: ([String], String), respectCursorPushing: Bool = true, preConsolidate: Bool = false
+    candidate: ([String], String), respectCursorPushing: Bool = true,
+    preConsolidate: Bool = false, skipObservation: Bool = false
   ) {
     let theCandidate: Megrez.Compositor.KeyValuePaired = .init(keyArray: candidate.0, value: candidate.1)
 
@@ -262,7 +273,8 @@ public class InputHandler: InputHandlerProtocol {
     let currentNode = currentWalk.findNode(at: cursorForCandidate, target: &accumulatedCursor)
     guard let currentNode = currentNode else { return }
 
-    if currentNode.currentUnigram.score > -12, prefs.fetchSuggestionsFromUserOverrideModel {
+    uom: if currentNode.currentUnigram.score > -12, prefs.fetchSuggestionsFromUserOverrideModel {
+      if skipObservation { break uom }
       vCLog("UOM: Start Observation.")
       // 這個過程可能會因為使用者半衰記憶模組內部資料錯亂、而導致輸入法在選字時崩潰。
       // 於是在這裡引入災後狀況察覺專用變數，且先開啟該開關。順利執行完觀察後會關閉。
