@@ -55,7 +55,7 @@ extension Tekkon {
       switch isHanyuPinyin {
         case false:  // 注音輸出的場合
           let valReturnZhuyin = value.replacingOccurrences(of: " ", with: "")
-          return isTextBookStyle ? cnvZhuyinChainToTextbookReading(targetJoined: valReturnZhuyin) : valReturnZhuyin
+          return isTextBookStyle ? cnvPhonaToTextbookReading(target: valReturnZhuyin) : valReturnZhuyin
         case true:  // 拼音輸出的場合
           let valReturnPinyin = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: value)
           return isTextBookStyle ? Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: valReturnPinyin) : valReturnPinyin

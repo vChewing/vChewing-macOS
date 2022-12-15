@@ -13,7 +13,7 @@ extension Tekkon {
 
   /// 注音轉拼音，要求陰平必須是空格。
   /// - Parameters:
-  ///   - target: 傳入的 String 對象物件。
+  ///   - targetJoined: 傳入的 String 對象物件。
   public static func cnvPhonaToHanyuPinyin(targetJoined: String) -> String {
     var targetConverted = targetJoined
     for pair in arrPhonaToHanyuPinyin {
@@ -35,42 +35,32 @@ extension Tekkon {
 
   /// 該函式負責將注音轉為教科書印刷的方式（先寫輕聲）。
   /// - Parameters:
-  ///   - target: 要拿來做轉換處理的讀音鏈，以英文減號來分隔每個讀音。
-  ///   - newSeparator: 新的讀音分隔符。
-  /// - Returns: 經過轉換處理的讀音鏈。
-  public static func cnvZhuyinChainToTextbookReading(targetJoined: String, newSeparator: String = "-") -> String {
-    var arrReturn: [String] = []
-    for neta in targetJoined.split(separator: "-") {
-      var newString = String(neta)
-      if String(neta.reversed()[0]) == "˙" {
-        newString = String(neta.dropLast())
-        newString.insert("˙", at: newString.startIndex)
-      }
-      arrReturn.append(newString)
+  ///   - target: 要拿來做轉換處理的讀音。
+  /// - Returns: 經過轉換處理的讀音。
+  public static func cnvPhonaToTextbookReading(target: String) -> String {
+    var newString = target
+    if String(target.reversed()[0]) == "˙" {
+      newString = String(target.dropLast())
+      newString.insert("˙", at: newString.startIndex)
     }
-    return arrReturn.joined(separator: newSeparator)
+    return newString
   }
 
   /// 該函式用來恢復注音當中的陰平聲調，恢復之後會以「1」表示陰平。
   /// - Parameters:
-  ///   - target: 要拿來做轉換處理的讀音鏈，以英文減號來分隔每個讀音。
-  ///   - newSeparator: 新的讀音分隔符。
-  /// - Returns: 經過轉換處理的讀音鏈。
-  public static func restoreToneOneInZhuyinKey(targetJoined: String, newSeparator: String = "-") -> String {
-    var arrReturn: [String] = []
-    for neta in targetJoined.split(separator: "-") {
-      var newNeta = String(neta)
-      if !"ˊˇˋ˙".contains(String(neta.reversed()[0])), !neta.contains("_") {
-        newNeta += "1"
-      }
-      arrReturn.append(newNeta)
-    }
-    return arrReturn.joined(separator: newSeparator)
+  ///   - target: 要拿來做轉換處理的讀音。
+  /// - Returns: 經過轉換處理的讀音。
+  public static func restoreToneOneInPhona(
+    target: String
+  ) -> String {
+    var newNeta = target
+    if !"ˊˇˋ˙".contains(String(target.reversed()[0])), !target.contains("_") { newNeta += "1" }
+    return newNeta
   }
 
   /// 該函式用來將漢語拼音轉為注音。
   /// - Parameters:
-  ///   - target: 要轉換的漢語拼音內容，要求必須帶有 12345 數字標調。
+  ///   - targetJoined: 要轉換的漢語拼音內容，要求必須帶有 12345 數字標調。
   ///   - newToneOne: 對陰平指定新的標記。預設情況下該標記為空字串。
   /// - Returns: 轉換結果。
   public static func cnvHanyuPinyinToPhona(targetJoined: String, newToneOne: String = "") -> String {
