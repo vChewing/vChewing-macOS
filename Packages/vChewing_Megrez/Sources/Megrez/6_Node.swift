@@ -3,6 +3,8 @@
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
+import Foundation
+
 extension Megrez.Compositor {
   /// 字詞節點。
   ///
@@ -197,22 +199,25 @@ extension Array where Element == Megrez.Compositor.Node {
 
   /// 返回一連串的節點起點。結果為 (Result A, Result B) 辭典陣列。
   /// Result A 以索引查座標，Result B 以座標查索引。
-  public var nodeBorderPointDictPair: ([Int: Int], [Int: Int]) {
+  private var nodeBorderPointDictPair: (regionCursorMap: [Int: Int], cursorRegionMap: [Int: Int]) {
     // Result A 以索引查座標，Result B 以座標查索引。
     var resultA = [Int: Int]()
-    var resultB = [Int: Int]()
-    var i = 0
-    for (j, neta) in enumerated() {
-      resultA[j] = i
+    var resultB: [Int: Int] = [-1: 0]  // 防呆
+    var cursorCounter = 0
+    for (nodeCounter, neta) in enumerated() {
+      resultA[nodeCounter] = cursorCounter
       neta.keyArray.forEach { _ in
-        resultB[i] = j
-        i += 1
+        resultB[cursorCounter] = nodeCounter
+        cursorCounter += 1
       }
     }
-    resultA[resultA.count] = i
-    resultB[i] = resultB.count
+    resultA[count] = cursorCounter
+    resultB[cursorCounter] = count
     return (resultA, resultB)
   }
+
+  /// 返回一個辭典，以座標查索引。允許以游標位置查詢其屬於第幾個幅位座標（從 0 開始算）。
+  public var cursorRegionMap: [Int: Int] { nodeBorderPointDictPair.cursorRegionMap }
 
   /// 總讀音單元數量。在絕大多數情況下，可視為總幅位長度。
   public var totalKeyCount: Int { map(\.keyArray.count).reduce(0, +) }
@@ -227,9 +232,9 @@ extension Array where Element == Megrez.Compositor.Node {
     let cursor = Swift.max(0, cursor)  // 防呆
     nilReturn = cursor..<cursor
     // 下文按道理來講不應該會出現 nilReturn。
-    guard let rearNodeID = nodeBorderPointDictPair.1[cursor] else { return nilReturn }
-    guard let rearIndex = nodeBorderPointDictPair.0[rearNodeID] else { return nilReturn }
-    guard let frontIndex = nodeBorderPointDictPair.0[rearNodeID + 1] else { return nilReturn }
+    guard let rearNodeID = nodeBorderPointDictPair.cursorRegionMap[cursor] else { return nilReturn }
+    guard let rearIndex = nodeBorderPointDictPair.regionCursorMap[rearNodeID] else { return nilReturn }
+    guard let frontIndex = nodeBorderPointDictPair.regionCursorMap[rearNodeID + 1] else { return nilReturn }
     return rearIndex..<frontIndex
   }
 
@@ -253,5 +258,26 @@ extension Array where Element == Megrez.Compositor.Node {
   public func findNode(at cursor: Int) -> Megrez.Compositor.Node? {
     var useless = 0
     return findNode(at: cursor, target: &useless)
+  }
+
+  /// 提供一組逐字的字音配對陣列（不使用 Megrez 的 KeyValuePaired 類型），但字音不匹配的節點除外。
+  public var smashedPairs: [(key: String, value: String)] {
+    var arrData = [(key: String, value: String)]()
+    let separator = Megrez.Compositor.theSeparator
+    forEach { node in
+      if node.isReadingMismatched {
+        var newKey = node.joinedKey()
+        if !separator.isEmpty, newKey != separator, newKey.contains(separator) {
+          newKey = newKey.replacingOccurrences(of: separator, with: "\t")
+        }
+        arrData.append((key: newKey, value: node.value))
+        return
+      }
+      let arrValueChars = node.value.map(\.description)
+      node.keyArray.enumerated().forEach { i, key in
+        arrData.append((key: key, value: arrValueChars[i]))
+      }
+    }
+    return arrData
   }
 }
