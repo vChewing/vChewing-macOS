@@ -181,25 +181,27 @@ extension IMEStateData {
   public var readingThreadForDisplay: String {
     var arrOutput = [String]()
     for neta in markedReadings {
-      var neta = neta
       if neta.isEmpty { continue }
       if neta.contains("_") {
         arrOutput.append("??")
         continue
       }
-      if !PrefMgr.shared.cassetteEnabled {
-        if PrefMgr.shared.showHanyuPinyinInCompositionBuffer,
-          PrefMgr.shared.alwaysShowTooltipTextsHorizontally || !isVerticalTyping
-        {
-          // 恢復陰平標記->注音轉拼音->轉教科書式標調
-          neta = Tekkon.restoreToneOneInZhuyinKey(targetJoined: neta)
-          neta = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: neta)
-          neta = Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: neta)
-        } else {
-          neta = Tekkon.cnvZhuyinChainToTextbookReading(targetJoined: neta)
+      neta.components(separatedBy: "-").forEach { subNeta in
+        var subNeta = subNeta
+        if !PrefMgr.shared.cassetteEnabled {
+          if PrefMgr.shared.showHanyuPinyinInCompositionBuffer,
+            PrefMgr.shared.alwaysShowTooltipTextsHorizontally || !isVerticalTyping
+          {
+            // 恢復陰平標記->注音轉拼音->轉教科書式標調
+            subNeta = Tekkon.restoreToneOneInPhona(target: subNeta)
+            subNeta = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: subNeta)
+            subNeta = Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: subNeta)
+          } else {
+            subNeta = Tekkon.cnvPhonaToTextbookReading(target: subNeta)
+          }
         }
+        arrOutput.append(subNeta)
       }
-      arrOutput.append(neta)
     }
     return arrOutput.joined(separator: "\u{A0}")
   }
