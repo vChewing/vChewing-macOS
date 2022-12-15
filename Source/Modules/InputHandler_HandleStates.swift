@@ -295,6 +295,7 @@ extension InputHandler {
   // MARK: - Command+Enter 鍵的處理（注音文）
 
   /// Command+Enter 鍵的處理（注音文）。
+  /// - Parameter isShiftPressed: 有沒有同時摁著 Shift 鍵。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleCtrlCommandEnter(isShiftPressed: Bool = false) -> Bool {
     guard let delegate = delegate else { return false }
@@ -308,7 +309,11 @@ extension InputHandler {
     if !prefs.cassetteEnabled {
       if prefs.inlineDumpPinyinInLieuOfZhuyin {
         if !compositor.isEmpty {
-          displayedText = Tekkon.restoreToneOneInZhuyinKey(targetJoined: displayedText)  // 恢復陰平標記
+          var arrDisplayedTextElements = [String]()
+          compositor.keys.forEach { key in
+            arrDisplayedTextElements.append(Tekkon.restoreToneOneInPhona(target: key))  // 恢復陰平標記
+          }
+          displayedText = arrDisplayedTextElements.joined(separator: "\t")
         }
         displayedText = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: displayedText)  // 注音轉拼音
       }
@@ -328,8 +333,9 @@ extension InputHandler {
   // MARK: - Command+Option+Enter 鍵的處理（網頁 Ruby 注音文標記）
 
   /// Command+Option+Enter 鍵的處理（網頁 Ruby 注音文標記）。
+  /// - Parameter isShiftPressed: 有沒有同時摁著 Shift 鍵。摁了的話則只遞交讀音字串。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func handleCtrlOptionCommandEnter() -> Bool {
+  func handleCtrlOptionCommandEnter(isShiftPressed: Bool = false) -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
@@ -337,19 +343,33 @@ extension InputHandler {
     var composed = ""
 
     for node in compositor.walkedNodes {
-      var key = node.keyArray.joined(separator: "\t")
+      var key = node.keyArray.joined(separator: " ")
       if !prefs.cassetteEnabled {
+        var keyArray = node.keyArray
+        for (i, neta) in keyArray.enumerated() {
+          keyArray[i] =
+            prefs.inlineDumpPinyinInLieuOfZhuyin
+            ? Tekkon.restoreToneOneInPhona(target: neta)  // 恢復陰平標記
+            : Tekkon.cnvPhonaToTextbookReading(target: neta)  // 恢復陰平標記
+        }
+
+        key = keyArray.joined(separator: "\t")
+
         if prefs.inlineDumpPinyinInLieuOfZhuyin {
-          key = Tekkon.restoreToneOneInZhuyinKey(targetJoined: key)  // 恢復陰平標記
           key = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: key)  // 注音轉拼音
           key = Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: key)  // 轉教科書式標調
-          key = key.replacingOccurrences(of: "\t", with: " ")
-        } else {
-          key = Tekkon.cnvZhuyinChainToTextbookReading(targetJoined: key, newSeparator: " ")
         }
+        key = key.replacingOccurrences(of: "\t", with: " ")
       }
 
       let value = node.value
+
+      if isShiftPressed {
+        if !composed.isEmpty { composed += " " }
+        composed += key
+        continue
+      }
+
       // 不要給標點符號等特殊元素加注音
       composed += key.contains("_") ? value : "<ruby>\(value)<rp>(</rp><rt>\(key)</rt><rp>)</rp></ruby>"
     }
