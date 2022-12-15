@@ -32,8 +32,14 @@ extension SessionCtl {
             ? theCandidate.0.joined(separator: separator)
             : (PrefMgr.shared.showHanyuPinyinInCompositionBuffer
               ? Tekkon.cnvPhonaToHanyuPinyin(
-                targetJoined: Tekkon.restoreToneOneInZhuyinKey(
-                  targetJoined: theCandidate.0.joined(separator: separator)))
+                targetJoined: {
+                  var arr = [String]()
+                  theCandidate.0.forEach { key in
+                    arr.append(Tekkon.restoreToneOneInPhona(target: key))
+                  }
+                  return arr.joined(separator: "-")
+                }()
+              )
               : theCandidate.0.joined(separator: separator))
           result = "\(result)\u{17}(\(reading))"
         }
@@ -95,7 +101,14 @@ extension SessionCtl {
           ? neta.0.joined(separator: separator)
           : (PrefMgr.shared.showHanyuPinyinInCompositionBuffer
             ? Tekkon.cnvPhonaToHanyuPinyin(
-              targetJoined: Tekkon.restoreToneOneInZhuyinKey(targetJoined: neta.0.joined(separator: separator)))
+              targetJoined: {
+                var arr = [String]()
+                neta.0.forEach { key in
+                  arr.append(Tekkon.restoreToneOneInPhona(target: key))
+                }
+                return arr.joined(separator: "-")
+              }()
+            )
             : neta.0.joined(separator: separator))
         let netaShownWithPronunciation = "\(netaShown)\u{17}(\(reading))"
         if candidateString == prefix + netaShownWithPronunciation {

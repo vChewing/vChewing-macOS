@@ -149,7 +149,7 @@ extension InputHandler {
         case .kCarriageReturn, .kLineFeed:  // Enter
           return (input.isCommandHold && input.isControlHold)
             ? (input.isOptionHold
-              ? handleCtrlOptionCommandEnter()
+              ? handleCtrlOptionCommandEnter(isShiftPressed: input.isShiftHold)
               : handleCtrlCommandEnter(isShiftPressed: input.isShiftHold))
             : handleEnter()
         case .kSpace:  // 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
