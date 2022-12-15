@@ -15,10 +15,7 @@ extension Megrez.Compositor {
   /// - Returns: 爬軌結果＋該過程是否順利執行。
   @discardableResult public mutating func walk() -> (walkedNode: [Node], succeeded: Bool) {
     var result = [Node]()
-    defer {
-      walkedNodes = result
-      updateCursorJumpingTables()
-    }
+    defer { walkedNodes = result }
     guard !spans.isEmpty else { return (result, true) }
 
     var vertexSpans = [[Vertex]]()
