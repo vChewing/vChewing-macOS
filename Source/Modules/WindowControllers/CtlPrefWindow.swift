@@ -66,6 +66,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   public static var shared: CtlPrefWindow?
 
   static func show() {
+    let resetPhraseEditor: Bool = shared?.window == nil || !(shared?.window?.isVisible ?? false) || shared == nil
     if shared == nil { shared = CtlPrefWindow(windowNibName: "frmPrefWindow") }
     guard let shared = shared, let sharedWindow = shared.window else { return }
     sharedWindow.delegate = shared
@@ -74,6 +75,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
     sharedWindow.level = .statusBar
     sharedWindow.titlebarAppearsTransparent = true
     shared.showWindow(shared)
+    if resetPhraseEditor { shared.initPhraseEditor() }
     NSApp.activate(ignoringOtherApps: true)
   }
 
