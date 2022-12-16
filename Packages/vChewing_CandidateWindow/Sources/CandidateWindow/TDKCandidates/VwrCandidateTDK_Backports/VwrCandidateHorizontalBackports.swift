@@ -160,7 +160,8 @@ public struct VwrCandidateHorizontalBackports: View {
     .frame(minWidth: thePool.maxWindowWidth, maxWidth: thePool.maxWindowWidth)
     .background(Color(white: colorScheme == .dark ? 0.1 : 1))
     .overlay(
-      RoundedRectangle(cornerRadius: 10).stroke(.white.opacity(0.2), lineWidth: 1)
+      RoundedRectangle(cornerRadius: 10).stroke(
+        Color(white: colorScheme == .dark ? 0 : 1).opacity(colorScheme == .dark ? 1 : 0.1), lineWidth: 0.5)
     )
     .cornerRadius(10)
   }
