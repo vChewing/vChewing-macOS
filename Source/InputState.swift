@@ -317,4 +317,53 @@ class InputState: NSObject {
             "<InputState.AssociatedPhrases, candidates:\(candidates), useVerticalMode:\(useVerticalMode)>"
         }
     }
+
+    @objc (InputStateSymbolTable)
+    class SymbolTable: ChoosingCandidate {
+        @objc var node: SymbolNode
+
+        @objc init(node: SymbolNode, useVerticalMode: Bool) {
+            self.node = node
+            let candidates = node.children?.map { $0.title } ?? [String]()
+            super.init(composingBuffer: "", cursorIndex: 0, candidates: candidates, useVerticalMode: useVerticalMode)
+        }
+
+        override var description: String {
+            "<InputState.SymbolTable, candidates:\(candidates), useVerticalMode:\(useVerticalMode),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
+        }
+    }
+
+}
+
+@objc class SymbolNode: NSObject {
+    @objc var title: String
+    @objc var children: [SymbolNode]?
+
+    @objc init(_ title: String, _ children: [SymbolNode]? = nil) {
+        self.title = title
+        self.children = children
+        super.init()
+    }
+
+    @objc init(_ title: String, symbols: String) {
+        self.title = title
+        self.children = Array(symbols).map { SymbolNode(String($0), nil) }
+        super.init()
+    }
+
+    @objc static let root: SymbolNode = SymbolNode("/", [
+        SymbolNode("…"),
+        SymbolNode("※"),
+        SymbolNode("常用符號", symbols:"，、。．？！；：‧‥﹐﹒˙·‘’“”〝〞‵′〃～＄％＠＆＃＊"),
+        SymbolNode("左右括號", symbols:"（）「」〔〕｛｝〈〉『』《》【】﹙﹚﹝﹞﹛﹜"),
+        SymbolNode("上下括號", symbols:"︵︶﹁﹂︹︺︷︸︿﹀﹃﹄︽︾︻︼"),
+        SymbolNode("希臘字母", symbols:"αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ"),
+        SymbolNode("數學符號", symbols:"＋－×÷＝≠≒∞±√＜＞﹤﹥≦≧∩∪ˇ⊥∠∟⊿㏒㏑∫∮∵∴╳﹢"),
+        SymbolNode("特殊圖形", symbols:"↑↓←→↖↗↙↘㊣◎○●⊕⊙○●△▲☆★◇◆□■▽▼§￥〒￠￡※♀♂"),
+        SymbolNode("Unicode", symbols:"♨☀☁☂☃♠♥♣♦♩♪♫♬☺☻"),
+        SymbolNode("單線框", symbols:"├─┼┴┬┤┌┐╞═╪╡│▕└┘╭╮╰╯"),
+        SymbolNode("雙線框", symbols:"╔╦╗╠═╬╣╓╥╖╒╤╕║╚╩╝╟╫╢╙╨╜╞╪╡╘╧╛"),
+        SymbolNode("填色方塊", symbols:"＿ˍ▁▂▃▄▅▆▇█▏▎▍▌▋▊▉◢◣◥◤"),
+        SymbolNode("線段", symbols:"﹣﹦≡｜∣∥–︱—︳╴¯￣﹉﹊﹍﹎﹋﹌﹏︴∕﹨╱╲／＼"),
+    ])
 }

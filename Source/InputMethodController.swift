@@ -575,6 +575,17 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
     func candidateController(_ controller: CandidateController, didSelectCandidateAtIndex index: UInt) {
         let client = currentCandidateClient
 
+        if let state = state as? InputState.SymbolTable,
+           let node = state.node.children?[Int(index)] {
+            if let children = node.children, !children.isEmpty {
+                self.handle(state: .SymbolTable(node: node, useVerticalMode: state.useVerticalMode), client: currentCandidateClient)
+            } else {
+                self.handle(state: .Committing(poppedText: node.title), client: client)
+                self.handle(state: .Empty(), client: client)
+            }
+            return
+        }
+
         if let state = state as? InputState.ChoosingCandidate {
             let selectedValue = state.candidates[Int(index)]
             keyHandler.fixNode(value: selectedValue)
@@ -596,7 +607,10 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             } else {
                 handle(state: inputting, client: client)
             }
-        } else if let state = state as? InputState.AssociatedPhrases {
+            return
+        }
+
+        if let state = state as? InputState.AssociatedPhrases {
             let selectedValue = state.candidates[Int(index)]
             handle(state: .Committing(poppedText: selectedValue), client: currentCandidateClient)
             if Preferences.associatedPhrasesEnabled,
