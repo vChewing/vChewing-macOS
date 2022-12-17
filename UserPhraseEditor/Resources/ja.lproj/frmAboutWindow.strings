@@ -1,0 +1,29 @@
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "btnConfirm"; */
+"btnConfirm.title" = "うむ";
+
+/* Class = "NSTextFieldCell"; title = "vChewing Phrase Editor for macOS"; ObjectID = "lblAppTitle"; */
+"lblAppTitle.title" = "vChewing Phrase Editor for macOS";
+
+/* Class = "NSTextFieldCell"; title = "Placeholder for showing copyright information."; ObjectID = "lblCopyright"; */
+"lblCopyright.title" = "Placeholder for showing copyright information.";
+
+/* Class = "NSTextFieldCell"; title = "vChewing Phrase Editor developed by Shiki Suen.\nvChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "lblCredits"; */
+"lblCredits.title" = "威注音辞書データ編集アプリ開発：Shiki Suen。\n威注音語彙データの維持：Shiki Suen。";
+
+/* Class = "NSTextFieldCell"; title = "DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, are not included in vChewing official phrase database."; ObjectID = "lblDisclaimer"; */
+"lblDisclaimer.title" = "免責事項：vChewing Project は、OpenVanilla と協力関係や提携関係にあるわけではなく、OpenVanilla が小麦注音プロジェクトに同梱した辞書データについて、vChewing Project は一切責任負い兼ねる。特定な地政学的・観念形態的な内容は、vChewing アプリの世界的な普及に妨害する恐れがあるため、vChewing 公式辞書データに不収録。";
+
+/* Class = "NSTextFieldCell"; title = "MIT-NTL License:"; ObjectID = "lblLicense"; */
+"lblLicense.title" = "ＭＩＴ商標不許可ライセンス (MIT-NTL License):";
+
+/* Class = "NSTextFieldCell"; title = "A subproduct of the vChewing Input Method for macOS."; ObjectID = "lblProjectDescription"; */
+"lblProjectDescription.title" = "威注音入力アプリの内蔵機能アプリの一つである。";
+
+/* Class = "NSTextFieldCell"; title = "version_placeholder"; ObjectID = "lblVersionString"; */
+"lblVersionString.title" = "version_placeholder";
+
+/* Class = "NSWindow"; title = "About vChewing Phrase Editor for macOS"; ObjectID = "ttlAboutWindow"; */
+"ttlAboutWindow.title" = "macOS 版威注音辞書データ編集アプリについて";
+
+"ImH-h2-3FG.title" = "公式HP";

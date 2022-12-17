@@ -1,0 +1,20 @@
+name: Build-with-macOS-12
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Build (macOS 12)
+    runs-on: macOS-12
+    env:
+        GIT_SSL_NO_VERIFY: true
+        DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@v1
+      - name: Clean
+        run: make clean
+      - name: Build
+        run: git pull --all && git submodule sync; make update; make

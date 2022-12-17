@@ -1,0 +1,3 @@
+[submodule "Source/Data"]
+	path = Source/Data
+	url = https://gitlink.org.cn/vChewing/vChewing-VanguardLexicon.git

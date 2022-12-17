@@ -1,0 +1,50 @@
+免责声明：威注音专案对小麦注音官方专案内赠的小麦注音原版词库内容不负任何责任。威注音输入法专用的威注音官方词库不包含任何「会在法理上妨碍威注音在全球传播」的「与地缘政治及政治意识形态有关的」内容。威注音专案与 OpenVanilla 专案之间无合作关系、无隶属关系。
+
+vChewing macOS: MIT-NTL License 麻理（去商标）授权合约
+
+© 2021-2022 vChewing Project.
+威注音 macOS 程式研发：Shiki Suen, Isaac Xen, Hiraku Wang, 等。
+威注音词库维护：Shiki Suen。
+
+软件之著作权利人依此麻理授权条款，将其对于软件之著作权利授权释出，只须使用者践履以下二项麻理授权条款叙明之义务性规定，其即享有对此软件程式及其相关说明文档自由不受限制地进行利用之权利，范围包括「使用、重制、修改、合并、出版、散布、再授权、及贩售程式重制作品」等诸多方面之应用，而散布程式之人、更可将上述权利传递予其后收受程式之后手，倘若其后收受程式之人亦服膺以下二项麻理授权条款之义务性规定，则其对程式亦享有与前手运用范围相同之同一权利。
+
+甲、散布此一软件程式者，须将本条款其上之「著作权声明」及以下之「免责声明」内嵌于软件程式及其重制作品之实体之中。
+
+乙、敝授权合约不提供对「贡献者」之商品名称、商标、服务标志或产品名称之商标许可，除非用以满足履行上文所述义务之必要。
+
+因麻理软件程式之授权模式乃是无偿提供，是以在现行法律之架构下可以主张合理之免除担保责任。麻理软件之著作权人或任何之后续散布者，对于其所散布之麻理软件程式皆不负任何形式上实质上之担保责任，明示亦或隐喻、商业利用性亦或特定目之使用性，这些均不在保障之列。利用麻理软件程式之所有风险均由使用者自行担负。假如所使用之麻理程式发生缺陷性问题，使用者需自行担负修正、改正及必要之服务支出。麻理软件程式之著作权人不负任何形式上实质上之担保责任，无论任何一般之、特殊之、偶发之、因果关系式之损害，或是麻理软件程式之不适用性，均须由使用者自行负担。
+
+$ 在本专案内用到了下述第三方模组:
+
+- ShiftKeyUpChecker: (c) 2019 and onwards Qwertyyb (March Yang) (MIT License).
+- LineReader: (c) 2019 and onwards Robert Muckle-Jones (Apache 2.0 License).
+- SwiftUI Preferences UI Framework: (c) 2018 and onwards Sindre Sorhus (MIT License).
+- SwiftUI VDKComboBox: (c) 2022 and onwards Bryan Jones (CC BY-SA 4.0)
+- Note that Hotenka Chinese Converter is rewritten by Shiki Suen (using Swift) from Nick Chen's Objective-C library "NCChineseConverter" (MIT License).
+
+########################################################
+## UPSTREAM LICENSE PROVIDED BELOW INTACT FOR REFERENCE
+## https://github.com/openvanilla/McBopomofo/blob/5b319f491142c1170a3607e28ab4e91c22861998/LICENSE.txt
+########################################################
+
+MIT License
+
+Copyright (c) 2011-2022 Mengjuei Hsieh et al.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
