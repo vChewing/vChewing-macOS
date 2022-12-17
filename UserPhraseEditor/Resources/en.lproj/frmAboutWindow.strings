@@ -1,0 +1,29 @@
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "btnConfirm"; */
+"btnConfirm.title" = "OK";
+
+/* Class = "NSTextFieldCell"; title = "vChewing Phrase Editor for macOS"; ObjectID = "lblAppTitle"; */
+"lblAppTitle.title" = "vChewing Phrase Editor for macOS";
+
+/* Class = "NSTextFieldCell"; title = "Placeholder for showing copyright information."; ObjectID = "lblCopyright"; */
+"lblCopyright.title" = "Placeholder for showing copyright information.";
+
+/* Class = "NSTextFieldCell"; title = "vChewing Phrase Editor developed by Shiki Suen.\nvChewing Phrase Database Maintained by Shiki Suen."; ObjectID = "lblCredits"; */
+"lblCredits.title" = "vChewing Phrase Editor developed by Shiki Suen.\nvChewing Phrase Database Maintained by Shiki Suen.";
+
+/* Class = "NSTextFieldCell"; title = "DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, are not included in vChewing official phrase database."; ObjectID = "lblDisclaimer"; */
+"lblDisclaimer.title" = "DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, are not included in vChewing official phrase database.";
+
+/* Class = "NSTextFieldCell"; title = "MIT-NTL License:"; ObjectID = "lblLicense"; */
+"lblLicense.title" = "MIT-NTL License:";
+
+/* Class = "NSTextFieldCell"; title = "A subproduct of the vChewing Input Method for macOS."; ObjectID = "lblProjectDescription"; */
+"lblProjectDescription.title" = "A subproduct of the vChewing Input Method for macOS.";
+
+/* Class = "NSTextFieldCell"; title = "version_placeholder"; ObjectID = "lblVersionString"; */
+"lblVersionString.title" = "version_placeholder";
+
+/* Class = "NSWindow"; title = "About vChewing Phrase Editor for macOS"; ObjectID = "ttlAboutWindow"; */
+"ttlAboutWindow.title" = "About vChewing Phrase Editor for macOS";
+
+"ImH-h2-3FG.title" = "Website";
