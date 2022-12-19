@@ -1295,14 +1295,14 @@
             <point key="canvasLocation" x="101.5" y="-255"/>
         </view>
         <view id="U4q-xw-mc0" userLabel="vwrKeyboard">
-            <rect key="frame" x="0.0" y="0.0" width="577" height="274"/>
+            <rect key="frame" x="0.0" y="0.0" width="577" height="298"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="0gn-BJ-qid">
-                    <rect key="frame" x="20" y="47" width="538" height="207"/>
+                    <rect key="frame" x="20" y="47" width="538" height="231"/>
                     <subviews>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="v7J-Jh-97Y">
-                            <rect key="frame" x="0.0" y="45" width="342" height="162"/>
+                            <rect key="frame" x="0.0" y="69" width="342" height="162"/>
                             <subviews>
                                 <textField autoresizesSubviews="NO" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="IpX-f7-rTL">
                                     <rect key="frame" x="-2" y="147" width="317" height="15"/>
@@ -1496,11 +1496,11 @@
                                 <real value="3.4028234663852886e+38"/>
                             </customSpacing>
                         </stackView>
-                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="9" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gwA-XL-zVB">
-                            <rect key="frame" x="350" y="0.0" width="188" height="207"/>
+                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="9" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="gwA-XL-zVB">
+                            <rect key="frame" x="350" y="0.0" width="188" height="231"/>
                             <subviews>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Md1-t7-hU4">
-                                    <rect key="frame" x="-2" y="192" width="125" height="15"/>
+                                    <rect key="frame" x="-2" y="216" width="125" height="15"/>
                                     <textFieldCell key="cell" lineBreakMode="clipping" title="Keyboard Shortcuts" id="xibKeyboardShortcuts">
                                         <font key="font" metaFont="systemBold" size="12"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1508,7 +1508,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <button verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="8fz-X4-HVS" userLabel="UsingHotKeySCPC">
-                                    <rect key="frame" x="-1" y="167.5" width="147" height="16"/>
+                                    <rect key="frame" x="-1" y="191.5" width="147" height="16"/>
                                     <buttonCell key="cell" type="check" title="Per-Char Select Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeySCPC">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
@@ -1518,7 +1518,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ajS-Ja-Vxr" userLabel="UsingHotKeyKangXi">
-                                    <rect key="frame" x="-1" y="143.5" width="140" height="16"/>
+                                    <rect key="frame" x="-1" y="167.5" width="140" height="16"/>
                                     <buttonCell key="cell" type="check" title="Force KangXi Writing" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyKangXi">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
@@ -1528,7 +1528,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZWc-3p-TII" userLabel="UsingHotKeyAssociates">
-                                    <rect key="frame" x="-1" y="119.5" width="187" height="16"/>
+                                    <rect key="frame" x="-1" y="143.5" width="187" height="16"/>
                                     <buttonCell key="cell" type="check" title="Per-Char Associated Phrases" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyAssociates">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
@@ -1538,7 +1538,7 @@
                                     </connections>
                                 </button>
                                 <button horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vbm-7v-Dtb" userLabel="UsingHotKeyJIS">
-                                    <rect key="frame" x="-1" y="95.5" width="189" height="16"/>
+                                    <rect key="frame" x="-1" y="119.5" width="189" height="16"/>
                                     <buttonCell key="cell" type="check" title="JIS Shinjitai Output" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyJIS">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
@@ -1548,7 +1548,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MVw-Gx-ueg" userLabel="UsingHotKeyCNS">
-                                    <rect key="frame" x="-1" y="71.5" width="116" height="16"/>
+                                    <rect key="frame" x="-1" y="95.5" width="116" height="16"/>
                                     <buttonCell key="cell" type="check" title="CNS11643 Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyCNS">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
@@ -1558,7 +1558,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aBy-qb-ZL5" userLabel="UsingHotKeyHalfWidthASCII">
-                                    <rect key="frame" x="-1" y="47.5" width="189" height="16"/>
+                                    <rect key="frame" x="-1" y="71.5" width="189" height="16"/>
                                     <buttonCell key="cell" type="check" title="Half-Width Punctuation Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyHalfWidthASCII">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
@@ -1568,7 +1568,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JvA-GK-VEW" userLabel="CurrencyNumerals">
-                                    <rect key="frame" x="-1" y="23.5" width="167" height="16"/>
+                                    <rect key="frame" x="-1" y="47.5" width="167" height="16"/>
                                     <buttonCell key="cell" type="check" title="Currency Numeral Output" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingCurrencyNumerals">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
@@ -1578,13 +1578,23 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zZA-X1-GCy" userLabel="UsingHotKeyCassette">
-                                    <rect key="frame" x="-1" y="-0.5" width="131" height="16"/>
+                                    <rect key="frame" x="-1" y="23.5" width="131" height="16"/>
                                     <buttonCell key="cell" type="check" title="CIN Cassette Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="1ll-Jn-OD5">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.UsingHotKeyCassette" id="mDe-q0-XYa"/>
+                                    </connections>
+                                </button>
+                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="g3L-S4-NBx" userLabel="UsingHotKeyCassette">
+                                    <rect key="frame" x="-1" y="-0.5" width="184" height="16"/>
+                                    <buttonCell key="cell" type="check" title="Reverse Lookup (Phonabets)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="1Pn-EV-mui">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="cellTitle"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <binding destination="32" name="value" keyPath="values.UsingHotKeyRevLookup" id="y9C-ob-Mw2"/>
                                     </connections>
                                 </button>
                             </subviews>
@@ -1598,8 +1608,10 @@
                                 <integer value="1000"/>
                                 <integer value="1000"/>
                                 <integer value="1000"/>
+                                <integer value="1000"/>
                             </visibilityPriorities>
                             <customSpacing>
+                                <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
@@ -1626,7 +1638,7 @@
                 <constraint firstItem="0gn-BJ-qid" firstAttribute="leading" secondItem="U4q-xw-mc0" secondAttribute="leading" constant="20" symbolic="YES" id="MYd-6b-0XR"/>
                 <constraint firstItem="0gn-BJ-qid" firstAttribute="top" secondItem="U4q-xw-mc0" secondAttribute="top" constant="20" symbolic="YES" id="qgB-J1-68N"/>
             </constraints>
-            <point key="canvasLocation" x="-466.5" y="-336"/>
+            <point key="canvasLocation" x="-466.5" y="-324"/>
         </view>
         <view wantsLayer="YES" id="nMV-YT-ex7" userLabel="vwrPhrases">
             <rect key="frame" x="0.0" y="0.0" width="577" height="508"/>

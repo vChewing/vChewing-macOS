@@ -77,8 +77,9 @@ extension SessionCtl {
       if optionKeyPressed || !PrefMgr.shared.shouldAutoReloadUserDataFiles {
         MenuItem("Reload User Phrases").action(#selector(self.reloadUserPhrasesData(_:)))
       }
-      MenuItem(verbatim: "Reverse Lookup (Phonabets)".localized.withEllipsis).action(
-        #selector(self.callReverseLookupWindow(_:)))
+      MenuItem(verbatim: "Reverse Lookup (Phonabets)".localized.withEllipsis)
+        .action(#selector(self.callReverseLookupWindow(_:)))
+        .shortcut(PrefMgr.shared.usingHotKeyRevLookup ? "/" : "", holding: [.command, .control])
 
       SeparatorItem()  // ------------------
 
