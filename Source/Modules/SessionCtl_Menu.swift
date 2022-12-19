@@ -144,10 +144,12 @@ extension SessionCtl {
       )
     }
 
-    menu.addItem(
+    let revLookupMenuItem = menu.addItem(
       withTitle: "Reverse Lookup (Phonabets)".localized.withEllipsis,
-      action: #selector(callReverseLookupWindow(_:))
+      action: #selector(callReverseLookupWindow(_:)),
+      keyEquivalent: PrefMgr.shared.usingHotKeyRevLookup ? "/" : ""
     )
+    revLookupMenuItem.keyEquivalentModifierMask = [.command, .control]
 
     menu.addItem(NSMenuItem.separator())  // ---------------------
 
