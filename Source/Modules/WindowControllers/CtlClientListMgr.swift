@@ -29,6 +29,7 @@ class CtlClientListMgr: NSWindowController, NSTableViewDelegate, NSTableViewData
 
   override func windowDidLoad() {
     super.windowDidLoad()
+    window?.setPosition(vertical: .center, horizontal: .right, padding: 20)
     localize()
     tblClients.delegate = self
     tblClients.allowsMultipleSelection = true
