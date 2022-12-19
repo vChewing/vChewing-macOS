@@ -83,6 +83,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
 
   override func windowDidLoad() {
     super.windowDidLoad()
+    window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
 
     cmbCandidateFontSize.isEnabled = true
 

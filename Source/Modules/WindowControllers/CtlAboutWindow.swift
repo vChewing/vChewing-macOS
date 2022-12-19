@@ -28,6 +28,7 @@ class CtlAboutWindow: NSWindowController {
 
   override func windowDidLoad() {
     super.windowDidLoad()
+    window?.setPosition(vertical: .top, horizontal: .left, padding: 20)
 
     window?.standardWindowButton(.closeButton)?.isHidden = true
     window?.standardWindowButton(.miniaturizeButton)?.isHidden = true
