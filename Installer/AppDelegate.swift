@@ -162,6 +162,8 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 
     if #available(macOS 10.13, *) {
       try task.run()
+    } else {
+      task.launch()
     }
 
     let data = pipe.fileHandleForReading.readDataToEndOfFile()
