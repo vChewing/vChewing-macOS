@@ -43,6 +43,9 @@ extension InputHandler {
         delegate.switchState(IMEState.ofAbortion())
       } else {
         delegate.switchState(generateStateOfInputting())
+        if input.isCursorBackward || input.isCursorForward, input.isShiftHold {
+          return handleInput(event: input)
+        }
       }
       if state.type == .ofSymbolTable, let nodePrevious = state.node.previous, !nodePrevious.members.isEmpty {
         delegate.switchState(IMEState.ofSymbolTable(node: nodePrevious))
