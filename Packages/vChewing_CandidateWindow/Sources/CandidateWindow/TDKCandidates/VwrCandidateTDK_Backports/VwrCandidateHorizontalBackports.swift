@@ -161,7 +161,8 @@ public struct VwrCandidateHorizontalBackports: View {
     .background(Color(white: colorScheme == .dark ? 0.1 : 1))
     .overlay(
       RoundedRectangle(cornerRadius: 10).stroke(
-        Color(white: colorScheme == .dark ? 0 : 1).opacity(colorScheme == .dark ? 1 : 0.1), lineWidth: 0.5)
+        Color(white: colorScheme == .dark ? 0 : 1).opacity(colorScheme == .dark ? 1 : 0.1), lineWidth: 0.5
+      )
     )
     .cornerRadius(10)
   }
