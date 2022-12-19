@@ -53,7 +53,6 @@ class FrmRevLookupWindow: NSWindow {
       backing: .buffered, defer: true
     )
     setupUI()
-    setupLayout()
   }
 
   private func setupUI() {
@@ -70,11 +69,12 @@ class FrmRevLookupWindow: NSWindow {
 
     view.wantsLayer = true
 
+    button.autoresizingMask = [.maxXMargin, .minYMargin]
+    button.frame = CGRect(x: 446, y: 319, width: 31, height: 21)
     button.setContentHuggingPriority(.defaultHigh, for: .vertical)
-    button.translatesAutoresizingMaskIntoConstraints = false
     button.alignment = .center
     button.bezelStyle = .recessed
-    button.font = NSFont.systemFont(ofSize: 12, weight: .bold)
+    button.font = NSFont.systemFont(ofSize: 12)
     button.imageScaling = .scaleProportionallyDown
     button.title = "👓"
     button.cell.map { $0 as? NSButtonCell }??.isBordered = true
@@ -82,11 +82,12 @@ class FrmRevLookupWindow: NSWindow {
     button.action = #selector(keyboardConfirmed(_:))
     button.keyEquivalent = String(utf16CodeUnits: [unichar(NSEvent.SpecialKey.enter.rawValue)], count: 1) as String
 
+    scrollView.autoresizingMask = [.maxXMargin, .minYMargin]
     scrollView.borderType = .noBorder
+    scrollView.frame = CGRect(x: 0, y: 0, width: 480, height: 320)
     scrollView.hasHorizontalScroller = false
     scrollView.horizontalLineScroll = 10
     scrollView.horizontalPageScroll = 10
-    scrollView.translatesAutoresizingMaskIntoConstraints = false
     scrollView.verticalLineScroll = 10
     scrollView.verticalPageScroll = 10
 
@@ -114,8 +115,9 @@ class FrmRevLookupWindow: NSWindow {
 
     scrollView.contentView = clipView
 
+    inputField.autoresizingMask = [.maxXMargin, .minYMargin]
+    inputField.frame = CGRect(x: 0, y: 320, width: 441, height: 20)
     inputField.setContentHuggingPriority(.defaultHigh, for: .vertical)
-    inputField.translatesAutoresizingMaskIntoConstraints = false
     inputField.backgroundColor = NSColor.textBackgroundColor
     inputField.drawsBackground = true
     inputField.font = NSFont.systemFont(ofSize: 13)
@@ -175,19 +177,5 @@ class FrmRevLookupWindow: NSWindow {
     resultView.string = strBuilder.description
     button.isEnabled = true
     inputField.isEnabled = true
-  }
-
-  private func setupLayout() {
-    inputField.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
-    button.leadingAnchor.constraint(equalTo: inputField.trailingAnchor, constant: 5).isActive = true
-    scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: 20).isActive = true
-    inputField.lastBaselineAnchor.constraint(equalTo: button.lastBaselineAnchor).isActive = true
-    scrollView.topAnchor.constraint(equalTo: button.bottomAnchor).isActive = true
-    view.trailingAnchor.constraint(equalTo: button.trailingAnchor, constant: 3).isActive = true
-    inputField.topAnchor.constraint(equalTo: button.topAnchor).isActive = true
-    view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
-    view.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
-    inputField.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-    inputField.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
   }
 }
