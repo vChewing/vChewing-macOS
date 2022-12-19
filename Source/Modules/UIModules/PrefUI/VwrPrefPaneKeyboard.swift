@@ -224,6 +224,8 @@ private struct VwrPrefPaneKeyboard_KeyboardShortcuts: View {
     forKey: UserDef.kUsingHotKeyCurrencyNumerals.rawValue)
   @State private var selUsingHotKeyCassette = UserDefaults.standard.bool(
     forKey: UserDef.kUsingHotKeyCassette.rawValue)
+  @State private var selUsingHotKeyRevLookup = UserDefaults.standard.bool(
+    forKey: UserDef.kUsingHotKeyRevLookup.rawValue)
 
   var body: some View {
     HStack(alignment: .top, spacing: NSFont.systemFontSize) {
@@ -250,6 +252,12 @@ private struct VwrPrefPaneKeyboard_KeyboardShortcuts: View {
           LocalizedStringKey("Force KangXi Writing"),
           isOn: $selUsingHotKeyKangXi.onChange {
             PrefMgr.shared.usingHotKeyKangXi = selUsingHotKeyKangXi
+          }
+        )
+        Toggle(
+          LocalizedStringKey("Reverse Lookup (Phonabets)"),
+          isOn: $selUsingHotKeyRevLookup.onChange {
+            PrefMgr.shared.usingHotKeyRevLookup = selUsingHotKeyRevLookup
           }
         )
       }
