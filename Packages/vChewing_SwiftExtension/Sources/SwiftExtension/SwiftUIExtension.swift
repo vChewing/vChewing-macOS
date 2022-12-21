@@ -156,3 +156,19 @@ public struct TextEditorEX: NSViewRepresentable {
     }
   }
 }
+
+// MARK: - Property Wrapper (Bindable Extension)
+
+extension AppProperty {
+  @available(macOS 10.15, *)
+  public var projectedValue: Binding<Value> {
+    .init(
+      get: {
+        container.object(forKey: key) as? Value ?? defaultValue
+      },
+      set: {
+        container.set($0, forKey: key)
+      }
+    )
+  }
+}
