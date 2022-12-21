@@ -115,7 +115,7 @@ extension Bool {
   }
 }
 
-// MARK: - Property wrapper
+// MARK: - Property Wrapper
 
 // Ref: https://www.avanderlee.com/swift/property-wrappers/
 
