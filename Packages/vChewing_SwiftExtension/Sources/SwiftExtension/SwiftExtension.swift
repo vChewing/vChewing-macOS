@@ -185,3 +185,23 @@ extension String {
 extension String {
   public var withEllipsis: String { self + "…" }
 }
+
+// MARK: - Localized String Extension for Integers and Floats
+
+extension BinaryFloatingPoint {
+  public func i18n(loc: String) -> String {
+    let formatter = NumberFormatter()
+    formatter.locale = Locale(identifier: loc)
+    formatter.numberStyle = .spellOut
+    return formatter.string(from: NSDecimalNumber(string: "\(self)")) ?? ""
+  }
+}
+
+extension BinaryInteger {
+  public func i18n(loc: String) -> String {
+    let formatter = NumberFormatter()
+    formatter.locale = Locale(identifier: loc)
+    formatter.numberStyle = .spellOut
+    return formatter.string(from: NSDecimalNumber(string: "\(self)")) ?? ""
+  }
+}
