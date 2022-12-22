@@ -41,6 +41,7 @@ public class TooltipUI: NSWindowController {
     messageText = NSAttributedTooltipTextView()
     messageText.backgroundColor = NSColor.controlBackgroundColor
     messageText.textColor = NSColor.textColor
+    messageText.needsDisplay = true
     panel.contentView?.addSubview(messageText)
     super.init(window: panel)
   }
