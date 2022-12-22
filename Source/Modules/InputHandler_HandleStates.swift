@@ -715,12 +715,13 @@ extension InputHandler {
 
     let currentPaired = (currentNode.keyArray, currentNode.value)
 
-    var currentIndex: Int {
+    // 改成一次性計算，省得每次讀取時都被重複計算。
+    let currentIndex: Int = {
       var result = 0
-      for candidate in candidates {
+      theLoop: for candidate in candidates {
         if !currentNode.isOverridden {
           if candidates[0] == currentPaired { result = reverseOrder ? candidates.count - 1 : 1 }
-          break
+          break theLoop
         }
         result =
           (candidate == currentPaired && reverseOrder)
@@ -728,13 +729,23 @@ extension InputHandler {
         if candidate == currentPaired { break }
       }
       return (0..<candidates.count).contains(result) ? result : 0
-    }
+    }()
 
     consolidateNode(
       candidate: candidates[currentIndex], respectCursorPushing: false,
       preConsolidate: false, skipObservation: true
     )
-    delegate.switchState(generateStateOfInputting())
+    var newState = generateStateOfInputting()
+    newState.tooltip = (currentIndex + 1).description + " / " + candidates.count.description + "    "
+    vCLog(newState.tooltip)
+    if #available(macOS 10.13, *) {
+      if delegate.state.isVerticalTyping, Bundle.main.preferredLocalizations[0] != "en" {
+        let locID = Bundle.main.preferredLocalizations[0]
+        newState.tooltip = (currentIndex + 1).i18n(loc: locID) + "・" + candidates.count.i18n(loc: locID) + ""
+      }
+    }
+    newState.tooltipDuration = 0
+    delegate.switchState(newState)
     return true
   }
 }
