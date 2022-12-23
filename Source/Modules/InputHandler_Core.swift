@@ -61,6 +61,7 @@ public protocol InputHandlerDelegate {
   var state: IMEStateProtocol { get set }
   var clientBundleIdentifier: String { get }
   func callError(_ logMessage: String)
+  func updateVerticalTypingStatus()
   func switchState(_ newState: IMEStateProtocol)
   func candidateController() -> CtlCandidateProtocol?
   func candidateSelectionCalledByInputHandler(at index: Int)
