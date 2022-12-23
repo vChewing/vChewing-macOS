@@ -84,6 +84,7 @@ extension SessionCtl {
     }
     // 浮動組字窗的顯示判定
     if newState.hasComposition, PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier) {
+      updateVerticalTypingStatus()
       popupCompositionBuffer.isTypingDirectionVertical = isVerticalTyping
       popupCompositionBuffer.show(
         state: newState, at: lineHeightRect(zeroCursor: true).origin
