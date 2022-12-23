@@ -46,6 +46,7 @@ extension SessionCtl {
       tooltipInstance.hide()
       return
     }
+    updateVerticalTypingStatus()
     let lineHeightRect = lineHeightRect()
     var finalOrigin: NSPoint = lineHeightRect.origin
     let delta: Double = lineHeightRect.size.height + 4.0  // bottomOutOfScreenAdjustmentHeight
