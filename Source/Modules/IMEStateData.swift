@@ -75,7 +75,6 @@ public struct IMEStateData: IMEStateDataProtocol {
 
   // MARK: Other data for non-empty states.
 
-  public var isVerticalTyping = false
   public var markedTargetExists: Bool {
     let pair = userPhraseKVPair
     return LMMgr.checkIfUserPhraseExist(
@@ -190,7 +189,7 @@ extension IMEStateData {
         var subNeta = subNeta
         if !PrefMgr.shared.cassetteEnabled {
           if PrefMgr.shared.showHanyuPinyinInCompositionBuffer,
-            PrefMgr.shared.alwaysShowTooltipTextsHorizontally || !isVerticalTyping
+            PrefMgr.shared.alwaysShowTooltipTextsHorizontally || !SessionCtl.isVerticalTyping
           {
             // 恢復陰平標記->注音轉拼音->轉教科書式標調
             subNeta = Tekkon.restoreToneOneInPhona(target: subNeta)

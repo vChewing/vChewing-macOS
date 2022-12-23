@@ -735,11 +735,12 @@ extension InputHandler {
       candidate: candidates[currentIndex], respectCursorPushing: false,
       preConsolidate: false, skipObservation: true
     )
+    delegate.updateVerticalTypingStatus()
     var newState = generateStateOfInputting()
     newState.tooltip = (currentIndex + 1).description + " / " + candidates.count.description + "    "
     vCLog(newState.tooltip)
     if #available(macOS 10.13, *) {
-      if delegate.state.isVerticalTyping, Bundle.main.preferredLocalizations[0] != "en" {
+      if delegate.isVerticalTyping, Bundle.main.preferredLocalizations[0] != "en" {
         let locID = Bundle.main.preferredLocalizations[0]
         newState.tooltip = (currentIndex + 1).i18n(loc: locID) + "・" + candidates.count.i18n(loc: locID) + ""
       }

@@ -51,12 +51,12 @@ extension InputHandler {
 
     /// 若 Caps Lock 被啟用的話，則暫停對注音輸入的處理。
     /// 這裡的處理仍舊有用，不然 Caps Lock 英文模式無法直接鍵入小寫字母。
-    if input.isCapsLockOn || state.isASCIIMode {
+    if input.isCapsLockOn || delegate.isASCIIMode {
       // 低於 macOS 12 的系統無法偵測 CapsLock 的啟用狀態，所以這裡一律強制重置狀態為 .ofEmpty()。
       delegate.switchState(IMEState.ofEmpty())
 
       // 字母鍵摁 Shift 的話，無須額外處理，因為直接就會敲出大寫字母。
-      if (input.isUpperCaseASCIILetterKey && state.isASCIIMode)
+      if (input.isUpperCaseASCIILetterKey && delegate.isASCIIMode)
         || (input.isCapsLockOn && input.isShiftHold)
       {
         return false
