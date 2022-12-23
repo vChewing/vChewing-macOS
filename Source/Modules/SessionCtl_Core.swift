@@ -114,6 +114,9 @@ public class SessionCtl: IMKInputController {
     isVerticalTyping = result
   }
 
+  /// 當前選字窗是否為縱向。（縱排輸入時，只會啟用縱排選字窗。）
+  public var isVerticalCandidateWindow = false
+
   /// InputMode 需要在每次出現內容變更的時候都連帶重設組字器與各項語言模組，
   /// 順帶更新 IME 模組及 UserPrefs 當中對於當前語言模式的記載。
   public var inputMode: Shared.InputMode = IMEApp.currentInputMode {
