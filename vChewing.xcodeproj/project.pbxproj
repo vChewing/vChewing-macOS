@@ -49,6 +49,8 @@
 		5B963CA328D5C23600DCEE88 /* SwiftExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 5B963CA228D5C23600DCEE88 /* SwiftExtension */; };
 		5B963CA828D5DB1400DCEE88 /* PrefMgr_Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B963CA728D5DB1400DCEE88 /* PrefMgr_Core.swift */; };
 		5B98114828D6198700CBC605 /* PinyinPhonaConverter in Frameworks */ = {isa = PBXBuildFile; productRef = 5B98114728D6198700CBC605 /* PinyinPhonaConverter */; };
+		5B9A62D9295BEA3400F79F3C /* SwiftExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 5B9A62D8295BEA3400F79F3C /* SwiftExtension */; };
+		5B9A62DB295BEA4500F79F3C /* CocoaExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 5B9A62DA295BEA4500F79F3C /* CocoaExtension */; };
 		5BA8C30328DF0360004C5CC4 /* CandidateWindow in Frameworks */ = {isa = PBXBuildFile; productRef = 5BA8C30228DF0360004C5CC4 /* CandidateWindow */; };
 		5BA9FD0F27FEDB6B002DE248 /* VwrPrefPaneGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0A27FEDB6B002DE248 /* VwrPrefPaneGeneral.swift */; };
 		5BA9FD1027FEDB6B002DE248 /* VwrPrefPaneKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0B27FEDB6B002DE248 /* VwrPrefPaneKeyboard.swift */; };
@@ -376,6 +378,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5B9A62D9295BEA3400F79F3C /* SwiftExtension in Frameworks */,
+				5B9A62DB295BEA4500F79F3C /* CocoaExtension in Frameworks */,
 				5BFC63D128D4B9F7004A77B7 /* IMKUtils in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -824,6 +828,8 @@
 			name = vChewingInstaller;
 			packageProductDependencies = (
 				5BFC63D028D4B9F7004A77B7 /* IMKUtils */,
+				5B9A62D8295BEA3400F79F3C /* SwiftExtension */,
+				5B9A62DA295BEA4500F79F3C /* CocoaExtension */,
 			);
 			productName = vChewingInstaller;
 			productReference = 6ACA41CB15FC1D7500935EF6 /* vChewingInstaller.app */;
@@ -1820,6 +1826,14 @@
 		5B98114728D6198700CBC605 /* PinyinPhonaConverter */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PinyinPhonaConverter;
+		};
+		5B9A62D8295BEA3400F79F3C /* SwiftExtension */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SwiftExtension;
+		};
+		5B9A62DA295BEA4500F79F3C /* CocoaExtension */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CocoaExtension;
 		};
 		5BA8C30228DF0360004C5CC4 /* CandidateWindow */ = {
 			isa = XCSwiftPackageProductDependency;

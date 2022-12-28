@@ -1,6 +1,7 @@
 // (c) 2019 and onwards Robert Muckle-Jones (Apache 2.0 License).
 
 import Foundation
+import SwiftExtension
 
 public class LineReader {
   let encoding: String.Encoding
@@ -36,17 +37,22 @@ public class LineReader {
         return line.trimmingCharacters(in: .newlines)
       }
 
-      let nextData = fileHandle.readData(ofLength: chunkSize)
-      if !nextData.isEmpty {
-        buffer.append(nextData)
-      } else {
-        // End of file or read error
-        atEof = true
-        if !buffer.isEmpty {
-          // Buffer contains last line in file (not terminated by delimiter).
-          let line = String(data: buffer as Data, encoding: encoding)!
-          return line.trimmingCharacters(in: .newlines)
+      fileRead: do {
+        let nextData = try fileHandle.read(upToCount: chunkSize)
+        if let nextData = nextData, !nextData.isEmpty {
+          buffer.append(nextData)
+          continue
         }
+      } catch {
+        break fileRead
+      }
+
+      // End of file or read error
+      atEof = true
+      if !buffer.isEmpty {
+        // Buffer contains last line in file (not terminated by delimiter).
+        let line = String(data: buffer as Data, encoding: encoding)!
+        return line.trimmingCharacters(in: .newlines)
       }
     }
     return nil
