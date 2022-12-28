@@ -12,11 +12,15 @@ let package = Package(
       targets: ["LineReader"]
     )
   ],
-  dependencies: [],
+  dependencies: [
+    .package(path: "../vChewing_SwiftExtension")
+  ],
   targets: [
     .target(
       name: "LineReader",
-      dependencies: []
+      dependencies: [
+        .product(name: "SwiftExtension", package: "vChewing_SwiftExtension")
+      ]
     )
   ]
 )
