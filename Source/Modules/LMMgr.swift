@@ -11,6 +11,7 @@ import LangModelAssembly
 import NotifierUI
 import PhraseEditorUI
 import Shared
+import SwiftExtension
 
 /// 使用者辭典資料預設範例檔案名稱。
 private let kTemplateNameUserPhrases = "template-userphrases"
@@ -675,9 +676,13 @@ public class LMMgr {
           } catch {
             NSWorkspace.shared.openFile(url.path, withApplication: "TextEdit")
           }
-          if let outStr = String(data: fileHandle.readDataToEndOfFile(), encoding: .utf8) {
-            vCLog(outStr)
-          }
+          do {
+            if let theData = try fileHandle.readToEnd(),
+              let outStr = String(data: theData, encoding: .utf8)
+            {
+              vCLog(outStr)
+            }
+          } catch {}
         case "Finder":
           NSWorkspace.shared.activateFileViewerSelecting([url])
         default:
