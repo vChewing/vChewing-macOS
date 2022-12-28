@@ -1,5 +1,4 @@
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
-// StringView Ranges extension by (c) 2022 and onwards Isaac Xen (MIT License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 // ... with NTL restriction stating that:
@@ -25,7 +24,7 @@ extension vChewingLM {
 
     public var isLoaded: Bool { !rangeMap.isEmpty }
 
-    internal func cnvNGramKeyFromPinyinToPhona(target: String) -> String {
+    internal static func cnvNGramKeyFromPinyinToPhona(target: String) -> String {
       guard target.contains("("), target.contains(","), target.contains(")") else {
         return target
       }
@@ -64,18 +63,23 @@ extension vChewingLM {
     public mutating func replaceData(textData rawStrData: String) {
       if strData == rawStrData { return }
       strData = rawStrData
-      strData.ranges(splitBy: "\n").filter { !$0.isEmpty }.forEach {
-        let neta = strData[$0].split(separator: " ")
-        if neta.count >= 2 {
-          let theKey = String(neta[0])
-          if !theKey.isEmpty, theKey.first != "#" {
-            for (i, _) in neta.filter({ $0.first != "#" && !$0.isEmpty }).enumerated() {
+      var newMap: [String: [(Range<String.Index>, Int)]] = [:]
+      strData.parse(splitee: "\n") { theRange in
+        let theCells = rawStrData[theRange].split(separator: " ")
+        if theCells.count >= 2 {
+          let theKey = theCells[0].description
+          if theKey.first != "#" {
+            for (i, _) in theCells.enumerated() {
               if i == 0 { continue }
-              rangeMap[cnvNGramKeyFromPinyinToPhona(target: theKey), default: []].append(($0, i))
+              if theCells[i].first == "#" { continue }
+              let newKey = Self.cnvNGramKeyFromPinyinToPhona(target: theKey)
+              newMap[newKey, default: []].append((theRange, i))
             }
           }
         }
       }
+      rangeMap = newMap
+      newMap.removeAll()
     }
 
     public mutating func clear() {
@@ -116,20 +120,6 @@ extension vChewingLM {
     public func hasValuesFor(pair: Megrez.Compositor.KeyValuePaired) -> Bool {
       if rangeMap[pair.toNGramKey] != nil { return true }
       return rangeMap[pair.value] != nil
-    }
-  }
-}
-
-// MARK: - StringView Ranges Extension (by Isaac Xen)
-
-extension String {
-  fileprivate func ranges(splitBy separator: Element) -> [Range<String.Index>] {
-    var startIndex = startIndex
-    return split(separator: separator).reduce(into: []) { ranges, substring in
-      _ = range(of: substring, range: startIndex..<endIndex).map { range in
-        ranges.append(range)
-        startIndex = range.upperBound
-      }
     }
   }
 }
