@@ -1,5 +1,4 @@
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
-// StringView Ranges extension by (c) 2022 and onwards Isaac Xen (MIT License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 // ... with NTL restriction stating that:
@@ -97,17 +96,18 @@ extension vChewingLM {
     public mutating func replaceData(textData rawStrData: String) {
       if strData == rawStrData { return }
       strData = rawStrData
-      strData.ranges(splitBy: "\n").filter { !$0.isEmpty }.forEach {
-        let neta = strData[$0].split(separator: " ")
-        if neta.count >= 2, String(neta[0]).first != "#" {
-          if !neta[0].isEmpty, !neta[1].isEmpty {
-            var theKey = shouldReverse ? String(neta[1]) : String(neta[0])
-            let theValue = $0
-            theKey.convertToPhonabets()
-            rangeMap[theKey, default: []].append(theValue)
-          }
+      var newMap: [String: [Range<String.Index>]] = [:]
+      let shouldReverse = shouldReverse  // 必需，否則下文的 closure 會出錯。
+      strData.parse(splitee: "\n") { theRange in
+        let theCells = rawStrData[theRange].split(separator: " ")
+        if theCells.count >= 2, theCells[0].description.first != "#" {
+          var theKey = shouldReverse ? String(theCells[1]) : String(theCells[0])
+          theKey.convertToPhonabets()
+          newMap[theKey, default: []].append(theRange)
         }
       }
+      rangeMap = newMap
+      newMap.removeAll()
       temporaryMap.removeAll()
     }
 
@@ -183,23 +183,6 @@ extension vChewingLM {
     ///   - key: 讀音索引鍵。
     public func hasUnigramsFor(key: String) -> Bool {
       rangeMap[key] != nil
-    }
-  }
-}
-
-// MARK: - StringView Ranges Extension (by Isaac Xen)
-
-extension String {
-  /// 就該字串與給定分隔符、返回每一元素的首尾索引值。
-  /// - parameters:
-  ///   - splitBy: 給定分隔符
-  fileprivate func ranges(splitBy separator: Element) -> [Range<String.Index>] {
-    var startIndex = startIndex
-    return split(separator: separator).reduce(into: []) { ranges, substring in
-      _ = range(of: substring, range: startIndex..<endIndex).map { range in
-        ranges.append(range)
-        startIndex = range.upperBound
-      }
     }
   }
 }
