@@ -1,5 +1,4 @@
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
-// StringView Ranges extension by (c) 2022 and onwards Isaac Xen (MIT License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 // ... with NTL restriction stating that:
@@ -68,19 +67,5 @@ extension vChewingLM {
     }
 
     public func hasValuesFor(key: String) -> Bool { dataMap.keys.contains(key) }
-  }
-}
-
-// MARK: - StringView Ranges Extension (by Isaac Xen)
-
-extension String {
-  fileprivate func ranges(splitBy separator: Element) -> [Range<String.Index>] {
-    var startIndex = startIndex
-    return split(separator: separator).reduce(into: []) { ranges, substring in
-      _ = range(of: substring, range: startIndex..<endIndex).map { range in
-        ranges.append(range)
-        startIndex = range.upperBound
-      }
-    }
   }
 }
