@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import Cocoa
+import SwiftExtension
 
 // MARK: - NSMutableString extension
 
@@ -45,9 +46,15 @@ extension NSApplication {
       task.launch()
     }
 
-    let data = pipe.fileHandleForReading.readDataToEndOfFile()
-    let output = String(data: data, encoding: .utf8)!
-
+    var output = ""
+    do {
+      let data = try pipe.fileHandleForReading.readToEnd()
+      if let data = data, let str = String(data: data, encoding: .utf8) {
+        output.append(str)
+      }
+    } catch {
+      return ""
+    }
     return output
   }
 }
