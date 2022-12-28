@@ -10,7 +10,7 @@ import Cocoa
 
 public class Notifier: NSWindowController {
   public static func notify(message: String) {
-    Self.message = message
+    DispatchQueue.main.async { Self.message = message }
   }
 
   static var message: String = "" {
