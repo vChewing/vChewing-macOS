@@ -114,31 +114,35 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
     lblCurrentlySpecifiedUserDataFolder.placeholderString = LMMgr.dataFolderPath(
       isDefaultFolder: true)
 
-    let languages = ["auto", "en", "zh-Hans", "zh-Hant", "ja"]
-    var autoMUISelectItem: NSMenuItem?
-    var chosenLanguageItem: NSMenuItem?
-    uiLanguageButton.menu?.removeAllItems()
+    // Credit: Hiraku Wang (for the implementation of the UI language select support in Cocoa PrefWindow.
+    // Note: The SwiftUI PrefWindow has the same feature implemented by Shiki Suen.
+    do {
+      let languages = ["auto", "en", "zh-Hans", "zh-Hant", "ja"]
+      var autoMUISelectItem: NSMenuItem?
+      var chosenLanguageItem: NSMenuItem?
+      uiLanguageButton.menu?.removeAllItems()
 
-    let appleLanguages = PrefMgr.shared.appleLanguages
-    for language in languages {
-      let menuItem = NSMenuItem()
-      menuItem.title = NSLocalizedString(language, comment: language)
-      menuItem.representedObject = language
+      let appleLanguages = PrefMgr.shared.appleLanguages
+      for language in languages {
+        let menuItem = NSMenuItem()
+        menuItem.title = NSLocalizedString(language, comment: language)
+        menuItem.representedObject = language
 
-      if language == "auto" {
-        autoMUISelectItem = menuItem
-      }
-
-      if !appleLanguages.isEmpty {
-        if appleLanguages[0] == language {
-          chosenLanguageItem = menuItem
+        if language == "auto" {
+          autoMUISelectItem = menuItem
         }
-      }
-      uiLanguageButton.menu?.addItem(menuItem)
-    }
 
-    currentLanguageSelectItem = chosenLanguageItem ?? autoMUISelectItem
-    uiLanguageButton.select(currentLanguageSelectItem)
+        if !appleLanguages.isEmpty {
+          if appleLanguages[0] == language {
+            chosenLanguageItem = menuItem
+          }
+        }
+        uiLanguageButton.menu?.addItem(menuItem)
+      }
+
+      currentLanguageSelectItem = chosenLanguageItem ?? autoMUISelectItem
+      uiLanguageButton.select(currentLanguageSelectItem)
+    }
 
     var usKeyboardLayoutItem: NSMenuItem?
     var chosenBaseKeyboardLayoutItem: NSMenuItem?
