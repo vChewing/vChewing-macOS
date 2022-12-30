@@ -27,6 +27,16 @@ extension String {
   }
 }
 
+// MARK: - String charComponents Extension
+
+extension String {
+  public var charComponents: [String] { map { String($0) } }
+}
+
+extension Array where Element == String.Element {
+  public var charComponents: [String] { map { String($0) } }
+}
+
 // MARK: - StringView Ranges Extension (by Isaac Xen)
 
 extension String {
@@ -136,6 +146,9 @@ private let urlPlistBPMFReverseLookupCNS6: String = "./data-bpmf-reverse-lookup-
 
 private var isReverseLookupDictionaryProcessed: Bool = false
 
+private var mapReverseLookupForCheck: [String: [String]] = [:]
+private var exceptedChars: Set<String> = .init()
+
 // MARK: - 載入詞組檔案且輸出陣列
 
 func rawDictForPhrases(isCHS: Bool) -> [Unigram] {
@@ -243,6 +256,7 @@ func rawDictForKanjis(isCHS: Bool) -> [Unigram] {
     NSOrderedSet(array: strRAW.components(separatedBy: "\n")).array as! [String])
   var varLineData = ""
   var mapReverseLookup: [String: [Data]] = [:]
+  var mapReverseLookupUnencrypted: [String: [String]] = [:]
   for lineData in arrData {
     // 簡體中文的話，提取 1,2,4；繁體中文的話，提取 1,3,4。
     let varLineDataPre = lineData.components(separatedBy: " ").prefix(isCHS ? 2 : 1)
@@ -283,6 +297,7 @@ func rawDictForKanjis(isCHS: Bool) -> [Unigram] {
     if phrase != "" {  // 廢掉空數據；之後無須再這樣處理。
       if !isReverseLookupDictionaryProcessed {
         mapReverseLookup[phrase, default: []].append(cnvPhonabetToASCII(phone).data(using: .utf8)!)
+        mapReverseLookupUnencrypted[phrase, default: []].append(phone)
       }
       arrUnigramRAW += [
         Unigram(
@@ -297,6 +312,7 @@ func rawDictForKanjis(isCHS: Bool) -> [Unigram] {
       isReverseLookupDictionaryProcessed = true
       try PropertyListSerialization.data(fromPropertyList: mapReverseLookup, format: .binary, options: 0).write(
         to: URL(fileURLWithPath: urlPlistBPMFReverseLookup))
+      mapReverseLookupForCheck = mapReverseLookupUnencrypted
     } catch {
       NSLog(" - Core Reverse Lookup Data Generation Failed.")
     }
@@ -368,6 +384,7 @@ func rawDictForNonKanjis(isCHS: Bool) -> [Unigram] {
       }
     }
     if phrase != "" {  // 廢掉空數據；之後無須再這樣處理。
+      exceptedChars.insert(phrase)
       arrUnigramRAW += [
         Unigram(
           key: phone, value: phrase, score: 0.0,
@@ -664,6 +681,7 @@ main()
 // MARK: - 辭庫健康狀況檢查專用函式
 
 func healthCheck(_ data: [Unigram]) -> String {
+  while mapReverseLookupForCheck.isEmpty { sleep(1) }
   var result = ""
   var unigramMonoChar = [String: Unigram]()
   var valueToScore = [String: Double]()
@@ -691,15 +709,31 @@ func healthCheck(_ data: [Unigram]) -> String {
     var competants = [Unigram]()
     var tscore: Double = 0
     var bad = false
-    for x in neta.key.split(separator: "-") {
+    let checkPerCharMachingStatus: Bool = neta.key.split(separator: "-").count == neta.value.count
+
+    outerMatchCheck: for (i, x) in neta.key.split(separator: "-").enumerated() {
       if !unigramMonoChar.keys.contains(String(x)) {
         bad = true
-        break
+        break outerMatchCheck
+      }
+      innerMatchCheck: if checkPerCharMachingStatus {
+        let char = neta.value.charComponents[i]
+        if exceptedChars.contains(char) { break innerMatchCheck }
+        guard let queriedPhones = mapReverseLookupForCheck[char] else {
+          bad = true
+          break outerMatchCheck
+        }
+        for queriedPhone in queriedPhones {
+          if queriedPhone == x.description { break innerMatchCheck }
+        }
+        bad = true
+        break outerMatchCheck
       }
       guard let u = unigramMonoChar[String(x)] else { continue }
       tscore += u.score
       competants.append(u)
     }
+
     if bad {
       faulty.append(neta)
       continue
