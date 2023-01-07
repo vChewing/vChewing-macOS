@@ -120,7 +120,9 @@ extension SessionCtl {
     }
 
     // 使 NSEvent 自翻譯，這樣可以讓 Emacs NSEvent 變成標準 NSEvent。
+    // 注意不要針對 Empty 空狀態使用這個轉換，否則會使得相關組合鍵第交出垃圾字元。
     if eventToDeal.isEmacsKey {
+      if state.type == .ofEmpty { return false }
       let verticalProcessing = (state.isCandidateContainer) ? isVerticalCandidateWindow : isVerticalTyping
       eventToDeal = eventToDeal.convertFromEmacsKeyEvent(isVerticalContext: verticalProcessing)
     }
