@@ -105,6 +105,11 @@ extension AppDelegate {
     alert.messageText = NSLocalizedString("Uninstallation", comment: "")
     alert.informativeText = content
     alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+    if #available(macOS 11, *) {
+      alert.buttons.forEach { button in
+        button.hasDestructiveAction = true
+      }
+    }
     alert.addButton(withTitle: NSLocalizedString("Not Now", comment: ""))
     let result = alert.runModal()
     NSApp.activate(ignoringOtherApps: true)
