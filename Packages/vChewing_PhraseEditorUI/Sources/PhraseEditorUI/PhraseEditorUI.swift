@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Cocoa
 import Combine
 import Foundation
 import LangModelAssembly
@@ -44,6 +45,7 @@ public struct VwrPhraseEditorUI: View {
   @State public var selUserDataType: vChewingLM.ReplacableUserDataType = .thePhrases
   @State private var isLoading = false
   @State private var textEditorTooltip = PETerms.TooltipTexts.sampleDictionaryContent(for: .thePhrases)
+  public weak var window: NSWindow?
 
   public var currentIMEInputMode: Shared.InputMode {
     delegate?.currentInputMode ?? selInputMode
@@ -59,7 +61,7 @@ public struct VwrPhraseEditorUI: View {
 
   // MARK: -
 
-  public init(delegate theDelegate: PhraseEditorDelegate? = nil) {
+  public init(delegate theDelegate: PhraseEditorDelegate? = nil, window: NSWindow? = nil) {
     _txtContent = .init(
       get: { Self.txtContentStorage },
       set: { newValue, _ in
@@ -68,7 +70,10 @@ public struct VwrPhraseEditorUI: View {
       }
     )
     guard let theDelegate = theDelegate else { return }
-    defer { delegate = theDelegate }
+    defer {
+      delegate = theDelegate
+      self.window = window
+    }
   }
 
   public func update() {
@@ -273,6 +278,13 @@ public struct VwrPhraseEditorUI: View {
               }
             ).help(PETerms.TooltipTexts.weightInputBox.localized)
           }
+          Button("?") {
+            guard let window = window else { return }
+            window.callAlert(
+              title: "You may follow:".localized,
+              text: PETerms.TooltipTexts.sampleDictionaryContent(for: selUserDataType)
+            )
+          }.disabled(window == nil)
           Button(PETerms.AddPhrases.locAdd.localized.0) {
             DispatchQueue.main.async { insertEntry() }
           }.disabled(txtAddPhraseField1.isEmpty || txtAddPhraseField2.isEmpty)
