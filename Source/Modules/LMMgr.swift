@@ -323,10 +323,65 @@ public class LMMgr {
     Self.lmCHS.deltaOfCalendarYears = delta
   }
 
-  // MARK: - 獲取當前輸入法封包內的原廠核心語彙檔案所在路徑
+  // MARK: - 獲取原廠核心語彙檔案資料所在路徑（優先獲取 Containers 下的資料檔案）。
 
-  public static func getBundleDataPath(_ filenameSansExt: String) -> String {
-    Bundle.main.path(forResource: filenameSansExt, ofType: "plist")!
+  // 該函式目前僅供步天歌繁簡轉換引擎使用，並不會檢查目標檔案格式的實際可用性。
+
+  public static func getBundleDataPath(_ filenameSansExt: String, factory: Bool = false) -> String {
+    let factory = PrefMgr.shared.useExternalFactoryDict ? factory : true
+    let factoryPath = Bundle.main.path(forResource: filenameSansExt, ofType: "plist")!
+    let containerPath = Self.appSupportURL.appendingPathComponent("vChewingFactoryData/\(filenameSansExt).plist").path
+      .expandingTildeInPath
+    var isFailed = false
+    if !factory {
+      var isFolder = ObjCBool(false)
+      if !FileManager.default.fileExists(atPath: containerPath, isDirectory: &isFolder) { isFailed = true }
+      if !isFailed, !FileManager.default.isReadableFile(atPath: containerPath) { isFailed = true }
+    }
+    let result = (factory || isFailed) ? factoryPath : containerPath
+    return result
+  }
+
+  // MARK: - 獲取原廠核心語彙檔案資料本身（優先獲取 Containers 下的資料檔案），可能會出 nil。
+
+  public static func getDictionaryData(_ filenameSansExt: String, factory: Bool = false) -> (
+    dict: [String: [Data]]?, path: String
+  ) {
+    let factory = PrefMgr.shared.useExternalFactoryDict ? factory : true
+    let factoryResultURL = Bundle.main.url(forResource: filenameSansExt, withExtension: "plist")
+    let containerResultURL = Self.appSupportURL.appendingPathComponent("vChewingFactoryData/\(filenameSansExt).plist")
+    var lastReadPath = factoryResultURL?.path ?? "Factory file missing: \(filenameSansExt).plist"
+
+    func getPlistData(url: URL?) -> [String: [Data]]? {
+      var isFailed = false
+      var isFolder = ObjCBool(false)
+      guard let url = url else {
+        vCLog("URL Invalid.")
+        return nil
+      }
+      defer { lastReadPath = url.path }
+      if !FileManager.default.fileExists(atPath: url.path, isDirectory: &isFolder) { isFailed = true }
+      if !isFailed, !FileManager.default.isReadableFile(atPath: url.path) { isFailed = true }
+      if isFailed {
+        vCLog("↑ Exception happened when reading plist file at: \(url.path).")
+        return nil
+      }
+      do {
+        let rawData = try Data(contentsOf: url)
+        return try PropertyListSerialization.propertyList(from: rawData, format: nil) as? [String: [Data]] ?? nil
+      } catch {
+        return nil
+      }
+    }
+
+    let result =
+      factory
+      ? getPlistData(url: factoryResultURL)
+      : getPlistData(url: containerResultURL) ?? getPlistData(url: factoryResultURL)
+    if result == nil {
+      vCLog("↑ Exception happened when reading plist file at: \(lastReadPath).")
+    }
+    return (dict: result, path: lastReadPath)
   }
 
   // MARK: - 使用者語彙檔案的具體檔案名稱路徑定義
