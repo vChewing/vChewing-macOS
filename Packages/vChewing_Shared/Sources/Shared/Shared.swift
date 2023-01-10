@@ -19,6 +19,7 @@ public enum UserDef: String, CaseIterable {
   case kCassettePath = "CassettePath"
   case kUserDataFolderSpecified = "UserDataFolderSpecified"
   case kCheckUpdateAutomatically = "CheckUpdateAutomatically"
+  case kUseExternalFactoryDict = "UseExternalFactoryDict"
   case kKeyboardParser = "KeyboardParser"
   case kBasicKeyboardLayout = "BasicKeyboardLayout"
   case kAlphanumericalKeyboardLayout = "AlphanumericalKeyboardLayout"
