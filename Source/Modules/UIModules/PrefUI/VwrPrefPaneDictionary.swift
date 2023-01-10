@@ -39,7 +39,7 @@ struct VwrPrefPaneDictionary: View {
   private static let dlgOpenPath = NSOpenPanel()
   private static let dlgOpenFile = NSOpenPanel()
 
-  private let contentMaxHeight: Double = 440
+  private let contentMaxHeight: Double = 490
   private let contentWidth: Double = {
     switch PrefMgr.shared.appleLanguages[0] {
       case "ja":

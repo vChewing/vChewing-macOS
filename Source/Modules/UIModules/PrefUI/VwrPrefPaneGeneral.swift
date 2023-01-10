@@ -40,7 +40,7 @@ struct VwrPrefPaneGeneral: View {
   @State private var selShowReverseLookupInCandidateUI = UserDefaults.standard.bool(
     forKey: UserDef.kShowReverseLookupInCandidateUI.rawValue)
 
-  private let contentMaxHeight: Double = 440
+  private let contentMaxHeight: Double = 490
   private let contentWidth: Double = {
     switch PrefMgr.shared.appleLanguages[0] {
       case "ja":
