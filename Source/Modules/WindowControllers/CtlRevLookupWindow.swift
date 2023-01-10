@@ -29,15 +29,15 @@ class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
 class FrmRevLookupWindow: NSWindow {
   typealias LMRevLookup = vChewingLM.LMRevLookup
 
-  static let lmRevLookupCore = LMRevLookup(path: LMMgr.getBundleDataPath("data-bpmf-reverse-lookup"))
+  static var lmRevLookupCore = LMRevLookup(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup"))
 
   // 全字庫資料接近十萬筆索引，只放到單個 Dictionary 內的話、每次查詢時都會把輸入法搞崩潰。只能分卷處理。
-  static let lmRevLookupCNS1 = LMRevLookup(path: LMMgr.getBundleDataPath("data-bpmf-reverse-lookup-CNS1"))
-  static let lmRevLookupCNS2 = LMRevLookup(path: LMMgr.getBundleDataPath("data-bpmf-reverse-lookup-CNS2"))
-  static let lmRevLookupCNS3 = LMRevLookup(path: LMMgr.getBundleDataPath("data-bpmf-reverse-lookup-CNS3"))
-  static let lmRevLookupCNS4 = LMRevLookup(path: LMMgr.getBundleDataPath("data-bpmf-reverse-lookup-CNS4"))
-  static let lmRevLookupCNS5 = LMRevLookup(path: LMMgr.getBundleDataPath("data-bpmf-reverse-lookup-CNS5"))
-  static let lmRevLookupCNS6 = LMRevLookup(path: LMMgr.getBundleDataPath("data-bpmf-reverse-lookup-CNS6"))
+  static var lmRevLookupCNS1 = LMRevLookup(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS1"))
+  static var lmRevLookupCNS2 = LMRevLookup(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS2"))
+  static var lmRevLookupCNS3 = LMRevLookup(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS3"))
+  static var lmRevLookupCNS4 = LMRevLookup(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS4"))
+  static var lmRevLookupCNS5 = LMRevLookup(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS5"))
+  static var lmRevLookupCNS6 = LMRevLookup(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS6"))
 
   public lazy var inputField = NSTextField()
   public lazy var resultView = NSTextView()
@@ -45,6 +45,16 @@ class FrmRevLookupWindow: NSWindow {
   private lazy var scrollView = NSScrollView()
   private lazy var button = NSButton()
   private lazy var view = NSView()
+
+  static func reloadData() {
+    DispatchQueue.main.async { lmRevLookupCore = .init(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup")) }
+    DispatchQueue.main.async { lmRevLookupCNS1 = .init(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS1")) }
+    DispatchQueue.main.async { lmRevLookupCNS2 = .init(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS2")) }
+    DispatchQueue.main.async { lmRevLookupCNS3 = .init(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS3")) }
+    DispatchQueue.main.async { lmRevLookupCNS4 = .init(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS4")) }
+    DispatchQueue.main.async { lmRevLookupCNS5 = .init(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS5")) }
+    DispatchQueue.main.async { lmRevLookupCNS6 = .init(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS6")) }
+  }
 
   init() {
     super.init(
