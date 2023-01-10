@@ -66,8 +66,7 @@ public class LMMgr {
   public static func loadCoreLanguageModelFile(
     filenameSansExtension: String, langModel lm: inout vChewingLM.LMInstantiator
   ) {
-    let dataPath: String = Self.getBundleDataPath(filenameSansExtension)
-    lm.loadLanguageModel(path: dataPath)
+    lm.loadLanguageModel(plist: Self.getDictionaryData(filenameSansExtension))
   }
 
   public static func loadDataModelsOnAppDelegate() {
@@ -77,22 +76,22 @@ public class LMMgr {
     group.enter()
     globalQueue.async {
       if !Self.lmCHT.isCNSDataLoaded {
-        Self.lmCHT.loadCNSData(path: getBundleDataPath("data-cns"))
+        Self.lmCHT.loadCNSData(plist: Self.getDictionaryData("data-cns"))
       }
       if !Self.lmCHT.isMiscDataLoaded {
-        Self.lmCHT.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
+        Self.lmCHT.loadMiscData(plist: Self.getDictionaryData("data-zhuyinwen"))
       }
       if !Self.lmCHT.isSymbolDataLoaded {
-        Self.lmCHT.loadSymbolData(path: getBundleDataPath("data-symbols"))
+        Self.lmCHT.loadSymbolData(plist: Self.getDictionaryData("data-symbols"))
       }
       if !Self.lmCHS.isCNSDataLoaded {
-        Self.lmCHS.loadCNSData(path: getBundleDataPath("data-cns"))
+        Self.lmCHS.loadCNSData(plist: Self.getDictionaryData("data-cns"))
       }
       if !Self.lmCHS.isMiscDataLoaded {
-        Self.lmCHS.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
+        Self.lmCHS.loadMiscData(plist: Self.getDictionaryData("data-zhuyinwen"))
       }
       if !Self.lmCHS.isSymbolDataLoaded {
-        Self.lmCHS.loadSymbolData(path: getBundleDataPath("data-symbols"))
+        Self.lmCHS.loadSymbolData(plist: Self.getDictionaryData("data-symbols"))
       }
       group.leave()
     }
@@ -136,23 +135,23 @@ public class LMMgr {
       switch mode {
         case .imeModeCHS:
           if !Self.lmCHS.isCNSDataLoaded {
-            Self.lmCHS.loadCNSData(path: getBundleDataPath("data-cns"))
+            Self.lmCHS.loadCNSData(plist: Self.getDictionaryData("data-cns"))
           }
           if !Self.lmCHS.isMiscDataLoaded {
-            Self.lmCHS.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
+            Self.lmCHS.loadMiscData(plist: Self.getDictionaryData("data-zhuyinwen"))
           }
           if !Self.lmCHS.isSymbolDataLoaded {
-            Self.lmCHS.loadSymbolData(path: getBundleDataPath("data-symbols"))
+            Self.lmCHS.loadSymbolData(plist: Self.getDictionaryData("data-symbols"))
           }
         case .imeModeCHT:
           if !Self.lmCHT.isCNSDataLoaded {
-            Self.lmCHT.loadCNSData(path: getBundleDataPath("data-cns"))
+            Self.lmCHT.loadCNSData(plist: Self.getDictionaryData("data-cns"))
           }
           if !Self.lmCHT.isMiscDataLoaded {
-            Self.lmCHT.loadMiscData(path: getBundleDataPath("data-zhuyinwen"))
+            Self.lmCHT.loadMiscData(plist: Self.getDictionaryData("data-zhuyinwen"))
           }
           if !Self.lmCHT.isSymbolDataLoaded {
-            Self.lmCHT.loadSymbolData(path: getBundleDataPath("data-symbols"))
+            Self.lmCHT.loadSymbolData(plist: Self.getDictionaryData("data-symbols"))
           }
         default: break
       }
@@ -191,6 +190,17 @@ public class LMMgr {
           message: NSLocalizedString("Core Dict loading complete.", comment: "")
         )
       }
+    }
+  }
+
+  public static func reloadFactoryDictionaryPlists() {
+    FrmRevLookupWindow.reloadData()
+    LMMgr.lmCHS.resetFactoryPlistModels()
+    LMMgr.lmCHT.resetFactoryPlistModels()
+    if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded {
+      LMMgr.loadDataModel(IMEApp.currentInputMode)
+    } else {
+      LMMgr.loadDataModelsOnAppDelegate()
     }
   }
 
