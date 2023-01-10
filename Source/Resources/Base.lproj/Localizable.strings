@@ -264,6 +264,7 @@
 "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu." = "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu.";
 "Push the cursor in front of the phrase after selection" = "Push the cursor in front of the phrase after selection";
 "Quick Setup:" = "Quick Setup:";
+"Read external factory dictionary plists if possible" = "Read external factory dictionary plists if possible";
 "Secondary Pinyin with Numeral Intonation" = "Secondary Pinyin with Numeral Intonation";
 "Seigyou" = "Seigyou (JinYei)";
 "Selection Keys:" = "Selection Keys:";
@@ -284,6 +285,7 @@
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode." = "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode.";
 "This only works with Tadokoro candidate window." = "This only works with Tadokoro candidate window.";
 "This will batch-replace specified candidates." = "This will batch-replace specified candidates.";
+"This will use the plist files deployed by the “make install” command from libvChewing-Data if possible." = "This will use the plist files deployed by the “make install” command from libvChewing-Data if possible.";
 "Traditional Chinese" = "Traditional Chinese";
 "Trim unfinished readings / strokes on commit" = "Trim unfinished readings / strokes on commit";
 "Type them into inline composition buffer" = "Type them into inline composition buffer";

@@ -20,6 +20,8 @@ struct VwrPrefPaneDictionary: View {
     ?? LMMgr.dataFolderPath(isDefaultFolder: true)
   @State private var selAutoReloadUserData: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kShouldAutoReloadUserDataFiles.rawValue)
+  @State private var selUseExternalFactoryDict: Bool = UserDefaults.standard.bool(
+    forKey: UserDef.kUseExternalFactoryDict.rawValue)
   @State private var selOnlyLoadFactoryLangModelsIfNeeded: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kOnlyLoadFactoryLangModelsIfNeeded.rawValue)
   @State private var selEnableCNS11643: Bool = UserDefaults.standard.bool(forKey: UserDef.kCNS11643Enabled.rawValue)
@@ -59,137 +61,153 @@ struct VwrPrefPaneDictionary: View {
         // MARK: - User Data Folder Path Management
 
         SSPreferences.Section(title: "", bottomDivider: true) {
-          Text(LocalizedStringKey("Choose your desired user data folder path. Will be omitted if invalid."))
-          HStack {
-            TextField(fdrUserDataDefault, text: $tbxUserDataPathSpecified).disabled(true)
-              .help(tbxUserDataPathSpecified)
-            Button {
-              Self.dlgOpenPath.title = NSLocalizedString(
-                "Choose your desired user data folder.", comment: ""
-              )
-              Self.dlgOpenPath.showsResizeIndicator = true
-              Self.dlgOpenPath.showsHiddenFiles = true
-              Self.dlgOpenPath.canChooseFiles = false
-              Self.dlgOpenPath.allowsMultipleSelection = false
-              Self.dlgOpenPath.canChooseDirectories = true
+          Group {
+            Text(LocalizedStringKey("Choose your desired user data folder path. Will be omitted if invalid."))
+            HStack {
+              TextField(fdrUserDataDefault, text: $tbxUserDataPathSpecified).disabled(true)
+                .help(tbxUserDataPathSpecified)
+              Button {
+                Self.dlgOpenPath.title = NSLocalizedString(
+                  "Choose your desired user data folder.", comment: ""
+                )
+                Self.dlgOpenPath.showsResizeIndicator = true
+                Self.dlgOpenPath.showsHiddenFiles = true
+                Self.dlgOpenPath.canChooseFiles = false
+                Self.dlgOpenPath.allowsMultipleSelection = false
+                Self.dlgOpenPath.canChooseDirectories = true
 
-              let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
-                PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath)
+                let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
+                  PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath)
 
-              if let window = CtlPrefUI.shared.controller.window {
-                Self.dlgOpenPath.beginSheetModal(for: window) { result in
-                  if result == NSApplication.ModalResponse.OK {
-                    guard let url = Self.dlgOpenPath.url else { return }
-                    // CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
-                    // 所以要手動補回來。
-                    var newPath = url.path
-                    newPath.ensureTrailingSlash()
-                    if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
-                      PrefMgr.shared.userDataFolderSpecified = newPath
-                      tbxUserDataPathSpecified = PrefMgr.shared.userDataFolderSpecified
-                      BookmarkManager.shared.saveBookmark(for: url)
-                      (NSApp.delegate as? AppDelegate)?.updateDirectoryMonitorPath()
+                if let window = CtlPrefUI.shared.controller.window {
+                  Self.dlgOpenPath.beginSheetModal(for: window) { result in
+                    if result == NSApplication.ModalResponse.OK {
+                      guard let url = Self.dlgOpenPath.url else { return }
+                      // CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
+                      // 所以要手動補回來。
+                      var newPath = url.path
+                      newPath.ensureTrailingSlash()
+                      if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
+                        PrefMgr.shared.userDataFolderSpecified = newPath
+                        tbxUserDataPathSpecified = PrefMgr.shared.userDataFolderSpecified
+                        BookmarkManager.shared.saveBookmark(for: url)
+                        (NSApp.delegate as? AppDelegate)?.updateDirectoryMonitorPath()
+                      } else {
+                        IMEApp.buzz()
+                        if !bolPreviousFolderValidity {
+                          LMMgr.resetSpecifiedUserDataFolder()
+                        }
+                        return
+                      }
                     } else {
-                      IMEApp.buzz()
                       if !bolPreviousFolderValidity {
                         LMMgr.resetSpecifiedUserDataFolder()
                       }
                       return
                     }
-                  } else {
-                    if !bolPreviousFolderValidity {
-                      LMMgr.resetSpecifiedUserDataFolder()
-                    }
-                    return
                   }
                 }
+              } label: {
+                Text("...")
               }
-            } label: {
-              Text("...")
+              Button {
+                LMMgr.resetSpecifiedUserDataFolder()
+                tbxUserDataPathSpecified = ""
+              } label: {
+                Text("↻")
+              }
             }
-            Button {
-              LMMgr.resetSpecifiedUserDataFolder()
-              tbxUserDataPathSpecified = ""
-            } label: {
-              Text("↻")
-            }
+            Toggle(
+              LocalizedStringKey("Automatically reload user data files if changes detected"),
+              isOn: $selAutoReloadUserData.onChange {
+                PrefMgr.shared.shouldAutoReloadUserDataFiles = selAutoReloadUserData
+                if selAutoReloadUserData {
+                  LMMgr.initUserLangModels()
+                }
+              }
+            ).controlSize(.small)
           }
-          Toggle(
-            LocalizedStringKey("Automatically reload user data files if changes detected"),
-            isOn: $selAutoReloadUserData.onChange {
-              PrefMgr.shared.shouldAutoReloadUserDataFiles = selAutoReloadUserData
-              if selAutoReloadUserData {
-                LMMgr.initUserLangModels()
+          Divider()
+          Group {
+            Toggle(
+              LocalizedStringKey("Read external factory dictionary plists if possible"),
+              isOn: $selUseExternalFactoryDict.onChange {
+                PrefMgr.shared.useExternalFactoryDict = selUseExternalFactoryDict
+                LMMgr.reloadFactoryDictionaryPlists()
               }
-            }
-          ).controlSize(.small)
-        }
-
-        // MARK: - Something Else
-
-        SSPreferences.Section(title: "") {
-          Toggle(
-            LocalizedStringKey("Only load factory language models if needed"),
-            isOn: $selOnlyLoadFactoryLangModelsIfNeeded.onChange {
-              PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded = selOnlyLoadFactoryLangModelsIfNeeded
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Enable CNS11643 Support (2022-12-01)"),
-            isOn: $selEnableCNS11643.onChange {
-              PrefMgr.shared.cns11643Enabled = selEnableCNS11643
-              LMMgr.setCNSEnabled(PrefMgr.shared.cns11643Enabled)
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Enable symbol input support (incl. certain emoji symbols)"),
-            isOn: $selEnableSymbolInputSupport.onChange {
-              PrefMgr.shared.symbolInputEnabled = selEnableSymbolInputSupport
-              LMMgr.setSymbolEnabled(PrefMgr.shared.symbolInputEnabled)
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Allow boosting / excluding a candidate of single kanji"),
-            isOn: $selAllowBoostingSingleKanjiAsUserPhrase.onChange {
-              PrefMgr.shared.allowBoostingSingleKanjiAsUserPhrase = selAllowBoostingSingleKanjiAsUserPhrase
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Applying typing suggestions from half-life user override model"),
-            isOn: $selFetchSuggestionsFromUserOverrideModel.onChange {
-              PrefMgr.shared.fetchSuggestionsFromUserOverrideModel = selFetchSuggestionsFromUserOverrideModel
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Always use fixed listing order in candidate window"),
-            isOn: $selUseFixecCandidateOrderOnSelection.onChange {
-              PrefMgr.shared.useFixecCandidateOrderOnSelection = selUseFixecCandidateOrderOnSelection
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Consolidate the context on confirming candidate selection"),
-            isOn: $selConsolidateContextOnCandidateSelection.onChange {
-              PrefMgr.shared.consolidateContextOnCandidateSelection = selConsolidateContextOnCandidateSelection
-            }
-          )
-          Text(
-            LocalizedStringKey(
-              "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is."
             )
-          )
-          .preferenceDescription().fixedSize(horizontal: false, vertical: true)
-          Toggle(
-            LocalizedStringKey("Harden vertical punctuations during vertical typing (not recommended)"),
-            isOn: $selHardenVerticalPunctuations.onChange {
-              PrefMgr.shared.hardenVerticalPunctuations = selHardenVerticalPunctuations
-            }
-          )
-          Text(
-            LocalizedStringKey(
-              "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal."
+            Text(
+              LocalizedStringKey(
+                "This will use the plist files deployed by the “make install” command from libvChewing-Data if possible."
+              )
             )
-          )
-          .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+            .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+            Toggle(
+              LocalizedStringKey("Only load factory language models if needed"),
+              isOn: $selOnlyLoadFactoryLangModelsIfNeeded.onChange {
+                PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded = selOnlyLoadFactoryLangModelsIfNeeded
+              }
+            )
+            Toggle(
+              LocalizedStringKey("Enable CNS11643 Support (2022-12-01)"),
+              isOn: $selEnableCNS11643.onChange {
+                PrefMgr.shared.cns11643Enabled = selEnableCNS11643
+                LMMgr.setCNSEnabled(PrefMgr.shared.cns11643Enabled)
+              }
+            )
+            Toggle(
+              LocalizedStringKey("Enable symbol input support (incl. certain emoji symbols)"),
+              isOn: $selEnableSymbolInputSupport.onChange {
+                PrefMgr.shared.symbolInputEnabled = selEnableSymbolInputSupport
+                LMMgr.setSymbolEnabled(PrefMgr.shared.symbolInputEnabled)
+              }
+            )
+          }
+          // Divider()
+          Group {
+            Toggle(
+              LocalizedStringKey("Allow boosting / excluding a candidate of single kanji"),
+              isOn: $selAllowBoostingSingleKanjiAsUserPhrase.onChange {
+                PrefMgr.shared.allowBoostingSingleKanjiAsUserPhrase = selAllowBoostingSingleKanjiAsUserPhrase
+              }
+            )
+            Toggle(
+              LocalizedStringKey("Applying typing suggestions from half-life user override model"),
+              isOn: $selFetchSuggestionsFromUserOverrideModel.onChange {
+                PrefMgr.shared.fetchSuggestionsFromUserOverrideModel = selFetchSuggestionsFromUserOverrideModel
+              }
+            )
+            Toggle(
+              LocalizedStringKey("Always use fixed listing order in candidate window"),
+              isOn: $selUseFixecCandidateOrderOnSelection.onChange {
+                PrefMgr.shared.useFixecCandidateOrderOnSelection = selUseFixecCandidateOrderOnSelection
+              }
+            )
+            Toggle(
+              LocalizedStringKey("Consolidate the context on confirming candidate selection"),
+              isOn: $selConsolidateContextOnCandidateSelection.onChange {
+                PrefMgr.shared.consolidateContextOnCandidateSelection = selConsolidateContextOnCandidateSelection
+              }
+            )
+            Text(
+              LocalizedStringKey(
+                "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is."
+              )
+            )
+            .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+            Toggle(
+              LocalizedStringKey("Harden vertical punctuations during vertical typing (not recommended)"),
+              isOn: $selHardenVerticalPunctuations.onChange {
+                PrefMgr.shared.hardenVerticalPunctuations = selHardenVerticalPunctuations
+              }
+            )
+            Text(
+              LocalizedStringKey(
+                "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal."
+              )
+            )
+            .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+          }
         }
       }
     }
