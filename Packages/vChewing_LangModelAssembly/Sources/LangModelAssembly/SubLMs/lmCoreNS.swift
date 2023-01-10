@@ -55,6 +55,15 @@ extension vChewingLM {
     /// 檢測資料庫辭典內是否已經有載入的資料。
     public var isLoaded: Bool { !dataMap.isEmpty }
 
+    /// 讀入資料辭典。
+    /// - parameters:
+    ///   - dictData: 辭典資料及對應的 URL 位置。
+    public mutating func load(_ dictData: (dict: [String: [Data]], path: String)) {
+      if isLoaded { return }
+      filePath = dictData.path
+      dataMap = dictData.dict
+    }
+
     /// 將資料從檔案讀入至資料庫辭典內。
     /// - parameters:
     ///   - path: 給定路徑。
