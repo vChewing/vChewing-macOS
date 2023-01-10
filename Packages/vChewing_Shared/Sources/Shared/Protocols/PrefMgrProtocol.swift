@@ -13,6 +13,7 @@ public protocol PrefMgrProtocol {
   var failureFlagForUOMObservation: Bool { get set }
   var deltaOfCalendarYears: Int { get set }
   var mostRecentInputMode: String { get set }
+  var useExternalFactoryDict: Bool { get set }
   var checkUpdateAutomatically: Bool { get set }
   var cassettePath: String { get set }
   var userDataFolderSpecified: String { get set }
