@@ -264,6 +264,7 @@
 "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu." = "请利用滑鼠滚轮检视该页面。也请洽输入法选单内的热键指南。";
 "Push the cursor in front of the phrase after selection" = "在选字后将游标置于该字词的前方";
 "Quick Setup:" = "直接设定:";
+"Read external factory dictionary plists if possible" = "尽量使用外置原厂辞典 plist 档案";
 "Secondary Pinyin with Numeral Intonation" = "国音二式+数字标调";
 "Seigyou" = "精业排列";
 "Selection Keys:" = "选字键:";
@@ -284,6 +285,7 @@
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode." = "该转换仅对磁带模式有影响，会将键入的内容根据该选项与当前的简繁体模式来转换。";
 "This only works with Tadokoro candidate window." = "该方法仅对田所选字窗起作用。";
 "This will batch-replace specified candidates." = "这将会对指定的候选字词进行整词取代。";
+"This will use the plist files deployed by the “make install” command from libvChewing-Data if possible." = "这将会优先使用由 libvChewing-Data 的 make install 部署的原厂辞典档案。";
 "Traditional Chinese" = "繁体中文";
 "Trim unfinished readings / strokes on commit" = "在递交时清理未完成拼写的读音或字根";
 "Type them into inline composition buffer" = "直接键入内文组字区";
