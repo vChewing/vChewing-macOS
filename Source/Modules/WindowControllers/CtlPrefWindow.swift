@@ -29,7 +29,6 @@ extension NSToolbarItem.Identifier {
 // It should be set as "Preferences" which correspondes to the "Preference" pref pane
 // of this build target.
 class CtlPrefWindow: NSWindowController, NSWindowDelegate {
-  @IBOutlet var fontSizePopUpButton: NSPopUpButton!
   @IBOutlet var uiLanguageButton: NSPopUpButton!
   @IBOutlet var basicKeyboardLayoutButton: NSPopUpButton!
   @IBOutlet var selectionKeyComboBox: NSComboBox!
@@ -265,6 +264,10 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
       }
       IMEApp.buzz()
     }
+  }
+
+  @IBAction func toggledExternalFactoryPlistDataOnOff(_: NSButton) {
+    LMMgr.reloadFactoryDictionaryPlists()
   }
 
   @IBAction func resetSpecifiedUserDataFolder(_: Any) {

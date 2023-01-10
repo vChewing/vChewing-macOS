@@ -19,7 +19,6 @@
                 <outlet property="cmbCandidateFontSize" destination="90" id="K27-YZ-Iki"/>
                 <outlet property="cmbPEDataTypeMenu" destination="Hdr-Qr-1qw" id="6Dv-pj-1EE"/>
                 <outlet property="cmbPEInputModeMenu" destination="y5f-AO-wKG" id="hW9-zZ-t8S"/>
-                <outlet property="fontSizePopUpButton" destination="90" id="108"/>
                 <outlet property="lblCurrentlySpecifiedUserDataFolder" destination="REC-r4-T7m" id="eEq-XN-mMq"/>
                 <outlet property="selectionKeyComboBox" destination="uHU-aL-du7" id="cEx-Ui-Phc"/>
                 <outlet property="tfdPETextEditor" destination="kSG-dz-P2N" id="aiA-EA-Isg"/>
@@ -876,14 +875,14 @@
         </view>
         <userDefaultsController representsSharedInstance="YES" id="32"/>
         <view id="Rnp-LM-RIF" userLabel="vwrDictionary">
-            <rect key="frame" x="0.0" y="0.0" width="445" height="284"/>
+            <rect key="frame" x="0.0" y="0.0" width="445" height="316"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="6" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="6xK-1z-A14">
-                    <rect key="frame" x="20" y="34" width="407" height="230"/>
+                    <rect key="frame" x="20" y="45" width="407" height="251"/>
                     <subviews>
                         <textField autoresizesSubviews="NO" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FUV-qx-xkC">
-                            <rect key="frame" x="-2" y="215" width="388" height="15"/>
+                            <rect key="frame" x="-2" y="236" width="388" height="15"/>
                             <textFieldCell key="cell" lineBreakMode="clipping" title="Choose your desired user data folder path. Will be omitted if invalid." id="wN3-k3-b2a">
                                 <font key="font" metaFont="cellTitle"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -891,7 +890,7 @@
                             </textFieldCell>
                         </textField>
                         <stackView distribution="fill" orientation="horizontal" alignment="bottom" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="uUS-Ni-jFP">
-                            <rect key="frame" x="0.0" y="189" width="407" height="20"/>
+                            <rect key="frame" x="0.0" y="210" width="407" height="20"/>
                             <subviews>
                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="s7t-Kk-EPu">
                                     <rect key="frame" x="0.0" y="0.0" width="347" height="19"/>
@@ -950,13 +949,24 @@
                             </customSpacing>
                         </stackView>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p7V-IN-OTr">
-                            <rect key="frame" x="-1" y="167.5" width="336" height="16"/>
+                            <rect key="frame" x="-1" y="188.5" width="336" height="16"/>
                             <buttonCell key="cell" type="check" title="Automatically reload user data files if changes detected" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="f8i-69-zxm">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="cellTitle"/>
                             </buttonCell>
                             <connections>
                                 <binding destination="32" name="value" keyPath="values.ShouldAutoReloadUserDataFiles" id="XTI-ol-DVN"/>
+                            </connections>
+                        </button>
+                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MJ6-U4-qyl">
+                            <rect key="frame" x="-1" y="167.5" width="297" height="16"/>
+                            <buttonCell key="cell" type="check" title="Read external factory dictionary plists if possible" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="fEA-Bp-Ayn" userLabel="chkUseExternalFactoryDict">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="cellTitle"/>
+                            </buttonCell>
+                            <connections>
+                                <action selector="toggledExternalFactoryPlistDataOnOff:" target="-2" id="TYX-1b-x0P"/>
+                                <binding destination="32" name="value" keyPath="values.UseExternalFactoryDict" id="1Gp-Ax-mRK"/>
                             </connections>
                         </button>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZQK-w3-FRb">
@@ -1055,8 +1065,10 @@
                         <integer value="1000"/>
                         <integer value="1000"/>
                         <integer value="1000"/>
+                        <integer value="1000"/>
                     </visibilityPriorities>
                     <customSpacing>
+                        <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
@@ -1075,7 +1087,7 @@
                 <constraint firstItem="6xK-1z-A14" firstAttribute="top" secondItem="Rnp-LM-RIF" secondAttribute="top" constant="20" symbolic="YES" id="W7P-xQ-mDE"/>
                 <constraint firstItem="6xK-1z-A14" firstAttribute="leading" secondItem="Rnp-LM-RIF" secondAttribute="leading" constant="20" symbolic="YES" id="zFW-2a-uC3"/>
             </constraints>
-            <point key="canvasLocation" x="101.5" y="178"/>
+            <point key="canvasLocation" x="93.5" y="217"/>
         </view>
         <view id="ZEr-3U-K9a" userLabel="vwrCassette">
             <rect key="frame" x="0.0" y="0.0" width="445" height="488"/>
@@ -1755,7 +1767,7 @@
                             <rect key="frame" x="0.0" y="80" width="538" height="360"/>
                             <clipView key="contentView" drawsBackground="NO" id="x8s-wo-bxi">
                                 <rect key="frame" x="0.0" y="0.0" width="538" height="360"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <textView wantsLayer="YES" importsGraphics="NO" richText="NO" verticallyResizable="YES" allowsUndo="YES" smartInsertDelete="YES" id="kSG-dz-P2N">
                                         <rect key="frame" x="0.0" y="0.0" width="538" height="360"/>
