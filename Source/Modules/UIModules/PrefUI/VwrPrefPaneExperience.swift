@@ -53,7 +53,7 @@ struct VwrPrefPaneExperience: View {
   @State private var selShareAlphanumericalModeStatusAcrossClients = UserDefaults.standard.bool(
     forKey: UserDef.kShareAlphanumericalModeStatusAcrossClients.rawValue)
 
-  private let contentMaxHeight: Double = 440
+  private let contentMaxHeight: Double = 490
   private let contentWidth: Double = {
     switch PrefMgr.shared.appleLanguages[0] {
       case "ja":
