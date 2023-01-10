@@ -92,45 +92,51 @@ extension vChewingLM {
 
     // MARK: - 工具函式
 
+    public func resetFactoryPlistModels() {
+      lmCore.clear()
+      lmMisc.clear()
+      Self.lmCNS.clear()
+      Self.lmSymbols.clear()
+    }
+
     public var isCoreLMLoaded: Bool { lmCore.isLoaded }
-    public func loadLanguageModel(path: String) {
-      if FileManager.default.isReadableFile(atPath: path) {
-        lmCore.open(path)
-        vCLog("lmCore: \(lmCore.count) entries of data loaded from: \(path)")
-      } else {
-        vCLog("lmCore: File access failure: \(path)")
+    public func loadLanguageModel(plist: (dict: [String: [Data]]?, path: String)) {
+      guard let plistDict = plist.dict else {
+        vCLog("lmCore: File access failure: \(plist.path)")
+        return
       }
+      lmCore.load((dict: plistDict, path: plist.path))
+      vCLog("lmCore: \(lmCore.count) entries of data loaded from: \(plist.path)")
     }
 
     public var isCNSDataLoaded: Bool { Self.lmCNS.isLoaded }
-    public func loadCNSData(path: String) {
-      if FileManager.default.isReadableFile(atPath: path) {
-        Self.lmCNS.open(path)
-        vCLog("lmCNS: \(Self.lmCNS.count) entries of data loaded from: \(path)")
-      } else {
-        vCLog("lmCNS: File access failure: \(path)")
+    public func loadCNSData(plist: (dict: [String: [Data]]?, path: String)) {
+      guard let plistDict = plist.dict else {
+        vCLog("lmCNS: File access failure: \(plist.path)")
+        return
       }
+      Self.lmCNS.load((dict: plistDict, path: plist.path))
+      vCLog("lmCNS: \(Self.lmCNS.count) entries of data loaded from: \(plist.path)")
     }
 
     public var isMiscDataLoaded: Bool { lmMisc.isLoaded }
-    public func loadMiscData(path: String) {
-      if FileManager.default.isReadableFile(atPath: path) {
-        lmMisc.open(path)
-        vCLog("lmMisc: \(lmMisc.count) entries of data loaded from: \(path)")
-      } else {
-        vCLog("lmMisc: File access failure: \(path)")
+    public func loadMiscData(plist: (dict: [String: [Data]]?, path: String)) {
+      guard let plistDict = plist.dict else {
+        vCLog("lmCore: File access failure: \(plist.path)")
+        return
       }
+      lmMisc.load((dict: plistDict, path: plist.path))
+      vCLog("lmMisc: \(lmMisc.count) entries of data loaded from: \(plist.path)")
     }
 
     public var isSymbolDataLoaded: Bool { Self.lmSymbols.isLoaded }
-    public func loadSymbolData(path: String) {
-      if FileManager.default.isReadableFile(atPath: path) {
-        Self.lmSymbols.open(path)
-        vCLog(
-          "lmSymbol: \(Self.lmSymbols.count) entries of data loaded from: \(path)")
-      } else {
-        vCLog("lmSymbols: File access failure: \(path)")
+    public func loadSymbolData(plist: (dict: [String: [Data]]?, path: String)) {
+      guard let plistDict = plist.dict else {
+        vCLog("lmCore: File access failure: \(plist.path)")
+        return
       }
+      Self.lmSymbols.load((dict: plistDict, path: plist.path))
+      vCLog("lmSymbols: \(Self.lmSymbols.count) entries of data loaded from: \(plist.path)")
     }
 
     // 上述幾個函式不要加 Async，因為這些內容都被 LMMgr 負責用別的方法 Async 了、用 GCD 的多任務並行共結來完成。

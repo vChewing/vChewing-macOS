@@ -14,8 +14,13 @@ extension vChewingLM {
     public private(set) var dataMap: [String: [Data]] = [:]
     public private(set) var filePath: String = ""
 
-    public init(dataMap: [String: [Data]]) {
-      self.dataMap = dataMap
+    public init(data dictData: (dict: [String: [Data]]?, path: String)) {
+      guard let theDict = dictData.dict else {
+        vCLog("↑ Exception happened when reading plist file at: \(dictData.path).")
+        return
+      }
+      filePath = dictData.path
+      dataMap = theDict
     }
 
     public init(path: String) {
