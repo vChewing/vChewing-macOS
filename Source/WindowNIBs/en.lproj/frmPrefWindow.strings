@@ -61,6 +61,7 @@
 "eia-1F-Do0.title" = "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters";
 "f2j-xD-4xK.title" = "Use ESC key to clear the entire input buffer";
 "f8i-69-zxm.title" = "Automatically reload user data files if changes detected";
+"fEA-Bp-Ayn.title" = "Read external factory dictionary plists if possible";
 "FnD-oH-El5.title" = "Selection Keys:";
 "fQ0-Yu-pJF.title" = "Enforce conversion in both input modes";
 "FSG-lN-CJO.title" = "English";
