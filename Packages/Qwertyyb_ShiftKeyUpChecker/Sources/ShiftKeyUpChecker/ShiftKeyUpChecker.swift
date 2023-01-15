@@ -31,10 +31,12 @@ public struct ShiftKeyUpChecker {
 
   private var lastTime: Date = .init()
 
+  private var shiftIsBeingPressed = false
+
   private mutating func checkModifierKeyUp(event: NSEvent) -> Bool {
     if event.type == .flagsChanged,
       event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .init(rawValue: 0),
-      Date() - lastTime <= delayInterval
+      Date() - lastTime <= delayInterval, shiftIsBeingPressed
     {
       // modifier keyup event
       lastTime = Date(timeInterval: -3600 * 4, since: Date())
@@ -54,8 +56,10 @@ public struct ShiftKeyUpChecker {
     if isKeyDown {
       // modifier keydown event
       lastTime = Date()
+      if event.modifierFlags == .shift { shiftIsBeingPressed = true }
     } else {
       lastTime = Date(timeInterval: -3600 * 4, since: Date())
+      shiftIsBeingPressed = false
     }
     return false
   }
