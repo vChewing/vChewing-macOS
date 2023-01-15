@@ -179,13 +179,14 @@ extension SessionCtl: CtlCandidateDelegate {
     var succeeded = true
 
     let rawPair = state.candidates[index]
+    let theKey = rawPair.0.joined(separator: InputHandler.keySeparator)
     let valueCurrent = rawPair.1
     let valueReversed = ChineseConverter.crossConvert(rawPair.1)
     let nerfedScore = (action == .toNerf) ? " -114.514" : ""
     let convertedMark = "#𝙃𝙪𝙢𝙖𝙣𝘾𝙝𝙚𝙘𝙠𝙍𝙚𝙦𝙪𝙞𝙧𝙚𝙙"
 
-    let userPhraseDumped = "\(valueCurrent) \(rawPair.0)\(nerfedScore)"
-    let userPhraseDumpedConverted = "\(valueReversed) \(rawPair.0)\(nerfedScore) \(convertedMark)"
+    let userPhraseDumped = "\(valueCurrent) \(theKey)\(nerfedScore)"
+    let userPhraseDumpedConverted = "\(valueReversed) \(theKey)\(nerfedScore) \(convertedMark)"
 
     if !LMMgr.writeUserPhrase(
       userPhraseDumped, inputMode: inputMode,
