@@ -60,6 +60,15 @@ extension SessionCtl {
       }
     }
 
+    func toggleAlphanumericalMode() {
+      let status = "NotificationSwitchASCII".localized
+      Notifier.notify(
+        message: isASCIIMode.toggled()
+          ? "Alphanumerical Input Mode".localized + "\n" + status
+          : "Chinese Input Mode".localized + "\n" + status
+      )
+    }
+
     // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
     let shouldUseShiftToggleHandle: Bool = {
       switch PrefMgr.shared.shiftKeyAccommodationBehavior {
@@ -73,18 +82,14 @@ extension SessionCtl {
     /// 警告：這裡的 event 必須是原始 event 且不能被 var，否則會影響 Shift 中英模式判定。
     if #available(macOS 10.15, *) {
       if Self.theShiftKeyDetector.check(event), !PrefMgr.shared.disableShiftTogglingAlphanumericalMode {
-        if !shouldUseShiftToggleHandle || (!rencentKeyHandledByInputHandlerEtc && shouldUseShiftToggleHandle) {
-          let status = NSLocalizedString("NotificationSwitchASCII", comment: "")
-          Notifier.notify(
-            message: isASCIIMode.toggled()
-              ? NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
-              : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
-          )
-        }
         if shouldUseShiftToggleHandle {
-          rencentKeyHandledByInputHandlerEtc = false
+          if !rencentKeyHandledByInputHandlerEtc {
+            toggleAlphanumericalMode()
+          } else {
+            rencentKeyHandledByInputHandlerEtc = false
+          }
         }
-        return false
+        return true
       }
     }
 
