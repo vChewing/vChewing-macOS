@@ -214,7 +214,6 @@
 "Directly commit lowercased letters" = "Directly commit lowercased letters";
 "Directly commit uppercased letters" = "Directly commit uppercased letters";
 "Disable forced conversion for cassette outputs" = "Disable forced conversion for cassette outputs";
-"Disable Shift key accomodation in all cases" = "Disable Shift key accomodation in all cases";
 "Disassemble the previous reading, dropping its intonation" = "Disassemble the previous reading, dropping its intonation";
 "Disassembling process does not work with non-phonetic reading keys." = "Disassembling process does not work with non-phonetic reading keys.";
 "Edit…" = "Edit…";
@@ -255,7 +254,6 @@
 "Only enforce conversion in Traditional Chinese mode" = "Only enforce conversion in Traditional Chinese mode";
 "Only load factory language models if needed" = "Only load factory language models if needed";
 "Only override the intonation of the previous reading if different" = "Only override the intonation of the previous reading if different";
-"Only use this with known Chromium-based browsers" = "Only use this with known Chromium-based browsers";
 "Output Settings:" = "Output Settings:";
 "Override the previous reading's intonation with candidate-reset" = "Override the previous reading's intonation with candidate-reset";
 "Path invalid or file access error." = "Path invalid or file access error.";
@@ -276,7 +274,6 @@
 "Show notifications when toggling Caps Lock" = "Show notifications when toggling Caps Lock";
 "Show translated strokes in composition buffer" = "Show translated strokes in composition buffer";
 "Simplified Chinese" = "Simplified Chinese";
-"Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work." = "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work.";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Space to +cycle candidates, Shift+Space to +cycle pages";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "Space to +cycle pages, Shift+Space to +cycle candidates";
 "Specify the behavior of intonation key when syllable composer is empty." = "Specify the behavior of intonation key when syllable composer is empty.";
@@ -295,7 +292,7 @@
 "Use .langIdentifier to handle UI fonts in candidate window" = "Use .langIdentifier to handle UI fonts in candidate window";
 "Use ESC key to clear the entire input buffer" = "Use ESC key to clear the entire input buffer";
 "Use IMK Candidate Window instead of Tadokoro (will reboot the IME)" = "Use IMK Candidate Window instead of Tadokoro (will reboot the IME)";
-"Use Shift key accommodation in all cases" = "Use Shift key accommodation in all cases";
+
 "Vertical" = "Vertical";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
 "Yale Pinyin with Numeral Intonation" = "Yale Pinyin with Numeral Intonation";

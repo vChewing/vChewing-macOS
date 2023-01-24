@@ -45,7 +45,6 @@ public protocol PrefMgrProtocol {
   var onlyLoadFactoryLangModelsIfNeeded: Bool { get set }
   var useIMKCandidateWindow: Bool { get set }
   var handleDefaultCandidateFontsByLangIdentifier: Bool { get set }
-  var shiftKeyAccommodationBehavior: Int { get set }
   var maxCandidateLength: Int { get set }
   var shouldNotFartInLieuOfBeep: Bool { get set }
   var showHanyuPinyinInCompositionBuffer: Bool { get set }

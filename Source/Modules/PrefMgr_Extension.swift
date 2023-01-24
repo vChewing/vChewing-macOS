@@ -16,7 +16,6 @@ extension PrefMgr {
     if #unavailable(macOS 10.15) {
       useIMKCandidateWindow = true
       handleDefaultCandidateFontsByLangIdentifier = false
-      shiftKeyAccommodationBehavior = 0
       disableShiftTogglingAlphanumericalMode = true
       togglingAlphanumericalModeWithLShift = false
       showReverseLookupInCandidateUI = false
@@ -50,9 +49,6 @@ extension PrefMgr {
     }
     if ![0, 1, 2].contains(upperCaseLetterKeyBehavior) {
       upperCaseLetterKeyBehavior = 0
-    }
-    if ![0, 1, 2].contains(shiftKeyAccommodationBehavior) {
-      shiftKeyAccommodationBehavior = 0
     }
   }
 }
