@@ -214,7 +214,6 @@
 "Directly commit lowercased letters" = "ローマ字（小文字）を直接出力";
 "Directly commit uppercased letters" = "ローマ字（大文字）を直接出力";
 "Disable forced conversion for cassette outputs" = "カセットモードによる漢字出力の簡繁転換を行わずにする";
-"Disable Shift key accomodation in all cases" = "いずれの客体アプリにも Shift キーの互換性措置を禁ず";
 "Disassemble the previous reading, dropping its intonation" = "カーソルの後部の音読みを解き、その音調を除く";
 "Disassembling process does not work with non-phonetic reading keys." = "実の意味の音読みだけを解くことができる。";
 "Edit…" = "編集…";
@@ -255,7 +254,6 @@
 "Only enforce conversion in Traditional Chinese mode" = "繁体モードだけの場合、カセットモードの漢字出力転換を";
 "Only load factory language models if needed" = "必要性を判断してから内蔵辞書を読み込む";
 "Only override the intonation of the previous reading if different" = "カーソルの後部の音読みの異なる音調だけを上書きする";
-"Only use this with known Chromium-based browsers" = "有名なる Chromium 系ブラウザーだけに、この装置を起用";
 "Output Settings:" = "出力設定:";
 "Override the previous reading's intonation with candidate-reset" = "カーソルの後部の音読みの音調を上書きし、候補選択状態を戻す";
 "Path invalid or file access error." = "ファイルアクセス失敗、或いはご指定したファイル位置情報は使えぬ。";
@@ -276,7 +274,6 @@
 "Show notifications when toggling Caps Lock" = "Caps Lock で切り替えの時に吹出通知メッセージを";
 "Show translated strokes in composition buffer" = "原始キーネームでなく、筆画を入力緩衝列で表示する";
 "Simplified Chinese" = "簡体中国語";
-"Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work." = "いくつかのアプリ（例えば MS Edge や Google Chrome などのような Chromium 系ブラウザー）には「Shift キーの入力イベントを複数化してしまう」という支障があり、そしてアプリそれぞれの開発元に修復される可能性はほぼゼロだと言える。威注音入力アプリは対策用の特殊措置を普段に起用している。ご自分の必要によって設定してください。";
 "Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+Space で次のページ、Space で次の候補文字を";
 "Space to +cycle pages, Shift+Space to +cycle candidates" = "Space で次のページ、Shift+Space で次の候補文字を";
 "Specify the behavior of intonation key when syllable composer is empty." = "音読組立緩衝列が空かされた時の音調キーの行為をご指定ください。";
@@ -295,7 +292,7 @@
 "Use .langIdentifier to handle UI fonts in candidate window" = "「.langIdentifier」を使って候補陳列ウィンドウのフォントを取り扱う";
 "Use ESC key to clear the entire input buffer" = "ESC キーで入力緩衝列を消す";
 "Use IMK Candidate Window instead of Tadokoro (will reboot the IME)" = "IMK 候補陳列ウィンドウを起用（入力アプリは自動的に再起動）";
-"Use Shift key accommodation in all cases" = "いずれの客体アプリにも Shift キーの互換性措置を起用";
+
 "Vertical" = "縦型陳列";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
 "Yale Pinyin with Numeral Intonation" = "イェール弁音 (ローマ字+数字音調)";

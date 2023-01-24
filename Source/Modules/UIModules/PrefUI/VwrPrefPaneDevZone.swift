@@ -17,8 +17,6 @@ struct VwrPrefPaneDevZone: View {
     forKey: UserDef.kUseIMKCandidateWindow.rawValue)
   @State private var selHandleDefaultCandidateFontsByLangIdentifier: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue)
-  @State private var selShiftKeyAccommodationBehavior: Int = UserDefaults.standard.integer(
-    forKey: UserDef.kShiftKeyAccommodationBehavior.rawValue)
   @State private var selPhraseReplacementEnabled: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kPhraseReplacementEnabled.rawValue
   )
@@ -79,24 +77,6 @@ struct VwrPrefPaneDevZone: View {
           Text(
             LocalizedStringKey(
               "This only works with Tadokoro candidate window."
-            )
-          )
-          .preferenceDescription().fixedSize(horizontal: false, vertical: true)
-          Picker(
-            "",
-            selection: $selShiftKeyAccommodationBehavior.onChange {
-              PrefMgr.shared.shiftKeyAccommodationBehavior = selShiftKeyAccommodationBehavior
-            }
-          ) {
-            Text(LocalizedStringKey("Disable Shift key accomodation in all cases")).tag(0)
-            Text(LocalizedStringKey("Only use this with known Chromium-based browsers")).tag(1)
-            Text(LocalizedStringKey("Use Shift key accommodation in all cases")).tag(2)
-          }
-          .labelsHidden()
-          .pickerStyle(RadioGroupPickerStyle())
-          Text(
-            LocalizedStringKey(
-              "Some client apps (like Chromium-cored browsers: MS Edge, Google Chrome, etc.) may duplicate Shift-key inputs due to their internal bugs, and their devs are less likely to fix their bugs of such. vChewing has its accommodation procedures enabled by default for known Chromium-cored browsers. Here you can customize how the accommodation should work."
             )
           )
           .preferenceDescription().fixedSize(horizontal: false, vertical: true)
