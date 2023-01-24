@@ -26,6 +26,8 @@ public protocol InputSignalProtocol {
   var isInvalid: Bool { get }
   var isKeyCodeBlacklisted: Bool { get }
   var isReservedKey: Bool { get }
+  var isJISAlphanumericalKey: Bool { get }
+  var isJISKanaSwappingKey: Bool { get }
   var isNumericPadKey: Bool { get }
   var isMainAreaNumKey: Bool { get }
   var isShiftHold: Bool { get }

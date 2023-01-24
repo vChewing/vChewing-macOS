@@ -122,6 +122,8 @@ extension NSEvent {
   }
 
   /// 單獨用 flags 來判定數字小鍵盤輸入的方法已經失效了，所以必須再增補用 KeyCode 判定的方法。
+  public var isJISAlphanumericalKey: Bool { KeyCode(rawValue: keyCode) == KeyCode.kJISAlphanumericalKey }
+  public var isJISKanaSwappingKey: Bool { KeyCode(rawValue: keyCode) == KeyCode.kJISKanaSwappingKey }
   public var isNumericPadKey: Bool { arrNumpadKeyCodes.contains(keyCode) }
   public var isMainAreaNumKey: Bool { arrMainAreaNumKey.contains(keyCode) }
   public var isShiftHold: Bool { modifierFlags.contains([.shift]) }
@@ -216,14 +218,18 @@ public enum KeyCode: UInt16 {
   case kF18 = 79
   case kF19 = 80
   case kF20 = 90
+  case kYen = 93
   case kSymbolMenuPhysicalKeyJIS = 94  // vChewing Specific (JIS)
+  case kJISNumPadComma = 95
   case kF5 = 96
   case kF6 = 97
   case kF7 = 98
   case kF3 = 99
   case kF8 = 100
   case kF9 = 101
+  case kJISAlphanumericalKey = 102
   case kF11 = 103
+  case kJISKanaSwappingKey = 104
   case kF13 = 105  // PrtSc
   case kF16 = 106
   case kF14 = 107
