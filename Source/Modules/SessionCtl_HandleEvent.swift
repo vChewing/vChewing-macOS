@@ -60,6 +60,7 @@ extension SessionCtl {
       }
     }
 
+    // 切換英數模式開關。
     func toggleAlphanumericalMode() {
       let status = "NotificationSwitchASCII".localized
       Notifier.notify(
@@ -70,24 +71,13 @@ extension SessionCtl {
     }
 
     // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
-    let shouldUseShiftToggleHandle: Bool = {
-      switch PrefMgr.shared.shiftKeyAccommodationBehavior {
-        case 0: return false
-        case 1: return Shared.arrClientShiftHandlingExceptionList.contains(clientBundleIdentifier)
-        case 2: return true
-        default: return false
-      }
-    }()
-
-    /// 警告：這裡的 event 必須是原始 event 且不能被 var，否則會影響 Shift 中英模式判定。
+    // 警告：這裡的 event 必須是原始 event 且不能被 var，否則會影響 Shift 中英模式判定。
     if #available(macOS 10.15, *) {
       if Self.theShiftKeyDetector.check(event), !PrefMgr.shared.disableShiftTogglingAlphanumericalMode {
-        if shouldUseShiftToggleHandle {
-          if !rencentKeyHandledByInputHandlerEtc {
-            toggleAlphanumericalMode()
-          } else {
-            rencentKeyHandledByInputHandlerEtc = false
-          }
+        if !rencentKeyHandledByInputHandlerEtc {
+          toggleAlphanumericalMode()
+        } else {
+          rencentKeyHandledByInputHandlerEtc = false
         }
         return true
       }
@@ -160,7 +150,7 @@ extension SessionCtl {
 
     /// 直接交給 commonEventHandler 來處理。
     let result = inputHandler.handleEvent(eventToDeal)
-    if shouldUseShiftToggleHandle { rencentKeyHandledByInputHandlerEtc = result }
+    rencentKeyHandledByInputHandlerEtc = result
     if !result {
       // 除非是 .ofMarking 狀態，否則讓某些不用去抓的按鍵起到「取消工具提示」的作用。
       if [.ofEmpty].contains(state.type) { tooltipInstance.hide() }
