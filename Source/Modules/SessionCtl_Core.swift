@@ -90,9 +90,6 @@ public class SessionCtl: IMKInputController {
   public static var theShiftKeyDetector = ShiftKeyUpChecker(
     useLShift: PrefMgr.shared.togglingAlphanumericalModeWithLShift)
 
-  /// `handle(event:)` 會利用這個參數判定某次 Shift 按鍵是否用來切換中英文輸入。
-  public var rencentKeyHandledByInputHandlerEtc = false
-
   /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
   public static var isVerticalTyping: Bool = false
   public var isVerticalTyping: Bool = false {
