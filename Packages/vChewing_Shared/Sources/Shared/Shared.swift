@@ -304,16 +304,6 @@ public func vCLog(_ strPrint: StringLiteralType) {
 public enum Shared {
   // MARK: - 瀏覽器 Bundle Identifier 關鍵詞匹配黑名單
 
-  /// 瀏覽器 Bundle Identifier 關鍵詞匹配黑名單，匹配到的瀏覽器會做出特殊的 Shift 鍵擊劍判定處理。
-  public static let arrClientShiftHandlingExceptionList: [String] = [
-    "com.avast.browser", "com.brave.Browser", "com.brave.Browser.beta", "com.coccoc.Coccoc", "com.fenrir-inc.Sleipnir",
-    "com.google.Chrome", "com.google.Chrome.beta", "com.google.Chrome.canary", "com.hiddenreflex.Epic",
-    "com.maxthon.Maxthon", "com.microsoft.edgemac", "com.microsoft.edgemac.Canary", "com.microsoft.edgemac.Dev",
-    "com.naver.Whale", "com.operasoftware.Opera", "com.valvesoftware.steam", "com.vivaldi.Vivaldi",
-    "net.qihoo.360browser", "org.blisk.Blisk", "org.chromium.Chromium", "org.qt-project.Qt.QtWebEngineCore",
-    "ru.yandex.desktop.yandex-browser",
-  ]
-
   public static let arrSupportedLocales: [String] = ["en", "zh-Hant", "zh-Hans", "ja"]
 
   // The type of input modes.
