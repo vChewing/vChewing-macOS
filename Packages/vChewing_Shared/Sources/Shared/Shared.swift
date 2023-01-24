@@ -72,7 +72,6 @@ public enum UserDef: String, CaseIterable {
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
-  case kShiftKeyAccommodationBehavior = "ShiftKeyAccommodationBehavior"
 
   case kCandidateTextFontName = "CandidateTextFontName"
   case kCandidateKeys = "CandidateKeys"
