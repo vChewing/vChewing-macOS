@@ -26,6 +26,9 @@ extension SessionCtl {
 
     // MARK: 前置處理
 
+    // 雖然在 recognizedEvents 當中有過定義，但這裡還是再多施加一道保險。
+    if event.type != .keyDown, event.type != .flagsChanged { return false }
+
     // 如果是 deactivated 狀態的話，強制糾正其為 empty()。
     if let client = client(), state.type == .ofDeactivated {
       state = IMEState.ofEmpty()
@@ -92,9 +95,9 @@ extension SessionCtl {
 
     /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 InputHandler 內修復。
     /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
-    /// 同時注意：必須在 event.type == .flagsChanged 結尾插入 return false，
+    /// 同時注意：必須針對 event.type == .flagsChanged 提前返回結果，
     /// 否則，每次處理這種判斷時都會因為讀取 event.characters? 而觸發 NSInternalInconsistencyException。
-    if event.type == .flagsChanged { return false }
+    if event.type == .flagsChanged { return true }
 
     /// 沒有文字輸入客體的話，就不要再往下處理了。
     guard let inputHandler = inputHandler, client() != nil else { return false }
