@@ -165,7 +165,6 @@
 "Allow boosting / excluding a candidate of single kanji" = "即排除/即最優先にできる候補の文字数の最低限は１字とする";
 "Allow using Enter key to confirm associated candidate selection" = "Enter キーを連想語彙候補の確認のために使う";
 "Alphanumerical Layout:" = "英数キーボード:";
-"Also toggle alphanumerical mode with Left-Shift" = "左側の Shift キーでも英数入力モードの切り替え";
 "Always drop the previous reading" = "カーソルの後部の音読みを常に削除する";
 "Always show tooltip texts horizontally" = "ヒントを常に横書きにする";
 "Always type intonations to the inline composition buffer" = "常に入力緩衝列に音調を入力する";
@@ -203,7 +202,6 @@
 "Choose your preferred layout of the candidate window." = "入力候補陳列の仕様をご指定ください。";
 "Clear the entire inline composition buffer like Shift+Delete" = "Shift+Delete のように入力緩衝列を消す";
 "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" = "Ctrl(+Option)+Command+Enter で出すのを漢語弁音と変換";
-"Completely disable using Shift key to toggle alphanumerical mode" = "Shift キーの英数入力モードの切り替え機能を徹底的に禁ず";
 "Consolidate the context on confirming candidate selection" = "候補陳列ウィンドウで候補を選ぶ時に文脈を強固する";
 "Cursor Selection:" = "カーソル候補呼出:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千配列 (Microsoft 標準・王安・零壹など)";
@@ -283,6 +281,8 @@
 "This only works with Tadokoro candidate window." = "これは田所候補陳列ウィンドウだけに効ける機能である。";
 "This will batch-replace specified candidates." = "指定された候補そのものを置き換える";
 "This will use the plist files deployed by the “make install” command from libvChewing-Data if possible." = "これで libvChewing-Data の make install にて設置した公式辞書ファイルを優先的に用いる。";
+"Toggle alphanumerical mode with Left-Shift" = "左側の Shift キーで英数入力モードの切り替え";
+"Toggle alphanumerical mode with Right-Shift" = "右側の Shift キーで英数入力モードの切り替え";
 "Traditional Chinese" = "繁体中国語";
 "Trim unfinished readings / strokes on commit" = "送り出す緩衝列内容から未完成な音読み/筆組みを除く";
 "Type them into inline composition buffer" = "入力緩衝列にローマ字入力";
@@ -292,7 +292,6 @@
 "Use .langIdentifier to handle UI fonts in candidate window" = "「.langIdentifier」を使って候補陳列ウィンドウのフォントを取り扱う";
 "Use ESC key to clear the entire input buffer" = "ESC キーで入力緩衝列を消す";
 "Use IMK Candidate Window instead of Tadokoro (will reboot the IME)" = "IMK 候補陳列ウィンドウを起用（入力アプリは自動的に再起動）";
-
 "Vertical" = "縦型陳列";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
 "Yale Pinyin with Numeral Intonation" = "イェール弁音 (ローマ字+数字音調)";
