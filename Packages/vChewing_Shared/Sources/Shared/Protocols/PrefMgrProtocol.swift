@@ -36,7 +36,7 @@ public protocol PrefMgrProtocol {
   var keepReadingUponCompositionError: Bool { get set }
   var upperCaseLetterKeyBehavior: Int { get set }
   var togglingAlphanumericalModeWithLShift: Bool { get set }
-  var disableShiftTogglingAlphanumericalMode: Bool { get set }
+  var togglingAlphanumericalModeWithRShift: Bool { get set }
   var consolidateContextOnCandidateSelection: Bool { get set }
   var hardenVerticalPunctuations: Bool { get set }
   var trimUnfinishedReadingsOnCommit: Bool { get set }

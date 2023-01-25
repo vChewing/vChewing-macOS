@@ -114,12 +114,16 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue, defaultValue: true)
   public var togglingAlphanumericalModeWithLShift: Bool {
     didSet {
-      SessionCtl.theShiftKeyDetector.alsoToggleWithLShift = togglingAlphanumericalModeWithLShift
+      SessionCtl.theShiftKeyDetector.toggleWithLShift = togglingAlphanumericalModeWithLShift
     }
   }
 
-  @AppProperty(key: UserDef.kDisableShiftTogglingAlphanumericalMode.rawValue, defaultValue: false)
-  public var disableShiftTogglingAlphanumericalMode: Bool
+  @AppProperty(key: UserDef.kTogglingAlphanumericalModeWithRShift.rawValue, defaultValue: true)
+  public var togglingAlphanumericalModeWithRShift: Bool {
+    didSet {
+      SessionCtl.theShiftKeyDetector.toggleWithRShift = togglingAlphanumericalModeWithRShift
+    }
+  }
 
   @AppProperty(key: UserDef.kConsolidateContextOnCandidateSelection.rawValue, defaultValue: true)
   public var consolidateContextOnCandidateSelection: Bool

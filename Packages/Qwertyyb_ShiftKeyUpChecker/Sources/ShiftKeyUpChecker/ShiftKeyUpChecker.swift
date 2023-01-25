@@ -12,19 +12,24 @@ extension Date {
 }
 
 public struct ShiftKeyUpChecker {
-  public init(useLShift: Bool) {
-    alsoToggleWithLShift = useLShift
+  public init(useLShift: Bool = false, useRShift: Bool = false) {
+    toggleWithLShift = useLShift
+    toggleWithRShift = useRShift
   }
 
-  public var alsoToggleWithLShift = false
+  public var toggleWithLShift = false
+  public var toggleWithRShift = false
   public var lShiftKeyCode: UInt16 = 56
   public var rShiftKeyCode: UInt16 = 60
 
+  public var enabled: Bool { toggleWithLShift || toggleWithRShift }
+
   private var checkModifier: NSEvent.ModifierFlags { NSEvent.ModifierFlags.shift }
   private var checkKeyCode: [UInt16] {
-    alsoToggleWithLShift
-      ? [lShiftKeyCode, rShiftKeyCode]
-      : [rShiftKeyCode]
+    var result = [UInt16]()
+    if toggleWithLShift { result.append(lShiftKeyCode) }
+    if toggleWithRShift { result.append(rShiftKeyCode) }
+    return result
   }
 
   private let delayInterval = 0.3

@@ -36,10 +36,10 @@ struct VwrPrefPaneExperience: View {
     forKey: UserDef.kKeepReadingUponCompositionError.rawValue)
   @State private var selTogglingAlphanumericalModeWithLShift = UserDefaults.standard.bool(
     forKey: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue)
+  @State private var selTogglingAlphanumericalModeWithRShift = UserDefaults.standard.bool(
+    forKey: UserDef.kTogglingAlphanumericalModeWithRShift.rawValue)
   @State private var selUpperCaseLetterKeyBehavior = UserDefaults.standard.integer(
     forKey: UserDef.kUpperCaseLetterKeyBehavior.rawValue)
-  @State private var selDisableShiftTogglingAlphanumericalMode: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kDisableShiftTogglingAlphanumericalMode.rawValue)
   @State private var selSpecifyIntonationKeyBehavior = UserDefaults.standard.integer(
     forKey: UserDef.kSpecifyIntonationKeyBehavior.rawValue)
   @State private var selSpecifyShiftBackSpaceKeyBehavior = UserDefaults.standard.integer(
@@ -193,26 +193,6 @@ struct VwrPrefPaneExperience: View {
           Text(LocalizedStringKey("Specify the behavior of intonation key when syllable composer is empty."))
             .preferenceDescription()
         }
-        SSPreferences.Section(title: "Shift:") {
-          Toggle(
-            LocalizedStringKey("Completely disable using Shift key to toggle alphanumerical mode"),
-            isOn: $selDisableShiftTogglingAlphanumericalMode.onChange {
-              PrefMgr.shared.disableShiftTogglingAlphanumericalMode = selDisableShiftTogglingAlphanumericalMode
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Also toggle alphanumerical mode with Left-Shift"),
-            isOn: $selTogglingAlphanumericalModeWithLShift.onChange {
-              PrefMgr.shared.togglingAlphanumericalModeWithLShift = selTogglingAlphanumericalModeWithLShift
-            }
-          ).disabled(PrefMgr.shared.disableShiftTogglingAlphanumericalMode == true)
-          Toggle(
-            LocalizedStringKey("Share alphanumerical mode status across all clients"),
-            isOn: $selShareAlphanumericalModeStatusAcrossClients.onChange {
-              PrefMgr.shared.shareAlphanumericalModeStatusAcrossClients = selShareAlphanumericalModeStatusAcrossClients
-            }
-          ).disabled(PrefMgr.shared.disableShiftTogglingAlphanumericalMode == true)
-        }
         SSPreferences.Section(title: "Caps Lock:") {
           Toggle(
             LocalizedStringKey("Show notifications when toggling Caps Lock"),
@@ -220,6 +200,28 @@ struct VwrPrefPaneExperience: View {
               PrefMgr.shared.showNotificationsWhenTogglingCapsLock = selShowNotificationsWhenTogglingCapsLock
             }
           ).disabled(!macOSMontereyOrLaterDetected)
+        }
+        SSPreferences.Section(title: "Shift:") {
+          Toggle(
+            LocalizedStringKey("Toggle alphanumerical mode with Right-Shift"),
+            isOn: $selTogglingAlphanumericalModeWithRShift.onChange {
+              PrefMgr.shared.togglingAlphanumericalModeWithRShift = selTogglingAlphanumericalModeWithRShift
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Toggle alphanumerical mode with Left-Shift"),
+            isOn: $selTogglingAlphanumericalModeWithLShift.onChange {
+              PrefMgr.shared.togglingAlphanumericalModeWithLShift = selTogglingAlphanumericalModeWithLShift
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Share alphanumerical mode status across all clients"),
+            isOn: $selShareAlphanumericalModeStatusAcrossClients.onChange {
+              PrefMgr.shared.shareAlphanumericalModeStatusAcrossClients = selShareAlphanumericalModeStatusAcrossClients
+            }
+          ).disabled(
+            !PrefMgr.shared.togglingAlphanumericalModeWithRShift && !PrefMgr.shared.togglingAlphanumericalModeWithLShift
+          )
         }
         SSPreferences.Section(label: { Text(LocalizedStringKey("Misc Settings:")) }) {
           Toggle(
