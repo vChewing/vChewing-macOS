@@ -56,7 +56,7 @@ public enum UserDef: String, CaseIterable {
   case kKeepReadingUponCompositionError = "KeepReadingUponCompositionError"
   case kTogglingAlphanumericalModeWithLShift = "TogglingAlphanumericalModeWithLShift"
   case kUpperCaseLetterKeyBehavior = "UpperCaseLetterKeyBehavior"
-  case kDisableShiftTogglingAlphanumericalMode = "DisableShiftTogglingAlphanumericalMode"
+  case kTogglingAlphanumericalModeWithRShift = "togglingAlphanumericalModeWithRShift"
   case kConsolidateContextOnCandidateSelection = "ConsolidateContextOnCandidateSelection"
   case kHardenVerticalPunctuations = "HardenVerticalPunctuations"
   case kTrimUnfinishedReadingsOnCommit = "TrimUnfinishedReadingsOnCommit"
