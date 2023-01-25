@@ -226,10 +226,11 @@ extension SessionCtl {
       inputHandler?.delegate = self
       syncBaseLMPrefs()
 
-      Self.theShiftKeyDetector.alsoToggleWithLShift = PrefMgr.shared.togglingAlphanumericalModeWithLShift
+      Self.theShiftKeyDetector.toggleWithLShift = PrefMgr.shared.togglingAlphanumericalModeWithLShift
+      Self.theShiftKeyDetector.toggleWithRShift = PrefMgr.shared.togglingAlphanumericalModeWithRShift
 
       if #available(macOS 10.15, *) {
-        if isASCIIMode, PrefMgr.shared.disableShiftTogglingAlphanumericalMode { isASCIIMode = false }
+        if isASCIIMode, !Self.theShiftKeyDetector.enabled { isASCIIMode = false }
       }
 
       DispatchQueue.main.async {

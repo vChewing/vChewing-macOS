@@ -16,7 +16,7 @@ extension PrefMgr {
     if #unavailable(macOS 10.15) {
       useIMKCandidateWindow = true
       handleDefaultCandidateFontsByLangIdentifier = false
-      disableShiftTogglingAlphanumericalMode = true
+      togglingAlphanumericalModeWithRShift = false
       togglingAlphanumericalModeWithLShift = false
       showReverseLookupInCandidateUI = false
       shareAlphanumericalModeStatusAcrossClients = false
