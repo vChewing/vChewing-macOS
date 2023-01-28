@@ -88,7 +88,9 @@ public class SessionCtl: IMKInputController {
   /// Shift 按鍵事件分析器的副本。
   /// - Remark: 警告：該工具必須為 Struct 且全專案只能有一個唯一初期化副本。否則會在動 Caps Lock 的時候誤以為是在摁 Shift。
   public static var theShiftKeyDetector = ShiftKeyUpChecker(
-    useLShift: PrefMgr.shared.togglingAlphanumericalModeWithLShift)
+    useLShift: PrefMgr.shared.togglingAlphanumericalModeWithLShift,
+    useRShift: PrefMgr.shared.togglingAlphanumericalModeWithRShift
+  )
 
   /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
   public static var isVerticalTyping: Bool = false
