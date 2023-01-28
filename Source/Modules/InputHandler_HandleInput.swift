@@ -140,12 +140,7 @@ extension InputHandler {
         case .kEnd: return handleEnd()
         case .kBackSpace: return handleBackSpace(input: input)
         case .kWindowsDelete: return handleDelete(input: input)
-        case .kCarriageReturn, .kLineFeed:  // Enter
-          return (input.isCommandHold && input.isControlHold)
-            ? (input.isOptionHold
-              ? handleCtrlOptionCommandEnter(isShiftPressed: input.isShiftHold)
-              : handleCtrlCommandEnter(isShiftPressed: input.isShiftHold))
-            : handleEnter()
+        case .kCarriageReturn, .kLineFeed: return handleEnter(input: input)
         case .kSpace:  // 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
           // 空格字符輸入行為處理。
           switch state.type {
