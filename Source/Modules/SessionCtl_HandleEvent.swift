@@ -20,7 +20,7 @@ extension SessionCtl {
   /// - Parameters:
   ///   - event: 裝置操作輸入事件，可能會是 nil。
   ///   - sender: 呼叫了該函式的客體（無須使用）。
-  /// - Returns: 回「`true`」以將該案件已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
+  /// - Returns: 回「`true`」以將該按鍵已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
   @objc(handleEvent:client:) public override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
     _ = sender  // 防止格式整理工具毀掉與此對應的參數。
 
@@ -73,7 +73,7 @@ extension SessionCtl {
     // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
     // 用 JIS 鍵盤的英數切換鍵來切換中英文模式，對 macOS 10.09 開始的系統均有效。
     // 警告：這裡的 event 必須是原始 event 且不能被 var，否則會影響 Shift 中英模式判定。
-    // 另：Shift 案件判斷需要同時偵測 keyUp。
+    // 另：Shift 按鍵判斷需要同時偵測 keyUp。
     if (event.type == .keyDown && event.isJISAlphanumericalKey) || Self.theShiftKeyDetector.check(event) {
       toggleAlphanumericalMode()
       // Adobe Photoshop 相容：對 JIS 英數切換鍵傳入事件一律立刻返回 true。
