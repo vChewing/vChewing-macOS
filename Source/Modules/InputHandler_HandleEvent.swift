@@ -16,7 +16,7 @@ import Shared
 extension InputHandler {
   /// 分診函式，會先確認是否是 IMK 選字窗要處理的事件、然後再決定處理步驟。
   /// - Parameter event: 由 IMK 選字窗接收的裝置操作輸入事件。
-  /// - Returns: 回「`true`」以將該案件已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
+  /// - Returns: 回「`true`」以將該按鍵已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
   public func handleEvent(_ event: NSEvent) -> Bool {
     imkCandidatesEventPreHandler(event: event) ?? handleInput(event: event)
   }
@@ -24,7 +24,7 @@ extension InputHandler {
   /// 專門處理與 IMK 選字窗有關的判斷語句。
   /// 這樣分開處理很有必要，不然 handle() 函式會陷入無限迴圈。
   /// - Parameter event: 由 IMK 選字窗接收的裝置操作輸入事件。
-  /// - Returns: 回「`true`」以將該案件已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
+  /// - Returns: 回「`true`」以將該按鍵已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
   private func imkCandidatesEventPreHandler(event eventToDeal: NSEvent) -> Bool? {
     guard let delegate = delegate else { return false }
 
