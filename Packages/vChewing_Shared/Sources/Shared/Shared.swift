@@ -301,8 +301,7 @@ public func vCLog(_ strPrint: StringLiteralType) {
 }
 
 public enum Shared {
-  // MARK: - 瀏覽器 Bundle Identifier 關鍵詞匹配黑名單
-
+  // Supported locales.
   public static let arrSupportedLocales: [String] = ["en", "zh-Hant", "zh-Hans", "ja"]
 
   // The type of input modes.
