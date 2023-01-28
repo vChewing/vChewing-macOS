@@ -234,6 +234,7 @@ public enum KeyCode: UInt16 {
   case kF16 = 106
   case kF14 = 107
   case kF10 = 109
+  case kContextMenu = 110
   case kF12 = 111
   case kF15 = 113
   case kHelp = 114  // Insert
