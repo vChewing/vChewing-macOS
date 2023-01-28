@@ -279,16 +279,30 @@ extension InputHandler {
     return true
   }
 
-  // MARK: - Enter 鍵的處理
+  // MARK: - Enter 鍵的處理，包括對其他修飾鍵的應對。
 
   /// Enter 鍵的處理。
+  /// - Parameter input: 輸入按鍵訊號。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  @discardableResult func handleEnter() -> Bool {
+  @discardableResult func handleEnter(input: InputSignalProtocol, readingOnly: Bool = false) -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
     guard state.type == .ofInputting else { return false }
 
-    delegate.switchState(IMEState.ofCommitting(textToCommit: state.displayedText))
+    var displayedText = state.displayedText
+
+    if input.modifierFlags == [.option, .shift] {
+      displayedText = displayedText.charComponents.joined(separator: " ")
+    } else if readingOnly {
+      displayedText = commissionByCtrlCommandEnter()
+    } else if input.isCommandHold, input.isControlHold {
+      displayedText =
+        input.isOptionHold
+        ? commissionByCtrlOptionCommandEnter(isShiftPressed: input.isShiftHold)
+        : commissionByCtrlCommandEnter(isShiftPressed: input.isShiftHold)
+    }
+
+    delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
     return true
   }
 
@@ -297,11 +311,7 @@ extension InputHandler {
   /// Command+Enter 鍵的處理（注音文）。
   /// - Parameter isShiftPressed: 有沒有同時摁著 Shift 鍵。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func handleCtrlCommandEnter(isShiftPressed: Bool = false) -> Bool {
-    guard let delegate = delegate else { return false }
-    let state = delegate.state
-    guard state.type == .ofInputting else { return false }
-
+  private func commissionByCtrlCommandEnter(isShiftPressed: Bool = false) -> String {
     var displayedText = compositor.keys.joined(separator: "\t")
     if compositor.isEmpty {
       displayedText = readingForDisplay
@@ -325,9 +335,7 @@ extension InputHandler {
     }
 
     displayedText = displayedText.replacingOccurrences(of: "\t", with: isShiftPressed ? "-" : " ")
-
-    delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
-    return true
+    return displayedText
   }
 
   // MARK: - Command+Option+Enter 鍵的處理（網頁 Ruby 注音文標記）
@@ -335,11 +343,7 @@ extension InputHandler {
   /// Command+Option+Enter 鍵的處理（網頁 Ruby 注音文標記）。
   /// - Parameter isShiftPressed: 有沒有同時摁著 Shift 鍵。摁了的話則只遞交讀音字串。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func handleCtrlOptionCommandEnter(isShiftPressed: Bool = false) -> Bool {
-    guard let delegate = delegate else { return false }
-    let state = delegate.state
-    guard state.type == .ofInputting else { return false }
-
+  private func commissionByCtrlOptionCommandEnter(isShiftPressed: Bool = false) -> String {
     var composed = ""
 
     compositor.walkedNodes.smashedPairs.forEach { key, value in
@@ -368,8 +372,7 @@ extension InputHandler {
       composed += key.contains("_") ? value : "<ruby>\(value)<rp>(</rp><rt>\(key)</rt><rp>)</rp></ruby>"
     }
 
-    delegate.switchState(IMEState.ofCommitting(textToCommit: composed))
-    return true
+    return composed
   }
 
   // MARK: - 處理 BackSpace (macOS Delete) 按鍵行為
