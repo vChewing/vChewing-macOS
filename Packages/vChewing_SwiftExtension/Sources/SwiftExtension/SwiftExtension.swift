@@ -218,3 +218,30 @@ extension FileHandle {
     readDataToEndOfFile()
   }
 }
+
+// MARK: - Index Revolver (only for Array)
+
+// Further discussion: https://forums.swift.org/t/62847
+
+extension Array {
+  public func revolvedIndex(_ id: Int, clockwise: Bool = true, steps: Int = 1) -> Int {
+    if id < 0 || steps < 1 { return id }
+    var result = id
+    func revolvedIndexByOneStep(_ id: Int, clockwise: Bool = true) -> Int {
+      let newID = clockwise ? id + 1 : id - 1
+      if (0..<count).contains(newID) { return newID }
+      return clockwise ? 0 : count - 1
+    }
+    for _ in 0..<steps {
+      result = revolvedIndexByOneStep(result, clockwise: clockwise)
+    }
+    return result
+  }
+}
+
+extension Int {
+  public mutating func revolveAsIndex(with target: [Any], clockwise: Bool = true, steps: Int = 1) {
+    if self < 0 || steps < 1 { return }
+    self = target.revolvedIndex(self, clockwise: clockwise, steps: steps)
+  }
+}
