@@ -228,8 +228,8 @@
 "Experience" = "体验设定";
 "Fake Seigyou" = "伪精业排列";
 "Follow OS settings" = "依系统设定";
-"for cycling candidates" = "轮替候选字";
-"for cycling pages" = "轮替页面";
+"for revolving candidates" = "轮替候选字";
+"for revolving pages" = "轮替页面";
 "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is." = "打比方说，你敲了「章太炎」，你想将「太」改成「泰」。这个操作的作业索引范围是开闭区间 [1,2)，会切到「章太炎」这个节点的所在索引范围 [0,3)。如果没有事前巩固处理的话，这个词会在你选字之后变成诸如「张泰言」这种你不想要的自动选字结果。当且仅当你启用了这个巩固功能的前提下，你选字之后的结果才会是「章泰炎」这种你想要的结果。";
 "General" = "通用设定";
 "Hanyu Pinyin with Numeral Intonation" = "汉语拼音+数字标调";
@@ -272,8 +272,8 @@
 "Show notifications when toggling Caps Lock" = "以 Caps Lock 切换输入法/中英模式时显示通知";
 "Show translated strokes in composition buffer" = "在组字区内显示字根、而非原始键盘码";
 "Simplified Chinese" = "简体中文";
-"Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+空格键 换下一页，空格键 换选下一个候选字";
-"Space to +cycle pages, Shift+Space to +cycle candidates" = "空格键 换下一页，Shift+空格键 换选下一个候选字";
+"Space to +revolve candidates, Shift+Space to +revolve pages" = "Shift+空格键 换下一页，空格键 换选下一个候选字";
+"Space to +revolve pages, Shift+Space to +revolve candidates" = "空格键 换下一页，Shift+空格键 换选下一个候选字";
 "Specify the behavior of intonation key when syllable composer is empty." = "指定声调键（在注拼槽为「空」状态时）的行为。";
 "Starlight" = "星光排列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉耻模式 // 取消勾选的话，敲错字时会有异音";
