@@ -719,35 +719,45 @@ extension InputHandler {
     let currentPaired = (currentNode.keyArray, currentNode.value)
 
     // 改成一次性計算，省得每次讀取時都被重複計算。
-    let currentIndex: Int = {
+    let newIndex: Int = {
+      if candidates.count == 1 { return 0 }
       var result = 0
       theLoop: for candidate in candidates {
         if !currentNode.isOverridden {
           if candidates[0] == currentPaired { result = reverseOrder ? candidates.count - 1 : 1 }
           break theLoop
         }
-        result =
-          (candidate == currentPaired && reverseOrder)
-          ? ((result == 0) ? candidates.count - 1 : result - 1) : result + 1
+        result.revolveAsIndex(with: candidates, clockwise: !(candidate == currentPaired && reverseOrder))
         if candidate == currentPaired { break }
       }
       return (0..<candidates.count).contains(result) ? result : 0
     }()
 
-    consolidateNode(
-      candidate: candidates[currentIndex], respectCursorPushing: false,
-      preConsolidate: false, skipObservation: true
-    )
-    delegate.updateVerticalTypingStatus()
-    var newState = generateStateOfInputting()
-    newState.tooltip = (currentIndex + 1).description + " / " + candidates.count.description + "    "
-    vCLog(newState.tooltip)
-    if #available(macOS 10.13, *) {
-      if delegate.isVerticalTyping, Bundle.main.preferredLocalizations[0] != "en" {
-        let locID = Bundle.main.preferredLocalizations[0]
-        newState.tooltip = (currentIndex + 1).i18n(loc: locID) + "・" + candidates.count.i18n(loc: locID) + ""
-      }
+    if candidates.count > 1 {
+      consolidateNode(
+        candidate: candidates[newIndex], respectCursorPushing: false,
+        preConsolidate: false, skipObservation: true
+      )
     }
+
+    // 該動態函式僅用於此場合。
+    func isContextVertical() -> Bool {
+      delegate.updateVerticalTypingStatus()
+      return delegate.isVerticalTyping
+    }
+
+    var newState = generateStateOfInputting()
+    let locID = Bundle.main.preferredLocalizations[0]
+    let newTooltip = NSMutableString()
+    newTooltip.insert("　" + candidates[newIndex].1, at: 0)
+    if #available(macOS 10.13, *), isContextVertical(), locID != "en" {
+      newTooltip.insert((newIndex + 1).i18n(loc: locID) + "・" + candidates.count.i18n(loc: locID), at: 0)
+    } else {
+      newTooltip.insert((newIndex + 1).description + " / " + candidates.count.description, at: 0)
+    }
+    newTooltip.append("　　")
+    newState.tooltip = newTooltip.description
+    vCLog(newState.tooltip)
     newState.tooltipDuration = 0
     delegate.switchState(newState)
     return true
