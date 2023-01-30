@@ -31,14 +31,8 @@ extension InputHandler {
     let inputText: String = input.text
     var state: IMEStateProtocol { delegate.state }  // 常數轉變數。
 
-    // 提前過濾掉一些不合規的按鍵訊號輸入，免得相關按鍵訊號被送給 Megrez 引發輸入法崩潰。
-    if input.isInvalid {
-      // 在「.Empty(IgnoringPreviousState) 與 .Deactivated」狀態下的首次不合規按鍵輸入可以直接放行。
-      // 因為「.Abortion」會在處理之後被自動轉為「.Empty」，所以不需要單獨判斷。
-      if state.type == .ofEmpty || state.type == .ofDeactivated { return false }
-      delegate.callError("550BCF7B: InputHandler just refused an invalid input.")
-      return true
-    }
+    // 提前放行一些用不到的特殊按鍵輸入情形。
+    if input.isInvalid, state.type == .ofEmpty || state.type == .ofDeactivated { return false }
 
     // 如果當前組字器為空的話，就不再攔截某些修飾鍵，畢竟這些鍵可能會會用來觸發某些功能。
     let isFunctionKey: Bool =
