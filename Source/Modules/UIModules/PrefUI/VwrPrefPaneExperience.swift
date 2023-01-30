@@ -137,8 +137,8 @@ struct VwrPrefPaneExperience: View {
               PrefMgr.shared.specifyShiftTabKeyBehavior = (selKeyBehaviorShiftTab == 1) ? true : false
             }
           ) {
-            Text(LocalizedStringKey("for cycling candidates")).tag(0)
-            Text(LocalizedStringKey("for cycling pages")).tag(1)
+            Text(LocalizedStringKey("for revolving candidates")).tag(0)
+            Text(LocalizedStringKey("for revolving pages")).tag(1)
           }
           .labelsHidden()
           .horizontalRadioGroupLayout()
@@ -153,8 +153,8 @@ struct VwrPrefPaneExperience: View {
               PrefMgr.shared.specifyShiftSpaceKeyBehavior = (selKeyBehaviorShiftSpace == 1) ? true : false
             }
           ) {
-            Text(LocalizedStringKey("Space to +cycle candidates, Shift+Space to +cycle pages")).tag(0)
-            Text(LocalizedStringKey("Space to +cycle pages, Shift+Space to +cycle candidates")).tag(1)
+            Text(LocalizedStringKey("Space to +revolve candidates, Shift+Space to +revolve pages")).tag(0)
+            Text(LocalizedStringKey("Space to +revolve pages, Shift+Space to +revolve candidates")).tag(1)
           }
           .labelsHidden()
           .pickerStyle(RadioGroupPickerStyle())

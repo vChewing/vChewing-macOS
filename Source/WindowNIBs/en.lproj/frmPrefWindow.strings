@@ -55,7 +55,7 @@
 "chkUseFixecCandidateOrderOnSelection.title" = "Always use fixed listing order in candidate window";
 "Cp2-hn-bOq.title" = "Disable forced conversion for cassette outputs";
 "DbW-eq-ZdB.title" = "Starlight";
-"dIN-TZ-67g.title" = "Space to +cycle candidates, Shift+Space to +cycle pages";
+"dIN-TZ-67g.title" = "Space to +revolve candidates, Shift+Space to +revolve pages";
 "E1l-m8-xgb.title" = "Advanced Settings";
 "ego-1f-8cO.title" = "Choose the Chinese conversion behavior in cassette mode.";
 "eia-1F-Do0.title" = "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters";
@@ -65,7 +65,7 @@
 "FnD-oH-El5.title" = "Selection Keys:";
 "fQ0-Yu-pJF.title" = "Enforce conversion in both input modes";
 "FSG-lN-CJO.title" = "English";
-"FVC-br-H57.title" = "Cycling Candidates";
+"FVC-br-H57.title" = "Revolving Candidates";
 "GlJ-Ns-9eE.title" = "Auto-Select";
 "Grn-MZ-wTg.title" = "Enable cassette mode, suppressing phonabet input";
 "hSv-LJ-Cq3.title" = "Enable symbol input support (incl. certain emoji symbols)";
@@ -103,7 +103,7 @@
 "RUG-ls-KyA.title" = "Push the cursor in front of the phrase after selection";
 "rVQ-Hx-cGi.title" = "Japanese";
 "rXc-Ji-ery.title" = "Cassette mode is similar to the CIN support of the Yahoo Kimo IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated).";
-"s7u-Fm-dVg.title" = "Cycling Pages";
+"s7u-Fm-dVg.title" = "Revolving Pages";
 "shc-Nu-UsM.title" = "Show notifications when toggling Caps Lock";
 "SzF-FL-sVO.title" = "Show translated strokes in composition buffer";
 "tglDevZoneIMKCandidate.title" = "Use IMK Candidate Window instead of Tadokoro (will reboot the IME)";
@@ -130,6 +130,6 @@
 "xibUsingHotKeyKangXi.title" = "Force KangXi Writing";
 "xibUsingHotKeySCPC.title" = "Per-Char Select Mode";
 "xjP-r7-GaK.title" = "Dachen 26 (libChewing)";
-"XqL-rf-X6d.title" = "Space to +cycle pages, Shift+Space to +cycle candidates";
+"XqL-rf-X6d.title" = "Space to +revolve pages, Shift+Space to +revolve candidates";
 "xrE-8T-WKO.label" = "Advanced";
 "ZEv-Q2-mYL.title" = "Change user interface language (will reboot the IME).";
