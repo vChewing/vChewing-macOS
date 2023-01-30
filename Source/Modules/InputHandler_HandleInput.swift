@@ -152,7 +152,7 @@ extension InputHandler {
             case .ofInputting:
               // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
               if input.isShiftHold, !input.isControlHold, !input.isOptionHold {
-                return rotateCandidate(reverseOrder: input.isCommandHold)
+                return revolveCandidate(reverseOrder: input.isCommandHold)
               }
               if compositor.cursor < compositor.length, compositor.insertKey(" ") {
                 walk()
