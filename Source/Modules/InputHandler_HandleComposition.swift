@@ -111,7 +111,8 @@ extension InputHandler {
       }
 
       // 將該讀音插入至組字器內的軌格當中。
-      if !compositor.insertKey(readingKey) {
+      // 提前過濾掉一些不合規的按鍵訊號輸入，免得相關按鍵訊號被送給 Megrez 引發輸入法崩潰。
+      if !input.isInvalid, !compositor.insertKey(readingKey) {
         delegate.callError("3CF278C9: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。")
         return true
       }
@@ -253,7 +254,8 @@ extension InputHandler {
       }
 
       // 將該讀音插入至組字器內的軌格當中。
-      if !compositor.insertKey(calligrapher) {
+      // 提前過濾掉一些不合規的按鍵訊號輸入，免得相關按鍵訊號被送給 Megrez 引發輸入法崩潰。
+      if !input.isInvalid, !compositor.insertKey(calligrapher) {
         delegate.callError("61F6B11F: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。")
         return true
       }
