@@ -276,9 +276,11 @@ extension vChewingLM.LMUserOverride {
     var forceHighScoreOverride = false
     var currentHighScore: Double = 0
     for (i, theObservation) in observation.overrides {
+      // 對 Unigram 只給大約六小時的半衰期。
+      let decayExp = mutDecayExponent * (key.contains("(),(),") ? 24 : 1)
       let overrideScore = getScore(
         eventCount: theObservation.count, totalCount: observation.count,
-        eventTimestamp: theObservation.timestamp, timestamp: timestamp, lambda: mutDecayExponent
+        eventTimestamp: theObservation.timestamp, timestamp: timestamp, lambda: decayExp
       )
       if (0...currentHighScore).contains(overrideScore) { continue }
 
@@ -338,8 +340,8 @@ extension vChewingLM.LMUserOverride {
 
     // 前置單元只記錄讀音，在其後的單元則同時記錄讀音與字詞
     let strCurrent = kvCurrent.joinedKey()
-    var kvPrevious = Megrez.Compositor.KeyValuePaired()
-    var kvAnterior = Megrez.Compositor.KeyValuePaired()
+    var kvPrevious = Megrez.Compositor.KeyValuePaired(keyArray: [""], value: "")
+    var kvAnterior = Megrez.Compositor.KeyValuePaired(keyArray: [""], value: "")
     var readingStack = ""
     var trigramKey: String { "(\(kvAnterior.toNGramKey),\(kvPrevious.toNGramKey),\(strCurrent))" }
     var result: String {
