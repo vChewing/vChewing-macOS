@@ -683,7 +683,7 @@ extension InputHandler {
   /// - Parameters:
   ///   - reverseOrder: 是否有控制輪替方向的修飾鍵輸入。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func rotateCandidate(reverseOrder: Bool) -> Bool {
+  func revolveCandidate(reverseOrder: Bool) -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
     if isComposerOrCalligrapherEmpty, compositor.isEmpty || compositor.walkedNodes.isEmpty { return false }
