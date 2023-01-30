@@ -230,6 +230,19 @@ extension Tekkon {
             if ["ㄨㄛ", "ㄨㄥ"].contains(semivowel.value + vowel.value) { semivowel.clear() }
           default: break
         }
+        if [.vowel, .intonation].contains(thePhone.type), "ㄓㄔㄕㄗㄘㄙ".contains(consonant.value) {
+          switch semivowel.value {
+            case "ㄧ": semivowel.clear()
+            case "ㄩ":
+              switch consonant {
+                case _ where "ㄓㄗ".contains(consonant.value): consonant = "ㄐ"
+                case _ where "ㄔㄘ".contains(consonant.value): consonant = "ㄑ"
+                case _ where "ㄕㄙ".contains(consonant.value): consonant = "ㄒ"
+                default: break
+              }
+            default: break
+          }
+        }
       }
       switch thePhone.type {
         case .consonant: consonant = thePhone

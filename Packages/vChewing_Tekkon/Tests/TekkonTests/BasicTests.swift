@@ -173,6 +173,46 @@ final class TekkonTestsBasic: XCTestCase {
     // 測試這種情形：「如果傳入的字串不包含任何半形英數內容的話，那麼應該直接將傳入的字串原樣返回」。
     XCTAssertEqual(Tekkon.cnvHanyuPinyinToPhona(targetJoined: "ㄅㄧㄢˋ-˙ㄌㄜ-ㄊㄧㄢ"), "ㄅㄧㄢˋ-˙ㄌㄜ-ㄊㄧㄢ")
   }
+
+  func testPhonabetCombinationCorrection() throws {
+    var composer = Tekkon.Composer(arrange: .ofDachen, correction: true)
+    composer.receiveKey(fromPhonabet: "ㄓ")
+    composer.receiveKey(fromPhonabet: "ㄧ")
+    composer.receiveKey(fromPhonabet: "ˋ")
+    XCTAssertEqual(composer.value, "ㄓˋ")
+
+    composer.clear()
+    composer.receiveKey(fromPhonabet: "ㄓ")
+    composer.receiveKey(fromPhonabet: "ㄩ")
+    composer.receiveKey(fromPhonabet: "ˋ")
+    XCTAssertEqual(composer.value, "ㄐㄩˋ")
+
+    composer.clear()
+    composer.receiveKey(fromPhonabet: "ㄓ")
+    composer.receiveKey(fromPhonabet: "ㄧ")
+    composer.receiveKey(fromPhonabet: "ㄢ")
+    XCTAssertEqual(composer.value, "ㄓㄢ")
+
+    composer.clear()
+    composer.receiveKey(fromPhonabet: "ㄓ")
+    composer.receiveKey(fromPhonabet: "ㄩ")
+    composer.receiveKey(fromPhonabet: "ㄢ")
+    XCTAssertEqual(composer.value, "ㄐㄩㄢ")
+
+    composer.clear()
+    composer.receiveKey(fromPhonabet: "ㄓ")
+    composer.receiveKey(fromPhonabet: "ㄧ")
+    composer.receiveKey(fromPhonabet: "ㄢ")
+    composer.receiveKey(fromPhonabet: "ˋ")
+    XCTAssertEqual(composer.value, "ㄓㄢˋ")
+
+    composer.clear()
+    composer.receiveKey(fromPhonabet: "ㄓ")
+    composer.receiveKey(fromPhonabet: "ㄩ")
+    composer.receiveKey(fromPhonabet: "ㄢ")
+    composer.receiveKey(fromPhonabet: "ˋ")
+    XCTAssertEqual(composer.value, "ㄐㄩㄢˋ")
+  }
 }
 
 // MARK: Testing Pinyin Arrangements
