@@ -193,25 +193,17 @@ struct VwrPrefPaneExperience: View {
           Text(LocalizedStringKey("Specify the behavior of intonation key when syllable composer is empty."))
             .preferenceDescription()
         }
-        SSPreferences.Section(title: "Caps Lock:") {
-          Toggle(
-            LocalizedStringKey("Show notifications when toggling Caps Lock"),
-            isOn: $selShowNotificationsWhenTogglingCapsLock.onChange {
-              PrefMgr.shared.showNotificationsWhenTogglingCapsLock = selShowNotificationsWhenTogglingCapsLock
-            }
-          ).disabled(!macOSMontereyOrLaterDetected)
-        }
         SSPreferences.Section(title: "Shift:") {
-          Toggle(
-            LocalizedStringKey("Toggle alphanumerical mode with Right-Shift"),
-            isOn: $selTogglingAlphanumericalModeWithRShift.onChange {
-              PrefMgr.shared.togglingAlphanumericalModeWithRShift = selTogglingAlphanumericalModeWithRShift
-            }
-          )
           Toggle(
             LocalizedStringKey("Toggle alphanumerical mode with Left-Shift"),
             isOn: $selTogglingAlphanumericalModeWithLShift.onChange {
               PrefMgr.shared.togglingAlphanumericalModeWithLShift = selTogglingAlphanumericalModeWithLShift
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Toggle alphanumerical mode with Right-Shift"),
+            isOn: $selTogglingAlphanumericalModeWithRShift.onChange {
+              PrefMgr.shared.togglingAlphanumericalModeWithRShift = selTogglingAlphanumericalModeWithRShift
             }
           )
           Toggle(
@@ -222,6 +214,14 @@ struct VwrPrefPaneExperience: View {
           ).disabled(
             !PrefMgr.shared.togglingAlphanumericalModeWithRShift && !PrefMgr.shared.togglingAlphanumericalModeWithLShift
           )
+        }
+        SSPreferences.Section(title: "Caps Lock:") {
+          Toggle(
+            LocalizedStringKey("Show notifications when toggling Caps Lock"),
+            isOn: $selShowNotificationsWhenTogglingCapsLock.onChange {
+              PrefMgr.shared.showNotificationsWhenTogglingCapsLock = selShowNotificationsWhenTogglingCapsLock
+            }
+          ).disabled(!macOSMontereyOrLaterDetected)
         }
         SSPreferences.Section(label: { Text(LocalizedStringKey("Misc Settings:")) }) {
           Toggle(
