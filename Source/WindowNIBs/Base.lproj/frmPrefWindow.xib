@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -568,13 +567,13 @@
                                     </buttonCell>
                                     <cells>
                                         <column>
-                                            <buttonCell type="radio" title="Cycling Candidates" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="FVC-br-H57">
+                                            <buttonCell type="radio" title="Revolving Candidates" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="FVC-br-H57">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
                                             </buttonCell>
                                         </column>
                                         <column>
-                                            <buttonCell type="radio" title="Cycling Pages" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="s7u-Fm-dVg">
+                                            <buttonCell type="radio" title="Revolving Pages" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="s7u-Fm-dVg">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
                                             </buttonCell>
@@ -776,11 +775,11 @@
                                     </buttonCell>
                                     <cells>
                                         <column>
-                                            <buttonCell type="radio" title="Space to +cycle candidates, Shift+Space to +cycle pages" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="dIN-TZ-67g">
+                                            <buttonCell type="radio" title="Space to +revolve candidates, Shift+Space t+revolve pages" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="dIN-TZ-67g">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
                                             </buttonCell>
-                                            <buttonCell type="radio" title="Space to +cycle pages, Shift+Space to +cycle candidates" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="XqL-rf-X6d">
+                                            <buttonCell type="radio" title="Space to +revolve pages, Shift+Space t+revolve candidates" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="XqL-rf-X6d">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
                                             </buttonCell>

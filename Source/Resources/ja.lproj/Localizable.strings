@@ -228,8 +228,8 @@
 "Experience" = "体験設定";
 "Fake Seigyou" = "偽精業配列";
 "Follow OS settings" = "システム設定に準ず";
-"for cycling candidates" = "候補文字そのもの";
-"for cycling pages" = "候補陳列ページ";
+"for revolving candidates" = "候補文字そのもの";
+"for revolving pages" = "候補陳列ページ";
 "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is." = "例えば、入力緩衝列には「章太炎」という節点があり、その範囲は [0,3) である。もし、「太」を「泰」にしたいのなら、今回の作業範囲は [1,2) で、「章太炎」の範囲と重ねてしまう。この場合、もし、事前強固措置がなければ、今回の作業でこの単語は「張泰言」のような望ましくない変換結果になってしまう。事前強固措置があるからこそ、「章泰炎」のような正確な作業結果の保証である。";
 "General" = "全般設定";
 "Hanyu Pinyin with Numeral Intonation" = "漢語弁音 (ローマ字+数字音調)";
@@ -272,8 +272,8 @@
 "Show notifications when toggling Caps Lock" = "Caps Lock で切り替えの時に吹出通知メッセージを";
 "Show translated strokes in composition buffer" = "原始キーネームでなく、筆画を入力緩衝列で表示する";
 "Simplified Chinese" = "簡体中国語";
-"Space to +cycle candidates, Shift+Space to +cycle pages" = "Shift+Space で次のページ、Space で次の候補文字を";
-"Space to +cycle pages, Shift+Space to +cycle candidates" = "Space で次のページ、Shift+Space で次の候補文字を";
+"Space to +revolve candidates, Shift+Space to +revolve pages" = "Shift+Space で次のページ、Space で次の候補文字を";
+"Space to +revolve pages, Shift+Space to +revolve candidates" = "Space で次のページ、Shift+Space で次の候補文字を";
 "Specify the behavior of intonation key when syllable composer is empty." = "音読組立緩衝列が空かされた時の音調キーの行為をご指定ください。";
 "Starlight" = "星光配列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "マナーモード // 外すと入力間違った時に変な声が出る";
