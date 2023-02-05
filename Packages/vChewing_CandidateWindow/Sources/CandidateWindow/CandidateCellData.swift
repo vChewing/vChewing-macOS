@@ -140,6 +140,10 @@ public class CandidateCellData: Hashable {
     }
     return result.charDescriptions.joined(separator: "\n")
   }
+
+  public var minWidthToDrawInSwiftUI: Double {
+    Double(cellLength) + ((displayedText.count > 2) ? 0 : fontSizeKey + 0) + ceil(fontSizeCandidate * 0.4)
+  }
 }
 
 // MARK: - Contents specifically made for macOS 12 and newer.
@@ -165,7 +169,7 @@ extension CandidateCellData {
                 .foregroundColor(.init(nsColor: fontColorCandidate)).lineLimit(1)
             }
           }.padding(3)
-        }
+        }.frame(minWidth: minWidthToDrawInSwiftUI, alignment: .leading)
       }.fixedSize(horizontal: false, vertical: true)
     }
     return result
@@ -202,7 +206,7 @@ extension CandidateCellData {
                 .font(.init(CTFontCreateUIFontForLanguage(.system, fontSizeCandidate, locale as CFString)!))
                 .foregroundColor(Color(white: 1)).lineLimit(1)
             }.padding(3).foregroundColor(Color(white: 0.9))
-          }
+          }.frame(minWidth: minWidthToDrawInSwiftUI, alignment: .leading)
         } else {
           VStack(spacing: 0) {
             HStack(spacing: 4) {
@@ -212,7 +216,7 @@ extension CandidateCellData {
                 .font(.init(CTFontCreateUIFontForLanguage(.system, fontSizeCandidate, locale as CFString)!))
                 .foregroundColor(Color.primary).lineLimit(1)
             }.padding(3).foregroundColor(Color(white: 0.9))
-          }
+          }.frame(minWidth: minWidthToDrawInSwiftUI, alignment: .leading)
         }
       }.fixedSize(horizontal: false, vertical: true)
     }

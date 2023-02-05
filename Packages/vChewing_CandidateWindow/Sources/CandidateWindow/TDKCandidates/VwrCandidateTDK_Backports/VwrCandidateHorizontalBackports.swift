@@ -16,11 +16,11 @@ import SwiftUIBackports
 @available(macOS 10.15, *)
 struct CandidatePoolViewUIHorizontalBackports_Previews: PreviewProvider {
   @State static var testCandidates: [String] = [
-    "八月中秋山林涼", "八月中秋", "風吹大地", "山林涼", "草枝擺", "八月", "中秋",
+    "二十四歲是學生", "二十四歲", "昏睡紅茶", "食雪漢", "意味深", "學生", "便乗",
     "🐂🍺🐂🍺", "🐃🍺", "🐂🍺", "🐃🐂🍺🍺", "🐂🍺", "🐃🍺", "🐂🍺", "🐃🍺", "🐂🍺", "🐃🍺",
-    "山林", "風吹", "大地", "草枝", "八", "月", "中", "秋", "山", "林", "涼", "風",
-    "吹", "大", "地", "草", "枝", "擺", "八", "月", "中", "秋", "山", "林", "涼", "風",
-    "吹", "大", "地", "草", "枝", "擺",
+    "迫真", "驚愕", "論證", "正論", "惱", "悲", "屑", "食", "雪", "漢", "意", "味",
+    "深", "二", "十", "四", "歲", "是", "學", "生", "昏", "睡", "紅", "茶", "便", "乗",
+    "嗯", "哼", "啊",
   ]
   static var thePool: CandidatePool {
     var result = CandidatePool(candidates: testCandidates, rowCapacity: 6)
@@ -63,14 +63,14 @@ public struct VwrCandidateHorizontalBackports: View {
       ScrollView(.vertical, showsIndicators: false) {
         VStack(alignment: .leading, spacing: 1.6) {
           ForEach(thePool.rangeForCurrentPage, id: \.self) { rowIndex in
-            HStack(spacing: 10) {
+            HStack(spacing: ceil(CandidateCellData.unifiedSize * 0.35)) {
               ForEach(Array(thePool.candidateLines[rowIndex]), id: \.self) { currentCandidate in
                 currentCandidate.attributedStringForSwiftUIBackports.fixedSize()
+                  .contentShape(Rectangle())
                   .frame(
                     maxWidth: .infinity,
                     alignment: .topLeading
                   )
-                  .contentShape(Rectangle())
                   .onTapGesture { didSelectCandidateAt(currentCandidate.index) }
                   .contextMenu {
                     if controller?.delegate?.isCandidateContextMenuEnabled ?? false {
@@ -92,7 +92,7 @@ public struct VwrCandidateHorizontalBackports: View {
                     }
                   }
               }
-              Spacer()
+              Spacer(minLength: Double.infinity)
             }.frame(
               minWidth: 0,
               maxWidth: .infinity,
@@ -104,8 +104,8 @@ public struct VwrCandidateHorizontalBackports: View {
             ForEach(thePool.rangeForLastPageBlanked, id: \.self) { _ in
               HStack(spacing: 0) {
                 thePool.blankCell.attributedStringForSwiftUIBackports
-                  .frame(maxWidth: .infinity, alignment: .topLeading)
                   .contentShape(Rectangle())
+                  .frame(maxWidth: .infinity, alignment: .topLeading)
                 Spacer()
               }.frame(
                 minWidth: 0,
