@@ -171,6 +171,35 @@ struct VwrPrefPaneGeneral: View {
           Toggle(
             LocalizedStringKey("Stop farting (when typed phonetic combination is invalid, etc.)"),
             isOn: $selEnableFartSuppressor.onChange {
+              let content = String(
+                format: NSLocalizedString(
+                  "You are about to uncheck this fart suppressor. You are responsible for all consequences lead by letting people nearby hear the fart sound come from your computer. We strongly advise against unchecking this in any public circumstance that prohibits NSFW netas.",
+                  comment: ""
+                ))
+              let alert = NSAlert(error: NSLocalizedString("Warning", comment: ""))
+              alert.informativeText = content
+              alert.addButton(withTitle: NSLocalizedString("Uncheck", comment: ""))
+              if #available(macOS 11, *) {
+                alert.buttons.forEach { button in
+                  button.hasDestructiveAction = true
+                }
+              }
+              alert.addButton(withTitle: NSLocalizedString("Leave it checked", comment: ""))
+              if let window = CtlPrefUI.shared.controller.window, !selEnableFartSuppressor {
+                PrefMgr.shared.shouldNotFartInLieuOfBeep = true
+                alert.beginSheetModal(for: window) { result in
+                  switch result {
+                    case .alertFirstButtonReturn:
+                      PrefMgr.shared.shouldNotFartInLieuOfBeep = false
+                    case .alertSecondButtonReturn:
+                      PrefMgr.shared.shouldNotFartInLieuOfBeep = true
+                    default: break
+                  }
+                  selEnableFartSuppressor = PrefMgr.shared.shouldNotFartInLieuOfBeep
+                  IMEApp.buzz()
+                }
+                return
+              }
               PrefMgr.shared.shouldNotFartInLieuOfBeep = selEnableFartSuppressor
               IMEApp.buzz()
             }
