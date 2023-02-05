@@ -32,7 +32,7 @@ public class PopupCompositionBuffer: NSWindowController {
     let panel = NSPanel(
       contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false
     )
-    panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel) + 1)
+    panel.level = NSWindow.Level(Int(max(CGShieldingWindowLevel(), kCGPopUpMenuWindowLevel)) + 1)
     panel.hasShadow = true
     panel.backgroundColor = NSColor.controlBackgroundColor
     panel.styleMask = .fullSizeContentView

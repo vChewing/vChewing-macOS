@@ -73,7 +73,7 @@ extension SessionCtl {
   }
 
   public func showCandidates() {
-    guard let client = client() else { return }
+    guard client() != nil else { return }
     updateVerticalTypingStatus()
     isVerticalCandidateWindow = (isVerticalTyping || !PrefMgr.shared.useHorizontalCandidateList)
 
@@ -127,9 +127,7 @@ extension SessionCtl {
     if #available(macOS 10.14, *) {
       // Spotlight 視窗會擋住 IMK 選字窗，所以需要特殊處理。
       if let ctlCandidateCurrent = candidateUI as? CtlCandidateIMK {
-        while ctlCandidateCurrent.windowLevel() <= client.windowLevel() {
-          ctlCandidateCurrent.setWindowLevel(UInt64(max(0, client.windowLevel() + 1000)))
-        }
+        ctlCandidateCurrent.setWindowLevel(UInt64(CGShieldingWindowLevel() + 2))
       }
     }
 
