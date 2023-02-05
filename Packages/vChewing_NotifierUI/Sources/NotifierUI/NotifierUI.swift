@@ -97,7 +97,7 @@ public class Notifier: NSWindowController {
     )
     theWindow.contentView = transparentVisualEffect
     theWindow.isMovableByWindowBackground = true
-    theWindow.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel))
+    theWindow.level = NSWindow.Level(Int(max(CGShieldingWindowLevel(), kCGPopUpMenuWindowLevel)))
     theWindow.hasShadow = true
     theWindow.backgroundColor = .textBackgroundColor
     theWindow.title = ""

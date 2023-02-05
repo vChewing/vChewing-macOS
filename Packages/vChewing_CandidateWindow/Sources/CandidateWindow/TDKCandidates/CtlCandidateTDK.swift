@@ -74,7 +74,7 @@ public class CtlCandidateTDK: CtlCandidate {
     let panel = NSPanel(
       contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false
     )
-    panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel) + 2)
+    panel.level = NSWindow.Level(Int(max(CGShieldingWindowLevel(), kCGPopUpMenuWindowLevel)) + 2)
     panel.hasShadow = true
     panel.isOpaque = false
     panel.backgroundColor = NSColor.clear
