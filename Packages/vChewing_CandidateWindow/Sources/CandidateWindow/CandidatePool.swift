@@ -33,7 +33,8 @@ public struct CandidatePool {
 
   public var maxRowWidth: Int { Int(Double(maxRowCapacity + 3) * 2) * Int(ceil(CandidateCellData.unifiedSize)) }
   public var maxWindowWidth: Double {
-    ceil(Double(maxRowCapacity + 3) * 2.7 * ceil(CandidateCellData.unifiedSize) * 1.2)
+    let testCell = CandidateCellData(key: "XX", displayedText: "XX", isSelected: false)
+    return Double(maxRowCapacity) * (testCell.minWidthToDrawInSwiftUI + ceil(CandidateCellData.unifiedSize * 0.5))
   }
 
   public var currentLineNumber: Int {
@@ -158,7 +159,7 @@ public struct CandidatePool {
     for (i, candidate) in candidateDataAll.enumerated() {
       candidate.index = i
       candidate.whichRow = candidateRows.count
-      let isOverflown: Bool = currentRow.map(\.cellLength).reduce(0, +) + candidate.cellLength > maxRowWidth
+      let isOverflown: Bool = currentRow.map(\.cellLength).reduce(0, +) > maxRowWidth
       if isOverflown || currentRow.count == maxRowCapacity, !currentRow.isEmpty {
         candidateRows.append(currentRow)
         currentRow.removeAll()
