@@ -66,10 +66,7 @@ public struct VwrCandidateHorizontal: View {
               ForEach(Array(thePool.candidateLines[rowIndex]), id: \.self) { currentCandidate in
                 currentCandidate.attributedStringForSwiftUI.fixedSize()
                   .contentShape(Rectangle())
-                  .frame(
-                    maxWidth: .infinity,
-                    alignment: .topLeading
-                  )
+                  .frame(alignment: .topLeading)
                   .onTapGesture { didSelectCandidateAt(currentCandidate.index) }
                   .contextMenu {
                     if controller?.delegate?.isCandidateContextMenuEnabled ?? false {
@@ -91,7 +88,7 @@ public struct VwrCandidateHorizontal: View {
                     }
                   }
               }
-              Spacer(minLength: Double.infinity)
+              Spacer()
             }.frame(
               minWidth: 0,
               maxWidth: .infinity,
@@ -104,7 +101,7 @@ public struct VwrCandidateHorizontal: View {
               HStack(spacing: 0) {
                 thePool.blankCell.attributedStringForSwiftUI
                   .contentShape(Rectangle())
-                  .frame(maxWidth: .infinity, alignment: .topLeading)
+                  .frame(alignment: .topLeading)
                 Spacer()
               }.frame(
                 minWidth: 0,
