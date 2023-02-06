@@ -218,6 +218,12 @@ extension SessionCtl {
         isServingIMEItself = Bundle.main.bundleIdentifier == senderBundleID
       }
     }
+    DispatchQueue.main.async {
+      // 自動啟用肛塞（廉恥模式），除非這一天是愚人節。
+      if !Date.isTodayTheDate(from: 0401), !PrefMgr.shared.shouldNotFartInLieuOfBeep {
+        PrefMgr.shared.shouldNotFartInLieuOfBeep = true
+      }
+    }
     DispatchQueue.main.async { [self] in
       if isActivated { return }
 
