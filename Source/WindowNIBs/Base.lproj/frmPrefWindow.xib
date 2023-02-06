@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -13,6 +14,7 @@
                 <outlet property="btnPEOpenExternally" destination="xXK-s1-vSe" id="vKF-Im-fLU"/>
                 <outlet property="btnPEReload" destination="PCy-3G-HoZ" id="Ssb-15-kUj"/>
                 <outlet property="btnPESave" destination="Ss7-cl-3E0" id="yK4-7N-pf2"/>
+                <outlet property="chkFartSuppressor" destination="pYB-E5-4Nv" id="zcC-ZZ-mG4"/>
                 <outlet property="chkTrad2JISShinjitai" destination="h4r-Sp-LBI" id="pk8-xi-IJi"/>
                 <outlet property="chkTrad2KangXi" destination="5IL-zZ-CL9" id="PGS-Dy-BBY"/>
                 <outlet property="cmbCandidateFontSize" destination="90" id="K27-YZ-Iki"/>
@@ -281,10 +283,10 @@
                             </textFieldCell>
                         </textField>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="9" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="ASo-Wd-8Kn">
-                            <rect key="frame" x="0.0" y="256" width="392" height="111"/>
+                            <rect key="frame" x="0.0" y="280" width="392" height="87"/>
                             <subviews>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gZ0-OK-r7a" userLabel="InlineDumpPinyinInLieuOfZhuyin">
-                                    <rect key="frame" x="-1" y="95.5" width="387" height="16"/>
+                                    <rect key="frame" x="-1" y="71.5" width="387" height="16"/>
                                     <buttonCell key="cell" type="check" title="Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="iWy-Nw-QKB">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
@@ -295,7 +297,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vwf-Kq-s8M" userLabel="chkShowHanyuPinyinInCompositionBuffer">
-                                    <rect key="frame" x="-1" y="71.5" width="361" height="16"/>
+                                    <rect key="frame" x="-1" y="47.5" width="361" height="16"/>
                                     <buttonCell key="cell" type="check" title="Show Hanyu-Pinyin in the inline composition buffer &amp; tooltip" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="wFR-zX-M8H">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
@@ -303,17 +305,6 @@
                                     <connections>
                                         <action selector="toggleTrad2KangXiAction:" target="-2" id="Bko-rV-Ygf"/>
                                         <binding destination="32" name="value" keyPath="values.ShowHanyuPinyinInCompositionBuffer" id="uDq-eC-wan"/>
-                                    </connections>
-                                </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pYB-E5-4Nv">
-                                    <rect key="frame" x="-1" y="47.5" width="373" height="16"/>
-                                    <buttonCell key="cell" type="check" title="Stop farting (when typed phonetic combination is invalid, etc.)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="62u-jY-BRh">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="cellTitle"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="clickedWhetherIMEShouldNotFartToggleAction:" target="-2" id="9h1-f6-SGF"/>
-                                        <binding destination="32" name="value" keyPath="values.ShouldNotFartInLieuOfBeep" id="EOH-Pc-8Hk"/>
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="h4r-Sp-LBI" userLabel="chkTrad2JISShinjitai">
@@ -344,10 +335,8 @@
                                 <integer value="1000"/>
                                 <integer value="1000"/>
                                 <integer value="1000"/>
-                                <integer value="1000"/>
                             </visibilityPriorities>
                             <customSpacing>
-                                <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
@@ -355,13 +344,13 @@
                             </customSpacing>
                         </stackView>
                         <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Agg-8d-6bO">
-                            <rect key="frame" x="0.0" y="245" width="400" height="5"/>
+                            <rect key="frame" x="0.0" y="269" width="400" height="5"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="400" id="e6d-B8-ghT"/>
                             </constraints>
                         </box>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="9" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="pwZ-0Z-1ID">
-                            <rect key="frame" x="0.0" y="56" width="380" height="183"/>
+                            <rect key="frame" x="0.0" y="80" width="380" height="183"/>
                             <subviews>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="109">
                                     <rect key="frame" x="-1" y="167.5" width="285" height="16"/>
@@ -466,16 +455,16 @@
                             </customSpacing>
                         </stackView>
                         <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="2Ox-3n-D0k">
-                            <rect key="frame" x="0.0" y="45" width="400" height="5"/>
+                            <rect key="frame" x="0.0" y="69" width="400" height="5"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="400" id="67d-fO-Sff"/>
                             </constraints>
                         </box>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="9" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="szY-fw-P6L">
-                            <rect key="frame" x="0.0" y="0.0" width="203" height="39"/>
+                            <rect key="frame" x="0.0" y="0.0" width="372" height="63"/>
                             <subviews>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="ChK-Du-6h1">
-                                    <rect key="frame" x="-1" y="23.5" width="204" height="16"/>
+                                    <rect key="frame" x="-1" y="47.5" width="204" height="16"/>
                                     <buttonCell key="cell" type="check" title="Check for updates automatically" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="8tT-hw-Hhr">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
@@ -485,7 +474,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0Fh-O5-BKD">
-                                    <rect key="frame" x="-1" y="-0.5" width="94" height="16"/>
+                                    <rect key="frame" x="-1" y="23.5" width="94" height="16"/>
                                     <buttonCell key="cell" type="check" title="Debug Mode" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="VdT-fw-7pQ">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
@@ -494,12 +483,25 @@
                                         <binding destination="32" name="value" keyPath="values._DebugMode" id="sEa-DE-7Dw"/>
                                     </connections>
                                 </button>
+                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pYB-E5-4Nv">
+                                    <rect key="frame" x="-1" y="-0.5" width="373" height="16"/>
+                                    <buttonCell key="cell" type="check" title="Stop farting (when typed phonetic combination is invalid, etc.)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="62u-jY-BRh">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="cellTitle"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="clickedWhetherIMEShouldNotFartToggleAction:" target="-2" id="9h1-f6-SGF"/>
+                                        <binding destination="32" name="value" keyPath="values.ShouldNotFartInLieuOfBeep" id="EOH-Pc-8Hk"/>
+                                    </connections>
+                                </button>
                             </subviews>
                             <visibilityPriorities>
                                 <integer value="1000"/>
                                 <integer value="1000"/>
+                                <integer value="1000"/>
                             </visibilityPriorities>
                             <customSpacing>
+                                <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                             </customSpacing>
@@ -1766,7 +1768,7 @@
                             <rect key="frame" x="0.0" y="80" width="538" height="360"/>
                             <clipView key="contentView" drawsBackground="NO" id="x8s-wo-bxi">
                                 <rect key="frame" x="0.0" y="0.0" width="538" height="360"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <textView wantsLayer="YES" importsGraphics="NO" richText="NO" verticallyResizable="YES" allowsUndo="YES" smartInsertDelete="YES" id="kSG-dz-P2N">
                                         <rect key="frame" x="0.0" y="0.0" width="538" height="360"/>
