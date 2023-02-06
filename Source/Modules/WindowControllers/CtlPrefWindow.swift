@@ -37,6 +37,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   @IBOutlet var lblCurrentlySpecifiedUserDataFolder: NSTextFieldCell!
   @IBOutlet var tglControlDevZoneIMKCandidate: NSButton!
   @IBOutlet var cmbCandidateFontSize: NSPopUpButton!
+  @IBOutlet var chkFartSuppressor: NSButton!
 
   @IBOutlet var cmbPEInputModeMenu: NSPopUpButton!
   @IBOutlet var cmbPEDataTypeMenu: NSPopUpButton!
@@ -83,6 +84,9 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   override func windowDidLoad() {
     super.windowDidLoad()
     window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
+
+    chkFartSuppressor.isHidden = !Date.isTodayTheDate(from: 0401)
+    chkFartSuppressor.isEnabled = !chkFartSuppressor.isHidden
 
     cmbCandidateFontSize.isEnabled = true
 
