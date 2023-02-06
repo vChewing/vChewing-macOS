@@ -31,10 +31,9 @@ public struct CandidatePool {
 
   // MARK: - 動態變數
 
-  public var maxRowWidth: Int { Int(Double(maxRowCapacity + 3) * 2) * Int(ceil(CandidateCellData.unifiedSize)) }
+  public var maxRowWidth: Int { Int(ceil((Double(maxRowCapacity + 3) * 2 - 0.5) * CandidateCellData.unifiedSize)) }
   public var maxWindowWidth: Double {
-    let testCell = CandidateCellData(key: "XX", displayedText: "XX", isSelected: false)
-    return Double(maxRowCapacity) * (testCell.minWidthToDrawInSwiftUI + ceil(CandidateCellData.unifiedSize * 0.5))
+    Double(maxRowCapacity) * (blankCell.minWidthToDrawInSwiftUI + ceil(CandidateCellData.unifiedSize * 0.5))
   }
 
   public var currentLineNumber: Int {
