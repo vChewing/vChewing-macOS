@@ -133,3 +133,38 @@ extension NSApplication {
     return info.phys_footprint as UInt64
   }
 }
+
+// MARK: - Check whether current date is the given date.
+
+extension Date {
+  /// Check whether current date is the given date.
+  /// - Parameter dateDigits: `yyyyMMdd`, 8-digit integer. If only `MMdd`, then the year will be the current year.
+  /// - Returns: The result. Will return false if the given dateDigits is invalid.
+  public static func isTodayTheDate(from dateDigits: Int) -> Bool {
+    let currentYear = Self.currentYear
+    var dateDigits = dateDigits
+    let strDateDigits = dateDigits.description
+    switch strDateDigits.count {
+      case 3, 4: dateDigits = currentYear * 10000 + dateDigits
+      case 8:
+        if let theHighest = strDateDigits.first, "12".contains(theHighest) { break }
+        return false
+      default: return false
+    }
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyyMMdd"
+    var calendar = NSCalendar.current
+    calendar.timeZone = TimeZone.current
+    let components = calendar.dateComponents([.day, .month, .year], from: Date())
+    if let a = calendar.date(from: components), let b = formatter.date(from: dateDigits.description), a == b {
+      return true
+    }
+    return false
+  }
+
+  public static var currentYear: Int {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy"
+    return (Int(formatter.string(from: Date())) ?? 1970)
+  }
+}
