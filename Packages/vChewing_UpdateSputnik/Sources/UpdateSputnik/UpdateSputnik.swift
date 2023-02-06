@@ -9,12 +9,12 @@
 import Cocoa
 
 public class UpdateSputnik {
-  public static var shared: UpdateSputnik = .init()
-  public var varkUpdateInfoPageURLKey: String = "UpdateInfoSite"
-  public var varkUpdateCheckDateKeyPrevious: String = "PreviousUpdateCheckDate"
-  public var varkUpdateCheckDateKeyNext: String = "NextUpdateCheckDate"
-  public var varkUpdateCheckInterval: TimeInterval = 114_514
-  public var varCheckUpdateAutomatically = "CheckUpdateAutomatically"
+  public static let shared: UpdateSputnik = .init()
+  public let kUpdateInfoPageURLKey: String = "UpdateInfoSite"
+  public let kUpdateCheckDateKeyPrevious: String = "PreviousUpdateCheckDate"
+  public let kUpdateCheckDateKeyNext: String = "NextUpdateCheckDate"
+  public let kUpdateCheckInterval: TimeInterval = 114_514
+  public let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
 
   public init() {}
 
@@ -22,7 +22,7 @@ public class UpdateSputnik {
     guard !busy else { return }
 
     if !forced {
-      if !UserDefaults.standard.bool(forKey: varCheckUpdateAutomatically) { return }
+      if !UserDefaults.standard.bool(forKey: kCheckUpdateAutomatically) { return }
       if let nextCheckDate = nextUpdateCheckDate, Date().compare(nextCheckDate) == .orderedAscending {
         return
       }
@@ -66,10 +66,10 @@ public class UpdateSputnik {
 
   private var nextUpdateCheckDate: Date? {
     get {
-      UserDefaults.standard.object(forKey: varkUpdateCheckDateKeyNext) as? Date
+      UserDefaults.standard.object(forKey: kUpdateCheckDateKeyNext) as? Date
     }
     set {
-      UserDefaults.standard.set(newValue, forKey: varkUpdateCheckDateKeyNext)
+      UserDefaults.standard.set(newValue, forKey: kUpdateCheckDateKeyNext)
     }
   }
 
@@ -78,7 +78,7 @@ public class UpdateSputnik {
   internal func dataDidSet(data: Data) {
     var plist: [AnyHashable: Any]?
     plist = try? PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [AnyHashable: Any]
-    nextUpdateCheckDate = .init().addingTimeInterval(varkUpdateCheckInterval)
+    nextUpdateCheckDate = .init().addingTimeInterval(kUpdateCheckInterval)
     cleanUp()
 
     guard let plist = plist else {
@@ -134,7 +134,7 @@ public class UpdateSputnik {
     let result = alert.runModal()
     NSApp.activate(ignoringOtherApps: true)
     if result == NSApplication.ModalResponse.alertFirstButtonReturn {
-      if let siteInfoURLString = plist[varkUpdateInfoPageURLKey] as? String,
+      if let siteInfoURLString = plist[kUpdateInfoPageURLKey] as? String,
         let siteURL = URL(string: siteInfoURLString)
       {
         DispatchQueue.main.async {
