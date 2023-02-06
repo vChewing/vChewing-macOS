@@ -18,13 +18,13 @@ extension NSSound {
     AudioServicesPlaySystemSound(soundID)
   }
 
-  public static func buzz(fart _: Bool = false, count: Int) {
+  public static func buzz(fart: Bool = false, count: Int) {
     if count <= 1 {
-      NSSound.buzz()
+      NSSound.buzz(fart: fart)
       return
     }
     for _ in 0...count {
-      NSSound.buzz()
+      NSSound.buzz(fart: fart)
       usleep(500_000)
     }
   }
