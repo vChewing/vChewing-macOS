@@ -27,10 +27,10 @@ extension Backport where Wrapped == Any {
     #if os(iOS)
       var scrollViewDismissMode: UIScrollView.KeyboardDismissMode {
         switch dismissMode {
-          case .automatic: return .none
-          case .immediately: return .onDrag
-          case .interactively: return .interactive
-          case .never: return .none
+        case .automatic: return .none
+        case .immediately: return .onDrag
+        case .interactively: return .interactive
+        case .never: return .none
         }
       }
     #endif

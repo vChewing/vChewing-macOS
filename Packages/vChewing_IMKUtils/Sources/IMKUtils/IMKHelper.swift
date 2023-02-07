@@ -92,8 +92,8 @@ public enum IMKHelper {
 
 // MARK: - 與輸入法的具體的安裝過程有關的命令
 
-extension IMKHelper {
-  @discardableResult public static func registerInputMethod() -> Int32 {
+public extension IMKHelper {
+  @discardableResult static func registerInputMethod() -> Int32 {
     TISInputSource.registerInputMethod() ? 0 : -1
   }
 }

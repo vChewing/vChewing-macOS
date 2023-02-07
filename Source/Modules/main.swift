@@ -14,25 +14,25 @@ import Shared
 import Uninstaller
 
 switch max(CommandLine.arguments.count - 1, 0) {
-  case 0: break
-  case 1, 2:
-    switch CommandLine.arguments[1] {
-      case "install":
-        if CommandLine.arguments[1] == "install" {
-          let exitCode = IMKHelper.registerInputMethod()
-          exit(exitCode)
-        }
-      case "uninstall":
-        if CommandLine.arguments[1] == "uninstall" {
-          let exitCode = Uninstaller.uninstall(
-            isSudo: NSApplication.isSudoMode, defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true)
-          )
-          exit(exitCode)
-        }
-      default: break
+case 0: break
+case 1, 2:
+  switch CommandLine.arguments[1] {
+  case "install":
+    if CommandLine.arguments[1] == "install" {
+      let exitCode = IMKHelper.registerInputMethod()
+      exit(exitCode)
     }
-    exit(0)
-  default: exit(0)
+  case "uninstall":
+    if CommandLine.arguments[1] == "uninstall" {
+      let exitCode = Uninstaller.uninstall(
+        isSudo: NSApplication.isSudoMode, defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true)
+      )
+      exit(exitCode)
+    }
+  default: break
+  }
+  exit(0)
+default: exit(0)
 }
 
 guard let mainNibName = Bundle.main.infoDictionary?["NSMainNibFile"] as? String else {
@@ -47,8 +47,8 @@ if !loaded {
 }
 
 guard let bundleID = Bundle.main.bundleIdentifier,
-  let kConnectionName = Bundle.main.infoDictionary?["InputMethodConnectionName"] as? String,
-  let server = IMKServer(name: kConnectionName, bundleIdentifier: bundleID)
+      let kConnectionName = Bundle.main.infoDictionary?["InputMethodConnectionName"] as? String,
+      let server = IMKServer(name: kConnectionName, bundleIdentifier: bundleID)
 else {
   NSLog(
     "Fatal error: Cannot initialize input method server with connection name retrieved from the plist, nor there's no connection name in the plist."
@@ -57,8 +57,8 @@ else {
 }
 
 guard let mainBundleInfoDict = Bundle.main.infoDictionary,
-  let strUpdateInfoSource = mainBundleInfoDict["UpdateInfoEndpoint"] as? String,
-  let urlUpdateInfoSource = URL(string: strUpdateInfoSource)
+      let strUpdateInfoSource = mainBundleInfoDict["UpdateInfoEndpoint"] as? String,
+      let urlUpdateInfoSource = URL(string: strUpdateInfoSource)
 else {
   NSLog("Fatal error: Info.plist wrecked. It needs to have correct 'UpdateInfoEndpoint' value.")
   exit(-1)

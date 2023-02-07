@@ -12,12 +12,12 @@ import Tekkon
 
 // MARK: - IMKCandidates 功能擴充
 
-extension SessionCtl {
+public extension SessionCtl {
   /// 生成 IMK 選字窗專用的候選字串陣列。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: IMK 選字窗專用的候選字串陣列。
-  public override func candidates(_ sender: Any!) -> [Any]! {
-    _ = sender  // 防止格式整理工具毀掉與此對應的參數。
+  override func candidates(_ sender: Any!) -> [Any]! {
+    _ = sender // 防止格式整理工具毀掉與此對應的參數。
     var arrResult = [String]()
 
     // 注意：下文中的不可列印字元是用來方便在 IMEState 當中用來分割資料的。
@@ -29,18 +29,18 @@ extension SessionCtl {
         if arrResult.contains(result) {
           let reading: String =
             PrefMgr.shared.cassetteEnabled
-            ? theCandidate.0.joined(separator: separator)
-            : (PrefMgr.shared.showHanyuPinyinInCompositionBuffer
-              ? Tekkon.cnvPhonaToHanyuPinyin(
-                targetJoined: {
-                  var arr = [String]()
-                  theCandidate.0.forEach { key in
-                    arr.append(Tekkon.restoreToneOneInPhona(target: key))
-                  }
-                  return arr.joined(separator: "-")
-                }()
-              )
-              : theCandidate.0.joined(separator: separator))
+              ? theCandidate.0.joined(separator: separator)
+              : (PrefMgr.shared.showHanyuPinyinInCompositionBuffer
+                ? Tekkon.cnvPhonaToHanyuPinyin(
+                  targetJoined: {
+                    var arr = [String]()
+                    theCandidate.0.forEach { key in
+                      arr.append(Tekkon.restoreToneOneInPhona(target: key))
+                    }
+                    return arr.joined(separator: "-")
+                  }()
+                )
+                : theCandidate.0.joined(separator: separator))
           result = "\(result)\u{17}(\(reading))"
         }
         arrResult.append(prefix + result)
@@ -55,7 +55,7 @@ extension SessionCtl {
     } else if state.type == .ofCandidates {
       guard !state.candidates.isEmpty else { return .init() }
       if state.candidates[0].0.contains("_punctuation") {
-        arrResult = state.candidates.map(\.1)  // 標點符號選單處理。
+        arrResult = state.candidates.map(\.1) // 標點符號選單處理。
       } else {
         handleIMKCandidatesPrepared(state.candidates)
       }
@@ -66,7 +66,7 @@ extension SessionCtl {
 
   /// IMK 選字窗限定函式，只要選字窗內的高亮內容選擇出現變化了、就會呼叫這個函式。
   /// - Parameter currentSelection: 已經高亮選中的候選字詞內容。
-  public override func candidateSelectionChanged(_ currentSelection: NSAttributedString!) {
+  override func candidateSelectionChanged(_ currentSelection: NSAttributedString!) {
     guard let currentCandidate = currentSelection?.string, !currentCandidate.isEmpty else { return }
     let annotation = reverseLookup(for: currentCandidate).joined(separator: "\n")
     guard !annotation.isEmpty else { return }
@@ -79,7 +79,7 @@ extension SessionCtl {
 
   /// IMK 選字窗限定函式，只要選字窗確認了某個候選字詞的選擇、就會呼叫這個函式。
   /// - Parameter candidateString: 已經確認的候選字詞內容。
-  public override func candidateSelected(_ candidateString: NSAttributedString!) {
+  override func candidateSelected(_ candidateString: NSAttributedString!) {
     let candidateString: String = candidateString?.string ?? ""
     if state.type == .ofAssociates {
       if !PrefMgr.shared.alsoConfirmAssociatedCandidatesByEnter {
@@ -98,18 +98,18 @@ extension SessionCtl {
         let netaShown = (neta.1 == theConverted) ? neta.1 : "\(theConverted)\u{1A}(\(neta.1))"
         let reading: String =
           PrefMgr.shared.cassetteEnabled
-          ? neta.0.joined(separator: separator)
-          : (PrefMgr.shared.showHanyuPinyinInCompositionBuffer
-            ? Tekkon.cnvPhonaToHanyuPinyin(
-              targetJoined: {
-                var arr = [String]()
-                neta.0.forEach { key in
-                  arr.append(Tekkon.restoreToneOneInPhona(target: key))
-                }
-                return arr.joined(separator: "-")
-              }()
-            )
-            : neta.0.joined(separator: separator))
+            ? neta.0.joined(separator: separator)
+            : (PrefMgr.shared.showHanyuPinyinInCompositionBuffer
+              ? Tekkon.cnvPhonaToHanyuPinyin(
+                targetJoined: {
+                  var arr = [String]()
+                  neta.0.forEach { key in
+                    arr.append(Tekkon.restoreToneOneInPhona(target: key))
+                  }
+                  return arr.joined(separator: "-")
+                }()
+              )
+              : neta.0.joined(separator: separator))
         let netaShownWithPronunciation = "\(netaShown)\u{17}(\(reading))"
         if candidateString == prefix + netaShownWithPronunciation {
           indexDeducted = i
@@ -139,7 +139,7 @@ extension SessionCtl {
     } else if state.type == .ofCandidates {
       guard !state.candidates.isEmpty else { return }
       if state.candidates[0].0.contains("_punctuation") {
-        handleSymbolCandidatesSelected(state.candidates)  // 標點符號選單處理。
+        handleSymbolCandidatesSelected(state.candidates) // 標點符號選單處理。
       } else {
         handleIMKCandidatesSelected(state.candidates)
       }

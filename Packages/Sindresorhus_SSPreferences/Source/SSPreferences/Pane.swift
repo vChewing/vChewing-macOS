@@ -15,13 +15,13 @@ public protocol PreferencePaneConvertible {
 }
 
 @available(macOS 10.15, *)
-extension SSPreferences {
+public extension SSPreferences {
   /**
    Create a SwiftUI-based preference pane.
 
    SwiftUI equivalent of the `PreferencePane` protocol.
    */
-  public struct Pane<Content: View>: View, PreferencePaneConvertible {
+  struct Pane<Content: View>: View, PreferencePaneConvertible {
     let identifier: PaneIdentifier
     let title: String
     let toolbarIcon: NSImage
@@ -49,7 +49,7 @@ extension SSPreferences {
   /**
    Hosting controller enabling `Preferences.Pane` to be used alongside AppKit `NSViewController`'s.
    */
-  public final class PaneHostingController<Content: View>: NSHostingController<Content>, PreferencePane {
+  final class PaneHostingController<Content: View>: NSHostingController<Content>, PreferencePane {
     public let preferencePaneIdentifier: PaneIdentifier
     public let preferencePaneTitle: String
     public let toolbarItemIcon: NSImage
@@ -84,11 +84,11 @@ extension SSPreferences {
 }
 
 @available(macOS 10.15, *)
-extension View {
+public extension View {
   /**
    Applies font and color for a label used for describing a preference.
    */
-  public func preferenceDescription() -> some View {
+  func preferenceDescription() -> some View {
     font(.system(size: 11.0))
       // TODO: Use `.foregroundStyle` when targeting macOS 12.
       .foregroundColor(.secondary)

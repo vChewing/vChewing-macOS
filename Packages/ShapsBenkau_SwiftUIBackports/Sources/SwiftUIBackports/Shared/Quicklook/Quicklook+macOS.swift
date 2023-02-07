@@ -10,7 +10,8 @@ import SwiftUI
 
   @available(macOS 10.15, *)
   final class PreviewController<Items>: NSViewController, QLPreviewPanelDataSource, QLPreviewPanelDelegate
-  where Items: RandomAccessCollection, Items.Element == URL {
+    where Items: RandomAccessCollection, Items.Element == URL
+  {
     private let panel = QLPreviewPanel.shared()!
     private weak var windowResponder: NSResponder?
 
@@ -27,14 +28,14 @@ import SwiftUI
 
     private func updateControllerLifecycle(from oldValue: Items.Element?, to newValue: Items.Element?) {
       switch (oldValue, newValue) {
-        case (.none, .some):
-          present()
-        case (.some, .some):
-          update()
-        case (.some, .none):
-          dismiss()
-        case (.none, .none):
-          break
+      case (.none, .some):
+        present()
+      case (.some, .some):
+        update()
+      case (.some, .none):
+        dismiss()
+      case (.none, .none):
+        break
       }
     }
 

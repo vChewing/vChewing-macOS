@@ -11,8 +11,8 @@ import NotifierUI
 import SSPreferences
 import UpdateSputnik
 
-extension Bool {
-  fileprivate var state: NSControl.StateValue {
+private extension Bool {
+  var state: NSControl.StateValue {
     self ? .on : .off
   }
 }
@@ -104,7 +104,7 @@ extension SessionCtl {
       toggleSymbolInputItem.state = PrefMgr.shared.symbolInputEnabled.state
     }
 
-    menu.addItem(NSMenuItem.separator())  // ---------------------
+    menu.addItem(NSMenuItem.separator()) // ---------------------
 
     menu.addItem(
       withTitle: "Open User Dictionary Folder".localized,
@@ -151,7 +151,7 @@ extension SessionCtl {
     )
     revLookupMenuItem.keyEquivalentModifierMask = [.command, .control]
 
-    menu.addItem(NSMenuItem.separator())  // ---------------------
+    menu.addItem(NSMenuItem.separator()) // ---------------------
 
     menu.addItem(
       withTitle: "Optimize Memorized Phrases".localized,
@@ -162,7 +162,7 @@ extension SessionCtl {
       action: #selector(clearUOM(_:)), keyEquivalent: ""
     )
 
-    menu.addItem(NSMenuItem.separator())  // ---------------------
+    menu.addItem(NSMenuItem.separator()) // ---------------------
 
     menu.addItem(
       withTitle: "vChewing Preferences…".localized,
@@ -203,8 +203,8 @@ extension SessionCtl {
 
 // MARK: - IME Menu Items
 
-extension SessionCtl {
-  @objc public override func showPreferences(_: Any? = nil) {
+public extension SessionCtl {
+  @objc override func showPreferences(_: Any? = nil) {
     if #unavailable(macOS 10.15) {
       CtlPrefWindow.show()
     } else if NSEvent.modifierFlags.contains(.option) {
@@ -217,19 +217,19 @@ extension SessionCtl {
     NSApp.activate(ignoringOtherApps: true)
   }
 
-  @objc public func showCheatSheet(_: Any? = nil) {
+  @objc func showCheatSheet(_: Any? = nil) {
     guard let url = Bundle.main.url(forResource: "shortcuts", withExtension: "html") else { return }
     DispatchQueue.main.async {
       NSWorkspace.shared.openFile(url.path, withApplication: "Safari")
     }
   }
 
-  @objc public func showClientListMgr(_: Any? = nil) {
+  @objc func showClientListMgr(_: Any? = nil) {
     CtlClientListMgr.show()
     NSApp.activate(ignoringOtherApps: true)
   }
 
-  @objc public func toggleCassetteMode(_: Any? = nil) {
+  @objc func toggleCassetteMode(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     if !PrefMgr.shared.cassetteEnabled, !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
       DispatchQueue.main.async {
@@ -257,7 +257,7 @@ extension SessionCtl {
     }
   }
 
-  @objc public func toggleSCPCTypingMode(_: Any? = nil) {
+  @objc func toggleSCPCTypingMode(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: "Per-Char Select Mode".localized + "\n"
@@ -267,7 +267,7 @@ extension SessionCtl {
     )
   }
 
-  @objc public func toggleChineseConverter(_: Any? = nil) {
+  @objc func toggleChineseConverter(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: "Force KangXi Writing".localized + "\n"
@@ -277,7 +277,7 @@ extension SessionCtl {
     )
   }
 
-  @objc public func toggleShiftJISShinjitaiOutput(_: Any? = nil) {
+  @objc func toggleShiftJISShinjitaiOutput(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: "JIS Shinjitai Output".localized + "\n"
@@ -287,7 +287,7 @@ extension SessionCtl {
     )
   }
 
-  @objc public func toggleCurrencyNumerals(_: Any? = nil) {
+  @objc func toggleCurrencyNumerals(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: "Currency Numeral Output".localized + "\n"
@@ -297,7 +297,7 @@ extension SessionCtl {
     )
   }
 
-  @objc public func toggleHalfWidthPunctuation(_: Any? = nil) {
+  @objc func toggleHalfWidthPunctuation(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: "Half-Width Punctuation Mode".localized + "\n"
@@ -307,7 +307,7 @@ extension SessionCtl {
     )
   }
 
-  @objc public func toggleCNS11643Enabled(_: Any? = nil) {
+  @objc func toggleCNS11643Enabled(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: "CNS11643 Mode".localized + "\n"
@@ -317,7 +317,7 @@ extension SessionCtl {
     )
   }
 
-  @objc public func toggleSymbolEnabled(_: Any? = nil) {
+  @objc func toggleSymbolEnabled(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: "Symbol & Emoji Input".localized + "\n"
@@ -327,7 +327,7 @@ extension SessionCtl {
     )
   }
 
-  @objc public func toggleAssociatedPhrasesEnabled(_: Any? = nil) {
+  @objc func toggleAssociatedPhrasesEnabled(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: "Per-Char Associated Phrases".localized + "\n"
@@ -337,7 +337,7 @@ extension SessionCtl {
     )
   }
 
-  @objc public func togglePhraseReplacement(_: Any? = nil) {
+  @objc func togglePhraseReplacement(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: "Use Phrase Replacement".localized + "\n"
@@ -347,20 +347,20 @@ extension SessionCtl {
     )
   }
 
-  @objc public func selfUninstall(_: Any? = nil) {
+  @objc func selfUninstall(_: Any? = nil) {
     (NSApp.delegate as? AppDelegate)?.selfUninstall()
   }
 
-  @objc public func selfTerminate(_: Any? = nil) {
+  @objc func selfTerminate(_: Any? = nil) {
     NSApp.activate(ignoringOtherApps: true)
     NSApp.terminate(nil)
   }
 
-  @objc public func checkForUpdate(_: Any? = nil) {
+  @objc func checkForUpdate(_: Any? = nil) {
     UpdateSputnik.shared.checkForUpdate(forced: true, url: kUpdateInfoSourceURL)
   }
 
-  @objc public func openUserDataFolder(_: Any? = nil) {
+  @objc func openUserDataFolder(_: Any? = nil) {
     if !LMMgr.userDataFolderExists {
       return
     }
@@ -369,49 +369,49 @@ extension SessionCtl {
     )
   }
 
-  @objc public func openUserPhrases(_: Any? = nil) {
+  @objc func openUserPhrases(_: Any? = nil) {
     LMMgr.openUserDictFile(type: .thePhrases, dual: optionKeyPressed, alt: optionKeyPressed)
   }
 
-  @objc public func openExcludedPhrases(_: Any? = nil) {
+  @objc func openExcludedPhrases(_: Any? = nil) {
     LMMgr.openUserDictFile(type: .theFilter, dual: optionKeyPressed, alt: optionKeyPressed)
   }
 
-  @objc public func openUserSymbols(_: Any? = nil) {
+  @objc func openUserSymbols(_: Any? = nil) {
     LMMgr.openUserDictFile(type: .theSymbols, dual: optionKeyPressed, alt: optionKeyPressed)
   }
 
-  @objc public func openPhraseReplacement(_: Any? = nil) {
+  @objc func openPhraseReplacement(_: Any? = nil) {
     LMMgr.openUserDictFile(type: .theReplacements, dual: optionKeyPressed, alt: optionKeyPressed)
   }
 
-  @objc public func openAssociatedPhrases(_: Any? = nil) {
+  @objc func openAssociatedPhrases(_: Any? = nil) {
     LMMgr.openUserDictFile(type: .theAssociates, dual: optionKeyPressed, alt: optionKeyPressed)
   }
 
-  @objc public func reloadUserPhrasesData(_: Any? = nil) {
+  @objc func reloadUserPhrasesData(_: Any? = nil) {
     LMMgr.initUserLangModels()
   }
 
-  @objc public func callReverseLookupWindow(_: Any? = nil) {
+  @objc func callReverseLookupWindow(_: Any? = nil) {
     CtlRevLookupWindow.show()
   }
 
-  @objc public func removeUnigramsFromUOM(_: Any? = nil) {
+  @objc func removeUnigramsFromUOM(_: Any? = nil) {
     LMMgr.removeUnigramsFromUserOverrideModel(IMEApp.currentInputMode)
     if NSEvent.modifierFlags.contains(.option) {
       LMMgr.removeUnigramsFromUserOverrideModel(IMEApp.currentInputMode.reversed)
     }
   }
 
-  @objc public func clearUOM(_: Any? = nil) {
+  @objc func clearUOM(_: Any? = nil) {
     LMMgr.clearUserOverrideModelData(IMEApp.currentInputMode)
     if NSEvent.modifierFlags.contains(.option) {
       LMMgr.clearUserOverrideModelData(IMEApp.currentInputMode.reversed)
     }
   }
 
-  @objc public func showAbout(_: Any? = nil) {
+  @objc func showAbout(_: Any? = nil) {
     CtlAboutWindow.show()
     NSApp.activate(ignoringOtherApps: true)
   }

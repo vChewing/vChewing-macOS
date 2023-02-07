@@ -24,7 +24,7 @@ extension AppDelegate {
 
     let shouldWaitForTranslocationRemoval =
       Reloc.isAppBundleTranslocated(atPath: kTargetPartialPath)
-      && window.responds(to: #selector(NSWindow.beginSheet(_:completionHandler:)))
+        && window.responds(to: #selector(NSWindow.beginSheet(_:completionHandler:)))
 
     // 將既存輸入法扔到垃圾桶內
     do {
@@ -116,7 +116,7 @@ extension AppDelegate {
     _ = try? shell("/usr/bin/xattr -drs com.apple.quarantine \(kTargetPartialPath)")
 
     guard let theBundle = Bundle(url: imeURLInstalled),
-      let imeIdentifier = theBundle.bundleIdentifier
+          let imeIdentifier = theBundle.bundleIdentifier
     else {
       endAppWithDelay()
       return

@@ -52,16 +52,16 @@ public class CtlCandidateTDK: CtlCandidate {
   private var thePool: CandidatePool {
     get {
       switch currentLayout {
-        case .horizontal: return Self.thePoolHorizontal
-        case .vertical: return Self.thePoolVertical
-        @unknown default: return .init(candidates: [], rowCapacity: 0)
+      case .horizontal: return Self.thePoolHorizontal
+      case .vertical: return Self.thePoolVertical
+      @unknown default: return .init(candidates: [], rowCapacity: 0)
       }
     }
     set {
       switch currentLayout {
-        case .horizontal: Self.thePoolHorizontal = newValue
-        case .vertical: Self.thePoolVertical = newValue
-        @unknown default: break
+      case .horizontal: Self.thePoolHorizontal = newValue
+      case .vertical: Self.thePoolVertical = newValue
+      @unknown default: break
       }
     }
   }
@@ -98,20 +98,20 @@ public class CtlCandidateTDK: CtlCandidate {
     guard let delegate = delegate else { return }
 
     switch currentLayout {
-      case .horizontal:
-        Self.thePoolHorizontal = .init(
-          candidates: delegate.candidatePairs(conv: true).map(\.1), rowCapacity: 6,
-          rows: maxLinesPerPage, selectionKeys: delegate.selectionKeys, locale: locale
-        )
-        Self.thePoolHorizontal.highlight(at: 0)
-      case .vertical:
-        Self.thePoolVertical = .init(
-          candidates: delegate.candidatePairs(conv: true).map(\.1), columnCapacity: 6,
-          columns: maxLinesPerPage, selectionKeys: delegate.selectionKeys, locale: locale
-        )
-        Self.thePoolVertical.highlight(at: 0)
-      @unknown default:
-        return
+    case .horizontal:
+      Self.thePoolHorizontal = .init(
+        candidates: delegate.candidatePairs(conv: true).map(\.1), rowCapacity: 6,
+        rows: maxLinesPerPage, selectionKeys: delegate.selectionKeys, locale: locale
+      )
+      Self.thePoolHorizontal.highlight(at: 0)
+    case .vertical:
+      Self.thePoolVertical = .init(
+        candidates: delegate.candidatePairs(conv: true).map(\.1), columnCapacity: 6,
+        columns: maxLinesPerPage, selectionKeys: delegate.selectionKeys, locale: locale
+      )
+      Self.thePoolVertical.highlight(at: 0)
+    @unknown default:
+      return
     }
     updateDisplay()
   }
@@ -120,30 +120,30 @@ public class CtlCandidateTDK: CtlCandidate {
     guard let window = window else { return }
     reverseLookupResult = delegate?.reverseLookup(for: currentSelectedCandidateText) ?? []
     switch currentLayout {
-      case .horizontal:
-        DispatchQueue.main.async { [self] in
-          if #available(macOS 12, *) {
-            Self.currentView = NSHostingView(rootView: theViewHorizontal)
-          } else {
-            Self.currentView = NSHostingView(rootView: theViewHorizontalBackports)
-          }
-          let newSize = Self.currentView.fittingSize
-          window.contentView = Self.currentView
-          window.setContentSize(newSize)
+    case .horizontal:
+      DispatchQueue.main.async { [self] in
+        if #available(macOS 12, *) {
+          Self.currentView = NSHostingView(rootView: theViewHorizontal)
+        } else {
+          Self.currentView = NSHostingView(rootView: theViewHorizontalBackports)
         }
-      case .vertical:
-        DispatchQueue.main.async { [self] in
-          if #available(macOS 12, *) {
-            Self.currentView = NSHostingView(rootView: theViewVertical)
-          } else {
-            Self.currentView = NSHostingView(rootView: theViewVerticalBackports)
-          }
-          let newSize = Self.currentView.fittingSize
-          window.contentView = Self.currentView
-          window.setContentSize(newSize)
+        let newSize = Self.currentView.fittingSize
+        window.contentView = Self.currentView
+        window.setContentSize(newSize)
+      }
+    case .vertical:
+      DispatchQueue.main.async { [self] in
+        if #available(macOS 12, *) {
+          Self.currentView = NSHostingView(rootView: theViewVertical)
+        } else {
+          Self.currentView = NSHostingView(rootView: theViewVerticalBackports)
         }
-      @unknown default:
-        return
+        let newSize = Self.currentView.fittingSize
+        window.contentView = Self.currentView
+        window.setContentSize(newSize)
+      }
+    @unknown default:
+      return
     }
   }
 
@@ -160,7 +160,7 @@ public class CtlCandidateTDK: CtlCandidate {
       return highlightNextCandidate()
     }
     if count <= 0 { return false }
-    for _ in 0..<min(thePool.maxLinesPerPage, count) {
+    for _ in 0 ..< min(thePool.maxLinesPerPage, count) {
       thePool.selectNewNeighborLine(isForward: true)
     }
     updateDisplay()
@@ -180,7 +180,7 @@ public class CtlCandidateTDK: CtlCandidate {
       return highlightPreviousCandidate()
     }
     if count <= 0 { return false }
-    for _ in 0..<min(thePool.maxLinesPerPage, count) {
+    for _ in 0 ..< min(thePool.maxLinesPerPage, count) {
       thePool.selectNewNeighborLine(isForward: false)
     }
     updateDisplay()
@@ -211,7 +211,7 @@ public class CtlCandidateTDK: CtlCandidate {
 
   override public func candidateIndexAtKeyLabelIndex(_ id: Int) -> Int {
     let arrCurrentLine = thePool.candidateLines[thePool.currentLineNumber]
-    if !(0..<arrCurrentLine.count).contains(id) { return -114_514 }
+    if !(0 ..< arrCurrentLine.count).contains(id) { return -114_514 }
     let actualID = max(0, min(id, arrCurrentLine.count - 1))
     return arrCurrentLine[actualID].index
   }
@@ -241,15 +241,15 @@ extension CtlCandidateTDK {
 }
 
 @available(macOS 10.15, *)
-extension CtlCandidateTDK {
-  public var highlightedColorUIBackports: some View {
+public extension CtlCandidateTDK {
+  var highlightedColorUIBackports: some View {
     // 設定當前高亮候選字的背景顏色。
     let result: Color = {
       switch locale {
-        case "zh-Hans": return Color.red
-        case "zh-Hant": return Color.blue
-        case "ja": return Color.pink
-        default: return Color.accentColor
+      case "zh-Hans": return Color.red
+      case "zh-Hant": return Color.blue
+      case "ja": return Color.pink
+      default: return Color.accentColor
       }
     }()
     return result.opacity(0.85)

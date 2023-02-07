@@ -8,13 +8,13 @@
 
 import Foundation
 
-extension Tekkon {
+public extension Tekkon {
   // MARK: - Phonabet to Hanyu-Pinyin Conversion Processing
 
   /// 注音轉拼音，要求陰平必須是空格。
   /// - Parameters:
   ///   - targetJoined: 傳入的 String 對象物件。
-  public static func cnvPhonaToHanyuPinyin(targetJoined: String) -> String {
+  static func cnvPhonaToHanyuPinyin(targetJoined: String) -> String {
     var targetConverted = targetJoined
     for pair in arrPhonaToHanyuPinyin {
       targetConverted = targetConverted.replacingOccurrences(of: pair[0], with: pair[1])
@@ -25,7 +25,7 @@ extension Tekkon {
   /// 漢語拼音數字標調式轉漢語拼音教科書格式，要求陰平必須是數字 1。
   /// - Parameters:
   ///   - target: 傳入的 String 對象物件。
-  public static func cnvHanyuPinyinToTextbookStyle(targetJoined: String) -> String {
+  static func cnvHanyuPinyinToTextbookStyle(targetJoined: String) -> String {
     var targetConverted = targetJoined
     for pair in arrHanyuPinyinTextbookStyleConversionTable {
       targetConverted = targetConverted.replacingOccurrences(of: pair[0], with: pair[1])
@@ -37,7 +37,7 @@ extension Tekkon {
   /// - Parameters:
   ///   - target: 要拿來做轉換處理的讀音。
   /// - Returns: 經過轉換處理的讀音。
-  public static func cnvPhonaToTextbookReading(target: String) -> String {
+  static func cnvPhonaToTextbookReading(target: String) -> String {
     var newString = target
     if String(target.reversed()[0]) == "˙" {
       newString = String(target.dropLast())
@@ -50,7 +50,7 @@ extension Tekkon {
   /// - Parameters:
   ///   - target: 要拿來做轉換處理的讀音。
   /// - Returns: 經過轉換處理的讀音。
-  public static func restoreToneOneInPhona(
+  static func restoreToneOneInPhona(
     target: String
   ) -> String {
     var newNeta = target
@@ -63,7 +63,7 @@ extension Tekkon {
   ///   - targetJoined: 要轉換的漢語拼音內容，要求必須帶有 12345 數字標調。
   ///   - newToneOne: 對陰平指定新的標記。預設情況下該標記為空字串。
   /// - Returns: 轉換結果。
-  public static func cnvHanyuPinyinToPhona(targetJoined: String, newToneOne: String = "") -> String {
+  static func cnvHanyuPinyinToPhona(targetJoined: String, newToneOne: String = "") -> String {
     /// 如果當前內容有任何除了半形英數內容以外的內容的話，就直接放棄轉換。
     if targetJoined.contains("_") || !targetJoined.isNotPureAlphanumerical { return targetJoined }
     var result = targetJoined
@@ -80,8 +80,8 @@ extension Tekkon {
 }
 
 /// 檢測字串是否包含半形英數內容
-extension String {
-  fileprivate var isNotPureAlphanumerical: Bool {
+private extension String {
+  var isNotPureAlphanumerical: Bool {
     let regex = ".*[^A-Za-z0-9].*"
     let testString = NSPredicate(format: "SELF MATCHES %@", regex)
     return testString.evaluate(with: self)

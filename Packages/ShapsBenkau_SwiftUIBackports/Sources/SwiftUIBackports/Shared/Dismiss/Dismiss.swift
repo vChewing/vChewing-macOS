@@ -5,7 +5,7 @@
 import SwiftUI
 
 @available(macOS 10.15, *)
-extension EnvironmentValues {
+public extension EnvironmentValues {
   /// An action that dismisses the current presentation.
   ///
   /// Use this environment value to get the ``Backport.DismissAction`` instance
@@ -73,7 +73,7 @@ extension EnvironmentValues {
   /// The dismiss action has no effect on a view that isn't currently
   /// presented. If you need to query whether SwiftUI is currently presenting
   /// a view, read the ``EnvironmentValues/backportIsPresented`` environment value.
-  public var backportDismiss: Backport<Any>.DismissAction {
+  var backportDismiss: Backport<Any>.DismissAction {
     .init(presentation: presentationMode)
   }
 
@@ -104,7 +104,7 @@ extension EnvironmentValues {
   ///
   /// To dismiss the currently presented view, use
   /// ``EnvironmentValues/backportDismiss``.
-  public var backportIsPresented: Bool {
+  var backportIsPresented: Bool {
     presentationMode.wrappedValue.isPresented
   }
 }

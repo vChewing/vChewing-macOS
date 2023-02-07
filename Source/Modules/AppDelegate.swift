@@ -41,12 +41,12 @@ extension AppDelegate {
 
 // MARK: - Public Functions
 
-extension AppDelegate {
-  public func userNotificationCenter(_: NSUserNotificationCenter, shouldPresent _: NSUserNotification) -> Bool {
+public extension AppDelegate {
+  func userNotificationCenter(_: NSUserNotificationCenter, shouldPresent _: NSUserNotification) -> Bool {
     true
   }
 
-  public func applicationDidFinishLaunching(_: Notification) {
+  func applicationDidFinishLaunching(_: Notification) {
     NSUserNotificationCenter.default.delegate = self
     // 一旦發現與使用者半衰模組的觀察行為有關的崩潰標記被開啟，就清空既有的半衰記憶資料檔案。
     if PrefMgr.shared.failureFlagForUOMObservation {
@@ -81,7 +81,7 @@ extension AppDelegate {
     }
   }
 
-  public func updateDirectoryMonitorPath() {
+  func updateDirectoryMonitorPath() {
     folderMonitor.stopMonitoring()
     folderMonitor = FolderMonitor(
       url: URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
@@ -89,13 +89,13 @@ extension AppDelegate {
     folderMonitor.folderDidChange = { [weak self] in
       self?.reloadOnFolderChangeHappens()
     }
-    if LMMgr.userDataFolderExists {  // 沒有資料夾的話，FolderMonitor 會崩潰。
+    if LMMgr.userDataFolderExists { // 沒有資料夾的話，FolderMonitor 會崩潰。
       folderMonitor.startMonitoring()
       reloadOnFolderChangeHappens(forced: true)
     }
   }
 
-  public func selfUninstall() {
+  func selfUninstall() {
     let content = String(
       format: NSLocalizedString(
         "This will remove vChewing Input Method from this user account, requiring your confirmation.",
@@ -125,29 +125,29 @@ extension AppDelegate {
 
   /// 檢查該程式本身的記憶體佔用量。
   /// - Returns: 記憶體佔用量（MiB）。
-  @discardableResult public func checkMemoryUsage() -> Double {
+  @discardableResult func checkMemoryUsage() -> Double {
     guard let currentMemorySizeInBytes = NSApplication.memoryFootprint else { return 0 }
     let currentMemorySize: Double = (Double(currentMemorySizeInBytes) / 1024 / 1024).rounded(toPlaces: 1)
     switch currentMemorySize {
-      case 512...:
-        vCLog("WARNING: EXCESSIVE MEMORY FOOTPRINT (\(currentMemorySize)MB).")
-        let userNotification = NSUserNotification()
-        userNotification.title = NSLocalizedString("vChewing", comment: "")
-        userNotification.informativeText = NSLocalizedString(
-          "vChewing is rebooted due to a memory-excessive-usage problem. If convenient, please inform the developer that you are having this issue, stating whether you are using an Intel Mac or Apple Silicon Mac. An NSLog is generated with the current memory footprint size.",
-          comment: ""
-        )
-        NSUserNotificationCenter.default.deliver(userNotification)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-          NSApp.terminate(self)
-        }
-      default: break
+    case 512...:
+      vCLog("WARNING: EXCESSIVE MEMORY FOOTPRINT (\(currentMemorySize)MB).")
+      let userNotification = NSUserNotification()
+      userNotification.title = NSLocalizedString("vChewing", comment: "")
+      userNotification.informativeText = NSLocalizedString(
+        "vChewing is rebooted due to a memory-excessive-usage problem. If convenient, please inform the developer that you are having this issue, stating whether you are using an Intel Mac or Apple Silicon Mac. An NSLog is generated with the current memory footprint size.",
+        comment: ""
+      )
+      NSUserNotificationCenter.default.deliver(userNotification)
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        NSApp.terminate(self)
+      }
+    default: break
     }
     return currentMemorySize
   }
 
   // New About Window
-  @IBAction public func about(_: Any) {
+  @IBAction func about(_: Any) {
     CtlAboutWindow.show()
     NSApp.activate(ignoringOtherApps: true)
   }

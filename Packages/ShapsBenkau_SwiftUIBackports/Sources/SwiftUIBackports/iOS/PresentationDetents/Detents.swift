@@ -178,10 +178,10 @@ extension Backport where Wrapped == Any {
     @available(macOS 10.15, *)
     public static func < (lhs: PresentationDetent, rhs: PresentationDetent) -> Bool {
       switch (lhs, rhs) {
-        case (.large, .medium):
-          return false
-        default:
-          return true
+      case (.large, .medium):
+        return false
+      default:
+        return true
       }
     }
   }
@@ -189,8 +189,8 @@ extension Backport where Wrapped == Any {
 
 #if os(iOS)
   @available(iOS 15, *)
-  extension Backport where Wrapped == Any {
-    fileprivate struct Representable: UIViewControllerRepresentable {
+  fileprivate extension Backport where Wrapped == Any {
+    struct Representable: UIViewControllerRepresentable {
       let detents: Set<Backport<Any>.PresentationDetent>
       let selection: Binding<Backport<Any>.PresentationDetent>?
       let largestUndimmed: Backport<Any>.PresentationDetent?
@@ -207,8 +207,8 @@ extension Backport where Wrapped == Any {
 
   @available(macOS 10.15, *)
   @available(iOS 15, *)
-  extension Backport.Representable {
-    fileprivate final class Controller: UIViewController, UISheetPresentationControllerDelegate {
+  fileprivate extension Backport.Representable {
+    final class Controller: UIViewController, UISheetPresentationControllerDelegate {
       var detents: Set<Backport<Any>.PresentationDetent>
       var selection: Binding<Backport<Any>.PresentationDetent>?
       var largestUndimmed: Backport<Any>.PresentationDetent?
@@ -256,10 +256,10 @@ extension Backport where Wrapped == Any {
           controller.animateChanges {
             controller.detents = detents.sorted().map {
               switch $0 {
-                case .medium:
-                  return .medium()
-                default:
-                  return .large()
+              case .medium:
+                return .medium()
+              default:
+                return .large()
               }
             }
 

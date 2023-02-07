@@ -42,8 +42,8 @@ extension Backport where Wrapped == Any {
 }
 
 @available(macOS 10.15, *)
-extension BackportProgressViewStyle where Self == Backport<Any>.CircularProgressViewStyle {
-  public static var circular: Self { .init() }
+public extension BackportProgressViewStyle where Self == Backport<Any>.CircularProgressViewStyle {
+  static var circular: Self { .init() }
 }
 
 #if os(macOS)

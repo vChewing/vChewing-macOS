@@ -7,8 +7,8 @@ import SwiftUI
 
 // MARK: Model
 
-extension NSWindow {
-  public struct Position {
+public extension NSWindow {
+  struct Position {
     public static let defaultPadding: CGFloat = 16
 
     public var vertical: Vertical
@@ -17,28 +17,28 @@ extension NSWindow {
   }
 }
 
-extension NSWindow.Position {
-  public enum Horizontal {
+public extension NSWindow.Position {
+  enum Horizontal {
     case left, center, right
   }
 
-  public enum Vertical {
+  enum Vertical {
     case top, center, bottom
   }
 }
 
 // MARK: Logic
 
-extension NSWindow.Position {
-  public func value(forWindow windowRect: CGRect, inScreen screenRect: CGRect) -> CGPoint {
+public extension NSWindow.Position {
+  func value(forWindow windowRect: CGRect, inScreen screenRect: CGRect) -> CGPoint {
     let xPosition = horizontal.valueFor(
-      screenRange: screenRect.minX..<screenRect.maxX,
+      screenRange: screenRect.minX ..< screenRect.maxX,
       width: windowRect.width,
       padding: padding
     )
 
     let yPosition = vertical.valueFor(
-      screenRange: screenRect.minY..<screenRect.maxY,
+      screenRange: screenRect.minY ..< screenRect.maxY,
       height: windowRect.height,
       padding: padding
     )
@@ -47,8 +47,8 @@ extension NSWindow.Position {
   }
 }
 
-extension NSWindow.Position.Horizontal {
-  public func valueFor(
+public extension NSWindow.Position.Horizontal {
+  func valueFor(
     screenRange: Range<CGFloat>,
     width: CGFloat,
     padding: CGFloat
@@ -56,15 +56,15 @@ extension NSWindow.Position.Horizontal {
     -> CGFloat
   {
     switch self {
-      case .left: return screenRange.lowerBound + padding
-      case .center: return (screenRange.upperBound + screenRange.lowerBound - width) / 2
-      case .right: return screenRange.upperBound - width - padding
+    case .left: return screenRange.lowerBound + padding
+    case .center: return (screenRange.upperBound + screenRange.lowerBound - width) / 2
+    case .right: return screenRange.upperBound - width - padding
     }
   }
 }
 
-extension NSWindow.Position.Vertical {
-  public func valueFor(
+public extension NSWindow.Position.Vertical {
+  func valueFor(
     screenRange: Range<CGFloat>,
     height: CGFloat,
     padding: CGFloat
@@ -72,23 +72,23 @@ extension NSWindow.Position.Vertical {
     -> CGFloat
   {
     switch self {
-      case .top: return screenRange.upperBound - height - padding
-      case .center: return (screenRange.upperBound + screenRange.lowerBound - height) / 2
-      case .bottom: return screenRange.lowerBound + padding
+    case .top: return screenRange.upperBound - height - padding
+    case .center: return (screenRange.upperBound + screenRange.lowerBound - height) / 2
+    case .bottom: return screenRange.lowerBound + padding
     }
   }
 }
 
 // MARK: - AppKit extension
 
-extension NSWindow {
-  public func setPosition(_ position: Position, in screen: NSScreen?) {
+public extension NSWindow {
+  func setPosition(_ position: Position, in screen: NSScreen?) {
     guard let visibleFrame = (screen ?? self.screen)?.visibleFrame else { return }
     let origin = position.value(forWindow: frame, inScreen: visibleFrame)
     setFrameOrigin(origin)
   }
 
-  public func setPosition(
+  func setPosition(
     vertical: Position.Vertical,
     horizontal: Position.Horizontal,
     padding: CGFloat = Position.defaultPadding,
@@ -136,8 +136,8 @@ extension NSWindow {
   }
 
   @available(macOS 10.15, *)
-  extension View {
-    public func hostingWindowPosition(
+  public extension View {
+    func hostingWindowPosition(
       vertical: NSWindow.Position.Vertical,
       horizontal: NSWindow.Position.Horizontal,
       padding: CGFloat = NSWindow.Position.defaultPadding,

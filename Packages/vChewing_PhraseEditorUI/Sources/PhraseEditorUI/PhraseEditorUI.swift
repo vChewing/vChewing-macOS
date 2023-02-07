@@ -92,34 +92,34 @@ public struct VwrPhraseEditorUI: View {
   private func updateLabels() {
     clearAllFields()
     switch selUserDataType {
-      case .thePhrases:
-        lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
-        lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
-        lblAddPhraseTag3 = PETerms.AddPhrases.locWeight.localized.0
-        lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
-      case .theFilter:
-        lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
-        lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
-        lblAddPhraseTag3 = ""
-        lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
-      case .theReplacements:
-        lblAddPhraseTag1 = PETerms.AddPhrases.locReplaceTo.localized.0
-        lblAddPhraseTag2 = PETerms.AddPhrases.locReplaceTo.localized.1
-        lblAddPhraseTag3 = ""
-        lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
-      case .theAssociates:
-        lblAddPhraseTag1 = PETerms.AddPhrases.locInitial.localized.0
-        lblAddPhraseTag2 = {
-          let result = PETerms.AddPhrases.locPhrase.localized.0
-          return (result == "Phrase") ? "Phrases" : result
-        }()
-        lblAddPhraseTag3 = ""
-        lblAddPhraseTag4 = ""
-      case .theSymbols:
-        lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
-        lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
-        lblAddPhraseTag3 = ""
-        lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
+    case .thePhrases:
+      lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
+      lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
+      lblAddPhraseTag3 = PETerms.AddPhrases.locWeight.localized.0
+      lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
+    case .theFilter:
+      lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
+      lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
+      lblAddPhraseTag3 = ""
+      lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
+    case .theReplacements:
+      lblAddPhraseTag1 = PETerms.AddPhrases.locReplaceTo.localized.0
+      lblAddPhraseTag2 = PETerms.AddPhrases.locReplaceTo.localized.1
+      lblAddPhraseTag3 = ""
+      lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
+    case .theAssociates:
+      lblAddPhraseTag1 = PETerms.AddPhrases.locInitial.localized.0
+      lblAddPhraseTag2 = {
+        let result = PETerms.AddPhrases.locPhrase.localized.0
+        return (result == "Phrase") ? "Phrases" : result
+      }()
+      lblAddPhraseTag3 = ""
+      lblAddPhraseTag4 = ""
+    case .theSymbols:
+      lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
+      lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
+      lblAddPhraseTag3 = ""
+      lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
     }
   }
 
@@ -140,9 +140,9 @@ public struct VwrPhraseEditorUI: View {
     }
     if !txtAddPhraseField4.isEmpty { arrResult.append("#" + txtAddPhraseField4) }
     if let delegate = delegate,
-      delegate.checkIfUserPhraseExist(
-        userPhrase: txtAddPhraseField1, mode: selInputMode, key: txtAddPhraseField2
-      )
+       delegate.checkIfUserPhraseExist(
+         userPhrase: txtAddPhraseField1, mode: selInputMode, key: txtAddPhraseField2
+       )
     {
       arrResult.append(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎")
     }
@@ -178,7 +178,7 @@ public struct VwrPhraseEditorUI: View {
     guard let delegate = delegate, selInputMode != .imeModeNULL else { return }
     DispatchQueue.main.async {
       isLoading = true
-      delegate.consolidate(text: &txtContent, pragma: false)  // 強制整理
+      delegate.consolidate(text: &txtContent, pragma: false) // 強制整理
       if selUserDataType == .thePhrases {
         delegate.tagOverrides(in: &txtContent, mode: selInputMode)
       }
@@ -198,21 +198,21 @@ public struct VwrPhraseEditorUI: View {
       HStack {
         Picker("", selection: $selInputMode.onChange { dropDownMenuDidChange() }) {
           switch currentIMEInputMode {
-            case .imeModeCHS:
+          case .imeModeCHS:
+            Text(Shared.InputMode.imeModeCHS.localizedDescription).tag(Shared.InputMode.imeModeCHS)
+            Text(Shared.InputMode.imeModeCHT.localizedDescription).tag(Shared.InputMode.imeModeCHT)
+          case .imeModeCHT:
+            Text(Shared.InputMode.imeModeCHT.localizedDescription).tag(Shared.InputMode.imeModeCHT)
+            Text(Shared.InputMode.imeModeCHS.localizedDescription).tag(Shared.InputMode.imeModeCHS)
+          case .imeModeNULL:
+            Text(Shared.InputMode.imeModeNULL.localizedDescription).tag(Shared.InputMode.imeModeNULL)
+            if loc.contains("Hans") {
               Text(Shared.InputMode.imeModeCHS.localizedDescription).tag(Shared.InputMode.imeModeCHS)
               Text(Shared.InputMode.imeModeCHT.localizedDescription).tag(Shared.InputMode.imeModeCHT)
-            case .imeModeCHT:
+            } else {
               Text(Shared.InputMode.imeModeCHT.localizedDescription).tag(Shared.InputMode.imeModeCHT)
               Text(Shared.InputMode.imeModeCHS.localizedDescription).tag(Shared.InputMode.imeModeCHS)
-            case .imeModeNULL:
-              Text(Shared.InputMode.imeModeNULL.localizedDescription).tag(Shared.InputMode.imeModeNULL)
-              if loc.contains("Hans") {
-                Text(Shared.InputMode.imeModeCHS.localizedDescription).tag(Shared.InputMode.imeModeCHS)
-                Text(Shared.InputMode.imeModeCHT.localizedDescription).tag(Shared.InputMode.imeModeCHT)
-              } else {
-                Text(Shared.InputMode.imeModeCHT.localizedDescription).tag(Shared.InputMode.imeModeCHT)
-                Text(Shared.InputMode.imeModeCHS.localizedDescription).tag(Shared.InputMode.imeModeCHS)
-              }
+            }
           }
         }
         .labelsHidden()
@@ -326,8 +326,8 @@ struct ContentView_Previews: PreviewProvider {
   }
 }
 
-extension vChewingLM.ReplacableUserDataType {
-  public var localizedDescription: String { NSLocalizedString(rawValue, comment: "") }
+public extension vChewingLM.ReplacableUserDataType {
+  var localizedDescription: String { NSLocalizedString(rawValue, comment: "") }
 }
 
 public enum PETerms {
@@ -359,15 +359,15 @@ public enum PETerms {
     public static func sampleDictionaryContent(for type: vChewingLM.ReplacableUserDataType) -> String {
       var result = ""
       switch type {
-        case .thePhrases:
-          result =
-            "Example:\nCandidate Reading-Reading Weight #Comment\nCandidate Reading-Reading #Comment".localized + "\n\n"
+      case .thePhrases:
+        result =
+          "Example:\nCandidate Reading-Reading Weight #Comment\nCandidate Reading-Reading #Comment".localized + "\n\n"
             + weightInputBox.localized
-        case .theFilter: result = "Example:\nCandidate Reading-Reading #Comment".localized
-        case .theReplacements: result = "Example:\nOldPhrase NewPhrase #Comment".localized
-        case .theAssociates:
-          result = "Example:\nInitial RestPhrase\nInitial RestPhrase1 RestPhrase2 RestPhrase3...".localized
-        case .theSymbols: result = "Example:\nCandidate Reading-Reading #Comment".localized
+      case .theFilter: result = "Example:\nCandidate Reading-Reading #Comment".localized
+      case .theReplacements: result = "Example:\nOldPhrase NewPhrase #Comment".localized
+      case .theAssociates:
+        result = "Example:\nInitial RestPhrase\nInitial RestPhrase1 RestPhrase2 RestPhrase3...".localized
+      case .theSymbols: result = "Example:\nCandidate Reading-Reading #Comment".localized
       }
       return result
     }

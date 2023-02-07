@@ -179,21 +179,21 @@ public enum KeyboardParser: Int, CaseIterable {
   public var localizedMenuName: String {
     let rawString: String = {
       switch self {
-        case .ofStandard: return "Dachen (Microsoft Standard / Wang / 01, etc.)"
-        case .ofETen: return "Eten Traditional"
-        case .ofIBM: return "IBM"
-        case .ofMiTAC: return "MiTAC"
-        case .ofSeigyou: return "Seigyou"
-        case .ofFakeSeigyou: return "Fake Seigyou"
-        case .ofDachen26: return "Dachen 26 (libChewing)"
-        case .ofETen26: return "Eten 26"
-        case .ofHsu: return "Hsu"
-        case .ofStarlight: return "Starlight"
-        case .ofHanyuPinyin: return "Hanyu Pinyin with Numeral Intonation"
-        case .ofSecondaryPinyin: return "Secondary Pinyin with Numeral Intonation"
-        case .ofYalePinyin: return "Yale Pinyin with Numeral Intonation"
-        case .ofHualuoPinyin: return "Hualuo Pinyin with Numeral Intonation"
-        case .ofUniversalPinyin: return "Universal Pinyin with Numeral Intonation"
+      case .ofStandard: return "Dachen (Microsoft Standard / Wang / 01, etc.)"
+      case .ofETen: return "Eten Traditional"
+      case .ofIBM: return "IBM"
+      case .ofMiTAC: return "MiTAC"
+      case .ofSeigyou: return "Seigyou"
+      case .ofFakeSeigyou: return "Fake Seigyou"
+      case .ofDachen26: return "Dachen 26 (libChewing)"
+      case .ofETen26: return "Eten 26"
+      case .ofHsu: return "Hsu"
+      case .ofStarlight: return "Starlight"
+      case .ofHanyuPinyin: return "Hanyu Pinyin with Numeral Intonation"
+      case .ofSecondaryPinyin: return "Secondary Pinyin with Numeral Intonation"
+      case .ofYalePinyin: return "Yale Pinyin with Numeral Intonation"
+      case .ofHualuoPinyin: return "Hualuo Pinyin with Numeral Intonation"
+      case .ofUniversalPinyin: return "Universal Pinyin with Numeral Intonation"
       }
     }()
     return NSLocalizedString(rawString, comment: "")
@@ -201,36 +201,36 @@ public enum KeyboardParser: Int, CaseIterable {
 
   public var name: String {
     switch self {
-      case .ofStandard:
-        return "Standard"
-      case .ofETen:
-        return "ETen"
-      case .ofHsu:
-        return "Hsu"
-      case .ofETen26:
-        return "ETen26"
-      case .ofIBM:
-        return "IBM"
-      case .ofMiTAC:
-        return "MiTAC"
-      case .ofFakeSeigyou:
-        return "FakeSeigyou"
-      case .ofDachen26:
-        return "Dachen26"
-      case .ofSeigyou:
-        return "Seigyou"
-      case .ofStarlight:
-        return "Starlight"
-      case .ofHanyuPinyin:
-        return "HanyuPinyin"
-      case .ofSecondaryPinyin:
-        return "SecondaryPinyin"
-      case .ofYalePinyin:
-        return "YalePinyin"
-      case .ofHualuoPinyin:
-        return "HualuoPinyin"
-      case .ofUniversalPinyin:
-        return "UniversalPinyin"
+    case .ofStandard:
+      return "Standard"
+    case .ofETen:
+      return "ETen"
+    case .ofHsu:
+      return "Hsu"
+    case .ofETen26:
+      return "ETen26"
+    case .ofIBM:
+      return "IBM"
+    case .ofMiTAC:
+      return "MiTAC"
+    case .ofFakeSeigyou:
+      return "FakeSeigyou"
+    case .ofDachen26:
+      return "Dachen26"
+    case .ofSeigyou:
+      return "Seigyou"
+    case .ofStarlight:
+      return "Starlight"
+    case .ofHanyuPinyin:
+      return "HanyuPinyin"
+    case .ofSecondaryPinyin:
+      return "SecondaryPinyin"
+    case .ofYalePinyin:
+      return "YalePinyin"
+    case .ofHualuoPinyin:
+      return "HualuoPinyin"
+    case .ofUniversalPinyin:
+      return "UniversalPinyin"
     }
   }
 }
@@ -249,19 +249,19 @@ public enum CandidateKey {
 
     public var description: String {
       switch self {
-        case .invalidCharacters:
-          return "- "
-            + NSLocalizedString(
-              "Candidate keys can only contain printable ASCII characters like alphanumericals.",
-              comment: ""
-            ) + "\n" + "- " + NSLocalizedString("Candidate keys cannot contain space.", comment: "")
-        case .countMismatch:
-          return "- "
-            + NSLocalizedString(
-              "Minimum 6 candidate keys allowed.", comment: ""
-            ) + "\n" + "- " + NSLocalizedString("Maximum 9 candidate keys allowed.", comment: "")
-        case .noError:
-          return ""
+      case .invalidCharacters:
+        return "- "
+          + NSLocalizedString(
+            "Candidate keys can only contain printable ASCII characters like alphanumericals.",
+            comment: ""
+          ) + "\n" + "- " + NSLocalizedString("Candidate keys cannot contain space.", comment: "")
+      case .countMismatch:
+        return "- "
+          + NSLocalizedString(
+            "Minimum 6 candidate keys allowed.", comment: ""
+          ) + "\n" + "- " + NSLocalizedString("Maximum 9 candidate keys allowed.", comment: "")
+      case .noError:
+        return ""
       }
     }
   }
@@ -287,7 +287,7 @@ public enum CandidateKey {
         }
       }
     }
-    if !(6...9).contains(candidateKeys.count) {
+    if !(6 ... 9).contains(candidateKeys.count) {
       result = CandidateKey.ValidationError.countMismatch
     }
     return result == ValidationError.noError ? nil : result.description
@@ -312,24 +312,24 @@ public enum Shared {
     case imeModeNULL = ""
     public var reversed: Shared.InputMode {
       switch self {
-        case .imeModeCHS:
-          return .imeModeCHT
-        case .imeModeCHT:
-          return .imeModeCHS
-        case .imeModeNULL:
-          return .imeModeNULL
+      case .imeModeCHS:
+        return .imeModeCHT
+      case .imeModeCHT:
+        return .imeModeCHS
+      case .imeModeNULL:
+        return .imeModeNULL
       }
     }
 
     public var localizedDescription: String { NSLocalizedString(description, comment: "") }
     public var description: String {
       switch self {
-        case .imeModeCHS:
-          return "Simplified Chinese"
-        case .imeModeCHT:
-          return "Traditional Chinese"
-        case .imeModeNULL:
-          return "Please select…"
+      case .imeModeCHS:
+        return "Simplified Chinese"
+      case .imeModeCHT:
+        return "Traditional Chinese"
+      case .imeModeNULL:
+        return "Please select…"
       }
     }
   }

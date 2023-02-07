@@ -35,12 +35,12 @@ public enum Uninstaller {
     let kTargetBundle = "/vChewing.app"
     let pathLibrary =
       isSudo
-      ? "/Library"
-      : realHomeDir.appendingPathComponent("Library/").path
+        ? "/Library"
+        : realHomeDir.appendingPathComponent("Library/").path
     let pathIMELibrary =
       isSudo
-      ? "/Library/Input Methods"
-      : realHomeDir.appendingPathComponent("Library/Input Methods/").path
+        ? "/Library/Input Methods"
+        : realHomeDir.appendingPathComponent("Library/Input Methods/").path
     let pathUnitKeyboardLayouts = "/Keyboard Layouts"
     let arrKeyLayoutFiles = [
       "/vChewing ETen.keylayout", "/vChewingKeyLayout.bundle", "/vChewing MiTAC.keylayout",
@@ -54,17 +54,17 @@ public enum Uninstaller {
       if !FileManager.trashTargetIfExists(objFullPath) { return -1 }
     }
     if CommandLine.arguments.count > 2, CommandLine.arguments[2] == "--all",
-      CommandLine.arguments[1] == "uninstall"
+       CommandLine.arguments[1] == "uninstall"
     {
       // 再處理是否需要移除放在預設使用者資料夾內的檔案的情況。
       // 如果使用者有在輸入法偏好設定內將該目錄改到別的地方（而不是用 symbol link）的話，則不處理。
       // 目前暫時無法應對 symbol link 的情況。
       FileManager.trashTargetIfExists(defaultDataFolderPath)
-      FileManager.trashTargetIfExists(pathLibrary + "/Preferences/" + bundleID + ".plist")  // 之後移除 App 偏好設定
-      FileManager.trashTargetIfExists(pathLibrary + "/Receipts/org.atelierInmu.vChewing.bom")  // pkg 垃圾
-      FileManager.trashTargetIfExists(pathLibrary + "/Receipts/org.atelierInmu.vChewing.plist")  // pkg 垃圾
+      FileManager.trashTargetIfExists(pathLibrary + "/Preferences/" + bundleID + ".plist") // 之後移除 App 偏好設定
+      FileManager.trashTargetIfExists(pathLibrary + "/Receipts/org.atelierInmu.vChewing.bom") // pkg 垃圾
+      FileManager.trashTargetIfExists(pathLibrary + "/Receipts/org.atelierInmu.vChewing.plist") // pkg 垃圾
     }
-    if !FileManager.trashTargetIfExists(pathIMELibrary + kTargetBundle) { return -1 }  // 最後移除 App 自身
+    if !FileManager.trashTargetIfExists(pathIMELibrary + kTargetBundle) { return -1 } // 最後移除 App 自身
     // 幹掉殘留在記憶體內的執行緒。
     if selfKill {
       NSApp.terminate(nil)

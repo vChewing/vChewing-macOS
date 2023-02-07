@@ -1,6 +1,7 @@
-.PHONY: format
+.PHONY: lint format
 
 format:
-	swiftformat ./ --swiftversion 5.5
-	@git ls-files --exclude-standard | grep -E '\.swift$$' | xargs swift-format format --in-place --configuration ./.clang-format-swift.json --parallel
-	@git ls-files --exclude-standard | grep -E '\.swift$$' | xargs swift-format lint --configuration ./.clang-format-swift.json --parallel
+	@swiftformat --swiftversion 5.5 --indent 2 ./
+
+lint:
+	@git ls-files --exclude-standard | grep -E '\.swift$$' | swiftlint --fix --autocorrect

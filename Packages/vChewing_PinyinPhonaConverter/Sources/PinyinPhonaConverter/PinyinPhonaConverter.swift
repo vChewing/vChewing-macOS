@@ -8,8 +8,8 @@
 
 import Cocoa
 
-extension String {
-  public mutating func convertToPhonabets(newToneOne: String = "") {
+public extension String {
+  mutating func convertToPhonabets(newToneOne: String = "") {
     if isEmpty || contains("_") || !isNotPureAlphanumerical { return }
     for key in arrHanyuPinyinToPhonabets {
       self = replacingOccurrences(of: key.0, with: key.1)
@@ -19,8 +19,8 @@ extension String {
 }
 
 /// 檢測字串是否包含半形英數內容
-extension String {
-  fileprivate var isNotPureAlphanumerical: Bool {
+private extension String {
+  var isNotPureAlphanumerical: Bool {
     let regex = ".*[^A-Za-z0-9].*"
     let testString = NSPredicate(format: "SELF MATCHES %@", regex)
     return testString.evaluate(with: self)

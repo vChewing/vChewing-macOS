@@ -81,9 +81,9 @@ public class InputHandler: InputHandlerProtocol {
   /// 半衰模組的衰減指數
   let kEpsilon: Double = 0.000_001
 
-  public var calligrapher = ""  // 磁帶專用組筆區
-  public var composer: Tekkon.Composer = .init()  // 注拼槽
-  public var compositor: Megrez.Compositor  // 組字器
+  public var calligrapher = "" // 磁帶專用組筆區
+  public var composer: Tekkon.Composer = .init() // 注拼槽
+  public var compositor: Megrez.Compositor // 組字器
   public var currentUOM: vChewingLM.LMUserOverride
   public var currentLM: vChewingLM.LMInstantiator {
     didSet {
@@ -117,7 +117,7 @@ public class InputHandler: InputHandlerProtocol {
   /// 獲取當前標記得範圍。這個函式只能是函式、而非只讀變數。
   /// - Returns: 當前標記範圍。
   func currentMarkedRange() -> Range<Int> {
-    min(compositor.cursor, compositor.marker)..<max(compositor.cursor, compositor.marker)
+    min(compositor.cursor, compositor.marker) ..< max(compositor.cursor, compositor.marker)
   }
 
   /// 檢測是否出現游標切斷組字區內字符的情況
@@ -206,26 +206,26 @@ public class InputHandler: InputHandlerProtocol {
     let cursorBackup = compositor.cursor
     while compositor.cursor > rearBoundary { compositor.jumpCursorBySpan(to: .rear) }
     rearBoundary = min(compositor.cursor, rearBoundary)
-    compositor.cursor = cursorBackup  // 游標歸位，再接著計算。
+    compositor.cursor = cursorBackup // 游標歸位，再接著計算。
     while compositor.cursor < frontBoundary { compositor.jumpCursorBySpan(to: .front) }
     frontBoundary = min(max(compositor.cursor, frontBoundary), compositor.length)
-    compositor.cursor = cursorBackup  // 計算結束，游標歸位。
+    compositor.cursor = cursorBackup // 計算結束，游標歸位。
 
     debugIntelToPrint.append("FIN: \(rearBoundary)..<\(frontBoundary)")
     vCLog(debugIntelToPrint)
 
     // 接下來獲取這個範圍內的媽的都不知道該怎麼講了。
-    var nodeIndices = [Int]()  // 僅作統計用。
+    var nodeIndices = [Int]() // 僅作統計用。
 
-    var position = rearBoundary  // 臨時統計用
+    var position = rearBoundary // 臨時統計用
     while position < frontBoundary {
       guard let regionIndex = compositor.walkedNodes.cursorRegionMap[position] else {
         position += 1
         continue
       }
       if !nodeIndices.contains(regionIndex) {
-        nodeIndices.append(regionIndex)  // 新增統計
-        guard compositor.walkedNodes.count > regionIndex else { break }  // 防呆
+        nodeIndices.append(regionIndex) // 新增統計
+        guard compositor.walkedNodes.count > regionIndex else { break } // 防呆
         let currentNode = compositor.walkedNodes[regionIndex]
         guard currentNode.keyArray.count == currentNode.value.count else {
           compositor.overrideCandidate(currentNode.currentPair, at: position)
@@ -234,7 +234,7 @@ public class InputHandler: InputHandlerProtocol {
         }
         let values = currentNode.currentPair.value.charComponents
         for (subPosition, key) in currentNode.keyArray.enumerated() {
-          guard values.count > subPosition else { break }  // 防呆，應該沒有發生的可能性
+          guard values.count > subPosition else { break } // 防呆，應該沒有發生的可能性
           let thePair = Megrez.Compositor.KeyValuePaired(
             keyArray: [key], value: values[subPosition]
           )
@@ -305,8 +305,8 @@ public class InputHandler: InputHandlerProtocol {
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
     var arrCandidates: [Megrez.Compositor.KeyValuePaired] = {
       switch prefs.useRearCursorMode {
-        case false: return compositor.fetchCandidates(at: cursorForCandidate, filter: .endAt)
-        case true: return compositor.fetchCandidates(at: cursorForCandidate, filter: .beginAt)
+      case false: return compositor.fetchCandidates(at: cursorForCandidate, filter: .endAt)
+      case true: return compositor.fetchCandidates(at: cursorForCandidate, filter: .beginAt)
       }
     }()
 
@@ -375,21 +375,21 @@ public class InputHandler: InputHandlerProtocol {
   /// 給注拼槽指定注音排列或拼音輸入種類之後，將注拼槽內容清空。
   public func ensureKeyboardParser() {
     switch currentKeyboardParserType {
-      case KeyboardParser.ofStandard: composer.ensureParser(arrange: .ofDachen)
-      case KeyboardParser.ofDachen26: composer.ensureParser(arrange: .ofDachen26)
-      case KeyboardParser.ofETen: composer.ensureParser(arrange: .ofETen)
-      case KeyboardParser.ofHsu: composer.ensureParser(arrange: .ofHsu)
-      case KeyboardParser.ofETen26: composer.ensureParser(arrange: .ofETen26)
-      case KeyboardParser.ofIBM: composer.ensureParser(arrange: .ofIBM)
-      case KeyboardParser.ofMiTAC: composer.ensureParser(arrange: .ofMiTAC)
-      case KeyboardParser.ofFakeSeigyou: composer.ensureParser(arrange: .ofFakeSeigyou)
-      case KeyboardParser.ofSeigyou: composer.ensureParser(arrange: .ofSeigyou)
-      case KeyboardParser.ofStarlight: composer.ensureParser(arrange: .ofStarlight)
-      case KeyboardParser.ofHanyuPinyin: composer.ensureParser(arrange: .ofHanyuPinyin)
-      case KeyboardParser.ofSecondaryPinyin: composer.ensureParser(arrange: .ofSecondaryPinyin)
-      case KeyboardParser.ofYalePinyin: composer.ensureParser(arrange: .ofYalePinyin)
-      case KeyboardParser.ofHualuoPinyin: composer.ensureParser(arrange: .ofHualuoPinyin)
-      case KeyboardParser.ofUniversalPinyin: composer.ensureParser(arrange: .ofUniversalPinyin)
+    case KeyboardParser.ofStandard: composer.ensureParser(arrange: .ofDachen)
+    case KeyboardParser.ofDachen26: composer.ensureParser(arrange: .ofDachen26)
+    case KeyboardParser.ofETen: composer.ensureParser(arrange: .ofETen)
+    case KeyboardParser.ofHsu: composer.ensureParser(arrange: .ofHsu)
+    case KeyboardParser.ofETen26: composer.ensureParser(arrange: .ofETen26)
+    case KeyboardParser.ofIBM: composer.ensureParser(arrange: .ofIBM)
+    case KeyboardParser.ofMiTAC: composer.ensureParser(arrange: .ofMiTAC)
+    case KeyboardParser.ofFakeSeigyou: composer.ensureParser(arrange: .ofFakeSeigyou)
+    case KeyboardParser.ofSeigyou: composer.ensureParser(arrange: .ofSeigyou)
+    case KeyboardParser.ofStarlight: composer.ensureParser(arrange: .ofStarlight)
+    case KeyboardParser.ofHanyuPinyin: composer.ensureParser(arrange: .ofHanyuPinyin)
+    case KeyboardParser.ofSecondaryPinyin: composer.ensureParser(arrange: .ofSecondaryPinyin)
+    case KeyboardParser.ofYalePinyin: composer.ensureParser(arrange: .ofYalePinyin)
+    case KeyboardParser.ofHualuoPinyin: composer.ensureParser(arrange: .ofHualuoPinyin)
+    case KeyboardParser.ofUniversalPinyin: composer.ensureParser(arrange: .ofUniversalPinyin)
     }
     composer.clear()
     composer.phonabetCombinationCorrectionEnabled = prefs.autoCorrectReadingCombination
@@ -426,7 +426,7 @@ public class InputHandler: InputHandlerProtocol {
       if !Tekkon.allowedPhonabets.contains(neta) || neta == " " { return nil }
       if Tekkon.allowedIntonations.contains(neta) { hasIntonation = true }
     }
-    if hasIntonation, components.count == 1 { return nil }  // 剔除純聲調之情形
+    if hasIntonation, components.count == 1 { return nil } // 剔除純聲調之情形
     let rawDataSansIntonation = hasIntonation ? components.dropLast(1).joined() : rawData
     return (rawData, rawDataSansIntonation, hasIntonation)
   }
@@ -435,8 +435,8 @@ public class InputHandler: InputHandlerProtocol {
   /// - Parameter input: 傳入的按鍵訊號。
   /// - Returns: 判斷結果：是否為聲調鍵。
   func isIntonationKey(_ input: InputSignalProtocol) -> Bool {
-    var theComposer = composer  // 複製一份用來做實驗。
-    theComposer.clear()  // 清空各種槽的內容。
+    var theComposer = composer // 複製一份用來做實驗。
+    theComposer.clear() // 清空各種槽的內容。
     theComposer.receiveKey(fromString: input.text)
     return theComposer.hasIntonation(withNothingElse: true)
   }
@@ -470,10 +470,10 @@ public class InputHandler: InputHandlerProtocol {
   func generatePunctuationNamePrefix(withKeyCondition input: InputSignalProtocol) -> String {
     if prefs.halfWidthPunctuationEnabled { return "_half_punctuation_" }
     switch (input.isControlHold, input.isOptionHold) {
-      case (true, true): return "_alt_ctrl_punctuation_"
-      case (true, false): return "_ctrl_punctuation_"
-      case (false, true): return "_alt_punctuation_"
-      case (false, false): return "_punctuation_"
+    case (true, true): return "_alt_ctrl_punctuation_"
+    case (true, false): return "_ctrl_punctuation_"
+    case (false, true): return "_alt_punctuation_"
+    case (false, false): return "_punctuation_"
     }
   }
 }
@@ -493,9 +493,9 @@ extension InputHandler {
   /// 用比較形象且生動卻有點噁心的解釋的話，蒼蠅一邊吃一邊屙。
   var commitOverflownComposition: String {
     guard !compositor.walkedNodes.isEmpty,
-      compositor.length > compositorWidthLimit,
-      let identifier = delegate?.clientBundleIdentifier,
-      prefs.clientsIMKTextInputIncapable.contains(identifier)
+          compositor.length > compositorWidthLimit,
+          let identifier = delegate?.clientBundleIdentifier,
+          prefs.clientsIMKTextInputIncapable.contains(identifier)
     else { return "" }
     // 回頭在這裡插上對 Steam 的 Client Identifier 的要求。
     var textToCommit = ""
@@ -507,13 +507,13 @@ extension InputHandler {
         textToCommit += node.currentPair.value
       } else {
         delta = min(delta, node.keyArray.count)
-        textToCommit += node.currentPair.value.charComponents[0..<delta].joined()
+        textToCommit += node.currentPair.value.charComponents[0 ..< delta].joined()
       }
       let newCursor = max(compositor.cursor - delta, 0)
       compositor.cursor = 0
       if !node.isReadingMismatched { consolidateCursorContext(with: node.currentPair) }
       // 威注音不支援 Bigram，所以無須考慮前後節點「是否需要鞏固」。
-      for _ in 0..<delta { compositor.dropKey(direction: .front) }
+      for _ in 0 ..< delta { compositor.dropKey(direction: .front) }
       compositor.cursor = newCursor
       walk()
     }

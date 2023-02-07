@@ -13,8 +13,8 @@ import SwiftUI
 // Ref: https://mjeld.com/swiftui-macos-10-15-toggle-onchange/
 
 @available(macOS 10.15, *)
-extension Binding {
-  public func onChange(_ action: @escaping () -> Void) -> Binding {
+public extension Binding {
+  func onChange(_ action: @escaping () -> Void) -> Binding {
     Binding(
       get: {
         wrappedValue
@@ -159,9 +159,9 @@ public struct TextEditorEX: NSViewRepresentable {
 
 // MARK: - Property Wrapper (Bindable Extension)
 
-extension AppProperty {
+public extension AppProperty {
   @available(macOS 10.15, *)
-  public var projectedValue: Binding<Value> {
+  var projectedValue: Binding<Value> {
     .init(
       get: {
         container.object(forKey: key) as? Value ?? defaultValue

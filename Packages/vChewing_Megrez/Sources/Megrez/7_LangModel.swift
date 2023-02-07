@@ -11,9 +11,9 @@ public protocol LangModelProtocol {
   func hasUnigramsFor(keyArray: [String]) -> Bool
 }
 
-extension Megrez.Compositor {
+public extension Megrez.Compositor {
   /// 一個套殼語言模型，用來始終返回經過排序的單元圖。
-  public class LangModelRanked: LangModelProtocol {
+  class LangModelRanked: LangModelProtocol {
     private let langModel: LangModelProtocol
     /// 一個套殼語言模型，用來始終返回經過排序的單元圖。
     /// - Parameter withLM: 用來對接的語言模型。
@@ -41,12 +41,12 @@ extension Megrez.Compositor {
 
 // Reference: https://stackoverflow.com/a/50545761/4162914
 
-extension Sequence {
+private extension Sequence {
   /// Return a stable-sorted collection.
   ///
   /// - Parameter areInIncreasingOrder: Return nil when two element are equal.
   /// - Returns: The sorted collection.
-  fileprivate func stableSorted(
+  func stableSorted(
     by areInIncreasingOrder: (Element, Element) throws -> Bool
   )
     rethrows -> [Element]

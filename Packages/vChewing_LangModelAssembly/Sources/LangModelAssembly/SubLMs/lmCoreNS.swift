@@ -10,11 +10,11 @@ import Foundation
 import Megrez
 import Shared
 
-extension vChewingLM {
+public extension vChewingLM {
   /// 與之前的 LMCore 不同，LMCoreNS 直接讀取 plist。
   /// 這樣一來可以節省在舊 mac 機種內的資料讀入速度。
   /// 目前僅針對輸入法原廠語彙資料檔案使用 plist 格式。
-  @frozen public struct LMCoreNS {
+  @frozen struct LMCoreNS {
     public private(set) var filePath: String?
     /// 資料庫辭典。索引內容為經過加密的注音字串，資料內容則為 UTF8 資料陣列。
     var dataMap: [String: [Data]] = [:]
@@ -144,7 +144,7 @@ extension vChewingLM {
           theScore = .init(String(neta[1])) ?? defaultScore
         }
         if theScore > 0 {
-          theScore *= -1  // 應對可能忘記寫負號的情形
+          theScore *= -1 // 應對可能忘記寫負號的情形
         }
         grams.append(Megrez.Unigram(value: theValue, score: theScore))
         if !key.contains("_punctuation") { continue }

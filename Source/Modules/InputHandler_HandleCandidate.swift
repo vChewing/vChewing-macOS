@@ -29,7 +29,7 @@ extension InputHandler {
 
     let cancelCandidateKey =
       input.isBackSpace || input.isEsc || input.isDelete
-      || ((input.isCursorBackward || input.isCursorForward) && input.isShiftHold)
+        || ((input.isCursorBackward || input.isCursorForward) && input.isShiftHold)
 
     if cancelCandidateKey {
       if state.type == .ofAssociates
@@ -57,66 +57,66 @@ extension InputHandler {
 
     if let keyCodeType = KeyCode(rawValue: input.keyCode) {
       switch keyCodeType {
-        case .kLineFeed, .kCarriageReturn:
-          if state.type == .ofAssociates, !prefs.alsoConfirmAssociatedCandidatesByEnter {
-            delegate.switchState(IMEState.ofAbortion())
-            return true
-          }
-          delegate.candidateSelectionCalledByInputHandler(at: ctlCandidate.highlightedIndex)
+      case .kLineFeed, .kCarriageReturn:
+        if state.type == .ofAssociates, !prefs.alsoConfirmAssociatedCandidatesByEnter {
+          delegate.switchState(IMEState.ofAbortion())
           return true
-        case .kTab:
-          let updated: Bool =
-            prefs.specifyShiftTabKeyBehavior
+        }
+        delegate.candidateSelectionCalledByInputHandler(at: ctlCandidate.highlightedIndex)
+        return true
+      case .kTab:
+        let updated: Bool =
+          prefs.specifyShiftTabKeyBehavior
             ? (input.isShiftHold
               ? ctlCandidate.showPreviousLine()
               : ctlCandidate.showNextLine())
             : (input.isShiftHold
               ? ctlCandidate.highlightPreviousCandidate()
               : ctlCandidate.highlightNextCandidate())
-          _ = updated ? {}() : delegate.callError("9B691919")
-          return true
-        case .kSpace:
-          let updated: Bool =
-            prefs.specifyShiftSpaceKeyBehavior
+        _ = updated ? {}() : delegate.callError("9B691919")
+        return true
+      case .kSpace:
+        let updated: Bool =
+          prefs.specifyShiftSpaceKeyBehavior
             ? (input.isShiftHold
               ? ctlCandidate.highlightNextCandidate()
               : ctlCandidate.showNextLine())
             : (input.isShiftHold
               ? ctlCandidate.showNextLine()
               : ctlCandidate.highlightNextCandidate())
-          _ = updated ? {}() : delegate.callError("A11C781F")
-          return true
-        case .kPageDown:
-          _ = ctlCandidate.showNextPage() ? {}() : delegate.callError("9B691919")
-          return true
-        case .kPageUp:
-          _ = ctlCandidate.showPreviousPage() ? {}() : delegate.callError("9569955D")
-          return true
-        case .kUpArrow, .kDownArrow, .kLeftArrow, .kRightArrow:
-          handleArrowKey: switch (keyCodeType, ctlCandidate.currentLayout) {
-            case (.kLeftArrow, .horizontal), (.kUpArrow, .vertical):  // Previous Candidate
-              _ = ctlCandidate.highlightPreviousCandidate() ? {}() : delegate.callError("5548FD14")
-            case (.kRightArrow, .horizontal), (.kDownArrow, .vertical):  // Next Candidate
-              _ = ctlCandidate.highlightNextCandidate() ? {}() : delegate.callError("3CEFB82E")
-            case (.kUpArrow, .horizontal), (.kLeftArrow, .vertical):  // Previous Line
-              _ = ctlCandidate.showPreviousLine() ? {}() : delegate.callError("827BBD79")
-            case (.kDownArrow, .horizontal), (.kRightArrow, .vertical):  // Next Line
-              _ = ctlCandidate.showNextLine() ? {}() : delegate.callError("7A0C7FBD")
-            default: break handleArrowKey
-          }
-          return true
-        case .kHome:
-          _ =
-            (ctlCandidate.highlightedIndex == 0)
+        _ = updated ? {}() : delegate.callError("A11C781F")
+        return true
+      case .kPageDown:
+        _ = ctlCandidate.showNextPage() ? {}() : delegate.callError("9B691919")
+        return true
+      case .kPageUp:
+        _ = ctlCandidate.showPreviousPage() ? {}() : delegate.callError("9569955D")
+        return true
+      case .kUpArrow, .kDownArrow, .kLeftArrow, .kRightArrow:
+        handleArrowKey: switch (keyCodeType, ctlCandidate.currentLayout) {
+        case (.kLeftArrow, .horizontal), (.kUpArrow, .vertical): // Previous Candidate
+          _ = ctlCandidate.highlightPreviousCandidate() ? {}() : delegate.callError("5548FD14")
+        case (.kRightArrow, .horizontal), (.kDownArrow, .vertical): // Next Candidate
+          _ = ctlCandidate.highlightNextCandidate() ? {}() : delegate.callError("3CEFB82E")
+        case (.kUpArrow, .horizontal), (.kLeftArrow, .vertical): // Previous Line
+          _ = ctlCandidate.showPreviousLine() ? {}() : delegate.callError("827BBD79")
+        case (.kDownArrow, .horizontal), (.kRightArrow, .vertical): // Next Line
+          _ = ctlCandidate.showNextLine() ? {}() : delegate.callError("7A0C7FBD")
+        default: break handleArrowKey
+        }
+        return true
+      case .kHome:
+        _ =
+          (ctlCandidate.highlightedIndex == 0)
             ? delegate.callError("9B6EDE8D") : (ctlCandidate.highlightedIndex = 0)
-          return true
-        case .kEnd:
-          let maxIndex = state.candidates.count - 1
-          _ =
-            (ctlCandidate.highlightedIndex == maxIndex)
+        return true
+      case .kEnd:
+        let maxIndex = state.candidates.count - 1
+        _ =
+          (ctlCandidate.highlightedIndex == maxIndex)
             ? delegate.callError("9B69AAAD") : (ctlCandidate.highlightedIndex = maxIndex)
-          return true
-        default: break
+        return true
+      default: break
       }
     }
 
@@ -132,7 +132,7 @@ extension InputHandler {
 
     let selectionKeys = delegate.selectionKeys
 
-    for j in 0..<selectionKeys.count {
+    for j in 0 ..< selectionKeys.count {
       let label = selectionKeys.charComponents[j]
       if match.compare(label, options: .caseInsensitive, range: nil, locale: .current) == .orderedSame {
         index = j
@@ -173,11 +173,11 @@ extension InputHandler {
 
       let isInputValid: Bool =
         prefs.cassetteEnabled
-        ? currentLM.isThisCassetteKeyAllowed(key: input.text) : composer.inputValidityCheck(key: input.charCode)
+          ? currentLM.isThisCassetteKeyAllowed(key: input.text) : composer.inputValidityCheck(key: input.charCode)
 
       var shouldAutoSelectCandidate: Bool =
         isInputValid || currentLM.hasUnigramsFor(keyArray: [customPunctuation])
-        || currentLM.hasUnigramsFor(keyArray: [punctuation])
+          || currentLM.hasUnigramsFor(keyArray: [punctuation])
 
       if !shouldAutoSelectCandidate, input.isUpperCaseASCIILetterKey {
         let letter = "_letter_\(input.text)"

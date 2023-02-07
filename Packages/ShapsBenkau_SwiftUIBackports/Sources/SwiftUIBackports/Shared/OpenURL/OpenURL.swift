@@ -132,16 +132,16 @@ extension Backport where Wrapped == Any {
       let result = handler(url).value
 
       switch result {
-        case .handled, .discarded: break
-        case let .systemAction(updatedUrl):
-          let resolved = updatedUrl ?? url
-          #if os(macOS)
-            NSWorkspace.shared.open(resolved)
-          #elseif os(iOS) || os(tvOS)
-            UIApplication.shared.open(resolved)
-          #else
-            WKExtension.shared().openSystemURL(resolved)
-          #endif
+      case .handled, .discarded: break
+      case let .systemAction(updatedUrl):
+        let resolved = updatedUrl ?? url
+        #if os(macOS)
+          NSWorkspace.shared.open(resolved)
+        #elseif os(iOS) || os(tvOS)
+          UIApplication.shared.open(resolved)
+        #else
+          WKExtension.shared().openSystemURL(resolved)
+        #endif
       }
 
       return result
@@ -169,8 +169,8 @@ private struct BackportOpenURLKey: EnvironmentKey {
 }
 
 @available(macOS 10.15, *)
-extension EnvironmentValues {
-  public var backportOpenURL: Backport<Any>.OpenURLAction {
+public extension EnvironmentValues {
+  var backportOpenURL: Backport<Any>.OpenURLAction {
     get { self[BackportOpenURLKey.self] }
     set { self[BackportOpenURLKey.self] = newValue }
   }

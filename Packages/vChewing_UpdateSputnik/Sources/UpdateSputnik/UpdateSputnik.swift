@@ -27,7 +27,7 @@ public class UpdateSputnik {
         return
       }
     }
-    isCurrentCheckForced = forced  // 留著用來生成錯誤報告
+    isCurrentCheckForced = forced // 留著用來生成錯誤報告
     let request = URLRequest(
       url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5
     )
@@ -92,7 +92,7 @@ public class UpdateSputnik {
     NSLog("update check plist: \(plist)")
 
     guard let intRemoteVersion = Int(plist[kCFBundleVersionKey] as? String ?? ""),
-      let strRemoteVersionShortened = plist["CFBundleShortVersionString"] as? String
+          let strRemoteVersionShortened = plist["CFBundleShortVersionString"] as? String
     else {
       DispatchQueue.main.async {
         self.showError(message: NSLocalizedString("Plist downloaded cannot be parsed correctly.", comment: ""))
@@ -102,9 +102,9 @@ public class UpdateSputnik {
     }
 
     guard let dicMainBundle = Bundle.main.infoDictionary,
-      let intCurrentVersion = Int(dicMainBundle[kCFBundleVersionKey as String] as? String ?? ""),
-      let strCurrentVersionShortened = dicMainBundle["CFBundleShortVersionString"] as? String
-    else { return }  // Shouldn't happen.
+          let intCurrentVersion = Int(dicMainBundle[kCFBundleVersionKey as String] as? String ?? ""),
+          let strCurrentVersionShortened = dicMainBundle["CFBundleShortVersionString"] as? String
+    else { return } // Shouldn't happen.
     if intRemoteVersion <= intCurrentVersion {
       guard isCurrentCheckForced else { return }
       let alert = NSAlert()
@@ -135,7 +135,7 @@ public class UpdateSputnik {
     NSApp.activate(ignoringOtherApps: true)
     if result == NSApplication.ModalResponse.alertFirstButtonReturn {
       if let siteInfoURLString = plist[kUpdateInfoPageURLKey] as? String,
-        let siteURL = URL(string: siteInfoURLString)
+         let siteURL = URL(string: siteInfoURLString)
       {
         DispatchQueue.main.async {
           NSWorkspace.shared.open(siteURL)

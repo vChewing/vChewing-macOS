@@ -4,13 +4,13 @@ import PackageDescription
 let package = Package(
   name: "CandidateWindow",
   platforms: [
-    .macOS(.v10_11)
+    .macOS(.v10_11),
   ],
   products: [
     .library(
       name: "CandidateWindow",
       targets: ["CandidateWindow"]
-    )
+    ),
   ],
   dependencies: [
     .package(path: "../vChewing_Shared"),

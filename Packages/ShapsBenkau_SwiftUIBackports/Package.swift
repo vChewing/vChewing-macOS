@@ -13,10 +13,10 @@ let package = Package(
     .library(
       name: "SwiftUIBackports",
       targets: ["SwiftUIBackports"]
-    )
+    ),
   ],
   targets: [
-    .target(name: "SwiftUIBackports")
+    .target(name: "SwiftUIBackports"),
   ],
   swiftLanguageVersions: [.v5]
 )

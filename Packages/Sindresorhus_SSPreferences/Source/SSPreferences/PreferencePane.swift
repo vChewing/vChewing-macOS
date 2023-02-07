@@ -4,8 +4,8 @@
 
 import Cocoa
 
-extension SSPreferences {
-  public struct PaneIdentifier: Hashable, RawRepresentable, Codable {
+public extension SSPreferences {
+  struct PaneIdentifier: Hashable, RawRepresentable, Codable {
     public let rawValue: String
 
     public init(rawValue: String) {
@@ -20,24 +20,24 @@ public protocol PreferencePane: NSViewController {
   var toolbarItemIcon: NSImage { get }
 }
 
-extension PreferencePane {
-  public var toolbarItemIdentifier: NSToolbarItem.Identifier {
+public extension PreferencePane {
+  var toolbarItemIdentifier: NSToolbarItem.Identifier {
     preferencePaneIdentifier.toolbarItemIdentifier
   }
 
-  public var toolbarItemIcon: NSImage { .empty }
+  var toolbarItemIcon: NSImage { .empty }
 }
 
-extension SSPreferences.PaneIdentifier {
-  public init(_ rawValue: String) {
+public extension SSPreferences.PaneIdentifier {
+  init(_ rawValue: String) {
     self.init(rawValue: rawValue)
   }
 
-  public init(fromToolbarItemIdentifier itemIdentifier: NSToolbarItem.Identifier) {
+  init(fromToolbarItemIdentifier itemIdentifier: NSToolbarItem.Identifier) {
     self.init(rawValue: itemIdentifier.rawValue)
   }
 
-  public var toolbarItemIdentifier: NSToolbarItem.Identifier {
+  var toolbarItemIdentifier: NSToolbarItem.Identifier {
     NSToolbarItem.Identifier(rawValue)
   }
 }
