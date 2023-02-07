@@ -4,13 +4,13 @@ import PackageDescription
 let package = Package(
   name: "PhraseEditorUI",
   platforms: [
-    .macOS(.v10_11)
+    .macOS(.v10_11),
   ],
   products: [
     .library(
       name: "PhraseEditorUI",
       targets: ["PhraseEditorUI"]
-    )
+    ),
   ],
   dependencies: [
     .package(path: "../vChewing_LangModelAssembly"),
@@ -25,6 +25,6 @@ let package = Package(
         .product(name: "SwiftUIBackports", package: "ShapsBenkau_SwiftUIBackports"),
         .product(name: "Shared", package: "vChewing_Shared"),
       ]
-    )
+    ),
   ]
 )

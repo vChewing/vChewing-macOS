@@ -5,12 +5,12 @@
 import SwiftUI
 
 @available(macOS 10.15, *)
-extension SSPreferences {
+public extension SSPreferences {
   /**
    Function builder for `Preferences` components used in order to restrict types of child views to be of type `Section`.
    */
   @resultBuilder
-  public enum SectionBuilder {
+  enum SectionBuilder {
     public static func buildBlock(_ sections: Section...) -> [Section] {
       sections
     }
@@ -19,7 +19,7 @@ extension SSPreferences {
   /**
    A view which holds `Preferences.Section` views and does all the alignment magic similar to `NSGridView` from AppKit.
    */
-  public struct Container: View {
+  struct Container: View {
     private let sectionBuilder: () -> [Section]
     private let contentWidth: Double
     private let minimumLabelWidth: Double
@@ -49,7 +49,7 @@ extension SSPreferences {
       let sections = sectionBuilder()
 
       return VStack(alignment: .preferenceSectionLabel) {
-        ForEach(0..<sections.count, id: \.self) { index in
+        ForEach(0 ..< sections.count, id: \.self) { index in
           viewForSection(sections, index: index)
         }
       }

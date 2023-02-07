@@ -4,13 +4,13 @@ import PackageDescription
 let package = Package(
   name: "TooltipUI",
   platforms: [
-    .macOS(.v10_11)
+    .macOS(.v10_11),
   ],
   products: [
     .library(
       name: "TooltipUI",
       targets: ["TooltipUI"]
-    )
+    ),
   ],
   dependencies: [
     .package(path: "../Fuziki_NSAttributedTextView"),
@@ -25,6 +25,6 @@ let package = Package(
         .product(name: "CocoaExtension", package: "vChewing_CocoaExtension"),
         .product(name: "Shared", package: "vChewing_Shared"),
       ]
-    )
+    ),
   ]
 )

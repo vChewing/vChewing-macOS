@@ -11,22 +11,22 @@ import SwiftExtension
 
 // MARK: - NSMutableString extension
 
-extension NSMutableString {
-  public var localized: String { NSLocalizedString(description, comment: "") }
+public extension NSMutableString {
+  var localized: String { NSLocalizedString(description, comment: "") }
 }
 
 // MARK: - NSRect Extension
 
-extension NSRect {
-  public static var seniorTheBeast: NSRect {
+public extension NSRect {
+  static var seniorTheBeast: NSRect {
     NSRect(x: 0.0, y: 0.0, width: 0.114, height: 0.514)
   }
 }
 
 // MARK: - Shell Extension
 
-extension NSApplication {
-  public static func shell(_ command: String) throws -> String {
+public extension NSApplication {
+  static func shell(_ command: String) throws -> String {
     let task = Process()
     let pipe = Pipe()
 
@@ -59,10 +59,10 @@ extension NSApplication {
   }
 }
 
-extension NSApplication {
+public extension NSApplication {
   // MARK: - System Dark Mode Status Detector.
 
-  public static var isDarkMode: Bool {
+  static var isDarkMode: Bool {
     if #unavailable(macOS 10.14) { return false }
     if #available(macOS 10.15, *) {
       let appearanceDescription = NSApp.effectiveAppearance.debugDescription
@@ -76,23 +76,23 @@ extension NSApplication {
 
   // MARK: - Tell whether this IME is running with Root privileges.
 
-  public static var isSudoMode: Bool {
+  static var isSudoMode: Bool {
     NSUserName() == "root"
   }
 }
 
 // MARK: - Real Home Dir for Sandboxed Apps
 
-extension FileManager {
-  public static let realHomeDir = URL(
+public extension FileManager {
+  static let realHomeDir = URL(
     fileURLWithFileSystemRepresentation: getpwuid(getuid()).pointee.pw_dir, isDirectory: true, relativeTo: nil
   )
 }
 
 // MARK: - Trash a file if it exists.
 
-extension FileManager {
-  @discardableResult public static func trashTargetIfExists(_ path: String) -> Bool {
+public extension FileManager {
+  @discardableResult static func trashTargetIfExists(_ path: String) -> Bool {
     do {
       if FileManager.default.fileExists(atPath: path) {
         // 塞入垃圾桶
@@ -113,9 +113,9 @@ extension FileManager {
 // MARK: - Memory Footprint Calculator
 
 // Ref: https://developer.apple.com/forums/thread/105088?answerId=357415022#357415022
-extension NSApplication {
+public extension NSApplication {
   /// The memory footprint of the current application in bytes.
-  public static var memoryFootprint: UInt64? {
+  static var memoryFootprint: UInt64? {
     // The `TASK_VM_INFO_COUNT` and `TASK_VM_INFO_REV1_COUNT` macros are too
     // complex for the Swift C importer, so we have to define them ourselves.
     let tskVMInfoCount = mach_msg_type_number_t(
@@ -136,20 +136,20 @@ extension NSApplication {
 
 // MARK: - Check whether current date is the given date.
 
-extension Date {
+public extension Date {
   /// Check whether current date is the given date.
   /// - Parameter dateDigits: `yyyyMMdd`, 8-digit integer. If only `MMdd`, then the year will be the current year.
   /// - Returns: The result. Will return false if the given dateDigits is invalid.
-  public static func isTodayTheDate(from dateDigits: Int) -> Bool {
+  static func isTodayTheDate(from dateDigits: Int) -> Bool {
     let currentYear = Self.currentYear
     var dateDigits = dateDigits
     let strDateDigits = dateDigits.description
     switch strDateDigits.count {
-      case 3, 4: dateDigits = currentYear * 10000 + dateDigits
-      case 8:
-        if let theHighest = strDateDigits.first, "12".contains(theHighest) { break }
-        return false
-      default: return false
+    case 3, 4: dateDigits = currentYear * 10000 + dateDigits
+    case 8:
+      if let theHighest = strDateDigits.first, "12".contains(theHighest) { break }
+      return false
+    default: return false
     }
     let formatter = DateFormatter()
     formatter.dateFormat = "yyyyMMdd"
@@ -162,7 +162,7 @@ extension Date {
     return false
   }
 
-  public static var currentYear: Int {
+  static var currentYear: Int {
     let formatter = DateFormatter()
     formatter.dateFormat = "yyyy"
     return (Int(formatter.string(from: Date())) ?? 1970)

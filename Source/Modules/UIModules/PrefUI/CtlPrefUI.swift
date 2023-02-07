@@ -152,15 +152,15 @@ extension CtlPrefWindow {
   /// 由於用於頁籤標題的某些用語放在 localizable 資源內管理的話容易混亂，所以這裡單獨處理。
   static var locPhrasesTabTitle: String {
     switch PrefMgr.shared.appleLanguages[0] {
-      case "ja":
-        return "辞書編集"
-      default:
-        if PrefMgr.shared.appleLanguages[0].contains("zh-Hans") {
-          return "语汇编辑"
-        } else if PrefMgr.shared.appleLanguages[0].contains("zh-Hant") {
-          return "語彙編輯"
-        }
-        return "Phrases"
+    case "ja":
+      return "辞書編集"
+    default:
+      if PrefMgr.shared.appleLanguages[0].contains("zh-Hans") {
+        return "语汇编辑"
+      } else if PrefMgr.shared.appleLanguages[0].contains("zh-Hant") {
+        return "語彙編輯"
+      }
+      return "Phrases"
     }
   }
 }

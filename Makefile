@@ -20,22 +20,13 @@ debug:
 DSTROOT = /Library/Input Methods
 VC_APP_ROOT = $(DSTROOT)/vChewing.app
 
-.PHONY: clang-format lint batchfix format clang-format-swift clang-format-cpp
+.PHONY: lint format
 
-format: batchfix clang-format lint
-
-clang-format:
-	@git ls-files --exclude-standard | grep -E '\.swift$$' | xargs swift-format format --in-place --configuration ./.clang-format-swift.json --parallel
-	@git ls-files --exclude-standard | grep -E '\.swift$$' | xargs swift-format lint --configuration ./.clang-format-swift.json --parallel
+format:
+	@swiftformat --swiftversion 5.5 --indent 2 ./
 
 lint:
-	@git ls-files --exclude-standard | grep -E '\.swift$$' | xargs swift-format lint --configuration ./.clang-format-swift.json --parallel 
-
-batchfix:
 	@git ls-files --exclude-standard | grep -E '\.swift$$' | swiftlint --fix --autocorrect
-
-advanced-lint:
-	@swiftformat --swiftversion 5.5 --indent 2 ./
 
 .PHONY: permission-check install-debug install-release
 

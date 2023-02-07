@@ -3,9 +3,9 @@
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
-extension Megrez {
+public extension Megrez {
   /// 單元圖。
-  @frozen public struct Unigram: Equatable, CustomStringConvertible, Hashable {
+  @frozen struct Unigram: Equatable, CustomStringConvertible, Hashable {
     /// 資料值，通常是詞語或單個字。
     public var value: String
     /// 權重。
@@ -43,9 +43,9 @@ extension Megrez {
 
 // MARK: - Array Extensions.
 
-extension Array where Element == Megrez.Unigram {
+public extension Array where Element == Megrez.Unigram {
   /// 給定過濾清單，讓單元圖陣列自我過濾。
-  public mutating func consolidate(filter theFilter: Set<String> = .init()) {
+  mutating func consolidate(filter theFilter: Set<String> = .init()) {
     var inserted: [String: Double] = [:]
     var insertedArray: [Megrez.Unigram] = []
     for neta in filter({ !theFilter.contains($0.value) }) {

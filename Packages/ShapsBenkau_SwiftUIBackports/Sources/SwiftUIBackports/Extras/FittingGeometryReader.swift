@@ -7,7 +7,7 @@ import SwiftUI
 @available(macOS 10.15, *)
 /// A geometry reader that automatically sizes its height to 'fit' its content.
 public struct FittingGeometryReader<Content>: View where Content: View {
-  @State private var height: CGFloat = 10  // must be non-zero
+  @State private var height: CGFloat = 10 // must be non-zero
   private var content: (GeometryProxy) -> Content
 
   @available(macOS 10.15, *)

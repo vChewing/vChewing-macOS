@@ -31,24 +31,24 @@ extension Backport where Wrapped == Any {
     ///  its preferred progress type.
     public func makeBody(configuration: Configuration) -> some View {
       switch configuration.preferredKind {
-        case .circular:
-          Backport.CircularProgressViewStyle().makeBody(configuration: configuration)
-        case .linear:
-          #if os(iOS)
-            if configuration.fractionCompleted == nil {
-              Backport.CircularProgressViewStyle().makeBody(configuration: configuration)
-            } else {
-              Backport.LinearProgressViewStyle().makeBody(configuration: configuration)
-            }
-          #else
+      case .circular:
+        Backport.CircularProgressViewStyle().makeBody(configuration: configuration)
+      case .linear:
+        #if os(iOS)
+          if configuration.fractionCompleted == nil {
+            Backport.CircularProgressViewStyle().makeBody(configuration: configuration)
+          } else {
             Backport.LinearProgressViewStyle().makeBody(configuration: configuration)
-          #endif
+          }
+        #else
+          Backport.LinearProgressViewStyle().makeBody(configuration: configuration)
+        #endif
       }
     }
   }
 }
 
 @available(macOS 10.15, *)
-extension BackportProgressViewStyle where Self == Backport<Any>.DefaultProgressViewStyle {
-  public static var automatic: Self { .init() }
+public extension BackportProgressViewStyle where Self == Backport<Any>.DefaultProgressViewStyle {
+  static var automatic: Self { .init() }
 }

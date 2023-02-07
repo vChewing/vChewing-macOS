@@ -5,7 +5,7 @@
 
 import Foundation
 
-extension Megrez.Compositor {
+public extension Megrez.Compositor {
   /// 字詞節點。
   ///
   /// 一個節點由這些內容組成：幅位長度、索引鍵、以及一組單元圖。幅位長度就是指這個
@@ -13,7 +13,7 @@ extension Megrez.Compositor {
   /// 的詞，組字器會將多個讀音索引鍵合併為一個讀音索引鍵、據此向語言模組請求對應的
   /// 單元圖結果陣列。舉例說，如果一個詞有兩個漢字組成的話，那麼讀音也是有兩個、其
   /// 索引鍵也是由兩個讀音組成的，那麼這個節點的幅位長度就是 2。
-  public class Node: Equatable, Hashable {
+  class Node: Equatable, Hashable {
     /// 三種不同的針對一個節點的覆寫行為。
     /// - withNoOverrides: 無覆寫行為。
     /// - withTopUnigramScore: 使用指定的單元圖資料值來覆寫該節點，但卻使用
@@ -107,9 +107,9 @@ extension Megrez.Compositor {
     public var score: Double {
       guard !unigrams.isEmpty else { return 0 }
       switch currentOverrideType {
-        case .withHighScore: return overridingScore
-        case .withTopUnigramScore: return unigrams[0].score
-        default: return currentUnigram.score
+      case .withHighScore: return overridingScore
+      case .withTopUnigramScore: return unigrams[0].score
+      default: return currentUnigram.score
       }
     }
 
@@ -158,9 +158,9 @@ extension Megrez.Compositor {
   }
 }
 
-extension Megrez.Compositor {
+public extension Megrez.Compositor {
   /// 節錨。在 Gramambular 2 當中又被稱為「NodeInSpan」。
-  public struct NodeAnchor: Hashable {
+  struct NodeAnchor: Hashable {
     /// 節點。
     let node: Megrez.Compositor.Node
     /// 幅位座標。
@@ -185,24 +185,24 @@ extension Megrez.Compositor {
 
 // MARK: - Array Extensions.
 
-extension Array where Element == Megrez.Compositor.Node {
+public extension Array where Element == Megrez.Compositor.Node {
   /// 從一個節點陣列當中取出目前的選字字串陣列。
-  public var values: [String] { map(\.value) }
+  var values: [String] { map(\.value) }
 
   /// 從一個節點陣列當中取出目前的索引鍵陣列。
-  public func joinedKeys(by separator: String = Megrez.Compositor.theSeparator) -> [String] {
+  func joinedKeys(by separator: String = Megrez.Compositor.theSeparator) -> [String] {
     map { $0.keyArray.lazy.joined(separator: separator) }
   }
 
   /// 從一個節點陣列當中取出目前的索引鍵陣列。
-  public var keyArrays: [[String]] { map(\.keyArray) }
+  var keyArrays: [[String]] { map(\.keyArray) }
 
   /// 返回一連串的節點起點。結果為 (Result A, Result B) 辭典陣列。
   /// Result A 以索引查座標，Result B 以座標查索引。
   private var nodeBorderPointDictPair: (regionCursorMap: [Int: Int], cursorRegionMap: [Int: Int]) {
     // Result A 以索引查座標，Result B 以座標查索引。
     var resultA = [Int: Int]()
-    var resultB: [Int: Int] = [-1: 0]  // 防呆
+    var resultB: [Int: Int] = [-1: 0] // 防呆
     var cursorCounter = 0
     for (nodeCounter, neta) in enumerated() {
       resultA[nodeCounter] = cursorCounter
@@ -217,25 +217,25 @@ extension Array where Element == Megrez.Compositor.Node {
   }
 
   /// 返回一個辭典，以座標查索引。允許以游標位置查詢其屬於第幾個幅位座標（從 0 開始算）。
-  public var cursorRegionMap: [Int: Int] { nodeBorderPointDictPair.cursorRegionMap }
+  var cursorRegionMap: [Int: Int] { nodeBorderPointDictPair.cursorRegionMap }
 
   /// 總讀音單元數量。在絕大多數情況下，可視為總幅位長度。
-  public var totalKeyCount: Int { map(\.keyArray.count).reduce(0, +) }
+  var totalKeyCount: Int { map(\.keyArray.count).reduce(0, +) }
 
   /// 根據給定的游標，返回其前後最近的邊界點。
   /// - Parameter cursor: 給定的游標。
-  public func contextRange(ofGivenCursor cursor: Int) -> Range<Int> {
-    guard !isEmpty else { return 0..<0 }
+  func contextRange(ofGivenCursor cursor: Int) -> Range<Int> {
+    guard !isEmpty else { return 0 ..< 0 }
     let lastSpanningLength = reversed()[0].keyArray.count
-    var nilReturn = (totalKeyCount - lastSpanningLength)..<totalKeyCount
-    if cursor >= totalKeyCount { return nilReturn }  // 防呆
-    let cursor = Swift.max(0, cursor)  // 防呆
-    nilReturn = cursor..<cursor
+    var nilReturn = (totalKeyCount - lastSpanningLength) ..< totalKeyCount
+    if cursor >= totalKeyCount { return nilReturn } // 防呆
+    let cursor = Swift.max(0, cursor) // 防呆
+    nilReturn = cursor ..< cursor
     // 下文按道理來講不應該會出現 nilReturn。
     guard let rearNodeID = nodeBorderPointDictPair.cursorRegionMap[cursor] else { return nilReturn }
     guard let rearIndex = nodeBorderPointDictPair.regionCursorMap[rearNodeID] else { return nilReturn }
     guard let frontIndex = nodeBorderPointDictPair.regionCursorMap[rearNodeID + 1] else { return nilReturn }
-    return rearIndex..<frontIndex
+    return rearIndex ..< frontIndex
   }
 
   /// 在陣列內以給定游標位置找出對應的節點。
@@ -243,9 +243,9 @@ extension Array where Element == Megrez.Compositor.Node {
   ///   - cursor: 給定游標位置。
   ///   - outCursorPastNode: 找出的節點的前端位置。
   /// - Returns: 查找結果。
-  public func findNode(at cursor: Int, target outCursorPastNode: inout Int) -> Megrez.Compositor.Node? {
+  func findNode(at cursor: Int, target outCursorPastNode: inout Int) -> Megrez.Compositor.Node? {
     guard !isEmpty else { return nil }
-    let cursor = Swift.max(0, Swift.min(cursor, totalKeyCount - 1))  // 防呆
+    let cursor = Swift.max(0, Swift.min(cursor, totalKeyCount - 1)) // 防呆
     let range = contextRange(ofGivenCursor: cursor)
     outCursorPastNode = range.upperBound
     guard let rearNodeID = nodeBorderPointDictPair.1[cursor] else { return nil }
@@ -255,13 +255,13 @@ extension Array where Element == Megrez.Compositor.Node {
   /// 在陣列內以給定游標位置找出對應的節點。
   /// - Parameter cursor: 給定游標位置。
   /// - Returns: 查找結果。
-  public func findNode(at cursor: Int) -> Megrez.Compositor.Node? {
+  func findNode(at cursor: Int) -> Megrez.Compositor.Node? {
     var useless = 0
     return findNode(at: cursor, target: &useless)
   }
 
   /// 提供一組逐字的字音配對陣列（不使用 Megrez 的 KeyValuePaired 類型），但字音不匹配的節點除外。
-  public var smashedPairs: [(key: String, value: String)] {
+  var smashedPairs: [(key: String, value: String)] {
     var arrData = [(key: String, value: String)]()
     let separator = Megrez.Compositor.theSeparator
     forEach { node in

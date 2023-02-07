@@ -11,21 +11,21 @@ import Foundation
 import Megrez
 import Shared
 
-extension vChewingLM {
-  public class LMUserOverride {
+public extension vChewingLM {
+  class LMUserOverride {
     // MARK: - Main
 
     var mutCapacity: Int
     var mutDecayExponent: Double
     var mutLRUList: [KeyObservationPair] = []
     var mutLRUMap: [String: KeyObservationPair] = [:]
-    let kDecayThreshold: Double = 1.0 / 1_048_576.0  // 衰減二十次之後差不多就失效了。
+    let kDecayThreshold: Double = 1.0 / 1_048_576.0 // 衰減二十次之後差不多就失效了。
     var fileSaveLocationURL: URL
 
-    public static let kObservedOverrideHalfLife: Double = 3600.0 * 6  // 6 小時半衰一次，能持續不到六天的記憶。
+    public static let kObservedOverrideHalfLife: Double = 3600.0 * 6 // 6 小時半衰一次，能持續不到六天的記憶。
 
     public init(capacity: Int = 500, decayConstant: Double = LMUserOverride.kObservedOverrideHalfLife, dataURL: URL) {
-      mutCapacity = max(capacity, 1)  // Ensures that this integer value is always > 0.
+      mutCapacity = max(capacity, 1) // Ensures that this integer value is always > 0.
       mutDecayExponent = log(0.5) / decayConstant
       fileSaveLocationURL = dataURL
     }
@@ -43,7 +43,7 @@ extension vChewingLM {
       // 當前節點超過三個字的話，就不記憶了。在這種情形下，使用者可以考慮新增自訂語彙。
       guard currentNode.spanLength <= 3 else { return }
       // 前一個節點得從前一次爬軌結果當中來找。
-      guard actualCursor > 0 else { return }  // 該情況應該不會出現。
+      guard actualCursor > 0 else { return } // 該情況應該不會出現。
       let currentNodeIndex = actualCursor
       actualCursor -= 1
       var prevNodeIndex = 0
@@ -153,8 +153,8 @@ extension vChewingLM.LMUserOverride {
 
 // MARK: - Hash and Dehash the entire UOM data, etc.
 
-extension vChewingLM.LMUserOverride {
-  public func bleachSpecifiedSuggestions(targets: [String], saveCallback: @escaping () -> Void) {
+public extension vChewingLM.LMUserOverride {
+  func bleachSpecifiedSuggestions(targets: [String], saveCallback: @escaping () -> Void) {
     if targets.isEmpty { return }
     for neta in mutLRUMap {
       for target in targets {
@@ -168,7 +168,7 @@ extension vChewingLM.LMUserOverride {
   }
 
   /// 自 LRU 辭典內移除所有的單元圖。
-  public func bleachUnigrams(saveCallback: @escaping () -> Void) {
+  func bleachUnigrams(saveCallback: @escaping () -> Void) {
     for key in mutLRUMap.keys {
       if !key.contains("(),()") { continue }
       mutLRUMap.removeValue(forKey: key)
@@ -184,7 +184,7 @@ extension vChewingLM.LMUserOverride {
     }
   }
 
-  public func clearData(withURL fileURL: URL) {
+  func clearData(withURL fileURL: URL) {
     mutLRUMap = .init()
     mutLRUList = .init()
     do {
@@ -196,7 +196,7 @@ extension vChewingLM.LMUserOverride {
     }
   }
 
-  public func saveData(toURL fileURL: URL? = nil) {
+  func saveData(toURL fileURL: URL? = nil) {
     let encoder = JSONEncoder()
     do {
       guard let jsonData = try? encoder.encode(mutLRUMap) else { return }
@@ -208,7 +208,7 @@ extension vChewingLM.LMUserOverride {
     }
   }
 
-  public func loadData(fromURL fileURL: URL) {
+  func loadData(fromURL fileURL: URL) {
     let decoder = JSONDecoder()
     do {
       let data = try Data(contentsOf: fileURL, options: .mappedIfSafe)
@@ -225,7 +225,7 @@ extension vChewingLM.LMUserOverride {
     }
   }
 
-  public struct Suggestion {
+  struct Suggestion {
     public var candidates = [(String, Megrez.Unigram)]()
     public var forceHighScoreOverride = false
     public var isEmpty: Bool { candidates.isEmpty }
@@ -282,7 +282,7 @@ extension vChewingLM.LMUserOverride {
         eventCount: theObservation.count, totalCount: observation.count,
         eventTimestamp: theObservation.timestamp, timestamp: timestamp, lambda: decayExp
       )
-      if (0...currentHighScore).contains(overrideScore) { continue }
+      if (0 ... currentHighScore).contains(overrideScore) { continue }
 
       candidates.append((headReading, .init(value: i, score: overrideScore)))
       forceHighScoreOverride = theObservation.forceHighScoreOverride
@@ -356,16 +356,16 @@ extension vChewingLM.LMUserOverride {
     }
 
     if arrNodes.count >= 2,
-      !kvPrevious.joinedKey().contains("_"),
-      kvPrevious.joinedKey().split(separator: "-").count == kvPrevious.value.count
+       !kvPrevious.joinedKey().contains("_"),
+       kvPrevious.joinedKey().split(separator: "-").count == kvPrevious.value.count
     {
       kvPrevious = arrNodes[1].currentPair
       readingStack = kvPrevious.joinedKey() + readingStack
     }
 
     if arrNodes.count >= 3,
-      !kvAnterior.joinedKey().contains("_"),
-      kvAnterior.joinedKey().split(separator: "-").count == kvAnterior.value.count
+       !kvAnterior.joinedKey().contains("_"),
+       kvAnterior.joinedKey().split(separator: "-").count == kvAnterior.value.count
     {
       kvAnterior = arrNodes[2].currentPair
       readingStack = kvAnterior.joinedKey() + readingStack

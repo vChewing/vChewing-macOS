@@ -29,7 +29,7 @@ extension InputHandler {
     guard !input.text.isEmpty, input.charCode.isPrintable, let delegate = delegate else { return false }
 
     let inputText: String = input.text
-    var state: IMEStateProtocol { delegate.state }  // 常數轉變數。
+    var state: IMEStateProtocol { delegate.state } // 常數轉變數。
 
     // 提前放行一些用不到的特殊按鍵輸入情形。
     if input.isInvalid, state.type == .ofEmpty || state.type == .ofDeactivated { return false }
@@ -109,9 +109,9 @@ extension InputHandler {
     // 僅憑藉 state.hasComposition 的話，並不能真實把握組字器的狀況。
     // 另外，這裡不要用「!input.isFunctionKeyHold」，否則會導致對上下左右鍵與翻頁鍵的判斷失效。
     if state.hasComposition, !compositor.isEmpty, isComposerOrCalligrapherEmpty,
-      !input.isOptionHold, !input.isShiftHold, !input.isCommandHold, !input.isControlHold,
-      input.isCursorClockLeft || input.isCursorClockRight || (input.isSpace && prefs.chooseCandidateUsingSpace)
-        || input.isPageDown || input.isPageUp || (input.isTab && prefs.specifyShiftTabKeyBehavior)
+       !input.isOptionHold, !input.isShiftHold, !input.isCommandHold, !input.isControlHold,
+       input.isCursorClockLeft || input.isCursorClockRight || (input.isSpace && prefs.chooseCandidateUsingSpace)
+       || input.isPageDown || input.isPageUp || (input.isTab && prefs.specifyShiftTabKeyBehavior)
     {
       // 開始決定是否切換至選字狀態。
       let candidateState: IMEStateProtocol = generateStateOfCandidates()
@@ -127,11 +127,11 @@ extension InputHandler {
       // 此處 JIS 鍵盤判定無法用於螢幕鍵盤。所以，螢幕鍵盤的場合，系統會依照 US 鍵盤的判定方案。
       let isJIS: Bool = KBGetLayoutType(Int16(LMGetKbdType())) == kKeyboardJIS
       switch (input.keyCode, isJIS) {
-        case (30, true): return revolveCandidate(reverseOrder: true)
-        case (42, true): return revolveCandidate(reverseOrder: false)
-        case (33, false): return revolveCandidate(reverseOrder: true)
-        case (30, false): return revolveCandidate(reverseOrder: false)
-        default: break
+      case (30, true): return revolveCandidate(reverseOrder: true)
+      case (42, true): return revolveCandidate(reverseOrder: false)
+      case (33, false): return revolveCandidate(reverseOrder: true)
+      case (30, false): return revolveCandidate(reverseOrder: false)
+      default: break
       }
     }
 
@@ -139,55 +139,55 @@ extension InputHandler {
 
     if let keyCodeType = KeyCode(rawValue: input.keyCode) {
       switch keyCodeType {
-        case .kEscape: return handleEsc()
-        case .kTab, .kContextMenu: return revolveCandidate(reverseOrder: input.isShiftHold)
-        case .kUpArrow, .kDownArrow, .kLeftArrow, .kRightArrow:
-          let rotation: Bool = (input.isOptionHold || input.isShiftHold) && state.type == .ofInputting
-          handleArrowKey: switch (keyCodeType, delegate.isVerticalTyping) {
-            case (.kLeftArrow, false), (.kUpArrow, true): return handleBackward(input: input)
-            case (.kRightArrow, false), (.kDownArrow, true): return handleForward(input: input)
-            case (.kUpArrow, false), (.kLeftArrow, true):
-              return rotation ? revolveCandidate(reverseOrder: true) : handleClockKey()
-            case (.kDownArrow, false), (.kRightArrow, true):
-              return rotation ? revolveCandidate(reverseOrder: false) : handleClockKey()
-            default: break handleArrowKey  // 該情況應該不會發生，因為上面都有處理過。
+      case .kEscape: return handleEsc()
+      case .kTab, .kContextMenu: return revolveCandidate(reverseOrder: input.isShiftHold)
+      case .kUpArrow, .kDownArrow, .kLeftArrow, .kRightArrow:
+        let rotation: Bool = (input.isOptionHold || input.isShiftHold) && state.type == .ofInputting
+        handleArrowKey: switch (keyCodeType, delegate.isVerticalTyping) {
+        case (.kLeftArrow, false), (.kUpArrow, true): return handleBackward(input: input)
+        case (.kRightArrow, false), (.kDownArrow, true): return handleForward(input: input)
+        case (.kUpArrow, false), (.kLeftArrow, true):
+          return rotation ? revolveCandidate(reverseOrder: true) : handleClockKey()
+        case (.kDownArrow, false), (.kRightArrow, true):
+          return rotation ? revolveCandidate(reverseOrder: false) : handleClockKey()
+        default: break handleArrowKey // 該情況應該不會發生，因為上面都有處理過。
+        }
+      case .kHome: return handleHome()
+      case .kEnd: return handleEnd()
+      case .kBackSpace: return handleBackSpace(input: input)
+      case .kWindowsDelete: return handleDelete(input: input)
+      case .kCarriageReturn, .kLineFeed: return handleEnter(input: input)
+      case .kSpace: // 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
+        // 空格字符輸入行為處理。
+        switch state.type {
+        case .ofEmpty:
+          if !input.isOptionHold, !input.isControlHold, !input.isCommandHold {
+            delegate.switchState(IMEState.ofCommitting(textToCommit: input.isShiftHold ? "　" : " "))
+            return true
           }
-        case .kHome: return handleHome()
-        case .kEnd: return handleEnd()
-        case .kBackSpace: return handleBackSpace(input: input)
-        case .kWindowsDelete: return handleDelete(input: input)
-        case .kCarriageReturn, .kLineFeed: return handleEnter(input: input)
-        case .kSpace:  // 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
-          // 空格字符輸入行為處理。
-          switch state.type {
-            case .ofEmpty:
-              if !input.isOptionHold, !input.isControlHold, !input.isCommandHold {
-                delegate.switchState(IMEState.ofCommitting(textToCommit: input.isShiftHold ? "　" : " "))
-                return true
-              }
-            case .ofInputting:
-              // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
-              if input.isShiftHold, !input.isControlHold, !input.isOptionHold {
-                return revolveCandidate(reverseOrder: input.isCommandHold)
-              }
-              if compositor.cursor < compositor.length, compositor.insertKey(" ") {
-                walk()
-                // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
-                let textToCommit = commitOverflownComposition
-                var inputting = generateStateOfInputting()
-                inputting.textToCommit = textToCommit
-                delegate.switchState(inputting)
-              } else {
-                let displayedText = state.displayedText
-                if !displayedText.isEmpty {
-                  delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
-                }
-                delegate.switchState(IMEState.ofCommitting(textToCommit: " "))
-              }
-              return true
-            default: break
+        case .ofInputting:
+          // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
+          if input.isShiftHold, !input.isControlHold, !input.isOptionHold {
+            return revolveCandidate(reverseOrder: input.isCommandHold)
           }
+          if compositor.cursor < compositor.length, compositor.insertKey(" ") {
+            walk()
+            // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
+            let textToCommit = commitOverflownComposition
+            var inputting = generateStateOfInputting()
+            inputting.textToCommit = textToCommit
+            delegate.switchState(inputting)
+          } else {
+            let displayedText = state.displayedText
+            if !displayedText.isEmpty {
+              delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
+            }
+            delegate.switchState(IMEState.ofCommitting(textToCommit: " "))
+          }
+          return true
         default: break
+        }
+      default: break
       }
     }
 
@@ -206,7 +206,7 @@ extension InputHandler {
             // 開始決定是否切換至選字狀態。
             let newState = generateStateOfCandidates()
             _ = newState.candidates.isEmpty ? delegate.callError("B5127D8A") : delegate.switchState(newState)
-          } else {  // 不要在注音沒敲完整的情況下叫出統合符號選單。
+          } else { // 不要在注音沒敲完整的情況下叫出統合符號選單。
             delegate.callError("17446655")
           }
           return true
@@ -260,21 +260,21 @@ extension InputHandler {
     // MARK: 摁住 Shift+字母鍵 的處理 (Shift+Letter Processing)
 
     if input.isUpperCaseASCIILetterKey, !input.isCommandHold, !input.isControlHold {
-      if input.isShiftHold {  // 這裡先不要判斷 isOptionHold。
+      if input.isShiftHold { // 這裡先不要判斷 isOptionHold。
         switch prefs.upperCaseLetterKeyBehavior {
-          case 1:
-            delegate.switchState(IMEState.ofEmpty())
-            delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
+        case 1:
+          delegate.switchState(IMEState.ofEmpty())
+          delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
+          return true
+        case 2:
+          delegate.switchState(IMEState.ofEmpty())
+          delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.uppercased()))
+          return true
+        default: // 包括 case 0，直接塞給組字區。
+          let letter = "_letter_\(inputText)"
+          if handlePunctuation(letter) {
             return true
-          case 2:
-            delegate.switchState(IMEState.ofEmpty())
-            delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.uppercased()))
-            return true
-          default:  // 包括 case 0，直接塞給組字區。
-            let letter = "_letter_\(inputText)"
-            if handlePunctuation(letter) {
-              return true
-            }
+          }
         }
       }
     }

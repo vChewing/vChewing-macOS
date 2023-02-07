@@ -4,23 +4,23 @@ import PackageDescription
 let package = Package(
   name: "LineReader",
   platforms: [
-    .macOS(.v10_11)
+    .macOS(.v10_11),
   ],
   products: [
     .library(
       name: "LineReader",
       targets: ["LineReader"]
-    )
+    ),
   ],
   dependencies: [
-    .package(path: "../vChewing_SwiftExtension")
+    .package(path: "../vChewing_SwiftExtension"),
   ],
   targets: [
     .target(
       name: "LineReader",
       dependencies: [
-        .product(name: "SwiftExtension", package: "vChewing_SwiftExtension")
+        .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
       ]
-    )
+    ),
   ]
 )

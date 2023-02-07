@@ -5,7 +5,7 @@
 
 import Foundation
 
-extension Megrez {
+public extension Megrez {
   /// 一個組字器用來在給定一系列的索引鍵的情況下（藉由一系列的觀測行為）返回一套資料值。
   ///
   /// 用於輸入法的話，給定的索引鍵可以是注音、且返回的資料值都是漢語字詞組合。該組字器
@@ -15,7 +15,7 @@ extension Megrez {
   /// 簡單的貝氏推論：因為底層的語言模組只會提供單元圖資料。一旦將所有可以組字的單元圖
   /// 作為節點塞到組字器內，就可以用一個簡單的有向無環圖爬軌過程、來利用這些隱性資料值
   /// 算出最大相似估算結果。
-  public struct Compositor {
+  struct Compositor {
     /// 就文字輸入方向而言的方向。
     public enum TypingDirection { case front, rear }
     /// 軌格增減行為。
@@ -92,7 +92,7 @@ extension Megrez {
         spans = gridBackup
         return false
       }
-      cursor += 1  // 游標必須得在執行 update() 之後才可以變動。
+      cursor += 1 // 游標必須得在執行 update() 之後才可以變動。
       return true
     }
 
@@ -106,7 +106,7 @@ extension Megrez {
       let isBackSpace: Bool = direction == .rear ? true : false
       guard cursor != (isBackSpace ? 0 : keys.count) else { return false }
       keys.remove(at: cursor - (isBackSpace ? 1 : 0))
-      cursor -= isBackSpace ? 1 : 0  // 在縮節之前。
+      cursor -= isBackSpace ? 1 : 0 // 在縮節之前。
       resizeGrid(at: cursor, do: .shrink)
       update()
       return true
@@ -129,36 +129,36 @@ extension Megrez {
     {
       var target = isMarker ? marker : cursor
       switch direction {
-        case .front:
-          if target == length { return false }
-        case .rear:
-          if target == 0 { return false }
+      case .front:
+        if target == length { return false }
+      case .rear:
+        if target == 0 { return false }
       }
       guard let currentRegion = walkedNodes.cursorRegionMap[target] else { return false }
 
       let aRegionForward = max(currentRegion - 1, 0)
-      let currentRegionBorderRear: Int = walkedNodes[0..<currentRegion].map(\.spanLength).reduce(0, +)
+      let currentRegionBorderRear: Int = walkedNodes[0 ..< currentRegion].map(\.spanLength).reduce(0, +)
       switch target {
-        case currentRegionBorderRear:
-          switch direction {
-            case .front:
-              target =
-                (currentRegion > walkedNodes.count)
-                ? keys.count : walkedNodes[0...currentRegion].map(\.spanLength).reduce(0, +)
-            case .rear:
-              target = walkedNodes[0..<aRegionForward].map(\.spanLength).reduce(0, +)
-          }
-        default:
-          switch direction {
-            case .front:
-              target = currentRegionBorderRear + walkedNodes[currentRegion].spanLength
-            case .rear:
-              target = currentRegionBorderRear
-          }
+      case currentRegionBorderRear:
+        switch direction {
+        case .front:
+          target =
+            (currentRegion > walkedNodes.count)
+              ? keys.count : walkedNodes[0 ... currentRegion].map(\.spanLength).reduce(0, +)
+        case .rear:
+          target = walkedNodes[0 ..< aRegionForward].map(\.spanLength).reduce(0, +)
+        }
+      default:
+        switch direction {
+        case .front:
+          target = currentRegionBorderRear + walkedNodes[currentRegion].spanLength
+        case .rear:
+          target = currentRegionBorderRear
+        }
       }
       switch isMarker {
-        case false: cursor = target
-        case true: marker = target
+      case false: cursor = target
+      case true: marker = target
       }
       return true
     }
@@ -168,7 +168,7 @@ extension Megrez {
       // C# StringBuilder 與 Swift NSMutableString 能提供爆發性的效能。
       let strOutput: NSMutableString = .init(string: "digraph {\ngraph [ rankdir=LR ];\nBOS;\n")
       for (p, span) in spans.enumerated() {
-        for ni in 0...(span.maxLength) {
+        for ni in 0 ... (span.maxLength) {
           guard let np = span.nodeOf(length: ni) else { continue }
           if p == 0 {
             strOutput.append("BOS -> \(np.value);\n")
@@ -176,7 +176,7 @@ extension Megrez {
           strOutput.append("\(np.value);\n")
           if (p + ni) < spans.count {
             let destinationSpan = spans[p + ni]
-            for q in 0...(destinationSpan.maxLength) {
+            for q in 0 ... (destinationSpan.maxLength) {
               guard let dn = destinationSpan.nodeOf(length: q) else { continue }
               strOutput.append(np.value + " -> " + dn.value + ";\n")
             }
@@ -199,14 +199,14 @@ extension Megrez.Compositor {
   ///   - location: 給定的幅位座標。
   ///   - action: 指定是擴張還是縮減一個幅位。
   mutating func resizeGrid(at location: Int, do action: ResizeBehavior) {
-    let location = max(min(location, spans.count), 0)  // 防呆
+    let location = max(min(location, spans.count), 0) // 防呆
     switch action {
-      case .expand:
-        spans.insert(SpanUnit(), at: location)
-        if [0, spans.count].contains(location) { return }
-      case .shrink:
-        if spans.count == location { return }
-        spans.remove(at: location)
+    case .expand:
+      spans.insert(SpanUnit(), at: location)
+      if [0, spans.count].contains(location) { return }
+    case .shrink:
+      if spans.count == location { return }
+      spans.remove(at: location)
     }
     dropWreckedNodes(at: location)
   }
@@ -243,12 +243,12 @@ extension Megrez.Compositor {
   /// ```
   /// - Parameter location: 給定的幅位座標。
   mutating func dropWreckedNodes(at location: Int) {
-    let location = max(min(location, spans.count), 0)  // 防呆
+    let location = max(min(location, spans.count), 0) // 防呆
     guard !spans.isEmpty else { return }
     let affectedLength = Megrez.Compositor.maxSpanLength - 1
     let begin = max(0, location - affectedLength)
     guard location >= begin else { return }
-    for i in begin..<location {
+    for i in begin ..< location {
       spans[i].dropNodesOfOrBeyond(length: location - i + 1)
     }
   }
@@ -269,7 +269,7 @@ extension Megrez.Compositor {
   ///   - keyArray: 指定索引鍵陣列。
   /// - Returns: 拿取的節點。拿不到的話就會是 nil。
   func getNode(at location: Int, length: Int, keyArray: [String]) -> Node? {
-    let location = max(min(location, spans.count - 1), 0)  // 防呆
+    let location = max(min(location, spans.count - 1), 0) // 防呆
     guard let node = spans[location].nodeOf(length: length) else { return nil }
     return keyArray == node.keyArray ? node : nil
   }
@@ -280,11 +280,11 @@ extension Megrez.Compositor {
   /// - Returns: 新增或影響了多少個節點。如果返回「0」則表示可能發生了錯誤。
   @discardableResult public mutating func update(updateExisting: Bool = false) -> Int {
     let maxSpanLength = Megrez.Compositor.maxSpanLength
-    let range = max(0, cursor - maxSpanLength)..<min(cursor + maxSpanLength, keys.count)
+    let range = max(0, cursor - maxSpanLength) ..< min(cursor + maxSpanLength, keys.count)
     var nodesChanged = 0
     for position in range {
-      for theLength in 1...min(maxSpanLength, range.upperBound - position) {
-        let joinedKeyArray = getJoinedKeyArray(range: position..<(position + theLength))
+      for theLength in 1 ... min(maxSpanLength, range.upperBound - position) {
+        let joinedKeyArray = getJoinedKeyArray(range: position ..< (position + theLength))
         if let theNode = getNode(at: position, length: theLength, keyArray: joinedKeyArray) {
           if !updateExisting { continue }
           let unigrams = langModel.unigramsFor(keyArray: joinedKeyArray)

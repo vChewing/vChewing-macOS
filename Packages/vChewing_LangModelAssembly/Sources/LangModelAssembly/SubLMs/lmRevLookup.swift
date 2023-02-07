@@ -9,8 +9,8 @@
 import Foundation
 import Shared
 
-extension vChewingLM {
-  @frozen public struct LMRevLookup {
+public extension vChewingLM {
+  @frozen struct LMRevLookup {
     public private(set) var dataMap: [String: [Data]] = [:]
     public private(set) var filePath: String = ""
 

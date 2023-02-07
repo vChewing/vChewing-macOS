@@ -47,7 +47,7 @@ extension Backport where Wrapped: View {
       .environment(
         \.navigationDestinations,
         [
-          .init(type: D.self): .init { destination($0 as! D) }
+          .init(type: D.self): .init { destination($0 as! D) },
         ]
       )
   }
@@ -96,8 +96,8 @@ private struct NavigationDestinationsEnvironmentKey: EnvironmentKey {
 }
 
 @available(macOS 10.15, *)
-extension EnvironmentValues {
-  fileprivate var navigationDestinations: [AnyMetaType: DestinationView] {
+private extension EnvironmentValues {
+  var navigationDestinations: [AnyMetaType: DestinationView] {
     get { self[NavigationDestinationsEnvironmentKey.self] }
     set {
       var current = self[NavigationDestinationsEnvironmentKey.self]
@@ -127,8 +127,8 @@ extension AnyMetaType: Hashable {
 }
 
 @available(macOS 10.15, *)
-extension Dictionary {
-  fileprivate subscript(_ key: Any.Type) -> Value? where Key == AnyMetaType {
+private extension Dictionary {
+  subscript(_ key: Any.Type) -> Value? where Key == AnyMetaType {
     get { self[.init(type: key)] }
     _modify { yield &self[.init(type: key)] }
   }

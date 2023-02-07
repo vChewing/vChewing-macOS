@@ -4,13 +4,13 @@ import PackageDescription
 let package = Package(
   name: "CocoaExtension",
   platforms: [
-    .macOS(.v10_11)
+    .macOS(.v10_11),
   ],
   products: [
     .library(
       name: "CocoaExtension",
       targets: ["CocoaExtension"]
-    )
+    ),
   ],
   dependencies: [
     .package(path: "../vChewing_IMKUtils"),
@@ -23,6 +23,6 @@ let package = Package(
         .product(name: "IMKUtils", package: "vChewing_IMKUtils"),
         .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
       ]
-    )
+    ),
   ]
 )

@@ -4,19 +4,19 @@ import PackageDescription
 let package = Package(
   name: "BookmarkManager",
   platforms: [
-    .macOS(.v10_11)
+    .macOS(.v10_11),
   ],
   products: [
     .library(
       name: "BookmarkManager",
       targets: ["BookmarkManager"]
-    )
+    ),
   ],
   dependencies: [],
   targets: [
     .target(
       name: "BookmarkManager",
       dependencies: []
-    )
+    ),
   ]
 )

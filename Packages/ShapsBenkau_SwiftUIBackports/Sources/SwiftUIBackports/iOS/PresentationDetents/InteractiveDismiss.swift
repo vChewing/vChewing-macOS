@@ -5,7 +5,7 @@
 import SwiftUI
 
 @available(macOS 10.15, *)
-extension Backport where Wrapped: View {
+public extension Backport where Wrapped: View {
   /// Conditionally prevents interactive dismissal of a popover or a sheet.
   ///
   /// Users can dismiss certain kinds of presentations using built-in
@@ -76,7 +76,7 @@ extension Backport where Wrapped: View {
   @available(tvOS, deprecated: 16)
   @available(macOS, deprecated: 13)
   @available(watchOS, deprecated: 9)
-  public func interactiveDismissDisabled(_ isDisabled: Bool = true) -> some View {
+  func interactiveDismissDisabled(_ isDisabled: Bool = true) -> some View {
     #if os(iOS)
       if #available(iOS 15, *) {
         content.background(Backport<Any>.Representable(isModal: isDisabled, onAttempt: nil))
@@ -157,7 +157,7 @@ extension Backport where Wrapped: View {
   /// - Parameter onAttempt: A closure that will be called when an interactive dismiss attempt occurs.
   ///   You can use this as an opportunity to present an confirmation or prompt to the user.
   @ViewBuilder
-  public func interactiveDismissDisabled(_ isDisabled: Bool = true, onAttempt: @escaping () -> Void) -> some View {
+  func interactiveDismissDisabled(_ isDisabled: Bool = true, onAttempt: @escaping () -> Void) -> some View {
     #if os(iOS)
       if #available(iOS 15, *) {
         content.background(Backport<Any>.Representable(isModal: isDisabled, onAttempt: onAttempt))
@@ -172,8 +172,8 @@ extension Backport where Wrapped: View {
 
 #if os(iOS)
   @available(macOS 10.15, *)
-  extension Backport where Wrapped == Any {
-    fileprivate struct Representable: UIViewControllerRepresentable {
+  fileprivate extension Backport where Wrapped == Any {
+    struct Representable: UIViewControllerRepresentable {
       let isModal: Bool
       let onAttempt: (() -> Void)?
 
@@ -190,8 +190,8 @@ extension Backport where Wrapped: View {
   }
 
   @available(macOS 10.15, *)
-  extension Backport.Representable {
-    fileprivate final class Controller: UIViewController, UIAdaptivePresentationControllerDelegate {
+  fileprivate extension Backport.Representable {
+    final class Controller: UIViewController, UIAdaptivePresentationControllerDelegate {
       var isModal: Bool
       var onAttempt: (() -> Void)?
       weak var _delegate: UIAdaptivePresentationControllerDelegate?

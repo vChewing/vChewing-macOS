@@ -4,13 +4,13 @@ import PackageDescription
 let package = Package(
   name: "Hotenka",
   platforms: [
-    .macOS(.v10_11)
+    .macOS(.v10_11),
   ],
   products: [
     .library(
       name: "Hotenka",
       targets: ["Hotenka"]
-    )
+    ),
   ],
   dependencies: [],
   targets: [

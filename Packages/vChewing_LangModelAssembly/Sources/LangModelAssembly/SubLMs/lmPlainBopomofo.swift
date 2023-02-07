@@ -9,8 +9,8 @@
 import Foundation
 import Shared
 
-extension vChewingLM {
-  @frozen public struct LMPlainBopomofo {
+public extension vChewingLM {
+  @frozen struct LMPlainBopomofo {
     public private(set) var filePath: String?
     var dataMap: [String: String] = [:]
 

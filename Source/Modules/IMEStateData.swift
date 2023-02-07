@@ -16,7 +16,7 @@ public struct IMEStateData: IMEStateDataProtocol {
   }
 
   static var allowedMarkLengthRange: ClosedRange<Int> {
-    Self.minCandidateLength...PrefMgr.shared.maxCandidateLength
+    Self.minCandidateLength ... PrefMgr.shared.maxCandidateLength
   }
 
   public var displayedText: String = "" {
@@ -53,7 +53,7 @@ public struct IMEStateData: IMEStateDataProtocol {
   }
 
   public var markedRange: Range<Int> {
-    min(cursor, marker)..<max(cursor, marker)
+    min(cursor, marker) ..< max(cursor, marker)
   }
 
   // MARK: Cursor & Marker & Range for UTF16 (Read-Only)
@@ -62,15 +62,15 @@ public struct IMEStateData: IMEStateDataProtocol {
   /// 所以在這裡必須做糾偏處理。因為在用 Swift，所以可以用「.utf16」取代「NSString.length()」。
   /// 這樣就可以免除不必要的類型轉換。
   public var u16Cursor: Int {
-    displayedText.charComponents[0..<cursor].joined().utf16.count
+    displayedText.charComponents[0 ..< cursor].joined().utf16.count
   }
 
   public var u16Marker: Int {
-    displayedText.charComponents[0..<marker].joined().utf16.count
+    displayedText.charComponents[0 ..< marker].joined().utf16.count
   }
 
   public var u16MarkedRange: Range<Int> {
-    min(u16Cursor, u16Marker)..<max(u16Cursor, u16Marker)
+    min(u16Cursor, u16Marker) ..< max(u16Cursor, u16Marker)
   }
 
   // MARK: Other data for non-empty states.
@@ -168,8 +168,8 @@ public struct IMEStateData: IMEStateDataProtocol {
 
 // MARK: - IMEState 工具函式
 
-extension IMEStateData {
-  public var doesUserPhraseExist: Bool {
+public extension IMEStateData {
+  var doesUserPhraseExist: Bool {
     let text = displayedText.charComponents[markedRange].joined()
     let joined = markedReadings.joined(separator: InputHandler.keySeparator)
     return LMMgr.checkIfUserPhraseExist(
@@ -177,7 +177,7 @@ extension IMEStateData {
     )
   }
 
-  public var readingThreadForDisplay: String {
+  var readingThreadForDisplay: String {
     var arrOutput = [String]()
     for neta in markedReadings {
       if neta.isEmpty { continue }
@@ -189,7 +189,7 @@ extension IMEStateData {
         var subNeta = subNeta
         if !PrefMgr.shared.cassetteEnabled {
           if PrefMgr.shared.showHanyuPinyinInCompositionBuffer,
-            PrefMgr.shared.alwaysShowTooltipTextsHorizontally || !SessionCtl.isVerticalTyping
+             PrefMgr.shared.alwaysShowTooltipTextsHorizontally || !SessionCtl.isVerticalTyping
           {
             // 恢復陰平標記->注音轉拼音->轉教科書式標調
             subNeta = Tekkon.restoreToneOneInPhona(target: subNeta)
@@ -205,19 +205,19 @@ extension IMEStateData {
     return arrOutput.joined(separator: "\u{A0}")
   }
 
-  public var userPhraseKVPair: (String, String) {
+  var userPhraseKVPair: (String, String) {
     let key = markedReadings.joined(separator: InputHandler.keySeparator)
     let value = displayedText.charComponents[markedRange].joined()
     return (key, value)
   }
 
-  public var userPhraseDumped: String {
+  var userPhraseDumped: String {
     let pair = userPhraseKVPair
     let nerfedScore = SessionCtl.areWeNerfing && markedTargetExists ? " -114.514" : ""
     return "\(pair.1) \(pair.0)\(nerfedScore)"
   }
 
-  public var userPhraseDumpedConverted: String {
+  var userPhraseDumpedConverted: String {
     let pair = userPhraseKVPair
     let text = ChineseConverter.crossConvert(pair.1)
     let nerfedScore = SessionCtl.areWeNerfing && markedTargetExists ? " -114.514" : ""
@@ -225,7 +225,7 @@ extension IMEStateData {
     return "\(text) \(pair.0)\(nerfedScore) \(convertedMark)"
   }
 
-  public mutating func updateTooltipForMarking() {
+  mutating func updateTooltipForMarking() {
     var tooltipForMarking: String {
       let pair = userPhraseKVPair
       if PrefMgr.shared.phraseReplacementEnabled {

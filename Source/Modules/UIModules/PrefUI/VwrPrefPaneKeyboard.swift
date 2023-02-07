@@ -7,8 +7,8 @@
 // requirements defined in MIT License.
 
 import IMKUtils
-import SSPreferences
 import Shared
+import SSPreferences
 import SwiftExtension
 import SwiftUI
 
@@ -19,19 +19,19 @@ struct VwrPrefPaneKeyboard: View {
     UserDefaults.standard.string(forKey: UserDef.kBasicKeyboardLayout.rawValue) ?? PrefMgr.shared.basicKeyboardLayout
   @State private var selAlphanumericalKeyboardLayout: String =
     UserDefaults.standard.string(forKey: UserDef.kAlphanumericalKeyboardLayout.rawValue)
-    ?? PrefMgr.shared.alphanumericalKeyboardLayout
+      ?? PrefMgr.shared.alphanumericalKeyboardLayout
 
   private let contentMaxHeight: Double = 490
   private let contentWidth: Double = {
     switch PrefMgr.shared.appleLanguages[0] {
-      case "ja":
-        return 520
-      default:
-        if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
-          return 480
-        } else {
-          return 580
-        }
+    case "ja":
+      return 520
+    default:
+      if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
+        return 480
+      } else {
+        return 580
+      }
     }
   }()
 
@@ -100,7 +100,7 @@ struct VwrPrefPaneKeyboard: View {
                 PrefMgr.shared.basicKeyboardLayout = value
               }
             ) {
-              ForEach(0...(IMKHelper.allowedBasicLayoutsAsTISInputSources.count - 1), id: \.self) { id in
+              ForEach(0 ... (IMKHelper.allowedBasicLayoutsAsTISInputSources.count - 1), id: \.self) { id in
                 let theEntry = IMKHelper.allowedBasicLayoutsAsTISInputSources[id]
                 if let theEntry = theEntry {
                   Text(theEntry.vChewingLocalizedName).tag(theEntry.identifier)
@@ -128,7 +128,7 @@ struct VwrPrefPaneKeyboard: View {
                 PrefMgr.shared.alphanumericalKeyboardLayout = selAlphanumericalKeyboardLayout
               }
             ) {
-              ForEach(0...(IMKHelper.allowedAlphanumericalTISInputSources.count - 1), id: \.self) { id in
+              ForEach(0 ... (IMKHelper.allowedAlphanumericalTISInputSources.count - 1), id: \.self) { id in
                 if let theEntry = IMKHelper.allowedAlphanumericalTISInputSources[id] {
                   Text(theEntry.vChewingLocalizedName).tag(theEntry.identifier)
                 }
@@ -350,8 +350,8 @@ public struct ComboBox: NSViewRepresentable {
 
     public func comboBoxSelectionDidChange(_ notification: Notification) {
       if !ignoreSelectionChanges,
-        let box: NSComboBox = notification.object as? NSComboBox,
-        let newStringValue: String = box.objectValueOfSelectedItem as? String
+         let box: NSComboBox = notification.object as? NSComboBox,
+         let newStringValue: String = box.objectValueOfSelectedItem as? String
       {
         parent.text = newStringValue
       }

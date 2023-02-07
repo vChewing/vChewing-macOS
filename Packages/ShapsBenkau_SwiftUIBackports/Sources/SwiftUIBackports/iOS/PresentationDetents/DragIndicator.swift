@@ -48,8 +48,8 @@ extension Backport where Wrapped: View {
 #if os(iOS)
   @available(iOS 15, *)
   @available(macOS 10.15, *)
-  extension Backport where Wrapped == Any {
-    fileprivate struct Representable: UIViewControllerRepresentable {
+  fileprivate extension Backport where Wrapped == Any {
+    struct Representable: UIViewControllerRepresentable {
       let visibility: Backport<Any>.Visibility
 
       func makeUIViewController(context _: Context) -> Backport.Representable.Controller {
@@ -64,8 +64,8 @@ extension Backport where Wrapped: View {
 
   @available(macOS 10.15, *)
   @available(iOS 15, *)
-  extension Backport.Representable {
-    fileprivate final class Controller: UIViewController {
+  fileprivate extension Backport.Representable {
+    final class Controller: UIViewController {
       var visibility: Backport<Any>.Visibility
 
       @available(macOS 10.15, *)

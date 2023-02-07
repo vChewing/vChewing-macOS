@@ -107,7 +107,7 @@ public struct VwrCandidateVerticalBackports: View {
           if thePool.maxLinesPerPage - thePool.rangeForCurrentPage.count > 0 {
             ForEach(Array(thePool.rangeForLastPageBlanked.enumerated()), id: \.offset) { loopIndex, _ in
               VStack(alignment: .leading, spacing: 0) {
-                ForEach(0..<thePool.maxLineCapacity, id: \.self) { _ in
+                ForEach(0 ..< thePool.maxLineCapacity, id: \.self) { _ in
                   thePool.blankCell.attributedStringForSwiftUIBackports.fixedSize()
                     .frame(width: Double(CandidateCellData.unifiedSize * 5), alignment: .topLeading)
                     .contentShape(Rectangle())

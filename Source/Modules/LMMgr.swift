@@ -32,23 +32,23 @@ public class LMMgr {
 
   public static var currentLM: vChewingLM.LMInstantiator {
     switch IMEApp.currentInputMode {
-      case .imeModeCHS:
-        return Self.lmCHS
-      case .imeModeCHT:
-        return Self.lmCHT
-      case .imeModeNULL:
-        return .init()
+    case .imeModeCHS:
+      return Self.lmCHS
+    case .imeModeCHT:
+      return Self.lmCHT
+    case .imeModeNULL:
+      return .init()
     }
   }
 
   public static var currentUOM: vChewingLM.LMUserOverride {
     switch IMEApp.currentInputMode {
-      case .imeModeCHS:
-        return Self.uomCHS
-      case .imeModeCHT:
-        return Self.uomCHT
-      case .imeModeNULL:
-        return .init(dataURL: Self.userOverrideModelDataURL(IMEApp.currentInputMode))
+    case .imeModeCHS:
+      return Self.uomCHS
+    case .imeModeCHT:
+      return Self.uomCHT
+    case .imeModeNULL:
+      return .init(dataURL: Self.userOverrideModelDataURL(IMEApp.currentInputMode))
     }
   }
 
@@ -133,56 +133,56 @@ public class LMMgr {
     group.enter()
     globalQueue.async {
       switch mode {
-        case .imeModeCHS:
-          if !Self.lmCHS.isCNSDataLoaded {
-            Self.lmCHS.loadCNSData(plist: Self.getDictionaryData("data-cns"))
-          }
-          if !Self.lmCHS.isMiscDataLoaded {
-            Self.lmCHS.loadMiscData(plist: Self.getDictionaryData("data-zhuyinwen"))
-          }
-          if !Self.lmCHS.isSymbolDataLoaded {
-            Self.lmCHS.loadSymbolData(plist: Self.getDictionaryData("data-symbols"))
-          }
-        case .imeModeCHT:
-          if !Self.lmCHT.isCNSDataLoaded {
-            Self.lmCHT.loadCNSData(plist: Self.getDictionaryData("data-cns"))
-          }
-          if !Self.lmCHT.isMiscDataLoaded {
-            Self.lmCHT.loadMiscData(plist: Self.getDictionaryData("data-zhuyinwen"))
-          }
-          if !Self.lmCHT.isSymbolDataLoaded {
-            Self.lmCHT.loadSymbolData(plist: Self.getDictionaryData("data-symbols"))
-          }
-        default: break
+      case .imeModeCHS:
+        if !Self.lmCHS.isCNSDataLoaded {
+          Self.lmCHS.loadCNSData(plist: Self.getDictionaryData("data-cns"))
+        }
+        if !Self.lmCHS.isMiscDataLoaded {
+          Self.lmCHS.loadMiscData(plist: Self.getDictionaryData("data-zhuyinwen"))
+        }
+        if !Self.lmCHS.isSymbolDataLoaded {
+          Self.lmCHS.loadSymbolData(plist: Self.getDictionaryData("data-symbols"))
+        }
+      case .imeModeCHT:
+        if !Self.lmCHT.isCNSDataLoaded {
+          Self.lmCHT.loadCNSData(plist: Self.getDictionaryData("data-cns"))
+        }
+        if !Self.lmCHT.isMiscDataLoaded {
+          Self.lmCHT.loadMiscData(plist: Self.getDictionaryData("data-zhuyinwen"))
+        }
+        if !Self.lmCHT.isSymbolDataLoaded {
+          Self.lmCHT.loadSymbolData(plist: Self.getDictionaryData("data-symbols"))
+        }
+      default: break
       }
       group.leave()
     }
     switch mode {
-      case .imeModeCHS:
-        if !Self.lmCHS.isCoreLMLoaded {
-          showFinishNotification = true
-          Notifier.notify(
-            message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
-          )
-          group.enter()
-          globalQueue.async {
-            loadCoreLanguageModelFile(filenameSansExtension: "data-chs", langModel: &Self.lmCHS)
-            group.leave()
-          }
+    case .imeModeCHS:
+      if !Self.lmCHS.isCoreLMLoaded {
+        showFinishNotification = true
+        Notifier.notify(
+          message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
+        )
+        group.enter()
+        globalQueue.async {
+          loadCoreLanguageModelFile(filenameSansExtension: "data-chs", langModel: &Self.lmCHS)
+          group.leave()
         }
-      case .imeModeCHT:
-        if !Self.lmCHT.isCoreLMLoaded {
-          showFinishNotification = true
-          Notifier.notify(
-            message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
-          )
-          group.enter()
-          globalQueue.async {
-            loadCoreLanguageModelFile(filenameSansExtension: "data-cht", langModel: &Self.lmCHT)
-            group.leave()
-          }
+      }
+    case .imeModeCHT:
+      if !Self.lmCHT.isCoreLMLoaded {
+        showFinishNotification = true
+        Notifier.notify(
+          message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
+        )
+        group.enter()
+        globalQueue.async {
+          loadCoreLanguageModelFile(filenameSansExtension: "data-cht", langModel: &Self.lmCHT)
+          group.leave()
         }
-      default: break
+      }
+    default: break
     }
     group.notify(queue: DispatchQueue.main) {
       if showFinishNotification {
@@ -234,26 +234,26 @@ public class LMMgr {
       return
     }
     switch type {
-      case .thePhrases, .theFilter:
-        Self.lmCHT.loadUserPhrasesData(
-          path: userDictDataURL(mode: .imeModeCHT, type: .thePhrases).path,
-          filterPath: userDictDataURL(mode: .imeModeCHT, type: .theFilter).path
-        )
-        Self.lmCHS.loadUserPhrasesData(
-          path: userDictDataURL(mode: .imeModeCHS, type: .thePhrases).path,
-          filterPath: userDictDataURL(mode: .imeModeCHS, type: .theFilter).path
-        )
-      case .theReplacements:
-        if PrefMgr.shared.phraseReplacementEnabled { Self.loadUserPhraseReplacement() }
-      case .theAssociates:
-        if PrefMgr.shared.associatedPhrasesEnabled { Self.loadUserAssociatesData() }
-      case .theSymbols:
-        Self.lmCHT.loadUserSymbolData(
-          path: Self.userDictDataURL(mode: .imeModeCHT, type: .theSymbols).path
-        )
-        Self.lmCHS.loadUserSymbolData(
-          path: Self.userDictDataURL(mode: .imeModeCHS, type: .theSymbols).path
-        )
+    case .thePhrases, .theFilter:
+      Self.lmCHT.loadUserPhrasesData(
+        path: userDictDataURL(mode: .imeModeCHT, type: .thePhrases).path,
+        filterPath: userDictDataURL(mode: .imeModeCHT, type: .theFilter).path
+      )
+      Self.lmCHS.loadUserPhrasesData(
+        path: userDictDataURL(mode: .imeModeCHS, type: .thePhrases).path,
+        filterPath: userDictDataURL(mode: .imeModeCHS, type: .theFilter).path
+      )
+    case .theReplacements:
+      if PrefMgr.shared.phraseReplacementEnabled { Self.loadUserPhraseReplacement() }
+    case .theAssociates:
+      if PrefMgr.shared.associatedPhrasesEnabled { Self.loadUserAssociatesData() }
+    case .theSymbols:
+      Self.lmCHT.loadUserSymbolData(
+        path: Self.userDictDataURL(mode: .imeModeCHT, type: .theSymbols).path
+      )
+      Self.lmCHS.loadUserSymbolData(
+        path: Self.userDictDataURL(mode: .imeModeCHS, type: .theSymbols).path
+      )
     }
   }
 
@@ -291,15 +291,15 @@ public class LMMgr {
     factoryDictionaryOnly: Bool = false
   ) -> Bool {
     switch mode {
-      case .imeModeCHS:
-        return lmCHS.hasKeyValuePairFor(
-          keyArray: [unigramKey], value: userPhrase, factoryDictionaryOnly: factoryDictionaryOnly
-        )
-      case .imeModeCHT:
-        return lmCHT.hasKeyValuePairFor(
-          keyArray: [unigramKey], value: userPhrase, factoryDictionaryOnly: factoryDictionaryOnly
-        )
-      case .imeModeNULL: return false
+    case .imeModeCHS:
+      return lmCHS.hasKeyValuePairFor(
+        keyArray: [unigramKey], value: userPhrase, factoryDictionaryOnly: factoryDictionaryOnly
+      )
+    case .imeModeCHT:
+      return lmCHT.hasKeyValuePairFor(
+        keyArray: [unigramKey], value: userPhrase, factoryDictionaryOnly: factoryDictionaryOnly
+      )
+    case .imeModeNULL: return false
     }
   }
 
@@ -386,8 +386,8 @@ public class LMMgr {
 
     let result =
       factory
-      ? getPlistData(url: factoryResultURL)
-      : getPlistData(url: containerResultURL) ?? getPlistData(url: factoryResultURL)
+        ? getPlistData(url: factoryResultURL)
+        : getPlistData(url: containerResultURL) ?? getPlistData(url: factoryResultURL)
     if result == nil {
       vCLog("↑ Exception happened when reading plist file at: \(lastReadPath).")
     }
@@ -406,11 +406,11 @@ public class LMMgr {
   public static func userDictDataURL(mode: Shared.InputMode, type: vChewingLM.ReplacableUserDataType) -> URL {
     var fileName: String = {
       switch type {
-        case .thePhrases: return "userdata"
-        case .theFilter: return "exclude-phrases"
-        case .theReplacements: return "phrases-replacement"
-        case .theAssociates: return "associatedPhrases"
-        case .theSymbols: return "usersymbolphrases"
+      case .thePhrases: return "userdata"
+      case .theFilter: return "exclude-phrases"
+      case .theReplacements: return "phrases-replacement"
+      case .theAssociates: return "associatedPhrases"
+      case .theSymbols: return "usersymbolphrases"
       }
     }()
     fileName.append((mode == .imeModeCHT) ? "-cht.txt" : "-chs.txt")
@@ -439,9 +439,9 @@ public class LMMgr {
   public static func userOverrideModelDataURL(_ mode: Shared.InputMode) -> URL {
     let fileName: String = {
       switch mode {
-        case .imeModeCHS: return "vChewing_override-model-data-chs.dat"
-        case .imeModeCHT: return "vChewing_override-model-data-cht.dat"
-        case .imeModeNULL: return "vChewing_override-model-data-dummy.dat"
+      case .imeModeCHS: return "vChewing_override-model-data-chs.dat"
+      case .imeModeCHT: return "vChewing_override-model-data-cht.dat"
+      case .imeModeNULL: return "vChewing_override-model-data-dummy.dat"
       }
     }()
 
@@ -498,12 +498,12 @@ public class LMMgr {
 
   private static func templateName(for type: vChewingLM.ReplacableUserDataType, mode: Shared.InputMode) -> String {
     switch type {
-      case .thePhrases: return kTemplateNameUserPhrases
-      case .theFilter: return kTemplateNameUserFilterList
-      case .theReplacements: return kTemplateNameUserReplacements
-      case .theSymbols: return kTemplateNameUserSymbolPhrases
-      case .theAssociates:
-        return mode == .imeModeCHS ? kTemplateNameUserAssociatesCHS : kTemplateNameUserAssociatesCHT
+    case .thePhrases: return kTemplateNameUserPhrases
+    case .theFilter: return kTemplateNameUserFilterList
+    case .theReplacements: return kTemplateNameUserReplacements
+    case .theSymbols: return kTemplateNameUserSymbolPhrases
+    case .theAssociates:
+      return mode == .imeModeCHS ? kTemplateNameUserAssociatesCHS : kTemplateNameUserAssociatesCHT
     }
   }
 
@@ -517,7 +517,7 @@ public class LMMgr {
 
     // 路徑沒有結尾斜槓的話，會導致目錄合規性判定失準。
     // 出於每個型別每個函式的自我責任原則，這裡多檢查一遍也不壞。
-    var folderPath = folderPath  // Convert the incoming constant to a variable.
+    var folderPath = folderPath // Convert the incoming constant to a variable.
     if isFolder.boolValue {
       folderPath?.ensureTrailingSlash()
     }
@@ -654,8 +654,8 @@ public class LMMgr {
       }
 
       if let writeFile = FileHandle(forUpdatingAtPath: theURL.path),
-        let data = currentMarkedPhrase.data(using: .utf8),
-        let endl = "\n".data(using: .utf8)
+         let data = currentMarkedPhrase.data(using: .utf8),
+         let endl = "\n".data(using: .utf8)
       {
         writeFile.seekToEndOfFile()
         writeFile.write(endl)
@@ -725,35 +725,35 @@ public class LMMgr {
     if !Self.checkIfUserFilesExistBeforeOpening() { return }
     DispatchQueue.main.async {
       switch app {
-        case "vim":
-          let process = Process()
-          let pipe = Pipe()
-          process.executableURL = URL(fileURLWithPath: "/bin/sh/")
-          process.arguments = ["-c", "open '/usr/bin/vim'", "'\(url.path)'"]
-          process.standardOutput = pipe
-          process.standardError = pipe
-          process.terminationHandler = { process in
-            vCLog("\ndidFinish: \(!process.isRunning)")
+      case "vim":
+        let process = Process()
+        let pipe = Pipe()
+        process.executableURL = URL(fileURLWithPath: "/bin/sh/")
+        process.arguments = ["-c", "open '/usr/bin/vim'", "'\(url.path)'"]
+        process.standardOutput = pipe
+        process.standardError = pipe
+        process.terminationHandler = { process in
+          vCLog("\ndidFinish: \(!process.isRunning)")
+        }
+        let fileHandle = pipe.fileHandleForReading
+        do {
+          try process.run()
+        } catch {
+          NSWorkspace.shared.openFile(url.path, withApplication: "TextEdit")
+        }
+        do {
+          if let theData = try fileHandle.readToEnd(),
+             let outStr = String(data: theData, encoding: .utf8)
+          {
+            vCLog(outStr)
           }
-          let fileHandle = pipe.fileHandleForReading
-          do {
-            try process.run()
-          } catch {
-            NSWorkspace.shared.openFile(url.path, withApplication: "TextEdit")
-          }
-          do {
-            if let theData = try fileHandle.readToEnd(),
-              let outStr = String(data: theData, encoding: .utf8)
-            {
-              vCLog(outStr)
-            }
-          } catch {}
-        case "Finder":
-          NSWorkspace.shared.activateFileViewerSelecting([url])
-        default:
-          if !NSWorkspace.shared.openFile(url.path, withApplication: app) {
-            NSWorkspace.shared.openFile(url.path, withApplication: "TextEdit")
-          }
+        } catch {}
+      case "Finder":
+        NSWorkspace.shared.activateFileViewerSelecting([url])
+      default:
+        if !NSWorkspace.shared.openFile(url.path, withApplication: app) {
+          NSWorkspace.shared.openFile(url.path, withApplication: "TextEdit")
+        }
       }
     }
   }
@@ -779,34 +779,34 @@ public class LMMgr {
 
   public static func bleachSpecifiedSuggestions(targets: [String], mode: Shared.InputMode) {
     switch mode {
-      case .imeModeCHS:
-        Self.uomCHT.bleachSpecifiedSuggestions(targets: targets, saveCallback: { Self.uomCHT.saveData() })
-      case .imeModeCHT:
-        Self.uomCHS.bleachSpecifiedSuggestions(targets: targets, saveCallback: { Self.uomCHS.saveData() })
-      case .imeModeNULL:
-        break
+    case .imeModeCHS:
+      Self.uomCHT.bleachSpecifiedSuggestions(targets: targets, saveCallback: { Self.uomCHT.saveData() })
+    case .imeModeCHT:
+      Self.uomCHS.bleachSpecifiedSuggestions(targets: targets, saveCallback: { Self.uomCHS.saveData() })
+    case .imeModeNULL:
+      break
     }
   }
 
   public static func removeUnigramsFromUserOverrideModel(_ mode: Shared.InputMode) {
     switch mode {
-      case .imeModeCHS:
-        Self.uomCHT.bleachUnigrams(saveCallback: { Self.uomCHT.saveData() })
-      case .imeModeCHT:
-        Self.uomCHS.bleachUnigrams(saveCallback: { Self.uomCHS.saveData() })
-      case .imeModeNULL:
-        break
+    case .imeModeCHS:
+      Self.uomCHT.bleachUnigrams(saveCallback: { Self.uomCHT.saveData() })
+    case .imeModeCHT:
+      Self.uomCHS.bleachUnigrams(saveCallback: { Self.uomCHS.saveData() })
+    case .imeModeNULL:
+      break
     }
   }
 
   public static func clearUserOverrideModelData(_ mode: Shared.InputMode = .imeModeNULL) {
     switch mode {
-      case .imeModeCHS:
-        Self.uomCHS.clearData(withURL: userOverrideModelDataURL(.imeModeCHS))
-      case .imeModeCHT:
-        Self.uomCHT.clearData(withURL: userOverrideModelDataURL(.imeModeCHT))
-      case .imeModeNULL:
-        break
+    case .imeModeCHS:
+      Self.uomCHS.clearData(withURL: userOverrideModelDataURL(.imeModeCHS))
+    case .imeModeCHT:
+      Self.uomCHT.clearData(withURL: userOverrideModelDataURL(.imeModeCHT))
+    case .imeModeNULL:
+      break
     }
   }
 }
@@ -863,31 +863,31 @@ extension LMMgr: PhraseEditorDelegate {
   public func tagOverrides(in strProcessed: inout String, mode: Shared.InputMode) {
     let outputStack: NSMutableString = .init()
     switch mode {
-      case .imeModeCHT:
-        if !Self.lmCHT.isCoreLMLoaded {
-          Notifier.notify(
-            message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
-          )
-          Self.loadCoreLanguageModelFile(
-            filenameSansExtension: "data-cht", langModel: &Self.lmCHT
-          )
-          Notifier.notify(
-            message: NSLocalizedString("Core Dict loading complete.", comment: "")
-          )
-        }
-      case .imeModeCHS:
-        if !Self.lmCHS.isCoreLMLoaded {
-          Notifier.notify(
-            message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
-          )
-          Self.loadCoreLanguageModelFile(
-            filenameSansExtension: "data-chs", langModel: &Self.lmCHS
-          )
-          Notifier.notify(
-            message: NSLocalizedString("Core Dict loading complete.", comment: "")
-          )
-        }
-      case .imeModeNULL: return
+    case .imeModeCHT:
+      if !Self.lmCHT.isCoreLMLoaded {
+        Notifier.notify(
+          message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
+        )
+        Self.loadCoreLanguageModelFile(
+          filenameSansExtension: "data-cht", langModel: &Self.lmCHT
+        )
+        Notifier.notify(
+          message: NSLocalizedString("Core Dict loading complete.", comment: "")
+        )
+      }
+    case .imeModeCHS:
+      if !Self.lmCHS.isCoreLMLoaded {
+        Notifier.notify(
+          message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
+        )
+        Self.loadCoreLanguageModelFile(
+          filenameSansExtension: "data-chs", langModel: &Self.lmCHS
+        )
+        Notifier.notify(
+          message: NSLocalizedString("Core Dict loading complete.", comment: "")
+        )
+      }
+    case .imeModeNULL: return
     }
     for currentLine in strProcessed.split(separator: "\n") {
       let arr = currentLine.split(separator: " ")

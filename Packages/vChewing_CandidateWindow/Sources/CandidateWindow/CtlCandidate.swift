@@ -24,13 +24,13 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
     }
     // 設定當前高亮候選字的背景顏色。
     switch locale {
-      case "zh-Hans":
-        result = NSColor.systemRed
-      case "zh-Hant":
-        result = NSColor.systemBlue
-      case "ja":
-        result = NSColor.systemBrown
-      default: break
+    case "zh-Hans":
+      result = NSColor.systemRed
+    case "zh-Hant":
+      result = NSColor.systemBlue
+    case "ja":
+      result = NSColor.systemBrown
+    default: break
     }
     var blendingAgainstTarget: NSColor = NSApplication.isDarkMode ? NSColor.black : NSColor.white
     if #unavailable(macOS 10.14) {

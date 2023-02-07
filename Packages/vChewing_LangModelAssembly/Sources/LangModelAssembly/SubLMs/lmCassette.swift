@@ -12,9 +12,9 @@ import LineReader
 import Megrez
 import Shared
 
-extension vChewingLM {
+public extension vChewingLM {
   /// 磁帶模組，用來方便使用者自行擴充字根輸入法。
-  @frozen public struct LMCassette {
+  @frozen struct LMCassette {
     public private(set) var filePath: String?
     public private(set) var nameShort: String = ""
     public private(set) var nameENG: String = ""
@@ -115,9 +115,9 @@ extension vChewingLM {
             } else if loadingOctagramData, !strLine.contains("%octagram") {
               guard let countValue = Int(cells[1]) else { continue }
               switch cells.count {
-                case 2: octagramMap[strFirstCell] = countValue
-                case 3: octagramDividedMap[strFirstCell] = (countValue, cells[2].trimmingCharacters(in: .newlines))
-                default: break
+              case 2: octagramMap[strFirstCell] = countValue
+              case 3: octagramDividedMap[strFirstCell] = (countValue, cells[2].trimmingCharacters(in: .newlines))
+              default: break
               }
               norm += Self.fscale ** (Double(cells[0].count) / 3.0 - 1.0) * Double(countValue)
             }
@@ -187,7 +187,7 @@ extension vChewingLM {
       let arrRaw = charDefMap[key]?.deduplicated ?? []
       var arrRawWildcard: [String] = []
       if let arrRawWildcardValues = charDefWildcardMap[key]?.deduplicated,
-        key.contains(wildcard), key.first?.description != wildcard
+         key.contains(wildcard), key.first?.description != wildcard
       {
         arrRawWildcard.append(contentsOf: arrRawWildcardValues)
       }
@@ -236,18 +236,18 @@ extension vChewingLM {
     private func calculateWeight(count theCount: Int, phraseLength: Int) -> Double {
       var weight: Double = 0
       switch theCount {
-        case -2:  // 拗音假名
-          weight = -13
-        case -1:  // 單個假名
-          weight = -13
-        case 0:  // 墊底低頻漢字與詞語
-          weight = log10(
-            Self.fscale ** (Double(phraseLength) / 3.0 - 1.0) * 0.25 / norm)
-        default:
-          weight = log10(
-            Self.fscale ** (Double(phraseLength) / 3.0 - 1.0)
-              * Double(theCount) / norm
-          )
+      case -2: // 拗音假名
+        weight = -13
+      case -1: // 單個假名
+        weight = -13
+      case 0: // 墊底低頻漢字與詞語
+        weight = log10(
+          Self.fscale ** (Double(phraseLength) / 3.0 - 1.0) * 0.25 / norm)
+      default:
+        weight = log10(
+          Self.fscale ** (Double(phraseLength) / 3.0 - 1.0)
+            * Double(theCount) / norm
+        )
       }
       return weight
     }

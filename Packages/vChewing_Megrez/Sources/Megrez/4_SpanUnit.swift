@@ -15,7 +15,7 @@ extension Megrez.Compositor {
     /// （該變數為捷徑，代傳 Megrez.Compositor.maxSpanLength。）
     private var maxSpanLength: Int { Megrez.Compositor.maxSpanLength }
     /// 該幅位單元內的節點的幅位長度上限。
-    private var allowedLengths: ClosedRange<Int> { 1...maxSpanLength }
+    private var allowedLengths: ClosedRange<Int> { 1 ... maxSpanLength }
 
     /// 幅位乃指一組共享起點的節點。
     public init() {
@@ -25,7 +25,7 @@ extension Megrez.Compositor {
     /// 清除該幅位單元的全部的節點，且重設最長節點長度為 0，然後再在節點陣列內預留空位。
     public func clear() {
       nodes.removeAll()
-      for _ in 0..<maxSpanLength {
+      for _ in 0 ..< maxSpanLength {
         nodes.append(nil)
       }
       maxLength = 0
@@ -50,13 +50,13 @@ extension Megrez.Compositor {
       guard allowedLengths.contains(length) else {
         return false
       }
-      for i in length...maxSpanLength {
+      for i in length ... maxSpanLength {
         nodes[i - 1] = nil
       }
       maxLength = 0
       guard length > 1 else { return false }
       let maxR = length - 2
-      for i in 0...maxR {
+      for i in 0 ... maxR {
         if nodes[maxR - i] == nil { continue }
         maxLength = maxR - i + 1
         break
@@ -83,17 +83,17 @@ extension Megrez.Compositor {
     guard !spans.isEmpty, location < spans.count else { return results }
 
     // 先獲取該位置的所有單字節點。
-    for theLocation in 1...spans[location].maxLength {
+    for theLocation in 1 ... spans[location].maxLength {
       guard let node = spans[location].nodeOf(length: theLocation) else { continue }
       results.append(.init(node: node, spanIndex: location))
     }
 
     // 再獲取以當前位置結尾或開頭的節點。
     let begin: Int = location - min(location, Megrez.Compositor.maxSpanLength - 1)
-    for theLocation in begin..<location {
+    for theLocation in begin ..< location {
       let (A, B): (Int, Int) = (location - theLocation + 1, spans[theLocation].maxLength)
       guard A <= B else { continue }
-      for theLength in A...B {
+      for theLength in A ... B {
         guard let node = spans[theLocation].nodeOf(length: theLength) else { continue }
         results.append(.init(node: node, spanIndex: theLocation))
       }

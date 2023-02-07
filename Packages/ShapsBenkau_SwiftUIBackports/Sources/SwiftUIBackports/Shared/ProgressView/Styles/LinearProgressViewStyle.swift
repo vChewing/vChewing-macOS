@@ -63,8 +63,8 @@ extension Backport where Wrapped == Any {
 }
 
 @available(macOS 10.15, *)
-extension BackportProgressViewStyle where Self == Backport<Any>.LinearProgressViewStyle {
-  public static var linear: Self { .init() }
+public extension BackportProgressViewStyle where Self == Backport<Any>.LinearProgressViewStyle {
+  static var linear: Self { .init() }
 }
 
 #if os(macOS)

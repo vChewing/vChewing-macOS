@@ -27,7 +27,7 @@ public final class PreferencesWindowController: NSWindowController {
   private func updateToolbarVisibility() {
     window?.toolbar?.isVisible =
       (hidesToolbarForSingleItem == false)
-      || (tabViewController.preferencePanesCount > 1)
+        || (tabViewController.preferencePanesCount > 1)
   }
 
   public init(
@@ -54,10 +54,10 @@ public final class PreferencesWindowController: NSWindowController {
 
     window.titleVisibility = {
       switch style {
-        case .toolbarItems:
-          return .visible
-        case .segmentedControl:
-          return preferencePanes.count <= 1 ? .visible : .hidden
+      case .toolbarItems:
+        return .visible
+      case .segmentedControl:
+        return preferencePanes.count <= 1 ? .visible : .hidden
       }
     }()
 
@@ -122,9 +122,9 @@ public final class PreferencesWindowController: NSWindowController {
   }
 }
 
-extension PreferencesWindowController {
+public extension PreferencesWindowController {
   /// Returns the active pane if it responds to the given action.
-  public override func supplementalTarget(forAction action: Selector, sender: Any?) -> Any? {
+  override func supplementalTarget(forAction action: Selector, sender: Any?) -> Any? {
     if let target = super.supplementalTarget(forAction: action, sender: sender) {
       return target
     }
@@ -134,13 +134,13 @@ extension PreferencesWindowController {
     }
 
     if let target = NSApp.target(forAction: action, to: activeViewController, from: sender) as? NSResponder,
-      target.responds(to: action)
+       target.responds(to: action)
     {
       return target
     }
 
     if let target = activeViewController.supplementalTarget(forAction: action, sender: sender) as? NSResponder,
-      target.responds(to: action)
+       target.responds(to: action)
     {
       return target
     }
@@ -150,11 +150,11 @@ extension PreferencesWindowController {
 }
 
 @available(macOS 10.15, *)
-extension PreferencesWindowController {
+public extension PreferencesWindowController {
   /**
    Create a preferences window from only SwiftUI-based preference panes.
    */
-  public convenience init(
+  convenience init(
     panes: [PreferencePaneConvertible],
     style: SSPreferences.Style = .toolbarItems,
     animated: Bool = true,

@@ -53,8 +53,8 @@ extension Backport where Wrapped: View {
 
 #if os(iOS)
   @available(iOS 15, *)
-  extension Backport where Wrapped == Any {
-    fileprivate struct Representable: UIViewControllerRepresentable {
+  fileprivate extension Backport where Wrapped == Any {
+    struct Representable: UIViewControllerRepresentable {
       let identifier: Backport<Any>.PresentationDetent.Identifier?
 
       func makeUIViewController(context _: Context) -> Backport.Representable.Controller {
@@ -68,8 +68,8 @@ extension Backport where Wrapped: View {
   }
 
   @available(iOS 15, *)
-  extension Backport.Representable {
-    fileprivate final class Controller: UIViewController {
+  fileprivate extension Backport.Representable {
+    final class Controller: UIViewController {
       var identifier: Backport<Any>.PresentationDetent.Identifier?
 
       init(identifier: Backport<Any>.PresentationDetent.Identifier?) {
