@@ -5,7 +5,7 @@
 import SwiftUI
 
 @available(macOS 10.15, *)
-extension Backport where Wrapped: View {
+public extension Backport where Wrapped: View {
   /// Layers the views that you specify behind this view.
   ///
   /// Use this modifier to place one or more views behind another view.
@@ -128,7 +128,7 @@ extension Backport where Wrapped: View {
   ///     The last view that you list appears at the front of the stack.
   ///
   /// - Returns: A view that uses the specified content as a background.
-  public func background<Content: View>(alignment: Alignment = .center, @ViewBuilder _ content: () -> Content)
+  func background<Content: View>(alignment: Alignment = .center, @ViewBuilder _ content: () -> Content)
     -> some View
   {
     self.content.background(content(), alignment: alignment)

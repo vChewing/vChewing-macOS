@@ -5,8 +5,8 @@
 import Carbon
 import Cocoa
 
-extension Date {
-  fileprivate static func - (lhs: Date, rhs: Date) -> TimeInterval {
+private extension Date {
+  static func - (lhs: Date, rhs: Date) -> TimeInterval {
     lhs.timeIntervalSinceReferenceDate - rhs.timeIntervalSinceReferenceDate
   }
 }
@@ -40,8 +40,8 @@ public struct ShiftKeyUpChecker {
 
   private mutating func checkModifierKeyUp(event: NSEvent) -> Bool {
     if event.type == .flagsChanged,
-      event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .init(rawValue: 0),
-      Date() - lastTime <= delayInterval, shiftIsBeingPressed
+       event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .init(rawValue: 0),
+       Date() - lastTime <= delayInterval, shiftIsBeingPressed
     {
       // modifier keyup event
       lastTime = Date(timeInterval: -3600 * 4, since: Date())
@@ -56,8 +56,8 @@ public struct ShiftKeyUpChecker {
     print("isLeftShift: \(isLeftShift), isRightShift: \(isRightShift)")
     let isKeyDown =
       event.type == .flagsChanged
-      && checkModifier.contains(event.modifierFlags.intersection(.deviceIndependentFlagsMask))
-      && checkKeyCode.contains(event.keyCode)
+        && checkModifier.contains(event.modifierFlags.intersection(.deviceIndependentFlagsMask))
+        && checkKeyCode.contains(event.keyCode)
     if isKeyDown {
       // modifier keydown event
       lastTime = Date()

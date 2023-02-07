@@ -45,14 +45,14 @@ final class PreferencesTabViewController: NSViewController, PreferencesStyleCont
     toolbar.delegate = self
 
     switch style {
-      case .segmentedControl:
-        preferencesStyleController = SegmentedControlStyleViewController(preferencePanes: preferencePanes)
-      case .toolbarItems:
-        preferencesStyleController = ToolbarItemStyleViewController(
-          preferencePanes: preferencePanes,
-          toolbar: toolbar,
-          centerToolbarItems: false
-        )
+    case .segmentedControl:
+      preferencesStyleController = SegmentedControlStyleViewController(preferencePanes: preferencePanes)
+    case .toolbarItems:
+      preferencesStyleController = ToolbarItemStyleViewController(
+        preferencePanes: preferencePanes,
+        toolbar: toolbar,
+        centerToolbarItems: false
+      )
     }
     preferencesStyleController.delegate = self
 
@@ -159,33 +159,31 @@ final class PreferencesTabViewController: NSViewController, PreferencesStyleCont
   ) {
     let isAnimated =
       options
-      .intersection([
-        .crossfade,
-        .slideUp,
-        .slideDown,
-        .slideForward,
-        .slideBackward,
-        .slideLeft,
-        .slideRight,
-      ])
-      .isEmpty == false
+        .intersection([
+          .crossfade,
+          .slideUp,
+          .slideDown,
+          .slideForward,
+          .slideBackward,
+          .slideLeft,
+          .slideRight,
+        ])
+        .isEmpty == false
 
     if isAnimated {
-      NSAnimationContext.runAnimationGroup(
-        { context in
-          context.allowsImplicitAnimation = true
-          context.duration = 0.25
-          context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-          setWindowFrame(for: toViewController, animated: true)
+      NSAnimationContext.runAnimationGroup({ context in
+        context.allowsImplicitAnimation = true
+        context.duration = 0.25
+        context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        setWindowFrame(for: toViewController, animated: true)
 
-          super.transition(
-            from: fromViewController,
-            to: toViewController,
-            options: options,
-            completionHandler: completion
-          )
-        }, completionHandler: nil
-      )
+        super.transition(
+          from: fromViewController,
+          to: toViewController,
+          options: options,
+          completionHandler: completion
+        )
+      }, completionHandler: nil)
     } else {
       super.transition(
         from: fromViewController,

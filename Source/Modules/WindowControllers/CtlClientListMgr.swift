@@ -20,7 +20,7 @@ class CtlClientListMgr: NSWindowController, NSTableViewDelegate, NSTableViewData
     if shared == nil { shared = CtlClientListMgr(windowNibName: "frmClientListMgr") }
     guard let shared = shared, let sharedWindow = shared.window else { return }
     sharedWindow.setPosition(vertical: .center, horizontal: .right, padding: 20)
-    sharedWindow.orderFrontRegardless()  // 逼著視窗往最前方顯示
+    sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
     sharedWindow.level = .statusBar
     sharedWindow.titlebarAppearsTransparent = true
     shared.showWindow(shared)
@@ -85,52 +85,52 @@ extension CtlClientListMgr {
     alert.accessoryView = scrollview
     alert.beginSheetModal(for: window) { result in
       switch result {
-        case .alertFirstButtonReturn, .alertSecondButtonReturn:
-          theTextView.textContainer?.textView?.string.components(separatedBy: "\n").filter { !$0.isEmpty }.forEach {
-            self.applyNewValue($0)
-          }
-          if result == .alertFirstButtonReturn { break }
-          let dlgOpenPath = NSOpenPanel()
-          dlgOpenPath.title = NSLocalizedString(
-            "Choose the target application bundle.", comment: ""
-          )
-          dlgOpenPath.showsResizeIndicator = true
-          dlgOpenPath.allowsMultipleSelection = true
-          dlgOpenPath.allowedFileTypes = ["app"]
-          dlgOpenPath.allowsOtherFileTypes = false
-          dlgOpenPath.showsHiddenFiles = true
-          dlgOpenPath.canChooseFiles = true
-          dlgOpenPath.canChooseDirectories = false
-          dlgOpenPath.beginSheetModal(for: window) { result in
-            switch result {
-              case .OK:
-                for url in dlgOpenPath.urls {
-                  var title = NSLocalizedString(
-                    "The selected item is not a valid macOS application bundle, nor not having a valid app bundle identifier.",
-                    comment: ""
-                  )
-                  let text = url.path + "\n\n" + NSLocalizedString("Please try again.", comment: "")
-                  guard let bundle = Bundle(url: url) else {
-                    self.window?.callAlert(title: title, text: text)
-                    return
-                  }
-                  guard let identifier = bundle.bundleIdentifier else {
-                    self.window?.callAlert(title: title, text: text)
-                    return
-                  }
-                  if PrefMgr.shared.clientsIMKTextInputIncapable.contains(identifier) {
-                    title = NSLocalizedString(
-                      "The selected item's identifier is already in the list.", comment: ""
-                    )
-                    self.window?.callAlert(title: title, text: identifier + "\n\n" + url.path)
-                    return
-                  }
-                  self.applyNewValue(identifier)
-                }
-              default: return
+      case .alertFirstButtonReturn, .alertSecondButtonReturn:
+        theTextView.textContainer?.textView?.string.components(separatedBy: "\n").filter { !$0.isEmpty }.forEach {
+          self.applyNewValue($0)
+        }
+        if result == .alertFirstButtonReturn { break }
+        let dlgOpenPath = NSOpenPanel()
+        dlgOpenPath.title = NSLocalizedString(
+          "Choose the target application bundle.", comment: ""
+        )
+        dlgOpenPath.showsResizeIndicator = true
+        dlgOpenPath.allowsMultipleSelection = true
+        dlgOpenPath.allowedFileTypes = ["app"]
+        dlgOpenPath.allowsOtherFileTypes = false
+        dlgOpenPath.showsHiddenFiles = true
+        dlgOpenPath.canChooseFiles = true
+        dlgOpenPath.canChooseDirectories = false
+        dlgOpenPath.beginSheetModal(for: window) { result in
+          switch result {
+          case .OK:
+            for url in dlgOpenPath.urls {
+              var title = NSLocalizedString(
+                "The selected item is not a valid macOS application bundle, nor not having a valid app bundle identifier.",
+                comment: ""
+              )
+              let text = url.path + "\n\n" + NSLocalizedString("Please try again.", comment: "")
+              guard let bundle = Bundle(url: url) else {
+                self.window?.callAlert(title: title, text: text)
+                return
+              }
+              guard let identifier = bundle.bundleIdentifier else {
+                self.window?.callAlert(title: title, text: text)
+                return
+              }
+              if PrefMgr.shared.clientsIMKTextInputIncapable.contains(identifier) {
+                title = NSLocalizedString(
+                  "The selected item's identifier is already in the list.", comment: ""
+                )
+                self.window?.callAlert(title: title, text: identifier + "\n\n" + url.path)
+                return
+              }
+              self.applyNewValue(identifier)
             }
+          default: return
           }
-        default: return
+        }
+      default: return
       }
     }
   }
@@ -141,7 +141,7 @@ extension CtlClientListMgr {
     arrResult.append(newValue)
     PrefMgr.shared.clientsIMKTextInputIncapable = arrResult.sorted()
     tblClients.reloadData()
-    btnRemoveClient.isEnabled = (0..<PrefMgr.shared.clientsIMKTextInputIncapable.count).contains(
+    btnRemoveClient.isEnabled = (0 ..< PrefMgr.shared.clientsIMKTextInputIncapable.count).contains(
       tblClients.selectedRow)
   }
 
@@ -163,12 +163,12 @@ extension CtlClientListMgr {
       tblClients.selectRowIndexes(.init(arrayLiteral: minIndexSelected - 1), byExtendingSelection: false)
     }
     tblClients.reloadData()
-    btnRemoveClient.isEnabled = (0..<PrefMgr.shared.clientsIMKTextInputIncapable.count).contains(minIndexSelected)
+    btnRemoveClient.isEnabled = (0 ..< PrefMgr.shared.clientsIMKTextInputIncapable.count).contains(minIndexSelected)
   }
 
   func tableView(_: NSTableView, objectValueFor _: NSTableColumn?, row: Int) -> Any? {
     defer {
-      self.btnRemoveClient.isEnabled = (0..<PrefMgr.shared.clientsIMKTextInputIncapable.count).contains(
+      self.btnRemoveClient.isEnabled = (0 ..< PrefMgr.shared.clientsIMKTextInputIncapable.count).contains(
         self.tblClients.selectedRow)
     }
     return PrefMgr.shared.clientsIMKTextInputIncapable[row]

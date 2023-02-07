@@ -5,12 +5,12 @@
 import SwiftUI
 
 @available(macOS 10.15, *)
-extension EnvironmentValues {
-  fileprivate func containsValue(forKey key: String) -> Bool {
+private extension EnvironmentValues {
+  func containsValue(forKey key: String) -> Bool {
     value(forKey: key) != nil
   }
 
-  fileprivate func value<T>(forKey key: String, from mirror: Mirror, as _: T.Type) -> T? {
+  func value<T>(forKey key: String, from mirror: Mirror, as _: T.Type) -> T? {
     // Found a match
     if let value = mirror.descendant("value", "some") {
       if let typedValue = value as? T {
@@ -32,7 +32,7 @@ extension EnvironmentValues {
 
   /// Extracts a value from the environment by the name of its associated EnvironmentKey.
   /// Can be used to grab private environment values such as foregroundColor ("ForegroundColorKey").
-  fileprivate func value<T>(forKey key: String, as _: T.Type) -> T? {
+  func value<T>(forKey key: String, as _: T.Type) -> T? {
     if let mirror = value(forKey: key) as? Mirror {
       return value(forKey: key, from: mirror, as: T.self)
     } else if let value = value(forKey: key) as? T {
@@ -42,7 +42,7 @@ extension EnvironmentValues {
     }
   }
 
-  fileprivate func value(forKey key: String) -> Any? {
+  func value(forKey key: String) -> Any? {
     func keyFromTypeName(typeName: String) -> String? {
       let expectedPrefix = "TypedElement<EnvironmentPropertyKey<"
       guard typeName.hasPrefix(expectedPrefix) else {
@@ -74,7 +74,7 @@ extension EnvironmentValues {
       // Environment values are stored in a doubly linked list. The "before" and "after" keys point
       // to the next environment member.
       if let linkedListMirror = mirror.superclassMirror,
-        let nextNode = linkedListMirror.descendant("after", "some")
+         let nextNode = linkedListMirror.descendant("after", "some")
       {
         return extract(startingAt: nextNode)
       }

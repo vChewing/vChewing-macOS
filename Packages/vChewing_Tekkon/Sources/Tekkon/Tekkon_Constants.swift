@@ -37,7 +37,7 @@ public enum Tekkon {
   }
 
   /// 原始轉換對照表資料貯存專用佇列（數字標調格式）
-  static let arrPhonaToHanyuPinyin: [[String]] = [  // 排序很重要。先處理最長的，再處理短的。不然會出亂子。
+  static let arrPhonaToHanyuPinyin: [[String]] = [ // 排序很重要。先處理最長的，再處理短的。不然會出亂子。
     [" ", "1"], ["ˊ", "2"], ["ˇ", "3"], ["ˋ", "4"], ["˙", "5"],
 
     ["ㄅㄧㄝ", "bie"], ["ㄅㄧㄠ", "biao"], ["ㄅㄧㄢ", "bian"], ["ㄅㄧㄣ", "bin"], ["ㄅㄧㄥ", "bing"], ["ㄆㄧㄚ", "pia"], ["ㄆㄧㄝ", "pie"],
@@ -110,7 +110,7 @@ public enum Tekkon {
   ]
 
   /// 漢語拼音韻母轉換對照表資料貯存專用佇列
-  static let arrHanyuPinyinTextbookStyleConversionTable: [[String]] = [  // 排序很重要。先處理最長的，再處理短的。不然會出亂子。
+  static let arrHanyuPinyinTextbookStyleConversionTable: [[String]] = [ // 排序很重要。先處理最長的，再處理短的。不然會出亂子。
     ["iang1", "iāng"], ["iang2", "iáng"], ["iang3", "iǎng"], ["iang4", "iàng"], ["iong1", "iōng"], ["iong2", "ióng"],
     ["iong3", "iǒng"], ["iong4", "iòng"], ["uang1", "uāng"], ["uang2", "uáng"], ["uang3", "uǎng"], ["uang4", "uàng"],
     ["uang5", "uang"],

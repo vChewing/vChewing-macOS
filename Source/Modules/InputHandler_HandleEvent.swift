@@ -48,8 +48,8 @@ extension InputHandler {
 
       // 聯想詞選字。
       if let newChar = CtlCandidateIMK.defaultIMKSelectionKey[event.keyCode],
-        event.isShiftHold, delegate.state.type == .ofAssociates,
-        let newEvent = event.reinitiate(modifierFlags: [], characters: newChar)
+         event.isShiftHold, delegate.state.type == .ofAssociates,
+         let newEvent = event.reinitiate(modifierFlags: [], characters: newChar)
       {
         if #available(macOS 10.14, *) {
           imkCandidates.handleKeyboardEvent(newEvent)
@@ -73,21 +73,21 @@ extension InputHandler {
     } else if event.isSymbolMenuPhysicalKey {
       // 符號鍵的行為是固定的，不受偏好設定影響。
       switch imkC.currentLayout {
-        case .horizontal: _ = event.isShiftHold ? imkC.moveUp(self) : imkC.moveDown(self)
-        case .vertical: _ = event.isShiftHold ? imkC.moveLeft(self) : imkC.moveRight(self)
-        @unknown default: break
+      case .horizontal: _ = event.isShiftHold ? imkC.moveUp(self) : imkC.moveDown(self)
+      case .vertical: _ = event.isShiftHold ? imkC.moveLeft(self) : imkC.moveRight(self)
+      @unknown default: break
       }
       return true
     } else if event.isSpace {
       switch prefs.specifyShiftSpaceKeyBehavior {
-        case true: _ = event.isShiftHold ? imkC.highlightNextCandidate() : imkC.showNextPage()
-        case false: _ = event.isShiftHold ? imkC.showNextPage() : imkC.highlightNextCandidate()
+      case true: _ = event.isShiftHold ? imkC.highlightNextCandidate() : imkC.showNextPage()
+      case false: _ = event.isShiftHold ? imkC.showNextPage() : imkC.highlightNextCandidate()
       }
       return true
     } else if event.isTab {
       switch prefs.specifyShiftTabKeyBehavior {
-        case true: _ = event.isShiftHold ? imkC.showPreviousPage() : imkC.showNextPage()
-        case false: _ = event.isShiftHold ? imkC.highlightPreviousCandidate() : imkC.highlightNextCandidate()
+      case true: _ = event.isShiftHold ? imkC.showPreviousPage() : imkC.showNextPage()
+      case false: _ = event.isShiftHold ? imkC.highlightPreviousCandidate() : imkC.highlightNextCandidate()
       }
       return true
     } else {
@@ -115,9 +115,9 @@ extension InputHandler {
       }
 
       if delegate.state.type == .ofAssociates,
-        !event.isPageUp, !event.isPageDown, !event.isCursorForward, !event.isCursorBackward,
-        !event.isCursorClockLeft, !event.isCursorClockRight, !event.isSpace,
-        !event.isEnter || !prefs.alsoConfirmAssociatedCandidatesByEnter
+         !event.isPageUp, !event.isPageDown, !event.isCursorForward, !event.isCursorBackward,
+         !event.isCursorClockLeft, !event.isCursorClockRight, !event.isSpace,
+         !event.isEnter || !prefs.alsoConfirmAssociatedCandidatesByEnter
       {
         return handleInput(event: event)
       }

@@ -28,8 +28,8 @@ public class CandidateCellData: Hashable {
   public var displayedText: String
   public var size: Double { Self.unifiedSize }
   public var isSelected: Bool = false
-  public var whichRow: Int = 0  // 橫排選字窗專用
-  public var whichColumn: Int = 0  // 縱排選字窗專用
+  public var whichRow: Int = 0 // 橫排選字窗專用
+  public var whichColumn: Int = 0 // 縱排選字窗專用
   public var index: Int = 0
   public var subIndex: Int = 0
 
@@ -149,8 +149,8 @@ public class CandidateCellData: Hashable {
 // MARK: - Contents specifically made for macOS 12 and newer.
 
 @available(macOS 12, *)
-extension CandidateCellData {
-  public var attributedStringForSwiftUI: some View {
+public extension CandidateCellData {
+  var attributedStringForSwiftUI: some View {
     var result: some View {
       ZStack(alignment: .leading) {
         if isSelected {
@@ -179,21 +179,21 @@ extension CandidateCellData {
 // MARK: - Contents specifically made for macOS 10.15 and macOS 11.
 
 @available(macOS 10.15, *)
-extension CandidateCellData {
-  public var themeColorBackports: some View {
+public extension CandidateCellData {
+  var themeColorBackports: some View {
     // 設定當前高亮候選字的背景顏色。
     let result: Color = {
       switch locale {
-        case "zh-Hans": return Color.red
-        case "zh-Hant": return Color.blue
-        case "ja": return Color.pink
-        default: return Color.accentColor
+      case "zh-Hans": return Color.red
+      case "zh-Hant": return Color.blue
+      case "ja": return Color.pink
+      default: return Color.accentColor
       }
     }()
     return result.opacity(0.85)
   }
 
-  public var attributedStringForSwiftUIBackports: some View {
+  var attributedStringForSwiftUIBackports: some View {
     var result: some View {
       ZStack(alignment: .leading) {
         if isSelected {

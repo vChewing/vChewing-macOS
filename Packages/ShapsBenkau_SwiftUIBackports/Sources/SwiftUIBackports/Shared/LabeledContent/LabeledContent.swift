@@ -137,8 +137,8 @@ extension Backport where Wrapped == Any {
 }
 
 @available(macOS 10.15, *)
-extension Backport.LabeledContent
-where
+public extension Backport.LabeledContent
+  where
   Wrapped == Any, Label == Backport<Any>.LabeledContentStyleConfiguration.Label,
   Content == Backport<Any>.LabeledContentStyleConfiguration.Content
 {
@@ -161,13 +161,13 @@ where
   ///     }
   ///
   /// - Parameter configuration: The properties of the labeled content
-  public init(_ config: Backport.LabeledContentStyleConfiguration) {
+  init(_ config: Backport.LabeledContentStyleConfiguration) {
     self.config = config
   }
 }
 
 @available(macOS 10.15, *)
-extension Backport.LabeledContent where Wrapped == Any, Label == Text, Content: View {
+public extension Backport.LabeledContent where Wrapped == Any, Label == Text, Content: View {
   /// Creates a labeled view that generates its label from a localized string
   /// key.
   ///
@@ -179,7 +179,7 @@ extension Backport.LabeledContent where Wrapped == Any, Label == Text, Content: 
   ///   - titleKey: The key for the view's localized title, that describes
   ///     the purpose of the view.
   ///   - content: The value content being labeled.
-  public init(_ titleKey: LocalizedStringKey, @ViewBuilder content: () -> Content) {
+  init(_ titleKey: LocalizedStringKey, @ViewBuilder content: () -> Content) {
     config = .init(
       label: Text(titleKey),
       content: content()
@@ -196,7 +196,7 @@ extension Backport.LabeledContent where Wrapped == Any, Label == Text, Content: 
   /// - Parameters:
   ///   - title: A string that describes the purpose of the view.
   ///   - content: The value content being labeled.
-  public init<S>(_ title: S, @ViewBuilder content: () -> Content) where S: StringProtocol {
+  init<S>(_ title: S, @ViewBuilder content: () -> Content) where S: StringProtocol {
     config = .init(
       label: Text(title),
       content: content()
@@ -226,7 +226,7 @@ extension Backport.LabeledContent: View where Wrapped == Any, Label: View, Conte
 }
 
 @available(macOS 10.15, *)
-extension Backport.LabeledContent where Wrapped == Any, Label == Text, Content == Text {
+public extension Backport.LabeledContent where Wrapped == Any, Label == Text, Content == Text {
   /// Creates a labeled informational view.
   ///
   /// This initializer creates a ``Text`` label on your behalf, and treats the
@@ -243,7 +243,7 @@ extension Backport.LabeledContent where Wrapped == Any, Label == Text, Content =
   ///   - titleKey: The key for the view's localized title, that describes
   ///     the purpose of the view.
   ///   - value: The value being labeled.
-  public init<S: StringProtocol>(_ titleKey: LocalizedStringKey, value: S) {
+  init<S: StringProtocol>(_ titleKey: LocalizedStringKey, value: S) {
     config = .init(
       label: Text(titleKey),
       content: Text(value)
@@ -266,7 +266,7 @@ extension Backport.LabeledContent where Wrapped == Any, Label == Text, Content =
   /// - Parameters:
   ///   - title: A string that describes the purpose of the view.
   ///   - value: The value being labeled.
-  public init<S1: StringProtocol, S2: StringProtocol>(_ title: S1, value: S2) {
+  init<S1: StringProtocol, S2: StringProtocol>(_ title: S1, value: S2) {
     config = .init(
       label: Text(title),
       content: Text(value)

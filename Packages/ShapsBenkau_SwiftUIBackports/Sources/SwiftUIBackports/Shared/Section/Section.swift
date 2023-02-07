@@ -33,13 +33,13 @@ extension Backport where Wrapped == Any {
 }
 
 @available(macOS 10.15, *)
-extension Backport.Section where Wrapped == Any, Parent == Text, Footer == EmptyView {
+public extension Backport.Section where Wrapped == Any, Parent == Text, Footer == EmptyView {
   /// Creates a section with the provided section content.
   /// - Parameters:
   ///   - titleKey: The key for the section's localized title, which describes
   ///     the contents of the section.
   ///   - content: The section's content.
-  public init(_ titleKey: LocalizedStringKey, @ViewBuilder content: @escaping () -> Content) {
+  init(_ titleKey: LocalizedStringKey, @ViewBuilder content: @escaping () -> Content) {
     header = { Text(titleKey) }
     self.content = content
     footer = { EmptyView() }
@@ -50,7 +50,7 @@ extension Backport.Section where Wrapped == Any, Parent == Text, Footer == Empty
   /// - Parameters:
   ///   - title: A string that describes the contents of the section.
   ///   - content: The section's content.
-  public init<S>(_ title: S, @ViewBuilder content: @escaping () -> Content) where S: StringProtocol {
+  init<S>(_ title: S, @ViewBuilder content: @escaping () -> Content) where S: StringProtocol {
     header = { Text(title) }
     self.content = content
     footer = { EmptyView() }

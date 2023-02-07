@@ -9,7 +9,8 @@ import SwiftUI
 
   final class PreviewController<Items>: UIViewController, UIAdaptivePresentationControllerDelegate,
     QLPreviewControllerDelegate, QLPreviewControllerDataSource
-  where Items: RandomAccessCollection, Items.Element == URL {
+    where Items: RandomAccessCollection, Items.Element == URL
+  {
     var items: Items
 
     var selection: Binding<Items.Element?> {
@@ -34,14 +35,14 @@ import SwiftUI
 
     private func updateControllerLifecycle(from oldValue: Items.Element?, to newValue: Items.Element?) {
       switch (oldValue, newValue) {
-        case (.none, .some):
-          presentController()
-        case (.some, .some):
-          updateController()
-        case (.some, .none):
-          dismissController()
-        case (.none, .none):
-          break
+      case (.none, .some):
+        presentController()
+      case (.some, .some):
+        updateController()
+      case (.some, .none):
+        dismissController()
+      case (.none, .none):
+        break
       }
     }
 

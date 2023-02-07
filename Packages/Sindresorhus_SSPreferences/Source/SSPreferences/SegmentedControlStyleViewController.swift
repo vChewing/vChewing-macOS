@@ -61,7 +61,7 @@ final class SegmentedControlStyleViewController: NSViewController, PreferencesSt
         let title = preferencePane.preferencePaneTitle
         let titleSize = title.size(
           withAttributes: [
-            .font: NSFont.systemFont(ofSize: NSFont.systemFontSize(for: .regular))
+            .font: NSFont.systemFont(ofSize: NSFont.systemFontSize(for: .regular)),
           ]
         )
 

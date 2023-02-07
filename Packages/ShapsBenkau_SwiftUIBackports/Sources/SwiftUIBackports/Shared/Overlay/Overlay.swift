@@ -5,7 +5,7 @@
 import SwiftUI
 
 @available(macOS 10.15, *)
-extension Backport where Wrapped: View {
+public extension Backport where Wrapped: View {
   /// Layers the views that you specify in front of this view.
   ///
   /// Use this modifier to place one or more views in front of another view.
@@ -121,8 +121,7 @@ extension Backport where Wrapped: View {
   ///     The last view that you list appears at the front of the stack.
   ///
   /// - Returns: A view that uses the specified content as a foreground.
-  public func overlay<Content: View>(alignment: Alignment = .center, @ViewBuilder _ content: () -> Content) -> some View
-  {
+  func overlay<Content: View>(alignment: Alignment = .center, @ViewBuilder _ content: () -> Content) -> some View {
     self.content.overlay(content(), alignment: alignment)
   }
 }

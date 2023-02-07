@@ -53,7 +53,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 
   var allRegisteredInstancesOfThisInputMethod: [TISInputSource] {
     guard let components = Bundle(url: imeURLInstalled)?.infoDictionary?["ComponentInputModeDict"] as? [String: Any],
-      let tsInputModeListKey = components["tsInputModeListKey"] as? [String: Any]
+          let tsInputModeListKey = components["tsInputModeListKey"] as? [String: Any]
     else {
       return []
     }
@@ -102,7 +102,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
       let currentVersion = currentBundle?.infoDictionary?[kCFBundleVersionKey as String] as? String
       currentVersionNumber = (currentVersion as NSString?)?.integerValue ?? 0
       if shortVersion != nil, let currentVersion = currentVersion,
-        currentVersion.compare(installingVersion, options: .numeric) == .orderedAscending
+         currentVersion.compare(installingVersion, options: .numeric) == .orderedAscending
       {
         // Upgrading confirmed.
         installButton.title = NSLocalizedString("Upgrade", comment: "")

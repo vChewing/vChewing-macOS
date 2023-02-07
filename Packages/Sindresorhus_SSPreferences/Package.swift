@@ -4,19 +4,19 @@ import PackageDescription
 let package = Package(
   name: "SSPreferences",
   platforms: [
-    .macOS(.v10_11)
+    .macOS(.v10_11),
   ],
   products: [
     .library(
       name: "SSPreferences",
       targets: [
-        "SSPreferences"
+        "SSPreferences",
       ]
-    )
+    ),
   ],
   targets: [
     .target(
       name: "SSPreferences"
-    )
+    ),
   ]
 )

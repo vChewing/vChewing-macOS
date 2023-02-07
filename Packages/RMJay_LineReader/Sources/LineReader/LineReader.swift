@@ -31,9 +31,9 @@ public class LineReader {
       // get a data from the buffer up to the next delimiter
       if let range = buffer.range(of: delimData) {
         // convert data to a string
-        let line = String(data: buffer.subdata(in: 0..<range.lowerBound), encoding: encoding)!
+        let line = String(data: buffer.subdata(in: 0 ..< range.lowerBound), encoding: encoding)!
         // remove that data from the buffer
-        buffer.removeSubrange(0..<range.upperBound)
+        buffer.removeSubrange(0 ..< range.upperBound)
         return line.trimmingCharacters(in: .newlines)
       }
 

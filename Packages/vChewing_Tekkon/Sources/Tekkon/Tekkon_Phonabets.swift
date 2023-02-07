@@ -8,20 +8,20 @@
 
 import Foundation
 
-extension Tekkon {
+public extension Tekkon {
   // MARK: - Dynamic Constants and Basic Enums
 
   /// 定義注音符號的種類
-  public enum PhoneType: Int {
-    case null = 0  // 假
-    case consonant = 1  // 聲
-    case semivowel = 2  // 介
-    case vowel = 3  // 韻
-    case intonation = 4  // 調
+  enum PhoneType: Int {
+    case null = 0 // 假
+    case consonant = 1 // 聲
+    case semivowel = 2 // 介
+    case vowel = 3 // 韻
+    case intonation = 4 // 調
   }
 
   /// 定義注音排列的類型
-  public enum MandarinParser: Int {
+  enum MandarinParser: Int {
     case ofDachen = 0
     case ofDachen26 = 1
     case ofETen = 2
@@ -40,36 +40,36 @@ extension Tekkon {
 
     var name: String {
       switch self {
-        case .ofDachen:
-          return "Dachen"
-        case .ofDachen26:
-          return "Dachen26"
-        case .ofETen:
-          return "ETen"
-        case .ofHsu:
-          return "Hsu"
-        case .ofETen26:
-          return "ETen26"
-        case .ofIBM:
-          return "IBM"
-        case .ofMiTAC:
-          return "MiTAC"
-        case .ofFakeSeigyou:
-          return "FakeSeigyou"
-        case .ofSeigyou:
-          return "Seigyou"
-        case .ofStarlight:
-          return "Starlight"
-        case .ofHanyuPinyin:
-          return "HanyuPinyin"
-        case .ofSecondaryPinyin:
-          return "SecondaryPinyin"
-        case .ofYalePinyin:
-          return "YalePinyin"
-        case .ofHualuoPinyin:
-          return "HualuoPinyin"
-        case .ofUniversalPinyin:
-          return "UniversalPinyin"
+      case .ofDachen:
+        return "Dachen"
+      case .ofDachen26:
+        return "Dachen26"
+      case .ofETen:
+        return "ETen"
+      case .ofHsu:
+        return "Hsu"
+      case .ofETen26:
+        return "ETen26"
+      case .ofIBM:
+        return "IBM"
+      case .ofMiTAC:
+        return "MiTAC"
+      case .ofFakeSeigyou:
+        return "FakeSeigyou"
+      case .ofSeigyou:
+        return "Seigyou"
+      case .ofStarlight:
+        return "Starlight"
+      case .ofHanyuPinyin:
+        return "HanyuPinyin"
+      case .ofSecondaryPinyin:
+        return "SecondaryPinyin"
+      case .ofYalePinyin:
+        return "YalePinyin"
+      case .ofHualuoPinyin:
+        return "HualuoPinyin"
+      case .ofUniversalPinyin:
+        return "UniversalPinyin"
       }
     }
   }
@@ -81,7 +81,7 @@ extension Tekkon {
   /// 如果遇到被設為多個字符、或者字符不對的情況的話，value 會被清空、PhoneType 會變成 null。
   /// 賦值時最好直接重新 init 且一直用 let 來初期化 Phonabet。
   /// 其實 value 對外只讀，對內的話另有 valueStorage 代為存儲內容。這樣比較安全一些。
-  @frozen public struct Phonabet: Equatable, Hashable, ExpressibleByStringLiteral {
+  @frozen struct Phonabet: Equatable, Hashable, ExpressibleByStringLiteral {
     public var type: PhoneType = .null
     private var valueStorage = ""
     public var value: String { valueStorage }

@@ -87,36 +87,36 @@ public struct IMEState: IMEStateProtocol {
 
 // MARK: - 針對不同的狀態，規定不同的構造器
 
-extension IMEState {
-  public static func ofDeactivated() -> IMEState { .init(type: .ofDeactivated) }
-  public static func ofEmpty() -> IMEState { .init(type: .ofEmpty) }
-  public static func ofAbortion() -> IMEState { .init(type: .ofAbortion) }
+public extension IMEState {
+  static func ofDeactivated() -> IMEState { .init(type: .ofDeactivated) }
+  static func ofEmpty() -> IMEState { .init(type: .ofEmpty) }
+  static func ofAbortion() -> IMEState { .init(type: .ofAbortion) }
 
   /// 用以手動遞交指定內容的狀態。
   /// - Remark: 直接切換至該狀態的話，會丟失上一個狀態的內容。
   /// 如不想丟失的話，請先切換至 `.ofEmpty()` 再切換至 `.ofCommitting()`。
   /// - Parameter textToCommit: 要遞交的文本。
   /// - Returns: 要切換到的狀態。
-  public static func ofCommitting(textToCommit: String) -> IMEState {
+  static func ofCommitting(textToCommit: String) -> IMEState {
     var result = IMEState(type: .ofCommitting)
     result.textToCommit = textToCommit
     ChineseConverter.ensureCurrencyNumerals(target: &result.data.textToCommit)
     return result
   }
 
-  public static func ofAssociates(candidates: [([String], String)]) -> IMEState {
+  static func ofAssociates(candidates: [([String], String)]) -> IMEState {
     var result = IMEState(type: .ofAssociates)
     result.candidates = candidates
     return result
   }
 
-  public static func ofInputting(displayTextSegments: [String], cursor: Int) -> IMEState {
+  static func ofInputting(displayTextSegments: [String], cursor: Int) -> IMEState {
     var result = IMEState(displayTextSegments: displayTextSegments, cursor: cursor)
     result.type = .ofInputting
     return result
   }
 
-  public static func ofMarking(
+  static func ofMarking(
     displayTextSegments: [String], markedReadings: [String], cursor: Int, marker: Int
   )
     -> IMEState
@@ -129,7 +129,7 @@ extension IMEState {
     return result
   }
 
-  public static func ofCandidates(candidates: [([String], String)], displayTextSegments: [String], cursor: Int)
+  static func ofCandidates(candidates: [([String], String)], displayTextSegments: [String], cursor: Int)
     -> IMEState
   {
     var result = IMEState(displayTextSegments: displayTextSegments, cursor: cursor)
@@ -138,7 +138,7 @@ extension IMEState {
     return result
   }
 
-  public static func ofSymbolTable(node: CandidateNode) -> IMEState {
+  static func ofSymbolTable(node: CandidateNode) -> IMEState {
     var result = IMEState(node: node)
     result.type = .ofSymbolTable
     return result
@@ -147,77 +147,77 @@ extension IMEState {
 
 // MARK: - 規定一個狀態該怎樣返回自己的資料值
 
-extension IMEState {
-  public var isFilterable: Bool { data.isFilterable }
-  public var isMarkedLengthValid: Bool { data.isMarkedLengthValid }
-  public var displayedText: String { data.displayedText }
-  public var displayedTextConverted: String { data.displayedTextConverted }
-  public var displayTextSegments: [String] { data.displayTextSegments }
-  public var markedRange: Range<Int> { data.markedRange }
-  public var u16MarkedRange: Range<Int> { data.u16MarkedRange }
-  public var u16Cursor: Int { data.u16Cursor }
+public extension IMEState {
+  var isFilterable: Bool { data.isFilterable }
+  var isMarkedLengthValid: Bool { data.isMarkedLengthValid }
+  var displayedText: String { data.displayedText }
+  var displayedTextConverted: String { data.displayedTextConverted }
+  var displayTextSegments: [String] { data.displayTextSegments }
+  var markedRange: Range<Int> { data.markedRange }
+  var u16MarkedRange: Range<Int> { data.u16MarkedRange }
+  var u16Cursor: Int { data.u16Cursor }
 
-  public var cursor: Int {
+  var cursor: Int {
     get { data.cursor }
     set { data.cursor = newValue }
   }
 
-  public var marker: Int {
+  var marker: Int {
     get { data.marker }
     set { data.marker = newValue }
   }
 
-  public var convertedToInputting: IMEStateProtocol {
+  var convertedToInputting: IMEStateProtocol {
     if type == .ofInputting { return self }
     var result = Self.ofInputting(displayTextSegments: data.displayTextSegments, cursor: data.cursor)
     result.tooltip = data.tooltipBackupForInputting
     return result
   }
 
-  public var candidates: [([String], String)] {
+  var candidates: [([String], String)] {
     get { data.candidates }
     set { data.candidates = newValue }
   }
 
-  public var textToCommit: String {
+  var textToCommit: String {
     get { data.textToCommit }
     set { data.textToCommit = newValue }
   }
 
-  public var tooltip: String {
+  var tooltip: String {
     get { data.tooltip }
     set { data.tooltip = newValue }
   }
 
-  public var attributedString: NSAttributedString {
+  var attributedString: NSAttributedString {
     switch type {
-      case .ofMarking: return data.attributedStringMarking
-      case .ofAssociates, .ofSymbolTable: return data.attributedStringPlaceholder
-      default: return data.attributedStringNormal
+    case .ofMarking: return data.attributedStringMarking
+    case .ofAssociates, .ofSymbolTable: return data.attributedStringPlaceholder
+    default: return data.attributedStringNormal
     }
   }
 
   /// 該參數僅用作輔助判斷。在 InputHandler 內使用的話，必須再檢查 !compositor.isEmpty。
-  public var hasComposition: Bool {
+  var hasComposition: Bool {
     switch type {
-      case .ofInputting, .ofMarking, .ofCandidates: return true
-      default: return false
+    case .ofInputting, .ofMarking, .ofCandidates: return true
+    default: return false
     }
   }
 
-  public var isCandidateContainer: Bool {
+  var isCandidateContainer: Bool {
     switch type {
-      case .ofCandidates, .ofAssociates, .ofSymbolTable: return true
-      default: return false
+    case .ofCandidates, .ofAssociates, .ofSymbolTable: return true
+    default: return false
     }
   }
 
-  public var tooltipBackupForInputting: String {
+  var tooltipBackupForInputting: String {
     get { data.tooltipBackupForInputting }
     set { data.tooltipBackupForInputting = newValue }
   }
 
-  public var tooltipDuration: Double {
+  var tooltipDuration: Double {
     get { type == .ofMarking ? 0 : data.tooltipDuration }
     set { data.tooltipDuration = newValue }
   }

@@ -42,21 +42,21 @@ public struct Backport<Wrapped> {
 }
 
 @available(macOS 10.15, *)
-extension View {
+public extension View {
   /// Wraps a SwiftUI `View` that can be extended to provide backport functionality.
-  public var backport: Backport<Self> { .init(self) }
+  var backport: Backport<Self> { .init(self) }
 }
 
 @available(macOS 10.15, *)
-extension NSObjectProtocol {
+public extension NSObjectProtocol {
   /// Wraps an `NSObject` that can be extended to provide backport functionality.
-  public var backport: Backport<Self> { .init(self) }
+  var backport: Backport<Self> { .init(self) }
 }
 
 @available(macOS 10.15, *)
-extension AnyTransition {
+public extension AnyTransition {
   /// Wraps an `AnyTransition` that can be extended to provide backport functionality.
-  public static var backport: Backport<AnyTransition> {
+  static var backport: Backport<AnyTransition> {
     Backport(.identity)
   }
 }

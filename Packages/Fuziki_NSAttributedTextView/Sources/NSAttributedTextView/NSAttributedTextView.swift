@@ -103,8 +103,8 @@ public class NSAttributedTextView: NSView {
   @discardableResult public func shrinkFrame() -> NSRect {
     let attrString: NSAttributedString = {
       switch direction {
-        case .horizontal: return attributedStringValue()
-        default: return attributedStringValue(areaCalculation: true)
+      case .horizontal: return attributedStringValue()
+      default: return attributedStringValue(areaCalculation: true)
       }
     }()
     var rect = attrString.boundingRect(
@@ -130,14 +130,14 @@ public class NSAttributedTextView: NSView {
     let path = CGPath(rect: rect, transform: nil)
     let theCTFrameProgression: CTFrameProgression = {
       switch direction {
-        case .horizontal: return CTFrameProgression.topToBottom
-        case .vertical: return CTFrameProgression.rightToLeft
-        case .verticalReversed: return CTFrameProgression.leftToRight
+      case .horizontal: return CTFrameProgression.topToBottom
+      case .vertical: return CTFrameProgression.rightToLeft
+      case .verticalReversed: return CTFrameProgression.leftToRight
       }
     }()
     let frameAttrs: CFDictionary =
       [
-        kCTFrameProgressionAttributeName: theCTFrameProgression.rawValue
+        kCTFrameProgressionAttributeName: theCTFrameProgression.rawValue,
       ] as CFDictionary
     let newFrame = CTFramesetterCreateFrame(setter, CFRangeMake(0, 0), path, frameAttrs)
     ctFrame = newFrame

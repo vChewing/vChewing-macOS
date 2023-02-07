@@ -10,8 +10,8 @@ import Megrez
 import PinyinPhonaConverter
 import Shared
 
-extension vChewingLM {
-  @frozen public struct LMAssociates {
+public extension vChewingLM {
+  @frozen struct LMAssociates {
     public private(set) var filePath: String?
     var rangeMap: [String: [(Range<String.Index>, Int)]] = [:]
     var strData: String = ""

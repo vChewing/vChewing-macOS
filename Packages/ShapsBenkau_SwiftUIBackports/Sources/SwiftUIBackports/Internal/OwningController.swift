@@ -5,8 +5,8 @@
 #if os(iOS)
   import UIKit
 
-  extension UIView {
-    public var parentController: UIViewController? {
+  public extension UIView {
+    var parentController: UIViewController? {
       var responder: UIResponder? = self
 
       while !(responder is UIViewController), superview != nil {
@@ -24,8 +24,8 @@
   import AppKit
 
   @available(macOS 10.15, *)
-  extension NSView {
-    public var parentController: NSViewController? {
+  public extension NSView {
+    var parentController: NSViewController? {
       var responder: NSResponder? = self
 
       while !(responder is NSViewController), superview != nil {

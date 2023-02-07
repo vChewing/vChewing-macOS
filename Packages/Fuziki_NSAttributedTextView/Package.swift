@@ -4,19 +4,19 @@ import PackageDescription
 let package = Package(
   name: "NSAttributedTextView",
   platforms: [
-    .macOS(.v10_11)
+    .macOS(.v10_11),
   ],
   products: [
     .library(
       name: "NSAttributedTextView",
       targets: ["NSAttributedTextView"]
-    )
+    ),
   ],
   dependencies: [],
   targets: [
     .target(
       name: "NSAttributedTextView",
       dependencies: []
-    )
+    ),
   ]
 )

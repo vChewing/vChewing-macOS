@@ -12,8 +12,8 @@ import Foundation
 
 // MARK: - 前導工作
 
-extension String {
-  fileprivate mutating func regReplace(pattern: String, replaceWith: String = "") {
+fileprivate extension String {
+  mutating func regReplace(pattern: String, replaceWith: String = "") {
     // Ref: https://stackoverflow.com/a/40993403/4162914 && https://stackoverflow.com/a/71291137/4162914
     do {
       let regex = try NSRegularExpression(
@@ -29,21 +29,21 @@ extension String {
 
 // MARK: - String charComponents Extension
 
-extension String {
-  public var charComponents: [String] { map { String($0) } }
+public extension String {
+  var charComponents: [String] { map { String($0) } }
 }
 
-extension Array where Element == String.Element {
-  public var charComponents: [String] { map { String($0) } }
+public extension Array where Element == String.Element {
+  var charComponents: [String] { map { String($0) } }
 }
 
 // MARK: - StringView Ranges Extension (by Isaac Xen)
 
-extension String {
-  fileprivate func ranges(splitBy separator: Element) -> [Range<String.Index>] {
+fileprivate extension String {
+  func ranges(splitBy separator: Element) -> [Range<String.Index>] {
     var startIndex = startIndex
     return split(separator: separator).reduce(into: []) { ranges, substring in
-      _ = range(of: substring, range: startIndex..<endIndex).map { range in
+      _ = range(of: substring, range: startIndex ..< endIndex).map { range in
         ranges.append(range)
         startIndex = range.upperBound
       }
@@ -54,8 +54,8 @@ extension String {
 // MARK: - 引入小數點位數控制函式
 
 // Ref: https://stackoverflow.com/a/32581409/4162914
-extension Double {
-  fileprivate func rounded(toPlaces places: Int) -> Double {
+fileprivate extension Double {
+  func rounded(toPlaces places: Int) -> Double {
     let divisor = pow(10.0, Double(places))
     return (self * divisor).rounded() / divisor
   }
@@ -173,15 +173,15 @@ func rawDictForPhrases(isCHS: Bool) -> [Unigram] {
     return []
   }
   // 預處理格式
-  strRAW = strRAW.replacingOccurrences(of: " #MACOS", with: "")  // 去掉 macOS 標記
+  strRAW = strRAW.replacingOccurrences(of: " #MACOS", with: "") // 去掉 macOS 標記
   // CJKWhiteSpace (\x{3000}) to ASCII Space
   // NonBreakWhiteSpace (\x{A0}) to ASCII Space
   // Tab to ASCII Space
   // 統整連續空格為一個 ASCII 空格
   strRAW.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: " ")
-  strRAW.regReplace(pattern: #"(^ | $)"#, replaceWith: "")  // 去除行尾行首空格
-  strRAW.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n")  // CR & Form Feed to LF, 且去除重複行
-  strRAW.regReplace(pattern: #"^(#.*|.*#WIN32.*)$"#, replaceWith: "")  // 以#開頭的行都淨空+去掉所有 WIN32 特有的行
+  strRAW.regReplace(pattern: #"(^ | $)"#, replaceWith: "") // 去除行尾行首空格
+  strRAW.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n") // CR & Form Feed to LF, 且去除重複行
+  strRAW.regReplace(pattern: #"^(#.*|.*#WIN32.*)$"#, replaceWith: "") // 以#開頭的行都淨空+去掉所有 WIN32 特有的行
   // 正式整理格式，現在就開始去重複：
   let arrData = Array(
     NSOrderedSet(array: strRAW.components(separatedBy: "\n")).array as! [String])
@@ -202,25 +202,25 @@ func rawDictForPhrases(isCHS: Bool) -> [Unigram] {
     }
     // 然後直接乾脆就轉成 Unigram 吧。
     let arrCells: [String] = varLineDataProcessed.components(separatedBy: "\t")
-    count = 0  // 不需要再定義，因為之前已經有定義過了。
+    count = 0 // 不需要再定義，因為之前已經有定義過了。
     var phone = ""
     var phrase = ""
     var occurrence = 0
     for cell in arrCells {
       count += 1
       switch count {
-        case 1: phrase = cell
-        case 3: phone = cell
-        case 2: occurrence = Int(cell) ?? 0
-        default: break
+      case 1: phrase = cell
+      case 3: phone = cell
+      case 2: occurrence = Int(cell) ?? 0
+      default: break
       }
     }
-    if phrase != "" {  // 廢掉空數據；之後無須再這樣處理。
+    if phrase != "" { // 廢掉空數據；之後無須再這樣處理。
       arrUnigramRAW += [
         Unigram(
           key: phone, value: phrase, score: 0.0,
           count: occurrence
-        )
+        ),
       ]
     }
   }
@@ -242,15 +242,15 @@ func rawDictForKanjis(isCHS: Bool) -> [Unigram] {
     return []
   }
   // 預處理格式
-  strRAW = strRAW.replacingOccurrences(of: " #MACOS", with: "")  // 去掉 macOS 標記
+  strRAW = strRAW.replacingOccurrences(of: " #MACOS", with: "") // 去掉 macOS 標記
   // CJKWhiteSpace (\x{3000}) to ASCII Space
   // NonBreakWhiteSpace (\x{A0}) to ASCII Space
   // Tab to ASCII Space
   // 統整連續空格為一個 ASCII 空格
   strRAW.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: " ")
-  strRAW.regReplace(pattern: #"(^ | $)"#, replaceWith: "")  // 去除行尾行首空格
-  strRAW.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n")  // CR & Form Feed to LF, 且去除重複行
-  strRAW.regReplace(pattern: #"^(#.*|.*#WIN32.*)$"#, replaceWith: "")  // 以#開頭的行都淨空+去掉所有 WIN32 特有的行
+  strRAW.regReplace(pattern: #"(^ | $)"#, replaceWith: "") // 去除行尾行首空格
+  strRAW.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n") // CR & Form Feed to LF, 且去除重複行
+  strRAW.regReplace(pattern: #"^(#.*|.*#WIN32.*)$"#, replaceWith: "") // 以#開頭的行都淨空+去掉所有 WIN32 特有的行
   // 正式整理格式，現在就開始去重複：
   let arrData = Array(
     NSOrderedSet(array: strRAW.components(separatedBy: "\n")).array as! [String])
@@ -281,20 +281,20 @@ func rawDictForKanjis(isCHS: Bool) -> [Unigram] {
     }
     // 然後直接乾脆就轉成 Unigram 吧。
     let arrCells: [String] = varLineDataProcessed.components(separatedBy: "\t")
-    count = 0  // 不需要再定義，因為之前已經有定義過了。
+    count = 0 // 不需要再定義，因為之前已經有定義過了。
     var phone = ""
     var phrase = ""
     var occurrence = 0
     for cell in arrCells {
       count += 1
       switch count {
-        case 1: phrase = cell
-        case 3: phone = cell
-        case 2: occurrence = Int(cell) ?? 0
-        default: break
+      case 1: phrase = cell
+      case 3: phone = cell
+      case 2: occurrence = Int(cell) ?? 0
+      default: break
       }
     }
-    if phrase != "" {  // 廢掉空數據；之後無須再這樣處理。
+    if phrase != "" { // 廢掉空數據；之後無須再這樣處理。
       if !isReverseLookupDictionaryProcessed {
         mapReverseLookup[phrase, default: []].append(cnvPhonabetToASCII(phone).data(using: .utf8)!)
         mapReverseLookupUnencrypted[phrase, default: []].append(phone)
@@ -303,7 +303,7 @@ func rawDictForKanjis(isCHS: Bool) -> [Unigram] {
         Unigram(
           key: phone, value: phrase, score: 0.0,
           count: occurrence
-        )
+        ),
       ]
     }
   }
@@ -337,15 +337,15 @@ func rawDictForNonKanjis(isCHS: Bool) -> [Unigram] {
     return []
   }
   // 預處理格式
-  strRAW = strRAW.replacingOccurrences(of: " #MACOS", with: "")  // 去掉 macOS 標記
+  strRAW = strRAW.replacingOccurrences(of: " #MACOS", with: "") // 去掉 macOS 標記
   // CJKWhiteSpace (\x{3000}) to ASCII Space
   // NonBreakWhiteSpace (\x{A0}) to ASCII Space
   // Tab to ASCII Space
   // 統整連續空格為一個 ASCII 空格
   strRAW.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: " ")
-  strRAW.regReplace(pattern: #"(^ | $)"#, replaceWith: "")  // 去除行尾行首空格
-  strRAW.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n")  // CR & Form Feed to LF, 且去除重複行
-  strRAW.regReplace(pattern: #"^(#.*|.*#WIN32.*)$"#, replaceWith: "")  // 以#開頭的行都淨空+去掉所有 WIN32 特有的行
+  strRAW.regReplace(pattern: #"(^ | $)"#, replaceWith: "") // 去除行尾行首空格
+  strRAW.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n") // CR & Form Feed to LF, 且去除重複行
+  strRAW.regReplace(pattern: #"^(#.*|.*#WIN32.*)$"#, replaceWith: "") // 以#開頭的行都淨空+去掉所有 WIN32 特有的行
   // 正式整理格式，現在就開始去重複：
   let arrData = Array(
     NSOrderedSet(array: strRAW.components(separatedBy: "\n")).array as! [String])
@@ -354,7 +354,7 @@ func rawDictForNonKanjis(isCHS: Bool) -> [Unigram] {
     varLineData = lineData
     // 先完成某兩步需要分行處理才能完成的格式整理。
     varLineData = varLineData.components(separatedBy: " ").prefix(3).joined(
-      separator: "\t")  // 提取前三欄的內容。
+      separator: "\t") // 提取前三欄的內容。
     let arrLineData = varLineData.components(separatedBy: " ")
     var varLineDataProcessed = ""
     var count = 0
@@ -370,26 +370,26 @@ func rawDictForNonKanjis(isCHS: Bool) -> [Unigram] {
     }
     // 然後直接乾脆就轉成 Unigram 吧。
     let arrCells: [String] = varLineDataProcessed.components(separatedBy: "\t")
-    count = 0  // 不需要再定義，因為之前已經有定義過了。
+    count = 0 // 不需要再定義，因為之前已經有定義過了。
     var phone = ""
     var phrase = ""
     var occurrence = 0
     for cell in arrCells {
       count += 1
       switch count {
-        case 1: phrase = cell
-        case 3: phone = cell
-        case 2: occurrence = Int(cell) ?? 0
-        default: break
+      case 1: phrase = cell
+      case 3: phone = cell
+      case 2: occurrence = Int(cell) ?? 0
+      default: break
       }
     }
-    if phrase != "" {  // 廢掉空數據；之後無須再這樣處理。
+    if phrase != "" { // 廢掉空數據；之後無須再這樣處理。
       exceptedChars.insert(phrase)
       arrUnigramRAW += [
         Unigram(
           key: phone, value: phrase, score: 0.0,
           count: occurrence
-        )
+        ),
       ]
     }
   }
@@ -415,24 +415,24 @@ func weightAndSort(_ arrStructUncalculated: [Unigram], isCHS: Bool) -> [Unigram]
   for unigram in arrStructUncalculated {
     var weight: Double = 0
     switch unigram.count {
-      case -2:  // 拗音假名
-        weight = -13
-      case -1:  // 單個假名
-        weight = -13
-      case 0:  // 墊底低頻漢字與詞語
-        weight = log10(
-          fscale ** (Double(unigram.value.count) / 3.0 - 1.0) * 0.25 / norm)
-      default:
-        weight = log10(
-          fscale ** (Double(unigram.value.count) / 3.0 - 1.0)
-            * Double(unigram.count) / norm)  // Credit: MJHsieh.
+    case -2: // 拗音假名
+      weight = -13
+    case -1: // 單個假名
+      weight = -13
+    case 0: // 墊底低頻漢字與詞語
+      weight = log10(
+        fscale ** (Double(unigram.value.count) / 3.0 - 1.0) * 0.25 / norm)
+    default:
+      weight = log10(
+        fscale ** (Double(unigram.value.count) / 3.0 - 1.0)
+          * Double(unigram.count) / norm) // Credit: MJHsieh.
     }
-    let weightRounded: Double = weight.rounded(toPlaces: 3)  // 為了節省生成的檔案體積，僅保留小數點後三位。
+    let weightRounded: Double = weight.rounded(toPlaces: 3) // 為了節省生成的檔案體積，僅保留小數點後三位。
     arrStructCalculated += [
       Unigram(
         key: unigram.key, value: unigram.value, score: weightRounded,
         count: unigram.count
-      )
+      ),
     ]
   }
   NSLog(" - \(i18n): 成功計算權重。")
@@ -763,7 +763,7 @@ func healthCheck(_ data: [Unigram]) -> String {
 
   let separator: String = {
     var result = ""
-    for _ in 0..<72 { result += "-" }
+    for _ in 0 ..< 72 { result += "-" }
     return result
   }()
 
@@ -784,7 +784,7 @@ func healthCheck(_ data: [Unigram]) -> String {
   printl("\n其中有：")
 
   var insufficientsMap = [Int: [(String, String, Double, [Unigram], Double)]]()
-  for x in 2...10 {
+  for x in 2 ... 10 {
     insufficientsMap[x] = insufficients.filter { $0.0.split(separator: "-").count == x }
   }
 

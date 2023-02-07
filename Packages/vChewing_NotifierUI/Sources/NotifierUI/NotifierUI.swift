@@ -21,8 +21,8 @@ public class Notifier: NSWindowController {
     }
   }
 
-  private var currentMessage: String  // 承載該副本在初期化時被傳入的訊息內容。
-  private var isNew = true  // 新通知標記。
+  private var currentMessage: String // 承載該副本在初期化時被傳入的訊息內容。
+  private var isNew = true // 新通知標記。
 
   // MARK: - Private Declarations
 
@@ -178,15 +178,15 @@ extension Notifier {
   }
 }
 
-extension NSMutableOrderedSet {
-  fileprivate var arrayOfWindows: [NSWindow] { compactMap { ($0 as? Notifier)?.window } }
+private extension NSMutableOrderedSet {
+  var arrayOfWindows: [NSWindow] { compactMap { ($0 as? Notifier)?.window } }
 
-  fileprivate var firstNotifier: Notifier? {
+  var firstNotifier: Notifier? {
     for neta in self { if let result = neta as? Notifier { return result } }
     return nil
   }
 
-  fileprivate var lastNotifier: Notifier? {
+  var lastNotifier: Notifier? {
     for neta in reversed { if let result = neta as? Notifier { return result } }
     return nil
   }

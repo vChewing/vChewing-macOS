@@ -19,7 +19,7 @@ class CtlAboutWindow: NSWindowController {
     if shared == nil { shared = CtlAboutWindow(windowNibName: "frmAboutWindow") }
     guard let shared = shared, let sharedWindow = shared.window else { return }
     sharedWindow.setPosition(vertical: .top, horizontal: .left, padding: 20)
-    sharedWindow.orderFrontRegardless()  // 逼著視窗往最前方顯示
+    sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
     sharedWindow.level = .statusBar
     sharedWindow.titlebarAppearsTransparent = true
     shared.showWindow(shared)
@@ -35,7 +35,7 @@ class CtlAboutWindow: NSWindowController {
     window?.standardWindowButton(.zoomButton)?.isHidden = true
     guard
       let installingVersion = Bundle.main.infoDictionary?[kCFBundleVersionKey as String]
-        as? String,
+      as? String,
       let versionString = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     else {
       return
@@ -46,7 +46,7 @@ class CtlAboutWindow: NSWindowController {
       appCopyrightLabel.stringValue = copyrightLabel
     }
     if let eulaContent = Bundle.main.localizedInfoDictionary?["CFEULAContent"] as? String,
-      let eulaContentUpstream = Bundle.main.infoDictionary?["CFUpstreamEULAContent"] as? String
+       let eulaContentUpstream = Bundle.main.infoDictionary?["CFUpstreamEULAContent"] as? String
     {
       appEULAContent.string = eulaContent + "\n" + eulaContentUpstream
     }

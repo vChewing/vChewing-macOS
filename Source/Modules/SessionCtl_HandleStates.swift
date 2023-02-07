@@ -11,7 +11,7 @@ import Shared
 
 // MARK: - 狀態調度 (State Handling)
 
-extension SessionCtl {
+public extension SessionCtl {
   /// 針對傳入的新狀態進行調度、且將當前會話控制器的狀態切換至新狀態。
   ///
   /// 先將舊狀態單獨記錄起來，再將新舊狀態作為參數，
@@ -22,7 +22,7 @@ extension SessionCtl {
   /// 不必要的互相干涉、打斷彼此的工作。
   /// - Note: 本來不用這麼複雜的，奈何 Swift Protocol 不允許給參數指定預設值。
   /// - Parameter newState: 新狀態。
-  public func switchState(_ newState: IMEStateProtocol) {
+  func switchState(_ newState: IMEStateProtocol) {
     handle(state: newState, replace: true)
   }
 
@@ -37,50 +37,50 @@ extension SessionCtl {
   /// - Parameters:
   ///   - newState: 新狀態。
   ///   - replace: 是否取代現有狀態。
-  public func handle(state newState: IMEStateProtocol, replace: Bool) {
+  func handle(state newState: IMEStateProtocol, replace: Bool) {
     var previous = state
     if replace { state = newState }
     switch newState.type {
-      case .ofDeactivated:
-        // 這裡移除一些處理，轉而交給 commitComposition() 代為執行。
-        // 這裡不需要 clearInlineDisplay() ，否則會觸發無限迴圈。
-        // 對於 IMK 選字窗的顯示狀態糾正的行為交給 inputMode.didSet() 來處理。
-        candidateUI?.visible = false
-        popupCompositionBuffer.hide()
-        tooltipInstance.hide()
-      case .ofEmpty, .ofAbortion, .ofCommitting:
-        innerCircle: switch newState.type {
-          case .ofAbortion:
-            previous = IMEState.ofEmpty()
-            if replace { state = previous }
-          case .ofCommitting:
-            commit(text: newState.textToCommit)
-            if replace { state = IMEState.ofEmpty() }
-          default: break innerCircle
-        }
-        candidateUI?.visible = false
-        // 全專案用以判斷「.Abortion」的地方僅此一處。
-        if previous.hasComposition, ![.ofAbortion, .ofCommitting].contains(newState.type) {
-          commit(text: previous.displayedText)
-        }
-        // 會在工具提示為空的時候自動消除顯示。
-        showTooltip(newState.tooltip, duration: newState.tooltipDuration)
-        clearInlineDisplay()
-        inputHandler?.clear()
-      case .ofInputting:
-        candidateUI?.visible = false
+    case .ofDeactivated:
+      // 這裡移除一些處理，轉而交給 commitComposition() 代為執行。
+      // 這裡不需要 clearInlineDisplay() ，否則會觸發無限迴圈。
+      // 對於 IMK 選字窗的顯示狀態糾正的行為交給 inputMode.didSet() 來處理。
+      candidateUI?.visible = false
+      popupCompositionBuffer.hide()
+      tooltipInstance.hide()
+    case .ofEmpty, .ofAbortion, .ofCommitting:
+      innerCircle: switch newState.type {
+      case .ofAbortion:
+        previous = IMEState.ofEmpty()
+        if replace { state = previous }
+      case .ofCommitting:
         commit(text: newState.textToCommit)
-        setInlineDisplayWithCursor()
-        // 會在工具提示為空的時候自動消除顯示。
-        showTooltip(newState.tooltip, duration: newState.tooltipDuration)
-      case .ofMarking:
-        candidateUI?.visible = false
-        setInlineDisplayWithCursor()
-        showTooltip(newState.tooltip)
-      case .ofCandidates, .ofAssociates, .ofSymbolTable:
-        tooltipInstance.hide()
-        setInlineDisplayWithCursor()
-        showCandidates()
+        if replace { state = IMEState.ofEmpty() }
+      default: break innerCircle
+      }
+      candidateUI?.visible = false
+      // 全專案用以判斷「.Abortion」的地方僅此一處。
+      if previous.hasComposition, ![.ofAbortion, .ofCommitting].contains(newState.type) {
+        commit(text: previous.displayedText)
+      }
+      // 會在工具提示為空的時候自動消除顯示。
+      showTooltip(newState.tooltip, duration: newState.tooltipDuration)
+      clearInlineDisplay()
+      inputHandler?.clear()
+    case .ofInputting:
+      candidateUI?.visible = false
+      commit(text: newState.textToCommit)
+      setInlineDisplayWithCursor()
+      // 會在工具提示為空的時候自動消除顯示。
+      showTooltip(newState.tooltip, duration: newState.tooltipDuration)
+    case .ofMarking:
+      candidateUI?.visible = false
+      setInlineDisplayWithCursor()
+      showTooltip(newState.tooltip)
+    case .ofCandidates, .ofAssociates, .ofSymbolTable:
+      tooltipInstance.hide()
+      setInlineDisplayWithCursor()
+      showCandidates()
     }
     // 浮動組字窗的顯示判定
     if newState.hasComposition, PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier) {
@@ -95,7 +95,7 @@ extension SessionCtl {
   }
 
   /// 如果當前狀態含有「組字結果內容」、或者有選字窗內容、或者存在正在輸入的字根/讀音，則在組字區內顯示游標。
-  public func setInlineDisplayWithCursor() {
+  func setInlineDisplayWithCursor() {
     /// 所謂選區「selectionRange」，就是「可見游標位置」的位置，只不過長度
     /// 是 0 且取代範圍（replacementRange）為「NSNotFound」罷了。
     /// 也就是說，內文組字區該在哪裡出現，得由客體軟體來作主。
@@ -106,7 +106,7 @@ extension SessionCtl {
   }
 
   /// 在處理某些「沒有組字區內容顯示」且「不需要攔截某些按鍵處理」的狀態時使用的函式，會清空螢幕上顯示的組字區。
-  public func clearInlineDisplay() {
+  func clearInlineDisplay() {
     doSetMarkedText(
       "", selectionRange: NSRange(location: 0, length: 0),
       replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
@@ -136,7 +136,7 @@ extension SessionCtl {
   }
 
   /// 把 setMarkedText 包裝一下，按需啟用 GCD。
-  public func doSetMarkedText(_ string: Any!, selectionRange: NSRange, replacementRange: NSRange) {
+  func doSetMarkedText(_ string: Any!, selectionRange: NSRange, replacementRange: NSRange) {
     guard isActivated, let client = client() else { return }
     if isServingIMEItself {
       DispatchQueue.main.async {

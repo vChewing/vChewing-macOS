@@ -20,10 +20,10 @@ extension CandidateNode {
         for strLine in arrLines.lazy.filter({ !$0.isEmpty }) {
           fieldSlice = strLine.split(separator: "=")
           switch fieldSlice.count {
-            case 1: arrMembers.append(.init(name: String(fieldSlice[0])))
-            case 2:
-              arrMembers.append(.init(name: String(fieldSlice[0]), symbols: .init(fieldSlice[1].map { String($0) })))
-            default: break
+          case 1: arrMembers.append(.init(name: String(fieldSlice[0])))
+          case 2:
+            arrMembers.append(.init(name: String(fieldSlice[0]), symbols: .init(fieldSlice[1].map { String($0) })))
+          default: break
           }
         }
         Self.root = arrMembers.isEmpty ? defaultSymbolRoot : .init(name: "/", members: arrMembers)

@@ -22,7 +22,7 @@ import SwiftUI
     /// Setting a content configuration replaces the existing contentView of the
     /// cell with a new content view instance from the configuration.
     public var contentConfiguration: BackportUIContentConfiguration? {
-      get { nil }  // we can't really support anything here, so for now we'll return nil
+      get { nil } // we can't really support anything here, so for now we'll return nil
       nonmutating set {
         content.configuredView?.removeFromSuperview()
 
@@ -39,8 +39,8 @@ import SwiftUI
 
         let insets =
           Mirror(reflecting: configuration)
-          .children.first(where: { $0.label == "insets" })?.value as? ProposedInsets
-          ?? .unspecified
+            .children.first(where: { $0.label == "insets" })?.value as? ProposedInsets
+            ?? .unspecified
 
         insets.top.flatMap { contentView.directionalLayoutMargins.top = $0 }
         insets.bottom.flatMap { contentView.directionalLayoutMargins.bottom = $0 }

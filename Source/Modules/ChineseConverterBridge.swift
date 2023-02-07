@@ -58,13 +58,13 @@ public enum ChineseConverter {
     for key in currencyNumeralDictTable.keys {
       guard let result = currencyNumeralDictTable[key] else { continue }
       if IMEApp.currentInputMode == .imeModeCHS {
-        target = target.replacingOccurrences(of: key, with: result.3)  // Simplified Chinese
+        target = target.replacingOccurrences(of: key, with: result.3) // Simplified Chinese
         continue
       }
       switch (PrefMgr.shared.chineseConversionEnabled, PrefMgr.shared.shiftJISShinjitaiOutputEnabled) {
-        case (false, true), (true, true): target = target.replacingOccurrences(of: key, with: result.2)  // JIS
-        case (true, false): target = target.replacingOccurrences(of: key, with: result.0)  // KangXi
-        default: target = target.replacingOccurrences(of: key, with: result.1)  // Contemporary
+      case (false, true), (true, true): target = target.replacingOccurrences(of: key, with: result.2) // JIS
+      case (true, false): target = target.replacingOccurrences(of: key, with: result.0) // KangXi
+      default: target = target.replacingOccurrences(of: key, with: result.1) // Contemporary
       }
     }
   }
@@ -75,12 +75,12 @@ public enum ChineseConverter {
   /// - Returns: Text converted to Different Script.
   public static func crossConvert(_ string: String) -> String {
     switch IMEApp.currentInputMode {
-      case .imeModeCHS:
-        return shared.convert(string, to: .zhHantTW)
-      case .imeModeCHT:
-        return shared.convert(string, to: .zhHansCN)
-      default:
-        return string
+    case .imeModeCHS:
+      return shared.convert(string, to: .zhHantTW)
+    case .imeModeCHT:
+      return shared.convert(string, to: .zhHansCN)
+    default:
+      return string
     }
   }
 
@@ -89,15 +89,15 @@ public enum ChineseConverter {
   public static func cassetteConvert(_ string: inout String) {
     // 0 為不轉換，1 為全轉換，2 為僅轉簡，3 為僅轉繁。
     switch PrefMgr.shared.forceCassetteChineseConversion {
-      case 1:
-        switch IMEApp.currentInputMode {
-          case .imeModeCHS: string = shared.convert(string, to: .zhHansCN)
-          case .imeModeCHT: string = shared.convert(string, to: .zhHantTW)
-          case .imeModeNULL: break
-        }
-      case 2: if IMEApp.currentInputMode == .imeModeCHS { string = shared.convert(string, to: .zhHansCN) }
-      case 3: if IMEApp.currentInputMode == .imeModeCHT { string = shared.convert(string, to: .zhHantTW) }
-      default: return
+    case 1:
+      switch IMEApp.currentInputMode {
+      case .imeModeCHS: string = shared.convert(string, to: .zhHansCN)
+      case .imeModeCHT: string = shared.convert(string, to: .zhHantTW)
+      case .imeModeNULL: break
+      }
+    case 2: if IMEApp.currentInputMode == .imeModeCHS { string = shared.convert(string, to: .zhHansCN) }
+    case 3: if IMEApp.currentInputMode == .imeModeCHT { string = shared.convert(string, to: .zhHantTW) }
+    default: return
     }
   }
 
@@ -118,11 +118,11 @@ public enum ChineseConverter {
     if PrefMgr.shared.cassetteEnabled { cassetteConvert(&text) }
     guard IMEApp.currentInputMode == .imeModeCHT else { return text }
     switch (PrefMgr.shared.chineseConversionEnabled, PrefMgr.shared.shiftJISShinjitaiOutputEnabled) {
-      case (false, true): return ChineseConverter.cnvTradToJIS(text)
-      case (true, false): return ChineseConverter.cnvTradToKangXi(text)
-      // 本來這兩個開關不該同時開啟的，但萬一被同時開啟了的話就這樣處理：
-      case (true, true): return ChineseConverter.cnvTradToJIS(text)
-      case (false, false): return text
+    case (false, true): return ChineseConverter.cnvTradToJIS(text)
+    case (true, false): return ChineseConverter.cnvTradToKangXi(text)
+    // 本來這兩個開關不該同時開啟的，但萬一被同時開啟了的話就這樣處理：
+    case (true, true): return ChineseConverter.cnvTradToJIS(text)
+    case (false, false): return text
     }
   }
 }

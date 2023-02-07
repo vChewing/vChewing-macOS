@@ -63,38 +63,6 @@ extension Backport where Wrapped == Any {
       /// Create a Dynamic Type size from its `UIContentSizeCategory` equivalent.
       public init?(_ uiSizeCategory: UIContentSizeCategory) {
         switch uiSizeCategory {
-          case .extraSmall:
-            self = .xSmall
-          case .small:
-            self = .small
-          case .medium:
-            self = .medium
-          case .large:
-            self = .medium
-          case .extraLarge:
-            self = .xLarge
-          case .extraExtraLarge:
-            self = .xxLarge
-          case .extraExtraExtraLarge:
-            self = .xxxLarge
-          case .accessibilityMedium:
-            self = .accessibility1
-          case .accessibilityLarge:
-            self = .accessibility2
-          case .accessibilityExtraLarge:
-            self = .accessibility3
-          case .accessibilityExtraExtraLarge:
-            self = .accessibility4
-          case .accessibilityExtraExtraExtraLarge:
-            self = .accessibility5
-          default:
-            return nil
-        }
-      }
-    #endif
-
-    internal init(_ sizeCategory: ContentSizeCategory) {
-      switch sizeCategory {
         case .extraSmall:
           self = .xSmall
         case .small:
@@ -102,7 +70,7 @@ extension Backport where Wrapped == Any {
         case .medium:
           self = .medium
         case .large:
-          self = .large
+          self = .medium
         case .extraLarge:
           self = .xLarge
         case .extraExtraLarge:
@@ -120,36 +88,68 @@ extension Backport where Wrapped == Any {
         case .accessibilityExtraExtraExtraLarge:
           self = .accessibility5
         default:
-          self = .large
+          return nil
+        }
+      }
+    #endif
+
+    internal init(_ sizeCategory: ContentSizeCategory) {
+      switch sizeCategory {
+      case .extraSmall:
+        self = .xSmall
+      case .small:
+        self = .small
+      case .medium:
+        self = .medium
+      case .large:
+        self = .large
+      case .extraLarge:
+        self = .xLarge
+      case .extraExtraLarge:
+        self = .xxLarge
+      case .extraExtraExtraLarge:
+        self = .xxxLarge
+      case .accessibilityMedium:
+        self = .accessibility1
+      case .accessibilityLarge:
+        self = .accessibility2
+      case .accessibilityExtraLarge:
+        self = .accessibility3
+      case .accessibilityExtraExtraLarge:
+        self = .accessibility4
+      case .accessibilityExtraExtraExtraLarge:
+        self = .accessibility5
+      default:
+        self = .large
       }
     }
 
     var sizeCategory: ContentSizeCategory {
       switch self {
-        case .xSmall:
-          return .extraSmall
-        case .small:
-          return .small
-        case .medium:
-          return .medium
-        case .large:
-          return .large
-        case .xLarge:
-          return .extraLarge
-        case .xxLarge:
-          return .extraExtraLarge
-        case .xxxLarge:
-          return .extraExtraExtraLarge
-        case .accessibility1:
-          return .accessibilityMedium
-        case .accessibility2:
-          return .accessibilityLarge
-        case .accessibility3:
-          return .accessibilityExtraLarge
-        case .accessibility4:
-          return .accessibilityExtraExtraLarge
-        case .accessibility5:
-          return .accessibilityExtraExtraExtraLarge
+      case .xSmall:
+        return .extraSmall
+      case .small:
+        return .small
+      case .medium:
+        return .medium
+      case .large:
+        return .large
+      case .xLarge:
+        return .extraLarge
+      case .xxLarge:
+        return .extraExtraLarge
+      case .xxxLarge:
+        return .extraExtraExtraLarge
+      case .accessibility1:
+        return .accessibilityMedium
+      case .accessibility2:
+        return .accessibilityLarge
+      case .accessibility3:
+        return .accessibilityExtraLarge
+      case .accessibility4:
+        return .accessibilityExtraExtraLarge
+      case .accessibility5:
+        return .accessibilityExtraExtraExtraLarge
       }
     }
   }
@@ -159,30 +159,30 @@ extension Backport where Wrapped == Any {
 extension Backport.DynamicTypeSize {
   var dynamicTypeSize: DynamicTypeSize {
     switch self {
-      case .xSmall:
-        return .xSmall
-      case .small:
-        return .small
-      case .medium:
-        return .medium
-      case .large:
-        return .large
-      case .xLarge:
-        return .xLarge
-      case .xxLarge:
-        return .xxLarge
-      case .xxxLarge:
-        return .xxxLarge
-      case .accessibility1:
-        return .accessibility1
-      case .accessibility2:
-        return .accessibility2
-      case .accessibility3:
-        return .accessibility3
-      case .accessibility4:
-        return .accessibility4
-      case .accessibility5:
-        return .accessibility5
+    case .xSmall:
+      return .xSmall
+    case .small:
+      return .small
+    case .medium:
+      return .medium
+    case .large:
+      return .large
+    case .xLarge:
+      return .xLarge
+    case .xxLarge:
+      return .xxLarge
+    case .xxxLarge:
+      return .xxxLarge
+    case .accessibility1:
+      return .accessibility1
+    case .accessibility2:
+      return .accessibility2
+    case .accessibility3:
+      return .accessibility3
+    case .accessibility4:
+      return .accessibility4
+    case .accessibility5:
+      return .accessibility5
     }
   }
 }
@@ -193,32 +193,32 @@ extension Backport.DynamicTypeSize {
   extension UIContentSizeCategory {
     public init(_ dynamicTypeSize: Backport<Any>.DynamicTypeSize?) {
       switch dynamicTypeSize {
-        case .xSmall:
-          self = .extraSmall
-        case .small:
-          self = .small
-        case .medium:
-          self = .medium
-        case .large:
-          self = .large
-        case .xLarge:
-          self = .extraLarge
-        case .xxLarge:
-          self = .extraExtraLarge
-        case .xxxLarge:
-          self = .extraExtraExtraLarge
-        case .accessibility1:
-          self = .accessibilityMedium
-        case .accessibility2:
-          self = .accessibilityLarge
-        case .accessibility3:
-          self = .accessibilityExtraLarge
-        case .accessibility4:
-          self = .accessibilityExtraExtraLarge
-        case .accessibility5:
-          self = .accessibilityExtraExtraExtraLarge
-        case .none:
-          self = .large
+      case .xSmall:
+        self = .extraSmall
+      case .small:
+        self = .small
+      case .medium:
+        self = .medium
+      case .large:
+        self = .large
+      case .xLarge:
+        self = .extraLarge
+      case .xxLarge:
+        self = .extraExtraLarge
+      case .xxxLarge:
+        self = .extraExtraExtraLarge
+      case .accessibility1:
+        self = .accessibilityMedium
+      case .accessibility2:
+        self = .accessibilityLarge
+      case .accessibility3:
+        self = .accessibilityExtraLarge
+      case .accessibility4:
+        self = .accessibilityExtraExtraLarge
+      case .accessibility5:
+        self = .accessibilityExtraExtraExtraLarge
+      case .none:
+        self = .large
       }
     }
   }

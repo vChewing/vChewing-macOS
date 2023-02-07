@@ -73,49 +73,49 @@ public class TooltipUI: NSWindowController {
     var backgroundColor = NSColor.controlBackgroundColor
     var textColor = NSColor.textColor
     switch state {
-      case .normal:
-        backgroundColor = NSColor(
-          red: 0.18, green: 0.18, blue: 0.18, alpha: 1.00
-        )
-        textColor = NSColor.white
-      case .redAlert:
-        backgroundColor = NSColor(
-          red: 0.55, green: 0.00, blue: 0.00, alpha: 1.00
-        )
-        textColor = NSColor.white
-      case .warning:
-        backgroundColor = NSColor.purple
-        textColor = NSColor.white
-      case .succeeded:
-        backgroundColor = NSColor(
-          red: 0.21, green: 0.15, blue: 0.02, alpha: 1.00
-        )
-        textColor = NSColor.white
-      case .denialOverflow:
-        backgroundColor = NSColor(
-          red: 0.13, green: 0.08, blue: 0.00, alpha: 1.00
-        )
-        textColor = NSColor(
-          red: 1.00, green: 0.60, blue: 0.00, alpha: 1.00
-        )
-      case .denialInsufficiency:
-        backgroundColor = NSColor.windowBackgroundColor
-        textColor = NSColor.labelColor
-      case .prompt:
-        backgroundColor = NSColor(
-          red: 0.09, green: 0.15, blue: 0.15, alpha: 1.00
-        )
-        textColor = NSColor(
-          red: 0.91, green: 0.95, blue: 0.92, alpha: 1.00
-        )
+    case .normal:
+      backgroundColor = NSColor(
+        red: 0.18, green: 0.18, blue: 0.18, alpha: 1.00
+      )
+      textColor = NSColor.white
+    case .redAlert:
+      backgroundColor = NSColor(
+        red: 0.55, green: 0.00, blue: 0.00, alpha: 1.00
+      )
+      textColor = NSColor.white
+    case .warning:
+      backgroundColor = NSColor.purple
+      textColor = NSColor.white
+    case .succeeded:
+      backgroundColor = NSColor(
+        red: 0.21, green: 0.15, blue: 0.02, alpha: 1.00
+      )
+      textColor = NSColor.white
+    case .denialOverflow:
+      backgroundColor = NSColor(
+        red: 0.13, green: 0.08, blue: 0.00, alpha: 1.00
+      )
+      textColor = NSColor(
+        red: 1.00, green: 0.60, blue: 0.00, alpha: 1.00
+      )
+    case .denialInsufficiency:
+      backgroundColor = NSColor.windowBackgroundColor
+      textColor = NSColor.labelColor
+    case .prompt:
+      backgroundColor = NSColor(
+        red: 0.09, green: 0.15, blue: 0.15, alpha: 1.00
+      )
+      textColor = NSColor(
+        red: 0.91, green: 0.95, blue: 0.92, alpha: 1.00
+      )
     }
     if !NSApplication.isDarkMode {
       switch state {
-        case .denialInsufficiency: break
-        default:
-          let colorInterchange = backgroundColor
-          backgroundColor = textColor
-          textColor = colorInterchange
+      case .denialInsufficiency: break
+      default:
+        let colorInterchange = backgroundColor
+        backgroundColor = textColor
+        textColor = colorInterchange
       }
     }
     window?.backgroundColor = backgroundColor
