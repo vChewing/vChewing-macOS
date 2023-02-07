@@ -32,7 +32,7 @@ extension InputHandler {
     var keyConsumedByReading = false
     let skipPhoneticHandling =
       input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
-      || input.isControlHold || input.isOptionHold || input.isShiftHold || input.isCommandHold
+        || input.isControlHold || input.isOptionHold || input.isShiftHold || input.isCommandHold
     let confirmCombination = input.isSpace || input.isEnter
 
     // 這裡 inputValidityCheck() 是讓注拼槽檢查 charCode 這個 UniChar 是否是合法的注音輸入。
@@ -55,7 +55,7 @@ extension InputHandler {
         let temporaryReadingKey = theComposer.getComposition()
         if currentLM.hasUnigramsFor(keyArray: [temporaryReadingKey]) {
           compositor.dropKey(direction: .rear)
-          walk()  // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
+          walk() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
           composer = theComposer
           // 這裡不需要回呼 generateStateOfInputting()，因為當前輸入的聲調鍵一定是合規的、會在之後回呼 generateStateOfInputting()。
         } else {
@@ -76,9 +76,9 @@ extension InputHandler {
       }
     }
 
-    let readingKey = composer.getComposition()  // 拿取用來進行索引檢索用的注音。
+    let readingKey = composer.getComposition() // 拿取用來進行索引檢索用的注音。
     // 如果輸入法的辭典索引是漢語拼音的話，要注意上一行拿到的內容得是漢語拼音。
-    var composeReading = composer.hasIntonation() && composer.inputValidityCheck(key: input.charCode)  // 這裡不需要做排他性判斷。
+    var composeReading = composer.hasIntonation() && composer.inputValidityCheck(key: input.charCode) // 這裡不需要做排他性判斷。
     // 如果當前的按鍵是 Enter 或 Space 的話，這時就可以取出 composer 內的注音來做檢查了。
     // 來看看詞庫內到底有沒有對應的讀音索引。這裡用了類似「|=」的判斷處理方式。
     // 這裡必須使用 composer.value.isEmpty，因為只有這樣才能真正檢測 composer 是否已經有陰平聲調了。
@@ -87,7 +87,7 @@ extension InputHandler {
     composeReading = composeReading && !readingKey.isEmpty
     if composeReading {
       if input.isControlHold, input.isCommandHold, input.isEnter,
-        !input.isOptionHold, !input.isShiftHold, compositor.isEmpty
+         !input.isOptionHold, !input.isShiftHold, compositor.isEmpty
       {
         return handleEnter(input: input, readingOnly: true)
       }
@@ -96,7 +96,7 @@ extension InputHandler {
         delegate.callError("B49C0979：語彙庫內無「\(readingKey)」的匹配記錄。")
 
         if prefs.keepReadingUponCompositionError {
-          composer.intonation.clear()  // 砍掉聲調。
+          composer.intonation.clear() // 砍掉聲調。
           delegate.switchState(generateStateOfInputting())
           return true
         }
@@ -104,10 +104,10 @@ extension InputHandler {
         composer.clear()
         // 根據「組字器是否為空」來判定回呼哪一種狀態。
         switch compositor.isEmpty {
-          case false: delegate.switchState(generateStateOfInputting())
-          case true: delegate.switchState(IMEState.ofAbortion())
+        case false: delegate.switchState(generateStateOfInputting())
+        case true: delegate.switchState(IMEState.ofAbortion())
         }
-        return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了。
+        return true // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了。
       }
 
       // 將該讀音插入至組字器內的軌格當中。
@@ -138,20 +138,20 @@ extension InputHandler {
       if prefs.useSCPCTypingMode {
         let candidateState: IMEStateProtocol = generateStateOfCandidates()
         switch candidateState.candidates.count {
-          case 2...: delegate.switchState(candidateState)
-          case 1:
-            let firstCandidate = candidateState.candidates.first!  // 一定會有，所以強制拆包也無妨。
-            let reading: String = firstCandidate.0.joined(separator: compositor.separator)
-            let text: String = firstCandidate.1
-            delegate.switchState(IMEState.ofCommitting(textToCommit: text))
+        case 2...: delegate.switchState(candidateState)
+        case 1:
+          let firstCandidate = candidateState.candidates.first! // 一定會有，所以強制拆包也無妨。
+          let reading: String = firstCandidate.0.joined(separator: compositor.separator)
+          let text: String = firstCandidate.1
+          delegate.switchState(IMEState.ofCommitting(textToCommit: text))
 
-            if !prefs.associatedPhrasesEnabled {
-              delegate.switchState(IMEState.ofEmpty())
-            } else {
-              let associatedPhrases = generateStateOfAssociates(withPair: .init(keyArray: [reading], value: text))
-              delegate.switchState(associatedPhrases.candidates.isEmpty ? IMEState.ofEmpty() : associatedPhrases)
-            }
-          default: break
+          if !prefs.associatedPhrasesEnabled {
+            delegate.switchState(IMEState.ofEmpty())
+          } else {
+            let associatedPhrases = generateStateOfAssociates(withPair: .init(keyArray: [reading], value: text))
+            delegate.switchState(associatedPhrases.candidates.isEmpty ? IMEState.ofEmpty() : associatedPhrases)
+          }
+        default: break
         }
       }
       // 將「這個按鍵訊號已經被輸入法攔截處理了」的結果藉由 SessionCtl 回報給 IMK。
@@ -182,13 +182,13 @@ extension InputHandler {
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   private func handleCassetteComposition(input: InputSignalProtocol) -> Bool? {
     guard let delegate = delegate else { return nil }
-    var wildcardKey: String { currentLM.cassetteWildcardKey }  // 花牌鍵。
+    var wildcardKey: String { currentLM.cassetteWildcardKey } // 花牌鍵。
     let isWildcardKeyInput: Bool = (input.text == wildcardKey && !wildcardKey.isEmpty)
 
     var keyConsumedByStrokes = false
     let skipStrokeHandling =
       input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
-      || input.isControlHold || input.isOptionHold || input.isShiftHold || input.isCommandHold
+        || input.isControlHold || input.isOptionHold || input.isShiftHold || input.isCommandHold
     let confirmCombination = input.isSpace || input.isEnter
 
     var isLongestPossibleKeyFormed: Bool {
@@ -229,14 +229,14 @@ extension InputHandler {
 
     var combineStrokes =
       (isStrokesFull && prefs.autoCompositeWithLongestPossibleCassetteKey)
-      || (isWildcardKeyInput && !calligrapher.isEmpty)
+        || (isWildcardKeyInput && !calligrapher.isEmpty)
 
     // 如果當前的按鍵是 Enter 或 Space 的話，這時就可以取出 calligrapher 內的筆畫來做檢查了。
     // 來看看詞庫內到底有沒有對應的讀音索引。這裡用了類似「|=」的判斷處理方式。
     combineStrokes = combineStrokes || (!calligrapher.isEmpty && confirmCombination)
     if combineStrokes {
       if input.isControlHold, input.isCommandHold, input.isEnter,
-        !input.isOptionHold, !input.isShiftHold, composer.isEmpty
+         !input.isOptionHold, !input.isShiftHold, composer.isEmpty
       {
         return handleEnter(input: input, readingOnly: true)
       }
@@ -247,10 +247,10 @@ extension InputHandler {
         calligrapher.removeAll()
         // 根據「組字器是否為空」來判定回呼哪一種狀態。
         switch compositor.isEmpty {
-          case false: delegate.switchState(generateStateOfInputting())
-          case true: delegate.switchState(IMEState.ofAbortion())
+        case false: delegate.switchState(generateStateOfInputting())
+        case true: delegate.switchState(IMEState.ofAbortion())
         }
-        return true  // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了。
+        return true // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了。
       }
 
       // 將該讀音插入至組字器內的軌格當中。
@@ -281,20 +281,20 @@ extension InputHandler {
       if prefs.useSCPCTypingMode {
         let candidateState: IMEStateProtocol = generateStateOfCandidates()
         switch candidateState.candidates.count {
-          case 2...: delegate.switchState(candidateState)
-          case 1:
-            let firstCandidate = candidateState.candidates.first!  // 一定會有，所以強制拆包也無妨。
-            let reading: String = firstCandidate.0.joined(separator: compositor.separator)
-            let text: String = firstCandidate.1
-            delegate.switchState(IMEState.ofCommitting(textToCommit: text))
+        case 2...: delegate.switchState(candidateState)
+        case 1:
+          let firstCandidate = candidateState.candidates.first! // 一定會有，所以強制拆包也無妨。
+          let reading: String = firstCandidate.0.joined(separator: compositor.separator)
+          let text: String = firstCandidate.1
+          delegate.switchState(IMEState.ofCommitting(textToCommit: text))
 
-            if !prefs.associatedPhrasesEnabled {
-              delegate.switchState(IMEState.ofEmpty())
-            } else {
-              let associatedPhrases = generateStateOfAssociates(withPair: .init(keyArray: [reading], value: text))
-              delegate.switchState(associatedPhrases.candidates.isEmpty ? IMEState.ofEmpty() : associatedPhrases)
-            }
-          default: break
+          if !prefs.associatedPhrasesEnabled {
+            delegate.switchState(IMEState.ofEmpty())
+          } else {
+            let associatedPhrases = generateStateOfAssociates(withPair: .init(keyArray: [reading], value: text))
+            delegate.switchState(associatedPhrases.candidates.isEmpty ? IMEState.ofEmpty() : associatedPhrases)
+          }
+        default: break
         }
       }
       // 將「這個按鍵訊號已經被輸入法攔截處理了」的結果藉由 SessionCtl 回報給 IMK。

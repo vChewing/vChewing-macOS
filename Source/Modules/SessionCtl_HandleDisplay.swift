@@ -12,17 +12,17 @@ import Shared
 
 // MARK: - Tooltip Display and Candidate Display Methods
 
-extension SessionCtl {
+public extension SessionCtl {
   // 有些 App 會濫用內文組字區的內容來預測使用者的輸入行為。
   // 對此類 App 有疑慮者，可以將這類 App 登記到客體管理員當中。
   // 這樣，不但強制使用（限制讀音 20 個的）浮動組字窗，而且內文組字區只會顯示一個空格。
-  public var attributedStringSecured: (NSAttributedString, NSRange) {
+  var attributedStringSecured: (NSAttributedString, NSRange) {
     PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier)
       ? (state.data.attributedStringPlaceholder, NSRange(location: 0, length: 0))
       : (state.attributedString, NSRange(state.u16MarkedRange))
   }
 
-  public func lineHeightRect(zeroCursor: Bool = false) -> NSRect {
+  func lineHeightRect(zeroCursor: Bool = false) -> NSRect {
     var lineHeightRect = NSRect.seniorTheBeast
     guard let client = client() else {
       return lineHeightRect
@@ -40,7 +40,7 @@ extension SessionCtl {
     return lineHeightRect
   }
 
-  public func showTooltip(_ tooltip: String, duration: Double = 0) {
+  func showTooltip(_ tooltip: String, duration: Double = 0) {
     guard client() != nil else { return }
     if tooltip.isEmpty {
       tooltipInstance.hide()
@@ -49,7 +49,7 @@ extension SessionCtl {
     updateVerticalTypingStatus()
     let lineHeightRect = lineHeightRect()
     var finalOrigin: NSPoint = lineHeightRect.origin
-    let delta: Double = lineHeightRect.size.height + 4.0  // bottomOutOfScreenAdjustmentHeight
+    let delta: Double = lineHeightRect.size.height + 4.0 // bottomOutOfScreenAdjustmentHeight
     if isVerticalTyping {
       finalOrigin = NSPoint(
         x: lineHeightRect.origin.x + lineHeightRect.size.width + 5, y: lineHeightRect.origin.y
@@ -72,7 +72,7 @@ extension SessionCtl {
     )
   }
 
-  public func showCandidates() {
+  func showCandidates() {
     guard client() != nil else { return }
     updateVerticalTypingStatus()
     isVerticalCandidateWindow = (isVerticalTyping || !PrefMgr.shared.useHorizontalCandidateList)
@@ -80,8 +80,8 @@ extension SessionCtl {
     /// 無論是田所選字窗還是 IMK 選字窗，在這裡都有必要重新初期化。
     let candidateLayout: NSUserInterfaceLayoutOrientation =
       ((isVerticalTyping || !PrefMgr.shared.useHorizontalCandidateList)
-        ? .vertical
-        : .horizontal)
+          ? .vertical
+          : .horizontal)
 
     /// 先取消既有的選字窗的內容顯示。否則可能會重複生成選字窗的 NSWindow()。
     candidateUI?.visible = false
@@ -89,7 +89,7 @@ extension SessionCtl {
     if #available(macOS 10.15, *) {
       candidateUI =
         PrefMgr.shared.useIMKCandidateWindow
-        ? CtlCandidateIMK(candidateLayout) : CtlCandidateTDK(candidateLayout)
+          ? CtlCandidateIMK(candidateLayout) : CtlCandidateTDK(candidateLayout)
       if let candidateTDK = candidateUI as? CtlCandidateTDK {
         candidateTDK.maxLinesPerPage = isVerticalTyping ? 1 : 3
       }
@@ -114,13 +114,13 @@ extension SessionCtl {
     candidateUI?.useLangIdentifier = PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier
     candidateUI?.locale = {
       switch inputMode {
-        case .imeModeCHS: return "zh-Hans"
-        case .imeModeCHT:
-          if !PrefMgr.shared.shiftJISShinjitaiOutputEnabled, !PrefMgr.shared.chineseConversionEnabled {
-            return "zh-Hant"
-          }
-          return "ja"
-        default: return ""
+      case .imeModeCHS: return "zh-Hans"
+      case .imeModeCHT:
+        if !PrefMgr.shared.shiftJISShinjitaiOutputEnabled, !PrefMgr.shared.chineseConversionEnabled {
+          return "zh-Hant"
+        }
+        return "ja"
+      default: return ""
       }
     }()
 
@@ -131,7 +131,7 @@ extension SessionCtl {
       }
     }
 
-    candidateUI?.delegate = self  // 會自動觸發田所選字窗的資料重載。
+    candidateUI?.delegate = self // 會自動觸發田所選字窗的資料重載。
     candidateUI?.visible = true
 
     if isVerticalTyping {
@@ -170,20 +170,19 @@ extension SessionCtl {
   /// 5) Do NOT enable either KangXi conversion mode nor JIS conversion mode. They are disabled by default.
   /// 6) Expecting the glyph differences of the candidate "骨" between PingFang SC and PingFang TC when rendering
   ///    the candidate window in different "vChewing-CHS" and "vChewing-CHT" input modes.
-  public static func candidateFont(name: String? = nil, size: Double) -> NSFont {
-    let finalReturnFont: NSFont =
-      {
-        switch IMEApp.currentInputMode {
-          case .imeModeCHS:
-            return CTFontCreateUIFontForLanguage(.system, size, "zh-Hans" as CFString)
-          case .imeModeCHT:
-            return (PrefMgr.shared.shiftJISShinjitaiOutputEnabled || PrefMgr.shared.chineseConversionEnabled)
-              ? CTFontCreateUIFontForLanguage(.system, size, "ja" as CFString)
-              : CTFontCreateUIFontForLanguage(.system, size, "zh-Hant" as CFString)
-          default:
-            return CTFontCreateUIFontForLanguage(.system, size, nil)
-        }
-      }()
+  static func candidateFont(name: String? = nil, size: Double) -> NSFont {
+    let finalReturnFont: NSFont = {
+      switch IMEApp.currentInputMode {
+      case .imeModeCHS:
+        return CTFontCreateUIFontForLanguage(.system, size, "zh-Hans" as CFString)
+      case .imeModeCHT:
+        return (PrefMgr.shared.shiftJISShinjitaiOutputEnabled || PrefMgr.shared.chineseConversionEnabled)
+          ? CTFontCreateUIFontForLanguage(.system, size, "ja" as CFString)
+          : CTFontCreateUIFontForLanguage(.system, size, "zh-Hant" as CFString)
+      default:
+        return CTFontCreateUIFontForLanguage(.system, size, nil)
+      }
+    }()
       ?? NSFont.systemFont(ofSize: size)
     if let name = name, !name.isEmpty {
       return NSFont(name: name, size: size) ?? finalReturnFont

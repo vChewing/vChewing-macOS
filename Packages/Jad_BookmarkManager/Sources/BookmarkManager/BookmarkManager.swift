@@ -8,7 +8,7 @@ public class BookmarkManager {
   // Save bookmark for URL. Use this inside the NSOpenPanel `begin` closure
   public func saveBookmark(for url: URL) {
     guard let bookmarkDic = getBookmarkData(url: url),
-      let bookmarkURL = getBookmarkURL()
+          let bookmarkURL = getBookmarkURL()
     else {
       NSLog("Error getting data or bookmarkURL")
       return

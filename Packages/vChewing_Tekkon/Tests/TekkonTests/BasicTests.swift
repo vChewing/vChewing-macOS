@@ -55,20 +55,20 @@ final class TekkonTestsBasic: XCTestCase {
     var toneMarkerIndicator = true
 
     // Test Key Receiving
-    composer.receiveKey(fromCharCode: 0x0032)  // 2, ㄉ
-    composer.receiveKey(fromString: "j")  // ㄨ
-    composer.receiveKey(fromString: "u")  // ㄧ
-    composer.receiveKey(fromString: "l")  // ㄠ
+    composer.receiveKey(fromCharCode: 0x0032) // 2, ㄉ
+    composer.receiveKey(fromString: "j") // ㄨ
+    composer.receiveKey(fromString: "u") // ㄧ
+    composer.receiveKey(fromString: "l") // ㄠ
 
     // Testing missing tone markers
     toneMarkerIndicator = composer.hasIntonation()
     XCTAssert(!toneMarkerIndicator)
 
-    composer.receiveKey(fromString: "3")  // 上聲
+    composer.receiveKey(fromString: "3") // 上聲
     XCTAssertEqual(composer.value, "ㄉㄧㄠˇ")
     composer.doBackSpace()
-    composer.receiveKey(fromString: " ")  // 陰平
-    XCTAssertEqual(composer.value, "ㄉㄧㄠ ")  // 這裡回傳的結果的陰平是空格
+    composer.receiveKey(fromString: " ") // 陰平
+    XCTAssertEqual(composer.value, "ㄉㄧㄠ ") // 這裡回傳的結果的陰平是空格
 
     // Test Getting Displayed Composition
     XCTAssertEqual(composer.getComposition(), "ㄉㄧㄠ")
@@ -77,7 +77,7 @@ final class TekkonTestsBasic: XCTestCase {
     XCTAssertEqual(composer.getInlineCompositionForDisplay(isHanyuPinyin: true), "diao1")
 
     // Test Tone 5
-    composer.receiveKey(fromString: "7")  // 輕聲
+    composer.receiveKey(fromString: "7") // 輕聲
     XCTAssertEqual(composer.getComposition(), "ㄉㄧㄠ˙")
     XCTAssertEqual(composer.getComposition(isTextBookStyle: true), "˙ㄉㄧㄠ")
 
@@ -91,7 +91,7 @@ final class TekkonTestsBasic: XCTestCase {
 
     // Testing having only tone markers
     composer.clear()
-    composer.receiveKey(fromString: "3")  // 上聲
+    composer.receiveKey(fromString: "3") // 上聲
     toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     XCTAssert(toneMarkerIndicator)
 
@@ -223,7 +223,7 @@ final class TekkonTestsPinyin: XCTestCase {
     var toneMarkerIndicator = true
 
     // Test Key Receiving
-    composer.receiveKey(fromCharCode: 100)  // d
+    composer.receiveKey(fromCharCode: 100) // d
     composer.receiveKey(fromString: "i")
     composer.receiveKey(fromString: "a")
     composer.receiveKey(fromString: "o")
@@ -232,11 +232,11 @@ final class TekkonTestsPinyin: XCTestCase {
     toneMarkerIndicator = composer.hasIntonation()
     XCTAssert(!toneMarkerIndicator)
 
-    composer.receiveKey(fromString: "3")  // 上聲
+    composer.receiveKey(fromString: "3") // 上聲
     XCTAssertEqual(composer.value, "ㄉㄧㄠˇ")
     composer.doBackSpace()
-    composer.receiveKey(fromString: " ")  // 陰平
-    XCTAssertEqual(composer.value, "ㄉㄧㄠ ")  // 這裡回傳的結果的陰平是空格
+    composer.receiveKey(fromString: " ") // 陰平
+    XCTAssertEqual(composer.value, "ㄉㄧㄠ ") // 這裡回傳的結果的陰平是空格
 
     // Test Getting Displayed Composition
     XCTAssertEqual(composer.getComposition(), "ㄉㄧㄠ")
@@ -245,7 +245,7 @@ final class TekkonTestsPinyin: XCTestCase {
     XCTAssertEqual(composer.getInlineCompositionForDisplay(isHanyuPinyin: true), "diao1")
 
     // Test Tone 5
-    composer.receiveKey(fromString: "7")  // 輕聲
+    composer.receiveKey(fromString: "7") // 輕聲
     XCTAssertEqual(composer.getComposition(), "ㄉㄧㄠ˙")
     XCTAssertEqual(composer.getComposition(isTextBookStyle: true), "˙ㄉㄧㄠ")
 
@@ -259,7 +259,7 @@ final class TekkonTestsPinyin: XCTestCase {
 
     // Testing having only tone markers
     composer.clear()
-    composer.receiveKey(fromString: "3")  // 上聲
+    composer.receiveKey(fromString: "3") // 上聲
     toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     XCTAssert(toneMarkerIndicator)
   }
@@ -269,7 +269,7 @@ final class TekkonTestsPinyin: XCTestCase {
     var toneMarkerIndicator = true
 
     // Test Key Receiving
-    composer.receiveKey(fromCharCode: 99)  // c
+    composer.receiveKey(fromCharCode: 99) // c
     composer.receiveKey(fromString: "h")
     composer.receiveKey(fromString: "i")
     composer.receiveKey(fromString: "u")
@@ -280,11 +280,11 @@ final class TekkonTestsPinyin: XCTestCase {
     toneMarkerIndicator = composer.hasIntonation()
     XCTAssert(!toneMarkerIndicator)
 
-    composer.receiveKey(fromString: "2")  // 陽平
+    composer.receiveKey(fromString: "2") // 陽平
     XCTAssertEqual(composer.value, "ㄑㄩㄥˊ")
     composer.doBackSpace()
-    composer.receiveKey(fromString: " ")  // 陰平
-    XCTAssertEqual(composer.value, "ㄑㄩㄥ ")  // 這裡回傳的結果的陰平是空格
+    composer.receiveKey(fromString: " ") // 陰平
+    XCTAssertEqual(composer.value, "ㄑㄩㄥ ") // 這裡回傳的結果的陰平是空格
 
     // Test Getting Displayed Composition
     XCTAssertEqual(composer.getComposition(), "ㄑㄩㄥ")
@@ -293,7 +293,7 @@ final class TekkonTestsPinyin: XCTestCase {
     XCTAssertEqual(composer.getInlineCompositionForDisplay(isHanyuPinyin: true), "chiung1")
 
     // Test Tone 5
-    composer.receiveKey(fromString: "7")  // 輕聲
+    composer.receiveKey(fromString: "7") // 輕聲
     XCTAssertEqual(composer.getComposition(), "ㄑㄩㄥ˙")
     XCTAssertEqual(composer.getComposition(isTextBookStyle: true), "˙ㄑㄩㄥ")
 
@@ -307,7 +307,7 @@ final class TekkonTestsPinyin: XCTestCase {
 
     // Testing having only tone markers
     composer.clear()
-    composer.receiveKey(fromString: "3")  // 上聲
+    composer.receiveKey(fromString: "3") // 上聲
     toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     XCTAssert(toneMarkerIndicator)
   }
@@ -317,7 +317,7 @@ final class TekkonTestsPinyin: XCTestCase {
     var toneMarkerIndicator = true
 
     // Test Key Receiving
-    composer.receiveKey(fromCharCode: 99)  // c
+    composer.receiveKey(fromCharCode: 99) // c
     composer.receiveKey(fromString: "h")
     composer.receiveKey(fromString: "y")
     composer.receiveKey(fromString: "u")
@@ -328,11 +328,11 @@ final class TekkonTestsPinyin: XCTestCase {
     toneMarkerIndicator = composer.hasIntonation()
     XCTAssert(!toneMarkerIndicator)
 
-    composer.receiveKey(fromString: "2")  // 陽平
+    composer.receiveKey(fromString: "2") // 陽平
     XCTAssertEqual(composer.value, "ㄑㄩㄥˊ")
     composer.doBackSpace()
-    composer.receiveKey(fromString: " ")  // 陰平
-    XCTAssertEqual(composer.value, "ㄑㄩㄥ ")  // 這裡回傳的結果的陰平是空格
+    composer.receiveKey(fromString: " ") // 陰平
+    XCTAssertEqual(composer.value, "ㄑㄩㄥ ") // 這裡回傳的結果的陰平是空格
 
     // Test Getting Displayed Composition
     XCTAssertEqual(composer.getComposition(), "ㄑㄩㄥ")
@@ -341,7 +341,7 @@ final class TekkonTestsPinyin: XCTestCase {
     XCTAssertEqual(composer.getInlineCompositionForDisplay(isHanyuPinyin: true), "chyung1")
 
     // Test Tone 5
-    composer.receiveKey(fromString: "7")  // 輕聲
+    composer.receiveKey(fromString: "7") // 輕聲
     XCTAssertEqual(composer.getComposition(), "ㄑㄩㄥ˙")
     XCTAssertEqual(composer.getComposition(isTextBookStyle: true), "˙ㄑㄩㄥ")
 
@@ -355,7 +355,7 @@ final class TekkonTestsPinyin: XCTestCase {
 
     // Testing having only tone markers
     composer.clear()
-    composer.receiveKey(fromString: "3")  // 上聲
+    composer.receiveKey(fromString: "3") // 上聲
     toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     XCTAssert(toneMarkerIndicator)
   }
@@ -365,7 +365,7 @@ final class TekkonTestsPinyin: XCTestCase {
     var toneMarkerIndicator = true
 
     // Test Key Receiving
-    composer.receiveKey(fromCharCode: 99)  // c
+    composer.receiveKey(fromCharCode: 99) // c
     composer.receiveKey(fromString: "h")
     composer.receiveKey(fromString: "y")
     composer.receiveKey(fromString: "o")
@@ -376,11 +376,11 @@ final class TekkonTestsPinyin: XCTestCase {
     toneMarkerIndicator = composer.hasIntonation()
     XCTAssert(!toneMarkerIndicator)
 
-    composer.receiveKey(fromString: "2")  // 陽平
+    composer.receiveKey(fromString: "2") // 陽平
     XCTAssertEqual(composer.value, "ㄑㄩㄥˊ")
     composer.doBackSpace()
-    composer.receiveKey(fromString: " ")  // 陰平
-    XCTAssertEqual(composer.value, "ㄑㄩㄥ ")  // 這裡回傳的結果的陰平是空格
+    composer.receiveKey(fromString: " ") // 陰平
+    XCTAssertEqual(composer.value, "ㄑㄩㄥ ") // 這裡回傳的結果的陰平是空格
 
     // Test Getting Displayed Composition
     XCTAssertEqual(composer.getComposition(), "ㄑㄩㄥ")
@@ -389,7 +389,7 @@ final class TekkonTestsPinyin: XCTestCase {
     XCTAssertEqual(composer.getInlineCompositionForDisplay(isHanyuPinyin: true), "chyong1")
 
     // Test Tone 5
-    composer.receiveKey(fromString: "7")  // 輕聲
+    composer.receiveKey(fromString: "7") // 輕聲
     XCTAssertEqual(composer.getComposition(), "ㄑㄩㄥ˙")
     XCTAssertEqual(composer.getComposition(isTextBookStyle: true), "˙ㄑㄩㄥ")
 
@@ -403,7 +403,7 @@ final class TekkonTestsPinyin: XCTestCase {
 
     // Testing having only tone markers
     composer.clear()
-    composer.receiveKey(fromString: "3")  // 上聲
+    composer.receiveKey(fromString: "3") // 上聲
     toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     XCTAssert(toneMarkerIndicator)
   }
@@ -413,7 +413,7 @@ final class TekkonTestsPinyin: XCTestCase {
     var toneMarkerIndicator = true
 
     // Test Key Receiving
-    composer.receiveKey(fromCharCode: 99)  // c
+    composer.receiveKey(fromCharCode: 99) // c
     composer.receiveKey(fromString: "y")
     composer.receiveKey(fromString: "o")
     composer.receiveKey(fromString: "n")
@@ -423,11 +423,11 @@ final class TekkonTestsPinyin: XCTestCase {
     toneMarkerIndicator = composer.hasIntonation()
     XCTAssert(!toneMarkerIndicator)
 
-    composer.receiveKey(fromString: "2")  // 陽平
+    composer.receiveKey(fromString: "2") // 陽平
     XCTAssertEqual(composer.value, "ㄑㄩㄥˊ")
     composer.doBackSpace()
-    composer.receiveKey(fromString: " ")  // 陰平
-    XCTAssertEqual(composer.value, "ㄑㄩㄥ ")  // 這裡回傳的結果的陰平是空格
+    composer.receiveKey(fromString: " ") // 陰平
+    XCTAssertEqual(composer.value, "ㄑㄩㄥ ") // 這裡回傳的結果的陰平是空格
 
     // Test Getting Displayed Composition
     XCTAssertEqual(composer.getComposition(), "ㄑㄩㄥ")
@@ -436,7 +436,7 @@ final class TekkonTestsPinyin: XCTestCase {
     XCTAssertEqual(composer.getInlineCompositionForDisplay(isHanyuPinyin: true), "cyong1")
 
     // Test Tone 5
-    composer.receiveKey(fromString: "7")  // 輕聲
+    composer.receiveKey(fromString: "7") // 輕聲
     XCTAssertEqual(composer.getComposition(), "ㄑㄩㄥ˙")
     XCTAssertEqual(composer.getComposition(isTextBookStyle: true), "˙ㄑㄩㄥ")
 
@@ -450,7 +450,7 @@ final class TekkonTestsPinyin: XCTestCase {
 
     // Testing having only tone markers
     composer.clear()
-    composer.receiveKey(fromString: "3")  // 上聲
+    composer.receiveKey(fromString: "3") // 上聲
     toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     XCTAssert(toneMarkerIndicator)
   }

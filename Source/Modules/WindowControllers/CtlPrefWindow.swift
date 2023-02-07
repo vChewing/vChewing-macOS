@@ -14,14 +14,14 @@ import Shared
 
 private let kWindowTitleHeight: Double = 78
 
-extension NSToolbarItem.Identifier {
-  fileprivate static let ofGeneral = NSToolbarItem.Identifier(rawValue: "tabGeneral")
-  fileprivate static let ofExperience = NSToolbarItem.Identifier(rawValue: "tabExperience")
-  fileprivate static let ofDictionary = NSToolbarItem.Identifier(rawValue: "tabDictionary")
-  fileprivate static let ofPhrases = NSToolbarItem.Identifier(rawValue: "tabPhrases")
-  fileprivate static let ofCassette = NSToolbarItem.Identifier(rawValue: "tabCassette")
-  fileprivate static let ofKeyboard = NSToolbarItem.Identifier(rawValue: "tabKeyboard")
-  fileprivate static let ofDevZone = NSToolbarItem.Identifier(rawValue: "tabDevZone")
+private extension NSToolbarItem.Identifier {
+  static let ofGeneral = NSToolbarItem.Identifier(rawValue: "tabGeneral")
+  static let ofExperience = NSToolbarItem.Identifier(rawValue: "tabExperience")
+  static let ofDictionary = NSToolbarItem.Identifier(rawValue: "tabDictionary")
+  static let ofPhrases = NSToolbarItem.Identifier(rawValue: "tabPhrases")
+  static let ofCassette = NSToolbarItem.Identifier(rawValue: "tabCassette")
+  static let ofKeyboard = NSToolbarItem.Identifier(rawValue: "tabKeyboard")
+  static let ofDevZone = NSToolbarItem.Identifier(rawValue: "tabDevZone")
 }
 
 // Note: The "InputMethodServerPreferencesWindowControllerClass" in Info.plist
@@ -71,7 +71,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
     guard let shared = shared, let sharedWindow = shared.window else { return }
     sharedWindow.delegate = shared
     sharedWindow.setPosition(vertical: .top, horizontal: .right, padding: 20)
-    sharedWindow.orderFrontRegardless()  // 逼著視窗往最前方顯示
+    sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
     sharedWindow.level = .statusBar
     sharedWindow.titlebarAppearsTransparent = true
     shared.showWindow(shared)
@@ -180,7 +180,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
 
     selectionKeyComboBox.stringValue = candidateSelectionKeys
     if PrefMgr.shared.useIMKCandidateWindow {
-      selectionKeyComboBox.isEnabled = false  // 無法與 IMKCandidates 協作，故禁用。
+      selectionKeyComboBox.isEnabled = false // 無法與 IMKCandidates 協作，故禁用。
     }
 
     initPhraseEditor()
@@ -260,11 +260,11 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
       PrefMgr.shared.shouldNotFartInLieuOfBeep = true
       alert.beginSheetModal(for: window) { result in
         switch result {
-          case .alertFirstButtonReturn:
-            PrefMgr.shared.shouldNotFartInLieuOfBeep = false
-          case .alertSecondButtonReturn:
-            PrefMgr.shared.shouldNotFartInLieuOfBeep = true
-          default: break
+        case .alertFirstButtonReturn:
+          PrefMgr.shared.shouldNotFartInLieuOfBeep = false
+        case .alertSecondButtonReturn:
+          PrefMgr.shared.shouldNotFartInLieuOfBeep = true
+        default: break
         }
         IMEApp.buzz()
       }
@@ -487,49 +487,49 @@ extension CtlPrefWindow: NSToolbarDelegate {
     let item = NSToolbarItem(itemIdentifier: itemIdentifier)
     item.target = self
     switch itemIdentifier {
-      case .ofGeneral:
-        let title = NSLocalizedString("General", comment: "")
-        item.label = title
-        item.image = .tabImageGeneral
-        item.action = #selector(showGeneralView(_:))
+    case .ofGeneral:
+      let title = NSLocalizedString("General", comment: "")
+      item.label = title
+      item.image = .tabImageGeneral
+      item.action = #selector(showGeneralView(_:))
 
-      case .ofExperience:
-        let title = NSLocalizedString("Experience", comment: "")
-        item.label = title
-        item.image = .tabImageExperience
-        item.action = #selector(showExperienceView(_:))
+    case .ofExperience:
+      let title = NSLocalizedString("Experience", comment: "")
+      item.label = title
+      item.image = .tabImageExperience
+      item.action = #selector(showExperienceView(_:))
 
-      case .ofDictionary:
-        let title = NSLocalizedString("Dictionary", comment: "")
-        item.label = title
-        item.image = .tabImageDictionary
-        item.action = #selector(showDictionaryView(_:))
+    case .ofDictionary:
+      let title = NSLocalizedString("Dictionary", comment: "")
+      item.label = title
+      item.image = .tabImageDictionary
+      item.action = #selector(showDictionaryView(_:))
 
-      case .ofPhrases:
-        item.label = CtlPrefWindow.locPhrasesTabTitle
-        item.image = .tabImagePhrases
-        item.action = #selector(showPhrasesView(_:))
+    case .ofPhrases:
+      item.label = CtlPrefWindow.locPhrasesTabTitle
+      item.image = .tabImagePhrases
+      item.action = #selector(showPhrasesView(_:))
 
-      case .ofCassette:
-        let title = NSLocalizedString("Cassette", comment: "")
-        item.label = title
-        item.image = .tabImageCassette
-        item.action = #selector(showCassetteView(_:))
+    case .ofCassette:
+      let title = NSLocalizedString("Cassette", comment: "")
+      item.label = title
+      item.image = .tabImageCassette
+      item.action = #selector(showCassetteView(_:))
 
-      case .ofKeyboard:
-        let title = NSLocalizedString("Keyboard", comment: "")
-        item.label = title
-        item.image = .tabImageKeyboard
-        item.action = #selector(showKeyboardView(_:))
+    case .ofKeyboard:
+      let title = NSLocalizedString("Keyboard", comment: "")
+      item.label = title
+      item.image = .tabImageKeyboard
+      item.action = #selector(showKeyboardView(_:))
 
-      case .ofDevZone:
-        let title = NSLocalizedString("DevZone", comment: "")
-        item.label = title
-        item.image = .tabImageDevZone
-        item.action = #selector(showDevZoneView(_:))
+    case .ofDevZone:
+      let title = NSLocalizedString("DevZone", comment: "")
+      item.label = title
+      item.image = .tabImageDevZone
+      item.action = #selector(showDevZoneView(_:))
 
-      default:
-        return nil
+    default:
+      return nil
     }
     return item
   }

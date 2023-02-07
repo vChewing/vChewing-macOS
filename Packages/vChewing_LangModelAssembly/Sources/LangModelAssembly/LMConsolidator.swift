@@ -10,8 +10,8 @@ import Foundation
 import LineReader
 import Shared
 
-extension vChewingLM {
-  public enum LMConsolidator {
+public extension vChewingLM {
+  enum LMConsolidator {
     public static let kPragmaHeader = "# 𝙵𝙾𝚁𝙼𝙰𝚃 𝚘𝚛𝚐.𝚊𝚝𝚎𝚕𝚒𝚎𝚛𝙸𝚗𝚖𝚞.𝚟𝚌𝚑𝚎𝚠𝚒𝚗𝚐.𝚞𝚜𝚎𝚛𝙻𝚊𝚗𝚐𝚞𝚊𝚐𝚎𝙼𝚘𝚍𝚎𝚕𝙳𝚊𝚝𝚊.𝚏𝚘𝚛𝚖𝚊𝚝𝚝𝚎𝚍"
 
     /// 檢查給定檔案的標頭是否正常。
@@ -24,7 +24,7 @@ extension vChewingLM {
             throw FileErrors.fileHandleError("")
           }
           let lineReader = try LineReader(file: fileHandle)
-          for strLine in lineReader {  // 不需要 i=0，因為第一遍迴圈就出結果。
+          for strLine in lineReader { // 不需要 i=0，因為第一遍迴圈就出結果。
             if strLine != kPragmaHeader {
               vCLog("Header Mismatch, Starting In-Place Consolidation.")
               return false
@@ -56,7 +56,7 @@ extension vChewingLM {
           if !strIncoming.hasSuffix("\n") {
             vCLog("EOF Fix Necessity Confirmed, Start Fixing.")
             if let writeFile = FileHandle(forUpdatingAtPath: path),
-              let endl = "\n".data(using: .utf8)
+               let endl = "\n".data(using: .utf8)
             {
               writeFile.seekToEndOfFile()
               writeFile.write(endl)
@@ -85,7 +85,7 @@ extension vChewingLM {
       var pragmaResult: Bool {
         let realPragmaHeader = kPragmaHeader + "\n"
         if strProcessed.count <= kPragmaHeader.count { return false }
-        let range = 0..<(realPragmaHeader.count)
+        let range = 0 ..< (realPragmaHeader.count)
         let fetchedPragma = ContiguousArray(strProcessed.utf8CString[range])
         return fetchedPragma == realPragmaHeader.utf8CString
       }
@@ -104,14 +104,14 @@ extension vChewingLM {
       strProcessed.regReplace(pattern: #"(\n | \n)"#, replaceWith: "\n")
       // CR & FF to LF, 且去除重複行
       strProcessed.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n")
-      if strProcessed.prefix(1) == " " {  // 去除檔案開頭空格
+      if strProcessed.prefix(1) == " " { // 去除檔案開頭空格
         strProcessed.removeFirst()
       }
-      if strProcessed.suffix(1) == " " {  // 去除檔案結尾空格
+      if strProcessed.suffix(1) == " " { // 去除檔案結尾空格
         strProcessed.removeLast()
       }
 
-      strProcessed = kPragmaHeader + "\n" + strProcessed  // Add Pragma Header
+      strProcessed = kPragmaHeader + "\n" + strProcessed // Add Pragma Header
 
       // Step 3: Deduplication.
       let arrData = strProcessed.split(separator: "\n")

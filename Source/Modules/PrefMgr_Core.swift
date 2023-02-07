@@ -69,7 +69,7 @@ public class PrefMgr: PrefMgrProtocol {
   public var candidateListTextSize: Double {
     didSet {
       // 必須確立條件，否則就會是無限迴圈。
-      if !(12...196).contains(candidateListTextSize) {
+      if !(12 ... 196).contains(candidateListTextSize) {
         candidateListTextSize = max(12, min(candidateListTextSize, 196))
       }
     }
@@ -190,21 +190,21 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kCNS11643Enabled.rawValue, defaultValue: false)
   public var cns11643Enabled: Bool {
     didSet {
-      LMMgr.setCNSEnabled(cns11643Enabled)  // 很重要
+      LMMgr.setCNSEnabled(cns11643Enabled) // 很重要
     }
   }
 
   @AppProperty(key: UserDef.kSymbolInputEnabled.rawValue, defaultValue: true)
   public var symbolInputEnabled: Bool {
     didSet {
-      LMMgr.setSymbolEnabled(symbolInputEnabled)  // 很重要
+      LMMgr.setSymbolEnabled(symbolInputEnabled) // 很重要
     }
   }
 
   @AppProperty(key: UserDef.kCassetteEnabled.rawValue, defaultValue: false)
   public var cassetteEnabled: Bool {
     didSet {
-      LMMgr.setCassetteEnabled(cassetteEnabled)  // 很重要
+      LMMgr.setCassetteEnabled(cassetteEnabled) // 很重要
     }
   }
 
@@ -272,7 +272,7 @@ public class PrefMgr: PrefMgrProtocol {
       if candidateKeys != candidateKeys.deduplicated {
         candidateKeys = candidateKeys.deduplicated
       }
-      if !(6...9).contains(candidateKeys.count) {
+      if !(6 ... 9).contains(candidateKeys.count) {
         candidateKeys = Self.kDefaultCandidateKeys
       }
     }

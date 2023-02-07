@@ -111,14 +111,14 @@ extension Backport where Wrapped == Any {
 }
 
 @available(macOS 10.15, *)
-extension Backport.Label where Wrapped == Any, Title == Text, Icon == Image {
+public extension Backport.Label where Wrapped == Any, Title == Text, Icon == Image {
   /// Creates a label with an icon image and a title generated from a
   /// localized string.
   ///
   /// - Parameters:
   ///    - titleKey: A title generated from a localized string.
   ///    - image: The name of the image resource to lookup.
-  public init(_ titleKey: LocalizedStringKey, image name: String) {
+  init(_ titleKey: LocalizedStringKey, image name: String) {
     self.init(title: { Text(titleKey) }, icon: { Image(name) })
   }
 
@@ -127,7 +127,7 @@ extension Backport.Label where Wrapped == Any, Title == Text, Icon == Image {
   /// - Parameters:
   ///    - title: A string used as the label's title.
   ///    - image: The name of the image resource to lookup.
-  public init<S>(_ title: S, image name: String) where S: StringProtocol {
+  init<S>(_ title: S, image name: String) where S: StringProtocol {
     self.init(title: { Text(title) }, icon: { Image(name) })
   }
 }
@@ -156,8 +156,9 @@ extension Backport.Label where Wrapped == Any, Title == Text, Icon == Image {
 }
 
 @available(macOS 10.15, *)
-extension Backport.Label
-where Wrapped == Any, Title == Backport.LabelStyleConfiguration.Title, Icon == Backport.LabelStyleConfiguration.Icon {
+public extension Backport.Label
+  where Wrapped == Any, Title == Backport.LabelStyleConfiguration.Title, Icon == Backport.LabelStyleConfiguration.Icon
+{
   /// Creates a label representing the configuration of a style.
   ///
   /// You can use this initializer within the ``LabelStyle/makeBody(configuration:)``
@@ -177,7 +178,7 @@ where Wrapped == Any, Title == Backport.LabelStyleConfiguration.Title, Icon == B
   ///     }
   ///
   /// - Parameter configuration: The label style to use.
-  public init(_ configuration: Backport.LabelStyleConfiguration) {
+  init(_ configuration: Backport.LabelStyleConfiguration) {
     config = configuration
   }
 }

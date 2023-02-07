@@ -4,13 +4,13 @@ import PackageDescription
 let package = Package(
   name: "LangModelAssembly",
   platforms: [
-    .macOS(.v10_11)
+    .macOS(.v10_11),
   ],
   products: [
     .library(
       name: "LangModelAssembly",
       targets: ["LangModelAssembly"]
-    )
+    ),
   ],
   dependencies: [
     .package(path: "../RMJay_LineReader"),

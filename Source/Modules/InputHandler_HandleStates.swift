@@ -23,7 +23,7 @@ extension InputHandler {
     /// 換成由此處重新生成的原始資料在 IMEStateData 當中生成的 NSAttributeString。
     var displayTextSegments: [String] = compositor.walkedNodes.values
     var cursor = convertCursorForDisplay(compositor.cursor)
-    let reading: String = sansReading ? "" : readingForDisplay  // 先提出來，減輕運算負擔。
+    let reading: String = sansReading ? "" : readingForDisplay // 先提出來，減輕運算負擔。
     if !reading.isEmpty {
       var newDisplayTextSegments = [String]()
       var temporaryNode = ""
@@ -45,7 +45,7 @@ extension InputHandler {
       displayTextSegments = newDisplayTextSegments
       cursor += reading.count
     }
-    for i in 0..<displayTextSegments.count {
+    for i in 0 ..< displayTextSegments.count {
       displayTextSegments[i] = displayTextSegments[i].trimmingCharacters(in: .newlines)
     }
     /// 這裡生成準備要拿來回呼的「正在輸入」狀態。
@@ -266,15 +266,15 @@ extension InputHandler {
 
     let candidateState = generateStateOfCandidates()
     switch candidateState.candidates.count {
-      case 2...: delegate.switchState(candidateState)
-      case 1:
-        clear()  // 這句不要砍，因為下文可能會回呼 candidateState。
-        if let candidateToCommit: ([String], String) = candidateState.candidates.first, !candidateToCommit.1.isEmpty {
-          delegate.switchState(IMEState.ofCommitting(textToCommit: candidateToCommit.1))
-        } else {
-          delegate.switchState(candidateState)
-        }
-      default: delegate.callError("8DA4096E")
+    case 2...: delegate.switchState(candidateState)
+    case 1:
+      clear() // 這句不要砍，因為下文可能會回呼 candidateState。
+      if let candidateToCommit: ([String], String) = candidateState.candidates.first, !candidateToCommit.1.isEmpty {
+        delegate.switchState(IMEState.ofCommitting(textToCommit: candidateToCommit.1))
+      } else {
+        delegate.switchState(candidateState)
+      }
+    default: delegate.callError("8DA4096E")
     }
     return true
   }
@@ -298,8 +298,8 @@ extension InputHandler {
     } else if input.isCommandHold, input.isControlHold {
       displayedText =
         input.isOptionHold
-        ? commissionByCtrlOptionCommandEnter(isShiftPressed: input.isShiftHold)
-        : commissionByCtrlCommandEnter(isShiftPressed: input.isShiftHold)
+          ? commissionByCtrlOptionCommandEnter(isShiftPressed: input.isShiftHold)
+          : commissionByCtrlCommandEnter(isShiftPressed: input.isShiftHold)
     }
 
     delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
@@ -321,11 +321,11 @@ extension InputHandler {
         if !compositor.isEmpty {
           var arrDisplayedTextElements = [String]()
           compositor.keys.forEach { key in
-            arrDisplayedTextElements.append(Tekkon.restoreToneOneInPhona(target: key))  // 恢復陰平標記
+            arrDisplayedTextElements.append(Tekkon.restoreToneOneInPhona(target: key)) // 恢復陰平標記
           }
           displayedText = arrDisplayedTextElements.joined(separator: "\t")
         }
-        displayedText = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: displayedText)  // 注音轉拼音
+        displayedText = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: displayedText) // 注音轉拼音
       }
       if prefs.showHanyuPinyinInCompositionBuffer {
         if compositor.isEmpty {
@@ -351,12 +351,12 @@ extension InputHandler {
       if !prefs.cassetteEnabled {
         key =
           prefs.inlineDumpPinyinInLieuOfZhuyin
-          ? Tekkon.restoreToneOneInPhona(target: key)  // 恢復陰平標記
-          : Tekkon.cnvPhonaToTextbookReading(target: key)  // 恢復陰平標記
+            ? Tekkon.restoreToneOneInPhona(target: key) // 恢復陰平標記
+            : Tekkon.cnvPhonaToTextbookReading(target: key) // 恢復陰平標記
 
         if prefs.inlineDumpPinyinInLieuOfZhuyin {
-          key = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: key)  // 注音轉拼音
-          key = Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: key)  // 轉教科書式標調
+          key = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: key) // 注音轉拼音
+          key = Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: key) // 轉教科書式標調
         }
       }
 
@@ -388,27 +388,27 @@ extension InputHandler {
 
     // 引入 macOS 內建注音輸入法的行為，允許用 Shift+BackSpace 解構前一個漢字的讀音。
     shiftBksp: switch prefs.specifyShiftBackSpaceKeyBehavior {
-      case 0:
-        if prefs.cassetteEnabled {
-          guard input.isShiftHold, calligrapher.isEmpty else { break shiftBksp }
-          guard let prevReading = previousParsableCalligraph else { break shiftBksp }
-          compositor.dropKey(direction: .rear)
-          walk()  // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
-          calligrapher = prevReading
-        } else {
-          guard input.isShiftHold, isComposerOrCalligrapherEmpty else { break shiftBksp }
-          guard let prevReading = previousParsableReading else { break shiftBksp }
-          // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
-          compositor.dropKey(direction: .rear)
-          walk()  // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
-          prevReading.1.charComponents.forEach { composer.receiveKey(fromPhonabet: $0) }
-        }
-        delegate.switchState(generateStateOfInputting())
-        return true
-      case 1:
-        delegate.switchState(IMEState.ofAbortion())
-        return true
-      default: break
+    case 0:
+      if prefs.cassetteEnabled {
+        guard input.isShiftHold, calligrapher.isEmpty else { break shiftBksp }
+        guard let prevReading = previousParsableCalligraph else { break shiftBksp }
+        compositor.dropKey(direction: .rear)
+        walk() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
+        calligrapher = prevReading
+      } else {
+        guard input.isShiftHold, isComposerOrCalligrapherEmpty else { break shiftBksp }
+        guard let prevReading = previousParsableReading else { break shiftBksp }
+        // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
+        compositor.dropKey(direction: .rear)
+        walk() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
+        prevReading.1.charComponents.forEach { composer.receiveKey(fromPhonabet: $0) }
+      }
+      delegate.switchState(generateStateOfInputting())
+      return true
+    case 1:
+      delegate.switchState(IMEState.ofAbortion())
+      return true
+    default: break
     }
 
     if input.isShiftHold, input.isOptionHold {
@@ -433,8 +433,8 @@ extension InputHandler {
     }
 
     switch isComposerOrCalligrapherEmpty && compositor.isEmpty {
-      case false: delegate.switchState(generateStateOfInputting())
-      case true: delegate.switchState(IMEState.ofAbortion())
+    case false: delegate.switchState(generateStateOfInputting())
+    case true: delegate.switchState(IMEState.ofAbortion())
     }
     return true
   }
@@ -470,8 +470,8 @@ extension InputHandler {
     let inputting = generateStateOfInputting()
     // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
     switch inputting.displayedText.isEmpty {
-      case false: delegate.switchState(inputting)
-      case true: delegate.switchState(IMEState.ofAbortion())
+    case false: delegate.switchState(inputting)
+    case true: delegate.switchState(IMEState.ofAbortion())
     }
     return true
   }
@@ -554,8 +554,8 @@ extension InputHandler {
       /// 如果注拼槽或組筆區不是空的話，則清空之。
       clearComposerAndCalligrapher()
       switch compositor.isEmpty {
-        case false: delegate.switchState(generateStateOfInputting())
-        case true: delegate.switchState(IMEState.ofAbortion())
+      case false: delegate.switchState(generateStateOfInputting())
+      case true: delegate.switchState(IMEState.ofAbortion())
       }
     }
     return true
@@ -708,7 +708,7 @@ extension InputHandler {
     }
 
     guard let region = compositor.walkedNodes.cursorRegionMap[cursorForCandidate],
-      compositor.walkedNodes.count > region
+          compositor.walkedNodes.count > region
     else {
       delegate.callError("1CE6FFBD")
       return true
@@ -730,7 +730,7 @@ extension InputHandler {
         result.revolveAsIndex(with: candidates, clockwise: !(candidate == currentPaired && reverseOrder))
         if candidate == currentPaired { break }
       }
-      return (0..<candidates.count).contains(result) ? result : 0
+      return (0 ..< candidates.count).contains(result) ? result : 0
     }()
 
     if candidates.count > 1 {

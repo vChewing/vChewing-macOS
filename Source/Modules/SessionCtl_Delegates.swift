@@ -85,8 +85,8 @@ extension SessionCtl: CtlCandidateDelegate {
     let blankResult: [String] = []
     // 這一段專門處理「反查」。
     if !PrefMgr.shared.showReverseLookupInCandidateUI { return blankResult }
-    if isVerticalTyping { return blankResult }  // 縱排輸入的場合，選字窗沒有足夠的空間顯示反查結果。
-    if value.isEmpty { return blankResult }  // 空字串沒有需要反查的東西。
+    if isVerticalTyping { return blankResult } // 縱排輸入的場合，選字窗沒有足夠的空間顯示反查結果。
+    if value.isEmpty { return blankResult } // 空字串沒有需要反查的東西。
     if value.contains("_") { return blankResult }
     // 因為威注音輸入法的反查結果僅由磁帶模組負責，所以相關運算挪至 LMInstantiator 內處理。
     return LMMgr.currentLM.cassetteReverseLookup(for: value)
@@ -112,10 +112,10 @@ extension SessionCtl: CtlCandidateDelegate {
 
   public func candidatePairSelected(at index: Int) {
     guard let inputHandler = inputHandler else { return }
-    if state.type == .ofSymbolTable, (0..<state.node.members.count).contains(index) {
+    if state.type == .ofSymbolTable, (0 ..< state.node.members.count).contains(index) {
       let node = state.node.members[index]
       if !node.members.isEmpty {
-        switchState(IMEState.ofEmpty())  // 防止縱橫排選字窗同時出現
+        switchState(IMEState.ofEmpty()) // 防止縱橫排選字窗同時出現
         switchState(IMEState.ofSymbolTable(node: node))
       } else {
         switchState(IMEState.ofCommitting(textToCommit: node.name))
@@ -216,20 +216,21 @@ extension SessionCtl: CtlCandidateDelegate {
     let updateResult = inputHandler.updateUnigramData()
     // 清詞完畢
 
-    var newState: IMEStateProtocol =
-      updateResult ? inputHandler.generateStateOfCandidates() : IMEState.ofCommitting(textToCommit: state.displayedText)
+    var newState: IMEStateProtocol = updateResult
+      ? inputHandler.generateStateOfCandidates()
+      : IMEState.ofCommitting(textToCommit: state.displayedText)
     newState.tooltipDuration = 1.85
     var tooltipMessage = ""
     switch action {
-      case .toBoost:
-        newState.data.tooltipColorState = .normal
-        tooltipMessage = succeeded ? "+ Succeeded in boosting a candidate." : "⚠︎ Failed from boosting a candidate."
-      case .toNerf:
-        newState.data.tooltipColorState = .succeeded
-        tooltipMessage = succeeded ? "- Succeeded in nerfing a candidate." : "⚠︎ Failed from nerfing a candidate."
-      case .toFilter:
-        newState.data.tooltipColorState = .warning
-        tooltipMessage = succeeded ? "! Succeeded in filtering a candidate." : "⚠︎ Failed from filtering a candidate."
+    case .toBoost:
+      newState.data.tooltipColorState = .normal
+      tooltipMessage = succeeded ? "+ Succeeded in boosting a candidate." : "⚠︎ Failed from boosting a candidate."
+    case .toNerf:
+      newState.data.tooltipColorState = .succeeded
+      tooltipMessage = succeeded ? "- Succeeded in nerfing a candidate." : "⚠︎ Failed from nerfing a candidate."
+    case .toFilter:
+      newState.data.tooltipColorState = .warning
+      tooltipMessage = succeeded ? "! Succeeded in filtering a candidate." : "⚠︎ Failed from filtering a candidate."
     }
     if !succeeded { newState.data.tooltipColorState = .redAlert }
     newState.tooltip = NSLocalizedString(tooltipMessage, comment: "") + "　　"

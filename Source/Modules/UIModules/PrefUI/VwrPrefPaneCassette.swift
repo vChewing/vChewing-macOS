@@ -7,8 +7,8 @@
 // requirements defined in MIT License.
 
 import BookmarkManager
-import SSPreferences
 import Shared
+import SSPreferences
 import SwiftExtension
 import SwiftUI
 
@@ -17,7 +17,7 @@ struct VwrPrefPaneCassette: View {
   private var fdrCassetteDataDefault: String { "" }
   @State private var tbxCassettePath: String =
     UserDefaults.standard.string(forKey: UserDef.kCassettePath.rawValue)
-    ?? ""
+      ?? ""
   @State private var selCassetteEnabled: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kCassetteEnabled.rawValue)
   @State private var selForceCassetteChineseConversion: Int = UserDefaults.standard.integer(
@@ -32,14 +32,14 @@ struct VwrPrefPaneCassette: View {
   private let contentMaxHeight: Double = 490
   private let contentWidth: Double = {
     switch PrefMgr.shared.appleLanguages[0] {
-      case "ja":
-        return 520
-      default:
-        if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
-          return 480
-        } else {
-          return 580
-        }
+    case "ja":
+      return 520
+    default:
+      if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
+        return 480
+      } else {
+        return 580
+      }
     }
   }()
 

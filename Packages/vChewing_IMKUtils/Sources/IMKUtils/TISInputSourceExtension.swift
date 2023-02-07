@@ -11,21 +11,21 @@ import InputMethodKit
 
 // MARK: - TISInputSource Extension by The vChewing Project (MIT-NTL License).
 
-extension TISInputSource {
-  public static var allRegisteredInstancesOfThisInputMethod: [TISInputSource] {
+public extension TISInputSource {
+  static var allRegisteredInstancesOfThisInputMethod: [TISInputSource] {
     TISInputSource.modes.compactMap { TISInputSource.generate(from: $0) }
   }
 
-  public static var modes: [String] {
+  static var modes: [String] {
     guard let components = Bundle.main.infoDictionary?["ComponentInputModeDict"] as? [String: Any],
-      let tsInputModeListKey = components["tsInputModeListKey"] as? [String: Any]
+          let tsInputModeListKey = components["tsInputModeListKey"] as? [String: Any]
     else {
       return []
     }
     return tsInputModeListKey.keys.map { $0 }
   }
 
-  @discardableResult public static func registerInputMethod() -> Bool {
+  @discardableResult static func registerInputMethod() -> Bool {
     let instances = TISInputSource.allRegisteredInstancesOfThisInputMethod
     if instances.isEmpty {
       // 有實例尚未登記。執行登記手續。
@@ -46,15 +46,15 @@ extension TISInputSource {
     return succeeded
   }
 
-  @discardableResult public static func registerInputSource() -> Bool {
+  @discardableResult static func registerInputSource() -> Bool {
     TISRegisterInputSource(Bundle.main.bundleURL as CFURL) == noErr
   }
 
-  @discardableResult public func activate() -> Bool {
+  @discardableResult func activate() -> Bool {
     TISEnableInputSource(self) == noErr
   }
 
-  @discardableResult public func select() -> Bool {
+  @discardableResult func select() -> Bool {
     if !isSelectable {
       NSLog("Non-selectable: \(identifier)")
       return false
@@ -66,35 +66,35 @@ extension TISInputSource {
     return true
   }
 
-  @discardableResult public func deactivate() -> Bool {
+  @discardableResult func deactivate() -> Bool {
     TISDisableInputSource(self) == noErr
   }
 
-  public var isActivated: Bool {
+  var isActivated: Bool {
     unsafeBitCast(TISGetInputSourceProperty(self, kTISPropertyInputSourceIsEnabled), to: CFBoolean.self)
       == kCFBooleanTrue
   }
 
-  public var isSelectable: Bool {
+  var isSelectable: Bool {
     unsafeBitCast(TISGetInputSourceProperty(self, kTISPropertyInputSourceIsSelectCapable), to: CFBoolean.self)
       == kCFBooleanTrue
   }
 
-  public static func generate(from identifier: String) -> TISInputSource? {
+  static func generate(from identifier: String) -> TISInputSource? {
     TISInputSource.rawTISInputSources(onlyASCII: false)[identifier]
   }
 
-  public var inputModeID: String {
+  var inputModeID: String {
     unsafeBitCast(TISGetInputSourceProperty(self, kTISPropertyInputModeID), to: NSString.self) as String? ?? ""
   }
 
-  public var vChewingLocalizedName: String {
+  var vChewingLocalizedName: String {
     switch identifier {
-      case "com.apple.keylayout.ZhuyinBopomofo":
-        return NSLocalizedString("Apple Zhuyin Bopomofo (Dachen)", comment: "")
-      case "com.apple.keylayout.ZhuyinEten":
-        return NSLocalizedString("Apple Zhuyin Eten (Traditional)", comment: "")
-      default: return localizedName
+    case "com.apple.keylayout.ZhuyinBopomofo":
+      return NSLocalizedString("Apple Zhuyin Bopomofo (Dachen)", comment: "")
+    case "com.apple.keylayout.ZhuyinEten":
+      return NSLocalizedString("Apple Zhuyin Eten (Traditional)", comment: "")
+    default: return localizedName
     }
   }
 }
@@ -104,23 +104,23 @@ extension TISInputSource {
 // Ref: Original source codes are written in Swift 4 from Mzp's InputMethodKit textbook.
 // Note: Slightly modified by vChewing Project: Using Dictionaries when necessary.
 
-extension TISInputSource {
-  public var localizedName: String {
+public extension TISInputSource {
+  var localizedName: String {
     unsafeBitCast(TISGetInputSourceProperty(self, kTISPropertyLocalizedName), to: NSString.self) as String? ?? ""
   }
 
-  public var identifier: String {
+  var identifier: String {
     unsafeBitCast(TISGetInputSourceProperty(self, kTISPropertyInputSourceID), to: NSString.self) as String? ?? ""
   }
 
-  public var scriptCode: Int {
+  var scriptCode: Int {
     // Shiki's note: There is no "kTISPropertyScriptCode" in TextInputSources.h file.
     // Using Mzp's latest solution in his blog: https://mzp.hatenablog.com/entry/2018/07/16/212026
     let r = TISGetInputSourceProperty(self, "TSMInputSourcePropertyScriptCode" as CFString)
     return unsafeBitCast(r, to: NSString.self).integerValue as Int? ?? 0
   }
 
-  public static func rawTISInputSources(onlyASCII: Bool = false) -> [String: TISInputSource] {
+  static func rawTISInputSources(onlyASCII: Bool = false) -> [String: TISInputSource] {
     // 為了指定檢索條件，先構築 CFDictionary 辭典。
     // 第二項代指辭典容量。
     let conditions = CFDictionaryCreateMutable(nil, 2, nil, nil)

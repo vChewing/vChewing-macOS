@@ -7,8 +7,8 @@
 // requirements defined in MIT License.
 
 import PhraseEditorUI
-import SSPreferences
 import Shared
+import SSPreferences
 import SwiftExtension
 import SwiftUI
 
@@ -17,14 +17,14 @@ struct VwrPrefPanePhrases: View {
   private let contentMaxHeight: Double = 490
   private let contentWidth: Double = {
     switch PrefMgr.shared.appleLanguages[0] {
-      case "ja":
-        return 520
-      default:
-        if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
-          return 480
-        } else {
-          return 580
-        }
+    case "ja":
+      return 520
+    default:
+      if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
+        return 480
+      } else {
+        return 580
+      }
     }
   }()
 

@@ -36,7 +36,8 @@ import SwiftUI
          }
      */
     public struct UIHostingConfiguration<Label, Background>: BackportUIContentConfiguration
-    where Label: View, Background: View {
+      where Label: View, Background: View
+    {
       var content: Label
       var background: AnyView?
       var insets: ProposedInsets
@@ -57,7 +58,8 @@ import SwiftUI
       /// - Parameter background: The contents of the SwiftUI hierarchy to be
       ///   shown inside the background of the cell.
       public func background<B>(@ViewBuilder background: () -> B) -> Backport.UIHostingConfiguration<Label, B>
-      where B: View {
+        where B: View
+      {
         .init(content: content, background: AnyView(background()), insets: insets, minSize: minSize)
       }
 
@@ -95,7 +97,7 @@ import SwiftUI
     }
   }
 
-  extension Backport.UIHostingConfiguration {
+  public extension Backport.UIHostingConfiguration {
     /// Sets the margins around the content of the configuration.
     ///
     /// Use this modifier to replace the default margins applied to the root of
@@ -112,7 +114,7 @@ import SwiftUI
     ///      use the system default values. The default value is
     ///      ``Edge/Set/all``.
     ///    - length: The amount to apply.
-    public func margins(_ edges: Edge.Set = .all, _ length: CGFloat) -> Self {
+    func margins(_ edges: Edge.Set = .all, _ length: CGFloat) -> Self {
       var view = self
       if edges.contains(.leading) { view.insets.leading = length }
       if edges.contains(.trailing) { view.insets.trailing = length }
@@ -138,7 +140,7 @@ import SwiftUI
     ///      use the system default values. The default value is
     ///      ``Edge/Set/all``.
     ///    - insets: The insets to apply.
-    public func margins(_ edges: Edge.Set = .all, _ insets: EdgeInsets) -> Self {
+    func margins(_ edges: Edge.Set = .all, _ insets: EdgeInsets) -> Self {
       var view = self
       if edges.contains(.leading) { view.insets.leading = insets.leading }
       if edges.contains(.trailing) { view.insets.trailing = insets.trailing }

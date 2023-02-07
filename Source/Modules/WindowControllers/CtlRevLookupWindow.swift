@@ -18,7 +18,7 @@ class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
     shared.window = window
     window.delegate = shared
     window.setPosition(vertical: .bottom, horizontal: .right, padding: 20)
-    window.orderFrontRegardless()  // 逼著視窗往最前方顯示
+    window.orderFrontRegardless() // 逼著視窗往最前方顯示
     window.level = .statusBar
     window.titlebarAppearsTransparent = true
     shared.showWindow(shared)

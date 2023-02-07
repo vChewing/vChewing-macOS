@@ -127,18 +127,18 @@ public class HotenkaChineseConverter {
     var dictTypeKey: String
 
     switch dictType {
-      case .zhHantTW:
-        dictTypeKey = "zh2TW"
-      case .zhHantHK:
-        dictTypeKey = "zh2HK"
-      case .zhHansSG:
-        dictTypeKey = "zh2SG"
-      case .zhHansJP:
-        dictTypeKey = "zh2JP"
-      case .zhHantKX:
-        dictTypeKey = "zh2KX"
-      case .zhHansCN:
-        dictTypeKey = "zh2CN"
+    case .zhHantTW:
+      dictTypeKey = "zh2TW"
+    case .zhHantHK:
+      dictTypeKey = "zh2HK"
+    case .zhHansSG:
+      dictTypeKey = "zh2SG"
+    case .zhHansJP:
+      dictTypeKey = "zh2JP"
+    case .zhHantKX:
+      dictTypeKey = "zh2KX"
+    case .zhHansCN:
+      dictTypeKey = "zh2CN"
     }
 
     var result = ""
@@ -153,7 +153,7 @@ public class HotenkaChineseConverter {
       innerloop: while j > 0 {
         let start = target.index(target.startIndex, offsetBy: i)
         let end = target.index(target.startIndex, offsetBy: i + j)
-        guard let useDictSubStr = useDict[String(target[start..<end])] else {
+        guard let useDictSubStr = useDict[String(target[start ..< end])] else {
           j -= 1
           continue
         }
@@ -164,7 +164,7 @@ public class HotenkaChineseConverter {
       if j == 0 {
         let start = target.index(target.startIndex, offsetBy: i)
         let end = target.index(target.startIndex, offsetBy: i + 1)
-        result = result + String(target[start..<end])
+        result = result + String(target[start ..< end])
         i += 1
       } else {
         i += j
@@ -177,18 +177,18 @@ public class HotenkaChineseConverter {
 
 // MARK: - String extensions
 
-extension String {
-  fileprivate func range(of str: String) -> Range<Int> {
+private extension String {
+  func range(of str: String) -> Range<Int> {
     var start = -1
     withCString { bytes in
       str.withCString { sbytes in
         start = strstr(bytes, sbytes) - UnsafeMutablePointer<Int8>(mutating: bytes)
       }
     }
-    return start < 0 ? 0..<0 : start..<start + str.utf8.count
+    return start < 0 ? 0 ..< 0 : start ..< start + str.utf8.count
   }
 
-  fileprivate func substring(to index: Int) -> String {
+  func substring(to index: Int) -> String {
     var out = self
     withCString { bytes in
       let bytes = UnsafeMutablePointer<Int8>(mutating: bytes)
@@ -198,7 +198,7 @@ extension String {
     return out
   }
 
-  fileprivate func substring(from index: Int) -> String {
+  func substring(from index: Int) -> String {
     var out = self
     withCString { bytes in
       out = String(cString: bytes + index)

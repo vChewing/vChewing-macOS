@@ -4,13 +4,13 @@ import PackageDescription
 let package = Package(
   name: "Megrez",
   platforms: [
-    .macOS(.v10_11)
+    .macOS(.v10_11),
   ],
   products: [
     .library(
       name: "Megrez",
       targets: ["Megrez"]
-    )
+    ),
   ],
   dependencies: [],
   targets: [

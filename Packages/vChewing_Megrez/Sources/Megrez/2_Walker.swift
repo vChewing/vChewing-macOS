@@ -3,7 +3,7 @@
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
-extension Megrez.Compositor {
+public extension Megrez.Compositor {
   /// 爬軌函式，會更新當前組字器的 walkedNodes。
   ///
   /// 找到軌格陣圖內權重最大的路徑。該路徑代表了可被觀測到的最可能的隱藏事件鏈。
@@ -13,7 +13,7 @@ extension Megrez.Compositor {
   /// 對於 `G = (V, E)`，該算法的運行次數為 `O(|V|+|E|)`，其中 `G` 是一個有向無環圖。
   /// 這意味著，即使軌格很大，也可以用很少的算力就可以爬軌。
   /// - Returns: 爬軌結果＋該過程是否順利執行。
-  @discardableResult public mutating func walk() -> (walkedNode: [Node], succeeded: Bool) {
+  @discardableResult mutating func walk() -> (walkedNode: [Node], succeeded: Bool) {
     var result = [Node]()
     defer { walkedNodes = result }
     guard !spans.isEmpty else { return (result, true) }
@@ -24,7 +24,7 @@ extension Megrez.Compositor {
     }
 
     for (i, span) in spans.enumerated() {
-      for j in 1...span.maxLength {
+      for j in 1 ... span.maxLength {
         if let theNode = span.nodeOf(length: j) {
           vertexSpans[i].append(.init(node: theNode))
         }

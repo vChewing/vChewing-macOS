@@ -104,7 +104,8 @@ extension Backport.ProgressView where Wrapped == Any {
   ///       task, meaning the task is complete if `value` equals `total`. The
   ///       default value is `1.0`.
   public init<V>(value: V?, total: V = 1.0)
-  where Label == EmptyView, CurrentValueLabel == EmptyView, V: BinaryFloatingPoint {
+    where Label == EmptyView, CurrentValueLabel == EmptyView, V: BinaryFloatingPoint
+  {
     if let value = value {
       config = .init(fractionCompleted: Double(value) / Double(total), preferredKind: .linear, max: Double(total))
     } else {
@@ -130,7 +131,8 @@ extension Backport.ProgressView where Wrapped == Any {
   ///     - label: A view builder that creates a view that describes the task
   ///       in progress.
   public init<V>(value: V?, total: V = 1.0, @ViewBuilder label: () -> Label)
-  where CurrentValueLabel == EmptyView, V: BinaryFloatingPoint {
+    where CurrentValueLabel == EmptyView, V: BinaryFloatingPoint
+  {
     if let value = value {
       config = .init(
         fractionCompleted: Double(value) / Double(total), label: .init(content: label()), preferredKind: .linear
@@ -200,7 +202,8 @@ extension Backport.ProgressView where Wrapped == Any {
   ///       task, meaning the task is complete if `value` equals `total`. The
   ///       default value is `1.0`.
   public init<V>(_ titleKey: LocalizedStringKey, value: V?, total: V = 1.0)
-  where Label == Text, CurrentValueLabel == EmptyView, V: BinaryFloatingPoint {
+    where Label == Text, CurrentValueLabel == EmptyView, V: BinaryFloatingPoint
+  {
     if let value = value {
       config = .init(
         fractionCompleted: Double(value) / Double(total), label: .init(content: Text(titleKey)), preferredKind: .linear,
@@ -237,7 +240,8 @@ extension Backport.ProgressView where Wrapped == Any {
   ///       task, meaning the task is complete if `value` equals `total`. The
   ///       default value is `1.0`.
   public init<S, V>(_ title: S, value: V?, total: V = 1.0)
-  where Label == Text, CurrentValueLabel == EmptyView, S: StringProtocol, V: BinaryFloatingPoint {
+    where Label == Text, CurrentValueLabel == EmptyView, S: StringProtocol, V: BinaryFloatingPoint
+  {
     if let value = value {
       config = .init(
         fractionCompleted: Double(value) / Double(total), label: .init(content: Text(title)), preferredKind: .linear,

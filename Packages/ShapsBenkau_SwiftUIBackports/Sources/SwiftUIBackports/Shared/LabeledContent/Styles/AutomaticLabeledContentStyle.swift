@@ -5,8 +5,8 @@
 import SwiftUI
 
 @available(macOS 10.15, *)
-extension Backport where Wrapped == Any {
-  public struct AutomaticLabeledContentStyle: BackportLabeledContentStyle {
+public extension Backport where Wrapped == Any {
+  struct AutomaticLabeledContentStyle: BackportLabeledContentStyle {
     public func makeBody(configuration: Configuration) -> some View {
       HStack(alignment: .firstTextBaseline) {
         configuration.label

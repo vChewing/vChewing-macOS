@@ -10,12 +10,12 @@ import Megrez
 import PinyinPhonaConverter
 import Shared
 
-extension vChewingLM {
+public extension vChewingLM {
   /// 與之前的 LMCore 不同，LMCoreEX 不在辭典內記錄實體，而是記錄 range 範圍。
   /// 需要資料的時候，直接拿 range 去 strData 取資料。
   /// 資料記錄原理與上游 C++ 的 ParselessLM 差不多，但用的是 Swift 原生手段。
   /// 主要時間消耗仍在 For 迴圈，但這個算法可以顯著減少記憶體佔用。
-  @frozen public struct LMCoreEX {
+  @frozen struct LMCoreEX {
     public private(set) var filePath: String?
     /// 資料庫辭典。索引內容為注音字串，資料內容則為字串首尾範圍、方便自 strData 取資料。
     var rangeMap: [String: [Range<String.Index>]] = [:]
@@ -97,7 +97,7 @@ extension vChewingLM {
       if strData == rawStrData { return }
       strData = rawStrData
       var newMap: [String: [Range<String.Index>]] = [:]
-      let shouldReverse = shouldReverse  // 必需，否則下文的 closure 會出錯。
+      let shouldReverse = shouldReverse // 必需，否則下文的 closure 會出錯。
       strData.parse(splitee: "\n") { theRange in
         let theCells = rawStrData[theRange].split(separator: " ")
         if theCells.count >= 2, theCells[0].description.first != "#" {
@@ -167,7 +167,7 @@ extension vChewingLM {
             theScore = .init(String(neta[2])) ?? defaultScore
           }
           if theScore > 0 {
-            theScore *= -1  // 應對可能忘記寫負號的情形
+            theScore *= -1 // 應對可能忘記寫負號的情形
           }
           grams.append(Megrez.Unigram(value: theValue, score: theScore))
         }

@@ -29,7 +29,8 @@ extension Backport where Wrapped: View {
   ///
   /// - Returns: A view that presents the preview of the contents of the URL.
   public func quickLookPreview<Items>(_ selection: Binding<Items.Element?>, in items: Items) -> some View
-  where Items: RandomAccessCollection, Items.Element == URL {
+    where Items: RandomAccessCollection, Items.Element == URL
+  {
     #if os(iOS) || os(macOS)
       content.background(QuicklookSheet(selection: selection, items: items))
     #else
@@ -64,7 +65,8 @@ extension Backport where Wrapped: View {
 
   @available(macOS 10.15, *)
   private struct QuicklookSheet<Items>: NSViewControllerRepresentable
-  where Items: RandomAccessCollection, Items.Element == URL {
+    where Items: RandomAccessCollection, Items.Element == URL
+  {
     let selection: Binding<Items.Element?>
     let items: Items
 
@@ -81,7 +83,8 @@ extension Backport where Wrapped: View {
 #elseif os(iOS)
 
   private struct QuicklookSheet<Items>: UIViewControllerRepresentable
-  where Items: RandomAccessCollection, Items.Element == URL {
+    where Items: RandomAccessCollection, Items.Element == URL
+  {
     let selection: Binding<Items.Element?>
     let items: Items
 

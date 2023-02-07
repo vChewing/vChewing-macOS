@@ -5,12 +5,12 @@
 import SwiftUI
 
 @available(macOS 10.15, *)
-extension SSPreferences {
+public extension SSPreferences {
   /**
    Represents a section with right-aligned title and optional bottom divider.
    */
   @available(macOS 10.15, *)
-  public struct Section: View {
+  struct Section: View {
     /**
      Preference key holding max width of section labels.
      */
@@ -74,7 +74,7 @@ extension SSPreferences {
     ) {
       self.label = label()
         .overlay(LabelOverlay())
-        .eraseToAnyView()  // TODO: Remove use of `AnyView`.
+        .eraseToAnyView() // TODO: Remove use of `AnyView`.
       self.bottomDivider = bottomDivider
       self.verticalAlignment = verticalAlignment
       let stack = VStack(alignment: .leading) { content() }

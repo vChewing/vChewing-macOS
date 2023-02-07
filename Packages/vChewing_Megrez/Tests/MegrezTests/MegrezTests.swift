@@ -335,7 +335,7 @@ final class MegrezTests: XCTestCase {
   func test13_Compositor_StressBench() throws {
     NSLog("// Stress test preparation begins.")
     var compositor = Megrez.Compositor(with: SimpleLM(input: strStressData))
-    for _ in 0..<1919 {
+    for _ in 0 ..< 1919 {
       compositor.insertKey("yi")
     }
     NSLog("// Stress test started.")

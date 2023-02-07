@@ -9,8 +9,8 @@
 import Cocoa
 import InputMethodKit
 
-extension NSWindowController {
-  public func orderFront() {
+public extension NSWindowController {
+  func orderFront() {
     window?.orderFront(self)
   }
 
@@ -21,7 +21,7 @@ extension NSWindowController {
   /// - Parameters:
   ///   - windowTopLeftPoint: 給定的視窗顯示位置。
   ///   - heightDelta: 為了「防止選字窗抻出螢幕下方」而給定的預留高度。
-  public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight heightDelta: Double, useGCD: Bool) {
+  func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight heightDelta: Double, useGCD: Bool) {
     func doSet() {
       guard let window = window, var screenFrame = NSScreen.main?.visibleFrame else { return }
       let windowSize = window.frame.size
@@ -48,8 +48,8 @@ extension NSWindowController {
   }
 }
 
-extension NSWindow {
-  @discardableResult public func callAlert(title: String, text: String? = nil) -> NSApplication.ModalResponse {
+public extension NSWindow {
+  @discardableResult func callAlert(title: String, text: String? = nil) -> NSApplication.ModalResponse {
     let alert = NSAlert()
     alert.messageText = title
     if let text = text { alert.informativeText = text }
@@ -62,7 +62,7 @@ extension NSWindow {
   }
 }
 
-extension IMKCandidates {
+public extension IMKCandidates {
   /// 設定選字窗的顯示位置。
   ///
   /// 需注意：該函式會藉由設定選字窗左上角頂點的方式、使選字窗始終位於某個螢幕之內。
@@ -70,7 +70,7 @@ extension IMKCandidates {
   /// - Parameters:
   ///   - windowTopLeftPoint: 給定的視窗顯示位置。
   ///   - heightDelta: 為了「防止選字窗抻出螢幕下方」而給定的預留高度。
-  public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight heightDelta: Double, useGCD: Bool) {
+  func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight heightDelta: Double, useGCD: Bool) {
     func doSet() {
       DispatchQueue.main.async { [self] in
         guard var screenFrame = NSScreen.main?.visibleFrame else { return }

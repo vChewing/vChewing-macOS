@@ -123,7 +123,7 @@ import SwiftUI
 
 #if os(iOS)
   extension InspectionView {
-    fileprivate struct Representable: UIViewRepresentable {
+    struct Representable: UIViewRepresentable {
       let parent: InspectionView
 
       func makeUIView(context _: Context) -> UIView { .init() }
@@ -149,7 +149,7 @@ import SwiftUI
 #elseif os(macOS)
   @available(macOS 10.15, *)
   extension InspectionView {
-    fileprivate struct Representable: NSViewRepresentable {
+    struct Representable: NSViewRepresentable {
       let parent: InspectionView
 
       func makeNSView(context _: Context) -> NSView {

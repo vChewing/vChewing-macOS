@@ -43,7 +43,7 @@ extension Backport where Wrapped == Any {
 }
 
 @available(macOS 10.15, *)
-extension Backport.AppStorage {
+public extension Backport.AppStorage {
   /// Creates a property that can read and write to a boolean user default.
   ///
   /// - Parameters:
@@ -53,7 +53,7 @@ extension Backport.AppStorage {
   ///     store.
   ///   - store: The store to read and write to. A value
   ///     of `nil` will use the user default store from the environment.
-  public init(wrappedValue: Value, _ key: String, store: UserDefaults = .standard) where Value == Bool {
+  init(wrappedValue: Value, _ key: String, store: UserDefaults = .standard) where Value == Bool {
     let value = store.value(forKey: key) as? Value ?? wrappedValue
     self.init(
       value: value, store: store, key: key,
@@ -71,7 +71,7 @@ extension Backport.AppStorage {
   ///     store.
   ///   - store: The store to read and write to. A value
   ///     of `nil` will use the user default store from the environment.
-  public init(wrappedValue: Value, _ key: String, store: UserDefaults = .standard) where Value == Int {
+  init(wrappedValue: Value, _ key: String, store: UserDefaults = .standard) where Value == Int {
     let value = store.value(forKey: key) as? Value ?? wrappedValue
     self.init(
       value: value, store: store, key: key,
@@ -89,7 +89,7 @@ extension Backport.AppStorage {
   ///     store.
   ///   - store: The store to read and write to. A value
   ///     of `nil` will use the user default store from the environment.
-  public init(wrappedValue: Value, _ key: String, store: UserDefaults = .standard) where Value == Double {
+  init(wrappedValue: Value, _ key: String, store: UserDefaults = .standard) where Value == Double {
     let value = store.value(forKey: key) as? Value ?? wrappedValue
     self.init(
       value: value, store: store, key: key,
@@ -107,7 +107,7 @@ extension Backport.AppStorage {
   ///     store.
   ///   - store: The store to read and write to. A value
   ///     of `nil` will use the user default store from the environment.
-  public init(wrappedValue: Value, _ key: String, store: UserDefaults = .standard) where Value == String {
+  init(wrappedValue: Value, _ key: String, store: UserDefaults = .standard) where Value == String {
     let value = store.value(forKey: key) as? Value ?? wrappedValue
     self.init(
       value: value, store: store, key: key,
@@ -125,7 +125,7 @@ extension Backport.AppStorage {
   ///     store.
   ///   - store: The store to read and write to. A value
   ///     of `nil` will use the user default store from the environment.
-  public init(wrappedValue: Value, _ key: String, store: UserDefaults = .standard) where Value == URL {
+  init(wrappedValue: Value, _ key: String, store: UserDefaults = .standard) where Value == URL {
     let value = store.url(forKey: key) ?? wrappedValue
     self.init(
       value: value, store: store, key: key,
@@ -146,7 +146,7 @@ extension Backport.AppStorage {
   ///     store.
   ///   - store: The store to read and write to. A value
   ///     of `nil` will use the user default store from the environment.
-  public init(wrappedValue: Value, _ key: String, store: UserDefaults = .standard) where Value == Data {
+  init(wrappedValue: Value, _ key: String, store: UserDefaults = .standard) where Value == Data {
     let value = store.value(forKey: key) as? Data ?? wrappedValue
     self.init(
       value: value, store: store, key: key,
@@ -157,7 +157,7 @@ extension Backport.AppStorage {
 }
 
 @available(macOS 10.15, *)
-extension Backport.AppStorage where Wrapped == Any, Value: ExpressibleByNilLiteral {
+public extension Backport.AppStorage where Wrapped == Any, Value: ExpressibleByNilLiteral {
   /// Creates a property that can read and write an Optional boolean user
   /// default.
   ///
@@ -168,7 +168,7 @@ extension Backport.AppStorage where Wrapped == Any, Value: ExpressibleByNilLiter
   ///     store.
   ///   - store: The store to read and write to. A value
   ///     of `nil` will use the user default store from the environment.
-  public init(_ key: String, store: UserDefaults = .standard) where Value == Bool? {
+  init(_ key: String, store: UserDefaults = .standard) where Value == Bool? {
     let value = store.value(forKey: key) as? Value ?? .none
     self.init(
       value: value, store: store, key: key,
@@ -187,7 +187,7 @@ extension Backport.AppStorage where Wrapped == Any, Value: ExpressibleByNilLiter
   ///     store.
   ///   - store: The store to read and write to. A value
   ///     of `nil` will use the user default store from the environment.
-  public init(_ key: String, store: UserDefaults = .standard) where Value == Int? {
+  init(_ key: String, store: UserDefaults = .standard) where Value == Int? {
     let value = store.value(forKey: key) as? Value ?? .none
     self.init(
       value: value, store: store, key: key,
@@ -206,7 +206,7 @@ extension Backport.AppStorage where Wrapped == Any, Value: ExpressibleByNilLiter
   ///     store.
   ///   - store: The store to read and write to. A value
   ///     of `nil` will use the user default store from the environment.
-  public init(_ key: String, store: UserDefaults = .standard) where Value == Double? {
+  init(_ key: String, store: UserDefaults = .standard) where Value == Double? {
     let value = store.value(forKey: key) as? Value ?? .none
     self.init(
       value: value, store: store, key: key,
@@ -225,7 +225,7 @@ extension Backport.AppStorage where Wrapped == Any, Value: ExpressibleByNilLiter
   ///     store.
   ///   - store: The store to read and write to. A value
   ///     of `nil` will use the user default store from the environment.
-  public init(_ key: String, store: UserDefaults = .standard) where Value == String? {
+  init(_ key: String, store: UserDefaults = .standard) where Value == String? {
     let value = store.value(forKey: key) as? Value ?? .none
     self.init(
       value: value, store: store, key: key,
@@ -244,7 +244,7 @@ extension Backport.AppStorage where Wrapped == Any, Value: ExpressibleByNilLiter
   ///     store.
   ///   - store: The store to read and write to. A value
   ///     of `nil` will use the user default store from the environment.
-  public init(_ key: String, store: UserDefaults = .standard) where Value == URL? {
+  init(_ key: String, store: UserDefaults = .standard) where Value == URL? {
     let value = store.url(forKey: key) ?? .none
     self.init(
       value: value, store: store, key: key,
@@ -263,7 +263,7 @@ extension Backport.AppStorage where Wrapped == Any, Value: ExpressibleByNilLiter
   ///     store.
   ///   - store: The store to read and write to. A value
   ///     of `nil` will use the user default store from the environment.
-  public init(_ key: String, store: UserDefaults = .standard) where Value == Data? {
+  init(_ key: String, store: UserDefaults = .standard) where Value == Data? {
     let value = store.value(forKey: key) as? Value ?? .none
     self.init(
       value: value, store: store, key: key,
@@ -274,7 +274,7 @@ extension Backport.AppStorage where Wrapped == Any, Value: ExpressibleByNilLiter
 }
 
 @available(macOS 10.15, *)
-extension Backport.AppStorage where Wrapped == Any, Value: RawRepresentable {
+public extension Backport.AppStorage where Wrapped == Any, Value: RawRepresentable {
   /// Creates a property that can read and write to a string user default,
   /// transforming that to `RawRepresentable` data type.
   ///
@@ -295,7 +295,7 @@ extension Backport.AppStorage where Wrapped == Any, Value: RawRepresentable {
   ///     store.
   ///   - store: The store to read and write to. A value
   ///     of `nil` will use the user default store from the environment.
-  public init(wrappedValue: Value, _ key: String, store: UserDefaults = .standard) where Value.RawValue == String {
+  init(wrappedValue: Value, _ key: String, store: UserDefaults = .standard) where Value.RawValue == String {
     let rawValue = store.value(forKey: key) as? Value.RawValue
     let value = rawValue.flatMap(Value.init) ?? wrappedValue
     self.init(
@@ -325,7 +325,7 @@ extension Backport.AppStorage where Wrapped == Any, Value: RawRepresentable {
   ///     store.
   ///   - store: The store to read and write to. A value
   ///     of `nil` will use the user default store from the environment.
-  public init(wrappedValue: Value, _ key: String, store: UserDefaults = .standard) where Value.RawValue == Int {
+  init(wrappedValue: Value, _ key: String, store: UserDefaults = .standard) where Value.RawValue == Int {
     let rawValue = store.value(forKey: key) as? Value.RawValue
     let value = rawValue.flatMap(Value.init) ?? wrappedValue
     self.init(
