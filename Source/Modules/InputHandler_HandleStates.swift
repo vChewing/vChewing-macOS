@@ -762,4 +762,50 @@ extension InputHandler {
     delegate.switchState(newState)
     return true
   }
+
+  // MARK: - 處理符號選單
+
+  /// 處理符號選單。
+  /// - Parameters:
+  ///   - alternative: 使用另一個模式。
+  ///   - JIS: 是否為 JIS 鍵盤。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  func handlePunctuationList(alternative: Bool, isJIS: Bool = false) -> Bool {
+    guard let delegate = delegate, delegate.state.type != .ofDeactivated else { return false }
+    if alternative {
+      if currentLM.hasUnigramsFor(keyArray: ["_punctuation_list"]) {
+        if isComposerOrCalligrapherEmpty, compositor.insertKey("_punctuation_list") {
+          walk()
+          // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
+          let textToCommit = commitOverflownComposition
+          var inputting = generateStateOfInputting()
+          inputting.textToCommit = textToCommit
+          delegate.switchState(inputting)
+          // 開始決定是否切換至選字狀態。
+          let newState = generateStateOfCandidates()
+          _ = newState.candidates.isEmpty ? delegate.callError("B5127D8A") : delegate.switchState(newState)
+        } else { // 不要在注音沒敲完整的情況下叫出統合符號選單。
+          delegate.callError("17446655")
+        }
+        return true
+      } else {
+        let errorMessage =
+          NSLocalizedString(
+            "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key.",
+            comment: ""
+          )
+        vCLog("8EB3FB1A: " + errorMessage)
+        let textToCommit = generateStateOfInputting(sansReading: true).displayedText
+        delegate.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
+        delegate.switchState(IMEState.ofCommitting(textToCommit: isJIS ? "_" : "`"))
+        return true
+      }
+    } else {
+      // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
+      let textToCommit = generateStateOfInputting(sansReading: true).displayedText
+      delegate.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
+      delegate.switchState(IMEState.ofSymbolTable(node: CandidateNode.root))
+      return true
+    }
+  }
 }
