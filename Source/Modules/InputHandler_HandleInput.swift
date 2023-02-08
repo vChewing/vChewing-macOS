@@ -235,8 +235,7 @@ extension InputHandler {
     if state.type == .ofEmpty {
       if input.isMainAreaNumKey, input.modifierFlags == [.shift, .option] {
         guard let strRAW = input.mainAreaNumKeyChar else { return false }
-        let newString =
-          strRAW.applyingTransform(.fullwidthToHalfwidth, reverse: !prefs.halfWidthPunctuationEnabled) ?? strRAW
+        let newString = strRAW.applyingTransformFW2HW(reverse: !prefs.halfWidthPunctuationEnabled)
         delegate.switchState(IMEState.ofCommitting(textToCommit: newString))
         return true
       }
