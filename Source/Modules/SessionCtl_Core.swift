@@ -258,7 +258,7 @@ public extension SessionCtl {
     _ = sender // 防止格式整理工具毀掉與此對應的參數。
     DispatchQueue.main.async { [self] in
       isActivated = false
-      resetInputHandler() // 這條會自動搞定 Empty 狀態。
+      resetInputHandler(forceComposerCleanup: true) // 這條會自動搞定 Empty 狀態。
       switchState(IMEState.ofDeactivated())
       inputHandler = nil
       // IMK 選字窗可以不用 nil，不然反而會出問題。反正 IMK 選字窗記憶體開銷可以不計。
@@ -338,7 +338,7 @@ public extension SessionCtl {
   /// 不過好像因為 IMK 的 Bug 而並不會被執行。
   override func inputControllerWillClose() {
     // 下述兩行用來防止尚未完成拼寫的注音內容被遞交出去。
-    resetInputHandler()
+    resetInputHandler(forceComposerCleanup: true)
     super.inputControllerWillClose()
   }
 }
