@@ -248,36 +248,25 @@ public extension Int {
 
 // MARK: - Parse String As Hex Literal
 
+// Original author: Shiki Suen
+// Refactored by: Isaac Xen
+
 public extension String {
   func parsedAsHexLiteral(encoding: CFStringEncodings? = nil) -> String? {
-    guard !isEmpty, count % 2 == 0 else { return nil }
-    guard range(of: "^[a-fA-F0-9]+$", options: .regularExpression) != nil else { return nil }
-    let encodingRaw: UInt32 = {
-      if let encoding = encoding {
-        return UInt32(encoding.rawValue)
+    guard !isEmpty else { return nil }
+    var charBytes = [Int8]()
+    var buffer: Int?
+    compactMap(\.hexDigitValue).forEach { neta in
+      if let validBuffer = buffer {
+        charBytes.append(.init(bitPattern: UInt8(validBuffer << 4 + neta)))
+        buffer = nil
       } else {
-        return CFStringBuiltInEncodings.UTF8.rawValue
-      }
-    }()
-    let charBytesRAW: [Int] = compactMap(\.hexDigitValue)
-    var charBytes = [UInt8]()
-    var buffer = 0
-    charBytesRAW.forEach { neta in
-      if buffer == 0 {
-        buffer += neta
-      } else {
-        buffer = Int(buffer) * 16
-        charBytes.append(UInt8(buffer + neta))
-        buffer = 0
+        buffer = neta
       }
     }
-    let data = Data(charBytes)
-    let result = data.withUnsafeBytes { n in
-      CFStringCreateWithBytes(nil, n.baseAddress, data.count, CFStringEncoding(encodingRaw), false)
-    }
-    if let string = result {
-      return string as String
-    }
-    return nil
+    let encodingUBE = CFStringBuiltInEncodings.UTF16BE.rawValue
+    let encodingRAW = encoding.map { UInt32($0.rawValue) } ?? encodingUBE
+    let result = CFStringCreateWithCString(nil, &charBytes, encodingRAW) as String?
+    return result?.isEmpty ?? true ? nil : result
   }
 }
