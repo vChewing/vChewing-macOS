@@ -130,7 +130,7 @@ public extension SessionCtl {
 
     // Apple 數字小鍵盤處理
     if eventToDeal.isNumericPadKey,
-       let eventCharConverted = eventToDeal.characters?.applyingTransform(.fullwidthToHalfwidth, reverse: false)
+       let eventCharConverted = eventToDeal.characters?.applyingTransformFW2HW(reverse: false)
     {
       eventToDeal = eventToDeal.reinitiate(characters: eventCharConverted) ?? eventToDeal
     }
