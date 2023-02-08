@@ -245,3 +245,39 @@ public extension Int {
     self = target.revolvedIndex(self, clockwise: clockwise, steps: steps)
   }
 }
+
+// MARK: - Parse String As Hex Literal
+
+public extension String {
+  func parsedAsHexLiteral(encoding: CFStringEncodings? = nil) -> String? {
+    guard !isEmpty, count % 2 == 0 else { return nil }
+    guard range(of: "^[a-fA-F0-9]+$", options: .regularExpression) != nil else { return nil }
+    let encodingRaw: UInt32 = {
+      if let encoding = encoding {
+        return UInt32(encoding.rawValue)
+      } else {
+        return CFStringBuiltInEncodings.UTF8.rawValue
+      }
+    }()
+    let charBytesRAW: [Int] = compactMap(\.hexDigitValue)
+    var charBytes = [UInt8]()
+    var buffer = 0
+    charBytesRAW.forEach { neta in
+      if buffer == 0 {
+        buffer += neta
+      } else {
+        buffer = Int(buffer) * 16
+        charBytes.append(UInt8(buffer + neta))
+        buffer = 0
+      }
+    }
+    let data = Data(charBytes)
+    let result = data.withUnsafeBytes { n in
+      CFStringCreateWithBytes(nil, n.baseAddress, data.count, CFStringEncoding(encodingRaw), false)
+    }
+    if let string = result {
+      return string as String
+    }
+    return nil
+  }
+}
