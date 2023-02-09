@@ -43,6 +43,10 @@ public class SessionCtl: IMKInputController {
   /// 當前副本的客體是否是輸入法本體？
   public var isServingIMEItself: Bool = false
 
+  /// 用以存儲客體的 bundleIdentifier。
+  /// 由於每次動態獲取都會耗時，所以這裡直接靜態記載之。
+  public var clientBundleIdentifier: String = ""
+
   // MARK: -
 
   /// 當前 Caps Lock 按鍵是否被摁下。
@@ -216,6 +220,7 @@ public extension SessionCtl {
       if let senderBundleID: String = (sender as? IMKTextInput)?.bundleIdentifier() {
         vCLog("activateServer(\(senderBundleID))")
         isServingIMEItself = Bundle.main.bundleIdentifier == senderBundleID
+        clientBundleIdentifier = senderBundleID
       }
     }
     DispatchQueue.main.async {
