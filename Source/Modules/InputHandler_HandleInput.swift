@@ -162,8 +162,10 @@ extension InputHandler {
         switch input.modifierFlags {
         case []:
           return handlePunctuationList(alternative: false, isJIS: isJIS)
-        case [.option]:
+        case [.option, .shift]:
           return handlePunctuationList(alternative: true, isJIS: isJIS)
+        case .option:
+          return handleCodePointInputToggle()
         default: break
         }
       case .kSpace: // 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
