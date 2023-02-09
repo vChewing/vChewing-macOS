@@ -48,6 +48,10 @@ public extension SessionCtl {
       candidateUI?.visible = false
       popupCompositionBuffer.hide()
       tooltipInstance.hide()
+      inputHandler?.clear()
+      if ![.ofAbortion, .ofEmpty].contains(previous.type), !previous.displayedText.isEmpty {
+        clearInlineDisplay()
+      }
     case .ofEmpty, .ofAbortion, .ofCommitting:
       innerCircle: switch newState.type {
       case .ofAbortion:
@@ -137,12 +141,13 @@ public extension SessionCtl {
 
   /// 把 setMarkedText 包裝一下，按需啟用 GCD。
   func doSetMarkedText(_ string: Any!, selectionRange: NSRange, replacementRange: NSRange) {
-    guard isActivated, let client = client() else { return }
-    if isServingIMEItself {
+    if isServingIMEItself || !isActivated {
       DispatchQueue.main.async {
+        guard let client = self.client() else { return }
         client.setMarkedText(string, selectionRange: selectionRange, replacementRange: replacementRange)
       }
     } else {
+      guard let client = client() else { return }
       client.setMarkedText(string, selectionRange: selectionRange, replacementRange: replacementRange)
     }
   }
