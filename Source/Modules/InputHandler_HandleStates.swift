@@ -19,11 +19,16 @@ extension InputHandler {
 
   /// 生成「正在輸入」狀態。相關的內容會被拿給狀態機械用來處理在電腦螢幕上顯示的內容。
   public func generateStateOfInputting(sansReading: Bool = false) -> IMEStateProtocol {
+    let cpInput = isCodePointInputMode && !sansReading
     /// 「更新內文組字區 (Update the composing buffer)」是指要求客體軟體將組字緩衝區的內容
     /// 換成由此處重新生成的原始資料在 IMEStateData 當中生成的 NSAttributeString。
-    var displayTextSegments: [String] = compositor.walkedNodes.values
-    var cursor = convertCursorForDisplay(compositor.cursor)
-    let reading: String = sansReading ? "" : readingForDisplay // 先提出來，減輕運算負擔。
+    var displayTextSegments: [String] = cpInput
+      ? [strCodePointBuffer]
+      : compositor.walkedNodes.values
+    var cursor = cpInput
+      ? displayTextSegments.joined().count
+      : convertCursorForDisplay(compositor.cursor)
+    let reading: String = (sansReading || isCodePointInputMode) ? "" : readingForDisplay // 先提出來，減輕運算負擔。
     if !reading.isEmpty {
       var newDisplayTextSegments = [String]()
       var temporaryNode = ""
@@ -287,6 +292,9 @@ extension InputHandler {
   @discardableResult func handleEnter(input: InputSignalProtocol, readingOnly: Bool = false) -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
+
+    if isCodePointInputMode { return handleCodePointInputToggle() }
+
     guard state.type == .ofInputting else { return false }
 
     var displayedText = state.displayedText
@@ -384,7 +392,24 @@ extension InputHandler {
   func handleBackSpace(input: InputSignalProtocol) -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
-    guard state.type == .ofInputting else { return false }
+    guard state.type == .ofInputting else {
+      isCodePointInputMode = false
+      return false
+    }
+
+    if isCodePointInputMode {
+      if !strCodePointBuffer.isEmpty {
+        strCodePointBuffer = strCodePointBuffer.dropLast(1).description
+        if !strCodePointBuffer.isEmpty {
+          var updatedState = generateStateOfInputting()
+          updatedState.tooltipDuration = 0
+          updatedState.tooltip = tooltipCodePointInputMode
+          delegate.switchState(updatedState)
+          return true
+        }
+      }
+      return handleCodePointInputToggle()
+    }
 
     // 引入 macOS 內建注音輸入法的行為，允許用 Shift+BackSpace 解構前一個漢字的讀音。
     shiftBksp: switch prefs.specifyShiftBackSpaceKeyBehavior {
@@ -448,6 +473,9 @@ extension InputHandler {
   func handleDelete(input: InputSignalProtocol) -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
+
+    if isCodePointInputMode { return handleCodePointInputToggle() }
+
     guard state.type == .ofInputting else { return false }
 
     if input.isShiftHold {
@@ -543,6 +571,9 @@ extension InputHandler {
   func handleEsc() -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
+
+    if isCodePointInputMode { return handleCodePointInputToggle() }
+
     guard state.type == .ofInputting else { return false }
 
     if prefs.escToCleanInputBuffer {
@@ -760,6 +791,25 @@ extension InputHandler {
     vCLog(newState.tooltip)
     newState.tooltipDuration = 0
     delegate.switchState(newState)
+    return true
+  }
+
+  // MARK: - 處理區位輸入狀態的啟動過程
+
+  @discardableResult func handleCodePointInputToggle() -> Bool {
+    guard let delegate = delegate, delegate.state.type != .ofDeactivated else { return false }
+    if isCodePointInputMode {
+      isCodePointInputMode = false
+      delegate.switchState(IMEState.ofAbortion())
+      return true
+    }
+    var updatedState = generateStateOfInputting(sansReading: true)
+    delegate.switchState(IMEState.ofCommitting(textToCommit: updatedState.displayedText))
+    updatedState = IMEState.ofEmpty()
+    updatedState.tooltipDuration = 0
+    updatedState.tooltip = tooltipCodePointInputMode
+    delegate.switchState(updatedState)
+    isCodePointInputMode = true
     return true
   }
 

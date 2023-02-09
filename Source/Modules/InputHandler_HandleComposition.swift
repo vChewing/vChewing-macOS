@@ -17,7 +17,9 @@ extension InputHandler {
   ///   - input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleComposition(input: InputSignalProtocol) -> Bool? {
-    prefs.cassetteEnabled ? handleCassetteComposition(input: input) : handlePhonabetComposition(input: input)
+    if isCodePointInputMode { return handleCodePointComposition(input: input) }
+    if prefs.cassetteEnabled { return handleCassetteComposition(input: input) }
+    return handlePhonabetComposition(input: input)
   }
 
   // MARK: 注音按鍵輸入處理 (Handle BPMF Keys)
@@ -304,5 +306,62 @@ extension InputHandler {
       return true
     }
     return nil
+  }
+
+  // MARK: 區位輸入處理 (Handle Code Point Input)
+
+  /// 用來處理 InputHandler.HandleInput() 當中的與區位輸入有關的組字行為。
+  /// - Parameters:
+  ///   - input: 輸入訊號。
+  /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
+  private func handleCodePointComposition(input: InputSignalProtocol) -> Bool? {
+    guard !input.isReservedKey else { return nil }
+    guard let delegate = delegate, input.text.count == 1 else { return nil }
+    guard !input.text.compactMap(\.hexDigitValue).isEmpty else {
+      delegate.callError("05DD692C：輸入的字元並非 ASCII 字元。。")
+      return true
+    }
+    switch strCodePointBuffer.count {
+    case 0 ..< 4:
+      if strCodePointBuffer.count < 3 {
+        strCodePointBuffer.append(input.text)
+        var updatedState = generateStateOfInputting()
+        updatedState.tooltipDuration = 0
+        updatedState.tooltip = tooltipCodePointInputMode
+        delegate.switchState(updatedState)
+        return true
+      }
+      let encoding: CFStringEncodings? = {
+        switch IMEApp.currentInputMode {
+        case .imeModeCHS: return .GB_18030_2000
+        case .imeModeCHT: return .big5_HKSCS_1999
+        default: return nil
+        }
+      }()
+      guard
+        var char = "\(strCodePointBuffer)\(input.text)"
+          .parsedAsHexLiteral(encoding: encoding)?.first?.description
+      else {
+        delegate.callError("D220B880：輸入的字碼沒有對應的字元。")
+        var updatedState = IMEState.ofAbortion()
+        updatedState.tooltipDuration = 0
+        updatedState.tooltip = "Invalid Code Point.".localized + "　　"
+        delegate.switchState(updatedState)
+        isCodePointInputMode = true
+        return true
+      }
+      // 某些舊版 macOS 會在這裡生成的字元後面插入垃圾字元。這裡只保留起始字元。
+      if char.count > 1 { char = char.map(\.description)[0] }
+      var updatedState = IMEState.ofCommitting(textToCommit: char)
+      updatedState.tooltipDuration = 0
+      updatedState.tooltip = tooltipCodePointInputMode
+      delegate.switchState(updatedState)
+      isCodePointInputMode = true
+      return true
+    default:
+      delegate.switchState(generateStateOfInputting())
+      isCodePointInputMode = true
+      return true
+    }
   }
 }

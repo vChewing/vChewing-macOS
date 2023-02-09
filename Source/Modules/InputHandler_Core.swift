@@ -108,6 +108,29 @@ public class InputHandler: InputHandlerProtocol {
   public func clear() {
     clearComposerAndCalligrapher()
     compositor.clear()
+    isCodePointInputMode = false
+  }
+
+  // MARK: - Codepoint Input Buffer.
+
+  var isCodePointInputMode = false {
+    willSet {
+      strCodePointBuffer.removeAll()
+    }
+  }
+
+  var strCodePointBuffer = ""
+
+  var tooltipCodePointInputMode: String {
+    let commonTerm = NSMutableString()
+    commonTerm.insert("Code Point Input Mode.".localized, at: 0)
+    switch IMEApp.currentInputMode {
+    case .imeModeCHS: commonTerm.insert("[GB] ", at: 0)
+    case .imeModeCHT: commonTerm.insert("[Big5] ", at: 0)
+    default: break
+    }
+    commonTerm.append("　　")
+    return commonTerm.description
   }
 
   // MARK: - Functions dealing with Megrez.
@@ -366,7 +389,10 @@ public class InputHandler: InputHandlerProtocol {
 
   // MARK: - Extracted methods and functions (Tekkon).
 
-  var isComposerOrCalligrapherEmpty: Bool { prefs.cassetteEnabled ? calligrapher.isEmpty : composer.isEmpty }
+  var isComposerOrCalligrapherEmpty: Bool {
+    if !strCodePointBuffer.isEmpty { return false }
+    return prefs.cassetteEnabled ? calligrapher.isEmpty : composer.isEmpty
+  }
 
   /// 獲取與當前注音排列或拼音輸入種類有關的標點索引鍵，以英數下畫線「_」結尾。
   var currentKeyboardParser: String { currentKeyboardParserType.name + "_" }
@@ -400,6 +426,7 @@ public class InputHandler: InputHandlerProtocol {
   public func clearComposerAndCalligrapher() {
     calligrapher.removeAll()
     composer.clear()
+    strCodePointBuffer.removeAll()
   }
 
   func letComposerAndCalligrapherDoBackSpace() {
