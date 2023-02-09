@@ -11,11 +11,6 @@ import Shared
 // MARK: - InputHandler Delegate
 
 extension SessionCtl: InputHandlerDelegate {
-  public var clientBundleIdentifier: String {
-    guard let client = client() else { return "" }
-    return client.bundleIdentifier() ?? ""
-  }
-
   public func candidateController() -> CtlCandidateProtocol? { candidateUI }
 
   public func candidateSelectionCalledByInputHandler(at index: Int) {
