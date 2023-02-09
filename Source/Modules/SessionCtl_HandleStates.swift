@@ -121,18 +121,16 @@ public extension SessionCtl {
   /// 注意：必須在 IMK 的 commitComposition 函式當中也間接或者直接執行這個處理。
   private func commit(text: String) {
     let text = text.trimmingCharacters(in: .newlines)
-    guard let client = client(), !text.isEmpty else { return }
     let buffer = ChineseConverter.kanjiConversionIfRequired(text)
-    if buffer.isEmpty {
-      return
-    }
     if isServingIMEItself {
       DispatchQueue.main.async {
+        guard let client = self.client() else { return }
         client.insertText(
           buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
         )
       }
     } else {
+      guard let client = client() else { return }
       client.insertText(
         buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
       )
