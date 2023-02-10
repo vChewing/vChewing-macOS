@@ -47,7 +47,7 @@ extension InputHandler {
         // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
         guard let prevReading = previousParsableReading, isIntonationKey(input) else { break proc }
         var theComposer = composer
-        prevReading.0.charComponents.forEach { theComposer.receiveKey(fromPhonabet: $0) }
+        prevReading.0.map(\.description).forEach { theComposer.receiveKey(fromPhonabet: $0) }
         // 發現要覆寫的聲調與覆寫對象的聲調雷同的情況的話，直接跳過處理。
         let oldIntonation: Tekkon.Phonabet = theComposer.intonation
         theComposer.receiveKey(fromString: input.text)

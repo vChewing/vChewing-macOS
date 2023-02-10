@@ -133,7 +133,7 @@ extension InputHandler {
     let selectionKeys = delegate.selectionKeys
 
     for j in 0 ..< selectionKeys.count {
-      let label = selectionKeys.charComponents[j]
+      let label = selectionKeys.map(\.description)[j]
       if match.compare(label, options: .caseInsensitive, range: nil, locale: .current) == .orderedSame {
         index = j
         break

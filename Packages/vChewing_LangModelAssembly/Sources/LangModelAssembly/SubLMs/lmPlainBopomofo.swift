@@ -61,7 +61,7 @@ public extension vChewingLM {
     public func valuesFor(key: String) -> [String] {
       var pairs: [String] = []
       if let arrRangeRecords: String = dataMap[key]?.trimmingCharacters(in: .newlines) {
-        pairs.append(contentsOf: arrRangeRecords.map { String($0) })
+        pairs.append(contentsOf: arrRangeRecords.map(\.description))
       }
       return pairs.deduplicated
     }
