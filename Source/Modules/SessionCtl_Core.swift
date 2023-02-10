@@ -131,7 +131,7 @@ public class SessionCtl: IMKInputController {
       if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(inputMode) }
       if oldValue != inputMode, inputMode != .imeModeNULL {
         /// 先重置輸入調度模組，不然會因為之後的命令而導致該命令無法正常執行。
-        resetInputHandler(forceComposerCleanup: true)
+        resetInputHandler()
         // ----------------------------
         /// 重設所有語言模組。這裡不需要做按需重設，因為對運算量沒有影響。
         inputHandler?.currentLM = LMMgr.currentLM // 會自動更新組字引擎內的模組。
@@ -263,7 +263,7 @@ public extension SessionCtl {
     _ = sender // 防止格式整理工具毀掉與此對應的參數。
     DispatchQueue.main.async { [self] in
       isActivated = false
-      resetInputHandler(forceComposerCleanup: true) // 這條會自動搞定 Empty 狀態。
+      resetInputHandler() // 這條會自動搞定 Empty 狀態。
       switchState(IMEState.ofDeactivated())
       inputHandler = nil
       // IMK 選字窗可以不用 nil，不然反而會出問題。反正 IMK 選字窗記憶體開銷可以不計。
@@ -343,7 +343,7 @@ public extension SessionCtl {
   /// 不過好像因為 IMK 的 Bug 而並不會被執行。
   override func inputControllerWillClose() {
     // 下述兩行用來防止尚未完成拼寫的注音內容被遞交出去。
-    resetInputHandler(forceComposerCleanup: true)
+    resetInputHandler()
     super.inputControllerWillClose()
   }
 }
