@@ -346,6 +346,10 @@ public extension vChewingLM {
       // 新增與日期、時間、星期有關的單元圖資料
       rawAllUnigrams.append(contentsOf: queryDateTimeUnigrams(with: keyChain))
 
+      if keyChain == "_punctuation_list" {
+        rawAllUnigrams.append(contentsOf: lmCore.getHaninSymbolMenuUnigrams())
+      }
+
       // 提前處理語彙置換
       if isPhraseReplacementEnabled {
         for i in 0 ..< rawAllUnigrams.count {
