@@ -480,7 +480,7 @@ func fileOutput(isCHS: Bool) {
     if neta.count >= 2 {
       let theKey = String(neta[0])
       let theValue = String(neta[1])
-      if !neta[0].isEmpty, !neta[1].isEmpty, line.first != "#", !theKey.contains("_punctuation_list") {
+      if !neta[0].isEmpty, !neta[1].isEmpty, line.first != "#" {
         rangeMap[cnvPhonabetToASCII(theKey), default: []].append(theValue.data(using: .utf8)!)
       }
     }

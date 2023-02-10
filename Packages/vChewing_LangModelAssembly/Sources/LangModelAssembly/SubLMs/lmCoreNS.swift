@@ -128,10 +128,31 @@ public extension vChewingLM {
       vCLog(strDump)
     }
 
+    public func getHaninSymbolMenuUnigrams() -> [Megrez.Unigram] {
+      let key = "_punctuation_list"
+      var grams: [Megrez.Unigram] = []
+      guard let arrRangeRecords: [Data] = dataMap[cnvPhonabetToASCII(key)] else { return grams }
+      for netaSet in arrRangeRecords {
+        let strNetaSet = String(decoding: netaSet, as: UTF8.self)
+        let neta = Array(strNetaSet.trimmingCharacters(in: .newlines).split(separator: " ").reversed())
+        let theValue: String = .init(neta[0])
+        var theScore = defaultScore
+        if neta.count >= 2, !shouldForceDefaultScore {
+          theScore = .init(String(neta[1])) ?? defaultScore
+        }
+        if theScore > 0 {
+          theScore *= -1 // 應對可能忘記寫負號的情形
+        }
+        grams.append(Megrez.Unigram(value: theValue, score: theScore))
+      }
+      return grams
+    }
+
     /// 根據給定的讀音索引鍵，來獲取資料庫辭典內的對應資料陣列的 UTF8 資料、就地分析、生成單元圖陣列。
     /// - parameters:
     ///   - key: 讀音索引鍵。
     public func unigramsFor(key: String) -> [Megrez.Unigram] {
+      if key == "_punctuation_list" { return [] }
       var grams: [Megrez.Unigram] = []
       var gramsHW: [Megrez.Unigram] = []
       guard let arrRangeRecords: [Data] = dataMap[cnvPhonabetToASCII(key)] else { return grams }
@@ -148,10 +169,9 @@ public extension vChewingLM {
         }
         grams.append(Megrez.Unigram(value: theValue, score: theScore))
         if !key.contains("_punctuation") { continue }
-        if let halfValue = theValue.applyingTransform(.fullwidthToHalfwidth, reverse: false) {
-          if halfValue != theValue {
-            gramsHW.append(Megrez.Unigram(value: halfValue, score: theScore))
-          }
+        let halfValue = theValue.applyingTransformFW2HW(reverse: false)
+        if halfValue != theValue {
+          gramsHW.append(Megrez.Unigram(value: halfValue, score: theScore))
         }
       }
       grams.append(contentsOf: gramsHW)
