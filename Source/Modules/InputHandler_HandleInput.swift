@@ -100,9 +100,13 @@ extension InputHandler {
       delegate.switchState(state.convertedToInputting)
     }
 
-    // MARK: 注音按鍵輸入處理 (Handle BPMF Keys)
+    // MARK: 注音按鍵輸入與漢音鍵盤符號輸入處理 (Handle BPMF Keys & Hanin Keyboard Symbol Input)
 
-    if let compositionHandled = handleComposition(input: input) { return compositionHandled }
+    if isHaninKeyboardSymbolMode, input.modifierFlags.isEmpty || input.modifierFlags == .shift {
+      return handleHaninKeyboardSymbolModeInput(input: input)
+    } else if let compositionHandled = handleComposition(input: input) {
+      return compositionHandled
+    }
 
     // MARK: 用上下左右鍵呼叫選字窗 (Calling candidate window using Up / Down or PageUp / PageDn.)
 
@@ -165,7 +169,16 @@ extension InputHandler {
         case [.option, .shift]:
           return handlePunctuationList(alternative: true, isJIS: isJIS)
         case .option:
-          return handleCodePointInputToggle()
+          switch (isCodePointInputMode, isHaninKeyboardSymbolMode) {
+          case (false, false): return handleCodePointInputToggle()
+          case (true, false):
+            handleCodePointInputToggle()
+            return handleHaninKeyboardSymbolModeToggle()
+          case (false, true):
+            return handleHaninKeyboardSymbolModeToggle()
+          default: break
+          }
+          return true
         default: break
         }
       case .kSpace: // 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
