@@ -293,6 +293,7 @@ extension InputHandler {
     guard let delegate = delegate else { return false }
     let state = delegate.state
 
+    if isHaninKeyboardSymbolMode { return handleHaninKeyboardSymbolModeToggle() }
     if isCodePointInputMode { return handleCodePointInputToggle() }
 
     guard state.type == .ofInputting else { return false }
@@ -474,6 +475,7 @@ extension InputHandler {
     guard let delegate = delegate else { return false }
     let state = delegate.state
 
+    if isHaninKeyboardSymbolMode { return handleHaninKeyboardSymbolModeToggle() }
     if isCodePointInputMode { return handleCodePointInputToggle() }
 
     guard state.type == .ofInputting else { return false }
@@ -572,6 +574,7 @@ extension InputHandler {
     guard let delegate = delegate else { return false }
     let state = delegate.state
 
+    if isHaninKeyboardSymbolMode { return handleHaninKeyboardSymbolModeToggle() }
     if isCodePointInputMode { return handleCodePointInputToggle() }
 
     guard state.type == .ofInputting else { return false }
@@ -810,6 +813,53 @@ extension InputHandler {
     updatedState.tooltip = tooltipCodePointInputMode
     delegate.switchState(updatedState)
     isCodePointInputMode = true
+    return true
+  }
+
+  // MARK: - 處理漢音鍵盤符號輸入狀態的啟動過程
+
+  @discardableResult func handleHaninKeyboardSymbolModeToggle() -> Bool {
+    guard let delegate = delegate, delegate.state.type != .ofDeactivated else { return false }
+    if isHaninKeyboardSymbolMode {
+      isHaninKeyboardSymbolMode = false
+      delegate.switchState(IMEState.ofAbortion())
+      return true
+    }
+    var updatedState = generateStateOfInputting(sansReading: true)
+    delegate.switchState(IMEState.ofCommitting(textToCommit: updatedState.displayedText))
+    updatedState = IMEState.ofEmpty()
+    updatedState.tooltipDuration = 0
+    updatedState.tooltip = Self.tooltipHaninKeyboardSymbolMode
+    delegate.switchState(updatedState)
+    isHaninKeyboardSymbolMode = true
+    return true
+  }
+
+  /// 處理漢音鍵盤符號輸入。
+  /// - Parameters:
+  ///   - input: 輸入按鍵訊號。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  func handleHaninKeyboardSymbolModeInput(input: InputSignalProtocol) -> Bool {
+    guard let delegate = delegate, delegate.state.type != .ofDeactivated else { return false }
+    let charText = input.text.lowercased().applyingTransformFW2HW(reverse: false)
+    guard CandidateNode.mapHaninKeyboardSymbols.keys.contains(charText) else {
+      return handleHaninKeyboardSymbolModeToggle()
+    }
+    guard
+      charText.count == 1, let symbols = CandidateNode.queryHaninKeyboardSymbols(char: charText)
+    else {
+      delegate.callError("C1A760C7")
+      return true
+    }
+    // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
+    let textToCommit = generateStateOfInputting(sansReading: true).displayedText
+    delegate.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
+    if symbols.members.count == 1 {
+      delegate.switchState(IMEState.ofCommitting(textToCommit: symbols.members.map(\.name).joined()))
+    } else {
+      delegate.switchState(IMEState.ofSymbolTable(node: symbols))
+    }
+    isHaninKeyboardSymbolMode = false // 用完就關掉，但保持選字窗開啟，所以這裡不用呼叫 toggle 函式。
     return true
   }
 
