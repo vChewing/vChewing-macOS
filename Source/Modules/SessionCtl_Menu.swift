@@ -135,6 +135,10 @@ extension SessionCtl {
         withTitle: "Edit User Symbol & Emoji Data…".localized,
         action: #selector(openUserSymbols(_:)), keyEquivalent: ""
       )
+      menu.addItem(
+        withTitle: "Open App Support Folder".localized.withEllipsis,
+        action: #selector(openAppSupportFolderFromContainer(_:)), keyEquivalent: ""
+      )
     }
 
     if optionKeyPressed || !PrefMgr.shared.shouldAutoReloadUserDataFiles {
@@ -367,6 +371,10 @@ public extension SessionCtl {
     NSWorkspace.shared.openFile(
       LMMgr.dataFolderPath(isDefaultFolder: false), withApplication: "Finder"
     )
+  }
+
+  @objc func openAppSupportFolderFromContainer(_: Any? = nil) {
+    NSWorkspace.shared.openFile(LMMgr.appSupportURL.path, withApplication: "Finder")
   }
 
   @objc func openUserPhrases(_: Any? = nil) {
