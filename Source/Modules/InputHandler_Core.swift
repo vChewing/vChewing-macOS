@@ -255,7 +255,7 @@ public class InputHandler: InputHandlerProtocol {
           position += currentNode.keyArray.count
           continue
         }
-        let values = currentNode.currentPair.value.charComponents
+        let values = currentNode.currentPair.value.map(\.description)
         for (subPosition, key) in currentNode.keyArray.enumerated() {
           guard values.count > subPosition else { break } // 防呆，應該沒有發生的可能性
           let thePair = Megrez.Compositor.KeyValuePaired(
@@ -447,7 +447,7 @@ public class InputHandler: InputHandlerProtocol {
     if compositor.cursor == 0 { return nil }
     let cursorPrevious = max(compositor.cursor - 1, 0)
     let rawData = compositor.keys[cursorPrevious]
-    let components = rawData.charComponents
+    let components = rawData.map(\.description)
     var hasIntonation = false
     for neta in components {
       if !Tekkon.allowedPhonabets.contains(neta) || neta == " " { return nil }
@@ -473,7 +473,7 @@ public class InputHandler: InputHandlerProtocol {
       return composer.getInlineCompositionForDisplay(isHanyuPinyin: prefs.showHanyuPinyinInCompositionBuffer)
     }
     if !prefs.showTranslatedStrokesInCompositionBuffer { return calligrapher }
-    return calligrapher.charComponents.map {
+    return calligrapher.map(\.description).map {
       currentLM.convertCassetteKeyToDisplay(char: $0)
     }.joined()
   }
@@ -534,7 +534,7 @@ extension InputHandler {
         textToCommit += node.currentPair.value
       } else {
         delta = min(delta, node.keyArray.count)
-        textToCommit += node.currentPair.value.charComponents[0 ..< delta].joined()
+        textToCommit += node.currentPair.value.map(\.description)[0 ..< delta].joined()
       }
       let newCursor = max(compositor.cursor - delta, 0)
       compositor.cursor = 0

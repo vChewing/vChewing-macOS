@@ -300,7 +300,7 @@ extension InputHandler {
     var displayedText = state.displayedText
 
     if input.modifierFlags == [.option, .shift] {
-      displayedText = displayedText.charComponents.joined(separator: " ")
+      displayedText = displayedText.map(\.description).joined(separator: " ")
     } else if readingOnly {
       displayedText = commissionByCtrlCommandEnter()
     } else if input.isCommandHold, input.isControlHold {
@@ -426,7 +426,7 @@ extension InputHandler {
         // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
         compositor.dropKey(direction: .rear)
         walk() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
-        prevReading.1.charComponents.forEach { composer.receiveKey(fromPhonabet: $0) }
+        prevReading.1.map(\.description).forEach { composer.receiveKey(fromPhonabet: $0) }
       }
       delegate.switchState(generateStateOfInputting())
       return true
