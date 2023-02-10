@@ -329,7 +329,7 @@ public extension vChewingLM {
       // 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
       rawAllUnigrams += lmUserPhrases.unigramsFor(key: keyChain).reversed()
 
-      if !isCassetteEnabled || isCassetteEnabled && keyChain.charComponents[0] == "_" {
+      if !isCassetteEnabled || isCassetteEnabled && keyChain.map(\.description)[0] == "_" {
         // LMMisc 與 LMCore 的 score 在 (-10.0, 0.0) 這個區間內。
         rawAllUnigrams += lmMisc.unigramsFor(key: keyChain)
         rawAllUnigrams += lmCore.unigramsFor(key: keyChain)

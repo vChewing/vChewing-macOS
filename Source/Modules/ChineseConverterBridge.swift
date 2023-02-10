@@ -32,10 +32,10 @@ public enum ChineseConverter {
   // 給 JIS 轉換模式新增疊字符號支援。
   private static func processKanjiRepeatSymbol(target: inout String) {
     guard !target.isEmpty else { return }
-    var arr = target.charComponents
+    var arr = target.map(\.description)
     for (i, char) in arr.enumerated() {
       if i == 0 { continue }
-      if char == target.charComponents[i - 1] {
+      if char == target.map(\.description)[i - 1] {
         arr[i] = "々"
       }
     }

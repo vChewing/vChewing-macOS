@@ -62,11 +62,11 @@ public struct IMEStateData: IMEStateDataProtocol {
   /// 所以在這裡必須做糾偏處理。因為在用 Swift，所以可以用「.utf16」取代「NSString.length()」。
   /// 這樣就可以免除不必要的類型轉換。
   public var u16Cursor: Int {
-    displayedText.charComponents[0 ..< cursor].joined().utf16.count
+    displayedText.map(\.description)[0 ..< cursor].joined().utf16.count
   }
 
   public var u16Marker: Int {
-    displayedText.charComponents[0 ..< marker].joined().utf16.count
+    displayedText.map(\.description)[0 ..< marker].joined().utf16.count
   }
 
   public var u16MarkedRange: Range<Int> {
@@ -170,7 +170,7 @@ public struct IMEStateData: IMEStateDataProtocol {
 
 public extension IMEStateData {
   var doesUserPhraseExist: Bool {
-    let text = displayedText.charComponents[markedRange].joined()
+    let text = displayedText.map(\.description)[markedRange].joined()
     let joined = markedReadings.joined(separator: InputHandler.keySeparator)
     return LMMgr.checkIfUserPhraseExist(
       userPhrase: text, mode: IMEApp.currentInputMode, key: joined
@@ -207,7 +207,7 @@ public extension IMEStateData {
 
   var userPhraseKVPair: (String, String) {
     let key = markedReadings.joined(separator: InputHandler.keySeparator)
-    let value = displayedText.charComponents[markedRange].joined()
+    let value = displayedText.map(\.description)[markedRange].joined()
     return (key, value)
   }
 

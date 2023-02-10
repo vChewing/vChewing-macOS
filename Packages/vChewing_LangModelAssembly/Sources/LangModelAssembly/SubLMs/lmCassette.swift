@@ -107,7 +107,7 @@ public extension vChewingLM {
               theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
               charDefMap[strFirstCell, default: []].append(strSecondCell)
               reverseLookupMap[strSecondCell, default: []].append(strFirstCell)
-              var keyComps = strFirstCell.charComponents
+              var keyComps = strFirstCell.map(\.description)
               while !keyComps.isEmpty {
                 keyComps.removeLast()
                 charDefWildcardMap[keyComps.joined() + wildcard, default: []].append(strSecondCell)
@@ -138,10 +138,10 @@ public extension vChewingLM {
             if nameCJK.isEmpty, strLine.contains("%cname ") { nameCJK = strSecondCell }
             if nameShort.isEmpty, strLine.contains("%sname ") { nameShort = strSecondCell }
             if selectionKeys.isEmpty, strLine.contains("%selkey ") {
-              selectionKeys = cells[1].map { String($0) }.deduplicated
+              selectionKeys = cells[1].map(\.description).deduplicated
             }
             if endKeys.isEmpty, strLine.contains("%endkey ") {
-              endKeys = cells[1].map { String($0) }.deduplicated
+              endKeys = cells[1].map(\.description).deduplicated
             }
             if wildcardKey.isEmpty, strLine.contains("%wildcardkey ") {
               wildcardKey = cells[1].first?.description ?? ""
