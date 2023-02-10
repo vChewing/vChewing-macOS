@@ -27,16 +27,6 @@ fileprivate extension String {
   }
 }
 
-// MARK: - String charComponents Extension
-
-public extension String {
-  var charComponents: [String] { map { String($0) } }
-}
-
-public extension Array where Element == String.Element {
-  var charComponents: [String] { map { String($0) } }
-}
-
 // MARK: - StringView Ranges Extension (by Isaac Xen)
 
 fileprivate extension String {
@@ -717,7 +707,7 @@ func healthCheck(_ data: [Unigram]) -> String {
         break outerMatchCheck
       }
       innerMatchCheck: if checkPerCharMachingStatus {
-        let char = neta.value.charComponents[i]
+        let char = neta.value.map(\.description)[i]
         if exceptedChars.contains(char) { break innerMatchCheck }
         guard let queriedPhones = mapReverseLookupForCheck[char] else {
           bad = true

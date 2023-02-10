@@ -22,7 +22,14 @@ extension CandidateNode {
           switch fieldSlice.count {
           case 1: arrMembers.append(.init(name: String(fieldSlice[0])))
           case 2:
-            arrMembers.append(.init(name: String(fieldSlice[0]), symbols: .init(fieldSlice[1].map { String($0) })))
+            arrMembers.append(
+              .init(
+                name: String(fieldSlice[0]),
+                symbols: .init(
+                  fieldSlice[1].map(\.description)
+                )
+              )
+            )
           default: break
           }
         }

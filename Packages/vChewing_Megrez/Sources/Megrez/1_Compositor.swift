@@ -259,7 +259,7 @@ extension Megrez.Compositor {
   func getJoinedKeyArray(range: Range<Int>) -> [String] {
     // 下面這句不能用 contains，不然會要求至少 macOS 13 Ventura。
     guard range.upperBound <= keys.count, range.lowerBound >= 0 else { return [] }
-    return keys[range].map { String($0) }
+    return keys[range].map(\.description)
   }
 
   /// 在指定位置（以指定索引鍵陣列和指定幅位長度）拿取節點。
