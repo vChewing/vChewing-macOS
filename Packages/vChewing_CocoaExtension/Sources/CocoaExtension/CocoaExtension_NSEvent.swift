@@ -326,7 +326,7 @@ let arrAppleABCKeyboardMap: [UInt16: (String, String)] = [
 public extension NSEvent {
   var inAppleABCStaticForm: NSEvent {
     if type == .flagsChanged { return self }
-    guard modifierFlags == .shift || modifierFlags == [] else { return self }
+    guard modifierFlags == .shift || modifierFlags.isEmpty else { return self }
     if !arrAppleABCKeyboardMap.keys.contains(keyCode) { return self }
     guard let dataTuplet = arrAppleABCKeyboardMap[keyCode] else { return self }
     let result: NSEvent? = reinitiate(
