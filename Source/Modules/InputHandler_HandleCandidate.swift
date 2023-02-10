@@ -198,11 +198,18 @@ extension InputHandler {
     // MARK: - Flipping pages by using symbol menu keys (when they are not occupied).
 
     if input.isSymbolMenuPhysicalKey {
-      var updated = true
-      let reverseTrigger = input.isShiftHold || input.isOptionHold
-      updated = reverseTrigger ? ctlCandidate.showPreviousLine() : ctlCandidate.showNextLine()
-      if !updated { delegate.callError("66F3477B") }
-      return true
+      switch input.modifierFlags {
+      case .shift, [],
+           .option where state.type != .ofSymbolTable:
+        var updated = true
+        let reverseTrigger = input.isShiftHold || input.isOptionHold
+        updated = reverseTrigger ? ctlCandidate.showPreviousLine() : ctlCandidate.showNextLine()
+        if !updated { delegate.callError("66F3477B") }
+        return true
+      case .option where state.type == .ofSymbolTable:
+        return handleHaninKeyboardSymbolModeToggle()
+      default: break
+      }
     }
 
     delegate.callError("172A0F81")
