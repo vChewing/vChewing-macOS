@@ -839,6 +839,7 @@ extension InputHandler {
 
   @discardableResult func handleHaninKeyboardSymbolModeToggle() -> Bool {
     guard let delegate = delegate, delegate.state.type != .ofDeactivated else { return false }
+    if isCodePointInputMode { isCodePointInputMode = false }
     if isHaninKeyboardSymbolMode {
       isHaninKeyboardSymbolMode = false
       delegate.switchState(IMEState.ofAbortion())
