@@ -29,23 +29,9 @@ struct VwrPrefPaneCassette: View {
 
   private static let dlgOpenFile = NSOpenPanel()
 
-  private let contentMaxHeight: Double = 490
-  private let contentWidth: Double = {
-    switch PrefMgr.shared.appleLanguages[0] {
-    case "ja":
-      return 520
-    default:
-      if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
-        return 480
-      } else {
-        return 580
-      }
-    }
-  }()
-
   var body: some View {
     ScrollView {
-      SSPreferences.Container(contentWidth: contentWidth) {
+      SSPreferences.Container(contentWidth: CtlPrefUI.contentWidth) {
         // MARK: - Cassette Data Path Management
 
         SSPreferences.Section(title: "", bottomDivider: true) {
@@ -169,14 +155,14 @@ struct VwrPrefPaneCassette: View {
           .pickerStyle(RadioGroupPickerStyle())
           Text(
             LocalizedStringKey(
-              "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode."
+              "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode."
             )
           )
           .preferenceDescription().fixedSize(horizontal: false, vertical: true)
         }
       }
     }
-    .frame(maxHeight: contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .frame(maxHeight: CtlPrefUI.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
   }
 }
 

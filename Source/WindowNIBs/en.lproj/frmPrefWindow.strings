@@ -72,7 +72,7 @@
 "Iai-0X-nxi.title" = "Choose your desired cassette file path. Will be omitted if invalid.";
 "iRg-wx-Nx2.title" = "Change UI font size of candidate window for a better visual clarity.";
 "iWy-Nw-QKB.title" = "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter";
-"j8q-IY-UF1.title" = "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance to this setting and your current input mode.";
+"j8q-IY-UF1.title" = "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode.";
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
@@ -107,7 +107,7 @@
 "s7u-Fm-dVg.title" = "Revolving Pages";
 "shc-Nu-UsM.title" = "Show notifications when toggling Caps Lock";
 "SzF-FL-sVO.title" = "Show translated strokes in composition buffer";
-"tglDevZoneIMKCandidate.title" = "Use IMK Candidate Window instead of Tadokoro (will reboot the IME)";
+"tglDevZoneIMKCandidate.title" = "Use IMK Candidate Window instead of Tadokoro";
 "tglTrimUnfinishedReadingsOnCommit.title" = "Trim unfinished readings / strokes on commit";
 "TXr-FF-ehw.title" = "Traditional Chinese";
 "ueU-Rz-a1C.title" = "Choose the behavior of (Shift+)Tab key in the candidate window.";

@@ -13,8 +13,6 @@ import SwiftUI
 
 @available(macOS 10.15, *)
 struct VwrPrefPaneGeneral: View {
-  @State private var selCandidateUIFontSize = UserDefaults.standard.integer(
-    forKey: UserDef.kCandidateListTextSize.rawValue)
   @State private var selUILanguage: [String] =
     Shared.arrSupportedLocales.contains(
       ((UserDefaults.standard.object(forKey: UserDef.kAppleLanguages.rawValue) == nil)
@@ -22,69 +20,40 @@ struct VwrPrefPaneGeneral: View {
     ? ((UserDefaults.standard.object(forKey: UserDef.kAppleLanguages.rawValue) == nil)
       ? ["auto"] : UserDefaults.standard.array(forKey: UserDef.kAppleLanguages.rawValue) as? [String] ?? ["auto"])
     : ["auto"]
-  @State private var selEnableHorizontalCandidateLayout = UserDefaults.standard.bool(
-    forKey: UserDef.kUseHorizontalCandidateList.rawValue)
-  @State private var selEnableKanjiConvToKangXi = UserDefaults.standard.bool(
-    forKey: UserDef.kChineseConversionEnabled.rawValue)
-  @State private var selEnableKanjiConvToJIS = UserDefaults.standard.bool(
-    forKey: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue)
+  @State private var selAutoCorrectReadingCombination = UserDefaults.standard.bool(
+    forKey: UserDef.kAutoCorrectReadingCombination.rawValue)
   @State private var selShowHanyuPinyinInCompositionBuffer = UserDefaults.standard.bool(
     forKey: UserDef.kShowHanyuPinyinInCompositionBuffer.rawValue)
-  @State private var selInlineDumpPinyinInLieuOfZhuyin = UserDefaults.standard.bool(
-    forKey: UserDef.kInlineDumpPinyinInLieuOfZhuyin.rawValue)
+  @State private var selKeepReadingUponCompositionError = UserDefaults.standard.bool(
+    forKey: UserDef.kKeepReadingUponCompositionError.rawValue)
+  @State private var selClassicHaninKeyboardSymbolModeShortcutEnabled = UserDefaults.standard.bool(
+    forKey: UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.rawValue)
+  @State private var selEnableSCPCTypingMode = UserDefaults.standard.bool(forKey: UserDef.kUseSCPCTypingMode.rawValue)
   @State private var selEnableFartSuppressor = UserDefaults.standard.bool(
     forKey: UserDef.kShouldNotFartInLieuOfBeep.rawValue)
   @State private var selEnableAutoUpdateCheck = UserDefaults.standard.bool(
     forKey: UserDef.kCheckUpdateAutomatically.rawValue)
   @State private var selEnableDebugMode = UserDefaults.standard.bool(forKey: UserDef.kIsDebugModeEnabled.rawValue)
-  @State private var selShowReverseLookupInCandidateUI = UserDefaults.standard.bool(
-    forKey: UserDef.kShowReverseLookupInCandidateUI.rawValue)
-
-  private let contentMaxHeight: Double = 490
-  private let contentWidth: Double = {
-    switch PrefMgr.shared.appleLanguages[0] {
-    case "ja":
-      return 520
-    default:
-      if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
-        return 480
-      } else {
-        return 580
-      }
-    }
-  }()
 
   var body: some View {
     ScrollView {
-      SSPreferences.Container(contentWidth: contentWidth) {
-        SSPreferences.Section(label: { Text(LocalizedStringKey("Candidate Size:")) }) {
-          Picker(
-            "",
-            selection: $selCandidateUIFontSize.onChange {
-              PrefMgr.shared.candidateListTextSize = Double(selCandidateUIFontSize)
-            }
-          ) {
-            Group {
-              Text("12").tag(12)
-              Text("14").tag(14)
-              Text("16").tag(16)
-              Text("17").tag(17)
-              Text("18").tag(18)
-              Text("20").tag(20)
-              Text("22").tag(22)
-              Text("24").tag(24)
-            }
-            Group {
-              Text("32").tag(32)
-              Text("64").tag(64)
-              Text("96").tag(96)
-            }
-          }
-          .labelsHidden()
-          .frame(width: 120.0)
-          Text(LocalizedStringKey("Choose candidate font size for better visual clarity."))
-            .preferenceDescription()
-        }
+      VStack {
+        _VSpacer(minHeight: 24)
+        Text(
+          "\u{2022} "
+            + NSLocalizedString(
+              "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu.",
+              comment: ""
+            ) + "\n\u{2022} "
+            + NSLocalizedString(
+              "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead.",
+              comment: ""
+            )
+        )
+        .preferenceDescription()
+        .fixedSize(horizontal: false, vertical: true)
+      }.frame(maxWidth: CtlPrefUI.contentWidth)
+      SSPreferences.Container(contentWidth: CtlPrefUI.contentWidth) {
         SSPreferences.Section(label: { Text(LocalizedStringKey("UI Language:")) }) {
           Picker(
             LocalizedStringKey("Follow OS settings"),
@@ -113,47 +82,14 @@ struct VwrPrefPaneGeneral: View {
           }
           .labelsHidden()
           .frame(width: 180.0)
-
           Text(LocalizedStringKey("Change user interface language (will reboot the IME)."))
-            .preferenceDescription()
+            .preferenceDescription().prefDescriptionWidthLimited()
         }
-        SSPreferences.Section(label: { Text(LocalizedStringKey("Candidate Layout:")) }) {
-          Picker(
-            "",
-            selection: $selEnableHorizontalCandidateLayout.onChange {
-              PrefMgr.shared.useHorizontalCandidateList = selEnableHorizontalCandidateLayout
-            }
-          ) {
-            Text(LocalizedStringKey("Vertical")).tag(false)
-            Text(LocalizedStringKey("Horizontal")).tag(true)
-          }
-          .labelsHidden()
-          .horizontalRadioGroupLayout()
-          .pickerStyle(RadioGroupPickerStyle())
-          Text(LocalizedStringKey("Choose your preferred layout of the candidate window."))
-            .preferenceDescription()
+        SSPreferences.Section(label: { Text(LocalizedStringKey("Typing Settings:")) }) {
           Toggle(
-            LocalizedStringKey("Show available reverse-lookup results in candidate window"),
-            isOn: $selShowReverseLookupInCandidateUI.onChange {
-              PrefMgr.shared.showReverseLookupInCandidateUI = selShowReverseLookupInCandidateUI
-            }
-          )
-          .controlSize(.small)
-          .disabled(PrefMgr.shared.useIMKCandidateWindow)
-        }
-        SSPreferences.Section(label: { Text(LocalizedStringKey("Output Settings:")) }) {
-          Toggle(
-            LocalizedStringKey("Auto-convert traditional Chinese glyphs to KangXi characters"),
-            isOn: $selEnableKanjiConvToKangXi.onChange {
-              PrefMgr.shared.chineseConversionEnabled = selEnableKanjiConvToKangXi
-              selEnableKanjiConvToJIS = PrefMgr.shared.shiftJISShinjitaiOutputEnabled
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Auto-convert traditional Chinese glyphs to JIS Shinjitai characters"),
-            isOn: $selEnableKanjiConvToJIS.onChange {
-              PrefMgr.shared.shiftJISShinjitaiOutputEnabled = selEnableKanjiConvToJIS
-              selEnableKanjiConvToKangXi = PrefMgr.shared.chineseConversionEnabled
+            LocalizedStringKey("Automatically correct reading combinations when typing"),
+            isOn: $selAutoCorrectReadingCombination.onChange {
+              PrefMgr.shared.autoCorrectReadingCombination = selAutoCorrectReadingCombination
             }
           )
           Toggle(
@@ -163,11 +99,26 @@ struct VwrPrefPaneGeneral: View {
             }
           )
           Toggle(
-            LocalizedStringKey("Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter"),
-            isOn: $selInlineDumpPinyinInLieuOfZhuyin.onChange {
-              PrefMgr.shared.inlineDumpPinyinInLieuOfZhuyin = selInlineDumpPinyinInLieuOfZhuyin
+            LocalizedStringKey("Allow backspace-editing miscomposed readings"),
+            isOn: $selKeepReadingUponCompositionError.onChange {
+              PrefMgr.shared.keepReadingUponCompositionError = selKeepReadingUponCompositionError
             }
           )
+          Toggle(
+            LocalizedStringKey("Also use “\\” or “¥” key for Hanin Keyboard Symbol Input"),
+            isOn: $selClassicHaninKeyboardSymbolModeShortcutEnabled.onChange {
+              PrefMgr.shared.classicHaninKeyboardSymbolModeShortcutEnabled
+                = selClassicHaninKeyboardSymbolModeShortcutEnabled
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Emulating select-candidate-per-character mode"),
+            isOn: $selEnableSCPCTypingMode.onChange {
+              PrefMgr.shared.useSCPCTypingMode = selEnableSCPCTypingMode
+            }
+          )
+          Text(LocalizedStringKey("An accommodation for elder computer users."))
+            .preferenceDescription()
           if Date.isTodayTheDate(from: 0401) {
             Toggle(
               LocalizedStringKey("Stop farting (when typed phonetic combination is invalid, etc.)"),
@@ -225,7 +176,7 @@ struct VwrPrefPaneGeneral: View {
         }
       }
     }
-    .frame(maxHeight: contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .frame(maxHeight: CtlPrefUI.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
   }
 }
 
