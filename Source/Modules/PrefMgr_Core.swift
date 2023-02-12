@@ -171,6 +171,9 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kPhraseEditorAutoReloadExternalModifications.rawValue, defaultValue: true)
   public var phraseEditorAutoReloadExternalModifications: Bool
 
+  @AppProperty(key: UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.rawValue, defaultValue: false)
+  public var classicHaninKeyboardSymbolModeShortcutEnabled: Bool
+
   // MARK: - Settings (Tier 2)
 
   @AppProperty(key: UserDef.kUseIMKCandidateWindow.rawValue, defaultValue: false)
