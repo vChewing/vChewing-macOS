@@ -100,9 +100,18 @@ extension InputHandler {
       delegate.switchState(state.convertedToInputting)
     }
 
+    // MARK: 判斷是否響應傳統的漢音鍵盤符號模式熱鍵。
+
+    if let x = input.inputTextIgnoringModifiers,
+       "¥\\".contains(x), input.modifierFlags.isEmpty,
+       prefs.classicHaninKeyboardSymbolModeShortcutEnabled
+    {
+      return handleHaninKeyboardSymbolModeToggle()
+    }
+
     // MARK: 注音按鍵輸入與漢音鍵盤符號輸入處理 (Handle BPMF Keys & Hanin Keyboard Symbol Input)
 
-    if isHaninKeyboardSymbolMode, input.modifierFlags.isEmpty || input.modifierFlags == .shift {
+    if isHaninKeyboardSymbolMode, [[], .shift].contains(input.modifierFlags) {
       return handleHaninKeyboardSymbolModeInput(input: input)
     } else if let compositionHandled = handleComposition(input: input) {
       return compositionHandled
@@ -171,10 +180,7 @@ extension InputHandler {
         case .option:
           switch (isCodePointInputMode, isHaninKeyboardSymbolMode) {
           case (false, false): return handleCodePointInputToggle()
-          case (true, false):
-            handleCodePointInputToggle()
-            return handleHaninKeyboardSymbolModeToggle()
-          case (false, true):
+          case (true, false), (false, true):
             return handleHaninKeyboardSymbolModeToggle()
           default: break
           }
