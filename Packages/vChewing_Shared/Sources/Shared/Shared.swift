@@ -69,6 +69,7 @@ public enum UserDef: String, CaseIterable {
   case kAutoCompositeWithLongestPossibleCassetteKey = "AutoCompositeWithLongestPossibleCassetteKey"
   case kShareAlphanumericalModeStatusAcrossClients = "ShareAlphanumericalModeStatusAcrossClients"
   case kPhraseEditorAutoReloadExternalModifications = "PhraseEditorAutoReloadExternalModifications"
+  case kClassicHaninKeyboardSymbolModeShortcutEnabled = "ClassicHaninKeyboardSymbolModeShortcutEnabled"
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
