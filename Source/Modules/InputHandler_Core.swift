@@ -129,7 +129,7 @@ public class InputHandler: InputHandlerProtocol {
 
   var tooltipCodePointInputMode: String {
     let commonTerm = NSMutableString()
-    commonTerm.insert("Code Point Input Mode.".localized, at: 0)
+    commonTerm.insert("Code Point Input.".localized, at: 0)
     switch IMEApp.currentInputMode {
     case .imeModeCHS: commonTerm.insert("[GB] ", at: 0)
     case .imeModeCHT: commonTerm.insert("[Big5] ", at: 0)
