@@ -21,28 +21,11 @@ struct VwrPrefPaneKeyboard: View {
     UserDefaults.standard.string(forKey: UserDef.kAlphanumericalKeyboardLayout.rawValue)
       ?? PrefMgr.shared.alphanumericalKeyboardLayout
 
-  private let contentMaxHeight: Double = 490
-  private let contentWidth: Double = {
-    switch PrefMgr.shared.appleLanguages[0] {
-    case "ja":
-      return 520
-    default:
-      if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
-        return 480
-      } else {
-        return 580
-      }
-    }
-  }()
-
   var body: some View {
     ScrollView {
-      SSPreferences.Container(contentWidth: contentWidth) {
-        SSPreferences.Section(label: { Text(LocalizedStringKey("Selection Keys:")) }) {
-          VwrPrefPaneKeyboard_SelectionKeys()
-        }
-        SSPreferences.Section(label: { Text(LocalizedStringKey("Quick Setup:")) }) {
-          HStack {
+      SSPreferences.Container(contentWidth: CtlPrefUI.contentWidth) {
+        SSPreferences.Section(title: "Quick Setup:".localized) {
+          HStack(alignment: .top) {
             Button {
               PrefMgr.shared.keyboardParser = 0
               selKeyboardParser = PrefMgr.shared.keyboardParser
@@ -67,7 +50,7 @@ struct VwrPrefPaneKeyboard: View {
             } label: {
               Text("↻Ａ")
             }
-          }
+          }.controlSize(.small)
         }
         SSPreferences.Section(label: { Text(LocalizedStringKey("Phonetic Parser:")) }) {
           HStack {
@@ -153,60 +136,7 @@ struct VwrPrefPaneKeyboard: View {
         }
       }
     }
-    .frame(maxHeight: contentMaxHeight).fixedSize(horizontal: false, vertical: true)
-  }
-}
-
-@available(macOS 10.15, *)
-private struct VwrPrefPaneKeyboard_SelectionKeys: View {
-  @State private var selSelectionKeysList = CandidateKey.suggestions
-  @State private var selSelectionKeys =
-    UserDefaults.standard.string(forKey: UserDef.kCandidateKeys.rawValue) ?? CandidateKey.defaultKeys
-
-  var body: some View {
-    ComboBox(
-      items: CandidateKey.suggestions,
-      text: $selSelectionKeys.onChange {
-        let value = selSelectionKeys
-        let keys: String = value.trimmingCharacters(in: .whitespacesAndNewlines).deduplicated
-        if keys.isEmpty {
-          selSelectionKeys = PrefMgr.shared.candidateKeys
-          return
-        }
-        // Start Error Handling.
-        if let errorResult = CandidateKey.validate(keys: keys) {
-          IMEApp.buzz()
-          if let window = CtlPrefUI.shared.controller.window {
-            let alert = NSAlert(error: NSLocalizedString("Invalid Selection Keys.", comment: ""))
-            alert.informativeText = errorResult
-            alert.beginSheetModal(for: window) { _ in
-              selSelectionKeys = PrefMgr.shared.candidateKeys
-            }
-          } else {
-            selSelectionKeys = PrefMgr.shared.candidateKeys
-          }
-        } else {
-          PrefMgr.shared.candidateKeys = keys
-          selSelectionKeys = PrefMgr.shared.candidateKeys
-          return
-        }
-      }
-    ).frame(width: 180).disabled(PrefMgr.shared.useIMKCandidateWindow)
-    if PrefMgr.shared.useIMKCandidateWindow {
-      Text(
-        LocalizedStringKey(
-          "⚠︎ This feature in IMK Candidate Window defects. Please consult Apple Developer Relations\nand tell them the related Radar ID: #FB11300759."
-        )
-      )
-      .preferenceDescription()
-    } else {
-      Text(
-        LocalizedStringKey(
-          "Choose or hit Enter to confim your prefered keys for selecting candidates."
-        )
-      )
-      .preferenceDescription()
-    }
+    .frame(maxHeight: CtlPrefUI.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
   }
 }
 

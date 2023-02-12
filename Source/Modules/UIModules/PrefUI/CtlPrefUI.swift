@@ -16,61 +16,74 @@ extension PrefUITabs {
 }
 
 @available(macOS 10.15, *)
+struct VwrPrefPage: View {
+  @State var tabType: PrefUITabs
+  var body: some View {
+    switch tabType {
+    case .tabGeneral: VwrPrefPaneGeneral()
+    case .tabCandidates: VwrPrefPaneCandidates()
+    case .tabBehavior: VwrPrefPaneBehavior()
+    case .tabOutput: VwrPrefPaneOutput()
+    case .tabDictionary: VwrPrefPaneDictionary()
+    case .tabPhrases: VwrPrefPanePhrases()
+    case .tabCassette: VwrPrefPaneCassette()
+    case .tabKeyboard: VwrPrefPaneKeyboard()
+    case .tabDevZone, .tabExperience: VwrPrefPaneDevZone()
+    }
+  }
+}
+
+@available(macOS 10.15, *)
 class CtlPrefUI {
   var controller = PreferencesWindowController(
-    panes: [
-      SSPreferences.Pane(
-        identifier: PrefUITabs.tabGeneral.ssPaneIdentifier,
-        title: PrefUITabs.tabGeneral.i18nTitle,
-        toolbarIcon: PrefUITabs.tabGeneral.icon
-      ) { VwrPrefPaneGeneral() },
-      SSPreferences.Pane(
-        identifier: PrefUITabs.tabCandidates.ssPaneIdentifier,
-        title: PrefUITabs.tabCandidates.i18nTitle,
-        toolbarIcon: PrefUITabs.tabCandidates.icon
-      ) { VwrPrefPaneExperience() },
-      SSPreferences.Pane(
-        identifier: PrefUITabs.tabBehavior.ssPaneIdentifier,
-        title: PrefUITabs.tabBehavior.i18nTitle,
-        toolbarIcon: PrefUITabs.tabBehavior.icon
-      ) { VwrPrefPaneExperience() },
-      SSPreferences.Pane(
-        identifier: PrefUITabs.tabOutput.ssPaneIdentifier,
-        title: PrefUITabs.tabOutput.i18nTitle,
-        toolbarIcon: PrefUITabs.tabOutput.icon
-      ) { VwrPrefPaneExperience() },
-      SSPreferences.Pane(
-        identifier: PrefUITabs.tabDictionary.ssPaneIdentifier,
-        title: PrefUITabs.tabDictionary.i18nTitle,
-        toolbarIcon: PrefUITabs.tabDictionary.icon
-      ) { VwrPrefPaneDictionary() },
-      SSPreferences.Pane(
-        identifier: PrefUITabs.tabPhrases.ssPaneIdentifier,
-        title: PrefUITabs.tabPhrases.i18nTitle,
-        toolbarIcon: PrefUITabs.tabPhrases.icon
-      ) { VwrPrefPanePhrases() },
-      SSPreferences.Pane(
-        identifier: PrefUITabs.tabCassette.ssPaneIdentifier,
-        title: PrefUITabs.tabCassette.i18nTitle,
-        toolbarIcon: PrefUITabs.tabCassette.icon
-      ) { VwrPrefPaneCassette() },
-      SSPreferences.Pane(
-        identifier: PrefUITabs.tabKeyboard.ssPaneIdentifier,
-        title: PrefUITabs.tabKeyboard.i18nTitle,
-        toolbarIcon: PrefUITabs.tabKeyboard.icon
-      ) { VwrPrefPaneKeyboard() },
-      SSPreferences.Pane(
-        identifier: PrefUITabs.tabDevZone.ssPaneIdentifier,
-        title: PrefUITabs.tabDevZone.i18nTitle,
-        toolbarIcon: PrefUITabs.tabDevZone.icon
-      ) { VwrPrefPaneDevZone() },
-      SSPreferences.Pane(
-        identifier: PrefUITabs.tabExperience.ssPaneIdentifier,
-        title: PrefUITabs.tabExperience.i18nTitle,
-        toolbarIcon: PrefUITabs.tabExperience.icon
-      ) { VwrPrefPaneExperience() },
-    ],
+    panes: {
+      var result = [PreferencePaneConvertible]()
+      PrefUITabs.allCases.forEach { neta in
+        if [.tabDevZone, .tabExperience].contains(neta) { return }
+        let item: PreferencePaneConvertible = SSPreferences.Pane(
+          identifier: SSPreferences.PaneIdentifier(rawValue: neta.rawValue),
+          title: neta.i18nTitle, toolbarIcon: neta.icon,
+          contentView: { VwrPrefPage(tabType: neta) }
+        )
+        result.append(item)
+      }
+      return result
+    }(),
     style: .toolbarItems
   )
+
   static let shared = CtlPrefUI()
+  static let sentenceSeparator: String = {
+    switch PrefMgr.shared.appleLanguages[0] {
+    case "ja":
+      return ""
+    default:
+      if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
+        return ""
+      } else {
+        return " "
+      }
+    }
+  }()
+
+  static let contentMaxHeight: Double = 490
+  static let contentWidth: Double = {
+    switch PrefMgr.shared.appleLanguages[0] {
+    case "ja":
+      return 520
+    default:
+      if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
+        return 500
+      } else {
+        return 580
+      }
+    }
+  }()
+}
+
+@available(macOS 10.15, *)
+public extension View {
+  func prefDescriptionWidthLimited() -> some View {
+    frame(maxWidth: CtlPrefUI.contentWidth * 0.8, alignment: .leading)
+  }
 }
