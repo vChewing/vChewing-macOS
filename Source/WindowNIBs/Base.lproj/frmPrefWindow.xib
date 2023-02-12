@@ -9,6 +9,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="CtlPrefWindow">
             <connections>
                 <outlet property="basicKeyboardLayoutButton" destination="124" id="135"/>
+                <outlet property="btnBrowseFolderForUserPhrases" destination="MPN-np-SbT" id="uul-be-VYE"/>
                 <outlet property="btnPEAdd" destination="gTs-SB-5lC" id="BMg-w3-GuB"/>
                 <outlet property="btnPEConsolidate" destination="Xcg-bf-PrB" id="Sa5-hl-sWg"/>
                 <outlet property="btnPEOpenExternally" destination="xXK-s1-vSe" id="vKF-Im-fLU"/>
@@ -21,12 +22,14 @@
                 <outlet property="cmbPEDataTypeMenu" destination="Hdr-Qr-1qw" id="6Dv-pj-1EE"/>
                 <outlet property="cmbPEInputModeMenu" destination="y5f-AO-wKG" id="hW9-zZ-t8S"/>
                 <outlet property="lblCurrentlySpecifiedUserDataFolder" destination="REC-r4-T7m" id="eEq-XN-mMq"/>
+                <outlet property="lblUserPhraseFolderChangeDescription" destination="FUV-qx-xkC" id="2vI-Wk-s0S"/>
                 <outlet property="selectionKeyComboBox" destination="uHU-aL-du7" id="cEx-Ui-Phc"/>
                 <outlet property="tfdPETextEditor" destination="kSG-dz-P2N" id="aiA-EA-Isg"/>
                 <outlet property="txtPECommentField" destination="cRd-HU-x7y" id="eJf-IX-goL"/>
                 <outlet property="txtPEField1" destination="eGd-pc-aEI" id="QQp-wQ-8sj"/>
                 <outlet property="txtPEField2" destination="4hL-rO-jca" id="g2Z-iV-KoH"/>
                 <outlet property="txtPEField3" destination="MtM-ya-r2H" id="NdN-Ty-TW9"/>
+                <outlet property="txtUserPhrasesFolderPath" destination="s7t-Kk-EPu" id="8cQ-dB-VGz"/>
                 <outlet property="uiLanguageButton" destination="oS6-u5-7dP" id="V3u-XK-z7G"/>
                 <outlet property="vwrCassette" destination="ZEr-3U-K9a" id="GrP-4e-JbJ"/>
                 <outlet property="vwrDictionary" destination="Rnp-LM-RIF" id="8gY-ah-RT8"/>
@@ -1768,7 +1771,7 @@
                             <rect key="frame" x="0.0" y="80" width="538" height="360"/>
                             <clipView key="contentView" drawsBackground="NO" id="x8s-wo-bxi">
                                 <rect key="frame" x="0.0" y="0.0" width="538" height="360"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <textView wantsLayer="YES" importsGraphics="NO" richText="NO" verticallyResizable="YES" allowsUndo="YES" smartInsertDelete="YES" id="kSG-dz-P2N">
                                         <rect key="frame" x="0.0" y="0.0" width="538" height="360"/>
