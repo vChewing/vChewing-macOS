@@ -14,16 +14,6 @@ import Shared
 
 private let kWindowTitleHeight: Double = 78
 
-private extension NSToolbarItem.Identifier {
-  static let ofGeneral = NSToolbarItem.Identifier(rawValue: "tabGeneral")
-  static let ofExperience = NSToolbarItem.Identifier(rawValue: "tabExperience")
-  static let ofDictionary = NSToolbarItem.Identifier(rawValue: "tabDictionary")
-  static let ofPhrases = NSToolbarItem.Identifier(rawValue: "tabPhrases")
-  static let ofCassette = NSToolbarItem.Identifier(rawValue: "tabCassette")
-  static let ofKeyboard = NSToolbarItem.Identifier(rawValue: "tabKeyboard")
-  static let ofDevZone = NSToolbarItem.Identifier(rawValue: "tabDevZone")
-}
-
 // Note: The "InputMethodServerPreferencesWindowControllerClass" in Info.plist
 // only works with macOS System Preference pane (like macOS built-in input methods).
 // It should be set as "Preferences" which correspondes to the "Preference" pref pane
@@ -104,7 +94,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
     toolbar.autosavesConfiguration = false
     toolbar.sizeMode = .default
     toolbar.delegate = self
-    toolbar.selectedItemIdentifier = .ofGeneral
+    toolbar.selectedItemIdentifier = PrefUITabs.tabGeneral.toolbarIdentifier
     toolbar.showsBaselineSeparator = true
     window?.titlebarAppearsTransparent = false
     if #available(macOS 11.0, *) {
@@ -430,7 +420,16 @@ extension CtlPrefWindow: NSToolbarDelegate {
   }
 
   var toolbarIdentifiers: [NSToolbarItem.Identifier] {
-    [.ofGeneral, .ofExperience, .ofDictionary, .ofPhrases, .ofCassette, .ofKeyboard]
+    var result = [NSToolbarItem.Identifier]()
+    PrefUITabs.allCases.forEach { neta in
+      if [.tabCandidates, .tabBehavior, .tabOutput, .tabDevZone].contains(neta) { return }
+      if neta == .tabExperience, result.count >= 1 {
+        result.insert(neta.toolbarIdentifier, at: 1)
+        return
+      }
+      result.append(neta.toolbarIdentifier)
+    }
+    return result
   }
 
   func toolbarDefaultItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
@@ -447,89 +446,64 @@ extension CtlPrefWindow: NSToolbarDelegate {
 
   @objc func showGeneralView(_: Any?) {
     use(view: vwrGeneral)
-    window?.toolbar?.selectedItemIdentifier = .ofGeneral
+    window?.toolbar?.selectedItemIdentifier = PrefUITabs.tabGeneral.toolbarIdentifier
   }
 
   @objc func showExperienceView(_: Any?) {
     use(view: vwrExperience)
-    window?.toolbar?.selectedItemIdentifier = .ofExperience
+    window?.toolbar?.selectedItemIdentifier = PrefUITabs.tabExperience.toolbarIdentifier
   }
 
   @objc func showDictionaryView(_: Any?) {
     use(view: vwrDictionary)
-    window?.toolbar?.selectedItemIdentifier = .ofDictionary
+    window?.toolbar?.selectedItemIdentifier = PrefUITabs.tabDictionary.toolbarIdentifier
   }
 
   @objc func showPhrasesView(_: Any?) {
     use(view: vwrPhrases)
-    window?.toolbar?.selectedItemIdentifier = .ofPhrases
+    window?.toolbar?.selectedItemIdentifier = PrefUITabs.tabPhrases.toolbarIdentifier
   }
 
   @objc func showCassetteView(_: Any?) {
     use(view: vwrCassette)
-    window?.toolbar?.selectedItemIdentifier = .ofCassette
+    window?.toolbar?.selectedItemIdentifier = PrefUITabs.tabCassette.toolbarIdentifier
   }
 
   @objc func showKeyboardView(_: Any?) {
     use(view: vwrKeyboard)
-    window?.toolbar?.selectedItemIdentifier = .ofKeyboard
-  }
-
-  @objc func showDevZoneView(_: Any?) {
-    use(view: vwrDevZone)
-    window?.toolbar?.selectedItemIdentifier = .ofDevZone
+    window?.toolbar?.selectedItemIdentifier = PrefUITabs.tabKeyboard.toolbarIdentifier
   }
 
   func toolbar(
     _: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier,
     willBeInsertedIntoToolbar _: Bool
   ) -> NSToolbarItem? {
+    guard let tab = PrefUITabs(rawValue: itemIdentifier.rawValue) else { return nil }
     let item = NSToolbarItem(itemIdentifier: itemIdentifier)
     item.target = self
-    switch itemIdentifier {
-    case .ofGeneral:
-      let title = NSLocalizedString("General", comment: "")
-      item.label = title
-      item.image = .tabImageGeneral
+    item.image = tab.icon
+    item.label = tab.i18nTitle
+    switch tab {
+    case .tabGeneral:
       item.action = #selector(showGeneralView(_:))
-
-    case .ofExperience:
-      let title = NSLocalizedString("Experience", comment: "")
-      item.label = title
-      item.image = .tabImageExperience
-      item.action = #selector(showExperienceView(_:))
-
-    case .ofDictionary:
-      let title = NSLocalizedString("Dictionary", comment: "")
-      item.label = title
-      item.image = .tabImageDictionary
-      item.action = #selector(showDictionaryView(_:))
-
-    case .ofPhrases:
-      item.label = CtlPrefWindow.locPhrasesTabTitle
-      item.image = .tabImagePhrases
-      item.action = #selector(showPhrasesView(_:))
-
-    case .ofCassette:
-      let title = NSLocalizedString("Cassette", comment: "")
-      item.label = title
-      item.image = .tabImageCassette
-      item.action = #selector(showCassetteView(_:))
-
-    case .ofKeyboard:
-      let title = NSLocalizedString("Keyboard", comment: "")
-      item.label = title
-      item.image = .tabImageKeyboard
-      item.action = #selector(showKeyboardView(_:))
-
-    case .ofDevZone:
-      let title = NSLocalizedString("DevZone", comment: "")
-      item.label = title
-      item.image = .tabImageDevZone
-      item.action = #selector(showDevZoneView(_:))
-
-    default:
+    case .tabCandidates:
       return nil
+    case .tabBehavior:
+      return nil
+    case .tabOutput:
+      return nil
+    case .tabDictionary:
+      item.action = #selector(showDictionaryView(_:))
+    case .tabPhrases:
+      item.action = #selector(showPhrasesView(_:))
+    case .tabCassette:
+      item.action = #selector(showCassetteView(_:))
+    case .tabKeyboard:
+      item.action = #selector(showKeyboardView(_:))
+    case .tabDevZone:
+      return nil
+    case .tabExperience:
+      item.action = #selector(showExperienceView(_:))
     }
     return item
   }
