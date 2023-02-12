@@ -59,6 +59,7 @@
 		5BA9FD1327FEDB6B002DE248 /* VwrPrefPaneDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0E27FEDB6B002DE248 /* VwrPrefPaneDictionary.swift */; };
 		5BAD0CD527D701F6003D127F /* vChewingKeyLayout.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */; };
 		5BAEFAD028012565001F42C9 /* LMMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BAEFACF28012565001F42C9 /* LMMgr.swift */; };
+		5BB1D7F42999027200EA8D2C /* PrefUITabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB1D7F32999027200EA8D2C /* PrefUITabs.swift */; };
 		5BB802DA27FABA8300CF1C19 /* SessionCtl_Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB802D927FABA8300CF1C19 /* SessionCtl_Menu.swift */; };
 		5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75D27AED54C0023B93A /* Beep.m4a */; };
 		5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75E27AED54C0023B93A /* Fart.m4a */; };
@@ -251,6 +252,7 @@
 		5BA9FD0D27FEDB6B002DE248 /* VwrPrefPaneExperience.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = VwrPrefPaneExperience.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BA9FD0E27FEDB6B002DE248 /* VwrPrefPaneDictionary.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = VwrPrefPaneDictionary.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BAEFACF28012565001F42C9 /* LMMgr.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = LMMgr.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		5BB1D7F32999027200EA8D2C /* PrefUITabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefUITabs.swift; sourceTree = "<group>"; };
 		5BB802D927FABA8300CF1C19 /* SessionCtl_Menu.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = SessionCtl_Menu.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BBBB75D27AED54C0023B93A /* Beep.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.m4a; sourceTree = "<group>"; };
 		5BBBB75E27AED54C0023B93A /* Fart.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.m4a; sourceTree = "<group>"; };
@@ -465,6 +467,7 @@
 			children = (
 				5B62A33E27AE7CD900A19448 /* CandidateUI */,
 				5BA9FD0927FED9F3002DE248 /* PrefUI */,
+				5BB1D7F32999027200EA8D2C /* PrefUITabs.swift */,
 			);
 			path = UIModules;
 			sourceTree = "<group>";
@@ -1102,6 +1105,7 @@
 				5B30BF282944867800BD87A9 /* CtlRevLookupWindow.swift in Sources */,
 				5BD0113D2818543900609769 /* InputHandler_Core.swift in Sources */,
 				5BF56F9A28C39D1800DD6839 /* IMEStateData.swift in Sources */,
+				5BB1D7F42999027200EA8D2C /* PrefUITabs.swift in Sources */,
 				5B21176C287539BB000443A9 /* SessionCtl_HandleStates.swift in Sources */,
 				5BE1F8A928F86AB5006C7FF5 /* InputHandler_HandleEvent.swift in Sources */,
 				5B69938C293B811F0057CB8E /* VwrPrefPanePhrases.swift in Sources */,
