@@ -12,28 +12,18 @@ import SwiftExtension
 import SwiftUI
 
 @available(macOS 10.15, *)
-struct VwrPrefPaneExperience: View {
-  @State private var selCursorPosition =
-    UserDefaults.standard.bool(
-      forKey: UserDef.kUseRearCursorMode.rawValue) ? 1 : 0
-  @State private var selPushCursorAfterSelection = UserDefaults.standard.bool(
-    forKey: UserDef.kMoveCursorAfterSelectingCandidate.rawValue)
+struct VwrPrefPaneBehavior: View {
+  @State private var selChooseCandidateUsingSpace = UserDefaults.standard.bool(
+    forKey: UserDef.kChooseCandidateUsingSpace.rawValue)
   @State private var selKeyBehaviorShiftTab =
     UserDefaults.standard.bool(forKey: UserDef.kSpecifyShiftTabKeyBehavior.rawValue) ? 1 : 0
   @State private var selKeyBehaviorShiftSpace =
     UserDefaults.standard.bool(
       forKey: UserDef.kSpecifyShiftSpaceKeyBehavior.rawValue) ? 1 : 0
-  @State private var selKeyBehaviorSpaceForCallingCandidate = UserDefaults.standard.bool(
-    forKey: UserDef.kChooseCandidateUsingSpace.rawValue)
   @State private var selKeyBehaviorESCForClearingTheBuffer = UserDefaults.standard.bool(
     forKey: UserDef.kEscToCleanInputBuffer.rawValue)
-  @State private var selEnableSCPCTypingMode = UserDefaults.standard.bool(forKey: UserDef.kUseSCPCTypingMode.rawValue)
-  @State private var selAutoCorrectReadingCombination = UserDefaults.standard.bool(
-    forKey: UserDef.kAutoCorrectReadingCombination.rawValue)
   @State private var selAlsoConfirmAssociatedCandidatesByEnter = UserDefaults.standard.bool(
     forKey: UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue)
-  @State private var selKeepReadingUponCompositionError = UserDefaults.standard.bool(
-    forKey: UserDef.kKeepReadingUponCompositionError.rawValue)
   @State private var selTogglingAlphanumericalModeWithLShift = UserDefaults.standard.bool(
     forKey: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue)
   @State private var selTogglingAlphanumericalModeWithRShift = UserDefaults.standard.bool(
@@ -44,28 +34,12 @@ struct VwrPrefPaneExperience: View {
     forKey: UserDef.kSpecifyIntonationKeyBehavior.rawValue)
   @State private var selSpecifyShiftBackSpaceKeyBehavior = UserDefaults.standard.integer(
     forKey: UserDef.kSpecifyShiftBackSpaceKeyBehavior.rawValue)
-  @State private var selTrimUnfinishedReadingsOnCommit = UserDefaults.standard.bool(
-    forKey: UserDef.kTrimUnfinishedReadingsOnCommit.rawValue)
   @State private var selAlwaysShowTooltipTextsHorizontally = UserDefaults.standard.bool(
     forKey: UserDef.kAlwaysShowTooltipTextsHorizontally.rawValue)
   @State private var selShowNotificationsWhenTogglingCapsLock = UserDefaults.standard.bool(
     forKey: UserDef.kShowNotificationsWhenTogglingCapsLock.rawValue)
   @State private var selShareAlphanumericalModeStatusAcrossClients = UserDefaults.standard.bool(
     forKey: UserDef.kShareAlphanumericalModeStatusAcrossClients.rawValue)
-
-  private let contentMaxHeight: Double = 490
-  private let contentWidth: Double = {
-    switch PrefMgr.shared.appleLanguages[0] {
-    case "ja":
-      return 520
-    default:
-      if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
-        return 480
-      } else {
-        return 580
-      }
-    }
-  }()
 
   var macOSMontereyOrLaterDetected: Bool {
     if #available(macOS 12, *) {
@@ -76,45 +50,50 @@ struct VwrPrefPaneExperience: View {
 
   var body: some View {
     ScrollView {
-      VStack {
-        _VSpacer(minHeight: 24)
-        Text(
-          "\u{2022} "
-            + NSLocalizedString(
-              "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu.",
-              comment: ""
-            ) + "\n\u{2022} "
-            + NSLocalizedString(
-              "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead.",
-              comment: ""
-            )
-        )
-        .preferenceDescription()
-        .fixedSize(horizontal: false, vertical: true)
-      }.frame(maxWidth: contentWidth)
-      SSPreferences.Container(contentWidth: contentWidth) {
-        SSPreferences.Section(label: { Text(LocalizedStringKey("Cursor Selection:")) }) {
-          Picker(
-            "",
-            selection: $selCursorPosition.onChange {
-              PrefMgr.shared.useRearCursorMode = (selCursorPosition == 1) ? true : false
-            }
-          ) {
-            Text(LocalizedStringKey("in front of the phrase (like macOS built-in Zhuyin IME)")).tag(0)
-            Text(LocalizedStringKey("at the rear of the phrase (like Microsoft New Phonetic)")).tag(1)
-          }
-          .labelsHidden()
-          .pickerStyle(RadioGroupPickerStyle())
-          Text(LocalizedStringKey("Choose the cursor position where you want to list possible candidates."))
-            .preferenceDescription()
+      SSPreferences.Container(contentWidth: CtlPrefUI.contentWidth) {
+        SSPreferences.Section(title: "Space:".localized, bottomDivider: true) {
           Toggle(
-            LocalizedStringKey("Push the cursor in front of the phrase after selection"),
-            isOn: $selPushCursorAfterSelection.onChange {
-              PrefMgr.shared.moveCursorAfterSelectingCandidate = selPushCursorAfterSelection
+            LocalizedStringKey("Enable Space key for calling candidate window"),
+            isOn: $selChooseCandidateUsingSpace.onChange {
+              PrefMgr.shared.chooseCandidateUsingSpace = selChooseCandidateUsingSpace
             }
-          ).controlSize(.small)
+          )
+          Text(
+            LocalizedStringKey(
+              "If disabled, this will insert space instead."
+            )
+          )
+          .preferenceDescription().prefDescriptionWidthLimited()
         }
-        SSPreferences.Section(label: { Text(LocalizedStringKey("Shift+BackSpace:")) }) {
+        SSPreferences.Section(title: "ESC:".localized, bottomDivider: true) {
+          Toggle(
+            LocalizedStringKey("Use ESC key to clear the entire input buffer"),
+            isOn: $selKeyBehaviorESCForClearingTheBuffer.onChange {
+              PrefMgr.shared.escToCleanInputBuffer = selKeyBehaviorESCForClearingTheBuffer
+            }
+          )
+          Text(
+            LocalizedStringKey(
+              "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strkes."
+            )
+          )
+          .preferenceDescription().prefDescriptionWidthLimited()
+        }
+        SSPreferences.Section(title: "Enter:".localized, bottomDivider: true) {
+          Toggle(
+            LocalizedStringKey("Allow using Enter key to confirm associated candidate selection"),
+            isOn: $selAlsoConfirmAssociatedCandidatesByEnter.onChange {
+              PrefMgr.shared.alsoConfirmAssociatedCandidatesByEnter = selAlsoConfirmAssociatedCandidatesByEnter
+            }
+          )
+          Text(
+            LocalizedStringKey(
+              "Otherwise, only the candidate keys are allowed to confirm associates."
+            )
+          )
+          .preferenceDescription().prefDescriptionWidthLimited()
+        }
+        SSPreferences.Section(title: "Shift+BackSpace:".localized, bottomDivider: true) {
           Picker(
             "",
             selection: $selSpecifyShiftBackSpaceKeyBehavior.onChange {
@@ -128,9 +107,9 @@ struct VwrPrefPaneExperience: View {
           .labelsHidden()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Disassembling process does not work with non-phonetic reading keys."))
-            .preferenceDescription()
+            .preferenceDescription().prefDescriptionWidthLimited()
         }
-        SSPreferences.Section(title: "(Shift+)Tab:") {
+        SSPreferences.Section(title: "(Shift+)Tab:", bottomDivider: true) {
           Picker(
             "",
             selection: $selKeyBehaviorShiftTab.onChange {
@@ -144,9 +123,9 @@ struct VwrPrefPaneExperience: View {
           .horizontalRadioGroupLayout()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Choose the behavior of (Shift+)Tab key in the candidate window."))
-            .preferenceDescription()
+            .preferenceDescription().prefDescriptionWidthLimited()
         }
-        SSPreferences.Section(label: { Text(LocalizedStringKey("(Shift+)Space:")) }) {
+        SSPreferences.Section(title: "(Shift+)Space:".localized, bottomDivider: true) {
           Picker(
             "",
             selection: $selKeyBehaviorShiftSpace.onChange {
@@ -159,9 +138,9 @@ struct VwrPrefPaneExperience: View {
           .labelsHidden()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Choose the behavior of (Shift+)Space key with candidates."))
-            .preferenceDescription()
+            .preferenceDescription().prefDescriptionWidthLimited()
         }
-        SSPreferences.Section(label: { Text(LocalizedStringKey("Shift+Letter:")) }) {
+        SSPreferences.Section(title: "Shift+Letter:".localized, bottomDivider: true) {
           Picker(
             "",
             selection: $selUpperCaseLetterKeyBehavior.onChange {
@@ -175,9 +154,9 @@ struct VwrPrefPaneExperience: View {
           .labelsHidden()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Choose the behavior of Shift+Letter key with letter inputs."))
-            .preferenceDescription()
+            .preferenceDescription().prefDescriptionWidthLimited()
         }
-        SSPreferences.Section(label: { Text(LocalizedStringKey("Intonation Key:")) }) {
+        SSPreferences.Section(title: "Intonation Key:".localized, bottomDivider: true) {
           Picker(
             "",
             selection: $selSpecifyIntonationKeyBehavior.onChange {
@@ -191,9 +170,9 @@ struct VwrPrefPaneExperience: View {
           .labelsHidden()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Specify the behavior of intonation key when syllable composer is empty."))
-            .preferenceDescription()
+            .preferenceDescription().prefDescriptionWidthLimited()
         }
-        SSPreferences.Section(title: "Shift:") {
+        SSPreferences.Section(title: "Shift:", bottomDivider: true) {
           Toggle(
             LocalizedStringKey("Toggle alphanumerical mode with Left-Shift"),
             isOn: $selTogglingAlphanumericalModeWithLShift.onChange {
@@ -214,60 +193,23 @@ struct VwrPrefPaneExperience: View {
           ).disabled(
             !PrefMgr.shared.togglingAlphanumericalModeWithRShift && !PrefMgr.shared.togglingAlphanumericalModeWithLShift
           )
+          Text(
+            "This feature requires macOS 10.15 and above.".localized + CtlPrefUI.sentenceSeparator
+              + "It only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable.".localized
+          ).preferenceDescription().prefDescriptionWidthLimited()
         }
-        SSPreferences.Section(title: "Caps Lock:") {
+        SSPreferences.Section(title: "Caps Lock:", bottomDivider: true) {
           Toggle(
             LocalizedStringKey("Show notifications when toggling Caps Lock"),
             isOn: $selShowNotificationsWhenTogglingCapsLock.onChange {
               PrefMgr.shared.showNotificationsWhenTogglingCapsLock = selShowNotificationsWhenTogglingCapsLock
             }
           ).disabled(!macOSMontereyOrLaterDetected)
+          Text(
+            "This feature requires macOS 10.15 and above.".localized
+          ).preferenceDescription().prefDescriptionWidthLimited()
         }
-        SSPreferences.Section(label: { Text(LocalizedStringKey("Misc Settings:")) }) {
-          Toggle(
-            LocalizedStringKey("Enable Space key for calling candidate window"),
-            isOn: $selKeyBehaviorSpaceForCallingCandidate.onChange {
-              PrefMgr.shared.chooseCandidateUsingSpace = selKeyBehaviorSpaceForCallingCandidate
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Use ESC key to clear the entire input buffer"),
-            isOn: $selKeyBehaviorESCForClearingTheBuffer.onChange {
-              PrefMgr.shared.escToCleanInputBuffer = selKeyBehaviorESCForClearingTheBuffer
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Automatically correct reading combinations when typing"),
-            isOn: $selAutoCorrectReadingCombination.onChange {
-              PrefMgr.shared.autoCorrectReadingCombination = selAutoCorrectReadingCombination
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Allow using Enter key to confirm associated candidate selection"),
-            isOn: $selAlsoConfirmAssociatedCandidatesByEnter.onChange {
-              PrefMgr.shared.alsoConfirmAssociatedCandidatesByEnter = selAlsoConfirmAssociatedCandidatesByEnter
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Allow backspace-editing miscomposed readings"),
-            isOn: $selKeepReadingUponCompositionError.onChange {
-              PrefMgr.shared.keepReadingUponCompositionError = selKeepReadingUponCompositionError
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Trim unfinished readings / strokes on commit"),
-            isOn: $selTrimUnfinishedReadingsOnCommit.onChange {
-              PrefMgr.shared.trimUnfinishedReadingsOnCommit = selTrimUnfinishedReadingsOnCommit
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Emulating select-candidate-per-character mode"),
-            isOn: $selEnableSCPCTypingMode.onChange {
-              PrefMgr.shared.useSCPCTypingMode = selEnableSCPCTypingMode
-            }
-          )
-          Text(LocalizedStringKey("An accommodation for elder computer users."))
-            .preferenceDescription()
+        SSPreferences.Section(title: "Misc Settings:".localized) {
           Toggle(
             LocalizedStringKey("Always show tooltip texts horizontally"),
             isOn: $selAlwaysShowTooltipTextsHorizontally.onChange {
@@ -278,17 +220,17 @@ struct VwrPrefPaneExperience: View {
             LocalizedStringKey(
               "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English."
             )
-          ).preferenceDescription()
+          ).preferenceDescription().prefDescriptionWidthLimited()
         }
       }
     }
-    .frame(maxHeight: contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .frame(maxHeight: CtlPrefUI.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
   }
 }
 
 @available(macOS 11.0, *)
-struct VwrPrefPaneExperience_Previews: PreviewProvider {
+struct VwrPrefPaneBehavior_Previews: PreviewProvider {
   static var previews: some View {
-    VwrPrefPaneExperience()
+    VwrPrefPaneBehavior()
   }
 }

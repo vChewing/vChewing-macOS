@@ -13,28 +13,6 @@ import SwiftUI
 
 @available(macOS 10.15, *)
 struct VwrPrefPaneDevZone: View {
-  @State private var selUseIMKCandidateWindow: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kUseIMKCandidateWindow.rawValue)
-  @State private var selHandleDefaultCandidateFontsByLangIdentifier: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue)
-  @State private var selPhraseReplacementEnabled: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kPhraseReplacementEnabled.rawValue
-  )
-
-  private let contentMaxHeight: Double = 490
-  private let contentWidth: Double = {
-    switch PrefMgr.shared.appleLanguages[0] {
-    case "ja":
-      return 520
-    default:
-      if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
-        return 480
-      } else {
-        return 580
-      }
-    }
-  }()
-
   var isMontereyOrAbove: Bool = {
     if #available(macOS 12.0, *) {
       return true
@@ -44,7 +22,7 @@ struct VwrPrefPaneDevZone: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Container(contentWidth: contentWidth) {
+      SSPreferences.Container(contentWidth: CtlPrefUI.contentWidth) {
         SSPreferences.Section(title: "", bottomDivider: true) {
           Text(
             LocalizedStringKey(
@@ -52,52 +30,13 @@ struct VwrPrefPaneDevZone: View {
           )
           .fixedSize(horizontal: false, vertical: true)
           Divider()
-          Toggle(
-            LocalizedStringKey("Use IMK Candidate Window instead of Tadokoro (will reboot the IME)"),
-            isOn: $selUseIMKCandidateWindow.onChange {
-              PrefMgr.shared.useIMKCandidateWindow = selUseIMKCandidateWindow
-              NSLog("vChewing App self-terminated due to enabling / disabling IMK candidate window.")
-              NSApp.terminate(nil)
-            }
-          )
-          Text(
-            LocalizedStringKey(
-              "IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases."
-            )
-          )
-          .preferenceDescription().fixedSize(horizontal: false, vertical: true)
-          Toggle(
-            LocalizedStringKey("Use .langIdentifier to handle UI fonts in candidate window"),
-            isOn: $selHandleDefaultCandidateFontsByLangIdentifier.onChange {
-              PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier =
-                selHandleDefaultCandidateFontsByLangIdentifier
-            }
-          )
-          .disabled(!isMontereyOrAbove)
-          Text(
-            LocalizedStringKey(
-              "This only works with Tadokoro candidate window."
-            )
-          )
-          .preferenceDescription().fixedSize(horizontal: false, vertical: true)
           HStack {
-            Toggle(
-              LocalizedStringKey("Enable phrase replacement table"),
-              isOn: $selPhraseReplacementEnabled.onChange {
-                PrefMgr.shared.phraseReplacementEnabled = selPhraseReplacementEnabled
-              }
-            )
+            Text("Nothing for now.")
           }
-          Text(
-            LocalizedStringKey(
-              "This will batch-replace specified candidates."
-            )
-          )
-          .preferenceDescription().fixedSize(horizontal: false, vertical: true)
         }
       }
     }
-    .frame(maxHeight: contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .frame(maxHeight: CtlPrefUI.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
   }
 }
 

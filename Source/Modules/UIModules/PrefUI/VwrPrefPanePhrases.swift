@@ -14,20 +14,6 @@ import SwiftUI
 
 @available(macOS 10.15, *)
 struct VwrPrefPanePhrases: View {
-  private let contentMaxHeight: Double = 490
-  private let contentWidth: Double = {
-    switch PrefMgr.shared.appleLanguages[0] {
-    case "ja":
-      return 520
-    default:
-      if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
-        return 480
-      } else {
-        return 580
-      }
-    }
-  }()
-
   var isMontereyOrAbove: Bool = {
     if #available(macOS 12.0, *) {
       return true
@@ -39,12 +25,12 @@ struct VwrPrefPanePhrases: View {
     ScrollView {
       VStack {
         VwrPhraseEditorUI(delegate: LMMgr.shared, window: CtlPrefUI.shared.controller.window)
-          .frame(width: contentWidth + 28, height: 445)
+          .frame(width: CtlPrefUI.contentWidth + 28, height: 445)
         Spacer()
       }
       .padding()
     }
-    .frame(maxHeight: contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .frame(maxHeight: CtlPrefUI.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
   }
 }
 
