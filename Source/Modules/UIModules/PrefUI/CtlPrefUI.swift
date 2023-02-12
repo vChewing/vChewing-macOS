@@ -10,81 +10,9 @@ import SSPreferences
 import SwiftExtension
 import SwiftUI
 
-extension NSImage {
-  static var tabImageGeneral: NSImage! {
-    if #unavailable(macOS 11.0) {
-      return NSImage(named: "PrefToolbar-General")
-    } else {
-      return NSImage(
-        systemSymbolName: "wrench.and.screwdriver.fill", accessibilityDescription: "General Preferences"
-      )
-    }
-  }
-
-  static var tabImageExperience: NSImage! {
-    if #unavailable(macOS 11.0) {
-      return NSImage(named: "PrefToolbar-Experience")
-    } else {
-      return NSImage(
-        systemSymbolName: "person.fill.questionmark", accessibilityDescription: "Experience Preferences"
-      )
-    }
-  }
-
-  static var tabImageDictionary: NSImage! {
-    if #unavailable(macOS 11.0) {
-      return NSImage(named: "PrefToolbar-Dictionary")
-    } else {
-      return NSImage(
-        systemSymbolName: "character.book.closed.fill", accessibilityDescription: "Dictionary Preferences"
-      )
-    }
-  }
-
-  static var tabImagePhrases: NSImage! {
-    if #unavailable(macOS 11.0) {
-      return NSImage(named: "PrefToolbar-Phrases")
-    } else {
-      return NSImage(
-        systemSymbolName: "tablecells.badge.ellipsis", accessibilityDescription: "Phrases Preferences"
-      )
-    }
-  }
-
-  static var tabImageCassette: NSImage! {
-    if #unavailable(macOS 11.0) {
-      return NSImage(named: "PrefToolbar-Cassette")
-    } else {
-      return NSImage(
-        systemSymbolName: "externaldrive.fill.badge.plus", accessibilityDescription: "Cassette Preferences"
-      )
-    }
-  }
-
-  static var tabImageKeyboard: NSImage! {
-    if #unavailable(macOS 11.0) {
-      return NSImage(named: "PrefToolbar-Keyboard")
-    } else {
-      return NSImage(
-        systemSymbolName: "keyboard.macwindow", accessibilityDescription: "Keyboard Preferences"
-      )
-    }
-  }
-
-  static var tabImageDevZone: NSImage! {
-    if #available(macOS 12.0, *) {
-      return NSImage(
-        systemSymbolName: "hand.raised.circle", accessibilityDescription: "DevZone Preferences"
-      )
-    }
-    if #unavailable(macOS 11.0) {
-      return NSImage(named: "PrefToolbar-DevZone")
-    } else {
-      return NSImage(
-        systemSymbolName: "pc", accessibilityDescription: "DevZone Preferences"
-      )
-    }
-  }
+@available(macOS 10.15, *)
+extension PrefUITabs {
+  var ssPaneIdentifier: SSPreferences.PaneIdentifier { .init(rawValue: rawValue) }
 }
 
 @available(macOS 10.15, *)
@@ -92,75 +20,57 @@ class CtlPrefUI {
   var controller = PreferencesWindowController(
     panes: [
       SSPreferences.Pane(
-        identifier: SSPreferences.PaneIdentifier(rawValue: "General"),
-        title: NSLocalizedString("General", comment: ""),
-        toolbarIcon: .tabImageGeneral
-      ) {
-        VwrPrefPaneGeneral()
-      },
+        identifier: PrefUITabs.tabGeneral.ssPaneIdentifier,
+        title: PrefUITabs.tabGeneral.i18nTitle,
+        toolbarIcon: PrefUITabs.tabGeneral.icon
+      ) { VwrPrefPaneGeneral() },
       SSPreferences.Pane(
-        identifier: SSPreferences.PaneIdentifier(rawValue: "Experience"),
-        title: NSLocalizedString("Experience", comment: ""),
-        toolbarIcon: .tabImageExperience
-      ) {
-        VwrPrefPaneExperience()
-      },
+        identifier: PrefUITabs.tabCandidates.ssPaneIdentifier,
+        title: PrefUITabs.tabCandidates.i18nTitle,
+        toolbarIcon: PrefUITabs.tabCandidates.icon
+      ) { VwrPrefPaneExperience() },
       SSPreferences.Pane(
-        identifier: SSPreferences.PaneIdentifier(rawValue: "Dictionary"),
-        title: NSLocalizedString("Dictionary", comment: ""),
-        toolbarIcon: .tabImageDictionary
-      ) {
-        VwrPrefPaneDictionary()
-      },
+        identifier: PrefUITabs.tabBehavior.ssPaneIdentifier,
+        title: PrefUITabs.tabBehavior.i18nTitle,
+        toolbarIcon: PrefUITabs.tabBehavior.icon
+      ) { VwrPrefPaneExperience() },
       SSPreferences.Pane(
-        identifier: SSPreferences.PaneIdentifier(rawValue: "Phrases"),
-        title: CtlPrefWindow.locPhrasesTabTitle,
-        toolbarIcon: .tabImagePhrases
-      ) {
-        VwrPrefPanePhrases()
-      },
+        identifier: PrefUITabs.tabOutput.ssPaneIdentifier,
+        title: PrefUITabs.tabOutput.i18nTitle,
+        toolbarIcon: PrefUITabs.tabOutput.icon
+      ) { VwrPrefPaneExperience() },
       SSPreferences.Pane(
-        identifier: SSPreferences.PaneIdentifier(rawValue: "Cassette"),
-        title: NSLocalizedString("Cassette", comment: ""),
-        toolbarIcon: .tabImageCassette
-      ) {
-        VwrPrefPaneCassette()
-      },
+        identifier: PrefUITabs.tabDictionary.ssPaneIdentifier,
+        title: PrefUITabs.tabDictionary.i18nTitle,
+        toolbarIcon: PrefUITabs.tabDictionary.icon
+      ) { VwrPrefPaneDictionary() },
       SSPreferences.Pane(
-        identifier: SSPreferences.PaneIdentifier(rawValue: "Keyboard"),
-        title: NSLocalizedString("Keyboard", comment: ""),
-        toolbarIcon: .tabImageKeyboard
-      ) {
-        VwrPrefPaneKeyboard()
-      },
+        identifier: PrefUITabs.tabPhrases.ssPaneIdentifier,
+        title: PrefUITabs.tabPhrases.i18nTitle,
+        toolbarIcon: PrefUITabs.tabPhrases.icon
+      ) { VwrPrefPanePhrases() },
       SSPreferences.Pane(
-        identifier: SSPreferences.PaneIdentifier(rawValue: "DevZone"),
-        title: NSLocalizedString("DevZone", comment: ""),
-        toolbarIcon: .tabImageDevZone
-      ) {
-        VwrPrefPaneDevZone()
-      },
+        identifier: PrefUITabs.tabCassette.ssPaneIdentifier,
+        title: PrefUITabs.tabCassette.i18nTitle,
+        toolbarIcon: PrefUITabs.tabCassette.icon
+      ) { VwrPrefPaneCassette() },
+      SSPreferences.Pane(
+        identifier: PrefUITabs.tabKeyboard.ssPaneIdentifier,
+        title: PrefUITabs.tabKeyboard.i18nTitle,
+        toolbarIcon: PrefUITabs.tabKeyboard.icon
+      ) { VwrPrefPaneKeyboard() },
+      SSPreferences.Pane(
+        identifier: PrefUITabs.tabDevZone.ssPaneIdentifier,
+        title: PrefUITabs.tabDevZone.i18nTitle,
+        toolbarIcon: PrefUITabs.tabDevZone.icon
+      ) { VwrPrefPaneDevZone() },
+      SSPreferences.Pane(
+        identifier: PrefUITabs.tabExperience.ssPaneIdentifier,
+        title: PrefUITabs.tabExperience.i18nTitle,
+        toolbarIcon: PrefUITabs.tabExperience.icon
+      ) { VwrPrefPaneExperience() },
     ],
     style: .toolbarItems
   )
   static let shared = CtlPrefUI()
-}
-
-// MARK: - Localization-Related Contents.
-
-extension CtlPrefWindow {
-  /// 由於用於頁籤標題的某些用語放在 localizable 資源內管理的話容易混亂，所以這裡單獨處理。
-  static var locPhrasesTabTitle: String {
-    switch PrefMgr.shared.appleLanguages[0] {
-    case "ja":
-      return "辞書編集"
-    default:
-      if PrefMgr.shared.appleLanguages[0].contains("zh-Hans") {
-        return "语汇编辑"
-      } else if PrefMgr.shared.appleLanguages[0].contains("zh-Hant") {
-        return "語彙編輯"
-      }
-      return "Phrases"
-    }
-  }
 }
