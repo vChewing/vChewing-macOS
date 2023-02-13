@@ -202,6 +202,16 @@ public class InputHandler: InputHandlerProtocol {
     return arrResult
   }
 
+  /// 用來計算離當前游標最近的一個節點邊界的距離的函式。
+  /// - Parameter direction: 文字輸入方向意義上的方向。
+  /// - Returns: 邊界距離。
+  func getStepsToNearbyNodeBorder(direction: Megrez.Compositor.TypingDirection) -> Int {
+    let currentCursor = compositor.cursor
+    var testCompositor = compositor
+    testCompositor.jumpCursorBySpan(to: direction)
+    return abs(testCompositor.cursor - currentCursor)
+  }
+
   /// 鞏固當前組字器游標上下文，防止在當前游標位置固化節點時給作業範圍以外的內容帶來不想要的變化。
   ///
   /// 打比方說輸入法原廠詞庫內有「章太炎」一詞，你敲「章太炎」，然後想把「太」改成「泰」以使其變成「章泰炎」。
