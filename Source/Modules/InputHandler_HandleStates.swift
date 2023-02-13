@@ -442,11 +442,7 @@ extension InputHandler {
       return true
     }
 
-    let isConfirm: Bool = prefs.cassetteEnabled ? input.isSpace : composer.hasIntonation(withNothingElse: true)
-
-    if isConfirm {
-      clearComposerAndCalligrapher()
-    } else if isComposerOrCalligrapherEmpty {
+    if isComposerOrCalligrapherEmpty {
       if compositor.cursor > 0 {
         compositor.dropKey(direction: .rear)
         walk()
