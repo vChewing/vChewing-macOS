@@ -438,24 +438,32 @@ extension InputHandler {
     default: break
     }
 
-    if input.isShiftHold, input.isOptionHold {
+    let steps = getStepsToNearbyNodeBorder(direction: .rear)
+    var actualSteps = 1
+
+    switch input.modifierFlags {
+    case .shift:
       delegate.switchState(IMEState.ofAbortion())
       return true
+    case .option:
+      actualSteps = steps
+    default: break
     }
 
     if isComposerOrCalligrapherEmpty {
-      if compositor.cursor > 0 {
-        compositor.dropKey(direction: .rear)
-        walk()
-      } else {
+      if compositor.cursor <= 0 || actualSteps <= 0 {
         delegate.callError("9D69908D")
         return true
       }
+      for _ in 0 ..< actualSteps {
+        compositor.dropKey(direction: .rear)
+      }
+      walk()
     } else {
       letComposerAndCalligrapherDoBackSpace()
     }
 
-    switch isComposerOrCalligrapherEmpty && compositor.isEmpty {
+    switch isConsideredEmptyForNow {
     case false: delegate.switchState(generateStateOfInputting())
     case true: delegate.switchState(IMEState.ofAbortion())
     }
@@ -477,18 +485,28 @@ extension InputHandler {
 
     guard state.type == .ofInputting else { return false }
 
-    if input.isShiftHold {
+    let steps = getStepsToNearbyNodeBorder(direction: .front)
+    var actualSteps = 1
+
+    // macOS 認為 PC Delete 鍵訊號是必然有 .function 這個修飾鍵在起作用的。
+    // 總之處理起來非常機車就是了。
+    switch input.modifierFlags {
+    case _ where input.isShiftHold && !input.isOptionHold && !input.isControlHold:
       delegate.switchState(IMEState.ofAbortion())
       return true
-    }
-
-    if compositor.cursor == compositor.length, isComposerOrCalligrapherEmpty {
-      delegate.callError("9B69938D")
-      return true
+    case _ where !input.isShiftHold && input.isOptionHold && !input.isControlHold:
+      actualSteps = steps
+    default: break
     }
 
     if isComposerOrCalligrapherEmpty {
-      compositor.dropKey(direction: .front)
+      if compositor.cursor >= compositor.length || actualSteps <= 0 {
+        delegate.callError("9B69938D")
+        return true
+      }
+      for _ in 0 ..< actualSteps {
+        compositor.dropKey(direction: .front)
+      }
       walk()
     } else {
       clearComposerAndCalligrapher()
