@@ -584,7 +584,11 @@ extension InputHandler {
       /// 此乃 macOS 內建注音輸入法預設之行為，但不太受 Windows 使用者群體之待見。
       delegate.switchState(IMEState.ofAbortion())
     } else {
-      if isComposerOrCalligrapherEmpty { return true }
+      if isComposerOrCalligrapherEmpty {
+        let commitText = generateStateOfInputting(sansReading: true).displayedText
+        delegate.switchState(IMEState.ofCommitting(textToCommit: commitText))
+        return true
+      }
       /// 如果注拼槽或組筆區不是空的話，則清空之。
       clearComposerAndCalligrapher()
       switch compositor.isEmpty {
