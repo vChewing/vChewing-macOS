@@ -73,7 +73,7 @@ public extension SessionCtl {
       inputHandler?.clear()
     case .ofInputting:
       candidateUI?.visible = false
-      commit(text: newState.textToCommit)
+      if !newState.textToCommit.isEmpty { commit(text: newState.textToCommit) }
       setInlineDisplayWithCursor()
       // 會在工具提示為空的時候自動消除顯示。
       showTooltip(newState.tooltip, duration: newState.tooltipDuration)
