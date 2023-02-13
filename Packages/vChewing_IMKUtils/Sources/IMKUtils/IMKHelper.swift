@@ -14,17 +14,25 @@ import InputMethodKit
 public enum IMKHelper {
   /// 威注音有專門統計過，實際上會有差異的英數鍵盤佈局只有這幾種。
   /// 精簡成這種清單的話，不但節省 SwiftUI 的繪製壓力，也方便使用者做選擇。
-  public static let arrWhitelistedKeyLayoutsASCII: [String] = [
-    "com.apple.keylayout.ABC",
-    "com.apple.keylayout.ABC-AZERTY",
-    "com.apple.keylayout.ABC-QWERTZ",
-    "com.apple.keylayout.British",
-    "com.apple.keylayout.Colemak",
-    "com.apple.keylayout.Dvorak",
-    "com.apple.keylayout.Dvorak-Left",
-    "com.apple.keylayout.DVORAK-QWERTYCMD",
-    "com.apple.keylayout.Dvorak-Right",
-  ]
+  public static let arrWhitelistedKeyLayoutsASCII: [String] = {
+    var result = [
+      "com.apple.keylayout.ABC",
+      "com.apple.keylayout.ABC-AZERTY",
+      "com.apple.keylayout.ABC-QWERTZ",
+      "com.apple.keylayout.British",
+      "com.apple.keylayout.Colemak",
+      "com.apple.keylayout.Dvorak",
+      "com.apple.keylayout.Dvorak-Left",
+      "com.apple.keylayout.DVORAK-QWERTYCMD",
+      "com.apple.keylayout.Dvorak-Right",
+    ]
+    if #unavailable(macOS 10.13) {
+      result.append("com.apple.keylayout.US")
+      result.append("com.apple.keylayout.German")
+      result.append("com.apple.keylayout.French")
+    }
+    return result
+  }()
 
   public static let arrDynamicBasicKeyLayouts: [String] = [
     "com.apple.keylayout.ZhuyinBopomofo",

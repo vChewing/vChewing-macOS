@@ -15,7 +15,13 @@ public class PrefMgr: PrefMgrProtocol {
   public static let shared = PrefMgr()
   public static let kDefaultCandidateKeys = "123456789"
   public static let kDefaultBasicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
-  public static let kDefaultAlphanumericalKeyboardLayout = "com.apple.keylayout.ABC"
+  public static let kDefaultAlphanumericalKeyboardLayout = {
+    if #available(macOS 10.13, *) {
+      return "com.apple.keylayout.ABC"
+    }
+    return "com.apple.keylayout.US"
+  }()
+
   public static let kDefaultClientsIMKTextInputIncapable: [String] = [
     "com.valvesoftware.steam", "jp.naver.line.mac",
   ]
