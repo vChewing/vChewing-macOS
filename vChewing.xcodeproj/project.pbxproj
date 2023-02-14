@@ -63,10 +63,8 @@
 		5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75D27AED54C0023B93A /* Beep.m4a */; };
 		5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75E27AED54C0023B93A /* Fart.m4a */; };
 		5BBBB76D27AED5DB0023B93A /* frmAboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB76927AED5DB0023B93A /* frmAboutWindow.xib */; };
-		5BBBB77327AED70B0023B93A /* MenuIcon-TCVIM@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB76F27AED70B0023B93A /* MenuIcon-TCVIM@2x.png */; };
-		5BBBB77427AED70B0023B93A /* MenuIcon-SCVIM@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77027AED70B0023B93A /* MenuIcon-SCVIM@2x.png */; };
-		5BBBB77527AED70B0023B93A /* MenuIcon-SCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77127AED70B0023B93A /* MenuIcon-SCVIM.png */; };
-		5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77227AED70B0023B93A /* MenuIcon-TCVIM.png */; };
+		5BBBB77527AED70B0023B93A /* MenuIcon-SCVIM.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77127AED70B0023B93A /* MenuIcon-SCVIM.tiff */; };
+		5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77227AED70B0023B93A /* MenuIcon-TCVIM.tiff */; };
 		5BBC2D9E28F51C0400C986F6 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */; };
 		5BBC2D9F28F51C0400C986F6 /* LICENSE-CHT.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */; };
 		5BBC2DA028F51C0400C986F6 /* LICENSE-JPN.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */; };
@@ -258,10 +256,8 @@
 		5BBBB75D27AED54C0023B93A /* Beep.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.m4a; sourceTree = "<group>"; };
 		5BBBB75E27AED54C0023B93A /* Fart.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.m4a; sourceTree = "<group>"; };
 		5BBBB76A27AED5DB0023B93A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmAboutWindow.xib; sourceTree = "<group>"; };
-		5BBBB76F27AED70B0023B93A /* MenuIcon-TCVIM@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-TCVIM@2x.png"; sourceTree = "<group>"; };
-		5BBBB77027AED70B0023B93A /* MenuIcon-SCVIM@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-SCVIM@2x.png"; sourceTree = "<group>"; };
-		5BBBB77127AED70B0023B93A /* MenuIcon-SCVIM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-SCVIM.png"; sourceTree = "<group>"; };
-		5BBBB77227AED70B0023B93A /* MenuIcon-TCVIM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-TCVIM.png"; sourceTree = "<group>"; };
+		5BBBB77127AED70B0023B93A /* MenuIcon-SCVIM.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "MenuIcon-SCVIM.tiff"; sourceTree = "<group>"; };
+		5BBBB77227AED70B0023B93A /* MenuIcon-TCVIM.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "MenuIcon-TCVIM.tiff"; sourceTree = "<group>"; };
 		5BBBB77727AEDB290023B93A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		5BBC2DA228F5212100C986F6 /* RelocationDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelocationDetector.swift; sourceTree = "<group>"; };
 		5BBC2DA428F521C200C986F6 /* AppDelegate_Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate_Extension.swift; sourceTree = "<group>"; };
@@ -556,10 +552,8 @@
 		5BBBB76E27AED70B0023B93A /* MenuIcons */ = {
 			isa = PBXGroup;
 			children = (
-				5BBBB77127AED70B0023B93A /* MenuIcon-SCVIM.png */,
-				5BBBB77027AED70B0023B93A /* MenuIcon-SCVIM@2x.png */,
-				5BBBB77227AED70B0023B93A /* MenuIcon-TCVIM.png */,
-				5BBBB76F27AED70B0023B93A /* MenuIcon-TCVIM@2x.png */,
+				5BBBB77127AED70B0023B93A /* MenuIcon-SCVIM.tiff */,
+				5BBBB77227AED70B0023B93A /* MenuIcon-TCVIM.tiff */,
 			);
 			name = MenuIcons;
 			path = Source/Resources/MenuIcons;
@@ -925,7 +919,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5B84579E2871AD2200C93B01 /* convdict.plist in Resources */,
-				5BBBB77427AED70B0023B93A /* MenuIcon-SCVIM@2x.png in Resources */,
 				D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */,
 				5BF9DA2828840E6200DBD48E /* template-exclusions.txt in Resources */,
 				5B7DA80328BF6BC600D7B2AD /* fixinstall.sh in Resources */,
@@ -944,7 +937,7 @@
 				5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */,
 				5BBBB76D27AED5DB0023B93A /* frmAboutWindow.xib in Resources */,
 				5BF9DA2B28840E6200DBD48E /* template-userphrases.txt in Resources */,
-				5BBBB77527AED70B0023B93A /* MenuIcon-SCVIM.png in Resources */,
+				5BBBB77527AED70B0023B93A /* MenuIcon-SCVIM.tiff in Resources */,
 				5BEDB722283B4C250078EB25 /* data-zhuyinwen.plist in Resources */,
 				5BF9DA2728840E6200DBD48E /* template-usersymbolphrases.txt in Resources */,
 				5B1C98B929436CEE0019B807 /* data-bpmf-reverse-lookup.plist in Resources */,
@@ -952,8 +945,7 @@
 				5BEDB724283B4C250078EB25 /* data-symbols.plist in Resources */,
 				5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */,
 				5BF9DA2A28840E6200DBD48E /* template-replacements.txt in Resources */,
-				5BBBB77327AED70B0023B93A /* MenuIcon-TCVIM@2x.png in Resources */,
-				5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.png in Resources */,
+				5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.tiff in Resources */,
 				6A187E2616004C5900466B2E /* MainMenu.xib in Resources */,
 				5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */,
 				5BC2652227E04B7E00700291 /* uninstall.sh in Resources */,
