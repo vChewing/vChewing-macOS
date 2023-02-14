@@ -128,6 +128,22 @@ extension InputHandler {
         }
       }
 
+      // Shift+Command+[] 被 Chrome 系瀏覽器佔用，所以改用 Ctrl。
+      revolveCandidateWithBrackets: if event.modifierFlags == [.control, .command] {
+        if !delegate.state.isCandidateContainer { break revolveCandidateWithBrackets }
+        // 此處 JIS 鍵盤判定無法用於螢幕鍵盤。所以，螢幕鍵盤的場合，系統會依照 US 鍵盤的判定方案。
+        let isJIS: Bool = KBGetLayoutType(Int16(LMGetKbdType())) == kKeyboardJIS
+        switch (event.keyCode, isJIS) {
+        case (30, true), (33, false):
+          _ = imkC.highlightPreviousCandidate() ? {}() : delegate.callError("8B144DCD")
+          return true
+        case (42, true), (30, false):
+          _ = imkC.highlightNextCandidate() ? {}() : delegate.callError("D2ABB507")
+          return true
+        default: break
+        }
+      }
+
       if prefs.useSCPCTypingMode, !event.isReservedKey {
         return handleInput(event: event)
       }
