@@ -407,16 +407,12 @@ public extension SessionCtl {
 
   @objc func removeUnigramsFromUOM(_: Any? = nil) {
     LMMgr.removeUnigramsFromUserOverrideModel(IMEApp.currentInputMode)
-    if NSEvent.modifierFlags.contains(.option) {
-      LMMgr.removeUnigramsFromUserOverrideModel(IMEApp.currentInputMode.reversed)
-    }
+    LMMgr.removeUnigramsFromUserOverrideModel(IMEApp.currentInputMode.reversed)
   }
 
   @objc func clearUOM(_: Any? = nil) {
     LMMgr.clearUserOverrideModelData(IMEApp.currentInputMode)
-    if NSEvent.modifierFlags.contains(.option) {
-      LMMgr.clearUserOverrideModelData(IMEApp.currentInputMode.reversed)
-    }
+    LMMgr.clearUserOverrideModelData(IMEApp.currentInputMode.reversed)
   }
 
   @objc func showAbout(_: Any? = nil) {
