@@ -195,6 +195,24 @@ extension InputHandler {
       }
     }
 
+    // MARK: - Flipping pages by using modified bracket keys (when they are not occupied).
+
+    // Shift+Command+[] 被 Chrome 系瀏覽器佔用，所以改用 Ctrl。
+    revolveCandidateWithBrackets: if input.modifierFlags == [.control, .command] {
+      if !state.isCandidateContainer { break revolveCandidateWithBrackets }
+      // 此處 JIS 鍵盤判定無法用於螢幕鍵盤。所以，螢幕鍵盤的場合，系統會依照 US 鍵盤的判定方案。
+      let isJIS: Bool = KBGetLayoutType(Int16(LMGetKbdType())) == kKeyboardJIS
+      switch (input.keyCode, isJIS) {
+      case (30, true), (33, false):
+        _ = ctlCandidate.highlightPreviousCandidate() ? {}() : delegate.callError("8B144DCD")
+        return true
+      case (42, true), (30, false):
+        _ = ctlCandidate.highlightNextCandidate() ? {}() : delegate.callError("D2ABB507")
+        return true
+      default: break
+      }
+    }
+
     // MARK: - Flipping pages by using symbol menu keys (when they are not occupied).
 
     if input.isSymbolMenuPhysicalKey {
