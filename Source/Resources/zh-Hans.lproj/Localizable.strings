@@ -1,4 +1,8 @@
 "vChewing" = "威注音输入法";
+"Do you want to enable the popup composition buffer for this client?" = "您要對該客體啟用浮動組字窗嗎？";
+"Some client apps may have different compatibility issues in IMKTextInput implementation." = "有些客體應用可能會有不同的 IMKTextInput 實作相容問題。";
+"Yes" = "是";
+"No" = "否";
 "Hanin Keyboard Symbol Input." = "汉音键盘符号模式。";
 "Open App Support Folder" = "开启 App Support 目录";
 "Invalid Code Point." = "内码不正确。";
@@ -58,11 +62,11 @@
 "One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed." = "每行一笔记录，用 Option+Enter 换行。\n空白值会被无视。";
 "Just Select" = "直接选取";
 "Client Manager" = "管理客体应用";
-"Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. Clients listed here will only use popup composition buffer with maximum 20 reading counts holdable." = "请在此管理这两类客体应用：1) 不遵守 IMKTextInput 协定；2）有滥用内文组字区的嫌疑。威注音输入法对于任何位列在此的客体应用均启用浮动组字窗、且对组字区内容设定容量上限（最多二十个读音）。";
+"Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. A client listed here, if checked, will use popup composition buffer with maximum 20 reading counts holdable." = "请在此管理这两类客体应用：1) 不遵守 IMKTextInput 协定；2）有滥用内文组字区的嫌疑。您可以勾选上述客体应用、以启用下述特性：启用浮动组字窗、且对组字区内容设定容量上限（最多二十个读音）。";
 "Add Client" = "登记新客体";
 "Remove Selected" = "移除所选条目";
 "Choose the target application bundle." = "请选择要登记的应用程式的封包。";
-"The selected item is not a valid macOS application bundle, nor not having a valid app bundle identifier." = "当前所选之物并非 macOS 应用程式封包，至少无法发现其唯一标帜（Bundle Identifier）。";
+"The selected item is either not a valid macOS application bundle or not having a valid app bundle identifier." = "当前所选之物并非 macOS 应用程式封包，至少无法发现其唯一标帜（Bundle Identifier）。";
 "Please try again." = "请重试。";
 "The selected item's identifier is already in the list." = "当前所选之封包的唯一标帜（Bundle Identifier）已被登记。";
 "Update Check Completed" = "更新检查完毕";

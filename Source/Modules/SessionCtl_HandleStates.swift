@@ -87,7 +87,7 @@ public extension SessionCtl {
       showCandidates()
     }
     // 浮動組字窗的顯示判定
-    if newState.hasComposition, PrefMgr.shared.clientsIMKTextInputIncapable.contains(clientBundleIdentifier) {
+    if newState.hasComposition, clientMitigationLevel >= 2 {
       updateVerticalTypingStatus()
       popupCompositionBuffer.isTypingDirectionVertical = isVerticalTyping
       popupCompositionBuffer.show(
@@ -100,12 +100,25 @@ public extension SessionCtl {
 
   /// 如果當前狀態含有「組字結果內容」、或者有選字窗內容、或者存在正在輸入的字根/讀音，則在組字區內顯示游標。
   func setInlineDisplayWithCursor() {
+    var attrStr: NSAttributedString = attributedStringSecured.value
+    var theRange: NSRange = attributedStringSecured.range
+    // 包括早期版本的騰訊 QQNT 在內，有些客體的 client.setMarkedText() 無法正常處理 .thick 下劃線。
+    mitigation: if clientMitigationLevel == 1, state.type == .ofMarking {
+      if !PrefMgr.shared.disableSegmentedThickUnderlineInMarkingModeForManagedClients { break mitigation }
+      let neo = NSMutableAttributedString(attributedString: attributedStringSecured.value)
+      neo.setAttributes(
+        [
+          .underlineStyle: NSUnderlineStyle.thick.rawValue,
+          .markedClauseSegment: 0,
+        ], range: NSRange(location: 0, length: neo.string.utf16.count)
+      )
+      attrStr = neo
+      theRange = NSRange.zero
+    }
     /// 所謂選區「selectionRange」，就是「可見游標位置」的位置，只不過長度
     /// 是 0 且取代範圍（replacementRange）為「NSNotFound」罷了。
     /// 也就是說，內文組字區該在哪裡出現，得由客體軟體來作主。
-    doSetMarkedText(
-      attributedStringSecured.0, selectionRange: attributedStringSecured.1
-    )
+    doSetMarkedText(attrStr, selectionRange: theRange)
   }
 
   /// 在處理某些「沒有組字區內容顯示」且「不需要攔截某些按鍵處理」的狀態時使用的函式，會清空螢幕上顯示的組字區。

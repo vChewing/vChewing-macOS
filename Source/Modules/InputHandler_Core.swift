@@ -61,6 +61,7 @@ public protocol InputHandlerDelegate {
   var selectionKeys: String { get }
   var state: IMEStateProtocol { get set }
   var clientBundleIdentifier: String { get }
+  var clientMitigationLevel: Int { get }
   func callError(_ logMessage: String)
   func updateVerticalTypingStatus()
   func switchState(_ newState: IMEStateProtocol)
@@ -540,8 +541,8 @@ extension InputHandler {
   var commitOverflownComposition: String {
     guard !compositor.walkedNodes.isEmpty,
           compositor.length > compositorWidthLimit,
-          let identifier = delegate?.clientBundleIdentifier,
-          prefs.clientsIMKTextInputIncapable.contains(identifier)
+          let delegate = delegate,
+          delegate.clientMitigationLevel >= 2
     else { return "" }
     // 回頭在這裡插上對 Steam 的 Client Identifier 的要求。
     var textToCommit = ""

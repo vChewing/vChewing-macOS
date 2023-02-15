@@ -41,7 +41,7 @@ public protocol PrefMgrProtocol {
   var hardenVerticalPunctuations: Bool { get set }
   var trimUnfinishedReadingsOnCommit: Bool { get set }
   var alwaysShowTooltipTextsHorizontally: Bool { get set }
-  var clientsIMKTextInputIncapable: [String] { get set }
+  var clientsIMKTextInputIncapable: [String: Bool] { get set }
   var onlyLoadFactoryLangModelsIfNeeded: Bool { get set }
   var useIMKCandidateWindow: Bool { get set }
   var handleDefaultCandidateFontsByLangIdentifier: Bool { get set }
