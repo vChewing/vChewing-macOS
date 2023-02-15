@@ -11,6 +11,15 @@ import Shared
 // MARK: - InputHandler Delegate
 
 extension SessionCtl: InputHandlerDelegate {
+  public var clientMitigationLevel: Int {
+    guard
+      let result = PrefMgr.shared.clientsIMKTextInputIncapable[clientBundleIdentifier]
+    else {
+      return 0
+    }
+    return result ? 2 : 1
+  }
+
   public func candidateController() -> CtlCandidateProtocol? { candidateUI }
 
   public func candidateSelectionCalledByInputHandler(at index: Int) {

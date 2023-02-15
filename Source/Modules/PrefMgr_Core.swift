@@ -22,8 +22,8 @@ public class PrefMgr: PrefMgrProtocol {
     return "com.apple.keylayout.US"
   }()
 
-  public static let kDefaultClientsIMKTextInputIncapable: [String] = [
-    "com.valvesoftware.steam", "jp.naver.line.mac",
+  public static let kDefaultClientsIMKTextInputIncapable: [String: Bool] = [
+    "com.valvesoftware.steam": true, "jp.naver.line.mac": true,
   ]
 
   // MARK: - Settings (Tier 1)
@@ -144,7 +144,7 @@ public class PrefMgr: PrefMgrProtocol {
   public var alwaysShowTooltipTextsHorizontally: Bool
 
   @AppProperty(key: UserDef.kClientsIMKTextInputIncapable.rawValue, defaultValue: kDefaultClientsIMKTextInputIncapable)
-  public var clientsIMKTextInputIncapable: [String]
+  public var clientsIMKTextInputIncapable: [String: Bool]
 
   @AppProperty(key: UserDef.kOnlyLoadFactoryLangModelsIfNeeded.rawValue, defaultValue: true)
   public var onlyLoadFactoryLangModelsIfNeeded: Bool {

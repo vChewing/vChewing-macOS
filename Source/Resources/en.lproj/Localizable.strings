@@ -1,4 +1,8 @@
 "vChewing" = "vChewing";
+"Do you want to enable the popup composition buffer for this client?" = "Do you want to enable the popup composition buffer for this client?";
+"Some client apps may have different compatibility issues in IMKTextInput implementation." = "Some client apps may have different compatibility issues in IMKTextInput implementation.";
+"Yes" = "Yes";
+"No" = "No";
 "Hanin Keyboard Symbol Input." = "Hanin Keyboard Symbol Input.";
 "Open App Support Folder" = "Open App Support Folder";
 "Invalid Code Point." = "Invalid Code Point.";
@@ -58,11 +62,11 @@
 "One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed." = "One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed.";
 "Just Select" = "Just Select";
 "Client Manager" = "Client Manager";
-"Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. Clients listed here will only use popup composition buffer with maximum 20 reading counts holdable." = "Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. Clients listed here will only use popup composition buffer with maximum 20 reading counts holdable.";
+"Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. A client listed here, if checked, will use popup composition buffer with maximum 20 reading counts holdable." = "Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. A client listed here, if checked, will use popup composition buffer with maximum 20 reading counts holdable.";
 "Add Client" = "Add Client";
 "Remove Selected" = "Remove Selected";
 "Choose the target application bundle." = "Choose the target application bundle.";
-"The selected item is not a valid macOS application bundle, nor not having a valid app bundle identifier." = "The selected item is not a valid macOS application bundle, nor not having a valid app bundle identifier.";
+"The selected item is either not a valid macOS application bundle or not having a valid app bundle identifier." = "The selected item is either not a valid macOS application bundle or not having a valid app bundle identifier.";
 "Please try again." = "Please try again.";
 "The selected item's identifier is already in the list." = "The selected item's identifier is already in the list.";
 "Update Check Completed" = "Update Check Completed";

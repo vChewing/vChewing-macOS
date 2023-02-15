@@ -1,4 +1,8 @@
 "vChewing" = "威注音入力アプリ";
+"Do you want to enable the popup composition buffer for this client?" = "この客体アプリに「吹き出し入力緩衝列ウィンドウ」を起用しますか？";
+"Some client apps may have different compatibility issues in IMKTextInput implementation." = "それぞれの客体アプリには、それぞれの IMKTextInput 不具合はあるかもしれません。";
+"Yes" = "うむ";
+"No" = "いな";
 "Hanin Keyboard Symbol Input." = "漢音キーボード符号入力。";
 "Open App Support Folder" = "App Support フォルダーを開く";
 "Invalid Code Point." = "コードポイントは正しくない。";
@@ -58,11 +62,11 @@
 "One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed." = "毎行は１つ記録とみなす。Option+Enter キーで改行。\n空白の記録値は無視される。";
 "Just Select" = "直接に選ぶ";
 "Client Manager" = "客体アプリの管理";
-"Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. Clients listed here will only use popup composition buffer with maximum 20 reading counts holdable." = "下記の種類の客体アプリはここでご登録ください：１）IMKTextInput 議定規約に反するもの；２）文脈内入力緩衝列の内容の不正利用の疑いのあるもの。登録済みのアプリには、威注音入力アプリは「吹き出し入力緩衝列ウィンドウ」と「緩衝列容量制限」を起用し、容量制限は最大限音読み２０箇とする。";
+"Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. A client listed here, if checked, will use popup composition buffer with maximum 20 reading counts holdable." = "下記の客体アプリはここでご登録を：１）IMKTextInput 議定規約に反するもの；２）文脈内入力緩衝列の内容の不正利用容疑のあるもの。「登録済みのアプリ」にチェックを入れると、「吹き出し入力緩衝列ウィンドウ」と「緩衝列容量制限」を起用し、容量制限は最大限音読み２０箇とする。";
 "Add Client" = "入れる";
 "Remove Selected" = "外す";
 "Choose the target application bundle." = "登録したいアプリのバンドルのお選びを。";
-"The selected item is not a valid macOS application bundle, nor not having a valid app bundle identifier." = "今選んだんのは正しい macOS アプリバンドルではないと考えられる。少なくとも、唯一識別子は検出できぬ。";
+"The selected item is either not a valid macOS application bundle or not having a valid app bundle identifier." = "今選んだんのは正しい macOS アプリバンドルではないと考えられる。少なくとも、唯一識別子は検出できぬ。";
 "Please try again." = "お選び直しください。";
 "The selected item's identifier is already in the list." = "今選んだバンドルの唯一識別子（Bundle Identifier）は既に登録済みである。";
 "Update Check Completed" = "新バージョンチェック完了";

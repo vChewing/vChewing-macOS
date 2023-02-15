@@ -34,7 +34,22 @@ class CtlClientListMgr: NSWindowController, NSTableViewDelegate, NSTableViewData
     tblClients.delegate = self
     tblClients.allowsMultipleSelection = true
     tblClients.dataSource = self
+    tblClients.action = #selector(onItemClicked(_:))
+    tblClients.target = self
     tblClients.reloadData()
+  }
+}
+
+// MARK: - UserDefaults Handlers
+
+extension CtlClientListMgr {
+  public static var clientsList: [String] { PrefMgr.shared.clientsIMKTextInputIncapable.keys.sorted() }
+  public static func removeClient(at index: Int) {
+    guard index < Self.clientsList.count else { return }
+    let key = Self.clientsList[index]
+    var dict = PrefMgr.shared.clientsIMKTextInputIncapable
+    dict[key] = nil
+    PrefMgr.shared.clientsIMKTextInputIncapable = dict
   }
 }
 
@@ -42,7 +57,7 @@ class CtlClientListMgr: NSWindowController, NSTableViewDelegate, NSTableViewData
 
 extension CtlClientListMgr {
   func numberOfRows(in _: NSTableView) -> Int {
-    PrefMgr.shared.clientsIMKTextInputIncapable.count
+    Self.clientsList.count
   }
 
   @IBAction func btnAddClientClicked(_: Any) {
@@ -105,8 +120,8 @@ extension CtlClientListMgr {
           switch result {
           case .OK:
             for url in dlgOpenPath.urls {
-              var title = NSLocalizedString(
-                "The selected item is not a valid macOS application bundle, nor not having a valid app bundle identifier.",
+              let title = NSLocalizedString(
+                "The selected item is either not a valid macOS application bundle or not having a valid app bundle identifier.",
                 comment: ""
               )
               let text = url.path + "\n\n" + NSLocalizedString("Please try again.", comment: "")
@@ -118,14 +133,21 @@ extension CtlClientListMgr {
                 self.window?.callAlert(title: title, text: text)
                 return
               }
-              if PrefMgr.shared.clientsIMKTextInputIncapable.contains(identifier) {
-                title = NSLocalizedString(
-                  "The selected item's identifier is already in the list.", comment: ""
-                )
-                self.window?.callAlert(title: title, text: identifier + "\n\n" + url.path)
-                return
+              let isIdentifierAlreadyRegistered = Self.clientsList.contains(identifier)
+              let alert2 = NSAlert()
+              alert2.messageText =
+                "Do you want to enable the popup composition buffer for this client?".localized
+              alert2.informativeText = "\(identifier)\n\n"
+                + "Some client apps may have different compatibility issues in IMKTextInput implementation.".localized
+              alert2.addButton(withTitle: "Yes".localized)
+              alert2.addButton(withTitle: "No".localized)
+              alert2.beginSheetModal(for: window) { result2 in
+                let oldValue = PrefMgr.shared.clientsIMKTextInputIncapable[identifier]
+                let newValue = result2 == .alertFirstButtonReturn
+                if !(isIdentifierAlreadyRegistered && oldValue == newValue) {
+                  self.applyNewValue(identifier, highMitigation: newValue)
+                }
               }
-              self.applyNewValue(identifier)
             }
           default: return
           }
@@ -135,50 +157,71 @@ extension CtlClientListMgr {
     }
   }
 
-  private func applyNewValue(_ newValue: String) {
+  private func applyNewValue(_ newValue: String, highMitigation mitigation: Bool = true) {
     guard !newValue.isEmpty else { return }
-    var arrResult = PrefMgr.shared.clientsIMKTextInputIncapable
-    arrResult.append(newValue)
-    PrefMgr.shared.clientsIMKTextInputIncapable = arrResult.sorted()
+    var dict = PrefMgr.shared.clientsIMKTextInputIncapable
+    dict[newValue] = mitigation
+    PrefMgr.shared.clientsIMKTextInputIncapable = dict
     tblClients.reloadData()
-    btnRemoveClient.isEnabled = (0 ..< PrefMgr.shared.clientsIMKTextInputIncapable.count).contains(
+    btnRemoveClient.isEnabled = (0 ..< Self.clientsList.count).contains(
       tblClients.selectedRow)
   }
 
   @IBAction func btnRemoveClientClicked(_: Any) {
     guard let minIndexSelected = tblClients.selectedRowIndexes.min() else { return }
-    if minIndexSelected >= PrefMgr.shared.clientsIMKTextInputIncapable.count { return }
+    if minIndexSelected >= Self.clientsList.count { return }
     if minIndexSelected < 0 { return }
     var isLastRow = false
     tblClients.selectedRowIndexes.sorted().reversed().forEach { index in
       isLastRow = {
-        if PrefMgr.shared.clientsIMKTextInputIncapable.count < 2 { return false }
-        return minIndexSelected == PrefMgr.shared.clientsIMKTextInputIncapable.count - 1
+        if Self.clientsList.count < 2 { return false }
+        return minIndexSelected == Self.clientsList.count - 1
       }()
-      if index < PrefMgr.shared.clientsIMKTextInputIncapable.count {
-        PrefMgr.shared.clientsIMKTextInputIncapable.remove(at: index)
+      if index < Self.clientsList.count {
+        Self.removeClient(at: index)
       }
     }
     if isLastRow {
       tblClients.selectRowIndexes(.init(arrayLiteral: minIndexSelected - 1), byExtendingSelection: false)
     }
     tblClients.reloadData()
-    btnRemoveClient.isEnabled = (0 ..< PrefMgr.shared.clientsIMKTextInputIncapable.count).contains(minIndexSelected)
+    btnRemoveClient.isEnabled = (0 ..< Self.clientsList.count).contains(minIndexSelected)
   }
 
-  func tableView(_: NSTableView, objectValueFor _: NSTableColumn?, row: Int) -> Any? {
+  @objc func onItemClicked(_: Any!) {
+    guard tblClients.clickedColumn == 0 else { return }
+    PrefMgr.shared.clientsIMKTextInputIncapable[Self.clientsList[tblClients.clickedRow]]?.toggle()
+    tblClients.reloadData()
+  }
+
+  func tableView(_: NSTableView, shouldEdit _: NSTableColumn?, row _: Int) -> Bool {
+    false
+  }
+
+  func tableView(_: NSTableView, objectValueFor column: NSTableColumn?, row: Int) -> Any? {
     defer {
-      self.btnRemoveClient.isEnabled = (0 ..< PrefMgr.shared.clientsIMKTextInputIncapable.count).contains(
+      self.btnRemoveClient.isEnabled = (0 ..< Self.clientsList.count).contains(
         self.tblClients.selectedRow)
     }
-    return PrefMgr.shared.clientsIMKTextInputIncapable[row]
+    guard row < Self.clientsList.count else { return "" }
+    if let column = column {
+      let colName = column.identifier.rawValue
+      switch colName {
+      case "colPCBEnabled":
+        let tick = PrefMgr.shared.clientsIMKTextInputIncapable[Self.clientsList[row]] ?? true
+        return tick
+      case "colClient": return Self.clientsList[row]
+      default: return ""
+      }
+    }
+    return Self.clientsList[row]
   }
 
   private func localize() {
     guard let window = window else { return }
     window.title = NSLocalizedString("Client Manager", comment: "")
     lblClientMgrWindow.stringValue = NSLocalizedString(
-      "Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. Clients listed here will only use popup composition buffer with maximum 20 reading counts holdable.",
+      "Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. A client listed here, if checked, will use popup composition buffer with maximum 20 reading counts holdable.",
       comment: ""
     )
     btnAddClient.title = NSLocalizedString("Add Client", comment: "")
