@@ -136,7 +136,7 @@ struct VwrPrefPaneDictionary: View {
               }
             )
             Toggle(
-              LocalizedStringKey("Enable CNS11643 Support (2022-12-01)"),
+              LocalizedStringKey("Enable CNS11643 Support (2023-01-06)"),
               isOn: $selEnableCNS11643.onChange {
                 PrefMgr.shared.cns11643Enabled = selEnableCNS11643
                 LMMgr.setCNSEnabled(PrefMgr.shared.cns11643Enabled)
