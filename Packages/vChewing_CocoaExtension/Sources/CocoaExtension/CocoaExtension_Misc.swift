@@ -15,6 +15,13 @@ public extension NSMutableString {
   var localized: String { NSLocalizedString(description, comment: "") }
 }
 
+// MARK: - NSRange Extension
+
+public extension NSRange {
+  static var zero = NSRange(location: 0, length: 0)
+  static var notFound = NSRange(location: NSNotFound, length: NSNotFound)
+}
+
 // MARK: - NSRect Extension
 
 public extension NSRect {

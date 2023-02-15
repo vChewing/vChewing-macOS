@@ -104,16 +104,14 @@ public extension SessionCtl {
     /// 是 0 且取代範圍（replacementRange）為「NSNotFound」罷了。
     /// 也就是說，內文組字區該在哪裡出現，得由客體軟體來作主。
     doSetMarkedText(
-      attributedStringSecured.0, selectionRange: attributedStringSecured.1,
-      replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
+      attributedStringSecured.0, selectionRange: attributedStringSecured.1
     )
   }
 
   /// 在處理某些「沒有組字區內容顯示」且「不需要攔截某些按鍵處理」的狀態時使用的函式，會清空螢幕上顯示的組字區。
   func clearInlineDisplay() {
     doSetMarkedText(
-      "", selectionRange: NSRange(location: 0, length: 0),
-      replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
+      NSAttributedString(), selectionRange: NSRange.zero
     )
   }
 
@@ -126,19 +124,28 @@ public extension SessionCtl {
       DispatchQueue.main.async {
         guard let client = self.client() else { return }
         client.insertText(
-          buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
+          buffer, replacementRange: NSRange.notFound
         )
       }
     } else {
       guard let client = client() else { return }
       client.insertText(
-        buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
+        buffer, replacementRange: NSRange.notFound
       )
     }
   }
 
   /// 把 setMarkedText 包裝一下，按需啟用 GCD。
-  func doSetMarkedText(_ string: Any!, selectionRange: NSRange, replacementRange: NSRange) {
+  /// - Parameters:
+  ///   - string: 要設定顯示的內容，必須得是 NSAttributedString（否則不顯示下劃線）且手動定義過下劃線。
+  ///   - selectionRange: 高亮選區範圍。該範圍只會在下劃線為 .thick 的時候在某些客體軟體當中生效。
+  ///   - replacementRange: 要替換掉的既有文本的範圍。
+  ///   警告：replacementRange 不要亂填，否則會在 Microsoft Office 等軟體內出現故障。
+  ///   該功能是給某些想設計「重新組字」功能的輸入法設計的，但一字多音的漢語在注音/拼音輸入這方面不適用這個輸入法特性。
+  func doSetMarkedText(
+    _ string: NSAttributedString, selectionRange: NSRange,
+    replacementRange: NSRange = .notFound
+  ) {
     if isServingIMEItself || !isActivated {
       DispatchQueue.main.async {
         guard let client = self.client() else { return }
