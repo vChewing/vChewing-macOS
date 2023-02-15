@@ -23,8 +23,16 @@ public extension PrefMgr {
     }
     // 自動糾正選字鍵 (利用其 didSet 特性)
     candidateKeys = candidateKeys
-    // 客體黑名單自動排序去重複。
-    clientsIMKTextInputIncapable = Array(Set(clientsIMKTextInputIncapable)).sorted()
+    // 客體黑名單資料類型升級。
+    if let clients = UserDefaults.standard.object(
+      forKey: UserDef.kClientsIMKTextInputIncapable.rawValue
+    ) as? [String] {
+      UserDefaults.standard.removeObject(forKey: UserDef.kClientsIMKTextInputIncapable.rawValue)
+      clients.forEach { neta in
+        guard !clientsIMKTextInputIncapable.keys.contains(neta) else { return }
+        clientsIMKTextInputIncapable[neta] = true
+      }
+    }
     // 注拼槽注音排列選項糾錯。
     var isKeyboardParserOptionValid = false
     KeyboardParser.allCases.forEach {
