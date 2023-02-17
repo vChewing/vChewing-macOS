@@ -236,7 +236,7 @@
 "Disable forced conversion for cassette outputs" = "对磁带模式禁用繁简转换";
 "Disassemble the previous reading, dropping its intonation" = "析构游标正后方的字音，且剔除其声调";
 "Disassembling process does not work with non-phonetic reading keys." = "析构行为仅针对组字器内「身为汉字读音」的读音索引单元有效。";
-"Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. Official releases of vChewing is Sandboxed, and a Sandboxed app is not allowed to execute an external shell command, either." = "出于与资讯安全有关的考量，此处不提供任何与终端机脚本执行有关的功能。一款尚未经过 App Sandbox 沙箱处理的输入法，若提供了这种功能，便会带来系统层面上的资安缺陷：与该功能有关的 UserDefaults 可被任意篡改、以执行恶意脚本。官方发行的威注音有经过沙箱处理，且经过该处理的 App 没有权限执行任何外部终端机指令。";
+"Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. vChewing is designed to be invulnerable from this kind of attack. Also, official releases of vChewing are Sandboxed." = "出于与资讯安全有关的考量，此处不提供任何与终端机脚本执行有关的功能。一款尚未经过 App Sandbox 沙箱处理的输入法，若提供了这种功能，便会带来系统层面上的资安缺陷：与该功能有关的 UserDefaults 可被任意篡改、以执行恶意脚本。威注音本身的设计使得其不会有这种资安缺陷，且官方发行的威注音有经过沙箱处理。";
 "Edit…" = "编辑…";
 "Emulating select-candidate-per-character mode" = "模拟 90 年代前期注音逐字选字输入风格";
 "Enable cassette mode, suppressing phonabet input" = "启用磁带模式，会停用注音输入";
