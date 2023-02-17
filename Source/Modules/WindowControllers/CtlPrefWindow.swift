@@ -422,7 +422,7 @@ extension CtlPrefWindow: NSToolbarDelegate {
   var toolbarIdentifiers: [NSToolbarItem.Identifier] {
     var result = [NSToolbarItem.Identifier]()
     PrefUITabs.allCases.forEach { neta in
-      if [.tabCandidates, .tabBehavior, .tabOutput, .tabDevZone].contains(neta) { return }
+      if [.tabCandidates, .tabBehavior, .tabOutput].contains(neta) { return }
       if neta == .tabExperience, result.count >= 1 {
         result.insert(neta.toolbarIdentifier, at: 1)
         return
@@ -474,6 +474,11 @@ extension CtlPrefWindow: NSToolbarDelegate {
     window?.toolbar?.selectedItemIdentifier = PrefUITabs.tabKeyboard.toolbarIdentifier
   }
 
+  @objc func showDevZoneView(_: Any?) {
+    use(view: vwrDevZone)
+    window?.toolbar?.selectedItemIdentifier = PrefUITabs.tabDevZone.toolbarIdentifier
+  }
+
   func toolbar(
     _: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier,
     willBeInsertedIntoToolbar _: Bool
@@ -484,26 +489,16 @@ extension CtlPrefWindow: NSToolbarDelegate {
     item.image = tab.icon
     item.label = tab.i18nTitle
     switch tab {
-    case .tabGeneral:
-      item.action = #selector(showGeneralView(_:))
-    case .tabCandidates:
-      return nil
-    case .tabBehavior:
-      return nil
-    case .tabOutput:
-      return nil
-    case .tabDictionary:
-      item.action = #selector(showDictionaryView(_:))
-    case .tabPhrases:
-      item.action = #selector(showPhrasesView(_:))
-    case .tabCassette:
-      item.action = #selector(showCassetteView(_:))
-    case .tabKeyboard:
-      item.action = #selector(showKeyboardView(_:))
-    case .tabDevZone:
-      return nil
-    case .tabExperience:
-      item.action = #selector(showExperienceView(_:))
+    case .tabGeneral: item.action = #selector(showGeneralView(_:))
+    case .tabCandidates: return nil
+    case .tabBehavior: return nil
+    case .tabOutput: return nil
+    case .tabDictionary: item.action = #selector(showDictionaryView(_:))
+    case .tabPhrases: item.action = #selector(showPhrasesView(_:))
+    case .tabCassette: item.action = #selector(showCassetteView(_:))
+    case .tabKeyboard: item.action = #selector(showKeyboardView(_:))
+    case .tabDevZone: item.action = #selector(showDevZoneView(_:))
+    case .tabExperience: item.action = #selector(showExperienceView(_:))
     }
     return item
   }
