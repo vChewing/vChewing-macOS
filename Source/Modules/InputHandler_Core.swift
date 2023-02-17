@@ -119,7 +119,7 @@ public class InputHandler: InputHandlerProtocol {
 
   var isHaninKeyboardSymbolMode = false
 
-  static let tooltipHaninKeyboardSymbolMode: String = "\("Hanin Keyboard Symbol Input.".localized)　　"
+  static let tooltipHaninKeyboardSymbolMode: String = "\("Hanin Keyboard Symbol Input.".localized)"
 
   // MARK: - Codepoint Input Buffer.
 
@@ -134,12 +134,13 @@ public class InputHandler: InputHandlerProtocol {
   var tooltipCodePointInputMode: String {
     let commonTerm = NSMutableString()
     commonTerm.insert("Code Point Input.".localized, at: 0)
-    switch IMEApp.currentInputMode {
-    case .imeModeCHS: commonTerm.insert("[GB] ", at: 0)
-    case .imeModeCHT: commonTerm.insert("[Big5] ", at: 0)
-    default: break
+    if !(delegate?.isVerticalTyping ?? false) {
+      switch IMEApp.currentInputMode {
+      case .imeModeCHS: commonTerm.insert("[GB] ", at: 0)
+      case .imeModeCHT: commonTerm.insert("[Big5] ", at: 0)
+      default: break
+      }
     }
-    commonTerm.append("　　")
     return commonTerm.description
   }
 

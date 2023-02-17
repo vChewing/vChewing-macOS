@@ -58,11 +58,7 @@ public class CandidateCellData: Hashable {
 
   public var cellLength: Int {
     if displayedText.count <= 2 { return Int(ceil(size * 3)) }
-    let rect = attributedStringForLengthCalculation.boundingRect(
-      with: NSSize(width: 1600.0, height: 1600.0), options: [.usesLineFragmentOrigin]
-    )
-    let rawResult = ceil(rect.width)
-    return Int(rawResult)
+    return Int(ceil(attributedStringForLengthCalculation.boundingDimension.width))
   }
 
   public var attributedStringHeader: NSAttributedString {
