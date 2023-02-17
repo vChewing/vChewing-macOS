@@ -169,14 +169,6 @@ public struct IMEStateData: IMEStateDataProtocol {
 // MARK: - IMEState 工具函式
 
 public extension IMEStateData {
-  var doesUserPhraseExist: Bool {
-    let text = displayedText.map(\.description)[markedRange].joined()
-    let joined = markedReadings.joined(separator: InputHandler.keySeparator)
-    return LMMgr.checkIfUserPhraseExist(
-      userPhrase: text, mode: IMEApp.currentInputMode, key: joined
-    )
-  }
-
   var readingThreadForDisplay: String {
     var arrOutput = [String]()
     for neta in markedReadings {
