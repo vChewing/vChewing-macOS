@@ -39,7 +39,7 @@ class CtlPrefUI {
     panes: {
       var result = [PreferencePaneConvertible]()
       PrefUITabs.allCases.forEach { neta in
-        if [.tabDevZone, .tabExperience].contains(neta) { return }
+        if [.tabExperience].contains(neta) { return }
         let item: PreferencePaneConvertible = SSPreferences.Pane(
           identifier: SSPreferences.PaneIdentifier(rawValue: neta.rawValue),
           title: neta.i18nTitle, toolbarIcon: neta.icon,
