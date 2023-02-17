@@ -9,9 +9,39 @@
 import Cocoa
 import SwiftExtension
 
-// MARK: - NSMutableString extension
+// MARK: - NSSize extension
 
-public extension NSMutableString {
+public extension NSSize {
+  static var infinity: NSSize { .init(width: Double.infinity, height: Double.infinity) }
+}
+
+// MARK: - NSAttributedString extension
+
+// Ref: https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/TextLayout/Tasks/StringHeight.html
+
+public extension NSAttributedString {
+  @objc var boundingDimension: NSSize {
+    let rectA = boundingRect(
+      with: NSSize(width: Double.infinity, height: Double.infinity),
+      options: [.usesLineFragmentOrigin]
+    )
+    let textStorage = NSTextStorage(attributedString: self)
+    let textContainer = NSTextContainer()
+    let layoutManager = NSLayoutManager()
+    layoutManager.addTextContainer(textContainer)
+    textStorage.addLayoutManager(layoutManager)
+    textContainer.lineFragmentPadding = 0.0
+    layoutManager.glyphRange(for: textContainer)
+    let rectB = layoutManager.usedRect(for: textContainer)
+    let width = ceil(max(rectA.width, rectB.width))
+    let height = ceil(max(rectA.height, rectB.height))
+    return .init(width: width, height: height)
+  }
+}
+
+// MARK: - NSString extension
+
+public extension NSString {
   var localized: String { NSLocalizedString(description, comment: "") }
 }
 
