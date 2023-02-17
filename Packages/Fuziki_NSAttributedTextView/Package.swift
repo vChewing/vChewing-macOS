@@ -12,11 +12,15 @@ let package = Package(
       targets: ["NSAttributedTextView"]
     ),
   ],
-  dependencies: [],
+  dependencies: [
+    .package(path: "../vChewing_CocoaExtension"),
+  ],
   targets: [
     .target(
       name: "NSAttributedTextView",
-      dependencies: []
+      dependencies: [
+        .product(name: "CocoaExtension", package: "vChewing_CocoaExtension"),
+      ]
     ),
   ]
 )

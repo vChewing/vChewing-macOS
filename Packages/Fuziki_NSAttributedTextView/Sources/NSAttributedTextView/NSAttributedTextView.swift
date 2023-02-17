@@ -6,6 +6,7 @@
 // Modified by The vChewing Project in order to use it with AppKit.
 
 import Cocoa
+import CocoaExtension
 import SwiftUI
 
 @available(macOS 10.15, *)
@@ -107,20 +108,14 @@ public class NSAttributedTextView: NSView {
       default: return attributedStringValue(areaCalculation: true)
       }
     }()
-    var rect = attrString.boundingRect(
-      with: NSSize(width: 1600.0, height: 1600.0),
-      options: [.usesLineFragmentOrigin, .usesFontLeading, .usesDeviceMetrics]
-    )
-    rect.size.height *= 1.03
-    rect.size.height = max(rect.size.height, NSFont.systemFontSize * 1.1)
-    rect.size.height = ceil(rect.size.height)
-    rect.size.width *= 1.03
-    rect.size.width = max(rect.size.width, NSFont.systemFontSize * 1.05)
-    rect.size.width = ceil(rect.size.width)
+    var textWH = attrString.boundingDimension
     if direction != .horizontal {
-      rect = .init(x: rect.minX, y: rect.minY, width: rect.height, height: rect.width)
+      textWH.height *= 1.03
+      textWH.height = max(textWH.height, NSFont.systemFontSize * 1.1)
+      textWH.height = ceil(textWH.height)
+      textWH = .init(width: textWH.height, height: textWH.width)
     }
-    return rect
+    return .init(origin: .zero, size: textWH)
   }
 
   override public func draw(_ rect: CGRect) {
