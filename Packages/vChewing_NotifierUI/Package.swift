@@ -12,11 +12,15 @@ let package = Package(
       targets: ["NotifierUI"]
     ),
   ],
-  dependencies: [],
+  dependencies: [
+    .package(path: "../vChewing_CocoaExtension"),
+  ],
   targets: [
     .target(
       name: "NotifierUI",
-      dependencies: []
+      dependencies: [
+        .product(name: "CocoaExtension", package: "vChewing_CocoaExtension"),
+      ]
     ),
   ]
 )

@@ -233,7 +233,7 @@ extension SessionCtl: CtlCandidateDelegate {
       tooltipMessage = succeeded ? "! Succeeded in filtering a candidate." : "⚠︎ Failed from filtering a candidate."
     }
     if !succeeded { newState.data.tooltipColorState = .redAlert }
-    newState.tooltip = NSLocalizedString(tooltipMessage, comment: "") + "　　"
+    newState.tooltip = NSLocalizedString(tooltipMessage, comment: "")
     switchState(newState)
   }
 }

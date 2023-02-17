@@ -164,13 +164,10 @@ public class PopupCompositionBuffer: NSWindowController {
 
   private func adjustSize() {
     let attrString = messageTextField.attributedStringValue
-    var rect = attrString.boundingRect(
-      with: NSSize(width: 1600.0, height: 1600.0),
-      options: [.usesLineFragmentOrigin, .usesFontLeading]
-    )
-    rect.size.width = max(rect.size.width, 20 * Double(attrString.string.count)) + 2
+    var rect = NSRect(origin: .zero, size: attrString.boundingDimension)
     rect.size.height *= 1.2
     rect.size.height = max(22, rect.size.height)
+    rect.size.width = max(rect.size.width, 20 * Double(attrString.string.count)) + 2
     if isTypingDirectionVertical {
       rect = .init(x: rect.minX, y: rect.minY, width: rect.height, height: rect.width)
     }
