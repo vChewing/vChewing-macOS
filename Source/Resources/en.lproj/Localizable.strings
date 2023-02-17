@@ -238,6 +238,7 @@
 "Directly commit lowercased letters" = "Directly commit lowercased letters";
 "Directly commit uppercased letters" = "Directly commit uppercased letters";
 "Disable forced conversion for cassette outputs" = "Disable forced conversion for cassette outputs";
+"Disable segmented thick underline in marking mode for managed clients" = "Disable segmented thick underline in marking mode for managed clients";
 "Disassemble the previous reading, dropping its intonation" = "Disassemble the previous reading, dropping its intonation";
 "Disassembling process does not work with non-phonetic reading keys." = "Disassembling process does not work with non-phonetic reading keys.";
 "Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. vChewing is designed to be invulnerable from this kind of attack. Also, official releases of vChewing are Sandboxed." = "Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. vChewing is designed to be invulnerable from this kind of attack. Also, official releases of vChewing are Sandboxed.";
@@ -304,6 +305,8 @@
 "Show notifications when toggling Caps Lock" = "Show notifications when toggling Caps Lock";
 "Show translated strokes in composition buffer" = "Show translated strokes in composition buffer";
 "Simplified Chinese" = "Simplified Chinese";
+"Some clients with web-based front UI may have issues rendering segmented thick underlines drawn by their implemented “setMarkedText()”. This option stops the input method from delivering segmented thick underlines to “client().setMarkedText()”. Note that segmented thick underlines are only used in marking mode, unless the client itself misimplements the IMKTextInput method “setMarkedText()”. This option only affects the inline composition buffer." = "Some clients with web-based front UI may have issues rendering segmented thick underlines drawn by their implemented “setMarkedText()”. This option stops the input method from delivering segmented thick underlines to “client().setMarkedText()”. Note that segmented thick underlines are only used in marking mode, unless the client itself misimplements the IMKTextInput method “setMarkedText()”. This option only affects the inline composition buffer.";
+"Some previous options are moved to other tabs." = "Some previous options are moved to other tabs.";
 "Space to +revolve candidates, Shift+Space to +revolve pages" = "Space to +revolve candidates, Shift+Space to +revolve pages";
 "Space to +revolve pages, Shift+Space to +revolve candidates" = "Space to +revolve pages, Shift+Space to +revolve candidates";
 "Space:" = "Space:";
