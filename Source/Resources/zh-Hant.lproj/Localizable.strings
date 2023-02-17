@@ -238,6 +238,7 @@
 "Directly commit lowercased letters" = "直接遞交小寫字母";
 "Directly commit uppercased letters" = "直接遞交大寫字母";
 "Disable forced conversion for cassette outputs" = "對磁帶模式禁用繁簡轉換";
+"Disable segmented thick underline in marking mode for managed clients" = "針對被管理的客體，在標記模式下禁用分段式粗型下劃線";
 "Disassemble the previous reading, dropping its intonation" = "析構游標正後方的字音，且剔除其聲調";
 "Disassembling process does not work with non-phonetic reading keys." = "析構行為僅針對組字器內「身為漢字讀音」的讀音索引單元有效。";
 "Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. vChewing is designed to be invulnerable from this kind of attack. Also, official releases of vChewing are Sandboxed." = "出於與資訊安全有關的考量，此處不提供任何與終端機腳本執行有關的功能。一款尚未經過 App Sandbox 沙箱處理的輸入法，若提供了這種功能，便會帶來系統層面上的資安缺陷：與該功能有關的 UserDefaults 可被任意篡改、以執行惡意腳本。威注音本身的設計使得其不會有這種資安缺陷，且官方發行的威注音有經過沙箱處理。";
@@ -304,6 +305,8 @@
 "Show notifications when toggling Caps Lock" = "以 Caps Lock 切換輸入法/中英模式時顯示通知";
 "Show translated strokes in composition buffer" = "在組字區內顯示字根、而非原始鍵盤碼";
 "Simplified Chinese" = "簡體中文";
+"Some clients with web-based front UI may have issues rendering segmented thick underlines drawn by their implemented “setMarkedText()”. This option stops the input method from delivering segmented thick underlines to “client().setMarkedText()”. Note that segmented thick underlines are only used in marking mode, unless the client itself misimplements the IMKTextInput method “setMarkedText()”. This option only affects the inline composition buffer." = "部分採用 Web 前端介面設計的客體應用可能會無法正常繪製用於輸入法標記模式的分段式粗型下劃線。這個選項將會阻止輸入法藉由 client().setMarkedText() 函式向客體應用傳達對粗型下劃線的分段繪製請求。分段式粗型下劃線僅用於輸入法的標記模式，除非客體應用對 setMarkedText() 這個 IMKTextInput 協定方法的實作有問題。該選項僅影響內文組字區。";
+"Some previous options are moved to other tabs." = "該頁面某些先前曾經有過的選項已被移往其它頁籤。";
 "Space to +revolve candidates, Shift+Space to +revolve pages" = "Shift+空格鍵 換下一頁，空格鍵 換選下一個候選字";
 "Space to +revolve pages, Shift+Space to +revolve candidates" = "空格鍵 換下一頁，Shift+空格鍵 換選下一個候選字";
 "Space:" = "空格鍵:";

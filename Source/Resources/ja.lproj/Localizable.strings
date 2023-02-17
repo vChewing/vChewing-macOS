@@ -239,6 +239,7 @@
 "Directly commit lowercased letters" = "ローマ字（小文字）を直接出力";
 "Directly commit uppercased letters" = "ローマ字（大文字）を直接出力";
 "Disable forced conversion for cassette outputs" = "カセットモードによる漢字出力の簡繁転換を行わずにする";
+"Disable segmented thick underline in marking mode for managed clients" = "管理されている客体アプリには、マーキングモードの多段式太下線の描きを禁ず";
 "Disassemble the previous reading, dropping its intonation" = "カーソルの後部の音読みを解き、その音調を除く";
 "Disassembling process does not work with non-phonetic reading keys." = "実の意味の音読みだけを解くことができる。";
 "Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. vChewing is designed to be invulnerable from this kind of attack. Also, official releases of vChewing are Sandboxed." = "セキュリティ上の懸念から、いかなるシェルスクリプトの実装も計画していません。App Sandbox の実装が無い場合には、関連する UserDefaults を容易に改ざんできることから、悪意のあるシェルスクリプトが実行される恐れがあり、従ってシステム全体に脆弱性を持つことは疑う余地がありません。威注音入力アプリの公式発行版は Sandbox 処理済みであり、そして威注音入力アプリは、このような脆弱性を持たないために、すでに（デザイン上の）安全処置済み。";
@@ -305,6 +306,8 @@
 "Show notifications when toggling Caps Lock" = "Caps Lock で切り替えの時に吹出通知メッセージを";
 "Show translated strokes in composition buffer" = "原始キーネームでなく、筆画を入力緩衝列で表示する";
 "Simplified Chinese" = "簡体中国語";
+"Some clients with web-based front UI may have issues rendering segmented thick underlines drawn by their implemented “setMarkedText()”. This option stops the input method from delivering segmented thick underlines to “client().setMarkedText()”. Note that segmented thick underlines are only used in marking mode, unless the client itself misimplements the IMKTextInput method “setMarkedText()”. This option only affects the inline composition buffer." = "一部の「Web UI を用いた」客体アプリには、多段式太下線の描きをうまく取り扱えぬ支障はございます。このチェックを入れると、IME から「client().setMarkedText()」を経由して、客体に「多段式太下線を書かずに」と命令することはできます。多段式太下線はマーキングモードだけで用いるデザインですが、間違くて別のモードでもそれを書いてしまう客体アプリはございます（多分 IMKTextInput の実作の問題かもしれません）。このチェックは「文脈内入力緩衝列」だけに関わります。";
+"Some previous options are moved to other tabs." = "かつてこのページに載った一部のオプションは、今は他のページへ移動しました。";
 "Space to +revolve candidates, Shift+Space to +revolve pages" = "Shift+Space で次のページ、Space で次の候補文字を";
 "Space to +revolve pages, Shift+Space to +revolve candidates" = "Space で次のページ、Shift+Space で次の候補文字を";
 "Space:" = "Space:";
