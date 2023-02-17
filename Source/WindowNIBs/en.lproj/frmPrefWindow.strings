@@ -111,6 +111,7 @@
 "tglTrimUnfinishedReadingsOnCommit.title" = "Trim unfinished readings / strokes on commit";
 "TXr-FF-ehw.title" = "Traditional Chinese";
 "ueU-Rz-a1C.title" = "Choose the behavior of (Shift+)Tab key in the candidate window.";
+"VAP-TU-eck.title" = "Some clients with web-based front UI may have issues rendering segmented thick underlines drawn by their implemented “setMarkedText()”. This option stops the input method from delivering segmented thick underlines to “client().setMarkedText()”. Note that segmented thick underlines are only used in marking mode, unless the client itself misimplements the IMKTextInput method “setMarkedText()”. This option only affects the inline composition buffer.";
 "VdT-fw-7pQ.title" = "Debug Mode";
 "vpd-zx-GIk.title" = "Seigyou (JinYei)";
 "W24-T4-cg0.title" = "Enable CNS11643 Support (2023-01-06)";
@@ -133,4 +134,5 @@
 "xjP-r7-GaK.title" = "Dachen 26 (libChewing)";
 "XqL-rf-X6d.title" = "Space to +revolve pages, Shift+Space to +revolve candidates";
 "xrE-8T-WKO.label" = "Advanced";
+"N6e-bR-mVa.title" = "Disable segmented thick underline in marking mode for managed clients";
 "ZEv-Q2-mYL.title" = "Change user interface language (will reboot the IME).";

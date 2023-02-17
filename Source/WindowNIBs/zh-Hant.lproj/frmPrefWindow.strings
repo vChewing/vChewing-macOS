@@ -111,6 +111,7 @@
 "tglTrimUnfinishedReadingsOnCommit.title" = "在遞交時清理未完成拼寫的讀音或字根";
 "TXr-FF-ehw.title" = "繁體中文";
 "ueU-Rz-a1C.title" = "指定 (Shift+)Tab 熱鍵在選字窗內的輪替操作對象。";
+"VAP-TU-eck.title" = "部分採用 Web 前端介面設計的客體應用可能會無法正常繪製用於輸入法標記模式的分段式粗型下劃線。這個選項將會阻止輸入法藉由 client().setMarkedText() 函式向客體應用傳達對粗型下劃線的分段繪製請求。分段式粗型下劃線僅用於輸入法的標記模式，除非客體應用對 setMarkedText() 這個 IMKTextInput 協定方法的實作有問題。該選項僅影響內文組字區。";
 "VdT-fw-7pQ.title" = "偵錯模式";
 "vpd-zx-GIk.title" = "精業";
 "W24-T4-cg0.title" = "啟用 CNS11643 全字庫支援 (2023-01-06)";
@@ -133,4 +134,5 @@
 "xjP-r7-GaK.title" = "酷音大千二十六鍵";
 "XqL-rf-X6d.title" = "Space 換下一頁，Shift+Space 換選下一個候選字";
 "xrE-8T-WKO.label" = "進階";
+"N6e-bR-mVa.title" = "針對被管理的客體，在標記模式下禁用分段式粗型下劃線";
 "ZEv-Q2-mYL.title" = "變更使用者介面語言，會自動重新啟動輸入法。";
