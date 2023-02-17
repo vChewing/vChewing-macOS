@@ -73,6 +73,8 @@ public enum UserDef: String, CaseIterable {
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kHandleDefaultCandidateFontsByLangIdentifier = "HandleDefaultCandidateFontsByLangIdentifier"
+  case kDisableSegmentedThickUnderlineInMarkingModeForManagedClients
+    = "DisableSegmentedThickUnderlineInMarkingModeForManagedClients"
 
   case kCandidateTextFontName = "CandidateTextFontName"
   case kCandidateKeys = "CandidateKeys"
