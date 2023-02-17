@@ -99,7 +99,7 @@ public extension SessionCtl {
     if !LMMgr.currentLM.isCoreLMLoaded {
       if (event as InputSignalProtocol).isReservedKey { return false }
       var newState: IMEStateProtocol = IMEState.ofEmpty()
-      newState.tooltip = NSLocalizedString("Factory dictionary not loaded yet.", comment: "") + "　　"
+      newState.tooltip = NSLocalizedString("Factory dictionary not loaded yet.", comment: "")
       newState.tooltipDuration = 1.85
       newState.data.tooltipColorState = .redAlert
       switchState(newState)

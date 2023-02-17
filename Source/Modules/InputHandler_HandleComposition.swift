@@ -204,7 +204,7 @@ extension InputHandler {
       if calligrapher.isEmpty, isWildcardKeyInput {
         delegate.callError("3606B9C0")
         var newEmptyState = compositor.isEmpty ? IMEState.ofEmpty() : generateStateOfInputting()
-        newEmptyState.tooltip = NSLocalizedString("Wildcard key cannot be the initial key.", comment: "") + "　　"
+        newEmptyState.tooltip = NSLocalizedString("Wildcard key cannot be the initial key.", comment: "")
         newEmptyState.data.tooltipColorState = .redAlert
         newEmptyState.tooltipDuration = 1.0
         delegate.switchState(newEmptyState)
@@ -345,7 +345,7 @@ extension InputHandler {
         delegate.callError("D220B880：輸入的字碼沒有對應的字元。")
         var updatedState = IMEState.ofAbortion()
         updatedState.tooltipDuration = 0
-        updatedState.tooltip = "Invalid Code Point.".localized + "　　"
+        updatedState.tooltip = "Invalid Code Point.".localized
         delegate.switchState(updatedState)
         isCodePointInputMode = true
         return true
