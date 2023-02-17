@@ -35,12 +35,10 @@ extension SessionCtl: InputHandlerDelegate {
     guard let inputHandler = inputHandler, state.type == .ofMarking else { return false }
     if !LMMgr.writeUserPhrase(
       state.data.userPhraseDumped, inputMode: inputMode,
-      areWeDuplicating: state.data.doesUserPhraseExist,
       areWeDeleting: addToFilter
     )
       || !LMMgr.writeUserPhrase(
         state.data.userPhraseDumpedConverted, inputMode: inputMode.reversed,
-        areWeDuplicating: false,
         areWeDeleting: addToFilter
       )
     {
@@ -194,12 +192,10 @@ extension SessionCtl: CtlCandidateDelegate {
 
     if !LMMgr.writeUserPhrase(
       userPhraseDumped, inputMode: inputMode,
-      areWeDuplicating: action != .toFilter,
       areWeDeleting: action == .toFilter
     )
       || !LMMgr.writeUserPhrase(
         userPhraseDumpedConverted, inputMode: inputMode.reversed,
-        areWeDuplicating: action != .toFilter,
         areWeDeleting: action == .toFilter
       )
     {

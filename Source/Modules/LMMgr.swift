@@ -634,54 +634,58 @@ public class LMMgr {
   // MARK: - 寫入使用者檔案
 
   public static func writeUserPhrase(
-    _ userPhrase: String?, inputMode mode: Shared.InputMode, areWeDuplicating: Bool, areWeDeleting: Bool
+    _ userPhrase: String, inputMode mode: Shared.InputMode, areWeDeleting: Bool
   ) -> Bool {
-    if var currentMarkedPhrase: String = userPhrase {
-      if !chkUserLMFilesExist(.imeModeCHS)
-        || !chkUserLMFilesExist(.imeModeCHT)
-      {
-        return false
-      }
-
-      let theType: vChewingLM.ReplacableUserDataType = areWeDeleting ? .theFilter : .thePhrases
-      let theURL = userDictDataURL(mode: mode, type: theType)
-
-      if areWeDuplicating, !areWeDeleting {
-        // Do not use ASCII characters to comment here.
-        // Otherwise, it will be scrambled by cnvHYPYtoBPMF
-        // module shipped in the vChewing Phrase Editor.
-        currentMarkedPhrase += " #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎"
-      }
-
-      if let writeFile = FileHandle(forUpdatingAtPath: theURL.path),
-         let data = currentMarkedPhrase.data(using: .utf8),
-         let endl = "\n".data(using: .utf8)
-      {
-        writeFile.seekToEndOfFile()
-        writeFile.write(endl)
-        writeFile.write(data)
-        writeFile.write(endl)
-        writeFile.closeFile()
-      } else {
-        return false
-      }
-
-      // We enforce the format consolidation here, since the pragma header
-      // will let the UserPhraseLM bypasses the consolidating process on load.
-      if !vChewingLM.LMConsolidator.consolidate(path: theURL.path, pragma: false) {
-        return false
-      }
-
-      // The new FolderMonitor module does NOT monitor cases that files are modified
-      // by the current application itself, requiring additional manual loading process here.
-      if #available(macOS 10.15, *) { FileObserveProject.shared.touch() }
-      if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
-        CtlPrefWindow.shared?.updatePhraseEditor()
-      }
-      loadUserPhrasesData(type: .thePhrases)
-      return true
+    var userPhraseOutput: String = userPhrase
+    if !chkUserLMFilesExist(.imeModeCHS)
+      || !chkUserLMFilesExist(.imeModeCHT)
+    {
+      return false
     }
-    return false
+
+    let theType: vChewingLM.ReplacableUserDataType = areWeDeleting ? .theFilter : .thePhrases
+    let theURL = userDictDataURL(mode: mode, type: theType)
+
+    let arr = userPhraseOutput.split(separator: " ")
+    var areWeDuplicating = false
+    if arr.count >= 2 {
+      areWeDuplicating = Self.checkIfUserPhraseExist(
+        userPhrase: arr[0].description, mode: mode, key: arr[1].description, factoryDictionaryOnly: true
+      )
+    }
+
+    if areWeDuplicating, !areWeDeleting {
+      // Do not use ASCII characters to comment here.
+      userPhraseOutput += " #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎"
+    }
+
+    if let writeFile = FileHandle(forUpdatingAtPath: theURL.path),
+       let data = userPhraseOutput.data(using: .utf8),
+       let endl = "\n".data(using: .utf8)
+    {
+      writeFile.seekToEndOfFile()
+      writeFile.write(endl)
+      writeFile.write(data)
+      writeFile.write(endl)
+      writeFile.closeFile()
+    } else {
+      return false
+    }
+
+    // We enforce the format consolidation here, since the pragma header
+    // will let the UserPhraseLM bypasses the consolidating process on load.
+    if !vChewingLM.LMConsolidator.consolidate(path: theURL.path, pragma: false) {
+      return false
+    }
+
+    // The new FolderMonitor module does NOT monitor cases that files are modified
+    // by the current application itself, requiring additional manual loading process here.
+    if #available(macOS 10.15, *) { FileObserveProject.shared.touch() }
+    if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
+      CtlPrefWindow.shared?.updatePhraseEditor()
+    }
+    loadUserPhrasesData(type: .thePhrases)
+    return true
   }
 
   // MARK: - 藉由語彙編輯器開啟使用者檔案
