@@ -109,7 +109,7 @@ struct VwrPrefPaneDictionary: View {
             ).controlSize(.small)
             Text(
               LocalizedStringKey(
-                "Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. Official releases of vChewing is Sandboxed, and a Sandboxed app is not allowed to execute an external shell command, either."
+                "Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. vChewing is designed to be invulnerable from this kind of attack. Also, official releases of vChewing are Sandboxed."
               )
             )
             .preferenceDescription()
