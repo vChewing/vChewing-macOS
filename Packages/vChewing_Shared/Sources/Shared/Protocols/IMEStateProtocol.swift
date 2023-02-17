@@ -57,7 +57,6 @@ public protocol IMEStateDataProtocol {
   var userPhraseKVPair: (String, String) { get }
   var userPhraseDumped: String { get }
   var userPhraseDumpedConverted: String { get }
-  var doesUserPhraseExist: Bool { get }
   var tooltipColorState: TooltipColorState { get set }
   mutating func updateTooltipForMarking()
 }
