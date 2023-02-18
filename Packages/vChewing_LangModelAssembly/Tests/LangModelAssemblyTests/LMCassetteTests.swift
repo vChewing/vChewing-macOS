@@ -21,7 +21,7 @@ private let testDataPath: String = packageRootPath + "/Tests/TestCINData/"
 final class LMCassetteTests: XCTestCase {
   func testCassetteLoadWubi86() throws {
     let pathCINFile = testDataPath + "wubi.cin"
-    let lmCassette = vChewingLM.LMCassette()
+    var lmCassette = vChewingLM.LMCassette()
     NSLog("LMCassette: Start loading CIN.")
     lmCassette.open(pathCINFile)
     NSLog("LMCassette: Finished loading CIN. Entries: \(lmCassette.count)")
