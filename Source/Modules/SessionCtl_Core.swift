@@ -45,7 +45,23 @@ public class SessionCtl: IMKInputController {
 
   /// 用以存儲客體的 bundleIdentifier。
   /// 由於每次動態獲取都會耗時，所以這裡直接靜態記載之。
-  public var clientBundleIdentifier: String = ""
+  public var clientBundleIdentifier: String = "" {
+    willSet {
+      if newValue.isEmpty { return }
+      Self.recentClientBundleIdentifiers[newValue] = Int(Date().timeIntervalSince1970)
+    }
+  }
+
+  /// 用以記錄最近存取過的十個客體（亂序），相關內容會在客體管理器當中用得到。
+  public static var recentClientBundleIdentifiers = [String: Int]() {
+    didSet {
+      if recentClientBundleIdentifiers.count < 20 { return }
+      if recentClientBundleIdentifiers.isEmpty { return }
+      let x = recentClientBundleIdentifiers.sorted(by: { $0.value < $1.value }).first?.key
+      guard let x = x else { return }
+      recentClientBundleIdentifiers[x] = nil
+    }
+  }
 
   // MARK: -
 
