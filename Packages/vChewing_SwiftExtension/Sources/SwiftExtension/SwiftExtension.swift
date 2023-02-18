@@ -8,6 +8,20 @@
 
 import Foundation
 
+// MARK: - Bool Operators
+
+public func |= (lhs: inout Bool, rhs: Bool) {
+  lhs = lhs || rhs
+}
+
+public func &= (lhs: inout Bool, rhs: Bool) {
+  lhs = lhs && rhs
+}
+
+public func ^= (lhs: inout Bool, rhs: Bool) {
+  lhs = lhs != rhs
+}
+
 // MARK: - String.localized extension
 
 public extension StringLiteralType {
