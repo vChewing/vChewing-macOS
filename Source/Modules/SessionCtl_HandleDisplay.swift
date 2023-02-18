@@ -86,15 +86,15 @@ public extension SessionCtl {
     /// 先取消既有的選字窗的內容顯示。否則可能會重複生成選字窗的 NSWindow()。
     candidateUI?.visible = false
     /// 然後再重新初期化。
-    if #available(macOS 10.15, *) {
+    if #available(macOS 10.13, *) {
       candidateUI =
         PrefMgr.shared.useIMKCandidateWindow
           ? CtlCandidateIMK(candidateLayout) : CtlCandidateTDK(candidateLayout)
       if let candidateTDK = candidateUI as? CtlCandidateTDK {
-        candidateTDK.maxLinesPerPage = isVerticalTyping ? 1 : 3
+        candidateTDK.maxLinesPerPage = isVerticalTyping ? 1 : 4
       }
     } else {
-      candidateUI = CtlCandidateIMK(candidateLayout)
+      candidateUI = CtlCandidateTDK(candidateLayout)
     }
 
     candidateUI?.candidateFont = Self.candidateFont(

@@ -9,61 +9,44 @@
 import Cocoa
 import CocoaExtension
 import Shared
+import SwiftExtension
 import SwiftUI
 
-@available(macOS 10.15, *)
+private extension NSUserInterfaceLayoutOrientation {
+  var layoutTDK: CandidatePool.LayoutOrientation {
+    switch self {
+    case .horizontal:
+      return .horizontal
+    case .vertical:
+      return .vertical
+    @unknown default:
+      return .horizontal
+    }
+  }
+}
+
 public class CtlCandidateTDK: CtlCandidate {
   public var maxLinesPerPage: Int = 0
-
-  private static var thePoolHorizontal: CandidatePool = .init(candidates: [], rowCapacity: 6)
-  private static var thePoolVertical: CandidatePool = .init(candidates: [], columnCapacity: 6)
+  public var isLegacyMode: Bool = false
+  private static var thePool: CandidatePool = .init(candidates: [])
   private static var currentView: NSView = .init()
 
-  @available(macOS 12, *)
-  private var theViewHorizontal: some View {
-    VwrCandidateHorizontal(
-      controller: self, thePool: Self.thePoolHorizontal,
-      tooltip: tooltip, reverseLookupResult: reverseLookupResult
+  @available(macOS 10.15, *)
+  private var theView: some View {
+    VwrCandidateTDK(
+      controller: self, thePool: Self.thePool
     ).edgesIgnoringSafeArea(.top)
   }
 
-  @available(macOS 12, *)
-  private var theViewVertical: some View {
-    VwrCandidateVertical(
-      controller: self, thePool: Self.thePoolVertical,
-      tooltip: tooltip, reverseLookupResult: reverseLookupResult
-    ).edgesIgnoringSafeArea(.top)
-  }
-
-  private var theViewHorizontalBackports: some View {
-    VwrCandidateHorizontalBackports(
-      controller: self, thePool: Self.thePoolHorizontal,
-      tooltip: tooltip, reverseLookupResult: reverseLookupResult
-    ).edgesIgnoringSafeArea(.top)
-  }
-
-  private var theViewVerticalBackports: some View {
-    VwrCandidateVerticalBackports(
-      controller: self, thePool: Self.thePoolVertical,
-      tooltip: tooltip, reverseLookupResult: reverseLookupResult
-    ).edgesIgnoringSafeArea(.top)
-  }
-
-  private var thePool: CandidatePool {
-    get {
-      switch currentLayout {
-      case .horizontal: return Self.thePoolHorizontal
-      case .vertical: return Self.thePoolVertical
-      @unknown default: return .init(candidates: [], rowCapacity: 0)
-      }
-    }
-    set {
-      switch currentLayout {
-      case .horizontal: Self.thePoolHorizontal = newValue
-      case .vertical: Self.thePoolVertical = newValue
-      @unknown default: break
-      }
-    }
+  private var theViewLegacy: NSView {
+    let textField = NSTextField(
+      labelWithAttributedString: Self.thePool.attributedDescription
+    )
+    textField.isSelectable = false
+    textField.allowsEditingTextAttributes = false
+    textField.preferredMaxLayoutWidth = textField.frame.width
+    textField.backgroundColor = .controlBackgroundColor
+    return textField
   }
 
   // MARK: - Constructors
@@ -93,165 +76,108 @@ public class CtlCandidateTDK: CtlCandidate {
   // MARK: - Public functions
 
   override public func reloadData() {
-    CandidateCellData.highlightBackground = highlightedColor()
     CandidateCellData.unifiedSize = candidateFont.pointSize
     guard let delegate = delegate else { return }
-
-    switch currentLayout {
-    case .horizontal:
-      Self.thePoolHorizontal = .init(
-        candidates: delegate.candidatePairs(conv: true).map(\.1), rowCapacity: 6,
-        rows: maxLinesPerPage, selectionKeys: delegate.selectionKeys, locale: locale
-      )
-      Self.thePoolHorizontal.highlight(at: 0)
-    case .vertical:
-      Self.thePoolVertical = .init(
-        candidates: delegate.candidatePairs(conv: true).map(\.1), columnCapacity: 6,
-        columns: maxLinesPerPage, selectionKeys: delegate.selectionKeys, locale: locale
-      )
-      Self.thePoolVertical.highlight(at: 0)
-    @unknown default:
-      return
-    }
+    Self.thePool = .init(
+      candidates: delegate.candidatePairs(conv: true).map(\.1), lines: maxLinesPerPage,
+      selectionKeys: delegate.selectionKeys, layout: currentLayout.layoutTDK, locale: locale
+    )
+    Self.thePool.tooltip = tooltip
+    Self.thePool.reverseLookupResult = reverseLookupResult
+    Self.thePool.highlight(at: 0)
     updateDisplay()
   }
 
   override open func updateDisplay() {
     guard let window = window else { return }
-    reverseLookupResult = delegate?.reverseLookup(for: currentSelectedCandidateText) ?? []
-    switch currentLayout {
-    case .horizontal:
-      DispatchQueue.main.async { [self] in
-        if #available(macOS 12, *) {
-          Self.currentView = NSHostingView(rootView: theViewHorizontal)
-        } else {
-          Self.currentView = NSHostingView(rootView: theViewHorizontalBackports)
+    if let currentCandidateText = Self.thePool.currentSelectedCandidateText {
+      reverseLookupResult = delegate?.reverseLookup(for: currentCandidateText) ?? []
+      Self.thePool.reverseLookupResult = reverseLookupResult
+    }
+    DispatchQueue.main.async { [self] in
+      if #available(macOS 10.15, *) {
+        if isLegacyMode {
+          updateNSWindowLegacy(window)
+          return
         }
+        window.isOpaque = false
+        window.backgroundColor = NSColor.clear
+        Self.currentView = NSHostingView(rootView: theView)
         let newSize = Self.currentView.fittingSize
         window.contentView = Self.currentView
         window.setContentSize(newSize)
+      } else {
+        updateNSWindowLegacy(window)
       }
-    case .vertical:
-      DispatchQueue.main.async { [self] in
-        if #available(macOS 12, *) {
-          Self.currentView = NSHostingView(rootView: theViewVertical)
-        } else {
-          Self.currentView = NSHostingView(rootView: theViewVerticalBackports)
-        }
-        let newSize = Self.currentView.fittingSize
-        window.contentView = Self.currentView
-        window.setContentSize(newSize)
-      }
-    @unknown default:
-      return
     }
   }
 
+  func updateNSWindowLegacy(_ window: NSWindow) {
+    window.isOpaque = true
+    window.backgroundColor = NSColor.controlBackgroundColor
+    let viewToDraw = theViewLegacy
+    let coreSize = viewToDraw.fittingSize
+    let padding: Double = 5
+    let outerSize: NSSize = .init(
+      width: coreSize.width + 2 * padding,
+      height: coreSize.height + 2 * padding
+    )
+    let innerOrigin: NSPoint = .init(x: padding, y: padding)
+    let outerRect: NSRect = .init(origin: .zero, size: outerSize)
+    viewToDraw.setFrameOrigin(innerOrigin)
+    Self.currentView = NSView(frame: outerRect)
+    Self.currentView.addSubview(viewToDraw)
+    window.contentView = Self.currentView
+    window.setContentSize(outerSize)
+  }
+
+  // Already implemented in CandidatePool.
   @discardableResult override public func showNextPage() -> Bool {
-    showNextLine(count: thePool.maxLinesPerPage)
+    defer { updateDisplay() }
+    return Self.thePool.flipPage(isBackward: false)
   }
 
-  @discardableResult override public func showNextLine() -> Bool {
-    showNextLine(count: 1)
-  }
-
-  public func showNextLine(count: Int) -> Bool {
-    if thePool.currentLineNumber == thePool.candidateLines.count - 1 {
-      return highlightNextCandidate()
-    }
-    if count <= 0 { return false }
-    for _ in 0 ..< min(thePool.maxLinesPerPage, count) {
-      thePool.selectNewNeighborLine(isForward: true)
-    }
-    updateDisplay()
-    return true
-  }
-
+  // Already implemented in CandidatePool.
   @discardableResult override public func showPreviousPage() -> Bool {
-    showPreviousLine(count: thePool.maxLinesPerPage)
+    defer { updateDisplay() }
+    return Self.thePool.flipPage(isBackward: true)
   }
 
+  // Already implemented in CandidatePool.
   @discardableResult override public func showPreviousLine() -> Bool {
-    showPreviousLine(count: 1)
+    defer { updateDisplay() }
+    return Self.thePool.consecutivelyFlipLines(isBackward: true, count: 1)
   }
 
-  public func showPreviousLine(count: Int) -> Bool {
-    if thePool.currentLineNumber == 0 {
-      return highlightPreviousCandidate()
-    }
-    if count <= 0 { return false }
-    for _ in 0 ..< min(thePool.maxLinesPerPage, count) {
-      thePool.selectNewNeighborLine(isForward: false)
-    }
-    updateDisplay()
-    return true
+  // Already implemented in CandidatePool.
+  @discardableResult override public func showNextLine() -> Bool {
+    defer { updateDisplay() }
+    return Self.thePool.consecutivelyFlipLines(isBackward: false, count: 1)
   }
 
+  // Already implemented in CandidatePool.
   @discardableResult override public func highlightNextCandidate() -> Bool {
-    if thePool.highlightedIndex == thePool.candidateDataAll.count - 1 {
-      thePool.highlight(at: 0)
-      updateDisplay()
-      return false
-    }
-    thePool.highlight(at: thePool.highlightedIndex + 1)
-    updateDisplay()
-    return true
+    defer { updateDisplay() }
+    return Self.thePool.highlightNeighborCandidate(isBackward: false)
   }
 
+  // Already implemented in CandidatePool.
   @discardableResult override public func highlightPreviousCandidate() -> Bool {
-    if thePool.highlightedIndex == 0 {
-      thePool.highlight(at: thePool.candidateDataAll.count - 1)
-      updateDisplay()
-      return false
-    }
-    thePool.highlight(at: thePool.highlightedIndex - 1)
-    updateDisplay()
-    return true
+    defer { updateDisplay() }
+    return Self.thePool.highlightNeighborCandidate(isBackward: true)
   }
 
-  override public func candidateIndexAtKeyLabelIndex(_ id: Int) -> Int {
-    let arrCurrentLine = thePool.candidateLines[thePool.currentLineNumber]
-    if !(0 ..< arrCurrentLine.count).contains(id) { return -114_514 }
-    let actualID = max(0, min(id, arrCurrentLine.count - 1))
-    return arrCurrentLine[actualID].index
+  // Already implemented in CandidatePool.
+  override public func candidateIndexAtKeyLabelIndex(_ id: Int) -> Int? {
+    Self.thePool.calculateCandidateIndex(subIndex: id)
   }
 
+  // Already implemented in CandidatePool.
   override public var highlightedIndex: Int {
-    get { thePool.highlightedIndex }
+    get { Self.thePool.highlightedIndex }
     set {
-      thePool.highlight(at: newValue)
+      Self.thePool.highlight(at: newValue)
       updateDisplay()
     }
-  }
-}
-
-@available(macOS 10.15, *)
-extension CtlCandidateTDK {
-  private var isMontereyAvailable: Bool {
-    if #unavailable(macOS 12) { return false }
-    return true
-  }
-
-  private var currentSelectedCandidateText: String {
-    if thePool.candidateDataAll.count > highlightedIndex {
-      return thePool.candidateDataAll[highlightedIndex].displayedText
-    }
-    return ""
-  }
-}
-
-@available(macOS 10.15, *)
-public extension CtlCandidateTDK {
-  var highlightedColorUIBackports: some View {
-    // 設定當前高亮候選字的背景顏色。
-    let result: Color = {
-      switch locale {
-      case "zh-Hans": return Color.red
-      case "zh-Hant": return Color.blue
-      case "ja": return Color.pink
-      default: return Color.accentColor
-      }
-    }()
-    return result.opacity(0.85)
   }
 }
