@@ -81,6 +81,9 @@ public class PrefMgr: PrefMgrProtocol {
     }
   }
 
+  @AppProperty(key: UserDef.kCandidateWindowShowOnlyOneLine.rawValue, defaultValue: false)
+  public var candidateWindowShowOnlyOneLine: Bool
+
   @AppProperty(key: UserDef.kShouldAutoReloadUserDataFiles.rawValue, defaultValue: true)
   public var shouldAutoReloadUserDataFiles: Bool
 
