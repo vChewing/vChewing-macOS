@@ -314,11 +314,13 @@
 "Specify the behavior of intonation key when syllable composer is empty." = "音読組立緩衝列が空かされた時の音調キーの行為をご指定ください。";
 "Starlight" = "星光配列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "マナーモード // 外すと入力間違った時に変な声が出る";
+"Tadokoro candidate window shows 4 rows / columns by default, providing similar experiences from Microsoft New Phonetic IME and macOS bult-in Chinese IME (since macOS 10.9). However, for some users who have presbyopia, they prefer giant candidate font sizes, resulting a concern that multiple rows / columns of candidates can make the candidate window looks too big, hence this option. Note that this option will be dismissed if the typing context is vertical, forcing the candidates to be shown in only one row / column. Only one reverse-lookup result can be made available in single row / column mode due to reduced candidate window size." = "田所候補陳列ウィンドウは普段４つの行・列で文字候補を陳列しています。ただ、老眼の患者には、大きなる文字候補サイズが必要であり、複数の行・列の文字候補ウィンドウのサイズも大きくなります。この場合、文字候補を１つ行・列だけにすれば、候補陳列ウィンドウのサイズを多少縮むことはできます。従って、このオプションを提供しました。ただ、注意点は２つ：１）縦書きの時には、このオプションは無視され、文字候補はずっと１つ行・列にされます；２）１つ行・列だけで文字候補を陳列する場合、候補陳列ウィンドウのサイズは不足で、表示できる逆引参照の結果は１つだけです。";
 "The lookup results are supplied by the CIN cassette module." = "逆引参照の結果は CIN カセットモジュールから提供。";
 "The user override model only possesses memories temporarily. It won't memorize those unigrams consisting of only one Chinese character, except “你/他/妳/她/祢/衪/它/牠/再/在”. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu." = "臨時記憶モジュールは文字の通り「臨時的」の記憶をし、そして「你/他/妳/她/祢/衪/它/牠/再/在」以外の「１漢字のユニグラム」を記憶しません。記録は六日間どんどん忘れてしまいます。入力アプリのメニューから全ての記録を消すことはできます。";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode." = "この転換はカセットモードだけに使える転換であり、転換結果はこの設定と入力モード次第である。";
 "This feature requires macOS 10.15 and above." = "この機能の稼働には macOS 10.15 以降のシステムが必要である。";
 "This only works with Tadokoro candidate window." = "これは田所候補陳列ウィンドウだけに効ける機能である。";
+"This will also affect the row / column capacity of the candidate window." = "言選り用キーの数は、候補陳列の行・列の容量制限にも影響。";
 "This will batch-replace specified candidates." = "指定された候補そのものを置き換える";
 "This will stop user override model from affecting how candidates get sorted." = "これで臨時記憶モジュールは候補陳列の順番に影響を与えなくなる。";
 "This will use the plist files deployed by the “make install” command from libvChewing-Data if possible." = "これで libvChewing-Data の make install にて設置した公式辞書ファイルを優先的に用いる。";
@@ -333,6 +335,7 @@
 "Use .langIdentifier to handle UI fonts in candidate window" = "「.langIdentifier」を使って候補陳列ウィンドウのフォントを取り扱う";
 "Use ESC key to clear the entire input buffer" = "ESC キーで入力緩衝列を消す";
 "Use IMK Candidate Window instead of Tadokoro" = "IMK 候補陳列ウィンドウを起用";
+"Use only one row / column in candidate window." = "ただ１つ行・列で文字候補を陳列。";
 "Vertical" = "縦型陳列";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
 "Yale Pinyin with Numeral Intonation" = "イェール弁音 (ローマ字+数字音調)";
