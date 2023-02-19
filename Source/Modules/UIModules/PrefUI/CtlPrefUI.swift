@@ -19,17 +19,19 @@ extension PrefUITabs {
 struct VwrPrefPage: View {
   @State var tabType: PrefUITabs
   var body: some View {
-    switch tabType {
-    case .tabGeneral: VwrPrefPaneGeneral()
-    case .tabCandidates: VwrPrefPaneCandidates()
-    case .tabBehavior: VwrPrefPaneBehavior()
-    case .tabOutput: VwrPrefPaneOutput()
-    case .tabDictionary: VwrPrefPaneDictionary()
-    case .tabPhrases: VwrPrefPanePhrases()
-    case .tabCassette: VwrPrefPaneCassette()
-    case .tabKeyboard: VwrPrefPaneKeyboard()
-    case .tabDevZone, .tabExperience: VwrPrefPaneDevZone()
-    }
+    Group {
+      switch tabType {
+      case .tabGeneral: VwrPrefPaneGeneral()
+      case .tabCandidates: VwrPrefPaneCandidates()
+      case .tabBehavior: VwrPrefPaneBehavior()
+      case .tabOutput: VwrPrefPaneOutput()
+      case .tabDictionary: VwrPrefPaneDictionary()
+      case .tabPhrases: VwrPrefPanePhrases()
+      case .tabCassette: VwrPrefPaneCassette()
+      case .tabKeyboard: VwrPrefPaneKeyboard()
+      case .tabDevZone, .tabExperience: VwrPrefPaneDevZone()
+      }
+    }.fixedSize()
   }
 }
 
