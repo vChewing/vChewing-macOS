@@ -13,7 +13,7 @@ import SwiftExtension
 
 public class PrefMgr: PrefMgrProtocol {
   public static let shared = PrefMgr()
-  public static let kDefaultCandidateKeys = "123456789"
+  public static let kDefaultCandidateKeys = "123456"
   public static let kDefaultBasicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
   public static let kDefaultAlphanumericalKeyboardLayout = {
     if #available(macOS 10.13, *) {

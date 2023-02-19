@@ -241,7 +241,7 @@ public enum KeyboardParser: Int, CaseIterable {
 public enum CandidateKey {
   public static var defaultKeys: String { suggestions[0] }
   public static let suggestions: [String] = [
-    "123456789", "234567890", "QWERTYUIO", "QWERTASDF", "ASDFGHJKL", "ASDFZXCVB",
+    "123456", "123456789", "234567890", "QWERTYUIO", "QWERTASDF", "ASDFGHJKL", "ASDFZXCVB",
   ]
 
   /// 僅列舉那些需要專門檢查才能發現的那種無法自動排除的錯誤。
