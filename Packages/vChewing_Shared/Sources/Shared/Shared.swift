@@ -25,6 +25,7 @@ public enum UserDef: String, CaseIterable {
   case kAlphanumericalKeyboardLayout = "AlphanumericalKeyboardLayout"
   case kShowNotificationsWhenTogglingCapsLock = "ShowNotificationsWhenTogglingCapsLock"
   case kCandidateListTextSize = "CandidateListTextSize"
+  case kCandidateWindowShowOnlyOneLine = "CandidateWindowShowOnlyOneLine"
   case kAppleLanguages = "AppleLanguages"
   case kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
   case kUseRearCursorMode = "UseRearCursorMode"
