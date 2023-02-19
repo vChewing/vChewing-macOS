@@ -79,9 +79,7 @@ extension SessionCtl: CtlCandidateDelegate {
       && !clientBundleIdentifier.contains("com.raycast.macos")
   }
 
-  public var showReverseLookupResult: Bool {
-    !isVerticalTyping && PrefMgr.shared.showReverseLookupInCandidateUI
-  }
+  public var showReverseLookupResult: Bool { PrefMgr.shared.showReverseLookupInCandidateUI }
 
   @discardableResult public func reverseLookup(for value: String) -> [String] {
     let blankResult: [String] = []

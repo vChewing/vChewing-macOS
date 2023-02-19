@@ -91,7 +91,8 @@ public extension SessionCtl {
         PrefMgr.shared.useIMKCandidateWindow
           ? CtlCandidateIMK(candidateLayout) : CtlCandidateTDK(candidateLayout)
       if let candidateTDK = candidateUI as? CtlCandidateTDK {
-        candidateTDK.maxLinesPerPage = isVerticalTyping ? 1 : 4
+        let singleLine = isVerticalTyping || PrefMgr.shared.candidateWindowShowOnlyOneLine
+        candidateTDK.maxLinesPerPage = singleLine ? 1 : 4
       }
     } else {
       candidateUI = CtlCandidateTDK(candidateLayout)
@@ -101,14 +102,16 @@ public extension SessionCtl {
       name: PrefMgr.shared.candidateTextFontName, size: PrefMgr.shared.candidateListTextSize
     )
 
+    let singleColumn = isVerticalTyping || PrefMgr.shared.candidateWindowShowOnlyOneLine
+
     if PrefMgr.shared.cassetteEnabled {
       candidateUI?.tooltip =
-        isVerticalTyping ? "📼" : "📼 " + NSLocalizedString("CIN Cassette Mode", comment: "")
+        singleColumn ? "📼" : "📼 " + NSLocalizedString("CIN Cassette Mode", comment: "")
     }
 
     if state.type == .ofAssociates {
       candidateUI?.tooltip =
-        isVerticalTyping ? "⇧" : NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
+        singleColumn ? "⇧" : NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
     }
 
     candidateUI?.useLangIdentifier = PrefMgr.shared.legacyCandidateViewTypesettingMethodEnabled
