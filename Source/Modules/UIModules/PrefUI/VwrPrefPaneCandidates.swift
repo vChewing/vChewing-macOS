@@ -17,6 +17,8 @@ struct VwrPrefPaneCandidates: View {
     forKey: UserDef.kCandidateListTextSize.rawValue)
   @State private var selEnableHorizontalCandidateLayout = UserDefaults.standard.bool(
     forKey: UserDef.kUseHorizontalCandidateList.rawValue)
+  @State private var selCandidateWindowShowOnlyOneLine = UserDefaults.standard.bool(
+    forKey: UserDef.kCandidateWindowShowOnlyOneLine.rawValue)
   @State private var selShowReverseLookupInCandidateUI = UserDefaults.standard.bool(
     forKey: UserDef.kShowReverseLookupInCandidateUI.rawValue)
   @State private var selCursorPosition =
@@ -63,6 +65,21 @@ struct VwrPrefPaneCandidates: View {
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Choose your preferred layout of the candidate window."))
             .preferenceDescription().prefDescriptionWidthLimited()
+          Toggle(
+            LocalizedStringKey("Use only one row / column in candidate window."),
+            isOn: $selCandidateWindowShowOnlyOneLine.onChange {
+              PrefMgr.shared.candidateWindowShowOnlyOneLine =
+                selCandidateWindowShowOnlyOneLine
+            }
+          )
+          .controlSize(.small)
+          .disabled(PrefMgr.shared.useIMKCandidateWindow)
+          Text(
+            "This only works with Tadokoro candidate window.".localized
+              + CtlPrefUI.sentenceSeparator
+              + "Tadokoro candidate window shows 4 rows / columns by default, providing similar experiences from Microsoft New Phonetic IME and macOS bult-in Chinese IME (since macOS 10.9). However, for some users who have presbyopia, they prefer giant candidate font sizes, resulting a concern that multiple rows / columns of candidates can make the candidate window looks too big, hence this option. Note that this option will be dismissed if the typing context is vertical, forcing the candidates to be shown in only one row / column. Only one reverse-lookup result can be made available in single row / column mode due to reduced candidate window size.".localized
+          )
+          .preferenceDescription().prefDescriptionWidthLimited()
         }
         SSPreferences.Section(title: "Candidate Size:".localized, bottomDivider: true) {
           Picker(
@@ -258,9 +275,9 @@ private struct VwrPrefPaneCandidates_SelectionKeys: View {
       .preferenceDescription().prefDescriptionWidthLimited()
     } else {
       Text(
-        LocalizedStringKey(
-          "Choose or hit Enter to confim your prefered keys for selecting candidates."
-        )
+        "Choose or hit Enter to confim your prefered keys for selecting candidates.".localized
+          + "\n"
+          + "This will also affect the row / column capacity of the candidate window.".localized
       )
       .preferenceDescription().prefDescriptionWidthLimited()
     }
