@@ -313,11 +313,13 @@
 "Specify the behavior of intonation key when syllable composer is empty." = "Specify the behavior of intonation key when syllable composer is empty.";
 "Starlight" = "Starlight";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "Stop farting (when typed phonetic combination is invalid, etc.)";
+"Tadokoro candidate window shows 4 rows / columns by default, providing similar experiences from Microsoft New Phonetic IME and macOS bult-in Chinese IME (since macOS 10.9). However, for some users who have presbyopia, they prefer giant candidate font sizes, resulting a concern that multiple rows / columns of candidates can make the candidate window looks too big, hence this option. Note that this option will be dismissed if the typing context is vertical, forcing the candidates to be shown in only one row / column. Only one reverse-lookup result can be made available in single row / column mode due to reduced candidate window size." = "Tadokoro candidate window shows 4 rows / columns by default, providing similar experiences from Microsoft New Phonetic IME and macOS bult-in Chinese IME (since macOS 10.9). However, for some users who have presbyopia, they prefer giant candidate font sizes, resulting a concern that multiple rows / columns of candidates can make the candidate window looks too big, hence this option. Note that this option will be dismissed if the typing context is vertical, forcing the candidates to be shown in only one row / column. Only one reverse-lookup result can be made available in single row / column mode due to reduced candidate window size.";
 "The lookup results are supplied by the CIN cassette module." = "The lookup results are supplied by the CIN cassette module.";
 "The user override model only possesses memories temporarily. It won't memorize those unigrams consisting of only one Chinese character, except “你/他/妳/她/祢/衪/它/牠/再/在”. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu." = "The user override model only possesses memories temporarily. It won't memorize those unigrams consisting of only one Chinese character, except “你/他/妳/她/祢/衪/它/牠/再/在”. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu.";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode." = "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode.";
 "This feature requires macOS 10.15 and above." = "This feature requires macOS 10.15 and above.";
 "This only works with Tadokoro candidate window." = "This only works with Tadokoro candidate window.";
+"This will also affect the row / column capacity of the candidate window." = "This will also affect the row / column capacity of the candidate window.";
 "This will batch-replace specified candidates." = "This will batch-replace specified candidates.";
 "This will stop user override model from affecting how candidates get sorted." = "This will stop user override model from affecting how candidates get sorted.";
 "This will use the plist files deployed by the “make install” command from libvChewing-Data if possible." = "This will use the plist files deployed by the “make install” command from libvChewing-Data if possible.";
@@ -332,6 +334,7 @@
 "Use .langIdentifier to handle UI fonts in candidate window" = "Use .langIdentifier to handle UI fonts in candidate window";
 "Use ESC key to clear the entire input buffer" = "Use ESC key to clear the entire input buffer";
 "Use IMK Candidate Window instead of Tadokoro" = "Use IMK Candidate Window instead of Tadokoro";
+"Use only one row / column in candidate window." = "Use only one row / column in candidate window.";
 "Vertical" = "Vertical";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
 "Yale Pinyin with Numeral Intonation" = "Yale Pinyin with Numeral Intonation";

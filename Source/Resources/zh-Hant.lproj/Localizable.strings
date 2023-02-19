@@ -313,11 +313,13 @@
 "Specify the behavior of intonation key when syllable composer is empty." = "指定聲調鍵（在注拼槽為「空」狀態時）的行為。";
 "Starlight" = "星光排列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉恥模式 // 取消勾選的話，敲錯字時會有異音";
+"Tadokoro candidate window shows 4 rows / columns by default, providing similar experiences from Microsoft New Phonetic IME and macOS bult-in Chinese IME (since macOS 10.9). However, for some users who have presbyopia, they prefer giant candidate font sizes, resulting a concern that multiple rows / columns of candidates can make the candidate window looks too big, hence this option. Note that this option will be dismissed if the typing context is vertical, forcing the candidates to be shown in only one row / column. Only one reverse-lookup result can be made available in single row / column mode due to reduced candidate window size." = "田所選字窗在預設情況下會顯示四列/四行候選字，提供類似於 macOS 內建中文輸入法（macOS 10.9 起算）以及微軟新注音輸入法那樣的選字窗排版體驗。然而，部分使用者受老花眼所困擾，需要以較大字號來顯示候選字。這種情況下，多行/多列的選字窗可能會佔用過多的螢幕空間，也就需要這麼一個選項來停用這個特性。需注意：如果當前文字輸入環境是縱排輸入的話，田所選字窗會始終使用單列/單行來顯示候選字、而無視該選項。因為單行/單列選字窗的面積不夠，所以最多只會顯示一筆字根反查結果。";
 "The lookup results are supplied by the CIN cassette module." = "反查結果取自 CIN 磁帶模組。";
 "The user override model only possesses memories temporarily. It won't memorize those unigrams consisting of only one Chinese character, except “你/他/妳/她/祢/衪/它/牠/再/在”. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu." = "半衰記憶模組僅持有臨時記憶之功能，且不會記憶以這幾個漢字以外的漢字組成的（單個漢字的）單元圖：「你/他/妳/她/祢/衪/它/牠/再/在」。每一筆記錄都會在六天之內逐漸變得徹底失效。您可以藉由輸入法選單清除全部的記憶記錄。";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode." = "該轉換僅對磁帶模式有影響，會將鍵入的內容根據該選項與當前的簡繁體模式來轉換。";
 "This feature requires macOS 10.15 and above." = "該功能要求系統版本至少 macOS 10.15。";
-"This only works with Tadokoro candidate window." = "該方法僅對田所選字窗起作用。";
+"This only works with Tadokoro candidate window." = "該選項僅對田所選字窗起作用。";
+"This will also affect the row / column capacity of the candidate window." = "該選項也會影響到選字窗每行/每列最多顯示的候選字數量。";
 "This will batch-replace specified candidates." = "這將會對指定的候選字詞進行整詞取代。";
 "This will stop user override model from affecting how candidates get sorted." = "這將阻止半衰記憶模組影響候選字詞的陳列順序。";
 "This will use the plist files deployed by the “make install” command from libvChewing-Data if possible." = "這將會優先使用由 libvChewing-Data 的 make install 部署的原廠辭典檔案。";
@@ -332,6 +334,7 @@
 "Use .langIdentifier to handle UI fonts in candidate window" = "使用 .langIdentifier 來管理選字窗的預設介面字型";
 "Use ESC key to clear the entire input buffer" = "敲 ESC 鍵以清空整個組字緩衝區";
 "Use IMK Candidate Window instead of Tadokoro" = "啟用與 macOS 內建輸入法相同的 IMK 選字窗";
+"Use only one row / column in candidate window." = "僅以單行/單列來陳列候選字。";
 "Vertical" = "縱向佈局";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：該頁面僅作未來功能測試所用。\n在此列出的功能並非處於完全可用之狀態。";
 "Yale Pinyin with Numeral Intonation" = "耶魯拼音+數字標調";
