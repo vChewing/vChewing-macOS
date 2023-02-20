@@ -42,7 +42,7 @@ public protocol CtlCandidateProtocol {
   func showPreviousLine() -> Bool
   func highlightNextCandidate() -> Bool
   func highlightPreviousCandidate() -> Bool
-  func candidateIndexAtKeyLabelIndex(_: Int) -> Int
+  func candidateIndexAtKeyLabelIndex(_: Int) -> Int?
   func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: Double, useGCD: Bool)
 }
 
