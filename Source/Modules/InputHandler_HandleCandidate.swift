@@ -141,8 +141,7 @@ extension InputHandler {
     }
 
     if index != NSNotFound {
-      let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(index)
-      if candidateIndex != -114_514 {
+      if let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(index) {
         delegate.candidateSelectionCalledByInputHandler(at: candidateIndex)
         return true
       }
@@ -185,13 +184,10 @@ extension InputHandler {
       }
 
       if shouldAutoSelectCandidate {
-        let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(0)
-        if candidateIndex != -114_514 {
-          delegate.candidateSelectionCalledByInputHandler(at: candidateIndex)
-          delegate.switchState(IMEState.ofAbortion())
-          return handleInput(event: input)
-        }
-        return true
+        guard let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(0) else { return true }
+        delegate.candidateSelectionCalledByInputHandler(at: candidateIndex)
+        delegate.switchState(IMEState.ofAbortion())
+        return handleInput(event: input)
       }
     }
 
