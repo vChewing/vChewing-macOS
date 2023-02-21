@@ -172,3 +172,26 @@ public extension AppProperty {
     )
   }
 }
+
+// MARK: - Porting NSTextField (Label) to SwiftUI.
+
+@available(macOS 10.15, *)
+public struct AttributedLabel: NSViewRepresentable {
+  private let text: NSAttributedString
+
+  public init(attributedString: NSAttributedString) {
+    text = attributedString
+  }
+
+  public func makeNSView(context _: Context) -> NSTextField {
+    let textField = NSTextField(labelWithAttributedString: text)
+    textField.isSelectable = false
+    textField.allowsEditingTextAttributes = false
+    textField.preferredMaxLayoutWidth = textField.frame.width
+    return textField
+  }
+
+  public func updateNSView(_ nsView: NSTextField, context _: Context) {
+    nsView.attributedStringValue = text
+  }
+}
