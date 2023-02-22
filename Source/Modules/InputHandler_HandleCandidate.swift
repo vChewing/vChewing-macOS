@@ -95,13 +95,13 @@ extension InputHandler {
       case .kUpArrow, .kDownArrow, .kLeftArrow, .kRightArrow:
         handleArrowKey: switch (keyCodeType, ctlCandidate.currentLayout) {
         case (.kLeftArrow, .horizontal), (.kUpArrow, .vertical): // Previous Candidate
-          _ = ctlCandidate.highlightPreviousCandidate() ? {}() : delegate.callError("5548FD14")
+          _ = ctlCandidate.highlightPreviousCandidate()
         case (.kRightArrow, .horizontal), (.kDownArrow, .vertical): // Next Candidate
-          _ = ctlCandidate.highlightNextCandidate() ? {}() : delegate.callError("3CEFB82E")
+          _ = ctlCandidate.highlightNextCandidate()
         case (.kUpArrow, .horizontal), (.kLeftArrow, .vertical): // Previous Line
-          _ = ctlCandidate.showPreviousLine() ? {}() : delegate.callError("827BBD79")
+          _ = ctlCandidate.showPreviousLine()
         case (.kDownArrow, .horizontal), (.kRightArrow, .vertical): // Next Line
-          _ = ctlCandidate.showNextLine() ? {}() : delegate.callError("7A0C7FBD")
+          _ = ctlCandidate.showNextLine()
         default: break handleArrowKey
         }
         return true
