@@ -207,6 +207,7 @@
 "Automatically correct reading combinations when typing" = "Automatically correct reading combinations when typing";
 "Automatically reload user data files if changes detected" = "Automatically reload user data files if changes detected";
 "Basic Keyboard Layout:" = "Basic Keyboard Layout:";
+"By checking this, Tadokoro Candidate Window will stop using SwiftUI but using a single NSTextView instead, utilizing one single special NSAttributedString to handle the typesetting of the entire candidate view. This will make the candidate window look “old-school” with no mouse-clicking features, but it renders much faster than SwiftUI on Intel macs. This mode allows Tadokoro candidate window to work in macOS 10.09 - 10.14 versions, accommodating their lack of support for SwiftUI." = "By checking this, Tadokoro Candidate Window will stop using SwiftUI but using a single NSTextView instead, utilizing one single special NSAttributedString to handle the typesetting of the entire candidate view. This will make the candidate window look “old-school” with no mouse-clicking features, but it renders much faster than SwiftUI on Intel macs. This mode allows Tadokoro candidate window to work in macOS 10.09 - 10.14 versions, accommodating their lack of support for SwiftUI.";
 "Candidate Layout:" = "Candidate Layout:";
 "Candidate Size:" = "Candidate Size:";
 "Cassette mode is similar to the CIN support of the Yahoo Kimo IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)." = "Cassette mode is similar to the CIN support of the Yahoo Kimo IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated).";
@@ -246,6 +247,7 @@
 "Emulating select-candidate-per-character mode" = "Emulating select-candidate-per-character mode";
 "Enable cassette mode, suppressing phonabet input" = "Enable cassette mode, suppressing phonabet input";
 "Enable CNS11643 Support (2023-01-06)" = "Enable CNS11643 Support (2023-01-06)";
+"Enable legacy UI typesetting method" = "Enable legacy UI typesetting method";
 "Enable phrase replacement table" = "Enable phrase replacement table";
 "Enable Space key for calling candidate window" = "Enable Space key for calling candidate window";
 "Enable symbol input support (incl. certain emoji symbols)" = "Enable symbol input support (incl. certain emoji symbols)";
@@ -331,7 +333,6 @@
 "Typing Settings:" = "Typing Settings:";
 "UI Language:" = "UI Language:";
 "Universal Pinyin with Numeral Intonation" = "Universal Pinyin with Numeral Intonation";
-"Use .langIdentifier to handle UI fonts in candidate window" = "Use .langIdentifier to handle UI fonts in candidate window";
 "Use ESC key to clear the entire input buffer" = "Use ESC key to clear the entire input buffer";
 "Use IMK Candidate Window instead of Tadokoro" = "Use IMK Candidate Window instead of Tadokoro";
 "Use only one row / column in candidate window." = "Use only one row / column in candidate window.";

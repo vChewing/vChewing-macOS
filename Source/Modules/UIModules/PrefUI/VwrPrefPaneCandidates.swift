@@ -32,8 +32,8 @@ struct VwrPrefPaneCandidates: View {
     forKey: UserDef.kConsolidateContextOnCandidateSelection.rawValue)
   @State private var selUseIMKCandidateWindow: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kUseIMKCandidateWindow.rawValue)
-  @State private var selHandleDefaultCandidateFontsByLangIdentifier: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue)
+  @State private var selLegacyCandidateViewTypesettingMethodEnabled: Bool = UserDefaults.standard.bool(
+    forKey: UserDef.kLegacyCandidateViewTypesettingMethodEnabled.rawValue)
   @State private var selAllowBoostingSingleKanjiAsUserPhrase: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kAllowBoostingSingleKanjiAsUserPhrase.rawValue)
 
@@ -78,6 +78,21 @@ struct VwrPrefPaneCandidates: View {
             "This only works with Tadokoro candidate window.".localized
               + CtlPrefUI.sentenceSeparator
               + "Tadokoro candidate window shows 4 rows / columns by default, providing similar experiences from Microsoft New Phonetic IME and macOS bult-in Chinese IME (since macOS 10.9). However, for some users who have presbyopia, they prefer giant candidate font sizes, resulting a concern that multiple rows / columns of candidates can make the candidate window looks too big, hence this option. Note that this option will be dismissed if the typing context is vertical, forcing the candidates to be shown in only one row / column. Only one reverse-lookup result can be made available in single row / column mode due to reduced candidate window size.".localized
+          )
+          .preferenceDescription().prefDescriptionWidthLimited()
+          Toggle(
+            LocalizedStringKey("Enable legacy UI typesetting method"),
+            isOn: $selLegacyCandidateViewTypesettingMethodEnabled.onChange {
+              PrefMgr.shared.legacyCandidateViewTypesettingMethodEnabled =
+                selLegacyCandidateViewTypesettingMethodEnabled
+            }
+          )
+          .controlSize(.small)
+          .disabled(PrefMgr.shared.useIMKCandidateWindow)
+          Text(
+            LocalizedStringKey(
+              "By checking this, Tadokoro Candidate Window will stop using SwiftUI but using a single NSTextView instead, utilizing one single special NSAttributedString to handle the typesetting of the entire candidate view. This will make the candidate window look “old-school” with no mouse-clicking features, but it renders much faster than SwiftUI on Intel macs. This mode allows Tadokoro candidate window to work in macOS 10.09 - 10.14 versions, accommodating their lack of support for SwiftUI."
+            )
           )
           .preferenceDescription().prefDescriptionWidthLimited()
         }
@@ -188,21 +203,6 @@ struct VwrPrefPaneCandidates: View {
             )
           )
           .preferenceDescription().prefDescriptionWidthLimited()
-          if isMontereyOrAbove {
-            Toggle(
-              LocalizedStringKey("Use .langIdentifier to handle UI fonts in candidate window"),
-              isOn: $selHandleDefaultCandidateFontsByLangIdentifier.onChange {
-                PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier =
-                  selHandleDefaultCandidateFontsByLangIdentifier
-              }
-            )
-            Text(
-              LocalizedStringKey(
-                "This only works with Tadokoro candidate window."
-              )
-            )
-            .preferenceDescription().prefDescriptionWidthLimited()
-          }
           Toggle(
             LocalizedStringKey("Allow boosting / excluding a candidate of single kanji"),
             isOn: $selAllowBoostingSingleKanjiAsUserPhrase.onChange {
