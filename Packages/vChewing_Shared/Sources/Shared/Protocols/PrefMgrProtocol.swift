@@ -44,7 +44,7 @@ public protocol PrefMgrProtocol {
   var clientsIMKTextInputIncapable: [String: Bool] { get set }
   var onlyLoadFactoryLangModelsIfNeeded: Bool { get set }
   var useIMKCandidateWindow: Bool { get set }
-  var handleDefaultCandidateFontsByLangIdentifier: Bool { get set }
+  var legacyCandidateViewTypesettingMethodEnabled: Bool { get set }
   var disableSegmentedThickUnderlineInMarkingModeForManagedClients: Bool { get set }
   var maxCandidateLength: Int { get set }
   var shouldNotFartInLieuOfBeep: Bool { get set }

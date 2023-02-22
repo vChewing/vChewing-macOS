@@ -15,7 +15,7 @@ public extension PrefMgr {
     // macOS 10.15 開始才能使用 SwiftUI 構建的田所選字窗。
     if #unavailable(macOS 10.15) {
       useIMKCandidateWindow = true
-      handleDefaultCandidateFontsByLangIdentifier = false
+      legacyCandidateViewTypesettingMethodEnabled = false
       togglingAlphanumericalModeWithRShift = false
       togglingAlphanumericalModeWithLShift = false
       showReverseLookupInCandidateUI = false
