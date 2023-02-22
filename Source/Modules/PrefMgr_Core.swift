@@ -179,8 +179,8 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kUseIMKCandidateWindow.rawValue, defaultValue: false)
   public var useIMKCandidateWindow: Bool
 
-  @AppProperty(key: UserDef.kHandleDefaultCandidateFontsByLangIdentifier.rawValue, defaultValue: false)
-  public var handleDefaultCandidateFontsByLangIdentifier: Bool
+  @AppProperty(key: UserDef.kLegacyCandidateViewTypesettingMethodEnabled.rawValue, defaultValue: false)
+  public var legacyCandidateViewTypesettingMethodEnabled: Bool
 
   @AppProperty(
     key: UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.rawValue,
