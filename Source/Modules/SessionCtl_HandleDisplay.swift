@@ -111,7 +111,7 @@ public extension SessionCtl {
         isVerticalTyping ? "⇧" : NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
     }
 
-    candidateUI?.useLangIdentifier = PrefMgr.shared.handleDefaultCandidateFontsByLangIdentifier
+    candidateUI?.useLangIdentifier = PrefMgr.shared.legacyCandidateViewTypesettingMethodEnabled
     candidateUI?.locale = {
       switch inputMode {
       case .imeModeCHS: return "zh-Hans"
