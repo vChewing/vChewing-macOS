@@ -68,12 +68,30 @@ func ** (_ base: Double, _ exp: Double) -> Double {
 // MARK: - 定義檔案結構
 
 struct Unigram: CustomStringConvertible {
+  enum UnigramCategory: String {
+    case macv = "MACV"
+    case tabe = "TABE"
+    case moe = "MOED"
+    case custom = "CUST"
+    case misc = "MISC"
+    var description: String { rawValue }
+  }
+
+  init(key: String, value: String, score: Double, count: Int, category: Unigram.UnigramCategory) {
+    self.key = key
+    self.value = value
+    self.score = score
+    self.count = count
+    self.category = category
+  }
+
   var key: String = ""
   var value: String = ""
   var score: Double = -1.0
   var count: Int = 0
+  var category: UnigramCategory
   var description: String {
-    "(\(key), \(value), \(score))"
+    "(\(key), \(value), \(score), \(category)"
   }
 }
 
@@ -143,7 +161,7 @@ private var exceptedChars: Set<String> = .init()
 
 func rawDictForPhrases(isCHS: Bool) -> [Unigram] {
   var arrUnigramRAW: [Unigram] = []
-  var strRAW = ""
+  var strRAWOrig: [String] = []
   let urlCustom: String = isCHS ? urlCHSforCustom : urlCHTforCustom
   let urlTABE: String = isCHS ? urlCHSforTABE : urlCHTforTABE
   let urlMOE: String = isCHS ? urlCHSforMOE : urlCHTforMOE
@@ -151,69 +169,84 @@ func rawDictForPhrases(isCHS: Bool) -> [Unigram] {
   let i18n: String = isCHS ? "簡體中文" : "繁體中文"
   // 讀取內容
   do {
-    strRAW += try String(contentsOfFile: urlCustom, encoding: .utf8)
-    strRAW += "\n"
-    strRAW += try String(contentsOfFile: urlTABE, encoding: .utf8)
-    strRAW += "\n"
-    strRAW += try String(contentsOfFile: urlMOE, encoding: .utf8)
-    strRAW += "\n"
-    strRAW += try String(contentsOfFile: urlVCHEW, encoding: .utf8)
+    let str1 = try String(contentsOfFile: urlCustom, encoding: .utf8)
+    let str2 = try String(contentsOfFile: urlTABE, encoding: .utf8)
+    let str3 = try String(contentsOfFile: urlMOE, encoding: .utf8)
+    let str4 = try String(contentsOfFile: urlVCHEW, encoding: .utf8)
+    strRAWOrig.append(str1)
+    strRAWOrig.append(str2)
+    strRAWOrig.append(str3)
+    strRAWOrig.append(str4)
   } catch {
     NSLog(" - Exception happened when reading raw phrases data.")
     return []
   }
-  // 預處理格式
-  strRAW = strRAW.replacingOccurrences(of: " #MACOS", with: "") // 去掉 macOS 標記
-  // CJKWhiteSpace (\x{3000}) to ASCII Space
-  // NonBreakWhiteSpace (\x{A0}) to ASCII Space
-  // Tab to ASCII Space
-  // 統整連續空格為一個 ASCII 空格
-  strRAW.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: " ")
-  strRAW.regReplace(pattern: #"(^ | $)"#, replaceWith: "") // 去除行尾行首空格
-  strRAW.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n") // CR & Form Feed to LF, 且去除重複行
-  strRAW.regReplace(pattern: #"^(#.*|.*#WIN32.*)$"#, replaceWith: "") // 以#開頭的行都淨空+去掉所有 WIN32 特有的行
-  // 正式整理格式，現在就開始去重複：
-  let arrData = Array(
-    NSOrderedSet(array: strRAW.components(separatedBy: "\n")).array as! [String])
-  for lineData in arrData {
-    // 第三欄開始是注音
-    let arrLineData = lineData.components(separatedBy: " ")
-    var varLineDataProcessed = ""
-    var count = 0
-    for currentCell in arrLineData {
-      count += 1
-      if count < 3 {
-        varLineDataProcessed += currentCell + "\t"
-      } else if count < arrLineData.count {
-        varLineDataProcessed += currentCell + "-"
-      } else {
-        varLineDataProcessed += currentCell
+  for i in 0 ..< strRAWOrig.count {
+    var strRAW = strRAWOrig[i]
+    // 預處理格式
+    strRAW = strRAW.replacingOccurrences(of: " #MACOS", with: "") // 去掉 macOS 標記
+    // CJKWhiteSpace (\x{3000}) to ASCII Space
+    // NonBreakWhiteSpace (\x{A0}) to ASCII Space
+    // Tab to ASCII Space
+    // 統整連續空格為一個 ASCII 空格
+    strRAW.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: " ")
+    strRAW.regReplace(pattern: #"(^ | $)"#, replaceWith: "") // 去除行尾行首空格
+    strRAW.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n") // CR & Form Feed to LF, 且去除重複行
+    strRAW.regReplace(pattern: #"^(#.*|.*#WIN32.*)$"#, replaceWith: "") // 以#開頭的行都淨空+去掉所有 WIN32 特有的行
+    strRAWOrig[i] = strRAW
+
+    let currentCategory: Unigram.UnigramCategory = {
+      switch i {
+      case 0: return .custom
+      case 1: return .tabe
+      case 2: return .moe
+      case 3: return .macv
+      default: return .custom
       }
-    }
-    // 然後直接乾脆就轉成 Unigram 吧。
-    let arrCells: [String] = varLineDataProcessed.components(separatedBy: "\t")
-    count = 0 // 不需要再定義，因為之前已經有定義過了。
-    var phone = ""
-    var phrase = ""
-    var occurrence = 0
-    for cell in arrCells {
-      count += 1
-      switch count {
-      case 1: phrase = cell
-      case 3: phone = cell
-      case 2: occurrence = Int(cell) ?? 0
-      default: break
+    }()
+    var lineData = ""
+    for lineNeta in strRAW.split(separator: "\n") {
+      lineData = lineNeta.description
+      // 第三欄開始是注音
+      let arrLineData = lineData.components(separatedBy: " ")
+      var varLineDataProcessed = ""
+      var count = 0
+      for currentCell in arrLineData {
+        count += 1
+        if count < 3 {
+          varLineDataProcessed += currentCell + "\t"
+        } else if count < arrLineData.count {
+          varLineDataProcessed += currentCell + "-"
+        } else {
+          varLineDataProcessed += currentCell
+        }
       }
-    }
-    if phrase != "" { // 廢掉空數據；之後無須再這樣處理。
-      arrUnigramRAW += [
-        Unigram(
-          key: phone, value: phrase, score: 0.0,
-          count: occurrence
-        ),
-      ]
+      // 然後直接乾脆就轉成 Unigram 吧。
+      let arrCells: [String] = varLineDataProcessed.components(separatedBy: "\t")
+      count = 0 // 不需要再定義，因為之前已經有定義過了。
+      var phone = ""
+      var phrase = ""
+      var occurrence = 0
+      for cell in arrCells {
+        count += 1
+        switch count {
+        case 1: phrase = cell
+        case 3: phone = cell
+        case 2: occurrence = Int(cell) ?? 0
+        default: break
+        }
+      }
+      if phrase != "" { // 廢掉空數據；之後無須再這樣處理。
+        arrUnigramRAW += [
+          Unigram(
+            key: phone, value: phrase, score: 0.0,
+            count: occurrence, category: currentCategory
+          ),
+        ]
+      }
     }
   }
+
   NSLog(" - \(i18n): 成功生成詞語語料辭典（權重待計算）。")
   return arrUnigramRAW
 }
@@ -292,7 +325,7 @@ func rawDictForKanjis(isCHS: Bool) -> [Unigram] {
       arrUnigramRAW += [
         Unigram(
           key: phone, value: phrase, score: 0.0,
-          count: occurrence
+          count: occurrence, category: .misc
         ),
       ]
     }
@@ -378,7 +411,7 @@ func rawDictForNonKanjis(isCHS: Bool) -> [Unigram] {
       arrUnigramRAW += [
         Unigram(
           key: phone, value: phrase, score: 0.0,
-          count: occurrence
+          count: occurrence, category: .misc
         ),
       ]
     }
@@ -421,7 +454,7 @@ func weightAndSort(_ arrStructUncalculated: [Unigram], isCHS: Bool) -> [Unigram]
     arrStructCalculated += [
       Unigram(
         key: unigram.key, value: unigram.value, score: weightRounded,
-        count: unigram.count
+        count: unigram.count, category: unigram.category
       ),
     ]
   }
@@ -432,7 +465,7 @@ func weightAndSort(_ arrStructUncalculated: [Unigram], isCHS: Bool) -> [Unigram]
     (lhs.key, rhs.count) < (rhs.key, lhs.count)
   })
   NSLog(" - \(i18n): 排序整理完畢，準備編譯要寫入的檔案內容。")
-  arrStructSorted.append(Unigram(key: "__NORM__", value: norm.description, score: 0, count: 0))
+  arrStructSorted.append(Unigram(key: "__NORM__", value: norm.description, score: 0, count: 0, category: .misc))
   return arrStructSorted
 }
 
@@ -690,7 +723,7 @@ func healthCheck(_ data: [Unigram]) -> String {
     }
   }
 
-  var faulty = [Unigram]()
+  var faulty = [[String]: [Unigram]]()
   var indifferents: [(String, String, Double, [Unigram], Double)] = []
   var insufficients: [(String, String, Double, [Unigram], Double)] = []
   var competingUnigrams = [(String, Double, String, Double)]()
@@ -701,8 +734,18 @@ func healthCheck(_ data: [Unigram]) -> String {
     var bad = false
     let checkPerCharMachingStatus: Bool = neta.key.split(separator: "-").count == neta.value.count
 
-    outerMatchCheck: for (i, x) in neta.key.split(separator: "-").enumerated() {
+    var mispronouncedKanji: [String] = []
+
+    let arrNetaKeys = neta.key.split(separator: "-")
+    outerMatchCheck: for (i, x) in arrNetaKeys.enumerated() {
       if !unigramMonoChar.keys.contains(String(x)) {
+        if neta.value.count == 1 {
+          mispronouncedKanji.append("\(neta.category)@\(neta.value)@\(neta.key)")
+        } else if neta.value.count == arrNetaKeys.count {
+          mispronouncedKanji.append("\(neta.category)@\(neta.value.map(\.description)[i])@\(arrNetaKeys[i])")
+        } else {
+          mispronouncedKanji.append("\(neta.category)@OTHER@\(String(x))")
+        }
         bad = true
         break outerMatchCheck
       }
@@ -710,12 +753,14 @@ func healthCheck(_ data: [Unigram]) -> String {
         let char = neta.value.map(\.description)[i]
         if exceptedChars.contains(char) { break innerMatchCheck }
         guard let queriedPhones = mapReverseLookupForCheck[char] else {
+          mispronouncedKanji.append("\(neta.category)@\(char)@\(String(x))")
           bad = true
           break outerMatchCheck
         }
         for queriedPhone in queriedPhones {
           if queriedPhone == x.description { break innerMatchCheck }
         }
+        mispronouncedKanji.append("\(neta.category)@\(char)@\(String(x))")
         bad = true
         break outerMatchCheck
       }
@@ -725,7 +770,7 @@ func healthCheck(_ data: [Unigram]) -> String {
     }
 
     if bad {
-      faulty.append(neta)
+      faulty[mispronouncedKanji, default: []].append(neta)
       continue
     }
     if tscore >= neta.score {
@@ -942,7 +987,7 @@ func healthCheck(_ data: [Unigram]) -> String {
     printl(separator)
     printl("下述單元圖用到了漢字核心表當中尚未收錄的讀音，可能無法正常輸入：")
     for content in faulty {
-      printl(content.description)
+      printl("\(content.key): \(content.value)")
     }
   }
 
