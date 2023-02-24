@@ -108,12 +108,16 @@ extension CtlClientListMgr {
 
     alert.accessoryView = scrollview
     alert.beginSheetModal(for: window) { result in
-      switch result {
+      resultCheck: switch result {
       case .alertFirstButtonReturn, .alertSecondButtonReturn:
         theTextView.textContainer?.textView?.string.components(separatedBy: "\n").filter { !$0.isEmpty }.forEach {
           self.applyNewValue($0, highMitigation: result == .alertFirstButtonReturn)
         }
         if result == .alertFirstButtonReturn { break }
+        if #unavailable(macOS 10.13) {
+          window.callAlert(title: "Please drag the apps into the Client Manager window from Finder.".localized)
+          break resultCheck
+        }
         let dlgOpenPath = NSOpenPanel()
         dlgOpenPath.title = NSLocalizedString(
           "Choose the target application bundle.", comment: ""

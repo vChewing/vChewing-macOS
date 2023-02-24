@@ -291,6 +291,7 @@
 "Override the previous reading's intonation with candidate-reset" = "Override the previous reading's intonation with candidate-reset";
 "Path invalid or file access error." = "Path invalid or file access error.";
 "Phonetic Parser:" = "Phonetic Parser:";
+"Please drag the apps into the Client Manager window from Finder." = "Please drag the apps into the Client Manager window from Finder.";
 "Please reconfigure the cassette path to a valid one before enabling this mode." = "Please reconfigure the cassette path to a valid one before enabling this mode.";
 "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu." = "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu.";
 "Push the cursor in front of the phrase after selection" = "Push the cursor in front of the phrase after selection";
