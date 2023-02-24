@@ -152,27 +152,35 @@ extension Notifier {
     }
   }
 
-  private func fadeIn() {
+  private func performDisplayLifetime() {
     guard let window = window else { return }
-    let afterRect = window.frame
+    Self.instanceSet.insert(self, at: 0)
+    var afterRect = window.frame
     var beforeRect = afterRect
     beforeRect.origin.x -= 20
     window.setFrame(beforeRect, display: true)
     window.orderFront(self)
     window.setFrame(afterRect, display: true, animate: true)
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
+      beforeRect = window.frame
+      afterRect = window.frame
+      afterRect.origin.x += 20
+      window.setFrame(afterRect, display: true, animate: true)
+      self.close()
+      Self.instanceSet.remove(self)
+    }
   }
 
   private func display() {
-    Self.instanceSet.arrayOfWindows.forEach {
-      $0.alphaValue -= 0.1
-      $0.contentView?.subviews.forEach { $0.alphaValue *= 0.5 }
+    Self.instanceSet.arrayOfWindows.enumerated().forEach { id, theInstance in
+      theInstance.alphaValue *= Double(pow(0.4, Double(id + 1)))
+      theInstance.contentView?.subviews.forEach {
+        $0.alphaValue *= Double(pow(0.6, Double(id + 1)))
+      }
     }
     shiftExistingWindowPositions()
-    fadeIn()
-    Self.instanceSet.insert(self, at: 0)
-    DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
-      self.close()
-      Self.instanceSet.remove(self)
+    DispatchQueue.main.async {
+      self.performDisplayLifetime()
     }
   }
 }
