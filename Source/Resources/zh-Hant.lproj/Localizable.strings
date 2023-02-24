@@ -291,6 +291,7 @@
 "Override the previous reading's intonation with candidate-reset" = "嘗試對游標正後方的字音覆寫聲調，且重設其選字狀態";
 "Path invalid or file access error." = "檔案存取失敗，或者路徑不合規。";
 "Phonetic Parser:" = "注音排列:";
+"Please drag the apps into the Client Manager window from Finder." = "請直接藉由 Finder 將客體軟體的 App 封包檔案拽入至該客體管理視窗內。";
 "Please reconfigure the cassette path to a valid one before enabling this mode." = "在啟用該模式之前，請事先正確設定磁帶檔案路徑。";
 "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu." = "請利用滑鼠滾輪檢視頁面。也請洽輸入法選單內的熱鍵指南。";
 "Push the cursor in front of the phrase after selection" = "在選字後將游標置於該字詞的前方";

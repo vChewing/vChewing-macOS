@@ -292,6 +292,7 @@
 "Override the previous reading's intonation with candidate-reset" = "カーソルの後部の音読みの音調を上書きし、候補選択状態を戻す";
 "Path invalid or file access error." = "ファイルアクセス失敗、或いはご指定したファイル位置情報は使えぬ。";
 "Phonetic Parser:" = "注音配列:";
+"Please drag the apps into the Client Manager window from Finder." = "Finder からアプリをこのウィンドウに直接にドラッグしてください。";
 "Please reconfigure the cassette path to a valid one before enabling this mode." = "カセットファイルを正しくご指定してから、このモードのご使用を。";
 "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu." = "マウスホイールでページをご覧ください。キーに関する取扱説明のアクセスはメニューに。";
 "Push the cursor in front of the phrase after selection" = "候補選択の直後、すぐカーソルを単語の向こうに推し進める";
@@ -340,3 +341,4 @@
 "Vertical" = "縦型陳列";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
 "Yale Pinyin with Numeral Intonation" = "イェール弁音 (ローマ字+数字音調)";
+"iyh-1K-76v.title" = "言葉置換表を起用";
