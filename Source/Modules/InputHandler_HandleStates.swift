@@ -401,12 +401,21 @@ extension InputHandler {
 
     if isCodePointInputMode {
       if !strCodePointBuffer.isEmpty {
-        strCodePointBuffer = strCodePointBuffer.dropLast(1).description
-        if !strCodePointBuffer.isEmpty {
+        func refreshState() {
           var updatedState = generateStateOfInputting()
           updatedState.tooltipDuration = 0
           updatedState.tooltip = tooltipCodePointInputMode
           delegate.switchState(updatedState)
+        }
+        strCodePointBuffer = strCodePointBuffer.dropLast(1).description
+        if input.modifierFlags == .option {
+          strCodePointBuffer.removeAll()
+          refreshState()
+          isCodePointInputMode = true
+          return true
+        }
+        if !strCodePointBuffer.isEmpty {
+          refreshState()
           return true
         }
       }
@@ -460,7 +469,9 @@ extension InputHandler {
       }
       walk()
     } else {
-      letComposerAndCalligrapherDoBackSpace()
+      _ = input.modifierFlags == .option
+        ? clearComposerAndCalligrapher()
+        : letComposerAndCalligrapherDoBackSpace()
     }
 
     switch isConsideredEmptyForNow {
