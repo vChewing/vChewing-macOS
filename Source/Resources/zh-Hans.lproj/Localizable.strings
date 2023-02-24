@@ -291,6 +291,7 @@
 "Override the previous reading's intonation with candidate-reset" = "尝试对游标正后方的字音覆写声调，且重设其选字状态";
 "Path invalid or file access error." = "档案存取失败，或者路径不合规。";
 "Phonetic Parser:" = "注音排列:";
+"Please drag the apps into the Client Manager window from Finder." = "请直接借由 Finder 将客体软体的 App 封包档案拽入至该客体管理视窗内。";
 "Please reconfigure the cassette path to a valid one before enabling this mode." = "在启用该模式之前，请事先正确设定磁带档案路径。";
 "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu." = "请利用滑鼠滚轮检视页面。也请洽输入法选单内的热键指南。";
 "Push the cursor in front of the phrase after selection" = "在选字后将游标置于该字词的前方";
@@ -339,3 +340,4 @@
 "Vertical" = "纵向布局";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";
 "Yale Pinyin with Numeral Intonation" = "耶鲁拼音+数字标调";
+"iyh-1K-76v.title" = "启用语汇置换表";
