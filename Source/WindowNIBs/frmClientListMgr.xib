@@ -113,6 +113,9 @@
                                 <buttonCell key="cell" type="push" title="Remove" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="wNc-xy-U4i">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
                                 </buttonCell>
                                 <connections>
                                     <action selector="btnRemoveClientClicked:" target="-2" id="VbY-dw-fRP"/>
