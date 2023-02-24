@@ -32,6 +32,7 @@ class CtlClientListMgr: NSWindowController, NSTableViewDelegate, NSTableViewData
     window?.setPosition(vertical: .center, horizontal: .right, padding: 20)
     localize()
     tblClients.delegate = self
+    tblClients.registerForDraggedTypes([.init(rawValue: kUTTypeFileURL as String)])
     tblClients.allowsMultipleSelection = true
     tblClients.dataSource = self
     tblClients.action = #selector(onItemClicked(_:))
@@ -223,6 +224,60 @@ extension CtlClientListMgr {
       }
     }
     return Self.clientsList[row]
+  }
+
+  /// 檢查傳入的 NSDraggingInfo 當中的 URL 對應的物件是否是 App Bundle。
+  /// - Parameters:
+  ///   - info: 傳入的 NSDraggingInfo 物件。
+  ///   - onError: 當不滿足判定條件時，執行給定的 lambda expression。
+  ///   - handler: 當滿足判定條件時，讓傳入的 lambda expression 處理已經整理出來的 URL 陣列。
+  private func validatePasteboardForAppBundles(
+    neta info: NSDraggingInfo, onError: @escaping () -> Void?, handler: (([URL]) -> Void)? = nil
+  ) {
+    let board = info.draggingPasteboard
+    let type = NSPasteboard.PasteboardType(rawValue: kUTTypeApplicationBundle as String)
+    let options: [NSPasteboard.ReadingOptionKey: Any] = [
+      .urlReadingFileURLsOnly: true,
+      .urlReadingContentsConformToTypes: [type],
+    ]
+    guard let urls = board.readObjects(forClasses: [NSURL.self], options: options) as? [URL], !urls.isEmpty else {
+      onError()
+      return
+    }
+    if let handler = handler {
+      handler(urls)
+    }
+  }
+
+  func tableView(
+    _: NSTableView, validateDrop info: NSDraggingInfo, proposedRow _: Int,
+    proposedDropOperation _: NSTableView.DropOperation
+  ) -> NSDragOperation {
+    var result = NSDragOperation.copy
+    validatePasteboardForAppBundles(
+      neta: info, onError: { result = .init(rawValue: 0) } // 對應 NSDragOperationNone。
+    )
+    return result
+  }
+
+  func tableView(
+    _: NSTableView, acceptDrop info: NSDraggingInfo,
+    row _: Int, dropOperation _: NSTableView.DropOperation
+  ) -> Bool {
+    var result = true
+    validatePasteboardForAppBundles(
+      neta: info, onError: { result = false } // 對應 NSDragOperationNone。
+    ) { theURLs in
+      var dealt = false
+      theURLs.forEach { url in
+        guard let bundle = Bundle(url: url), let bundleID = bundle.bundleIdentifier else { return }
+        self.applyNewValue(bundleID, highMitigation: true)
+        dealt = true
+      }
+      result = dealt
+    }
+    defer { if result { tblClients.reloadData() } }
+    return result
   }
 
   private func localize() {
