@@ -8,7 +8,11 @@
 
 import Cocoa
 
+// MARK: - Using One Single NSAttributedString.
+
 extension CandidatePool {
+  // MARK: Candidate List with Peripherals.
+
   public var attributedDescription: NSAttributedString {
     switch layout {
     case .horizontal: return attributedDescriptionHorizontal
@@ -16,13 +20,12 @@ extension CandidatePool {
     }
   }
 
-  /// 將當前資料池以橫版的形式列印成 NSAttributedString。
+  private var sharedParagraphStyle: NSParagraphStyle { CandidateCellData.sharedParagraphStyle }
+
   private var attributedDescriptionHorizontal: NSAttributedString {
-    let paragraphStyle = CandidateCellData.sharedParagraphStyle as! NSMutableParagraphStyle
-    paragraphStyle.lineSpacing = ceil(blankCell.size * 0.3)
-    paragraphStyle.lineBreakStrategy = .pushOut
+    let paragraphStyle = sharedParagraphStyle
     let attrCandidate: [NSAttributedString.Key: AnyObject] = [
-      .font: NSFont.monospacedDigitSystemFont(ofSize: blankCell.size, weight: .regular),
+      .font: blankCell.phraseFont(size: blankCell.size),
       .paragraphStyle: paragraphStyle,
     ]
     let result = NSMutableAttributedString(string: "", attributes: attrCandidate)
@@ -59,11 +62,9 @@ extension CandidatePool {
   }
 
   private var attributedDescriptionVertical: NSAttributedString {
-    let paragraphStyle = CandidateCellData.sharedParagraphStyle as! NSMutableParagraphStyle
-    paragraphStyle.lineSpacing = ceil(blankCell.size * 0.3)
-    paragraphStyle.lineBreakStrategy = .pushOut
+    let paragraphStyle = sharedParagraphStyle
     let attrCandidate: [NSAttributedString.Key: AnyObject] = [
-      .font: NSFont.monospacedDigitSystemFont(ofSize: blankCell.size, weight: .regular),
+      .font: blankCell.phraseFont(size: blankCell.size),
       .paragraphStyle: paragraphStyle,
     ]
     let result = NSMutableAttributedString(string: "", attributes: attrCandidate)
@@ -90,7 +91,7 @@ extension CandidatePool {
           if currentCell.isHighlighted {
             spacer.addAttribute(
               .backgroundColor,
-              value: currentCell.highlightedNSColor,
+              value: currentCell.themeColorCocoa,
               range: .init(location: 0, length: spacer.string.utf16.count)
             )
           } else {
@@ -109,63 +110,60 @@ extension CandidatePool {
     return result
   }
 
-  private var attributedDescriptionBottomPanes: NSAttributedString {
-    let paragraphStyle = CandidateCellData.sharedParagraphStyle as! NSMutableParagraphStyle
-    paragraphStyle.lineSpacing = ceil(blankCell.size * 0.3)
-    paragraphStyle.lineBreakStrategy = .pushOut
-    let attrCandidate: [NSAttributedString.Key: AnyObject] = [
-      .font: NSFont.monospacedDigitSystemFont(ofSize: blankCell.size, weight: .regular),
-      .paragraphStyle: paragraphStyle,
-    ]
-    let result = NSMutableAttributedString(string: "", attributes: attrCandidate)
+  // MARK: Peripherals
+
+  public var attributedDescriptionBottomPanes: NSAttributedString {
+    let paragraphStyle = sharedParagraphStyle
+    let result = NSMutableAttributedString(string: "")
+    result.append(attributedDescriptionPositionCounter)
+    if !tooltip.isEmpty { result.append(attributedDescriptionTooltip) }
+    if !reverseLookupResult.isEmpty { result.append(attributedDescriptionReverseLookp) }
+    result.addAttribute(.paragraphStyle, value: paragraphStyle, range: .init(location: 0, length: result.string.utf16.count))
+    return result
+  }
+
+  private var attributedDescriptionPositionCounter: NSAttributedString {
     let positionCounterColorBG = NSApplication.isDarkMode
       ? NSColor(white: 0.215, alpha: 0.7)
       : NSColor(white: 0.9, alpha: 0.7)
     let positionCounterColorText = NSColor.controlTextColor
     let positionCounterTextSize = max(ceil(CandidateCellData.unifiedSize * 0.7), 11)
     let attrPositionCounter: [NSAttributedString.Key: AnyObject] = [
-      .font: NSFont.monospacedDigitSystemFont(ofSize: positionCounterTextSize, weight: .bold),
-      .paragraphStyle: paragraphStyle,
+      .font: blankCell.phraseFontEmphasized(size: positionCounterTextSize),
       .backgroundColor: positionCounterColorBG,
       .foregroundColor: positionCounterColorText,
     ]
     let positionCounter = NSAttributedString(
       string: " \(currentPositionLabelText) ", attributes: attrPositionCounter
     )
-    result.append(positionCounter)
+    return positionCounter
+  }
 
-    if !tooltip.isEmpty {
-      let attrTooltip: [NSAttributedString.Key: AnyObject] = [
-        .font: NSFont.monospacedDigitSystemFont(ofSize: positionCounterTextSize, weight: .regular),
-        .paragraphStyle: paragraphStyle,
-      ]
-      let tooltipText = NSAttributedString(
-        string: " \(tooltip) ", attributes: attrTooltip
-      )
-      result.append(tooltipText)
-    }
+  private var attributedDescriptionTooltip: NSAttributedString {
+    let positionCounterTextSize = max(ceil(CandidateCellData.unifiedSize * 0.7), 11)
+    let attrTooltip: [NSAttributedString.Key: AnyObject] = [
+      .font: blankCell.phraseFontEmphasized(size: positionCounterTextSize),
+    ]
+    let tooltipText = NSAttributedString(
+      string: " \(tooltip) ", attributes: attrTooltip
+    )
+    return tooltipText
+  }
 
-    if !reverseLookupResult.isEmpty {
-      let reverseLookupTextSize = max(ceil(CandidateCellData.unifiedSize * 0.6), 9)
-      let reverseLookupColorBG = NSApplication.isDarkMode
-        ? NSColor(white: 0.1, alpha: 1)
-        : NSColor(white: 0.9, alpha: 1)
-      let attrReverseLookup: [NSAttributedString.Key: AnyObject] = [
-        .font: NSFont.monospacedDigitSystemFont(ofSize: reverseLookupTextSize, weight: .regular),
-        .paragraphStyle: paragraphStyle,
-        .backgroundColor: reverseLookupColorBG,
-      ]
-      let attrReverseLookupSpacer: [NSAttributedString.Key: AnyObject] = [
-        .font: NSFont.monospacedDigitSystemFont(ofSize: reverseLookupTextSize, weight: .regular),
-        .paragraphStyle: paragraphStyle,
-      ]
-      for neta in reverseLookupResult {
-        result.append(NSAttributedString(string: " ", attributes: attrReverseLookupSpacer))
-        result.append(NSAttributedString(string: " \(neta) ", attributes: attrReverseLookup))
-        if maxLinesPerPage == 1 { break }
-      }
+  private var attributedDescriptionReverseLookp: NSAttributedString {
+    let reverseLookupTextSize = max(ceil(CandidateCellData.unifiedSize * 0.6), 9)
+    let attrReverseLookup: [NSAttributedString.Key: AnyObject] = [
+      .font: blankCell.phraseFont(size: reverseLookupTextSize),
+    ]
+    let attrReverseLookupSpacer: [NSAttributedString.Key: AnyObject] = [
+      .font: blankCell.phraseFont(size: reverseLookupTextSize),
+    ]
+    let result = NSMutableAttributedString(string: "", attributes: attrReverseLookupSpacer)
+    for neta in reverseLookupResult {
+      result.append(NSAttributedString(string: " ", attributes: attrReverseLookupSpacer))
+      result.append(NSAttributedString(string: " \(neta) ", attributes: attrReverseLookup))
+      if maxLinesPerPage == 1 { break }
     }
-    result.addAttribute(.paragraphStyle, value: paragraphStyle, range: .init(location: 0, length: result.string.utf16.count))
     return result
   }
 }

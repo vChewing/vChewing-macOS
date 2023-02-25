@@ -12,6 +12,7 @@ import Shared
 /// 候選字窗會用到的資料池單位，即用即拋。
 public struct CandidatePool {
   public let blankCell: CandidateCellData
+  public let shitCell: CandidateCellData // 只用來測量單漢字候選字 cell 的最大可能寬度。
   public let maxLinesPerPage: Int
   public let layout: LayoutOrientation
   public let selectionKeys: String
@@ -29,7 +30,7 @@ public struct CandidatePool {
 
   /// 用來在初期化一個候選字詞資料池的時候研判「橫版多行選字窗每行最大應該塞多少個候選字詞」。
   /// 注意：該參數不用來計算視窗寬度，所以無須算上候選字詞間距。
-  public var maxRowWidth: Double { ceil(Double(maxLineCapacity) * blankCell.minWidthToDraw()) }
+  public var maxRowWidth: Double { ceil(Double(maxLineCapacity) * blankCell.cellLength()) }
 
   /// 當前高亮的候選字詞的順序標籤（同時顯示資料池內已有的全部的候選字詞的數量）
   public var currentPositionLabelText: String {
@@ -82,6 +83,7 @@ public struct CandidatePool {
     self.layout = layout
     maxLinesPerPage = max(1, lines)
     blankCell = CandidateCellData(key: " ", displayedText: "　", isSelected: false)
+    shitCell = CandidateCellData(key: " ", displayedText: "💩", isSelected: false)
     blankCell.locale = locale
     self.selectionKeys = selectionKeys.isEmpty ? "123456789" : selectionKeys
     var allCandidates = candidates.map { CandidateCellData(key: " ", displayedText: $0) }
@@ -94,7 +96,7 @@ public struct CandidatePool {
       var isOverflown: Bool = (currentColumn.count == maxLineCapacity) && !currentColumn.isEmpty
       if layout == .horizontal {
         isOverflown = isOverflown
-          || currentColumn.map { $0.cellLength() }.reduce(0, +) >= maxRowWidth - candidate.cellLength()
+          || currentColumn.map { $0.cellLength() }.reduce(0, +) > maxRowWidth - candidate.cellLength()
       }
       if isOverflown {
         candidateLines.append(currentColumn)
@@ -216,9 +218,21 @@ public extension CandidatePool {
       fixLineRange(isBackward: isBackward)
     }
   }
+
+  func cellWidth(_ cell: CandidateCellData) -> (min: CGFloat?, max: CGFloat?) {
+    let minAccepted = ceil(shitCell.cellLength(isMatrix: false))
+    let defaultMin: CGFloat = cell.cellLength(isMatrix: maxLinesPerPage != 1)
+    var min: CGFloat = defaultMin
+    if layout != .vertical, maxLinesPerPage == 1 {
+      min = max(minAccepted, cell.cellLength(isMatrix: false))
+    } else if layout == .vertical, maxLinesPerPage == 1 {
+      min = max(Double(CandidateCellData.unifiedSize * 6), 90)
+    }
+    return (min, nil)
+  }
 }
 
-// MARK: - Private Functions
+// MARK: - Privates.
 
 private extension CandidatePool {
   enum VerticalDirection {
