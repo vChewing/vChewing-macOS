@@ -136,7 +136,7 @@ public extension SessionCtl {
 
     if #available(macOS 10.15, *) {
       if let ctlCandidateCurrent = candidateUI as? CtlCandidateTDK {
-        ctlCandidateCurrent.isLegacyMode = PrefMgr.shared.legacyCandidateViewTypesettingMethodEnabled
+        ctlCandidateCurrent.useCocoa = PrefMgr.shared.legacyCandidateViewTypesettingMethodEnabled
       }
     }
 

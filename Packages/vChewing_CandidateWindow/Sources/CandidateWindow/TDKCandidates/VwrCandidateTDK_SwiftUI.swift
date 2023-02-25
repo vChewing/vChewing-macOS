@@ -42,26 +42,11 @@ public struct VwrCandidateTDK: View {
           mainViewVertical.background(candidateListBackground)
         }
         if thePool.maxLinesPerPage > 1 || thePool.layout == .vertical {
-          if controller?.delegate?.showReverseLookupResult ?? true, !tooltip.isEmpty {
-            ZStack(alignment: .leading) {
-              bottomPanelBackgroundTDK
-                .opacity(colorScheme == .dark ? 0 : 0.35)
-              reverseLookupPane.padding([.top, .horizontal], 4).padding([.bottom], 2)
-            }
-          }
-          statusBar.background(
-            bottomPanelBackgroundTDK
-              .opacity(colorScheme == .dark ? 0.35 : 0.5)
-          )
+          statusBarContent
         }
       }
-      .frame(minWidth: windowWidth, maxWidth: windowWidth)
+      .fixedSize()
       .background(candidateListBackground)
-      .overlay(
-        RoundedRectangle(cornerRadius: 10).stroke(
-          absoluteBackgroundColor.opacity(colorScheme == .dark ? 1 : 0.1), lineWidth: 0.5
-        )
-      )
       .cornerRadius(10)
     }
   }
@@ -70,20 +55,20 @@ public struct VwrCandidateTDK: View {
 // MARK: - Main Views.
 
 @available(macOS 10.15, *)
-extension VwrCandidateTDK {
+private extension VwrCandidateTDK {
   var mainViewHorizontal: some View {
     ScrollView(.vertical, showsIndicators: false) {
       VStack(alignment: .leading, spacing: 1.6) {
         ForEach(thePool.lineRangeForCurrentPage, id: \.self) { rowIndex in
           ZStack(alignment: .leading) {
-            lineBackground(lineID: rowIndex).cornerRadius(6)
+            lineBackground(lineID: rowIndex).cornerRadius(6).frame(minWidth: minLineWidth)
             HStack(spacing: horizontalCellSpacing) {
               ForEach(Array(thePool.candidateLines[rowIndex]), id: \.self) { currentCandidate in
                 drawCandidate(currentCandidate).fixedSize()
               }
+              .opacity(rowIndex == thePool.currentLineNumber ? 1 : 0.95)
             }
           }
-          .opacity(rowIndex == thePool.currentLineNumber ? 1 : 0.95)
           .id(rowIndex)
         }
         if thePool.maxLinesPerPage - thePool.lineRangeForCurrentPage.count > 0 {
@@ -102,9 +87,9 @@ extension VwrCandidateTDK {
         }
       }
     }
-    .fixedSize(horizontal: thePool.maxLinesPerPage == 1, vertical: true)
+    .fixedSize()
     .padding([.horizontal, .top], 5)
-    .padding([.bottom], thePool.maxLinesPerPage == 1 ? 5 : 2)
+    .padding([.bottom], thePool.maxLinesPerPage == 1 ? 5 : 0)
   }
 
   var mainViewVertical: some View {
@@ -115,6 +100,7 @@ extension VwrCandidateTDK {
             ForEach(Array(thePool.candidateLines[columnIndex]), id: \.self) { currentCandidate in
               drawCandidate(currentCandidate)
             }
+            .opacity(columnIndex == thePool.currentLineNumber ? 1 : 0.95)
             if thePool.candidateLines[columnIndex].count < thePool.maxLineCapacity {
               ForEach(0 ..< thePool.dummyCellsRequiredForCurrentLine, id: \.self) { _ in
                 drawCandidate(thePool.blankCell)
@@ -122,11 +108,7 @@ extension VwrCandidateTDK {
             }
           }
           .background(lineBackground(lineID: columnIndex)).cornerRadius(6)
-          .opacity(columnIndex == thePool.currentLineNumber ? 1 : 0.95)
           .frame(
-            minWidth: thePool.maxLinesPerPage == 1
-              ? max(Double(CandidateCellData.unifiedSize * 6), 90)
-              : nil,
             alignment: .topLeading
           )
           .id(columnIndex)
@@ -140,7 +122,7 @@ extension VwrCandidateTDK {
               ForEach(0 ..< thePool.maxLineCapacity, id: \.self) { _ in
                 attributedStringFor(cell: thePool.blankCell).fixedSize()
                   .frame(
-                    width: ceil(thePool.blankCell.minWidthToDraw(isMatrix: true)),
+                    width: ceil(thePool.blankCell.cellLength(isMatrix: true)),
                     alignment: .topLeading
                   )
                   .contentShape(Rectangle())
@@ -161,7 +143,7 @@ extension VwrCandidateTDK {
     }
     .fixedSize(horizontal: true, vertical: false)
     .padding([.horizontal, .top], 5)
-    .padding([.bottom], thePool.maxLinesPerPage == 1 ? 5 : 2)
+    .padding([.bottom], 0)
   }
 }
 
@@ -171,7 +153,7 @@ extension VwrCandidateTDK {
 extension VwrCandidateTDK {
   func drawCandidate(_ cell: CandidateCellData) -> some View {
     attributedStringFor(cell: cell)
-      .frame(minWidth: cellWidth(cell).min, maxWidth: cellWidth(cell).max, alignment: .topLeading)
+      .frame(minWidth: thePool.cellWidth(cell).min, maxWidth: thePool.cellWidth(cell).max, alignment: .topLeading)
       .contentShape(Rectangle())
       .onTapGesture { didSelectCandidateAt(cell.index) }
       .contextMenu {
@@ -199,31 +181,20 @@ extension VwrCandidateTDK {
     let isCurrentLineInMatrix = lineID == thePool.currentLineNumber && thePool.maxLinesPerPage != 1
     switch thePool.layout {
     case .horizontal where isCurrentLineInMatrix:
-      return Color.primary.opacity(0.05)
+      return colorScheme == .dark ? Color.primary.opacity(0.05) : .white
     case .vertical where isCurrentLineInMatrix:
-      return absoluteBackgroundColor.opacity(0.15)
+      return absoluteBackgroundColor.opacity(0.13)
     default:
       return Color.clear
     }
   }
 
-  func cellWidth(_ cell: CandidateCellData) -> (min: CGFloat?, max: CGFloat?) {
-    let minAccepted = ceil(thePool.blankCell.minWidthToDraw(isMatrix: false) * 1.1)
-    let defaultMin: CGFloat = cell.minWidthToDraw(isMatrix: thePool.maxLinesPerPage != 1)
-    var min: CGFloat = defaultMin
-    if thePool.layout != .vertical, thePool.maxLinesPerPage == 1 {
-      min = max(minAccepted, cell.minWidthToDraw(isMatrix: false))
-    }
-    return (min, nil)
-  }
-
-  var windowWidth: CGFloat? {
-    let paddings: CGFloat = 10.0
+  var minLineWidth: CGFloat? {
     let spacings: CGFloat = horizontalCellSpacing * Double(thePool.maxLineCapacity - 1)
     let maxWindowWith: CGFloat
       = ceil(
-        Double(thePool.maxLineCapacity) * (thePool.blankCell.minWidthToDraw())
-          + paddings + spacings
+        Double(thePool.maxLineCapacity) * (thePool.blankCell.cellLength())
+          + spacings
       )
     return thePool.layout == .horizontal && thePool.maxLinesPerPage > 1 ? maxWindowWith : nil
   }
@@ -264,7 +235,7 @@ extension VwrCandidateTDK {
           )
         )
         .padding([.horizontal], 2)
-        .foregroundColor(.primary.opacity(0.8))
+        .foregroundColor(.primary.opacity(0.9))
     }.fixedSize()
   }
 
@@ -272,7 +243,7 @@ extension VwrCandidateTDK {
     HStack {
       if !tooltip.isEmpty {
         ZStack(alignment: .center) {
-          Circle().fill(highlightBackgroundTDK.opacity(0.8))
+          Circle().fill(thePool.blankCell.themeColor.opacity(0.8))
           Text(tooltip.first?.description ?? "").padding(2).font(.system(size: CandidateCellData.unifiedSize))
         }.frame(width: ceil(CandidateCellData.unifiedSize * 1.7), height: ceil(CandidateCellData.unifiedSize * 1.7))
       }
@@ -281,7 +252,6 @@ extension VwrCandidateTDK {
         if controller?.delegate?.showReverseLookupResult ?? true {
           if !firstReverseLookupResult.isEmpty {
             ZStack(alignment: .center) {
-              Color(white: colorScheme == .dark ? 0.2 : 0.9).cornerRadius(4)
               Text(firstReverseLookupResult)
                 .font(.system(size: max(ceil(CandidateCellData.unifiedSize * 0.6), 9)))
                 .frame(
@@ -307,16 +277,13 @@ extension VwrCandidateTDK {
       if thePool.maxLinesPerPage == 1 {
         if !firstReverseLookupResult.isEmpty {
           ZStack(alignment: .center) {
-            Color(white: colorScheme == .dark ? 0.3 : 0.9).cornerRadius(3)
             Text("\(firstReverseLookupResult.trimmingCharacters(in: .newlines))")
               .lineLimit(1).padding([.horizontal], 2)
           }.fixedSize()
         }
       } else {
-        Text("→").opacity(0.8)
         ForEach(reverseLookupResult, id: \.self) { currentResult in
           ZStack(alignment: .center) {
-            Color(white: colorScheme == .dark ? 0.3 : 0.9).cornerRadius(3)
             Text("\(currentResult.trimmingCharacters(in: .newlines))")
               .lineLimit(1).padding([.horizontal], 2)
           }.fixedSize()
@@ -327,25 +294,20 @@ extension VwrCandidateTDK {
     .foregroundColor(colorScheme == .light ? Color(white: 0.1) : Color(white: 0.9))
   }
 
-  var statusBar: some View {
+  var statusBarContent: some View {
     HStack(alignment: .center) {
+      positionLabelView
       if !tooltip.isEmpty {
         Text(tooltip).lineLimit(1)
-      } else {
-        if controller?.delegate?.showReverseLookupResult ?? true, tooltip.isEmpty {
-          reverseLookupPane.padding(0)
-        }
       }
-      Spacer()
-      positionLabelView
+      if controller?.delegate?.showReverseLookupResult ?? true, !tooltip.isEmpty {
+        reverseLookupPane.padding(0)
+      }
+      Spacer(minLength: 0)
     }
     .font(.system(size: max(ceil(CandidateCellData.unifiedSize * 0.7), 11), weight: .bold))
     .padding([.bottom, .horizontal], 7).padding([.top], 2)
     .fixedSize(horizontal: false, vertical: true)
-  }
-
-  var highlightBackgroundTDK: Color {
-    tooltip.isEmpty ? Color(white: colorScheme == .dark ? 0.2 : 0.9) : thePool.blankCell.themeColor
   }
 
   var candidateListBackground: some View {
@@ -367,10 +329,6 @@ extension VwrCandidateTDK {
     }
   }
 
-  var bottomPanelBackgroundTDK: Color {
-    Color(white: colorScheme == .dark ? 0.145 : 0.95)
-  }
-
   func attributedStringFor(cell theCell: CandidateCellData) -> some View {
     let defaultResult = theCell.attributedStringForSwiftUIBackports
     if forceCatalinaCompatibility {
@@ -386,7 +344,7 @@ extension VwrCandidateTDK {
 // MARK: - Delegate Methods
 
 @available(macOS 10.15, *)
-extension VwrCandidateTDK {
+private extension VwrCandidateTDK {
   func didSelectCandidateAt(_ pos: Int) {
     controller?.delegate?.candidatePairSelected(at: pos)
   }
@@ -401,7 +359,7 @@ extension VwrCandidateTDK {
 import SwiftExtension
 
 @available(macOS 10.15, *)
-struct AttributedLabel_Previews: PreviewProvider {
+struct VwrCandidateTDK_Previews: PreviewProvider {
   @State static var testCandidates: [String] = [
     "二十四歲是學生", "二十四歲", "昏睡紅茶", "食雪漢", "意味深", "學生", "便乗",
     "🐂🍺🐂🍺", "🐃🍺", "🐂🍺", "🐃🐂🍺🍺", "🐂🍺", "🐃🍺", "🐂🍺", "🐃🍺", "🐂🍺", "🐃🍺",
@@ -488,6 +446,31 @@ struct AttributedLabel_Previews: PreviewProvider {
               .padding(5)
               .background(candidateListBackground)
               .cornerRadius(10).fixedSize()
+          }
+        }
+      }
+      Divider()
+      HStack(alignment: .top) {
+        Text("田所選字窗 SwiftUI 模式").bold().font(Font.system(.title))
+        VStack {
+          VwrCandidateTDK(controller: nil, thePool: thePoolX, forceCatalinaCompatibility: oldOS).fixedSize()
+          VwrCandidateTDK(controller: nil, thePool: thePoolXS, forceCatalinaCompatibility: oldOS).fixedSize()
+          HStack {
+            VwrCandidateTDK(controller: nil, thePool: thePoolY, forceCatalinaCompatibility: oldOS).fixedSize()
+            VwrCandidateTDK(controller: nil, thePool: thePoolYS, forceCatalinaCompatibility: oldOS).fixedSize()
+          }
+        }
+      }
+    }
+    VStack {
+      HStack(alignment: .top) {
+        Text("田所選字窗 Cocoa 模式").bold().font(Font.system(.title))
+        VStack {
+          VwrCandidateTDKCocoaForSwiftUI(controller: nil, thePool: thePoolX).fixedSize()
+          VwrCandidateTDKCocoaForSwiftUI(controller: nil, thePool: thePoolXS).fixedSize()
+          HStack {
+            VwrCandidateTDKCocoaForSwiftUI(controller: nil, thePool: thePoolY).fixedSize()
+            VwrCandidateTDKCocoaForSwiftUI(controller: nil, thePool: thePoolYS).fixedSize()
           }
         }
       }
