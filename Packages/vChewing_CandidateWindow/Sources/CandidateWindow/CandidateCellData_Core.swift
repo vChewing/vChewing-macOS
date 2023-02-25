@@ -30,11 +30,12 @@ public class CandidateCellData: Hashable {
   public var charGlyphWidth: Double { ceil(size * 1.0125 + 7) }
   public var fontSizeCandidate: Double { size }
   public var fontSizeKey: Double { max(ceil(fontSizeCandidate * 0.6), 11) }
+  public var fontColorCandidate: NSColor { isHighlighted ? .selectedMenuItemTextColor : .controlTextColor }
   public var fontColorKey: NSColor {
-    isHighlighted ? .selectedMenuItemTextColor.withAlphaComponent(0.8) : .secondaryLabelColor
+    isHighlighted
+      ? .selectedMenuItemTextColor.withAlphaComponent(0.9)
+      : .init(red: 142 / 255, green: 142 / 255, blue: 147 / 255, alpha: 1)
   }
-
-  public var fontColorCandidate: NSColor { isHighlighted ? .selectedMenuItemTextColor : .labelColor }
 
   public init(key: String, displayedText: String, isSelected: Bool = false) {
     self.key = key
@@ -52,10 +53,59 @@ public class CandidateCellData: Hashable {
   }
 
   public func cellLength(isMatrix: Bool = true) -> Double {
-    let minLength = ceil(charGlyphWidth * 2 + size)
+    let minLength = ceil(charGlyphWidth * 2 + size * 1.25)
     if displayedText.count <= 2, isMatrix { return minLength }
-    return ceil(attributedStringForLengthCalculation.boundingDimension.width)
+    return ceil(attributedStringPhrase().boundingDimension.width + charGlyphWidth)
   }
+
+  // MARK: - Fonts and NSColors.
+
+  func selectionKeyFont(size: CGFloat? = nil) -> NSFont {
+    let size: CGFloat = size ?? fontSizeKey
+    if #available(macOS 10.15, *) {
+      return NSFont.monospacedSystemFont(ofSize: fontSizeKey, weight: .regular)
+    }
+    return NSFont(name: "Menlo", size: size) ?? phraseFont(size: size)
+  }
+
+  func phraseFont(size: CGFloat? = nil) -> NSFont {
+    let size: CGFloat = size ?? fontSizeCandidate
+    //  暫時停用自訂字型回退機制，因為行高處理比較棘手。
+    //  有相關需求者請自行修改 macOS 10.9 - 10.12 的 DefaultFontFallbacks 和 CTPresetFallbacks 檔案。
+    //  var result: NSFont?
+    //  compatibility: if #unavailable(macOS 10.11) {
+    //    var fontIDs = [String]()
+    //    switch locale {
+    //    case "zh-Hans": fontIDs = ["PingFang SC", "Noto Sans CJK SC", "Hiragino Sans GB"]
+    //    case "zh-Hant": fontIDs = ["PingFang TC", "Noto Sans CJK TC", "LiHei Pro"]
+    //    case "ja": fontIDs = ["PingFang JA", "Noto Sans CJK JP", "Hiragino Kaku Gothic ProN W3"]
+    //    default: break compatibility
+    //    }
+    //    fallback: for psName in fontIDs {
+    //      result = NSFont(name: psName, size: size)
+    //      guard result == nil else { break compatibility }
+    //    }
+    //  }
+    let defaultResult: CTFont? = CTFontCreateUIFontForLanguage(.system, size, locale as CFString)
+    return defaultResult ?? NSFont.systemFont(ofSize: size)
+  }
+
+  func phraseFontEmphasized(size: CGFloat? = nil) -> NSFont {
+    let size: CGFloat = size ?? fontSizeCandidate
+    let result: CTFont? = CTFontCreateUIFontForLanguage(.emphasizedSystem, size, locale as CFString)
+    return result ?? NSFont.systemFont(ofSize: size)
+  }
+
+  var themeColorCocoa: NSColor {
+    switch locale {
+    case "zh-Hans": return .init(red: 255 / 255, green: 64 / 255, blue: 53 / 255, alpha: 0.85)
+    case "zh-Hant": return .init(red: 5 / 255, green: 127 / 255, blue: 255 / 255, alpha: 0.85)
+    case "ja": return .init(red: 167 / 255, green: 137 / 255, blue: 99 / 255, alpha: 0.85)
+    default: return .init(red: 5 / 255, green: 127 / 255, blue: 255 / 255, alpha: 0.85)
+    }
+  }
+
+  // MARK: - Basic NSAttributedString Components.
 
   public static let sharedParagraphStyle: NSParagraphStyle = {
     let paraStyle = NSMutableParagraphStyle()
@@ -65,65 +115,28 @@ public class CandidateCellData: Hashable {
     return paraStyle
   }()
 
-  var phraseFont: NSFont {
-    CTFontCreateUIFontForLanguage(.system, size, locale as CFString) ?? NSFont.systemFont(ofSize: size)
-  }
-
-  var highlightedNSColor: NSColor {
-    var result = NSColor.alternateSelectedControlColor
-    var colorBlendAmount: Double = NSApplication.isDarkMode ? 0.3 : 0.0
-    if #available(macOS 10.14, *), !NSApplication.isDarkMode, locale == "zh-Hant" {
-      colorBlendAmount = 0.15
-    }
-    // 設定當前高亮候選字的背景顏色。
-    switch locale {
-    case "zh-Hans":
-      result = NSColor.systemRed
-    case "zh-Hant":
-      result = NSColor.systemBlue
-    case "ja":
-      result = NSColor.systemBrown
-    default: break
-    }
-    var blendingAgainstTarget: NSColor = NSApplication.isDarkMode ? NSColor.black : NSColor.white
-    if #unavailable(macOS 10.14) {
-      colorBlendAmount = 0.3
-      blendingAgainstTarget = NSColor.white
-    }
-    return result.blended(withFraction: colorBlendAmount, of: blendingAgainstTarget)!
-  }
-
-  public var attributedStringForLengthCalculation: NSAttributedString {
-    let attrCandidate: [NSAttributedString.Key: AnyObject] = [
-      .font: NSFont.monospacedDigitSystemFont(ofSize: size, weight: .regular),
-      .paragraphStyle: Self.sharedParagraphStyle,
-    ]
-    let attrStrCandidate = NSAttributedString(string: displayedText + "　", attributes: attrCandidate)
-    return attrStrCandidate
-  }
-
   public func attributedString(
     noSpacePadding: Bool = true, withHighlight: Bool = false, isMatrix: Bool = false
   ) -> NSAttributedString {
-    let attrCandidate: [NSAttributedString.Key: AnyObject] = [
-      .font: NSFont.monospacedDigitSystemFont(ofSize: size, weight: .regular),
+    let attrSpace: [NSAttributedString.Key: AnyObject] = [
+      .font: phraseFont(size: size),
       .paragraphStyle: Self.sharedParagraphStyle,
     ]
     let result: NSMutableAttributedString = {
       if noSpacePadding {
-        let resultNeo = NSMutableAttributedString(string: " ", attributes: attrCandidate)
+        let resultNeo = NSMutableAttributedString(string: " ", attributes: attrSpace)
         resultNeo.insert(attributedStringPhrase(isMatrix: isMatrix), at: 1)
         resultNeo.insert(attributedStringHeader, at: 0)
         return resultNeo
       }
-      let resultNeo = NSMutableAttributedString(string: "   ", attributes: attrCandidate)
+      let resultNeo = NSMutableAttributedString(string: "   ", attributes: attrSpace)
       resultNeo.insert(attributedStringPhrase(isMatrix: isMatrix), at: 2)
       resultNeo.insert(attributedStringHeader, at: 1)
       return resultNeo
     }()
     if withHighlight, isHighlighted {
       result.addAttribute(
-        .backgroundColor, value: highlightedNSColor,
+        .backgroundColor, value: themeColorCocoa,
         range: NSRange(location: 0, length: result.string.utf16.count)
       )
     }
@@ -131,35 +144,21 @@ public class CandidateCellData: Hashable {
   }
 
   public var attributedStringHeader: NSAttributedString {
-    let theFontForCandidateKey: NSFont = {
-      if #available(macOS 10.15, *) {
-        return NSFont.monospacedSystemFont(ofSize: fontSizeKey, weight: .regular)
-      }
-      return NSFont.monospacedDigitSystemFont(ofSize: fontSizeKey, weight: .regular)
-    }()
-    var attrKey: [NSAttributedString.Key: AnyObject] = [
-      .font: theFontForCandidateKey,
+    let attrKey: [NSAttributedString.Key: AnyObject] = [
+      .font: selectionKeyFont(size: fontSizeKey),
       .paragraphStyle: Self.sharedParagraphStyle,
+      .foregroundColor: fontColorKey,
     ]
-    if isHighlighted {
-      attrKey[.foregroundColor] = NSColor.white.withAlphaComponent(0.8)
-    } else {
-      attrKey[.foregroundColor] = NSColor.secondaryLabelColor
-    }
     let attrStrKey = NSAttributedString(string: key, attributes: attrKey)
     return attrStrKey
   }
 
   public func attributedStringPhrase(isMatrix: Bool = false) -> NSAttributedString {
     var attrCandidate: [NSAttributedString.Key: AnyObject] = [
-      .font: phraseFont,
+      .font: phraseFont(size: size),
       .paragraphStyle: Self.sharedParagraphStyle,
+      .foregroundColor: fontColorCandidate,
     ]
-    if isHighlighted {
-      attrCandidate[.foregroundColor] = NSColor.white
-    } else {
-      attrCandidate[.foregroundColor] = NSColor.labelColor
-    }
     if #available(macOS 12, *) {
       if UserDefaults.standard.bool(
         forKey: UserDef.kLegacyCandidateViewTypesettingMethodEnabled.rawValue
@@ -184,8 +183,15 @@ public class CandidateCellData: Hashable {
       return String(format: "U+%02X %@", $0.value, theName)
     }
   }
+}
 
-  public func minWidthToDraw(isMatrix: Bool = true) -> Double {
-    cellLength(isMatrix: isMatrix) + ceil(fontSizeKey * 0.1)
+// MARK: - Array Container Extension.
+
+public extension Array where Element == CandidateCellData {
+  var hasHighlightedCell: Bool {
+    for neta in self {
+      if neta.isHighlighted { return true }
+    }
+    return false
   }
 }
