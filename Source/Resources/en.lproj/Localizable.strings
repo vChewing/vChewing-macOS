@@ -1,4 +1,5 @@
 "vChewing" = "vChewing";
+"IMK Candidate Window has been automatically disabled due to its recent crash with force-exposed necessary internal APIs. As an experimental feature, we advise against using IMK Candidate Window in productive environments." = "IMK Candidate Window has been automatically disabled due to its recent crash with force-exposed necessary internal APIs. As an experimental feature, we advise against using IMK Candidate Window in productive environments.";
 "Do you want to enable the popup composition buffer for this client?" = "Do you want to enable the popup composition buffer for this client?";
 "Some client apps may have different compatibility issues in IMKTextInput implementation." = "Some client apps may have different compatibility issues in IMKTextInput implementation.";
 "Yes" = "Yes";
