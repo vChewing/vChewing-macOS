@@ -1,4 +1,5 @@
 "vChewing" = "威注音入力アプリ";
+"IMK Candidate Window has been automatically disabled due to its recent crash with force-exposed necessary internal APIs. As an experimental feature, we advise against using IMK Candidate Window in productive environments." = "IMK 文字候補ウィンドウの利用できるようのために、システム内部の必要のある API の強引的アクセスが必要ですが、前回のその利用で威注音入力アプリが崩れました。故に今は IMK 文字候補ウィンドウを OFF にしました。IMK 文字候補ウィンドウはあくまで実験的な機能として提供していたため、業務用にはお勧めできません。";
 "Do you want to enable the popup composition buffer for this client?" = "この客体アプリに「吹き出し入力緩衝列ウィンドウ」を起用しますか？";
 "Some client apps may have different compatibility issues in IMKTextInput implementation." = "それぞれの客体アプリには、それぞれの IMKTextInput 不具合はあるかもしれません。";
 "Yes" = "うむ";

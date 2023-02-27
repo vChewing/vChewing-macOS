@@ -44,7 +44,11 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
 
   public var candidateFont = NSFont.systemFont(ofSize: 16) {
     didSet {
-      if #available(macOS 10.14, *) { setFontSize(candidateFont.pointSize) }
+      if #available(macOS 10.14, *) {
+        PrefMgr.shared.failureFlagForIMKCandidates = true
+        setFontSize(candidateFont.pointSize)
+        PrefMgr.shared.failureFlagForIMKCandidates = false
+      }
       var attributes = attributes()
       // FB11300759: Set "NSAttributedString.Key.font" doesn't work.
       attributes?[NSAttributedString.Key.font] = candidateFont
