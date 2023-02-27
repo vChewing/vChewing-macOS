@@ -14,7 +14,7 @@ public extension PrefMgr {
   func fixOddPreferences() {
     // macOS 10.15 開始才能使用 SwiftUI 構建的田所選字窗。
     if #unavailable(macOS 10.15) {
-      legacyCandidateViewTypesettingMethodEnabled = false
+      enableSwiftUIForTDKCandidates = false
       togglingAlphanumericalModeWithRShift = false
       togglingAlphanumericalModeWithLShift = false
       showReverseLookupInCandidateUI = false

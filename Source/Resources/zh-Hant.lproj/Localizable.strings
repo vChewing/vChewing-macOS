@@ -208,7 +208,7 @@
 "Automatically correct reading combinations when typing" = "敲字時自動糾正讀音組合";
 "Automatically reload user data files if changes detected" = "自動檢測並載入使用者語彙檔案變更";
 "Basic Keyboard Layout:" = "基礎鍵盤佈局:";
-"By checking this, Tadokoro Candidate Window will stop using SwiftUI but using a single NSTextView instead, utilizing one single special NSAttributedString to handle the typesetting of the entire candidate view. This will make the candidate window look “old-school” with no mouse-clicking features, but it renders much faster than SwiftUI on Intel macs. This mode allows Tadokoro candidate window to work in macOS 10.09 - 10.14 versions, accommodating their lack of support for SwiftUI." = "若啟用該選項，則田所選字窗會棄用 SwiftUI、且改用單個 NSTextView 處理一個特製的 NSAttributedString 的方式來實現自身的介面排版。這會讓選字窗的外觀美學看上去倒退二十年、且沒有滑鼠點擊支援，但卻能在 Intel mac 電腦上換得更快速的渲染效能。因為該模式不需要 SwiftUI，所以田所選字窗得以藉由該模式為 macOS 10.09 - 10.14 系統工作。";
+"By checking this, Tadokoro Candidate Window will use SwiftUI. SwiftUI was being used in vChewing 3.3.8 and before. However, SwiftUI has unacceptable responsiveness & latency & efficiency problems in rendering the candidate panel UI. That's why a refactored version has been introduced since vChewing 3.3.9 using Cocoa, providing an optimized user experience with blasing-fast operation responsiveness, plus experimental mouse-wheel support." = "若啟用該選項，則田所選字窗會改用 SwiftUI 繪製。田所選字窗在威注音輸入法 3.3.8 版為止一直都使用 SwiftUI 繪製，但卻因此有著不堪忍受的介面渲染效率問題。因此，自威注音 3.3.9 版開始，田所選字窗藉由 Cocoa 技術得以重構，擁有行雲流水般的介面繪製速度，更具（嘗鮮性質的）滑鼠滾輪支援。";
 "Candidate Layout:" = "候選字窗佈局:";
 "Candidate Size:" = "候選字窗字號:";
 "Cassette mode is similar to the CIN support of the Yahoo Kimo IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)." = "磁帶模式類似於雅虎奇摩輸入法的 CIN 支援模式，允許使用者藉由 CIN 表格檔案擴充自己想要的筆畫輸入法（比如五筆、倉頡、嘸蝦米，等）。然而，因為威注音不打算為了這個功能而犧牲注音輸入的體驗，所以這個磁帶模式的體驗對於已經習慣 RIME 或者 OpenVanilla 的人群而言可能會稍微麻煩一些。";
@@ -248,7 +248,7 @@
 "Emulating select-candidate-per-character mode" = "模擬 90 年代前期注音逐字選字輸入風格";
 "Enable cassette mode, suppressing phonabet input" = "啟用磁帶模式，會停用注音輸入";
 "Enable CNS11643 Support (2023-01-06)" = "啟用 CNS11643 全字庫支援 (2023-01-06)";
-"Enable legacy UI typesetting method" = "使用古早的介面排版方法";
+"Enable experimental Swift UI typesetting method" = "使用 Swift UI 介面排版方法";
 "Enable phrase replacement table" = "啟用語彙置換表";
 "Enable Space key for calling candidate window" = "敲空格鍵以呼出候選字窗";
 "Enable symbol input support (incl. certain emoji symbols)" = "啟用包括少許繪文字在內的符號輸入支援";
