@@ -130,7 +130,9 @@ public extension SessionCtl {
     if #available(macOS 10.14, *) {
       // Spotlight 視窗會擋住 IMK 選字窗，所以需要特殊處理。
       if let ctlCandidateCurrent = candidateUI as? CtlCandidateIMK {
+        PrefMgr.shared.failureFlagForIMKCandidates = true
         ctlCandidateCurrent.setWindowLevel(UInt64(CGShieldingWindowLevel() + 2))
+        PrefMgr.shared.failureFlagForIMKCandidates = false
       }
     }
 
