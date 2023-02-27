@@ -84,6 +84,7 @@
 "lblIntonationKeyBehavior.title" = "Specify what intonation key does when syllable composer is empty.";
 "lblShiftBkspKeyBehavior.title" = "Choose the attempted behavior of Shift+BackSpace key.";
 "lblUpperCaseLetterKeyBehavior.title" = "Choose the behavior of Shift+Letter key with letter inputs.";
+"lDd-rN-BSM.title" = "Enable mouse wheel support for Tadokoro Candidate Window";
 "MKJ-Q6-dLd.title" = "Also use “\\” or “¥” key for Hanin Keyboard Symbol Input";
 "N6e-bR-mVa.title" = "Disable segmented thick underline in marking mode for managed clients";
 "neb-Pz-n1h.title" = "Auto-composite when the longest possible key is formed";
