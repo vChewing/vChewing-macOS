@@ -84,6 +84,7 @@
 "lblIntonationKeyBehavior.title" = "音調組立緩衝列が空かされた時の音調キーの行為をご指定ください。";
 "lblShiftBkspKeyBehavior.title" = "Shift+BackSpace キーの優先行為をご指定ください。";
 "lblUpperCaseLetterKeyBehavior.title" = "Shift+文字キーの行為をご指定ください。";
+"lDd-rN-BSM.title" = "田所候補陳列ウィンドウのマウススクロール機能を起用";
 "MKJ-Q6-dLd.title" = "「\\」・「¥」キーでも漢音キーボード符号入力";
 "N6e-bR-mVa.title" = "管理されている客体アプリには、マーキングモードの多段式太下線の描きを禁ず";
 "neb-Pz-n1h.title" = "最長可能キーができた場合、文字を組み立つ";
