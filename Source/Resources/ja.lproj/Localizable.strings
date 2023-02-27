@@ -209,7 +209,7 @@
 "Automatically correct reading combinations when typing" = "入力中で打ち間違った発音組み合わせを自動的に訂正する";
 "Automatically reload user data files if changes detected" = "ユーザー辞書データの変更を自動検出し、自動的に再読込";
 "Basic Keyboard Layout:" = "基礎キーボード:";
-"By checking this, Tadokoro Candidate Window will stop using SwiftUI but using a single NSTextView instead, utilizing one single special NSAttributedString to handle the typesetting of the entire candidate view. This will make the candidate window look “old-school” with no mouse-clicking features, but it renders much faster than SwiftUI on Intel macs. This mode allows Tadokoro candidate window to work in macOS 10.09 - 10.14 versions, accommodating their lack of support for SwiftUI." = "このチェックを入れると、田所候補陳列ウィンドウ（TDK）は SwiftUI を使わずに、代わりに１つ NSTextView だけで、１つ特製の NSAttributedString のご利用で、ウィンドウ全体の組版を行います。見た目はなかなか野暮で、さらにマウスクリックの処理もありませんけど、Intel mac での操作反応スピードはこれで保証できます。SwiftUI の利用のないため、これで TDK は macOS 10.09 - 10.14 でも動作可能です。";
+"By checking this, Tadokoro Candidate Window will use SwiftUI. SwiftUI was being used in vChewing 3.3.8 and before. However, SwiftUI has unacceptable responsiveness & latency & efficiency problems in rendering the candidate panel UI. That's why a refactored version has been introduced since vChewing 3.3.9 using Cocoa, providing an optimized user experience with blasing-fast operation responsiveness, plus experimental mouse-wheel support." = "このチェックを入れると、田所候補陳列ウィンドウ（TDK）は SwiftUI を用い始めます。このアプリの 3.3.8 版まで SwiftUI をずっと使っていましたが、SwiftUI の画面描画の低効率の固有問題はございます。故に、このアプリの 3.3.9 版にて、Cocoa で TDK を作り直しました。これで画面操作の反応は迅雷の如く、さらに（実験的な）マウススクロール機能も可能になりました。";
 "Candidate Layout:" = "候補陳列の仕様";
 "Candidate Size:" = "候補文字の字号:";
 "Cassette mode is similar to the CIN support of the Yahoo Kimo IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)." = "カセットモードは、CIN ファイルを用いて、（五筆や倉頡や嘸蝦米などのような）筆画入力を機能拡張できるモードである。ですが、単なる予備機能として提供したもののため、使いやすいかどうか、RIME や OpenVanilla などに比べられないかもしれん。";
@@ -249,7 +249,7 @@
 "Emulating select-candidate-per-character mode" = "漢字１つづつ全候補選択入力モード";
 "Enable cassette mode, suppressing phonabet input" = "カセットモードを起用（注音入力はこのモードで使えぬ）";
 "Enable CNS11643 Support (2023-01-06)" = "全字庫モード // 入力可能な漢字数を倍増す (2023-01-06)";
-"Enable legacy UI typesetting method" = "古いUIの組版方法を起用する";
+"Enable experimental Swift UI typesetting method" = "Swift UI 組版方法を起用する";
 "Enable phrase replacement table" = "言葉置換表を起用";
 "Enable Space key for calling candidate window" = "Space キーで入力候補を呼び出す";
 "Enable symbol input support (incl. certain emoji symbols)" = "僅かなる絵文字も含む符号入力サポートを起用";

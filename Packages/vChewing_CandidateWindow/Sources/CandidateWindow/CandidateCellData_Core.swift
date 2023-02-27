@@ -161,7 +161,7 @@ public class CandidateCellData: Hashable {
     ]
     if #available(macOS 12, *) {
       if UserDefaults.standard.bool(
-        forKey: UserDef.kLegacyCandidateViewTypesettingMethodEnabled.rawValue
+        forKey: UserDef.kEnableSwiftUIForTDKCandidates.rawValue
       ) {
         attrCandidate[.languageIdentifier] = self.locale as AnyObject
       }
