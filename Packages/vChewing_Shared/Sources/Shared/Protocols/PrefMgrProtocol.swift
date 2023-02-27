@@ -47,6 +47,7 @@ public protocol PrefMgrProtocol {
   var onlyLoadFactoryLangModelsIfNeeded: Bool { get set }
   var useIMKCandidateWindow: Bool { get set }
   var enableSwiftUIForTDKCandidates: Bool { get set }
+  var enableMouseScrollingForTDKCandidatesCocoa: Bool { get set }
   var disableSegmentedThickUnderlineInMarkingModeForManagedClients: Bool { get set }
   var maxCandidateLength: Int { get set }
   var shouldNotFartInLieuOfBeep: Bool { get set }
