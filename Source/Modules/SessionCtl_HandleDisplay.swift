@@ -114,7 +114,6 @@ public extension SessionCtl {
         singleColumn ? "⇧" : NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
     }
 
-    candidateUI?.useLangIdentifier = PrefMgr.shared.legacyCandidateViewTypesettingMethodEnabled
     candidateUI?.locale = {
       switch inputMode {
       case .imeModeCHS: return "zh-Hans"
@@ -138,7 +137,7 @@ public extension SessionCtl {
 
     if #available(macOS 10.15, *) {
       if let ctlCandidateCurrent = candidateUI as? CtlCandidateTDK {
-        ctlCandidateCurrent.useCocoa = PrefMgr.shared.legacyCandidateViewTypesettingMethodEnabled
+        ctlCandidateCurrent.useCocoa = !PrefMgr.shared.enableSwiftUIForTDKCandidates
       }
     }
 

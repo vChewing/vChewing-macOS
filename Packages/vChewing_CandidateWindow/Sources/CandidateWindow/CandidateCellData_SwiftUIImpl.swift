@@ -66,7 +66,7 @@ public extension CandidateCellData {
         }
         VStack(spacing: 0) {
           HStack(spacing: 4) {
-            if UserDefaults.standard.bool(forKey: UserDef.kLegacyCandidateViewTypesettingMethodEnabled.rawValue) {
+            if UserDefaults.standard.bool(forKey: UserDef.kEnableSwiftUIForTDKCandidates.rawValue) {
               Text(AttributedString(attributedStringHeader))
               Text(AttributedString(attributedStringPhrase()))
             } else {
