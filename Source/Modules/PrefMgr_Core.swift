@@ -34,6 +34,9 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kFailureFlagForUOMObservation.rawValue, defaultValue: false)
   public var failureFlagForUOMObservation: Bool
 
+  @AppProperty(key: UserDef.kFailureFlagForIMKCandidates.rawValue, defaultValue: false)
+  public var failureFlagForIMKCandidates: Bool
+
   @AppProperty(key: UserDef.kDeltaOfCalendarYears.rawValue, defaultValue: -2000)
   public var deltaOfCalendarYears: Int
 
