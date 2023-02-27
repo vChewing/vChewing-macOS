@@ -75,6 +75,7 @@ public enum UserDef: String, CaseIterable {
 
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kEnableSwiftUIForTDKCandidates = "EnableSwiftUIForTDKCandidates"
+  case kEnableMouseScrollingForTDKCandidatesCocoa = "EnableMouseScrollingForTDKCandidatesCocoa"
   case kDisableSegmentedThickUnderlineInMarkingModeForManagedClients
     = "DisableSegmentedThickUnderlineInMarkingModeForManagedClients"
 
