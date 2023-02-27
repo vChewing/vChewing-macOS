@@ -52,7 +52,9 @@ extension InputHandler {
          let newEvent = event.reinitiate(modifierFlags: [], characters: newChar)
       {
         if #available(macOS 10.14, *) {
+          PrefMgr.shared.failureFlagForIMKCandidates = true
           imkCandidates.handleKeyboardEvent(newEvent)
+          PrefMgr.shared.failureFlagForIMKCandidates = false
         } else {
           imkCandidates.interpretKeyEvents([newEvent])
         }
@@ -119,7 +121,9 @@ extension InputHandler {
             return event.isShiftHold ? true : handleInput(event: event)
           } else {
             if #available(macOS 10.14, *) {
+              PrefMgr.shared.failureFlagForIMKCandidates = true
               imkC.handleKeyboardEvent(newEvent)
+              PrefMgr.shared.failureFlagForIMKCandidates = false
             } else {
               imkC.interpretKeyEvents([newEvent])
             }

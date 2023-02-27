@@ -48,19 +48,37 @@ public extension AppDelegate {
 
   func applicationDidFinishLaunching(_: Notification) {
     NSUserNotificationCenter.default.delegate = self
+
+    if PrefMgr.shared.failureFlagForIMKCandidates {
+      DispatchQueue.main.async {
+        PrefMgr.shared.failureFlagForIMKCandidates = false
+        PrefMgr.shared.useIMKCandidateWindow = false
+        let userNotification = NSUserNotification()
+        userNotification.title = NSLocalizedString("vChewing", comment: "")
+        userNotification.informativeText = NSLocalizedString(
+          "IMK Candidate Window has been automatically disabled due to its recent crash with force-exposed necessary internal APIs. As an experimental feature, we advise against using IMK Candidate Window in productive environments.",
+          comment: ""
+        )
+        userNotification.soundName = NSUserNotificationDefaultSoundName
+        NSUserNotificationCenter.default.deliver(userNotification)
+      }
+    }
+
     // 一旦發現與使用者半衰模組的觀察行為有關的崩潰標記被開啟，就清空既有的半衰記憶資料檔案。
     if PrefMgr.shared.failureFlagForUOMObservation {
-      LMMgr.clearUserOverrideModelData(.imeModeCHS)
-      LMMgr.clearUserOverrideModelData(.imeModeCHT)
-      PrefMgr.shared.failureFlagForUOMObservation = false
-      let userNotification = NSUserNotification()
-      userNotification.title = NSLocalizedString("vChewing", comment: "")
-      userNotification.informativeText = NSLocalizedString(
-        "vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability.",
-        comment: ""
-      )
-      userNotification.soundName = NSUserNotificationDefaultSoundName
-      NSUserNotificationCenter.default.deliver(userNotification)
+      DispatchQueue.main.async {
+        LMMgr.clearUserOverrideModelData(.imeModeCHS)
+        LMMgr.clearUserOverrideModelData(.imeModeCHT)
+        PrefMgr.shared.failureFlagForUOMObservation = false
+        let userNotification = NSUserNotification()
+        userNotification.title = NSLocalizedString("vChewing", comment: "")
+        userNotification.informativeText = NSLocalizedString(
+          "vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability.",
+          comment: ""
+        )
+        userNotification.soundName = NSUserNotificationDefaultSoundName
+        NSUserNotificationCenter.default.deliver(userNotification)
+      }
     }
 
     if !PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModelsOnAppDelegate() }

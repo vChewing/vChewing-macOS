@@ -1,4 +1,5 @@
 "vChewing" = "威注音輸入法";
+"IMK Candidate Window has been automatically disabled due to its recent crash with force-exposed necessary internal APIs. As an experimental feature, we advise against using IMK Candidate Window in productive environments." = "IMK 選字窗在最近一次存取被強制曝露的必需 API 時令輸入法崩潰，所以被自動停用。請勿在生產力場合使用該實驗型功能。";
 "Do you want to enable the popup composition buffer for this client?" = "您要对该客体启用浮动组字窗吗？";
 "Some client apps may have different compatibility issues in IMKTextInput implementation." = "有些客体应用可能会有不同的 IMKTextInput 实作相容问题。";
 "Yes" = "是";
