@@ -249,6 +249,7 @@
 "Enable cassette mode, suppressing phonabet input" = "Enable cassette mode, suppressing phonabet input";
 "Enable CNS11643 Support (2023-01-06)" = "Enable CNS11643 Support (2023-01-06)";
 "Enable experimental Swift UI typesetting method" = "Enable experimental Swift UI typesetting method";
+"Enable mouse wheel support for Tadokoro Candidate Window" = "Enable mouse wheel support for Tadokoro Candidate Window";
 "Enable phrase replacement table" = "Enable phrase replacement table";
 "Enable Space key for calling candidate window" = "Enable Space key for calling candidate window";
 "Enable symbol input support (incl. certain emoji symbols)" = "Enable symbol input support (incl. certain emoji symbols)";

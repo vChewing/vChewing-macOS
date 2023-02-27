@@ -32,6 +32,8 @@ struct VwrPrefPaneCandidates: View {
     forKey: UserDef.kConsolidateContextOnCandidateSelection.rawValue)
   @State private var selUseIMKCandidateWindow: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kUseIMKCandidateWindow.rawValue)
+  @State private var selEnableMouseScrollingForTDKCandidatesCocoa: Bool = UserDefaults.standard.bool(
+    forKey: UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.rawValue)
   @State private var selEnableSwiftUIForTDKCandidates: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kEnableSwiftUIForTDKCandidates.rawValue)
   @State private var selAllowBoostingSingleKanjiAsUserPhrase: Bool = UserDefaults.standard.bool(
@@ -188,6 +190,16 @@ struct VwrPrefPaneCandidates: View {
             )
           )
           .preferenceDescription().prefDescriptionWidthLimited()
+          Toggle(
+            LocalizedStringKey("Enable mouse wheel support for Tadokoro Candidate Window"),
+            isOn: $selEnableMouseScrollingForTDKCandidatesCocoa.onChange {
+              PrefMgr.shared.enableMouseScrollingForTDKCandidatesCocoa =
+                selEnableMouseScrollingForTDKCandidatesCocoa
+            }
+          )
+          .disabled(
+            PrefMgr.shared.useIMKCandidateWindow || PrefMgr.shared.enableSwiftUIForTDKCandidates
+          )
           Toggle(
             LocalizedStringKey("Enable experimental Swift UI typesetting method"),
             isOn: $selEnableSwiftUIForTDKCandidates.onChange {

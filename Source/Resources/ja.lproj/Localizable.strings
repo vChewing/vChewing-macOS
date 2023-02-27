@@ -250,6 +250,7 @@
 "Enable cassette mode, suppressing phonabet input" = "カセットモードを起用（注音入力はこのモードで使えぬ）";
 "Enable CNS11643 Support (2023-01-06)" = "全字庫モード // 入力可能な漢字数を倍増す (2023-01-06)";
 "Enable experimental Swift UI typesetting method" = "Swift UI 組版方法を起用する";
+"Enable mouse wheel support for Tadokoro Candidate Window" = "田所候補陳列ウィンドウのマウススクロール機能を起用";
 "Enable phrase replacement table" = "言葉置換表を起用";
 "Enable Space key for calling candidate window" = "Space キーで入力候補を呼び出す";
 "Enable symbol input support (incl. certain emoji symbols)" = "僅かなる絵文字も含む符号入力サポートを起用";
