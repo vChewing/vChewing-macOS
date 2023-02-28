@@ -89,6 +89,7 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
       Self.thePool.reverseLookupResult = reverseLookupResult
     }
     DispatchQueue.main.async { [self] in
+      window.isOpaque = false
       window.backgroundColor = .clear
       viewCheck: if #available(macOS 10.15, *) {
         if useCocoa {
