@@ -15,6 +15,7 @@ import SwiftUIBackports
 
 /// 用來管理選字窗內顯示的候選字的單位。用 class 型別會比較方便一些。
 public class CandidateCellData: Hashable {
+  public var visualDimension: CGSize = .zero
   public var locale = ""
   public static var unifiedSize: Double = 16
   public var key: String
