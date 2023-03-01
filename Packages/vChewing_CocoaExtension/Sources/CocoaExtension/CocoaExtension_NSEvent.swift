@@ -125,7 +125,7 @@ public extension NSEvent {
   var isJISAlphanumericalKey: Bool { KeyCode(rawValue: keyCode) == KeyCode.kJISAlphanumericalKey }
   var isJISKanaSwappingKey: Bool { KeyCode(rawValue: keyCode) == KeyCode.kJISKanaSwappingKey }
   var isNumericPadKey: Bool { arrNumpadKeyCodes.contains(keyCode) }
-  var isMainAreaNumKey: Bool { arrMainAreaNumKey.contains(keyCode) }
+  var isMainAreaNumKey: Bool { mapMainAreaNumKey.keys.contains(keyCode) }
   var isShiftHold: Bool { modifierFlags.contains([.shift]) }
   var isCommandHold: Bool { modifierFlags.contains([.command]) }
   var isControlHold: Bool { modifierFlags.contains([.control]) }
@@ -289,9 +289,6 @@ let mapMainAreaNumKey: [UInt16: String] = [
 ///
 /// 注意：第 95 號 Key Code（逗號）為 JIS 佈局特有的數字小鍵盤按鍵。
 let arrNumpadKeyCodes: [UInt16] = [65, 67, 69, 71, 75, 78, 81, 82, 83, 84, 85, 86, 87, 88, 89, 91, 92, 95]
-
-/// 主鍵盤區域的數字鍵的 KeyCode。
-let arrMainAreaNumKey: [UInt16] = [18, 19, 20, 21, 22, 23, 25, 26, 28, 29]
 
 // CharCodes: https://theasciicode.com.ar/ascii-control-characters/horizontal-tab-ascii-code-9.html
 enum CharCode: UInt16 {
