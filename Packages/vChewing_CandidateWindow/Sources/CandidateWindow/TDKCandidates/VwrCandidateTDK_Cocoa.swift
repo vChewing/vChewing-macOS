@@ -238,6 +238,7 @@ private extension VwrCandidateTDKCocoa {
       vwrCurrentLine.layer?.backgroundColor = lineBg.cgColor
       vwrCurrentLine.layer?.cornerRadius = 6
     }
+    vwrCurrentLine.alphaValue = isCurrentLine ? 1 : 0.85
     lineDimension.width = max(lineSize.width, lineDimension.width)
     switch thePool.layout {
     case .horizontal: lineDimension.height = max(lineSize.height, lineDimension.height)
