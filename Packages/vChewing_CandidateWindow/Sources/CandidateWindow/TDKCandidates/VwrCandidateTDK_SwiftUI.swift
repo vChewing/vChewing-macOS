@@ -66,7 +66,7 @@ private extension VwrCandidateTDK {
               ForEach(Array(thePool.candidateLines[rowIndex]), id: \.self) { currentCandidate in
                 drawCandidate(currentCandidate).fixedSize()
               }
-              .opacity(rowIndex == thePool.currentLineNumber ? 1 : 0.95)
+              .opacity(rowIndex == thePool.currentLineNumber ? 1 : 0.85)
             }
           }
           .id(rowIndex)
@@ -100,7 +100,7 @@ private extension VwrCandidateTDK {
             ForEach(Array(thePool.candidateLines[columnIndex]), id: \.self) { currentCandidate in
               drawCandidate(currentCandidate)
             }
-            .opacity(columnIndex == thePool.currentLineNumber ? 1 : 0.95)
+            .opacity(columnIndex == thePool.currentLineNumber ? 1 : 0.85)
             if thePool.candidateLines[columnIndex].count < thePool.maxLineCapacity {
               ForEach(0 ..< thePool.dummyCellsRequiredForCurrentLine, id: \.self) { _ in
                 drawCandidate(thePool.blankCell)

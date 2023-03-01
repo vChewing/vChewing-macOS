@@ -41,7 +41,7 @@ extension CandidatePool {
         )
         if lineID != currentLineNumber {
           cellString.addAttribute(
-            .foregroundColor, value: NSColor.controlTextColor,
+            .foregroundColor, value: NSColor.gray,
             range: .init(location: 0, length: cellString.string.utf16.count)
           )
         }
