@@ -517,12 +517,17 @@ public class InputHandler: InputHandlerProtocol {
   /// - Returns: 生成的標點符號索引鍵。
   func generatePunctuationNamePrefix(withKeyCondition input: InputSignalProtocol) -> String {
     if prefs.halfWidthPunctuationEnabled { return "_half_punctuation_" }
+    // 注意：這一行為 SHIFT+ALT+主鍵盤數字鍵專用，強制無視不同地區的鍵盤在這個按鍵組合下的符號輸入差異。
+    // 但如果去掉「input.isMainAreaNumKey」這個限定條件的話，可能會影響其他依賴 Shift 鍵輸入的符號。
+    if input.isMainAreaNumKey, input.modifierFlags == [.option, .shift] { return "_shift_alt_punctuation_" }
+    var result = ""
     switch (input.isControlHold, input.isOptionHold) {
-    case (true, true): return "_alt_ctrl_punctuation_"
-    case (true, false): return "_ctrl_punctuation_"
-    case (false, true): return "_alt_punctuation_"
-    case (false, false): return "_punctuation_"
+    case (true, true): result.append("_alt_ctrl_punctuation_")
+    case (true, false): result.append("_ctrl_punctuation_")
+    case (false, true): result.append("_alt_punctuation_")
+    case (false, false): result.append("_punctuation_")
     }
+    return result
   }
 }
 
