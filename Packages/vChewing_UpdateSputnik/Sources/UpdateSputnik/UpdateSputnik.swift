@@ -11,6 +11,7 @@ import Cocoa
 public class UpdateSputnik {
   public static let shared: UpdateSputnik = .init()
   public let kUpdateInfoPageURLKey: String = "UpdateInfoSite"
+  public let kUpdateInfoPageURLGitHubKey: String = "UpdateInfoSiteGitHub"
   public let kUpdateCheckDateKeyPrevious: String = "PreviousUpdateCheckDate"
   public let kUpdateCheckDateKeyNext: String = "NextUpdateCheckDate"
   public let kUpdateCheckInterval: TimeInterval = 114_514
@@ -127,20 +128,33 @@ public class UpdateSputnik {
       intRemoteVersion.description
     )
     let alert = NSAlert()
-    alert.messageText = NSLocalizedString("New Version Available", comment: "")
     alert.informativeText = content
-    alert.addButton(withTitle: NSLocalizedString("Visit Website", comment: ""))
+    alert.messageText = NSLocalizedString("New Version Available", comment: "")
+    let strVisitWebsite = NSLocalizedString("Visit Website", comment: "")
+    alert.addButton(withTitle: "\(strVisitWebsite) (Gitee)")
+    alert.addButton(withTitle: "\(strVisitWebsite) (GitHub)")
     alert.addButton(withTitle: NSLocalizedString("Not Now", comment: ""))
+
+    guard let siteInfoURLString = plist["\(kUpdateInfoPageURLKey)"] as? String,
+          let siteURL = URL(string: siteInfoURLString),
+          let siteInfoURLStringGitHub = plist["\(kUpdateInfoPageURLGitHubKey)"] as? String,
+          let siteURLGitHub = URL(string: siteInfoURLStringGitHub)
+    else {
+      return
+    }
+
     let result = alert.runModal()
     NSApp.activate(ignoringOtherApps: true)
-    if result == NSApplication.ModalResponse.alertFirstButtonReturn {
-      if let siteInfoURLString = plist[kUpdateInfoPageURLKey] as? String,
-         let siteURL = URL(string: siteInfoURLString)
-      {
-        DispatchQueue.main.async {
-          NSWorkspace.shared.open(siteURL)
-        }
+    switch result {
+    case .alertFirstButtonReturn:
+      DispatchQueue.main.async {
+        NSWorkspace.shared.open(siteURL)
       }
+    case .alertSecondButtonReturn:
+      DispatchQueue.main.async {
+        NSWorkspace.shared.open(siteURLGitHub)
+      }
+    default: break
     }
   }
 
