@@ -133,6 +133,11 @@ public extension SessionCtl {
        let eventCharConverted = eventToDeal.characters?.applyingTransformFW2HW(reverse: false)
     {
       eventToDeal = eventToDeal.reinitiate(characters: eventCharConverted) ?? eventToDeal
+    } else if [.ofEmpty, .ofInputting].contains(state.type), eventToDeal.isMainAreaNumKey,
+              !eventToDeal.isCommandHold, !eventToDeal.isControlHold, eventToDeal.isOptionHold
+    {
+      // Alt(+Shift)+主鍵盤區數字鍵 預先處理
+      eventToDeal = eventToDeal.reinitiate(characters: eventToDeal.mainAreaNumKeyChar) ?? eventToDeal
     }
 
     // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
