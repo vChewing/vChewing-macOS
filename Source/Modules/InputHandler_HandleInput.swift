@@ -222,9 +222,14 @@ extension InputHandler {
     // MARK: 全形/半形阿拉伯數字輸入 (FW / HW Arabic Numbers Input)
 
     if state.type == .ofEmpty {
-      if input.isMainAreaNumKey, input.modifierFlags == [.shift, .option] {
+      if input.isMainAreaNumKey, input.isOptionHold, !input.isCommandHold, !input.isControlHold {
         guard let strRAW = input.mainAreaNumKeyChar else { return false }
-        let newString = strRAW.applyingTransformFW2HW(reverse: !prefs.halfWidthPunctuationEnabled)
+        let newString: String = {
+          if input.isShiftHold {
+            return strRAW.applyingTransformFW2HW(reverse: !prefs.halfWidthPunctuationEnabled)
+          }
+          return strRAW.applyingTransformFW2HW(reverse: false)
+        }()
         delegate.switchState(IMEState.ofCommitting(textToCommit: newString))
         return true
       }
