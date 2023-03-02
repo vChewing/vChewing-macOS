@@ -32,6 +32,7 @@ public extension Megrez.Compositor {
     }
 
     let terminal = Vertex(node: .init(keyArray: ["_TERMINAL_"]))
+    var root = Vertex(node: .init(keyArray: ["_ROOT_"]))
 
     for (i, vertexSpan) in vertexSpans.enumerated() {
       for vertex in vertexSpan {
@@ -46,11 +47,10 @@ public extension Megrez.Compositor {
       }
     }
 
-    let root = Vertex(node: .init(keyArray: ["_ROOT_"]))
     root.distance = 0
     root.edges.append(contentsOf: vertexSpans[0])
 
-    var ordered: [Vertex] = topologicalSort(root: root)
+    var ordered = topologicalSort(root: &root)
     for (j, neta) in ordered.reversed().enumerated() {
       for (k, _) in neta.edges.enumerated() {
         relax(u: neta, v: &neta.edges[k])
@@ -58,14 +58,22 @@ public extension Megrez.Compositor {
       ordered[j] = neta
     }
 
+    var iterated = terminal
     var walked = [Node]()
     var totalLengthOfKeys = 0
-    var iterated = terminal
+
     while let itPrev = iterated.prev {
       walked.append(itPrev.node)
       iterated = itPrev
       totalLengthOfKeys += iterated.node.spanLength
     }
+
+    // 清理內容，否則會有記憶體洩漏。
+    ordered.removeAll()
+    vertexSpans.removeAll()
+    iterated.destroy()
+    root.destroy()
+    terminal.destroy()
 
     guard totalLengthOfKeys == keys.count else {
       print("!!! ERROR A")
