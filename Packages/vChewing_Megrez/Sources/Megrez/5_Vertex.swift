@@ -29,6 +29,16 @@ extension Megrez.Compositor {
     public init(node: Node) {
       self.node = node
     }
+
+    /// 讓一個 Vertex 順藤摸瓜地將自己的所有的連帶的 Vertex 都摧毀，再摧毀自己。
+    /// 此過程必須在一套 Vertex 全部使用完畢之後執行一次，可防止記憶體洩漏。
+    public func destroy() {
+      while prev?.prev != nil { prev?.destroy() }
+      prev = nil
+      edges.forEach { $0.destroy() }
+      edges.removeAll()
+      node = .init()
+    }
   }
 
   /// 卸勁函式。
@@ -67,7 +77,7 @@ extension Megrez.Compositor {
   /// 至於其遞迴版本，則類似於 Cormen 在 2001 年的著作「Introduction to Algorithms」當中的樣子。
   /// - Parameter root: 根頂點。
   /// - Returns: 排序結果（頂點陣列）。
-  func topologicalSort(root: Vertex) -> [Vertex] {
+  func topologicalSort(root: inout Vertex) -> [Vertex] {
     class State {
       var iterIndex: Int
       let vertex: Vertex
