@@ -161,11 +161,7 @@ public class CandidateCellData: Hashable {
       .foregroundColor: fontColorCandidate,
     ]
     if #available(macOS 12, *) {
-      if UserDefaults.standard.bool(
-        forKey: UserDef.kEnableSwiftUIForTDKCandidates.rawValue
-      ) {
-        attrCandidate[.languageIdentifier] = self.locale as AnyObject
-      }
+      attrCandidate[.languageIdentifier] = self.locale as AnyObject
     }
     let delta: String = (isMatrix && displayedText.count < 2) ? "  　" : ""
     let attrStrCandidate = NSAttributedString(
