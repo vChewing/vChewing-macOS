@@ -320,7 +320,7 @@
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉耻模式 // 取消勾选的话，敲错字时会有异音";
 "Tadokoro candidate window shows 4 rows / columns by default, providing similar experiences from Microsoft New Phonetic IME and macOS bult-in Chinese IME (since macOS 10.9). However, for some users who have presbyopia, they prefer giant candidate font sizes, resulting a concern that multiple rows / columns of candidates can make the candidate window looks too big, hence this option. Note that this option will be dismissed if the typing context is vertical, forcing the candidates to be shown in only one row / column. Only one reverse-lookup result can be made available in single row / column mode due to reduced candidate window size." = "田所选字窗在预设情况下会显示四列/四行候选字，提供类似于 macOS 内建中文输入法（macOS 10.9 起算）以及微软新注音输入法那样的选字窗排版体验。然而，部分使用者受老花眼所困扰，需要以较大字号来显示候选字。这种情况下，多行/多列的选字窗可能会占用过多的萤幕空间，也就需要这么一个选项来停用这个特性。需注意：如果当前文字输入环境是纵排输入的话，田所选字窗会始终使用单列/单行来显示候选字、而无视该选项。因为单行/单列选字窗的面积不够，所以最多只会显示一笔字根反查结果。。";
 "The lookup results are supplied by the CIN cassette module." = "反查结果取自 CIN 磁带模组。";
-"The user override model only possesses memories temporarily. It won't memorize those unigrams consisting of only one Chinese character, except “你/他/妳/她/祢/衪/它/牠/再/在”. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu." = "半衰记忆模组仅持有临时记忆之功能，且不会记忆以这几个汉字以外的汉字组成的（单个汉字的）单元图：「你/他/妳/她/祢/衪/它/牠/再/在」。每一笔记录都会在六天之内逐渐变得彻底失效。您可以借由输入法选单清除全部的记忆记录。";
+"The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu." = "半衰记忆模组仅持有临时记忆之功能。每一笔记录都会在六天之内逐渐变得彻底失效。您可以借由输入法选单清除全部的记忆记录。";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode." = "该转换仅对磁带模式有影响，会将键入的内容根据该选项与当前的简繁体模式来转换。";
 "This feature requires macOS 10.15 and above." = "该功能要求系统版本至少 macOS 10.15。";
 "This only works with Tadokoro candidate window." = "该选项仅对田所选字窗起作用。";
@@ -342,4 +342,3 @@
 "Vertical" = "纵向布局";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";
 "Yale Pinyin with Numeral Intonation" = "耶鲁拼音+数字标调";
-"iyh-1K-76v.title" = "启用语汇置换表";
