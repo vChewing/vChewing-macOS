@@ -66,16 +66,11 @@ public extension CandidateCellData {
         }
         VStack(spacing: 0) {
           HStack(spacing: 4) {
-            if UserDefaults.standard.bool(forKey: UserDef.kEnableSwiftUIForTDKCandidates.rawValue) {
-              Text(AttributedString(attributedStringHeader))
-              Text(AttributedString(attributedStringPhrase()))
-            } else {
-              Text(verbatim: key).font(.system(size: fontSizeKey).monospaced())
-                .foregroundColor(.init(nsColor: fontColorKey)).lineLimit(1)
-              Text(verbatim: displayedText)
-                .font(.init(CTFontCreateUIFontForLanguage(.system, fontSizeCandidate, locale as CFString)!))
-                .foregroundColor(.init(nsColor: fontColorCandidate)).lineLimit(1)
-            }
+            Text(verbatim: key).font(.system(size: fontSizeKey).monospaced())
+              .foregroundColor(.init(nsColor: fontColorKey)).lineLimit(1)
+            Text(verbatim: displayedText)
+              .font(.init(CTFontCreateUIFontForLanguage(.system, fontSizeCandidate, locale as CFString)!))
+              .foregroundColor(.init(nsColor: fontColorCandidate)).lineLimit(1)
           }.padding(3)
         }.frame(alignment: .leading)
       }.fixedSize(horizontal: false, vertical: true)
