@@ -11,6 +11,6 @@
 	<key>UpdateInfoSite</key>
 	<string>https://gitee.com/vChewing/vChewing-macOS/releases</string>
 	<key>UpdateInfoSiteGitHub</key>
-	<string>https://gitee.com/vChewing/vChewing-macOS/releases</string>
+	<string>https://github.com/vChewing/vChewing-macOS/releases</string>
 </dict>
 </plist>
