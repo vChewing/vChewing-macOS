@@ -105,8 +105,6 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     }
   }
 
-  // TODO: 滑鼠滾輪操作的體驗不該是這個鬼樣子，今後還得再重新設計。
-  // 這裡暫時先僅實裝給單行單列模式
   override public func scrollWheel(with event: NSEvent) {
     guard useMouseScrolling else { return }
     handleMouseScroll(deltaX: event.deltaX, deltaY: event.deltaY)
