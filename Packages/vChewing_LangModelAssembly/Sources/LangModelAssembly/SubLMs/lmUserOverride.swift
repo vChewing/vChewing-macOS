@@ -277,7 +277,10 @@ extension vChewingLM.LMUserOverride {
     var currentHighScore: Double = 0
     for (i, theObservation) in observation.overrides {
       // 對 Unigram 只給大約六小時的半衰期。
-      let decayExp = mutDecayExponent * (key.contains("(),(),") ? 24 : 1)
+      let isUnigramKey = key.contains("(),(),")
+      var decayExp = mutDecayExponent * (isUnigramKey ? 24 : 1)
+      // 對於單漢字 Unigram，讓半衰期繼續除以 12。
+      if isUnigramKey, !key.replacingOccurrences(of: "(),(),", with: "").contains("-") { decayExp *= 12 }
       let overrideScore = getScore(
         eventCount: theObservation.count, totalCount: observation.count,
         eventTimestamp: theObservation.timestamp, timestamp: timestamp, lambda: decayExp
@@ -315,7 +318,7 @@ extension vChewingLM.LMUserOverride {
   private static func formObservationKey(
     walkedNodes: [Megrez.Compositor.Node], headIndex cursorIndex: Int, readingOnly: Bool = false
   ) -> String {
-    let whiteList = "你他妳她祢衪它牠再在"
+    // let whiteList = "你他妳她祢衪它牠再在"
     var arrNodes: [Megrez.Compositor.Node] = []
     var intLength = 0
     for theNodeAnchor in walkedNodes {
@@ -345,9 +348,10 @@ extension vChewingLM.LMUserOverride {
     var readingStack = ""
     var trigramKey: String { "(\(kvAnterior.toNGramKey),\(kvPrevious.toNGramKey),\(strCurrent))" }
     var result: String {
-      // 不要把單個漢字的 kvCurrent 當前鍵值領頭的單元圖記入資料庫，不然對敲字體驗破壞太大。
       if readingStack.contains("_")
-        || (!kvPrevious.isValid && kvCurrent.value.count == 1 && !whiteList.contains(kvCurrent.value))
+      // 該限制因使用者來信投訴太多，暫時停用：
+      // 不要把單個漢字的 kvCurrent 當前鍵值領頭的單元圖記入資料庫，不然對敲字體驗破壞太大。
+      // || (!kvPrevious.isValid && kvCurrent.value.count == 1 && !whiteList.contains(kvCurrent.value))
       {
         return ""
       } else {
