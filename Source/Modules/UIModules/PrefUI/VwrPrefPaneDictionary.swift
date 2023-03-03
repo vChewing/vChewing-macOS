@@ -156,7 +156,7 @@ struct VwrPrefPaneDictionary: View {
               }
             )
             Text(
-              "The user override model only possesses memories temporarily. It won't memorize those unigrams consisting of only one Chinese character, except “你/他/妳/她/祢/衪/它/牠/再/在”. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu.".localized
+              "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu.".localized
             )
             .preferenceDescription()
             Toggle(
