@@ -47,29 +47,27 @@ public extension SSPreferences {
 
     public var body: some View {
       let sections = sectionBuilder()
+      let labelWidth = max(minimumLabelWidth, maximumLabelWidth)
 
       return VStack(alignment: .preferenceSectionLabel) {
         ForEach(0 ..< sections.count, id: \.self) { index in
-          viewForSection(sections, index: index)
+          if sections[index].label != nil {
+            sections[index].bodyLimited(rightPaneWidth: contentWidth - labelWidth)
+          } else {
+            sections[index]
+              .alignmentGuide(.preferenceSectionLabel) { $0[.leading] + labelWidth }
+          }
+          if sections[index].bottomDivider, index < sections.count - 1 {
+            Divider()
+              .frame(height: 10)
+              .alignmentGuide(.preferenceSectionLabel) { $0[.leading] + labelWidth }
+          }
         }
       }
       .modifier(Section.LabelWidthModifier(maximumWidth: $maximumLabelWidth))
-      .frame(width: Double(contentWidth), alignment: .leading)
+      .frame(width: contentWidth, alignment: .leading)
       .padding(.vertical, 20)
       .padding(.horizontal, 30)
-    }
-
-    @ViewBuilder
-    private func viewForSection(_ sections: [Section], index: Int) -> some View {
-      sections[index]
-      if index != sections.count - 1, sections[index].bottomDivider {
-        Divider()
-          // Strangely doesn't work without width being specified. Probably because of custom alignment.
-          .frame(width: Double(contentWidth), height: 20)
-          .alignmentGuide(.preferenceSectionLabel) {
-            $0[.leading] + Double(max(minimumLabelWidth, maximumLabelWidth))
-          }
-      }
     }
   }
 }

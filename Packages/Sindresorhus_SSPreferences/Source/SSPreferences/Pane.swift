@@ -92,5 +92,6 @@ public extension View {
     font(.system(size: 11.0))
       // TODO: Use `.foregroundStyle` when targeting macOS 12.
       .foregroundColor(.secondary)
+      .frame(maxWidth: .infinity, alignment: .leading)
   }
 }
