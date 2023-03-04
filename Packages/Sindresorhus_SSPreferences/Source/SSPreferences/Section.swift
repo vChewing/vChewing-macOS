@@ -51,10 +51,32 @@ public extension SSPreferences {
       }
     }
 
-    public let label: AnyView
+    public private(set) var label: AnyView?
     public let content: AnyView
     public let bottomDivider: Bool
     public let verticalAlignment: VerticalAlignment
+
+    /**
+     A section is responsible for controlling a single preference without Label.
+
+     - Parameters:
+       - bottomDivider: Whether to place a `Divider` after the section content. Default is `false`.
+       - verticalAlignement: The vertical alignment of the section content.
+       - verticalAlignment:
+       - label: A view describing preference handled by this section.
+       - content: A content view.
+     */
+    public init<Content: View>(
+      bottomDivider: Bool = false,
+      verticalAlignment: VerticalAlignment = .firstTextBaseline,
+      @ViewBuilder content: @escaping () -> Content
+    ) {
+      label = nil
+      self.bottomDivider = bottomDivider
+      self.verticalAlignment = verticalAlignment
+      let stack = VStack(alignment: .leading) { content() }
+      self.content = stack.eraseToAnyView()
+    }
 
     /**
      A section is responsible for controlling a single preference.
@@ -92,33 +114,47 @@ public extension SSPreferences {
      	- content: A content view.
      */
     public init<Content: View>(
-      title: String,
+      title: String? = nil,
       bottomDivider: Bool = false,
       verticalAlignment: VerticalAlignment = .firstTextBaseline,
       @ViewBuilder content: @escaping () -> Content
     ) {
-      let textLabel = {
-        Text(title)
-          .font(.system(size: 13.0))
-          .overlay(LabelOverlay())
-          .eraseToAnyView()
+      if let title = title {
+        let textLabel = {
+          Text(title)
+            .font(.system(size: 13.0))
+            .overlay(LabelOverlay())
+            .eraseToAnyView()
+        }
+        self.init(
+          bottomDivider: bottomDivider,
+          verticalAlignment: verticalAlignment,
+          label: textLabel,
+          content: content
+        )
+        return
       }
-
       self.init(
         bottomDivider: bottomDivider,
         verticalAlignment: verticalAlignment,
-        label: textLabel,
         content: content
       )
     }
 
-    public var body: some View {
+    public func bodyLimited(rightPaneWidth: CGFloat? = nil) -> some View {
       HStack(alignment: verticalAlignment) {
-        label
-          .alignmentGuide(.preferenceSectionLabel) { $0[.trailing] }
-        content
-        Spacer()
+        if let label = label {
+          label.alignmentGuide(.preferenceSectionLabel) { $0[.trailing] }
+        }
+        HStack {
+          content
+          Spacer()
+        }.frame(maxWidth: rightPaneWidth)
       }
+    }
+
+    public var body: some View {
+      bodyLimited()
     }
   }
 }

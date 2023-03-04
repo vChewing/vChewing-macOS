@@ -8,4 +8,4 @@
 
 See its original repository for details: https://github.com/sindresorhus/Preferences/
 
-Note: In vChewing IME, this module is renamed to SSPreferences due to potential namespace conflicts with InputMethodKit's own method of implementing system preferences pane.
+Note: In vChewing IME, this module is renamed to SSPreferences due to potential namespace conflicts with InputMethodKit's own method of implementing system preferences pane. Also, this module has been heavily modded for vChewing-specific necessities.
