@@ -31,10 +31,10 @@ struct VwrPrefPaneCassette: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Container(contentWidth: CtlPrefUI.contentWidth) {
+      SSPreferences.Container(contentWidth: CtlPrefUIShared.contentWidth) {
         // MARK: - Cassette Data Path Management
 
-        SSPreferences.Section(title: "", bottomDivider: true) {
+        SSPreferences.Section(bottomDivider: true) {
           Text(LocalizedStringKey("Choose your desired cassette file path. Will be omitted if invalid."))
           HStack {
             TextField(fdrCassetteDataDefault, text: $tbxCassettePath).disabled(true)
@@ -54,7 +54,7 @@ struct VwrPrefPaneCassette: View {
               let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(
                 PrefMgr.shared.cassettePath.expandingTildeInPath)
 
-              if let window = CtlPrefUI.shared.controller.window {
+              if let window = CtlPrefUIShared.sharedWindow {
                 Self.dlgOpenFile.beginSheetModal(for: window) { result in
                   if result == NSApplication.ModalResponse.OK {
                     guard let url = Self.dlgOpenFile.url else { return }
@@ -92,7 +92,7 @@ struct VwrPrefPaneCassette: View {
             LocalizedStringKey("Enable cassette mode, suppressing phonabet input"),
             isOn: $selCassetteEnabled.onChange {
               if selCassetteEnabled, !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
-                if let window = CtlPrefUI.shared.controller.window {
+                if let window = CtlPrefUIShared.sharedWindow {
                   IMEApp.buzz()
                   let alert = NSAlert(error: NSLocalizedString("Path invalid or file access error.", comment: ""))
                   alert.informativeText = NSLocalizedString(
@@ -115,12 +115,12 @@ struct VwrPrefPaneCassette: View {
               "Cassette mode is similar to the CIN support of the Yahoo Kimo IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)."
             )
           )
-          .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+          .preferenceDescription()
         }
 
         // MARK: - Something Else
 
-        SSPreferences.Section(title: "") {
+        SSPreferences.Section {
           Toggle(
             LocalizedStringKey("Auto-composite when the longest possible key is formed"),
             isOn: $selAutoCompositeWithLongestPossibleCassetteKey.onChange {
@@ -139,7 +139,7 @@ struct VwrPrefPaneCassette: View {
               "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file."
             )
           )
-          .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+          .preferenceDescription()
           Picker(
             "",
             selection: $selForceCassetteChineseConversion.onChange {
@@ -158,11 +158,11 @@ struct VwrPrefPaneCassette: View {
               "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode."
             )
           )
-          .preferenceDescription().fixedSize(horizontal: false, vertical: true)
+          .preferenceDescription()
         }
       }
     }
-    .frame(maxHeight: CtlPrefUI.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
   }
 }
 

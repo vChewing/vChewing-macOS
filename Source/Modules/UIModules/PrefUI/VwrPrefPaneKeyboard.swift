@@ -23,7 +23,7 @@ struct VwrPrefPaneKeyboard: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Container(contentWidth: CtlPrefUI.contentWidth) {
+      SSPreferences.Container(contentWidth: CtlPrefUIShared.contentWidth) {
         SSPreferences.Section(title: "Quick Setup:".localized) {
           HStack(alignment: .top) {
             Button {
@@ -52,7 +52,7 @@ struct VwrPrefPaneKeyboard: View {
             }
           }.controlSize(.small)
         }
-        SSPreferences.Section(label: { Text(LocalizedStringKey("Phonetic Parser:")) }) {
+        SSPreferences.Section(title: "Phonetic Parser:".localized) {
           HStack {
             Picker(
               "",
@@ -68,13 +68,12 @@ struct VwrPrefPaneKeyboard: View {
             }
             .fixedSize()
             .labelsHidden()
-            Spacer()
+            Spacer(minLength: NSFont.systemFontSize)
           }
-          .frame(width: 380.0)
           Text(NSLocalizedString("Choose the phonetic layout for Mandarin parser.", comment: ""))
             .preferenceDescription()
         }
-        SSPreferences.Section(label: { Text(LocalizedStringKey("Basic Keyboard Layout:")) }) {
+        SSPreferences.Section(title: "Basic Keyboard Layout:".localized) {
           HStack {
             Picker(
               "",
@@ -92,8 +91,8 @@ struct VwrPrefPaneKeyboard: View {
                 }
               }.id(UUID())
             }
-            .labelsHidden()
-            .frame(width: 240.0)
+            .labelsHidden().frame(width: 290)
+            Spacer(minLength: NSFont.systemFontSize)
           }
           Text(
             NSLocalizedString(
@@ -103,7 +102,7 @@ struct VwrPrefPaneKeyboard: View {
           )
           .preferenceDescription()
         }
-        SSPreferences.Section(label: { Text(LocalizedStringKey("Alphanumerical Layout:")) }) {
+        SSPreferences.Section(title: "Alphanumerical Layout:".localized) {
           HStack {
             Picker(
               "",
@@ -117,26 +116,23 @@ struct VwrPrefPaneKeyboard: View {
                 }
               }.id(UUID())
             }
-            .labelsHidden()
-            .frame(width: 240.0)
+            .labelsHidden().frame(width: 290)
+            Spacer(minLength: NSFont.systemFontSize)
           }
-          HStack {
-            Text(
-              NSLocalizedString(
-                "Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only.",
-                comment: ""
-              )
+          Text(
+            NSLocalizedString(
+              "Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only.",
+              comment: ""
             )
-            .preferenceDescription().fixedSize(horizontal: false, vertical: true)
-            Spacer().frame(width: 30)
-          }
+          )
+          .preferenceDescription()
         }
-        SSPreferences.Section(label: { Text(LocalizedStringKey("Keyboard Shortcuts:")) }) {
+        SSPreferences.Section(title: "Keyboard Shortcuts:".localized) {
           VwrPrefPaneKeyboard_KeyboardShortcuts()
         }
       }
     }
-    .frame(maxHeight: CtlPrefUI.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
   }
 }
 

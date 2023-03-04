@@ -19,7 +19,6 @@ enum PrefUITabs: String, CaseIterable {
   case tabCassette = "Cassette"
   case tabKeyboard = "Keyboard"
   case tabDevZone = "DevZone"
-  case tabExperience = "Experience"
 }
 
 extension PrefUITabs {
@@ -33,8 +32,36 @@ extension PrefUITabs {
     "Cassette": (Hans: "磁带设定", Hant: "磁帶設定", Ja: "カセ設定"),
     "Keyboard": (Hans: "键盘设定", Hant: "鍵盤設定", Ja: "配列設定"),
     "DevZone": (Hans: "开发道场", Hant: "開發道場", Ja: "開発道場"),
-    "Experience": (Hans: "体验设定", Hant: "體驗設定", Ja: "体験設定"),
   ]
+
+  var cocoaTag: Int {
+    switch self {
+    case .tabGeneral: return 10
+    case .tabCandidates: return 20
+    case .tabBehavior: return 30
+    case .tabOutput: return 40
+    case .tabDictionary: return 50
+    case .tabPhrases: return 60
+    case .tabCassette: return 70
+    case .tabKeyboard: return 80
+    case .tabDevZone: return 90
+    }
+  }
+
+  static func fromInt(_ int: Int) -> Self? {
+    switch int {
+    case 10: return .tabGeneral
+    case 20: return .tabCandidates
+    case 30: return .tabBehavior
+    case 40: return .tabOutput
+    case 50: return .tabDictionary
+    case 60: return .tabPhrases
+    case 70: return .tabCassette
+    case 80: return .tabKeyboard
+    case 90: return .tabDevZone
+    default: return nil
+    }
+  }
 
   var toolbarIdentifier: NSToolbarItem.Identifier { .init(rawValue: rawValue) }
 
@@ -73,8 +100,6 @@ extension PrefUITabs {
           return "keyboard.macwindow"
         case .tabDevZone:
           return "pc"
-        case .tabExperience:
-          return "person.fill.questionmark"
         }
       }()
       let note = "\(self.rawValue) Preferences"
