@@ -54,7 +54,7 @@
 		5BA8C30328DF0360004C5CC4 /* CandidateWindow in Frameworks */ = {isa = PBXBuildFile; productRef = 5BA8C30228DF0360004C5CC4 /* CandidateWindow */; };
 		5BA9FD0F27FEDB6B002DE248 /* VwrPrefPaneGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0A27FEDB6B002DE248 /* VwrPrefPaneGeneral.swift */; };
 		5BA9FD1027FEDB6B002DE248 /* VwrPrefPaneKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0B27FEDB6B002DE248 /* VwrPrefPaneKeyboard.swift */; };
-		5BA9FD1127FEDB6B002DE248 /* CtlPrefUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0C27FEDB6B002DE248 /* CtlPrefUI.swift */; };
+		5BA9FD1127FEDB6B002DE248 /* CtlPrefUIShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0C27FEDB6B002DE248 /* CtlPrefUIShared.swift */; };
 		5BA9FD1327FEDB6B002DE248 /* VwrPrefPaneDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0E27FEDB6B002DE248 /* VwrPrefPaneDictionary.swift */; };
 		5BAD0CD527D701F6003D127F /* vChewingKeyLayout.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */; };
 		5BAEFAD028012565001F42C9 /* LMMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BAEFACF28012565001F42C9 /* LMMgr.swift */; };
@@ -103,6 +103,7 @@
 		5BF018FD299923C200248CDD /* VwrPrefPaneCandidates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF018FC299923C100248CDD /* VwrPrefPaneCandidates.swift */; };
 		5BF56F9828C39A2700DD6839 /* IMEState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF56F9728C39A2700DD6839 /* IMEState.swift */; };
 		5BF56F9A28C39D1800DD6839 /* IMEStateData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF56F9928C39D1800DD6839 /* IMEStateData.swift */; };
+		5BF7548929B2F04F00FA50DA /* CtlPrefUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF7548829B2F04F00FA50DA /* CtlPrefUI.swift */; };
 		5BF9DA2728840E6200DBD48E /* template-usersymbolphrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2228840E6200DBD48E /* template-usersymbolphrases.txt */; };
 		5BF9DA2828840E6200DBD48E /* template-exclusions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2328840E6200DBD48E /* template-exclusions.txt */; };
 		5BF9DA2928840E6200DBD48E /* template-associatedPhrases-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2428840E6200DBD48E /* template-associatedPhrases-chs.txt */; };
@@ -248,7 +249,7 @@
 		5BA8C30128DEFE4F004C5CC4 /* vChewing_CandidateWindow */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_CandidateWindow; path = Packages/vChewing_CandidateWindow; sourceTree = "<group>"; };
 		5BA9FD0A27FEDB6B002DE248 /* VwrPrefPaneGeneral.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = VwrPrefPaneGeneral.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BA9FD0B27FEDB6B002DE248 /* VwrPrefPaneKeyboard.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = VwrPrefPaneKeyboard.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5BA9FD0C27FEDB6B002DE248 /* CtlPrefUI.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = CtlPrefUI.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		5BA9FD0C27FEDB6B002DE248 /* CtlPrefUIShared.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = CtlPrefUIShared.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BA9FD0E27FEDB6B002DE248 /* VwrPrefPaneDictionary.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = VwrPrefPaneDictionary.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BAEFACF28012565001F42C9 /* LMMgr.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = LMMgr.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BB1D7F32999027200EA8D2C /* PrefUITabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefUITabs.swift; sourceTree = "<group>"; };
@@ -302,6 +303,7 @@
 		5BF4A44628E5820C002AF9C5 /* vChewingInstaller.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewingInstaller.entitlements; sourceTree = "<group>"; };
 		5BF56F9728C39A2700DD6839 /* IMEState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMEState.swift; sourceTree = "<group>"; };
 		5BF56F9928C39D1800DD6839 /* IMEStateData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMEStateData.swift; sourceTree = "<group>"; };
+		5BF7548829B2F04F00FA50DA /* CtlPrefUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CtlPrefUI.swift; sourceTree = "<group>"; };
 		5BF9DA2228840E6200DBD48E /* template-usersymbolphrases.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-usersymbolphrases.txt"; sourceTree = "<group>"; usesTabs = 0; };
 		5BF9DA2328840E6200DBD48E /* template-exclusions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-exclusions.txt"; sourceTree = "<group>"; usesTabs = 0; };
 		5BF9DA2428840E6200DBD48E /* template-associatedPhrases-chs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; name = "template-associatedPhrases-chs.txt"; path = "../Data/components/chs/template-associatedPhrases-chs.txt"; sourceTree = "<group>"; usesTabs = 0; };
@@ -526,7 +528,8 @@
 		5BA9FD0927FED9F3002DE248 /* PrefUI */ = {
 			isa = PBXGroup;
 			children = (
-				5BA9FD0C27FEDB6B002DE248 /* CtlPrefUI.swift */,
+				5BA9FD0C27FEDB6B002DE248 /* CtlPrefUIShared.swift */,
+				5BF7548829B2F04F00FA50DA /* CtlPrefUI.swift */,
 				5BA9FD0A27FEDB6B002DE248 /* VwrPrefPaneGeneral.swift */,
 				5BF018FC299923C100248CDD /* VwrPrefPaneCandidates.swift */,
 				5BF018F8299923BD00248CDD /* VwrPrefPaneBehavior.swift */,
@@ -1112,9 +1115,10 @@
 				5B782EC4280C243C007276DE /* InputHandler_HandleCandidate.swift in Sources */,
 				5BA9FD0F27FEDB6B002DE248 /* VwrPrefPaneGeneral.swift in Sources */,
 				5BCCAFF828DB19A300AB1B27 /* PrefMgr_Extension.swift in Sources */,
-				5BA9FD1127FEDB6B002DE248 /* CtlPrefUI.swift in Sources */,
+				5BA9FD1127FEDB6B002DE248 /* CtlPrefUIShared.swift in Sources */,
 				5B8457A12871ADBE00C93B01 /* ChineseConverterBridge.swift in Sources */,
 				5BA9FD1327FEDB6B002DE248 /* VwrPrefPaneDictionary.swift in Sources */,
+				5BF7548929B2F04F00FA50DA /* CtlPrefUI.swift in Sources */,
 				5BF018F9299923BD00248CDD /* VwrPrefPaneBehavior.swift in Sources */,
 				5BFDF011289635C100417BBC /* IMKCandidatesImpl.swift in Sources */,
 				5BB802DA27FABA8300CF1C19 /* SessionCtl_Menu.swift in Sources */,

@@ -209,15 +209,19 @@ extension SessionCtl {
 
 public extension SessionCtl {
   @objc override func showPreferences(_: Any? = nil) {
-    if #unavailable(macOS 10.15) {
-      CtlPrefWindow.show()
-    } else if NSEvent.modifierFlags.contains(.option) {
-      CtlPrefWindow.show()
-    } else {
-      CtlPrefUI.shared.controller.show(preferencePane: SSPreferences.PaneIdentifier(rawValue: "General"))
-      CtlPrefUI.shared.controller.window?.level = .statusBar
-      CtlPrefUI.shared.controller.window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
+    osCheck: if #available(macOS 10.15, *) {
+      switch NSEvent.modifierFlags {
+      case .option: break osCheck
+      // case .shift:
+      // CtlPrefUIShared.shared.controller.show(preferencePane: PrefUITabs.tabGeneral.ssPaneIdentifier)
+      // CtlPrefUIShared.shared.controller.window?.level = .statusBar
+      // CtlPrefUIShared.shared.controller.window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
+      default: CtlPrefUI.show()
+      }
+      NSApp.activate(ignoringOtherApps: true)
+      return
     }
+    CtlPrefWindow.show()
     NSApp.activate(ignoringOtherApps: true)
   }
 

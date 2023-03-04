@@ -24,13 +24,13 @@ struct VwrPrefPanePhrases: View {
   var body: some View {
     ScrollView {
       VStack {
-        VwrPhraseEditorUI(delegate: LMMgr.shared, window: CtlPrefUI.shared.controller.window)
-          .frame(width: CtlPrefUI.contentWidth + 28, height: 445)
+        VwrPhraseEditorUI(delegate: LMMgr.shared, window: CtlPrefUIShared.sharedWindow)
+          .frame(width: CtlPrefUIShared.contentWidth + 28, height: 445)
         Spacer()
       }
       .padding()
     }
-    .frame(maxHeight: CtlPrefUI.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
   }
 }
 

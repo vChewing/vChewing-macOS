@@ -14,10 +14,8 @@ import Shared
 
 private let kWindowTitleHeight: Double = 78
 
-// Note: The "InputMethodServerPreferencesWindowControllerClass" in Info.plist
-// only works with macOS System Preference pane (like macOS built-in input methods).
-// It should be set as "Preferences" which correspondes to the "Preference" pref pane
-// of this build target.
+// InputMethodServerPreferencesWindowControllerClass 非必需。
+
 class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   @IBOutlet var uiLanguageButton: NSPopUpButton!
   @IBOutlet var basicKeyboardLayoutButton: NSPopUpButton!
@@ -30,6 +28,10 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   @IBOutlet var chkFartSuppressor: NSButton!
 
   @IBOutlet var chkRevLookupInCandidateWindow: NSButton!
+  @IBOutlet var btnBrowseFolderForUserPhrases: NSButton!
+  @IBOutlet var txtUserPhrasesFolderPath: NSTextField!
+  @IBOutlet var lblUserPhraseFolderChangeDescription: NSTextField!
+
   @IBOutlet var cmbPEInputModeMenu: NSPopUpButton!
   @IBOutlet var cmbPEDataTypeMenu: NSPopUpButton!
   @IBOutlet var btnPEReload: NSButton!
@@ -62,10 +64,12 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
     if shared == nil { shared = CtlPrefWindow(windowNibName: "frmPrefWindow") }
     guard let shared = shared, let sharedWindow = shared.window else { return }
     sharedWindow.delegate = shared
+    if !sharedWindow.isVisible {
+      shared.windowDidLoad()
+    }
     sharedWindow.setPosition(vertical: .top, horizontal: .right, padding: 20)
     sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
     sharedWindow.level = .statusBar
-    sharedWindow.titlebarAppearsTransparent = true
     shared.showWindow(shared)
     if resetPhraseEditor { shared.initPhraseEditor() }
     NSApp.activate(ignoringOtherApps: true)
@@ -98,13 +102,13 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
     toolbar.delegate = self
     toolbar.selectedItemIdentifier = PrefUITabs.tabGeneral.toolbarIdentifier
     toolbar.showsBaselineSeparator = true
-    window?.titlebarAppearsTransparent = false
     if #available(macOS 11.0, *) {
       window?.toolbarStyle = .preference
     }
     window?.toolbar = toolbar
     window?.title = preferencesTitleName
-    use(view: vwrGeneral)
+    window?.titlebarAppearsTransparent = false
+    use(view: vwrGeneral, animate: false)
 
     lblCurrentlySpecifiedUserDataFolder.placeholderString = LMMgr.dataFolderPath(
       isDefaultFolder: true)
@@ -406,28 +410,21 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
 // MARK: - NSToolbarDelegate Methods
 
 extension CtlPrefWindow: NSToolbarDelegate {
-  func use(view: NSView) {
-    guard let window = window else {
-      return
-    }
-    window.contentView?.subviews.first?.removeFromSuperview()
-    let viewFrame = view.frame
-    var windowRect = window.frame
-    windowRect.size.height = kWindowTitleHeight + viewFrame.height
-    windowRect.size.width = viewFrame.width
-    windowRect.origin.y = window.frame.maxY - (viewFrame.height + kWindowTitleHeight)
-    window.setFrame(windowRect, display: true, animate: true)
-    window.contentView?.frame = view.bounds
-    window.contentView?.addSubview(view)
+  func use(view newView: NSView, animate: Bool = true) {
+    guard let window = window, let existingContentView = window.contentView else { return }
+    let temporaryViewOld = NSView(frame: existingContentView.frame)
+    window.contentView = temporaryViewOld
+    var newWindowRect = NSRect(origin: window.frame.origin, size: newView.bounds.size)
+    newWindowRect.size.height += kWindowTitleHeight
+    newWindowRect.origin.y = window.frame.maxY - newWindowRect.height
+    window.setFrame(newWindowRect, display: true, animate: animate)
+    window.contentView = newView
   }
 
   var toolbarIdentifiers: [NSToolbarItem.Identifier] {
-    var result = [NSToolbarItem.Identifier]()
-    PrefUITabs.allCases.forEach { neta in
-      if [.tabOutput, .tabExperience].contains(neta) { return }
-      result.append(neta.toolbarIdentifier)
-    }
-    return result
+    PrefUITabs.allCases.filter {
+      $0 != .tabOutput
+    }.map(\.toolbarIdentifier)
   }
 
   func toolbarDefaultItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
@@ -442,44 +439,20 @@ extension CtlPrefWindow: NSToolbarDelegate {
     toolbarIdentifiers
   }
 
-  @objc func showGeneralView(_: Any?) {
-    use(view: vwrGeneral)
-    window?.toolbar?.selectedItemIdentifier = PrefUITabs.tabGeneral.toolbarIdentifier
-  }
-
-  @objc func showCandidatesView(_: Any?) {
-    use(view: vwrCandidates)
-    window?.toolbar?.selectedItemIdentifier = PrefUITabs.tabCandidates.toolbarIdentifier
-  }
-
-  @objc func showBehaviorView(_: Any?) {
-    use(view: vwrBehavior)
-    window?.toolbar?.selectedItemIdentifier = PrefUITabs.tabBehavior.toolbarIdentifier
-  }
-
-  @objc func showDictionaryView(_: Any?) {
-    use(view: vwrDictionary)
-    window?.toolbar?.selectedItemIdentifier = PrefUITabs.tabDictionary.toolbarIdentifier
-  }
-
-  @objc func showPhrasesView(_: Any?) {
-    use(view: vwrPhrases)
-    window?.toolbar?.selectedItemIdentifier = PrefUITabs.tabPhrases.toolbarIdentifier
-  }
-
-  @objc func showCassetteView(_: Any?) {
-    use(view: vwrCassette)
-    window?.toolbar?.selectedItemIdentifier = PrefUITabs.tabCassette.toolbarIdentifier
-  }
-
-  @objc func showKeyboardView(_: Any?) {
-    use(view: vwrKeyboard)
-    window?.toolbar?.selectedItemIdentifier = PrefUITabs.tabKeyboard.toolbarIdentifier
-  }
-
-  @objc func showDevZoneView(_: Any?) {
-    use(view: vwrDevZone)
-    window?.toolbar?.selectedItemIdentifier = PrefUITabs.tabDevZone.toolbarIdentifier
+  @objc func updateTab(_ target: NSToolbarItem) {
+    guard let tab = PrefUITabs.fromInt(target.tag) else { return }
+    switch tab {
+    case .tabGeneral: use(view: vwrGeneral)
+    case .tabCandidates: use(view: vwrCandidates)
+    case .tabBehavior: use(view: vwrBehavior)
+    case .tabOutput: return
+    case .tabDictionary: use(view: vwrDictionary)
+    case .tabPhrases: use(view: vwrPhrases)
+    case .tabCassette: use(view: vwrCassette)
+    case .tabKeyboard: use(view: vwrKeyboard)
+    case .tabDevZone: use(view: vwrDevZone)
+    }
+    window?.toolbar?.selectedItemIdentifier = tab.toolbarIdentifier
   }
 
   func toolbar(
@@ -491,18 +464,8 @@ extension CtlPrefWindow: NSToolbarDelegate {
     item.target = self
     item.image = tab.icon
     item.label = tab.i18nTitle
-    switch tab {
-    case .tabGeneral: item.action = #selector(showGeneralView(_:))
-    case .tabCandidates: item.action = #selector(showCandidatesView(_:))
-    case .tabBehavior: item.action = #selector(showBehaviorView(_:))
-    case .tabOutput: return nil
-    case .tabDictionary: item.action = #selector(showDictionaryView(_:))
-    case .tabPhrases: item.action = #selector(showPhrasesView(_:))
-    case .tabCassette: item.action = #selector(showCassetteView(_:))
-    case .tabKeyboard: item.action = #selector(showKeyboardView(_:))
-    case .tabDevZone: item.action = #selector(showDevZoneView(_:))
-    case .tabExperience: return nil
-    }
+    item.tag = tab.cocoaTag
+    item.action = #selector(updateTab(_:))
     return item
   }
 }

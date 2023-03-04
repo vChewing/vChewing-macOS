@@ -37,8 +37,8 @@ struct VwrPrefPaneGeneral: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Container(contentWidth: CtlPrefUI.contentWidth) {
-        SSPreferences.Section(title: "") {
+      SSPreferences.Container(contentWidth: CtlPrefUIShared.contentWidth) {
+        SSPreferences.Section {
           Text(
             "\u{2022} "
               + NSLocalizedString(
@@ -50,38 +50,41 @@ struct VwrPrefPaneGeneral: View {
                 comment: ""
               )
           )
-          .preferenceDescription().prefDescriptionWidthLimited()
+          .preferenceDescription().padding(.bottom, NSFont.systemFontSize)
         }
-        SSPreferences.Section(label: { Text(LocalizedStringKey("UI Language:")) }) {
-          Picker(
-            LocalizedStringKey("Follow OS settings"),
-            selection: $selUILanguage.onChange {
-              vCLog(selUILanguage[0])
-              if selUILanguage == PrefMgr.shared.appleLanguages
-                || (selUILanguage[0] == "auto"
-                  && UserDefaults.standard.object(forKey: UserDef.kAppleLanguages.rawValue) == nil)
-              {
-                return
+        SSPreferences.Section(title: "UI Language:".localized) {
+          HStack {
+            Picker(
+              LocalizedStringKey("Follow OS settings"),
+              selection: $selUILanguage.onChange {
+                vCLog(selUILanguage[0])
+                if selUILanguage == PrefMgr.shared.appleLanguages
+                  || (selUILanguage[0] == "auto"
+                    && UserDefaults.standard.object(forKey: UserDef.kAppleLanguages.rawValue) == nil)
+                {
+                  return
+                }
+                if selUILanguage[0] != "auto" {
+                  PrefMgr.shared.appleLanguages = selUILanguage
+                } else {
+                  UserDefaults.standard.removeObject(forKey: UserDef.kAppleLanguages.rawValue)
+                }
+                NSLog("vChewing App self-terminated due to UI language change.")
+                NSApp.terminate(nil)
               }
-              if selUILanguage[0] != "auto" {
-                PrefMgr.shared.appleLanguages = selUILanguage
-              } else {
-                UserDefaults.standard.removeObject(forKey: UserDef.kAppleLanguages.rawValue)
-              }
-              NSLog("vChewing App self-terminated due to UI language change.")
-              NSApp.terminate(nil)
+            ) {
+              Text(LocalizedStringKey("Follow OS settings")).tag(["auto"])
+              Text(LocalizedStringKey("Simplified Chinese")).tag(["zh-Hans"])
+              Text(LocalizedStringKey("Traditional Chinese")).tag(["zh-Hant"])
+              Text(LocalizedStringKey("Japanese")).tag(["ja"])
+              Text(LocalizedStringKey("English")).tag(["en"])
             }
-          ) {
-            Text(LocalizedStringKey("Follow OS settings")).tag(["auto"])
-            Text(LocalizedStringKey("Simplified Chinese")).tag(["zh-Hans"])
-            Text(LocalizedStringKey("Traditional Chinese")).tag(["zh-Hant"])
-            Text(LocalizedStringKey("Japanese")).tag(["ja"])
-            Text(LocalizedStringKey("English")).tag(["en"])
+            .labelsHidden()
+            .frame(width: 180.0)
+            Spacer()
           }
-          .labelsHidden()
-          .frame(width: 180.0)
           Text(LocalizedStringKey("Change user interface language (will reboot the IME)."))
-            .preferenceDescription().prefDescriptionWidthLimited()
+            .preferenceDescription()
         }
         SSPreferences.Section(label: { Text(LocalizedStringKey("Typing Settings:")) }) {
           Toggle(
@@ -135,7 +138,7 @@ struct VwrPrefPaneGeneral: View {
                   }
                 }
                 alert.addButton(withTitle: NSLocalizedString("Leave it checked", comment: ""))
-                if let window = CtlPrefUI.shared.controller.window, !selEnableFartSuppressor {
+                if let window = CtlPrefUIShared.sharedWindow, !selEnableFartSuppressor {
                   PrefMgr.shared.shouldNotFartInLieuOfBeep = true
                   alert.beginSheetModal(for: window) { result in
                     switch result {
@@ -174,7 +177,7 @@ struct VwrPrefPaneGeneral: View {
         }
       }
     }
-    .frame(maxHeight: CtlPrefUI.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
   }
 }
 

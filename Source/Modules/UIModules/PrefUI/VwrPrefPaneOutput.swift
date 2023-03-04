@@ -33,8 +33,8 @@ struct VwrPrefPaneOutput: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Container(contentWidth: CtlPrefUI.contentWidth) {
-        SSPreferences.Section(title: "Output Settings:".localized) {
+      SSPreferences.Container(contentWidth: CtlPrefUIShared.contentWidth) {
+        SSPreferences.Section(title: "Output Settings:".localized, bottomDivider: true) {
           Toggle(
             LocalizedStringKey("Auto-convert traditional Chinese glyphs to KangXi characters"),
             isOn: $selEnableKanjiConvToKangXi.onChange {
@@ -61,6 +61,8 @@ struct VwrPrefPaneOutput: View {
               PrefMgr.shared.trimUnfinishedReadingsOnCommit = selTrimUnfinishedReadingsOnCommit
             }
           )
+        }
+        SSPreferences.Section(title: "Experimental:".localized) {
           Toggle(
             LocalizedStringKey("Harden vertical punctuations during vertical typing (not recommended)"),
             isOn: $selHardenVerticalPunctuations.onChange {
@@ -72,11 +74,11 @@ struct VwrPrefPaneOutput: View {
               "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal."
             )
           )
-          .preferenceDescription().prefDescriptionWidthLimited()
+          .preferenceDescription()
         }
       }
     }
-    .frame(maxHeight: CtlPrefUI.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
   }
 }
 
