@@ -50,7 +50,7 @@ struct VwrPrefPaneBehavior: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Container(contentWidth: CtlPrefUI.contentWidth) {
+      SSPreferences.Container(contentWidth: CtlPrefUIShared.contentWidth) {
         SSPreferences.Section(title: "Space:".localized, bottomDivider: true) {
           Toggle(
             LocalizedStringKey("Enable Space key for calling candidate window"),
@@ -63,7 +63,7 @@ struct VwrPrefPaneBehavior: View {
               "If disabled, this will insert space instead."
             )
           )
-          .preferenceDescription().prefDescriptionWidthLimited()
+          .preferenceDescription()
         }
         SSPreferences.Section(title: "ESC:".localized, bottomDivider: true) {
           Toggle(
@@ -77,7 +77,7 @@ struct VwrPrefPaneBehavior: View {
               "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strkes."
             )
           )
-          .preferenceDescription().prefDescriptionWidthLimited()
+          .preferenceDescription()
         }
         SSPreferences.Section(title: "Enter:".localized, bottomDivider: true) {
           Toggle(
@@ -91,7 +91,7 @@ struct VwrPrefPaneBehavior: View {
               "Otherwise, only the candidate keys are allowed to confirm associates."
             )
           )
-          .preferenceDescription().prefDescriptionWidthLimited()
+          .preferenceDescription()
         }
         SSPreferences.Section(title: "Shift+BackSpace:".localized, bottomDivider: true) {
           Picker(
@@ -107,7 +107,7 @@ struct VwrPrefPaneBehavior: View {
           .labelsHidden()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Disassembling process does not work with non-phonetic reading keys."))
-            .preferenceDescription().prefDescriptionWidthLimited()
+            .preferenceDescription()
         }
         SSPreferences.Section(title: "(Shift+)Tab:", bottomDivider: true) {
           Picker(
@@ -123,7 +123,7 @@ struct VwrPrefPaneBehavior: View {
           .horizontalRadioGroupLayout()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Choose the behavior of (Shift+)Tab key in the candidate window."))
-            .preferenceDescription().prefDescriptionWidthLimited()
+            .preferenceDescription()
         }
         SSPreferences.Section(title: "(Shift+)Space:".localized, bottomDivider: true) {
           Picker(
@@ -138,7 +138,7 @@ struct VwrPrefPaneBehavior: View {
           .labelsHidden()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Choose the behavior of (Shift+)Space key with candidates."))
-            .preferenceDescription().prefDescriptionWidthLimited()
+            .preferenceDescription()
         }
         SSPreferences.Section(title: "Shift+Letter:".localized, bottomDivider: true) {
           Picker(
@@ -154,7 +154,7 @@ struct VwrPrefPaneBehavior: View {
           .labelsHidden()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Choose the behavior of Shift+Letter key with letter inputs."))
-            .preferenceDescription().prefDescriptionWidthLimited()
+            .preferenceDescription()
         }
         SSPreferences.Section(title: "Intonation Key:".localized, bottomDivider: true) {
           Picker(
@@ -170,7 +170,7 @@ struct VwrPrefPaneBehavior: View {
           .labelsHidden()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Specify the behavior of intonation key when syllable composer is empty."))
-            .preferenceDescription().prefDescriptionWidthLimited()
+            .preferenceDescription()
         }
         SSPreferences.Section(title: "Shift:", bottomDivider: true) {
           Toggle(
@@ -194,9 +194,9 @@ struct VwrPrefPaneBehavior: View {
             !PrefMgr.shared.togglingAlphanumericalModeWithRShift && !PrefMgr.shared.togglingAlphanumericalModeWithLShift
           )
           Text(
-            "This feature requires macOS 10.15 and above.".localized + CtlPrefUI.sentenceSeparator
+            "This feature requires macOS 10.15 and above.".localized + CtlPrefUIShared.sentenceSeparator
               + "It only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable.".localized
-          ).preferenceDescription().prefDescriptionWidthLimited()
+          ).preferenceDescription()
         }
         SSPreferences.Section(title: "Caps Lock:", bottomDivider: true) {
           Toggle(
@@ -207,7 +207,7 @@ struct VwrPrefPaneBehavior: View {
           ).disabled(!macOSMontereyOrLaterDetected)
           Text(
             "This feature requires macOS 10.15 and above.".localized
-          ).preferenceDescription().prefDescriptionWidthLimited()
+          ).preferenceDescription()
         }
         SSPreferences.Section(title: "Misc Settings:".localized) {
           Toggle(
@@ -220,11 +220,11 @@ struct VwrPrefPaneBehavior: View {
             LocalizedStringKey(
               "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English."
             )
-          ).preferenceDescription().prefDescriptionWidthLimited()
+          ).preferenceDescription()
         }
       }
     }
-    .frame(maxHeight: CtlPrefUI.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
   }
 }
 

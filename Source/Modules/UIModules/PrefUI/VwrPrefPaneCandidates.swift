@@ -48,7 +48,7 @@ struct VwrPrefPaneCandidates: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Container(contentWidth: CtlPrefUI.contentWidth) {
+      SSPreferences.Container(contentWidth: CtlPrefUIShared.contentWidth) {
         SSPreferences.Section(title: "Selection Keys:".localized, bottomDivider: true) {
           VwrPrefPaneCandidates_SelectionKeys()
         }
@@ -66,7 +66,7 @@ struct VwrPrefPaneCandidates: View {
           .horizontalRadioGroupLayout()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Choose your preferred layout of the candidate window."))
-            .preferenceDescription().prefDescriptionWidthLimited()
+            .preferenceDescription()
           Toggle(
             LocalizedStringKey("Use only one row / column in candidate window."),
             isOn: $selCandidateWindowShowOnlyOneLine.onChange {
@@ -78,10 +78,10 @@ struct VwrPrefPaneCandidates: View {
           .disabled(PrefMgr.shared.useIMKCandidateWindow)
           Text(
             "This only works with Tadokoro candidate window.".localized
-              + CtlPrefUI.sentenceSeparator
+              + CtlPrefUIShared.sentenceSeparator
               + "Tadokoro candidate window shows 4 rows / columns by default, providing similar experiences from Microsoft New Phonetic IME and macOS bult-in Chinese IME (since macOS 10.9). However, for some users who have presbyopia, they prefer giant candidate font sizes, resulting a concern that multiple rows / columns of candidates can make the candidate window looks too big, hence this option. Note that this option will be dismissed if the typing context is vertical, forcing the candidates to be shown in only one row / column. Only one reverse-lookup result can be made available in single row / column mode due to reduced candidate window size.".localized
           )
-          .preferenceDescription().prefDescriptionWidthLimited()
+          .preferenceDescription()
         }
         SSPreferences.Section(title: "Candidate Size:".localized, bottomDivider: true) {
           Picker(
@@ -109,7 +109,7 @@ struct VwrPrefPaneCandidates: View {
           .labelsHidden()
           .frame(width: 120.0)
           Text(LocalizedStringKey("Choose candidate font size for better visual clarity."))
-            .preferenceDescription().prefDescriptionWidthLimited()
+            .preferenceDescription()
         }
         SSPreferences.Section(title: "Cursor Selection:".localized, bottomDivider: true) {
           Picker(
@@ -142,10 +142,10 @@ struct VwrPrefPaneCandidates: View {
           .disabled(PrefMgr.shared.useIMKCandidateWindow)
           Text(
             "This only works with Tadokoro candidate window.".localized
-              + CtlPrefUI.sentenceSeparator
+              + CtlPrefUIShared.sentenceSeparator
               + "The lookup results are supplied by the CIN cassette module.".localized
           )
-          .preferenceDescription().prefDescriptionWidthLimited()
+          .preferenceDescription()
           Toggle(
             LocalizedStringKey("Always use fixed listing order in candidate window"),
             isOn: $selUseFixecCandidateOrderOnSelection.onChange {
@@ -157,7 +157,7 @@ struct VwrPrefPaneCandidates: View {
               "This will stop user override model from affecting how candidates get sorted."
             )
           )
-          .preferenceDescription().prefDescriptionWidthLimited()
+          .preferenceDescription()
           Toggle(
             LocalizedStringKey("Consolidate the context on confirming candidate selection"),
             isOn: $selConsolidateContextOnCandidateSelection.onChange {
@@ -165,11 +165,9 @@ struct VwrPrefPaneCandidates: View {
             }
           )
           Text(
-            LocalizedStringKey(
-              "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is."
-            )
+            "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is.".localized
           )
-          .preferenceDescription().prefDescriptionWidthLimited()
+          .preferenceDescription()
         }
         SSPreferences.Section(title: "Experimental:".localized) {
           Toggle(
@@ -183,13 +181,11 @@ struct VwrPrefPaneCandidates: View {
           Text(
             LocalizedStringKey("⚠︎ This will reboot the vChewing IME.")
           )
-          .preferenceDescription().prefDescriptionWidthLimited()
+          .preferenceDescription()
           Text(
-            LocalizedStringKey(
-              "IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases."
-            )
+            "IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases.".localized
           )
-          .preferenceDescription().prefDescriptionWidthLimited()
+          .preferenceDescription()
           Toggle(
             LocalizedStringKey("Enable mouse wheel support for Tadokoro Candidate Window"),
             isOn: $selEnableMouseScrollingForTDKCandidatesCocoa.onChange {
@@ -209,11 +205,9 @@ struct VwrPrefPaneCandidates: View {
           )
           .disabled(PrefMgr.shared.useIMKCandidateWindow)
           Text(
-            LocalizedStringKey(
-              "By checking this, Tadokoro Candidate Window will use SwiftUI. SwiftUI was being used in vChewing 3.3.8 and before. However, SwiftUI has unacceptable responsiveness & latency & efficiency problems in rendering the candidate panel UI. That's why a refactored version has been introduced since vChewing 3.3.9 using Cocoa, providing an optimized user experience with blasing-fast operation responsiveness, plus experimental mouse-wheel support."
-            )
+            "By checking this, Tadokoro Candidate Window will use SwiftUI. SwiftUI was being used in vChewing 3.3.8 and before. However, SwiftUI has unacceptable responsiveness & latency & efficiency problems in rendering the candidate panel UI. That's why a refactored version has been introduced since vChewing 3.3.9 using Cocoa, providing an optimized user experience with blasing-fast operation responsiveness, plus experimental mouse-wheel support.".localized
           )
-          .preferenceDescription().prefDescriptionWidthLimited()
+          .preferenceDescription()
           Toggle(
             LocalizedStringKey("Allow boosting / excluding a candidate of single kanji"),
             isOn: $selAllowBoostingSingleKanjiAsUserPhrase.onChange {
@@ -225,11 +219,11 @@ struct VwrPrefPaneCandidates: View {
               "⚠︎ This may hinder the walking algorithm from giving appropriate results."
             )
           )
-          .preferenceDescription().prefDescriptionWidthLimited()
+          .preferenceDescription()
         }
       }
     }
-    .frame(maxHeight: CtlPrefUI.contentMaxHeight)
+    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }
 }
 
@@ -261,7 +255,7 @@ private struct VwrPrefPaneCandidates_SelectionKeys: View {
         // Start Error Handling.
         if let errorResult = CandidateKey.validate(keys: keys) {
           IMEApp.buzz()
-          if let window = CtlPrefUI.shared.controller.window {
+          if let window = CtlPrefUIShared.sharedWindow {
             let alert = NSAlert(error: NSLocalizedString("Invalid Selection Keys.", comment: ""))
             alert.informativeText = errorResult
             alert.beginSheetModal(for: window) { _ in
@@ -283,14 +277,14 @@ private struct VwrPrefPaneCandidates_SelectionKeys: View {
           "⚠︎ This feature in IMK Candidate Window defects. Please consult\nApple Developer Relations with Radar ID: #FB11300759."
         )
       )
-      .preferenceDescription().prefDescriptionWidthLimited()
+      .preferenceDescription()
     } else {
       Text(
         "Choose or hit Enter to confim your prefered keys for selecting candidates.".localized
           + "\n"
           + "This will also affect the row / column capacity of the candidate window.".localized
       )
-      .preferenceDescription().prefDescriptionWidthLimited()
+      .preferenceDescription()
     }
   }
 }

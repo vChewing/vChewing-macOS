@@ -38,10 +38,10 @@ struct VwrPrefPaneDictionary: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Container(contentWidth: CtlPrefUI.contentWidth) {
+      SSPreferences.Container(contentWidth: CtlPrefUIShared.contentWidth) {
         // MARK: - User Data Folder Path Management
 
-        SSPreferences.Section(title: "", bottomDivider: true) {
+        SSPreferences.Section(bottomDivider: true) {
           Group {
             Text(LocalizedStringKey("Choose your desired user data folder path. Will be omitted if invalid."))
             HStack {
@@ -60,7 +60,7 @@ struct VwrPrefPaneDictionary: View {
                 let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
                   PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath)
 
-                if let window = CtlPrefUI.shared.controller.window {
+                if let window = CtlPrefUIShared.sharedWindow {
                   Self.dlgOpenPath.beginSheetModal(for: window) { result in
                     if result == NSApplication.ModalResponse.OK {
                       guard let url = Self.dlgOpenPath.url else { return }
@@ -170,7 +170,7 @@ struct VwrPrefPaneDictionary: View {
         }
       }
     }
-    .frame(maxHeight: CtlPrefUI.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
   }
 }
 
