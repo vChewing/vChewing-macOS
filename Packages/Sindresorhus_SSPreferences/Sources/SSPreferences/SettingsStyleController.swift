@@ -4,16 +4,16 @@
 
 import Cocoa
 
-protocol PreferencesStyleController: AnyObject {
-  var delegate: PreferencesStyleControllerDelegate? { get set }
+protocol SettingsStyleController: AnyObject {
+  var delegate: SettingsStyleControllerDelegate? { get set }
   var isKeepingWindowCentered: Bool { get }
 
   func toolbarItemIdentifiers() -> [NSToolbarItem.Identifier]
-  func toolbarItem(preferenceIdentifier: SSPreferences.PaneIdentifier) -> NSToolbarItem?
+  func toolbarItem(paneIdentifier: Settings.PaneIdentifier) -> NSToolbarItem?
   func selectTab(index: Int)
 }
 
-protocol PreferencesStyleControllerDelegate: AnyObject {
-  func activateTab(preferenceIdentifier: SSPreferences.PaneIdentifier, animated: Bool)
+protocol SettingsStyleControllerDelegate: AnyObject {
+  func activateTab(paneIdentifier: Settings.PaneIdentifier, animated: Bool)
   func activateTab(index: Int, animated: Bool)
 }

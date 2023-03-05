@@ -2,5 +2,11 @@
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
-/// The namespace for this package.
-public enum SSPreferences {}
+import Cocoa
+
+public extension Settings {
+  enum Style {
+    case toolbarItems
+    case segmentedControl
+  }
+}
