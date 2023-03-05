@@ -103,7 +103,7 @@ public struct IMEStateData: IMEStateDataProtocol {
     ]
   )
   public var isFilterable: Bool {
-    markedTargetExists ? isMarkedLengthValid : false
+    markedTargetExists ? (isMarkedLengthValid && markedRange.count > 1) : false
   }
 
   public var isMarkedLengthValid: Bool {
@@ -232,30 +232,40 @@ public extension IMEStateData {
 
       let text = pair.1
       let readingDisplay = readingThreadForDisplay
-      if markedRange.count < IMEStateData.allowedMarkLengthRange.lowerBound {
+      if markedRange.count < Self.allowedMarkLengthRange.lowerBound {
         tooltipColorState = .denialInsufficiency
         return String(
           format: NSLocalizedString(
             "\"%@\" length must ≥ 2 for a user phrase.", comment: ""
           ) + "\n◆  " + readingDisplay, text
         )
-      } else if markedRange.count > IMEStateData.allowedMarkLengthRange.upperBound {
+      } else if markedRange.count > Self.allowedMarkLengthRange.upperBound {
         tooltipColorState = .denialOverflow
         return String(
           format: NSLocalizedString(
             "\"%@\" length should ≤ %d for a user phrase.", comment: ""
-          ) + "\n◆  " + readingDisplay, text, IMEStateData.allowedMarkLengthRange.upperBound
+          ) + "\n◆  " + readingDisplay, text, Self.allowedMarkLengthRange.upperBound
         )
       }
 
       if markedTargetExists {
         tooltipColorState = .prompt
-        return String(
-          format: NSLocalizedString(
-            "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude.",
-            comment: ""
-          ) + "\n◆  " + readingDisplay, text
-        )
+        switch markedRange.count {
+        case 1:
+          return String(
+            format: NSLocalizedString(
+              "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf.",
+              comment: ""
+            ) + "\n◆  " + readingDisplay, text
+          )
+        default:
+          return String(
+            format: NSLocalizedString(
+              "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude.",
+              comment: ""
+            ) + "\n◆  " + readingDisplay, text
+          )
+        }
       }
       tooltipColorState = .normal
       return String(
