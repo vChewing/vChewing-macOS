@@ -20,6 +20,9 @@ public extension PrefMgr {
       showReverseLookupInCandidateUI = false
       shareAlphanumericalModeStatusAcrossClients = false
     }
+    if #unavailable(macOS 12) {
+      showNotificationsWhenTogglingCapsLock = false
+    }
     // 自動糾正選字鍵 (利用其 didSet 特性)
     candidateKeys = candidateKeys
     // 客體黑名單資料類型升級。
