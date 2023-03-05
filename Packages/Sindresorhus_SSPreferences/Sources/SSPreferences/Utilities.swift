@@ -2,7 +2,6 @@
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
-import Cocoa
 import SwiftUI
 
 extension NSImage {
@@ -12,21 +11,13 @@ extension NSImage {
 extension NSView {
   @discardableResult
   func constrainToSuperviewBounds() -> [NSLayoutConstraint] {
-    guard let superview = superview else {
+    guard let superview else {
       preconditionFailure("superview has to be set first")
     }
 
     var result = [NSLayoutConstraint]()
-    result.append(
-      contentsOf: NSLayoutConstraint.constraints(
-        withVisualFormat: "H:|-0-[subview]-0-|", options: .directionLeadingToTrailing, metrics: nil,
-        views: ["subview": self]
-      ))
-    result.append(
-      contentsOf: NSLayoutConstraint.constraints(
-        withVisualFormat: "V:|-0-[subview]-0-|", options: .directionLeadingToTrailing, metrics: nil,
-        views: ["subview": self]
-      ))
+    result.append(contentsOf: NSLayoutConstraint.constraints(withVisualFormat: "H:|-0-[subview]-0-|", options: .directionLeadingToTrailing, metrics: nil, views: ["subview": self]))
+    result.append(contentsOf: NSLayoutConstraint.constraints(withVisualFormat: "V:|-0-[subview]-0-|", options: .directionLeadingToTrailing, metrics: nil, views: ["subview": self]))
     translatesAutoresizingMaskIntoConstraints = false
     superview.addConstraints(result)
 
@@ -35,42 +26,39 @@ extension NSView {
 }
 
 extension NSEvent {
-  /// Events triggered by user interaction.
-  static let userInteractionEvents: [NSEvent.EventType] = {
-    var events: [NSEvent.EventType] = [
-      .leftMouseDown,
-      .leftMouseUp,
-      .rightMouseDown,
-      .rightMouseUp,
-      .leftMouseDragged,
-      .rightMouseDragged,
-      .keyDown,
-      .keyUp,
-      .scrollWheel,
-      .tabletPoint,
-      .otherMouseDown,
-      .otherMouseUp,
-      .otherMouseDragged,
-      .gesture,
-      .magnify,
-      .swipe,
-      .rotate,
-      .beginGesture,
-      .endGesture,
-      .smartMagnify,
-      .quickLook,
-      .directTouch,
-    ]
+  /**
+   Events triggered by user interaction.
+   */
+  static let userInteractionEvents: [EventType] = [
+    .leftMouseDown,
+    .leftMouseUp,
+    .rightMouseDown,
+    .rightMouseUp,
+    .leftMouseDragged,
+    .rightMouseDragged,
+    .keyDown,
+    .keyUp,
+    .scrollWheel,
+    .tabletPoint,
+    .otherMouseDown,
+    .otherMouseUp,
+    .otherMouseDragged,
+    .gesture,
+    .magnify,
+    .swipe,
+    .rotate,
+    .beginGesture,
+    .endGesture,
+    .smartMagnify,
+    .pressure,
+    .quickLook,
+    .directTouch,
+  ]
 
-    if #available(macOS 10.10.3, *) {
-      events.append(.pressure)
-    }
-
-    return events
-  }()
-
-  /// Whether the event was triggered by user interaction.
-  var isUserInteraction: Bool { NSEvent.userInteractionEvents.contains(type) }
+  /**
+   Whether the event was triggered by user interaction.
+   */
+  var isUserInteraction: Bool { Self.userInteractionEvents.contains(type) }
 }
 
 extension Bundle {
@@ -87,10 +75,12 @@ extension Bundle {
   }
 }
 
-/// A window that allows you to disable all user interactions via `isUserInteractionEnabled`.
-///
-/// Used to avoid breaking animations when the user clicks too fast. Disable user interactions during animations and you're set.
-class UserInteractionPausableWindow: NSWindow {
+/**
+ A window that allows you to disable all user interactions via `isUserInteractionEnabled`.
+
+ Used to avoid breaking animations when the user clicks too fast. Disable user interactions during animations and you're set.
+ */
+class UserInteractionPausableWindow: NSWindow { // swiftlint:disable:this final_class
   var isUserInteractionEnabled = true
 
   override func sendEvent(_ event: NSEvent) {
