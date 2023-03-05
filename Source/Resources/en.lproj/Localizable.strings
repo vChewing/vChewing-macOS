@@ -189,7 +189,7 @@
 "⚠︎ This will reboot the vChewing IME." = "⚠︎ This will reboot the vChewing IME.";
 "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file.";
 "Allow backspace-editing miscomposed readings" = "Allow backspace-editing miscomposed readings";
-"Allow boosting / excluding a candidate of single kanji" = "Allow boosting / excluding a candidate of single kanji";
+"Allow boosting / excluding a candidate of single kanji when marking" = "Allow boosting / excluding a candidate of single kanji when marking";
 "Allow using Enter key to confirm associated candidate selection" = "Allow using Enter key to confirm associated candidate selection";
 "Alphanumerical Layout:" = "Alphanumerical Layout:";
 "Also use “\\” or “¥” key for Hanin Keyboard Symbol Input" = "Also use “\\” or “¥” key for Hanin Keyboard Symbol Input";
