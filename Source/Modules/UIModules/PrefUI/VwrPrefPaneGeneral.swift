@@ -70,8 +70,8 @@ struct VwrPrefPaneGeneral: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Container(contentWidth: CtlPrefUIShared.contentWidth) {
-        SSPreferences.Section {
+      SSPreferences.Settings.Container(contentWidth: CtlPrefUIShared.contentWidth) {
+        SSPreferences.Settings.Section {
           Text(
             "\u{2022} "
               + NSLocalizedString(
@@ -83,9 +83,10 @@ struct VwrPrefPaneGeneral: View {
                 comment: ""
               )
           )
-          .preferenceDescription().padding(.bottom, NSFont.systemFontSize)
+
+          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth).padding(.bottom, NSFont.systemFontSize)
         }
-        SSPreferences.Section(title: "UI Language:".localized) {
+        SSPreferences.Settings.Section(title: "UI Language:".localized) {
           HStack {
             Picker(
               LocalizedStringKey("Follow OS settings"),
@@ -102,9 +103,10 @@ struct VwrPrefPaneGeneral: View {
             Spacer()
           }
           Text(LocalizedStringKey("Change user interface language (will reboot the IME)."))
-            .preferenceDescription()
+
+            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
-        SSPreferences.Section(label: { Text(LocalizedStringKey("Typing Settings:")) }) {
+        SSPreferences.Settings.Section(label: { Text(LocalizedStringKey("Typing Settings:")) }) {
           Toggle(
             LocalizedStringKey("Automatically correct reading combinations when typing"),
             isOn: $autoCorrectReadingCombination
@@ -129,7 +131,8 @@ struct VwrPrefPaneGeneral: View {
             }
           )
           Text(LocalizedStringKey("An accommodation for elder computer users."))
-            .preferenceDescription()
+
+            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           if Date.isTodayTheDate(from: 0401) {
             Toggle(
               LocalizedStringKey("Stop farting (when typed phonetic combination is invalid, etc.)"),
@@ -167,7 +170,7 @@ struct VwrPrefPaneGeneral: View {
             )
           }
         }
-        SSPreferences.Section(label: { Text(LocalizedStringKey("Misc Settings:")).controlSize(.small) }) {
+        SSPreferences.Settings.Section(label: { Text(LocalizedStringKey("Misc Settings:")).controlSize(.small) }) {
           Toggle(
             LocalizedStringKey("Check for updates automatically"),
             isOn: $checkUpdateAutomatically
@@ -181,7 +184,7 @@ struct VwrPrefPaneGeneral: View {
         }
       }
     }
-    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }
 }
 

@@ -35,34 +35,36 @@ struct VwrPrefPaneOutput: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Container(contentWidth: CtlPrefUIShared.contentWidth) {
-        SSPreferences.Section(title: "Output Settings:".localized, bottomDivider: true) {
-          Toggle(
-            LocalizedStringKey("Auto-convert traditional Chinese glyphs to KangXi characters"),
-            isOn: $chineseConversionEnabled.onChange {
-              if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
-                shiftJISShinjitaiOutputEnabled = false
+      SSPreferences.Settings.Container(contentWidth: CtlPrefUIShared.contentWidth) {
+        SSPreferences.Settings.Section(title: "Output Settings:".localized, bottomDivider: true) {
+          VStack(alignment: .leading) {
+            Toggle(
+              LocalizedStringKey("Auto-convert traditional Chinese glyphs to KangXi characters"),
+              isOn: $chineseConversionEnabled.onChange {
+                if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
+                  shiftJISShinjitaiOutputEnabled = false
+                }
               }
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Auto-convert traditional Chinese glyphs to JIS Shinjitai characters"),
-            isOn: $shiftJISShinjitaiOutputEnabled.onChange {
-              if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
-                chineseConversionEnabled = false
+            )
+            Toggle(
+              LocalizedStringKey("Auto-convert traditional Chinese glyphs to JIS Shinjitai characters"),
+              isOn: $shiftJISShinjitaiOutputEnabled.onChange {
+                if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
+                  chineseConversionEnabled = false
+                }
               }
-            }
-          )
-          Toggle(
-            LocalizedStringKey("Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter"),
-            isOn: $inlineDumpPinyinInLieuOfZhuyin
-          )
-          Toggle(
-            LocalizedStringKey("Trim unfinished readings / strokes on commit"),
-            isOn: $trimUnfinishedReadingsOnCommit
-          )
+            )
+            Toggle(
+              LocalizedStringKey("Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter"),
+              isOn: $inlineDumpPinyinInLieuOfZhuyin
+            )
+            Toggle(
+              LocalizedStringKey("Trim unfinished readings / strokes on commit"),
+              isOn: $trimUnfinishedReadingsOnCommit
+            )
+          }
         }
-        SSPreferences.Section(title: "Experimental:".localized) {
+        SSPreferences.Settings.Section(title: "Experimental:".localized) {
           Toggle(
             LocalizedStringKey("Harden vertical punctuations during vertical typing (not recommended)"),
             isOn: $hardenVerticalPunctuations
@@ -72,11 +74,12 @@ struct VwrPrefPaneOutput: View {
               "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal."
             )
           )
-          .preferenceDescription()
+
+          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
       }
     }
-    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }
 }
 
