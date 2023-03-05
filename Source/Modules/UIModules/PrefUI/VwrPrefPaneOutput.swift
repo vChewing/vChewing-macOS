@@ -10,26 +10,28 @@ import Shared
 import SSPreferences
 import SwiftExtension
 import SwiftUI
+import SwiftUIBackports
 
 @available(macOS 10.15, *)
 struct VwrPrefPaneOutput: View {
-  @State private var selEnableKanjiConvToKangXi = UserDefaults.standard.bool(
-    forKey: UserDef.kChineseConversionEnabled.rawValue)
-  @State private var selEnableKanjiConvToJIS = UserDefaults.standard.bool(
-    forKey: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue)
-  @State private var selInlineDumpPinyinInLieuOfZhuyin = UserDefaults.standard.bool(
-    forKey: UserDef.kInlineDumpPinyinInLieuOfZhuyin.rawValue)
-  @State private var selTrimUnfinishedReadingsOnCommit = UserDefaults.standard.bool(
-    forKey: UserDef.kTrimUnfinishedReadingsOnCommit.rawValue)
-  @State private var selHardenVerticalPunctuations: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kHardenVerticalPunctuations.rawValue)
+  // MARK: - AppStorage Variables
 
-  var macOSMontereyOrLaterDetected: Bool {
-    if #available(macOS 12, *) {
-      return true
-    }
-    return false
-  }
+  @Backport.AppStorage(wrappedValue: false, UserDef.kChineseConversionEnabled.rawValue)
+  private var chineseConversionEnabled: Bool
+
+  @Backport.AppStorage(wrappedValue: false, UserDef.kShiftJISShinjitaiOutputEnabled.rawValue)
+  private var shiftJISShinjitaiOutputEnabled: Bool
+
+  @Backport.AppStorage(wrappedValue: false, UserDef.kInlineDumpPinyinInLieuOfZhuyin.rawValue)
+  private var inlineDumpPinyinInLieuOfZhuyin: Bool
+
+  @Backport.AppStorage(wrappedValue: true, UserDef.kTrimUnfinishedReadingsOnCommit.rawValue)
+  private var trimUnfinishedReadingsOnCommit: Bool
+
+  @Backport.AppStorage(wrappedValue: false, UserDef.kHardenVerticalPunctuations.rawValue)
+  private var hardenVerticalPunctuations: Bool
+
+  // MARK: - Main View
 
   var body: some View {
     ScrollView {
@@ -37,37 +39,33 @@ struct VwrPrefPaneOutput: View {
         SSPreferences.Section(title: "Output Settings:".localized, bottomDivider: true) {
           Toggle(
             LocalizedStringKey("Auto-convert traditional Chinese glyphs to KangXi characters"),
-            isOn: $selEnableKanjiConvToKangXi.onChange {
-              PrefMgr.shared.chineseConversionEnabled = selEnableKanjiConvToKangXi
-              selEnableKanjiConvToJIS = PrefMgr.shared.shiftJISShinjitaiOutputEnabled
+            isOn: $chineseConversionEnabled.onChange {
+              if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
+                shiftJISShinjitaiOutputEnabled = false
+              }
             }
           )
           Toggle(
             LocalizedStringKey("Auto-convert traditional Chinese glyphs to JIS Shinjitai characters"),
-            isOn: $selEnableKanjiConvToJIS.onChange {
-              PrefMgr.shared.shiftJISShinjitaiOutputEnabled = selEnableKanjiConvToJIS
-              selEnableKanjiConvToKangXi = PrefMgr.shared.chineseConversionEnabled
+            isOn: $shiftJISShinjitaiOutputEnabled.onChange {
+              if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
+                chineseConversionEnabled = false
+              }
             }
           )
           Toggle(
             LocalizedStringKey("Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter"),
-            isOn: $selInlineDumpPinyinInLieuOfZhuyin.onChange {
-              PrefMgr.shared.inlineDumpPinyinInLieuOfZhuyin = selInlineDumpPinyinInLieuOfZhuyin
-            }
+            isOn: $inlineDumpPinyinInLieuOfZhuyin
           )
           Toggle(
             LocalizedStringKey("Trim unfinished readings / strokes on commit"),
-            isOn: $selTrimUnfinishedReadingsOnCommit.onChange {
-              PrefMgr.shared.trimUnfinishedReadingsOnCommit = selTrimUnfinishedReadingsOnCommit
-            }
+            isOn: $trimUnfinishedReadingsOnCommit
           )
         }
         SSPreferences.Section(title: "Experimental:".localized) {
           Toggle(
             LocalizedStringKey("Harden vertical punctuations during vertical typing (not recommended)"),
-            isOn: $selHardenVerticalPunctuations.onChange {
-              PrefMgr.shared.hardenVerticalPunctuations = selHardenVerticalPunctuations
-            }
+            isOn: $hardenVerticalPunctuations
           )
           Text(
             LocalizedStringKey(

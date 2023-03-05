@@ -324,6 +324,7 @@
 "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu." = "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu.";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode." = "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode.";
 "This feature requires macOS 10.15 and above." = "This feature requires macOS 10.15 and above.";
+"This feature requires macOS 12 and above." = "This feature requires macOS 12 and above.";
 "This only works with Tadokoro candidate window." = "This only works with Tadokoro candidate window.";
 "This will also affect the row / column capacity of the candidate window." = "This will also affect the row / column capacity of the candidate window.";
 "This will batch-replace specified candidates." = "This will batch-replace specified candidates.";
