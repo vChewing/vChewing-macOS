@@ -48,6 +48,7 @@ public extension AppDelegate {
 
   func applicationDidFinishLaunching(_: Notification) {
     NSUserNotificationCenter.default.delegate = self
+    PrefMgr.shared.fixOddPreferences()
 
     if PrefMgr.shared.failureFlagForIMKCandidates {
       DispatchQueue.main.async {
@@ -90,8 +91,6 @@ public extension AppDelegate {
       }
       if LMMgr.userDataFolderExists { self.folderMonitor.startMonitoring() }
     }
-
-    PrefMgr.shared.fixOddPreferences()
 
     // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
     if PrefMgr.shared.checkUpdateAutomatically {
