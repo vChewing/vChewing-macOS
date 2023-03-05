@@ -4,24 +4,26 @@
 
 import SwiftUI
 
-/// Represents a type that can be converted to `PreferencePane`.
-///
-/// Acts as type-eraser for `Preferences.Pane<T>`.
-public protocol PreferencePaneConvertible {
+/**
+ Represents a type that can be converted to `SettingsPane`.
+
+ Acts as type-eraser for `Settings.Pane<T>`.
+ */
+public protocol SettingsPaneConvertible {
   /**
-   Convert `self` to equivalent `PreferencePane`.
+   Convert `self` to equivalent `SettingsPane`.
    */
-  func asPreferencePane() -> PreferencePane
+  func asPreferencePane() -> SettingsPane
 }
 
 @available(macOS 10.15, *)
-public extension SSPreferences {
+public extension Settings {
   /**
-   Create a SwiftUI-based preference pane.
+   Create a SwiftUI-based settings pane.
 
-   SwiftUI equivalent of the `PreferencePane` protocol.
+   SwiftUI equivalent of the `SettingsPane` protocol.
    */
-  struct Pane<Content: View>: View, PreferencePaneConvertible {
+  struct Pane<Content: View>: View, SettingsPaneConvertible {
     let identifier: PaneIdentifier
     let title: String
     let toolbarIcon: NSImage
@@ -41,15 +43,15 @@ public extension SSPreferences {
 
     public var body: some View { content }
 
-    public func asPreferencePane() -> PreferencePane {
+    public func asPreferencePane() -> SettingsPane {
       PaneHostingController(pane: self)
     }
   }
 
   /**
-   Hosting controller enabling `Preferences.Pane` to be used alongside AppKit `NSViewController`'s.
+   Hosting controller enabling `Settings.Pane` to be used alongside AppKit `NSViewController`'s.
    */
-  final class PaneHostingController<Content: View>: NSHostingController<Content>, PreferencePane {
+  final class PaneHostingController<Content: View>: NSHostingController<Content>, SettingsPane {
     public let preferencePaneIdentifier: PaneIdentifier
     public let preferencePaneTitle: String
     public let toolbarItemIcon: NSImage
@@ -86,12 +88,11 @@ public extension SSPreferences {
 @available(macOS 10.15, *)
 public extension View {
   /**
-   Applies font and color for a label used for describing a preference.
+   Applies font and color for a label used for describing a setting.
    */
   func preferenceDescription() -> some View {
     font(.system(size: 11.0))
       // TODO: Use `.foregroundStyle` when targeting macOS 12.
       .foregroundColor(.secondary)
-      .frame(maxWidth: .infinity, alignment: .leading)
   }
 }
