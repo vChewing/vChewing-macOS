@@ -23,7 +23,7 @@ struct VwrPrefPanePhrases: View {
       }
       .padding()
     }
-    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }
 }
 

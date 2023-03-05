@@ -40,10 +40,10 @@ struct VwrPrefPaneCassette: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Container(contentWidth: CtlPrefUIShared.contentWidth) {
+      SSPreferences.Settings.Container(contentWidth: CtlPrefUIShared.contentWidth) {
         // MARK: - Cassette Data Path Management
 
-        SSPreferences.Section(bottomDivider: true) {
+        SSPreferences.Settings.Section(bottomDivider: true) {
           Text(LocalizedStringKey("Choose your desired cassette file path. Will be omitted if invalid."))
           HStack {
             TextField(fdrCassetteDataDefault, text: $cassettePath).disabled(true)
@@ -121,12 +121,13 @@ struct VwrPrefPaneCassette: View {
               "Cassette mode is similar to the CIN support of the Yahoo Kimo IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)."
             )
           )
-          .preferenceDescription()
+
+          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
 
         // MARK: - Something Else
 
-        SSPreferences.Section {
+        SSPreferences.Settings.Section {
           Toggle(
             LocalizedStringKey("Auto-composite when the longest possible key is formed"),
             isOn: $autoCompositeWithLongestPossibleCassetteKey
@@ -140,7 +141,8 @@ struct VwrPrefPaneCassette: View {
               "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file."
             )
           )
-          .preferenceDescription()
+
+          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           Picker(
             "",
             selection: $forceCassetteChineseConversion
@@ -157,11 +159,12 @@ struct VwrPrefPaneCassette: View {
               "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode."
             )
           )
-          .preferenceDescription()
+
+          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
       }
     }
-    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }
 }
 

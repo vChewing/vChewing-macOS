@@ -53,10 +53,10 @@ struct VwrPrefPaneDictionary: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Container(contentWidth: CtlPrefUIShared.contentWidth) {
+      SSPreferences.Settings.Container(contentWidth: CtlPrefUIShared.contentWidth) {
         // MARK: - User Data Folder Path Management
 
-        SSPreferences.Section(bottomDivider: true) {
+        SSPreferences.Settings.Section(bottomDivider: true) {
           Group {
             Text(LocalizedStringKey("Choose your desired user data folder path. Will be omitted if invalid."))
             HStack {
@@ -125,7 +125,8 @@ struct VwrPrefPaneDictionary: View {
                 "Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. vChewing is designed to be invulnerable from this kind of attack. Also, official releases of vChewing are Sandboxed."
               )
             )
-            .preferenceDescription()
+
+            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           }
           Divider()
           Group {
@@ -140,7 +141,8 @@ struct VwrPrefPaneDictionary: View {
                 "This will use the plist files deployed by the “make install” command from libvChewing-Data if possible."
               )
             )
-            .preferenceDescription()
+
+            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
             Toggle(
               LocalizedStringKey("Only load factory language models if needed"),
               isOn: $onlyLoadFactoryLangModelsIfNeeded.onChange {
@@ -166,7 +168,8 @@ struct VwrPrefPaneDictionary: View {
             Text(
               "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu.".localized
             )
-            .preferenceDescription()
+
+            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
             Toggle(
               LocalizedStringKey("Enable phrase replacement table"),
               isOn: $phraseReplacementEnabled.onChange {
@@ -176,7 +179,8 @@ struct VwrPrefPaneDictionary: View {
                 }
               }
             )
-            Text("This will batch-replace specified candidates.".localized).preferenceDescription()
+            Text("This will batch-replace specified candidates.".localized)
+              .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           }
           Divider()
           Group {
@@ -189,12 +193,13 @@ struct VwrPrefPaneDictionary: View {
                 "⚠︎ This may hinder the walking algorithm from giving appropriate results."
               )
             )
-            .preferenceDescription()
+
+            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           }
         }
       }
     }
-    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }
 }
 
