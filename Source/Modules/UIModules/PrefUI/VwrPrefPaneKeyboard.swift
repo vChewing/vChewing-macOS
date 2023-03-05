@@ -11,15 +11,28 @@ import Shared
 import SSPreferences
 import SwiftExtension
 import SwiftUI
+import SwiftUIBackports
 
 @available(macOS 10.15, *)
 struct VwrPrefPaneKeyboard: View {
-  @State private var selKeyboardParser = UserDefaults.standard.integer(forKey: UserDef.kKeyboardParser.rawValue)
-  @State private var selBasicKeyboardLayout: String =
-    UserDefaults.standard.string(forKey: UserDef.kBasicKeyboardLayout.rawValue) ?? PrefMgr.shared.basicKeyboardLayout
-  @State private var selAlphanumericalKeyboardLayout: String =
-    UserDefaults.standard.string(forKey: UserDef.kAlphanumericalKeyboardLayout.rawValue)
-      ?? PrefMgr.shared.alphanumericalKeyboardLayout
+  // MARK: - AppStorage Variables
+
+  @Backport.AppStorage(wrappedValue: 0, UserDef.kKeyboardParser.rawValue)
+  private var keyboardParser: Int
+
+  @Backport.AppStorage(
+    wrappedValue: PrefMgr.kDefaultBasicKeyboardLayout,
+    UserDef.kBasicKeyboardLayout.rawValue
+  )
+  private var basicKeyboardLayout: String
+
+  @Backport.AppStorage(
+    wrappedValue: PrefMgr.kDefaultAlphanumericalKeyboardLayout,
+    UserDef.kAlphanumericalKeyboardLayout.rawValue
+  )
+  private var alphanumericalKeyboardLayout: String
+
+  // MARK: - Main View
 
   var body: some View {
     ScrollView {
@@ -27,26 +40,20 @@ struct VwrPrefPaneKeyboard: View {
         SSPreferences.Section(title: "Quick Setup:".localized) {
           HStack(alignment: .top) {
             Button {
-              PrefMgr.shared.keyboardParser = 0
-              selKeyboardParser = PrefMgr.shared.keyboardParser
-              PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
-              selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
+              keyboardParser = 0
+              basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
             } label: {
               Text("↻ㄅ" + " " + NSLocalizedString("Dachen Trad.", comment: ""))
             }
             Button {
-              PrefMgr.shared.keyboardParser = 1
-              selKeyboardParser = PrefMgr.shared.keyboardParser
-              PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ZhuyinEten"
-              selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
+              keyboardParser = 1
+              basicKeyboardLayout = "com.apple.keylayout.ZhuyinEten"
             } label: {
               Text("↻ㄅ" + " " + NSLocalizedString("Eten Trad.", comment: ""))
             }
             Button {
-              PrefMgr.shared.keyboardParser = 10
-              selKeyboardParser = PrefMgr.shared.keyboardParser
-              PrefMgr.shared.basicKeyboardLayout = "com.apple.keylayout.ABC"
-              selBasicKeyboardLayout = PrefMgr.shared.basicKeyboardLayout
+              keyboardParser = 10
+              basicKeyboardLayout = "com.apple.keylayout.ABC"
             } label: {
               Text("↻Ａ")
             }
@@ -56,10 +63,7 @@ struct VwrPrefPaneKeyboard: View {
           HStack {
             Picker(
               "",
-              selection: $selKeyboardParser.onChange {
-                let value = selKeyboardParser
-                PrefMgr.shared.keyboardParser = value
-              }
+              selection: $keyboardParser
             ) {
               ForEach(KeyboardParser.allCases, id: \.self) { item in
                 if [7, 10].contains(item.rawValue) { Divider() }
@@ -77,10 +81,7 @@ struct VwrPrefPaneKeyboard: View {
           HStack {
             Picker(
               "",
-              selection: $selBasicKeyboardLayout.onChange {
-                let value = selBasicKeyboardLayout
-                PrefMgr.shared.basicKeyboardLayout = value
-              }
+              selection: $basicKeyboardLayout
             ) {
               ForEach(0 ... (IMKHelper.allowedBasicLayoutsAsTISInputSources.count - 1), id: \.self) { id in
                 let theEntry = IMKHelper.allowedBasicLayoutsAsTISInputSources[id]
@@ -106,9 +107,7 @@ struct VwrPrefPaneKeyboard: View {
           HStack {
             Picker(
               "",
-              selection: $selAlphanumericalKeyboardLayout.onChange {
-                PrefMgr.shared.alphanumericalKeyboardLayout = selAlphanumericalKeyboardLayout
-              }
+              selection: $alphanumericalKeyboardLayout
             ) {
               ForEach(0 ... (IMKHelper.allowedAlphanumericalTISInputSources.count - 1), id: \.self) { id in
                 if let theEntry = IMKHelper.allowedAlphanumericalTISInputSources[id] {
@@ -138,79 +137,77 @@ struct VwrPrefPaneKeyboard: View {
 
 @available(macOS 10.15, *)
 private struct VwrPrefPaneKeyboard_KeyboardShortcuts: View {
-  @State private var selUsingHotKeySCPC = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeySCPC.rawValue)
-  @State private var selUsingHotKeyAssociates = UserDefaults.standard.bool(
-    forKey: UserDef.kUsingHotKeyAssociates.rawValue)
-  @State private var selUsingHotKeyCNS = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyCNS.rawValue)
-  @State private var selUsingHotKeyKangXi = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyKangXi.rawValue)
-  @State private var selUsingHotKeyJIS = UserDefaults.standard.bool(forKey: UserDef.kUsingHotKeyJIS.rawValue)
-  @State private var selUsingHotKeyHalfWidthASCII = UserDefaults.standard.bool(
-    forKey: UserDef.kUsingHotKeyHalfWidthASCII.rawValue)
-  @State private var selUsingHotKeyCurrencyNumerals = UserDefaults.standard.bool(
-    forKey: UserDef.kUsingHotKeyCurrencyNumerals.rawValue)
-  @State private var selUsingHotKeyCassette = UserDefaults.standard.bool(
-    forKey: UserDef.kUsingHotKeyCassette.rawValue)
-  @State private var selUsingHotKeyRevLookup = UserDefaults.standard.bool(
-    forKey: UserDef.kUsingHotKeyRevLookup.rawValue)
+  // MARK: - AppStorage Variables
+
+  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeySCPC.rawValue)
+  private var usingHotKeySCPC: Bool
+
+  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeyAssociates.rawValue)
+  private var usingHotKeyAssociates: Bool
+
+  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeyCNS.rawValue)
+  private var usingHotKeyCNS: Bool
+
+  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeyKangXi.rawValue)
+  private var usingHotKeyKangXi: Bool
+
+  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeyJIS.rawValue)
+  private var usingHotKeyJIS: Bool
+
+  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeyHalfWidthASCII.rawValue)
+  private var usingHotKeyHalfWidthASCII: Bool
+
+  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeyCurrencyNumerals.rawValue)
+  private var usingHotKeyCurrencyNumerals: Bool
+
+  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeyCassette.rawValue)
+  private var usingHotKeyCassette: Bool
+
+  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeyRevLookup.rawValue)
+  private var usingHotKeyRevLookup: Bool
+
+  // MARK: - Main View
 
   var body: some View {
     HStack(alignment: .top, spacing: NSFont.systemFontSize) {
       VStack(alignment: .leading) {
         Toggle(
           LocalizedStringKey("Per-Char Select Mode"),
-          isOn: $selUsingHotKeySCPC.onChange {
-            PrefMgr.shared.usingHotKeySCPC = selUsingHotKeySCPC
-          }
+          isOn: $usingHotKeySCPC
         )
         Toggle(
           LocalizedStringKey("Per-Char Associated Phrases"),
-          isOn: $selUsingHotKeyAssociates.onChange {
-            PrefMgr.shared.usingHotKeyAssociates = selUsingHotKeyAssociates
-          }
+          isOn: $usingHotKeyAssociates
         )
         Toggle(
           LocalizedStringKey("CNS11643 Mode"),
-          isOn: $selUsingHotKeyCNS.onChange {
-            PrefMgr.shared.usingHotKeyCNS = selUsingHotKeyCNS
-          }
+          isOn: $usingHotKeyCNS
         )
         Toggle(
           LocalizedStringKey("Force KangXi Writing"),
-          isOn: $selUsingHotKeyKangXi.onChange {
-            PrefMgr.shared.usingHotKeyKangXi = selUsingHotKeyKangXi
-          }
+          isOn: $usingHotKeyKangXi
         )
         Toggle(
           LocalizedStringKey("Reverse Lookup (Phonabets)"),
-          isOn: $selUsingHotKeyRevLookup.onChange {
-            PrefMgr.shared.usingHotKeyRevLookup = selUsingHotKeyRevLookup
-          }
+          isOn: $usingHotKeyRevLookup
         )
       }
       VStack(alignment: .leading) {
         Toggle(
           LocalizedStringKey("JIS Shinjitai Output"),
-          isOn: $selUsingHotKeyJIS.onChange {
-            PrefMgr.shared.usingHotKeyJIS = selUsingHotKeyJIS
-          }
+          isOn: $usingHotKeyJIS
         )
         Toggle(
           LocalizedStringKey("Half-Width Punctuation Mode"),
-          isOn: $selUsingHotKeyHalfWidthASCII.onChange {
-            PrefMgr.shared.usingHotKeyHalfWidthASCII = selUsingHotKeyHalfWidthASCII
-          }
+          isOn: $usingHotKeyHalfWidthASCII
         )
         Toggle(
           LocalizedStringKey("Currency Numeral Output"),
-          isOn: $selUsingHotKeyCurrencyNumerals.onChange {
-            PrefMgr.shared.usingHotKeyCurrencyNumerals = selUsingHotKeyCurrencyNumerals
-          }
+          isOn: $usingHotKeyCurrencyNumerals
         )
         Toggle(
           LocalizedStringKey("CIN Cassette Mode"),
-          isOn: $selUsingHotKeyCassette.onChange {
-            PrefMgr.shared.usingHotKeyCassette = selUsingHotKeyCassette
-          }
+          isOn: $usingHotKeyCassette
         )
       }
     }
