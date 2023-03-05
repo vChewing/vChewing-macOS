@@ -32,6 +32,8 @@ struct VwrPrefPaneDictionary: View {
   @State private var selPhraseReplacementEnabled: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kPhraseReplacementEnabled.rawValue
   )
+  @State private var selAllowBoostingSingleKanjiAsUserPhrase: Bool = UserDefaults.standard.bool(
+    forKey: UserDef.kAllowBoostingSingleKanjiAsUserPhrase.rawValue)
 
   private static let dlgOpenPath = NSOpenPanel()
   private static let dlgOpenFile = NSOpenPanel()
@@ -166,6 +168,21 @@ struct VwrPrefPaneDictionary: View {
               }
             )
             Text("This will batch-replace specified candidates.".localized).preferenceDescription()
+          }
+          Divider()
+          Group {
+            Toggle(
+              LocalizedStringKey("Allow boosting / excluding a candidate of single kanji when marking"),
+              isOn: $selAllowBoostingSingleKanjiAsUserPhrase.onChange {
+                PrefMgr.shared.allowBoostingSingleKanjiAsUserPhrase = selAllowBoostingSingleKanjiAsUserPhrase
+              }
+            )
+            Text(
+              LocalizedStringKey(
+                "⚠︎ This may hinder the walking algorithm from giving appropriate results."
+              )
+            )
+            .preferenceDescription()
           }
         }
       }

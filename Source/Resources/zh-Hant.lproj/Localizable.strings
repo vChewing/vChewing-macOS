@@ -189,7 +189,7 @@
 "⚠︎ This will reboot the vChewing IME." = "⚠︎ 這將重啟威注音輸入法。";
 "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "不啟用該選項的話，在組字區內的字根將會以原始鍵盤按鍵名稱來顯示。所有關於字根的定義，均請洽 CIN 磁帶檔案內的「%keyname」章節。";
 "Allow backspace-editing miscomposed readings" = "允許對無效的讀音使用 BackSpace 編輯";
-"Allow boosting / excluding a candidate of single kanji" = "將可以就地升權/排除的候選字詞的最短詞長設為單個漢字";
+"Allow boosting / excluding a candidate of single kanji when marking" = "允許藉由標記模式將可以就地升權/排除的候選字詞的最短詞長設為單個漢字";
 "Allow using Enter key to confirm associated candidate selection" = "允許使用 Enter 確認當前選中的聯想詞";
 "Alphanumerical Layout:" = "英數鍵盤佈局:";
 "Also use “\\” or “¥” key for Hanin Keyboard Symbol Input" = "亦使用「\\」或「¥」鍵啟用漢音鍵盤符號模式";

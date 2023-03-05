@@ -190,7 +190,7 @@
 "⚠︎ This will reboot the vChewing IME." = "⚠︎ これで威注音入力アプリを再起動。";
 "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "これをチェックしないと、全ての筆画は ASCII キーネームで入力緩衝列で表示してしまうことになる。CIN ファイルの「%keyname」というところで筆画の定義はできる。";
 "Allow backspace-editing miscomposed readings" = "効かぬ音読みを BackSpace で再編集";
-"Allow boosting / excluding a candidate of single kanji" = "即排除/即最優先にできる候補の文字数の最低限は１字とする";
+"Allow boosting / excluding a candidate of single kanji when marking" = "マーキングモードで即排除/即最優先にできる候補の文字数の最低限は１字とする";
 "Allow using Enter key to confirm associated candidate selection" = "Enter キーを連想語彙候補の確認のために使う";
 "Alphanumerical Layout:" = "英数キーボード:";
 "Also use “\\” or “¥” key for Hanin Keyboard Symbol Input" = "「\\」・「¥」キーでも漢音キーボード符号入力";
