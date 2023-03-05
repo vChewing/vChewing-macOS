@@ -36,8 +36,6 @@ struct VwrPrefPaneCandidates: View {
     forKey: UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.rawValue)
   @State private var selEnableSwiftUIForTDKCandidates: Bool = UserDefaults.standard.bool(
     forKey: UserDef.kEnableSwiftUIForTDKCandidates.rawValue)
-  @State private var selAllowBoostingSingleKanjiAsUserPhrase: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kAllowBoostingSingleKanjiAsUserPhrase.rawValue)
 
   var isMontereyOrAbove: Bool = {
     if #available(macOS 12.0, *) {
@@ -206,18 +204,6 @@ struct VwrPrefPaneCandidates: View {
           .disabled(PrefMgr.shared.useIMKCandidateWindow)
           Text(
             "By checking this, Tadokoro Candidate Window will use SwiftUI. SwiftUI was being used in vChewing 3.3.8 and before. However, SwiftUI has unacceptable responsiveness & latency & efficiency problems in rendering the candidate panel UI. That's why a refactored version has been introduced since vChewing 3.3.9 using Cocoa, providing an optimized user experience with blasing-fast operation responsiveness, plus experimental mouse-wheel support.".localized
-          )
-          .preferenceDescription()
-          Toggle(
-            LocalizedStringKey("Allow boosting / excluding a candidate of single kanji"),
-            isOn: $selAllowBoostingSingleKanjiAsUserPhrase.onChange {
-              PrefMgr.shared.allowBoostingSingleKanjiAsUserPhrase = selAllowBoostingSingleKanjiAsUserPhrase
-            }
-          )
-          Text(
-            LocalizedStringKey(
-              "⚠︎ This may hinder the walking algorithm from giving appropriate results."
-            )
           )
           .preferenceDescription()
         }
