@@ -12,7 +12,7 @@ import SwiftUI
 
 @available(macOS 10.15, *)
 extension PrefUITabs {
-  var ssPaneIdentifier: SSPreferences.PaneIdentifier { .init(rawValue: rawValue) }
+  var ssPaneIdentifier: SSPreferences.Settings.PaneIdentifier { .init(rawValue: rawValue) }
 }
 
 @available(macOS 10.15, *)
@@ -41,8 +41,8 @@ class CtlPrefUIShared {
     panes: {
       var result = [PreferencePaneConvertible]()
       PrefUITabs.allCases.forEach { neta in
-        let item: PreferencePaneConvertible = SSPreferences.Pane(
-          identifier: SSPreferences.PaneIdentifier(rawValue: neta.rawValue),
+        let item: PreferencePaneConvertible = SSPreferences.Settings.Pane(
+          identifier: SSPreferences.Settings.PaneIdentifier(rawValue: neta.rawValue),
           title: neta.i18nTitle, toolbarIcon: neta.icon,
           contentView: { VwrPrefPage(tabType: neta) }
         )
@@ -84,4 +84,7 @@ class CtlPrefUIShared {
       }
     }
   }()
+
+  static var containerWidth: Double { contentWidth + 60 }
+  static var maxDescriptionWidth: Double { contentWidth * 0.8 }
 }

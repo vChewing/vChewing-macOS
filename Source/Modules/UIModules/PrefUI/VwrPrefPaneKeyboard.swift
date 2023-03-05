@@ -36,8 +36,8 @@ struct VwrPrefPaneKeyboard: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Container(contentWidth: CtlPrefUIShared.contentWidth) {
-        SSPreferences.Section(title: "Quick Setup:".localized) {
+      SSPreferences.Settings.Container(contentWidth: CtlPrefUIShared.contentWidth) {
+        SSPreferences.Settings.Section(title: "Quick Setup:".localized) {
           HStack(alignment: .top) {
             Button {
               keyboardParser = 0
@@ -59,7 +59,7 @@ struct VwrPrefPaneKeyboard: View {
             }
           }.controlSize(.small)
         }
-        SSPreferences.Section(title: "Phonetic Parser:".localized) {
+        SSPreferences.Settings.Section(title: "Phonetic Parser:".localized) {
           HStack {
             Picker(
               "",
@@ -75,9 +75,10 @@ struct VwrPrefPaneKeyboard: View {
             Spacer(minLength: NSFont.systemFontSize)
           }
           Text(NSLocalizedString("Choose the phonetic layout for Mandarin parser.", comment: ""))
-            .preferenceDescription()
+
+            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
-        SSPreferences.Section(title: "Basic Keyboard Layout:".localized) {
+        SSPreferences.Settings.Section(title: "Basic Keyboard Layout:".localized) {
           HStack {
             Picker(
               "",
@@ -101,9 +102,10 @@ struct VwrPrefPaneKeyboard: View {
               comment: ""
             )
           )
-          .preferenceDescription()
+
+          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
-        SSPreferences.Section(title: "Alphanumerical Layout:".localized) {
+        SSPreferences.Settings.Section(title: "Alphanumerical Layout:".localized) {
           HStack {
             Picker(
               "",
@@ -124,14 +126,15 @@ struct VwrPrefPaneKeyboard: View {
               comment: ""
             )
           )
-          .preferenceDescription()
+
+          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
-        SSPreferences.Section(title: "Keyboard Shortcuts:".localized) {
+        SSPreferences.Settings.Section(title: "Keyboard Shortcuts:".localized) {
           VwrPrefPaneKeyboard_KeyboardShortcuts()
         }
       }
     }
-    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }
 }
 

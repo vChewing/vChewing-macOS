@@ -53,11 +53,11 @@ struct VwrPrefPaneCandidates: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Container(contentWidth: CtlPrefUIShared.contentWidth) {
-        SSPreferences.Section(title: "Selection Keys:".localized, bottomDivider: true) {
+      SSPreferences.Settings.Container(contentWidth: CtlPrefUIShared.contentWidth) {
+        SSPreferences.Settings.Section(title: "Selection Keys:".localized, bottomDivider: true) {
           VwrPrefPaneCandidates_SelectionKeys()
         }
-        SSPreferences.Section(title: "Candidate Layout:".localized, bottomDivider: true) {
+        SSPreferences.Settings.Section(title: "Candidate Layout:".localized, bottomDivider: true) {
           Picker(
             "",
             selection: $useHorizontalCandidateList
@@ -69,7 +69,8 @@ struct VwrPrefPaneCandidates: View {
           .horizontalRadioGroupLayout()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Choose your preferred layout of the candidate window."))
-            .preferenceDescription()
+
+            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           Toggle(
             LocalizedStringKey("Use only one row / column in candidate window."),
             isOn: $candidateWindowShowOnlyOneLine
@@ -81,9 +82,10 @@ struct VwrPrefPaneCandidates: View {
               + CtlPrefUIShared.sentenceSeparator
               + "Tadokoro candidate window shows 4 rows / columns by default, providing similar experiences from Microsoft New Phonetic IME and macOS bult-in Chinese IME (since macOS 10.9). However, for some users who have presbyopia, they prefer giant candidate font sizes, resulting a concern that multiple rows / columns of candidates can make the candidate window looks too big, hence this option. Note that this option will be dismissed if the typing context is vertical, forcing the candidates to be shown in only one row / column. Only one reverse-lookup result can be made available in single row / column mode due to reduced candidate window size.".localized
           )
-          .preferenceDescription()
+
+          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
-        SSPreferences.Section(title: "Candidate Size:".localized, bottomDivider: true) {
+        SSPreferences.Settings.Section(title: "Candidate Size:".localized, bottomDivider: true) {
           Picker(
             "",
             selection: $candidateListTextSize.onChange {
@@ -110,9 +112,10 @@ struct VwrPrefPaneCandidates: View {
           .labelsHidden()
           .frame(width: 120.0)
           Text(LocalizedStringKey("Choose candidate font size for better visual clarity."))
-            .preferenceDescription()
+
+            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
-        SSPreferences.Section(title: "Cursor Selection:".localized, bottomDivider: true) {
+        SSPreferences.Settings.Section(title: "Cursor Selection:".localized, bottomDivider: true) {
           Picker(
             "",
             selection: $useRearCursorMode
@@ -123,13 +126,14 @@ struct VwrPrefPaneCandidates: View {
           .labelsHidden()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Choose the cursor position where you want to list possible candidates."))
-            .preferenceDescription()
+
+            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           Toggle(
             LocalizedStringKey("Push the cursor in front of the phrase after selection"),
             isOn: $moveCursorAfterSelectingCandidate
           ).controlSize(.small)
         }
-        SSPreferences.Section(title: "Misc Settings:".localized, bottomDivider: true) {
+        SSPreferences.Settings.Section(title: "Misc Settings:".localized, bottomDivider: true) {
           Toggle(
             LocalizedStringKey("Show available reverse-lookup results in candidate window"),
             isOn: $showReverseLookupInCandidateUI
@@ -140,7 +144,8 @@ struct VwrPrefPaneCandidates: View {
               + CtlPrefUIShared.sentenceSeparator
               + "The lookup results are supplied by the CIN cassette module.".localized
           )
-          .preferenceDescription()
+
+          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           Toggle(
             LocalizedStringKey("Always use fixed listing order in candidate window"),
             isOn: $useFixecCandidateOrderOnSelection
@@ -150,7 +155,8 @@ struct VwrPrefPaneCandidates: View {
               "This will stop user override model from affecting how candidates get sorted."
             )
           )
-          .preferenceDescription()
+
+          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           Toggle(
             LocalizedStringKey("Consolidate the context on confirming candidate selection"),
             isOn: $consolidateContextOnCandidateSelection
@@ -158,9 +164,10 @@ struct VwrPrefPaneCandidates: View {
           Text(
             "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is.".localized
           )
-          .preferenceDescription()
+
+          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
-        SSPreferences.Section(title: "Experimental:".localized) {
+        SSPreferences.Settings.Section(title: "Experimental:".localized) {
           Toggle(
             LocalizedStringKey("Use IMK Candidate Window instead of Tadokoro"),
             isOn: $useIMKCandidateWindow.onChange {
@@ -171,11 +178,13 @@ struct VwrPrefPaneCandidates: View {
           Text(
             LocalizedStringKey("⚠︎ This will reboot the vChewing IME.")
           )
-          .preferenceDescription()
+
+          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           Text(
             "IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases.".localized
           )
-          .preferenceDescription()
+
+          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           Toggle(
             LocalizedStringKey("Enable mouse wheel support for Tadokoro Candidate Window"),
             isOn: $enableMouseScrollingForTDKCandidatesCocoa
@@ -191,7 +200,8 @@ struct VwrPrefPaneCandidates: View {
           Text(
             "By checking this, Tadokoro Candidate Window will use SwiftUI. SwiftUI was being used in vChewing 3.3.8 and before. However, SwiftUI has unacceptable responsiveness & latency & efficiency problems in rendering the candidate panel UI. That's why a refactored version has been introduced since vChewing 3.3.9 using Cocoa, providing an optimized user experience with blasing-fast operation responsiveness, plus experimental mouse-wheel support.".localized
           )
-          .preferenceDescription()
+
+          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
       }
     }
@@ -244,14 +254,16 @@ private struct VwrPrefPaneCandidates_SelectionKeys: View {
           "⚠︎ This feature in IMK Candidate Window defects. Please consult\nApple Developer Relations with Radar ID: #FB11300759."
         )
       )
-      .preferenceDescription()
+
+      .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
     } else {
       Text(
         "Choose or hit Enter to confim your prefered keys for selecting candidates.".localized
           + "\n"
           + "This will also affect the row / column capacity of the candidate window.".localized
       )
-      .preferenceDescription()
+
+      .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
     }
   }
 }

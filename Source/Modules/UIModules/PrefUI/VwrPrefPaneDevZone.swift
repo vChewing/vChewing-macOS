@@ -26,8 +26,8 @@ struct VwrPrefPaneDevZone: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Container(contentWidth: CtlPrefUIShared.contentWidth) {
-        SSPreferences.Section(bottomDivider: true) {
+      SSPreferences.Settings.Container(contentWidth: CtlPrefUIShared.contentWidth) {
+        SSPreferences.Settings.Section(bottomDivider: true) {
           Text(
             LocalizedStringKey(
               "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.")
@@ -36,7 +36,8 @@ struct VwrPrefPaneDevZone: View {
           Divider()
           HStack {
             Text("Some previous options are moved to other tabs.".localized)
-              .preferenceDescription()
+
+              .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           }
           Toggle(
             "Disable segmented thick underline in marking mode for managed clients".localized,
@@ -45,11 +46,12 @@ struct VwrPrefPaneDevZone: View {
           Text(
             "Some clients with web-based front UI may have issues rendering segmented thick underlines drawn by their implemented “setMarkedText()”. This option stops the input method from delivering segmented thick underlines to “client().setMarkedText()”. Note that segmented thick underlines are only used in marking mode, unless the client itself misimplements the IMKTextInput method “setMarkedText()”. This option only affects the inline composition buffer.".localized
           )
-          .preferenceDescription()
+
+          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
       }
     }
-    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight).fixedSize(horizontal: false, vertical: true)
+    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }
 }
 
