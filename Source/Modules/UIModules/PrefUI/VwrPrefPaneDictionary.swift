@@ -11,29 +11,42 @@ import Shared
 import SSPreferences
 import SwiftExtension
 import SwiftUI
+import SwiftUIBackports
 
 @available(macOS 10.15, *)
 struct VwrPrefPaneDictionary: View {
+  // MARK: - AppStorage Variables
+
+  @Backport.AppStorage(wrappedValue: "", UserDef.kUserDataFolderSpecified.rawValue)
+  private var userDataFolderSpecified: String
+
+  @Backport.AppStorage(wrappedValue: true, UserDef.kShouldAutoReloadUserDataFiles.rawValue)
+  private var shouldAutoReloadUserDataFiles: Bool
+
+  @Backport.AppStorage(wrappedValue: false, UserDef.kUseExternalFactoryDict.rawValue)
+  private var useExternalFactoryDict: Bool
+
+  @Backport.AppStorage(wrappedValue: true, UserDef.kOnlyLoadFactoryLangModelsIfNeeded.rawValue)
+  private var onlyLoadFactoryLangModelsIfNeeded: Bool
+
+  @Backport.AppStorage(wrappedValue: false, UserDef.kCNS11643Enabled.rawValue)
+  private var cns11643Enabled: Bool
+
+  @Backport.AppStorage(wrappedValue: true, UserDef.kSymbolInputEnabled.rawValue)
+  private var symbolInputEnabled: Bool
+
+  @Backport.AppStorage(wrappedValue: true, UserDef.kFetchSuggestionsFromUserOverrideModel.rawValue)
+  private var fetchSuggestionsFromUserOverrideModel: Bool
+
+  @Backport.AppStorage(wrappedValue: false, UserDef.kPhraseReplacementEnabled.rawValue)
+  private var phraseReplacementEnabled: Bool
+
+  @Backport.AppStorage(wrappedValue: false, UserDef.kAllowBoostingSingleKanjiAsUserPhrase.rawValue)
+  private var allowBoostingSingleKanjiAsUserPhrase: Bool
+
+  // MARK: - Main View
+
   private var fdrUserDataDefault: String { LMMgr.dataFolderPath(isDefaultFolder: true) }
-  @State private var tbxUserDataPathSpecified: String =
-    UserDefaults.standard.string(forKey: UserDef.kUserDataFolderSpecified.rawValue)
-      ?? LMMgr.dataFolderPath(isDefaultFolder: true)
-  @State private var selAutoReloadUserData: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kShouldAutoReloadUserDataFiles.rawValue)
-  @State private var selUseExternalFactoryDict: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kUseExternalFactoryDict.rawValue)
-  @State private var selOnlyLoadFactoryLangModelsIfNeeded: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kOnlyLoadFactoryLangModelsIfNeeded.rawValue)
-  @State private var selEnableCNS11643: Bool = UserDefaults.standard.bool(forKey: UserDef.kCNS11643Enabled.rawValue)
-  @State private var selEnableSymbolInputSupport: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kSymbolInputEnabled.rawValue)
-  @State private var selFetchSuggestionsFromUserOverrideModel: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kFetchSuggestionsFromUserOverrideModel.rawValue)
-  @State private var selPhraseReplacementEnabled: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kPhraseReplacementEnabled.rawValue
-  )
-  @State private var selAllowBoostingSingleKanjiAsUserPhrase: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kAllowBoostingSingleKanjiAsUserPhrase.rawValue)
 
   private static let dlgOpenPath = NSOpenPanel()
   private static let dlgOpenFile = NSOpenPanel()
@@ -47,8 +60,8 @@ struct VwrPrefPaneDictionary: View {
           Group {
             Text(LocalizedStringKey("Choose your desired user data folder path. Will be omitted if invalid."))
             HStack {
-              TextField(fdrUserDataDefault, text: $tbxUserDataPathSpecified).disabled(true)
-                .help(tbxUserDataPathSpecified)
+              TextField(fdrUserDataDefault, text: $userDataFolderSpecified).disabled(true)
+                .help(userDataFolderSpecified)
               Button {
                 Self.dlgOpenPath.title = NSLocalizedString(
                   "Choose your desired user data folder.", comment: ""
@@ -60,7 +73,7 @@ struct VwrPrefPaneDictionary: View {
                 Self.dlgOpenPath.canChooseDirectories = true
 
                 let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
-                  PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath)
+                  userDataFolderSpecified.expandingTildeInPath)
 
                 if let window = CtlPrefUIShared.sharedWindow {
                   Self.dlgOpenPath.beginSheetModal(for: window) { result in
@@ -71,8 +84,7 @@ struct VwrPrefPaneDictionary: View {
                       var newPath = url.path
                       newPath.ensureTrailingSlash()
                       if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
-                        PrefMgr.shared.userDataFolderSpecified = newPath
-                        tbxUserDataPathSpecified = PrefMgr.shared.userDataFolderSpecified
+                        userDataFolderSpecified = newPath
                         BookmarkManager.shared.saveBookmark(for: url)
                         (NSApp.delegate as? AppDelegate)?.updateDirectoryMonitorPath()
                       } else {
@@ -94,17 +106,16 @@ struct VwrPrefPaneDictionary: View {
                 Text("...")
               }
               Button {
+                userDataFolderSpecified = ""
                 LMMgr.resetSpecifiedUserDataFolder()
-                tbxUserDataPathSpecified = ""
               } label: {
                 Text("↻")
               }
             }
             Toggle(
               LocalizedStringKey("Automatically reload user data files if changes detected"),
-              isOn: $selAutoReloadUserData.onChange {
-                PrefMgr.shared.shouldAutoReloadUserDataFiles = selAutoReloadUserData
-                if selAutoReloadUserData {
+              isOn: $shouldAutoReloadUserDataFiles.onChange {
+                if shouldAutoReloadUserDataFiles {
                   LMMgr.initUserLangModels()
                 }
               }
@@ -120,8 +131,7 @@ struct VwrPrefPaneDictionary: View {
           Group {
             Toggle(
               LocalizedStringKey("Read external factory dictionary plists if possible"),
-              isOn: $selUseExternalFactoryDict.onChange {
-                PrefMgr.shared.useExternalFactoryDict = selUseExternalFactoryDict
+              isOn: $useExternalFactoryDict.onChange {
                 LMMgr.reloadFactoryDictionaryPlists()
               }
             )
@@ -133,29 +143,25 @@ struct VwrPrefPaneDictionary: View {
             .preferenceDescription()
             Toggle(
               LocalizedStringKey("Only load factory language models if needed"),
-              isOn: $selOnlyLoadFactoryLangModelsIfNeeded.onChange {
-                PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded = selOnlyLoadFactoryLangModelsIfNeeded
+              isOn: $onlyLoadFactoryLangModelsIfNeeded.onChange {
+                if !onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModelsOnAppDelegate() }
               }
             )
             Toggle(
               LocalizedStringKey("Enable CNS11643 Support (2023-01-06)"),
-              isOn: $selEnableCNS11643.onChange {
-                PrefMgr.shared.cns11643Enabled = selEnableCNS11643
-                LMMgr.setCNSEnabled(PrefMgr.shared.cns11643Enabled)
+              isOn: $cns11643Enabled.onChange {
+                LMMgr.setCNSEnabled(cns11643Enabled)
               }
             )
             Toggle(
               LocalizedStringKey("Enable symbol input support (incl. certain emoji symbols)"),
-              isOn: $selEnableSymbolInputSupport.onChange {
-                PrefMgr.shared.symbolInputEnabled = selEnableSymbolInputSupport
-                LMMgr.setSymbolEnabled(PrefMgr.shared.symbolInputEnabled)
+              isOn: $symbolInputEnabled.onChange {
+                LMMgr.setSymbolEnabled(symbolInputEnabled)
               }
             )
             Toggle(
               LocalizedStringKey("Applying typing suggestions from half-life user override model"),
-              isOn: $selFetchSuggestionsFromUserOverrideModel.onChange {
-                PrefMgr.shared.fetchSuggestionsFromUserOverrideModel = selFetchSuggestionsFromUserOverrideModel
-              }
+              isOn: $fetchSuggestionsFromUserOverrideModel
             )
             Text(
               "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu.".localized
@@ -163,8 +169,11 @@ struct VwrPrefPaneDictionary: View {
             .preferenceDescription()
             Toggle(
               LocalizedStringKey("Enable phrase replacement table"),
-              isOn: $selPhraseReplacementEnabled.onChange {
-                PrefMgr.shared.phraseReplacementEnabled = selPhraseReplacementEnabled
+              isOn: $phraseReplacementEnabled.onChange {
+                LMMgr.setPhraseReplacementEnabled(phraseReplacementEnabled)
+                if phraseReplacementEnabled {
+                  LMMgr.loadUserPhraseReplacement()
+                }
               }
             )
             Text("This will batch-replace specified candidates.".localized).preferenceDescription()
@@ -173,9 +182,7 @@ struct VwrPrefPaneDictionary: View {
           Group {
             Toggle(
               LocalizedStringKey("Allow boosting / excluding a candidate of single kanji when marking"),
-              isOn: $selAllowBoostingSingleKanjiAsUserPhrase.onChange {
-                PrefMgr.shared.allowBoostingSingleKanjiAsUserPhrase = selAllowBoostingSingleKanjiAsUserPhrase
-              }
+              isOn: $allowBoostingSingleKanjiAsUserPhrase
             )
             Text(
               LocalizedStringKey(

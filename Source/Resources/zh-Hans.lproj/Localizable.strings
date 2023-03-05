@@ -324,6 +324,7 @@
 "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu." = "半衰记忆模组仅持有临时记忆之功能。每一笔记录都会在六天之内逐渐变得彻底失效。您可以借由输入法选单清除全部的记忆记录。";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode." = "该转换仅对磁带模式有影响，会将键入的内容根据该选项与当前的简繁体模式来转换。";
 "This feature requires macOS 10.15 and above." = "该功能要求系统版本至少 macOS 10.15。";
+"This feature requires macOS 12 and above." = "该功能要求系统版本至少 macOS 12。";
 "This only works with Tadokoro candidate window." = "该选项仅对田所选字窗起作用。";
 "This will also affect the row / column capacity of the candidate window." = "该选项也会影响到选字窗每行/每列最多显示的候选字数量。";
 "This will batch-replace specified candidates." = "这将会对指定的候选字词进行整词取代。";

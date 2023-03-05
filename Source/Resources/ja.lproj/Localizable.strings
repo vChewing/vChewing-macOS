@@ -325,6 +325,7 @@
 "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu." = "臨時記憶モジュールは文字の通り「臨時的」の記憶をします。記録は六日間どんどん忘れてしまいます。入力アプリのメニューから全ての記録を消すことはできます。";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode." = "この転換はカセットモードだけに使える転換であり、転換結果はこの設定と入力モード次第である。";
 "This feature requires macOS 10.15 and above." = "この機能の稼働には macOS 10.15 以降のシステムが必要である。";
+"This feature requires macOS 12 and above." = "この機能の稼働には macOS 12 以降のシステムが必要である。";
 "This only works with Tadokoro candidate window." = "これは田所候補陳列ウィンドウだけに効ける機能である。";
 "This will also affect the row / column capacity of the candidate window." = "言選り用キーの数は、候補陳列の行・列の容量制限にも影響。";
 "This will batch-replace specified candidates." = "指定された候補そのものを置き換える";

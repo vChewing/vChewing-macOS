@@ -10,20 +10,19 @@ import Shared
 import SSPreferences
 import SwiftExtension
 import SwiftUI
+import SwiftUIBackports
 
 @available(macOS 10.15, *)
 struct VwrPrefPaneDevZone: View {
-  @State private var selDisableSegmentedThickUnderlineInMarkingModeForManagedClients
-    = UserDefaults.standard.bool(
-      forKey: UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.rawValue
-    )
+  // MARK: - AppStorage Variables
 
-  var isMontereyOrAbove: Bool = {
-    if #available(macOS 12.0, *) {
-      return true
-    }
-    return false
-  }()
+  @Backport.AppStorage(
+    wrappedValue: false,
+    UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.rawValue
+  )
+  private var disableSegmentedThickUnderlineInMarkingModeForManagedClients: Bool
+
+  // MARK: - Main View
 
   var body: some View {
     ScrollView {
@@ -41,9 +40,7 @@ struct VwrPrefPaneDevZone: View {
           }
           Toggle(
             "Disable segmented thick underline in marking mode for managed clients".localized,
-            isOn: $selDisableSegmentedThickUnderlineInMarkingModeForManagedClients.onChange {
-              PrefMgr.shared.disableSegmentedThickUnderlineInMarkingModeForManagedClients = selDisableSegmentedThickUnderlineInMarkingModeForManagedClients
-            }
+            isOn: $disableSegmentedThickUnderlineInMarkingModeForManagedClients
           )
           Text(
             "Some clients with web-based front UI may have issues rendering segmented thick underlines drawn by their implemented “setMarkedText()”. This option stops the input method from delivering segmented thick underlines to “client().setMarkedText()”. Note that segmented thick underlines are only used in marking mode, unless the client itself misimplements the IMKTextInput method “setMarkedText()”. This option only affects the inline composition buffer.".localized

@@ -14,13 +14,6 @@ import SwiftUI
 
 @available(macOS 10.15, *)
 struct VwrPrefPanePhrases: View {
-  var isMontereyOrAbove: Bool = {
-    if #available(macOS 12.0, *) {
-      return true
-    }
-    return false
-  }()
-
   var body: some View {
     ScrollView {
       VStack {
