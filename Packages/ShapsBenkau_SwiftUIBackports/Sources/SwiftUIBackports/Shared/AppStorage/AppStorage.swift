@@ -116,6 +116,42 @@ public extension Backport.AppStorage {
     )
   }
 
+  /// Creates a property that can read and write to a [string] user default.
+  ///
+  /// - Parameters:
+  ///   - wrappedValue: The default value if a string value is not specified
+  ///     for the given key.
+  ///   - key: The key to read and write the value to in the store
+  ///     store.
+  ///   - store: The store to read and write to. A value
+  ///     of `nil` will use the user default store from the environment.
+  init(wrappedValue: Value, _ key: String, store: UserDefaults = .standard) where Value == [String] {
+    let value = store.value(forKey: key) as? Value ?? wrappedValue
+    self.init(
+      value: value, store: store, key: key,
+      get: { $0 as? Value },
+      set: { store.set($0, forKey: key) }
+    )
+  }
+
+  /// Creates a property that can read and write to a [String: Bool] user default.
+  ///
+  /// - Parameters:
+  ///   - wrappedValue: The default value if a string value is not specified
+  ///     for the given key.
+  ///   - key: The key to read and write the value to in the store
+  ///     store.
+  ///   - store: The store to read and write to. A value
+  ///     of `nil` will use the user default store from the environment.
+  init(wrappedValue: Value, _ key: String, store: UserDefaults = .standard) where Value == [String: Bool] {
+    let value = store.value(forKey: key) as? Value ?? wrappedValue
+    self.init(
+      value: value, store: store, key: key,
+      get: { $0 as? Value },
+      set: { store.set($0, forKey: key) }
+    )
+  }
+
   /// Creates a property that can read and write to a url user default.
   ///
   /// - Parameters:
