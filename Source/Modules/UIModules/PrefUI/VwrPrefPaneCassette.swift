@@ -11,21 +11,30 @@ import Shared
 import SSPreferences
 import SwiftExtension
 import SwiftUI
+import SwiftUIBackports
 
 @available(macOS 10.15, *)
 struct VwrPrefPaneCassette: View {
+  // MARK: - AppStorage Variables
+
+  @Backport.AppStorage(wrappedValue: "", UserDef.kCassettePath.rawValue)
+  private var cassettePath: String
+
+  @Backport.AppStorage(wrappedValue: false, UserDef.kCassetteEnabled.rawValue)
+  private var cassetteEnabled: Bool
+
+  @Backport.AppStorage(wrappedValue: 0, UserDef.kForceCassetteChineseConversion.rawValue)
+  private var forceCassetteChineseConversion: Int
+
+  @Backport.AppStorage(wrappedValue: true, UserDef.kShowTranslatedStrokesInCompositionBuffer.rawValue)
+  private var showTranslatedStrokesInCompositionBuffer: Bool
+
+  @Backport.AppStorage(wrappedValue: true, UserDef.kAutoCompositeWithLongestPossibleCassetteKey.rawValue)
+  private var autoCompositeWithLongestPossibleCassetteKey: Bool
+
+  // MARK: - Main View
+
   private var fdrCassetteDataDefault: String { "" }
-  @State private var tbxCassettePath: String =
-    UserDefaults.standard.string(forKey: UserDef.kCassettePath.rawValue)
-      ?? ""
-  @State private var selCassetteEnabled: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kCassetteEnabled.rawValue)
-  @State private var selForceCassetteChineseConversion: Int = UserDefaults.standard.integer(
-    forKey: UserDef.kForceCassetteChineseConversion.rawValue)
-  @State private var selShowTranslatedStrokesInCompositionBuffer: Bool = UserDefaults.standard.bool(
-    forKey: UserDef.kShowTranslatedStrokesInCompositionBuffer.rawValue)
-  @State private var selAutoCompositeWithLongestPossibleCassetteKey = UserDefaults.standard.bool(
-    forKey: UserDef.kAutoCompositeWithLongestPossibleCassetteKey.rawValue)
 
   private static let dlgOpenFile = NSOpenPanel()
 
@@ -37,8 +46,8 @@ struct VwrPrefPaneCassette: View {
         SSPreferences.Section(bottomDivider: true) {
           Text(LocalizedStringKey("Choose your desired cassette file path. Will be omitted if invalid."))
           HStack {
-            TextField(fdrCassetteDataDefault, text: $tbxCassettePath).disabled(true)
-              .help(tbxCassettePath)
+            TextField(fdrCassetteDataDefault, text: $cassettePath).disabled(true)
+              .help(cassettePath)
             Button {
               Self.dlgOpenFile.title = NSLocalizedString(
                 "Choose your desired cassette file path.", comment: ""
@@ -52,16 +61,15 @@ struct VwrPrefPaneCassette: View {
               Self.dlgOpenFile.allowsOtherFileTypes = true
 
               let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(
-                PrefMgr.shared.cassettePath.expandingTildeInPath)
+                cassettePath.expandingTildeInPath)
 
               if let window = CtlPrefUIShared.sharedWindow {
                 Self.dlgOpenFile.beginSheetModal(for: window) { result in
                   if result == NSApplication.ModalResponse.OK {
                     guard let url = Self.dlgOpenFile.url else { return }
                     if LMMgr.checkCassettePathValidity(url.path) {
-                      PrefMgr.shared.cassettePath = url.path
+                      cassettePath = url.path
                       LMMgr.loadCassetteData()
-                      tbxCassettePath = PrefMgr.shared.cassettePath
                       BookmarkManager.shared.saveBookmark(for: url)
                     } else {
                       IMEApp.buzz()
@@ -83,15 +91,14 @@ struct VwrPrefPaneCassette: View {
             }
             Button {
               LMMgr.resetCassettePath()
-              tbxCassettePath = ""
             } label: {
               Text("×")
             }
           }
           Toggle(
             LocalizedStringKey("Enable cassette mode, suppressing phonabet input"),
-            isOn: $selCassetteEnabled.onChange {
-              if selCassetteEnabled, !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
+            isOn: $cassetteEnabled.onChange {
+              if cassetteEnabled, !LMMgr.checkCassettePathValidity(cassettePath) {
                 if let window = CtlPrefUIShared.sharedWindow {
                   IMEApp.buzz()
                   let alert = NSAlert(error: NSLocalizedString("Path invalid or file access error.", comment: ""))
@@ -99,15 +106,14 @@ struct VwrPrefPaneCassette: View {
                     "Please reconfigure the cassette path to a valid one before enabling this mode.", comment: ""
                   )
                   alert.beginSheetModal(for: window) { _ in
-                    LMMgr.resetCassettePath()
-                    PrefMgr.shared.cassetteEnabled = false
-                    selCassetteEnabled = false
                   }
                 }
+                LMMgr.resetCassettePath()
+                cassetteEnabled = false
               } else {
-                PrefMgr.shared.cassetteEnabled = selCassetteEnabled
                 LMMgr.loadCassetteData()
               }
+              LMMgr.setCassetteEnabled(cassetteEnabled)
             }
           ).controlSize(.small)
           Text(
@@ -123,16 +129,11 @@ struct VwrPrefPaneCassette: View {
         SSPreferences.Section {
           Toggle(
             LocalizedStringKey("Auto-composite when the longest possible key is formed"),
-            isOn: $selAutoCompositeWithLongestPossibleCassetteKey.onChange {
-              PrefMgr.shared.autoCompositeWithLongestPossibleCassetteKey =
-                selAutoCompositeWithLongestPossibleCassetteKey
-            }
+            isOn: $autoCompositeWithLongestPossibleCassetteKey
           )
           Toggle(
             LocalizedStringKey("Show translated strokes in composition buffer"),
-            isOn: $selShowTranslatedStrokesInCompositionBuffer.onChange {
-              PrefMgr.shared.showTranslatedStrokesInCompositionBuffer = selShowTranslatedStrokesInCompositionBuffer
-            }
+            isOn: $showTranslatedStrokesInCompositionBuffer
           )
           Text(
             LocalizedStringKey(
@@ -142,9 +143,7 @@ struct VwrPrefPaneCassette: View {
           .preferenceDescription()
           Picker(
             "",
-            selection: $selForceCassetteChineseConversion.onChange {
-              PrefMgr.shared.forceCassetteChineseConversion = selForceCassetteChineseConversion
-            }
+            selection: $forceCassetteChineseConversion
           ) {
             Text(LocalizedStringKey("Disable forced conversion for cassette outputs")).tag(0)
             Text(LocalizedStringKey("Enforce conversion in both input modes")).tag(1)
