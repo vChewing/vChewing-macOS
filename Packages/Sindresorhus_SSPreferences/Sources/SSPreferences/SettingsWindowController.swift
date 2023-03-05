@@ -5,11 +5,11 @@
 import Cocoa
 
 extension NSWindow.FrameAutosaveName {
-  static let preferences: NSWindow.FrameAutosaveName = "com.sindresorhus.Preferences.FrameAutosaveName"
+  static let settings: NSWindow.FrameAutosaveName = "com.sindresorhus.Preferences.FrameAutosaveName"
 }
 
-public final class PreferencesWindowController: NSWindowController {
-  private let tabViewController = PreferencesTabViewController()
+public final class SettingsWindowController: NSWindowController {
+  private let tabViewController = SettingsTabViewController()
 
   public var isAnimated: Bool {
     get { tabViewController.isAnimated }
@@ -25,14 +25,13 @@ public final class PreferencesWindowController: NSWindowController {
   }
 
   private func updateToolbarVisibility() {
-    window?.toolbar?.isVisible =
-      (hidesToolbarForSingleItem == false)
-        || (tabViewController.preferencePanesCount > 1)
+    window?.toolbar?.isVisible = (hidesToolbarForSingleItem == false)
+      || (tabViewController.settingsPanesCount > 1)
   }
 
   public init(
-    preferencePanes: [PreferencePane],
-    style: SSPreferences.Style = .toolbarItems,
+    preferencePanes: [SettingsPane],
+    style: Settings.Style = .toolbarItems,
     animated: Bool = true,
     hidesToolbarForSingleItem: Bool = true
   ) {
@@ -66,7 +65,7 @@ public final class PreferencesWindowController: NSWindowController {
     }
 
     tabViewController.isAnimated = animated
-    tabViewController.configure(preferencePanes: preferencePanes, style: style)
+    tabViewController.configure(panes: preferencePanes, style: style)
     updateToolbarVisibility()
   }
 
@@ -81,20 +80,20 @@ public final class PreferencesWindowController: NSWindowController {
   }
 
   /**
-   Show the preferences window and brings it to front.
+   Show the settings window and brings it to front.
 
-   If you pass a `SSPreferences.PaneIdentifier`, the window will activate the corresponding tab.
+   If you pass a `Settings.PaneIdentifier`, the window will activate the corresponding tab.
 
-   - Parameter preferencePane: Identifier of the preference pane to display, or `nil` to show the tab that was open when the user last closed the window.
+   - Parameter preferencePane: Identifier of the settings pane to display, or `nil` to show the tab that was open when the user last closed the window.
 
    - Note: Unless you need to open a specific pane, prefer not to pass a parameter at all or `nil`.
 
    - See `close()` to close the window again.
    - See `showWindow(_:)` to show the window without the convenience of activating the app.
    */
-  public func show(preferencePane preferenceIdentifier: SSPreferences.PaneIdentifier? = nil) {
-    if let preferenceIdentifier = preferenceIdentifier {
-      tabViewController.activateTab(preferenceIdentifier: preferenceIdentifier, animated: false)
+  public func show(preferencePane paneIdentifier: Settings.PaneIdentifier? = nil) {
+    if let paneIdentifier {
+      tabViewController.activateTab(paneIdentifier: paneIdentifier, animated: false)
     } else {
       tabViewController.restoreInitialTab()
     }
@@ -106,24 +105,25 @@ public final class PreferencesWindowController: NSWindowController {
 
   private func restoreWindowPosition() {
     guard
-      let window = window,
+      let window,
       let screenContainingWindow = window.screen
     else {
       return
     }
 
-    window.setFrameOrigin(
-      CGPoint(
-        x: screenContainingWindow.visibleFrame.midX - window.frame.width / 2,
-        y: screenContainingWindow.visibleFrame.midY - window.frame.height / 2
-      ))
-    window.setFrameUsingName(.preferences)
-    window.setFrameAutosaveName(.preferences)
+    window.setFrameOrigin(CGPoint(
+      x: screenContainingWindow.visibleFrame.midX - window.frame.width / 2,
+      y: screenContainingWindow.visibleFrame.midY - window.frame.height / 2
+    ))
+    window.setFrameUsingName(.settings)
+    window.setFrameAutosaveName(.settings)
   }
 }
 
-public extension PreferencesWindowController {
-  /// Returns the active pane if it responds to the given action.
+public extension SettingsWindowController {
+  /**
+   Returns the active pane if it responds to the given action.
+   */
   override func supplementalTarget(forAction action: Selector, sender: Any?) -> Any? {
     if let target = super.supplementalTarget(forAction: action, sender: sender) {
       return target
@@ -133,15 +133,11 @@ public extension PreferencesWindowController {
       return nil
     }
 
-    if let target = NSApp.target(forAction: action, to: activeViewController, from: sender) as? NSResponder,
-       target.responds(to: action)
-    {
+    if let target = NSApp.target(forAction: action, to: activeViewController, from: sender) as? NSResponder, target.responds(to: action) {
       return target
     }
 
-    if let target = activeViewController.supplementalTarget(forAction: action, sender: sender) as? NSResponder,
-       target.responds(to: action)
-    {
+    if let target = activeViewController.supplementalTarget(forAction: action, sender: sender) as? NSResponder, target.responds(to: action) {
       return target
     }
 
@@ -150,20 +146,18 @@ public extension PreferencesWindowController {
 }
 
 @available(macOS 10.15, *)
-public extension PreferencesWindowController {
+public extension SettingsWindowController {
   /**
-   Create a preferences window from only SwiftUI-based preference panes.
+   Create a settings window from only SwiftUI-based settings panes.
    */
   convenience init(
-    panes: [PreferencePaneConvertible],
-    style: SSPreferences.Style = .toolbarItems,
+    panes: [SettingsPaneConvertible],
+    style: Settings.Style = .toolbarItems,
     animated: Bool = true,
     hidesToolbarForSingleItem: Bool = true
   ) {
-    let preferencePanes = panes.map { $0.asPreferencePane() }
-
     self.init(
-      preferencePanes: preferencePanes,
+      preferencePanes: panes.map { $0.asPreferencePane() },
       style: style,
       animated: animated,
       hidesToolbarForSingleItem: hidesToolbarForSingleItem

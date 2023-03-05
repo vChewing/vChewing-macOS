@@ -5,9 +5,9 @@
 import SwiftUI
 
 @available(macOS 10.15, *)
-public extension SSPreferences {
+public extension Settings {
   /**
-   Function builder for `Preferences` components used in order to restrict types of child views to be of type `Section`.
+   Function builder for `Settings` components used in order to restrict types of child views to be of type `Section`.
    */
   @resultBuilder
   enum SectionBuilder {
@@ -17,7 +17,7 @@ public extension SSPreferences {
   }
 
   /**
-   A view which holds `Preferences.Section` views and does all the alignment magic similar to `NSGridView` from AppKit.
+   A view which holds `Settings.Section` views and does all the alignment magic similar to `NSGridView` from AppKit.
    */
   struct Container: View {
     private let sectionBuilder: () -> [Section]
@@ -26,14 +26,14 @@ public extension SSPreferences {
     @State private var maximumLabelWidth = 0.0
 
     /**
-     Creates an instance of container component, which handles layout of stacked `Preferences.Section` views.
+     Creates an instance of container component, which handles layout of stacked `Settings.Section` views.
 
      Custom alignment requires content width to be specified beforehand.
 
      - Parameters:
      	- contentWidth: A fixed width of the container's content (excluding paddings).
      	- minimumLabelWidth: A minimum width for labels within this container. By default, it will fit to the largest label.
-     	- builder: A view builder that creates `Preferences.Section`'s of this container.
+     	- builder: A view builder that creates `Settings.Section`'s of this container.
      */
     public init(
       contentWidth: Double,
@@ -47,21 +47,10 @@ public extension SSPreferences {
 
     public var body: some View {
       let sections = sectionBuilder()
-      let labelWidth = max(minimumLabelWidth, maximumLabelWidth)
 
-      return VStack(alignment: .preferenceSectionLabel) {
+      return VStack(alignment: .settingsSectionLabel) {
         ForEach(0 ..< sections.count, id: \.self) { index in
-          if sections[index].label != nil {
-            sections[index].bodyLimited(rightPaneWidth: contentWidth - labelWidth)
-          } else {
-            sections[index]
-              .alignmentGuide(.preferenceSectionLabel) { $0[.leading] + labelWidth }
-          }
-          if sections[index].bottomDivider, index < sections.count - 1 {
-            Divider()
-              .frame(height: 10)
-              .alignmentGuide(.preferenceSectionLabel) { $0[.leading] + labelWidth }
-          }
+          viewForSection(sections, index: index)
         }
       }
       .modifier(Section.LabelWidthModifier(maximumWidth: $maximumLabelWidth))
@@ -69,17 +58,31 @@ public extension SSPreferences {
       .padding(.vertical, 20)
       .padding(.horizontal, 30)
     }
+
+    @ViewBuilder
+    private func viewForSection(_ sections: [Section], index: Int) -> some View {
+      sections[index]
+      if index != sections.count - 1, sections[index].bottomDivider {
+        Divider()
+          // Strangely doesn't work without width being specified. Probably because of custom alignment.
+          .frame(width: contentWidth, height: 20)
+          .alignmentGuide(.settingsSectionLabel) { $0[.leading] + max(minimumLabelWidth, maximumLabelWidth) }
+      }
+    }
   }
 }
 
-/// Extension with custom alignment guide for section title labels.
+/**
+ Extension with custom alignment guide for section title labels.
+ */
 @available(macOS 10.15, *)
 extension HorizontalAlignment {
-  private enum PreferenceSectionLabelAlignment: AlignmentID {
+  private enum SettingsSectionLabelAlignment: AlignmentID {
+    // swiftlint:disable:next no_cgfloat
     static func defaultValue(in context: ViewDimensions) -> CGFloat {
       context[HorizontalAlignment.leading]
     }
   }
 
-  static let preferenceSectionLabel = HorizontalAlignment(PreferenceSectionLabelAlignment.self)
+  static let settingsSectionLabel = HorizontalAlignment(SettingsSectionLabelAlignment.self)
 }
