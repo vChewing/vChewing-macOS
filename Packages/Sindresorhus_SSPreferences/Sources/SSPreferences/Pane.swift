@@ -90,8 +90,9 @@ public extension View {
   /**
    Applies font and color for a label used for describing a setting.
    */
-  func preferenceDescription() -> some View {
-    font(.system(size: 11.0))
+  func preferenceDescription(maxWidth: CGFloat? = nil) -> some View {
+    controlSize(.small)
+      .frame(maxWidth: maxWidth, alignment: .leading)
       // TODO: Use `.foregroundStyle` when targeting macOS 12.
       .foregroundColor(.secondary)
   }
