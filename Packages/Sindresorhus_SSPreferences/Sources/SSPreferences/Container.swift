@@ -50,24 +50,26 @@ public extension Settings {
 
       return VStack(alignment: .settingsSectionLabel) {
         ForEach(0 ..< sections.count, id: \.self) { index in
-          viewForSection(sections, index: index)
+          let labelWidth = max(minimumLabelWidth, maximumLabelWidth)
+          if sections[index].label != nil {
+            sections[index]
+              .frame(width: contentWidth, alignment: .leading)
+          } else {
+            sections[index].content
+              .alignmentGuide(.settingsSectionLabel) { $0[.leading] + labelWidth }
+              .frame(width: contentWidth, alignment: .leading)
+          }
+          if sections[index].bottomDivider, index < sections.count - 1 {
+            Divider()
+              .frame(height: 10)
+              .alignmentGuide(.settingsSectionLabel) { $0[.leading] + labelWidth }
+          }
         }
       }
       .modifier(Section.LabelWidthModifier(maximumWidth: $maximumLabelWidth))
       .frame(width: contentWidth, alignment: .leading)
       .padding(.vertical, 20)
       .padding(.horizontal, 30)
-    }
-
-    @ViewBuilder
-    private func viewForSection(_ sections: [Section], index: Int) -> some View {
-      sections[index]
-      if index != sections.count - 1, sections[index].bottomDivider {
-        Divider()
-          // Strangely doesn't work without width being specified. Probably because of custom alignment.
-          .frame(width: contentWidth, height: 20)
-          .alignmentGuide(.settingsSectionLabel) { $0[.leading] + max(minimumLabelWidth, maximumLabelWidth) }
-      }
     }
   }
 }

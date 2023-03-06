@@ -54,7 +54,7 @@ public extension Settings {
       }
     }
 
-    public let label: AnyView
+    public private(set) var label: AnyView?
     public let content: AnyView
     public let bottomDivider: Bool
     public let verticalAlignment: VerticalAlignment
@@ -77,6 +77,27 @@ public extension Settings {
       self.label = label()
         .overlay(LabelOverlay())
         .eraseToAnyView() // TODO: Remove use of `AnyView`.
+      self.bottomDivider = bottomDivider
+      self.verticalAlignment = verticalAlignment
+      let stack = VStack(alignment: .leading) { content() }
+      self.content = stack.eraseToAnyView()
+    }
+
+    /**
+     A section is responsible for controlling a single setting without title label.
+
+     - Parameters:
+       - bottomDivider: Whether to place a `Divider` after the section content. Default is `false`.
+       - verticalAlignement: The vertical alignment of the section content.
+       - label: A view describing the setting handled by this section.
+       - content: A content view.
+     */
+    public init(
+      bottomDivider: Bool = false,
+      verticalAlignment: VerticalAlignment = .firstTextBaseline,
+      @ViewBuilder content: @escaping () -> some View
+    ) {
+      label = nil
       self.bottomDivider = bottomDivider
       self.verticalAlignment = verticalAlignment
       let stack = VStack(alignment: .leading) { content() }
@@ -115,8 +136,9 @@ public extension Settings {
 
     public var body: some View {
       HStack(alignment: verticalAlignment) {
-        label
-          .alignmentGuide(.settingsSectionLabel) { $0[.trailing] }
+        if let label = label {
+          label.alignmentGuide(.settingsSectionLabel) { $0[.trailing] }
+        }
         content
         Spacer()
       }
