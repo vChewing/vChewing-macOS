@@ -371,9 +371,16 @@ struct VwrCandidateTDK_Previews: PreviewProvider {
   @State static var tooltip = "📼"
   @State static var oldOS: Bool = true
 
+  static var testCandidatesConverted: [([String], String)] {
+    testCandidates.map { candidate in
+      let firstValue: [String] = .init(repeating: "", count: candidate.count)
+      return (firstValue, candidate)
+    }
+  }
+
   static var thePoolX: CandidatePool {
     var result = CandidatePool(
-      candidates: testCandidates, lines: 4,
+      candidates: testCandidatesConverted, lines: 4,
       selectionKeys: "123456", layout: .horizontal
     )
     result.reverseLookupResult = Self.reverseLookupResult
@@ -384,7 +391,7 @@ struct VwrCandidateTDK_Previews: PreviewProvider {
 
   static var thePoolXS: CandidatePool {
     var result = CandidatePool(
-      candidates: testCandidates, lines: 1,
+      candidates: testCandidatesConverted, lines: 1,
       selectionKeys: "123456", layout: .horizontal
     )
     result.reverseLookupResult = Self.reverseLookupResult
@@ -395,7 +402,7 @@ struct VwrCandidateTDK_Previews: PreviewProvider {
 
   static var thePoolY: CandidatePool {
     var result = CandidatePool(
-      candidates: testCandidates, lines: 4,
+      candidates: testCandidatesConverted, lines: 4,
       selectionKeys: "123456", layout: .vertical
     )
     result.reverseLookupResult = Self.reverseLookupResult
@@ -407,7 +414,7 @@ struct VwrCandidateTDK_Previews: PreviewProvider {
 
   static var thePoolYS: CandidatePool {
     var result = CandidatePool(
-      candidates: testCandidates, lines: 1,
+      candidates: testCandidatesConverted, lines: 1,
       selectionKeys: "123456", layout: .vertical
     )
     result.reverseLookupResult = Self.reverseLookupResult

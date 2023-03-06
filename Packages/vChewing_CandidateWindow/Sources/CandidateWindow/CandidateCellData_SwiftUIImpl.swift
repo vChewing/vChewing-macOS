@@ -34,7 +34,7 @@ public extension CandidateCellData {
           themeColor.cornerRadius(6)
           VStack(spacing: 0) {
             HStack(spacing: 4) {
-              Text(verbatim: key).font(.custom("Menlo", size: fontSizeKey))
+              Text(verbatim: selectionKey).font(.custom("Menlo", size: fontSizeKey))
                 .foregroundColor(Color.white.opacity(0.8)).lineLimit(1)
               Text(verbatim: displayedText)
                 .font(.init(CTFontCreateUIFontForLanguage(.system, fontSizeCandidate, locale as CFString)!))
@@ -44,7 +44,7 @@ public extension CandidateCellData {
         } else {
           VStack(spacing: 0) {
             HStack(spacing: 4) {
-              Text(verbatim: key).font(.custom("Menlo", size: fontSizeKey))
+              Text(verbatim: selectionKey).font(.custom("Menlo", size: fontSizeKey))
                 .foregroundColor(Color.secondary).lineLimit(1)
               Text(verbatim: displayedText)
                 .font(.init(CTFontCreateUIFontForLanguage(.system, fontSizeCandidate, locale as CFString)!))
@@ -66,7 +66,7 @@ public extension CandidateCellData {
         }
         VStack(spacing: 0) {
           HStack(spacing: 4) {
-            Text(verbatim: key).font(.system(size: fontSizeKey).monospaced())
+            Text(verbatim: selectionKey).font(.system(size: fontSizeKey).monospaced())
               .foregroundColor(.init(nsColor: fontColorKey)).lineLimit(1)
             Text(verbatim: displayedText)
               .font(.init(CTFontCreateUIFontForLanguage(.system, fontSizeCandidate, locale as CFString)!))
