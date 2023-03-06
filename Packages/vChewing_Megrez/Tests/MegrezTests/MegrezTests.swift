@@ -537,5 +537,13 @@ final class MegrezTests: XCTestCase {
     let newResult = compositor.walk().0.values.joined()
     print(newResult)
     XCTAssertEqual([oldResult, newResult], ["年中獎金", "年終獎金"])
+    compositor.cursor = 4
+    compositor.dropKey(direction: .rear)
+    compositor.dropKey(direction: .rear)
+    theLM.trim(key: "nian2zhong1", value: "年終")
+    compositor.update(updateExisting: true)
+    let newResult2 = compositor.walk().0.values
+    print(newResult2)
+    XCTAssertEqual(newResult2, ["年", "中"])
   }
 }
