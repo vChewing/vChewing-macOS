@@ -18,8 +18,9 @@ public class CandidateCellData: Hashable {
   public var visualDimension: CGSize = .zero
   public var locale = ""
   public static var unifiedSize: Double = 16
-  public var key: String
+  public var selectionKey: String
   public var displayedText: String
+  public var spanLength: Int
   public var size: Double { Self.unifiedSize }
   public var isHighlighted: Bool = false
   public var whichLine: Int = 0
@@ -38,18 +39,22 @@ public class CandidateCellData: Hashable {
       : .init(red: 142 / 255, green: 142 / 255, blue: 147 / 255, alpha: 1)
   }
 
-  public init(key: String, displayedText: String, isSelected: Bool = false) {
-    self.key = key
+  public init(
+    key: String, displayedText: String,
+    spanLength spanningLength: Int? = nil, isSelected: Bool = false
+  ) {
+    selectionKey = key
     self.displayedText = displayedText
+    spanLength = max(spanningLength ?? displayedText.count, 1)
     isHighlighted = isSelected
   }
 
   public static func == (lhs: CandidateCellData, rhs: CandidateCellData) -> Bool {
-    lhs.key == rhs.key && lhs.displayedText == rhs.displayedText
+    lhs.selectionKey == rhs.selectionKey && lhs.displayedText == rhs.displayedText
   }
 
   public func hash(into hasher: inout Hasher) {
-    hasher.combine(key)
+    hasher.combine(selectionKey)
     hasher.combine(displayedText)
   }
 
@@ -150,7 +155,7 @@ public class CandidateCellData: Hashable {
       .paragraphStyle: Self.sharedParagraphStyle,
       .foregroundColor: fontColorKey,
     ]
-    let attrStrKey = NSAttributedString(string: key, attributes: attrKey)
+    let attrStrKey = NSAttributedString(string: selectionKey, attributes: attrKey)
     return attrStrKey
   }
 
