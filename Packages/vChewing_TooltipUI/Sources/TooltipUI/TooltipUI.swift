@@ -36,10 +36,14 @@ public class TooltipUI: NSWindowController {
     )
     panel.level = NSWindow.Level(Int(max(CGShieldingWindowLevel(), kCGPopUpMenuWindowLevel)) + 2)
     panel.hasShadow = true
-    panel.backgroundColor = NSColor.controlBackgroundColor
+    panel.backgroundColor = NSColor.clear
+    panel.isOpaque = false
     panel.isMovable = false
+    panel.contentView?.wantsLayer = true
+    panel.contentView?.layer?.cornerRadius = 7
+    panel.contentView?.layer?.backgroundColor = NSColor.controlBackgroundColor.cgColor
     messageText = NSAttributedTooltipTextView()
-    messageText.backgroundColor = NSColor.controlBackgroundColor
+    messageText.backgroundColor = NSColor.clear
     messageText.textColor = NSColor.textColor
     messageText.needsDisplay = true
     panel.contentView?.addSubview(messageText)
@@ -118,8 +122,7 @@ public class TooltipUI: NSWindowController {
         textColor = colorInterchange
       }
     }
-    window?.backgroundColor = backgroundColor
-    messageText.backgroundColor = backgroundColor
+    window?.contentView?.layer?.backgroundColor = backgroundColor.cgColor
     messageText.textColor = textColor
   }
 
