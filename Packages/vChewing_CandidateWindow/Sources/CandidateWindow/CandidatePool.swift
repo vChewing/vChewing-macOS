@@ -77,7 +77,7 @@ public struct CandidatePool {
   ///   - direction: 橫向排列還是縱向排列（預設情況下是縱向）。
   ///   - locale: 區域編碼。例：「zh-Hans」或「zh-Hant」。
   public init(
-    candidates: [String], lines: Int = 3, selectionKeys: String = "123456789",
+    candidates: [([String], String)], lines: Int = 3, selectionKeys: String = "123456789",
     layout: LayoutOrientation = .vertical, locale: String = ""
   ) {
     self.layout = layout
@@ -86,7 +86,9 @@ public struct CandidatePool {
     shitCell = CandidateCellData(key: " ", displayedText: "💩", isSelected: false)
     blankCell.locale = locale
     self.selectionKeys = selectionKeys.isEmpty ? "123456789" : selectionKeys
-    var allCandidates = candidates.map { CandidateCellData(key: " ", displayedText: $0) }
+    var allCandidates = candidates.map {
+      CandidateCellData(key: " ", displayedText: $0.1, spanLength: $0.0.count)
+    }
     if allCandidates.isEmpty { allCandidates.append(blankCell) }
     candidateDataAll = allCandidates
     var currentColumn: [CandidateCellData] = []
@@ -203,12 +205,12 @@ public extension CandidatePool {
     for (i, candidateColumn) in candidateLines.enumerated() {
       if i != currentLineNumber {
         candidateColumn.forEach {
-          $0.key = " "
+          $0.selectionKey = " "
         }
       } else {
         for (i, neta) in candidateColumn.enumerated() {
-          if neta.key.isEmpty { continue }
-          neta.key = selectionKeys.map(\.description)[i]
+          if neta.selectionKey.isEmpty { continue }
+          neta.selectionKey = selectionKeys.map(\.description)[i]
         }
       }
     }

@@ -19,8 +19,17 @@ final class CandidatePoolTests: XCTestCase {
     "嗯", "哼", "啊",
   ]
 
+  var testCandidatesConverted: [([String], String)] {
+    testCandidates.map { candidate in
+      let firstValue: [String] = .init(repeating: "", count: candidate.count)
+      return (firstValue, candidate)
+    }
+  }
+
   func testPoolHorizontal() throws {
-    let pool = CandidatePool(candidates: testCandidates, selectionKeys: "123456", layout: .horizontal)
+    let pool = CandidatePool(
+      candidates: testCandidatesConverted, selectionKeys: "123456", layout: .horizontal
+    )
     var strOutput = ""
     pool.candidateLines.forEach {
       $0.forEach {
@@ -33,7 +42,9 @@ final class CandidatePoolTests: XCTestCase {
   }
 
   func testPoolVertical() throws {
-    let pool = CandidatePool(candidates: testCandidates, selectionKeys: "123456", layout: .vertical)
+    let pool = CandidatePool(
+      candidates: testCandidatesConverted, selectionKeys: "123456", layout: .vertical
+    )
     var strOutput = ""
     pool.candidateLines.forEach {
       $0.forEach {
