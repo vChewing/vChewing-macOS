@@ -40,7 +40,10 @@ class SimpleLM: LangModelProtocol {
   func trim(key: String, value: String) {
     guard var arr = mutDatabase[key] else { return }
     arr = arr.compactMap { $0.value == value ? nil : $0 }
-    guard !arr.isEmpty else { return }
+    guard !arr.isEmpty else {
+      mutDatabase[key] = nil
+      return
+    }
     mutDatabase[key] = arr
   }
 }

@@ -24,10 +24,7 @@ extension Megrez.Compositor {
 
     /// 清除該幅位單元的全部的節點，且重設最長節點長度為 0，然後再在節點陣列內預留空位。
     public func clear() {
-      nodes.removeAll()
-      for _ in 0 ..< maxSpanLength {
-        nodes.append(nil)
-      }
+      nodes = .init(repeating: nil, count: maxSpanLength)
       maxLength = 0
     }
 
@@ -43,6 +40,18 @@ extension Megrez.Compositor {
       return true
     }
 
+    /// 丟掉任何與給定節點完全雷同的節點。
+    /// - Remark: Swift 不像 C# 那樣有容量鎖定型陣列，
+    /// 對某個位置的內容的刪除行為都可能會導致其它內容錯位、繼發其它不可知故障。
+    /// 於是就提供了這個專門的工具函式。
+    /// - Parameter node: 要參照的節點。
+    public func nullify(node givenNode: Node) {
+      nodes.enumerated().forEach { index, theNode in
+        guard theNode == givenNode else { return }
+        nodes[index] = nil
+      }
+    }
+
     /// 丟掉任何不小於給定幅位長度的節點。
     /// - Parameter length: 給定的幅位長度。
     /// - Returns: 該操作是否成功執行。
@@ -51,12 +60,14 @@ extension Megrez.Compositor {
         return false
       }
       for i in length ... maxSpanLength {
+        guard (0 ..< nodes.count).contains(i - 1) else { continue } // 防呆
         nodes[i - 1] = nil
       }
       maxLength = 0
       guard length > 1 else { return false }
       let maxR = length - 2
       for i in 0 ... maxR {
+        guard (0 ..< nodes.count).contains(maxR - i) else { continue } // 防呆
         if nodes[maxR - i] == nil { continue }
         maxLength = maxR - i + 1
         break

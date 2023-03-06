@@ -291,7 +291,7 @@ extension Megrez.Compositor {
           // 自動銷毀無效的節點。
           if unigrams.isEmpty {
             if theNode.keyArray.count == 1 { continue }
-            spans[position].nodes.removeAll { $0 == theNode }
+            spans[position].nullify(node: theNode)
           } else {
             theNode.syncingUnigrams(from: unigrams)
           }
