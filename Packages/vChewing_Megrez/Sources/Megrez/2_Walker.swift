@@ -24,7 +24,7 @@ public extension Megrez.Compositor {
     }
 
     for (i, span) in spans.enumerated() {
-      for j in 1 ... span.maxLength {
+      for j in 1 ... max(span.maxLength, 1) {
         if let theNode = span.nodeOf(length: j) {
           vertexSpans[i].append(.init(node: theNode))
         }
