@@ -168,10 +168,14 @@ extension VwrCandidateTDK {
           } label: {
             Text("↓ " + cell.displayedText)
           }
-          Button {
-            didRightClickCandidateAt(cell.index, action: .toFilter)
-          } label: {
-            Text("✖︎ " + cell.displayedText)
+          if thePool.candidateDataAll.count > cell.index,
+             thePool.candidateDataAll[cell.index].spanLength > 1
+          {
+            Button {
+              didRightClickCandidateAt(cell.index, action: .toFilter)
+            } label: {
+              Text("✖︎ " + cell.displayedText)
+            }
           }
         }
       }
