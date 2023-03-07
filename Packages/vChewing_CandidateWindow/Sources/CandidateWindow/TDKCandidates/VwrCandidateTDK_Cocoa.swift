@@ -339,25 +339,29 @@ private extension VwrCandidateTDKCocoa {
         action: #selector(menuActionOfBoosting(_:)),
         keyEquivalent: ""
       )
+      boostMenuItem.target = self
+      newMenu.addItem(boostMenuItem)
 
       let nerfMenuItem = NSMenuItem(
         title: "↓ \(cellData.displayedText)",
         action: #selector(menuActionOfNerfing(_:)),
         keyEquivalent: ""
       )
-
-      let filterMenuItem = NSMenuItem(
-        title: "✖︎ \(cellData.displayedText)",
-        action: #selector(menuActionOfFiltering(_:)),
-        keyEquivalent: ""
-      )
-
-      boostMenuItem.target = self
       nerfMenuItem.target = self
-      filterMenuItem.target = self
-      newMenu.addItem(boostMenuItem)
       newMenu.addItem(nerfMenuItem)
-      newMenu.addItem(filterMenuItem)
+
+      if let dataAll = (target as? VwrCandidateTDKCocoa)?.thePool.candidateDataAll,
+         dataAll.count > cellData.index, dataAll[cellData.index].spanLength > 1
+      {
+        let filterMenuItem = NSMenuItem(
+          title: "✖︎ \(cellData.displayedText)",
+          action: #selector(menuActionOfFiltering(_:)),
+          keyEquivalent: ""
+        )
+        filterMenuItem.target = self
+        newMenu.addItem(filterMenuItem)
+      }
+
       theMenu = newMenu
     }
 
