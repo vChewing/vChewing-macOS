@@ -7,10 +7,10 @@ extension Megrez.Compositor {
   /// 幅位單元乃指一組共享起點的節點。
   public class SpanUnit {
     /// 節點陣列。每個位置上的節點可能是 nil。
-    public var nodes: [Node?] = []
+    public var nodes: [Int: Node] = [:]
     /// 該幅位單元內的所有節點當中持有最長幅位的節點長度。
     /// 該變數受該幅位的自身操作函式而被動更新。
-    public private(set) var maxLength = 0
+    public var maxLength: Int { nodes.keys.max() ?? 0 }
 
     /// （該變數為捷徑，代傳 Megrez.Compositor.maxSpanLength。）
     private var maxSpanLength: Int { Megrez.Compositor.maxSpanLength }
@@ -24,19 +24,15 @@ extension Megrez.Compositor {
 
     /// 清除該幅位單元的全部的節點，且重設最長節點長度為 0，然後再在節點陣列內預留空位。
     public func clear() {
-      nodes = .init(repeating: nil, count: maxSpanLength)
-      maxLength = 0
+      nodes.removeAll()
     }
 
     /// 往該幅位塞入一個節點。
     /// - Parameter node: 要塞入的節點。
     /// - Returns: 該操作是否成功執行。
     @discardableResult public func append(node: Node) -> Bool {
-      guard allowedLengths.contains(node.spanLength) else {
-        return false
-      }
-      nodes[node.spanLength - 1] = node
-      maxLength = max(maxLength, node.spanLength)
+      guard allowedLengths.contains(node.spanLength) else { return false }
+      nodes[node.spanLength] = node
       return true
     }
 
@@ -46,32 +42,17 @@ extension Megrez.Compositor {
     /// 於是就提供了這個專門的工具函式。
     /// - Parameter node: 要參照的節點。
     public func nullify(node givenNode: Node) {
-      nodes.enumerated().forEach { index, theNode in
-        guard theNode == givenNode else { return }
-        nodes[index] = nil
-      }
+      let spanLength = givenNode.spanLength
+      nodes[spanLength] = nil
     }
 
     /// 丟掉任何不小於給定幅位長度的節點。
     /// - Parameter length: 給定的幅位長度。
     /// - Returns: 該操作是否成功執行。
     @discardableResult public func dropNodesOfOrBeyond(length: Int) -> Bool {
-      guard allowedLengths.contains(length) else {
-        return false
-      }
-      for i in length ... maxSpanLength {
-        guard (0 ..< nodes.count).contains(i - 1) else { continue } // 防呆
-        nodes[i - 1] = nil
-      }
-      maxLength = 0
-      guard length > 1 else { return false }
-      let maxR = length - 2
-      for i in 0 ... maxR {
-        guard (0 ..< nodes.count).contains(maxR - i) else { continue } // 防呆
-        if nodes[maxR - i] == nil { continue }
-        maxLength = maxR - i + 1
-        break
-      }
+      guard allowedLengths.contains(length) else { return false }
+      let length = min(length, maxSpanLength)
+      (length ... maxSpanLength).forEach { nodes[$0] = nil }
       return true
     }
 
@@ -80,7 +61,7 @@ extension Megrez.Compositor {
     /// - Returns: 查詢結果。
     public func nodeOf(length: Int) -> Node? {
       guard allowedLengths.contains(length) else { return nil }
-      return nodes[length - 1]
+      return nodes[length]
     }
   }
 
