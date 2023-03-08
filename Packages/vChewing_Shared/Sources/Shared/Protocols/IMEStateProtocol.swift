@@ -12,7 +12,7 @@ import Cocoa
 public protocol IMEStateProtocol {
   var type: StateType { get }
   var data: IMEStateDataProtocol { get set }
-  var candidates: [([String], String)] { get set }
+  var candidates: [(keyArray: [String], value: String)] { get set }
   var hasComposition: Bool { get }
   var isCandidateContainer: Bool { get }
   var displayedText: String { get }
@@ -45,7 +45,7 @@ public protocol IMEStateDataProtocol {
   var displayTextSegments: [String] { get set }
   var isFilterable: Bool { get }
   var isMarkedLengthValid: Bool { get }
-  var candidates: [([String], String)] { get set }
+  var candidates: [(keyArray: [String], value: String)] { get set }
   var displayedText: String { get set }
   var displayedTextConverted: String { get }
   var tooltipBackupForInputting: String { get set }
@@ -54,9 +54,7 @@ public protocol IMEStateDataProtocol {
   var attributedStringNormal: NSAttributedString { get }
   var attributedStringMarking: NSAttributedString { get }
   var attributedStringPlaceholder: NSAttributedString { get }
-  var userPhraseKVPair: (String, String) { get }
-  var userPhraseDumped: String { get }
-  var userPhraseDumpedConverted: String { get }
+  var userPhraseKVPair: (keyArray: [String], value: String) { get }
   var tooltipColorState: TooltipColorState { get set }
   mutating func updateTooltipForMarking()
 }

@@ -78,7 +78,7 @@ public struct IMEStateData: IMEStateDataProtocol {
   public var markedTargetExists: Bool {
     let pair = userPhraseKVPair
     return LMMgr.checkIfUserPhraseExist(
-      userPhrase: pair.1, mode: IMEApp.currentInputMode, key: pair.0
+      userPhrase: pair.value, mode: IMEApp.currentInputMode, keyArray: pair.keyArray
     )
   }
 
@@ -90,7 +90,7 @@ public struct IMEStateData: IMEStateDataProtocol {
 
   public var reading: String = ""
   public var markedReadings = [String]()
-  public var candidates = [([String], String)]()
+  public var candidates = [(keyArray: [String], value: String)]()
   public var textToCommit: String = ""
   public var tooltip: String = ""
   public var tooltipDuration: Double = 1.0
@@ -197,24 +197,10 @@ public extension IMEStateData {
     return arrOutput.joined(separator: "\u{A0}")
   }
 
-  var userPhraseKVPair: (String, String) {
-    let key = markedReadings.joined(separator: InputHandler.keySeparator)
+  var userPhraseKVPair: (keyArray: [String], value: String) {
+    let key = markedReadings
     let value = displayedText.map(\.description)[markedRange].joined()
     return (key, value)
-  }
-
-  var userPhraseDumped: String {
-    let pair = userPhraseKVPair
-    let nerfedScore = SessionCtl.areWeNerfing && markedTargetExists ? " -114.514" : ""
-    return "\(pair.1) \(pair.0)\(nerfedScore)"
-  }
-
-  var userPhraseDumpedConverted: String {
-    let pair = userPhraseKVPair
-    let text = ChineseConverter.crossConvert(pair.1)
-    let nerfedScore = SessionCtl.areWeNerfing && markedTargetExists ? " -114.514" : ""
-    let convertedMark = "#𝙃𝙪𝙢𝙖𝙣𝘾𝙝𝙚𝙘𝙠𝙍𝙚𝙦𝙪𝙞𝙧𝙚𝙙"
-    return "\(text) \(pair.0)\(nerfedScore) \(convertedMark)"
   }
 
   mutating func updateTooltipForMarking() {
