@@ -170,6 +170,12 @@ public class SessionCtl: IMKInputController {
   }
 
   /// 對用以設定委任物件的控制器型別進行初期化處理。
+  override public init() {
+    super.init()
+    construct(client: client())
+  }
+
+  /// 對用以設定委任物件的控制器型別進行初期化處理。
   ///
   /// inputClient 參數是客體應用側存在的用以藉由 IMKServer 伺服器向輸入法傳訊的物件。該物件始終遵守 IMKTextInput 協定。
   /// - Remark: 所有由委任物件實裝的「被協定要求實裝的方法」都會有一個用來接受客體物件的參數。在 IMKInputController 內部的型別不需要接受這個參數，因為已經有「client()」這個參數存在了。
@@ -179,6 +185,12 @@ public class SessionCtl: IMKInputController {
   ///   - inputClient: 用以接受輸入的客體應用物件
   override public init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
     super.init(server: server, delegate: delegate, client: inputClient)
+    let theClient = inputClient as? (IMKTextInput & NSObjectProtocol)
+    construct(client: theClient)
+  }
+
+  /// 所有建構子都會執行的共用部分，在 super.init() 之後執行。
+  private func construct(client theClient: (IMKTextInput & NSObjectProtocol)? = nil) {
     DispatchQueue.main.async { [self] in
       inputHandler = InputHandler(
         lm: LMMgr.currentLM, uom: LMMgr.currentUOM, pref: PrefMgr.shared
@@ -186,7 +198,8 @@ public class SessionCtl: IMKInputController {
       inputHandler?.delegate = self
       syncBaseLMPrefs()
       // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
-      activateServer(inputClient)
+      let maybeClient = theClient ?? client()
+      activateServer(maybeClient)
       // GCD 會觸發 didSet，所以不用擔心。
       inputMode = .init(rawValue: PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
     }
