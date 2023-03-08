@@ -174,7 +174,7 @@ public extension IMEState {
     return result
   }
 
-  var candidates: [([String], String)] {
+  var candidates: [(keyArray: [String], value: String)] {
     get { data.candidates }
     set { data.candidates = newValue }
   }
