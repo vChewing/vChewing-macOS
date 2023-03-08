@@ -39,6 +39,7 @@ public struct ShiftKeyUpChecker {
   private var shiftIsBeingPressed = false
 
   private mutating func checkModifierKeyUp(event: NSEvent) -> Bool {
+    guard checkKeyCode.contains(event.keyCode) else { return false }
     if event.type == .flagsChanged,
        event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .init(rawValue: 0),
        Date() - lastTime <= delayInterval, shiftIsBeingPressed
