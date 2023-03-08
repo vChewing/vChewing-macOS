@@ -34,7 +34,7 @@ public protocol InputHandlerProtocol {
   func generateStateOfInputting(sansReading: Bool) -> IMEStateProtocol
   func generateStateOfAssociates(withPair pair: Megrez.Compositor.KeyValuePaired) -> IMEStateProtocol
   func consolidateNode(
-    candidate: ([String], String), respectCursorPushing: Bool, preConsolidate: Bool, skipObservation: Bool
+    candidate: (keyArray: [String], value: String), respectCursorPushing: Bool, preConsolidate: Bool, skipObservation: Bool
   )
   func updateUnigramData() -> Bool
 }
@@ -44,7 +44,7 @@ extension InputHandlerProtocol {
     generateStateOfInputting(sansReading: sansReading)
   }
 
-  func consolidateNode(candidate: ([String], String), respectCursorPushing: Bool, preConsolidate: Bool) {
+  func consolidateNode(candidate: (keyArray: [String], value: String), respectCursorPushing: Bool, preConsolidate: Bool) {
     consolidateNode(
       candidate: candidate, respectCursorPushing: respectCursorPushing,
       preConsolidate: preConsolidate, skipObservation: false
@@ -196,8 +196,8 @@ public class InputHandler: InputHandlerProtocol {
   /// - Parameter key: 給定的聯想詞的開頭字。
   /// - Returns: 抓取到的聯想詞陣列。
   /// 不會是 nil，但那些負責接收結果的函式會對空白陣列結果做出正確的處理。
-  func generateArrayOfAssociates(withPair pair: Megrez.Compositor.KeyValuePaired) -> [([String], String)] {
-    var arrResult: [([String], String)] = []
+  func generateArrayOfAssociates(withPair pair: Megrez.Compositor.KeyValuePaired) -> [(keyArray: [String], value: String)] {
+    var arrResult: [(keyArray: [String], value: String)] = []
     if currentLM.hasAssociatedPhrasesFor(pair: pair) {
       arrResult = currentLM.associatedPhrasesFor(pair: pair).map { ([""], $0) }
     }
@@ -299,10 +299,12 @@ public class InputHandler: InputHandlerProtocol {
   ///   - preConsolidate: 在固化節點之前，先鞏固上下文。該選項可能會破壞在內文組字區內就地輪替候選字詞時的體驗。
   ///   - skipObservation: 不要讓半衰記憶模組對此做出觀察。
   public func consolidateNode(
-    candidate: ([String], String), respectCursorPushing: Bool = true,
+    candidate: (keyArray: [String], value: String), respectCursorPushing: Bool = true,
     preConsolidate: Bool = false, skipObservation: Bool = false
   ) {
-    let theCandidate: Megrez.Compositor.KeyValuePaired = .init(keyArray: candidate.0, value: candidate.1)
+    let theCandidate: Megrez.Compositor.KeyValuePaired = .init(
+      keyArray: candidate.keyArray, value: candidate.value
+    )
 
     /// 必須先鞏固當前組字器游標上下文、以消滅意料之外的影響，但在內文組字區內就地輪替候選字詞時除外。
     if preConsolidate { consolidateCursorContext(with: theCandidate) }
@@ -344,7 +346,7 @@ public class InputHandler: InputHandlerProtocol {
   }
 
   /// 獲取候選字詞（包含讀音）陣列資料內容。
-  func generateArrayOfCandidates(fixOrder: Bool = true) -> [([String], String)] {
+  func generateArrayOfCandidates(fixOrder: Bool = true) -> [(keyArray: [String], value: String)] {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
     var arrCandidates: [Megrez.Compositor.KeyValuePaired] = {

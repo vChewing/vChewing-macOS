@@ -104,7 +104,7 @@ public extension IMEState {
     return result
   }
 
-  static func ofAssociates(candidates: [([String], String)]) -> IMEState {
+  static func ofAssociates(candidates: [(keyArray: [String], value: String)]) -> IMEState {
     var result = IMEState(type: .ofAssociates)
     result.candidates = candidates
     return result
@@ -129,7 +129,7 @@ public extension IMEState {
     return result
   }
 
-  static func ofCandidates(candidates: [([String], String)], displayTextSegments: [String], cursor: Int)
+  static func ofCandidates(candidates: [(keyArray: [String], value: String)], displayTextSegments: [String], cursor: Int)
     -> IMEState
   {
     var result = IMEState(displayTextSegments: displayTextSegments, cursor: cursor)

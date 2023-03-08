@@ -275,8 +275,8 @@ extension InputHandler {
     case 2...: delegate.switchState(candidateState)
     case 1:
       clear() // 這句不要砍，因為下文可能會回呼 candidateState。
-      if let candidateToCommit: ([String], String) = candidateState.candidates.first, !candidateToCommit.1.isEmpty {
-        delegate.switchState(IMEState.ofCommitting(textToCommit: candidateToCommit.1))
+      if let strToCommit = candidateState.candidates.first?.value, !strToCommit.isEmpty {
+        delegate.switchState(IMEState.ofCommitting(textToCommit: strToCommit))
       } else {
         delegate.switchState(candidateState)
       }
@@ -813,7 +813,7 @@ extension InputHandler {
     var newState = generateStateOfInputting()
     let locID = Bundle.main.preferredLocalizations[0]
     let newTooltip = NSMutableString()
-    newTooltip.insert("　" + candidates[newIndex].1, at: 0)
+    newTooltip.insert("　" + candidates[newIndex].value, at: 0)
     if #available(macOS 10.13, *), isContextVertical(), locID != "en" {
       newTooltip.insert((newIndex + 1).i18n(loc: locID) + "・" + candidates.count.i18n(loc: locID), at: 0)
     } else {

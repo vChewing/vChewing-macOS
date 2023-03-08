@@ -95,16 +95,15 @@ extension SessionCtl: CtlCandidateDelegate {
     PrefMgr.shared.useIMKCandidateWindow ? "123456789" : PrefMgr.shared.candidateKeys
   }
 
-  public func candidatePairs(conv: Bool = false) -> [([String], String)] {
+  public func candidatePairs(conv: Bool = false) -> [(keyArray: [String], value: String)] {
     if !state.isCandidateContainer || state.candidates.isEmpty { return [] }
-    if !conv || PrefMgr.shared.cns11643Enabled || state.candidates[0].0.joined().contains("_punctuation") {
+    if !conv || PrefMgr.shared.cns11643Enabled || state.candidates[0].keyArray.joined().contains("_punctuation") {
       return state.candidates
     }
-    let convertedCandidates: [([String], String)] = state.candidates.map { theCandidatePair -> ([String], String) in
-      let theCandidate = theCandidatePair.1
-      let theConverted = ChineseConverter.kanjiConversionIfRequired(theCandidate)
-      let result = (theCandidate == theConverted) ? theCandidate : "\(theConverted)(\(theCandidate))"
-      return (theCandidatePair.0, result)
+    let convertedCandidates = state.candidates.map { theCandidatePair -> (keyArray: [String], value: String) in
+      var theCandidatePair = theCandidatePair
+      theCandidatePair.value = ChineseConverter.kanjiConversionIfRequired(theCandidatePair.value)
+      return theCandidatePair
     }
     return convertedCandidates
   }
@@ -136,10 +135,10 @@ extension SessionCtl: CtlCandidateDelegate {
 
       if PrefMgr.shared.useSCPCTypingMode {
         switchState(IMEState.ofCommitting(textToCommit: inputting.displayedText))
-        // 此時是逐字選字模式，所以「selectedValue.1」是單個字、不用追加處理。
+        // 此時是逐字選字模式，所以「selectedValue.value」是單個字、不用追加處理。
         if PrefMgr.shared.associatedPhrasesEnabled {
           let associates = inputHandler.generateStateOfAssociates(
-            withPair: .init(keyArray: selectedValue.0, value: selectedValue.1)
+            withPair: .init(keyArray: selectedValue.keyArray, value: selectedValue.value)
           )
           switchState(associates.candidates.isEmpty ? IMEState.ofEmpty() : associates)
         } else {
@@ -153,16 +152,16 @@ extension SessionCtl: CtlCandidateDelegate {
 
     if state.type == .ofAssociates {
       let selectedValue = state.candidates[index]
-      switchState(IMEState.ofCommitting(textToCommit: selectedValue.1))
-      // 此時是聯想詞選字模式，所以「selectedValue.1」必須只保留最後一個字。
+      switchState(IMEState.ofCommitting(textToCommit: selectedValue.value))
+      // 此時是聯想詞選字模式，所以「selectedValue.value」必須只保留最後一個字。
       // 不然的話，一旦你選中了由多個字組成的聯想候選詞，則連續聯想會被打斷。
-      guard let valueKept = selectedValue.1.last else {
+      guard let valueKept = selectedValue.value.last else {
         switchState(IMEState.ofEmpty())
         return
       }
       if PrefMgr.shared.associatedPhrasesEnabled {
         let associates = inputHandler.generateStateOfAssociates(
-          withPair: .init(keyArray: selectedValue.0, value: String(valueKept))
+          withPair: .init(keyArray: selectedValue.keyArray, value: String(valueKept))
         )
         if !associates.candidates.isEmpty {
           switchState(associates)
