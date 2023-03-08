@@ -375,7 +375,7 @@ struct VwrCandidateTDK_Previews: PreviewProvider {
   @State static var tooltip = "📼"
   @State static var oldOS: Bool = true
 
-  static var testCandidatesConverted: [([String], String)] {
+  static var testCandidatesConverted: [(keyArray: [String], value: String)] {
     testCandidates.map { candidate in
       let firstValue: [String] = .init(repeating: "", count: candidate.count)
       return (firstValue, candidate)

@@ -21,26 +21,28 @@ public extension SessionCtl {
     var arrResult = [String]()
 
     // 注意：下文中的不可列印字元是用來方便在 IMEState 當中用來分割資料的。
-    func handleIMKCandidatesPrepared(_ candidates: [([String], String)], prefix: String = "") {
+    func handleIMKCandidatesPrepared(
+      _ candidates: [(keyArray: [String], value: String)], prefix: String = ""
+    ) {
       guard let separator = inputHandler?.keySeparator else { return }
       for theCandidate in candidates {
-        let theConverted = ChineseConverter.kanjiConversionIfRequired(theCandidate.1)
-        var result = (theCandidate.1 == theConverted) ? theCandidate.1 : "\(theConverted)\u{1A}(\(theCandidate.1))"
+        let theConverted = ChineseConverter.kanjiConversionIfRequired(theCandidate.value)
+        var result = (theCandidate.value == theConverted) ? theCandidate.value : "\(theConverted)\u{1A}(\(theCandidate.value))"
         if arrResult.contains(result) {
           let reading: String =
             PrefMgr.shared.cassetteEnabled
-              ? theCandidate.0.joined(separator: separator)
+              ? theCandidate.keyArray.joined(separator: separator)
               : (PrefMgr.shared.showHanyuPinyinInCompositionBuffer
                 ? Tekkon.cnvPhonaToHanyuPinyin(
                   targetJoined: {
                     var arr = [String]()
-                    theCandidate.0.forEach { key in
+                    theCandidate.keyArray.forEach { key in
                       arr.append(Tekkon.restoreToneOneInPhona(target: key))
                     }
                     return arr.joined(separator: "-")
                   }()
                 )
-                : theCandidate.0.joined(separator: separator))
+                : theCandidate.keyArray.joined(separator: separator))
           result = "\(result)\u{17}(\(reading))"
         }
         arrResult.append(prefix + result)
@@ -51,11 +53,11 @@ public extension SessionCtl {
       handleIMKCandidatesPrepared(state.candidates, prefix: "⇧")
     } else if state.type == .ofSymbolTable {
       // 分類符號選單不會出現同符異音項、不需要康熙 / JIS 轉換，所以使用簡化過的處理方式。
-      arrResult = state.candidates.map(\.1)
+      arrResult = state.candidates.map(\.value)
     } else if state.type == .ofCandidates {
       guard !state.candidates.isEmpty else { return .init() }
-      if state.candidates[0].0.contains("_punctuation") {
-        arrResult = state.candidates.map(\.1) // 標點符號選單處理。
+      if state.candidates[0].keyArray.joined(separator: "-").contains("_punctuation") {
+        arrResult = state.candidates.map(\.value) // 標點符號選單處理。
       } else {
         handleIMKCandidatesPrepared(state.candidates)
       }
@@ -91,25 +93,29 @@ public extension SessionCtl {
     var indexDeducted = 0
 
     // 注意：下文中的不可列印字元是用來方便在 IMEState 當中用來分割資料的。
-    func handleIMKCandidatesSelected(_ candidates: [([String], String)], prefix: String = "") {
+    func handleIMKCandidatesSelected(
+      _ candidates: [(keyArray: [String], value: String)], prefix: String = ""
+    ) {
       guard let separator = inputHandler?.keySeparator else { return }
       for (i, neta) in candidates.enumerated() {
-        let theConverted = ChineseConverter.kanjiConversionIfRequired(neta.1)
-        let netaShown = (neta.1 == theConverted) ? neta.1 : "\(theConverted)\u{1A}(\(neta.1))"
+        let theConverted = ChineseConverter.kanjiConversionIfRequired(neta.value)
+        let netaShown = (neta.value == theConverted)
+          ? neta.value
+          : "\(theConverted)\u{1A}(\(neta.value))"
         let reading: String =
           PrefMgr.shared.cassetteEnabled
-            ? neta.0.joined(separator: separator)
+            ? neta.keyArray.joined(separator: separator)
             : (PrefMgr.shared.showHanyuPinyinInCompositionBuffer
               ? Tekkon.cnvPhonaToHanyuPinyin(
                 targetJoined: {
                   var arr = [String]()
-                  neta.0.forEach { key in
+                  neta.keyArray.forEach { key in
                     arr.append(Tekkon.restoreToneOneInPhona(target: key))
                   }
                   return arr.joined(separator: "-")
                 }()
               )
-              : neta.0.joined(separator: separator))
+              : neta.keyArray.joined(separator: separator))
         let netaShownWithPronunciation = "\(netaShown)\u{17}(\(reading))"
         if candidateString == prefix + netaShownWithPronunciation {
           indexDeducted = i
@@ -123,9 +129,9 @@ public extension SessionCtl {
     }
 
     // 分類符號選單不會出現同符異音項、不需要康熙 / JIS 轉換，所以使用簡化過的處理方式。
-    func handleSymbolCandidatesSelected(_ candidates: [([String], String)]) {
+    func handleSymbolCandidatesSelected(_ candidates: [(keyArray: [String], value: String)]) {
       for (i, neta) in candidates.enumerated() {
-        if candidateString == neta.1 {
+        if candidateString == neta.value {
           indexDeducted = i
           break
         }
@@ -138,7 +144,7 @@ public extension SessionCtl {
       handleSymbolCandidatesSelected(state.candidates)
     } else if state.type == .ofCandidates {
       guard !state.candidates.isEmpty else { return }
-      if state.candidates[0].0.contains("_punctuation") {
+      if state.candidates[0].keyArray.description.contains("_punctuation") {
         handleSymbolCandidatesSelected(state.candidates) // 標點符號選單處理。
       } else {
         handleIMKCandidatesSelected(state.candidates)
