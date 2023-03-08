@@ -48,13 +48,12 @@ public extension SessionCtl {
         DispatchQueue.main.async {
           let isCapsLockTurnedOn = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
           let status = NSLocalizedString("NotificationSwitchASCII", comment: "")
-          if PrefMgr.shared.showNotificationsWhenTogglingCapsLock {
-            Notifier.notify(
-              message: isCapsLockTurnedOn
-                ? "Caps Lock" + NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
-                : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
-            )
-          }
+          guard PrefMgr.shared.showNotificationsWhenTogglingCapsLock else { return }
+          Notifier.notify(
+            message: isCapsLockTurnedOn
+              ? "Caps Lock " + "Alphanumerical Input Mode".localized + "\n" + status
+              : "Chinese Input Mode".localized + "\n" + status
+          )
           self.isASCIIMode = isCapsLockTurnedOn
         }
       }
