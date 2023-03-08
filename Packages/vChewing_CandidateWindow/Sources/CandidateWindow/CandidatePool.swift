@@ -77,7 +77,7 @@ public struct CandidatePool {
   ///   - direction: 橫向排列還是縱向排列（預設情況下是縱向）。
   ///   - locale: 區域編碼。例：「zh-Hans」或「zh-Hant」。
   public init(
-    candidates: [([String], String)], lines: Int = 3, selectionKeys: String = "123456789",
+    candidates: [(keyArray: [String], value: String)], lines: Int = 3, selectionKeys: String = "123456789",
     layout: LayoutOrientation = .vertical, locale: String = ""
   ) {
     self.layout = layout
@@ -87,7 +87,7 @@ public struct CandidatePool {
     blankCell.locale = locale
     self.selectionKeys = selectionKeys.isEmpty ? "123456789" : selectionKeys
     var allCandidates = candidates.map {
-      CandidateCellData(key: " ", displayedText: $0.1, spanLength: $0.0.count)
+      CandidateCellData(key: " ", displayedText: $0.value, spanLength: $0.keyArray.count)
     }
     if allCandidates.isEmpty { allCandidates.append(blankCell) }
     candidateDataAll = allCandidates

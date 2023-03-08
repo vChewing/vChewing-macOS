@@ -143,12 +143,12 @@ extension InputHandler {
         case 2...: delegate.switchState(candidateState)
         case 1:
           let firstCandidate = candidateState.candidates.first! // 一定會有，所以強制拆包也無妨。
-          let reading: String = firstCandidate.0.joined(separator: compositor.separator)
-          let text: String = firstCandidate.1
+          let reading: [String] = firstCandidate.keyArray
+          let text: String = firstCandidate.value
           delegate.switchState(IMEState.ofCommitting(textToCommit: text))
 
           if prefs.associatedPhrasesEnabled {
-            let associatedPhrases = generateStateOfAssociates(withPair: .init(keyArray: [reading], value: text))
+            let associatedPhrases = generateStateOfAssociates(withPair: .init(keyArray: reading, value: text))
             delegate.switchState(associatedPhrases.candidates.isEmpty ? IMEState.ofEmpty() : associatedPhrases)
           }
         default: break
@@ -285,7 +285,7 @@ extension InputHandler {
         case 1:
           let firstCandidate = candidateState.candidates.first! // 一定會有，所以強制拆包也無妨。
           let reading: String = firstCandidate.0.joined(separator: compositor.separator)
-          let text: String = firstCandidate.1
+          let text: String = firstCandidate.value
           delegate.switchState(IMEState.ofCommitting(textToCommit: text))
 
           if prefs.associatedPhrasesEnabled {

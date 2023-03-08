@@ -19,7 +19,7 @@ final class CandidatePoolTests: XCTestCase {
     "嗯", "哼", "啊",
   ]
 
-  var testCandidatesConverted: [([String], String)] {
+  var testCandidatesConverted: [(keyArray: [String], value: String)] {
     testCandidates.map { candidate in
       let firstValue: [String] = .init(repeating: "", count: candidate.count)
       return (firstValue, candidate)
