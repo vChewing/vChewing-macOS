@@ -11,43 +11,43 @@ import XCTest
 final class MegrezTests: XCTestCase {
   func test01_Span() throws {
     let langModel = SimpleLM(input: strSampleData)
-    let span = Megrez.Compositor.SpanUnit()
-    let n1 = Megrez.Compositor.Node(
+    var span = Megrez.SpanUnit()
+    let n1 = Megrez.Node(
       keyArray: ["gao1"], spanLength: 1, unigrams: langModel.unigramsFor(keyArray: ["gao1"])
     )
-    let n3 = Megrez.Compositor.Node(
+    let n3 = Megrez.Node(
       keyArray: ["gao1ke1ji4"], spanLength: 3, unigrams: langModel.unigramsFor(keyArray: ["gao1ke1ji4"])
     )
     XCTAssertEqual(span.maxLength, 0)
-    span.append(node: n1)
+    span.addNode(node: n1)
     XCTAssertEqual(span.maxLength, 1)
-    span.append(node: n3)
+    span.addNode(node: n3)
     XCTAssertEqual(span.maxLength, 3)
-    XCTAssertEqual(span.nodeOf(length: 1), n1)
-    XCTAssertEqual(span.nodeOf(length: 2), nil)
-    XCTAssertEqual(span.nodeOf(length: 3), n3)
-    XCTAssertEqual(span.nodeOf(length: Megrez.Compositor.maxSpanLength), nil)
-    span.clear()
+    XCTAssertEqual(span[1], n1)
+    XCTAssertEqual(span[2], nil)
+    XCTAssertEqual(span[3], n3)
+    XCTAssertEqual(span[Megrez.Compositor.maxSpanLength], nil)
+    span.removeAll()
     XCTAssertEqual(span.maxLength, 0)
-    XCTAssertEqual(span.nodeOf(length: 1), nil)
-    XCTAssertEqual(span.nodeOf(length: 2), nil)
-    XCTAssertEqual(span.nodeOf(length: 3), nil)
-    XCTAssertEqual(span.nodeOf(length: Megrez.Compositor.maxSpanLength), nil)
+    XCTAssertEqual(span[1], nil)
+    XCTAssertEqual(span[2], nil)
+    XCTAssertEqual(span[3], nil)
+    XCTAssertEqual(span[Megrez.Compositor.maxSpanLength], nil)
 
-    span.append(node: n1)
-    span.append(node: n3)
+    span.addNode(node: n1)
+    span.addNode(node: n3)
     span.dropNodesOfOrBeyond(length: 2)
     XCTAssertEqual(span.maxLength, 1)
-    XCTAssertEqual(span.nodeOf(length: 1), n1)
-    XCTAssertEqual(span.nodeOf(length: 2), nil)
-    XCTAssertEqual(span.nodeOf(length: 3), nil)
+    XCTAssertEqual(span[1], n1)
+    XCTAssertEqual(span[2], nil)
+    XCTAssertEqual(span[3], nil)
     span.dropNodesOfOrBeyond(length: 1)
     XCTAssertEqual(span.maxLength, 0)
-    XCTAssertEqual(span.nodeOf(length: 1), nil)
-    let n114514 = Megrez.Compositor.Node(spanLength: 114_514)
-    XCTAssertFalse(span.append(node: n114514))
-    XCTAssertNil(span.nodeOf(length: 0))
-    XCTAssertNil(span.nodeOf(length: Megrez.Compositor.maxSpanLength + 1))
+    XCTAssertEqual(span[1], nil)
+    let n114514 = Megrez.Node(spanLength: 114_514)
+    XCTAssertFalse(span.addNode(node: n114514))
+    XCTAssertNil(span[0])
+    XCTAssertNil(span[Megrez.Compositor.maxSpanLength + 1])
   }
 
   func test02_RankedLangModel() throws {
@@ -85,7 +85,7 @@ final class MegrezTests: XCTestCase {
     XCTAssertEqual(compositor.length, 1)
     XCTAssertEqual(compositor.spans.count, 1)
     XCTAssertEqual(compositor.spans[0].maxLength, 1)
-    guard let zeroNode = compositor.spans[0].nodeOf(length: 1) else {
+    guard let zeroNode = compositor.spans[0][1] else {
       print("fuckme")
       return
     }
@@ -149,14 +149,14 @@ final class MegrezTests: XCTestCase {
     XCTAssertEqual(compositor.length, 3)
     XCTAssertEqual(compositor.spans.count, 3)
     XCTAssertEqual(compositor.spans[0].maxLength, 3)
-    XCTAssertEqual(compositor.spans[0].nodeOf(length: 1)?.keyArray.joined(separator: compositor.separator), "a")
-    XCTAssertEqual(compositor.spans[0].nodeOf(length: 2)?.keyArray.joined(separator: compositor.separator), "a;b")
-    XCTAssertEqual(compositor.spans[0].nodeOf(length: 3)?.keyArray.joined(separator: compositor.separator), "a;b;c")
+    XCTAssertEqual(compositor.spans[0][1]?.keyArray.joined(separator: compositor.separator), "a")
+    XCTAssertEqual(compositor.spans[0][2]?.keyArray.joined(separator: compositor.separator), "a;b")
+    XCTAssertEqual(compositor.spans[0][3]?.keyArray.joined(separator: compositor.separator), "a;b;c")
     XCTAssertEqual(compositor.spans[1].maxLength, 2)
-    XCTAssertEqual(compositor.spans[1].nodeOf(length: 1)?.keyArray.joined(separator: compositor.separator), "b")
-    XCTAssertEqual(compositor.spans[1].nodeOf(length: 2)?.keyArray.joined(separator: compositor.separator), "b;c")
+    XCTAssertEqual(compositor.spans[1][1]?.keyArray.joined(separator: compositor.separator), "b")
+    XCTAssertEqual(compositor.spans[1][2]?.keyArray.joined(separator: compositor.separator), "b;c")
     XCTAssertEqual(compositor.spans[2].maxLength, 1)
-    XCTAssertEqual(compositor.spans[2].nodeOf(length: 1)?.keyArray.joined(separator: compositor.separator), "c")
+    XCTAssertEqual(compositor.spans[2][1]?.keyArray.joined(separator: compositor.separator), "c")
   }
 
   func test07_Compositor_SpanDeletionFromFront() throws {
@@ -171,10 +171,10 @@ final class MegrezTests: XCTestCase {
     XCTAssertEqual(compositor.length, 2)
     XCTAssertEqual(compositor.spans.count, 2)
     XCTAssertEqual(compositor.spans[0].maxLength, 2)
-    XCTAssertEqual(compositor.spans[0].nodeOf(length: 1)?.keyArray.joined(separator: compositor.separator), "a")
-    XCTAssertEqual(compositor.spans[0].nodeOf(length: 2)?.keyArray.joined(separator: compositor.separator), "a;b")
+    XCTAssertEqual(compositor.spans[0][1]?.keyArray.joined(separator: compositor.separator), "a")
+    XCTAssertEqual(compositor.spans[0][2]?.keyArray.joined(separator: compositor.separator), "a;b")
     XCTAssertEqual(compositor.spans[1].maxLength, 1)
-    XCTAssertEqual(compositor.spans[1].nodeOf(length: 1)?.keyArray.joined(separator: compositor.separator), "b")
+    XCTAssertEqual(compositor.spans[1][1]?.keyArray.joined(separator: compositor.separator), "b")
   }
 
   func test08_Compositor_SpanDeletionFromMiddle() throws {
@@ -190,10 +190,10 @@ final class MegrezTests: XCTestCase {
     XCTAssertEqual(compositor.length, 2)
     XCTAssertEqual(compositor.spans.count, 2)
     XCTAssertEqual(compositor.spans[0].maxLength, 2)
-    XCTAssertEqual(compositor.spans[0].nodeOf(length: 1)?.keyArray.joined(separator: compositor.separator), "a")
-    XCTAssertEqual(compositor.spans[0].nodeOf(length: 2)?.keyArray.joined(separator: compositor.separator), "a;c")
+    XCTAssertEqual(compositor.spans[0][1]?.keyArray.joined(separator: compositor.separator), "a")
+    XCTAssertEqual(compositor.spans[0][2]?.keyArray.joined(separator: compositor.separator), "a;c")
     XCTAssertEqual(compositor.spans[1].maxLength, 1)
-    XCTAssertEqual(compositor.spans[1].nodeOf(length: 1)?.keyArray.joined(separator: compositor.separator), "c")
+    XCTAssertEqual(compositor.spans[1][1]?.keyArray.joined(separator: compositor.separator), "c")
 
     compositor.clear()
     compositor.insertKey("a")
@@ -206,10 +206,10 @@ final class MegrezTests: XCTestCase {
     XCTAssertEqual(compositor.length, 2)
     XCTAssertEqual(compositor.spans.count, 2)
     XCTAssertEqual(compositor.spans[0].maxLength, 2)
-    XCTAssertEqual(compositor.spans[0].nodeOf(length: 1)?.keyArray.joined(separator: compositor.separator), "a")
-    XCTAssertEqual(compositor.spans[0].nodeOf(length: 2)?.keyArray.joined(separator: compositor.separator), "a;c")
+    XCTAssertEqual(compositor.spans[0][1]?.keyArray.joined(separator: compositor.separator), "a")
+    XCTAssertEqual(compositor.spans[0][2]?.keyArray.joined(separator: compositor.separator), "a;c")
     XCTAssertEqual(compositor.spans[1].maxLength, 1)
-    XCTAssertEqual(compositor.spans[1].nodeOf(length: 1)?.keyArray.joined(separator: compositor.separator), "c")
+    XCTAssertEqual(compositor.spans[1][1]?.keyArray.joined(separator: compositor.separator), "c")
   }
 
   func test09_Compositor_SpanDeletionFromRear() throws {
@@ -226,10 +226,10 @@ final class MegrezTests: XCTestCase {
     XCTAssertEqual(compositor.length, 2)
     XCTAssertEqual(compositor.spans.count, 2)
     XCTAssertEqual(compositor.spans[0].maxLength, 2)
-    XCTAssertEqual(compositor.spans[0].nodeOf(length: 1)?.keyArray.joined(separator: compositor.separator), "b")
-    XCTAssertEqual(compositor.spans[0].nodeOf(length: 2)?.keyArray.joined(separator: compositor.separator), "b;c")
+    XCTAssertEqual(compositor.spans[0][1]?.keyArray.joined(separator: compositor.separator), "b")
+    XCTAssertEqual(compositor.spans[0][2]?.keyArray.joined(separator: compositor.separator), "b;c")
     XCTAssertEqual(compositor.spans[1].maxLength, 1)
-    XCTAssertEqual(compositor.spans[1].nodeOf(length: 1)?.keyArray.joined(separator: compositor.separator), "c")
+    XCTAssertEqual(compositor.spans[1][1]?.keyArray.joined(separator: compositor.separator), "c")
   }
 
   func test10_Compositor_SpanInsertion() throws {
@@ -245,19 +245,19 @@ final class MegrezTests: XCTestCase {
     XCTAssertEqual(compositor.length, 4)
     XCTAssertEqual(compositor.spans.count, 4)
     XCTAssertEqual(compositor.spans[0].maxLength, 4)
-    XCTAssertEqual(compositor.spans[0].nodeOf(length: 1)?.keyArray.joined(separator: compositor.separator), "a")
-    XCTAssertEqual(compositor.spans[0].nodeOf(length: 2)?.keyArray.joined(separator: compositor.separator), "a;X")
-    XCTAssertEqual(compositor.spans[0].nodeOf(length: 3)?.keyArray.joined(separator: compositor.separator), "a;X;b")
-    XCTAssertEqual(compositor.spans[0].nodeOf(length: 4)?.keyArray.joined(separator: compositor.separator), "a;X;b;c")
+    XCTAssertEqual(compositor.spans[0][1]?.keyArray.joined(separator: compositor.separator), "a")
+    XCTAssertEqual(compositor.spans[0][2]?.keyArray.joined(separator: compositor.separator), "a;X")
+    XCTAssertEqual(compositor.spans[0][3]?.keyArray.joined(separator: compositor.separator), "a;X;b")
+    XCTAssertEqual(compositor.spans[0][4]?.keyArray.joined(separator: compositor.separator), "a;X;b;c")
     XCTAssertEqual(compositor.spans[1].maxLength, 3)
-    XCTAssertEqual(compositor.spans[1].nodeOf(length: 1)?.keyArray.joined(separator: compositor.separator), "X")
-    XCTAssertEqual(compositor.spans[1].nodeOf(length: 2)?.keyArray.joined(separator: compositor.separator), "X;b")
-    XCTAssertEqual(compositor.spans[1].nodeOf(length: 3)?.keyArray.joined(separator: compositor.separator), "X;b;c")
+    XCTAssertEqual(compositor.spans[1][1]?.keyArray.joined(separator: compositor.separator), "X")
+    XCTAssertEqual(compositor.spans[1][2]?.keyArray.joined(separator: compositor.separator), "X;b")
+    XCTAssertEqual(compositor.spans[1][3]?.keyArray.joined(separator: compositor.separator), "X;b;c")
     XCTAssertEqual(compositor.spans[2].maxLength, 2)
-    XCTAssertEqual(compositor.spans[2].nodeOf(length: 1)?.keyArray.joined(separator: compositor.separator), "b")
-    XCTAssertEqual(compositor.spans[2].nodeOf(length: 2)?.keyArray.joined(separator: compositor.separator), "b;c")
+    XCTAssertEqual(compositor.spans[2][1]?.keyArray.joined(separator: compositor.separator), "b")
+    XCTAssertEqual(compositor.spans[2][2]?.keyArray.joined(separator: compositor.separator), "b;c")
     XCTAssertEqual(compositor.spans[3].maxLength, 1)
-    XCTAssertEqual(compositor.spans[3].nodeOf(length: 1)?.keyArray.joined(separator: compositor.separator), "c")
+    XCTAssertEqual(compositor.spans[3][1]?.keyArray.joined(separator: compositor.separator), "c")
   }
 
   func test11_Compositor_LongGridDeletion() throws {
@@ -282,17 +282,17 @@ final class MegrezTests: XCTestCase {
     XCTAssertEqual(compositor.cursor, 6)
     XCTAssertEqual(compositor.length, 13)
     XCTAssertEqual(compositor.spans.count, 13)
-    XCTAssertEqual(compositor.spans[0].nodeOf(length: 6)?.keyArray.joined(separator: compositor.separator), "abcdef")
-    XCTAssertEqual(compositor.spans[1].nodeOf(length: 6)?.keyArray.joined(separator: compositor.separator), "bcdefh")
-    XCTAssertEqual(compositor.spans[1].nodeOf(length: 5)?.keyArray.joined(separator: compositor.separator), "bcdef")
-    XCTAssertEqual(compositor.spans[2].nodeOf(length: 6)?.keyArray.joined(separator: compositor.separator), "cdefhi")
-    XCTAssertEqual(compositor.spans[2].nodeOf(length: 5)?.keyArray.joined(separator: compositor.separator), "cdefh")
-    XCTAssertEqual(compositor.spans[3].nodeOf(length: 6)?.keyArray.joined(separator: compositor.separator), "defhij")
-    XCTAssertEqual(compositor.spans[4].nodeOf(length: 6)?.keyArray.joined(separator: compositor.separator), "efhijk")
-    XCTAssertEqual(compositor.spans[5].nodeOf(length: 6)?.keyArray.joined(separator: compositor.separator), "fhijkl")
-    XCTAssertEqual(compositor.spans[6].nodeOf(length: 6)?.keyArray.joined(separator: compositor.separator), "hijklm")
-    XCTAssertEqual(compositor.spans[7].nodeOf(length: 6)?.keyArray.joined(separator: compositor.separator), "ijklmn")
-    XCTAssertEqual(compositor.spans[8].nodeOf(length: 5)?.keyArray.joined(separator: compositor.separator), "jklmn")
+    XCTAssertEqual(compositor.spans[0][6]?.keyArray.joined(separator: compositor.separator), "abcdef")
+    XCTAssertEqual(compositor.spans[1][6]?.keyArray.joined(separator: compositor.separator), "bcdefh")
+    XCTAssertEqual(compositor.spans[1][5]?.keyArray.joined(separator: compositor.separator), "bcdef")
+    XCTAssertEqual(compositor.spans[2][6]?.keyArray.joined(separator: compositor.separator), "cdefhi")
+    XCTAssertEqual(compositor.spans[2][5]?.keyArray.joined(separator: compositor.separator), "cdefh")
+    XCTAssertEqual(compositor.spans[3][6]?.keyArray.joined(separator: compositor.separator), "defhij")
+    XCTAssertEqual(compositor.spans[4][6]?.keyArray.joined(separator: compositor.separator), "efhijk")
+    XCTAssertEqual(compositor.spans[5][6]?.keyArray.joined(separator: compositor.separator), "fhijkl")
+    XCTAssertEqual(compositor.spans[6][6]?.keyArray.joined(separator: compositor.separator), "hijklm")
+    XCTAssertEqual(compositor.spans[7][6]?.keyArray.joined(separator: compositor.separator), "ijklmn")
+    XCTAssertEqual(compositor.spans[8][5]?.keyArray.joined(separator: compositor.separator), "jklmn")
   }
 
   func test12_Compositor_LongGridInsertion() throws {
@@ -317,25 +317,25 @@ final class MegrezTests: XCTestCase {
     XCTAssertEqual(compositor.cursor, 8)
     XCTAssertEqual(compositor.length, 15)
     XCTAssertEqual(compositor.spans.count, 15)
-    XCTAssertEqual(compositor.spans[0].nodeOf(length: 6)?.keyArray.joined(separator: compositor.separator), "abcdef")
-    XCTAssertEqual(compositor.spans[1].nodeOf(length: 6)?.keyArray.joined(separator: compositor.separator), "bcdefg")
-    XCTAssertEqual(compositor.spans[2].nodeOf(length: 6)?.keyArray.joined(separator: compositor.separator), "cdefgX")
-    XCTAssertEqual(compositor.spans[3].nodeOf(length: 6)?.keyArray.joined(separator: compositor.separator), "defgXh")
-    XCTAssertEqual(compositor.spans[3].nodeOf(length: 5)?.keyArray.joined(separator: compositor.separator), "defgX")
-    XCTAssertEqual(compositor.spans[4].nodeOf(length: 6)?.keyArray.joined(separator: compositor.separator), "efgXhi")
-    XCTAssertEqual(compositor.spans[4].nodeOf(length: 5)?.keyArray.joined(separator: compositor.separator), "efgXh")
-    XCTAssertEqual(compositor.spans[4].nodeOf(length: 4)?.keyArray.joined(separator: compositor.separator), "efgX")
-    XCTAssertEqual(compositor.spans[4].nodeOf(length: 3)?.keyArray.joined(separator: compositor.separator), "efg")
-    XCTAssertEqual(compositor.spans[5].nodeOf(length: 6)?.keyArray.joined(separator: compositor.separator), "fgXhij")
-    XCTAssertEqual(compositor.spans[6].nodeOf(length: 6)?.keyArray.joined(separator: compositor.separator), "gXhijk")
-    XCTAssertEqual(compositor.spans[7].nodeOf(length: 6)?.keyArray.joined(separator: compositor.separator), "Xhijkl")
-    XCTAssertEqual(compositor.spans[8].nodeOf(length: 6)?.keyArray.joined(separator: compositor.separator), "hijklm")
+    XCTAssertEqual(compositor.spans[0][6]?.keyArray.joined(separator: compositor.separator), "abcdef")
+    XCTAssertEqual(compositor.spans[1][6]?.keyArray.joined(separator: compositor.separator), "bcdefg")
+    XCTAssertEqual(compositor.spans[2][6]?.keyArray.joined(separator: compositor.separator), "cdefgX")
+    XCTAssertEqual(compositor.spans[3][6]?.keyArray.joined(separator: compositor.separator), "defgXh")
+    XCTAssertEqual(compositor.spans[3][5]?.keyArray.joined(separator: compositor.separator), "defgX")
+    XCTAssertEqual(compositor.spans[4][6]?.keyArray.joined(separator: compositor.separator), "efgXhi")
+    XCTAssertEqual(compositor.spans[4][5]?.keyArray.joined(separator: compositor.separator), "efgXh")
+    XCTAssertEqual(compositor.spans[4][4]?.keyArray.joined(separator: compositor.separator), "efgX")
+    XCTAssertEqual(compositor.spans[4][3]?.keyArray.joined(separator: compositor.separator), "efg")
+    XCTAssertEqual(compositor.spans[5][6]?.keyArray.joined(separator: compositor.separator), "fgXhij")
+    XCTAssertEqual(compositor.spans[6][6]?.keyArray.joined(separator: compositor.separator), "gXhijk")
+    XCTAssertEqual(compositor.spans[7][6]?.keyArray.joined(separator: compositor.separator), "Xhijkl")
+    XCTAssertEqual(compositor.spans[8][6]?.keyArray.joined(separator: compositor.separator), "hijklm")
   }
 
   func test13_Compositor_StressBench() throws {
     NSLog("// Stress test preparation begins.")
     var compositor = Megrez.Compositor(with: SimpleLM(input: strStressData))
-    for _ in 0 ..< 1919 {
+    (0 ..< 1919).forEach { _ in
       compositor.insertKey("yi")
     }
     NSLog("// Stress test started.")
@@ -348,8 +348,8 @@ final class MegrezTests: XCTestCase {
   func test14_Compositor_WordSegmentation() throws {
     var compositor = Megrez.Compositor(with: SimpleLM(input: strSampleData, swapKeyValue: true))
     compositor.separator = ""
-    for i in "高科技公司的年終獎金" {
-      compositor.insertKey(String(i))
+    "高科技公司的年終獎金".forEach { i in
+      compositor.insertKey(i.description)
     }
     let result = compositor.walk().0
     XCTAssertEqual(result.joinedKeys(by: ""), ["高科技", "公司", "的", "年終", "獎金"])
@@ -545,5 +545,18 @@ final class MegrezTests: XCTestCase {
     let newResult2 = compositor.walk().0.values
     print(newResult2)
     XCTAssertEqual(newResult2, ["年", "中"])
+  }
+
+  func test21_Compositor_hardCopy() throws {
+    let theLM = SimpleLM(input: strSampleData)
+    let rawReadings = "gao1 ke1 ji4 gong1 si1 de5 nian2 zhong1 jiang3 jin1"
+    var compositorA = Megrez.Compositor(with: theLM)
+    rawReadings.split(separator: " ").forEach { key in
+      compositorA.insertKey(key.description)
+    }
+    var compositorB = compositorA.hardCopy
+    let resultA = compositorA.walk().walkedNodes
+    let resultB = compositorB.walk().walkedNodes
+    XCTAssertEqual(resultA, resultB)
   }
 }

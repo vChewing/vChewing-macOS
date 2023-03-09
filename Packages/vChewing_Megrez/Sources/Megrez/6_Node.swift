@@ -5,7 +5,7 @@
 
 import Foundation
 
-public extension Megrez.Compositor {
+public extension Megrez {
   /// 字詞節點。
   ///
   /// 一個節點由這些內容組成：幅位長度、索引鍵、以及一組單元圖。幅位長度就是指這個
@@ -38,8 +38,6 @@ public extension Megrez.Compositor {
     /// 數（比如野獸常數），以讓「c」更容易單獨被選中。
     public var overridingScore: Double = 114_514
 
-    // public var key: String { keyArray.joined(separator: Megrez.Compositor.theSeparator) }
-
     /// 索引鍵陣列。
     public private(set) var keyArray: [String]
     /// 幅位長度。
@@ -54,21 +52,22 @@ public extension Megrez.Compositor {
     }
 
     /// 該節點當前狀態所展示的鍵值配對。
-    public var currentPair: Megrez.Compositor.KeyValuePaired { .init(keyArray: keyArray, value: value) }
+    public var currentPair: Megrez.KeyValuePaired { .init(keyArray: keyArray, value: value) }
 
     /// 做為預設雜湊函式。
     /// - Parameter hasher: 目前物件的雜湊碼。
     public func hash(into hasher: inout Hasher) {
+      hasher.combine(overridingScore)
       hasher.combine(keyArray)
       hasher.combine(spanLength)
       hasher.combine(unigrams)
-      hasher.combine(currentUnigramIndex)
-      hasher.combine(spanLength)
       hasher.combine(currentOverrideType)
+      hasher.combine(currentUnigramIndex)
     }
 
     public static func == (lhs: Node, rhs: Node) -> Bool {
-      lhs.keyArray == rhs.keyArray && lhs.spanLength == rhs.spanLength
+      lhs.overridingScore == rhs.overridingScore && lhs.spanLength == rhs.spanLength
+        && lhs.keyArray == rhs.keyArray && lhs.currentUnigramIndex == rhs.currentUnigramIndex
         && lhs.unigrams == rhs.unigrams && lhs.currentOverrideType == rhs.currentOverrideType
     }
 
@@ -89,6 +88,25 @@ public extension Megrez.Compositor {
       self.unigrams = unigrams
       currentOverrideType = .withNoOverrides
     }
+
+    /// 以指定字詞節點生成拷貝。
+    /// - Remark: 因為 Node 不是 Struct，所以會在 Compositor 被拷貝的時候無法被真實複製。
+    /// 這樣一來，Compositor 複製品當中的 Node 的變化會被反應到原先的 Compositor 身上。
+    /// 這在某些情況下會造成意料之外的混亂情況，所以需要引入一個拷貝用的建構子。
+    public init(node: Node) {
+      overridingScore = node.overridingScore
+      keyArray = node.keyArray
+      spanLength = node.spanLength
+      unigrams = node.unigrams
+      currentOverrideType = node.currentOverrideType
+      currentUnigramIndex = node.currentUnigramIndex
+    }
+
+    /// 生成自身的拷貝。
+    /// - Remark: 因為 Node 不是 Struct，所以會在 Compositor 被拷貝的時候無法被真實複製。
+    /// 這樣一來，Compositor 複製品當中的 Node 的變化會被反應到原先的 Compositor 身上。
+    /// 這在某些情況下會造成意料之外的混亂情況，所以需要引入一個拷貝用的建構子。
+    public var copy: Node { .init(node: self) }
 
     /// 檢查當前節點是否「讀音字長與候選字字長不一致」。
     public var isReadingMismatched: Bool { keyArray.count != value.count }
@@ -162,7 +180,7 @@ public extension Megrez.Compositor {
   /// 節錨。在 Gramambular 2 當中又被稱為「NodeInSpan」。
   struct NodeAnchor: Hashable {
     /// 節點。
-    let node: Megrez.Compositor.Node
+    let node: Megrez.Node
     /// 幅位座標。
     let spanIndex: Int
     /// 幅位長度。
@@ -185,7 +203,7 @@ public extension Megrez.Compositor {
 
 // MARK: - Array Extensions.
 
-public extension Array where Element == Megrez.Compositor.Node {
+public extension Array where Element == Megrez.Node {
   /// 從一個節點陣列當中取出目前的選字字串陣列。
   var values: [String] { map(\.value) }
 
@@ -204,7 +222,7 @@ public extension Array where Element == Megrez.Compositor.Node {
     var resultA = [Int: Int]()
     var resultB: [Int: Int] = [-1: 0] // 防呆
     var cursorCounter = 0
-    for (nodeCounter, neta) in enumerated() {
+    enumerated().forEach { nodeCounter, neta in
       resultA[nodeCounter] = cursorCounter
       neta.keyArray.forEach { _ in
         resultB[cursorCounter] = nodeCounter
@@ -243,7 +261,7 @@ public extension Array where Element == Megrez.Compositor.Node {
   ///   - cursor: 給定游標位置。
   ///   - outCursorPastNode: 找出的節點的前端位置。
   /// - Returns: 查找結果。
-  func findNode(at cursor: Int, target outCursorPastNode: inout Int) -> Megrez.Compositor.Node? {
+  func findNode(at cursor: Int, target outCursorPastNode: inout Int) -> Megrez.Node? {
     guard !isEmpty else { return nil }
     let cursor = Swift.max(0, Swift.min(cursor, totalKeyCount - 1)) // 防呆
     let range = contextRange(ofGivenCursor: cursor)
@@ -255,7 +273,7 @@ public extension Array where Element == Megrez.Compositor.Node {
   /// 在陣列內以給定游標位置找出對應的節點。
   /// - Parameter cursor: 給定游標位置。
   /// - Returns: 查找結果。
-  func findNode(at cursor: Int) -> Megrez.Compositor.Node? {
+  func findNode(at cursor: Int) -> Megrez.Node? {
     var useless = 0
     return findNode(at: cursor, target: &useless)
   }

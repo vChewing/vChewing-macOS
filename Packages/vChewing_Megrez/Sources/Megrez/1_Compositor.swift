@@ -66,6 +66,26 @@ public extension Megrez {
       self.separator = separator
     }
 
+    /// 以指定組字器生成拷貝。
+    /// - Remark: 因為 Node 不是 Struct，所以會在 Compositor 被拷貝的時候無法被真實複製。
+    /// 這樣一來，Compositor 複製品當中的 Node 的變化會被反應到原先的 Compositor 身上。
+    /// 這在某些情況下會造成意料之外的混亂情況，所以需要引入一個拷貝用的建構子。
+    public init(from target: Compositor) {
+      cursor = target.cursor
+      marker = target.marker
+      separator = target.separator
+      walkedNodes = target.walkedNodes.map(\.copy)
+      keys = target.keys
+      spans = target.spans.map(\.hardCopy)
+      langModel = target.langModel
+    }
+
+    /// 該組字器的硬拷貝。
+    /// - Remark: 因為 Node 不是 Struct，所以會在 Compositor 被拷貝的時候無法被真實複製。
+    /// 這樣一來，Compositor 複製品當中的 Node 的變化會被反應到原先的 Compositor 身上。
+    /// 這在某些情況下會造成意料之外的混亂情況，所以需要引入一個拷貝用的建構子。
+    public var hardCopy: Compositor { .init(from: self) }
+
     /// 重置包括游標在內的各項參數，且清空各種由組字器生成的內部資料。
     ///
     /// 將已經被插入的索引鍵陣列與幅位單元陣列（包括其內的節點）全部清空。
@@ -167,21 +187,19 @@ public extension Megrez {
     public var dumpDOT: String {
       // C# StringBuilder 與 Swift NSMutableString 能提供爆發性的效能。
       let strOutput: NSMutableString = .init(string: "digraph {\ngraph [ rankdir=LR ];\nBOS;\n")
-      for (p, span) in spans.enumerated() {
-        for ni in 0 ... (span.maxLength) {
-          guard let np = span.nodeOf(length: ni) else { continue }
-          if p == 0 {
-            strOutput.append("BOS -> \(np.value);\n")
-          }
+      spans.enumerated().forEach { p, span in
+        (0 ... span.maxLength).forEach { ni in
+          guard let np = span[ni] else { return }
+          if p == 0 { strOutput.append("BOS -> \(np.value);\n") }
           strOutput.append("\(np.value);\n")
           if (p + ni) < spans.count {
             let destinationSpan = spans[p + ni]
-            for q in 0 ... (destinationSpan.maxLength) {
-              guard let dn = destinationSpan.nodeOf(length: q) else { continue }
+            (0 ... destinationSpan.maxLength).forEach { q in
+              guard let dn = destinationSpan[q] else { return }
               strOutput.append(np.value + " -> " + dn.value + ";\n")
             }
           }
-          guard (p + ni) == spans.count else { continue }
+          guard (p + ni) == spans.count else { return }
           strOutput.append(np.value + " -> EOS;\n")
         }
       }
@@ -198,11 +216,11 @@ extension Megrez.Compositor {
   /// - Parameters:
   ///   - location: 給定的幅位座標。
   ///   - action: 指定是擴張還是縮減一個幅位。
-  mutating func resizeGrid(at location: Int, do action: ResizeBehavior) {
+  private mutating func resizeGrid(at location: Int, do action: ResizeBehavior) {
     let location = max(min(location, spans.count), 0) // 防呆
     switch action {
     case .expand:
-      spans.insert(SpanUnit(), at: location)
+      spans.insert(.init(), at: location)
       if [0, spans.count].contains(location) { return }
     case .shrink:
       if spans.count == location { return }
@@ -248,30 +266,20 @@ extension Megrez.Compositor {
     let affectedLength = Megrez.Compositor.maxSpanLength - 1
     let begin = max(0, location - affectedLength)
     guard location >= begin else { return }
-    for i in begin ..< location {
-      spans[i].dropNodesOfOrBeyond(length: location - i + 1)
+    (begin ..< location).forEach { delta in
+      ((location - delta + 1) ... Self.maxSpanLength).forEach { theLength in
+        spans[delta][theLength] = nil
+      }
     }
   }
 
   /// 自索引鍵陣列獲取指定範圍的資料。
   /// - Parameter range: 指定範圍。
   /// - Returns: 拿到的資料。
-  func getJoinedKeyArray(range: Range<Int>) -> [String] {
+  private func getJoinedKeyArray(range: Range<Int>) -> [String] {
     // 下面這句不能用 contains，不然會要求至少 macOS 13 Ventura。
     guard range.upperBound <= keys.count, range.lowerBound >= 0 else { return [] }
     return keys[range].map(\.description)
-  }
-
-  /// 在指定位置（以指定索引鍵陣列和指定幅位長度）拿取節點。
-  /// - Parameters:
-  ///   - location: 指定游標位置。
-  ///   - length: 指定幅位長度。
-  ///   - keyArray: 指定索引鍵陣列。
-  /// - Returns: 拿取的節點。拿不到的話就會是 nil。
-  func getNode(at location: Int, length: Int, keyArray: [String]) -> Node? {
-    let location = max(min(location, spans.count - 1), 0) // 防呆
-    guard let node = spans[location].nodeOf(length: length) else { return nil }
-    return keyArray == node.keyArray ? node : nil
   }
 
   /// 根據當前狀況更新整個組字器的節點文脈。
@@ -280,28 +288,32 @@ extension Megrez.Compositor {
   /// - Returns: 新增或影響了多少個節點。如果返回「0」則表示可能發生了錯誤。
   @discardableResult public mutating func update(updateExisting: Bool = false) -> Int {
     let maxSpanLength = Megrez.Compositor.maxSpanLength
-    let range = max(0, cursor - maxSpanLength) ..< min(cursor + maxSpanLength, keys.count)
+    let rangeOfPositions = max(0, cursor - maxSpanLength) ..< min(cursor + maxSpanLength, keys.count)
     var nodesChanged = 0
-    for position in range {
-      for theLength in 1 ... min(maxSpanLength, range.upperBound - position) {
-        let joinedKeyArray = getJoinedKeyArray(range: position ..< (position + theLength))
-        if let theNode = getNode(at: position, length: theLength, keyArray: joinedKeyArray) {
-          if !updateExisting { continue }
+    rangeOfPositions.forEach { position in
+      let rangeOfLengths = 1 ... min(maxSpanLength, rangeOfPositions.upperBound - position)
+      rangeOfLengths.forEach { theLength in
+        guard position + theLength <= keys.count, position >= 0 else { return }
+        let joinedKeyArray = keys[position ..< (position + theLength)].map(\.description)
+
+        if let theNode = spans[position][theLength] {
+          if !updateExisting { return }
           let unigrams = langModel.unigramsFor(keyArray: joinedKeyArray)
           // 自動銷毀無效的節點。
           if unigrams.isEmpty {
-            if theNode.keyArray.count == 1 { continue }
-            spans[position].nullify(node: theNode)
+            if theNode.keyArray.count == 1 { return }
+            spans[position][theNode.spanLength] = nil
           } else {
             theNode.syncingUnigrams(from: unigrams)
           }
           nodesChanged += 1
-          continue
+          return
         }
         let unigrams = langModel.unigramsFor(keyArray: joinedKeyArray)
-        guard !unigrams.isEmpty else { continue }
-        spans[position].append(
-          node: .init(keyArray: joinedKeyArray, spanLength: theLength, unigrams: unigrams)
+        guard !unigrams.isEmpty else { return }
+        // 這裡原本用 SpanUnit.addNode 來完成的，但直接當作辭典來互動的話也沒差。
+        spans[position][theLength] = .init(
+          keyArray: joinedKeyArray, spanLength: theLength, unigrams: unigrams
         )
         nodesChanged += 1
       }

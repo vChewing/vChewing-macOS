@@ -13,37 +13,34 @@ public extension Megrez.Compositor {
   /// 對於 `G = (V, E)`，該算法的運行次數為 `O(|V|+|E|)`，其中 `G` 是一個有向無環圖。
   /// 這意味著，即使軌格很大，也可以用很少的算力就可以爬軌。
   /// - Returns: 爬軌結果＋該過程是否順利執行。
-  @discardableResult mutating func walk() -> (walkedNode: [Node], succeeded: Bool) {
-    var result = [Node]()
+  @discardableResult mutating func walk() -> (walkedNodes: [Megrez.Node], succeeded: Bool) {
+    var result = [Megrez.Node]()
     defer { walkedNodes = result }
     guard !spans.isEmpty else { return (result, true) }
 
     var vertexSpans = [[Vertex]]()
-    for _ in spans {
+    spans.forEach { _ in
       vertexSpans.append(.init())
     }
 
-    for (i, span) in spans.enumerated() {
-      for j in 1 ... max(span.maxLength, 1) {
-        if let theNode = span.nodeOf(length: j) {
-          vertexSpans[i].append(.init(node: theNode))
-        }
+    spans.enumerated().forEach { i, span in
+      (1 ... max(span.maxLength, 1)).forEach { j in
+        guard let theNode = span[j] else { return }
+        vertexSpans[i].append(.init(node: theNode))
       }
     }
 
     let terminal = Vertex(node: .init(keyArray: ["_TERMINAL_"]))
     var root = Vertex(node: .init(keyArray: ["_ROOT_"]))
 
-    for (i, vertexSpan) in vertexSpans.enumerated() {
-      for vertex in vertexSpan {
+    vertexSpans.enumerated().forEach { i, vertexSpan in
+      vertexSpan.forEach { vertex in
         let nextVertexPosition = i + vertex.node.spanLength
         if nextVertexPosition == vertexSpans.count {
           vertex.edges.append(terminal)
-          continue
+          return
         }
-        for nextVertex in vertexSpans[nextVertexPosition] {
-          vertex.edges.append(nextVertex)
-        }
+        vertexSpans[nextVertexPosition].forEach { vertex.edges.append($0) }
       }
     }
 
@@ -51,15 +48,13 @@ public extension Megrez.Compositor {
     root.edges.append(contentsOf: vertexSpans[0])
 
     var ordered = topologicalSort(root: &root)
-    for (j, neta) in ordered.reversed().enumerated() {
-      for (k, _) in neta.edges.enumerated() {
-        relax(u: neta, v: &neta.edges[k])
-      }
+    ordered.reversed().enumerated().forEach { j, neta in
+      neta.edges.indices.forEach { relax(u: neta, v: &neta.edges[$0]) }
       ordered[j] = neta
     }
 
     var iterated = terminal
-    var walked = [Node]()
+    var walked = [Megrez.Node]()
     var totalLengthOfKeys = 0
 
     while let itPrev = iterated.prev {
