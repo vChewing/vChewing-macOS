@@ -66,7 +66,7 @@ public protocol InputHandlerDelegate {
   func updateVerticalTypingStatus()
   func switchState(_ newState: IMEStateProtocol)
   func candidateController() -> CtlCandidateProtocol?
-  func candidateSelectionCalledByInputHandler(at index: Int)
+  func candidateSelectionConfirmedByInputHandler(at index: Int)
   func performUserPhraseOperation(addToFilter: Bool)
     -> Bool
 }

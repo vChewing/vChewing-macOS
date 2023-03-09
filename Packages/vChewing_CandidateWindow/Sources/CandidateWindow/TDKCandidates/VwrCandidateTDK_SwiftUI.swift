@@ -350,7 +350,7 @@ extension VwrCandidateTDK {
 @available(macOS 10.15, *)
 private extension VwrCandidateTDK {
   func didSelectCandidateAt(_ pos: Int) {
-    controller?.delegate?.candidatePairSelected(at: pos)
+    controller?.delegate?.candidatePairSelectionConfirmed(at: pos)
   }
 
   func didRightClickCandidateAt(_ pos: Int, action: CandidateContextMenuAction) {

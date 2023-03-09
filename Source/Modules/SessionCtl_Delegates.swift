@@ -22,8 +22,8 @@ extension SessionCtl: InputHandlerDelegate {
 
   public func candidateController() -> CtlCandidateProtocol? { candidateUI }
 
-  public func candidateSelectionCalledByInputHandler(at index: Int) {
-    candidatePairSelected(at: index)
+  public func candidateSelectionConfirmedByInputHandler(at index: Int) {
+    candidatePairSelectionConfirmed(at: index)
   }
 
   public func callError(_ logMessage: String) {
@@ -108,7 +108,9 @@ extension SessionCtl: CtlCandidateDelegate {
     return convertedCandidates
   }
 
-  public func candidatePairSelected(at index: Int) {
+  public func candidatePairHighlightChanged(at _: Int) {}
+
+  public func candidatePairSelectionConfirmed(at index: Int) {
     guard let inputHandler = inputHandler else { return }
     if state.type == .ofSymbolTable, (0 ..< state.node.members.count).contains(index) {
       let node = state.node.members[index]
