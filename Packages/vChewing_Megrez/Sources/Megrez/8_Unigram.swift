@@ -48,8 +48,8 @@ public extension Array where Element == Megrez.Unigram {
   mutating func consolidate(filter theFilter: Set<String> = .init()) {
     var inserted: [String: Double] = [:]
     var insertedArray: [Megrez.Unigram] = []
-    for neta in filter({ !theFilter.contains($0.value) }) {
-      if inserted.keys.contains(neta.value) { continue }
+    filter { !theFilter.contains($0.value) }.forEach { neta in
+      if inserted.keys.contains(neta.value) { return }
       inserted[neta.value] = neta.score
       insertedArray.append(neta)
     }
