@@ -88,6 +88,7 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
       reverseLookupResult = delegate?.reverseLookup(for: currentCandidateText) ?? []
       Self.thePool.reverseLookupResult = reverseLookupResult
     }
+    delegate?.candidatePairHighlightChanged(at: highlightedIndex)
     DispatchQueue.main.async { [self] in
       window.isOpaque = false
       window.backgroundColor = .clear
