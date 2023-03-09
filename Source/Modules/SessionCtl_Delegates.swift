@@ -112,19 +112,15 @@ extension SessionCtl: CtlCandidateDelegate {
 
   public func candidatePairSelectionConfirmed(at index: Int) {
     guard let inputHandler = inputHandler else { return }
-    if state.type == .ofSymbolTable, (0 ..< state.node.members.count).contains(index) {
+    switch state.type {
+    case .ofSymbolTable where (0 ..< state.node.members.count).contains(index):
       let node = state.node.members[index]
       if !node.members.isEmpty {
-        switchState(IMEState.ofEmpty()) // 防止縱橫排選字窗同時出現
         switchState(IMEState.ofSymbolTable(node: node))
       } else {
         switchState(IMEState.ofCommitting(textToCommit: node.name))
-        switchState(IMEState.ofEmpty())
       }
-      return
-    }
-
-    if [.ofCandidates, .ofSymbolTable].contains(state.type) {
+    case .ofCandidates where (0 ..< state.candidates.count).contains(index):
       let selectedValue = state.candidates[index]
       if state.type == .ofCandidates {
         inputHandler.consolidateNode(
@@ -132,45 +128,34 @@ extension SessionCtl: CtlCandidateDelegate {
           preConsolidate: PrefMgr.shared.consolidateContextOnCandidateSelection
         )
       }
-
-      let inputting = inputHandler.generateStateOfInputting()
-
+      var result: IMEStateProtocol = inputHandler.generateStateOfInputting()
+      defer { switchState(result) } // 這是最終輸出結果。
       if PrefMgr.shared.useSCPCTypingMode {
-        switchState(IMEState.ofCommitting(textToCommit: inputting.displayedText))
+        switchState(IMEState.ofCommitting(textToCommit: result.displayedText))
         // 此時是逐字選字模式，所以「selectedValue.value」是單個字、不用追加處理。
         if PrefMgr.shared.associatedPhrasesEnabled {
           let associates = inputHandler.generateStateOfAssociates(
             withPair: .init(keyArray: selectedValue.keyArray, value: selectedValue.value)
           )
-          switchState(associates.candidates.isEmpty ? IMEState.ofEmpty() : associates)
+          result = associates.candidates.isEmpty ? IMEState.ofEmpty() : associates
         } else {
-          switchState(IMEState.ofEmpty())
+          result = IMEState.ofEmpty()
         }
-      } else {
-        switchState(inputting)
       }
-      return
-    }
-
-    if state.type == .ofAssociates {
+    case .ofAssociates where (0 ..< state.candidates.count).contains(index):
       let selectedValue = state.candidates[index]
+      var result: IMEStateProtocol = IMEState.ofEmpty()
+      defer { switchState(result) } // 這是最終輸出結果。
       switchState(IMEState.ofCommitting(textToCommit: selectedValue.value))
+      guard PrefMgr.shared.associatedPhrasesEnabled else { return }
       // 此時是聯想詞選字模式，所以「selectedValue.value」必須只保留最後一個字。
       // 不然的話，一旦你選中了由多個字組成的聯想候選詞，則連續聯想會被打斷。
-      guard let valueKept = selectedValue.value.last else {
-        switchState(IMEState.ofEmpty())
-        return
-      }
-      if PrefMgr.shared.associatedPhrasesEnabled {
-        let associates = inputHandler.generateStateOfAssociates(
-          withPair: .init(keyArray: selectedValue.keyArray, value: String(valueKept))
-        )
-        if !associates.candidates.isEmpty {
-          switchState(associates)
-          return
-        }
-      }
-      switchState(IMEState.ofEmpty())
+      guard let valueKept = selectedValue.value.last?.description else { return }
+      let associates = inputHandler.generateStateOfAssociates(
+        withPair: .init(keyArray: selectedValue.keyArray, value: valueKept)
+      )
+      if !associates.candidates.isEmpty { result = associates }
+    default: return
     }
   }
 
