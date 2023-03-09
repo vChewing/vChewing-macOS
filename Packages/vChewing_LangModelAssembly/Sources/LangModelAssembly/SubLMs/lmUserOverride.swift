@@ -31,7 +31,7 @@ public extension vChewingLM {
     }
 
     public func performObservation(
-      walkedBefore: [Megrez.Compositor.Node], walkedAfter: [Megrez.Compositor.Node],
+      walkedBefore: [Megrez.Node], walkedAfter: [Megrez.Node],
       cursor: Int, timestamp: Double, saveCallback: @escaping () -> Void
     ) {
       // 參數合規性檢查。
@@ -64,7 +64,7 @@ public extension vChewingLM {
     }
 
     public func fetchSuggestion(
-      currentWalk: [Megrez.Compositor.Node], cursor: Int, timestamp: Double
+      currentWalk: [Megrez.Node], cursor: Int, timestamp: Double
     ) -> Suggestion {
       var headIndex = 0
       guard let nodeIter = currentWalk.findNode(at: cursor, target: &headIndex) else { return .init() }
@@ -307,7 +307,7 @@ extension vChewingLM.LMUserOverride {
     return prob * decay
   }
 
-  private static func isPunctuation(_ node: Megrez.Compositor.Node) -> Bool {
+  private static func isPunctuation(_ node: Megrez.Node) -> Bool {
     for key in node.keyArray {
       guard let firstChar = key.first else { continue }
       return String(firstChar) == "_"
@@ -316,10 +316,10 @@ extension vChewingLM.LMUserOverride {
   }
 
   private static func formObservationKey(
-    walkedNodes: [Megrez.Compositor.Node], headIndex cursorIndex: Int, readingOnly: Bool = false
+    walkedNodes: [Megrez.Node], headIndex cursorIndex: Int, readingOnly: Bool = false
   ) -> String {
     // let whiteList = "你他妳她祢衪它牠再在"
-    var arrNodes: [Megrez.Compositor.Node] = []
+    var arrNodes: [Megrez.Node] = []
     var intLength = 0
     for theNodeAnchor in walkedNodes {
       arrNodes.append(theNodeAnchor)
@@ -343,8 +343,8 @@ extension vChewingLM.LMUserOverride {
 
     // 前置單元只記錄讀音，在其後的單元則同時記錄讀音與字詞
     let strCurrent = kvCurrent.joinedKey()
-    var kvPrevious = Megrez.Compositor.KeyValuePaired(keyArray: [""], value: "")
-    var kvAnterior = Megrez.Compositor.KeyValuePaired(keyArray: [""], value: "")
+    var kvPrevious = Megrez.KeyValuePaired(keyArray: [""], value: "")
+    var kvAnterior = Megrez.KeyValuePaired(keyArray: [""], value: "")
     var readingStack = ""
     var trigramKey: String { "(\(kvAnterior.toNGramKey),\(kvPrevious.toNGramKey),\(strCurrent))" }
     var result: String {
