@@ -32,7 +32,7 @@ public protocol InputHandlerProtocol {
   func handleEvent(_ event: NSEvent) -> Bool
   func generateStateOfCandidates() -> IMEStateProtocol
   func generateStateOfInputting(sansReading: Bool) -> IMEStateProtocol
-  func generateStateOfAssociates(withPair pair: Megrez.Compositor.KeyValuePaired) -> IMEStateProtocol
+  func generateStateOfAssociates(withPair pair: Megrez.KeyValuePaired) -> IMEStateProtocol
   func consolidateNode(
     candidate: (keyArray: [String], value: String), respectCursorPushing: Bool, preConsolidate: Bool, skipObservation: Bool
   )
@@ -196,7 +196,7 @@ public class InputHandler: InputHandlerProtocol {
   /// - Parameter key: 給定的聯想詞的開頭字。
   /// - Returns: 抓取到的聯想詞陣列。
   /// 不會是 nil，但那些負責接收結果的函式會對空白陣列結果做出正確的處理。
-  func generateArrayOfAssociates(withPair pair: Megrez.Compositor.KeyValuePaired) -> [(keyArray: [String], value: String)] {
+  func generateArrayOfAssociates(withPair pair: Megrez.KeyValuePaired) -> [(keyArray: [String], value: String)] {
     var arrResult: [(keyArray: [String], value: String)] = []
     if currentLM.hasAssociatedPhrasesFor(pair: pair) {
       arrResult = currentLM.associatedPhrasesFor(pair: pair).map { ([""], $0) }
@@ -209,7 +209,7 @@ public class InputHandler: InputHandlerProtocol {
   /// - Returns: 邊界距離。
   func getStepsToNearbyNodeBorder(direction: Megrez.Compositor.TypingDirection) -> Int {
     let currentCursor = compositor.cursor
-    var testCompositor = compositor
+    var testCompositor = compositor // 只是影響到 Compositor 內部的游標位置記錄器，故不需要 hardCopy。
     testCompositor.jumpCursorBySpan(to: direction)
     return abs(testCompositor.cursor - currentCursor)
   }
@@ -228,8 +228,8 @@ public class InputHandler: InputHandlerProtocol {
   /// 威注音輸入法截至 v1.9.3 SP2 版為止都受到上游的這個 Bug 的影響，且在 v1.9.4 版利用該函式修正了這個缺陷。
   /// 該修正必須搭配至少天權星組字引擎 v2.0.2 版方可生效。算法可能比較囉唆，但至少在常用情形下不會再發生該問題。
   /// - Parameter theCandidate: 要拿來覆寫的詞音配對。
-  func consolidateCursorContext(with theCandidate: Megrez.Compositor.KeyValuePaired) {
-    var grid = compositor
+  func consolidateCursorContext(with theCandidate: Megrez.KeyValuePaired) {
+    var grid = compositor.hardCopy // 因為會影響到 Node 自身的權重覆寫狀態，所以必須用 hardCopy。
     var frontBoundaryEX = cursorForCandidate + 1
     var rearBoundaryEX = cursorForCandidate
     var debugIntelToPrint = ""
@@ -279,7 +279,7 @@ public class InputHandler: InputHandlerProtocol {
         let values = currentNode.currentPair.value.map(\.description)
         for (subPosition, key) in currentNode.keyArray.enumerated() {
           guard values.count > subPosition else { break } // 防呆，應該沒有發生的可能性
-          let thePair = Megrez.Compositor.KeyValuePaired(
+          let thePair = Megrez.KeyValuePaired(
             keyArray: [key], value: values[subPosition]
           )
           compositor.overrideCandidate(thePair, at: position)
@@ -302,9 +302,7 @@ public class InputHandler: InputHandlerProtocol {
     candidate: (keyArray: [String], value: String), respectCursorPushing: Bool = true,
     preConsolidate: Bool = false, skipObservation: Bool = false
   ) {
-    let theCandidate: Megrez.Compositor.KeyValuePaired = .init(
-      keyArray: candidate.keyArray, value: candidate.value
-    )
+    let theCandidate: Megrez.KeyValuePaired = .init(candidate)
 
     /// 必須先鞏固當前組字器游標上下文、以消滅意料之外的影響，但在內文組字區內就地輪替候選字詞時除外。
     if preConsolidate { consolidateCursorContext(with: theCandidate) }
@@ -349,7 +347,7 @@ public class InputHandler: InputHandlerProtocol {
   func generateArrayOfCandidates(fixOrder: Bool = true) -> [(keyArray: [String], value: String)] {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
-    var arrCandidates: [Megrez.Compositor.KeyValuePaired] = {
+    var arrCandidates: [Megrez.KeyValuePaired] = {
       switch prefs.useRearCursorMode {
       case false: return compositor.fetchCandidates(at: cursorForCandidate, filter: .endAt)
       case true: return compositor.fetchCandidates(at: cursorForCandidate, filter: .beginAt)
@@ -367,8 +365,8 @@ public class InputHandler: InputHandlerProtocol {
     }
 
     let arrSuggestedUnigrams: [(String, Megrez.Unigram)] = retrieveUOMSuggestions(apply: false)
-    let arrSuggestedCandidates: [Megrez.Compositor.KeyValuePaired] = arrSuggestedUnigrams.map {
-      Megrez.Compositor.KeyValuePaired(key: $0.0, value: $0.1.value)
+    let arrSuggestedCandidates: [Megrez.KeyValuePaired] = arrSuggestedUnigrams.map {
+      Megrez.KeyValuePaired(key: $0.0, value: $0.1.value)
     }
     arrCandidates = arrSuggestedCandidates.filter { arrCandidates.contains($0) } + arrCandidates
     arrCandidates = arrCandidates.deduplicated
@@ -391,9 +389,9 @@ public class InputHandler: InputHandlerProtocol {
     if apply {
       /// 再看有沒有選字建議。有的話就遵循之、讓天權星引擎對指定節錨下的節點複寫權重。
       if !suggestion.isEmpty, let newestSuggestedCandidate = suggestion.candidates.last {
-        let overrideBehavior: Megrez.Compositor.Node.OverrideType =
+        let overrideBehavior: Megrez.Node.OverrideType =
           suggestion.forceHighScoreOverride ? .withHighScore : .withTopUnigramScore
-        let suggestedPair: Megrez.Compositor.KeyValuePaired = .init(
+        let suggestedPair: Megrez.KeyValuePaired = .init(
           key: newestSuggestedCandidate.0, value: newestSuggestedCandidate.1.value
         )
         vCLog(
