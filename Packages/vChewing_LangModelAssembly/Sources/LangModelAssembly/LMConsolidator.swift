@@ -104,14 +104,13 @@ public extension vChewingLM {
       strProcessed.regReplace(pattern: #"(\n | \n)"#, replaceWith: "\n")
       // CR & FF to LF, 且去除重複行
       strProcessed.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n")
+      strProcessed.regReplace(pattern: "^\(kPragmaHeader)$", replaceWith: "")
       if strProcessed.prefix(1) == " " { // 去除檔案開頭空格
         strProcessed.removeFirst()
       }
       if strProcessed.suffix(1) == " " { // 去除檔案結尾空格
         strProcessed.removeLast()
       }
-
-      strProcessed = kPragmaHeader + "\n" + strProcessed // Add Pragma Header
 
       // Step 3: Deduplication.
       let arrData = strProcessed.split(separator: "\n")
@@ -121,6 +120,9 @@ public extension vChewingLM {
 
       // Step 4: Remove duplicated newlines at the end of the file.
       strProcessed.regReplace(pattern: #"\n+"#, replaceWith: "\n")
+
+      // Step 5: Add pragma header back.
+      strProcessed = kPragmaHeader + "\n" + strProcessed // Add Pragma Header
     }
 
     /// 統整給定的檔案的格式。
