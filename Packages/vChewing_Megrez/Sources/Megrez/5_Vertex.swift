@@ -20,13 +20,13 @@ extension Megrez.Compositor {
     /// 在進行進行位相幾何排序時會用到的狀態標記。
     public var topologicallySorted = false
     /// 字詞節點。
-    public var node: Node
+    public var node: Megrez.Node
 
     /// 初期化一個「有向無環圖的」的頂點單位。
     ///
     /// 這是一個可變的數據結構，用於有向無環圖的構建和單源最短路徑的計算。
     /// - Parameter node: 字詞節點。
-    public init(node: Node) {
+    public init(node: Megrez.Node) {
       self.node = node
     }
 
@@ -65,7 +65,7 @@ extension Megrez.Compositor {
   /// 這樣我們就不會受到當前線程的堆棧大小的限制。以下是等價的原始算法。
   /// ```
   ///  func topologicalSort(vertex: Vertex) {
-  ///    for vertexNode in vertex.edges {
+  ///    vertex.edges.forEach {vertexNode in
   ///      if !vertexNode.topologicallySorted {
   ///        dfs(vertexNode, result)
   ///        vertexNode.topologicallySorted = true

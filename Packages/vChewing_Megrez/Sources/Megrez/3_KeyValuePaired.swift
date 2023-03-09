@@ -5,7 +5,7 @@
 
 import Foundation
 
-public extension Megrez.Compositor {
+public extension Megrez {
   /// 鍵值配對，乃索引鍵陣列與讀音的配對單元。
   struct KeyValuePaired: Equatable, Hashable, Comparable, CustomStringConvertible {
     /// 索引鍵陣列。一般情況下用來放置讀音等可以用來作為索引的內容。
@@ -18,6 +18,8 @@ public extension Megrez.Compositor {
     public var isValid: Bool { !keyArray.joined().isEmpty && !value.isEmpty }
     /// 將當前鍵值列印成一個字串，但如果該鍵值配對為空的話則僅列印「()」。
     public var toNGramKey: String { !isValid ? "()" : "(" + joinedKey() + "," + value + ")" }
+    /// 通用陣列表達形式。
+    public var tupletExpression: (keyArray: [String], value: String) { (keyArray, value) }
 
     /// 初期化一組鍵值配對。
     /// - Parameters:
@@ -26,6 +28,13 @@ public extension Megrez.Compositor {
     public init(keyArray: [String], value: String = "N/A") {
       self.keyArray = keyArray.isEmpty ? ["N/A"] : keyArray
       self.value = value.isEmpty ? "N/A" : value
+    }
+
+    /// 初期化一組鍵值配對。
+    /// - Parameter tupletExpression: 傳入的通用陣列表達形式。
+    public init(_ tupletExpression: (keyArray: [String], value: String)) {
+      keyArray = tupletExpression.keyArray.isEmpty ? ["N/A"] : tupletExpression.keyArray
+      value = tupletExpression.value.isEmpty ? "N/A" : tupletExpression.value
     }
 
     /// 初期化一組鍵值配對。
@@ -72,7 +81,9 @@ public extension Megrez.Compositor {
         || (lhs.keyArray.count == rhs.keyArray.count && lhs.value >= rhs.value)
     }
   }
+}
 
+public extension Megrez.Compositor {
   /// 規定候選字陣列內容的獲取範圍類型：
   /// - all: 不只包含其它兩類結果，還允許游標穿插候選字。
   /// - beginAt: 僅獲取從當前游標位置開始的節點內的候選字。
@@ -84,8 +95,8 @@ public extension Megrez.Compositor {
   /// 話，那麼這裡會用到 location - 1、以免去在呼叫該函式後再處理的麻煩。
   /// - Parameter location: 游標位置。
   /// - Returns: 候選字音配對陣列。
-  func fetchCandidates(at location: Int, filter: CandidateFetchFilter = .all) -> [KeyValuePaired] {
-    var result = [KeyValuePaired]()
+  func fetchCandidates(at location: Int, filter: CandidateFetchFilter = .all) -> [Megrez.KeyValuePaired] {
+    var result = [Megrez.KeyValuePaired]()
     guard !keys.isEmpty else { return result }
     let location = max(min(location, keys.count - 1), 0) // 防呆
     let anchors: [NodeAnchor] = fetchOverlappingNodes(at: location).stableSorted {
@@ -93,17 +104,16 @@ public extension Megrez.Compositor {
       $0.spanLength > $1.spanLength
     }
     let keyAtCursor = keys[location]
-    for theNode in anchors.map(\.node) {
-      if theNode.keyArray.isEmpty { continue }
-      for gram in theNode.unigrams {
+    anchors.map(\.node).filter(\.keyArray.isEmpty.negative).forEach { theNode in
+      theNode.unigrams.forEach { gram in
         switch filter {
         case .all:
-          // 得加上這道篩選，所以會出現很多無效結果。
-          if !theNode.keyArray.contains(keyAtCursor) { continue }
+          // 得加上這道篩選，不然會出現很多無效結果。
+          if !theNode.keyArray.contains(keyAtCursor) { return }
         case .beginAt:
-          if theNode.keyArray[0] != keyAtCursor { continue }
+          if theNode.keyArray[0] != keyAtCursor { return }
         case .endAt:
-          if theNode.keyArray.reversed()[0] != keyAtCursor { continue }
+          if theNode.keyArray.reversed()[0] != keyAtCursor { return }
         }
         result.append(.init(keyArray: theNode.keyArray, value: gram.value))
       }
@@ -120,7 +130,7 @@ public extension Megrez.Compositor {
   ///   - overrideType: 指定覆寫行為。
   /// - Returns: 該操作是否成功執行。
   @discardableResult func overrideCandidate(
-    _ candidate: KeyValuePaired, at location: Int, overrideType: Node.OverrideType = .withHighScore
+    _ candidate: Megrez.KeyValuePaired, at location: Int, overrideType: Megrez.Node.OverrideType = .withHighScore
   )
     -> Bool
   {
@@ -137,7 +147,7 @@ public extension Megrez.Compositor {
   /// - Returns: 該操作是否成功執行。
   @discardableResult func overrideCandidateLiteral(
     _ candidate: String,
-    at location: Int, overrideType: Node.OverrideType = .withHighScore
+    at location: Int, overrideType: Megrez.Node.OverrideType = .withHighScore
   ) -> Bool {
     overrideCandidateAgainst(keyArray: nil, at: location, value: candidate, type: overrideType)
   }
@@ -151,7 +161,7 @@ public extension Megrez.Compositor {
   ///   - value: 資料值。
   ///   - type: 指定覆寫行為。
   /// - Returns: 該操作是否成功執行。
-  internal func overrideCandidateAgainst(keyArray: [String]?, at location: Int, value: String, type: Node.OverrideType)
+  internal func overrideCandidateAgainst(keyArray: [String]?, at location: Int, value: String, type: Megrez.Node.OverrideType)
     -> Bool
   {
     let location = max(min(location, keys.count), 0) // 防呆
@@ -166,18 +176,18 @@ public extension Megrez.Compositor {
 
     guard let overridden = overridden else { return false } // 啥也不覆寫。
 
-    for i in overridden.spanIndex ..< min(spans.count, overridden.spanIndex + overridden.node.spanLength) {
+    (overridden.spanIndex ..< min(spans.count, overridden.spanIndex + overridden.node.spanLength)).forEach { i in
       /// 咱們還得弱化所有在相同的幅位座標的節點的複寫權重。舉例說之前爬軌的結果是「A BC」
       /// 且 A 與 BC 都是被覆寫的結果，然後使用者現在在與 A 相同的幅位座標位置
       /// 選了「DEF」，那麼 BC 的覆寫狀態就有必要重設（但 A 不用重設）。
       arrOverlappedNodes = fetchOverlappingNodes(at: i)
-      for anchor in arrOverlappedNodes {
-        if anchor.node == overridden.node { continue }
+      arrOverlappedNodes.forEach { anchor in
+        if anchor.node == overridden.node { return }
         if !overridden.node.joinedKey(by: "\t").contains(anchor.node.joinedKey(by: "\t"))
           || !overridden.node.value.contains(anchor.node.value)
         {
           anchor.node.reset()
-          continue
+          return
         }
         anchor.node.overridingScore /= 4
       }
@@ -207,4 +217,10 @@ private extension Sequence {
       }
       .map(\.element)
   }
+}
+
+// MARK: - Bool Extension (Private)
+
+extension Bool {
+  var negative: Bool { !self }
 }

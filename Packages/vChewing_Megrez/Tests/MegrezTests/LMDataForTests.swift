@@ -11,9 +11,9 @@ class SimpleLM: LangModelProtocol {
   var mutDatabase: [String: [Megrez.Unigram]] = [:]
   init(input: String, swapKeyValue: Bool = false) {
     let sstream = input.components(separatedBy: "\n")
-    for line in sstream {
+    sstream.forEach { line in
       if line.isEmpty || line.hasPrefix("#") {
-        continue
+        return
       }
       let linestream = line.split(separator: " ")
       let col0 = String(linestream[0])
