@@ -37,6 +37,7 @@ public protocol InputHandlerProtocol {
     candidate: (keyArray: [String], value: String), respectCursorPushing: Bool, preConsolidate: Bool, skipObservation: Bool
   )
   func updateUnigramData() -> Bool
+  func previewCompositionBufferForCandidate(at index: Int)
 }
 
 extension InputHandlerProtocol {
@@ -67,6 +68,7 @@ public protocol InputHandlerDelegate {
   func switchState(_ newState: IMEStateProtocol)
   func candidateController() -> CtlCandidateProtocol?
   func candidateSelectionConfirmedByInputHandler(at index: Int)
+  func setInlineDisplayWithCursor()
   func performUserPhraseOperation(addToFilter: Bool)
     -> Bool
 }
@@ -406,6 +408,28 @@ public class InputHandler: InputHandlerProtocol {
     }
     arrResult = arrResult.stableSort { $0.1.score > $1.1.score }
     return arrResult
+  }
+
+  public func previewCompositionBufferForCandidate(at index: Int) {
+    guard var delegate = delegate, delegate.state.type == .ofCandidates,
+          (0 ..< delegate.state.candidates.count).contains(index)
+    else {
+      return
+    }
+    let gridBackup = compositor.hardCopy
+    defer { compositor = gridBackup }
+    var theState = delegate.state
+    let highlightedPair = theState.candidates[index]
+    consolidateNode(
+      candidate: highlightedPair, respectCursorPushing: false,
+      preConsolidate: PrefMgr.shared.consolidateContextOnCandidateSelection,
+      skipObservation: true
+    )
+    let inputting = generateStateOfInputting(sansReading: true)
+    theState.data.displayTextSegments = inputting.data.displayTextSegments
+    theState.data.cursor = inputting.cursor
+    delegate.state = theState // 直接就地取代，不經過 switchState 處理，免得選字窗被重新載入。
+    delegate.setInlineDisplayWithCursor()
   }
 
   // MARK: - Extracted methods and functions (Tekkon).
