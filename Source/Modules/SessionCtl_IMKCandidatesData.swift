@@ -80,6 +80,7 @@ public extension SessionCtl {
   }
 
   /// IMK 選字窗限定函式，只要選字窗確認了某個候選字詞的選擇、就會呼叫這個函式。
+  /// - Remark: 不要被 IMK 的 API 命名方式困惑到。這其實是 Confirm Selection 確認選字。
   /// - Parameter candidateString: 已經確認的候選字詞內容。
   override func candidateSelected(_ candidateString: NSAttributedString!) {
     let candidateString: String = candidateString?.string ?? ""
@@ -150,6 +151,6 @@ public extension SessionCtl {
         handleIMKCandidatesSelected(state.candidates)
       }
     }
-    candidatePairSelected(at: indexDeducted)
+    candidatePairSelectionConfirmed(at: indexDeducted)
   }
 }

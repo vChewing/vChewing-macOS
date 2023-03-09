@@ -10,7 +10,8 @@ import Cocoa
 
 public protocol CtlCandidateDelegate {
   func candidatePairs(conv: Bool) -> [(keyArray: [String], value: String)]
-  func candidatePairSelected(at index: Int)
+  func candidatePairSelectionConfirmed(at index: Int)
+  func candidatePairHighlightChanged(at index: Int)
   func candidatePairRightClicked(at index: Int, action: CandidateContextMenuAction)
   func candidates(_ sender: Any!) -> [Any]!
   @discardableResult func reverseLookup(for value: String) -> [String]
