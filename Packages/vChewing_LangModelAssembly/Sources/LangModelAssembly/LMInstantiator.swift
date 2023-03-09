@@ -225,11 +225,11 @@ public extension vChewingLM {
 
     // MARK: - 核心函式（對外）
 
-    public func hasAssociatedPhrasesFor(pair: Megrez.Compositor.KeyValuePaired) -> Bool {
+    public func hasAssociatedPhrasesFor(pair: Megrez.KeyValuePaired) -> Bool {
       lmAssociates.hasValuesFor(pair: pair)
     }
 
-    public func associatedPhrasesFor(pair: Megrez.Compositor.KeyValuePaired) -> [String] {
+    public func associatedPhrasesFor(pair: Megrez.KeyValuePaired) -> [String] {
       lmAssociates.valuesFor(pair: pair)
     }
 
