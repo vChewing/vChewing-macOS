@@ -62,7 +62,7 @@ extension InputHandler {
           delegate.switchState(IMEState.ofAbortion())
           return true
         }
-        delegate.candidateSelectionCalledByInputHandler(at: ctlCandidate.highlightedIndex)
+        delegate.candidateSelectionConfirmedByInputHandler(at: ctlCandidate.highlightedIndex)
         return true
       case .kTab:
         let updated: Bool =
@@ -142,7 +142,7 @@ extension InputHandler {
 
     if index != NSNotFound {
       if let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(index) {
-        delegate.candidateSelectionCalledByInputHandler(at: candidateIndex)
+        delegate.candidateSelectionConfirmedByInputHandler(at: candidateIndex)
         return true
       }
     }
@@ -185,7 +185,7 @@ extension InputHandler {
 
       if shouldAutoSelectCandidate {
         guard let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(0) else { return true }
-        delegate.candidateSelectionCalledByInputHandler(at: candidateIndex)
+        delegate.candidateSelectionConfirmedByInputHandler(at: candidateIndex)
         delegate.switchState(IMEState.ofAbortion())
         return handleInput(event: input)
       }
