@@ -108,7 +108,9 @@ extension SessionCtl: CtlCandidateDelegate {
     return convertedCandidates
   }
 
-  public func candidatePairHighlightChanged(at _: Int) {}
+  public func candidatePairHighlightChanged(at theIndex: Int) {
+    inputHandler?.previewCompositionBufferForCandidate(at: theIndex)
+  }
 
   public func candidatePairSelectionConfirmed(at index: Int) {
     guard let inputHandler = inputHandler else { return }
