@@ -87,11 +87,16 @@ public extension SessionCtl {
       showCandidates()
     }
     // 浮動組字窗的顯示判定
-    if newState.hasComposition, clientMitigationLevel >= 2 {
+    updatePopupDisplayWithCursor()
+  }
+
+  /// 浮動組字窗的顯示判定
+  func updatePopupDisplayWithCursor() {
+    if state.hasComposition, clientMitigationLevel >= 2 {
       updateVerticalTypingStatus()
       popupCompositionBuffer.isTypingDirectionVertical = isVerticalTyping
       popupCompositionBuffer.show(
-        state: newState, at: lineHeightRect(zeroCursor: true).origin
+        state: state, at: lineHeightRect(zeroCursor: true).origin
       )
     } else {
       popupCompositionBuffer.hide()
