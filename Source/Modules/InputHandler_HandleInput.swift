@@ -255,19 +255,23 @@ extension InputHandler {
     if input.isUpperCaseASCIILetterKey, !input.isCommandHold, !input.isControlHold {
       if input.isShiftHold { // 這裡先不要判斷 isOptionHold。
         switch prefs.upperCaseLetterKeyBehavior {
-        case 1:
-          delegate.switchState(IMEState.ofEmpty())
-          delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
+        case 1, 3:
+          if prefs.upperCaseLetterKeyBehavior == 3, !isConsideredEmptyForNow { break }
+          let commitText = generateStateOfInputting(sansReading: true).displayedText
+          delegate.switchState(IMEState.ofCommitting(textToCommit: commitText + inputText.lowercased()))
           return true
-        case 2:
-          delegate.switchState(IMEState.ofEmpty())
-          delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.uppercased()))
+        case 2, 4:
+          if prefs.upperCaseLetterKeyBehavior == 4, !isConsideredEmptyForNow { break }
+          let commitText = generateStateOfInputting(sansReading: true).displayedText
+          delegate.switchState(IMEState.ofCommitting(textToCommit: commitText + inputText.uppercased()))
           return true
-        default: // 包括 case 0，直接塞給組字區。
-          let letter = "_letter_\(inputText)"
-          if handlePunctuation(letter) {
-            return true
-          }
+        default: // 包括 case 0。
+          break
+        }
+        // 直接塞給組字區。
+        let letter = "_letter_\(inputText)"
+        if handlePunctuation(letter) {
+          return true
         }
       }
     }
