@@ -60,7 +60,7 @@ public extension PrefMgr {
     if ![0, 1, 2].contains(specifyShiftBackSpaceKeyBehavior) {
       specifyShiftBackSpaceKeyBehavior = 0
     }
-    if ![0, 1, 2].contains(upperCaseLetterKeyBehavior) {
+    if ![0, 1, 2, 3, 4].contains(upperCaseLetterKeyBehavior) {
       upperCaseLetterKeyBehavior = 0
     }
   }

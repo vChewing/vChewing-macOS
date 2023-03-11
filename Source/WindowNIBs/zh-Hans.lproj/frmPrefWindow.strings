@@ -103,8 +103,10 @@
 "rdoShiftBkspKeyBehavior1.title" = "像 Shift+Delete 那样清空当前组字区的内容";
 "rdoShiftBkspKeyBehavior2.title" = "始终剔除游标正后方的字音";
 "rdoUpperCaseLetterKeyBehavior0.title" = "直接键入内文组字区";
-"rdoUpperCaseLetterKeyBehavior1.title" = "直接递交小写字母";
-"rdoUpperCaseLetterKeyBehavior2.title" = "直接递交大写字母";
+"rdoUpperCaseLetterKeyBehavior1.title" = "始终直接递交小写字母";
+"rdoUpperCaseLetterKeyBehavior2.title" = "始终直接递交大写字母";
+"rdoUpperCaseLetterKeyBehavior3.title" = "直接递交小写字母，除非组字区不为空";
+"rdoUpperCaseLetterKeyBehavior4.title" = "直接递交大写字母，除非组字区不为空";
 "RQ6-MS-m4C.title" = "选择您所偏好的系统键盘布局与注音分析器排列。";
 "RUG-ls-KyA.title" = "在选字后将光标置于该字词的前方";
 "rVQ-Hx-cGi.title" = "和语";

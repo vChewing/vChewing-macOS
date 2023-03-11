@@ -103,8 +103,10 @@
 "rdoShiftBkspKeyBehavior1.title" = "Clear the entire inline composition buffer like Shift+Delete";
 "rdoShiftBkspKeyBehavior2.title" = "Always drop the previous reading";
 "rdoUpperCaseLetterKeyBehavior0.title" = "Type them into inline composition buffer";
-"rdoUpperCaseLetterKeyBehavior1.title" = "Directly commit lowercased letters";
-"rdoUpperCaseLetterKeyBehavior2.title" = "Directly commit uppercased letters";
+"rdoUpperCaseLetterKeyBehavior1.title" = "Always directly commit lowercased letters";
+"rdoUpperCaseLetterKeyBehavior2.title" = "Always directly commit uppercased letters";
+"rdoUpperCaseLetterKeyBehavior3.title" = "Directly commit lowercased letters only if the compositor is empty";
+"rdoUpperCaseLetterKeyBehavior4.title" = "Directly commit uppercased letters only if the compositor is empty";
 "RQ6-MS-m4C.title" = "Choose your preferred keyboard layout and phonetic parser.";
 "RUG-ls-KyA.title" = "Push the cursor in front of the phrase after selection";
 "rVQ-Hx-cGi.title" = "Japanese";

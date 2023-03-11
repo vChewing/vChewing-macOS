@@ -193,6 +193,8 @@
 "Allow using Enter key to confirm associated candidate selection" = "允許使用 Enter 確認當前選中的聯想詞";
 "Alphanumerical Layout:" = "英數鍵盤佈局:";
 "Also use “\\” or “¥” key for Hanin Keyboard Symbol Input" = "亦使用「\\」或「¥」鍵啟用漢音鍵盤符號模式";
+"Always directly commit lowercased letters" = "始終直接遞交小寫字母";
+"Always directly commit uppercased letters" = "始終直接遞交大寫字母";
 "Always drop the previous reading" = "始終剔除游標正後方的字音";
 "Always show tooltip texts horizontally" = "始終使用橫排來顯示工具提示視窗";
 "Always type intonations to the inline composition buffer" = "始終在內文組字區內鍵入聲調符號";
@@ -238,8 +240,8 @@
 "Debug Mode" = "偵錯模式";
 "DevZone" = "開發道場";
 "Dictionary" = "辭典設定";
-"Directly commit lowercased letters" = "直接遞交小寫字母";
-"Directly commit uppercased letters" = "直接遞交大寫字母";
+"Directly commit lowercased letters only if the compositor is empty" = "直接遞交小寫字母，除非組字區不為空";
+"Directly commit uppercased letters only if the compositor is empty" = "直接遞交大寫字母，除非組字區不為空";
 "Disable forced conversion for cassette outputs" = "對磁帶模式禁用繁簡轉換";
 "Disable segmented thick underline in marking mode for managed clients" = "針對被管理的客體，在標記模式下禁用分段式粗型下劃線";
 "Disassemble the previous reading, dropping its intonation" = "析構游標正後方的字音，且剔除其聲調";
