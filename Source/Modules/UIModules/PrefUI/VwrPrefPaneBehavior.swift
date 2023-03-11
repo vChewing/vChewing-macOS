@@ -155,8 +155,10 @@ struct VwrPrefPaneBehavior: View {
             selection: $upperCaseLetterKeyBehavior
           ) {
             Text(LocalizedStringKey("Type them into inline composition buffer")).tag(0)
-            Text(LocalizedStringKey("Directly commit lowercased letters")).tag(1)
-            Text(LocalizedStringKey("Directly commit uppercased letters")).tag(2)
+            Text(LocalizedStringKey("Always directly commit lowercased letters")).tag(1)
+            Text(LocalizedStringKey("Always directly commit uppercased letters")).tag(2)
+            Text(LocalizedStringKey("Directly commit lowercased letters only if the compositor is empty")).tag(3)
+            Text(LocalizedStringKey("Directly commit uppercased letters only if the compositor is empty")).tag(4)
           }
           .labelsHidden()
           .pickerStyle(RadioGroupPickerStyle())
