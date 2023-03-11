@@ -194,6 +194,8 @@
 "Allow using Enter key to confirm associated candidate selection" = "Enter キーを連想語彙候補の確認のために使う";
 "Alphanumerical Layout:" = "英数キーボード:";
 "Also use “\\” or “¥” key for Hanin Keyboard Symbol Input" = "「\\」・「¥」キーでも漢音キーボード符号入力";
+"Always directly commit lowercased letters" = "いつでもローマ字（小文字）を直接出力";
+"Always directly commit uppercased letters" = "いつでもローマ字（大文字）を直接出力";
 "Always drop the previous reading" = "カーソルの後部の音読みを常に削除する";
 "Always show tooltip texts horizontally" = "ヒントを常に横書きにする";
 "Always type intonations to the inline composition buffer" = "常に入力緩衝列に音調を入力する";
@@ -239,8 +241,8 @@
 "Debug Mode" = "欠陥辿着モード";
 "DevZone" = "開発道場";
 "Dictionary" = "辞書設定";
-"Directly commit lowercased letters" = "ローマ字（小文字）を直接出力";
-"Directly commit uppercased letters" = "ローマ字（大文字）を直接出力";
+"Directly commit lowercased letters only if the compositor is empty" = "入力緩衝列がからっぽの時、ローマ字（小文字）を直接出力";
+"Directly commit uppercased letters only if the compositor is empty" = "入力緩衝列がからっぽの時、ローマ字（大文字）を直接出力";
 "Disable forced conversion for cassette outputs" = "カセットモードによる漢字出力の簡繁転換を行わずにする";
 "Disable segmented thick underline in marking mode for managed clients" = "管理されている客体アプリには、マーキングモードの多段式太下線の描きを禁ず";
 "Disassemble the previous reading, dropping its intonation" = "カーソルの後部の音読みを解き、その音調を除く";
