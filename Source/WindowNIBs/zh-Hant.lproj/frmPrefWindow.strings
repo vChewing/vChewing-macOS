@@ -103,8 +103,10 @@
 "rdoShiftBkspKeyBehavior1.title" = "像 Shift+Delete 那樣清空當前組字區的內容";
 "rdoShiftBkspKeyBehavior2.title" = "始終剔除游標正後方的字音";
 "rdoUpperCaseLetterKeyBehavior0.title" = "直接鍵入內文組字區";
-"rdoUpperCaseLetterKeyBehavior1.title" = "直接遞交小寫字母";
-"rdoUpperCaseLetterKeyBehavior2.title" = "直接遞交大寫字母";
+"rdoUpperCaseLetterKeyBehavior1.title" = "始終直接遞交小寫字母";
+"rdoUpperCaseLetterKeyBehavior2.title" = "始終直接遞交大寫字母";
+"rdoUpperCaseLetterKeyBehavior3.title" = "直接遞交小寫字母，除非組字區不為空";
+"rdoUpperCaseLetterKeyBehavior4.title" = "直接遞交大寫字母，除非組字區不為空";
 "RQ6-MS-m4C.title" = "選擇您所偏好的系統鍵盤佈局與注音分析器排列。";
 "RUG-ls-KyA.title" = "在選字後將游標置於該字詞的前方";
 "rVQ-Hx-cGi.title" = "和語";

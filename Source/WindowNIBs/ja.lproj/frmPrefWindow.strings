@@ -103,8 +103,10 @@
 "rdoShiftBkspKeyBehavior1.title" = "Shift+Delete のように入力緩衝列を消す";
 "rdoShiftBkspKeyBehavior2.title" = "カーソルの後部の音読みを常に削除する";
 "rdoUpperCaseLetterKeyBehavior0.title" = "入力緩衝列にローマ字入力";
-"rdoUpperCaseLetterKeyBehavior1.title" = "ローマ字（小文字）を直接出力";
-"rdoUpperCaseLetterKeyBehavior2.title" = "ローマ字（大文字）を直接出力";
+"rdoUpperCaseLetterKeyBehavior1.title" = "いつでもローマ字（小文字）を直接出力";
+"rdoUpperCaseLetterKeyBehavior2.title" = "いつでもローマ字（大文字）を直接出力";
+"rdoUpperCaseLetterKeyBehavior3.title" = "入力緩衝列がからっぽの時、ローマ字（小文字）を直接出力";
+"rdoUpperCaseLetterKeyBehavior4.title" = "入力緩衝列がからっぽの時、ローマ字（大文字）を直接出力";
 "RQ6-MS-m4C.title" = "お好きなるキーボードとそれに相応しい注音配列をお選びください。";
 "RUG-ls-KyA.title" = "候補選択の直後、すぐカーソルを単語の向こうに推す";
 "rVQ-Hx-cGi.title" = "和語";
