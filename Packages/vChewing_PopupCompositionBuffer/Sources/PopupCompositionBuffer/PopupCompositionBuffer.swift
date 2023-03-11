@@ -62,6 +62,7 @@ public class PopupCompositionBuffer: NSWindowController {
     }
 
     let attrString: NSMutableAttributedString = .init(string: state.displayedTextConverted)
+    let attrPCBHeader: NSMutableAttributedString = .init(string: "　")
     let verticalAttributes: [NSAttributedString.Key: Any] = [
       .verticalGlyphForm: true,
       .paragraphStyle: {
@@ -77,6 +78,9 @@ public class PopupCompositionBuffer: NSWindowController {
     ]
 
     if isTypingDirectionVertical {
+      attrPCBHeader.setAttributes(
+        verticalAttributes, range: NSRange(location: 0, length: attrPCBHeader.length)
+      )
       attrString.setAttributes(
         verticalAttributes, range: NSRange(location: 0, length: attrString.length)
       )
@@ -127,6 +131,8 @@ public class PopupCompositionBuffer: NSWindowController {
         ? NSMutableAttributedString(string: "▔", attributes: cursorAttributes)
         : NSMutableAttributedString(string: "_", attributes: cursorAttributes)
     attrString.insert(attrCursor, at: state.u16Cursor)
+
+    attrString.insert(attrPCBHeader, at: 0)
 
     textShown = attrString
     messageTextField.maximumNumberOfLines = 1
