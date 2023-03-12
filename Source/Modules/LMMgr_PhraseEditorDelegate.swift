@@ -97,7 +97,8 @@ extension LMMgr: PhraseEditorDelegate {
       guard arr.count >= 2 else { continue }
       let exists = Self.checkIfUserPhraseExist(
         userPhrase: arr[0].description, mode: mode,
-        keyArray: arr[1].map(\.description), factoryDictionaryOnly: true
+        keyArray: arr[1].split(separator: "-").map(\.description),
+        factoryDictionaryOnly: true
       )
       outputStack.append(currentLine.description)
       let replace = !currentLine.contains(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎") && exists
