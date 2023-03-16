@@ -92,28 +92,41 @@ public extension Megrez.Compositor {
 
   /// 返回在當前位置的所有候選字詞（以詞音配對的形式）。如果組字器內有幅位、且游標
   /// 位於組字器的（文字輸入順序的）最前方（也就是游標位置的數值是最大合規數值）的
-  /// 話，那麼這裡會用到 location - 1、以免去在呼叫該函式後再處理的麻煩。
-  /// - Parameter location: 游標位置。
+  /// 話，那麼這裡會對 location 的位置自動減去 1、以免去在呼叫該函式後再處理的麻煩。
+  /// - Parameter location: 游標位置，必須是顯示的游標位置、不得做任何事先糾偏處理。
   /// - Returns: 候選字音配對陣列。
-  func fetchCandidates(at location: Int, filter: CandidateFetchFilter = .all) -> [Megrez.KeyValuePaired] {
+  func fetchCandidates(
+    at givenLocation: Int? = nil, filter givenFilter: CandidateFetchFilter = .all
+  ) -> [Megrez.KeyValuePaired] {
     var result = [Megrez.KeyValuePaired]()
     guard !keys.isEmpty else { return result }
-    let location = max(min(location, keys.count - 1), 0) // 防呆
+    var location = max(min(givenLocation ?? cursor, keys.count), 0)
+    var filter = givenFilter
+    if filter == .endAt {
+      if location == keys.count { filter = .all }
+      location -= 1
+    }
+    location = max(min(location, keys.count - 1), 0)
     let anchors: [NodeAnchor] = fetchOverlappingNodes(at: location).stableSorted {
       // 按照讀音的長度（幅位長度）來給節點排序。
       $0.spanLength > $1.spanLength
     }
     let keyAtCursor = keys[location]
-    anchors.map(\.node).filter(\.keyArray.isEmpty.negative).forEach { theNode in
+    anchors.forEach { theAnchor in
+      let theNode = theAnchor.node
       theNode.unigrams.forEach { gram in
         switch filter {
         case .all:
           // 得加上這道篩選，不然會出現很多無效結果。
           if !theNode.keyArray.contains(keyAtCursor) { return }
         case .beginAt:
-          if theNode.keyArray[0] != keyAtCursor { return }
+          guard theAnchor.spanIndex == location else { return }
         case .endAt:
-          if theNode.keyArray.reversed()[0] != keyAtCursor { return }
+          guard theNode.keyArray.last == keyAtCursor else { return }
+          switch theNode.spanLength {
+          case 2... where theAnchor.spanIndex + theAnchor.spanLength - 1 != location: return
+          default: break
+          }
         }
         result.append(.init(keyArray: theNode.keyArray, value: gram.value))
       }

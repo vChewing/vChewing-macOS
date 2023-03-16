@@ -559,4 +559,25 @@ final class MegrezTests: XCTestCase {
     let resultB = compositorB.walk().walkedNodes
     XCTAssertEqual(resultA, resultB)
   }
+
+  func test22_Compositor_SanitizingNodeCrossing() throws {
+    let theLM = SimpleLM(input: strSampleData)
+    let rawReadings = "ke1 ke1"
+    var compositor = Megrez.Compositor(with: theLM)
+    rawReadings.split(separator: " ").forEach { key in
+      compositor.insertKey(key.description)
+    }
+    var a = compositor.fetchCandidates(at: 1, filter: .beginAt).map(\.keyArray.count).max() ?? 0
+    var b = compositor.fetchCandidates(at: 1, filter: .endAt).map(\.keyArray.count).max() ?? 0
+    var c = compositor.fetchCandidates(at: 0, filter: .beginAt).map(\.keyArray.count).max() ?? 0
+    var d = compositor.fetchCandidates(at: 2, filter: .endAt).map(\.keyArray.count).max() ?? 0
+    XCTAssertEqual("\(a) \(b) \(c) \(d)", "1 1 2 2")
+    compositor.cursor = compositor.length
+    compositor.insertKey("jin1")
+    a = compositor.fetchCandidates(at: 1, filter: .beginAt).map(\.keyArray.count).max() ?? 0
+    b = compositor.fetchCandidates(at: 1, filter: .endAt).map(\.keyArray.count).max() ?? 0
+    c = compositor.fetchCandidates(at: 0, filter: .beginAt).map(\.keyArray.count).max() ?? 0
+    d = compositor.fetchCandidates(at: 2, filter: .endAt).map(\.keyArray.count).max() ?? 0
+    XCTAssertEqual("\(a) \(b) \(c) \(d)", "1 1 2 2")
+  }
 }

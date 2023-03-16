@@ -66,11 +66,13 @@ extension Megrez.Compositor {
   /// - Returns: 一個包含所有與該位置重疊的節點的陣列。
   func fetchOverlappingNodes(at givenLocation: Int) -> [NodeAnchor] {
     var results = [NodeAnchor]()
-    guard !spans.isEmpty, givenLocation < spans.count else { return results }
+    let givenLocation = max(0, min(givenLocation, keys.count - 1))
+    guard !spans.isEmpty else { return results }
 
     // 先獲取該位置的所有單字節點。
     (1 ... max(spans[givenLocation].maxLength, 1)).forEach { theSpanLength in
       guard let node = spans[givenLocation][theSpanLength] else { return }
+      guard !node.keyArray.joined().isEmpty else { return }
       results.append(.init(node: node, spanIndex: givenLocation))
     }
 
@@ -81,6 +83,7 @@ extension Megrez.Compositor {
       guard A <= B else { return }
       (A ... B).forEach { theLength in
         guard let node = spans[theLocation][theLength] else { return }
+        guard !node.keyArray.joined().isEmpty else { return }
         results.append(.init(node: node, spanIndex: theLocation))
       }
     }
