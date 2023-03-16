@@ -166,10 +166,9 @@ public class InputHandler: InputHandlerProtocol {
     return !isBound && rawResult
   }
 
-  /// 實際上要拿給 Megrez 使用的的游標位址，以方便在組字器最開頭或者最末尾的時候始終能抓取候選字節點陣列。
-  ///
-  /// 威注音對游標前置與游標後置模式採取的候選字節點陣列抓取方法是分離的，且不使用 Node Crossing。
-  var cursorForCandidate: Int {
+  /// 要拿給 Megrez 使用的特殊游標位址，用於各種與節點判定有關的操作。
+  /// - Remark: 自 Megrez 引擎 v2.6.2 開始，該參數不得用於獲取候選字詞清單資料。相關函式僅接收原始 cursor 資料。
+  var actualNodeCursorPosition: Int {
     compositor.cursor
       - ((compositor.cursor == compositor.length || !prefs.useRearCursorMode) && compositor.cursor > 0 ? 1 : 0)
   }
@@ -233,18 +232,18 @@ public class InputHandler: InputHandlerProtocol {
   /// - Parameter theCandidate: 要拿來覆寫的詞音配對。
   func consolidateCursorContext(with theCandidate: Megrez.KeyValuePaired) {
     var grid = compositor.hardCopy // 因為會影響到 Node 自身的權重覆寫狀態，所以必須用 hardCopy。
-    var frontBoundaryEX = cursorForCandidate + 1
-    var rearBoundaryEX = cursorForCandidate
+    var frontBoundaryEX = actualNodeCursorPosition + 1
+    var rearBoundaryEX = actualNodeCursorPosition
     var debugIntelToPrint = ""
-    if grid.overrideCandidate(theCandidate, at: cursorForCandidate) {
+    if grid.overrideCandidate(theCandidate, at: actualNodeCursorPosition) {
       grid.walk()
-      let range = grid.walkedNodes.contextRange(ofGivenCursor: cursorForCandidate)
+      let range = grid.walkedNodes.contextRange(ofGivenCursor: actualNodeCursorPosition)
       rearBoundaryEX = range.lowerBound
       frontBoundaryEX = range.upperBound
       debugIntelToPrint.append("EX: \(rearBoundaryEX)..<\(frontBoundaryEX), ")
     }
 
-    let range = compositor.walkedNodes.contextRange(ofGivenCursor: cursorForCandidate)
+    let range = compositor.walkedNodes.contextRange(ofGivenCursor: actualNodeCursorPosition)
     var rearBoundary = min(range.lowerBound, rearBoundaryEX)
     var frontBoundary = max(range.upperBound, frontBoundaryEX)
 
@@ -311,7 +310,7 @@ public class InputHandler: InputHandlerProtocol {
     if preConsolidate { consolidateCursorContext(with: theCandidate) }
 
     // 回到正常流程。
-    if !compositor.overrideCandidate(theCandidate, at: cursorForCandidate) { return }
+    if !compositor.overrideCandidate(theCandidate, at: actualNodeCursorPosition) { return }
     let previousWalk = compositor.walkedNodes
     // 開始爬軌。
     walk()
@@ -319,7 +318,7 @@ public class InputHandler: InputHandlerProtocol {
 
     // 在可行的情況下更新使用者半衰記憶模組。
     var accumulatedCursor = 0
-    let currentNode = currentWalk.findNode(at: cursorForCandidate, target: &accumulatedCursor)
+    let currentNode = currentWalk.findNode(at: actualNodeCursorPosition, target: &accumulatedCursor)
     guard let currentNode = currentNode else { return }
 
     uom: if currentNode.currentUnigram.score > -12, prefs.fetchSuggestionsFromUserOverrideModel {
@@ -332,7 +331,7 @@ public class InputHandler: InputHandlerProtocol {
       // 令半衰記憶模組觀測給定的三元圖。
       // 這個過程會讓半衰引擎根據當前上下文生成三元圖索引鍵。
       currentUOM.performObservation(
-        walkedBefore: previousWalk, walkedAfter: currentWalk, cursor: cursorForCandidate,
+        walkedBefore: previousWalk, walkedAfter: currentWalk, cursor: actualNodeCursorPosition,
         timestamp: Date().timeIntervalSince1970, saveCallback: { self.currentUOM.saveData() }
       )
       // 如果沒有出現崩框的話，那就將這個開關復位。
@@ -352,8 +351,8 @@ public class InputHandler: InputHandlerProtocol {
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
     var arrCandidates: [Megrez.KeyValuePaired] = {
       switch prefs.useRearCursorMode {
-      case false: return compositor.fetchCandidates(at: cursorForCandidate, filter: .endAt)
-      case true: return compositor.fetchCandidates(at: cursorForCandidate, filter: .beginAt)
+      case false: return compositor.fetchCandidates(filter: .endAt)
+      case true: return compositor.fetchCandidates(filter: .beginAt)
       }
     }()
 
@@ -386,7 +385,7 @@ public class InputHandler: InputHandlerProtocol {
     if !prefs.fetchSuggestionsFromUserOverrideModel { return arrResult }
     /// 獲取來自半衰記憶模組的建議結果
     let suggestion = currentUOM.fetchSuggestion(
-      currentWalk: compositor.walkedNodes, cursor: cursorForCandidate, timestamp: Date().timeIntervalSince1970
+      currentWalk: compositor.walkedNodes, cursor: actualNodeCursorPosition, timestamp: Date().timeIntervalSince1970
     )
     arrResult.append(contentsOf: suggestion.candidates)
     if apply {
@@ -399,9 +398,9 @@ public class InputHandler: InputHandlerProtocol {
         )
         vCLog(
           "UOM: Suggestion received, overriding the node score of the selected candidate: \(suggestedPair.toNGramKey)")
-        if !compositor.overrideCandidate(suggestedPair, at: cursorForCandidate, overrideType: overrideBehavior) {
+        if !compositor.overrideCandidate(suggestedPair, at: actualNodeCursorPosition, overrideType: overrideBehavior) {
           compositor.overrideCandidateLiteral(
-            newestSuggestedCandidate.1.value, at: cursorForCandidate, overrideType: overrideBehavior
+            newestSuggestedCandidate.1.value, at: actualNodeCursorPosition, overrideType: overrideBehavior
           )
         }
         walk()
