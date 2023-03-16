@@ -173,6 +173,7 @@ nian2zhong1 年中 -11.373044
 gao1ke1ji4 高科技 -9.842421
 zhe4yang4 這樣 -6.000000 // Non-LibTaBE
 ni3zhe4 你這 -9.000000 // Non-LibTaBE
+ke1ke1 顆顆 -8.000000 // Non-LibTaBE
 jiao4 教 -3.676169
 jiao4 較 -3.24869962
 jiao4yu4 教育 -3.32220565
