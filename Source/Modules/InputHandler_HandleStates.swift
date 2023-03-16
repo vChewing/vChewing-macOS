@@ -789,7 +789,7 @@ extension InputHandler {
       return true
     }
 
-    guard let region = compositor.walkedNodes.cursorRegionMap[cursorForCandidate],
+    guard let region = compositor.walkedNodes.cursorRegionMap[actualNodeCursorPosition],
           compositor.walkedNodes.count > region
     else {
       delegate.callError("1CE6FFBD")
