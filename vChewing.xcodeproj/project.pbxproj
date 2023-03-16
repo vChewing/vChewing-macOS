@@ -678,6 +678,8 @@
 		6A0D4F1215FC0EB100ABF4B3 /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				5B62A33927AE7C6700A19448 /* UIModules */,
+				5B62A33A27AE7C7500A19448 /* WindowControllers */,
 				D427F76B278CA1BA004A2160 /* AppDelegate.swift */,
 				5B8457A02871ADBE00C93B01 /* ChineseConverterBridge.swift */,
 				5BF56F9728C39A2700DD6839 /* IMEState.swift */,
@@ -703,8 +705,6 @@
 				5B00FA0B28DEC17200F6D436 /* SessionCtl_IMKCandidatesData.swift */,
 				5BB802D927FABA8300CF1C19 /* SessionCtl_Menu.swift */,
 				5B660A8528F64A8800E5E4F6 /* SymbolMenuDefaultData.swift */,
-				5B62A33927AE7C6700A19448 /* UIModules */,
-				5B62A33A27AE7C7500A19448 /* WindowControllers */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
