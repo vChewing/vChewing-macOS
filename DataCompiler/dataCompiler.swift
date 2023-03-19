@@ -426,7 +426,7 @@ func weightAndSort(_ arrStructUncalculated: [Unigram], isCHS: Bool) -> [Unigram]
   let fscale = 2.7
   var norm = 0.0
   for unigram in arrStructUncalculated {
-    if unigram.count >= 0 {
+    if (1 ... 6).contains(unigram.value.count), unigram.category != .custom {
       norm += fscale ** (Double(unigram.value.count) / 3.0 - 1.0)
         * Double(unigram.count)
     }
