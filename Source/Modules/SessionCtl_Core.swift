@@ -375,4 +375,11 @@ public extension SessionCtl {
     resetInputHandler()
     super.inputControllerWillClose()
   }
+
+  /// 該函式僅用來取消任何輸入法浮動視窗的顯示。
+  override func hidePalettes() {
+    candidateUI?.visible = false
+    popupCompositionBuffer.hide()
+    tooltipInstance.hide()
+  }
 }
