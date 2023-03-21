@@ -18,39 +18,27 @@ public extension Megrez.Compositor {
     defer { walkedNodes = result }
     guard !spans.isEmpty else { return (result, true) }
 
-    var vertexSpans = [[Vertex]]()
-    spans.forEach { _ in
-      vertexSpans.append(.init())
-    }
-
-    spans.enumerated().forEach { i, span in
-      (1 ... max(span.maxLength, 1)).forEach { j in
-        guard let theNode = span[j] else { return }
-        vertexSpans[i].append(.init(node: theNode))
-      }
-    }
+    var vertexSpans: [[Int: Vertex]] = spans.map(\.asVertexSpan)
 
     let terminal = Vertex(node: .init(keyArray: ["_TERMINAL_"]))
     var root = Vertex(node: .init(keyArray: ["_ROOT_"]))
+    root.distance = 0
 
-    vertexSpans.enumerated().forEach { i, vertexSpan in
-      vertexSpan.forEach { vertex in
-        let nextVertexPosition = i + vertex.node.spanLength
+    vertexSpans.enumerated().forEach { location, vertexSpan in
+      vertexSpan.values.forEach { vertex in
+        let nextVertexPosition = location + vertex.node.spanLength
         if nextVertexPosition == vertexSpans.count {
           vertex.edges.append(terminal)
           return
         }
-        vertexSpans[nextVertexPosition].forEach { vertex.edges.append($0) }
+        vertexSpans[nextVertexPosition].values.forEach { vertex.edges.append($0) }
       }
     }
 
-    root.distance = 0
-    root.edges.append(contentsOf: vertexSpans[0])
+    root.edges.append(contentsOf: vertexSpans[0].values)
 
-    var ordered = topologicalSort(root: &root)
-    ordered.reversed().enumerated().forEach { j, neta in
-      neta.edges.indices.forEach { relax(u: neta, v: &neta.edges[$0]) }
-      ordered[j] = neta
+    topologicalSort(root: &root).reversed().forEach { neta in
+      neta.edges.indices.forEach { neta.relax(target: &neta.edges[$0]) }
     }
 
     var iterated = terminal
@@ -64,7 +52,6 @@ public extension Megrez.Compositor {
     }
 
     // 清理內容，否則會有記憶體洩漏。
-    ordered.removeAll()
     vertexSpans.removeAll()
     iterated.destroy()
     root.destroy()
@@ -82,5 +69,16 @@ public extension Megrez.Compositor {
     walked.removeFirst()
     result = walked
     return (result, true)
+  }
+}
+
+extension Megrez.SpanUnit {
+  /// 將當前幅位單元由節點辭典轉為頂點辭典。
+  var asVertexSpan: [Int: Megrez.Compositor.Vertex] {
+    var result = [Int: Megrez.Compositor.Vertex]()
+    forEach { theKey, theValue in
+      result[theKey] = .init(node: theValue)
+    }
+    return result
   }
 }

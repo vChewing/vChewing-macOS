@@ -107,10 +107,7 @@ public extension Megrez.Compositor {
       location -= 1
     }
     location = max(min(location, keys.count - 1), 0)
-    let anchors: [NodeAnchor] = fetchOverlappingNodes(at: location).stableSorted {
-      // 按照讀音的長度（幅位長度）來給節點排序。
-      $0.spanLength > $1.spanLength
-    }
+    let anchors: [(location: Int, node: Megrez.Node)] = fetchOverlappingNodes(at: location)
     let keyAtCursor = keys[location]
     anchors.forEach { theAnchor in
       let theNode = theAnchor.node
@@ -120,11 +117,11 @@ public extension Megrez.Compositor {
           // 得加上這道篩選，不然會出現很多無效結果。
           if !theNode.keyArray.contains(keyAtCursor) { return }
         case .beginAt:
-          guard theAnchor.spanIndex == location else { return }
+          guard theAnchor.location == location else { return }
         case .endAt:
           guard theNode.keyArray.last == keyAtCursor else { return }
           switch theNode.spanLength {
-          case 2... where theAnchor.spanIndex + theAnchor.spanLength - 1 != location: return
+          case 2... where theAnchor.location + theAnchor.node.spanLength - 1 != location: return
           default: break
           }
         }
@@ -178,8 +175,8 @@ public extension Megrez.Compositor {
     -> Bool
   {
     let location = max(min(location, keys.count), 0) // 防呆
-    var arrOverlappedNodes: [NodeAnchor] = fetchOverlappingNodes(at: min(keys.count - 1, location))
-    var overridden: NodeAnchor?
+    var arrOverlappedNodes: [(location: Int, node: Megrez.Node)] = fetchOverlappingNodes(at: min(keys.count - 1, location))
+    var overridden: (location: Int, node: Megrez.Node)?
     for anchor in arrOverlappedNodes {
       if keyArray != nil, anchor.node.keyArray != keyArray { continue }
       if !anchor.node.selectOverrideUnigram(value: value, type: type) { continue }
@@ -189,7 +186,7 @@ public extension Megrez.Compositor {
 
     guard let overridden = overridden else { return false } // 啥也不覆寫。
 
-    (overridden.spanIndex ..< min(spans.count, overridden.spanIndex + overridden.node.spanLength)).forEach { i in
+    (overridden.location ..< min(spans.count, overridden.location + overridden.node.spanLength)).forEach { i in
       /// 咱們還得弱化所有在相同的幅位座標的節點的複寫權重。舉例說之前爬軌的結果是「A BC」
       /// 且 A 與 BC 都是被覆寫的結果，然後使用者現在在與 A 相同的幅位座標位置
       /// 選了「DEF」，那麼 BC 的覆寫狀態就有必要重設（但 A 不用重設）。
@@ -207,33 +204,4 @@ public extension Megrez.Compositor {
     }
     return true
   }
-}
-
-// MARK: - Stable Sort Extension
-
-// Reference: https://stackoverflow.com/a/50545761/4162914
-
-private extension Sequence {
-  /// Return a stable-sorted collection.
-  ///
-  /// - Parameter areInIncreasingOrder: Return nil when two element are equal.
-  /// - Returns: The sorted collection.
-  func stableSorted(
-    by areInIncreasingOrder: (Element, Element) throws -> Bool
-  )
-    rethrows -> [Element]
-  {
-    try enumerated()
-      .sorted { a, b -> Bool in
-        try areInIncreasingOrder(a.element, b.element)
-          || (a.offset < b.offset && !areInIncreasingOrder(b.element, a.element))
-      }
-      .map(\.element)
-  }
-}
-
-// MARK: - Bool Extension (Private)
-
-extension Bool {
-  var negative: Bool { !self }
 }
