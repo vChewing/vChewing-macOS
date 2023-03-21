@@ -39,23 +39,23 @@ extension Megrez.Compositor {
       edges.removeAll()
       node = .init()
     }
-  }
 
-  /// 卸勁函式。
-  ///
-  /// 「卸勁 (relax)」一詞出自 Cormen 在 2001 年的著作「Introduction to Algorithms」的 585 頁。
-  /// - Parameters:
-  ///   - u: 參照頂點，會在必要時成為 v 的前述頂點。
-  ///   - v: 要影響的頂點。
-  func relax(u: Vertex, v: inout Vertex) {
-    // 從 u 到 w 的距離，也就是 v 的權重。
-    let w: Double = v.node.score
-    // 這裡計算最大權重：
-    // 如果 v 目前的距離值小於「u 的距離值＋w（w 是 u 到 w 的距離，也就是 v 的權重）」，
-    // 我們就更新 v 的距離及其前述頂點。
-    if v.distance >= u.distance + w { return }
-    v.distance = u.distance + w
-    v.prev = u
+    /// 卸勁函式。
+    ///
+    /// 「卸勁 (relax)」一詞出自 Cormen 在 2001 年的著作「Introduction to Algorithms」的 585 頁。
+    /// - Remark: 自己就是參照頂點 (u)，會在必要時成為 target (v) 的前述頂點。
+    /// - Parameters:
+    ///   - target: 要影響的頂點。
+    public func relax(target: inout Vertex) {
+      // 從 u 到 w 的距離，也就是 v 的權重。
+      let w: Double = target.node.score
+      // 這裡計算最大權重：
+      // 如果 v 目前的距離值小於「u 的距離值＋w（w 是 u 到 w 的距離，也就是 v 的權重）」，
+      // 我們就更新 v 的距離及其前述頂點。
+      if target.distance >= distance + w { return }
+      target.distance = distance + w
+      target.prev = self
+    }
   }
 
   /// 對持有單個根頂點的有向無環圖進行位相幾何排序（topological
@@ -65,7 +65,7 @@ extension Megrez.Compositor {
   /// 這樣我們就不會受到當前線程的堆棧大小的限制。以下是等價的原始算法。
   /// ```
   ///  func topologicalSort(vertex: Vertex) {
-  ///    vertex.edges.forEach {vertexNode in
+  ///    vertex.edges.forEach { vertexNode in
   ///      if !vertexNode.topologicallySorted {
   ///        dfs(vertexNode, result)
   ///        vertexNode.topologicallySorted = true
