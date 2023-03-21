@@ -176,31 +176,6 @@ public extension Megrez {
   }
 }
 
-public extension Megrez.Compositor {
-  /// 節錨。在 Gramambular 2 當中又被稱為「NodeInSpan」。
-  struct NodeAnchor: Hashable {
-    /// 節點。
-    let node: Megrez.Node
-    /// 幅位座標。
-    let spanIndex: Int
-    /// 幅位長度。
-    var spanLength: Int { node.spanLength }
-    /// 單元圖陣列。
-    var unigrams: [Megrez.Unigram] { node.unigrams }
-    /// 索引鍵陣列。
-    var keyArray: [String] { node.keyArray }
-    /// 給出該節點內部單元圖陣列內目前被索引位置所指向的單元圖的資料值。
-    var value: String { node.value }
-
-    /// 做為預設雜湊函式。
-    /// - Parameter hasher: 目前物件的雜湊碼。
-    public func hash(into hasher: inout Hasher) {
-      hasher.combine(node)
-      hasher.combine(spanIndex)
-    }
-  }
-}
-
 // MARK: - Array Extensions.
 
 public extension Array where Element == Megrez.Node {

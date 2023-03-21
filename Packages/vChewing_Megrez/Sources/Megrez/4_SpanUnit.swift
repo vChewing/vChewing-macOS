@@ -64,16 +64,15 @@ extension Megrez.Compositor {
   /// 找出所有與該位置重疊的節點。其返回值為一個節錨陣列（包含節點、以及其起始位置）。
   /// - Parameter location: 游標位置。
   /// - Returns: 一個包含所有與該位置重疊的節點的陣列。
-  func fetchOverlappingNodes(at givenLocation: Int) -> [NodeAnchor] {
-    var results = [NodeAnchor]()
+  public func fetchOverlappingNodes(at givenLocation: Int) -> [(location: Int, node: Megrez.Node)] {
+    var results = [(location: Int, node: Megrez.Node)]()
     let givenLocation = max(0, min(givenLocation, keys.count - 1))
     guard !spans.isEmpty else { return results }
 
     // 先獲取該位置的所有單字節點。
     (1 ... max(spans[givenLocation].maxLength, 1)).forEach { theSpanLength in
       guard let node = spans[givenLocation][theSpanLength] else { return }
-      guard !node.keyArray.joined().isEmpty else { return }
-      results.append(.init(node: node, spanIndex: givenLocation))
+      Self.insertAnchor(spanIndex: givenLocation, node: node, to: &results)
     }
 
     // 再獲取以當前位置結尾或開頭的節點。
@@ -83,11 +82,27 @@ extension Megrez.Compositor {
       guard A <= B else { return }
       (A ... B).forEach { theLength in
         guard let node = spans[theLocation][theLength] else { return }
-        guard !node.keyArray.joined().isEmpty else { return }
-        results.append(.init(node: node, spanIndex: theLocation))
+        Self.insertAnchor(spanIndex: theLocation, node: node, to: &results)
       }
     }
 
     return results
+  }
+
+  /// 要在 fetchOverlappingNodes() 內使用的一個工具函式。
+  private static func insertAnchor(
+    spanIndex location: Int, node: Megrez.Node,
+    to targetContainer: inout [(location: Int, node: Megrez.Node)]
+  ) {
+    guard !node.keyArray.joined().isEmpty else { return }
+    let anchor = (location: location, node: node)
+    for i in 0 ... targetContainer.count {
+      guard !targetContainer.isEmpty else { break }
+      guard targetContainer[i].node.spanLength <= anchor.node.spanLength else { continue }
+      targetContainer.insert(anchor, at: i)
+      return
+    }
+    guard targetContainer.isEmpty else { return }
+    targetContainer.append(anchor)
   }
 }

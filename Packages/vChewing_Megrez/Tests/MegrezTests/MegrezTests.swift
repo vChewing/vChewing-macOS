@@ -522,7 +522,7 @@ final class MegrezTests: XCTestCase {
     XCTAssertEqual(result.values, ["高熱", "🔥", "危險"])
   }
 
-  func test20_Compositor_updateUnigramData() throws {
+  func test20_Compositor_UpdateUnigramData() throws {
     let theLM = SimpleLM(input: strSampleData)
     var compositor = Megrez.Compositor(with: theLM)
     compositor.separator = ""
@@ -547,7 +547,7 @@ final class MegrezTests: XCTestCase {
     XCTAssertEqual(newResult2, ["年", "中"])
   }
 
-  func test21_Compositor_hardCopy() throws {
+  func test21_Compositor_HardCopy() throws {
     let theLM = SimpleLM(input: strSampleData)
     let rawReadings = "gao1 ke1 ji4 gong1 si1 de5 nian2 zhong1 jiang3 jin1"
     var compositorA = Megrez.Compositor(with: theLM)
@@ -579,5 +579,28 @@ final class MegrezTests: XCTestCase {
     c = compositor.fetchCandidates(at: 0, filter: .beginAt).map(\.keyArray.count).max() ?? 0
     d = compositor.fetchCandidates(at: 2, filter: .endAt).map(\.keyArray.count).max() ?? 0
     XCTAssertEqual("\(a) \(b) \(c) \(d)", "1 1 2 2")
+  }
+
+  func test23_Compositor_CheckGetCandidates() throws {
+    let theLM = SimpleLM(input: strSampleData)
+    let rawReadings = "gao1 ke1 ji4 gong1 si1 de5 nian2 zhong1 jiang3 jin1"
+    var compositor = Megrez.Compositor(with: theLM)
+    rawReadings.split(separator: " ").forEach { key in
+      compositor.insertKey(key.description)
+    }
+    var stack1A = [String]()
+    var stack1B = [String]()
+    var stack2A = [String]()
+    var stack2B = [String]()
+    for i in 0 ... compositor.keys.count {
+      stack1A.append(compositor.fetchCandidates(at: i, filter: .beginAt).map(\.value).joined(separator: "-"))
+      stack1B.append(compositor.fetchCandidates(at: i, filter: .endAt).map(\.value).joined(separator: "-"))
+      stack2A.append(compositor.fetchCandidatesDeprecated(at: i, filter: .beginAt).map(\.value).joined(separator: "-"))
+      stack2B.append(compositor.fetchCandidatesDeprecated(at: i, filter: .endAt).map(\.value).joined(separator: "-"))
+    }
+    stack1B.removeFirst()
+    stack2B.removeLast()
+    XCTAssertEqual(stack1A, stack2A)
+    XCTAssertEqual(stack1B, stack2B)
   }
 }
