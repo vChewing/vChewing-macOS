@@ -152,10 +152,6 @@ extension InputHandler {
       if input.isShiftHold, input.isCommandHold {
         tooltipMessage = "- Succeeded in nerfing a user phrase."
         tooltipColorState = .succeeded
-        if !state.isFilterable {
-          delegate.callError("2EAC1F7A")
-          return true
-        }
       }
       if !state.isMarkedLengthValid {
         delegate.callError("9AAFAC00")
