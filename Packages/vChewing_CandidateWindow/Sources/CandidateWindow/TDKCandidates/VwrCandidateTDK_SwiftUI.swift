@@ -168,9 +168,7 @@ extension VwrCandidateTDK {
           } label: {
             Text("↓ " + cell.displayedText)
           }
-          if thePool.candidateDataAll.count > cell.index,
-             thePool.candidateDataAll[cell.index].spanLength > 1
-          {
+          if thePool.isFilterable(target: cell.index) {
             Button {
               didRightClickCandidateAt(cell.index, action: .toFilter)
             } label: {
