@@ -214,7 +214,7 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
         arrResult.append(weightVal.description)
       }
       if !txtPECommentField.stringValue.isEmpty { arrResult.append("#" + txtPECommentField.stringValue) }
-      if LMMgr.shared.checkIfUserPhraseExist(
+      if LMMgr.shared.checkIfPhrasePairExists(
         userPhrase: txtPEField1.stringValue, mode: selInputMode, key: txtPEField2.stringValue
       ) {
         arrResult.append(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎")

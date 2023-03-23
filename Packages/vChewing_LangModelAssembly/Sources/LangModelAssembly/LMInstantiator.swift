@@ -305,6 +305,17 @@ public extension vChewingLM {
         : unigramsFor(keyArray: keyArray).map(\.value).contains(value)
     }
 
+    /// 根據給定的索引鍵，確認有多少筆資料值在庫。
+    /// - Parameters:
+    ///   - keyArray: 索引鍵陣列。
+    ///   - factoryDictionaryOnly: 是否僅統計原廠辭典。
+    /// - Returns: 是否在庫。
+    public func countKeyValuePairs(keyArray: [String], factoryDictionaryOnly: Bool = false) -> Int {
+      factoryDictionaryOnly
+        ? lmCore.unigramsFor(key: keyArray.joined(separator: "-")).count
+        : unigramsFor(keyArray: keyArray).count
+    }
+
     /// 給定讀音字串，讓 LMI 給出對應的經過處理的單元圖陣列。
     /// - Parameter key: 給定的讀音字串。
     /// - Returns: 對應的經過處理的單元圖陣列。

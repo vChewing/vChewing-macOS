@@ -77,7 +77,7 @@ public struct IMEStateData: IMEStateDataProtocol {
 
   public var markedTargetExists: Bool {
     let pair = userPhraseKVPair
-    return LMMgr.checkIfUserPhraseExist(
+    return LMMgr.checkIfPhrasePairExists(
       userPhrase: pair.value, mode: IMEApp.currentInputMode, keyArray: pair.keyArray
     )
   }
