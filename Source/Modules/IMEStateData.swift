@@ -102,8 +102,13 @@ public struct IMEStateData: IMEStateDataProtocol {
       .markedClauseSegment: 0,
     ]
   )
+
   public var isFilterable: Bool {
-    markedTargetExists ? (isMarkedLengthValid && markedRange.count > 1) : false
+    guard isMarkedLengthValid else { return false } // 範圍長度必須合規。
+    guard markedTargetExists else { return false } // 必須得有在庫對象
+    guard markedReadings.count == 1 else { return true } // 如果幅長大於 1，則直接批准。
+    // 處理單個漢字的情形：當且僅當在庫量僅有一筆的時候，才禁止過濾。
+    return LMMgr.countPhrasePairs(keyArray: markedReadings, mode: IMEApp.currentInputMode) > 1
   }
 
   public var isMarkedLengthValid: Bool {
@@ -236,15 +241,15 @@ public extension IMEStateData {
 
       if markedTargetExists {
         tooltipColorState = .prompt
-        switch markedRange.count {
-        case 1:
+        switch isFilterable {
+        case false:
           return String(
             format: NSLocalizedString(
               "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf.",
               comment: ""
             ) + "\n◆  " + readingDisplay, text
           )
-        default:
+        case true:
           return String(
             format: NSLocalizedString(
               "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude.",
