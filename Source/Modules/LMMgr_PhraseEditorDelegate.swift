@@ -25,8 +25,8 @@ extension LMMgr: PhraseEditorDelegate {
     vChewingLM.LMConsolidator.consolidate(text: &strProcessed, pragma: shouldCheckPragma)
   }
 
-  public func checkIfUserPhraseExist(userPhrase: String, mode: Shared.InputMode, key unigramKey: String) -> Bool {
-    Self.checkIfUserPhraseExist(userPhrase: userPhrase, mode: mode, keyArray: [unigramKey])
+  public func checkIfPhrasePairExists(userPhrase: String, mode: Shared.InputMode, key unigramKey: String) -> Bool {
+    Self.checkIfPhrasePairExists(userPhrase: userPhrase, mode: mode, keyArray: [unigramKey])
   }
 
   public func retrieveData(mode: Shared.InputMode, type: vChewingLM.ReplacableUserDataType) -> String {
@@ -95,7 +95,7 @@ extension LMMgr: PhraseEditorDelegate {
     for currentLine in strProcessed.split(separator: "\n") {
       let arr = currentLine.split(separator: " ")
       guard arr.count >= 2 else { continue }
-      let exists = Self.checkIfUserPhraseExist(
+      let exists = Self.checkIfPhrasePairExists(
         userPhrase: arr[0].description, mode: mode,
         keyArray: arr[1].split(separator: "-").map(\.description),
         factoryDictionaryOnly: true
