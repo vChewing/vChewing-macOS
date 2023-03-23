@@ -232,6 +232,16 @@ public extension CandidatePool {
     }
     return (min, nil)
   }
+
+  func isFilterable(target index: Int) -> Bool {
+    let spanLength = candidateDataAll[index].spanLength
+    guard spanLength == 1 else { return true }
+    return cellsOf(spanLength: spanLength).count > 1
+  }
+
+  func cellsOf(spanLength: Int) -> [CandidateCellData] {
+    candidateDataAll.filter { $0.spanLength == spanLength }
+  }
 }
 
 // MARK: - Privates.
