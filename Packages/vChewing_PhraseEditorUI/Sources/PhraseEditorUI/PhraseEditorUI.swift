@@ -140,7 +140,7 @@ public struct VwrPhraseEditorUI: View {
     }
     if !txtAddPhraseField4.isEmpty { arrResult.append("#" + txtAddPhraseField4) }
     if let delegate = delegate,
-       delegate.checkIfUserPhraseExist(
+       delegate.checkIfPhrasePairExists(
          userPhrase: txtAddPhraseField1, mode: selInputMode, key: txtAddPhraseField2
        )
     {
