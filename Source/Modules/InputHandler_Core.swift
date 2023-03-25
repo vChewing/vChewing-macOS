@@ -428,6 +428,7 @@ public class InputHandler: InputHandlerProtocol {
     let inputting = generateStateOfInputting(sansReading: true)
     theState.data.displayTextSegments = inputting.data.displayTextSegments
     theState.data.cursor = inputting.cursor
+    theState.data.marker = inputting.marker
     delegate.state = theState // 直接就地取代，不經過 switchState 處理，免得選字窗被重新載入。
     delegate.setInlineDisplayWithCursor()
     if delegate.clientMitigationLevel >= 2, theState.hasComposition {
