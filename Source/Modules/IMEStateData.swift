@@ -62,11 +62,13 @@ public struct IMEStateData: IMEStateDataProtocol {
   /// 所以在這裡必須做糾偏處理。因為在用 Swift，所以可以用「.utf16」取代「NSString.length()」。
   /// 這樣就可以免除不必要的類型轉換。
   public var u16Cursor: Int {
-    displayedText.map(\.description)[0 ..< cursor].joined().utf16.count
+    let upperBound = max(0, min(cursor, displayedText.count))
+    return displayedText.map(\.description)[0 ..< upperBound].joined().utf16.count
   }
 
   public var u16Marker: Int {
-    displayedText.map(\.description)[0 ..< marker].joined().utf16.count
+    let upperBound = max(0, min(marker, displayedText.count))
+    return displayedText.map(\.description)[0 ..< upperBound].joined().utf16.count
   }
 
   public var u16MarkedRange: Range<Int> {
