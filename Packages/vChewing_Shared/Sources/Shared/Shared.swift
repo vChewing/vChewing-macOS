@@ -181,6 +181,7 @@ public enum KeyboardParser: Int, CaseIterable {
   case ofYalePinyin = 12
   case ofHualuoPinyin = 13
   case ofUniversalPinyin = 14
+  case ofWadeGilesPinyin = 15
 
   public var localizedMenuName: String {
     let rawString: String = {
@@ -200,6 +201,7 @@ public enum KeyboardParser: Int, CaseIterable {
       case .ofYalePinyin: return "Yale Pinyin with Numeral Intonation"
       case .ofHualuoPinyin: return "Hualuo Pinyin with Numeral Intonation"
       case .ofUniversalPinyin: return "Universal Pinyin with Numeral Intonation"
+      case .ofWadeGilesPinyin: return "Wade-Giles Pinyin with Numeral Intonation"
       }
     }()
     return NSLocalizedString(rawString, comment: "")
@@ -237,6 +239,8 @@ public enum KeyboardParser: Int, CaseIterable {
       return "HualuoPinyin"
     case .ofUniversalPinyin:
       return "UniversalPinyin"
+    case .ofWadeGilesPinyin:
+      return "WadeGilesPinyin"
     }
   }
 }
