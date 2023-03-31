@@ -18,6 +18,7 @@ private let kWindowTitleHeight: Double = 78
 
 class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   @IBOutlet var uiLanguageButton: NSPopUpButton!
+  @IBOutlet var parserButton: NSPopUpButton!
   @IBOutlet var basicKeyboardLayoutButton: NSPopUpButton!
   @IBOutlet var selectionKeyComboBox: NSComboBox!
   @IBOutlet var chkTrad2KangXi: NSButton!
@@ -26,7 +27,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   @IBOutlet var tglControlDevZoneIMKCandidate: NSButton!
   @IBOutlet var cmbCandidateFontSize: NSPopUpButton!
   @IBOutlet var chkFartSuppressor: NSButton!
-
+  
   @IBOutlet var chkRevLookupInCandidateWindow: NSButton!
   @IBOutlet var btnBrowseFolderForUserPhrases: NSButton!
   @IBOutlet var txtUserPhrasesFolderPath: NSTextField!
@@ -143,27 +144,8 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
       uiLanguageButton.select(currentLanguageSelectItem)
     }
 
-    var usKeyboardLayoutItem: NSMenuItem?
-    var chosenBaseKeyboardLayoutItem: NSMenuItem?
-
-    basicKeyboardLayoutButton.menu?.removeAllItems()
-
-    let basicKeyboardLayoutID = PrefMgr.shared.basicKeyboardLayout
-
-    for source in IMKHelper.allowedBasicLayoutsAsTISInputSources {
-      guard let source = source else {
-        basicKeyboardLayoutButton.menu?.addItem(NSMenuItem.separator())
-        continue
-      }
-      let menuItem = NSMenuItem()
-      menuItem.title = source.vChewingLocalizedName
-      menuItem.representedObject = source.identifier
-      if source.identifier == "com.apple.keylayout.US" { usKeyboardLayoutItem = menuItem }
-      if basicKeyboardLayoutID == source.identifier { chosenBaseKeyboardLayoutItem = menuItem }
-      basicKeyboardLayoutButton.menu?.addItem(menuItem)
-    }
-
-    basicKeyboardLayoutButton.select(chosenBaseKeyboardLayoutItem ?? usKeyboardLayoutItem)
+    refreshBasicKeyboardLayoutMenu()
+    refreshParserMenu()
 
     selectionKeyComboBox.usesDataSource = false
     selectionKeyComboBox.removeAllItems()
@@ -186,6 +168,45 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
     tfdPETextEditor.string = ""
   }
 
+  func refreshBasicKeyboardLayoutMenu() {
+    var usKeyboardLayoutItem: NSMenuItem?
+    var chosenBaseKeyboardLayoutItem: NSMenuItem?
+    basicKeyboardLayoutButton.menu?.removeAllItems()
+    let basicKeyboardLayoutID = PrefMgr.shared.basicKeyboardLayout
+    for source in IMKHelper.allowedBasicLayoutsAsTISInputSources {
+      guard let source = source else {
+        basicKeyboardLayoutButton.menu?.addItem(NSMenuItem.separator())
+        continue
+      }
+      let menuItem = NSMenuItem()
+      menuItem.title = source.vChewingLocalizedName
+      menuItem.representedObject = source.identifier
+      if source.identifier == "com.apple.keylayout.US" { usKeyboardLayoutItem = menuItem }
+      if basicKeyboardLayoutID == source.identifier { chosenBaseKeyboardLayoutItem = menuItem }
+      basicKeyboardLayoutButton.menu?.addItem(menuItem)
+    }
+    basicKeyboardLayoutButton.select(chosenBaseKeyboardLayoutItem ?? usKeyboardLayoutItem)
+  }
+
+  func refreshParserMenu() {
+    var defaultParserItem: NSMenuItem?
+    var chosenParserItem: NSMenuItem?
+    parserButton.menu?.removeAllItems()
+    let basicParserID = PrefMgr.shared.keyboardParser
+    KeyboardParser.allCases.forEach { item in
+      if [7, 10].contains(item.rawValue) {
+        parserButton.menu?.addItem(NSMenuItem.separator())
+      }
+      let menuItem = NSMenuItem()
+      menuItem.title = item.localizedMenuName
+      menuItem.tag = item.rawValue
+      if item.rawValue == 0 { defaultParserItem = menuItem }
+      if basicParserID == item.rawValue { chosenParserItem = menuItem }
+      parserButton.menu?.addItem(menuItem)
+    }
+    parserButton.select(chosenParserItem ?? defaultParserItem)
+  }
+
   // 這裡有必要加上這段處理，用來確保藉由偏好設定介面動過的 CNS 開關能夠立刻生效。
   // 所有涉及到語言模型開關的內容均需要這樣處理。
   @IBAction func toggleCNSSupport(_: Any) {
@@ -205,6 +226,12 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   @IBAction func toggleTrad2JISShinjitaiAction(_: Any) {
     if chkTrad2KangXi.state == .on, chkTrad2JISShinjitai.state == .on {
       PrefMgr.shared.chineseConversionEnabled.toggle()
+    }
+  }
+
+  @IBAction func updateParserAction(_: Any) {
+    if let sourceID = parserButton.selectedItem?.tag as? Int {
+      PrefMgr.shared.keyboardParser = sourceID
     }
   }
 
