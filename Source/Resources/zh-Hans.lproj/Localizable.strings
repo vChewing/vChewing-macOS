@@ -345,4 +345,5 @@
 "Use only one row / column in candidate window." = "仅以单行/单列来陈列候选字。";
 "Vertical" = "纵向布局";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";
+"Wade-Giles Pinyin with Numeral Intonation" = "韦氏拼音+数字标调";
 "Yale Pinyin with Numeral Intonation" = "耶鲁拼音+数字标调";
