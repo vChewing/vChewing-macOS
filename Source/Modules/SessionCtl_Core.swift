@@ -138,7 +138,7 @@ public class SessionCtl: IMKInputController {
 
   /// InputMode 需要在每次出現內容變更的時候都連帶重設組字器與各項語言模組，
   /// 順帶更新 IME 模組及 UserPrefs 當中對於當前語言模式的記載。
-  public var inputMode: Shared.InputMode = IMEApp.currentInputMode {
+  public var inputMode: Shared.InputMode = .imeModeNULL {
     willSet {
       /// 將新的簡繁輸入模式提報給 Prefs 模組。IMEApp 模組會據此計算正確的資料值。
       PrefMgr.shared.mostRecentInputMode = newValue.rawValue
@@ -259,6 +259,11 @@ public extension SessionCtl {
       }
     }
     DispatchQueue.main.async { [self] in
+      if inputMode != IMEApp.currentInputMode {
+        inputMode = IMEApp.currentInputMode
+      }
+    }
+    DispatchQueue.main.async { [self] in
       if isActivated { return }
 
       // 這裡不需要 setValue()，因為 IMK 會在自動呼叫 activateServer() 之後自動執行 setValue()。
@@ -313,7 +318,8 @@ public extension SessionCtl {
     _ = tag // 防止格式整理工具毀掉與此對應的參數。
     _ = sender // 防止格式整理工具毀掉與此對應的參數。
     DispatchQueue.main.async { [self] in
-      inputMode = .init(rawValue: value as? String ?? PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
+      let newMode: Shared.InputMode = .init(rawValue: value as? String ?? PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
+      if inputMode != newMode { inputMode = newMode }
     }
   }
 
