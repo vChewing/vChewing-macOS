@@ -24,6 +24,7 @@
                 <outlet property="cmbPEInputModeMenu" destination="y5f-AO-wKG" id="hW9-zZ-t8S"/>
                 <outlet property="lblCurrentlySpecifiedUserDataFolder" destination="REC-r4-T7m" id="eEq-XN-mMq"/>
                 <outlet property="lblUserPhraseFolderChangeDescription" destination="FUV-qx-xkC" id="2vI-Wk-s0S"/>
+                <outlet property="parserButton" destination="3" id="jhm-hs-Rsn"/>
                 <outlet property="selectionKeyComboBox" destination="uHU-aL-du7" id="cEx-Ui-Phc"/>
                 <outlet property="tfdPETextEditor" destination="kSG-dz-P2N" id="aiA-EA-Isg"/>
                 <outlet property="tglControlDevZoneIMKCandidate" destination="MQ1-z8-Yf1" id="qRk-OO-iUU"/>
@@ -2041,6 +2042,7 @@ DQ
                                                             </items>
                                                         </menu>
                                                         <connections>
+                                                            <action selector="updateParserAction:" target="-2" id="Vbo-gW-rwU"/>
                                                             <binding destination="32" name="selectedTag" keyPath="values.KeyboardParser" id="8MX-rF-6Lp"/>
                                                         </connections>
                                                     </popUpButtonCell>
