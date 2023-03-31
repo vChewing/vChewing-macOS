@@ -67,7 +67,7 @@ public extension Tekkon {
     ///   - isHanyuPinyin: 是否將輸出結果轉成漢語拼音。
     public func getInlineCompositionForDisplay(isHanyuPinyin: Bool = false) -> String {
       switch parser {
-      case .ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin:
+      case .ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin, .ofWadeGilesPinyin:
         var toneReturned = ""
         switch intonation.value {
         case " ": toneReturned = "1"
@@ -77,7 +77,7 @@ public extension Tekkon {
         case "˙": toneReturned = "5"
         default: break
         }
-        return romajiBuffer + toneReturned
+        return romajiBuffer.replacingOccurrences(of: "v", with: "ü") + toneReturned
       default: return getComposition(isHanyuPinyin: isHanyuPinyin)
       }
     }
@@ -85,7 +85,7 @@ public extension Tekkon {
     /// 注拼槽內容是否為空。
     public var isEmpty: Bool {
       switch parser {
-      case .ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin:
+      case .ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin, .ofWadeGilesPinyin:
         return intonation.isEmpty && romajiBuffer.isEmpty
       default: return intonation.isEmpty && vowel.isEmpty && semivowel.isEmpty && consonant.isEmpty
       }
@@ -151,6 +151,8 @@ public extension Tekkon {
           return Tekkon.mapFakeSeigyou[input] != nil
         case .ofStarlight:
           return Tekkon.mapStarlightStaticKeys[input] != nil
+        case .ofWadeGilesPinyin:
+          return Tekkon.mapWadeGilesPinyinKeys.contains(input)
         case .ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin:
           return Tekkon.mapArayuruPinyin.contains(input)
         }
@@ -171,14 +173,15 @@ public extension Tekkon {
     ///   - fromString: 傳入的 String 內容。
     public mutating func receiveKey(fromString input: String = "") {
       switch parser {
-      case .ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin:
+      case .ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin, .ofWadeGilesPinyin:
         if mapArayuruPinyinIntonation.keys.contains(input) {
           if let theTone = mapArayuruPinyinIntonation[input] {
             intonation = Phonabet(theTone)
           }
         } else {
           // 為了防止 romajiBuffer 越敲越長帶來算力負擔，這裡讓它在要溢出時自動丟掉最早輸入的音頭。
-          if romajiBuffer.count > 5 {
+          let maxCount: Int = (parser == .ofWadeGilesPinyin) ? 7 : 6
+          if romajiBuffer.count > maxCount - 1 {
             romajiBuffer = String(romajiBuffer.dropFirst())
           }
           let romajiBufferBackup = romajiBuffer + input
@@ -261,45 +264,27 @@ public extension Tekkon {
     ///   - isRomaji: 如果輸入的字串是諸如漢語拼音這樣的西文字母拼音的話，請啟用此選項。
     public mutating func receiveSequence(_ givenSequence: String = "", isRomaji: Bool = false) {
       clear()
-      if isRomaji {
-        switch parser {
-        case .ofHanyuPinyin:
-          if let dictResult = mapHanyuPinyin[givenSequence] {
-            for phonabet in dictResult {
-              receiveKey(fromPhonabet: String(phonabet))
-            }
-          }
-        case .ofSecondaryPinyin:
-          if let dictResult = mapSecondaryPinyin[givenSequence] {
-            for phonabet in dictResult {
-              receiveKey(fromPhonabet: String(phonabet))
-            }
-          }
-        case .ofYalePinyin:
-          if let dictResult = mapYalePinyin[givenSequence] {
-            for phonabet in dictResult {
-              receiveKey(fromPhonabet: String(phonabet))
-            }
-          }
-        case .ofHualuoPinyin:
-          if let dictResult = mapHualuoPinyin[givenSequence] {
-            for phonabet in dictResult {
-              receiveKey(fromPhonabet: String(phonabet))
-            }
-          }
-        case .ofUniversalPinyin:
-          if let dictResult = mapUniversalPinyin[givenSequence] {
-            for phonabet in dictResult {
-              receiveKey(fromPhonabet: String(phonabet))
-            }
-          }
-        default: break
-        }
-      } else {
-        for key in givenSequence {
-          receiveKey(fromString: String(key))
-        }
+      guard isRomaji else {
+        givenSequence.forEach { receiveKey(fromString: $0.description) }
+        return
       }
+      var dictResult: String?
+      switch parser {
+      case .ofHanyuPinyin:
+        dictResult = mapHanyuPinyin[givenSequence]
+      case .ofSecondaryPinyin:
+        dictResult = mapSecondaryPinyin[givenSequence]
+      case .ofYalePinyin:
+        dictResult = mapYalePinyin[givenSequence]
+      case .ofHualuoPinyin:
+        dictResult = mapHualuoPinyin[givenSequence]
+      case .ofUniversalPinyin:
+        dictResult = mapUniversalPinyin[givenSequence]
+      case .ofWadeGilesPinyin:
+        dictResult = mapWadeGilesPinyin[givenSequence]
+      default: break
+      }
+      dictResult?.forEach { receiveKey(fromPhonabet: $0.description) }
     }
 
     /// 處理一連串的按鍵輸入、且返回被處理之後的注音（陰平為空格）。
@@ -315,7 +300,7 @@ public extension Tekkon {
     ///
     /// 基本上就是按順序從游標前方開始往後刪。
     public mutating func doBackSpace() {
-      if [.ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin].contains(parser),
+      if [.ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin, .ofWadeGilesPinyin].contains(parser),
          !romajiBuffer.isEmpty
       {
         if !intonation.isEmpty {
@@ -382,7 +367,7 @@ public extension Tekkon {
         return Tekkon.mapFakeSeigyou[key] ?? ""
       case .ofStarlight:
         return handleStarlight(key: key)
-      case .ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin:
+      case .ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin, .ofWadeGilesPinyin:
         break // 漢語拼音單獨用另外的函式處理
       }
       return ""

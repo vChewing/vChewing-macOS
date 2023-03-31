@@ -454,4 +454,53 @@ final class TekkonTestsPinyin: XCTestCase {
     toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     XCTAssert(toneMarkerIndicator)
   }
+
+  func testWadeGilesPinyinKeyReceivingAndCompositions() throws {
+    var composer = Tekkon.Composer(arrange: .ofWadeGilesPinyin)
+    var toneMarkerIndicator = true
+
+    // Test Key Receiving
+    composer.receiveKey(fromCharCode: 99) // c
+    composer.receiveKey(fromString: "h")
+    composer.receiveKey(fromString: "'") // 韋氏拼音清濁分辨鍵
+    composer.receiveKey(fromString: "i")
+    composer.receiveKey(fromString: "u")
+    composer.receiveKey(fromString: "n")
+    composer.receiveKey(fromString: "g")
+
+    // Testing missing tone markers
+    toneMarkerIndicator = composer.hasIntonation()
+    XCTAssert(!toneMarkerIndicator)
+
+    composer.receiveKey(fromString: "2") // 陽平
+    XCTAssertEqual(composer.value, "ㄑㄩㄥˊ")
+    composer.doBackSpace()
+    composer.receiveKey(fromString: " ") // 陰平
+    XCTAssertEqual(composer.value, "ㄑㄩㄥ ") // 這裡回傳的結果的陰平是空格
+
+    // Test Getting Displayed Composition
+    XCTAssertEqual(composer.getComposition(), "ㄑㄩㄥ")
+    XCTAssertEqual(composer.getComposition(isHanyuPinyin: true), "qiong1")
+    XCTAssertEqual(composer.getComposition(isHanyuPinyin: true, isTextBookStyle: true), "qiōng")
+    XCTAssertEqual(composer.getInlineCompositionForDisplay(isHanyuPinyin: true), "ch'iung1")
+
+    // Test Tone 5
+    composer.receiveKey(fromString: "7") // 輕聲
+    XCTAssertEqual(composer.getComposition(), "ㄑㄩㄥ˙")
+    XCTAssertEqual(composer.getComposition(isTextBookStyle: true), "˙ㄑㄩㄥ")
+
+    // Testing having tone markers
+    toneMarkerIndicator = composer.hasIntonation()
+    XCTAssert(toneMarkerIndicator)
+
+    // Testing having not-only tone markers
+    toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
+    XCTAssert(!toneMarkerIndicator)
+
+    // Testing having only tone markers
+    composer.clear()
+    composer.receiveKey(fromString: "3") // 上聲
+    toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
+    XCTAssert(toneMarkerIndicator)
+  }
 }
