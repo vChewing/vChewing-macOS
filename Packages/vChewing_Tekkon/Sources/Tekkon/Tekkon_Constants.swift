@@ -143,9 +143,14 @@ public enum Tekkon {
 
   // MARK: - Maps for Keyboard-to-Pinyin parsers
 
-  /// 任何形式的拼音排列都會用到的陣列，用 Strings 反而省事一些。
+  /// 任何形式的拼音排列都會用到的陣列（韋氏拼音與趙元任國語羅馬字除外），
+  /// 用 Strings 反而省事一些。
   /// 這裡同時兼容大千注音的調號數字，所以也將 6、7 號數字鍵放在允許範圍內。
   static let mapArayuruPinyin: String = "abcdefghijklmnopqrstuvwxyz1234567 "
+
+  /// 韋氏拼音專用會用到的陣列，用 Strings 反而省事一些。
+  /// 這裡同時兼容大千注音的調號數字，所以也將 6、7 號數字鍵放在允許範圍內。
+  static var mapWadeGilesPinyinKeys: String = mapArayuruPinyin + "'"
 
   /// 任何拼音都會用到的聲調鍵陣列
   static let mapArayuruPinyinIntonation: [String: String] = [
@@ -451,6 +456,72 @@ public enum Tekkon {
     "fo": "ㄈㄛ", "fa": "ㄈㄚ", "er": "ㄦ", "en": "ㄣ", "ei": "ㄟ", "eh": "ㄝ", "du": "ㄉㄨ", "di": "ㄉㄧ", "de": "ㄉㄜ", "da": "ㄉㄚ",
     "bu": "ㄅㄨ", "bo": "ㄅㄛ", "bi": "ㄅㄧ", "ba": "ㄅㄚ", "ao": "ㄠ", "an": "ㄢ", "ai": "ㄞ",
     "c": "ㄑ", "o": "ㄛ", "e": "ㄜ", "a": "ㄚ",
+  ]
+
+  /// 韋氏拼音排列專用處理陣列
+  static let mapWadeGilesPinyin: [String: String] = [
+    "a": "ㄚ", "ai": "ㄞ", "an": "ㄢ", "ang": "ㄤ", "ao": "ㄠ", "cha": "ㄓㄚ", "chai": "ㄓㄞ", "chan": "ㄓㄢ",
+    "chang": "ㄓㄤ", "chao": "ㄓㄠ", "che": "ㄓㄜ", "chei": "ㄓㄟ", "chen": "ㄓㄣ", "cheng": "ㄓㄥ", "chi": "ㄐㄧ",
+    "chia": "ㄐㄧㄚ", "chiang": "ㄐㄧㄤ", "chiao": "ㄐㄧㄠ", "chieh": "ㄐㄧㄝ", "chien": "ㄐㄧㄢ", "chih": "ㄓ",
+    "chin": "ㄐㄧㄣ", "ching": "ㄐㄧㄥ", "chiu": "ㄐㄧㄡ", "chiung": "ㄐㄩㄥ", "cho": "ㄓㄨㄛ", "chou": "ㄓㄡ",
+    "chu": "ㄓㄨ", "chua": "ㄓㄨㄚ", "chuai": "ㄓㄨㄞ", "chuan": "ㄓㄨㄢ", "chuang": "ㄓㄨㄤ", "chui": "ㄓㄨㄟ",
+    "chun": "ㄓㄨㄣ", "chung": "ㄓㄨㄥ", "ch'a": "ㄔㄚ", "ch'ai": "ㄔㄞ", "ch'an": "ㄔㄢ", "ch'ang": "ㄔㄤ",
+    "ch'ao": "ㄔㄠ", "ch'e": "ㄔㄜ", "ch'en": "ㄔㄣ", "ch'eng": "ㄔㄥ", "ch'i": "ㄑㄧ", "ch'ia": "ㄑㄧㄚ",
+    "ch'iang": "ㄑㄧㄤ", "ch'iao": "ㄑㄧㄠ", "ch'ieh": "ㄑㄧㄝ", "ch'ien": "ㄑㄧㄢ", "ch'ih": "ㄔ", "ch'in": "ㄑㄧㄣ",
+    "ch'ing": "ㄑㄧㄥ", "ch'iu": "ㄑㄧㄡ", "ch'iung": "ㄑㄩㄥ", "ch'o": "ㄔㄨㄛ", "ch'ou": "ㄔㄡ", "ch'u": "ㄔㄨ",
+    "ch'ua": "ㄔㄨㄚ", "ch'uai": "ㄔㄨㄞ", "ch'uan": "ㄔㄨㄢ", "ch'uang": "ㄔㄨㄤ", "ch'ui": "ㄔㄨㄟ",
+    "ch'un": "ㄔㄨㄣ", "ch'ung": "ㄔㄨㄥ", "ch'v": "ㄑㄩ", "ch'van": "ㄑㄩㄢ", "ch'veh": "ㄑㄩㄝ", "ch'vn": "ㄑㄩㄣ",
+    "chv": "ㄐㄩ", "chvan": "ㄐㄩㄢ", "chveh": "ㄐㄩㄝ", "chvn": "ㄐㄩㄣ", "e": "ㄜ", "ei": "ㄟ", "en": "ㄣ",
+    "erh": "ㄦ", "fa": "ㄈㄚ", "fan": "ㄈㄢ", "fang": "ㄈㄤ", "fei": "ㄈㄟ", "fen": "ㄈㄣ", "feng": "ㄈㄥ",
+    "fo": "ㄈㄛ", "fou": "ㄈㄡ", "fu": "ㄈㄨ", "ha": "ㄏㄚ", "hai": "ㄏㄞ", "han": "ㄏㄢ", "hang": "ㄏㄤ",
+    "hao": "ㄏㄠ", "hei": "ㄏㄟ", "hen": "ㄏㄣ", "heng": "ㄏㄥ", "ho": "ㄏㄜ", "hou": "ㄏㄡ", "hsi": "ㄒㄧ",
+    "hsia": "ㄒㄧㄚ", "hsiang": "ㄒㄧㄤ", "hsiao": "ㄒㄧㄠ", "hsieh": "ㄒㄧㄝ", "hsien": "ㄒㄧㄢ", "hsin": "ㄒㄧㄣ",
+    "hsing": "ㄒㄧㄥ", "hsiu": "ㄒㄧㄡ", "hsiung": "ㄒㄩㄥ", "hsv": "ㄒㄩ", "hsvan": "ㄒㄩㄢ", "hsveh": "ㄒㄩㄝ",
+    "hsvn": "ㄒㄩㄣ", "hu": "ㄏㄨ", "hua": "ㄏㄨㄚ", "huai": "ㄏㄨㄞ", "huan": "ㄏㄨㄢ", "huang": "ㄏㄨㄤ",
+    "hui": "ㄏㄨㄟ", "hun": "ㄏㄨㄣ", "hung": "ㄏㄨㄥ", "huo": "ㄏㄨㄛ", "i": "ㄧ", "jan": "ㄖㄢ", "jang": "ㄖㄤ",
+    "jao": "ㄖㄠ", "je": "ㄖㄜ", "jen": "ㄖㄣ", "jeng": "ㄖㄥ", "jih": "ㄖ", "jo": "ㄖㄨㄛ", "jou": "ㄖㄡ",
+    "ju": "ㄖㄨ", "juan": "ㄖㄨㄢ", "jui": "ㄖㄨㄟ", "jun": "ㄖㄨㄣ", "jung": "ㄖㄨㄥ", "ka": "ㄍㄚ", "kai": "ㄍㄞ",
+    "kan": "ㄍㄢ", "kang": "ㄍㄤ", "kao": "ㄍㄠ", "kei": "ㄍㄟ", "ken": "ㄍㄣ", "keng": "ㄍㄥ", "ko": "ㄍㄜ",
+    "kou": "ㄍㄡ", "ku": "ㄍㄨ", "kua": "ㄍㄨㄚ", "kuai": "ㄍㄨㄞ", "kuan": "ㄍㄨㄢ", "kuang": "ㄍㄨㄤ",
+    "kuei": "ㄍㄨㄟ", "kun": "ㄍㄨㄣ", "kung": "ㄍㄨㄥ", "kuo": "ㄍㄨㄛ", "k'a": "ㄎㄚ", "k'ai": "ㄎㄞ", "k'an": "ㄎㄢ",
+    "k'ang": "ㄎㄤ", "k'ao": "ㄎㄠ", "k'en": "ㄎㄣ", "k'eng": "ㄎㄥ", "k'o": "ㄎㄜ", "k'ou": "ㄎㄡ", "k'u": "ㄎㄨ",
+    "k'ua": "ㄎㄨㄚ", "k'uai": "ㄎㄨㄞ", "k'uan": "ㄎㄨㄢ", "k'uang": "ㄎㄨㄤ", "k'uei": "ㄎㄨㄟ", "k'un": "ㄎㄨㄣ",
+    "k'ung": "ㄎㄨㄥ", "k'uo": "ㄎㄨㄛ", "la": "ㄌㄚ", "lai": "ㄌㄞ", "lan": "ㄌㄢ", "lang": "ㄌㄤ", "lao": "ㄌㄠ",
+    "le": "ㄌㄜ", "lei": "ㄌㄟ", "leng": "ㄌㄥ", "li": "ㄌㄧ", "lia": "ㄌㄧㄚ", "liang": "ㄌㄧㄤ", "liao": "ㄌㄧㄠ",
+    "lieh": "ㄌㄧㄝ", "lien": "ㄌㄧㄢ", "lin": "ㄌㄧㄣ", "ling": "ㄌㄧㄥ", "liu": "ㄌㄧㄡ", "lo": "ㄌㄨㄛ", "lou": "ㄌㄡ",
+    "lu": "ㄌㄨ", "luan": "ㄌㄨㄢ", "lun": "ㄌㄨㄣ", "lung": "ㄌㄨㄥ", "lv": "ㄌㄩ", "lveh": "ㄌㄩㄝ", "lvn": "ㄌㄩㄣ",
+    "ma": "ㄇㄚ", "mai": "ㄇㄞ", "man": "ㄇㄢ", "mang": "ㄇㄤ", "mao": "ㄇㄠ", "me": "ㄇㄜ", "mei": "ㄇㄟ",
+    "men": "ㄇㄣ", "meng": "ㄇㄥ", "mi": "ㄇㄧ", "miao": "ㄇㄧㄠ", "mieh": "ㄇㄧㄝ", "mien": "ㄇㄧㄢ", "min": "ㄇㄧㄣ",
+    "ming": "ㄇㄧㄥ", "miu": "ㄇㄧㄡ", "mo": "ㄇㄛ", "mou": "ㄇㄡ", "mu": "ㄇㄨ", "na": "ㄋㄚ", "nai": "ㄋㄞ",
+    "nan": "ㄋㄢ", "nang": "ㄋㄤ", "nao": "ㄋㄠ", "ne": "ㄋㄜ", "nei": "ㄋㄟ", "nen": "ㄋㄣ", "neng": "ㄋㄥ",
+    "ni": "ㄋㄧ", "nia": "ㄋㄧㄚ", "niang": "ㄋㄧㄤ", "niao": "ㄋㄧㄠ", "nieh": "ㄋㄧㄝ", "nien": "ㄋㄧㄢ",
+    "nin": "ㄋㄧㄣ", "ning": "ㄋㄧㄥ", "niu": "ㄋㄧㄡ", "no": "ㄋㄨㄛ", "nou": "ㄋㄡ", "nu": "ㄋㄨ", "nuan": "ㄋㄨㄢ",
+    "nun": "ㄋㄨㄣ", "nung": "ㄋㄨㄥ", "nv": "ㄋㄩ", "nveh": "ㄋㄩㄝ", "ou": "ㄡ", "pa": "ㄅㄚ", "pai": "ㄅㄞ",
+    "pan": "ㄅㄢ", "pang": "ㄅㄤ", "pao": "ㄅㄠ", "pei": "ㄅㄟ", "pen": "ㄅㄣ", "peng": "ㄅㄥ", "pi": "ㄅㄧ",
+    "piao": "ㄅㄧㄠ", "pieh": "ㄅㄧㄝ", "pien": "ㄅㄧㄢ", "pin": "ㄅㄧㄣ", "ping": "ㄅㄧㄥ", "po": "ㄅㄛ", "pu": "ㄅㄨ",
+    "p'a": "ㄆㄚ", "p'ai": "ㄆㄞ", "p'an": "ㄆㄢ", "p'ang": "ㄆㄤ", "p'ao": "ㄆㄠ", "p'ei": "ㄆㄟ", "p'en": "ㄆㄣ",
+    "p'eng": "ㄆㄥ", "p'i": "ㄆㄧ", "p'iao": "ㄆㄧㄠ", "p'ieh": "ㄆㄧㄝ", "p'ien": "ㄆㄧㄢ", "p'in": "ㄆㄧㄣ",
+    "p'ing": "ㄆㄧㄥ", "p'o": "ㄆㄛ", "p'ou": "ㄆㄡ", "p'u": "ㄆㄨ", "sa": "ㄙㄚ", "sai": "ㄙㄞ", "san": "ㄙㄢ",
+    "sang": "ㄙㄤ", "sao": "ㄙㄠ", "se": "ㄙㄜ", "sei": "ㄙㄟ", "sen": "ㄙㄣ", "seng": "ㄙㄥ", "sha": "ㄕㄚ",
+    "shai": "ㄕㄞ", "shan": "ㄕㄢ", "shang": "ㄕㄤ", "shao": "ㄕㄠ", "she": "ㄕㄜ", "shei": "ㄕㄟ", "shen": "ㄕㄣ",
+    "sheng": "ㄕㄥ", "shih": "ㄕ", "shou": "ㄕㄡ", "shu": "ㄕㄨ", "shua": "ㄕㄨㄚ", "shuai": "ㄕㄨㄞ",
+    "shuan": "ㄕㄨㄢ", "shuang": "ㄕㄨㄤ", "shui": "ㄕㄨㄟ", "shun": "ㄕㄨㄣ", "shung": "ㄕㄨㄥ", "shuo": "ㄕㄨㄛ",
+    "so": "ㄙㄨㄛ", "sou": "ㄙㄡ", "ssu": "ㄙ", "su": "ㄙㄨ", "suan": "ㄙㄨㄢ", "sui": "ㄙㄨㄟ", "sun": "ㄙㄨㄣ",
+    "sung": "ㄙㄨㄥ", "ta": "ㄉㄚ", "tai": "ㄉㄞ", "tan": "ㄉㄢ", "tang": "ㄉㄤ", "tao": "ㄉㄠ", "te": "ㄉㄜ",
+    "tei": "ㄉㄟ", "ten": "ㄉㄣ", "teng": "ㄉㄥ", "ti": "ㄉㄧ", "tiang": "ㄉㄧㄤ", "tiao": "ㄉㄧㄠ", "tieh": "ㄉㄧㄝ",
+    "tien": "ㄉㄧㄢ", "ting": "ㄉㄧㄥ", "tiu": "ㄉㄧㄡ", "to": "ㄉㄨㄛ", "tou": "ㄉㄡ", "tsa": "ㄗㄚ", "tsai": "ㄗㄞ",
+    "tsan": "ㄗㄢ", "tsang": "ㄗㄤ", "tsao": "ㄗㄠ", "tse": "ㄗㄜ", "tsei": "ㄗㄟ", "tsen": "ㄗㄣ", "tseng": "ㄗㄥ",
+    "tso": "ㄗㄨㄛ", "tsou": "ㄗㄡ", "tsu": "ㄗㄨ", "tsuan": "ㄗㄨㄢ", "tsui": "ㄗㄨㄟ", "tsun": "ㄗㄨㄣ",
+    "tsung": "ㄗㄨㄥ", "ts'a": "ㄘㄚ", "ts'ai": "ㄘㄞ", "ts'an": "ㄘㄢ", "ts'ang": "ㄘㄤ", "ts'ao": "ㄘㄠ",
+    "ts'e": "ㄘㄜ", "ts'en": "ㄘㄣ", "ts'eng": "ㄘㄥ", "ts'o": "ㄘㄨㄛ", "ts'ou": "ㄘㄡ", "ts'u": "ㄘㄨ",
+    "ts'uan": "ㄘㄨㄢ", "ts'ui": "ㄘㄨㄟ", "ts'un": "ㄘㄨㄣ", "ts'ung": "ㄘㄨㄥ", "tu": "ㄉㄨ", "tuan": "ㄉㄨㄢ",
+    "tui": "ㄉㄨㄟ", "tun": "ㄉㄨㄣ", "tung": "ㄉㄨㄥ", "tzu": "ㄗ", "tz'u": "ㄘ", "t'a": "ㄊㄚ", "t'ai": "ㄊㄞ",
+    "t'an": "ㄊㄢ", "t'ang": "ㄊㄤ", "t'ao": "ㄊㄠ", "t'e": "ㄊㄜ", "t'eng": "ㄊㄥ", "t'i": "ㄊㄧ",
+    "t'iao": "ㄊㄧㄠ", "t'ieh": "ㄊㄧㄝ", "t'ien": "ㄊㄧㄢ", "t'ing": "ㄊㄧㄥ", "t'o": "ㄊㄨㄛ", "t'ou": "ㄊㄡ",
+    "t'u": "ㄊㄨ", "t'uan": "ㄊㄨㄢ", "t'ui": "ㄊㄨㄟ", "t'un": "ㄊㄨㄣ", "t'ung": "ㄊㄨㄥ", "wa": "ㄨㄚ",
+    "wai": "ㄨㄞ", "wan": "ㄨㄢ", "wang": "ㄨㄤ", "wei": "ㄨㄟ", "wen": "ㄨㄣ", "weng": "ㄨㄥ", "wo": "ㄨㄛ",
+    "wu": "ㄨ", "ya": "ㄧㄚ", "yan": "ㄧㄢ", "yang": "ㄧㄤ", "yao": "ㄧㄠ", "yeh": "ㄧㄝ", "yin": "ㄧㄣ",
+    "ying": "ㄧㄥ", "yu": "ㄧㄡ", "yung": "ㄩㄥ", "yv": "ㄩ", "yvan": "ㄩㄢ", "yveh": "ㄩㄝ", "yvn": "ㄩㄣ",
   ]
 
   // MARK: - Maps for Keyboard-to-Phonabet parsers
