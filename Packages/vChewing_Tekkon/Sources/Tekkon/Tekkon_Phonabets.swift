@@ -37,6 +37,7 @@ public extension Tekkon {
     case ofYalePinyin = 102
     case ofHualuoPinyin = 103
     case ofUniversalPinyin = 104
+    case ofWadeGilesPinyin = 105
 
     var name: String {
       switch self {
@@ -70,6 +71,8 @@ public extension Tekkon {
         return "HualuoPinyin"
       case .ofUniversalPinyin:
         return "UniversalPinyin"
+      case .ofWadeGilesPinyin:
+        return "WadeGilesPinyin"
       }
     }
   }
