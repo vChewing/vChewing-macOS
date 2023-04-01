@@ -45,9 +45,7 @@ public extension SessionCtl {
       // 這裡移除一些處理，轉而交給 commitComposition() 代為執行。
       // 這裡不需要 clearInlineDisplay() ，否則會觸發無限迴圈。
       // 對於 IMK 選字窗的顯示狀態糾正的行為交給 inputMode.didSet() 來處理。
-      candidateUI?.visible = false
-      popupCompositionBuffer.hide()
-      tooltipInstance.hide()
+      hidePalettes()
       inputHandler?.clear()
       if ![.ofAbortion, .ofEmpty].contains(previous.type), !previous.displayedText.isEmpty {
         clearInlineDisplay()
