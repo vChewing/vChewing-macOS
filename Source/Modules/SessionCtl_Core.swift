@@ -43,9 +43,6 @@ public class SessionCtl: IMKInputController {
   /// 當前副本的客體是否是輸入法本體？
   public var isServingIMEItself: Bool = false
 
-  /// 專門用來記錄處理狀態的執行緒記錄槽。
-  public var stateQueueSet = [String]()
-
   /// 用以存儲客體的 bundleIdentifier。
   /// 由於每次動態獲取都會耗時，所以這裡直接靜態記載之。
   public var clientBundleIdentifier: String = "" {
