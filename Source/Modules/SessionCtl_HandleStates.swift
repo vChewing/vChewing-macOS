@@ -12,20 +12,6 @@ import Shared
 // MARK: - 狀態調度 (State Handling)
 
 public extension SessionCtl {
-  private func performStateTask(_ doTask: @escaping () -> Void) {
-    let queueID = UUID().uuidString
-    DispatchQueue.main.async { [self] in
-      stateQueueSet.append(queueID)
-      while stateQueueSet.first != queueID {
-        Thread.sleep(forTimeInterval: 0.001)
-      }
-      doTask()
-      if stateQueueSet.first == queueID {
-        stateQueueSet.removeFirst()
-      }
-    }
-  }
-
   /// 針對傳入的新狀態進行調度、且將當前會話控制器的狀態切換至新狀態。
   ///
   /// 先將舊狀態單獨記錄起來，再將新舊狀態作為參數，
@@ -57,8 +43,11 @@ public extension SessionCtl {
     switch newState.type {
     case .ofDeactivated:
       // 這裡移除一些處理，轉而交給 commitComposition() 代為執行。
+      // 這裡不需要 clearInlineDisplay() ，否則會觸發無限迴圈。
       // 對於 IMK 選字窗的顯示狀態糾正的行為交給 inputMode.didSet() 來處理。
-      hidePalettes()
+      candidateUI?.visible = false
+      popupCompositionBuffer.hide()
+      tooltipInstance.hide()
       inputHandler?.clear()
       if ![.ofAbortion, .ofEmpty].contains(previous.type), !previous.displayedText.isEmpty {
         clearInlineDisplay()
@@ -79,23 +68,23 @@ public extension SessionCtl {
         commit(text: previous.displayedText)
       }
       // 會在工具提示為空的時候自動消除顯示。
-      performStateTask { self.showTooltip(newState.tooltip, duration: newState.tooltipDuration) }
+      showTooltip(newState.tooltip, duration: newState.tooltipDuration)
       clearInlineDisplay()
       inputHandler?.clear()
     case .ofInputting:
       candidateUI?.visible = false
       if !newState.textToCommit.isEmpty { commit(text: newState.textToCommit) }
-      // 會在工具提示為空的時候自動消除顯示。
-      performStateTask { self.showTooltip(newState.tooltip, duration: newState.tooltipDuration) }
       setInlineDisplayWithCursor()
+      // 會在工具提示為空的時候自動消除顯示。
+      showTooltip(newState.tooltip, duration: newState.tooltipDuration)
     case .ofMarking:
       candidateUI?.visible = false
-      performStateTask { self.showTooltip(newState.tooltip) }
       setInlineDisplayWithCursor()
+      showTooltip(newState.tooltip)
     case .ofCandidates, .ofAssociates, .ofSymbolTable:
-      performStateTask { self.showCandidates() }
-      setInlineDisplayWithCursor()
       tooltipInstance.hide()
+      setInlineDisplayWithCursor()
+      showCandidates()
     }
     // 浮動組字窗的顯示判定
     updatePopupDisplayWithCursor()
