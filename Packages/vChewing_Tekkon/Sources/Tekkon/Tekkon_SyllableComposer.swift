@@ -165,6 +165,31 @@ public extension Tekkon {
       romajiBuffer = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: consonant.value + semivowel.value + vowel.value)
     }
 
+    /// 自我變換單個注音資料值。
+    /// - Parameters:
+    ///   - strOf: 要取代的內容。
+    ///   - strWith: 要取代成的內容。
+    mutating func fixValue(_ strOf: String, _ strWith: String = "") {
+      let theOld = Phonabet(strOf)
+      if !strOf.isEmpty {
+        switch theOld.type {
+        case .consonant where consonant == theOld: consonant.clear()
+        case .semivowel where semivowel == theOld: semivowel.clear()
+        case .vowel where vowel == theOld: vowel.clear()
+        case .intonation where intonation == theOld: intonation.clear()
+        default: return
+        }
+      }
+      let theNew = Phonabet(strWith)
+      switch theNew.type {
+      case .consonant: consonant = theNew
+      case .semivowel: semivowel = theNew
+      case .vowel: vowel = theNew
+      case .intonation: intonation = theNew
+      case .null: return
+      }
+    }
+
     /// 接受傳入的按鍵訊號時的處理，處理對象為 String。
     /// 另有同名函式可處理 UniChar 訊號。
     ///
@@ -412,9 +437,9 @@ public extension Tekkon {
         }
       case .vowel:
         if semivowel.isEmpty {
-          consonant.selfReplace("ㄐ", "ㄓ")
-          consonant.selfReplace("ㄑ", "ㄔ")
-          consonant.selfReplace("ㄒ", "ㄕ")
+          fixValue("ㄐ", "ㄓ")
+          fixValue("ㄑ", "ㄔ")
+          fixValue("ㄒ", "ㄕ")
         }
       default: break
       }
@@ -447,7 +472,7 @@ public extension Tekkon {
         } else if consonant.isEmpty, semivowel == "ㄧ" {
           vowel = "ㄡ"
         } else if consonant.isEmpty {
-          vowel = "ㄆ"
+          consonant = "ㄆ"
         } else {
           vowel = "ㄡ"
         }
@@ -460,12 +485,12 @@ public extension Tekkon {
       if "dfjk ".contains(key),
          !consonant.isEmpty, semivowel.isEmpty, vowel.isEmpty
       {
-        consonant.selfReplace("ㄆ", "ㄡ")
-        consonant.selfReplace("ㄇ", "ㄢ")
-        consonant.selfReplace("ㄊ", "ㄤ")
-        consonant.selfReplace("ㄋ", "ㄣ")
-        consonant.selfReplace("ㄌ", "ㄥ")
-        consonant.selfReplace("ㄏ", "ㄦ")
+        fixValue("ㄆ", "ㄡ")
+        fixValue("ㄇ", "ㄢ")
+        fixValue("ㄊ", "ㄤ")
+        fixValue("ㄋ", "ㄣ")
+        fixValue("ㄌ", "ㄥ")
+        fixValue("ㄏ", "ㄦ")
       }
 
       // 後置修正
@@ -522,24 +547,21 @@ public extension Tekkon {
 
       if "dfjs ".contains(key) {
         if !consonant.isEmpty, semivowel.isEmpty, vowel.isEmpty {
-          consonant.selfReplace("ㄍ", "ㄜ")
-          consonant.selfReplace("ㄋ", "ㄣ")
-          consonant.selfReplace("ㄌ", "ㄦ")
-          consonant.selfReplace("ㄎ", "ㄤ")
-          consonant.selfReplace("ㄇ", "ㄢ")
-        }
-        if !consonant.isEmpty, vowel.isEmpty {
-          consonant.selfReplace("ㄧ", "ㄝ")
+          fixValue("ㄍ", "ㄜ")
+          fixValue("ㄋ", "ㄣ")
+          fixValue("ㄌ", "ㄦ")
+          fixValue("ㄎ", "ㄤ")
+          fixValue("ㄇ", "ㄢ")
         }
         if "ㄢㄣㄤㄥ".contains(vowel.value), semivowel.isEmpty {
-          consonant.selfReplace("ㄐ", "ㄓ")
-          consonant.selfReplace("ㄑ", "ㄔ")
-          consonant.selfReplace("ㄒ", "ㄕ")
+          fixValue("ㄐ", "ㄓ")
+          fixValue("ㄑ", "ㄔ")
+          fixValue("ㄒ", "ㄕ")
         }
         if "ㄐㄑㄒ".contains(consonant.value), semivowel.isEmpty {
-          consonant.selfReplace("ㄐ", "ㄓ")
-          consonant.selfReplace("ㄑ", "ㄔ")
-          consonant.selfReplace("ㄒ", "ㄕ")
+          fixValue("ㄐ", "ㄓ")
+          fixValue("ㄑ", "ㄔ")
+          fixValue("ㄒ", "ㄕ")
         }
         if consonant == "ㄏ", semivowel.isEmpty, vowel.isEmpty {
           consonant.clear()
@@ -582,13 +604,13 @@ public extension Tekkon {
 
       if "67890 ".contains(key) {
         if !consonant.isEmpty, semivowel.isEmpty, vowel.isEmpty {
-          consonant.selfReplace("ㄈ", "ㄠ")
-          consonant.selfReplace("ㄍ", "ㄥ")
-          consonant.selfReplace("ㄎ", "ㄤ")
-          consonant.selfReplace("ㄌ", "ㄦ")
-          consonant.selfReplace("ㄇ", "ㄢ")
-          consonant.selfReplace("ㄋ", "ㄣ")
-          consonant.selfReplace("ㄊ", "ㄟ")
+          fixValue("ㄈ", "ㄠ")
+          fixValue("ㄍ", "ㄥ")
+          fixValue("ㄎ", "ㄤ")
+          fixValue("ㄌ", "ㄦ")
+          fixValue("ㄇ", "ㄢ")
+          fixValue("ㄋ", "ㄣ")
+          fixValue("ㄊ", "ㄟ")
         }
       }
 
