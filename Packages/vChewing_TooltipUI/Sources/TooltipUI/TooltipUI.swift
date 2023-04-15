@@ -103,8 +103,12 @@ public class TooltipUI: NSWindowController {
         red: 1.00, green: 0.60, blue: 0.00, alpha: 1.00
       )
     case .denialInsufficiency:
-      backgroundColor = NSColor.windowBackgroundColor
-      textColor = NSColor.labelColor
+      backgroundColor = NSColor(
+        red: 0.15, green: 0.15, blue: 0.15, alpha: 1.00
+      )
+      textColor = NSColor(
+        red: 0.88, green: 0.88, blue: 0.88, alpha: 1.00
+      )
     case .prompt:
       backgroundColor = NSColor(
         red: 0.09, green: 0.15, blue: 0.15, alpha: 1.00
@@ -114,13 +118,9 @@ public class TooltipUI: NSWindowController {
       )
     }
     if !NSApplication.isDarkMode {
-      switch state {
-      case .denialInsufficiency: break
-      default:
-        let colorInterchange = backgroundColor
-        backgroundColor = textColor
-        textColor = colorInterchange
-      }
+      let colorInterchange = backgroundColor
+      backgroundColor = textColor
+      textColor = colorInterchange
     }
     window?.contentView?.layer?.backgroundColor = backgroundColor.cgColor
     messageText.textColor = textColor
