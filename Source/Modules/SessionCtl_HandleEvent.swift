@@ -21,8 +21,15 @@ public extension SessionCtl {
   ///   - event: 裝置操作輸入事件，可能會是 nil。
   ///   - sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 回「`true`」以將該按鍵已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
-  @objc(handleEvent:client:) override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
+  @objc(handleEvent:client:) override func handle(_ event: NSEvent?, client sender: Any?) -> Bool {
     _ = sender // 防止格式整理工具毀掉與此對應的參數。
+
+    // 就這傳入的 NSEvent 都還有可能是 nil，Apple InputMethodKit 團隊到底在搞三小。
+    // 只針對特定類型的 client() 進行處理。
+    guard let event = event, sender is IMKTextInput else {
+      resetInputHandler(forceComposerCleanup: true)
+      return false
+    }
 
     // MARK: 前置處理
 
@@ -33,13 +40,6 @@ public extension SessionCtl {
     if let client = client(), state.type == .ofDeactivated {
       state = IMEState.ofEmpty()
       return handle(event, client: client)
-    }
-
-    // 就這傳入的 NSEvent 都還有可能是 nil，Apple InputMethodKit 團隊到底在搞三小。
-    // 只針對特定類型的 client() 進行處理。
-    guard let event = event, sender is IMKTextInput else {
-      resetInputHandler(forceComposerCleanup: true)
-      return false
     }
 
     // Caps Lock 通知與切換處理，要求至少 macOS 12 Monterey。
