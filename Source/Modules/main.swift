@@ -80,6 +80,12 @@ public enum IMEApp {
 
   /// Fart or Beep?
   static func buzz() {
-    NSSound.buzz(fart: !PrefMgr.shared.shouldNotFartInLieuOfBeep)
+    if PrefMgr.shared.isDebugModeEnabled {
+      NSSound.buzz(fart: !PrefMgr.shared.shouldNotFartInLieuOfBeep)
+    } else if !PrefMgr.shared.shouldNotFartInLieuOfBeep {
+      NSSound.buzz(fart: true)
+    } else {
+      NSSound.beep()
+    }
   }
 }
