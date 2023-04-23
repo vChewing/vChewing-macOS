@@ -27,7 +27,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   @IBOutlet var tglControlDevZoneIMKCandidate: NSButton!
   @IBOutlet var cmbCandidateFontSize: NSPopUpButton!
   @IBOutlet var chkFartSuppressor: NSButton!
-  
+
   @IBOutlet var chkRevLookupInCandidateWindow: NSButton!
   @IBOutlet var btnBrowseFolderForUserPhrases: NSButton!
   @IBOutlet var txtUserPhrasesFolderPath: NSTextField!
