@@ -124,7 +124,7 @@ public extension SessionCtl {
 
     // 在啟用注音排列而非拼音輸入的情況下，強制將當前鍵盤佈局翻譯為美規鍵盤。
     if !inputHandler.isComposerUsingPinyin || IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
-      eventToDeal = eventToDeal.inAppleABCStaticForm
+      eventToDeal = eventToDeal.layoutTranslated(to: .qwerty)
     }
 
     // Apple 數字小鍵盤處理
