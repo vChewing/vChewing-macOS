@@ -95,16 +95,6 @@ public struct IMEStateData: IMEStateDataProtocol {
   public var markedReadings = [String]()
   public var candidates = [(keyArray: [String], value: String)]()
   public var textToCommit: String = ""
-  public var tooltip: String = ""
-  public var tooltipDuration: Double = 1.0
-  public var tooltipBackupForInputting: String = ""
-  public var attributedStringPlaceholder: NSAttributedString = .init(
-    string: " ",
-    attributes: [
-      .underlineStyle: NSUnderlineStyle.single.rawValue,
-      .markedClauseSegment: 0,
-    ]
-  )
 
   public var isFilterable: Bool {
     guard isMarkedLengthValid else { return false } // 範圍長度必須合規。
@@ -118,60 +108,12 @@ public struct IMEStateData: IMEStateDataProtocol {
     Self.allowedMarkLengthRange.contains(markedRange.count)
   }
 
+  // MARK: Tooltip neta.
+
+  public var tooltip: String = ""
+  public var tooltipDuration: Double = 1.0
+  public var tooltipBackupForInputting: String = ""
   public var tooltipColorState: TooltipColorState = .normal
-
-  public var attributedStringNormal: NSAttributedString {
-    /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
-    /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
-    let attributedString = NSMutableAttributedString(string: displayedTextConverted)
-    var newBegin = 0
-    for (i, neta) in displayTextSegments.enumerated() {
-      attributedString.setAttributes(
-        [
-          /// 不能用 .thick，否則會看不到游標。
-          .underlineStyle: NSUnderlineStyle.single.rawValue,
-          .markedClauseSegment: i,
-        ], range: NSRange(location: newBegin, length: neta.utf16.count)
-      )
-      newBegin += neta.utf16.count
-    }
-    return attributedString
-  }
-
-  public var attributedStringMarking: NSAttributedString {
-    /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
-    /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
-    let attributedString = NSMutableAttributedString(string: displayedTextConverted)
-    let end = u16MarkedRange.upperBound
-
-    attributedString.setAttributes(
-      [
-        .underlineStyle: NSUnderlineStyle.single.rawValue,
-        .markedClauseSegment: 0,
-      ], range: NSRange(location: 0, length: u16MarkedRange.lowerBound)
-    )
-    attributedString.setAttributes(
-      [
-        .underlineStyle: NSUnderlineStyle.thick.rawValue,
-        .markedClauseSegment: 1,
-      ],
-      range: NSRange(
-        location: u16MarkedRange.lowerBound,
-        length: u16MarkedRange.upperBound - u16MarkedRange.lowerBound
-      )
-    )
-    attributedString.setAttributes(
-      [
-        .underlineStyle: NSUnderlineStyle.single.rawValue,
-        .markedClauseSegment: 2,
-      ],
-      range: NSRange(
-        location: end,
-        length: displayedTextConverted.utf16.count - end
-      )
-    )
-    return attributedString
-  }
 }
 
 // MARK: - AttributedString 生成器
