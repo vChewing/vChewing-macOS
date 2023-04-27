@@ -109,11 +109,11 @@ public extension SessionCtl {
     mitigation: if clientMitigationLevel == 1, state.type == .ofMarking {
       if !PrefMgr.shared.disableSegmentedThickUnderlineInMarkingModeForManagedClients { break mitigation }
       let neo = NSMutableAttributedString(attributedString: attributedStringSecured.value)
+      let rangeNeo = NSRange(location: 0, length: neo.string.utf16.count)
       neo.setAttributes(
-        [
-          .underlineStyle: NSUnderlineStyle.thick.rawValue,
-          .markedClauseSegment: 0,
-        ], range: NSRange(location: 0, length: neo.string.utf16.count)
+        mark(forStyle: kTSMHiliteSelectedConvertedText, at: rangeNeo)
+          as? [NSAttributedString.Key: Any]
+          ?? [.underlineStyle: NSUnderlineStyle.thick.rawValue], range: rangeNeo
       )
       attrStr = neo
       theRange = NSRange.zero
