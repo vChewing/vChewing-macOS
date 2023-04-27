@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import InputMethodKit
 import Shared
 import Tekkon
 import TooltipUI
@@ -170,6 +171,72 @@ public struct IMEStateData: IMEStateDataProtocol {
       )
     )
     return attributedString
+  }
+}
+
+// MARK: - AttributedString 生成器
+
+public extension IMEStateData {
+  func attributedStringNormal(for session: IMKInputController) -> NSAttributedString {
+    /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
+    /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
+    let attributedString = NSMutableAttributedString(string: displayedTextConverted)
+    var newBegin = 0
+    for (i, neta) in displayTextSegments.enumerated() {
+      let rangeNow = NSRange(location: newBegin, length: neta.utf16.count)
+      /// 不能用 .thick，否則會看不到游標。
+      var theAttributes: [NSAttributedString.Key: Any]
+        = session.mark(forStyle: kTSMHiliteConvertedText, at: rangeNow)
+        as? [NSAttributedString.Key: Any]
+        ?? [.underlineStyle: NSUnderlineStyle.single.rawValue]
+      theAttributes[.markedClauseSegment] = i
+      attributedString.setAttributes(theAttributes, range: rangeNow)
+      newBegin += neta.utf16.count
+    }
+    return attributedString
+  }
+
+  func attributedStringMarking(for session: IMKInputController) -> NSAttributedString {
+    /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
+    /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
+    let attributedString = NSMutableAttributedString(string: displayedTextConverted)
+    let u16MarkedRange = u16MarkedRange
+    let range1 = NSRange(location: 0, length: u16MarkedRange.lowerBound)
+    let range2 = NSRange(
+      location: u16MarkedRange.lowerBound,
+      length: u16MarkedRange.upperBound - u16MarkedRange.lowerBound
+    )
+    let range3 = NSRange(
+      location: u16MarkedRange.upperBound,
+      length: displayedTextConverted.utf16.count - u16MarkedRange.upperBound
+    )
+    var rawAttribute1: [NSAttributedString.Key: Any]
+      = session.mark(forStyle: kTSMHiliteConvertedText, at: range1)
+      as? [NSAttributedString.Key: Any]
+      ?? [.underlineStyle: NSUnderlineStyle.single.rawValue]
+    rawAttribute1[.markedClauseSegment] = 0
+    var rawAttribute2: [NSAttributedString.Key: Any]
+      = session.mark(forStyle: kTSMHiliteSelectedConvertedText, at: range2)
+      as? [NSAttributedString.Key: Any]
+      ?? [.underlineStyle: NSUnderlineStyle.thick.rawValue]
+    rawAttribute2[.markedClauseSegment] = 1
+    var rawAttribute3: [NSAttributedString.Key: Any]
+      = session.mark(forStyle: kTSMHiliteConvertedText, at: range3)
+      as? [NSAttributedString.Key: Any]
+      ?? [.underlineStyle: NSUnderlineStyle.single.rawValue]
+    rawAttribute3[.markedClauseSegment] = 2
+    attributedString.setAttributes(rawAttribute1, range: range1)
+    attributedString.setAttributes(rawAttribute2, range: range2)
+    attributedString.setAttributes(rawAttribute3, range: range3)
+    return attributedString
+  }
+
+  func attributedStringPlaceholder(for session: IMKInputController) -> NSAttributedString {
+    let attributes: [NSAttributedString.Key: Any]
+      = session.mark(forStyle: kTSMHiliteSelectedRawText, at: .zero)
+      as? [NSAttributedString.Key: Any]
+      ?? [.underlineStyle: NSUnderlineStyle.single.rawValue]
+    return .init(string: " ", attributes: attributes)
   }
 }
 
