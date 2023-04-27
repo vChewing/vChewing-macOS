@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import InputMethodKit
 import LangModelAssembly
 import Shared
 
@@ -194,6 +195,14 @@ public extension IMEState {
     case .ofMarking: return data.attributedStringMarking
     case .ofAssociates, .ofSymbolTable: return data.attributedStringPlaceholder
     default: return data.attributedStringNormal
+    }
+  }
+
+  func attributedString(for session: IMKInputController) -> NSAttributedString {
+    switch type {
+    case .ofMarking: return data.attributedStringMarking(for: session)
+    case .ofAssociates, .ofSymbolTable: return data.attributedStringPlaceholder(for: session)
+    default: return data.attributedStringNormal(for: session)
     }
   }
 

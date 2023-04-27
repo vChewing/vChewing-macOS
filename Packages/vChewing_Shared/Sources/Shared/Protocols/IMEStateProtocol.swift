@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import Cocoa
+import InputMethodKit
 
 // 所有 IMEState 均遵守該協定：
 public protocol IMEStateProtocol {
@@ -32,6 +33,7 @@ public protocol IMEStateProtocol {
   var u16Cursor: Int { get }
   var cursor: Int { get set }
   var marker: Int { get set }
+  func attributedString(for session: IMKInputController) -> NSAttributedString
 }
 
 public protocol IMEStateDataProtocol {
@@ -57,4 +59,7 @@ public protocol IMEStateDataProtocol {
   var userPhraseKVPair: (keyArray: [String], value: String) { get }
   var tooltipColorState: TooltipColorState { get set }
   mutating func updateTooltipForMarking()
+  func attributedStringNormal(for session: IMKInputController) -> NSAttributedString
+  func attributedStringMarking(for session: IMKInputController) -> NSAttributedString
+  func attributedStringPlaceholder(for session: IMKInputController) -> NSAttributedString
 }
