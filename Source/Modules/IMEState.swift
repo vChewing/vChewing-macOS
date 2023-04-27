@@ -190,14 +190,6 @@ public extension IMEState {
     set { data.tooltip = newValue }
   }
 
-  var attributedString: NSAttributedString {
-    switch type {
-    case .ofMarking: return data.attributedStringMarking
-    case .ofAssociates, .ofSymbolTable: return data.attributedStringPlaceholder
-    default: return data.attributedStringNormal
-    }
-  }
-
   func attributedString(for session: IMKInputController) -> NSAttributedString {
     switch type {
     case .ofMarking: return data.attributedStringMarking(for: session)
