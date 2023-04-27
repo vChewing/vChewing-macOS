@@ -18,8 +18,8 @@ public extension SessionCtl {
   // 這樣，不但強制使用（限制讀音 20 個的）浮動組字窗，而且內文組字區只會顯示一個空格。
   var attributedStringSecured: (value: NSAttributedString, range: NSRange) {
     clientMitigationLevel >= 2
-      ? (state.data.attributedStringPlaceholder, NSRange(location: 0, length: 0))
-      : (state.attributedString, NSRange(state.u16MarkedRange))
+      ? (state.data.attributedStringPlaceholder(for: self), NSRange(location: 0, length: 0))
+      : (state.attributedString(for: self), NSRange(state.u16MarkedRange))
   }
 
   func lineHeightRect(zeroCursor: Bool = false) -> NSRect {
