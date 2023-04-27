@@ -244,7 +244,7 @@ public extension SessionCtl {
   /// 啟用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體。
   override func activateServer(_ sender: Any!) {
-    _ = sender // 防止格式整理工具毀掉與此對應的參數。
+    super.activateServer(sender)
     DispatchQueue.main.async { [self] in
       if let senderBundleID: String = (sender as? IMKTextInput)?.bundleIdentifier() {
         vCLog("activateServer(\(senderBundleID))")
@@ -294,7 +294,6 @@ public extension SessionCtl {
   /// 停用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   override func deactivateServer(_ sender: Any!) {
-    _ = sender // 防止格式整理工具毀掉與此對應的參數。
     DispatchQueue.main.async { [self] in
       isActivated = false
       resetInputHandler() // 這條會自動搞定 Empty 狀態。
@@ -305,6 +304,7 @@ public extension SessionCtl {
         candidateUI = nil
       }
     }
+    super.deactivateServer(sender)
   }
 
   /// 切換至某一個輸入法的某個副本時（比如威注音的簡體輸入法副本與繁體輸入法副本），會觸發該函式。
@@ -315,12 +315,11 @@ public extension SessionCtl {
   ///   - tag: 標記（無須使用）。
   ///   - sender: 呼叫了該函式的客體（無須使用）。
   override func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
-    _ = tag // 防止格式整理工具毀掉與此對應的參數。
-    _ = sender // 防止格式整理工具毀掉與此對應的參數。
     DispatchQueue.main.async { [self] in
       let newMode: Shared.InputMode = .init(rawValue: value as? String ?? PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
       if inputMode != newMode { inputMode = newMode }
     }
+    super.setValue(value, forTag: tag, client: sender)
   }
 
   /// 將輸入法偏好設定同步至語言模組內。
@@ -380,6 +379,11 @@ public extension SessionCtl {
     // 下述兩行用來防止尚未完成拼寫的注音內容被遞交出去。
     resetInputHandler()
     super.inputControllerWillClose()
+  }
+
+  /// 指定標記模式下被高亮的部分。
+  override func selectionRange() -> NSRange {
+    attributedStringSecured.range
   }
 
   /// 該函式僅用來取消任何輸入法浮動視窗的顯示。
