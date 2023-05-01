@@ -226,7 +226,7 @@
 "Choose the behavior of Shift+Letter key with letter inputs." = "Shift+文字キーの行為をご指定ください。";
 "Choose the cursor position where you want to list possible candidates." = "カーソルはどこで入力候補を呼び出すかとご指定ださい。";
 "Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only." = "macOS 英数キーボード配置をご指定ください。Shift 英数入力モードだけに使われる配置である。";
-"Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is not (any) pinyin." = "macOS 基礎キーボード配置をご指定ください。QWERTY 以外の英数キーボードは弁音以外の配列に不適用。弁音配列を起用していない限り、キーボード配置の設定はキーボードビューアの有りようだけに影響を及ぼす。";
+"Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is neither (any) pinyin nor dynamically reparsable with different western keyboard layouts (like Eten 26, Hsu, etc.)." = "macOS 基礎キーボード配置をご指定ください。QWERTY 以外の英数キーボードは弁音以外の配列に不適用。弁音配列或いは「英数キーボードー配置と関わる注音配列（例えば許氏など）」を起用していない限り、キーボード配置の設定はキーボードビューアの有りようだけに影響を及ぼす。";
 "Choose the phonetic layout for Mandarin parser." = "共通語分析器の注音配列をご指定ください。";
 "Choose your desired cassette file path. Will be omitted if invalid." = "欲しがる CIN カセットファイルをご指定ください。無効なる設定は省かれる。";
 "Choose your desired cassette file path." = "欲しがる CIN カセットファイルをご指定ください。";
