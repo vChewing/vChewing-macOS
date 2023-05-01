@@ -12,8 +12,6 @@
 "17.title" = "単語の後で // Microsoft 新注音入力のやり方";
 "18.title" = "Radio";
 "1AW-xf-c2f.label" = "キーボード";
-"1ll-Jn-OD5.title" = "CIN カセットモード";
-"1Pn-EV-mui.title" = "注音音読逆引参照";
 "20.title" = "Radio";
 "21.title" = "横型陳列";
 "22.title" = "縦型陳列";
@@ -134,10 +132,13 @@
 "xibOutputSettings.title" = "出力設定";
 "xibUsingCurrencyNumerals.title" = "数字大字変換";
 "xibUsingHotKeyAssociates.title" = "全候補入力で連想語彙";
+"xibUsingHotKeyCassette.title" = "CIN カセットモード";
 "xibUsingHotKeyCNS.title" = "全字庫モード";
 "xibUsingHotKeyHalfWidthASCII.title" = "半角句読モード";
+"xibUsingHotKeyInputMode.title" = "簡体・繁体中国語入力の切り替え";
 "xibUsingHotKeyJIS.title" = "JIS 新字体モード";
 "xibUsingHotKeyKangXi.title" = "康熙文字変換モード";
+"xibUsingHotKeyRevLookup.title" = "注音音読逆引参照";
 "xibUsingHotKeySCPC.title" = "全候補入力モード";
 "xjP-r7-GaK.title" = "酷音大千 26 キー配列";
 "XqL-rf-X6d.title" = "Space で次のページ、Shift+Space で次の候補文字を";

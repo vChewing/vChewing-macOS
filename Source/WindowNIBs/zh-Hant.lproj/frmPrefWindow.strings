@@ -12,8 +12,6 @@
 "17.title" = "游標置於詞語後方 // Windows 微軟新注音風格";
 "18.title" = "Radio";
 "1AW-xf-c2f.label" = "鍵盤";
-"1ll-Jn-OD5.title" = "CIN 磁帶模式";
-"1Pn-EV-mui.title" = "注音反查";
 "20.title" = "Radio";
 "21.title" = "橫向佈局";
 "22.title" = "縱向佈局";
@@ -134,10 +132,13 @@
 "xibOutputSettings.title" = "輸出設定";
 "xibUsingCurrencyNumerals.title" = "大寫漢字數字輸出";
 "xibUsingHotKeyAssociates.title" = "逐字選字聯想模式";
+"xibUsingHotKeyCassette.title" = "CIN 磁帶模式";
 "xibUsingHotKeyCNS.title" = "全字庫模式";
 "xibUsingHotKeyHalfWidthASCII.title" = "半形標點模式";
+"xibUsingHotKeyInputMode.title" = "簡體/繁體中文輸入模式切換";
 "xibUsingHotKeyJIS.title" = "JIS 新字體模式";
 "xibUsingHotKeyKangXi.title" = "康熙正體字模式";
+"xibUsingHotKeyRevLookup.title" = "注音反查";
 "xibUsingHotKeySCPC.title" = "模擬逐字選字輸入";
 "xjP-r7-GaK.title" = "酷音大千二十六鍵";
 "XqL-rf-X6d.title" = "Space 換下一頁，Shift+Space 換選下一個候選字";
