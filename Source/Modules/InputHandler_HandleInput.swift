@@ -207,7 +207,7 @@ extension InputHandler {
             delegate.switchState(inputting)
           } else {
             let displayedText = state.displayedText
-            if !displayedText.isEmpty {
+            if !displayedText.isEmpty, !isConsideredEmptyForNow {
               delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
             }
             delegate.switchState(IMEState.ofCommitting(textToCommit: " "))
