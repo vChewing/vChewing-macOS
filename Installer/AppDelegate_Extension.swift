@@ -156,28 +156,22 @@ extension AppDelegate {
       }
     }
 
-    var isMacOS12OrAbove = false
-    if #available(macOS 12.0, *) {
-      NSLog("macOS 12 or later detected.")
-      isMacOS12OrAbove = true
-    } else {
-      NSLog("Installer runs with the pre-macOS 12 flow.")
-    }
-
-    // Unconditionally enable the IME on macOS 12.0+,
-    // as the kTISPropertyInputSourceIsEnabled can still be true even if the IME is *not*
-    // enabled in the user's current set of IMEs (which means the IME does not show up in
-    // the user's input menu).
-
     var mainInputSourceEnabled = false
 
-    allRegisteredInstancesOfThisInputMethod.forEach {
-      if $0.activate() {
+    allRegisteredInstancesOfThisInputMethod.forEach { neta in
+      let isActivated = neta.isActivated
+      defer {
+        // 如果使用者在升級安裝或再次安裝之前已經有啟用威注音任一簡繁模式的話，則標記安裝成功。
+        // 這樣可以尊重某些使用者「僅使用簡體中文」或「僅使用繁體中文」的習慣。
+        mainInputSourceEnabled = mainInputSourceEnabled || isActivated
+      }
+      if isActivated, !isMonterey { return }
+      // WARNING: macOS 12 may return false positives, hence forced activation.
+      if neta.activate() {
         NSLog("Input method enabled: \(imeIdentifier)")
       } else {
         NSLog("Failed to enable input method: \(imeIdentifier)")
       }
-      mainInputSourceEnabled = $0.isActivated
     }
 
     // Alert Panel
@@ -190,7 +184,7 @@ extension AppDelegate {
       )
       ntfPostInstall.addButton(withTitle: NSLocalizedString("OK", comment: ""))
     } else {
-      if !mainInputSourceEnabled, !isMacOS12OrAbove {
+      if !mainInputSourceEnabled, !isMonterey {
         ntfPostInstall.messageText = NSLocalizedString("Warning", comment: "")
         ntfPostInstall.informativeText = NSLocalizedString(
           "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources.",
