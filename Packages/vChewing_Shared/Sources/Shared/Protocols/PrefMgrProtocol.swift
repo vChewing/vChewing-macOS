@@ -86,4 +86,5 @@ public protocol PrefMgrProtocol {
   var usingHotKeyCurrencyNumerals: Bool { get set }
   var usingHotKeyCassette: Bool { get set }
   var usingHotKeyRevLookup: Bool { get set }
+  var usingHotKeyInputMode: Bool { get set }
 }

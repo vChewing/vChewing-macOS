@@ -1,4 +1,8 @@
 "vChewing" = "vChewing";
+"CHS / CHT Input Mode Switch" = "CHS / CHT Input Mode Switch";
+"Switch to %@ Input Mode" = "Switch to %@ Input Mode";
+"Target Input Mode Activation Required" = "Target Input Mode Activation Required";
+"You are proceeding to System Preferences to enable the Input Source which corresponds to the input mode you are going to switch to." = "You are proceeding to System Preferences to enable the Input Source which corresponds to the input mode you are going to switch to.";
 "IMK Candidate Window has been automatically disabled due to its recent crash with force-exposed necessary internal APIs. As an experimental feature, we advise against using IMK Candidate Window in productive environments." = "IMK Candidate Window has been automatically disabled due to its recent crash with force-exposed necessary internal APIs. As an experimental feature, we advise against using IMK Candidate Window in productive environments.";
 "Do you want to enable the popup composition buffer for this client?" = "Do you want to enable the popup composition buffer for this client?";
 "Some client apps may have different compatibility issues in IMKTextInput implementation." = "Some client apps may have different compatibility issues in IMKTextInput implementation.";

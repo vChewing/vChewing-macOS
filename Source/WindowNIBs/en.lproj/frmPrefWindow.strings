@@ -12,8 +12,6 @@
 "17.title" = "Cursor at the rear of the phrase (like Microsoft New Phonetic)";
 "18.title" = "Radio";
 "1AW-xf-c2f.label" = "Keyboard";
-"1ll-Jn-OD5.title" = "CIN Cassette Mode";
-"1Pn-EV-mui.title" = "Reverse Lookup (Phonabets)";
 "20.title" = "Radio";
 "21.title" = "Horizontal";
 "22.title" = "Vertical";
@@ -134,10 +132,13 @@
 "xibOutputSettings.title" = "Output Settings";
 "xibUsingCurrencyNumerals.title" = "Currency Numeral Output";
 "xibUsingHotKeyAssociates.title" = "Per-Char Associated Phrases";
+"xibUsingHotKeyCassette.title" = "CIN Cassette Mode";
 "xibUsingHotKeyCNS.title" = "CNS11643 Mode";
 "xibUsingHotKeyHalfWidthASCII.title" = "Half-Width Punctuation Mode";
+"xibUsingHotKeyInputMode.title" = "CHS / CHT Input Mode Switch";
 "xibUsingHotKeyJIS.title" = "JIS Shinjitai Output";
 "xibUsingHotKeyKangXi.title" = "Force KangXi Writing";
+"xibUsingHotKeyRevLookup.title" = "Reverse Lookup (Phonabets)";
 "xibUsingHotKeySCPC.title" = "Per-Char Select Mode";
 "xjP-r7-GaK.title" = "Dachen 26 (libChewing)";
 "XqL-rf-X6d.title" = "Space to +revolve pages, Shift+Space to +revolve candidates";
