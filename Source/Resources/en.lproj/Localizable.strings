@@ -96,7 +96,7 @@
 "Force KangXi Writing" = "Force KangXi Writing";
 "NotificationSwitchON" = "✔ ON";
 "NotificationSwitchOFF" = "✘ OFF";
-"NotificationSwitchASCII" = "↺ Switched";
+"NotificationSwitchRevolver" = "↺ Switched";
 "Edit vChewing User Phrases…" = "Edit vChewing User Phrases…";
 "Reload User Phrases" = "Reload User Phrases";
 "Unable to create the user phrase file." = "Unable to create the user phrase file.";
