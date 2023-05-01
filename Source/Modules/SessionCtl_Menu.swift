@@ -27,6 +27,15 @@ extension SessionCtl {
   override public func menu() -> NSMenu! {
     let menu = NSMenu(title: "Input Method Menu")
 
+    let switchInputModeItem = menu.addItem(
+      withTitle: String(
+        format: "Switch to %@ Input Mode".localized,
+        IMEApp.currentInputMode.reversed.localizedDescription
+      ),
+      action: #selector(switchInputMode(_:)), keyEquivalent: PrefMgr.shared.usingHotKeyInputMode ? "D" : ""
+    )
+    switchInputModeItem.keyEquivalentModifierMask = [.command, .control]
+
     let useSCPCTypingModeItem = menu.addItem(
       withTitle: "Per-Char Select Mode".localized,
       action: #selector(toggleSCPCTypingMode(_:)), keyEquivalent: PrefMgr.shared.usingHotKeySCPC ? "P" : ""
@@ -154,8 +163,6 @@ extension SessionCtl {
       keyEquivalent: PrefMgr.shared.usingHotKeyRevLookup ? "/" : ""
     )
     revLookupMenuItem.keyEquivalentModifierMask = [.command, .control]
-
-    menu.addItem(NSMenuItem.separator()) // ---------------------
 
     menu.addItem(
       withTitle: "Optimize Memorized Phrases".localized,

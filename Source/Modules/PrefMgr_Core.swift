@@ -358,4 +358,7 @@ public class PrefMgr: PrefMgrProtocol {
 
   @AppProperty(key: UserDef.kUsingHotKeyRevLookup.rawValue, defaultValue: true)
   public var usingHotKeyRevLookup: Bool
+
+  @AppProperty(key: UserDef.kUsingHotKeyInputMode.rawValue, defaultValue: true)
+  public var usingHotKeyInputMode: Bool
 }

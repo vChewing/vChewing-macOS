@@ -94,6 +94,7 @@ public enum UserDef: String, CaseIterable {
   case kUsingHotKeyCurrencyNumerals = "UsingHotKeyCurrencyNumerals"
   case kUsingHotKeyCassette = "UsingHotKeyCassette"
   case kUsingHotKeyRevLookup = "UsingHotKeyRevLookup"
+  case kUsingHotKeyInputMode = "UsingHotKeyInputMode"
 
   public static func resetAll() {
     UserDef.allCases.forEach {

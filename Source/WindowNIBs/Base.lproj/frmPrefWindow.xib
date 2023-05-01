@@ -2137,7 +2137,7 @@ DQ
                             </customSpacing>
                         </stackView>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="gwA-XL-zVB">
-                            <rect key="frame" x="0.0" y="0.0" width="394" height="123"/>
+                            <rect key="frame" x="0.0" y="0.0" width="396" height="123"/>
                             <subviews>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Md1-t7-hU4">
                                     <rect key="frame" x="-2" y="108" width="125" height="15"/>
@@ -2148,7 +2148,7 @@ DQ
                                     </textFieldCell>
                                 </textField>
                                 <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="9gt-7a-9Z9">
-                                    <rect key="frame" x="0.0" y="0.0" width="394" height="100"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="396" height="100"/>
                                     <subviews>
                                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="j6Y-Nb-nco">
                                             <rect key="frame" x="0.0" y="0.0" width="186" height="100"/>
@@ -2235,10 +2235,10 @@ DQ
                                             </customSpacing>
                                         </stackView>
                                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="xUN-xX-K7e">
-                                            <rect key="frame" x="206" y="21" width="188" height="79"/>
+                                            <rect key="frame" x="206" y="0.0" width="190" height="100"/>
                                             <subviews>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aBy-qb-ZL5" userLabel="UsingHotKeyHalfWidthASCII">
-                                                    <rect key="frame" x="-1" y="62.5" width="189" height="17"/>
+                                                    <rect key="frame" x="-1" y="83.5" width="189" height="17"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="9gu-Gq-Bpc"/>
                                                     </constraints>
@@ -2251,7 +2251,7 @@ DQ
                                                     </connections>
                                                 </button>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JvA-GK-VEW" userLabel="CurrencyNumerals">
-                                                    <rect key="frame" x="-1" y="41.5" width="167" height="17"/>
+                                                    <rect key="frame" x="-1" y="62.5" width="167" height="17"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="6EL-3G-s7z"/>
                                                     </constraints>
@@ -2264,11 +2264,11 @@ DQ
                                                     </connections>
                                                 </button>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zZA-X1-GCy" userLabel="UsingHotKeyCassette">
-                                                    <rect key="frame" x="-1" y="20.5" width="131" height="17"/>
+                                                    <rect key="frame" x="-1" y="41.5" width="131" height="17"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="D36-2Y-mX5"/>
                                                     </constraints>
-                                                    <buttonCell key="cell" type="check" title="CIN Cassette Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="1ll-Jn-OD5">
+                                                    <buttonCell key="cell" type="check" title="CIN Cassette Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyCassette">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="cellTitle"/>
                                                     </buttonCell>
@@ -2277,16 +2277,29 @@ DQ
                                                     </connections>
                                                 </button>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="g3L-S4-NBx" userLabel="UsingHotKeyCassette">
-                                                    <rect key="frame" x="-1" y="-0.5" width="184" height="17"/>
+                                                    <rect key="frame" x="-1" y="20.5" width="184" height="17"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="MlY-Pc-flb"/>
                                                     </constraints>
-                                                    <buttonCell key="cell" type="check" title="Reverse Lookup (Phonabets)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="1Pn-EV-mui">
+                                                    <buttonCell key="cell" type="check" title="Reverse Lookup (Phonabets)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyRevLookup">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="cellTitle"/>
                                                     </buttonCell>
                                                     <connections>
                                                         <binding destination="32" name="value" keyPath="values.UsingHotKeyRevLookup" id="y9C-ob-Mw2"/>
+                                                    </connections>
+                                                </button>
+                                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SAU-IA-cdf" userLabel="UsingHotKeyCassette">
+                                                    <rect key="frame" x="-1" y="-0.5" width="191" height="17"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="16" id="aIj-Ga-hmJ"/>
+                                                    </constraints>
+                                                    <buttonCell key="cell" type="check" title="CHS / CHT Input Mode Switch" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyInputMode">
+                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                        <font key="font" metaFont="cellTitle"/>
+                                                    </buttonCell>
+                                                    <connections>
+                                                        <binding destination="32" name="value" keyPath="values.UsingHotKeyInputMode" id="C0X-mL-WNo"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -2295,8 +2308,10 @@ DQ
                                                 <integer value="1000"/>
                                                 <integer value="1000"/>
                                                 <integer value="1000"/>
+                                                <integer value="1000"/>
                                             </visibilityPriorities>
                                             <customSpacing>
+                                                <real value="3.4028234663852886e+38"/>
                                                 <real value="3.4028234663852886e+38"/>
                                                 <real value="3.4028234663852886e+38"/>
                                                 <real value="3.4028234663852886e+38"/>

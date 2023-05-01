@@ -1,4 +1,8 @@
 "vChewing" = "威注音输入法";
+"CHS / CHT Input Mode Switch" = "简体/繁体中文输入模式切换";
+"Switch to %@ Input Mode" = "切换至%@输入模式";
+"Target Input Mode Activation Required" = "得启用对应的「輸入法」";
+"You are proceeding to System Preferences to enable the Input Source which corresponds to the input mode you are going to switch to." = "若要使用您想切换到的输入模式，您必须得先在系统偏好设定内启用对应的「輸入法/输入源」。接下来将会弹出对应的系统偏好设定画面。";
 "IMK Candidate Window has been automatically disabled due to its recent crash with force-exposed necessary internal APIs. As an experimental feature, we advise against using IMK Candidate Window in productive environments." = "IMK 选字窗在最近一次存取被强制曝露的必需 API 时令输入法崩溃，所以被自动停用。请勿在生产力场合使用该实验型功能。";
 "Do you want to enable the popup composition buffer for this client?" = "您要對該客體啟用浮動組字窗嗎？";
 "Some client apps may have different compatibility issues in IMKTextInput implementation." = "有些客體應用可能會有不同的 IMKTextInput 實作相容問題。";
