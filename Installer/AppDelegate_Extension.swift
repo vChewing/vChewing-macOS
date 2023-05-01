@@ -165,7 +165,7 @@ extension AppDelegate {
         // 這樣可以尊重某些使用者「僅使用簡體中文」或「僅使用繁體中文」的習慣。
         mainInputSourceEnabled = mainInputSourceEnabled || isActivated
       }
-      if isActivated, !isMonterey { return }
+      if isActivated { return }
       // WARNING: macOS 12 may return false positives, hence forced activation.
       if neta.activate() {
         NSLog("Input method enabled: \(imeIdentifier)")
@@ -184,7 +184,7 @@ extension AppDelegate {
       )
       ntfPostInstall.addButton(withTitle: NSLocalizedString("OK", comment: ""))
     } else {
-      if !mainInputSourceEnabled, !isMonterey {
+      if !mainInputSourceEnabled {
         ntfPostInstall.messageText = NSLocalizedString("Warning", comment: "")
         ntfPostInstall.informativeText = NSLocalizedString(
           "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources.",
