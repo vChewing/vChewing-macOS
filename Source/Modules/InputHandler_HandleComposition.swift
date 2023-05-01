@@ -86,7 +86,11 @@ extension InputHandler {
     // 這裡必須使用 composer.value.isEmpty，因為只有這樣才能真正檢測 composer 是否已經有陰平聲調了。
     composeReading = composeReading || (!composer.isEmpty && confirmCombination)
     // readingKey 不能為空。
-    composeReading = composeReading && !readingKey.isEmpty
+    var isReadingKeyNotEmpty = !readingKey.isEmpty
+    if isComposerUsingPinyin {
+      isReadingKeyNotEmpty = isReadingKeyNotEmpty || !composer.romajiBuffer.isEmpty
+    }
+    composeReading = composeReading && isReadingKeyNotEmpty
     if composeReading {
       if input.isControlHold, input.isCommandHold, input.isEnter,
          !input.isOptionHold, !input.isShiftHold, compositor.isEmpty
