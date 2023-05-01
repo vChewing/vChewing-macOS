@@ -169,6 +169,9 @@ private struct VwrPrefPaneKeyboard_KeyboardShortcuts: View {
   @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeyRevLookup.rawValue)
   private var usingHotKeyRevLookup: Bool
 
+  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeyInputMode.rawValue)
+  private var usingHotKeyInputMode: Bool
+
   // MARK: - Main View
 
   var body: some View {
@@ -211,6 +214,10 @@ private struct VwrPrefPaneKeyboard_KeyboardShortcuts: View {
         Toggle(
           LocalizedStringKey("CIN Cassette Mode"),
           isOn: $usingHotKeyCassette
+        )
+        Toggle(
+          LocalizedStringKey("CHS / CHT Input Mode Switch"),
+          isOn: $usingHotKeyInputMode
         )
       }
     }
