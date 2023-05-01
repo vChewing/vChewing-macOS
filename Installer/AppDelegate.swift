@@ -34,12 +34,6 @@ public let kTargetFullBinPartialPath = urlTargetFullBinPartial.path
 public let kTranslocationRemovalTickInterval: TimeInterval = 0.5
 public let kTranslocationRemovalDeadline: TimeInterval = 60.0
 
-public var isMonterey: Bool {
-  guard #unavailable(macOS 13) else { return false }
-  guard #available(macOS 12, *) else { return false }
-  return true
-}
-
 @NSApplicationMain
 @objc(AppDelegate)
 class AppDelegate: NSWindowController, NSApplicationDelegate {
