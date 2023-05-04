@@ -31,6 +31,11 @@ extension InputHandler {
   private func handlePhonabetComposition(input: InputSignalProtocol) -> Bool? {
     guard let delegate = delegate else { return nil }
 
+    // 威注音不打算支援對「先輸入聲調、後輸入注音」的情況的支援。
+    // 但是對 keyConsumedByReading 的處理得保留。
+    // 不然的話，「敲 Space 叫出選字窗」的功能會失效。
+    // 究其原因，乃是因為威注音所用的鐵恨注拼引擎「有在處理陰平聲調」的緣故。
+    // 對於某些動態注音排列，威注音會依賴包括陰平聲調鍵在內的聲調按鍵做結算判斷。
     var keyConsumedByReading = false
     let skipPhoneticHandling =
       input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
@@ -78,25 +83,18 @@ extension InputHandler {
       }
     }
 
-    let readingKey = composer.getComposition() // 拿取用來進行索引檢索用的注音。
-    // 如果輸入法的辭典索引是漢語拼音的話，要注意上一行拿到的內容得是漢語拼音。
     var composeReading = composer.hasIntonation() && composer.inputValidityCheck(key: input.charCode) // 這裡不需要做排他性判斷。
     // 如果當前的按鍵是 Enter 或 Space 的話，這時就可以取出 composer 內的注音來做檢查了。
     // 來看看詞庫內到底有沒有對應的讀音索引。這裡用了類似「|=」的判斷處理方式。
-    // 這裡必須使用 composer.value.isEmpty，因為只有這樣才能真正檢測 composer 是否已經有陰平聲調了。
     composeReading = composeReading || (!composer.isEmpty && confirmCombination)
-    // readingKey 不能為空。
-    var isReadingKeyNotEmpty = !readingKey.isEmpty
-    if isComposerUsingPinyin {
-      isReadingKeyNotEmpty = isReadingKeyNotEmpty || !composer.romajiBuffer.isEmpty
-    }
-    composeReading = composeReading && isReadingKeyNotEmpty
-    if composeReading {
+    ifComposeReading: if composeReading {
       if input.isControlHold, input.isCommandHold, input.isEnter,
          !input.isOptionHold, !input.isShiftHold, compositor.isEmpty
       {
         return handleEnter(input: input, readingOnly: true)
       }
+      // 拿取用來進行索引檢索用的注音。
+      guard let readingKey = composer.keyForQuery else { break ifComposeReading }
       // 向語言模型詢問是否有對應的記錄。
       if !currentLM.hasUnigramsFor(keyArray: [readingKey]) {
         delegate.callError("B49C0979：語彙庫內無「\(readingKey)」的匹配記錄。")
@@ -168,7 +166,7 @@ extension InputHandler {
     /// 是說此時注拼槽並非為空、卻還沒組音。這種情況下只可能是「注拼槽內只有聲調」。
     /// 但這裡不處理陰平聲調。
     if keyConsumedByReading {
-      if readingKey.isEmpty {
+      if composer.abortConsumption {
         composer.clear()
         return nil
       }
@@ -241,7 +239,9 @@ extension InputHandler {
     // 如果當前的按鍵是 Enter 或 Space 的話，這時就可以取出 calligrapher 內的筆畫來做檢查了。
     // 來看看詞庫內到底有沒有對應的讀音索引。這裡用了類似「|=」的判斷處理方式。
     combineStrokes = combineStrokes || (!calligrapher.isEmpty && confirmCombination)
-    if combineStrokes {
+    ifCombineStrokes: if combineStrokes {
+      // 警告：calligrapher 不能為空，否則組字引擎會炸。
+      guard !calligrapher.isEmpty else { break ifCombineStrokes }
       if input.isControlHold, input.isCommandHold, input.isEnter,
          !input.isOptionHold, !input.isShiftHold, composer.isEmpty
       {
@@ -373,5 +373,34 @@ extension InputHandler {
       isCodePointInputMode = true
       return true
     }
+  }
+}
+
+// MARK: - Private Extensions for Tekkon Composer
+
+// 此處的功能擴充大概只會在威注音輸入法當中用到。
+
+private extension Tekkon.Composer {
+  var isPinyinMode: Bool { parser.rawValue >= 100 }
+  // 拿取用來進行索引檢索用的注音。
+  // 如果輸入法的辭典索引是漢語拼音的話，要注意改這裡、使其拿到的內容是漢語拼音。
+  // 警告：該字串不能為空，否則組字引擎會炸。
+  var keyForQuery: String? {
+    let readingKey = getComposition()
+    var validKeyGeneratable = false
+    switch isPinyinMode {
+    case false:
+      // 威注音不處理「先輸入聲調、後輸入注音」的情形。
+      validKeyGeneratable = !readingKey.isEmpty
+      // 是說改用下面這句的話就可以像小麥注音那樣處理「先輸入聲調、後輸入注音」的情形，
+      // 但這就沒辦法將注音符號單獨鍵入組字區了。
+      // validKeyGeneratable = readingKey.isEmpty ? false : !romajiBuffer.isEmpty
+    case true: validKeyGeneratable = !romajiBuffer.isEmpty
+    }
+    return validKeyGeneratable ? readingKey : nil
+  }
+
+  var abortConsumption: Bool {
+    isPinyinMode ? romajiBuffer.isEmpty : getComposition().isEmpty
   }
 }
