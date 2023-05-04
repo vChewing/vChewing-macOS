@@ -471,7 +471,7 @@ public class InputHandler: InputHandlerProtocol {
     composer.phonabetCombinationCorrectionEnabled = prefs.autoCorrectReadingCombination
   }
 
-  public var isComposerUsingPinyin: Bool { composer.parser.rawValue >= 100 }
+  public var isComposerUsingPinyin: Bool { composer.isPinyinMode }
 
   public func clearComposerAndCalligrapher() {
     calligrapher.removeAll()
