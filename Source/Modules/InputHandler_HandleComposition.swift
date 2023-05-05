@@ -94,7 +94,8 @@ extension InputHandler {
         return handleEnter(input: input, readingOnly: true)
       }
       // 拿取用來進行索引檢索用的注音。這裡先不急著處理「僅有注音符號輸入」的情況。
-      guard let readingKey = composer.phonabetKeyForQuery(pronouncable: true) else { break ifComposeReading }
+      let maybeKey = composer.phonabetKeyForQuery(pronouncable: prefs.acceptLeadingIntonations)
+      guard let readingKey = maybeKey else { break ifComposeReading }
       // 向語言模型詢問是否有對應的記錄。
       if !currentLM.hasUnigramsFor(keyArray: [readingKey]) {
         delegate.callError("B49C0979：語彙庫內無「\(readingKey)」的匹配記錄。")
