@@ -74,7 +74,6 @@ struct VwrPrefPaneOutput: View {
               "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal."
             )
           )
-
           .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
       }

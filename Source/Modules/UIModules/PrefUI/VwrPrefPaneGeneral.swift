@@ -83,7 +83,6 @@ struct VwrPrefPaneGeneral: View {
                 comment: ""
               )
           )
-
           .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth).padding(.bottom, NSFont.systemFontSize)
         }
         SSPreferences.Settings.Section(title: "UI Language:".localized) {
